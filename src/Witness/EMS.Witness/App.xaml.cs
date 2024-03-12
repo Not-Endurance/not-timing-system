@@ -68,18 +68,18 @@ public partial class App : Application
 	{
 
         this.participantsClient.Updated += (sender, args) => this.participantsService.Update(args.entry, args.action);
-        this.participantsClient.ServerConnectionChanged += async (sender, isConnected) => 
+        this.participantsClient.ServerConnectionChanged += async (sender, status) => 
 		{
-			if (isConnected)
+			if (status == RpcConnectionStatus.Connected)
 			{
 				await this.participantsService.Load();
 			}
         };
 
 		this.startlistClient.Updated += (s, a) => this.startlistService.Update(a.entry, a.action);
-        this.startlistClient.ServerConnectionChanged += async (sender, isConnected) =>
+        this.startlistClient.ServerConnectionChanged += async (sender, status) =>
         {
-            if (isConnected)
+            if (status == RpcConnectionStatus.Connected)
             {
                 await this.startlistService.Load();
             }

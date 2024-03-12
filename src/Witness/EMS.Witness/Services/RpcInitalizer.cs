@@ -3,20 +3,20 @@ using Core.Application.Services;
 using Core.ConventionalServices;
 using EMS.Witness.Platforms.Services;
 using EMS.Witness.Shared.Toasts;
+using System.Net;
 using static Core.Application.CoreApplicationConstants;
 
 namespace EMS.Witness.Services;
 
 public class RpcInitalizer : IRpcInitalizer
 {
-    private const string ALEX_HOME_WORKSTATION_IP = "192.168.0.60";
+    private const string ALEX_HOME_WORKSTATION_IP = "localhost";
 
     private readonly IToaster toaster;
     private readonly IHandshakeService _handshakeService;
     private readonly IEnumerable<IRpcClient> rpcClients;
 	private readonly IPermissionsService permissionsService;
 	private readonly WitnessContext context;
-	private bool isHandshaking;
 
 	public RpcInitalizer(
         IHandshakeService handshakeService,
@@ -44,21 +44,21 @@ public class RpcInitalizer : IRpcInitalizer
         }
 		try
 		{
-            this.isHandshaking = true;
-
+            this.context.RaiseIsHandshakingEvent(true);
+#if DEBUG
+			var host = ALEX_HOME_WORKSTATION_IP;
+#else
 			var ip = await _handshakeService.Handshake(Apps.WITNESS, CancellationToken.None);
             if (ip == null)
             {
                 throw new Exception("Server broadcast received, but payload does not contain an IP address");
             }
+#endif
+            this.context.RaiseIsHandshakingEvent(false);
 
             foreach (var client in this.rpcClients.Where(x => !x.IsConnected))
             {
-#if DEBUG
-				await client.Connect(ip); // ALEX_HOME_WORKSTATION_IP
-#else
-				await client.Connect(ip); 
-#endif
+				await client.Connect(host); 
             }
         }
 		catch (Exception exception)
@@ -67,8 +67,7 @@ public class RpcInitalizer : IRpcInitalizer
 		}
 		finally
 		{
-			this.isHandshaking = false;
-			this.context.RaiseIsHandshakingEvent(this.isHandshaking);
+			this.context.RaiseIsHandshakingEvent(false);
 		}
 	}
 

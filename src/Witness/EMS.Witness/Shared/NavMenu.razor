@@ -3,22 +3,26 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
 	<div class="container-fluid">
-		@if (!this.isConnected)
-		{
-			<div class="col-5 navbar-brand">Disconnected...</div>
-		}
-		else
-		{
-			<div class="col-8">
-				<a class="navbar-brand" href="">eWitness</a>
-			</div>
-		}
 		@if (this.isHandshaking)
 		{
 			<div class="col-3">
 				<div class="spinner-border text-danger" role="status">
 					<span class="visually-hidden">Loading...</span>
 				</div>
+			</div>
+		}
+		@if (this.rpcConnectionStatus == RpcConnectionStatus.Connecting)
+		{
+			<div class="col-3">
+				<div class="spinner-border text-warning" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		}
+		@if (this.rpcConnectionStatus == RpcConnectionStatus.Connected)
+		{
+			<div class="col-8">
+				<a class="navbar-brand" href="">eWitness</a>
 			</div>
 		}
 		<div class="col-3">
@@ -49,6 +53,8 @@
 	private IWitnessContext Context { get; set; } = default!;
 	[Inject]
 	private IEnumerable<IRpcClient> RpcClients { get; set; } = default!;
+	[Inject]
+	private IToaster _toaster { get; set; } = default!;
 
 	private bool CollapseNavMenu = true;
 
@@ -60,20 +66,24 @@
 		this.CollapseNavMenu = !this.CollapseNavMenu;
 	}
 
-	private bool isConnected;
-	private bool isHandshaking = true;
+	private RpcConnectionStatus rpcConnectionStatus;
+	private bool isHandshaking;
 
 	protected override void OnInitialized()
 	{
 		foreach (var client in this.RpcClients)
 		{
-			client.ServerConnectionChanged += async (sender, isConnected) =>
+			client.ServerConnectionChanged += async (sender, status) =>
 			{
-				if (this.isConnected != isConnected)
+				if (this.rpcConnectionStatus != status)
 				{
-					this.isConnected = isConnected;
+					this.rpcConnectionStatus = status;
 					await this.InvokeAsync(this.StateHasChanged);
 				}
+			};
+			client.ServerConnectionInfo += (sender, message) =>
+			{
+				_toaster.Add("Rpc connection", message, UiColor.Warning, 10);
 			};
 		}
 		this.Context.IsHandshakingEvent += async (sender, isHandshaking) =>
