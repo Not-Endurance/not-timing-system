@@ -54,8 +54,6 @@ public class Startup
         IWebHostEnvironment env,
         IServiceProvider provider)
     {
-        StaticProvider.Initialize(provider);
-
         if (env.IsDevelopment())
         {
             app.UseMiddleware<ErrorLogger>();

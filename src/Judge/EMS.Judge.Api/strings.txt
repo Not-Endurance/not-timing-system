@@ -1,0 +1,159 @@
+﻿constant-key | english-value | translated-value
+ATHLETE_ENTITY                      | Athlete | Athlete
+ATHLETES_ENTITY                     | Athletes | Athletes
+HORSE_ENTITY                        | Horse | Horse
+HORSES_ENTITY                       | Horses | Horses
+PARTICIPANT_ENTITY                  | Participant | Participant
+PARTICIPANTS_ENTITY                 | Participants | Participants
+PARTICIPATION_ENTITY                | Participation | Participation
+PARTICIPATIONS_ENTITY               | Participations | Participations
+PERFORMANCE_ENTITY                  | Performance | Performance
+PERFORMANCES_ENTITY                 | Performances | Performances
+ENDURANCE_EVENT_ENTITY              | Endurance Event | Endurance Event
+ENDURANCE_EVENTS_ENTITY             | Endurance Events | Endurance Events
+COMPETITION_ENTITY                  | Competition | Competition
+COMPETITIONS_ENTITY                 | Competitions | Competitions
+PERSONNEL_ENTITY                    | Personnel | Personnel
+LAP_ENTITY                          | Lap | Lap
+LAPS_ENTITY                         | Laps | Laps
+COUNTRY_ENTITY                      | Country | Country
+COUNTRIES_ENTITY                    | Countries | Countries
+RESULT_ENTITY                       | Result | Result
+RESULTS_ENTITY                      | Results | Results
+LAP_RECORD_ENTITY                   | Lap Record | Lap Record
+LAP_RECORDS_ENTITY                  | Lap Records | Lap Records
+IMPORT_PAGE                                | Import | Import
+EVENT_PAGE                                 | Event | Event
+MANAGER_PAGE                               | Manager | Manager
+RANK_LIST_PAGE                             | Ranking | Ranking
+HARDWARE_PAGE                              | Hardware | Hardware
+ARRIVAL_TERM                               | ARR | ARR
+INSPECTION_TERM                            | IN | IN
+RE_INSPECTION_TERM                         | ReIN | ReIN
+REQUIRED_INSPECTION_TERM                   | RECINS | RECINS
+COMPULSORY_REQUIRED_INSPECTION_TERM        | CRI | CRI
+NEXT_START_TIME_TERM                       | OUT | OUT
+RECOVERY_SPAN_TERM                         | REC | REC
+TIME_TERM                                  | TIME | TIME
+AVERAGE_SPEED_LOOP_TERM                    | Speed (loop) | Speed (loop)
+AVERAGE_SPEED_PHASE_TERM                   | Speed (phase) | Speed (phase)
+WRITE                                | Add tag | Add tag
+_SAVE                                | _Save | _Save
+UPDATE                              | Update | Update
+REMOVE                              | Remove | Remove
+SEARCH                              | Search | Search
+CLEAR                               | Clear | Clear
+_CREATE                              | _Create | _Create
+_BACK                                | _Back | _Back
+YES                                 | Yes | Yes
+NO                                  | No | No
+RECOVERY_IN_MINUTES_TEXT            | Recovery (min) | Recovery (min)
+LENGTH_IN_KM_TEXT                   | Length (km) | Length (km)
+FINAL                               | Final | Final
+UPDATE_PHASE_TEXT                   | Update Lap | Update Lap
+SELECT_DIRECTORY                    | Select Directory | Select Directory
+SELECT_IMPORT_FILE                  | Select Import File | Select Import File
+NAME                                | Name | Name
+START_TIME                          | Start Time | Start Time
+POPULATED_PLACE                     | Populated Place | Populated Place
+TYPE                                | Type | Type
+ROLE                                | Role | Role
+ORDER                               | Order | Order
+IS_FINAL                            | Is Final {entities-lap} | Is Final {entities-lap}
+RFID_TAGS							| RFID Tags | RFID Tags
+RFID_HEAD_NUMBER                    | Head Tag ID | Head Tag ID
+RFID_NECK_NUMBER                    | Neck Tag ID | Neck Tag ID
+MAX_AVERAGE_SPEED_IN_KMH            | Max Average Speed (km/h) | Max Average Speed (km/h)
+HAS_AVERAGE_SPEED_LIMIT             | Has Average Speed Limit | Has Average Speed Limit
+MAX_RECOVERY_TIME_IN_MINS           | Max Recovery Time (mins) | Max Recovery Time (mins)
+REST_TIME_IN_MINS                   | Rest Time (mins) | Rest Time (mins)
+FEI_ID                              | Fei ID | Fei ID
+FIRST_NAME                          | First Name | First Name
+LAST_NAME                           | Last Name | Last Name
+BREED                               | Breed | Breed
+TRAINER_FEI_ID                      | Trainer FEI ID | Trainer FEI ID
+TRAINER_FIRST_NAME                  | Trainer First | Trainer First Name
+TRAINER_LAST_NAME                   | Trainer Last Name | Trainer Last Name
+IS_STALLION                         | Is Stallion | Is Stallion
+CLUB                                | Club | Club
+MANAGER                             | Manager | Manager
+NUMBER                              | Number or Tag  | Number or Tag
+START                               | Start | Start
+KM                                  | Km | Km
+LENGTH_IN_KM                        | Length | Length
+HOURS_SYMBOL                        | h | h
+KM_PER_HOUR                         | km/h | km/h
+KIDS                                | Kids | Kids
+ADULTS                              | Adults | Adults
+CATEGORY                            | Category | Category
+DQ                                 | DQ | DQ
+FTQ                                | FTQ | FTQ
+RET                                | Ret | Ret
+UPDATE_PERSONNEL                    | Update Personnel | Update Personnel
+_YES                                | _Yes | _Yes
+_NO                                 | _No | _No
+EXPAND                              | Expand | Expand
+COLLAPSE                            | Collapse | Collapse
+REQUIRE_COMPULSORY_INSPECTION       | Require Compulsory Inspection | Require Compulsory Inspection
+_RE_INSPECTION                      | _ReInspection | _ReInspection
+_NUMBER                             | _Number | _Number
+PRINT                               | Print | Print
+EDIT                                | Edit | Edit
+VIEW                                | View | View
+ADD                                 | Add | Add
+ADD_PARTICIPANTS_TO                 | Add Participants to | Add Participants to
+APPLICATION_ERROR                   | Application Error | Application Error
+VALIDATION_MESSAGE                  | Validation Message | Validation Message
+CONFIRMATION                        | Confirmation | Confirmation
+MARE                                | Mare | Mare
+STALLION                            | Stallion | Stallion
+TOTAL                               | Total | Total
+SELECT                              | Select | Select
+GATE                                | Gate | Gate
+RE_QUIRED_INSPECTION                | Re_quired Inspection | Re_quired Inspection
+HAS_STARTED                         | Started | Started
+DISTANCE                            | Distance | Distance
+STARTLIST                           | Startlist | Startlist
+RESET_DETECTED_LISTS                | Reset Detected | Reset Detected
+RECONNECT_HARDWARE                  | Reconnect Hardware | Reconnect Hardware
+INCLUDE_PAST                        | Include Past | Include Past
+IMPORT                              | Import | Import
+_HOUR_SYMBOL                        | _h | _h
+_MINUTE_SYMBOL                      | _m | _m
+_SECOND_SYMBOL                      | _s | _s
+RESULTS_COMPETITION                 | Results Competition | Results Competition
+JURY                                | Jury | Jury
+FEI_TECH_DELEGATE                   | FEI Tech.Delegate | FEI Tech.Delegate
+FEI_VET_DELEGATE                    | FEI Vet.Delegate | FEI Vet.Delegate
+PRESIDENT_VET_COMMITTEE             | Pres. Vet. Comm. | Pres. Vet. Comm.
+_IS_SANDBOX_MODE                                         | _Is Sandbox Mode | _Is Sandbox Mode
+FINAL_LAP_ALREADY_EXISTS_MESSAGE                         | cannot be saved as final. Final {entities-lap} already exists | cannot be saved as final. Final {entities-lap} already exists
+FINAL_LAP_MUST_HAVE_HIGHEST_ORDER_MESSAGE                | cannot be saved as final. Final {entities-lap} must have the highest {words-order-by} | cannot be saved as final. Final {entities-lap} must have the highest {words-order-by}
+LAP_MUST_HAVE_LOWER_ORDER_THAN_FINAL_LAP_MESSAGE         | cannot be saved. A final {entities-lap} already exists with lower {words-order-by} | cannot be saved. A final {entities-lap} already exists with lower {words-order-by}
+CANNOT_REMOVE_USED_IN_PARTICIPANT_MESSAGE                | cannot be removed because it is used in an existing {entities-participant} | cannot be removed because it is used in an existing {entities-participant}
+ALREADY_PARTICIPATING_MESSAGE                            | cannot be created - '{0}' is already participating. | cannot be created - '{0}' is already participating.
+CANNOT_ADD_PARTICIPATION_DIFFERENT_PHASE_COUNT_MESSAGE   | cannot be added, because they already participate in '{0}' with different amount of {entities-lap-plurals}  | cannot be added, because they already participate in '{0}' with different amount of {entities-lap-plurals}
+CANNOT_ADD_PARTICIPATION_DIFFERENT_PHASE_LENGTHS_MESSAGE | cannot be added in '{0}'- they already participate in '{1}' and difference is detected in '{entities-lap} {2}' lengths: '{3}' and '{4} | cannot be added in '{0}'- they already participate in '{1}' and difference is detected in '{entities-lap} {2}' lengths: '{3}' and '{4}
+DATE_TIME_HAS_TO_BE_LATER_MESSAGE                        | invalid '{0}' with '{1}'. Has to be later than '{2}' | : invalid '{0}' with '{1}'. Has to be later than '{2}'
+CANNOT_EDIT_PERFORMANCE_MESSAGE                          | - INVALID edit. Value does not exist for '{0}'. 'Edit' button should only be used to correct errors. Please use '{words-update}' button above when setting Times.  | - INVALID edit. Value does not exist for '{0}'. 'Edit' button should only be used to correct errors. Please use '{words-update}' button above when setting Times.
+IS_REQUIRED_MESSAGE                                      | '{0}' is required. | '{0}' is required.
+NOT_FOUND_MESSAGE                                        | with {0} '{1}' not found | with {0} '{1}' not found
+CHANGE_NOT_ALLOWED_WHEN_EVENT_HAS_STARTED_MESSAGE        | changes are not allowed after {entities-participation-plurals} have started | changes are not allowed after {entities-participation-plurals} have started
+REQUIRED_INSPECTION_IS_NOT_ALLOWED_ON_FINAL_MESSAGE      | CRI is not allowed on Final stage | CRI is not allowed on Final stage
+INVALID_ORDER_BY_MESSAGE                                 | with order '{0}' already exists | with order '{0}' already exists
+INVALID_COMPETITION_NO_FINAL_PHASE_MESSAGE               | {0} has no final {entities-lap} | {0} has no final {entities-lap}
+INVALID_PARTICIPANT_NO_PARTICIPATIONS_MESSAGE            | '{0}' is not included in any {entities-competition} | '{0}' is not included in any {entities-competition}
+INVALID_PARTICIPANT_NO_COUNTRY_MESSAGE                   | '{0}' has no {entities-country} | '{0}' has no {entities-country}
+PARTICIPANT_HAS_NO_ACTIVE_PERFORMANCE_MESSAGE            | '{0}' has no active {entities-performance} | '{0}' has no active {entities-performance}
+INVALID_FULL_NAME_MESSAGE                                | Full Name '{0}' is INVALID. Please use First and Last name | Full Name '{0}' is INVALID. Please use First and Last name
+SELECT_WORK_DIRECTORY_MESSAGE                            | Select working directory using the {words-select-directory} button above. | Select working directory using the {words-select-directory} button above.
+REMOVE_CONFIRMATION_MESSAGE                              | Are you sure you want to remove this item | Are you sure you want to remove this item
+INVALID_DATE_FORMAT_MESSAGE                              | Invalid date: '{0}'. Expected format: '{1}' | Invalid date: '{0}'. Expected format: '{1}'
+UNSUPPORTED_IMPORT_FILE_MESSAGE                          | Unsupported file. Please use '{0}' or '{1}' | Unsupported file. Please use '{0}' or '{1}'
+NOT_FOUND_BY_ID_MESSAGE                                  | with ID '{0}' not found | with ID '{0}' not found
+PARTICIPATION_HAS_ENDED_MESSAGE                          | is complete and could not be updated | is complete and could not be updated
+COMPETITION_CANNOT_START_WITHOUT_PHASES_MESSAGES         | '{0}' cannot start without {entities-lap-plurals} | '{0}' cannot start without {entities-lap-plurals}
+PARTICIPANTS_CANNOT_BE_IMPORTED_MESSAGE                  | cannot be imported - no {entities-horse-plurals} or {entities-athlete-plurals} | cannot be imported - no {entities-horse-plurals} or {entities-athlete-plurals}
+UNEXPECTED_ERROR_MESSAGE                                 | Unexpected error occured. Log file '{0}' has been created. Please contact the developer and send them the file | Unexpected error occured. Log file '{0}' has been created. Please contact the developer and send them the file
+PARTICIPANT_CANNOT_FTQ_WITHOUT_REASON_MESSAGE            | cannot be recorded as '{0}' without a reason | cannot be recorded as '{0}' without a reason
+PARTICIPATION_IS_DISQUALIFIED                            | '{0}' is disqualified | '{0}' is disqualified
