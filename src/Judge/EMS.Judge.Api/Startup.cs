@@ -22,6 +22,7 @@ using EMS.Judge.Api.Rpc.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using static Core.Application.CoreApplicationConstants;
+using Core.Utilities;
 
 namespace EMS.Judge.Api;
 
@@ -53,6 +54,8 @@ public class Startup
         IWebHostEnvironment env,
         IServiceProvider provider)
     {
+        StaticProvider.Initialize(provider);
+
         if (env.IsDevelopment())
         {
             app.UseMiddleware<ErrorLogger>();
@@ -76,6 +79,10 @@ public class Startup
         Task.Run(() => new NetworkBroadcastService(broadcastService).StartAsync(new CancellationToken()));
         // attach event listeners that make RPCs
         provider.GetRequiredService<IEnumerable<IClientRpcService>>();
+
+        Console.WriteLine("================================================");
+        Console.WriteLine("=               JUDGE API running               ");
+        Console.WriteLine("================================================");
     }
 }
 

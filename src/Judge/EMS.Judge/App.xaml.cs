@@ -91,6 +91,6 @@ public partial class App : PrismApplication
 
     private static void StartApi(IServiceProvider provider)
     {
-        CoreEvents.StateLoadedEvent += (_, __) => Task.Run(() => JudgeApi.Start(provider));
+        CoreEvents.StateLoadedEvent += (_, __) => Task.Run(() => Program.StartEmbedded(provider));
     }
 }
