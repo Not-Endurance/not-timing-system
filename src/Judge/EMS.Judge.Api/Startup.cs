@@ -74,6 +74,11 @@ public class Startup
             endpoints.MapHub<ParticipantsHub>($"/{RpcEndpoints.PARTICIPANTS}");
         });
 
+        foreach (var initializer in provider.GetServices<IInitializer>())
+        {
+            initializer.Run();
+        }
+
         var broadcastService = provider.GetRequiredService<INetworkBroadcastService>();
         // TODO: is termination logic necessary. Does not seem so, but should be tested.
         Task.Run(() => new NetworkBroadcastService(broadcastService).StartAsync(new CancellationToken()));
