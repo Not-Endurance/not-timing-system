@@ -1,8 +1,10 @@
-﻿using Core.ConventionalServices;
+﻿using Core.Application.Rpc;
+using Core.ConventionalServices;
 using Core.Services;
-using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Text;
 
 namespace EMS.Judge.Api.Services;
 
@@ -15,31 +17,21 @@ public class RpcClientLogger : IRpcClientLogger
 		_fileService = fileService;
 	}
 
-    public Task Log(string clientId, string message)
+	public void Log(IEnumerable<RpcLog> logs)
 	{
-		InternalLog(clientId, message);
-		return Task.CompletedTask;
-	}
-
-	public Task Log(string clientId, Exception exception)
-	{
-		var message = exception.Message + Environment.NewLine + exception.StackTrace;
-		InternalLog(clientId, message);
-		return Task.CompletedTask;
-	}
-
-	private void InternalLog(string clientId, string message)
-	{
-		message = $"{DateTimeOffset.Now}_{clientId}: {message}";
+		var sb = new StringBuilder();
+		foreach (var log in logs.OrderBy(x => x.DateTime))
+		{
+			sb.AppendLine($"{log.DateTime}_{log.ClientId}: {log.Message}");
+		}
 
 		var dir = $"{Directory.GetCurrentDirectory()}/logs-clients";
 		var path = Path.Combine(dir, "rpc-log.txt");
-		_fileService.Append(path, message);
+		_fileService.Append(path, sb.ToString());
 	}
 }
 
 public interface IRpcClientLogger : ITransientService
 {
-	Task Log(string clientId, string message);
-	Task Log(string clientId, Exception exception);
+	void Log(IEnumerable<RpcLog> logs);
 }
