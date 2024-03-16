@@ -11,7 +11,6 @@ namespace Core.Application.Rpc;
 public class RpcClient : IRpcClient, IAsyncDisposable
 {
 	private const int AUTOMATIC_RECONNECT_ATTEMPTS = 3;
-	private int _reconnectAttempts;
     public event EventHandler<RpcConnectionStatus>? ServerConnectionChanged;
 	public event EventHandler<string>? ServerConnectionInfo;
 	public bool IsConnected => this.Connection?.State == HubConnectionState.Connected;
@@ -21,49 +20,51 @@ public class RpcClient : IRpcClient, IAsyncDisposable
     // Necessary because this.Connection instance is not intialized 
     // when procedures are reigstered in the child constructor
     private List<Action<HubConnection>> procedureRegistrations = new();
-	private CancellationTokenSource reconnectTokenSource;
+	private CancellationTokenSource? reconnectTokenSource;
+	private readonly string _name;
 
     public RpcClient(RpcContext context)
     {
         this.context = context;
-        this.reconnectTokenSource = new CancellationTokenSource();
+		_name = GetType().Name;
     }
     
     protected HubConnection? Connection { get; private set; }
 
     public virtual async Task Connect(string host)
     {
-		_reconnectAttempts = 0;
-        await InternalConnect(host);
+        await InternalConnect(host, 0);
 	}
 
-	private async Task InternalConnect(string host)
+	private async Task InternalConnect(string host, int reconnectAttempts)
 	{
-        if (this.reconnectTokenSource.IsCancellationRequested)
-        {
-            this.reconnectTokenSource = new CancellationTokenSource();
-        }
+		if (IsConnected)
+		{
+			ServerConnectionInfo?.Invoke(this, $"{this.GetType().Name} is already connected");
+			return;
+		}
         if (this.Connection == null)
         {
             this.ConfigureConnection(host);
         }
-        RaiseConnecting();
         try
         {
-            await this.Connection!.StartAsync();
+			this.reconnectTokenSource = new CancellationTokenSource();
+			RaiseConnecting();
+			await this.Connection!.StartAsync();
             this.RaiseConnected();
         }
         catch (Exception ex)
         {
-            this.RaiseError(ex, this.context.Url);
-            RaiseDisconnected(ex);
-            if (_reconnectAttempts < AUTOMATIC_RECONNECT_ATTEMPTS)
+			if (HasReachedReconnectionAttemptLimit(++reconnectAttempts))
             {
-                _reconnectAttempts++;
-                await InternalConnect(host);
+				RaiseDisconnected(ex);
+				return;
             }
-        }
-    }
+			await Task.Delay(TimeSpan.FromSeconds(5));
+			await InternalConnect(host, reconnectAttempts);
+		}
+	}
 
     private void ConfigureConnection(string host)
     {
@@ -73,7 +74,7 @@ public class RpcClient : IRpcClient, IAsyncDisposable
             .Build();
         this.Connection.Closed += ex =>
         {
-            this.BeginReconnecting(this.reconnectTokenSource.Token, ex);
+            this.BeginReconnecting(this.reconnectTokenSource!.Token, ex);
             return Task.CompletedTask;
         };
         foreach (var registerProcedure in procedureRegistrations)
@@ -88,7 +89,8 @@ public class RpcClient : IRpcClient, IAsyncDisposable
         {
             return;
         }
-		this.reconnectTokenSource.Cancel();
+		this.reconnectTokenSource!.Cancel();
+		reconnectTokenSource!.Dispose();
         await this.Connection.StopAsync();
     }
 
@@ -99,7 +101,7 @@ public class RpcClient : IRpcClient, IAsyncDisposable
             return;
         }
         await this.Connection.DisposeAsync();
-		this.reconnectTokenSource.Dispose();
+		this.reconnectTokenSource?.Dispose();
     }
 
 	protected void AddProcedure(string name, Func<Task> action)
@@ -228,7 +230,8 @@ public class RpcClient : IRpcClient, IAsyncDisposable
     {
 		this.RaiseDisconnected(error);
 		RaiseConnecting();
-        var timer = new System.Timers.Timer(TimeSpan.FromSeconds(5).TotalMilliseconds);
+		var reconnectAttempts = 0;
+		var timer = new System.Timers.Timer(TimeSpan.FromSeconds(10).TotalMilliseconds);
         timer.Elapsed += async (s, e) =>
         {
             if (cancellationToken.IsCancellationRequested)
@@ -249,26 +252,43 @@ public class RpcClient : IRpcClient, IAsyncDisposable
             }
             catch (Exception ex) 
 			{
-				ServerConnectionInfo?.Invoke(this, $"Reconnect attempt failed: {ex.Message}");
+				RaiseReconnecting(ex);
+			}
+			finally
+			{
+				if (HasReachedReconnectionAttemptLimit(++reconnectAttempts))
+				{
+					RaiseDisconnected(new Exception("Automatic reconnection reached attempt limits. Try to reconnect manually"));
+					timer.Stop();
+					timer.Dispose();
+				}
 			}
         };
         timer.Start();
     }
 
+	private bool HasReachedReconnectionAttemptLimit(int attempts)
+	{
+		return attempts >= AUTOMATIC_RECONNECT_ATTEMPTS;
+	}
+
 	private void RaiseDisconnected(Exception? ex = default)
 	{
-		ServerConnectionChanged?.Invoke(this, RpcConnectionStatus.Disconnected);
-		ServerConnectionInfo?.Invoke(this, ex?.Message ?? "Disconnected manually");
+		ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Disconnected);
+		ServerConnectionInfo?.Invoke(_name, ex?.Message ?? "Disconnected manually");
 	}
+	private void RaiseReconnecting(Exception ex)
+	{
+		ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connecting);
+        ServerConnectionInfo?.Invoke(_name, $"{ex.Message}. Attempting to reconnect");
+    }
 	private void RaiseConnecting()
 	{
-		ServerConnectionChanged?.Invoke(this, RpcConnectionStatus.Connecting);
-        ServerConnectionInfo?.Invoke(this, "Attempting to connect");
+		ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connecting);
     }
 	private void RaiseConnected()
 	{
-		ServerConnectionChanged?.Invoke(this, RpcConnectionStatus.Connected);
-        ServerConnectionInfo?.Invoke(this, "Connected");
+		ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connected);
     }
 }
 

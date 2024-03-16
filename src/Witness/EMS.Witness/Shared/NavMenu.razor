@@ -25,6 +25,10 @@
 				<a class="navbar-brand" href="">eWitness</a>
 			</div>
 		}
+		@if (!isHandshaking && rpcConnectionStatus == RpcConnectionStatus.Disconnected)
+		{
+			<button class="btn btn-warning" @onclick="_rpcInitializer.StartConnections">Reconnect</button>
+		}
 		<div class="col-3">
 			<button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
 				<span class="navbar-toggler-icon"></span>
@@ -83,9 +87,9 @@
 					await this.InvokeAsync(this.StateHasChanged);
 				}
 			};
-			client.ServerConnectionInfo += (sender, message) =>
+			client.ServerConnectionInfo += (senderName, message) =>
 			{
-				_toaster.Add("Rpc connection", message, UiColor.Warning, 10);
+				_toaster.Add(senderName!.ToString(), message, UiColor.Warning, 10);
 			};
 		}
 		this.Context.IsHandshakingEvent += async (sender, isHandshaking) =>
