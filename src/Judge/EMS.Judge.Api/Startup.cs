@@ -70,6 +70,7 @@ public class Startup
             endpoints.MapHub<StartlistHub>($"/{RpcEndpoints.STARTLIST}");
             endpoints.MapHub<WitnessEventsHub>($"/{RpcEndpoints.WITNESS_EVENTS}");
             endpoints.MapHub<ParticipantsHub>($"/{RpcEndpoints.PARTICIPANTS}");
+            endpoints.MapHub<LoggingHub>($"/{RpcEndpoints.LOGGING}");
         });
 
         foreach (var initializer in provider.GetServices<IInitializer>())
@@ -100,7 +101,8 @@ public static class ApiServices
         services
             .AddTransient<ErrorLogger, ErrorLogger>()
             .AddTransient<IStartlistService, StartlistService>()
-            .AddTransient<IWitnessEventService, WitnessEventService>();
+            .AddTransient<IWitnessEventService, WitnessEventService>()
+            .AddHostedService<LoggingHub.Service>();
 
         return services;
     }

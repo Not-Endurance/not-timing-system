@@ -1,5 +1,4 @@
 ﻿using Core.Application.Rpc.Procedures;
-using Core.Application.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,9 @@ namespace Core.Application.Rpc;
 
 public class RpcClient : IRpcClient, IAsyncDisposable
 {
-    public event EventHandler<bool>? ServerConnectionChanged;
+	private const int AUTOMATIC_RECONNECT_ATTEMPTS = 3;
+    public event EventHandler<RpcConnectionStatus>? ServerConnectionChanged;
+	public event EventHandler<string>? ServerConnectionInfo;
 	public bool IsConnected => this.Connection?.State == HubConnectionState.Connected;
 
     private readonly RpcContext context;
@@ -19,46 +20,61 @@ public class RpcClient : IRpcClient, IAsyncDisposable
     // Necessary because this.Connection instance is not intialized 
     // when procedures are reigstered in the child constructor
     private List<Action<HubConnection>> procedureRegistrations = new();
-	private CancellationTokenSource reconnectTokenSource;
+	private CancellationTokenSource? reconnectTokenSource;
+	private readonly string _name;
 
     public RpcClient(RpcContext context)
     {
         this.context = context;
-        this.reconnectTokenSource = new CancellationTokenSource();
+		_name = GetType().Name;
     }
     
     protected HubConnection? Connection { get; private set; }
 
-    public virtual async Task Connect(IPAddress ip)
+    public virtual async Task Connect(string host)
     {
-        if (this.reconnectTokenSource.IsCancellationRequested)
-        {
-            this.reconnectTokenSource = new CancellationTokenSource();
-        }
+        await InternalConnect(host, 0);
+	}
+
+	private async Task InternalConnect(string host, int reconnectAttempts)
+	{
+		if (IsConnected)
+		{
+			ServerConnectionInfo?.Invoke(this, $"{this.GetType().Name} is already connected");
+			return;
+		}
         if (this.Connection == null)
         {
-			this.ConfigureConnection(ip);
+            this.ConfigureConnection(host);
         }
         try
-		{
+        {
+			this.reconnectTokenSource = new CancellationTokenSource();
+			RaiseConnecting();
 			await this.Connection!.StartAsync();
-			this.RaiseConnected();
-		}
+            this.RaiseConnected();
+        }
         catch (Exception ex)
-		{
-			this.RaiseError(ex, this.context.Url);
+        {
+			if (HasReachedReconnectionAttemptLimit(++reconnectAttempts))
+            {
+				RaiseDisconnected(ex);
+				return;
+            }
+			await Task.Delay(TimeSpan.FromSeconds(5));
+			await InternalConnect(host, reconnectAttempts);
 		}
-    }
+	}
 
-    private void ConfigureConnection(IPAddress ip)
+    private void ConfigureConnection(string host)
     {
-		context.Host = ip.ToString();
+		context.Host = host;
         this.Connection = new HubConnectionBuilder()
             .WithUrl(this.context.Url)
             .Build();
         this.Connection.Closed += ex =>
         {
-            this.BeginReconnecting(this.reconnectTokenSource.Token);
+            this.BeginReconnecting(this.reconnectTokenSource!.Token, ex);
             return Task.CompletedTask;
         };
         foreach (var registerProcedure in procedureRegistrations)
@@ -73,7 +89,8 @@ public class RpcClient : IRpcClient, IAsyncDisposable
         {
             return;
         }
-		this.reconnectTokenSource.Cancel();
+		this.reconnectTokenSource!.Cancel();
+		reconnectTokenSource!.Dispose();
         await this.Connection.StopAsync();
     }
 
@@ -84,7 +101,7 @@ public class RpcClient : IRpcClient, IAsyncDisposable
             return;
         }
         await this.Connection.DisposeAsync();
-		this.reconnectTokenSource.Dispose();
+		this.reconnectTokenSource?.Dispose();
     }
 
 	protected void AddProcedure(string name, Func<Task> action)
@@ -209,14 +226,17 @@ public class RpcClient : IRpcClient, IAsyncDisposable
         this.Error?.Invoke(this, error);
     }
 
-    private void BeginReconnecting(CancellationToken cancellationToken)
+    private void BeginReconnecting(CancellationToken cancellationToken, Exception? error)
     {
-		this.RaiseDisconnected();
-        var timer = new System.Timers.Timer(TimeSpan.FromSeconds(5).TotalMilliseconds);
+		this.RaiseDisconnected(error);
+		RaiseConnecting();
+		var reconnectAttempts = 0;
+		var timer = new System.Timers.Timer(TimeSpan.FromSeconds(10).TotalMilliseconds);
         timer.Elapsed += async (s, e) =>
         {
             if (cancellationToken.IsCancellationRequested)
             {
+				ServerConnectionInfo?.Invoke(this, "Reconecting stopped due to cancelation request");
                 timer.Stop();
                 timer.Dispose();
             }
@@ -230,20 +250,46 @@ public class RpcClient : IRpcClient, IAsyncDisposable
                     timer.Dispose();
                 }
             }
-            catch (Exception) { }
+            catch (Exception ex) 
+			{
+				RaiseReconnecting(ex);
+			}
+			finally
+			{
+				if (HasReachedReconnectionAttemptLimit(++reconnectAttempts))
+				{
+					RaiseDisconnected(new Exception("Automatic reconnection reached attempt limits. Try to reconnect manually"));
+					timer.Stop();
+					timer.Dispose();
+				}
+			}
         };
         timer.Start();
     }
 
-	private void RaiseDisconnected()
+	private bool HasReachedReconnectionAttemptLimit(int attempts)
 	{
-		ServerConnectionChanged?.Invoke(this, false);
+		return attempts >= AUTOMATIC_RECONNECT_ATTEMPTS;
 	}
 
+	private void RaiseDisconnected(Exception? ex = default)
+	{
+		ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Disconnected);
+		ServerConnectionInfo?.Invoke(_name, ex?.Message ?? "Disconnected manually");
+	}
+	private void RaiseReconnecting(Exception ex)
+	{
+		ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connecting);
+        ServerConnectionInfo?.Invoke(_name, $"{ex.Message}. Attempting to reconnect");
+    }
+	private void RaiseConnecting()
+	{
+		ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connecting);
+    }
 	private void RaiseConnected()
 	{
-		ServerConnectionChanged?.Invoke(this, true);
-	}
+		ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connected);
+    }
 }
 
 public interface IRpcClient
@@ -251,9 +297,17 @@ public interface IRpcClient
 	/// <summary>
 	/// 'true' means connected; 'false' - disconnected;
 	/// </summary>
-	event EventHandler<bool>? ServerConnectionChanged;
+	event EventHandler<RpcConnectionStatus>? ServerConnectionChanged;
+	event EventHandler<string>? ServerConnectionInfo;
 	event EventHandler<RpcError>? Error;
 	bool IsConnected { get; }
-	Task Connect(IPAddress ip);
+	Task Connect(string host);
     Task Disconnect();
+}
+
+public enum RpcConnectionStatus
+{
+	Disconnected = 0,
+	Connecting = 1,
+	Connected = 2,
 }
