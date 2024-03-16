@@ -55,6 +55,8 @@
 	private IEnumerable<IRpcClient> RpcClients { get; set; } = default!;
 	[Inject]
 	private IToaster _toaster { get; set; } = default!;
+	[Inject]
+	private IRpcInitalizer _rpcInitializer { get; set; } = default!;
 
 	private bool CollapseNavMenu = true;
 
@@ -69,7 +71,7 @@
 	private RpcConnectionStatus rpcConnectionStatus;
 	private bool isHandshaking;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		foreach (var client in this.RpcClients)
 		{
@@ -94,5 +96,7 @@
 				await this.InvokeAsync(this.StateHasChanged);
 			}
 		};
+		await _rpcInitializer.StartConnections();
+		_toaster.Add("NavMenu initialized", "You should only see this once!", UiColor.Warning, 15);
 	}
 }

@@ -47,7 +47,6 @@ public partial class App : Application
 
 		window.Created += async (s, e) =>
 		{
-			await this.rpcService.StartConnections();
 			await this.persistence.Restore();
 		};
 		window.Resumed += (s, e) =>

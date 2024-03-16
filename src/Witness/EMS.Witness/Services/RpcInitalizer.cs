@@ -3,21 +3,20 @@ using Core.Application.Services;
 using Core.ConventionalServices;
 using EMS.Witness.Platforms.Services;
 using EMS.Witness.Shared.Toasts;
-using System.Net;
 using static Core.Application.CoreApplicationConstants;
 
 namespace EMS.Witness.Services;
 
 public class RpcInitalizer : IRpcInitalizer
 {
-    private const string ALEX_HOME_WORKSTATION_IP = "localhost";
+    private const string ALEX_HOME_WORKSTATION_IP = "localhost"; // DO NOT DELETE 
 
     private readonly IToaster toaster;
     private readonly IHandshakeService _handshakeService;
     private readonly IEnumerable<IRpcClient> rpcClients;
 	private readonly IPermissionsService permissionsService;
 	private readonly WitnessContext context;
-
+	
 	public RpcInitalizer(
         IHandshakeService handshakeService,
         IWitnessContext context,
@@ -34,41 +33,50 @@ public class RpcInitalizer : IRpcInitalizer
 
     public async Task StartConnections()
 	{
-		if (!await this.permissionsService.HasNetworkPermissions())
-		{
-            this.toaster.Add(
-                "Network permission rejected",
-                "eWitness app cannot operate without Network permissions. Grant permissions in device settings.",
-                UiColor.Danger);
-			return;
-        }
 		try
 		{
-            this.context.RaiseIsHandshakingEvent(true);
-#if DEBUG
-			var host = ALEX_HOME_WORKSTATION_IP;
-#else
-			var ip = await _handshakeService.Handshake(Apps.WITNESS, CancellationToken.None);
-            if (ip == null)
-            {
-                throw new Exception("Server broadcast received, but payload does not contain an IP address");
-            }
-#endif
-            this.context.RaiseIsHandshakingEvent(false);
+			if (!await this.permissionsService.HasNetworkPermissions())
+			{
+				this.toaster.Add(
+					"Network permission rejected",
+					"eWitness app cannot operate without Network permissions. Grant permissions in device settings.",
+					UiColor.Danger);
+				return;
+			}
+			if (this.rpcClients.All(x => x.IsConnected))
+			{
+				return;
+			}
 
-            foreach (var client in this.rpcClients.Where(x => !x.IsConnected))
-            {
-				await client.Connect(host); 
-            }
-        }
+			var host = await Handshake();
+			foreach (var client in this.rpcClients.Where(x => !x.IsConnected))
+			{
+				await client.Connect(host);
+			}
+		}
 		catch (Exception exception)
 		{
 			this.ToastError(exception);
 		}
-		finally
+	}
+
+	private async Task<string> Handshake()
+	{
+#if RELEASE
+		return ALEX_HOME_WORKSTATION_IP;
+#else
+		this.context.RaiseIsHandshakingEvent(true);
+
+		var hostIp = await _handshakeService.Handshake(Apps.WITNESS, CancellationToken.None);
+		if (hostIp == null)
 		{
 			this.context.RaiseIsHandshakingEvent(false);
+			throw new Exception("Server broadcast received, but payload does not contain an IP address");
 		}
+		
+		this.context.RaiseIsHandshakingEvent(false);
+		return hostIp.ToString();
+#endif
 	}
 
 	private void ToastError(Exception exception)

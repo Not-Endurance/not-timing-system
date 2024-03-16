@@ -10,6 +10,8 @@ namespace Core.Application.Rpc;
 
 public class RpcClient : IRpcClient, IAsyncDisposable
 {
+	private const int AUTOMATIC_RECONNECT_ATTEMPTS = 3;
+	private int _reconnectAttempts;
     public event EventHandler<RpcConnectionStatus>? ServerConnectionChanged;
 	public event EventHandler<string>? ServerConnectionInfo;
 	public bool IsConnected => this.Connection?.State == HubConnectionState.Connected;
@@ -31,27 +33,37 @@ public class RpcClient : IRpcClient, IAsyncDisposable
 
     public virtual async Task Connect(string host)
     {
+		_reconnectAttempts = 0;
+        await InternalConnect(host);
+	}
+
+	private async Task InternalConnect(string host)
+	{
         if (this.reconnectTokenSource.IsCancellationRequested)
         {
             this.reconnectTokenSource = new CancellationTokenSource();
         }
         if (this.Connection == null)
         {
-			this.ConfigureConnection(host);
+            this.ConfigureConnection(host);
         }
-		RaiseConnecting();
+        RaiseConnecting();
         try
-		{
-			await this.Connection!.StartAsync();
-			this.RaiseConnected();
-		}
+        {
+            await this.Connection!.StartAsync();
+            this.RaiseConnected();
+        }
         catch (Exception ex)
-		{
-			this.RaiseError(ex, this.context.Url);
-			RaiseDisconnected(ex);
-			await Connect(host);
-		}
-	}
+        {
+            this.RaiseError(ex, this.context.Url);
+            RaiseDisconnected(ex);
+            if (_reconnectAttempts < AUTOMATIC_RECONNECT_ATTEMPTS)
+            {
+                _reconnectAttempts++;
+                await InternalConnect(host);
+            }
+        }
+    }
 
     private void ConfigureConnection(string host)
     {
