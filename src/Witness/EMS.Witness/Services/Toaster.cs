@@ -8,6 +8,7 @@ public class Toaster : IToaster, INotificationService, IDisposable
 {
     private readonly List<Toast> toastList = new();
     private readonly System.Timers.Timer timer = new();
+    private object lockObject = new();
 
     public Toaster()
     {
@@ -33,7 +34,7 @@ public class Toaster : IToaster, INotificationService, IDisposable
         return this.toastList.ToList();
     }
 
-    public void Add(string header, string? message, UiColor color, int seconds = 10)
+    public void Add(string header, string? message, UiColor color, int seconds = 11)
     {
         var toast = new Toast(header, message, color, seconds);
         this.Add(toast);
@@ -77,8 +78,11 @@ public class Toaster : IToaster, INotificationService, IDisposable
             return false;
         }
         
-        toastsToDelete.ForEach(toast => this.toastList.Remove(toast));
-        this.ToasterChanged?.Invoke(this, EventArgs.Empty);
+        lock(lockObject)
+        {
+			toastsToDelete.ForEach(toast => this.toastList.Remove(toast));
+		}
+		this.ToasterChanged?.Invoke(this, EventArgs.Empty);
         return true;
     }
 
