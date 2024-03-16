@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Core.Application.Rpc.Procedures;
 
 public interface ILoggingHubProcedures
-{
-	Task Log(string clientId, string message);
-	Task LogError(string clientId, Exception exception);
+{ 
+	Task ReceiveLog(RpcLog log);
 }
