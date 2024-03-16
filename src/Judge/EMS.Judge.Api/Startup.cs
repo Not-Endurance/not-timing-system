@@ -101,8 +101,7 @@ public static class ApiServices
         services
             .AddTransient<ErrorLogger, ErrorLogger>()
             .AddTransient<IStartlistService, StartlistService>()
-            .AddTransient<IWitnessEventService, WitnessEventService>()
-            .AddHostedService<LoggingHub.Service>();
+            .AddTransient<IWitnessEventService, WitnessEventService>();
 
         return services;
     }
