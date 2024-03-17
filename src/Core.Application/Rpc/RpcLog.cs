@@ -2,7 +2,7 @@
 
 namespace Core.Application.Rpc;
 
-public readonly struct RpcLog
+public struct RpcLog
 {
 	public RpcLog(string clientId, string message)
     {
@@ -15,7 +15,7 @@ public readonly struct RpcLog
     {
     }
 
-    public string ClientId { get; }
-    public string Message { get; }
-    public DateTimeOffset DateTime { get; }
+    public string ClientId { get; private set; }
+    public string Message { get; private set; }
+    public DateTimeOffset DateTime { get; private set; }
 }
