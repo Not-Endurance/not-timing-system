@@ -1,4 +1,5 @@
 ﻿using Core.Application.Rpc.Procedures;
+using Core.Domain.AggregateRoots.Manager.Aggregates.Startlists;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
@@ -90,13 +91,20 @@ public class RpcClient : IRpcClient, IAsyncDisposable
 
 	private void ConfigureConnection(string host)
 	{
+		var reconnectionAttempts = 0;
 		context.Host = host;
 		this.Connection = new HubConnectionBuilder()
 			.WithUrl(this.context.Url)
 			.Build();
 		this.Connection.Closed += ex =>
 		{
-			this.BeginReconnecting(this.reconnectTokenSource!.Token, ex);
+			// This check is also necessary here, because if the server hub cannot be constructed (DI error for example)
+			// SignalR keeps closing each connection to that hub as soon as it is created
+			// Maybe test again with static connection?
+			if (!HasReachedReconnectionAttemptLimit(++reconnectionAttempts))
+			{
+				this.BeginReconnecting(this.reconnectTokenSource!.Token, ex);
+			}
 			return Task.CompletedTask;
 		};
 		foreach (var registerProcedure in procedureRegistrations)

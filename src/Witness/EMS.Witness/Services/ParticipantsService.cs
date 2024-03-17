@@ -55,9 +55,15 @@ public class ParticipantsService : IParticipantsService
         var result = await this.participantsClient.Load();
         if (result.IsSuccessful)
         {
-            var (eventId, participants) = result.Data;
+            //var (eventId, participants) = result.Data;
+            var eventId = result.Data!.EventId;
+            var participants = result.Data.Participants;
+            if (eventId == default || participants == default)
+            {
+                return;
+            }
 			this.Participants.Clear();
-			this.Participants.AddRange(participants);
+			this.Participants.AddRange(participants!);
             if (!state.EventId.HasValue)
             {
                 state.EventId = eventId;

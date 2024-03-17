@@ -30,6 +30,7 @@
 		{
 			<button class="btn btn-warning" @onclick="_rpcInitializer.StartConnections">Reconnect</button>
 		}
+		<button class="btn btn-primary" @onclick="() => _participantsService.Load()"></button>
 		<div class="col-3">
 			<button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
 				<span class="navbar-toggler-icon"></span>
@@ -62,6 +63,8 @@
 	private IToaster _toaster { get; set; } = default!;
 	[Inject]
 	private IRpcInitalizer _rpcInitializer { get; set; } = default!;
+	[Inject]
+	private IParticipantsService _participantsService { get; set; } = default!;
 
 	private bool CollapseNavMenu = true;
 

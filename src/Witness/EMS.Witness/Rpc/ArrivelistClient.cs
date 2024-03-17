@@ -24,9 +24,9 @@ public class ParticipantsClient: RpcClient, IParticipantsClient, IParticipantsCl
         return Task.CompletedTask;
     }
 
-    public async Task<RpcInvokeResult<(int eventId, IEnumerable<ParticipantEntry> participants)>> Load()
+    public async Task<RpcInvokeResult<ParticipantsPayload>> Load()
 	{
-		return await this.InvokeHubProcedure<(int, IEnumerable<ParticipantEntry>)>(nameof(IParticipantstHubProcedures.Get));
+		return await this.InvokeHubProcedure<ParticipantsPayload>(nameof(IParticipantstHubProcedures.Get));
 	}
 
     public async Task<RpcInvokeResult> Send(IEnumerable<ParticipantEntry> entries, WitnessEventType type)
@@ -38,6 +38,6 @@ public class ParticipantsClient: RpcClient, IParticipantsClient, IParticipantsCl
 public interface IParticipantsClient : IRpcClient
 {
 	event EventHandler<(ParticipantEntry entry, CollectionAction action)>? Updated;
-	Task<RpcInvokeResult<(int eventId, IEnumerable<ParticipantEntry> participants)>> Load();
+	Task<RpcInvokeResult<ParticipantsPayload>> Load();
 	Task<RpcInvokeResult> Send(IEnumerable<ParticipantEntry> entries, WitnessEventType type);
 }

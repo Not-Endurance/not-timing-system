@@ -72,16 +72,17 @@ public class Toaster : IToaster, INotificationService, IDisposable
 
     private bool ClearBurntToast()
     {
-        var toastsToDelete = this.toastList.Where(item => item.IsBurnt).ToList();
-        if (!toastsToDelete.Any())
+        var toastsToDelete = new List<Toast>();
+        lock (lockObject)
+        {
+			toastsToDelete = this.toastList.Where(item => item.IsBurnt).ToList();
+		}
+		if (!toastsToDelete.Any())
         {
             return false;
         }
         
-        lock(lockObject)
-        {
-			toastsToDelete.ForEach(toast => this.toastList.Remove(toast));
-		}
+		toastsToDelete.ForEach(toast => this.toastList.Remove(toast));
 		this.ToasterChanged?.Invoke(this, EventArgs.Empty);
         return true;
     }
