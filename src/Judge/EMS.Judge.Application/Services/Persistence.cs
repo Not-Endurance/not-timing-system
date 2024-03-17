@@ -8,6 +8,7 @@ using EMS.Judge.Application.Models;
 using EMS.Judge.Application.State;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace EMS.Judge.Application.Services;
 
@@ -71,6 +72,8 @@ public class Persistence : IPersistence
         this.StateDirectoryPath = directoryPath;
         var database = this.GetFilePath();
         var sandboxDatabase = this.GetSandBoxFilePath();
+        Console.WriteLine($"database: {database}");
+        Console.WriteLine($"database exists: {this.file.Exists(database)}");
         if (this.settings.IsSandboxMode && this.file.Exists(sandboxDatabase))
         {
             this.LoadState(sandboxDatabase);
@@ -99,7 +102,9 @@ public class Persistence : IPersistence
     private void LoadState(string path)
     {
         var contents = this.file.Read(path);
+        Console.WriteLine($"Dabase contentns: {contents}");
         var state = this.serialization.Deserialize<StateModel>(contents);
+        Console.WriteLine($"Deserialized event: {state.Event?.Id}");
         this.stateSetter.Set(state);
         CoreEvents.RaiseStateLoaded();
     }
@@ -113,7 +118,7 @@ public class Persistence : IPersistence
         => $"{this.StateDirectoryPath}\\{SANDBOX_STORAGE_FILE_NAME}";
 
     private string GetFilePath()
-        => $"{this.StateDirectoryPath}\\{STORAGE_FILE_NAME}";
+        => $"{this.StateDirectoryPath}/{STORAGE_FILE_NAME}";
 }
 
 

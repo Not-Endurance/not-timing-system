@@ -21,6 +21,7 @@ public class StartlistHub : Hub<IStartlistClientProcedures>, IStartlistHubProced
 		
 	public Dictionary<int, Startlist> Get()
 	{
+		return new Dictionary<int, Startlist>();
 		var startlist = this.managerRoot.GetStartList();
 		return startlist;
 	}
