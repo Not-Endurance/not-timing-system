@@ -84,8 +84,6 @@ public class Startup
         Task.Run(() => new NetworkBroadcastService(broadcastService).StartAsync(new CancellationToken()));
         // attach event listeners that make RPCs
         provider.GetRequiredService<IEnumerable<IClientRpcService>>();
-        var persistance = provider.GetRequiredService<IPersistence>();
-        persistance.Configure("../../../../event-archive/2023-10_asenovgrad");
 
         Console.WriteLine("================================================");
         Console.WriteLine("=               JUDGE API running               ");

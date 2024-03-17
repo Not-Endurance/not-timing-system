@@ -62,6 +62,10 @@ public class Persistence : IPersistence
 
     public PersistenceResult Configure(string directoryPath)
     {
+        if (this.stateSetter.Event != null) 
+        {
+            return PersistenceResult.Existing;
+        }
         this.StateDirectoryPath = directoryPath;
         var database = this.GetFilePath();
         var sandboxDatabase = this.GetSandBoxFilePath();
@@ -113,6 +117,6 @@ public interface IPersistence : ISingletonService
 	string StateDirectoryPath { get; }
 	void SaveState();
     void LogStatistics(string text);
-    string LogError(string message, string stackTrace);
+    string LogError(string message, string stackTrace); 
     PersistenceResult Configure(string directoryPath);
 }

@@ -39,18 +39,20 @@ public static class Program
                 .AddCore(assemblies)
                 .AddDomain(assemblies)
                 .AddCoreApplication(assemblies)
-                .AddJudgeApplication(assemblies);
+                .AddJudgeApplication(assemblies)
+                .AddTransient<INotificationService, NotificationMock>()
+                .AddSingleton<ISettings, SettingsMock>();
 
 #pragma warning disable ASP0000 // Used to simulate how services work in StartEmbedded
             services
-                .AddTransient<INotificationService, NotificationMock>()
-                .AddSingleton<ISettings, SettingsMock>()
                 .AddSingleton<IJudgeServiceProvider>(new JudgeServiceProvider(judgeServices.BuildServiceProvider()))
                 .AddCore(assemblies)
                 .AddDomain(assemblies)
                 .AddCoreApplication(assemblies)
                 .AddJudgeApplication(assemblies)
-                .AddInitializers(assemblies);
+                .AddInitializers(assemblies)
+                .AddTransient<INotificationService, NotificationMock>()
+                .AddSingleton<ISettings, SettingsMock>();
 #pragma warning restore ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
         });
     }

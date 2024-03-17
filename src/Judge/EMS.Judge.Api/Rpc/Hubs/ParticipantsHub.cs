@@ -2,8 +2,10 @@
 using Core.Domain.AggregateRoots.Manager;
 using Core.Domain.AggregateRoots.Manager.Aggregates.Participants;
 using EMS.Judge.Api.Configuration;
+using EMS.Judge.Application.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -16,10 +18,15 @@ public class ParticipantsHub : Hub<IParticipantsClientProcedures>, IParticipants
     public ParticipantsHub(IJudgeServiceProvider provider)
     {
         this.managerRoot = provider.GetRequiredService<ManagerRoot>();
+        var persistence = provider.GetRequiredService<IPersistence>();
+        Console.WriteLine("Restoring state");
+        persistence.Configure("../../../../event-archive/2023-10_asenovgrad");
+        Console.WriteLine("Restored state!");
     }
 
     public (int eventId, IEnumerable<ParticipantEntry> participants) Get()
     {
+        Console.WriteLine("Calling Get");
         var participants = this.managerRoot.GetActiveParticipants();
         var eventId = managerRoot.GetEventId();
         return (eventId, participants);
