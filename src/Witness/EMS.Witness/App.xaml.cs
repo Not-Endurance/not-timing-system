@@ -45,10 +45,11 @@ public partial class App : Application
 	{
 		var window = base.CreateWindow(activationState);
 
-		window.Created += async (s, e) =>
-		{
-			await this.persistence.Restore();
-		};
+		// Invoked by the RpcClients instead
+		//window.Created += async (s, e) =>
+		//{
+		//	await this.persistence.RestoreIfAny();
+		//};
 		window.Resumed += (s, e) =>
 		{
 			this.isDeactivated = false;

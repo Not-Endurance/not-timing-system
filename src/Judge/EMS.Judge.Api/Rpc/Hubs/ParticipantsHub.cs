@@ -1,7 +1,6 @@
 ﻿using Core.Application.Rpc.Procedures;
 using Core.Domain.AggregateRoots.Manager;
 using Core.Domain.AggregateRoots.Manager.Aggregates.Participants;
-using Core.Domain.AggregateRoots.Manager.WitnessEvents;
 using EMS.Judge.Api.Configuration;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,9 +18,11 @@ public class ParticipantsHub : Hub<IParticipantsClientProcedures>, IParticipants
         this.managerRoot = provider.GetRequiredService<ManagerRoot>();
     }
 
-    public IEnumerable<ParticipantEntry> Get()
+    public (int eventId, IEnumerable<ParticipantEntry> participants) Get()
     {
-        return this.managerRoot.GetActiveParticipants();
+        var participants = this.managerRoot.GetActiveParticipants();
+        var eventId = managerRoot.GetEventId();
+        return (eventId, participants);
     }
     public Task Witness(IEnumerable<ParticipantEntry> entries, WitnessEventType type)
     {

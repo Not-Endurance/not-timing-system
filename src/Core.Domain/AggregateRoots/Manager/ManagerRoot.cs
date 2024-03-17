@@ -305,6 +305,11 @@ public class ManagerRoot : IAggregateRoot
         return entries;
     }
 
+    public int GetEventId()
+    {
+        return state.Event.Id;
+    }
+
     private Participation GetParticipation(string number)
     {
         if (string.IsNullOrEmpty(number))

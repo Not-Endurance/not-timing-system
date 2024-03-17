@@ -15,7 +15,7 @@ public struct RpcLog
     {
     }
 
-    public string ClientId { get; private set; }
-    public string Message { get; private set; }
-    public DateTimeOffset DateTime { get; private set; }
+    public string ClientId { get; set; }
+    public string Message { get; set; }
+    public DateTimeOffset DateTime { get; set; }
 }

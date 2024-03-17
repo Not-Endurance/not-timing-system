@@ -11,20 +11,23 @@ namespace EMS.Witness.Services;
 
 public class ParticipantsService : IParticipantsService
 {
-    private readonly IWitnessState state;
+	private readonly IPersistenceService _persistence;
+	private readonly IWitnessState state;
     private readonly IWitnessContext context;
     private readonly IParticipantsClient participantsClient;
     private readonly IToaster toaster;
     private readonly IDateService dateService;
 
     public ParticipantsService(
+        IPersistenceService persistence,
         IWitnessState state,
         IWitnessContext context,
         IParticipantsClient arrivelistClient,
         IToaster toaster,
         IDateService dateService)
     {
-        this.state = state;
+		_persistence = persistence;
+		this.state = state;
         this.context = context;
         this.participantsClient = arrivelistClient;
         this.toaster = toaster;
@@ -52,8 +55,14 @@ public class ParticipantsService : IParticipantsService
         var result = await this.participantsClient.Load();
         if (result.IsSuccessful)
         {
+            var (eventId, participants) = result.Data;
 			this.Participants.Clear();
-			this.Participants.AddRange(result.Data!);
+			this.Participants.AddRange(participants);
+            if (!state.EventId.HasValue)
+            {
+                state.EventId = eventId;
+                await _persistence.RestoreIfAny(eventId);
+            }
 		}
     }
 

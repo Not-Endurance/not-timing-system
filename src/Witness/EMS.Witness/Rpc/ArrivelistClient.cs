@@ -15,7 +15,7 @@ public class ParticipantsClient: RpcClient, IParticipantsClient, IParticipantsCl
 	public ParticipantsClient()
 		: base(new RpcContext(RpcProtocls.Http, NetworkPorts.JUDGE_SERVER, RpcEndpoints.PARTICIPANTS))
     {
-		this.AddProcedure<ParticipantEntry, CollectionAction>(nameof(this.Update), this.Update);
+		this.RegisterClientProcedure<ParticipantEntry, CollectionAction>(nameof(this.Update), this.Update);
 	}
 
     public Task Update(ParticipantEntry entry, CollectionAction action)
@@ -24,20 +24,20 @@ public class ParticipantsClient: RpcClient, IParticipantsClient, IParticipantsCl
         return Task.CompletedTask;
     }
 
-    public async Task<RpcInvokeResult<IEnumerable<ParticipantEntry>>> Load()
+    public async Task<RpcInvokeResult<(int eventId, IEnumerable<ParticipantEntry> participants)>> Load()
 	{
-		return await this.InvokeAsync<IEnumerable<ParticipantEntry>>(nameof(IParticipantstHubProcedures.Get));
+		return await this.InvokeHubProcedure<(int, IEnumerable<ParticipantEntry>)>(nameof(IParticipantstHubProcedures.Get));
 	}
 
     public async Task<RpcInvokeResult> Send(IEnumerable<ParticipantEntry> entries, WitnessEventType type)
     {
-		return await this.InvokeAsync(nameof(IParticipantstHubProcedures.Witness), entries, type);
+		return await this.InvokeHubProcedure(nameof(IParticipantstHubProcedures.Witness), entries, type);
     }
 }
 
 public interface IParticipantsClient : IRpcClient
 {
 	event EventHandler<(ParticipantEntry entry, CollectionAction action)>? Updated;
-	Task<RpcInvokeResult<IEnumerable<ParticipantEntry>>> Load();
+	Task<RpcInvokeResult<(int eventId, IEnumerable<ParticipantEntry> participants)>> Load();
 	Task<RpcInvokeResult> Send(IEnumerable<ParticipantEntry> entries, WitnessEventType type);
 }
