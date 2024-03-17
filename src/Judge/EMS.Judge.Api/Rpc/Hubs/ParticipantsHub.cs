@@ -14,19 +14,20 @@ namespace EMS.Judge.Api.Rpc.Hubs;
 public class ParticipantsHub : Hub<IParticipantsClientProcedures>, IParticipantstHubProcedures
 {
     private readonly ManagerRoot managerRoot;
-    
+    private readonly IPersistence _persistence;
+
+
     public ParticipantsHub(IJudgeServiceProvider provider)
     {
         this.managerRoot = provider.GetRequiredService<ManagerRoot>();
-        var persistence = provider.GetRequiredService<IPersistence>();
-        Console.WriteLine("Restoring state");
-        persistence.Configure("../../../../event-archive/2023-10_asenovgrad");
-        Console.WriteLine("Restored state!");
+        _persistence = provider.GetRequiredService<IPersistence>();
     }
 
     public (int eventId, IEnumerable<ParticipantEntry> participants) Get()
     {
-        Console.WriteLine("Calling Get");
+		_persistence.Configure("../../../../event-archive/2023-10_asenovgrad");
+
+		Console.WriteLine("Calling Get");
         var participants = this.managerRoot.GetActiveParticipants();
         var eventId = managerRoot.GetEventId();
         return (eventId, participants);

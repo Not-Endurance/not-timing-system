@@ -66,6 +66,8 @@ public class Persistence : IPersistence
         {
             return PersistenceResult.Existing;
         }
+
+        Console.WriteLine("Restoring state");
         this.StateDirectoryPath = directoryPath;
         var database = this.GetFilePath();
         var sandboxDatabase = this.GetSandBoxFilePath();
@@ -77,10 +79,12 @@ public class Persistence : IPersistence
         if (this.file.Exists(database))
         {
             this.LoadState(database);
-            return PersistenceResult.Existing;
+			Console.WriteLine("Restored state!");
+			return PersistenceResult.Existing;
         }
 
         this.SaveState();
+        Console.WriteLine("No existing state to restore");
         return PersistenceResult.New;
     }
 
