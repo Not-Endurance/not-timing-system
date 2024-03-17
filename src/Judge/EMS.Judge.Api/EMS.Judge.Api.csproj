@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>latestmajor</LangVersion>
-        <OutputType>Library</OutputType>
+        <OutputType>WinExe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
