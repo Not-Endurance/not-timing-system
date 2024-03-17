@@ -1,6 +1,7 @@
 ﻿using Core.Application.Rpc.Procedures;
 using Core.Domain.AggregateRoots.Manager;
 using Core.Domain.AggregateRoots.Manager.Aggregates.Participants;
+using Core.Domain.State;
 using EMS.Judge.Api.Configuration;
 using EMS.Judge.Application.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -15,18 +16,19 @@ public class ParticipantsHub : Hub<IParticipantsClientProcedures>, IParticipants
 {
     private readonly ManagerRoot managerRoot;
     private readonly IPersistence _persistence;
-
+    private readonly IState _state;
 
     public ParticipantsHub(IJudgeServiceProvider provider)
     {
         this.managerRoot = provider.GetRequiredService<ManagerRoot>();
         _persistence = provider.GetRequiredService<IPersistence>();
+        _state = provider.GetRequiredService<IState>();
     }
 
     public (int eventId, IEnumerable<ParticipantEntry> participants) Get()
     {
 		_persistence.Configure("../../../../event-archive/2023-10_asenovgrad");
-
+        Console.WriteLine($"State event (in hub): {_state.Event?.Id}, {_state.Event?.Name}")
 		Console.WriteLine("Calling Get");
         var participants = this.managerRoot.GetActiveParticipants();
         var eventId = managerRoot.GetEventId();

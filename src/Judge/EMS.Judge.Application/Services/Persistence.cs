@@ -79,6 +79,7 @@ public class Persistence : IPersistence
         if (this.file.Exists(database))
         {
             this.LoadState(database);
+            Console.WriteLine($"Event in state: {this.stateSetter.Event?.Id}, {this.stateSetter.Event?.Name}");
 			Console.WriteLine("Restored state!");
 			return PersistenceResult.Existing;
         }

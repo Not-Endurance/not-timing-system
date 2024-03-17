@@ -299,7 +299,9 @@ public class ManagerRoot : IAggregateRoot
 
     public IEnumerable<ParticipantEntry> GetActiveParticipants()
     {
-        var entries = this.state.Participations
+        Console.WriteLine($"State event (in managerRoot.GetActiveParticipants): {state.Event?.Id}, {state.Event?.Name}");
+
+		var entries = this.state.Participations
             .Where(x => x.Participant.LapRecords.Any() && x.IsNotComplete)
             .Select(x => new ParticipantEntry(x));
         return entries;
@@ -307,7 +309,8 @@ public class ManagerRoot : IAggregateRoot
 
     public int GetEventId()
     {
-        return state.Event.Id;
+		Console.WriteLine($"State event (in managerRoot.GetEventId): {state.Event?.Id}, {state.Event?.Name}");
+		return state.Event.Id;
     }
 
     private Participation GetParticipation(string number)
