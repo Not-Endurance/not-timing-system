@@ -28,7 +28,7 @@ public class ParticipantsHub : Hub<IParticipantsClientProcedures>, IParticipants
     public (int eventId, IEnumerable<ParticipantEntry> participants) Get()
     {
 		_persistence.Configure("../../../../event-archive/2023-10_asenovgrad");
-        Console.WriteLine($"State event (in hub): {_state.Event?.Id}, {_state.Event?.Name}")
+        Console.WriteLine($"State event (in hub): {_state.Event?.Id}, {_state.Event?.Name}");
 		Console.WriteLine("Calling Get");
         var participants = this.managerRoot.GetActiveParticipants();
         var eventId = managerRoot.GetEventId();
