@@ -1,0 +1,47 @@
+﻿@using NTS.Domain.Setup.Entities;
+@using NTS.Judge.Setup.Competitions
+@using Not.Blazor.Forms;
+@using Not.Blazor.TM.Forms;
+@using Not.Blazor.TM.Forms.Components;
+
+@inherits NotForm<Contestant>;
+
+<EditForm Model="_model">
+    <MudTimePicker DisableToolbar="true" @ref="_timeField" @bind-Time="_model.StartTime" Label="@Localizer.Get("Time")" />
+</EditForm>
+
+@code {
+    private MudPicker<TimeSpan?> _timeField = default!;
+    private ContestantFormModel _model { get; set; } = new();
+
+    public DateTimeOffset ToDateTimeOffSet(TimeSpan? time)
+    {
+        DateTime today = DateTime.Today;
+        DateTime timeWithSpecifiedKind = DateTime.SpecifyKind(today, DateTimeKind.Local);
+        timeWithSpecifiedKind.Add((TimeSpan)time);
+        DateTimeOffset offsetTime = timeWithSpecifiedKind;
+        return offsetTime;
+    }
+
+    public override void RegisterValidationInjectors()
+    {
+        RegisterInjector(nameof(_model.StartTime), () => _timeField);
+    }
+
+    public override void SetUpdateModel(Contestant contestant)
+    {
+        _model = new ContestantFormModel(contestant);
+    }
+
+    public override Contestant SubmitCreate()
+    {
+        DateTimeOffset newStartTimeOffset = ToDateTimeOffSet(_model.StartTime);
+        return Contestant.Create(newStartTimeOffset);
+    }
+
+    public override Contestant SubmitUpdate()
+    {
+        DateTimeOffset newStartTimeOffset = ToDateTimeOffSet(_model.StartTime);
+        return Contestant.Update(newStartTimeOffset);
+    }
+}
