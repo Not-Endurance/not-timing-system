@@ -45,21 +45,16 @@ public partial class App : Application
 	{
 		var window = base.CreateWindow(activationState);
 
-		window.Created += async (s, e) =>
-		{
-			await this.rpcService.StartConnections();
-			await this.persistence.Restore();
-		};
-		window.Resumed += (s, e) =>
+		window.Resumed += async (s, e) => await SafeAction(async () =>
 		{
 			this.isDeactivated = false;
-			this.rpcService.StartConnections();
-		};
-		window.Deactivated += async (s, e) =>
+			await this.rpcService.StartConnections();
+		});
+		window.Deactivated += async (s, e) => await SafeAction(async () =>
 		{
 			this.isDeactivated = true;
 			await this.persistence.Store();
-		};
+		});
 
 		return window;
 	}
@@ -68,23 +63,35 @@ public partial class App : Application
 	{
 
         this.participantsClient.Updated += (sender, args) => this.participantsService.Update(args.entry, args.action);
-        this.participantsClient.ServerConnectionChanged += async (sender, isConnected) => 
+        this.participantsClient.ServerConnectionChanged += async (sender, status) => 
 		{
-			if (isConnected)
+			if (status == RpcConnectionStatus.Connected)
 			{
 				await this.participantsService.Load();
 			}
         };
 
 		this.startlistClient.Updated += (s, a) => this.startlistService.Update(a.entry, a.action);
-        this.startlistClient.ServerConnectionChanged += async (sender, isConnected) =>
+        this.startlistClient.ServerConnectionChanged += async (sender, status) =>
         {
-            if (isConnected)
+            if (status == RpcConnectionStatus.Connected)
             {
                 await this.startlistService.Load();
             }
         };
     }
+
+	private async Task SafeAction(Func<Task> action)
+	{
+		try
+		{
+			await action();
+		}
+		catch (Exception ex)
+		{
+			await Application.Current!.MainPage!.DisplayAlert(ex.Message, ex.StackTrace, "damn");
+        }
+	}
 
 	private void HandleRpcErrors(IEnumerable<IRpcClient> rpcClients)
 	{

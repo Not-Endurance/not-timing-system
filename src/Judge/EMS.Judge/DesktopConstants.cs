@@ -6,8 +6,8 @@ namespace EMS.Judge;
 public static class DesktopConstants
 {
     public const string SETTINGS_FILE = "judge-settings.json";
-    public const string TIME_FORMAT = "HH:mm:ss.fff";
-    public const string TIME_SPAN_FORMAT = @"hh\:mm\:ss\.FFF";
+    public const string TIME_FORMAT = "HH:mm:ss";
+    public const string TIME_SPAN_FORMAT = @"hh\:mm\:ss";
     public const string DOUBLE_FORMAT = "0.000";
     public const string DATE_ONLY_FORMAT = "dd.MM.yyyy";
     public const string UNEXPECTED_ERROR_MESSAGE = "Unexpected error occured. Log file '{0}' created. Please contact developer";

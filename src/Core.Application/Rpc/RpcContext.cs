@@ -9,19 +9,17 @@ public class RpcContext
     private readonly string hub;
     private string? host;
 
-    public RpcContext(string clientId, RpcProtocls protocol, int port, string hub)
+    public RpcContext(RpcProtocls protocol, int port, string hub)
     {
         if (hub.StartsWith("/"))
         {
             hub = hub[1..];
         }
-        this.ClientId = clientId;
         this.protocol = protocol;
         this.port = port;
         this.hub = hub;
     }
 
-    public string ClientId { get; }
     public string? Host
     {
         get => this.host; 

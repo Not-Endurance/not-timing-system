@@ -104,6 +104,16 @@
     private bool sortByDistance = false;
     private bool sortByName = false;
 
+    protected override bool ShouldRender(object changedState)
+    {
+        return changedState == this.ParticipantsService.Participants || changedState == this.ParticipantsService.Selected;
+    }
+
+    protected override void OnInitialized()
+    {
+        WitnessState.StateLoaded += async (_, __) => await InvokeAsync(StateHasChanged);
+    }
+
     private void SortByNumber()
     {
         this.sortByNumber = true;
@@ -124,10 +134,5 @@
         this.sortByDistance = false;
         this.sortByName = true;
         this.ParticipantsService.Sort(byName: true);
-    }
-
-    protected override bool ShouldRender(object changedState)
-    {
-        return changedState == this.ParticipantsService.Participants || changedState == this.ParticipantsService.Selected;
     }
 }

@@ -1,18 +1,9 @@
 ﻿@using Core.Application.Rpc;
 @using EMS.Witness.Services;
+@using EMS.Witness.Rpc;
 
 <div class="top-row ps-3 navbar navbar-dark">
 	<div class="container-fluid">
-		@if (!this.isConnected)
-		{
-			<div class="col-5 navbar-brand">Disconnected...</div>
-		}
-		else
-		{
-			<div class="col-8">
-				<a class="navbar-brand" href="">eWitness</a>
-			</div>
-		}
 		@if (this.isHandshaking)
 		{
 			<div class="col-3">
@@ -20,6 +11,24 @@
 					<span class="visually-hidden">Loading...</span>
 				</div>
 			</div>
+		}
+		@if (this.rpcConnectionStatus == RpcConnectionStatus.Connecting)
+		{
+			<div class="col-3">
+				<div class="spinner-border text-warning" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		}
+		@if (this.rpcConnectionStatus == RpcConnectionStatus.Connected)
+		{
+			<div class="col-8">
+				<a class="navbar-brand" href="">eWitness</a>
+			</div>
+		}
+		@if (!isHandshaking && rpcConnectionStatus == RpcConnectionStatus.Disconnected)
+		{
+			<button class="btn btn-warning" @onclick="_rpcInitializer.StartConnections">Reconnect</button>
 		}
 		<div class="col-3">
 			<button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -49,6 +58,12 @@
 	private IWitnessContext Context { get; set; } = default!;
 	[Inject]
 	private IEnumerable<IRpcClient> RpcClients { get; set; } = default!;
+	[Inject]
+	private IToaster _toaster { get; set; } = default!;
+	[Inject]
+	private IRpcInitalizer _rpcInitializer { get; set; } = default!;
+	[Inject]
+	private IParticipantsService _participantsService { get; set; } = default!;
 
 	private bool CollapseNavMenu = true;
 
@@ -60,20 +75,24 @@
 		this.CollapseNavMenu = !this.CollapseNavMenu;
 	}
 
-	private bool isConnected;
-	private bool isHandshaking = true;
+	private RpcConnectionStatus rpcConnectionStatus;
+	private bool isHandshaking;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		foreach (var client in this.RpcClients)
 		{
-			client.ServerConnectionChanged += async (sender, isConnected) =>
+			client.ServerConnectionChanged += async (sender, status) =>
 			{
-				if (this.isConnected != isConnected)
+				if (this.rpcConnectionStatus != status)
 				{
-					this.isConnected = isConnected;
+					this.rpcConnectionStatus = status;
 					await this.InvokeAsync(this.StateHasChanged);
 				}
+			};
+			client.ServerConnectionInfo += (senderName, message) =>
+			{
+				_toaster.Add(senderName!.ToString()!, message, UiColor.Warning, 10);
 			};
 		}
 		this.Context.IsHandshakingEvent += async (sender, isHandshaking) =>
@@ -84,5 +103,18 @@
 				await this.InvokeAsync(this.StateHasChanged);
 			}
 		};
+		await SafeAction(async () => await _rpcInitializer.StartConnections());
+	}
+
+	private async Task SafeAction(Func<Task> action)
+	{
+		try
+		{
+			await action();
+		}
+		catch (Exception ex)
+		{
+			await Application.Current!.MainPage!.DisplayAlert(ex.Message, ex.StackTrace, "damn");
+		}
 	}
 }

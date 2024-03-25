@@ -43,13 +43,19 @@ public class LapRecordsAggregate : IAggregate
     internal void Disqualify(string number, string reason)
     {
         this.Record.Result = new Result(ResultType.Disqualified, reason);
-		Witness.RaiseStartlistChanged(number, CollectionAction.Remove);
+        if (!this.Record.Lap.IsFinal)
+        {
+            Witness.RaiseStartlistChanged(number, CollectionAction.AddOrUpdate);
+        }
         Witness.RaiseParticipantChanged(number, CollectionAction.Remove);
 	}
     internal void FailToQualify(string number, string reason)
     {
         this.Record.Result = new Result(ResultType.FailedToQualify, reason);
-		Witness.RaiseStartlistChanged(number, CollectionAction.Remove);
+        if (!this.Record.Lap.IsFinal)
+        {
+            Witness.RaiseStartlistChanged(number, CollectionAction.AddOrUpdate);
+        }
         Witness.RaiseParticipantChanged(number, CollectionAction.Remove);
 	}
     internal void Resign(string reason)
@@ -59,7 +65,10 @@ public class LapRecordsAggregate : IAggregate
     internal void Complete(string number)
     {
 		this.Record.Result = new Result(ResultType.Successful);
-		Witness.RaiseStartlistChanged(number, CollectionAction.AddOrUpdate);
+        if (!this.Record.Lap.IsFinal)
+        {
+            Witness.RaiseStartlistChanged(number, CollectionAction.AddOrUpdate);
+        }
         Witness.RaiseParticipantChanged(number, CollectionAction.AddOrUpdate);
 	}
     internal void RequireReInspection(bool isRequired)

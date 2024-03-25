@@ -38,6 +38,8 @@ public partial class ParticipationResultControl
         this.HorseNameText.Text = participation.Participant.Horse.Name;
         this.AthleteClub.Text = participation.Participant.Athlete.Club;
         this.RankText.Text = participation.Rank.ToString();
+        this.RideTime.Text = participation.RideTime;
+        this.RecTime.Text = participation.RecTime;
         this.TotalTime.Text = participation.TotalTime;
         this.TotalAverageSpeedString.Text = participation.TotalAverageSpeed;
         if (participation.DisqualifiedVisibility == Visibility.Visible)

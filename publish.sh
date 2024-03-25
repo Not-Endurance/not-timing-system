@@ -38,6 +38,7 @@ echo "opening explorer..."
 mkdir logs
 touch logs/witness-events.log
 touch logs/witness-event-errors.log
+mkdir logs-clients
 cd ..
 explorer "$output_dir"
 echo "publish complete."

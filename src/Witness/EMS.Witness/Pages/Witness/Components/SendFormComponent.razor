@@ -50,6 +50,11 @@
         return changedState == this.ParticipantsService.Snapshots;
     }
 
+    protected override void OnInitialized()
+    {
+        WitnessState.StateLoaded += async (_, __) => await InvokeAsync(StateHasChanged);
+    }
+
     private async Task EditSnapshot(string number, DateTime value)
     {
         var time = await this.PopupService.EditTime(value);

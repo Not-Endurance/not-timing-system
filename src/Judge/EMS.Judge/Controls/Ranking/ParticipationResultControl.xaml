@@ -1,4 +1,5 @@
-﻿<StackPanel x:Class="EMS.Judge.Controls.Ranking.ParticipationResultControl"
+﻿
+    <StackPanel x:Class="EMS.Judge.Controls.Ranking.ParticipationResultControl"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:EMS.Judge.Controls.Manager"
@@ -61,7 +62,30 @@
                     <TextBlock Style="{StaticResource Text-Small}" FontWeight="Bold" TextAlignment="Center"
                                Text="{x:Static localization:Strings.TOTAL}" />
                 </Border>
+                <!-- RideTime -->
+                <TextBlock Style="{StaticResource Text-Table}">Ride:</TextBlock>
+                <Border Style="{StaticResource Border-Padding}">
+                    <StackPanel Style="{StaticResource List-Horizontal}">
+                        <TextBlock Style="{StaticResource Text-Table}" FontWeight="Bold"
+                                   Name="RideTime" />
+                        <TextBlock Text=" " />
+                        <TextBlock Style="{StaticResource Text-Table}" FontWeight="Bold"
+                                   Text="{x:Static localization:Strings.HOURS_SYMBOL}" />
+                    </StackPanel>
+                </Border>
+                <!-- RecTime -->
+                <TextBlock Style="{StaticResource Text-Table}">Rec:</TextBlock>
+                <Border Style="{StaticResource Border-Padding}">
+                    <StackPanel Style="{StaticResource List-Horizontal}">
+                        <TextBlock Style="{StaticResource Text-Table}" FontWeight="Bold"
+                                   Name="RecTime" />
+                        <TextBlock Text=" " />
+                        <TextBlock Style="{StaticResource Text-Table}" FontWeight="Bold"
+                                   Text="{x:Static localization:Strings.HOURS_SYMBOL}" />
+                    </StackPanel>
+                </Border>
                 <!-- TotalTime -->
+                <TextBlock Style="{StaticResource Text-Table}">Total:</TextBlock>
                 <Border Style="{StaticResource Border-Padding}">
                     <StackPanel Style="{StaticResource List-Horizontal}">
                         <TextBlock Style="{StaticResource Text-Table}" FontWeight="Bold"

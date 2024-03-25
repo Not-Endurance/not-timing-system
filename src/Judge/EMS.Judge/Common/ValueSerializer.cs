@@ -45,7 +45,7 @@ public class ValueSerializer
     public static string FormatSpan(TimeSpan? span)
     {
         var spanString = span?.ToString(TIME_SPAN_FORMAT) ?? DEFAULT_SPAN;
-        spanString = spanString.PadRight(12, '0');
+        //spanString = spanString.PadRight(12, '0');
         return spanString;
     }
     public static string FormatTime(DateTime? time)

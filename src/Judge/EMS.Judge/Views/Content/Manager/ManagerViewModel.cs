@@ -78,7 +78,7 @@ public class ManagerViewModel : ViewModelBase
         Participation.UpdateEvent += (_, participation) => this.HandleParticipationUpdate(participation);
         CoreEvents.StateLoadedEvent += async (_, __) =>
         {
-            if (this.state.Event.HasStarted)
+            if (this.state.Event?.HasStarted ?? false)
             {
                 this.StartReadingTags();
             }

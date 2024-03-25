@@ -8,7 +8,7 @@ namespace Core.Application.Rpc.Procedures;
 
 public interface IParticipantstHubProcedures
 {
-    IEnumerable<ParticipantEntry> Get();
+	ParticipantsPayload Get();
     Task Witness(IEnumerable<ParticipantEntry> entries, WitnessEventType type);
 }
 

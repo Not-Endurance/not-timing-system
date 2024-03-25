@@ -19,7 +19,7 @@ public class FileService : IFileService
     }
     public void Append(string filePath, string content)
     {
-        File.AppendAllText(filePath, content);
+        File.AppendAllText(filePath, content + Environment.NewLine);
     }
     public void Delete(string path)
         => File.Delete(path);

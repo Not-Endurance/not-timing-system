@@ -1,80 +1,88 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-    <PropertyGroup>
-        <TargetFrameworks>net6.0-android;net6.0-ios</TargetFrameworks>
-        <OutputType>Exe</OutputType>
-        <UseMaui>true</UseMaui>
-        <SingleProject>true</SingleProject>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <EnableDefaultCssItems>false</EnableDefaultCssItems>
-        <Nullable>enable</Nullable>
+  <PropertyGroup>
+    <TargetFrameworks>net7.0-android;net7.0-ios</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCssItems>false</EnableDefaultCssItems>
+    <Nullable>enable</Nullable>
 		
-        <!-- Display name -->
-        <ApplicationTitle>eWitness</ApplicationTitle>
+    <!-- Display name -->
+    <ApplicationTitle>eWitness</ApplicationTitle>
 
-        <!-- App Identifier -->
-        <ApplicationId>com.ems.witness</ApplicationId>
-        <ApplicationIdGuid>E28F87C5-E076-4180-AB84-DBE4E9E99526</ApplicationIdGuid>
+    <!-- App Identifier -->
+    <ApplicationId>com.ems.witness</ApplicationId>
+    <ApplicationIdGuid>E28F87C5-E076-4180-AB84-DBE4E9E99526</ApplicationIdGuid>
 
-        <!-- Versions -->
-        <ApplicationDisplayVersion>2.3</ApplicationDisplayVersion>
-        <ApplicationVersion>8</ApplicationVersion>
+    <!-- Versions -->
+    <ApplicationDisplayVersion>2.4</ApplicationDisplayVersion>
+    <ApplicationVersion>13</ApplicationVersion>
 
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">13.5</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
-    </PropertyGroup>
+		<CheckEolWorkloads>false</CheckEolWorkloads>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-android|AnyCPU'">
-      <ApplicationId>com.ems.witness</ApplicationId>
-    </PropertyGroup>
+    <UseInterpreter>true</UseInterpreter>
+    <NoSymbolStrip>true</NoSymbolStrip>
+    <MtouchLink>SdkOnly</MtouchLink>
+      
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-ios|AnyCPU'">
-      <CodesignKey>Apple Development: Created via API (P9YBGLG69Y)</CodesignKey>
-      <CodesignProvision>VS: com.ems.witness Development</CodesignProvision>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-android|AnyCPU'">
+    <ApplicationId>com.ems.witness</ApplicationId>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-android|AnyCPU'">
-      <ApplicationId>com.ems.witness</ApplicationId>
-      <AndroidPackageFormat>apk</AndroidPackageFormat>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
+    <CodesignKey>Apple Development: Created via API (P9YBGLG69Y)</CodesignKey>
+    <CodesignProvision>VS: com.ems.witness Development</CodesignProvision>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-ios|AnyCPU'">
-      <CreatePackage>false</CreatePackage>
-      <ApplicationId>com.ems.witness</ApplicationId>
-      <CodesignKey>iPhone Distribution: ALEXANDER NIKOLOV CHOBANOV (979B4XB2MX)</CodesignKey>
-      <CodesignProvision>e.Witness</CodesignProvision>
-      <ProvisioningType>manual</ProvisioningType>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-android|AnyCPU'">
+    <ApplicationId>com.ems.witness</ApplicationId>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-ios|AnyCPU'">
+    <CreatePackage>false</CreatePackage>
+    <ApplicationId>com.ems.witness</ApplicationId>
+    <CodesignKey>iPhone Distribution: ALEXANDER NIKOLOV CHOBANOV (979B4XB2MX)</CodesignKey>
+    <CodesignProvision>e.Witness</CodesignProvision>
+    <ProvisioningType>manual</ProvisioningType>
+  </PropertyGroup>
   
-    <ItemGroup>
-        <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+  <ItemGroup>
+    <!-- App Icon -->
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 
-        <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+    <!-- Splash Screen -->
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
-        <!-- Images -->
-        <MauiImage Include="Resources\Images\*" />
-        <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
+    <!-- Images -->
+    <MauiImage Include="Resources\Images\*" />
+    <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
 
-        <!-- Custom Fonts -->
-        <MauiFont Include="Resources\Fonts\*" />
+    <!-- Custom Fonts -->
+    <MauiFont Include="Resources\Fonts\*" />
 
-        <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-    </ItemGroup>
+    <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\Core.Application\Core.Application.csproj" />
-      <ProjectReference Include="..\..\Core.Domain\Core.Domain.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core.Application\Core.Application.csproj" />
+    <ProjectReference Include="..\..\Core.Domain\Core.Domain.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Platforms\Services\" />
-    </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Platforms\Services\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties XamarinHotReloadDebuggerTimeoutExceptionEMSWitnessHideInfoBar="True" /></VisualStudio></ProjectExtensions>
 
 </Project>

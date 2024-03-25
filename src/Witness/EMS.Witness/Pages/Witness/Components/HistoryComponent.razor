@@ -57,6 +57,11 @@
         return changedState == this.ParticipantsService.History;
     }
 
+    protected override void OnInitialized()
+    {
+        WitnessState.StateLoaded += async (_, __) => await InvokeAsync(StateHasChanged);
+    }
+
     private async Task Save(ParticipantsBatch batch)
     {
         var type = await this.PopupService.SelecEventType();
