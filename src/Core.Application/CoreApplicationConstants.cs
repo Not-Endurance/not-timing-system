@@ -7,24 +7,13 @@ public static class CoreApplicationConstants
 {
     public const int NETWORK_API_PORT = 11337;
     public const int NETWORK_BROADCAST_PORT = 21337;
+    public const string RPC_ENDPOINT = "judge-hub";
+    public const int RPC_PORT = 11337;
 
     public static class Apps
     {
         public const string JUDGE = "Judge";
         public const string WITNESS = "Witness";
-    }
-
-    public static class NetworkPorts
-    {
-        public const int JUDGE_SERVER = 11337;
-    }
-
-    public static class RpcEndpoints
-    {
-        public const string STARTLIST = "startlist-hub";
-        public const string WITNESS_EVENTS = "witness-events-hub";
-        public const string PARTICIPANTS = "participants-hub";
-        public const string LOGGING = "logging-hub";
     }
 
     public static class Api

@@ -64,7 +64,6 @@ public class PerformanceColumnModel : ViewModelBase, ILapRecordState
     {
         this.Id = performance.Id;
         this.HeaderValue = this.CreateHeader(performance);
-        this.RequiredInspectionTimeString = ValueSerializer.FormatTime(performance.RequiredInspectionTime);
         this.RecoverySpanString = ValueSerializer.FormatSpan(performance.RecoverySpan);
         this.TimeString = ValueSerializer.FormatSpan(performance.Time);
         this.AverageSpeed = performance.AverageSpeed;
@@ -76,13 +75,8 @@ public class PerformanceColumnModel : ViewModelBase, ILapRecordState
         this.IsReinspectionRequired = performance.IsReinspectionRequired;
         this.IsRequiredInspectionRequired = performance.IsRequiredInspectionRequired;
         this.ReInspectionTimeString = ValueSerializer.FormatTime(performance.ReInspectionTime);
-        var requiredInspectionTime = ValueSerializer.FormatTime(performance.RequiredInspectionTime);
-        this.RequiredInspectionTimeString = performance.Record.Lap.IsCompulsoryInspectionRequired
-            ? string.Empty
-            : requiredInspectionTime;
-        this.CompulsoryRequiredInspectionTimeString = performance.Record.Lap.IsCompulsoryInspectionRequired
-            ? requiredInspectionTime
-            : string.Empty;
+        this.RequiredInspectionTimeString = ValueSerializer.FormatTime(performance.RequiredInspectionTime);
+        this.CompulsoryRequiredInspectionTimeString = ValueSerializer.FormatTime(performance.CompulsoryRequiredInspectionTime);
 
         this.RaisePropertyChanged(nameof(this.ReInspectionTimeString));
         this.RaisePropertyChanged(nameof(this.RecoverySpanString));

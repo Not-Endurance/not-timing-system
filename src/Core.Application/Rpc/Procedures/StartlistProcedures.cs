@@ -7,10 +7,10 @@ namespace Core.Application.Rpc.Procedures;
 
 public interface IStartlistClientProcedures
 {
-    Task Update(StartlistEntry entry, CollectionAction action);
+    Task ReceiveEntry(StartlistEntry entry, CollectionAction action);
 }
 
 public interface IStartlistHubProcedures
 {
-    Dictionary<int, Startlist> Get();
+    Dictionary<int, Startlist> SendStartlist();
 }

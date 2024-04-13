@@ -30,6 +30,7 @@ public class LapRecordsAggregate : IAggregate
 
     internal void Vet(DateTime time)
     {
+        this.validator.IsLaterThan(time, this.Record.StartTime, "IN");
         if (this.Record.InspectionTime == null)
         {
             this.EnterIn(time);

@@ -15,7 +15,7 @@ public class PersistenceService : IPersistenceService
         this.state = state;
         this.jsonSerializer = jsonSerializer;
 		_witnessLogger = witnessLogger;
-		this.path = Path.Combine(FileSystem.Current.CacheDirectory, "e.witness");
+		this.path = Path.Combine(FileSystem.Current.AppDataDirectory, "e.witness");
     }
 
     public async Task RestoreIfAny(int eventId)

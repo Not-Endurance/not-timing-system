@@ -34,9 +34,11 @@ public class Participant : DomainBase<ParticipantException>, IParticipantState
                 $"Invalid '{nameof(Number)}' - '{state?.Number}'. Please enter a valid number");
         }
         this.Number = state?.Number;
+        this.Unranked = state?.Unranked ?? false;
     }
 
     public List<RfidTag> RfidTags { get; internal set; } = new();
+    public bool Unranked { get; internal set; }
     public string Number { get; internal set; }
     public int? MaxAverageSpeedInKmPh { get; internal set; }
     public Horse Horse { get; internal set; }

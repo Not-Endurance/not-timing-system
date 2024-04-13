@@ -49,6 +49,7 @@ public class ParticipantsAggregate : IAggregate
             participant.Horse = horse;
             participant.MaxAverageSpeedInKmPh = participantState.MaxAverageSpeedInKmPh;
             participant.Number = participantState.Number;
+            participant.Unranked = participantState.Unranked;
         }
 
         return participant;

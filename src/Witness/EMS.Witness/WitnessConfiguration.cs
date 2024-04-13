@@ -30,20 +30,15 @@ public static class WitnessConfiguration
             .AddSingleton<WitnessContext>()
             .AddSingleton<IWitnessContext>(provider => provider.GetRequiredService<WitnessContext>())
             .AddTransient<IDateService, DateService>()
+            .AddSingleton<IRpcSocket, SignalRSocket>()
             .AddSingleton<IStartlistClient, StartlistClient>()
-            .AddSingleton<IRpcClient>(p => p.GetRequiredService<IStartlistClient>())
             .AddSingleton<IParticipantsClient, ParticipantsClient>()
-            .AddSingleton<IRpcClient>(x => x.GetRequiredService<IParticipantsClient>())
             .AddSingleton<WitnessState>()
             .AddSingleton<IWitnessState>(x => x.GetRequiredService<WitnessState>())
             .AddTransient<IPersistenceService, PersistenceService>()
             .AddTransient<IRpcInitalizer, RpcInitalizer>()
-
-            //.AddSingleton<IWitnessLogger, LoggerMock>();
-
             .AddSingleton<LoggingClient>()
-            .AddSingleton<IWitnessLogger>(x => x.GetRequiredService<LoggingClient>())
-            .AddSingleton<IRpcClient>(x => x.GetRequiredService<LoggingClient>());
+            .AddSingleton<IWitnessLogger, LoggingClient>();
 
         return services;
     }

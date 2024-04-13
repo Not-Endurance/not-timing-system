@@ -59,6 +59,7 @@ public class ParticipantViewModel : ConfigurationBase<ParticipantView, Participa
     private int horseId;
     private int athleteId;
     private string name;
+    private bool unranked;
     private string horseName;
     private string athleteName;
     private int positionid;
@@ -231,5 +232,10 @@ public class ParticipantViewModel : ConfigurationBase<ParticipantView, Participa
     {
         get => this.name;
         private set => this.SetProperty(ref this.name, value);
+    }
+    public bool Unranked
+    {
+        get => this.unranked;
+        set => this.SetProperty(ref this.unranked, value);
     }
 }

@@ -40,7 +40,7 @@ public class ParticipationResultModel : ParticipationGridModel
 
         var rideTime = performances.Aggregate(TimeSpan.Zero, (result, x) => result + (x.ArrivalTime.Value - x.StartTime));
         var recTime = performances
-            .Where(x => !x.Record.Lap.IsFinal)
+            .Where(x => !x.Record.Lap.IsFinal) // This is on Purpose: Tedi?
             .Aggregate(TimeSpan.Zero, (result, x) => result + x.RecoverySpan.Value);
         var totalPhaseTime = rideTime + recTime;
         var avrageTotalPhaseSpeed = totalLenght / totalPhaseTime.TotalHours;

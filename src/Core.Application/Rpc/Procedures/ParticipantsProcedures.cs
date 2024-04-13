@@ -8,11 +8,11 @@ namespace Core.Application.Rpc.Procedures;
 
 public interface IParticipantstHubProcedures
 {
-	ParticipantsPayload Get();
-    Task Witness(IEnumerable<ParticipantEntry> entries, WitnessEventType type);
+	ParticipantsPayload SendParticipants();
+    Task ReceiveWitnessEvent(IEnumerable<ParticipantEntry> entries, WitnessEventType type);
 }
 
 public interface IParticipantsClientProcedures
 {
-    Task Update(ParticipantEntry entry, CollectionAction action);
+    Task ReceiveEntryUpdate(ParticipantEntry entry, CollectionAction action);
 }

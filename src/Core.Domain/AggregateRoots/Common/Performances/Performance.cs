@@ -13,7 +13,7 @@ public class Performance : IAggregate, IPerformance, INotifyPropertyChanged
 {
     public LapRecord Record { get; private set; }
     private readonly CompetitionType type;
-    public const int COMPULSORY_INSPECTION_TIME_OFFSET = -15;
+    public const int REQUIRED_OR_COMPULSORY_INSPECTION_MINUTES_OFFSET = -15;
 
     public Performance(LapRecord record, CompetitionType type, double previousLength)
     {
@@ -27,8 +27,9 @@ public class Performance : IAggregate, IPerformance, INotifyPropertyChanged
     private void UpdateValues()
     {
         this.NextStartTime = this.UpdateNextStartTime();
-        this.RequiredInspectionTime = this.UpdateRequiredInspectionTime();
         this.RecoverySpan = this.UpdateRecoverySpan();
+        this.RequiredInspectionTime = this.UpdateRequiredInspectionTime();
+        this.CompulsoryRequiredInspectionTime = this.UpdateCompulsoryRequiredInspectionTime();
         this.Time = this.UpdateTime();
         this.AverageSpeed = this.UpdateAverageSpeed();
         this.AverageSpeedPhase = this.UpdateAverageSpeedPhase();
@@ -37,6 +38,7 @@ public class Performance : IAggregate, IPerformance, INotifyPropertyChanged
         this.RaisePropertyChanged(nameof(this.InspectionTime));
         this.RaisePropertyChanged(nameof(this.ReInspectionTime));
         this.RaisePropertyChanged(nameof(this.RequiredInspectionTime));
+        this.RaisePropertyChanged(nameof(this.CompulsoryRequiredInspectionTime));
         this.RaisePropertyChanged(nameof(this.RecoverySpan));
         this.RaisePropertyChanged(nameof(this.Time));
         this.RaisePropertyChanged(nameof(this.AverageSpeed));
@@ -44,15 +46,25 @@ public class Performance : IAggregate, IPerformance, INotifyPropertyChanged
         this.RaisePropertyChanged(nameof(this.NextStartTime));
     }
     public DateTime? RequiredInspectionTime { get; private set; }
+    public DateTime? CompulsoryRequiredInspectionTime { get; private set; }
 
     private DateTime? UpdateRequiredInspectionTime()
     {
-        if (!this.Record.IsRequiredInspectionRequired
-            && !this.Record.Lap.IsCompulsoryInspectionRequired)
+        if (!this.Record.IsRequiredInspectionRequired)
         {
             return null;
         }
-        var inspection = this.NextStartTime?.AddMinutes(COMPULSORY_INSPECTION_TIME_OFFSET);
+        var inspection = this.NextStartTime?.AddMinutes(REQUIRED_OR_COMPULSORY_INSPECTION_MINUTES_OFFSET);
+        return inspection;
+    }
+
+    private DateTime? UpdateCompulsoryRequiredInspectionTime()
+    {
+        if (!this.Record.Lap.IsCompulsoryInspectionRequired && (RecoverySpan == null || RecoverySpan < TimeSpan.FromMinutes(10)))
+        {
+            return null;
+        }
+        var inspection = this.NextStartTime?.AddMinutes(REQUIRED_OR_COMPULSORY_INSPECTION_MINUTES_OFFSET);
         return inspection;
     }
 

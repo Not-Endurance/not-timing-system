@@ -106,12 +106,10 @@ public class VupVF747pController : RfidController
         return indices.ToArray();
     }
 
-    private DateTime? disconnectedMessageTime;
     private IEnumerable<string> ReadTags(IEnumerable<int> antennaIndices)
     {
         var readTimer = new Stopwatch();
         var reconnectTimer = new Stopwatch();
-        var emptyCounter = 0;
         foreach (var i in antennaIndices)
         {
             this.reader.SetWorkAnt(i);
@@ -124,21 +122,16 @@ public class VupVF747pController : RfidController
                 Convert.FromHexString("00000000"));
             readTimer.Stop();
             
-            if (this.disconnectedMessageTime == null
-                || DateTime.Now - this.disconnectedMessageTime > TimeSpan.FromMinutes(1))
+            if (readTimer.ElapsedMilliseconds is < 5)
             {
-                if (readTimer.ElapsedMilliseconds is > 1000 or < 5)
-                {
-                    reconnectTimer.Start();
-                    this.disconnectedMessageTime = DateTime.Now;
-                    var sb = new StringBuilder();
-                    sb.AppendLine($"VF747p reader response indicates a disconnect. Response time: '{readTimer.ElapsedMilliseconds}'");
-					this.RaiseError(sb.ToString());
-                    this.Reconnect();
-                    reconnectTimer.Stop();
-                    sb.AppendLine($"Reconnected after '{reconnectTimer.ElapsedMilliseconds}'");
-                    this.logger.Log("VF747p-disconnected", sb.ToString());
-                }
+                reconnectTimer.Start();
+                var sb = new StringBuilder();
+                sb.AppendLine($"VF747p reader response indicates a disconnect. Response time: '{readTimer.ElapsedMilliseconds}'");
+				this.RaiseError(sb.ToString());
+                this.Reconnect();
+                reconnectTimer.Stop();
+                sb.AppendLine($"Reconnected after '{reconnectTimer.ElapsedMilliseconds}'");
+                this.logger.Log("VF747p-disconnected", sb.ToString());
             }
 
             if (tagsBytes.Success)

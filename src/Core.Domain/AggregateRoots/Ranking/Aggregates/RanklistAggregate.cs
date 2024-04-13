@@ -46,6 +46,7 @@ public class RanklistAggregate : List<Participation>, IAggregate
         => participations
             .Where(x => x.Participant.Athlete.Category == Category.Adults)
             .OrderBy(this.IsNotQualifiedPredicate)
+            .ThenBy(x => x.Participant.Unranked)
             .ThenBy(participation => participation.Participant
                 .LapRecords
                 .LastOrDefault()

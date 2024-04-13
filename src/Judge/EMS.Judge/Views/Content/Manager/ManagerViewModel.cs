@@ -34,6 +34,7 @@ public class ManagerViewModel : ViewModelBase
     private readonly IEventAggregator eventAggregator;
     private readonly IExecutor<ManagerRoot> managerExecutor;
     private readonly IQueries<Participation> participations;
+    private static bool IsReadingTags;
 
     public ManagerViewModel(
         ISettings settings,
@@ -202,28 +203,32 @@ public class ManagerViewModel : ViewModelBase
     }
     private void StartReadingTags()
     {
-        Task.Run(() =>
+        if (!IsReadingTags)
         {
-            foreach (var tag in this.rfidService.StartReading())
+            IsReadingTags = true;
+            Task.Run(() =>
             {
-                var eventType = (WitnessEventType)RfidEventType;
-				RfidTagEvent witnessEvent = null;
-                try
+                foreach (var tag in this.rfidService.StartReading())
                 {
-                    witnessEvent = new RfidTagEvent(tag)
+                    var eventType = (WitnessEventType)RfidEventType;
+                    RfidTagEvent witnessEvent = null;
+                    try
                     {
-                        Time = DateTime.Now,
-                        Type = eventType,
-                    };
-					Witness.Raise(witnessEvent);
-				}
-				catch (Exception e)
-                {
-                    this.logger.LogError(e, "Couldn't create RfidTagEvent");
-                    continue;
+                        witnessEvent = new RfidTagEvent(tag)
+                        {
+                            Time = DateTime.Now,
+                            Type = eventType,
+                        };
+                        Witness.Raise(witnessEvent);
+                    }
+                    catch (Exception e)
+                    {
+                        this.logger.LogError(e, "Couldn't create RfidTagEvent");
+                        continue;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
     private void UpdateAction()
         => this.ExecuteAndRender((manager, number) => manager.UpdateRecord(number, this.InputTime));
@@ -256,6 +261,7 @@ public class ManagerViewModel : ViewModelBase
     {
         this.rfidService.StopReading();
         this.rfidService.DisconnectReader();
+        IsReadingTags = false;
         this.StartReadingTags();
     }
 

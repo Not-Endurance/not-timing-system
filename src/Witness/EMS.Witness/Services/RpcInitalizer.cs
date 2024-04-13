@@ -9,29 +9,36 @@ namespace EMS.Witness.Services;
 
 public class RpcInitalizer : IRpcInitalizer
 {
-    private const string ALEX_HOME_WORKSTATION_IP = "localhost"; // DO NOT DELETE 
-
     private readonly IToaster toaster;
-    private readonly IHandshakeService _handshakeService;
-    private readonly IEnumerable<IRpcClient> rpcClients;
+	private readonly IWitnessState _witnessState;
+	private readonly IHandshakeService _handshakeService;
+    private readonly IRpcSocket _rpcSocket;
 	private readonly IPermissionsService permissionsService;
 	private readonly WitnessContext context;
 	
 	public RpcInitalizer(
+		IWitnessState witnessState,
         IHandshakeService handshakeService,
         IWitnessContext context,
-		IEnumerable<IRpcClient> rpcClients,
+		IRpcSocket rpcSocket,
 		IPermissionsService permissionsService,
 		IToaster toaster)
     {
 		this.context = (WitnessContext)context;
-        _handshakeService = handshakeService;
-        this.rpcClients = rpcClients;
+		_witnessState = witnessState;
+		_handshakeService = handshakeService;
+        _rpcSocket = rpcSocket;
 		this.permissionsService = permissionsService;
 		this.toaster = toaster;
     }
 
-    public async Task StartConnections()
+	public Task Disconnect()
+	{
+		_rpcSocket.Disconnect();
+		return Task.CompletedTask;
+	}
+
+	public async Task StartConnections()
 	{
 		try
 		{
@@ -43,16 +50,13 @@ public class RpcInitalizer : IRpcInitalizer
 					UiColor.Danger);
 				return;
 			}
-			if (this.rpcClients.All(x => x.IsConnected))
+			if (_rpcSocket.IsConnected)
 			{
 				return;
 			}
 
-			var host = await Handshake();
-			foreach (var client in this.rpcClients.Where(x => !x.IsConnected))
-			{
-				await client.Connect(host);
-			}
+			var host = _witnessState.HostIp ??= await Handshake();
+            await _rpcSocket.Connect(host);
 		}
 		catch (Exception exception)
 		{
@@ -62,9 +66,6 @@ public class RpcInitalizer : IRpcInitalizer
 
 	private async Task<string> Handshake()
 	{
-#if RELEASE
-		return ALEX_HOME_WORKSTATION_IP;
-#else
 		this.context.RaiseIsHandshakingEvent(true);
 
 		var hostIp = await _handshakeService.Handshake(Apps.WITNESS, CancellationToken.None);
@@ -76,7 +77,6 @@ public class RpcInitalizer : IRpcInitalizer
 		
 		this.context.RaiseIsHandshakingEvent(false);
 		return hostIp.ToString();
-#endif
 	}
 
 	private void ToastError(Exception exception)
@@ -88,4 +88,5 @@ public class RpcInitalizer : IRpcInitalizer
 public interface IRpcInitalizer : ISingletonService
 {
 	Task StartConnections();
+	Task Disconnect();
 }

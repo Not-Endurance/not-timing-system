@@ -10,6 +10,7 @@ public class WitnessState : IWitnessState
     public ObservableCollection<ParticipantEntry> ParticipantSelected { get; private set; } = new();
     public SortedCollection<ParticipantsBatch> ParticipantHistory { get; private set; } = new();
 	public int? EventId { get; set; }
+	public string? HostIp { get; set; }
 
 	public void Set(IWitnessState state)
     {
@@ -22,6 +23,7 @@ public class WitnessState : IWitnessState
 
 public interface IWitnessState
 {
+    string? HostIp { get; set; }
     int? EventId { get; set; }
     ObservableCollection<ParticipantEntry> ParticipantSnapshots { get; }
     ObservableCollection<ParticipantEntry> ParticipantSelected { get; }

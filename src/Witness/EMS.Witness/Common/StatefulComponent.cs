@@ -12,6 +12,7 @@ public abstract class StatefulComponent : ComponentBase, IDisposable
 
 	public virtual void Dispose()
 	{
+        AppState.Changed -= OnStateChanged;
 	}
 
 	/// <summary>

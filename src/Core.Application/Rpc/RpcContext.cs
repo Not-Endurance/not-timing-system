@@ -6,18 +6,18 @@ public class RpcContext
 {
     private readonly RpcProtocls protocol;
     private readonly int port;
-    private readonly string hub;
+    private readonly string endpoint;
     private string? host;
 
-    public RpcContext(RpcProtocls protocol, int port, string hub)
+    public RpcContext(RpcProtocls protocol, int port, string endpoint)
     {
-        if (hub.StartsWith("/"))
+        if (endpoint.StartsWith("/"))
         {
-            hub = hub[1..];
+            endpoint = endpoint[1..];
         }
         this.protocol = protocol;
         this.port = port;
-        this.hub = hub;
+        this.endpoint = endpoint;
     }
 
     public string? Host
@@ -42,5 +42,5 @@ public class RpcContext
     public string? Url
         => this.Host == null
             ? null
-            : $"{this.protocol.ToString().ToLower()}://{this.host}:{this.port}/{this.hub}";
+            : $"{this.protocol.ToString().ToLower()}://{this.host}:{this.port}/{this.endpoint}";
 }

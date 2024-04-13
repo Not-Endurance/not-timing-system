@@ -18,7 +18,7 @@ public class RfidService : IRfidService
     public RfidService(ISettings settings, IPopupService popupService, Application.Services.ILogger logger)
     {
         this.vd67Controller = new VupVD67Controller(TimeSpan.FromMilliseconds(100));
-        this.vupVF747PController = new VupVF747pController("192.168.68.128", logger);
+        this.vupVF747PController = new VupVF747pController("192.168.68.128", logger, TimeSpan.FromMilliseconds(10));
         this.vd67Controller.ErrorEvent += (_, message) => this.RenderError(message);
         this.vupVF747PController.ErrorEvent += (_, message) => this.RenderError(message);
         this.settings = settings;
@@ -27,6 +27,10 @@ public class RfidService : IRfidService
 
     public void ConnectReader()
     {
+        if (!this.settings.StartVupRfid)
+        {
+            return;
+        }
         if (this.settings.UseVD67InManager)
         {
             this.vd67Controller.Connect();
@@ -39,6 +43,10 @@ public class RfidService : IRfidService
 
     public void DisconnectReader()
     {
+        if (!this.settings.StartVupRfid)
+        {
+            return;
+        }
         if (this.settings.UseVD67InManager)
         {
             this.vd67Controller.Disconnect();
@@ -51,6 +59,10 @@ public class RfidService : IRfidService
 
     public RfidTag Read()
     {
+        if (!this.settings.StartVupRfid)
+        {
+            return null;
+        }
         this.isReading = true;
         var data = this.vd67Controller.Read();
         this.isReading = false;
@@ -64,6 +76,10 @@ public class RfidService : IRfidService
 
     public IEnumerable<RfidTag> StartReading()
     {
+        if (!this.settings.StartVupRfid)
+        {
+            yield break;
+        }
         if (this.isReading)
         {
             yield break;
@@ -90,6 +106,10 @@ public class RfidService : IRfidService
 
     public void StopReading()
     {
+        if (!this.settings.StartVupRfid)
+        {
+            return;
+        }
         if (this.settings.UseVD67InManager)
         {
             this.vd67Controller.StopReading();
@@ -103,6 +123,11 @@ public class RfidService : IRfidService
 
     public RfidTag Write(string position, string number)
     {
+
+        if (!this.settings.StartVupRfid)
+        {
+            return null;
+        }
         var tag = this.Read();
         tag.Position = position;
         tag.ParticipantNumber = number;

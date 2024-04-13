@@ -1,8 +1,9 @@
-﻿{
-  "version": "3.5",
+﻿
+{
+  "version": "3.6.1",
   "isSandboxMode": false,
   "startVupRfid": true,
   "startServer": true,
   "useVD67InManager": false,
-  "witnessEventType": "VetIn"
+  "witnessEventType": "Arrival"
 }

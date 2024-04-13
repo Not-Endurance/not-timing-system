@@ -1,4 +1,6 @@
 ﻿
+@implements IDisposable
+
 @if (this.Header != null)
 {
     <h2 class="accordion-header">
@@ -71,13 +73,20 @@
         }
         if (this.SyncId != null)
         {
-            SyncEvent += (sender, _) =>
-            {
-                if (sender is Collapsable collapsable)
-                {
-                    this.SyncIsCollapsed(collapsable);
-                }
-            };
+            SyncEvent += HandleSync;
+        }
+    }
+
+    public void Dispose()
+    {
+        SyncEvent -= HandleSync;
+    }
+
+    private void HandleSync(object? sender, EventArgs _)
+    {
+        if (sender is Collapsable collapsable)
+        {
+            this.SyncIsCollapsed(collapsable);
         }
     }
 

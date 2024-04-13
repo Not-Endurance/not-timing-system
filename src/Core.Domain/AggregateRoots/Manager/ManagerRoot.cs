@@ -153,8 +153,7 @@ public class ManagerRoot : IAggregateRoot
     {
         var participation = this.GetParticipation(witnessEvent.TagId);
         var aggregate = participation.Aggregate();
-        if (aggregate.CurrentLap.Result != null
-            || aggregate.CurrentLap.InspectionTime != null && aggregate.CurrentLap.ReInspectionTime != null)
+        if (aggregate.CurrentLap.InspectionTime != null && aggregate.CurrentLap.ReInspectionTime != null)
         {
             return;
         }

@@ -16,11 +16,7 @@ public class Toaster : IToaster, INotificationService, IDisposable
         this.timer.AutoReset = true;
         this.timer.Elapsed += this.HandleTimerElapsed;
         this.timer.Start();
-        CoreEvents.ErrorEvent += (sender, exception) =>
-        {
-            var toast = new Toast(exception.Message, exception.StackTrace, UiColor.Danger, 60);
-            this.Add(toast);
-        };
+        CoreEvents.ErrorEvent += HandleCoreError;
     }
 
     public event EventHandler? ToasterChanged;
@@ -65,9 +61,17 @@ public class Toaster : IToaster, INotificationService, IDisposable
     {
         if (this.timer is not null)
         {
-            this.timer.Elapsed += this.HandleTimerElapsed;
+            this.timer.Elapsed -= HandleTimerElapsed;
             this.timer.Stop();
+            this.timer.Dispose();
         }
+        CoreEvents.ErrorEvent -= HandleCoreError;
+    }
+
+    private void HandleCoreError(object? sender, Exception exception)
+    {
+        var toast = new Toast(exception.Message, exception.StackTrace, UiColor.Danger, 60);
+        this.Add(toast);
     }
 
     private bool ClearBurntToast()
@@ -76,13 +80,14 @@ public class Toaster : IToaster, INotificationService, IDisposable
         lock (lockObject)
         {
 			toastsToDelete = this.toastList.Where(item => item.IsBurnt).ToList();
-		}
-		if (!toastsToDelete.Any())
-        {
-            return false;
+            if (!toastsToDelete.Any())
+            {
+                return false;
+            }
+
+            toastsToDelete.ForEach(toast => this.toastList.Remove(toast));
         }
-        
-		toastsToDelete.ForEach(toast => this.toastList.Remove(toast));
+		
 		this.ToasterChanged?.Invoke(this, EventArgs.Empty);
         return true;
     }

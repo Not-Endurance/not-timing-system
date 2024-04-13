@@ -21,6 +21,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <!--  ID -->
         <TextBox Style="{StaticResource Input-Id}"
@@ -51,23 +52,30 @@
                    Target="{Binding ElementName=MaxAverageSpeedInKmPh}"
                    Content="{x:Static localization:Strings.MAX_AVERAGE_SPEED_IN_KMH}" />
         </Border>
+        <!-- Unranked label -->
+        <Border Style="{StaticResource Border-Content-Left}"
+                Grid.Row="5" Grid.Column="0" >
+            <Label Style="{StaticResource Label-Primary}"
+                   Target="{Binding ElementName=Unranked}"
+                   Content="Unranked" />
+        </Border>
         <!-- Athlete label -->
         <Border Style="{StaticResource Border-Content-Left}"
-                Grid.Row="5" Grid.Column="0">
+                Grid.Row="6" Grid.Column="0">
             <Label Style="{StaticResource Label-Primary}"
                    Target="{Binding ElementName=Athlete}"
                    Content="{x:Static localization:Strings.ATHLETE_ENTITY}" />
         </Border>
         <!-- Horse label -->
         <Border Style="{StaticResource Border-Content-Left}"
-                Grid.Row="6" Grid.Column="0">
+                Grid.Row="7" Grid.Column="0">
             <Label Style="{StaticResource Label-Primary}"
                    Target="{Binding ElementName=Horse}"
                    Content="{x:Static localization:Strings.HORSE_ENTITY}" />
         </Border>
         <!-- RFID Tags -->
         <Border Style="{StaticResource Border-Content-Left}"
-                Grid.Row="7" Grid.Column="0">
+                Grid.Row="8" Grid.Column="0">
             <Label Style="{StaticResource Label-Primary}"
                    Content="{x:Static localization:Strings.RFID_TAGS}" />
         </Border>
@@ -98,9 +106,17 @@
                      Text="{Binding MaxAverageSpeedInKmPh}"
                      Name="MaxAverageSpeedInKmPh" />
         </Border>
+        <!-- Unranked field -->
+        <Border Style="{StaticResource Border-Content-Center}" Visibility="{Binding Unranked}"
+                Grid.Row="5" Grid.Column="1">
+            <CheckBox Style="{StaticResource CheckBox}"
+                     IsChecked="{Binding Unranked}"
+                     Name="Unranked"
+                     Content="{x:Static localization:Strings._YES}" />
+        </Border>
         <!-- Athlete field -->
         <Border Style="{StaticResource Border-Content-Center}"
-                Grid.Row="5" Grid.Column="1">
+                Grid.Row="6" Grid.Column="1">
             <ComboBox Style="{StaticResource Combo-Box}"
                       ItemsSource="{Binding AthleteItems}"
                       SelectedValue="{Binding AthleteId}"
@@ -108,14 +124,14 @@
         </Border>
         <!-- Horse field -->
         <Border Style="{StaticResource Border-Content-Center}"
-                Grid.Row="6" Grid.Column="1">
+                Grid.Row="7" Grid.Column="1">
             <ComboBox Style="{StaticResource Combo-Box}"
                       ItemsSource="{Binding HorseItems}"
                       SelectedValue="{Binding HorseId}"
                       Name="Horse" />
         </Border>
         <Border Style="{StaticResource Border-Vertical}"
-                    Grid.Row="7" Grid.Column="1">
+                    Grid.Row="8" Grid.Column="1">
             <StackPanel Style="{StaticResource List-Horizontal}">
                 <ComboBox Style="{StaticResource Combo-Box}"
                           ItemsSource="{Binding PositionItems}"
@@ -131,7 +147,7 @@
             </StackPanel>
         </Border>
         <Border Style="{StaticResource Border-Vertical}"
-                    Grid.Row="8" Grid.Column="1">
+                    Grid.Row="9" Grid.Column="1">
             <ListBox Style="{StaticResource ListBox-Vertical}"
                      ItemsSource="{Binding RfidTags}" />
         </Border>
