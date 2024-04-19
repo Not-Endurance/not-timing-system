@@ -23,7 +23,7 @@ public class ErrorHandlerFilter : IHubFilter
         }
         catch (Exception exception)
         {
-            this.logger.LogRpcError(exception);
+            this.logger.LogError(exception);
             throw;
         }
     }

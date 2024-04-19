@@ -3,6 +3,9 @@ using Core.Services;
 using Core.Domain.AggregateRoots.Manager;
 using System;
 using System.IO;
+using Core.Application.Http;
+using System.Text;
+using System.Collections.Generic;
 
 namespace EMS.Judge.Api.Services
 {
@@ -26,14 +29,18 @@ namespace EMS.Judge.Api.Services
             this.Log(message);
         }
 
-        public void LogRpcError(Exception exception)
+        public void LogClientError(string functionality, IEnumerable<Error> errors)
         {
             var now = DateTime.Now;
-            var message = 
-                $"{now}: " + exception.Message + Environment.NewLine
-                + exception.StackTrace + Environment.NewLine;
-            var filename = $"T{now:HH-mm-ss}_rpc-error.log";
-            this.Log(message, filename);
+            var sb = new StringBuilder();
+            sb.AppendLine($"{now}: {functionality}:");
+            foreach (var error in errors)
+            {
+                sb.AppendLine(error.Message);
+                sb.AppendLine(error.StackTrace);
+            }
+            var filename = $"T{now:HH-mm-ss}_client-error.log";
+            this.Log(sb.ToString(), filename);
         }
 
         public void LogEventError(Exception exception, WitnessEvent witnessEvent)
@@ -52,8 +59,8 @@ namespace EMS.Judge.Api.Services
 
         private void Log(string message, string filename = FILE_NAME)
         {
-            var dir = $"{Directory.GetCurrentDirectory()}/logs";
-            var path = Path.Combine(dir, filename);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "logs", filename);
+            Directory.CreateDirectory(path);
             this.fileService.Append(path, message);
         }
     }
@@ -62,6 +69,6 @@ namespace EMS.Judge.Api.Services
 public interface ILogger : ITransientService
 {
     void LogError(Exception exception, string message = "");
-    void LogRpcError(Exception exception);
+    void LogClientError(string functionality, IEnumerable<Error> errors);
     void LogEventError(Exception exception, WitnessEvent witnessEvent);
 }

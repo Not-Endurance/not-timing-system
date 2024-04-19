@@ -62,7 +62,7 @@
 	[Inject]
 	private IWitnessContext Context { get; set; } = default!;
 	[Inject]
-	private IEnumerable<IRpcSocket> RpcClients { get; set; } = default!;
+	private IRpcSocket _rpcSocket { get; set; } = default!;
 	[Inject]
 	private IToaster _toaster { get; set; } = default!;
 	[Inject]
@@ -85,23 +85,20 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		this.rpcConnectionStatus = this.RpcClients.All(x => x.IsConnected) ? RpcConnectionStatus.Connected : RpcConnectionStatus.Disconnected;
-		foreach (var client in this.RpcClients)
-		{
-			client.ServerConnectionChanged += HandleServerConnectionChanged;
-			client.ServerConnectionInfo += HandleServerConnectionInfo;
-		}
+		Core.Events.CoreEvents.ErrorEvent += HandleCoreErrors;
+		_rpcSocket.Error += HandleRpcErrors;
+		_rpcSocket.ServerConnectionChanged += HandleServerConnectionChanged;
+		_rpcSocket.ServerConnectionInfo += HandleServerConnectionInfo;
 		this.Context.IsHandshakingEvent += HandleIsHandshakingEvent;
 		await SafeActionHelper.Act(async () => await _rpcInitializer.StartConnections());
 	}
 
 	public void Dispose()
 	{
-		foreach (var client in this.RpcClients)
-		{
-			client.ServerConnectionChanged -= HandleServerConnectionChanged;
-			client.ServerConnectionInfo -= HandleServerConnectionInfo;
-		}
+		Core.Events.CoreEvents.ErrorEvent -= HandleCoreErrors;
+		_rpcSocket.Error -= HandleRpcErrors;
+		_rpcSocket.ServerConnectionChanged -= HandleServerConnectionChanged;
+		_rpcSocket.ServerConnectionInfo -= HandleServerConnectionInfo;
 		this.Context.IsHandshakingEvent -= HandleIsHandshakingEvent;
 	}
 
@@ -126,6 +123,16 @@
 			this.isHandshaking = isHandshaking;
 			await this.InvokeAsync(this.StateHasChanged);
 		}
+	}
+
+	private void HandleRpcErrors(object? sender, RpcError error)
+	{
+		_toaster.Add("RPC client error", $"{error.Procedure}: {error.Exception.Message}", UiColor.Danger, 30);
+	}
+
+	private void HandleCoreErrors(object? sender, Exception error)
+	{
+		_toaster.Add(error.Message, error.StackTrace, UiColor.Danger, 30);
 	}
 }
 `
