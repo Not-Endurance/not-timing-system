@@ -6,5 +6,5 @@ public interface IStore<T> : ISingletonService
     where T : class, new()
 {
     public Task<T> Load();
-    public Task Commit(T context);
+    public Task Commit(T state);
 }
