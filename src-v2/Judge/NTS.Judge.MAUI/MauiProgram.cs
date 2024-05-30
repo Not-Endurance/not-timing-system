@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
         builder
             .ConfigureLogging()
             .AddFilesystemLogger<JudgeContext>()
-            .AddHttpLogger<JudgeContext>();
+            .AddFilesystemLogger<JudgeContext>();
 
         builder.Services
             .AddJudgeBlazor()
