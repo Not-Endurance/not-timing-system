@@ -1,3 +1,5 @@
+using Not.Storage.Ports.States;
+
 namespace Not.Storage.Adapters.Repositories;
 
 /// <summary>
@@ -10,7 +12,7 @@ namespace Not.Storage.Adapters.Repositories;
 /// <typeparam name="TState">Type of the state object containing the Root entity</typeparam>
 public abstract class BranchRepository<T, TState> : IRepository<T>
     where T : DomainEntity
-    where TState : class, new()
+    where TState : class, IState, new()
 {
     private readonly IStore<TState> _store;
 
@@ -24,13 +26,13 @@ public abstract class BranchRepository<T, TState> : IRepository<T>
 
     public virtual async Task<T?> Read(int id)
     {
-        var state = await _store.Load();
+        var state = await _store.Readonly();
         return Get(state, id);
     }
 
     public async Task<T> Update(T entity)
     {
-        var state = await _store.Load();
+        var state = await _store.Transact();
         var parent = GetParent(state, entity.Id);
         GuardHelper.ThrowIfDefault(parent);
 

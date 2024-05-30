@@ -33,8 +33,8 @@ public class Official : DomainEntity, ISummarizable, IImportable
 
 	public override string ToString()
 	{
-        return $"{LocalizationHelper.Get(this.Role)}: {this.Person}";
-	}
+        return $"{Get(this.Role)}: {this.Person}";
+    }
     public bool IsUniqueRole()
     {
         return Role is PresidentVet or PresidentGroundJury or ActiveVet or FeiVetDelegate or FeiTechDelegate or ForeignJudge;

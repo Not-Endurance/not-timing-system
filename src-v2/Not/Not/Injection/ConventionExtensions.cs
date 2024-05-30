@@ -33,7 +33,7 @@ public static class ConventionExtensions
         foreach (var c in classes)
         {
             var interfaces = c.GetInterfaces()
-                .Where(x => x.IsAssignableFrom(c))
+                .Where(x => x.IsAssignableFrom(c) && x != TransientType && x != ScopedType && x != SingletonType)
                 .ToList();
             
             var singletons = interfaces.Where(x => x.IsSingleton()).ToList();
@@ -88,11 +88,19 @@ public static class ConventionExtensions
         var service = @interface.IsGenericType && implementation.IsGenericType
             ? @interface.GetGenericTypeDefinition()
             : @interface;
-        if (service.IsTransient())
+
+        if (service.IsTransient() && (implementation.IsScoped() || implementation.IsSingleton())
+            || service.IsScoped() && (implementation.IsTransient() || implementation.IsSingleton())
+            || service.IsSingleton() && (implementation.IsTransient() || implementation.IsScoped()))
+        {
+            throw new Exception($"Conflicting lifecycles detected for service '{service.FullName}' and implementation '{implementation.FullName}'");
+        }
+
+        if (implementation.IsTransient())
         {
             services.AddTransient(service, implementation);
         }
-        else if (service.IsScoped())
+        else if (implementation.IsScoped())
         {
             services.AddScoped(service, implementation);
         }

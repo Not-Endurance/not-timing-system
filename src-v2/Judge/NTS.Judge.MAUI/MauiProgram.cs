@@ -4,6 +4,7 @@ using Not.Injection;
 using Not.MAUI.Logging;
 using Not.Logging;
 using NTS.Judge.Startup;
+using Not.Storage.Stores;
 
 namespace NTS.Judge.MAUI;
 
@@ -34,10 +35,10 @@ public static class ServiceCollectionExtensions
 #endif
         builder
             .ConfigureLogging()
-            .AddFilesystemLogger<JudgeContext>()
             .AddFilesystemLogger<JudgeContext>();
 
         builder.Services
+            .AddJsonFileStore<JudgeContext>()
             .AddJudgeBlazor()
             .AddInversedDependencies();
         return builder;

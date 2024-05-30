@@ -22,7 +22,7 @@ public abstract class TreeRepository<T, TState> : IRepository<T>
 
     public async Task<T> Create(T entity)
     {
-        var state = await _store.Load();
+        var state = await _store.Transact();
         state.Root = entity;
         await _store.Commit(state);
         return entity;
@@ -35,7 +35,7 @@ public abstract class TreeRepository<T, TState> : IRepository<T>
 
     public async Task<T?> Read(int _)
     {
-        var state = await _store.Load();
+        var state = await _store.Readonly();
         return state.Root;
     }
 

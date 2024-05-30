@@ -24,6 +24,6 @@ public class ServiceLocator : IInitializer, ITransientService
 
     public void Run()
     {
-        // It's just necessary to load ServiceLocator in order to set _provider from DI container
+        ;// It's just necessary to load ServiceLocator in order to set _provider from DI container
     }
 }
