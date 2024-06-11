@@ -7,13 +7,16 @@ public class Person
     internal static string DELIMITER = " ";
 
     [JsonConstructor]
-    private Person() {}
+    private Person(string[] names)
+    {
+        Names = names;
+    }
     public Person(string name)
     {
         this.Names = name.Split(DELIMITER);
     }
 
-    public string[] Names { get; private set; } // TODO: test record equality
+    public string[] Names { get; private set; } = Array.Empty<string>();// TODO: test record equality
 
     public override string ToString()
 	{

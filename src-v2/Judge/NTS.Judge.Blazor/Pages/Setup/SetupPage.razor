@@ -1,5 +1,6 @@
 @using NTS.Domain.Setup.Entities;
 @using NTS.Judge.Blazor.Pages.Setup.Events;
+@using NTS.Judge.Ports
 @using Not.Blazor.Components;
 @using Not.Blazor.Forms
 
@@ -17,6 +18,7 @@
     {
         <EventPage />
     }
+    <MudButton OnClick="@(() => _interop.Html(_mudThemeProvider))">Print</MudButton>
 </MudPaper>
 
 @code {
@@ -25,7 +27,11 @@
     private IFormNavigator<Event, EventForm> _formNavigator { get; set; } = default!;
     [Inject]
     private INotBehind<Event> _behind { get; set; } = default!;
-
+    [Inject]
+    private IHelloWorldInterop _interop { get; set; } = default!;
+    [CascadingParameter]
+    private MudThemeProvider _mudThemeProvider { get; set; } = default!;
+    
     protected override async Task OnInitializedAsync()
     {
         await Init();

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Compatibility.EMS\NTS.Compabitility.EMS.csproj" />
+    <ProjectReference Include="..\..\Not\Not.Storage\Not.Storage.csproj" />
     <ProjectReference Include="..\..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Setup\NTS.Domain.Setup.csproj" />

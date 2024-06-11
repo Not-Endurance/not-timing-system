@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Not.Logging;
+using NTS.Judge.Startup;
 
 namespace NTS.Persistence.Startup;
 

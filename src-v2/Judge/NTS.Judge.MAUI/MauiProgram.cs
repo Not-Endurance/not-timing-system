@@ -1,7 +1,10 @@
 ﻿using NTS.Persistence.Startup;
-using Microsoft.Extensions.Logging;
 using NTS.Judge.Blazor.Startup;
 using Not.Injection;
+using Not.MAUI.Logging;
+using Not.Logging;
+using NTS.Judge.Startup;
+using Not.Storage.Stores;
 
 namespace NTS.Judge.MAUI;
 
@@ -29,9 +32,13 @@ public static class ServiceCollectionExtensions
         builder.Services.AddMauiBlazorWebView();
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
-        builder.Logging.AddDebug();
 #endif
+        builder
+            .ConfigureLogging()
+            .AddFilesystemLogger<JudgeContext>();
+
         builder.Services
+            .AddJsonFileStore<JudgeContext>()
             .AddJudgeBlazor()
             .AddInversedDependencies();
         return builder;

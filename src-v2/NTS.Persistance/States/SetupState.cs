@@ -2,7 +2,7 @@
 
 namespace NTS.Persistence.Setup;
 
-public class SetupState : ITreeState<Event>
+public class SetupState : NotState, ITreeState<Event>
 {
     public Event? Event { get; set; }
     

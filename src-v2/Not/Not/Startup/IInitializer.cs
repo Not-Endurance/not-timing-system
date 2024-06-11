@@ -2,7 +2,7 @@
 
 namespace Not.Startup;
 
-public interface IInitializer : ISingletonService
+public interface IInitializer
 {
     void Run();
 }

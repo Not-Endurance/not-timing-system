@@ -5,11 +5,12 @@ namespace Not.Serialization;
 
 public static class SerializationExtensions
 {
-    private static JsonSerializerSettings _settings = new()
+    private static readonly JsonSerializerSettings _settings = new()
     {
         ContractResolver = new PrivatePropertySetterResolver(),
         ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
         PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+        Formatting = Formatting.Indented,
     };
 
     public static string ToJson(this object obj)

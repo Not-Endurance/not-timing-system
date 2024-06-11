@@ -3,8 +3,8 @@ using NTS.Domain.Core.Entities;
 
 namespace NTS.Persistence.States;
 
-public class CoreState
-    : ITreeState<Event>,
+public class CoreState : NotState,
+    ITreeState<Event>,
     ISetState<Official>,
     ISetState<Participation>,
     ISetState<Classification>,

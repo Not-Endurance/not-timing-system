@@ -26,7 +26,8 @@
     protected override async Task OnInitializedAsync()
     {
         // Needs to wait untill ref is evaluated. Also this makes it necessary to trigger a manual rerender of TForm
-        while (_notUpdate == null)
+        // https://learn.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-8.0#handle-incomplete-async-actions-at-render
+        while (_notUpdate == null || Entity == null)
         {
             await Task.Delay(TimeSpan.FromMilliseconds(10));
         }
