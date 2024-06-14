@@ -1,0 +1,18 @@
+﻿@using Not.Blazor.Navigation
+@using Not.Blazor.Print
+
+@attribute [Route(PRINT_PAGE)]
+
+<HtmlPrinter Css="@_css" />
+
+@code {
+    [Inject]
+    private INavigator _navigator { get; set; } = default!;
+
+    private string? _css;
+
+    protected override void OnInitialized()
+    {
+        _css = _navigator.ConsumeParameter<string>();
+    }
+}

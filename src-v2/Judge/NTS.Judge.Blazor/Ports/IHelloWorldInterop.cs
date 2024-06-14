@@ -7,5 +7,5 @@ namespace NTS.Judge.Ports;
 public interface IHelloWorldInterop : ITransientService
 {
     Task Hello();
-    Task Html(MudThemeProvider provider);
+    Task Print(MudThemeProvider provider);
 }

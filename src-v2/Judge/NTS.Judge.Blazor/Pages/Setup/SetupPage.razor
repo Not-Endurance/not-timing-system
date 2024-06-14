@@ -1,8 +1,10 @@
 @using NTS.Domain.Setup.Entities;
 @using NTS.Judge.Blazor.Pages.Setup.Events;
+@using NTS.Judge.Blazor.Ports
 @using NTS.Judge.Ports
 @using Not.Blazor.Components;
 @using Not.Blazor.Forms
+@using NTS.Judge.Blazor.Pages.Demos;
 
 @attribute [Route(SETUP_PAGE)]
 @inherits NotComponent
@@ -18,7 +20,7 @@
     {
         <EventPage />
     }
-    <MudButton OnClick="@(() => _interop.Html(_mudThemeProvider))">Print</MudButton>
+    <MudButton OnClick="@(() => Print())">Print</MudButton>
 </MudPaper>
 
 @code {
@@ -28,10 +30,10 @@
     [Inject]
     private INotBehind<Event> _behind { get; set; } = default!;
     [Inject]
-    private IHelloWorldInterop _interop { get; set; } = default!;
+    private IPrinter _printer { get; set; } = default!;
     [CascadingParameter]
     private MudThemeProvider _mudThemeProvider { get; set; } = default!;
-    
+
     protected override async Task OnInitializedAsync()
     {
         await Init();
@@ -46,5 +48,10 @@
     {
         await _formNavigator.Create();
         await Init();
+    }
+
+    private async Task Print()
+    {
+        await _printer.NavigateToPrint();
     }
 }
