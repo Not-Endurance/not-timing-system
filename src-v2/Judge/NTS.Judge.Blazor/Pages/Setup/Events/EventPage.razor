@@ -1,4 +1,5 @@
 @using NTS.Domain.Setup.Entities
+@using NTS.Judge.Blazor.Pages.Setup.Athletes
 @using NTS.Judge.Blazor.Pages.Setup.Events
 @using NTS.Judge.Blazor.Pages.Setup.Loops
 @using NTS.Judge.Blazor.Pages.Setup.Officials
@@ -20,6 +21,12 @@
     <NotSetList Name="Officials" T="Official" TForm="OfficialForm" UpdateRoute="@OFFICIAL_UPDATE" />
     <MudDivider Vertical="true" FlexItem="true" />
     <NotSetList Name="Loops" T="Loop" TForm="LoopForm" UpdateRoute="@LOOP_UPDATE" />
+</MudPaper>
+
+<MudDivider />
+
+<MudPaper Class="d-flex justify-space-between pr-6" Elevation="0">
+    <NotSetList Name="Athletes" T="Athlete" TForm="AthleteForm" UpdateRoute="@ATHLETE_UPDATE" />
 </MudPaper>
 
 <MudDivider />

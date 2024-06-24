@@ -1,0 +1,25 @@
+﻿@using NTS.Domain.Setup.Entities;
+@using Not.Blazor.Components;
+@using Not.Blazor.Navigation;
+@using Not.Blazor.TM.Forms.Components
+
+@attribute [Route(ATHLETE_UPDATE)]
+@inherits NotComponent
+
+<MudPaper Elevation="0">
+    <NotH2>@Localizer.Get("Update Athlete")</NotH2>
+    <NotFormUpdate T="Athlete" TForm="AthleteForm" Entity="_navigator.ConsumeParameter<Athlete>()" UpdateAction="Update" />
+</MudPaper>
+
+@code {
+    [Inject]
+    private INotSetBehind<Athlete> _behind { get; set; } = default!;
+    [Inject]
+    private INavigator _navigator { get; set; } = default!;
+
+    protected async Task Update(Athlete athlete)
+    {
+        await _behind.Update(athlete);
+        _navigator.NavigateTo(SETUP_PAGE);
+    }
+}

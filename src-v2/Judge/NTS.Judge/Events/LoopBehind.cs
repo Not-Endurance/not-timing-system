@@ -15,10 +15,12 @@ public class LoopBehind : INotSetBehind<Loop>
     {
         _loopRepository = loopRepository;
     }
+
     public Task<IEnumerable<Loop>> GetAll()
     {
         return _loopRepository.ReadAll();
     }
+
     public async Task<Loop> Create(Loop entity)
     {
         _loop = await _loopRepository.Create(entity);

@@ -6,11 +6,11 @@ public record Country(string IsoCode, string Name) : DomainObject, ISummarizable
 {
 	public string Summarize()
 	{
-		return $"{this.Name}, {this.IsoCode}";
+		return $"{Name}, {IsoCode}";
 	}
 
 	public override string ToString()
 	{
-		return this.Name;
+		return Name;
 	}
 }
