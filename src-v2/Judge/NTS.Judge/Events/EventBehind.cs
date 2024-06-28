@@ -102,8 +102,10 @@ public class EventBehind : INotBehind<Event>, INotSetBehind<Official>, INotSetBe
         return child;
     }
 
-    public async Task Initialize(int id)
+    public async Task<Event> Initialize(int id)
     {
         _event = await _eventRepository.Read(id);
+        GuardHelper.ThrowIfDefault(_event);
+        return _event;
     }
 }

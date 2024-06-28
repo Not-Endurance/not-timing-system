@@ -11,5 +11,5 @@ namespace Not.Blazor.Ports.Behinds;
 public interface INotParentBehind<T>: ISingletonService
     where T : DomainEntity, IParent
 {
-    Task Initialize(int id);
+    Task<T> Initialize(int id);
 }

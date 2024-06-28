@@ -21,7 +21,7 @@
     <NotSetList Name="Contestants" T="Contestant" TForm="ContestantForm" UpdateRoute="@CONTESTANT_UPDATE" />
 </MudPaper>
 
-@code {   
+@code {
     private Competition _competition { get; set; } = default!;
     [Inject]
     private INotSetBehind<Competition> _setBehind { get; set; } = default!;
@@ -32,12 +32,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _competition = _navigator.ConsumeParameter<Competition>();
-        await _competitionWithChildren.Initialize(_competition.Id);
+        var competition = _navigator.ConsumeParameter<Competition>();
+        _competition = await _competitionWithChildren.Initialize(competition.Id);
     }
 
     protected async Task Update(Competition competition)
     {
+
         await _setBehind.Update(competition);
         _navigator.NavigateTo(SETUP_PAGE);
     }

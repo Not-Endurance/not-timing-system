@@ -81,8 +81,10 @@ public class CompetitionChildrenBehind : INotSetBehind<Contestant>, INotSetBehin
         return entity;
     }
 
-    public async Task Initialize(int id)
+    public async Task<Competition> Initialize(int id)
     {
         _competition = await _competitionReader.Read(id);
+        GuardHelper.ThrowIfDefault(_competition);
+        return _competition;
     }
 }
