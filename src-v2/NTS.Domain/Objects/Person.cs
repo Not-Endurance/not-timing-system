@@ -2,7 +2,7 @@
 
 namespace NTS.Domain.Objects;
 
-public class Person
+public class Person : IComparable<Person>
 {
     internal static string DELIMITER = " ";
 
@@ -23,6 +23,15 @@ public class Person
 	{
 		return string.Join(DELIMITER, this.Names);
 	}
+
+    public int CompareTo(Person? other)
+    {
+        if (other == null) return 1;
+
+        // First compare Athlete
+        int athleteComparison = string.Compare(String.Join(DELIMITER, Names), String.Join(" ", other.Names), StringComparison.Ordinal);
+        return athleteComparison;
+    }
 
     public static implicit operator string(Person member)
     {

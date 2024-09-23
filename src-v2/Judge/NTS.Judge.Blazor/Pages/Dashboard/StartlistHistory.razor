@@ -1,0 +1,87 @@
+﻿@using NTS.Domain.Core.Objects
+@using NTS.Judge.Blazor.Ports
+@using System.Collections
+@using Not.Blazor.TM
+@using Not.Extensions
+
+@attribute [Route(STARTLIST_HISTORY)]
+@inherits NotComponent
+
+<NotH1>@Localizer.Get("Startlist History")</NotH1>
+
+<MudGrid Style="margin-top:0 !important;">
+    <MudTabs @ref="@Tabs" PanelClass="px-4 py-6" Elevation="4"
+        Rounded ApplyEffectsToContainer>
+        @foreach (var tab in UserTabs)
+        {
+            <MudTabPanel ID="@tab.Id" Text="@tab.Label">
+                <ChildContent>
+                    <MudSimpleTable Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Style="overflow-x: auto;">
+                        <thead>
+                            <tr>
+                                @foreach (var h in headings)
+                                {
+                                    <th>@h</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in groupedData)
+                            {
+                                if (tab.Label.Contains(row.TotalDistance.ToString()))
+                                {
+                                    <tr>
+                                        @foreach (var x in row.ToString().Split(","))
+                                        {
+                                            <td>@x</td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </ChildContent>
+            </MudTabPanel>
+        }
+        </MudTabs>
+</MudGrid>
+
+@code{
+    [Inject]
+    private IStartlistBehind _behind { get; set; } = default!;
+
+    public class TabView
+    {
+        public string Label { get; set; }
+        public Guid Id { get; set; }
+        public bool ShowCloseIcon { get; set; } = true;
+    }
+    public MudTabs Tabs = default!;
+    public List<TabView> UserTabs = new();
+    public int UserIndex;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await _behind.Initialize();
+        //var ringiringirae = _behind.StartHistory;
+        var starts = _behind.StartHistory.StartlistByDistance();
+        foreach (var start in starts)
+        {
+            TabView tab = new TabView();
+            tab.Label = $"{start.TotalDistance.FloorWholeNumberToTens()} {@Localizer.Get("KM")}";
+            tab.Id = Guid.NewGuid();
+            if (!UserTabs.Any(t => t.Label == tab.Label))
+            {
+                UserTabs.Add(tab);
+            }
+            groupedData.Add(start);
+        }
+    }
+    public bool dense = false;
+    public bool hover = false;
+    public bool bordered = false;
+    public bool striped = false;
+    public Color color = Color.Primary;
+    public string[] headings = { "Number", "Athlete", "Loop", "Start Time" };
+    public List<Start> groupedData { get; set; } = new List<Start>();
+}

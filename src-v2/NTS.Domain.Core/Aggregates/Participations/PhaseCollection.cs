@@ -21,7 +21,7 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
     public Phase? Current { get; private set; } 
     internal int CurrentNumber => this.NumberOf(Current ?? this.Last());
     public double Distance => this.Sum(x => x.Length);
-    internal Timestamp? OutTime => this.LastOrDefault(x => x.OutTime != null)?.OutTime;
+    public Timestamp? OutTime => this.LastOrDefault(x => x.OutTime != null)?.OutTime;
 
     public override string ToString()
     {

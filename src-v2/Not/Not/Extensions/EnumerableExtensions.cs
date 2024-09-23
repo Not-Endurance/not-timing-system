@@ -21,4 +21,17 @@ public static class EnumerableExtensions
             ? NOT_FOUND
             : index + 1;
     }
+
+    public static IEnumerable<TElement> FlattenGroupedItems<TKey, TElement>(this
+    IOrderedEnumerable<IGrouping<TKey, TElement>> groupedStarts)
+    {
+        foreach (var group in groupedStarts)
+        {
+            foreach (var groupedAndOrderedList in group)
+            {
+                yield return groupedAndOrderedList;
+            }
+        }
+    }
+
 }

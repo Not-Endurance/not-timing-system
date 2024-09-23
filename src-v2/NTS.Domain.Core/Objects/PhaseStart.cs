@@ -1,5 +1,6 @@
 ﻿using Not.Events;
 using NTS.Domain.Core.Aggregates.Participations;
+using System.Text;
 
 namespace NTS.Domain.Core.Objects;
 
