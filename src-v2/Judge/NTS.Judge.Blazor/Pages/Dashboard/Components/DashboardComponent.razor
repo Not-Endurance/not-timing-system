@@ -14,15 +14,14 @@
     </MudItem>
     <MudItem xs="3">
         <MudChipSet @bind-SelectedValue="_behind.SelectedParticipation" SelectionMode="SelectionMode.SingleSelection">
-            @foreach (var grouping in _behind.Participations.GroupBy(x => x.Phases.Distance)) // TODO: move grouping in field
+            @foreach (var (distance, participations) in _participationsByDistance)
             {
-                <MudText Class="pl-4"><strong>@($"{grouping.Key} {@Localizer.Get("KM")}")</strong></MudText>
+                <MudText Class="pl-4"><strong>@($"{distance} {@Localizer.Get("KM")}")</strong></MudText>
                 <MudDivider /> 
-                @foreach (var participation in grouping.OrderBy(x => x.Tandem.Number))
+                @foreach (var participation in participations)
                 {
                     var number = participation.Tandem.Number;
                     var color = participation.IsNotQualified() ? Color.Error : Color.Primary;
-                    // TODO: Update Mudblazor and use bind-Selected: https://mudblazor.com/components/chipset#binding-chips-in-a-selection
                     <MudChip Text="@number.ToString()" Value="@participation" Color="@color" Style="min-width: 1rem" />
                 }
             }
@@ -36,13 +35,25 @@
 @code {
     [Inject]
     private IParticipationBehind _behind { get; set; } = default!;
+    IEnumerable<(double, IOrderedEnumerable<Participation>)> _participationsByDistance = [];
 
     protected override async Task OnInitializedAsync()
     {
         await Observe(_behind);
+        SortParticipations();
     }
 
-    private Task<IEnumerable<Participation>> Search(string term)
+    void SortParticipations()
+    {
+        _participationsByDistance = _behind
+            .Participations
+            .GroupBy(x => x.Phases.Distance)
+            .Select(x => (x.Key, x.OrderBy(y => y.Tandem.Number)))
+            .OrderBy(x => x.Key)
+            .ToList();
+    }
+
+    Task<IEnumerable<Participation>> Search(string term)
     {
         if (string.IsNullOrEmpty(term))
         {

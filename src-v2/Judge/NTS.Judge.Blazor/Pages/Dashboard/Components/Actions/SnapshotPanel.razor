@@ -3,43 +3,38 @@
 
 @inherits NotComponent
 
-<MudStack Row="true" AlignItems="AlignItems.Center">
-    <MudTextField @bind-Value="_time" T="string" Label="Time" Mask="@(new PatternMask("00:00:00"))" Class="mr-2"/>
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="@Class">
+    <MudTextField @bind-Value="_time" Label="Time" Mask="_timeMask" />
+
+    <MudSpacer />
+
     <MudButtonGroup OverrideStyles="false" Size="Size.Medium">
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Process">Process</MudButton>
-        <MudIconButton Icon="@Icons.Material.Outlined.Timer" Color="Color.Primary" Variant="Variant.Outlined" OnClick="SnapshotTime">Snapshot</MudIconButton>
+        <NotButtonPrimary Text="Process" OnClick="Process" />
+
+        <MudIconButton Icon="@Icons.Material.Outlined.Timer" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Snapshot" />
     </MudButtonGroup>
 </MudStack>
 
 @code {
+    readonly static PatternMask _timeMask = new PatternMask("00:00:00");
+    const string DEFAULT_TIME = "00:00:00";
+
     [Inject]
     IParticipationBehind _participationBehind { get; set; } = default!;
-    private const string DEFAULT_TIME = "00:00:00";
-    private string _time = DEFAULT_TIME;
-    
+    string _time = DEFAULT_TIME;
+
     protected override async Task OnInitializedAsync()
     {
         await Observe(_participationBehind);
     }
 
-    public void SnapshotTime()
+    void Snapshot()
     {
         var currentTime = DateTime.Now.TimeOfDay;
         _time = currentTime.ToString();
     }
 
-    public Snapshot CreateSnapshot(DateTime timeStampDateTime)
-    {
-        var timestamp = new Timestamp(timeStampDateTime);
-
-        return new Snapshot(
-            _participationBehind.SelectedParticipation!.Tandem.Number, 
-           SnapshotType.Automatic,
-           SnapshotMethod.Manual,
-           timestamp);
-    }
-
-    public void Process()
+    void Process()
     {
         if (_time == DEFAULT_TIME)
         {

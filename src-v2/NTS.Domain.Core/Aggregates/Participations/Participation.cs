@@ -7,8 +7,8 @@ namespace NTS.Domain.Core.Aggregates.Participations;
 public class Participation : DomainEntity, IAggregateRoot
 {
     private static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
-    private static readonly FailedToQualify OUT_OF_TIME = new (FTQCodes.OT);
-    private static readonly FailedToQualify SPEED_RESTRICTION = new (FTQCodes.SP);
+    private static readonly FailedToQualify OUT_OF_TIME = new ([FTQCodes.OT]);
+    private static readonly FailedToQualify SPEED_RESTRICTION = new ([FTQCodes.SP]);
 
     private Participation(int id) : base(id)
     {
@@ -128,7 +128,7 @@ public class Participation : DomainEntity, IAggregateRoot
         }
         else
         {
-            RevokeQualification(new FailedToQualify(reason, codes));
+            RevokeQualification(new FailedToQualify(codes, reason));
         }
     }
 

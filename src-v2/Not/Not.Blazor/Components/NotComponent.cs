@@ -15,7 +15,7 @@ public class NotComponent : ComponentBase
 
     protected async Task Observe(IObservableBehind observable)
     {
-        observable.Subscribe(Render);
+        observable.Subscribe(OnEmit);
 
         await observable.Initialize();
         await Render();
@@ -24,5 +24,15 @@ public class NotComponent : ComponentBase
     protected async Task Render()
     {
         await InvokeAsync(StateHasChanged);
+    }
+
+    protected virtual void OnBeforeRender()
+    {
+    }
+
+    async Task OnEmit()
+    {
+        OnBeforeRender();
+        await Render();
     }
 }

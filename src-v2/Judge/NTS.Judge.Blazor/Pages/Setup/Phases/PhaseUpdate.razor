@@ -10,20 +10,12 @@
 <NotPage Title="Configure Phase">
 
     <Main>
-        <NotFormUpdate T="Phase" TForm="PhaseForm" Entity="_navigator.ConsumeParameter<Phase>()" UpdateAction="Update" />
+        <NotFormUpdate T="Phase" TForm="PhaseForm" Entity="_navigator.ConsumeParameter<Phase>()" />
     </Main>
 
 </NotPage>
 
 @code {
     [Inject]
-    private INotSetBehind<Phase> _parentBehind { get; set; } = default!;
-    [Inject]
-    private INavigator _navigator { get; set; } = default!;
-
-    protected async Task Update(Phase phase)
-    {
-        await _parentBehind.Update(phase);
-        _navigator.NavigateTo(ENDURANCE_EVENT_PAGE);
-    }
+    private ICrumbsNavigator _navigator { get; set; } = default!;
 }

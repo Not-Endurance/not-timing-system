@@ -1,17 +1,19 @@
+@using Not.Blazor.Navigation
+@using Not.Blazor.TM.Navigation
 
 @inherits NotComponent
 
 <MudNavMenu>
     <MudNavGroup Title="@Localizer.Get("Setup")" Expanded="true">
-        <MudNavLink Href="@ENDURANCE_EVENT_PAGE" Match="NavLinkMatch.All">@Localizer.Get("Endurance Event")</MudNavLink>
-        <MudNavLink Href="@ATHLETES_HORSES_PAGE" Match="NavLinkMatch.Prefix">@Localizer.Get("Athletes & Horses")</MudNavLink>
-        <MudNavLink Href="@COMBINATIONS_PAGE" Match="NavLinkMatch.Prefix">@Localizer.Get("Combinations")</MudNavLink>
-        <MudNavLink Href="@LOOPS_PAGE" Match="NavLinkMatch.Prefix">@Localizer.Get("Loops")</MudNavLink>
+        <NotNavLink Endpoint="@ENDURANCE_EVENT_PAGE" Text="Endurance Event" Match="NavLinkMatch.All" />
+        <NotNavLink Endpoint="@ATHLETES_HORSES_PAGE" Text="Athletes & Horses" />
+        <NotNavLink Endpoint="@COMBINATIONS_PAGE" Text="Combinations" />
+        <NotNavLink Endpoint="@LOOPS_PAGE" Text="Loops" />
     </MudNavGroup>
     <MudNavGroup Title="@Localizer.Get("Dashboard")" Expanded="true">
-        <MudNavLink Href="@DASHBOARD_PAGE" Match="NavLinkMatch.Prefix">@Localizer.Get("Dashboard")</MudNavLink>
-        <MudNavLink Href="@RANKLIST_PAGE" Match="NavLinkMatch.Prefix">@Localizer.Get("Ranklist")</MudNavLink>
-        <MudNavLink Href="@HANDOUTS_PAGE" Match="NavLinkMatch.Prefix">@Localizer.Get("Handouts")</MudNavLink>
+        <NotNavLink Endpoint="@DASHBOARD_PAGE" Text="Dashboard" />
+        <NotNavLink Endpoint="@RANKLIST_PAGE" Text="Ranklist" />
+        <NotNavLink Endpoint="@HANDOUTS_PAGE" Text="Handouts" />
     </MudNavGroup>
     <MudNavGroup Title="Demos">
         <MudNavLink Href="/localization-demo" Match="NavLinkMatch.Prefix">Localization</MudNavLink>
@@ -19,3 +21,13 @@
         <MudNavLink Href="/persistence-demo" Match="NavLinkMatch.Prefix">Persitence</MudNavLink>
     </MudNavGroup>
 </MudNavMenu>
+
+@code {
+    [Inject]
+    ILandNavigator _landNavigator { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        _landNavigator.Initialize(ENDURANCE_EVENT_PAGE);
+    }
+}

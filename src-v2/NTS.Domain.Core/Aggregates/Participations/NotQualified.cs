@@ -56,30 +56,37 @@ public record FinishedNotRanked : NotQualified
 
 public record FailedToQualify : NotQualified
 {
-    public FailedToQualify(params FTQCodes[] codes) : base(FAILED_TO_QUALIFY)
+    public FailedToQualify(FTQCodes[] codes) : this(null, codes)
     {
+        if (codes == null || codes.Length == 0)
+        {
+            throw new DomainException($"Cannot eliminate as FTQ without FTQ codes");
+        }
         if (codes.Contains(FTQCodes.FTC))
         {
-            throw new DomainException($"'Failed to Complete' requires a writen explanation from officials. Please provide 'complement'");
+            throw new DomainException(
+                $"Rules require a written explanation for FTC (Failed to Complete) elimination. Please provide '{nameof(Complement)}'");
         }
         Codes = codes;
     }
 
-    public FailedToQualify(string complement ,params FTQCodes[] codes) : base(complement, FAILED_TO_QUALIFY)
+    public FailedToQualify(FTQCodes[] codes, string complement) : this(complement, codes)
     {
         Codes = codes;
     }
+
     [JsonConstructor]
-    public FailedToQualify(string complement) : base(complement, FAILED_TO_QUALIFY)
+    private FailedToQualify(string? complement, FTQCodes[] codes) : base(FAILED_TO_QUALIFY)
     {
-        Codes = new List<FTQCodes>{FTQCodes.FTC};
+        Codes = codes;
+        Complement = complement;
     }
 
     public IEnumerable<FTQCodes> Codes { get; private set; } = new List<FTQCodes>();
 
     public override string ToString()
     {
-        string codes = String.Join('+', Codes);
+        var codes = string.Join('+', Codes);
         return $"FTQ {codes}";
     }
 }
@@ -147,7 +154,7 @@ public abstract record NotQualified : DomainObject
     }
     protected NotQualified(string complement, string eliminationCode)
     {
-        Complement = complement;
+        Complement = complement ?? throw new DomainException($"Cannot eliminate as '{eliminationCode}' without reason");
         EliminationCode = eliminationCode;
     }
 

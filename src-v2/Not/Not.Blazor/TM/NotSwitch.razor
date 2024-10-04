@@ -1,20 +1,12 @@
 ﻿@using Not.Blazor.Components
+@using Not.Services
 
-@inherits BindableValueComponent<bool>
+@inherits MudSwitch<bool>
 
-<MudSwitch T="bool" @bind-Value="Value" Label="@Localizer.Get(Label)"
-           ThumbIcon="@(Value==true ? IconForTrue : IconForFalse )"
-           ThumbIconColor="@(Value==true ? ColorForTrue : ColorForFalse )" />
+<MudSwitch @bind-Value="Value" Label="@(Label != null ? _localizer.Get(Label) : null)" Style="Style" Class="Class"
+    Color="Color.Primary" Converter="Converter" Culture="Culture" Disabled="Disabled" LabelPosition="LabelPosition" />
 
 @code {
-    [Parameter]
-    public string Label { get; set; } = default!;
-    [Parameter]
-    public string IconForTrue { get; set; } = Icons.Material.Filled.Done;
-    [Parameter]
-    public string IconForFalse { get; set; } = Icons.Material.Filled.Close;
-    [Parameter]
-    public Color ColorForTrue { get; set; } = Color.Success;
-    [Parameter]
-    public Color ColorForFalse { get; set; } = Color.Error;
+    [Inject]
+    ILocalizer _localizer { get; set; } = default!;
 }

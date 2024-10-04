@@ -11,9 +11,9 @@ public class NotFormNavigator<T, TFields> : IFormNavigator<T, TFields>
     where TFields : NotForm<T>
 {
     private readonly IDialogs<T, TFields> _notDialogs;
-    private readonly INavigator _navigator;
+    private readonly ICrumbsNavigator _navigator;
 
-    public NotFormNavigator(IDialogs<T, TFields> notDialogs, INavigator navigator)
+    public NotFormNavigator(IDialogs<T, TFields> notDialogs, ICrumbsNavigator navigator)
     {
         _notDialogs = notDialogs;
         _navigator = navigator;

@@ -10,21 +10,12 @@
 <NotPage Title="Configure Contestant">
 
     <Main>
-        <NotFormUpdate T="Contestant" TForm="ContestantForm" Entity="_navigator.ConsumeParameter<Contestant>()" UpdateAction="Update" />
+        <NotFormUpdate T="Contestant" TForm="ContestantForm" Entity="_navigator.ConsumeParameter<Contestant>()" />
     </Main>
 
 </NotPage>
 
 @code {
-    private Contestant _contestant { get; set; } = default!;
     [Inject]
-    private INotSetBehind<Contestant> _parentBehind { get; set; } = default!;
-    [Inject]
-    private INavigator _navigator { get; set; } = default!;
-
-    protected async Task Update(Contestant contestant)
-    {
-        await _parentBehind.Update(contestant);
-        _navigator.NavigateTo(ENDURANCE_EVENT_PAGE);
-    }
+    private ICrumbsNavigator _navigator { get; set; } = default!;
 }

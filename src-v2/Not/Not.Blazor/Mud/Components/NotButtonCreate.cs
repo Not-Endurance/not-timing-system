@@ -6,7 +6,7 @@ public class NotButtonCreate : NotButtonPrimary
 {
     public NotButtonCreate()
     {
-        StartIcon = Icons.Material.Filled.Create;
+        StartIcon = Icons.Material.Filled.Add;
         Text = "Create";
     }
 }

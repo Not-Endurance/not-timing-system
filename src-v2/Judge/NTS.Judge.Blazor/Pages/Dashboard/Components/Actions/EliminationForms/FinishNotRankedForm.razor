@@ -1,35 +1,36 @@
 ﻿@using NTS.Domain.Core.Aggregates.Participations
 @using NTS.Judge.Blazor.Enums
+@using NTS.Judge.Blazor.Pages.Dashboard.Components.Actions.EliminationForms.Components
 @using NTS.Judge.Blazor.Ports
 @using System.Diagnostics
+@using Not.Notifier
 
 @inherits EliminationForm
 
-<MudTextField @bind-Value="Reason" Label="Reason" Variant="Variant.Outlined"></MudTextField>
+<MudPaper Elevation="1" Class="pa-2">
+    <EliminationFormReason @bind-Value="_reason" />
 
-<MudButton Class="mt-4 one-third-width" Variant="Variant.Filled" Color="Color.Primary" OnClick="Eliminate">
-    @Localizer.Get("Eliminate")
-</MudButton>
-
-<MudButton Class="mt-4 one-third-width" Variant="Variant.Filled" Color="Color.Primary" OnClick="Restore">
-    @Localizer.Get("Restore")
-</MudButton>
+    <EliminationFormActions Form="this" />
+</MudPaper>
 
 @code {
+    string? _reason;
+
     [Parameter]
     public FinishedNotRanked? FinishedNotRanked { get; set; } = default!;
 
-    private string? Reason;
-
     protected override void OnParametersSet()
     {
-        Reason = FinishedNotRanked?.Complement;
+        _reason = FinishedNotRanked?.Complement;
     }
 
-    public override async Task Eliminate()
+    internal override async Task Eliminate()
     {
-        //TO DO: Validate for null Reason
-        await _participationBehind.FinishNotRanked(Reason);
-        await OnEliminate.InvokeAsync();
+        if (_reason == null)
+        {
+            NotifyHelper.Warn("Reason is required");
+            return;
+        }
+        await _participationBehind.FinishNotRanked(_reason);
     }
 }

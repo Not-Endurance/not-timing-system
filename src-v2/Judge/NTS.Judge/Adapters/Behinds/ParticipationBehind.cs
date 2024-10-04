@@ -23,7 +23,6 @@ public class ParticipationBehind : ObservableBehind, IParticipationBehind
     }
 
     public IEnumerable<Participation> Participations { get; private set; } = new List<Participation>();
-    public IEnumerable<IGrouping<double, Participation>> ParticipationsByDistance => Participations.GroupBy(x => x.Phases.Distance);
     public Participation? SelectedParticipation
     {
         get => _selectedParticipation; 
@@ -123,10 +122,10 @@ public class ParticipationBehind : ObservableBehind, IParticipationBehind
         EmitChange();
     }
 
-    async Task SafeFailToQualify(string? reason, params FTQCodes[] ftqCodes)
+    async Task SafeFailToQualify(string? reason, FTQCodes[] ftqCodes)
     {
         GuardHelper.ThrowIfDefault(SelectedParticipation);
-        GuardHelper.ThrowIfDefault(ftqCodes);
+
         SelectedParticipation.FailToQualify(reason, ftqCodes);
         await _participationRepository.Update(SelectedParticipation);
 
@@ -158,12 +157,12 @@ public class ParticipationBehind : ObservableBehind, IParticipationBehind
         await SafeHelper.Run(() => SafeProcess(snapshot));
     }
 
-    public async Task RequestReinspection(bool isRequested)
+    public async Task RequestRepresent(bool isRequested)
     {
         await SafeHelper.Run(() => SafeRequestReinspection(isRequested));
     }
 
-    public async Task RequestRequiredInspection(bool isRequested)
+    public async Task RequireInspection(bool isRequested)
     {
         await SafeHelper.Run(() => SafeRequestRequiredInspection(isRequested));
     }
@@ -195,7 +194,7 @@ public class ParticipationBehind : ObservableBehind, IParticipationBehind
 
     public async Task RestoreQualification()
     {
-        await SafeHelper.Run(RestoreQualification);
+        await SafeHelper.Run(SafeRestoreQualification);
     }
 
     public Participation? Get(int id)

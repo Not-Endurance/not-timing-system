@@ -14,8 +14,10 @@
 
     <MudStack Row="true" Class="mb-2">
         <NotH2 Class="pt-1">@Name</NotH2>
+
         <MudSpacer />
-        <NotButtonSecondary Text="Create" StartIcon="@Icons.Material.Filled.Create" OnClick="CreateHandler" />
+
+        <NotButtonCreate Variant="Variant.Outlined" OnClick="CreateHandler" />
     </MudStack>
 
     @if (Items == null || !Items.Any())
@@ -31,24 +33,22 @@
 
                 <MudSpacer />
 
-                <MudIconButton Icon="@Icons.Material.Filled.Update"
-                               Color="Color.Primary"
-                               Variant="Variant.Text"
-                               Size="Size.Medium"
-                               OnClick="() => this._contestantNavigator.Update(UpdateRoute, item)" />
+                <NotIconButtonUpdate OnClick="() => this._formNavigator.Update(UpdateRoute, item)" />
 
-                <MudIconButton Icon="@Icons.Material.Outlined.Delete"
-                               Color="Color.Error"
-                               Variant="Variant.Text"
-                               Size="Size.Medium"
-                               OnClick="() => DeleteHandler(item)" />
+                <NotIconButtonDelete OnClick="() => DeleteHandler(item)" />
             </MudStack>
+
             <MudDivider />
         }        
     }
 </MudPaper>
 
 @code {
+    [Inject]
+    private INotSetBehind<T> _behind { get; set; } = default!;
+    [Inject]
+    private IFormNavigator<T, TForm> _formNavigator { get; set; } = default!;
+
     [Parameter]
     public string? Name { get; set; }
     [Parameter]
@@ -68,28 +68,23 @@
             string defaultMessage = $"No {Name.ToLower()} have been created for this event.";
             EmptyMessage = Localizer.Get(defaultMessage);
         }
-        Items = await _setBehind.GetAll();
+        Items = await _behind.GetAll();
     }
 
     // TODO: Implement ObservableBehind pattern
     public async Task CreateHandler()
     {
-        await _contestantNavigator.Create();
-        Items = await _setBehind.GetAll();
+        await _formNavigator.Create();
+        Items = await _behind.GetAll();
         await InvokeAsync(StateHasChanged);
     }
 
     public async Task DeleteHandler(T item)
     {
-        await _setBehind.Delete(item);
-        Items = await _setBehind.GetAll();
+        await _behind.Delete(item);
+        Items = await _behind.GetAll();
         await InvokeAsync(StateHasChanged);
     }
-
-    [Inject]
-    private INotSetBehind<T> _setBehind { get; set; } = default!;
-    [Inject]
-    private IFormNavigator<T, TForm> _contestantNavigator { get; set; } = default!;
 
     string GetDefaultName()
     {

@@ -1,4 +1,5 @@
-﻿@using Not.Services;
+﻿@using Not.Blazor.Mud.Components
+@using Not.Services;
 @using Not.Blazor.Components;
 @using Not.Blazor.Forms;
 @using Not.Blazor.Navigation;
@@ -9,19 +10,24 @@
 
 <MudContainer Class="not-page-mid-width">
     <NotDynamic T="TForm" @ref="_form" />
+    
+    <MudStack Row="true" Class="mt-4">
+        <NotButtonUpdate OnClick="Update" />
 
-    <MudButton Class="mt-4" Variant="Variant.Filled" Color="Color.Primary" OnClick="Update">
-        @Localizer.Get("Update")
-    </MudButton>
+        <NotButtonBack OnClick="NavigateBack" /> 
+    </MudStack>
 </MudContainer>
 
 @code {
-    private NotDynamic<TForm>? _form;
+    NotDynamic<TForm>? _form;
+
+    [Inject]
+    ICrumbsNavigator _navigator { get; set; } = default!;
+    [Inject]
+    IUpdateBehind<T> _behind { get; set; } = default!;
 
     [Parameter]
     public T Entity { get; set; } = default!;
-    [Parameter]
-    public Func<T, Task> UpdateAction { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -36,16 +42,22 @@
         _form!.Instance.TriggerRender();
     }
 
-    protected async Task Update()
+    async Task Update()
     {
         try
         {
             var entity = _form!.Instance.SubmitUpdate();
-            await UpdateAction(entity);
+            await _behind.Update(entity);
+            NavigateBack();
         }
         catch (DomainException domainException)
         {
             await _form!.Instance.AddValidationError(domainException.Property, domainException.Message);
         }
+    }
+
+    void NavigateBack()
+    {
+        _navigator.NavigateBack();
     }
 }

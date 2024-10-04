@@ -13,11 +13,13 @@ public class Ranklist : ReadOnlyCollection<RankingEntry>
 
     public Ranklist(Ranking ranking, IEnumerable<Participation> participations) : base(Rank(ranking, participations))
     {
+        RankingId = ranking.Id;
         Name = ranking.Name;
         Category = ranking.Category;
         Ruleset = ranking.Ruleset;
     }
 
+    public int RankingId { get; }
     public string Title => $"{Category}: {Name}";
     public string Name { get; }
     public AthleteCategory Category { get; }

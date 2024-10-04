@@ -10,20 +10,12 @@
 <NotPage Title="Configure Loop">
 
     <Main>
-        <NotFormUpdate T="Loop" TForm="LoopForm" Entity="_navigator.ConsumeParameter<Loop>()" UpdateAction="Update" />
+        <NotFormUpdate T="Loop" TForm="LoopForm" Entity="_navigator.ConsumeParameter<Loop>()" />
     </Main>
 
 </NotPage>
 
 @code {
     [Inject]
-    private INotSetBehind<Loop> _behind { get; set; } = default!;
-    [Inject]
-    private INavigator _navigator { get; set; } = default!;
-
-    protected async Task Update(Loop Loop)
-    {
-        await _behind.Update(Loop);
-        _navigator.NavigateTo(ENDURANCE_EVENT_PAGE);
-    }
+    private ICrumbsNavigator _navigator { get; set; } = default!;
 }

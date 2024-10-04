@@ -10,21 +10,12 @@
 <NotPage Title="Configure Horse">
 
     <Main>
-        <NotFormUpdate T="Horse" TForm="HorseForm" Entity="_navigator.ConsumeParameter<Horse>()" UpdateAction="Update" />
+        <NotFormUpdate T="Horse" TForm="HorseForm" Entity="_navigator.ConsumeParameter<Horse>()" />
     </Main>
 
 </NotPage>
 
 @code{
-    private Horse _horse {get; set;} = default!;
     [Inject]
-    INotSetBehind<Horse> _setBehind { get; set; } = default!;
-    [Inject]
-    INavigator _navigator { get; set; } = default!;
-
-    protected async Task Update(Horse horse)
-    {
-        await _setBehind.Update(horse);
-        _navigator.NavigateTo(ENDURANCE_EVENT_PAGE);
-    }
+    ICrumbsNavigator _navigator { get; set; } = default!;
 }

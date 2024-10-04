@@ -1,53 +1,52 @@
 ﻿@using NTS.Domain.Core.Aggregates.Participations
 @using NTS.Domain.Objects
 @using NTS.Judge.Blazor.Enums
+@using NTS.Judge.Blazor.Pages.Dashboard.Components.Actions.EliminationForms.Components
 @using NTS.Judge.Blazor.Ports
 @using Not.Structures
 
 @inherits EliminationForm
 
-<MudSelect @bind-SelectedValues="@Codes" Label="Failed to Qualify Reason" MultiSelection="true" Delimiter="+" Placeholder="Select a reason">
-    @foreach (var failToQualifyCode in SelectListModel.FromEnum<FTQCodes>())
-    {
-        <MudSelectItem Value="@failToQualifyCode.Value">
-            <MudText Typo="Typo.body2">@failToQualifyCode.Value</MudText>
-            <MudText Typo="Typo.subtitle2">@failToQualifyCode.Description</MudText>
-        </MudSelectItem>
-    }
-</MudSelect>
+<MudPaper Elevation="1" Class="pa-2">
+    <MudSelect @bind-SelectedValues="@_codes" MultiSelection="true" Delimiter="+" Class="mt-4"
+        Label="@Localizer.Get("Failed to Qualify Reason")" Placeholder="@Localizer.Get("Select a reason")">
+    
+        @foreach (var ftqCode in SelectListModel.FromEnum<FTQCodes>())
+        {
+            <MudTooltip Text="@ftqCode.Description" Inline="false">
+                <MudSelectItem Value="@ftqCode.Value">
+                    <MudText Typo="Typo.body1">@ftqCode.Value</MudText>
+                </MudSelectItem>
+            </MudTooltip>
 
-<MudCollapse Expanded="Codes.Contains(FTQCodes.FTC)">
-    <MudTextField @bind-Value="Reason" Label="Reason" Variant="Variant.Outlined"></MudTextField>
-</MudCollapse>
+        }
+    </MudSelect>
 
-<MudButton Class="mt-4 one-third-width" Variant="Variant.Filled" Color="Color.Primary" OnClick="Eliminate">
-    @Localizer.Get("Eliminate")
-</MudButton>
+    <MudCollapse Expanded="_codes.Contains(FTQCodes.FTC)">
+        <EliminationFormReason @bind-Value="_reason" />
+    </MudCollapse>
 
-<MudButton Class="mt-4 one-third-width" Variant="Variant.Filled" Color="Color.Primary" OnClick="Restore">
-    @Localizer.Get("Restore")
-</MudButton>
+    <EliminationFormActions Form="this" />
+</MudPaper>
 
 @code {
+    IEnumerable<FTQCodes> _codes { get; set; } = [];
+    string? _reason;
+
     [Parameter]
     public FailedToQualify? FailedToQualify { get; set; }
-
-    private IEnumerable<FTQCodes> Codes { get; set; } = [];
-    public string? Reason { get; set; }
 
     protected override void OnParametersSet()
     {
         if (FailedToQualify != null)
         {
-            Codes = FailedToQualify.Codes.ToList();
-            Reason = FailedToQualify.Complement;
+            _codes = FailedToQualify.Codes.ToList();
+            _reason = FailedToQualify.Complement;
         }
     }
 
-    public override async Task Eliminate()
+    internal override async Task Eliminate()
     {
-        //TODO: Validate for incorrect inputs
-        await _participationBehind.FailToQualify(Reason, Codes.ToArray());
-        await OnEliminate.InvokeAsync();
+        await _participationBehind.FailToQualify(_reason, _codes.ToArray());
     }
 }

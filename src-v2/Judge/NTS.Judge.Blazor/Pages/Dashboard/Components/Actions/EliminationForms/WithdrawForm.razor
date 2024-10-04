@@ -1,25 +1,20 @@
 ﻿@using NTS.Domain.Core.Aggregates.Participations
 @using NTS.Judge.Blazor.Enums
+@using NTS.Judge.Blazor.Pages.Dashboard.Components.Actions.EliminationForms.Components
 @using NTS.Judge.Blazor.Ports
 
 @inherits EliminationForm
 
-<MudButton Class="mt-4 one-third-width" Variant="Variant.Filled" Color="Color.Primary" OnClick="Eliminate">
-    @Localizer.Get("Eliminate")
-</MudButton>
-
-<MudButton Class="mt-4 one-third-width" Variant="Variant.Filled" Color="Color.Primary" OnClick="Restore">
-    @Localizer.Get("Restore")
-</MudButton>
-
+<MudPaper Elevation="1" Class="pa-2">
+    <EliminationFormActions Form="this" />
+</MudPaper>
 
 @code {
     [Parameter]
     public Withdrawn? Withdrawn { get; set; } = default!;
 
-    public override async Task Eliminate()
+    internal override async Task Eliminate()
     {
         await _participationBehind.Withdraw();
-        await OnEliminate.InvokeAsync();
     }
 }

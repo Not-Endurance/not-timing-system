@@ -4,34 +4,32 @@
 
 @inherits NotComponent
 
-<MudPaper Class="d-flex flex-row mb-4" Elevation="0">
-    <NotSwitch Label="Reinspection" Value="_reinspectionToggled" ValueChanged="ToggleReinspection"
-               IconForTrue="@Icons.Material.Filled._360" IconForFalse="@Icons.Material.Filled._360" />
-    <NotSwitch Label="Required Inspection" Value="_requiredInspectionToggled" ValueChanged="ToggleRequiredInspection"
-               IconForTrue="@Icons.Material.Filled.HourglassEmpty" IconForFalse="@Icons.Material.Filled.HourglassEmpty" />
-</MudPaper>
+<MudStack Class="@Class">
+    <NotSwitch Label="Represent" Value="_represent" ValueChanged="ToggleReinspection" />
+
+    <NotSwitch Label="Require Inspection" Value="_requireInspection" ValueChanged="ToggleRequiredInspection" />
+</MudStack>
 
 @code {
     [Inject]
     IParticipationBehind _participationBehind { get; set; } = default!;
     Participation _selectedParticipation => _participationBehind.SelectedParticipation!;
     Phase? _currentPhase => _selectedParticipation.Phases.Current;
-    bool _reinspectionToggled => _currentPhase?.IsReinspectionRequested ?? false;
-    bool _requiredInspectionToggled => _currentPhase?.IsRIRequested ?? false;
+    bool _represent => _currentPhase?.IsReinspectionRequested ?? false;
+    bool _requireInspection => _currentPhase?.IsRIRequested ?? false;
 
     protected override async Task OnInitializedAsync()
     {
         await Observe(_participationBehind);
     }
 
-    private async void ToggleReinspection(bool value)
+    async Task ToggleReinspection(bool value)
     {
-        _participationBehind.RequestReinspection(value);
-        await InvokeAsync(StateHasChanged); // TODO test without as it should re-render on its own
+        await _participationBehind.RequestRepresent(value);
     }
-    private async void ToggleRequiredInspection(bool value)
+
+    async Task ToggleRequiredInspection(bool value)
     {
-        _participationBehind.RequestRequiredInspection(value);
-        await InvokeAsync(StateHasChanged); // TODO test without
+        await _participationBehind.RequireInspection(value);
     }
 }
