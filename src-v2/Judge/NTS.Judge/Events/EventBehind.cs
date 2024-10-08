@@ -3,175 +3,101 @@ using Not.Application.Ports.CRUD;
 using Not.Blazor.Ports.Behinds;
 using Not.Exceptions;
 using Not.Safe;
+using NTS.Judge.Blazor.Pages.Setup.Ports;
+using NTS.Judge.Blazor.Setup.Events;
 
 namespace NTS.Judge.Events;
 
-public class EventBehind : INotBehind<Event>, INotSetBehind<Official>, INotSetBehind<Competition>, INotParentBehind<Event>
+public class EventBehind : ObservableBehind, IEnduranceEventBehind
 {
-    private readonly IRepository<Event> _eventRepository;
-    private Event? _event;
+    public static Event? StaticEnduranceEvent { get; internal set; }
+
+    private readonly IRepository<Event> StaticEnduranceEventRepository;
 
     public EventBehind(IRepository<Event> eventRepository)
     {
-        _eventRepository = eventRepository;
+        StaticEnduranceEventRepository = eventRepository;
     }
 
-    Task<IEnumerable<Official>> SafeGetAllOfficials()
+    public EventFormModel? Model { get; private set; }
+
+    protected override async Task<bool> PerformInitialization(params IEnumerable<object> _)
     {
-        return Task.FromResult(_event?.Officials.AsEnumerable() ?? []);
+        StaticEnduranceEvent = await StaticEnduranceEventRepository.Read(0);
+        if (StaticEnduranceEvent == null)
+        {
+            return false;
+        }
+        Model = new EventFormModel();
+        Model.FromEntity(StaticEnduranceEvent);
+        return true;
     }
 
-    Task<IEnumerable<Competition>> SafeGetAllCompetitions()
+    async Task<EventFormModel> SafeCreate(EventFormModel model)
     {
-        return Task.FromResult(_event?.Competitions.AsEnumerable() ?? []);
+        StaticEnduranceEvent = Event.Create(model.Place, model.Country);
+        await StaticEnduranceEventRepository.Create(StaticEnduranceEvent);
+        Model = model;
+        EmitChange();
+        return model;
     }
 
-    async Task<Event?> SafeRead(int id)
+    async Task<EventFormModel> SafeUpdate(EventFormModel model)
     {
-        _event = await _eventRepository.Read(id);
-        return _event;
-    }
-
-    async Task<Event> SafeCreate(Event entity)
-    {
-        await _eventRepository.Create(entity);
-        return _event = entity;
-    }
-
-    async Task<Event> SafeUpdate(Event entity)
-    {
-        return await _eventRepository.Update(entity);
-    }
-
-    Task<Event> SafeDelete(Event @event)
-    {
-        throw new NotImplementedException();
+        StaticEnduranceEvent = Event.Update(model.Id, model.Place, model.Country, model.Competitions, model.Officials);
+        await StaticEnduranceEventRepository.Update(StaticEnduranceEvent);
+        Model = model;
+        EmitChange();
+        return model;
     }
 
     async Task<Official> SafeCreate(Official child)
     {
-        GuardHelper.ThrowIfDefault(_event);
+        GuardHelper.ThrowIfDefault(StaticEnduranceEvent);
 
-        _event.Add(child);
-        await _eventRepository.Update(_event);
+        StaticEnduranceEvent.Add(child);
+        await StaticEnduranceEventRepository.Update(StaticEnduranceEvent);
         return child;
     }
 
     async Task<Official> SafeDelete(Official child)
     {
-        GuardHelper.ThrowIfDefault(_event);
+        GuardHelper.ThrowIfDefault(StaticEnduranceEvent);
 
-        _event.Remove(child);
-        await _eventRepository.Update(_event);
+        StaticEnduranceEvent.Remove(child);
+        await StaticEnduranceEventRepository.Update(StaticEnduranceEvent);
         return child;
     }
 
     async Task<Official> SafeUpdate(Official child)
     {
-        GuardHelper.ThrowIfDefault(_event);
+        GuardHelper.ThrowIfDefault(StaticEnduranceEvent);
 
-        _event.Update(child);
-        await _eventRepository.Update(_event);
-        return child;
-    }
-
-    async Task<Competition> SafeCreate(Competition child)
-    {
-        GuardHelper.ThrowIfDefault(_event);
-
-        _event.Add(child);
-        await _eventRepository.Update(_event);
-        return child;
-    }
-
-    async Task<Competition> SafeDelete(Competition child)
-    {
-        GuardHelper.ThrowIfDefault(_event);
-
-        _event.Remove(child);
-        await _eventRepository.Update(_event);
-        return child;
-    }
-
-    async Task<Competition> SafeUpdate(Competition child)
-    {
-        GuardHelper.ThrowIfDefault(_event);
-
-        _event.Update(child);
-        await _eventRepository.Update(_event);
+        StaticEnduranceEvent.Update(child);
+        await StaticEnduranceEventRepository.Update(StaticEnduranceEvent);
         return child;
     }
 
     async Task<Event?> SafeInitialize(int id)
     {
-        return _event = await _eventRepository.Read(id);
+        return StaticEnduranceEvent = await StaticEnduranceEventRepository.Read(id);
     }
 
     #region SafePattern 
 
-    async Task<IEnumerable<Official>> IReadAllBehind<Official>.GetAll()
-    {
-        return await SafeHelper.Run(SafeGetAllOfficials) ?? [];
-    }
-
-    async Task<IEnumerable<Competition>> IReadAllBehind<Competition>.GetAll()
-    {
-        return await SafeHelper.Run(SafeGetAllCompetitions) ?? [];
-    }
-
-    public async Task<Event> Create(Event @event)
+    public async Task<EventFormModel> Create(EventFormModel @event)
     {
         return await SafeHelper.Run(() => SafeCreate(@event)) ?? @event;
     }
 
-    public async Task<Event?> Read(int id)
-    {
-        return await SafeHelper.Run(() => SafeRead(id));
-    }
-
-    public async Task<Event> Update(Event @event)
+    public async Task<EventFormModel> Update(EventFormModel @event)
     {
         return await SafeHelper.Run(() => SafeUpdate(@event)) ?? @event;
     }
 
-    public async Task<Event> Delete(Event @event)
+    public Task<Event> Delete(Event @event)
     {
-        return await SafeHelper.Run(() => SafeDelete(@event)) ?? @event;
-    }
-
-    public async Task<Official> Create(Official official)
-    {
-        return await SafeHelper.Run(() => SafeCreate(official)) ?? official;
-    }
-
-    public async Task<Official> Update(Official official)
-    {
-        return await SafeHelper.Run(() => SafeUpdate(official)) ?? official;
-    }
-
-    public async Task<Official> Delete(Official official)
-    {
-        return await SafeHelper.Run(() => SafeDelete(official)) ?? official;
-    }
-
-    public async Task<Competition> Create(Competition competition)
-    {
-        return await SafeHelper.Run(() => SafeCreate(competition)) ?? competition;
-    }
-
-    public async Task<Competition> Update(Competition competition)
-    {
-        return await SafeHelper.Run(() => SafeUpdate(competition)) ?? competition;
-    }
-
-    public async Task<Competition> Delete(Competition competition)
-    {
-        return await SafeHelper.Run(() => SafeDelete(competition)) ?? competition;
-    }
-
-    public async Task<Event?> Initialize(int id)
-    {
-        return await SafeHelper.Run(() => SafeInitialize(id));
+        throw new NotImplementedException("Endurance event cannot be deleted");
     }
 
     #endregion

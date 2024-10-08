@@ -19,7 +19,7 @@ public class RanklistBehind : ObservableBehind, IRanklistBehind
 
     public Ranklist? Ranklist { get; private set; }
 
-    protected override async Task<bool> PerformInitialization()
+    protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
         var ranking = await _rankings.Read(x => true);
         if (ranking == null)

@@ -5,12 +5,12 @@
 @using Not.Blazor.TM;
 
 @inherits NotComponent
-@typeparam T where T : DomainEntity;
-@typeparam TForm where TForm : NotForm<T>
+@typeparam T;
+@typeparam TForm where TForm : FormTM<T>
 
 <MudDialog>
     <DialogContent>
-        <NotDynamic T="TForm" @ref="_dynamicForm" />
+        <NotDynamic T="T" TForm="TForm" @ref="_dynamicForm" />
     </DialogContent>
 
     <DialogActions>
@@ -21,7 +21,7 @@
 </MudDialog>
 
 @code {
-    private NotDynamic<TForm>? _dynamicForm;
+    private NotDynamic<T, TForm>? _dynamicForm;
     [Inject]
     private ICreateBehind<T> _behind { get; set; } = default!;
 

@@ -4,14 +4,14 @@ namespace Not.Blazor.TM.Models;
 
 public class NotListModel
 {
-    public static IEnumerable<NotListModel<T>> FromEnum<T>()
-        where T : Enum
+    public static IEnumerable<NotListModel<T?>> FromEnum<T>()
+        where T : struct, Enum
     {
         var values = Enum.GetValues(typeof(T));
         foreach (var value in values)
         {
             var enumValue = (T)value;
-            yield return new NotListModel<T>(enumValue, enumValue.GetDescription());
+            yield return new NotListModel<T?>(enumValue, enumValue.GetDescription());
         }
     }
 

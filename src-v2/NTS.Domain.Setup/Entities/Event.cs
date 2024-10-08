@@ -6,29 +6,37 @@ namespace NTS.Domain.Setup.Entities;
 
 public class Event : DomainEntity, ISummarizable, IImportable, IParent<Official>, IParent<Competition> 
 {
-    public static Event Create(string place, Country country) => new(place, country);
-    public static Event Update(int id, string place, Country country, IEnumerable<Competition> competitions, IEnumerable<Official> officials)
+    public static Event Create(string? place, Country? country) => new(place, country);
+
+    public static Event Update(int id, string? place, Country? country, IEnumerable<Competition> competitions, IEnumerable<Official> officials)
         => new(id, place, country, competitions, officials);
 
-    private List<Competition> _competitions = new();
-    private List<Official> _officials = new();
+    private List<Competition> _competitions = [];
+    private List<Official> _officials = [];
 
     [JsonConstructor]
-    private Event(int id, string place, Country country, IEnumerable<Competition> competitions, IEnumerable<Official> officials) : this(place, country)
+    private Event(int id, string? place, Country? country, IEnumerable<Competition> competitions, IEnumerable<Official> officials)
+        : base(id)
     {
-        Id = id;
-        _competitions = (competitions ?? Enumerable.Empty<Competition>()).ToList();
-        _officials = (officials ?? Enumerable.Empty<Official>()).ToList();
+        Place = Capitalized(nameof(Place), place);
+        Country = Required(nameof(Country), country);
+        _competitions = competitions.ToList();
+        _officials = officials.ToList();
     }
-    private Event(string place, Country country)
-    {
-        if (string.IsNullOrEmpty(place) || !char.IsUpper(place.First()))
-        {
-            throw new DomainException(nameof(Place), $"{nameof(Place)} is invalid. It has to be Capitalized");
-        }
 
-        Place = place;
-        Country = country;
+    private Event(string? place, Country? country) : this(GenerateId(), place,  country, [], [])
+    {
+    }
+
+    static string Capitalized(string name, string? value)
+    {
+        Required(name, value);
+
+        if (string.IsNullOrEmpty(value) || !char.IsUpper(value.First()))
+        {
+            throw new DomainException(name, $"Has to be Capital case");
+        }
+        return value;
     }
 
     public string Place { get; private set; }
@@ -43,6 +51,7 @@ public class Event : DomainEntity, ISummarizable, IImportable, IParent<Official>
         get => _competitions.AsReadOnly();
         private set => _competitions = value.ToList();
     }
+
     public void Add(Competition competition)
     {
         _competitions.Add(competition);
@@ -55,9 +64,10 @@ public class Event : DomainEntity, ISummarizable, IImportable, IParent<Official>
     {
         _competitions.Remove(competition);
     }
+
     public void Add(Official official)
     {
-        ThrowIfInvalidRole(official);
+        ValidateRole(official);
 
         _officials.Add(official);
     }
@@ -78,12 +88,13 @@ public class Event : DomainEntity, ISummarizable, IImportable, IParent<Official>
         summary.Add(nameof(this.Competitions).Localize(), this.Competitions);
         return summary.ToString();
 	}
+
 	public override string ToString()
 	{
         return Combine(Place, Country);
 	}
 
-    private void ThrowIfInvalidRole(Official member)
+    private void ValidateRole(Official member)
     {
         var role = member.Role;
         if (member.IsUniqueRole())
@@ -91,7 +102,10 @@ public class Event : DomainEntity, ISummarizable, IImportable, IParent<Official>
             var existing = _officials.FirstOrDefault(x => x.Role == role);
             if (existing != null && existing != member)
             {
-                throw new DomainException("Official '{0}' already exists", member.Role.GetDescription());
+                throw new DomainException(
+                    nameof(Official.Role),
+                    //TODO: Notification should localize the templates and arguments separately
+                    string.Format("Official '{0}' already exists", member.Role.GetDescription()));
             }
         }
     }

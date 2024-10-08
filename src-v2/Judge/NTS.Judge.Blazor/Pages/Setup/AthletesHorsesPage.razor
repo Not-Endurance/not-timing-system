@@ -11,15 +11,13 @@
 
     <Main>
         <MudGrid Spacing="8" Style="margin-top:0!important;">
-            
             <MudItem xs="6">
-                <NotSetList T="Athlete" TForm="AthleteForm" UpdateRoute="@ATHLETE_UPDATE" />
+                <CrudList T="Athlete" TForm="AthleteForm" TModel="AthleteFormModel" UpdateRoute="@ATHLETE_UPDATE" />
             </MudItem>
             
             <MudItem xs="6">
-                <NotSetList T="Horse" TForm="HorseForm" UpdateRoute="@HORSE_UPDATE" />
+                <CrudList T="Horse" TForm="HorseForm" TModel="HorseFormModel" UpdateRoute="@HORSE_UPDATE" />
             </MudItem>
-
         </MudGrid>
     </Main>
 

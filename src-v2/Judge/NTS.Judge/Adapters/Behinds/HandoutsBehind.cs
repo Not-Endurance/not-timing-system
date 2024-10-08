@@ -42,7 +42,7 @@ public class HandoutsBehind : ObservableBehind, IHandoutsBehind
         EventHelper.Subscribe<PhaseCompleted>(PhaseCompletedHandler);
     }
 
-    protected override async Task<bool> PerformInitialization()
+    protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
         var handouts = await _handoutRepository.ReadAll();
 

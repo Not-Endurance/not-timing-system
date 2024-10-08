@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Not.Random;
+using System.Diagnostics.CodeAnalysis;
+using System.Dynamic;
 
 namespace Not.Domain;
 
@@ -11,10 +13,10 @@ public abstract class DomainEntity : IEquatable<DomainEntity>, IIdentifiable
     }
     protected DomainEntity()
     {
-        this.Id = RandomHelper.GenerateUniqueInteger();
+        this.Id = GenerateId();
     }
 
-    // TODO: use DomainObject for ID
+    // TODO: use DomainObject for ID, do private set
     public int Id { get; protected init; }
 
     public static bool operator == (DomainEntity? left, DomainEntity? right)
@@ -52,5 +54,29 @@ public abstract class DomainEntity : IEquatable<DomainEntity>, IIdentifiable
     protected string Combine(params object?[] values)
     {
         return string.Join(" | ", values.Where(x => x != null));
+    }
+
+    protected static int GenerateId()
+    {
+        return RandomHelper.GenerateUniqueInteger();
+    }
+
+    protected static T Required<T>(string field, T? value)
+        where T : struct
+    {
+        return value ?? throw GetRequiredException(field);
+    }
+
+
+    [return: NotNull]
+    protected static T Required<T>(string field, T? instance)
+        where T : class
+    {
+        return instance ?? throw GetRequiredException(field);
+    }
+
+    static DomainException GetRequiredException(string field)
+    {
+        return new DomainException(field, "Please provide value");
     }
 }

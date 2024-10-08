@@ -1,9 +1,10 @@
-﻿using NTS.Domain.Objects;
+﻿using Not.Blazor.Ports;
+using NTS.Domain.Objects;
 using NTS.Domain.Setup.Entities;
 
 namespace NTS.Judge.Blazor.Setup.Events;
 
-public class EventFormModel
+public class EventFormModel : IFormModel<Event>
 {
     public EventFormModel()
     {
@@ -11,7 +12,15 @@ public class EventFormModel
         Place = "Каспичан";
         Country = new Country("BG", "zz", "Bulgaria");
     }
-    public EventFormModel(Event @event)
+
+    public int Id { get; private set; }
+    public string? Place { get; set; }
+    public Country? Country { get; set; }
+    public IReadOnlyCollection<Phase> Phases { get; private set; } = [];
+    public IReadOnlyCollection<Competition> Competitions { get; private set; } = [];
+    public IReadOnlyCollection<Official> Officials { get; private set; } = [];
+
+    public void FromEntity(Event @event)
     {
         Id = @event.Id;
         Place = @event.Place;
@@ -19,11 +28,4 @@ public class EventFormModel
         Competitions = @event.Competitions;
         Officials = @event.Officials;
     }
-
-    public int? Id { get; }
-    public string? Place { get; set; }
-    public Country? Country { get; set; }
-    public IReadOnlyCollection<Phase>? Phases { get; }
-    public IReadOnlyCollection<Competition>? Competitions { get; }
-    public IReadOnlyCollection<Official>? Officials { get; }
 }

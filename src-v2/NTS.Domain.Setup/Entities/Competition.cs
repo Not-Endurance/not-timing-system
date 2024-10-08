@@ -4,58 +4,64 @@ namespace NTS.Domain.Setup.Entities;
 
 public class Competition : DomainEntity, ISummarizable, IParent<Contestant>, IParent<Phase>
 {
-
-    public static Competition Create(string name, CompetitionRuleset type, DateTimeOffset start, int? criRecovery)
+    public static Competition Create(string? name, CompetitionRuleset? type, DateTimeOffset start, int? criRecovery)
         => new(name, type, start, criRecovery);
+
     public static Competition Update(
         int id,
-        string name,
-        CompetitionRuleset type,
+        string? name,
+        CompetitionRuleset? type,
         DateTimeOffset start,
         int? criRecovery,
         IEnumerable<Phase> phases,
         IEnumerable<Contestant> contestants)
         => new(id, name, type, start, criRecovery, phases, contestants);
 
-    private List<Phase> _phases = new();
-    private List<Contestant> _contestants = new();
+    private List<Phase> _phases = [];
+    private List<Contestant> _contestants = [];
 
     [JsonConstructor]
-    private Competition(int id) : base(id) { }
     private Competition(
         int id, 
-        string name, 
-        CompetitionRuleset type,
+        string? name, 
+        CompetitionRuleset? type,
         DateTimeOffset startTime,
         int? criRecovery,
         IEnumerable<Phase> phases,
-        IEnumerable<Contestant> contestants) : this(name, type, startTime, criRecovery)
+        IEnumerable<Contestant> contestants) : base(id)
     {
-        Id = id;
+        Name = Required(nameof(Name), name);
+        Type = Required(nameof(Type), type);
+        StartTime = startTime;
+        CriRecovery = criRecovery;
         _phases = phases.ToList();
         _contestants = contestants.ToList();
     }
-    private Competition(string name, CompetitionRuleset type, DateTimeOffset startTime, int? criRecovery)
+
+    private Competition(string? name, CompetitionRuleset? type, DateTimeOffset startTime, int? criRecovery) : this(
+        GenerateId(),
+        name,
+        type,
+        NotBeforeToday(nameof(StartTime), startTime),
+        criRecovery,
+        [],
+        [])
     {
-        if (type == default)
-        {
-            throw new DomainException(nameof(type), "Competition Type is required");
-        }
+    }
+
+    static DateTimeOffset NotBeforeToday(string field, DateTimeOffset startTime)
+    {
         if (startTime.DateTime < DateTime.Today)
         {
-            throw new DomainException(nameof(StartTime), "Competition date cannot be in the past");
+            throw new DomainException(field, "Start day cannot be in the past");
         }
-
-        Name = name;
-        Type = type;
-        StartTime = startTime;
-        CriRecovery = criRecovery;
+        return startTime;
     }
 
     public string Name { get; private set; }
     public CompetitionRuleset Type { get; private set; }
 	public DateTimeOffset StartTime { get; private set; }
-    public int? CriRecovery { get; private set; }
+    public int? CriRecovery { get; private set; } //TODO: change to TimSpan
     public IReadOnlyList<Phase> Phases
     {
         get => _phases.AsReadOnly();
@@ -74,6 +80,7 @@ public class Competition : DomainEntity, ISummarizable, IParent<Contestant>, IPa
 		summary.Add("contestants".Localize(), _contestants);
 		return summary.ToString();
 	}
+
 	public override string ToString()
 	{
         return Combine(
@@ -86,12 +93,10 @@ public class Competition : DomainEntity, ISummarizable, IParent<Contestant>, IPa
     {
         _contestants.Add(child);
     }
-
     public void Remove(Contestant child)
     {
         _contestants.Remove(child);
     }
-
     public void Update(Contestant child)
     {
         _contestants.Remove(child);
@@ -102,12 +107,10 @@ public class Competition : DomainEntity, ISummarizable, IParent<Contestant>, IPa
     {
         _phases.Add(child);
     }
-
     public void Remove(Phase child)
     {
         _phases.Remove(child);
     }
-
     public void Update(Phase child)
     {
         _phases.Remove(child);

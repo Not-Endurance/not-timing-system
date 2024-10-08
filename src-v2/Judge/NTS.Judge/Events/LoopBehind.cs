@@ -1,60 +1,23 @@
-﻿using Not.Application.Ports.CRUD;
-using Not.Blazor.Ports.Behinds;
-using Not.Safe;
+﻿using Not.Application.Adapters.Behinds;
+using Not.Application.Ports.CRUD;
 using NTS.Domain.Setup.Entities;
+using NTS.Judge.Blazor.Pages.Setup.Loops;
 
 namespace NTS.Judge.Events;
 
-public class LoopBehind : INotSetBehind<Loop>
+public class LoopBehind : SimpleCrudBehind<Loop, LoopFormModel>
 {
-    private readonly IRepository<Loop> _loopRepository;
-
-    public LoopBehind(IRepository<Loop> loopRepository)
+    public LoopBehind(IRepository<Loop> loopRepository) : base(loopRepository)
     {
-        _loopRepository = loopRepository;
     }
 
-    Task<IEnumerable<Loop>> SafeGetAll()
+    protected override Loop CreateEntity(LoopFormModel model)
     {
-        return _loopRepository.ReadAll();
+        return Loop.Create(model.Distance);
     }
 
-    Task<Loop> SafeCreate(Loop entity)
+    protected override Loop UpdateEntity(LoopFormModel model)
     {
-        return _loopRepository.Create(entity);
+        return Loop.Update(model.Id, model.Distance);
     }
-
-    Task<Loop> SafeUpdate(Loop entity)
-    {
-        return _loopRepository.Update(entity);
-    }
-
-    Task<Loop> SafeDelete(Loop entity)
-    {
-        return _loopRepository.Delete(entity);
-    }
-
-    #region SafePattern
-
-    public async Task<IEnumerable<Loop>> GetAll()
-    {
-        return await SafeHelper.Run(SafeGetAll) ?? [];
-    }
-
-    public async Task<Loop> Create(Loop loop)
-    {
-        return await SafeHelper.Run(() => SafeCreate(loop)) ?? loop;
-    }
-
-    public async Task<Loop> Update(Loop loop)
-    {
-        return await SafeHelper.Run(() => SafeUpdate(loop)) ?? loop;
-    }
-
-    public async Task<Loop> Delete(Loop loop)
-    {
-        return await SafeHelper.Run(() => SafeDelete(loop)) ?? loop;
-    }
-
-    #endregion
 }

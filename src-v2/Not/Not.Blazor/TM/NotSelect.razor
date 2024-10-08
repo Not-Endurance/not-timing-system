@@ -7,7 +7,7 @@
 @inherits BindableValueComponent<T>
 @implements IMudBaseInputWrapper<T>
 
-<MudSelect T="T" @bind-Value="Value" @ref="MudBaseInput" Placeholder="@Placeholder" Label="@Localizer.Get(Label)">
+<MudSelect @bind-Value="Value" @ref="MudBaseInput" Placeholder="@Localizer.Get(Placeholder)" Label="@Localizer.Get(Label)">
     @foreach (var item in Items)
     {
         <MudSelectItem Value="@item.Value">@item.Label</MudSelectItem>
@@ -24,5 +24,5 @@
     public string Placeholder { get; set; } = default!;
 
 
-    public MudBaseInput<T> MudBaseInput { get; private set; } = default!;
+    public MudBaseInput<T?> MudBaseInput { get; private set; } = default!;
 }

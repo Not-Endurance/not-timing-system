@@ -1,60 +1,23 @@
-﻿using Not.Application.Ports.CRUD;
-using Not.Blazor.Ports.Behinds;
-using Not.Safe;
+﻿using Not.Application.Adapters.Behinds;
+using Not.Application.Ports.CRUD;
 using NTS.Domain.Setup.Entities;
+using NTS.Judge.Blazor.Pages.Setup.Combinations;
 
 namespace NTS.Judge.Events;
 
-public class CombinationBehind : INotSetBehind<Combination>
+public class CombinationBehind : SimpleCrudBehind<Combination, CombinationFormModel>
 {
-    private readonly IRepository<Combination> _combinationRepository;
-
-    public CombinationBehind(IRepository<Combination> combinationRepository)
+    public CombinationBehind(IRepository<Combination> repository) : base(repository)
     {
-        _combinationRepository = combinationRepository;
     }
 
-    Task<IEnumerable<Combination>> SafeGetAll()
+    protected override Combination CreateEntity(CombinationFormModel model)
     {
-        return _combinationRepository.ReadAll();
+        return Combination.Create(model.Number, model.Athlete, model.Horse);
     }
 
-    Task<Combination> SafeCreate(Combination entity)
+    protected override Combination UpdateEntity(CombinationFormModel model)
     {
-        return _combinationRepository.Create(entity);
+        return Combination.Update(model.Id, model.Number, model.Athlete, model.Horse);
     }
-
-    Task<Combination> SafeUpdate(Combination entity)
-    {
-        return _combinationRepository.Update(entity);
-    }
-
-    Task<Combination> SafeDelete(Combination entity)
-    {
-        return _combinationRepository.Delete(entity);
-    }
-
-    #region SafePattern
-
-    public async Task<IEnumerable<Combination>> GetAll()
-    {
-        return await SafeHelper.Run(SafeGetAll) ?? [];
-    }
-
-    public async Task<Combination> Create(Combination entity)
-    {
-        return await SafeHelper.Run(() => SafeCreate(entity)) ?? entity;
-    }
-
-    public async Task<Combination> Update(Combination entity)
-    {
-        return await SafeHelper.Run(() => SafeUpdate(entity)) ?? entity;
-    }
-
-    public async Task<Combination> Delete(Combination entity)
-    {
-        return await SafeHelper.Run(() => SafeDelete(entity)) ?? entity;
-    }
-
-    #endregion
 }
