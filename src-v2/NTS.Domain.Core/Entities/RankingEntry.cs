@@ -7,17 +7,17 @@ public class RankingEntry : DomainEntity
     private RankingEntry(int id) : base(id)
     {
     }
-    public RankingEntry(int participationId, bool isRanked)
+    public RankingEntry(Participation participation, bool isRanked)
     {
-        ParticipationId = participationId;
+        Participation = participation;
         IsRanked = isRanked;
     }
 
-    public int ParticipationId { get; private set; }
+    public Participation Participation { get; private set; }
     public bool IsRanked { get; private set; }
 
     public override string ToString()
     {
-        return $"IsRanked: {IsRanked}, {ParticipationId}";
+        return $"IsRanked: {IsRanked}, {Participation}";
     }
 }

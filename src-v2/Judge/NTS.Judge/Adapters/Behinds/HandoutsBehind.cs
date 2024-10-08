@@ -46,6 +46,7 @@ public class HandoutsBehind : ObservableBehind, IHandoutsBehind
     {
         var handouts = await _handoutRepository.ReadAll();
 
+        //TODO: REMOVE
         if (!handouts.Any())
         {
             var allParticipations = await _participations.ReadAll();
@@ -57,16 +58,11 @@ public class HandoutsBehind : ObservableBehind, IHandoutsBehind
             handouts = list;
         }
 
-        var participations = await _participations.ReadAll(x => handouts.Any(y => y.ParticipationId == x.Id));
         var enduranceEvent = await _events.Read(0);
         var officials = await _officials.ReadAll();
         GuardHelper.ThrowIfDefault(enduranceEvent);
 
-        var documents = handouts.Select(handout => new HandoutDocument(
-            handout,
-            participations.First(y => y.Id == handout.ParticipationId),
-            enduranceEvent, 
-            officials));
+        var documents = handouts.Select(handout => new HandoutDocument(handout, enduranceEvent, officials));
         _documents = new(documents);
         
         EmitChange();
@@ -97,7 +93,7 @@ public class HandoutsBehind : ObservableBehind, IHandoutsBehind
         var handout = new Handout(phaseCompleted.Participation);
         await _handoutRepository.Create(handout);
 
-        var document = new HandoutDocument(handout, phaseCompleted.Participation, @event, officials);
+        var document = new HandoutDocument(handout, @event, officials);
         _documents.Add(document);
 
         _semaphore.Release();
@@ -107,7 +103,7 @@ public class HandoutsBehind : ObservableBehind, IHandoutsBehind
 
     async Task HandleExistingHandout(PhaseCompleted phaseCompleted)
     {
-        var existing = await _handoutRepository.Read(x => x.ParticipationId == phaseCompleted.Participation.Id);
+        var existing = await _handoutRepository.Read(x => x.Participation == phaseCompleted.Participation);
         if (existing != null)
         {
             await _handoutRepository.Delete(existing);

@@ -4,12 +4,8 @@ using NTS.Persistence.Setup;
 
 namespace NTS.Persistence.Adapters;
 
-public class SetupCompetitionRepository : BranchRepository<Competition, SetupState>
+public class SetupCompetitionRepository(IStore<SetupState> store) : BranchRepository<Competition, SetupState>(store)
 {
-    public SetupCompetitionRepository(IStore<SetupState> store) : base(store)
-    {
-    }
-
     protected override Competition? Get(SetupState state, int id)
     {
         return state.Event?.Competitions.FirstOrDefault(x => x.Id == id);

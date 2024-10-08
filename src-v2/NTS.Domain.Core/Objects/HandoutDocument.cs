@@ -5,8 +5,9 @@ namespace NTS.Domain.Core.Objects;
 
 public record HandoutDocument : DomainObject
 {
-    public HandoutDocument(Handout handout, Participation participation, Event enduranceEvent, IEnumerable<Official> officials)
+    public HandoutDocument(Handout handout, Event enduranceEvent, IEnumerable<Official> officials)
     {
+        var participation = handout.Participation;
         Header = new DocumentHeader(participation.Competition.Name, enduranceEvent.PopulatedPlace, enduranceEvent.EventSpan, officials);
         Tandem = participation.Tandem;
         Phases = participation.Phases;

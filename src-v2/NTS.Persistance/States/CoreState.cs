@@ -11,12 +11,16 @@ public class CoreState : NotState,
     ISetState<SnapshotResult>,
     ISetState<Handout>
 {
+    // The order here is very important due to how EntityReferenceEqualityGuardConverter works
+    // Root level entities (Loop, Horse etc) MUST precede their parent entities (Combination, Phase)
+    // in order to be the first to be serialized. Otherwise updates on those entities will be ignored
+    // because the obsoleted entities will be serialized first and the updates will be lost to a $domainRef
     public Event? Event { get; set; }
-    public List<Official> Officials { get; } = new();
-    public List<Participation> Participations { get; } = new();
-    public List<Ranking> Rankings { get; } = new();
-    public List<SnapshotResult> SnapshotResults { get; } = new();
-    public List<Handout> Handouts { get; } = new();
+    public List<Participation> Participations { get; } = [];
+    public List<Official> Officials { get; } = [];
+    public List<Ranking> Rankings { get; } = [];
+    public List<SnapshotResult> SnapshotResults { get; } = [];
+    public List<Handout> Handouts { get; } = [];
 
     Event? ITreeState<Event>.Root { get => Event; set => Event = value; }
     List<Official> ISetState<Official>.EntitySet => Officials;

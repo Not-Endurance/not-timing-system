@@ -14,8 +14,8 @@ public class Handout : DomainEntity
     }
     public Handout(Participation participation)
     {
-        ParticipationId = participation.Id;
+        Participation = participation;
     }
 
-    public int ParticipationId { get; private set; }
+    public Participation Participation { get; private set; }
 }

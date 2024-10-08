@@ -3,9 +3,6 @@ using NTS.Persistence.States;
 
 namespace NTS.Persistence.Adapters;
 
-public class ClassificationRepository : SetRepository<Ranking, CoreState>
+public class ClassificationRepository(IStore<CoreState> store) : SetRepository<Ranking, CoreState>(store)
 {
-    public ClassificationRepository(IStore<CoreState> store) : base(store)
-    {
-    }
 }

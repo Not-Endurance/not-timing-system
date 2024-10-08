@@ -125,7 +125,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
                 var competition = state.Event.Competitions.First(x => x.Id == competitionId);
                 var participation = ParticipationFactory.CreateCore(emsParticipation, competition, adjustTime);
                 var category = EmsCategoryToAthleteCategory(emsParticipation.Participant.Athlete.Category);
-                var entry = new RankingEntry(participation.Id, !emsParticipation.Participant.Unranked);
+                var entry = new RankingEntry(participation, !emsParticipation.Participant.Unranked);
                 if (entriesforClassification.ContainsKey(competition) && entriesforClassification[competition].ContainsKey(category))
                 {
                     entriesforClassification[competition][category].Add((entry, participation));

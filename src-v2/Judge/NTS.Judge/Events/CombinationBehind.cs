@@ -48,12 +48,12 @@ public class CombinationBehind : INotSetBehind<Combination>
 
     public async Task<Combination> Update(Combination entity)
     {
-        return await SafeHelper.Run(() => SafeCreate(entity)) ?? entity;
+        return await SafeHelper.Run(() => SafeUpdate(entity)) ?? entity;
     }
 
     public async Task<Combination> Delete(Combination entity)
     {
-        return await SafeHelper.Run(() => SafeCreate(entity)) ?? entity;
+        return await SafeHelper.Run(() => SafeDelete(entity)) ?? entity;
     }
 
     #endregion

@@ -3,9 +3,6 @@ using NTS.Persistence.States;
 
 namespace NTS.Persistence.Adapters;
 
-public class HandoutRepository : SetRepository<Handout, CoreState>
+public class HandoutRepository(IStore<CoreState> store) : SetRepository<Handout, CoreState>(store)
 {
-    public HandoutRepository(IStore<CoreState> store) : base(store)
-    {
-    }
 }

@@ -1,5 +1,4 @@
-﻿using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Domain.Core.Configuration;
+﻿using NTS.Domain.Core.Configuration;
 using NTS.Domain.Core.Entities;
 using NTS.Domain.Core.Objects.Regional;
 using System.Collections.ObjectModel;
@@ -11,7 +10,7 @@ public class Ranklist : ReadOnlyCollection<RankingEntry>
     private readonly static FeiRanker _feiRanker = new();
     private readonly static Ranker[] _regionalRankers = [ new BulgariaRanker() ];
 
-    public Ranklist(Ranking ranking, IEnumerable<Participation> participations) : base(Rank(ranking, participations))
+    public Ranklist(Ranking ranking) : base(Rank(ranking))
     {
         RankingId = ranking.Id;
         Name = ranking.Name;
@@ -25,12 +24,12 @@ public class Ranklist : ReadOnlyCollection<RankingEntry>
     public AthleteCategory Category { get; }
     public CompetitionRuleset Ruleset { get; }
 
-    private static IList<RankingEntry> Rank(Ranking ranking, IEnumerable<Participation> participations)
+    private static IList<RankingEntry> Rank(Ranking ranking)
     {
         var ranker = StaticOptions.ShouldUseRegionalRanker(ranking.Ruleset)
             ? GetRanker(StaticOptions.RegionalConfiguration)
             : _feiRanker;
-        return ranker.Rank(ranking, participations);
+        return ranker.Rank(ranking);
     }
 
     private static Ranker GetRanker(IRegionalConfiguration? configuration)

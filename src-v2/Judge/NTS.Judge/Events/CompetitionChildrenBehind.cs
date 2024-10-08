@@ -84,7 +84,7 @@ public class CompetitionChildrenBehind : INotSetBehind<Contestant>, INotSetBehin
 
     async Task<Competition?> SafeInitialize(int id)
     {
-        return await _competitionReader.Read(id);
+        return _competition = await _competitionReader.Read(id);
     }
 
     #region SafePatter

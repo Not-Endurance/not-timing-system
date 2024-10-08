@@ -75,24 +75,10 @@
     public RankingEntry Entry { get; set; } = default!;
     [Parameter]
     public int Index { get; set; } = default!;
-    // TODO: probably shouldn't depend on IParticipationBehind here. Can be solved if participation refereces are 
-    // handled in repositories and thus Entry contains the entire Participation and not only id. Other solutions?
-    [Inject]
-    IParticipationBehind _behind { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(_behind);
-    }
 
     protected override void OnParametersSet()
     {
-        var participation = _behind.Get(Entry.ParticipationId);
-        if (participation == null)
-        {
-            return;
-        }
-
+        var participation = Entry.Participation;
         _phases = participation.Phases;
         _tandem = participation.Tandem;
         _notQualified = participation.NotQualified;

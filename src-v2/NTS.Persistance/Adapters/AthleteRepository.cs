@@ -1,5 +1,4 @@
-﻿
-using NTS.Domain.Setup.Entities;
+﻿using NTS.Domain.Setup.Entities;
 using NTS.Persistence.Setup;
 
 namespace NTS.Persistence.Adapters;

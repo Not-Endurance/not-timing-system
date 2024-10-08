@@ -3,9 +3,6 @@ using NTS.Persistence.States;
 
 namespace NTS.Persistence.Adapters;
 
-public class CoreOfficialRepository : SetRepository<Official, CoreState>
+public class CoreOfficialRepository(IStore<CoreState> store) : SetRepository<Official, CoreState>(store)
 {
-    public CoreOfficialRepository(IStore<CoreState> store) : base(store)
-    {
-    }
 }
