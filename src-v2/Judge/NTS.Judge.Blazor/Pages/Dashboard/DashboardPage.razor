@@ -35,6 +35,8 @@
     private IEmsImportBehind _importBehind { get; set; } = default!;
     [Inject]
     private IParticipationBehind _participationBehind { get; set; } = default!;
+    [Inject]
+    private IDashboardBehind _dashboardBehind { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

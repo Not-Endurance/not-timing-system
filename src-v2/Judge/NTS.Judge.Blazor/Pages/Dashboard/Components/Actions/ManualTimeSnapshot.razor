@@ -1,4 +1,5 @@
 ﻿@using NTS.Domain.Objects
+@using NTS.Judge.Adapters.Behinds
 @using NTS.Judge.Blazor.Ports
 
 @inherits NotComponent
@@ -14,6 +15,8 @@
 @code {
     [Inject]
     IParticipationBehind _participationBehind { get; set; } = default!;
+    [Inject]
+    ISnapshotProcess _snapshotProcess { get; set; } = default!;
     private const string DEFAULT_TIME = "00:00:00";
     private string _time = DEFAULT_TIME;
     
@@ -54,7 +57,7 @@
            SnapshotType.Automatic,
            SnapshotMethod.Manual,
            timestamp);
-        _participationBehind.Process(snapshot);
+        _snapshotProcess.Process(snapshot);
 
         _time = DEFAULT_TIME;
     }

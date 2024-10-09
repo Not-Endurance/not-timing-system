@@ -52,6 +52,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_EMS", "_EMS", "{60852EE2-A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Compabitility.EMS", "Compatibility.EMS\NTS.Compabitility.EMS.csproj", "{AEEE20E5-A226-40CE-B4B2-804FF44CE8F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.TagRfidControllers", "NTS.TagRfidControllers\NTS.TagRfidControllers.csproj", "{28E0CF13-ED82-40C1-B322-79BB313C556E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{AEEE20E5-A226-40CE-B4B2-804FF44CE8F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEEE20E5-A226-40CE-B4B2-804FF44CE8F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEEE20E5-A226-40CE-B4B2-804FF44CE8F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28E0CF13-ED82-40C1-B322-79BB313C556E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28E0CF13-ED82-40C1-B322-79BB313C556E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28E0CF13-ED82-40C1-B322-79BB313C556E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28E0CF13-ED82-40C1-B322-79BB313C556E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,6 +149,7 @@ Global
 		{D4EAE4FE-862F-492B-9CB1-F013FFF731C4} = {35F61047-DE3E-46D3-B125-DCE4AF783A33}
 		{A6196586-C84D-4CAE-957B-FB86B0063037} = {06233005-CC56-4846-8760-F7AFF5F72F4C}
 		{AEEE20E5-A226-40CE-B4B2-804FF44CE8F7} = {60852EE2-A5B6-47A7-BE86-89CAA47DD8AC}
+		{28E0CF13-ED82-40C1-B322-79BB313C556E} = {35F61047-DE3E-46D3-B125-DCE4AF783A33}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3CB609D9-5D54-4C11-A371-DAAC8B74E430}

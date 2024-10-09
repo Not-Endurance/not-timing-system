@@ -2,14 +2,6 @@
 
 public class Tag : DomainEntity, ISummarizable
 {
-    //remove when integrating controllers
-    //public IdTag(string tagData)
-    //{
-    //    var number = tagData.Substring(0, 3);
-    //    var id = tagData.Substring(9);
-    //    Id = int.Parse(id);
-    //    Number = int.Parse(number);
-    //}
     public Tag(string tagId, int number)
     {
 		TagId = tagId;
@@ -18,6 +10,14 @@ public class Tag : DomainEntity, ISummarizable
 
     public string TagId { get; private set; }
     public int Number { get; }
+
+    public string PrepareToWrite()
+    {
+        const char EMPTY_CHAR = '0';
+        var number = Number.ToString().PadLeft(3, EMPTY_CHAR);
+        var position = "abcdef".PadLeft(6, EMPTY_CHAR); // present for legacy compatibility
+        return number + position + TagId;
+    }
 
     public override string ToString()
 	{

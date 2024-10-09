@@ -16,4 +16,9 @@ public record Snapshot : DomainObject, ISnapshot
     public SnapshotType Type { get; }
     public SnapshotMethod Method { get; }
     public Timestamp Timestamp { get; }
+
+    public static implicit operator Snapshot(RfidSnapshot rfidSnapshot)
+    {
+        return new (rfidSnapshot.Number, rfidSnapshot.Type, rfidSnapshot.Method, rfidSnapshot.Timestamp);
+    }
 }

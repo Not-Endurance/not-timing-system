@@ -8,7 +8,7 @@ using NTS.Judge.Blazor.Ports;
 
 namespace NTS.Judge.Adapters.Behinds;
 
-public class ParticipationBehind : ObservableBehind, IParticipationBehind
+public class ParticipationBehind : ObservableBehind, IParticipationBehind, ISnapshotProcess
 {
     private readonly IRepository<Participation> _participationRepository;
     private readonly IRepository<SnapshotResult> _snapshotResultRepository;

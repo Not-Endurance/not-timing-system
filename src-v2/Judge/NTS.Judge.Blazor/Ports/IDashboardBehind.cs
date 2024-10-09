@@ -1,7 +1,7 @@
 ﻿using Not.Injection;
 namespace NTS.Judge.Blazor.Ports;
 
-public interface IDashboardBehind : ITransientService
+public interface IDashboardBehind : ISingletonService
 {
     Task Start();
 }

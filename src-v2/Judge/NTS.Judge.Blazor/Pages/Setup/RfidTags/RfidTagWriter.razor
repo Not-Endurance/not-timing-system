@@ -33,7 +33,7 @@
 
 @code {
     [Inject]
-    public ITagBehind _tagBehind { get; set; } = default!;
+    public ITagWrite _tagBehind { get; set; } = default!;
     [Parameter]
     public int CombinationNumber { get; set; }
 
@@ -43,7 +43,7 @@
     {
         _awaitingScan = true;
         NotifyHelper.Inform("Waiting for Tag Scan");
-        Value = await _tagBehind.WriteTag(CombinationNumber);
+        Value = await _tagBehind.WriteAsync(CombinationNumber);
         _awaitingScan = false;
     }
 

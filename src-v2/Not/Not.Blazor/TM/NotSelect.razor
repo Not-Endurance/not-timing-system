@@ -14,7 +14,7 @@
     }
     @if(!Items.Any())
     {
-        var emptyItem = NotListModel.GetEmptyValue<T>();
+        var emptyItem = NotListModel.CreateEmptyValue<T>();
         <MudSelectItem Class="pa-4" Value="emptyItem.Value">@(new MarkupString(emptyItem.Label))</MudSelectItem>
     }
 </MudSelect>
