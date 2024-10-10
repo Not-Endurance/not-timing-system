@@ -12,6 +12,24 @@ namespace Not.Safe;
 // - public methods with OG names are added to invoke the Safe methods within SafeHelper.Run
 public static class SafeHelper
 {
+    public static T? Run<T>(Func<T> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (DomainExceptionBase validation)
+        {
+            NotifyHelper.Warn(validation);
+            return default;
+        }
+        catch (Exception ex)
+        {
+            HandleError(ex);
+            return default;
+        }
+    }
+
     public static Task RunAsync(Func<Task> action)
     {
         return Task.Run(() => Run(action));

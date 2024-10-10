@@ -1,52 +1,62 @@
 ﻿@using Not.Blazor.Components
 @using Not.Blazor.Mud.Components
+@using Not.Blazor.Print
+@using static Not.Blazor.Print.PrintableComponent
 
 @inherits NotComponent
+@implements IDisposable
 
-<NotGrid Spacing="4" Class="@("not-page " + Class)">
-    
-    <MudItem xs="12">
-        <NotTitle Content="@Title" />
-    </MudItem>
-
-    @if (!HasContent)
-    {
+@if (_showOnlyMain)
+{
+    @Main
+}
+else
+{
+    <NotGrid Spacing="4" Class="@("not-page " + Class)">
         <MudItem xs="12">
-            <MudPaper Elevation="3" Class="not-mid-height pa-12">
-                <NotTrueCenterText Typo="Typo.h5" Content="@EmptyMessage" />
-
-                @if (EmptyContent != null)
-                {
-                    @EmptyContent
-                }
-            </MudPaper>
-        </MudItem>
-    }
-    else
-    {
-        <MudItem xs="@mainXs" Class="not-page-content">
-            <MudPaper Elevation="3" Class="pa-4">@Main</MudPaper>
+            <NotTitle Content="@Title" />
         </MudItem>
 
-        if (Main2 != null)
+        @if (!HasContent)
+        {
+            <MudItem xs="12">
+                <MudPaper Elevation="3" Class="not-mid-height pa-12">
+                    <NotTrueCenterText Typo="Typo.h5" Content="@EmptyMessage" />
+
+                    @if (EmptyContent != null)
+                    {
+                        @EmptyContent
+                    }
+                </MudPaper>
+            </MudItem>
+        }
+        else
         {
             <MudItem xs="@mainXs" Class="not-page-content">
-                <MudPaper Elevation="3" Class="pa-4">@Main2</MudPaper>
+                <MudPaper Elevation="3" Class="pa-4">@Main</MudPaper>
             </MudItem>
-        }
 
-        if (Rightbar != null)
-        {
-            <MudItem xs="@RightBarXS" Class="not-page-rightbar">
-                @Rightbar
-            </MudItem>
+            if (Main2 != null)
+            {
+                <MudItem xs="@mainXs" Class="not-page-content">
+                    <MudPaper Elevation="3" Class="pa-4">@Main2</MudPaper>
+                </MudItem>
+            }
+
+            if (Rightbar != null)
+            {
+                <MudItem xs="@RightBarXS" Class="not-page-rightbar">
+                    @Rightbar
+                </MudItem>
+            }
         }
-    }
-</NotGrid>
+    </NotGrid>
+}
 
 @code {
     const int GRID_MAX_WIDTH = 12;
 
+    bool _showOnlyMain;
     int mainXs => Rightbar == null
         ? GRID_MAX_WIDTH
         : GRID_MAX_WIDTH - RightBarXS;
@@ -67,6 +77,22 @@
     public string EmptyMessage { get; set; } = "Page is empty :)";
     [Parameter]
     public RenderFragment? EmptyContent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        PrintableComponent.ToggleVisibilityEvent += ToggleVisibilityHandler;
+    }
+
+    public void Dispose()
+    {
+        PrintableComponent.ToggleVisibilityEvent -= ToggleVisibilityHandler;
+    }
+
+    async void ToggleVisibilityHandler()
+    {
+        _showOnlyMain = !_showOnlyMain;
+        await Render();
+    }
 }
 
 <style>

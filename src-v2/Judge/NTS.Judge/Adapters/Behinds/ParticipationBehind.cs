@@ -144,9 +144,9 @@ public class ParticipationBehind : ObservableBehind, IParticipationBehind
 
     #region SafePattern
 
-    async Task<Participation?> SafeGet(int id)
+    Participation? SafeGet(int id)
     {
-        return await _participationRepository.Read(id);
+        return Participations.FirstOrDefault(x => x.Id == id);
     }
 
     public async Task Update(IPhaseState state)
@@ -198,9 +198,9 @@ public class ParticipationBehind : ObservableBehind, IParticipationBehind
         await SafeHelper.Run(RestoreQualification);
     }
 
-    public async Task<Participation?> Get(int id)
+    public Participation? Get(int id)
     {
-        return await SafeHelper.Run(() => SafeGet(id));
+        return SafeHelper.Run(() => SafeGet(id));
     }
 
     #endregion

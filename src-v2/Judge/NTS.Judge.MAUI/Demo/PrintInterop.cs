@@ -12,7 +12,9 @@ public class PrintInterop : IPrintInterop
         _jsRuntime = jsRuntime;
     }
 
-    public async Task Print()
+    // The JS implementation currently depends on using MudBlazor UI in order to locate the main content element
+    // I've left it as such as there isn't any realistic chance of dropping Mud any time soon
+    public async Task OpenPrintDialog()
     {
         var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/print-custom.js");
         await module.InvokeVoidAsync("printCustom");

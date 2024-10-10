@@ -25,5 +25,5 @@ public interface IParticipationBehind : IObservableBehind
     Task Disqualify(string reason);
     Task FailToQualify(string? reason, FTQCodes[] ftqCodes);
     Task RestoreQualification();
-    Task<Participation?> Get(int id);
+    Participation? Get(int id);
 }

@@ -4,9 +4,11 @@
 @using NTS.Judge.Blazor.Pages.Dashboard.Components
 @using NTS.Judge.Blazor.Ports
 
+@inherits NotComponent
+
 @if (_phases != null)
 {
-    <RanklistTableFrame>
+    <RanklistTableFrame Class="printable">
         <One>
             @if (_notQualified != null)
             {
@@ -64,7 +66,7 @@
     private bool _expanded;
     private PhaseCollection _phases = default!;
     private Tandem _tandem = default!;
-    private NotQualified _notQualified = default!;
+    private NotQualified? _notQualified;
     private Total? _total;
     private TimeInterval? _totalInterval;
     private string? _rank;
@@ -73,13 +75,23 @@
     public RankingEntry Entry { get; set; } = default!;
     [Parameter]
     public int Index { get; set; } = default!;
+    // TODO: probably shouldn't depend on IParticipationBehind here. Can be solved if participation refereces are 
+    // handled in repositories and thus Entry contains the entire Participation and not only id. Other solutions?
     [Inject]
     IParticipationBehind _behind { get; set; } = default!;
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        var participation = await _behind.Get(Entry.ParticipationId);
-        GuardHelper.ThrowIfDefault(participation);
+        await Observe(_behind);
+    }
+
+    protected override void OnParametersSet()
+    {
+        var participation = _behind.Get(Entry.ParticipationId);
+        if (participation == null)
+        {
+            return;
+        }
 
         _phases = participation.Phases;
         _tandem = participation.Tandem;

@@ -2,7 +2,6 @@
 
 public static class Endpoints
 {
-    public const string PRINT_PAGE = "/print";
     public const string ENDURANCE_EVENT_PAGE = "/";
     public const string ATHLETES_HORSES_PAGE = "/athletes-horses";
     public const string COMBINATIONS_PAGE = "/combinations";

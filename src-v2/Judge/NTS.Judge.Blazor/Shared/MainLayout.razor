@@ -1,5 +1,9 @@
 ﻿@using Not.Blazor.Notifier
+@using Not.Blazor.Print
+@using static Not.Blazor.Print.PrintableComponent
+
 @inherits LayoutComponentBase
+@implements IDisposable
 
 <MudThemeProvider @ref="_themeProvider" />
 <MudDialogProvider CloseOnEscapeKey="true" CloseButton="true" MaxWidth="MaxWidth.Small" FullWidth="true" />
@@ -7,38 +11,62 @@
 <MudPopoverProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
-        <MudSpacer />
-        <NotH3 Style="color:#9ca2b8">NTS v0.1</NotH3>
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
-    </MudAppBar>
+    @if (!_hideLayout)
+    {
+        <MudAppBar Elevation="1">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
 
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
-        <MudDrawerHeader>
-            <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
-        </MudDrawerHeader>
-        <NavMenu />
-    </MudDrawer>
+            <MudSpacer />
+
+            <NotH3 Style="color:#9ca2b8">NTS v0.1</NotH3>
+
+            <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        </MudAppBar>
+
+        <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
+            </MudDrawerHeader>
+
+            <NavMenu />
+        </MudDrawer>
+    }
 
     <MudMainContent>
         <CascadingValue Value="@_themeProvider">
             <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
                 @Body
             </MudContainer>
+
             <BlazorNotifier />
         </CascadingValue>
     </MudMainContent>
 </MudLayout>
 
 @code {
-    private MudThemeProvider _themeProvider { get; set; } = default!;
-
+    private MudThemeProvider _themeProvider = default!;
+    private bool _hideLayout;
     private bool _drawerOpen = true;
+
+    protected override void OnInitialized()
+    {
+        PrintableComponent.ToggleVisibilityEvent += ToggleLayoutVisibility;
+    }
+
+    public void Dispose()
+    {
+        PrintableComponent.ToggleVisibilityEvent -= ToggleLayoutVisibility;
+    }
 
     void ToggleDrawer()
     {
         this._drawerOpen = !this._drawerOpen;
+    }
+
+    async void ToggleLayoutVisibility()
+    {
+        _hideLayout = !_hideLayout;
+        await InvokeAsync(StateHasChanged);
     }
 }
 

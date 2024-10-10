@@ -3,9 +3,9 @@
 
 @inherits NotComponent
 
-<NotH2 Class="mb-4">@_behind.Ranklist!.Title</NotH2>
+<NotH2 Class="printable mb-4">@_behind.Ranklist!.Title</NotH2>
 
-<RanklistTableFrame>
+<RanklistTableFrame Class="printable">
     <One>
         <MudText Typo="Typo.subtitle2">
             @Localizer.Get("Rank")
@@ -43,13 +43,17 @@
     </Seven>
 </RanklistTableFrame>
 
-@for (var i = 0; i < _behind.Ranklist!.Count; i++)
+
+@if (_behind.Ranklist != null)
 {
-    var entry = _behind.Ranklist[i];
-    <RanklistRow Entry="entry" Index="i" />
-    if (i != _behind.Ranklist.Count - 1)
+    var count = 0;
+    @foreach (var entry in _behind.Ranklist)
     {
-        <MudDivider />
+        <RanklistRow Entry="entry" Index="count" />
+        if (count++ != _behind.Ranklist.Count - 1)
+        {
+            <MudDivider Class="printable" />
+        }
     }
 }
 

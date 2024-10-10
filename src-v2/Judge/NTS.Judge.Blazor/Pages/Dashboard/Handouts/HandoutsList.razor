@@ -8,7 +8,7 @@
     @foreach (var document in Documents!)
     {
         var header = document.Header;
-        <MudItem>
+        <MudItem Class="printable">
             <MudItem Class="d-flex flex-row">
                 <MudItem Class="mr-4">
                     <MudStack Style="height:100%; max-width:300px">
@@ -60,7 +60,7 @@
             </MudItem>
         </MudItem>
 
-        <MudDivider />
+        <MudDivider Class="printable" />
     }
 </MudStack>
 

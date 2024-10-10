@@ -1,0 +1,29 @@
+﻿@inherits NotComponent
+
+<MudDialog>
+    <TitleContent>@Localizer.Get("Print confirmation")</TitleContent>
+
+    <DialogContent>
+        @Localizer.Get("Are handouts printed successfully? \"YES\" will delete all handouts. This cannot be undone.")
+    </DialogContent>
+
+    <DialogActions>
+        <NotButtonDanger Text="Yes" OnClick="Confirm" />
+        <NotButtonSecondary Text="Cancel" OnClick="Cancel" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance _mudDialog { get; set; } = default!;
+
+    void Confirm()
+    {
+        _mudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel()
+    {
+        _mudDialog.Cancel();
+    }
+}

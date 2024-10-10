@@ -7,6 +7,6 @@ public class NotButtonDelete : NotButtonPrimary
     public NotButtonDelete()
     {
         StartIcon = Icons.Material.Filled.Delete;
-        UseText("Delete");
+        Text = "Delete";
     }
 }

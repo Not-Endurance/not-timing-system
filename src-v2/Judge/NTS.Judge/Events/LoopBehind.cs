@@ -38,7 +38,7 @@ public class LoopBehind : INotSetBehind<Loop>
 
     public async Task<IEnumerable<Loop>> GetAll()
     {
-        return await SafeHelper.Run(GetAll) ?? [];
+        return await SafeHelper.Run(SafeGetAll) ?? [];
     }
 
     public async Task<Loop> Create(Loop loop)

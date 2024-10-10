@@ -104,7 +104,7 @@ public class EventBehind : INotBehind<Event>, INotSetBehind<Official>, INotSetBe
 
     async Task<Event?> SafeInitialize(int id)
     {
-        return await _eventRepository.Read(id);
+        return _event = await _eventRepository.Read(id);
     }
 
     #region SafePattern 

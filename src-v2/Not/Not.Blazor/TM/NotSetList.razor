@@ -15,7 +15,7 @@
     <MudStack Row="true" Class="mb-2">
         <NotH2 Class="pt-1">@Name</NotH2>
         <MudSpacer />
-        <NotButtonCreate Variant="Variant.Outlined" OnClick="CreateHandler" />
+        <NotButtonSecondary Text="Create" StartIcon="@Icons.Material.Filled.Create" OnClick="CreateHandler" />
     </MudStack>
 
     @if (Items == null || !Items.Any())
@@ -28,7 +28,9 @@
         {
             <MudStack Row="true">
                 <MudText Typo="Typo.body1" Class="pa-4">@item</MudText>
+
                 <MudSpacer />
+
                 <MudIconButton Icon="@Icons.Material.Filled.Update"
                                Color="Color.Primary"
                                Variant="Variant.Text"

@@ -7,8 +7,8 @@ public class NotButtonSecondary : NotButtonBase
 {
     public NotButtonSecondary()
     {
-        Color = Color.Secondary;
-        Variant = Variant.Filled;
-        IconSize = Size.Small;
+        Color = Color.Primary;
+        Variant = Variant.Outlined;
+        IconSize = Size.Medium;
     }
 }

@@ -1,9 +1,10 @@
 ﻿@using NTS.Judge.Blazor.Pages.Dashboard.Ranklist
 @using NTS.Judge.Blazor.Ports
+@using Not.Blazor.Print
 @using Not.Blazor.TM.Pages
 
 @attribute [Route(RANKLIST_PAGE)]
-@inherits NotComponent
+@inherits PrintableComponent
 
 <NotPage Title="Ranklist" HasContent="_behind.Ranklist != null" EmptyMessage="The Event isn't started yet :)">
     @* // TODO: Add Start button in EmptyContent *@
@@ -13,6 +14,8 @@
     </Main>
 
     <Rightbar>
+        <NotButtonPrint OnClick="OpenPrintDialog" Class="mb-4" />
+
         <RankingMenu />
     </Rightbar>
 
