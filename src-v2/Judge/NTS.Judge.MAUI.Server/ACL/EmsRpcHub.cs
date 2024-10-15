@@ -3,6 +3,7 @@ using Not.Application.Ports.CRUD;
 using Not.Concurrency;
 using Not.Events;
 using Not.Safe;
+using Not.Startup;
 using NTS.Compatibility.EMS.Entities;
 using NTS.Compatibility.EMS.Entities.EMS;
 using NTS.Compatibility.EMS.Enums;
@@ -20,13 +21,13 @@ namespace NTS.Judge.MAUI.Server.ACL;
 public class EmsRpcHub : Hub<IEmsClientProcedures>, IEmsStartlistHubProcedures, IEmsEmsParticipantstHubProcedures
 {
     private readonly IRepository<Participation> _participations;
-    private readonly IRepository<Event> _events;
+    private readonly IRepository<Domain.Core.Entities.Event> _events;
     private readonly IParticipationBehind _participationBehind;
 
     public EmsRpcHub(IJudgeServiceProvider judgeProvider)
     {
         _participations = judgeProvider.GetRequiredService<IRepository<Participation>>();
-        _events = judgeProvider.GetRequiredService<IRepository<Event>>();
+        _events = judgeProvider.GetRequiredService<IRepository<Domain.Core.Entities.Event>>();
         _participationBehind = judgeProvider.GetRequiredService<IParticipationBehind>();
     }
 
@@ -123,7 +124,7 @@ public class EmsRpcHub : Hub<IEmsClientProcedures>, IEmsStartlistHubProcedures, 
         return Task.CompletedTask;
     }
 
-    public class ClientService : IDisposable, IClientProcedures
+    public class ClientService : IDisposable, IClientProcedures, IStartupInitializer
     {
         private readonly IHubContext<EmsRpcHub, IEmsClientProcedures> _hub;
 
@@ -132,10 +133,13 @@ public class EmsRpcHub : Hub<IEmsClientProcedures>, IEmsStartlistHubProcedures, 
             IHubContext<EmsRpcHub, IEmsClientProcedures> hub)
         {
             _hub = hub;
+        }
 
-            EventHelper.Subscribe<PhaseCompleted>(SendStartlistEntryUpdate);
-            EventHelper.Subscribe<QualificationRestored>(SendParticipantEntryAddOrUpdate);
-            EventHelper.Subscribe<QualificationRevoked>(SendParticipantEntryRemove);
+        public void RunAtStartup()
+        {
+            Participation.PhaseCompletedEvent.SubscribeAsync(SendStartlistEntryUpdate);
+            Participation.QualificationRevokedEvent.SubscribeAsync(SendQualificationRevoked);
+            Participation.QualificationRestoredEvent.SubscribeAsync(SendQualificationRestored);
         }
 
         public async void SendStartlistEntryUpdate(PhaseCompleted phaseCompleted)

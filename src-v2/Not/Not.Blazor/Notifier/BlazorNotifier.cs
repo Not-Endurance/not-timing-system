@@ -1,6 +1,5 @@
 ﻿using MudBlazor;
 using Not.Blazor.Mud.Extensions;
-using Not.Events;
 using Not.Notifier;
 
 namespace Not.Blazor.Notifier;
@@ -14,10 +13,10 @@ public class BlazorNotifier : ComponentBase
 
     public BlazorNotifier()
     {
-        EventHelper.Subscribe<Informed>(AddSnack);
-        EventHelper.Subscribe<Warned>(AddSnack);
-        EventHelper.Subscribe<Failed>(AddSnack);
-        EventHelper.Subscribe<Succeeded>(AddSnack);
+        Notifications.InformedEvent.SubscribeAsync(AddSnack);
+        Notifications.SucceededEvent.SubscribeAsync(AddSnack);
+        Notifications.WarnedEvent.SubscribeAsync(AddSnack);
+        Notifications.FailedEvent.SubscribeAsync(AddSnack);
     }
 
     void AddSnack(Informed informed)

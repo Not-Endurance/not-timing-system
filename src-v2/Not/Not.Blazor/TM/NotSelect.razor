@@ -7,20 +7,20 @@
 @inherits BindableValueComponent<T>
 @implements IMudBaseInputWrapper<T>
 
-<MudSelect T="T" @bind-Value="Value" @ref="MudBaseInput" Placeholder="@Placeholder" Label="@Localizer.Get(Label)" >
+<MudSelect @bind-Value="Value" @ref="MudBaseInput" Placeholder="@Localizer.Get(Placeholder)" Label="@Localizer.Get(Label)">
     @foreach (var item in Items)
     {
         <MudSelectItem Value="@item.Value">@item.Label</MudSelectItem>
     }
     @if(!Items.Any())
     {
-        var emptyItem = NotListModel.GetEmptyValue<T>();
-        <MudSelectItem Class="pa-4" Value="emptyItem.Value">@(new MarkupString(emptyItem.Label))</MudSelectItem>
+        <MudSelectItem Class="pa-4" Value="_empty.Value">@(new MarkupString(_empty.Label))</MudSelectItem>
     }
 </MudSelect>
 
 @code {
-    // TODO: Implement Validation injection for custom input components
+    static NotListModel<T> _empty = NotListModel.Empty<T>();
+
     [Parameter]
     public List<NotListModel<T>> Items { get; set; } = new();
     [Parameter]
@@ -28,5 +28,5 @@
     [Parameter]
     public string Placeholder { get; set; } = default!;
 
-    public MudBaseInput<T> MudBaseInput { get; private set; } = default!;
+    public MudBaseInput<T?> MudBaseInput { get; private set; } = default!;
 }

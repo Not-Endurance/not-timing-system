@@ -10,16 +10,16 @@ public abstract class ObservableBehind : IObservableBehind
 {
     readonly SemaphoreSlim _semaphore = new(1);
     bool _isInitialized;
-    private readonly IEventManager _stateChanged = new EventManager();
+    private readonly Event _stateChanged = new();
 
     /// <summary>
     /// Initialize the state of an ObservableBehind. 
     /// If the state has been initialized successfully It cannot be initialized again.
     /// </summary>
     /// <returns>Indicates weather or not the state has been initialized successfully</returns>
-    protected abstract Task<bool> PerformInitialization();
+    protected abstract Task<bool> PerformInitialization(params IEnumerable<object> arguments);
 
-    public async Task Initialize()
+    public async Task Initialize(params IEnumerable<object> arguments)
     {
         if (_isInitialized)
         {
@@ -29,7 +29,7 @@ public abstract class ObservableBehind : IObservableBehind
         try
         {
             await _semaphore.WaitAsync();
-            _isInitialized = await SafeHelper.Run(PerformInitialization);
+            _isInitialized = await SafeHelper.Run(() => PerformInitialization(arguments));
         }
         finally
         {
@@ -39,7 +39,7 @@ public abstract class ObservableBehind : IObservableBehind
     
     public void Subscribe(Func<Task> action)
     {
-        _stateChanged.Subscribe(action);
+        _stateChanged.SubscribeAsync(action);
     }
 
     protected void EmitChange()
@@ -50,6 +50,6 @@ public abstract class ObservableBehind : IObservableBehind
 
 public interface IObservableBehind : INotBehind, ISingletonService
 {
-    Task Initialize();
+    Task Initialize(params IEnumerable<object> arguments);
     void Subscribe(Func<Task> action);
 }

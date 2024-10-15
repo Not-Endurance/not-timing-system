@@ -3,7 +3,7 @@
 
 @inherits MudSwitch<bool>
 
-<MudSwitch @bind-Value="Value" Label="@(Label != null ? _localizer.Get(Label) : null)" Style="Style" Class="Class"
+<MudSwitch Value="Value" ValueChanged="ValueChanged" Label="@(Label != null ? _localizer.Get(Label) : null)" Style="Style" Class="Class"
     Color="Color.Primary" Converter="Converter" Culture="Culture" Disabled="Disabled" LabelPosition="LabelPosition" />
 
 @code {

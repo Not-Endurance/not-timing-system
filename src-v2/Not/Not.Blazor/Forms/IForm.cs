@@ -2,6 +2,8 @@
 
 namespace Not.Blazor.Forms;
 
+// Probably remove these
+
 /// <summary>
 /// Abstraction enabling seemless validation per form field
 /// </summary>
@@ -21,7 +23,6 @@ public interface IForm
 /// </summary>
 /// <typeparam name="T">Type of Domain Entity to be created</typeparam>
 public interface ICreateForm<T> : IForm
-    where T : DomainEntity
 {
     /// <summary>
     /// Construct an instance of <typeparamref name="T"/> based on the form inputs that is suitable for create.
@@ -36,7 +37,6 @@ public interface ICreateForm<T> : IForm
 /// </summary>
 /// <typeparam name="T">Type of Domain Entity to be updated</typeparam>
 public interface IUpdateForm<T> : IForm
-    where T : DomainEntity
 {
     /// <summary>
     /// Constructs an instance of update model from an instance of <typeparamref name="T"/> 

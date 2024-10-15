@@ -3,6 +3,6 @@ using NTS.Persistence.States;
 
 namespace NTS.Persistence.Adapters;
 
-public class CoreEventRepository(IStore<CoreState> store) : TreeRepository<Event, CoreState>(store)
+public class CoreEventRepository(IStore<CoreState> store) : RootRepository<Event, CoreState>(store)
 {
 }

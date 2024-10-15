@@ -8,11 +8,9 @@ namespace Not.Blazor.Ports.Behinds;
 /// <typeparamref name="T">Type of domain entity</typeparamref>
 /// </summary>
 public interface INotBehind<T> : ICreateBehind<T>, IReadBehind<T>, IUpdateBehind<T>, IDeleteBehind<T>, INotParentBehind<T>
-    where T : DomainEntity, IParent
 {
 }
 public interface INotSetBehind<T> : ICreateBehind<T>, IReadAllBehind<T>, IUpdateBehind<T>, IDeleteBehind<T>
-    where T : DomainEntity
 {
 }
 /// <summary>

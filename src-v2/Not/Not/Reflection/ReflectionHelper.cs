@@ -21,6 +21,11 @@ public static class ReflectionHelper
         return typeof(T).Name;
     }
 
+    public static string GetTypeName(this object instance)
+    {
+        return instance.GetType().Name;
+    }
+
     public static FieldInfo? GetEnumField(this Type type, object instance)
     {
         var stringValue = instance.ToString();

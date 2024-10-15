@@ -1,39 +1,23 @@
-﻿@using NTS.Domain.Setup.Entities;
-@using NTS.Judge.Setup.Competitions
+﻿@using NTS.Judge.Setup.Competitions
 @using Not.Blazor.Forms;
 @using Not.Blazor.TM.Forms;
 @using Not.Blazor.TM.Forms.Components;
 
-@inherits NotForm<Horse>;
+@inherits FormTM<HorseFormModel>;
 
-<EditForm Model="_model">
-    <MudTextField @bind-Value="_model.Name" Label="Horse Name" Variant="Variant.Text" Margin="Margin.Dense" />
-    <MudTextField @bind-Value="_model.FeiId" Label="Fei Id" HelperText="@Localizer.Get(OPTIONAL_FEI_ID)" Variant="Variant.Text" Margin="Margin.Dense" />
+<EditForm Model="Model">
+    <MudTextField @bind-Value="Model.Name" Label="Horse Name" Variant="Variant.Text" Margin="Margin.Dense" />
+
+    <MudTextField @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Localizer.Get(OPTIONAL_FEI_ID)" Variant="Variant.Text" Margin="Margin.Dense" />
 </EditForm>
 
 @code {
     private MudTextField<string> _feiIdField = default!;
     private MudTextField<string> _nameField = default!;
-    private HorseFormModel _model { get; set; } = new();
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(_model.FeiId), () => _feiIdField);
-        RegisterInjector(nameof(_model.Name), () => _nameField);
-    }
-
-    public override void SetUpdateModel(Horse horse)
-    {
-        _model = new HorseFormModel(horse);
-    }
-
-    public override Horse SubmitCreate()
-    {
-        return Horse.Create(_model.Name, _model.FeiId);
-    }
-
-    public override Horse SubmitUpdate()
-    {
-        return Horse.Update(_model.Id, _model.Name, _model.FeiId);
+        RegisterInjector(nameof(Model.FeiId), () => _feiIdField);
+        RegisterInjector(nameof(Model.Name), () => _nameField);
     }
 }

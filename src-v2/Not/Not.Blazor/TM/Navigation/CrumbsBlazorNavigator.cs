@@ -1,5 +1,4 @@
 ﻿using Not.Blazor.Navigation;
-using Not.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Not.Blazor.TM.Navigation;
@@ -53,8 +52,6 @@ public class CrumbsBlazorNavigator : ICrumbsNavigator, ILandNavigator
         _parameters = previousCrumb.parameters;
         NavigateForward(previousCrumb.endpoint);
     }
-
-    //TODO: add can navigate and hide back if cannot
 
     public void LandTo(string landing)
     {

@@ -1,33 +1,38 @@
 ﻿using Newtonsoft.Json;
 
 namespace NTS.Domain.Setup.Entities;
+
 public class Contestant : DomainEntity, ISummarizable
 {
-    public static Contestant Create(DateTimeOffset? newStart, bool isUnranked, Combination combination) => new(newStart, isUnranked, combination);
-    public static Contestant Update(int id, DateTimeOffset? newStart, bool isUnranked, Combination combination) => new(id, newStart, isUnranked, combination);
-    private List<Combination> _combinations = new();
+    public static Contestant Create(DateTimeOffset? newStart, bool isUnranked, Combination? combination) => new(newStart, isUnranked, combination);
+    public static Contestant Update(int id, DateTimeOffset? newStart, bool isUnranked, Combination? combination) => new(id, newStart, isUnranked, combination);
+    
+    List<Combination> _combinations = [];
 
     [JsonConstructor]
-    private Contestant(int id, DateTimeOffset? startTimeOverride, bool isUnranked, Combination combination)
+    private Contestant(int id, DateTimeOffset? startTimeOverride, bool isUnranked, Combination? combination) : base(id)
     {
         Id = id;
         StartTimeOverride = startTimeOverride;
         IsUnranked = isUnranked;
-        Combination = combination;
+        Combination = Required(nameof(Combination), combination);
     }
-    // TODO: use this ctor to validate and then call the JsonCtor to assign the property values
-    // then remove private setter where not needed as serialization happens through the ctor anyway
-    // Move the ID generation logic in protected method in DomainEntity and call inside this() to generate ID
-    // as oposed to generating it automatically in DomainEntity ctor
-    private Contestant(DateTimeOffset? startTimeOverride, bool isUnranked, Combination combination)
+
+    private Contestant(DateTimeOffset? startTimeOverride, bool isUnranked, Combination? combination) : this(
+        GenerateId(),
+        Validate(startTimeOverride),
+        isUnranked,
+        combination)
+    {
+    }
+
+    static DateTimeOffset? Validate(DateTimeOffset? startTimeOverride)
     {
         if (startTimeOverride != null && startTimeOverride.Value.DateTime.CompareTo(DateTime.Today) < 0)
         {
             throw new DomainException(nameof(StartTimeOverride), "Start time cannot be in the past");
         }
-        StartTimeOverride = startTimeOverride;
-        IsUnranked = isUnranked;
-        Combination = combination;
+        return startTimeOverride;
     }
 
     public Combination Combination {  get; private set; }

@@ -6,46 +6,39 @@
 @using Not.Blazor.TM.Forms;
 @using Not.Blazor.TM.Forms.Components;
 
+@inherits FormTM<AthleteFormModel>;
 
-@inherits NotForm<Athlete>;
+<EditForm Model="Model">
+    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Localizer.Get("Name")" />
 
-<EditForm Model="_model">
-    <MudTextField @ref="_nameField" @bind-Value="_model.Name" Label="@Localizer.Get("Name")" />
-    <MudTextField @bind-Value="_model.FeiId" Label="Fei Id" HelperText="@Localizer.Get(OPTIONAL_FEI_ID)" Variant="Variant.Text" Margin="Margin.Dense" />
-    <NotAutocomplete T="Country" @ref="_countryField" @bind-Value="_model.Country" Label="@nameof(Athlete.Country)" Search="_countries.Search" />
-    <MudTextField @bind-Value="_model.Club" Label="Club" Variant="Variant.Text" Margin="Margin.Dense" />
-    <MudTextField @bind-Value="_model.Category" Label="Category" Variant="Variant.Text" Margin="Margin.Dense" />
+    <MudTextField @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Localizer.Get(OPTIONAL_FEI_ID)" Variant="Variant.Text" Margin="Margin.Dense" />
+
+    <NotAutocomplete T="Country" @ref="_countryField" @bind-Value="Model.Country" Label="@nameof(Athlete.Country)" Search="_countries.Search" />
+
+    <MudTextField @bind-Value="Model.Club" Label="Club" Variant="Variant.Text" Margin="Margin.Dense" />
+
+    <MudTextField @bind-Value="Model.Category" Label="Category" Variant="Variant.Text" Margin="Margin.Dense" />
 </EditForm>
 
 @code {
+    // TODO: Introduce NotText variants for consistency
+
     private MudTextField<string> _nameField = default!;
     private MudTextField<string?> _feiIdField = default!;
     private NotAutocomplete<Country?> _countryField = default!;
     private MudTextField<string> _clubField = default!;
     private MudTextField<string> _categoryField = default!;
-    private AthleteFormModel _model { get; set; } = new();
 
     [Inject]
     private ICountriesContext _countries { get; set; } = default!;
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(_model.Name), () => _nameField);
-        RegisterInjector(nameof(_model.Country), () => _countryField);
+        RegisterInjector(nameof(Model.Name), () => _nameField);
+        RegisterInjector(nameof(Model.Country), () => _countryField);
     }
 
-    public override void SetUpdateModel(Athlete Athlete)
+    public override void SetUpdateModel(AthleteFormModel Athlete)
     {
-        _model = new AthleteFormModel(Athlete);
-    }
-
-    public override Athlete SubmitCreate()
-    {
-        return Athlete.Create(_model.Name, _model.FeiId, _model.Country, _model.Club, _model.Category);
-    }
-
-    public override Athlete SubmitUpdate()
-    {
-        return Athlete.Update(_model.Id, _model.Name, _model.FeiId, _model.Country, _model.Club, _model.Category);
     }
 }

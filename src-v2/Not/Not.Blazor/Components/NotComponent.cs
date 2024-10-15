@@ -13,11 +13,10 @@ public class NotComponent : ComponentBase
     [Parameter]
     public string? Class { get; set; }
 
-    protected async Task Observe(IObservableBehind observable)
+    protected async Task Observe(IObservableBehind observable, params IEnumerable<object> arguments)
     {
         observable.Subscribe(OnEmit);
-
-        await observable.Initialize();
+        await observable.Initialize(arguments);
         await Render();
     }
 

@@ -3,7 +3,7 @@ using NTS.Domain.Core.Objects;
 
 namespace NTS.Domain.Core.Events;
 
-public record DocumentProduced : DomainObject, IEvent
+public record DocumentProduced : DomainObject
 {
     public DocumentProduced(Document document)
     {

@@ -7,67 +7,42 @@
 @using Not.Blazor.TM.Forms.Components;
 @using Not.Extensions;
 
-@inherits NotForm<Competition>;
+@inherits FormTM<CompetitionFormModel>;
 
-<EditForm Model="_model">
-    <MudTextField @ref="_nameField" @bind-Value="_model.Name" Label="@Localizer.Get("Name")" />
-    <NotSelect T="CompetitionRuleset" Label="@Localizer.Get("Type")" @bind-Value="_model.Type" Items="_competitionTypes" />
-    <MudDatePicker DisableToolbar="true" @ref="_dayField" @bind-Date="_model.StartDay" Label="@Localizer.Get("Date")" />
-    <MudTimePicker DisableToolbar="true" @ref="_timeField" @bind-Time="_model.StartTime" Label="@Localizer.Get("Time")" />
-    <NotSwitch @bind-Value="_model.UseAutomaticCRI" Label="Use automatic CRI" />
-    @if (_model.UseAutomaticCRI)
+<EditForm Model="Model">
+    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Localizer.Get("Name")" />
+
+    <NotSelect Label="Type" @bind-Value="Model.Type" Items="_competitionTypes" />
+
+    <MudDatePicker DisableToolbar="true" @ref="_dayField" @bind-Date="Model.Day" Label="@Localizer.Get("Date")" />
+
+    <MudTimePicker DisableToolbar="true" @ref="_timeField" @bind-Time="Model.Time" Label="@Localizer.Get("Time")" />
+
+    <NotSwitch @bind-Value="Model.UseAutomaticCRI" Label="Use automatic CRI" />
+
+    @if (Model.UseAutomaticCRI)
     {
-        <MudNumericField @bind-Value="_model.CRIRecovery" />
+        <MudNumericField @bind-Value="Model.CRIRecovery" />
     }
 </EditForm>
 
-    @code {
-    private MudTextField<string> _nameField = default!;
-    private NotSelect<CompetitionRuleset> _typeField = default!;
-    private MudPicker<DateTime?> _dayField = default!;
-    private MudPicker<TimeSpan?> _timeField = default!;
-    private CompetitionFormModel _model { get; set; } = new();
-
-    private List<NotListModel<CompetitionRuleset>> _competitionTypes = NotListModel.FromEnum<CompetitionRuleset>().ToList();
-
-    public DateTimeOffset CombineStartDayAndTime(DateTime? startDay, TimeSpan? startTime)
-    {
-        var start = startDay.GetValueOrDefault(DateTime.Today);
-        var startDayTime = start.Date.Add(startTime.GetValueOrDefault(DateTime.Now.TimeOfDay));
-        var startTimeOffset = startDayTime.ToDateTimeOffset();
-        return startTimeOffset;
-    }
+@code {
+    MudTextField<string?> _nameField = default!;
+    NotSelect<CompetitionRuleset> _typeField = default!;
+    MudPicker<DateTime?> _dayField = default!;
+    MudPicker<TimeSpan?> _timeField = default!;
+    List<NotListModel<CompetitionRuleset?>> _competitionTypes = NotListModel.FromEnum<CompetitionRuleset>().ToList();
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(_model.Name), () => _nameField);
-        RegisterInjector(nameof(_model.StartTime), () => _timeField);
-        RegisterInjector(nameof(_model.Type), () => _typeField);
+        RegisterInjector(nameof(Model.Name), () => _nameField);
+        RegisterInjector(nameof(Competition.StartTime), () => _timeField);
+        RegisterInjector(nameof(Model.Type), () => _typeField);
     }
 
-    public override void SetUpdateModel(Competition competition)
+    public void Test(bool value)
     {
-        _model = new CompetitionFormModel(competition);
-    }
-
-    public override Competition SubmitCreate()
-    {
-        DateTimeOffset startTimeOffset = CombineStartDayAndTime(_model.StartDay, _model.StartTime);
-        var criRecovery = GetCRIRecovery();
-        return Competition.Create(_model.Name, _model.Type, startTimeOffset, criRecovery);
-    }
-
-    public override Competition SubmitUpdate()
-    {
-        DateTimeOffset startTimeOffset = CombineStartDayAndTime(_model.StartDay, _model.StartTime);
-        var criRecovery = GetCRIRecovery();
-        return Competition.Update(_model.Id!.Value, _model.Name, _model.Type, startTimeOffset, criRecovery, _model.Phases!, _model.Contestants!);
-    }
-
-    private int? GetCRIRecovery()
-    {
-        return _model.UseAutomaticCRI
-            ? _model.CRIRecovery
-            : null;
+        Model.UseAutomaticCRI = value;
+        StateHasChanged();
     }
 }
