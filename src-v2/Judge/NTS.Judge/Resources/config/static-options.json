@@ -1,6 +1,8 @@
 {
   "$id": "1",
   "$type": "NTS.Domain.Core.Configuration.StaticOptions+Model, NTS.Domain.Core",
+  "DetectionMode": "Rfid",
+  "RfidSnapshotType": "Stage",
   "Countries": {
     "$type": "NTS.Domain.Objects.Country[], NTS.Domain",
     "$values": [
