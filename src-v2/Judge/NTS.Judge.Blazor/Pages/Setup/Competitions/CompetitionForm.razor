@@ -11,9 +11,10 @@
 
 <EditForm Model="_model">
     <MudTextField @ref="_nameField" @bind-Value="_model.Name" Label="@Localizer.Get("Name")" />
-    <NotSelect T="CompetitionRuleset" Label="@Localizer.Get("Type")" @bind-Value="_model.Type" Items="_competitionTypes" />
-    <MudDatePicker DisableToolbar="true" @ref="_dayField" @bind-Date="_model.StartDay" Label="@Localizer.Get("Date")" />
-    <MudTimePicker DisableToolbar="true" @ref="_timeField" @bind-Time="_model.StartTime" Label="@Localizer.Get("Time")" />
+    <NotSelect @ref="_ruleField" T="CompetitionRuleset" Label="Ruleset" @bind-Value="_model.Ruleset" Items="_competitionRules" />
+    <NotSelect @ref="_typeField" T="CompetitionType" Label="Type" @bind-Value="_model.Type" Items="_competitionTypes" />
+    <MudDatePicker ShowToolbar="false" @ref="_dayField" @bind-Date="_model.StartDay" Label="@Localizer.Get("Date")" />
+    <MudTimePicker ShowToolbar="false" @ref="_timeField" @bind-Time="_model.StartTime" Label="@Localizer.Get("Time")" />
     <NotSwitch @bind-Value="_model.UseAutomaticCRI" Label="Use automatic CRI" />
     @if (_model.UseAutomaticCRI)
     {
@@ -21,14 +22,16 @@
     }
 </EditForm>
 
-    @code {
+@code {
     private MudTextField<string> _nameField = default!;
-    private NotSelect<CompetitionRuleset> _typeField = default!;
+    private NotSelect<CompetitionRuleset> _ruleField = default!;
+    private NotSelect<CompetitionType> _typeField = default!;
     private MudPicker<DateTime?> _dayField = default!;
     private MudPicker<TimeSpan?> _timeField = default!;
     private CompetitionFormModel _model { get; set; } = new();
 
-    private List<NotListModel<CompetitionRuleset>> _competitionTypes = NotListModel.FromEnum<CompetitionRuleset>().ToList();
+    private List<NotListModel<CompetitionRuleset>> _competitionRules = NotListModel.FromEnum<CompetitionRuleset>().ToList();
+    private List<NotListModel<CompetitionType>> _competitionTypes = NotListModel.FromEnum<CompetitionType>().ToList();
 
     public DateTimeOffset CombineStartDayAndTime(DateTime? startDay, TimeSpan? startTime)
     {
@@ -54,14 +57,14 @@
     {
         DateTimeOffset startTimeOffset = CombineStartDayAndTime(_model.StartDay, _model.StartTime);
         var criRecovery = GetCRIRecovery();
-        return Competition.Create(_model.Name, _model.Type, startTimeOffset, criRecovery);
+        return Competition.Create(_model.Name, _model.Ruleset, _model.Type, startTimeOffset, criRecovery);
     }
 
     public override Competition SubmitUpdate()
     {
         DateTimeOffset startTimeOffset = CombineStartDayAndTime(_model.StartDay, _model.StartTime);
         var criRecovery = GetCRIRecovery();
-        return Competition.Update(_model.Id!.Value, _model.Name, _model.Type, startTimeOffset, criRecovery, _model.Phases!, _model.Contestants!);
+        return Competition.Update(_model.Id!.Value, _model.Name, _model.Ruleset, _model.Type, startTimeOffset, criRecovery, _model.Phases!, _model.Contestants!);
     }
 
     private int? GetCRIRecovery()

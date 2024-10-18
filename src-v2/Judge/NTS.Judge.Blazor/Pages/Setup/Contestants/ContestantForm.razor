@@ -17,14 +17,20 @@
     <NotSwitch @bind-Value="_overrideStartTime" Label="Override Start Time"/>
     @if (_overrideStartTime)
     {
-        <MudTimePicker DisableToolbar="true" @ref="_timeField" @bind-Time="_model.StartTimeOverride" Label="@Localizer.Get("Start Time")" />
+        <MudTimePicker ShowToolbar="false" @ref="_timeField" @bind-Time="_model.StartTimeOverride" Label="@Localizer.Get("Start Time")" />
+    }
+    <NotSwitch @bind-Value="_overrideMaxSpeed" Label="Override Max Speed" />
+    @if (_overrideMaxSpeed)
+    {
+        <MudNumericField @bind-Value="_model.MaxSpeedOverride" Label="Standard" Variant="Variant.Text" Min="5" Max="20" />
     }
 </EditForm>
 
 @code {
     private MudPicker<TimeSpan?> _timeField = default!;
     private ContestantFormModel _model { get; set; } = new();
-    private Boolean _overrideStartTime;
+    private bool _overrideStartTime;
+    private bool _overrideMaxSpeed;
     private List<NotListModel<Combination>> _combinations = new();
 
     [Inject]
@@ -50,12 +56,12 @@
     public override Contestant SubmitCreate()
     {
         var newStartTimeOffset = _model.StartTimeOverride?.ToDateTimeOffset();
-        return Contestant.Create(newStartTimeOffset, _model.IsUnranked, _model.Combination);
+        return Contestant.Create(newStartTimeOffset, _model.IsUnranked, _model.Combination, _model.MaxSpeedOverride);
     }
 
     public override Contestant SubmitUpdate()
     {
         var newStartTimeOffset = _model.StartTimeOverride?.ToDateTimeOffset();
-        return Contestant.Update(_model.Id, newStartTimeOffset, _model.IsUnranked, _model.Combination);
+        return Contestant.Update(_model.Id, newStartTimeOffset, _model.IsUnranked, _model.Combination, _model.MaxSpeedOverride);
     }
 }
