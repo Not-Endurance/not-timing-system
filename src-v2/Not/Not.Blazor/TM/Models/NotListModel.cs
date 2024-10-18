@@ -23,7 +23,7 @@ public class NotListModel
         }
     }
 
-    public static NotListModel<T> CreateEmptyValue<T>()
+    public static NotListModel<T> GetEmptyValue<T>()
     {
         return new NotListModel<T>();
     }
@@ -39,6 +39,7 @@ public class NotListModel<T>
 
     public NotListModel()
     {
+        //TODO: Localize no items label
         Label = "No items in this list yet.";
     }
 
