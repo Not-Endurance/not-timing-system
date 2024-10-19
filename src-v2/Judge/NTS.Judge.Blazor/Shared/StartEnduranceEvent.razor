@@ -1,0 +1,40 @@
+﻿﻿@using NTS.Domain.Objects
+@using NTS.Judge.Blazor.Ports;
+@using Not.Blazor.TM
+@using Not.Notifier
+
+@inherits NotComponent
+
+<MudStack Class="ma-5">
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" Disabled="_enduranceEventStarted" OnClick="Start">@Localizer.Get(connectMessage)</MudButton>
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="GetTags">Get Tags</MudButton>
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Stop">@Localizer.Get("Stop Reading")</MudButton>
+</MudStack>
+
+@code {
+    [Inject]
+    private IRfidTagReaderBehind _reader { get; set; } = default!;
+    [Inject]
+    private IParticipationBehind _participationBehind { get; set; } = default!;
+    private bool _enduranceEventStarted;
+    private string connectMessage = "Start Reading";
+
+    public void Start()
+    {
+        _reader.StartReading(true);
+    }
+
+    public void GetTags()
+    {
+        var snapshots = _reader.ProcessTags();
+        foreach(var snapshot in snapshots)
+        {
+            NotifyHelper.Inform("Tag Detected: " + snapshot.Number + " at " + snapshot.Timestamp);
+        }
+    }
+
+    public void Stop()
+    {
+        _reader.StartReading(false);
+    }
+}

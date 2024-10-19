@@ -33,7 +33,7 @@
 
 @code {
     [Inject]
-    public ITagBehind _tagBehind { get; set; } = default!;
+    public IRfidTagWriterBehind _tagBehind { get; set; } = default!;
     [Parameter]
     public int CombinationNumber { get; set; }
 
