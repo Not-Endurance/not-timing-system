@@ -1,0 +1,55 @@
+﻿@using Not.Blazor.Mud.Components
+@using Not.Safe
+@using Not.Services;
+@using Not.Blazor.Components;
+@using Not.Blazor.Navigation;
+
+@inherits NotComponent
+@typeparam T;
+@typeparam TForm where TForm : FormTM<T>;
+
+<MudContainer Class="not-page-mid-width">
+    <NotDynamic @ref="_form" T="T" TForm="TForm" Model="Model" />
+    
+    <MudStack Row="true" Class="mt-4">
+        <NotButtonUpdate OnClick="Update" />
+
+        @if (_navigator.CanNavigateBack())
+        {
+            <NotButtonBack OnClick="NavigateBack" />
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    NotDynamic<T, TForm> _form = default!;
+
+    [Inject]
+    ICrumbsNavigator _navigator { get; set; } = default!;
+    [Inject]
+    IUpdateBehind<T> _behind { get; set; } = default!;
+
+    [Parameter]
+    public T Model { get; set; } = default!;
+
+    async Task Update()
+    {
+        await SafeHelper.Run(Submit, InjectValidation);
+    }
+
+    async Task Submit()
+    {
+        await _behind.Update(Model);
+        NavigateBack();
+    }
+
+    async Task InjectValidation(DomainExceptionBase validation)
+    {
+        await _form!.Instance.AddValidationError(validation.Property, validation.Message);
+    }
+
+    void NavigateBack()
+    {
+        _navigator.NavigateBack();
+    }
+}

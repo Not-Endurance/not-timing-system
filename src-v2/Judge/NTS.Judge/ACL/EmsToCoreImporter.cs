@@ -7,7 +7,7 @@ using static NTS.Domain.Enums.OfficialRole;
 using NTS.Compatibility.EMS.Entities.Competitions;
 using NTS.Domain.Enums;
 using NTS.Judge.ACL.Factories;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Entities.ParticipationAggregate;
 using NTS.Compatibility.EMS.Enums;
 using Not.Application.Ports.CRUD;
 using Not.Injection;
@@ -16,13 +16,13 @@ namespace NTS.Judge.ACL;
 
 public class EmsToCoreImporter : IEmsToCoreImporter
 {
-    private readonly IRepository<Event> _events;
+    private readonly IRepository<EnduranceEvent> _events;
     private readonly IRepository<Official> _officials;
     private readonly IRepository<Participation> _participations;
     private readonly IRepository<Ranking> _classfications;
 
     public EmsToCoreImporter(
-        IRepository<Event> events,
+        IRepository<EnduranceEvent> events,
         IRepository<Official> officials,
         IRepository<Participation> participations,
         IRepository<Ranking> classfications)
@@ -43,12 +43,12 @@ public class EmsToCoreImporter : IEmsToCoreImporter
 
         var emsState = emsJson.FromJson<EmsState>();
 
-        var @event = CreateEvent(emsState.Event, adjustTime);
+        var enduranceEvent = CreateEvent(emsState.Event, adjustTime);
         //TODOL interesting why some imports fail without ToList? 2024-vakarel (finished) for example
         var officials = CreateOfficials(emsState.Event).ToList();
         var (rankings, participations) = CreateRankingsAndParticipations(emsState, adjustTime);
 
-        await _events.Create(@event);
+        await _events.Create(enduranceEvent);
         foreach (var official in officials)
         {
             await _officials.Create(official);
@@ -63,7 +63,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
         }
     }
 
-    private Event CreateEvent(EmsEnduranceEvent emsEvent, bool adjustTime)
+    private EnduranceEvent CreateEvent(EmsEnduranceEvent emsEvent, bool adjustTime)
     {
         var country = new Country(emsEvent.Country.IsoCode, "zz", emsEvent.Country.Name);
         var startTime = emsEvent.Competitions.OrderBy(x => x.StartTime).First().StartTime;
@@ -71,7 +71,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
         {
             startTime = DateTime.UtcNow.AddHours(-1);
         }
-        return new Event(
+        return new EnduranceEvent(
             country,
             emsEvent.PopulatedPlace,
             "populated place",
@@ -85,31 +85,31 @@ public class EmsToCoreImporter : IEmsToCoreImporter
         var result = new List<Official>();
         if (emsEvent.PresidentGroundJury != null)
         {
-            result.Add(new (new Person(emsEvent.PresidentGroundJury.Name), GroundJuryPresident));
+            result.Add(new (Person.Create(emsEvent.PresidentGroundJury.Name), GroundJuryPresident));
         }
         if (emsEvent.PresidentVetCommittee != null)
         {
-            result.Add(new(new Person(emsEvent.PresidentVetCommittee.Name), VeterinaryCommissionPresident));
+            result.Add(new(Person.Create(emsEvent.PresidentVetCommittee.Name), VeterinaryCommissionPresident));
         }
         if (emsEvent.FeiTechDelegate != null)
         {
-            result.Add(new(new Person(emsEvent.FeiTechDelegate.Name), TechnicalDelegate));
+            result.Add(new(Person.Create(emsEvent.FeiTechDelegate.Name), TechnicalDelegate));
         }
         if (emsEvent.FeiVetDelegate != null)
         {
-            result.Add(new(new Person(emsEvent.FeiVetDelegate.Name), ForeignVeterinaryDelegate));
+            result.Add(new(Person.Create(emsEvent.FeiVetDelegate.Name), ForeignVeterinaryDelegate));
         }
         if (emsEvent.ForeignJudge != null)
         {
-            result.Add(new(new Person(emsEvent.ForeignJudge.Name), ForeignJudge));
+            result.Add(new(Person.Create(emsEvent.ForeignJudge.Name), ForeignJudge));
         }
         foreach (var jury in emsEvent.MembersOfJudgeCommittee)
         {
-            result.Add(new (new Person(jury.Name), GroundJury));
+            result.Add(new (Person.Create(jury.Name), GroundJury));
         };
         foreach (var vet in emsEvent.MembersOfVetCommittee)
         {
-            result.Add(new(new Person(vet.Name), VeterinaryCommission));
+            result.Add(new(Person.Create(vet.Name), VeterinaryCommission));
         }
         return result;
     }

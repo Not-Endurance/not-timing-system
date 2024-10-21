@@ -2,99 +2,111 @@ using Newtonsoft.Json;
 
 namespace NTS.Domain.Setup.Entities;
 
-public class Competition : DomainEntity, ISummarizable, IParent<Contestant>, IParent<Phase>
+public class Competition : DomainEntity, ISummarizable, IParent<Participation>, IParent<Phase>
 {
+    public static Competition Create(string? name, CompetitionRuleset? type, DateTimeOffset start, int? compulsoryThresholdMinutes)
+        => new(name, type, start, compulsoryThresholdMinutes);
 
-    public static Competition Create(string name, CompetitionRuleset type, DateTimeOffset start, int? criRecovery)
-        => new(name, type, start, criRecovery);
     public static Competition Update(
         int id,
-        string name,
-        CompetitionRuleset type,
+        string? name,
+        CompetitionRuleset? type,
         DateTimeOffset start,
-        int? criRecovery,
+        int? compulsoryThresholdMinutes,
         IEnumerable<Phase> phases,
-        IEnumerable<Contestant> contestants)
-        => new(id, name, type, start, criRecovery, phases, contestants);
+        IEnumerable<Participation> participations)
+        => new(id, name, type, start, ToTimeSpan(compulsoryThresholdMinutes), phases, participations);
 
-    private List<Phase> _phases = new();
-    private List<Contestant> _contestants = new();
+    List<Phase> _phases = [];
+    List<Participation> _participations = [];
 
     [JsonConstructor]
-    private Competition(int id) : base(id) { }
     private Competition(
         int id, 
-        string name, 
-        CompetitionRuleset type,
-        DateTimeOffset startTime,
-        int? criRecovery,
+        string? name, 
+        CompetitionRuleset? type,
+        DateTimeOffset start,
+        TimeSpan? criRecovery,
         IEnumerable<Phase> phases,
-        IEnumerable<Contestant> contestants) : this(name, type, startTime, criRecovery)
+        IEnumerable<Participation> participations) : base(id)
     {
-        Id = id;
+        Name = Required(nameof(Name), name);
+        Type = Required(nameof(Type), type);
+        Start = start;
+        CompulsoryThreshold = criRecovery;
         _phases = phases.ToList();
-        _contestants = contestants.ToList();
+        _participations = participations.ToList();
     }
-    private Competition(string name, CompetitionRuleset type, DateTimeOffset startTime, int? criRecovery)
-    {
-        if (type == default)
-        {
-            throw new DomainException(nameof(type), "Competition Type is required");
-        }
-        if (startTime.DateTime < DateTime.Today)
-        {
-            throw new DomainException(nameof(StartTime), "Competition date cannot be in the past");
-        }
 
-        Name = name;
-        Type = type;
-        StartTime = startTime;
-        CriRecovery = criRecovery;
+    private Competition(string? name, CompetitionRuleset? type, DateTimeOffset start, int? compulsoryThresholdMinutes) : this(
+        GenerateId(),
+        name,
+        type,
+        IsFuture(nameof(Start), start),
+        ToTimeSpan(compulsoryThresholdMinutes),
+        [],
+        [])
+    {
+    }
+
+    static DateTimeOffset IsFuture(string field, DateTimeOffset start)
+    {
+        if (start <= DateTimeOffset.Now)
+        {
+            throw new DomainException(field, "Competition start cannot be in the past");
+        }
+        return start;
+    }
+
+    static TimeSpan? ToTimeSpan(int? minutes)
+    {
+        return minutes != null ? TimeSpan.FromSeconds(minutes.Value) : null;
     }
 
     public string Name { get; private set; }
     public CompetitionRuleset Type { get; private set; }
-	public DateTimeOffset StartTime { get; private set; }
-    public int? CriRecovery { get; private set; }
+	public DateTimeOffset Start { get; private set; }
+    public TimeSpan? CompulsoryThreshold { get; private set; }
     public IReadOnlyList<Phase> Phases
     {
         get => _phases.AsReadOnly();
         private set => _phases = value.ToList();
     }
-    public IReadOnlyList<Contestant> Contestants
+    public IReadOnlyList<Participation> Participations
     {
-        get => _contestants.AsReadOnly();
-        private set => _contestants = value.ToList();
+        get => _participations.AsReadOnly();
+        private set => _participations = value.ToList();
     }
 
     public string Summarize()
 	{
 		var summary = new Summarizer(this);
 		summary.Add("phases".Localize(), _phases);
-		summary.Add("contestants".Localize(), _contestants);
+		summary.Add("contestants".Localize(), _participations);
 		return summary.ToString();
 	}
+
 	public override string ToString()
 	{
         return Combine(
             LocalizationHelper.Get(Type),
             $"{"phases".Localize()}: {Phases.Count}",
-            $"{"start".Localize()}: {StartTime:f}");
+            $"{"start".Localize()}: {Start:f}");
 	}
 
-    public void Add(Contestant child)
+    public void Add(Participation child)
     {
-        _contestants.Add(child);
+        _participations.Add(child);
     }
 
-    public void Remove(Contestant child)
+    public void Remove(Participation child)
     {
-        _contestants.Remove(child);
+        _participations.Remove(child);
     }
 
-    public void Update(Contestant child)
+    public void Update(Participation child)
     {
-        _contestants.Remove(child);
+        _participations.Remove(child);
         Add(child);
     }
 

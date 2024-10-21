@@ -1,21 +1,72 @@
-﻿using NTS.Domain.Core.Aggregates.Participations;
+﻿using Not.Blazor.Ports;
+using NTS.Domain.Core.Entities.ParticipationAggregate;
+using System.Globalization;
 
 namespace NTS.Judge.Blazor.Pages.Dashboard.Phases;
 
-public class PhaseUpdateModel : IPhaseState
+public class PhaseUpdateModel : IPhaseState, IFormModel<Phase>
 {
-    public PhaseUpdateModel(IPhaseState state)
+    public const string TIME_MASK = "00:00:00";
+
+    public PhaseUpdateModel()
     {
-        Id = state.Id;
-        StartTime = state.StartTime;
-        ArriveTime = state.ArriveTime;
-        InspectTime = state.InspectTime;
-        ReinspectTime = state.ReinspectTime;
+    }
+    public PhaseUpdateModel(Phase phase)
+    {
+        FromEntity(phase);
     }
 
-    public int Id { get; }
-    public Timestamp? StartTime { get; set; }
-    public Timestamp? ArriveTime { get; set; }
-    public Timestamp? InspectTime { get; set; }
-    public Timestamp? ReinspectTime { get; set; }
+    public string? StartTimeInput { get; set; }
+    public string? ArriveTimeInput { get; set; }
+    public string? PresentTimeInput { get; set; }
+    public string? RepresentTimeInput { get; set; }
+
+    public int Id { get; private set; }
+    public DateTimeOffset? StartTime 
+    {
+        get => Parse(StartTimeInput);
+        set => StartTimeInput = ToInputString(value);
+    }
+    public DateTimeOffset? ArriveTime 
+    { 
+        get => Parse(ArriveTimeInput); 
+        set => ArriveTimeInput = ToInputString(value); 
+    }
+    public DateTimeOffset? PresentTime
+    {
+        get => Parse(PresentTimeInput);
+        set => PresentTimeInput = ToInputString(value);
+    }
+    public DateTimeOffset? RepresentTime
+    {
+        get => Parse(RepresentTimeInput);
+        set => PresentTimeInput = ToInputString(value);
+    }
+
+    public void FromEntity(Phase entity)
+    {
+        Id = entity.Id;
+        StartTime = entity.StartTime?.DateTime;
+        ArriveTime = entity.ArriveTime?.DateTime;
+        PresentTime = entity.PresentTime?.DateTime;
+        RepresentTime = entity.RepresentTime?.DateTime;
+    }
+
+    DateTimeOffset? Parse(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return null;
+        }
+        return DateTimeOffset.ParseExact(input, "HH:mm:ss", CultureInfo.InvariantCulture);
+    }
+
+    string? ToInputString(DateTimeOffset? dateTime)
+    {
+        if (dateTime == null)
+        {
+            return null;
+        }
+        return dateTime.Value.ToString("HH:mm:ss");
+    }
 }

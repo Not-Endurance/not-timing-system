@@ -1,21 +1,20 @@
-﻿using NTS.Domain.Core.Aggregates.Participations;
+﻿using NTS.Domain.Core.Entities.ParticipationAggregate;
+﻿using Not;
 using NTS.Domain.Core.Entities;
 
 namespace NTS.Domain.Core.Objects;
 
-public record HandoutDocument : DomainObject
+public record HandoutDocument : Document, IIdentifiable
 {
-    public HandoutDocument(Handout handout, Event enduranceEvent, IEnumerable<Official> officials)
+    public HandoutDocument(Participation participation, EnduranceEvent enduranceEvent, IEnumerable<Official> officials)
+        : base(new DocumentHeader(participation.Competition.Name, enduranceEvent.PopulatedPlace, enduranceEvent.EventSpan, officials))
     {
-        var participation = handout.Participation;
-        Header = new DocumentHeader(participation.Competition.Name, enduranceEvent.PopulatedPlace, enduranceEvent.EventSpan, officials);
+        Id = participation.Id;
         Tandem = participation.Tandem;
         Phases = participation.Phases;
-        HandoutId = handout.Id;
     }
 
-    public int HandoutId { get; }
-    public DocumentHeader Header { get; }
+    public int Id { get; }
     public Tandem Tandem { get; }
     public PhaseCollection Phases { get; }
 }

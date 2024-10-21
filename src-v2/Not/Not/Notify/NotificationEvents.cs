@@ -3,7 +3,7 @@ using Not.Localization;
 
 namespace Not.Notifier;
 
-public abstract class NotifyEvent(string message) : IEvent
+public abstract class NotifyEvent(string message)
 {
     public string Message { get; } = message;
 }

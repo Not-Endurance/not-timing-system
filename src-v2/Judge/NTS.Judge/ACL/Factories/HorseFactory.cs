@@ -1,5 +1,5 @@
 ﻿using NTS.Compatibility.EMS.Entities.Horses;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Entities;
 using NTS.Judge.ACL.Bridge;
 
 namespace NTS.Judge.ACL.Factories;

@@ -1,60 +1,23 @@
-﻿using Not.Application.Ports.CRUD;
-using Not.Blazor.Ports.Behinds;
-using Not.Safe;
+﻿using Not.Application.Adapters.Behinds;
+using Not.Application.Ports.CRUD;
 using NTS.Domain.Setup.Entities;
+using NTS.Judge.Blazor.Pages.Setup.Athletes;
 
 namespace NTS.Judge.Events;
 
-public class AthleteBehind : INotSetBehind<Athlete>
+public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>
 {
-    private readonly IRepository<Athlete> _athleteRepository;
-
-    public AthleteBehind(IRepository<Athlete> athleteRepository)
+    public AthleteBehind(IRepository<Athlete> repository) : base(repository)
     {
-        _athleteRepository = athleteRepository;
     }
 
-    Task<IEnumerable<Athlete>> SafeGetAll()
+    protected override Athlete CreateEntity(AthleteFormModel model)
     {
-        return _athleteRepository.ReadAll();
+        return Athlete.Create(model.Name, model.FeiId, model.Country, model.Club, model.Category);
     }
 
-    Task<Athlete> SafeCreate(Athlete entity)
+    protected override Athlete UpdateEntity(AthleteFormModel model)
     {
-        return _athleteRepository.Create(entity);
+        return Athlete.Update(model.Id, model.Name, model.FeiId, model.Country, model.Club, model.Category);
     }
-
-    Task<Athlete> SafeUpdate(Athlete entity)
-    {
-        return _athleteRepository.Update(entity);
-    }
-
-    Task<Athlete> SafeDelete(Athlete entity)
-    {
-        return _athleteRepository.Delete(entity);
-    }
-
-    #region SafePattern
-    
-    public async Task<IEnumerable<Athlete>> GetAll()
-    {
-        return await SafeHelper.Run(SafeGetAll) ?? [];
-    }
-
-    public async Task<Athlete> Create(Athlete athlete)
-    {
-        return await SafeHelper.Run(() => SafeCreate(athlete)) ?? athlete;
-    }
-
-    public async Task<Athlete> Update(Athlete athlete)
-    {
-        return await SafeHelper.Run(() => SafeUpdate(athlete)) ?? athlete;
-    }
-
-    public async Task<Athlete> Delete(Athlete athlete)
-    {
-        return await SafeHelper.Run(() => SafeDelete(athlete)) ?? athlete;
-    }
-
-    #endregion
 }

@@ -1,5 +1,4 @@
-﻿@using NTS.Domain.Core.Aggregates.Participations
-@using NTS.Domain.Core.Events
+﻿@using NTS.Domain.Core.Entities
 @using NTS.Judge.Blazor.Pages.Dashboard;
 @using NTS.Judge.Blazor.Ports
 @using Not.Blazor.TM
@@ -21,14 +20,14 @@
                 @foreach (var participation in participations)
                 {
                     var number = participation.Tandem.Number;
-                    var color = participation.IsNotQualified() ? Color.Error : Color.Primary;
+                    var color = participation.IsEliminated() ? Color.Error : Color.Primary;
                     <MudChip Text="@number.ToString()" Value="@participation" Color="@color" Style="min-width: 1rem" />
                 }
             }
         </MudChipSet>
     </MudItem>
     <MudItem xs="9">
-        <ParticipationTable Phases="_behind.SelectedParticipation?.Phases" />
+        <ParticipationTable Number="_behind.SelectedParticipation!.Tandem.Number" Phases="_behind.SelectedParticipation!.Phases" />
     </MudItem>
 </MudGrid>
 

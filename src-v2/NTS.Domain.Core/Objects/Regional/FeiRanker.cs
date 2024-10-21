@@ -14,7 +14,7 @@ internal class FeiRanker : Ranker
     protected IOrderedEnumerable<RankingEntry> OrderByNotEliminatedAndRanked(IEnumerable<RankingEntry> entries)
     {
         return entries
-            .OrderBy(x => x.Participation.IsNotQualified())
+            .OrderBy(x => x.Participation.IsEliminated())
             .ThenBy(x => x.IsNotRanked);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using NTS.Compatibility.EMS.Entities.Laps;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Entities;
 using NTS.Judge.ACL.Bridge;
 
 namespace NTS.Judge.ACL.Factories;
@@ -15,7 +15,7 @@ public class LapFactory
             {
                 Id = phase.Id,
                 IsFinal = participation.Phases.Last() == phase ? true : false,
-                IsCompulsoryInspectionRequired = phase.IsCRIRequested,
+                IsCompulsoryInspectionRequired = phase.IsRequiredInspectionCompulsory,
                 LengthInKm = phase.Length,
                 MaxRecoveryTimeInMins = phase.MaxRecovery,
                 OrderBy = ++i,

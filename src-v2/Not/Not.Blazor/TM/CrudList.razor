@@ -1,0 +1,95 @@
+﻿@using Not.Blazor.Components
+@using Not.Blazor.Mud.Components
+@using Not.Blazor.Navigation
+@using Not.Blazor.Ports
+@using Not.Blazor.TM.Forms
+@using Not.Blazor.TM.Forms.Components
+@using Not.Exceptions
+@using Not.Services
+
+@inherits NotComponent
+@typeparam T where T : DomainEntity
+@typeparam TModel where TModel : IFormModel<T>, new()
+@typeparam TForm where TForm : FormTM<TModel>
+
+<MudPaper Elevation="0" Class="@("pa-4 " + Class)" Style="@Style">
+
+    <MudStack Row="true" Class="mb-2">
+        <NotH2 Class="pt-1">@Name</NotH2>
+
+        <MudSpacer />
+
+        <NotButtonCreate Variant="Variant.Outlined" OnClick="CreateHandler" />
+    </MudStack>
+
+    @if (_behind.Items.Count == 0)
+    {
+        <MudText Typo="Typo.body1">@EmptyMessage</MudText>
+    }
+    else
+    {
+        @foreach (var entity in _behind.Items)
+        {
+            <MudStack Row="true">
+                <MudText Typo="Typo.body1" Class="pa-4">@entity</MudText>
+
+                <MudSpacer />
+
+                <NotIconButtonUpdate OnClick="() => _formNavigator.Update(UpdateRoute, CreateModel(entity))" />
+
+                <NotIconButtonDelete OnClick="() => DeleteHandler(entity)" />
+            </MudStack>
+
+            <MudDivider />
+        }        
+    }
+</MudPaper>
+
+@code {
+    string _emptyMessage = default!;
+
+    [Inject]
+    IListBehind<T> _behind { get; set; } = default!;
+    [Inject]
+    FormManager<TModel, TForm> _formNavigator { get; set; } = default!;
+
+    [Parameter]
+    public int? ParentId { get; set; }
+    [Parameter]
+    public string Name { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public string UpdateRoute { get; set; } = default!;
+
+    public string EmptyMessage { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        GuardHelper.ThrowIfDefault(UpdateRoute);
+        Name = Localizer.Get(Name ?? $"{typeof(T).Name}s");
+        //TODO: RefactorLocalizer.Get to use string.Format
+        _emptyMessage = Localizer.Get($"No {Name} have been created for this event");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IEnumerable<object> args = ParentId != null ? [ ParentId ] : [];
+        await Observe(_behind, args);
+    }
+
+    public async Task CreateHandler()
+    {
+        await _formNavigator.Create();
+    }
+
+    public async Task DeleteHandler(T item)
+    {
+        await _behind.Delete(item);
+    }
+
+    TModel CreateModel(T entity)
+    {
+        var model = new TModel();
+        model.FromEntity(entity);
+        return model;
+    }
+}

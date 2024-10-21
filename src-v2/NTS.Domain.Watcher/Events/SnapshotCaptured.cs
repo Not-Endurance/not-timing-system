@@ -1,10 +1,9 @@
 ﻿using Not.Domain;
-using Not.Events;
 using NTS.Domain.Objects;
 
 namespace NTS.Domain.Watcher.Events;
 
-public abstract record SnapshotCaptured : DomainObject, IEvent
+public abstract record SnapshotCaptured : DomainObject
 {
     protected SnapshotCaptured(int number, Snapshot snapshot)
     {

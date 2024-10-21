@@ -1,36 +1,19 @@
-﻿@using NTS.Domain.Setup.Entities;
+﻿@using NTS.Domain.Setup.Entities
 @using NTS.Judge.Setup.Competitions
-@using Not.Blazor.Forms;
 @using Not.Blazor.TM.Forms;
 @using Not.Blazor.TM.Forms.Components;
 
-@inherits NotForm<Loop>;
+@inherits FormTM<LoopFormModel>;
 
-<EditForm Model="_model">
-    <MudNumericField @bind-Value="_model.Distance" Label="Loop" />
+<EditForm Model="Model">
+    <MudNumericField @ref="_distanceField" @bind-Value="Model.Distance" Label="Loop" />
 </EditForm>
 
 @code {
-    private MudNumericField<double> _distanceField = default!;
-    private LoopFormModel _model { get; set; } = new();
+    MudNumericField<double> _distanceField = default!;
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(_model.Distance), () => _distanceField);
-    }
-
-    public override void SetUpdateModel(Loop Loop)
-    {
-        _model = new LoopFormModel(Loop);
-    }
-
-    public override Loop SubmitCreate()
-    {
-        return Loop.Create(_model.Distance);
-    }
-
-    public override Loop SubmitUpdate()
-    {
-        return Loop.Update(_model.Id, _model.Distance);
+        RegisterInjector(nameof(Loop.Distance), () => _distanceField);
     }
 }

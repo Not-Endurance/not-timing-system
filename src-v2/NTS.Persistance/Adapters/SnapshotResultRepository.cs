@@ -1,4 +1,4 @@
-﻿using NTS.Domain.Core.Aggregates.Participations;
+﻿using NTS.Domain.Core.Entities;
 using NTS.Persistence.States;
 
 namespace NTS.Persistence.Adapters;

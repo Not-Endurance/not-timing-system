@@ -1,15 +1,14 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Not.Application.Ports.CRUD;
 using Not.Concurrency;
-using Not.Events;
 using Not.Safe;
+using Not.Startup;
 using NTS.Compatibility.EMS.Entities;
 using NTS.Compatibility.EMS.Entities.EMS;
 using NTS.Compatibility.EMS.Enums;
 using NTS.Compatibility.EMS.RPC;
-using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Entities;
-using NTS.Domain.Core.Events.Participations;
+using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
 using NTS.Judge.ACL.Factories;
 using NTS.Judge.Blazor.Ports;
@@ -20,19 +19,19 @@ namespace NTS.Judge.MAUI.Server.ACL;
 public class EmsRpcHub : Hub<IEmsClientProcedures>, IEmsStartlistHubProcedures, IEmsEmsParticipantstHubProcedures
 {
     private readonly IRepository<Participation> _participations;
-    private readonly IRepository<Event> _events;
+    private readonly IRepository<Domain.Core.Entities.EnduranceEvent> _events;
     private readonly IParticipationBehind _participationBehind;
 
     public EmsRpcHub(IJudgeServiceProvider judgeProvider)
     {
         _participations = judgeProvider.GetRequiredService<IRepository<Participation>>();
-        _events = judgeProvider.GetRequiredService<IRepository<Event>>();
+        _events = judgeProvider.GetRequiredService<IRepository<Domain.Core.Entities.EnduranceEvent>>();
         _participationBehind = judgeProvider.GetRequiredService<IParticipationBehind>();
     }
 
     public Dictionary<int, EmsStartlist> SendStartlist()
     {
-        var participations = _participations.ReadAll().Result;
+        var participations = _participations.ReadAll(x => !x.IsEliminated()).Result;
         var emsParticipations = participations
             .Select(ParticipationFactory.CreateEms);
         
@@ -78,14 +77,14 @@ public class EmsRpcHub : Hub<IEmsClientProcedures>, IEmsStartlistHubProcedures, 
     public EmsParticipantsPayload SendParticipants()
     {
         var participants = _participations
-            .ReadAll(x => x.Phases.All(x => !x.IsComplete()))
+            .ReadAll(x => !x.IsEliminated() && !x.IsComplete())
             .Result
             .Select(ParticipantEntryFactory.Create);
-        var @event = _events.Read(0);
+        var enduranceEvent = _events.Read(0).Result;
         return new EmsParticipantsPayload
         {
             Participants = participants.ToList(),
-            EventId = @event.Id,
+            EventId = enduranceEvent?.Id ?? 0,
         };
     }
     public Task ReceiveWitnessEvent(IEnumerable<EmsParticipantEntry> entries, EmsWitnessEventType type)
@@ -123,7 +122,7 @@ public class EmsRpcHub : Hub<IEmsClientProcedures>, IEmsStartlistHubProcedures, 
         return Task.CompletedTask;
     }
 
-    public class ClientService : IDisposable, IClientProcedures
+    public class ClientService : IDisposable, IClientProcedures, IStartupInitializer
     {
         private readonly IHubContext<EmsRpcHub, IEmsClientProcedures> _hub;
 
@@ -132,10 +131,15 @@ public class EmsRpcHub : Hub<IEmsClientProcedures>, IEmsStartlistHubProcedures, 
             IHubContext<EmsRpcHub, IEmsClientProcedures> hub)
         {
             _hub = hub;
+        }
 
-            EventHelper.Subscribe<PhaseCompleted>(SendStartlistEntryUpdate);
-            EventHelper.Subscribe<QualificationRestored>(SendParticipantEntryAddOrUpdate);
-            EventHelper.Subscribe<QualificationRevoked>(SendParticipantEntryRemove);
+        public void RunAtStartup()
+        {
+            // Disable methods as currently Server to Client SignalR calls aren't working 
+            // see: https://github.com/Not-Endurance/not-timing-system/issues/307
+            //Participation.PhaseCompletedEvent.SubscribeAsync(SendStartlistEntryUpdate);
+            //Participation.QualificationRevokedEvent.SubscribeAsync(SendQualificationRevoked);
+            //Participation.QualificationRestoredEvent.SubscribeAsync(SendQualificationRestored);
         }
 
         public async void SendStartlistEntryUpdate(PhaseCompleted phaseCompleted)
@@ -145,14 +149,14 @@ public class EmsRpcHub : Hub<IEmsClientProcedures>, IEmsStartlistHubProcedures, 
             await _hub.Clients.All.ReceiveEntry(entry, EmsCollectionAction.AddOrUpdate);
         }
 
-        public async void SendParticipantEntryAddOrUpdate(QualificationRestored qualificationRestored)
+        public async void SendParticipantEntryAddOrUpdate(ParticipationRestored qualificationRestored)
         {
             var emsParticipation = ParticipationFactory.CreateEms(qualificationRestored.Participation);
             var entry = new EmsParticipantEntry(emsParticipation);
             await _hub.Clients.All.ReceiveEntryUpdate(entry, EmsCollectionAction.AddOrUpdate);
         }
 
-        public async void SendParticipantEntryRemove(QualificationRevoked qualificationRevoked)
+        public async void SendParticipantEntryRemove(ParticipationEliminated qualificationRevoked)
         {
             var emsParticipation = ParticipationFactory.CreateEms(qualificationRevoked.Participation);
             var entry = new EmsParticipantEntry(emsParticipation);
@@ -175,13 +179,13 @@ public class EmsRpcHub : Hub<IEmsClientProcedures>, IEmsStartlistHubProcedures, 
             await Task.CompletedTask;
         }
 
-        public async Task SendQualificationRevoked(QualificationRevoked revoked)
+        public async Task SendParticipationEliminated(ParticipationEliminated revoked)
         {
             SendParticipantEntryRemove(revoked);
             await Task.CompletedTask;
         }
 
-        public async Task SendQualificationRestored(QualificationRestored restored)
+        public async Task SendParticipationRestored(ParticipationRestored restored)
         {
             SendParticipantEntryAddOrUpdate(restored);
             await Task.CompletedTask;

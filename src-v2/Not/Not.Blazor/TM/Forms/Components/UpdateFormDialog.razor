@@ -1,0 +1,52 @@
+﻿@using Not.Safe
+@using Not.Services;
+@using Not.Blazor.Components;
+@using Not.Blazor.TM.Forms;
+@using Not.Blazor.TM;
+
+@inherits NotComponent
+@typeparam T where T : new();
+@typeparam TForm where TForm : FormTM<T>
+
+<MudDialog>
+    <DialogContent>
+        <NotDynamic T="T" TForm="TForm" @ref="_dynamicForm" Model="Model" />
+    </DialogContent>
+
+    <DialogActions>
+        <NotButtonUpdate OnClick="Update" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    NotDynamic<T, TForm>? _dynamicForm;
+
+    [Inject]
+    IUpdateBehind<T> _behind { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public T Model { get; set; } = default!;
+    [CascadingParameter]
+    protected MudDialogInstance Dialog { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    async Task Update()
+    {
+        await SafeHelper.Run(Submit, InjectValidation);
+    }
+
+    async Task Submit()
+    {
+        await _behind.Update(Model);
+        Dialog.Close(DialogResult.Ok(true));
+    }
+
+    async Task InjectValidation(DomainExceptionBase validation)
+    {
+        await _dynamicForm!.Instance.AddValidationError(validation.Property, validation.Message);
+    }
+}

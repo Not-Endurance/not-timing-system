@@ -16,14 +16,15 @@ public class MudValidationInjector
     protected PropertyInfo ValidationErrorsProperty { get; }
     protected MethodInfo AddValidationErrorMethod { get; }
 
+    // Change to use MudFormComponent<T, U>
     private MudValidationInjector(Type mudInputType, Func<object> mudInputInstanceGetter)
     {
         InstanceGetter = mudInputInstanceGetter;
         // Generic parameter doesn't matter here as it's only used to obtain property names with nameof()
 
-        ErrorProperty = mudInputType.Property(nameof(MudBaseInput<string>.Error));
-        ErrorTextProperty = mudInputType.Property(nameof(MudBaseInput<string>.ErrorText));
-        ValidationErrorsProperty = mudInputType.Property(nameof(MudBaseInput<string>.ValidationErrors));
+        ErrorProperty = mudInputType.Property("Error");
+        ErrorTextProperty = mudInputType.Property("ErrorText");
+        ValidationErrorsProperty = mudInputType.Property("ValidationErrors");
         AddValidationErrorMethod = LIST_OF_STRING_TYPE.Method(nameof(List<string>.Add));
     }
 
@@ -41,6 +42,14 @@ public class MudValidationInjector
     public static MudValidationInjector Create<T>(Func<MudFormComponent<T, string>> getter)
     {
         return new MudValidationInjector(typeof(MudFormComponent<T, string>), getter);
+    }
+    public static MudValidationInjector Create<T>(Func<MudBooleanInput<T>> wrapperGetter)
+    {
+        return new MudValidationInjector(typeof(MudFormComponent<T, string>), () => wrapperGetter());
+    }
+    public static MudValidationInjector Create<T, TInternal>(Func<NotSwitch> wrapperGetter)
+    {
+        return new MudValidationInjector(typeof(NotSwitch), () => wrapperGetter());
     }
     public static MudValidationInjector Create<T>(Func<IMudBaseInputWrapper<T>> wrapperGetter)
     {

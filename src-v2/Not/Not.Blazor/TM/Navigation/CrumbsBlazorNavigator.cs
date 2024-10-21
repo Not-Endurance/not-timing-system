@@ -1,5 +1,4 @@
 ﻿using Not.Blazor.Navigation;
-using Not.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Not.Blazor.TM.Navigation;
@@ -54,8 +53,6 @@ public class CrumbsBlazorNavigator : ICrumbsNavigator, ILandNavigator
         NavigateForward(previousCrumb.endpoint);
     }
 
-    //TODO: add can navigate and hide back if cannot
-
     public void LandTo(string landing)
     {
         _crumbs = [];
@@ -69,7 +66,7 @@ public class CrumbsBlazorNavigator : ICrumbsNavigator, ILandNavigator
             throw GuardHelper.Exception($"Cannot get parameter '{typeof(T)}'. There are no parameters on this landing");
         }
         var result = _parameters.Get<T>();
-        _parameters = null;
+        //_parameters = null;
         return result;
     }
     public void Initialize(string landingEndpoint)

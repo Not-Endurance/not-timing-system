@@ -1,0 +1,58 @@
+@using NTS.Domain.Setup.Entities
+@using NTS.Judge.Blazor.Pages.Setup.Events
+@using NTS.Judge.Blazor.Pages.Setup.Officials
+@using NTS.Judge.Blazor.Pages.Setup.Competitions
+@using NTS.Judge.Blazor.Pages.Setup.Ports
+@using NTS.Judge.Blazor.Setup.Events
+@using NTS.Judge.Blazor.Setup.Officials
+@using NTS.Judge.Setup.Competitions
+@using Not.Blazor.TM
+@using Not.Blazor.TM.Forms
+@using Not.Blazor.TM.Forms.Components
+@using Not.Blazor.TM.Pages
+
+@attribute [Route(ENDURANCE_EVENT_PAGE)]
+@inherits NotComponent
+
+<NotPage Title="Configure Endurance Event" HasContent="_behind.Model != null" EmptyMessage="Endurance Event is not created yet :)">
+
+    <EmptyContent>
+        <NotButtonCreate OnClick="OpenCreateForm" />
+    </EmptyContent>
+
+    <Main>
+        <UpdateForm T="EnduranceEventFormModel" TForm="EnduranceEventForm" Model="_behind.Model" />
+    </Main>
+
+    <Main2>
+        <NotGrid Spacing="8">
+
+            <MudItem xs="6">
+                <CrudList T="Competition" TModel="CompetitionFormModel" TForm="CompetitionForm" UpdateRoute="@COMPETITION_UPDATE" />
+            </MudItem>
+
+            <MudItem xs="6">
+                <CrudList T="Official" TModel="OfficialFormModel" TForm="OfficialForm" UpdateRoute="@OFFICIAL_UPDATE" />
+            </MudItem>
+
+        </NotGrid>
+    </Main2>
+
+</NotPage>
+
+@code {
+    [Inject]
+    IEnduranceEventBehind _behind { get; set; } = default!;
+    [Inject]
+    FormManager<EnduranceEventFormModel, EnduranceEventForm> _form { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(_behind);
+    }
+
+    private async Task OpenCreateForm()
+    {
+        await _form.Create();
+    }
+}

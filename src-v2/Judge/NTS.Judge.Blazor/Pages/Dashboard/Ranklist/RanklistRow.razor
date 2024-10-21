@@ -1,4 +1,4 @@
-﻿@using NTS.Domain.Core.Aggregates.Participations
+﻿@using NTS.Domain.Core.Entities.ParticipationAggregate
 @using NTS.Domain.Core.Entities
 @using NTS.Domain.Objects
 @using NTS.Judge.Blazor.Pages.Dashboard.Components
@@ -10,9 +10,9 @@
 {
     <RanklistTableFrame Class="printable">
         <One>
-            @if (_notQualified != null)
+            @if (_eliminated != null)
             {
-                <MudText Typo="Typo.caption" Class="mr-4 pl-2" Style="width: 1rem;">@_notQualified</MudText>
+                <MudText Typo="Typo.caption" Class="mr-4 pl-2" Style="width: 1rem;">@_eliminated</MudText>
                 <MudIcon Icon="@Icons.Material.TwoTone.Flag" Color="Color.Error" Size="Size.Large" />
             }
             else if (_phases.Any(x => !x.IsComplete()))
@@ -66,7 +66,7 @@
     private bool _expanded;
     private PhaseCollection _phases = default!;
     private Tandem _tandem = default!;
-    private NotQualified? _notQualified;
+    private Eliminated? _eliminated;
     private Total? _total;
     private TimeInterval? _totalInterval;
     private string? _rank;
@@ -81,7 +81,7 @@
         var participation = Entry.Participation;
         _phases = participation.Phases;
         _tandem = participation.Tandem;
-        _notQualified = participation.NotQualified;
+        _eliminated = participation.Eliminated;
         _total = participation.GetTotal();
         _totalInterval = _total?.RideInterval + _total?.RecoveryIntervalWithoutFinal;
 
@@ -90,7 +90,7 @@
             _rank = Localizer.Get("NOT");
             return;
         }
-        if (participation.IsNotQualified())
+        if (participation.IsEliminated())
         {
             _rank = null;
             return;

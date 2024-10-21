@@ -15,10 +15,10 @@ namespace NTS.Judge.Adapters.Behinds.Compatibility;
 
 public class EmsImportBehind : IEmsImportBehind
 {
-    private readonly IRepository<Event> _eventRepository;
+    private readonly IRepository<EnduranceEvent> _eventRepository;
     private readonly IEmsToCoreImporter _emsToCoreImporter;
 
-    public EmsImportBehind(IRepository<Event> eventRepository, IEmsToCoreImporter emsToCoreImporter)
+    public EmsImportBehind(IRepository<EnduranceEvent> eventRepository, IEmsToCoreImporter emsToCoreImporter)
     {
         _eventRepository = eventRepository;
         _emsToCoreImporter = emsToCoreImporter;
@@ -30,18 +30,18 @@ public class EmsImportBehind : IEmsImportBehind
         var emsState = contents.FromJson<EmsState>();
 
         var country = new Country(emsState.Event.Country.IsoCode, "zz", emsState.Event.Country.Name);
-        var @event = Event.Create(emsState.Event.PopulatedPlace, country);
+        var enduranceEvent = EnduranceEvent.Create(emsState.Event.PopulatedPlace, country);
 
         foreach (var offical in CreateOfficials(emsState.Event))
         {
-            @event.Add(offical);
+            enduranceEvent.Add(offical);
         }
         foreach (var competition in CreateCompetitions(emsState.Event))
         {
-            @event.Add(@competition);
+            enduranceEvent.Add(@competition);
         }
 
-        await _eventRepository.Update(@event);
+        await _eventRepository.Update(enduranceEvent);
     }
 
     async Task SafeImportCore(string contents)

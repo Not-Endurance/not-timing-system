@@ -12,7 +12,7 @@ namespace Not.Safe;
 // - public methods with OG names are added to invoke the Safe methods within SafeHelper.Run
 public static class SafeHelper
 {
-    public static T? Run<T>(Func<T> action)
+    public static T? Run<T>(Func<T> action, Action<DomainExceptionBase> validationHandler)
     {
         try
         {
@@ -20,7 +20,7 @@ public static class SafeHelper
         }
         catch (DomainExceptionBase validation)
         {
-            NotifyHelper.Warn(validation);
+            validationHandler(validation);
             return default;
         }
         catch (Exception ex)
@@ -30,12 +30,22 @@ public static class SafeHelper
         }
     }
 
-    public static Task RunAsync(Func<Task> action)
+    public static T? Run<T>(Func<T> action)
     {
-        return Task.Run(() => Run(action));
+        return Run(action, NotifyHelper.Warn);
     }
 
-    public static async Task Run(Func<Task> action)
+    public static Task RunAsync(Func<Task> action)
+    {
+        return Task.Run(() => Run(action, DefaultValidationHandler));
+    }
+
+    public static Task RunAsync(Func<Task> action, Func<DomainExceptionBase, Task> validationHandler)
+    {
+        return Task.Run(() => Run(action, validationHandler));
+    }
+
+    public static async Task Run(Func<Task> action, Func<DomainExceptionBase, Task> validationHandler)
     {
         try
         {
@@ -43,7 +53,7 @@ public static class SafeHelper
         }
         catch (DomainExceptionBase validation)
         {
-            NotifyHelper.Warn(validation);
+            await validationHandler(validation);
         }
         catch (Exception ex)
         {
@@ -51,7 +61,12 @@ public static class SafeHelper
         }
     }
 
-    public static async Task<T?> Run<T>(Func<Task<T>> action)
+    public static Task Run(Func<Task> action)
+    {
+        return Run(action, DefaultValidationHandler);
+    }
+
+    public static async Task<T?> Run<T>(Func<Task<T>> action, Func<DomainExceptionBase, Task> validationHandler)
     {
         try
         {
@@ -59,7 +74,7 @@ public static class SafeHelper
         }
         catch (DomainExceptionBase validation)
         {
-            NotifyHelper.Warn(validation);
+            await validationHandler(validation);
             return default;
         }
         catch (Exception ex)
@@ -69,12 +84,17 @@ public static class SafeHelper
         }
     }
 
+    public static Task<T?> Run<T>(Func<Task<T>> action)
+    {
+        return Run(action, DefaultValidationHandler);
+    }
+
     public static Task RunAsync<T>(Func<T, Task> action, T argument)
     {
         return Task.Run(() => Run(action, argument));
     }
 
-    public static async Task Run<T>(Func<T, Task> action, T argument)
+    public static async Task Run<T>(Func<T, Task> action, T argument, Action<DomainExceptionBase> validationHandler)
     {
         try
         {
@@ -83,12 +103,23 @@ public static class SafeHelper
 
         catch (DomainExceptionBase validation)
         {
-            NotifyHelper.Warn(validation);
+            validationHandler(validation);
         }
         catch (Exception ex)
         {
             HandleError(ex);
         }
+    }
+
+    public static Task Run<T>(Func<T, Task> action, T argument)
+    {
+        return Run(action, argument, NotifyHelper.Warn);
+    }
+
+    static Task DefaultValidationHandler(DomainExceptionBase validation)
+    {
+        NotifyHelper.Warn(validation);
+        return Task.CompletedTask;
     }
 
     static void HandleError(Exception ex)

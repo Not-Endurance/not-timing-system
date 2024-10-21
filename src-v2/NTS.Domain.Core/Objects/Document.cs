@@ -1,6 +1,4 @@
-﻿using Not.Events;
-
-namespace NTS.Domain.Core.Objects;
+﻿namespace NTS.Domain.Core.Objects;
 
 public record Document : DomainObject
 {

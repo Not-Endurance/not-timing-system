@@ -1,21 +1,52 @@
-﻿@using Not.Exceptions;
+﻿@using Not.Blazor.TM.Forms.Components
+@using Not.Exceptions;
 
-@typeparam T where T : ComponentBase
+@typeparam T
+@typeparam TForm where TForm : FormTM<T>
 
-<DynamicComponent Type="typeof(T)" @ref="_dynamicComponent" />
+@if (Model == null)
+{
+    <p>Model parameter is null at NotDynamic</p>
+}
+else
+{
+}
+
+<DynamicComponent Type="typeof(TForm)" @ref="_dynamicComponent" Parameters="_parameters" />
 
 @code {
-    private DynamicComponent? _dynamicComponent;
+    DynamicComponent? _dynamicComponent;
+    Dictionary<string, object> _parameters = [];
 
-    internal T Instance
+    [Parameter, EditorRequired]
+    public T Model { get; set; } = default!;
+
+    protected override void OnParametersSet()
+    {
+        if (Model == null)
+        {
+            return;
+        }
+        var key = nameof(FormTM<T>.Model);
+        if (_parameters.ContainsKey(key))
+        {
+            _parameters[key] = Model;
+        }
+        else
+        {
+            _parameters.Add(key, Model);
+        }
+    }
+
+    internal TForm Instance
     {
         get
         {
             if (_dynamicComponent?.Instance == null)
             {
-                throw GuardHelper.Exception($"Instance of '{typeof(T)}' is null");
+                throw GuardHelper.Exception($"Instance of '{typeof(TForm)}' is null");
             }
-            return (T)_dynamicComponent.Instance;
+            return (TForm)_dynamicComponent.Instance;
         }
     }
 }

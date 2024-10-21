@@ -1,5 +1,6 @@
 ﻿@using NTS.Domain.Setup.Entities;
 @using NTS.Judge.Blazor.Pages.Setup.Phases
+@using NTS.Judge.Setup.Competitions
 @using Not.Blazor.Components;
 @using Not.Blazor.Navigation;
 @using Not.Blazor.TM
@@ -16,17 +17,18 @@
         <NotGrid Spacing="8">
             
             <MudItem xs="12">
-                <NotFormUpdate T="Competition" TForm="CompetitionForm" Entity="_competition" />
+                <UpdateForm T="CompetitionFormModel" TForm="CompetitionForm" Model="_competition" />
             </MudItem>
 
             <MudItem xs="6">
                 @* //TODO: behind creates multiple phases at once. *@
-                <NotSetList T="Phase" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" />
+                <CrudList T="Phase" TModel="PhaseFormModel" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" ParentId="_competition!.Id"/>
             </MudItem>
 
             <MudItem xs="6">
                 @* //TODO: behind creates multiple contestants at once. *@
-                <NotSetList T="Contestant" TForm="ContestantForm" UpdateRoute="@CONTESTANT_UPDATE" />
+                <CrudList T="Participation" TModel="ParticipationFormModel" TForm="ParticipationForm" 
+                    UpdateRoute="@PARTICIPATION_UPDATE" ParentId="_competition!.Id" />
             </MudItem>
 
         </NotGrid>
@@ -35,15 +37,12 @@
 </NotPage>
 
 @code {
-    private Competition? _competition { get; set; } = default!;
+    CompetitionFormModel? _competition { get; set; } = default!;
     [Inject]
-    private INotParentBehind<Competition> _competitionWithChildren { get; set; } = default!;
-    [Inject]
-    private ICrumbsNavigator _navigator { get; set; } = default!;
+    ICrumbsNavigator _navigator { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        var competition = _navigator.ConsumeParameter<Competition>();
-        _competition = await _competitionWithChildren.Initialize(competition.Id);
+        _competition = _navigator.ConsumeParameter<CompetitionFormModel>();
     }
 }

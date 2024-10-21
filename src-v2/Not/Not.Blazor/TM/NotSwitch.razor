@@ -3,10 +3,13 @@
 
 @inherits MudSwitch<bool>
 
-<MudSwitch @bind-Value="Value" Label="@(Label != null ? _localizer.Get(Label) : null)" Style="Style" Class="Class"
-    Color="Color.Primary" Converter="Converter" Culture="Culture" Disabled="Disabled" LabelPosition="LabelPosition" />
+<MudSwitch Value="Value" ValueChanged="ValueChanged" Label="@(Label != null ? _localizer.Get(Label) : null)" Style="Style" Class="Class"
+    Color="Color.Primary" Converter="Converter" Culture="Culture" Disabled="Disabled" LabelPosition="LabelPosition" 
+    Error="Error" ErrorText="ErrorText" />
 
 @code {
+    // TODO: convert to .cs only component in order to avoid having to propagate all properties manually
+    // investigate how cs only components work - it's something like doesn't override RenderTree method, I guess
     [Inject]
     ILocalizer _localizer { get; set; } = default!;
 }

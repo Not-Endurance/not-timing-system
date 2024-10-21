@@ -1,11 +1,13 @@
-﻿@using NTS.Domain.Core.Aggregates.Participations
+﻿@using NTS.Domain.Core.Entities.ParticipationAggregate
+@using NTS.Judge.Blazor.Pages.Dashboard.Phases
+@using Not.Blazor.TM.Dialogs
 
-@* <MudButton OnClick="FlipAxis">Flip</MudButton> *@
+@inherits NotComponent
 
 <table class="rtable mt-6 @_axisClass">
     <thead>
         <tr>
-            <th>Gate</th>
+            <MudButton Variant="Variant.Text" Disabled="true">#@Number</MudButton>
             <th>Start</th>
             <th>Arrive</th>
             <th>Present</th>
@@ -23,13 +25,15 @@
         @foreach (var phase in Phases ?? Enumerable.Empty<Phase>())
         {
             <tr>
-                <TableData Value="@phase.Gate" />
+                <MudTooltip Text="@Localizer.Get("Edit times")" Inline="false" RootStyle="width:inherit;">
+                    <MudButton Variant="Variant.Text" OnClick="() => ShowUpdate(phase)">@phase.Gate</MudButton>
+                </MudTooltip>
                 <TableData Value="@phase.StartTime" />
                 <TableData Value="@phase.ArriveTime" />
-                <TableData Value="@phase.InspectTime" />
-                <TableData Value="@phase.ReinspectTime" />
-                <TableData Value="@(phase.IsRIRequested ? phase.GetRequiredInspectionTime() : null)" />
-                <TableData Value="@(phase.IsCRIRequested ? phase.GetRequiredInspectionTime() : null)" />
+                <TableData Value="@phase.PresentTime" />
+                <TableData Value="@phase.RepresentTime" />
+                <TableData Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
+                <TableData Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
                 <TableData Value="@phase.GetRecoverySpan()" />
                 <TableData Value="@phase.GetLoopSpan()" />
                 <TableData Value="@phase.GetPhaseSpan()" />
@@ -42,11 +46,16 @@
 
 @code {
     private const string FLIPPED_AXIS_CLASS = "rtable--flip";
-    
+
     private string _axisClass = FLIPPED_AXIS_CLASS;
-    
+
+    [Parameter]
+    public int Number { get; set; }
     [Parameter]
     public PhaseCollection? Phases { get; set; }
+
+    [Inject]
+    DialogTM<PhaseUpdateModel, PhaseForm> _dialog { get; set; } = default!;
 
     private void FlipAxis()
     {
@@ -58,6 +67,13 @@
         {
             _axisClass = FLIPPED_AXIS_CLASS;
         }
+    }
+
+    async Task ShowUpdate(Phase phase)
+    {
+        var model = new PhaseUpdateModel(phase);
+        await _dialog.RenderUpdate(model);
+        await Render();
     }
 }
 

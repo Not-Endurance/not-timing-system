@@ -1,5 +1,5 @@
 ﻿using NTS.Compatibility.EMS.Entities.Competitions;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Entities;
 using NTS.Domain.Enums;
 using NTS.Judge.ACL.Bridge;
 

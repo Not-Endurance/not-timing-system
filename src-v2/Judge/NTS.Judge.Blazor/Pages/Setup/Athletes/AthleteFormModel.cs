@@ -1,8 +1,10 @@
-﻿using NTS.Domain.Objects;
+﻿using Not.Blazor.Ports;
+using NTS.Domain.Objects;
 using NTS.Domain.Setup.Entities;
 
 namespace NTS.Judge.Blazor.Pages.Setup.Athletes;
-public class AthleteFormModel
+
+public class AthleteFormModel : IFormModel<Athlete>
 {
     public AthleteFormModel()
     {
@@ -12,7 +14,15 @@ public class AthleteFormModel
         Category = "Олимпийски надежди";
         Country = new Country("BG", "zz", "Bulgaria");
     }
-    public AthleteFormModel(Athlete athlete)
+
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? FeiId { get; set; }
+    public Country Country { get; set; }
+    public string? Club { get; set; }
+    public string? Category { get; set; }
+
+    public void FromEntity(Athlete athlete)
     {
         Id = athlete.Id;
         Name = athlete.Person;
@@ -21,12 +31,4 @@ public class AthleteFormModel
         Club = athlete.Club.ToString();
         Category = athlete.Category;
     }
-
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string? FeiId { get; set; }
-    public Country Country { get; set; }
-    public string Club { get; set; }
-    public string Category { get; set; }
-
 }

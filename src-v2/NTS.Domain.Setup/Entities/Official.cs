@@ -6,26 +6,20 @@ namespace NTS.Domain.Setup.Entities;
 
 public class Official : DomainEntity, ISummarizable, IImportable
 {
-    public static Official Create(string name, OfficialRole role) => new(new Person(name), role);
-    public static Official Update(int id, string name, OfficialRole role) => new(id, new Person(name), role);
+    public static Official Create(string? names, OfficialRole? role) => new(Person.Create(names), role);
+
+    public static Official Update(int id, string? names, OfficialRole? role) => new(id, Person.Create(names), role);
 
     [JsonConstructor]
-    private Official(int id, Person person, OfficialRole role)
+    private Official(int id, Person? person, OfficialRole? role) : base(id)
     {
-        this.Person = person;
-        this.Role = role;
-        this.Id = id;
+        var name = person;
+        this.Role = Required(nameof(Role), role);
+        this.Person =  Required(nameof(Person), person);
     }
-    // TODO: fix ctor usage
-    private Official(string name, OfficialRole role)
-    {
-        if (role == default)
-        {
-            throw new DomainException(nameof(Role), "Official Role is required");
-        }
 
-        this.Person = new Person(name);
-		this.Role = role;
+    private Official(Person? person, OfficialRole? role) : this(GenerateId(), person, role)
+    {
     }
 
     public Person Person { get; private set; }
@@ -35,6 +29,7 @@ public class Official : DomainEntity, ISummarizable, IImportable
 	{
         return Combine(Role.GetDescription(), Person);
     }
+
     public bool IsUniqueRole()
     {
         return Role is VeterinaryCommissionPresident or GroundJuryPresident or  ForeignVeterinaryDelegate or TechnicalDelegate or ForeignJudge;

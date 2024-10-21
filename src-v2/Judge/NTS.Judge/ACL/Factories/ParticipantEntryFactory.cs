@@ -1,5 +1,5 @@
 ﻿using NTS.Compatibility.EMS.Entities.EMS;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Entities;
 
 namespace NTS.Judge.ACL.Factories;
 

@@ -1,7 +1,38 @@
-﻿<h3>PhaseForm</h3>
+﻿@using NTS.Domain.Core.Entities.ParticipationAggregate
+@using Not.Blazor.TM.Forms.Components
 
+@inherits FormTM<PhaseUpdateModel>
 
+<EditForm Model="Model">
+
+    <MudTextField @ref="_startField" @bind-Value="Model.StartTimeInput" Label="Start" Mask="_timeMask" />
+
+    <MudTextField @ref="_arriveField" @bind-Value="Model.ArriveTimeInput" Label="Arrive" Mask="_timeMask" />
+
+    <MudTextField @ref="_presentField" @bind-Value="Model.PresentTimeInput" Label="Present" Mask="_timeMask" />
+
+    <MudTextField @ref="_representField" @bind-Value="Model.RepresentTimeInput" Label="Represent" Mask="_timeMask" />
+
+</EditForm>
 
 @code {
+    readonly static PatternMask _timeMask = new PatternMask("00:00:00");
 
+    MudTextField<string?> _startField = default!;
+    MudTextField<string?> _arriveField = default!;
+    MudTextField<string?> _presentField = default!;
+    MudTextField<string?> _representField = default!;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    public override void RegisterValidationInjectors()
+    {
+        RegisterInjector(nameof(Phase.StartTime), () => _startField);
+        RegisterInjector(nameof(Phase.ArriveTime), () => _arriveField);
+        RegisterInjector(nameof(Phase.PresentTime), () => _presentField);
+        RegisterInjector(nameof(Phase.RepresentTime), () => _representField);
+    }
 }

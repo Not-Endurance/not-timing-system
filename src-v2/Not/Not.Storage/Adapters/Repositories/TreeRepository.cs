@@ -11,13 +11,13 @@ namespace Not.Storage.Adapters.Repositories;
 /// </summary>
 /// <typeparam name="T">Type of the Root entity</typeparam>
 /// <typeparam name="TState">Type of the state object containing the Root entity</typeparam>
-public abstract class TreeRepository<T, TState> : IRepository<T>
+public abstract class RootRepository<T, TState> : IRepository<T>
     where T : DomainEntity
     where TState : class, ITreeState<T>, new()
 {
     private readonly IStore<TState> _store;
 
-    public TreeRepository(IStore<TState> store)
+    public RootRepository(IStore<TState> store)
     {
         _store = store;
     }

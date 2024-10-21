@@ -6,18 +6,22 @@ public class Person
 {
     internal static string DELIMITER = " ";
 
-    [JsonConstructor]
-    private Person(params string[] names) 
+    public static Person? Create(string? names)
     {
-        this.Names = names;
-    }
- 
-    public Person(string names)
-    {
-        this.Names = names.Split(DELIMITER);
+        if (string.IsNullOrWhiteSpace(names))
+        {
+            return null;
+        }
+        return new Person(names.Split(DELIMITER, StringSplitOptions.RemoveEmptyEntries));
     }
 
-    public string[] Names { get; private set; } = Array.Empty<string>();// TODO: test record equality
+    [JsonConstructor]
+    public Person(string[] names) 
+    {
+        Names = names;
+    }
+
+    public string[] Names { get; private set; } = [];
 
     public override string ToString()
 	{

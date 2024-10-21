@@ -1,46 +1,28 @@
 ﻿@using NTS.Domain.Enums;
 @using NTS.Domain.Setup.Entities;
 @using NTS.Judge.Blazor.Setup.Officials;
-@using Not.Blazor.Forms;
 @using Not.Blazor.TM.Forms;
 @using Not.Blazor.TM.Forms.Components;
 @using Not.Blazor.TM.Models;
 @using Not.Blazor.TM;
 
-@inherits NotForm<Official>;
+@inherits FormTM<OfficialFormModel>;
 
-<EditForm Model="_model">
-    <MudTextField @ref="_nameField" @bind-Value="_model.Name" Label="@Localizer.Get("Name")" />
-    <NotSelect @ref="_roleField" T = "OfficialRole"
-               Items="_roles" @bind-Value="_model.Role"
-               Label="@Localizer.Get("Official Role")" Placeholder="@Localizer.Get("Select a role")"/>
+<EditForm Model="Model">
+    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Localizer.Get("Name")" />
+
+    <NotSelect @ref="_roleField" Items="_roles" @bind-Value="Model.Role" Label="Official Role" Placeholder="Select a role"/>
 </EditForm>
 
 @code {
     private MudTextField<string?> _nameField = default!;
-    private NotSelect<OfficialRole> _roleField = default!;
-    private OfficialFormModel _model { get; set; } = new();
+    private NotSelect<OfficialRole?> _roleField = default!;
 
-    private List<NotListModel<OfficialRole>> _roles = NotListModel.FromEnum<OfficialRole>().ToList();
+    private List<NotListModel<OfficialRole?>> _roles = NotListModel.FromEnum<OfficialRole>().ToList();
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(_model.Name), () => _nameField);
-        RegisterInjector(nameof(_model.Role), () => _roleField);
-    } 
-
-    public override void SetUpdateModel(Official official)
-    {
-        _model = new OfficialFormModel(official);
-    }
-
-    public override Official SubmitCreate()
-    {
-        return Official.Create(_model.Name!, _model.Role);
-    }
-
-    public override Official SubmitUpdate()
-    {
-        return Official.Update(_model.Id!.Value, _model.Name!, _model.Role);
+        RegisterInjector(nameof(Official.Person), () => _nameField);
+        RegisterInjector(nameof(Official.Role), () => _roleField);
     }
 }

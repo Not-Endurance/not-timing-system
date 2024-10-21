@@ -2,13 +2,13 @@
 
 public class Official : DomainEntity
 {
-    private Official(int id) : base(id)
+    private Official(int id, Person? person, OfficialRole? role) : base(id)
     {
+        Person = Required(nameof(Person), person);
+        Role = Required(nameof(Role), role);
     }
-    public Official(Person person, OfficialRole role)
+    public Official(Person? person, OfficialRole? role) : this(GenerateId(), person, role)
     {
-        Person = person;
-        Role = role;
     }
 
     public Person Person { get; private set; }

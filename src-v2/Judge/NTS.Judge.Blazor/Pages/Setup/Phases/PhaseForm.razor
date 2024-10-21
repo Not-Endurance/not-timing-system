@@ -1,56 +1,39 @@
 ﻿@using NTS.Domain.Setup.Entities;
 @using NTS.Judge.Setup.Competitions
-@using Not.Blazor.Forms;
 @using Not.Blazor.TM;
 @using Not.Blazor.TM.Models;
 @using Not.Blazor.TM.Forms;
 @using Not.Blazor.TM.Forms.Components;
 
-@inherits NotForm<Phase>;
+@inherits FormTM<PhaseFormModel>;
 
-<EditForm Model="_model">
-    <NotSelect T="Loop" Label="@Localizer.Get("Loop distance")" Placeholder="@Localizer.Get("Select a loop")"
-               Items="_loops" @bind-Value="_model.Loop" />
-    <MudNumericField T="int" @ref="_recoveryField" @bind-Value="_model.Recovery" Min="0" Label="@Localizer.Get("Recovery Time")" />
-    <MudNumericField T="int" @ref="_restField" @bind-Value="_model.Rest" Min="0" Label="@Localizer.Get("Rest Duration")" />
+<EditForm Model="Model">
+    <NotSelect @ref="_loopField" T="Loop" Label="Loop distance" Placeholder="Select a loop" Items="_loops" @bind-Value="Model.Loop" />
+
+    <MudNumericField T="int" @ref="_recoveryField" @bind-Value="Model.Recovery" Min="0" Label="Recovery Time" />
+
+    <MudNumericField T="int" @ref="_restField" @bind-Value="Model.Rest" Min="0" Label="Rest Duration" />
 </EditForm>
 
 @code {
-    private NotSelect<Loop> _loopField = default!;
-    private MudNumericField<int> _recoveryField = default!;
-    private MudNumericField<int> _restField = default!;
-    private PhaseFormModel _model { get; set; } = new();
-
-    private List<NotListModel<Loop>> _loops = new();
+    NotSelect<Loop> _loopField = default!;
+    MudNumericField<int> _recoveryField = default!;
+    MudNumericField<int> _restField = default!;
+    List<NotListModel<Loop>> _loops = new();
 
     [Inject]
-    private INotSetBehind<Loop> _setBehind { get; set; } = default!;
+    IListBehind<Loop> _behind { get; set; } = default!;
 
     protected async override Task OnInitializedAsync()
     {
-        var loops = await _setBehind.GetAll();
-        _loops = NotListModel.FromEntity<Loop>(loops).ToList();
+        await Observe(_behind);
+        _loops = NotListModel.FromEntity<Loop>(_behind.Items).ToList();
     }
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(_model.Loop), () => _loopField);
-        RegisterInjector(nameof(_model.Recovery), () => _recoveryField);
-        RegisterInjector(nameof(_model.Rest), () => _restField);
-    }
-
-    public override void SetUpdateModel(Phase phase)
-    {
-        _model = new PhaseFormModel(phase);
-    }
-
-    public override Phase SubmitCreate()
-    {
-        return Phase.Create(_model.Loop, _model.Recovery, _model.Rest);
-    }
-
-    public override Phase SubmitUpdate()
-    {        
-        return Phase.Update(_model.Id, _model.Loop, _model.Recovery, _model.Rest);
+        RegisterInjector(nameof(Phase.Loop), () => _loopField);
+        RegisterInjector(nameof(Phase.Recovery), () => _recoveryField);
+        RegisterInjector(nameof(Phase.Rest), () => _restField); 
     }
 }

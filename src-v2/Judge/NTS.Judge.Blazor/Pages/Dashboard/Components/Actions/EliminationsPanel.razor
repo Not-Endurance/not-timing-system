@@ -1,4 +1,4 @@
-﻿@using NTS.Domain.Core.Aggregates.Participations
+﻿@using NTS.Domain.Core.Entities.ParticipationAggregate
 @using NTS.Judge.Blazor.Enums
 @using NTS.Judge.Blazor.Pages.Dashboard.Components.Actions.EliminationForms
 @using NTS.Judge.Blazor.Ports
@@ -11,37 +11,37 @@
     <MudPaper Elevation="1">
         <MudToggleGroup @bind-Value="_toggleValue" Delimiters="true" Color="Color.Error" SelectionMode="SelectionMode.ToggleSelection">
 
-            <MudToggleItem Value="NotQualified.WITHDRAWN" />
+            <MudToggleItem Value="Eliminated.WITHDRAWN" />
 
-            <MudToggleItem Value="NotQualified.RETIRED" />
+            <MudToggleItem Value="Eliminated.RETIRED" />
 
-            <MudToggleItem Value="NotQualified.FINISHED_NOT_RANKED" />
+            <MudToggleItem Value="Eliminated.FINISHED_NOT_RANKED" />
 
-            <MudToggleItem Value="NotQualified.DISQUALIFIED" />
+            <MudToggleItem Value="Eliminated.DISQUALIFIED" />
 
-            <MudToggleItem Value="NotQualified.FAILED_TO_QUALIFY" />
+            <MudToggleItem Value="Eliminated.FAILED_TO_QUALIFY" />
         </MudToggleGroup>
 
         <MudCollapse Expanded="_toggleValue != null">
-            @if (_toggleValue == NotQualified.WITHDRAWN)
+            @if (_toggleValue == Eliminated.WITHDRAWN)
             {
-                <WithdrawForm Withdrawn="_notQualified as Withdrawn" />
+                <WithdrawForm Withdrawn="_eliminated as Withdrawn" />
             }
-            else if (_toggleValue == NotQualified.RETIRED)
+            else if (_toggleValue == Eliminated.RETIRED)
             {
-                <RetireForm Retired="_notQualified as Retired" />
+                <RetireForm Retired="_eliminated as Retired" />
             }
-            else if (_toggleValue == NotQualified.FINISHED_NOT_RANKED)
+            else if (_toggleValue == Eliminated.FINISHED_NOT_RANKED)
             {
-                <FinishNotRankedForm FinishedNotRanked="_notQualified as FinishedNotRanked" />
+                <FinishNotRankedForm FinishedNotRanked="_eliminated as FinishedNotRanked" />
             }
-            else if (_toggleValue == NotQualified.DISQUALIFIED)
+            else if (_toggleValue == Eliminated.DISQUALIFIED)
             {
-                <DisqualifyForm Disqualified="_notQualified as Disqualified" />
+                <DisqualifyForm Disqualified="_eliminated as Disqualified" />
             }
-            else if (_toggleValue == NotQualified.FAILED_TO_QUALIFY)
+            else if (_toggleValue == Eliminated.FAILED_TO_QUALIFY)
             {
-                <FailedToQualifyForm FailedToQualify="_notQualified as FailedToQualify" />
+                <FailedToQualifyForm FailedToQualify="_eliminated as FailedToQualify" />
             }
         </MudCollapse>
     </MudPaper>
@@ -51,10 +51,10 @@
     [Inject]
     IParticipationBehind _participationBehind { get; set; } = default!;
 
-    NotQualified? _notQualified => _participationBehind.SelectedParticipation?.NotQualified;
+    Eliminated? _eliminated => _participationBehind.SelectedParticipation?.Eliminated;
     string? _toggleValue
     {
-        get => _inputValue != null ? _inputValue : _notQualified?.EliminationCode;
+        get => _inputValue != null ? _inputValue : _eliminated?.Code;
         set => _inputValue = value; 
     }
     string? _inputValue;

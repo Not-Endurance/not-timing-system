@@ -1,0 +1,48 @@
+﻿@using NTS.Domain.Setup.Entities;
+@using NTS.Judge.Setup.Competitions
+@using Not.Blazor.TM;
+@using Not.Blazor.TM.Forms;
+@using Not.Blazor.TM.Forms.Components;
+@using Not.Blazor.TM.Models
+@using Not.Extensions;
+@using NTS.Judge.Blazor.Pages.Setup.Combinations;
+
+@inherits FormTM<ParticipationFormModel>;
+
+<EditForm Model="Model">
+    <NotSelect @ref="_combinaionField" T="Combination" Label="Combination" Placeholder="Select a combination" 
+        Items="_combinations" @bind-Value="Model.Combination" />
+
+    <NotSwitch @ref="_isNotRankedField" @bind-Value="Model.IsNotRanked" Label="Unranked" />
+
+    <NotSwitch @bind-Value="_overrideStartTime" Label="Override Start Time"/>
+
+    @if (_overrideStartTime)
+    {
+        <MudTimePicker @ref="_timeField" @bind-Time="Model.StartTimeOverride" ShowToolbar="false" Label="Start Time" />
+    }
+</EditForm>
+
+@code {
+    NotSelect<Combination> _combinaionField = default!;
+    NotSwitch _isNotRankedField = default!;
+    MudPicker<TimeSpan?> _timeField = default!;
+    bool _overrideStartTime;
+    List<NotListModel<Combination>> _combinations = [];
+
+    [Inject]
+    private IListBehind<Combination> _behind { get; set; } = default!;
+
+    public override void RegisterValidationInjectors()
+    {
+        RegisterInjector(nameof(Participation.Combination), () => _combinaionField);
+        RegisterInjector(nameof(Participation.IsNotRanked), () => _isNotRankedField);
+        RegisterInjector(nameof(Participation.StartTimeOverride), () => _timeField);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(_behind);
+        _combinations = NotListModel.FromEntity<Combination>(_behind.Items).ToList();
+    }
+}

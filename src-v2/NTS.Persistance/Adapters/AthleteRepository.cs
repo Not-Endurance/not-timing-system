@@ -2,9 +2,7 @@
 using NTS.Persistence.Setup;
 
 namespace NTS.Persistence.Adapters;
-public class AthleteRepository : SetRepository<Athlete, SetupState>
+
+public class AthleteRepository(IStore<SetupState> store) : SetRepository<Athlete, SetupState>(store)
 {
-    public AthleteRepository(IStore<SetupState> store) : base(store)
-    {
-    }
 }

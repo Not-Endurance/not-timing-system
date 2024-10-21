@@ -1,14 +1,13 @@
 ﻿using NTS.Compatibility.EMS.Entities.Participants;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Entities.ParticipationAggregate;
 using NTS.Domain.Objects;
 using NTS.Judge.ACL.Bridge;
 using EmsParticipation = NTS.Compatibility.EMS.Entities.Participations.EmsParticipation;
 using EmsCompetition = NTS.Compatibility.EMS.Entities.Competitions.EmsCompetition;
-using EmsCompetitionType = NTS.Compatibility.EMS.Entities.Competitions.EmsCompetitionType;
-using NTS.Domain.Enums;
 using NTS.Domain;
 using NTS.Compatibility.EMS.Entities.Results;
 using NTS.Compatibility.EMS.Entities.LapRecords;
+using NTS.Domain.Core.Entities;
 
 namespace NTS.Judge.ACL.Factories;
 
@@ -36,6 +35,9 @@ public class ParticipationFactory
                 break;
             }
             var emsRecord = new EmsLapRecord(phase.StartTime.DateTime.DateTime, emsLap);
+            emsRecord.ArrivalTime = phase.ArriveTime?.DateTime.DateTime;
+            emsRecord.InspectionTime = phase.PresentTime?.DateTime.DateTime;
+            emsRecord.ReInspectionTime = phase.RepresentTime?.DateTime.DateTime;
             emsParticipant.Add(emsRecord);
         }
         var competition = CompetitionFactory.Create(participation);
@@ -47,7 +49,7 @@ public class ParticipationFactory
     {
         var tandem = new Tandem(
             int.Parse(emsParticipation.Participant.Number),
-            new Person(emsParticipation.Participant.Athlete.Name),
+            new Person(emsParticipation.Participant.Athlete.Name.Split(" ", StringSplitOptions.RemoveEmptyEntries)),
             emsParticipation.Participant.Horse.Name,
             competition.Laps.Sum(x => (decimal)x.LengthInKm),
             null,
@@ -96,7 +98,7 @@ public class ParticipationFactory
                     reinspectTime = AdjustTime(ref previousTime, record.ReInspectionTime.Value, record.ReInspectionTime.Value - record.InspectionTime!.Value, adjustTime);
                 }
 
-                phase = new Phase(
+                phase = Phase.ImportFromEMS(
                     lap.LengthInKm,
                     lap.MaxRecoveryTimeInMins,
                     lap.RestTimeInMins,
@@ -130,7 +132,7 @@ public class ParticipationFactory
         var participation = new Participation(competition.Name, ruleset, tandem, phases);
         if (finalRecord?.Result?.Type == EmsResultType.FailedToQualify)
         {
-            participation.FailToQualify(FTQCodes.GA);
+            participation.FailToQualify([ FTQCodes.GA ], null);
         }
         if (finalRecord?.Result?.Type == EmsResultType.Resigned)
         {

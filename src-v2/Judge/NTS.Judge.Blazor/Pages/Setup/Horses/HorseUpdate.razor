@@ -1,8 +1,6 @@
-﻿@using NTS.Domain.Setup.Entities;
-@using Not.Blazor.Components;
+﻿@using Not.Blazor.Components;
 @using Not.Blazor.Navigation;
 @using Not.Blazor.TM.Forms.Components
-@using Not.Blazor.TM.Pages
 
 @attribute [Route(HORSE_UPDATE)]
 @inherits NotComponent
@@ -10,7 +8,7 @@
 <NotPage Title="Configure Horse">
 
     <Main>
-        <NotFormUpdate T="Horse" TForm="HorseForm" Entity="_navigator.ConsumeParameter<Horse>()" />
+        <UpdateForm T="HorseFormModel" TForm="HorseForm" Model="_navigator.ConsumeParameter<HorseFormModel>()" />
     </Main>
 
 </NotPage>

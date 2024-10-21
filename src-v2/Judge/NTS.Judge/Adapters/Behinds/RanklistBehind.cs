@@ -1,5 +1,5 @@
-﻿using Not.Application.Ports.CRUD;
-using Not.Blazor.Ports.Behinds;
+﻿using Not.Application.Adapters.Behinds;
+using Not.Application.Ports.CRUD;
 using Not.Exceptions;
 using Not.Safe;
 using NTS.Domain.Core.Entities;
@@ -19,7 +19,7 @@ public class RanklistBehind : ObservableBehind, IRanklistBehind
 
     public Ranklist? Ranklist { get; private set; }
 
-    protected override async Task<bool> PerformInitialization()
+    protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
         var ranking = await _rankings.Read(x => true);
         if (ranking == null)

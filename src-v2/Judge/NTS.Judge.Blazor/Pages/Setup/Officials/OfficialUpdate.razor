@@ -1,4 +1,5 @@
 ﻿@using NTS.Domain.Setup.Entities;
+@using NTS.Judge.Blazor.Setup.Officials
 @using Not.Blazor.Components;
 @using Not.Blazor.Navigation;
 @using Not.Blazor.TM.Forms.Components
@@ -10,7 +11,7 @@
 <NotPage Title="Configure Official">
 
     <Main>
-        <NotFormUpdate T="Official" TForm="OfficialForm" Entity="_navigator.ConsumeParameter<Official>()" />
+        <UpdateForm T="OfficialFormModel" TForm="OfficialForm" Model="_navigator.ConsumeParameter<OfficialFormModel>()" />
     </Main>
 
 </NotPage>

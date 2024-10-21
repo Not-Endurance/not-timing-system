@@ -8,7 +8,7 @@ public abstract class EliminationForm : NotComponent
     [Inject]
     protected IParticipationBehind _participationBehind { get; set; } = default!;
 
-    public bool IsEliminated => _participationBehind.SelectedParticipation?.NotQualified != null;
+    public bool IsEliminated => _participationBehind.SelectedParticipation?.Eliminated != null;
 
     internal abstract Task Eliminate();
 

@@ -1,11 +1,11 @@
 ﻿using Not.Injection;
-using NTS.Domain.Core.Events.Participations;
+using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Judge.Ports;
 
 public interface IClientProcedures : ITransientService
 {
     Task SendStartCreated(PhaseCompleted phaseCompleted);
-    Task SendQualificationRevoked(QualificationRevoked revoked);
-    Task SendQualificationRestored(QualificationRestored restored);
+    Task SendParticipationEliminated(ParticipationEliminated revoked);
+    Task SendParticipationRestored(ParticipationRestored restored);
 }

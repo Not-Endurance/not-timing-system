@@ -1,177 +1,71 @@
 ﻿using NTS.Domain.Setup.Entities;
 using Not.Application.Ports.CRUD;
-using Not.Blazor.Ports.Behinds;
-using Not.Exceptions;
 using Not.Safe;
+using NTS.Judge.Blazor.Pages.Setup.Ports;
+using NTS.Judge.Blazor.Setup.Events;
+using NTS.Judge.Contexts;
+using Not.Application.Adapters.Behinds;
 
 namespace NTS.Judge.Events;
 
-public class EventBehind : INotBehind<Event>, INotSetBehind<Official>, INotSetBehind<Competition>, INotParentBehind<Event>
+public class EventBehind : ObservableBehind, IEnduranceEventBehind
 {
-    private readonly IRepository<Event> _eventRepository;
-    private Event? _event;
+    private readonly IRepository<EnduranceEvent> _events;
+    private readonly EventParentContext _context;
 
-    public EventBehind(IRepository<Event> eventRepository)
+    public EventBehind(IRepository<EnduranceEvent> events, EventParentContext context)
     {
-        _eventRepository = eventRepository;
+        _events = events;
+        _context = context;
     }
 
-    Task<IEnumerable<Official>> SafeGetAllOfficials()
+    public EnduranceEventFormModel? Model { get; private set; }
+
+    protected override async Task<bool> PerformInitialization(params IEnumerable<object> _)
     {
-        return Task.FromResult(_event?.Officials.AsEnumerable() ?? []);
+        await _context.Load(0);
+        if (_context.Entity == null)
+        {
+            return false;
+        }
+        Model = new EnduranceEventFormModel();
+        Model.FromEntity(_context.Entity);
+        return false;
     }
 
-    Task<IEnumerable<Competition>> SafeGetAllCompetitions()
+    async Task<EnduranceEventFormModel> SafeCreate(EnduranceEventFormModel model)
     {
-        return Task.FromResult(_event?.Competitions.AsEnumerable() ?? []);
+        _context.Entity = EnduranceEvent.Create(model.Place, model.Country);
+        await _events.Create(_context.Entity);
+        Model = model;
+        EmitChange();
+        return model;
     }
 
-    async Task<Event?> SafeRead(int id)
+    async Task<EnduranceEventFormModel> SafeUpdate(EnduranceEventFormModel model)
     {
-        _event = await _eventRepository.Read(id);
-        return _event;
-    }
-
-    async Task<Event> SafeCreate(Event entity)
-    {
-        await _eventRepository.Create(entity);
-        return _event = entity;
-    }
-
-    async Task<Event> SafeUpdate(Event entity)
-    {
-        return await _eventRepository.Update(entity);
-    }
-
-    Task<Event> SafeDelete(Event @event)
-    {
-        throw new NotImplementedException();
-    }
-
-    async Task<Official> SafeCreate(Official child)
-    {
-        GuardHelper.ThrowIfDefault(_event);
-
-        _event.Add(child);
-        await _eventRepository.Update(_event);
-        return child;
-    }
-
-    async Task<Official> SafeDelete(Official child)
-    {
-        GuardHelper.ThrowIfDefault(_event);
-
-        _event.Remove(child);
-        await _eventRepository.Update(_event);
-        return child;
-    }
-
-    async Task<Official> SafeUpdate(Official child)
-    {
-        GuardHelper.ThrowIfDefault(_event);
-
-        _event.Update(child);
-        await _eventRepository.Update(_event);
-        return child;
-    }
-
-    async Task<Competition> SafeCreate(Competition child)
-    {
-        GuardHelper.ThrowIfDefault(_event);
-
-        _event.Add(child);
-        await _eventRepository.Update(_event);
-        return child;
-    }
-
-    async Task<Competition> SafeDelete(Competition child)
-    {
-        GuardHelper.ThrowIfDefault(_event);
-
-        _event.Remove(child);
-        await _eventRepository.Update(_event);
-        return child;
-    }
-
-    async Task<Competition> SafeUpdate(Competition child)
-    {
-        GuardHelper.ThrowIfDefault(_event);
-
-        _event.Update(child);
-        await _eventRepository.Update(_event);
-        return child;
-    }
-
-    async Task<Event?> SafeInitialize(int id)
-    {
-        return _event = await _eventRepository.Read(id);
+        _context.Entity = EnduranceEvent.Update(model.Id, model.Place, model.Country, model.Competitions, model.Officials);
+        await _events.Update(_context.Entity);
+        Model = model;
+        EmitChange();
+        return model;
     }
 
     #region SafePattern 
 
-    async Task<IEnumerable<Official>> IReadAllBehind<Official>.GetAll()
+    public async Task<EnduranceEventFormModel> Create(EnduranceEventFormModel enduranceEvent)
     {
-        return await SafeHelper.Run(SafeGetAllOfficials) ?? [];
+        return await SafeHelper.Run(() => SafeCreate(enduranceEvent)) ?? enduranceEvent;
     }
 
-    async Task<IEnumerable<Competition>> IReadAllBehind<Competition>.GetAll()
+    public async Task<EnduranceEventFormModel> Update(EnduranceEventFormModel enduranceEvent)
     {
-        return await SafeHelper.Run(SafeGetAllCompetitions) ?? [];
+        return await SafeHelper.Run(() => SafeUpdate(enduranceEvent)) ?? enduranceEvent;
     }
 
-    public async Task<Event> Create(Event @event)
+    public Task<EnduranceEvent> Delete(EnduranceEvent enduranceEvent)
     {
-        return await SafeHelper.Run(() => SafeCreate(@event)) ?? @event;
-    }
-
-    public async Task<Event?> Read(int id)
-    {
-        return await SafeHelper.Run(() => SafeRead(id));
-    }
-
-    public async Task<Event> Update(Event @event)
-    {
-        return await SafeHelper.Run(() => SafeUpdate(@event)) ?? @event;
-    }
-
-    public async Task<Event> Delete(Event @event)
-    {
-        return await SafeHelper.Run(() => SafeDelete(@event)) ?? @event;
-    }
-
-    public async Task<Official> Create(Official official)
-    {
-        return await SafeHelper.Run(() => SafeCreate(official)) ?? official;
-    }
-
-    public async Task<Official> Update(Official official)
-    {
-        return await SafeHelper.Run(() => SafeUpdate(official)) ?? official;
-    }
-
-    public async Task<Official> Delete(Official official)
-    {
-        return await SafeHelper.Run(() => SafeDelete(official)) ?? official;
-    }
-
-    public async Task<Competition> Create(Competition competition)
-    {
-        return await SafeHelper.Run(() => SafeCreate(competition)) ?? competition;
-    }
-
-    public async Task<Competition> Update(Competition competition)
-    {
-        return await SafeHelper.Run(() => SafeUpdate(competition)) ?? competition;
-    }
-
-    public async Task<Competition> Delete(Competition competition)
-    {
-        return await SafeHelper.Run(() => SafeDelete(competition)) ?? competition;
-    }
-
-    public async Task<Event?> Initialize(int id)
-    {
-        return await SafeHelper.Run(() => SafeInitialize(id));
+        throw new NotImplementedException("Endurance event cannot be deleted");
     }
 
     #endregion

@@ -7,6 +7,15 @@ public record Timestamp : DomainObject, IComparable<Timestamp>
         return new Timestamp(DateTimeOffset.Now);
     }
 
+    public static Timestamp? Create(DateTimeOffset? dateTime)
+    {
+        if (dateTime == null)
+        {
+            return null;
+        }
+        return new Timestamp(dateTime.Value);
+    }
+
     public Timestamp(DateTime dateTime)
     {
         DateTime = dateTime;
