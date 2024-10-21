@@ -3,15 +3,16 @@
 namespace NTS.Domain.Setup.Entities;
 public class Contestant : DomainEntity, ISummarizable
 {
-    public static Contestant Create(DateTimeOffset? newStart, bool isUnranked, Combination combination) => new(newStart, isUnranked, combination);
-    public static Contestant Update(int id, DateTimeOffset? newStart, bool isUnranked, Combination combination) => new(id, newStart, isUnranked, combination);
+    public static Contestant Create(DateTimeOffset? newStart, bool isUnranked, Combination combination, double? maxSpeedOverride) => new(newStart, isUnranked, combination, maxSpeedOverride);
+    public static Contestant Update(int id, DateTimeOffset? newStart, bool isUnranked, Combination combination, double? maxSpeedOverride) => new(id, newStart, isUnranked, combination, maxSpeedOverride);
     private List<Combination> _combinations = new();
 
     [JsonConstructor]
-    private Contestant(int id, DateTimeOffset? startTimeOverride, bool isUnranked, Combination combination)
+    private Contestant(int id, DateTimeOffset? startTimeOverride, bool isUnranked, Combination combination, double? maxSpeedOverride)
     {
         Id = id;
         StartTimeOverride = startTimeOverride;
+        MaxSpeedOverride = maxSpeedOverride;
         IsUnranked = isUnranked;
         Combination = combination;
     }
@@ -19,19 +20,21 @@ public class Contestant : DomainEntity, ISummarizable
     // then remove private setter where not needed as serialization happens through the ctor anyway
     // Move the ID generation logic in protected method in DomainEntity and call inside this() to generate ID
     // as oposed to generating it automatically in DomainEntity ctor
-    private Contestant(DateTimeOffset? startTimeOverride, bool isUnranked, Combination combination)
+    private Contestant(DateTimeOffset? startTimeOverride, bool isUnranked, Combination combination, double? maxSpeedOverride)
     {
         if (startTimeOverride != null && startTimeOverride.Value.DateTime.CompareTo(DateTime.Today) < 0)
         {
             throw new DomainException(nameof(StartTimeOverride), "Start time cannot be in the past");
         }
         StartTimeOverride = startTimeOverride;
+        MaxSpeedOverride = maxSpeedOverride;
         IsUnranked = isUnranked;
         Combination = combination;
     }
 
     public Combination Combination {  get; private set; }
     public DateTimeOffset? StartTimeOverride { get; private set; }
+    public double? MaxSpeedOverride { get; private set; }
     public bool IsUnranked { get; private set; }
 
     public IReadOnlyList<Combination> Combinations

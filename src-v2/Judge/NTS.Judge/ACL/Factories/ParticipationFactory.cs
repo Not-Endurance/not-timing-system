@@ -52,7 +52,8 @@ public class ParticipationFactory
             competition.Laps.Sum(x => (decimal)x.LengthInKm),
             null,
             null,
-            12,
+            null,
+            null,
             emsParticipation.Participant.MaxAverageSpeedInKmPh);
         
         var phases = new List<Phase>();

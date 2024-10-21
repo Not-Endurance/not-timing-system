@@ -1,0 +1,20 @@
+﻿@using NTS.Domain.Objects
+@using NTS.Judge.Blazor.Ports;
+@using Not.Blazor.TM
+@using Not.Notifier
+
+@inherits NotComponent
+
+<MudStack Class="ma-6">
+    <NotButtonPrimary OnClick="Start" Text="Start Endurance Event"></NotButtonPrimary>
+</MudStack>
+
+@code {
+    [Inject]
+    private IDashboardBehind _dashboardBehind { get; set; } = default!;
+
+    public void Start()
+    {
+        _dashboardBehind.Start();
+    }
+}

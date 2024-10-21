@@ -5,17 +5,18 @@ namespace NTS.Domain.Setup.Entities;
 public class Competition : DomainEntity, ISummarizable, IParent<Contestant>, IParent<Phase>
 {
 
-    public static Competition Create(string name, CompetitionRuleset type, DateTimeOffset start, int? criRecovery)
-        => new(name, type, start, criRecovery);
+    public static Competition Create(string name, CompetitionRuleset ruleset, CompetitionType type, DateTimeOffset start, int? criRecovery)
+        => new(name, ruleset, type, start, criRecovery);
     public static Competition Update(
         int id,
         string name,
-        CompetitionRuleset type,
+        CompetitionRuleset ruleset,
+        CompetitionType type,
         DateTimeOffset start,
         int? criRecovery,
         IEnumerable<Phase> phases,
         IEnumerable<Contestant> contestants)
-        => new(id, name, type, start, criRecovery, phases, contestants);
+        => new(id, name, ruleset, type, start, criRecovery, phases, contestants);
 
     private List<Phase> _phases = new();
     private List<Contestant> _contestants = new();
@@ -24,18 +25,19 @@ public class Competition : DomainEntity, ISummarizable, IParent<Contestant>, IPa
     private Competition(int id) : base(id) { }
     private Competition(
         int id, 
-        string name, 
-        CompetitionRuleset type,
+        string name,
+        CompetitionRuleset ruleset,
+        CompetitionType type,
         DateTimeOffset startTime,
         int? criRecovery,
         IEnumerable<Phase> phases,
-        IEnumerable<Contestant> contestants) : this(name, type, startTime, criRecovery)
+        IEnumerable<Contestant> contestants) : this(name, ruleset, type, startTime, criRecovery)
     {
         Id = id;
         _phases = phases.ToList();
         _contestants = contestants.ToList();
     }
-    private Competition(string name, CompetitionRuleset type, DateTimeOffset startTime, int? criRecovery)
+    private Competition(string name, CompetitionRuleset ruleset, CompetitionType type, DateTimeOffset startTime, int? criRecovery)
     {
         if (type == default)
         {
@@ -47,13 +49,15 @@ public class Competition : DomainEntity, ISummarizable, IParent<Contestant>, IPa
         }
 
         Name = name;
+        Ruleset = ruleset;
         Type = type;
         StartTime = startTime;
         CriRecovery = criRecovery;
     }
 
     public string Name { get; private set; }
-    public CompetitionRuleset Type { get; private set; }
+    public CompetitionRuleset Ruleset { get; private set; }
+    public CompetitionType Type { get; private set; }
 	public DateTimeOffset StartTime { get; private set; }
     public int? CriRecovery { get; private set; }
     public IReadOnlyList<Phase> Phases

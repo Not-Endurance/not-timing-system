@@ -5,6 +5,7 @@
 @using Not.Blazor.TM
 @using Not.Blazor.TM.Forms;
 @using Not.Blazor.TM.Forms.Components;
+@using Not.Blazor.TM.Models
 
 
 @inherits NotForm<Athlete>;
@@ -13,8 +14,8 @@
     <MudTextField @ref="_nameField" @bind-Value="_model.Name" Label="@Localizer.Get("Name")" />
     <MudTextField @bind-Value="_model.FeiId" Label="Fei Id" HelperText="@Localizer.Get(OPTIONAL_FEI_ID)" Variant="Variant.Text" Margin="Margin.Dense" />
     <NotAutocomplete T="Country" @ref="_countryField" @bind-Value="_model.Country" Label="@nameof(Athlete.Country)" Search="_countries.Search" />
-    <MudTextField @bind-Value="_model.Club" Label="Club" Variant="Variant.Text" Margin="Margin.Dense" />
-    <MudTextField @bind-Value="_model.Category" Label="Category" Variant="Variant.Text" Margin="Margin.Dense" />
+    <MudTextField @bind-Value="_model.Club" Label="@Localizer.Get("Club")" Variant="Variant.Text" Margin="Margin.Dense" />
+    <NotSelect @ref="_categoryField" T="AthleteCategory" Items="_categories" @bind-Value="_model.Category" Label="Category"/>
 </EditForm>
 
 @code {
@@ -22,16 +23,18 @@
     private MudTextField<string?> _feiIdField = default!;
     private NotAutocomplete<Country?> _countryField = default!;
     private MudTextField<string> _clubField = default!;
-    private MudTextField<string> _categoryField = default!;
+    private NotSelect<AthleteCategory> _categoryField = default!;
     private AthleteFormModel _model { get; set; } = new();
 
     [Inject]
     private ICountriesContext _countries { get; set; } = default!;
+    private List<NotListModel<AthleteCategory>> _categories = NotListModel.FromEnum<AthleteCategory>().ToList();
 
     public override void RegisterValidationInjectors()
     {
         RegisterInjector(nameof(_model.Name), () => _nameField);
         RegisterInjector(nameof(_model.Country), () => _countryField);
+        RegisterInjector(nameof(_model.Category), () => _categoryField);
     }
 
     public override void SetUpdateModel(Athlete Athlete)
