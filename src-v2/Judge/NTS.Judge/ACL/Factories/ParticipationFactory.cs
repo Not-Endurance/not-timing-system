@@ -123,6 +123,7 @@ public class ParticipationFactory
                     lap.RestTimeInMins,
                     type,
                     lap.IsFinal,
+                    null,
                     null);
             }
 

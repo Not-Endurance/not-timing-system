@@ -4,6 +4,7 @@ using Not.Exceptions;
 using Not.Safe;
 using NTS.Domain.Core.Entities;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Blazor.Ports;
 
 namespace NTS.Judge.Adapters.Behinds;
@@ -15,6 +16,9 @@ public class RanklistBehind : ObservableBehind, IRanklistBehind
     public RanklistBehind(IRepository<Ranking> rankings)
     {
         _rankings = rankings;
+        Participation.PhaseCompletedEvent.Subscribe(UpdateRanklist);
+        Participation.EliminatedEvent.Subscribe(UpdateRanklist);
+        Participation.RestoredEvent.Subscribe(UpdateRanklist);
     }
 
     public Ranklist? Ranklist { get; private set; }
@@ -42,6 +46,11 @@ public class RanklistBehind : ObservableBehind, IRanklistBehind
 
         Ranklist = new Ranklist(ranking);
         EmitChange();
+    }
+
+    void UpdateRanklist(ParticipationPayload payload)
+    {
+        Ranklist?.Update(payload.Participation);
     }
 
     #region SafePattern

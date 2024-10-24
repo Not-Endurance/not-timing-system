@@ -11,9 +11,9 @@
 <EditForm Model="Model">
     <MudNumericField @ref="_numberField" @bind-Value="Model.Number" T="int" Min="0" Label="@Localizer.Get("Combination Number")" />
 
-    <NotSelect @ref="_athleteField" @bind-Value="Model.Athlete" T="Athlete" Label="Athlete" Placeholder="Select an athlete" Items="_athletes" />
+    <NotAutocomplete @ref="_athleteField" @bind-Value="Model.Athlete" Label="Athlete" Search="SearchAthletes" />
 
-    <NotSelect @ref="_horseField" @bind-Value="Model.Horse" T="Horse" Label="Horse" Placeholder="Select a horse" Items="_horses" />
+    <NotAutocomplete @ref="_horseField" @bind-Value="Model.Horse" Label="Horse" Search="SearchHorses"/>
 
     @if (StaticOptions.IsRfidDetectionEnabled())
     {
@@ -23,8 +23,8 @@
 
 @code {
     MudNumericField<int> _numberField = default!;
-    NotSelect<Athlete> _athleteField = default!;
-    NotSelect<Horse> _horseField = default!;
+    NotAutocomplete<Athlete?> _athleteField = default!;
+    NotAutocomplete<Horse?> _horseField = default!;
     List<NotListModel<Athlete>> _athletes = [];
     List<NotListModel<Horse>> _horses = [];
 
@@ -46,5 +46,27 @@
         RegisterInjector(nameof(Combination.Number), () => _numberField);
         RegisterInjector(nameof(Combination.Athlete), () => _athleteField);
         RegisterInjector(nameof(Combination.Horse), () => _horseField);
+    }
+
+    Task<IEnumerable<Athlete>> SearchAthletes(string term)
+    {
+        var result = Search(_athletesBehind.Items, term);
+        return Task.FromResult(result);
+    }
+
+    Task<IEnumerable<Horse>> SearchHorses(string term)
+    {
+        var result = Search(_horsesBehind.Items, term);
+        return Task.FromResult(result);
+    }
+
+    // TODO: extract search functionality somehow, because ToString() should be identical (maybe ToString should be configurable)
+    IEnumerable<T> Search<T>(IEnumerable<T> values, string term)
+    {
+        if (string.IsNullOrWhiteSpace(term))
+        {
+            return values;
+        }
+        return values.Where(x => x != null && x.ToString()!.Contains(term, StringComparison.InvariantCultureIgnoreCase));
     }
 }

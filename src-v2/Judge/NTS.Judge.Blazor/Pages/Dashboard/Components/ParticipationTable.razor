@@ -8,12 +8,24 @@
     <thead>
         <tr>
             <MudButton Variant="Variant.Text" Disabled="true">#@Number</MudButton>
+
             <th>Start</th>
             <th>Arrive</th>
             <th>Present</th>
-            <th>Represent</th>
-            <th>RI Time</th>
-            <th>CRI Time</th>
+
+            @if (_anyRepresentation)
+            {
+                <th>Represent</th>
+            }
+            @if (_anyRequiredInspection)
+            {
+                <th>RI Time</th>
+            }
+            @if (_anyCompulsoryRequiredInspection)
+            {
+                <th>CRI Time</th>
+            }
+
             <th>Recovery</th>
             <th>Loop T</th>
             <th>Phase T</th>
@@ -28,12 +40,24 @@
                 <MudTooltip Text="@Localizer.Get("Edit times")" Inline="false" RootStyle="width:inherit;">
                     <MudButton Variant="Variant.Text" OnClick="() => ShowUpdate(phase)">@phase.Gate</MudButton>
                 </MudTooltip>
+
                 <TableData Value="@phase.StartTime" />
                 <TableData Value="@phase.ArriveTime" />
                 <TableData Value="@phase.PresentTime" />
-                <TableData Value="@phase.RepresentTime" />
-                <TableData Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
-                <TableData Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
+
+                @if (_anyRepresentation)
+                {
+                    <TableData Value="@phase.RepresentTime" />
+                }
+                @if (_anyRequiredInspection)
+                {
+                    <TableData Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
+                }
+                @if (_anyCompulsoryRequiredInspection)
+                {
+                    <TableData Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
+                }
+
                 <TableData Value="@phase.GetRecoverySpan()" />
                 <TableData Value="@phase.GetLoopSpan()" />
                 <TableData Value="@phase.GetPhaseSpan()" />
@@ -45,17 +69,26 @@
 </table>
 
 @code {
-    private const string FLIPPED_AXIS_CLASS = "rtable--flip";
+    const string FLIPPED_AXIS_CLASS = "rtable--flip";
+    string _axisClass = FLIPPED_AXIS_CLASS;
+    bool _anyRepresentation;
+    bool _anyRequiredInspection;
+    bool _anyCompulsoryRequiredInspection;
 
-    private string _axisClass = FLIPPED_AXIS_CLASS;
+    [Inject]
+    DialogTM<PhaseUpdateModel, PhaseForm> _dialog { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public int Number { get; set; }
     [Parameter]
     public PhaseCollection? Phases { get; set; }
 
-    [Inject]
-    DialogTM<PhaseUpdateModel, PhaseForm> _dialog { get; set; } = default!;
+    protected override void OnParametersSet()
+    {
+        _anyRepresentation = Phases != null && Phases.Any(x => x.IsReinspectionRequested);
+        _anyRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionRequested);
+        _anyCompulsoryRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionCompulsory);
+    }
 
     private void FlipAxis()
     {

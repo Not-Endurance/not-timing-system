@@ -2,7 +2,7 @@
 
 public class Tag : DomainEntity, ISummarizable
 {
-    public Tag(string tagId, int number)
+    public Tag(string tagId, int number) : base(GenerateId())
     {
 		TagId = tagId;
         Number = number;

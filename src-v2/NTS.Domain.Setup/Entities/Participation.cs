@@ -19,7 +19,6 @@ public class Participation : DomainEntity, ISummarizable
     private Participation(int id, DateTimeOffset? startTimeOverride, bool isUnranked, Combination? combination, double? maxSpeedOverride)
         : base(id)
     {
-        Id = id;
         StartTimeOverride = startTimeOverride;
         IsNotRanked = isUnranked;
         Combination = Required(nameof(Combination), combination);

@@ -68,9 +68,9 @@ public class DashboardBehind : IDashboardBehind
     {
         foreach (var competition in setupEvent.Competitions)
         {
-            var (participations, rankingEntriesByCategory) = CoreFactory.CreateParticipationAndRankingEntries(competition);
+            var (participations, rankingEntriesByCategory) = await CoreFactory.CreateParticipationAndRankingEntriesAsync(competition, _participationRepository);
             foreach (var participation in participations) 
-            { 
+            {
                 await _participationRepository.Create(participation);
             }
             await CreateRankings(new Competition(competition.Name, competition.Ruleset), rankingEntriesByCategory);

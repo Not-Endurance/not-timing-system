@@ -10,18 +10,13 @@ public class Horse : DomainEntity, ISummarizable, IImportable
     public static Horse Update(int id, string name, string? feiId) => new(id, name, feiId); 
 
     [JsonConstructor]
-    private Horse(int id, string name, string? feiId) : this(name, feiId)
+    private Horse(int id, string name, string? feiId) : base(id)
     {
-        Id = id;
-    }
-    private Horse(string name, string? feiId)
-    {
-        if (name == null || name == "")
-        {
-            throw new DomainException(nameof(Name), "Name is required");
-        }
         Name = name;
         FeiId = feiId;
+    }
+    private Horse(string name, string? feiId) : this(GenerateId(), Required(nameof(Name), name), feiId)
+    {
     }
 
 	public string? FeiId { get; }

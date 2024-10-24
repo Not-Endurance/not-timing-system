@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using Not.Random;
+﻿using Not.Random;
 using System.Diagnostics.CodeAnalysis;
-using System.Dynamic;
 
 namespace Not.Domain;
 
@@ -11,13 +9,9 @@ public abstract class DomainEntity : IEquatable<DomainEntity>, IIdentifiable
     {
         Id = id;
     }
-    protected DomainEntity()
-    {
-        this.Id = GenerateId();
-    }
 
     // TODO: use DomainObject for ID, do private set
-    public int Id { get; protected init; }
+    public int Id { get; }
 
     public static bool operator == (DomainEntity? left, DomainEntity? right)
         => left?.IsEqual(right) ?? right is null;

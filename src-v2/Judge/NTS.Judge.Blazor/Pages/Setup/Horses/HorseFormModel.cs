@@ -8,7 +8,6 @@ public class HorseFormModel : IFormModel<Horse>
     public HorseFormModel() 
     {
 #if DEBUG
-        FeiId = "66";
         Name = "Хан Аспарух";
 #endif
     }

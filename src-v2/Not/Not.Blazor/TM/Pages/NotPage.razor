@@ -19,7 +19,7 @@ else
 
         @if (!HasContent)
         {
-            <MudItem xs="12">
+            <MudItem xs="@mainXs">
                 <MudPaper Elevation="3" Class="not-mid-height pa-12">
                     <NotTrueCenterText Typo="Typo.h5" Content="@EmptyMessage" />
 
@@ -42,13 +42,13 @@ else
                     <MudPaper Elevation="3" Class="pa-4">@Main2</MudPaper>
                 </MudItem>
             }
+        }
 
-            if (Rightbar != null)
-            {
-                <MudItem xs="@RightBarXS" Class="not-page-rightbar">
-                    @Rightbar
-                </MudItem>
-            }
+        @if (Rightbar != null)
+        {
+            <MudItem xs="@RightBarXS" Class="not-page-rightbar">
+                @Rightbar
+            </MudItem>
         }
     </NotGrid>
 }

@@ -20,7 +20,7 @@ public class Phase : DomainEntity
         bool isRequiredInspectionRequested,
         bool isCompulsoryRequiredInspectionRequested)
     {
-        var phase = new Phase(length, maxRecovery, rest, competitionType, isFinal, compulsoryThreshold);
+        var phase = new Phase(length, maxRecovery, rest, competitionType, isFinal, compulsoryThreshold, startTimestamp.DateTime);
 
         phase.StartTime = startTimestamp;
         if (arriveTime != null)
@@ -53,7 +53,7 @@ public class Phase : DomainEntity
         string gate,
         double length,
         int maxRecovery,
-        int rest,
+        int? rest,
         CompetitionRuleset ruleset,
         bool isFinal,
         TimeSpan? compulsoryThresholdSpan,
@@ -77,17 +77,18 @@ public class Phase : DomainEntity
         RepresentTime = representTime;
         IsReinspectionRequested = isRepresentationRequested;
         IsRequiredInspectionRequested = isRequiredInspectionRequested;
-        IsRequiredInspectionCompulsory = isRequiredInspectionCompulsory;
+        IsRequiredInspectionCompulsory = isRequiredInspectionCompulsory && !isFinal;
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
     }
 
     public Phase(
         double length,
         int maxRecovery,
-        int rest,
+        int? rest,
         CompetitionRuleset competitionRuleset,
         bool isFinal,
-        TimeSpan? compulsoryThresholdSpan)
+        TimeSpan? compulsoryThresholdSpan,
+        DateTimeOffset? startTime)
         : this(
               GenerateId(),
               "",
@@ -97,7 +98,7 @@ public class Phase : DomainEntity
               competitionRuleset,
               isFinal,
               compulsoryThresholdSpan,
-              null,
+              Timestamp.Create(startTime),
               null,
               null,
               null,
@@ -110,7 +111,7 @@ public class Phase : DomainEntity
     public string Gate { get; private set; }
     public double Length { get; }
     public int MaxRecovery { get; }
-    public int Rest { get; }
+    public int? Rest { get; }
     public CompetitionRuleset Ruleset { get; }
     public bool IsFinal { get; }
     public Timestamp? StartTime { get; internal set; }
@@ -124,16 +125,20 @@ public class Phase : DomainEntity
 
     public Timestamp? GetRequiredInspectionTime()
     {
-        return VetTime?.Add(TimeSpan.FromMinutes(Rest - 15)); //TODO: settings
+        if (Rest == null)
+        {
+            return null;
+        }
+        return VetTime?.Add(TimeSpan.FromMinutes(Rest.Value - 15)); //TODO: settings
     }
 
     public Timestamp? GetOutTime()
     {
-        if (ArriveTime == null)
+        if (ArriveTime == null || Rest == null)
         {
             return null;
         }
-        return VetTime?.Add(TimeSpan.FromMinutes(Rest));
+        return VetTime?.Add(TimeSpan.FromMinutes(Rest.Value));
     }
 
     public TimeInterval? GetLoopSpan()
@@ -143,7 +148,7 @@ public class Phase : DomainEntity
 
     public TimeInterval? GetPhaseSpan()
     {
-        return VetTime - StartTime;
+        return IsFinal ? GetLoopSpan() : VetTime - StartTime;
     }
 
     public TimeInterval? GetRecoverySpan()
@@ -225,7 +230,8 @@ public class Phase : DomainEntity
 
     internal bool ViolatesSpeedRestriction(Speed? minSpeed, Speed? maxSpeed)
     {
-        return GetAverageSpeed() < minSpeed || GetAverageSpeed() > maxSpeed;
+        var averageSpeed = GetAverageSpeed();
+        return averageSpeed < minSpeed || averageSpeed > maxSpeed;
     }
 
     internal void RequestRequiredInspection()
@@ -269,7 +275,7 @@ public class Phase : DomainEntity
         {
             return Arrive(snapshot);
         }
-        if (VetTime == null)
+        if (PresentTime == null || RepresentTime == null)
         {
             return Inspect(snapshot);
         }
@@ -314,9 +320,17 @@ public class Phase : DomainEntity
         {
             return SnapshotResult.NotApplied(snapshot, NotAppliedDueToDuplicateInspect);
         }
+        if (snapshot.Timestamp <= ArriveTime)
+        {
+            throw new DomainException($"Presentation time cannot be before arrival '{ArriveTime}'");
+        }
 
         if (IsReinspectionRequested)
         {
+            if (snapshot.Timestamp <= PresentTime)
+            {
+                throw new DomainException($"Representation time cannot be before presentation '{PresentTime}'");
+            }
             RepresentTime = snapshot.Timestamp;
         }
         else
@@ -333,7 +347,7 @@ public class Phase : DomainEntity
         {
             return;
         }
-        IsRequiredInspectionCompulsory = GetRecoverySpan() >= CompulsoryThresholdSpan;
+        IsRequiredInspectionCompulsory = GetRecoverySpan() >= CompulsoryThresholdSpan && !IsFinal;
     }
 }
 

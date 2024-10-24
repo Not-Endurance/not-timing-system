@@ -9,10 +9,10 @@
 @if (_behind.Ranklist != null)
 {
     <MudChipSet T="int" SelectedValue="_behind.Ranklist.RankingId" SelectedValueChanged="_behind.SelectRanking">
-        @foreach (var grouping in _rankingsByDistance)
+        @foreach (var tuple in _rankingsByDistance)
         {
-            <TextDividerTM Text="@grouping.Key" />
-            @foreach (var ranking in grouping.OrderBy(x => x.Category))
+            <TextDividerTM Text="@tuple.Name" />
+            @foreach (var ranking in tuple.ranking)
             {
                 <MudChip Text="@ranking.Category.ToString()" Value="@ranking.Id" Color="Color.Primary" Style="min-width: 1rem" />
             }
@@ -23,7 +23,7 @@
 
 @code {
     private MudChip<int>? _selectedChip;
-    private IEnumerable<IGrouping<string, Ranking>> _rankingsByDistance = Enumerable.Empty<IGrouping<string, Ranking>>();
+    private List<(string Name, IOrderedEnumerable<Ranking> ranking)> _rankingsByDistance = [];
 
     [Inject]
     public IRanklistBehind _behind { get; set; } = default!;
@@ -33,6 +33,13 @@
         await Observe(_behind);
 
         var rankings = await _behind.GetRankings();
-        _rankingsByDistance = rankings.GroupBy(x => x.Name);
+        // TODO: this is too complicated, probably should be in the behind or better yet in the Domain Model
+        _rankingsByDistance = rankings
+            .GroupBy(x => x.Name)
+            .Select(x => (
+                x.Key, 
+                x.Where(x => x.Entries.Any()).OrderBy(x => x.Category)
+            ))
+            .ToList();
     }
 }

@@ -12,13 +12,13 @@
 
     <MudNumericField T="int" @ref="_recoveryField" @bind-Value="Model.Recovery" Min="0" Label="Recovery Time" />
 
-    <MudNumericField T="int" @ref="_restField" @bind-Value="Model.Rest" Min="0" Label="Rest Duration" />
+    <MudNumericField @ref="_restField" @bind-Value="Model.Rest" Min="0" Label="Rest Duration" />
 </EditForm>
 
 @code {
     NotSelect<Loop> _loopField = default!;
     MudNumericField<int> _recoveryField = default!;
-    MudNumericField<int> _restField = default!;
+    MudNumericField<int?> _restField = default!;
     List<NotListModel<Loop>> _loops = new();
 
     [Inject]

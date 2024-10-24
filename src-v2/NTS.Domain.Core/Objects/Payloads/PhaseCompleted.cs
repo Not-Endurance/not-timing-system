@@ -2,7 +2,7 @@
 
 namespace NTS.Domain.Core.Objects.Payloads;
 
-public record PhaseCompleted : ParticipationEventBase
+public record PhaseCompleted : ParticipationPayload
 {
     public PhaseCompleted(Participation participation) : base(participation)
     {

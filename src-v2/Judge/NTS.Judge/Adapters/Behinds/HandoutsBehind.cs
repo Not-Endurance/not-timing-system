@@ -40,7 +40,7 @@ public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBe
         var officials = await _officials.ReadAll();
         GuardHelper.ThrowIfDefault(enduranceEvent);
 
-        var documents = handouts.Select(handout => new HandoutDocument(handout.Participation, enduranceEvent, officials));
+        var documents = handouts.Select(handout => new HandoutDocument(handout, enduranceEvent, officials));
         ObservableList.AddRange(documents);
         
         return true;
@@ -89,7 +89,7 @@ public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBe
         GuardHelper.ThrowIfDefault(enduranceEvent);
 
         var handout = new Handout(participation);
-        var document = new HandoutDocument(participation, enduranceEvent, officials);
+        var document = new HandoutDocument(handout, enduranceEvent, officials);
 
         await _semaphore.WaitAsync();
 

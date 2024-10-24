@@ -1,4 +1,5 @@
 ﻿using Not.Blazor.Ports;
+using NTS.Domain.Core.Configuration;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Entities;
 
@@ -11,8 +12,8 @@ public class AthleteFormModel : IFormModel<Athlete>
 #if DEBUG
         Name = "Gucci Petrov";
         Club = "Конярче ООД";
-        Country = new Country("BG", "zz", "Bulgaria");
 #endif
+        Country = StaticOptions.SelectedCountry;
     }
 
     public int Id { get; set; }
@@ -21,7 +22,6 @@ public class AthleteFormModel : IFormModel<Athlete>
     public Country? Country { get; set; }
     public string? Club { get; set; }
     public AthleteCategory Category { get; set; } = AthleteCategory.Senior;
-
 
     public void FromEntity(Athlete athlete)
     {

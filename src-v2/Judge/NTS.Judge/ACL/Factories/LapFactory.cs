@@ -19,7 +19,7 @@ public class LapFactory
                 LengthInKm = phase.Length,
                 MaxRecoveryTimeInMins = phase.MaxRecovery,
                 OrderBy = ++i,
-                RestTimeInMins = phase.Rest
+                RestTimeInMins = phase.Rest ?? 0
             };
             yield return new EmsLap(state);
         }

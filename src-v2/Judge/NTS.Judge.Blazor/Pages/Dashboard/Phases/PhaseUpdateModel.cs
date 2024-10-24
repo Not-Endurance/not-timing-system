@@ -40,7 +40,7 @@ public class PhaseUpdateModel : IPhaseState, IFormModel<Phase>
     public DateTimeOffset? RepresentTime
     {
         get => Parse(RepresentTimeInput);
-        set => PresentTimeInput = ToInputString(value);
+        set => RepresentTimeInput = ToInputString(value);
     }
 
     public void FromEntity(Phase entity)

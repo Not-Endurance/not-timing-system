@@ -1,30 +1,59 @@
 ﻿using NTS.Domain.Core.Configuration;
 using NTS.Domain.Core.Entities;
 using NTS.Domain.Core.Objects.Regional;
-using System.Collections.ObjectModel;
+using System.Collections;
 
 namespace NTS.Domain.Core.Objects;
 
-public class Ranklist : ReadOnlyCollection<RankingEntry>
+public class Ranklist : IReadOnlyList<RankingEntry>
 {
-    private readonly static FeiRanker _feiRanker = new();
-    private readonly static Ranker[] _regionalRankers = [ new BulgariaRanker() ];
+    readonly static FeiRanker _feiRanker = new();
+    readonly static Ranker[] _regionalRankers = [ new BulgariaRanker() ];
+    readonly Ranking _ranking;
 
-    public Ranklist(Ranking ranking) : base(Rank(ranking))
+    List<RankingEntry> _entries;
+
+    public Ranklist(Ranking ranking)
     {
-        RankingId = ranking.Id;
-        Name = ranking.Name;
-        Category = ranking.Category;
-        Ruleset = ranking.Ruleset;
+        _entries = Rank(ranking);
+        _ranking = ranking;
     }
 
-    public int RankingId { get; }
-    public string Title => $"{Category}: {Name}";
-    public string Name { get; }
-    public AthleteCategory Category { get; }
-    public CompetitionRuleset Ruleset { get; }
+    #region IReadOnlyList implementation
 
-    private static IList<RankingEntry> Rank(Ranking ranking)
+    public int Count => _entries.Count;
+    public RankingEntry this[int index] => _entries[index];
+
+    public IEnumerator<RankingEntry> GetEnumerator()
+    {
+        return _entries.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    #endregion
+
+    public int RankingId => _ranking.Id;
+    public string Name => _ranking.Name;
+    public AthleteCategory Category => _ranking.Category;
+    public CompetitionRuleset Ruleset => _ranking.Ruleset;
+    public string Title => $"{Category}: {Name}";
+
+    public void Update(Participation participation)
+    {
+        var existing = _ranking.Entries.FirstOrDefault(x => x.Participation == participation);
+        if (existing == null)
+        {
+            return;
+        }
+        existing.Participation = participation;
+        _entries = Rank(_ranking);
+    }
+
+    static List<RankingEntry> Rank(Ranking ranking)
     {
         var ranker = StaticOptions.ShouldUseRegionalRanker(ranking.Ruleset)
             ? GetRanker(StaticOptions.RegionalConfiguration)
@@ -32,8 +61,9 @@ public class Ranklist : ReadOnlyCollection<RankingEntry>
         return ranker.Rank(ranking);
     }
 
-    private static Ranker GetRanker(IRegionalConfiguration? configuration)
+    static Ranker GetRanker(IRegionalConfiguration? configuration)
     {
         return _regionalRankers.FirstOrDefault(x => x.CountryIsoCode == configuration?.CountryIsoCode) ?? _feiRanker;
     }
-}   
+}
+

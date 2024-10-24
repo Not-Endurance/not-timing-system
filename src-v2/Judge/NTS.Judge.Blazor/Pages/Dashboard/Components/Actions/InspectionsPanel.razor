@@ -15,8 +15,8 @@
     [Inject]
     IParticipationBehind _participationBehind { get; set; } = default!;
 
-    Participation _selectedParticipation => _participationBehind.SelectedParticipation!;
-    Phase? _currentPhase => _selectedParticipation.Phases.Current;
+    Participation? _selectedParticipation => _participationBehind.SelectedParticipation;
+    Phase? _currentPhase => _selectedParticipation?.Phases.Current;
     bool _represent => _currentPhase?.IsReinspectionRequested ?? false;
     bool _requireInspection => _currentPhase?.IsRequiredInspectionRequested ?? false;
 

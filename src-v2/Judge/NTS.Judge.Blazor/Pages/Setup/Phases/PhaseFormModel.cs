@@ -16,7 +16,7 @@ public class PhaseFormModel : IFormModel<Phase>
     public int Id { get; set; }
     public Loop? Loop { get; set; }
     public int Recovery { get; set; }
-    public int Rest { get; set; }
+    public int? Rest { get; set; }
 
     public void FromEntity(Phase phase)
     {

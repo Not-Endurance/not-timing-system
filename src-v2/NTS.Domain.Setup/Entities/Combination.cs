@@ -9,9 +9,8 @@ public class Combination : DomainEntity, ISummarizable, IImportable, IParent
     public static Combination Update(int id, int number, Athlete? athlete, Horse? horse, Tag? tag) => new(id, number, athlete, horse, tag);
 
     [JsonConstructor]
-    public Combination(int id, int number, Athlete? athlete, Horse? horse, Tag? tag)
+    public Combination(int id, int number, Athlete? athlete, Horse? horse, Tag? tag) : base(id)
     {
-        Id = id;
         Number = NotDefault(nameof(Number), number);
         Athlete = Required(nameof(Athlete), athlete);
         Horse = Required(nameof(Horse), horse);

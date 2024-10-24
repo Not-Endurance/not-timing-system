@@ -10,8 +10,8 @@
 @inherits FormTM<ParticipationFormModel>;
 
 <EditForm Model="Model">
-    <NotSelect @ref="_combinaionField" T="Combination" Label="Combination" Placeholder="Select a combination" 
-        Items="_combinations" @bind-Value="Model.Combination" />
+    <NotAutocomplete @ref="_combinaionField" T="Combination" Label="Combination" @bind-Value="Model.Combination"
+        Search="SearchCombinations" />
 
     <NotSwitch @ref="_isNotRankedField" @bind-Value="Model.IsNotRanked" Label="Unranked" />
 
@@ -31,7 +31,7 @@
 </EditForm>
 
 @code {
-    NotSelect<Combination> _combinaionField = default!;
+    NotAutocomplete<Combination> _combinaionField = default!;
     NotSwitch _isNotRankedField = default!;
     MudPicker<TimeSpan?> _timeField = default!;
     MudNumericField<double?> _maxSpeedOverrideField = default!;
@@ -55,5 +55,21 @@
     {
         await Observe(_behind);
         _combinations = NotListModel.FromEntity<Combination>(_behind.Items).ToList();
+    }
+
+    Task<IEnumerable<Combination>> SearchCombinations(string term)
+    {
+        var result = Search(_behind.Items, term);
+        return Task.FromResult(result);
+    }
+
+    // TODO: extract search functionality somehow, because ToString() should be identical (maybe ToString should be configurable)
+    IEnumerable<T> Search<T>(IEnumerable<T> values, string term)
+    {
+        if (string.IsNullOrWhiteSpace(term))
+        {
+            return values;
+        }
+        return values.Where(x => x != null && x.ToString()!.Contains(term, StringComparison.InvariantCultureIgnoreCase));
     }
 }

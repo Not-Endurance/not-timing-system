@@ -2,6 +2,10 @@
 
 public class LocalizationTest : DomainEntity
 {
+    public LocalizationTest() : base(GenerateId())
+    {
+    }
+
     public string Success()
         => "My dick Yanko";
 

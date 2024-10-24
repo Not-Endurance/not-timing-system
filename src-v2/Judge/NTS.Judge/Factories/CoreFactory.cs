@@ -1,4 +1,5 @@
-﻿using Not.Domain;
+﻿using Not.Application.Ports.CRUD;
+using Not.Domain;
 using NTS.Domain.Core.Entities;
 using NTS.Domain.Core.Entities.ParticipationAggregate;
 using NTS.Domain.Enums;
@@ -28,8 +29,8 @@ public class CoreFactory
         return coreOfficial;
     }
 
-    public static (List<Participation> Participations, Dictionary<AthleteCategory, List<RankingEntry>> RankingEntriesByCategory)
-        CreateParticipationAndRankingEntries(Domain.Setup.Entities.Competition setupCompetition)
+    public static async Task<(List<Participation> Participations, Dictionary<AthleteCategory, List<RankingEntry>> RankingEntriesByCategory)>
+        CreateParticipationAndRankingEntriesAsync(Domain.Setup.Entities.Competition setupCompetition, IRepository<Participation> participationRepository)
     {
         if (setupCompetition.Phases.Count == 0)
         {
@@ -39,9 +40,8 @@ public class CoreFactory
         {
             throw new DomainException($"Cannot start - Particiaptions of competition {setupCompetition.Name} aren't configured");
         }
-        var setupPhases = setupCompetition.Phases;
+
         var competitionDistance = 0m;
-        var phases = new List<Phase>();
         var participations = new List<Participation>();
         var rankingEntriesByCategory = new Dictionary<AthleteCategory, List<RankingEntry>>
         {
@@ -50,20 +50,25 @@ public class CoreFactory
             { AthleteCategory.JuniorOrYoungAdult, new List<RankingEntry>() },
             { AthleteCategory.Training, new List<RankingEntry>() }
         };
-        foreach (var phase in setupPhases)
-        {
-            var corePhase = new Phase(
-                phase.Loop!.Distance,
-                phase.Recovery,
-                phase.Rest,
-                setupCompetition.Ruleset,
-                setupPhases.Last() == phase,
-                setupCompetition.CompulsoryThreshold);
-            phases.Add(corePhase);
-            competitionDistance += (decimal)phase.Loop!.Distance;
-        }
         foreach (var contestant in setupCompetition.Participations)
         {
+            DateTimeOffset? startTime = setupCompetition.Start;
+            var setupPhases = setupCompetition.Phases;
+            var phases = new List<Phase>();
+            foreach (var phase in setupPhases)
+            {
+                var corePhase = new Phase(
+                    phase.Loop!.Distance,
+                    phase.Recovery,
+                    phase.Rest,
+                    setupCompetition.Ruleset,
+                    setupPhases.Last() == phase,
+                    setupCompetition.CompulsoryThresholdSpan,
+                    startTime);
+                startTime = null; //Set only first phase StartTime
+                phases.Add(corePhase);
+                competitionDistance += (decimal)phase.Loop!.Distance;
+            }
             var setupCombination = contestant.Combination;
             var combination = new Combination(
                 setupCombination.Number,
@@ -75,10 +80,22 @@ public class CoreFactory
                 contestant.MinAverageSpeed,
                 contestant.MaxAverageSpeed);
             var participation = new Participation(setupCompetition.Name, setupCompetition.Ruleset, combination, phases);
-            var rankingEntry = new RankingEntry(participation, contestant.IsNotRanked);
-            
-            participations.Add(participation);
-            rankingEntriesByCategory[setupCombination.Athlete.Category].Add(rankingEntry);
+            var storedParticipations = await participationRepository.ReadAll();
+            if(!storedParticipations.Any(p => p.Combination.Number == participation.Combination.Number))
+            {               
+                participations.Add(participation);
+                var rankingEntry = new RankingEntry(participation, contestant.IsNotRanked);
+                rankingEntriesByCategory[setupCombination.Athlete.Category].Add(rankingEntry);
+            }
+            else
+            {
+                var participationRef = storedParticipations.ToList().Find(p => p.Combination.Number == participation.Combination.Number);
+                if(participationRef != null)
+                {
+                    var rankingEntry = new RankingEntry(participationRef, contestant.IsNotRanked);
+                    rankingEntriesByCategory[setupCombination.Athlete.Category].Add(rankingEntry);
+                }
+            }
         }
         return (participations, rankingEntriesByCategory);
     }

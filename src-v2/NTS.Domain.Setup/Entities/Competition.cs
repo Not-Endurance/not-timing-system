@@ -43,7 +43,7 @@ public class Competition : DomainEntity, ISummarizable, IParent<Participation>, 
         Type = Required(nameof(Type), type);
         Ruleset = Required(nameof(Ruleset), ruleset);
         Start = start;
-        CompulsoryThreshold = compulsoryThresholdSpan;
+        CompulsoryThresholdSpan = compulsoryThresholdSpan;
     }
 
     private Competition(
@@ -75,14 +75,14 @@ public class Competition : DomainEntity, ISummarizable, IParent<Participation>, 
 
     static TimeSpan? ToTimeSpan(int? minutes)
     {
-        return minutes != null ? TimeSpan.FromSeconds(minutes.Value) : null;
+        return minutes != null ? TimeSpan.FromMinutes(minutes.Value) : null;
     }
 
     public string Name { get; }
     public CompetitionType Type { get; }
     public CompetitionRuleset Ruleset { get; }
 	public DateTimeOffset Start { get; }
-    public TimeSpan? CompulsoryThreshold { get; }
+    public TimeSpan? CompulsoryThresholdSpan { get; }
     public IReadOnlyList<Phase> Phases => _phases.AsReadOnly();
     public IReadOnlyList<Participation> Participations => _participations.AsReadOnly();
 

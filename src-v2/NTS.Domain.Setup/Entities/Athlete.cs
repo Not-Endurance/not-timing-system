@@ -13,7 +13,7 @@ public class Athlete : DomainEntity, ISummarizable, IImportable
 
 
     [JsonConstructor]
-    private Athlete(int id, Person? person, string? feiId, Country? country, Club? club, AthleteCategory? category)
+    private Athlete(int id, Person? person, string? feiId, Country? country, Club? club, AthleteCategory? category) : base(id)
     {
         FeiId = feiId;
         Person = Required(nameof(Person), person);

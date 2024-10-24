@@ -29,6 +29,7 @@
 
     public async void Start()
     {
+        // TODO make sure that DashboardPage, RanklistPage and HandoutsPage rerender if active
         await _dashboardBehind.Start();
         _enduranceEventStarted = await _dashboardBehind.IsEnduranceEventStarted();
         await InvokeAsync(StateHasChanged);

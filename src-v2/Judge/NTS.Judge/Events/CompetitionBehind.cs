@@ -1,4 +1,5 @@
 ﻿using Not.Application.Adapters.Behinds;
+using Not.Application.Contexts;
 using Not.Application.Ports.CRUD;
 using NTS.Domain.Setup.Entities;
 using NTS.Judge.Contexts;
@@ -9,10 +10,18 @@ namespace NTS.Judge.Events;
 public class CompetitionBehind : CrudBehind<Competition, CompetitionFormModel>
 {
     private readonly EventParentContext _parentContext;
+    private readonly IParentContext<Phase> _phaseParent;
+    private readonly IParentContext<Participation> _participationParent;
 
-    public CompetitionBehind(IRepository<Competition> competitions, EventParentContext parentContext) : base(competitions, parentContext)
+    public CompetitionBehind(
+        IRepository<Competition> competitions,
+        EventParentContext parentContext,
+        IParentContext<Phase> phaseParent,
+        IParentContext<Participation> participationParent) : base(competitions, parentContext)
     {
-        this._parentContext = parentContext;
+        _parentContext = parentContext;
+        _phaseParent = phaseParent;
+        _participationParent = participationParent;
     }
 
     protected override Competition CreateEntity(CompetitionFormModel model)
@@ -29,7 +38,7 @@ public class CompetitionBehind : CrudBehind<Competition, CompetitionFormModel>
             model.Ruleset,
             model.StartTime,
             model.CompulsoryThresholdMinutes,
-            model.Phases,
-            model.Participations);
+            _phaseParent.Children,
+            _participationParent.Children);
     }
 }

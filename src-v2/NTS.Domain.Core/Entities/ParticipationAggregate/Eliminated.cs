@@ -8,12 +8,22 @@ public record Withdrawn : Eliminated
     public Withdrawn() : base(WITHDRAWN)
     {
     }
+
+    public override string ToString()
+    {
+        return base.ToString();
+    }
 }
 
 public record Retired : Eliminated
 {
     public Retired() : base(RETIRED)
     {
+    }
+
+    public override string ToString()
+    {
+        return base.ToString();
     }
 }
 
@@ -22,6 +32,11 @@ public record Disqualified : Eliminated
     public Disqualified(string complement) : base(DISQUALIFIED, complement)
     {
     }
+
+    public override string ToString()
+    {
+        return base.ToString();
+    }
 }
 
 public record FinishedNotRanked : Eliminated
@@ -29,15 +44,20 @@ public record FinishedNotRanked : Eliminated
     public FinishedNotRanked(string complement) : base(FINISHED_NOT_RANKED, complement)
     {
     }
+
+    public override string ToString()
+    {
+        return base.ToString();
+    }
 }
 
 public record FailedToQualify : Eliminated
 {
     [JsonConstructor]
-    public FailedToQualify(FtqCode[] codes, string? complement) : base(FAILED_TO_QUALIFY)
+    public FailedToQualify(FtqCode[] ftqCodes, string? complement) : base(FAILED_TO_QUALIFY)
     {
-        PreventInvalidFTC(codes, complement);
-        FtqCodes = codes;
+        PreventInvalidFTC(ftqCodes, complement);
+        FtqCodes = ftqCodes;
         Complement = complement; // Doesn't use base ctor with complement, because it is not required here
     }
     public FailedToQualify(FtqCode[] codes) : this(IsNotEmpty(codes), null)

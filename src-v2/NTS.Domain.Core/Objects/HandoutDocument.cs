@@ -6,12 +6,13 @@ namespace NTS.Domain.Core.Objects;
 
 public record HandoutDocument : Document, IIdentifiable
 {
-    public HandoutDocument(Participation participation, EnduranceEvent enduranceEvent, IEnumerable<Official> officials)
-        : base(new DocumentHeader(participation.Competition.Name, enduranceEvent.PopulatedPlace, enduranceEvent.EventSpan, officials))
+    public HandoutDocument(Handout handout, EnduranceEvent enduranceEvent, IEnumerable<Official> officials)
+        : base(
+            new DocumentHeader(handout.Participation.Competition.Name, enduranceEvent.PopulatedPlace, enduranceEvent.EventSpan, officials))
     {
-        Id = participation.Id;
-        Combination = participation.Combination;
-        Phases = participation.Phases;
+        Id = handout.Id;
+        Combination = handout.Participation.Combination;
+        Phases = handout.Participation.Phases;
     }
 
     public int Id { get; }

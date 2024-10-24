@@ -63,6 +63,15 @@ public record Timestamp : DomainObject, IComparable<Timestamp>
         return left?.DateTime > right?.DateTime;
     }
 
+    public static bool operator <=(Timestamp? left, Timestamp? right)
+    {
+        return left?.DateTime <= right?.DateTime;
+    }
+    public static bool operator >=(Timestamp? left, Timestamp? right)
+    {
+        return left?.DateTime > right?.DateTime;
+    }
+
     public static bool operator <(Timestamp? left, DateTimeOffset? right)
     {
         return left?.DateTime < right;

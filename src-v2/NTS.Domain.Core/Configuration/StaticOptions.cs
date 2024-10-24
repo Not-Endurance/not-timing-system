@@ -6,14 +6,16 @@ namespace NTS.Domain.Core.Configuration;
 
 public class StaticOptions : IStartupInitializer, ISingletonService
 {
-    readonly IStaticOptionsProvider<Model> _provider;
+    public static IRegionalConfiguration? RegionalConfiguration { get; private set; }
+    public static Country[] Countries { get; private set; } = [];
+    public static Country? SelectedCountry { get; private set; }
+    public static DetectionMode? Detection { get; private set; }
     
     static Model? _options;
-    public static IRegionalConfiguration? RegionalConfiguration { get; set; }
 
     public static bool IsRfidDetectionEnabled()
     {
-        return _options != default && _options.DetectionMode == DetectionMode.Rfid;
+        return Detection != default && Detection == DetectionMode.Rfid;
     }
 
     public static SnapshotType GetRfidSnapshotType()
@@ -24,9 +26,10 @@ public class StaticOptions : IStartupInitializer, ISingletonService
         }
         return _options.RfidSnapshotType;
     }
+
     public static bool IsVisionDetectionEnabled()
     {
-        return _options != default && _options.DetectionMode == DetectionMode.ComputerVision;
+        return Detection != default && Detection == DetectionMode.ComputerVision;
     }
 
     public static bool ShouldOnlyUseAverageLoopSpeed(CompetitionRuleset ruleset)
@@ -52,6 +55,10 @@ public class StaticOptions : IStartupInitializer, ISingletonService
         return ruleset == CompetitionRuleset.Regional && RegionalConfiguration != null;
     }
 
+    #region Instance is used in order to be initialized on Startup
+
+    readonly IStaticOptionsProvider<Model> _provider;
+
     public StaticOptions(IStaticOptionsProvider<Model> provider)
     {
         _provider = provider;
@@ -59,9 +66,13 @@ public class StaticOptions : IStartupInitializer, ISingletonService
 
     public void RunAtStartup()
     {
-        _options = _provider.Get();
-        RegionalConfiguration = RegionalConfigurationProvider.Get(_options.SelectedCountry);
+        var options = _provider.Get();
+        SelectedCountry = options.SelectedCountry;
+        RegionalConfiguration = RegionalConfigurationProvider.Get(options.SelectedCountry);
+        Detection = options.DetectionMode;
     }
+
+    #endregion
 
     public class Model
     {
