@@ -14,21 +14,12 @@ namespace NTS.Judge.RPC;
 public class ParticipationClient : RpcClient, IParticipationRpcClient, IStartupInitializer
 {
     readonly ISnapshotProcessor _snapshotProcessor;
-    readonly IConnectionsBehind _remoteConnections;
 
-    public ParticipationClient(
-        IRpcSocket socket,
-        ISnapshotProcessor snapshotProcessor,
-        IConnectionsBehind remoteConnections
-    )
+    public ParticipationClient(IRpcSocket socket, ISnapshotProcessor snapshotProcessor, IConnectionsBehind remoteConnections)
         : base(socket)
     {
         _snapshotProcessor = snapshotProcessor;
-        _remoteConnections = remoteConnections;
-        RegisterClientProcedure<IEnumerable<Snapshot>>(
-            nameof(IJudgeClientProcedures.ReceiveSnapshots),
-            ReceiveSnapshots
-        );
+        RegisterClientProcedure<IEnumerable<Snapshot>>(nameof(IJudgeClientProcedures.ReceiveSnapshots), ReceiveSnapshots);
     }
 
     public void RunAtStartup()
@@ -44,18 +35,6 @@ public class ParticipationClient : RpcClient, IParticipationRpcClient, IStartupI
         {
             await _snapshotProcessor.Process(snapshot);
         }
-    }
-
-    public Task ReceiveRemoteConnectionId(string connectionId)
-    {
-        _remoteConnections.Add(connectionId);
-        return Task.CompletedTask;
-    }
-
-    public Task ReceiveRemoteDisconnectId(string connectionId)
-    {
-        _remoteConnections.Remove(connectionId);
-        return Task.CompletedTask;
     }
 
     public async Task SendParticipationEliminated(ParticipationEliminated revoked)

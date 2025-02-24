@@ -8,31 +8,25 @@ namespace NTS.Judge.RPC;
 
 public class ConnectionsClient : RpcClient, IConnectionsRpcClient
 {
-    readonly IConnectionsBehind _remoteConnections;
+    readonly IConnectionsRegistry _connectionsRegistry;
 
-    public ConnectionsClient(IRpcSocket socket, IConnectionsBehind remoteConnections)
+    public ConnectionsClient(IRpcSocket socket, IConnectionsRegistry connectionsRegistry)
         : base(socket)
     {
-        _remoteConnections = remoteConnections;
-        RegisterClientProcedure<string>(
-            nameof(IJudgeClientProcedures.ReceiveRemoteConnectionId),
-            ReceiveRemoteConnectionId
-        );
-        RegisterClientProcedure<string>(
-            nameof(IJudgeClientProcedures.ReceiveRemoteDisconnectId),
-            ReceiveRemoteDisconnectId
-        );
+        _connectionsRegistry = connectionsRegistry;
+        RegisterClientProcedure<string>(nameof(IJudgeClientProcedures.ReceiveRemoteConnectionId), ReceiveRemoteConnectionId);
+        RegisterClientProcedure<string>(nameof(IJudgeClientProcedures.ReceiveRemoteDisconnectId), ReceiveRemoteDisconnectId);
     }
 
     public Task ReceiveRemoteConnectionId(string connectionId)
     {
-        _remoteConnections.Add(connectionId);
+        _connectionsRegistry.Add(connectionId);
         return Task.CompletedTask;
     }
 
     public Task ReceiveRemoteDisconnectId(string connectionId)
     {
-        _remoteConnections.Remove(connectionId);
+        _connectionsRegistry.Remove(connectionId);
         return Task.CompletedTask;
     }
 }

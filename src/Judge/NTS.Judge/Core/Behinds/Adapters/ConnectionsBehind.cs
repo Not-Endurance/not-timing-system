@@ -5,7 +5,7 @@ using Not.Notify;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
-public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IDisposable
+public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IConnectionsRegistry, IDisposable
 {
     readonly IRpcSocket _rpcSocket;
     HashSet<string> _connections = [];
@@ -20,7 +20,7 @@ public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IDisposab
 
     public RpcConnectionStatus ServerConnectionStatus { get; private set; }
     public bool IsServerConnected { get; private set; }
-    public HashSet<string> RemoteConnections => _connections;
+    public IEnumerable<string> RemoteConnections => _connections;
 
     protected override Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
@@ -38,11 +38,6 @@ public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IDisposab
     {
         _connections.Remove(connectionId);
         EmitChange();
-    }
-
-    public int GetConnectionCount()
-    {
-        return _connections.Count;
     }
 
     public void Dispose()

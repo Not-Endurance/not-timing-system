@@ -6,9 +6,7 @@ namespace Not.Application.RPC;
 
 public interface IConnectionsBehind : IObservableBehind
 {
-    void Add(string connectionId);
-    void Remove(string connectionId);
-    HashSet<string> RemoteConnections { get; }
+    IEnumerable<string> RemoteConnections { get; }
     bool IsServerConnected { get; }
     RpcConnectionStatus ServerConnectionStatus { get; }
 }
