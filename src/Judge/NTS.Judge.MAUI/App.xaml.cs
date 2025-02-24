@@ -1,4 +1,4 @@
-﻿using Not.Contexts;
+﻿using Not.Filesystem;
 using Not.Startup;
 
 namespace NTS.Judge.MAUI;
@@ -11,7 +11,7 @@ public partial class App : Microsoft.Maui.Controls.Application
 
         MainPage = new MainPage();
 
-        ContextHelper.ConfigureApplicationName("nts");
+        FileContextHelper.ConfigureApplicationName("nts");
 
         foreach (var initializer in initializers)
         {
