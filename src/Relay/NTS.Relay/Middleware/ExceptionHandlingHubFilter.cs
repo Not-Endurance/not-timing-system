@@ -23,20 +23,19 @@ public class ExceptionHandlingHubFilter : IHubFilter
         }
     }
 
-    public Task OnConnectedAsync(HubLifetimeContext context, Func<HubLifetimeContext, Task> next)
+    public async Task OnConnectedAsync(HubLifetimeContext context, Func<HubLifetimeContext, Task> next)
     {
         try
         {
-            return next(context);
+            await next(context);
         }
         catch (HubException ex)
         {
             HandleHubException(ex, nameof(OnConnectedAsync));
-            return Task.FromException(ex);
         }
     }
 
-    public Task OnDisconnectedAsync(
+    public async Task OnDisconnectedAsync(
         HubLifetimeContext context,
         Exception? exception,
         Func<HubLifetimeContext, Exception?, Task> next
@@ -44,12 +43,11 @@ public class ExceptionHandlingHubFilter : IHubFilter
     {
         try
         {
-            return next(context, exception);
+            await next(context, exception);
         }
         catch (HubException ex)
         {
             HandleHubException(ex, nameof(OnDisconnectedAsync));
-            return Task.FromException(ex);
         }
     }
 
