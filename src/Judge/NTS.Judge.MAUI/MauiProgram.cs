@@ -2,6 +2,7 @@
 using NTS.Judge.RPC;
 using static NTS.Relay.Constants;
 using static NTS.Judge.MAUI.Constants;
+using Not.Application.RPC.SignalR;
 
 namespace NTS.Judge.MAUI;
 
@@ -25,10 +26,8 @@ public static class MauiProgram
     static void ConnectToHub(IServiceProvider serviceProvider)
     {
         StartHub();
-        var connectionsClient = serviceProvider.GetRequiredService<IConnectionsRpcClient>();
-        var participationClient = serviceProvider.GetRequiredService<IParticipationRpcClient>();
-        connectionsClient.Connect();
-        participationClient.Connect();
+        var socket = serviceProvider.GetRequiredService<IRpcSocket>();
+        socket.Connect();
     }
 
     static void StartHub()

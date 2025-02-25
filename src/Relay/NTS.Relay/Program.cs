@@ -24,8 +24,8 @@ if (parentPidArgument.Any())
 
 builder.ConfigureLogging().AddFilesystemLogger(logFileConfig =>
 {
-    logFileConfig.Path = FileContextHelper.GetAppDirectory();
-    logFileConfig.Name = ContextHelper.ConfigureApplicationName("NTS.Judge.Server");
+    logFileConfig.Path = FileContextHelper.GetAppDirectory("logs");
+    logFileConfig.Name = FileContextHelper.ConfigureApplicationName("NTS.Judge.Server");
 
 });
 
