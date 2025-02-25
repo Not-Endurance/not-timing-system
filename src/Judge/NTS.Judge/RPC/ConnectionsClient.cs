@@ -14,8 +14,14 @@ public class ConnectionsClient : RpcClient, IConnectionsRpcClient
         : base(socket)
     {
         _connectionsRegistry = connectionsRegistry;
-        RegisterClientProcedure<string>(nameof(IJudgeClientProcedures.ReceiveRemoteConnectionId), ReceiveRemoteConnectionId);
-        RegisterClientProcedure<string>(nameof(IJudgeClientProcedures.ReceiveRemoteDisconnectId), ReceiveRemoteDisconnectId);
+        RegisterClientProcedure<string>(
+            nameof(IJudgeClientProcedures.ReceiveRemoteConnectionId),
+            ReceiveRemoteConnectionId
+        );
+        RegisterClientProcedure<string>(
+            nameof(IJudgeClientProcedures.ReceiveRemoteDisconnectId),
+            ReceiveRemoteDisconnectId
+        );
     }
 
     public Task ReceiveRemoteConnectionId(string connectionId)
