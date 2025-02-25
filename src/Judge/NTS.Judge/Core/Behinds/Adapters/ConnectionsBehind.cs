@@ -5,7 +5,11 @@ using Not.Notify;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
-public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IConnectionsRegistry, IDisposable
+public class ConnectionsBehind
+    : ObservableBehind,
+        IConnectionsBehind,
+        IConnectionsRegistry,
+        IDisposable
 {
     readonly IRpcSocket _rpcSocket;
     HashSet<string> _connections = [];
