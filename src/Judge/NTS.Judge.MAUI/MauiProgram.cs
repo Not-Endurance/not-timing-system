@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using Not.Application.RPC.Clients;
 using NTS.Judge.RPC;
+using static NTS.Relay.Constants;
 using static NTS.Judge.MAUI.Constants;
 
 namespace NTS.Judge.MAUI;
@@ -40,7 +40,7 @@ public static class MauiProgram
             var info = new ProcessStartInfo
             {
                 FileName = Path.Combine(currentDirectory, RELAY_APP_EXE),
-                Arguments = parentPid.ToString(),
+                Arguments = PARENT_PID_KEY + parentPid.ToString()
             };
 
             var hubProcess = Process.Start(info);
