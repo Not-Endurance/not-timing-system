@@ -2,7 +2,7 @@
 using Not.Injection;
 using Not.Localization;
 using Not.Serialization;
-using NTS.ACL.Handshake;
+using NTS.Application.Handshake;
 using NTS.Relay.Middleware;
 using NTS.Storage;
 
