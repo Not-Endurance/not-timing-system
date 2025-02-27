@@ -1,5 +1,4 @@
-﻿using Not.Domain.Base;
-namespace NTS.Domain.Core.Aggregates;
+﻿namespace NTS.Domain.Core.Aggregates;
 
 public class ArchiveEntry : IAggregateRoot
 {

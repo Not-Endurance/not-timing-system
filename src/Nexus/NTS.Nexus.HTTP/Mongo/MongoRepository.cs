@@ -4,6 +4,8 @@ using Not.Domain;
 using Not.Application.CRUD.Ports;
 using NTS.Storage.Documents;
 using System.Linq.Expressions;
+using MongoDB.Bson;
+using NTS.Storage.Documents.Horses;
 
 namespace NTS.Nexus.HTTP.Mongo;
 
@@ -17,6 +19,9 @@ public abstract class MongoRepository<T> : IRepository<T>
         settings.SslSettings = new SslSettings() { EnabledSslProtocols = SslProtocols.Tls12 };
         Collection = new MongoClient(settings).GetDatabase(db).GetCollection<T>(collection);
     }
+
+    protected abstract UpdateDefinition<T> GetUpdateDefinition(T document);
+    
     protected IMongoCollection<T> Collection { get; }
 
     public async Task Create(T document)
@@ -58,9 +63,10 @@ public abstract class MongoRepository<T> : IRepository<T>
         return await Collection.Find(filter).ToListAsync();
     }
 
-    public Task Update(T entity)
+    public async Task Update(T document)
     {
-        throw new NotImplementedException();
+        var updateDefinition = GetUpdateDefinition(document);
+        await Collection.UpdateOneAsync(x => x.Id == document.Id, updateDefinition);
     }
 
     public Task Delete(int id)
