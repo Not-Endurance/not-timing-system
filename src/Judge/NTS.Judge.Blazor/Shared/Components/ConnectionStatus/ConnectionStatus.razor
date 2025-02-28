@@ -1,0 +1,17 @@
+﻿@using Not.Application.RPC.SignalR
+
+@inherits NComponent
+
+
+<MudStack Class="mt-3 mb-n3" AlignItems="AlignItems.Center" Row="false">
+	<MudInputLabel Class="mt-2 font-size-12">@Localizer.Get("Connection Status")</MudInputLabel>
+	@if(ConnectionsBehind.IsServerConnected)
+	{
+		<MudInputLabel Class="mt-2 font-size-12">@Localizer.Get("Connected to Server")</MudInputLabel>
+		<MudInputLabel Class="mt-2 font-size-12">@Localizer.Get($"{ConnectionsBehind.RemoteConnections.Count()} connected devices")</MudInputLabel>
+	}
+	else
+	{
+		<MudProgressCircular Class="mt-2" Color=" SpinnerColor" Size="Size.Medium" Indeterminate="true" />
+	}
+</MudStack>

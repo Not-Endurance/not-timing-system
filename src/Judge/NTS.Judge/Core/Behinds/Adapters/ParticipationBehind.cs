@@ -28,18 +28,15 @@ public class ParticipationBehind
         IManualProcessor
 {
     readonly List<int> _recentlyProcessed = [];
-    readonly IJudgeRpcClient _judgeRpcClient;
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<SnapshotResult> _snapshotResultRepository;
     Participation? _selectedParticipation;
 
     public ParticipationBehind(
-        IJudgeRpcClient judgeRpcClient,
         IRepository<Participation> participationRepository,
         IRepository<SnapshotResult> snapshotResultRepository
     )
     {
-        _judgeRpcClient = judgeRpcClient;
         _participationRepository = participationRepository;
         _snapshotResultRepository = snapshotResultRepository;
     }
@@ -65,10 +62,6 @@ public class ParticipationBehind
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
-        Participation.PHASE_COMPLETED_EVENT.Subscribe(_judgeRpcClient.SendStartCreated); //TODO: figure out where to subscribe?
-        Participation.ELIMINATED_EVENT.Subscribe(_judgeRpcClient.SendParticipationEliminated); //TODO: figure out where to subscribe?
-        Participation.RESTORED_EVENT.Subscribe(_judgeRpcClient.SendParticipationRestored); //TODO: figure out where to subscribe?
-
         Participations = await _participationRepository.ReadAll();
         SelectedParticipation = Participations.FirstOrDefault();
         return Participations.Any();
@@ -78,6 +71,8 @@ public class ParticipationBehind
     {
         Task action() => SafeUpdate(model);
         await SafeHelper.Run(action);
+
+        EmitChange();
     }
 
     public async Task Process(Snapshot snapshot)

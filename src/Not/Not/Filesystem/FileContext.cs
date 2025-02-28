@@ -1,11 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Not.Injection.Config;
+﻿using Not.Injection.Config;
 
 namespace Not.Filesystem;
 
 public class FileContext : INConfig, IFileContext // TODO: move to Filesystem
 {
     public string Path { get; set; } = default!;
+    public string? Name { get; set; }
 
     void INConfig.Validate()
     {
@@ -21,4 +21,5 @@ public class FileContext : INConfig, IFileContext // TODO: move to Filesystem
 public interface IFileContext : INConfig
 {
     string Path { get; set; }
+    string? Name { get; set; }
 }

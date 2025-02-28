@@ -1,4 +1,5 @@
 ﻿using NTS.Domain.Core.Objects.Payloads;
+using NTS.Domain.Objects;
 
 namespace NTS.Application.RPC;
 

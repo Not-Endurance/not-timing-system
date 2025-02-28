@@ -3,8 +3,8 @@ using NTS.ACL.Entities.EMS;
 
 namespace NTS.ACL.RPC.Procedures;
 
-public interface IEmsEmsParticipantstHubProcedures
+public interface IEmsParticipantsHubProcedures
 {
-    EmsParticipantsPayload SendParticipants();
+    Task<EmsParticipantsPayload> SendParticipants();
     Task ReceiveWitnessEvent(IEnumerable<EmsParticipantEntry> entries, EmsWitnessEventType type);
 }

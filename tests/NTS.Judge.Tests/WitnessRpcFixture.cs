@@ -13,7 +13,7 @@ public class WitnessRpcFixture : HubFixture<WitnessTestClient>
             RpcProtocol.Http,
             ApplicationConstants.RPC_PORT,
             ApplicationConstants.WITNESS_HUB,
-            "NTS.Judge.MAUI.Server"
+            "NTS.Relay"
         ) { }
 
     protected override WitnessTestClient CreateClient(

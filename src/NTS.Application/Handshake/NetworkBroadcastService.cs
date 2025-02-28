@@ -1,7 +1,6 @@
-﻿using Core.Application.Services;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 
-namespace NTS.ACL.Handshake;
+namespace NTS.Application.Handshake;
 
 public class NetworkBroadcastService : BackgroundService
 {

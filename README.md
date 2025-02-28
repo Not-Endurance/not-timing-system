@@ -34,7 +34,7 @@ MAUI Blazor hybrid apps use MS's WebView2 in order to run natively. This might n
   - `NTS.Judge` contains the **Behinds** (from code-behind) which invoke the Domain Model and fascilitate the operations
   - `NTS.Judge.MAUI` is the MAUI startup project
   - `NTS.Judge.Blazor` contains the blazor components. These are segregated because once we reach a certain scale that we can afford to run servers it will be simpler to use a web-based blazor app, rather than integrated.
-  - `NTS.Judge.MAUI.Server` is a separet ASP.NET app spinned alongside the integrated, which fascilitates the connection with the mobile Witness apps
+  - `NTS.Relay` is a separet ASP.NET app spinned alongside the integrated, which fascilitates the connection with the mobile Witness apps
 4. `NTS.Domain*` - contains the domain model for NTS. It defines 3 separate boundaries:
   - `Setup` - create and configure an event
   - `Core` - service the event
