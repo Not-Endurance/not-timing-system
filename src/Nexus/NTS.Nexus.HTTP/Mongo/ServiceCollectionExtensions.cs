@@ -9,12 +9,6 @@ public static class ServiceCollectionExtensions
         string? connectionString
     )
     {
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new ApplicationException(
-                "Mongo is not configured - connectionString is required"
-            );
-        }
         services.AddSingleton<IMongoContext, MongoContext>(x => new MongoContext(connectionString));
         return services;
     }
