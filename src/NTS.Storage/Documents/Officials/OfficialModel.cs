@@ -5,7 +5,8 @@ namespace NTS.Storage.Documents.Officials;
 
 public class OfficialModel : Document
 {
-    public OfficialModel(Official official) : base(official.Id)
+    public OfficialModel(Official official)
+        : base(official.Id)
     {
         Names = official.Person.Names;
         Role = official.Role;

@@ -8,7 +8,13 @@ namespace NTS.Storage.Documents.Athletes;
 
 public class AthleteDocument : Document
 {
-    public AthleteDocument(string[] names, AthleteCategory category, CountryDocument? country, ClubDocument? club) : base(RandomHelper.GenerateUniqueInteger()) // TODO: remove Core.Combination workaround
+    public AthleteDocument(
+        string[] names,
+        AthleteCategory category,
+        CountryDocument? country,
+        ClubDocument? club
+    )
+        : base(RandomHelper.GenerateUniqueInteger()) // TODO: remove Core.Combination workaround
     {
         Names = names;
         Category = category;
@@ -16,7 +22,8 @@ public class AthleteDocument : Document
         Club = club;
     }
 
-    public AthleteDocument(Athlete athlete) : base(athlete.Id)
+    public AthleteDocument(Athlete athlete)
+        : base(athlete.Id)
     {
         FeiId = athlete.FeiId;
         Names = athlete.Person;

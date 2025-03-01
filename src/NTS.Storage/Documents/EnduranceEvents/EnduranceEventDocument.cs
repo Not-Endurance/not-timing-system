@@ -8,7 +8,12 @@ namespace NTS.Storage.Documents.EnduranceEvents;
 
 public class EnduranceEventDocument : Document, IAggregateRoot // TODO: questionmark?
 {
-    public EnduranceEventDocument(EnduranceEvent enduranceEvent, IEnumerable<Official> officials, IEnumerable<Ranking> rankings) : base(enduranceEvent.Id)
+    public EnduranceEventDocument(
+        EnduranceEvent enduranceEvent,
+        IEnumerable<Official> officials,
+        IEnumerable<Ranking> rankings
+    )
+        : base(enduranceEvent.Id)
     {
         Country = new CountryDocument(enduranceEvent.PopulatedPlace.Country);
         City = enduranceEvent.PopulatedPlace.City;

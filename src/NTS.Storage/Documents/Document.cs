@@ -8,7 +8,7 @@ public class Document : IIdentifiable, ITenantAware, IAggregateRoot
 {
     public Document(int id)
     {
-        Id = id;    
+        Id = id;
     }
 
     public int Id { get; init; }

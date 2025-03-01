@@ -6,14 +6,15 @@ namespace NTS.Nexus.HTTP.Functions.Athletes;
 
 public class AthleteRepository : MongoRepository<AthleteDocument>
 {
-    public AthleteRepository() : base(MongoConstants.NTS_DATABASE, MongoConstants.ATHLETES_COLLECTION)
-    {
-    }
+    public AthleteRepository()
+        : base(MongoConstants.NTS_DATABASE, MongoConstants.ATHLETES_COLLECTION) { }
 
-    protected override UpdateDefinition<AthleteDocument> GetUpdateDefinition(AthleteDocument document)
+    protected override UpdateDefinition<AthleteDocument> GetUpdateDefinition(
+        AthleteDocument document
+    )
     {
-        return Builders<AthleteDocument>.Update
-            .Set(x => x.Names, document.Names)
+        return Builders<AthleteDocument>
+            .Update.Set(x => x.Names, document.Names)
             .Set(x => x.Category, document.Category)
             .Set(x => x.Club, document.Club)
             .Set(x => x.Country, document.Country)

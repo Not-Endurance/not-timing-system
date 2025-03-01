@@ -2,7 +2,11 @@
 
 public class ArchiveEntry : IAggregateRoot
 {
-    public ArchiveEntry(EnduranceEvent enduranceEvent, IReadOnlyList<Official> officials, IReadOnlyList<Ranking> rankings)
+    public ArchiveEntry(
+        EnduranceEvent enduranceEvent,
+        IReadOnlyList<Official> officials,
+        IReadOnlyList<Ranking> rankings
+    )
     {
         EnduranceEvent = enduranceEvent;
         Officials = officials;

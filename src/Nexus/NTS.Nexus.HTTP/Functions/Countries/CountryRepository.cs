@@ -6,14 +6,15 @@ namespace NTS.Nexus.HTTP.Functions.Countries;
 
 public class CountryRepository : MongoRepository<CountryDocument>
 {
-    public CountryRepository() : base(MongoConstants.NTS_DATABASE, MongoConstants.COUNTRIES_COLLECTION)
-    {
-    }
+    public CountryRepository()
+        : base(MongoConstants.NTS_DATABASE, MongoConstants.COUNTRIES_COLLECTION) { }
 
-    protected override UpdateDefinition<CountryDocument> GetUpdateDefinition(CountryDocument document)
+    protected override UpdateDefinition<CountryDocument> GetUpdateDefinition(
+        CountryDocument document
+    )
     {
-        return Builders<CountryDocument>.Update
-            .Set(x => x.IsoCode, document.IsoCode)
+        return Builders<CountryDocument>
+            .Update.Set(x => x.IsoCode, document.IsoCode)
             .Set(x => x.NfCode, document.NfCode)
             .Set(x => x.Name, document.Name);
     }

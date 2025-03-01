@@ -6,13 +6,11 @@ namespace NTS.Nexus.HTTP.Functions.Clubs;
 
 public class ClubRepository : MongoRepository<ClubDocument>
 {
-    public ClubRepository() : base(MongoConstants.NTS_DATABASE, MongoConstants.CLUBS_COLLECTION)
-    {
-    }
+    public ClubRepository()
+        : base(MongoConstants.NTS_DATABASE, MongoConstants.CLUBS_COLLECTION) { }
 
     protected override UpdateDefinition<ClubDocument> GetUpdateDefinition(ClubDocument document)
     {
-        return Builders<ClubDocument>.Update
-            .Set(x => x.Name, document.Name);
+        return Builders<ClubDocument>.Update.Set(x => x.Name, document.Name);
     }
 }

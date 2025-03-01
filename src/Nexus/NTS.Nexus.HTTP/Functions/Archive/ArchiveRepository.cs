@@ -9,14 +9,15 @@ namespace NTS.Nexus.HTTP.Functions.Archive;
 
 public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchiveRepository
 {
-    public ArchiveRepository() : base(MongoConstants.NTS_DATABASE, MongoConstants.ARCHIVE_COLLECTION)
-    {
-    }
+    public ArchiveRepository()
+        : base(MongoConstants.NTS_DATABASE, MongoConstants.ARCHIVE_COLLECTION) { }
 
-    protected override UpdateDefinition<EnduranceEventDocument> GetUpdateDefinition(EnduranceEventDocument document)
+    protected override UpdateDefinition<EnduranceEventDocument> GetUpdateDefinition(
+        EnduranceEventDocument document
+    )
     {
-        return Builders<EnduranceEventDocument>.Update
-            .Set(x => x.Officials, document.Officials)
+        return Builders<EnduranceEventDocument>
+            .Update.Set(x => x.Officials, document.Officials)
             .Set(x => x.Rankings, document.Rankings)
             .Set(x => x.EndDay, document.EndDay)
             .Set(x => x.StartDay, document.StartDay)
@@ -29,12 +30,15 @@ public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchi
     {
         return await Collection
             .Aggregate()
-            .Match(x => x.Rankings
-                .Any(y => y.Entries
-                    .Any(z => z.Participation.Combination.Horse.Id == horseId)))
-            .Project(x => x.Rankings
-                .SelectMany(y => y.Entries)
-                .First(z => z.Participation.Combination.Horse.Id == horseId))
+            .Match(x =>
+                x.Rankings.Any(y =>
+                    y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)
+                )
+            )
+            .Project(x =>
+                x.Rankings.SelectMany(y => y.Entries)
+                    .First(z => z.Participation.Combination.Horse.Id == horseId)
+            )
             .ToListAsync();
     }
 }

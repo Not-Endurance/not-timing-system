@@ -13,13 +13,19 @@ public class CountriesFunctions : FunctionBase<CountriesFunctions>
 {
     readonly IRepository<CountryDocument> _countries;
 
-    public CountriesFunctions(IFunctionLogger<CountriesFunctions> logger, IRepository<CountryDocument> countries) : base(logger)
+    public CountriesFunctions(
+        IFunctionLogger<CountriesFunctions> logger,
+        IRepository<CountryDocument> countries
+    )
+        : base(logger)
     {
         _countries = countries;
     }
 
     [Function("country-insert")]
-    public async Task<IActionResult> Insert([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "countries")] HttpRequest request)
+    public async Task<IActionResult> Insert(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "countries")] HttpRequest request
+    )
     {
         LogInformation(request);
 
@@ -32,7 +38,10 @@ public class CountriesFunctions : FunctionBase<CountriesFunctions>
     }
 
     [Function("country-update")]
-    public async Task<IActionResult> Update([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "countries")] HttpRequest request)
+    public async Task<IActionResult> Update(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "countries")]
+            HttpRequest request
+    )
     {
         LogInformation(request);
 
@@ -45,7 +54,9 @@ public class CountriesFunctions : FunctionBase<CountriesFunctions>
     }
 
     [Function("country-list")]
-    public async Task<IActionResult> List([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "countries")] HttpRequest request)
+    public async Task<IActionResult> List(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "countries")] HttpRequest request
+    )
     {
         LogInformation(request);
 

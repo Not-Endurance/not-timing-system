@@ -5,7 +5,8 @@ namespace NTS.Storage.Documents.Countries;
 
 public class CountryDocument : Document
 {
-    public CountryDocument(Country country) : base(RandomHelper.GenerateUniqueInteger())
+    public CountryDocument(Country country)
+        : base(RandomHelper.GenerateUniqueInteger())
     {
         IsoCode = country.IsoCode;
         NfCode = country.NfCode;

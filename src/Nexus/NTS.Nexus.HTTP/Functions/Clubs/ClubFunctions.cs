@@ -13,13 +13,16 @@ public class ClubsFunctions : FunctionBase<ClubsFunctions>
 {
     readonly IRepository<ClubDocument> _clubs;
 
-    public ClubsFunctions(IFunctionLogger<ClubsFunctions> logger, IRepository<ClubDocument> clubs) : base(logger)
+    public ClubsFunctions(IFunctionLogger<ClubsFunctions> logger, IRepository<ClubDocument> clubs)
+        : base(logger)
     {
         _clubs = clubs;
     }
 
     [Function("club-insert")]
-    public async Task<IActionResult> Insert([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "clubs")] HttpRequest request)
+    public async Task<IActionResult> Insert(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "clubs")] HttpRequest request
+    )
     {
         LogInformation(request);
 
@@ -32,7 +35,9 @@ public class ClubsFunctions : FunctionBase<ClubsFunctions>
     }
 
     [Function("club-update")]
-    public async Task<IActionResult> Update([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "clubs")] HttpRequest request)
+    public async Task<IActionResult> Update(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "clubs")] HttpRequest request
+    )
     {
         LogInformation(request);
 
@@ -45,7 +50,11 @@ public class ClubsFunctions : FunctionBase<ClubsFunctions>
     }
 
     [Function("club-delete")]
-    public async Task<IActionResult> Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "clubs/{id:int}")] HttpRequest request, int id)
+    public async Task<IActionResult> Delete(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "clubs/{id:int}")]
+            HttpRequest request,
+        int id
+    )
     {
         LogInformation(request);
 
@@ -54,7 +63,11 @@ public class ClubsFunctions : FunctionBase<ClubsFunctions>
     }
 
     [Function("club-get-one")]
-    public async Task<IActionResult> GetOne([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs/{id:int}")] HttpRequest request, int id)
+    public async Task<IActionResult> GetOne(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs/{id:int}")]
+            HttpRequest request,
+        int id
+    )
     {
         LogInformation(request);
 
@@ -63,7 +76,9 @@ public class ClubsFunctions : FunctionBase<ClubsFunctions>
     }
 
     [Function("club-list")]
-    public async Task<IActionResult> List([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs")] HttpRequest request)
+    public async Task<IActionResult> List(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs")] HttpRequest request
+    )
     {
         LogInformation(request);
 

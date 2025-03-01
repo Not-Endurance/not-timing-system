@@ -11,19 +11,26 @@ using NTS.Storage.Documents.Horses;
 
 namespace NTS.Nexus.HTTP.Functions.Horses;
 
-public  class HorseFunctions : FunctionBase<HorseFunctions>
+public class HorseFunctions : FunctionBase<HorseFunctions>
 {
     readonly IRepository<HorseDocument> _horses;
     readonly IArchiveRepository _archive;
 
-    public HorseFunctions(IFunctionLogger<HorseFunctions> logger, IRepository<HorseDocument> horses, IArchiveRepository archive) : base(logger)
+    public HorseFunctions(
+        IFunctionLogger<HorseFunctions> logger,
+        IRepository<HorseDocument> horses,
+        IArchiveRepository archive
+    )
+        : base(logger)
     {
         _horses = horses;
         _archive = archive;
     }
 
     [Function("horse-insert")]
-    public async Task<IActionResult> Insert([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "horses")] HttpRequest request)
+    public async Task<IActionResult> Insert(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "horses")] HttpRequest request
+    )
     {
         LogInformation(request);
 
@@ -36,7 +43,9 @@ public  class HorseFunctions : FunctionBase<HorseFunctions>
     }
 
     [Function("horse-update")]
-    public async Task<IActionResult> Update([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "horses")] HttpRequest request)
+    public async Task<IActionResult> Update(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "horses")] HttpRequest request
+    )
     {
         LogInformation(request);
 
@@ -49,20 +58,26 @@ public  class HorseFunctions : FunctionBase<HorseFunctions>
     }
 
     [Function("horse-safe-delete")]
-    public async Task<IActionResult> SafeDelete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")] HttpRequest request, int id)
+    public async Task<IActionResult> SafeDelete(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")]
+            HttpRequest request,
+        int id
+    )
     {
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
 
         var recordsWithHorse = await _archive
-            .ReadAll(x => x.Rankings
-                .Any(y => y.Entries
-                    .Any(z => z.Participation.Combination.Horse.Id == id)))
+            .ReadAll(x =>
+                x.Rankings.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id))
+            )
             .ToList();
         if (recordsWithHorse.Any())
         {
-            return new OkObjectResult($"The horse you want to delete has participated in '{recordsWithHorse.Count}' events. It will not be removed from those archives, but will no longer be visible for future events");
+            return new OkObjectResult(
+                $"The horse you want to delete has participated in '{recordsWithHorse.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
+            );
         }
 
         await _horses.Delete(id);
@@ -71,7 +86,11 @@ public  class HorseFunctions : FunctionBase<HorseFunctions>
     }
 
     [Function("horse-delete")]
-    public async Task<IActionResult> Delete([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}")] HttpRequest request, int id)
+    public async Task<IActionResult> Delete(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}")]
+            HttpRequest request,
+        int id
+    )
     {
         LogInformation(request);
 
@@ -81,7 +100,11 @@ public  class HorseFunctions : FunctionBase<HorseFunctions>
     }
 
     [Function("horse-get-one")]
-    public async Task<IActionResult> GetOne([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses/{id:int}")] HttpRequest request, int id)
+    public async Task<IActionResult> GetOne(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses/{id:int}")]
+            HttpRequest request,
+        int id
+    )
     {
         LogInformation(request);
 
@@ -91,7 +114,9 @@ public  class HorseFunctions : FunctionBase<HorseFunctions>
     }
 
     [Function("horse-list")]
-    public async Task<IActionResult> List([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses")] HttpRequest request)
+    public async Task<IActionResult> List(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses")] HttpRequest request
+    )
     {
         LogInformation(request);
 

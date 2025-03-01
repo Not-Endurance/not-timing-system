@@ -30,11 +30,11 @@ builder.Services.AddSingleton<IRepository<ClubDocument>, ClubRepository>();
 
 builder.Services.AddTransient(typeof(IFunctionLogger<>), typeof(FunctionLogger<>));
 
-builder.Services
-    .AddApplicationInsightsTelemetryWorkerService()
+builder
+    .Services.AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
-BsonClassMap.RegisterClassMap<Document>(x => 
+BsonClassMap.RegisterClassMap<Document>(x =>
 {
     x.AutoMap();
     x.MapIdField(x => x.Id);

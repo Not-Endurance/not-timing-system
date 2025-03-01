@@ -19,7 +19,8 @@ public class CombinationModel
             domainModel.Name,
             AthleteCategory.Senior,
             domainModel.Country == null ? null : new CountryDocument(domainModel.Country),
-            domainModel.Club == null ? null : new ClubDocument(domainModel.Club));
+            domainModel.Club == null ? null : new ClubDocument(domainModel.Club)
+        );
         Horse = new HorseDocument(domainModel.Horse);
     }
 
