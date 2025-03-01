@@ -28,7 +28,7 @@ public abstract class MongoRepository<T> : IRepository<T>
         {
             if (ex.WriteError.Code == 11000)
             {
-                throw new Exception(
+                throw new ApplicationException(
                     $"Could not insert. Document with ID '{document.Id}' already exists",
                     ex
                 ); //TODO: streamline validation with Middleware
@@ -50,9 +50,10 @@ public abstract class MongoRepository<T> : IRepository<T>
         return await Read(x => x.Id == id);
     }
 
-    public async Task<IEnumerable<T>> ReadAll()
+    public Task<IEnumerable<T>> ReadAll()
     {
-        return await ReadAll(x => true);
+        throw new Exception("GG bro");
+        //return await ReadAll(x => true);
     }
 
     public async Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter)
