@@ -2,7 +2,7 @@ name: "[net8] deploy nexus functions"
 on:
   push:
     branches:
-    - develop
+    - feature/nts-nexus
 env:
   AZURE_FUNCTIONAPP_NAME: nts-nexus-functions
   AZURE_RESOURCE_GROUP: NTS
