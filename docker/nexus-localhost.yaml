@@ -1,33 +1,13 @@
-version: '3.7'
+version: "3.8"
 
 services:
-  cosmosdb-emulator:
-    container_name: cosmosdb-emulator
-    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
-    environment:
-      # Accept the license terms for the Azure Cosmos DB Emulator
-      AZURE_COSMOS_EMULATOR_ACCEPT_EULA: "Y"
-      # (Optional) Set the number of partitions (default is 4)
-      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "4"
-      # Enable the MongoDB endpoint
-      AZURE_COSMOS_EMULATOR_ENABLE_MONGODB_ENDPOINT: "4.0"
-      # Bind emulator to all network interfaces
-      AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE: "0.0.0.0"
-    # Persist data in a named volume
-    volumes:
-      - cosmosdbdata:/data
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
     ports:
-      # Typical ports for the emulator
-      - "8081:8081"   # Azure Cosmos DB Emulator Explorer
-      - "1234:1234"   # Certificate endpoint
-      - "10250:10250" # Primary port
-      - "10251:10251"
-      - "10252:10252"
-      - "10253:10253"
-      - "10254:10254"
-    privileged: true  # Required to run in Docker on certain platforms
-    command: --protocol https
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
 
 volumes:
-  # Named volume to persist data files
-  cosmosdbdata:
+  mongodb_data:
