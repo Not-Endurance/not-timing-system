@@ -9,9 +9,14 @@ public record Speed : DomainObject
         return speed.HasValue ? new Speed(speed.Value) : null;
     }
 
-    public static implicit operator double(Speed speed)
+    public static implicit operator double?(Speed? speed)
     {
-        return speed._speed;
+        return speed?._speed;
+    }
+
+    public static implicit operator Speed?(double? speed)
+    {
+        return speed == null ? null : new Speed(speed.Value);
     }
 
     public static bool operator >(Speed? a, Speed? b)

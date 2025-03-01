@@ -1,4 +1,5 @@
-﻿using Not.Domain.Base;
+﻿using System.Linq.Expressions;
+using Not.Domain.Base;
 using Not.Storage.States;
 
 namespace Not.Storage.Repositories;
@@ -21,7 +22,7 @@ public abstract class ReadonlyRootRepository<T, TState>
         );
     }
 
-    public async Task<T?> Read(Predicate<T> _)
+    public async Task<T?> Read(Expression<Func<T, bool>> _)
     {
         return await Read(0);
     }
@@ -37,7 +38,7 @@ public abstract class ReadonlyRootRepository<T, TState>
         throw NotImplemented();
     }
 
-    public Task<IEnumerable<T>> ReadAll(Predicate<T> filter)
+    public Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter)
     {
         throw NotImplemented();
     }

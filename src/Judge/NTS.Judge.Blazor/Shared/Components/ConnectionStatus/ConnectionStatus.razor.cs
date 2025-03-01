@@ -1,11 +1,11 @@
 ﻿using MudBlazor;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
-using Not.Notify;
+using Not.Blazor.Components;
 
 namespace NTS.Judge.Blazor.Shared.Components.ConnectionStatus;
 
-public partial class ConnectionStatus
+public partial class ConnectionStatus : NComponent
 {
     [Inject]
     IConnectionsBehind ConnectionsBehind { get; set; } = default!;

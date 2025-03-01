@@ -4,28 +4,27 @@ namespace NTS.Domain.Objects;
 
 public record PopulatedPlace : DomainObject
 {
-    readonly string _city;
-    readonly string? _location;
-
     public PopulatedPlace(Country country, string city, string? location)
     {
         Country = country;
-        _city = city;
-        _location = location;
+        City = city;
+        Location = location;
     }
 
     public Country Country { get; }
+    public string City { get; }
+    public string? Location { get; }
 
     public override string ToString()
     {
         var sb = new StringBuilder();
-        if (_location != null)
+        if (Location != null)
         {
-            sb.Append($"{_location} ");
+            sb.Append($"{Location} ");
         }
-        if (_city != null)
+        if (City != null)
         {
-            sb.Append($"{_city} ");
+            sb.Append($"{City} ");
         }
         var country = Country.ToString();
         sb.Append(country);

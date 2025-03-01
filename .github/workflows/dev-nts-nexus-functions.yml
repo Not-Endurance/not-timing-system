@@ -1,0 +1,119 @@
+name: "[net8] deploy nexus functions"
+on:
+  push:
+    branches:
+    - feature/nts-nexus
+env:
+  AZURE_FUNCTIONAPP_NAME: nts-nexus-functions
+  AZURE_RESOURCE_GROUP: NTS
+  AZURE_STORAGE_CONTAINER: azurefunctions
+  AZURE_STORAGE_ACCOUNT: ntsstoragedev
+  OUTPUT_PATH: Nexus/NTS.Nexus.Test/published
+  CONFIGURATION: Release
+  DOTNET_CORE_VERSION: 8.0.x
+  FUNCTIONS_SOURCE_PATH: src/Nexus/NTS.Nexus.HTTP
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+        
+    #Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
+    - name: Set current workding directory env
+      run: echo "CURRENT_DIR=$(pwd)/src" >> $GITHUB_ENV
+    - name: Remove local-cache NuGet source
+      run: dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config
+
+    - name: Restore
+      run: dotnet restore "${{ env.FUNCTIONS_SOURCE_PATH }}"
+      
+    - name: Build
+      run: |
+        dotnet build "${{ env.FUNCTIONS_SOURCE_PATH }}" \
+        --configuration "${{ env.CONFIGURATION }}" \
+        --no-restore \
+        -property:SolutionDir="$CURRENT_DIR"
+
+    - name: Publish
+      run: |
+        dotnet publish "${{ env.FUNCTIONS_SOURCE_PATH }}" \
+        --configuration "${{ env.CONFIGURATION }}" \
+        --no-build \
+        --output "${{ env.OUTPUT_PATH }}" \
+        -property:SolutionDir="$CURRENT_DIR"
+
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        path: ${{ env.OUTPUT_PATH }}
+        include-hidden-files: true
+
+  deploy:
+    # Issues: https://github.com/Not-Endurance/not-timing-system/wiki/Azure
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        path: ${{ env.OUTPUT_PATH }}
+
+    - name: Zip function
+      run: |
+        cd ${{ env.OUTPUT_PATH }}
+        zip -r ../../../${{ env.AZURE_FUNCTIONAPP_NAME }}.zip .
+        cd -
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_SUBSCRIPTION_DEV_CREDENTIALS }}
+
+    - name: Generate SAS URL
+      id: sas
+      run: |
+        TOKEN=$(az storage blob generate-sas \
+        --connection-string "${{ secrets.AZURE_NTSSTORAGEDEV_CONNECTION_STRING }}" \
+        --container-name "${{ env.AZURE_STORAGE_CONTAINER }}" \
+        --name ${{ env.AZURE_FUNCTIONAPP_NAME }}.zip \
+        --permissions r \
+        --expiry 2036-01-01 \
+        --output tsv)
+
+        echo "SAS_TOKEN=$TOKEN" >> $GITHUB_ENV
+
+    - name: Generate FULL_URL
+      run: |
+        FULL_URL="https://${{ env.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/azurefunctions/${{ env.AZURE_FUNCTIONAPP_NAME }}.zip?$SAS_TOKEN"
+        echo "SAS_URL=$FULL_URL" >> $GITHUB_ENV
+
+    - name: Upload to blob
+      run: |
+        az storage blob upload \
+        --connection-string "${{ secrets.AZURE_NTSSTORAGEDEV_CONNECTION_STRING }}" \
+        --container-name "${{ env.AZURE_STORAGE_CONTAINER }}" \
+        --sas-token "$SAS_TOKEN" \
+        --name ${{ env.AZURE_FUNCTIONAPP_NAME }}.zip \
+        --file ${{ env.AZURE_FUNCTIONAPP_NAME }}.zip \
+        --overwrite
+
+    - name: Configure WEBSITE_RUN_FROM_PACKAGE
+      run: |
+        az functionapp config appsettings set \
+        --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+        --name "${{ env.AZURE_FUNCTIONAPP_NAME }}" \
+        --settings WEBSITE_RUN_FROM_PACKAGE="$SAS_URL"
+
+    - name: Restart function
+      run: |
+        az functionapp restart \
+        --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+        --name "${{ env.AZURE_FUNCTIONAPP_NAME }}"

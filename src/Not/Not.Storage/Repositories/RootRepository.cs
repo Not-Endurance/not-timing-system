@@ -1,4 +1,5 @@
-﻿using Not.Application.CRUD.Ports;
+﻿using System.Linq.Expressions;
+using Not.Application.CRUD.Ports;
 using Not.Domain.Base;
 using Not.Storage.States;
 
@@ -35,7 +36,7 @@ public abstract class RootRepository<T, TState> : ReadonlyRootRepository<T, TSta
         throw NotImplemented();
     }
 
-    public Task Delete(Predicate<T> filter)
+    public Task Delete(Expression<Func<T, bool>> filter)
     {
         throw NotImplemented();
     }

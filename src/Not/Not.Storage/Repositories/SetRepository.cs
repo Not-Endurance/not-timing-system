@@ -1,4 +1,5 @@
-﻿using Not.Application.CRUD.Ports;
+﻿using System.Linq.Expressions;
+using Not.Application.CRUD.Ports;
 using Not.Domain.Base;
 using Not.Storage.States;
 
@@ -25,10 +26,11 @@ public abstract class SetRepository<T, TState> : ReadonlySetRepository<T, TState
         await Store.Commit(state);
     }
 
-    public async Task Delete(Predicate<T> filter)
+    public async Task Delete(Expression<Func<T, bool>> filter)
     {
         var state = await Store.Transact();
-        state.EntitySet.RemoveAll(filter);
+        var predicate = filter.Compile();
+        state.EntitySet.RemoveAll(x => predicate(x));
         await Store.Commit(state);
     }
 

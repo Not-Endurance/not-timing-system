@@ -28,6 +28,7 @@ public class Athlete : AggregateRoot, IAggregateRoot
         return new(id, Person.Create(name), feiId, country, Club.Create(club), category);
     }
 
+    [System.Text.Json.Serialization.JsonConstructor]
     [JsonConstructor]
     Athlete(
         int id,

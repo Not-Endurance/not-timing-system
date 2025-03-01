@@ -1,4 +1,5 @@
-﻿using Not.Application.CRUD.Ports;
+﻿using System.Linq.Expressions;
+using Not.Application.CRUD.Ports;
 using Not.Domain.Base;
 using Not.Storage.States;
 
@@ -21,10 +22,11 @@ public abstract class ReadonlySetRepository<T, TState> : IRead<T>
         return state.EntitySet.FirstOrDefault(x => x.Id == id);
     }
 
-    public async Task<T?> Read(Predicate<T> filter)
+    public async Task<T?> Read(Expression<Func<T, bool>> filter)
     {
         var state = await Store.Readonly();
-        return state.EntitySet.FirstOrDefault(x => filter(x));
+        var predicate = filter.Compile();
+        return state.EntitySet.FirstOrDefault(x => predicate(x));
     }
 
     public async Task<IEnumerable<T>> ReadAll()
@@ -33,9 +35,10 @@ public abstract class ReadonlySetRepository<T, TState> : IRead<T>
         return state.EntitySet;
     }
 
-    public async Task<IEnumerable<T>> ReadAll(Predicate<T> filter)
+    public async Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter)
     {
         var state = await Store.Readonly();
-        return state.EntitySet.Where(x => filter(x));
+        var predicate = filter.Compile();
+        return state.EntitySet.Where(x => predicate(x));
     }
 }
