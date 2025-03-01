@@ -4,9 +4,9 @@ using NTS.Storage.Documents.Horses;
 
 namespace NTS.Nexus.HTTP.Functions.Horses;
 
-public class HorsesRepository : MongoRepository<HorseDocument>
+public class HorseRepository : MongoRepository<HorseDocument>
 {
-    public HorsesRepository() : base(MongoConstants.NTS_DATABASE, MongoConstants.HORSES_COLLECTION)
+    public HorseRepository() : base(MongoConstants.NTS_DATABASE, MongoConstants.HORSES_COLLECTION)
     {
     }
 

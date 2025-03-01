@@ -3,12 +3,12 @@ using NTS.Nexus.HTTP.Logger;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public abstract class FunctionsBase<T>
-    where T : FunctionsBase<T>
+public abstract class FunctionBase<T>
+    where T : FunctionBase<T>
 {
     readonly IFunctionLogger<T> _logger;
 
-    protected FunctionsBase(IFunctionLogger<T> logger)
+    protected FunctionBase(IFunctionLogger<T> logger)
     {
         _logger = logger;
     }

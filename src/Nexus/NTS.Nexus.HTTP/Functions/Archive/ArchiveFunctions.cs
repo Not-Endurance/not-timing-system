@@ -8,7 +8,7 @@ using NTS.Storage.Documents.EnduranceEvents;
 
 namespace NTS.Nexus.HTTP.Functions.Archive;
 
-public class ArchiveFunctions : FunctionsBase<ArchiveFunctions>
+public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 {
     readonly IArchiveRepository _archive;
 

@@ -11,12 +11,12 @@ using NTS.Storage.Documents.Horses;
 
 namespace NTS.Nexus.HTTP.Functions.Horses;
 
-public  class HorsesFunctions : FunctionsBase<HorsesFunctions>
+public  class HorseFunctions : FunctionBase<HorseFunctions>
 {
     readonly IRepository<HorseDocument> _horses;
     readonly IArchiveRepository _archive;
 
-    public HorsesFunctions(IFunctionLogger<HorsesFunctions> logger, IRepository<HorseDocument> horses, IArchiveRepository archive) : base(logger)
+    public HorseFunctions(IFunctionLogger<HorseFunctions> logger, IRepository<HorseDocument> horses, IArchiveRepository archive) : base(logger)
     {
         _horses = horses;
         _archive = archive;
