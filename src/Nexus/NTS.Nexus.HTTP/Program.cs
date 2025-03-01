@@ -6,11 +6,13 @@ using MongoDB.Bson.Serialization;
 using Not.Application.CRUD.Ports;
 using NTS.Nexus.HTTP.Functions.Archive;
 using NTS.Nexus.HTTP.Functions.Athletes;
+using NTS.Nexus.HTTP.Functions.Clubs;
 using NTS.Nexus.HTTP.Functions.Countries;
 using NTS.Nexus.HTTP.Functions.Horses;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Storage.Documents;
 using NTS.Storage.Documents.Athletes;
+using NTS.Storage.Documents.Clubs;
 using NTS.Storage.Documents.Countries;
 using NTS.Storage.Documents.EnduranceEvents;
 using NTS.Storage.Documents.Horses;
@@ -24,6 +26,8 @@ builder.Services.AddSingleton<IArchiveRepository, ArchiveRepository>();
 builder.Services.AddSingleton<IRepository<HorseDocument>, HorseRepository>();
 builder.Services.AddSingleton<IRepository<AthleteDocument>, AthleteRepository>();
 builder.Services.AddSingleton<IRepository<CountryDocument>, CountryRepository>();
+builder.Services.AddSingleton<IRepository<ClubDocument>, ClubRepository>();
+
 builder.Services.AddTransient(typeof(IFunctionLogger<>), typeof(FunctionLogger<>));
 
 builder.Services
