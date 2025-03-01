@@ -39,7 +39,10 @@ public abstract class HubFixture<T> : IDisposable
         var currentDirectory = Directory.GetCurrentDirectory();
         var info = new ProcessStartInfo
         {
-            FileName = Path.Combine(currentDirectory, $"../../../../../src/Relay/NTS.Relay/bin/Debug/net8.0/{_hubExecutable}.dll"),
+            FileName = Path.Combine(
+                currentDirectory,
+                $"../../../../../src/Relay/NTS.Relay/bin/Debug/net8.0/{_hubExecutable}.dll"
+            ),
         };
 
         _hubProcess = Process.Start(info);
