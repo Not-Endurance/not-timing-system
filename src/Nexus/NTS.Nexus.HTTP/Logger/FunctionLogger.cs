@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Not.Injection;
 
 namespace NTS.Nexus.HTTP.Logger;
 
@@ -60,7 +61,7 @@ internal class FunctionLogger<T> : IFunctionLogger<T>
     }
 }
 
-public interface IFunctionLogger<T>
+public interface IFunctionLogger<T> : ITransient
 {
     void LogDebug(HttpRequest request, [CallerMemberName] string method = "");
     void LogDebug(
