@@ -4,8 +4,6 @@ using Not.Domain;
 using Not.Application.CRUD.Ports;
 using NTS.Storage.Documents;
 using System.Linq.Expressions;
-using MongoDB.Bson;
-using NTS.Storage.Documents.Horses;
 
 namespace NTS.Nexus.HTTP.Mongo;
 
@@ -43,14 +41,14 @@ public abstract class MongoRepository<T> : IRepository<T>
         }
     }
 
-    public Task<T?> Read(Expression<Func<T, bool>> filter)
+    public async Task<T?> Read(Expression<Func<T, bool>> filter)
     {
-        throw new NotImplementedException();
+        return await Collection.Find(filter).FirstOrDefaultAsync();
     }
 
-    public Task<T?> Read(int id)
+    public async Task<T?> Read(int id)
     {
-        throw new NotImplementedException();
+        return await Read(x => x.Id == id);
     }
 
     public async Task<IEnumerable<T>> ReadAll()
@@ -69,23 +67,23 @@ public abstract class MongoRepository<T> : IRepository<T>
         await Collection.UpdateOneAsync(x => x.Id == document.Id, updateDefinition);
     }
 
-    public Task Delete(int id)
+    public async Task Delete(int id)
     {
-        throw new NotImplementedException();
+        await Collection.DeleteOneAsync(x => x.Id == id);
     }
 
     public Task Delete(T entity)
     {
-        throw new NotImplementedException();
+        return Delete(entity.Id);
     }
 
-    public Task Delete(Expression<Func<T, bool>> filter)
+    public async Task Delete(Expression<Func<T, bool>> filter)
     {
-        throw new NotImplementedException();
+        await Collection.DeleteManyAsync(filter);
     }
 
     public Task Delete(IEnumerable<T> entities)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("Batch delete with full entities isn't supported. Probably remove this method");
     }
 }
