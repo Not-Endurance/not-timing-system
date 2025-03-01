@@ -119,9 +119,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     )
     {
         LogInformation(request);
-
         var horses = await _horses.ReadAll();
-
         return new OkObjectResult(horses);
     }
 }

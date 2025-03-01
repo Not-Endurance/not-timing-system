@@ -8,7 +8,7 @@ public class MongoContext : IMongoContext
 {
     public MongoContext()
     {
-        var connectionString = @"mongodb://nts-mongo-dev:t4aX66O4VMIvO4vnLvMUEP3sVt8tfcAM651094Xl1WRzv1VsQY9qI48RTb7elIW7kEIt8AcJHfLPACDbrAqJEg==@nts-mongo-dev.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@nts-mongo-dev@";
+        var connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING");
         var settings = MongoClientSettings.FromUrl(new MongoUrl(connectionString));
         settings.SslSettings = new SslSettings() { EnabledSslProtocols = SslProtocols.Tls12 };
         Client = new MongoClient(settings);
