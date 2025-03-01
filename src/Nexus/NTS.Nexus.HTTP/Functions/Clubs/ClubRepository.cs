@@ -6,8 +6,8 @@ namespace NTS.Nexus.HTTP.Functions.Clubs;
 
 public class ClubRepository : MongoRepository<ClubDocument>
 {
-    public ClubRepository()
-        : base(MongoConstants.NTS_DATABASE, MongoConstants.CLUBS_COLLECTION) { }
+    public ClubRepository(IMongoContext context)
+        : base(context, MongoConstants.NTS_DATABASE, MongoConstants.CLUBS_COLLECTION) { }
 
     protected override UpdateDefinition<ClubDocument> GetUpdateDefinition(ClubDocument document)
     {

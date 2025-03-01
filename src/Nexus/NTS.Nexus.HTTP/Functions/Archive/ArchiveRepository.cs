@@ -1,6 +1,5 @@
 ﻿using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
-using NTS.Domain.Core.Aggregates;
 using NTS.Nexus.HTTP.Mongo;
 using NTS.Storage.Documents.EnduranceEvents;
 using NTS.Storage.Documents.EnduranceEvents.Models;
@@ -9,8 +8,8 @@ namespace NTS.Nexus.HTTP.Functions.Archive;
 
 public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchiveRepository
 {
-    public ArchiveRepository()
-        : base(MongoConstants.NTS_DATABASE, MongoConstants.ARCHIVE_COLLECTION) { }
+    public ArchiveRepository(IMongoContext context)
+        : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ARCHIVE_COLLECTION) { }
 
     protected override UpdateDefinition<EnduranceEventDocument> GetUpdateDefinition(
         EnduranceEventDocument document

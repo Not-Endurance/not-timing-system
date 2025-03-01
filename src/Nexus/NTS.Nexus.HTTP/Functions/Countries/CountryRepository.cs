@@ -6,8 +6,8 @@ namespace NTS.Nexus.HTTP.Functions.Countries;
 
 public class CountryRepository : MongoRepository<CountryDocument>
 {
-    public CountryRepository()
-        : base(MongoConstants.NTS_DATABASE, MongoConstants.COUNTRIES_COLLECTION) { }
+    public CountryRepository(IMongoContext context)
+        : base(context, MongoConstants.NTS_DATABASE, MongoConstants.COUNTRIES_COLLECTION) { }
 
     protected override UpdateDefinition<CountryDocument> GetUpdateDefinition(
         CountryDocument document

@@ -6,8 +6,8 @@ namespace NTS.Nexus.HTTP.Functions.Athletes;
 
 public class AthleteRepository : MongoRepository<AthleteDocument>
 {
-    public AthleteRepository()
-        : base(MongoConstants.NTS_DATABASE, MongoConstants.ATHLETES_COLLECTION) { }
+    public AthleteRepository(IMongoContext context)
+        : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ATHLETES_COLLECTION) { }
 
     protected override UpdateDefinition<AthleteDocument> GetUpdateDefinition(
         AthleteDocument document
