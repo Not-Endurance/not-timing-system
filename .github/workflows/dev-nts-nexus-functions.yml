@@ -11,7 +11,7 @@ env:
   OUTPUT_PATH: Nexus/NTS.Nexus.Test/published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
-  FUNCTIONS_SOURCE_PATH: src/Nexus/NTS.Nexus.Functions
+  FUNCTIONS_SOURCE_PATH: src/Nexus/NTS.Nexus.HTTP
 
 jobs:
   build:
