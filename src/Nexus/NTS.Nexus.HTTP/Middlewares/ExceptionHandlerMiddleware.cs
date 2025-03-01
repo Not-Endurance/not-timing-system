@@ -18,7 +18,6 @@ public class ExceptionHandlerMiddleware : IFunctionsWorkerMiddleware
         }
         catch (Exception ex)
         {
-
             if (request != null)
             {
                 HttpResponseData? response;
@@ -32,7 +31,11 @@ public class ExceptionHandlerMiddleware : IFunctionsWorkerMiddleware
                 else
                 {
                     response = request.CreateResponse(HttpStatusCode.InternalServerError);
-                    var errorMessage = new { Message = "An unexpected error occurred.", Exception = ex.Message };
+                    var errorMessage = new
+                    {
+                        Message = "An unexpected error occurred.",
+                        Exception = ex.Message,
+                    };
                     var responseBody = errorMessage.ToJson();
                     await response.WriteStringAsync(responseBody);
                 }
