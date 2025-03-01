@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Judge\NTS.Judge.MAUI.Server\NTS.Judge.MAUI.Server.csproj" />
     <ProjectReference Include="..\..\src\Judge\NTS.Judge\NTS.Judge.csproj" />
     <ProjectReference Include="..\..\src\Not\Not.Tests\Not.Tests.csproj" />
     <ProjectReference Include="..\..\src\NTS.Storage\NTS.Storage.csproj" />

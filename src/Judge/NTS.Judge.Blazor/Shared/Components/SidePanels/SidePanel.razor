@@ -1,4 +1,5 @@
-﻿@using NTS.Judge.Blazor.Shared.Components.SidePanels.RFID
+﻿@using NTS.Judge.Blazor.Shared.Components.ConnectionStatus
+@using NTS.Judge.Blazor.Shared.Components.SidePanels.RFID
 
 @inherits NComponent
 
@@ -11,4 +12,5 @@
     {
         <RfidPanel EnduranceEventStarted="CoreBehind.IsStarted" />
     }
+    <ConnectionStatus/>
 </MudStack>

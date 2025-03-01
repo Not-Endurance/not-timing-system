@@ -19,9 +19,10 @@ public class FilesystemLoggerInitalizer : IStartupInitializer
     {
         LoggingHelper.Validate();
 
+        var filename = _context.Name != null ? _context.Name + ".Log.txt" : "log.txt";
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
-            .WriteTo.File($"{_context.Path}/log.txt")
+            .WriteTo.File($"{_context.Path}/{filename}")
             .CreateLogger();
     }
 }

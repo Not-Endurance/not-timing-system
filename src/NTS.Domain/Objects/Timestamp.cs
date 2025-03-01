@@ -54,16 +54,6 @@ public record Timestamp : DomainObject, IComparable<Timestamp>
         return left?._stamp > right?._stamp;
     }
 
-    public static bool operator <(Timestamp? left, DateTimeOffset? right)
-    {
-        return left?._stamp < right;
-    }
-
-    public static bool operator >(Timestamp? left, DateTimeOffset? right)
-    {
-        return left?._stamp > right;
-    }
-
     public static TimeInterval? operator -(Timestamp? left, Timestamp? right)
     {
         if (left == null || right == null)

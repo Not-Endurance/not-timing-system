@@ -3,6 +3,5 @@
 namespace NTS.Application.RPC;
 
 public interface IJudgeClientProcedures
-{
-    Task Process(IEnumerable<Snapshot> snapshots);
-}
+    : IParticipationClientProcedures,
+        IConnectionsClientProcedures { }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Not.Application.CRUD.Ports;
+using Not.Concurrency.Extensions;
 using Not.Safe;
 using NTS.ACL.Entities;
 using NTS.ACL.Entities.EMS;
@@ -10,12 +11,9 @@ using NTS.Application.RPC;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 
-namespace NTS.Judge.MAUI.Server.RPC;
+namespace NTS.Relay.RPC;
 
-public class WitnessRpcHub
-    : Hub<IEmsClientProcedures>,
-        IEmsStartlistHubProcedures,
-        IEmsEmsParticipantstHubProcedures
+public class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistHubProcedures
 {
     readonly IRead<Participation> _participations;
     readonly IRead<EnduranceEvent> _events;
@@ -30,6 +28,18 @@ public class WitnessRpcHub
         _participations = participations;
         _events = events;
         _judgeRelay = judgeRelay;
+    }
+
+    public override async Task OnConnectedAsync()
+    {
+        var connectionId = base.Context.ConnectionId;
+        await _judgeRelay.Clients.All.ReceiveRemoteConnectionId(connectionId);
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        var connectionId = base.Context.ConnectionId;
+        await _judgeRelay.Clients.All.ReceiveRemoteDisconnectId(connectionId);
     }
 
     public Dictionary<int, EmsStartlist> SendStartlist()
@@ -83,12 +93,12 @@ public class WitnessRpcHub
         return startlists;
     }
 
-    public EmsParticipantsPayload SendParticipants()
+    public async Task<EmsParticipantsPayload> SendParticipants()
     {
-        var participants = _participations
+        var participants = await _participations
             .ReadAll(x => !x.IsEliminated() && !x.IsComplete())
-            .Result.Select(ParticipantEntryFactory.Create);
-        var enduranceEvent = _events.Read(0).Result;
+            .Select(ParticipantEntryFactory.Create);
+        var enduranceEvent = await _events.Read(0);
         return new EmsParticipantsPayload
         {
             Participants = participants.ToList(),
@@ -122,7 +132,7 @@ public class WitnessRpcHub
                 var snapshot = SnapshotFactory.Create(entry, type, isFinal);
                 snapshots.Add(snapshot);
             }
-            await _judgeRelay.Clients.All.Process(snapshots);
+            await _judgeRelay.Clients.All.ReceiveSnapshots(snapshots);
         });
     }
 }

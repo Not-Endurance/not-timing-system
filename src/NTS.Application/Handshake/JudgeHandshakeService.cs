@@ -2,10 +2,9 @@
 using System.Net.Sockets;
 using System.Text;
 using Not.Injection;
-using NTS.ACL.Handshake;
-using static NTS.Judge.MAUI.Server.ACL.Constants;
+using static NTS.Relay.ACL.Constants;
 
-namespace Core.Application.Services;
+namespace NTS.Application.Handshake;
 
 public class JudgeHandshakeService : INetworkBroadcastService, IHandshakeService
 {
