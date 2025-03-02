@@ -6,9 +6,9 @@ using NTS.Judge.Blazor.Ports;
 
 namespace NTS.Judge.Adapters;
 
-public class CountriesContext : HttpCache<Country>, ICountryCache
+public class CountryCache : HttpCache<Country>, ICountryCache
 {
-    public CountriesContext(IRepository<Country> countries) : base(countries)
+    public CountryCache(IRepository<Country> countries) : base(countries)
     {
     }
 
