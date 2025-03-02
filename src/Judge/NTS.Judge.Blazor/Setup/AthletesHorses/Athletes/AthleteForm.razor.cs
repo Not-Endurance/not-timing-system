@@ -20,7 +20,7 @@ public partial class AthleteForm
         .ToList();
 
     [Inject]
-    ICountriesContext Countries { get; set; } = default!;
+    ICountryCache Countries { get; set; } = default!;
 
     public override void RegisterValidationInjectors()
     {

@@ -158,15 +158,15 @@ public static class SafeHelper
 
     static void HandleError(Exception ex)
     {
-#if DEBUG
-        throw ex;
-#else
+//#if DEBUG
+//        throw ex;
+//#else
         NotifyHelper.Error(ex);
         var logMessage =
             $"An error {ex.Message} was thrown at {ex.Source} with trace \n {ex.StackTrace}";
         LoggingHelper.Error(logMessage);
         WriteToTraceConsole(ex);
-#endif
+//#endif
     }
 
 #pragma warning disable IDE0051 // Used in RELEASE build

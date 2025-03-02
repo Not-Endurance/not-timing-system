@@ -12,7 +12,7 @@ public partial class EnduranceEventForm
     NAutocomplete<Country?> _countryField = default!;
 
     [Inject]
-    ICountriesContext Countries { get; set; } = default!;
+    ICountryCache Countries { get; set; } = default!;
 
     public override void RegisterValidationInjectors()
     {
