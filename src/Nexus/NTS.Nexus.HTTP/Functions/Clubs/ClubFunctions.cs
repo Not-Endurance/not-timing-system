@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
+using Not.Async;
 using Not.Serialization;
 using NTS.Domain.Aggregates;
 using NTS.Nexus.HTTP.Logger;
@@ -9,17 +10,17 @@ using NTS.Storage.Documents.Clubs;
 
 namespace NTS.Nexus.HTTP.Functions.Clubs;
 
-public class ClubsFunctions : FunctionBase<ClubsFunctions>
+public class ClubFunctions : FunctionBase<ClubFunctions>
 {
     readonly IRepository<ClubDocument> _clubs;
 
-    public ClubsFunctions(IFunctionLogger<ClubsFunctions> logger, IRepository<ClubDocument> clubs)
+    public ClubFunctions(IFunctionLogger<ClubFunctions> logger, IRepository<ClubDocument> clubs)
         : base(logger)
     {
         _clubs = clubs;
     }
 
-    [Function("club-insert")]
+    [Function("clubs-insert")]
     public async Task<IActionResult> Insert(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "clubs")] HttpRequest request
     )
@@ -34,7 +35,7 @@ public class ClubsFunctions : FunctionBase<ClubsFunctions>
         return new OkObjectResult($"Inserted {club}");
     }
 
-    [Function("club-update")]
+    [Function("clubs-update")]
     public async Task<IActionResult> Update(
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "clubs")] HttpRequest request
     )
@@ -49,7 +50,7 @@ public class ClubsFunctions : FunctionBase<ClubsFunctions>
         return new OkObjectResult($"Updated {club}");
     }
 
-    [Function("club-delete")]
+    [Function("clubs-delete")]
     public async Task<IActionResult> Delete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "clubs/{id:int}")]
             HttpRequest request,
@@ -62,7 +63,7 @@ public class ClubsFunctions : FunctionBase<ClubsFunctions>
         return new OkObjectResult($"Deleted club with id '{id}'");
     }
 
-    [Function("club-get-one")]
+    [Function("clubs-get-one")]
     public async Task<IActionResult> GetOne(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs/{id:int}")]
             HttpRequest request,
@@ -72,17 +73,19 @@ public class ClubsFunctions : FunctionBase<ClubsFunctions>
         LogInformation(request);
 
         var club = await _clubs.Read(id);
-        return new OkObjectResult(club);
+        return new OkObjectResult(club?.ToDomain());
     }
 
-    [Function("club-list")]
+    [Function("clubs-list")]
     public async Task<IActionResult> List(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs")] HttpRequest request
     )
     {
         LogInformation(request);
 
-        var clubs = await _clubs.ReadAll();
+        var clubs = await _clubs
+            .ReadAll()
+            .Select(x => x.ToDomain());
         return new OkObjectResult(clubs);
     }
 }

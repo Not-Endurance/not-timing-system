@@ -12,4 +12,9 @@ public class ClubDocument : Document
     }
 
     public string Name { get; init; }
+
+    public Club ToDomain()
+    {
+        return new Club(Id, Name);
+    }
 }

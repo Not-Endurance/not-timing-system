@@ -5,18 +5,17 @@ using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Serialization;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Storage.Documents.Countries;
 
 namespace NTS.Nexus.HTTP.Functions.Countries;
 
-public class CountriesFunctions : FunctionBase<CountriesFunctions>
+public class CountryFunctions : FunctionBase<CountryFunctions>
 {
     readonly IRepository<CountryDocument> _countries;
 
-    public CountriesFunctions(
-        IFunctionLogger<CountriesFunctions> logger,
+    public CountryFunctions(
+        IFunctionLogger<CountryFunctions> logger,
         IRepository<CountryDocument> countries
     )
         : base(logger)
@@ -24,7 +23,7 @@ public class CountriesFunctions : FunctionBase<CountriesFunctions>
         _countries = countries;
     }
 
-    [Function("country-insert")]
+    [Function("countries-insert")]
     public async Task<IActionResult> Insert(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "countries")] HttpRequest request
     )
@@ -39,7 +38,7 @@ public class CountriesFunctions : FunctionBase<CountriesFunctions>
         return new OkObjectResult($"Inserted {country}");
     }
 
-    [Function("country-update")]
+    [Function("countries-update")]
     public async Task<IActionResult> Update(
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "countries")]
             HttpRequest request
@@ -55,14 +54,16 @@ public class CountriesFunctions : FunctionBase<CountriesFunctions>
         return new OkObjectResult($"Updated {country}");
     }
 
-    [Function("country-list")]
+    [Function("countries-list")]
     public async Task<IActionResult> List(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "countries")] HttpRequest request
     )
     {
         LogInformation(request);
 
-        var countries = await _countries.ReadAll();
+        var countries = await _countries
+            .ReadAll()
+            .Select(x => x.ToDomain());
         return new OkObjectResult(countries);
     }
 }

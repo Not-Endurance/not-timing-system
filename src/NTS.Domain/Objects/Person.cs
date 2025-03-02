@@ -18,6 +18,11 @@ public class Person
         return member.Names;
     }
 
+    public static implicit operator Person(string[] names)
+    {
+        return new Person(names);
+    }
+
     public static implicit operator string(Person person)
     {
         return person.ToString();

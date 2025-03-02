@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+﻿using Not.Domain.Base;
 
 namespace NTS.Domain.Core.Aggregates;
 
 public class Official : AggregateRoot, IAggregateRoot
 {
-    [JsonConstructor]
-    Official(int id, Person? person, OfficialRole? role)
+    [Newtonsoft.Json.JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Official(int id, Person? person, OfficialRole? role)
         : base(id)
     {
         Person = Required(nameof(Person), person);

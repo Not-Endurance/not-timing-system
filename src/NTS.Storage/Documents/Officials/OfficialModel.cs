@@ -14,4 +14,9 @@ public class OfficialModel : Document
 
     public string[] Names { get; init; }
     public OfficialRole Role { get; init; }
+
+    public Official ToDomain()
+    {
+        return new Official(Id, Names, Role);
+    }
 }

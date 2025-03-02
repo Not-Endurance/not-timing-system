@@ -31,4 +31,9 @@ public class EnduranceEventDocument : Document, IAggregateRoot // TODO: question
     public DateTimeOffset EndDay { get; init; }
     public OfficialModel[] Officials { get; init; }
     public RankingModel[] Rankings { get; init; }
+
+    public EnduranceEvent ToDomain()
+    {
+        return new EnduranceEvent(Id, Country.ToDomain(), City, Location ?? "", StartDay, EndDay, null, null, null); // TODO: fix for FEI
+    }
 }

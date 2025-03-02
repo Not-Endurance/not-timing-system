@@ -1,4 +1,5 @@
-﻿using Not.Domain.Base;
+﻿using Newtonsoft.Json;
+using Not.Domain.Base;
 
 namespace NTS.Domain.Aggregates;
 
@@ -11,6 +12,13 @@ public class Club : AggregateRoot
             return null;
         }
         return new Club(name);
+    }
+
+    [System.Text.Json.Serialization.JsonConstructor]
+    [JsonConstructor]
+    public Club(int id, string name) : base(id)
+    {
+        Name = name;
     }
 
     public Club(string name) : base(GenerateId())

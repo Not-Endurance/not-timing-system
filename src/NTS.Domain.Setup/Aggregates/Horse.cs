@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+﻿using Not.Domain.Base;
 
 namespace NTS.Domain.Setup.Aggregates;
 
@@ -15,16 +14,17 @@ public class Horse : AggregateRoot, IAggregateRoot
         return new(id, name, feiId);
     }
 
-    [JsonConstructor]
-    Horse(int id, string? name, string? feiId)
+    Horse(string? name, string? feiId)
+        : this(GenerateId(), name, feiId) { }
+
+    [Newtonsoft.Json.JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Horse(int id, string? name, string? feiId)
         : base(id)
     {
         Name = Required(nameof(Name), name);
         FeiId = feiId;
     }
-
-    Horse(string? name, string? feiId)
-        : this(GenerateId(), name, feiId) { }
 
     public string? FeiId { get; }
     public string Name { get; }

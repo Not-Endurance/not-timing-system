@@ -37,4 +37,9 @@ public class AthleteDocument : Document
     public AthleteCategory Category { get; init; }
     public CountryDocument? Country { get; init; } // TODO: should be required
     public ClubDocument? Club { get; init; }
+
+    public Athlete ToDomain()
+    {
+        return new Athlete(Id, Names, FeiId, Country?.ToDomain(), Club?.ToDomain(), Category);
+    }
 }
