@@ -2,7 +2,7 @@ using MudBlazor;
 using Not.Blazor.Components;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Shared.Contexts;
+using NTS.Judge.Blazor.Ports;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 

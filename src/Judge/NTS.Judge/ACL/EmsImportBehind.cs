@@ -6,6 +6,7 @@ using Not.Serialization;
 using NTS.ACL;
 using NTS.ACL.Entities.Competitions;
 using NTS.ACL.Entities.EnduranceEvents;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;

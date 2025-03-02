@@ -7,6 +7,7 @@ using NTS.ACL.Entities.Competitions;
 using NTS.ACL.Entities.EnduranceEvents;
 using NTS.ACL.Enums;
 using NTS.ACL.Factories;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
