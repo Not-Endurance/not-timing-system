@@ -1,16 +1,27 @@
-﻿using Not.Async;
+﻿using Not.Application.CRUD.Ports;
+using Not.Async;
+using Not.Domain;
 using Not.Injection;
 using Not.Structures;
 
 namespace Not.Application.HTTP;
 
 public abstract class HttpCache<T> : IHttpCache<T>
-    where T : class, IIdentifiable
+    where T : class, IAggregateRoot, IIdentifiable
 {
     readonly SemaphoreSlim _semaphore = new(1);
+    readonly IRepository<T> _repository;
     List<T> _cache = [];
 
-    protected abstract Task<IEnumerable<T>> FetchItems();
+    protected HttpCache(IRepository<T> repository)
+    {
+        _repository = repository;
+    }
+
+    protected async Task<IEnumerable<T>> FetchItems()
+    {
+        return await _repository.ReadAll();
+    }
 
     public async Task<T?> Get(int id)
     {

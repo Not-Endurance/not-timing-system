@@ -4,7 +4,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.StaticOptions;
 
-// TODO: StaticOptions needs a redesign as it is too intertwined with infrastructure to be in the Domain layer
+// TODO: Move static options in Mongo
 public class StaticOption : IStartupInitializer
 {
     public static bool IsRfidDetectionEnabled()
@@ -57,7 +57,6 @@ public class StaticOption : IStartupInitializer
     }
 
     public static IRegionOption? Regional { get; private set; }
-    public static Country[] Countries { get; private set; } = [];
     public static Country? SelectedCountry { get; private set; }
     public static DetectionMode? Detection { get; private set; }
 
@@ -65,7 +64,6 @@ public class StaticOption : IStartupInitializer
     {
         _options = _provider.Get();
         SelectedCountry = _options.SelectedCountry;
-        Countries = _options.Countries;
         Regional = RegionOptionProvider.Get(_options.SelectedCountry);
         Detection = _options.DetectionMode;
     }

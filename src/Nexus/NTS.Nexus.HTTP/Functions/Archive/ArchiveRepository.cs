@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
+using NTS.Application.Mongo;
 using NTS.Nexus.HTTP.Mongo;
 using NTS.Storage.Documents.EnduranceEvents;
 using NTS.Storage.Documents.EnduranceEvents.Models;

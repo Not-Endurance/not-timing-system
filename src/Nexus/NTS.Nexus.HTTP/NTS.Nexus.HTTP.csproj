@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
@@ -9,6 +10,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
+  
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
@@ -20,12 +22,14 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.2.0" />
   </ItemGroup>
+  
   <ItemGroup>
-    <ProjectReference Include="..\..\Not\Not.Application\Not.Application.csproj" />
     <ProjectReference Include="..\..\Not\Not\Not.csproj" />
+    <ProjectReference Include="..\..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
     <ProjectReference Include="..\..\NTS.Storage\NTS.Storage.csproj" />
   </ItemGroup>
+  
   <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -35,7 +39,9 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+  
   <ItemGroup>
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
   </ItemGroup>
+  
 </Project>

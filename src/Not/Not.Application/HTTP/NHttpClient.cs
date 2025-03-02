@@ -18,13 +18,12 @@ public class NHttpClient
         _logger = logger;
     }
 
-    public async Task<string> Get(string endpoint)
+    public async Task<string?> Get(string endpoint)
     {
         var url = BuildUrl(endpoint);
         try
         {
             var response = await _httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode();
             return await ReadResponse(response);
         }
         catch (Exception ex)

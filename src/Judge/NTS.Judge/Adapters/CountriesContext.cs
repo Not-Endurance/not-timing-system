@@ -1,5 +1,5 @@
-﻿using Not.Application.HTTP;
-using Not.Serialization;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.HTTP;
 using Not.Strings;
 using NTS.Domain.Aggregates;
 using NTS.Judge.Blazor.Ports;
@@ -8,17 +8,8 @@ namespace NTS.Judge.Adapters;
 
 public class CountriesContext : HttpCache<Country>, ICountryCache
 {
-    readonly NHttpClient _client;
-
-    public CountriesContext(NHttpClient client)
+    public CountriesContext(IRepository<Country> countries) : base(countries)
     {
-        _client = client;
-    }
-
-    protected override async Task<IEnumerable<Country>> FetchItems()
-    {
-        var resposne = await _client.Get("countries");
-        return resposne.FromJson<IEnumerable<Country>>();
     }
 
     public async Task<IEnumerable<Country>> Search(string term)
