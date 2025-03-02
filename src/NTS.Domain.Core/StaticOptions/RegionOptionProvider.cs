@@ -1,4 +1,5 @@
-﻿using NTS.Domain.Core.StaticOptions.Regions;
+﻿using NTS.Domain.Aggregates;
+using NTS.Domain.Core.StaticOptions.Regions;
 using NTS.Domain.Core.StaticOptions.Regions.Base;
 
 namespace NTS.Domain.Core.StaticOptions;

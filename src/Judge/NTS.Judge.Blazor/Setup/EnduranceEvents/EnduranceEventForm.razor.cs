@@ -1,6 +1,6 @@
 using MudBlazor;
 using Not.Blazor.Components;
-using NTS.Domain.Objects;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Shared.Contexts;
 

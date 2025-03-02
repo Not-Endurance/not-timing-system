@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Serialization;
-using NTS.Domain.Objects;
+using NTS.Domain.Aggregates;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Storage.Documents.Countries;
 

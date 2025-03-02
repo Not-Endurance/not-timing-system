@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Base;
 using Not.Localization;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 

@@ -1,12 +1,12 @@
 ﻿using Not.Random;
-using NTS.Domain.Objects;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Storage.Documents.Countries;
 
 public class CountryDocument : Document
 {
     public CountryDocument(Country country)
-        : base(RandomHelper.GenerateUniqueInteger())
+        : base(country.Id)
     {
         IsoCode = country.IsoCode;
         NfCode = country.NfCode;

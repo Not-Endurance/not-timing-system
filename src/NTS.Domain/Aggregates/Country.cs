@@ -1,10 +1,10 @@
 ﻿using Not.Domain.Base;
 
-namespace NTS.Domain.Objects;
+namespace NTS.Domain.Aggregates;
 
-public record Country : DomainObject
+public class Country : AggregateRoot
 {
-    public Country(string isoCode, string nfCode, string name)
+    public Country(string isoCode, string nfCode, string name) : base(GenerateId())
     {
         IsoCode = isoCode;
         NfCode = nfCode;

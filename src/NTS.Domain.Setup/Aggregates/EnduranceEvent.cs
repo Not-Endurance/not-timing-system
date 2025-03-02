@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Base;
 using Not.Domain.Exceptions;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Extensions;
 
 namespace NTS.Domain.Setup.Aggregates;

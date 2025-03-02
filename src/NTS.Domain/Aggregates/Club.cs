@@ -1,8 +1,8 @@
 ﻿using Not.Domain.Base;
 
-namespace NTS.Domain.Objects;
+namespace NTS.Domain.Aggregates;
 
-public record Club : DomainObject
+public class Club : AggregateRoot
 {
     public static Club? Create(string? name)
     {
@@ -13,7 +13,7 @@ public record Club : DomainObject
         return new Club(name);
     }
 
-    public Club(string name)
+    public Club(string name) : base(GenerateId())
     {
         Name = name;
     }

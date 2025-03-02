@@ -1,6 +1,6 @@
 ﻿using Not.Injection;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.StaticOptions;
-using NTS.Domain.Objects;
 
 namespace NTS.Judge.Blazor.Shared.Contexts;
 

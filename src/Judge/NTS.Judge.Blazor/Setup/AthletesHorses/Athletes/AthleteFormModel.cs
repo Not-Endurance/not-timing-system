@@ -1,6 +1,6 @@
 ﻿using Not.Blazor.CRUD.Forms.Ports;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.StaticOptions;
-using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;

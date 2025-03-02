@@ -1,5 +1,6 @@
 ﻿using Not.Domain.Ports;
 using Not.Startup;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.StaticOptions;
 
