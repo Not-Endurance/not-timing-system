@@ -29,9 +29,18 @@ public class Athlete : AggregateRoot, IAggregateRoot
         return new(id, Person.Create(name), feiId, country, Club.Create(club), category);
     }
 
+    Athlete(
+        Person? person,
+        string? feiId,
+        Country? country,
+        Club? club,
+        AthleteCategory? category
+    )
+        : this(GenerateId(), person, feiId, country, club, category) { }
+
     [System.Text.Json.Serialization.JsonConstructor]
     [JsonConstructor]
-    Athlete(
+    public Athlete(
         int id,
         Person? person,
         string? feiId,
@@ -47,15 +56,6 @@ public class Athlete : AggregateRoot, IAggregateRoot
         Club = Required(nameof(Club), club);
         Category = Required(nameof(Category), category);
     }
-
-    Athlete( //TODO: consider Club as persisted across Events (MAUI's raw resources?)
-        Person? person,
-        string? feiId,
-        Country? country,
-        Club? club,
-        AthleteCategory? category
-    )
-        : this(GenerateId(), person, feiId, country, club, category) { }
 
     public string? FeiId { get; }
     public Person Person { get; }

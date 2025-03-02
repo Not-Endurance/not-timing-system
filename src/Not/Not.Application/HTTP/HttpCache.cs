@@ -1,12 +1,12 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Domain;
-using Not.Injection;
+using Not.Cache;
 using Not.Structures;
 
 namespace Not.Application.HTTP;
 
-public abstract class HttpCache<T> : IHttpCache<T>
+public abstract class HttpCache<T> : ICache<T>
     where T : class, IAggregateRoot, IIdentifiable
 {
     readonly SemaphoreSlim _semaphore = new(1);
@@ -38,6 +38,39 @@ public abstract class HttpCache<T> : IHttpCache<T>
         return _cache;
     }
 
+    public void Clear()
+    {
+        _semaphore.Wait();
+        try
+        {
+            _cache.Clear();
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public void Update(T entry)
+    {
+        var match = _cache.FirstOrDefault(x => x.Id == entry.Id);
+        if (match != null)
+        {
+            _cache.Remove(match);
+            _cache.Add(entry);
+        }
+    }
+
+    public void Add(T entry)
+    {
+        _cache.Add(entry);
+    }
+
+    public void Delete(T entry)
+    {
+        _cache.Remove(entry);
+    }
+
     async Task LoadCache()
     {
         await _semaphore.WaitAsync();
@@ -50,11 +83,4 @@ public abstract class HttpCache<T> : IHttpCache<T>
             _semaphore.Release();
         }
     }
-}
-
-public interface IHttpCache<T> : ISingleton
-    where T : class
-{
-    Task<IEnumerable<T>> List();
-    Task<T?> Get(int id);
 }

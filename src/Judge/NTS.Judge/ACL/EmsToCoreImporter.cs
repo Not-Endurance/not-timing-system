@@ -44,7 +44,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
             throw new Exception($"Cannot import data as Event already exists: '{existingEvent}'");
         }
 
-        var emsState = emsJson.FromJson<EmsState>();
+        var emsState = emsJson.FromConvertedJson<EmsState>();
 
         var enduranceEvent = CreateEvent(emsState.Event, adjustTime);
         //TODOL interesting why some imports fail without ToList? 2024-vakarel (finished) for example

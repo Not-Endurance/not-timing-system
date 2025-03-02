@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
+using Not.Async;
 using Not.Serialization;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Storage.Documents.Countries;
 
@@ -30,7 +32,7 @@ public class CountriesFunctions : FunctionBase<CountriesFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var country = requestBody.FromJson<Country>();
+        var country = requestBody.FromConvertedJson<Country>();
         var document = new CountryDocument(country);
         await _countries.Create(document);
 
@@ -46,7 +48,7 @@ public class CountriesFunctions : FunctionBase<CountriesFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var country = requestBody.FromJson<Country>();
+        var country = requestBody.FromConvertedJson<Country>();
         var document = new CountryDocument(country);
         await _countries.Update(document);
 

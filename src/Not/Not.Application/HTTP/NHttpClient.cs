@@ -33,8 +33,9 @@ public class NHttpClient
         }
     }
 
-    public async Task<string> Delete(string url)
+    public async Task<string> Delete(string endpoint)
     {
+        var url = BuildUrl(endpoint);
         try
         {
             var response = await _httpClient.DeleteAsync(url);
@@ -67,7 +68,7 @@ public class NHttpClient
         {
             var request = new HttpRequestMessage(method, url)
             {
-                Content = new StringContent(payload.ToJson(), Encoding.UTF8, "application/json")
+                Content = new StringContent(payload.ToConvertedJson(), Encoding.UTF8, "application/json")
             };
 
             var response = await _httpClient.SendAsync(request);

@@ -39,7 +39,7 @@ public class StorageTests : JudgeIntegrationTest
             ),
         };
 
-        await AssertStateEquals(expectedState.ToJson());
+        await AssertStateEquals(expectedState.ToConvertedJson());
     }
 
     [Fact]

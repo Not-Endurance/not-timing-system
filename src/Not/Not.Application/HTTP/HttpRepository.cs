@@ -135,6 +135,6 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
 
     string BuildUrl(int id)
     {
-        return $"{_endpoint}/{{{id}}}";
+        return $"{_endpoint}/{id}";
     }
 }

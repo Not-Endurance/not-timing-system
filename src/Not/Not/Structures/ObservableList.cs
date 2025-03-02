@@ -68,8 +68,16 @@ public class ObservableList<T> : IReadOnlyList<T>
 
     public void AddRange(IEnumerable<T> items)
     {
-        _dictionary = items.ToDictionary(x => x.Id, x => x);
+        foreach (var (key, value) in items.ToDictionary(x => x.Id, x => x))
+        {
+            _dictionary.Add(key, value);
+        }
         ChangedEvent.Emit();
+    }
+
+    public void Clear()
+    {
+        _dictionary.Clear();
     }
 
     public bool Contains(T item)

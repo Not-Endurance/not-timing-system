@@ -43,7 +43,7 @@ public class EmsImporters : IEmsImporter
     async Task SafeImport(string emsStateFilePath)
     {
         var contents = await File.ReadAllTextAsync(emsStateFilePath);
-        var emsState = contents.FromJson<EmsState>();
+        var emsState = contents.FromConvertedJson<EmsState>();
 
         var country = new Country(
             emsState.Event.Country.IsoCode,

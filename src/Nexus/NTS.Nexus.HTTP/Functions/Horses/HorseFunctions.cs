@@ -35,7 +35,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var horse = requestBody.FromJson<Horse>();
+        var horse = requestBody.FromConvertedJson<Horse>();
         var document = new HorseDocument(horse);
         await _horses.Create(document);
 
@@ -50,7 +50,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var horse = requestBody.FromJson<Horse>();
+        var horse = requestBody.FromConvertedJson<Horse>();
         var document = new HorseDocument(horse);
         await _horses.Update(document);
 

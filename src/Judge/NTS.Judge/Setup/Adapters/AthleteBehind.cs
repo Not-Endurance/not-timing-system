@@ -1,14 +1,15 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Judge.Blazor.Ports;
 using NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 
 namespace NTS.Judge.Setup.Adapters;
 
 public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>
 {
-    public AthleteBehind(IRepository<Athlete> repository)
-        : base(repository) { }
+    public AthleteBehind(IRepository<Athlete> repository, IAthleteCache cache)
+        : base(repository, cache) { }
 
     protected override Athlete CreateEntity(AthleteFormModel model)
     {

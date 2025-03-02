@@ -4,6 +4,8 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Serialization;
+using NTS.Domain.Aggregates;
+using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Archive;
 using NTS.Nexus.HTTP.Logger;
@@ -35,7 +37,7 @@ public class AthletesFunctions : FunctionBase<AthletesFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var athlete = requestBody.FromJson<Athlete>();
+        var athlete = requestBody.FromConvertedJson<Athlete>();
         var document = new AthleteDocument(athlete);
         await _athletes.Create(document);
 
@@ -50,7 +52,7 @@ public class AthletesFunctions : FunctionBase<AthletesFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var athlete = requestBody.FromJson<Athlete>();
+        var athlete = requestBody.FromConvertedJson<Athlete>();
         var document = new AthleteDocument(athlete);
         await _athletes.Update(document);
 
@@ -115,7 +117,17 @@ public class AthletesFunctions : FunctionBase<AthletesFunctions>
     )
     {
         LogInformation(request);
-        var athletes = await _athletes.ReadAll();
+
+        // TODO: Implement response mapping layer for documents back to aggregates
+        var athletes = await _athletes
+            .ReadAll()
+            .Select(x => new Athlete(
+                x.Id, 
+                new Person(x.Names),
+                x.FeiId,
+                x.Country == null ? null : new Country(x.Country.IsoCode, x.Country.NfCode, x.Country.Name),
+                x.Club == null ? null : new Club(x.Club.Name),
+                x.Category));
         return new OkObjectResult(athletes);
     }
 }

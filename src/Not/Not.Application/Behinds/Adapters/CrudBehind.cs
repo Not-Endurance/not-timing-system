@@ -2,6 +2,7 @@
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
 using Not.Blazor.Ports;
+using Not.Cache;
 using Not.Domain.Base;
 using Not.Exceptions;
 using Not.Reflection;
@@ -17,6 +18,7 @@ public abstract class CrudBehind<T, TModel>
 {
     readonly IParentContext<T>? _parentContext;
     readonly IRepository<T> _repository;
+    readonly ICache<T>? _cache;
 
     /// <summary>
     /// Instantiates a CRUD behind capable of handling child items using <seealso cref="IParentContext{T}"/>
@@ -34,16 +36,18 @@ public abstract class CrudBehind<T, TModel>
     /// Instatiates a basic CRUD behind for a standalone or root-level entity
     /// </summary>
     /// <param name="repository">Entity's repository</param
-    protected CrudBehind(IRepository<T> repository)
+    protected CrudBehind(IRepository<T> repository, ICache<T>? cache = null)
         : base([])
     {
         _repository = repository;
+        _cache = cache;
     }
 
     protected abstract T CreateEntity(TModel model);
     protected abstract T UpdateEntity(TModel model);
 
     public IReadOnlyList<T> Items => ObservableList;
+    public Guid Id { get; } = Guid.NewGuid();
 
     protected virtual async Task OnBeforeCreate(T entity)
     {
@@ -72,6 +76,10 @@ public abstract class CrudBehind<T, TModel>
         }
     }
 
+    // TODO: refactor this initialization flow. Currently after Update it emmits change and then PerformInitialization is called again
+    // which leads to ObservableList being overwritten. This is not intuitive and is a problem, because then ICache is used that cache
+    // also has to be updated. Too many sources of sporradic truth. But it also has to run every time in order to reflect changes in children
+    // See comment at the end of the method
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
         if (_parentContext != null)
@@ -101,7 +109,10 @@ public abstract class CrudBehind<T, TModel>
         }
         else
         {
-            var entities = await _repository.ReadAll();
+            var entities = _cache != null
+                ? await _cache.List()
+                : await _repository.ReadAll();
+            ObservableList.Clear();
             ObservableList.AddRange(entities);
         }
         // Has to be false in order to be able to reintialize and update if any children are changed
@@ -114,6 +125,7 @@ public abstract class CrudBehind<T, TModel>
         await OnBeforeUpdate(entity);
         await _repository.Update(entity);
         ObservableList.AddOrReplace(entity);
+        _cache?.Update(entity);
     }
 
     public async Task Create(TModel model)
@@ -122,9 +134,8 @@ public abstract class CrudBehind<T, TModel>
         await OnBeforeCreate(entity);
         await _repository.Create(entity);
         ObservableList.AddOrReplace(entity);
+        _cache?.Add(entity);
     }
-
-    #region Safe pattern
 
     public async Task Delete(T entity)
     {
@@ -136,7 +147,6 @@ public abstract class CrudBehind<T, TModel>
         await OnBeforeDelete(entity);
         await _repository.Delete(entity);
         ObservableList.Remove(entity);
+        _cache?.Delete(entity);
     }
-
-    #endregion
 }
