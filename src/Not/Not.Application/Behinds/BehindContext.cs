@@ -1,10 +1,12 @@
 ﻿using Not.Application.CRUD.Ports;
+using Not.Blazor.Ports;
+using Not.Domain;
 using Not.Domain.Base;
 using Not.Exceptions;
 
 namespace Not.Application.Behinds;
 
-public abstract class BehindContext<T>
+public abstract class BehindContext<T> : IParentContext
     where T : AggregateRoot
 {
     protected BehindContext(IRepository<T> repository)
@@ -15,9 +17,12 @@ public abstract class BehindContext<T>
     protected IRepository<T> Repository { get; }
     public T? Entity { get; set; }
 
-    public bool HasLoaded()
+    public void SetParent(IParent entity)
     {
-        return Entity != null;
+        if (entity is T competition)
+        {
+            Entity = competition;
+        }
     }
 
     public async Task Persist()

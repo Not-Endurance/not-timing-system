@@ -32,7 +32,10 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> _)
     {
-        await _context.Load(0);
+        if (_context.Entity == null)
+        {
+            await _context.Load(0);
+        }
         if (_context.Entity == null)
         {
             return false;

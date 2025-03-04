@@ -1,5 +1,6 @@
 ﻿using Not.Application.Behinds;
 using Not.Application.CRUD.Ports;
+using Not.Domain;
 using Not.Structures;
 using NTS.Domain.Setup.Aggregates;
 

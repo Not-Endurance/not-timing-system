@@ -1,11 +1,8 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
-using Not.Blazor.Ports;
 using Not.Cache;
 using Not.Domain.Base;
-using Not.Exceptions;
-using Not.Reflection;
 using Not.Safe;
 
 namespace Not.Application.Behinds.Adapters;
@@ -76,46 +73,14 @@ public abstract class CrudBehind<T, TModel>
         }
     }
 
-    // TODO: refactor this initialization flow. Currently after Update it emmits change and then PerformInitialization is called again
-    // which leads to ObservableList being overwritten. This is not intuitive and is a problem, because then ICache is used that cache
-    // also has to be updated. Too many sources of sporradic truth. But it also has to run every time in order to reflect changes in children
-    // See comment at the end of the method
+    // TODO: Remove arguments and cache as they are no longer necessary. 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
-        if (_parentContext != null)
-        {
-            // Since it's it's a child it asssumes that it's parent is initiazliaed already. I.e. that EnduranceEvent is already
-            // initialized and _parentContext.Entity is not null for Competitions.
-            // If it can be invoked autonomously then it can be initialized using args
-            if (!_parentContext.HasLoaded() && !arguments.Any())
-            {
-                var name = this.GetTypeName();
-                var message =
-                    $"{name} is used as standalone child behind. "
-                    + $"I.e. it depends on parent context '{_parentContext.GetTypeName()}' which isn't loaded."
-                    + $"Either use initialize the context preemptively or pass parentId to '{name}.{nameof(IObservableBehind.Initialize)}'";
-                throw GuardHelper.Exception(message);
-            }
-            if (arguments.Any())
-            {
-                var argument = arguments.First();
-                if (argument is not int parentId)
-                {
-                    var message = $"Invalid argument '{argument.GetTypeName()}'";
-                    throw GuardHelper.Exception(message);
-                }
-                await _parentContext.Load(parentId);
-            }
-        }
-        else
-        {
-            var entities = _cache != null
-                ? await _cache.List()
-                : await _repository.ReadAll();
-            ObservableList.Clear();
-            ObservableList.AddRange(entities);
-        }
-        // Has to be false in order to be able to reintialize and update if any children are changed
+        var entities = _cache != null
+            ? await _cache.List()
+            : await _repository.ReadAll();
+        ObservableList.Clear();
+        ObservableList.AddRange(entities);
         return ActualizeEveryTime;
     }
 

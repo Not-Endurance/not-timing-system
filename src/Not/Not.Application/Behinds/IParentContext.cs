@@ -1,14 +1,13 @@
-﻿using Not.Injection;
+﻿using Not.Blazor.Ports;
+using Not.Domain.Base;
 using Not.Structures;
 
 namespace Not.Application.Behinds;
 
-public interface IParentContext<T> : ISingleton
-    where T : IIdentifiable
+public interface IParentContext<T> : IParentContext
+    where T : AggregateRoot
 {
-    bool HasLoaded();
-    Task Load(int parentId);
-    Task Persist();
+    Task Persist(); // TODO: consider removing persist and changing Add/Update/Remove to task
     ObservableList<T> Children { get; }
     void Add(T child);
     void Update(T child);

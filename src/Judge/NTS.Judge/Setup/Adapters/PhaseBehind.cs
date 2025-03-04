@@ -8,12 +8,9 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class PhaseBehind : CrudBehind<Phase, PhaseFormModel>
 {
-    readonly CompetitionParentContext _parentContext;
-
     public PhaseBehind(IRepository<Phase> phase, CompetitionParentContext parentContext)
         : base(phase, parentContext)
     {
-        _parentContext = parentContext;
     }
 
     protected override Phase CreateEntity(PhaseFormModel model)
