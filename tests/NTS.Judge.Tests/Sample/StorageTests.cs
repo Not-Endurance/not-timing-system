@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Not.Blazor.CRUD.Ports;
 using Not.Serialization;
-using NTS.Domain.Objects;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents;
 using NTS.Storage.Setup;

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Not.Application.RPC;
 using Not.Filesystem;
 using Not.Injection;
@@ -18,8 +19,9 @@ public abstract class JudgeIntegrationTest : IntegrationTest
     {
         FileContextHelper.SetDebugRootDirectory("nts");
         var services = new ServiceCollection();
+        var configuration = new ConfigurationBuilder().Build();
         return services
-            .ConfigureJudge()
+            .ConfigureJudge(configuration)
             .AddRpcSocket(
                 RpcProtocol.Http,
                 "localhost",
