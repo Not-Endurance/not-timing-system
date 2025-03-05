@@ -1,5 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Blazor.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.AthletesHorses.Horses;
 
@@ -7,8 +8,8 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class HorseBehind : CrudBehind<Horse, HorseFormModel>
 {
-    public HorseBehind(IRepository<Horse> repository)
-        : base(repository) { }
+    public HorseBehind(IRepository<Horse> repository, IEnumerable<ISingleParentContext> singleParentContexts)
+        : base(repository, singleParentContexts) { }
 
     protected override Horse CreateEntity(HorseFormModel model)
     {

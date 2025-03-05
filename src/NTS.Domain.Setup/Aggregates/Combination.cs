@@ -3,7 +3,7 @@ using Not.Domain.Base;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Combination : AggregateRoot, IParent, IAggregateRoot
+public class Combination : AggregateRoot, IParent, ISingleParent<Athlete>, ISingleParent<Horse>
 {
     public static Combination Create(int number, Athlete? athlete, Horse? horse, Tag? tag)
     {
@@ -29,13 +29,29 @@ public class Combination : AggregateRoot, IParent, IAggregateRoot
         : this(GenerateId(), number, athlete, horse, tag) { }
 
     public int Number { get; }
-    public Athlete Athlete { get; }
-    public Horse Horse { get; }
+    public Athlete Athlete { get; private set; }
+    public Horse Horse { get; private set; }
     public Tag? Tag { get; }
 
     public override string ToString()
     {
         var number = $"{"#".Localize()}{Number}";
         return Combine(number, Athlete, Horse);
+    }
+
+    public void Update(Horse child)
+    {
+        if (Horse == child)
+        {
+            Horse = child;
+        }
+    }
+
+    public void Update(Athlete child)
+    {
+        if (Athlete == child)
+        {
+            Athlete = child;
+        }
     }
 }

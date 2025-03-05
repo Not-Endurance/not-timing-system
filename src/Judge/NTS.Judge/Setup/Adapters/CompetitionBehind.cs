@@ -1,6 +1,7 @@
 ﻿using Not.Application.Behinds;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Blazor.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions;
 using NTS.Judge.Core.Behinds;
@@ -16,9 +17,10 @@ public class CompetitionBehind : CrudBehind<Competition, CompetitionFormModel>
         IRepository<Competition> competitions,
         EventParentContext parentContext,
         IParentContext<Phase> phaseParent,
-        IParentContext<Participation> participationParent
+        IParentContext<Participation> participationParent,
+        IEnumerable<ISingleParentContext> singleParentContexts
     )
-        : base(competitions, parentContext)
+        : base(competitions, singleParentContexts, parentContext)
     {
         _phaseParent = phaseParent;
         _participationParent = participationParent;

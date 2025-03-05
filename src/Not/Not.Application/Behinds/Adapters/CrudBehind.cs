@@ -1,6 +1,8 @@
-﻿using Not.Application.CRUD.Ports;
+﻿using System.Transactions;
+using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
+using Not.Blazor.Ports;
 using Not.Domain.Base;
 using Not.Safe;
 
@@ -14,16 +16,18 @@ public abstract class CrudBehind<T, TModel>
 {
     readonly IParentContext<T>? _parentContext;
     readonly IRepository<T> _repository;
+    readonly IEnumerable<ISingleParentContext> _singleParentContexts;
 
     /// <summary>
     /// Instantiates a CRUD behind capable of handling child items using <seealso cref="IParentContext{T}"/>
     /// </summary>
     /// <param name="repository">Items repository</param>
     /// <param name="parentContext">ParentContext defines the necessary operations in order to update item's parent when item changes</param>
-    protected CrudBehind(IRepository<T> repository, IParentContext<T> parentContext)
+    protected CrudBehind(IRepository<T> repository, IEnumerable<ISingleParentContext> singleParentContexts, IParentContext<T> parentContext)
         : base(parentContext.Children)
     {
         _repository = repository;
+        _singleParentContexts = singleParentContexts;
         _parentContext = parentContext;
     }
 
@@ -31,10 +35,11 @@ public abstract class CrudBehind<T, TModel>
     /// Instatiates a basic CRUD behind for a standalone or root-level entity
     /// </summary>
     /// <param name="repository">Entity's repository</param
-    protected CrudBehind(IRepository<T> repository)
+    protected CrudBehind(IRepository<T> repository, IEnumerable<ISingleParentContext> singleParentContexts)
         : base([])
     {
         _repository = repository;
+        _singleParentContexts = singleParentContexts;
     }
 
     protected abstract T CreateEntity(TModel model);
@@ -47,8 +52,7 @@ public abstract class CrudBehind<T, TModel>
     {
         if (_parentContext != null)
         {
-            _parentContext.Add(entity);
-            await _parentContext.Persist();
+            await _parentContext.Add(entity);
         }
     }
 
@@ -56,8 +60,7 @@ public abstract class CrudBehind<T, TModel>
     {
         if (_parentContext != null)
         {
-            _parentContext.Update(entity);
-            await _parentContext.Persist();
+            await _parentContext.Update(entity);
         }
     }
 
@@ -65,8 +68,7 @@ public abstract class CrudBehind<T, TModel>
     {
         if (_parentContext != null)
         {
-            _parentContext.Remove(entity);
-            await _parentContext.Persist();
+            await _parentContext.Remove(entity);
         }
     }
 
@@ -84,6 +86,10 @@ public abstract class CrudBehind<T, TModel>
         await OnBeforeUpdate(entity);
         await _repository.Update(entity);
         ObservableList.AddOrReplace(entity);
+        foreach (var singleParentContext in _singleParentContexts)
+        {
+            singleParentContext.Update(entity);
+        }
     }
 
     public async Task Create(TModel model)

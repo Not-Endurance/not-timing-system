@@ -1,5 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Blazor.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents.Phases;
 using NTS.Judge.Core.Behinds;
@@ -8,8 +9,8 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class PhaseBehind : CrudBehind<Phase, PhaseFormModel>
 {
-    public PhaseBehind(IRepository<Phase> phase, CompetitionParentContext parentContext)
-        : base(phase, parentContext)
+    public PhaseBehind(IRepository<Phase> phase, IEnumerable<ISingleParentContext> singleParentContexts, CompetitionParentContext parentContext)
+        : base(phase, singleParentContexts, parentContext)
     {
     }
 
