@@ -17,17 +17,17 @@ public abstract class BehindContext<T> : IParentContext
     protected IRepository<T> Repository { get; }
     public T? Entity { get; set; }
 
+    protected async Task Persist()
+    {
+        GuardHelper.ThrowIfDefault(Entity);
+        await Repository.Update(Entity);
+    }
+
     public void SetParent(IParent entity)
     {
         if (entity is T competition)
         {
             Entity = competition;
         }
-    }
-
-    public async Task Persist()
-    {
-        GuardHelper.ThrowIfDefault(Entity);
-        await Repository.Update(Entity);
     }
 }

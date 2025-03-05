@@ -19,42 +19,39 @@ public class EventParentContext
     ObservableList<Competition> IParentContext<Competition>.Children => _competitions;
     ObservableList<Official> IParentContext<Official>.Children => _officials;
 
-    public async Task Load(int parentId)
-    {
-        Entity = await Repository.Read(parentId);
-        if (Entity == null)
-        {
-            return;
-        }
-    }
-
-    public void Add(Competition child)
+    public async Task Add(Competition child)
     {
         Entity!.Add(child);
+        await Persist();
     }
 
-    public void Update(Competition child)
+    public async Task Update(Competition child)
     {
         Entity!.Update(child);
+        await Persist();
     }
 
-    public void Remove(Competition child)
+    public async Task Remove(Competition child)
     {
         Entity!.Remove(child);
+        await Persist();
     }
 
-    public void Add(Official child)
+    public async Task Add(Official child)
     {
         Entity?.Add(child);
+        await Persist();
     }
 
-    public void Update(Official child)
+    public async Task Update(Official child)
     {
         Entity!.Update(child);
+        await Persist();
     }
 
-    public void Remove(Official child)
+    public async Task Remove(Official child)
     {
         Entity!.Remove(child);
+        await Persist();
     }
 }
