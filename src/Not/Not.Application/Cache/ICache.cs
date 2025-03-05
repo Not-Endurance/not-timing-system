@@ -1,14 +1,15 @@
-﻿using Not.Injection;
+﻿using Not.Domain;
+using Not.Injection;
 
-namespace Not.Cache;
+namespace Not.Application.Cache;
 
 public interface ICache<T> : ISingleton
-    where T : class
+    where T : IAggregateRoot
 {
     Task<IEnumerable<T>> List();
     Task<T?> Get(int id);
     void Clear();
-    
+
     /// <summary>
     /// Update the state of the entry if found in cache
     /// </summary>
@@ -25,4 +26,5 @@ public interface ICache<T> : ISingleton
     /// Removes an entry from the cache
     /// </summary>
     /// <param name="entry"></param>
-    void Delete(T entry);}
+    void Delete(T entry);
+}

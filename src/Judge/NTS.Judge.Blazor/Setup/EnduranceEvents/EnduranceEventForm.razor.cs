@@ -1,8 +1,8 @@
 using MudBlazor;
 using Not.Blazor.Components;
+using Not.Blazor.Ports;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Ports;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 
@@ -12,7 +12,7 @@ public partial class EnduranceEventForm
     NAutocomplete<Country?> _countryField = default!;
 
     [Inject]
-    ICountryCache Countries { get; set; } = default!;
+    ISearchable<Country> Countries { get; set; } = default!;
 
     public override void RegisterValidationInjectors()
     {

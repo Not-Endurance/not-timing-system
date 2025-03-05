@@ -1,9 +1,9 @@
 using MudBlazor;
 using Not.Blazor.Components;
+using Not.Blazor.Ports;
 using Not.Structures;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Ports;
 
 namespace NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 
@@ -20,7 +20,7 @@ public partial class AthleteForm
         .ToList();
 
     [Inject]
-    ICountryCache Countries { get; set; } = default!;
+    ISearchable<Country> Countries { get; set; } = default!;
 
     public override void RegisterValidationInjectors()
     {

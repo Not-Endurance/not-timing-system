@@ -1,6 +1,5 @@
 ﻿using Not.Application.Behinds;
 using Not.Application.CRUD.Ports;
-using Not.Domain;
 using Not.Structures;
 using NTS.Domain.Setup.Aggregates;
 
@@ -27,8 +26,6 @@ public class EventParentContext
         {
             return;
         }
-        _competitions.AddRange(Entity!.Competitions);
-        _officials.AddRange(Entity!.Officials);
     }
 
     public void Add(Competition child)

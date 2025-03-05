@@ -1,7 +1,6 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
-using Not.Cache;
 using Not.Domain.Base;
 using Not.Safe;
 
@@ -15,7 +14,6 @@ public abstract class CrudBehind<T, TModel>
 {
     readonly IParentContext<T>? _parentContext;
     readonly IRepository<T> _repository;
-    readonly ICache<T>? _cache;
 
     /// <summary>
     /// Instantiates a CRUD behind capable of handling child items using <seealso cref="IParentContext{T}"/>
@@ -33,11 +31,10 @@ public abstract class CrudBehind<T, TModel>
     /// Instatiates a basic CRUD behind for a standalone or root-level entity
     /// </summary>
     /// <param name="repository">Entity's repository</param
-    protected CrudBehind(IRepository<T> repository, ICache<T>? cache = null)
+    protected CrudBehind(IRepository<T> repository)
         : base([])
     {
         _repository = repository;
-        _cache = cache;
     }
 
     protected abstract T CreateEntity(TModel model);
@@ -73,15 +70,12 @@ public abstract class CrudBehind<T, TModel>
         }
     }
 
-    // TODO: Remove arguments and cache as they are no longer necessary. 
+    // TODO: reevaluate the usefullnes around the complexities of this method - return for example
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
-        var entities = _cache != null
-            ? await _cache.List()
-            : await _repository.ReadAll();
-        ObservableList.Clear();
+        var entities = await _repository.ReadAll();
         ObservableList.AddRange(entities);
-        return ActualizeEveryTime;
+        return true;
     }
 
     public async Task Update(TModel model)
@@ -90,7 +84,6 @@ public abstract class CrudBehind<T, TModel>
         await OnBeforeUpdate(entity);
         await _repository.Update(entity);
         ObservableList.AddOrReplace(entity);
-        _cache?.Update(entity);
     }
 
     public async Task Create(TModel model)
@@ -99,7 +92,6 @@ public abstract class CrudBehind<T, TModel>
         await OnBeforeCreate(entity);
         await _repository.Create(entity);
         ObservableList.AddOrReplace(entity);
-        _cache?.Add(entity);
     }
 
     public async Task Delete(T entity)
@@ -112,6 +104,5 @@ public abstract class CrudBehind<T, TModel>
         await OnBeforeDelete(entity);
         await _repository.Delete(entity);
         ObservableList.Remove(entity);
-        _cache?.Delete(entity);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace NTS.Domain.Core.Aggregates;
 
-public class ArchiveEntry : IAggregateRoot
+public class ArchiveEntry
 {
     public ArchiveEntry(
         EnduranceEvent enduranceEvent,
