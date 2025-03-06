@@ -1,7 +1,9 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
+using Not.Domain;
 using Not.Domain.Base;
+using Not.Exceptions;
 using Not.Safe;
 
 namespace Not.Application.Behinds.Adapters;
@@ -14,7 +16,7 @@ public abstract class CrudBehind<T, TModel>
 {
     readonly IRepository<T> _repository;
     ICrudParent<T>? _parentContext;
-    List<ICrudDependant<T>>? _dependants;
+    List<ICrudReflection<T>> _reflections;
 
     /// <summary>
     /// Instantiates a CRUD behind capable of handling child items using <seealso cref="ICrudParent{T}"/>
@@ -22,25 +24,17 @@ public abstract class CrudBehind<T, TModel>
     /// <param name="repository">Items repository</param>
     /// <param name="parentContext">ParentContext defines the necessary operations in order to update item's parent when item changes</param>
 
-    protected CrudBehind(IRepository<T> repository)
+    protected CrudBehind(IRepository<T> repository, IEnumerable<ICrudReflection<T>> reflections)
         : base([])
     {
         _repository = repository;
+        _reflections = reflections.ToList();
     }
 
     protected abstract T CreateEntity(TModel model);
     protected abstract T UpdateEntity(TModel model);
 
     public IReadOnlyList<T> Items => ObservableList;
-
-    /// <summary>
-    /// Attached dependants are updated with changes in the state of <typeparamref name="T"/> <br />
-    /// </summary>
-    /// <param name="dependants">The dependants to be attached. </param>
-    protected void AttachDependants(IEnumerable<ICrudDependant<T>> dependants)
-    {
-        _dependants = dependants.ToList();
-    }
 
     /// <summary>
     /// Attach CRUD parent context to be updated with changes in the state of <typeparamref name="T"/>
@@ -50,6 +44,15 @@ public abstract class CrudBehind<T, TModel>
     protected void AttachParent(ICrudParent<T> parentBehind)
     {
         _parentContext = parentBehind;
+    }
+    
+    protected void UpdateReflections<TReflection>(Func<T, TReflection?> selector, TReflection reflection, Action<T> update)
+        where TReflection : class
+    {
+        foreach (var item in Items.Where(x => selector(x)?.Equals(reflection) ?? false))
+        {
+            update(item);
+        }
     }
 
     // TODO: reevaluate the usefullnes around the complexities of this method - return for example
@@ -68,7 +71,7 @@ public abstract class CrudBehind<T, TModel>
         {
             await _parentContext.Update(entity);
         }
-        _dependants?.ForEach(x => x.Update(entity));
+        _reflections.ForEach(x => x.Reflect(entity));
 
         ObservableList.AddOrReplace(entity);
     }

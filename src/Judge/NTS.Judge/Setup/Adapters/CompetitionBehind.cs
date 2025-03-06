@@ -16,9 +16,10 @@ public class CompetitionBehind : CrudBehind<Competition, CompetitionFormModel>
         IRepository<Competition> competitions,
         EventParentContext parentContext,
         ICrudParent<Phase> phaseParent,
-        ICrudParent<Participation> participationParent
+        ICrudParent<Participation> participationParent,
+        IEnumerable<ICrudReflection<Competition>> dependants
     )
-        : base(competitions)
+        : base(competitions, dependants)
     {
         _phaseParent = phaseParent;
         _participationParent = participationParent;

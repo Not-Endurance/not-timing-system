@@ -3,7 +3,7 @@ using Not.Domain.Base;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Combination : AggregateRoot, IParent, IDependOn<Athlete>, IDependOn<Horse>
+public class Combination : AggregateRoot, IParent, IReflect<Athlete>, IReflect<Horse>
 {
     public static Combination Create(int number, Athlete? athlete, Horse? horse, Tag? tag)
     {
@@ -39,19 +39,13 @@ public class Combination : AggregateRoot, IParent, IDependOn<Athlete>, IDependOn
         return Combine(number, Athlete, Horse);
     }
 
-    public void Update(Horse child)
+    public void Reflect(Horse child)
     {
-        if (Horse == child)
-        {
-            Horse = child;
-        }
+        Horse = child;
     }
 
-    public void Update(Athlete child)
+    public void Reflect(Athlete child)
     {
-        if (Athlete == child)
-        {
-            Athlete = child;
-        }
+        Athlete = child;
     }
 }

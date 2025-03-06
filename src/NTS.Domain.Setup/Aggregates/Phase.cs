@@ -4,7 +4,7 @@ using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Phase : AggregateRoot, IAggregateRoot
+public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
 {
     public static Phase Create(Loop? loop, int recovery, int? rest)
     {
@@ -33,7 +33,7 @@ public class Phase : AggregateRoot, IAggregateRoot
             NullOrPositiveRest(rest)
         ) { }
 
-    public Loop? Loop { get; }
+    public Loop? Loop { get; private set; }
     public int Recovery { get; }
     public int? Rest { get; }
 
@@ -42,6 +42,11 @@ public class Phase : AggregateRoot, IAggregateRoot
         var recovery = $"{Get("recovery")}: {Recovery}";
         var rest = Rest != null ? $"{Get("rest")}: {Rest}" : null;
         return Combine(Loop, recovery, rest);
+    }
+
+    public void Reflect(Loop loop)
+    {
+        Loop = loop;
     }
 
     static int PositiveRecovery(int minutes)

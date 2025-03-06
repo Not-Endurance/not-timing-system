@@ -7,10 +7,9 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>
 {
-    public AthleteBehind(IRepository<Athlete> repository, IEnumerable<ICrudDependant<Athlete>> dependants)
-        : base(repository) 
+    public AthleteBehind(IRepository<Athlete> repository, IEnumerable<ICrudReflection<Athlete>> dependants)
+        : base(repository, dependants) 
     {
-        AttachDependants(dependants);
     }
 
     protected override Athlete CreateEntity(AthleteFormModel model)
