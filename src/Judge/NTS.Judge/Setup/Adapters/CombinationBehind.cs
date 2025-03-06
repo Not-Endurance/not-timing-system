@@ -21,6 +21,8 @@ public class CombinationBehind : CrudBehind<Combination, CombinationFormModel>, 
         return Combination.Update(model.Id, model.Number, model.Athlete, model.Horse, model.Tag);
     }
 
+    //TODO: The Athlete and Horse behinds should take care to update any combinations more explicitly,
+    // rather than having to modify all other Behinds in order to accomodate.
     public void Update(object child)
     {
         if (child is Athlete athlete)

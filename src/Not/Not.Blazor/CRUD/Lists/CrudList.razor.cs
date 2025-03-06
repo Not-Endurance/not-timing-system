@@ -3,7 +3,7 @@ using Not.Blazor.CRUD.Forms;
 using Not.Blazor.CRUD.Forms.Components;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
-using Not.Blazor.Ports;
+using Not.Blazor.CRUD.Ports;
 using Not.Domain;
 using Not.Domain.Base;
 
@@ -20,8 +20,8 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     [Inject]
     FormManager<TModel, TForm> FormNavigator { get; set; } = default!;
 
-    [Inject]
-    IEnumerable<IParentContext> ParentContexts { get; set; } = default!;
+    [Inject] // TODO: Probably refactor this as ICrudParent<T> and make it nullable
+    IEnumerable<ICrudParentContext> ParentContexts { get; set; } = default!;
 
     [Parameter]
     public int? ParentId { get; set; }

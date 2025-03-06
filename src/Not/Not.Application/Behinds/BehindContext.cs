@@ -1,12 +1,12 @@
 ﻿using Not.Application.CRUD.Ports;
-using Not.Blazor.Ports;
+using Not.Blazor.CRUD.Ports;
 using Not.Domain;
 using Not.Domain.Base;
 using Not.Exceptions;
 
 namespace Not.Application.Behinds;
 
-public abstract class BehindContext<T> : IParentContext
+public abstract class BehindContext<T> : ICrudParentContext
     where T : AggregateRoot
 {
     protected BehindContext(IRepository<T> repository)
