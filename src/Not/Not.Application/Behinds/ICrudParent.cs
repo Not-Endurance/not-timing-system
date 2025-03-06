@@ -4,7 +4,7 @@ using Not.Structures;
 
 namespace Not.Application.Behinds;
 
-public interface IParentContext<T> : ICrudParentContext
+public interface ICrudParent<T> : ICrudParentContext
     where T : AggregateRoot
 {
     ObservableList<T> Children { get; }

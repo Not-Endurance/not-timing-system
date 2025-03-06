@@ -1,6 +1,5 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Blazor.Ports;
 using Not.Extensions;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents.Contestants;
@@ -10,12 +9,11 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class SetupParticipationBehind : CrudBehind<Participation, ParticipationFormModel>
 {
-    public SetupParticipationBehind(
-        IRepository<Participation> participations,
-        IEnumerable<ISingleParentContext> singleParentContexts,
-        CompetitionParentContext parentContext
-    )
-        : base(participations, singleParentContexts, parentContext) { }
+    public SetupParticipationBehind(IRepository<Participation> participations, CompetitionParentContext parentContext)
+        : base(participations)
+    {
+        AttachParent(parentContext);
+    }
 
     protected override Participation CreateEntity(ParticipationFormModel model)
     {

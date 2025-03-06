@@ -9,18 +9,18 @@ namespace Not.Application.Behinds;
 public abstract class BehindContext<T> : ICrudParentContext
     where T : AggregateRoot
 {
-    protected BehindContext(IRepository<T> repository)
+    protected BehindContext(IUpdate<T> updater)
     {
-        Repository = repository;
+        Updater = updater;
     }
 
-    protected IRepository<T> Repository { get; }
+    protected IUpdate<T> Updater { get; }
     public T? Entity { get; set; }
 
     protected async Task Persist()
     {
         GuardHelper.ThrowIfDefault(Entity);
-        await Repository.Update(Entity);
+        await Updater.Update(Entity);
     }
 
     public void SetParent(IParent entity)

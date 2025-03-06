@@ -1,15 +1,15 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Blazor.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.Combinations.Dot;
 
 namespace NTS.Judge.Setup.Adapters;
 
-public class CombinationBehind : CrudBehind<Combination, CombinationFormModel>, ISingleParentContext
+public class CombinationBehind
+    : CrudBehind<Combination, CombinationFormModel>, ICrudDependant<Athlete>, ICrudDependant<Horse>
 {
     public CombinationBehind(IRepository<Combination> repository)
-        : base(repository, []) { }
+        : base(repository) { }
 
     protected override Combination CreateEntity(CombinationFormModel model)
     {
@@ -21,29 +21,13 @@ public class CombinationBehind : CrudBehind<Combination, CombinationFormModel>, 
         return Combination.Update(model.Id, model.Number, model.Athlete, model.Horse, model.Tag);
     }
 
-    //TODO: The Athlete and Horse behinds should take care to update any combinations more explicitly,
-    // rather than having to modify all other Behinds in order to accomodate.
-    public void Update(object child)
+    public void Update(Athlete athlete)
     {
-        if (child is Athlete athlete)
-        {
-            foreach (var combination in Items)
-            {
-                if (combination.Athlete == athlete)
-                {
-                    combination.Update(athlete);
-                }
-            }
-        }
-        if (child is Horse horse)
-        {
-            foreach (var combination in Items)
-            {
-                if (combination.Horse == horse)
-                {
-                    combination.Update(horse);
-                }
-            }
-        }
+        Items.FirstOrDefault(x => x.Athlete == athlete)?.Update(athlete);
+    }
+
+    public void Update(Horse horse)
+    {
+        Items.FirstOrDefault(x => x.Horse == horse)?.Update(horse);
     }
 }

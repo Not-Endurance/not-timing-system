@@ -3,7 +3,7 @@ using Not.Domain.Base;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Combination : AggregateRoot, IParent, ISingleParent<Athlete>, ISingleParent<Horse>
+public class Combination : AggregateRoot, IParent, IDependOn<Athlete>, IDependOn<Horse>
 {
     public static Combination Create(int number, Athlete? athlete, Horse? horse, Tag? tag)
     {

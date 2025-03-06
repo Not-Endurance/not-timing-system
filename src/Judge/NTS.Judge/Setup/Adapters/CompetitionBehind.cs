@@ -1,7 +1,6 @@
 ﻿using Not.Application.Behinds;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Blazor.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions;
 using NTS.Judge.Core.Behinds;
@@ -10,20 +9,20 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class CompetitionBehind : CrudBehind<Competition, CompetitionFormModel>
 {
-    readonly IParentContext<Phase> _phaseParent;
-    readonly IParentContext<Participation> _participationParent;
+    readonly ICrudParent<Phase> _phaseParent;
+    readonly ICrudParent<Participation> _participationParent;
 
     public CompetitionBehind(
         IRepository<Competition> competitions,
         EventParentContext parentContext,
-        IParentContext<Phase> phaseParent,
-        IParentContext<Participation> participationParent,
-        IEnumerable<ISingleParentContext> singleParentContexts
+        ICrudParent<Phase> phaseParent,
+        ICrudParent<Participation> participationParent
     )
-        : base(competitions, singleParentContexts, parentContext)
+        : base(competitions)
     {
         _phaseParent = phaseParent;
         _participationParent = participationParent;
+        AttachParent(parentContext);
     }
 
     protected override Competition CreateEntity(CompetitionFormModel model)

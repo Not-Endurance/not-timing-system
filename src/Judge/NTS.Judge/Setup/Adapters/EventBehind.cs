@@ -12,14 +12,14 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
 {
     readonly IRepository<EnduranceEvent> _events;
     readonly EventParentContext _context;
-    readonly IParentContext<Competition> _competitionParent;
-    readonly IParentContext<Official> _officialParent;
+    readonly ICrudParent<Competition> _competitionParent;
+    readonly ICrudParent<Official> _officialParent;
 
     public EventBehind(
         IRepository<EnduranceEvent> events,
         EventParentContext context,
-        IParentContext<Competition> compeitionParent,
-        IParentContext<Official> officialParent
+        ICrudParent<Competition> compeitionParent,
+        ICrudParent<Official> officialParent
     )
     {
         _events = events;
