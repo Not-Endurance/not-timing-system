@@ -24,8 +24,9 @@ public class PhaseBehind : CrudBehind<Phase, PhaseFormModel>, ICrudReflection<Lo
         return Phase.Update(model.Id, model.Loop, model.Recovery, model.Rest);
     }
 
-    public void Reflect(Loop loop)
+    public Task Reflect(Loop loop)
     {
         UpdateReflections(x => x.Loop, loop, phase => phase.Reflect(loop));
+        return Task.CompletedTask;
     }
 }

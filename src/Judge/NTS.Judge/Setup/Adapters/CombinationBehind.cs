@@ -21,13 +21,15 @@ public class CombinationBehind
         return Combination.Update(model.Id, model.Number, model.Athlete, model.Horse, model.Tag);
     }
 
-    public void Reflect(Athlete athlete)
+    public Task Reflect(Athlete athlete)
     {
         UpdateReflections(x => x.Athlete, athlete, x => x.Reflect(athlete));
+        return Task.CompletedTask;
     }
 
-    public void Reflect(Horse horse)
+    public Task Reflect(Horse horse)
     {
         UpdateReflections(x => x.Horse, horse, x => x.Reflect(horse));
+        return Task.CompletedTask;
     }
 }

@@ -38,8 +38,9 @@ public class SetupParticipationBehind : CrudBehind<Participation, ParticipationF
         );
     }
 
-    public void Reflect(Combination combination)
+    public Task Reflect(Combination combination)
     {
         UpdateReflections(x => x.Combination, combination, x => x.Reflect(combination));
+        return Task.CompletedTask;
     }
 }
