@@ -14,7 +14,7 @@ public class EnduranceEvent : AggregateRoot, IParent<Official>, IParent<Competit
     }
 
     public static EnduranceEvent Update(
-        int id,
+        int? id,
         string? place,
         Country? country,
         IEnumerable<Competition> competitions,
@@ -29,13 +29,13 @@ public class EnduranceEvent : AggregateRoot, IParent<Official>, IParent<Competit
 
     [JsonConstructor]
     EnduranceEvent(
-        int id,
+        int? id,
         string? place,
         Country? country,
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials
     )
-        : base(id)
+        : base(id!.Value)
     {
         Place = Capitalized(nameof(Place), place);
         Country = Required(nameof(Country), country);

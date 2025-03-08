@@ -4,13 +4,14 @@
 @using Not.Blazor.Navigation
 @using Not.Blazor.Pages
 
-@attribute [Route(ATHLETE_UPDATE)]
+@attribute [Route(CLUB_UPDATE)]
 @inherits NUpdatePage
 
-<NContent Title="Configure Athlete">
+<NContent Title="Configure Club">
 
     <Main>
-        <NUpdateContainer T="AthleteFormModel" TForm="AthleteForm" Model="Navigator.ConsumeParameter<AthleteFormModel>()" />
+        <NUpdateContainer T="ClubFormModel" TForm="ClubForm" Model="Navigator.ConsumeParameter<ClubFormModel>()" />
     </Main>
 
 </NContent>
+

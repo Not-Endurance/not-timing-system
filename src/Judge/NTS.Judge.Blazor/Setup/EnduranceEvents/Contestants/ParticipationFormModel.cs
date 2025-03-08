@@ -5,7 +5,7 @@ namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Contestants;
 
 public class ParticipationFormModel : IFormModel<Participation>
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public TimeSpan? StartTimeOverride { get; set; }
     public bool IsNotRanked { get; set; }
     public Combination? Combination { get; set; }

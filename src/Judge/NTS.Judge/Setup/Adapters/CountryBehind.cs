@@ -5,7 +5,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Judge.Setup.Adapters;
 
-public class CountryBehind : ISearchable<Country>
+public class CountryBehind : ISeeker<Country>
 {
     readonly ICache<Country> _countriesCache;
 

@@ -5,25 +5,25 @@ namespace NTS.Domain.Aggregates;
 
 public class Club : AggregateRoot
 {
-    public static Club? Create(string? name)
+    public static Club Create(string? name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return null;
-        }
         return new Club(name);
+    }
+
+    public static Club Update(int id, string? name)
+    {
+        return new Club(id, name);
+    }
+
+    public Club(string? name) : this(GenerateId(), name)
+    {
     }
 
     [System.Text.Json.Serialization.JsonConstructor]
     [JsonConstructor]
-    public Club(int id, string name) : base(id)
+    public Club(int id, string? name) : base(id)
     {
-        Name = name;
-    }
-
-    public Club(string name) : base(GenerateId())
-    {
-        Name = name;
+        Name = Required(nameof(Name), name);
     }
 
     public string Name { get; }

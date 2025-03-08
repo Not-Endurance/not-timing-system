@@ -14,7 +14,7 @@
 
     <NAutocomplete T="Country" @ref="_countryField" @bind-Value="Model.Country" Label="@nameof(Athlete.Country)" Search="Countries.Search" />
 
-    <MudTextField @ref="_clubField" @bind-Value="Model.Club" Label="Club" Variant="Variant.Text" Margin="Margin.Dense" />
+    <NAutocomplete @ref="_clubField" @bind-Value="Model.Club" Label="@nameof(Athlete.Club)" />
 
     <NSelect @ref="_categoryField" T="AthleteCategory" Items="_categories" @bind-Value="Model.Category" Label="Category" />
 </EditForm>

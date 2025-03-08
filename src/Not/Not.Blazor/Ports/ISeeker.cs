@@ -2,7 +2,7 @@
 
 namespace Not.Blazor.Ports;
 
-public interface ISearchable<T> : ITransient
+public interface ISeeker<T> : ITransient
 {
     Task<IEnumerable<T>> Search(string term);
 }

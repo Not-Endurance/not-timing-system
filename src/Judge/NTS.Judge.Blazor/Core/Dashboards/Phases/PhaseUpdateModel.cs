@@ -15,11 +15,14 @@ public class PhaseUpdateModel : IPhaseState, IFormModel<Phase>
         FromEntity(phase);
     }
 
+    int IPhaseState.Id => Id ?? default;
+
     public string? StartTimeInput { get; set; }
     public string? ArriveTimeInput { get; set; }
     public string? PresentTimeInput { get; set; }
     public string? RepresentTimeInput { get; set; }
-    public int Id { get; private set; }
+    public int? Id { get; set; }
+
     public DateTimeOffset? StartTime
     {
         get => Parse(StartTimeInput);

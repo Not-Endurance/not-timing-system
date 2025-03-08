@@ -9,7 +9,7 @@ public class Horse : AggregateRoot, IAggregateRoot
         return new(name, feiId);
     }
 
-    public static Horse Update(int id, string? name, string? feiId)
+    public static Horse Update(int? id, string? name, string? feiId)
     {
         return new(id, name, feiId);
     }
@@ -19,8 +19,8 @@ public class Horse : AggregateRoot, IAggregateRoot
 
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Horse(int id, string? name, string? feiId)
-        : base(id)
+    public Horse(int? id, string? name, string? feiId)
+        : base(id!.Value)
     {
         Name = Required(nameof(Name), name);
         FeiId = feiId;

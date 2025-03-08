@@ -12,7 +12,7 @@ public class HorseFormModel : IFormModel<Horse>
 #endif
     }
 
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public string? FeiId { get; set; }
     public string? Name { get; set; }
 

@@ -1,9 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
-using Not.Domain;
 using Not.Domain.Base;
-using Not.Exceptions;
 using Not.Safe;
 
 namespace Not.Application.Behinds.Adapters;
@@ -60,7 +58,7 @@ public abstract class CrudBehind<T, TModel>
     {
         var entities = await _repository.ReadAll();
         ObservableList.AddRange(entities);
-        return true;
+        return entities.Any();
     }
 
     public async Task Update(TModel model)

@@ -13,14 +13,14 @@ public partial class AthleteForm
     MudTextField<string?> _nameField = default!;
     MudTextField<string?> _feiIdField = default!;
     NAutocomplete<Country?> _countryField = default!;
-    MudTextField<string?> _clubField = default!;
+    NAutocomplete<Club?> _clubField = default!;
     NSelect<AthleteCategory> _categoryField = default!;
     List<NotListModel<AthleteCategory>> _categories = NotListModel
         .FromEnum<AthleteCategory>()
         .ToList();
 
     [Inject]
-    ISearchable<Country> Countries { get; set; } = default!;
+    ISeeker<Country> Countries { get; set; } = default!;
 
     public override void RegisterValidationInjectors()
     {

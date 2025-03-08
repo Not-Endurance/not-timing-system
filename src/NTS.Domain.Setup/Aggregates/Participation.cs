@@ -22,7 +22,7 @@ public class Participation : AggregateRoot, IAggregateRoot, IReflect<Combination
     }
 
     public static Participation Update(
-        int id,
+        int? id,
         DateTimeOffset? newStart,
         bool isUnranked,
         Combination? combination,
@@ -34,13 +34,13 @@ public class Participation : AggregateRoot, IAggregateRoot, IReflect<Combination
 
     [JsonConstructor]
     Participation(
-        int id,
+        int? id,
         DateTimeOffset? startTimeOverride,
         bool isUnranked,
         Combination? combination,
         double? maxSpeedOverride
     )
-        : base(id)
+        : base(id!.Value)
     {
         StartTimeOverride = startTimeOverride;
         IsNotRanked = isUnranked;

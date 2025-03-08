@@ -9,7 +9,7 @@ namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Phases;
 public partial class PhaseForm
 {
     NSelect<Loop> _loopField = default!;
-    MudNumericField<int> _recoveryField = default!;
+    MudNumericField<int?> _recoveryField = default!;
     MudNumericField<int?> _restField = default!;
     List<NotListModel<Loop>> _loops = [];
 

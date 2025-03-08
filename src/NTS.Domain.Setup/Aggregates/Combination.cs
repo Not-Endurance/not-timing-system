@@ -5,27 +5,27 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class Combination : AggregateRoot, IParent, IReflect<Athlete>, IReflect<Horse>
 {
-    public static Combination Create(int number, Athlete? athlete, Horse? horse, Tag? tag)
+    public static Combination Create(int? number, Athlete? athlete, Horse? horse, Tag? tag)
     {
         return new(number, athlete, horse, tag);
     }
 
-    public static Combination Update(int id, int number, Athlete? athlete, Horse? horse, Tag? tag)
+    public static Combination Update(int? id, int? number, Athlete? athlete, Horse? horse, Tag? tag)
     {
         return new(id, number, athlete, horse, tag);
     }
 
     [JsonConstructor]
-    public Combination(int id, int number, Athlete? athlete, Horse? horse, Tag? tag)
-        : base(id)
+    public Combination(int? id, int? number, Athlete? athlete, Horse? horse, Tag? tag)
+        : base(id!.Value)
     {
-        Number = NotDefault(nameof(Number), number);
+        Number = Required(nameof(Number), number);
         Athlete = Required(nameof(Athlete), athlete);
         Horse = Required(nameof(Horse), horse);
         Tag = tag;
     }
 
-    public Combination(int number, Athlete? athlete, Horse? horse, Tag? tag)
+    public Combination(int? number, Athlete? athlete, Horse? horse, Tag? tag)
         : this(GenerateId(), number, athlete, horse, tag) { }
 
     public int Number { get; }

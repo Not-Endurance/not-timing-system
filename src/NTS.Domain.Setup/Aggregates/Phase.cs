@@ -6,26 +6,26 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
 {
-    public static Phase Create(Loop? loop, int recovery, int? rest)
+    public static Phase Create(Loop? loop, int? recovery, int? rest)
     {
         return new(loop, recovery, rest);
     }
 
-    public static Phase Update(int id, Loop? loop, int recovery, int? rest)
+    public static Phase Update(int? id, Loop? loop, int? recovery, int? rest)
     {
         return new(id, loop, recovery, rest);
     }
 
     [JsonConstructor]
-    public Phase(int id, Loop? loop, int recovery, int? rest)
-        : base(id)
+    public Phase(int? id, Loop? loop, int? recovery, int? rest)
+        : base(id!.Value)
     {
         Loop = Required(nameof(Loop), loop);
-        Recovery = recovery;
+        Recovery = Required(nameof(Recovery), recovery);
         Rest = rest;
     }
 
-    public Phase(Loop? loop, int recovery, int? rest)
+    public Phase(Loop? loop, int? recovery, int? rest)
         : this(
             GenerateId(),
             Required(nameof(Loop), loop),
@@ -49,13 +49,13 @@ public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
         Loop = loop;
     }
 
-    static int PositiveRecovery(int minutes)
+    static int PositiveRecovery(int? minutes)
     {
-        if (minutes <= 0)
+        if (minutes == null || minutes.Value <= 0)
         {
             throw new DomainException(nameof(Recovery), "Min value is 1 minute");
         }
-        return minutes;
+        return minutes.Value;
     }
 
     static int? NullOrPositiveRest(int? minutes)

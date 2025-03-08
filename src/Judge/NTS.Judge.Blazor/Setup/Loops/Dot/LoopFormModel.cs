@@ -12,8 +12,8 @@ public class LoopFormModel : IFormModel<Loop>
 #endif
     }
 
-    public int Id { get; set; }
-    public double Distance { get; set; }
+    public int? Id { get; set; }
+    public double? Distance { get; set; }
 
     public void FromEntity(Loop entity)
     {

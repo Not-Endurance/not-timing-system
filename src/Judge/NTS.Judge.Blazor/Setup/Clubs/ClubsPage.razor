@@ -1,0 +1,17 @@
+﻿@using NTS.Domain.Aggregates
+@using NTS.Domain.Setup.Aggregates
+@using NTS.Judge.Blazor.Setup.Loops.Dot
+@using Not.Blazor.CRUD.Lists
+
+@attribute [Route(CLUBS_PAGE)]
+@inherits NComponent
+
+<NContent Title="Configure Clubs" Class="not-mid-width">
+
+    <Main>
+        <CrudList T="Club" TModel="ClubFormModel" TForm="ClubForm" UpdateRoute="@CLUB_UPDATE" />
+    </Main>
+
+</NContent>
+
+

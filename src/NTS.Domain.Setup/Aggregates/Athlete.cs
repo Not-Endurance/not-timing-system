@@ -4,29 +4,29 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Athlete : AggregateRoot, IAggregateRoot
+public class Athlete : AggregateRoot, IAggregateRoot, IReflect<Club>
 {
     public static Athlete Create(
         string? name,
         string? feiId,
         Country? country,
-        string? club,
+        Club? club,
         AthleteCategory? category
     )
     {
-        return new(Person.Create(name), feiId, country, Club.Create(club), category);
+        return new(Person.Create(name), feiId, country, club, category);
     }
 
     public static Athlete Update(
-        int id,
+        int? id,
         string? name,
         string? feiId,
         Country? country,
-        string? club,
+        Club? club,
         AthleteCategory? category
     )
     {
-        return new(id, Person.Create(name), feiId, country, Club.Create(club), category);
+        return new(id, Person.Create(name), feiId, country, club, category);
     }
 
     Athlete(
@@ -41,14 +41,14 @@ public class Athlete : AggregateRoot, IAggregateRoot
     [System.Text.Json.Serialization.JsonConstructor]
     [JsonConstructor]
     public Athlete(
-        int id,
+        int? id,
         Person? person,
         string? feiId,
         Country? country,
         Club? club,
         AthleteCategory? category
     )
-        : base(id)
+        : base(id!.Value)
     {
         FeiId = feiId;
         Person = Required(nameof(Person), person);
@@ -60,11 +60,16 @@ public class Athlete : AggregateRoot, IAggregateRoot
     public string? FeiId { get; }
     public Person Person { get; }
     public Country Country { get; }
-    public Club Club { get; }
+    public Club Club { get; private set; }
     public AthleteCategory Category { get; private set; }
 
     public override string ToString()
     {
         return Person.ToString();
+    }
+
+    public void Reflect(Club club)
+    {
+        Club = club;
     }
 }
