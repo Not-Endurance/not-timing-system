@@ -38,7 +38,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var athlete = requestBody.FromConvertedJson<Athlete>();
+        var athlete = requestBody.FromJson<Athlete>();
         var document = new AthleteDocument(athlete);
         await _athletes.Create(document);
 
@@ -53,7 +53,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var athlete = requestBody.FromConvertedJson<Athlete>();
+        var athlete = requestBody.FromJson<Athlete>();
         var document = new AthleteDocument(athlete);
         await _athletes.Update(document);
 

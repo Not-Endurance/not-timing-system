@@ -31,7 +31,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var country = requestBody.FromConvertedJson<Country>();
+        var country = requestBody.FromJson<Country>();
         var document = new CountryDocument(country);
         await _countries.Create(document);
 
@@ -47,7 +47,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var country = requestBody.FromConvertedJson<Country>();
+        var country = requestBody.FromJson<Country>();
         var document = new CountryDocument(country);
         await _countries.Update(document);
 

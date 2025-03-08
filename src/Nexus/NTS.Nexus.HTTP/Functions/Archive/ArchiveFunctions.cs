@@ -26,7 +26,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var entry = requestBody.FromConvertedJson<ArchiveEntry>();
+        var entry = requestBody.FromJson<ArchiveEntry>();
         var document = new EnduranceEventDocument(
             entry.EnduranceEvent,
             entry.Officials,

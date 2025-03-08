@@ -1,4 +1,5 @@
-namespace Not.Blazor.Components.Mud;
+namespace Not.Blazor.Components;
+
 public partial class NSkeleton
 {
 }

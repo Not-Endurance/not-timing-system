@@ -1,7 +1,11 @@
 ﻿@namespace Not.Blazor.Components
 @inherits NComponent
 
-@if (_showOnlyMain)
+@if (!IsInitialized)
+{
+    <NSkeleton />
+}
+else if (_showOnlyMain)
 {
     @Main
 }
@@ -47,8 +51,6 @@ else
         }
     </NGrid>
 }
-
-
 
 <style>
     .not-page .not-page-content > .mud-paper > .mud-grid:first-child > .mud-grid-item,

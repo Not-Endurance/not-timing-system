@@ -1,5 +1,6 @@
 using MudBlazor;
 using Not.Blazor.Components;
+using NTS.Judge.Blazor.Setup.Settings;
 
 namespace NTS.Judge.Blazor.Shared.Components;
 
@@ -8,6 +9,7 @@ public partial class MainLayout
     MudThemeProvider _themeProvider = default!;
     bool _hideLayout;
     bool _drawerOpen = true;
+
 
     protected override void OnInitialized()
     {

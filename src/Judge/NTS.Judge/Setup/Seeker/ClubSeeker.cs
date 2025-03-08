@@ -3,13 +3,13 @@ using Not.Blazor.Ports;
 using Not.Strings;
 using NTS.Domain.Aggregates;
 
-namespace NTS.Judge.Setup.Searchers;
+namespace NTS.Judge.Setup.Seeker;
 
-public class ClubSearcher : ISeeker<Club>
+public class ClubSeeker : ISeeker<Club>
 {
     readonly IListBehind<Club> _clubBehind;
 
-    public ClubSearcher(IListBehind<Club> clubBehind)
+    public ClubSeeker(IListBehind<Club> clubBehind)
     {
         _clubBehind = clubBehind;
     }

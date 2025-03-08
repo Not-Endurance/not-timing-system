@@ -20,7 +20,7 @@ public class EnduranceEventDocument : Document, IAggregateRoot // TODO: question
         Location = enduranceEvent.PopulatedPlace.Location;
         StartDay = enduranceEvent.EventSpan.StartDay;
         EndDay = enduranceEvent.EventSpan.EndDay;
-        Officials = officials.Select(x => new OfficialModel(x)).ToArray();
+        Officials = officials.Select(x => new OfficialDocument(x)).ToArray();
         Rankings = rankings.Select(x => new RankingModel(x)).ToArray();
     }
 
@@ -29,7 +29,7 @@ public class EnduranceEventDocument : Document, IAggregateRoot // TODO: question
     public string? Location { get; init; }
     public DateTimeOffset StartDay { get; init; }
     public DateTimeOffset EndDay { get; init; }
-    public OfficialModel[] Officials { get; init; }
+    public OfficialDocument[] Officials { get; init; }
     public RankingModel[] Rankings { get; init; }
 
     public EnduranceEvent ToDomain()

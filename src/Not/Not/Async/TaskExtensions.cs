@@ -7,6 +7,11 @@ public static class TaskExtensions
         return (await task).ToList();
     }
 
+    public static async Task<T?> FirstOrDefault<T>(this Task<IEnumerable<T>> task)
+    {
+        return (await task).FirstOrDefault();
+    }
+
     public static async Task<T?> FirstOrDefault<T>(this Task<IEnumerable<T>> task, Func<T, bool> filter)
     {
         return (await task).FirstOrDefault(filter);

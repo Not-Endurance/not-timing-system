@@ -13,19 +13,32 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
     const string ERROR_TEMPLATE = "Could not connect to Nexus. Some operations will not be available. Please check your internet connection";
 
     readonly string _endpoint;
-    readonly NHttpClient _client;
 
     public HttpRepository(string endpoint, NHttpClient client)
     {
         _endpoint = endpoint;
-        _client = client;
+        Client = client;
+    }
+    protected NHttpClient Client { get; }
+
+    protected string BuildUrl(object id)
+    {
+        return $"{_endpoint}/{id}";
+    }
+
+    protected void HandleException(Exception ex)
+    {
+        var message = ex is HttpRequestException httpRequestException && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
+            ? ERROR_TEMPLATE
+            : ex.Message;
+        NotifyHelper.Warn(message);
     }
 
     public async Task Create(T entity)
     {
         try
         {
-            await _client.Post(_endpoint, entity);
+            await Client.Post(_endpoint, entity);
         }
         catch (Exception ex)
         {
@@ -38,7 +51,7 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         try
         {
             var url = BuildUrl(id);
-            await _client.Delete(url);
+            await Client.Delete(url);
         }
         catch (Exception ex)
         {
@@ -71,7 +84,7 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         try
         {
             var url = BuildUrl(id);
-            var content = await _client.Get(url);
+            var content = await Client.Get(url);
             return content?.FromJson<T>();
         }
         catch (Exception ex)
@@ -85,7 +98,7 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
     {
         try
         {
-            var content = await _client.Get(_endpoint);
+            var content = await Client.Get(_endpoint);
             return content?.FromJson<IEnumerable<T>>() ?? [];
         }
         catch (Exception ex)
@@ -105,7 +118,7 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         try
         {
             var url = $"{BuildUrl(id)}/safe";
-            await _client.Delete(url);
+            await Client.Delete(url);
         }
         catch (Exception ex)
         {
@@ -117,24 +130,11 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
     {
         try
         {
-            await _client.Patch(_endpoint, entity);
+            await Client.Patch(_endpoint, entity);
         }
         catch (Exception ex)
         {
             HandleException(ex);
         }
-    }
-
-    void HandleException(Exception ex)
-    {
-        var message = ex is HttpRequestException httpRequestException && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
-            ? ERROR_TEMPLATE
-            : ex.Message;
-        NotifyHelper.Warn(message);
-    }
-
-    string BuildUrl(int id)
-    {
-        return $"{_endpoint}/{id}";
     }
 }

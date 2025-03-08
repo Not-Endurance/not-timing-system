@@ -3,9 +3,9 @@ using NTS.Domain.Enums;
 
 namespace NTS.Storage.Documents.Officials;
 
-public class OfficialModel : Document
+public class OfficialDocument : Document
 {
-    public OfficialModel(Official official)
+    public OfficialDocument(Official official)
         : base(official.Id)
     {
         Names = official.Person.Names;

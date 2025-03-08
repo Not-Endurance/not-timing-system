@@ -17,4 +17,13 @@ public partial class NSelect<T>
     public string Placeholder { get; set; } = default!;
 
     public MudBaseInput<T?> MudBaseInput { get; private set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        var type = typeof(T);
+        if (type.IsEnum || (Nullable.GetUnderlyingType(type)?.IsEnum ?? false))
+        {
+            Items = NotListModel.FromEnum<T>(type).ToList();
+        }
+    }
 }

@@ -28,7 +28,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var club = requestBody.FromConvertedJson<Club>();
+        var club = requestBody.FromJson<Club>();
         var document = new ClubDocument(club);
         await _clubs.Create(document);
 
@@ -43,7 +43,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var club = requestBody.FromConvertedJson<Club>();
+        var club = requestBody.FromJson<Club>();
         var document = new ClubDocument(club);
         await _clubs.Update(document);
 
