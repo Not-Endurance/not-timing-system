@@ -168,7 +168,7 @@ public class Participation : AggregateRoot, IAggregateRoot
         {
             Restore();
         }
-        if (phase.IsComplete())
+        if (phase.IsComplete() && !phase.IsFinal)
         {
             Phases.StartIfNext();
             var phaseCompleted = new PhaseCompleted(this);
