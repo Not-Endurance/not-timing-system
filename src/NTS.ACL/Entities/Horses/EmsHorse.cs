@@ -1,8 +1,9 @@
 using NTS.ACL.Abstractions;
+using NTS.Domain.Aggregates;
 
 namespace NTS.ACL.Entities.Horses;
 
-public class EmsHorse : EmsDomainBase<EmsHorseException>, IEmsHorseState
+public class EmsHorse : EmsDomainBase<EmsHorseException>, IEmsHorseState, IHorse
 {
     [Newtonsoft.Json.JsonConstructor]
     EmsHorse() { }

@@ -23,7 +23,7 @@ public class StorageTests : JudgeIntegrationTest
             ICreateBehind<EnduranceEventFormModel>
         >();
 
-        var country = new Country("testIso", "testNf", "Test");
+        var country = new Country(0, "testIso", "testNf", "Test");
         var enduranceEvent = new EnduranceEventTestModel { Country = country, Place = "Sofia" };
 
         await enduranceEventBehind.Create(enduranceEvent);

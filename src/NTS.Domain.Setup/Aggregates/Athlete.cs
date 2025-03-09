@@ -1,10 +1,9 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+﻿using Not.Domain.Base;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Athlete : AggregateRoot, IAggregateRoot, IReflect<Club>
+public class Athlete : AggregateRoot, IAthlete, IAggregateRoot, IReflect<Club>
 {
     public static Athlete Create(
         string? name,
@@ -38,11 +37,11 @@ public class Athlete : AggregateRoot, IAggregateRoot, IReflect<Club>
     )
         : this(GenerateId(), person, feiId, country, club, category) { }
 
+    [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    [JsonConstructor]
     public Athlete(
         int? id,
-        Person? person,
+        Person? names,
         string? feiId,
         Country? country,
         Club? club,
@@ -51,21 +50,22 @@ public class Athlete : AggregateRoot, IAggregateRoot, IReflect<Club>
         : base(id!.Value)
     {
         FeiId = feiId;
-        Person = Required(nameof(Person), person);
+        Names = Required(nameof(Names), names);
         Country = Required(nameof(Country), country);
         Club = Required(nameof(Club), club);
         Category = Required(nameof(Category), category);
     }
 
+    IClub? IAthlete.Club => Club;
     public string? FeiId { get; }
-    public Person Person { get; }
+    public Person Names { get; }
     public Country Country { get; }
-    public Club Club { get; private set; }
+    public Club? Club { get; private set; }
     public AthleteCategory Category { get; private set; }
 
     public override string ToString()
     {
-        return Person.ToString();
+        return Names.ToString();
     }
 
     public void Reflect(Club club)

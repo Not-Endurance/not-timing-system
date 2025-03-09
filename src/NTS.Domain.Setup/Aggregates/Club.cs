@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Base;
+using NTS.Domain.Aggregates;
 
-namespace NTS.Domain.Aggregates;
+namespace NTS.Domain.Setup.Aggregates;
 
-public class Club : AggregateRoot
+public class Club : AggregateRoot, IClub, IAggregateRoot
 {
     public static Club Create(string? name)
     {

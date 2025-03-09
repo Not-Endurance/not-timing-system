@@ -15,8 +15,8 @@ public class AthleteFactory
             Category = EmsCategory.Seniors, //TODO: after athlete
             Club = participation.Combination.Club?.ToString(),
             FeiId = "", //TODO: after athlete
-            FirstName = participation.Combination.Name.ToString().Split().First(),
-            LastName = participation.Combination.Name.ToString().Split().Last(),
+            FirstName = participation.Combination.Athlete.ToString().Split().First(),
+            LastName = participation.Combination.Athlete.ToString().Split().Last(),
             Id = participation.Combination.Id,
         };
         var country = new EmsCountry(

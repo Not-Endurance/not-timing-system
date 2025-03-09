@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Serialization;
-using NTS.Domain.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Storage.Documents.Clubs;
 

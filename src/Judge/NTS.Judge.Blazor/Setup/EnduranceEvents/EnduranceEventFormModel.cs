@@ -10,7 +10,6 @@ public class EnduranceEventFormModel
     {
 #if DEBUG
         Place = "Каспичан";
-        Country = new Country("BG", "zz", "Bulgaria");
 #endif
     }
 

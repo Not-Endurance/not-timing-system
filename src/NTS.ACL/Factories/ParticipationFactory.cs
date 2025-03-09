@@ -56,13 +56,8 @@ public class ParticipationFactory
     {
         var combination = new Combination(
             int.Parse(emsParticipation.Participant.Number),
-            new Person(
-                emsParticipation.Participant.Athlete.Name.Split(
-                    " ",
-                    StringSplitOptions.RemoveEmptyEntries
-                )
-            ),
-            emsParticipation.Participant.Horse.Name,
+            emsParticipation.Participant.Athlete,
+            emsParticipation.Participant.Horse,
             competition.Laps.Sum(x => (decimal)x.LengthInKm),
             null,
             null,

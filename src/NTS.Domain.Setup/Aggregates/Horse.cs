@@ -1,8 +1,9 @@
 ﻿using Not.Domain.Base;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Horse : AggregateRoot, IAggregateRoot
+public class Horse : AggregateRoot, IHorse, IAggregateRoot
 {
     public static Horse Create(string? name, string? feiId)
     {
@@ -26,8 +27,8 @@ public class Horse : AggregateRoot, IAggregateRoot
         FeiId = feiId;
     }
 
-    public string? FeiId { get; }
     public string Name { get; }
+    public string? FeiId { get; }
 
     public string Summarize()
     {

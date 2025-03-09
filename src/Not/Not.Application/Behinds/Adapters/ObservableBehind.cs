@@ -19,11 +19,7 @@ public abstract class ObservableBehind : IObservableBehind
     /// <returns>Indicates weather or not the state has been initialized successfully</returns>
     protected abstract Task<bool> PerformInitialization(params IEnumerable<object> arguments);
 
-    /// <summary>
-    /// This flag indicates that <seealso cref="PerformInitialization(IEnumerable{object})" /> is always
-    /// invoked during OnInitializedAsync />
-    /// </summary>
-    protected bool ActualizeEveryTime { get; } = false;
+    protected bool Initialized { get; } = false;
 
     protected void EmitChange()
     {

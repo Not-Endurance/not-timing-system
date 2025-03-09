@@ -1,7 +1,7 @@
 ﻿using Not.Blazor.CRUD.Lists.Ports;
 using Not.Blazor.Ports;
 using Not.Strings;
-using NTS.Domain.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Setup.Seeker;
 
@@ -16,7 +16,7 @@ public class ClubSeeker : ISeeker<Club>
 
     public Task<IEnumerable<Club>> Search(string term)
     {
-        var results = _clubBehind.Items.Where(x => term == string.Empty || x.Name.NContains(term));
+        var results = _clubBehind.Items.Where(x => term == string.Empty || StringExtensions.NContains(x.Name, term));
         return Task.FromResult(results);
     }
 }

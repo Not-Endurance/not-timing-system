@@ -26,7 +26,7 @@ public class AthleteFormModel : IFormModel<Athlete>
     public void FromEntity(Athlete athlete)
     {
         Id = athlete.Id;
-        Name = athlete.Person;
+        Name = athlete.Names;
         FeiId = athlete.FeiId;
         Country = athlete.Country;
         Club = athlete.Club;

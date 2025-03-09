@@ -17,7 +17,9 @@ public class EmsParticipant : EmsDomainBase<EmsParticipantException>, IEmsPartic
         return string.Format(NAME_FORMAT, number, athleteName, horseName);
     }
 
+#pragma warning disable IDE0052 // Remove unread private members
     readonly ReadOnlyObservableCollection<EmsLapRecord> lapRecordsReadonly;
+#pragma warning restore IDE0052 // Remove unread private members
     ObservableCollection<EmsLapRecord> lapRecords = [];
 
     [JsonConstructor]

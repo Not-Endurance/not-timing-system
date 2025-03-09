@@ -1,4 +1,5 @@
 ﻿using Not.Random;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Storage.Documents.Clubs;
@@ -8,28 +9,14 @@ namespace NTS.Storage.Documents.Athletes;
 
 public class AthleteDocument : Document
 {
-    public AthleteDocument(
-        string[] names,
-        AthleteCategory category,
-        CountryDocument? country,
-        ClubDocument? club
-    )
-        : base(RandomHelper.GenerateUniqueInteger()) // TODO: remove Core.Combination workaround
-    {
-        Names = names;
-        Category = category;
-        Country = country;
-        Club = club;
-    }
-
-    public AthleteDocument(Athlete athlete)
+    public AthleteDocument(IAthlete athlete)
         : base(athlete.Id)
     {
         FeiId = athlete.FeiId;
-        Names = athlete.Person;
+        Names = athlete.Names;
         Category = athlete.Category;
         Country = new CountryDocument(athlete.Country);
-        Club = new ClubDocument(athlete.Club);
+        Club = athlete.Club == null ? null : new ClubDocument(athlete.Club);
     }
 
     public string? FeiId { get; init; }

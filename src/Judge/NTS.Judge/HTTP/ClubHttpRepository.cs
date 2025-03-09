@@ -1,5 +1,5 @@
 ﻿using Not.Application.HTTP;
-using NTS.Domain.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.HTTP;
 

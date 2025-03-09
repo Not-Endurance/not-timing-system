@@ -22,6 +22,10 @@ public abstract class MongoRepository<T> : IRepository<T>
     {
         try
         {
+            if (document.Id == default)
+            {
+                throw new ApplicationException($"Invalid ID '{document.Id}'");
+            }
             await Collection.InsertOneAsync(document);
         }
         catch (MongoWriteException ex)

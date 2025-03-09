@@ -44,6 +44,6 @@ public partial class ParticipationForm
         {
             return values;
         }
-        return values.Where(x => x != null && x.ToString()!.NContains(term));
+        return values.Where(x => x != null && StringExtensions.NContains(x.ToString()!, term));
     }
 }

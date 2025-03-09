@@ -56,6 +56,10 @@ public abstract class CrudBehind<T, TModel>
     // TODO: reevaluate the usefullnes around the complexities of this method - return for example
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
+        if (ObservableList.Any())
+        {
+            return Initialized;
+        }
         var entities = await _repository.ReadAll();
         ObservableList.AddRange(entities);
         return entities.Any();

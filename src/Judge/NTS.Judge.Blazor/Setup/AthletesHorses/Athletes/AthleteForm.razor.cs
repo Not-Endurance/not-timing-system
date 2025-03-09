@@ -24,7 +24,7 @@ public partial class AthleteForm
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(Athlete.Person), () => _nameField);
+        RegisterInjector(nameof(Athlete.Names), () => _nameField);
         RegisterInjector(nameof(Athlete.Country), () => _countryField);
         RegisterInjector(nameof(Athlete.Club), () => _clubField);
         RegisterInjector(nameof(Athlete.FeiId), () => _feiIdField);

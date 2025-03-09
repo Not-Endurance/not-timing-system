@@ -1,6 +1,8 @@
-﻿using Not.Application.Behinds.Adapters;
+﻿using AngleSharp.Io;
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
+using Not.Notify;
 using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
@@ -12,10 +14,16 @@ namespace NTS.Judge.Core.Behinds.Adapters;
 public class RanklistBehind : ObservableBehind, IRankingBehind
 {
     readonly IRepository<Ranking> _rankings;
+    readonly IRepository<EnduranceEvent> _events;
+    readonly IRepository<Official> _officials;
+    readonly IRepository<ArchiveEntry> _archive;
 
-    public RanklistBehind(IRepository<Ranking> rankings)
+    public RanklistBehind(IRepository<Ranking> rankings, IRepository<EnduranceEvent> events, IRepository<Official> officials, IRepository<ArchiveEntry> archive)
     {
         _rankings = rankings;
+        _events = events;
+        _officials = officials;
+        _archive = archive;
         Participation.PHASE_COMPLETED_EVENT.Subscribe(UpdateRanklist);
         Participation.ELIMINATED_EVENT.Subscribe(UpdateRanklist);
         Participation.RESTORED_EVENT.Subscribe(UpdateRanklist);
@@ -43,6 +51,21 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
     {
         Task action() => SafeSelectRanking(id);
         await SafeHelper.Run(action);
+    }
+
+    public async Task Archive()
+    {
+        var enduranceEvent = await _events.Read(0);
+        if (enduranceEvent == null)
+        {
+            NotifyHelper.Warn("Event is not started yet");
+            return;
+        }
+        var officials = await _officials.ReadAll();
+        var rankings = await _rankings.ReadAll();
+
+        var entry = new ArchiveEntry(enduranceEvent, officials, rankings);
+        await _archive.Create(entry);
     }
 
     async Task<IEnumerable<Ranking>> SafeGetRankings()

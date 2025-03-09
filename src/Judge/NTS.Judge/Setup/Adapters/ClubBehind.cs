@@ -1,7 +1,7 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Blazor.Ports;
-using NTS.Domain.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.Clubs;
 
 namespace NTS.Judge.Setup.Adapters;

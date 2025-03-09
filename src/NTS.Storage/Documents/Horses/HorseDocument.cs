@@ -1,17 +1,11 @@
-﻿using Not.Random;
+﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.Documents.Horses;
 
 public class HorseDocument : Document
 {
-    public HorseDocument(string name)
-        : base(RandomHelper.GenerateUniqueInteger()) // TODO: remove Core.Combination workaround
-    {
-        Name = name;
-    }
-
-    public HorseDocument(Horse horse)
+    public HorseDocument(IHorse horse)
         : base(horse.Id)
     {
         FeiId = horse.FeiId;

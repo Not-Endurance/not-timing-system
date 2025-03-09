@@ -1,11 +1,12 @@
 ﻿using Not.Random;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.Documents.Clubs;
 
 public class ClubDocument : Document
 {
-    public ClubDocument(Club club)
+    public ClubDocument(IClub club)
         : base(club.Id)
     {
         Name = club.Name;

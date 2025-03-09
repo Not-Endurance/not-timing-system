@@ -1,4 +1,6 @@
-﻿namespace Not.Strings;
+﻿using System.Text;
+
+namespace Not.Strings;
 
 public static class StringExtensions
 {
@@ -11,5 +13,20 @@ public static class StringExtensions
     public static bool NContains(this string str, string term)
     {
         return str.Contains(term, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    public static string NTrim(this string str, int maxLength)
+    {
+        if (str.Length <= maxLength)
+        {
+            return str;
+        }
+        var sb = new StringBuilder();
+        for (var i = 0; i < maxLength; i++)
+        {
+            sb.Append(str[i]);
+        }
+        sb.AppendLine("...");
+        return sb.ToString();
     }
 }
