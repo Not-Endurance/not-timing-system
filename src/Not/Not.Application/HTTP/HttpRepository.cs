@@ -10,7 +10,7 @@ namespace Not.Application.HTTP;
 public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
     where T : class, IAggregateRoot, IIdentifiable
 {
-    const string ERROR_TEMPLATE = "Could not connect to Nexus. Some operations will not be available. Please check your internet connection";
+    const string CONNECTION_ERROR = "Could not connect to Nexus. Some operations will not be available. Please check your internet connection";
 
     readonly string _endpoint;
 
@@ -28,10 +28,14 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
 
     protected void HandleException(Exception ex)
     {
-        var message = ex is HttpRequestException httpRequestException && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
-            ? ERROR_TEMPLATE
-            : ex.Message;
-        NotifyHelper.Warn(message);
+        if (ex is HttpRequestException httpRequestException && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError)
+        {
+            NotifyHelper.Warn(CONNECTION_ERROR);
+        }
+        else
+        {
+            NotifyHelper.Error(ex);
+        }
     }
 
     public async Task Create(T entity)
