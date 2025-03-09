@@ -20,10 +20,8 @@ public class ParticipationFactory
         var state = new EmsParticipantState
         {
             Number = participation.Combination.Number.ToString(),
-            MaxAverageSpeedInKmPh = (int)participation.Combination.MinAverageSpeed!,
-            Unranked =
-                true // TODO: fix when Unranked is added on Unranked level
-            ,
+            MaxAverageSpeedInKmPh = (int?)participation.Combination.MinAverageSpeed,
+            Unranked = true // TODO: fix when Unranked is added on Unranked level
         };
         var emsParticipant = new EmsParticipant(athlete, horse, state);
         var emsLaps = LapFactory.Create(participation).ToList();
@@ -81,8 +79,8 @@ public class ParticipationFactory
                 if (phases.Any())
                 {
                     // Adjusting isnt necessary since it's already done in the previous iteration
-                    var outTime = phases.Last().GetOutTime()!;
-                    previousTime = outTime.ToDateTimeOffset();
+                    var outTime = phases.Last().GetOutTime();
+                    previousTime = outTime?.ToDateTimeOffset();
                     startTimestamp = Timestamp.Copy(outTime);
                 }
                 else

@@ -116,6 +116,6 @@ public class EmsStartlistEntry : IComparable<EmsStartlistEntry>, IEquatable<EmsS
     DateTime? GetLastNextStartTime(EmsParticipation participation)
     {
         var currentRecord = participation.Participant.LapRecords.Last();
-        return currentRecord.NextStarTime;
+        return currentRecord.StartTime;
     }
 }
