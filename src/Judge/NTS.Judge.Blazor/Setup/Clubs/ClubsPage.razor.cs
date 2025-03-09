@@ -1,5 +1,3 @@
 namespace NTS.Judge.Blazor.Setup.Clubs;
 
-public partial class ClubsPage
-{
-}
+public partial class ClubsPage { }

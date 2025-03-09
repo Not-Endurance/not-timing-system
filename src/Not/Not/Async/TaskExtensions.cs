@@ -12,12 +12,18 @@ public static class TaskExtensions
         return (await task).FirstOrDefault();
     }
 
-    public static async Task<T?> FirstOrDefault<T>(this Task<IEnumerable<T>> task, Func<T, bool> filter)
+    public static async Task<T?> FirstOrDefault<T>(
+        this Task<IEnumerable<T>> task,
+        Func<T, bool> filter
+    )
     {
         return (await task).FirstOrDefault(filter);
     }
 
-    public static async Task<IEnumerable<TOther>> Select<T, TOther>(this Task<IEnumerable<T>> task, Func<T, TOther> selector)
+    public static async Task<IEnumerable<TOther>> Select<T, TOther>(
+        this Task<IEnumerable<T>> task,
+        Func<T, TOther> selector
+    )
     {
         return (await task).Select(selector);
     }

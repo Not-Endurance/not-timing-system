@@ -13,14 +13,18 @@ public class SettingFunction : FunctionBase<SettingFunction>
 {
     readonly IRepository<SettingDocument> _settings;
 
-    public SettingFunction(IFunctionLogger<SettingFunction> logger, IRepository<SettingDocument> settings) : base(logger)
+    public SettingFunction(
+        IFunctionLogger<SettingFunction> logger,
+        IRepository<SettingDocument> settings
+    )
+        : base(logger)
     {
         _settings = settings;
     }
 
     [Function("settings-insert")]
     public async Task<IActionResult> Insert(
-       [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "settings")] HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "settings")] HttpRequest request
     )
     {
         LogInformation(request);

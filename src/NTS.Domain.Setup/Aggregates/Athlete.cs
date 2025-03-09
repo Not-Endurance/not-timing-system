@@ -28,13 +28,7 @@ public class Athlete : AggregateRoot, IAthlete, IAggregateRoot, IReflect<Club>
         return new(id, Person.Create(name), feiId, country, club, category);
     }
 
-    Athlete(
-        Person? person,
-        string? feiId,
-        Country? country,
-        Club? club,
-        AthleteCategory? category
-    )
+    Athlete(Person? person, string? feiId, Country? country, Club? club, AthleteCategory? category)
         : this(GenerateId(), person, feiId, country, club, category) { }
 
     [Newtonsoft.Json.JsonConstructor]

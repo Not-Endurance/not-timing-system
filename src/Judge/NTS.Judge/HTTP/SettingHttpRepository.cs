@@ -7,9 +7,8 @@ namespace NTS.Judge.HTTP;
 
 public class SettingHttpRepository : HttpRepository<Setting>, ISettingRepository
 {
-    public SettingHttpRepository(NHttpClient client) : base("settings", client)
-    {
-    }
+    public SettingHttpRepository(NHttpClient client)
+        : base("settings", client) { }
 
     public async Task<Setting?> Get(Guid accountId)
     {

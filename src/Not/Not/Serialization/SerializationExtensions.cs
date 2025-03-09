@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 namespace Not.Serialization;
 
 public static class SerializationExtensions
-
 {
     public static readonly JsonSerializerSettings SETTINGS = new()
     {
@@ -20,7 +19,6 @@ public static class SerializationExtensions
     {
         _converters.Add(converter);
     }
-
 
     /// <summary>
     /// Serializes the object by keeping single instance of uniqute (AggregateRoot.Id) object and replaces usages with #domainRef

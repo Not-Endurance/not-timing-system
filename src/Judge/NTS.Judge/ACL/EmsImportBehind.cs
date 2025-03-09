@@ -45,7 +45,12 @@ public class EmsImporters : IEmsImporter
         var contents = await File.ReadAllTextAsync(emsStateFilePath);
         var emsState = contents.FromConvertedJson<EmsState>();
 
-        var country = new Country(0, emsState.Event.Country.IsoCode, null, emsState.Event.Country.Name);
+        var country = new Country(
+            0,
+            emsState.Event.Country.IsoCode,
+            null,
+            emsState.Event.Country.Name
+        );
         var enduranceEvent = EnduranceEvent.Create(emsState.Event.PopulatedPlace, country);
 
         foreach (var offical in CreateOfficials(emsState.Event))

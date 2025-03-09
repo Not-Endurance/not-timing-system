@@ -13,7 +13,11 @@ public class SettingBehind : ObservableBehind, ISettingBehind
     readonly IEnumerable<ICrudReflection<Setting>> _reflections;
     readonly IAccountBehind _accountBehind;
 
-    public SettingBehind(ISettingRepository repository, IEnumerable<ICrudReflection<Setting>> reflections, IAccountBehind accountBehind)
+    public SettingBehind(
+        ISettingRepository repository,
+        IEnumerable<ICrudReflection<Setting>> reflections,
+        IAccountBehind accountBehind
+    )
     {
         _repository = repository;
         _reflections = reflections;

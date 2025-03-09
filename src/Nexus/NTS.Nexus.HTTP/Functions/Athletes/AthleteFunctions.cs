@@ -120,9 +120,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         LogInformation(request);
 
         // TODO: Implement response mapping layer for documents back to aggregates
-        var athletes = await _athletes
-            .ReadAll()
-            .Select(x => x.ToDomain());
+        var athletes = await _athletes.ReadAll().Select(x => x.ToDomain());
         return new OkObjectResult(athletes);
     }
 }

@@ -28,7 +28,9 @@ public static class NotifyHelper
     public static void Error(Exception exception)
     {
         exception = exception.GetInnermost();
-        var failure = new Failure(exception.Message + Environment.NewLine + exception.StackTrace?.NTrim(1000));
+        var failure = new Failure(
+            exception.Message + Environment.NewLine + exception.StackTrace?.NTrim(1000)
+        );
         NotificationEvents.Failed.Emit(failure);
     }
 }

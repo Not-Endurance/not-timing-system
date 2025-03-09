@@ -8,7 +8,7 @@ public class ArchiveEntry : AggregateRoot
         EnduranceEvent enduranceEvent,
         IEnumerable<Official> officials,
         IEnumerable<Ranking> rankings
-    ) 
+    )
         : base(GenerateId())
     {
         EnduranceEvent = enduranceEvent;

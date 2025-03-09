@@ -26,7 +26,9 @@ public partial class NAutocomplete<T>
         var seeker = Provider.GetService<ISeeker<T>>();
         if (Search == null && seeker == null)
         {
-            throw GuardHelper.Exception($"NAutocomplete cannot work without search provider. Either define '{nameof(ISeeker<T>)}' implementation or provide '{nameof(Search)}' parameter");
+            throw GuardHelper.Exception(
+                $"NAutocomplete cannot work without search provider. Either define '{nameof(ISeeker<T>)}' implementation or provide '{nameof(Search)}' parameter"
+            );
         }
         Search ??= seeker!.Search;
     }

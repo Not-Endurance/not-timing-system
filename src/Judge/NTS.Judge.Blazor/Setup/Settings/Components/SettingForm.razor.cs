@@ -9,7 +9,7 @@ public partial class SettingForm : NForm<SettingFormModel>
 {
     NAutocomplete<Country?> _countryField = default!;
     NSelect<DetectionMode?> _detectionModeField = default!;
-    
+
     public override void RegisterValidationInjectors()
     {
         RegisterInjector(nameof(Setting.Country), () => _countryField);

@@ -8,9 +8,8 @@ namespace NTS.Judge.Setup.Adapters;
 
 internal class ClubBehind : CrudBehind<Club, ClubFormModel>
 {
-    public ClubBehind(IRepository<Club> repository, IEnumerable<ICrudReflection<Club>> reflections) : base(repository, reflections)
-    {
-    }
+    public ClubBehind(IRepository<Club> repository, IEnumerable<ICrudReflection<Club>> reflections)
+        : base(repository, reflections) { }
 
     protected override Club CreateEntity(ClubFormModel model)
     {

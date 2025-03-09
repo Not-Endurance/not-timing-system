@@ -8,7 +8,11 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class PhaseBehind : CrudBehind<Phase, PhaseFormModel>, ICrudReflection<Loop>
 {
-    public PhaseBehind(IRepository<Phase> phase, CompetitionParentContext parentContext, IEnumerable<ICrudReflection<Phase>> reflections)
+    public PhaseBehind(
+        IRepository<Phase> phase,
+        CompetitionParentContext parentContext,
+        IEnumerable<ICrudReflection<Phase>> reflections
+    )
         : base(phase, reflections)
     {
         AttachParent(parentContext);

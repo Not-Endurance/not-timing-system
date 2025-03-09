@@ -10,7 +10,8 @@ namespace Not.Application.HTTP;
 public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
     where T : class, IAggregateRoot, IIdentifiable
 {
-    const string CONNECTION_ERROR = "Could not connect to Nexus. Some operations will not be available. Please check your internet connection";
+    const string CONNECTION_ERROR =
+        "Could not connect to Nexus. Some operations will not be available. Please check your internet connection";
 
     readonly string _endpoint;
 
@@ -19,6 +20,7 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         _endpoint = endpoint;
         Client = client;
     }
+
     protected NHttpClient Client { get; }
 
     protected string BuildUrl(object id)
@@ -28,7 +30,10 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
 
     protected void HandleException(Exception ex)
     {
-        if (ex is HttpRequestException httpRequestException && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError)
+        if (
+            ex is HttpRequestException httpRequestException
+            && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
+        )
         {
             NotifyHelper.Warn(CONNECTION_ERROR);
         }

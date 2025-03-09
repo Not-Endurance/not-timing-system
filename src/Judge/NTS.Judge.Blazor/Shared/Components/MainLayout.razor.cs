@@ -10,7 +10,6 @@ public partial class MainLayout
     bool _hideLayout;
     bool _drawerOpen = true;
 
-
     protected override void OnInitialized()
     {
         PrintableComponent.OnToggle(ToggleLayoutVisibility);

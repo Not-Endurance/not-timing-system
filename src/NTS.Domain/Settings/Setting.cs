@@ -6,13 +6,13 @@ namespace NTS.Domain.Settings;
 
 public class Setting : AggregateRoot
 {
-    public Setting(Guid accountId, Country? country, DetectionMode? detectionMode) : this(GenerateId(), accountId, country, detectionMode)
-    {
-    }
+    public Setting(Guid accountId, Country? country, DetectionMode? detectionMode)
+        : this(GenerateId(), accountId, country, detectionMode) { }
 
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Setting(int? id, Guid? accountId, Country? country, DetectionMode? detectionMode) : base(id!.Value)
+    public Setting(int? id, Guid? accountId, Country? country, DetectionMode? detectionMode)
+        : base(id!.Value)
     {
         AccountId = Required(nameof(AccountId), accountId);
         Country = Required(nameof(Country), country);

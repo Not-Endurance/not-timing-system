@@ -6,7 +6,6 @@ namespace NTS.Judge.HTTP;
 
 public class CountryHttpCache : HttpCache<Country>
 {
-    public CountryHttpCache(IRepository<Country> repository) : base(repository)
-    {
-    }
+    public CountryHttpCache(IRepository<Country> repository)
+        : base(repository) { }
 }

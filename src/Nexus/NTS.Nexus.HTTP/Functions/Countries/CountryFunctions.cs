@@ -61,9 +61,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
     {
         LogInformation(request);
 
-        var countries = await _countries
-            .ReadAll()
-            .Select(x => x.ToDomain());
+        var countries = await _countries.ReadAll().Select(x => x.ToDomain());
         return new OkObjectResult(countries);
     }
 }

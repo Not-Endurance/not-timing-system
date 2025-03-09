@@ -5,7 +5,6 @@ namespace NTS.Judge.HTTP;
 
 public class CountryHttpRepository : HttpRepository<Country>
 {
-    public CountryHttpRepository(NHttpClient client) : base("countries", client)
-    {
-    }
+    public CountryHttpRepository(NHttpClient client)
+        : base("countries", client) { }
 }

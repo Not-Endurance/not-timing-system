@@ -9,10 +9,8 @@ public class NHttpClient
 {
 #if DEBUG
     static readonly string HOST = "http://localhost:8080/api";
-
 #else
     static readonly string HOST = "https://nts-nexus-functions.azurewebsites.net/api";
-
 #endif
 
     readonly HttpClient _httpClient;
@@ -74,7 +72,11 @@ public class NHttpClient
         {
             var request = new HttpRequestMessage(method, url)
             {
-                Content = new StringContent(payload.ToConvertedJson(), Encoding.UTF8, "application/json")
+                Content = new StringContent(
+                    payload.ToConvertedJson(),
+                    Encoding.UTF8,
+                    "application/json"
+                ),
             };
 
             var response = await _httpClient.SendAsync(request);

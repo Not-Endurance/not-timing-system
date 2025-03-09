@@ -83,9 +83,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
     {
         LogInformation(request);
 
-        var clubs = await _clubs
-            .ReadAll()
-            .Select(x => x.ToDomain());
+        var clubs = await _clubs.ReadAll().Select(x => x.ToDomain());
         return new OkObjectResult(clubs);
     }
 }

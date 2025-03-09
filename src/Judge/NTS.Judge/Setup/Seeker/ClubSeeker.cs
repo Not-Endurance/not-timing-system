@@ -16,7 +16,9 @@ public class ClubSeeker : ISeeker<Club>
 
     public Task<IEnumerable<Club>> Search(string term)
     {
-        var results = _clubBehind.Items.Where(x => term == string.Empty || StringExtensions.NContains(x.Name, term));
+        var results = _clubBehind.Items.Where(x =>
+            term == string.Empty || StringExtensions.NContains(x.Name, term)
+        );
         return Task.FromResult(results);
     }
 }

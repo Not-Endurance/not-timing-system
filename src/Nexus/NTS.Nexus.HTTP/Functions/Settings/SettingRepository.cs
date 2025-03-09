@@ -6,14 +6,15 @@ namespace NTS.Nexus.HTTP.Functions.Settings;
 
 public class SettingRepository : MongoRepository<SettingDocument>
 {
-    public SettingRepository(IMongoContext context) : base(context, "nts", "settings")
-    {
-    }
+    public SettingRepository(IMongoContext context)
+        : base(context, "nts", "settings") { }
 
-    protected override UpdateDefinition<SettingDocument> GetUpdateDefinition(SettingDocument document)
+    protected override UpdateDefinition<SettingDocument> GetUpdateDefinition(
+        SettingDocument document
+    )
     {
-        return Builders<SettingDocument>.Update
-            .Set(x => x.DetectionMode, document.DetectionMode)
+        return Builders<SettingDocument>
+            .Update.Set(x => x.DetectionMode, document.DetectionMode)
             .Set(x => x.Country, document.Country);
     }
 }

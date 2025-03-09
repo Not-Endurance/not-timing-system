@@ -6,7 +6,14 @@ public class Athlete : IAthlete
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Athlete(int id, Person names, AthleteCategory category, Country country, Club? club, string feiId)
+    public Athlete(
+        int id,
+        Person names,
+        AthleteCategory category,
+        Country country,
+        Club? club,
+        string feiId
+    )
     {
         Id = id;
         Names = names;

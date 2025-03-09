@@ -12,7 +12,10 @@ public static class JudgeInjection
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static IServiceCollection ConfigureJudge(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection ConfigureJudge(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services.AddNHttp(configuration);
         return services;

@@ -67,7 +67,9 @@ public abstract class NForm<T> : NComponent
         if (!ValidationInjectors.TryGetValue(field, out var injectors))
         {
             NotifyHelper.Warn(message);
-            var error = GuardHelper.Exception($"'{typeof(T)}' form does not have injector for field '{field}'");
+            var error = GuardHelper.Exception(
+                $"'{typeof(T)}' form does not have injector for field '{field}'"
+            );
             NotifyHelper.Error(error);
             return;
         }

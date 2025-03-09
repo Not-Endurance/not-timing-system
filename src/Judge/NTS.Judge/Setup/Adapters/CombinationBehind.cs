@@ -6,9 +6,14 @@ using NTS.Judge.Blazor.Setup.Combinations.Dot;
 namespace NTS.Judge.Setup.Adapters;
 
 public class CombinationBehind
-    : CrudBehind<Combination, CombinationFormModel>, ICrudReflection<Athlete>, ICrudReflection<Horse>
+    : CrudBehind<Combination, CombinationFormModel>,
+        ICrudReflection<Athlete>,
+        ICrudReflection<Horse>
 {
-    public CombinationBehind(IRepository<Combination> repository, IEnumerable<ICrudReflection<Combination>> dependants)
+    public CombinationBehind(
+        IRepository<Combination> repository,
+        IEnumerable<ICrudReflection<Combination>> dependants
+    )
         : base(repository, dependants) { }
 
     protected override Combination CreateEntity(CombinationFormModel model)

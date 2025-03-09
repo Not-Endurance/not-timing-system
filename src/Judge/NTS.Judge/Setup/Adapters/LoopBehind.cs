@@ -7,7 +7,10 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class LoopBehind : CrudBehind<Loop, LoopFormModel>
 {
-    public LoopBehind(IRepository<Loop> loopRepository, IEnumerable<ICrudReflection<Loop>> dependants)
+    public LoopBehind(
+        IRepository<Loop> loopRepository,
+        IEnumerable<ICrudReflection<Loop>> dependants
+    )
         : base(loopRepository, dependants) { }
 
     protected override Loop CreateEntity(LoopFormModel model)

@@ -18,7 +18,12 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
 
-    public RanklistBehind(IRepository<Ranking> rankings, IRepository<EnduranceEvent> events, IRepository<Official> officials, IRepository<ArchiveEntry> archive)
+    public RanklistBehind(
+        IRepository<Ranking> rankings,
+        IRepository<EnduranceEvent> events,
+        IRepository<Official> officials,
+        IRepository<ArchiveEntry> archive
+    )
     {
         _rankings = rankings;
         _events = events;

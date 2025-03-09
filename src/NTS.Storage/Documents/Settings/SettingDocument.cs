@@ -6,7 +6,8 @@ namespace NTS.Storage.Documents.Settings;
 
 public class SettingDocument : Document
 {
-    public SettingDocument(Setting setting) : base(setting.Id)
+    public SettingDocument(Setting setting)
+        : base(setting.Id)
     {
         Country = setting.Country;
         DetectionMode = setting.DetectionMode;

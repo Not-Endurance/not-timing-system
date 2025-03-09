@@ -5,7 +5,6 @@ namespace NTS.Judge.HTTP;
 
 public class ArchiveHttpRepository : HttpRepository<ArchiveEntry>
 {
-    public ArchiveHttpRepository(NHttpClient client) : base("archive", client)
-    {
-    }
+    public ArchiveHttpRepository(NHttpClient client)
+        : base("archive", client) { }
 }

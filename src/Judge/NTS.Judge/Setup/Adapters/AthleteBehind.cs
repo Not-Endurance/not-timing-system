@@ -7,10 +7,11 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflection<Club>
 {
-    public AthleteBehind(IRepository<Athlete> repository, IEnumerable<ICrudReflection<Athlete>> dependants)
-        : base(repository, dependants) 
-    {
-    }
+    public AthleteBehind(
+        IRepository<Athlete> repository,
+        IEnumerable<ICrudReflection<Athlete>> dependants
+    )
+        : base(repository, dependants) { }
 
     protected override Athlete CreateEntity(AthleteFormModel model)
     {

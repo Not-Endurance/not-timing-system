@@ -16,13 +16,13 @@ public class Club : AggregateRoot, IClub, IAggregateRoot
         return new Club(id, name);
     }
 
-    public Club(string? name) : this(GenerateId(), name)
-    {
-    }
+    public Club(string? name)
+        : this(GenerateId(), name) { }
 
     [System.Text.Json.Serialization.JsonConstructor]
     [JsonConstructor]
-    public Club(int id, string? name) : base(id)
+    public Club(int id, string? name)
+        : base(id)
     {
         Name = Required(nameof(Name), name);
     }

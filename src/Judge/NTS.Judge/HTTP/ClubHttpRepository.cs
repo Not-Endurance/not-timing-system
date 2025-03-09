@@ -5,7 +5,6 @@ namespace NTS.Judge.HTTP;
 
 public class ClubHttpRepository : HttpRepository<Club>
 {
-    public ClubHttpRepository(NHttpClient client) : base("clubs", client)
-    {
-    }
+    public ClubHttpRepository(NHttpClient client)
+        : base("clubs", client) { }
 }

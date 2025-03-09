@@ -48,7 +48,6 @@ public class NotListModel
         }
     }
 
-
     public static IEnumerable<NotListModel<T>> FromEntity<T>(IEnumerable<T> values)
     {
         foreach (var value in values)

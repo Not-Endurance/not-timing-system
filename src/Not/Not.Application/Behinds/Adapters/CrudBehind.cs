@@ -43,8 +43,12 @@ public abstract class CrudBehind<T, TModel>
     {
         _parentContext = parentBehind;
     }
-    
-    protected void UpdateReflections<TReflection>(Func<T, TReflection?> selector, TReflection reflection, Action<T> update)
+
+    protected void UpdateReflections<TReflection>(
+        Func<T, TReflection?> selector,
+        TReflection reflection,
+        Action<T> update
+    )
         where TReflection : class
     {
         foreach (var item in Items.Where(x => selector(x)?.Equals(reflection) ?? false))

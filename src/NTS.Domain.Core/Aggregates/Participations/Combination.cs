@@ -61,7 +61,7 @@ public class Combination : AggregateRoot
 
     public int Number { get; }
     public Athlete Athlete { get; }
-    public Horse Horse { get; } 
+    public Horse Horse { get; }
     public Country? Country { get; }
     public Club? Club { get; }
     public Speed? MinAverageSpeed { get; }

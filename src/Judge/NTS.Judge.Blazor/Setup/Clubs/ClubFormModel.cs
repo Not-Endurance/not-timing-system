@@ -2,6 +2,7 @@
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.Clubs;
+
 public class ClubFormModel : IFormModel<Club>
 {
     public ClubFormModel()
