@@ -7,17 +7,18 @@ namespace Not.Application.HTTP;
 
 public class NHttpClient
 {
-#if DEBUG
-    static readonly string HOST = "http://localhost:8080/api";
-#else
-    static readonly string HOST = "https://nts-nexus-functions.azurewebsites.net/api";
-#endif
-
+    readonly string _host;
     readonly HttpClient _httpClient;
     readonly ILogger<NHttpClient> _logger;
 
     public NHttpClient(IHttpClientFactory httpClientFactory, ILogger<NHttpClient> logger)
     {
+#if DEBUG
+        _host = "http://localhost:8080/api";
+#else
+        _host = "https://nts-nexus-functions.azurewebsites.net/api";
+#endif
+
         _httpClient = httpClientFactory.CreateClient("NHttpClient");
         _logger = logger;
     }
@@ -97,6 +98,6 @@ public class NHttpClient
 
     Uri BuildUrl(string endpoint)
     {
-        return new Uri($"{HOST}/{endpoint}");
+        return new Uri($"{_host}/{endpoint}");
     }
 }
