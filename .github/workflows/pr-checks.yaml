@@ -77,7 +77,7 @@ jobs:
       run: dotnet nuget remove source "local-cache" --configfile ./${{ env.SOLUTION_DIR }}/NuGet.config
 
     - name: MAUI workloads
-      run: dotnet workload restore --project ${{ env.SOLUTION_DIR }}/${{ env.MAUI_PROJECT_PATH }}
+      run: dotnet workload install maui
 
     - name: Restore
       run: dotnet restore "${{ env.SOLUTION_DIR }}"
