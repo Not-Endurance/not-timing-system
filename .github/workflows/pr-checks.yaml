@@ -5,7 +5,8 @@ on:
 
 env:
   DOTNET_CORE_VERSION: 8.0.x
-  NEXUS_SOURCE_DIR: src/Nexus/NTS.Nexus.HTTP
+  SOURCE_DIR: src
+  NEXUS_PATH: Nexus/NTS.Nexus.HTTP
   CONFIGURATION: Release
 
 jobs:
@@ -73,14 +74,14 @@ jobs:
     - name: Set current workding directory env
       run: echo "CURRENT_DIR=$(pwd)/src" >> $GITHUB_ENV
     - name: Remove local-cache NuGet source
-      run: dotnet nuget remove source "local-cache" --configfile ./${{ env.NEXUS_SOURCE_DIR }}/NuGet.config
+      run: dotnet nuget remove source "local-cache" --configfile ./${{ env.SOURCE_DIR }}/NuGet.config
 
     - name: Restore
-      run: dotnet restore "${{ env.NEXUS_SOURCE_DIR }}"
+      run: dotnet restore ${{ env.SOURCE_DIR }}/${{ env.NEXUS_PATH }}
     
     - name: Build
       run: |
-        dotnet build "${{ env.NEXUS_SOURCE_DIR }}" \
-        --configuration "${{ env.CONFIGURATION }}" \
+        dotnet build ${{ env.SOURCE_DIR }}/${{ env.NEXUS_PATH }} \
+        --configuration ${{ env.CONFIGURATION }} \
         --no-restore \
         -property:SolutionDir="$CURRENT_DIR"
