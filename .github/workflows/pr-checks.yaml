@@ -5,9 +5,8 @@ on:
 
 env:
   DOTNET_CORE_VERSION: 8.0.x
-  SOLUTION_DIR: src
+  NEXUS_SOURCE_DIR: src/Nexus/NTS.Nexus.HTTP
   CONFIGURATION: Release
-  MAUI_PROJECT_PATH: Judge/NTS.Judge.MAUI/NTS.Judge.MAUI.csproj
 
 jobs:
   csharpier-format:
@@ -74,17 +73,14 @@ jobs:
     - name: Set current workding directory env
       run: echo "CURRENT_DIR=$(pwd)/src" >> $GITHUB_ENV
     - name: Remove local-cache NuGet source
-      run: dotnet nuget remove source "local-cache" --configfile ./${{ env.SOLUTION_DIR }}/NuGet.config
-
-    - name: MAUI workloads
-      run: dotnet workload install maui
+      run: dotnet nuget remove source "local-cache" --configfile ./${{ env.NEXUS_SOURCE_DIR }}/NuGet.config
 
     - name: Restore
-      run: dotnet restore "${{ env.SOLUTION_DIR }}"
+      run: dotnet restore "${{ env.NEXUS_SOURCE_DIR }}"
     
     - name: Build
       run: |
-        dotnet build "${{ env.SOLUTION_DIR }}" \
+        dotnet build "${{ env.NEXUS_SOURCE_DIR }}" \
         --configuration "${{ env.CONFIGURATION }}" \
         --no-restore \
         -property:SolutionDir="$CURRENT_DIR"
