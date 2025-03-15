@@ -26,7 +26,7 @@ public static class SafeHelper
         }
         catch (Exception ex)
         {
-            HandleError(ex); 
+            HandleError(ex);
             return default;
         }
     }
