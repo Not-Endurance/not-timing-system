@@ -1,6 +1,6 @@
 ﻿using Not.Blazor.CRUD.Forms.Ports;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.StaticOptions;
-using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
@@ -11,25 +11,25 @@ public class AthleteFormModel : IFormModel<Athlete>
     {
 #if DEBUG
         Name = "Gucci Petrov";
-        Club = "Конярче ООД";
+        Club = Club.Create("Конярче ЕООД");
 #endif
         Country = StaticOption.SelectedCountry;
     }
 
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public string? Name { get; set; }
     public string? FeiId { get; set; }
     public Country? Country { get; set; }
-    public string? Club { get; set; }
+    public Club? Club { get; set; }
     public AthleteCategory Category { get; set; } = AthleteCategory.Senior;
 
     public void FromEntity(Athlete athlete)
     {
         Id = athlete.Id;
-        Name = athlete.Person;
+        Name = athlete.Names;
         FeiId = athlete.FeiId;
         Country = athlete.Country;
-        Club = athlete.Club.ToString();
+        Club = athlete.Club;
         Category = athlete.Category;
     }
 }

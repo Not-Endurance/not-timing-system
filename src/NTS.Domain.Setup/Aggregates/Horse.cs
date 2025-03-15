@@ -1,33 +1,34 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+﻿using Not.Domain.Base;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Horse : AggregateRoot, IAggregateRoot
+public class Horse : AggregateRoot, IHorse, IAggregateRoot
 {
     public static Horse Create(string? name, string? feiId)
     {
         return new(name, feiId);
     }
 
-    public static Horse Update(int id, string? name, string? feiId)
+    public static Horse Update(int? id, string? name, string? feiId)
     {
         return new(id, name, feiId);
-    }
-
-    [JsonConstructor]
-    Horse(int id, string? name, string? feiId)
-        : base(id)
-    {
-        Name = Required(nameof(Name), name);
-        FeiId = feiId;
     }
 
     Horse(string? name, string? feiId)
         : this(GenerateId(), name, feiId) { }
 
-    public string? FeiId { get; }
+    [Newtonsoft.Json.JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Horse(int? id, string? name, string? feiId)
+        : base(id!.Value)
+    {
+        Name = Required(nameof(Name), name);
+        FeiId = feiId;
+    }
+
     public string Name { get; }
+    public string? FeiId { get; }
 
     public string Summarize()
     {

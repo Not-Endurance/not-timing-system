@@ -9,8 +9,15 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class OfficialBehind : CrudBehind<Official, OfficialFormModel>
 {
-    public OfficialBehind(IRepository<Official> official, EventParentContext enduraceEventContext)
-        : base(official, enduraceEventContext) { }
+    public OfficialBehind(
+        IRepository<Official> official,
+        EventParentContext enduraceEventContext,
+        IEnumerable<ICrudReflection<Official>> dependants
+    )
+        : base(official, dependants)
+    {
+        AttachParent(enduraceEventContext);
+    }
 
     protected override Official CreateEntity(OfficialFormModel model)
     {

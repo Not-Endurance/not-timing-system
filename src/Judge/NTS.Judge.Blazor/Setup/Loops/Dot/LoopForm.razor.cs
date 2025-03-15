@@ -5,7 +5,7 @@ namespace NTS.Judge.Blazor.Setup.Loops.Dot;
 
 public partial class LoopForm
 {
-    MudNumericField<double> _distanceField = default!;
+    MudNumericField<double?> _distanceField = default!;
 
     public override void RegisterValidationInjectors()
     {

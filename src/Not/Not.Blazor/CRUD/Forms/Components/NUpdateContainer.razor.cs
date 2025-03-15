@@ -30,7 +30,7 @@ public partial class NUpdateContainer<T, TForm>
         NavigateBack();
     }
 
-    async Task InjectValidation(DomainExceptionBase validation)
+    async Task InjectValidation(ValidationException validation)
     {
         await _form!.Instance.AddValidationError(validation.Property, validation.Message);
     }

@@ -32,6 +32,11 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
             entry.Officials,
             entry.Rankings
         );
+
+        if (await _archive.Read(entry.Id) != null)
+        {
+            await _archive.Delete(entry.Id);
+        }
         await _archive.Create(document);
 
         return new OkObjectResult($"Archived event {entry.EnduranceEvent}");

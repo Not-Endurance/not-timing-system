@@ -9,19 +9,21 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class CompetitionBehind : CrudBehind<Competition, CompetitionFormModel>
 {
-    readonly IParentContext<Phase> _phaseParent;
-    readonly IParentContext<Participation> _participationParent;
+    readonly ICrudParent<Phase> _phaseParent;
+    readonly ICrudParent<Participation> _participationParent;
 
     public CompetitionBehind(
         IRepository<Competition> competitions,
         EventParentContext parentContext,
-        IParentContext<Phase> phaseParent,
-        IParentContext<Participation> participationParent
+        ICrudParent<Phase> phaseParent,
+        ICrudParent<Participation> participationParent,
+        IEnumerable<ICrudReflection<Competition>> dependants
     )
-        : base(competitions, parentContext)
+        : base(competitions, dependants)
     {
         _phaseParent = phaseParent;
         _participationParent = participationParent;
+        AttachParent(parentContext);
     }
 
     protected override Competition CreateEntity(CompetitionFormModel model)

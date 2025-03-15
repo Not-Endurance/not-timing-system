@@ -1,16 +1,19 @@
-﻿namespace NTS.Domain.Core.Aggregates;
+﻿using Not.Domain.Base;
 
-public class ArchiveEntry : IAggregateRoot
+namespace NTS.Domain.Core.Aggregates;
+
+public class ArchiveEntry : AggregateRoot
 {
     public ArchiveEntry(
         EnduranceEvent enduranceEvent,
-        IReadOnlyList<Official> officials,
-        IReadOnlyList<Ranking> rankings
+        IEnumerable<Official> officials,
+        IEnumerable<Ranking> rankings
     )
+        : base(GenerateId())
     {
         EnduranceEvent = enduranceEvent;
-        Officials = officials;
-        Rankings = rankings;
+        Officials = officials.ToList();
+        Rankings = rankings.ToList();
     }
 
     public string TenantId { get; set; } = default!;

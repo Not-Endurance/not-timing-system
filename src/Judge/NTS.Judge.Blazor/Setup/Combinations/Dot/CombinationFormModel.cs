@@ -12,8 +12,8 @@ public class CombinationFormModel : IFormModel<Combination>
 #endif
     }
 
-    public int Id { get; set; }
-    public int Number { get; set; }
+    public int? Id { get; set; }
+    public int? Number { get; set; }
     public Athlete? Athlete { get; set; }
     public Horse? Horse { get; set; }
     public Tag? Tag { get; set; }

@@ -1,29 +1,33 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
+# Base runtime image for Azure Functions
 FROM mcr.microsoft.com/azure-functions/dotnet-isolated:4-dotnet-isolated8.0 AS base
 WORKDIR /home/site/wwwroot
 EXPOSE 8080
 
-
-# This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["Nexus/NTS.Nexus.HTTP/NTS.Nexus.HTTP.csproj", "Nexus/NTS.Nexus.HTTP/"]
-RUN dotnet restore "./Nexus/NTS.Nexus.HTTP/NTS.Nexus.HTTP.csproj"
-COPY . .
-WORKDIR "/src/Nexus/NTS.Nexus.HTTP"
-RUN dotnet build "./NTS.Nexus.HTTP.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
+COPY /src /src
+
+# Remove local-source
+RUN dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config
+# Remove analyzers dll reference
+RUN rm -f ./src/Directory.Build.props
+
+WORKDIR /src/Nexus/NTS.Nexus.HTTP
+
+# 2. Restore + Build
+RUN dotnet restore "NTS.Nexus.HTTP.csproj" 
+RUN dotnet build "NTS.Nexus.HTTP.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
+
+# Publish stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./NTS.Nexus.HTTP.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "NTS.Nexus.HTTP.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+# Final image
 FROM base AS final
 WORKDIR /home/site/wwwroot
+
 COPY --from=publish /app/publish .
 ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true

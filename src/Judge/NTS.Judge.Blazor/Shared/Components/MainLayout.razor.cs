@@ -1,5 +1,6 @@
 using MudBlazor;
 using Not.Blazor.Components;
+using NTS.Judge.Blazor.Setup.Settings;
 
 namespace NTS.Judge.Blazor.Shared.Components;
 

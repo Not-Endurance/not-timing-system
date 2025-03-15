@@ -1,4 +1,4 @@
-﻿namespace NTS.Nexus.HTTP.Mongo;
+﻿namespace NTS.Application.Mongo;
 
 public static class MongoConstants
 {

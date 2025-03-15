@@ -66,10 +66,12 @@ public abstract class NForm<T> : NComponent
         }
         if (!ValidationInjectors.TryGetValue(field, out var injectors))
         {
-            throw GuardHelper.Exception(
-                $"Key '{field}' not found in {nameof(NForm<T>)}.{nameof(ValidationInjectors)}. "
-                    + $"Make sure all field components have a ref pointer in there."
+            NotifyHelper.Warn(message);
+            var error = GuardHelper.Exception(
+                $"'{typeof(T)}' form does not have injector for field '{field}'"
             );
+            NotifyHelper.Error(error);
+            return;
         }
 
         foreach (var injector in injectors)

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Not.Blazor.CRUD.Ports;
 using Not.Serialization;
-using NTS.Domain.Objects;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents;
 using NTS.Storage.Setup;
@@ -23,7 +23,7 @@ public class StorageTests : JudgeIntegrationTest
             ICreateBehind<EnduranceEventFormModel>
         >();
 
-        var country = new Country("testIso", "testNf", "Test");
+        var country = new Country(0, "testIso", "testNf", "Test");
         var enduranceEvent = new EnduranceEventTestModel { Country = country, Place = "Sofia" };
 
         await enduranceEventBehind.Create(enduranceEvent);
@@ -39,7 +39,7 @@ public class StorageTests : JudgeIntegrationTest
             ),
         };
 
-        await AssertStateEquals(expectedState.ToJson());
+        await AssertStateEquals(expectedState.ToConvertedJson());
     }
 
     [Fact]

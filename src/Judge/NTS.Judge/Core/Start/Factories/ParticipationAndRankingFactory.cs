@@ -1,5 +1,6 @@
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
@@ -61,8 +62,8 @@ public static class ParticipationAndRankingrFactory
             var setupCombination = contestant.Combination;
             var combination = new Combination(
                 setupCombination.Number,
-                setupCombination.Athlete.Person,
-                setupCombination.Horse.Name,
+                setupCombination.Athlete,
+                setupCombination.Horse,
                 competitionDistance,
                 setupCombination.Athlete.Country,
                 setupCombination.Athlete.Club,

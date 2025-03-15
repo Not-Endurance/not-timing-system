@@ -17,7 +17,7 @@ public class CompetitionFormModel : IFormModel<Competition>
 #endif
     }
 
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public string? Name { get; set; }
     public CompetitionType Type { get; set; } = CompetitionType.Qualification;
     public CompetitionRuleset Ruleset { get; set; } = CompetitionRuleset.Regional;

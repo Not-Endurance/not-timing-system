@@ -1,5 +1,5 @@
 ﻿using Not.Blazor.CRUD.Forms.Ports;
-using NTS.Domain.Objects;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
@@ -10,7 +10,6 @@ public class EnduranceEventFormModel
     {
 #if DEBUG
         Place = "Каспичан";
-        Country = new Country("BG", "zz", "Bulgaria");
 #endif
     }
 

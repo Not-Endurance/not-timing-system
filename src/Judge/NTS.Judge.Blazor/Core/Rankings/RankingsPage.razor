@@ -22,21 +22,25 @@
     <Rightbar>
         <NTextDivider Text="Export" />
 
-        <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
-            <MudMenu 
-                Icon="@Icons.Material.Filled.ArrowDropDown"
-                Color="Color.Primary"
-                Variant="Variant.Outlined" 
-                Class="sidebar-menu-button align-center"
-                Style="align-self:auto">
+        <MudStack Row="@true">
 
-                <MudMenuItem OnClick="ShowRanklist">@Localizer.Get("Ranklist")</MudMenuItem>
+            <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
+                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
+                         Color="Color.Primary"
+                         Variant="Variant.Outlined"
+                         Class="sidebar-menu-button align-center"
+                         Style="align-self:auto">
 
-                <MudMenuItem OnClick="ShowProtocol">@Localizer.Get("Protocol")</MudMenuItem>
-            </MudMenu>
+                    <MudMenuItem OnClick="ShowRanklist">@Localizer.Get("Ranklist")</MudMenuItem>
 
-            <NotButtonPrint OnClick="OpenPrintDialog" />
-        </MudButtonGroup>
+                    <MudMenuItem OnClick="ShowProtocol">@Localizer.Get("Protocol")</MudMenuItem>
+                </MudMenu>
+
+                <NotButtonPrint OnClick="OpenPrintDialog" />
+            </MudButtonGroup>
+
+            <NButtonPrimary OnClick="Behind.Archive" Text="Archive" />
+        </MudStack>
 
         <RankingMenu Class="mt-4" />
     </Rightbar>

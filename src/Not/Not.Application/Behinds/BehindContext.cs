@@ -1,28 +1,33 @@
 ﻿using Not.Application.CRUD.Ports;
+using Not.Blazor.CRUD.Ports;
+using Not.Domain;
 using Not.Domain.Base;
 using Not.Exceptions;
 
 namespace Not.Application.Behinds;
 
-public abstract class BehindContext<T>
+public abstract class BehindContext<T> : ICrudParentContext
     where T : AggregateRoot
 {
-    protected BehindContext(IRepository<T> repository)
+    protected BehindContext(IUpdate<T> updater)
     {
-        Repository = repository;
+        Updater = updater;
     }
 
-    protected IRepository<T> Repository { get; }
+    protected IUpdate<T> Updater { get; }
     public T? Entity { get; set; }
 
-    public bool HasLoaded()
-    {
-        return Entity != null;
-    }
-
-    public async Task Persist()
+    protected async Task Persist()
     {
         GuardHelper.ThrowIfDefault(Entity);
-        await Repository.Update(Entity);
+        await Updater.Update(Entity);
+    }
+
+    public void SetParent(IParent entity)
+    {
+        if (entity is T competition)
+        {
+            Entity = competition;
+        }
     }
 }

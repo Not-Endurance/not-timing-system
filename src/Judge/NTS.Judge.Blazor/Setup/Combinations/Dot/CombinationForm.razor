@@ -6,14 +6,14 @@
 @inherits NForm<CombinationFormModel>
 
 <EditForm Model="Model">
-    <MudNumericField @ref="_numberField" @bind-Value="Model.Number" T="int" Min="0" Label="@Localizer.Get("Combination Number")" />
+    <MudNumericField @ref="_numberField" @bind-Value="Model.Number" Min="0" Label="@Localizer.Get("Combination Number")" />
 
     <NAutocomplete @ref="_athleteField" @bind-Value="Model.Athlete" Label="Athlete" Search="SearchAthletes" />
 
     <NAutocomplete @ref="_horseField" @bind-Value="Model.Horse" Label="Horse" Search="SearchHorses"/>
 
-    @if (StaticOption.IsRfidDetectionEnabled())
+    @if (StaticOption.IsRfidDetectionEnabled() && Model.Number.HasValue)
     {
-        <RfidTagWriter CombinationNumber="Model.Number" @bind-Value="Model.Tag" />
+        <RfidTagWriter CombinationNumber="Model.Number.Value" @bind-Value="Model.Tag" />
     }
 </EditForm>

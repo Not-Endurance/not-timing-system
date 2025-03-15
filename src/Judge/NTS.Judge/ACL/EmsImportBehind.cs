@@ -6,6 +6,7 @@ using Not.Serialization;
 using NTS.ACL;
 using NTS.ACL.Entities.Competitions;
 using NTS.ACL.Entities.EnduranceEvents;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
@@ -42,11 +43,12 @@ public class EmsImporters : IEmsImporter
     async Task SafeImport(string emsStateFilePath)
     {
         var contents = await File.ReadAllTextAsync(emsStateFilePath);
-        var emsState = contents.FromJson<EmsState>();
+        var emsState = contents.FromConvertedJson<EmsState>();
 
         var country = new Country(
+            0,
             emsState.Event.Country.IsoCode,
-            "zz",
+            null,
             emsState.Event.Country.Name
         );
         var enduranceEvent = EnduranceEvent.Create(emsState.Event.PopulatedPlace, country);

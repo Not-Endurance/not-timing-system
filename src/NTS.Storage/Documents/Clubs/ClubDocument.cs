@@ -1,15 +1,21 @@
 ﻿using Not.Random;
-using NTS.Domain.Objects;
+using NTS.Domain.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.Documents.Clubs;
 
 public class ClubDocument : Document
 {
-    public ClubDocument(Club club)
-        : base(RandomHelper.GenerateUniqueInteger()) // TODO: convert Club to entity
+    public ClubDocument(IClub club)
+        : base(club.Id)
     {
         Name = club.Name;
     }
 
     public string Name { get; init; }
+
+    public Club ToDomain()
+    {
+        return new Club(Id, Name);
+    }
 }

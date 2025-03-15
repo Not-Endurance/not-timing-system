@@ -51,7 +51,7 @@ public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBe
             officials
         ));
         ObservableList.AddRange(documents);
-        return true;
+        return ObservableList.Any();
     }
 
     public void RunAtStartup()

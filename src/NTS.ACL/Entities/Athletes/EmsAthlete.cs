@@ -2,10 +2,13 @@ using Core.Domain.State.Athletes;
 using NTS.ACL.Abstractions;
 using NTS.ACL.Entities.Countries;
 using NTS.ACL.Enums;
+using NTS.Domain.Aggregates;
+using NTS.Domain.Enums;
+using NTS.Domain.Objects;
 
 namespace NTS.ACL.Entities.Athletes;
 
-public class EmsAthlete : EmsDomainBase<EmsAthleteException>
+public class EmsAthlete : EmsDomainBase<EmsAthleteException>, IAthlete
 {
     const int ADULT_AGE_IN_YEARS = 18;
 
@@ -49,4 +52,21 @@ public class EmsAthlete : EmsDomainBase<EmsAthleteException>
     public EmsCategory Category { get; internal set; }
     public EmsCountry Country { get; internal set; }
     public string Name => $"{FirstName} {LastName}";
+
+    public Person Names => new([FirstName, LastName]);
+    AthleteCategory IAthlete.Category => Category.ToNtsCategory();
+    Country IAthlete.Country => new(0, Country.IsoCode, null, Country.Name);
+    IClub? IAthlete.Club => new EmsClubIntermediate(Club);
+}
+
+public class EmsClubIntermediate : IClub
+{
+    public EmsClubIntermediate(string name)
+    {
+        Id = 0;
+        Name = Name;
+    }
+
+    public int Id { get; }
+    public string Name { get; }
 }

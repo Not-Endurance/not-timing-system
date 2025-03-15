@@ -4,7 +4,7 @@ using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Participation : AggregateRoot, IAggregateRoot
+public class Participation : AggregateRoot, IAggregateRoot, IReflect<Combination>
 {
     const double CHILDREN_MIN_SPEED = 8;
     const double CHILDREN_MAX_SPEED = 12;
@@ -22,7 +22,7 @@ public class Participation : AggregateRoot, IAggregateRoot
     }
 
     public static Participation Update(
-        int id,
+        int? id,
         DateTimeOffset? newStart,
         bool isUnranked,
         Combination? combination,
@@ -34,13 +34,13 @@ public class Participation : AggregateRoot, IAggregateRoot
 
     [JsonConstructor]
     Participation(
-        int id,
+        int? id,
         DateTimeOffset? startTimeOverride,
         bool isUnranked,
         Combination? combination,
         double? maxSpeedOverride
     )
-        : base(id)
+        : base(id!.Value)
     {
         StartTimeOverride = startTimeOverride;
         IsNotRanked = isUnranked;
@@ -62,7 +62,7 @@ public class Participation : AggregateRoot, IAggregateRoot
             maxSpeedOverride
         ) { }
 
-    public Combination Combination { get; }
+    public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
     public DateTimeOffset? StartTimeOverride { get; }
     public double? MinAverageSpeed { get; private set; }
@@ -99,6 +99,11 @@ public class Participation : AggregateRoot, IAggregateRoot
                 : null;
         var isUnrankedMessage = IsNotRanked ? "not-ranked" : null;
         return Combine(Combination, startTimeMessage, isUnrankedMessage);
+    }
+
+    public void Reflect(Combination child)
+    {
+        Combination = child;
     }
 
     static DateTimeOffset? IsFutureTime(DateTimeOffset? startTimeOverride)

@@ -7,13 +7,19 @@ using NTS.Judge.Core.Behinds;
 
 namespace NTS.Judge.Setup.Adapters;
 
-public class SetupParticipationBehind : CrudBehind<Participation, ParticipationFormModel>
+public class SetupParticipationBehind
+    : CrudBehind<Participation, ParticipationFormModel>,
+        ICrudReflection<Combination>
 {
     public SetupParticipationBehind(
         IRepository<Participation> participations,
-        CompetitionParentContext parentContext
+        CompetitionParentContext parentContext,
+        IEnumerable<ICrudReflection<Participation>> dependants
     )
-        : base(participations, parentContext) { }
+        : base(participations, dependants)
+    {
+        AttachParent(parentContext);
+    }
 
     protected override Participation CreateEntity(ParticipationFormModel model)
     {
@@ -36,5 +42,11 @@ public class SetupParticipationBehind : CrudBehind<Participation, ParticipationF
             model.Combination,
             model.MaxSpeedOverride
         );
+    }
+
+    public Task Reflect(Combination combination)
+    {
+        UpdateReflections(x => x.Combination, combination, x => x.Reflect(combination));
+        return Task.CompletedTask;
     }
 }

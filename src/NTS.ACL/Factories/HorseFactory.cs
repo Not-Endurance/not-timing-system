@@ -8,7 +8,7 @@ public class HorseFactory
 {
     public static EmsHorse Create(Participation participation)
     {
-        var state = new EmsHorseState { Name = participation.Combination.Horse };
+        var state = new EmsHorseState { Name = participation.Combination.Horse.Name };
         return new EmsHorse(state);
     }
 }

@@ -8,7 +8,7 @@
 <EditForm Model="Model">
     <NSelect @ref="_loopField" T="Loop" Label="Loop distance" Placeholder="Select a loop" Items="_loops" @bind-Value="Model.Loop" />
 
-    <MudNumericField T="int" @ref="_recoveryField" @bind-Value="Model.Recovery" Min="0" Label="Recovery Time" />
+    <MudNumericField @ref="_recoveryField" @bind-Value="Model.Recovery" Min="0" Label="Recovery Time" />
 
     <MudNumericField @ref="_restField" @bind-Value="Model.Rest" Min="0" Label="Rest Duration" />
 </EditForm>

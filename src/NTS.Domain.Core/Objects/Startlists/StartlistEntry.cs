@@ -23,7 +23,7 @@ public record StartlistEntry : DomainObject
 
     public StartlistEntry(Participation participation)
     {
-        Athlete = participation.Combination.Name;
+        Athlete = participation.Combination.Athlete.Names;
         Number = participation.Combination.Number;
         var currentIndex = participation.Phases.IndexOf(participation.Phases.Current);
         var nextPhase = participation.Phases[currentIndex + 1];

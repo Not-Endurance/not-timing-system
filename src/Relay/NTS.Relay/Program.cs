@@ -11,10 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureHub();
 
-var parentPidArgument = args.First(arg => arg.Contains(PARENT_PID_KEY));
-if (parentPidArgument.Any())
+if (args.Any())
 {
-    builder.Services.AddSingleton<ProcessServiceContext>(provider =>
+    var parentPidArgument = args.First(arg => arg.Contains(PARENT_PID_KEY));
+    builder.Services.AddSingleton(provider =>
     {
         var parentProcessId = parentPidArgument.Substring(PARENT_PID_KEY.Length);
         return new ProcessServiceContext(parentProcessId);

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Base;
 using Not.Localization;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
@@ -13,8 +14,8 @@ public class Combination : AggregateRoot
     Combination(
         int id,
         int number,
-        Person name,
-        string horse,
+        Athlete athlete,
+        Horse horse,
         string distance,
         Country? country,
         Club? club,
@@ -24,7 +25,7 @@ public class Combination : AggregateRoot
         : base(id)
     {
         Number = number;
-        Name = name;
+        Athlete = athlete;
         Horse = horse;
         Distance = distance;
         Country = country;
@@ -35,22 +36,22 @@ public class Combination : AggregateRoot
 
     public Combination(
         int number,
-        Person name,
-        string horse,
+        IAthlete athlete,
+        IHorse horse,
         decimal distance,
         Country? country,
-        Club? club,
+        IClub? club,
         double? minAverageSpeedlimit,
         double? maxAverageSpeedLimit
     )
         : this(
             GenerateId(),
             number,
-            name,
-            horse,
+            new Athlete(athlete),
+            new Horse(horse),
             FormatDistance(distance),
             country,
-            club,
+            club == null ? null : new Club(club),
             Speed.Create(minAverageSpeedlimit),
             Speed.Create(maxAverageSpeedLimit)
         )
@@ -59,8 +60,8 @@ public class Combination : AggregateRoot
     }
 
     public int Number { get; }
-    public Person Name { get; }
-    public string Horse { get; }
+    public Athlete Athlete { get; }
+    public Horse Horse { get; }
     public Country? Country { get; }
     public Club? Club { get; }
     public Speed? MinAverageSpeed { get; }
@@ -73,7 +74,7 @@ public class Combination : AggregateRoot
 
     public override string ToString()
     {
-        var result = $"{"#".Localize()}{Number}: {Name}, {Horse}";
+        var result = $"{"#".Localize()}{Number}: {Athlete}, {Horse}";
         var kmph = "km/h".Localize();
         if (MinAverageSpeed != null && MaxAverageSpeed != null)
         {

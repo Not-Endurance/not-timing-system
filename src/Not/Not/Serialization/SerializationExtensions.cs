@@ -18,7 +18,48 @@ public static class SerializationExtensions
         where T : JsonConverterBase
     {
         _converters.Add(converter);
-        SETTINGS.Converters.Add(converter);
+    }
+
+    /// <summary>
+    /// Serializes the object by keeping single instance of uniqute (AggregateRoot.Id) object and replaces usages with #domainRef
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public static string ToConvertedJson(this object obj)
+    {
+        // TODO probably separate in two serializers;
+        AddConverters();
+        lock (_lock)
+        {
+            var result = JsonConvert.SerializeObject(obj, SETTINGS);
+            ResetConverters();
+            RemoveConverters();
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Deserializes the object and preserves instance equality (AggregateRoot.Id) by #domainRef with it's actual previously serialized instance
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="json"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public static T FromConvertedJson<T>(this string json)
+        where T : class
+    {
+        AddConverters();
+        lock (_lock) // TODO: investigate serialization locking as a whole (reference serializer locks as well)
+        {
+            var result = JsonConvert.DeserializeObject<T>(json, SETTINGS);
+            if (result == default)
+            {
+                throw new Exception($"Cannot serialize '{json}' to type of '{typeof(T)}'");
+            }
+            ResetConverters();
+            RemoveConverters();
+            return result;
+        }
     }
 
     public static string ToJson(this object obj)
@@ -26,7 +67,6 @@ public static class SerializationExtensions
         lock (_lock)
         {
             var result = JsonConvert.SerializeObject(obj, SETTINGS);
-            ResetConverters();
             return result;
         }
     }
@@ -41,7 +81,6 @@ public static class SerializationExtensions
             {
                 throw new Exception($"Cannot serialize '{json}' to type of '{typeof(T)}'");
             }
-            ResetConverters();
             return result;
         }
     }
@@ -54,6 +93,22 @@ public static class SerializationExtensions
         foreach (var converter in _converters)
         {
             converter.Reset();
+        }
+    }
+
+    static void AddConverters()
+    {
+        foreach (var converter in _converters)
+        {
+            SETTINGS.Converters.Add(converter);
+        }
+    }
+
+    static void RemoveConverters()
+    {
+        foreach (var converter in _converters)
+        {
+            SETTINGS.Converters.Remove(converter);
         }
     }
 }

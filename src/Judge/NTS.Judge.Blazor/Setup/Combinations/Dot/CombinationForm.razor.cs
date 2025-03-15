@@ -7,7 +7,7 @@ namespace NTS.Judge.Blazor.Setup.Combinations.Dot;
 
 public partial class CombinationForm
 {
-    MudNumericField<int> _numberField = default!;
+    MudNumericField<int?> _numberField = default!;
     NAutocomplete<Athlete?> _athleteField = default!;
     NAutocomplete<Horse?> _horseField = default!;
 

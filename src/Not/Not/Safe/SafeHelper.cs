@@ -13,13 +13,13 @@ namespace Not.Safe;
 // - public methods with OG names are added to invoke the Safe methods within SafeHelper.Run
 public static class SafeHelper
 {
-    public static T? Run<T>(Func<T> action, Action<DomainExceptionBase> validationHandler)
+    public static T? Run<T>(Func<T> action, Action<ValidationException> validationHandler)
     {
         try
         {
             return action();
         }
-        catch (DomainExceptionBase validation)
+        catch (ValidationException validation)
         {
             validationHandler(validation);
             return default;
@@ -43,7 +43,7 @@ public static class SafeHelper
 
     public static Task RunAsync(
         Func<Task> action,
-        Func<DomainExceptionBase, Task> validationHandler
+        Func<ValidationException, Task> validationHandler
     )
     {
         return Task.Run(() => Run(action, validationHandler));
@@ -51,14 +51,14 @@ public static class SafeHelper
 
     public static async Task Run(
         Func<Task> action,
-        Func<DomainExceptionBase, Task> validationHandler
+        Func<ValidationException, Task> validationHandler
     )
     {
         try
         {
             await action();
         }
-        catch (DomainExceptionBase validation)
+        catch (ValidationException validation)
         {
             await validationHandler(validation);
         }
@@ -68,13 +68,13 @@ public static class SafeHelper
         }
     }
 
-    public static async void Run(Action action, Func<DomainExceptionBase, Task> validationHandler)
+    public static async void Run(Action action, Func<ValidationException, Task> validationHandler)
     {
         try
         {
             action();
         }
-        catch (DomainExceptionBase validation)
+        catch (ValidationException validation)
         {
             await validationHandler(validation);
         }
@@ -96,14 +96,14 @@ public static class SafeHelper
 
     public static async Task<T?> Run<T>(
         Func<Task<T>> action,
-        Func<DomainExceptionBase, Task> validationHandler
+        Func<ValidationException, Task> validationHandler
     )
     {
         try
         {
             return await action();
         }
-        catch (DomainExceptionBase validation)
+        catch (ValidationException validation)
         {
             await validationHandler(validation);
             return default;
@@ -128,14 +128,14 @@ public static class SafeHelper
     public static async Task Run<T>(
         Func<T, Task> action,
         T argument,
-        Action<DomainExceptionBase> validationHandler
+        Action<ValidationException> validationHandler
     )
     {
         try
         {
             await action(argument);
         }
-        catch (DomainExceptionBase validation)
+        catch (ValidationException validation)
         {
             validationHandler(validation);
         }
@@ -150,7 +150,7 @@ public static class SafeHelper
         return Run(action, argument, NotifyHelper.Warn);
     }
 
-    static Task DefaultValidationHandler(DomainExceptionBase validation)
+    static Task DefaultValidationHandler(ValidationException validation)
     {
         NotifyHelper.Warn(validation);
         return Task.CompletedTask;
@@ -158,15 +158,15 @@ public static class SafeHelper
 
     static void HandleError(Exception ex)
     {
-#if DEBUG
-        throw ex;
-#else
+        //#if DEBUG
+        //        throw ex;
+        //#else
         NotifyHelper.Error(ex);
         var logMessage =
             $"An error {ex.Message} was thrown at {ex.Source} with trace \n {ex.StackTrace}";
         LoggingHelper.Error(logMessage);
         WriteToTraceConsole(ex);
-#endif
+        //#endif
     }
 
 #pragma warning disable IDE0051 // Used in RELEASE build

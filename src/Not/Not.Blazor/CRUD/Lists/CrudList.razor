@@ -17,22 +17,26 @@
         <NButtonCreate Variant="Variant.Outlined" OnClick="CreateHandler" />
     </MudStack>
 
-    @if (Behind.Items.Count == 0)
+    @if (!IsInitialized)
+    {
+        <NSkeleton />
+    }
+    else if (Behind.Items.Count == 0)
     {
         <MudText Typo="Typo.body1">@EmptyMessage</MudText>
     }
     else
     {
-        @foreach (var entity in Behind.Items)
+        @foreach (var item in Behind.Items)
         {
             <MudStack Row="true">
-                <MudText Typo="Typo.body1" Class="pa-4">@entity</MudText>
+                <MudText Typo="Typo.body1" Class="pa-4">@item</MudText>
 
                 <MudSpacer />
 
-                <NIconUpdate OnClick="() => FormNavigator.Update(UpdateRoute, CreateModel(entity))" />
+                <NIconUpdate OnClick="() => UpdateHandler(item)" />
 
-                <NIconDelete OnClick="() => DeleteHandler(entity)" />
+                <NIconDelete OnClick="() => DeleteHandler(item)" />
             </MudStack>
 
             <MudDivider />

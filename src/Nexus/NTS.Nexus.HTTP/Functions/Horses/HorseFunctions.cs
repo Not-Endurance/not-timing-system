@@ -27,7 +27,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         _archive = archive;
     }
 
-    [Function("horse-insert")]
+    [Function("horses-insert")]
     public async Task<IActionResult> Insert(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "horses")] HttpRequest request
     )
@@ -42,7 +42,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         return new OkObjectResult($"Inserted {horse}");
     }
 
-    [Function("horse-update")]
+    [Function("horses-update")]
     public async Task<IActionResult> Update(
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "horses")] HttpRequest request
     )
@@ -57,7 +57,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         return new OkObjectResult($"Updated {horse}");
     }
 
-    [Function("horse-safe-delete")]
+    [Function("horses-safe-delete")]
     public async Task<IActionResult> SafeDelete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")]
             HttpRequest request,
@@ -85,7 +85,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         return new OkObjectResult($"Deleted horse with id '{id}'");
     }
 
-    [Function("horse-delete")]
+    [Function("horses-delete")]
     public async Task<IActionResult> Delete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}")]
             HttpRequest request,
@@ -99,7 +99,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         return new OkObjectResult($"Deleted horse with id '{id}'");
     }
 
-    [Function("horse-get-one")]
+    [Function("horses-get")]
     public async Task<IActionResult> GetOne(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses/{id:int}")]
             HttpRequest request,
@@ -113,13 +113,13 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         return new OkObjectResult(horse);
     }
 
-    [Function("horse-list")]
+    [Function("horses-list")]
     public async Task<IActionResult> List(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses")] HttpRequest request
     )
     {
         LogInformation(request);
-        var horses = await _horses.ReadAll();
+        var horses = await _horses.ReadAll().Select(x => x.ToDomain());
         return new OkObjectResult(horses);
     }
 }

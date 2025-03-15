@@ -4,7 +4,7 @@ using Not.Structures;
 
 namespace NTS.Storage.Documents;
 
-public class Document : IIdentifiable, ITenantAware, IAggregateRoot
+public abstract class Document : IIdentifiable, ITenantAware, IAggregateRoot
 {
     public Document(int id)
     {

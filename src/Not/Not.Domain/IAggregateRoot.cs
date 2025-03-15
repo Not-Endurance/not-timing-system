@@ -1,3 +1,5 @@
-﻿namespace Not.Domain;
+﻿using Not.Structures;
 
-public interface IAggregateRoot { }
+namespace Not.Domain;
+
+public interface IAggregateRoot : IIdentifiable { }

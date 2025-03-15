@@ -4,28 +4,28 @@ using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Phase : AggregateRoot, IAggregateRoot
+public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
 {
-    public static Phase Create(Loop? loop, int recovery, int? rest)
+    public static Phase Create(Loop? loop, int? recovery, int? rest)
     {
         return new(loop, recovery, rest);
     }
 
-    public static Phase Update(int id, Loop? loop, int recovery, int? rest)
+    public static Phase Update(int? id, Loop? loop, int? recovery, int? rest)
     {
         return new(id, loop, recovery, rest);
     }
 
     [JsonConstructor]
-    public Phase(int id, Loop? loop, int recovery, int? rest)
-        : base(id)
+    public Phase(int? id, Loop? loop, int? recovery, int? rest)
+        : base(id!.Value)
     {
         Loop = Required(nameof(Loop), loop);
-        Recovery = recovery;
+        Recovery = Required(nameof(Recovery), recovery);
         Rest = rest;
     }
 
-    public Phase(Loop? loop, int recovery, int? rest)
+    public Phase(Loop? loop, int? recovery, int? rest)
         : this(
             GenerateId(),
             Required(nameof(Loop), loop),
@@ -33,7 +33,7 @@ public class Phase : AggregateRoot, IAggregateRoot
             NullOrPositiveRest(rest)
         ) { }
 
-    public Loop? Loop { get; }
+    public Loop? Loop { get; private set; }
     public int Recovery { get; }
     public int? Rest { get; }
 
@@ -44,13 +44,18 @@ public class Phase : AggregateRoot, IAggregateRoot
         return Combine(Loop, recovery, rest);
     }
 
-    static int PositiveRecovery(int minutes)
+    public void Reflect(Loop loop)
     {
-        if (minutes <= 0)
+        Loop = loop;
+    }
+
+    static int PositiveRecovery(int? minutes)
+    {
+        if (minutes == null || minutes.Value <= 0)
         {
             throw new DomainException(nameof(Recovery), "Min value is 1 minute");
         }
-        return minutes;
+        return minutes.Value;
     }
 
     static int? NullOrPositiveRest(int? minutes)

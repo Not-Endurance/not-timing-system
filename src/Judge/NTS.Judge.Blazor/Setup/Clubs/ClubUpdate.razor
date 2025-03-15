@@ -1,0 +1,17 @@
+﻿@using NTS.Domain.Setup.Aggregates
+@using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components
+@using Not.Blazor.Navigation
+@using Not.Blazor.Pages
+
+@attribute [Route(CLUB_UPDATE)]
+@inherits NUpdatePage
+
+<NContent Title="Configure Club">
+
+    <Main>
+        <NUpdateContainer T="ClubFormModel" TForm="ClubForm" Model="Navigator.ConsumeParameter<ClubFormModel>()" />
+    </Main>
+
+</NContent>
+

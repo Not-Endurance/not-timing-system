@@ -14,10 +14,15 @@ public class NComponent : ComponentBase
     [Parameter]
     public string? Class { get; set; }
 
+    public bool IsInitialized { get; private set; } = true;
+
     protected async Task Observe(IObservableBehind observable, params IEnumerable<object> arguments)
     {
+        IsInitialized = false;
+        await Render();
         observable.Subscribe(OnEmit);
         await observable.Initialize(arguments);
+        IsInitialized = true;
         await Render();
     }
 

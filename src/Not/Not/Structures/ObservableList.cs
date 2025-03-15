@@ -7,24 +7,28 @@ namespace Not.Structures;
 public class ObservableList<T> : IReadOnlyList<T>
     where T : IIdentifiable
 {
+    readonly object _lock = new();
     Dictionary<int, T> _dictionary = [];
 
     public T this[int index]
     {
         get
         {
-            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, _dictionary.Count);
-
-            var count = 0;
-            foreach (var item in this)
+            lock (_lock)
             {
-                if (count++ == index)
+                ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, _dictionary.Count);
+
+                var count = 0;
+                foreach (var item in this)
                 {
-                    return item;
+                    if (count++ == index)
+                    {
+                        return item;
+                    }
                 }
+                // Should never be reached
+                throw new Exception();
             }
-            // Should never be reached
-            throw new Exception();
         }
     }
     public Event ChangedEvent { get; } = new();
@@ -32,49 +36,76 @@ public class ObservableList<T> : IReadOnlyList<T>
 
     public void AddOrReplace(T item)
     {
-        GuardHelper.ThrowIfDefault(item);
-
-        if (!_dictionary.TryAdd(item.Id, item))
+        lock (_lock)
         {
-            _dictionary[item.Id] = item;
+            GuardHelper.ThrowIfDefault(item);
+            if (!_dictionary.TryAdd(item.Id, item))
+            {
+                _dictionary[item.Id] = item;
+            }
+            ChangedEvent.Emit();
         }
-
-        ChangedEvent.Emit();
     }
 
     public bool Remove(T item)
     {
-        GuardHelper.ThrowIfDefault(item);
-        var result = _dictionary.Remove(item.Id);
-        ChangedEvent.Emit();
-        return result;
+        lock (_lock)
+        {
+            GuardHelper.ThrowIfDefault(item);
+            var result = _dictionary.Remove(item.Id);
+            ChangedEvent.Emit();
+            return result;
+        }
     }
 
     public bool Remove(int id)
     {
-        var result = _dictionary.Remove(id);
-        ChangedEvent.Emit();
-        return result;
+        lock (_lock)
+        {
+            var result = _dictionary.Remove(id);
+            ChangedEvent.Emit();
+            return result;
+        }
     }
 
     public void RemoveRange(IEnumerable<T> items)
     {
-        foreach (var item in items)
+        lock (_lock)
         {
-            _dictionary.Remove(item.Id);
+            foreach (var item in items)
+            {
+                _dictionary.Remove(item.Id);
+            }
+            ChangedEvent.Emit();
         }
-        ChangedEvent.Emit();
     }
 
     public void AddRange(IEnumerable<T> items)
     {
-        _dictionary = items.ToDictionary(x => x.Id, x => x);
-        ChangedEvent.Emit();
+        lock (_lock)
+        {
+            foreach (var (key, value) in items.ToDictionary(x => x.Id, x => x))
+            {
+                _dictionary.Add(key, value);
+            }
+            ChangedEvent.Emit();
+        }
+    }
+
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            _dictionary.Clear();
+        }
     }
 
     public bool Contains(T item)
     {
-        return _dictionary.ContainsKey(item.Id);
+        lock (_lock)
+        {
+            return _dictionary.ContainsKey(item.Id);
+        }
     }
 
     public IEnumerator<T> GetEnumerator()

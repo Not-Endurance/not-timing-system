@@ -18,7 +18,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
     }
 
     public static Competition Update(
-        int id,
+        int? id,
         string? name,
         CompetitionType type,
         CompetitionRuleset? ruleset,
@@ -45,7 +45,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
 
     [JsonConstructor]
     Competition(
-        int id,
+        int? id,
         string? name,
         CompetitionType? type,
         CompetitionRuleset? ruleset,
@@ -54,7 +54,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         IEnumerable<Phase> phases,
         IEnumerable<Participation> participations
     )
-        : base(id)
+        : base(id!.Value)
     {
         _phases = phases.ToList();
         _participations = participations.ToList();

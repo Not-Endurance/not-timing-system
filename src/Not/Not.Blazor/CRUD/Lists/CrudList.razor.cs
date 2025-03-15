@@ -3,6 +3,8 @@ using Not.Blazor.CRUD.Forms;
 using Not.Blazor.CRUD.Forms.Components;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
+using Not.Blazor.CRUD.Ports;
+using Not.Domain;
 using Not.Domain.Base;
 
 namespace Not.Blazor.CRUD.Lists;
@@ -17,6 +19,9 @@ public partial class CrudList<T, TModel, TForm> : NComponent
 
     [Inject]
     FormManager<TModel, TForm> FormNavigator { get; set; } = default!;
+
+    [Inject] // TODO: Probably refactor this as ICrudParent<T> and make it nullable
+    IEnumerable<ICrudParentContext> ParentContexts { get; set; } = default!;
 
     [Parameter]
     public int? ParentId { get; set; }
@@ -43,14 +48,32 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         await Observe(Behind, args);
     }
 
-    public async Task CreateHandler()
+    protected async Task CreateHandler()
     {
         await FormNavigator.Create();
     }
 
-    public async Task DeleteHandler(T item)
+    protected async Task UpdateHandler(T item)
+    {
+        SetParentContext(item);
+        var model = CreateModel(item);
+        await FormNavigator.Update(UpdateRoute, model);
+    }
+
+    protected async Task DeleteHandler(T item)
     {
         await Behind.Delete(item);
+    }
+
+    void SetParentContext(T entity)
+    {
+        if (entity is IParent parent)
+        {
+            foreach (var context in ParentContexts)
+            {
+                context.SetParent(parent);
+            }
+        }
     }
 
     TModel CreateModel(T entity)

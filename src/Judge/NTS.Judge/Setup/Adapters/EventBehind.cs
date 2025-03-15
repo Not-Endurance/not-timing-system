@@ -12,14 +12,14 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
 {
     readonly IRepository<EnduranceEvent> _events;
     readonly EventParentContext _context;
-    readonly IParentContext<Competition> _competitionParent;
-    readonly IParentContext<Official> _officialParent;
+    readonly ICrudParent<Competition> _competitionParent;
+    readonly ICrudParent<Official> _officialParent;
 
     public EventBehind(
         IRepository<EnduranceEvent> events,
         EventParentContext context,
-        IParentContext<Competition> compeitionParent,
-        IParentContext<Official> officialParent
+        ICrudParent<Competition> compeitionParent,
+        ICrudParent<Official> officialParent
     )
     {
         _events = events;
@@ -32,7 +32,7 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> _)
     {
-        await _context.Load(0);
+        _context.Entity = await _events.Read(0);
         if (_context.Entity == null)
         {
             return false;

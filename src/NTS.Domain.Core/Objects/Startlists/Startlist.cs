@@ -26,7 +26,7 @@ public class StartList
                     var phaseIndex = phases.IndexOf(phase);
                     var phaseNumber = phaseIndex + 1;
                     var start = new StartlistEntry(
-                        participation.Combination.Name,
+                        participation.Combination.Athlete.Names,
                         participation.Combination.Number,
                         phaseNumber,
                         phases[phaseIndex].Length,

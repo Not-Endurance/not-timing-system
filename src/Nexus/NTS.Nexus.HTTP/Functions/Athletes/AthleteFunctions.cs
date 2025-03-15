@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AngleSharp.Common;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Serialization;
+using NTS.Domain.Aggregates;
+using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Archive;
 using NTS.Nexus.HTTP.Logger;
@@ -11,13 +14,13 @@ using NTS.Storage.Documents.Athletes;
 
 namespace NTS.Nexus.HTTP.Functions.Athletes;
 
-public class AthletesFunctions : FunctionBase<AthletesFunctions>
+public class AthleteFunctions : FunctionBase<AthleteFunctions>
 {
     readonly IRepository<AthleteDocument> _athletes;
     readonly IArchiveRepository _archive;
 
-    public AthletesFunctions(
-        IFunctionLogger<AthletesFunctions> logger,
+    public AthleteFunctions(
+        IFunctionLogger<AthleteFunctions> logger,
         IRepository<AthleteDocument> athletes,
         IArchiveRepository archive
     )
@@ -27,7 +30,7 @@ public class AthletesFunctions : FunctionBase<AthletesFunctions>
         _archive = archive;
     }
 
-    [Function("athlete-insert")]
+    [Function("athletes-insert")]
     public async Task<IActionResult> Insert(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "athletes")] HttpRequest request
     )
@@ -42,7 +45,7 @@ public class AthletesFunctions : FunctionBase<AthletesFunctions>
         return new OkObjectResult($"Inserted {athlete}");
     }
 
-    [Function("athlete-update")]
+    [Function("athletes-update")]
     public async Task<IActionResult> Update(
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "athletes")] HttpRequest request
     )
@@ -57,7 +60,7 @@ public class AthletesFunctions : FunctionBase<AthletesFunctions>
         return new OkObjectResult($"Updated {athlete}");
     }
 
-    [Function("athlete-safe-delete")]
+    [Function("athletes-safe-delete")]
     public async Task<IActionResult> SafeDelete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:int}/safe")]
             HttpRequest request,
@@ -85,7 +88,7 @@ public class AthletesFunctions : FunctionBase<AthletesFunctions>
         return new OkObjectResult($"Deleted athlete with id '{id}'");
     }
 
-    [Function("athlete-delete")]
+    [Function("athletes-delete")]
     public async Task<IActionResult> Delete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:int}")]
             HttpRequest request,
@@ -97,8 +100,8 @@ public class AthletesFunctions : FunctionBase<AthletesFunctions>
         return new OkObjectResult($"Deleted athlete with id '{id}'");
     }
 
-    [Function("athlete-get-one")]
-    public async Task<IActionResult> GetOne(
+    [Function("athletes-get-one")]
+    public async Task<IActionResult> Get(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "athletes/{id:int}")]
             HttpRequest request,
         int id
@@ -106,16 +109,18 @@ public class AthletesFunctions : FunctionBase<AthletesFunctions>
     {
         LogInformation(request);
         var athlete = await _athletes.Read(id);
-        return new OkObjectResult(athlete);
+        return new OkObjectResult(athlete?.ToDomain());
     }
 
-    [Function("athlete-list")]
+    [Function("athletes-list")]
     public async Task<IActionResult> List(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "athletes")] HttpRequest request
     )
     {
         LogInformation(request);
-        var athletes = await _athletes.ReadAll();
+
+        // TODO: Implement response mapping layer for documents back to aggregates
+        var athletes = await _athletes.ReadAll().Select(x => x.ToDomain());
         return new OkObjectResult(athletes);
     }
 }

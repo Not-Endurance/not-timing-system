@@ -1,19 +1,24 @@
 ﻿using Not.Random;
-using NTS.Domain.Objects;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Storage.Documents.Countries;
 
 public class CountryDocument : Document
 {
     public CountryDocument(Country country)
-        : base(RandomHelper.GenerateUniqueInteger())
+        : base(country.Id)
     {
         IsoCode = country.IsoCode;
         NfCode = country.NfCode;
         Name = country.Name;
     }
 
-    public string IsoCode { get; init; }
-    public string NfCode { get; init; }
+    public string? IsoCode { get; init; }
+    public string? NfCode { get; init; }
     public string Name { get; init; }
+
+    public Country ToDomain()
+    {
+        return new Country(Id, IsoCode, NfCode, Name);
+    }
 }

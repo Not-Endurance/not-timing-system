@@ -106,6 +106,6 @@ public abstract class AggregateRoot : IEquatable<AggregateRoot>, IIdentifiable, 
 
     static DomainException GetRequiredException(string field)
     {
-        return new DomainException(field, "Please provide value");
+        return new DomainException(field, "'{0}' is required");
     }
 }

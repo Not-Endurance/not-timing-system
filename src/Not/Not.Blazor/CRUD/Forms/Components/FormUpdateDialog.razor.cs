@@ -37,7 +37,7 @@ public partial class FormUpdateDialog<T, TForm>
         Dialog.Close(dialogResult);
     }
 
-    async Task InjectValidation(DomainExceptionBase validation)
+    async Task InjectValidation(ValidationException validation)
     {
         await _dynamicForm!.Instance.AddValidationError(validation.Property, validation.Message);
     }

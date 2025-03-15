@@ -5,8 +5,8 @@ using Not.Serialization;
 using NTS.ACL;
 using NTS.ACL.Entities.Competitions;
 using NTS.ACL.Entities.EnduranceEvents;
-using NTS.ACL.Enums;
 using NTS.ACL.Factories;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
@@ -43,7 +43,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
             throw new Exception($"Cannot import data as Event already exists: '{existingEvent}'");
         }
 
-        var emsState = emsJson.FromJson<EmsState>();
+        var emsState = emsJson.FromConvertedJson<EmsState>();
 
         var enduranceEvent = CreateEvent(emsState.Event, adjustTime);
         //TODOL interesting why some imports fail without ToList? 2024-vakarel (finished) for example
@@ -67,7 +67,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
 
     EnduranceEvent CreateEvent(EmsEnduranceEvent emsEvent, bool adjustTime)
     {
-        var country = new Country(emsEvent.Country.IsoCode, "zz", emsEvent.Country.Name);
+        var country = new Country(0, emsEvent.Country.IsoCode, null, emsEvent.Country.Name);
         var startTime = emsEvent.Competitions.OrderBy(x => x.StartTime).First().StartTime;
         if (adjustTime)
         {
@@ -161,9 +161,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
                     competition,
                     adjustTime
                 );
-                var category = EmsCategoryToAthleteCategory(
-                    emsParticipation.Participant.Athlete.Category
-                );
+                var category = emsParticipation.Participant.Athlete.Category.ToNtsCategory();
                 var entry = new RankingEntry(participation, !emsParticipation.Participant.Unranked);
                 if (
                     entriesforClassification.ContainsKey(competition)
@@ -216,17 +214,6 @@ public class EmsToCoreImporter : IEmsToCoreImporter
             .SelectMany(x => x.Select(y => y.particpation))
             .Distinct();
         return (result, participations);
-    }
-
-    AthleteCategory EmsCategoryToAthleteCategory(EmsCategory category)
-    {
-        return category switch
-        {
-            EmsCategory.Seniors => AthleteCategory.Senior,
-            EmsCategory.Children => AthleteCategory.Children,
-            EmsCategory.JuniorOrYoungAdults => AthleteCategory.JuniorOrYoungAdult,
-            _ => throw new NotImplementedException(),
-        };
     }
 }
 

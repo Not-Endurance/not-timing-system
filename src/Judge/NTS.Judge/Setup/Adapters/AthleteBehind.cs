@@ -5,10 +5,13 @@ using NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 
 namespace NTS.Judge.Setup.Adapters;
 
-public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>
+public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflection<Club>
 {
-    public AthleteBehind(IRepository<Athlete> repository)
-        : base(repository) { }
+    public AthleteBehind(
+        IRepository<Athlete> repository,
+        IEnumerable<ICrudReflection<Athlete>> dependants
+    )
+        : base(repository, dependants) { }
 
     protected override Athlete CreateEntity(AthleteFormModel model)
     {
@@ -25,5 +28,11 @@ public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>
             model.Club,
             model.Category
         );
+    }
+
+    public Task Reflect(Club dependable)
+    {
+        UpdateReflections(x => x.Club, dependable, athlete => athlete.Reflect(dependable));
+        return Task.CompletedTask;
     }
 }

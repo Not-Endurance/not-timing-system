@@ -18,7 +18,7 @@ public static class JudgeMauiInjection
 #endif
         builder
             .Services.ConfigureStorage()
-            .ConfigureJudge()
+            .ConfigureJudge(builder.Configuration)
             .ConfigureJudgeBlazor(builder.Configuration)
             .RegisterConventionalServices();
 
