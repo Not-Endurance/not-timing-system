@@ -7,11 +7,7 @@ namespace Not.Application.HTTP;
 
 public class NHttpClient
 {
-#if DEBUG
     static readonly string HOST = "http://localhost:8080/api";
-#else
-    static readonly string HOST = "https://nts-nexus-functions.azurewebsites.net/api";
-#endif
 
     readonly HttpClient _httpClient;
     readonly ILogger<NHttpClient> _logger;
