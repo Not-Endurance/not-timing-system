@@ -23,6 +23,7 @@ public class Ranklist : IReadOnlyList<RankingEntry>
     public int RankingId => _ranking.Id;
     public string Name => _ranking.Name;
     public AthleteCategory Category => _ranking.Category;
+    public CompetitionType Type => _ranking.Type;
     public CompetitionRuleset Ruleset => _ranking.Ruleset;
     public string Title => $"{Category}: {Name}";
 

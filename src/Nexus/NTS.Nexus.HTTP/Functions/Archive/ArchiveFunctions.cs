@@ -30,7 +30,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
         var document = new EnduranceEventDocument(
             entry.EnduranceEvent,
             entry.Officials,
-            entry.Rankings
+            entry.Ranklists
         );
 
         if (await _archive.Read(entry.Id) != null)

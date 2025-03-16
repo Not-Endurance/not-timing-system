@@ -1,9 +1,12 @@
-﻿using NTS.ACL.Entities.LapRecords;
+﻿using Not.Strings;
+using NTS.ACL.Entities.LapRecords;
 using NTS.ACL.Entities.Participants;
 using NTS.ACL.Entities.Results;
 using NTS.ACL.Models;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using EmsCompetition = NTS.ACL.Entities.Competitions.EmsCompetition;
 using EmsParticipation = NTS.ACL.Entities.Participations.EmsParticipation;
@@ -48,27 +51,30 @@ public class ParticipationFactory
 
     public static Participation CreateCore(
         EmsParticipation emsParticipation,
-        EmsCompetition competition,
+        EmsCompetition emsCompetition,
         bool adjustTime
     )
     {
+        var minSpeed =
+            emsParticipation.Participant.Athlete.Category == Enums.EmsCategory.Children ? 10 : 12;
+
         var combination = new Combination(
             int.Parse(emsParticipation.Participant.Number),
             emsParticipation.Participant.Athlete,
             emsParticipation.Participant.Horse,
-            competition.Laps.Sum(x => (decimal)x.LengthInKm),
-            null,
-            null,
-            12,
+            emsCompetition.Laps.Sum(x => (decimal)x.LengthInKm),
+            ((IAthlete)emsParticipation.Participant.Athlete).Country,
+            ((IAthlete)emsParticipation.Participant.Athlete).Club,
+            minSpeed,
             emsParticipation.Participant.MaxAverageSpeedInKmPh
         );
 
         var phases = new List<Phase>();
         EmsLapRecord? finalRecord = null;
         DateTimeOffset? previousTime = null;
-        foreach (var lap in competition.Laps)
+        foreach (var lap in emsCompetition.Laps)
         {
-            var type = CompetitionFactory.MapCompetitionRuleset(competition.Type);
+            var type = CompetitionFactory.MapCompetitionRuleset(emsCompetition.Type);
 
             var record = emsParticipation.Participant.LapRecords.FirstOrDefault(x => x.Lap == lap);
 
@@ -154,12 +160,26 @@ public class ParticipationFactory
 
             phases.Add(phase);
         }
-        var ruleset = CompetitionFactory.MapCompetitionRuleset(competition.Type);
-        const int DEFAULT_NTS_COMPETITION_TYPE = 0;
+        var ruleset = CompetitionFactory.MapCompetitionRuleset(emsCompetition.Type);
+
+        CompetitionType competitionType;
+        if (emsCompetition.Name.NContains("първенство"))
+        {
+            competitionType = CompetitionType.Championship;
+        }
+        else if (emsCompetition.Name.NContains("*"))
+        {
+            competitionType = CompetitionType.Star;
+        }
+        else
+        {
+            competitionType = CompetitionType.Qualification;
+        }
+
         var participation = new Participation(
-            competition.Name,
+            emsCompetition.Name,
             ruleset,
-            DEFAULT_NTS_COMPETITION_TYPE,
+            competitionType,
             combination,
             phases
         );

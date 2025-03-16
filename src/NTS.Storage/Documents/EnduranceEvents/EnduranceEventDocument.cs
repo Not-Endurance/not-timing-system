@@ -1,5 +1,6 @@
 ﻿using Not.Domain;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects;
 using NTS.Storage.Documents.Countries;
 using NTS.Storage.Documents.EnduranceEvents.Models;
 using NTS.Storage.Documents.Officials;
@@ -11,7 +12,7 @@ public class EnduranceEventDocument : Document, IAggregateRoot // TODO: question
     public EnduranceEventDocument(
         EnduranceEvent enduranceEvent,
         IEnumerable<Official> officials,
-        IEnumerable<Ranking> rankings
+        IEnumerable<Ranklist> ranklists
     )
         : base(enduranceEvent.Id)
     {
@@ -21,7 +22,7 @@ public class EnduranceEventDocument : Document, IAggregateRoot // TODO: question
         StartDay = enduranceEvent.EventSpan.StartDay;
         EndDay = enduranceEvent.EventSpan.EndDay;
         Officials = officials.Select(x => new OfficialDocument(x)).ToArray();
-        Rankings = rankings.Select(x => new RankingModel(x)).ToArray();
+        Rankings = ranklists.Select(x => new RanklistModel(x)).ToArray();
     }
 
     public CountryDocument Country { get; init; }
@@ -30,7 +31,7 @@ public class EnduranceEventDocument : Document, IAggregateRoot // TODO: question
     public DateTimeOffset StartDay { get; init; }
     public DateTimeOffset EndDay { get; init; }
     public OfficialDocument[] Officials { get; init; }
-    public RankingModel[] Rankings { get; init; }
+    public RanklistModel[] Rankings { get; init; }
 
     public EnduranceEvent ToDomain()
     {
