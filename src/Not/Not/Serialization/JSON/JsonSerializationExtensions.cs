@@ -30,7 +30,6 @@ public static class JsonSerializationExtensions
     }
 
     static object _lock = new();
-
 }
 
 public abstract class JsonConverterBase : JsonConverter
