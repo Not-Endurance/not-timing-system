@@ -11,7 +11,7 @@ public class RanklistModel
         Ruleset = ranklist.Ruleset;
         Type = ranklist.Type;
         Category = ranklist.Category;
-        Entries = ranklist.Select(e => new RankingEntryModel(e)).ToArray();
+        Entries = ranklist.Entries.Select(e => new RankingEntryModel(e)).ToArray();
     }
 
     public string Name { get; init; }
