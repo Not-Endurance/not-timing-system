@@ -18,14 +18,7 @@ public class MemberSpacingHelper
         var memberGroups = new List<MemberKind[]>
         {
             new[] { MemberKind.Delegate },
-            new[]
-            {
-                PrivateConst,
-                PrivateStaticReadonly,
-                PublicConst,
-                PublicStaticReadonly,
-                PublicStaticEvent,
-            },
+            new[] { PrivateConst, PrivateStaticReadonly, PublicConst, PublicStaticReadonly, PublicStaticEvent },
             new[] { PrivateReadonly, PrivateField, PrivateEvent, PublicField },
             new[] { AbstractProperty, AbstractMethod },
             new[] { PublicIndexDeclarator, PublicEvent },

@@ -15,16 +15,12 @@ public record DocumentHeader : DomainObject
         Title = enduranceEvent;
         PopulatedPlace = populatedPlace;
         EventSpan = eventSpan;
-        GroundJuryPresident = officials.FirstOrDefault(x =>
-            x.Role == OfficialRole.GroundJuryPresident
-        );
+        GroundJuryPresident = officials.FirstOrDefault(x => x.Role == OfficialRole.GroundJuryPresident);
         VeterinaryCommissionPresident = officials.FirstOrDefault(x =>
             x.Role == OfficialRole.VeterinaryCommissionPresident
         );
         TechnicalDelegate = officials.FirstOrDefault(x => x.Role == OfficialRole.TechnicalDelegate);
-        ForeignVeterinaryDelegate = officials.FirstOrDefault(x =>
-            x.Role == OfficialRole.ForeignVeterinaryDelegate
-        );
+        ForeignVeterinaryDelegate = officials.FirstOrDefault(x => x.Role == OfficialRole.ForeignVeterinaryDelegate);
         ForeignJudge = officials.FirstOrDefault(x => x.Role == OfficialRole.ForeignJudge);
         ChiefSteward = officials.FirstOrDefault(x => x.Role == OfficialRole.ChiefSteward);
     }

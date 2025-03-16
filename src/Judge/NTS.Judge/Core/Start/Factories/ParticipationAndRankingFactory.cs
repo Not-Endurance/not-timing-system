@@ -12,10 +12,7 @@ public static class ParticipationAndRankingrFactory
     public static async Task<(
         List<Participation> Participations,
         Dictionary<AthleteCategory, List<RankingEntry>> RankingEntriesByCategory
-    )> Create(
-        Domain.Setup.Aggregates.Competition setupCompetition,
-        IRepository<Participation> participationRepository
-    )
+    )> Create(Domain.Setup.Aggregates.Competition setupCompetition, IRepository<Participation> participationRepository)
     {
         if (setupCompetition.Phases.Count == 0)
         {
@@ -78,11 +75,7 @@ public static class ParticipationAndRankingrFactory
                 phases
             );
             var storedParticipations = await participationRepository.ReadAll();
-            if (
-                !storedParticipations.Any(p =>
-                    p.Combination.Number == participation.Combination.Number
-                )
-            )
+            if (!storedParticipations.Any(p => p.Combination.Number == participation.Combination.Number))
             {
                 participations.Add(participation);
                 var rankingEntry = new RankingEntry(participation, contestant.IsNotRanked);

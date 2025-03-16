@@ -55,9 +55,7 @@ public class ParticipationFactory
         bool adjustTime
     )
     {
-        var minSpeed = emsParticipation.Participant.Athlete.Category == Enums.EmsCategory.Children
-            ? 10
-            : 12;
+        var minSpeed = emsParticipation.Participant.Athlete.Category == Enums.EmsCategory.Children ? 10 : 12;
 
         var combination = new Combination(
             int.Parse(emsParticipation.Participant.Number),
@@ -177,13 +175,7 @@ public class ParticipationFactory
             competitionType = CompetitionType.Qualification;
         }
 
-        var participation = new Participation(
-            emsCompetition.Name,
-            ruleset,
-            competitionType,
-            combination,
-            phases
-        );
+        var participation = new Participation(emsCompetition.Name, ruleset, competitionType, combination, phases);
         if (finalRecord?.Result?.Type == EmsResultType.FailedToQualify)
         {
             participation.FailToQualify([FtqCode.GA], null);
@@ -199,20 +191,13 @@ public class ParticipationFactory
         return participation;
     }
 
-    static DateTime AdjustTime(
-        ref DateTimeOffset? previousTime,
-        DateTime currentTime,
-        TimeSpan diff,
-        bool shouldAdjust
-    )
+    static DateTime AdjustTime(ref DateTimeOffset? previousTime, DateTime currentTime, TimeSpan diff, bool shouldAdjust)
     {
         if (!shouldAdjust)
         {
             return currentTime;
         }
-        currentTime = previousTime.HasValue
-            ? (previousTime.Value + diff).DateTime
-            : DateTimeOffset.Now.DateTime;
+        currentTime = previousTime.HasValue ? (previousTime.Value + diff).DateTime : DateTimeOffset.Now.DateTime;
         previousTime = currentTime;
         return currentTime;
     }

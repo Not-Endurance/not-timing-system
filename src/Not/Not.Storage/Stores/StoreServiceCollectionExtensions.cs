@@ -37,14 +37,8 @@ public static class StoreServiceCollectionExtensions
     )
     {
         var factory = FileContextHelper.CreateFileContextFactory(configure, "Resources");
-        services.AddKeyedSingleton<IFileContext, FileContext>(
-            StoreConstants.STATIC_OPTIONS_STORE_KEY,
-            factory
-        );
-        services.AddSingleton(
-            typeof(IStaticOptionsProvider<>),
-            typeof(JsonStaticOptionsProvider<>)
-        );
+        services.AddKeyedSingleton<IFileContext, FileContext>(StoreConstants.STATIC_OPTIONS_STORE_KEY, factory);
+        services.AddSingleton(typeof(IStaticOptionsProvider<>), typeof(JsonStaticOptionsProvider<>));
         return services;
     }
 }

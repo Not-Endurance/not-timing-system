@@ -18,11 +18,7 @@ public class EmsValidator<T>
         var parts = name.Split(" ", StringSplitOptions.RemoveEmptyEntries);
         var firstName = parts.FirstOrDefault();
         var lastName = parts.LastOrDefault();
-        if (
-            parts.Length < 2
-            || string.IsNullOrWhiteSpace(firstName)
-            || string.IsNullOrWhiteSpace(lastName)
-        )
+        if (parts.Length < 2 || string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
         {
             throw EmsHelper.Create<T>("Invalid full name {1}", name);
         }
@@ -33,12 +29,7 @@ public class EmsValidator<T>
     {
         if (value <= compareTo)
         {
-            throw EmsHelper.Create<T>(
-                "Date has to be lated than {1}, {2}, {3}",
-                name,
-                value,
-                compareTo
-            );
+            throw EmsHelper.Create<T>("Date has to be lated than {1}, {2}, {3}", name, value, compareTo);
         }
     }
 }

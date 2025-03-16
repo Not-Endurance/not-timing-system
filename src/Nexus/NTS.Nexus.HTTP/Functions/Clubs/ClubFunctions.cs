@@ -52,8 +52,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
 
     [Function("clubs-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "clubs/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "clubs/{id:int}")] HttpRequest request,
         int id
     )
     {
@@ -65,8 +64,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
 
     [Function("clubs-get-one")]
     public async Task<IActionResult> GetOne(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs/{id:int}")] HttpRequest request,
         int id
     )
     {

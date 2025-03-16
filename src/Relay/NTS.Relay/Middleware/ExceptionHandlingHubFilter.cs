@@ -23,10 +23,7 @@ public class ExceptionHandlingHubFilter : IHubFilter
         }
     }
 
-    public async Task OnConnectedAsync(
-        HubLifetimeContext context,
-        Func<HubLifetimeContext, Task> next
-    )
+    public async Task OnConnectedAsync(HubLifetimeContext context, Func<HubLifetimeContext, Task> next)
     {
         try
         {

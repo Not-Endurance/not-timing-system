@@ -28,16 +28,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         IEnumerable<Participation> participations
     )
     {
-        return new(
-            id,
-            name,
-            type,
-            ruleset,
-            start,
-            ToTimeSpan(compulsoryThresholdMinutes),
-            phases,
-            participations
-        );
+        return new(id, name, type, ruleset, start, ToTimeSpan(compulsoryThresholdMinutes), phases, participations);
     }
 
     readonly List<Phase> _phases = [];

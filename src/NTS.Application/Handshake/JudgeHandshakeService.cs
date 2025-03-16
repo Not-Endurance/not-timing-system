@@ -30,9 +30,7 @@ public class JudgeHandshakeService : INetworkBroadcastService, IHandshakeService
                 var request = await requestTask;
                 if (_handshakeValidatorService.ValidatePayload(request.Buffer, Apps.WITNESS))
                 {
-                    Console.WriteLine(
-                        $"Handshake with '{Apps.WITNESS}' on '{request.RemoteEndPoint.Address}'"
-                    );
+                    Console.WriteLine($"Handshake with '{Apps.WITNESS}' on '{request.RemoteEndPoint.Address}'");
                     server.Send(serverPayload, serverPayload.Length, request.RemoteEndPoint);
                 }
                 else
@@ -61,9 +59,7 @@ public class JudgeHandshakeService : INetworkBroadcastService, IHandshakeService
             var response = handshake.Result!.Value;
             if (_handshakeValidatorService.ValidatePayload(response.Buffer, Apps.JUDGE))
             {
-                Console.WriteLine(
-                    $"Handshake completed with '{Apps.JUDGE}' on '{response.RemoteEndPoint.Address}'"
-                );
+                Console.WriteLine($"Handshake completed with '{Apps.JUDGE}' on '{response.RemoteEndPoint.Address}'");
                 return response.RemoteEndPoint.Address;
             }
         }
@@ -79,11 +75,7 @@ public class JudgeHandshakeService : INetworkBroadcastService, IHandshakeService
     {
         using var socket = new UdpClient();
         socket.EnableBroadcast = true;
-        socket.Send(
-            payload,
-            payload.Length,
-            new IPEndPoint(IPAddress.Broadcast, NETWORK_BROADCAST_PORT)
-        );
+        socket.Send(payload, payload.Length, new IPEndPoint(IPAddress.Broadcast, NETWORK_BROADCAST_PORT));
 
         var delay = TimeSpan.FromSeconds(3); // can be a constant
         var timeout = Task.Delay(delay);

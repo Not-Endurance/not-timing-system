@@ -60,7 +60,4 @@ public class ParticipationClient : RpcClient, IParticipationRpcClient, IStartupI
     }
 }
 
-public interface IParticipationRpcClient
-    : IParticipationClientProcedures,
-        IRpcClient,
-        ITransient { }
+public interface IParticipationRpcClient : IParticipationClientProcedures, IRpcClient, ITransient { }

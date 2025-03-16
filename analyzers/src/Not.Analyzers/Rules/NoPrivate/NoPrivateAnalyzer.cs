@@ -26,9 +26,7 @@ public class NoPrivateAnalyzer : AnalyzerBase
             return;
         }
 
-        var privateModifier = declaration.Modifiers.FirstOrDefault(m =>
-            m.IsKind(SyntaxKind.PrivateKeyword)
-        );
+        var privateModifier = declaration.Modifiers.FirstOrDefault(m => m.IsKind(SyntaxKind.PrivateKeyword));
         if (privateModifier != default)
         {
             context.ReportDiagnostic(CreateDiagnostic(privateModifier.GetLocation()));

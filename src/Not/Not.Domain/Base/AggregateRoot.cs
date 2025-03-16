@@ -86,9 +86,7 @@ public abstract class AggregateRoot : IEquatable<AggregateRoot>, IIdentifiable, 
 
     public override string ToString()
     {
-        throw new NotImplementedException(
-            $"'{GetType().Name}' has to override ToString() to provide short info"
-        );
+        throw new NotImplementedException($"'{GetType().Name}' has to override ToString() to provide short info");
     }
 
     bool IsEqual(object? other)

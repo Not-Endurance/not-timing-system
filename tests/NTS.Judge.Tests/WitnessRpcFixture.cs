@@ -9,17 +9,9 @@ namespace NTS.Judge.Tests;
 public class WitnessRpcFixture : HubFixture<WitnessTestClient>
 {
     public WitnessRpcFixture()
-        : base(
-            RpcProtocol.Http,
-            ApplicationConstants.RPC_PORT,
-            ApplicationConstants.WITNESS_HUB,
-            "NTS.Relay"
-        ) { }
+        : base(RpcProtocol.Http, ApplicationConstants.RPC_PORT, ApplicationConstants.WITNESS_HUB, "NTS.Relay") { }
 
-    protected override WitnessTestClient CreateClient(
-        SignalRSocket socket,
-        ITestOutputHelper testOutputHelper
-    )
+    protected override WitnessTestClient CreateClient(SignalRSocket socket, ITestOutputHelper testOutputHelper)
     {
         return new WitnessTestClient(socket, testOutputHelper);
     }

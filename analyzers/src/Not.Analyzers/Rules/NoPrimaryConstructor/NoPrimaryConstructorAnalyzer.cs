@@ -23,11 +23,7 @@ public class NoPrimaryConstructorAnalyzer : AnalyzerBase
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
-        context.RegisterSyntaxNodeAction(
-            AnalyzeSyntaxNode,
-            SyntaxKind.ClassDeclaration,
-            SyntaxKind.RecordDeclaration
-        );
+        context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.ClassDeclaration, SyntaxKind.RecordDeclaration);
     }
 
     protected override void SafeAnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)

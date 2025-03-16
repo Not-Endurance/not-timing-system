@@ -26,9 +26,7 @@ public class MemberSpacingCodeFixProvider : TypeMemberCodeFixProvider
             return document;
         }
 
-        var editor = await DocumentEditor
-            .CreateAsync(document, cancellationToken)
-            .ConfigureAwait(false);
+        var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
 
         var members = typeDeclaration.Members.ToList();
         for (int i = 1; i < members.Count; i++)
@@ -39,10 +37,7 @@ public class MemberSpacingCodeFixProvider : TypeMemberCodeFixProvider
             var currentKind = MemberKindHelper.GetMemberKind(currentMember);
             var nextKind = MemberKindHelper.GetMemberKind(nextMember);
 
-            var requiresBlankLine = MemberSpacingHelper.RequiresBlankLineBetween(
-                currentKind,
-                nextKind
-            );
+            var requiresBlankLine = MemberSpacingHelper.RequiresBlankLineBetween(currentKind, nextKind);
             var hasBlankLine = MemberSpacingHelper.HasLeadingBlankLine(nextMember);
 
             if (requiresBlankLine && !hasBlankLine)
@@ -56,10 +51,7 @@ public class MemberSpacingCodeFixProvider : TypeMemberCodeFixProvider
             {
                 var trivia = nextMember
                     .GetLeadingTrivia()
-                    .Where(t =>
-                        !t.IsKind(SyntaxKind.EndOfLineTrivia)
-                        || !string.IsNullOrWhiteSpace(t.ToString())
-                    )
+                    .Where(t => !t.IsKind(SyntaxKind.EndOfLineTrivia) || !string.IsNullOrWhiteSpace(t.ToString()))
                     .ToList();
                 members[i] = nextMember.WithLeadingTrivia(trivia);
             }

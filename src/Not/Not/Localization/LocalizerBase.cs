@@ -8,9 +8,7 @@ public abstract class LocalizerBase : ILocalizer
 
     public string Get(params object[] args)
     {
-        var localized = args.Where(x => x != null)
-            .Select(x => GetLocalizedValue(x.ToString()!))
-            .ToArray();
+        var localized = args.Where(x => x != null).Select(x => GetLocalizedValue(x.ToString()!)).ToArray();
         if (localized.Length == 0)
         {
             return "";

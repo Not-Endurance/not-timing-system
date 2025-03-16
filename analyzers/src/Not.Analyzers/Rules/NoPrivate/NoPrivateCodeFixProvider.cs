@@ -25,9 +25,7 @@ public class NoPrivateCodeFixProvider : TypeMemberCodeFixProvider
             return document;
         }
 
-        var editor = await DocumentEditor
-            .CreateAsync(document, cancellationToken)
-            .ConfigureAwait(false);
+        var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
         var privateModifier = declaration.Modifiers.First(m => m.IsKind(SyntaxKind.PrivateKeyword));
 
         var leadingTrivia = privateModifier.LeadingTrivia;
@@ -46,10 +44,7 @@ public class NoPrivateCodeFixProvider : TypeMemberCodeFixProvider
         {
             newDeclaration = declaration.WithModifiers(leftoverModifiers);
             var firstToken = newDeclaration.GetFirstToken();
-            newDeclaration = newDeclaration.ReplaceToken(
-                firstToken,
-                firstToken.WithLeadingTrivia(leadingTrivia)
-            );
+            newDeclaration = newDeclaration.ReplaceToken(firstToken, firstToken.WithLeadingTrivia(leadingTrivia));
         }
 
         editor.ReplaceNode(declaration, newDeclaration);

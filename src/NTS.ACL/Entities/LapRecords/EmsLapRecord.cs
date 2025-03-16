@@ -44,8 +44,7 @@ public class EmsLapRecord : EmsDomainBase<EmsLapRecordException>
     public bool IsRequiredInspectionRequired { get; internal set; }
     public EmsResult Result { get; internal set; }
     public DateTime? VetGateTime => ReInspectionTime ?? InspectionTime;
-    public DateTime? NextStarTime =>
-        Lap.IsFinal ? null : VetGateTime?.AddMinutes(Lap.RestTimeInMins);
+    public DateTime? NextStarTime => Lap.IsFinal ? null : VetGateTime?.AddMinutes(Lap.RestTimeInMins);
     public Dictionary<WitnessEventType, EmsRfidTag> Detected { get; private set; } = [];
 
     protected virtual void RaisePropertyChanged(string propertyName = null)

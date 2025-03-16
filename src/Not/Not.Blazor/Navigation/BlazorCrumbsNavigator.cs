@@ -62,9 +62,7 @@ public class BlazorCrumbsNavigator : ICrumbsNavigator, ILandNavigator
     {
         if (_parameters == null)
         {
-            throw GuardHelper.Exception(
-                $"Cannot get parameter '{typeof(T)}'. There are no parameters on this landing"
-            );
+            throw GuardHelper.Exception($"Cannot get parameter '{typeof(T)}'. There are no parameters on this landing");
         }
         var result = _parameters.Get<T>();
         //_parameters = null;

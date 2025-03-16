@@ -43,8 +43,7 @@ public static class ReflectionHelper
 
     public static MethodInfo Method(this Type type, string name)
     {
-        return type.GetMethod(name)
-            ?? throw new Exception($"'{type}' doesn't have method method '{name}'");
+        return type.GetMethod(name) ?? throw new Exception($"'{type}' doesn't have method method '{name}'");
     }
 
     public static object? Get(this PropertyInfo property, object instance)

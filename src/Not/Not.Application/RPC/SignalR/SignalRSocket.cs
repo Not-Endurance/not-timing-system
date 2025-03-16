@@ -117,9 +117,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     void ConfigureConnection()
     {
         Connection = new HubConnectionBuilder()
-            .AddNewtonsoftJsonProtocol(x =>
-                x.PayloadSerializerSettings = SerializationExtensions.SETTINGS
-            )
+            .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = SerializationExtensions.SETTINGS)
             .WithUrl(_context.Url)
             .Build();
         Connection.Reconnected += HandleReconnected;
@@ -139,9 +137,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     Task HandleReconnecting(Exception? exception)
     {
-        RaiseReconnecting(
-            $"SignalR automatic reconnecting: {exception?.Message ?? "something went wrong"}"
-        );
+        RaiseReconnecting($"SignalR automatic reconnecting: {exception?.Message ?? "something went wrong"}");
         return Task.CompletedTask;
     }
 
@@ -160,11 +156,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         }
         else
         {
-            BeginReconnecting(
-                _reconnectTokenSource!.Token,
-                exception,
-                () => _connectionClosedReconnectAttempts = 0
-            );
+            BeginReconnecting(_reconnectTokenSource!.Token, exception, () => _connectionClosedReconnectAttempts = 0);
         }
         return Task.CompletedTask;
     }
@@ -179,10 +171,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                ServerConnectionInfo?.Invoke(
-                    this,
-                    "Reconnecting stopped due to cancelation request"
-                );
+                ServerConnectionInfo?.Invoke(this, "Reconnecting stopped due to cancelation request");
                 _reconnectionTimer.Stop();
                 _reconnectionTimer.Dispose();
             }
@@ -206,9 +195,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
                 if (HasReachedReconnectionAttemptLimit(++reconnectAttempts))
                 {
                     RaiseDisconnected(
-                        new Exception(
-                            "Automatic reconnection reached attempt limits. Try to reconnect manually"
-                        )
+                        new Exception("Automatic reconnection reached attempt limits. Try to reconnect manually")
                     );
                     _reconnectionTimer.Stop();
                     _reconnectionTimer.Dispose();

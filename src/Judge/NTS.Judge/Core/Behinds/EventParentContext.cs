@@ -5,10 +5,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Core.Behinds;
 
-public class EventParentContext
-    : BehindContext<EnduranceEvent>,
-        ICrudParent<Competition>,
-        ICrudParent<Official>
+public class EventParentContext : BehindContext<EnduranceEvent>, ICrudParent<Competition>, ICrudParent<Official>
 {
     readonly ObservableList<Competition> _competitions = new();
     readonly ObservableList<Official> _officials = new();

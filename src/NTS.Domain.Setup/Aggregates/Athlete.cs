@@ -5,13 +5,7 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class Athlete : AggregateRoot, IAthlete, IAggregateRoot, IReflect<Club>
 {
-    public static Athlete Create(
-        string? name,
-        string? feiId,
-        Country? country,
-        Club? club,
-        AthleteCategory? category
-    )
+    public static Athlete Create(string? name, string? feiId, Country? country, Club? club, AthleteCategory? category)
     {
         return new(Person.Create(name), feiId, country, club, category);
     }
@@ -33,14 +27,7 @@ public class Athlete : AggregateRoot, IAthlete, IAggregateRoot, IReflect<Club>
 
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Athlete(
-        int? id,
-        Person? names,
-        string? feiId,
-        Country? country,
-        Club? club,
-        AthleteCategory? category
-    )
+    public Athlete(int? id, Person? names, string? feiId, Country? country, Club? club, AthleteCategory? category)
         : base(id!.Value)
     {
         FeiId = feiId;

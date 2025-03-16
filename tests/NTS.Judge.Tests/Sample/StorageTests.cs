@@ -19,9 +19,7 @@ public class StorageTests : JudgeIntegrationTest
     {
         await Seed();
 
-        var enduranceEventBehind = Provider.GetRequiredService<
-            ICreateBehind<EnduranceEventFormModel>
-        >();
+        var enduranceEventBehind = Provider.GetRequiredService<ICreateBehind<EnduranceEventFormModel>>();
 
         var country = new Country(0, "testIso", "testNf", "Test");
         var enduranceEvent = new EnduranceEventTestModel { Country = country, Place = "Sofia" };

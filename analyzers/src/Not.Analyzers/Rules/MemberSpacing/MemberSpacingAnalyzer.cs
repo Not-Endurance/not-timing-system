@@ -56,10 +56,7 @@ public class MemberSpacingAnalyzer : AnalyzerBase
                 continue;
             }
 
-            var requiresBlankLine = MemberSpacingHelper.RequiresBlankLineBetween(
-                currentKind,
-                nextKind
-            );
+            var requiresBlankLine = MemberSpacingHelper.RequiresBlankLineBetween(currentKind, nextKind);
             var hasBlankLine = MemberSpacingHelper.HasLeadingBlankLine(nextMember);
 
             if (requiresBlankLine && !hasBlankLine || !requiresBlankLine && hasBlankLine)

@@ -9,9 +9,7 @@ public class SettingRepository : MongoRepository<SettingDocument>
     public SettingRepository(IMongoContext context)
         : base(context, "nts", "settings") { }
 
-    protected override UpdateDefinition<SettingDocument> GetUpdateDefinition(
-        SettingDocument document
-    )
+    protected override UpdateDefinition<SettingDocument> GetUpdateDefinition(SettingDocument document)
     {
         return Builders<SettingDocument>
             .Update.Set(x => x.DetectionMode, document.DetectionMode)

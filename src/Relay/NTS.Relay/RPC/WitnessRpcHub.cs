@@ -68,10 +68,7 @@ public class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistH
                 }
                 // If record is complete, but is not last -> insert another record for current stage
                 // This bullshit happens because "current" stage is not yet created. Its only created at Arrive
-                if (
-                    record == emsParticipation.Participant.LapRecords.Last()
-                    && record.NextStarTime.HasValue
-                )
+                if (record == emsParticipation.Participant.LapRecords.Last() && record.NextStarTime.HasValue)
                 {
                     var nextEntry = new EmsStartlistEntry(emsParticipation)
                     {
@@ -99,17 +96,10 @@ public class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistH
             .ReadAll(x => !x.IsEliminated() && !x.IsComplete())
             .Select(ParticipantEntryFactory.Create);
         var enduranceEvent = await _events.Read(0);
-        return new EmsParticipantsPayload
-        {
-            Participants = participants.ToList(),
-            EventId = enduranceEvent?.Id ?? 0,
-        };
+        return new EmsParticipantsPayload { Participants = participants.ToList(), EventId = enduranceEvent?.Id ?? 0 };
     }
 
-    public async Task ReceiveWitnessEvent(
-        IEnumerable<EmsParticipantEntry> entries,
-        EmsWitnessEventType type
-    )
+    public async Task ReceiveWitnessEvent(IEnumerable<EmsParticipantEntry> entries, EmsWitnessEventType type)
     {
         // Task.Run because Event hadling in dotnet seems to hold the current thread. Further investigation is needed
         // but what was happening is that Witness apps didn't receive rpc response untill the handling thread was finished
@@ -119,16 +109,12 @@ public class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistH
             var snapshots = new List<Snapshot>();
             foreach (var entry in entries)
             {
-                var participation = await _participations.Read(x =>
-                    x.Combination.Number == int.Parse(entry.Number)
-                );
+                var participation = await _participations.Read(x => x.Combination.Number == int.Parse(entry.Number));
                 if (participation == null)
                 {
                     continue;
                 }
-                var isFinal = participation
-                    .Phases.Take(participation.Phases.Count - 1)
-                    .All(x => x.IsComplete());
+                var isFinal = participation.Phases.Take(participation.Phases.Count - 1).All(x => x.IsComplete());
                 var snapshot = SnapshotFactory.Create(entry, type, isFinal);
                 snapshots.Add(snapshot);
             }

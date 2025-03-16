@@ -4,9 +4,7 @@ namespace NTS.Domain.Core.Objects.Rankers;
 
 internal class FeiRanker : Ranker
 {
-    protected IOrderedEnumerable<RankingEntry> OrderByNotEliminatedAndRanked(
-        IEnumerable<RankingEntry> entries
-    )
+    protected IOrderedEnumerable<RankingEntry> OrderByNotEliminatedAndRanked(IEnumerable<RankingEntry> entries)
     {
         return entries
             .OrderBy(x => x.Participation.IsEliminated())

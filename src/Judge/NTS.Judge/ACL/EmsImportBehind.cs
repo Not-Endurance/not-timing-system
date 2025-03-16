@@ -19,10 +19,7 @@ public class EmsImporters : IEmsImporter
     readonly IRepository<EnduranceEvent> _eventRepository;
     readonly IEmsToCoreImporter _emsToCoreImporter;
 
-    public EmsImporters(
-        IRepository<EnduranceEvent> eventRepository,
-        IEmsToCoreImporter emsToCoreImporter
-    )
+    public EmsImporters(IRepository<EnduranceEvent> eventRepository, IEmsToCoreImporter emsToCoreImporter)
     {
         _eventRepository = eventRepository;
         _emsToCoreImporter = emsToCoreImporter;
@@ -45,12 +42,7 @@ public class EmsImporters : IEmsImporter
         var contents = await File.ReadAllTextAsync(emsStateFilePath);
         var emsState = contents.FromConvertedJson<EmsState>();
 
-        var country = new Country(
-            0,
-            emsState.Event.Country.IsoCode,
-            null,
-            emsState.Event.Country.Name
-        );
+        var country = new Country(0, emsState.Event.Country.IsoCode, null, emsState.Event.Country.Name);
         var enduranceEvent = EnduranceEvent.Create(emsState.Event.PopulatedPlace, country);
 
         foreach (var offical in CreateOfficials(emsState.Event))
@@ -79,9 +71,7 @@ public class EmsImporters : IEmsImporter
             yield return Competition.Create(emsCompetition.Name, type, ruleset, start, 10);
         }
 
-        static (CompetitionType type, CompetitionRuleset ruleset) MapRuleset(
-            EmsCompetitionType emsType
-        )
+        static (CompetitionType type, CompetitionRuleset ruleset) MapRuleset(EmsCompetitionType emsType)
         {
             if (emsType == EmsCompetitionType.National)
             {

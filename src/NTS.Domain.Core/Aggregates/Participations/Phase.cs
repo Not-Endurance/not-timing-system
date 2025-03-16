@@ -162,24 +162,15 @@ public class Phase : AggregateRoot
         {
             if (state.ArriveTime < state.StartTime)
             {
-                throw new DomainException(
-                    nameof(ArriveTime),
-                    "Arrive Time cannot be sooner than Start Time"
-                );
+                throw new DomainException(nameof(ArriveTime), "Arrive Time cannot be sooner than Start Time");
             }
             if (state.PresentTime < state.StartTime)
             {
-                throw new DomainException(
-                    nameof(PresentTime),
-                    "Inspect Time cannot be sooner than Start Time"
-                );
+                throw new DomainException(nameof(PresentTime), "Inspect Time cannot be sooner than Start Time");
             }
             if (state.RepresentTime < state.ArriveTime)
             {
-                throw new DomainException(
-                    nameof(RepresentTime),
-                    "Reinspect Time cannot be sooner than Start Time"
-                );
+                throw new DomainException(nameof(RepresentTime), "Reinspect Time cannot be sooner than Start Time");
             }
         }
         StartTime = Timestamp.Create(state.StartTime);
@@ -220,9 +211,7 @@ public class Phase : AggregateRoot
         }
         if (RepresentTime != null)
         {
-            throw new DomainException(
-                "Cannot disable Reinspection because time of Reinspection is already present"
-            );
+            throw new DomainException("Cannot disable Reinspection because time of Reinspection is already present");
         }
         IsReinspectionRequested = false;
     }
@@ -371,9 +360,7 @@ public class Phase : AggregateRoot
         {
             if (snapshot.Timestamp <= PresentTime)
             {
-                throw new DomainException(
-                    $"Representation time cannot be before presentation '{PresentTime}'"
-                );
+                throw new DomainException($"Representation time cannot be before presentation '{PresentTime}'");
             }
             RepresentTime = snapshot.Timestamp;
         }

@@ -54,13 +54,7 @@ public class Participation : AggregateRoot, IAggregateRoot, IReflect<Combination
         Combination? combination,
         double? maxSpeedOverride
     )
-        : this(
-            GenerateId(),
-            IsFutureTime(startTimeOverride),
-            isUnranked,
-            combination,
-            maxSpeedOverride
-        ) { }
+        : this(GenerateId(), IsFutureTime(startTimeOverride), isUnranked, combination, maxSpeedOverride) { }
 
     public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
@@ -94,9 +88,7 @@ public class Participation : AggregateRoot, IAggregateRoot, IReflect<Combination
     public override string ToString()
     {
         var startTimeMessage =
-            StartTimeOverride != null
-                ? $"start: {StartTimeOverride.Value.ToLocalTime().TimeOfDay} "
-                : null;
+            StartTimeOverride != null ? $"start: {StartTimeOverride.Value.ToLocalTime().TimeOfDay} " : null;
         var isUnrankedMessage = IsNotRanked ? "not-ranked" : null;
         return Combine(Combination, startTimeMessage, isUnrankedMessage);
     }

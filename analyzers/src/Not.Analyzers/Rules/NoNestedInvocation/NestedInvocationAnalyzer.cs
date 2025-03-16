@@ -62,9 +62,7 @@ public class NestedInvocationAnalyzer : AnalyzerBase
         }
 
         // Check descendant invocations
-        foreach (
-            var descendant in expression.DescendantNodes().OfType<InvocationExpressionSyntax>()
-        )
+        foreach (var descendant in expression.DescendantNodes().OfType<InvocationExpressionSyntax>())
         {
             // Skip if the descendant is inside a lambda expression
             if (descendant.Ancestors().Any(a => a is LambdaExpressionSyntax))

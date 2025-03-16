@@ -16,9 +16,7 @@ builder.ConfigureFunctionsWebApplication();
 builder.Services.AddMongo(connectionString);
 builder.Services.RegisterConventionalServices();
 
-builder
-    .Services.AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();
+builder.Services.AddApplicationInsightsTelemetryWorkerService().ConfigureFunctionsApplicationInsights();
 
 BsonClassMap.RegisterClassMap<Document>(x =>
 {

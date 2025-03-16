@@ -7,11 +7,7 @@ namespace NTS.Domain.Core.Objects.Documents;
 
 public record HandoutDocument : Document, IIdentifiable
 {
-    public HandoutDocument(
-        Handout handout,
-        EnduranceEvent enduranceEvent,
-        IEnumerable<Official> officials
-    )
+    public HandoutDocument(Handout handout, EnduranceEvent enduranceEvent, IEnumerable<Official> officials)
         : base(
             new DocumentHeader(
                 handout.Participation.Competition.Name,

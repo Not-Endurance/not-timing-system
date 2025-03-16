@@ -23,9 +23,7 @@ public class VupVD67Controller : RfidController
         var setPowerResult = _reader.SetAntPower(0, 27);
         if (!connectionResult.Success || !setPowerResult.Success)
         {
-            RaiseError(
-                $"Connect failed '{connectionResult.ErrorCode}': '{connectionResult.Message}'"
-            );
+            RaiseError($"Connect failed '{connectionResult.ErrorCode}': '{connectionResult.Message}'");
             return;
         }
         RaiseMessage("Connected");
@@ -174,9 +172,7 @@ public class VupVD67Controller : RfidController
             }
             catch (Exception exception)
             {
-                throw new Exception(
-                    $"Write ERROR: {exception.Message + Environment.NewLine + exception.StackTrace}"
-                );
+                throw new Exception($"Write ERROR: {exception.Message + Environment.NewLine + exception.StackTrace}");
             }
 
             Thread.Sleep(Throttle);
