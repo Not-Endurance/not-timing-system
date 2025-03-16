@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Not.Serialization;
+using Not.Serialization.JSON;
 using NTS.Domain.Core.Aggregates;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Storage.Documents.EnduranceEvents;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Not.Injection;
 using Not.Localization;
-using Not.Serialization;
+using Not.Serialization.JSON;
 using NTS.Application.Handshake;
 using NTS.Relay.Middleware;
 using NTS.Storage;
@@ -20,7 +20,7 @@ public static class HubInjection
             })
             .AddNewtonsoftJsonProtocol(x =>
             {
-                x.PayloadSerializerSettings = SerializationExtensions.SETTINGS;
+                x.PayloadSerializerSettings = new NJsonSettings();
             });
 
         services

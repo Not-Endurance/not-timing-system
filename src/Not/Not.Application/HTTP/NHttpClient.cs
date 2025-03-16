@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using Not.Serialization;
+using Not.Serialization.JSON;
 
 namespace Not.Application.HTTP;
 
@@ -71,9 +71,10 @@ public class NHttpClient
         var url = BuildUrl(endpoint);
         try
         {
+            var content = payload.ToJson();
             var request = new HttpRequestMessage(method, url)
             {
-                Content = new StringContent(payload.ToConvertedJson(), Encoding.UTF8, "application/json"),
+                Content = new StringContent(content, Encoding.UTF8, "application/json"),
             };
 
             var response = await _httpClient.SendAsync(request);

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
-using Not.Serialization;
+using Not.Serialization.JSON;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Archive;
 using NTS.Nexus.HTTP.Logger;

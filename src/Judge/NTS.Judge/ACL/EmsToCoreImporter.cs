@@ -1,7 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Extensions;
 using Not.Injection;
-using Not.Serialization;
+using Not.Serialization.JSON;
 using NTS.ACL;
 using NTS.ACL.Entities.Competitions;
 using NTS.ACL.Entities.EnduranceEvents;
@@ -43,7 +43,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
             throw new Exception($"Cannot import data as Event already exists: '{existingEvent}'");
         }
 
-        var emsState = emsJson.FromConvertedJson<EmsState>();
+        var emsState = emsJson.FromJson<EmsState>();
 
         var enduranceEvent = CreateEvent(emsState.Event, adjustTime);
         //TODOL interesting why some imports fail without ToList? 2024-vakarel (finished) for example

@@ -1,6 +1,6 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
-using Not.Serialization;
+using Not.Serialization.JSON;
 using NTS.Domain.Settings;
 
 namespace NTS.Judge.HTTP;
