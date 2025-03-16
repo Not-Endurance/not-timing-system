@@ -1,4 +1,5 @@
 ﻿using Not.Domain.Base;
+using NTS.Domain.Core.Objects;
 
 namespace NTS.Domain.Core.Aggregates;
 
@@ -7,17 +8,17 @@ public class ArchiveEntry : AggregateRoot
     public ArchiveEntry(
         EnduranceEvent enduranceEvent,
         IEnumerable<Official> officials,
-        IEnumerable<Ranking> rankings
+        IEnumerable<Ranklist> ranklists
     )
         : base(GenerateId())
     {
         EnduranceEvent = enduranceEvent;
         Officials = officials.ToList();
-        Rankings = rankings.ToList();
+        Ranklists = ranklists.ToList();
     }
 
     public string TenantId { get; set; } = default!;
     public EnduranceEvent EnduranceEvent { get; set; }
     public IReadOnlyList<Official> Officials { get; }
-    public IReadOnlyList<Ranking> Rankings { get; }
+    public IReadOnlyList<Ranklist> Ranklists { get; }
 }

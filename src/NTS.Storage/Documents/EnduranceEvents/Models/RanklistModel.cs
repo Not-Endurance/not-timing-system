@@ -1,17 +1,17 @@
-﻿using NTS.Domain.Core.Aggregates;
+﻿using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 
 namespace NTS.Storage.Documents.EnduranceEvents.Models;
 
-public class RankingModel
+public class RanklistModel
 {
-    public RankingModel(Ranking domainModel)
+    public RanklistModel(Ranklist ranklist)
     {
-        Name = domainModel.Name;
-        Ruleset = domainModel.Ruleset;
-        Type = domainModel.Type;
-        Category = domainModel.Category;
-        Entries = domainModel.Entries.Select(e => new RankingEntryModel(e)).ToArray();
+        Name = ranklist.Name;
+        Ruleset = ranklist.Ruleset;
+        Type = ranklist.Type;
+        Category = ranklist.Category;
+        Entries = ranklist.Select(e => new RankingEntryModel(e)).ToArray();
     }
 
     public string Name { get; init; }

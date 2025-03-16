@@ -68,8 +68,9 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
         }
         var officials = await _officials.ReadAll();
         var rankings = await _rankings.ReadAll();
+        var ranklists = rankings.Select(x => new Ranklist(x));
 
-        var entry = new ArchiveEntry(enduranceEvent, officials, rankings);
+        var entry = new ArchiveEntry(enduranceEvent, officials, ranklists);
         await _archive.Create(entry);
     }
 
