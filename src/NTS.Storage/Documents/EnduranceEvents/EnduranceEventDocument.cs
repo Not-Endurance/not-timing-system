@@ -35,16 +35,6 @@ public class EnduranceEventDocument : Document, IAggregateRoot // TODO: question
 
     public EnduranceEvent ToDomain()
     {
-        return new EnduranceEvent(
-            Id,
-            Country.ToDomain(),
-            City,
-            Location ?? "",
-            StartDay,
-            EndDay,
-            null,
-            null,
-            null
-        ); // TODO: fix for FEI
+        return new EnduranceEvent(Id, Country.ToDomain(), City, Location ?? "", StartDay, EndDay, null, null, null); // TODO: fix for FEI
     }
 }

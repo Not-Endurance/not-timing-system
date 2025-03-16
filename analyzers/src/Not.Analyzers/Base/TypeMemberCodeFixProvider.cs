@@ -10,9 +10,7 @@ public abstract class TypeMemberCodeFixProvider : CodeFixProviderBase
 
     public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        var root = await context
-            .Document.GetSyntaxRootAsync(context.CancellationToken)
-            .ConfigureAwait(false);
+        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
         var diagnostic = context.Diagnostics[0];
         var diagnosticSpan = diagnostic.Location.SourceSpan;
 

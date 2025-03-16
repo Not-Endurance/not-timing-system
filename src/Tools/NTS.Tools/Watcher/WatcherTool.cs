@@ -128,9 +128,7 @@ public record SendCommand : ICommand
 {
     public SendCommand(string timeString)
     {
-        var segments = timeString
-            .Split(":", StringSplitOptions.RemoveEmptyEntries)
-            .Select(int.Parse);
+        var segments = timeString.Split(":", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         var hour = segments.First();
         var minute = segments.Skip(1).FirstOrDefault();
         var second = segments.Skip(2).FirstOrDefault();

@@ -59,8 +59,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
     [Function("horses-safe-delete")]
     public async Task<IActionResult> SafeDelete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")] HttpRequest request,
         int id
     )
     {
@@ -69,9 +68,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
 
         var recordsWithHorse = await _archive
-            .ReadAll(x =>
-                x.Rankings.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id))
-            )
+            .ReadAll(x => x.Rankings.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
             .ToList();
         if (recordsWithHorse.Any())
         {
@@ -87,8 +84,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
     [Function("horses-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}")] HttpRequest request,
         int id
     )
     {
@@ -101,8 +97,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
     [Function("horses-get")]
     public async Task<IActionResult> GetOne(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses/{id:int}")] HttpRequest request,
         int id
     )
     {

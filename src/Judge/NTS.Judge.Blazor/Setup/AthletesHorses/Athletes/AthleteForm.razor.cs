@@ -15,9 +15,7 @@ public partial class AthleteForm
     NAutocomplete<Country?> _countryField = default!;
     NAutocomplete<Club?> _clubField = default!;
     NSelect<AthleteCategory> _categoryField = default!;
-    List<NotListModel<AthleteCategory>> _categories = NotListModel
-        .FromEnum<AthleteCategory>()
-        .ToList();
+    List<NotListModel<AthleteCategory>> _categories = NotListModel.FromEnum<AthleteCategory>().ToList();
 
     [Inject]
     ISeeker<Country> Countries { get; set; } = default!;

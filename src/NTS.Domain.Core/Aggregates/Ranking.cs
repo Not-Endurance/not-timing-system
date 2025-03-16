@@ -25,19 +25,9 @@ public class Ranking : AggregateRoot, IAggregateRoot
         Entries = entries;
     }
 
-    public Ranking(
-        Competition competition,
-        AthleteCategory category,
-        IEnumerable<RankingEntry> entries
-    )
-        : this(
-            GenerateId(),
-            competition.Name,
-            competition.Ruleset,
-            competition.Type,
-            category,
-            new(entries.ToList())
-        ) { }
+    public Ranking(Competition competition, AthleteCategory category, IEnumerable<RankingEntry> entries)
+        : this(GenerateId(), competition.Name, competition.Ruleset, competition.Type, category, new(entries.ToList()))
+    { }
 
     public string Name { get; }
     public CompetitionRuleset Ruleset { get; }

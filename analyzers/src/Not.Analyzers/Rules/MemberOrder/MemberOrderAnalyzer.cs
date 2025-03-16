@@ -51,11 +51,7 @@ public class MemberOrderAnalyzer : AnalyzerBase
 
             if (MemberOrderHelper.CompareOrder(currentKind, nextKind) > 0)
             {
-                var diagnostic = CreateDiagnostic(
-                    classDeclaration.GetLocation(),
-                    currentKind,
-                    nextKind
-                );
+                var diagnostic = CreateDiagnostic(classDeclaration.GetLocation(), currentKind, nextKind);
                 context.ReportDiagnostic(diagnostic);
             }
         }

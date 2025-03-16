@@ -1,9 +1,6 @@
 ﻿namespace NTS.ACL.Abstractions;
 
-public abstract class EmsDomainBase<TException>
-    : IEmsDomain,
-        IEquatable<EmsDomainBase<TException>>,
-        IEmsIdentifiable
+public abstract class EmsDomainBase<TException> : IEmsDomain, IEquatable<EmsDomainBase<TException>>, IEmsIdentifiable
     where TException : EmsDomainExceptionBase, new()
 {
     protected const string GENERATE_ID = "GenerateIdFlag";
@@ -13,10 +10,7 @@ public abstract class EmsDomainBase<TException>
         return one is null ? two is null : one.Equals(two);
     }
 
-    public static bool operator !=(
-        EmsDomainBase<TException>? one,
-        EmsDomainBase<TException>? two
-    ) => !(one == two);
+    public static bool operator !=(EmsDomainBase<TException>? one, EmsDomainBase<TException>? two) => !(one == two);
 
     // Empty constructor is used by mapping for existing (in the database) entries
     protected EmsDomainBase() { }

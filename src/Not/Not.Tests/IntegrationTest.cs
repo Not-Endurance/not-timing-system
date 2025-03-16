@@ -73,27 +73,13 @@ public abstract class IntegrationTest : IDisposable
     protected async Task Seed([CallerMemberName] string? test = null)
     {
         var currentDirectory = Directory.GetCurrentDirectory();
-        var path = Path.Combine(
-            currentDirectory,
-            SEED_DIRECTORY,
-            _stateName,
-            _testClassName,
-            $"{test}.json"
-        );
+        var path = Path.Combine(currentDirectory, SEED_DIRECTORY, _stateName, _testClassName, $"{test}.json");
         if (!File.Exists(path))
         {
-            path = Path.Combine(
-                currentDirectory,
-                SEED_DIRECTORY,
-                _stateName,
-                _testClassName,
-                $"{_testClassName}.json"
-            );
+            path = Path.Combine(currentDirectory, SEED_DIRECTORY, _stateName, _testClassName, $"{_testClassName}.json");
             if (!File.Exists(path))
             {
-                throw new InvalidOperationException(
-                    $"Seed file '{test}.json' or '{_testClassName}.json' not found"
-                );
+                throw new InvalidOperationException($"Seed file '{test}.json' or '{_testClassName}.json' not found");
             }
         }
         var contents = await File.ReadAllTextAsync(path);
@@ -105,12 +91,7 @@ public abstract class IntegrationTest : IDisposable
         var contents = await File.ReadAllTextAsync(_storageFilePath);
         var expected = Normalize(expectedContents);
         var actual = Normalize(contents);
-        Assert.Equal(
-            expected,
-            actual,
-            ignoreLineEndingDifferences: true,
-            ignoreWhiteSpaceDifferences: true
-        );
+        Assert.Equal(expected, actual, ignoreLineEndingDifferences: true, ignoreWhiteSpaceDifferences: true);
     }
 
     public async Task AssertRpcInvoked<T>(HubFixture<T> fixture, Func<Task> action, string rpcName)

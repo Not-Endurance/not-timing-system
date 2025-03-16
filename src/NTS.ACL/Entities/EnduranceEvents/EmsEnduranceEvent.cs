@@ -15,13 +15,7 @@ public class EmsEnduranceEvent : EmsDomainBase<EmsEnduranceEventException>
     [Newtonsoft.Json.JsonConstructor]
     EmsEnduranceEvent() { }
 
-    internal EmsEnduranceEvent(
-        string name,
-        EmsCountry country,
-        string feiId,
-        string feiCode,
-        string showFeiId
-    )
+    internal EmsEnduranceEvent(string name, EmsCountry country, string feiId, string feiCode, string showFeiId)
         : this(name, country)
     {
         FeiId = feiId;

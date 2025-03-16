@@ -29,9 +29,7 @@ public class EntityReferenceConverter<T> : JsonConverterBase
     {
         var entity =
             value as T
-            ?? throw new JsonSerializationException(
-                $"Unexpected value when converting: {value?.GetType().Name}"
-            );
+            ?? throw new JsonSerializationException($"Unexpected value when converting: {value?.GetType().Name}");
 
         if (_instancesById.ContainsKey(entity.Id))
         {
@@ -71,9 +69,7 @@ public class EntityReferenceConverter<T> : JsonConverterBase
                 var id = GetIdValue(jObject, DOMAIN_REF_PROPERTY);
                 if (!_instancesById.TryGetValue(id, out var existingEntity))
                 {
-                    throw new JsonSerializationException(
-                        $"Unresolved domain reference value '{id}'"
-                    );
+                    throw new JsonSerializationException($"Unresolved domain reference value '{id}'");
                 }
                 return existingEntity;
             }

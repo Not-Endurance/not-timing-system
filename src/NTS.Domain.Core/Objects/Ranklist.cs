@@ -64,8 +64,6 @@ public class Ranklist : IReadOnlyList<RankingEntry>
 
     static Ranker GetRanker(IRegionOption? configuration)
     {
-        return _regionalRankers.FirstOrDefault(x =>
-                x.CountryIsoCode == configuration?.CountryIsoCode
-            ) ?? _feiRanker;
+        return _regionalRankers.FirstOrDefault(x => x.CountryIsoCode == configuration?.CountryIsoCode) ?? _feiRanker;
     }
 }

@@ -38,9 +38,7 @@ public static class FileContextHelper
         string defaultDirectoryName
     )
     {
-        return configure == null
-            ? CreateFileContextFactory(defaultDirectoryName)
-            : CreateFileContextFactory(configure);
+        return configure == null ? CreateFileContextFactory(defaultDirectoryName) : CreateFileContextFactory(configure);
     }
 
     static string? _applicationName;
@@ -52,9 +50,7 @@ public static class FileContextHelper
         return (_, __) => context;
     }
 
-    static Func<IServiceProvider, object?, FileContext> CreateFileContextFactory(
-        Action<FileContext> configure
-    )
+    static Func<IServiceProvider, object?, FileContext> CreateFileContextFactory(Action<FileContext> configure)
     {
         var context = new FileContext();
         configure(context);

@@ -15,23 +15,14 @@ public class EmsAthlete : EmsDomainBase<EmsAthleteException>, IAthlete
     [Newtonsoft.Json.JsonConstructor]
     EmsAthlete() { }
 
-    public EmsAthlete(
-        string feiId,
-        string firstName,
-        string lastName,
-        EmsCountry country,
-        DateTime birthDate
-    )
+    public EmsAthlete(string feiId, string firstName, string lastName, EmsCountry country, DateTime birthDate)
         : base(GENERATE_ID)
     {
         FeiId = feiId;
         FirstName = firstName;
         LastName = lastName;
         Country = country;
-        Category =
-            birthDate.AddYears(ADULT_AGE_IN_YEARS) <= DateTime.Now
-                ? EmsCategory.Seniors
-                : EmsCategory.Children;
+        Category = birthDate.AddYears(ADULT_AGE_IN_YEARS) <= DateTime.Now ? EmsCategory.Seniors : EmsCategory.Children;
     }
 
     public EmsAthlete(IEmsAthleteState state, EmsCountry country)

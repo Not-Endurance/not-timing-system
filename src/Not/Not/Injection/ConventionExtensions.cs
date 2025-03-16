@@ -25,10 +25,7 @@ public static class InjectionServiceCollectionExtensions
     {
         assemblies = assemblies.Distinct().OrderBy(x => x.FullName).ToList();
         var classes = assemblies
-            .SelectMany(x =>
-                x.GetTypes()
-                    .Where(y => !y.IsInterface && !y.IsAbstract && y.IsConventionalService())
-            )
+            .SelectMany(x => x.GetTypes().Where(y => !y.IsInterface && !y.IsAbstract && y.IsConventionalService()))
             .ToList();
         foreach (var implementation in classes)
         {
@@ -42,10 +39,7 @@ public static class InjectionServiceCollectionExtensions
         var interfaces = implementation
             .GetInterfaces()
             .Where(x =>
-                x.IsAssignableFrom(implementation)
-                && x != TRANSIENT_TYPE
-                && x != SCOPED_TYPE
-                && x != SINGLETON_TYPE
+                x.IsAssignableFrom(implementation) && x != TRANSIENT_TYPE && x != SCOPED_TYPE && x != SINGLETON_TYPE
             )
             .ToList();
 
@@ -53,12 +47,7 @@ public static class InjectionServiceCollectionExtensions
 
         if (interfaces.Any(x => x.IsSingleton()))
         {
-            AddAsSelfWithInterfaces(
-                services,
-                interfaces,
-                implementation,
-                ServiceLifetime.Singleton
-            );
+            AddAsSelfWithInterfaces(services, interfaces, implementation, ServiceLifetime.Singleton);
             return;
         }
         if (interfaces.Any(x => x.IsScoped()))
@@ -76,21 +65,15 @@ public static class InjectionServiceCollectionExtensions
     {
         if (implementation.IsSingleton() && implementation.IsTransient())
         {
-            throw new Exception(
-                $"Service '{implementation}' cannot both both Singleton and Transient"
-            );
+            throw new Exception($"Service '{implementation}' cannot both both Singleton and Transient");
         }
         if (implementation.IsScoped() && implementation.IsTransient())
         {
-            throw new Exception(
-                $"Service '{implementation}' cannot both both Scoped and Transient"
-            );
+            throw new Exception($"Service '{implementation}' cannot both both Scoped and Transient");
         }
         if (implementation.IsSingleton() && implementation.IsScoped())
         {
-            throw new Exception(
-                $"Service '{implementation}' cannot both both Singleton and Scoped"
-            );
+            throw new Exception($"Service '{implementation}' cannot both both Singleton and Scoped");
         }
     }
 
@@ -107,11 +90,7 @@ public static class InjectionServiceCollectionExtensions
         Add(services, implementation, implementation);
         foreach (var @interface in interfaces)
         {
-            var descriptor = new ServiceDescriptor(
-                @interface,
-                x => x.GetRequiredService(implementation),
-                lifetime
-            );
+            var descriptor = new ServiceDescriptor(@interface, x => x.GetRequiredService(implementation), lifetime);
             services.Add(descriptor);
         }
     }
@@ -155,26 +134,17 @@ public static class InjectionServiceCollectionExtensions
         )
         {
             var sb = new StringBuilder();
-            sb.AppendLine(
-                $"'{implementation.Name}' and it's parent '{implementation.BaseType.Name}' cannot be "
-            );
-            sb.AppendLine(
-                $"instantiable NonTransient services. Either declare base class as 'abstract' or decouple."
-            );
+            sb.AppendLine($"'{implementation.Name}' and it's parent '{implementation.BaseType.Name}' cannot be ");
+            sb.AppendLine($"instantiable NonTransient services. Either declare base class as 'abstract' or decouple.");
             sb.AppendLine(
                 $"This check exists to prevent accidental invokations of the base class instead of the derrived"
             );
-            sb.AppendLine(
-                $"or to prevent unwanted duplications in case of IEnumerable<T> injection"
-            );
+            sb.AppendLine($"or to prevent unwanted duplications in case of IEnumerable<T> injection");
             throw new Exception(sb.ToString());
         }
     }
 
-    static Assembly[] RecursiveGetReferencedAssemblies(
-        this Assembly assembly,
-        List<Assembly> result
-    )
+    static Assembly[] RecursiveGetReferencedAssemblies(this Assembly assembly, List<Assembly> result)
     {
         if (result.Any(x => x.FullName == assembly.FullName))
         {

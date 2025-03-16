@@ -26,12 +26,7 @@ public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
     }
 
     public Phase(Loop? loop, int? recovery, int? rest)
-        : this(
-            GenerateId(),
-            Required(nameof(Loop), loop),
-            PositiveRecovery(recovery),
-            NullOrPositiveRest(rest)
-        ) { }
+        : this(GenerateId(), Required(nameof(Loop), loop), PositiveRecovery(recovery), NullOrPositiveRest(rest)) { }
 
     public Loop? Loop { get; private set; }
     public int Recovery { get; }

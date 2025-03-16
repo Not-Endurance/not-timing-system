@@ -26,10 +26,7 @@ public class Dialog<T, TForm>
 
     public async Task RenderUpdate(T model)
     {
-        var parameters = new DialogParameters<FormUpdateDialog<T, TForm>>
-        {
-            { x => x.Model, model },
-        };
+        var parameters = new DialogParameters<FormUpdateDialog<T, TForm>> { { x => x.Model, model } };
         await Show("Update", parameters);
     }
 

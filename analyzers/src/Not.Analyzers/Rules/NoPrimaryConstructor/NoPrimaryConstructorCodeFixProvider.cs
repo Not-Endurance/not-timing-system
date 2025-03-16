@@ -15,9 +15,7 @@ public class NoPrimaryConstructorCodeFixProvider : CodeFixProviderBase
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        var root = await context
-            .Document.GetSyntaxRootAsync(context.CancellationToken)
-            .ConfigureAwait(false);
+        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
         var diagnostic = context.Diagnostics.First();
         var diagnosticSpan = diagnostic.Location.SourceSpan;
@@ -46,14 +44,8 @@ public class NoPrimaryConstructorCodeFixProvider : CodeFixProviderBase
 
         var newDeclaration = typeDeclaration switch
         {
-            RecordDeclarationSyntax recordDeclaration => ConvertRecord(
-                recordDeclaration,
-                parameters
-            ),
-            ClassDeclarationSyntax classDeclaration => ConvertClassOrStruct(
-                classDeclaration,
-                parameters
-            ),
+            RecordDeclarationSyntax recordDeclaration => ConvertRecord(recordDeclaration, parameters),
+            ClassDeclarationSyntax classDeclaration => ConvertClassOrStruct(classDeclaration, parameters),
             _ => typeDeclaration,
         };
 
@@ -72,17 +64,13 @@ public class NoPrimaryConstructorCodeFixProvider : CodeFixProviderBase
             parameters.Select(p =>
                 SyntaxFactory
                     .PropertyDeclaration(p.Type!, ToPascalCase(p.Identifier.Text))
-                    .WithModifiers(
-                        SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
-                    )
+                    .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
                     .WithAccessorList(
                         SyntaxFactory.AccessorList(
                             SyntaxFactory.SingletonList(
                                 SyntaxFactory
                                     .AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                                    .WithSemicolonToken(
-                                        SyntaxFactory.Token(SyntaxKind.SemicolonToken)
-                                    )
+                                    .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))
                             )
                         )
                     )
@@ -150,19 +138,14 @@ public class NoPrimaryConstructorCodeFixProvider : CodeFixProviderBase
                 SyntaxFactory.ParameterList(
                     SyntaxFactory.SeparatedList(
                         parameters.Select(p =>
-                            p.WithIdentifier(
-                                SyntaxFactory.Identifier(ToCamelCase(p.Identifier.Text))
-                            )
+                            p.WithIdentifier(SyntaxFactory.Identifier(ToCamelCase(p.Identifier.Text)))
                         )
                     )
                 )
             )
             .WithBody(SyntaxFactory.Block(assignments))
             .WithLeadingTrivia(
-                SyntaxFactory.TriviaList(
-                    SyntaxFactory.ElasticCarriageReturnLineFeed,
-                    SyntaxFactory.Whitespace("    ")
-                )
+                SyntaxFactory.TriviaList(SyntaxFactory.ElasticCarriageReturnLineFeed, SyntaxFactory.Whitespace("    "))
             );
     }
 

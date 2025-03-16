@@ -6,10 +6,7 @@ using Not.Safe;
 
 namespace Not.Application.Behinds.Adapters;
 
-public abstract class CrudBehind<T, TModel>
-    : ObservableListBehind<T>,
-        IListBehind<T>,
-        IFormBehind<TModel>
+public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehind<T>, IFormBehind<TModel>
     where T : AggregateRoot
 {
     readonly IRepository<T> _repository;

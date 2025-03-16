@@ -12,8 +12,6 @@ public class HorseRepository : MongoRepository<HorseDocument>
 
     protected override UpdateDefinition<HorseDocument> GetUpdateDefinition(HorseDocument document)
     {
-        return Builders<HorseDocument>
-            .Update.Set(x => x.Name, document.Name)
-            .Set(x => x.FeiId, document.FeiId);
+        return Builders<HorseDocument>.Update.Set(x => x.Name, document.Name).Set(x => x.FeiId, document.FeiId);
     }
 }

@@ -91,34 +91,22 @@ public class EmsToCoreImporter : IEmsToCoreImporter
         var result = new List<Official>();
         if (emsEvent.PresidentGroundJury != null)
         {
-            var item = new Official(
-                Person.Create(emsEvent.PresidentGroundJury.Name),
-                GroundJuryPresident
-            );
+            var item = new Official(Person.Create(emsEvent.PresidentGroundJury.Name), GroundJuryPresident);
             result.Add(item);
         }
         if (emsEvent.PresidentVetCommittee != null)
         {
-            var item = new Official(
-                Person.Create(emsEvent.PresidentVetCommittee.Name),
-                VeterinaryCommissionPresident
-            );
+            var item = new Official(Person.Create(emsEvent.PresidentVetCommittee.Name), VeterinaryCommissionPresident);
             result.Add(item);
         }
         if (emsEvent.FeiTechDelegate != null)
         {
-            var item = new Official(
-                Person.Create(emsEvent.FeiTechDelegate.Name),
-                TechnicalDelegate
-            );
+            var item = new Official(Person.Create(emsEvent.FeiTechDelegate.Name), TechnicalDelegate);
             result.Add(item);
         }
         if (emsEvent.FeiVetDelegate != null)
         {
-            var item = new Official(
-                Person.Create(emsEvent.FeiVetDelegate.Name),
-                ForeignVeterinaryDelegate
-            );
+            var item = new Official(Person.Create(emsEvent.FeiVetDelegate.Name), ForeignVeterinaryDelegate);
             result.Add(item);
         }
         if (emsEvent.ForeignJudge != null)
@@ -140,10 +128,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
         return result;
     }
 
-    (IEnumerable<Ranking>, IEnumerable<Participation>) CreateRankingsAndParticipations(
-        EmsState state,
-        bool adjustTime
-    )
+    (IEnumerable<Ranking>, IEnumerable<Participation>) CreateRankingsAndParticipations(EmsState state, bool adjustTime)
     {
         var result = new List<Ranking>();
         var entriesforClassification =
@@ -156,11 +141,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
             foreach (var competitionId in emsParticipation.CompetitionsIds)
             {
                 var competition = state.Event.Competitions.First(x => x.Id == competitionId);
-                var participation = ParticipationFactory.CreateCore(
-                    emsParticipation,
-                    competition,
-                    adjustTime
-                );
+                var participation = ParticipationFactory.CreateCore(emsParticipation, competition, adjustTime);
                 var category = emsParticipation.Participant.Athlete.Category.ToNtsCategory();
                 var entry = new RankingEntry(participation, !emsParticipation.Participant.Unranked);
                 if (
@@ -178,17 +159,11 @@ public class EmsToCoreImporter : IEmsToCoreImporter
                 {
                     entriesforClassification.Add(
                         competition,
-                        new Dictionary<
-                            AthleteCategory,
-                            List<(RankingEntry entry, Participation particpation)>
-                        >
+                        new Dictionary<AthleteCategory, List<(RankingEntry entry, Participation particpation)>>
                         {
                             {
                                 category,
-                                new List<(RankingEntry entry, Participation particpation)>
-                                {
-                                    (entry, participation),
-                                }
+                                new List<(RankingEntry entry, Participation particpation)> { (entry, participation) }
                             },
                         }
                     );

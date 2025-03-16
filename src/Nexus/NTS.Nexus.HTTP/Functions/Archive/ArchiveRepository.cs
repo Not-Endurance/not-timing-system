@@ -12,9 +12,7 @@ public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchi
     public ArchiveRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ARCHIVE_COLLECTION) { }
 
-    protected override UpdateDefinition<EnduranceEventDocument> GetUpdateDefinition(
-        EnduranceEventDocument document
-    )
+    protected override UpdateDefinition<EnduranceEventDocument> GetUpdateDefinition(EnduranceEventDocument document)
     {
         return Builders<EnduranceEventDocument>
             .Update.Set(x => x.Officials, document.Officials)
@@ -30,14 +28,9 @@ public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchi
     {
         return await Collection
             .Aggregate()
-            .Match(x =>
-                x.Rankings.Any(y =>
-                    y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)
-                )
-            )
+            .Match(x => x.Rankings.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)))
             .Project(x =>
-                x.Rankings.SelectMany(y => y.Entries)
-                    .First(z => z.Participation.Combination.Horse.Id == horseId)
+                x.Rankings.SelectMany(y => y.Entries).First(z => z.Participation.Combination.Horse.Id == horseId)
             )
             .ToListAsync();
     }

@@ -26,8 +26,7 @@ public partial class ParticipationTable
     {
         _anyRepresentation = Phases != null && Phases.Any(x => x.IsReinspectionRequested);
         _anyRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionRequested);
-        _anyCompulsoryRequiredInspection =
-            Phases != null && Phases.Any(x => x.IsRequiredInspectionCompulsory);
+        _anyCompulsoryRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionCompulsory);
     }
 
 #pragma warning disable IDE0051 // Remove unused private members

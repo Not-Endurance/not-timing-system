@@ -14,11 +14,7 @@ public class CoreBehind : ObservableBehind, ICoreBehind
     readonly ICoreStarter _coreStarter;
     readonly IRepository<EnduranceEvent> _enduranceEvents;
 
-    public CoreBehind(
-        IEmsImporter emsImporter,
-        ICoreStarter coreStarter,
-        IRepository<EnduranceEvent> enduranceEvents
-    )
+    public CoreBehind(IEmsImporter emsImporter, ICoreStarter coreStarter, IRepository<EnduranceEvent> enduranceEvents)
     {
         _emsImporter = emsImporter;
         _coreStarter = coreStarter;

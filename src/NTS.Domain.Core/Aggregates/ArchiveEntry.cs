@@ -5,11 +5,7 @@ namespace NTS.Domain.Core.Aggregates;
 
 public class ArchiveEntry : AggregateRoot
 {
-    public ArchiveEntry(
-        EnduranceEvent enduranceEvent,
-        IEnumerable<Official> officials,
-        IEnumerable<Ranklist> ranklists
-    )
+    public ArchiveEntry(EnduranceEvent enduranceEvent, IEnumerable<Official> officials, IEnumerable<Ranklist> ranklists)
         : base(GenerateId())
     {
         EnduranceEvent = enduranceEvent;

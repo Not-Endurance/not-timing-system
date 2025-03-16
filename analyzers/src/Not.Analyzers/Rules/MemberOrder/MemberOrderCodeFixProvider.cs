@@ -26,9 +26,7 @@ public class MemberOrderCodeFixProvider : TypeMemberCodeFixProvider
             return document;
         }
 
-        var editor = await DocumentEditor
-            .CreateAsync(document, cancellationToken)
-            .ConfigureAwait(false);
+        var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
 
         var orderedMembers = typeDeclaration
             .Members.OrderBy(MemberKindHelper.GetMemberKind)
@@ -36,9 +34,7 @@ public class MemberOrderCodeFixProvider : TypeMemberCodeFixProvider
                 (member, index) =>
                     index == 0
                         ? member.WithLeadingTrivia(
-                            member
-                                .GetLeadingTrivia()
-                                .Where(t => !t.IsKind(SyntaxKind.EndOfLineTrivia))
+                            member.GetLeadingTrivia().Where(t => !t.IsKind(SyntaxKind.EndOfLineTrivia))
                         )
                         : member
             )

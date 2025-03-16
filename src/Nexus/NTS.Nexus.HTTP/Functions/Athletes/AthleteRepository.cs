@@ -10,9 +10,7 @@ public class AthleteRepository : MongoRepository<AthleteDocument>
     public AthleteRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ATHLETES_COLLECTION) { }
 
-    protected override UpdateDefinition<AthleteDocument> GetUpdateDefinition(
-        AthleteDocument document
-    )
+    protected override UpdateDefinition<AthleteDocument> GetUpdateDefinition(AthleteDocument document)
     {
         return Builders<AthleteDocument>
             .Update.Set(x => x.Names, document.Names)

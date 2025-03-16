@@ -27,11 +27,7 @@ public class WatcherClient : RpcClient
         await _socket.Connect("localhost");
 
         var entries = new List<ParticipantEntry> { entry };
-        var result = await InvokeHubProcedure(
-            nameof(IParticipantstHubProcedures.ReceiveWitnessEvent),
-            entries,
-            type
-        );
+        var result = await InvokeHubProcedure(nameof(IParticipantstHubProcedures.ReceiveWitnessEvent), entries, type);
 
         await _socket.Disconnect();
     }

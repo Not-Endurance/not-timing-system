@@ -22,12 +22,7 @@ public abstract class JudgeIntegrationTest : IntegrationTest
         var configuration = new ConfigurationBuilder().Build();
         return services
             .ConfigureJudge(configuration)
-            .AddRpcSocket(
-                RpcProtocol.Http,
-                "localhost",
-                ApplicationConstants.RPC_PORT,
-                ApplicationConstants.JUDGE_HUB
-            )
+            .AddRpcSocket(RpcProtocol.Http, "localhost", ApplicationConstants.RPC_PORT, ApplicationConstants.JUDGE_HUB)
             .AddJsonFileStore(x => x.Path = storagePath)
             .AddStaticOptionsStore(x => x.Path = FileContextHelper.GetAppDirectory("resources"))
             .RegisterConventionalServices();

@@ -51,12 +51,7 @@ public class MemberOrderTests
             }
             """;
 
-        await VerifyFix(
-            test,
-            expected,
-            MemberKind.PublicStaticReadonly,
-            MemberKind.PrivateStaticReadonly
-        );
+        await VerifyFix(test, expected, MemberKind.PublicStaticReadonly, MemberKind.PrivateStaticReadonly);
     }
 
     [Fact]
@@ -301,23 +296,14 @@ public class MemberOrderTests
         await VerifyFix(test, expected, MemberKind.PrivateClass, MemberKind.InternalMethod);
     }
 
-    private static async Task VerifyFix(
-        string test,
-        string expected,
-        MemberKind currentMember,
-        MemberKind nextMember
-    )
+    private static async Task VerifyFix(string test, string expected, MemberKind currentMember, MemberKind nextMember)
     {
         var analyzer = new MemberOrderAnalyzer();
         var tree = CSharpSyntaxTree.ParseText(test);
         var root = tree.GetRoot();
         var firstMember = root.DescendantNodes().OfType<MemberDeclarationSyntax>().First();
 
-        var context = new CSharpCodeFixTest<
-            MemberOrderAnalyzer,
-            MemberOrderCodeFixProvider,
-            DefaultVerifier
-        >
+        var context = new CSharpCodeFixTest<MemberOrderAnalyzer, MemberOrderCodeFixProvider, DefaultVerifier>
         {
             ReferenceAssemblies = ReferenceAssemblies.Net.Net80,
             TestCode = test,

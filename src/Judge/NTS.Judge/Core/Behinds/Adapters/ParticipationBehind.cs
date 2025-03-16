@@ -171,9 +171,7 @@ public class ParticipationBehind
 
     async Task SafeProcess(Snapshot snapshot)
     {
-        var participation = Participations.FirstOrDefault(x =>
-            x.Combination.Number == snapshot.Number
-        );
+        var participation = Participations.FirstOrDefault(x => x.Combination.Number == snapshot.Number);
         if (participation == null)
         {
             return;

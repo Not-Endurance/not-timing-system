@@ -13,10 +13,7 @@ public class SettingFunction : FunctionBase<SettingFunction>
 {
     readonly IRepository<SettingDocument> _settings;
 
-    public SettingFunction(
-        IFunctionLogger<SettingFunction> logger,
-        IRepository<SettingDocument> settings
-    )
+    public SettingFunction(IFunctionLogger<SettingFunction> logger, IRepository<SettingDocument> settings)
         : base(logger)
     {
         _settings = settings;
@@ -54,8 +51,7 @@ public class SettingFunction : FunctionBase<SettingFunction>
 
     [Function("settings-get")]
     public async Task<IActionResult> GetOne(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "settings/{accountId}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "settings/{accountId}")] HttpRequest request,
         string accountId
     )
     {
