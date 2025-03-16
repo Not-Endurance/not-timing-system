@@ -5,15 +5,14 @@ namespace Not.Serialization;
 
 public static class SerializationExtensions
 {
-    public static readonly JsonSerializerSettings SETTINGS =
-        new()
-        {
-            ContractResolver = new PrivatePropertySetterResolver(),
-            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
-            Formatting = Newtonsoft.Json.Formatting.Indented,
-            TypeNameHandling = TypeNameHandling.Auto,
-            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-        };
+    public static readonly JsonSerializerSettings SETTINGS = new()
+    {
+        ContractResolver = new PrivatePropertySetterResolver(),
+        ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+        Formatting = Newtonsoft.Json.Formatting.Indented,
+        TypeNameHandling = TypeNameHandling.Auto,
+        ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+    };
 
     public static void AddConverter<T>(T converter)
         where T : JsonConverterBase
