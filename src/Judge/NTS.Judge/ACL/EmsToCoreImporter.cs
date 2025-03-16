@@ -143,7 +143,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
                 var competition = state.Event.Competitions.First(x => x.Id == competitionId);
                 var participation = ParticipationFactory.CreateCore(emsParticipation, competition, adjustTime);
                 var category = emsParticipation.Participant.Athlete.Category.ToNtsCategory();
-                var entry = new RankingEntry(participation, !emsParticipation.Participant.Unranked);
+                var entry = new RankingEntry(participation, emsParticipation.Participant.Unranked);
                 if (
                     entriesforClassification.ContainsKey(competition)
                     && entriesforClassification[competition].ContainsKey(category)
@@ -174,12 +174,12 @@ public class EmsToCoreImporter : IEmsToCoreImporter
         {
             foreach (var (category, tuples) in entriesByCategory)
             {
-                const int DEFAULT_NTS_COMPETITION_TYPE = 0;
+                var competitionType = ParticipationFactory.GetType(emsCompetition);
                 var entries = tuples.Select(x => x.entry);
                 var competition = new Competition(
                     emsCompetition.Name,
                     CompetitionFactory.MapCompetitionRuleset(emsCompetition.Type),
-                    DEFAULT_NTS_COMPETITION_TYPE
+                    competitionType
                 );
                 result.Add(new Ranking(competition, category, entries));
             }

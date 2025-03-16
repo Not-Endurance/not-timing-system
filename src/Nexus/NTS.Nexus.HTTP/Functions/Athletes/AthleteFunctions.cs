@@ -69,7 +69,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         LogInformation(request);
 
         var recordsWithAthlete = await _archive
-            .ReadAll(x => x.Rankings.Any(y => y.Entries.Any(z => z.Participation.Combination.Athlete.Id == id)))
+            .ReadAll(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Athlete.Id == id)))
             .ToList();
 
         if (recordsWithAthlete.Any())

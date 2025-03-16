@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using Not.Localization;
 
@@ -18,19 +19,20 @@ public abstract partial class NButtonBase : MudButton
         ChildContent = Text == null ? null : new RenderFragment(x => x.AddContent(0, Localizer.Get(Text)));
     }
 
-    protected async Task HandleClick()
+    protected async Task HandleClick(MouseEventArgs args)
     {
         try
         {
             IsLoading = true;
             if (OnClick.HasDelegate)
             {
-                await OnClick.InvokeAsync(null);
+                await OnClick.InvokeAsync(args);
             }
         }
         finally
         {
             IsLoading = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 

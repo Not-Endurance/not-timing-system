@@ -68,7 +68,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
 
         var recordsWithHorse = await _archive
-            .ReadAll(x => x.Rankings.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
+            .ReadAll(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
             .ToList();
         if (recordsWithHorse.Any())
         {

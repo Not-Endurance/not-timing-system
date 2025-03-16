@@ -16,7 +16,7 @@ public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchi
     {
         return Builders<EnduranceEventDocument>
             .Update.Set(x => x.Officials, document.Officials)
-            .Set(x => x.Rankings, document.Rankings)
+            .Set(x => x.Ranklists, document.Ranklists)
             .Set(x => x.EndDay, document.EndDay)
             .Set(x => x.StartDay, document.StartDay)
             .Set(x => x.City, document.City)
@@ -28,9 +28,9 @@ public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchi
     {
         return await Collection
             .Aggregate()
-            .Match(x => x.Rankings.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)))
+            .Match(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)))
             .Project(x =>
-                x.Rankings.SelectMany(y => y.Entries).First(z => z.Participation.Combination.Horse.Id == horseId)
+                x.Ranklists.SelectMany(y => y.Entries).First(z => z.Participation.Combination.Horse.Id == horseId)
             )
             .ToListAsync();
     }
