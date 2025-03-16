@@ -162,7 +162,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
                     adjustTime
                 );
                 var category = emsParticipation.Participant.Athlete.Category.ToNtsCategory();
-                var entry = new RankingEntry(participation, !emsParticipation.Participant.Unranked);
+                var entry = new RankingEntry(participation, emsParticipation.Participant.Unranked);
                 if (
                     entriesforClassification.ContainsKey(competition)
                     && entriesforClassification[competition].ContainsKey(category)
