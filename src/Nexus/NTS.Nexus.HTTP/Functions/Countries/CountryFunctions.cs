@@ -14,10 +14,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
 {
     readonly IRepository<CountryDocument> _countries;
 
-    public CountryFunctions(
-        IFunctionLogger<CountryFunctions> logger,
-        IRepository<CountryDocument> countries
-    )
+    public CountryFunctions(IFunctionLogger<CountryFunctions> logger, IRepository<CountryDocument> countries)
         : base(logger)
     {
         _countries = countries;
@@ -40,8 +37,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
 
     [Function("countries-update")]
     public async Task<IActionResult> Update(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "countries")]
-            HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "countries")] HttpRequest request
     )
     {
         LogInformation(request);

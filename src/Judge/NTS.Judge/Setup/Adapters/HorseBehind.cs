@@ -7,10 +7,7 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class HorseBehind : CrudBehind<Horse, HorseFormModel>
 {
-    public HorseBehind(
-        IRepository<Horse> repository,
-        IEnumerable<ICrudReflection<Horse>> dependants
-    )
+    public HorseBehind(IRepository<Horse> repository, IEnumerable<ICrudReflection<Horse>> dependants)
         : base(repository, dependants) { }
 
     protected override Horse CreateEntity(HorseFormModel model)

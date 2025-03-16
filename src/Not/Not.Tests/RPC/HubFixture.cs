@@ -37,10 +37,7 @@ public abstract class HubFixture<T> : IDisposable
     public void Start()
     {
         var currentDirectory = Directory.GetCurrentDirectory();
-        var info = new ProcessStartInfo
-        {
-            FileName = Path.Combine(currentDirectory, $"../../../{_hubExecutable}.dll"),
-        };
+        var info = new ProcessStartInfo { FileName = Path.Combine(currentDirectory, $"../../../{_hubExecutable}.dll") };
 
         _hubProcess = Process.Start(info);
     }

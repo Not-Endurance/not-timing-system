@@ -11,8 +11,7 @@ public partial class SettingsUpdatePage
     [Inject]
     FormManager<SettingFormModel, SettingForm> FormManager { get; set; } = default!;
 
-    protected SettingFormModel? FormModel =>
-        Behind.Setting == null ? null : new SettingFormModel(Behind.Setting);
+    protected SettingFormModel? FormModel => Behind.Setting == null ? null : new SettingFormModel(Behind.Setting);
 
     protected override async Task OnInitializedAsync()
     {

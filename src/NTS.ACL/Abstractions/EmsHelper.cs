@@ -23,11 +23,7 @@ public static class EmsHelper
         return exception;
     }
 
-    internal static EmsDomainException Create(
-        string entity,
-        string message,
-        params object[] arguments
-    )
+    internal static EmsDomainException Create(string entity, string message, params object[] arguments)
     {
         var exception = new EmsDomainException(entity, message, arguments);
         return exception;

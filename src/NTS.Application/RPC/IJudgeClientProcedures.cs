@@ -2,6 +2,4 @@
 
 namespace NTS.Application.RPC;
 
-public interface IJudgeClientProcedures
-    : IParticipationClientProcedures,
-        IConnectionsClientProcedures { }
+public interface IJudgeClientProcedures : IParticipationClientProcedures, IConnectionsClientProcedures { }

@@ -55,11 +55,7 @@ public abstract class AnalyzerBase : DiagnosticAnalyzer
         {
             System.Diagnostics.Debug.WriteLine($"Analyzer error: {ex}");
 
-            var diagnostic = Diagnostic.Create(
-                _errorRule,
-                context.Node?.GetLocation(),
-                ex.ToString()
-            );
+            var diagnostic = Diagnostic.Create(_errorRule, context.Node?.GetLocation(), ex.ToString());
             context.ReportDiagnostic(diagnostic);
         }
     }

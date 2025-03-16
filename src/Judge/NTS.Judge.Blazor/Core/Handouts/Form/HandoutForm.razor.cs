@@ -28,8 +28,6 @@ public partial class HandoutForm
         {
             return combinations;
         }
-        return combinations.Where(x =>
-            x.ToString().Contains(term, StringComparison.InvariantCultureIgnoreCase)
-        );
+        return combinations.Where(x => x.ToString().Contains(term, StringComparison.InvariantCultureIgnoreCase));
     }
 }

@@ -13,8 +13,7 @@ public abstract class NForm<T> : NComponent
     /// Contains refs to the actual field components, necessary in order to render Mud validation messages from the DomainException
     /// This is a workaround until: https://github.com/eSolutions-EMS/endurance-management-system/issues/185
     /// </summary>
-    protected Dictionary<string, List<MudValidationInjector>> ValidationInjectors { get; set; } =
-        [];
+    protected Dictionary<string, List<MudValidationInjector>> ValidationInjectors { get; set; } = [];
 
     [Parameter]
     public T Model { get; set; } = default!;
@@ -24,28 +23,19 @@ public abstract class NForm<T> : NComponent
         RegisterValidationInjectors();
     }
 
-    protected void RegisterInjector<TInput>(
-        string field,
-        Func<MudBaseInput<TInput>> mudInputInstanceGetter
-    )
+    protected void RegisterInjector<TInput>(string field, Func<MudBaseInput<TInput>> mudInputInstanceGetter)
     {
         var injector = MudValidationInjector.Create(mudInputInstanceGetter);
         AddInjector(field, injector);
     }
 
-    protected void RegisterInjector<TInput>(
-        string field,
-        Func<IMudBaseInputWrapper<TInput>> mudInputWrapper
-    )
+    protected void RegisterInjector<TInput>(string field, Func<IMudBaseInputWrapper<TInput>> mudInputWrapper)
     {
         var injector = MudValidationInjector.Create(mudInputWrapper);
         AddInjector(field, injector);
     }
 
-    protected void RegisterInjector<TInput>(
-        string field,
-        Func<MudPicker<TInput>> mudInputInstanceGetter
-    )
+    protected void RegisterInjector<TInput>(string field, Func<MudPicker<TInput>> mudInputInstanceGetter)
     {
         var injector = MudValidationInjector.Create(mudInputInstanceGetter);
         AddInjector(field, injector);
@@ -67,9 +57,7 @@ public abstract class NForm<T> : NComponent
         if (!ValidationInjectors.TryGetValue(field, out var injectors))
         {
             NotifyHelper.Warn(message);
-            var error = GuardHelper.Exception(
-                $"'{typeof(T)}' form does not have injector for field '{field}'"
-            );
+            var error = GuardHelper.Exception($"'{typeof(T)}' form does not have injector for field '{field}'");
             NotifyHelper.Error(error);
             return;
         }

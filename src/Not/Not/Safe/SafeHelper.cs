@@ -41,18 +41,12 @@ public static class SafeHelper
         return Task.Run(() => Run(action, DefaultValidationHandler));
     }
 
-    public static Task RunAsync(
-        Func<Task> action,
-        Func<ValidationException, Task> validationHandler
-    )
+    public static Task RunAsync(Func<Task> action, Func<ValidationException, Task> validationHandler)
     {
         return Task.Run(() => Run(action, validationHandler));
     }
 
-    public static async Task Run(
-        Func<Task> action,
-        Func<ValidationException, Task> validationHandler
-    )
+    public static async Task Run(Func<Task> action, Func<ValidationException, Task> validationHandler)
     {
         try
         {
@@ -94,10 +88,7 @@ public static class SafeHelper
         Run(action, DefaultValidationHandler);
     }
 
-    public static async Task<T?> Run<T>(
-        Func<Task<T>> action,
-        Func<ValidationException, Task> validationHandler
-    )
+    public static async Task<T?> Run<T>(Func<Task<T>> action, Func<ValidationException, Task> validationHandler)
     {
         try
         {
@@ -125,11 +116,7 @@ public static class SafeHelper
         return Task.Run(() => Run(action, argument));
     }
 
-    public static async Task Run<T>(
-        Func<T, Task> action,
-        T argument,
-        Action<ValidationException> validationHandler
-    )
+    public static async Task Run<T>(Func<T, Task> action, T argument, Action<ValidationException> validationHandler)
     {
         try
         {
@@ -162,8 +149,7 @@ public static class SafeHelper
         //        throw ex;
         //#else
         NotifyHelper.Error(ex);
-        var logMessage =
-            $"An error {ex.Message} was thrown at {ex.Source} with trace \n {ex.StackTrace}";
+        var logMessage = $"An error {ex.Message} was thrown at {ex.Source} with trace \n {ex.StackTrace}";
         LoggingHelper.Error(logMessage);
         WriteToTraceConsole(ex);
         //#endif
@@ -175,23 +161,13 @@ public static class SafeHelper
     {
         // TODO: add notification
         var sb = new StringBuilder();
-        sb.AppendLine(
-            "!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION START !!!!!!!!!!!!!!!!!!!!!!!!!"
-        );
-        sb.AppendLine(
-            "!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION START !!!!!!!!!!!!!!!!!!!!!!!!!"
-        );
-        sb.AppendLine(
-            "!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION START !!!!!!!!!!!!!!!!!!!!!!!!!"
-        );
-        sb.AppendLine(
-            "!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION START !!!!!!!!!!!!!!!!!!!!!!!!!"
-        );
+        sb.AppendLine("!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION START !!!!!!!!!!!!!!!!!!!!!!!!!");
+        sb.AppendLine("!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION START !!!!!!!!!!!!!!!!!!!!!!!!!");
+        sb.AppendLine("!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION START !!!!!!!!!!!!!!!!!!!!!!!!!");
+        sb.AppendLine("!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION START !!!!!!!!!!!!!!!!!!!!!!!!!");
         sb.AppendLine(exception.Message);
         sb.AppendLine(exception.StackTrace);
-        sb.AppendLine(
-            "!!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION END !!!!!!!!!!!!!!!!!!!!!!!!!!"
-        );
+        sb.AppendLine("!!!!!!!!!!!!!!!!!!!!!!!!!! TASKHELPER EXCEPTION END !!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         var message = sb.ToString();
         Trace.WriteLine(message, "console");

@@ -1,51 +1,47 @@
-﻿using System.Collections;
-using NTS.Domain.Core.Aggregates;
+﻿using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Rankers;
 using NTS.Domain.Core.StaticOptions;
 
 namespace NTS.Domain.Core.Objects;
 
-public class Ranklist : IReadOnlyList<RankingEntry>
+public class Ranklist
 {
-    readonly Ranking _ranking;
     static FeiRanker _feiRanker = new();
     static Ranker[] _regionalRankers = [new BulgariaRanker()];
-    List<RankingEntry> _entries;
+
+    [Newtonsoft.Json.JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Ranklist(Ranking ranking, IEnumerable<RankingEntry> entries)
+    {
+        Ranking = ranking;
+        Entries = entries.ToList().AsReadOnly();
+    }
 
     public Ranklist(Ranking ranking)
     {
-        _entries = Rank(ranking);
-        _ranking = ranking;
+        Entries = Rank(ranking);
+        Ranking = ranking;
     }
 
-    public RankingEntry this[int index] => _entries[index];
-    public int Count => _entries.Count;
-    public int RankingId => _ranking.Id;
-    public string Name => _ranking.Name;
-    public AthleteCategory Category => _ranking.Category;
-    public CompetitionType Type => _ranking.Type;
-    public CompetitionRuleset Ruleset => _ranking.Ruleset;
+    public IReadOnlyList<RankingEntry> Entries { get; private set; }
+    public Ranking Ranking { get; }
+
+    public int RankingId => Ranking.Id;
+    public string Name => Ranking.Name;
+    public AthleteCategory Category => Ranking.Category;
+    public CompetitionType Type => Ranking.Type;
+    public CompetitionRuleset Ruleset => Ranking.Ruleset;
     public string Title => $"{Category}: {Name}";
-
-    public IEnumerator<RankingEntry> GetEnumerator()
-    {
-        return _entries.GetEnumerator();
-    }
 
     public void Update(Participation participation)
     {
-        var existing = _ranking.Entries.FirstOrDefault(x => x.Participation == participation);
+        var existing = Ranking.Entries.FirstOrDefault(x => x.Participation == participation);
         if (existing == null)
         {
             return;
         }
         existing.Participation = participation;
-        _entries = Rank(_ranking);
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
+        Entries = Rank(Ranking);
     }
 
     static List<RankingEntry> Rank(Ranking ranking)
@@ -64,8 +60,6 @@ public class Ranklist : IReadOnlyList<RankingEntry>
 
     static Ranker GetRanker(IRegionOption? configuration)
     {
-        return _regionalRankers.FirstOrDefault(x =>
-                x.CountryIsoCode == configuration?.CountryIsoCode
-            ) ?? _feiRanker;
+        return _regionalRankers.FirstOrDefault(x => x.CountryIsoCode == configuration?.CountryIsoCode) ?? _feiRanker;
     }
 }

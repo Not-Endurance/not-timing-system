@@ -11,9 +11,7 @@ public class FileContext : INConfig, IFileContext // TODO: move to Filesystem
     {
         if (string.IsNullOrWhiteSpace(Path))
         {
-            throw new ArgumentException(
-                $"'{nameof(IFileContext)}.{nameof(Path)}' cannot be null or whitespace"
-            );
+            throw new ArgumentException($"'{nameof(IFileContext)}.{nameof(Path)}' cannot be null or whitespace");
         }
     }
 }

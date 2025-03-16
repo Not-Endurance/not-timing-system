@@ -7,10 +7,7 @@ using Not.Analyzers.Base;
 
 namespace Not.Analyzers.Rules.NotUnnecessaryThis;
 
-[
-    ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NoUnnecessaryThisCodeFixProvider)),
-    Shared
-]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NoUnnecessaryThisCodeFixProvider)), Shared]
 public class NoUnnecessaryThisCodeFixProvider : CodeFixProviderBase
 {
     public NoUnnecessaryThisCodeFixProvider()
@@ -18,9 +15,7 @@ public class NoUnnecessaryThisCodeFixProvider : CodeFixProviderBase
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        var root = await context
-            .Document.GetSyntaxRootAsync(context.CancellationToken)
-            .ConfigureAwait(false);
+        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
         var diagnostic = context.Diagnostics[0];
         var diagnosticSpan = diagnostic.Location.SourceSpan;
 

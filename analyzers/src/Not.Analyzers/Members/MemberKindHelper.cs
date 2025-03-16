@@ -107,10 +107,7 @@ public class MemberKindHelper
         if (isAbstract)
             return MemberKind.AbstractMethod;
 
-        if (
-            method.Modifiers.Any(SyntaxKind.PublicKeyword)
-            && method.Modifiers.Any(SyntaxKind.StaticKeyword)
-        )
+        if (method.Modifiers.Any(SyntaxKind.PublicKeyword) && method.Modifiers.Any(SyntaxKind.StaticKeyword))
             return MemberKind.PublicStaticMethod;
         if (method.Modifiers.Any(SyntaxKind.PublicKeyword))
             return MemberKind.PublicMethod;

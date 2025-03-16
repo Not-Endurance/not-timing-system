@@ -6,13 +6,7 @@ namespace NTS.Domain.Core.Objects.Startlists;
 
 public record StartlistEntry : DomainObject
 {
-    public StartlistEntry(
-        Person athlete,
-        int number,
-        int loopNumber,
-        double distance,
-        DateTimeOffset startAt
-    )
+    public StartlistEntry(Person athlete, int number, int loopNumber, double distance, DateTimeOffset startAt)
     {
         Athlete = athlete;
         Number = number;

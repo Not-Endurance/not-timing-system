@@ -17,9 +17,7 @@ public abstract class ReadonlyRootRepository<T, TState>
 
     protected ApplicationException NotImplemented()
     {
-        return new ApplicationException(
-            "Only Create, Read and Update operations are implemented for Root entities."
-        );
+        return new ApplicationException("Only Create, Read and Update operations are implemented for Root entities.");
     }
 
     public async Task<T?> Read(Expression<Func<T, bool>> _)

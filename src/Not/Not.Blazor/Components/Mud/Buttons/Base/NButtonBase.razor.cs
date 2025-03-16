@@ -16,8 +16,7 @@ public abstract partial class NButtonBase : MudButton
 
     protected override void OnParametersSet()
     {
-        ChildContent =
-            Text == null ? null : new RenderFragment(x => x.AddContent(0, Localizer.Get(Text)));
+        ChildContent = Text == null ? null : new RenderFragment(x => x.AddContent(0, Localizer.Get(Text)));
     }
 
     protected async Task HandleClick(MouseEventArgs args)

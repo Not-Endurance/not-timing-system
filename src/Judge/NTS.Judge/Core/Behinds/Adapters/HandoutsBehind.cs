@@ -45,11 +45,7 @@ public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBe
             return false;
         }
 
-        var documents = handouts.Select(handout => new HandoutDocument(
-            handout,
-            enduranceEvent,
-            officials
-        ));
+        var documents = handouts.Select(handout => new HandoutDocument(handout, enduranceEvent, officials));
         ObservableList.AddRange(documents);
         return ObservableList.Any();
     }

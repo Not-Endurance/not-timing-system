@@ -62,19 +62,14 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
     [Function("athletes-safe-delete")]
     public async Task<IActionResult> SafeDelete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:int}/safe")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:int}/safe")] HttpRequest request,
         int id
     )
     {
         LogInformation(request);
 
         var recordsWithAthlete = await _archive
-            .ReadAll(x =>
-                x.Rankings.Any(y =>
-                    y.Entries.Any(z => z.Participation.Combination.Athlete.Id == id)
-                )
-            )
+            .ReadAll(x => x.Rankings.Any(y => y.Entries.Any(z => z.Participation.Combination.Athlete.Id == id)))
             .ToList();
 
         if (recordsWithAthlete.Any())
@@ -90,8 +85,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
     [Function("athletes-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:int}")] HttpRequest request,
         int id
     )
     {
@@ -102,8 +96,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
     [Function("athletes-get-one")]
     public async Task<IActionResult> Get(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "athletes/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "athletes/{id:int}")] HttpRequest request,
         int id
     )
     {

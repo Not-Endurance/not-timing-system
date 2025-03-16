@@ -182,8 +182,6 @@ public class VupVF747pController : RfidController
             counter++;
         } while (!IsConnected);
         var after = DateTime.Now;
-        Console.WriteLine(
-            $"Reconnected after '{counter}' attempts and '{(after - before).TotalSeconds}' seconds"
-        );
+        Console.WriteLine($"Reconnected after '{counter}' attempts and '{(after - before).TotalSeconds}' seconds");
     }
 }

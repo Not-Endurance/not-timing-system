@@ -8,10 +8,7 @@ using Not.Analyzers.Base;
 
 namespace Not.Analyzers.Rules.NoLambdaMethodMembers;
 
-[
-    ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NoLambdaMethodMemberCodeFixProvider)),
-    Shared
-]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NoLambdaMethodMemberCodeFixProvider)), Shared]
 public class NoLambdaMethodMemberCodeFixProvider : TypeMemberCodeFixProvider
 {
     public NoLambdaMethodMemberCodeFixProvider()

@@ -27,11 +27,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var entry = requestBody.FromJson<ArchiveEntry>();
-        var document = new EnduranceEventDocument(
-            entry.EnduranceEvent,
-            entry.Officials,
-            entry.Ranklists
-        );
+        var document = new EnduranceEventDocument(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
 
         if (await _archive.Read(entry.Id) != null)
         {
@@ -56,8 +52,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 
     [Function("archive-query-by-horse")]
     public async Task<IActionResult> QueryByHorse(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "archive/horse/{horseId:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "archive/horse/{horseId:int}")] HttpRequest request,
         int horseId
     )
     {

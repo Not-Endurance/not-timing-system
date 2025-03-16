@@ -14,9 +14,7 @@ public class NestedInvocationCodeFixProvider : CodeFixProviderBase
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        var root = await context
-            .Document.GetSyntaxRootAsync(context.CancellationToken)
-            .ConfigureAwait(false);
+        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
         var diagnostic = context.Diagnostics.First();
         var diagnosticSpan = diagnostic.Location.SourceSpan;
@@ -52,9 +50,7 @@ public class NestedInvocationCodeFixProvider : CodeFixProviderBase
         var newStatements = new List<StatementSyntax>();
         // Add statements before the og invocation
         newStatements.AddRange(block.Statements.TakeWhile(s => s != statement));
-        newStatements.AddRange(
-            variableDeclarations.Select(d => d.WithLeadingTrivia(statement.GetLeadingTrivia()))
-        );
+        newStatements.AddRange(variableDeclarations.Select(d => d.WithLeadingTrivia(statement.GetLeadingTrivia())));
         newStatements.Add(newInvocation);
         // Add statements after the og invocation
         newStatements.AddRange(block.Statements.SkipWhile(s => s != statement).Skip(1));
@@ -128,10 +124,7 @@ public class NestedInvocationCodeFixProvider : CodeFixProviderBase
             statements.Add(declaration);
 
             // Replace the argument in the original invocation
-            invocation = invocation.ReplaceNode(
-                arg.Expression,
-                SyntaxFactory.IdentifierName(tempName)
-            );
+            invocation = invocation.ReplaceNode(arg.Expression, SyntaxFactory.IdentifierName(tempName));
         }
 
         return (statements, invocation);

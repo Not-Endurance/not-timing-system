@@ -8,11 +8,7 @@ namespace NTS.ACL.Factories;
 
 public class SnapshotFactory
 {
-    public static Snapshot Create(
-        EmsParticipantEntry participant,
-        EmsWitnessEventType emsType,
-        bool isFinal
-    )
+    public static Snapshot Create(EmsParticipantEntry participant, EmsWitnessEventType emsType, bool isFinal)
     {
         var number = int.Parse(participant.Number);
         var method = SnapshotMethod.EmsIntegration;
@@ -24,9 +20,7 @@ public class SnapshotFactory
             EmsWitnessEventType.Arrival => isFinal
                 ? new Snapshot(number, SnapshotType.Final, method, timestamp)
                 : new Snapshot(number, SnapshotType.Stage, method, timestamp),
-            _ => throw new Exception(
-                $"Invalid WitnessEventType for participant '{participant.Number}'"
-            ),
+            _ => throw new Exception($"Invalid WitnessEventType for participant '{participant.Number}'"),
         };
     }
 }

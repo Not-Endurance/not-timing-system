@@ -35,10 +35,7 @@ public class NoUnnecessaryThisAnalyzer : AnalyzerBase
             if (memberAccess.Parent is InvocationExpressionSyntax invocation)
             {
                 var symbolInfo = context.SemanticModel.GetSymbolInfo(invocation);
-                if (
-                    symbolInfo.Symbol is IMethodSymbol methodSymbol
-                    && methodSymbol.IsExtensionMethod
-                )
+                if (symbolInfo.Symbol is IMethodSymbol methodSymbol && methodSymbol.IsExtensionMethod)
                 {
                     return;
                 }

@@ -58,11 +58,7 @@ public class EmsParticipant : EmsDomainBase<EmsParticipantException>, IEmsPartic
     }
     public string Name => FormatName(this.Number, Athlete.Name, Horse.Name);
     public Dictionary<WitnessEventType, List<int>> DetectedHead { get; } = // Metadata for stats
-        new()
-        {
-            { WitnessEventType.Arrival, new List<int>() },
-            { WitnessEventType.VetIn, new List<int>() },
-        };
+        new() { { WitnessEventType.Arrival, new List<int>() }, { WitnessEventType.VetIn, new List<int>() } };
 
     public void Add(EmsLapRecord record)
     {

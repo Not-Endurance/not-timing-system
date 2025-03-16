@@ -139,11 +139,7 @@ public abstract class RpcClient : IRpcClient
         }
     }
 
-    public async Task<RpcInvokeResult> InvokeHubProcedure<T1, T2>(
-        string name,
-        T1 parameter1,
-        T2 parameter2
-    )
+    public async Task<RpcInvokeResult> InvokeHubProcedure<T1, T2>(string name, T1 parameter1, T2 parameter2)
     {
         if (!_socket.IsConnected)
         {

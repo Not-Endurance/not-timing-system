@@ -16,8 +16,7 @@ public class ProcessSnapshotTests : JudgeIntegrationTest
     public ProcessSnapshotTests(ITestOutputHelper testOutputHelper)
         : base(nameof(CoreState), testOutputHelper) { }
 
-    IRepository<Participation> Participations =>
-        Provider.GetRequiredService<IRepository<Participation>>();
+    IRepository<Participation> Participations => Provider.GetRequiredService<IRepository<Participation>>();
 
     [Theory]
     [InlineData(SnapshotMethod.Manual)] //Manual is OK here, because if no times are recorded Manual will record ArriveTime first
@@ -27,19 +26,12 @@ public class ProcessSnapshotTests : JudgeIntegrationTest
     {
         await Seed();
         var arriveAt = TimestampHelper.Create(19, 30);
-        var snapshot = new Snapshot(
-            DEFAULT_COMBINATION_NUMBER,
-            SnapshotType.Stage,
-            method,
-            arriveAt
-        );
+        var snapshot = new Snapshot(DEFAULT_COMBINATION_NUMBER, SnapshotType.Stage, method, arriveAt);
         var behind = await GetBehind<ISnapshotProcessor>(x => { });
 
         await behind.Process(snapshot);
 
-        var participation = await Participations.Read(x =>
-            x.Combination.Number == DEFAULT_COMBINATION_NUMBER
-        );
+        var participation = await Participations.Read(x => x.Combination.Number == DEFAULT_COMBINATION_NUMBER);
         Assert.NotNull(participation);
         Assert.Equal(participation.Phases.First().ArriveTime, arriveAt);
     }
@@ -51,19 +43,12 @@ public class ProcessSnapshotTests : JudgeIntegrationTest
     {
         await Seed();
         var presentAt = TimestampHelper.Create(19, 35);
-        var snapshot = new Snapshot(
-            DEFAULT_COMBINATION_NUMBER,
-            SnapshotType.Vet,
-            method,
-            presentAt
-        );
+        var snapshot = new Snapshot(DEFAULT_COMBINATION_NUMBER, SnapshotType.Vet, method, presentAt);
         var behind = await GetBehind<ISnapshotProcessor>(x => { });
 
         await behind.Process(snapshot);
 
-        var participation = await Participations.Read(x =>
-            x.Combination.Number == DEFAULT_COMBINATION_NUMBER
-        );
+        var participation = await Participations.Read(x => x.Combination.Number == DEFAULT_COMBINATION_NUMBER);
         Assert.NotNull(participation);
         Assert.Equal(participation.Phases.First().PresentTime, presentAt);
     }
