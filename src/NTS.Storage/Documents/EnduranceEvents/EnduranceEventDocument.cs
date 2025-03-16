@@ -7,7 +7,7 @@ using NTS.Storage.Documents.Officials;
 
 namespace NTS.Storage.Documents.EnduranceEvents;
 
-public class EnduranceEventDocument : Document, IAggregateRoot // TODO: questionmark?
+public class EnduranceEventDocument : Document
 {
     public EnduranceEventDocument(
         EnduranceEvent enduranceEvent,
@@ -22,7 +22,7 @@ public class EnduranceEventDocument : Document, IAggregateRoot // TODO: question
         StartDay = enduranceEvent.EventSpan.StartDay;
         EndDay = enduranceEvent.EventSpan.EndDay;
         Officials = officials.Select(x => new OfficialDocument(x)).ToArray();
-        Rankings = ranklists.Select(x => new RanklistModel(x)).ToArray();
+        Ranklists = ranklists.Select(x => new RanklistModel(x)).ToArray();
     }
 
     public CountryDocument Country { get; init; }
@@ -31,7 +31,7 @@ public class EnduranceEventDocument : Document, IAggregateRoot // TODO: question
     public DateTimeOffset StartDay { get; init; }
     public DateTimeOffset EndDay { get; init; }
     public OfficialDocument[] Officials { get; init; }
-    public RanklistModel[] Rankings { get; init; }
+    public RanklistModel[] Ranklists { get; init; }
 
     public EnduranceEvent ToDomain()
     {

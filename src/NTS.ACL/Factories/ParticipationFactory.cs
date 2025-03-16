@@ -161,19 +161,7 @@ public class ParticipationFactory
         }
         var ruleset = CompetitionFactory.MapCompetitionRuleset(emsCompetition.Type);
 
-        CompetitionType competitionType;
-        if (emsCompetition.Name.NContains("първенство"))
-        {
-            competitionType = CompetitionType.Championship;
-        }
-        else if (emsCompetition.Name.NContains("*"))
-        {
-            competitionType = CompetitionType.Star;
-        }
-        else
-        {
-            competitionType = CompetitionType.Qualification;
-        }
+        var competitionType = GetType(emsCompetition);
 
         var participation = new Participation(emsCompetition.Name, ruleset, competitionType, combination, phases);
         if (finalRecord?.Result?.Type == EmsResultType.FailedToQualify)
@@ -200,5 +188,21 @@ public class ParticipationFactory
         currentTime = previousTime.HasValue ? (previousTime.Value + diff).DateTime : DateTimeOffset.Now.DateTime;
         previousTime = currentTime;
         return currentTime;
+    }
+
+    public static CompetitionType GetType(EmsCompetition emsCompetition)
+    {
+        if (emsCompetition.Name.NContains("първенство"))
+        {
+            return CompetitionType.Championship;
+        }
+        else if (emsCompetition.Name.NContains("*"))
+        {
+            return CompetitionType.Star;
+        }
+        else
+        {
+            return CompetitionType.Qualification;
+        }
     }
 }
