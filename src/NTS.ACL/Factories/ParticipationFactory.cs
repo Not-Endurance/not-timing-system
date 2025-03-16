@@ -55,9 +55,8 @@ public class ParticipationFactory
         bool adjustTime
     )
     {
-        var minSpeed = emsParticipation.Participant.Athlete.Category == Enums.EmsCategory.Children
-            ? 10
-            : 12;
+        var minSpeed =
+            emsParticipation.Participant.Athlete.Category == Enums.EmsCategory.Children ? 10 : 12;
 
         var combination = new Combination(
             int.Parse(emsParticipation.Participant.Number),
