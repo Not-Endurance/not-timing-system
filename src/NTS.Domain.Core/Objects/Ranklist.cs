@@ -17,7 +17,6 @@ public class Ranklist
         Entries = entries.ToList().AsReadOnly();
     }
 
-
     public Ranklist(Ranking ranking)
     {
         Entries = Rank(ranking);
@@ -44,7 +43,6 @@ public class Ranklist
         existing.Participation = participation;
         Entries = Rank(Ranking);
     }
-
 
     static List<RankingEntry> Rank(Ranking ranking)
     {
