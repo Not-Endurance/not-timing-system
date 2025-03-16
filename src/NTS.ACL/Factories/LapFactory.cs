@@ -14,7 +14,7 @@ public class LapFactory
             var state = new EmsLapState
             {
                 Id = phase.Id,
-                IsFinal = participation.Phases.Last() == phase ? true : false,
+                IsFinal = participation.Phases.Last() == phase,
                 IsCompulsoryInspectionRequired = phase.IsRequiredInspectionCompulsory,
                 LengthInKm = phase.Length,
                 MaxRecoveryTimeInMins = phase.MaxRecovery,

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Not.Blazor.CRUD.Ports;
-using Not.Serialization;
+using Not.Serialization.JSON;
+using Not.Storage.Stores.Files;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents;
@@ -37,7 +38,7 @@ public class StorageTests : JudgeIntegrationTest
             ),
         };
 
-        await AssertStateEquals(expectedState.ToConvertedJson());
+        await AssertStateEquals(JsonFileStore.ToJson(expectedState));
     }
 
     [Fact]

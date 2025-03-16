@@ -2,7 +2,7 @@
 using Not.Extensions;
 using Not.Injection;
 using Not.Safe;
-using Not.Serialization;
+using Not.Serialization.JSON;
 using NTS.ACL;
 using NTS.ACL.Entities.Competitions;
 using NTS.ACL.Entities.EnduranceEvents;
@@ -40,7 +40,7 @@ public class EmsImporters : IEmsImporter
     async Task SafeImport(string emsStateFilePath)
     {
         var contents = await File.ReadAllTextAsync(emsStateFilePath);
-        var emsState = contents.FromConvertedJson<EmsState>();
+        var emsState = contents.FromJson<EmsState>();
 
         var country = new Country(0, emsState.Event.Country.IsoCode, null, emsState.Event.Country.Name);
         var enduranceEvent = EnduranceEvent.Create(emsState.Event.PopulatedPlace, country);

@@ -2,7 +2,7 @@
 using Not.Application.CRUD.Ports;
 using Not.Domain;
 using Not.Notify;
-using Not.Serialization;
+using Not.Serialization.JSON;
 using Not.Structures;
 
 namespace Not.Application.HTTP;
