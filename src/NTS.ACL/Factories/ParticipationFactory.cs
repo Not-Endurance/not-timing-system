@@ -55,6 +55,7 @@ public class ParticipationFactory
         bool adjustTime
     )
     {
+        adjustTime = false;
         var minSpeed = emsParticipation.Participant.Athlete.Category == Enums.EmsCategory.Children ? 10 : 12;
 
         var combination = new Combination(
@@ -183,7 +184,7 @@ public class ParticipationFactory
     {
         if (!shouldAdjust)
         {
-            return currentTime;
+            return currentTime.AddHours(1); // TODO: pay attention to this wen importing
         }
         currentTime = previousTime.HasValue ? (previousTime.Value + diff).DateTime : DateTimeOffset.Now.DateTime;
         previousTime = currentTime;

@@ -74,7 +74,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
             startTime = DateTime.UtcNow.AddHours(-1);
         }
         return new EnduranceEvent(
-            DomainModelHelper.GenerateId(),
+            emsEvent.Id,
             country,
             emsEvent.PopulatedPlace,
             "populated place",
