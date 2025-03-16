@@ -24,8 +24,8 @@ public class ParticipationFactory
         {
             Number = participation.Combination.Number.ToString(),
             MaxAverageSpeedInKmPh = (int?)participation.Combination.MinAverageSpeed,
-            Unranked = true, // TODO: fix when Unranked is added on Unranked level
-        };
+            Unranked = true,
+        }; // TODO: fix when Unranked is added on Unranked level
         var emsParticipant = new EmsParticipant(athlete, horse, state);
         var emsLaps = LapFactory.Create(participation).ToList();
         for (var i = 0; i < participation.Phases.Count; i++)
