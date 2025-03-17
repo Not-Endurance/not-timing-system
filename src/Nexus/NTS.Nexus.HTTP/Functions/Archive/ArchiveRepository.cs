@@ -26,7 +26,7 @@ public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchi
 
     public async Task<IEnumerable<RankingEntryModel>> GetPerformances(int horseId)
     {
-        return await Collection
+        return await GetCollection
             .Aggregate()
             .Match(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)))
             .Project(x =>
