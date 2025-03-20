@@ -116,7 +116,7 @@ public record Timestamp : DomainObject, IComparable<Timestamp>
 
     public DateTimeOffset ToDateTimeOffset()
     {
-        return _stamp; //TODO: test reference modification
+        return _stamp.LocalDateTime;
     }
 
     public DateTime ToDateTime()
