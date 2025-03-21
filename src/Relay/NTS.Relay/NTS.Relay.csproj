@@ -8,15 +8,22 @@
     <OutputType>Exe</OutputType>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-	  <ProjectReference Include="..\..\NTS.ACL\NTS.ACL.csproj" />
 	  <ProjectReference Include="..\..\NTS.Storage\NTS.Storage.csproj" />
 	  <ProjectReference Include="..\..\NTS.Application\NTS.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Source\NTS\not-timing-system\src\Relay\NTS.Relay\ACL\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Source\NTS\not-timing-system\src\Relay\NTS.Relay\ACL\.editorconfig" />
   </ItemGroup>
 
 </Project>
