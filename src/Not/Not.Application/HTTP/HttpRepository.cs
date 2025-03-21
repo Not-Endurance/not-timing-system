@@ -7,7 +7,7 @@ using Not.Structures;
 
 namespace Not.Application.HTTP;
 
-public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
+public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
     where T : class, IAggregateRoot, IIdentifiable
 {
     const string CONNECTION_ERROR =
