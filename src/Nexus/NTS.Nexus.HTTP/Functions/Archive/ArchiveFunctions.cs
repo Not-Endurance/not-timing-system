@@ -29,7 +29,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
         var entry = requestBody.FromJson<ArchiveEntry>();
         var document = new EnduranceEventDocument(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
 
-        if (await _archive.Read(entry.Id) != null)
+        if (await _archive.Read(entry.Id) != null) // TODO: investigate this not working
         {
             await _archive.Delete(entry.Id);
         }

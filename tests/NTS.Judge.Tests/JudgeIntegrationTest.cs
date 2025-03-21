@@ -24,7 +24,6 @@ public abstract class JudgeIntegrationTest : IntegrationTest
             .ConfigureJudge(configuration)
             .AddRpcSocket(RpcProtocol.Http, "localhost", ApplicationConstants.RPC_PORT, ApplicationConstants.JUDGE_HUB)
             .AddJsonFileStore(x => x.Path = storagePath)
-            .AddStaticOptionsStore(x => x.Path = FileContextHelper.GetAppDirectory("resources"))
             .RegisterConventionalServices();
     }
 }
