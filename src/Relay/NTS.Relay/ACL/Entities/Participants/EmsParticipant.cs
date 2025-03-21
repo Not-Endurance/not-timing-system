@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
+using NTS.Relay.ACL.Abstractions;
 using NTS.Relay.ACL.Entities.Athletes;
 using NTS.Relay.ACL.Entities.Horses;
 using NTS.Relay.ACL.Entities.LapRecords;
-using NTS.Relay.ACL.Abstractions;
 
 namespace NTS.Relay.ACL.Entities.Participants;
 

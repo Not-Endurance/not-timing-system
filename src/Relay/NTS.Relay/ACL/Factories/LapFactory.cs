@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Entities.Laps;
+﻿using NTS.Domain.Core.Aggregates;
+using NTS.Relay.ACL.Entities.Laps;
 using NTS.Relay.ACL.Models;
-using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Relay.ACL.Factories;
 

@@ -1,7 +1,7 @@
-﻿using NTS.Relay.ACL.Entities.LapRecords;
+﻿using NTS.Domain.Core.Aggregates;
+using NTS.Relay.ACL.Entities.LapRecords;
 using NTS.Relay.ACL.Entities.Participants;
 using NTS.Relay.ACL.Models;
-using NTS.Domain.Core.Aggregates;
 using EmsParticipation = NTS.Relay.ACL.Entities.Participations.EmsParticipation;
 
 namespace NTS.Relay.ACL.Factories;

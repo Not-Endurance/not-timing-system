@@ -1,5 +1,5 @@
-﻿using NTS.Relay.ACL.Enums;
-using NTS.Domain.Enums;
+﻿using NTS.Domain.Enums;
+using NTS.Relay.ACL.Enums;
 
 namespace NTS.Relay.ACL;
 
