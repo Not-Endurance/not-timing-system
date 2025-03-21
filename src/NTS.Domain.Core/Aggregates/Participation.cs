@@ -17,7 +17,7 @@ public class Participation : AggregateRoot, IAggregateRoot
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
     [JsonConstructor]
-    public Participation(
+    Participation(
         int id,
         Competition competition,
         Combination combination,

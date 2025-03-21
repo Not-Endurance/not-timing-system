@@ -35,7 +35,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
         _classfications = classfications;
     }
 
-    public async Task Import(string emsJson, bool adjustTime = false)
+    public async Task Import(string emsJson, bool adjustTime = true)
     {
         var existingEvent = await _events.Read(0);
         if (existingEvent != null)
@@ -68,7 +68,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
     EnduranceEvent CreateEvent(EmsEnduranceEvent emsEvent, bool adjustTime)
     {
         var country = new Country(0, emsEvent.Country.IsoCode, null, emsEvent.Country.Name);
-        var startTime = emsEvent.Competitions.OrderBy(x => x.StartTime).First().StartTime.Date;
+        var startTime = emsEvent.Competitions.OrderBy(x => x.StartTime).First().StartTime;
         if (adjustTime)
         {
             startTime = DateTime.UtcNow.AddHours(-1);
@@ -79,7 +79,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
             emsEvent.PopulatedPlace,
             "populated place",
             new DateTimeOffset(startTime),
-            new DateTimeOffset(startTime.AddHours(23).AddMinutes(59).AddSeconds(59)),
+            new DateTimeOffset(startTime + TimeSpan.FromHours(12)),
             null,
             null,
             null
@@ -130,7 +130,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
 
     (IEnumerable<Ranking>, IEnumerable<Participation>) CreateRankingsAndParticipations(EmsState state, bool adjustTime)
     {
-        var rankings = new List<Ranking>();
+        var result = new List<Ranking>();
         var entriesforClassification =
             new Dictionary<
                 EmsCompetition,
@@ -141,14 +141,7 @@ public class EmsToCoreImporter : IEmsToCoreImporter
             foreach (var competitionId in emsParticipation.CompetitionsIds)
             {
                 var competition = state.Event.Competitions.First(x => x.Id == competitionId);
-                var existingParticipation = entriesforClassification
-                    .Values.SelectMany(x => x.Values)
-                    .SelectMany(x => x)
-                    .FirstOrDefault(x => x.particpation.Combination.Number == int.Parse(emsParticipation.Participant.Number))
-                    .particpation;
-                var participation = existingParticipation != null
-                    ? existingParticipation
-                    : ParticipationFactory.CreateCore(emsParticipation, competition, adjustTime);
+                var participation = ParticipationFactory.CreateCore(emsParticipation, competition, adjustTime);
                 var category = emsParticipation.Participant.Athlete.Category.ToNtsCategory();
                 var entry = new RankingEntry(participation, emsParticipation.Participant.Unranked);
                 if (
@@ -188,18 +181,18 @@ public class EmsToCoreImporter : IEmsToCoreImporter
                     CompetitionFactory.MapCompetitionRuleset(emsCompetition.Type),
                     competitionType
                 );
-                rankings.Add(new Ranking(competition, category, entries));
+                result.Add(new Ranking(competition, category, entries));
             }
         }
         var participations = entriesforClassification
             .Values.SelectMany(x => x.Values)
             .SelectMany(x => x.Select(y => y.particpation))
             .Distinct();
-        return (rankings, participations);
+        return (result, participations);
     }
 }
 
 public interface IEmsToCoreImporter : ITransient
 {
-    Task Import(string filePath, bool adjustTime = false);
+    Task Import(string filePath, bool adjustTime = true);
 }

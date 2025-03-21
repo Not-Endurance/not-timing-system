@@ -1,10 +1,9 @@
 using MudBlazor;
-using Not.Blazor.Components;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Component;
 
-public partial class Dashboard : NComponent
+public partial class Dashboard
 {
     [Inject]
     IDashboardBehind Behind { get; set; } = default!;
@@ -14,7 +13,7 @@ public partial class Dashboard : NComponent
         await Observe(Behind);
     }
 
-    protected Task<IEnumerable<Participation>> Search(string term)
+    Task<IEnumerable<Participation>> Search(string term)
     {
         if (string.IsNullOrEmpty(term))
         {
@@ -24,7 +23,7 @@ public partial class Dashboard : NComponent
         return Task.FromResult(result);
     }
 
-    protected Color GetColor(Participation participation)
+    Color GetColor(Participation participation)
     {
         if (Behind.RecentlyProcessed.Contains(participation.Combination.Number))
         {

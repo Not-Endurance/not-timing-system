@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Not.Domain.Base;
 using Not.Domain.Exceptions;
 
@@ -63,6 +62,8 @@ public record FailedToQualify : Eliminated
     public FailedToQualify(FtqCode[] codes)
         : this(IsNotEmpty(codes), null) { }
 
+    public IEnumerable<FtqCode> FtqCodes { get; private set; } = [];
+
     public override string ToString()
     {
         var codes = string.Join('+', FtqCodes);
@@ -91,7 +92,7 @@ public record FailedToQualify : Eliminated
     }
 }
 
-public record Eliminated : DomainObject
+public abstract record Eliminated : DomainObject
 {
     public const string WITHDRAWN = "WD";
     public const string RETIRED = "RET";
@@ -99,28 +100,19 @@ public record Eliminated : DomainObject
     public const string DISQUALIFIED = "DQ";
     public const string FAILED_TO_QUALIFY = "FTQ";
 
-    public Eliminated(string code)
+    protected Eliminated(string eliminationCode)
     {
-        Code = code;
+        Code = eliminationCode;
     }
 
-    [Newtonsoft.Json.JsonConstructor]
-    public Eliminated(string code, string complement, IEnumerable<FtqCode> ftqCodes)
-        : this(code)
+    protected Eliminated(string eliminationCode, string complement)
+        : this(eliminationCode)
     {
-        Complement = IsNotNullOrEmpty(complement, code);
-        FtqCodes = ftqCodes;
-    }
-
-    public Eliminated(string code, string complement)
-        : this(code)
-    {
-        Complement = IsNotNullOrEmpty(complement, code);
+        Complement = IsNotNullOrEmpty(complement, eliminationCode);
     }
 
     public string Code { get; }
     public string? Complement { get; protected set; }
-    public IEnumerable<FtqCode> FtqCodes { get; protected set; } = [];
 
     public override string ToString()
     {

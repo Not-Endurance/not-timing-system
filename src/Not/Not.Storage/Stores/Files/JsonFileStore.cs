@@ -67,6 +67,12 @@ public abstract class JsonFileStore<T>
         FileHelper.Write(contents, _path);
     }
 
+    protected T Deserialize()
+    {
+        var contents = FileHelper.SafeReadString(_path);
+        return contents == null ? new() : JsonFileStore.FromJson<T>(contents);
+    }
+
     protected async Task SerializeAsync(T value)
     {
         var contents = JsonFileStore.ToJson(value);

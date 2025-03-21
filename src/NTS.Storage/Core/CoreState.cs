@@ -33,5 +33,4 @@ public class CoreState
     public List<Ranking> Rankings { get; } = [];
     public List<SnapshotResult> SnapshotResults { get; } = [];
     public List<Handout> Handouts { get; } = [];
-
 }

@@ -8,7 +8,7 @@ namespace NTS.Domain.Core.Aggregates;
 public class Ranking : AggregateRoot, IAggregateRoot
 {
     [JsonConstructor]
-    public Ranking(
+    Ranking(
         int id,
         string name,
         CompetitionRuleset ruleset,
