@@ -5,9 +5,9 @@ using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects.Payloads;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
-namespace NTS.Domain.Core.Aggregates;
+namespace NTS.Domain.Core.Aggregates.Temp;
 
-public class Participation : AggregateRoot, IAggregateRoot
+public class Participation2 : AggregateRoot, IAggregateRoot
 {
     //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
     static readonly FailedToQualify OUT_OF_TIME = new([FtqCode.OT]);
@@ -17,10 +17,10 @@ public class Participation : AggregateRoot, IAggregateRoot
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
     [JsonConstructor]
-    public Participation(
+    Participation2(
         int id,
         Competition competition,
-        Combination combination,
+        Combination2 combination,
         PhaseCollection phases,
         Eliminated? notQualified
     )
@@ -32,17 +32,17 @@ public class Participation : AggregateRoot, IAggregateRoot
         Eliminated = notQualified;
     }
 
-    public Participation(
+    public Participation2(
         string competitionName,
         CompetitionRuleset ruleset,
         CompetitionType type,
-        Combination combination,
+        Combination2 combination,
         IEnumerable<Phase> phases
     )
         : this(GenerateId(), new(competitionName, ruleset, type), combination, new(phases), null) { }
 
     public Competition Competition { get; }
-    public Combination Combination { get; }
+    public Combination2 Combination { get; }
     public PhaseCollection Phases { get; }
     public Eliminated? Eliminated { get; private set; }
 
@@ -145,8 +145,8 @@ public class Participation : AggregateRoot, IAggregateRoot
     public void Restore()
     {
         Eliminated = null;
-        var qualificationRestored = new ParticipationRestored(this);
-        RESTORED_EVENT.Emit(qualificationRestored);
+        //var qualificationRestored = new ParticipationRestored(this);
+        //RESTORED_EVENT.Emit(qualificationRestored);
     }
 
     void EvaluatePhase(Phase phase)
@@ -168,15 +168,15 @@ public class Participation : AggregateRoot, IAggregateRoot
         if (phase.IsComplete() && !phase.IsFinal)
         {
             Phases.StartIfNext();
-            var phaseCompleted = new PhaseCompleted(this);
-            PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
+            //var phaseCompleted = new PhaseCompleted(this);
+            //PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
         }
     }
 
     void Eliminate(Eliminated notQualified)
     {
         Eliminated = notQualified;
-        var qualificationRevoked = new ParticipationEliminated(this);
-        ELIMINATED_EVENT.Emit(qualificationRevoked);
+        //var qualificationRevoked = new ParticipationEliminated(this);
+        //ELIMINATED_EVENT.Emit(qualificationRevoked);
     }
 }

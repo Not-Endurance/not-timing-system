@@ -20,5 +20,6 @@ public class EntityReferenceConverterInitializer : IStartupInitializer, ITransie
         JsonFileStore.AddConverter(new EntityReferenceConverter<Domain.Setup.Aggregates.Participation>());
         JsonFileStore.AddConverter(new EntityReferenceConverter<Domain.Setup.Aggregates.Phase>());
         JsonFileStore.AddConverter(new EntityReferenceConverter<Domain.Core.Aggregates.Participation>());
+        //JsonFileStore.AddConverter(new EntityReferenceConverter<Domain.Core.Aggregates.Temp.Participation2>());
     }
 }

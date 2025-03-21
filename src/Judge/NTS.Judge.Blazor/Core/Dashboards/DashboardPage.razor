@@ -6,7 +6,7 @@
 @attribute [Route(DASHBOARD_PAGE)]
 @inherits NComponent
 
-<NContent Title="Dashboard" HasContent="CoreBehind.IsStarted" EmptyMessage="Event isn't started">
+<NContent Title="Dashboard" HasContent="true" EmptyMessage="Event isn't started">
     <EmptyContent>
         <InputFile OnChange="ImportEmsData" />
     </EmptyContent>

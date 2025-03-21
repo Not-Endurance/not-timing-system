@@ -2,9 +2,12 @@
 using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Ports;
 using Not.Exceptions;
+using Not.Random;
 using Not.Safe;
+using NTS.ACL.Entities.Athletes;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Temp;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Judge.Blazor.Core.Dashboards;
@@ -13,7 +16,6 @@ using NTS.Judge.Blazor.Core.Dashboards.Actions.Inspections;
 using NTS.Judge.Blazor.Core.Dashboards.Actions.Snapshots;
 using NTS.Judge.Blazor.Core.Dashboards.Component;
 using NTS.Judge.Blazor.Core.Dashboards.Phases;
-using NTS.Judge.RPC;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
@@ -62,6 +64,43 @@ public class ParticipationBehind
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
+        //var participation2 = await _participation2Repository.ReadAll();
+        //var rankings2 = await _ranking2Repository.ReadAll();
+        ////foreach (var part2 in participation2)
+        ////{
+        ////    var matchingRanking = rankings2.First(x => x.Entries.Any(x => x.Participation.Id == part2.Id));
+        ////    var athlete = new Athlete(RandomHelper.GenerateUniqueInteger(), part2.Combination.Name, matchingRanking.Category, part2.Combination.Country!, null, null);
+        ////    var horse = new Horse(RandomHelper.GenerateUniqueInteger(), part2.Combination.Horse, null);
+
+        ////    var combination = new Combination(part2.Combination.Number, athlete, horse, decimal.Parse(part2.Combination.Distance), part2.Combination.Country, null, part2.Combination.MinAverageSpeed, part2.Combination.MaxAverageSpeed);
+        ////    var participation = new Participation(part2.Id, part2.Competition, combination, part2.Phases, part2.Eliminated);
+        ////    await _participationRepository.Create(participation);
+        ////}
+        //foreach (var rank2 in rankings2.Where(x => x.Entries.Any()))
+        //{
+        //    var rankingEntries = new List<RankingEntry>();
+        //    foreach (var entry2 in rank2.Entries)
+        //    {
+        //        var part2 = entry2.Participation;
+        //        var athlete = new Athlete(RandomHelper.GenerateUniqueInteger(), part2.Combination.Name, rank2.Category, part2.Combination.Country!, null, null);
+        //        var horse = new Horse(RandomHelper.GenerateUniqueInteger(), part2.Combination.Horse, null);
+
+        //        var combination = new Combination(part2.Combination.Number, athlete, horse, decimal.Parse(part2.Combination.Distance), part2.Combination.Country, null, part2.Combination.MinAverageSpeed, part2.Combination.MaxAverageSpeed);
+        //        var participation = new Participation(part2.Id, part2.Competition, combination, part2.Phases, part2.Eliminated);
+        //        var entry = new RankingEntry(participation, entry2.IsNotRanked);
+
+        //        var existingParticipation = await _participationRepository.Read(participation.Id);
+        //        if (existingParticipation == null)
+        //        {
+        //            await _participationRepository.Create(participation);
+        //        }
+        //        rankingEntries.Add(entry);
+        //    }
+
+        //    var ranking = new Ranking(rank2.Id, rank2.Name, rank2.Ruleset, rank2.Type, rank2.Category, new (rankingEntries));
+        //    await _rankingRepository.Create(ranking);
+        //}
+        
         Participations = await _participationRepository.ReadAll();
         SelectedParticipation = Participations.FirstOrDefault();
         return Participations.Any();
