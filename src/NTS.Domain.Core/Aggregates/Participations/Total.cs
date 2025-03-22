@@ -14,7 +14,7 @@ public record Total : DomainObject
         var totalLength = completedPhases.Sum(x => x.Length);
         RideInterval = completedPhases.Aggregate(
             TimeInterval.Zero,
-            (result, x) => result + (x.ArriveTime - x.StartTime) ?? result
+            (result, x) => result + (x.ArriveTime - x.StartTime) ?? throw GuardHelper.Exception("Invalid Total - Do not use Total when all phases are incomplete")
         );
         RecoveryInterval = completedPhases.Aggregate(
             TimeInterval.Zero,
@@ -25,10 +25,10 @@ public record Total : DomainObject
             ?? RecoveryInterval;
         Interval = (RideInterval + RecoveryIntervalWithoutFinal)!;
         AverageSpeed = new Speed(totalLength, Interval);
-        LastArriveTime = phases.Last().ArriveTime!;
+        FinishTime = phases.Last().ArriveTime!;
     }
 
-    public Timestamp LastArriveTime { get; }
+    public Timestamp? FinishTime { get; }
     public Speed AverageSpeed { get; }
     public TimeInterval Interval { get; }
     public TimeInterval RideInterval { get; }
