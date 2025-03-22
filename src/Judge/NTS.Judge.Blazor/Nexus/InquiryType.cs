@@ -9,16 +9,16 @@ public enum InquiryType
 
     [Description("Horse name")]
     HorseName = 3,
-    
+
     [Description("Athlete ID")]
     AthleteId = 2,
-    
+
     [Description("Athlete name")]
     AthleteName = 4,
-    
+
     [Description("Official ID")]
     OfficialId = 5,
-    
+
     [Description("Horse name")]
-    OfficialName = 6
+    OfficialName = 6,
 }

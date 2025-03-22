@@ -14,7 +14,8 @@ public class ParticipationDocumentModel
             Combination = CombinationDocumentModel.Create(participation.Combination),
             Phases = participation.Phases.Select(PhaseDocumentModel.Create).ToArray(),
             Total = total == null ? null : TotalDocumentModel.Create(total),
-            Eliminated = participation.Eliminated == null ? null : EliminatedDocumentModel.Create(participation.Eliminated),
+            Eliminated =
+                participation.Eliminated == null ? null : EliminatedDocumentModel.Create(participation.Eliminated),
         };
     }
 

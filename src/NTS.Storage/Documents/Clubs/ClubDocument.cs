@@ -7,11 +7,7 @@ public class ClubDocument : Document
 {
     public static ClubDocument Create(IClub club)
     {
-        return new ClubDocument
-        {
-            Id = club.Id,
-            Name = club.Name,
-        };
+        return new ClubDocument { Id = club.Id, Name = club.Name };
     }
 
     public string Name { get; init; } = default!;
