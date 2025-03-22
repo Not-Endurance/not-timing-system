@@ -8,7 +8,7 @@ public class TotalDocumentModel
     {
         return new TotalDocumentModel
         {
-            LastArriveTime = total.LastArriveTime.ToDateTimeOffset(),
+            LastArriveTime = total.FinishTime?.ToDateTimeOffset(),
             AverageSpeed = total.AverageSpeed.ToDouble(),
             Interval = total.Interval.ToTimeSpan(),
             RideInterval = total.RideInterval.ToTimeSpan(),
@@ -17,7 +17,7 @@ public class TotalDocumentModel
         };
     }
 
-    public DateTimeOffset LastArriveTime { get; init; }
+    public DateTimeOffset? LastArriveTime { get; init; }
     public double AverageSpeed { get; init; }
     public TimeSpan Interval { get; init; }
     public TimeSpan RideInterval { get; init; }
