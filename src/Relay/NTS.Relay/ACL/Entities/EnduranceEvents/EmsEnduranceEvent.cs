@@ -1,7 +1,7 @@
+using NTS.Relay.ACL.Abstractions;
 using NTS.Relay.ACL.Entities.Competitions;
 using NTS.Relay.ACL.Entities.Countries;
 using NTS.Relay.ACL.Entities.Personnels;
-using NTS.Relay.ACL.Abstractions;
 
 namespace NTS.Relay.ACL.Entities.EnduranceEvents;
 

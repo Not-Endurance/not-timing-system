@@ -5,5 +5,4 @@ namespace NTS.Relay.RPC.Procedures;
 public interface ILegacyWitnessClientProcedures
     : IEmsParticipantsClientProcedures,
         IEmsParticipantsHubProcedures,
-        IEmsStartlistClientProcedures
-{ }
+        IEmsStartlistClientProcedures { }

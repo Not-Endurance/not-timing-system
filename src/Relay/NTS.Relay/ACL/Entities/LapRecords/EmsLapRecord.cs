@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
+using NTS.Relay.ACL.Abstractions;
 using NTS.Relay.ACL.Entities.Laps;
 using NTS.Relay.ACL.Entities.Participants;
 using NTS.Relay.ACL.Entities.Results;
-using NTS.Relay.ACL.Abstractions;
 
 namespace NTS.Relay.ACL.Entities.LapRecords;
 

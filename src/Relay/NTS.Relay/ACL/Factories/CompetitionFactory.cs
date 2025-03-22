@@ -1,7 +1,7 @@
-﻿using NTS.Relay.ACL.Entities.Competitions;
-using NTS.Relay.ACL.Models;
-using NTS.Domain.Core.Aggregates;
+﻿using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
+using NTS.Relay.ACL.Entities.Competitions;
+using NTS.Relay.ACL.Models;
 
 namespace NTS.Relay.ACL.Factories;
 

@@ -1,8 +1,8 @@
-﻿using NTS.Relay.ACL.Entities.Athletes;
+﻿using NTS.Domain.Core.Aggregates;
+using NTS.Judge.ACL.Models;
+using NTS.Relay.ACL.Entities.Athletes;
 using NTS.Relay.ACL.Entities.Countries;
 using NTS.Relay.ACL.Enums;
-using NTS.Domain.Core.Aggregates;
-using NTS.Judge.ACL.Models;
 
 namespace NTS.Relay.ACL.Factories;
 

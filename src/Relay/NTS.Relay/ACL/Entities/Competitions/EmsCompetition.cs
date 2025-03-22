@@ -1,6 +1,6 @@
 using System.Data;
-using NTS.Relay.ACL.Entities.Laps;
 using NTS.Relay.ACL.Abstractions;
+using NTS.Relay.ACL.Entities.Laps;
 
 namespace NTS.Relay.ACL.Entities.Competitions;
 

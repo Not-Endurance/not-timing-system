@@ -1,7 +1,7 @@
-﻿using NTS.Relay.ACL.Entities;
-using NTS.Relay.ACL.Entities.EMS;
-using NTS.Domain.Enums;
+﻿using NTS.Domain.Enums;
 using NTS.Domain.Objects;
+using NTS.Relay.ACL.Entities;
+using NTS.Relay.ACL.Entities.EMS;
 
 namespace NTS.Relay.ACL.Factories;
 
