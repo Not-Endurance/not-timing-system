@@ -5,17 +5,22 @@ namespace NTS.Storage.Documents.Countries;
 
 public class CountryDocument : Document
 {
-    public CountryDocument(Country country)
-        : base(country.Id)
+    public static CountryDocument Create(Country country)
     {
-        IsoCode = country.IsoCode;
-        NfCode = country.NfCode;
-        Name = country.Name;
+        return new CountryDocument
+        {
+            Id = country.Id,
+            IsoCode = country.IsoCode,
+            NfCode = country.NfCode,
+            Name = country.Name,
+        };
     }
 
     public string? IsoCode { get; init; }
+
     public string? NfCode { get; init; }
-    public string Name { get; init; }
+
+    public string Name { get; init; } = default!;
 
     public Country ToDomain()
     {

@@ -24,19 +24,19 @@ public class ArchiveRepository : MongoRepository<ArchiveDocument>, IArchiveRepos
             .Set(x => x.Location, document.Location);
     }
 
-    public async Task<IEnumerable<RankingEntryDocumentModel>> GetPerformances(int horseId)
+    public async Task<IEnumerable<ArchiveDocument>> GetPerformances(int horseId)
     {
         return await GetCollection()
             .Aggregate()
             .Match(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)))
-            .Project(x =>
-                x.Ranklists.SelectMany(y => y.Entries).First(z => z.Participation.Combination.Horse.Id == horseId)
-            )
+            //.Project(x =>
+            //    x.Ranklists.SelectMany(y => y.Entries).First(z => z.Participation.Combination.Horse.Id == horseId)
+            //)
             .ToListAsync();
     }
 }
 
 public interface IArchiveRepository : IRepository<ArchiveDocument>
 {
-    Task<IEnumerable<RankingEntryDocumentModel>> GetPerformances(int horseId);
+    Task<IEnumerable<ArchiveDocument>> GetPerformances(int horseId);
 }

@@ -39,7 +39,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = new AthleteDocument(athlete);
+        var document = AthleteDocument.Create(athlete);
         await _athletes.Create(document);
 
         return new OkObjectResult($"Inserted {athlete}");
@@ -54,7 +54,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = new AthleteDocument(athlete);
+        var document = AthleteDocument.Create(athlete);
         await _athletes.Update(document);
 
         return new OkObjectResult($"Updated {athlete}");

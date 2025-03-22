@@ -5,14 +5,17 @@ namespace NTS.Storage.Documents.Archive.Models;
 
 public class CompetitionDocumentModel
 {
-    public CompetitionDocumentModel(Competition domainModel)
+    public static CompetitionDocumentModel Create(Competition competition)
     {
-        Name = domainModel.Name;
-        Ruleset = domainModel.Ruleset;
-        Type = domainModel.Type;
+        return new CompetitionDocumentModel
+        {
+            Name = competition.Name,
+            Ruleset = competition.Ruleset,
+            Type = competition.Type,
+        };
     }
 
-    public string Name { get; init; }
+    public string Name { get; init; } = default!;
     public CompetitionRuleset Ruleset { get; init; }
     public CompetitionType Type { get; init; }
 }

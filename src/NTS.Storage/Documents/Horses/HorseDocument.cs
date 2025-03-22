@@ -5,15 +5,18 @@ namespace NTS.Storage.Documents.Horses;
 
 public class HorseDocument : Document
 {
-    public HorseDocument(IHorse horse)
-        : base(horse.Id)
+    public static HorseDocument Create(IHorse horse)
     {
-        FeiId = horse.FeiId;
-        Name = horse.Name;
+        return new HorseDocument
+        {
+            Id = horse.Id,
+            FeiId = horse.FeiId,
+            Name = horse.Name,
+        };
     }
 
     public string? FeiId { get; init; }
-    public string Name { get; init; }
+    public string Name { get; init; } = default!;
 
     public Horse ToDomain()
     {

@@ -93,8 +93,7 @@ public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         try
         {
             var url = BuildUrl(id);
-            var content = await Client.Get(url);
-            return content?.FromJson<T>();
+            return await Client.GetJson<T>(url);
         }
         catch (Exception ex)
         {
@@ -107,8 +106,7 @@ public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
     {
         try
         {
-            var content = await Client.Get(_endpoint);
-            return content?.FromJson<IEnumerable<T>>() ?? [];
+            return await Client.GetJson<IEnumerable<T>>(_endpoint) ?? [];
         }
         catch (Exception ex)
         {

@@ -27,7 +27,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var entry = requestBody.FromJson<ArchiveEntry>();
-        var document = new ArchiveDocument(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
+        var document = ArchiveDocument.Create(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
 
         if (await _archive.Read(entry.Id) != null) // TODO: investigate this not working
         {
@@ -58,8 +58,8 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
     {
         LogInformation(request);
 
-        var performances = await _archive.GetPerformances(horseId);
+        var archives = await _archive.GetPerformances(horseId);
 
-        return new OkObjectResult(performances);
+        return new OkObjectResult(archives);
     }
 }

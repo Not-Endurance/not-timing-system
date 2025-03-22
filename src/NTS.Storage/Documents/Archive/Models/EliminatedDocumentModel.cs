@@ -4,17 +4,21 @@ namespace NTS.Storage.Documents.Archive.Models;
 
 public class EliminatedDocumentModel
 {
-    public EliminatedDocumentModel(Eliminated eliminated)
+    public static EliminatedDocumentModel Create(Eliminated eliminated)
     {
-        Code = eliminated.Code;
-        Reason = eliminated.Complement;
         if (eliminated is FailedToQualify ftq)
         {
-            FtqCodes = ftq.FtqCodes.ToArray();
+            return new EliminatedDocumentModel
+            {
+                Code = eliminated.Code,
+                Reason = eliminated.Complement,
+                FtqCodes = ftq.FtqCodes.ToArray(),
+            };
         }
+        return new EliminatedDocumentModel { Code = eliminated.Code, Reason = eliminated.Complement };
     }
 
-    public string Code { get; init; }
+    public string Code { get; init; } = default!;
     public string? Reason { get; init; }
     public FtqCode[]? FtqCodes { get; init; }
 }

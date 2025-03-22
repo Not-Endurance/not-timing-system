@@ -4,14 +4,17 @@ namespace NTS.Storage.Documents.Archive.Models;
 
 public class RankingEntryDocumentModel
 {
-    public RankingEntryDocumentModel(RankingEntry rankingEntry)
+    public static RankingEntryDocumentModel Create(RankingEntry rankingEntry)
     {
-        Participation = new ParticipationDocumentModel(rankingEntry.Participation);
-        Rank = rankingEntry.Rank;
-        IsNotRanked = rankingEntry.IsNotRanked;
+        return new RankingEntryDocumentModel
+        {
+            Participation = ParticipationDocumentModel.Create(rankingEntry.Participation),
+            Rank = rankingEntry.Rank,
+            IsNotRanked = rankingEntry.IsNotRanked,
+        };
     }
 
-    public ParticipationDocumentModel Participation { get; init; }
+    public ParticipationDocumentModel Participation { get; init; } = default!;
     public int? Rank { get; init; }
     public bool IsNotRanked { get; init; }
 }

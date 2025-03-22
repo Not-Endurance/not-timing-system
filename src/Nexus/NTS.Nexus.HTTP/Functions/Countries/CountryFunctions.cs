@@ -29,7 +29,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var country = requestBody.FromJson<Country>();
-        var document = new CountryDocument(country);
+        var document = CountryDocument.Create(country);
         await _countries.Create(document);
 
         return new OkObjectResult($"Inserted {country}");
@@ -44,7 +44,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var country = requestBody.FromJson<Country>();
-        var document = new CountryDocument(country);
+        var document = CountryDocument.Create(country);
         await _countries.Update(document);
 
         return new OkObjectResult($"Updated {country}");

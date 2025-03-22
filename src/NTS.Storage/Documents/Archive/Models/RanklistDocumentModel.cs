@@ -5,18 +5,21 @@ namespace NTS.Storage.Documents.Archive.Models;
 
 public class RanklistDocumentModel
 {
-    public RanklistDocumentModel(Ranklist ranklist)
+    public static RanklistDocumentModel Create(Ranklist ranklist)
     {
-        Name = ranklist.Name;
-        Ruleset = ranklist.Ruleset;
-        Type = ranklist.Type;
-        Category = ranklist.Category;
-        Entries = ranklist.Entries.Select(e => new RankingEntryDocumentModel(e)).ToArray();
+        return new RanklistDocumentModel
+        {
+            Name = ranklist.Name,
+            Ruleset = ranklist.Ruleset,
+            Type = ranklist.Type,
+            Category = ranklist.Category,
+            Entries = ranklist.Entries.Select(RankingEntryDocumentModel.Create).ToArray(),
+        };
     }
 
-    public string Name { get; init; }
+    public string Name { get; init; } = default!;
     public CompetitionRuleset Ruleset { get; init; }
     public CompetitionType Type { get; init; }
     public AthleteCategory Category { get; init; }
-    public RankingEntryDocumentModel[] Entries { get; init; }
+    public RankingEntryDocumentModel[] Entries { get; init; } = [];
 }
