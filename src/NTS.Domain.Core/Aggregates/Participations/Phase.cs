@@ -181,7 +181,7 @@ public class Phase : AggregateRoot
 
     internal bool ViolatesRecoveryTime()
     {
-        return GetRecoverySpan() > TimeSpan.FromMinutes(MaxRecovery);
+        return GetRecoveryInterval() > TimeSpan.FromMinutes(MaxRecovery);
     }
 
     internal bool ViolatesSpeedRestriction(Speed? minSpeed, Speed? maxSpeed)
@@ -249,29 +249,29 @@ public class Phase : AggregateRoot
         return VetTime?.Add(span);
     }
 
-    public TimeInterval? GetLoopSpan()
+    public TimeInterval? GetLoopInterval()
     {
         return ArriveTime - StartTime;
     }
 
-    public TimeInterval? GetPhaseSpan()
+    public TimeInterval? GetPhaseInterval()
     {
-        return IsFinal ? GetLoopSpan() : VetTime - StartTime;
+        return IsFinal ? GetLoopInterval() : VetTime - StartTime;
     }
 
-    public TimeInterval? GetRecoverySpan()
+    public TimeInterval? GetRecoveryInterval()
     {
         return VetTime - ArriveTime;
     }
 
     public Speed? GetAverageLoopSpeed()
     {
-        return Length / GetLoopSpan();
+        return Length / GetLoopInterval();
     }
 
     public Speed? GetAveragePhaseSpeed()
     {
-        return Length / GetPhaseSpan();
+        return Length / GetPhaseInterval();
     }
 
     public Speed? GetAverageSpeed()
@@ -378,7 +378,7 @@ public class Phase : AggregateRoot
         {
             return;
         }
-        IsRequiredInspectionCompulsory = GetRecoverySpan() >= CompulsoryThresholdSpan;
+        IsRequiredInspectionCompulsory = GetRecoveryInterval() >= CompulsoryThresholdSpan;
     }
 }
 

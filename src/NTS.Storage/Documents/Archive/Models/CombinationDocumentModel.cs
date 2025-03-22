@@ -3,11 +3,11 @@ using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Storage.Documents.Athletes;
 using NTS.Storage.Documents.Horses;
 
-namespace NTS.Storage.Documents.EnduranceEvents.Models;
+namespace NTS.Storage.Documents.Archive.Models;
 
-public class CombinationModel
+public class CombinationDocumentModel
 {
-    public CombinationModel(Combination domainModel)
+    public CombinationDocumentModel(Combination domainModel)
     {
         Number = domainModel.Number;
         Distance = domainModel.Distance;

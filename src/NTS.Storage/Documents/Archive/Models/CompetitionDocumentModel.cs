@@ -1,11 +1,11 @@
 ﻿using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
 
-namespace NTS.Storage.Documents.EnduranceEvents.Models;
+namespace NTS.Storage.Documents.Archive.Models;
 
-public class CompetitionModel
+public class CompetitionDocumentModel
 {
-    public CompetitionModel(Competition domainModel)
+    public CompetitionDocumentModel(Competition domainModel)
     {
         Name = domainModel.Name;
         Ruleset = domainModel.Ruleset;

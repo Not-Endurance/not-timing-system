@@ -2,19 +2,19 @@
 using Not.Application.CRUD.Ports;
 using NTS.Application.Mongo;
 using NTS.Nexus.HTTP.Mongo;
-using NTS.Storage.Documents.EnduranceEvents;
-using NTS.Storage.Documents.EnduranceEvents.Models;
+using NTS.Storage.Documents.Archive;
+using NTS.Storage.Documents.Archive.Models;
 
 namespace NTS.Nexus.HTTP.Functions.Archive;
 
-public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchiveRepository
+public class ArchiveRepository : MongoRepository<ArchiveDocument>, IArchiveRepository
 {
     public ArchiveRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ARCHIVE_COLLECTION) { }
 
-    protected override UpdateDefinition<EnduranceEventDocument> GetUpdateDefinition(EnduranceEventDocument document)
+    protected override UpdateDefinition<ArchiveDocument> GetUpdateDefinition(ArchiveDocument document)
     {
-        return Builders<EnduranceEventDocument>
+        return Builders<ArchiveDocument>
             .Update.Set(x => x.Officials, document.Officials)
             .Set(x => x.Ranklists, document.Ranklists)
             .Set(x => x.EndDay, document.EndDay)
@@ -24,7 +24,7 @@ public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchi
             .Set(x => x.Location, document.Location);
     }
 
-    public async Task<IEnumerable<RankingEntryModel>> GetPerformances(int horseId)
+    public async Task<IEnumerable<RankingEntryDocumentModel>> GetPerformances(int horseId)
     {
         return await GetCollection()
             .Aggregate()
@@ -36,7 +36,7 @@ public class ArchiveRepository : MongoRepository<EnduranceEventDocument>, IArchi
     }
 }
 
-public interface IArchiveRepository : IRepository<EnduranceEventDocument>
+public interface IArchiveRepository : IRepository<ArchiveDocument>
 {
-    Task<IEnumerable<RankingEntryModel>> GetPerformances(int horseId);
+    Task<IEnumerable<RankingEntryDocumentModel>> GetPerformances(int horseId);
 }

@@ -16,15 +16,19 @@ public record Total : DomainObject
             TimeInterval.Zero,
             (result, x) => result + (x.ArriveTime - x.StartTime) ?? result
         );
-        RecoveryInterval = completedPhases.Aggregate(TimeInterval.Zero, (result, x) => (result + x.GetRecoverySpan())!);
+        RecoveryInterval = completedPhases.Aggregate(
+            TimeInterval.Zero,
+            (result, x) => (result + x.GetRecoveryInterval())!
+        );
         RecoveryIntervalWithoutFinal =
-            RecoveryInterval - completedPhases.FirstOrDefault(x => x.IsFinal)?.GetRecoverySpan() ?? RecoveryInterval;
+            RecoveryInterval - completedPhases.FirstOrDefault(x => x.IsFinal)?.GetRecoveryInterval()
+            ?? RecoveryInterval;
         Interval = (RideInterval + RecoveryIntervalWithoutFinal)!;
         AverageSpeed = new Speed(totalLength, Interval);
-        Finish = phases.Last().ArriveTime;
+        LastArriveTime = phases.Last().ArriveTime!;
     }
 
-    public Timestamp? Finish { get; }
+    public Timestamp LastArriveTime { get; }
     public Speed AverageSpeed { get; }
     public TimeInterval Interval { get; }
     public TimeInterval RideInterval { get; }

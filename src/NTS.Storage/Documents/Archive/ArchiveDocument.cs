@@ -1,15 +1,15 @@
 ﻿using Not.Domain;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
+using NTS.Storage.Documents.Archive.Models;
 using NTS.Storage.Documents.Countries;
-using NTS.Storage.Documents.EnduranceEvents.Models;
 using NTS.Storage.Documents.Officials;
 
-namespace NTS.Storage.Documents.EnduranceEvents;
+namespace NTS.Storage.Documents.Archive;
 
-public class EnduranceEventDocument : Document
+public class ArchiveDocument : Document
 {
-    public EnduranceEventDocument(
+    public ArchiveDocument(
         EnduranceEvent enduranceEvent,
         IEnumerable<Official> officials,
         IEnumerable<Ranklist> ranklists
@@ -22,7 +22,7 @@ public class EnduranceEventDocument : Document
         StartDay = enduranceEvent.EventSpan.StartDay;
         EndDay = enduranceEvent.EventSpan.EndDay;
         Officials = officials.Select(x => new OfficialDocument(x)).ToArray();
-        Ranklists = ranklists.Select(x => new RanklistModel(x)).ToArray();
+        Ranklists = ranklists.Select(x => new RanklistDocumentModel(x)).ToArray();
     }
 
     public CountryDocument Country { get; init; }
@@ -31,10 +31,5 @@ public class EnduranceEventDocument : Document
     public DateTimeOffset StartDay { get; init; }
     public DateTimeOffset EndDay { get; init; }
     public OfficialDocument[] Officials { get; init; }
-    public RanklistModel[] Ranklists { get; init; }
-
-    public EnduranceEvent ToDomain()
-    {
-        return new EnduranceEvent(Id, Country.ToDomain(), City, Location ?? "", StartDay, EndDay, null, null, null); // TODO: fix for FEI
-    }
+    public RanklistDocumentModel[] Ranklists { get; init; }
 }
