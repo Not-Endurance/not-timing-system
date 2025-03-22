@@ -76,9 +76,8 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
         _stamp = timestamp._stamp;
     }
 
-    Timestamp(TimeSpan timeSpan) : this(DateTimeOffset.Now.Add(timeSpan))
-    {
-    }
+    Timestamp(TimeSpan timeSpan)
+        : this(DateTimeOffset.Now.Add(timeSpan)) { }
 
     public Timestamp(DateTimeOffset dateTimeOffset)
     {

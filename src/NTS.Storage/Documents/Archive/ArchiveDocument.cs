@@ -1,15 +1,19 @@
 ﻿using Not.Domain;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
-using NTS.Storage.Documents.Countries;
 using NTS.Storage.Documents.Archive.Models;
+using NTS.Storage.Documents.Countries;
 using NTS.Storage.Documents.Officials;
 
 namespace NTS.Storage.Documents.Archive;
 
 public class ArchiveDocument : Document
 {
-    public ArchiveDocument(EnduranceEvent enduranceEvent, IEnumerable<Official> officials, IEnumerable<Ranklist> ranklists)
+    public ArchiveDocument(
+        EnduranceEvent enduranceEvent,
+        IEnumerable<Official> officials,
+        IEnumerable<Ranklist> ranklists
+    )
         : base(enduranceEvent.Id)
     {
         Country = new CountryDocument(enduranceEvent.PopulatedPlace.Country);
