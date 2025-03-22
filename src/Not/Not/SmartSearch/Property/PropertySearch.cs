@@ -37,7 +37,7 @@ internal abstract class PropertySearch<T, TValue> : SearchBase<T>
         }
         catch (InvalidSearchTermException)
         {
-            return Enumerable.Empty<T>();
+            return [];
         }
     }
 }

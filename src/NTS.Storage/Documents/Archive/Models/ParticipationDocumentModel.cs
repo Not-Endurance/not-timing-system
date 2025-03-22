@@ -1,20 +1,26 @@
 ﻿using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
 
 namespace NTS.Storage.Documents.Archive.Models;
 
 public class ParticipationDocumentModel
 {
-    public ParticipationDocumentModel(Participation participation)
+    public static ParticipationDocumentModel Create(Participation participation)
     {
-        Competition = new CompetitionDocumentModel(participation.Competition);
-        Combination = new CombinationDocumentModel(participation.Combination);
-        Phases = participation.Phases.Select(p => new PhaseDocumentModel(p)).ToArray();
-        Eliminated = participation.Eliminated == null ? null : new EliminatedDocumentModel(participation.Eliminated);
+        var total = participation.GetTotal();
+
+        return new ParticipationDocumentModel
+        {
+            Competition = CompetitionDocumentModel.Create(participation.Competition),
+            Combination = CombinationDocumentModel.Create(participation.Combination),
+            Phases = participation.Phases.Select(PhaseDocumentModel.Create).ToArray(),
+            Total = total == null ? null : TotalDocumentModel.Create(total),
+            Eliminated = participation.Eliminated == null ? null : EliminatedDocumentModel.Create(participation.Eliminated),
+        };
     }
 
-    public CompetitionDocumentModel Competition { get; init; }
-    public CombinationDocumentModel Combination { get; init; }
-    public PhaseDocumentModel[] Phases { get; init; }
+    public CompetitionDocumentModel Competition { get; init; } = default!;
+    public CombinationDocumentModel Combination { get; init; } = default!;
+    public PhaseDocumentModel[] Phases { get; init; } = default!;
+    public TotalDocumentModel? Total { get; init; }
     public EliminatedDocumentModel? Eliminated { get; init; }
 }

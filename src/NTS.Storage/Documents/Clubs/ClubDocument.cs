@@ -1,18 +1,20 @@
-﻿using Not.Random;
-using NTS.Domain.Aggregates;
+﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.Documents.Clubs;
 
 public class ClubDocument : Document
 {
-    public ClubDocument(IClub club)
-        : base(club.Id)
+    public static ClubDocument Create(IClub club)
     {
-        Name = club.Name;
+        return new ClubDocument
+        {
+            Id = club.Id,
+            Name = club.Name,
+        };
     }
 
-    public string Name { get; init; }
+    public string Name { get; init; } = default!;
 
     public Club ToDomain()
     {

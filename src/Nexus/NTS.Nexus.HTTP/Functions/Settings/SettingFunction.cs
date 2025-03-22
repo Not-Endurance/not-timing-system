@@ -28,10 +28,10 @@ public class SettingFunction : FunctionBase<SettingFunction>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var setting = requestBody.FromJson<Setting>();
-        var document = new SettingDocument(setting);
+        var document = SettingDocument.Create(setting);
         await _settings.Create(document);
 
-        return new OkObjectResult($"Inserted {setting}");
+        return new OkObjectResult($"Inserted {setting}"); 
     }
 
     [Function("settings-update")]
@@ -43,7 +43,7 @@ public class SettingFunction : FunctionBase<SettingFunction>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var setting = requestBody.FromJson<Setting>();
-        var document = new SettingDocument(setting);
+        var document = SettingDocument.Create(setting);
         await _settings.Update(document);
 
         return new OkObjectResult($"Updated {setting}");

@@ -5,31 +5,35 @@ namespace NTS.Storage.Documents.Archive.Models;
 
 public class PhaseDocumentModel
 {
-    public PhaseDocumentModel(Phase phase)
+    public static PhaseDocumentModel Create(Phase phase)
     {
-        Gate = phase.Gate;
-        Length = phase.Length;
-        MaxRecovery = phase.MaxRecovery;
-        Rest = phase.Rest;
-        Ruleset = phase.Ruleset;
-        IsFinal = phase.IsFinal;
-        StartTime = phase.StartTime;
-        ArriveTime = phase.ArriveTime;
-        PresentTime = phase.PresentTime;
-        RepresentTime = phase.RepresentTime;
-        IsReinspectionRequested = phase.IsReinspectionRequested;
-        IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested;
-        RequiredInspectionTime = phase.GetRequiredInspectionTime();
-        OutTime = phase.GetOutTime();
-        LoopInterval = phase.GetLoopInterval();
-        PhaseInterval = phase.GetPhaseInterval();
-        RecoveryInterval = phase.GetRecoveryInterval();
-        AverageLoopSpeed = phase.GetAverageLoopSpeed();
-        AveragePhaseSpeed = phase.GetAveragePhaseSpeed();
-        AverageSpeed = phase.GetAverageSpeed();
+        return new PhaseDocumentModel
+        {
+            Gate = phase.Gate,
+            Length = phase.Length,
+            MaxRecovery = phase.MaxRecovery,
+            Rest = phase.Rest,
+            Ruleset = phase.Ruleset,
+            IsFinal = phase.IsFinal,
+            StartTime = phase.StartTime,
+            ArriveTime = phase.ArriveTime,
+            PresentTime = phase.PresentTime,
+            RepresentTime = phase.RepresentTime,
+            IsReinspectionRequested = phase.IsReinspectionRequested,
+            IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested,
+            RequiredInspectionTime = phase.GetRequiredInspectionTime(),
+            OutTime = phase.GetOutTime(),
+            LoopInterval = phase.GetLoopInterval(),
+            PhaseInterval = phase.GetPhaseInterval(),
+            RecoveryInterval = phase.GetRecoveryInterval(),
+            AverageLoopSpeed = phase.GetAverageLoopSpeed(),
+            AveragePhaseSpeed = phase.GetAveragePhaseSpeed(),
+            AverageSpeed = phase.GetAverageSpeed(),
+            IsComplete = phase.IsComplete(),
+        };
     }
 
-    public string Gate { get; init; }
+    public string Gate { get; init; } = default!;
     public double Length { get; init; }
     public int MaxRecovery { get; init; }
     public int? Rest { get; init; }
@@ -49,4 +53,5 @@ public class PhaseDocumentModel
     public double? AverageLoopSpeed { get; init; }
     public double? AveragePhaseSpeed { get; init; }
     public double? AverageSpeed { get; init; }
+    public bool IsComplete { get; init; }
 }

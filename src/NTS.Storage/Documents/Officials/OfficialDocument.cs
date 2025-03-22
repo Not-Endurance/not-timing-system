@@ -5,15 +5,18 @@ namespace NTS.Storage.Documents.Officials;
 
 public class OfficialDocument : Document
 {
-    public OfficialDocument(Official official)
-        : base(official.Id)
+    public static OfficialDocument Create(Official official)
     {
-        Names = official.Person.Names;
-        Role = official.Role;
+        return new OfficialDocument
+        {
+            Id = official.Id,
+            Names = official.Person.Names,
+            Role = official.Role,
+        };
     }
 
-    public string[] Names { get; init; }
-    public OfficialRole Role { get; init; }
+    public string[] Names { get; init; } = [];
+    public OfficialRole Role { get; init; } = default!;
 
     public Official ToDomain()
     {

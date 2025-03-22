@@ -6,10 +6,10 @@ namespace NTS.Storage.Documents;
 
 public abstract class Document : IIdentifiable, ITenantAware, IAggregateRoot
 {
-    public Document(int id)
-    {
-        Id = id;
-    }
+    //public Document(int id)
+    //{
+    //    Id = id;
+    //}
 
     public int Id { get; init; }
     public string TenantId { get; set; } = "nts";

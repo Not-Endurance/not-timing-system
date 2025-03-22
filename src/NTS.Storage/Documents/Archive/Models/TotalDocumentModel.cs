@@ -4,14 +4,17 @@ namespace NTS.Storage.Documents.Archive.Models;
 
 public class TotalDocumentModel
 {
-    public TotalDocumentModel(Total total)
+    public static TotalDocumentModel Create(Total total)
     {
-        LastArriveTime = total.LastArriveTime.ToDateTimeOffset();
-        AverageSpeed = total.AverageSpeed.ToDouble();
-        Interval = total.Interval.ToTimeSpan();
-        RideInterval = total.RideInterval.ToTimeSpan();
-        RecoveryInterval = total.RecoveryInterval.ToTimeSpan();
-        RecoveryIntervalWithoutFinal = total.RecoveryIntervalWithoutFinal.ToTimeSpan();
+        return new TotalDocumentModel
+        {
+            LastArriveTime = total.LastArriveTime.ToDateTimeOffset(),
+            AverageSpeed = total.AverageSpeed.ToDouble(),
+            Interval = total.Interval.ToTimeSpan(),
+            RideInterval = total.RideInterval.ToTimeSpan(),
+            RecoveryInterval = total.RecoveryInterval.ToTimeSpan(),
+            RecoveryIntervalWithoutFinal = total.RecoveryIntervalWithoutFinal.ToTimeSpan(),
+        };
     }
 
     public DateTimeOffset LastArriveTime { get; init; }
