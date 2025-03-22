@@ -31,7 +31,7 @@ public class SettingFunction : FunctionBase<SettingFunction>
         var document = SettingDocument.Create(setting);
         await _settings.Create(document);
 
-        return new OkObjectResult($"Inserted {setting}"); 
+        return new OkObjectResult($"Inserted {setting}");
     }
 
     [Function("settings-update")]

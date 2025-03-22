@@ -9,7 +9,11 @@ namespace NTS.Storage.Documents.Archive;
 
 public class ArchiveDocument : Document
 {
-    public static ArchiveDocument Create(EnduranceEvent enduranceEvent, IEnumerable<Official> officials, IEnumerable<Ranklist> ranklists)
+    public static ArchiveDocument Create(
+        EnduranceEvent enduranceEvent,
+        IEnumerable<Official> officials,
+        IEnumerable<Ranklist> ranklists
+    )
     {
         return new ArchiveDocument
         {

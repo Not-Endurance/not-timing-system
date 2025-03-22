@@ -15,11 +15,7 @@ public class EliminatedDocumentModel
                 FtqCodes = ftq.FtqCodes.ToArray(),
             };
         }
-        return new EliminatedDocumentModel
-        {
-            Code = eliminated.Code,
-            Reason = eliminated.Complement,
-        };
+        return new EliminatedDocumentModel { Code = eliminated.Code, Reason = eliminated.Complement };
     }
 
     public string Code { get; init; } = default!;
