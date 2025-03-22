@@ -1,12 +1,11 @@
 ﻿using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
-using NTS.Domain.Objects;
 
-namespace NTS.Storage.Documents.EnduranceEvents.Models;
+namespace NTS.Storage.Documents.Archive.Models;
 
-public class PhaseModel
+public class PhaseDocumentModel
 {
-    public PhaseModel(Phase phase)
+    public PhaseDocumentModel(Phase phase)
     {
         Gate = phase.Gate;
         Length = phase.Length;
@@ -20,6 +19,14 @@ public class PhaseModel
         RepresentTime = phase.RepresentTime;
         IsReinspectionRequested = phase.IsReinspectionRequested;
         IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested;
+        RequiredInspectionTime = phase.GetRequiredInspectionTime();
+        OutTime = phase.GetOutTime();
+        LoopInterval = phase.GetLoopInterval();
+        PhaseInterval = phase.GetPhaseInterval();
+        RecoveryInterval = phase.GetRecoveryInterval();
+        AverageLoopSpeed = phase.GetAverageLoopSpeed();
+        AveragePhaseSpeed = phase.GetAveragePhaseSpeed();
+        AverageSpeed = phase.GetAverageSpeed();
     }
 
     public string Gate { get; init; }
@@ -34,4 +41,12 @@ public class PhaseModel
     public DateTimeOffset? RepresentTime { get; init; }
     public bool IsReinspectionRequested { get; init; }
     public bool IsRequiredInspectionRequested { get; init; }
+    public DateTimeOffset? RequiredInspectionTime { get; init; }
+    public DateTimeOffset? OutTime { get; init; }
+    public TimeSpan? LoopInterval { get; init; }
+    public TimeSpan? PhaseInterval { get; init; }
+    public TimeSpan? RecoveryInterval { get; init; }
+    public double? AverageLoopSpeed { get; init; }
+    public double? AveragePhaseSpeed { get; init; }
+    public double? AverageSpeed { get; init; }
 }
