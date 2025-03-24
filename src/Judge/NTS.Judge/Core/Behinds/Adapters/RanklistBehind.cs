@@ -6,6 +6,7 @@ using Not.Notify;
 using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Blazor.Core.Rankings;
 
@@ -35,6 +36,7 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
     }
 
     public Ranklist? Ranklist { get; private set; }
+    public RanklistDocument? Document { get; private set; }
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
@@ -44,6 +46,15 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
             return false;
         }
         Ranklist = new Ranklist(ranking);
+        var enduranceEvent = await _events.Read(0);
+        if (enduranceEvent == null)
+        {
+            NotifyHelper.Warn("Event is not started yet");
+            return false;
+        }
+        var officials = await _officials.ReadAll();
+        var ranklistDocument = new RanklistDocument(Ranklist,enduranceEvent, officials);
+        Document = ranklistDocument;
         return true;
     }
 
