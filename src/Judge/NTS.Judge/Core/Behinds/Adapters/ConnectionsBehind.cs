@@ -24,6 +24,8 @@ public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IConnecti
 
     protected override Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
+        ServerConnectionStatus = RpcConnectionStatus.Disconnected;
+        IsServerConnected = false;
         var result = _connections.Any();
         return Task.FromResult(result);
     }
@@ -49,6 +51,7 @@ public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IConnecti
     void HandleRpcErrors(object? sender, RpcError rpcError)
     {
         ServerConnectionStatus = RpcConnectionStatus.Disconnected;
+        IsServerConnected = ServerConnectionStatus.Equals(RpcConnectionStatus.Connected);
         NotifyHelper.Error(rpcError.Exception);
         EmitChange();
     }
