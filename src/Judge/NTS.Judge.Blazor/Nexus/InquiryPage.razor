@@ -1,0 +1,99 @@
+﻿@attribute [Route(INQUIRY_PAGE)]
+@inherits NComponent
+
+<NContent Title="Inquiry performances">
+    
+    <Main>
+        <NSelect T="InquiryType?" @bind-Value="Type" />
+
+        <MudStack Row="true">
+            @if (Type == InquiryType.HorseId || Type == InquiryType.AthleteId || Type == InquiryType.OfficialId)
+            {
+                <MudNumericField @bind-Value="SearchInt" Label="@Localizer.Get("Search by ID:")" />
+                if (SearchInt != null)
+                {
+                    <NButtonPrimary OnClick="x => Behind.Search(SearchInt.Value)" Text="Search" />
+                }
+            }
+            else
+            {
+                <MudTextField @bind-Value="SearchTerm" Label="@Localizer.Get("Search by name:")" />
+                if (SearchTerm != null)
+                {
+                    <NButtonPrimary OnClick="x => Behind.Search(SearchTerm!)" Text="Search" />
+                }
+            }
+
+        </MudStack>
+        
+        @if (Behind.Match != null)
+        {
+            <MudTextField Value="Behind.Match.ToString()" />
+
+            <MudSimpleTable>
+
+                <MudTr>
+                    <MudTh>
+                        @Localizer.Get("Date")
+                    </MudTh>
+                    <MudTh>
+                        @Localizer.Get("Rank")
+                    </MudTh>
+                    <MudTh>
+                        @Localizer.Get("Event")
+                    </MudTh>
+                    <MudTh>
+                        @Localizer.Get("Stages")
+                    </MudTh>
+                    <MudTh>
+                        @Localizer.Get("Arrive")
+                    </MudTh>
+                    <MudTh>
+                        @Localizer.Get("Ride")
+                    </MudTh>
+                    <MudTh>
+                        @Localizer.Get("Speed")
+                    </MudTh>
+                </MudTr>
+
+                @foreach (var archive in Behind.Records)
+                {
+                    var entry = archive.Ranklists
+                        .OrderBy(x => x.Type == CompetitionType.Star)
+                        .ThenBy(x => x.Type == CompetitionType.Championship)
+                        .SelectMany(x => x.Entries)
+                        .First(y => y.Participation.Combination.Athlete.Id == Behind.Match.Combination.Athlete.Id);
+                    var total = entry.Participation.Total;
+                    <MudTr>
+                        <MudTd>
+                            @Behind.Match.Phases.First().StartTime!.Value.Date
+                        </MudTd>
+                        <MudTd>
+                            @(entry.IsNotRanked ? Localizer.Get("Not ranked") : entry.Rank)
+                        </MudTd>
+                        <MudTd>
+                            @entry.Participation.Competition.Name
+                        </MudTd>
+                        <MudTd>
+                            @entry.Participation.Phases.Where(x => x.IsComplete).Count() / @entry.Participation.Phases.Count()
+                        </MudTd>
+                        <MudTd>
+                            @total?.LastArriveTime
+                        </MudTd>
+                        <MudTd>
+                            @total?.RideInterval
+                        </MudTd>
+                        <MudTd>
+                            @total?.AverageSpeed
+                        </MudTd>
+                    </MudTr>
+                }
+
+            </MudSimpleTable>
+        }
+        
+    </Main>
+
+</NContent>
+
+

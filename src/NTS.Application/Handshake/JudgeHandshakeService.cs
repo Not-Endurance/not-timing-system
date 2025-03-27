@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using Not.Injection;
-using static NTS.Relay.ACL.Constants;
+using static NTS.Application.ApplicationConstants;
 
 namespace NTS.Application.Handshake;
 

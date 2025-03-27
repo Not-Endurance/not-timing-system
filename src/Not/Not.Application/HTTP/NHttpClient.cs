@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using Microsoft.Extensions.Logging;
 using Not.Serialization.JSON;
 
@@ -36,6 +35,13 @@ public class NHttpClient
             _logger.LogError(ex, "Error during GET request to {Url}", url);
             throw;
         }
+    }
+
+    public async Task<T?> GetJson<T>(string endpoint)
+        where T : class
+    {
+        var contents = await Get(endpoint);
+        return contents?.FromJson<T>();
     }
 
     public async Task<string> Delete(string endpoint)

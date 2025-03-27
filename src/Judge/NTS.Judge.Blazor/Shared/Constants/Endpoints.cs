@@ -21,4 +21,5 @@ public static class Endpoints
     public const string STARTLIST_PAGE = "/startlist";
     public const string HANDOUTS_PAGE = "/handouts";
     public const string SETTINGS_PAGE = "/settings";
+    public const string INQUIRY_PAGE = "/inquiry";
 }
