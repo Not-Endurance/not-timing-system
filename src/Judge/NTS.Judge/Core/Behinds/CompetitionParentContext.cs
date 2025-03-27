@@ -7,14 +7,11 @@ namespace NTS.Judge.Core.Behinds;
 
 public class CompetitionParentContext : BehindContext<Competition>, ICrudParent<Phase>, ICrudParent<Participation>
 {
-    readonly ObservableList<Phase> _phases = new();
-    readonly ObservableList<Participation> _participations = new();
-
     public CompetitionParentContext(IRepository<Competition> competitionRepository)
         : base(competitionRepository) { }
 
-    ObservableList<Phase> ICrudParent<Phase>.Children => _phases;
-    ObservableList<Participation> ICrudParent<Participation>.Children => _participations;
+    IReadOnlyList<Phase> ICrudParent<Phase>.Children => Entity!.Phases;
+    IReadOnlyList<Participation> ICrudParent<Participation>.Children => Entity!.Participations;
 
     public async Task Add(Phase child)
     {
