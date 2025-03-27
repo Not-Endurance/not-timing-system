@@ -3,8 +3,8 @@
 
 @inherits NComponent
 
-<MudStack Class="mt-3 mb-n3" AlignItems="AlignItems.Center" Row="false">
-	<MudInputLabel Class="mt-2 font-size-12">@Localizer.Get("Connection Status")</MudInputLabel>
+<MudStack Class="mt-2 mb-n3" AlignItems="AlignItems.Center" Row="false">
+	<MudInputLabel Class="mt-2 font-size-12">@Localizer.Get("CONNECTION STATUS:")</MudInputLabel>
 	@if(ConnectionsBehind.IsServerConnected)
 	{
 		<MudInputLabel Class="mt-2 font-size-12">@Localizer.Get("Connected to Server")</MudInputLabel>
