@@ -23,9 +23,7 @@ public class ConnectionsClient : RpcClient, IConnectionsRpcClient
         );
     }
 
-    public override void RunAtStartup()
-    {
-    }
+    public override void RunAtStartup() { }
 
     public Task ReceiveRemoteConnectionId(string connectionId)
     {

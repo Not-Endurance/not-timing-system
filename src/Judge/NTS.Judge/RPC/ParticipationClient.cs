@@ -12,10 +12,7 @@ public class ParticipationClient : RpcClient, IParticipationRpcClient
 {
     readonly ISnapshotProcessor _snapshotProcessor;
 
-    public ParticipationClient(
-        IRpcSocket socket,
-        ISnapshotProcessor snapshotProcessor
-    )
+    public ParticipationClient(IRpcSocket socket, ISnapshotProcessor snapshotProcessor)
         : base(socket)
     {
         _snapshotProcessor = snapshotProcessor;
