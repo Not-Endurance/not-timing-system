@@ -6,16 +6,15 @@ using NTS.Judge.Core.Behinds;
 
 namespace NTS.Judge.Setup.Adapters;
 
-public class PhaseBehind : CrudBehind<Phase, PhaseFormModel>, ICrudReflection<Loop>
+public class PhaseBehind : CrudChildBehind<Phase, PhaseFormModel>, ICrudReflection<Loop>
 {
     public PhaseBehind(
         IRepository<Phase> phase,
         CompetitionParentContext parentContext,
         IEnumerable<ICrudReflection<Phase>> reflections
     )
-        : base(phase, reflections)
+        : base(phase, reflections, parentContext)
     {
-        AttachParent(parentContext);
     }
 
     protected override Phase CreateEntity(PhaseFormModel model)

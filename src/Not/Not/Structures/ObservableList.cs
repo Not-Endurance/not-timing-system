@@ -10,6 +10,15 @@ public class ObservableList<T> : IReadOnlyList<T>
     readonly object _lock = new();
     Dictionary<int, T> _dictionary = [];
 
+    public ObservableList()
+    {
+    }
+
+    public ObservableList(IEnumerable<T> items)
+    {
+        _dictionary = items.ToDictionary(x => x.Id, x => x);
+    }
+
     public T this[int index]
     {
         get
