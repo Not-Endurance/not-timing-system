@@ -3,6 +3,7 @@
 @inherits NComponent
 
 <MudNavMenu>
+
     <MudNavGroup Title="@Localizer.Get("Setup")" Expanded="true">
         <NNavLink Endpoint="@ENDURANCE_EVENT_PAGE" Text="Endurance Event" Match="NavLinkMatch.All" />
         <NNavLink Endpoint="@ATHLETES_HORSES_PAGE" Text="Athletes & Horses" />
@@ -11,13 +12,18 @@
         <NNavLink Endpoint="@CLUBS_PAGE" Text="Clubs" />
         <NNavLink Endpoint="@SETTINGS_PAGE" Text="Settings" />
     </MudNavGroup>
+
     <MudNavGroup Title="@Localizer.Get("Dashboard")" Expanded="true">
         <NNavLink Endpoint="@DASHBOARD_PAGE" Text="Dashboard" />
         <NNavLink Endpoint="@STARTLIST_PAGE" Text="Startlist"/>
         <NNavLink Endpoint="@RANKLIST_PAGE" Text="Ranklist" />
         <NNavLink Endpoint="@HANDOUTS_PAGE" Text="Handouts" />
     </MudNavGroup>
+
+    <NNavLink Endpoint="@INQUIRY_PAGE" Text="Inquiry" />
+
     <MudNavGroup Title="Demos">
         <MudNavLink Href="/localization-demo" Match="NavLinkMatch.Prefix">Localization</MudNavLink>
+    
     </MudNavGroup>
 </MudNavMenu>

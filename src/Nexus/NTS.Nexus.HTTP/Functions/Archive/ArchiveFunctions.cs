@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Serialization.JSON;
 using NTS.Domain.Core.Aggregates;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.EnduranceEvents;
+using NTS.Storage.Documents.Archive;
 
 namespace NTS.Nexus.HTTP.Functions.Archive;
 
@@ -27,9 +27,9 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var entry = requestBody.FromJson<ArchiveEntry>();
-        var document = new EnduranceEventDocument(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
+        var document = ArchiveDocument.Create(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
 
-        if (await _archive.Read(entry.Id) != null)
+        if (await _archive.Read(entry.Id) != null) // TODO: investigate this not working
         {
             await _archive.Delete(entry.Id);
         }
@@ -58,8 +58,8 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
     {
         LogInformation(request);
 
-        var performances = await _archive.GetPerformances(horseId);
+        var archives = await _archive.GetPerformances(horseId);
 
-        return new OkObjectResult(performances);
+        return new OkObjectResult(archives);
     }
 }

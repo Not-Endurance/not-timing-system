@@ -54,4 +54,9 @@ public record Speed : DomainObject
     {
         return $"{_speed:0.00}";
     }
+
+    public double ToDouble()
+    {
+        return _speed;
+    }
 }

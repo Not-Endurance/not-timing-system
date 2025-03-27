@@ -1,6 +1,5 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
-using Not.Serialization.JSON;
 using NTS.Domain.Settings;
 
 namespace NTS.Judge.HTTP;
@@ -15,8 +14,7 @@ public class SettingHttpRepository : HttpRepository<Setting>, ISettingRepository
         try
         {
             var url = BuildUrl(accountId);
-            var contents = await Client.Get(url);
-            return contents?.FromJson<Setting>();
+            return await Client.GetJson<Setting>(url);
         }
         catch (Exception ex)
         {

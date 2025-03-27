@@ -10,7 +10,7 @@ public partial class NContent
             ? GRID_MAX_WIDTH
             : GRID_MAX_WIDTH - RightBarXS;
 
-    [Parameter]
+    [Parameter, EditorRequired]
     public string Title { get; set; } = default!;
 
     [Parameter]

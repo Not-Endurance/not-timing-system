@@ -2,7 +2,9 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using Not.Injection;
 using NTS.Nexus.HTTP.Mongo;
 using NTS.Storage.Documents;
@@ -23,5 +25,6 @@ BsonClassMap.RegisterClassMap<Document>(x =>
     x.AutoMap();
     x.MapIdField(x => x.Id);
 });
+BsonSerializer.RegisterSerializer(typeof(DateTimeOffset), new DateTimeOffsetSerializer(BsonType.DateTime));
 
 builder.Build().Run();
