@@ -90,7 +90,11 @@ public static class ParticipationAndRankingrFactory
         return (participations, rankingEntriesByCategory);
     }
 
-    static void AddRanking(Dictionary<AthleteCategory, List<RankingEntry>> dictionary, AthleteCategory category, RankingEntry entry)
+    static void AddRanking(
+        Dictionary<AthleteCategory, List<RankingEntry>> dictionary,
+        AthleteCategory category,
+        RankingEntry entry
+    )
     {
         if (dictionary.TryGetValue(category, out List<RankingEntry>? value))
         {
