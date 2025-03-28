@@ -16,7 +16,7 @@ public class CompetitionParentContext : BehindContext<Competition>, ICrudParent<
 
     ObservableList<Phase> ICrudParent<Phase>.Children => _phases;
     ObservableList<Participation> ICrudParent<Participation>.Children => _participations;
-    
+
     public override void SetParent(IParent parent)
     {
         if (parent is not Competition competition)

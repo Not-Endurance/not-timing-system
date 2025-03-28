@@ -10,9 +10,7 @@ public class ObservableList<T> : IReadOnlyList<T>
     readonly object _lock = new();
     Dictionary<int, T> _dictionary = [];
 
-    public ObservableList()
-    {
-    }
+    public ObservableList() { }
 
     public ObservableList(IEnumerable<T> items)
     {

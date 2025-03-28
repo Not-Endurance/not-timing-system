@@ -14,9 +14,7 @@ public class OfficialBehind : CrudChildBehind<Official, OfficialFormModel>
         EventParentContext enduraceEventContext,
         IEnumerable<ICrudReflection<Official>> dependants
     )
-        : base(official, dependants, enduraceEventContext)
-    {
-    }
+        : base(official, dependants, enduraceEventContext) { }
 
     protected override Official CreateEntity(OfficialFormModel model)
     {

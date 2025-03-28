@@ -13,9 +13,7 @@ public class PhaseBehind : CrudChildBehind<Phase, PhaseFormModel>, ICrudReflecti
         CompetitionParentContext parentContext,
         IEnumerable<ICrudReflection<Phase>> reflections
     )
-        : base(phase, reflections, parentContext)
-    {
-    }
+        : base(phase, reflections, parentContext) { }
 
     protected override Phase CreateEntity(PhaseFormModel model)
     {

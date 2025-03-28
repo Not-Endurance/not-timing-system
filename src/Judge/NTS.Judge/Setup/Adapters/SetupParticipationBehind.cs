@@ -7,16 +7,16 @@ using NTS.Judge.Core.Behinds;
 
 namespace NTS.Judge.Setup.Adapters;
 
-public class SetupParticipationBehind : CrudChildBehind<Participation, ParticipationFormModel>, ICrudReflection<Combination>
+public class SetupParticipationBehind
+    : CrudChildBehind<Participation, ParticipationFormModel>,
+        ICrudReflection<Combination>
 {
     public SetupParticipationBehind(
         IRepository<Participation> participations,
         CompetitionParentContext parentContext,
         IEnumerable<ICrudReflection<Participation>> dependants
     )
-        : base(participations, dependants, parentContext)
-    {
-    }
+        : base(participations, dependants, parentContext) { }
 
     protected override Participation CreateEntity(ParticipationFormModel model)
     {
