@@ -15,7 +15,11 @@ public abstract class CrudChildBehind<T, TModel> : CrudBehind<T, TModel>
     /// Attach CRUD parent context to be updated with changes in the state of <typeparamref name="T"/>
     /// <br/> CRUD treats parents as permissinve - delete/updates are not validated by the parent
     /// </summary>
-    protected CrudChildBehind(IRepository<T> repository, IEnumerable<ICrudReflection<T>> reflections, ICrudParent<T> parentContext)
+    protected CrudChildBehind(
+        IRepository<T> repository,
+        IEnumerable<ICrudReflection<T>> reflections,
+        ICrudParent<T> parentContext
+    )
         : base(repository, reflections)
     {
         _repository = repository;
