@@ -7,17 +7,14 @@ using NTS.Judge.Core.Behinds;
 
 namespace NTS.Judge.Setup.Adapters;
 
-public class OfficialBehind : CrudBehind<Official, OfficialFormModel>
+public class OfficialBehind : CrudChildBehind<Official, OfficialFormModel>
 {
     public OfficialBehind(
         IRepository<Official> official,
         EventParentContext enduraceEventContext,
         IEnumerable<ICrudReflection<Official>> dependants
     )
-        : base(official, dependants)
-    {
-        AttachParent(enduraceEventContext);
-    }
+        : base(official, dependants, enduraceEventContext) { }
 
     protected override Official CreateEntity(OfficialFormModel model)
     {

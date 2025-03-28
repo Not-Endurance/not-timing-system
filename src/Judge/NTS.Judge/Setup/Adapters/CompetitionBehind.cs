@@ -7,7 +7,7 @@ using NTS.Judge.Core.Behinds;
 
 namespace NTS.Judge.Setup.Adapters;
 
-public class CompetitionBehind : CrudBehind<Competition, CompetitionFormModel>
+public class CompetitionBehind : CrudChildBehind<Competition, CompetitionFormModel>
 {
     readonly ICrudParent<Phase> _phaseParent;
     readonly ICrudParent<Participation> _participationParent;
@@ -19,11 +19,10 @@ public class CompetitionBehind : CrudBehind<Competition, CompetitionFormModel>
         ICrudParent<Participation> participationParent,
         IEnumerable<ICrudReflection<Competition>> dependants
     )
-        : base(competitions, dependants)
+        : base(competitions, dependants, parentContext)
     {
         _phaseParent = phaseParent;
         _participationParent = participationParent;
-        AttachParent(parentContext);
     }
 
     protected override Competition CreateEntity(CompetitionFormModel model)

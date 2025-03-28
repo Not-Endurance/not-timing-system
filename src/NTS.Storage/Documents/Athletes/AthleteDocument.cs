@@ -12,6 +12,7 @@ public class AthleteDocument : Document
     {
         return new AthleteDocument
         {
+            Id = athlete.Id,
             FeiId = athlete.FeiId,
             Names = athlete.Names,
             Category = athlete.Category,
