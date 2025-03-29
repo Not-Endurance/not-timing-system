@@ -1,19 +1,18 @@
 ﻿using Not.Blazor.Ports;
-using Not.Localization;
 
 namespace Not.Blazor.Components;
 
 public class NComponent : ComponentBase
 {
-    [Inject]
-    protected ILocalizer Localizer { get; set; } = default!;
-
     [Parameter]
     public string? Style { get; set; }
 
     [Parameter]
     public string? Class { get; set; }
 
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    
     public bool IsInitialized { get; private set; } = true;
 
     protected async Task Observe(IObservableBehind observable, params IEnumerable<object> arguments)

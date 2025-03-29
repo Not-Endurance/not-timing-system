@@ -37,7 +37,7 @@
         @foreach (var phase in Phases ?? Enumerable.Empty<Phase>())
         {
             <tr>
-                <MudTooltip Text="@Localizer.Get("Edit times")" Inline="false" RootStyle="width:inherit;">
+                <MudTooltip Text="@Edit_times_string" Inline="false" RootStyle="width:inherit;">
                     <MudButton Variant="Variant.Text" OnClick="() => ShowUpdate(phase)">@phase.Gate</MudButton>
                 </MudTooltip>
 

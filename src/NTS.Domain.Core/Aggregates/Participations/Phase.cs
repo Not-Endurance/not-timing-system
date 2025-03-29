@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+﻿using Not.Domain.Base;
 using Not.Domain.Exceptions;
-using Not.Localization;
 using NTS.Domain.Core.StaticOptions;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
@@ -59,7 +57,7 @@ public class Phase : AggregateRoot
     // TODO: settings - Add setting for separate final. This is useful for some events such as Shumen where we need separate detection for the actual final
     bool _isSeparateFinish = false;
 
-    [JsonConstructor]
+    [Newtonsoft.Json.JsonConstructor]
     Phase(
         int id,
         string gate,
@@ -223,9 +221,9 @@ public class Phase : AggregateRoot
 
     public override string ToString()
     {
-        var arrive = $"{LocalizationHelper.Get("ARR")}:{ArriveTime}";
-        var present = $"{LocalizationHelper.Get("IN")}:{PresentTime}";
-        var complete = IsComplete() ? "complete" : "";
+        var arrive = $"{ARR_string}:{ArriveTime}";
+        var present = $"{IN_string}:{PresentTime}";
+        var complete = IsComplete() ? complete_string : "";
         return Combine(Gate, arrive, present, complete);
     }
 

@@ -6,7 +6,7 @@
 @inherits NForm<CombinationFormModel>
 
 <EditForm Model="Model">
-    <MudNumericField @ref="_numberField" @bind-Value="Model.Number" Min="0" Label="@Localizer.Get("Combination Number")" />
+    <MudNumericField @ref="_numberField" @bind-Value="Model.Number" Min="@((int?)0)" Label="@Combination_Number_string" />
 
     <NAutocomplete @ref="_athleteField" @bind-Value="Model.Athlete" Label="Athlete" Search="SearchAthletes" />
 

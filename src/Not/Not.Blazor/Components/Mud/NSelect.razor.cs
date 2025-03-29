@@ -1,9 +1,10 @@
 using MudBlazor;
+using Not.Blazor.CRUD.Forms.Validation;
 using Not.Structures;
 
 namespace Not.Blazor.Components;
 
-public partial class NSelect<T>
+public partial class NSelect<T> : NBindableComponent<T>, IMudBaseInputWrapper<T>
 {
     static NotListModel<T> _empty = NotListModel.Empty<T>();
 
@@ -16,7 +17,7 @@ public partial class NSelect<T>
     [Parameter]
     public string Placeholder { get; set; } = default!;
 
-    public MudBaseInput<T?> MudBaseInput { get; private set; } = default!;
+    public MudBaseInput<T> MudBaseInput { get; private set; } = default!;
 
     protected override void OnInitialized()
     {

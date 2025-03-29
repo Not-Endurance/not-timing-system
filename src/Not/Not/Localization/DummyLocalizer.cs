@@ -1,9 +1,14 @@
-﻿namespace Not.Localization;
+﻿using Microsoft.Extensions.Localization;
 
-public class DummyLocalizer : LocalizerBase
+namespace Not.Localization;
+
+public class DummyLocalizer : IStringLocalizer
 {
-    protected override string GetLocalizedValue(string key)
+    public LocalizedString this[string name] => new(name, name);
+    public LocalizedString this[string name, params object[] arguments] => new(name, string.Format(name, arguments));
+
+    public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
     {
-        return key;
+        throw new NotImplementedException();
     }
 }

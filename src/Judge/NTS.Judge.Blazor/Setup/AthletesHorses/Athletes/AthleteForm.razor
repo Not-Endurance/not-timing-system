@@ -7,10 +7,9 @@
 @inherits NForm<AthleteFormModel>
 
 <EditForm Model="Model">
-    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Localizer.Get("Name")" />
+    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
 
-    <MudTextField @ref="_feiIdField" @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Localizer.Get(OPTIONAL_FEI_ID)"
-        Variant="Variant.Text" Margin="Margin.Dense" />
+    <MudTextField @ref="_feiIdField" @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Required_only_for_FEI_export_string" Variant="Variant.Text" Margin="Margin.Dense" />
 
     <NAutocomplete T="Country" @ref="_countryField" @bind-Value="Model.Country" Label="@nameof(Athlete.Country)" Search="Countries.Search" />
 

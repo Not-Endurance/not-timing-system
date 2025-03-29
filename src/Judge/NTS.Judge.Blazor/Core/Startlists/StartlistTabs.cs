@@ -13,7 +13,7 @@ public abstract class StartlistTabs : NComponent
     {
         foreach (var start in starts)
         {
-            var tabHeader = $"{Localizer.Get("Stage")} {start.PhaseNumber}";
+            var tabHeader = $"{Stage_string} {start.PhaseNumber}";
             if (!StartlistsByStage.Keys.Any(t => t == tabHeader))
             {
                 StartlistsByStage.Add(tabHeader, []);

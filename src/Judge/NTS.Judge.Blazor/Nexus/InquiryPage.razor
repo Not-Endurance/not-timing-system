@@ -9,7 +9,7 @@
         <MudStack Row="true">
             @if (Type == InquiryType.HorseId || Type == InquiryType.AthleteId || Type == InquiryType.OfficialId)
             {
-                <MudNumericField @bind-Value="SearchInt" Label="@Localizer.Get("Search by ID:")" />
+                <MudNumericField @bind-Value="SearchInt" Label="@Search_by_ID_colon_string" />
                 if (SearchInt != null)
                 {
                     <NButtonPrimary OnClick="x => Behind.Search(SearchInt.Value)" Text="Search" />
@@ -17,7 +17,7 @@
             }
             else
             {
-                <MudTextField @bind-Value="SearchTerm" Label="@Localizer.Get("Search by name:")" />
+                <MudTextField @bind-Value="SearchTerm" Label="@Search_by_name_colon_string" />
                 if (SearchTerm != null)
                 {
                     <NButtonPrimary OnClick="x => Behind.Search(SearchTerm!)" Text="Search" />
@@ -34,25 +34,25 @@
 
                 <MudTr>
                     <MudTh>
-                        @Localizer.Get("Date")
+                        @Date_string
                     </MudTh>
                     <MudTh>
-                        @Localizer.Get("Rank")
+                        @Rank_string
                     </MudTh>
                     <MudTh>
-                        @Localizer.Get("Event")
+                        @Event_string
                     </MudTh>
                     <MudTh>
-                        @Localizer.Get("Stages")
+                        @Stages_string
                     </MudTh>
                     <MudTh>
-                        @Localizer.Get("Arrive")
+                        @Arrive_string
                     </MudTh>
                     <MudTh>
-                        @Localizer.Get("Ride")
+                        @Ride_string
                     </MudTh>
                     <MudTh>
-                        @Localizer.Get("Speed")
+                        @Speed_string
                     </MudTh>
                 </MudTr>
 
@@ -69,7 +69,7 @@
                             @Behind.Match.Phases.First().StartTime!.Value.Date
                         </MudTd>
                         <MudTd>
-                            @(entry.IsNotRanked ? Localizer.Get("Not ranked") : entry.Rank)
+                            @(entry.IsNotRanked ? @Not_ranked_string : entry.Rank)
                         </MudTd>
                         <MudTd>
                             @entry.Participation.Competition.Name

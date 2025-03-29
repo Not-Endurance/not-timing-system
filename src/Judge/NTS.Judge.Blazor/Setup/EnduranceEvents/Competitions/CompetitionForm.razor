@@ -6,15 +6,15 @@
 @inherits NForm<CompetitionFormModel>;
 
 <EditForm Model="Model">
-    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Localizer.Get("Name")" />
+    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
 
     <NSelect @ref="_rulesetField" Label="Ruleset" @bind-Value="Model.Ruleset" Items="_competitionRules" />
 
     <NSelect @ref="_typeField" Label="Type" @bind-Value="Model.Type" Items="_competitionTypes" />
 
-    <MudDatePicker @ref="_dayField" @bind-Date="Model.Day" Label="@Localizer.Get("Date")" ImmediateText="true"/>
+    <MudDatePicker @ref="_dayField" @bind-Date="Model.Day" Label="@Date_string" ImmediateText="true"/>
 
-    <MudTimePicker @ref="_timeField" @bind-Time="Model.Time" Label="@Localizer.Get("Time")" ImmediateText="true"/>
+    <MudTimePicker @ref="_timeField" @bind-Time="Model.Time" Label="@Time_string" ImmediateText="true"/>
 
     <NSwitch @bind-Value="Model.UseCompulsoryThreshold" Label="Use automatic CRI" />
 

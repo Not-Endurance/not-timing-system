@@ -1,0 +1,330 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="debel" xml:space="preserve">
+    <value>fat</value>
+  </data>
+  <data name="Kur {0}" xml:space="preserve">
+    <value>Dick {0}</value>
+  </data>
+  <data name="My dick Yanko" xml:space="preserve">
+    <value>My dick Yanko</value>
+  </data>
+  <data name="TEST_WITH__VALUE_C" xml:space="preserve">
+    <value>Test with {0} value</value>
+  </data>
+  <data name="TEST" xml:space="preserve">
+    <value>test</value>
+  </data>
+  <data name="hash_string" xml:space="preserve">
+  <value>hash</value>
+  </data>
+    <data name="X_string" xml:space="preserve">
+    <value>X</value>
+  </data>
+    <data name="Create_string" xml:space="preserve">
+    <value>Create</value>
+  </data>
+    <data name="Update_string" xml:space="preserve">
+    <value>Update</value>
+  </data>
+    <data name="Print_string" xml:space="preserve">
+    <value>Print</value>
+  </data>
+    <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
+    <value>No  have been created for this event</value>
+  </data>
+    <data name="Date_string" xml:space="preserve">
+    <value>Date</value>
+  </data>
+    <data name="Time_string" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="recovery_string" xml:space="preserve">
+    <value>recovery</value>
+  </data>
+    <data name="km_string" xml:space="preserve">
+    <value>km</value>
+  </data>
+    <data name="rest_string" xml:space="preserve">
+    <value>rest</value>
+  </data>
+    <data name="ARR_string" xml:space="preserve">
+    <value>ARR</value>
+  </data>
+    <data name="IN_string" xml:space="preserve">
+    <value>IN</value>
+  </data>
+    <data name="complete_string" xml:space="preserve">
+    <value>complete</value>
+  </data>
+    <data name="min_string" xml:space="preserve">
+    <value>min</value>
+  </data>
+    <data name="max_string" xml:space="preserve">
+    <value>max</value>
+  </data>
+    <data name="not_ranked_string" xml:space="preserve">
+    <value>not ranked</value>
+  </data>
+    <data name="km_per_hour_string" xml:space="preserve">
+    <value>km per hour</value>
+  </data>
+    <data name="Min_value_is_1_minute_string" xml:space="preserve">
+    <value>Min value is 1 minute</value>
+  </data>
+    <data name="Distance_cannot_be_zero_or_less_string" xml:space="preserve">
+    <value>Distance cannot be zero or less</value>
+  </data>
+    <data name="Setup_string" xml:space="preserve">
+    <value>Setup</value>
+  </data>
+    <data name="Dashboard_string" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+    <data name="Endurance_Event_string" xml:space="preserve">
+    <value>Endurance Event</value>
+  </data>
+    <data name="Athletes_and_Horses_string" xml:space="preserve">
+    <value>Athletes and Horses</value>
+  </data>
+    <data name="Combinations_string" xml:space="preserve">
+    <value>Combinations</value>
+  </data>
+    <data name="Clubs_string" xml:space="preserve">
+    <value>Clubs</value>
+  </data>
+    <data name="Startlist_string" xml:space="preserve">
+    <value>Startlist</value>
+  </data>
+    <data name="Ranklist_string" xml:space="preserve">
+    <value>Ranklist</value>
+  </data>
+    <data name="Handouts_string" xml:space="preserve">
+    <value>Handouts</value>
+  </data>
+    <data name="Inquiry_string" xml:space="preserve">
+    <value>Inquiry</value>
+  </data>
+    <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
+    <value>Failed to Qualify Reason</value>
+  </data>
+    <data name="Select_a_reason_string" xml:space="preserve">
+    <value>Select a reason</value>
+  </data>
+    <data name="Reason_string" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+    <data name="Print_confirmation_string" xml:space="preserve">
+    <value>Print confirmation</value>
+  </data>
+    <data name="Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string" xml:space="preserve">
+    <value>Are handouts printed successfully Yes will delete all handouts This cannot be undone</value>
+  </data>
+    <data name="Edit_times_string" xml:space="preserve">
+    <value>Edit times</value>
+  </data>
+    <data name="Total_string" xml:space="preserve">
+    <value>Total</value>
+  </data>
+    <data name="Finished_at_colon_string" xml:space="preserve">
+    <value>Finished at colon</value>
+  </data>
+    <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
+    <value>Ride time in hours colon</value>
+  </data>
+    <data name="Recovery_in_hours_colon_string" xml:space="preserve">
+    <value>Recovery in hours colon</value>
+  </data>
+    <data name="Incomplete_string" xml:space="preserve">
+    <value>Incomplete</value>
+  </data>
+    <data name="Protocol_string" xml:space="preserve">
+    <value>Protocol</value>
+  </data>
+    <data name="Rank_string" xml:space="preserve">
+    <value>Rank</value>
+  </data>
+    <data name="Combination_string" xml:space="preserve">
+    <value>Combination</value>
+  </data>
+    <data name="Arrive_string" xml:space="preserve">
+    <value>Arrive</value>
+  </data>
+    <data name="Speed_string" xml:space="preserve">
+    <value>Speed</value>
+  </data>
+    <data name="Loop_string" xml:space="preserve">
+    <value>Loop</value>
+  </data>
+    <data name="Recovery_string" xml:space="preserve">
+    <value>Recovery</value>
+  </data>
+    <data name="Stage_string" xml:space="preserve">
+    <value>Stage</value>
+  </data>
+    <data name="Search_by_ID_colon_string" xml:space="preserve">
+    <value>Search by ID colon</value>
+  </data>
+    <data name="Search_by_name_colon_string" xml:space="preserve">
+    <value>Search by name colon</value>
+  </data>
+    <data name="Event_string" xml:space="preserve">
+    <value>Event</value>
+  </data>
+    <data name="Stages_string" xml:space="preserve">
+    <value>Stages</value>
+  </data>
+    <data name="Ride_string" xml:space="preserve">
+    <value>Ride</value>
+  </data>
+    <data name="Not_ranked_string" xml:space="preserve">
+    <value>Not ranked</value>
+  </data>
+    <data name="Name_string" xml:space="preserve">
+    <value>Name</value>
+  </data>
+    <data name="Required_only_for_FEI_export_string" xml:space="preserve">
+    <value>Required only for FEI export</value>
+  </data>
+    <data name="Combination_Number_string" xml:space="preserve">
+    <value>Combination Number</value>
+  </data>
+    <data name="Place_string" xml:space="preserve">
+    <value>Place</value>
+  </data>
+    <data name="Country_string" xml:space="preserve">
+    <value>Country</value>
+  </data>
+    <data name="Connection_Status_string" xml:space="preserve">
+    <value>Connection Status</value>
+  </data>
+    <data name="Connected_string" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+    <data name="Witnesses_connected__colon_string" xml:space="preserve">
+    <value>Witnesses connected  colon</value>
+  </data>
+    <data name="Loops_string" xml:space="preserve">
+    <value>Loops</value>
+  </data>
+    <data name="Settings_string" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+</root>

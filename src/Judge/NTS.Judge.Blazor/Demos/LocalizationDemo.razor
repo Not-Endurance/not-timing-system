@@ -15,5 +15,13 @@
 <p>Locale: @CultureInfo.DefaultThreadCurrentUICulture</p>
 <p>Kaji neshto</p>
 <MudButton @onclick="_ => this.SayPolite()">Polite</MudButton>
-<MudButton @onclick="_ => this.LocalizationTestService.Rude()">Rude</MudButton>
+<MudButton @onclick="Rude">Rude</MudButton>
+@foreach (var item in Strings)
+{
+    <p>@item</p>
+    <MudTextField Value="@item" />
+}
+<MudButton @onclick="Test">Test</MudButton>
+<MudButton @onclick="Test2">Test2</MudButton>
+<p>TEST_WITH__VALUE_C</p>
 <p>@this._polite</p>

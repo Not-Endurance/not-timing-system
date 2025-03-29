@@ -9,10 +9,10 @@ public abstract class ValidationException : ApplicationException
     protected ValidationException(string message)
         : base(message) { }
 
-    protected ValidationException(string property, string message)
-        : this(string.Format(message, property))
+    protected ValidationException(string propertyName, string message)
+        : this(message)
     {
-        Property = property;
+        Property = propertyName;
     }
 
     public string? Property { get; }

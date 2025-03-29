@@ -1,29 +1,20 @@
-﻿using Not.Injection;
+﻿using Microsoft.Extensions.Localization;
+using Not.Injection;
 
 namespace Not.Localization;
 
 public static class LocalizationHelper
 {
-    static readonly ILocalizer LOCALIZER = ServiceLocator.Get<ILocalizer>();
+    static readonly IStringLocalizer LOCALIZER = ServiceLocator.Get<IStringLocalizer>();
 
-    public static string Get(params object[] args)
-    {
-        return LOCALIZER.Get(args);
-    }
-}
+    //public static string Localize(string text)
+    //{
+    //    return LOCALIZER[text];
+    //}
 
-public static class LocalizationExtensions
-{
-    public static string Localize(this string text)
+    public static string LocalizeString(string text, params object[] args)
     {
-        return LocalizationHelper.Get(text);
-    }
-
-    public static IEnumerable<string> Localize(this IEnumerable<string> words)
-    {
-        foreach (var word in words)
-        {
-            yield return LocalizationHelper.Get(word);
-        }
+        var localized = args.Select(x => LOCALIZER[x.ToString() ?? ""]);
+        return string.Format(LOCALIZER[text], localized);
     }
 }

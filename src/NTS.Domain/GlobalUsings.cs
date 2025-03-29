@@ -5,5 +5,6 @@ global using System.Linq;
 global using System.Text;
 global using System.Threading.Tasks;
 global using Not.Domain;
-global using Not.Localization;
 global using NTS.Domain.Objects;
+global using static Not.Localization.NLocalizedStrings;
+global using static NTS.Localization.NtsLocalizedStrings;

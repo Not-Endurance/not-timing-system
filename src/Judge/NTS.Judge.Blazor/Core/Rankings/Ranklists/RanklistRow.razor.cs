@@ -29,7 +29,7 @@ public partial class RanklistRow
 
         if (Entry.IsNotRanked)
         {
-            _rank = Localizer.Get("NOT");
+            _rank = X_string;
             return;
         }
         if (participation.IsEliminated())

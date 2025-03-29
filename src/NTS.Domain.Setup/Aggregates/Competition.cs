@@ -84,7 +84,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
 
     public override string ToString()
     {
-        var type = Type.ToString().Localize();
+        var type = Localize(Type);
         return Combine($"{Name} ({Phases.Count})", type, $"{Start:g}");
     }
 

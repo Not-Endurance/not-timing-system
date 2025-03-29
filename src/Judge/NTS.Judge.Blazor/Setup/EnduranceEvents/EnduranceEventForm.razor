@@ -6,7 +6,7 @@
 @inherits NForm<EnduranceEventFormModel>;
 
 <EditForm Model="Model">
-    <MudTextField @ref="_placeField" @bind-Value="Model.Place" Label="@Localizer.Get(nameof(EnduranceEvent.Place))" />
+    <MudTextField @ref="_placeField" @bind-Value="Model.Place" Label="@Place_string" />
 
-    <NAutocomplete T="Country" @ref="_countryField" @bind-Value="Model.Country" Label="@nameof(Athlete.Country)" Search="Countries.Search" />
+    <NAutocomplete T="Country" @ref="_countryField" @bind-Value="Model.Country" Label="@Country_string" Search="Countries.Search" />
 </EditForm>

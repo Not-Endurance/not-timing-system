@@ -37,9 +37,9 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     protected override void OnInitialized()
     {
         GuardHelper.ThrowIfDefault(UpdateRoute);
-        Name = Localizer.Get(Name ?? $"{typeof(T).Name}s");
+        //Name = Localizer.Get(Name ?? $"{typeof(T).Name}s");
         //TODO: RefactorLocalizer.Get to use string.Format
-        EmptyMessage = Localizer.Get($"No {Name} have been created for this event");
+        EmptyMessage = string.Format(No__have_been_created_for_this_event_string, Name);
     }
 
     protected override async Task OnInitializedAsync()

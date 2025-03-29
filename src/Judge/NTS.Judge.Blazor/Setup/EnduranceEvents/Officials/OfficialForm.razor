@@ -7,7 +7,7 @@
 @inherits NForm<OfficialFormModel>;
 
 <EditForm Model="Model">
-    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Localizer.Get("Name")" />
+    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
 
     <NSelect @ref="_roleField" Items="_roles" @bind-Value="Model.Role" Label="Official Role" Placeholder="Select a role"/>
 </EditForm>
