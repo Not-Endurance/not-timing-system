@@ -5,7 +5,7 @@
 @attribute [Route(RANKLIST_PAGE)]
 @inherits PrintableComponent
 
-<NContent Title="Ranklist" HasContent="Behind.Ranklist != null" EmptyMessage="The Event isn't started yet :)">
+<NContent Title="@Ranklist_string" HasContent="Behind.Ranklist != null" EmptyMessage="@The_Competitions_havent_started_yet_colon_string">
     @* // TODO: Add Start button in EmptyContent *@
 
     <Main>
@@ -39,7 +39,7 @@
                 <NotButtonPrint OnClick="OpenPrintDialog" />
             </MudButtonGroup>
 
-            <NButtonPrimary OnClick="Behind.Archive" Text="Archive" />
+            <NButtonPrimary OnClick="Behind.Archive" Text="@Archive_string" />
         </MudStack>
 
         <RankingMenu Class="mt-4" />

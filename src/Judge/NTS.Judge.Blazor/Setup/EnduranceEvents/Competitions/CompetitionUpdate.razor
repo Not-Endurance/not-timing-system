@@ -8,7 +8,7 @@
 @attribute [Route(COMPETITION_UPDATE)]
 @inherits NComponent
 
-<NContent Title="Configure Competition" HasContent="_competition != null" EmptyMessage="Competition does not exist">
+<NContent Title="@Configure_Competition_string" HasContent="_competition != null">
 
     <Main>
         <NGrid Spacing="8">

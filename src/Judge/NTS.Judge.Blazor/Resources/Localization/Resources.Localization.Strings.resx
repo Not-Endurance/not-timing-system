@@ -243,14 +243,14 @@
     <data name="Total_string" xml:space="preserve">
     <value>Total</value>
   </data>
-    <data name="Finished_at_colon_string" xml:space="preserve">
-    <value>Finished at colon</value>
+  <data name="Finished_at_colon_string" xml:space="preserve">
+    <value>Finished at:</value>
   </data>
-    <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
-    <value>Ride time in hours colon</value>
+  <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
+    <value>Ride time (hrs):</value>
   </data>
-    <data name="Recovery_in_hours_colon_string" xml:space="preserve">
-    <value>Recovery in hours colon</value>
+  <data name="Recovery_in_hours_colon_string" xml:space="preserve">
+    <value>Recovery (hrs):</value>
   </data>
     <data name="Incomplete_string" xml:space="preserve">
     <value>Incomplete</value>
@@ -279,11 +279,11 @@
     <data name="Stage_string" xml:space="preserve">
     <value>Stage</value>
   </data>
-    <data name="Search_by_ID_colon_string" xml:space="preserve">
-    <value>Search by ID colon</value>
+  <data name="Search_by_ID_colon_string" xml:space="preserve">
+    <value>Search by ID:</value>
   </data>
-    <data name="Search_by_name_colon_string" xml:space="preserve">
-    <value>Search by name colon</value>
+  <data name="Search_by_name_colon_string" xml:space="preserve">
+    <value>Search by name:</value>
   </data>
     <data name="Event_string" xml:space="preserve">
     <value>Event</value>
@@ -318,13 +318,79 @@
     <data name="Connected_string" xml:space="preserve">
     <value>Connected</value>
   </data>
-    <data name="Witnesses_connected__colon_string" xml:space="preserve">
-    <value>Witnesses connected  colon</value>
+  <data name="Witnesses_connected__colon_string" xml:space="preserve">
+    <value>Witnesses connected:</value>
   </data>
     <data name="Loops_string" xml:space="preserve">
     <value>Loops</value>
   </data>
     <data name="Settings_string" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="Start_Competitions_string" xml:space="preserve">
+    <value>Start competitions</value>
+  </data>
+  <data name="Configure_Endurance_Event_string" xml:space="preserve">
+    <value>Configure Endurance Event</value>
+  </data>
+  <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
+    <value>Endurance event does not exist yet</value>
+  </data>
+  <data name="Configure_Competition_string" xml:space="preserve">
+    <value>Configure Competition</value>
+  </data>
+  <data name="Configure_Club_string" xml:space="preserve">
+    <value>Configure Club</value>
+  </data>
+  <data name="Configure_Horse_string" xml:space="preserve">
+    <value>Configure Horse</value>
+  </data>
+  <data name="Configure_Athlete_string" xml:space="preserve">
+    <value>Configure Athlete</value>
+  </data>
+  <data name="Configure_Combinations_string" xml:space="preserve">
+    <value>Configure Combinations</value>
+  </data>
+  <data name="Configure_Participation_string" xml:space="preserve">
+    <value>Configure Participant</value>
+  </data>
+  <data name="Configure_Official_string" xml:space="preserve">
+    <value>Configure Official</value>
+  </data>
+  <data name="Configure_Loops_string" xml:space="preserve">
+    <value>Configure Loops</value>
+  </data>
+  <data name="Process_string" xml:space="preserve">
+    <value>Process</value>
+  </data>
+  <data name="Representation_string" xml:space="preserve">
+    <value>Representation</value>
+  </data>
+  <data name="Required_Inspection_string" xml:space="preserve">
+    <value>Required Inspection</value>
+  </data>
+  <data name="Export_string" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Print_Preview_string" xml:space="preserve">
+    <value>Print Preview</value>
+  </data>
+  <data name="Manual_handout_strings" xml:space="preserve">
+    <value>Manaul handout</value>
+  </data>
+  <data name="Yes_string" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Cancel_string" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="The_Competitions_havent_started_yet_colon_string" xml:space="preserve">
+    <value>The Competitions haven't started yet:</value>
+  </data>
+  <data name="Archive_string" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="History_string" xml:space="preserve">
+    <value>History</value>
   </data>
 </root>

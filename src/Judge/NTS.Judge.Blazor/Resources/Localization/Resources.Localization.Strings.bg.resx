@@ -108,7 +108,7 @@
     <value>Разстоянието не може да бъде нула или по-малко</value>
   </data>
   <data name="Setup_string" xml:space="preserve">
-    <value>Настройка</value>
+    <value>Конфигурация</value>
   </data>
   <data name="Dashboard_string" xml:space="preserve">
     <value>Табло</value>
@@ -126,7 +126,7 @@
     <value>Клубове</value>
   </data>
   <data name="Startlist_string" xml:space="preserve">
-    <value>Стартов списък</value>
+    <value>Стартлист</value>
   </data>
   <data name="Ranklist_string" xml:space="preserve">
     <value>Класиране</value>
@@ -159,13 +159,13 @@
     <value>Общо</value>
   </data>
   <data name="Finished_at_colon_string" xml:space="preserve">
-    <value>Приключено в:</value>
+    <value>Финиширал:</value>
   </data>
   <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
-    <value>Време за езда в часове:</value>
+    <value>Време на езда (час):</value>
   </data>
   <data name="Recovery_in_hours_colon_string" xml:space="preserve">
-    <value>Възстановяване в часове:</value>
+    <value>Възстановяване (час):</value>
   </data>
   <data name="Incomplete_string" xml:space="preserve">
     <value>Незавършено</value>
@@ -242,5 +242,70 @@
   <data name="Settings_string" xml:space="preserve">
     <value>Настройки</value>
   </data>
-
+  <data name="Start_Competitions_string" xml:space="preserve">
+    <value>Стартирай състезанията</value>
+  </data>
+  <data name="Configure_Endurance_Event_string" xml:space="preserve">
+    <value>Конфигурирай Събитие</value>
+  </data>
+  <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
+    <value>Събитие не съществува</value>
+  </data>
+  <data name="Configure_Competition_string" xml:space="preserve">
+    <value>Конфигурирай Състезание</value>
+  </data>
+  <data name="Configure_Club_string" xml:space="preserve">
+    <value>Конфигурирай Клуб</value>
+  </data>
+  <data name="Configure_Horse_string" xml:space="preserve">
+    <value>Конфигурирай Кон</value>
+  </data>
+  <data name="Configure_Athlete_string" xml:space="preserve">
+    <value>Конфигурирай Атлет</value>
+  </data>
+  <data name="Configure_Combinations_string" xml:space="preserve">
+    <value>Конфигурирай Комбинация</value>
+  </data>
+  <data name="Configure_Participation_string" xml:space="preserve">
+    <value>Конфигурирай Участник</value>
+  </data>
+  <data name="Configure_Official_string" xml:space="preserve">
+    <value>Конфигурирай Официално лице</value>
+  </data>
+  <data name="Configure_Loops_string" xml:space="preserve">
+    <value>Конфигурирай Обиколка</value>
+  </data>
+  <data name="Process_string" xml:space="preserve">
+    <value>Обработи</value>
+  </data>
+  <data name="Representation_string" xml:space="preserve">
+    <value>Реинспекция</value>
+  </data>
+  <data name="Required_Inspection_string" xml:space="preserve">
+    <value>Задължителна проверка</value>
+  </data>
+  <data name="Export_string" xml:space="preserve">
+    <value>Експорт</value>
+  </data>
+  <data name="Print_Preview_string" xml:space="preserve">
+    <value>Прегледай Печат</value>
+  </data>
+  <data name="Manual_handout_strings" xml:space="preserve">
+    <value>Генерирай печат</value>
+  </data>
+  <data name="Yes_string" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="Cancel_string" xml:space="preserve">
+    <value>Откажи</value>
+  </data>
+  <data name="The_Competitions_havent_started_yet_colon_string" xml:space="preserve">
+    <value>Състезанията не са стартирани:</value>
+  </data>
+  <data name="Archive_string" xml:space="preserve">
+    <value>Архивирай</value>
+  </data>
+  <data name="History_string" xml:space="preserve">
+    <value>История</value>
+  </data>
 </root>

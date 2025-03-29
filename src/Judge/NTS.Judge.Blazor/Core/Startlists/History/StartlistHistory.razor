@@ -6,7 +6,7 @@
 
 @if (Behind.History.Count() != 0)
 {
-    <NHeadline2 Content="History" IsAbsoluteCenter Class="mb-4" />
+    <NHeadline2 Content="@History_string" IsAbsoluteCenter Class="mb-4" />
     <MudTabs PanelClass="px-4 py-6" Elevation="0" Rounded ApplyEffectsToContainer>
         @foreach (var tabHeader in StartlistsByStage.Keys)
         {

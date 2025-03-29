@@ -20,7 +20,10 @@ else
         {
             <MudItem xs="@MainXs">
                 <MudPaper Elevation="3" Class="not-mid-height pa-12">
-                    <NHeadline2 Content="@EmptyMessage" IsAbsoluteCenter />
+                    @if (EmptyMessage != null)
+                    {
+                        <NHeadline2 Content="@EmptyMessage" IsAbsoluteCenter/>
+                    }
 
                     @if (EmptyContent != null)
                     {
