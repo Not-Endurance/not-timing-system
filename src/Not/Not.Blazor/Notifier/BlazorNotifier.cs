@@ -10,32 +10,32 @@ public class BlazorNotifier : ComponentBase
 
     public BlazorNotifier()
     {
-        NotificationEvents.Informed.SubscribeAsync(AddSnack);
-        NotificationEvents.Succeded.SubscribeAsync(AddSnack);
-        NotificationEvents.Warned.SubscribeAsync(AddSnack);
-        NotificationEvents.Failed.SubscribeAsync(AddSnack);
+        NotificationEvents.INFORMED.SubscribeAsync(AddInformationSnack);
+        NotificationEvents.SUCCEDED.SubscribeAsync(AddSuccessSnack);
+        NotificationEvents.WARNED.SubscribeAsync(AddWarningSnack);
+        NotificationEvents.FAILED.SubscribeAsync(AddFailureSnak);
     }
 
     [Inject]
     ISnackbar Snackbar { get; set; } = default!;
 
-    void AddSnack(Information informed)
+    void AddInformationSnack(string message)
     {
-        Snackbar.Add(informed.Message, Severity.Info);
+        Snackbar.Add(message, Severity.Info);
     }
 
-    void AddSnack(Warning warned)
+    void AddWarningSnack(string message)
     {
-        Snackbar.Add(warned.Message, Severity.Warning);
+        Snackbar.Add(message, Severity.Warning);
     }
 
-    void AddSnack(Failure failed)
+    void AddFailureSnak(string message)
     {
-        Snackbar.Add(failed.Message, Severity.Error, config => config.SetVisibleDuration(_failedDuration));
+        Snackbar.Add(message, Severity.Error, config => config.SetVisibleDuration(_failedDuration));
     }
 
-    void AddSnack(Success succeeded)
+    void AddSuccessSnack(string message)
     {
-        Snackbar.Add(succeeded.Message, Severity.Success);
+        Snackbar.Add(message, Severity.Success);
     }
 }
