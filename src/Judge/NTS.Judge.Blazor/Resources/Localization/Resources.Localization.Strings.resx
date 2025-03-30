@@ -495,4 +495,10 @@
   <data name="Rest_time_string" xml:space="preserve">
     <value>Rest time (mins)</value>
   </data>
+  <data name="Text_formatting_failed_This_is_usually_not_critical_failure_string" xml:space="preserve">
+    <value>Text formatting failed. This is usually not a critical failure</value>
+  </data>
+  <data name="Number_string" xml:space="preserve">
+    <value>Number</value>
+  </data>
 </root>
