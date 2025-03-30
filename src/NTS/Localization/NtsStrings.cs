@@ -116,6 +116,7 @@ namespace NTS.Localization
         public static string Rest_time_string => LocalizeString(nameof(Rest_time_string));
         public static string __cannot_be_sooner_than__string => LocalizeString(nameof(__cannot_be_sooner_than__string));
         public static string Number_string => LocalizeString(nameof(Number_string));
+        public static string Category_string => LocalizeString(nameof(Category_string));
     }
 }
 #pragma warning restore NA0004

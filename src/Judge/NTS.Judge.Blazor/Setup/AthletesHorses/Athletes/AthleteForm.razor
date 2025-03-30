@@ -15,5 +15,5 @@
 
     <NAutocomplete @ref="_clubField" @bind-Value="Model.Club" Label="@nameof(Athlete.Club)" />
 
-    <NSelect @ref="_categoryField" T="AthleteCategory" Items="_categories" @bind-Value="Model.Category" Label="Category" />
+    <NSelect @ref="_categoryField" T="AthleteCategory" @bind-Value="Model.Category" Label="@Category_string" />
 </EditForm>

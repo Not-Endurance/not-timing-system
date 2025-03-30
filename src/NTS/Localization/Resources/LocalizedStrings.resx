@@ -318,7 +318,7 @@
     <data name="Loops_string" xml:space="preserve">
     <value>Loops</value>
   </data>
-    <data name="Settings_string" xml:space="preserve">
+  <data name="Settings_string" xml:space="preserve">
     <value>Settings</value>
   </data>
   <data name="Start_Competitions_string" xml:space="preserve">
@@ -503,5 +503,14 @@
   </data>
   <data name="Language_string" xml:space="preserve">
     <value>Language</value>
+  </data>
+  <data name="Category_string" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Senior_string" xml:space="preserve">
+    <value>Senior</value>
+  </data>
+  <data name="Senior" xml:space="preserve">
+    <value>Senior</value>
   </data>
 </root>

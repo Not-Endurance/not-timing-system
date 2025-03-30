@@ -419,4 +419,13 @@
   <data name="Language_string" xml:space="preserve">
     <value>Език</value>
   </data>
+  <data name="Category_string" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="Senior_string" xml:space="preserve">
+    <value>Мъже</value>
+  </data>
+  <data name="Senior" xml:space="preserve">
+    <value>Мъже</value>
+  </data>
 </root>

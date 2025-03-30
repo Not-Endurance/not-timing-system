@@ -1,6 +1,4 @@
-﻿using Not.Reflection;
-using System.ComponentModel;
-using static Not.Localization.LocalizationHelper;
+﻿using static Not.Localization.LocalizationHelper;
 // ReSharper disable InconsistentNaming
 
 #pragma warning disable IDE1006 // Naming Styles
@@ -11,15 +9,7 @@ public static class NStrings
 {
     public static string Localize(Enum value) // TODO: Use DisplayAttribute
     {
-        var type = value.GetType();
-        return
-            ReflectionHelper
-                .GetEnumField(type, value)
-                ?.GetCustomAttributes(typeof(DescriptionAttribute), false)
-                .FirstOrDefault()
-                is not DescriptionAttribute descriptionAttribute
-            ? value.ToString()
-            : descriptionAttribute.Description;
+        return LocalizeEnum(value);
     }
     
     public static string hash_string => LocalizeString("#");
