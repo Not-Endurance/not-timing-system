@@ -1,3 +1,3 @@
 ﻿global using Not.Storage.Stores;
-global using static Not.Localization.NLocalizedStrings;
-global using static NTS.Localization.NtsLocalizedStrings;
+global using static Not.Localization.NStrings;
+global using static NTS.Localization.NtsStrings;

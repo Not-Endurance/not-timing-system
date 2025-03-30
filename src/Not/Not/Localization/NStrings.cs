@@ -7,7 +7,7 @@ using static Not.Localization.LocalizationHelper;
 #pragma warning disable NA0004 // Member spacing rule violation
 namespace Not.Localization;
 
-public static class NLocalizedStrings
+public static class NStrings
 {
     public static string Localize(Enum value) // TODO: Use DisplayAttribute
     {
@@ -21,6 +21,7 @@ public static class NLocalizedStrings
             ? value.ToString()
             : descriptionAttribute.Description;
     }
+    
     public static string hash_string => LocalizeString("#");
     public static string X_string => LocalizeString("X");
     public static string Create_string => LocalizeString(nameof(Create_string));

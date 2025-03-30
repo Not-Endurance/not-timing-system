@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Localization;
 
-namespace Not.Localization;
+namespace Not.Localization.Localizers;
 
 public class DummyLocalizer : IStringLocalizer
 {

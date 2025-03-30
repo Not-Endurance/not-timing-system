@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Not.Domain.Exceptions;
 using Not.Extensions;
-using static Not.Localization.NLocalizedStrings;
+using static Not.Localization.NStrings;
 
 namespace Not.Domain.Base;
 

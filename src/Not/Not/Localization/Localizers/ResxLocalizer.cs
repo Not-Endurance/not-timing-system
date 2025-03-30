@@ -1,14 +1,12 @@
 ﻿using Microsoft.Extensions.Localization;
-using Not.Injection;
-using NTS.Localization.Resources;
 
-namespace NTS.Judge.Blazor.Shared.Services;
+namespace Not.Localization.Localizers;
 
-public class ResxLocalizer : IStringLocalizer, ISingleton
+public class ResxLocalizer<T> : IStringLocalizer
 {
-    readonly IStringLocalizer<LocalizedStrings> _stringLocalizer;
+    readonly IStringLocalizer<T> _stringLocalizer;
 
-    public ResxLocalizer(IStringLocalizer<LocalizedStrings> stringLocalizer)
+    public ResxLocalizer(IStringLocalizer<T> stringLocalizer)
     {
         _stringLocalizer = stringLocalizer;
     }

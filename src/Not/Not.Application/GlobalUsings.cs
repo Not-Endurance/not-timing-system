@@ -1,1 +1,1 @@
-﻿global using static Not.Localization.NLocalizedStrings;
+﻿global using static Not.Localization.NStrings;

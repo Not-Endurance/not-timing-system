@@ -4,8 +4,9 @@
 @using NTS.Domain;
 @using System.Globalization;
 @using Microsoft.Extensions.Localization;
+@using NTS.Localization.Resources
 
-@inject IStringLocalizer<Strings> StringLocalizer;
+@inject IStringLocalizer<LocalizedStrings> StringLocalizer;
 @inject ILocalizationTestService LocalizationTestService;
 
 <h1>This is localization test including exception handling</h1>

@@ -6,7 +6,7 @@ using NTS.Application;
 
 namespace NTS.Judge.Blazor;
 
-public static class JudgeBlazorInjection
+public static class JudgeBlazorServiceCollectionExtensions
 {
     public static IServiceCollection ConfigureJudgeBlazor(
         this IServiceCollection services,
@@ -14,7 +14,7 @@ public static class JudgeBlazorInjection
     )
     {
         services
-            .AddLocalization(x => x.ResourcesPath = "Resources/Localization")
+            .ConfigureNts(configuration)
             .AddNotBlazor(configuration)
             .AddRpcSocket(RpcProtocol.Http, "localhost", ApplicationConstants.RPC_PORT, ApplicationConstants.JUDGE_HUB);
 

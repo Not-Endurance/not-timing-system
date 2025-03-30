@@ -9,4 +9,10 @@
     <ProjectReference Include="..\Not\Not\Not.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Update="Localization\Resources\LocalizedStrings.*.resx">
+      <DependentUpon>LocalizedStrings.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
