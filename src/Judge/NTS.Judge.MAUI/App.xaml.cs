@@ -8,7 +8,6 @@ public partial class App : Microsoft.Maui.Controls.Application
 {
     public App(IEnumerable<IStartupInitializer> initializers)
     {
-        Thread.CurrentThread.CurrentUICulture = new CultureInfo("bg-BG");
         InitializeComponent();
 
         MainPage = new MainPage();

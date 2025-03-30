@@ -6,6 +6,8 @@
 
     <NAutocomplete @ref="_countryField" @bind-Value="Model.Country" Label="@Country_string" />
     
+    <NAutocomplete @bind-Value="Model.LanguageCountry" @bind-Value:after="SetUiCulture" Label="@Language_string" Search="LanguageSeeker.SearchLocalizedCountries" />
+    
     @* <NSelect @ref="_detectionModeField" @bind-Value="Model.DetectionMode" Label="Detection Mode" /> *@
 
 </EditForm>

@@ -501,4 +501,7 @@
   <data name="Number_string" xml:space="preserve">
     <value>Number</value>
   </data>
+  <data name="Language_string" xml:space="preserve">
+    <value>Language</value>
+  </data>
 </root>

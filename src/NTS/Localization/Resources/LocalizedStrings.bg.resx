@@ -416,4 +416,7 @@
   <data name="Number_string" xml:space="preserve">
     <value>Номер</value>
   </data>
+  <data name="Language_string" xml:space="preserve">
+    <value>Език</value>
+  </data>
 </root>
