@@ -7,53 +7,6 @@ namespace NTS.Domain.Core.Aggregates.Participations;
 
 public class Phase : AggregateRoot
 {
-    public static Phase ImportFromEMS(
-        double length,
-        int maxRecovery,
-        int rest,
-        CompetitionRuleset competitionType,
-        bool isFinal,
-        TimeSpan? compulsoryThreshold,
-        Timestamp startTimestamp,
-        DateTime? arriveTime,
-        DateTime? inspectTime,
-        DateTime? reinspectTime,
-        bool isReinspectionRequested,
-        bool isRequiredInspectionRequested,
-        bool isCompulsoryRequiredInspectionRequested
-    )
-    {
-        var phase = new Phase(
-            length,
-            maxRecovery,
-            rest,
-            competitionType,
-            isFinal,
-            compulsoryThreshold,
-            startTimestamp.ToDateTimeOffset()
-        )
-        {
-            StartTime = startTimestamp,
-        };
-        if (arriveTime != null)
-        {
-            phase.ArriveTime = new Timestamp(arriveTime.Value);
-        }
-        if (inspectTime != null)
-        {
-            phase.PresentTime = new Timestamp(inspectTime.Value);
-        }
-        if (reinspectTime != null)
-        {
-            phase.RepresentTime = new Timestamp(reinspectTime.Value);
-        }
-        phase.IsReinspectionRequested = isReinspectionRequested;
-        phase.IsRequiredInspectionRequested = isRequiredInspectionRequested;
-        phase.IsRequiredInspectionCompulsory = isCompulsoryRequiredInspectionRequested;
-
-        return phase;
-    }
-
     // TODO: settings - Add setting for separate final. This is useful for some events such as Shumen where we need separate detection for the actual final
     bool _isSeparateFinish = false;
 
@@ -145,9 +98,9 @@ public class Phase : AggregateRoot
             SnapshotType.Stage => Arrive(snapshot),
             SnapshotType.Final => Finish(snapshot),
             SnapshotType.Automatic => Automatic(snapshot),
-            _ => guardUnknownSnapshot(snapshot),
+            _ => GuardUnknownSnapshot(snapshot),
         };
-        static SnapshotResult guardUnknownSnapshot(Snapshot snapshot)
+        static SnapshotResult GuardUnknownSnapshot(Snapshot snapshot)
         {
             var message = $"Invalid snapshot '{snapshot.GetType()}'";
             throw GuardHelper.Exception(message);
@@ -160,15 +113,19 @@ public class Phase : AggregateRoot
         {
             if (state.ArriveTime < state.StartTime)
             {
-                throw new DomainException(nameof(ArriveTime), "Arrive Time cannot be sooner than Start Time");
+                throw new DomainPropertyException(nameof(ArriveTime), __cannot_be_sooner_than__string, Arrival_string, StartTime);
             }
             if (state.PresentTime < state.StartTime)
             {
-                throw new DomainException(nameof(PresentTime), "Inspect Time cannot be sooner than Start Time");
+                throw new DomainPropertyException(nameof(PresentTime), __cannot_be_sooner_than__string, Presentation_string, StartTime);
             }
             if (state.RepresentTime < state.ArriveTime)
             {
-                throw new DomainException(nameof(RepresentTime), "Reinspect Time cannot be sooner than Start Time");
+                throw new DomainPropertyException(nameof(RepresentTime), __cannot_be_sooner_than__string, Presentation_string, RepresentTime);
+            }
+            if (state.RepresentTime < state.PresentTime)
+            {
+                throw new DomainPropertyException(nameof(RepresentTime), __cannot_be_sooner_than__string, Representation_string, PresentTime);
             }
         }
         StartTime = Timestamp.Create(state.StartTime);
@@ -196,7 +153,7 @@ public class Phase : AggregateRoot
         }
         if (IsRequiredInspectionCompulsory)
         {
-            throw new DomainException("Required inspection is compulsory");
+            throw new DomainException(Required_inspection_is_compulsory_string);
         }
         IsRequiredInspectionRequested = true;
     }
@@ -209,7 +166,7 @@ public class Phase : AggregateRoot
         }
         if (RepresentTime != null)
         {
-            throw new DomainException("Cannot disable Reinspection because time of Reinspection is already present");
+            throw new DomainException(Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string);
         }
         IsReinspectionRequested = false;
     }
@@ -351,14 +308,14 @@ public class Phase : AggregateRoot
         }
         if (snapshot.Timestamp <= ArriveTime)
         {
-            throw new DomainException($"Presentation time cannot be before arrival '{ArriveTime}'");
+            throw new DomainException(__cannot_be_sooner_than__string, Presentation_string, ArriveTime);
         }
 
         if (IsReinspectionRequested)
         {
             if (snapshot.Timestamp <= PresentTime)
             {
-                throw new DomainException($"Representation time cannot be before presentation '{PresentTime}'");
+                throw new DomainException(__cannot_be_sooner_than__string, Representation_string, PresentTime);
             }
             RepresentTime = snapshot.Timestamp;
         }

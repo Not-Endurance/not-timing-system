@@ -1,9 +1,9 @@
 ﻿@using NTS.Domain.Setup.Aggregates
-@using NTS.Judge.Blazor.Setup.EnduranceEvents.Contestants
 @using NTS.Judge.Blazor.Setup.EnduranceEvents.Phases
 @using Not.Blazor.CRUD.Forms.Components
 @using Not.Blazor.Navigation
 @using Not.Blazor.CRUD.Lists
+@using NTS.Judge.Blazor.Setup.EnduranceEvents.Participations
 
 @attribute [Route(COMPETITION_UPDATE)]
 @inherits NComponent
@@ -19,12 +19,12 @@
 
             <MudItem xs="6">
                 @* //TODO: behind creates multiple phases at once. *@
-                <CrudList T="Phase" TModel="PhaseFormModel" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" ParentId="_competition!.Id"/>
+                <CrudList T="Phase" Name="@Phases_string" TModel="PhaseFormModel" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" ParentId="_competition!.Id"/>
             </MudItem>
 
             <MudItem xs="6">
                 @* //TODO: behind creates multiple contestants at once. *@
-                <CrudList T="Participation" TModel="ParticipationFormModel" TForm="ParticipationForm" 
+                <CrudList T="Participation" Name="@Participations_string" TModel="ParticipationFormModel" TForm="ParticipationForm" 
                     UpdateRoute="@PARTICIPATION_UPDATE" ParentId="_competition!.Id" />
             </MudItem>
 

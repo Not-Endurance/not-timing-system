@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms;
 using Not.Blazor.CRUD.Forms.Components;
@@ -26,7 +27,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     [Parameter]
     public int? ParentId { get; set; }
 
-    [Parameter]
+    [Parameter, EditorRequired]
     public string Name { get; set; } = default!;
 
     [Parameter, EditorRequired]

@@ -8,15 +8,15 @@
 <EditForm Model="Model">
     <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
 
-    <NSelect @ref="_rulesetField" Label="Ruleset" @bind-Value="Model.Ruleset" Items="_competitionRules" />
+    <NSelect @ref="_rulesetField" Label="@Competition_Ruleset_string" @bind-Value="Model.Ruleset" Items="_competitionRules" />
 
-    <NSelect @ref="_typeField" Label="Type" @bind-Value="Model.Type" Items="_competitionTypes" />
+    <NSelect @ref="_typeField" Label="@Competition_Type_string" @bind-Value="Model.Type" Items="_competitionTypes" />
 
     <MudDatePicker @ref="_dayField" @bind-Date="Model.Day" Label="@Date_string" ImmediateText="true"/>
 
     <MudTimePicker @ref="_timeField" @bind-Time="Model.Time" Label="@Time_string" ImmediateText="true"/>
 
-    <NSwitch @bind-Value="Model.UseCompulsoryThreshold" Label="Use automatic CRI" />
+    <NSwitch @bind-Value="Model.UseCompulsoryThreshold" Label="@Automatic_CRI_string" />
 
     @if (Model.UseCompulsoryThreshold)
     {

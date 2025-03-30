@@ -37,7 +37,7 @@ public class Loop : AggregateRoot, IAggregateRoot
     {
         if (distance == null || distance.Value <= 0)
         {
-            throw new DomainException(nameof(Distance), Distance_cannot_be_zero_or_less_string);
+            throw new DomainException(Distance_cannot_be_zero_or_less_string, nameof(Distance));
         }
         return distance.Value;
     }

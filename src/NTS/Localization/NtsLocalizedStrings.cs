@@ -1,8 +1,5 @@
-﻿using System;
-using System.ComponentModel;
-using Not.Reflection;
-using static Not.Localization.LocalizationHelper;
-using System.Linq;
+﻿using static Not.Localization.LocalizationHelper;
+// ReSharper disable InconsistentNaming
 
 #pragma warning disable IDE1006 // Naming Styles
 #pragma warning disable IDE0130 // Namespace does not match folder structure
@@ -12,7 +9,6 @@ namespace NTS.Localization
 {
     public static class NtsLocalizedStrings
     {
-        public static readonly string recovery_string = LocalizeString(nameof(recovery_string));
         public static readonly string km_string = LocalizeString(nameof(km_string));
         public static readonly string rest_string = LocalizeString(nameof(rest_string));
         public static readonly string ARR_string = LocalizeString(nameof(ARR_string));
@@ -48,7 +44,7 @@ namespace NTS.Localization
         public static readonly string Protocol_string = LocalizeString(nameof(Protocol_string));
         public static readonly string Rank_string = LocalizeString(nameof(Rank_string));
         public static readonly string Combination_string = LocalizeString(nameof(Combination_string));
-        public static readonly string Arrive_string = LocalizeString(nameof(Arrive_string));
+        public static readonly string Arrival_string = LocalizeString(nameof(Arrival_string));
         public static readonly string Speed_string = LocalizeString(nameof(Speed_string));
         public static readonly string Loop_string = LocalizeString(nameof(Loop_string));
         public static readonly string Recovery_string = LocalizeString(nameof(Recovery_string));
@@ -84,9 +80,41 @@ namespace NTS.Localization
         public static readonly string Representation_string = LocalizeString(nameof(Representation_string));
         public static readonly string Required_Inspection_string = LocalizeString(nameof(Required_Inspection_string));
         public static readonly string Manual_handout_strings = LocalizeString(nameof(Manual_handout_strings));
-        public static readonly string The_Competitions_havent_started_yet_colon_string = LocalizeString(nameof(The_Competitions_havent_started_yet_colon_string));
+        public static readonly string The_Competitions_havent_started_yet_string = LocalizeString(nameof(The_Competitions_havent_started_yet_string));
         public static readonly string Archive_string = LocalizeString(nameof(Archive_string));
         public static readonly string History_string = LocalizeString(nameof(History_string));
+        public static readonly string __cannot_be_sooner_than__string = LocalizeString(nameof(__cannot_be_sooner_than__string));
+        public static readonly string Required_inspection_is_compulsory_string = LocalizeString(nameof(Required_inspection_is_compulsory_string));
+        public static readonly string Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string = LocalizeString(nameof(Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string));
+        public static readonly string Please_provide_reason_to_eliminate_as__ = LocalizeString(nameof(Please_provide_reason_to_eliminate_as__));
+        public static readonly string Select_FTQ_codes = LocalizeString(nameof(Select_FTQ_codes));
+        public static readonly string Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category = LocalizeString(nameof(Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category));
+        public static readonly string Competition_start_cannot_be_in_the_past = LocalizeString(nameof(Competition_start_cannot_be_in_the_past));
+        public static readonly string Official__already_exists = LocalizeString(nameof(Official__already_exists));
+        public static readonly string start_string = LocalizeString(nameof(start_string));
+        public static readonly string Please_select_future_time_string = LocalizeString(nameof(Please_select_future_time_string));
+        public static readonly string Athletes_string = LocalizeString(nameof(Athletes_string));
+        public static readonly string Horses_string = LocalizeString(nameof(Horses_string));
+        public static readonly string Competitions_string = LocalizeString(nameof(Competitions_string));
+        public static readonly string Officials_string = LocalizeString(nameof(Officials_string));
+        public static readonly string Phases_string = LocalizeString(nameof(Phases_string));
+        public static readonly string Participations_string = LocalizeString(nameof(Participations_string));
+        public static readonly string Athlete_string = LocalizeString(nameof(Athlete_string));
+        public static readonly string Horse_string = LocalizeString(nameof(Horse_string));
+        public static readonly string Competition_Ruleset_string = LocalizeString(nameof(Competition_Ruleset_string));
+        public static readonly string Competition_Type_string = LocalizeString(nameof(Competition_Type_string));
+        public static readonly string Automatic_CRI_string = LocalizeString(nameof(Automatic_CRI_string));
+        public static readonly string Official_Role_string = LocalizeString(nameof(Official_Role_string));
+        public static readonly string Select_a_role_string = LocalizeString(nameof(Select_a_role_string));
+        public static readonly string Is_not_ranked_string = LocalizeString(nameof(Is_not_ranked_string));
+        public static readonly string Override_Start_Time_string = LocalizeString(nameof(Override_Start_Time_string));
+        public static readonly string Start_Time_string = LocalizeString(nameof(Start_Time_string));
+        public static readonly string Max_Speed_Penalty_string = LocalizeString(nameof(Max_Speed_Penalty_string));
+        public static readonly string Presentation_string = LocalizeString(nameof(Presentation_string));
+        public static readonly string Loop_distance_string = LocalizeString(nameof(Loop_distance_string));
+        public static readonly string Select_a_loop_string = LocalizeString(nameof(Select_a_loop_string));
+        public static readonly string Recovery_time_string = LocalizeString(nameof(Recovery_time_string));
+        public static readonly string Rest_time_string = LocalizeString(nameof(Rest_time_string));
     }
 }
 #pragma warning restore NA0004

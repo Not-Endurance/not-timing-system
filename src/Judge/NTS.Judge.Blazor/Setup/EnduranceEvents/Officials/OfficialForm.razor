@@ -1,13 +1,9 @@
-﻿@using NTS.Domain.Enums
-@using NTS.Domain.Setup.Aggregates
-@using Not.Blazor.CRUD.Forms.Components
-
-@using Not.Structures
+﻿@using Not.Blazor.CRUD.Forms.Components
 
 @inherits NForm<OfficialFormModel>;
 
 <EditForm Model="Model">
     <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
 
-    <NSelect @ref="_roleField" Items="_roles" @bind-Value="Model.Role" Label="Official Role" Placeholder="Select a role"/>
+    <NSelect @ref="_roleField" Items="_roles" @bind-Value="Model.Role" Label="@Official_Role_string" Placeholder="@Select_a_role_string"/>
 </EditForm>

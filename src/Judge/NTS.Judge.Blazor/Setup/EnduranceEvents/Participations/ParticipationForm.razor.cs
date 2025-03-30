@@ -4,7 +4,7 @@ using Not.Blazor.CRUD.Lists.Ports;
 using Not.Strings;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Contestants;
+namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 
 public partial class ParticipationForm
 {

@@ -1,7 +1,7 @@
 ﻿using Not.Blazor.CRUD.Forms.Ports;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Contestants;
+namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 
 public class ParticipationFormModel : IFormModel<Participation>
 {

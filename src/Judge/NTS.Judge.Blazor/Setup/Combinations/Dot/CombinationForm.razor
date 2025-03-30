@@ -1,16 +1,15 @@
 ﻿@using NTS.Domain.Core.StaticOptions
 @using NTS.Judge.Blazor.Setup.Combinations.RFID
 @using Not.Blazor.CRUD.Forms.Components
-@using Not.Blazor.CRUD.Lists.Ports
 
 @inherits NForm<CombinationFormModel>
 
 <EditForm Model="Model">
     <MudNumericField @ref="_numberField" @bind-Value="Model.Number" Min="@((int?)0)" Label="@Combination_Number_string" />
 
-    <NAutocomplete @ref="_athleteField" @bind-Value="Model.Athlete" Label="Athlete" Search="SearchAthletes" />
+    <NAutocomplete @ref="_athleteField" @bind-Value="Model.Athlete" Label="@Athlete_string" Search="SearchAthletes" />
 
-    <NAutocomplete @ref="_horseField" @bind-Value="Model.Horse" Label="Horse" Search="SearchHorses"/>
+    <NAutocomplete @ref="_horseField" @bind-Value="Model.Horse" Label="@Horse_string" Search="SearchHorses"/>
 
     @if (StaticOption.IsRfidDetectionEnabled() && Model.Number.HasValue)
     {

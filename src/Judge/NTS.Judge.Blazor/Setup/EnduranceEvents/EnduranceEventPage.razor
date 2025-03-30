@@ -1,6 +1,5 @@
 @using NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions
 @using NTS.Judge.Blazor.Setup.EnduranceEvents.Officials
-@using Not.Blazor.CRUD.Forms
 @using NTS.Domain.Setup.Aggregates
 @using Not.Blazor.CRUD.Forms.Components
 @using Not.Blazor.CRUD.Lists
@@ -22,11 +21,11 @@
         <NGrid Spacing="8">
 
             <MudItem xs="6">
-                <CrudList T="Competition" TModel="CompetitionFormModel" TForm="CompetitionForm" UpdateRoute="@COMPETITION_UPDATE" />
+                <CrudList T="Competition" Name="@Competitions_string" TModel="CompetitionFormModel" TForm="CompetitionForm" UpdateRoute="@COMPETITION_UPDATE" />
             </MudItem>
 
             <MudItem xs="6">
-                <CrudList T="Official" TModel="OfficialFormModel" TForm="OfficialForm" UpdateRoute="@OFFICIAL_UPDATE" />
+                <CrudList T="Official" Name="@Officials_string" TModel="OfficialFormModel" TForm="OfficialForm" UpdateRoute="@OFFICIAL_UPDATE" />
             </MudItem>
 
         </NGrid>

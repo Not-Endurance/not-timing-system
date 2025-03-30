@@ -1,6 +1,7 @@
 ﻿using Not.Reflection;
 using System.ComponentModel;
 using static Not.Localization.LocalizationHelper;
+// ReSharper disable InconsistentNaming
 
 #pragma warning disable IDE1006 // Naming Styles
 #pragma warning disable NA0004 // Member spacing rule violation
@@ -20,6 +21,8 @@ public static class NLocalizedStrings
     public static readonly string Print_Preview_string = LocalizeString(nameof(Print_Preview_string));
     public static readonly string Yes_string = LocalizeString(nameof(Yes_string));
     public static readonly string Cancel_string = LocalizeString(nameof(Cancel_string));
+    public static readonly string Field_is_required_string = LocalizeString(nameof(Field_is_required_string));
+    public static readonly string Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection = LocalizeString(nameof(Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection));
 
     public static string Localize(Enum value) // TODO: Use DisplayAttribute
     {

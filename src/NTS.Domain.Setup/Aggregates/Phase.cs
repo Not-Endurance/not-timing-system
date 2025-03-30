@@ -34,7 +34,7 @@ public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
 
     public override string ToString()
     {
-        var recovery = $"{recovery_string}: {Recovery}";
+        var recovery = $"{Recovery_string}: {Recovery}";
         var rest = Rest != null ? $"{rest_string}: {Rest}" : null;
         return Combine(Loop, recovery, rest);
     }
@@ -46,9 +46,9 @@ public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
 
     static int PositiveRecovery(int? minutes)
     {
-        if (minutes == null || minutes.Value <= 0)
+        if (minutes is not > 0)
         {
-            throw new DomainException(nameof(Recovery), Min_value_is_1_minute_string);
+            throw new DomainPropertyException(nameof(Recovery), Min_value_is_1_minute_string);
         }
         return minutes.Value;
     }
@@ -57,7 +57,7 @@ public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
     {
         if (minutes <= 0)
         {
-            throw new DomainException(nameof(Rest), Min_value_is_1_minute_string);
+            throw new DomainPropertyException(nameof(Rest), Min_value_is_1_minute_string);
         }
         return minutes;
     }

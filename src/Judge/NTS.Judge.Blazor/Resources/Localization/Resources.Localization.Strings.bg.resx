@@ -71,9 +71,6 @@
   <data name="Time_string" xml:space="preserve">
     <value>Време</value>
   </data>
-  <data name="recovery_string" xml:space="preserve">
-    <value>възстановяване</value>
-  </data>
   <data name="km_string" xml:space="preserve">
     <value>км</value>
   </data>
@@ -94,9 +91,6 @@
   </data>
   <data name="max_string" xml:space="preserve">
     <value>макс</value>
-  </data>
-  <data name="not_ranked_string" xml:space="preserve">
-    <value>без класиране</value>
   </data>
   <data name="km_per_hour_string" xml:space="preserve">
     <value>км/ч</value>
@@ -165,7 +159,7 @@
     <value>Време на езда (час):</value>
   </data>
   <data name="Recovery_in_hours_colon_string" xml:space="preserve">
-    <value>Възстановяване (час):</value>
+    <value>Възстановяване (час)</value>
   </data>
   <data name="Incomplete_string" xml:space="preserve">
     <value>Незавършено</value>
@@ -179,7 +173,7 @@
   <data name="Combination_string" xml:space="preserve">
     <value>Комбинация</value>
   </data>
-  <data name="Arrive_string" xml:space="preserve">
+  <data name="Arrival_string" xml:space="preserve">
     <value>Пристигане</value>
   </data>
   <data name="Speed_string" xml:space="preserve">
@@ -234,7 +228,7 @@
     <value>Свързан</value>
   </data>
   <data name="Witnesses_connected__colon_string" xml:space="preserve">
-    <value>Свързани свидетели:</value>
+    <value>Witness приложения:</value>
   </data>
   <data name="Loops_string" xml:space="preserve">
     <value>Кръгове</value>
@@ -299,13 +293,121 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>Откажи</value>
   </data>
-  <data name="The_Competitions_havent_started_yet_colon_string" xml:space="preserve">
-    <value>Състезанията не са стартирани:</value>
+  <data name="The_Competitions_havent_started_yet_string" xml:space="preserve">
+    <value>Състезанията не са стартирани</value>
   </data>
   <data name="Archive_string" xml:space="preserve">
     <value>Архивирай</value>
   </data>
   <data name="History_string" xml:space="preserve">
     <value>История</value>
+  </data>
+  <data name="Field_is_required_string" xml:space="preserve">
+    <value>Полето е задължително</value>
+  </data>
+  <data name="Required_inspection_is_compulsory_string" xml:space="preserve">
+    <value>Проверка вече е планирана, защото е конфигурирана като задължителна в състезанието</value>
+  </data>
+  <data name="Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string" xml:space="preserve">
+    <value>Не може да изключим Реинспекция защото време на Реинспекция вече е записано</value>
+  </data>
+  <data name="Presentation_time_cannot_be_before_arrival__" xml:space="preserve">
+    <value>Времето на Инспекция не може да бъде преди времето на пристигане '{0}'</value>
+  </data>
+  <data name="Representation_time_cannot_be_before_presentation__" xml:space="preserve">
+    <value>Времето на Реинспекция на може да бъде преди времето на Инспецкия  '{0}'</value>
+  </data>
+  <data name="Please_provide_reason_to_eliminate_as__" xml:space="preserve">
+    <value>Елиминация '{0}' изисква причина. Въведете причина и опитайте пак</value>
+  </data>
+  <data name="Select_FTQ_codes" xml:space="preserve">
+    <value>Изберете FTQ кодове и опитайте пак</value>
+  </data>
+  <data name="Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category" xml:space="preserve">
+    <value>Атлети участващи в Шампионати не могат да бъдат от категория Младши ездачи</value>
+  </data>
+  <data name="Competition_start_cannot_be_in_the_past" xml:space="preserve">
+    <value>Старт на състезението не може да бъде в миналото</value>
+  </data>
+  <data name="Official__already_exists" xml:space="preserve">
+    <value>Официално лице '{0}' вече съществува</value>
+  </data>
+  <data name="start_string" xml:space="preserve">
+    <value>старт</value>
+  </data>
+  <data name="Please_select_future_time_string" xml:space="preserve">
+    <value>Моля изберете време в бъдещето</value>
+  </data>
+  <data name="Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection" xml:space="preserve">
+    <value>Не може да бъде установена връзка към Нексус сървъра. Някои функции ще бъдат ограничени. Моля проверете интернет връзката си</value>
+  </data>
+  <data name="Athletes_string" xml:space="preserve">
+    <value>Атлети</value>
+  </data>
+  <data name="Horses_string" xml:space="preserve">
+    <value>Коне</value>
+  </data>
+  <data name="Competitions_string" xml:space="preserve">
+    <value>Състезания</value>
+  </data>
+  <data name="Officials_string" xml:space="preserve">
+    <value>Официални лица</value>
+  </data>
+  <data name="Phases_string" xml:space="preserve">
+    <value>Фази</value>
+  </data>
+  <data name="Participations_string" xml:space="preserve">
+    <value>Участници</value>
+  </data>
+  <data name="Athlete_string" xml:space="preserve">
+    <value>Атлет</value>
+  </data>
+  <data name="Horse_string" xml:space="preserve">
+    <value>Кон</value>
+  </data>
+  <data name="Competition_Ruleset_string" xml:space="preserve">
+    <value>Правилник</value>
+  </data>
+  <data name="Competition_Type_string" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="Automatic_CRI" xml:space="preserve">
+    <value>Задължителна инспекция базирана на време на възстановяване</value>
+  </data>
+  <data name="Official_Role_string" xml:space="preserve">
+    <value>Роля на Официално лице</value>
+  </data>
+  <data name="Select_a_role_string" xml:space="preserve">
+    <value>Изберете роля</value>
+  </data>
+  <data name="Is_not_ranked_string" xml:space="preserve">
+    <value>Не е класиран</value>
+  </data>
+  <data name="Override_Start_Time_string" xml:space="preserve">
+    <value>Промени времето на Старт за дадения Участник</value>
+  </data>
+  <data name="Start_Time_string" xml:space="preserve">
+    <value>Време на Старт</value>
+  </data>
+  <data name="Max_Speed_Penalty_string" xml:space="preserve">
+    <value>Наказателно ограничение на Мак Скорост</value>
+  </data>
+  <data name="Presentation_string" xml:space="preserve">
+    <value>Инспекция</value>
+  </data>
+  <data name="__cannot_be_sooner_than__string" xml:space="preserve">
+    <value>'{0}' не може да бъде преди  '{1}'</value>
+  </data>
+  <data name="Loop_distance_string" xml:space="preserve">
+    <value>Дължина на обиколка (км)</value>
+  </data>
+  <data name="Select_a_loop_string" xml:space="preserve">
+    <value>Изберете Обиколка</value>
+  </data>
+  <data name="Recovery_time_string" xml:space="preserve">
+    <value>Време на възстановяване (мин)</value>
+  </data>
+  <data name="Rest_time_string" xml:space="preserve">
+    <value>Време за почивка (мин)</value>
   </data>
 </root>
