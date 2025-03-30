@@ -25,10 +25,15 @@ public static class NotifyHelper
         Warn(validation.Message);
     }
 
+    public static void Error(string message)
+    {
+        NotificationEvents.FAILED.Emit(message);
+    }
+
     public static void Error(Exception exception)
     {
         exception = exception.GetBaseException();
-        var failure = exception.Message + Environment.NewLine + exception.StackTrace?.NTrim(1000);
-        NotificationEvents.FAILED.Emit(failure);
+        var message = exception.Message + Environment.NewLine + exception.StackTrace?.NTrim(1000);
+        Error(message);
     }
 }
