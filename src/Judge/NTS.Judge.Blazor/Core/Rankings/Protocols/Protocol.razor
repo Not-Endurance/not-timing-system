@@ -2,15 +2,23 @@
 
 @inherits NComponent
 
-<NHeadline2 Content="@Document.Header.Title" Class="printable mb-4" />
-<NHeadline2 Content="@_documentSubtitle" Class="printable" />
+<MudItem Class="d-flex flex-row justify-space-around">
+    @* TODO: include a setting which configures the local fedaration's logo *@
+    <MudImage Class="pt-2 printable" Height="115" Width="135" Src="images/logo-bfks.png" />
+    <MudItem Class="d-flex flex-column justify-center">
+        <NHeadline2 Content="@Document.Header.Title" Class="printable mb-4" />
+        <NHeadline2 Content="@_documentSubtitle" Class="printable" />
+    </MudItem>
+    <MudImage Class="pb-5 printable" Height="150" Width="135" Src="images/logo-fei.png" />
+</MudItem>
 
-<MudStack Spacing="2" Row="true" Justify="Justify.Center">
+
+<MudItem Class="d-flex flex-row justify-center mt-n3">
     <MudText Typo="Typo.overline" Style="font-size:20px;" Class="printable">
-        Officials:
+        Official Members:
     </MudText>
-</MudStack>
-<MudStack Row="true" Justify="Justify.Center">
+</MudItem>
+<MudStack Class="mb-4" Row="true" Justify="Justify.Center">
     <MudStack Row="false">
         @if (Document.Header.GroundJuryPresident != null)
         {
