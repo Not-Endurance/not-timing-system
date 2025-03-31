@@ -4,7 +4,7 @@
 @inherits NComponent
 
 <MudStack Class="mt-3 mb-n3" AlignItems="AlignItems.Center" Row="false">
-	<MudInputLabel Class="mt-2 font-size-12">@Connection_Status_string</MudInputLabel>
+	<MudInputLabel Class="mt-2 font-size-12">@Connection_Status_string.ToUpper()</MudInputLabel>
 	@if(ConnectionsBehind.IsServerConnected)
 	{
 		<MudInputLabel Class="mt-2 font-size-12">
@@ -12,7 +12,7 @@
 		</MudInputLabel>
 		
 		<MudInputLabel Class="mt-2 font-size-12">
-			@string.Format(Witnesses_connected__colon_string, ConnectionsBehind.RemoteConnections.Count())
+			@Witnesses_connected__colon_string @ConnectionsBehind.RemoteConnections.Count()
 		</MudInputLabel>
 	}
 	else
