@@ -84,7 +84,10 @@ public record FailedToQualify : Eliminated
     {
         if (codes.Contains(FtqCode.FTC) && string.IsNullOrWhiteSpace(complement))
         {
-            throw new DomainException(Please_provide_reason_to_eliminate_as__, $"{Eliminated.FAILED_TO_QUALIFY} {FtqCode.FTC}");
+            throw new DomainException(
+                Please_provide_reason_to_eliminate_as__,
+                $"{Eliminated.FAILED_TO_QUALIFY} {FtqCode.FTC}"
+            );
         }
     }
 }

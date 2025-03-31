@@ -111,6 +111,6 @@ public class EnduranceEvent : AggregateRoot, IParent<Official>, IParent<Competit
         }
         //TODO: Enum localization
         var roleString = member.Role.GetDescription();
-        throw new DomainPropertyException(nameof(Official.Role),Official__already_exists, roleString);
+        throw new DomainPropertyException(nameof(Official.Role), Official__already_exists, roleString);
     }
 }

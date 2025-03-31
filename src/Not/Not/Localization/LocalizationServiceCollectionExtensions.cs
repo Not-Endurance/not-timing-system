@@ -9,11 +9,9 @@ public static class LocalizationServiceCollectionExtensions
 {
     public static IServiceCollection AddNLocalization<T>(this IServiceCollection services, IConfiguration _)
     {
-        return services
-            .AddLocalization()
-            .AddSingleton<ResxLocalizer<T>>();
+        return services.AddLocalization().AddSingleton<ResxLocalizer<T>>();
     }
-    
+
     public static IServiceCollection AddDummyLocalizer(this IServiceCollection services)
     {
         return services.AddSingleton<IStringLocalizer, DummyLocalizer>();

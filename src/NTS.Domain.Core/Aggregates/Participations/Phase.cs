@@ -113,19 +113,39 @@ public class Phase : AggregateRoot
         {
             if (state.ArriveTime < state.StartTime)
             {
-                throw new DomainPropertyException(nameof(ArriveTime), __cannot_be_sooner_than__string, Arrival_string, StartTime);
+                throw new DomainPropertyException(
+                    nameof(ArriveTime),
+                    __cannot_be_sooner_than__string,
+                    Arrival_string,
+                    StartTime
+                );
             }
             if (state.PresentTime < state.StartTime)
             {
-                throw new DomainPropertyException(nameof(PresentTime), __cannot_be_sooner_than__string, Presentation_string, StartTime);
+                throw new DomainPropertyException(
+                    nameof(PresentTime),
+                    __cannot_be_sooner_than__string,
+                    Presentation_string,
+                    StartTime
+                );
             }
             if (state.RepresentTime < state.ArriveTime)
             {
-                throw new DomainPropertyException(nameof(RepresentTime), __cannot_be_sooner_than__string, Presentation_string, RepresentTime);
+                throw new DomainPropertyException(
+                    nameof(RepresentTime),
+                    __cannot_be_sooner_than__string,
+                    Presentation_string,
+                    RepresentTime
+                );
             }
             if (state.RepresentTime < state.PresentTime)
             {
-                throw new DomainPropertyException(nameof(RepresentTime), __cannot_be_sooner_than__string, Representation_string, PresentTime);
+                throw new DomainPropertyException(
+                    nameof(RepresentTime),
+                    __cannot_be_sooner_than__string,
+                    Representation_string,
+                    PresentTime
+                );
             }
         }
         StartTime = Timestamp.Create(state.StartTime);
@@ -166,7 +186,9 @@ public class Phase : AggregateRoot
         }
         if (RepresentTime != null)
         {
-            throw new DomainException(Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string);
+            throw new DomainException(
+                Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string
+            );
         }
         IsReinspectionRequested = false;
     }

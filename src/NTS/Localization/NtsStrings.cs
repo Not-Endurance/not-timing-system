@@ -19,7 +19,8 @@ namespace NTS.Localization
         public static string not_ranked_string => LocalizeString(nameof(not_ranked_string));
         public static string km_per_hour_string => LocalizeString(nameof(km_per_hour_string));
         public static string Min_value_is_1_minute_string => LocalizeString(nameof(Min_value_is_1_minute_string));
-        public static string Distance_cannot_be_zero_or_less_string => LocalizeString(nameof(Distance_cannot_be_zero_or_less_string));
+        public static string Distance_cannot_be_zero_or_less_string =>
+            LocalizeString(nameof(Distance_cannot_be_zero_or_less_string));
         public static string Setup_string => LocalizeString(nameof(Setup_string));
         public static string Dashboard_string => LocalizeString(nameof(Dashboard_string));
         public static string Endurance_Event_string => LocalizeString(nameof(Endurance_Event_string));
@@ -34,7 +35,10 @@ namespace NTS.Localization
         public static string Select_a_reason_string => LocalizeString(nameof(Select_a_reason_string));
         public static string Reason_string => LocalizeString(nameof(Reason_string));
         public static string Print_confirmation_string => LocalizeString(nameof(Print_confirmation_string));
-        public static string Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string => LocalizeString(nameof(Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string));
+        public static string Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string =>
+            LocalizeString(
+                nameof(Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string)
+            );
         public static string Edit_times_string => LocalizeString(nameof(Edit_times_string));
         public static string Total_string => LocalizeString(nameof(Total_string));
         public static string Finished_at_colon_string => LocalizeString(nameof(Finished_at_colon_string));
@@ -56,18 +60,22 @@ namespace NTS.Localization
         public static string Ride_string => LocalizeString(nameof(Ride_string));
         public static string Not_ranked_string => LocalizeString(nameof(Not_ranked_string));
         public static string Name_string => LocalizeString(nameof(Name_string));
-        public static string Required_only_for_FEI_export_string => LocalizeString(nameof(Required_only_for_FEI_export_string));
+        public static string Required_only_for_FEI_export_string =>
+            LocalizeString(nameof(Required_only_for_FEI_export_string));
         public static string Combination_Number_string => LocalizeString(nameof(Combination_Number_string));
         public static string Place_string => LocalizeString(nameof(Place_string));
         public static string Country_string => LocalizeString(nameof(Country_string));
         public static string Connection_Status_string => LocalizeString(nameof(Connection_Status_string));
         public static string Connected_string => LocalizeString(nameof(Connected_string));
-        public static string Witnesses_connected__colon_string => LocalizeString(nameof(Witnesses_connected__colon_string));
+        public static string Witnesses_connected__colon_string =>
+            LocalizeString(nameof(Witnesses_connected__colon_string));
         public static string Loops_string => LocalizeString(nameof(Loops_string));
         public static string Settings_string => LocalizeString(nameof(Settings_string));
         public static string Start_Competitions_string => LocalizeString(nameof(Start_Competitions_string));
-        public static string Configure_Endurance_Event_string => LocalizeString(nameof(Configure_Endurance_Event_string));
-        public static string Endurance_Event_does_not_exist_yet_string => LocalizeString(nameof(Endurance_Event_does_not_exist_yet_string));
+        public static string Configure_Endurance_Event_string =>
+            LocalizeString(nameof(Configure_Endurance_Event_string));
+        public static string Endurance_Event_does_not_exist_yet_string =>
+            LocalizeString(nameof(Endurance_Event_does_not_exist_yet_string));
         public static string Configure_Competition_string => LocalizeString(nameof(Configure_Competition_string));
         public static string Configure_Club_string => LocalizeString(nameof(Configure_Club_string));
         public static string Configure_Horse_string => LocalizeString(nameof(Configure_Horse_string));
@@ -80,18 +88,27 @@ namespace NTS.Localization
         public static string Representation_string => LocalizeString(nameof(Representation_string));
         public static string Required_Inspection_string => LocalizeString(nameof(Required_Inspection_string));
         public static string Manual_handout_strings => LocalizeString(nameof(Manual_handout_strings));
-        public static string The_Competitions_havent_started_yet_string => LocalizeString(nameof(The_Competitions_havent_started_yet_string));
+        public static string The_Competitions_havent_started_yet_string =>
+            LocalizeString(nameof(The_Competitions_havent_started_yet_string));
         public static string Archive_string => LocalizeString(nameof(Archive_string));
         public static string History_string => LocalizeString(nameof(History_string));
-        public static string Required_inspection_is_compulsory_string => LocalizeString(nameof(Required_inspection_is_compulsory_string));
-        public static string Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string => LocalizeString(nameof(Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string));
-        public static string Please_provide_reason_to_eliminate_as__ => LocalizeString(nameof(Please_provide_reason_to_eliminate_as__));
+        public static string Required_inspection_is_compulsory_string =>
+            LocalizeString(nameof(Required_inspection_is_compulsory_string));
+        public static string Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string =>
+            LocalizeString(nameof(Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string));
+        public static string Please_provide_reason_to_eliminate_as__ =>
+            LocalizeString(nameof(Please_provide_reason_to_eliminate_as__));
         public static string Select_FTQ_codes => LocalizeString(nameof(Select_FTQ_codes));
-        public static string Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category => LocalizeString(nameof(Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category));
-        public static string Competition_start_cannot_be_in_the_past => LocalizeString(nameof(Competition_start_cannot_be_in_the_past));
+        public static string Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category =>
+            LocalizeString(
+                nameof(Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category)
+            );
+        public static string Competition_start_cannot_be_in_the_past =>
+            LocalizeString(nameof(Competition_start_cannot_be_in_the_past));
         public static string Official__already_exists => LocalizeString(nameof(Official__already_exists));
         public static string start_string => LocalizeString(nameof(start_string));
-        public static string Please_select_future_time_string => LocalizeString(nameof(Please_select_future_time_string));
+        public static string Please_select_future_time_string =>
+            LocalizeString(nameof(Please_select_future_time_string));
         public static string Athletes_string => LocalizeString(nameof(Athletes_string));
         public static string Horses_string => LocalizeString(nameof(Horses_string));
         public static string Competitions_string => LocalizeString(nameof(Competitions_string));

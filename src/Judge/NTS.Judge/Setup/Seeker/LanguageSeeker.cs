@@ -12,7 +12,7 @@ public class LanguageSeeker : ILanguageSeeker
     {
         _countrySeeker = countrySeeker;
     }
-    
+
     public async Task<IEnumerable<Country?>> SearchLocalizedCountries(string term)
     {
         var foundCountries = await _countrySeeker.Search(term);
