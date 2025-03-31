@@ -101,7 +101,7 @@ public class Participation : AggregateRoot, IAggregateRoot
         }
         else
         {
-            Phases.Current.DisableReinspection();
+            Phases.Current.DisableRepresentation();
         }
     }
 
