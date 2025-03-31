@@ -17,14 +17,12 @@
 
             <MudSpacer />
 
-            <NHeadline3 Content="NTS v0.2" Style="color:#9ca2b8" />
-
             <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
         </MudAppBar>
 
         <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
             <MudDrawerHeader>
-                <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
+                <NHeadline3 Content="NTS Judge v0.2" Style="color:#9ca2b8" />
             </MudDrawerHeader>
 
             <NavMenu />

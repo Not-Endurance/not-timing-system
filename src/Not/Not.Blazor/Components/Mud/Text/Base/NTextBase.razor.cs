@@ -9,9 +9,6 @@ public partial class NTextBase
             ? "position: absolute; left: 0; width: 100%"
             : "";
 
-    [Inject]
-    ILocalizer Localizer { get; set; } = default!;
-
     [Parameter, EditorRequired]
     public string Content { get; set; } = default!;
 

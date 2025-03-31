@@ -4,13 +4,13 @@
 @inherits MudText
 
 <MudText Align="Align.Center" Typo="Typo" Color="Color" Class="@Class" Style="@(Style + AbsoluteCenterStyle)" >
-    @Localizer.Get(Content)
+    @Content
 </MudText>
 
 @* position:absolute removes the element from the natural stack thus a second identical element issed to preserve vertical layout *@
 @if (IsAbsoluteCenter) 
 {
     <MudText Align="Align.Center" Typo="Typo" Color="Color" Class="Class" Style="@(Style + "visibility:hidden")">
-        @Localizer.Get(Content)
+        @Content
     </MudText>
 }

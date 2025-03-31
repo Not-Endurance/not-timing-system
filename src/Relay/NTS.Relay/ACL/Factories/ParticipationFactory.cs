@@ -16,7 +16,7 @@ public class ParticipationFactory
         var state = new EmsParticipantState
         {
             Number = participation.Combination.Number.ToString(),
-            MaxAverageSpeedInKmPh = (int?)participation.Combination.MinAverageSpeed,
+            MaxAverageSpeedInKmPh = (int?)participation.Combination?.MinAverageSpeed?.ToDouble(),
             Unranked = true, // Cannot be fixed easy because IsNotRanked is on Ranking level. Not necessary in current Witness
         };
         var emsParticipant = new EmsParticipant(athlete, horse, state);

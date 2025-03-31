@@ -1,12 +1,13 @@
-﻿@using NTS.Domain.Setup.Aggregates
-@using Not.Blazor.CRUD.Forms.Components
+﻿@using Not.Blazor.CRUD.Forms.Components
 
 @inherits NForm<SettingFormModel>
 
 <EditForm Model="Model">
 
-    <NAutocomplete @ref="_countryField" @bind-Value="Model.Country" Label="Country" />
-
-    <NSelect @ref="_detectionModeField" @bind-Value="Model.DetectionMode" Label="Detection Mode" />
+    <NAutocomplete @ref="_countryField" @bind-Value="Model.Country" Label="@Country_string" />
+    
+    <NAutocomplete @bind-Value="Model.LanguageCountry" @bind-Value:after="SetUiCulture" Label="@Language_string" Search="LanguageSeeker.SearchLocalizedCountries" />
+    
+    @* <NSelect @ref="_detectionModeField" @bind-Value="Model.DetectionMode" Label="Detection Mode" /> *@
 
 </EditForm>

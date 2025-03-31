@@ -14,20 +14,14 @@ public abstract class BehindContext<T> : ICrudParentContext
         Updater = updater;
     }
 
-    protected IUpdate<T> Updater { get; }
-    public T? Entity { get; set; }
+    public abstract void SetParent(IParent parent);
 
-    protected async Task Persist()
+    protected IUpdate<T> Updater { get; }
+    public T? Entity { get; protected set; }
+
+    public async Task Persist()
     {
         GuardHelper.ThrowIfDefault(Entity);
         await Updater.Update(Entity);
-    }
-
-    public void SetParent(IParent entity)
-    {
-        if (entity is T competition)
-        {
-            Entity = competition;
-        }
     }
 }

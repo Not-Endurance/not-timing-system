@@ -1,0 +1,519 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="debel" xml:space="preserve">
+    <value>fat</value>
+  </data>
+  <data name="Kur {0}" xml:space="preserve">
+    <value>Dick {0}</value>
+  </data>
+  <data name="My dick Yanko" xml:space="preserve">
+    <value>My dick Yanko</value>
+  </data>
+  <data name="TEST_WITH__VALUE_C" xml:space="preserve">
+    <value>Test with {0} value</value>
+  </data>
+  <data name="TEST" xml:space="preserve">
+    <value>test</value>
+  </data>
+  <data name="hash_string" xml:space="preserve">
+  <value>hash</value>
+  </data>
+    <data name="X_string" xml:space="preserve">
+    <value>X</value>
+  </data>
+    <data name="Create_string" xml:space="preserve">
+    <value>Create</value>
+  </data>
+    <data name="Update_string" xml:space="preserve">
+    <value>Update</value>
+  </data>
+    <data name="Print_string" xml:space="preserve">
+    <value>Print</value>
+  </data>
+    <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
+    <value>No  have been created for this event</value>
+  </data>
+    <data name="Date_string" xml:space="preserve">
+    <value>Date</value>
+  </data>
+    <data name="Time_string" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="km_string" xml:space="preserve">
+    <value>km</value>
+  </data>
+    <data name="rest_string" xml:space="preserve">
+    <value>rest</value>
+  </data>
+    <data name="ARR_string" xml:space="preserve">
+    <value>ARR</value>
+  </data>
+    <data name="IN_string" xml:space="preserve">
+    <value>IN</value>
+  </data>
+    <data name="complete_string" xml:space="preserve">
+    <value>complete</value>
+  </data>
+    <data name="min_string" xml:space="preserve">
+    <value>min</value>
+  </data>
+    <data name="max_string" xml:space="preserve">
+    <value>max</value>
+  </data>
+  <data name="km_per_hour_string" xml:space="preserve">
+    <value>km per hour</value>
+  </data>
+    <data name="Min_value_is_1_minute_string" xml:space="preserve">
+    <value>Min value is 1 minute</value>
+  </data>
+    <data name="Distance_cannot_be_zero_or_less_string" xml:space="preserve">
+    <value>Distance cannot be zero or less</value>
+  </data>
+    <data name="Setup_string" xml:space="preserve">
+    <value>Setup</value>
+  </data>
+    <data name="Dashboard_string" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+    <data name="Endurance_Event_string" xml:space="preserve">
+    <value>Endurance Event</value>
+  </data>
+    <data name="Athletes_and_Horses_string" xml:space="preserve">
+    <value>Athletes and Horses</value>
+  </data>
+    <data name="Combinations_string" xml:space="preserve">
+    <value>Combinations</value>
+  </data>
+    <data name="Clubs_string" xml:space="preserve">
+    <value>Clubs</value>
+  </data>
+    <data name="Startlist_string" xml:space="preserve">
+    <value>Startlist</value>
+  </data>
+    <data name="Ranklist_string" xml:space="preserve">
+    <value>Ranklist</value>
+  </data>
+    <data name="Handouts_string" xml:space="preserve">
+    <value>Handouts</value>
+  </data>
+    <data name="Inquiry_string" xml:space="preserve">
+    <value>Inquiry</value>
+  </data>
+    <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
+    <value>Failed to Qualify Reason</value>
+  </data>
+    <data name="Select_a_reason_string" xml:space="preserve">
+    <value>Select a reason</value>
+  </data>
+    <data name="Reason_string" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+    <data name="Print_confirmation_string" xml:space="preserve">
+    <value>Print confirmation</value>
+  </data>
+    <data name="Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string" xml:space="preserve">
+    <value>Are handouts printed successfully Yes will delete all handouts This cannot be undone</value>
+  </data>
+    <data name="Edit_times_string" xml:space="preserve">
+    <value>Edit times</value>
+  </data>
+    <data name="Total_string" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Finished_at_colon_string" xml:space="preserve">
+    <value>Finished at:</value>
+  </data>
+  <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
+    <value>Ride time (hrs):</value>
+  </data>
+  <data name="Recovery_in_hours_colon_string" xml:space="preserve">
+    <value>Recovery (hrs):</value>
+  </data>
+    <data name="Incomplete_string" xml:space="preserve">
+    <value>Incomplete</value>
+  </data>
+    <data name="Protocol_string" xml:space="preserve">
+    <value>Protocol</value>
+  </data>
+    <data name="Rank_string" xml:space="preserve">
+    <value>Rank</value>
+  </data>
+    <data name="Combination_string" xml:space="preserve">
+    <value>Combination</value>
+  </data>
+  <data name="Arrival_string" xml:space="preserve">
+    <value>Arrival</value>
+  </data>
+    <data name="Speed_string" xml:space="preserve">
+    <value>Speed</value>
+  </data>
+    <data name="Loop_string" xml:space="preserve">
+    <value>Loop</value>
+  </data>
+    <data name="Recovery_string" xml:space="preserve">
+    <value>Recovery</value>
+  </data>
+    <data name="Stage_string" xml:space="preserve">
+    <value>Stage</value>
+  </data>
+  <data name="Search_by_ID_colon_string" xml:space="preserve">
+    <value>Search by ID:</value>
+  </data>
+  <data name="Search_by_name_colon_string" xml:space="preserve">
+    <value>Search by name:</value>
+  </data>
+    <data name="Event_string" xml:space="preserve">
+    <value>Event</value>
+  </data>
+    <data name="Stages_string" xml:space="preserve">
+    <value>Stages</value>
+  </data>
+    <data name="Ride_string" xml:space="preserve">
+    <value>Ride</value>
+  </data>
+    <data name="Not_ranked_string" xml:space="preserve">
+    <value>Not ranked</value>
+  </data>
+    <data name="Name_string" xml:space="preserve">
+    <value>Name</value>
+  </data>
+    <data name="Required_only_for_FEI_export_string" xml:space="preserve">
+    <value>Required only for FEI export</value>
+  </data>
+    <data name="Combination_Number_string" xml:space="preserve">
+    <value>Combination Number</value>
+  </data>
+    <data name="Place_string" xml:space="preserve">
+    <value>Place</value>
+  </data>
+    <data name="Country_string" xml:space="preserve">
+    <value>Country</value>
+  </data>
+    <data name="Connection_Status_string" xml:space="preserve">
+    <value>Connection Status</value>
+  </data>
+    <data name="Connected_string" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="Witnesses_connected__colon_string" xml:space="preserve">
+    <value>Witness apps:</value>
+  </data>
+    <data name="Loops_string" xml:space="preserve">
+    <value>Loops</value>
+  </data>
+  <data name="Settings_string" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Start_Competitions_string" xml:space="preserve">
+    <value>Start competitions</value>
+  </data>
+  <data name="Configure_Endurance_Event_string" xml:space="preserve">
+    <value>Configure Endurance Event</value>
+  </data>
+  <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
+    <value>Endurance event does not exist yet</value>
+  </data>
+  <data name="Configure_Competition_string" xml:space="preserve">
+    <value>Configure Competition</value>
+  </data>
+  <data name="Configure_Club_string" xml:space="preserve">
+    <value>Configure Club</value>
+  </data>
+  <data name="Configure_Horse_string" xml:space="preserve">
+    <value>Configure Horse</value>
+  </data>
+  <data name="Configure_Athlete_string" xml:space="preserve">
+    <value>Configure Athlete</value>
+  </data>
+  <data name="Configure_Combinations_string" xml:space="preserve">
+    <value>Configure Combinations</value>
+  </data>
+  <data name="Configure_Participation_string" xml:space="preserve">
+    <value>Configure Participant</value>
+  </data>
+  <data name="Configure_Official_string" xml:space="preserve">
+    <value>Configure Official</value>
+  </data>
+  <data name="Configure_Loops_string" xml:space="preserve">
+    <value>Configure Loops</value>
+  </data>
+  <data name="Process_string" xml:space="preserve">
+    <value>Process</value>
+  </data>
+  <data name="Representation_string" xml:space="preserve">
+    <value>Representation</value>
+  </data>
+  <data name="Required_Inspection_string" xml:space="preserve">
+    <value>Required Inspection</value>
+  </data>
+  <data name="Export_string" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Print_Preview_string" xml:space="preserve">
+    <value>Print Preview</value>
+  </data>
+  <data name="Manual_handout_strings" xml:space="preserve">
+    <value>Manaul handout</value>
+  </data>
+  <data name="Yes_string" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Cancel_string" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="The_Competitions_havent_started_yet_string" xml:space="preserve">
+    <value>The Competitions haven't started yet</value>
+  </data>
+  <data name="Archive_string" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="History_string" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="Field_is_required_string" xml:space="preserve">
+    <value>Field is required</value>
+  </data>
+  <data name="Required_inspection_is_compulsory_string" xml:space="preserve">
+    <value>Inspection is already configured as compulsory on Competition level</value>
+  </data>
+  <data name="Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string" xml:space="preserve">
+    <value>Cannot disable Reinspection because Reinspection Time is already present</value>
+  </data>
+  <data name="Presentation_time_cannot_be_before_arrival__" xml:space="preserve">
+    <value>Presentation time cannot be before arrival '{0}'</value>
+  </data>
+  <data name="Representation_time_cannot_be_before_presentation__" xml:space="preserve">
+    <value>Representation time cacnnot be before presentation '{0}'</value>
+  </data>
+  <data name="Please_provide_reason_to_eliminate_as__" xml:space="preserve">
+    <value>'{0}' elimination requires a reason. Please provide reason and try again</value>
+  </data>
+  <data name="Select_FTQ_codes" xml:space="preserve">
+    <value>Select FTQ codes and try again</value>
+  </data>
+  <data name="Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category" xml:space="preserve">
+    <value>Athletes participating in Championship competitions cannot be of Junior or yound adult category</value>
+  </data>
+  <data name="Competition_start_cannot_be_in_the_past" xml:space="preserve">
+    <value>Competition start cannot be in the past</value>
+  </data>
+  <data name="Official__already_exists" xml:space="preserve">
+    <value>Official '{0}' already exists</value>
+  </data>
+  <data name="start_string" xml:space="preserve">
+    <value>start</value>
+  </data>
+  <data name="Please_select_future_time_string" xml:space="preserve">
+    <value>Please select a future time</value>
+  </data>
+  <data name="Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection" xml:space="preserve">
+    <value>Could not connect to Nexus. Some operations will not be available. Please check your internet connection</value>
+  </data>
+  <data name="Athletes_string" xml:space="preserve">
+    <value>Athletes</value>
+  </data>
+  <data name="Horses_string" xml:space="preserve">
+    <value>Horses</value>
+  </data>
+  <data name="Competitions_string" xml:space="preserve">
+    <value>Competitions</value>
+  </data>
+  <data name="Officials_string" xml:space="preserve">
+    <value>Officials</value>
+  </data>
+  <data name="Phases_string" xml:space="preserve">
+    <value>Phases</value>
+  </data>
+  <data name="Participations_string" xml:space="preserve">
+    <value>Participations</value>
+  </data>
+  <data name="Athlete_string" xml:space="preserve">
+    <value>Athlete</value>
+  </data>
+  <data name="Horse_string" xml:space="preserve">
+    <value>Horse</value>
+  </data>
+  <data name="Competition_Ruleset_string" xml:space="preserve">
+    <value>Ruleset</value>
+  </data>
+  <data name="Competition_Type_string" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Automatic_CRI" xml:space="preserve">
+    <value>Require compulsory inspection based on recovery</value>
+  </data>
+  <data name="Official_Role_string" xml:space="preserve">
+    <value>Official Role</value>
+  </data>
+  <data name="Select_a_role_string" xml:space="preserve">
+    <value>Select a role</value>
+  </data>
+  <data name="Is_not_ranked_string" xml:space="preserve">
+    <value>Is not ranked</value>
+  </data>
+  <data name="Override_Start_Time_string" xml:space="preserve">
+    <value>Override Start Time for this Participant</value>
+  </data>
+  <data name="Start_Time_string" xml:space="preserve">
+    <value>Start Time</value>
+  </data>
+  <data name="Max_Speed_Penalty_string" xml:space="preserve">
+    <value>Max Speed Penalty</value>
+  </data>
+  <data name="Presentation_string" xml:space="preserve">
+    <value>Present</value>
+  </data>
+  <data name="__cannot_be_sooner_than__string" xml:space="preserve">
+    <value>'{0}' cannot be sooner than '{1}'</value>
+  </data>
+  <data name="Loop_distance_string" xml:space="preserve">
+    <value>Loop distance (km)</value>
+  </data>
+  <data name="Select_a_loop_string" xml:space="preserve">
+    <value>Select a Loop</value>
+  </data>
+  <data name="Recovery_time_string" xml:space="preserve">
+    <value>Recovery time (mins)</value>
+  </data>
+  <data name="Rest_time_string" xml:space="preserve">
+    <value>Rest time (mins)</value>
+  </data>
+  <data name="Text_formatting_failed_This_is_usually_not_critical_failure_string" xml:space="preserve">
+    <value>Text formatting failed. This is usually not a critical failure</value>
+  </data>
+  <data name="Number_string" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="Language_string" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Category_string" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Senior_string" xml:space="preserve">
+    <value>Senior</value>
+  </data>
+  <data name="Senior" xml:space="preserve">
+    <value>Senior</value>
+  </data>
+  <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
+    <value>Time format is incorect 'hours:minutes:seconds'</value>
+  </data>
+</root>

@@ -6,16 +6,16 @@
 @attribute [Route(ATHLETES_HORSES_PAGE)]
 @inherits NComponent
 
-<NContent Title="Athletes & Horses">
+<NContent Title="@Athletes_and_Horses_string">
 
     <Main>
         <MudGrid Spacing="8" Style="margin-top:0!important;">
             <MudItem xs="6">
-                <CrudList T="Athlete" TForm="AthleteForm" TModel="AthleteFormModel" UpdateRoute="@ATHLETE_UPDATE" />
+                <CrudList T="Athlete" Name="@Athletes_string" TForm="AthleteForm" TModel="AthleteFormModel" UpdateRoute="@ATHLETE_UPDATE" />
             </MudItem>
             
             <MudItem xs="6">
-                <CrudList T="Horse" TForm="HorseForm" TModel="HorseFormModel" UpdateRoute="@HORSE_UPDATE" />
+                <CrudList T="Horse" Name="@Horses_string" TForm="HorseForm" TModel="HorseFormModel" UpdateRoute="@HORSE_UPDATE" />
             </MudItem>
         </MudGrid>
     </Main>

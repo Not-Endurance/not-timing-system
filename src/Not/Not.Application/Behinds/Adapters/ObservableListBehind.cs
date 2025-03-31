@@ -18,7 +18,7 @@ public abstract class ObservableListBehind<T> : ObservableBehind, IDisposable
         ObservableList = list;
     }
 
-    protected ObservableList<T> ObservableList { get; } = [];
+    protected virtual ObservableList<T> ObservableList { get; set; } = [];
 
     public void Dispose()
     {

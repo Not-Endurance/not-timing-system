@@ -1,12 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Not.Domain.Exceptions;
 using Not.Extensions;
-using Not.Random;
-using Not.Structures;
+using static Not.Localization.NStrings;
 
 namespace Not.Domain.Base;
 
-public abstract class AggregateRoot : IEquatable<AggregateRoot>, IIdentifiable, IAggregateRoot
+public abstract class AggregateRoot : IEquatable<AggregateRoot>, IAggregateRoot
 {
     public static bool operator ==(AggregateRoot? left, AggregateRoot? right)
     {
@@ -26,7 +25,7 @@ public abstract class AggregateRoot : IEquatable<AggregateRoot>, IIdentifiable, 
     // TODO: use DomainObject for ID, do private set
     public int Id { get; }
 
-    protected string Combine(params object?[] values)
+    protected static string Combine(params object?[] values)
     {
         return DomainModelHelper.Combine(values);
     }
@@ -104,6 +103,6 @@ public abstract class AggregateRoot : IEquatable<AggregateRoot>, IIdentifiable, 
 
     static DomainException GetRequiredException(string field)
     {
-        return new DomainException(field, "'{0}' is required");
+        return new DomainPropertyException(Field_is_required_string, field);
     }
 }

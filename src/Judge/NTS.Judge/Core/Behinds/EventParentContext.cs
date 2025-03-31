@@ -1,5 +1,6 @@
 ﻿using Not.Application.Behinds;
 using Not.Application.CRUD.Ports;
+using Not.Domain;
 using Not.Structures;
 using NTS.Domain.Setup.Aggregates;
 
@@ -7,14 +8,25 @@ namespace NTS.Judge.Core.Behinds;
 
 public class EventParentContext : BehindContext<EnduranceEvent>, ICrudParent<Competition>, ICrudParent<Official>
 {
-    readonly ObservableList<Competition> _competitions = new();
-    readonly ObservableList<Official> _officials = new();
+    ObservableList<Competition> _competitions = new();
+    ObservableList<Official> _officials = new();
 
     public EventParentContext(IUpdate<EnduranceEvent> updater)
         : base(updater) { }
 
     ObservableList<Competition> ICrudParent<Competition>.Children => _competitions;
     ObservableList<Official> ICrudParent<Official>.Children => _officials;
+
+    public override void SetParent(IParent parent)
+    {
+        if (parent is not EnduranceEvent enduranceEvent)
+        {
+            return;
+        }
+        Entity = enduranceEvent;
+        _competitions = new(enduranceEvent.Competitions);
+        _officials = new(enduranceEvent.Officials);
+    }
 
     public async Task Add(Competition child)
     {

@@ -25,22 +25,22 @@
     {
         <MudStack>
             <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">
-                @Localizer.Get("Total")
+                @Total_string
             </MudText>
 
             <MudStack Justify="Justify.SpaceEvenly" Style="height:100%; width:125px">
                 <MudText Typo="Typo.body2" Align="Align.Center">
-                    @Localizer.Get("Finished at:")
+                    @Finished_at_colon_string
                     <strong>@_total!.FinishTime</strong>
                 </MudText>
 
                 <MudText Typo="Typo.body2" Align="Align.Center">
-                    @Localizer.Get("Ride time (hrs):")
+                    @Ride_time_in_hours_colon_string
                     <strong>@_total!.RideInterval</strong>
                 </MudText>
 
                 <MudText Typo="Typo.body2" Align="Align.Center">
-                    @Localizer.Get("Recovery (hrs):")
+                    @Recovery_in_hours_colon_string
                     <strong>@_total!.RecoveryIntervalWithoutFinal</strong>
                 </MudText>
             </MudStack>

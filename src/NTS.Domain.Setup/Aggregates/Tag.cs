@@ -24,6 +24,6 @@ public class Tag : AggregateRoot, IAggregateRoot
 
     public override string ToString()
     {
-        return $"{"Tag Id".Localize()}: {TagId}";
+        return $"{"Tag Id"}: {TagId}";
     }
 }

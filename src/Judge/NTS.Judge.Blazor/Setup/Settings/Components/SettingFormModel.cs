@@ -6,6 +6,8 @@ namespace NTS.Judge.Blazor.Setup.Settings.Components;
 
 public class SettingFormModel : IFormModel<Setting>
 {
+    static Country? _languageCountry;
+
     public SettingFormModel() { }
 
     public SettingFormModel(Setting entity)
@@ -15,6 +17,12 @@ public class SettingFormModel : IFormModel<Setting>
 
     public int? Id { get; set; }
     public Country? Country { get; set; }
+
+    public Country? LanguageCountry
+    {
+        get => _languageCountry;
+        set => _languageCountry = value;
+    }
     public DetectionMode? DetectionMode { get; set; }
 
     public void FromEntity(Setting entity)

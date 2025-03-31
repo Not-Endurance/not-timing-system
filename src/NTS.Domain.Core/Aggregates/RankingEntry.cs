@@ -23,7 +23,7 @@ public class RankingEntry : AggregateRoot, IAggregateRoot
 
     public override string ToString()
     {
-        var message = IsNotRanked ? $"({"not ranked".Localize()}) " : "";
+        var message = IsNotRanked ? $"({not_ranked_string}) " : "";
         return message + Participation.ToString();
     }
 }
