@@ -15,7 +15,7 @@ public partial class AthleteForm
     NAutocomplete<Country?> _countryField = default!;
     NAutocomplete<Club?> _clubField = default!;
     NSelect<AthleteCategory> _categoryField = default!;
-    
+
     [Inject]
     ISeeker<Country> Countries { get; set; } = default!;
 

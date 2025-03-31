@@ -9,13 +9,13 @@ namespace NTS.Judge.Blazor.Setup.Settings.Components;
 public partial class SettingForm : NForm<SettingFormModel>
 {
     NAutocomplete<Country?> _countryField = default!;
-    
+
     [Inject]
     ILanguageSeeker LanguageSeeker { get; set; } = default!;
-    
-    [Inject] 
+
+    [Inject]
     NavigationManager NavManager { get; set; } = default!;
-    
+
     protected Task SetUiCulture()
     {
         if (Model.LanguageCountry == null)
@@ -30,7 +30,7 @@ public partial class SettingForm : NForm<SettingFormModel>
     }
 
     // NSelect<DetectionMode?> _detectionModeField = default!;
-    
+
     public override void RegisterValidationInjectors()
     {
         RegisterInjector(nameof(Setting.Country), () => _countryField);

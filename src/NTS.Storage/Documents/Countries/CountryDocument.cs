@@ -15,6 +15,7 @@ public class CountryDocument : Document
             Locale = country.Locale,
         };
     }
+
     public string Name { get; init; } = default!;
     public string? IsoCode { get; init; }
     public string? NfCode { get; init; }

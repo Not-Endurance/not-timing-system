@@ -35,7 +35,7 @@ public static class ReflectionHelper
         return type.GetField(stringValue);
     }
 
-    public static IEnumerable<T> GetAttributes<T>(this FieldInfo? fieldInfo, bool inherit = false) 
+    public static IEnumerable<T> GetAttributes<T>(this FieldInfo? fieldInfo, bool inherit = false)
         where T : Attribute
     {
         return fieldInfo?.GetCustomAttributes(typeof(T), inherit).Cast<T>() ?? [];

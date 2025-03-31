@@ -19,10 +19,11 @@ public static class LocalizationHelper
         }
         catch (FormatException)
         {
-            var message = Text_formatting_failed_This_is_usually_not_critical_failure_string
+            var message =
+                Text_formatting_failed_This_is_usually_not_critical_failure_string
                 + Environment.NewLine
                 + $"Format: {resource}"
-                +Environment.NewLine
+                + Environment.NewLine
                 + $"args: {string.Join(", ", args)}";
             NotifyHelper.Error(message);
             return resource;
@@ -33,18 +34,15 @@ public static class LocalizationHelper
     {
         try
         {
-            return value.GetType()
-                       .GetEnumField(value)
-                       ?.GetAttributes<DisplayAttribute>()
-                       .FirstOrDefault()
-                       ?.GetName()
-                   ?? value.ToString();
+            return value.GetType().GetEnumField(value)?.GetAttributes<DisplayAttribute>().FirstOrDefault()?.GetName()
+                ?? value.ToString();
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("localization"))
         {
-            var message = Text_formatting_failed_This_is_usually_not_critical_failure_string
-                          + Environment.NewLine
-                          + $"Localization resource is missing key for '{value}'";
+            var message =
+                Text_formatting_failed_This_is_usually_not_critical_failure_string
+                + Environment.NewLine
+                + $"Localization resource is missing key for '{value}'";
             NotifyHelper.Error(message);
             return value.ToString();
         }

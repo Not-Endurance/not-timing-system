@@ -12,7 +12,7 @@ public class NComponent : ComponentBase
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
-    
+
     public bool IsInitialized { get; private set; } = true;
 
     protected async Task Observe(IObservableBehind observable, params IEnumerable<object> arguments)

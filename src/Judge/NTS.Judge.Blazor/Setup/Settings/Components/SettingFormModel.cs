@@ -7,7 +7,7 @@ namespace NTS.Judge.Blazor.Setup.Settings.Components;
 public class SettingFormModel : IFormModel<Setting>
 {
     static Country? _languageCountry;
-    
+
     public SettingFormModel() { }
 
     public SettingFormModel(Setting entity)
