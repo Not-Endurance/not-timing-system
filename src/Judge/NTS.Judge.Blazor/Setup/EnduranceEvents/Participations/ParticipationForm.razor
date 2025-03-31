@@ -1,0 +1,25 @@
+﻿@using NTS.Domain.Setup.Aggregates
+@using Not.Blazor.CRUD.Forms.Components
+
+@inherits NForm<ParticipationFormModel>;
+
+<EditForm Model="Model">
+    <NAutocomplete @ref="_combinationField" T="Combination" Label="@Combination_string" @bind-Value="Model.Combination"
+        Search="SearchCombinations" />
+
+    <NSwitch @ref="_isNotRankedField" @bind-Value="Model.IsNotRanked" Label="@Is_not_ranked_string" />
+
+    <NSwitch @bind-Value="_overrideStartTime" Label="@Override_Start_Time_string"/>
+
+    @if (_overrideStartTime)
+    {
+        <MudTimePicker @ref="_timeField" @bind-Time="Model.StartTimeOverride" ShowToolbar="false" Label="@Start_Time_string" />
+    }
+
+    <NSwitch @bind-Value="_overrideMaxSpeed" Label="@Max_Speed_Penalty_string" />
+
+    @if (_overrideMaxSpeed)
+    {
+        <MudNumericField @ref="_maxSpeedOverrideField" @bind-Value="Model.MaxSpeedOverride" Label="@Max_Speed_Penalty_string" Variant="Variant.Text" />
+    }
+</EditForm>

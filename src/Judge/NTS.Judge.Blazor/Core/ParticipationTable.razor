@@ -37,7 +37,7 @@
         @foreach (var phase in Phases ?? Enumerable.Empty<Phase>())
         {
             <tr>
-                <MudTooltip Text="@Localizer.Get("Edit times")" Inline="false" RootStyle="width:inherit;">
+                <MudTooltip Text="@Edit_times_string" Inline="false" RootStyle="width:inherit;">
                     <MudButton Variant="Variant.Text" OnClick="() => ShowUpdate(phase)">@phase.Gate</MudButton>
                 </MudTooltip>
 
@@ -58,9 +58,9 @@
                     <NTd Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
                 }
 
-                <NTd Value="@phase.GetRecoverySpan()" />
-                <NTd Value="@phase.GetLoopSpan()" />
-                <NTd Value="@phase.GetPhaseSpan()" />
+                <NTd Value="@phase.GetRecoveryInterval()" />
+                <NTd Value="@phase.GetLoopInterval()" />
+                <NTd Value="@phase.GetPhaseInterval()" />
                 <NTd Value="@phase.GetAverageLoopSpeed()" />
                 <NTd Value="@phase.GetAveragePhaseSpeed()" />
             </tr>

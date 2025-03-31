@@ -1,7 +1,6 @@
 ﻿using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
-using Not.Injection;
 using NTS.Application.RPC;
 
 namespace NTS.Judge.RPC;
@@ -24,6 +23,8 @@ public class ConnectionsClient : RpcClient, IConnectionsRpcClient
         );
     }
 
+    public override void RunAtStartup() { }
+
     public Task ReceiveRemoteConnectionId(string connectionId)
     {
         _connectionsRegistry.Add(connectionId);
@@ -37,4 +38,4 @@ public class ConnectionsClient : RpcClient, IConnectionsRpcClient
     }
 }
 
-public interface IConnectionsRpcClient : IConnectionsClientProcedures, IRpcClient, ITransient { }
+public interface IConnectionsRpcClient : IConnectionsClientProcedures, IRpcClient { }

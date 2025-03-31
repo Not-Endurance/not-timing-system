@@ -3,20 +3,20 @@ using Not.Domain.Base;
 
 namespace NTS.Domain.Objects;
 
-public record Timestamp : DomainObject, IComparable<Timestamp>
+public sealed record Timestamp : DomainObject, IComparable<Timestamp>
 {
     public static Timestamp Now()
     {
         return new Timestamp(DateTimeOffset.UtcNow);
     }
 
-    public static Timestamp? Create(DateTimeOffset? dateTime)
+    public static Timestamp? Create(DateTimeOffset? dateTimeOffset)
     {
-        if (dateTime == null)
+        if (dateTimeOffset == null)
         {
             return null;
         }
-        return new Timestamp(dateTime.Value.ToUniversalTime());
+        return new Timestamp(dateTimeOffset.Value);
     }
 
     public static Timestamp Copy(Timestamp timestamp)
@@ -36,22 +36,22 @@ public record Timestamp : DomainObject, IComparable<Timestamp>
 
     public static bool operator <(Timestamp? left, Timestamp? right)
     {
-        return left?._stamp < right?._stamp;
+        return left?._stamp.TimeOfDay < right?._stamp.TimeOfDay;
     }
 
     public static bool operator >(Timestamp? left, Timestamp? right)
     {
-        return left?._stamp > right?._stamp;
+        return left?._stamp.TimeOfDay > right?._stamp.TimeOfDay;
     }
 
     public static bool operator <=(Timestamp? left, Timestamp? right)
     {
-        return left?._stamp <= right?._stamp;
+        return left?._stamp.TimeOfDay <= right?._stamp.TimeOfDay;
     }
 
     public static bool operator >=(Timestamp? left, Timestamp? right)
     {
-        return left?._stamp > right?._stamp;
+        return left?._stamp.TimeOfDay > right?._stamp.TimeOfDay;
     }
 
     public static TimeInterval? operator -(Timestamp? left, Timestamp? right)
@@ -60,33 +60,28 @@ public record Timestamp : DomainObject, IComparable<Timestamp>
         {
             return null;
         }
-        return new TimeInterval(left!._stamp - right!._stamp);
+        return new TimeInterval(left!._stamp.TimeOfDay - right!._stamp.TimeOfDay);
     }
 
     public static Timestamp? operator +(Timestamp? left, TimeSpan? right)
     {
-        return left == null ? null : new Timestamp(left!._stamp + (right ?? TimeSpan.Zero));
+        return left == null ? null : new Timestamp(left!._stamp.TimeOfDay + (right ?? TimeSpan.Zero));
     }
 
     Timestamp() { }
 
-    protected Timestamp(Timestamp timestamp)
+    Timestamp(Timestamp timestamp)
         : base(timestamp)
     {
         _stamp = timestamp._stamp;
     }
 
-    public Timestamp(DateTimeOffset dateTime)
+    Timestamp(TimeSpan timeSpan)
+        : this(DateTimeOffset.Now.Add(timeSpan)) { }
+
+    public Timestamp(DateTimeOffset dateTimeOffset)
     {
-        _stamp = new DateTimeOffset(
-            1337,
-            1,
-            3,
-            dateTime.Hour,
-            dateTime.Minute,
-            dateTime.Second,
-            dateTime.Offset
-        ).ToUniversalTime();
+        _stamp = dateTimeOffset.ToUniversalTime();
     }
 
     [JsonProperty]
@@ -116,7 +111,7 @@ public record Timestamp : DomainObject, IComparable<Timestamp>
 
     public DateTimeOffset ToDateTimeOffset()
     {
-        return _stamp; //TODO: test reference modification
+        return _stamp.LocalDateTime;
     }
 
     public DateTime ToDateTime()

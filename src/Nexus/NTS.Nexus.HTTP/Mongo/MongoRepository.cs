@@ -9,14 +9,23 @@ namespace NTS.Nexus.HTTP.Mongo;
 public abstract class MongoRepository<T> : IRepository<T>
     where T : Document, IAggregateRoot
 {
+    readonly IMongoContext _context;
+    readonly string _db;
+    readonly string _collection;
+
     public MongoRepository(IMongoContext context, string db, string collection)
     {
-        Collection = context.Client.GetDatabase(db).GetCollection<T>(collection);
+        _context = context;
+        _db = db;
+        _collection = collection;
     }
 
     protected abstract UpdateDefinition<T> GetUpdateDefinition(T document);
 
-    protected IMongoCollection<T> Collection { get; }
+    protected IMongoCollection<T> GetCollection()
+    {
+        return _context.Client.GetDatabase(_db).GetCollection<T>(_collection);
+    }
 
     public async Task Create(T document)
     {
@@ -26,7 +35,7 @@ public abstract class MongoRepository<T> : IRepository<T>
             {
                 throw new ApplicationException($"Invalid ID '{document.Id}'");
             }
-            await Collection.InsertOneAsync(document);
+            await GetCollection().InsertOneAsync(document);
         }
         catch (MongoWriteException ex)
         {
@@ -46,7 +55,7 @@ public abstract class MongoRepository<T> : IRepository<T>
 
     public async Task<T?> Read(Expression<Func<T, bool>> filter)
     {
-        return await Collection.Find(filter).FirstOrDefaultAsync();
+        return await GetCollection().Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task<T?> Read(int id)
@@ -61,18 +70,18 @@ public abstract class MongoRepository<T> : IRepository<T>
 
     public async Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter)
     {
-        return await Collection.Find(filter).ToListAsync();
+        return await GetCollection().Find(filter).ToListAsync();
     }
 
     public async Task Update(T document)
     {
         var updateDefinition = GetUpdateDefinition(document);
-        await Collection.UpdateOneAsync(x => x.Id == document.Id, updateDefinition);
+        await GetCollection().UpdateOneAsync(x => x.Id == document.Id, updateDefinition);
     }
 
     public async Task Delete(int id)
     {
-        await Collection.DeleteOneAsync(x => x.Id == id);
+        await GetCollection().DeleteOneAsync(x => x.Id == id);
     }
 
     public Task Delete(T entity)
@@ -82,7 +91,7 @@ public abstract class MongoRepository<T> : IRepository<T>
 
     public async Task Delete(Expression<Func<T, bool>> filter)
     {
-        await Collection.DeleteManyAsync(filter);
+        await GetCollection().DeleteManyAsync(filter);
     }
 
     public Task Delete(IEnumerable<T> entities)

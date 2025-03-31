@@ -1,7 +1,5 @@
 ﻿using MudBlazor;
 using Not.Blazor.CRUD.Forms.Components;
-using Not.Localization;
-using Not.Reflection;
 
 namespace Not.Blazor.Dialogs;
 
@@ -10,31 +8,27 @@ public class Dialog<T, TForm>
     where TForm : NForm<T>
 {
     readonly IDialogService _mudDialogService;
-    readonly ILocalizer _localizer;
     readonly DialogOptions _options = new() { BackdropClick = false };
 
-    public Dialog(IDialogService mudDialogService, ILocalizer localizer)
+    public Dialog(IDialogService mudDialogService)
     {
         _mudDialogService = mudDialogService;
-        _localizer = localizer;
     }
 
     public async Task RenderCreate()
     {
-        await Show<FormCreateDialog<T, TForm>>("Create", []);
+        await Show<FormCreateDialog<T, TForm>>(Create_string, []);
     }
 
     public async Task RenderUpdate(T model)
     {
         var parameters = new DialogParameters<FormUpdateDialog<T, TForm>> { { x => x.Model, model } };
-        await Show("Update", parameters);
+        await Show(Update_string, parameters);
     }
 
-    async Task Show<TDialog>(string type, DialogParameters<TDialog> parameters)
+    async Task Show<TDialog>(string title, DialogParameters<TDialog> parameters)
         where TDialog : IComponent
     {
-        var typeName = ReflectionHelper.GetName<T>();
-        var title = _localizer.Get(type, " ", typeName);
         var dialog = await _mudDialogService.ShowAsync<TDialog>(title, parameters, _options);
         await dialog.Result;
     }

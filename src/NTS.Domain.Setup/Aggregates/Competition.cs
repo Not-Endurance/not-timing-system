@@ -84,7 +84,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
 
     public override string ToString()
     {
-        var type = Type.ToString().Localize();
+        var type = Localize(Type);
         return Combine($"{Name} ({Phases.Count})", type, $"{Start:g}");
     }
 
@@ -130,9 +130,9 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
             && Type == CompetitionType.Championship
         )
         {
-            throw new DomainException(
+            throw new DomainPropertyException(
                 nameof(Participation.Combination),
-                "Athletes participating in Championship Competitions cannot be of JuniorOrYoungAdult category."
+                Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category
             );
         }
     }
@@ -141,7 +141,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
     {
         if (start <= DateTimeOffset.Now)
         {
-            throw new DomainException(field, "Competition start cannot be in the past");
+            throw new DomainPropertyException(field, Competition_start_cannot_be_in_the_past);
         }
         return start;
     }

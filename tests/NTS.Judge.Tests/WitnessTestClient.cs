@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-using Not.Application.RPC.Clients;
+﻿using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Tests.RPC;
-using NTS.ACL.Entities;
-using NTS.ACL.Enums;
-using NTS.ACL.RPC;
-using NTS.ACL.RPC.Procedures;
+using NTS.Relay.ACL.Entities;
+using NTS.Relay.ACL.Enums;
+using NTS.Relay.ACL.RPC;
+using NTS.Relay.ACL.RPC.Procedures;
 using Xunit.Abstractions;
 
 namespace NTS.Judge.Tests;
@@ -50,5 +49,10 @@ public class WitnessTestClient
     {
         InvokedMethods.Add(nameof(ReceiveEntryUpdate));
         return Task.CompletedTask;
+    }
+
+    public override void RunAtStartup()
+    {
+        throw new NotImplementedException();
     }
 }

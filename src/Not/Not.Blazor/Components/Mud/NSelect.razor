@@ -4,9 +4,8 @@
 @namespace Not.Blazor.Components
 @typeparam T
 @inherits NBindableComponent<T>
-@implements IMudBaseInputWrapper<T>
 
-<MudSelect @bind-Value="Value" @ref="MudBaseInput" Placeholder="@Localizer.Get(Placeholder)" Label="@Localizer.Get(Label)">
+<MudSelect @bind-Value="Value" @ref="MudBaseInput" Placeholder="@Placeholder" Label="@Label">
     @foreach (var item in Items)
     {
         <MudSelectItem Value="@item.Value">@item.Label</MudSelectItem>

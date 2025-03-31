@@ -10,9 +10,13 @@ public static class StringExtensions
     /// <param name="str">Orginal string</param>
     /// <param name="term">Search term</param>
     /// <returns</returns>
-    public static bool NContains(this string str, string term)
+    public static bool NContains(this string? str, string? term)
     {
-        return str.Contains(term, StringComparison.InvariantCultureIgnoreCase);
+        if (term == null)
+        {
+            return false;
+        }
+        return str?.Contains(term, StringComparison.InvariantCultureIgnoreCase) ?? false;
     }
 
     public static string NTrim(this string str, int maxLength)

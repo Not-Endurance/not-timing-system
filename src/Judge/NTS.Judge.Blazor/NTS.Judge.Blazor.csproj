@@ -17,6 +17,7 @@
     <ProjectReference Include="..\..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Setup\NTS.Domain.Setup.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
+    <ProjectReference Include="..\..\NTS.Storage\NTS.Storage.csproj" /> <!-- Remove when Nexus Document objects are settled -->
   </ItemGroup>
 
 </Project>

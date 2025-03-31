@@ -13,7 +13,6 @@ public static class StorageInjection
     )
     {
         FileContextHelper.SetDebugRootDirectory(debugRootDirectoryName);
-
-        return services.AddJsonFileStore().AddStaticOptionsStore();
+        return services.AddJsonFileStore();
     }
 }

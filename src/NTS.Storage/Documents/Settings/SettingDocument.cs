@@ -1,25 +1,28 @@
 ﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Settings;
+using NTS.Storage.Documents.Countries;
 
 namespace NTS.Storage.Documents.Settings;
 
 public class SettingDocument : Document
 {
-    public SettingDocument(Setting setting)
-        : base(setting.Id)
+    public static SettingDocument Create(Setting setting)
     {
-        Country = setting.Country;
-        DetectionMode = setting.DetectionMode;
-        AccountId = setting.AccountId.ToString();
+        return new SettingDocument
+        {
+            Country = CountryDocument.Create(setting.Country),
+            DetectionMode = setting.DetectionMode,
+            AccountId = setting.AccountId.ToString(),
+        };
     }
 
-    public string AccountId { get; set; }
-    public Country Country { get; set; }
+    public string AccountId { get; set; } = default!;
+    public CountryDocument Country { get; set; } = default!;
     public DetectionMode DetectionMode { get; set; }
 
     public Setting ToDomain()
     {
-        return new Setting(Id, Guid.Parse(AccountId), Country, DetectionMode);
+        return new Setting(Id, Guid.Parse(AccountId), Country.ToDomain(), DetectionMode);
     }
 }

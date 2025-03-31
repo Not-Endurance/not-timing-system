@@ -1,0 +1,20 @@
+﻿@using NTS.Judge.Blazor.Setup.Settings.Components
+@using Not.Blazor.CRUD.Forms.Components
+
+@attribute [Route(SETTINGS_PAGE)]
+@inherits NComponent
+
+<NContent Title="@Settings_string" Class="not-mid-width">
+
+    <Main>
+        @if (Behind.Setting == null)
+        {
+            <NButtonCreate OnClick="OpenCreateForm" />
+        }
+        else
+        {
+            <NUpdateContainer T="SettingFormModel" TForm="SettingForm" Model="FormModel!" />
+        }
+    </Main>
+
+</NContent>

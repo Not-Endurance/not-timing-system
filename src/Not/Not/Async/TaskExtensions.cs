@@ -1,7 +1,14 @@
-﻿namespace Not.Async;
+﻿using System.Collections.ObjectModel;
+
+namespace Not.Async;
 
 public static class TaskExtensions
 {
+    public static async Task<ReadOnlyCollection<T>> AsReadonly<T>(this Task<List<T>> task)
+    {
+        return (await task).ToList().AsReadOnly();
+    }
+
     public static async Task<List<T>> ToList<T>(this Task<IEnumerable<T>> task)
     {
         return (await task).ToList();

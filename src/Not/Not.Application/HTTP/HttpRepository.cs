@@ -7,12 +7,9 @@ using Not.Structures;
 
 namespace Not.Application.HTTP;
 
-public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
+public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
     where T : class, IAggregateRoot, IIdentifiable
 {
-    const string CONNECTION_ERROR =
-        "Could not connect to Nexus. Some operations will not be available. Please check your internet connection";
-
     readonly string _endpoint;
 
     public HttpRepository(string endpoint, NHttpClient client)
@@ -35,7 +32,9 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
             && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
         )
         {
-            NotifyHelper.Warn(CONNECTION_ERROR);
+            NotifyHelper.Warn(
+                Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
+            );
         }
         else
         {
@@ -93,8 +92,7 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         try
         {
             var url = BuildUrl(id);
-            var content = await Client.Get(url);
-            return content?.FromJson<T>();
+            return await Client.GetJson<T>(url);
         }
         catch (Exception ex)
         {
@@ -107,8 +105,7 @@ public class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
     {
         try
         {
-            var content = await Client.Get(_endpoint);
-            return content?.FromJson<IEnumerable<T>>() ?? [];
+            return await Client.GetJson<IEnumerable<T>>(_endpoint) ?? [];
         }
         catch (Exception ex)
         {

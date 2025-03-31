@@ -1,0 +1,468 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Turkish (Translated by ChatGPT)
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+              xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- All keys translated to Turkish. -->
+
+  <data name="debel" xml:space="preserve">
+    <value>şişman</value>
+  </data>
+  <data name="Kur {0}" xml:space="preserve">
+    <value>Koca {0}</value>
+  </data>
+  <data name="My dick Yanko" xml:space="preserve">
+    <value>Benim yarram Yanko</value>
+  </data>
+  <data name="TEST_WITH__VALUE_C" xml:space="preserve">
+    <value>{0} değeriyle test</value>
+  </data>
+  <data name="TEST" xml:space="preserve">
+    <value>deneme</value>
+  </data>
+  <data name="hash_string" xml:space="preserve">
+    <value>özet</value>
+  </data>
+  <data name="X_string" xml:space="preserve">
+    <value>X</value>
+  </data>
+  <data name="Create_string" xml:space="preserve">
+    <value>Oluştur</value>
+  </data>
+  <data name="Update_string" xml:space="preserve">
+    <value>Güncelle</value>
+  </data>
+  <data name="Print_string" xml:space="preserve">
+    <value>Yazdır</value>
+  </data>
+  <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
+    <value>Bu etkinlik için hiçbir şey oluşturulmadı</value>
+  </data>
+  <data name="Date_string" xml:space="preserve">
+    <value>Tarih</value>
+  </data>
+  <data name="Time_string" xml:space="preserve">
+    <value>Zaman</value>
+  </data>
+  <data name="km_string" xml:space="preserve">
+    <value>km</value>
+  </data>
+  <data name="rest_string" xml:space="preserve">
+    <value>dinlenme</value>
+  </data>
+  <data name="ARR_string" xml:space="preserve">
+    <value>ARR</value>
+  </data>
+  <data name="IN_string" xml:space="preserve">
+    <value>IN</value>
+  </data>
+  <data name="complete_string" xml:space="preserve">
+    <value>tamamla</value>
+  </data>
+  <data name="min_string" xml:space="preserve">
+    <value>dak</value>
+  </data>
+  <data name="max_string" xml:space="preserve">
+    <value>maks</value>
+  </data>
+  <data name="km_per_hour_string" xml:space="preserve">
+    <value>km/saat</value>
+  </data>
+  <data name="Min_value_is_1_minute_string" xml:space="preserve">
+    <value>Minimum değer 1 dakikadır</value>
+  </data>
+  <data name="Distance_cannot_be_zero_or_less_string" xml:space="preserve">
+    <value>Mesafe sıfır veya daha az olamaz</value>
+  </data>
+  <data name="Setup_string" xml:space="preserve">
+    <value>Kurulum</value>
+  </data>
+  <data name="Dashboard_string" xml:space="preserve">
+    <value>Gösterge Paneli</value>
+  </data>
+  <data name="Endurance_Event_string" xml:space="preserve">
+    <value>Dayanıklılık Etkinliği</value>
+  </data>
+  <data name="Athletes_and_Horses_string" xml:space="preserve">
+    <value>Biniciler ve Atlar</value>
+  </data>
+  <data name="Combinations_string" xml:space="preserve">
+    <value>Kombinasyonlar</value>
+  </data>
+  <data name="Clubs_string" xml:space="preserve">
+    <value>Kulüpler</value>
+  </data>
+  <data name="Startlist_string" xml:space="preserve">
+    <value>Başlangıç listesi</value>
+  </data>
+  <data name="Ranklist_string" xml:space="preserve">
+    <value>Sıralama</value>
+  </data>
+  <data name="Handouts_string" xml:space="preserve">
+    <value>Dokümanlar</value>
+  </data>
+  <data name="Inquiry_string" xml:space="preserve">
+    <value>Sorgu</value>
+  </data>
+  <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
+    <value>Elenme Nedeni</value>
+  </data>
+  <data name="Select_a_reason_string" xml:space="preserve">
+    <value>Bir neden seçin</value>
+  </data>
+  <data name="Reason_string" xml:space="preserve">
+    <value>Neden</value>
+  </data>
+  <data name="Print_confirmation_string" xml:space="preserve">
+    <value>Yazdırma onayı</value>
+  </data>
+  <data name="Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string" xml:space="preserve">
+    <value>Dokümanlar başarıyla yazdırıldı mı? Evet seçilirse tüm dokümanlar silinir. Bu işlem geri alınamaz</value>
+  </data>
+  <data name="Edit_times_string" xml:space="preserve">
+    <value>Zamanları düzenle</value>
+  </data>
+  <data name="Total_string" xml:space="preserve">
+    <value>Toplam</value>
+  </data>
+  <data name="Finished_at_colon_string" xml:space="preserve">
+    <value>Şu saatte tamamlandı:</value>
+  </data>
+  <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
+    <value>Binme süresi (saat):</value>
+  </data>
+  <data name="Recovery_in_hours_colon_string" xml:space="preserve">
+    <value>Toparlanma (saat):</value>
+  </data>
+  <data name="Incomplete_string" xml:space="preserve">
+    <value>Eksik</value>
+  </data>
+  <data name="Protocol_string" xml:space="preserve">
+    <value>Protokol</value>
+  </data>
+  <data name="Rank_string" xml:space="preserve">
+    <value>Derece</value>
+  </data>
+  <data name="Combination_string" xml:space="preserve">
+    <value>Kombinasyon</value>
+  </data>
+  <data name="Arrival_string" xml:space="preserve">
+    <value>Varış</value>
+  </data>
+  <data name="Speed_string" xml:space="preserve">
+    <value>Hız</value>
+  </data>
+  <data name="Loop_string" xml:space="preserve">
+    <value>Tur</value>
+  </data>
+  <data name="Recovery_string" xml:space="preserve">
+    <value>Toparlanma</value>
+  </data>
+  <data name="Stage_string" xml:space="preserve">
+    <value>Aşama</value>
+  </data>
+  <data name="Search_by_ID_colon_string" xml:space="preserve">
+    <value>ID'ye göre ara:</value>
+  </data>
+  <data name="Search_by_name_colon_string" xml:space="preserve">
+    <value>İsme göre ara:</value>
+  </data>
+  <data name="Event_string" xml:space="preserve">
+    <value>Etkinlik</value>
+  </data>
+  <data name="Stages_string" xml:space="preserve">
+    <value>Aşamalar</value>
+  </data>
+  <data name="Ride_string" xml:space="preserve">
+    <value>Binme</value>
+  </data>
+  <data name="Not_ranked_string" xml:space="preserve">
+    <value>Sıralanmadı</value>
+  </data>
+  <data name="Name_string" xml:space="preserve">
+    <value>İsim</value>
+  </data>
+  <data name="Required_only_for_FEI_export_string" xml:space="preserve">
+    <value>Yalnızca FEI dışa aktarma için gerekli</value>
+  </data>
+  <data name="Combination_Number_string" xml:space="preserve">
+    <value>Kombinasyon Numarası</value>
+  </data>
+  <data name="Place_string" xml:space="preserve">
+    <value>Yer</value>
+  </data>
+  <data name="Country_string" xml:space="preserve">
+    <value>Ülke</value>
+  </data>
+  <data name="Connection_Status_string" xml:space="preserve">
+    <value>Bağlantı Durumu</value>
+  </data>
+  <data name="Connected_string" xml:space="preserve">
+    <value>Bağlı</value>
+  </data>
+  <data name="Witnesses_connected__colon_string" xml:space="preserve">
+    <value>Tanık uygulamaları:</value>
+  </data>
+  <data name="Loops_string" xml:space="preserve">
+    <value>Turlar</value>
+  </data>
+  <data name="Settings_string" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="Start_Competitions_string" xml:space="preserve">
+    <value>Yarışları başlat</value>
+  </data>
+  <data name="Configure_Endurance_Event_string" xml:space="preserve">
+    <value>Dayanıklılık Etkinliğini Yapılandır</value>
+  </data>
+  <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
+    <value>Dayanıklılık etkinliği henüz yok</value>
+  </data>
+  <data name="Configure_Competition_string" xml:space="preserve">
+    <value>Yarışmayı Yapılandır</value>
+  </data>
+  <data name="Configure_Club_string" xml:space="preserve">
+    <value>Kulübü Yapılandır</value>
+  </data>
+  <data name="Configure_Horse_string" xml:space="preserve">
+    <value>Atı Yapılandır</value>
+  </data>
+  <data name="Configure_Athlete_string" xml:space="preserve">
+    <value>Biniciyi Yapılandır</value>
+  </data>
+  <data name="Configure_Combinations_string" xml:space="preserve">
+    <value>Kombinasyonları Yapılandır</value>
+  </data>
+  <data name="Configure_Participation_string" xml:space="preserve">
+    <value>Katılımcıyı Yapılandır</value>
+  </data>
+  <data name="Configure_Official_string" xml:space="preserve">
+    <value>Resmi Görevliyi Yapılandır</value>
+  </data>
+  <data name="Configure_Loops_string" xml:space="preserve">
+    <value>Turları Yapılandır</value>
+  </data>
+  <data name="Process_string" xml:space="preserve">
+    <value>İşle</value>
+  </data>
+  <data name="Representation_string" xml:space="preserve">
+    <value>Yeniden İnceleme</value>
+  </data>
+  <data name="Required_Inspection_string" xml:space="preserve">
+    <value>Zorunlu İnceleme</value>
+  </data>
+  <data name="Export_string" xml:space="preserve">
+    <value>Dışa Aktar</value>
+  </data>
+  <data name="Print_Preview_string" xml:space="preserve">
+    <value>Yazdırma Önizleme</value>
+  </data>
+  <data name="Manual_handout_strings" xml:space="preserve">
+    <value>Manuel çıktı</value>
+  </data>
+  <data name="Yes_string" xml:space="preserve">
+    <value>Evet</value>
+  </data>
+  <data name="Cancel_string" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="The_Competitions_havent_started_yet_string" xml:space="preserve">
+    <value>Yarışlar henüz başlamadı</value>
+  </data>
+  <data name="Archive_string" xml:space="preserve">
+    <value>Arşivle</value>
+  </data>
+  <data name="History_string" xml:space="preserve">
+    <value>Geçmiş</value>
+  </data>
+  <data name="Field_is_required_string" xml:space="preserve">
+    <value>Bu alan zorunludur</value>
+  </data>
+  <data name="Required_inspection_is_compulsory_string" xml:space="preserve">
+    <value>Yarışma düzeyinde bu inceleme zaten zorunlu olarak ayarlandı</value>
+  </data>
+  <data name="Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string" xml:space="preserve">
+    <value>Yeniden inceleme devre dışı bırakılamaz çünkü Yeniden İnceleme Zamanı zaten mevcut</value>
+  </data>
+  <data name="Presentation_time_cannot_be_before_arrival__" xml:space="preserve">
+    <value>Sunum zamanı '{0}' zamanından önce olamaz</value>
+  </data>
+  <data name="Representation_time_cannot_be_before_presentation__" xml:space="preserve">
+    <value>Yeniden inceleme zamanı '{0}' sunum zamanından önce olamaz</value>
+  </data>
+  <data name="Please_provide_reason_to_eliminate_as__" xml:space="preserve">
+    <value>'{0}' elemesi bir neden gerektirir. Lütfen bir neden belirtin ve tekrar deneyin</value>
+  </data>
+  <data name="Select_FTQ_codes" xml:space="preserve">
+    <value>FTQ kodlarını seçin ve tekrar deneyin</value>
+  </data>
+  <data name="Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category" xml:space="preserve">
+    <value>Şampiyona yarışlarına katılan biniciler Genç kategoride olamaz</value>
+  </data>
+  <data name="Competition_start_cannot_be_in_the_past" xml:space="preserve">
+    <value>Yarışma başlangıcı geçmişte olamaz</value>
+  </data>
+  <data name="Official__already_exists" xml:space="preserve">
+    <value>'{0}' adlı resmi görevli zaten mevcut</value>
+  </data>
+  <data name="start_string" xml:space="preserve">
+    <value>başla</value>
+  </data>
+  <data name="Please_select_future_time_string" xml:space="preserve">
+    <value>Lütfen gelecekteki bir zaman seçin</value>
+  </data>
+  <data name="Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection" xml:space="preserve">
+    <value>Nexus'a bağlanılamadı. Bazı işlemler kullanılamayacak. Lütfen internet bağlantınızı kontrol edin</value>
+  </data>
+  <data name="Athletes_string" xml:space="preserve">
+    <value>Biniciler</value>
+  </data>
+  <data name="Horses_string" xml:space="preserve">
+    <value>Atlar</value>
+  </data>
+  <data name="Competitions_string" xml:space="preserve">
+    <value>Yarışmalar</value>
+  </data>
+  <data name="Officials_string" xml:space="preserve">
+    <value>Resmi Görevliler</value>
+  </data>
+  <data name="Phases_string" xml:space="preserve">
+    <value>Aşamalar</value>
+  </data>
+  <data name="Participations_string" xml:space="preserve">
+    <value>Katılımlar</value>
+  </data>
+  <data name="Athlete_string" xml:space="preserve">
+    <value>Binici</value>
+  </data>
+  <data name="Horse_string" xml:space="preserve">
+    <value>At</value>
+  </data>
+  <data name="Competition_Ruleset_string" xml:space="preserve">
+    <value>Kural seti</value>
+  </data>
+  <data name="Competition_Type_string" xml:space="preserve">
+    <value>Tür</value>
+  </data>
+  <data name="Automatic_CRI" xml:space="preserve">
+    <value>Toparlanma süresine göre zorunlu inceleme</value>
+  </data>
+  <data name="Official_Role_string" xml:space="preserve">
+    <value>Resmi Görevli Rolü</value>
+  </data>
+  <data name="Select_a_role_string" xml:space="preserve">
+    <value>Bir rol seçin</value>
+  </data>
+  <data name="Is_not_ranked_string" xml:space="preserve">
+    <value>Sıralı değil</value>
+  </data>
+  <data name="Override_Start_Time_string" xml:space="preserve">
+    <value>Bu Katılımcı için Başlangıç Zamanını değiştir</value>
+  </data>
+  <data name="Start_Time_string" xml:space="preserve">
+    <value>Başlangıç Zamanı</value>
+  </data>
+  <data name="Max_Speed_Penalty_string" xml:space="preserve">
+    <value>Maksimum Hız Cezası</value>
+  </data>
+  <data name="Presentation_string" xml:space="preserve">
+    <value>Sunum</value>
+  </data>
+  <data name="__cannot_be_sooner_than__string" xml:space="preserve">
+    <value>'{0}' '{1}' değerinden daha erken olamaz</value>
+  </data>
+  <data name="Loop_distance_string" xml:space="preserve">
+    <value>Tur mesafesi (km)</value>
+  </data>
+  <data name="Select_a_loop_string" xml:space="preserve">
+    <value>Bir Tur seçin</value>
+  </data>
+  <data name="Recovery_time_string" xml:space="preserve">
+    <value>Toparlanma süresi (dak)</value>
+  </data>
+  <data name="Rest_time_string" xml:space="preserve">
+    <value>Dinlenme süresi (dak)</value>
+  </data>
+  <data name="Text_formatting_failed_This_is_usually_not_critical_failure_string" xml:space="preserve">
+    <value>Metin biçimlendirmesi başarısız oldu. Genellikle bu kritik bir hata değildir</value>
+  </data>
+  <data name="Number_string" xml:space="preserve">
+    <value>Numara</value>
+  </data>
+  <data name="Language_string" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="Category_string" xml:space="preserve">
+    <value>Kategori</value>
+  </data>
+  <data name="Senior_string" xml:space="preserve">
+    <value>Kıdemli</value>
+  </data>
+  <data name="Senior" xml:space="preserve">
+    <value>Kıdemli</value>
+  </data>
+  <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
+    <value>Zaman formatı yanlış 'saat:dakika:saniye'</value>
+  </data>
+</root>

@@ -36,7 +36,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var horse = requestBody.FromJson<Horse>();
-        var document = new HorseDocument(horse);
+        var document = HorseDocument.Create(horse);
         await _horses.Create(document);
 
         return new OkObjectResult($"Inserted {horse}");
@@ -51,7 +51,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var horse = requestBody.FromJson<Horse>();
-        var document = new HorseDocument(horse);
+        var document = HorseDocument.Create(horse);
         await _horses.Update(document);
 
         return new OkObjectResult($"Updated {horse}");

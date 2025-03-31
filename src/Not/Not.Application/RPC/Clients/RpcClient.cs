@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Not.Application.RPC.SignalR;
+using Not.Injection;
 using Not.Reflection;
+using Not.Startup;
 
 namespace Not.Application.RPC.Clients;
 
@@ -16,6 +18,8 @@ public abstract class RpcClient : IRpcClient
         }
         _socket = signalRSocket;
     }
+
+    public abstract void RunAtStartup();
 
     protected SignalRSocket Socket => _socket;
 
@@ -176,7 +180,7 @@ public abstract class RpcClient : IRpcClient
     }
 }
 
-public interface IRpcClient
+public interface IRpcClient : IStartupInitializer, ISingleton
 {
     Task Connect();
     Task Disconnect();

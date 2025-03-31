@@ -10,7 +10,7 @@ public partial class NContent
             ? GRID_MAX_WIDTH
             : GRID_MAX_WIDTH - RightBarXS;
 
-    [Parameter]
+    [Parameter, EditorRequired]
     public string Title { get; set; } = default!;
 
     [Parameter]
@@ -29,7 +29,7 @@ public partial class NContent
     public bool HasContent { get; set; } = true;
 
     [Parameter]
-    public string EmptyMessage { get; set; } = "Page is empty :)";
+    public string? EmptyMessage { get; set; }
 
     [Parameter]
     public RenderFragment? EmptyContent { get; set; }

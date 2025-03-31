@@ -29,7 +29,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var club = requestBody.FromJson<Club>();
-        var document = new ClubDocument(club);
+        var document = ClubDocument.Create(club);
         await _clubs.Create(document);
 
         return new OkObjectResult($"Inserted {club}");
@@ -44,7 +44,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var club = requestBody.FromJson<Club>();
-        var document = new ClubDocument(club);
+        var document = ClubDocument.Create(club);
         await _clubs.Update(document);
 
         return new OkObjectResult($"Updated {club}");

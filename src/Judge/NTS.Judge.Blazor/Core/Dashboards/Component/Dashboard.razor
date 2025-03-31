@@ -19,7 +19,7 @@
                 @foreach (var grouping in Behind.Participations.GroupBy(x => x.Phases.Distance)) // TODO: move grouping in field
                 {
                     <MudText Class="pl-4">
-                        <strong>@($"{grouping.Key.RoundNumberToTens()} {@Localizer.Get("KM")}")</strong>
+                        <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
                     </MudText>
 
                     <MudDivider /> 

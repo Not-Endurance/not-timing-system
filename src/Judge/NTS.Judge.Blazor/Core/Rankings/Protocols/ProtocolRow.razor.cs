@@ -15,7 +15,7 @@ public partial class ProtocolRow
 
     protected override void OnParametersSet()
     {
-        _rankText = Entry.Rank?.ToString() ?? Localizer.Get("Incomplete");
+        _rankText = Entry.Rank?.ToString() ?? Incomplete_string;
         _combination = Entry.Participation.Combination;
         _phases = Entry.Participation.Phases;
         _total = Entry.Participation.GetTotal();

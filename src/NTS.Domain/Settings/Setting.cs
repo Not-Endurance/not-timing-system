@@ -17,6 +17,7 @@ public class Setting : AggregateRoot
         AccountId = Required(nameof(AccountId), accountId);
         Country = Required(nameof(Country), country);
         DetectionMode = Required(nameof(DetectionMode), detectionMode);
+        StaticSettings.Instance = this;
     }
 
     public Guid AccountId { get; }
