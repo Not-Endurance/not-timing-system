@@ -29,8 +29,7 @@ public partial class SnapshotPanel
         }
         if (_time.Length < DEFAULT_TIME.Length)
         {
-            var incorrectInputMessage = "Time must have Hours:Minutes:Seconds".Localize();
-            NotifyHelper.Inform(incorrectInputMessage);
+            NotifyHelper.Inform(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string);
             return;
         }
 

@@ -462,4 +462,7 @@
   <data name="Senior" xml:space="preserve">
     <value>Kıdemli</value>
   </data>
+  <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
+    <value>Zaman formatı yanlış 'saat:dakika:saniye'</value>
+  </data>
 </root>
