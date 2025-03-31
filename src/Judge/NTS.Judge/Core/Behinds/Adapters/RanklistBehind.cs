@@ -94,8 +94,11 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
     {
         var ranking = await _rankings.Read(id);
         GuardHelper.ThrowIfDefault(ranking);
-
         Ranklist = new Ranklist(ranking);
+        var enduranceEvent = await _events.Read(0);
+        GuardHelper.ThrowIfDefault(enduranceEvent);
+        var officials = await _officials.ReadAll();
+        Document = new RanklistDocument(Ranklist, enduranceEvent, officials);
         EmitChange();
     }
 
