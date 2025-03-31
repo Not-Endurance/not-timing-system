@@ -3,7 +3,7 @@ using NTS.Judge.Blazor.Setup.Settings.Components;
 
 namespace NTS.Judge.Blazor.Setup.Settings;
 
-public partial class SettingsUpdatePage
+public partial class SettingsPage
 {
     [Inject]
     ISettingBehind Behind { get; set; } = default!;

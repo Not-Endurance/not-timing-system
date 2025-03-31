@@ -6,9 +6,6 @@ namespace Not.Blazor.Components;
 
 public abstract partial class NButtonBase : MudButton
 {
-    [Inject]
-    ILocalizer Localizer { get; set; } = default!;
-
     [Parameter]
     public string? Text { get; set; }
 
@@ -16,7 +13,7 @@ public abstract partial class NButtonBase : MudButton
 
     protected override void OnParametersSet()
     {
-        ChildContent = Text == null ? null : new RenderFragment(x => x.AddContent(0, Localizer.Get(Text)));
+        ChildContent ??= Text == null ? null : new RenderFragment(x => x.AddContent(0, Text));
     }
 
     protected async Task HandleClick(MouseEventArgs args)

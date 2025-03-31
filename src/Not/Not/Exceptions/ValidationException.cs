@@ -10,7 +10,7 @@ public abstract class ValidationException : ApplicationException
         : base(message) { }
 
     protected ValidationException(string property, string message)
-        : this(string.Format(message, property))
+        : this(message)
     {
         Property = property;
     }

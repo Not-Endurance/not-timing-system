@@ -1,0 +1,431 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Bulgarian (translated by The One And Only)
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+              xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <!-- Keep schema definition as in original -->
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Below are the data items with Bulgarian translations. -->
+  <data name="debel" xml:space="preserve">
+    <value>дебел</value>
+  </data>
+  <data name="Kur {0}" xml:space="preserve">
+    <value>Кур {0}</value>
+  </data>
+  <data name="My dick Yanko" xml:space="preserve">
+    <value>Моят кур Янко</value>
+  </data>
+  <data name="TEST_WITH__VALUE_C" xml:space="preserve">
+    <value>Тест с {0} стойност</value>
+  </data>
+  <data name="TEST" xml:space="preserve">
+    <value>тест</value>
+  </data>
+  <data name="hash_string" xml:space="preserve">
+    <value>хеш</value>
+  </data>
+  <data name="X_string" xml:space="preserve">
+    <value>X</value>
+  </data>
+  <data name="Create_string" xml:space="preserve">
+    <value>Създай</value>
+  </data>
+  <data name="Update_string" xml:space="preserve">
+    <value>Обнови</value>
+  </data>
+  <data name="Print_string" xml:space="preserve">
+    <value>Отпечатай</value>
+  </data>
+  <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
+    <value>Нищо не е създадено за това събитие</value>
+  </data>
+  <data name="Date_string" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="Time_string" xml:space="preserve">
+    <value>Време</value>
+  </data>
+  <data name="km_string" xml:space="preserve">
+    <value>км</value>
+  </data>
+  <data name="rest_string" xml:space="preserve">
+    <value>почивка</value>
+  </data>
+  <data name="ARR_string" xml:space="preserve">
+    <value>ARR</value>
+  </data>
+  <data name="IN_string" xml:space="preserve">
+    <value>IN</value>
+  </data>
+  <data name="complete_string" xml:space="preserve">
+    <value>завършено</value>
+  </data>
+  <data name="min_string" xml:space="preserve">
+    <value>мин</value>
+  </data>
+  <data name="max_string" xml:space="preserve">
+    <value>макс</value>
+  </data>
+  <data name="km_per_hour_string" xml:space="preserve">
+    <value>км/ч</value>
+  </data>
+  <data name="Min_value_is_1_minute_string" xml:space="preserve">
+    <value>Минималната стойност е 1 минута</value>
+  </data>
+  <data name="Distance_cannot_be_zero_or_less_string" xml:space="preserve">
+    <value>Разстоянието не може да бъде нула или по-малко</value>
+  </data>
+  <data name="Setup_string" xml:space="preserve">
+    <value>Конфигурация</value>
+  </data>
+  <data name="Dashboard_string" xml:space="preserve">
+    <value>Табло</value>
+  </data>
+  <data name="Endurance_Event_string" xml:space="preserve">
+    <value>Състезание по издръжливост</value>
+  </data>
+  <data name="Athletes_and_Horses_string" xml:space="preserve">
+    <value>Състезатели и коне</value>
+  </data>
+  <data name="Combinations_string" xml:space="preserve">
+    <value>Комбинации</value>
+  </data>
+  <data name="Clubs_string" xml:space="preserve">
+    <value>Клубове</value>
+  </data>
+  <data name="Startlist_string" xml:space="preserve">
+    <value>Стартлист</value>
+  </data>
+  <data name="Ranklist_string" xml:space="preserve">
+    <value>Класиране</value>
+  </data>
+  <data name="Handouts_string" xml:space="preserve">
+    <value>Разпечатки</value>
+  </data>
+  <data name="Inquiry_string" xml:space="preserve">
+    <value>Справки</value>
+  </data>
+  <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
+    <value>Причина за отпадане</value>
+  </data>
+  <data name="Select_a_reason_string" xml:space="preserve">
+    <value>Изберете причина</value>
+  </data>
+  <data name="Reason_string" xml:space="preserve">
+    <value>Причина</value>
+  </data>
+  <data name="Print_confirmation_string" xml:space="preserve">
+    <value>Потвърждение за печат</value>
+  </data>
+  <data name="Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string" xml:space="preserve">
+    <value>Разпечатките отпечатани ли са успешно? Да ще изтрие всички разпечатки. Това не може да бъде отменено.</value>
+  </data>
+  <data name="Edit_times_string" xml:space="preserve">
+    <value>Редактиране на времена</value>
+  </data>
+  <data name="Total_string" xml:space="preserve">
+    <value>Общо</value>
+  </data>
+  <data name="Finished_at_colon_string" xml:space="preserve">
+    <value>Финиширал:</value>
+  </data>
+  <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
+    <value>Време на езда (час):</value>
+  </data>
+  <data name="Recovery_in_hours_colon_string" xml:space="preserve">
+    <value>Възстановяване (час)</value>
+  </data>
+  <data name="Incomplete_string" xml:space="preserve">
+    <value>Незавършено</value>
+  </data>
+  <data name="Protocol_string" xml:space="preserve">
+    <value>Протокол</value>
+  </data>
+  <data name="Rank_string" xml:space="preserve">
+    <value>Класиране</value>
+  </data>
+  <data name="Combination_string" xml:space="preserve">
+    <value>Комбинация</value>
+  </data>
+  <data name="Arrival_string" xml:space="preserve">
+    <value>Пристигане</value>
+  </data>
+  <data name="Speed_string" xml:space="preserve">
+    <value>Скорост</value>
+  </data>
+  <data name="Loop_string" xml:space="preserve">
+    <value>Кръг</value>
+  </data>
+  <data name="Recovery_string" xml:space="preserve">
+    <value>Възстановяване</value>
+  </data>
+  <data name="Stage_string" xml:space="preserve">
+    <value>Етап</value>
+  </data>
+  <data name="Search_by_ID_colon_string" xml:space="preserve">
+    <value>Търсене по ID:</value>
+  </data>
+  <data name="Search_by_name_colon_string" xml:space="preserve">
+    <value>Търсене по име:</value>
+  </data>
+  <data name="Event_string" xml:space="preserve">
+    <value>Събитие</value>
+  </data>
+  <data name="Stages_string" xml:space="preserve">
+    <value>Етапи</value>
+  </data>
+  <data name="Ride_string" xml:space="preserve">
+    <value>Езда</value>
+  </data>
+  <data name="Not_ranked_string" xml:space="preserve">
+    <value>Без класиране</value>
+  </data>
+  <data name="Name_string" xml:space="preserve">
+    <value>Име</value>
+  </data>
+  <data name="Required_only_for_FEI_export_string" xml:space="preserve">
+    <value>Задължително само за FEI експорт</value>
+  </data>
+  <data name="Combination_Number_string" xml:space="preserve">
+    <value>Номер на комбинация</value>
+  </data>
+  <data name="Place_string" xml:space="preserve">
+    <value>Място</value>
+  </data>
+  <data name="Country_string" xml:space="preserve">
+    <value>Държава</value>
+  </data>
+  <data name="Connection_Status_string" xml:space="preserve">
+    <value>Статус на връзката</value>
+  </data>
+  <data name="Connected_string" xml:space="preserve">
+    <value>Свързан</value>
+  </data>
+  <data name="Witnesses_connected__colon_string" xml:space="preserve">
+    <value>Witness приложения:</value>
+  </data>
+  <data name="Loops_string" xml:space="preserve">
+    <value>Кръгове</value>
+  </data>
+  <data name="Settings_string" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="Start_Competitions_string" xml:space="preserve">
+    <value>Стартирай състезанията</value>
+  </data>
+  <data name="Configure_Endurance_Event_string" xml:space="preserve">
+    <value>Конфигурирай Събитие</value>
+  </data>
+  <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
+    <value>Събитие не съществува</value>
+  </data>
+  <data name="Configure_Competition_string" xml:space="preserve">
+    <value>Конфигурирай Състезание</value>
+  </data>
+  <data name="Configure_Club_string" xml:space="preserve">
+    <value>Конфигурирай Клуб</value>
+  </data>
+  <data name="Configure_Horse_string" xml:space="preserve">
+    <value>Конфигурирай Кон</value>
+  </data>
+  <data name="Configure_Athlete_string" xml:space="preserve">
+    <value>Конфигурирай Атлет</value>
+  </data>
+  <data name="Configure_Combinations_string" xml:space="preserve">
+    <value>Конфигурирай Комбинация</value>
+  </data>
+  <data name="Configure_Participation_string" xml:space="preserve">
+    <value>Конфигурирай Участник</value>
+  </data>
+  <data name="Configure_Official_string" xml:space="preserve">
+    <value>Конфигурирай Официално лице</value>
+  </data>
+  <data name="Configure_Loops_string" xml:space="preserve">
+    <value>Конфигурирай Обиколка</value>
+  </data>
+  <data name="Process_string" xml:space="preserve">
+    <value>Обработи</value>
+  </data>
+  <data name="Representation_string" xml:space="preserve">
+    <value>Реинспекция</value>
+  </data>
+  <data name="Required_Inspection_string" xml:space="preserve">
+    <value>Задължителна проверка</value>
+  </data>
+  <data name="Export_string" xml:space="preserve">
+    <value>Експорт</value>
+  </data>
+  <data name="Print_Preview_string" xml:space="preserve">
+    <value>Прегледай Печат</value>
+  </data>
+  <data name="Manual_handout_strings" xml:space="preserve">
+    <value>Генерирай печат</value>
+  </data>
+  <data name="Yes_string" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="Cancel_string" xml:space="preserve">
+    <value>Откажи</value>
+  </data>
+  <data name="The_Competitions_havent_started_yet_string" xml:space="preserve">
+    <value>Състезанията не са стартирани</value>
+  </data>
+  <data name="Archive_string" xml:space="preserve">
+    <value>Архивирай</value>
+  </data>
+  <data name="History_string" xml:space="preserve">
+    <value>История</value>
+  </data>
+  <data name="Field_is_required_string" xml:space="preserve">
+    <value>Полето е задължително</value>
+  </data>
+  <data name="Required_inspection_is_compulsory_string" xml:space="preserve">
+    <value>Проверка вече е планирана, защото е конфигурирана като задължителна в състезанието</value>
+  </data>
+  <data name="Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string" xml:space="preserve">
+    <value>Не може да изключим Реинспекция защото време на Реинспекция вече е записано</value>
+  </data>
+  <data name="Presentation_time_cannot_be_before_arrival__" xml:space="preserve">
+    <value>Времето на Инспекция не може да бъде преди времето на пристигане '{0}'</value>
+  </data>
+  <data name="Representation_time_cannot_be_before_presentation__" xml:space="preserve">
+    <value>Времето на Реинспекция на може да бъде преди времето на Инспецкия  '{0}'</value>
+  </data>
+  <data name="Please_provide_reason_to_eliminate_as__" xml:space="preserve">
+    <value>Елиминация '{0}' изисква причина. Въведете причина и опитайте пак</value>
+  </data>
+  <data name="Select_FTQ_codes" xml:space="preserve">
+    <value>Изберете FTQ кодове и опитайте пак</value>
+  </data>
+  <data name="Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category" xml:space="preserve">
+    <value>Атлети участващи в Шампионати не могат да бъдат от категория Младши ездачи</value>
+  </data>
+  <data name="Competition_start_cannot_be_in_the_past" xml:space="preserve">
+    <value>Старт на състезението не може да бъде в миналото</value>
+  </data>
+  <data name="Official__already_exists" xml:space="preserve">
+    <value>Официално лице '{0}' вече съществува</value>
+  </data>
+  <data name="start_string" xml:space="preserve">
+    <value>старт</value>
+  </data>
+  <data name="Please_select_future_time_string" xml:space="preserve">
+    <value>Моля изберете време в бъдещето</value>
+  </data>
+  <data name="Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection" xml:space="preserve">
+    <value>Не може да бъде установена връзка към Нексус сървъра. Някои функции ще бъдат ограничени. Моля проверете интернет връзката си</value>
+  </data>
+  <data name="Athletes_string" xml:space="preserve">
+    <value>Атлети</value>
+  </data>
+  <data name="Horses_string" xml:space="preserve">
+    <value>Коне</value>
+  </data>
+  <data name="Competitions_string" xml:space="preserve">
+    <value>Състезания</value>
+  </data>
+  <data name="Officials_string" xml:space="preserve">
+    <value>Официални лица</value>
+  </data>
+  <data name="Phases_string" xml:space="preserve">
+    <value>Фази</value>
+  </data>
+  <data name="Participations_string" xml:space="preserve">
+    <value>Участници</value>
+  </data>
+  <data name="Athlete_string" xml:space="preserve">
+    <value>Атлет</value>
+  </data>
+  <data name="Horse_string" xml:space="preserve">
+    <value>Кон</value>
+  </data>
+  <data name="Competition_Ruleset_string" xml:space="preserve">
+    <value>Правилник</value>
+  </data>
+  <data name="Competition_Type_string" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="Automatic_CRI" xml:space="preserve">
+    <value>Задължителна инспекция базирана на време на възстановяване</value>
+  </data>
+  <data name="Official_Role_string" xml:space="preserve">
+    <value>Роля на Официално лице</value>
+  </data>
+  <data name="Select_a_role_string" xml:space="preserve">
+    <value>Изберете роля</value>
+  </data>
+  <data name="Is_not_ranked_string" xml:space="preserve">
+    <value>Не е класиран</value>
+  </data>
+  <data name="Override_Start_Time_string" xml:space="preserve">
+    <value>Промени времето на Старт за дадения Участник</value>
+  </data>
+  <data name="Start_Time_string" xml:space="preserve">
+    <value>Време на Старт</value>
+  </data>
+  <data name="Max_Speed_Penalty_string" xml:space="preserve">
+    <value>Наказателно ограничение на Мак Скорост</value>
+  </data>
+  <data name="Presentation_string" xml:space="preserve">
+    <value>Инспекция</value>
+  </data>
+  <data name="__cannot_be_sooner_than__string" xml:space="preserve">
+    <value>'{0}' не може да бъде преди  '{1}'</value>
+  </data>
+  <data name="Loop_distance_string" xml:space="preserve">
+    <value>Дължина на обиколка (км)</value>
+  </data>
+  <data name="Select_a_loop_string" xml:space="preserve">
+    <value>Изберете Обиколка</value>
+  </data>
+  <data name="Recovery_time_string" xml:space="preserve">
+    <value>Време на възстановяване (мин)</value>
+  </data>
+  <data name="Rest_time_string" xml:space="preserve">
+    <value>Време за почивка (мин)</value>
+  </data>
+  <data name="Text_formatting_failed_This_is_usually_not_critical_failure_string" xml:space="preserve">
+    <value>Изникна грешка при форматиренето на текст. Обикновено това не е критичен проблем.</value>
+  </data>
+  <data name="Number_string" xml:space="preserve">
+    <value>Номер</value>
+  </data>
+  <data name="Language_string" xml:space="preserve">
+    <value>Език</value>
+  </data>
+  <data name="Category_string" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="Senior_string" xml:space="preserve">
+    <value>Мъже</value>
+  </data>
+  <data name="Senior" xml:space="preserve">
+    <value>Мъже</value>
+  </data>
+  <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
+    <value>Форматът е невалиден 'час:минута:секунда'</value>
+  </data>
+</root>

@@ -3,7 +3,7 @@ using Not.Blazor.Navigation;
 
 namespace Not.Blazor.Components;
 
-public partial class NNavLink
+public partial class NNavLink : NComponent
 {
     [Inject]
     ILandNavigator LandNavigator { get; set; } = default!;
@@ -13,9 +13,6 @@ public partial class NNavLink
 
     [Parameter, EditorRequired]
     public string Endpoint { get; set; } = default!;
-
-    [Parameter, EditorRequired]
-    public string Text { get; set; } = default!;
 
     [Parameter]
     public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;

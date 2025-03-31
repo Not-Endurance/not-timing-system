@@ -8,7 +8,7 @@
 
 <MudPaper Elevation="1" Class="pa-2">
     <MudSelect @bind-SelectedValues="@Codes" MultiSelection="true" Delimiter="+" Class="mt-4"
-        Label="@Localizer.Get("Failed to Qualify Reason")" Placeholder="@Localizer.Get("Select a reason")">
+        Label="@Failed_to_Qualify_Reason_string" Placeholder="@Select_a_reason_string">
     
         @foreach (var ftqCode in SelectListModel.FromEnum<FtqCode>())
         {

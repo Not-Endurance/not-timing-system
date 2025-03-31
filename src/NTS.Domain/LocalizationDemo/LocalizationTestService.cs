@@ -1,4 +1,5 @@
 ﻿using Not.Injection;
+using Not.Notify;
 
 namespace NTS.Domain.LocalizationDemo;
 
@@ -11,7 +12,15 @@ public class LocalizationTestService : ILocalizationTestService
 
     public string Rude()
     {
-        return new LocalizationTest().Invalid();
+        try
+        {
+            return new LocalizationTest().Invalid();
+        }
+        catch (Exception ex)
+        {
+            NotifyHelper.Warn(ex.Message);
+            return ex.Message;
+        }
     }
 }
 

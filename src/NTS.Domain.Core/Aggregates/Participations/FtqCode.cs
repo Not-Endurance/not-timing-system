@@ -7,7 +7,7 @@ public enum FtqCode
     /// <summary>
     /// Not respecting applicable speed restrictions
     /// </summary>
-    [Description("Not respecting applicable speed restrictions")]
+    [Description("Not respecting applicable speed restrictions")] // TODO: DisplayAttribute and ResourceType
     SP = 1,
 
     /// <summary>

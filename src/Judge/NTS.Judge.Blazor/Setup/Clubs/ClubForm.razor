@@ -1,11 +1,10 @@
-﻿@using NTS.Domain.Aggregates
-@using Not.Blazor.CRUD.Forms.Components
+﻿@using Not.Blazor.CRUD.Forms.Components
 
 @inherits NForm<ClubFormModel>
 
 <EditForm Model="Model">
 
-    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Localizer.Get("Name")" />
+    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
 
 </EditForm>
  

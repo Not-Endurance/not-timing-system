@@ -1,4 +1,4 @@
-﻿using Not.Application.RPC.SignalR;
+using Not.Application.RPC.SignalR;
 using Not.Filesystem;
 using Not.Startup;
 

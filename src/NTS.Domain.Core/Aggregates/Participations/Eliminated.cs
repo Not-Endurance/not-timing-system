@@ -74,7 +74,7 @@ public record FailedToQualify : Eliminated
     {
         if (codes == null || codes.Length == 0)
         {
-            throw new DomainException($"Cannot eliminate as FTQ without FTQ codes");
+            throw new DomainException(Select_FTQ_codes);
         }
         if (codes.Contains(FtqCode.FTC)) { }
         return codes;
@@ -85,8 +85,8 @@ public record FailedToQualify : Eliminated
         if (codes.Contains(FtqCode.FTC) && string.IsNullOrWhiteSpace(complement))
         {
             throw new DomainException(
-                $"FEI rules require a written explanation for FTC"
-                    + $" (Failed to Complete) elimination. Please provide '{nameof(Complement)}'"
+                Please_provide_reason_to_eliminate_as__,
+                $"{Eliminated.FAILED_TO_QUALIFY} {FtqCode.FTC}"
             );
         }
     }
@@ -123,7 +123,7 @@ public abstract record Eliminated : DomainObject
     {
         if (string.IsNullOrWhiteSpace(complement))
         {
-            throw new DomainException($"Please provide reason to eliminate as '{eliminationCode}'");
+            throw new DomainException(Please_provide_reason_to_eliminate_as__, eliminationCode);
         }
         return complement;
     }

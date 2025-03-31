@@ -4,17 +4,17 @@
 @attribute [Route(HANDOUTS_PAGE)]
 @inherits PrintableComponent
 
-<NContent Title="Handouts" HasContent="@Behind.Documents.Any()" EmptyMessage="No handouts to print :)" RightBarXS="2">
+<NContent Title="@Handouts_string" HasContent="@Behind.Documents.Any()" RightBarXS="2">
 
     <Main>
         <HandoutsList Documents="Behind.Documents" />
     </Main>
 
     <Rightbar>
-        <NTextDivider Text="Export" />
-        <NotButtonPrint Text="Print Preview" OnClick="OpenPrintPreview" />
+        <NTextDivider Text="@Export_string" />
+        <NotButtonPrint Text="@Print_Preview_string" OnClick="OpenPrintPreview" />
 
-        <NTextDivider Text="Manual handout" Class="mt-4" />
+        <NTextDivider Text="@Manual_handout_strings" Class="mt-4" />
         <HandoutForm />
     </Rightbar>
 

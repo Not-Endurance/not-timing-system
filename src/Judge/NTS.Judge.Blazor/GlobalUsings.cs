@@ -1,3 +1,4 @@
 ﻿global using Microsoft.AspNetCore.Components;
+global using static Not.Localization.NStrings;
 global using NTS.Domain.Enums;
-global using NTS.Judge.Blazor.Resources.Localization;
+global using static NTS.Localization.NtsStrings;

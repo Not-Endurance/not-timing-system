@@ -5,13 +5,13 @@
 <MudSwitch 
 	Value="Value" 
 	ValueChanged="ValueChanged" 
-	Label="@(Label != null ? Localizer.Get(Label) : null)" 
-	Style="Style" 
-	Class="Class"
+	Label=@Label
+	Style="@Style" 
+	Class="@Class"
     Color="Color.Primary" 
 	Converter="Converter" 
 	Culture="Culture"
 	Disabled="Disabled" 
 	LabelPosition="LabelPosition" 
     Error="Error"
-	ErrorText="ErrorText" />
+	ErrorText="@ErrorText" />

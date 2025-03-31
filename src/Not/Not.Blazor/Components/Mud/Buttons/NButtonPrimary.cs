@@ -1,4 +1,6 @@
-﻿using MudBlazor;
+﻿// ReSharper disable CheckNamespace
+
+using MudBlazor;
 
 namespace Not.Blazor.Components;
 

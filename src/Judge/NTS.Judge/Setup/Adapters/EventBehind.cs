@@ -32,13 +32,14 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> _)
     {
-        _context.Entity = await _events.Read(0);
-        if (_context.Entity == null)
+        var enduranceEvent = await _events.Read(0);
+        if (enduranceEvent == null)
         {
             return false;
         }
+        _context.SetParent(enduranceEvent);
         Model = new EnduranceEventFormModel();
-        Model.FromEntity(_context.Entity);
+        Model.FromEntity(enduranceEvent);
         return false;
     }
 
@@ -61,24 +62,25 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
 
     async Task SafeCreate(EnduranceEventFormModel model)
     {
-        _context.Entity = EnduranceEvent.Create(model.Place, model.Country);
-        await _events.Create(_context.Entity);
-        Model = model;
+        var enduranceEvent = EnduranceEvent.Create(model.Place, model.Country);
+        await _events.Create(enduranceEvent);
+        _context.SetParent(enduranceEvent);
+        Model = new EnduranceEventFormModel();
+        Model.FromEntity(enduranceEvent);
         EmitChange();
     }
 
     async Task SafeUpdate(EnduranceEventFormModel model)
     {
-        _context.Entity = EnduranceEvent.Update(
+        var enduranceEvent = EnduranceEvent.Update(
             model.Id,
             model.Place,
             model.Country,
             _competitionParent.Children,
             _officialParent.Children
         );
-        await _events.Update(_context.Entity);
-
-        Model = model;
+        await _events.Update(enduranceEvent);
+        _context.SetParent(enduranceEvent);
         EmitChange();
     }
 }

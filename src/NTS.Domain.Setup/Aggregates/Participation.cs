@@ -4,7 +4,7 @@ using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Participation : AggregateRoot, IAggregateRoot, IReflect<Combination>
+public class Participation : AggregateRoot, IReflect<Combination>
 {
     const double CHILDREN_MIN_SPEED = 8;
     const double CHILDREN_MAX_SPEED = 12;
@@ -88,8 +88,8 @@ public class Participation : AggregateRoot, IAggregateRoot, IReflect<Combination
     public override string ToString()
     {
         var startTimeMessage =
-            StartTimeOverride != null ? $"start: {StartTimeOverride.Value.ToLocalTime().TimeOfDay} " : null;
-        var isUnrankedMessage = IsNotRanked ? "not-ranked" : null;
+            StartTimeOverride != null ? $"{start_string}: {StartTimeOverride.Value.ToLocalTime().TimeOfDay} " : null;
+        var isUnrankedMessage = IsNotRanked ? not_ranked_string : null;
         return Combine(Combination, startTimeMessage, isUnrankedMessage);
     }
 
@@ -102,7 +102,7 @@ public class Participation : AggregateRoot, IAggregateRoot, IReflect<Combination
     {
         if (startTimeOverride != null && startTimeOverride.Value <= DateTimeOffset.Now)
         {
-            throw new DomainException(nameof(StartTimeOverride), "Please select future time");
+            throw new DomainPropertyException(nameof(StartTimeOverride), Please_select_future_time_string);
         }
         return startTimeOverride;
     }

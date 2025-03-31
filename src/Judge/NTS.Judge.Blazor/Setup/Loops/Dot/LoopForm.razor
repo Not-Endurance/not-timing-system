@@ -4,5 +4,5 @@
 @inherits NForm<LoopFormModel>
 
 <EditForm Model="Model">
-    <MudNumericField @ref="_distanceField" @bind-Value="Model.Distance" Label="Loop" />
+    <MudNumericField @ref="_distanceField" @bind-Value="Model.Distance" Label="@Loop_distance_string" />
 </EditForm>
