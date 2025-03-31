@@ -7,7 +7,7 @@ using NTS.Domain.Enums;
 
 namespace NTS.Judge.Core.Start.Factories;
 
-public static class ParticipationAndRankingrFactory
+public static class ParticipationAndRankingFactory
 {
     public static async Task<(
         List<Participation> Participations,
@@ -32,23 +32,23 @@ public static class ParticipationAndRankingrFactory
         var rankingEntriesByCategory = new Dictionary<AthleteCategory, List<RankingEntry>>();
         foreach (var contestant in setupCompetition.Participations)
         {
-            DateTimeOffset? startTime = setupCompetition.Start;
+            DateTimeOffset? startTime = setupCompetition.Start.ToUniversalTime();
             var setupPhases = setupCompetition.Phases;
             var phases = new List<Phase>();
-            foreach (var phase in setupPhases)
+            foreach (var setupPhase in setupPhases)
             {
                 var corePhase = new Phase(
-                    phase.Loop!.Distance,
-                    phase.Recovery,
-                    phase.Rest,
+                    setupPhase.Loop!.Distance,
+                    setupPhase.Recovery,
+                    setupPhase.Rest,
                     setupCompetition.Ruleset,
-                    setupPhases.Last() == phase,
+                    setupPhases.Last() == setupPhase,
                     setupCompetition.CompulsoryThresholdSpan,
                     startTime
                 );
                 startTime = null; //Set only first phase StartTime
                 phases.Add(corePhase);
-                competitionDistance += (decimal)phase.Loop!.Distance;
+                competitionDistance += (decimal)setupPhase.Loop!.Distance;
             }
             var setupCombination = contestant.Combination;
             var combination = new Combination(
@@ -69,7 +69,7 @@ public static class ParticipationAndRankingrFactory
                 phases
             );
             var storedParticipations = await participationRepository.ReadAll();
-            if (!storedParticipations.Any(p => p.Combination.Number == participation.Combination.Number))
+            if (storedParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
                 var rankingEntry = new RankingEntry(participation, contestant.IsNotRanked);
