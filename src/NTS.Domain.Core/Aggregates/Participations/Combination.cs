@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Globalization;
+using Newtonsoft.Json;
 using Not.Domain.Base;
 using Not.Localization;
 using NTS.Domain.Aggregates;
@@ -69,7 +70,11 @@ public class Combination : AggregateRoot
     public string Distance
     {
         get => FormatDistance(_distance);
-        set => _distance = decimal.Parse(value);
+        set
+        {
+            decimal.TryParse(value, NumberFormatInfo.InvariantInfo, out var parsedValue);
+            _distance = parsedValue;
+        }
     }
 
     public override string ToString()
