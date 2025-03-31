@@ -35,7 +35,7 @@ public class Combination : AggregateRoot, IParent, IReflect<Athlete>, IReflect<H
 
     public override string ToString()
     {
-        var number = $"{"#".Localize()}{Number}";
+        var number = $"{hash_string}{Number}";
         return Combine(number, Athlete, Horse);
     }
 

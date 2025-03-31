@@ -1,12 +1,9 @@
-﻿@using NTS.Domain.Setup.Aggregates
-@using Not.Blazor.CRUD.Forms.Components
-@using Not.Blazor.Components
-@using Not.Blazor.Navigation
+﻿@using Not.Blazor.CRUD.Forms.Components
 
 @attribute [Route(PARTICIPATION_UPDATE)]
 @inherits NComponent
 
-<NContent Title="Configure Participation">
+<NContent Title="@Configure_Participation_string">
 
     <Main>
         <NUpdateContainer T="ParticipationFormModel" TForm="ParticipationForm" Model="Navigator.ConsumeParameter<ParticipationFormModel>()" />

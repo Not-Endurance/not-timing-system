@@ -1,11 +1,9 @@
-﻿@using NTS.Domain.Setup.Aggregates
-@using Not.Blazor.CRUD.Forms.Components
+﻿@using Not.Blazor.CRUD.Forms.Components
 
 @inherits NForm<HorseFormModel>
 
 <EditForm Model="Model">
     <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="Horse Name" Variant="Variant.Text" Margin="Margin.Dense" />
 
-    <MudTextField @ref="_feiIdField" @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Localizer.Get(OPTIONAL_FEI_ID)"
-        Variant="Variant.Text" Margin="Margin.Dense" />
+    <MudTextField @ref="_feiIdField" @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Required_only_for_FEI_export_string" Variant="Variant.Text" Margin="Margin.Dense" />
 </EditForm>

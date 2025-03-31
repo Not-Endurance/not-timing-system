@@ -6,7 +6,7 @@
 @attribute [Route(DASHBOARD_PAGE)]
 @inherits NComponent
 
-<NContent Title="Dashboard" HasContent="@CoreBehind.IsStarted" EmptyMessage="Event isn't started">
+<NContent Title="@Dashboard_string" HasContent="@CoreBehind.IsStarted" EmptyMessage="@The_Competitions_havent_started_yet_string">
     <Main>
         <Dashboard />
     </Main>

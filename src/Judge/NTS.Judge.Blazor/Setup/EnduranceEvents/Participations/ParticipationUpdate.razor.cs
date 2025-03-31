@@ -1,6 +1,6 @@
 using Not.Blazor.Navigation;
 
-namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Contestants;
+namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 
 public partial class ParticipationUpdate
 {

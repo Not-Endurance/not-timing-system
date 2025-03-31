@@ -4,23 +4,23 @@
 
 <MudNavMenu>
 
-    <MudNavGroup Title="@Localizer.Get("Setup")" Expanded="true">
-        <NNavLink Endpoint="@ENDURANCE_EVENT_PAGE" Text="Endurance Event" Match="NavLinkMatch.All" />
-        <NNavLink Endpoint="@ATHLETES_HORSES_PAGE" Text="Athletes & Horses" />
-        <NNavLink Endpoint="@COMBINATIONS_PAGE" Text="Combinations" />
-        <NNavLink Endpoint="@LOOPS_PAGE" Text="Loops" />
-        <NNavLink Endpoint="@CLUBS_PAGE" Text="Clubs" />
-        <NNavLink Endpoint="@SETTINGS_PAGE" Text="Settings" />
+    <MudNavGroup Title="@Setup_string" Expanded="true">
+        <NNavLink Endpoint="@ENDURANCE_EVENT_PAGE" Match="NavLinkMatch.All">@Endurance_Event_string</NNavLink>
+        <NNavLink Endpoint="@ATHLETES_HORSES_PAGE">@Athletes_and_Horses_string</NNavLink>
+        <NNavLink Endpoint="@COMBINATIONS_PAGE">@Combinations_string</NNavLink>
+        <NNavLink Endpoint="@LOOPS_PAGE">@Loops_string</NNavLink>
+        <NNavLink Endpoint="@CLUBS_PAGE">@Clubs_string</NNavLink>
+        <NNavLink Endpoint="@SETTINGS_PAGE">@Settings_string</NNavLink>
     </MudNavGroup>
 
-    <MudNavGroup Title="@Localizer.Get("Dashboard")" Expanded="true">
-        <NNavLink Endpoint="@DASHBOARD_PAGE" Text="Dashboard" />
-        <NNavLink Endpoint="@STARTLIST_PAGE" Text="Startlist"/>
-        <NNavLink Endpoint="@RANKLIST_PAGE" Text="Ranklist" />
-        <NNavLink Endpoint="@HANDOUTS_PAGE" Text="Handouts" />
+    <MudNavGroup Title="@Dashboard_string" Expanded="true">
+        <NNavLink Endpoint="@DASHBOARD_PAGE">@Dashboard_string</NNavLink>
+        <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
+        <NNavLink Endpoint="@RANKLIST_PAGE">@Ranklist_string</NNavLink>
+        <NNavLink Endpoint="@HANDOUTS_PAGE">@Handouts_string</NNavLink>
     </MudNavGroup>
 
-    <NNavLink Endpoint="@INQUIRY_PAGE" Text="Inquiry" />
+    <NNavLink Endpoint="@INQUIRY_PAGE">@Inquiry_string</NNavLink>
 
     <MudNavGroup Title="Demos">
         <MudNavLink Href="/localization-demo" Match="NavLinkMatch.Prefix">Localization</MudNavLink>

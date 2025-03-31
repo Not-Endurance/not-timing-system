@@ -7,6 +7,6 @@ public class NButtonUpdate : NButtonPrimary
     public NButtonUpdate()
     {
         StartIcon = Icons.Material.Filled.Create;
-        Text = "Update";
+        Text = Update_string;
     }
 }

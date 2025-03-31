@@ -42,7 +42,7 @@ public class NotListModel
         foreach (var value in values)
         {
             var enumValue = (Enum)value;
-            var description = enumValue.GetDescription();
+            var description = Localize(enumValue);
             var tValue = (T)Enum.ToObject(underlyingType, value);
             yield return new NotListModel<T>(tValue, description);
         }

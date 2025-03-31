@@ -2,7 +2,7 @@
 
 namespace NTS.Domain.Enums;
 
-public enum CompetitionType
+public enum CompetitionType // TODO: Use DisplayAttribute
 {
     [Display(Name = "Qualification")]
     Qualification = 1,

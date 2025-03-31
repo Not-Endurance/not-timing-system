@@ -79,19 +79,18 @@ public class Combination : AggregateRoot
 
     public override string ToString()
     {
-        var result = $"{"#".Localize()}{Number}: {Athlete}, {Horse}";
-        var kmph = "km/h".Localize();
+        var result = $"{hash_string}{Number}: {Athlete}, {Horse}";
         if (MinAverageSpeed != null && MaxAverageSpeed != null)
         {
-            return result + $" ({MinAverageSpeed}-{MaxAverageSpeed} {kmph})";
+            return result + $" ({MinAverageSpeed}-{MaxAverageSpeed} {km_per_hour_string})";
         }
         else if (MinAverageSpeed != null && MaxAverageSpeed == null)
         {
-            return result + $" ({"min".Localize()}:{MinAverageSpeed} {kmph})";
+            return result + $" ({min_string}:{MinAverageSpeed} {km_per_hour_string})";
         }
         else if (MinAverageSpeed == null && MaxAverageSpeed != null)
         {
-            return result + $" ({"max".Localize()} : {MaxAverageSpeed}   {kmph})";
+            return result + $" ({max_string} : {MaxAverageSpeed}   {km_per_hour_string})";
         }
         return result;
     }

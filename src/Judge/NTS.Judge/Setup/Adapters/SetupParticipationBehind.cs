@@ -2,7 +2,7 @@
 using Not.Application.CRUD.Ports;
 using Not.Extensions;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Setup.EnduranceEvents.Contestants;
+using NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 using NTS.Judge.Core.Behinds;
 
 namespace NTS.Judge.Setup.Adapters;

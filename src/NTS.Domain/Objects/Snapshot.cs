@@ -20,6 +20,6 @@ public record Snapshot : DomainObject
 
     public override string ToString()
     {
-        return "#".Localize() + $"{Number} at {Timestamp}";
+        return hash_string + $"{Number} at {Timestamp}";
     }
 }

@@ -94,26 +94,23 @@ public class EnduranceEvent : AggregateRoot, IParent<Official>, IParent<Competit
         Required(name, value);
 
         var character = value.First();
-        if (string.IsNullOrEmpty(value) || !char.IsUpper(character))
-        {
-            throw new DomainException(name, $"Has to be Capital case");
-        }
         return value;
     }
 
     void ValidateRole(Official member)
     {
         var role = member.Role;
-        if (member.IsUniqueRole())
+        if (!member.IsUniqueRole())
         {
-            var existing = _officials.FirstOrDefault(x => x.Role == role);
-            if (existing != null && existing != member)
-            {
-                var description = member.Role.GetDescription();
-                //TODO: Notification should localize the templates and arguments separately
-                var message = string.Format("Official '{0}' already exists", description);
-                throw new DomainException(nameof(Official.Role), message);
-            }
+            return;
         }
+        var existing = _officials.FirstOrDefault(x => x.Role == role);
+        if (existing == null || existing == member)
+        {
+            return;
+        }
+        //TODO: Enum localization
+        var roleString = member.Role.GetDescription();
+        throw new DomainPropertyException(nameof(Official.Role), Official__already_exists, roleString);
     }
 }

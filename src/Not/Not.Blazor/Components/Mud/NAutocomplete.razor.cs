@@ -5,7 +5,7 @@ using Not.Blazor.Ports;
 
 namespace Not.Blazor.Components;
 
-public partial class NAutocomplete<T>
+public partial class NAutocomplete<T> : NBindableComponent<T>
 {
     [Inject]
     IServiceProvider Provider { get; set; } = default!;
