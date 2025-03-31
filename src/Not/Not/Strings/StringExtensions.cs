@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Not.Notify;
 
 namespace Not.Strings;
 
@@ -33,4 +34,25 @@ public static class StringExtensions
         sb.AppendLine("...");
         return sb.ToString();
     }
+
+    public static string Format(this string format, params object?[] args)
+    {
+        try
+        {
+            var normalized = args.Select(x => x?.ToString() ?? "");
+            return string.Format(format, [..normalized]);
+        }
+        catch (FormatException)
+        {
+            var message =
+                Text_formatting_failed_This_is_usually_not_critical_failure_string
+                + Environment.NewLine
+                + $"Format: {format}"
+                + Environment.NewLine
+                + $"args: {string.Join(", ", args)}";
+            NotifyHelper.Error(message);
+            return format;
+        }
+    }
 }
+ 

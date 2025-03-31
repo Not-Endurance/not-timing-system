@@ -1,4 +1,5 @@
 ﻿using Not.Exceptions;
+using Not.Strings;
 
 namespace Not.Domain.Exceptions;
 
@@ -9,7 +10,7 @@ public class DomainException : ValidationException
         : base(message) { }
 
     public DomainException(string template, params object[] args)
-        : base(string.Format(template, args)) { }
+        : base(template.Format(args)) { } // TODO: add template validation attribute wtf ever its name was
 }
 
 public class DomainPropertyException : DomainException
@@ -18,5 +19,5 @@ public class DomainPropertyException : DomainException
         : base(property, message) { }
 
     public DomainPropertyException(string property, string template, params object?[] args)
-        : base(property, string.Format(template, args)) { }
+        : base(property, template.Format(args)) { }
 }
