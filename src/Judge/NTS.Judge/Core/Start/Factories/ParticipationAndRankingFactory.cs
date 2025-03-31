@@ -30,7 +30,7 @@ public static class ParticipationAndRankingFactory
         var competitionDistance = 0m;
         var participations = new List<Participation>();
         var rankingEntriesByCategory = new Dictionary<AthleteCategory, List<RankingEntry>>();
-        foreach (var contestant in setupCompetition.Participations)
+        foreach (var setupParticipation in setupCompetition.Participations)
         {
             DateTimeOffset? startTime = setupCompetition.Start.ToUniversalTime();
             var setupPhases = setupCompetition.Phases;
@@ -50,7 +50,7 @@ public static class ParticipationAndRankingFactory
                 phases.Add(corePhase);
                 competitionDistance += (decimal)setupPhase.Loop!.Distance;
             }
-            var setupCombination = contestant.Combination;
+            var setupCombination = setupParticipation.Combination;
             var combination = new Combination(
                 setupCombination.Number,
                 setupCombination.Athlete,
@@ -58,8 +58,8 @@ public static class ParticipationAndRankingFactory
                 competitionDistance,
                 setupCombination.Athlete.Country,
                 setupCombination.Athlete.Club,
-                contestant.MinAverageSpeed,
-                contestant.MaxAverageSpeed
+                setupParticipation.MinAverageSpeed,
+                setupParticipation.MaxAverageSpeed
             );
             var participation = new Participation(
                 setupCompetition.Name,
@@ -72,7 +72,7 @@ public static class ParticipationAndRankingFactory
             if (storedParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
-                var rankingEntry = new RankingEntry(participation, contestant.IsNotRanked);
+                var rankingEntry = new RankingEntry(participation, setupParticipation.IsNotRanked);
                 AddRanking(rankingEntriesByCategory, setupCombination.Athlete.Category, rankingEntry);
             }
             else
@@ -82,7 +82,7 @@ public static class ParticipationAndRankingFactory
                     .Find(p => p.Combination.Number == participation.Combination.Number);
                 if (participationRef != null)
                 {
-                    var rankingEntry = new RankingEntry(participationRef, contestant.IsNotRanked);
+                    var rankingEntry = new RankingEntry(participationRef, setupParticipation.IsNotRanked);
                     AddRanking(rankingEntriesByCategory, setupCombination.Athlete.Category, rankingEntry);
                 }
             }
