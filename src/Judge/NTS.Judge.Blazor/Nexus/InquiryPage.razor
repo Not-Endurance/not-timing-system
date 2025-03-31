@@ -26,7 +26,11 @@
 
         </MudStack>
         
-        @if (Behind.Match != null)
+        @if (Behind.Match = null)
+        {
+            <MudTextField Value="@No_results_found_in_archive_string" />
+        }
+        else 
         {
             <MudTextField Value="Behind.Match.ToString()" />
 

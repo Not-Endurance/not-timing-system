@@ -516,4 +516,7 @@
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Time format is incorect 'hours:minutes:seconds'</value>
   </data>
+  <data name="No_results_found_in_archive_string" xml:space="preserve">
+    <value>No results found in archive</value>
+  </data>
 </root>
