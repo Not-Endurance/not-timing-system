@@ -111,7 +111,7 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
 
     public DateTimeOffset ToDateTimeOffset()
     {
-        return _stamp;
+        return _stamp.LocalDateTime;
     }
 
     public DateTime ToDateTime()
