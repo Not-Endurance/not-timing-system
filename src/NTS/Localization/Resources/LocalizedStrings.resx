@@ -178,7 +178,7 @@
     <value>max</value>
   </data>
   <data name="km_per_hour_string" xml:space="preserve">
-    <value>km per hour</value>
+    <value>km/h</value>
   </data>
     <data name="Min_value_is_1_minute_string" xml:space="preserve">
     <value>Min value is 1 minute</value>
