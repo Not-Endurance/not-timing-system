@@ -134,7 +134,8 @@ namespace NTS.Localization
         public static string __cannot_be_sooner_than__string => LocalizeString(nameof(__cannot_be_sooner_than__string));
         public static string Number_string => LocalizeString(nameof(Number_string));
         public static string Category_string => LocalizeString(nameof(Category_string));
-        public static string No_results_found_in_archive_string => LocalizeString(nameof(No_results_found_in_archive_string));
+        public static string No_results_found_in_archive_string =>
+            LocalizeString(nameof(No_results_found_in_archive_string));
         public static string Time_format_is_incorrect_hrs_colon_mins_colon_secs_string =>
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
     }

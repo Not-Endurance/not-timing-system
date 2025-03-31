@@ -40,7 +40,7 @@ public static class StringExtensions
         try
         {
             var normalized = args.Select(x => x?.ToString() ?? "");
-            return string.Format(format, [..normalized]);
+            return string.Format(format, [.. normalized]);
         }
         catch (FormatException)
         {
@@ -55,4 +55,3 @@ public static class StringExtensions
         }
     }
 }
- 

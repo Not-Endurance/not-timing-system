@@ -12,7 +12,10 @@ public class CompetitionParentContext : BehindContext<Competition>, ICrudParent<
     ObservableList<Phase> _phases = new();
     ObservableList<Participation> _participations = new();
 
-    public CompetitionParentContext(IRepository<Competition> competitionRepository, IRepository<Participation> participationRepository)
+    public CompetitionParentContext(
+        IRepository<Competition> competitionRepository,
+        IRepository<Participation> participationRepository
+    )
         : base(competitionRepository)
     {
         _participationRepository = participationRepository;
