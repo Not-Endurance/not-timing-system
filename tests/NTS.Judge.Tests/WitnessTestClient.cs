@@ -50,4 +50,9 @@ public class WitnessTestClient
         InvokedMethods.Add(nameof(ReceiveEntryUpdate));
         return Task.CompletedTask;
     }
+
+    public override void RunAtStartup()
+    {
+        throw new NotImplementedException();
+    }
 }

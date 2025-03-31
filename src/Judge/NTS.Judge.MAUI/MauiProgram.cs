@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Not.Application.RPC.SignalR;
+using NTS.Judge.RPC;
 using static NTS.Judge.MAUI.Constants;
 using static NTS.Relay.Constants;
 
@@ -17,16 +18,9 @@ public static class MauiProgram
 
         var app = builder.Build();
 
-        ConnectToHub(app.Services);
+        StartHub();
 
         return app;
-    }
-
-    static void ConnectToHub(IServiceProvider serviceProvider)
-    {
-        StartHub();
-        var socket = serviceProvider.GetRequiredService<IRpcSocket>();
-        socket.Connect();
     }
 
     static void StartHub()
