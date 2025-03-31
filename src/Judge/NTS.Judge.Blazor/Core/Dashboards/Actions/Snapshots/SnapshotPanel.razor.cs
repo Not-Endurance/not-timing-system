@@ -1,4 +1,6 @@
 using MudBlazor;
+using Not.Localization;
+using Not.Notify;
 using NTS.Domain.Objects;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Snapshots;
@@ -23,6 +25,12 @@ public partial class SnapshotPanel
     {
         if (_time == DEFAULT_TIME)
         {
+            return;
+        }
+        if (_time.Length < DEFAULT_TIME.Length)
+        {
+            var incorrectInputMessage = "Time must have Hours:Minutes:Seconds".Localize();
+            NotifyHelper.Inform(incorrectInputMessage);
             return;
         }
 
