@@ -317,6 +317,10 @@ public class Phase : AggregateRoot
         {
             return SnapshotResult.NotApplied(snapshot, NotAppliedDueToDuplicateArrive);
         }
+        if (snapshot.Timestamp < StartTime)
+        {
+            throw new DomainException(__cannot_be_sooner_than__string, Arrival_string, StartTime);
+        }
 
         ArriveTime = snapshot.Timestamp;
         CheckCompulsoryThreshold();
