@@ -1,7 +1,4 @@
-﻿@using NTS.Domain.Core.Objects.Documents
-@using NTS.Domain.Core.Objects
-
-@inherits NComponent
+﻿@inherits NComponent
 
 <MudStack>
     @foreach (var document in Documents!)
@@ -44,10 +41,11 @@
                         }
                         <MudSpacer />
 
-                        <MudItem Class="d-flex flex-row">
-                            <MudImage Src="images/logo-bfks.JPG" />
-                            <MudImage Src="images/logo-fei.JPG" />
-                        </MudItem>
+                        @* Fix logos *@
+                        @* <MudItem Class="d-flex flex-row"> *@
+                        @*     <MudImage Src="images/logo-bfks.JPG" /> *@
+                        @*     <MudImage Src="images/logo-fei.JPG" /> *@
+                        @* </MudItem> *@
 
                     </MudStack>
                 </MudItem>

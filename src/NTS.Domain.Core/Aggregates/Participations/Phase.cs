@@ -152,6 +152,7 @@ public class Phase : AggregateRoot
         ArriveTime = Timestamp.Create(state.ArriveTime);
         PresentTime = Timestamp.Create(state.PresentTime);
         RepresentTime = Timestamp.Create(state.RepresentTime);
+        CheckCompulsoryThreshold();
     }
 
     internal bool ViolatesRecoveryTime()
@@ -178,7 +179,7 @@ public class Phase : AggregateRoot
         IsRequiredInspectionRequested = true;
     }
 
-    internal void DisableReinspection()
+    internal void DisableRepresentation()
     {
         if (!IsReinspectionRequested)
         {
@@ -190,7 +191,7 @@ public class Phase : AggregateRoot
                 Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string
             );
         }
-        IsReinspectionRequested = false;
+        IsReinspectionRequested = false; // TODO:rename to IsRepresentation requested
     }
 
     internal void SetGate(int number, double totalDistanceSoFar)

@@ -178,7 +178,7 @@
     <value>max</value>
   </data>
   <data name="km_per_hour_string" xml:space="preserve">
-    <value>km per hour</value>
+    <value>km/h</value>
   </data>
     <data name="Min_value_is_1_minute_string" xml:space="preserve">
     <value>Min value is 1 minute</value>
@@ -515,5 +515,8 @@
   </data>
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Time format is incorect 'hours:minutes:seconds'</value>
+  </data>
+  <data name="No_results_found_in_archive_string" xml:space="preserve">
+    <value>No results found in archive</value>
   </data>
 </root>
