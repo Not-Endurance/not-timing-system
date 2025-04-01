@@ -284,7 +284,7 @@ public class Phase : AggregateRoot
         {
             return Arrive(snapshot);
         }
-        if (PresentTime == null || RepresentTime == null)
+        if (PresentTime == null || RepresentTime == null && IsReinspectionRequested)
         {
             return Inspect(snapshot);
         }
