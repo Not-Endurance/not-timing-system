@@ -23,10 +23,10 @@ if (args.Any())
 }
 
 #if DEBUG
-    builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Trace);
-    builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Trace);
+builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Trace);
+builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Trace);
 #else
-    builder
+builder
     .ConfigureLogging()
     .AddFilesystemLogger(logFileConfig =>
     {
