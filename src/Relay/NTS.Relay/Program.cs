@@ -22,13 +22,18 @@ if (args.Any())
     builder.Services.AddHostedService<ProcessService>();
 }
 
-builder
+#if DEBUG
+    builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Trace);
+    builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Trace);
+#else
+    builder
     .ConfigureLogging()
     .AddFilesystemLogger(logFileConfig =>
     {
         logFileConfig.Path = FileContextHelper.GetAppDirectory("logs");
-        logFileConfig.Name = FileContextHelper.ConfigureApplicationName("NTS.Judge.Server");
+        logFileConfig.Name = FileContextHelper.ConfigureApplicationName("NTS.Relay");
     });
+#endif
 
 var app = builder.Build();
 
