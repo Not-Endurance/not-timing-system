@@ -8,30 +8,32 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class EnduranceEvent : AggregateRoot, IParent<Official>, IParent<Competition>, IAggregateRoot
 {
-    public static EnduranceEvent Create(string? place, Country? country)
+    public static EnduranceEvent Create(string? place, Country? country, string? showFeiId)
     {
-        return new(place, country);
+        return new(place, country, showFeiId);
     }
 
     public static EnduranceEvent Update(
         int? id,
         string? place,
         Country? country,
+        string? showFeiId,
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials
     )
     {
-        return new(id, place, country, competitions, officials);
+        return new(id, place, country, showFeiId, competitions, officials);
     }
 
-    List<Competition> _competitions = [];
-    List<Official> _officials = [];
+    readonly List<Competition> _competitions = [];
+    readonly List<Official> _officials = [];
 
     [JsonConstructor]
     EnduranceEvent(
         int? id,
         string? place,
         Country? country,
+        string? showFeiId,
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials
     )
@@ -39,15 +41,17 @@ public class EnduranceEvent : AggregateRoot, IParent<Official>, IParent<Competit
     {
         Place = Capitalized(nameof(Place), place);
         Country = Required(nameof(Country), country);
+        ShowFeiId = showFeiId;
         _competitions = competitions.ToList();
         _officials = officials.ToList();
     }
 
-    EnduranceEvent(string? place, Country? country)
-        : this(GenerateId(), place, country, [], []) { }
+    EnduranceEvent(string? place, Country? country, string? showFeiId)
+        : this(GenerateId(), place, country, showFeiId, [], []) { }
 
     public string Place { get; }
     public Country Country { get; }
+    public string? ShowFeiId { get; }
     public IReadOnlyList<Official> Officials => _officials.AsReadOnly();
     public IReadOnlyList<Competition> Competitions => _competitions.AsReadOnly();
 

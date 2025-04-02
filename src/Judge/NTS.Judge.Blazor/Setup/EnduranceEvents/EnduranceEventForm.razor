@@ -9,4 +9,6 @@
     <MudTextField @ref="_placeField" @bind-Value="Model.Place" Label="@Place_string" />
 
     <NAutocomplete T="Country" @ref="_countryField" @bind-Value="Model.Country" Label="@Country_string" Search="Countries.Search" />
+    
+    <MudTextField @bind-Value="Model.FeiShowId" Label="@($"{FEI_Show_ID} {required_for_FEI_export})")" />
 </EditForm>

@@ -23,9 +23,7 @@ public static class EnduranceEventFactory
             "",
             startDate,
             endDate,
-            null,
-            null,
-            null
+           setupEvent.ShowFeiId
         );
         return enduranceEvent;
     }

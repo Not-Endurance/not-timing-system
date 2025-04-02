@@ -5,24 +5,20 @@ using NTS.Domain.Core.Objects;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class EnduranceEvent : AggregateRoot, IAggregateRoot
+public class EnduranceEvent : AggregateRoot
 {
     [JsonConstructor]
     EnduranceEvent(
         int id,
         PopulatedPlace populatedPlace,
         EventSpan eventSpan,
-        string? feiId,
-        string? feiCode,
-        string? showFeiId
+        string? feiShowId
     )
         : base(id)
     {
         PopulatedPlace = populatedPlace;
         EventSpan = eventSpan;
-        FeiId = feiId;
-        FeiCode = feiCode;
-        ShowFeiId = showFeiId;
+        FeiShowId = feiShowId;
     }
 
     public EnduranceEvent(
@@ -32,24 +28,13 @@ public class EnduranceEvent : AggregateRoot, IAggregateRoot
         string place,
         DateTimeOffset startDate,
         DateTimeOffset endDate,
-        string? feiId,
-        string? feiCode,
-        string? showFeiId
+        string? feiShowId
     )
-        : this(
-            id,
-            new PopulatedPlace(country, city, place),
-            new EventSpan(startDate, endDate),
-            feiId,
-            feiCode,
-            showFeiId
-        ) { }
+        : this(id, new PopulatedPlace(country, city, place), new EventSpan(startDate, endDate), feiShowId) { }
 
     public PopulatedPlace PopulatedPlace { get; set; }
     public EventSpan EventSpan { get; }
-    public string? FeiId { get; }
-    public string? FeiCode { get; }
-    public string? ShowFeiId { get; }
+    public string? FeiShowId { get; }
 
     public override string ToString()
     {

@@ -1,7 +1,4 @@
-﻿@using NTS.Domain.Setup.Aggregates
-@using Not.Blazor.CRUD.Forms.Components
-@using Not.Extensions
-@using Not.Structures
+﻿@using Not.Blazor.CRUD.Forms.Components
 
 @inherits NForm<CompetitionFormModel>;
 
@@ -22,4 +19,12 @@
     {
         <MudNumericField @ref="_requiredInspectionCompulsoryThreshold" @bind-Value="Model.CompulsoryThresholdMinutes" />
     }
+
+    <MudTextField @bind-Value="Model.FeiRule" Label="@($"{FEI_Rule} {required_for_FEI_export})")" />
+    
+    <MudTextField @bind-Value="Model.FeiEventCode" Label="@($"{FEI_Event_Code} {required_for_FEI_export})")" />
+    
+    <MudTextField @bind-Value="Model.FeiScheduleNumber" Label="@($"{FEI_Schedule_NR} {required_for_FEI_export})")" />
+    
+    <MudTextField @bind-Value="Model.FeiCategoryEventNumber" Label="@($"{FEI_Category_Event_NR} {required_for_FEI_export})")" />
 </EditForm>

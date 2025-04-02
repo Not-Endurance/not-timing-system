@@ -62,7 +62,7 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
 
     async Task SafeCreate(EnduranceEventFormModel model)
     {
-        var enduranceEvent = EnduranceEvent.Create(model.Place, model.Country);
+        var enduranceEvent = EnduranceEvent.Create(model.Place, model.Country, model.FeiShowId);
         await _events.Create(enduranceEvent);
         _context.SetParent(enduranceEvent);
         Model = new EnduranceEventFormModel();
@@ -76,6 +76,7 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
             model.Id,
             model.Place,
             model.Country,
+            model.FeiShowId,
             _competitionParent.Children,
             _officialParent.Children
         );
