@@ -519,9 +519,6 @@
   <data name="No_results_found_in_archive_string" xml:space="preserve">
     <value>Няма резултати в архива</value>
   </data>
-<<<<<<< Updated upstream
-</root>
-=======
   <data name="required_for_FEI_export" xml:space="preserve">
     <value>(задължително за ФЕИ експорт)</value>
   </data>
@@ -541,4 +538,3 @@
     <value>FEI Schedule NR</value>
   </data>
 </root>
->>>>>>> Stashed changes
