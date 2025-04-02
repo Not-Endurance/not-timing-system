@@ -1,5 +1,4 @@
-﻿using Not.Domain;
-using NTS.Domain.Core.Aggregates;
+﻿using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Storage.Documents.Archive.Models;
 using NTS.Storage.Documents.Countries;
@@ -21,6 +20,7 @@ public class ArchiveDocument : Document
             Country = CountryDocument.Create(enduranceEvent.PopulatedPlace.Country),
             City = enduranceEvent.PopulatedPlace.City,
             Location = enduranceEvent.PopulatedPlace.Location,
+            FeiShowId = enduranceEvent.FeiShowId,
             StartDay = enduranceEvent.EventSpan.StartDay,
             EndDay = enduranceEvent.EventSpan.EndDay,
             Officials = officials.Select(OfficialDocument.Create).ToArray(),
@@ -31,6 +31,7 @@ public class ArchiveDocument : Document
     public CountryDocument Country { get; init; } = default!;
     public string City { get; init; } = default!;
     public string? Location { get; init; }
+    public string? FeiShowId { get; init; }
     public DateTimeOffset StartDay { get; init; }
     public DateTimeOffset EndDay { get; init; }
     public OfficialDocument[] Officials { get; init; } = default!;
