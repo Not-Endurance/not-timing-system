@@ -11,4 +11,5 @@ public interface IRankingBehind : IObservableBehind, ISingleton
     Task<IEnumerable<Ranking>> GetRankings();
     Task SelectRanking(int id);
     Task Archive();
+    Task ExportFei();
 }

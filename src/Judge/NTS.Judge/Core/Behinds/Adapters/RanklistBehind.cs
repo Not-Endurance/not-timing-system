@@ -8,23 +8,27 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Blazor.Core.Rankings;
+using NTS.Judge.Core.FeiExport;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
 public class RanklistBehind : ObservableBehind, IRankingBehind
 {
+    readonly IFeiExportBusiness _feiExportBusiness;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
 
     public RanklistBehind(
+        IFeiExportBusiness feiExportBusiness,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Official> officials,
         IRepository<ArchiveEntry> archive
     )
     {
+        _feiExportBusiness = feiExportBusiness;
         _rankings = rankings;
         _events = events;
         _officials = officials;
@@ -72,6 +76,17 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
 
         var entry = new ArchiveEntry(enduranceEvent, officials, ranklists);
         await _archive.Create(entry);
+    }
+
+    public async Task ExportFei()
+    {
+        if (Ranklist == null)
+        {
+            return;
+        }
+        var xml = await _feiExportBusiness.Create(Ranklist);
+        var path = $"C:/fei-export-{Ranklist.Name}.xml";
+        await File.WriteAllTextAsync(path, xml);
     }
 
     async Task<IEnumerable<Ranking>> SafeGetRankings()

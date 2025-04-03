@@ -1,6 +1,11 @@
+using System.Globalization;
+using System.Xml.Serialization;
 using Not.Application.CRUD.Ports;
+using Not.Domain.Exceptions;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Enums;
 
 namespace NTS.Judge.Core.FeiExport;
 
@@ -13,67 +18,70 @@ public class FeiExportBusiness : IFeiExportBusiness
         _events = events;
     }
     
-    public async Task Export(Ranklist ranklist)
+    public async Task<string> Create(Ranklist ranklist)
     {
         var enduranceEvent = await _events.Read(0);
         
-        throw new NotImplementedException();
+        var ctCompetition = CreateCompetitions(enduranceEvent!, ranklist);
+        var horseSport = CreateHorseSport(enduranceEvent!, ctCompetition, ranklist.Ranking);
+
+        var xml = Serialize(horseSport);
+        return InsertGeneratedDate(xml);
     }
 
-    ctEnduranceCompetition CreateCompetitions(Competition competition, string showFeiId, Category category)
+    ctEnduranceCompetition CreateCompetitions(EnduranceEvent enduranceEvent, Ranklist ranklist)
     {
-        var categoryString = category == Category.Seniors
+        var ranking = ranklist.Ranking;
+        var categoryString = ranking.Category == AthleteCategory.Senior
             ? "S"
-            : category == Category.Children ? "C" : "YJ";
-        var competitionFeiId = $"{showFeiId}_E_{categoryString}_{competition.FeiCategoryEventNumber}_{competition.FeiScheduleNumber}";
+            : ranking.Category == AthleteCategory.Children ? "C" : "YJ";
+        var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}_{ranking.FeiScheduleNumber}";
         var ctCompetition = new ctEnduranceCompetition
         {
             FEIID = competitionFeiId,
-            ScheduleCompetitionNr = competition.FeiScheduleNumber,
-            Rule = competition.Rule,
-            Name = competition.Name,
-            StartDate = competition.StartTime,
+            ScheduleCompetitionNr = ranking.FeiScheduleNumber!,
+            Rule = ranking.FeiRule!,
+            Name = ranking.Name,
+            StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
             Team = false,
             ParticipationList = new ctEnduranceParticipations()
         };
 
-        var ctParticipations = CreateParticipations(competition);
+        var ctParticipations = CreateParticipations(ranklist);
 
         // .. Necessary to order here, because Ranklist implementation is terrible
         ctCompetition.ParticipationList.Participation = ctParticipations.OrderBy(x => x.Position.Rank).ToArray();
         return ctCompetition;
     }
 
-    IEnumerable<ctEnduranceIndivResult> CreateParticipations(Competition competition)
+    IEnumerable<ctEnduranceIndivResult> CreateParticipations(Ranklist ranklist)
     {
-        var competitionResult = _competitions.First(x => x.Id == competition.Id);
-        var participations = _stateContext.State.Participations.Where(x => x.CompetitionsIds.Contains(competition.Id));
-        var withoutFeiId = participations.Where(x => string.IsNullOrWhiteSpace(x.Participant.Athlete.FeiId));
+        var entries = ranklist.Entries;
+        var withoutFeiId = entries.Where(x => string.IsNullOrWhiteSpace(x.Participation.Combination.Athlete.FeiId) || string.IsNullOrWhiteSpace(x.Participation.Combination.Horse.FeiId));
         if (withoutFeiId.Any())
         {
-            var numbers = string.Join(", ", withoutFeiId.Select(x => x.Participant.Number));
-            throw new DomainException(nameof(Participant), $"Participants '{numbers}' are not configured with Athlete FEIID");
+            var numbers = withoutFeiId.Select(x => x.Participation.Combination.Number);
+            var formatted = string.Join(", ", numbers);
+            throw new DomainException($"Participants '{formatted}' are not configured with Athlete/Horse FEI ID");
         }
-        foreach (var participation in participations)
+        foreach (var entry in entries)
         {
-            var ranklist = competitionResult.Rank(participation.Participant.Athlete.Category);
-            var result = ranklist.FirstOrDefault(x => x.Participant.Number == participation.Participant.Number);
-            var athlete = participation.Participant.Athlete;
-            var horse = participation.Participant.Horse;
+            var athlete = entry.Participation.Combination.Athlete;
+            var horse = entry.Participation.Combination.Horse;
 
             var ctParticipation = new ctEnduranceIndivResult
             {
                 Athlete = new ctEnduranceAthlete
                 {
-                    FEIID = int.Parse(athlete.FeiId),
-                    AthleteNumber = int.Parse(participation.Participant.Number),
-                    FirstName = athlete.FirstName,
-                    FamilyName = athlete.LastName,
+                    FEIID = int.Parse(athlete.FeiId!),
+                    AthleteNumber = entry.Participation.Combination.Number,
+                    FirstName = athlete.Names.Names.First(),
+                    FamilyName = athlete.Names.Names.Last(),
                     CompetingFor = athlete.Country.IsoCode,
                 },
                 Horse = new ctHorse
                 {
-                    FEIID = horse.FeiId,
+                    FEIID = horse.FeiId!,
                     Name = horse.Name
                 },
                 Complement = new ctEnduranceComplement
@@ -82,17 +90,20 @@ public class FeiExportBusiness : IFeiExportBusiness
                 },
                 Position = new ctPositionIndiv
                 {
-                    Status = result.Participant.LapRecords.Last().Result.TypeCode,
-                    Rank = ranklist.IndexOf(result) + 1,
+                    Status = entry.Participation.Eliminated?.Code ?? "R",
                 },
             };
+            if (ctParticipation.Position.Status == "R")
+            {
+                ctParticipation.Position.Rank = entry.Rank!.Value;
+            }
 
-            var ctDays = CreateDaysAndPhases(participation, competition);
+            var ctDays = CreateDaysAndPhases(entry.Participation);
             ctParticipation.Phases = ctDays.ToArray();
 
-            if (participation.Participant.LapRecords.All(x => x.Result.Type == ResultType.Successful))
+            if (entry.Participation.Eliminated == null)
             {
-                ctParticipation.Total = CreateTotal(participation);
+                ctParticipation.Total = CreateTotal(entry.Participation);
             }
 
             yield return ctParticipation;
@@ -102,8 +113,8 @@ public class FeiExportBusiness : IFeiExportBusiness
     ctEnduranceTotal CreateTotal(Participation participation)
     {
         var total = participation.GetTotal();
-        var time = total?.Interval.ToTimeSpan();
-        var speed = total?.AverageSpeed.ToDouble()  ?? default;
+        var time = total?.Interval.ToTimeSpan() ?? TimeSpan.Zero;
+        var speed = total?.AverageSpeed.ToDouble() ?? default;
         return new ctEnduranceTotal
         {
             AverageSpeed = Round(speed),
@@ -111,40 +122,31 @@ public class FeiExportBusiness : IFeiExportBusiness
         };
     }
 
-    IEnumerable<ctEnduranceDayResult> CreateDaysAndPhases(Participation participation, Competition competition)
+    IEnumerable<ctEnduranceDayResult> CreateDaysAndPhases(Participation participation)
     {
         var days = new List<ctEnduranceDayResult>();
         var day = new ctEnduranceDayResult() { Number = 1 };
-        var lastDate = default(DateTime);
-        foreach (var record in participation.Participant.LapRecords)
+        var lastDate = default(DateTimeOffset);
+        foreach (var phase in participation.Phases)
         {
-            var performance = new Performance(record, competition.Type, 0);
-            var phase = new ctEndurancePhaseResult
+            var averagePhaseSpeed = phase.GetAveragePhaseSpeed()?.ToDouble() ?? 0;
+            var phaseInterval = phase.GetPhaseInterval()?.ToTimeSpan() ?? TimeSpan.Zero;
+            var recoveryInterval = phase.GetRecoveryInterval()?.ToTimeSpan() ?? TimeSpan.Zero;
+            var ctPhase = new ctEndurancePhaseResult
             {
-                Number = participation.Participant.LapRecords.IndexOf(record) + 1,
+                Number = participation.Phases.IndexOf(phase) + 1,
                 Result = new ctEndurancePhaseResultScore
                 {
-                    PhaseAverageSpeed = Round(performance.AverageSpeedPhase.Value),
-                    PhaseTime = FormatTime(performance.Time),
-                    RecoveryTime = FormatTime(performance.RecoverySpan),
+                    PhaseAverageSpeed = Round(averagePhaseSpeed),
+                    PhaseTime = FormatTime(phaseInterval),
+                    RecoveryTime = FormatTime(recoveryInterval),
                 },
             };
-            if (record.Result.Type != ResultType.Successful)
-            {
-                var eliminationCode = record.Result.TypeCode == "RET"
-                    ? record.Result.TypeCode
-                    : $"{record.Result.TypeCode} {record.Result.Code}";
-                phase.VetInspection = new ctEnduranceVetInspection
-                {
-                    Type = stEnduranceVetTypeCode.Standard,
-                    EliminationCode = eliminationCode,
-                };
-            }
-            if (lastDate == default || lastDate == record.StartTime.Date)
+            if (lastDate == default || lastDate == phase.StartTime?.ToDateTimeOffset())
             {
                 var list = new List<ctEndurancePhaseResult>(day.Phase ?? Enumerable.Empty<ctEndurancePhaseResult>())
                 {
-                    phase
+                    ctPhase
                 };
                 day.Phase = list.ToArray();
             }
@@ -153,66 +155,86 @@ public class FeiExportBusiness : IFeiExportBusiness
                 days.Add(day);
                 day = new ctEnduranceDayResult()
                 {
-                    Phase = new List<ctEndurancePhaseResult> { phase }.ToArray(),
+                    Phase = new List<ctEndurancePhaseResult> { ctPhase }.ToArray(),
                     Number = day.Number + 1
                 };
             }
-            lastDate = record.StartTime.Date;
+            lastDate = phase.StartTime?.ToDateTimeOffset() ?? default;
         }
+        if (participation.Eliminated != null)
+        {
+            var eliminationCode = participation.Eliminated.Code;
+            if (participation.Eliminated is FailedToQualify failedToQualify)
+            {
+                var codes = failedToQualify.FtqCodes.Select(x => x.ToString());
+                eliminationCode = string.Join(" ", codes);
+            }
+            var ctPhase = days.Last().Phase.Last();
+            ctPhase.VetInspection = new ctEnduranceVetInspection
+            {
+                Type = stEnduranceVetTypeCode.Standard,
+                EliminationCode = eliminationCode,
+            };
+        }
+
         days.Add(day);
         return days;
     }
 
-    HorseSport CreateHorseSport(EnduranceEvent @event, ctEnduranceCompetition ctEnduranceCompetition, Category category, Competition competition)
+    HorseSport CreateHorseSport(EnduranceEvent enduranceEvent, ctEnduranceCompetition ctEnduranceCompetition, Ranking ranking)
     {
-        if (string.IsNullOrWhiteSpace(@event.ShowFeiId))
+        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiShowId))
         {
             throw new DomainException(nameof(EnduranceEvent), "Missing Show FEIID");
         }
-        if (string.IsNullOrEmpty(@event.PopulatedPlace))
+        if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace?.Location))
         {
             throw new DomainException(nameof(EnduranceEvent), "Missing PopulatedPlace");
         }
-        if (string.IsNullOrEmpty(competition.Name))
+        if (string.IsNullOrEmpty(ranking.Name))
         {
             throw new DomainException(nameof(Competition), "Missing Name");
         }
-        if (string.IsNullOrEmpty(competition.FeiCategoryEventNumber))
+        if (string.IsNullOrEmpty(ranking.FeiCategoryEventNumber))
         {
             throw new DomainException(nameof(Competition), "Missing FEI Category Event NR");
         }
-        if (string.IsNullOrEmpty(competition.FeiScheduleNumber))
+        if (string.IsNullOrEmpty(ranking.FeiScheduleNumber))
         {
             throw new DomainException(nameof(Competition), "Missing FEI Schedule NR");
         }
-        if (string.IsNullOrEmpty(competition.Rule))
+        if (string.IsNullOrEmpty(ranking.FeiRule))
         {
             throw new DomainException(nameof(Competition), "Missing FEI Rule");
         }
-        if (string.IsNullOrEmpty(competition.EventCode))
+        if (string.IsNullOrEmpty(ranking.FeiEventCode))
         {
             throw new DomainException(nameof(Competition), "Missing FEI Event Code");
         }
+        if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace.Country.NfCode))
+        {
+            throw new DomainException($"Country '{enduranceEvent.PopulatedPlace.Country}' does not have 'NF' code. Contact developer");
+        }
 
-        var categoryString = category == Category.Seniors
+        var categoryString = ranking.Category == AthleteCategory.Senior
             ? "S"
-            : category == Category.Children ? "C" : "YJ";
-        var competitionFeiId = $"{@event.ShowFeiId}_E_{categoryString}_{competition.FeiCategoryEventNumber}";
+            : ranking.Category == AthleteCategory.Children ? "C" : "YJ";
+        var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}";
         var ctEnduranceEvent = new ctEnduranceEvent
         {
             FEIID = competitionFeiId,
-            Code = competition.EventCode,
-            StartDate = @event.Competitions.OrderBy(x => x.StartTime).First().StartTime,
-            EndDate = DateTime.UtcNow,
-            NF = @event.Country.IsoCode,
+            Code = ranking.FeiEventCode,
+            StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
+            EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
+            NF = enduranceEvent.PopulatedPlace.Country.NfCode,
             Competitions = new ctEnduranceCompetition[] { ctEnduranceCompetition },
         };
         var horseSport = new HorseSport()
         {
             Generated = new ctGenerated
             {
-                Software = "EMS",
-                SoftwareVersion = "4.1.3",
+                Software = "NTS",
+                SoftwareVersion = "1.0.0",
                 Organization = "NotACompany",
             },
             EventResult = new ctShowResultType
@@ -221,20 +243,20 @@ public class FeiExportBusiness : IFeiExportBusiness
                 {
                     Venue = new ctVenue
                     {
-                        Name = @event.PopulatedPlace,
-                        Country = @event.Country.IsoCode,
+                        Name = enduranceEvent.PopulatedPlace.Location,
+                        Country = enduranceEvent.PopulatedPlace.Country.IsoCode,
                     },
                     EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
-                    StartDate = @event.Competitions.OrderBy(x => x.StartTime).First().StartTime.Date,
-                    EndDate = DateTime.UtcNow.Date,
-                    FEIID = @event.ShowFeiId,
+                    StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
+                    EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
+                    FEIID = enduranceEvent.FeiShowId,
                 }
             }
         };
         return horseSport;
     }
 
-    string BuildXml(HorseSport horseSport)
+    string Serialize(HorseSport horseSport)
     {
         var serializer = new XmlSerializer(typeof(HorseSport));
         using var stream = new StringWriter();
@@ -244,20 +266,23 @@ public class FeiExportBusiness : IFeiExportBusiness
 
     string InsertGeneratedDate(string xml)
     {
-        return xml.Replace("<Generated Software", $"<Generated Date=\"{DateTime.UtcNow.ToString("s", CultureInfo.InvariantCulture)}+00:00\" Software");
+        var now = DateTime.UtcNow.ToString("s", CultureInfo.InvariantCulture);
+        var generated = $"<Generated Date=\"{now}+00:00\" Software";
+        return xml.Replace("<Generated Software", generated);
     }
 
-    decimal Round(double value) => (decimal)Math.Round(value, 2);
+    decimal Round(double value)
+    {
+        return (decimal)Math.Round(value, 2);
+    }
 
-    string FormatTime(TimeSpan? value) => value?.ToString(@"hh\:mm\:ss");
-        
-    
-    
-    
-    
+    string FormatTime(TimeSpan value)
+    {
+        return value.ToString(@"hh\:mm\:ss");
+    }
 }
 
 public interface IFeiExportBusiness
 {
-    Task Export(Ranklist ranklist);
+    Task<string> Create(Ranklist ranklist);
 }
