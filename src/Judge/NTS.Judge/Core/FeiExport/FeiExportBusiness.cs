@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Xml.Serialization;
+using MudBlazor.Extensions;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
@@ -49,9 +50,7 @@ public class FeiExportBusiness : IFeiExportBusiness
         };
 
         var ctParticipations = CreateParticipations(ranklist);
-
-        // .. Necessary to order here, because Ranklist implementation is terrible
-        ctCompetition.ParticipationList.Participation = ctParticipations.OrderBy(x => x.Position.Rank).ToArray();
+        ctCompetition.ParticipationList.Participation = ctParticipations.ToArray();
         return ctCompetition;
     }
 
@@ -65,7 +64,7 @@ public class FeiExportBusiness : IFeiExportBusiness
             var formatted = string.Join(", ", numbers);
             throw new DomainException($"Participants '{formatted}' are not configured with Athlete/Horse FEI ID");
         }
-        foreach (var entry in entries.OrderBy(x => x.Rank))
+        foreach (var entry in entries)
         {
             var athlete = entry.Participation.Combination.Athlete;
             var horse = entry.Participation.Combination.Horse;
@@ -125,9 +124,8 @@ public class FeiExportBusiness : IFeiExportBusiness
 
     IEnumerable<ctEnduranceDayResult> CreateDaysAndPhases(Participation participation)
     {
-        var days = new List<ctEnduranceDayResult>();
         var day = new ctEnduranceDayResult() { Number = 1 };
-        var lastDate = default(DateTimeOffset);
+        var ctPhases = new List<ctEndurancePhaseResult>();
         foreach (var phase in participation.Phases)
         {
             var averagePhaseSpeed = phase.GetAveragePhaseSpeed()?.ToDouble() ?? 0;
@@ -143,24 +141,25 @@ public class FeiExportBusiness : IFeiExportBusiness
                     RecoveryTime = FormatTime(recoveryInterval),
                 },
             };
-            if (lastDate == default || lastDate == phase.StartTime?.ToDateTimeOffset())
-            {
-                var list = new List<ctEndurancePhaseResult>(day.Phase ?? Enumerable.Empty<ctEndurancePhaseResult>())
-                {
-                    ctPhase
-                };
-                day.Phase = list.ToArray();
-            }
-            else
-            {
-                days.Add(day);
-                day = new ctEnduranceDayResult()
-                {
-                    Phase = new List<ctEndurancePhaseResult> { ctPhase }.ToArray(),
-                    Number = day.Number + 1
-                };
-            }
-            lastDate = phase.StartTime?.ToDateTimeOffset() ?? default;
+            ctPhases.Add(ctPhase);
+            //if (lastDate == default || lastDate == phase.StartTime?.ToDateTimeOffset())
+            //{
+            //    var list = new List<ctEndurancePhaseResult>(day.Phase ?? Enumerable.Empty<ctEndurancePhaseResult>())
+            //    {
+            //        ctPhase
+            //    };
+            //    day.Phase = list.ToArray();
+            //}
+            //else
+            //{
+            //    days.Add(day);
+            //    day = new ctEnduranceDayResult()
+            //    {
+            //        Phase = new List<ctEndurancePhaseResult> { ctPhase }.ToArray(),
+            //        Number = day.Number + 1
+            //    };
+            //}
+            //lastDate = phase.StartTime?.ToDateTimeOffset() ?? default;
         }
         if (participation.Eliminated != null)
         {
@@ -170,7 +169,7 @@ public class FeiExportBusiness : IFeiExportBusiness
                 var codes = failedToQualify.FtqCodes.Select(x => x.ToString());
                 eliminationCode = string.Join(" ", codes);
             }
-            var ctPhase = days.Last().Phase.Last();
+            var ctPhase = ctPhases.Last();
             ctPhase.VetInspection = new ctEnduranceVetInspection
             {
                 Type = stEnduranceVetTypeCode.Standard,
@@ -178,8 +177,8 @@ public class FeiExportBusiness : IFeiExportBusiness
             };
         }
 
-        days.Add(day);
-        return days;
+        day.Phase = ctPhases.ToArray();
+        return [day];
     }
 
     HorseSport CreateHorseSport(EnduranceEvent enduranceEvent, ctEnduranceCompetition ctEnduranceCompetition, Ranking ranking)

@@ -87,7 +87,7 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
             return;
         }
         var xml = await _feiExportBusiness.Create(Ranklist);
-        var path = $"C:/fei-export-{Ranklist.Name}.xml";
+        var path = $"C:/Users/User/Documents/fei-exrt-{Ranklist.Name.Replace(" ", "").Replace("*", "")}.xml";
         await File.WriteAllTextAsync(path, xml);
     }
 
