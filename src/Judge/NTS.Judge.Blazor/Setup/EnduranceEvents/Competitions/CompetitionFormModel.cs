@@ -29,6 +29,10 @@ public class CompetitionFormModel : IFormModel<Competition>
         get => UseCompulsoryThreshold ? _requiredInspectionCompulsoryThreshold : null;
         set => _requiredInspectionCompulsoryThreshold = value;
     }
+    public string? FeiRule { get; set; }
+    public string? FeiEventCode { get; set; }
+    public string? FeiScheduleNumber { get; set; }
+    public string? FeiCategoryEventNumber { get; set; }
     public IReadOnlyCollection<Phase> Phases { get; private set; } = [];
     public IReadOnlyCollection<Participation> Participations { get; private set; } = [];
     public DateTimeOffset StartTime => CombineStartDayAndTime(Day, Time);
@@ -45,6 +49,10 @@ public class CompetitionFormModel : IFormModel<Competition>
         Participations = competition.Participations;
         CompulsoryThresholdMinutes = competition.CompulsoryThresholdSpan?.Minutes;
         UseCompulsoryThreshold = competition.CompulsoryThresholdSpan != null;
+        FeiRule = competition.FeiRule;
+        FeiEventCode = competition.FeiEventCode;
+        FeiScheduleNumber = competition.FeiScheduleNumber;
+        FeiCategoryEventNumber = competition.FeiCategoryEventNumber;
     }
 
     static DateTimeOffset CombineStartDayAndTime(DateTime? startDay, TimeSpan? startTime)

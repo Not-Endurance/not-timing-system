@@ -12,10 +12,8 @@ public static class JudgeMauiInjection
     public static MauiAppBuilder ConfigureJudgeMaui(this MauiAppBuilder builder)
     {
         builder.Services.AddMauiBlazorWebView();
-#if DEBUG
         builder.Logging.AddDebug();
         builder.Services.AddBlazorWebViewDeveloperTools();
-#endif
         builder
             .Services.ConfigureStorage()
             .ConfigureJudge(builder.Configuration)

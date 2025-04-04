@@ -1,4 +1,5 @@
-﻿using NTS.Domain.Core.Aggregates.Participations;
+﻿using Not.Random;
+using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
 
 namespace NTS.Storage.Documents.Archive.Models;
@@ -20,7 +21,7 @@ public class PhaseDocumentModel
             PresentTime = phase.PresentTime,
             RepresentTime = phase.RepresentTime,
             IsReinspectionRequested = phase.IsReinspectionRequested,
-            IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested,
+            IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested || phase.IsRequiredInspectionCompulsory, // TODO: probably remove compulsory altogether
             RequiredInspectionTime = phase.GetRequiredInspectionTime(),
             OutTime = phase.GetOutTime(),
             LoopInterval = phase.GetLoopInterval(),
@@ -50,8 +51,30 @@ public class PhaseDocumentModel
     public TimeSpan? LoopInterval { get; init; }
     public TimeSpan? PhaseInterval { get; init; }
     public TimeSpan? RecoveryInterval { get; init; }
+    public TimeSpan? CompulsoryTresholdInterval { get; init; } = TimeSpan.FromMinutes(10);
     public double? AverageLoopSpeed { get; init; }
     public double? AveragePhaseSpeed { get; init; }
     public double? AverageSpeed { get; init; }
     public bool IsComplete { get; init; }
+
+    public Phase ToDomain()
+    {
+        return new Phase(
+            RandomHelper.GenerateUniqueInteger(),
+            Gate,
+            Length,
+            MaxRecovery,
+            Rest,
+            Ruleset,
+            IsFinal,
+            CompulsoryTresholdInterval,
+            StartTime,
+            ArriveTime,
+            PresentTime,
+            RepresentTime,
+            IsReinspectionRequested,
+            IsRequiredInspectionRequested,
+            false
+        );
+    }
 }

@@ -16,8 +16,9 @@ public class Participation : AggregateRoot, IAggregateRoot
     public static readonly Event<ParticipationEliminated> ELIMINATED_EVENT = new();
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
-    [JsonConstructor]
-    Participation(
+    [Newtonsoft.Json.JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Participation(
         int id,
         Competition competition,
         Combination combination,

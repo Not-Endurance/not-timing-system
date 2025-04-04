@@ -32,7 +32,11 @@ public class CompetitionBehind : CrudChildBehind<Competition, CompetitionFormMod
             model.Type,
             model.Ruleset,
             model.StartTime,
-            model.CompulsoryThresholdMinutes
+            model.CompulsoryThresholdMinutes,
+            model.FeiRule,
+            model.FeiEventCode,
+            model.FeiScheduleNumber,
+            model.FeiCategoryEventNumber
         );
     }
 
@@ -45,6 +49,10 @@ public class CompetitionBehind : CrudChildBehind<Competition, CompetitionFormMod
             model.Ruleset,
             model.StartTime,
             model.CompulsoryThresholdMinutes,
+            model.FeiRule,
+            model.FeiEventCode,
+            model.FeiScheduleNumber,
+            model.FeiCategoryEventNumber,
             _phaseParent.Children,
             _participationParent.Children
         );

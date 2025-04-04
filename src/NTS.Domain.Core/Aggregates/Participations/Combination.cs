@@ -1,7 +1,5 @@
 ﻿using System.Globalization;
-using Newtonsoft.Json;
 using Not.Domain.Base;
-using Not.Localization;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
@@ -11,15 +9,14 @@ public class Combination : AggregateRoot
 {
     decimal _distance;
 
-    [JsonConstructor]
-    Combination(
+    [Newtonsoft.Json.JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Combination(
         int id,
         int number,
         Athlete athlete,
         Horse horse,
         string distance,
-        Country? country,
-        Club? club,
         Speed? minAverageSpeed,
         Speed? maxAverageSpeed
     )
@@ -29,8 +26,6 @@ public class Combination : AggregateRoot
         Athlete = athlete;
         Horse = horse;
         Distance = distance;
-        Country = country;
-        Club = club;
         MinAverageSpeed = minAverageSpeed;
         MaxAverageSpeed = maxAverageSpeed;
     }
@@ -40,8 +35,6 @@ public class Combination : AggregateRoot
         IAthlete athlete,
         IHorse horse,
         decimal distance,
-        Country? country,
-        IClub? club,
         double? minAverageSpeedlimit,
         double? maxAverageSpeedLimit
     )
@@ -51,8 +44,6 @@ public class Combination : AggregateRoot
             new Athlete(athlete),
             new Horse(horse),
             FormatDistance(distance),
-            country,
-            club == null ? null : new Club(club),
             Speed.Create(minAverageSpeedlimit),
             Speed.Create(maxAverageSpeedLimit)
         )
@@ -63,7 +54,6 @@ public class Combination : AggregateRoot
     public int Number { get; }
     public Athlete Athlete { get; }
     public Horse Horse { get; }
-    public Country? Country { get; }
     public Club? Club { get; }
     public Speed? MinAverageSpeed { get; }
     public Speed? MaxAverageSpeed { get; }

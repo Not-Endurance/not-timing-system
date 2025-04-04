@@ -1,5 +1,4 @@
-﻿using AngleSharp.Io;
-using Not.Application.Behinds.Adapters;
+﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
 using Not.Notify;
@@ -8,23 +7,28 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Blazor.Core.Rankings;
+using NTS.Judge.Core.FeiExport;
+using NTS.Judge.HTTP;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
 public class RanklistBehind : ObservableBehind, IRankingBehind
 {
+    readonly IFeiExportBusiness _feiExportBusiness;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
-    readonly IRepository<ArchiveEntry> _archive;
+    readonly IArchiveRepository _archive;
 
     public RanklistBehind(
+        IFeiExportBusiness feiExportBusiness,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Official> officials,
-        IRepository<ArchiveEntry> archive
+        IArchiveRepository archive
     )
     {
+        _feiExportBusiness = feiExportBusiness;
         _rankings = rankings;
         _events = events;
         _officials = officials;
@@ -35,6 +39,8 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
     }
 
     public Ranklist? Ranklist { get; private set; }
+
+    public int? ArchiveId { get; set; }
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
@@ -72,6 +78,17 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
 
         var entry = new ArchiveEntry(enduranceEvent, officials, ranklists);
         await _archive.Create(entry);
+    }
+
+    public async Task ExportFei()
+    {
+        if (Ranklist == null)
+        {
+            return;
+        }
+        var xml = await _feiExportBusiness.Create(Ranklist);
+        var path = $"C:/Users/User/Documents/fei-exrt-{Ranklist.Name.Replace(" ", "").Replace("*", "")}.xml";
+        await File.WriteAllTextAsync(path, xml);
     }
 
     async Task<IEnumerable<Ranking>> SafeGetRankings()

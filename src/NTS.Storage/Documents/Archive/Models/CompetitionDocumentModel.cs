@@ -18,4 +18,9 @@ public class CompetitionDocumentModel
     public string Name { get; init; } = default!;
     public CompetitionRuleset Ruleset { get; init; }
     public CompetitionType Type { get; init; }
+
+    public Competition ToDomain()
+    {
+        return new Competition(Name, Ruleset, Type);
+    }
 }

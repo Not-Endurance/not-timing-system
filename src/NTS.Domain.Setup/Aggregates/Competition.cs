@@ -4,17 +4,31 @@ using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>, IAggregateRoot
+public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
 {
     public static Competition Create(
         string? name,
         CompetitionType? type,
         CompetitionRuleset ruleset,
         DateTimeOffset start,
-        int? compulsoryThresholdMinutes
+        int? compulsoryThresholdMinutes,
+        string? feiRule,
+        string? feiEventCode,
+        string? feiScheduleNumber,
+        string? feiCategoryEventNumber
     )
     {
-        return new(name, type, ruleset, start, compulsoryThresholdMinutes);
+        return new(
+            name,
+            type,
+            ruleset,
+            start,
+            compulsoryThresholdMinutes,
+            feiRule,
+            feiEventCode,
+            feiScheduleNumber,
+            feiCategoryEventNumber
+        );
     }
 
     public static Competition Update(
@@ -24,11 +38,28 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         CompetitionRuleset? ruleset,
         DateTimeOffset start,
         int? compulsoryThresholdMinutes,
+        string? feiRule,
+        string? feiEventCode,
+        string? feiScheduleNumber,
+        string? feiCategoryEventNumber,
         IEnumerable<Phase> phases,
         IEnumerable<Participation> participations
     )
     {
-        return new(id, name, type, ruleset, start, ToTimeSpan(compulsoryThresholdMinutes), phases, participations);
+        return new(
+            id,
+            name,
+            type,
+            ruleset,
+            start,
+            ToTimeSpan(compulsoryThresholdMinutes),
+            feiRule,
+            feiEventCode,
+            feiScheduleNumber,
+            feiCategoryEventNumber,
+            phases,
+            participations
+        );
     }
 
     readonly List<Phase> _phases = [];
@@ -42,6 +73,10 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         CompetitionRuleset? ruleset,
         DateTimeOffset start,
         TimeSpan? compulsoryThresholdSpan,
+        string? feiRule,
+        string? feiEventCode,
+        string? feiScheduleNumber,
+        string? feiCategoryEventNumber,
         IEnumerable<Phase> phases,
         IEnumerable<Participation> participations
     )
@@ -54,6 +89,10 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         Ruleset = Required(nameof(Ruleset), ruleset);
         Start = start;
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
+        FeiRule = feiRule;
+        FeiEventCode = feiEventCode;
+        FeiScheduleNumber = feiScheduleNumber;
+        FeiCategoryEventNumber = feiCategoryEventNumber;
     }
 
     Competition(
@@ -61,7 +100,11 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         CompetitionType? type,
         CompetitionRuleset ruleset,
         DateTimeOffset start,
-        int? compulsoryThresholdMinutes
+        int? compulsoryThresholdMinutes,
+        string? feiRule,
+        string? feiEventCode,
+        string? feiScheduleNumber,
+        string? feiCategoryEventNumber
     )
         : this(
             GenerateId(),
@@ -70,6 +113,10 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
             ruleset,
             IsFutureTime(nameof(Start), start),
             ToTimeSpan(compulsoryThresholdMinutes),
+            feiRule,
+            feiEventCode,
+            feiScheduleNumber,
+            feiCategoryEventNumber,
             [],
             []
         ) { }
@@ -79,6 +126,10 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
     public CompetitionRuleset Ruleset { get; }
     public DateTimeOffset Start { get; }
     public TimeSpan? CompulsoryThresholdSpan { get; }
+    public string? FeiRule { get; }
+    public string? FeiEventCode { get; }
+    public string? FeiScheduleNumber { get; }
+    public string? FeiCategoryEventNumber { get; }
     public IReadOnlyList<Phase> Phases => _phases.AsReadOnly();
     public IReadOnlyList<Participation> Participations => _participations.AsReadOnly();
 

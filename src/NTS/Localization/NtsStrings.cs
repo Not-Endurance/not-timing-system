@@ -136,6 +136,12 @@ namespace NTS.Localization
         public static string Category_string => LocalizeString(nameof(Category_string));
         public static string No_results_found_in_archive_string =>
             LocalizeString(nameof(No_results_found_in_archive_string));
+        public static string FEI_Show_ID => LocalizeString(nameof(FEI_Show_ID));
+        public static string FEI_Rule => LocalizeString(nameof(FEI_Rule));
+        public static string FEI_Event_Code => LocalizeString(nameof(FEI_Event_Code));
+        public static string FEI_Schedule_NR => LocalizeString(nameof(FEI_Schedule_NR));
+        public static string FEI_Category_Event_NR => LocalizeString(nameof(FEI_Category_Event_NR));
+        public static string required_for_FEI_export => LocalizeString(nameof(required_for_FEI_export));
         public static string Time_format_is_incorrect_hrs_colon_mins_colon_secs_string =>
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
     }

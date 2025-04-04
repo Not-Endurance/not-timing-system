@@ -1,21 +1,21 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Base;
-using Not.Localization;
+﻿using Not.Domain.Base;
 
 namespace NTS.Domain.Core.Aggregates;
 
 public class RankingEntry : AggregateRoot, IAggregateRoot
 {
-    [JsonConstructor]
-    RankingEntry(int id, Participation participation, bool isNotRanked)
+    [Newtonsoft.Json.JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    public RankingEntry(int id, Participation participation, int? rank, bool isNotRanked)
         : base(id)
     {
         Participation = participation;
+        Rank = rank;
         IsNotRanked = isNotRanked;
     }
 
     public RankingEntry(Participation participation, bool isNotRanked)
-        : this(GenerateId(), participation, isNotRanked) { }
+        : this(GenerateId(), participation, null, isNotRanked) { }
 
     public Participation Participation { get; internal set; }
     public int? Rank { get; internal set; }

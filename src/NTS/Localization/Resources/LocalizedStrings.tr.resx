@@ -519,4 +519,22 @@
   <data name="No_results_found_in_archive_string" xml:space="preserve">
     <value>Arşivde sonuç bulunamadı</value>
   </data>
+  <data name="required_for_FEI_export" xml:space="preserve">
+    <value>(FEI dışa aktarımı için gerekli)</value>
+  </data>
+  <data name="FEI_Show_ID" xml:space="preserve">
+    <value>FEI Show ID</value>
+  </data>
+  <data name="FEI_Category_Event_NR" xml:space="preserve">
+    <value>FEI Category Event NR</value>
+  </data>
+  <data name="FEI_Event_Code" xml:space="preserve">
+    <value>FEI Event Code</value>
+  </data>
+  <data name="FEI_Rule" xml:space="preserve">
+    <value>FEI Rule</value>
+  </data>
+  <data name="FEI_Schedule_NR" xml:space="preserve">
+    <value>FEI Schedule NR</value>
+  </data>
 </root>

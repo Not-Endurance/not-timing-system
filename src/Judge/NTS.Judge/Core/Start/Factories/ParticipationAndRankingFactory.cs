@@ -56,8 +56,6 @@ public static class ParticipationAndRankingFactory
                 setupCombination.Athlete,
                 setupCombination.Horse,
                 competitionDistance,
-                setupCombination.Athlete.Country,
-                setupCombination.Athlete.Club,
                 setupParticipation.MinAverageSpeed,
                 setupParticipation.MaxAverageSpeed
             );
