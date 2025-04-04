@@ -17,6 +17,6 @@ public enum AthleteCategory
     // [Display(Name = "Training_string", ResourceType = typeof(LocalizedStrings))]
     Training = 4,
 
-    // [Display(Name = "Companion_string", ResourceType = typeof(LocalizedStrings))]a
+    // [Display(Name = "Companion_string", ResourceType = typeof(LocalizedStrings))]
     Companion = 5,
 }

@@ -65,7 +65,7 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
 
     public static Timestamp? operator +(Timestamp? left, TimeSpan? right)
     {
-        return left == null ? null : new Timestamp(left!._stamp.TimeOfDay + (right ?? TimeSpan.Zero));
+        return left == null ? null : new Timestamp(left!._stamp + (right ?? TimeSpan.Zero));
     }
 
     Timestamp() { }

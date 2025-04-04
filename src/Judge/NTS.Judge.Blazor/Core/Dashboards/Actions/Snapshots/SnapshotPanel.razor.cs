@@ -9,7 +9,7 @@ public partial class SnapshotPanel
     const string DEFAULT_TIME = "00:00:00";
     static readonly PatternMask TIME_MASK = new("00:00:00");
 
-    string _input = DEFAULT_TIME;
+    string? _input = DEFAULT_TIME;
 
     [Inject]
     IManualProcessor ManualProcessor { get; set; } = default!;
@@ -20,13 +20,13 @@ public partial class SnapshotPanel
         _input = currentTime.ToString();
     }
 
-    void Process()
+    async Task Process()
     {
-        if (_input == DEFAULT_TIME)
+        if (_input is null or DEFAULT_TIME)
         {
             return;
         }
-        var timeString = NormalizeInput();
+        var timeString = NormalizeInput(_input);
         if (!TimeSpan.TryParse(timeString, out var timeSpan))
         {
             NotifyHelper.Inform(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string);
@@ -34,12 +34,12 @@ public partial class SnapshotPanel
         }
         var time = DateTime.Today + timeSpan;
         var timestamp = new Timestamp(time);
-        ManualProcessor.Process(timestamp);
+        await ManualProcessor.Process(timestamp);
     }
 
-    string NormalizeInput()
+    string NormalizeInput(string input)
     {
-        var values = _input
+        var values = input
             .Split(':')
             .Select(x =>
             {
