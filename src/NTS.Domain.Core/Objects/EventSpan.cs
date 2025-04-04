@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Not.Domain.Base;
+using DateTimeOffset = System.DateTimeOffset;
 
 namespace NTS.Domain.Core.Objects;
 
@@ -7,8 +8,8 @@ public record EventSpan : DomainObject
 {
     public EventSpan(DateTimeOffset startDay, DateTimeOffset endDay)
     {
-        StartDay = startDay;
-        EndDay = endDay;
+        StartDay = new DateTimeOffset(startDay.Year, startDay.Month, startDay.Day, 0, 0, 0, startDay.Offset);
+        EndDay = new DateTimeOffset(endDay.Year, endDay.Month, endDay.Day, 23, 59, 59, endDay.Offset);
     }
 
     public DateTimeOffset StartDay { get; }
@@ -16,21 +17,19 @@ public record EventSpan : DomainObject
 
     public override string ToString()
     {
-        var start = StartDay.ToLocalTime();
-        var end = EndDay.ToLocalTime();
-        var now = DateTimeOffset.UtcNow;
+        var now = DateTimeOffset.Now;
         DateTimeOffset date;
-        if (now > start && now < end)
+        if (now > StartDay && now < EndDay)
         {
             date = now;
         }
-        else if (start > now)
+        else if (StartDay > now)
         {
-            date = start;
+            date = StartDay;
         }
         else
         {
-            date = end;
+            date = EndDay;
         }
         return date.ToString("d", CultureInfo.CurrentCulture);
     }

@@ -31,7 +31,7 @@ public class InquiryBehind : ObservableBehind, IInquiryBehind
             .SelectMany(x => x.Ranklists)
             .SelectMany(x => x.Entries)
             .Select(x => x.Participation)
-            .First(x => x.Combination.Horse.Id == id);
+            .FirstOrDefault(x => x.Combination.Horse.Id == id);
         EmitChange();
     }
 

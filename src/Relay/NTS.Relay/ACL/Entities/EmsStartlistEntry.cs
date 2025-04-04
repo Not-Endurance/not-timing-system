@@ -29,7 +29,7 @@ public class EmsStartlistEntry : IComparable<EmsStartlistEntry>, IEquatable<EmsS
         CountryName = participation.Participant.Athlete.Country.Name;
         Distance = participation.Distance!.Value;
         IsRestOver = StartTime < DateTime.Now;
-        Stage = participation.Participant.LapRecords.Count + 1;
+        Stage = participation.Participant.LapRecords.Count;
         StartTime = GetLastNextStartTime(participation) ?? throw new Exception("Missing NextStartTime on record");
         ;
     }

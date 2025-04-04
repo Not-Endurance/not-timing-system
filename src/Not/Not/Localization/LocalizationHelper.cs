@@ -10,24 +10,9 @@ public static class LocalizationHelper
 {
     static readonly IStringLocalizer LOCALIZER = ServiceLocator.Get<IStringLocalizer>();
 
-    public static string LocalizeString(string resource, params object[] args)
+    public static string LocalizeString(string resource)
     {
-        try
-        {
-            var localized = args.Select(x => LOCALIZER[x.ToString() ?? ""]);
-            return string.Format(LOCALIZER[resource], localized);
-        }
-        catch (FormatException)
-        {
-            var message =
-                Text_formatting_failed_This_is_usually_not_critical_failure_string
-                + Environment.NewLine
-                + $"Format: {resource}"
-                + Environment.NewLine
-                + $"args: {string.Join(", ", args)}";
-            NotifyHelper.Error(message);
-            return resource;
-        }
+        return LOCALIZER[resource];
     }
 
     public static string LocalizeEnum(Enum value)

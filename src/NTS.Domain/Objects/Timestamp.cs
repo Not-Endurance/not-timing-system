@@ -7,7 +7,7 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
 {
     public static Timestamp Now()
     {
-        return new Timestamp(DateTimeOffset.UtcNow);
+        return new Timestamp(DateTimeOffset.Now);
     }
 
     public static Timestamp? Create(DateTimeOffset? dateTimeOffset)
@@ -81,7 +81,7 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
 
     public Timestamp(DateTimeOffset dateTimeOffset)
     {
-        _stamp = dateTimeOffset.ToUniversalTime();
+        _stamp = dateTimeOffset;
     }
 
     [JsonProperty]
@@ -96,12 +96,12 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
 
     public string ToString(string format, IFormatProvider formatProvider)
     {
-        return _stamp.LocalDateTime.ToString(format, formatProvider);
+        return _stamp.ToString(format, formatProvider);
     }
 
     public override string ToString()
     {
-        return _stamp.LocalDateTime.ToString("HH:mm:ss");
+        return _stamp.ToString("HH:mm:ss");
     }
 
     public int CompareTo(Timestamp? other)
@@ -111,7 +111,7 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
 
     public DateTimeOffset ToDateTimeOffset()
     {
-        return _stamp.LocalDateTime;
+        return _stamp;
     }
 
     public DateTime ToDateTime()

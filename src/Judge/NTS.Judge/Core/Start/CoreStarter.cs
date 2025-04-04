@@ -64,7 +64,7 @@ public class CoreStarter : ICoreStarter
     {
         foreach (var competition in setupEvent.Competitions)
         {
-            var (participations, rankingEntriesByCategory) = await ParticipationAndRankingrFactory.Create(
+            var (participations, rankingEntriesByCategory) = await ParticipationAndRankingFactory.Create(
                 competition,
                 _participationRepository
             );
