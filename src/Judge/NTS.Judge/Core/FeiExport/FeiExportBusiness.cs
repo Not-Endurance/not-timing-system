@@ -65,7 +65,7 @@ public class FeiExportBusiness : IFeiExportBusiness
             var formatted = string.Join(", ", numbers);
             throw new DomainException($"Participants '{formatted}' are not configured with Athlete/Horse FEI ID");
         }
-        foreach (var entry in entries)
+        foreach (var entry in entries.OrderBy(x => x.Rank))
         {
             var athlete = entry.Participation.Combination.Athlete;
             var horse = entry.Participation.Combination.Horse;
@@ -78,7 +78,7 @@ public class FeiExportBusiness : IFeiExportBusiness
                     AthleteNumber = entry.Participation.Combination.Number,
                     FirstName = athlete.Names.Names.First(),
                     FamilyName = athlete.Names.Names.Last(),
-                    CompetingFor = athlete.Country.IsoCode,
+                    CompetingFor = athlete.Country.NfCode!,
                 },
                 Horse = new ctHorse
                 {
@@ -245,7 +245,7 @@ public class FeiExportBusiness : IFeiExportBusiness
                     Venue = new ctVenue
                     {
                         Name = enduranceEvent.PopulatedPlace.Location,
-                        Country = enduranceEvent.PopulatedPlace.Country.IsoCode,
+                        Country = enduranceEvent.PopulatedPlace.Country.NfCode,
                     },
                     EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
                     StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
