@@ -61,7 +61,9 @@ public class FeiExportBusiness : IFeiExportBusiness
         }
         if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace.Country.NfCode))
         {
-            throw new DomainException($"Country '{enduranceEvent.PopulatedPlace.Country}' does not have 'NF' code. Contact developer");
+            throw new DomainException(
+                $"Country '{enduranceEvent.PopulatedPlace.Country}' does not have 'NF' code. Contact developer"
+            );
         }
 
         var feiCategory = GetFeiCategory(ranking.Category);
@@ -97,8 +99,8 @@ public class FeiExportBusiness : IFeiExportBusiness
                     StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
                     EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
                     FEIID = enduranceEvent.FeiShowId,
-                }
-            }
+                },
+            },
         };
         return horseSport;
     }
@@ -107,7 +109,8 @@ public class FeiExportBusiness : IFeiExportBusiness
     {
         var ranking = ranklist.Ranking;
         var categoryString = GetFeiCategory(ranking.Category);
-        var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}_{ranking.FeiScheduleNumber}";
+        var competitionFeiId =
+            $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}_{ranking.FeiScheduleNumber}";
         var ctCompetition = new ctEnduranceCompetition
         {
             FEIID = competitionFeiId,
@@ -242,9 +245,9 @@ public class FeiExportBusiness : IFeiExportBusiness
             AthleteCategory.Senior => "S",
             AthleteCategory.Children => "C",
             AthleteCategory.JuniorOrYoungAdult => "YJ",
-            AthleteCategory.Training or
-            AthleteCategory.Companion or
-            _ => throw GuardHelper.Exception("Implement validation for non-fei categories for Star during setup") //TODO:
+            AthleteCategory.Training or AthleteCategory.Companion or _ => throw GuardHelper.Exception(
+                "Implement validation for non-fei categories for Star during setup"
+            ), //TODO:
         };
     }
 
