@@ -284,7 +284,7 @@ public class Phase : AggregateRoot
         {
             return Arrive(snapshot);
         }
-        if (PresentTime == null || RepresentTime == null)
+        if (PresentTime == null || RepresentTime == null && IsReinspectionRequested)
         {
             return Inspect(snapshot);
         }
@@ -316,6 +316,10 @@ public class Phase : AggregateRoot
         if (ArriveTime != null)
         {
             return SnapshotResult.NotApplied(snapshot, NotAppliedDueToDuplicateArrive);
+        }
+        if (snapshot.Timestamp < StartTime)
+        {
+            throw new DomainException(__cannot_be_sooner_than__string, Arrival_string, StartTime);
         }
 
         ArriveTime = snapshot.Timestamp;

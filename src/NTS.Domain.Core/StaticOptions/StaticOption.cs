@@ -38,7 +38,7 @@ public class StaticOption
         return false;
     }
 
-    public static IRegionOption? Regional { get; private set; }
+    public static IRegionOption? Regional { get; private set; } // TODO: fix regional options
     public static DetectionMode? Detection => StaticSettings.DetectionMode;
     public static Country? SelectedCountry => StaticSettings.SelectedCountry;
 }

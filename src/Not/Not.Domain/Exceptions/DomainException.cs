@@ -9,11 +9,11 @@ public class DomainException : ValidationException
     public DomainException(string message)
         : base(message) { }
 
-    public DomainException(string template, params object[] args)
+    public DomainException(string template, params object?[] args)
         : base(template.Format(args)) { } // TODO: add template validation attribute wtf ever its name was
 }
 
-public class DomainPropertyException : DomainException
+public class DomainPropertyException : ValidationException
 {
     public DomainPropertyException(string property, string message)
         : base(property, message) { }
