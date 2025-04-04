@@ -1,5 +1,4 @@
-﻿using AngleSharp.Io;
-using Not.Application.Behinds.Adapters;
+﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
 using Not.Notify;
@@ -9,6 +8,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Blazor.Core.Rankings;
 using NTS.Judge.Core.FeiExport;
+using NTS.Judge.HTTP;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
@@ -18,14 +18,14 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
-    readonly IRepository<ArchiveEntry> _archive;
+    readonly IArchiveRepository _archive;
 
     public RanklistBehind(
         IFeiExportBusiness feiExportBusiness,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Official> officials,
-        IRepository<ArchiveEntry> archive
+        IArchiveRepository archive
     )
     {
         _feiExportBusiness = feiExportBusiness;
@@ -39,6 +39,8 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
     }
 
     public Ranklist? Ranklist { get; private set; }
+
+    public int? ArchiveId { get; set; }
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {

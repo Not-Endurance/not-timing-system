@@ -21,4 +21,17 @@ public class EliminatedDocumentModel
     public string Code { get; init; } = default!;
     public string? Reason { get; init; }
     public FtqCode[]? FtqCodes { get; init; }
+
+    public Eliminated ToDomain()
+    {
+        return Code switch // TODO refactor Eliminated to non-abstract and only FTQ as separate class
+        {
+            Eliminated.FAILED_TO_QUALIFY => new FailedToQualify(FtqCodes!, Reason),
+            Eliminated.WITHDRAWN => new Withdrawn(),
+            Eliminated.DISQUALIFIED => new Disqualified(Reason!),
+            Eliminated.FINISHED_NOT_RANKED => new FinishedNotRanked(Reason!),
+            Eliminated.RETIRED => new Retired(),
+            _ => throw new NotImplementedException(),
+        };
+    }
 }

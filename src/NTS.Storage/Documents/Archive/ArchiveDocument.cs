@@ -36,4 +36,12 @@ public class ArchiveDocument : Document
     public DateTimeOffset EndDay { get; init; }
     public OfficialDocument[] Officials { get; init; } = default!;
     public RanklistDocumentModel[] Ranklists { get; init; } = default!;
+
+    public ArchiveEntry ToDomain()
+    {
+        var enduranceEvent = new EnduranceEvent(Id, Country.ToDomain(), City, Location ?? "", StartDay, EndDay, FeiShowId);
+        var officials = Officials.Select(x => x.ToDomain());
+        var ranklists = Ranklists.Select(x => x.ToDomain());
+        return new ArchiveEntry(enduranceEvent, officials, ranklists);
+    }
 }

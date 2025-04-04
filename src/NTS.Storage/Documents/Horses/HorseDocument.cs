@@ -18,7 +18,7 @@ public class HorseDocument : Document
     public string? FeiId { get; init; }
     public string Name { get; init; } = default!;
 
-    public Horse ToDomain()
+    public Horse ToSetupDomain()
     {
         return new Horse(Id, Name, FeiId);
     }

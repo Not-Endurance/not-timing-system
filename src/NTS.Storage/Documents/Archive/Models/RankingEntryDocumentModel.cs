@@ -1,4 +1,5 @@
-﻿using NTS.Domain.Core.Aggregates;
+﻿using Not.Random;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Documents.Archive.Models;
 
@@ -17,4 +18,10 @@ public class RankingEntryDocumentModel
     public ParticipationDocumentModel Participation { get; init; } = default!;
     public int? Rank { get; init; }
     public bool IsNotRanked { get; init; }
+
+    public RankingEntry ToDomain()
+    {
+        var participation = Participation.ToDomain();
+        return new RankingEntry(RandomHelper.GenerateUniqueInteger(), participation, Rank, IsNotRanked);
+    }
 }

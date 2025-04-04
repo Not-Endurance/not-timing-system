@@ -1,4 +1,5 @@
-﻿using NTS.Domain.Core.Aggregates;
+﻿using Not.Random;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Documents.Archive.Models;
 
@@ -24,4 +25,13 @@ public class ParticipationDocumentModel
     public PhaseDocumentModel[] Phases { get; init; } = default!;
     public TotalDocumentModel? Total { get; init; }
     public EliminatedDocumentModel? Eliminated { get; init; }
+
+    public Participation ToDomain()
+    {
+        var competition = Competition.ToDomain();
+        var combination = Combination.ToDomain();
+        var phases = Phases.Select(x => x.ToDomain());
+        var eliminated = Eliminated?.ToDomain();
+        return new Participation(RandomHelper.GenerateUniqueInteger(), competition, combination, new(phases), eliminated);
+    }
 }

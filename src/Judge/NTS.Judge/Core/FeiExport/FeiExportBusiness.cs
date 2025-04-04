@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Xml.Serialization;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
+using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects;
@@ -282,7 +283,7 @@ public class FeiExportBusiness : IFeiExportBusiness
     }
 }
 
-public interface IFeiExportBusiness
+public interface IFeiExportBusiness : ITransient
 {
     Task<string> Create(Ranklist ranklist);
 }

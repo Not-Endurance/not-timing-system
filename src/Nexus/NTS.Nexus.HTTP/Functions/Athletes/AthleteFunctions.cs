@@ -102,7 +102,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
     {
         LogInformation(request);
         var athlete = await _athletes.Read(id);
-        return new OkObjectResult(athlete?.ToDomain());
+        return new OkObjectResult(athlete?.ToSetupDomain());
     }
 
     [Function("athletes-list")]
@@ -113,7 +113,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         LogInformation(request);
 
         // TODO: Implement response mapping layer for documents back to aggregates
-        var athletes = await _athletes.ReadAll().Select(x => x.ToDomain());
+        var athletes = await _athletes.ReadAll().Select(x => x.ToSetupDomain());
         return new OkObjectResult(athletes);
     }
 }

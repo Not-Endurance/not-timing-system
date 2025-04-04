@@ -1,4 +1,6 @@
-﻿using NTS.Domain.Core.Aggregates.Participations;
+﻿using Not.Random;
+using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Objects;
 using NTS.Storage.Documents.Athletes;
 using NTS.Storage.Documents.Horses;
 
@@ -25,4 +27,13 @@ public class CombinationDocumentModel
     public double? MaxAverageSpeed { get; init; }
     public AthleteDocument Athlete { get; init; } = default!;
     public HorseDocument Horse { get; init; } = default!;
+
+    public Combination ToDomain()
+    {
+        var athlete = new Athlete(Athlete.ToSetupDomain());
+        var horse = new Horse(Horse.ToSetupDomain());
+        var minSpeed = Speed.Create(MinAverageSpeed);
+        var maxSpeed = Speed.Create(MaxAverageSpeed);
+        return new Combination(RandomHelper.GenerateUniqueInteger(), Number, athlete, horse, Distance, minSpeed, maxSpeed);
+    }
 }

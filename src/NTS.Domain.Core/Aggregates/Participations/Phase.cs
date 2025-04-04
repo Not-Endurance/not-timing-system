@@ -11,7 +11,8 @@ public class Phase : AggregateRoot
     bool _isSeparateFinish = false;
 
     [Newtonsoft.Json.JsonConstructor]
-    Phase(
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Phase(
         int id,
         string gate,
         double length,

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Newtonsoft.Json;
 using Not.Domain.Base;
 using NTS.Domain.Core.Aggregates.Participations;
 
@@ -7,8 +6,9 @@ namespace NTS.Domain.Core.Aggregates;
 
 public class Ranking : AggregateRoot
 {
-    [JsonConstructor]
-    Ranking(
+    [Newtonsoft.Json.JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Ranking(
         int id,
         string name,
         CompetitionRuleset ruleset,
