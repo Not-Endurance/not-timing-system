@@ -14,10 +14,11 @@ public partial class SnapshotPanel
     [Inject]
     IManualProcessor ManualProcessor { get; set; } = default!;
 
-    void Snapshot()
+    Task Snapshot()
     {
         var currentTime = DateTime.Now.TimeOfDay;
         _input = currentTime.ToString();
+        return Task.CompletedTask;
     }
 
     async Task Process()
