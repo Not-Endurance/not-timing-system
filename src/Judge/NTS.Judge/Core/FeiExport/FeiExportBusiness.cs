@@ -186,31 +186,31 @@ public class FeiExportBusiness : IFeiExportBusiness
     {
         if (string.IsNullOrWhiteSpace(enduranceEvent.FeiShowId))
         {
-            throw new DomainException(nameof(EnduranceEvent), "Missing Show FEIID");
+            throw new DomainException("Missing Show FEIID");
         }
         if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace?.Location))
         {
-            throw new DomainException(nameof(EnduranceEvent), "Missing PopulatedPlace");
+            throw new DomainException("Missing PopulatedPlace");
         }
         if (string.IsNullOrEmpty(ranking.Name))
         {
-            throw new DomainException(nameof(Competition), "Missing Name");
+            throw new DomainException("Missing ranking Name");
         }
         if (string.IsNullOrEmpty(ranking.FeiCategoryEventNumber))
         {
-            throw new DomainException(nameof(Competition), "Missing FEI Category Event NR");
+            throw new DomainException("Missing FEI Category Event NR");
         }
         if (string.IsNullOrEmpty(ranking.FeiScheduleNumber))
         {
-            throw new DomainException(nameof(Competition), "Missing FEI Schedule NR");
+            throw new DomainException("Missing FEI Schedule NR");
         }
         if (string.IsNullOrEmpty(ranking.FeiRule))
         {
-            throw new DomainException(nameof(Competition), "Missing FEI Rule");
+            throw new DomainException("Missing FEI Rule");
         }
         if (string.IsNullOrEmpty(ranking.FeiEventCode))
         {
-            throw new DomainException(nameof(Competition), "Missing FEI Event Code");
+            throw new DomainException("Missing FEI Event Code");
         }
         if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace.Country.NfCode))
         {
