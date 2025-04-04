@@ -19,11 +19,11 @@ public class FeiExportBusiness : IFeiExportBusiness
     {
         _events = events;
     }
-    
+
     public async Task<string> Create(Ranklist ranklist)
     {
         var enduranceEvent = await _events.Read(0);
-        
+
         var ctCompetition = CreateCompetitions(enduranceEvent!, ranklist);
         var horseSport = CreateHorseSport(enduranceEvent!, ctCompetition, ranklist.Ranking);
 
@@ -34,10 +34,12 @@ public class FeiExportBusiness : IFeiExportBusiness
     ctEnduranceCompetition CreateCompetitions(EnduranceEvent enduranceEvent, Ranklist ranklist)
     {
         var ranking = ranklist.Ranking;
-        var categoryString = ranking.Category == AthleteCategory.Senior
-            ? "S"
-            : ranking.Category == AthleteCategory.Children ? "C" : "YJ";
-        var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}_{ranking.FeiScheduleNumber}";
+        var categoryString =
+            ranking.Category == AthleteCategory.Senior ? "S"
+            : ranking.Category == AthleteCategory.Children ? "C"
+            : "YJ";
+        var competitionFeiId =
+            $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}_{ranking.FeiScheduleNumber}";
         var ctCompetition = new ctEnduranceCompetition
         {
             FEIID = competitionFeiId,
@@ -46,7 +48,7 @@ public class FeiExportBusiness : IFeiExportBusiness
             Name = ranking.Name,
             StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
             Team = false,
-            ParticipationList = new ctEnduranceParticipations()
+            ParticipationList = new ctEnduranceParticipations(),
         };
 
         var ctParticipations = CreateParticipations(ranklist);
@@ -57,7 +59,10 @@ public class FeiExportBusiness : IFeiExportBusiness
     IEnumerable<ctEnduranceIndivResult> CreateParticipations(Ranklist ranklist)
     {
         var entries = ranklist.Entries;
-        var withoutFeiId = entries.Where(x => string.IsNullOrWhiteSpace(x.Participation.Combination.Athlete.FeiId) || string.IsNullOrWhiteSpace(x.Participation.Combination.Horse.FeiId));
+        var withoutFeiId = entries.Where(x =>
+            string.IsNullOrWhiteSpace(x.Participation.Combination.Athlete.FeiId)
+            || string.IsNullOrWhiteSpace(x.Participation.Combination.Horse.FeiId)
+        );
         if (withoutFeiId.Any())
         {
             var numbers = withoutFeiId.Select(x => x.Participation.Combination.Number);
@@ -79,19 +84,9 @@ public class FeiExportBusiness : IFeiExportBusiness
                     FamilyName = athlete.Names.Names.Last(),
                     CompetingFor = athlete.Country.NfCode!,
                 },
-                Horse = new ctHorse
-                {
-                    FEIID = horse.FeiId!,
-                    Name = horse.Name
-                },
-                Complement = new ctEnduranceComplement
-                {
-                    BestCondition = false,
-                },
-                Position = new ctPositionIndiv
-                {
-                    Status = entry.Participation.Eliminated?.Code ?? "R",
-                },
+                Horse = new ctHorse { FEIID = horse.FeiId!, Name = horse.Name },
+                Complement = new ctEnduranceComplement { BestCondition = false },
+                Position = new ctPositionIndiv { Status = entry.Participation.Eliminated?.Code ?? "R" },
             };
             if (ctParticipation.Position.Status == "R")
             {
@@ -115,11 +110,7 @@ public class FeiExportBusiness : IFeiExportBusiness
         var total = participation.GetTotal();
         var time = total?.Interval.ToTimeSpan() ?? TimeSpan.Zero;
         var speed = total?.AverageSpeed.ToDouble() ?? default;
-        return new ctEnduranceTotal
-        {
-            AverageSpeed = Round(speed),
-            Time = FormatTime(time),
-        };
+        return new ctEnduranceTotal { AverageSpeed = Round(speed), Time = FormatTime(time) };
     }
 
     IEnumerable<ctEnduranceDayResult> CreateDaysAndPhases(Participation participation)
@@ -181,7 +172,11 @@ public class FeiExportBusiness : IFeiExportBusiness
         return [day];
     }
 
-    HorseSport CreateHorseSport(EnduranceEvent enduranceEvent, ctEnduranceCompetition ctEnduranceCompetition, Ranking ranking)
+    HorseSport CreateHorseSport(
+        EnduranceEvent enduranceEvent,
+        ctEnduranceCompetition ctEnduranceCompetition,
+        Ranking ranking
+    )
     {
         if (string.IsNullOrWhiteSpace(enduranceEvent.FeiShowId))
         {
@@ -213,12 +208,15 @@ public class FeiExportBusiness : IFeiExportBusiness
         }
         if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace.Country.NfCode))
         {
-            throw new DomainException($"Country '{enduranceEvent.PopulatedPlace.Country}' does not have 'NF' code. Contact developer");
+            throw new DomainException(
+                $"Country '{enduranceEvent.PopulatedPlace.Country}' does not have 'NF' code. Contact developer"
+            );
         }
 
-        var categoryString = ranking.Category == AthleteCategory.Senior
-            ? "S"
-            : ranking.Category == AthleteCategory.Children ? "C" : "YJ";
+        var categoryString =
+            ranking.Category == AthleteCategory.Senior ? "S"
+            : ranking.Category == AthleteCategory.Children ? "C"
+            : "YJ";
         var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}";
         var ctEnduranceEvent = new ctEnduranceEvent
         {
@@ -250,8 +248,8 @@ public class FeiExportBusiness : IFeiExportBusiness
                     StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
                     EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
                     FEIID = enduranceEvent.FeiShowId,
-                }
-            }
+                },
+            },
         };
         return horseSport;
     }

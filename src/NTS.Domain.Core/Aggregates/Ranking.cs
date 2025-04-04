@@ -33,9 +33,27 @@ public class Ranking : AggregateRoot
         Entries = entries;
     }
 
-    public Ranking(Competition competition, AthleteCategory category, string? feiRule, string? feiEventCode, string? feiScheduleNumber, string? feiCategoryEventNumber, IEnumerable<RankingEntry> entries)
-        : this(GenerateId(), competition.Name, competition.Ruleset, competition.Type, category, feiRule, feiEventCode, feiScheduleNumber, feiCategoryEventNumber, new(entries.ToList()))
-    { }
+    public Ranking(
+        Competition competition,
+        AthleteCategory category,
+        string? feiRule,
+        string? feiEventCode,
+        string? feiScheduleNumber,
+        string? feiCategoryEventNumber,
+        IEnumerable<RankingEntry> entries
+    )
+        : this(
+            GenerateId(),
+            competition.Name,
+            competition.Ruleset,
+            competition.Type,
+            category,
+            feiRule,
+            feiEventCode,
+            feiScheduleNumber,
+            feiCategoryEventNumber,
+            new(entries.ToList())
+        ) { }
 
     public string Name { get; }
     public CompetitionRuleset Ruleset { get; }

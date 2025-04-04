@@ -32,6 +32,12 @@ public class ParticipationDocumentModel
         var combination = Combination.ToDomain();
         var phases = Phases.Select(x => x.ToDomain());
         var eliminated = Eliminated?.ToDomain();
-        return new Participation(RandomHelper.GenerateUniqueInteger(), competition, combination, new(phases), eliminated);
+        return new Participation(
+            RandomHelper.GenerateUniqueInteger(),
+            competition,
+            combination,
+            new(phases),
+            eliminated
+        );
     }
 }

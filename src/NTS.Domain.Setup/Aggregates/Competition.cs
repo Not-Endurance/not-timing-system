@@ -18,7 +18,17 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         string? feiCategoryEventNumber
     )
     {
-        return new(name, type, ruleset, start, compulsoryThresholdMinutes, feiRule, feiEventCode, feiScheduleNumber, feiCategoryEventNumber);
+        return new(
+            name,
+            type,
+            ruleset,
+            start,
+            compulsoryThresholdMinutes,
+            feiRule,
+            feiEventCode,
+            feiScheduleNumber,
+            feiCategoryEventNumber
+        );
     }
 
     public static Competition Update(
@@ -36,7 +46,20 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         IEnumerable<Participation> participations
     )
     {
-        return new(id, name, type, ruleset, start, ToTimeSpan(compulsoryThresholdMinutes), feiRule, feiEventCode, feiScheduleNumber, feiCategoryEventNumber, phases, participations);
+        return new(
+            id,
+            name,
+            type,
+            ruleset,
+            start,
+            ToTimeSpan(compulsoryThresholdMinutes),
+            feiRule,
+            feiEventCode,
+            feiScheduleNumber,
+            feiCategoryEventNumber,
+            phases,
+            participations
+        );
     }
 
     readonly List<Phase> _phases = [];

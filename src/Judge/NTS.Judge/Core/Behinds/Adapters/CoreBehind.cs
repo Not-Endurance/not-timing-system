@@ -18,12 +18,14 @@ public class CoreBehind : ObservableBehind, ICoreBehind
     readonly IRepository<Official> _officials;
     readonly IArchiveRepository _archive;
 
-    public CoreBehind(ICoreStarter coreStarter,
+    public CoreBehind(
+        ICoreStarter coreStarter,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Participation> participations,
         IRepository<Official> officials,
-        IArchiveRepository archive)
+        IArchiveRepository archive
+    )
     {
         _coreStarter = coreStarter;
         _rankings = rankings;

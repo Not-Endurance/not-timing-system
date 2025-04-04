@@ -59,6 +59,22 @@ public class PhaseDocumentModel
 
     public Phase ToDomain()
     {
-        return new Phase(RandomHelper.GenerateUniqueInteger(), Gate, Length, MaxRecovery, Rest, Ruleset, IsFinal, CompulsoryTresholdInterval, StartTime, ArriveTime, PresentTime, RepresentTime, IsReinspectionRequested, IsRequiredInspectionRequested, false);
+        return new Phase(
+            RandomHelper.GenerateUniqueInteger(),
+            Gate,
+            Length,
+            MaxRecovery,
+            Rest,
+            Ruleset,
+            IsFinal,
+            CompulsoryTresholdInterval,
+            StartTime,
+            ArriveTime,
+            PresentTime,
+            RepresentTime,
+            IsReinspectionRequested,
+            IsRequiredInspectionRequested,
+            false
+        );
     }
 }

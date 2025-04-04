@@ -27,8 +27,7 @@ public class Athlete : AggregateRoot, IAthlete, IAggregateRoot, IReflect<Club>
 
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Athlete(int? id, Person? names, string? feiId, Country? country, Club? club, AthleteCategory? 
-        category)
+    public Athlete(int? id, Person? names, string? feiId, Country? country, Club? club, AthleteCategory? category)
         : base(id!.Value)
     {
         FeiId = feiId;

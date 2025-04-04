@@ -72,10 +72,7 @@ public class CoreStarter : ICoreStarter
             {
                 await _participationRepository.Create(participation);
             }
-            await CreateRankings(
-                setupCompetition,
-                rankingEntriesByCategory
-            );
+            await CreateRankings(setupCompetition, rankingEntriesByCategory);
         }
     }
 
@@ -89,7 +86,15 @@ public class CoreStarter : ICoreStarter
         {
             if (relation.Value.Count > 0)
             {
-                var ranking = RankingFactory.Create(competition, relation.Key, relation.Value, setupCompetition.FeiRule, setupCompetition.FeiEventCode, setupCompetition.FeiScheduleNumber, setupCompetition.FeiCategoryEventNumber);
+                var ranking = RankingFactory.Create(
+                    competition,
+                    relation.Key,
+                    relation.Value,
+                    setupCompetition.FeiRule,
+                    setupCompetition.FeiEventCode,
+                    setupCompetition.FeiScheduleNumber,
+                    setupCompetition.FeiCategoryEventNumber
+                );
                 await _rankingRepository.Create(ranking);
             }
         }

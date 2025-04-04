@@ -38,5 +38,5 @@ public enum OfficialRole
     TreatingVeterinaryCommissionMember = 11,
 
     [Description("Veterinary Service Member")]
-    VeterinaryServiceMember = 12
+    VeterinaryServiceMember = 12,
 }

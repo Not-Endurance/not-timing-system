@@ -29,7 +29,6 @@ namespace NTS.Judge.Core.FeiExport;
 [XmlRoot(Namespace = "http://www.fei.org/Result", IsNullable = false)]
 public class HorseSport
 {
-
     private ctGenerated generatedField;
 
     private ctIssuer issuerField;
@@ -39,40 +38,22 @@ public class HorseSport
     /// <remarks/>
     public ctGenerated Generated
     {
-        get
-        {
-            return generatedField;
-        }
-        set
-        {
-            generatedField = value;
-        }
+        get { return generatedField; }
+        set { generatedField = value; }
     }
 
     /// <remarks/>
     public ctIssuer Issuer
     {
-        get
-        {
-            return issuerField;
-        }
-        set
-        {
-            issuerField = value;
-        }
+        get { return issuerField; }
+        set { issuerField = value; }
     }
 
     /// <remarks/>
     public ctShowResultType EventResult
     {
-        get
-        {
-            return eventResultField;
-        }
-        set
-        {
-            eventResultField = value;
-        }
+        get { return eventResultField; }
+        set { eventResultField = value; }
     }
 }
 
@@ -84,7 +65,6 @@ public class HorseSport
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctGenerated
 {
-
     private DateTime dateField;
 
     private string softwareField;
@@ -98,56 +78,32 @@ public class ctGenerated
     [XmlAttribute(DataType = "date")]
     public DateTime Date
     {
-        get
-        {
-            return dateField;
-        }
-        set
-        {
-            dateField = value;
-        }
+        get { return dateField; }
+        set { dateField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Software
     {
-        get
-        {
-            return softwareField;
-        }
-        set
-        {
-            softwareField = value;
-        }
+        get { return softwareField; }
+        set { softwareField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string SoftwareVersion
     {
-        get
-        {
-            return softwareVersionField;
-        }
-        set
-        {
-            softwareVersionField = value;
-        }
+        get { return softwareVersionField; }
+        set { softwareVersionField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Organization
     {
-        get
-        {
-            return organizationField;
-        }
-        set
-        {
-            organizationField = value;
-        }
+        get { return organizationField; }
+        set { organizationField = value; }
     }
 }
 
@@ -159,21 +115,14 @@ public class ctGenerated
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceTotalTeam
 {
-
     private string timeField;
 
     /// <remarks/>
     [XmlAttribute]
     public string Time
     {
-        get
-        {
-            return timeField;
-        }
-        set
-        {
-            timeField = value;
-        }
+        get { return timeField; }
+        set { timeField = value; }
     }
 }
 
@@ -185,7 +134,6 @@ public class ctEnduranceTotalTeam
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctPositionTeam
 {
-
     private string statusField;
 
     private int rankField;
@@ -196,28 +144,16 @@ public class ctPositionTeam
     [XmlAttribute]
     public string Status
     {
-        get
-        {
-            return statusField;
-        }
-        set
-        {
-            statusField = value;
-        }
+        get { return statusField; }
+        set { statusField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int Rank
     {
-        get
-        {
-            return rankField;
-        }
-        set
-        {
-            rankField = value;
-        }
+        get { return rankField; }
+        set { rankField = value; }
     }
 
     /// <remarks/>
@@ -233,7 +169,6 @@ public class ctPositionTeam
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctTeam
 {
-
     private int numberField;
 
     private bool numberFieldSpecified;
@@ -244,42 +179,24 @@ public class ctTeam
     [XmlAttribute]
     public int Number
     {
-        get
-        {
-            return numberField;
-        }
-        set
-        {
-            numberField = value;
-        }
+        get { return numberField; }
+        set { numberField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool NumberSpecified
     {
-        get
-        {
-            return numberFieldSpecified;
-        }
-        set
-        {
-            numberFieldSpecified = value;
-        }
+        get { return numberFieldSpecified; }
+        set { numberFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NF
     {
-        get
-        {
-            return nfField;
-        }
-        set
-        {
-            nfField = value;
-        }
+        get { return nfField; }
+        set { nfField = value; }
     }
 }
 
@@ -291,7 +208,6 @@ public class ctTeam
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceTeamResult
 {
-
     private ctTeam teamField;
 
     private ctPositionTeam positionField;
@@ -303,53 +219,29 @@ public class ctEnduranceTeamResult
     /// <remarks/>
     public ctTeam Team
     {
-        get
-        {
-            return teamField;
-        }
-        set
-        {
-            teamField = value;
-        }
+        get { return teamField; }
+        set { teamField = value; }
     }
 
     /// <remarks/>
     public ctPositionTeam Position
     {
-        get
-        {
-            return positionField;
-        }
-        set
-        {
-            positionField = value;
-        }
+        get { return positionField; }
+        set { positionField = value; }
     }
 
     /// <remarks/>
     public ctPrizeMoney PrizeMoney
     {
-        get
-        {
-            return prizeMoneyField;
-        }
-        set
-        {
-            prizeMoneyField = value;
-        }
+        get { return prizeMoneyField; }
+        set { prizeMoneyField = value; }
     }
 
     /// <remarks/>
     public ctEnduranceTotalTeam Total
     {
-        get
-        {
-            return totalField;
-        }
-        set
-        {
-            totalField = value;
-        }
+        get { return totalField; }
+        set { totalField = value; }
     }
 }
 
@@ -361,7 +253,6 @@ public class ctEnduranceTeamResult
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctPrizeMoney
 {
-
     private decimal valueField;
 
     private string inKindField;
@@ -374,56 +265,32 @@ public class ctPrizeMoney
     [XmlAttribute]
     public decimal Value
     {
-        get
-        {
-            return valueField;
-        }
-        set
-        {
-            valueField = value;
-        }
+        get { return valueField; }
+        set { valueField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string InKind
     {
-        get
-        {
-            return inKindField;
-        }
-        set
-        {
-            inKindField = value;
-        }
+        get { return inKindField; }
+        set { inKindField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public decimal InKindValue
     {
-        get
-        {
-            return inKindValueField;
-        }
-        set
-        {
-            inKindValueField = value;
-        }
+        get { return inKindValueField; }
+        set { inKindValueField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool InKindValueSpecified
     {
-        get
-        {
-            return inKindValueFieldSpecified;
-        }
-        set
-        {
-            inKindValueFieldSpecified = value;
-        }
+        get { return inKindValueFieldSpecified; }
+        set { inKindValueFieldSpecified = value; }
     }
 }
 
@@ -435,7 +302,6 @@ public class ctPrizeMoney
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceTotal
 {
-
     private string timeField;
 
     private decimal averageSpeedField;
@@ -446,28 +312,16 @@ public class ctEnduranceTotal
     [XmlAttribute]
     public string Time
     {
-        get
-        {
-            return timeField;
-        }
-        set
-        {
-            timeField = value;
-        }
+        get { return timeField; }
+        set { timeField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public decimal AverageSpeed
     {
-        get
-        {
-            return averageSpeedField;
-        }
-        set
-        {
-            averageSpeedField = value;
-        }
+        get { return averageSpeedField; }
+        set { averageSpeedField = value; }
     }
 
     /// <remarks/>
@@ -483,7 +337,6 @@ public class ctEnduranceTotal
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceVetInspection
 {
-
     private stEnduranceVetTypeCode typeField;
 
     private string eliminationCodeField;
@@ -502,98 +355,56 @@ public class ctEnduranceVetInspection
     [XmlAttribute]
     public stEnduranceVetTypeCode Type
     {
-        get
-        {
-            return typeField;
-        }
-        set
-        {
-            typeField = value;
-        }
+        get { return typeField; }
+        set { typeField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string EliminationCode
     {
-        get
-        {
-            return eliminationCodeField;
-        }
-        set
-        {
-            eliminationCodeField = value;
-        }
+        get { return eliminationCodeField; }
+        set { eliminationCodeField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int HeartRate
     {
-        get
-        {
-            return heartRateField;
-        }
-        set
-        {
-            heartRateField = value;
-        }
+        get { return heartRateField; }
+        set { heartRateField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool HeartRateSpecified
     {
-        get
-        {
-            return heartRateFieldSpecified;
-        }
-        set
-        {
-            heartRateFieldSpecified = value;
-        }
+        get { return heartRateFieldSpecified; }
+        set { heartRateFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string RecoveryTime
     {
-        get
-        {
-            return recoveryTimeField;
-        }
-        set
-        {
-            recoveryTimeField = value;
-        }
+        get { return recoveryTimeField; }
+        set { recoveryTimeField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public stEnduranceDuringReinspection DuringReinspection
     {
-        get
-        {
-            return duringReinspectionField;
-        }
-        set
-        {
-            duringReinspectionField = value;
-        }
+        get { return duringReinspectionField; }
+        set { duringReinspectionField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool DuringReinspectionSpecified
     {
-        get
-        {
-            return duringReinspectionFieldSpecified;
-        }
-        set
-        {
-            duringReinspectionFieldSpecified = value;
-        }
+        get { return duringReinspectionFieldSpecified; }
+        set { duringReinspectionFieldSpecified = value; }
     }
 }
 
@@ -603,7 +414,6 @@ public class ctEnduranceVetInspection
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public enum stEnduranceVetTypeCode
 {
-
     /// <remarks/>
     Standard,
 
@@ -617,7 +427,6 @@ public enum stEnduranceVetTypeCode
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public enum stEnduranceDuringReinspection
 {
-
     /// <remarks/>
     no,
 
@@ -638,7 +447,6 @@ public enum stEnduranceDuringReinspection
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEndurancePhaseResultScore
 {
-
     private decimal phaseAverageSpeedField;
 
     private bool phaseAverageSpeedFieldSpecified;
@@ -655,14 +463,8 @@ public class ctEndurancePhaseResultScore
     [XmlAttribute]
     public decimal PhaseAverageSpeed
     {
-        get
-        {
-            return phaseAverageSpeedField;
-        }
-        set
-        {
-            phaseAverageSpeedField = value;
-        }
+        get { return phaseAverageSpeedField; }
+        set { phaseAverageSpeedField = value; }
     }
 
     /// <remarks/>
@@ -673,28 +475,16 @@ public class ctEndurancePhaseResultScore
     [XmlAttribute]
     public string PhaseTime
     {
-        get
-        {
-            return phaseTimeField;
-        }
-        set
-        {
-            phaseTimeField = value;
-        }
+        get { return phaseTimeField; }
+        set { phaseTimeField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int Rank
     {
-        get
-        {
-            return rankField;
-        }
-        set
-        {
-            rankField = value;
-        }
+        get { return rankField; }
+        set { rankField = value; }
     }
 
     /// <remarks/>
@@ -705,14 +495,8 @@ public class ctEndurancePhaseResultScore
     [XmlAttribute]
     public string RecoveryTime
     {
-        get
-        {
-            return recoveryTimeField;
-        }
-        set
-        {
-            recoveryTimeField = value;
-        }
+        get { return recoveryTimeField; }
+        set { recoveryTimeField = value; }
     }
 }
 
@@ -724,7 +508,6 @@ public class ctEndurancePhaseResultScore
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEndurancePhaseResult
 {
-
     private ctEndurancePhaseResultScore resultField;
 
     private ctEnduranceVetInspection vetInspectionField;
@@ -734,41 +517,23 @@ public class ctEndurancePhaseResult
     /// <remarks/>
     public ctEndurancePhaseResultScore Result
     {
-        get
-        {
-            return resultField;
-        }
-        set
-        {
-            resultField = value;
-        }
+        get { return resultField; }
+        set { resultField = value; }
     }
 
     /// <remarks/>
     public ctEnduranceVetInspection VetInspection
     {
-        get
-        {
-            return vetInspectionField;
-        }
-        set
-        {
-            vetInspectionField = value;
-        }
+        get { return vetInspectionField; }
+        set { vetInspectionField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int Number
     {
-        get
-        {
-            return numberField;
-        }
-        set
-        {
-            numberField = value;
-        }
+        get { return numberField; }
+        set { numberField = value; }
     }
 }
 
@@ -780,7 +545,6 @@ public class ctEndurancePhaseResult
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceDayResult
 {
-
     private ctEndurancePhaseResult[] phaseField;
 
     private int numberField;
@@ -793,42 +557,24 @@ public class ctEnduranceDayResult
     [XmlElement("Phase")]
     public ctEndurancePhaseResult[] Phase
     {
-        get
-        {
-            return phaseField;
-        }
-        set
-        {
-            phaseField = value;
-        }
+        get { return phaseField; }
+        set { phaseField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int Number
     {
-        get
-        {
-            return numberField;
-        }
-        set
-        {
-            numberField = value;
-        }
+        get { return numberField; }
+        set { numberField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute(DataType = "date")]
     public DateTime Date
     {
-        get
-        {
-            return dateField;
-        }
-        set
-        {
-            dateField = value;
-        }
+        get { return dateField; }
+        set { dateField = value; }
     }
 
     /// <remarks/>
@@ -844,7 +590,6 @@ public class ctEnduranceDayResult
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceFirstVetInspection
 {
-
     private stEnduranceFirstVetTypeCode typeField;
 
     private string eliminationCodeField;
@@ -853,28 +598,16 @@ public class ctEnduranceFirstVetInspection
     [XmlAttribute]
     public stEnduranceFirstVetTypeCode Type
     {
-        get
-        {
-            return typeField;
-        }
-        set
-        {
-            typeField = value;
-        }
+        get { return typeField; }
+        set { typeField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string EliminationCode
     {
-        get
-        {
-            return eliminationCodeField;
-        }
-        set
-        {
-            eliminationCodeField = value;
-        }
+        get { return eliminationCodeField; }
+        set { eliminationCodeField = value; }
     }
 }
 
@@ -884,7 +617,6 @@ public class ctEnduranceFirstVetInspection
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public enum stEnduranceFirstVetTypeCode
 {
-
     /// <remarks/>
     First,
 }
@@ -897,7 +629,6 @@ public enum stEnduranceFirstVetTypeCode
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctPositionIndiv
 {
-
     private string statusField;
 
     private int rankField;
@@ -912,28 +643,16 @@ public class ctPositionIndiv
     [XmlAttribute]
     public string Status
     {
-        get
-        {
-            return statusField;
-        }
-        set
-        {
-            statusField = value;
-        }
+        get { return statusField; }
+        set { statusField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int Rank
     {
-        get
-        {
-            return rankField;
-        }
-        set
-        {
-            rankField = value;
-        }
+        get { return rankField; }
+        set { rankField = value; }
     }
 
     /// <remarks/>
@@ -944,28 +663,16 @@ public class ctPositionIndiv
     [XmlAttribute]
     public string Complement
     {
-        get
-        {
-            return complementField;
-        }
-        set
-        {
-            complementField = value;
-        }
+        get { return complementField; }
+        set { complementField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string ComplementData
     {
-        get
-        {
-            return complementDataField;
-        }
-        set
-        {
-            complementDataField = value;
-        }
+        get { return complementDataField; }
+        set { complementDataField = value; }
     }
 }
 
@@ -977,21 +684,14 @@ public class ctPositionIndiv
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceComplement
 {
-
     private bool bestConditionField;
 
     /// <remarks/>
     [XmlAttribute]
     public bool BestCondition
     {
-        get
-        {
-            return bestConditionField;
-        }
-        set
-        {
-            bestConditionField = value;
-        }
+        get { return bestConditionField; }
+        set { bestConditionField = value; }
     }
 }
 
@@ -1003,21 +703,14 @@ public class ctEnduranceComplement
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctRefTeam
 {
-
     private string nameField;
 
     /// <remarks/>
     [XmlAttribute]
     public string Name
     {
-        get
-        {
-            return nameField;
-        }
-        set
-        {
-            nameField = value;
-        }
+        get { return nameField; }
+        set { nameField = value; }
     }
 }
 
@@ -1029,7 +722,6 @@ public class ctRefTeam
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctHorse
 {
-
     private string fEIIDField;
 
     private string nameField;
@@ -1044,70 +736,40 @@ public class ctHorse
     [XmlAttribute]
     public string FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Name
     {
-        get
-        {
-            return nameField;
-        }
-        set
-        {
-            nameField = value;
-        }
+        get { return nameField; }
+        set { nameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int HeadNumber
     {
-        get
-        {
-            return headNumberField;
-        }
-        set
-        {
-            headNumberField = value;
-        }
+        get { return headNumberField; }
+        set { headNumberField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool HeadNumberSpecified
     {
-        get
-        {
-            return headNumberFieldSpecified;
-        }
-        set
-        {
-            headNumberFieldSpecified = value;
-        }
+        get { return headNumberFieldSpecified; }
+        set { headNumberFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 }
 
@@ -1119,7 +781,6 @@ public class ctHorse
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceAthlete
 {
-
     private int fEIIDField;
 
     private string firstNameField;
@@ -1138,98 +799,56 @@ public class ctEnduranceAthlete
     [XmlAttribute]
     public int FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FirstName
     {
-        get
-        {
-            return firstNameField;
-        }
-        set
-        {
-            firstNameField = value;
-        }
+        get { return firstNameField; }
+        set { firstNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FamilyName
     {
-        get
-        {
-            return familyNameField;
-        }
-        set
-        {
-            familyNameField = value;
-        }
+        get { return familyNameField; }
+        set { familyNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string CompetingFor
     {
-        get
-        {
-            return competingForField;
-        }
-        set
-        {
-            competingForField = value;
-        }
+        get { return competingForField; }
+        set { competingForField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int AthleteNumber
     {
-        get
-        {
-            return athleteNumberField;
-        }
-        set
-        {
-            athleteNumberField = value;
-        }
+        get { return athleteNumberField; }
+        set { athleteNumberField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool AthleteNumberSpecified
     {
-        get
-        {
-            return athleteNumberFieldSpecified;
-        }
-        set
-        {
-            athleteNumberFieldSpecified = value;
-        }
+        get { return athleteNumberFieldSpecified; }
+        set { athleteNumberFieldSpecified = value; }
     }
 }
 
@@ -1241,7 +860,6 @@ public class ctEnduranceAthlete
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceIndivResult
 {
-
     private ctEnduranceAthlete athleteField;
 
     private ctHorse horseField;
@@ -1263,119 +881,65 @@ public class ctEnduranceIndivResult
     /// <remarks/>
     public ctEnduranceAthlete Athlete
     {
-        get
-        {
-            return athleteField;
-        }
-        set
-        {
-            athleteField = value;
-        }
+        get { return athleteField; }
+        set { athleteField = value; }
     }
 
     /// <remarks/>
     public ctHorse Horse
     {
-        get
-        {
-            return horseField;
-        }
-        set
-        {
-            horseField = value;
-        }
+        get { return horseField; }
+        set { horseField = value; }
     }
 
     /// <remarks/>
     public ctPrizeMoney PrizeMoney
     {
-        get
-        {
-            return prizeMoneyField;
-        }
-        set
-        {
-            prizeMoneyField = value;
-        }
+        get { return prizeMoneyField; }
+        set { prizeMoneyField = value; }
     }
 
     /// <remarks/>
     public ctRefTeam Team
     {
-        get
-        {
-            return teamField;
-        }
-        set
-        {
-            teamField = value;
-        }
+        get { return teamField; }
+        set { teamField = value; }
     }
 
     /// <remarks/>
     public ctEnduranceComplement Complement
     {
-        get
-        {
-            return complementField;
-        }
-        set
-        {
-            complementField = value;
-        }
+        get { return complementField; }
+        set { complementField = value; }
     }
 
     /// <remarks/>
     public ctPositionIndiv Position
     {
-        get
-        {
-            return positionField;
-        }
-        set
-        {
-            positionField = value;
-        }
+        get { return positionField; }
+        set { positionField = value; }
     }
 
     /// <remarks/>
     public ctEnduranceFirstVetInspection VetInspection
     {
-        get
-        {
-            return vetInspectionField;
-        }
-        set
-        {
-            vetInspectionField = value;
-        }
+        get { return vetInspectionField; }
+        set { vetInspectionField = value; }
     }
 
     /// <remarks/>
     [XmlArrayItem("Day", IsNullable = false)]
     public ctEnduranceDayResult[] Phases
     {
-        get
-        {
-            return phasesField;
-        }
-        set
-        {
-            phasesField = value;
-        }
+        get { return phasesField; }
+        set { phasesField = value; }
     }
 
     /// <remarks/>
     public ctEnduranceTotal Total
     {
-        get
-        {
-            return totalField;
-        }
-        set
-        {
-            totalField = value;
-        }
+        get { return totalField; }
+        set { totalField = value; }
     }
 }
 
@@ -1387,7 +951,6 @@ public class ctEnduranceIndivResult
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceParticipations
 {
-
     private ctEnduranceIndivResult[] participationField;
 
     private ctEnduranceTeamResult[] teamParticipationField;
@@ -1396,28 +959,16 @@ public class ctEnduranceParticipations
     [XmlElement("Participation")]
     public ctEnduranceIndivResult[] Participation
     {
-        get
-        {
-            return participationField;
-        }
-        set
-        {
-            participationField = value;
-        }
+        get { return participationField; }
+        set { participationField = value; }
     }
 
     /// <remarks/>
     [XmlElement("TeamParticipation")]
     public ctEnduranceTeamResult[] TeamParticipation
     {
-        get
-        {
-            return teamParticipationField;
-        }
-        set
-        {
-            teamParticipationField = value;
-        }
+        get { return teamParticipationField; }
+        set { teamParticipationField = value; }
     }
 }
 
@@ -1429,7 +980,6 @@ public class ctEnduranceParticipations
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctPrizeMoneyPlace
 {
-
     private int placeField;
 
     private bool placeFieldSpecified;
@@ -1448,98 +998,56 @@ public class ctPrizeMoneyPlace
     [XmlAttribute]
     public int Place
     {
-        get
-        {
-            return placeField;
-        }
-        set
-        {
-            placeField = value;
-        }
+        get { return placeField; }
+        set { placeField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool PlaceSpecified
     {
-        get
-        {
-            return placeFieldSpecified;
-        }
-        set
-        {
-            placeFieldSpecified = value;
-        }
+        get { return placeFieldSpecified; }
+        set { placeFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public decimal Amount
     {
-        get
-        {
-            return amountField;
-        }
-        set
-        {
-            amountField = value;
-        }
+        get { return amountField; }
+        set { amountField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool AmountSpecified
     {
-        get
-        {
-            return amountFieldSpecified;
-        }
-        set
-        {
-            amountFieldSpecified = value;
-        }
+        get { return amountFieldSpecified; }
+        set { amountFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string InKind
     {
-        get
-        {
-            return inKindField;
-        }
-        set
-        {
-            inKindField = value;
-        }
+        get { return inKindField; }
+        set { inKindField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public decimal InKindValue
     {
-        get
-        {
-            return inKindValueField;
-        }
-        set
-        {
-            inKindValueField = value;
-        }
+        get { return inKindValueField; }
+        set { inKindValueField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool InKindValueSpecified
     {
-        get
-        {
-            return inKindValueFieldSpecified;
-        }
-        set
-        {
-            inKindValueFieldSpecified = value;
-        }
+        get { return inKindValueFieldSpecified; }
+        set { inKindValueFieldSpecified = value; }
     }
 }
 
@@ -1551,7 +1059,6 @@ public class ctPrizeMoneyPlace
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEndurancePrizeMoneyDetail
 {
-
     private ctPrizeMoneyPlace[] prizeField;
 
     private string currencyField;
@@ -1564,56 +1071,32 @@ public class ctEndurancePrizeMoneyDetail
     [XmlElement("Prize")]
     public ctPrizeMoneyPlace[] Prize
     {
-        get
-        {
-            return prizeField;
-        }
-        set
-        {
-            prizeField = value;
-        }
+        get { return prizeField; }
+        set { prizeField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Currency
     {
-        get
-        {
-            return currencyField;
-        }
-        set
-        {
-            currencyField = value;
-        }
+        get { return currencyField; }
+        set { currencyField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public decimal Total
     {
-        get
-        {
-            return totalField;
-        }
-        set
-        {
-            totalField = value;
-        }
+        get { return totalField; }
+        set { totalField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool TotalSpecified
     {
-        get
-        {
-            return totalFieldSpecified;
-        }
-        set
-        {
-            totalFieldSpecified = value;
-        }
+        get { return totalFieldSpecified; }
+        set { totalFieldSpecified = value; }
     }
 }
 
@@ -1625,7 +1108,6 @@ public class ctEndurancePrizeMoneyDetail
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctPhaseDetailDetail
 {
-
     private int numberOfStarterField;
 
     private int numberOfFinisherField;
@@ -1634,28 +1116,16 @@ public class ctPhaseDetailDetail
     [XmlAttribute]
     public int NumberOfStarter
     {
-        get
-        {
-            return numberOfStarterField;
-        }
-        set
-        {
-            numberOfStarterField = value;
-        }
+        get { return numberOfStarterField; }
+        set { numberOfStarterField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int NumberOfFinisher
     {
-        get
-        {
-            return numberOfFinisherField;
-        }
-        set
-        {
-            numberOfFinisherField = value;
-        }
+        get { return numberOfFinisherField; }
+        set { numberOfFinisherField = value; }
     }
 }
 
@@ -1667,7 +1137,6 @@ public class ctPhaseDetailDetail
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctPhaseDetailTime
 {
-
     private DateTime startField;
 
     private DateTime endField;
@@ -1676,28 +1145,16 @@ public class ctPhaseDetailTime
     [XmlAttribute]
     public DateTime Start
     {
-        get
-        {
-            return startField;
-        }
-        set
-        {
-            startField = value;
-        }
+        get { return startField; }
+        set { startField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public DateTime End
     {
-        get
-        {
-            return endField;
-        }
-        set
-        {
-            endField = value;
-        }
+        get { return endField; }
+        set { endField = value; }
     }
 }
 
@@ -1709,7 +1166,6 @@ public class ctPhaseDetailTime
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEndurancePhaseDetailCourse
 {
-
     private int distanceField;
 
     private bool distanceFieldSpecified;
@@ -1726,84 +1182,48 @@ public class ctEndurancePhaseDetailCourse
     [XmlAttribute]
     public int Distance
     {
-        get
-        {
-            return distanceField;
-        }
-        set
-        {
-            distanceField = value;
-        }
+        get { return distanceField; }
+        set { distanceField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool DistanceSpecified
     {
-        get
-        {
-            return distanceFieldSpecified;
-        }
-        set
-        {
-            distanceFieldSpecified = value;
-        }
+        get { return distanceFieldSpecified; }
+        set { distanceFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int HoldTime
     {
-        get
-        {
-            return holdTimeField;
-        }
-        set
-        {
-            holdTimeField = value;
-        }
+        get { return holdTimeField; }
+        set { holdTimeField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool HoldTimeSpecified
     {
-        get
-        {
-            return holdTimeFieldSpecified;
-        }
-        set
-        {
-            holdTimeFieldSpecified = value;
-        }
+        get { return holdTimeFieldSpecified; }
+        set { holdTimeFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public bool CompulsoryReinspection
     {
-        get
-        {
-            return compulsoryReinspectionField;
-        }
-        set
-        {
-            compulsoryReinspectionField = value;
-        }
+        get { return compulsoryReinspectionField; }
+        set { compulsoryReinspectionField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool CompulsoryReinspectionSpecified
     {
-        get
-        {
-            return compulsoryReinspectionFieldSpecified;
-        }
-        set
-        {
-            compulsoryReinspectionFieldSpecified = value;
-        }
+        get { return compulsoryReinspectionFieldSpecified; }
+        set { compulsoryReinspectionFieldSpecified = value; }
     }
 }
 
@@ -1815,7 +1235,6 @@ public class ctEndurancePhaseDetailCourse
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEndurancePhaseDetail
 {
-
     private ctEndurancePhaseDetailCourse courseField;
 
     private ctPhaseDetailTime executionTimeField;
@@ -1831,82 +1250,46 @@ public class ctEndurancePhaseDetail
     /// <remarks/>
     public ctEndurancePhaseDetailCourse Course
     {
-        get
-        {
-            return courseField;
-        }
-        set
-        {
-            courseField = value;
-        }
+        get { return courseField; }
+        set { courseField = value; }
     }
 
     /// <remarks/>
     public ctPhaseDetailTime ExecutionTime
     {
-        get
-        {
-            return executionTimeField;
-        }
-        set
-        {
-            executionTimeField = value;
-        }
+        get { return executionTimeField; }
+        set { executionTimeField = value; }
     }
 
     /// <remarks/>
     public ctPhaseDetailDetail Detail
     {
-        get
-        {
-            return detailField;
-        }
-        set
-        {
-            detailField = value;
-        }
+        get { return detailField; }
+        set { detailField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int Number
     {
-        get
-        {
-            return numberField;
-        }
-        set
-        {
-            numberField = value;
-        }
+        get { return numberField; }
+        set { numberField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public DateTime StartHour
     {
-        get
-        {
-            return startHourField;
-        }
-        set
-        {
-            startHourField = value;
-        }
+        get { return startHourField; }
+        set { startHourField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool StartHourSpecified
     {
-        get
-        {
-            return startHourFieldSpecified;
-        }
-        set
-        {
-            startHourFieldSpecified = value;
-        }
+        get { return startHourFieldSpecified; }
+        set { startHourFieldSpecified = value; }
     }
 }
 
@@ -1918,7 +1301,6 @@ public class ctEndurancePhaseDetail
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceDayDetail
 {
-
     private ctEndurancePhaseDetail[] phaseField;
 
     private int numberField;
@@ -1929,42 +1311,24 @@ public class ctEnduranceDayDetail
     [XmlElement("Phase")]
     public ctEndurancePhaseDetail[] Phase
     {
-        get
-        {
-            return phaseField;
-        }
-        set
-        {
-            phaseField = value;
-        }
+        get { return phaseField; }
+        set { phaseField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int Number
     {
-        get
-        {
-            return numberField;
-        }
-        set
-        {
-            numberField = value;
-        }
+        get { return numberField; }
+        set { numberField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute(DataType = "date")]
     public DateTime Date
     {
-        get
-        {
-            return dateField;
-        }
-        set
-        {
-            dateField = value;
-        }
+        get { return dateField; }
+        set { dateField = value; }
     }
 }
 
@@ -1976,7 +1340,6 @@ public class ctEnduranceDayDetail
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEndurancePhasesDetail
 {
-
     private ctEnduranceDayDetail[] dayField;
 
     private int totalNumberField;
@@ -1987,42 +1350,24 @@ public class ctEndurancePhasesDetail
     [XmlElement("Day")]
     public ctEnduranceDayDetail[] Day
     {
-        get
-        {
-            return dayField;
-        }
-        set
-        {
-            dayField = value;
-        }
+        get { return dayField; }
+        set { dayField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public int TotalNumber
     {
-        get
-        {
-            return totalNumberField;
-        }
-        set
-        {
-            totalNumberField = value;
-        }
+        get { return totalNumberField; }
+        set { totalNumberField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool TotalNumberSpecified
     {
-        get
-        {
-            return totalNumberFieldSpecified;
-        }
-        set
-        {
-            totalNumberFieldSpecified = value;
-        }
+        get { return totalNumberFieldSpecified; }
+        set { totalNumberFieldSpecified = value; }
     }
 }
 
@@ -2034,7 +1379,6 @@ public class ctEndurancePhasesDetail
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceDescription
 {
-
     private ctEndurancePhasesDetail phasesField;
 
     private ctEndurancePrizeMoneyDetail prizesField;
@@ -2042,27 +1386,15 @@ public class ctEnduranceDescription
     /// <remarks/>
     public ctEndurancePhasesDetail Phases
     {
-        get
-        {
-            return phasesField;
-        }
-        set
-        {
-            phasesField = value;
-        }
+        get { return phasesField; }
+        set { phasesField = value; }
     }
 
     /// <remarks/>
     public ctEndurancePrizeMoneyDetail Prizes
     {
-        get
-        {
-            return prizesField;
-        }
-        set
-        {
-            prizesField = value;
-        }
+        get { return prizesField; }
+        set { prizesField = value; }
     }
 }
 
@@ -2074,7 +1406,6 @@ public class ctEnduranceDescription
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceCompetition
 {
-
     private ctEnduranceDescription descriptionField;
 
     private ctEnduranceParticipations participationListField;
@@ -2104,139 +1435,79 @@ public class ctEnduranceCompetition
     /// <remarks/>
     public ctEnduranceDescription Description
     {
-        get
-        {
-            return descriptionField;
-        }
-        set
-        {
-            descriptionField = value;
-        }
+        get { return descriptionField; }
+        set { descriptionField = value; }
     }
 
     /// <remarks/>
     public ctEnduranceParticipations ParticipationList
     {
-        get
-        {
-            return participationListField;
-        }
-        set
-        {
-            participationListField = value;
-        }
+        get { return participationListField; }
+        set { participationListField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string ScheduleCompetitionNr
     {
-        get
-        {
-            return scheduleCompetitionNrField;
-        }
-        set
-        {
-            scheduleCompetitionNrField = value;
-        }
+        get { return scheduleCompetitionNrField; }
+        set { scheduleCompetitionNrField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Rule
     {
-        get
-        {
-            return ruleField;
-        }
-        set
-        {
-            ruleField = value;
-        }
+        get { return ruleField; }
+        set { ruleField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Name
     {
-        get
-        {
-            return nameField;
-        }
-        set
-        {
-            nameField = value;
-        }
+        get { return nameField; }
+        set { nameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public bool Team
     {
-        get
-        {
-            return teamField;
-        }
-        set
-        {
-            teamField = value;
-        }
+        get { return teamField; }
+        set { teamField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool TeamSpecified
     {
-        get
-        {
-            return teamFieldSpecified;
-        }
-        set
-        {
-            teamFieldSpecified = value;
-        }
+        get { return teamFieldSpecified; }
+        set { teamFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute(DataType = "date")]
     public DateTime StartDate
     {
-        get
-        {
-            return startDateField;
-        }
-        set
-        {
-            startDateField = value;
-        }
+        get { return startDateField; }
+        set { startDateField = value; }
     }
 
     /// <remarks/>
@@ -2247,14 +1518,8 @@ public class ctEnduranceCompetition
     [XmlAttribute]
     public DateTime EndDate
     {
-        get
-        {
-            return endDateField;
-        }
-        set
-        {
-            endDateField = value;
-        }
+        get { return endDateField; }
+        set { endDateField = value; }
     }
 
     /// <remarks/>
@@ -2270,7 +1535,6 @@ public class ctEnduranceCompetition
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctOfficialVeterinarianRole
 {
-
     private int fEIIDField;
 
     private bool fEIIDFieldSpecified;
@@ -2289,98 +1553,56 @@ public class ctOfficialVeterinarianRole
     [XmlAttribute]
     public int FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool FEIIDSpecified
     {
-        get
-        {
-            return fEIIDFieldSpecified;
-        }
-        set
-        {
-            fEIIDFieldSpecified = value;
-        }
+        get { return fEIIDFieldSpecified; }
+        set { fEIIDFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FirstName
     {
-        get
-        {
-            return firstNameField;
-        }
-        set
-        {
-            firstNameField = value;
-        }
+        get { return firstNameField; }
+        set { firstNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FamilyName
     {
-        get
-        {
-            return familyNameField;
-        }
-        set
-        {
-            familyNameField = value;
-        }
+        get { return familyNameField; }
+        set { familyNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NF
     {
-        get
-        {
-            return nfField;
-        }
-        set
-        {
-            nfField = value;
-        }
+        get { return nfField; }
+        set { nfField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public stVeterinarianRole Role
     {
-        get
-        {
-            return roleField;
-        }
-        set
-        {
-            roleField = value;
-        }
+        get { return roleField; }
+        set { roleField = value; }
     }
 }
 
@@ -2390,7 +1612,6 @@ public class ctOfficialVeterinarianRole
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public enum stVeterinarianRole
 {
-
     /// <remarks/>
     President,
 
@@ -2409,7 +1630,6 @@ public enum stVeterinarianRole
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctOfficialSteward
 {
-
     private int fEIIDField;
 
     private bool fEIIDFieldSpecified;
@@ -2428,98 +1648,56 @@ public class ctOfficialSteward
     [XmlAttribute]
     public int FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool FEIIDSpecified
     {
-        get
-        {
-            return fEIIDFieldSpecified;
-        }
-        set
-        {
-            fEIIDFieldSpecified = value;
-        }
+        get { return fEIIDFieldSpecified; }
+        set { fEIIDFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FirstName
     {
-        get
-        {
-            return firstNameField;
-        }
-        set
-        {
-            firstNameField = value;
-        }
+        get { return firstNameField; }
+        set { firstNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FamilyName
     {
-        get
-        {
-            return familyNameField;
-        }
-        set
-        {
-            familyNameField = value;
-        }
+        get { return familyNameField; }
+        set { familyNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NF
     {
-        get
-        {
-            return nfField;
-        }
-        set
-        {
-            nfField = value;
-        }
+        get { return nfField; }
+        set { nfField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public stOfficialStewardRole Role
     {
-        get
-        {
-            return roleField;
-        }
-        set
-        {
-            roleField = value;
-        }
+        get { return roleField; }
+        set { roleField = value; }
     }
 }
 
@@ -2529,7 +1707,6 @@ public class ctOfficialSteward
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public enum stOfficialStewardRole
 {
-
     /// <remarks/>
     Chief,
 
@@ -2545,7 +1722,6 @@ public enum stOfficialStewardRole
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctTechnicalDelegate
 {
-
     private int fEIIDField;
 
     private bool fEIIDFieldSpecified;
@@ -2562,84 +1738,48 @@ public class ctTechnicalDelegate
     [XmlAttribute]
     public int FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool FEIIDSpecified
     {
-        get
-        {
-            return fEIIDFieldSpecified;
-        }
-        set
-        {
-            fEIIDFieldSpecified = value;
-        }
+        get { return fEIIDFieldSpecified; }
+        set { fEIIDFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FirstName
     {
-        get
-        {
-            return firstNameField;
-        }
-        set
-        {
-            firstNameField = value;
-        }
+        get { return firstNameField; }
+        set { firstNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FamilyName
     {
-        get
-        {
-            return familyNameField;
-        }
-        set
-        {
-            familyNameField = value;
-        }
+        get { return familyNameField; }
+        set { familyNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NF
     {
-        get
-        {
-            return nfField;
-        }
-        set
-        {
-            nfField = value;
-        }
+        get { return nfField; }
+        set { nfField = value; }
     }
 }
 
@@ -2651,7 +1791,6 @@ public class ctTechnicalDelegate
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctOfficialJudge
 {
-
     private int fEIIDField;
 
     private bool fEIIDFieldSpecified;
@@ -2670,98 +1809,56 @@ public class ctOfficialJudge
     [XmlAttribute]
     public int FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool FEIIDSpecified
     {
-        get
-        {
-            return fEIIDFieldSpecified;
-        }
-        set
-        {
-            fEIIDFieldSpecified = value;
-        }
+        get { return fEIIDFieldSpecified; }
+        set { fEIIDFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FirstName
     {
-        get
-        {
-            return firstNameField;
-        }
-        set
-        {
-            firstNameField = value;
-        }
+        get { return firstNameField; }
+        set { firstNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FamilyName
     {
-        get
-        {
-            return familyNameField;
-        }
-        set
-        {
-            familyNameField = value;
-        }
+        get { return familyNameField; }
+        set { familyNameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NF
     {
-        get
-        {
-            return nfField;
-        }
-        set
-        {
-            nfField = value;
-        }
+        get { return nfField; }
+        set { nfField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public stOfficialJudgeRole Role
     {
-        get
-        {
-            return roleField;
-        }
-        set
-        {
-            roleField = value;
-        }
+        get { return roleField; }
+        set { roleField = value; }
     }
 }
 
@@ -2771,7 +1868,6 @@ public class ctOfficialJudge
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public enum stOfficialJudgeRole
 {
-
     /// <remarks/>
     President,
 
@@ -2790,7 +1886,6 @@ public enum stOfficialJudgeRole
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceOfficial
 {
-
     private ctOfficialJudge[] judgeField;
 
     private ctTechnicalDelegate[] technicalDelegateField;
@@ -2803,56 +1898,32 @@ public class ctEnduranceOfficial
     [XmlElement("Judge")]
     public ctOfficialJudge[] Judge
     {
-        get
-        {
-            return judgeField;
-        }
-        set
-        {
-            judgeField = value;
-        }
+        get { return judgeField; }
+        set { judgeField = value; }
     }
 
     /// <remarks/>
     [XmlElement("TechnicalDelegate")]
     public ctTechnicalDelegate[] TechnicalDelegate
     {
-        get
-        {
-            return technicalDelegateField;
-        }
-        set
-        {
-            technicalDelegateField = value;
-        }
+        get { return technicalDelegateField; }
+        set { technicalDelegateField = value; }
     }
 
     /// <remarks/>
     [XmlElement("Steward")]
     public ctOfficialSteward[] Steward
     {
-        get
-        {
-            return stewardField;
-        }
-        set
-        {
-            stewardField = value;
-        }
+        get { return stewardField; }
+        set { stewardField = value; }
     }
 
     /// <remarks/>
     [XmlElement("Veterinarian")]
     public ctOfficialVeterinarianRole[] Veterinarian
     {
-        get
-        {
-            return veterinarianField;
-        }
-        set
-        {
-            veterinarianField = value;
-        }
+        get { return veterinarianField; }
+        set { veterinarianField = value; }
     }
 }
 
@@ -2864,7 +1935,6 @@ public class ctEnduranceOfficial
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctEnduranceEvent
 {
-
     private ctEnduranceOfficial officialsField;
 
     private ctEnduranceCompetition[] competitionsField;
@@ -2890,112 +1960,64 @@ public class ctEnduranceEvent
     /// <remarks/>
     public ctEnduranceOfficial Officials
     {
-        get
-        {
-            return officialsField;
-        }
-        set
-        {
-            officialsField = value;
-        }
+        get { return officialsField; }
+        set { officialsField = value; }
     }
 
     /// <remarks/>
     [XmlArrayItem("Competition", IsNullable = false)]
     public ctEnduranceCompetition[] Competitions
     {
-        get
-        {
-            return competitionsField;
-        }
-        set
-        {
-            competitionsField = value;
-        }
+        get { return competitionsField; }
+        set { competitionsField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Code
     {
-        get
-        {
-            return codeField;
-        }
-        set
-        {
-            codeField = value;
-        }
+        get { return codeField; }
+        set { codeField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NF
     {
-        get
-        {
-            return nfField;
-        }
-        set
-        {
-            nfField = value;
-        }
+        get { return nfField; }
+        set { nfField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Name
     {
-        get
-        {
-            return nameField;
-        }
-        set
-        {
-            nameField = value;
-        }
+        get { return nameField; }
+        set { nameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute(DataType = "date")]
     public DateTime StartDate
     {
-        get
-        {
-            return startDateField;
-        }
-        set
-        {
-            startDateField = value;
-        }
+        get { return startDateField; }
+        set { startDateField = value; }
     }
 
     /// <remarks/>
@@ -3006,14 +2028,8 @@ public class ctEnduranceEvent
     [XmlAttribute(DataType = "date")]
     public DateTime EndDate
     {
-        get
-        {
-            return endDateField;
-        }
-        set
-        {
-            endDateField = value;
-        }
+        get { return endDateField; }
+        set { endDateField = value; }
     }
 
     /// <remarks/>
@@ -3029,7 +2045,6 @@ public class ctEnduranceEvent
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctVenue
 {
-
     private string nameField;
 
     private string countryField;
@@ -3050,112 +2065,64 @@ public class ctVenue
     [XmlAttribute]
     public string Name
     {
-        get
-        {
-            return nameField;
-        }
-        set
-        {
-            nameField = value;
-        }
+        get { return nameField; }
+        set { nameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Country
     {
-        get
-        {
-            return countryField;
-        }
-        set
-        {
-            countryField = value;
-        }
+        get { return countryField; }
+        set { countryField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public decimal Latitude
     {
-        get
-        {
-            return latitudeField;
-        }
-        set
-        {
-            latitudeField = value;
-        }
+        get { return latitudeField; }
+        set { latitudeField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool LatitudeSpecified
     {
-        get
-        {
-            return latitudeFieldSpecified;
-        }
-        set
-        {
-            latitudeFieldSpecified = value;
-        }
+        get { return latitudeFieldSpecified; }
+        set { latitudeFieldSpecified = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public decimal Longitude
     {
-        get
-        {
-            return longitudeField;
-        }
-        set
-        {
-            longitudeField = value;
-        }
+        get { return longitudeField; }
+        set { longitudeField = value; }
     }
 
     /// <remarks/>
     [XmlIgnore]
     public bool LongitudeSpecified
     {
-        get
-        {
-            return longitudeFieldSpecified;
-        }
-        set
-        {
-            longitudeFieldSpecified = value;
-        }
+        get { return longitudeFieldSpecified; }
+        set { longitudeFieldSpecified = value; }
     }
 }
 
@@ -3167,7 +2134,6 @@ public class ctVenue
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctShowResult
 {
-
     private ctVenue venueField;
 
     private ctEnduranceEvent[] enduranceEventField;
@@ -3189,70 +2155,40 @@ public class ctShowResult
     /// <remarks/>
     public ctVenue Venue
     {
-        get
-        {
-            return venueField;
-        }
-        set
-        {
-            venueField = value;
-        }
+        get { return venueField; }
+        set { venueField = value; }
     }
 
     /// <remarks/>
     [XmlElement("EnduranceEvent")]
     public ctEnduranceEvent[] EnduranceEvent
     {
-        get
-        {
-            return enduranceEventField;
-        }
-        set
-        {
-            enduranceEventField = value;
-        }
+        get { return enduranceEventField; }
+        set { enduranceEventField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string FEIID
     {
-        get
-        {
-            return fEIIDField;
-        }
-        set
-        {
-            fEIIDField = value;
-        }
+        get { return fEIIDField; }
+        set { fEIIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string NFID
     {
-        get
-        {
-            return nFIDField;
-        }
-        set
-        {
-            nFIDField = value;
-        }
+        get { return nFIDField; }
+        set { nFIDField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute(DataType = "date")]
     public DateTime StartDate
     {
-        get
-        {
-            return startDateField;
-        }
-        set
-        {
-            startDateField = value;
-        }
+        get { return startDateField; }
+        set { startDateField = value; }
     }
 
     /// <remarks/>
@@ -3263,14 +2199,8 @@ public class ctShowResult
     [XmlAttribute(DataType = "date")]
     public DateTime EndDate
     {
-        get
-        {
-            return endDateField;
-        }
-        set
-        {
-            endDateField = value;
-        }
+        get { return endDateField; }
+        set { endDateField = value; }
     }
 
     /// <remarks/>
@@ -3281,14 +2211,8 @@ public class ctShowResult
     [XmlAttribute]
     public string NF
     {
-        get
-        {
-            return nfField;
-        }
-        set
-        {
-            nfField = value;
-        }
+        get { return nfField; }
+        set { nfField = value; }
     }
 }
 
@@ -3300,20 +2224,13 @@ public class ctShowResult
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctShowResultType
 {
-
     private ctShowResult showField;
 
     /// <remarks/>
     public ctShowResult Show
     {
-        get
-        {
-            return showField;
-        }
-        set
-        {
-            showField = value;
-        }
+        get { return showField; }
+        set { showField = value; }
     }
 }
 
@@ -3325,7 +2242,6 @@ public class ctShowResultType
 [XmlType(Namespace = "http://www.fei.org/Result")]
 public class ctIssuer
 {
-
     private string nameField;
 
     private string emailField;
@@ -3334,27 +2250,15 @@ public class ctIssuer
     [XmlAttribute]
     public string Name
     {
-        get
-        {
-            return nameField;
-        }
-        set
-        {
-            nameField = value;
-        }
+        get { return nameField; }
+        set { nameField = value; }
     }
 
     /// <remarks/>
     [XmlAttribute]
     public string Email
     {
-        get
-        {
-            return emailField;
-        }
-        set
-        {
-            emailField = value;
-        }
+        get { return emailField; }
+        set { emailField = value; }
     }
 }

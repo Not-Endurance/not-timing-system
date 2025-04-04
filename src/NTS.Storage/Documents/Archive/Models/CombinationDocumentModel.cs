@@ -34,6 +34,14 @@ public class CombinationDocumentModel
         var horse = new Horse(Horse.ToSetupDomain());
         var minSpeed = Speed.Create(MinAverageSpeed);
         var maxSpeed = Speed.Create(MaxAverageSpeed);
-        return new Combination(RandomHelper.GenerateUniqueInteger(), Number, athlete, horse, Distance, minSpeed, maxSpeed);
+        return new Combination(
+            RandomHelper.GenerateUniqueInteger(),
+            Number,
+            athlete,
+            horse,
+            Distance,
+            minSpeed,
+            maxSpeed
+        );
     }
 }

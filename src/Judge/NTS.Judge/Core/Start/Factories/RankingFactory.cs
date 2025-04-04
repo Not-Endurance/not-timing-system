@@ -16,7 +16,15 @@ public class RankingFactory
         string? feiCategoryEventNumber
     )
     {
-        var ranking = new Ranking(competition, athleteCategory, feiRule, feiEventCode, feiScheduleNumber, feiCategoryEventNumber, rankingEntries);
+        var ranking = new Ranking(
+            competition,
+            athleteCategory,
+            feiRule,
+            feiEventCode,
+            feiScheduleNumber,
+            feiCategoryEventNumber,
+            rankingEntries
+        );
         return ranking;
     }
 }

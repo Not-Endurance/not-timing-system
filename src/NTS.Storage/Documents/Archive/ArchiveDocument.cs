@@ -39,7 +39,15 @@ public class ArchiveDocument : Document
 
     public ArchiveEntry ToDomain()
     {
-        var enduranceEvent = new EnduranceEvent(Id, Country.ToDomain(), City, Location ?? "", StartDay, EndDay, FeiShowId);
+        var enduranceEvent = new EnduranceEvent(
+            Id,
+            Country.ToDomain(),
+            City,
+            Location ?? "",
+            StartDay,
+            EndDay,
+            FeiShowId
+        );
         var officials = Officials.Select(x => x.ToDomain());
         var ranklists = Ranklists.Select(x => x.ToDomain());
         return new ArchiveEntry(enduranceEvent, officials, ranklists);

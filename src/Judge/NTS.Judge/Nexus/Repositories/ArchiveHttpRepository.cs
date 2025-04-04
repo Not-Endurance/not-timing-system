@@ -11,7 +11,8 @@ public class ArchiveHttpRepository : NTS.Judge.HTTP.ArchiveHttpRepository, IArch
 {
     readonly NHttpClient _client;
 
-    public ArchiveHttpRepository(NHttpClient client) : base(client)
+    public ArchiveHttpRepository(NHttpClient client)
+        : base(client)
     {
         _client = client;
     }

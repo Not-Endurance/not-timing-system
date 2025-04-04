@@ -27,7 +27,7 @@ public class RanklistDocumentModel
     public CompetitionRuleset Ruleset { get; init; }
     public CompetitionType Type { get; init; }
     public AthleteCategory Category { get; init; }
-    
+
     public string? FeiRule { get; init; }
     public string? FeiEventCode { get; init; }
     public string? FeiScheduleNumber { get; init; }
@@ -38,7 +38,15 @@ public class RanklistDocumentModel
     {
         var entries = Entries.Select(x => x.ToDomain());
         var competition = new Competition(Name, Ruleset, Type);
-        var ranking = new Ranking(competition, Category, FeiRule, FeiEventCode, FeiScheduleNumber, FeiCategoryEventNumber, entries);
+        var ranking = new Ranking(
+            competition,
+            Category,
+            FeiRule,
+            FeiEventCode,
+            FeiScheduleNumber,
+            FeiCategoryEventNumber,
+            entries
+        );
         return new Ranklist(ranking, entries);
     }
 }
