@@ -12,9 +12,7 @@ public class CompetitionParentContext : BehindContext<Competition>, ICrudParent<
     ObservableList<Participation> _participations = new();
 
     public CompetitionParentContext(IRepository<Competition> competitionRepository)
-        : base(competitionRepository)
-    {
-    }
+        : base(competitionRepository) { }
 
     ObservableList<Phase> ICrudParent<Phase>.Children => _phases;
     ObservableList<Participation> ICrudParent<Participation>.Children => _participations;
