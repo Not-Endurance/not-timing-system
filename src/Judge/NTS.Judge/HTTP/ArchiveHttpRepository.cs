@@ -16,6 +16,16 @@ public class ArchiveHttpRepository : HttpRepository<ArchiveEntry>, IArchiveRepos
         _client = client;
     }
 
+    public async Task<IEnumerable<ArchiveEntry>> GetEntries()
+    {
+        var contents = await _client.Get("archive");
+        if (contents == null)
+        {
+            return [];
+        }
+        return contents.FromJson<IEnumerable<ArchiveDocument>>().Select(x => x.ToDomain());
+    }
+
     public async Task<ArchiveEntry?> GetEntry(int id)
     {
         var contents = await _client.Get("archive");
@@ -36,4 +46,5 @@ public class ArchiveHttpRepository : HttpRepository<ArchiveEntry>, IArchiveRepos
 public interface IArchiveRepository : IRepository<ArchiveEntry>
 {
     Task<ArchiveEntry?> GetEntry(int id);
+    Task<IEnumerable<ArchiveEntry>> GetEntries();
 }
