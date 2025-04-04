@@ -13,7 +13,7 @@ public class DomainException : ValidationException
         : base(template.Format(args)) { } // TODO: add template validation attribute wtf ever its name was
 }
 
-public class DomainPropertyException : DomainException
+public class DomainPropertyException : ValidationException
 {
     public DomainPropertyException(string property, string message)
         : base(property, message) { }
