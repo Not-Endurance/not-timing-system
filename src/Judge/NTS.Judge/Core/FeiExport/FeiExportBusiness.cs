@@ -2,11 +2,13 @@ using System.Globalization;
 using System.Xml.Serialization;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
+using Not.Exceptions;
 using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
+using static MudBlazor.CategoryTypes;
 
 namespace NTS.Judge.Core.FeiExport;
 
@@ -22,20 +24,90 @@ public class FeiExportBusiness : IFeiExportBusiness
     public async Task<string> Create(Ranklist ranklist)
     {
         var enduranceEvent = await _events.Read(0);
-        
-        var ctCompetition = CreateCompetitions(enduranceEvent!, ranklist);
-        var horseSport = CreateHorseSport(enduranceEvent!, ctCompetition, ranklist.Ranking);
-
+        var horseSport = CreateHorseSport(enduranceEvent!, ranklist);
         var xml = Serialize(horseSport);
         return InsertGeneratedDate(xml);
+    }
+
+    HorseSport CreateHorseSport(EnduranceEvent enduranceEvent, Ranklist ranklist)
+    {
+        var ranking = ranklist.Ranking;
+        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiShowId))
+        {
+            throw new DomainException("Missing Show FEIID");
+        }
+        if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace?.Location))
+        {
+            throw new DomainException("Missing PopulatedPlace");
+        }
+        if (string.IsNullOrEmpty(ranking.Name))
+        {
+            throw new DomainException("Missing ranking Name");
+        }
+        if (string.IsNullOrEmpty(ranking.FeiCategoryEventNumber))
+        {
+            throw new DomainException("Missing FEI Category Event NR");
+        }
+        if (string.IsNullOrEmpty(ranking.FeiScheduleNumber))
+        {
+            throw new DomainException("Missing FEI Schedule NR");
+        }
+        if (string.IsNullOrEmpty(ranking.FeiRule))
+        {
+            throw new DomainException("Missing FEI Rule");
+        }
+        if (string.IsNullOrEmpty(ranking.FeiEventCode))
+        {
+            throw new DomainException("Missing FEI Event Code");
+        }
+        if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace.Country.NfCode))
+        {
+            throw new DomainException($"Country '{enduranceEvent.PopulatedPlace.Country}' does not have 'NF' code. Contact developer");
+        }
+
+        var feiCategory = GetFeiCategory(ranking.Category);
+        var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{feiCategory}_{ranking.FeiCategoryEventNumber}";
+        var ctEnduranceCompetition = CreateCompetitions(enduranceEvent!, ranklist);
+        var ctEnduranceEvent = new ctEnduranceEvent
+        {
+            FEIID = competitionFeiId,
+            Code = ranking.FeiEventCode,
+            StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
+            EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
+            NF = enduranceEvent.PopulatedPlace.Country.NfCode,
+            Competitions = new ctEnduranceCompetition[] { ctEnduranceCompetition },
+        };
+        var horseSport = new HorseSport()
+        {
+            Generated = new ctGenerated
+            {
+                Software = "NTS",
+                SoftwareVersion = "1.0.0",
+                Organization = "NotACompany",
+            },
+            EventResult = new ctShowResultType
+            {
+                Show = new ctShowResult
+                {
+                    Venue = new ctVenue
+                    {
+                        Name = enduranceEvent.PopulatedPlace.Location,
+                        Country = enduranceEvent.PopulatedPlace.Country.NfCode,
+                    },
+                    EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
+                    StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
+                    EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
+                    FEIID = enduranceEvent.FeiShowId,
+                }
+            }
+        };
+        return horseSport;
     }
 
     ctEnduranceCompetition CreateCompetitions(EnduranceEvent enduranceEvent, Ranklist ranklist)
     {
         var ranking = ranklist.Ranking;
-        var categoryString = ranking.Category == AthleteCategory.Senior
-            ? "S"
-            : ranking.Category == AthleteCategory.Children ? "C" : "YJ";
+        var categoryString = GetFeiCategory(ranking.Category);
         var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}_{ranking.FeiScheduleNumber}";
         var ctCompetition = new ctEnduranceCompetition
         {
@@ -175,79 +247,17 @@ public class FeiExportBusiness : IFeiExportBusiness
         return days;
     }
 
-    HorseSport CreateHorseSport(EnduranceEvent enduranceEvent, ctEnduranceCompetition ctEnduranceCompetition, Ranking ranking)
+    string GetFeiCategory(AthleteCategory category)
     {
-        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiShowId))
+        return category switch
         {
-            throw new DomainException("Missing Show FEIID");
-        }
-        if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace?.Location))
-        {
-            throw new DomainException("Missing PopulatedPlace");
-        }
-        if (string.IsNullOrEmpty(ranking.Name))
-        {
-            throw new DomainException("Missing ranking Name");
-        }
-        if (string.IsNullOrEmpty(ranking.FeiCategoryEventNumber))
-        {
-            throw new DomainException("Missing FEI Category Event NR");
-        }
-        if (string.IsNullOrEmpty(ranking.FeiScheduleNumber))
-        {
-            throw new DomainException("Missing FEI Schedule NR");
-        }
-        if (string.IsNullOrEmpty(ranking.FeiRule))
-        {
-            throw new DomainException("Missing FEI Rule");
-        }
-        if (string.IsNullOrEmpty(ranking.FeiEventCode))
-        {
-            throw new DomainException("Missing FEI Event Code");
-        }
-        if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace.Country.NfCode))
-        {
-            throw new DomainException($"Country '{enduranceEvent.PopulatedPlace.Country}' does not have 'NF' code. Contact developer");
-        }
-
-        var categoryString = ranking.Category == AthleteCategory.Senior
-            ? "S"
-            : ranking.Category == AthleteCategory.Children ? "C" : "YJ";
-        var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}";
-        var ctEnduranceEvent = new ctEnduranceEvent
-        {
-            FEIID = competitionFeiId,
-            Code = ranking.FeiEventCode,
-            StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
-            EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
-            NF = enduranceEvent.PopulatedPlace.Country.NfCode,
-            Competitions = new ctEnduranceCompetition[] { ctEnduranceCompetition },
+            AthleteCategory.Senior => "S",
+            AthleteCategory.Children => "C",
+            AthleteCategory.JuniorOrYoungAdult => "YJ",
+            AthleteCategory.Training or
+            AthleteCategory.Companion or
+            _ => throw GuardHelper.Exception("Implement validation for non-fei categories for Star during setup") //TODO:
         };
-        var horseSport = new HorseSport()
-        {
-            Generated = new ctGenerated
-            {
-                Software = "NTS",
-                SoftwareVersion = "1.0.0",
-                Organization = "NotACompany",
-            },
-            EventResult = new ctShowResultType
-            {
-                Show = new ctShowResult
-                {
-                    Venue = new ctVenue
-                    {
-                        Name = enduranceEvent.PopulatedPlace.Location,
-                        Country = enduranceEvent.PopulatedPlace.Country.NfCode,
-                    },
-                    EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
-                    StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
-                    EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
-                    FEIID = enduranceEvent.FeiShowId,
-                }
-            }
-        };
-        return horseSport;
     }
 
     string Serialize(HorseSport horseSport)
