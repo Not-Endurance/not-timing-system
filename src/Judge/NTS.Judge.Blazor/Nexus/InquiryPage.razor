@@ -2,7 +2,7 @@
 @inherits NComponent
 
 <NContent Title="@Inquiry_string">
-    
+
     <Main>
         <NSelect T="InquiryType?" @bind-Value="Type" />
 
@@ -25,10 +25,14 @@
             }
 
         </MudStack>
-        
-        @if (Behind.Match != null)
+
+        @if (!Behind.Match?.Any() ?? true)
         {
-            <MudTextField Value="Behind.Match.ToString()" />
+            <MudTextField Value="@No_results_found_in_archive_string" />
+        }
+        else 
+        {
+            <MudTextField Value="Behind.Match?.First()?.ToString()" />
 
             <MudSimpleTable>
 
@@ -56,29 +60,35 @@
                     </MudTh>
                 </MudTr>
 
-                @foreach (var archive in Behind.Records)
+                @foreach (var zz in Behind.Match ?? [])
                 {
-                    var entry = archive.Ranklists
-                        .OrderBy(x => x.Type == CompetitionType.Star)
-                        .ThenBy(x => x.Type == CompetitionType.Championship)
-                        .SelectMany(x => x.Entries)
-                        .First(y => y.Participation.Combination.Athlete.Id == Behind.Match.Combination.Athlete.Id);
-                    var total = entry.Participation.Total;
+
+                    var archive = zz.Participation;
+                    var total = archive.GetTotal();
                     <MudTr>
                         <MudTd>
-                            @Behind.Match.Phases.First().StartTime!.Value.Date
+                            @archive.Phases.First().StartTime?.ToDateTimeOffset().ToString("yyyy-MM-dd")
                         </MudTd>
                         <MudTd>
-                            @(entry.IsNotRanked ? @Not_ranked_string : entry.Rank)
+                            @if (archive.Eliminated != null)
+                            {
+                                @archive.Eliminated
+                                ;
+                            }
+                            else
+                            {
+                                @(zz.IsNotRanked
+                                ? @Not_ranked_string : zz.Rank);
+                            }
                         </MudTd>
                         <MudTd>
-                            @entry.Participation.Competition.Name
+                            @archive.Competition.Name
                         </MudTd>
                         <MudTd>
-                            @entry.Participation.Phases.Where(x => x.IsComplete).Count() / @entry.Participation.Phases.Count()
+                            @archive.Phases.Where(x => x.IsComplete()).Count() / @archive.Phases.Count()
                         </MudTd>
                         <MudTd>
-                            @total?.LastArriveTime
+                            @total?.FinishTime
                         </MudTd>
                         <MudTd>
                             @total?.RideInterval

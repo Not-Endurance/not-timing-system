@@ -62,33 +62,39 @@ public class CoreStarter : ICoreStarter
 
     async Task CreateParticipationsAndRankings(Domain.Setup.Aggregates.EnduranceEvent setupEvent)
     {
-        foreach (var competition in setupEvent.Competitions)
+        foreach (var setupCompetition in setupEvent.Competitions)
         {
-            var (participations, rankingEntriesByCategory) = await ParticipationAndRankingrFactory.Create(
-                competition,
+            var (participations, rankingEntriesByCategory) = await ParticipationAndRankingFactory.Create(
+                setupCompetition,
                 _participationRepository
             );
             foreach (var participation in participations)
             {
                 await _participationRepository.Create(participation);
             }
-            await CreateRankings(
-                new Competition(competition.Name, competition.Ruleset, competition.Type),
-                rankingEntriesByCategory
-            );
+            await CreateRankings(setupCompetition, rankingEntriesByCategory);
         }
     }
 
     async Task CreateRankings(
-        Competition competition,
+        Domain.Setup.Aggregates.Competition setupCompetition,
         Dictionary<AthleteCategory, List<RankingEntry>> rankingEntriesByCategory
     )
     {
+        var competition = new Competition(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type);
         foreach (var relation in rankingEntriesByCategory)
         {
             if (relation.Value.Count > 0)
             {
-                var ranking = RankingFactory.Create(competition, relation.Key, relation.Value);
+                var ranking = RankingFactory.Create(
+                    competition,
+                    relation.Key,
+                    relation.Value,
+                    setupCompetition.FeiRule,
+                    setupCompetition.FeiEventCode,
+                    setupCompetition.FeiScheduleNumber,
+                    setupCompetition.FeiCategoryEventNumber
+                );
                 await _rankingRepository.Create(ranking);
             }
         }

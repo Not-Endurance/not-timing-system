@@ -1,5 +1,4 @@
 using MudBlazor;
-using Not.Localization;
 using Not.Notify;
 using NTS.Domain.Objects;
 
@@ -10,32 +9,51 @@ public partial class SnapshotPanel
     const string DEFAULT_TIME = "00:00:00";
     static readonly PatternMask TIME_MASK = new("00:00:00");
 
-    string _time = DEFAULT_TIME;
+    string? _input = DEFAULT_TIME;
 
     [Inject]
     IManualProcessor ManualProcessor { get; set; } = default!;
 
-    void Snapshot()
+    Task Snapshot()
     {
         var currentTime = DateTime.Now.TimeOfDay;
-        _time = currentTime.ToString();
+        _input = currentTime.ToString();
+        return Task.CompletedTask;
     }
 
-    void Process()
+    async Task Process()
     {
-        if (_time == DEFAULT_TIME)
+        if (_input is null or DEFAULT_TIME)
         {
             return;
         }
-        if (_time.Length < DEFAULT_TIME.Length)
+        var timeString = NormalizeInput(_input);
+        if (!TimeSpan.TryParse(timeString, out var timeSpan))
         {
             NotifyHelper.Inform(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string);
             return;
         }
-
-        var inputTime = TimeSpan.Parse(_time);
-        var time = DateTime.Today + inputTime;
+        var time = DateTime.Today + timeSpan;
         var timestamp = new Timestamp(time);
-        ManualProcessor.Process(timestamp);
+        await ManualProcessor.Process(timestamp);
+    }
+
+    string NormalizeInput(string input)
+    {
+        var values = input
+            .Split(':')
+            .Select(x =>
+            {
+                if (x == string.Empty)
+                {
+                    return "00";
+                }
+                if (x.Length == 1)
+                {
+                    return '0' + x;
+                }
+                return x;
+            });
+        return string.Join(':', values);
     }
 }

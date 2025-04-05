@@ -101,8 +101,8 @@ public abstract class AggregateRoot : IEquatable<AggregateRoot>, IAggregateRoot
         return GetHashCode() == other.GetHashCode() && GetType() == other.GetType();
     }
 
-    static DomainException GetRequiredException(string field)
+    static DomainPropertyException GetRequiredException(string field)
     {
-        return new DomainPropertyException(Field_is_required_string, field);
+        return new DomainPropertyException(field, Field_is_required_string);
     }
 }

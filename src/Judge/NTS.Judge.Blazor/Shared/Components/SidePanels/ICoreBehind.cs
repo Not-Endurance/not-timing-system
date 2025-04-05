@@ -7,4 +7,5 @@ public interface ICoreBehind : IObservableBehind, ISingleton
 {
     bool IsStarted { get; }
     Task Start();
+    Task LoadArchive(int archiveId);
 }

@@ -11,7 +11,8 @@ public class Phase : AggregateRoot
     bool _isSeparateFinish = false;
 
     [Newtonsoft.Json.JsonConstructor]
-    Phase(
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Phase(
         int id,
         string gate,
         double length,
@@ -152,6 +153,7 @@ public class Phase : AggregateRoot
         ArriveTime = Timestamp.Create(state.ArriveTime);
         PresentTime = Timestamp.Create(state.PresentTime);
         RepresentTime = Timestamp.Create(state.RepresentTime);
+        CheckCompulsoryThreshold();
     }
 
     internal bool ViolatesRecoveryTime()
@@ -178,7 +180,7 @@ public class Phase : AggregateRoot
         IsRequiredInspectionRequested = true;
     }
 
-    internal void DisableReinspection()
+    internal void DisableRepresentation()
     {
         if (!IsReinspectionRequested)
         {
@@ -190,7 +192,7 @@ public class Phase : AggregateRoot
                 Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string
             );
         }
-        IsReinspectionRequested = false;
+        IsReinspectionRequested = false; // TODO:rename to IsRepresentation requested
     }
 
     internal void SetGate(int number, double totalDistanceSoFar)
@@ -283,7 +285,7 @@ public class Phase : AggregateRoot
         {
             return Arrive(snapshot);
         }
-        if (PresentTime == null || RepresentTime == null)
+        if (PresentTime == null || RepresentTime == null && IsReinspectionRequested)
         {
             return Inspect(snapshot);
         }
@@ -315,6 +317,10 @@ public class Phase : AggregateRoot
         if (ArriveTime != null)
         {
             return SnapshotResult.NotApplied(snapshot, NotAppliedDueToDuplicateArrive);
+        }
+        if (snapshot.Timestamp < StartTime)
+        {
+            throw new DomainException(__cannot_be_sooner_than__string, Arrival_string, StartTime);
         }
 
         ArriveTime = snapshot.Timestamp;

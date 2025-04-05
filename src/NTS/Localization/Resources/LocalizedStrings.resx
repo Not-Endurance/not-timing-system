@@ -133,108 +133,108 @@
     <value>test</value>
   </data>
   <data name="hash_string" xml:space="preserve">
-  <value>hash</value>
+    <value>hash</value>
   </data>
-    <data name="X_string" xml:space="preserve">
+  <data name="X_string" xml:space="preserve">
     <value>X</value>
   </data>
-    <data name="Create_string" xml:space="preserve">
+  <data name="Create_string" xml:space="preserve">
     <value>Create</value>
   </data>
-    <data name="Update_string" xml:space="preserve">
+  <data name="Update_string" xml:space="preserve">
     <value>Update</value>
   </data>
-    <data name="Print_string" xml:space="preserve">
+  <data name="Print_string" xml:space="preserve">
     <value>Print</value>
   </data>
-    <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
+  <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
     <value>No  have been created for this event</value>
   </data>
-    <data name="Date_string" xml:space="preserve">
+  <data name="Date_string" xml:space="preserve">
     <value>Date</value>
   </data>
-    <data name="Time_string" xml:space="preserve">
+  <data name="Time_string" xml:space="preserve">
     <value>Time</value>
   </data>
   <data name="km_string" xml:space="preserve">
     <value>km</value>
   </data>
-    <data name="rest_string" xml:space="preserve">
+  <data name="rest_string" xml:space="preserve">
     <value>rest</value>
   </data>
-    <data name="ARR_string" xml:space="preserve">
+  <data name="ARR_string" xml:space="preserve">
     <value>ARR</value>
   </data>
-    <data name="IN_string" xml:space="preserve">
+  <data name="IN_string" xml:space="preserve">
     <value>IN</value>
   </data>
-    <data name="complete_string" xml:space="preserve">
+  <data name="complete_string" xml:space="preserve">
     <value>complete</value>
   </data>
-    <data name="min_string" xml:space="preserve">
+  <data name="min_string" xml:space="preserve">
     <value>min</value>
   </data>
-    <data name="max_string" xml:space="preserve">
+  <data name="max_string" xml:space="preserve">
     <value>max</value>
   </data>
   <data name="km_per_hour_string" xml:space="preserve">
-    <value>km per hour</value>
+    <value>km/h</value>
   </data>
-    <data name="Min_value_is_1_minute_string" xml:space="preserve">
+  <data name="Min_value_is_1_minute_string" xml:space="preserve">
     <value>Min value is 1 minute</value>
   </data>
-    <data name="Distance_cannot_be_zero_or_less_string" xml:space="preserve">
+  <data name="Distance_cannot_be_zero_or_less_string" xml:space="preserve">
     <value>Distance cannot be zero or less</value>
   </data>
-    <data name="Setup_string" xml:space="preserve">
+  <data name="Setup_string" xml:space="preserve">
     <value>Setup</value>
   </data>
-    <data name="Dashboard_string" xml:space="preserve">
+  <data name="Dashboard_string" xml:space="preserve">
     <value>Dashboard</value>
   </data>
-    <data name="Endurance_Event_string" xml:space="preserve">
+  <data name="Endurance_Event_string" xml:space="preserve">
     <value>Endurance Event</value>
   </data>
-    <data name="Athletes_and_Horses_string" xml:space="preserve">
+  <data name="Athletes_and_Horses_string" xml:space="preserve">
     <value>Athletes and Horses</value>
   </data>
-    <data name="Combinations_string" xml:space="preserve">
+  <data name="Combinations_string" xml:space="preserve">
     <value>Combinations</value>
   </data>
-    <data name="Clubs_string" xml:space="preserve">
+  <data name="Clubs_string" xml:space="preserve">
     <value>Clubs</value>
   </data>
-    <data name="Startlist_string" xml:space="preserve">
+  <data name="Startlist_string" xml:space="preserve">
     <value>Startlist</value>
   </data>
-    <data name="Ranklist_string" xml:space="preserve">
+  <data name="Ranklist_string" xml:space="preserve">
     <value>Ranklist</value>
   </data>
-    <data name="Handouts_string" xml:space="preserve">
+  <data name="Handouts_string" xml:space="preserve">
     <value>Handouts</value>
   </data>
-    <data name="Inquiry_string" xml:space="preserve">
+  <data name="Inquiry_string" xml:space="preserve">
     <value>Inquiry</value>
   </data>
-    <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
+  <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Failed to Qualify Reason</value>
   </data>
-    <data name="Select_a_reason_string" xml:space="preserve">
+  <data name="Select_a_reason_string" xml:space="preserve">
     <value>Select a reason</value>
   </data>
-    <data name="Reason_string" xml:space="preserve">
+  <data name="Reason_string" xml:space="preserve">
     <value>Reason</value>
   </data>
-    <data name="Print_confirmation_string" xml:space="preserve">
+  <data name="Print_confirmation_string" xml:space="preserve">
     <value>Print confirmation</value>
   </data>
-    <data name="Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string" xml:space="preserve">
+  <data name="Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string" xml:space="preserve">
     <value>Are handouts printed successfully Yes will delete all handouts This cannot be undone</value>
   </data>
-    <data name="Edit_times_string" xml:space="preserve">
+  <data name="Edit_times_string" xml:space="preserve">
     <value>Edit times</value>
   </data>
-    <data name="Total_string" xml:space="preserve">
+  <data name="Total_string" xml:space="preserve">
     <value>Total</value>
   </data>
   <data name="Finished_at_colon_string" xml:space="preserve">
@@ -246,31 +246,31 @@
   <data name="Recovery_in_hours_colon_string" xml:space="preserve">
     <value>Recovery (hrs):</value>
   </data>
-    <data name="Incomplete_string" xml:space="preserve">
+  <data name="Incomplete_string" xml:space="preserve">
     <value>Incomplete</value>
   </data>
-    <data name="Protocol_string" xml:space="preserve">
+  <data name="Protocol_string" xml:space="preserve">
     <value>Protocol</value>
   </data>
-    <data name="Rank_string" xml:space="preserve">
+  <data name="Rank_string" xml:space="preserve">
     <value>Rank</value>
   </data>
-    <data name="Combination_string" xml:space="preserve">
+  <data name="Combination_string" xml:space="preserve">
     <value>Combination</value>
   </data>
   <data name="Arrival_string" xml:space="preserve">
     <value>Arrival</value>
   </data>
-    <data name="Speed_string" xml:space="preserve">
+  <data name="Speed_string" xml:space="preserve">
     <value>Speed</value>
   </data>
-    <data name="Loop_string" xml:space="preserve">
+  <data name="Loop_string" xml:space="preserve">
     <value>Loop</value>
   </data>
-    <data name="Recovery_string" xml:space="preserve">
+  <data name="Recovery_string" xml:space="preserve">
     <value>Recovery</value>
   </data>
-    <data name="Stage_string" xml:space="preserve">
+  <data name="Stage_string" xml:space="preserve">
     <value>Stage</value>
   </data>
   <data name="Search_by_ID_colon_string" xml:space="preserve">
@@ -279,43 +279,43 @@
   <data name="Search_by_name_colon_string" xml:space="preserve">
     <value>Search by name:</value>
   </data>
-    <data name="Event_string" xml:space="preserve">
+  <data name="Event_string" xml:space="preserve">
     <value>Event</value>
   </data>
-    <data name="Stages_string" xml:space="preserve">
+  <data name="Stages_string" xml:space="preserve">
     <value>Stages</value>
   </data>
-    <data name="Ride_string" xml:space="preserve">
+  <data name="Ride_string" xml:space="preserve">
     <value>Ride</value>
   </data>
-    <data name="Not_ranked_string" xml:space="preserve">
+  <data name="Not_ranked_string" xml:space="preserve">
     <value>Not ranked</value>
   </data>
-    <data name="Name_string" xml:space="preserve">
+  <data name="Name_string" xml:space="preserve">
     <value>Name</value>
   </data>
-    <data name="Required_only_for_FEI_export_string" xml:space="preserve">
+  <data name="Required_only_for_FEI_export_string" xml:space="preserve">
     <value>Required only for FEI export</value>
   </data>
-    <data name="Combination_Number_string" xml:space="preserve">
+  <data name="Combination_Number_string" xml:space="preserve">
     <value>Combination Number</value>
   </data>
-    <data name="Place_string" xml:space="preserve">
+  <data name="Place_string" xml:space="preserve">
     <value>Place</value>
   </data>
-    <data name="Country_string" xml:space="preserve">
+  <data name="Country_string" xml:space="preserve">
     <value>Country</value>
   </data>
-    <data name="Connection_Status_string" xml:space="preserve">
+  <data name="Connection_Status_string" xml:space="preserve">
     <value>Connection Status</value>
   </data>
-    <data name="Connected_string" xml:space="preserve">
+  <data name="Connected_string" xml:space="preserve">
     <value>Connected</value>
   </data>
   <data name="Witnesses_connected__colon_string" xml:space="preserve">
-    <value>Witness apps:</value>
+    <value>Witness apps: {0}</value>
   </data>
-    <data name="Loops_string" xml:space="preserve">
+  <data name="Loops_string" xml:space="preserve">
     <value>Loops</value>
   </data>
   <data name="Settings_string" xml:space="preserve">
@@ -515,5 +515,26 @@
   </data>
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Time format is incorect 'hours:minutes:seconds'</value>
+  </data>
+  <data name="No_results_found_in_archive_string" xml:space="preserve">
+    <value>No results found in archive</value>
+  </data>
+  <data name="required_for_FEI_export" xml:space="preserve">
+    <value>(required for FEI export)</value>
+  </data>
+  <data name="FEI_Show_ID" xml:space="preserve">
+    <value>FEI Show ID</value>
+  </data>
+  <data name="FEI_Event_Code" xml:space="preserve">
+    <value>FEI Event Code</value>
+  </data>
+  <data name="FEI_Category_Event_NR" xml:space="preserve">
+    <value>FEI Category Event NR</value>
+  </data>
+  <data name="FEI_Schedule_NR" xml:space="preserve">
+    <value>FEI Schedule NR</value>
+  </data>
+  <data name="FEI_Rule" xml:space="preserve">
+    <value>FEI Rule</value>
   </data>
 </root>

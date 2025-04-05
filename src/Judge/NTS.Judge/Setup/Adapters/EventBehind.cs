@@ -43,26 +43,9 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
         return false;
     }
 
-    public async Task Create(EnduranceEventFormModel enduranceEvent)
+    public async Task Create(EnduranceEventFormModel model)
     {
-        Task action() => SafeCreate(enduranceEvent);
-        await SafeHelper.Run(action);
-    }
-
-    public async Task Update(EnduranceEventFormModel enduranceEvent)
-    {
-        Task action() => SafeUpdate(enduranceEvent);
-        await SafeHelper.Run(action);
-    }
-
-    public Task<EnduranceEvent> Delete(EnduranceEvent enduranceEvent)
-    {
-        throw new NotImplementedException("Endurance event cannot be deleted");
-    }
-
-    async Task SafeCreate(EnduranceEventFormModel model)
-    {
-        var enduranceEvent = EnduranceEvent.Create(model.Place, model.Country);
+        var enduranceEvent = EnduranceEvent.Create(model.Place, model.Country, model.FeiShowId);
         await _events.Create(enduranceEvent);
         _context.SetParent(enduranceEvent);
         Model = new EnduranceEventFormModel();
@@ -70,17 +53,23 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
         EmitChange();
     }
 
-    async Task SafeUpdate(EnduranceEventFormModel model)
+    public async Task Update(EnduranceEventFormModel model)
     {
         var enduranceEvent = EnduranceEvent.Update(
             model.Id,
             model.Place,
             model.Country,
+            model.FeiShowId,
             _competitionParent.Children,
             _officialParent.Children
         );
         await _events.Update(enduranceEvent);
         _context.SetParent(enduranceEvent);
         EmitChange();
+    }
+
+    public Task<EnduranceEvent> Delete(EnduranceEvent enduranceEvent)
+    {
+        throw new NotImplementedException("Endurance event cannot be deleted");
     }
 }

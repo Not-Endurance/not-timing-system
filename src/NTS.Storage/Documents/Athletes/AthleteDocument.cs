@@ -27,7 +27,7 @@ public class AthleteDocument : Document
     public ClubDocument? Club { get; init; }
     public string? FeiId { get; init; }
 
-    public Athlete ToDomain()
+    public Athlete ToSetupDomain()
     {
         return new Athlete(Id, Names, FeiId, Country?.ToDomain(), Club?.ToDomain(), Category);
     }

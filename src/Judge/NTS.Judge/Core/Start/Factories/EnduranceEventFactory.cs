@@ -11,7 +11,7 @@ public static class EnduranceEventFactory
         {
             throw new DomainException("Cannot start - Competitions aren't configured");
         }
-        var competitionStartTimes = setupEvent.Competitions.Select(x => x.Start);
+        var competitionStartTimes = setupEvent.Competitions.Select(x => x.Start).ToList();
         var startDate = competitionStartTimes.First();
         var endDate = competitionStartTimes.Last();
 
@@ -23,9 +23,7 @@ public static class EnduranceEventFactory
             "",
             startDate,
             endDate,
-            null,
-            null,
-            null
+            setupEvent.ShowFeiId
         );
         return enduranceEvent;
     }

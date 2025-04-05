@@ -16,8 +16,9 @@ public class Participation : AggregateRoot, IAggregateRoot
     public static readonly Event<ParticipationEliminated> ELIMINATED_EVENT = new();
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
-    [JsonConstructor]
-    Participation(
+    [Newtonsoft.Json.JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    public Participation(
         int id,
         Competition competition,
         Combination combination,
@@ -77,10 +78,11 @@ public class Participation : AggregateRoot, IAggregateRoot
         {
             return SnapshotResult.NotApplied(snapshot, NotAppliedDueToNotQualified);
         }
-
         var result = Phases.Process(snapshot);
-        EvaluatePhase(Phases.Current);
-
+        if (result.Type == Applied)
+        {
+            EvaluatePhase(Phases.Current);
+        }
         return result;
     }
 
@@ -101,7 +103,7 @@ public class Participation : AggregateRoot, IAggregateRoot
         }
         else
         {
-            Phases.Current.DisableReinspection();
+            Phases.Current.DisableRepresentation();
         }
     }
 

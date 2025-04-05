@@ -33,8 +33,8 @@ public class Athlete : AggregateRoot, IAthlete, IAggregateRoot, IReflect<Club>
         FeiId = feiId;
         Names = Required(nameof(Names), names);
         Country = Required(nameof(Country), country);
-        Club = Required(nameof(Club), club);
         Category = Required(nameof(Category), category);
+        Club = club; //Required(nameof(Club), club);
     }
 
     IClub? IAthlete.Club => Club;
