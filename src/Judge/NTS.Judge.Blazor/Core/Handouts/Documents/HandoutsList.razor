@@ -40,9 +40,11 @@
                         }
                         <MudSpacer />
 
-                        <MudItem Class="d-flex flex-row">
-                            <MudImage Src="images/logo-bfks.JPG" />
-                            <MudImage Src="images/logo-fei.JPG" />
+                        <MudItem Class="d-flex flex-row justify-center">
+                            @* TODO: Consider removing FEI logo for regional championships *@
+                            <MudImage Class="pb-5" Height="150" Width="135" Src="images/logo-fei.png" />
+                            @* TODO: include a setting which configures the local fedaration's logo *@
+                            <MudImage Height="115" Width="135" Src="images/logo-bfks.png" />
                         </MudItem>
 
                     </MudStack>
