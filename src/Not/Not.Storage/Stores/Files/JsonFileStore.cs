@@ -7,7 +7,7 @@ namespace Not.Storage.Stores.Files;
 public static class JsonFileStore
 {
     internal static readonly JsonSerializerSettings SETTINGS = new NJsonSettings();
-    static readonly SemaphoreSlim SEMAPHORE = new (1);
+    static readonly SemaphoreSlim SEMAPHORE = new(1);
     static readonly List<JsonConverterBase> CONVERTERS = [];
 
     public static void AddConverter<TConverter>(TConverter converter)
@@ -28,7 +28,7 @@ public static class JsonFileStore
         }
         finally
         {
-            SEMAPHORE.Release();    
+            SEMAPHORE.Release();
         }
     }
 

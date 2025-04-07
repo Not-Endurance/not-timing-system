@@ -44,7 +44,7 @@ public class LockingJsonFileStore<T> : IStore<T>
 
     public async Task Commit(T state)
     {
-        if (state.TransactionId == null) 
+        if (state.TransactionId == null)
         {
             throw new Exception(
                 $"Cannot commit state without a transaction. Please use '{nameof(Transact)}' for write operations"
