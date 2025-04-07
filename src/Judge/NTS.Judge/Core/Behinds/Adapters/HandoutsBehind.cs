@@ -114,6 +114,8 @@ public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBe
         var handout = new Handout(participation);
         var document = new HandoutDocument(handout, enduranceEvent, officials);
 
+        var delay = TimeSpan.FromSeconds(1);
+        await Task.Delay(delay);
         await _semaphore.WaitAsync();
 
         await _handoutRepository.Delete(x => x.Participation == participation);
