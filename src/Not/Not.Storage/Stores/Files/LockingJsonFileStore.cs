@@ -6,14 +6,15 @@ using Not.Storage.States;
 
 namespace Not.Storage.Stores.Files;
 
-public class LockingJsonFileStore<T> : JsonFileStore<T>, IStore<T>
+public class LockingJsonFileStore<T> : IStore<T>
     where T : class, IState, new()
 {
     readonly TimeoutLockSemaphore _timeoutLock;
+    readonly string _path;
 
     public LockingJsonFileStore([FromKeyedServices(StoreConstants.DATA_KEY)] IFileContext configuration)
-        : base(Path.Combine(configuration.Path, $"{typeof(T).Name}.json"))
     {
+        _path = Path.Combine(configuration.Path, $"{typeof(T).Name}.json");
         _timeoutLock = new TimeoutLockSemaphore();
     }
 
@@ -24,7 +25,7 @@ public class LockingJsonFileStore<T> : JsonFileStore<T>, IStore<T>
     {
         // TODO: figure out better way? Maybe cache the contents and update the cache on Commit?
         var transactionId = await _timeoutLock.Wait(callerPath, callerMember);
-        var state = await DeserializeAsync();
+        var state = await JsonFileStore.Read<T>(_path) ?? new T();
         _timeoutLock.Release(transactionId);
         return state;
     }
@@ -36,7 +37,7 @@ public class LockingJsonFileStore<T> : JsonFileStore<T>, IStore<T>
     {
         var transactionId = await _timeoutLock.Wait(callerPath, callerMember);
 
-        var state = await DeserializeAsync();
+        var state = await JsonFileStore.Read<T>(_path) ?? new T();
         state.TransactionId = transactionId;
         return state;
     }
@@ -50,7 +51,7 @@ public class LockingJsonFileStore<T> : JsonFileStore<T>, IStore<T>
             );
         }
 
-        await SerializeAsync(state);
+        await JsonFileStore.Write(_path, state);
         _timeoutLock.Release(state.TransactionId.Value);
     }
 }

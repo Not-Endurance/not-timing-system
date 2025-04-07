@@ -20,7 +20,7 @@ public partial class MainLayout
         _drawerOpen = !_drawerOpen;
     }
 
-    async void ToggleLayoutVisibility()
+    async void ToggleLayoutVisibility() // TODO: fix all async voids possible
     {
         _hideLayout = !_hideLayout;
         await InvokeAsync(StateHasChanged);

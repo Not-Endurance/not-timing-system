@@ -39,7 +39,7 @@ public class StorageTests : JudgeIntegrationTest
             ),
         };
 
-        await AssertStateEquals(JsonFileStore.ToJson(expectedState));
+        await AssertStateEquals(JsonFileStore.Write(expectedState));
     }
 
     [Fact]

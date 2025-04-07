@@ -100,7 +100,7 @@ public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBe
         _semaphore.Release();
     }
 
-    async void PhaseCompletedHandler(PhaseCompleted phaseCompleted)
+    async Task PhaseCompletedHandler(PhaseCompleted phaseCompleted) // TODO: change to Task
     {
         await CreateDocument(phaseCompleted.Participation);
     }
@@ -114,9 +114,7 @@ public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBe
         var handout = new Handout(participation);
         var document = new HandoutDocument(handout, enduranceEvent, officials);
 
-        var delay = TimeSpan.FromSeconds(1);
-        await Task.Delay(delay);
-        await _semaphore.WaitAsync();
+        await _semaphore.WaitAsync(); // TODO: Create LockHelper to encapsulate semaphore releases
 
         await _handoutRepository.Delete(x => x.Participation == participation);
         await _handoutRepository.Create(handout);

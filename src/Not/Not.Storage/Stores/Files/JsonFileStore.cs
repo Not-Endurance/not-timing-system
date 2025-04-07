@@ -7,7 +7,7 @@ namespace Not.Storage.Stores.Files;
 public static class JsonFileStore
 {
     internal static readonly JsonSerializerSettings SETTINGS = new NJsonSettings();
-    static readonly object LOCK = new();
+    static readonly SemaphoreSlim SEMAPHORE = new(1);
     static readonly List<JsonConverterBase> CONVERTERS = [];
 
     public static void AddConverter<TConverter>(TConverter converter)
@@ -17,28 +17,44 @@ public static class JsonFileStore
         CONVERTERS.Add(converter);
     }
 
-    public static string ToJson(object obj)
+    public static async Task Write(string path, object obj)
     {
-        lock (LOCK)
+        await SEMAPHORE.WaitAsync();
+        try
         {
             var result = JsonConvert.SerializeObject(obj, SETTINGS);
             ResetConverters();
-            return result;
+            await File.WriteAllTextAsync(path, result);
+        }
+        finally
+        {
+            SEMAPHORE.Release();
         }
     }
 
-    public static T FromJson<T>(string json)
-        where T : class, new()
+    public static async Task<T?> Read<T>(string path)
+        where T : class
     {
-        lock (LOCK) // TODO: investigate serialization locking as a whole (reference serializer locks as well)
+        await SEMAPHORE.WaitAsync();
+        try // TODO: investigate serialization locking as a whole (reference serializer locks as well)
         {
+            var json = await FileHelper.SafeReadStringAsync(path);
+            if (json == null)
+            {
+                return null;
+            }
             var result = JsonConvert.DeserializeObject<T>(json, SETTINGS);
             if (result == default)
             {
                 throw new Exception($"Cannot serialize '{json}' to type of '{typeof(T)}'");
             }
+
             ResetConverters();
             return result;
+        }
+        finally
+        {
+            SEMAPHORE.Release();
         }
     }
 
@@ -48,40 +64,5 @@ public static class JsonFileStore
         {
             converter.Reset();
         }
-    }
-}
-
-public abstract class JsonFileStore<T>
-    where T : class, new()
-{
-    readonly string _path;
-
-    protected JsonFileStore(string path)
-    {
-        _path = path;
-    }
-
-    protected void Serialize(T value)
-    {
-        var contents = JsonFileStore.ToJson(value);
-        FileHelper.Write(contents, _path);
-    }
-
-    protected T Deserialize()
-    {
-        var contents = FileHelper.SafeReadString(_path);
-        return contents == null ? new() : JsonFileStore.FromJson<T>(contents);
-    }
-
-    protected async Task SerializeAsync(T value)
-    {
-        var contents = JsonFileStore.ToJson(value);
-        await FileHelper.WriteAsync(contents, _path);
-    }
-
-    protected async Task<T> DeserializeAsync()
-    {
-        var contents = await FileHelper.SafeReadStringAsync(_path);
-        return contents == null ? new() : JsonFileStore.FromJson<T>(contents);
     }
 }
