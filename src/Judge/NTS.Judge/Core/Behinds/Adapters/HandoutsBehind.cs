@@ -100,7 +100,7 @@ public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBe
         _semaphore.Release();
     }
 
-    async void PhaseCompletedHandler(PhaseCompleted phaseCompleted) // TODO: change to Task
+    async Task PhaseCompletedHandler(PhaseCompleted phaseCompleted) // TODO: change to Task
     {
         await CreateDocument(phaseCompleted.Participation);
     }
