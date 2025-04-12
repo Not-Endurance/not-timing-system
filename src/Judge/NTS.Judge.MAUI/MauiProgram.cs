@@ -15,7 +15,7 @@ public static class MauiProgram
 
         var app = builder.Build();
 
-        StartHub();
+        //StartHub();
 
         return app;
     }
