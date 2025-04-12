@@ -8,12 +8,12 @@ public static class RpcServiceCollectionExtensions
     public static IServiceCollection AddRpcSocket(
         this IServiceCollection services,
         RpcProtocol protocol,
-        string host,
-        int port,
-        string hubPattern
+        string host, 
+        string hubPattern,
+        int? port
     )
     {
-        var context = new SignalRContext(protocol, host, port, hubPattern);
+        var context = new SignalRContext(protocol, host, hubPattern, port);
         var socket = new SignalRSocket(context);
         services.AddSingleton<IRpcSocket>(socket);
         return services;

@@ -16,7 +16,7 @@ public static class JudgeBlazorServiceCollectionExtensions
         services
             .ConfigureNts(configuration)
             .AddNotBlazor(configuration)
-            .AddRpcSocket(RpcProtocol.Http, "localhost", ApplicationConstants.RPC_PORT, ApplicationConstants.JUDGE_HUB);
+            .AddRpcSocket(RpcProtocol.Http, "localhost", ApplicationConstants.JUDGE_HUB, ApplicationConstants.RPC_PORT);
 
         return services;
     }

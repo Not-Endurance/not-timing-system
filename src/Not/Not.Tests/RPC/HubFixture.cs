@@ -55,7 +55,7 @@ public abstract class HubFixture<T> : IDisposable
 
     SignalRSocket ConfigureRpc()
     {
-        var context = new SignalRContext(_rpcProtocol, "localhost", _hubPort, _hubPattern);
+        var context = new SignalRContext(_rpcProtocol, "localhost", _hubPattern, _hubPort);
         return new SignalRSocket(context);
     }
 }

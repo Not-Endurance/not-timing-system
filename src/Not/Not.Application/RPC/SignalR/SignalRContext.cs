@@ -3,19 +3,21 @@
 public class SignalRContext
 {
     readonly RpcProtocol _protocol;
-    readonly int _port;
+    readonly int? _port;
     readonly string _hubPattern;
-    string _host;
+    readonly string _host;
 
-    public SignalRContext(RpcProtocol protocol, string host, int port, string hubPattern)
+    public SignalRContext(RpcProtocol protocol, string host, string hubPattern, int?  port = null)
     {
         _protocol = protocol;
         _host = NormalizeHost(host);
-        _port = port;
         _hubPattern = NormalizePattern(hubPattern);
+        _port = port;
     }
 
-    public string Url => $"{_protocol.ToString().ToLower()}://{_host}:{_port}/{_hubPattern}";
+    public string Url => _port == null
+        ? $"{_protocol.ToString().ToLower()}://{_host}/{_hubPattern}"
+        : $"{_protocol.ToString().ToLower()}://{_host}:{_port}/{_hubPattern}";
 
     string NormalizePattern(string hubPattern)
     {
