@@ -10,7 +10,7 @@ env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   SOURCE_PATH: src/Nexus/NTS.Nexus.Warp
-  ARTIFACT_PATH: ./publish
+  ARTIFACT_PATH: NTS.Nexus.Warp/publish
   AZURE_RESOURCE: nts-nexus-warp-dev
 
 jobs:

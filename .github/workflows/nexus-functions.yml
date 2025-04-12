@@ -8,7 +8,7 @@ env:
   AZURE_RESOURCE_GROUP: NTS
   AZURE_STORAGE_CONTAINER: azurefunctions
   AZURE_STORAGE_ACCOUNT: ntsstoragedev
-  ARTIFACT_PATH: Nexus/NTS.Nexus.Test/published
+  ARTIFACT_PATH: NTS.Nexus.API/publish
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   SOURCE_PATH: src/Nexus/NTS.Nexus.HTTP
