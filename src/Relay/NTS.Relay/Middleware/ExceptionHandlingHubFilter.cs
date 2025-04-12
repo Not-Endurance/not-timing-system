@@ -4,7 +4,7 @@ using Not.Notify;
 
 namespace NTS.Relay.Middleware;
 
-public class ExceptionHandlingHubFilter : IHubFilter
+internal class ExceptionHandlingHubFilter : IHubFilter
 {
     public async ValueTask<object?> InvokeMethodAsync(
         HubInvocationContext invocationContext,

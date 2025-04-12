@@ -5,7 +5,7 @@ using NTS.Storage.Core;
 
 namespace NTS.Relay.Storage;
 
-public class ParticipationReadonlyRepository : ReadonlySetRepository<Participation, CoreState>
+internal class ParticipationReadonlyRepository : ReadonlySetRepository<Participation, CoreState>
 {
     public ParticipationReadonlyRepository(IStore<CoreState> store)
         : base(store) { }

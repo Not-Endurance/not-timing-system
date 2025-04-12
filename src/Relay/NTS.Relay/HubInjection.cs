@@ -8,7 +8,7 @@ using NTS.Storage;
 
 namespace NTS.Relay;
 
-public static class HubInjection
+internal static class HubInjection
 {
     public static IServiceCollection ConfigureHub(this IServiceCollection services)
     {

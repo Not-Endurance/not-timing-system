@@ -1,8 +1,5 @@
 ﻿using System.Diagnostics;
-using Not.Application.RPC.SignalR;
-using NTS.Judge.RPC;
-using static NTS.Judge.MAUI.Constants;
-using static NTS.Relay.Constants;
+using NTS.Judge.Warp;
 
 namespace NTS.Judge.MAUI;
 
@@ -27,15 +24,14 @@ public static class MauiProgram
     {
         try
         {
-            var parentPid = Process.GetCurrentProcess().Id;
+            var parentPid = Environment.ProcessId;
             var currentDirectory = Directory.GetCurrentDirectory();
             var info = new ProcessStartInfo
             {
-                FileName = Path.Combine(currentDirectory, RELAY_APP_EXE),
-                Arguments = PARENT_PID_KEY + parentPid.ToString(),
+                FileName = Path.Combine(currentDirectory, "NTS.Judge.Warp.exe"),
+                Arguments = JudgeWarpConstants.PARENT_PID_KEY + parentPid,
             };
-
-            var hubProcess = Process.Start(info);
+            Process.Start(info);
         }
         catch (Exception ex)
         {

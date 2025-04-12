@@ -9,7 +9,7 @@ using NTS.Relay.RPC.Procedures;
 
 namespace NTS.Relay.RPC;
 
-public class JudgeRpcHub : Hub<IJudgeClientProcedures>, IJudgeHubProcedures
+internal class JudgeRpcHub : Hub<IJudgeClientProcedures>, IJudgeHubProcedures
 {
     readonly IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> _witnessRelay;
 

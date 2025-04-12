@@ -5,7 +5,7 @@ using NTS.Storage.Core;
 
 namespace NTS.Relay.Storage;
 
-public class EnduranceEventReadonlyRepository : ReadonlyRootRepository<EnduranceEvent, CoreState>
+internal class EnduranceEventReadonlyRepository : ReadonlyRootRepository<EnduranceEvent, CoreState>
 {
     public EnduranceEventReadonlyRepository(IStore<CoreState> store)
         : base(store) { }
