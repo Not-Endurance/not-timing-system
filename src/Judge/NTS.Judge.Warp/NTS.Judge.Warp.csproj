@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Relay\NTS.Relay\NTS.Relay.csproj" />
+      <ProjectReference Include="..\..\NTS.Warp\NTS.Warp.csproj" />
     </ItemGroup>
 
 </Project>

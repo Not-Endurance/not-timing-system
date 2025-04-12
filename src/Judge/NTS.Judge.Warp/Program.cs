@@ -29,7 +29,7 @@ builder.Services
     .AddFilesystemLogger(logFileConfig =>
     {
         logFileConfig.Path = FileContextHelper.GetAppDirectory("logs");
-        logFileConfig.Name = FileContextHelper.ConfigureApplicationName("NTS.Relay");
+        logFileConfig.Name = FileContextHelper.ConfigureApplicationName("NTS.Warp");
     });
 #endif
 
