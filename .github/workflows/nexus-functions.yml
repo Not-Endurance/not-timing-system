@@ -8,7 +8,7 @@ env:
   AZURE_RESOURCE_GROUP: NTS
   AZURE_STORAGE_CONTAINER: azurefunctions
   AZURE_STORAGE_ACCOUNT: ntsstoragedev
-  BIN_PATH: Nexus/NTS.Nexus.Test/published
+  ARTIFACT_PATH: Nexus/NTS.Nexus.Test/published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   SOURCE_PATH: src/Nexus/NTS.Nexus.HTTP
@@ -45,14 +45,14 @@ jobs:
         dotnet publish "${{ env.SOURCE_PATH }}" \
         --configuration "${{ env.CONFIGURATION }}" \
         --no-build \
-        --output "${{ env.BIN_PATH }}" \
+        --output "${{ env.ARTIFACT_PATH }}" \
         -property:SolutionDir="$CURRENT_DIR"
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.AZURE_RESOURCE }}
-        path: ${{ env.BIN_PATH }}
+        path: ${{ env.ARTIFACT_PATH }}
         include-hidden-files: true
 
   nexus-functions-deploy:
@@ -64,11 +64,11 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.AZURE_RESOURCE }}
-        path: ${{ env.BIN_PATH }}
+        path: ${{ env.ARTIFACT_PATH }}
 
     - name: Zip function
       run: |
-        cd ${{ env.BIN_PATH }}
+        cd ${{ env.ARTIFACT_PATH }}
         zip -r ../../../${{ env.AZURE_RESOURCE }}.zip .
         cd -
 
