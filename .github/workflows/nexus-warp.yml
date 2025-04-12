@@ -54,7 +54,7 @@ jobs:
       with:
         name: ${{ env.AZURE_RESOURCE }}
         path: ${{ env.ARTIFACT_PATH }}
-        include-hidden-files: true
+        include-hidden-files: true 
 
   nexus-warp-deploy:
     runs-on: ubuntu-latest
