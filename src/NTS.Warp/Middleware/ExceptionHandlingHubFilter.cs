@@ -2,7 +2,7 @@
 using Not.Logging;
 using Not.Notify;
 
-namespace NTS.Relay.Middleware;
+namespace NTS.Warp.Middleware;
 
 internal class ExceptionHandlingHubFilter : IHubFilter
 {

@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.EnduranceEvents;
+namespace NTS.Warp.ACL.Entities.EnduranceEvents;
 
 public class EmsEnduranceEventException : EmsDomainExceptionBase
 {

@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace Core.Domain.State.Countries;
+namespace NTS.Warp.ACL.Entities.Countries;
 
 public interface IEmsCountryState : IEmsIdentifiable
 {

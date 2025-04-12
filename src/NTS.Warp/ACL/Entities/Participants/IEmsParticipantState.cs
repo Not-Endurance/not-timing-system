@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.Participants;
+namespace NTS.Warp.ACL.Entities.Participants;
 
 public interface IEmsParticipantState : IEmsIdentifiable
 {

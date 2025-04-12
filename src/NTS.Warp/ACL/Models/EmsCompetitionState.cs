@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Entities.Competitions;
+﻿using NTS.Warp.ACL.Entities.Competitions;
 
-namespace NTS.Relay.ACL.Models;
+namespace NTS.Warp.ACL.Models;
 
 public class EmsCompetitionState : IEmsCompetitionState
 {

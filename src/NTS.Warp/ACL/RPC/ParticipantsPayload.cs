@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Entities;
+﻿using NTS.Warp.ACL.Entities;
 
-namespace NTS.Relay.ACL.RPC;
+namespace NTS.Warp.ACL.RPC;
 
 public class ParticipantsPayload
 {

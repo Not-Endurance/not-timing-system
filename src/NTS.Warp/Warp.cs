@@ -1,7 +1,6 @@
 ﻿using Not.Startup;
 using NTS.Application;
-using NTS.Relay;
-using NTS.Relay.RPC;
+using NTS.Warp.RPC;
 
 namespace NTS.Warp;
 

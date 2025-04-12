@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Abstractions;
+﻿using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.Participations;
+namespace NTS.Warp.ACL.Entities.Participations;
 
 public class EmsParticipationException : EmsDomainExceptionBase
 {

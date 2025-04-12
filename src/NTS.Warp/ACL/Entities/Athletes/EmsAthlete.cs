@@ -1,12 +1,11 @@
-using Core.Domain.State.Athletes;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Relay.ACL.Abstractions;
-using NTS.Relay.ACL.Entities.Countries;
-using NTS.Relay.ACL.Enums;
+using NTS.Warp.ACL.Abstractions;
+using NTS.Warp.ACL.Entities.Countries;
+using NTS.Warp.ACL.Enums;
 
-namespace NTS.Relay.ACL.Entities.Athletes;
+namespace NTS.Warp.ACL.Entities.Athletes;
 
 public class EmsAthlete : EmsDomainBase<EmsAthleteException>, IAthlete
 {

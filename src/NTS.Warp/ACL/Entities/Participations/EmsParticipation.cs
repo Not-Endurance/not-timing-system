@@ -1,9 +1,9 @@
-﻿using NTS.Relay.ACL.Abstractions;
-using NTS.Relay.ACL.Entities.Competitions;
-using NTS.Relay.ACL.Entities.LapRecords;
-using NTS.Relay.ACL.Entities.Participants;
+﻿using NTS.Warp.ACL.Abstractions;
+using NTS.Warp.ACL.Entities.Competitions;
+using NTS.Warp.ACL.Entities.LapRecords;
+using NTS.Warp.ACL.Entities.Participants;
 
-namespace NTS.Relay.ACL.Entities.Participations;
+namespace NTS.Warp.ACL.Entities.Participations;
 
 public class EmsParticipation : EmsDomainBase<EmsParticipationException>
 {

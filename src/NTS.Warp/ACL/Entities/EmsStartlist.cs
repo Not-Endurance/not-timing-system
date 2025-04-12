@@ -1,7 +1,6 @@
-﻿using NTS.Relay.ACL.Enums;
-using NTS.Relay.ACL.RPC;
+﻿using NTS.Warp.ACL.Enums;
 
-namespace NTS.Relay.ACL.Entities;
+namespace NTS.Warp.ACL.Entities;
 
 public class EmsStartlist : StartlistBase<EmsStartlistEntry>
 {

@@ -1,4 +1,4 @@
-namespace NTS.Relay.ACL.RPC;
+namespace NTS.Warp.ACL.RPC;
 
 public static class CoreApplicationConstants
 {

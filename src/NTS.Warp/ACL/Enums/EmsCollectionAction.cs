@@ -1,4 +1,4 @@
-﻿namespace NTS.Relay.ACL.Enums;
+﻿namespace NTS.Warp.ACL.Enums;
 
 public enum EmsCollectionAction
 {

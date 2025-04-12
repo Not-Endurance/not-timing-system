@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.Athletes;
+namespace NTS.Warp.ACL.Entities.Athletes;
 
 public class EmsAthleteException : EmsDomainExceptionBase
 {

@@ -1,10 +1,9 @@
 ﻿using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Tests.RPC;
-using NTS.Relay.ACL.Entities;
-using NTS.Relay.ACL.Enums;
-using NTS.Relay.ACL.RPC;
-using NTS.Relay.ACL.RPC.Procedures;
+using NTS.Warp.ACL.Entities;
+using NTS.Warp.ACL.Enums;
+using NTS.Warp.ACL.RPC.Procedures;
 using Xunit.Abstractions;
 
 namespace NTS.Judge.Tests;

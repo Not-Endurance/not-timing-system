@@ -1,7 +1,7 @@
 ﻿using NTS.Domain.Core.Aggregates;
-using NTS.Relay.ACL.Entities;
+using NTS.Warp.ACL.Entities;
 
-namespace NTS.Relay.ACL.Factories;
+namespace NTS.Warp.ACL.Factories;
 
 public class ParticipantEntryFactory
 {

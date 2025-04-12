@@ -1,4 +1,4 @@
-﻿namespace NTS.Relay.ACL.Abstractions;
+﻿namespace NTS.Warp.ACL.Abstractions;
 
 public class EmsDomainException : EmsDomainExceptionBase
 {

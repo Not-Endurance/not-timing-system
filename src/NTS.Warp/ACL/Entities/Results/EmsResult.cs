@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.Results;
+namespace NTS.Warp.ACL.Entities.Results;
 
 public class EmsResult : EmsDomainBase<EmsResultException>, IEmsResultState
 {

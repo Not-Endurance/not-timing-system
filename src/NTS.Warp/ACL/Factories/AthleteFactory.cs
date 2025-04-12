@@ -1,10 +1,10 @@
 ﻿using NTS.Domain.Core.Aggregates;
-using NTS.Judge.ACL.Models;
-using NTS.Relay.ACL.Entities.Athletes;
-using NTS.Relay.ACL.Entities.Countries;
-using NTS.Relay.ACL.Enums;
+using NTS.Warp.ACL.Entities.Athletes;
+using NTS.Warp.ACL.Entities.Countries;
+using NTS.Warp.ACL.Enums;
+using NTS.Warp.ACL.Models;
 
-namespace NTS.Relay.ACL.Factories;
+namespace NTS.Warp.ACL.Factories;
 
 public class AthleteFactory
 {

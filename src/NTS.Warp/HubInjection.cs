@@ -3,10 +3,10 @@ using Not.Injection;
 using Not.Localization;
 using Not.Serialization.JSON;
 using NTS.Application.Handshake;
-using NTS.Relay.Middleware;
 using NTS.Storage;
+using NTS.Warp.Middleware;
 
-namespace NTS.Relay;
+namespace NTS.Warp;
 
 internal static class HubInjection
 {

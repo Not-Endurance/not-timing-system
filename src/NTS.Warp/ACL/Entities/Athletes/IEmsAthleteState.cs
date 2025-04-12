@@ -1,7 +1,7 @@
-﻿using NTS.Relay.ACL.Abstractions;
-using NTS.Relay.ACL.Enums;
+﻿using NTS.Warp.ACL.Abstractions;
+using NTS.Warp.ACL.Enums;
 
-namespace Core.Domain.State.Athletes;
+namespace NTS.Warp.ACL.Entities.Athletes;
 
 public interface IEmsAthleteState : IEmsIdentifiable
 {

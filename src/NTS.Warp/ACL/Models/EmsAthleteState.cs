@@ -1,7 +1,7 @@
-﻿using Core.Domain.State.Athletes;
-using NTS.Relay.ACL.Enums;
+﻿using NTS.Warp.ACL.Entities.Athletes;
+using NTS.Warp.ACL.Enums;
 
-namespace NTS.Judge.ACL.Models;
+namespace NTS.Warp.ACL.Models;
 
 internal class EmsAthleteState : IEmsAthleteState
 {

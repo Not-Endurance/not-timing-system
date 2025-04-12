@@ -1,9 +1,9 @@
 ﻿using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Relay.ACL.Entities;
-using NTS.Relay.ACL.Entities.EMS;
+using NTS.Warp.ACL.Entities;
+using NTS.Warp.ACL.Enums;
 
-namespace NTS.Relay.ACL.Factories;
+namespace NTS.Warp.ACL.Factories;
 
 public class SnapshotFactory
 {

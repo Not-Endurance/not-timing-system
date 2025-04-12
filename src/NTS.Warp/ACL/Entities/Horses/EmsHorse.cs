@@ -1,7 +1,7 @@
 using NTS.Domain.Aggregates;
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.Horses;
+namespace NTS.Warp.ACL.Entities.Horses;
 
 public class EmsHorse : EmsDomainBase<EmsHorseException>, IEmsHorseState, IHorse
 {

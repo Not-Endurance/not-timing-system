@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Entities.Horses;
+﻿using NTS.Warp.ACL.Entities.Horses;
 
-namespace NTS.Relay.ACL.Models;
+namespace NTS.Warp.ACL.Models;
 
 public class EmsHorseState : IEmsHorseState
 {

@@ -1,6 +1,4 @@
-﻿using NTS.Relay.ACL.Entities.EMS;
-
-namespace NTS.Relay.ACL.Entities;
+﻿namespace NTS.Warp.ACL.Entities;
 
 public class EmsParticipantsPayload
 {

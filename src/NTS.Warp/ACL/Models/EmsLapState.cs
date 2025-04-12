@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Entities.Laps;
+﻿using NTS.Warp.ACL.Entities.Laps;
 
-namespace NTS.Relay.ACL.Models;
+namespace NTS.Warp.ACL.Models;
 
 public class EmsLapState : IEmsLapState
 {

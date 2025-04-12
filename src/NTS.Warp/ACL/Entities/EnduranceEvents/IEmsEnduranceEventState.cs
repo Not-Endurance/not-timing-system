@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace Core.Domain.State.EnduranceEvents;
+namespace NTS.Warp.ACL.Entities.EnduranceEvents;
 
 public interface IEmsEnduranceEventState : IEmsIdentifiable
 {

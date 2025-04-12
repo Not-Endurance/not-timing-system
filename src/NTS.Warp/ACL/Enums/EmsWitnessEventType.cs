@@ -1,4 +1,4 @@
-﻿namespace NTS.Relay.ACL.Entities.EMS;
+﻿namespace NTS.Warp.ACL.Enums;
 
 public enum EmsWitnessEventType
 {

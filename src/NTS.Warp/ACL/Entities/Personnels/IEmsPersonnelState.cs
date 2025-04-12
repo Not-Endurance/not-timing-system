@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.Personnels;
+namespace NTS.Warp.ACL.Entities.Personnels;
 
 public interface IEmsPersonnelState : IEmsIdentifiable
 {

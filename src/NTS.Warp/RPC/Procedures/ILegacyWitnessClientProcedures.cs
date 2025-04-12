@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.RPC.Procedures;
+﻿using NTS.Warp.ACL.RPC.Procedures;
 
-namespace NTS.Relay.RPC.Procedures;
+namespace NTS.Warp.RPC.Procedures;
 
 public interface ILegacyWitnessClientProcedures
     : IEmsParticipantsClientProcedures,

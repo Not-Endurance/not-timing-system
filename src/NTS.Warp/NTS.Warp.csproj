@@ -7,7 +7,6 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <OutputType>Library</OutputType>
     <LangVersion>preview</LangVersion>
-    <RootNamespace>NTS.Relay</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using NTS.Application.RPC;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Relay.ACL.Entities;
-using NTS.Relay.ACL.Enums;
-using NTS.Relay.ACL.Factories;
-using NTS.Relay.ACL.RPC;
-using NTS.Relay.RPC.Procedures;
+using NTS.Warp.ACL.Entities;
+using NTS.Warp.ACL.Enums;
+using NTS.Warp.ACL.Factories;
+using NTS.Warp.RPC.Procedures;
 
-namespace NTS.Relay.RPC;
+namespace NTS.Warp.RPC;
 
 internal class JudgeRpcHub : Hub<IJudgeClientProcedures>, IJudgeHubProcedures
 {

@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Entities.Participations;
+﻿using NTS.Warp.ACL.Entities.Participations;
 
-namespace NTS.Relay.ACL.Entities;
+namespace NTS.Warp.ACL.Entities;
 
 public class EmsParticipantEntry : IComparable<EmsParticipantEntry>, IEquatable<EmsParticipantEntry>
 {

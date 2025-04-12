@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Entities.Participants;
+﻿using NTS.Warp.ACL.Entities.Participants;
 
-namespace NTS.Relay.ACL.Models;
+namespace NTS.Warp.ACL.Models;
 
 public class EmsParticipantState : IEmsParticipantState
 {

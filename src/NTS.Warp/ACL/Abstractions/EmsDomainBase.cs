@@ -1,4 +1,4 @@
-﻿namespace NTS.Relay.ACL.Abstractions;
+﻿namespace NTS.Warp.ACL.Abstractions;
 
 public abstract class EmsDomainBase<TException> : IEmsDomain, IEquatable<EmsDomainBase<TException>>, IEmsIdentifiable
     where TException : EmsDomainExceptionBase, new()

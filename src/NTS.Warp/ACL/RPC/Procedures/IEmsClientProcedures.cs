@@ -1,4 +1,4 @@
-﻿namespace NTS.Relay.ACL.RPC.Procedures;
+﻿namespace NTS.Warp.ACL.RPC.Procedures;
 
 public interface IEmsClientProcedures
     : IEmsParticipantsClientProcedures,

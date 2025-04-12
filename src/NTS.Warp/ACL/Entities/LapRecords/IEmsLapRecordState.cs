@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Abstractions;
+﻿using NTS.Warp.ACL.Abstractions;
 
-namespace Core.Domain.State.LapRecords;
+namespace NTS.Warp.ACL.Entities.LapRecords;
 
 public interface IEmsLapRecordState : IEmsIdentifiable
 {

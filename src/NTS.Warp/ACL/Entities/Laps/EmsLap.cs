@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.Laps;
+namespace NTS.Warp.ACL.Entities.Laps;
 
 public class EmsLap : EmsDomainBase<EmsLapException>
 {

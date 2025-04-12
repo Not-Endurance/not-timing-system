@@ -1,6 +1,6 @@
-﻿using NTS.Relay.ACL.Entities.LapRecords;
+﻿using NTS.Warp.ACL.Entities.LapRecords;
 
-namespace NTS.Relay.ACL.Entities;
+namespace NTS.Warp.ACL.Entities;
 
 public class EmsWitnessEvent
 {

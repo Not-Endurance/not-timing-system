@@ -1,8 +1,8 @@
 ﻿using NTS.Domain.Core.Aggregates;
-using NTS.Relay.ACL.Entities.Horses;
-using NTS.Relay.ACL.Models;
+using NTS.Warp.ACL.Entities.Horses;
+using NTS.Warp.ACL.Models;
 
-namespace NTS.Relay.ACL.Factories;
+namespace NTS.Warp.ACL.Factories;
 
 public class HorseFactory
 {

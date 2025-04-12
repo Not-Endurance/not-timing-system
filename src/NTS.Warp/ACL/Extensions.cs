@@ -1,7 +1,7 @@
 ﻿using NTS.Domain.Enums;
-using NTS.Relay.ACL.Enums;
+using NTS.Warp.ACL.Enums;
 
-namespace NTS.Relay.ACL;
+namespace NTS.Warp.ACL;
 
 public static class Extensions
 {

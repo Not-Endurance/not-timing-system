@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.Competitions;
+namespace NTS.Warp.ACL.Entities.Competitions;
 
 public class EmsCompetitionException : EmsDomainExceptionBase
 {

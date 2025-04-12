@@ -1,6 +1,6 @@
-using NTS.Relay.ACL.Abstractions;
+using NTS.Warp.ACL.Abstractions;
 
-namespace NTS.Relay.ACL.Entities.Countries;
+namespace NTS.Warp.ACL.Entities.Countries;
 
 public class EmsCountryException : EmsDomainExceptionBase
 {

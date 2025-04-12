@@ -1,4 +1,4 @@
-﻿namespace NTS.Relay;
+﻿namespace NTS.Warp;
 
 internal static class Constants
 {
