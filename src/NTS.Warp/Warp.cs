@@ -14,12 +14,15 @@ public static class Warp
 
         builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
         builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
-
+ 
         return builder;
     }
 
     public static void Start(WebApplication app)
     {
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        Console.WriteLine(@$"******* WARP: Starting in '{environment}' environment *******");  
+        
         app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB);
         app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB);
 

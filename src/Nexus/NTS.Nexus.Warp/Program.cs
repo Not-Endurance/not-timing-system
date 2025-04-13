@@ -6,6 +6,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
+    Console.WriteLine(@"******* WARP: Using HTTPS Redirection *******");  
     app.UseHttpsRedirection();
 }
 
