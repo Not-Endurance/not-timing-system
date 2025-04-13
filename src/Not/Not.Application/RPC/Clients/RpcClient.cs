@@ -41,7 +41,7 @@ public abstract class RpcClient : IRpcClient
         await _socket.Disconnect();
     }
 
-    public void RegisterClientProcedure(string name, Func<Task> action)
+    public void RegisterInputProcedure(string name, Func<Task> action)
     {
         _socket.Procedures.Add(connection =>
         {
@@ -62,7 +62,53 @@ public abstract class RpcClient : IRpcClient
         });
     }
 
-    public void RegisterClientProcedure<T>(string name, Func<T, Task> action)
+    public void RegisterOutputCollectionProcedure<T>(string name, Func<Task<IEnumerable<T>>> action)
+        where T : class
+    {
+        _socket.Procedures.Add(connection =>
+        {
+            connection.On(
+                name,
+                (Func<Task<IEnumerable<T>>>)(async () =>
+                {
+                    try
+                    {
+                        return await action();
+                    }
+                    catch (Exception exception)
+                    {
+                        _socket.RaiseError(exception, name);
+                        return [];
+                    }
+                })
+            );
+        });
+    }
+
+    public void RegisterOutputProcedure<T>(string name, Func<Task<T?>> action)
+        where T : class
+    {
+        _socket.Procedures.Add(connection =>
+        {
+            connection.On(
+                name,
+                (Func<Task<T?>>)(async () =>
+                {
+                    try
+                    {
+                        return await action();
+                    }
+                    catch (Exception exception)
+                    {
+                        _socket.RaiseError(exception, name);
+                        return null;
+                    }
+                })
+            );
+        });
+    }
+
+    public void RegisterInputProcedure<T>(string name, Func<T, Task> action)
     {
         _socket.Procedures.Add(connection =>
         {
@@ -83,7 +129,7 @@ public abstract class RpcClient : IRpcClient
         });
     }
 
-    public void RegisterClientProcedure<T1, T2>(string name, Func<T1, T2, Task> action)
+    public void RegisterInputProcedure<T1, T2>(string name, Func<T1, T2, Task> action)
     {
         _socket.Procedures.Add(connection =>
         {
@@ -104,7 +150,7 @@ public abstract class RpcClient : IRpcClient
         });
     }
 
-    public void RegisterClientProcedure<T1, T2, T3>(string name, Func<T1, T2, T3, Task> action)
+    public void RegisterInputProcedure<T1, T2, T3>(string name, Func<T1, T2, T3, Task> action)
     {
         _socket.Procedures.Add(connection =>
         {

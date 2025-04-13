@@ -22,8 +22,8 @@ public class WitnessTestClient
     {
         _socket = socket;
         _testOutputHelper = testOutputHelper;
-        RegisterClientProcedure<EmsStartlistEntry, EmsCollectionAction>(nameof(ReceiveEntry), ReceiveEntry);
-        RegisterClientProcedure<EmsParticipantEntry, EmsCollectionAction>(
+        RegisterInputProcedure<EmsStartlistEntry, EmsCollectionAction>(nameof(ReceiveEntry), ReceiveEntry);
+        RegisterInputProcedure<EmsParticipantEntry, EmsCollectionAction>(
             nameof(ReceiveEntryUpdate),
             ReceiveEntryUpdate
         );

@@ -17,7 +17,7 @@ public class EnduranceEventRpcClient : RpcClient, IEnduranceEventRpcClient
 
     public override void RunAtStartup()
     {
-        RegisterClientProcedure(nameof(GetEventId), GetEventId);
+        RegisterInputProcedure(nameof(GetEventId), GetEventId);
     }
 
     public async Task<int?> GetEventId()

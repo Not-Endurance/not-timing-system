@@ -17,8 +17,8 @@ public class ConnectionsRpcClient : RpcClient, IConnectionsClientProcedures
 
     public override void RunAtStartup()
     {
-        RegisterClientProcedure<string>(nameof(ReceiveRemoteConnectionId), ReceiveRemoteConnectionId);
-        RegisterClientProcedure<string>(nameof(ReceiveRemoteDisconnectId), ReceiveRemoteDisconnectId);
+        RegisterInputProcedure<string>(nameof(ReceiveRemoteConnectionId), ReceiveRemoteConnectionId);
+        RegisterInputProcedure<string>(nameof(ReceiveRemoteDisconnectId), ReceiveRemoteDisconnectId);
     }
 
     public Task ReceiveRemoteConnectionId(string connectionId)

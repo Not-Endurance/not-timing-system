@@ -34,8 +34,8 @@ public class ParticipationRpcClient : RpcClient, IParticipationRemoteProcedures
         Domain.Core.Aggregates.Participation.ELIMINATED_EVENT.Subscribe(SendParticipationEliminated);
         Domain.Core.Aggregates.Participation.RESTORED_EVENT.Subscribe(SendParticipationRestored);
         
-        RegisterClientProcedure<IEnumerable<Snapshot>>(nameof(ProcessSnapshots), ProcessSnapshots);
-        RegisterClientProcedure(nameof(GetActiveParticipations), GetActiveParticipations);
+        RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(ProcessSnapshots), ProcessSnapshots);
+        RegisterOutputCollectionProcedure(nameof(GetActiveParticipations), GetActiveParticipations);
     }
 
     public async Task ProcessSnapshots(IEnumerable<Snapshot> snapshots)
