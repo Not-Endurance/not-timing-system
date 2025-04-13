@@ -18,10 +18,12 @@ public static class Warp
         return builder;
     }
 
-    public static void Start(WebApplication app)
+    public static void Start(WebApplication app, string port)
     {
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        Console.WriteLine(@$"******* WARP: Starting in '{environment}' environment *******");  
+        Console.WriteLine(@$"******* WARP: Starting in '{environment}' environment *******");
+        
+        app.Urls.Add($"http://*:{port}");
         
         app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB);
         app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB);

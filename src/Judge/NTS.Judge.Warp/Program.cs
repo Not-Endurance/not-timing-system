@@ -34,7 +34,5 @@ builder.Services
 #endif
 
 var app = builder.Build();
-
-app.Urls.Add("http://*:11337");
-
-Warp.Start(app);
+var port = "11337";
+Warp.Start(app, port);
