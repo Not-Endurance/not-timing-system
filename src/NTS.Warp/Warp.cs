@@ -11,9 +11,6 @@ public static class Warp
         var builder = WebApplication.CreateBuilder(args);
         
         builder.Services.ConfigureHub();
-
-        builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
-        builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
  
         return builder;
     }

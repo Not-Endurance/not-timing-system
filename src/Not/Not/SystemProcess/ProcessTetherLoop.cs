@@ -5,30 +5,39 @@ namespace Not.SystemProcess;
 
 public class ProcessTetherLoop : BackgroundService
 {
-    readonly ProcessContext _context;
+    readonly ProcessTetherContext _tetherContext;
+    readonly TimeSpan _interval = TimeSpan.FromSeconds(2);
 
-    public ProcessTetherLoop(ProcessContext context)
+    public ProcessTetherLoop(ProcessTetherContext tetherContext)
     {
-        _context = context;
+        _tetherContext = tetherContext;
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellation)
     {
         while (!cancellation.IsCancellationRequested)
         {
-            if (!ProcessExists(_context.ParentProcessId))
+            if (!ProcessExists(_tetherContext.ParentProcessId))
             {
                 Console.WriteLine(
-                    $"Parent process {_context.ParentProcessId} has exited. Shutting down child process..."
+                    $"Parent process {_tetherContext.ParentProcessId} has exited. Shutting down child process..."
                 );
                 Environment.Exit(0);
             }
-            await Task.Delay(2000, cancellation);
+            await Task.Delay(_interval, cancellation);
         }
     }
 
     bool ProcessExists(int pid)
     {
-        return Process.GetProcessById(pid) != null;
+        try
+        {
+            Process.GetProcessById(pid);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

@@ -24,7 +24,6 @@ internal static class HubInjection
             });
 
         services
-            .AddHostedService<NetworkBroadcastService>()
             .AddDummyLocalizer()
             .RegisterConventionalServices()
             .ConfigureStorage();

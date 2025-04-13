@@ -4,8 +4,9 @@ using Not.Logging;
 using Not.Logging.Builder;
 using Serilog;
 #endif
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Not.SystemProcess;
+using NTS.Judge.Warp;
 using NTS.Warp;
 using static NTS.Judge.Warp.JudgeWarpConstants;
 
@@ -13,15 +14,19 @@ var builder = Warp.CreateBuilder(args);
 
 if (args.Any())
 {
-    var parentPidArgument = args.First(arg => arg.Contains(PARENT_PID_KEY));
-    builder.Services.AddSingleton(provider =>
+    var parentPidArgument = args.FirstOrDefault(arg => arg.Contains(PARENT_PID_KEY));
+    if (parentPidArgument == null)
     {
-        var parentProcessId = parentPidArgument.Substring(PARENT_PID_KEY.Length);
-        return new ProcessContext(parentProcessId);
-    });
-    builder.Services.AddHostedService<ProcessTetherLoop>();
+        throw new ApplicationException(
+            "Parent PID not found in Warp arguments. " +
+            "PID is necessary in order to terminate the local Warp instance when Judge closes");
+    }
+    var parentProcessId = parentPidArgument[PARENT_PID_KEY.Length..];
+    builder.Services.RegisterServices(builder.Configuration, new ProcessTetherContext(parentProcessId));
 }
 
+builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
 # if RELEASE
 builder.Logging.AddSerilog();
 builder.Services
@@ -34,5 +39,4 @@ builder.Services
 #endif
 
 var app = builder.Build();
-var port = "11337";
-Warp.Start(app, port);
+Warp.Start(app, "11337");

@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
+using Not.Application.Environments;
 using NTS.Judge.Warp;
 
 namespace NTS.Judge.MAUI;
@@ -7,15 +9,26 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var builder = MauiApp.CreateBuilder();
-        builder
+        var builder = MauiApp
+            .CreateBuilder()
             .UseMauiApp<App>()
             .ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"))
             .ConfigureJudgeMaui();
 
-        var app = builder.Build();
+        var environment = EnvironmentHelper.GetEnvironment();
 
-        //StartHub();
+        var config = new ConfigurationBuilder()
+            .AddJsonFile($"appsettings.{environment}.json", optional: false)
+            .Build();
+
+        builder.Configuration.AddConfiguration(config);
+
+        var app = builder.Build();
+        
+        if (EnvironmentHelper.IsLocalhost())
+        {
+            StartHub();
+        }
 
         return app;
     }

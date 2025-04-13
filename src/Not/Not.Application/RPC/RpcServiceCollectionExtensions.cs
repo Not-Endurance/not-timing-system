@@ -10,7 +10,7 @@ public static class RpcServiceCollectionExtensions
         RpcProtocol protocol,
         string host, 
         string hubPattern,
-        int? port
+        int? port = null
     )
     {
         var context = new SignalRContext(protocol, host, hubPattern, port);

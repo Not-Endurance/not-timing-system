@@ -1,8 +1,8 @@
 ﻿namespace Not.SystemProcess;
 
-public class ProcessContext
+public class ProcessTetherContext
 {
-    public ProcessContext(string parentPid)
+    public ProcessTetherContext(string parentPid)
     {
         ParentProcessId = int.Parse(parentPid);
     }

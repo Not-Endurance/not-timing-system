@@ -12,7 +12,7 @@ public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
 {
     readonly string _endpoint;
 
-    public HttpRepository(string endpoint, NHttpClient client)
+    protected HttpRepository(string endpoint, NHttpClient client)
     {
         _endpoint = endpoint;
         Client = client;
