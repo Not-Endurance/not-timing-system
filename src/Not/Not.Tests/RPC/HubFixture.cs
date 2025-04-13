@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.Options;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Xunit.Abstractions;
@@ -55,7 +56,24 @@ public abstract class HubFixture<T> : IDisposable
 
     SignalRSocket ConfigureRpc()
     {
-        var context = new SignalRContext(_rpcProtocol, "localhost", _hubPattern, _hubPort);
-        return new SignalRSocket(context);
+        var settings = new RpcSettings
+        {
+            Port = _hubPort,
+            HubPattern = _hubPattern,
+            Host = $"http://localhost",
+        };
+        var options = new TestOptions<RpcSettings>(settings);
+        return new SignalRSocket(options);
     }
+}
+
+public class TestOptions<T> : IOptions<T>
+    where T : class
+{
+    public TestOptions(T instance)
+    {
+        Value = instance;
+    }
+    
+    public T Value { get; }
 }

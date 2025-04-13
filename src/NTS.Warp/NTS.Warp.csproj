@@ -22,4 +22,8 @@
     <None Include="D:\Source\NTS\not-timing-system\src\Relay\NTS.Relay\ACL\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="RPC\Procedures\" />
+  </ItemGroup>
+
 </Project>

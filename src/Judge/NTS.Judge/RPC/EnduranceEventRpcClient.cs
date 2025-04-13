@@ -1,7 +1,8 @@
 using Not.Application.CRUD.Ports;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
-using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Setup.Aggregates;
+using NTS.Warp.Features.Participations.Procedures;
 
 namespace NTS.Judge.RPC;
 
@@ -26,7 +27,3 @@ public class EnduranceEventRpcClient : RpcClient, IEnduranceEventRpcClient
     }
 }
 
-public interface IEnduranceEventRpcClient : IRpcClient
-{
-    Task<int?> GetEventId();
-}

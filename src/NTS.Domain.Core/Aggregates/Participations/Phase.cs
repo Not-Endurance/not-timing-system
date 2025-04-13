@@ -82,7 +82,7 @@ public class Phase : AggregateRoot
     public int? Rest { get; }
     public CompetitionRuleset Ruleset { get; }
     public bool IsFinal { get; }
-    public Timestamp? StartTime { get; internal set; }
+    public Timestamp? StartTime { get; internal set; } // TODO: does it have to be nullable?
     public Timestamp? ArriveTime { get; private set; }
     public Timestamp? PresentTime { get; private set; }
     public Timestamp? RepresentTime { get; private set; }
@@ -301,6 +301,10 @@ public class Phase : AggregateRoot
         if (ArriveTime != null)
         {
             return SnapshotResult.NotApplied(snapshot, NotAppliedDueToDuplicateArrive);
+        }
+        if (snapshot.Timestamp < StartTime)
+        {
+            throw new DomainException(__cannot_be_sooner_than__string, Arrival_string, StartTime);
         }
 
         ArriveTime = snapshot.Timestamp;

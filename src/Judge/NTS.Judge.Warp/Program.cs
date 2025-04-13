@@ -22,8 +22,10 @@ if (args.Any())
             "PID is necessary in order to terminate the local Warp instance when Judge closes");
     }
     var parentProcessId = parentPidArgument[PARENT_PID_KEY.Length..];
-    builder.Services.RegisterServices(builder.Configuration, new ProcessTetherContext(parentProcessId));
+    builder.Services.AddProcessTether(parentProcessId);
 }
+
+builder.Services.RegisterServices(builder.Configuration);
 
 builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
 builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);

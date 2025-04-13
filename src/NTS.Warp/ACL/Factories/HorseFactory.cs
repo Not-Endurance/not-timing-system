@@ -1,14 +1,16 @@
 ﻿using NTS.Domain.Core.Aggregates;
 using NTS.Warp.ACL.Entities.Horses;
 using NTS.Warp.ACL.Models;
+using NTS.Warp.Features.Judge.Models;
+using NTS.Warp.Features.Participations;
 
 namespace NTS.Warp.ACL.Factories;
 
 public class HorseFactory
 {
-    public static EmsHorse Create(Participation participation)
+    public static EmsHorse Create(ParticipationWarpDto.HorseDto horse)
     {
-        var state = new EmsHorseState { Name = participation.Combination.Horse.Name };
+        var state = new EmsHorseState { Name = horse.Name };
         return new EmsHorse(state);
     }
 }

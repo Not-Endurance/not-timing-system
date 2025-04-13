@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Not.Application.Options;
+namespace Not.Application.Configurations;
 
 public static class OptionServiceCollectionExtensions
 {

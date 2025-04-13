@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Not.Injection;
 using Not.Logging;
 using Not.Serialization.JSON;
 
@@ -9,19 +11,15 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 {
     const int AUTOMATIC_RECONNECT_ATTEMPTS = 3;
 
-    readonly SignalRContext _context;
+    readonly RpcSettings _context;
     readonly string _name;
     System.Timers.Timer? _reconnectionTimer;
     int _connectionClosedReconnectAttempts;
     CancellationTokenSource? _reconnectTokenSource;
 
-    internal SignalRSocket(SignalRContext? context = null)
+    public SignalRSocket(IOptions<RpcSettings> options)
     {
-        _context =
-            context
-            ?? throw new ApplicationException(
-                $"SignalR socket is not configured. Use '{nameof(RpcServiceCollectionExtensions)}' to configure the socket"
-            );
+        _context = options.Value;
         _name = GetType().Name;
     }
 
@@ -242,7 +240,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     }
 }
 
-public interface IRpcSocket
+public interface IRpcSocket : ISingleton
 {
     /// <summary>
     /// 'true' means connected; 'false' - disconnected;

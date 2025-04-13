@@ -1,6 +1,6 @@
 ﻿using NTS.Warp.ACL.RPC.Procedures;
 
-namespace NTS.Warp.RPC.Procedures;
+namespace NTS.Warp.Features.Judge.ACL;
 
 public interface ILegacyWitnessClientProcedures
     : IEmsParticipantsClientProcedures,

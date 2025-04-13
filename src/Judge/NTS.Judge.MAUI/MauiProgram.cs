@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Microsoft.Extensions.Configuration;
+using Not.Application.Configurations;
 using Not.Application.Environments;
 using NTS.Judge.Warp;
 
@@ -15,17 +15,11 @@ public static class MauiProgram
             .ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"))
             .ConfigureJudgeMaui();
 
-        var environment = EnvironmentHelper.GetEnvironment();
-
-        var config = new ConfigurationBuilder()
-            .AddJsonFile($"appsettings.{environment}.json", optional: false)
-            .Build();
-
-        builder.Configuration.AddConfiguration(config);
+        builder.Configuration.AddNAppsettings();
 
         var app = builder.Build();
         
-        if (EnvironmentHelper.IsLocalhost())
+        if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.DEBUG_WARP))
         {
             StartHub();
         }
@@ -51,4 +45,9 @@ public static class MauiProgram
             Console.WriteLine(ex.Message);
         }
     }
+}
+
+public static class JudgeVariables
+{
+    public const string DEBUG_WARP = nameof(DEBUG_WARP);
 }

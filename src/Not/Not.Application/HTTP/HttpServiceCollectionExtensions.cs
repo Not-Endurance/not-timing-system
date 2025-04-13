@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Options;
+using Not.Application.Configurations;
 
 namespace Not.Application.HTTP;
 

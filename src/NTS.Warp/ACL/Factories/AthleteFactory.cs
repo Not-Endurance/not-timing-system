@@ -1,29 +1,45 @@
 ﻿using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Athletes;
 using NTS.Warp.ACL.Entities.Countries;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Models;
+using NTS.Warp.Features.Judge.Models;
+using NTS.Warp.Features.Participations;
 
 namespace NTS.Warp.ACL.Factories;
 
 public class AthleteFactory
 {
-    public static EmsAthlete Create(Participation participation)
+    public static EmsAthlete Create(ParticipationWarpDto.AthleteDto athlete)
     {
         var athleteState = new EmsAthleteState
         {
             Category = EmsCategory.Seniors, //TODO: after athlete
-            Club = participation.Combination.Club?.ToString(),
-            FeiId = "", //TODO: after athlete
-            FirstName = participation.Combination.Athlete.ToString().Split().First(),
-            LastName = participation.Combination.Athlete.ToString().Split().Last(),
-            Id = participation.Combination.Id,
+            Club = athlete.Club,
+            FeiId = athlete.FeiId, //TODO: after athlete
+            FirstName = athlete.Person.GetFirstName(),
+            LastName = athlete.Person.GetLastName(),
+            Id = athlete.Id,
         };
         var country = new EmsCountry(
-            participation.Combination.Athlete.Country?.IsoCode ?? "iso",
-            participation.Combination.Athlete.Country?.Name ?? "country-name",
+            athlete.Country?.IsoCode ?? "iso",
+            athlete.Country?.Name ?? "country-name",
             1337
         );
         return new EmsAthlete(athleteState, country);
+    }
+
+    public EmsCategory MapCategory(AthleteCategory category)
+    {
+        return category switch
+        {
+            AthleteCategory.Senior => EmsCategory.Seniors,
+            AthleteCategory.Children => EmsCategory.Children,
+            AthleteCategory.JuniorOrYoungAdult => EmsCategory.JuniorOrYoungAdults,
+            AthleteCategory.Training
+                or AthleteCategory.Companion => EmsCategory.Seniors,
+            _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
+        };
     }
 }

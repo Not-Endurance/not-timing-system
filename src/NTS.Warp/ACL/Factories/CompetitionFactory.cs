@@ -2,19 +2,20 @@
 using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Competitions;
 using NTS.Warp.ACL.Models;
+using NTS.Warp.Features.Judge.Models;
 
 namespace NTS.Warp.ACL.Factories;
 
 public class CompetitionFactory
 {
-    public static EmsCompetition Create(Participation participation)
+    public static EmsCompetition Create(ParticipationWarpDto participation)
     {
-        var laps = LapFactory.Create(participation);
+        var laps = LapFactory.Create(participation.Phases);
         var state = new EmsCompetitionState
         {
             Id = participation.Id,
-            Name = participation.Competition.Name,
-            Type = MapEmsCompetitionType(participation.Competition.Ruleset),
+            Name = participation.CompetitionName,
+            Type = MapEmsCompetitionType(participation.Ruleset!.Value),
         };
         var competition = new EmsCompetition(state);
         foreach (var lap in laps)

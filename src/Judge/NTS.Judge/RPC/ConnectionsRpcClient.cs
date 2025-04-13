@@ -5,7 +5,7 @@ using NTS.Application.RPC;
 
 namespace NTS.Judge.RPC;
 
-public class ConnectionsRpcClient : RpcClient, IConnectionsRpcClient
+public class ConnectionsRpcClient : RpcClient, IConnectionsClientProcedures
 {
     readonly IConnectionsRegistry _connectionsRegistry;
 
@@ -13,17 +13,13 @@ public class ConnectionsRpcClient : RpcClient, IConnectionsRpcClient
         : base(socket)
     {
         _connectionsRegistry = connectionsRegistry;
-        RegisterClientProcedure<string>(
-            nameof(IJudgeClientProcedures.ReceiveRemoteConnectionId),
-            ReceiveRemoteConnectionId
-        );
-        RegisterClientProcedure<string>(
-            nameof(IJudgeClientProcedures.ReceiveRemoteDisconnectId),
-            ReceiveRemoteDisconnectId
-        );
     }
 
-    public override void RunAtStartup() { }
+    public override void RunAtStartup()
+    {
+        RegisterClientProcedure<string>(nameof(ReceiveRemoteConnectionId), ReceiveRemoteConnectionId);
+        RegisterClientProcedure<string>(nameof(ReceiveRemoteDisconnectId), ReceiveRemoteDisconnectId);
+    }
 
     public Task ReceiveRemoteConnectionId(string connectionId)
     {
@@ -37,5 +33,3 @@ public class ConnectionsRpcClient : RpcClient, IConnectionsRpcClient
         return Task.CompletedTask;
     }
 }
-
-public interface IConnectionsRpcClient : IConnectionsClientProcedures, IRpcClient { }

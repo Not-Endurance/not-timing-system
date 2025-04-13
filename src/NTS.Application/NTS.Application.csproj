@@ -13,5 +13,9 @@
     <ProjectReference Include="..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>
  

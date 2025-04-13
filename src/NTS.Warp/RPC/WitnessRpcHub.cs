@@ -2,99 +2,66 @@
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Safe;
-using NTS.Application.RPC;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Objects;
 using NTS.Warp.ACL.Entities;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Factories;
 using NTS.Warp.ACL.RPC.Procedures;
-using NTS.Warp.RPC.Procedures;
+using NTS.Warp.Features;
+using NTS.Warp.Features.Judge.ACL;
 
 namespace NTS.Warp.RPC;
 
 internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistHubProcedures, IEmsParticipantsHubProcedures
 {
-    readonly IRead<Participation> _participations;
+    readonly IPrimaryConnectionContext _judgeConnectionContext;
     readonly IRead<EnduranceEvent> _events;
-    readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;
+    readonly IHubContext<JudgeRpcHub, IJudgeRemoteProcedures> _judgeRelay;
 
     public WitnessRpcHub(
-        IRead<Participation> participations,
+        IPrimaryConnectionContext judgeConnectionContext,
         IRead<EnduranceEvent> events,
-        IHubContext<JudgeRpcHub, IJudgeClientProcedures> judgeRelay
+        IHubContext<JudgeRpcHub, IJudgeRemoteProcedures> judgeRelay
     )
     {
-        _participations = participations;
+        _judgeConnectionContext = judgeConnectionContext;
         _events = events;
         _judgeRelay = judgeRelay;
     }
 
     public override async Task OnConnectedAsync()
     {
-        var connectionId = base.Context.ConnectionId;
+        var connectionId = Context.ConnectionId;
+        Console.WriteLine($"Connected: {Context.ConnectionId}");
         await _judgeRelay.Clients.All.ReceiveRemoteConnectionId(connectionId);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var connectionId = base.Context.ConnectionId;
+        var connectionId = Context.ConnectionId;
+        Console.WriteLine($"Disconnected: {Context.ConnectionId}");
         await _judgeRelay.Clients.All.ReceiveRemoteDisconnectId(connectionId);
     }
 
     public Dictionary<int, EmsStartlist> SendStartlist()
     {
-        var participations = _participations.ReadAll(x => !x.IsEliminated()).Result;
-        var emsParticipations = participations.Select(ParticipationFactory.CreateEms);
-
-        var startlists = new Dictionary<int, EmsStartlist>();
-        foreach (var emsParticipation in emsParticipations)
+        if (_judgeConnectionContext.Id == null)
         {
-            var toSkip = 0;
-            foreach (
-                var record in emsParticipation.Participant.LapRecords.Where(x =>
-                    x.Result == null || !x.Result.IsNotQualified
-                )
-            )
-            {
-                var entry = new EmsStartlistEntry(emsParticipation, toSkip);
-                if (startlists.ContainsKey(entry.Stage))
-                {
-                    startlists[entry.Stage].Add(entry);
-                }
-                else
-                {
-                    startlists.Add(entry.Stage, new EmsStartlist([entry]));
-                }
-                // If record is complete, but is not last -> insert another record for current stage
-                // This bullshit happens because "current" stage is not yet created. Its only created at Arrive
-                if (record == emsParticipation.Participant.LapRecords.Last() && record.NextStarTime.HasValue)
-                {
-                    var nextEntry = new EmsStartlistEntry(emsParticipation)
-                    {
-                        Stage = emsParticipation.Participant.LapRecords.Count + 1,
-                        StartTime = record.NextStarTime.Value,
-                    };
-                    if (startlists.ContainsKey(nextEntry.Stage))
-                    {
-                        startlists[nextEntry.Stage].Add(nextEntry);
-                    }
-                    else
-                    {
-                        startlists.Add(nextEntry.Stage, new EmsStartlist([nextEntry]));
-                    }
-                }
-                toSkip++;
-            }
+            return [];
         }
-        return startlists;
+        var judge = _judgeRelay.Clients.Client(_judgeConnectionContext.Id);
+        var participations = judge.GetActiveParticipations().Result;
+        return StartlistFactory.Create(participations);
     }
 
     public async Task<EmsParticipantsPayload> SendParticipants()
     {
-        var participants = await _participations
-            .ReadAll(x => !x.IsEliminated() && !x.IsComplete())
-            .Select(ParticipantEntryFactory.Create);
+        if (_judgeConnectionContext.Id == null)
+        {
+            return new EmsParticipantsPayload();
+        }
+        var judge = _judgeRelay.Clients.Client(_judgeConnectionContext.Id);
+        var participants = await judge.GetActiveParticipations().Select(ParticipantEntryFactory.Create);
         var enduranceEvent = await _events.Read(0);
         return new EmsParticipantsPayload { Participants = participants.ToList(), EventId = enduranceEvent?.Id ?? 0 };
     }
@@ -106,19 +73,8 @@ internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlis
         // which is motly visible when it causes a validation (popup) which blocks the thread until closed in Prism/WPF
         await SafeHelper.RunAsync(async () =>
         {
-            var snapshots = new List<Snapshot>();
-            foreach (var entry in entries)
-            {
-                var participation = await _participations.Read(x => x.Combination.Number == int.Parse(entry.Number));
-                if (participation == null)
-                {
-                    continue;
-                }
-                var isFinal = participation.Phases.Take(participation.Phases.Count - 1).All(x => x.IsComplete());
-                var snapshot = SnapshotFactory.Create(entry, type, isFinal);
-                snapshots.Add(snapshot);
-            }
-            await _judgeRelay.Clients.All.ReceiveSnapshots(snapshots);
+            var snapshots = entries.Select(entry => SnapshotFactory.Create(entry, type));
+            await _judgeRelay.Clients.All.ProcessSnapshots(snapshots);
         });
     }
 }
