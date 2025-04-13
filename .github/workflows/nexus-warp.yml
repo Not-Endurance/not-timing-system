@@ -48,8 +48,6 @@ jobs:
         --no-build \
         --output ${{ env.ARTIFACT_PATH }} \
         -property:SolutionDir="$CURRENT_DIR"
-      env:
-        ASPNETCORE_ENVIRONMENT: Production
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
