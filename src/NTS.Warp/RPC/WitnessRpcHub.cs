@@ -62,8 +62,8 @@ internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlis
         }
         var judge = _judgeRelay.Clients.Client(_judgeConnectionContext.Id);
         var participants = await judge.GetActiveParticipations().Select(ParticipantEntryFactory.Create);
-        var enduranceEvent = await _events.Read(0);
-        return new EmsParticipantsPayload { Participants = participants.ToList(), EventId = enduranceEvent?.Id ?? 0 };
+        var enduranceEventId = await judge.GetEventId();
+        return new EmsParticipantsPayload { Participants = participants.ToList(), EventId = enduranceEventId ?? 0 };
     }
 
     public async Task ReceiveWitnessEvent(IEnumerable<EmsParticipantEntry> entries, EmsWitnessEventType type)

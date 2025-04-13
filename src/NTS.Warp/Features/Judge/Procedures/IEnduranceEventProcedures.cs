@@ -1,4 +1,4 @@
-namespace NTS.Warp.Features.Participations.Procedures;
+namespace NTS.Warp.Features.Judge.Procedures;
 
 public interface IEnduranceEventRpcClient
 {

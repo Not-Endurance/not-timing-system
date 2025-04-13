@@ -55,6 +55,6 @@ internal class JudgeRpcHub : Hub<IJudgeRemoteProcedures>, IJudgeHubProcedures
     }
 }
 
-public interface IJudgeRemoteProcedures : IParticipationRemoteProcedures, IConnectionsClientProcedures
+public interface IJudgeRemoteProcedures : IParticipationRemoteProcedures, IConnectionsClientProcedures, IEnduranceEventRpcClient
 {
 }

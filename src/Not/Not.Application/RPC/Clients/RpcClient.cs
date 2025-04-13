@@ -86,6 +86,29 @@ public abstract class RpcClient : IRpcClient
     }
 
     public void RegisterOutputProcedure<T>(string name, Func<Task<T?>> action)
+        where T : struct
+    {
+        _socket.Procedures.Add(connection =>
+        {
+            connection.On(
+                name,
+                (Func<Task<T?>>)(async () =>
+                {
+                    try
+                    {
+                        return await action();
+                    }
+                    catch (Exception exception)
+                    {
+                        _socket.RaiseError(exception, name);
+                        return null;
+                    }
+                })
+            );
+        });
+    }
+
+    public void RegisterOutputProcedure<T>(string name, Func<Task<T?>> action)
         where T : class
     {
         _socket.Procedures.Add(connection =>

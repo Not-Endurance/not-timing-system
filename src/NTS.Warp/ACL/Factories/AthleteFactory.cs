@@ -1,11 +1,9 @@
-﻿using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Enums;
+﻿using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Athletes;
 using NTS.Warp.ACL.Entities.Countries;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Models;
 using NTS.Warp.Features.Judge.Models;
-using NTS.Warp.Features.Participations;
 
 namespace NTS.Warp.ACL.Factories;
 

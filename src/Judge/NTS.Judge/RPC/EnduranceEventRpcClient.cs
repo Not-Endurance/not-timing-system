@@ -2,7 +2,7 @@ using Not.Application.CRUD.Ports;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Warp.Features.Participations.Procedures;
+using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.RPC;
 
@@ -17,7 +17,7 @@ public class EnduranceEventRpcClient : RpcClient, IEnduranceEventRpcClient
 
     public override void RunAtStartup()
     {
-        RegisterInputProcedure(nameof(GetEventId), GetEventId);
+        RegisterOutputProcedure(nameof(GetEventId), GetEventId);
     }
 
     public async Task<int?> GetEventId()

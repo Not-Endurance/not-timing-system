@@ -1,8 +1,6 @@
-﻿using NTS.Domain.Core.Aggregates;
-using NTS.Warp.ACL.Entities.Horses;
+﻿using NTS.Warp.ACL.Entities.Horses;
 using NTS.Warp.ACL.Models;
 using NTS.Warp.Features.Judge.Models;
-using NTS.Warp.Features.Participations;
 
 namespace NTS.Warp.ACL.Factories;
 
