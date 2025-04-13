@@ -10,7 +10,7 @@ env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   SOURCE_PATH: src/Nexus/NTS.Nexus.Warp
-  BIN_PATH: ./publish
+  ARTIFACT_PATH: NTS.Nexus.Warp/publish
   AZURE_RESOURCE: nts-nexus-warp-dev
 
 jobs:
@@ -46,16 +46,29 @@ jobs:
         dotnet publish ${{ env.SOURCE_PATH }} \
         --configuration ${{ env.CONFIGURATION }} \
         --no-build \
-        --output ${{ env.BIN_PATH }} \
+        --output ${{ env.ARTIFACT_PATH }} \
         -property:SolutionDir="$CURRENT_DIR"
+
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.AZURE_RESOURCE }}
+        path: ${{ env.ARTIFACT_PATH }}
+        include-hidden-files: true 
 
   nexus-warp-deploy:
     runs-on: ubuntu-latest
     needs: nexus-warp-build
     steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.AZURE_RESOURCE }}
+          path: ${{ env.ARTIFACT_PATH }}
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_RESOURCE }}
           publish-profile: ${{ secrets.AZURE_NTS_NEXUS_WARP_DEV_PUBLISH_PROFILE }}
-          package: ${{ env.BIN_PATH }}
+          package: ${{ env.ARTIFACT_PATH }}
