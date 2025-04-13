@@ -2,4 +2,11 @@ using NTS.Warp;
 
 var builder = Warp.CreateBuilder(args);
 
-Warp.StartApp(builder);
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+Warp.Start(app);

@@ -18,12 +18,8 @@ public static class Warp
         return builder;
     }
 
-    public static void StartApp(WebApplicationBuilder builder)
+    public static void Start(WebApplication app)
     {
-        var app = builder.Build();
-
-        app.Urls.Add("http://*:11337");
-
         app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB);
         app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB);
 

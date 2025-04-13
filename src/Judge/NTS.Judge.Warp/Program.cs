@@ -33,4 +33,8 @@ builder.Services
     });
 #endif
 
-Warp.StartApp(builder);
+var app = builder.Build();
+
+app.Urls.Add("http://*:11337");
+
+Warp.Start(app);
