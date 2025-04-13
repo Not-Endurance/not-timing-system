@@ -8,11 +8,11 @@ using NTS.Judge.Core;
 
 namespace NTS.Judge.RPC;
 
-public class ParticipationClient : RpcClient, IParticipationRpcClient
+public class ParticipationRpcClient : RpcClient, IParticipationRpcClient
 {
     readonly ISnapshotProcessor _snapshotProcessor;
 
-    public ParticipationClient(IRpcSocket socket, ISnapshotProcessor snapshotProcessor)
+    public ParticipationRpcClient(IRpcSocket socket, ISnapshotProcessor snapshotProcessor)
         : base(socket)
     {
         _snapshotProcessor = snapshotProcessor;

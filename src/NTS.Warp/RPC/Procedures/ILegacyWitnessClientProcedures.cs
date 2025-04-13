@@ -4,5 +4,4 @@ namespace NTS.Warp.RPC.Procedures;
 
 public interface ILegacyWitnessClientProcedures
     : IEmsParticipantsClientProcedures,
-        IEmsParticipantsHubProcedures,
         IEmsStartlistClientProcedures { }

@@ -13,7 +13,7 @@ using NTS.Warp.RPC.Procedures;
 
 namespace NTS.Warp.RPC;
 
-internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistHubProcedures
+internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistHubProcedures, IEmsParticipantsHubProcedures
 {
     readonly IRead<Participation> _participations;
     readonly IRead<EnduranceEvent> _events;

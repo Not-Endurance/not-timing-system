@@ -5,11 +5,11 @@ using NTS.Application.RPC;
 
 namespace NTS.Judge.RPC;
 
-public class ConnectionsClient : RpcClient, IConnectionsRpcClient
+public class ConnectionsRpcClient : RpcClient, IConnectionsRpcClient
 {
     readonly IConnectionsRegistry _connectionsRegistry;
 
-    public ConnectionsClient(IRpcSocket socket, IConnectionsRegistry connectionsRegistry)
+    public ConnectionsRpcClient(IRpcSocket socket, IConnectionsRegistry connectionsRegistry)
         : base(socket)
     {
         _connectionsRegistry = connectionsRegistry;
