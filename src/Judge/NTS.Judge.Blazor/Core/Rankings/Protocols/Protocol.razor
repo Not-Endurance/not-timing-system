@@ -4,7 +4,7 @@
 
 <MudItem Class="d-flex flex-row justify-space-around">
     @* TODO: include a setting which configures the local fedaration's logo *@
-    <MudImage Class="pt-2 " Height="115" Width="135" Src="images/logo-bfks.png" />
+    <MudImage Class="pt-2 " Height="115" Width="135" Src="images/logo-TEF.png" />
     <MudItem Class="d-flex flex-column justify-center">
         <NHeadline2 Content="@Document.Header.Title" Class="mb-4" />
         <NHeadline2 Content="@_documentSubtitle" />
@@ -13,12 +13,12 @@
 </MudItem>
 
 
-<MudItem Class="d-flex flex-row justify-center mt-n3">
+<MudItem Class="d-flex flex-row justify-center mt-n5">
     <MudText Typo="Typo.overline" Style="font-size:14px;" >
         Official Members:
     </MudText>
 </MudItem>
-<MudStack Class="d-flex mb-4" Row="true" Justify="Justify.Center">
+<MudStack Class="d-flex mb-3" Row="true" Justify="Justify.Center">
     <MudStack Row="false">
         @if (Document.Header.GroundJuryPresident != null)
         {
@@ -61,14 +61,15 @@
     </MudStack>
 </MudStack>
 
-<MudDivider Class="mt-1" />
-
-@foreach (var entry in Ranklist.Entries)
-{
-    <ProtocolRow Entry="entry" />
-
+<MudStack Spacing="1" AlignItems="AlignItems.Center" Class="mt-n3">
     <MudDivider Class="mt-1" />
-}
+    @foreach (var entry in Ranklist.Entries)
+    {
+        <ProtocolRow Entry="entry" />
+
+        <MudDivider Class="mt-1" />
+    }
+</MudStack>
 
 <style>
     .printing .printable,

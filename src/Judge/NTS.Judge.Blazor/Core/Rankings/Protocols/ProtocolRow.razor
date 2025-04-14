@@ -23,7 +23,7 @@
 
     @if (_total != null && !Entry.Participation.IsEliminated())
     {
-        <MudStack Class="d-flex">
+        <MudStack Class="d-flex" Style="width:140px;">
             <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">
                 @Total_string
             </MudText>
@@ -50,7 +50,7 @@
     }
     else
     {
-        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="width:140px;">
             <MudText Typo="Typo.body2" Align="Align.Center" Class="mud-button-text">
                 @* @Eliminated_string *@
                 Eliminated:
