@@ -4,37 +4,37 @@
 
 <MudItem Class="d-flex flex-row justify-space-around">
     @* TODO: include a setting which configures the local fedaration's logo *@
-    <MudImage Class="pt-2 printable" Height="115" Width="135" Src="images/logo-bfks.png" />
+    <MudImage Class="pt-2 " Height="115" Width="135" Src="images/logo-bfks.png" />
     <MudItem Class="d-flex flex-column justify-center">
-        <NHeadline2 Content="@Document.Header.Title" Class="printable mb-4" />
-        <NHeadline2 Content="@_documentSubtitle" Class="printable" />
+        <NHeadline2 Content="@Document.Header.Title" Class="mb-4" />
+        <NHeadline2 Content="@_documentSubtitle" />
     </MudItem>
-    <MudImage Class="pb-5 printable" Height="150" Width="135" Src="images/logo-fei.png" />
+    <MudImage Class="pb-5" Height="150" Width="135" Src="images/logo-fei.png" />
 </MudItem>
 
 
 <MudItem Class="d-flex flex-row justify-center mt-n3">
-    <MudText Typo="Typo.overline" Style="font-size:20px;" Class="printable">
+    <MudText Typo="Typo.overline" Style="font-size:14px;" >
         Official Members:
     </MudText>
 </MudItem>
-<MudStack Class="mb-4" Row="true" Justify="Justify.Center">
+<MudStack Class="d-flex mb-4" Row="true" Justify="Justify.Center">
     <MudStack Row="false">
         @if (Document.Header.GroundJuryPresident != null)
         {
-            <MudText Typo="Typo.caption" Style="font-size:14px;" Class="printable">
+            <MudText Typo="Typo.caption" Style="font-size:12px;">
                 @Document.Header.GroundJuryPresident
             </MudText>
         }
         @if (Document.Header.ChiefSteward != null)
         {
-            <MudText Typo="Typo.caption" Style="font-size:14px;" Class="printable">
+            <MudText Typo="Typo.caption" Style="font-size:12px;">
                 @Document.Header.ChiefSteward
             </MudText>
         } 
         @if (Document.Header.ForeignJudge != null)
         {
-            <MudText Typo="Typo.caption" Style="font-size:14px;" Class="printable">
+            <MudText Typo="Typo.caption" Style="font-size:12px;">
                 @Document.Header.ForeignJudge
             </MudText>
         }
@@ -42,30 +42,50 @@
     <MudStack Row="false">
         @if (Document.Header.VeterinaryCommissionPresident != null)
         {
-            <MudText Typo="Typo.caption" Style="font-size:14px;" Class="printable">
+            <MudText Typo="Typo.caption" Style="font-size:12px;">
                 @Document.Header.VeterinaryCommissionPresident
             </MudText>
         }
         @if (Document.Header.TechnicalDelegate != null)
         {
-            <MudText Typo="Typo.caption" Style="font-size:14px;" Class="printable">
+            <MudText Typo="Typo.caption" Style="font-size:12px;">
                 @Document.Header.TechnicalDelegate
             </MudText>
         }
         @if (Document.Header.ForeignVeterinaryDelegate != null)
         {
-            <MudText Typo="Typo.caption" Style="font-size:14px;" Class="printable">
+            <MudText Typo="Typo.caption" Style="font-size:12px;">
                 @Document.Header.ForeignVeterinaryDelegate
             </MudText>
         }
     </MudStack>
 </MudStack>
 
-<MudDivider Class="mt-1 printable" />
+<MudDivider Class="mt-1" />
 
 @foreach (var entry in Ranklist.Entries)
 {
     <ProtocolRow Entry="entry" />
 
-    <MudDivider Class="mt-1 printable" />
+    <MudDivider Class="mt-1" />
 }
+
+<style>
+    .printing .printable,
+    .printing .printable p,
+    .printing .printable button {
+        font-size: 10px;
+    }
+    
+    .printing .printable .subtitle,
+    .printing .printable .subtitle p,
+    .printing .printable .subtitle button{
+        font-size: 14px;
+    }
+
+    .printing .printable .title    
+    .printing .printable .title p,
+    .printing .printable .title button{
+        font-size: 18px;
+    }
+</style>

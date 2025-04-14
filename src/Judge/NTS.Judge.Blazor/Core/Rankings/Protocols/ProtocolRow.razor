@@ -3,7 +3,7 @@
 
 @inherits NComponent
 
-<MudStack Row="true" Class="printable">
+<MudStack Row="true" Justify="Justify.FlexStart" Class="printable">
 
     <MudStack>
         <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">@_rankText</MudText>
@@ -19,19 +19,21 @@
         </MudStack>
     </MudStack>
 
-    <ParticipationTable Number="_combination.Number" Phases="_phases" />
+    <ParticipationTable Number="_combination.Number" Phases="_phases"/>
 
-    @if (_total != null)
+    @if (_total != null && !Entry.Participation.IsEliminated())
     {
-        <MudStack>
+        <MudStack Class="d-flex">
             <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">
                 @Total_string
             </MudText>
 
-            <MudStack Justify="Justify.SpaceEvenly" Style="height:100%; width:125px">
+            <MudStack Justify="Justify.SpaceEvenly" Style="height:100%;">
                 <MudText Typo="Typo.body2" Align="Align.Center">
                     @Finished_at_colon_string
-                    <strong>@_total!.FinishTime</strong>
+                    <strong>
+                            @_total!.FinishTime
+                    </strong>
                 </MudText>
 
                 <MudText Typo="Typo.body2" Align="Align.Center">
@@ -44,6 +46,17 @@
                     <strong>@_total!.RecoveryIntervalWithoutFinal</strong>
                 </MudText>
             </MudStack>
+        </MudStack>
+    }
+    else
+    {
+        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center">
+            <MudText Typo="Typo.body2" Align="Align.Center" Class="mud-button-text">
+                @* @Eliminated_string *@
+                Eliminated:
+                <br />
+                <strong>@Entry.Participation.Eliminated</strong>
+            </MudText>
         </MudStack>
     }
 
