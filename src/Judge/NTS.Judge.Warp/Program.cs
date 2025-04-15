@@ -10,7 +10,6 @@ using Not.Logging.Builder;
 using Serilog;
 #endif
 
-
 var builder = Warp.CreateBuilder(args);
 
 if (args.Any())
