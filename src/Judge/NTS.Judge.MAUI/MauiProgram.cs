@@ -18,7 +18,7 @@ public static class MauiProgram
         builder.Configuration.AddNAppsettings();
 
         var app = builder.Build();
-        
+
         if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))
         {
             StartHub();

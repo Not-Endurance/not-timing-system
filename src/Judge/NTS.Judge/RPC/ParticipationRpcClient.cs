@@ -18,9 +18,10 @@ public class ParticipationRpcClient : RpcClient, IParticipationRemoteProcedures
 
     public ParticipationRpcClient(
         IRpcSocket socket,
-        ISnapshotProcessor snapshotProcessor, 
+        ISnapshotProcessor snapshotProcessor,
         IRead<Domain.Core.Aggregates.Participation> coreParticipations,
-        IRead<Domain.Setup.Aggregates.Participation> setupParticipations)
+        IRead<Domain.Setup.Aggregates.Participation> setupParticipations
+    )
         : base(socket)
     {
         _snapshotProcessor = snapshotProcessor;
@@ -33,7 +34,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationRemoteProcedures
         Domain.Core.Aggregates.Participation.PHASE_COMPLETED_EVENT.Subscribe(SendStartCreated);
         Domain.Core.Aggregates.Participation.ELIMINATED_EVENT.Subscribe(SendParticipationEliminated);
         Domain.Core.Aggregates.Participation.RESTORED_EVENT.Subscribe(SendParticipationRestored);
-        
+
         RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(ProcessSnapshots), ProcessSnapshots);
         RegisterOutputCollectionProcedure(nameof(GetActiveParticipations), GetActiveParticipations);
     }
@@ -59,9 +60,8 @@ public class ParticipationRpcClient : RpcClient, IParticipationRemoteProcedures
         {
             return coreParticipations;
         }
-        
-        var participations = await _setupParticipations
-            .ReadAll();
+
+        var participations = await _setupParticipations.ReadAll();
         return participations.Select(ParticipationWarpDto.Create);
     }
 

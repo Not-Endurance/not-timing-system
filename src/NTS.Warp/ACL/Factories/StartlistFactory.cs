@@ -12,9 +12,9 @@ public static class StartlistFactory
         foreach (var emsParticipation in emsParticipations)
         {
             var toSkip = 0;
-            var records = emsParticipation
-                .Participant.LapRecords
-                .Where(x => x.Result == null || !x.Result.IsNotQualified);
+            var records = emsParticipation.Participant.LapRecords.Where(x =>
+                x.Result == null || !x.Result.IsNotQualified
+            );
             foreach (var record in records)
             {
                 var entry = new EmsStartlistEntry(emsParticipation, toSkip);

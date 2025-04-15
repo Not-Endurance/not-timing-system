@@ -10,7 +10,7 @@ public class JudgeHandshakeService : INetworkBroadcastService, IHandshakeService
     const int PORT = 11337;
     const string JUDGE = "Judge";
     const string WITNESS = "Witness";
-        
+
     readonly IHandshakeValidatorService _handshakeValidatorService;
 
     public JudgeHandshakeService(IHandshakeValidatorService handshakeValidatorService)

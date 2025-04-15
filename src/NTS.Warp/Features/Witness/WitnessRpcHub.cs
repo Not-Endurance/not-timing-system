@@ -11,7 +11,10 @@ using NTS.Warp.Features.Judge;
 
 namespace NTS.Warp.Features.Witness;
 
-internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistHubProcedures, IEmsParticipantsHubProcedures
+internal class WitnessRpcHub
+    : Hub<ILegacyWitnessClientProcedures>,
+        IEmsStartlistHubProcedures,
+        IEmsParticipantsHubProcedures
 {
     readonly IJudgeConnectionContext _judgeConnectionContext;
     readonly IHubContext<JudgeRpcHub, IJudgeRemoteProcedures> _judgeRelay;

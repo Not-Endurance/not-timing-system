@@ -13,10 +13,7 @@ public static class JudgeBlazorServiceCollectionExtensions
         IConfiguration configuration
     )
     {
-        services
-            .ConfigureNts(configuration)
-            .AddNotBlazor(configuration)
-            .AddRpcSocket(configuration);
+        services.ConfigureNts(configuration).AddNotBlazor(configuration).AddRpcSocket(configuration);
 
         return services;
     }

@@ -20,11 +20,7 @@ public class AthleteFactory
             LastName = athlete.Person.GetLastName(),
             Id = athlete.Id,
         };
-        var country = new EmsCountry(
-            athlete.Country?.IsoCode ?? "iso",
-            athlete.Country?.Name ?? "country-name",
-            1337
-        );
+        var country = new EmsCountry(athlete.Country?.IsoCode ?? "iso", athlete.Country?.Name ?? "country-name", 1337);
         return new EmsAthlete(athleteState, country);
     }
 
@@ -35,9 +31,8 @@ public class AthleteFactory
             AthleteCategory.Senior => EmsCategory.Seniors,
             AthleteCategory.Children => EmsCategory.Children,
             AthleteCategory.JuniorOrYoungAdult => EmsCategory.JuniorOrYoungAdults,
-            AthleteCategory.Training
-                or AthleteCategory.Companion => EmsCategory.Seniors,
-            _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
+            AthleteCategory.Training or AthleteCategory.Companion => EmsCategory.Seniors,
+            _ => throw new ArgumentOutOfRangeException(nameof(category), category, null),
         };
     }
 }

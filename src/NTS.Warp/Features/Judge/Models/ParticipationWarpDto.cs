@@ -29,7 +29,7 @@ public class ParticipationWarpDto
             },
         };
     }
-    
+
     public static ParticipationWarpDto Create(Domain.Core.Aggregates.Participation participation)
     {
         return new ParticipationWarpDto
@@ -53,23 +53,24 @@ public class ParticipationWarpDto
                 Id = participation.Combination.Horse.Id,
                 Name = participation.Combination.Horse.Name,
             },
-            Phases = participation.Phases.Select(x => new PhaseDto
-            {
-                Id =  x.Id,
-                Length = x.Length,
-                MaxRecovery =  x.MaxRecovery,
-                Rest =  x.Rest,
-                StartTime = x.StartTime,
-                ArriveTime = x.ArriveTime,
-                PresentTime = x.PresentTime,
-                RepresentTime = x.RepresentTime,
-                IsRequestedInspectionRequired = x.IsRequiredInspectionRequested,
-                IsRequestedInspectionCompulsory = x.IsRequiredInspectionCompulsory,
-                
-            }).ToArray(),
+            Phases = participation
+                .Phases.Select(x => new PhaseDto
+                {
+                    Id = x.Id,
+                    Length = x.Length,
+                    MaxRecovery = x.MaxRecovery,
+                    Rest = x.Rest,
+                    StartTime = x.StartTime,
+                    ArriveTime = x.ArriveTime,
+                    PresentTime = x.PresentTime,
+                    RepresentTime = x.RepresentTime,
+                    IsRequestedInspectionRequired = x.IsRequiredInspectionRequested,
+                    IsRequestedInspectionCompulsory = x.IsRequiredInspectionCompulsory,
+                })
+                .ToArray(),
         };
     }
-    
+
     public int Id { get; init; }
     public int Number { get; init; }
     public string? CompetitionName { get; init; }
@@ -78,8 +79,8 @@ public class ParticipationWarpDto
     public double? MaxAverageSpeed { get; init; }
     public AthleteDto Athlete { get; init; } = default!;
     public HorseDto Horse { get; init; } = default!;
-    public PhaseDto[]? Phases { get; init; } = [];  
-    
+    public PhaseDto[]? Phases { get; init; } = [];
+
     public class AthleteDto
     {
         public int Id { get; init; }

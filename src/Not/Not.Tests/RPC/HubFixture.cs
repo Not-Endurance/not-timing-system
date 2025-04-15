@@ -74,6 +74,6 @@ public class TestOptions<T> : IOptions<T>
     {
         Value = instance;
     }
-    
+
     public T Value { get; }
 }

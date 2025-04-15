@@ -22,10 +22,7 @@ internal static class HubInjection
                 x.PayloadSerializerSettings = new NJsonSettings();
             });
 
-        services
-            .AddDummyLocalizer()
-            .RegisterConventionalServices()
-            .ConfigureStorage();
+        services.AddDummyLocalizer().RegisterConventionalServices().ConfigureStorage();
 
         return services;
     }

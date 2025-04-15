@@ -9,13 +9,15 @@ public static class OptionServiceCollectionExtensions
         where T : class
     {
         var section = configuration.GetSection(typeof(T).Name);
-        services
-            .AddOptions<T>()
-            .Bind(section);
+        services.AddOptions<T>().Bind(section);
         return services;
     }
-    
-    public static IServiceCollection AddSettings<T>(this IServiceCollection services, IConfiguration configuration, Func<T, bool> validator)
+
+    public static IServiceCollection AddSettings<T>(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Func<T, bool> validator
+    )
         where T : class
     {
         var name = typeof(T).Name;

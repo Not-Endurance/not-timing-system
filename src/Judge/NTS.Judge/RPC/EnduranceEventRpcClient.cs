@@ -10,7 +10,8 @@ public class EnduranceEventRpcClient : RpcClient, IEnduranceEventRpcClient
 {
     readonly IRead<EnduranceEvent> _eventReader;
 
-    public EnduranceEventRpcClient(IRpcSocket socket, IRead<EnduranceEvent> eventReader) : base(socket)
+    public EnduranceEventRpcClient(IRpcSocket socket, IRead<EnduranceEvent> eventReader)
+        : base(socket)
     {
         _eventReader = eventReader;
     }
@@ -26,4 +27,3 @@ public class EnduranceEventRpcClient : RpcClient, IEnduranceEventRpcClient
         return enduranceEvent?.Id;
     }
 }
-

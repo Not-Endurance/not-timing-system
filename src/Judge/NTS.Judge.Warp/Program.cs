@@ -1,14 +1,15 @@
-﻿# if RELEASE
+﻿using Microsoft.Extensions.Logging;
+using Not.SystemProcess;
+using NTS.Judge.Warp;
+using NTS.Warp;
+using static NTS.Judge.Warp.JudgeWarpConstants;
+# if RELEASE
 using Not.Filesystem;
 using Not.Logging;
 using Not.Logging.Builder;
 using Serilog;
 #endif
-using Microsoft.Extensions.Logging;
-using Not.SystemProcess;
-using NTS.Judge.Warp;
-using NTS.Warp;
-using static NTS.Judge.Warp.JudgeWarpConstants;
+
 
 var builder = Warp.CreateBuilder(args);
 
@@ -18,8 +19,9 @@ if (args.Any())
     if (parentPidArgument == null)
     {
         throw new ApplicationException(
-            "Parent PID not found in Warp arguments. " +
-            "PID is necessary in order to terminate the local Warp instance when Judge closes");
+            "Parent PID not found in Warp arguments. "
+                + "PID is necessary in order to terminate the local Warp instance when Judge closes"
+        );
     }
     var parentProcessId = parentPidArgument[PARENT_PID_KEY.Length..];
     builder.Services.AddProcessTether(parentProcessId);
@@ -31,8 +33,8 @@ builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
 builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
 # if RELEASE
 builder.Logging.AddSerilog();
-builder.Services
-    .AddNLogging()
+builder
+    .Services.AddNLogging()
     .AddFilesystemLogger(logFileConfig =>
     {
         logFileConfig.Path = FileContextHelper.GetAppDirectory("logs");

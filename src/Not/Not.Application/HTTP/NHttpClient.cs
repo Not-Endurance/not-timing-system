@@ -11,7 +11,11 @@ public class NHttpClient
     readonly HttpClient _httpClient;
     readonly ILogger<NHttpClient> _logger;
 
-    public NHttpClient(IHttpClientFactory httpClientFactory, ILogger<NHttpClient> logger, IOptions<NHttpSettings> options)
+    public NHttpClient(
+        IHttpClientFactory httpClientFactory,
+        ILogger<NHttpClient> logger,
+        IOptions<NHttpSettings> options
+    )
     {
         _host = options.Value.Host;
         _httpClient = httpClientFactory.CreateClient("NHttpClient");

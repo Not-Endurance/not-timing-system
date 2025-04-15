@@ -9,7 +9,10 @@ public static class RpcServiceCollectionExtensions
 {
     public static IServiceCollection AddRpcSocket(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSettings<RpcSettings>(configuration, x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern));
+        services.AddSettings<RpcSettings>(
+            configuration,
+            x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern)
+        );
         return services;
     }
 }

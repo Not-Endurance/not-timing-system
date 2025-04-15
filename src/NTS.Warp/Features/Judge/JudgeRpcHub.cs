@@ -15,7 +15,10 @@ internal class JudgeRpcHub : Hub<IJudgeRemoteProcedures>, IJudgeHubProcedures
     readonly IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> _witnessRelay;
     readonly JudgeConnectionContext _judgeConnectionContext;
 
-    public JudgeRpcHub(IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> witnessRelay, JudgeConnectionContext judgeConnectionContext)
+    public JudgeRpcHub(
+        IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> witnessRelay,
+        JudgeConnectionContext judgeConnectionContext
+    )
     {
         _witnessRelay = witnessRelay;
         _judgeConnectionContext = judgeConnectionContext;
@@ -55,6 +58,7 @@ internal class JudgeRpcHub : Hub<IJudgeRemoteProcedures>, IJudgeHubProcedures
     }
 }
 
-public interface IJudgeRemoteProcedures : IParticipationRemoteProcedures, IConnectionsClientProcedures, IEnduranceEventRpcClient
-{
-}
+public interface IJudgeRemoteProcedures
+    : IParticipationRemoteProcedures,
+        IConnectionsClientProcedures,
+        IEnduranceEventRpcClient { }
