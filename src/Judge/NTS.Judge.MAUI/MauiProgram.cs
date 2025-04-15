@@ -19,7 +19,7 @@ public static class MauiProgram
 
         var app = builder.Build();
         
-        if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.DEBUG_WARP))
+        if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))
         {
             StartHub();
         }
@@ -49,5 +49,5 @@ public static class MauiProgram
 
 public static class JudgeVariables
 {
-    public const string DEBUG_WARP = nameof(DEBUG_WARP);
+    public const string NO_WARP = nameof(NO_WARP);
 }

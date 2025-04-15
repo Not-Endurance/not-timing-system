@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NTS.Application.Handshake;
+using Not.Application.UdpHandshake;
 
 namespace NTS.Judge.Warp;
 

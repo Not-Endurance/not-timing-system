@@ -2,7 +2,6 @@
 using Not.Injection;
 using Not.Localization;
 using Not.Serialization.JSON;
-using NTS.Application.Handshake;
 using NTS.Storage;
 using NTS.Warp.Middleware;
 
@@ -10,7 +9,7 @@ namespace NTS.Warp;
 
 internal static class HubInjection
 {
-    public static IServiceCollection ConfigureHub(this IServiceCollection services)
+    public static IServiceCollection ConfigureWarp(this IServiceCollection services)
     {
         services
             .AddSignalR(options =>

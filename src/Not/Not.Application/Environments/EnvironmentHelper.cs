@@ -14,7 +14,7 @@ public static class EnvironmentHelper
 
     public static bool Is(string env)
     {
-        return Environment.GetEnvironmentVariable(env) != null;
+        return Environment.GetEnvironmentVariable(env) == null;
     }
     
     public static string GetEnvironment()

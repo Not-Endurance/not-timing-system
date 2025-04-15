@@ -2,7 +2,7 @@
 using System.Text;
 using Not.Injection;
 
-namespace NTS.Application.Handshake;
+namespace Not.Application.UdpHandshake;
 
 public class HandshakeValidatorService : IHandshakeValidatorService
 {

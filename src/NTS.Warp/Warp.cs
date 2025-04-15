@@ -11,7 +11,7 @@ public static class Warp
     {
         var builder = WebApplication.CreateBuilder(args);
         
-        builder.Services.ConfigureHub();
+        builder.Services.ConfigureWarp();
  
         return builder;
     }
