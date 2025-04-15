@@ -1,7 +1,7 @@
 ﻿using Not.Startup;
 using NTS.Application;
 using NTS.Warp.Features.Judge;
-using NTS.Warp.RPC;
+using NTS.Warp.Features.Witness;
 
 namespace NTS.Warp;
 

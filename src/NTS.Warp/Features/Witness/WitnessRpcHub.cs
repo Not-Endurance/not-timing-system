@@ -7,11 +7,9 @@ using NTS.Warp.ACL.Entities;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Factories;
 using NTS.Warp.ACL.RPC.Procedures;
-using NTS.Warp.Features;
 using NTS.Warp.Features.Judge;
-using NTS.Warp.Features.Judge.ACL;
 
-namespace NTS.Warp.RPC;
+namespace NTS.Warp.Features.Witness;
 
 internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistHubProcedures, IEmsParticipantsHubProcedures
 {
@@ -33,14 +31,12 @@ internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlis
     public override async Task OnConnectedAsync()
     {
         var connectionId = Context.ConnectionId;
-        Console.WriteLine($"Connected: {Context.ConnectionId}");
         await _judgeRelay.Clients.All.ReceiveRemoteConnectionId(connectionId);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var connectionId = Context.ConnectionId;
-        Console.WriteLine($"Disconnected: {Context.ConnectionId}");
         await _judgeRelay.Clients.All.ReceiveRemoteDisconnectId(connectionId);
     }
 

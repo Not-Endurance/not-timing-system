@@ -3,10 +3,10 @@ using NTS.Application.RPC;
 using NTS.Warp.ACL.Entities;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Factories;
-using NTS.Warp.Features.Judge.ACL;
+using NTS.Warp.ACL.RPC.Procedures;
 using NTS.Warp.Features.Judge.Models;
 using NTS.Warp.Features.Judge.Procedures;
-using NTS.Warp.RPC;
+using NTS.Warp.Features.Witness;
 
 namespace NTS.Warp.Features.Judge;
 

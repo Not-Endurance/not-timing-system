@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="RPC\Procedures\" />
+    <Folder Include="Features\Witness\Procedures\" />
   </ItemGroup>
 
 </Project>

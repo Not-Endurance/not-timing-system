@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="RPC\" />
   </ItemGroup>
 
 </Project>
