@@ -2,12 +2,12 @@ using Not.Injection;
 
 namespace NTS.Warp.Features;
 
-public class PrimaryConnectionContext : IPrimaryConnectionContext
+public class JudgeConnectionContext : IJudgeConnectionContext
 {
     public string? Id { get; set; }
 }
 
-public interface IPrimaryConnectionContext : ISingleton
+public interface IJudgeConnectionContext : ISingleton
 {
     string? Id { get; }
 }

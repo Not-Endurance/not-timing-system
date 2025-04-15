@@ -8,18 +8,19 @@ using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Factories;
 using NTS.Warp.ACL.RPC.Procedures;
 using NTS.Warp.Features;
+using NTS.Warp.Features.Judge;
 using NTS.Warp.Features.Judge.ACL;
 
 namespace NTS.Warp.RPC;
 
 internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistHubProcedures, IEmsParticipantsHubProcedures
 {
-    readonly IPrimaryConnectionContext _judgeConnectionContext;
+    readonly IJudgeConnectionContext _judgeConnectionContext;
     readonly IRead<EnduranceEvent> _events;
     readonly IHubContext<JudgeRpcHub, IJudgeRemoteProcedures> _judgeRelay;
 
     public WitnessRpcHub(
-        IPrimaryConnectionContext judgeConnectionContext,
+        IJudgeConnectionContext judgeConnectionContext,
         IRead<EnduranceEvent> events,
         IHubContext<JudgeRpcHub, IJudgeRemoteProcedures> judgeRelay
     )

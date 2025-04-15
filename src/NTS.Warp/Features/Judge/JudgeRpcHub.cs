@@ -3,33 +3,33 @@ using NTS.Application.RPC;
 using NTS.Warp.ACL.Entities;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Factories;
-using NTS.Warp.Features;
 using NTS.Warp.Features.Judge.ACL;
 using NTS.Warp.Features.Judge.Models;
 using NTS.Warp.Features.Judge.Procedures;
+using NTS.Warp.RPC;
 
-namespace NTS.Warp.RPC;
+namespace NTS.Warp.Features.Judge;
 
 internal class JudgeRpcHub : Hub<IJudgeRemoteProcedures>, IJudgeHubProcedures
 {
     readonly IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> _witnessRelay;
-    readonly PrimaryConnectionContext _primaryConnectionContext;
+    readonly JudgeConnectionContext _judgeConnectionContext;
 
-    public JudgeRpcHub(IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> witnessRelay, PrimaryConnectionContext primaryConnectionContext)
+    public JudgeRpcHub(IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> witnessRelay, JudgeConnectionContext judgeConnectionContext)
     {
         _witnessRelay = witnessRelay;
-        _primaryConnectionContext = primaryConnectionContext;
+        _judgeConnectionContext = judgeConnectionContext;
     }
 
     public override Task OnConnectedAsync()
     {
-        _primaryConnectionContext.Id = Context.ConnectionId;
+        _judgeConnectionContext.Id = Context.ConnectionId;
         return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        _primaryConnectionContext.Id = null;
+        _judgeConnectionContext.Id = null;
         return base.OnDisconnectedAsync(exception);
     }
 
