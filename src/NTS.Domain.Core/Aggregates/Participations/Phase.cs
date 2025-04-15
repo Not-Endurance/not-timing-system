@@ -186,9 +186,9 @@ public class Phase : AggregateRoot
         {
             throw new DomainException(Cannot_require_representation_without_presentation_time);
         }
-        IsReinspectionRequested = true; 
+        IsReinspectionRequested = true;
     }
-    
+
     internal void DisableRepresentation()
     {
         if (!IsReinspectionRequested)
