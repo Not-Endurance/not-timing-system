@@ -180,6 +180,15 @@ public class Phase : AggregateRoot
         IsRequiredInspectionRequested = true;
     }
 
+    internal void RequireRepresentation()
+    {
+        if (PresentTime == null)
+        {
+            throw new DomainException(Cannot_require_representation_without_presentation_time);
+        }
+        IsReinspectionRequested = true;
+    }
+
     internal void DisableRepresentation()
     {
         if (!IsReinspectionRequested)

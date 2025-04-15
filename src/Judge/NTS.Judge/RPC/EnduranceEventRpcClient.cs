@@ -6,11 +6,11 @@ using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.RPC;
 
-public class EnduranceEventRpcClient : RpcClient, IEnduranceEventRpcClient
+public class EnduranceEventClientProcedures : RpcClient, IEnduranceEventClientProcedures
 {
     readonly IRead<EnduranceEvent> _eventReader;
 
-    public EnduranceEventRpcClient(IRpcSocket socket, IRead<EnduranceEvent> eventReader)
+    public EnduranceEventClientProcedures(IRpcSocket socket, IRead<EnduranceEvent> eventReader)
         : base(socket)
     {
         _eventReader = eventReader;

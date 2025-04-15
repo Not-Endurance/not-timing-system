@@ -28,7 +28,7 @@ public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
     public Phase(Loop? loop, int? recovery, int? rest)
         : this(GenerateId(), Required(nameof(Loop), loop), PositiveRecovery(recovery), NullOrPositiveRest(rest)) { }
 
-    public Loop? Loop { get; private set; }
+    public Loop? Loop { get; private set; } // TODO: shouldnt be nullable probably
     public int Recovery { get; }
     public int? Rest { get; }
 

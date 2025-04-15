@@ -1,6 +1,4 @@
-using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
-using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
@@ -9,10 +7,10 @@ namespace NTS.Judge.Core.Start.Factories;
 
 public static class ParticipationAndRankingFactory
 {
-    public static async Task<(
+    public static (
         List<Participation> Participations,
         Dictionary<AthleteCategory, List<RankingEntry>> RankingEntriesByCategory
-    )> Create(Domain.Setup.Aggregates.Competition setupCompetition, IRepository<Participation> participationRepository)
+    ) Create(Domain.Setup.Aggregates.Competition setupCompetition, IEnumerable<Participation> existingParticipations)
     {
         if (setupCompetition.Phases.Count == 0)
         {
@@ -37,12 +35,21 @@ public static class ParticipationAndRankingFactory
             var phases = new List<Phase>();
             foreach (var setupPhase in setupPhases)
             {
+                var isFinal = setupPhases.Last() == setupPhase;
+                if (!isFinal && setupPhase.Rest == null)
+                {
+                    throw new DomainException(
+                        Invalid_phase_configuration_in_competition__missing_rest,
+                        setupCompetition.Name
+                    );
+                }
+
                 var corePhase = new Phase(
                     setupPhase.Loop!.Distance,
                     setupPhase.Recovery,
                     setupPhase.Rest,
                     setupCompetition.Ruleset,
-                    setupPhases.Last() == setupPhase,
+                    isFinal,
                     setupCompetition.CompulsoryThresholdSpan,
                     startTime
                 );
@@ -66,8 +73,7 @@ public static class ParticipationAndRankingFactory
                 combination,
                 phases
             );
-            var storedParticipations = await participationRepository.ReadAll();
-            if (storedParticipations.All(p => p.Combination.Number != participation.Combination.Number))
+            if (existingParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
                 var rankingEntry = new RankingEntry(participation, setupParticipation.IsNotRanked);
@@ -75,7 +81,7 @@ public static class ParticipationAndRankingFactory
             }
             else
             {
-                var participationRef = storedParticipations
+                var participationRef = existingParticipations
                     .ToList()
                     .Find(p => p.Combination.Number == participation.Combination.Number);
                 if (participationRef != null)
