@@ -4,14 +4,14 @@ on:
     branches:
     - develop
 env:
-  AZURE_FUNCTIONAPP_NAME: nts-nexus-functions
+  AZURE_RESOURCE: nts-nexus-functions
   AZURE_RESOURCE_GROUP: NTS
   AZURE_STORAGE_CONTAINER: azurefunctions
   AZURE_STORAGE_ACCOUNT: ntsstoragedev
-  OUTPUT_PATH: Nexus/NTS.Nexus.Test/published
+  ARTIFACT_PATH: NTS.Nexus.API/publish
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
-  FUNCTIONS_SOURCE_PATH: src/Nexus/NTS.Nexus.HTTP
+  SOURCE_PATH: src/Nexus/NTS.Nexus.HTTP
 
 jobs:
   nexus-functions-build:
@@ -31,28 +31,28 @@ jobs:
       run: dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config
 
     - name: Restore
-      run: dotnet restore "${{ env.FUNCTIONS_SOURCE_PATH }}"
+      run: dotnet restore "${{ env.SOURCE_PATH }}"
       
     - name: Build
       run: |
-        dotnet build "${{ env.FUNCTIONS_SOURCE_PATH }}" \
+        dotnet build "${{ env.SOURCE_PATH }}" \
         --configuration "${{ env.CONFIGURATION }}" \
         --no-restore \
         -property:SolutionDir="$CURRENT_DIR"
 
     - name: Publish
       run: |
-        dotnet publish "${{ env.FUNCTIONS_SOURCE_PATH }}" \
+        dotnet publish "${{ env.SOURCE_PATH }}" \
         --configuration "${{ env.CONFIGURATION }}" \
         --no-build \
-        --output "${{ env.OUTPUT_PATH }}" \
+        --output "${{ env.ARTIFACT_PATH }}" \
         -property:SolutionDir="$CURRENT_DIR"
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        path: ${{ env.OUTPUT_PATH }}
+        name: ${{ env.AZURE_RESOURCE }}
+        path: ${{ env.ARTIFACT_PATH }}
         include-hidden-files: true
 
   nexus-functions-deploy:
@@ -63,13 +63,13 @@ jobs:
     - name: Download artifact from build job
       uses: actions/download-artifact@v4
       with:
-        name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        path: ${{ env.OUTPUT_PATH }}
+        name: ${{ env.AZURE_RESOURCE }}
+        path: ${{ env.ARTIFACT_PATH }}
 
     - name: Zip function
       run: |
-        cd ${{ env.OUTPUT_PATH }}
-        zip -r ../../../${{ env.AZURE_FUNCTIONAPP_NAME }}.zip .
+        cd ${{ env.ARTIFACT_PATH }}
+        zip -r ../../../${{ env.AZURE_RESOURCE }}.zip .
         cd -
 
     - name: Login to Azure
@@ -83,7 +83,7 @@ jobs:
         TOKEN=$(az storage blob generate-sas \
         --connection-string "${{ secrets.AZURE_NTSSTORAGEDEV_CONNECTION_STRING }}" \
         --container-name "${{ env.AZURE_STORAGE_CONTAINER }}" \
-        --name ${{ env.AZURE_FUNCTIONAPP_NAME }}.zip \
+        --name ${{ env.AZURE_RESOURCE }}.zip \
         --permissions r \
         --expiry 2036-01-01 \
         --output tsv)
@@ -92,7 +92,7 @@ jobs:
 
     - name: Generate FULL_URL
       run: |
-        FULL_URL="https://${{ env.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/azurefunctions/${{ env.AZURE_FUNCTIONAPP_NAME }}.zip?$SAS_TOKEN"
+        FULL_URL="https://${{ env.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net/azurefunctions/${{ env.AZURE_RESOURCE }}.zip?$SAS_TOKEN"
         echo "SAS_URL=$FULL_URL" >> $GITHUB_ENV
 
     - name: Upload to blob
@@ -101,19 +101,19 @@ jobs:
         --connection-string "${{ secrets.AZURE_NTSSTORAGEDEV_CONNECTION_STRING }}" \
         --container-name "${{ env.AZURE_STORAGE_CONTAINER }}" \
         --sas-token "$SAS_TOKEN" \
-        --name ${{ env.AZURE_FUNCTIONAPP_NAME }}.zip \
-        --file ${{ env.AZURE_FUNCTIONAPP_NAME }}.zip \
+        --name ${{ env.AZURE_RESOURCE }}.zip \
+        --file ${{ env.AZURE_RESOURCE }}.zip \
         --overwrite
 
     - name: Configure WEBSITE_RUN_FROM_PACKAGE
       run: |
         az functionapp config appsettings set \
         --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
-        --name "${{ env.AZURE_FUNCTIONAPP_NAME }}" \
+        --name "${{ env.AZURE_RESOURCE }}" \
         --settings WEBSITE_RUN_FROM_PACKAGE="$SAS_URL"
 
     - name: Restart function
       run: |
         az functionapp restart \
         --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
-        --name "${{ env.AZURE_FUNCTIONAPP_NAME }}"
+        --name "${{ env.AZURE_RESOURCE }}"

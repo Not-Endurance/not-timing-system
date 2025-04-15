@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Not.Blazor.CRUD.Ports;
 using Not.Serialization.JSON;
 using Not.Storage.Stores.Files;
@@ -38,8 +39,9 @@ public class StorageTests : JudgeIntegrationTest
                 []
             ),
         };
-
-        await AssertStateEquals(JsonFileStore.Write(expectedState));
+        var settings = new NJsonSettings();
+        var expected = JsonConvert.SerializeObject(expectedState, settings);
+        await AssertStateEquals(expected);
     }
 
     [Fact]

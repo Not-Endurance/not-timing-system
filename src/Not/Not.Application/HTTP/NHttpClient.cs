@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Not.Serialization.JSON;
 
 namespace Not.Application.HTTP;
@@ -10,14 +11,13 @@ public class NHttpClient
     readonly HttpClient _httpClient;
     readonly ILogger<NHttpClient> _logger;
 
-    public NHttpClient(IHttpClientFactory httpClientFactory, ILogger<NHttpClient> logger)
+    public NHttpClient(
+        IHttpClientFactory httpClientFactory,
+        ILogger<NHttpClient> logger,
+        IOptions<NHttpSettings> options
+    )
     {
-#if DEBUG
-        _host = "http://localhost:8080/api";
-#else
-        _host = "https://nts-nexus-functions.azurewebsites.net/api";
-#endif
-
+        _host = options.Value.Host;
         _httpClient = httpClientFactory.CreateClient("NHttpClient");
         _logger = logger;
     }
