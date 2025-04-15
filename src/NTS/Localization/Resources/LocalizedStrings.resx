@@ -537,4 +537,7 @@
   <data name="FEI_Rule" xml:space="preserve">
     <value>FEI Rule</value>
   </data>
+  <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
+    <value>Cannot require Representation without Presentation time</value>
+  </data>
 </root>

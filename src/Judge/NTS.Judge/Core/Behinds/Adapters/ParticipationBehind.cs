@@ -144,7 +144,7 @@ public class ParticipationBehind
 
     async Task SafeRequestReinspection(bool requestFlag)
     {
-        SelectedParticipation!.ChangeReinspection(requestFlag);
+        SelectedParticipation!.ToggleRepresentation(requestFlag);
         await _participationRepository.Update(SelectedParticipation);
 
         EmitChange();
@@ -152,7 +152,7 @@ public class ParticipationBehind
 
     async Task SafeRequestRequiredInspection(bool requestFlag)
     {
-        SelectedParticipation!.ChangeRequiredInspection(requestFlag);
+        SelectedParticipation!.ToggleRequestedInspection(requestFlag);
         await _participationRepository.Update(SelectedParticipation);
 
         EmitChange();

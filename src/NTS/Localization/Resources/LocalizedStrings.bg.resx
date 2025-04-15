@@ -537,4 +537,7 @@
   <data name="FEI_Schedule_NR" xml:space="preserve">
     <value>FEI Schedule NR</value>
   </data>
+  <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
+    <value>Не може да поискаме Реинспекция без време на инспекция</value>
+  </data>
 </root>

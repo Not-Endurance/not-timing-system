@@ -95,11 +95,11 @@ public class Participation : AggregateRoot, IAggregateRoot
         EvaluatePhase(phase);
     }
 
-    public void ChangeReinspection(bool isRequested)
+    public void ToggleRepresentation(bool isRequested)
     {
         if (isRequested)
         {
-            Phases.Current.IsReinspectionRequested = true;
+            Phases.Current.RequireRepresentation();
         }
         else
         {
@@ -107,7 +107,7 @@ public class Participation : AggregateRoot, IAggregateRoot
         }
     }
 
-    public void ChangeRequiredInspection(bool isRequested)
+    public void ToggleRequestedInspection(bool isRequested)
     {
         if (isRequested)
         {
