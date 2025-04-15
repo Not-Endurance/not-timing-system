@@ -48,7 +48,6 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
         }
         var next = GetNext();
         next.StartTime = Current.GetOutTime();
-        ;
     }
 
     internal bool SelectNext()
