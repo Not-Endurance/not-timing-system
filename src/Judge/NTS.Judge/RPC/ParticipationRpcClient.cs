@@ -10,12 +10,12 @@ using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.RPC;
 
-public class ParticipationRpcClient : RpcClient, IParticipationRemoteProcedures
+public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures, IParticipationHubProcedures
 {
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IRead<Domain.Core.Aggregates.Participation> _coreParticipations;
     readonly IRead<Domain.Setup.Aggregates.Participation> _setupParticipations;
-
+    
     public ParticipationRpcClient(
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
@@ -31,9 +31,9 @@ public class ParticipationRpcClient : RpcClient, IParticipationRemoteProcedures
 
     public override void RunAtStartup()
     {
-        Domain.Core.Aggregates.Participation.PHASE_COMPLETED_EVENT.Subscribe(SendStartCreated);
-        Domain.Core.Aggregates.Participation.ELIMINATED_EVENT.Subscribe(SendParticipationEliminated);
-        Domain.Core.Aggregates.Participation.RESTORED_EVENT.Subscribe(SendParticipationRestored);
+        Domain.Core.Aggregates.Participation.PHASE_COMPLETED_EVENT.Subscribe(OnPhaseCompleted);
+        Domain.Core.Aggregates.Participation.ELIMINATED_EVENT.Subscribe(OnParticipationEliminated);
+        Domain.Core.Aggregates.Participation.RESTORED_EVENT.Subscribe(OnParticipationRestored);
 
         RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(ProcessSnapshots), ProcessSnapshots);
         RegisterOutputCollectionProcedure(nameof(GetActiveParticipations), GetActiveParticipations);
@@ -65,18 +65,18 @@ public class ParticipationRpcClient : RpcClient, IParticipationRemoteProcedures
         return participations.Select(ParticipationWarpDto.Create);
     }
 
-    public async Task SendParticipationEliminated(ParticipationEliminated revoked)
+    public async Task OnParticipationEliminated(ParticipationEliminated eliminated)
     {
-        await InvokeHubProcedure(nameof(IJudgeHubProcedures.SendParticipationEliminated), revoked);
+        await InvokeInputProcedure(nameof(IParticipationHubProcedures.OnParticipationEliminated), eliminated);
     }
 
-    public async Task SendParticipationRestored(ParticipationRestored restored)
+    public async Task OnParticipationRestored(ParticipationRestored restored)
     {
-        await InvokeHubProcedure(nameof(IJudgeHubProcedures.SendParticipationRestored), restored);
+        await InvokeInputProcedure(nameof(IParticipationHubProcedures.OnParticipationRestored), restored);
     }
 
-    public async Task SendStartCreated(PhaseCompleted phaseCompleted)
+    public async Task OnPhaseCompleted(PhaseCompleted phaseCompleted)
     {
-        await InvokeHubProcedure(nameof(IJudgeHubProcedures.SendStartCreated), phaseCompleted);
+        await InvokeInputProcedure(nameof(IParticipationHubProcedures.OnPhaseCompleted), phaseCompleted);
     }
 }

@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using NTS.Application.RPC;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects.Payloads;
 using NTS.Warp.ACL.Entities;
+using NTS.Warp.ACL.Entities.Participations;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Factories;
 using NTS.Warp.ACL.RPC.Procedures;
@@ -10,12 +13,12 @@ using NTS.Warp.Features.Witness;
 
 namespace NTS.Warp.Features.Judge;
 
-internal class JudgeRpcHub : Hub<IJudgeRemoteProcedures>, IJudgeHubProcedures
+internal class ParticipationRpcHub : Hub<IJudgeClientProcedures>, IJudgeHubProcedures
 {
     readonly IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> _witnessRelay;
     readonly JudgeConnectionContext _judgeConnectionContext;
 
-    public JudgeRpcHub(
+    public ParticipationRpcHub(
         IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> witnessRelay,
         JudgeConnectionContext judgeConnectionContext
     )
@@ -36,29 +39,37 @@ internal class JudgeRpcHub : Hub<IJudgeRemoteProcedures>, IJudgeHubProcedures
         return base.OnDisconnectedAsync(exception);
     }
 
-    public async Task SendParticipationEliminated(ParticipationWarpDto participation)
+    public async Task OnParticipationEliminated(ParticipationEliminated eliminated)
     {
-        var emsParticipation = ParticipationFactory.CreateEms(participation);
+        var emsParticipation = Convert(eliminated.Participation);
         var entry = new EmsParticipantEntry(emsParticipation);
         await _witnessRelay.Clients.All.ReceiveEntryUpdate(entry, EmsCollectionAction.Remove);
     }
 
-    public async Task SendParticipationRestored(ParticipationWarpDto participation)
+    public async Task OnParticipationRestored(ParticipationRestored restored)
     {
-        var emsParticipation = ParticipationFactory.CreateEms(participation);
+        var emsParticipation = Convert(restored.Participation);
         var entry = new EmsParticipantEntry(emsParticipation);
         await _witnessRelay.Clients.All.ReceiveEntryUpdate(entry, EmsCollectionAction.AddOrUpdate);
     }
 
-    public async Task SendStartCreated(ParticipationWarpDto participation)
+    public async Task OnPhaseCompleted(PhaseCompleted phaseCompleted)
     {
-        var emsParticipation = ParticipationFactory.CreateEms(participation);
+        var emsParticipation = Convert(phaseCompleted.Participation);
         var entry = new EmsStartlistEntry(emsParticipation);
         await _witnessRelay.Clients.All.ReceiveEntry(entry, EmsCollectionAction.AddOrUpdate);
     }
+
+    EmsParticipation Convert(Participation participation)
+    {
+        var dto = ParticipationWarpDto.Create(participation);
+        return ParticipationFactory.CreateEms(dto);
+    }
 }
 
-public interface IJudgeRemoteProcedures
-    : IParticipationRemoteProcedures,
+public interface IJudgeClientProcedures
+    : IParticipationClientProcedures,
         IConnectionsClientProcedures,
-        IEnduranceEventRpcClient { }
+        IEnduranceEventClientProcedures { }
+
+public interface IJudgeHubProcedures : IParticipationHubProcedures { }

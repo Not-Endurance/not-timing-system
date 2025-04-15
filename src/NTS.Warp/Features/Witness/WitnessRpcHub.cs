@@ -17,11 +17,11 @@ internal class WitnessRpcHub
         IEmsParticipantsHubProcedures
 {
     readonly IJudgeConnectionContext _judgeConnectionContext;
-    readonly IHubContext<JudgeRpcHub, IJudgeRemoteProcedures> _judgeRelay;
+    readonly IHubContext<ParticipationRpcHub, IJudgeClientProcedures> _judgeRelay;
 
     public WitnessRpcHub(
         IJudgeConnectionContext judgeConnectionContext,
-        IHubContext<JudgeRpcHub, IJudgeRemoteProcedures> judgeRelay
+        IHubContext<ParticipationRpcHub, IJudgeClientProcedures> judgeRelay
     )
     {
         _judgeConnectionContext = judgeConnectionContext;

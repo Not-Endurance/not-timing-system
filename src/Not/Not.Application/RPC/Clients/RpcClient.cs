@@ -200,7 +200,7 @@ public abstract class RpcClient : IRpcClient
         });
     }
 
-    public async Task<RpcInvokeResult> InvokeHubProcedure<T>(string name, T parameter)
+    public async Task<RpcInvokeResult> InvokeInputProcedure<T>(string name, T parameter)
     {
         if (!_socket.IsConnected)
         {
@@ -218,7 +218,7 @@ public abstract class RpcClient : IRpcClient
         }
     }
 
-    public async Task<RpcInvokeResult> InvokeHubProcedure<T1, T2>(string name, T1 parameter1, T2 parameter2)
+    public async Task<RpcInvokeResult> InvokeInputProcedure<T1, T2>(string name, T1 parameter1, T2 parameter2)
     {
         if (!_socket.IsConnected)
         {
@@ -236,7 +236,7 @@ public abstract class RpcClient : IRpcClient
         }
     }
 
-    public async Task<RpcInvokeResult<T>> InvokeHubProcedure<T>(string name)
+    public async Task<RpcInvokeResult<T>> InvokeOutputProcedure<T>(string name)
     {
         if (!_socket.IsConnected)
         {

@@ -1,6 +1,6 @@
 namespace NTS.Warp.Features.Judge.Procedures;
 
-public interface IEnduranceEventRpcClient
+public interface IEnduranceEventClientProcedures
 {
     Task<int?> GetEventId();
 }
