@@ -14,17 +14,14 @@ namespace NTS.Warp.Features.Witness;
 internal class WitnessRpcHub : Hub<ILegacyWitnessClientProcedures>, IEmsStartlistHubProcedures, IEmsParticipantsHubProcedures
 {
     readonly IJudgeConnectionContext _judgeConnectionContext;
-    readonly IRead<EnduranceEvent> _events;
     readonly IHubContext<JudgeRpcHub, IJudgeRemoteProcedures> _judgeRelay;
 
     public WitnessRpcHub(
         IJudgeConnectionContext judgeConnectionContext,
-        IRead<EnduranceEvent> events,
         IHubContext<JudgeRpcHub, IJudgeRemoteProcedures> judgeRelay
     )
     {
         _judgeConnectionContext = judgeConnectionContext;
-        _events = events;
         _judgeRelay = judgeRelay;
     }
 
