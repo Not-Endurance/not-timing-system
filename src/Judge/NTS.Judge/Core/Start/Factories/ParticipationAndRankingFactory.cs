@@ -38,9 +38,12 @@ public static class ParticipationAndRankingFactory
                 var isFinal = setupPhases.Last() == setupPhase;
                 if (!isFinal && setupPhase.Rest == null)
                 {
-                    throw new DomainException(Invalid_phase_configuration_in_competition__missing_rest, setupCompetition.Name);
+                    throw new DomainException(
+                        Invalid_phase_configuration_in_competition__missing_rest,
+                        setupCompetition.Name
+                    );
                 }
-                
+
                 var corePhase = new Phase(
                     setupPhase.Loop!.Distance,
                     setupPhase.Recovery,

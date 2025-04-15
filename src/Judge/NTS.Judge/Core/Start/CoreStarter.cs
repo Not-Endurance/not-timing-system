@@ -42,12 +42,12 @@ public class CoreStarter : ICoreStarter
 
         var enduranceEvent = EnduranceEventFactory.Create(setupEvent);
         var officials = setupEvent.Officials.Select(OfficialFactory.Create);
-        var (participations, rankings) =  CreateParticipationsAndRankings(setupEvent);
-        
+        var (participations, rankings) = CreateParticipationsAndRankings(setupEvent);
+
         await _coreEventRepository.Create(enduranceEvent);
         foreach (var official in officials)
         {
-            await  _coreOfficialRepository.Create(official);
+            await _coreOfficialRepository.Create(official);
         }
         foreach (var participation in participations)
         {
@@ -60,21 +60,18 @@ public class CoreStarter : ICoreStarter
         return true;
     }
 
-    (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(Domain.Setup.Aggregates.EnduranceEvent setupEvent)
+    (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(
+        Domain.Setup.Aggregates.EnduranceEvent setupEvent
+    )
     {
         var participations = new List<Participation>();
         var rankings = new List<Ranking>();
-        
+
         foreach (var setupCompetition in setupEvent.Competitions)
         {
-            var (p, rankingEntriesByCategory) = ParticipationAndRankingFactory.Create(
-                setupCompetition,
-                participations
-            );
-            var r = rankingEntriesByCategory
-                .Where(x => x.Value.Any())
-                .Select(x => CreateRanking(setupCompetition, x));
-            
+            var (p, rankingEntriesByCategory) = ParticipationAndRankingFactory.Create(setupCompetition, participations);
+            var r = rankingEntriesByCategory.Where(x => x.Value.Any()).Select(x => CreateRanking(setupCompetition, x));
+
             participations.AddRange(p);
             rankings.AddRange(r);
         }
