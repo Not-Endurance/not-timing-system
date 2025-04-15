@@ -540,4 +540,7 @@
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Не може да поискаме Реинспекция без време на инспекция</value>
   </data>
+  <data name="Invalid_phase_configuration_in_competition__missing_rest" xml:space="preserve">
+    <value>Невалидно състезание '{0}' поради липсващо Време за почивка на не-финална фаза</value>
+  </data>
 </root>

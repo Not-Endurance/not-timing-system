@@ -143,6 +143,7 @@ namespace NTS.Localization
         public static string FEI_Category_Event_NR => LocalizeString(nameof(FEI_Category_Event_NR));
         public static string required_for_FEI_export => LocalizeString(nameof(required_for_FEI_export));
         public static string Cannot_require_representation_without_presentation_time => LocalizeString(nameof(Cannot_require_representation_without_presentation_time));
+        public static string Invalid_phase_configuration_in_competition__missing_rest => LocalizeString(nameof(Invalid_phase_configuration_in_competition__missing_rest));
         public static string Time_format_is_incorrect_hrs_colon_mins_colon_secs_string =>
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
     }
