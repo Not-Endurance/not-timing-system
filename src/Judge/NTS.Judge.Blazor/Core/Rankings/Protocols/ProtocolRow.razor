@@ -3,23 +3,23 @@
 
 @inherits NComponent
 
-<MudStack Row="true" Justify="Justify.FlexStart" Class="printable">
+<MudStack Row="true" Justify="Justify.FlexStart">
 
     <MudStack>
         <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">@_rankText</MudText>
 
-        <MudStack Justify="Justify.SpaceEvenly" Style="height:100%; width:140px">
-            <MudText Typo="Typo.body2" Align="Align.Right">@_combination.Athlete</MudText>
+        <MudStack Justify="Justify.SpaceEvenly" Style="height:100%; width:80px">
+            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Athlete</MudText>
 
-            <MudText Typo="Typo.body2" Align="Align.Right">@_combination.Horse</MudText>
+            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Horse</MudText>
 
-            <MudText Typo="Typo.body2" Align="Align.Right">@_combination.Club</MudText>
+            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Club</MudText>
 
-            <MudText Typo="Typo.body2" Align="Align.Right">@_combination.Athlete.Country</MudText>
+            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Athlete.Country</MudText>
         </MudStack>
     </MudStack>
 
-    <ParticipationTable Number="_combination.Number" Phases="_phases"/>
+    <ParticipationTable Number="_combination.Number" Phases="_phases" Vertical="true" />
 
     @if (_total != null && !Entry.Participation.IsEliminated())
     {
@@ -36,12 +36,12 @@
                     </strong>
                 </MudText>
 
-                <MudText Typo="Typo.body2" Align="Align.Center">
+                <MudText Typo="Typo.caption" Align="Align.Center">
                     @Ride_time_in_hours_colon_string
                     <strong>@_total!.RideInterval</strong>
                 </MudText>
 
-                <MudText Typo="Typo.body2" Align="Align.Center">
+                <MudText Typo="Typo.caption" Align="Align.Center">
                     @Recovery_in_hours_colon_string
                     <strong>@_total!.RecoveryIntervalWithoutFinal</strong>
                 </MudText>
