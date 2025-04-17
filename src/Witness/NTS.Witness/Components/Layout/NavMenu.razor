@@ -1,0 +1,18 @@
+﻿@using Not.Blazor.Components
+@using Not.Blazor.Navigation
+
+@inherits NComponent
+
+<MudNavMenu>
+    <NNavLink Endpoint="@WITNESS_HOME_PAGE" Match="NavLinkMatch.All" AfterNavigation="AfterNavigationAction">Home</NNavLink>
+    <NNavLink Endpoint="@LOGIN" AfterNavigation="AfterNavigationAction">Login</NNavLink>
+    <NNavLink Endpoint="@EMERGENCY_CONTACTS" AfterNavigation="AfterNavigationAction">Emergency Contacts</NNavLink>
+    <NNavLink Endpoint="@SNAPSHOT" AfterNavigation="AfterNavigationAction">Snapshot</NNavLink>
+    <NNavLink Endpoint="@STARTLIST" AfterNavigation="AfterNavigationAction">Startlist</NNavLink>
+    <NNavLink Endpoint="@PHASE_DETAILS" AfterNavigation="AfterNavigationAction">Performance</NNavLink>
+</MudNavMenu>
+
+@code{
+    [Parameter]
+    public Action AfterNavigationAction { get; set; } = default!;
+}

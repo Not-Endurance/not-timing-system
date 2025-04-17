@@ -1,0 +1,39 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider @ref="_themeProvider" />
+<MudDialogProvider CloseOnEscapeKey="true" CloseButton="true" MaxWidth="MaxWidth.Small" FullWidth="true" />
+<MudSnackbarProvider />
+<MudPopoverProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
+        <MudSpacer />
+        Server connection spinner to be added here...
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen" Elevation="2" Anchor="Anchor.Top" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Witness</MudText>
+        </MudDrawerHeader>
+
+        <NavMenu AfterNavigationAction="CloseDrawer" />
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code{
+    MudThemeProvider _themeProvider = default!;
+    bool _drawerOpen = false;
+
+    void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    void CloseDrawer()
+    {
+        _drawerOpen = false;
+    }
+}
