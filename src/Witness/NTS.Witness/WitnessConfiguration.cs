@@ -5,15 +5,10 @@ namespace NTS.Witness;
 
 public static class WitnessConfiguration
 {
-    public static IServiceCollection AddWitnessServices(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddWitnessServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services
-            .AddNotBlazor(configuration);
+        services.AddNotBlazor(configuration);
 
         return services;
     }
-
-
 }

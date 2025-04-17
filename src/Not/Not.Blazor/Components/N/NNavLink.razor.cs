@@ -19,7 +19,7 @@ public partial class NNavLink : NComponent
 
     [Parameter]
     public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
-     
+
     void Land()
     {
         LandNavigator.LandTo(Endpoint);
