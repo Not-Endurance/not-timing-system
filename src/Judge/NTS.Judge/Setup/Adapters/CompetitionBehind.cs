@@ -14,12 +14,12 @@ public class CompetitionBehind : CrudChildBehind<Competition, CompetitionFormMod
 
     public CompetitionBehind(
         IRepository<Competition> competitions,
-        EventParentContext parentContext,
+        EnduranceEventCrudeContext crudeContext,
         ICrudParent<Phase> phaseParent,
         ICrudParent<Participation> participationParent,
         IEnumerable<ICrudReflection<Competition>> dependants
     )
-        : base(competitions, dependants, parentContext)
+        : base(competitions, dependants, crudeContext)
     {
         _phaseParent = phaseParent;
         _participationParent = participationParent;

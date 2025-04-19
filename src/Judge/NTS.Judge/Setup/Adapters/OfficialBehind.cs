@@ -1,5 +1,4 @@
-﻿using AngleSharp.Io;
-using Not.Application.Behinds.Adapters;
+﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents.Officials;
@@ -11,10 +10,10 @@ public class OfficialBehind : CrudChildBehind<Official, OfficialFormModel>
 {
     public OfficialBehind(
         IRepository<Official> official,
-        EventParentContext enduraceEventContext,
+        EnduranceEventCrudeContext enduranceEventContext,
         IEnumerable<ICrudReflection<Official>> dependants
     )
-        : base(official, dependants, enduraceEventContext) { }
+        : base(official, dependants, enduranceEventContext) { }
 
     protected override Official CreateEntity(OfficialFormModel model)
     {

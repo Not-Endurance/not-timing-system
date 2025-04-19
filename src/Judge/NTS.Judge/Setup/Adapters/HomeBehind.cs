@@ -1,31 +1,25 @@
 ﻿using Not.Application.Behinds;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Safe;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents;
 using NTS.Judge.Core.Behinds;
 
 namespace NTS.Judge.Setup.Adapters;
 
-public class EventBehind : ObservableBehind, IEnduranceEventBehind
+public class HomeBehind : ObservableBehind, IEnduranceEventBehind
 {
     readonly IRepository<EnduranceEvent> _events;
-    readonly EventParentContext _context;
+    readonly EnduranceEventCrudeContext _crudeContext;
     readonly ICrudParent<Competition> _competitionParent;
     readonly ICrudParent<Official> _officialParent;
 
-    public EventBehind(
-        IRepository<EnduranceEvent> events,
-        EventParentContext context,
-        ICrudParent<Competition> compeitionParent,
-        ICrudParent<Official> officialParent
-    )
+    public HomeBehind(IRepository<EnduranceEvent> events, EnduranceEventCrudeContext crudeContext)
     {
         _events = events;
-        _context = context;
-        _competitionParent = compeitionParent;
-        _officialParent = officialParent;
+        _crudeContext = crudeContext;
+        _competitionParent = crudeContext;
+        _officialParent = crudeContext;
     }
 
     public EnduranceEventFormModel? Model { get; private set; }
@@ -37,7 +31,7 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
         {
             return false;
         }
-        _context.SetParent(enduranceEvent);
+        _crudeContext.SetParent(enduranceEvent);
         Model = new EnduranceEventFormModel();
         Model.FromEntity(enduranceEvent);
         return false;
@@ -47,7 +41,7 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
     {
         var enduranceEvent = EnduranceEvent.Create(model.Place, model.Country, model.FeiShowId);
         await _events.Create(enduranceEvent);
-        _context.SetParent(enduranceEvent);
+        _crudeContext.SetParent(enduranceEvent);
         Model = new EnduranceEventFormModel();
         Model.FromEntity(enduranceEvent);
         EmitChange();
@@ -64,7 +58,7 @@ public class EventBehind : ObservableBehind, IEnduranceEventBehind
             _officialParent.Children
         );
         await _events.Update(enduranceEvent);
-        _context.SetParent(enduranceEvent);
+        _crudeContext.SetParent(enduranceEvent);
         EmitChange();
     }
 

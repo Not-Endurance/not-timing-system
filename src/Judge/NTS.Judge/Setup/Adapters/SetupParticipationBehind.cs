@@ -13,10 +13,10 @@ public class SetupParticipationBehind
 {
     public SetupParticipationBehind(
         IRepository<Participation> participations,
-        CompetitionParentContext parentContext,
+        CompetitionCrudeContext crudeContext,
         IEnumerable<ICrudReflection<Participation>> dependants
     )
-        : base(participations, dependants, parentContext) { }
+        : base(participations, dependants, crudeContext) { }
 
     protected override Participation CreateEntity(ParticipationFormModel model)
     {

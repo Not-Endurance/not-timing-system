@@ -10,10 +10,10 @@ public class PhaseBehind : CrudChildBehind<Phase, PhaseFormModel>, ICrudReflecti
 {
     public PhaseBehind(
         IRepository<Phase> phase,
-        CompetitionParentContext parentContext,
+        CompetitionCrudeContext crudeContext,
         IEnumerable<ICrudReflection<Phase>> reflections
     )
-        : base(phase, reflections, parentContext) { }
+        : base(phase, reflections, crudeContext) { }
 
     protected override Phase CreateEntity(PhaseFormModel model)
     {
