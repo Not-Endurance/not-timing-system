@@ -1,10 +1,9 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Blazor.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.Clubs;
 
-namespace NTS.Judge.Setup.Adapters;
+namespace NTS.Judge.Features.Setup.Clubs;
 
 internal class ClubBehind : CrudBehind<Club, ClubFormModel>
 {

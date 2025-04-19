@@ -5,18 +5,15 @@ using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 using NTS.Judge.Core.Behinds;
 
-namespace NTS.Judge.Setup.Adapters;
+namespace NTS.Judge.Features.Setup.Participations;
 
-public class SetupParticipationBehind
-    : CrudChildBehind<Participation, ParticipationFormModel>,
-        ICrudReflection<Combination>
+public class SetupParticipationBehind : CrudChildBehind<Participation, ParticipationFormModel>
 {
     public SetupParticipationBehind(
-        IRepository<Participation> participations,
         CompetitionCrudeContext crudeContext,
         IEnumerable<ICrudReflection<Participation>> dependants
     )
-        : base(participations, dependants, crudeContext) { }
+        : base(dependants, crudeContext) { }
 
     protected override Participation CreateEntity(ParticipationFormModel model)
     {
@@ -30,9 +27,8 @@ public class SetupParticipationBehind
         return Participation.Update(model.Id, newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride);
     }
 
-    public Task Reflect(Combination combination)
-    {
-        UpdateReflections(x => x.Combination, combination, x => x.Reflect(combination));
-        return Task.CompletedTask;
-    }
+    // public async Task Reflect(Combination update)
+    // {
+    //     await UpdateReflections(x => x.Combination, update, x => x.Reflect(update));
+    // }
 }

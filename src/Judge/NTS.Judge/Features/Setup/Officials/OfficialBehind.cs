@@ -4,16 +4,12 @@ using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents.Officials;
 using NTS.Judge.Core.Behinds;
 
-namespace NTS.Judge.Setup.Adapters;
+namespace NTS.Judge.Features.Setup.Officials;
 
 public class OfficialBehind : CrudChildBehind<Official, OfficialFormModel>
 {
-    public OfficialBehind(
-        IRepository<Official> official,
-        EnduranceEventCrudeContext enduranceEventContext,
-        IEnumerable<ICrudReflection<Official>> dependants
-    )
-        : base(official, dependants, enduranceEventContext) { }
+    public OfficialBehind(UpcomingEventCrudeContext upcomingEventContext, IEnumerable<ICrudReflection<Official>> dependants)
+        : base(dependants, upcomingEventContext) { }
 
     protected override Official CreateEntity(OfficialFormModel model)
     {

@@ -36,6 +36,8 @@ public class StorageTests : JudgeIntegrationTest
                 enduranceEvent.Country,
                 enduranceEvent.FeiShowId,
                 [],
+                [],
+                [],
                 []
             ),
         };

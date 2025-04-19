@@ -2,13 +2,14 @@
 using Not.Application.CRUD.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.Loops.Dot;
+using NTS.Judge.Core.Behinds;
 
-namespace NTS.Judge.Setup.Adapters;
+namespace NTS.Judge.Features.Setup.Loops;
 
-public class LoopBehind : CrudBehind<Loop, LoopFormModel>
+public class LoopBehind : CrudChildBehind<Loop, LoopFormModel>
 {
-    public LoopBehind(IRepository<Loop> loopRepository, IEnumerable<ICrudReflection<Loop>> dependants)
-        : base(loopRepository, dependants) { }
+    public LoopBehind(IEnumerable<ICrudReflection<Loop>> dependants, UpcomingEventCrudeContext parentContext)
+        : base(dependants, parentContext) { }
 
     protected override Loop CreateEntity(LoopFormModel model)
     {

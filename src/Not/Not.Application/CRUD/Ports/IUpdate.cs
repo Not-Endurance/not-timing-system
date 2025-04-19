@@ -3,7 +3,7 @@ using Not.Injection;
 
 namespace Not.Application.CRUD.Ports;
 
-public interface IUpdate<T> : ITransient
+public interface IUpdate<in T> : ITransient
     where T : IAggregateRoot
 {
     Task Update(T entity);

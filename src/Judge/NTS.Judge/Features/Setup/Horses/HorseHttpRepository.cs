@@ -1,7 +1,7 @@
 ﻿using Not.Application.HTTP;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.HTTP;
+namespace NTS.Judge.Features.Setup.Horses;
 
 public class HorseHttpRepository : HttpRepository<Horse>
 {

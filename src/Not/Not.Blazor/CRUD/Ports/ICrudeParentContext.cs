@@ -6,11 +6,11 @@ namespace Not.Blazor.CRUD.Ports;
 /// <summary>
 /// Used in a loop without filtration. Implementations must implement type checking and NOT throw any errors
 /// </summary>
-public interface ICrudParentContext : ISingleton
+public interface ICrudeParentContext : ISingleton
 {
     /// <summary>
     /// Set the parent reference
     /// </summary>
     /// <param name="parent"></param>
-    void SetParent(IParent parent);
+    void Set(IParent parent);
 }

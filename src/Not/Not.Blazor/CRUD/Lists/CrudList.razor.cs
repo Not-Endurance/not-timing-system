@@ -21,8 +21,8 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     [Inject]
     FormManager<TModel, TForm> FormNavigator { get; set; } = default!;
 
-    [Inject] // TODO: Probably refactor this as ICrudParent<T> and make it nullable
-    IEnumerable<ICrudParentContext> ParentContexts { get; set; } = default!;
+    [Inject] // TODO: Probably refactor this as ICrudParent<T> and make it nullable!!!!
+    IEnumerable<ICrudeParentContext> ParentContexts { get; set; } = default!;
 
     [Parameter]
     public int? ParentId { get; set; }
@@ -72,7 +72,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         {
             foreach (var context in ParentContexts)
             {
-                context.SetParent(parent);
+                context.Set(parent);
             }
         }
     }

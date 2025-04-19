@@ -5,21 +5,20 @@ using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions;
 using NTS.Judge.Core.Behinds;
 
-namespace NTS.Judge.Setup.Adapters;
+namespace NTS.Judge.Features.Setup.Competitions;
 
 public class CompetitionBehind : CrudChildBehind<Competition, CompetitionFormModel>
 {
-    readonly ICrudParent<Phase> _phaseParent;
-    readonly ICrudParent<Participation> _participationParent;
+    readonly ICrudeParent<Phase> _phaseParent;
+    readonly ICrudeParent<Participation> _participationParent;
 
     public CompetitionBehind(
-        IRepository<Competition> competitions,
-        EnduranceEventCrudeContext crudeContext,
-        ICrudParent<Phase> phaseParent,
-        ICrudParent<Participation> participationParent,
+        UpcomingEventCrudeContext crudeContext,
+        ICrudeParent<Phase> phaseParent,
+        ICrudeParent<Participation> participationParent,
         IEnumerable<ICrudReflection<Competition>> dependants
     )
-        : base(competitions, dependants, crudeContext)
+        : base(dependants, crudeContext)
     {
         _phaseParent = phaseParent;
         _participationParent = participationParent;

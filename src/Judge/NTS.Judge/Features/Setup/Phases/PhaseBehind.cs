@@ -4,16 +4,12 @@ using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents.Phases;
 using NTS.Judge.Core.Behinds;
 
-namespace NTS.Judge.Setup.Adapters;
+namespace NTS.Judge.Features.Setup.Phases;
 
-public class PhaseBehind : CrudChildBehind<Phase, PhaseFormModel>, ICrudReflection<Loop>
+public class PhaseBehind : CrudChildBehind<Phase, PhaseFormModel>
 {
-    public PhaseBehind(
-        IRepository<Phase> phase,
-        CompetitionCrudeContext crudeContext,
-        IEnumerable<ICrudReflection<Phase>> reflections
-    )
-        : base(phase, reflections, crudeContext) { }
+    public PhaseBehind(CompetitionCrudeContext crudeContext, IEnumerable<ICrudReflection<Phase>> reflections)
+        : base(reflections, crudeContext) { }
 
     protected override Phase CreateEntity(PhaseFormModel model)
     {
@@ -24,10 +20,9 @@ public class PhaseBehind : CrudChildBehind<Phase, PhaseFormModel>, ICrudReflecti
     {
         return Phase.Update(model.Id, model.Loop, model.Recovery, model.Rest);
     }
-
-    public Task Reflect(Loop loop)
-    {
-        UpdateReflections(x => x.Loop, loop, phase => phase.Reflect(loop));
-        return Task.CompletedTask;
-    }
+    //
+    // public async Task Reflect(Loop loop)
+    // {
+    //     await UpdateReflections(x => x.Loop, loop, phase => phase.Reflect(loop));
+    // }
 }

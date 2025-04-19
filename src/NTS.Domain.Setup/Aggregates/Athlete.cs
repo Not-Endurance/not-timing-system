@@ -3,7 +3,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Athlete : AggregateRoot, IAthlete, IAggregateRoot, IReflect<Club>
+public class Athlete : AggregateRoot, IAthlete, IReflect<Club>
 {
     public static Athlete Create(string? name, string? feiId, Country? country, Club? club, AthleteCategory? category)
     {
@@ -34,7 +34,7 @@ public class Athlete : AggregateRoot, IAthlete, IAggregateRoot, IReflect<Club>
         Names = Required(nameof(Names), names);
         Country = Required(nameof(Country), country);
         Category = Required(nameof(Category), category);
-        Club = club; //Required(nameof(Club), club);
+        Club = club;
     }
 
     IClub? IAthlete.Club => Club;
@@ -51,6 +51,9 @@ public class Athlete : AggregateRoot, IAthlete, IAggregateRoot, IReflect<Club>
 
     public void Reflect(Club club)
     {
-        Club = club;
+        if (Club == club)
+        {
+            Club = club;
+        }
     }
 }

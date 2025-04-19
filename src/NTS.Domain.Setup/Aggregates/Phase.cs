@@ -41,7 +41,10 @@ public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
 
     public void Reflect(Loop loop)
     {
-        Loop = loop;
+        if (Loop == loop)
+        {
+            Loop = loop;
+        }
     }
 
     static int PositiveRecovery(int? minutes)

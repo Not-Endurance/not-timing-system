@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.AthletesHorses.Horses;
 
-namespace NTS.Judge.Setup.Adapters;
+namespace NTS.Judge.Features.Setup.Horses;
 
 public class HorseBehind : CrudBehind<Horse, HorseFormModel>
 {

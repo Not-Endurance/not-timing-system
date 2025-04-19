@@ -10,10 +10,10 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
     where T : AggregateRoot
 {
     readonly IRepository<T> _repository;
-    List<ICrudReflection<T>> _reflections;
+    readonly List<ICrudReflection<T>> _reflections;
 
     protected CrudBehind(IRepository<T> repository, IEnumerable<ICrudReflection<T>> reflections)
-        : base([])
+        : base()
     {
         _repository = repository;
         _reflections = reflections.ToList();

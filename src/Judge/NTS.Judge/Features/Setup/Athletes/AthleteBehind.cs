@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 
-namespace NTS.Judge.Setup.Adapters;
+namespace NTS.Judge.Features.Setup.Athletes;
 
 public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflection<Club>
 {
@@ -20,9 +20,9 @@ public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflect
         return Athlete.Update(model.Id, model.Name, model.FeiId, model.Country, model.Club, model.Category);
     }
 
-    public Task Reflect(Club dependable)
+    public Task Reflect(Club update) // TODO: persist update
     {
-        UpdateReflections(x => x.Club, dependable, athlete => athlete.Reflect(dependable));
+        UpdateReflections(x => x.Club, update, athlete => athlete.Reflect(update));
         return Task.CompletedTask;
     }
 }

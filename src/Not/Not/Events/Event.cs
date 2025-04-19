@@ -23,7 +23,7 @@ public class Event : EventBase<EventDelegate>, IEventSubscriber
 
     public Guid Subscribe(Func<Task> action)
     {
-        return InternalSubscribe(() => SafeHelper.Run(() => action()));
+        return InternalSubscribe(() => SafeHelper.Run(action));
     }
 
     public Guid Subscribe(Action action)
@@ -33,7 +33,7 @@ public class Event : EventBase<EventDelegate>, IEventSubscriber
 
     public Guid SubscribeAsync(Func<Task> action)
     {
-        return InternalSubscribe(() => SafeHelper.RunAsync(() => action()));
+        return InternalSubscribe(() => SafeHelper.RunAsync(action));
     }
 
     public Guid SubscribeAsync(Action action)
