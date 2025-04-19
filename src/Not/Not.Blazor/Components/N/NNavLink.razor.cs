@@ -11,14 +11,14 @@ public partial class NNavLink : NComponent
     [Inject]
     NavigationManager NavigationManager { get; set; } = default!;
 
-    [Parameter]
-    public Action? AfterNavigation { get; set; } = default!;
-
     [Parameter, EditorRequired]
     public string Endpoint { get; set; } = default!;
 
     [Parameter]
     public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+    [Parameter]
+    public Action? AfterNavigation { get; set; } = default!;
 
     void Land()
     {
