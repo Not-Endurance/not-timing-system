@@ -11,8 +11,3 @@
     <NNavLink Endpoint="@STARTLIST" AfterNavigation="AfterNavigationAction">Startlist</NNavLink>
     <NNavLink Endpoint="@PHASE_DETAILS" AfterNavigation="AfterNavigationAction">Performance</NNavLink>
 </MudNavMenu>
-
-@code{
-    [Parameter]
-    public Action AfterNavigationAction { get; set; } = default!;
-}
