@@ -10,14 +10,14 @@ namespace NTS.Judge.Core.Start;
 
 public class CoreStarter : ICoreStarter
 {
-    readonly IRepository<Domain.Setup.Aggregates.EnduranceEvent> _setupRepository;
+    readonly IRepository<Domain.Setup.Aggregates.UpcomingEvent> _setupRepository;
     readonly IRepository<EnduranceEvent> _coreEventRepository;
     readonly IRepository<Official> _coreOfficialRepository;
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<Ranking> _rankingRepository;
 
     public CoreStarter(
-        IRepository<Domain.Setup.Aggregates.EnduranceEvent> setupRepository,
+        IRepository<Domain.Setup.Aggregates.UpcomingEvent> setupRepository,
         IRepository<EnduranceEvent> coreEventRepository,
         IRepository<Official> coreOfficialRepository,
         IRepository<Participation> participationRepository,
@@ -61,7 +61,7 @@ public class CoreStarter : ICoreStarter
     }
 
     (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(
-        Domain.Setup.Aggregates.EnduranceEvent setupEvent
+        Domain.Setup.Aggregates.UpcomingEvent setupEvent
     )
     {
         var participations = new List<Participation>();

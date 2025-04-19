@@ -6,12 +6,12 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Core.Behinds;
 
-public class EnduranceEventCrudeContext : BehindContext<EnduranceEvent>, ICrudParent<Competition>, ICrudParent<Official>
+public class EnduranceEventCrudeContext : BehindContext<UpcomingEvent>, ICrudParent<Competition>, ICrudParent<Official>
 {
     ObservableList<Competition> _competitions = new();
     ObservableList<Official> _officials = new();
 
-    public EnduranceEventCrudeContext(IUpdate<EnduranceEvent> updater)
+    public EnduranceEventCrudeContext(IUpdate<UpcomingEvent> updater)
         : base(updater) { }
 
     ObservableList<Competition> ICrudParent<Competition>.Children => _competitions;
@@ -19,7 +19,7 @@ public class EnduranceEventCrudeContext : BehindContext<EnduranceEvent>, ICrudPa
 
     public override void SetParent(IParent parent)
     {
-        if (parent is not EnduranceEvent enduranceEvent)
+        if (parent is not UpcomingEvent enduranceEvent)
         {
             return;
         }

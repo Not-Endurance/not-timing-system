@@ -19,13 +19,13 @@ public class EnduranceEventFormModel
     public IReadOnlyCollection<Competition> Competitions { get; private set; } = [];
     public IReadOnlyCollection<Official> Officials { get; private set; } = [];
 
-    public void FromEntity(EnduranceEvent enduranceEvent)
+    public void FromEntity(UpcomingEvent upcomingEvent)
     {
-        Id = enduranceEvent.Id;
-        Place = enduranceEvent.Place;
-        Country = enduranceEvent.Country;
-        FeiShowId = enduranceEvent.ShowFeiId;
-        Competitions = enduranceEvent.Competitions;
-        Officials = enduranceEvent.Officials;
+        Id = upcomingEvent.Id;
+        Place = upcomingEvent.Place;
+        Country = upcomingEvent.Country;
+        FeiShowId = upcomingEvent.ShowFeiId;
+        Competitions = upcomingEvent.Competitions;
+        Officials = upcomingEvent.Officials;
     }
 }

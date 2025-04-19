@@ -5,7 +5,7 @@ namespace NTS.Storage.Setup;
 
 public class SetupState
     : NState,
-        ITreeState<EnduranceEvent>,
+        ITreeState<UpcomingEvent>,
         ISetState<Loop>,
         ISetState<Horse>,
         ISetState<Athlete>,
@@ -15,7 +15,7 @@ public class SetupState
         ISetState<Phase>,
         ISetState<Official>
 {
-    EnduranceEvent? ITreeState<EnduranceEvent>.Root
+    UpcomingEvent? ITreeState<UpcomingEvent>.Root
     {
         get => EnduranceEvent;
         set => EnduranceEvent = value;
@@ -41,5 +41,5 @@ public class SetupState
     public List<Combination> Combinations { get; } = [];
     public List<Participation> Participations { get; } = [];
     public List<Competition> Competitions { get; } = [];
-    public EnduranceEvent? EnduranceEvent { get; set; }
+    public UpcomingEvent? EnduranceEvent { get; set; }
 }

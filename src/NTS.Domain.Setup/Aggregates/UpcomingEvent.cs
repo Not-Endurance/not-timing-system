@@ -6,14 +6,14 @@ using NTS.Domain.Extensions;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class EnduranceEvent : AggregateRoot, IParent<Official>, IParent<Competition>, IAggregateRoot
+public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competition>, IAggregateRoot
 {
-    public static EnduranceEvent Create(string? place, Country? country, string? showFeiId)
+    public static UpcomingEvent Create(string? place, Country? country, string? showFeiId)
     {
         return new(place, country, showFeiId);
     }
 
-    public static EnduranceEvent Update(
+    public static UpcomingEvent Update(
         int? id,
         string? place,
         Country? country,
@@ -29,7 +29,7 @@ public class EnduranceEvent : AggregateRoot, IParent<Official>, IParent<Competit
     readonly List<Official> _officials = [];
 
     [JsonConstructor]
-    EnduranceEvent(
+    UpcomingEvent(
         int? id,
         string? place,
         Country? country,
@@ -46,7 +46,7 @@ public class EnduranceEvent : AggregateRoot, IParent<Official>, IParent<Competit
         _officials = officials.ToList();
     }
 
-    EnduranceEvent(string? place, Country? country, string? showFeiId)
+    UpcomingEvent(string? place, Country? country, string? showFeiId)
         : this(GenerateId(), place, country, showFeiId, [], []) { }
 
     public string Place { get; }

@@ -9,12 +9,12 @@ namespace NTS.Judge.Setup.Adapters;
 
 public class HomeBehind : ObservableBehind, IEnduranceEventBehind
 {
-    readonly IRepository<EnduranceEvent> _events;
+    readonly IRepository<UpcomingEvent> _events;
     readonly EnduranceEventCrudeContext _crudeContext;
     readonly ICrudParent<Competition> _competitionParent;
     readonly ICrudParent<Official> _officialParent;
 
-    public HomeBehind(IRepository<EnduranceEvent> events, EnduranceEventCrudeContext crudeContext)
+    public HomeBehind(IRepository<UpcomingEvent> events, EnduranceEventCrudeContext crudeContext)
     {
         _events = events;
         _crudeContext = crudeContext;
@@ -39,7 +39,7 @@ public class HomeBehind : ObservableBehind, IEnduranceEventBehind
 
     public async Task Create(EnduranceEventFormModel model)
     {
-        var enduranceEvent = EnduranceEvent.Create(model.Place, model.Country, model.FeiShowId);
+        var enduranceEvent = UpcomingEvent.Create(model.Place, model.Country, model.FeiShowId);
         await _events.Create(enduranceEvent);
         _crudeContext.SetParent(enduranceEvent);
         Model = new EnduranceEventFormModel();
@@ -49,7 +49,7 @@ public class HomeBehind : ObservableBehind, IEnduranceEventBehind
 
     public async Task Update(EnduranceEventFormModel model)
     {
-        var enduranceEvent = EnduranceEvent.Update(
+        var enduranceEvent = UpcomingEvent.Update(
             model.Id,
             model.Place,
             model.Country,
@@ -62,7 +62,7 @@ public class HomeBehind : ObservableBehind, IEnduranceEventBehind
         EmitChange();
     }
 
-    public Task<EnduranceEvent> Delete(EnduranceEvent enduranceEvent)
+    public Task<UpcomingEvent> Delete(UpcomingEvent upcomingEvent)
     {
         throw new NotImplementedException("Endurance event cannot be deleted");
     }

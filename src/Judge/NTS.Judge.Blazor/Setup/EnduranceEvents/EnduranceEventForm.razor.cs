@@ -16,7 +16,7 @@ public partial class EnduranceEventForm
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(EnduranceEvent.Place), () => _placeField);
-        RegisterInjector(nameof(EnduranceEvent.Country), () => _countryField);
+        RegisterInjector(nameof(UpcomingEvent.Place), () => _placeField);
+        RegisterInjector(nameof(UpcomingEvent.Country), () => _countryField);
     }
 }
