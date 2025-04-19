@@ -23,7 +23,7 @@ public static class Warp
 
         app.Urls.Add($"http://*:{port}");
 
-        app.MapHub<ParticipationRpcHub>(ApplicationConstants.JUDGE_HUB);
+        app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB);
         app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB);
 
         foreach (var initializer in app.Services.GetServices<IStartupInitializer>())

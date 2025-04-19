@@ -1,10 +1,11 @@
 ﻿using NTS.Warp.ACL.Entities;
 using NTS.Warp.ACL.Enums;
+using NTS.Warp.Features.Witness.ProcessSnapshots;
 
 namespace NTS.Warp.ACL.RPC.Procedures;
 
 public interface IEmsParticipantsHubProcedures
 {
-    Task<EmsParticipantsPayload> SendParticipants();
-    Task ReceiveWitnessEvent(IEnumerable<EmsParticipantEntry> entries, EmsWitnessEventType type);
+    Task<EmsParticipantsPayload> SendParticipants(WarpRequest request);
+    Task ReceiveWitnessEvent(WarpRequest<ProcessSnapshotsPayload> request);
 }

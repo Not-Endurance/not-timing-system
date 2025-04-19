@@ -200,59 +200,7 @@ public abstract class RpcClient : IRpcClient
         });
     }
 
-    public async Task<RpcInvokeResult> InvokeInputProcedure<T>(string name, T parameter)
-    {
-        if (!_socket.IsConnected)
-        {
-            await Connect();
-        }
-        try
-        {
-            await _socket.Connection!.InvokeAsync(name, parameter);
-            return RpcInvokeResult.Success;
-        }
-        catch (Exception exception)
-        {
-            _socket.RaiseError(exception, name, parameter);
-            return RpcInvokeResult.Error;
-        }
-    }
-
-    public async Task<RpcInvokeResult> InvokeInputProcedure<T1, T2>(string name, T1 parameter1, T2 parameter2)
-    {
-        if (!_socket.IsConnected)
-        {
-            await Connect();
-        }
-        try
-        {
-            await _socket.Connection!.InvokeAsync(name, parameter1, parameter2);
-            return RpcInvokeResult.Success;
-        }
-        catch (Exception exception)
-        {
-            _socket.RaiseError(exception, name, parameter1, parameter2);
-            return RpcInvokeResult.Error;
-        }
-    }
-
-    public async Task<RpcInvokeResult<T>> InvokeOutputProcedure<T>(string name)
-    {
-        if (!_socket.IsConnected)
-        {
-            await Connect();
-        }
-        try
-        {
-            var result = await _socket.Connection!.InvokeAsync<T>(name);
-            return RpcInvokeResult<T>.Success(result);
-        }
-        catch (Exception exception)
-        {
-            _socket.RaiseError(exception, name);
-            return RpcInvokeResult<T>.Error;
-        }
-    }
+    
 }
 
 public interface IRpcClient : IStartupInitializer, ISingleton

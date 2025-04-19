@@ -2,7 +2,7 @@
 using Not.Logging;
 using Not.Notify;
 
-namespace NTS.Warp.Middleware;
+namespace NTS.Warp.Middlewares;
 
 internal class ExceptionHandlingHubFilter : IHubFilter
 {
@@ -11,7 +11,7 @@ internal class ExceptionHandlingHubFilter : IHubFilter
         Func<HubInvocationContext, ValueTask<object?>> next
     )
     {
-        Console.WriteLine($"Calling hub method '{invocationContext.HubMethodName}'");
+        Console.WriteLine(@$"Calling hub method '{invocationContext.HubMethodName}'");
         try
         {
             return await next(invocationContext);

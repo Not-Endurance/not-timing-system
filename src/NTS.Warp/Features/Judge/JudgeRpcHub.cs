@@ -13,49 +13,50 @@ using NTS.Warp.Features.Witness;
 
 namespace NTS.Warp.Features.Judge;
 
-internal class ParticipationRpcHub : Hub<IJudgeClientProcedures>, IJudgeHubProcedures
+internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 {
     readonly IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> _witnessRelay;
-    readonly JudgeConnectionContext _judgeConnectionContext;
+    readonly PrimaryConnectionsContext _primaryConnections;
 
-    public ParticipationRpcHub(
+    public JudgeRpcHub(
         IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> witnessRelay,
-        JudgeConnectionContext judgeConnectionContext
+        PrimaryConnectionsContext primaryConnections
     )
     {
         _witnessRelay = witnessRelay;
-        _judgeConnectionContext = judgeConnectionContext;
+        _primaryConnections = primaryConnections;
     }
 
-    public override Task OnConnectedAsync()
+    public override async Task OnConnectedAsync()
     {
-        _judgeConnectionContext.Id = Context.ConnectionId;
-        return base.OnConnectedAsync();
+        await base.OnConnectedAsync();
+        var enduranceEventId = Context.GetHttpContext()!.Request.Query[WarpConstants.EVENT_GROUP_ID_KEY].ToString();
+        _primaryConnections.Add(enduranceEventId, Context.ConnectionId);
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _judgeConnectionContext.Id = null;
-        return base.OnDisconnectedAsync(exception);
+        await base.OnDisconnectedAsync(exception);
+        _primaryConnections.Remove(Context.ConnectionId);
     }
 
-    public async Task OnParticipationEliminated(ParticipationEliminated eliminated)
+    public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)
     {
-        var emsParticipation = Convert(eliminated.Participation);
+        var emsParticipation = Convert(request.Payload.Participation);
         var entry = new EmsParticipantEntry(emsParticipation);
         await _witnessRelay.Clients.All.ReceiveEntryUpdate(entry, EmsCollectionAction.Remove);
     }
 
-    public async Task OnParticipationRestored(ParticipationRestored restored)
+    public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
     {
-        var emsParticipation = Convert(restored.Participation);
+        var emsParticipation = Convert(request.Payload.Participation);
         var entry = new EmsParticipantEntry(emsParticipation);
         await _witnessRelay.Clients.All.ReceiveEntryUpdate(entry, EmsCollectionAction.AddOrUpdate);
     }
 
-    public async Task OnPhaseCompleted(PhaseCompleted phaseCompleted)
+    public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
     {
-        var emsParticipation = Convert(phaseCompleted.Participation);
+        var emsParticipation = Convert(request.Payload.Participation);
         var entry = new EmsStartlistEntry(emsParticipation);
         await _witnessRelay.Clients.All.ReceiveEntry(entry, EmsCollectionAction.AddOrUpdate);
     }

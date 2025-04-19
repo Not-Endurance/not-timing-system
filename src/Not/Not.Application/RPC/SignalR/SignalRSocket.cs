@@ -35,7 +35,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     public bool IsConnected => Connection?.State == HubConnectionState.Connected;
 
-    internal void RaiseError(Exception exception, string? procedure, params object?[] arguments)
+    public void RaiseError(Exception exception, string? procedure, params object?[] arguments)
     {
         var message =
             procedure == null
@@ -252,6 +252,7 @@ public interface IRpcSocket : ISingleton
     bool IsConnected { get; }
     Task Connect();
     Task Disconnect();
+    void RaiseError(Exception exception, string? procedure, params object?[] arguments);
 }
 
 public enum RpcConnectionStatus
