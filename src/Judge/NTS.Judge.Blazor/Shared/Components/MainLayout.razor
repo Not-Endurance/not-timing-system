@@ -4,10 +4,7 @@
 
 @inherits LayoutComponentBase
 
-<MudThemeProvider @ref="_themeProvider" />
-<MudDialogProvider CloseOnEscapeKey="true" CloseButton="true" MaxWidth="MaxWidth.Small" FullWidth="true" />
-<MudSnackbarProvider />
-<MudPopoverProvider />
+<NMudProviders @ref="_mudProviders"/>
 
 <MudLayout>
     @if (!_hideLayout)
@@ -32,7 +29,7 @@
     }
 
     <MudMainContent>
-        <CascadingValue Value="@_themeProvider">
+        <CascadingValue Value="@_mudProviders.ThemeProvider">
             <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
                 @Body
             </MudContainer>

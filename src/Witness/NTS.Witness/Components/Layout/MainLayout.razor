@@ -1,9 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider @ref="_themeProvider" />
-<MudDialogProvider CloseOnEscapeKey="true" CloseButton="true" MaxWidth="MaxWidth.Small" FullWidth="true" />
-<MudSnackbarProvider />
-<MudPopoverProvider />
+<NMudProviders/>
 
 <MudLayout>
     <MudAppBar Elevation="1">
@@ -23,7 +20,6 @@
 </MudLayout>
 
 @code{
-    MudThemeProvider _themeProvider = default!;
     bool _drawerOpen = false;
 
     void ToggleDrawer()
