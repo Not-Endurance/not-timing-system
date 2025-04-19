@@ -1,5 +1,6 @@
 using Not.Blazor.Components;
 using Not.Blazor.Components.Mud;
+
 namespace NTS.Judge.Blazor.Shared.Components;
 
 public partial class MainLayout

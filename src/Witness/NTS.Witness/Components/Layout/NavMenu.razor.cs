@@ -2,8 +2,8 @@
 
 namespace NTS.Witness.Components.Layout;
 
-    public partial class NavMenu
-    {
-        [Parameter]
-        public Action AfterNavigationAction { get; set; } = default!;
-    }
+public partial class NavMenu
+{
+    [Parameter]
+    public Action AfterNavigationAction { get; set; } = default!;
+}
