@@ -1,7 +1,9 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
+using Not.Domain;
 using Not.Domain.Base;
+using Not.Exceptions;
 using Not.Safe;
 
 namespace Not.Application.Behinds.Adapters;
@@ -13,7 +15,6 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
     readonly List<ICrudReflection<T>> _reflections;
 
     protected CrudBehind(IRepository<T> repository, IEnumerable<ICrudReflection<T>> reflections)
-        : base()
     {
         _repository = repository;
         _reflections = reflections.ToList();
@@ -24,16 +25,18 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
 
     public IReadOnlyList<T> Items => ObservableList;
 
-    protected void UpdateReflections<TReflection>(
-        Func<T, TReflection?> selector,
-        TReflection reflection,
-        Action<T> update
-    )
-        where TReflection : class
+    protected async Task Update<TUpdate>(Func<T, bool> filter, TUpdate update)
     {
-        foreach (var item in Items.Where(x => selector(x)?.Equals(reflection) ?? false))
+        var matches = Items.Where(filter).ToList();
+        if (matches is not IEnumerable<IReflect<TUpdate>> reflections)
         {
-            update(item);
+            throw GuardHelper.Exception(
+                $"Invalid update '{typeof(TUpdate).Name}'. Type '{typeof(T).Name}' does not implement 'IReflect<TUpdate>'");
+        }
+        foreach (var item in reflections)
+        {
+            item.Reflect(update);
+            await _repository.Update((T)item);
         }
     }
 

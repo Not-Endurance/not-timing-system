@@ -8,7 +8,9 @@ namespace NTS.Judge.Features.Setup.Athletes;
 public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflection<Club>
 {
     public AthleteBehind(IRepository<Athlete> repository, IEnumerable<ICrudReflection<Athlete>> dependants)
-        : base(repository, dependants) { }
+        : base(repository, dependants)
+    {
+    }
 
     protected override Athlete CreateEntity(AthleteFormModel model)
     {
@@ -20,9 +22,8 @@ public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflect
         return Athlete.Update(model.Id, model.Name, model.FeiId, model.Country, model.Club, model.Category);
     }
 
-    public Task Reflect(Club update) // TODO: persist update
+    public async Task Reflect(Club update)
     {
-        UpdateReflections(x => x.Club, update, athlete => athlete.Reflect(update));
-        return Task.CompletedTask;
+        await Update(x => x.Club == update, update);
     }
 }
