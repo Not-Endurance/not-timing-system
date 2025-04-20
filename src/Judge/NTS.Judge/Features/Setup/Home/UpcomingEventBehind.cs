@@ -48,35 +48,35 @@ public class UpcomingEventBehind : CrudBehind<UpcomingEvent, EnduranceEventFormM
         return Task.CompletedTask;
     }
 
-    public async Task Reflect(Loop update)
+    public async Task Reflect(Loop loop)
     {
         foreach (var competitions in ((ICrudeParent<Competition>)_crudeContext).Children)
         {
             foreach (var phase in competitions.Phases)
             {
-                phase.Reflect(update);
+                phase.Reflect(loop);
             }
         }
         await _updater.Update(_eventContext.Event!);
     }
 
-    public async Task Reflect(Combination update)
+    public async Task Reflect(Combination combination)
     {
         foreach (var competitions in ((ICrudeParent<Competition>)_crudeContext).Children)
         {
             foreach (var participation in competitions.Participations)
             {
-                participation.Reflect(update);
+                participation.Reflect(combination);
             }
         }
         await _updater.Update(_eventContext.Event!);
     }
 
-    public async Task Reflect(Athlete update)
+    public async Task Reflect(Athlete athlete)
     {
         foreach (var combination in ((ICrudeParent<Combination>)_crudeContext).Children)
         {
-            combination.Reflect(update);
+            combination.Reflect(athlete);
             foreach (var competition in ((ICrudeParent<Competition>)_crudeContext).Children)
             {
                 foreach (var participation in competition.Participations)
@@ -89,11 +89,11 @@ public class UpcomingEventBehind : CrudBehind<UpcomingEvent, EnduranceEventFormM
         await _updater.Update(_eventContext.Event!);
     }
 
-    public async Task Reflect(Horse update)
+    public async Task Reflect(Horse horse)
     {
         foreach (var combination in ((ICrudeParent<Combination>)_crudeContext).Children)
         {
-            combination.Reflect(update);
+            combination.Reflect(horse);
             foreach (var competition in ((ICrudeParent<Competition>)_crudeContext).Children)
             {
                 foreach (var participation in competition.Participations)
