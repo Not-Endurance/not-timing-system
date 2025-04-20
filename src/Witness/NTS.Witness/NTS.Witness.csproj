@@ -58,6 +58,26 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Remove="Properties\appsettings.Development.json" />
+      <Content Remove="Properties\appsettings.json" />
+      <Content Remove="Properties\appsettings.Staging.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Properties\appsettings.Development.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <DependentUpon>appsettings.json</DependentUpon>
+      </None>
+      <None Include="Properties\appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="Properties\appsettings.Staging.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <DependentUpon>appsettings.json</DependentUpon>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
