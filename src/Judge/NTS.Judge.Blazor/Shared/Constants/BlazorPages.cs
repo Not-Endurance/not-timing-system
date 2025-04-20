@@ -1,8 +1,9 @@
 ﻿namespace NTS.Judge.Blazor.Shared.Constants;
 
-public static class Endpoints
+public static class BlazorPages
 {
-    public const string ENDURANCE_EVENT_PAGE = "/";
+    public const string HOME = "/";
+    public const string ENDURANCE_EVENT_PAGE = "/upcoming-events";
     public const string ATHLETES_HORSES_PAGE = "/athletes-horses";
     public const string COMBINATIONS_PAGE = "/combinations";
     public const string LOOPS_PAGE = "/loops";

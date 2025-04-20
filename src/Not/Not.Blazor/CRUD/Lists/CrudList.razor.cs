@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms;
 using Not.Blazor.CRUD.Forms.Components;
@@ -25,7 +24,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     IEnumerable<ICrudeParentContext> ParentContexts { get; set; } = default!;
 
     [Parameter]
-    public int? ParentId { get; set; }
+    public int? ParentId { get; set; } // TODO: can probably be deleted
 
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;

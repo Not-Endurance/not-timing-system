@@ -56,6 +56,8 @@ namespace NTS.Localization
         public static string Search_by_ID_colon_string => LocalizeString(nameof(Search_by_ID_colon_string));
         public static string Search_by_name_colon_string => LocalizeString(nameof(Search_by_name_colon_string));
         public static string Event_string => LocalizeString(nameof(Event_string));
+        public static string Upcoming_events_string => LocalizeString(nameof(Upcoming_events_string));
+        public static string Select_event_string => LocalizeString(nameof(Select_event_string));
         public static string Stages_string => LocalizeString(nameof(Stages_string));
         public static string Ride_string => LocalizeString(nameof(Ride_string));
         public static string Not_ranked_string => LocalizeString(nameof(Not_ranked_string));

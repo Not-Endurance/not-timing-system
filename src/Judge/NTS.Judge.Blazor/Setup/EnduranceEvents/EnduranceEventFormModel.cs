@@ -1,9 +1,10 @@
-﻿using NTS.Domain.Aggregates;
+﻿using Not.Blazor.CRUD.Forms.Ports;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 
-public class EnduranceEventFormModel
+public class EnduranceEventFormModel : IFormModel<UpcomingEvent>
 {
     public EnduranceEventFormModel()
     {
@@ -13,7 +14,7 @@ public class EnduranceEventFormModel
 #endif
     }
 
-    public int Id { get; private set; }
+    public int? Id { get; set; }
     public string Name { get; set; }
     public string? Place { get; set; }
     public Country? Country { get; set; }

@@ -1,22 +1,16 @@
-using Not.Blazor.CRUD.Forms;
+using Not.Blazor.Navigation;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 
 public partial class EnduranceEventPage
 {
+    EnduranceEventFormModel? _upcomingEvent;
+    
     [Inject]
-    IEnduranceEventBehind Behind { get; set; } = default!;
+    ICrumbsNavigator Navigator { get; set; } = default!;
 
-    [Inject]
-    FormManager<EnduranceEventFormModel, EnduranceEventForm> FormManager { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await Observe(Behind);
-    }
-
-    async Task OpenCreateForm()
-    {
-        await FormManager.Create();
+        _upcomingEvent = Navigator.ConsumeParameter<EnduranceEventFormModel>();
     }
 }
