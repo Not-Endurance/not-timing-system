@@ -27,22 +27,22 @@ public abstract class MongoRepository<T> : IRepository<T>
         return _context.Client.GetDatabase(_db).GetCollection<T>(_collection);
     }
 
-    public async Task Create(T document)
+    public async Task Create(T item)
     {
         try
         {
-            if (document.Id == default)
+            if (item.Id == default)
             {
-                throw new ApplicationException($"Invalid ID '{document.Id}'");
+                throw new ApplicationException($"Invalid ID '{item.Id}'");
             }
-            await GetCollection().InsertOneAsync(document);
+            await GetCollection().InsertOneAsync(item);
         }
         catch (MongoWriteException ex)
         {
             if (ex.WriteError.Code == 11000)
             {
                 throw new ApplicationException(
-                    $"Could not insert. Document with ID '{document.Id}' already exists",
+                    $"Could not insert. Document with ID '{item.Id}' already exists",
                     ex
                 );
             }
@@ -73,10 +73,10 @@ public abstract class MongoRepository<T> : IRepository<T>
         return await GetCollection().Find(filter).ToListAsync();
     }
 
-    public async Task Update(T document)
+    public async Task Update(T items)
     {
-        var updateDefinition = GetUpdateDefinition(document);
-        await GetCollection().UpdateOneAsync(x => x.Id == document.Id, updateDefinition);
+        var updateDefinition = GetUpdateDefinition(items);
+        await GetCollection().UpdateOneAsync(x => x.Id == items.Id, updateDefinition);
     }
 
     public async Task Delete(int id)
@@ -84,9 +84,9 @@ public abstract class MongoRepository<T> : IRepository<T>
         await GetCollection().DeleteOneAsync(x => x.Id == id);
     }
 
-    public Task Delete(T entity)
+    public Task Delete(T item)
     {
-        return Delete(entity.Id);
+        return Delete(item.Id);
     }
 
     public async Task Delete(Expression<Func<T, bool>> filter)
@@ -94,7 +94,7 @@ public abstract class MongoRepository<T> : IRepository<T>
         await GetCollection().DeleteManyAsync(filter);
     }
 
-    public Task Delete(IEnumerable<T> entities)
+    public Task Delete(IEnumerable<T> items)
     {
         throw new NotImplementedException(
             "Batch delete with full entities isn't supported. Probably remove this method"

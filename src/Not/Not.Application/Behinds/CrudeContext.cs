@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Ports;
 using Not.Domain;
 using Not.Domain.Base;
@@ -11,11 +12,11 @@ public abstract class CrudeContext<T> : ICrudeParentContext
     where T : AggregateRoot
 {
     readonly string _tName = typeof(T).Name;
-    readonly ICrudePropagator<T> _crude;
+    readonly IUpdate<T> _parent;
 
-    protected CrudeContext(ICrudePropagator<T> crude)
+    protected CrudeContext(IUpdate<T> parent)
     {
-        _crude = crude;
+        _parent = parent;
     }
     
     public abstract void Set(IParent parent);
@@ -27,7 +28,7 @@ public abstract class CrudeContext<T> : ICrudeParentContext
     {
         var tParent = ValidateParentType(parent);
         parent.Add(child);
-        await _crude.Propagate(tParent);
+        await _parent.Update(tParent);
         Changed.Emit();
     }
 
@@ -37,7 +38,7 @@ public abstract class CrudeContext<T> : ICrudeParentContext
     {
         var tParent = ValidateParentType(parent);
         parent.Update(child);
-        await _crude.Propagate(tParent);
+        await _parent.Update(tParent);
         Changed.Emit();
     }
 
@@ -50,7 +51,7 @@ public abstract class CrudeContext<T> : ICrudeParentContext
         {
             parent.Remove(child);
         }
-        await _crude.Propagate(tParent);
+        await _parent.Update(tParent);
         Changed.Emit();
     }
 

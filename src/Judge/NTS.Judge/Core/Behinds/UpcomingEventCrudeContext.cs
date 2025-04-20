@@ -10,7 +10,7 @@ public class UpcomingEventCrudeContext : CrudeContext<UpcomingEvent>, ICrudePare
 {
     readonly EventContext _eventContext;
 
-    public UpcomingEventCrudeContext(ICrudePropagator<UpcomingEvent> crude, EventContext eventContext) : base(crude)
+    public UpcomingEventCrudeContext(IRepository<UpcomingEvent> parent, EventContext eventContext) : base(parent)
     {
         _eventContext = eventContext;
     }
@@ -29,78 +29,63 @@ public class UpcomingEventCrudeContext : CrudeContext<UpcomingEvent>, ICrudePare
         _eventContext.Event = upcomingEvent;
     }
 
-    public async Task Add(Competition child)
+    public async Task Create(Competition item)
     {
-        await Add(_eventContext.Event, child);
+        await Add(_eventContext.Event, item);
     }
 
-    public async Task Propagate(Competition child)
+    public async Task Update(Competition items)
     {
-        await Update(_eventContext.Event, child);
+        await Update(_eventContext.Event, items);
     }
 
-    public async Task Remove(IEnumerable<Competition> children)
+    public async Task Delete(IEnumerable<Competition> children)
     {
         await Remove(_eventContext.Event, children);
     }
 
-    public async Task Add(Official child)
+    public async Task Create(Official item)
     {
-        await Add(_eventContext.Event, child);
+        await Add(_eventContext.Event, item);
     }
 
-    public async Task Propagate(Official child)
+    public async Task Update(Official items)
     {
-        await Update(_eventContext.Event, child);
+        await Update(_eventContext.Event, items);
     }
 
-    public async Task Remove(IEnumerable<Official> children)
+    public async Task Delete(IEnumerable<Official> children)
     {
         await Remove(_eventContext.Event, children);
     }
     
-    public async Task Add(Loop child)
+    public async Task Create(Loop item)
     {
-        await Add(_eventContext.Event, child);
+        await Add(_eventContext.Event, item);
     }
 
-    public async Task Propagate(Loop child)
+    public async Task Update(Loop items)
     {
-        await Update(_eventContext.Event, child);
+        await Update(_eventContext.Event, items);
     }
 
-    public async Task Remove(IEnumerable<Loop> children)
+    public async Task Delete(IEnumerable<Loop> children)
     {
         await Remove(_eventContext.Event, children);
     }
 
-    public async Task Add(Combination child)
+    public async Task Create(Combination item)
     {
-        await Add(_eventContext.Event, child);
+        await Add(_eventContext.Event, item);
     }
 
-    public async Task Propagate(Combination child)
+    public async Task Update(Combination items)
     {
-        await Update(_eventContext.Event, child);
+        await Update(_eventContext.Event, items);
     }
 
-    public async Task Remove(IEnumerable<Combination> children)
+    public async Task Delete(IEnumerable<Combination> children)
     {
         await Remove(_eventContext.Event, children);
-    }
-}
-
-public class RootUpdater : ICrudePropagator<UpcomingEvent>
-{
-    readonly IUpdate<UpcomingEvent> _updater;
-
-    public RootUpdater(IUpdate<UpcomingEvent> updater)
-    {
-        _updater = updater;
-    }
-    
-    public async Task Propagate(UpcomingEvent aggregate)
-    {
-        await _updater.Update(aggregate);
     }
 }

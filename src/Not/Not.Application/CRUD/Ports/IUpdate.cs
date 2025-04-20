@@ -1,10 +1,9 @@
 ﻿using Not.Domain;
-using Not.Injection;
 
 namespace Not.Application.CRUD.Ports;
 
-public interface IUpdate<in T> : ITransient
+public interface IUpdate<in T>
     where T : IAggregateRoot
 {
-    Task Update(T entity);
+    Task Update(T items);
 }

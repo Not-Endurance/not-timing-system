@@ -24,32 +24,32 @@ public class CompetitionCrudeContext : CrudeContext<Competition>, ICrudeParent<P
         _competition = competition;
     }
 
-    public async Task Add(Phase child)
+    public async Task Create(Phase item)
     {
-        await Add(_competition, child);
+        await Add(_competition, item);
     }
 
-    public async Task Propagate(Phase child)
+    public async Task Update(Phase items)
     {
-        await Update(_competition, child);
+        await Update(_competition, items);
     }
 
-    public async Task Remove(params IEnumerable<Phase> children)
+    public async Task Delete(params IEnumerable<Phase> children)
     {
         await Remove(_competition, children);
     }
 
-    public async Task Add(Participation child)
+    public async Task Create(Participation item)
     {
-        await Add(_competition, child);
+        await Add(_competition, item);
     }
 
-    public async Task Propagate(Participation child)
+    public async Task Update(Participation items)
     {
-        await Update(_competition, child);
+        await Update(_competition, items);
     }
 
-    public async Task Remove(IEnumerable<Participation> children)
+    public async Task Delete(IEnumerable<Participation> children)
     {
         await Remove(_competition, children);
     }

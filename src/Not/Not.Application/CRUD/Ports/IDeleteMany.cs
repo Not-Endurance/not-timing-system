@@ -2,8 +2,8 @@
 
 namespace Not.Application.CRUD.Ports;
 
-internal interface ISafeDelete<T>
+public interface IDeleteMany<in T>
     where T : IAggregateRoot
 {
-    Task SafeDelete(int id);
+    Task Delete(params IEnumerable<T> items);
 }

@@ -18,9 +18,9 @@ public abstract class CrudeRepository<T> : IRepository<T>
     
     protected abstract IReadOnlyList<T> Aggregates { get; }
     
-    public async Task Create(T entity)
+    public async Task Create(T item)
     {
-        await _parentContext.Add(entity);
+        await _parentContext.Create(item);
     }
 
     public Task<T?> Read(Expression<Func<T, bool>> filter)
@@ -49,32 +49,32 @@ public abstract class CrudeRepository<T> : IRepository<T>
         return Task.FromResult(result);
     }
 
-    public async Task Update(T entity)
+    public async Task Update(T items)
     {
-        await _parentContext.Propagate(entity);
+        await _parentContext.Update(items);
     }
 
     public async Task Delete(int id)
     {
         var official =  Aggregates.FirstOrDefault(x => x.Id == id) ?? throw GuardHelper.Exception($"{typeof(T).Name} with '{id}' not found");
-        await _parentContext.Remove(official);
+        await _parentContext.Delete(official);
     }
 
-    public async Task Delete(T entity)
+    public async Task Delete(T item)
     {
-        await _parentContext.Remove(entity);
+        await _parentContext.Delete(item);
     }
 
     public async Task Delete(Expression<Func<T, bool>> filter)
     {
         var predicate = filter.Compile();
         var official =  Aggregates.FirstOrDefault(predicate) ?? throw GuardHelper.Exception($"{typeof(T).Name} Official not found");
-        await _parentContext.Remove(official);
+        await _parentContext.Delete(official);
     }
 
-    public async Task Delete(IEnumerable<T> entities)
+    public async Task Delete(IEnumerable<T> items)
     {
-        await _parentContext.Remove(entities);
+        await _parentContext.Delete(items);
     }
 }
 

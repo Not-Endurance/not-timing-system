@@ -35,20 +35,20 @@ public abstract class CrudChildBehind<T, TModel> : ObservableBehind, IListBehind
 
     protected async Task SafeDelete(T entity)
     {
-        await _crudeContext.Remove(entity);
+        await _crudeContext.Delete(entity);
     }
 
     public async Task Update(TModel model)
     {
         var entity = UpdateEntity(model);
-        await _crudeContext.Propagate(entity);
+        await _crudeContext.Update(entity);
         _reflections.ForEach(x => x.Reflect(entity));
     }
 
     public async Task Create(TModel model)
     {
         var entity = CreateEntity(model);
-        await _crudeContext.Add(entity);
+        await _crudeContext.Create(entity);
     }
     
     public async Task Delete(T entity)
