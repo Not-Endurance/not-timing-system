@@ -7,6 +7,7 @@ using NTS.Judge.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.Home;
 
+// TODO: Try to decouple Home logic in separate behind and inherit CrudBehind here
 public class UpcomingEventBehind : ObservableBehind, IEnduranceEventBehind, ICrudReflection<Loop>, ICrudReflection<Combination>, ICrudReflection<Athlete>, ICrudReflection<Horse>
 {
     readonly IRepository<UpcomingEvent> _events;
@@ -39,7 +40,7 @@ public class UpcomingEventBehind : ObservableBehind, IEnduranceEventBehind, ICru
 
     public async Task Create(EnduranceEventFormModel model)
     {
-        var enduranceEvent = UpcomingEvent.Create(model.Place, model.Country, model.FeiShowId);
+        var enduranceEvent = UpcomingEvent.Create(model.Name, model.Place, model.Country, model.FeiShowId);
         await _events.Create(enduranceEvent);
         _crudeContext.Set(enduranceEvent);
         Model = new EnduranceEventFormModel();
@@ -51,6 +52,7 @@ public class UpcomingEventBehind : ObservableBehind, IEnduranceEventBehind, ICru
     {
         var enduranceEvent = UpcomingEvent.Update(
             model.Id,
+            model.Name,
             model.Place,
             model.Country,
             model.FeiShowId,

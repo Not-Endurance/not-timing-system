@@ -1,17 +1,11 @@
-using Not.Storage.Repositories;
-using Not.Storage.Stores;
+using Not.Application.HTTP;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Storage.Setup;
 
 namespace NTS.Judge.Features.Setup.Home;
 
-public class EnduranceEventHttpRepository : RootRepository<UpcomingEvent, SetupState>
+public class EnduranceEventHttpRepository : HttpRepository<UpcomingEvent>
 {
-    readonly IEventContext _context;
-
-    public EnduranceEventHttpRepository(IStore<SetupState> store, IEventContext context)
-        : base(store)
+    public EnduranceEventHttpRepository(NHttpClient httpClient) : base("upcoming-event", httpClient)
     {
-        _context = context;
     }
 }

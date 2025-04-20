@@ -32,6 +32,7 @@ public class StorageTests : JudgeIntegrationTest
         {
             EnduranceEvent = UpcomingEvent.Update(
                 enduranceEvent.Id,
+                enduranceEvent.Name,
                 enduranceEvent.Place,
                 enduranceEvent.Country,
                 enduranceEvent.FeiShowId,

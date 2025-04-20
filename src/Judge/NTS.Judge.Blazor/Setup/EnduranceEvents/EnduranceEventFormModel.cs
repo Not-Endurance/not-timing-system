@@ -8,11 +8,13 @@ public class EnduranceEventFormModel
     public EnduranceEventFormModel()
     {
 #if DEBUG
+        Name = "Test";
         Place = "Каспичан";
 #endif
     }
 
     public int Id { get; private set; }
+    public string Name { get; set; }
     public string? Place { get; set; }
     public Country? Country { get; set; }
     public string? FeiShowId { get; set; }
@@ -22,6 +24,7 @@ public class EnduranceEventFormModel
     public void FromEntity(UpcomingEvent upcomingEvent)
     {
         Id = upcomingEvent.Id;
+        Name = upcomingEvent.Name;
         Place = upcomingEvent.Place;
         Country = upcomingEvent.Country;
         FeiShowId = upcomingEvent.ShowFeiId;

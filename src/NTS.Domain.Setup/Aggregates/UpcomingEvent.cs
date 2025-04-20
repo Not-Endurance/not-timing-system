@@ -8,13 +8,14 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competition>, IParent<Loop>, IParent<Combination>
 {
-    public static UpcomingEvent Create(string? place, Country? country, string? showFeiId)
+    public static UpcomingEvent Create(string? name, string? place, Country? country, string? showFeiId)
     {
-        return new(place, country, showFeiId);
+        return new(name, place, country, showFeiId);
     }
 
     public static UpcomingEvent Update(
         int? id,
+        string? name,
         string? place,
         Country? country,
         string? showFeiId,
@@ -23,7 +24,7 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         IEnumerable<Loop> loops,
         IEnumerable<Combination> combinations)
     {
-        return new(id, place, country, showFeiId, competitions, officials, loops, combinations);
+        return new(id, name, place, country, showFeiId, competitions, officials, loops, combinations);
     }
 
     readonly List<Competition> _competitions = [];
@@ -34,6 +35,7 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
     [JsonConstructor]
     UpcomingEvent(
         int? id,
+        string? name,
         string? place,
         Country? country,
         string? showFeiId,
@@ -43,6 +45,7 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         IEnumerable<Combination> combinations)
         : base(id!.Value)
     {
+        Name = Required(nameof(Name), name);
         Place = Capitalized(nameof(Place), place);
         Country = Required(nameof(Country), country);
         ShowFeiId = showFeiId;
@@ -52,9 +55,10 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         _combinations = combinations.ToList();
     }
 
-    UpcomingEvent(string? place, Country? country, string? showFeiId)
-        : this(GenerateId(), place, country, showFeiId, [], [], [], []) { }
+    UpcomingEvent(string? name, string? place, Country? country, string? showFeiId)
+        : this(GenerateId(), name, place, country, showFeiId, [], [], [], []) { }
 
+    public string Name { get; }
     public string Place { get; }
     public Country Country { get; }
     public string? ShowFeiId { get; }
@@ -98,7 +102,7 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
 
     public override string ToString()
     {
-        return Combine(Place, Country);
+        return Combine(Name, Place, Country);
     }
 
     public void Add(Loop child)

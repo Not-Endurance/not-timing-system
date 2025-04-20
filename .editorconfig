@@ -273,3 +273,9 @@ dotnet_diagnostic.CA1310.severity = warning
 dotnet_diagnostic.CA1310.severity = warning
 # CA1865: Use char overload
 dotnet_diagnostic.CA1865.severity = warning
+
+############## Disable custom rules >>>>>>>>>>>>>>
+
+dotnet_diagnostic.NA0006.severity = none
+
+#<<<<<<<<<<<<<< Disable custom rules ##############

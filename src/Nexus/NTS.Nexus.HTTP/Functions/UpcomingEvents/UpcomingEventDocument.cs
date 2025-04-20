@@ -1,0 +1,192 @@
+using Not.Random;
+using NTS.Domain.Enums;
+using NTS.Domain.Setup.Aggregates;
+using NTS.Storage.Documents;
+using NTS.Storage.Documents.Athletes;
+using NTS.Storage.Documents.Countries;
+using NTS.Storage.Documents.Horses;
+using NTS.Storage.Documents.Officials;
+
+namespace NTS.Nexus.HTTP.Functions.UpcomingEvents;
+
+public class UpcomingEventDocument : Document
+{
+    public static UpcomingEventDocument Create(UpcomingEvent evt)
+    {
+        return new UpcomingEventDocument
+        {
+            Id = evt.Id,
+            Name = evt.Name,
+            Place = evt.Place,
+            Country = CountryDocument.Create(evt.Country),
+            ShowFeiId = evt.ShowFeiId,
+            Competitions = evt.Competitions.Select(CompetitionModel.Create).ToArray(),
+            Officials = evt.Officials.Select(OfficialDocument.Create).ToArray(),
+            Loops = evt.Loops.Select(LoopModel.Create).ToArray(),
+            Combinations = evt.Combinations.Select(CombinationModel.Create).ToArray(),
+        };
+    }
+
+    public string Place { get; init; } = default!;
+    public CountryDocument Country { get; init; } = default!;
+    public string? ShowFeiId { get; init; }
+    public CompetitionModel[] Competitions { get; init; } = default!;
+    public OfficialDocument[] Officials { get; init; } = default!;
+    public LoopModel[] Loops { get; init; } = default!;
+    public CombinationModel[] Combinations { get; init; } = default!;
+    public string Name { get; init; } = default!;
+
+    public UpcomingEvent ToDomain()
+    {
+        return UpcomingEvent.Update(
+            Id,
+            Name,
+            Place,
+            Country.ToDomain(),
+            ShowFeiId,
+            Competitions.Select(x => x.ToSetupDomain()),
+            Officials.Select(x => x.ToSetupDomain()),
+            Loops.Select(x => x.ToSetupDomain()),
+            Combinations.Select(x => x.ToSetupDomain())
+        );
+    }
+
+    public class CompetitionModel
+    {
+        public static CompetitionModel Create(Competition competition)
+        {
+            return new CompetitionModel
+            {
+                Name = competition.Name,
+                Type = competition.Type,
+                Ruleset = competition.Ruleset,
+                Start = competition.Start,
+                CompulsoryThreshold = competition.CompulsoryThresholdSpan,
+                FeiRule = competition.FeiRule,
+                FeiEventCode = competition.FeiEventCode,
+                FeiScheduleNumber = competition.FeiScheduleNumber,
+                FeiCategoryEventNumber = competition.FeiCategoryEventNumber,
+                Phases = competition.Phases.Select(PhaseModel.Create).ToArray(),
+                Participations = competition.Participations.Select(ParticipationModel.Create).ToArray(),
+            };
+        }
+
+        public string Name { get; init; } = default!;
+        public CompetitionType Type { get; init; }
+        public CompetitionRuleset Ruleset { get; init; }
+        public DateTimeOffset Start { get; init; }
+        public TimeSpan? CompulsoryThreshold { get; init; }
+        public string? FeiRule { get; init; }
+        public string? FeiEventCode { get; init; }
+        public string? FeiScheduleNumber { get; init; }
+        public string? FeiCategoryEventNumber { get; init; }
+        public PhaseModel[] Phases { get; init; } = default!;
+        public ParticipationModel[] Participations { get; init; } = default!;
+
+        public Competition ToSetupDomain()
+        {
+            return new Competition(
+                RandomHelper.GenerateUniqueInteger(),
+                Name,
+                Type,
+                Ruleset,
+                Start,
+                CompulsoryThreshold,
+                FeiRule,
+                FeiEventCode,
+                FeiScheduleNumber,
+                FeiCategoryEventNumber,
+                Phases.Select(x => x.ToSetupDomain()),
+                Participations.Select(x => x.ToSetupDomain())
+            );
+        }
+    }
+
+    public class PhaseModel
+    {
+        public static PhaseModel Create(Phase phase)
+        {
+            return new PhaseModel
+            {
+                Loop = LoopModel.Create(phase.Loop!),
+                Recovery = phase.Recovery,
+                Rest = phase.Rest,
+            };
+        }
+
+        public LoopModel Loop { get; init; } = default!;
+        public int Recovery { get; init; }
+        public int? Rest { get; init; }
+
+        public Phase ToSetupDomain()
+        {
+            return Phase.Create(Loop.ToSetupDomain(), Recovery, Rest);
+        }
+    }
+
+    public class ParticipationModel
+    {
+        public static ParticipationModel Create(Participation participation)
+        {
+            return new ParticipationModel
+            {
+                StartTimeOverride = participation.StartTimeOverride,
+                IsNotRanked = participation.IsNotRanked,
+                Combination = CombinationModel.Create(participation.Combination),
+                MaxSpeedOverride = participation.MaxSpeedOverride,
+            };
+        }
+
+        public DateTimeOffset? StartTimeOverride { get; init; }
+        public bool IsNotRanked { get; init; }
+        public CombinationModel Combination { get; init; } = default!;
+        public double? MaxSpeedOverride { get; init; }
+
+        public Participation ToSetupDomain()
+        {
+            return Participation.Create(
+                StartTimeOverride,
+                IsNotRanked, // TODO: investigate not persisted as true
+                Combination.ToSetupDomain(),
+                MaxSpeedOverride
+            );
+        }
+    }
+
+    public class LoopModel
+    {
+        public static LoopModel Create(Loop loop)
+        {
+            return new() { Distance = loop.Distance };
+        }
+
+        public double Distance { get; init; }
+
+        public Loop ToSetupDomain()
+        {
+            return Loop.Create(Distance);
+        }
+    }
+
+    public class CombinationModel
+    {
+        public static CombinationModel Create(Combination combination)
+        {
+            return new CombinationModel
+            {
+                Number = combination.Number,
+                Athlete = AthleteDocument.Create(combination.Athlete),
+                Horse = HorseDocument.Create(combination.Horse),
+            };
+        }
+
+        public int Number { get; init; }
+        public AthleteDocument Athlete { get; init; } = default!;
+        public HorseDocument Horse { get; init; } = default!;
+
+        public Combination ToSetupDomain()
+        {
+            return Combination.Create(Number, Athlete.ToSetupDomain(), Horse.ToSetupDomain(), null);
+        }
+    }
+}
