@@ -1,6 +1,7 @@
 ﻿using Not.Application.Behinds;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Application.RPC.SignalR;
 using Not.Notify;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents;
@@ -41,7 +42,7 @@ public class UpcomingEventBehind : CrudBehind<UpcomingEvent, EnduranceEventFormM
             ((ICrudeParent<Combination>)_crudeContext).Children
         );
     }
-
+    
     protected override Task SafeDelete(UpcomingEvent entity)
     {
         NotifyHelper.Inform("Upcoming events cannot be deleted");

@@ -18,9 +18,11 @@ internal class WitnessRpcHub
     readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;
 
     public WitnessRpcHub(
+        ILogger<WitnessRpcHub> logger,
         IPrimaryConnectionContext primaryConnections,
         IHubContext<JudgeRpcHub, IJudgeClientProcedures> judgeRelay
     )
+        : base(logger)
     {
         _primaryConnections = primaryConnections;
         _judgeRelay = judgeRelay;
@@ -29,7 +31,7 @@ internal class WitnessRpcHub
     public override async Task OnConnectedAsync()
     {
         await base.OnConnectedAsync();
-        var enduranceEventId = Context.GetHttpContext()!.Request.Query[WarpConstants.EVENT_GROUP_ID_KEY].ToString();
+        var enduranceEventId = GetConnectionGroup()!;
         if (!TryGetJudgeClient(enduranceEventId, out var judgeClient))
         {
             return;
@@ -40,7 +42,7 @@ internal class WitnessRpcHub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         await base.OnDisconnectedAsync(exception);
-        var enduranceEventId = Context.GetHttpContext()!.Request.Query[WarpConstants.EVENT_GROUP_ID_KEY].ToString();
+        var enduranceEventId = GetConnectionGroup()!;
         if (!TryGetJudgeClient(enduranceEventId, out var judgeClient))
         {
             return;

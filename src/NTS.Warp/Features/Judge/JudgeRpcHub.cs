@@ -19,9 +19,11 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
     readonly PrimaryConnectionsContext _primaryConnections;
 
     public JudgeRpcHub(
+        ILogger<JudgeRpcHub> logger,
         IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> witnessRelay,
         PrimaryConnectionsContext primaryConnections
     )
+        : base(logger)
     {
         _witnessRelay = witnessRelay;
         _primaryConnections = primaryConnections;
@@ -30,7 +32,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
     public override async Task OnConnectedAsync()
     {
         await base.OnConnectedAsync();
-        var enduranceEventId = Context.GetHttpContext()!.Request.Query[WarpConstants.EVENT_GROUP_ID_KEY].ToString();
+        var enduranceEventId = GetConnectionGroup()!;
         _primaryConnections.Add(enduranceEventId, Context.ConnectionId);
     }
 

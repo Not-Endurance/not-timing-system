@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Not.Injection;
@@ -11,14 +12,16 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 {
     const int AUTOMATIC_RECONNECT_ATTEMPTS = 3;
 
+    readonly IRpcMetadata? _metadata;
     readonly RpcSettings _context;
     readonly string _name;
     System.Timers.Timer? _reconnectionTimer;
     int _connectionClosedReconnectAttempts;
     CancellationTokenSource? _reconnectTokenSource;
 
-    public SignalRSocket(IOptions<RpcSettings> options)
+    public SignalRSocket(IOptions<RpcSettings> options, IRpcMetadata? metadata = null)
     {
+        _metadata = metadata;
         _context = options.Value;
         _name = GetType().Name;
     }
@@ -58,7 +61,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         {
             return;
         }
-        _reconnectTokenSource!.Cancel();
+        await _reconnectTokenSource!.CancelAsync();
         await Connection.StopAsync();
         RaiseDisconnected();
     }
@@ -114,9 +117,21 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     void ConfigureConnection()
     {
+        var url = _context.Url;
+        if (_metadata != null)
+        {
+            var query = new Dictionary<string, string?>();
+            if (_metadata.ConnectionGroupKey != null)
+            {
+                query.Add(RpcConstants.CONNECTION_GROUP_KEY, _metadata.ConnectionGroupKey);
+            }
+
+            url = QueryHelpers.AddQueryString(url, query);
+        }
+        
         Connection = new HubConnectionBuilder()
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = new NJsonSettings())
-            .WithUrl(_context.Url)
+            .WithUrl(url)
             .Build();
         Connection.Reconnected += HandleReconnected;
         Connection.Reconnecting += HandleReconnecting;
