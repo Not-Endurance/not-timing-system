@@ -11,6 +11,7 @@ public class SettingDocument : Document
     {
         return new SettingDocument
         {
+            Id = setting.Id,
             Country = CountryDocument.Create(setting.Country),
             DetectionMode = setting.DetectionMode,
             AccountId = setting.AccountId.ToString(),
@@ -19,7 +20,7 @@ public class SettingDocument : Document
 
     public string AccountId { get; set; } = default!;
     public CountryDocument Country { get; set; } = default!;
-    public DetectionMode DetectionMode { get; set; }
+    public DetectionMode? DetectionMode { get; set; }
 
     public Setting ToDomain()
     {
