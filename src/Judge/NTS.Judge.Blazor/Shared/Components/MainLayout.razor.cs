@@ -5,7 +5,7 @@ namespace NTS.Judge.Blazor.Shared.Components;
 
 public partial class MainLayout
 {
-    NMudProviders _mudProviders = default!;
+    NTheme _mudTheme = default!;
     bool _hideLayout;
     bool _drawerOpen = true;
 

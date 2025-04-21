@@ -2,7 +2,7 @@
 
 namespace Not.Blazor.Components.Mud;
 
-public partial class NMudProviders
+public partial class NTheme
 {
     MudThemeProvider _themeProvider = default!;
 

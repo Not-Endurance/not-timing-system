@@ -4,7 +4,7 @@
 
 @inherits LayoutComponentBase
 
-<NMudProviders @ref="_mudProviders"/>
+<NTheme @ref="_mudTheme"/>
 
 <MudLayout>
     @if (!_hideLayout)
@@ -29,7 +29,7 @@
     }
 
     <MudMainContent>
-        <CascadingValue Value="@_mudProviders.ThemeProvider">
+        <CascadingValue Value="@_mudTheme.ThemeProvider">
             <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
                 @Body
             </MudContainer>
