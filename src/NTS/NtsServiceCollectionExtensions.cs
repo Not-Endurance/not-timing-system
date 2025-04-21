@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Not.Application.RPC;
+using Not.Blazor.Injection;
 using Not.Localization;
 using NTS.Localization.Resources;
 
@@ -10,5 +12,15 @@ public static class NtsServiceCollectionExtensions
     public static IServiceCollection ConfigureNts(this IServiceCollection services, IConfiguration configuration)
     {
         return services.AddNLocalization<LocalizedStrings>(configuration);
+    }
+
+    public static IServiceCollection ConfigureNtsBlazor(
+       this IServiceCollection services,
+       IConfiguration configuration
+   )
+    {
+        services.ConfigureNts(configuration).AddNotBlazor(configuration).AddRpcSocket(configuration);
+
+        return services;
     }
 }
