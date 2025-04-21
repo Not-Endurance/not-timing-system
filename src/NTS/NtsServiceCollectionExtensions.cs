@@ -14,10 +14,7 @@ public static class NtsServiceCollectionExtensions
         return services.AddNLocalization<LocalizedStrings>(configuration);
     }
 
-    public static IServiceCollection ConfigureNtsBlazor(
-       this IServiceCollection services,
-       IConfiguration configuration
-   )
+    public static IServiceCollection ConfigureNtsBlazor(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureNts(configuration).AddNotBlazor(configuration).AddRpcSocket(configuration);
 
