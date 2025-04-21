@@ -1,6 +1,6 @@
 using Not.Blazor.Navigation;
 using NTS.Judge.Blazor.Setup.Settings;
-using static NTS.Judge.Blazor.Shared.Constants.Endpoints;
+using static NTS.Judge.Blazor.Shared.Constants.BlazorPages;
 
 namespace NTS.Judge.Blazor.Shared.Components.Nav;
 
@@ -14,7 +14,7 @@ public partial class NavMenu
 
     protected override void OnInitialized()
     {
-        LandNavigator.Initialize(ENDURANCE_EVENT_PAGE);
+        LandNavigator.Initialize(HOME);
     }
 
     protected override async Task OnInitializedAsync()

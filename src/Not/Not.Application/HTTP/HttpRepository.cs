@@ -42,11 +42,11 @@ public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         }
     }
 
-    public async Task Create(T entity)
+    public async Task Create(T item)
     {
         try
         {
-            await Client.Post(_endpoint, entity);
+            await Client.Post(_endpoint, item);
         }
         catch (Exception ex)
         {
@@ -67,9 +67,9 @@ public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         }
     }
 
-    public async Task Delete(T entity)
+    public async Task Delete(T item)
     {
-        await Delete(entity.Id);
+        await Delete(item.Id);
     }
 
     public Task Delete(Expression<Func<T, bool>> filter)
@@ -77,7 +77,7 @@ public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         throw new NotImplementedException();
     }
 
-    public Task Delete(IEnumerable<T> entities)
+    public Task Delete(IEnumerable<T> items)
     {
         throw new NotImplementedException();
     }
@@ -132,11 +132,11 @@ public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
         }
     }
 
-    public async Task Update(T entity)
+    public async Task Update(T items)
     {
         try
         {
-            await Client.Patch(_endpoint, entity);
+            await Client.Patch(_endpoint, items);
         }
         catch (Exception ex)
         {

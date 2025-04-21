@@ -65,8 +65,34 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
     readonly List<Phase> _phases = [];
     readonly List<Participation> _participations = [];
 
-    [JsonConstructor]
     Competition(
+        string? name,
+        CompetitionType? type,
+        CompetitionRuleset ruleset,
+        DateTimeOffset start,
+        int? compulsoryThresholdMinutes,
+        string? feiRule,
+        string? feiEventCode,
+        string? feiScheduleNumber,
+        string? feiCategoryEventNumber
+    )
+        : this(
+            GenerateId(),
+            name,
+            type,
+            ruleset,
+            IsFutureTime(nameof(Start), start),
+            ToTimeSpan(compulsoryThresholdMinutes),
+            feiRule,
+            feiEventCode,
+            feiScheduleNumber,
+            feiCategoryEventNumber,
+            [],
+            []
+        ) { }
+
+    [JsonConstructor]
+    public Competition(
         int? id,
         string? name,
         CompetitionType? type,
@@ -94,32 +120,6 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         FeiScheduleNumber = feiScheduleNumber;
         FeiCategoryEventNumber = feiCategoryEventNumber;
     }
-
-    Competition(
-        string? name,
-        CompetitionType? type,
-        CompetitionRuleset ruleset,
-        DateTimeOffset start,
-        int? compulsoryThresholdMinutes,
-        string? feiRule,
-        string? feiEventCode,
-        string? feiScheduleNumber,
-        string? feiCategoryEventNumber
-    )
-        : this(
-            GenerateId(),
-            name,
-            type,
-            ruleset,
-            IsFutureTime(nameof(Start), start),
-            ToTimeSpan(compulsoryThresholdMinutes),
-            feiRule,
-            feiEventCode,
-            feiScheduleNumber,
-            feiCategoryEventNumber,
-            [],
-            []
-        ) { }
 
     public string Name { get; }
     public CompetitionType Type { get; }

@@ -15,7 +15,7 @@ public class CompetitionFactory
         {
             Id = participation.Id,
             Name = participation.CompetitionName,
-            Type = MapEmsCompetitionType(participation.Ruleset!.Value),
+            Type = MapEmsCompetitionType(participation.Ruleset),
         };
         var competition = new EmsCompetition(state);
         foreach (var lap in laps)
@@ -25,11 +25,11 @@ public class CompetitionFactory
         return competition;
     }
 
-    public static EmsCompetitionType MapEmsCompetitionType(CompetitionRuleset ruleset)
+    public static EmsCompetitionType MapEmsCompetitionType(CompetitionRuleset? ruleset)
     {
         return ruleset switch
         {
-            CompetitionRuleset.Regional => EmsCompetitionType.National,
+            null or CompetitionRuleset.Regional => EmsCompetitionType.National,
             CompetitionRuleset.FEI => EmsCompetitionType.International,
             _ => throw new NotImplementedException(),
         };

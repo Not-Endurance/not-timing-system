@@ -17,17 +17,17 @@ public class ConnectionsRpcClient : RpcClient, IConnectionsClientProcedures
 
     public override void RunAtStartup()
     {
-        RegisterInputProcedure<string>(nameof(ReceiveRemoteConnectionId), ReceiveRemoteConnectionId);
-        RegisterInputProcedure<string>(nameof(ReceiveRemoteDisconnectId), ReceiveRemoteDisconnectId);
+        RegisterInputProcedure<string>(nameof(OnWitnessConnected), OnWitnessConnected);
+        RegisterInputProcedure<string>(nameof(OnWitnessDisconnedted), OnWitnessDisconnedted);
     }
 
-    public Task ReceiveRemoteConnectionId(string connectionId)
+    public Task OnWitnessConnected(string connectionId)
     {
         _connectionsRegistry.Add(connectionId);
         return Task.CompletedTask;
     }
 
-    public Task ReceiveRemoteDisconnectId(string connectionId)
+    public Task OnWitnessDisconnedted(string connectionId)
     {
         _connectionsRegistry.Remove(connectionId);
         return Task.CompletedTask;

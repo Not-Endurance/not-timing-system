@@ -3,7 +3,7 @@ using Not.Injection;
 using Not.Localization;
 using Not.Serialization.JSON;
 using NTS.Storage;
-using NTS.Warp.Middleware;
+using NTS.Warp.Middlewares;
 
 namespace NTS.Warp;
 

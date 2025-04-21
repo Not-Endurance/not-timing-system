@@ -5,7 +5,7 @@ namespace NTS.Judge.Core.Start.Factories;
 
 public static class EnduranceEventFactory
 {
-    public static EnduranceEvent Create(Domain.Setup.Aggregates.EnduranceEvent setupEvent)
+    public static EnduranceEvent Create(Domain.Setup.Aggregates.UpcomingEvent setupEvent)
     {
         if (!setupEvent.Competitions.Any())
         {

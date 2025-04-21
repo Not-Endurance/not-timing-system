@@ -1,9 +1,9 @@
 ﻿using NTS.Domain.Core.Aggregates;
 using NTS.Warp.ACL.Entities.LapRecords;
 using NTS.Warp.ACL.Entities.Participants;
+using NTS.Warp.ACL.Entities.Participations;
 using NTS.Warp.ACL.Models;
 using NTS.Warp.Features.Judge.Models;
-using EmsParticipation = NTS.Warp.ACL.Entities.Participations.EmsParticipation;
 
 namespace NTS.Warp.ACL.Factories;
 

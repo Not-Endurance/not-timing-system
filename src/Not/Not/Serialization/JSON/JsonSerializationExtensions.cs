@@ -5,10 +5,11 @@ namespace Not.Serialization.JSON;
 public static class JsonSerializationExtensions
 {
     static readonly JsonSerializerSettings SETTINGS = new NJsonSettings();
+    static readonly object LOCK = new();
 
     public static string ToJson(this object obj)
     {
-        lock (_lock)
+        lock (LOCK)
         {
             var result = JsonConvert.SerializeObject(obj, SETTINGS);
             return result;
@@ -18,7 +19,7 @@ public static class JsonSerializationExtensions
     public static T FromJson<T>(this string json)
         where T : class
     {
-        lock (_lock) // TODO: investigate serialization locking as a whole (reference serializer locks as well)
+        lock (LOCK) // TODO: investigate serialization locking as a whole (reference serializer locks as well)
         {
             var result = JsonConvert.DeserializeObject<T>(json, SETTINGS);
             if (result == default)
@@ -28,8 +29,6 @@ public static class JsonSerializationExtensions
             return result;
         }
     }
-
-    static object _lock = new();
 }
 
 public abstract class JsonConverterBase : JsonConverter

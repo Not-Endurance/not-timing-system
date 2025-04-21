@@ -41,7 +41,11 @@ public class NHttpClient
         where T : class
     {
         var contents = await Get(endpoint);
-        return contents?.FromJson<T>();
+        if (string.IsNullOrWhiteSpace(contents))
+        {
+            return null;
+        }
+        return contents.FromJson<T>();
     }
 
     public async Task<string> Delete(string endpoint)
