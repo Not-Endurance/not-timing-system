@@ -5,26 +5,27 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
 using NTS.Judge.Core.Start.Factories;
+using NTS.Judge.Features;
 
 namespace NTS.Judge.Core.Start;
 
 public class CoreStarter : ICoreStarter
 {
-    readonly IRepository<Domain.Setup.Aggregates.UpcomingEvent> _setupRepository;
+    readonly IEventContext _eventContext;
     readonly IRepository<EnduranceEvent> _coreEventRepository;
     readonly IRepository<Official> _coreOfficialRepository;
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<Ranking> _rankingRepository;
 
     public CoreStarter(
-        IRepository<Domain.Setup.Aggregates.UpcomingEvent> setupRepository,
+        IEventContext eventContext,
         IRepository<EnduranceEvent> coreEventRepository,
         IRepository<Official> coreOfficialRepository,
         IRepository<Participation> participationRepository,
         IRepository<Ranking> rankingRepository
     )
     {
-        _setupRepository = setupRepository;
+        _eventContext = eventContext;
         _coreEventRepository = coreEventRepository;
         _coreOfficialRepository = coreOfficialRepository;
         _participationRepository = participationRepository;
@@ -33,7 +34,7 @@ public class CoreStarter : ICoreStarter
 
     public async Task<bool> Start()
     {
-        var setupEvent = await _setupRepository.Read(0);
+        var setupEvent = _eventContext.Event;
         if (setupEvent == null)
         {
             // TODO: Create ValidationException containing localization logic and inherit form it in DomainException. Use that here instead
