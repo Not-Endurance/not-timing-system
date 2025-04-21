@@ -15,7 +15,7 @@ public class EnduranceEventFormModel : IFormModel<UpcomingEvent>
     }
 
     public int? Id { get; set; }
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public string? Place { get; set; }
     public Country? Country { get; set; }
     public string? FeiShowId { get; set; }

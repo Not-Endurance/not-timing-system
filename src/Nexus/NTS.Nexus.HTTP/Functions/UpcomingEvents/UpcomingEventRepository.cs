@@ -12,8 +12,9 @@ public class UpcomingEventRepository : MongoRepository<UpcomingEventDocument>, I
 
     protected override UpdateDefinition<UpcomingEventDocument> GetUpdateDefinition(UpcomingEventDocument document)
     {
-        return Builders<UpcomingEventDocument>
+        return Builders<UpcomingEventDocument> // TODO: use Reflection to build a full update definition by default
             .Update.Set(x => x.Place, document.Place)
+            .Set(x => x.Name, document.Name)
             .Set(x => x.Country, document.Country)
             .Set(x => x.ShowFeiId, document.ShowFeiId)
             .Set(x => x.Competitions, document.Competitions)
