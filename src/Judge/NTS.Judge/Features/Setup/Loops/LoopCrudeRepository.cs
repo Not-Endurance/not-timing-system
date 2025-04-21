@@ -8,7 +8,8 @@ public class LoopCrudeRepository : CrudeRepository<Loop>
 {
     readonly IEventContext _rootContext;
 
-    public LoopCrudeRepository(ICrudeParent<Loop> parentContext, IEventContext rootContext) : base(parentContext)
+    public LoopCrudeRepository(ICrudeParent<Loop> parentContext, IEventContext rootContext)
+        : base(parentContext)
     {
         _rootContext = rootContext;
     }

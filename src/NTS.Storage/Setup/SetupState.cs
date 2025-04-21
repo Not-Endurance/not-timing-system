@@ -10,6 +10,6 @@ public class SetupState : NState, ITreeState<UpcomingEvent>
         get => EnduranceEvent;
         set => EnduranceEvent = value;
     }
-    
+
     public UpcomingEvent? EnduranceEvent { get; set; }
 }

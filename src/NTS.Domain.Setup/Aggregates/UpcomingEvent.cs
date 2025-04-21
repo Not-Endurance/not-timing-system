@@ -22,7 +22,8 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials,
         IEnumerable<Loop> loops,
-        IEnumerable<Combination> combinations)
+        IEnumerable<Combination> combinations
+    )
     {
         return new(id, name, place, country, showFeiId, competitions, officials, loops, combinations);
     }
@@ -42,7 +43,8 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials,
         IEnumerable<Loop> loops,
-        IEnumerable<Combination> combinations)
+        IEnumerable<Combination> combinations
+    )
         : base(id!.Value)
     {
         Name = Required(nameof(Name), name);

@@ -128,7 +128,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
             url = QueryHelpers.AddQueryString(url, query);
         }
-        
+
         Connection = new HubConnectionBuilder()
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = new NJsonSettings())
             .WithUrl(url)

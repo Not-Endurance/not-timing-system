@@ -199,8 +199,6 @@ public abstract class RpcClient : IRpcClient
             );
         });
     }
-
-    
 }
 
 public interface IRpcClient : IStartupInitializer, ISingleton

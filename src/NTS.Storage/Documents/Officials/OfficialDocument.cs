@@ -14,7 +14,7 @@ public class OfficialDocument : Document
             Role = official.Role,
         };
     }
-    
+
     public static OfficialDocument Create(Domain.Setup.Aggregates.Official official)
     {
         return new OfficialDocument

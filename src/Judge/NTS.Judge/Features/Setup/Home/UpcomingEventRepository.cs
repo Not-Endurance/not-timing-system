@@ -5,7 +5,6 @@ namespace NTS.Judge.Features.Setup.Home;
 
 public class EnduranceEventHttpRepository : HttpRepository<UpcomingEvent>
 {
-    public EnduranceEventHttpRepository(NHttpClient httpClient) : base("upcoming-event", httpClient)
-    {
-    }
+    public EnduranceEventHttpRepository(NHttpClient httpClient)
+        : base("upcoming-event", httpClient) { }
 }

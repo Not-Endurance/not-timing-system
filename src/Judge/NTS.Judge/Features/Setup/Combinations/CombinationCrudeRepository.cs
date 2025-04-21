@@ -8,7 +8,8 @@ public class CombinationCrudeRepository : CrudeRepository<Combination>
 {
     readonly IEventContext _rootContext;
 
-    public CombinationCrudeRepository(ICrudeParent<Combination> parentContext, IEventContext rootContext) : base(parentContext)
+    public CombinationCrudeRepository(ICrudeParent<Combination> parentContext, IEventContext rootContext)
+        : base(parentContext)
     {
         _rootContext = rootContext;
     }

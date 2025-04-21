@@ -27,7 +27,7 @@ public abstract class CrudChildBehind<T, TModel> : ObservableBehind, IListBehind
     protected abstract T UpdateEntity(TModel model);
 
     public IReadOnlyList<T> Items => _crudeContext.Children;
-    
+
     protected sealed override Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
         return Task.FromResult(true);
@@ -50,7 +50,7 @@ public abstract class CrudChildBehind<T, TModel> : ObservableBehind, IListBehind
         var entity = CreateEntity(model);
         await _crudeContext.Create(entity);
     }
-    
+
     public async Task Delete(T entity)
     {
         await SafeHelper.Run(() => SafeDelete(entity));

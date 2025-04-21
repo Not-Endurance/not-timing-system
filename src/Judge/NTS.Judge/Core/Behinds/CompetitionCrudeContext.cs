@@ -8,9 +8,8 @@ public class CompetitionCrudeContext : CrudeContext<Competition>, ICrudeParent<P
 {
     Competition? _competition;
 
-    public CompetitionCrudeContext(ICrudeParent<Competition> parentContext) : base(parentContext)
-    {
-    }
+    public CompetitionCrudeContext(ICrudeParent<Competition> parentContext)
+        : base(parentContext) { }
 
     IReadOnlyList<Phase> ICrudeParent<Phase>.Children => _competition?.Phases ?? [];
     IReadOnlyList<Participation> ICrudeParent<Participation>.Children => _competition?.Participations ?? [];

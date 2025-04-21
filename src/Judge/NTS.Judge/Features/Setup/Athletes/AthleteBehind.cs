@@ -8,9 +8,7 @@ namespace NTS.Judge.Features.Setup.Athletes;
 public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflection<Club>
 {
     public AthleteBehind(IRepository<Athlete> repository, IEnumerable<ICrudReflection<Athlete>> dependants)
-        : base(repository, dependants)
-    {
-    }
+        : base(repository, dependants) { }
 
     protected override Athlete CreateEntity(AthleteFormModel model)
     {

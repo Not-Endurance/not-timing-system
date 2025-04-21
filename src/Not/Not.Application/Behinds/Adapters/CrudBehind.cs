@@ -31,7 +31,8 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
         if (matches is not IEnumerable<IReflect<TUpdate>> reflections)
         {
             throw GuardHelper.Exception(
-                $"Invalid update '{typeof(TUpdate).Name}'. Type '{typeof(T).Name}' does not implement 'IReflect<TUpdate>'");
+                $"Invalid update '{typeof(TUpdate).Name}'. Type '{typeof(T).Name}' does not implement 'IReflect<TUpdate>'"
+            );
         }
         foreach (var item in reflections)
         {

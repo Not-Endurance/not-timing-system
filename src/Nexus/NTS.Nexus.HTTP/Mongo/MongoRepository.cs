@@ -41,10 +41,7 @@ public abstract class MongoRepository<T> : IRepository<T>
         {
             if (ex.WriteError.Code == 11000)
             {
-                throw new ApplicationException(
-                    $"Could not insert. Document with ID '{item.Id}' already exists",
-                    ex
-                );
+                throw new ApplicationException($"Could not insert. Document with ID '{item.Id}' already exists", ex);
             }
             else
             {

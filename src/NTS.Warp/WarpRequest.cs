@@ -4,7 +4,7 @@ public class WarpRequest
 {
     public static WarpRequest Crate(string enduranceEventId)
     {
-        return new () { EnduranceEventId = enduranceEventId };
+        return new() { EnduranceEventId = enduranceEventId };
     }
 
     public static WarpRequest<T> Create<T>(string enduranceEventId, T payload)

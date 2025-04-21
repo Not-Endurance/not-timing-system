@@ -11,7 +11,10 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
 {
     readonly IUpcomingEventRepository _upcomingEventRepository;
 
-    public UpcomingEventFunctions(IUpcomingEventRepository upcomingEventRepository, IFunctionLogger<UpcomingEventFunctions> logger)
+    public UpcomingEventFunctions(
+        IUpcomingEventRepository upcomingEventRepository,
+        IFunctionLogger<UpcomingEventFunctions> logger
+    )
         : base(logger)
     {
         _upcomingEventRepository = upcomingEventRepository;

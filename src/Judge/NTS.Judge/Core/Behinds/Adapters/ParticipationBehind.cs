@@ -72,7 +72,7 @@ public class ParticipationBehind
     {
         await PerformInitialization();
     }
-    
+
     public async Task Update(PhaseUpdateModel model)
     {
         Task action() => SafeUpdate(model);
