@@ -95,7 +95,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     {
         return _eventContext.Event!.Id.ToString();
     }
-    
+
     class HubProcedures : IParticipationHubProcedures
     {
         readonly IRpcSocket _socket;
