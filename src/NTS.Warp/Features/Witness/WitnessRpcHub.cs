@@ -50,13 +50,13 @@ internal class WitnessRpcHub
         await judgeClient.OnWitnessDisconnedted(Context.ConnectionId);
     }
 
-    public Dictionary<int, EmsStartlist> SendStartlist(WarpRequest request)
+    public async Task<Dictionary<int, EmsStartlist>> SendStartlist(WarpRequest request)
     {
         if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
             return [];
         }
-        var participations = judgeClient.GetActiveParticipations().Result;
+        var participations = await judgeClient.GetActiveParticipations();
         return StartlistFactory.Create(participations);
     }
 

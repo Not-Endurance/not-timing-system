@@ -44,7 +44,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)
     {
-        var emsParticipation = Convert(request.Payload.Participation);
+        var emsParticipation = Convert(request.Payload.Participation); // TODO: group instead of all
         var entry = new EmsParticipantEntry(emsParticipation);
         await _witnessRelay.Clients.All.ReceiveEntryUpdate(entry, EmsCollectionAction.Remove);
     }

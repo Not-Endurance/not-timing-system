@@ -11,8 +11,8 @@ public class EmsParticipantEntry : IComparable<EmsParticipantEntry>, IEquatable<
         Number = participation.Participant.Number;
         Name = participation.Participant.Athlete.Name;
         LapNumber = participation.Participant.LapRecords.Count;
-        var record = participation.Participant.LapRecords.Last();
-        LapDistance = record.Lap.LengthInKm;
+        var record = participation.Participant.LapRecords.LastOrDefault();
+        LapDistance = record?.Lap.LengthInKm ?? 0; // TODO: remove and debug connections
     }
 
     public int LapNumber { get; init; }
