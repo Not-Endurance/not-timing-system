@@ -1,11 +1,23 @@
-﻿namespace NTS.Witness;
+﻿using Not.Application.RPC.SignalR;
+using Not.Filesystem;
+using Not.Startup;
+
+namespace NTS.Witness;
 
 public partial class App : Application
 {
-    public App()
+    public App(IEnumerable<IStartupInitializer> initializers, IRpcSocket rpcSocket)
     {
         InitializeComponent();
 
         MainPage = new MainPage();
+
+        FileContextHelper.ConfigureApplicationName("nts-witness");
+
+        foreach (var initializer in initializers)
+        {
+            initializer.RunAtStartup();
+        }
+        rpcSocket.Connect();
     }
 }
