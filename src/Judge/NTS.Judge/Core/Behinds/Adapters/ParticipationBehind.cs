@@ -3,6 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Ports;
 using Not.Exceptions;
 using Not.Safe;
+using Not.Startup;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
@@ -19,13 +20,13 @@ namespace NTS.Judge.Core.Behinds.Adapters;
 
 public class ParticipationBehind
     : ObservableBehind,
-        IParticipationContext,
         IInspections,
         IEliminations,
         IDashboardBehind,
         IUpdateBehind<PhaseUpdateModel>,
         ISnapshotProcessor,
-        IManualProcessor
+        IManualProcessor,
+        IStartupInitializerAsync
 {
     readonly List<int> _recentlyProcessed = [];
     readonly IRepository<Participation> _participationRepository;
@@ -67,6 +68,11 @@ public class ParticipationBehind
         return Participations.Any();
     }
 
+    public async Task RunAtStartupAsync()
+    {
+        await PerformInitialization();
+    }
+    
     public async Task Update(PhaseUpdateModel model)
     {
         Task action() => SafeUpdate(model);

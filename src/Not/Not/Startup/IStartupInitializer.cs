@@ -1,6 +1,4 @@
-﻿using Not.Injection;
-
-namespace Not.Startup;
+﻿namespace Not.Startup;
 
 /// <summary>
 /// Execute synchronous code at application startup.
