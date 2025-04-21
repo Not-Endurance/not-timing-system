@@ -60,14 +60,15 @@ internal class WitnessRpcHub
         return StartlistFactory.Create(participations);
     }
 
-    public async Task<EmsParticipantsPayload> SendParticipants(WarpRequest request)
+    public async Task<IEnumerable<EmsParticipantEntry>> SendParticipants(WarpRequest request)
     {
         if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
-            return new EmsParticipantsPayload();
+            return [];
         }
-        var participants = await judgeClient.GetActiveParticipations().Select(ParticipantEntryFactory.Create);
-        return new EmsParticipantsPayload { Participants = participants.ToList(), EventId = int.Parse(request.EnduranceEventId) };
+        var participants = await judgeClient.GetActiveParticipations();
+        var emsPartcipants = participants.Select(ParticipantEntryFactory.Create).ToList();
+        return emsPartcipants;
     }
 
     public async Task ReceiveWitnessEvent(WarpRequest<ProcessSnapshotsPayload> request)

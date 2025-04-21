@@ -6,6 +6,6 @@ namespace NTS.Warp.ACL.RPC.Procedures;
 
 public interface IEmsParticipantsHubProcedures
 {
-    Task<EmsParticipantsPayload> SendParticipants(WarpRequest request);
+    Task<IEnumerable<EmsParticipantEntry>> SendParticipants(WarpRequest request);
     Task ReceiveWitnessEvent(WarpRequest<ProcessSnapshotsPayload> request);
 }

@@ -12,7 +12,7 @@ public class EmsParticipantEntry : IComparable<EmsParticipantEntry>, IEquatable<
         Name = participation.Participant.Athlete.Name;
         LapNumber = participation.Participant.LapRecords.Count;
         var record = participation.Participant.LapRecords.LastOrDefault();
-        LapDistance = record?.Lap.LengthInKm ?? 0; // TODO: remove and debug connections
+        LapDistance = record?.Lap.LengthInKm ?? 0;
     }
 
     public int LapNumber { get; init; }
