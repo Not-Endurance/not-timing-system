@@ -2,7 +2,7 @@
 
 public static class Endpoints
 {
-    public const string WITNESS_HOME_PAGE = "/";
+    public const string WITNESS_PAGE = "/";
     public const string LOGIN = "/login";
     public const string EMERGENCY_CONTACTS = "/emergency-contacts";
     public const string PHASE_DETAILS = "/phase-details";
