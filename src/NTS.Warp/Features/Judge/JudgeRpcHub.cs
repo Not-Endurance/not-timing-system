@@ -44,23 +44,23 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)
     {
-        var emsParticipation = Convert(request.Payload.Participation); // TODO: group instead of all
+        var emsParticipation = Convert(request.Payload.Participation);
         var entry = new EmsParticipantEntry(emsParticipation);
-        await _witnessRelay.Clients.All.ReceiveEntryUpdate(entry, EmsCollectionAction.Remove);
+        await _witnessRelay.Clients.Group(request.EnduranceEventId).ReceiveEntryUpdate(entry, EmsCollectionAction.Remove);
     }
 
     public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
     {
         var emsParticipation = Convert(request.Payload.Participation);
         var entry = new EmsParticipantEntry(emsParticipation);
-        await _witnessRelay.Clients.All.ReceiveEntryUpdate(entry, EmsCollectionAction.AddOrUpdate);
+        await _witnessRelay.Clients.Group(request.EnduranceEventId).ReceiveEntryUpdate(entry, EmsCollectionAction.AddOrUpdate);
     }
 
     public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
     {
         var emsParticipation = Convert(request.Payload.Participation);
         var entry = new EmsStartlistEntry(emsParticipation);
-        await _witnessRelay.Clients.All.ReceiveEntry(entry, EmsCollectionAction.AddOrUpdate);
+        await _witnessRelay.Clients.Group(request.EnduranceEventId).ReceiveEntry(entry, EmsCollectionAction.AddOrUpdate);
     }
 
     EmsParticipation Convert(Participation participation)

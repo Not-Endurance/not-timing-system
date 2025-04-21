@@ -6,6 +6,7 @@ using Not.Async;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
 using NTS.Judge.Core;
+using NTS.Judge.Features;
 using NTS.Warp;
 using NTS.Warp.Features.Judge.Models;
 using NTS.Warp.Features.Judge.Procedures;
@@ -14,12 +15,14 @@ namespace NTS.Judge.RPC;
 
 public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
 {
+    readonly IEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IRead<Domain.Core.Aggregates.Participation> _coreParticipations;
     readonly IRead<Domain.Setup.Aggregates.Participation> _setupParticipations;
     readonly HubProcedures _hubProcedures;
 
     public ParticipationRpcClient(
+        IEventContext eventContext,
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
         IRead<Domain.Core.Aggregates.Participation> coreParticipations,
@@ -28,6 +31,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         : base(socket)
     {
         _hubProcedures = new HubProcedures(socket);
+        _eventContext = eventContext;
         _snapshotProcessor = snapshotProcessor;
         _coreParticipations = coreParticipations;
         _setupParticipations = setupParticipations;
@@ -71,22 +75,27 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
 
     public async Task OnParticipationEliminated(ParticipationEliminated eliminated)
     {
-        var request = WarpRequest.Create("test", eliminated);
+        var request = WarpRequest.Create(GetGroupId(), eliminated);
         await _hubProcedures.OnParticipationEliminated(request);
     }
 
     public async Task OnParticipationRestored(ParticipationRestored restored)
     {
-        var request = WarpRequest.Create("test", restored);
+        var request = WarpRequest.Create(GetGroupId(), restored);
         await _hubProcedures.OnParticipationRestored(request);
     }
 
     public async Task OnPhaseCompleted(PhaseCompleted phaseCompleted)
     {
-        var request = WarpRequest.Create("test", phaseCompleted);
+        var request = WarpRequest.Create(GetGroupId(), phaseCompleted);
         await _hubProcedures.OnPhaseCompleted(request);
     }
 
+    string GetGroupId()
+    {
+        return _eventContext.Event!.Id.ToString();
+    }
+    
     class HubProcedures : IParticipationHubProcedures
     {
         readonly IRpcSocket _socket;
