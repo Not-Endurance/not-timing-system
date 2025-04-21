@@ -78,7 +78,7 @@ internal class WitnessRpcHub
             return; // TODO: meaningful message would improve UX here
         }
         var snapshots = request.Payload.Entries.Select(entry => SnapshotFactory.Create(entry, request.Payload.Type));
-        await judgeClient.ProcessSnapshots(snapshots);        
+        await judgeClient.ProcessSnapshots(snapshots);
     }
 
     bool TryGetJudgeClient(string enduranceEventId, [NotNullWhen(true)] out IJudgeClientProcedures? judeClient)

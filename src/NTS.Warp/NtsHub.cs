@@ -17,7 +17,7 @@ public class NtsHub<T> : Hub<T>
     {
         return Context.GetHttpContext()!.Request.Query[RpcConstants.CONNECTION_GROUP_KEY].ToString();
     }
-    
+
     public override async Task OnConnectedAsync()
     {
         var query = Context.GetHttpContext()!.Request.Query;

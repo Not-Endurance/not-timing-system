@@ -8,7 +8,8 @@ public class OfficialContextRepository : CrudeRepository<Official>
 {
     readonly IEventContext _rootContext;
 
-    public OfficialContextRepository(ICrudeParent<Official> parentContext, IEventContext rootContext) : base(parentContext)
+    public OfficialContextRepository(ICrudeParent<Official> parentContext, IEventContext rootContext)
+        : base(parentContext)
     {
         _rootContext = rootContext;
     }

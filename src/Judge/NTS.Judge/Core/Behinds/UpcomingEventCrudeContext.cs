@@ -6,11 +6,17 @@ using NTS.Judge.Features;
 
 namespace NTS.Judge.Core.Behinds;
 
-public class UpcomingEventCrudeContext : CrudeContext<UpcomingEvent>, ICrudeParent<Competition>, ICrudeParent<Official>, ICrudeParent<Loop>, ICrudeParent<Combination>
+public class UpcomingEventCrudeContext
+    : CrudeContext<UpcomingEvent>,
+        ICrudeParent<Competition>,
+        ICrudeParent<Official>,
+        ICrudeParent<Loop>,
+        ICrudeParent<Combination>
 {
     readonly EventContext _eventContext;
 
-    public UpcomingEventCrudeContext(IRepository<UpcomingEvent> parent, EventContext eventContext) : base(parent)
+    public UpcomingEventCrudeContext(IRepository<UpcomingEvent> parent, EventContext eventContext)
+        : base(parent)
     {
         _eventContext = eventContext;
     }
@@ -58,7 +64,7 @@ public class UpcomingEventCrudeContext : CrudeContext<UpcomingEvent>, ICrudePare
     {
         await Remove(_eventContext.Event, children);
     }
-    
+
     public async Task Create(Loop item)
     {
         await Add(_eventContext.Event, item);

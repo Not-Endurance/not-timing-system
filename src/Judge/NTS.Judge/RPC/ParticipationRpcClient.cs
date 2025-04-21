@@ -99,12 +99,12 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     class HubProcedures : IParticipationHubProcedures
     {
         readonly IRpcSocket _socket;
-        
+
         public HubProcedures(IRpcSocket socket)
         {
             _socket = socket;
         }
-        
+
         public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
         {
             await _socket.InvokeInputProcedure(nameof(OnPhaseCompleted), request);

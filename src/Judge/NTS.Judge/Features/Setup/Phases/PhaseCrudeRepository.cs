@@ -8,10 +8,12 @@ public class PhaseCrudeRepository : CrudeRepository<Phase>
 {
     readonly IEventContext _rootContext;
 
-    public PhaseCrudeRepository(ICrudeParent<Phase> parentContext, IEventContext rootContext) : base(parentContext)
+    public PhaseCrudeRepository(ICrudeParent<Phase> parentContext, IEventContext rootContext)
+        : base(parentContext)
     {
         _rootContext = rootContext;
     }
 
-    protected override IReadOnlyList<Phase> Aggregates => _rootContext.Event?.Competitions.SelectMany(x => x.Phases).ToList() ?? [];
+    protected override IReadOnlyList<Phase> Aggregates =>
+        _rootContext.Event?.Competitions.SelectMany(x => x.Phases).ToList() ?? [];
 }

@@ -18,11 +18,11 @@ public abstract class CrudeContext<T> : ICrudeParentContext
     {
         _parent = parent;
     }
-    
+
     public abstract void Set(IParent parent);
     public Event Changed { get; } = new();
-    
-    public async Task Add<TParent, TChild>(TParent? parent, TChild child) 
+
+    public async Task Add<TParent, TChild>(TParent? parent, TChild child)
         where TParent : IParent<TChild>, IAggregateRoot
         where TChild : AggregateRoot
     {
@@ -59,7 +59,9 @@ public abstract class CrudeContext<T> : ICrudeParentContext
     {
         if (inParent is not T tParent)
         {
-            throw GuardHelper.Exception($"Invalid parent type '{typeof(TParent).Name}' used. Expected type is '{_tName}'");
+            throw GuardHelper.Exception(
+                $"Invalid parent type '{typeof(TParent).Name}' used. Expected type is '{_tName}'"
+            );
         }
         return tParent;
     }

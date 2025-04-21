@@ -15,9 +15,9 @@ public abstract class CrudeRepository<T> : IRepository<T>
     {
         _parentContext = parentContext;
     }
-    
+
     protected abstract IReadOnlyList<T> Aggregates { get; }
-    
+
     public async Task Create(T item)
     {
         await _parentContext.Create(item);
@@ -56,7 +56,9 @@ public abstract class CrudeRepository<T> : IRepository<T>
 
     public async Task Delete(int id)
     {
-        var official =  Aggregates.FirstOrDefault(x => x.Id == id) ?? throw GuardHelper.Exception($"{typeof(T).Name} with '{id}' not found");
+        var official =
+            Aggregates.FirstOrDefault(x => x.Id == id)
+            ?? throw GuardHelper.Exception($"{typeof(T).Name} with '{id}' not found");
         await _parentContext.Delete(official);
     }
 
@@ -68,7 +70,8 @@ public abstract class CrudeRepository<T> : IRepository<T>
     public async Task Delete(Expression<Func<T, bool>> filter)
     {
         var predicate = filter.Compile();
-        var official =  Aggregates.FirstOrDefault(predicate) ?? throw GuardHelper.Exception($"{typeof(T).Name} Official not found");
+        var official =
+            Aggregates.FirstOrDefault(predicate) ?? throw GuardHelper.Exception($"{typeof(T).Name} Official not found");
         await _parentContext.Delete(official);
     }
 
@@ -77,4 +80,3 @@ public abstract class CrudeRepository<T> : IRepository<T>
         await _parentContext.Delete(items);
     }
 }
-

@@ -21,7 +21,12 @@ public static class RpcSocketExtensions
         }
     }
 
-    public static async Task<RpcInvokeResult> InvokeInputProcedure<T1, T2>(this IRpcSocket socket, string name, T1 parameter1, T2 parameter2)
+    public static async Task<RpcInvokeResult> InvokeInputProcedure<T1, T2>(
+        this IRpcSocket socket,
+        string name,
+        T1 parameter1,
+        T2 parameter2
+    )
     {
         try
         {

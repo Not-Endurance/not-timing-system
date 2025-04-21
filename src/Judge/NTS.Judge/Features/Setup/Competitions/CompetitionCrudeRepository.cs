@@ -8,10 +8,11 @@ public class CompetitionCrudeRepository : CrudeRepository<Competition>
 {
     readonly IEventContext _rootContext;
 
-    public CompetitionCrudeRepository(ICrudeParent<Competition> parentContext, IEventContext rootContext) : base(parentContext)
+    public CompetitionCrudeRepository(ICrudeParent<Competition> parentContext, IEventContext rootContext)
+        : base(parentContext)
     {
         _rootContext = rootContext;
     }
 
-    protected override IReadOnlyList<Competition> Aggregates =>  _rootContext.Event?.Competitions ?? [];
+    protected override IReadOnlyList<Competition> Aggregates => _rootContext.Event?.Competitions ?? [];
 }

@@ -10,13 +10,23 @@ using NTS.Judge.Core.Behinds;
 namespace NTS.Judge.Features.Setup.Home;
 
 // TODO: Try to decouple Home logic in separate behind and inherit CrudBehind here
-public class UpcomingEventBehind : CrudBehind<UpcomingEvent, EnduranceEventFormModel>, ICrudReflection<Loop>, ICrudReflection<Combination>, ICrudReflection<Athlete>, ICrudReflection<Horse>
+public class UpcomingEventBehind
+    : CrudBehind<UpcomingEvent, EnduranceEventFormModel>,
+        ICrudReflection<Loop>,
+        ICrudReflection<Combination>,
+        ICrudReflection<Athlete>,
+        ICrudReflection<Horse>
 {
     readonly UpcomingEventCrudeContext _crudeContext;
     readonly IUpdate<UpcomingEvent> _updater;
     readonly IEventContext _eventContext;
 
-    public UpcomingEventBehind(IRepository<UpcomingEvent> events, UpcomingEventCrudeContext crudeContext, IEventContext eventContext) : base(events, [])
+    public UpcomingEventBehind(
+        IRepository<UpcomingEvent> events,
+        UpcomingEventCrudeContext crudeContext,
+        IEventContext eventContext
+    )
+        : base(events, [])
     {
         _updater = events;
         _crudeContext = crudeContext;
@@ -42,7 +52,7 @@ public class UpcomingEventBehind : CrudBehind<UpcomingEvent, EnduranceEventFormM
             ((ICrudeParent<Combination>)_crudeContext).Children
         );
     }
-    
+
     protected override Task SafeDelete(UpcomingEvent entity)
     {
         NotifyHelper.Inform("Upcoming events cannot be deleted");

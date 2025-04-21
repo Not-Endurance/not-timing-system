@@ -23,6 +23,4 @@ public class UpcomingEventRepository : MongoRepository<UpcomingEventDocument>, I
     }
 }
 
-public interface IUpcomingEventRepository : IRepository<UpcomingEventDocument>
-{
-}
+public interface IUpcomingEventRepository : IRepository<UpcomingEventDocument> { }

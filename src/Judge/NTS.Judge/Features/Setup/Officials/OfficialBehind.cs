@@ -8,7 +8,10 @@ namespace NTS.Judge.Features.Setup.Officials;
 
 public class OfficialBehind : CrudChildBehind<Official, OfficialFormModel>
 {
-    public OfficialBehind(UpcomingEventCrudeContext upcomingEventContext, IEnumerable<ICrudReflection<Official>> dependants)
+    public OfficialBehind(
+        UpcomingEventCrudeContext upcomingEventContext,
+        IEnumerable<ICrudReflection<Official>> dependants
+    )
         : base(dependants, upcomingEventContext) { }
 
     protected override Official CreateEntity(OfficialFormModel model)

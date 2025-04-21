@@ -8,7 +8,10 @@ namespace NTS.Judge.Features.Setup.Combinations;
 
 public class CombinationBehind : CrudChildBehind<Combination, CombinationFormModel>
 {
-    public CombinationBehind(IEnumerable<ICrudReflection<Combination>> reflections, UpcomingEventCrudeContext parentContext)
+    public CombinationBehind(
+        IEnumerable<ICrudReflection<Combination>> reflections,
+        UpcomingEventCrudeContext parentContext
+    )
         : base(reflections, parentContext) { }
 
     protected override Combination CreateEntity(CombinationFormModel model)

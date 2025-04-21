@@ -12,7 +12,7 @@ public class PrimaryConnectionsContext : IPrimaryConnectionContext
     {
         _logger = logger;
     }
-    
+
     public void Add(string identifier, string connectionId)
     {
         if (_connections.TryAdd(identifier, connectionId))
@@ -28,7 +28,7 @@ public class PrimaryConnectionsContext : IPrimaryConnectionContext
         var match = _connections.FirstOrDefault(x => x.Value == connectionId);
         _connections.TryRemove(match);
     }
-    
+
     public string? GetConnectionId(string identifier)
     {
         return _connections.GetValueOrDefault(identifier);
