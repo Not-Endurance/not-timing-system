@@ -2,13 +2,13 @@
 
 public class FileHelper
 {
-    public static async Task WriteAsync(string content, string path)
+    public static async Task WriteAsync(string path, string content)
     {
         CreateDirectoryIfDoesNotExist(path);
         await File.WriteAllTextAsync(path, content);
     }
 
-    public static void Write(string content, string path)
+    public static void Write(string path, string content)
     {
         CreateDirectoryIfDoesNotExist(path);
         File.WriteAllText(path, content);
