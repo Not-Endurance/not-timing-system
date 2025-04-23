@@ -1,4 +1,5 @@
 ﻿using NTS.Domain.Aggregates;
+using NTS.Domain.Core.StaticOptions.Regions;
 using NTS.Domain.Settings;
 
 namespace NTS.Domain.Core.StaticOptions;
@@ -38,7 +39,7 @@ public class StaticOption
         return false;
     }
 
-    public static IRegionOption? Regional { get; private set; } // TODO: fix regional options
-    public static DetectionMode? Detection => StaticSettings.DetectionMode;
+    public static IRegionOption? Regional { get; private set; } = new BulgariaOption();
+    public static DetectionMode? Detection => DetectionMode.Manual;
     public static Country? SelectedCountry => StaticSettings.SelectedCountry;
 }
