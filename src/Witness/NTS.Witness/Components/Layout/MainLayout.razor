@@ -4,17 +4,21 @@
 
 <MudLayout>
     <MudAppBar Elevation="1">
+        <MudText>NTS Witness</MudText>
         <MudSpacer />
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen" Elevation="2" Anchor="Anchor.Right" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
         <MudDrawerHeader>
-            <MudText Typo="Typo.h6">Witness</MudText>
+            <MudText Typo="Typo.h6">Main Menu</MudText>
         </MudDrawerHeader>
 
         <NavMenu AfterNavigationAction="CloseDrawer" />
     </MudDrawer>
     <MudMainContent>
+        <MudPaper Class="d-flex justify-end flex-grow-1 absolute pa-5" Style="width:100%;" Elevation="0">
+            <MudFab Color="Color.Surface" StartIcon="@Icons.Material.Filled.LocalPhone" IconColor="Color.Error" Style="color:rgb(244, 67, 54)" Size="Size.Large" Label="Help" />
+        </MudPaper>
         @Body
     </MudMainContent>
 </MudLayout>
