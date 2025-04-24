@@ -40,7 +40,7 @@ public class EmsStartlistEntry : IComparable<EmsStartlistEntry>, IEquatable<EmsS
     public string CountryName { get; init; }
     public double Distance { get; init; }
     public int Stage { get; init; }
-    public DateTime StartTime { get; init; }
+    public DateTimeOffset StartTime { get; init; }
     public bool IsRestOver { get; internal set; }
     public bool IsLateStart { get; internal set; }
 
@@ -113,7 +113,7 @@ public class EmsStartlistEntry : IComparable<EmsStartlistEntry>, IEquatable<EmsS
 
     DateTime? GetLastNextStartTime(EmsParticipation participation)
     {
-        var currentRecord = participation.Participant.LapRecords.Last();
-        return currentRecord.StartTime;
+        var currentRecord = participation.Participant.LapRecords.Last(x => x.NextStarTime != null);
+        return currentRecord.NextStarTime;
     }
 }

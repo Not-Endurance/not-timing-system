@@ -136,7 +136,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
     public override string ToString()
     {
         var type = Localize(Type);
-        return Combine($"{Name} ({Phases.Count})", type, $"{Start:g}");
+        return Combine($"{Name} ({Phases.Count})", type, $"{Start.LocalDateTime:g}");
     }
 
     public void Add(Participation child)
