@@ -11,61 +11,54 @@ env:
   CONFIGURATION: Release
 
 jobs:
-  pr-checks-csharpier:
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
-    steps:
-      - name: Print pull_request event
-        run: |
-          echo Branch:
-          echo "${{ github.event.pull_request }}"
+  # pr-checks-csharpier:
+  #   runs-on: ubuntu-latest
+  #   if: github.event.pull_request.draft == false
+  #   steps:
+  #     # - name: Print pull_request event
+  #     #   run: |
+  #     #     echo Branch:
+  #     #     echo "${{ github.event.pull_request }}"
 
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          # Use custom PAT instead of GITHUB_TOKEN in order to allow subsequent workflow.
-          # Otherwise checks are stuck at csharpier commit: 
-          # https://stackoverflow.com/questions/74047352/github-checks-reset-their-statuses-after-push-made-by-a-workflow-run
-          token: ${{ secrets.NTS_CICD_PAT }}  
-          ref: ${{ github.event.pull_request.head.ref }}
+  #     # - name: Checkout code
+  #     #   uses: actions/checkout@v2
+  #     #   with:
+  #     #     # Use custom PAT instead of GITHUB_TOKEN in order to allow subsequent workflow execution 
+  #     #     # based on this csharpier commit. Otherwise the PR is stuc (csharpier commit is never checked):
+  #     #     # https://stackoverflow.com/questions/74047352/github-checks-reset-their-statuses-after-push-made-by-a-workflow-run
+  #     #     token: ${{ secrets.NTS_CICD_PAT }}  
+  #     #     ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'  #
+  #     # - name: Set up .NET
+  #     #   uses: actions/setup-dotnet@v3
+  #     #   with:
+  #     #     dotnet-version: ${{ env.DOTNET_CORE_VERSION }}  #
 
-      - name: Cache Csharpier tool
-        id: cache-csharpier
-        uses: actions/cache@v3
-        with:
-          path: ~/.dotnet/tools
-          key: ${{ runner.os }}-dotnet-tools-csharpier
+  #     # - name: Install Csharpier
+  #     #   run: dotnet tool install -g csharpier
 
-      - name: Install Csharpier if not cached
-        run: dotnet tool install -g csharpier || echo "Csharpier already installed"
+  #     # - name: Format code
+  #     #   run: csharpier format .
 
-      - name: Run Csharpier
-        run: dotnet csharpier . 
-
-      - name: Check for formatting changes
-        run: |
-          if [[ `git status --porcelain` ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add .
-            if [[ `git status --porcelain` ]]; then
-              git commit -m "Apply Csharpier code formatting"
-              git push
-            else 
-              echo "No formatting changes needed"
-            fi
-          else
-            echo "No formatting changes needed"
-          fi
+  #     # - name: Check for formatting changes
+  #     #   run: |
+  #     #     if [[ `git status --porcelain` ]]; then
+  #     #       git config user.name "github-actions[bot]"
+  #     #       git config user.email "github-actions[bot]@users.noreply.github.com"
+  #     #       git add .
+  #     #       if [[ `git status --porcelain` ]]; then
+  #     #         git commit -m "Apply Csharpier code formatting"
+  #     #         git push
+  #     #       else 
+  #     #         echo "No formatting changes needed"
+  #     #       fi
+  #     #     else
+  #     #       echo "No formatting changes needed"
+  #     #     fi
 
   pr-checks-build:
     runs-on: ubuntu-latest
-    needs: pr-checks-csharpier
+    # needs: pr-checks-csharpier
     steps:
     - uses: actions/checkout@v4
     
