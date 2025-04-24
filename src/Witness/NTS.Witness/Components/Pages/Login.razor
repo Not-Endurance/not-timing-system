@@ -1,4 +1,20 @@
 ﻿@attribute [Route(LOGIN)]
 
-We are waiting for a developer to finish their nap to put some content here. 
-Thank you for patience!
+@using Not.Blazor.Components
+
+<MudGrid Justify="Justify.Center" Class="align-center" Style="height:100%;">
+    <MudItem xs="8" sm="4" lg="4" xl="3">
+        <MudStack>
+            <NHeadline Content="Log In"/>
+            <MudTextField T="string" Label="User Name" ShrinkLabel Variant="Variant.Outlined" />
+            <MudTextField T="string" Label="Password" ShrinkLabel Variant="Variant.Outlined" InputType="InputType.Password" />
+            <MudButton Variant="Variant.Filled" Class="rounded-pill">Log In</MudButton>
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+<style>
+    .mud-input-outlined-border {
+        border-radius: 24px !important;
+    }
+</style>
