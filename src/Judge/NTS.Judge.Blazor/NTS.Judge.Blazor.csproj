@@ -1,23 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
-  
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Not\Not.Blazor\Not.Blazor.csproj" />
     <ProjectReference Include="..\..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Setup\NTS.Domain.Setup.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
-    <ProjectReference Include="..\..\NTS.Storage\NTS.Storage.csproj" /> <!-- Remove when Nexus Document objects are settled -->
+    <ProjectReference Include="..\..\NTS.Storage\NTS.Storage.csproj" />
+    <!-- Remove when Nexus Document objects are settled -->
   </ItemGroup>
-
 </Project>

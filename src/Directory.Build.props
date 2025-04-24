@@ -1,9 +1,7 @@
 <Project>
-
   <PropertyGroup>
-   <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
     <!-- Attempt to use as a local nuget package.
     <PackageReference Include="Not.Analyzers" Version="0.2.0">
@@ -12,5 +10,4 @@
     </PackageReference> -->
     <Analyzer Include="$(SolutionDir)/../analyzers/build/Not.Analyzers.dll" />
   </ItemGroup>
-
 </Project>

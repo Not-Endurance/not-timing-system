@@ -1,27 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="8.0.10" />
+    <PackageReference
+      Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson"
+      Version="8.0.10"
+    />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.15" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
   </ItemGroup>
-  
   <ItemGroup>
     <ProjectReference Include="..\Not.Blazor\Not.Blazor.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <InternalsVisibleTo Include="NTS.Judge.Tests" />
     <InternalsVisibleTo Include="Not.Tests" />
   </ItemGroup>
-
 </Project>
