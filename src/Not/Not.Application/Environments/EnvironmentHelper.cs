@@ -19,7 +19,6 @@ public static class EnvironmentHelper
 
     public static string GetEnvironment()
     {
-        return Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE)
-            ?? throw new ApplicationException("Environment variable not found");
+        return Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE) ?? "Staging"; // TODO: figure out how to pass this
     }
 }
