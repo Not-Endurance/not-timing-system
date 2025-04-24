@@ -23,8 +23,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          # Use custom PAT instead of GITHUB_TOKEN in order to allow subsequent workflow.
-          # Otherwise checks are stuck at csharpier commit: 
+          # Use custom PAT instead of GITHUB_TOKEN in order to allow subsequent workflow execution 
+          # based on this csharpier commit. Otherwise the PR is stuc (csharpier commit is never checked):
           # https://stackoverflow.com/questions/74047352/github-checks-reset-their-statuses-after-push-made-by-a-workflow-run
           token: ${{ secrets.NTS_CICD_PAT }}  
           ref: ${{ github.event.pull_request.head.ref }}
@@ -32,20 +32,13 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'  #
+          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}  #
 
-      - name: Cache Csharpier tool
-        id: cache-csharpier
-        uses: actions/cache@v3
-        with:
-          path: ~/.dotnet/tools
-          key: ${{ runner.os }}-dotnet-tools-csharpier
+      - name: Install Csharpier
+        run: dotnet tool install -g csharpier
 
-      - name: Install Csharpier if not cached
-        run: dotnet tool install -g csharpier || echo "Csharpier already installed"
-
-      - name: Run Csharpier
-        run: dotnet csharpier . 
+      - name: Format code
+        run: csharpier format .
 
       - name: Check for formatting changes
         run: |
