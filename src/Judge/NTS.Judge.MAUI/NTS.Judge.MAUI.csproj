@@ -5,6 +5,8 @@
     <RootNamespace>NTS.Judge.MAUI</RootNamespace>
     <UseMaui>true</UseMaui>
 
+    
+
      
     <SingleProject
     >true</SingleProject>
