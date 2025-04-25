@@ -75,6 +75,8 @@ public class CoreBehind : ObservableBehind, ICoreBehind
 
     async Task SafeStart()
     {
+        // TODO: Ensure witness apps receive the participants list on Start (or before).
+        // Currently you need to restart witness after start in order to fetch
         await _coreStarter.Start();
         IsStarted = true;
         EmitChange();

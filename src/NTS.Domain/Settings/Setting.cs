@@ -16,13 +16,13 @@ public class Setting : AggregateRoot
     {
         AccountId = Required(nameof(AccountId), accountId);
         Country = Required(nameof(Country), country);
-        DetectionMode = Required(nameof(DetectionMode), detectionMode);
+        DetectionMode = detectionMode;
         StaticSettings.Instance = this;
     }
 
     public Guid AccountId { get; }
     public Country Country { get; }
-    public DetectionMode DetectionMode { get; }
+    public DetectionMode? DetectionMode { get; }
 
     public override string ToString()
     {

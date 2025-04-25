@@ -1,11 +1,9 @@
-@using Not.Blazor.Navigation
-
 @inherits NComponent
 
 <MudNavMenu>
 
     <MudNavGroup Title="@Setup_string" Expanded="true">
-        <NNavLink Endpoint="@ENDURANCE_EVENT_PAGE" Match="NavLinkMatch.All">@Endurance_Event_string</NNavLink>
+        <NNavLink Endpoint="@HOME" Match="NavLinkMatch.All">@Upcoming_events_string</NNavLink>
         <NNavLink Endpoint="@ATHLETES_HORSES_PAGE">@Athletes_and_Horses_string</NNavLink>
         <NNavLink Endpoint="@COMBINATIONS_PAGE">@Combinations_string</NNavLink>
         <NNavLink Endpoint="@LOOPS_PAGE">@Loops_string</NNavLink>

@@ -93,9 +93,12 @@ public class Participation : AggregateRoot, IReflect<Combination>
         return Combine(Combination, startTimeMessage, isUnrankedMessage);
     }
 
-    public void Reflect(Combination child)
+    public void Reflect(Combination combination)
     {
-        Combination = child;
+        if (Combination == combination)
+        {
+            Combination = combination;
+        }
     }
 
     static DateTimeOffset? IsFutureTime(DateTimeOffset? startTimeOverride)

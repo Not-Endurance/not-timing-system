@@ -1,0 +1,74 @@
+name: "[net8] deploy nexus warp"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop 
+
+env:
+  CONFIGURATION: Release
+  DOTNET_CORE_VERSION: 8.0.x
+  SOURCE_PATH: src/Nexus/NTS.Nexus.Warp
+  ARTIFACT_PATH: NTS.Nexus.Warp/publish
+  AZURE_RESOURCE: nts-nexus-warp-dev
+
+jobs:
+  nexus-warp-build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}  # adjust if needed
+
+    #Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
+    - name: Set current workding directory env
+      run: echo "CURRENT_DIR=$(pwd)/src" >> $GITHUB_ENV
+    - name: Remove local-cache NuGet source
+      run: dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config
+
+    - name: Restore
+      run: dotnet restore "${{ env.SOURCE_PATH }}"
+      
+    - name: Build
+      run: |
+        dotnet build ${{ env.SOURCE_PATH }} \
+        --configuration ${{ env.CONFIGURATION }} \
+        --no-restore \
+        -property:SolutionDir="$CURRENT_DIR"
+
+    - name: Publish
+      run: |
+        dotnet publish ${{ env.SOURCE_PATH }} \
+        --configuration ${{ env.CONFIGURATION }} \
+        --no-build \
+        --output ${{ env.ARTIFACT_PATH }} \
+        -property:SolutionDir="$CURRENT_DIR"
+
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.AZURE_RESOURCE }}
+        path: ${{ env.ARTIFACT_PATH }}
+        include-hidden-files: true
+
+  nexus-warp-deploy:
+    runs-on: ubuntu-latest
+    needs: nexus-warp-build
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.AZURE_RESOURCE }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_RESOURCE }}
+          publish-profile: ${{ secrets.AZURE_NTS_NEXUS_WARP_DEV_PUBLISH_PROFILE }}
+          package: ${{ env.ARTIFACT_PATH }}

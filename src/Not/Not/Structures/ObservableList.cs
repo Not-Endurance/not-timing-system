@@ -8,7 +8,7 @@ public class ObservableList<T> : IReadOnlyList<T>
     where T : IIdentifiable
 {
     readonly object _lock = new();
-    Dictionary<int, T> _dictionary = [];
+    readonly Dictionary<int, T> _dictionary = [];
 
     public ObservableList() { }
 

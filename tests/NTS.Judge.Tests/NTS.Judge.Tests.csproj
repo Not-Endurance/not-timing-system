@@ -13,7 +13,7 @@
     <ProjectReference Include="..\..\src\Judge\NTS.Judge\NTS.Judge.csproj" />
     <ProjectReference Include="..\..\src\Not\Not.Tests\Not.Tests.csproj" />
     <ProjectReference Include="..\..\src\NTS.Storage\NTS.Storage.csproj" />
-    <ProjectReference Include="..\..\src\Relay\NTS.Relay\NTS.Relay.csproj" />
+    <ProjectReference Include="..\..\src\NTS.Warp\NTS.Warp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

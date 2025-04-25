@@ -3,6 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Ports;
 using Not.Exceptions;
 using Not.Safe;
+using Not.Startup;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
@@ -19,13 +20,13 @@ namespace NTS.Judge.Core.Behinds.Adapters;
 
 public class ParticipationBehind
     : ObservableBehind,
-        IParticipationContext,
         IInspections,
         IEliminations,
         IDashboardBehind,
         IUpdateBehind<PhaseUpdateModel>,
         ISnapshotProcessor,
-        IManualProcessor
+        IManualProcessor,
+        IStartupInitializerAsync
 {
     readonly List<int> _recentlyProcessed = [];
     readonly IRepository<Participation> _participationRepository;
@@ -65,6 +66,11 @@ public class ParticipationBehind
         Participations = await _participationRepository.ReadAll();
         SelectedParticipation = Participations.FirstOrDefault();
         return Participations.Any();
+    }
+
+    public async Task RunAtStartupAsync()
+    {
+        await PerformInitialization();
     }
 
     public async Task Update(PhaseUpdateModel model)
@@ -144,7 +150,7 @@ public class ParticipationBehind
 
     async Task SafeRequestReinspection(bool requestFlag)
     {
-        SelectedParticipation!.ChangeReinspection(requestFlag);
+        SelectedParticipation!.ToggleRepresentation(requestFlag);
         await _participationRepository.Update(SelectedParticipation);
 
         EmitChange();
@@ -152,7 +158,7 @@ public class ParticipationBehind
 
     async Task SafeRequestRequiredInspection(bool requestFlag)
     {
-        SelectedParticipation!.ChangeRequiredInspection(requestFlag);
+        SelectedParticipation!.ToggleRequestedInspection(requestFlag);
         await _participationRepository.Update(SelectedParticipation);
 
         EmitChange();

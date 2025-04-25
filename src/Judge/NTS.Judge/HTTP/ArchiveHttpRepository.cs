@@ -35,11 +35,7 @@ public class ArchiveHttpRepository : HttpRepository<ArchiveEntry>, IArchiveRepos
         }
         var documents = contents.FromJson<IEnumerable<ArchiveDocument>>();
         var document = documents.FirstOrDefault(x => x.Id == id);
-        if (document == null)
-        {
-            return null;
-        }
-        return document.ToDomain();
+        return document?.ToDomain();
     }
 }
 

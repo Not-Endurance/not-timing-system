@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Not.Blazor.CRUD.Ports;
 using Not.Serialization.JSON;
 using Not.Storage.Stores.Files;
@@ -29,17 +30,21 @@ public class StorageTests : JudgeIntegrationTest
 
         var expectedState = new SetupState
         {
-            EnduranceEvent = EnduranceEvent.Update(
+            EnduranceEvent = UpcomingEvent.Update(
                 enduranceEvent.Id,
+                enduranceEvent.Name,
                 enduranceEvent.Place,
                 enduranceEvent.Country,
                 enduranceEvent.FeiShowId,
                 [],
+                [],
+                [],
                 []
             ),
         };
-
-        await AssertStateEquals(JsonFileStore.ToJson(expectedState));
+        var settings = new NJsonSettings();
+        var expected = JsonConvert.SerializeObject(expectedState, settings);
+        await AssertStateEquals(expected);
     }
 
     [Fact]

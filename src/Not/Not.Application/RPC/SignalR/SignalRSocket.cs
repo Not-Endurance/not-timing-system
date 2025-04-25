@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Not.Injection;
 using Not.Logging;
 using Not.Serialization.JSON;
 
@@ -9,19 +12,17 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 {
     const int AUTOMATIC_RECONNECT_ATTEMPTS = 3;
 
-    readonly SignalRContext _context;
+    readonly IRpcMetadata? _metadata;
+    readonly RpcSettings _context;
     readonly string _name;
     System.Timers.Timer? _reconnectionTimer;
     int _connectionClosedReconnectAttempts;
     CancellationTokenSource? _reconnectTokenSource;
 
-    internal SignalRSocket(SignalRContext? context = null)
+    public SignalRSocket(IOptions<RpcSettings> options, IRpcMetadata? metadata = null)
     {
-        _context =
-            context
-            ?? throw new ApplicationException(
-                $"SignalR socket is not configured. Use '{nameof(RpcServiceCollectionExtensions)}' to configure the socket"
-            );
+        _metadata = metadata;
+        _context = options.Value;
         _name = GetType().Name;
     }
 
@@ -37,7 +38,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     public bool IsConnected => Connection?.State == HubConnectionState.Connected;
 
-    internal void RaiseError(Exception exception, string? procedure, params object?[] arguments)
+    public void RaiseError(Exception exception, string? procedure, params object?[] arguments)
     {
         var message =
             procedure == null
@@ -60,7 +61,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         {
             return;
         }
-        _reconnectTokenSource!.Cancel();
+        await _reconnectTokenSource!.CancelAsync();
         await Connection.StopAsync();
         RaiseDisconnected();
     }
@@ -116,9 +117,21 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     void ConfigureConnection()
     {
+        var url = _context.Url;
+        if (_metadata != null)
+        {
+            var query = new Dictionary<string, string?>();
+            if (_metadata.ConnectionGroupKey != null)
+            {
+                query.Add(RpcConstants.CONNECTION_GROUP_KEY, _metadata.ConnectionGroupKey);
+            }
+
+            url = QueryHelpers.AddQueryString(url, query);
+        }
+
         Connection = new HubConnectionBuilder()
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = new NJsonSettings())
-            .WithUrl(_context.Url)
+            .WithUrl(url)
             .Build();
         Connection.Reconnected += HandleReconnected;
         Connection.Reconnecting += HandleReconnecting;
@@ -242,7 +255,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     }
 }
 
-public interface IRpcSocket
+public interface IRpcSocket : ISingleton
 {
     /// <summary>
     /// 'true' means connected; 'false' - disconnected;
@@ -254,6 +267,7 @@ public interface IRpcSocket
     bool IsConnected { get; }
     Task Connect();
     Task Disconnect();
+    void RaiseError(Exception exception, string? procedure, params object?[] arguments);
 }
 
 public enum RpcConnectionStatus

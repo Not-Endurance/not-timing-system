@@ -42,4 +42,14 @@ public class Person
     {
         return string.Join(DELIMITER, Names);
     }
+
+    public string? GetFirstName()
+    {
+        return Names.First();
+    }
+
+    public string? GetLastName()
+    {
+        return Names.Last();
+    }
 }

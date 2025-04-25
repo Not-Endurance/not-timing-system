@@ -7,14 +7,10 @@
 @attribute [Route(ENDURANCE_EVENT_PAGE)]
 @inherits NComponent
 
-<NContent Title="@Configure_Endurance_Event_string" HasContent="Behind.Model != null" EmptyMessage="@Endurance_Event_does_not_exist_yet_string">
-
-    <EmptyContent>
-        <NButtonCreate OnClick="OpenCreateForm" />
-    </EmptyContent>
+<NContent Title="@Configure_Endurance_Event_string" HasContent="_upcomingEvent != null" EmptyMessage="@Endurance_Event_does_not_exist_yet_string"> @* TODO: remove string *@
 
     <Main>
-        <NUpdateContainer T="EnduranceEventFormModel" TForm="EnduranceEventForm" Model="Behind.Model" />
+        <NUpdateContainer T="EnduranceEventFormModel" TForm="EnduranceEventForm" Model="_upcomingEvent" />
     </Main>
 
     <Main2>
