@@ -15,8 +15,15 @@ public partial class ProtocolRow
 
     protected override void OnParametersSet()
     {
-        _rankText = Entry.Rank?.ToString() ?? Incomplete_string;
-        _combination = Entry.Participation.Combination;
+        if (!Entry.Participation.IsEliminated())
+        {
+            _rankText = Entry.Rank?.ToString() ?? Incomplete_string;
+        }
+        else
+        {
+            _rankText = " ";
+        }
+            _combination = Entry.Participation.Combination;
         _phases = Entry.Participation.Phases;
         _total = Entry.Participation.GetTotal();
     }

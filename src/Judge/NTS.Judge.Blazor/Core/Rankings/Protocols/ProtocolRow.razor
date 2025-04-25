@@ -5,17 +5,19 @@
 
 <MudStack Row="true" Justify="Justify.FlexStart">
 
-    <MudStack>
-        <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">@_rankText</MudText>
+    <MudStack >
+        <MudText Typo="Typo.button" Align="Align.Center">@_rankText</MudText>
 
-        <MudStack Justify="Justify.SpaceEvenly" Style="height:100%; width:80px">
-            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Athlete</MudText>
+        <MudStack Justify="Justify.FlexStart" Spacing="1" Style="height:100%; width:80px">
+            <MudText Typo="Typo.caption" Align="Align.Right">Rider:<br/>@_combination.Athlete.Names</MudText>
 
-            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Horse</MudText>
-
-            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Club</MudText>
-
-            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Athlete.Country</MudText>
+            <MudText Typo="Typo.caption" Align="Align.Right">Horse:<br/>@_combination.Horse</MudText>
+            @if(_combination.Club != null)
+            {
+                <MudText Typo="Typo.caption" Align="Align.Right">Club:<br/>@_combination.Club</MudText>
+            }else{
+                <MudText Typo="Typo.caption" Align="Align.Right">Country:<br/>@_combination.Athlete.Country</MudText>
+            }
         </MudStack>
     </MudStack>
 
@@ -23,13 +25,13 @@
 
     @if (_total != null && !Entry.Participation.IsEliminated())
     {
-        <MudStack Class="d-flex" Style="width:140px;">
+        <MudStack Class="d-flex" Style="width:140px;" Spacing="1">
             <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">
                 @Total_string
             </MudText>
 
-            <MudStack Justify="Justify.SpaceEvenly" Style="height:100%;">
-                <MudText Typo="Typo.body2" Align="Align.Center">
+            <MudStack Justify="Justify.FlexStart" Style="height:100%;">
+                <MudText Typo="Typo.caption" Align="Align.Center">
                     @Finished_at_colon_string
                     <strong>
                             @_total!.FinishTime
@@ -42,8 +44,10 @@
                 </MudText>
 
                 <MudText Typo="Typo.caption" Align="Align.Center">
-                    @Recovery_in_hours_colon_string
-                    <strong>@_total!.RecoveryIntervalWithoutFinal</strong>
+                    @* @Average_speed_string *@
+                    Average Speed:
+                    <br />
+                    <strong>@_total!.AverageSpeed.ToString()</strong> km/h
                 </MudText>
             </MudStack>
         </MudStack>
