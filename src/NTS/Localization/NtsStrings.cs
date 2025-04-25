@@ -56,6 +56,8 @@ namespace NTS.Localization
         public static string Search_by_ID_colon_string => LocalizeString(nameof(Search_by_ID_colon_string));
         public static string Search_by_name_colon_string => LocalizeString(nameof(Search_by_name_colon_string));
         public static string Event_string => LocalizeString(nameof(Event_string));
+        public static string Upcoming_events_string => LocalizeString(nameof(Upcoming_events_string));
+        public static string Select_event_string => LocalizeString(nameof(Select_event_string));
         public static string Stages_string => LocalizeString(nameof(Stages_string));
         public static string Ride_string => LocalizeString(nameof(Ride_string));
         public static string Not_ranked_string => LocalizeString(nameof(Not_ranked_string));
@@ -142,6 +144,10 @@ namespace NTS.Localization
         public static string FEI_Schedule_NR => LocalizeString(nameof(FEI_Schedule_NR));
         public static string FEI_Category_Event_NR => LocalizeString(nameof(FEI_Category_Event_NR));
         public static string required_for_FEI_export => LocalizeString(nameof(required_for_FEI_export));
+        public static string Cannot_require_representation_without_presentation_time =>
+            LocalizeString(nameof(Cannot_require_representation_without_presentation_time));
+        public static string Invalid_phase_configuration_in_competition__missing_rest =>
+            LocalizeString(nameof(Invalid_phase_configuration_in_competition__missing_rest));
         public static string Time_format_is_incorrect_hrs_colon_mins_colon_secs_string =>
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
     }

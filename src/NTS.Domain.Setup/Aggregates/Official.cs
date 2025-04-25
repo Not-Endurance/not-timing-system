@@ -4,7 +4,7 @@ using static NTS.Domain.Enums.OfficialRole;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Official : AggregateRoot, IAggregateRoot
+public class Official : AggregateRoot
 {
     public static Official Create(string? names, OfficialRole? role)
     {
@@ -16,16 +16,16 @@ public class Official : AggregateRoot, IAggregateRoot
         return new(id, Person.Create(names), role);
     }
 
+    Official(Person? person, OfficialRole? role)
+        : this(GenerateId(), person, role) { }
+
     [JsonConstructor]
-    Official(int? id, Person? person, OfficialRole? role)
+    public Official(int? id, Person? person, OfficialRole? role)
         : base(id!.Value)
     {
         Role = Required(nameof(Role), role);
         Person = Required(nameof(Person), person);
     }
-
-    Official(Person? person, OfficialRole? role)
-        : this(GenerateId(), person, role) { }
 
     public Person Person { get; }
     public OfficialRole Role { get; }

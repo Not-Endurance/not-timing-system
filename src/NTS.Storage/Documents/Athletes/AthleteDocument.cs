@@ -22,7 +22,7 @@ public class AthleteDocument : Document
     }
 
     public string[] Names { get; init; } = default!;
-    public AthleteCategory Category { get; init; } = default!;
+    public AthleteCategory Category { get; init; }
     public CountryDocument? Country { get; init; } // TODO: should be required
     public ClubDocument? Club { get; init; }
     public string? FeiId { get; init; }

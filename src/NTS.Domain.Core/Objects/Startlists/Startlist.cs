@@ -7,36 +7,37 @@ public class StartList
 {
     static readonly TimeSpan START_EXPIRY_TIME = TimeSpan.FromMinutes(15);
 
-    List<StartlistEntry> _starts;
+    readonly List<StartlistEntry> _starts;
 
     public StartList(IEnumerable<Participation> participations, Action action)
     {
         _starts = [];
         foreach (var participation in participations)
         {
-            if (!participation.IsEliminated())
+            if (participation.IsEliminated())
             {
-                var phases = participation.Phases;
-                foreach (var phase in phases)
+                continue;
+            }
+            var phases = participation.Phases;
+            foreach (var phase in phases)
+            {
+                if (phase.StartTime == null)
                 {
-                    if (phase.StartTime == null)
-                    {
-                        continue;
-                    }
-                    var phaseIndex = phases.IndexOf(phase);
-                    var phaseNumber = phaseIndex + 1;
-                    var start = new StartlistEntry(
-                        participation.Combination.Athlete.Names,
-                        participation.Combination.Number,
-                        phaseNumber,
-                        phases[phaseIndex].Length,
-                        phase.StartTime.ToDateTimeOffset()
-                    );
-                    _starts.Add(start);
+                    continue;
                 }
+                var phaseIndex = phases.IndexOf(phase);
+                var phaseNumber = phaseIndex + 1;
+                var start = new StartlistEntry(
+                    participation.Combination.Athlete.Names,
+                    participation.Combination.Number,
+                    phaseNumber,
+                    phases[phaseIndex].Length,
+                    phase.StartTime.ToDateTimeOffset()
+                );
+                _starts.Add(start);
             }
         }
-        Participation.PHASE_COMPLETED_EVENT.Subscribe(PhaseCompletedHandler);
+        Participation.PHASE_COMPLETED_EVENT.Subscribe(OnPhaseComplete);
         ChangeHandler = action;
     }
 
@@ -65,7 +66,7 @@ public class StartList
         return _starts.Any();
     }
 
-    void PhaseCompletedHandler(PhaseCompleted phaseCompleted)
+    void OnPhaseComplete(PhaseCompleted phaseCompleted)
     {
         var newStart = new StartlistEntry(phaseCompleted.Participation);
         _starts.Add(newStart);

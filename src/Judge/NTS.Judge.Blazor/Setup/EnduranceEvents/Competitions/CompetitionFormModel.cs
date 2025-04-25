@@ -42,8 +42,8 @@ public class CompetitionFormModel : IFormModel<Competition>
         Id = competition.Id;
         Name = competition.Name;
         Type = competition.Type;
-        Day = competition.Start.DateTime;
-        Time = competition.Start.DateTime.TimeOfDay;
+        Day = competition.Start.ToLocalTime().DateTime; // TODO: Create NComponent that's using DateTimeOffset and convert to DateTime correctly
+        Time = competition.Start.ToLocalTime().DateTime.TimeOfDay;
         Ruleset = competition.Ruleset;
         Phases = competition.Phases;
         Participations = competition.Participations;

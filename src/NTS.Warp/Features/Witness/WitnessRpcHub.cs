@@ -1,0 +1,97 @@
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.SignalR;
+using Not.Concurrency.Extensions;
+using NTS.Warp.ACL.Entities;
+using NTS.Warp.ACL.Factories;
+using NTS.Warp.ACL.RPC.Procedures;
+using NTS.Warp.Features.Judge;
+using NTS.Warp.Features.Witness.ProcessSnapshots;
+
+namespace NTS.Warp.Features.Witness;
+
+internal class WitnessRpcHub
+    : NtsHub<ILegacyWitnessClientProcedures>,
+        IEmsStartlistHubProcedures,
+        IEmsParticipantsHubProcedures
+{
+    readonly IPrimaryConnectionContext _primaryConnections;
+    readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;
+
+    public WitnessRpcHub(
+        ILogger<WitnessRpcHub> logger,
+        IPrimaryConnectionContext primaryConnections,
+        IHubContext<JudgeRpcHub, IJudgeClientProcedures> judgeRelay
+    )
+        : base(logger)
+    {
+        _primaryConnections = primaryConnections;
+        _judgeRelay = judgeRelay;
+    }
+
+    public override async Task OnConnectedAsync()
+    {
+        await base.OnConnectedAsync();
+        var enduranceEventId = GetConnectionGroup()!;
+        if (!TryGetJudgeClient(enduranceEventId, out var judgeClient))
+        {
+            return;
+        }
+        await judgeClient.OnWitnessConnected(Context.ConnectionId);
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        await base.OnDisconnectedAsync(exception);
+        var enduranceEventId = GetConnectionGroup()!;
+        if (!TryGetJudgeClient(enduranceEventId, out var judgeClient))
+        {
+            return;
+        }
+        await judgeClient.OnWitnessDisconnedted(Context.ConnectionId);
+    }
+
+    public async Task<Dictionary<int, EmsStartlist>> SendStartlist(WarpRequest request)
+    {
+        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
+        {
+            return [];
+        }
+        var participations = await judgeClient.GetActiveParticipations();
+        return StartlistFactory.Create(participations);
+    }
+
+    public async Task<IEnumerable<EmsParticipantEntry>> SendParticipants(WarpRequest request)
+    {
+        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
+        {
+            return [];
+        }
+        var participants = await judgeClient.GetActiveParticipations();
+        var emsPartcipants = participants.Select(ParticipantEntryFactory.Create).ToList();
+        return emsPartcipants;
+    }
+
+    public async Task ReceiveWitnessEvent(WarpRequest<ProcessSnapshotsPayload> request)
+    {
+        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
+        {
+            return; // TODO: meaningful message would improve UX here
+        }
+        var snapshots = request.Payload.Entries.Select(entry => SnapshotFactory.Create(entry, request.Payload.Type));
+        await judgeClient.ProcessSnapshots(snapshots);
+    }
+
+    bool TryGetJudgeClient(string enduranceEventId, [NotNullWhen(true)] out IJudgeClientProcedures? judeClient)
+    {
+        var identifier = enduranceEventId.ToString();
+        var connectionId = _primaryConnections.GetConnectionId(identifier);
+        if (connectionId == null)
+        {
+            judeClient = null;
+            return false;
+        }
+
+        judeClient = _judgeRelay.Clients.Client(connectionId);
+        return true;
+    }
+}

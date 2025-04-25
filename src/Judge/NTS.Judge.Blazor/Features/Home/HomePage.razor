@@ -1,0 +1,16 @@
+@attribute [Route(HOME)]
+
+@using Not.Blazor.CRUD.Lists
+@using NTS.Domain.Setup.Aggregates
+@using NTS.Judge.Blazor.Setup.EnduranceEvents
+@inherits NComponent
+
+<NContent Title="@Select_event_string">
+   
+    <Main>
+        <CrudList T="UpcomingEvent" TForm="EnduranceEventForm" TModel="EnduranceEventFormModel" Name="@Upcoming_events_string" UpdateRoute="@ENDURANCE_EVENT_PAGE" />
+    </Main>
+    
+</NContent>
+
+    

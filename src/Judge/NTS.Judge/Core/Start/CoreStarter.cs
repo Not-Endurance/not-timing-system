@@ -5,27 +5,28 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
 using NTS.Judge.Core.Start.Factories;
+using NTS.Judge.Features;
 
 namespace NTS.Judge.Core.Start;
 
 public class CoreStarter : ICoreStarter
 {
-    readonly IRepository<Domain.Setup.Aggregates.EnduranceEvent> _setupRepository;
-    readonly IRepository<EnduranceEvent> _coreEventRespository;
+    readonly IEventContext _eventContext;
+    readonly IRepository<EnduranceEvent> _coreEventRepository;
     readonly IRepository<Official> _coreOfficialRepository;
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<Ranking> _rankingRepository;
 
     public CoreStarter(
-        IRepository<Domain.Setup.Aggregates.EnduranceEvent> setupRepository,
-        IRepository<EnduranceEvent> coreEventRespository,
+        IEventContext eventContext,
+        IRepository<EnduranceEvent> coreEventRepository,
         IRepository<Official> coreOfficialRepository,
         IRepository<Participation> participationRepository,
         IRepository<Ranking> rankingRepository
     )
     {
-        _setupRepository = setupRepository;
-        _coreEventRespository = coreEventRespository;
+        _eventContext = eventContext;
+        _coreEventRepository = coreEventRepository;
         _coreOfficialRepository = coreOfficialRepository;
         _participationRepository = participationRepository;
         _rankingRepository = rankingRepository;
@@ -33,71 +34,66 @@ public class CoreStarter : ICoreStarter
 
     public async Task<bool> Start()
     {
-        var setupEvent = await _setupRepository.Read(0);
+        var setupEvent = _eventContext.Event;
         if (setupEvent == null)
         {
             // TODO: Create ValidationException containing localization logic and inherit form it in DomainException. Use that here instead
             throw new DomainException("Cannot start - Event is not configured");
         }
-        await CreateEvent(setupEvent);
-        await CreateOfficials(setupEvent.Officials);
-        await CreateParticipationsAndRankings(setupEvent);
+
+        var enduranceEvent = EnduranceEventFactory.Create(setupEvent);
+        var officials = setupEvent.Officials.Select(OfficialFactory.Create);
+        var (participations, rankings) = CreateParticipationsAndRankings(setupEvent);
+
+        await _coreEventRepository.Create(enduranceEvent);
+        foreach (var official in officials)
+        {
+            await _coreOfficialRepository.Create(official);
+        }
+        foreach (var participation in participations)
+        {
+            await _participationRepository.Create(participation);
+        }
+        foreach (var ranking in rankings)
+        {
+            await _rankingRepository.Create(ranking);
+        }
         return true;
     }
 
-    async Task CreateEvent(Domain.Setup.Aggregates.EnduranceEvent setupEvent)
+    (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(
+        Domain.Setup.Aggregates.UpcomingEvent setupEvent
+    )
     {
-        var @event = EnduranceEventFactory.Create(setupEvent);
-        await _coreEventRespository.Create(@event);
-    }
+        var participations = new List<Participation>();
+        var rankings = new List<Ranking>();
 
-    async Task CreateOfficials(IEnumerable<Domain.Setup.Aggregates.Official> setupOfficials)
-    {
-        foreach (var setupOfficial in setupOfficials)
-        {
-            var official = OfficialFactory.Create(setupOfficial);
-            await _coreOfficialRepository.Create(official);
-        }
-    }
-
-    async Task CreateParticipationsAndRankings(Domain.Setup.Aggregates.EnduranceEvent setupEvent)
-    {
         foreach (var setupCompetition in setupEvent.Competitions)
         {
-            var (participations, rankingEntriesByCategory) = await ParticipationAndRankingFactory.Create(
-                setupCompetition,
-                _participationRepository
-            );
-            foreach (var participation in participations)
-            {
-                await _participationRepository.Create(participation);
-            }
-            await CreateRankings(setupCompetition, rankingEntriesByCategory);
+            var (p, rankingEntriesByCategory) = ParticipationAndRankingFactory.Create(setupCompetition, participations);
+            var r = rankingEntriesByCategory.Where(x => x.Value.Any()).Select(x => CreateRanking(setupCompetition, x));
+
+            participations.AddRange(p);
+            rankings.AddRange(r);
         }
+        return (participations, rankings);
     }
 
-    async Task CreateRankings(
+    Ranking CreateRanking(
         Domain.Setup.Aggregates.Competition setupCompetition,
-        Dictionary<AthleteCategory, List<RankingEntry>> rankingEntriesByCategory
+        KeyValuePair<AthleteCategory, List<RankingEntry>> entriesByCategory
     )
     {
         var competition = new Competition(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type);
-        foreach (var relation in rankingEntriesByCategory)
-        {
-            if (relation.Value.Count > 0)
-            {
-                var ranking = RankingFactory.Create(
-                    competition,
-                    relation.Key,
-                    relation.Value,
-                    setupCompetition.FeiRule,
-                    setupCompetition.FeiEventCode,
-                    setupCompetition.FeiScheduleNumber,
-                    setupCompetition.FeiCategoryEventNumber
-                );
-                await _rankingRepository.Create(ranking);
-            }
-        }
+        return RankingFactory.Create(
+            competition,
+            entriesByCategory.Key,
+            entriesByCategory.Value,
+            setupCompetition.FeiRule,
+            setupCompetition.FeiEventCode,
+            setupCompetition.FeiScheduleNumber,
+            setupCompetition.FeiCategoryEventNumber
+        );
     }
 }
 

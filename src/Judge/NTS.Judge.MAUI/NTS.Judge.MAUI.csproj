@@ -67,9 +67,19 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Not\Not.MAUI\Not.MAUI.csproj" />
     <ProjectReference Include="..\..\NTS.Storage\NTS.Storage.csproj" />
-    <ProjectReference Include="..\..\Relay\NTS.Relay\NTS.Relay.csproj" />
+    <ProjectReference Include="..\NTS.Judge.Warp\NTS.Judge.Warp.csproj" />
     <ProjectReference Include="..\NTS.Judge\NTS.Judge.csproj" />
     <ProjectReference Include="..\NTS.Judge.Blazor\NTS.Judge.Blazor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="appsettings.*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <DependentUpon>appsettings.json</DependentUpon>
+    </None>
+  </ItemGroup>
+  
 </Project>

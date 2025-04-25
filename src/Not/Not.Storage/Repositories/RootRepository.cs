@@ -16,19 +16,19 @@ public abstract class RootRepository<T, TState> : ReadonlyRootRepository<T, TSta
     where T : AggregateRoot
     where TState : class, ITreeState<T>, new()
 {
-    public RootRepository(IStore<TState> store)
+    protected RootRepository(IStore<TState> store)
         : base(store) { }
 
-    public async Task Create(T entity)
+    public async Task Create(T item)
     {
         var state = await Store.Transact();
-        state.Root = entity;
+        state.Root = item;
         await Store.Commit(state);
     }
 
-    public async Task Update(T entity)
+    public async Task Update(T items)
     {
-        await Create(entity);
+        await Create(items);
     }
 
     public Task Delete(int id)
@@ -41,12 +41,12 @@ public abstract class RootRepository<T, TState> : ReadonlyRootRepository<T, TSta
         throw NotImplemented();
     }
 
-    public Task Delete(T entity)
+    public Task Delete(T item)
     {
         throw NotImplemented();
     }
 
-    public Task Delete(IEnumerable<T> entities)
+    public Task Delete(IEnumerable<T> items)
     {
         throw NotImplemented();
     }

@@ -7,6 +7,8 @@
 
 <EditForm Model="Model">
     <MudTextField @ref="_placeField" @bind-Value="Model.Place" Label="@Place_string" />
+    
+    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
 
     <NAutocomplete T="Country" @ref="_countryField" @bind-Value="Model.Country" Label="@Country_string" Search="Countries.Search" />
     

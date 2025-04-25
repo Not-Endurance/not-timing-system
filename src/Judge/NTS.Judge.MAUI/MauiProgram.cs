@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics;
-using Not.Application.RPC.SignalR;
-using NTS.Judge.RPC;
-using static NTS.Judge.MAUI.Constants;
-using static NTS.Relay.Constants;
+using Not.Application.Configurations;
+using Not.Application.Environments;
+using NTS.Judge.Warp;
 
 namespace NTS.Judge.MAUI;
 
@@ -10,15 +9,20 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var builder = MauiApp.CreateBuilder();
-        builder
+        var builder = MauiApp
+            .CreateBuilder()
             .UseMauiApp<App>()
             .ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"))
             .ConfigureJudgeMaui();
 
+        builder.Configuration.AddNAppsettings();
+
         var app = builder.Build();
 
-        StartHub();
+        if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))
+        {
+            StartHub();
+        }
 
         return app;
     }
@@ -27,19 +31,23 @@ public static class MauiProgram
     {
         try
         {
-            var parentPid = Process.GetCurrentProcess().Id;
+            var parentPid = Environment.ProcessId;
             var currentDirectory = Directory.GetCurrentDirectory();
             var info = new ProcessStartInfo
             {
-                FileName = Path.Combine(currentDirectory, RELAY_APP_EXE),
-                Arguments = PARENT_PID_KEY + parentPid.ToString(),
+                FileName = Path.Combine(currentDirectory, "NTS.Judge.Warp.exe"),
+                Arguments = JudgeWarpConstants.PARENT_PID_KEY + parentPid,
             };
-
-            var hubProcess = Process.Start(info);
+            Process.Start(info);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
         }
     }
+}
+
+public static class JudgeVariables
+{
+    public const string NO_WARP = nameof(NO_WARP);
 }
