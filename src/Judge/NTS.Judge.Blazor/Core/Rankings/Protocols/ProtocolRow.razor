@@ -9,14 +9,14 @@
         <MudText Typo="Typo.button" Align="Align.Center">@_rankText</MudText>
 
         <MudStack Justify="Justify.FlexStart" Spacing="1" Style="height:100%; width:80px">
-            <MudText Typo="Typo.caption" Align="Align.Right">Rider:<br/>@_combination.Athlete.Names</MudText>
+            <MudText Typo="Typo.caption" Align="Align.Right">@Rider_string:<br/>@_combination.Athlete.Names</MudText>
 
-            <MudText Typo="Typo.caption" Align="Align.Right">Horse:<br/>@_combination.Horse</MudText>
+            <MudText Typo="Typo.caption" Align="Align.Right">@Horse_string:<br/>@_combination.Horse</MudText>
             @if(_combination.Club != null)
             {
-                <MudText Typo="Typo.caption" Align="Align.Right">Club:<br/>@_combination.Club</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Right">@Club_string:<br/>@_combination.Club</MudText>
             }else{
-                <MudText Typo="Typo.caption" Align="Align.Right">Country:<br/>@_combination.Athlete.Country</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Right">@Country_string:<br/>@_combination.Athlete.Country</MudText>
             }
         </MudStack>
     </MudStack>
@@ -34,7 +34,7 @@
                 <MudText Typo="Typo.caption" Align="Align.Center">
                     @Finished_at_colon_string
                     <strong>
-                            @_total!.FinishTime
+                        @_total!.FinishTime
                     </strong>
                 </MudText>
 
@@ -44,22 +44,28 @@
                 </MudText>
 
                 <MudText Typo="Typo.caption" Align="Align.Center">
-                    @* @Average_speed_string *@
-                    Average Speed:
+                    @Average_speed
                     <br />
                     <strong>@_total!.AverageSpeed.ToString()</strong> km/h
                 </MudText>
             </MudStack>
         </MudStack>
     }
+    else if (Entry.Participation.IsEliminated())
+    {
+        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="width:140px;">
+            <MudText Typo="Typo.body2" Align="Align.Center" Class="mud-button-text">
+                @Eliminated_string:
+                <br />
+                <strong>@Entry.Participation.Eliminated</strong>
+            </MudText>
+        </MudStack>
+    }
     else
     {
         <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="width:140px;">
             <MudText Typo="Typo.body2" Align="Align.Center" Class="mud-button-text">
-                @* @Eliminated_string *@
-                Eliminated:
-                <br />
-                <strong>@Entry.Participation.Eliminated</strong>
+                @Competition_ongoing_string
             </MudText>
         </MudStack>
     }

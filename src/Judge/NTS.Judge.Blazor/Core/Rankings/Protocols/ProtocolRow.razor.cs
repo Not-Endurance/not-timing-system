@@ -23,7 +23,7 @@ public partial class ProtocolRow
         {
             _rankText = " ";
         }
-            _combination = Entry.Participation.Combination;
+        _combination = Entry.Participation.Combination;
         _phases = Entry.Participation.Phases;
         _total = Entry.Participation.GetTotal();
     }
