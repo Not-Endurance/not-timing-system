@@ -12,7 +12,7 @@
 		</MudInputLabel>
 		
 		<MudInputLabel Class="mt-2 font-size-12">
-			@Witnesses_connected__colon_string @ConnectionsBehind.RemoteConnections.Count()
+			@string.Format(Witnesses_connected__colon_string, ConnectionsBehind.RemoteConnections.Count())
 		</MudInputLabel>
 	}
 	else
