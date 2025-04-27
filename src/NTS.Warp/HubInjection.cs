@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Not.Application.UdpHandshake;
 using Not.Injection;
 using Not.Localization;
 using Not.Serialization.JSON;
@@ -18,6 +19,7 @@ internal static class HubInjection
             })
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = NJsonSettings.ConfigureServerSerialization());
 
-        return services.AddDummyLocalizer().RegisterConventionalServices();
+        // TODO: Not.Application is getting handshaked..
+        return services.AddDummyLocalizer().RegisterConventionalServices().AddTransient<INetworkBroadcastService, JudgeHandshakeService>();
     }
 }
