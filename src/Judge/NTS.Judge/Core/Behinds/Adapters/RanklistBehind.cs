@@ -59,7 +59,7 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
             return false;
         }
         var officials = await _officials.ReadAll();
-        var ranklistDocument = new RanklistDocument(Ranklist,enduranceEvent, officials);
+        var ranklistDocument = new RanklistDocument(Ranklist, enduranceEvent, officials);
         Document = ranklistDocument;
         return true;
     }

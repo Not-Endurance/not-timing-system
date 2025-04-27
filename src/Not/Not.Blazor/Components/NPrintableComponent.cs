@@ -28,7 +28,6 @@ public abstract class PrintableComponent : NComponent, IDisposable
 
     protected async Task OpenPrintDialog()
     {
-        PrintingClassName = "printing";
         InvokeToggle();
         await PrintInterop.OpenPrintDialog();
         InvokeToggle();
