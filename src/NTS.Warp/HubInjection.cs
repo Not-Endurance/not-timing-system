@@ -2,7 +2,6 @@
 using Not.Injection;
 using Not.Localization;
 using Not.Serialization.JSON;
-using NTS.Storage;
 using NTS.Warp.Middlewares;
 
 namespace NTS.Warp;
@@ -17,13 +16,8 @@ internal static class HubInjection
                 options.EnableDetailedErrors = true;
                 options.AddFilter<ExceptionHandlingHubFilter>();
             })
-            .AddNewtonsoftJsonProtocol(x =>
-            {
-                x.PayloadSerializerSettings = new NJsonSettings();
-            });
+            .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = NJsonSettings.ConfigureServerSerialization());
 
-        services.AddDummyLocalizer().RegisterConventionalServices().ConfigureStorage();
-
-        return services;
+        return services.AddDummyLocalizer().RegisterConventionalServices();
     }
 }
