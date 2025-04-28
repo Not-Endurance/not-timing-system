@@ -1,6 +1,7 @@
 using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Lists.Ports;
+using Not.Domain.Exceptions;
 using Not.Strings;
 using NTS.Domain.Setup.Aggregates;
 
@@ -8,12 +9,12 @@ namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 
 public partial class ParticipationForm
 {
+    static readonly PatternMask TIME_MASK = new("00:00");
+
     NAutocomplete<Combination> _combinationField = default!;
     NSwitch _isNotRankedField = default!;
     MudPicker<TimeSpan?> _timeField = default!;
     MudNumericField<double?> _maxSpeedOverrideField = default!;
-    bool _overrideMaxSpeed;
-    bool _overrideStartTime;
 
     [Inject]
     IListBehind<Combination> Behind { get; set; } = default!;
