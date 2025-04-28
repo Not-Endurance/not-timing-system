@@ -5,6 +5,7 @@ using static Not.Localization.NStrings;
 
 namespace Not.Domain.Base;
 
+// TODO: consider renaming Id to AggregateId and storing it as something other than Mongo's _id. Store only Document.Id as _id
 public abstract class AggregateRoot : IEquatable<AggregateRoot>, IAggregateRoot
 {
     public static bool operator ==(AggregateRoot? left, AggregateRoot? right)
