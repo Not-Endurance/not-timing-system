@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Not.Domain.Base;
 using Not.Domain.Exceptions;
+using NTS.Domain.Extensions;
 
 namespace NTS.Domain.Setup.Aggregates;
 
@@ -154,8 +155,8 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
     public void Update(Participation child)
     {
         ValidateAthleteCategory(child);
-        _participations.Remove(child);
-        Add(child);
+        child.SetSpeedLimits(Type);
+        _participations.Update(child);
     }
 
     public void Add(Phase child)
@@ -170,8 +171,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
 
     public void Update(Phase child)
     {
-        _phases.Remove(child);
-        Add(child);
+        _phases.Update(child);
     }
 
     void ValidateAthleteCategory(Participation child)
