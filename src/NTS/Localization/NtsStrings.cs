@@ -91,6 +91,7 @@ namespace NTS.Localization
         public static string Representation_string => LocalizeString(nameof(Representation_string));
         public static string Required_Inspection_string => LocalizeString(nameof(Required_Inspection_string));
         public static string Manual_handout_strings => LocalizeString(nameof(Manual_handout_strings));
+        public static string Handouts_list_empty_message_string => LocalizeString(nameof(Handouts_list_empty_message_string));
         public static string The_Competitions_havent_started_yet_string =>
             LocalizeString(nameof(The_Competitions_havent_started_yet_string));
         public static string Archive_string => LocalizeString(nameof(Archive_string));

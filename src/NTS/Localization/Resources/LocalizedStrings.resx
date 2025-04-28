@@ -370,7 +370,7 @@
     <value>Print Preview</value>
   </data>
   <data name="Manual_handout_strings" xml:space="preserve">
-    <value>Manaul handout</value>
+    <value>Create handout:</value>
   </data>
   <data name="Yes_string" xml:space="preserve">
     <value>Yes</value>
@@ -551,5 +551,8 @@
   </data>
   <data name="Disqualify_Reason_string" xml:space="preserve">
     <value>Disqualify Reason</value>
+  </data>
+  <data name="Handouts_list_empty_message_string" xml:space="preserve">
+    <value>Create Handouts manually to print...</value>
   </data>
 </root>

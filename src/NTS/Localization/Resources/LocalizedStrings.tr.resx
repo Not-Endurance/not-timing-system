@@ -370,7 +370,7 @@
     <value>Yazdırma Önizleme</value>
   </data>
   <data name="Manual_handout_strings" xml:space="preserve">
-    <value>Manuel çıktı</value>
+    <value>Manuel çıktı:</value>
   </data>
   <data name="Yes_string" xml:space="preserve">
     <value>Evet</value>
@@ -551,5 +551,8 @@
   </data>
   <data name="Disqualify_Reason_string" xml:space="preserve">
     <value>Diskalifiye olma nedeni</value>
+  </data>
+  <data name="Handouts_list_empty_message_string" xml:space="preserve">
+    <value>Yazdırmadan önce çıktıları manuel olarak oluşturun...</value>
   </data>
 </root>

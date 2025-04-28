@@ -370,7 +370,7 @@
     <value>Прегледай Печат</value>
   </data>
   <data name="Manual_handout_strings" xml:space="preserve">
-    <value>Генерирай печат</value>
+    <value>Генерирай разпечатка:</value>
   </data>
   <data name="Yes_string" xml:space="preserve">
     <value>Да</value>
@@ -551,5 +551,8 @@
   </data>
   <data name="Disqualify_Reason_string" xml:space="preserve">
     <value>Причина за дисквалифициране</value>
+  </data>
+  <data name="Handouts_list_empty_message_string" xml:space="preserve">
+    <value>Генерирай разпечатки ръчно преди принтиране...</value>
   </data>
 </root>
