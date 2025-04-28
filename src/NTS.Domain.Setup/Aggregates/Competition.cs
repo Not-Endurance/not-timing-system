@@ -81,7 +81,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
             name,
             type,
             ruleset,
-            IsFutureTime(nameof(Start), start),
+            start,
             ToTimeSpan(compulsoryThresholdMinutes),
             feiRule,
             feiEventCode,
@@ -97,7 +97,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         string? name,
         CompetitionType? type,
         CompetitionRuleset? ruleset,
-        DateTimeOffset start,
+        DateTimeOffset? start,
         TimeSpan? compulsoryThresholdSpan,
         string? feiRule,
         string? feiEventCode,
@@ -113,7 +113,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         Name = Required(nameof(Name), name);
         Type = Required(nameof(Type), type);
         Ruleset = Required(nameof(Ruleset), ruleset);
-        Start = start;
+        Start = Required(nameof(Start), start);
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
         FeiRule = feiRule;
         FeiEventCode = feiEventCode;
@@ -186,15 +186,6 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
                 Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category
             );
         }
-    }
-
-    static DateTimeOffset IsFutureTime(string field, DateTimeOffset start)
-    {
-        if (start <= DateTimeOffset.Now)
-        {
-            throw new DomainPropertyException(field, Competition_start_cannot_be_in_the_past);
-        }
-        return start;
     }
 
     static TimeSpan? ToTimeSpan(int? minutes)

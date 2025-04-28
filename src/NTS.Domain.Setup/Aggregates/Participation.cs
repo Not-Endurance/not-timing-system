@@ -54,7 +54,7 @@ public class Participation : AggregateRoot, IReflect<Combination>
         Combination? combination,
         double? maxSpeedOverride
     )
-        : this(GenerateId(), IsFutureTime(startTimeOverride), isUnranked, combination, maxSpeedOverride) { }
+        : this(GenerateId(), startTimeOverride, isUnranked, combination, maxSpeedOverride) { }
 
     public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
@@ -99,14 +99,5 @@ public class Participation : AggregateRoot, IReflect<Combination>
         {
             Combination = combination;
         }
-    }
-
-    static DateTimeOffset? IsFutureTime(DateTimeOffset? startTimeOverride)
-    {
-        if (startTimeOverride != null && startTimeOverride.Value <= DateTimeOffset.Now)
-        {
-            throw new DomainPropertyException(nameof(StartTimeOverride), Please_select_future_time_string);
-        }
-        return startTimeOverride;
     }
 }
