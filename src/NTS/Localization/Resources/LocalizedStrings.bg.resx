@@ -558,4 +558,7 @@
   <data name="Null_or_malformed_string" xml:space="preserve">
     <value>Стойността за полето '{0}' липсва или е в грешен формат. Моля въведете коректна стойност и опитайте отново</value>
   </data>
+  <data name="Main_menu_string" xml:space="preserve">
+    <value>Главно Меню</value>
+  </data>
 </root>

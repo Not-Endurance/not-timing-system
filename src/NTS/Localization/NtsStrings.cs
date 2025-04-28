@@ -153,6 +153,7 @@ namespace NTS.Localization
         public static string Time_format_is_incorrect_hrs_colon_mins_colon_secs_string =>
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
         public static string Null_or_malformed_string => LocalizeString(nameof(Null_or_malformed_string));
+        public static string Main_menu_string => LocalizeString(nameof(Main_menu_string));
     }
 }
 #pragma warning restore NA0004

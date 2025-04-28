@@ -558,4 +558,7 @@
   <data name="Null_or_malformed_string" xml:space="preserve">
     <value>'{0}' value is missing or malformed. Please enter a correct value and try again</value>
   </data>
+  <data name="Main_menu_string" xml:space="preserve">
+    <value>Main Menu</value>
+  </data>
 </root>

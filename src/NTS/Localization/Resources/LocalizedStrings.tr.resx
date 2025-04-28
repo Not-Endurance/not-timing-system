@@ -558,4 +558,7 @@
   <data name="Null_or_malformed_string" xml:space="preserve">
     <value>'{0}' alanının değeri eksik veya yanlış biçimde. Lütfen doğru bir değer girip tekrar deneyin</value>
   </data>
+  <data name="Main_menu_string" xml:space="preserve">
+    <value>Ana Menü</value>
+  </data>
 </root>
