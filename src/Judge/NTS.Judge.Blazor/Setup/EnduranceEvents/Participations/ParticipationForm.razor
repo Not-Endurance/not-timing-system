@@ -13,7 +13,7 @@
 
     @if (_overrideStartTime)
     {
-        <MudTimePicker @ref="_timeField" @bind-Time="Model.StartTimeOverride" ShowToolbar="false" Label="@Start_Time_string" />
+        <MudTimePicker @ref="_timeField" @bind-Time="Model.StartTimeOverride" ShowToolbar="false" Label="@Start_Time_string" Editable="true" Mask="TIME_MASK" />
     }
 
     <NSwitch @bind-Value="_overrideMaxSpeed" Label="@Max_Speed_Penalty_string" />

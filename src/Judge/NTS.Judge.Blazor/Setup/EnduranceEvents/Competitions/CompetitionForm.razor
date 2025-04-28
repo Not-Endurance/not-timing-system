@@ -11,7 +11,7 @@
 
     <MudDatePicker @ref="_dayField" @bind-Date="Model.Day" Label="@Date_string" ImmediateText="true"/>
 
-    <MudTimePicker @ref="_timeField" @bind-Time="Model.Time" Label="@Time_string" ImmediateText="true"/>
+    <MudTimePicker @ref="_timeField" @bind-Time="Model.Time" Label="@Time_string" ImmediateText="true" Editable="true" Mask="TIME_MASK" />
 
     <NSwitch @bind-Value="Model.UseCompulsoryThreshold" Label="@Automatic_CRI_string" />
 

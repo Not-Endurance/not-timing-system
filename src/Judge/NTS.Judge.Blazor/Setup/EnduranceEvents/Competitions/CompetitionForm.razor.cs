@@ -1,5 +1,6 @@
 using MudBlazor;
 using Not.Blazor.Components;
+using Not.Notify;
 using Not.Structures;
 using NTS.Domain.Setup.Aggregates;
 
@@ -7,6 +8,8 @@ namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions;
 
 public partial class CompetitionForm
 {
+    static readonly PatternMask TIME_MASK = new("00:00");
+
     MudNumericField<int?> _requiredInspectionCompulsoryThreshold = default!;
     MudTextField<string?> _nameField = default!;
     NSelect<CompetitionType> _typeField = default!;
