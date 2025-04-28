@@ -555,4 +555,7 @@
   <data name="Handouts_list_empty_message_string" xml:space="preserve">
     <value>Create Handouts manually to print...</value>
   </data>
+  <data name="Null_or_malformed_string" xml:space="preserve">
+    <value>'{0}' value is missing or malformed. Please enter a correct value and try again</value>
+  </data>
 </root>

@@ -152,6 +152,7 @@ namespace NTS.Localization
             LocalizeString(nameof(Invalid_phase_configuration_in_competition__missing_rest));
         public static string Time_format_is_incorrect_hrs_colon_mins_colon_secs_string =>
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
+        public static string Null_or_malformed_string => LocalizeString(nameof(Null_or_malformed_string));
     }
 }
 #pragma warning restore NA0004

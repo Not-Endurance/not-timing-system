@@ -403,10 +403,10 @@
     <value>Времето на Реинспекция нe може да бъде преди времето на Инспецкия  '{0}'</value>
   </data>
   <data name="Please_provide_reason_to_eliminate_as__" xml:space="preserve">
-    <value>Елиминация '{0}' изисква причина. Въведете причина и опитайте пак</value>
+    <value>Елиминация '{0}' изисква причина. Въведете причина и опитайте отново</value>
   </data>
   <data name="Select_FTQ_codes" xml:space="preserve">
-    <value>Изберете FTQ кодове и опитайте пак</value>
+    <value>Изберете FTQ кодове и опитайте отново</value>
   </data>
   <data name="Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category" xml:space="preserve">
     <value>Атлети участващи в Шампионати не могат да бъдат от категория Младши ездачи</value>
@@ -554,5 +554,8 @@
   </data>
   <data name="Handouts_list_empty_message_string" xml:space="preserve">
     <value>Генерирай разпечатки ръчно преди принтиране...</value>
+  </data>
+  <data name="Null_or_malformed_string" xml:space="preserve">
+    <value>Стойността за полето '{0}' липсва или е в грешен формат. Моля въведете коректна стойност и опитайте отново</value>
   </data>
 </root>

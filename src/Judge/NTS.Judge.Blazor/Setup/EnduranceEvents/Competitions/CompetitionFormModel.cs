@@ -1,4 +1,5 @@
 ﻿using Not.Blazor.CRUD.Forms.Ports;
+using Not.Domain.Exceptions;
 using Not.Extensions;
 using NTS.Domain.Setup.Aggregates;
 
@@ -58,6 +59,10 @@ public class CompetitionFormModel : IFormModel<Competition>
     static DateTimeOffset CombineStartDayAndTime(DateTime? startDay, TimeSpan? startTime)
     {
         var today = startDay.GetValueOrDefault(DateTime.Today);
+        if(startTime == null)
+        {
+            throw new DomainException(Null_or_malformed_string, Time_string);
+        }
         var nowTime = startTime.GetValueOrDefault(DateTime.Now.TimeOfDay);
         var startDayTime = today.Date.Add(nowTime);
         var startTimeOffset = startDayTime.ToDateTimeOffset();
