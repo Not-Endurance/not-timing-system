@@ -7,7 +7,7 @@ public interface IEliminations : IParticipationContext
     Task Withdraw();
     Task Retire();
     Task FinishNotRanked(string reason);
-    Task Disqualify(string reason);
+    Task Disqualify(DqCode[] dqCodes, string? reason);
     Task FailToQualify(FtqCode[] ftqCodes, string? reason);
     Task RestoreQualification();
 }

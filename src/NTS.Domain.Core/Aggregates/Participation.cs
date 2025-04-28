@@ -129,9 +129,9 @@ public class Participation : AggregateRoot, IAggregateRoot
         Eliminate(new Retired());
     }
 
-    public void Disqualify(string reason)
+    public void Disqualify(DqCode[] codes, string? reason)
     {
-        Eliminate(new Disqualified(reason));
+        Eliminate(new Disqualified(codes, reason));
     }
 
     public void FinishNotRanked(string reason)

@@ -14,6 +14,15 @@ public class EliminatedDocumentModel
                 Reason = eliminated.Complement,
                 FtqCodes = ftq.FtqCodes.ToArray(),
             };
+        } 
+        else if(eliminated is Disqualified dq)
+        {
+            return new EliminatedDocumentModel
+            {
+                Code = eliminated.Code,
+                Reason = eliminated.Complement,
+                DqCodes = dq.DqCodes.ToArray(),
+            };
         }
         return new EliminatedDocumentModel { Code = eliminated.Code, Reason = eliminated.Complement };
     }
@@ -21,6 +30,7 @@ public class EliminatedDocumentModel
     public string Code { get; init; } = default!;
     public string? Reason { get; init; }
     public FtqCode[]? FtqCodes { get; init; }
+    public DqCode[] DqCodes { get; init; } = default!;
 
     public Eliminated ToDomain()
     {
@@ -28,7 +38,7 @@ public class EliminatedDocumentModel
         {
             Eliminated.FAILED_TO_QUALIFY => new FailedToQualify(FtqCodes!, Reason),
             Eliminated.WITHDRAWN => new Withdrawn(),
-            Eliminated.DISQUALIFIED => new Disqualified(Reason!),
+            Eliminated.DISQUALIFIED => new Disqualified(DqCodes, Reason!),
             Eliminated.FINISHED_NOT_RANKED => new FinishedNotRanked(Reason!),
             Eliminated.RETIRED => new Retired(),
             _ => throw new NotImplementedException(),

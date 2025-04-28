@@ -549,4 +549,7 @@
   <data name="Select_event_string" xml:space="preserve">
     <value>Select event</value>
   </data>
+  <data name="Disqualify_Reason_string" xml:space="preserve">
+    <value>Disqualify Reason</value>
+  </data>
 </root>

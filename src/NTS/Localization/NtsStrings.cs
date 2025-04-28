@@ -32,6 +32,7 @@ namespace NTS.Localization
         public static string Handouts_string => LocalizeString(nameof(Handouts_string));
         public static string Inquiry_string => LocalizeString(nameof(Inquiry_string));
         public static string Failed_to_Qualify_Reason_string => LocalizeString(nameof(Failed_to_Qualify_Reason_string));
+        public static string Disqualify_Reason_string => LocalizeString(nameof(Disqualify_Reason_string));
         public static string Select_a_reason_string => LocalizeString(nameof(Select_a_reason_string));
         public static string Reason_string => LocalizeString(nameof(Reason_string));
         public static string Print_confirmation_string => LocalizeString(nameof(Print_confirmation_string));

@@ -1,11 +1,27 @@
 ﻿@using NTS.Domain.Core.Aggregates.Participations
 @using Not.Notify
 @using NTS.Judge.Blazor.Core.Dashboards.Actions.Eliminations.EliminationForms.Shared
+@using Not.Structures
 
 @inherits EliminationForm
 
 <MudPaper Elevation="1" Class="pa-2">
-    <EliminationFormReason @bind-Value="Reason" />
+    <MudSelect @bind-SelectedValues="@Codes" MultiSelection="true" Delimiter="+" Class="mt-4"
+               Label="@Disqualify_Reason_string" Placeholder="@Select_a_reason_string">
+
+        @foreach (var dqCode in SelectListModel.FromEnum<DqCode>())
+        {
+            <MudTooltip Text="@dqCode.Description" Inline="false" RootStyle="width:inherit;">
+                <MudSelectItem Value="@dqCode.Value">
+                    <MudText Typo="Typo.body1">@dqCode.Value</MudText>
+                </MudSelectItem>
+            </MudTooltip>
+
+        }
+    </MudSelect>
+    <MudCollapse Expanded="Codes.Contains(DqCode.other)">
+        <EliminationFormReason @bind-Value="Reason" />
+    </MudCollapse>
 
     <EliminationFormActions Form="this" />
 </MudPaper>
