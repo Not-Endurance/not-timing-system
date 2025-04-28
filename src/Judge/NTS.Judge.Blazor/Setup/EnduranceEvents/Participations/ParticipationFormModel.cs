@@ -1,4 +1,5 @@
 ﻿using Not.Blazor.CRUD.Forms.Ports;
+using Not.Domain.Exceptions;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
@@ -39,5 +40,17 @@ public class ParticipationFormModel : IFormModel<Participation>
         IsNotRanked = participation.IsNotRanked;
         Combination = participation.Combination;
         MaxSpeedOverride = participation.MaxSpeedOverride;
+    }
+
+    public void ValidateConditionalInputs()
+    {
+        if (OverrideStartTime && StartTimeOverride == null)
+        {
+            throw new DomainException(Null_or_malformed_string, Start_Time_string);
+        }
+        if (OverrideMaxSpeed && MaxSpeedOverride == null)
+        {
+            throw new DomainException(Null_or_malformed_string, Max_Speed_Penalty_string);
+        }
     }
 }

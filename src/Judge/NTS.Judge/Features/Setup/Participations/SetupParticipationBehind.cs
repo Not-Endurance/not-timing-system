@@ -17,12 +17,14 @@ public class SetupParticipationBehind : CrudChildBehind<Participation, Participa
 
     protected override Participation CreateEntity(ParticipationFormModel model)
     {
+        model.ValidateConditionalInputs();
         var newStart = model.StartTimeOverride?.ToDateTimeOffset();
         return Participation.Create(newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride);
     }
 
     protected override Participation UpdateEntity(ParticipationFormModel model)
     {
+        model.ValidateConditionalInputs();
         var newStart = model.StartTimeOverride?.ToDateTimeOffset();
         return Participation.Update(model.Id, newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride);
     }
