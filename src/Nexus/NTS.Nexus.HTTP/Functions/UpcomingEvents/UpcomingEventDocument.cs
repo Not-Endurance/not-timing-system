@@ -162,7 +162,7 @@ public class UpcomingEventDocument : Document
             return new(
                 EnsureId(Id),
                 StartTimeOverride,
-                IsNotRanked, // TODO: investigate not persisted as true
+                IsNotRanked,
                 Combination.ToSetupDomain(),
                 MaxSpeedOverride,
                 MinAverageSpeed,
