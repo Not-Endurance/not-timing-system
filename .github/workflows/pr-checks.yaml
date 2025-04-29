@@ -58,7 +58,7 @@ jobs:
 
   pr-checks-build:
     runs-on: ubuntu-latest
-    # needs: pr-checks-csharpier
+    needs: pr-checks-csharpier
     steps:
     - uses: actions/checkout@v4
     
