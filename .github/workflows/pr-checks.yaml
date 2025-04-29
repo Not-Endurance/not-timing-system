@@ -38,7 +38,7 @@ jobs:
         run: dotnet tool install -g csharpier --version 0.30.6
 
       - name: Format code
-        run: csharpier format .
+        run: dotnet csharpier .
 
       - name: Check for formatting changes
         run: |
