@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Base;
-using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Setup.Aggregates;
 
@@ -11,34 +10,15 @@ public class Participation : AggregateRoot, IReflect<Combination>
     const double MIN_SPEED = 10;
     const double MAX_SPEED = 16;
 
-    public static Participation Create(
-        DateTimeOffset? newStart,
-        bool isUnranked,
-        Combination? combination,
-        double? maxSpeedOverride
-    )
-    {
-        return new(newStart, isUnranked, combination, maxSpeedOverride);
-    }
-
-    public static Participation Update(
-        int? id,
-        DateTimeOffset? newStart,
-        bool isUnranked,
-        Combination? combination,
-        double? maxSpeedOverride
-    )
-    {
-        return new(id, newStart, isUnranked, combination, maxSpeedOverride);
-    }
-
     [JsonConstructor]
-    Participation(
+    public Participation(
         int? id,
         DateTimeOffset? startTimeOverride,
         bool isUnranked,
         Combination? combination,
-        double? maxSpeedOverride
+        double? maxSpeedOverride,
+        double? minAverageSpeed = null,
+        double? maxAverageSpeed = null
     )
         : base(id!.Value)
     {
@@ -46,22 +26,30 @@ public class Participation : AggregateRoot, IReflect<Combination>
         IsNotRanked = isUnranked;
         Combination = Required(nameof(Combination), combination);
         MaxSpeedOverride = maxSpeedOverride;
+        if (minAverageSpeed.HasValue)
+        {
+            MinAverageSpeed = minAverageSpeed;
+        }
+        if (maxAverageSpeed.HasValue)
+        {
+            MaxAverageSpeed = maxAverageSpeed;
+        }
     }
 
-    Participation(
+    public Participation(
         DateTimeOffset? startTimeOverride,
         bool isUnranked,
         Combination? combination,
         double? maxSpeedOverride
     )
-        : this(GenerateId(), startTimeOverride, isUnranked, combination, maxSpeedOverride) { }
+        : this(GenerateId(), startTimeOverride, isUnranked, combination, maxSpeedOverride, null, null) { }
 
     public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
     public DateTimeOffset? StartTimeOverride { get; }
+    public double? MaxSpeedOverride { get; }
     public double? MinAverageSpeed { get; private set; }
     public double? MaxAverageSpeed { get; private set; }
-    public double? MaxSpeedOverride { get; private set; }
 
     internal void SetSpeedLimits(CompetitionType competitionType)
     {
