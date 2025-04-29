@@ -2,7 +2,7 @@
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class RankingEntry : AggregateRoot, IAggregateRoot
+public class RankingEntry : AggregateRoot
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
@@ -23,7 +23,8 @@ public class RankingEntry : AggregateRoot, IAggregateRoot
 
     public override string ToString()
     {
-        var message = IsNotRanked ? $"({not_ranked_string}) " : "";
-        return message + Participation.ToString();
+        return IsNotRanked
+            ? $"{X_string} {Participation}"
+            : Participation.ToString();
     }
 }

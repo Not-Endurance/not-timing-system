@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Base;
+using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Setup.Aggregates;
 
@@ -75,10 +76,9 @@ public class Participation : AggregateRoot, IReflect<Combination>
 
     public override string ToString()
     {
-        var startTimeMessage =
-            StartTimeOverride != null ? $"{start_string}: {StartTimeOverride.Value.ToLocalTime().TimeOfDay} " : null;
-        var isUnrankedMessage = IsNotRanked ? not_ranked_string : null;
-        return Combine(Combination, startTimeMessage, isUnrankedMessage);
+        var restrictions = ToStringHelper.FormatSpeedRestrictions(MinAverageSpeed, MaxAverageSpeed);
+        var ex = IsNotRanked ? X_string : null;
+        return Combine(ex, Combination, restrictions);
     }
 
     public void Reflect(Combination combination)
