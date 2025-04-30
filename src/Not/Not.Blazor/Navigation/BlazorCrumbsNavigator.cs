@@ -8,10 +8,31 @@ public class BlazorCrumbsNavigator : ICrumbsNavigator, ILandNavigator
     readonly NavigationManager _blazorNavigationManager;
     static Parameters? _parameters;
     static Stack<(string endpoint, Parameters? parameters)>? _crumbs;
+    static string _home_page_endpoint = "/";
 
     public BlazorCrumbsNavigator(NavigationManager blazorNavigationManager)
     {
         _blazorNavigationManager = blazorNavigationManager;
+    }
+
+    public string CurrentEndpoint
+    {
+        get
+        {
+            if (_crumbs == null)
+            {
+                _crumbs = [];
+                _crumbs.Push((_home_page_endpoint, null));
+            }
+            if (_crumbs.TryPeek(out var crumb))
+            {
+                return crumb.endpoint;
+            }
+            else
+            {
+                throw new GuardException("Page cannot be without endpoint");
+            }
+        }
     }
 
     public void NavigateTo(string endpoint)
@@ -54,7 +75,6 @@ public class BlazorCrumbsNavigator : ICrumbsNavigator, ILandNavigator
 
     public void LandTo(string landing)
     {
-        _crumbs = [];
         NavigateTo(landing);
     }
 
