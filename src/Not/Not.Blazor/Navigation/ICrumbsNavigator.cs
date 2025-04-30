@@ -10,5 +10,4 @@ public interface ICrumbsNavigator
     bool CanNavigateBack();
     void NavigateBack();
     T ConsumeParameter<T>();
-    Even
 }
