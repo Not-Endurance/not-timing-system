@@ -1,4 +1,8 @@
-﻿namespace NTS.Witness.Components.Layout;
+﻿using Microsoft.AspNetCore.Components;
+using Not.Blazor.Navigation;
+using NTS.Witness.Constants;
+
+namespace NTS.Witness.Components.Layout;
 
 public partial class MainLayout
 {

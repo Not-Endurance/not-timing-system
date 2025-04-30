@@ -1,0 +1,12 @@
+﻿@using Not.Blazor.Components
+
+@inherits NComponent
+
+@if(IsEmergencyContactsConfigured && !IsCurrentPageEmergencyContacts)
+{
+    <MudFab Color="Color.Surface" StartIcon="@Icons.Material.Filled.LocalPhone" IconColor="Color.Error"
+            Style="color:rgb(244, 67, 54)"
+            Size="Size.Large"
+            Label="Help"
+            OnClick="HelpHandler" />
+}
