@@ -15,7 +15,8 @@ public static class MauiProgram
             .ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"))
             .ConfigureJudgeMaui();
 
-        builder.Configuration.AddNAppsettings();
+        var assembly = typeof(MauiProgram).Assembly;
+        builder.Configuration.AddNAppsettings(assembly);
 
         var app = builder.Build();
 
