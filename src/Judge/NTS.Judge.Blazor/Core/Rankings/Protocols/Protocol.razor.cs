@@ -15,8 +15,11 @@ public partial class Protocol
 
     protected override void OnParametersSet()
     {
-        _documentSubtitle = Document.Header.PopulatedPlace.City + "   " +
-        Document.Header.EventSpan + "   " +
-        Document.Header.PopulatedPlace.Country;
+        _documentSubtitle =
+            Document.Header.PopulatedPlace.City
+            + "   "
+            + Document.Header.EventSpan
+            + "   "
+            + Document.Header.PopulatedPlace.Country;
     }
 }
