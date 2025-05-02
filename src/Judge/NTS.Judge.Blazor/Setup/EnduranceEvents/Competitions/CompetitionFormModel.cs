@@ -61,7 +61,7 @@ public class CompetitionFormModel : IFormModel<Competition>
         var today = startDay.GetValueOrDefault(DateTime.Today);
         if(startTime == null)
         {
-            throw new DomainException(Null_or_malformed_string, Time_string);
+            throw new DomainPropertyException(nameof(Time), Null_or_malformed_string, Time_string);
         }
         var nowTime = startTime.GetValueOrDefault(DateTime.Now.TimeOfDay);
         var startDayTime = today.Date.Add(nowTime);

@@ -24,6 +24,7 @@ public partial class CompetitionForm
         RegisterInjector(nameof(Competition.Name), () => _nameField);
         RegisterInjector(nameof(Competition.Start), () => _dayField);
         RegisterInjector(nameof(Competition.Start), () => _timeField);
+        RegisterInjector(nameof(CompetitionFormModel.Time), () => _timeField);
         RegisterInjector(nameof(Competition.Type), () => _typeField);
         RegisterInjector(nameof(Competition.Ruleset), () => _rulesetField);
         RegisterInjector(nameof(Competition.CompulsoryThresholdSpan), () => _requiredInspectionCompulsoryThreshold);
