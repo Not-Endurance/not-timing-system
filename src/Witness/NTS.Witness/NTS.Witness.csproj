@@ -60,17 +60,15 @@
     </ItemGroup>
 
 	<ItemGroup>
-		<None Include="appsettings.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Include="appsettings.*.json">
+		<EmbeddedResource Include="appsettings.json" />
+		<EmbeddedResource Include="appsettings.*.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<DependentUpon>appsettings.json</DependentUpon>
-		</None>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Remove="Components\Routes.razor" />
+		<Content Remove="Components\Routes.razor" />
 	</ItemGroup>
 
     <ItemGroup>

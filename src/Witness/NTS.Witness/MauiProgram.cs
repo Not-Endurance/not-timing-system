@@ -19,7 +19,8 @@ public static class MauiProgram
 
         builder.Services.AddMauiBlazorWebView();
 
-        builder.Configuration.AddNAppsettings();
+        var assembly = typeof(MauiProgram).Assembly;
+        builder.Configuration.AddNAppsettings(assembly);
 
         builder.Logging.AddSerilog();
         //builder.ConfigureLogging().AddFilesystemLogger();
