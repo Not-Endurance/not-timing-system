@@ -23,8 +23,8 @@ public class ParticipationFormModel : IFormModel<Participation>
     public bool IsNotRanked { get; set; }
     public Combination? Combination { get; set; }
     public bool OverrideMaxSpeed { get; set; }
-    public double? MaxSpeedOverride 
-    {   
+    public double? MaxSpeedOverride
+    {
         get => _maxSpeedOverride;
         set
         {

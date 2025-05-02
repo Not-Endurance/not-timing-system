@@ -33,7 +33,7 @@ public record Disqualified : Eliminated
 
     [JsonConstructor]
     public Disqualified(DqCode[] dqCodes, string? complement)
-    : base(DISQUALIFIED)
+        : base(DISQUALIFIED)
     {
         PreventInvalidDq(dqCodes, complement);
         DqCodes = dqCodes;
@@ -59,10 +59,7 @@ public record Disqualified : Eliminated
     {
         if (codes.Length == 0)
         {
-            throw new DomainException(
-                Please_provide_reason_to_eliminate_as__,
-                $"{Eliminated.DISQUALIFIED} "
-            );
+            throw new DomainException(Please_provide_reason_to_eliminate_as__, $"{Eliminated.DISQUALIFIED} ");
         }
         if (codes.Contains(DqCode.other) && string.IsNullOrWhiteSpace(complement))
         {

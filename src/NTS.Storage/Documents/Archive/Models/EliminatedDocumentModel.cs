@@ -14,8 +14,8 @@ public class EliminatedDocumentModel
                 Reason = eliminated.Complement,
                 FtqCodes = ftq.FtqCodes.ToArray(),
             };
-        } 
-        else if(eliminated is Disqualified dq)
+        }
+        else if (eliminated is Disqualified dq)
         {
             return new EliminatedDocumentModel
             {

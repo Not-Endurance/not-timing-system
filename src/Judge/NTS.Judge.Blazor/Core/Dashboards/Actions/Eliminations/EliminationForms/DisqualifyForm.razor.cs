@@ -14,7 +14,7 @@ public partial class DisqualifyForm
 
     protected override void OnParametersSet()
     {
-        if(Disqualified != null)
+        if (Disqualified != null)
         {
             Codes = Disqualified.DqCodes.ToList();
             Reason = Disqualified?.Complement;

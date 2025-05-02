@@ -59,7 +59,7 @@ public class CompetitionFormModel : IFormModel<Competition>
     static DateTimeOffset CombineStartDayAndTime(DateTime? startDay, TimeSpan? startTime)
     {
         var today = startDay.GetValueOrDefault(DateTime.Today);
-        if(startTime == null)
+        if (startTime == null)
         {
             throw new DomainPropertyException(nameof(Time), Null_or_malformed_string, Time_string);
         }

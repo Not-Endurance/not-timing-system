@@ -9,9 +9,8 @@ public static class DateTimeOffsetExtension
         return offsetTime;
     }
 
-
     /// <summary>
-    /// ToDateTimeOffset creates a new DateTimeOffset from a TimeSpan. 
+    /// ToDateTimeOffset creates a new DateTimeOffset from a TimeSpan.
     /// The DateTimeOffset's day defaults to the one following the current date to ensure scheduling events doesn't happen in the past.
     /// To set the date to the current day pass 'true' as the second argument.
     /// </summary>
