@@ -32,6 +32,7 @@ public class ParticipationFactory
             }
             var emsRecord = new EmsLapRecord(phase.StartTime.Value.Date, emsLap)
             {
+                StartTime = phase.StartTime.Value.DateTime,
                 ArrivalTime = phase.ArriveTime?.DateTime,
                 InspectionTime = phase.PresentTime?.DateTime,
                 ReInspectionTime = phase.RepresentTime?.DateTime,

@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Not.Domain.Base;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
@@ -60,7 +61,7 @@ public class Combination : AggregateRoot
     public string Distance
     {
         get => FormatDistance(_distance);
-        set
+        init
         {
             decimal.TryParse(value, NumberFormatInfo.InvariantInfo, out var parsedValue);
             _distance = parsedValue;
@@ -69,20 +70,8 @@ public class Combination : AggregateRoot
 
     public override string ToString()
     {
-        var result = $"{hash_string}{Number}: {Athlete}, {Horse}";
-        if (MinAverageSpeed != null && MaxAverageSpeed != null)
-        {
-            return result + $" ({MinAverageSpeed}-{MaxAverageSpeed} {km_per_hour_string})";
-        }
-        else if (MinAverageSpeed != null && MaxAverageSpeed == null)
-        {
-            return result + $" ({min_string}:{MinAverageSpeed} {km_per_hour_string})";
-        }
-        else if (MinAverageSpeed == null && MaxAverageSpeed != null)
-        {
-            return result + $" ({max_string} : {MaxAverageSpeed}   {km_per_hour_string})";
-        }
-        return result;
+        var speed = ToStringHelper.FormatSpeedRestrictions(MinAverageSpeed, MaxAverageSpeed);
+        return $"{hash_string}{Number}: {Athlete}, {Horse} {speed}";
     }
 
     static string FormatDistance(decimal distance)

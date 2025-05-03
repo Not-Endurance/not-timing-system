@@ -1,3 +1,4 @@
+using Not.Localization;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Objects;
@@ -29,7 +30,7 @@ public partial class RanklistRow
 
         if (Entry.IsNotRanked)
         {
-            _rank = X_string;
+            _rank = NStrings.X_string;
             return;
         }
         if (participation.IsEliminated())
