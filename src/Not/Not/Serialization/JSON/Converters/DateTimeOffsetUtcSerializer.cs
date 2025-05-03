@@ -4,7 +4,13 @@ namespace Not.Serialization.JSON.Converters;
 
 public class DateTimeOffsetUtcSerializer : JsonConverter<DateTimeOffset>
 {
-    public override DateTimeOffset ReadJson(JsonReader reader, Type objectType, DateTimeOffset existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override DateTimeOffset ReadJson(
+        JsonReader reader,
+        Type objectType,
+        DateTimeOffset existingValue,
+        bool hasExistingValue,
+        JsonSerializer serializer
+    )
     {
         if (reader.TokenType == JsonToken.Null)
         {
@@ -35,4 +41,3 @@ public class DateTimeOffsetUtcSerializer : JsonConverter<DateTimeOffset>
         writer.WriteValue(value.UtcDateTime);
     }
 }
-

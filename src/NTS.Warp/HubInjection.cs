@@ -20,6 +20,9 @@ internal static class HubInjection
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = NJsonSettings.ConfigureServerSerialization());
 
         // TODO: Not.Application is getting handshaked..
-        return services.AddDummyLocalizer().RegisterConventionalServices().AddTransient<INetworkBroadcastService, JudgeHandshakeService>();
+        return services
+            .AddDummyLocalizer()
+            .RegisterConventionalServices()
+            .AddTransient<INetworkBroadcastService, JudgeHandshakeService>();
     }
 }

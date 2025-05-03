@@ -23,8 +23,6 @@ public class RankingEntry : AggregateRoot
 
     public override string ToString()
     {
-        return IsNotRanked
-            ? $"{X_string} {Participation}"
-            : Participation.ToString();
+        return IsNotRanked ? $"{X_string} {Participation}" : Participation.ToString();
     }
 }

@@ -55,7 +55,7 @@ public class UpcomingEventDocument : Document
     {
         return id == default ? RandomHelper.GenerateUniqueInteger() : id;
     }
-    
+
     public class CompetitionModel
     {
         public static CompetitionModel Create(Competition competition)
@@ -148,7 +148,7 @@ public class UpcomingEventDocument : Document
                 MaxAverageSpeed = participation.MaxAverageSpeed,
             };
         }
-        
+
         public int Id { get; init; }
         public DateTimeOffset? StartTimeOverride { get; init; }
         public bool IsNotRanked { get; init; }
