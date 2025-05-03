@@ -51,16 +51,7 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
         {
             return false;
         }
-        Ranklist = new Ranklist(ranking);
-        var enduranceEvent = await _events.Read(0);
-        if (enduranceEvent == null)
-        {
-            NotifyHelper.Warn("Event is not started yet");
-            return false;
-        }
-        var officials = await _officials.ReadAll();
-        var ranklistDocument = new RanklistDocument(Ranklist, enduranceEvent, officials);
-        Document = ranklistDocument;
+        CreateDocument(ranking);
         return true;
     }
 
@@ -111,12 +102,17 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
     {
         var ranking = await _rankings.Read(id);
         GuardHelper.ThrowIfDefault(ranking);
+        CreateDocument(ranking);
+        EmitChange();
+    }
+
+    async void CreateDocument(Ranking ranking)
+    {
         Ranklist = new Ranklist(ranking);
         var enduranceEvent = await _events.Read(0);
         GuardHelper.ThrowIfDefault(enduranceEvent);
         var officials = await _officials.ReadAll();
-        Document = new RanklistDocument(Ranklist, enduranceEvent, officials);
-        EmitChange();
+        Document = new RanklistDocument(Ranklist!, enduranceEvent, officials);
     }
 
     void UpdateRanklist(ParticipationPayload payload)
