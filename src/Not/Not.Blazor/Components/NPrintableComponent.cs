@@ -31,7 +31,6 @@ public abstract class PrintableComponent : NComponent, IDisposable
         InvokeToggle();
         await PrintInterop.OpenPrintDialog();
         InvokeToggle();
-        //PrintingClassName = string.Empty;
     }
 
     /// <summary>

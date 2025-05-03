@@ -23,7 +23,7 @@ public partial class ParticipationTable
     public PhaseCollection? Phases { get; set; }
 
     [Parameter]
-    public bool Vertical { get; set; } = default;
+    public bool AlignVertically { get; set; } = default;
 
     protected override void OnParametersSet()
     {
@@ -37,7 +37,7 @@ public partial class ParticipationTable
     void FlipAxis()
 #pragma warning restore IDE0051 // Remove unused private members
     {
-        if (Vertical)
+        if (AlignVertically)
         {
             _axisClass = "size-xs";
         }

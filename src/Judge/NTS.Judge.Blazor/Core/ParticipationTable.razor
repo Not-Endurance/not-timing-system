@@ -13,15 +13,15 @@
             <th>Arrive</th>
             <th>Present</th>
 
-            @if (_anyRepresentation && !Vertical)
+            @if (_anyRepresentation && !AlignVertically)
             {
                 <th>Represent</th>
             }
-            @if (_anyRequiredInspection && !Vertical)
+            @if (_anyRequiredInspection && !AlignVertically)
             {
                 <th>RI Time</th>
             }
-            @if (_anyCompulsoryRequiredInspection && !Vertical)
+            @if (_anyCompulsoryRequiredInspection && !AlignVertically)
             {
                 <th>CRI Time</th>
             }
@@ -45,15 +45,15 @@
                 <NTd Value="@phase.ArriveTime" />
                 <NTd Value="@phase.PresentTime" />
 
-                @if (_anyRepresentation && !Vertical)
+                @if (_anyRepresentation && !AlignVertically)
                 {
                     <NTd Value="@phase.RepresentTime" />
                 }
-                @if (_anyRequiredInspection && !Vertical)
+                @if (_anyRequiredInspection && !AlignVertically)
                 {
                     <NTd Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
                 }
-                @if (_anyCompulsoryRequiredInspection && !Vertical)
+                @if (_anyCompulsoryRequiredInspection && !AlignVertically)
                 {
                     <NTd Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
                 }
