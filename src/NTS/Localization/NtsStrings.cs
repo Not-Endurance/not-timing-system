@@ -16,7 +16,6 @@ namespace NTS.Localization
         public static string complete_string => LocalizeString(nameof(complete_string));
         public static string min_string => LocalizeString(nameof(min_string));
         public static string max_string => LocalizeString(nameof(max_string));
-        public static string not_ranked_string => LocalizeString(nameof(not_ranked_string));
         public static string km_per_hour_string => LocalizeString(nameof(km_per_hour_string));
         public static string Min_value_is_1_minute_string => LocalizeString(nameof(Min_value_is_1_minute_string));
         public static string Distance_cannot_be_zero_or_less_string =>

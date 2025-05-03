@@ -18,17 +18,12 @@ public class SetupParticipationBehind : CrudChildBehind<Participation, Participa
     protected override Participation CreateEntity(ParticipationFormModel model)
     {
         var newStart = model.StartTimeOverride?.ToDateTimeOffset();
-        return Participation.Create(newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride);
+        return new(newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride);
     }
 
     protected override Participation UpdateEntity(ParticipationFormModel model)
     {
         var newStart = model.StartTimeOverride?.ToDateTimeOffset();
-        return Participation.Update(model.Id, newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride);
+        return new(model.Id, newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride);
     }
-
-    // public async Task Reflect(Combination update)
-    // {
-    //     await UpdateReflections(x => x.Combination, update, x => x.Reflect(update));
-    // }
 }

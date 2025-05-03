@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Not.Domain.Base;
 using Not.Domain.Exceptions;
+using NTS.Domain.Extensions;
 
 namespace NTS.Domain.Setup.Aggregates;
 
@@ -81,7 +82,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
             name,
             type,
             ruleset,
-            IsFutureTime(nameof(Start), start),
+            start,
             ToTimeSpan(compulsoryThresholdMinutes),
             feiRule,
             feiEventCode,
@@ -97,7 +98,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         string? name,
         CompetitionType? type,
         CompetitionRuleset? ruleset,
-        DateTimeOffset start,
+        DateTimeOffset? start,
         TimeSpan? compulsoryThresholdSpan,
         string? feiRule,
         string? feiEventCode,
@@ -113,7 +114,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         Name = Required(nameof(Name), name);
         Type = Required(nameof(Type), type);
         Ruleset = Required(nameof(Ruleset), ruleset);
-        Start = start;
+        Start = Required(nameof(Start), start);
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
         FeiRule = feiRule;
         FeiEventCode = feiEventCode;
@@ -154,8 +155,8 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
     public void Update(Participation child)
     {
         ValidateAthleteCategory(child);
-        _participations.Remove(child);
-        Add(child);
+        child.SetSpeedLimits(Type);
+        _participations.Update(child);
     }
 
     public void Add(Phase child)
@@ -170,8 +171,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
 
     public void Update(Phase child)
     {
-        _phases.Remove(child);
-        Add(child);
+        _phases.Update(child);
     }
 
     void ValidateAthleteCategory(Participation child)
@@ -186,15 +186,6 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
                 Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category
             );
         }
-    }
-
-    static DateTimeOffset IsFutureTime(string field, DateTimeOffset start)
-    {
-        if (start <= DateTimeOffset.Now)
-        {
-            throw new DomainPropertyException(field, Competition_start_cannot_be_in_the_past);
-        }
-        return start;
     }
 
     static TimeSpan? ToTimeSpan(int? minutes)
