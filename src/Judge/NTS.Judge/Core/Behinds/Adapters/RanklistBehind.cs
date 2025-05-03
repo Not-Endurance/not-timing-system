@@ -13,7 +13,7 @@ using NTS.Judge.HTTP;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
-public class RanklistBehind : ObservableBehind, IRankingBehind
+public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocumentBehind
 {
     readonly IFeiExportBusiness _feiExportBusiness;
     readonly IRepository<Ranking> _rankings;
