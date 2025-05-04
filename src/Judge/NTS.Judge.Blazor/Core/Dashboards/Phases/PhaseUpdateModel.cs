@@ -1,13 +1,12 @@
 ﻿using System.Globalization;
 using Not.Blazor.CRUD.Forms.Ports;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Blazor;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Phases;
 
 public class PhaseUpdateModel : IPhaseState, IFormModel<Phase>
 {
-    public const string TIME_MASK = "00:00:00";
-
     public PhaseUpdateModel() { }
 
     public PhaseUpdateModel(Phase phase)

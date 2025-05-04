@@ -1,11 +1,12 @@
 using MudBlazor;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Blazor;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Phases;
 
 public partial class PhaseForm
 {
-    static readonly PatternMask TIME_MASK = new("00:00:00");
+    static readonly PatternMask TIME_MASK = new(Constants.SECONDS_TIME_MASK_FORMAT);
 
     MudTextField<string?> _startField = default!;
     MudTextField<string?> _arriveField = default!;
