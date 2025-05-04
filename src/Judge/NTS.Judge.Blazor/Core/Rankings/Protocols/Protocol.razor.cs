@@ -8,6 +8,7 @@ public partial class Protocol
 {
     string? _documentSubtitle;
     RanklistDocument? _document;
+
     [Inject]
     IRankingDocumentBehind Behind { get; set; } = default!;
 
@@ -20,6 +21,9 @@ public partial class Protocol
         GuardHelper.ThrowIfDefault(_document);
         var city = _document.Header.PopulatedPlace.City;
         var eventSpan = _document.Header.EventSpan.ToString();
-        _documentSubtitle = city.PadRight(city.Length + 3) + eventSpan.PadRight(eventSpan.Length + 3) + _document.Header.PopulatedPlace.Country;
+        _documentSubtitle =
+            city.PadRight(city.Length + 3)
+            + eventSpan.PadRight(eventSpan.Length + 3)
+            + _document.Header.PopulatedPlace.Country;
     }
 }
