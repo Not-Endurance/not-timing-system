@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Base;
-using Not.Domain.Exceptions;
+using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Setup.Aggregates;
 
@@ -15,11 +15,10 @@ public class Participation : AggregateRoot, IReflect<Combination>
         DateTimeOffset? newStart,
         bool isUnranked,
         Combination? combination,
-        double? maxSpeedOverride,
-        double? minSpeedOverride
+        double? maxSpeedOverride
     )
     {
-        return new(newStart, isUnranked, combination, maxSpeedOverride, minSpeedOverride);
+        return new(newStart, isUnranked, combination, maxSpeedOverride);
     }
 
     public static Participation Update(
@@ -27,47 +26,44 @@ public class Participation : AggregateRoot, IReflect<Combination>
         DateTimeOffset? newStart,
         bool isUnranked,
         Combination? combination,
-        double? maxSpeedOverride,
-        double? minSpeedOverride
+        double? maxSpeedOverride
     )
     {
-        return new(id, newStart, isUnranked, combination, maxSpeedOverride, minSpeedOverride);
+        return new(id, newStart, isUnranked, combination, maxSpeedOverride);
     }
 
     [JsonConstructor]
-    Participation(
+    public Participation(
         int? id,
         DateTimeOffset? startTimeOverride,
-        bool isUnranked,
+        bool isNotRanked,
         Combination? combination,
-        double? maxSpeedOverride,
-        double? minSpeedOverride
+        double? maxSpeedOverride
     )
         : base(id!.Value)
     {
         StartTimeOverride = startTimeOverride;
-        IsNotRanked = isUnranked;
+        IsNotRanked = isNotRanked;
         Combination = Required(nameof(Combination), combination);
         MaxSpeedOverride = maxSpeedOverride;
-        MinSpeedOverride = minSpeedOverride;
     }
 
-    Participation(
+    public Participation(
         DateTimeOffset? startTimeOverride,
-        bool isUnranked,
+        bool isNotRanked,
         Combination? combination,
         double? maxSpeedOverride,
         double? minSpeedOverride
     )
-        : this(GenerateId(), IsFutureTime(startTimeOverride), isUnranked, combination, maxSpeedOverride, minSpeedOverride) { }
+        : this(GenerateId(), IsFutureTime(startTimeOverride), isUnranked, combination, maxSpeedOverride) { }
 
     public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
     public DateTimeOffset? StartTimeOverride { get; }
+    public double? MaxSpeedOverride { get; }
     public double? MinAverageSpeed { get; private set; }
     public double? MaxAverageSpeed { get; private set; }
     public double? MaxSpeedOverride { get; private set; }
-    public double? MinSpeedOverride { get; private set; }
 
     internal void SetSpeedLimits(CompetitionType competitionType)
     {
@@ -97,10 +93,9 @@ public class Participation : AggregateRoot, IReflect<Combination>
 
     public override string ToString()
     {
-        var startTimeMessage =
-            StartTimeOverride != null ? $"{start_string}: {StartTimeOverride.Value.ToLocalTime().TimeOfDay} " : null;
-        var isUnrankedMessage = IsNotRanked ? not_ranked_string : null;
-        return Combine(Combination, startTimeMessage, isUnrankedMessage);
+        var restrictions = ToStringHelper.FormatSpeedRestrictions(MinAverageSpeed, MaxAverageSpeed);
+        var ex = IsNotRanked ? X_string : null;
+        return Combine(ex, Combination, restrictions);
     }
 
     public void Reflect(Combination combination)
@@ -109,14 +104,5 @@ public class Participation : AggregateRoot, IReflect<Combination>
         {
             Combination = combination;
         }
-    }
-
-    static DateTimeOffset? IsFutureTime(DateTimeOffset? startTimeOverride)
-    {
-        if (startTimeOverride != null && startTimeOverride.Value <= DateTimeOffset.Now)
-        {
-            throw new DomainPropertyException(nameof(StartTimeOverride), Please_select_future_time_string);
-        }
-        return startTimeOverride;
     }
 }

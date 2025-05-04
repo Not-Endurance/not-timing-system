@@ -51,12 +51,18 @@ public class UpcomingEventDocument : Document
         );
     }
 
+    static int EnsureId(int id)
+    {
+        return id == default ? RandomHelper.GenerateUniqueInteger() : id;
+    }
+
     public class CompetitionModel
     {
         public static CompetitionModel Create(Competition competition)
         {
             return new CompetitionModel
             {
+                Id = competition.Id,
                 Name = competition.Name,
                 Type = competition.Type,
                 Ruleset = competition.Ruleset,
@@ -71,6 +77,7 @@ public class UpcomingEventDocument : Document
             };
         }
 
+        public int Id { get; init; }
         public string Name { get; init; } = default!;
         public CompetitionType Type { get; init; }
         public CompetitionRuleset Ruleset { get; init; }
@@ -86,7 +93,7 @@ public class UpcomingEventDocument : Document
         public Competition ToSetupDomain()
         {
             return new Competition(
-                RandomHelper.GenerateUniqueInteger(),
+                EnsureId(Id),
                 Name,
                 Type,
                 Ruleset,
@@ -108,19 +115,21 @@ public class UpcomingEventDocument : Document
         {
             return new PhaseModel
             {
+                Id = phase.Id,
                 Loop = LoopModel.Create(phase.Loop!),
                 Recovery = phase.Recovery,
                 Rest = phase.Rest,
             };
         }
 
+        public int Id { get; init; }
         public LoopModel Loop { get; init; } = default!;
         public int Recovery { get; init; }
         public int? Rest { get; init; }
 
         public Phase ToSetupDomain()
         {
-            return Phase.Create(Loop.ToSetupDomain(), Recovery, Rest);
+            return Phase.Update(EnsureId(Id), Loop.ToSetupDomain(), Recovery, Rest);
         }
     }
 
@@ -130,28 +139,34 @@ public class UpcomingEventDocument : Document
         {
             return new ParticipationModel
             {
+                Id = participation.Id,
                 StartTimeOverride = participation.StartTimeOverride,
                 IsNotRanked = participation.IsNotRanked,
                 Combination = CombinationModel.Create(participation.Combination),
                 MaxSpeedOverride = participation.MaxSpeedOverride,
-                MinSpeedOverride = participation.MinSpeedOverride
+                MinAverageSpeed = participation.MinAverageSpeed,
+                MaxAverageSpeed = participation.MaxAverageSpeed,
             };
         }
 
+        public int Id { get; init; }
         public DateTimeOffset? StartTimeOverride { get; init; }
         public bool IsNotRanked { get; init; }
         public CombinationModel Combination { get; init; } = default!;
         public double? MaxSpeedOverride { get; init; }
-        public double? MinSpeedOverride { get; init; }
+        public double? MinAverageSpeed { get; init; }
+        public double? MaxAverageSpeed { get; init; }
 
         public Participation ToSetupDomain()
         {
-            return Participation.Create(
+            return new(
+                EnsureId(Id),
                 StartTimeOverride,
-                IsNotRanked, // TODO: investigate not persisted as true
+                IsNotRanked,
                 Combination.ToSetupDomain(),
                 MaxSpeedOverride,
-                MinSpeedOverride
+                MinAverageSpeed,
+                MaxAverageSpeed
             );
         }
     }
@@ -160,14 +175,15 @@ public class UpcomingEventDocument : Document
     {
         public static LoopModel Create(Loop loop)
         {
-            return new() { Distance = loop.Distance };
+            return new() { Id = loop.Id, Distance = loop.Distance };
         }
 
+        public int Id { get; init; }
         public double Distance { get; init; }
 
         public Loop ToSetupDomain()
         {
-            return Loop.Create(Distance);
+            return Loop.Update(EnsureId(Id), Distance);
         }
     }
 
@@ -177,19 +193,21 @@ public class UpcomingEventDocument : Document
         {
             return new CombinationModel
             {
+                Id = combination.Id,
                 Number = combination.Number,
                 Athlete = AthleteDocument.Create(combination.Athlete),
                 Horse = HorseDocument.Create(combination.Horse),
             };
         }
 
+        public int Id { get; init; }
         public int Number { get; init; }
         public AthleteDocument Athlete { get; init; } = default!;
         public HorseDocument Horse { get; init; } = default!;
 
         public Combination ToSetupDomain()
         {
-            return Combination.Create(Number, Athlete.ToSetupDomain(), Horse.ToSetupDomain(), null);
+            return Combination.Update(EnsureId(Id), Number, Athlete.ToSetupDomain(), Horse.ToSetupDomain(), null);
         }
     }
 }

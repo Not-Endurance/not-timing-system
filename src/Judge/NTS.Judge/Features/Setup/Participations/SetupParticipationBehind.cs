@@ -45,9 +45,4 @@ public class SetupParticipationBehind : CrudChildBehind<Participation, Participa
             throw new DomainPropertyException(nameof(model.MinSpeedOverride), Null_or_malformed_string, Min_Speed_string);
         }
     }
-
-    // public async Task Reflect(Combination update)
-    // {
-    //     await UpdateReflections(x => x.Combination, update, x => x.Reflect(update));
-    // }
 }
