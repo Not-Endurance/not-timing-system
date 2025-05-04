@@ -8,7 +8,8 @@ public partial class ProtocolRow
     Combination _combination = default!;
     PhaseCollection _phases = default!;
     Total? _total;
-    string _rankText = " "; //TODO: implement NText component to display string with value null as white space
+    //TODO: implement NText component to display string with value null as white space
+    string _rankText = " ";
 
     [Parameter, EditorRequired]
     public RankingEntry Entry { get; set; } = default!;
