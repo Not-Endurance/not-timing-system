@@ -32,7 +32,7 @@ public record Disqualified : Eliminated
         : base(DISQUALIFIED) { }
 
     [JsonConstructor]
-    public Disqualified(DqCode[] dqCodes, string? complement)
+    public Disqualified(DisqualifyCode[] dqCodes, string? complement)
         : base(DISQUALIFIED)
     {
         PreventInvalidDq(dqCodes, complement);
@@ -40,13 +40,13 @@ public record Disqualified : Eliminated
         Complement = complement; // Doesn't use base ctor with complement, because it is not required here
     }
 
-    public IEnumerable<DqCode> DqCodes { get; private set; } = [];
+    public IEnumerable<DisqualifyCode> DqCodes { get; private set; } = [];
 
     public override string ToString()
     {
         if (DqCodes.Any())
         {
-            var codes = string.Join('+', DqCodes.Where(code => code != DqCode.other));
+            var codes = string.Join('+', DqCodes.Where(code => code != DisqualifyCode.other));
             return $"DQ {codes}";
         }
         else
@@ -55,17 +55,17 @@ public record Disqualified : Eliminated
         }
     }
 
-    static void PreventInvalidDq(DqCode[] codes, string? complement)
+    static void PreventInvalidDq(DisqualifyCode[] codes, string? complement)
     {
         if (codes.Length == 0)
         {
             throw new DomainException(Please_provide_reason_to_eliminate_as__, $"{Eliminated.DISQUALIFIED} ");
         }
-        if (codes.Contains(DqCode.other) && string.IsNullOrWhiteSpace(complement))
+        if (codes.Contains(DisqualifyCode.other) && string.IsNullOrWhiteSpace(complement))
         {
             throw new DomainException(
                 Please_provide_reason_to_eliminate_as__,
-                $"{Eliminated.DISQUALIFIED} {DqCode.other}"
+                $"{Eliminated.DISQUALIFIED} {DisqualifyCode.other}"
             );
         }
     }

@@ -129,7 +129,7 @@ public class Participation : AggregateRoot, IAggregateRoot
         Eliminate(new Retired());
     }
 
-    public void Disqualify(DqCode[] codes, string? reason)
+    public void Disqualify(DisqualifyCode[] codes, string? reason)
     {
         Eliminate(new Disqualified(codes, reason));
     }

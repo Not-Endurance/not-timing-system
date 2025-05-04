@@ -115,7 +115,7 @@ public class ParticipationBehind
         await SafeHelper.Run(action);
     }
 
-    public async Task Disqualify(DqCode[] dqCodes, string? reason)
+    public async Task Disqualify(DisqualifyCode[] dqCodes, string? reason)
     {
         Task action() => SafeDisqualify(dqCodes, reason);
         await SafeHelper.Run(action);
@@ -219,7 +219,7 @@ public class ParticipationBehind
         EmitChange();
     }
 
-    async Task SafeDisqualify(DqCode[] dqCodes, string? reason)
+    async Task SafeDisqualify(DisqualifyCode[] dqCodes, string? reason)
     {
         GuardHelper.ThrowIfDefault(SelectedParticipation);
         SelectedParticipation.Disqualify(dqCodes, reason);

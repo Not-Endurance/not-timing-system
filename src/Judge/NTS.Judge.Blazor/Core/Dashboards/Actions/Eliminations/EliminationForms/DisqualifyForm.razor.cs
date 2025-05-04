@@ -7,7 +7,7 @@ public partial class DisqualifyForm
 {
     string? Reason { get; set; }
 
-    IEnumerable<DqCode> Codes { get; set; } = [];
+    IEnumerable<DisqualifyCode> Codes { get; set; } = [];
 
     [Parameter]
     public Disqualified? Disqualified { get; set; }
