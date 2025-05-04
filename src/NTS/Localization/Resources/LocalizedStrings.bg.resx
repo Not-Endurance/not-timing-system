@@ -474,8 +474,8 @@
   <data name="Start_Time_string" xml:space="preserve">
     <value>Време на Старт</value>
   </data>
-  <data name="Max_Speed_Penalty_string" xml:space="preserve">
-    <value>Наказателно ограничение на Мак Скорост</value>
+  <data name="Max_Speed_string" xml:space="preserve">
+    <value>Максимална Скорост</value>
   </data>
   <data name="Presentation_string" xml:space="preserve">
     <value>Инспекция</value>
@@ -560,5 +560,8 @@
   </data>
   <data name="Main_menu_string" xml:space="preserve">
     <value>Главно Меню</value>
+  </data>
+  <data name="Min_Speed_string" xml:space="preserve">
+    <value>Минимална Скорост</value>
   </data>
 </root>

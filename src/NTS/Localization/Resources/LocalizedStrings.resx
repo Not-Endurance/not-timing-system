@@ -474,8 +474,8 @@
   <data name="Start_Time_string" xml:space="preserve">
     <value>Start Time</value>
   </data>
-  <data name="Max_Speed_Penalty_string" xml:space="preserve">
-    <value>Max Speed Penalty</value>
+  <data name="Max_Speed_string" xml:space="preserve">
+    <value>Max Speed </value>
   </data>
   <data name="Presentation_string" xml:space="preserve">
     <value>Present</value>
@@ -556,9 +556,12 @@
     <value>Create Handouts manually to print...</value>
   </data>
   <data name="Null_or_malformed_string" xml:space="preserve">
-    <value>'{0}' value is missing or malformed. Please enter a correct value and try again</value>
+    <value>{0} value is missing or malformed. Please enter a correct value and try again</value>
   </data>
   <data name="Main_menu_string" xml:space="preserve">
     <value>Main Menu</value>
+  </data>
+  <data name="Min_Speed_string" xml:space="preserve">
+    <value>Min Speed</value>
   </data>
 </root>

@@ -130,7 +130,8 @@ namespace NTS.Localization
         public static string Is_not_ranked_string => LocalizeString(nameof(Is_not_ranked_string));
         public static string Override_Start_Time_string => LocalizeString(nameof(Override_Start_Time_string));
         public static string Start_Time_string => LocalizeString(nameof(Start_Time_string));
-        public static string Max_Speed_Penalty_string => LocalizeString(nameof(Max_Speed_Penalty_string));
+        public static string Max_Speed_string => LocalizeString(nameof(Max_Speed_string));
+        public static string Min_Speed_string => LocalizeString(nameof(Min_Speed_string));
         public static string Presentation_string => LocalizeString(nameof(Presentation_string));
         public static string Loop_distance_string => LocalizeString(nameof(Loop_distance_string));
         public static string Select_a_loop_string => LocalizeString(nameof(Select_a_loop_string));
