@@ -23,7 +23,7 @@
 
     <ParticipationTable Number="_combination.Number" Phases="_phases" AlignVertically="true" />
 
-    @if (_total != null && !Entry.Participation.IsEliminated())
+    @if (Entry.Participation.IsComplete() && _total != null)
     {
         <MudStack Class="d-flex" Style="width:140px;" Spacing="1">
             <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">
