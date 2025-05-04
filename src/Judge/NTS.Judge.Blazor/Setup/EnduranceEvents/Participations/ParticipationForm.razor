@@ -9,16 +9,16 @@
 
     <NSwitch @ref="_isNotRankedField" @bind-Value="Model.IsNotRanked" Label="@Is_not_ranked_string" />
 
-    <NSwitch @bind-Value="Model.OverrideStartTime" Label="@Override_Start_Time_string" />
+    <NSwitch @bind-Value="Model.IsStartTimeOverriden" Label="@Override_Start_Time_string" />
 
-    @if (Model.OverrideStartTime)
+    @if (Model.IsStartTimeOverriden)
     {
         <MudTimePicker @ref="_timeField" @bind-Time="Model.StartTimeOverride" ShowToolbar="false" Label="@Start_Time_string" Editable="true" Mask="TIME_MASK" />
     }
 
-    <NSwitch @bind-Value="Model.OverrideMaxSpeed" Label="@Max_Speed_Penalty_string" />
+    <NSwitch @bind-Value="Model.IsMaxSpeedOverriden" Label="@Max_Speed_Penalty_string" />
 
-    @if (Model.OverrideMaxSpeed)
+    @if (Model.IsMaxSpeedOverriden)
     {
         <MudNumericField @ref="_maxSpeedOverrideField" @bind-Value="Model.MaxSpeedOverride" Label="@Max_Speed_Penalty_string" Variant="Variant.Text" />
     }
