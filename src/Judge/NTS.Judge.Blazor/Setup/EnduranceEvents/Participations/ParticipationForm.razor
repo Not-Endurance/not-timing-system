@@ -16,10 +16,17 @@
         <MudTimePicker @ref="_timeField" @bind-Time="Model.StartTimeOverride" ShowToolbar="false" Label="@Start_Time_string" Editable="true" Mask="TIME_MASK" />
     }
 
-    <NSwitch @bind-Value="Model.IsMaxSpeedOverriden" Label="@Max_Speed_Penalty_string" />
+    <NSwitch @bind-Value="Model.IsMaxSpeedOverriden" Label="@Max_Speed_string" />
 
     @if (Model.IsMaxSpeedOverriden)
     {
-        <MudNumericField @ref="_maxSpeedOverrideField" @bind-Value="Model.MaxSpeedOverride" Label="@Max_Speed_Penalty_string" Variant="Variant.Text" />
+        <MudNumericField @ref="_maxSpeedOverrideField" @bind-Value="Model.MaxSpeedOverride" Label="@Max_Speed_string" Variant="Variant.Text" />
+    }
+
+    <NSwitch @bind-Value="Model.IsMinSpeedOverriden" Label="@Min_Speed_string" />
+
+    @if (Model.IsMinSpeedOverriden)
+    {
+        <MudNumericField @ref="_minSpeedOverrideField" @bind-Value="Model.MinSpeedOverride" Label="@Min_Speed_string" Variant="Variant.Text" />
     }
 </EditForm>

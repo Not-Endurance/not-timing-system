@@ -12,6 +12,8 @@ public class ParticipationFormModel : IFormModel<Participation>
     public Combination? Combination { get; set; }
     public bool IsMaxSpeedOverriden { get; set; }
     public double? MaxSpeedOverride { get; set; }
+    public bool IsMinSpeedOverriden { get; set; }
+    public double? MinSpeedOverride { get; set; }
 
     public void FromEntity(Participation participation)
     {
@@ -22,5 +24,7 @@ public class ParticipationFormModel : IFormModel<Participation>
         Combination = participation.Combination;
         IsMaxSpeedOverriden = participation.MaxSpeedOverride != null;
         MaxSpeedOverride = participation.MaxSpeedOverride;
+        IsMinSpeedOverriden = participation.MinSpeedOverride != null;
+        MinSpeedOverride = participation.MinSpeedOverride;
     }
 }
