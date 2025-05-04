@@ -15,10 +15,11 @@ public class Participation : AggregateRoot, IReflect<Combination>
         DateTimeOffset? newStart,
         bool isUnranked,
         Combination? combination,
-        double? maxSpeedOverride
+        double? maxSpeedOverride,
+        double? minSpeedOverride
     )
     {
-        return new(newStart, isUnranked, combination, maxSpeedOverride);
+        return new(newStart, isUnranked, combination, maxSpeedOverride, minSpeedOverride);
     }
 
     public static Participation Update(
@@ -26,10 +27,11 @@ public class Participation : AggregateRoot, IReflect<Combination>
         DateTimeOffset? newStart,
         bool isUnranked,
         Combination? combination,
-        double? maxSpeedOverride
+        double? maxSpeedOverride,
+        double? minSpeedOverride
     )
     {
-        return new(id, newStart, isUnranked, combination, maxSpeedOverride);
+        return new(id, newStart, isUnranked, combination, maxSpeedOverride, minSpeedOverride);
     }
 
     [JsonConstructor]
@@ -38,7 +40,8 @@ public class Participation : AggregateRoot, IReflect<Combination>
         DateTimeOffset? startTimeOverride,
         bool isUnranked,
         Combination? combination,
-        double? maxSpeedOverride
+        double? maxSpeedOverride,
+        double? minSpeedOverride
     )
         : base(id!.Value)
     {
@@ -46,15 +49,17 @@ public class Participation : AggregateRoot, IReflect<Combination>
         IsNotRanked = isUnranked;
         Combination = Required(nameof(Combination), combination);
         MaxSpeedOverride = maxSpeedOverride;
+        MinSpeedOverride = minSpeedOverride;
     }
 
     Participation(
         DateTimeOffset? startTimeOverride,
         bool isUnranked,
         Combination? combination,
-        double? maxSpeedOverride
+        double? maxSpeedOverride,
+        double? minSpeedOverride
     )
-        : this(GenerateId(), IsFutureTime(startTimeOverride), isUnranked, combination, maxSpeedOverride) { }
+        : this(GenerateId(), IsFutureTime(startTimeOverride), isUnranked, combination, maxSpeedOverride, minSpeedOverride) { }
 
     public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
@@ -62,6 +67,7 @@ public class Participation : AggregateRoot, IReflect<Combination>
     public double? MinAverageSpeed { get; private set; }
     public double? MaxAverageSpeed { get; private set; }
     public double? MaxSpeedOverride { get; private set; }
+    public double? MinSpeedOverride { get; private set; }
 
     internal void SetSpeedLimits(CompetitionType competitionType)
     {
@@ -82,6 +88,10 @@ public class Participation : AggregateRoot, IReflect<Combination>
         if (MaxSpeedOverride != null)
         {
             MaxAverageSpeed = MaxSpeedOverride;
+        }
+        if(MinSpeedOverride != null)
+        {
+            MinAverageSpeed = MinSpeedOverride;
         }
     }
 

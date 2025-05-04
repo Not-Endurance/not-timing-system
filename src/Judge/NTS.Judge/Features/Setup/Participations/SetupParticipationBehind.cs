@@ -20,14 +20,14 @@ public class SetupParticipationBehind : CrudChildBehind<Participation, Participa
     {
         ValidateEntity(model);
         var newStart = model.IsStartTimeOverriden ? model.StartTimeOverride?.ToDateTimeOffset() : null;
-        return Participation.Create(newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride);
+        return Participation.Create(newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride, model.MinSpeedOverride);
     }
 
     protected override Participation UpdateEntity(ParticipationFormModel model)
     {
         ValidateEntity(model);
         var newStart = model.IsStartTimeOverriden ? model.StartTimeOverride?.ToDateTimeOffset() : null;
-        return Participation.Update(model.Id, newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride);
+        return Participation.Update(model.Id, newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride, model.MinSpeedOverride);
     }
 
     public void ValidateEntity(ParticipationFormModel model)
@@ -38,7 +38,11 @@ public class SetupParticipationBehind : CrudChildBehind<Participation, Participa
         }
         if (model.IsMaxSpeedOverriden && model.MaxSpeedOverride == null)
         {
-            throw new DomainPropertyException(nameof(model.MaxSpeedOverride), Null_or_malformed_string, Max_Speed_Penalty_string);
+            throw new DomainPropertyException(nameof(model.MaxSpeedOverride), Null_or_malformed_string, Max_Speed_string);
+        }
+        if (model.IsMinSpeedOverriden && model.MinSpeedOverride == null)
+        {
+            throw new DomainPropertyException(nameof(model.MinSpeedOverride), Null_or_malformed_string, Min_Speed_string);
         }
     }
 

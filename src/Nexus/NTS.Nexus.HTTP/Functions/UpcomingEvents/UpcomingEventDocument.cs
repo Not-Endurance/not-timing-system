@@ -134,6 +134,7 @@ public class UpcomingEventDocument : Document
                 IsNotRanked = participation.IsNotRanked,
                 Combination = CombinationModel.Create(participation.Combination),
                 MaxSpeedOverride = participation.MaxSpeedOverride,
+                MinSpeedOverride = participation.MinSpeedOverride
             };
         }
 
@@ -141,6 +142,7 @@ public class UpcomingEventDocument : Document
         public bool IsNotRanked { get; init; }
         public CombinationModel Combination { get; init; } = default!;
         public double? MaxSpeedOverride { get; init; }
+        public double? MinSpeedOverride { get; init; }
 
         public Participation ToSetupDomain()
         {
@@ -148,7 +150,8 @@ public class UpcomingEventDocument : Document
                 StartTimeOverride,
                 IsNotRanked, // TODO: investigate not persisted as true
                 Combination.ToSetupDomain(),
-                MaxSpeedOverride
+                MaxSpeedOverride,
+                MinSpeedOverride
             );
         }
     }
