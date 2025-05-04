@@ -9,9 +9,6 @@ public partial class RankingsPage : PrintableComponent
     [Inject]
     IRankingBehind Behind { get; set; } = default!;
 
-    [Inject]
-    IRankingDocumentBehind DocumentBehind { get; set; } = default!;
-
     protected override async Task OnInitializedAsync()
     {
         await Observe(Behind);

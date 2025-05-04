@@ -40,7 +40,6 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
     }
 
     public Ranklist? Ranklist { get; private set; }
-    public RanklistDocument? Document { get; private set; }
 
     public int? ArchiveId { get; set; }
 
@@ -51,7 +50,7 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
         {
             return false;
         }
-        CreateDocument(ranking);
+        Ranklist = new Ranklist(ranking);
         return true;
     }
 
@@ -93,6 +92,14 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
         await File.WriteAllTextAsync(path, xml);
     }
 
+    public async Task<RanklistDocument> CreateDocument()
+    {
+        var enduranceEvent = await _events.Read(0);
+        GuardHelper.ThrowIfDefault(enduranceEvent);
+        var officials = await _officials.ReadAll();
+        return new RanklistDocument(Ranklist!, enduranceEvent, officials);
+    }
+
     async Task<IEnumerable<Ranking>> SafeGetRankings()
     {
         return await _rankings.ReadAll();
@@ -102,17 +109,8 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
     {
         var ranking = await _rankings.Read(id);
         GuardHelper.ThrowIfDefault(ranking);
-        CreateDocument(ranking);
-        EmitChange();
-    }
-
-    async void CreateDocument(Ranking ranking)
-    {
         Ranklist = new Ranklist(ranking);
-        var enduranceEvent = await _events.Read(0);
-        GuardHelper.ThrowIfDefault(enduranceEvent);
-        var officials = await _officials.ReadAll();
-        Document = new RanklistDocument(Ranklist!, enduranceEvent, officials);
+        EmitChange();
     }
 
     void UpdateRanklist(ParticipationPayload payload)

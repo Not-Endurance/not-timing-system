@@ -5,7 +5,7 @@
 <MudItem Class="d-flex flex-row justify-space-around">
     <MudImage Class="pb-5" Height="150" Width="135" Src="images/logo-fei.png" />
     <MudItem Class="d-flex flex-column justify-center">
-        <NHeadline2 Content="@Document.Header.Title" Class="mb-4" />
+        <NHeadline2 Content="@_document!.Header.Title" Class="mb-4" />
         <NHeadline2 Content="@_documentSubtitle" />
     </MudItem>
     <MudImage Class="pt-2 " Height="115" Width="135" Src="images/logo-bfks.png" />
@@ -20,42 +20,42 @@
 </MudItem>
 <MudStack Class="d-flex mb-3" Row="true" Justify="Justify.Center">
     <MudStack Row="false">
-        @if (Document.Header.GroundJuryPresident != null)
+        @if (_document!.Header.GroundJuryPresident != null)
         {
             <MudText Typo="Typo.caption" Style="font-size:12px;">
-                @Document.Header.GroundJuryPresident
+                @_document.Header.GroundJuryPresident
             </MudText>
         }
-        @if (Document.Header.ChiefSteward != null)
+        @if (_document.Header.ChiefSteward != null)
         {
             <MudText Typo="Typo.caption" Style="font-size:12px;">
-                @Document.Header.ChiefSteward
+                @_document.Header.ChiefSteward
             </MudText>
         } 
-        @if (Document.Header.ForeignJudge != null)
+        @if (_document.Header.ForeignJudge != null)
         {
             <MudText Typo="Typo.caption" Style="font-size:12px;">
-                @Document.Header.ForeignJudge
+                @_document.Header.ForeignJudge
             </MudText>
         }
     </MudStack>
     <MudStack Row="false">
-        @if (Document.Header.VeterinaryCommissionPresident != null)
+        @if (_document!.Header.VeterinaryCommissionPresident != null)
         {
             <MudText Typo="Typo.caption" Style="font-size:12px;">
-                @Document.Header.VeterinaryCommissionPresident
+                @_document.Header.VeterinaryCommissionPresident
             </MudText>
         }
-        @if (Document.Header.TechnicalDelegate != null)
+        @if (_document.Header.TechnicalDelegate != null)
         {
             <MudText Typo="Typo.caption" Style="font-size:12px;">
-                @Document.Header.TechnicalDelegate
+                @_document.Header.TechnicalDelegate
             </MudText>
         }
-        @if (Document.Header.ForeignVeterinaryDelegate != null)
+        @if (_document.Header.ForeignVeterinaryDelegate != null)
         {
             <MudText Typo="Typo.caption" Style="font-size:12px;">
-                @Document.Header.ForeignVeterinaryDelegate
+                @_document.Header.ForeignVeterinaryDelegate
             </MudText>
         }
     </MudStack>
