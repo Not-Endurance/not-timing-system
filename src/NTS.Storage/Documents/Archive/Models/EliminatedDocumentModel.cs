@@ -6,22 +6,22 @@ public class EliminatedDocumentModel
 {
     public static EliminatedDocumentModel Create(Eliminated eliminated)
     {
-        if (eliminated is FailedToQualify ftq)
+        if (eliminated is FailedToQualify failedToQualify)
         {
             return new EliminatedDocumentModel
             {
                 Code = eliminated.Code,
                 Reason = eliminated.Complement,
-                FtqCodes = ftq.FtqCodes.ToArray(),
+                FtqCodes = failedToQualify.FtqCodes.ToArray(),
             };
         }
-        else if (eliminated is Disqualified dq)
+        else if (eliminated is Disqualified disqualified)
         {
             return new EliminatedDocumentModel
             {
                 Code = eliminated.Code,
                 Reason = eliminated.Complement,
-                DqCodes = dq.DqCodes.ToArray(),
+                DqCodes = disqualified.DqCodes.ToArray(),
             };
         }
         return new EliminatedDocumentModel { Code = eliminated.Code, Reason = eliminated.Complement };
