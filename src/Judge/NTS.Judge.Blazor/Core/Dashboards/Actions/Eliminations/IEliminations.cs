@@ -8,6 +8,6 @@ public interface IEliminations : IParticipationContext
     Task Retire();
     Task FinishNotRanked(string reason);
     Task Disqualify(DisqualifyCode[] dqCodes, string? reason);
-    Task FailToQualify(FtqCode[] ftqCodes, string? reason);
+    Task FailToQualify(FailToQualifyCode[] ftqCodes, string? reason);
     Task RestoreQualification();
 }

@@ -29,7 +29,7 @@ public class EliminatedDocumentModel
 
     public string Code { get; init; } = default!;
     public string? Reason { get; init; }
-    public FtqCode[]? FtqCodes { get; init; }
+    public FailToQualifyCode[]? FtqCodes { get; init; }
     public DisqualifyCode[] DqCodes { get; init; } = default!;
 
     public Eliminated ToDomain()
