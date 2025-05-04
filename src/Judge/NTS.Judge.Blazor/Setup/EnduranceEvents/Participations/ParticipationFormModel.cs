@@ -7,7 +7,7 @@ public class ParticipationFormModel : IFormModel<Participation>
 {
     public int? Id { get; set; }
     public bool IsStartTimeOverriden { get; set; }
-    public TimeSpan? StartTimeOverride { get; set;}
+    public TimeSpan? StartTimeOverride { get; set; }
     public bool IsNotRanked { get; set; }
     public Combination? Combination { get; set; }
     public bool IsMaxSpeedOverriden { get; set; }

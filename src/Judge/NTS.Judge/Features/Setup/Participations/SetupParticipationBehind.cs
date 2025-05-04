@@ -27,22 +27,41 @@ public class SetupParticipationBehind : CrudChildBehind<Participation, Participa
     {
         ValidateEntity(model);
         var newStart = model.IsStartTimeOverriden ? model.StartTimeOverride?.ToDateTimeOffset() : null;
-        return new(model.Id, newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride, model.MinSpeedOverride);
+        return new(
+            model.Id,
+            newStart,
+            model.IsNotRanked,
+            model.Combination,
+            model.MaxSpeedOverride,
+            model.MinSpeedOverride
+        );
     }
 
     public void ValidateEntity(ParticipationFormModel model)
     {
         if (model.IsStartTimeOverriden && model.StartTimeOverride == null)
         {
-            throw new DomainPropertyException(nameof(model.StartTimeOverride), Null_or_malformed_string, Start_Time_string);
+            throw new DomainPropertyException(
+                nameof(model.StartTimeOverride),
+                Null_or_malformed_string,
+                Start_Time_string
+            );
         }
         if (model.IsMaxSpeedOverriden && model.MaxSpeedOverride == null)
         {
-            throw new DomainPropertyException(nameof(model.MaxSpeedOverride), Null_or_malformed_string, Max_Speed_string);
+            throw new DomainPropertyException(
+                nameof(model.MaxSpeedOverride),
+                Null_or_malformed_string,
+                Max_Speed_string
+            );
         }
         if (model.IsMinSpeedOverriden && model.MinSpeedOverride == null)
         {
-            throw new DomainPropertyException(nameof(model.MinSpeedOverride), Null_or_malformed_string, Min_Speed_string);
+            throw new DomainPropertyException(
+                nameof(model.MinSpeedOverride),
+                Null_or_malformed_string,
+                Min_Speed_string
+            );
         }
     }
 }

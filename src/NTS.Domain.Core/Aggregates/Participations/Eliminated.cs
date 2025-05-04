@@ -63,7 +63,10 @@ public record Disqualified : Eliminated
         }
         if (codes.Contains(DisqualifyCode.other) && string.IsNullOrWhiteSpace(complement))
         {
-            throw new DomainException(Please_provide_reason_to_eliminate_as__, $"{Eliminated.DISQUALIFIED} {DisqualifyCode.other}");
+            throw new DomainException(
+                Please_provide_reason_to_eliminate_as__,
+                $"{Eliminated.DISQUALIFIED} {DisqualifyCode.other}"
+            );
         }
     }
 }

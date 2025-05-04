@@ -16,7 +16,6 @@ public enum DisqualifyCode
     [Description("Horse Abuse")]
     HA = 4,
 
-
     [Description("Horse Not Presented")]
     HNP = 5,
 
