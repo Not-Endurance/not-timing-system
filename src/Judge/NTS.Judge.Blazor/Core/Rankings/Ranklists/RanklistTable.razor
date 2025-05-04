@@ -2,7 +2,7 @@
 
 @inherits NComponent
 
-<NHeadline2 Content="@Behind.Document!.Ranklist!.Title" Class="printable mb-4" />
+<NHeadline2 Content="@Behind.Ranklist!.Title" Class="printable mb-4" />
 
 <RanklistTableFrame Class="printable">
     <One>
@@ -43,9 +43,9 @@
 </RanklistTableFrame>
 
 
-@if (Behind.Document!.Ranklist != null)
+@if (Behind.Ranklist != null)
 {
-    @foreach (var entry in Behind.Document.Ranklist.Entries)
+    @foreach (var entry in Behind.Ranklist.Entries)
     {
         <RanklistRow Entry="entry"/>
 
