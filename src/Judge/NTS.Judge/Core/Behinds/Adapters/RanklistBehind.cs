@@ -97,7 +97,8 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
         var enduranceEvent = await _events.Read(0);
         GuardHelper.ThrowIfDefault(enduranceEvent);
         var officials = await _officials.ReadAll();
-        return new RanklistDocument(Ranklist!, enduranceEvent, officials);
+        GuardHelper.ThrowIfDefault(Ranklist);
+        return new RanklistDocument(Ranklist, enduranceEvent, officials);
     }
 
     async Task<IEnumerable<Ranking>> SafeGetRankings()
