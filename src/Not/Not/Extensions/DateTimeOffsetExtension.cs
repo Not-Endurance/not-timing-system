@@ -11,7 +11,7 @@ public static class DateTimeOffsetExtension
 
     public static DateTimeOffset ToDateTimeOffset(this TimeSpan setTime, DateTime? setDate = null)
     {
-        if(setDate == null)
+        if (setDate == null)
         {
             var today = DateTime.Today;
             today.Add(setTime);
