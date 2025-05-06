@@ -19,8 +19,6 @@ public abstract class PrintableComponent : NComponent, IDisposable
 
     protected bool IsButtonVisible { get; private set; }
 
-    protected string PrintingClassName { get; set; } = string.Empty;
-
     protected override void OnInitialized()
     {
         _toggleEvent.Subscribe(VisibilityToggleHook);
