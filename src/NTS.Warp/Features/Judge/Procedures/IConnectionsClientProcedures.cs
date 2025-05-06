@@ -2,6 +2,6 @@
 
 public interface IConnectionsClientProcedures
 {
-    Task ReceiveRemoteConnectionId(string connectionId);
-    Task ReceiveRemoteDisconnectId(string connectionId);
+    Task OnWitnessConnected(string connectionId);
+    Task OnWitnessDisconnedted(string connectionId);
 }

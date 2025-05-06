@@ -4,10 +4,11 @@ public static class RandomHelper
 {
     static readonly System.Random _random = new();
     static readonly HashSet<int> _uniqueIntegers = [];
+    static readonly object LOCK = new();
 
     public static int GenerateUniqueInteger()
     {
-        lock (_lock)
+        lock (LOCK)
         {
             var id = _random.Next();
             while (_uniqueIntegers.Contains(id))
@@ -19,6 +20,4 @@ public static class RandomHelper
             return id;
         }
     }
-
-    static object _lock = new();
 }

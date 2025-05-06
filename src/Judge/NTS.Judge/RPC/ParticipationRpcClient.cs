@@ -1,22 +1,28 @@
 ﻿using Not.Application.CRUD.Ports;
+using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Async;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
 using NTS.Judge.Core;
+using NTS.Judge.Features;
+using NTS.Warp;
 using NTS.Warp.Features.Judge.Models;
 using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.RPC;
 
-public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures, IParticipationHubProcedures
+public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
 {
+    readonly IEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IRead<Domain.Core.Aggregates.Participation> _coreParticipations;
     readonly IRead<Domain.Setup.Aggregates.Participation> _setupParticipations;
+    readonly HubProcedures _hubProcedures;
 
     public ParticipationRpcClient(
+        IEventContext eventContext,
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
         IRead<Domain.Core.Aggregates.Participation> coreParticipations,
@@ -24,6 +30,8 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures,
     )
         : base(socket)
     {
+        _hubProcedures = new HubProcedures(socket);
+        _eventContext = eventContext;
         _snapshotProcessor = snapshotProcessor;
         _coreParticipations = coreParticipations;
         _setupParticipations = setupParticipations;
@@ -67,16 +75,49 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures,
 
     public async Task OnParticipationEliminated(ParticipationEliminated eliminated)
     {
-        await InvokeInputProcedure(nameof(IParticipationHubProcedures.OnParticipationEliminated), eliminated);
+        var request = WarpRequest.Create(GetGroupId(), eliminated);
+        await _hubProcedures.OnParticipationEliminated(request);
     }
 
     public async Task OnParticipationRestored(ParticipationRestored restored)
     {
-        await InvokeInputProcedure(nameof(IParticipationHubProcedures.OnParticipationRestored), restored);
+        var request = WarpRequest.Create(GetGroupId(), restored);
+        await _hubProcedures.OnParticipationRestored(request);
     }
 
     public async Task OnPhaseCompleted(PhaseCompleted phaseCompleted)
     {
-        await InvokeInputProcedure(nameof(IParticipationHubProcedures.OnPhaseCompleted), phaseCompleted);
+        var request = WarpRequest.Create(GetGroupId(), phaseCompleted);
+        await _hubProcedures.OnPhaseCompleted(request);
+    }
+
+    string GetGroupId()
+    {
+        return _eventContext.Event!.Id.ToString();
+    }
+
+    class HubProcedures : IParticipationHubProcedures
+    {
+        readonly IRpcSocket _socket;
+
+        public HubProcedures(IRpcSocket socket)
+        {
+            _socket = socket;
+        }
+
+        public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
+        {
+            await _socket.InvokeInputProcedure(nameof(OnPhaseCompleted), request);
+        }
+
+        public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)
+        {
+            await _socket.InvokeInputProcedure(nameof(OnParticipationEliminated), request);
+        }
+
+        public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
+        {
+            await _socket.InvokeInputProcedure(nameof(OnParticipationRestored), request);
+        }
     }
 }

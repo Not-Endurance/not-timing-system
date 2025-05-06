@@ -2,16 +2,17 @@
 using NTS.Domain.Objects;
 using NTS.Warp.ACL.Entities;
 using NTS.Warp.ACL.Enums;
+using NTS.Warp.Features.Witness.ProcessSnapshots;
 
 namespace NTS.Warp.ACL.Factories;
 
 public class SnapshotFactory
 {
-    public static Snapshot Create(EmsParticipantEntry participant, EmsWitnessEventType emsType)
+    public static Snapshot Create(EmsSnapshotModel participant, EmsWitnessEventType emsType)
     {
         var number = int.Parse(participant.Number);
         var method = SnapshotMethod.EmsIntegration;
-        var timestamp = new Timestamp(participant.ArriveTime!.Value);
+        var timestamp = new Timestamp(participant.ArriveTime);
 
         return emsType switch
         {

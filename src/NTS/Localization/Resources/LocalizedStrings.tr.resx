@@ -543,4 +543,10 @@
   <data name="Invalid_phase_configuration_in_competition__missing_rest" xml:space="preserve">
     <value>Yarışma '{0}' içinde geçersiz aşama yapılandırması: final olmayan bir aşamada Dinlenme süresi eksik</value>
   </data>
+  <data name="Upcoming_events_string" xml:space="preserve">
+    <value>Yaklaşan etkinlikler</value>
+  </data>
+  <data name="Select_event_string" xml:space="preserve">
+    <value>Etkinlik seç</value>
+  </data>
 </root>

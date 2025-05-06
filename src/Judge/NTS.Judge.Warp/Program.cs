@@ -28,8 +28,9 @@ if (args.Any())
 
 builder.Services.RegisterServices(builder.Configuration);
 
-builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
-builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
+// TODO: configure using Judge appsettings;
+builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Information);
+builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Information);
 # if RELEASE
 builder.Logging.AddSerilog();
 builder

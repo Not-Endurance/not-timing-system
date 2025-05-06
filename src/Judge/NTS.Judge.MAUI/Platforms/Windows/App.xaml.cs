@@ -7,7 +7,9 @@ namespace NTS.Judge.MAUI.WinUI;
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.
 /// </summary>
+#pragma warning disable CsWinRT1029
 public partial class App : MauiWinUIApplication
+#pragma warning restore CsWinRT1029
 {
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code

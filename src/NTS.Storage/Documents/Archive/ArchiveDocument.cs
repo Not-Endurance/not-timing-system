@@ -48,7 +48,7 @@ public class ArchiveDocument : Document
             EndDay,
             FeiShowId
         );
-        var officials = Officials.Select(x => x.ToDomain());
+        var officials = Officials.Select(x => x.ToCoreDomain());
         var ranklists = Ranklists.Select(x => x.ToDomain());
         return new ArchiveEntry(enduranceEvent, officials, ranklists);
     }

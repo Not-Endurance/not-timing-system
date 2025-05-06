@@ -1,10 +1,9 @@
 ﻿using System.Linq.Expressions;
 using Not.Domain;
-using Not.Injection;
 
 namespace Not.Application.CRUD.Ports;
 
-public interface IRead<T> : ITransient
+public interface IRead<T>
     where T : IAggregateRoot
 {
     Task<T?> Read(Expression<Func<T, bool>> filter);

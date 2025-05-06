@@ -3,8 +3,8 @@ using Not.Injection;
 
 namespace Not.Application.CRUD.Ports;
 
-public interface ICrudReflection<T> : ISingleton
+public interface ICrudReflection<in T> : ISingleton
     where T : IAggregateRoot
 {
-    Task Reflect(T dependable);
+    Task Reflect(T update);
 }

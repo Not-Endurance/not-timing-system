@@ -1,77 +1,97 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Not.Application.CRUD.Ports;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.SignalR;
 using Not.Concurrency.Extensions;
-using Not.Safe;
-using NTS.Domain.Core.Aggregates;
 using NTS.Warp.ACL.Entities;
-using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Factories;
 using NTS.Warp.ACL.RPC.Procedures;
 using NTS.Warp.Features.Judge;
+using NTS.Warp.Features.Witness.ProcessSnapshots;
 
 namespace NTS.Warp.Features.Witness;
 
 internal class WitnessRpcHub
-    : Hub<ILegacyWitnessClientProcedures>,
+    : NtsHub<ILegacyWitnessClientProcedures>,
         IEmsStartlistHubProcedures,
         IEmsParticipantsHubProcedures
 {
-    readonly IJudgeConnectionContext _judgeConnectionContext;
-    readonly IHubContext<ParticipationRpcHub, IJudgeClientProcedures> _judgeRelay;
+    readonly IPrimaryConnectionContext _primaryConnections;
+    readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;
 
     public WitnessRpcHub(
-        IJudgeConnectionContext judgeConnectionContext,
-        IHubContext<ParticipationRpcHub, IJudgeClientProcedures> judgeRelay
+        ILogger<WitnessRpcHub> logger,
+        IPrimaryConnectionContext primaryConnections,
+        IHubContext<JudgeRpcHub, IJudgeClientProcedures> judgeRelay
     )
+        : base(logger)
     {
-        _judgeConnectionContext = judgeConnectionContext;
+        _primaryConnections = primaryConnections;
         _judgeRelay = judgeRelay;
     }
 
     public override async Task OnConnectedAsync()
     {
-        var connectionId = Context.ConnectionId;
-        await _judgeRelay.Clients.All.ReceiveRemoteConnectionId(connectionId);
+        await base.OnConnectedAsync();
+        var enduranceEventId = GetConnectionGroup()!;
+        if (!TryGetJudgeClient(enduranceEventId, out var judgeClient))
+        {
+            return;
+        }
+        await judgeClient.OnWitnessConnected(Context.ConnectionId);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var connectionId = Context.ConnectionId;
-        await _judgeRelay.Clients.All.ReceiveRemoteDisconnectId(connectionId);
+        await base.OnDisconnectedAsync(exception);
+        var enduranceEventId = GetConnectionGroup()!;
+        if (!TryGetJudgeClient(enduranceEventId, out var judgeClient))
+        {
+            return;
+        }
+        await judgeClient.OnWitnessDisconnedted(Context.ConnectionId);
     }
 
-    public Dictionary<int, EmsStartlist> SendStartlist()
+    public async Task<Dictionary<int, EmsStartlist>> SendStartlist(WarpRequest request)
     {
-        if (_judgeConnectionContext.Id == null)
+        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
             return [];
         }
-        var judge = _judgeRelay.Clients.Client(_judgeConnectionContext.Id);
-        var participations = judge.GetActiveParticipations().Result;
+        var participations = await judgeClient.GetActiveParticipations();
         return StartlistFactory.Create(participations);
     }
 
-    public async Task<EmsParticipantsPayload> SendParticipants()
+    public async Task<IEnumerable<EmsParticipantEntry>> SendParticipants(WarpRequest request)
     {
-        if (_judgeConnectionContext.Id == null)
+        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
-            return new EmsParticipantsPayload();
+            return [];
         }
-        var judge = _judgeRelay.Clients.Client(_judgeConnectionContext.Id);
-        var participants = await judge.GetActiveParticipations().Select(ParticipantEntryFactory.Create);
-        var enduranceEventId = await judge.GetEventId();
-        return new EmsParticipantsPayload { Participants = participants.ToList(), EventId = enduranceEventId ?? 0 };
+        var participants = await judgeClient.GetActiveParticipations();
+        var emsPartcipants = participants.Select(ParticipantEntryFactory.Create).ToList();
+        return emsPartcipants;
     }
 
-    public async Task ReceiveWitnessEvent(IEnumerable<EmsParticipantEntry> entries, EmsWitnessEventType type)
+    public async Task ReceiveWitnessEvent(WarpRequest<ProcessSnapshotsPayload> request)
     {
-        // Task.Run because Event hadling in dotnet seems to hold the current thread. Further investigation is needed
-        // but what was happening is that Witness apps didn't receive rpc response untill the handling thread was finished
-        // which is motly visible when it causes a validation (popup) which blocks the thread until closed in Prism/WPF
-        await SafeHelper.RunAsync(async () =>
+        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
-            var snapshots = entries.Select(entry => SnapshotFactory.Create(entry, type));
-            await _judgeRelay.Clients.All.ProcessSnapshots(snapshots);
-        });
+            return; // TODO: meaningful message would improve UX here
+        }
+        var snapshots = request.Payload.Entries.Select(entry => SnapshotFactory.Create(entry, request.Payload.Type));
+        await judgeClient.ProcessSnapshots(snapshots);
+    }
+
+    bool TryGetJudgeClient(string enduranceEventId, [NotNullWhen(true)] out IJudgeClientProcedures? judeClient)
+    {
+        var identifier = enduranceEventId.ToString();
+        var connectionId = _primaryConnections.GetConnectionId(identifier);
+        if (connectionId == null)
+        {
+            judeClient = null;
+            return false;
+        }
+
+        judeClient = _judgeRelay.Clients.Client(connectionId);
+        return true;
     }
 }

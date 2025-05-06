@@ -24,7 +24,7 @@ public static class JsonFileStore
         {
             var result = JsonConvert.SerializeObject(obj, SETTINGS);
             ResetConverters();
-            await File.WriteAllTextAsync(path, result);
+            await FileHelper.WriteAsync(path, result);
         }
         finally
         {

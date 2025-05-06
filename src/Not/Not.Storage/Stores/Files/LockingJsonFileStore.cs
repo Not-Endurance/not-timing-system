@@ -23,10 +23,7 @@ public class LockingJsonFileStore<T> : IStore<T>
         [CallerMemberName] string callerMember = default!
     )
     {
-        // TODO: figure out better way? Maybe cache the contents and update the cache on Commit?
-        var transactionId = await _timeoutLock.Wait(callerPath, callerMember);
         var state = await JsonFileStore.Read<T>(_path) ?? new T();
-        _timeoutLock.Release(transactionId);
         return state;
     }
 
