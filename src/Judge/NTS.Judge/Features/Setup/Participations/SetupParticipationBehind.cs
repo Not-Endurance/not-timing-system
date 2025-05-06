@@ -19,14 +19,14 @@ public class SetupParticipationBehind : CrudChildBehind<Participation, Participa
     protected override Participation CreateEntity(ParticipationFormModel model)
     {
         ValidateEntity(model);
-        var newStart = model.IsStartTimeOverriden ? model.StartTimeOverride?.ToDateTimeOffset() : null;
+        var newStart = OverrideStartTime(model);
         return new(newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride, model.MinSpeedOverride);
     }
 
     protected override Participation UpdateEntity(ParticipationFormModel model)
     {
         ValidateEntity(model);
-        var newStart = model.IsStartTimeOverriden ? model.StartTimeOverride?.ToDateTimeOffset() : null;
+        var newStart = OverrideStartTime(model);
         return new(
             model.Id,
             newStart,
@@ -63,5 +63,15 @@ public class SetupParticipationBehind : CrudChildBehind<Participation, Participa
                 Min_Speed_string
             );
         }
+    }
+
+    public DateTimeOffset? OverrideStartTime(ParticipationFormModel model)
+    {
+        if (model.StartTimeOverride != null)
+        {
+            var time = (TimeSpan)model.StartTimeOverride;
+            return DateTime.Today.Date.Add(time).ToDateTimeOffset();
+        }
+        return null;
     }
 }
