@@ -9,22 +9,19 @@ public static class DateTimeOffsetExtension
         return offsetTime;
     }
 
-    /// <summary>
-    /// ToDateTimeOffset creates a new DateTimeOffset from a TimeSpan.
-    /// The DateTimeOffset's day defaults to the one following the current date to ensure scheduling events doesn't happen in the past.
-    /// To set the date to the current day pass 'true' as the second argument.
-    /// </summary>
-    public static DateTimeOffset ToDateTimeOffset(this TimeSpan timeToBeAdded, bool enforceDateToCurrentDay = false)
+    public static DateTimeOffset ToDateTimeOffset(this TimeSpan setTime, DateTime? setDate = null)
     {
-        var daysToAdd = 1;
-        if (enforceDateToCurrentDay)
+        if(setDate == null)
         {
-            daysToAdd = 0;
+            var today = DateTime.Today;
+            today.Add(setTime);
+            return today.ToDateTimeOffset();
         }
-        var today = DateTime.Today.AddDays(daysToAdd);
-        var time = today.Add(timeToBeAdded);
-        var timeWithSpecifiedKind = DateTime.SpecifyKind(time, DateTimeKind.Local);
-        var offsetTime = timeWithSpecifiedKind;
-        return offsetTime;
+        else
+        {
+            var date = (DateTime)setDate;
+            var dateTime = date.Date.Add(setTime);
+            return dateTime.ToDateTimeOffset();
+        }
     }
 }
