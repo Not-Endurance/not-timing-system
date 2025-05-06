@@ -23,8 +23,9 @@
 
     <ParticipationTable Number="_combination.Number" Phases="_phases" AlignVertically="true" />
 
-    @if (Entry.Participation.IsComplete() && _total != null)
+    @if (Entry.Participation.IsComplete())
     {
+        var total = Entry.Participation.GetTotal();
         <MudStack Class="d-flex" Style="width:140px;" Spacing="1">
             <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">
                 @Total_string
@@ -34,19 +35,19 @@
                 <MudText Typo="Typo.caption" Align="Align.Center">
                     @Finished_at_colon_string
                     <strong>
-                        @_total!.FinishTime
-                    </strong>
+                        @total!.FinishTime
+               this.    </strong>
                 </MudText>
 
                 <MudText Typo="Typo.caption" Align="Align.Center">
                     @Ride_time_in_hours_colon_string
-                    <strong>@_total!.RideInterval</strong>
+                    <strong>@total!.RideInterval</strong>
                 </MudText>
 
                 <MudText Typo="Typo.caption" Align="Align.Center">
                     @Average_speed
                     <br />
-                    <strong>@_total!.AverageSpeed.ToString()</strong> km/h
+                    <strong>@total!.AverageSpeed.ToString()</strong> km/h
                 </MudText>
             </MudStack>
         </MudStack>

@@ -7,7 +7,6 @@ public partial class ProtocolRow
 {
     Combination _combination = default!;
     PhaseCollection _phases = default!;
-    Total? _total;
     string _rankText = " "; //TODO: implement NText component to display string with value null as white space
 
     [Parameter, EditorRequired]
@@ -21,6 +20,5 @@ public partial class ProtocolRow
         }
         _combination = Entry.Participation.Combination;
         _phases = Entry.Participation.Phases;
-        _total = Entry.Participation.GetTotal();
     }
 }
