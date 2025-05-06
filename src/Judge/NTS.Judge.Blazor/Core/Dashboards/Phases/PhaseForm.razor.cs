@@ -1,6 +1,6 @@
 using MudBlazor;
-using NTS.Judge.Blazor.Shared.Constants;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Judge.Blazor.Shared.Constants;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Phases;
 
