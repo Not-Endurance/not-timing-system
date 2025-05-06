@@ -1,14 +1,14 @@
 using MudBlazor;
 using Not.Blazor.Components;
 using Not.Structures;
-using NTS.Blazor;
+using NTS.Judge.Blazor.Shared.Constants;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions;
 
 public partial class CompetitionForm
 {
-    static readonly PatternMask TIME_MASK = new(Constants.MINUTES_TIME_MASK_FORMAT);
+    static readonly PatternMask TIME_MASK = new(Masks.MINUTES_TIME_MASK_FORMAT);
 
     MudNumericField<int?> _requiredInspectionCompulsoryThreshold = default!;
     MudTextField<string?> _nameField = default!;

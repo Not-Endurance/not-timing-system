@@ -2,14 +2,14 @@ using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Lists.Ports;
 using Not.Strings;
-using NTS.Blazor;
+using NTS.Judge.Blazor.Shared.Constants;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 
 public partial class ParticipationForm
 {
-    static readonly PatternMask TIME_MASK = new(Constants.MINUTES_TIME_MASK_FORMAT);
+    static readonly PatternMask TIME_MASK = new(Masks.MINUTES_TIME_MASK_FORMAT);
 
     NAutocomplete<Combination> _combinationField = default!;
     NSwitch _isNotRankedField = default!;

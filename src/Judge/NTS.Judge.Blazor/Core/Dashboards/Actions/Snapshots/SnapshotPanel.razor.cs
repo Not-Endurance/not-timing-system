@@ -1,14 +1,15 @@
 using MudBlazor;
 using Not.Notify;
-using NTS.Blazor;
+using NTS.Judge.Blazor.Shared.Constants;
 using NTS.Domain.Objects;
+
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Snapshots;
 
 public partial class SnapshotPanel
 {
     const string DEFAULT_TIME = "00:00:00";
-    static readonly PatternMask TIME_MASK = new(Constants.SECONDS_TIME_MASK_FORMAT);
+    static readonly PatternMask TIME_MASK = new(Masks.SECONDS_TIME_MASK_FORMAT);
 
     string? _input = DEFAULT_TIME;
 

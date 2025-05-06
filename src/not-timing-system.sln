@@ -67,8 +67,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Warp", "NTS.Warp\NTS.Wa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Nexus.Warp", "Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj", "{06B8CB89-11BC-4902-8404-F8193E113C9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Blazor", "NTS.Blazor\NTS.Blazor.csproj", "{D27E3E8D-3E8E-46ED-9DC8-1D038DD5F0DE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,10 +162,6 @@ Global
 		{06B8CB89-11BC-4902-8404-F8193E113C9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06B8CB89-11BC-4902-8404-F8193E113C9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06B8CB89-11BC-4902-8404-F8193E113C9C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D27E3E8D-3E8E-46ED-9DC8-1D038DD5F0DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D27E3E8D-3E8E-46ED-9DC8-1D038DD5F0DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D27E3E8D-3E8E-46ED-9DC8-1D038DD5F0DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D27E3E8D-3E8E-46ED-9DC8-1D038DD5F0DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
