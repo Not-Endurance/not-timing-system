@@ -567,4 +567,10 @@
   <data name="Rider_string" xml:space="preserve">
     <value>Ездач</value>
   </data>
+  <data name="Component_missing_required_value_string" xml:space="preserve">
+    <value>{0} не беше създаден успешно. Моля свържете се с разработчика.</value>
+  </data>
+  <data name="Protocol_is_null_string" xml:space="preserve">
+    <value>Протоколът не беше създаден успешно. Моля свържете се с разработчик.</value>
+  </data>
 </root>

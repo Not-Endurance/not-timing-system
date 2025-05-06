@@ -567,4 +567,7 @@
   <data name="Rider_string" xml:space="preserve">
     <value>Binici</value>
   </data>
+  <data name="Component_missing_required_value_string" xml:space="preserve">
+    <value>{0} oluşturulamadı. Lütfen geliştiriciyle iletişime geçin.</value>
+  </data>
 </root>

@@ -567,4 +567,7 @@
   <data name="Rider_string" xml:space="preserve">
     <value>Rider</value>
   </data>
+  <data name="Component_missing_required_value_string" xml:space="preserve">
+    <value>{0} couldn't be created. Please contact developer.</value>
+  </data>
 </root>

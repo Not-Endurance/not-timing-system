@@ -156,6 +156,7 @@ namespace NTS.Localization
         public static string Eliminated_string => LocalizeString(nameof(Eliminated_string));
         public static string Eliminated_with_colon_string => LocalizeString(nameof(Eliminated_with_colon_string));
         public static string Competition_ongoing_string => LocalizeString(nameof(Competition_ongoing_string));
+        public static string Component_missing_required_value_string => LocalizeString(nameof(Component_missing_required_value_string));
     }
 }
 #pragma warning restore NA0004
