@@ -2,11 +2,78 @@
 
 @inherits NComponent
 
-<NHeadline2 Content="@Ranklist.Title" Class="printable mb-4" />
-
-@foreach (var entry in Ranklist.Entries)
+@if(_document != null)
 {
-    <ProtocolRow Entry="entry" />
+    <MudItem Class="d-flex flex-row justify-space-around">
+        <MudImage Class="pb-5" Height="150" Width="135" Src="images/logo-fei.png" />
+        <MudItem Class="d-flex flex-column justify-center">
+            <NHeadline2 Content="@_document.Header.Title" Class="mb-4" />
+            <NHeadline2 Content="@_documentSubtitle" />
+        </MudItem>
+        <MudImage Class="pt-2 " Height="115" Width="135" Src="images/logo-bfks.png" />
+        @* available images in wwwroot/images are: logo-fei.png; logo-nak.jpg; logo-bfks.png *@
+    </MudItem>
 
-    <MudDivider Class="printable" />
+
+    <MudItem Class="d-flex flex-row justify-center mt-n5">
+        <MudText Typo="Typo.overline" Style="font-size:20px;" Class="printable">
+            @Officials_string:
+        </MudText>
+    </MudItem>
+    <MudStack Class="d-flex mb-3" Row="true" Justify="Justify.Center">
+        <MudStack Row="false">
+            @if (_document!.Header.GroundJuryPresident != null)
+            {
+                <MudText Typo="Typo.caption" Style="font-size:12px;">
+                    @_document.Header.GroundJuryPresident
+                </MudText>
+            }
+            @if (_document.Header.ChiefSteward != null)
+            {
+                <MudText Typo="Typo.caption" Style="font-size:12px;">
+                    @_document.Header.ChiefSteward
+                </MudText>
+            } 
+            @if (_document.Header.ForeignJudge != null)
+            {
+                <MudText Typo="Typo.caption" Style="font-size:12px;">
+                    @_document.Header.ForeignJudge
+                </MudText>
+            }
+        </MudStack>
+        <MudStack Row="false">
+            @if (_document!.Header.VeterinaryCommissionPresident != null)
+            {
+                <MudText Typo="Typo.caption" Style="font-size:12px;">
+                    @_document.Header.VeterinaryCommissionPresident
+                </MudText>
+            }
+            @if (_document.Header.TechnicalDelegate != null)
+            {
+                <MudText Typo="Typo.caption" Style="font-size:12px;">
+                    @_document.Header.TechnicalDelegate
+                </MudText>
+            }
+            @if (_document.Header.ForeignVeterinaryDelegate != null)
+            {
+                <MudText Typo="Typo.caption" Style="font-size:12px;">
+                    @_document.Header.ForeignVeterinaryDelegate
+                </MudText>
+            }
+        </MudStack>
+    </MudStack>
+
+    <MudStack Spacing="1" AlignItems="AlignItems.Center" Class="mt-n3">
+        <MudDivider Class="mt-1" />
+        @foreach (var entry in Ranklist.Entries)
+        {
+            <ProtocolRow Entry="entry" />
+
+            <MudDivider Class="mt-1 printable" />
+        }
+    </MudStack>
+}
+else
+{
+    <NHeadline3 Color="Color.Error" Content="@string.Format(Component_missing_required_value_string, Ranklist_string)" />
 }

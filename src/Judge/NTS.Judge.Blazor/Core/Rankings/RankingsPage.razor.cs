@@ -1,6 +1,8 @@
+using Not.Blazor.Components;
+
 namespace NTS.Judge.Blazor.Core.Rankings;
 
-public partial class RankingsPage
+public partial class RankingsPage : PrintableComponent
 {
     bool _showProtocol;
 
