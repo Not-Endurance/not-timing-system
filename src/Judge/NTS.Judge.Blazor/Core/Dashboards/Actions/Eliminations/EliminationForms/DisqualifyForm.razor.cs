@@ -7,21 +7,28 @@ public partial class DisqualifyForm
 {
     string? Reason { get; set; }
 
+    IEnumerable<DisqualifyCode> Codes { get; set; } = [];
+
     [Parameter]
     public Disqualified? Disqualified { get; set; }
 
     protected override void OnParametersSet()
     {
-        Reason = Disqualified?.Complement;
+        if (Disqualified != null)
+        {
+            Codes = Disqualified.DqCodes.ToList();
+            Reason = Disqualified?.Complement;
+        }
     }
 
     internal override async Task Eliminate()
     {
-        if (Reason == null)
+        if (Reason == null && !Codes.Any())
         {
             NotifyHelper.Warn("Reason is required");
             return;
         }
-        await Eliminations.Disqualify(Reason);
+        var dqCodes = Codes.ToArray();
+        await Eliminations.Disqualify(dqCodes, Reason);
     }
 }

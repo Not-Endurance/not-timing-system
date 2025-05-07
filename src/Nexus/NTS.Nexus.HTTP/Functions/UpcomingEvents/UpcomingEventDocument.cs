@@ -144,6 +144,7 @@ public class UpcomingEventDocument : Document
                 IsNotRanked = participation.IsNotRanked,
                 Combination = CombinationModel.Create(participation.Combination),
                 MaxSpeedOverride = participation.MaxSpeedOverride,
+                MinSpeedOverride = participation.MinSpeedOverride,
                 MinAverageSpeed = participation.MinAverageSpeed,
                 MaxAverageSpeed = participation.MaxAverageSpeed,
             };
@@ -154,6 +155,7 @@ public class UpcomingEventDocument : Document
         public bool IsNotRanked { get; init; }
         public CombinationModel Combination { get; init; } = default!;
         public double? MaxSpeedOverride { get; init; }
+        public double? MinSpeedOverride { get; init; }
         public double? MinAverageSpeed { get; init; }
         public double? MaxAverageSpeed { get; init; }
 
@@ -165,6 +167,7 @@ public class UpcomingEventDocument : Document
                 IsNotRanked,
                 Combination.ToSetupDomain(),
                 MaxSpeedOverride,
+                MinSpeedOverride,
                 MinAverageSpeed,
                 MaxAverageSpeed
             );

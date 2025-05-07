@@ -6,13 +6,22 @@ public class EliminatedDocumentModel
 {
     public static EliminatedDocumentModel Create(Eliminated eliminated)
     {
-        if (eliminated is FailedToQualify ftq)
+        if (eliminated is FailedToQualify failedToQualify)
         {
             return new EliminatedDocumentModel
             {
                 Code = eliminated.Code,
                 Reason = eliminated.Complement,
-                FtqCodes = ftq.FtqCodes.ToArray(),
+                FtqCodes = failedToQualify.FtqCodes.ToArray(),
+            };
+        }
+        else if (eliminated is Disqualified disqualified)
+        {
+            return new EliminatedDocumentModel
+            {
+                Code = eliminated.Code,
+                Reason = eliminated.Complement,
+                DqCodes = disqualified.DqCodes.ToArray(),
             };
         }
         return new EliminatedDocumentModel { Code = eliminated.Code, Reason = eliminated.Complement };
@@ -20,7 +29,8 @@ public class EliminatedDocumentModel
 
     public string Code { get; init; } = default!;
     public string? Reason { get; init; }
-    public FtqCode[]? FtqCodes { get; init; }
+    public FailToQualifyCode[]? FtqCodes { get; init; }
+    public DisqualifyCode[] DqCodes { get; init; } = default!;
 
     public Eliminated ToDomain()
     {
@@ -28,7 +38,7 @@ public class EliminatedDocumentModel
         {
             Eliminated.FAILED_TO_QUALIFY => new FailedToQualify(FtqCodes!, Reason),
             Eliminated.WITHDRAWN => new Withdrawn(),
-            Eliminated.DISQUALIFIED => new Disqualified(Reason!),
+            Eliminated.DISQUALIFIED => new Disqualified(DqCodes, Reason!),
             Eliminated.FINISHED_NOT_RANKED => new FinishedNotRanked(Reason!),
             Eliminated.RETIRED => new Retired(),
             _ => throw new NotImplementedException(),

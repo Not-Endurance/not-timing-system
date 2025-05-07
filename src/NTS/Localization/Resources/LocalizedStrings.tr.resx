@@ -370,7 +370,7 @@
     <value>Yazdırma Önizleme</value>
   </data>
   <data name="Manual_handout_strings" xml:space="preserve">
-    <value>Manuel çıktı</value>
+    <value>Manuel çıktı:</value>
   </data>
   <data name="Yes_string" xml:space="preserve">
     <value>Evet</value>
@@ -474,7 +474,7 @@
   <data name="Start_Time_string" xml:space="preserve">
     <value>Başlangıç Zamanı</value>
   </data>
-  <data name="Max_Speed_Penalty_string" xml:space="preserve">
+  <data name="Max_Speed_string" xml:space="preserve">
     <value>Maksimum Hız Cezası</value>
   </data>
   <data name="Presentation_string" xml:space="preserve">
@@ -548,6 +548,21 @@
   </data>
   <data name="Select_event_string" xml:space="preserve">
     <value>Etkinlik seç</value>
+  </data>
+  <data name="Disqualify_Reason_string" xml:space="preserve">
+    <value>Diskalifiye olma nedeni</value>
+  </data>
+  <data name="Handouts_list_empty_message_string" xml:space="preserve">
+    <value>Yazdırmadan önce çıktıları manuel olarak oluşturun...</value>
+  </data>
+  <data name="Null_or_malformed_string" xml:space="preserve">
+    <value>'{0}' alanının değeri eksik veya yanlış biçimde. Lütfen doğru bir değer girip tekrar deneyin</value>
+  </data>
+  <data name="Main_menu_string" xml:space="preserve">
+    <value>Ana Menü</value>
+  </data>
+  <data name="Min_Speed_string" xml:space="preserve">
+    <value>Minimum Hız Cezası</value>
   </data>
   <data name="Average_speed" xml:space="preserve">
     <value>Ortalama hız:</value>

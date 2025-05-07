@@ -6,17 +6,25 @@ namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 public class ParticipationFormModel : IFormModel<Participation>
 {
     public int? Id { get; set; }
-    public TimeSpan? StartTimeOverride { get; set; } // TODO: toggle checkbox
+    public bool IsStartTimeOverriden { get; set; }
+    public TimeSpan? StartTimeOverride { get; set; }
     public bool IsNotRanked { get; set; }
     public Combination? Combination { get; set; }
-    public double? MaxSpeedOverride { get; set; } // TODO: toggle checkbox
+    public bool IsMaxSpeedOverriden { get; set; }
+    public double? MaxSpeedOverride { get; set; }
+    public bool IsMinSpeedOverriden { get; set; }
+    public double? MinSpeedOverride { get; set; }
 
     public void FromEntity(Participation participation)
     {
         Id = participation.Id;
+        IsStartTimeOverriden = participation.StartTimeOverride != null;
         StartTimeOverride = participation.StartTimeOverride?.LocalDateTime.TimeOfDay;
         IsNotRanked = participation.IsNotRanked;
         Combination = participation.Combination;
+        IsMaxSpeedOverriden = participation.MaxSpeedOverride != null;
         MaxSpeedOverride = participation.MaxSpeedOverride;
+        IsMinSpeedOverriden = participation.MinSpeedOverride != null;
+        MinSpeedOverride = participation.MinSpeedOverride;
     }
 }

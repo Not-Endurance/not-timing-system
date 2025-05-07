@@ -6,7 +6,7 @@ namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Eliminations.EliminationForms
 public partial class FailedToQualifyForm : EliminationForm
 {
     string? _reason;
-    IEnumerable<FtqCode> Codes { get; set; } = [];
+    IEnumerable<FailToQualifyCode> Codes { get; set; } = [];
 
     [Parameter]
     public FailedToQualify? FailedToQualify { get; set; }
