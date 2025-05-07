@@ -436,7 +436,7 @@
     <value>Competitions</value>
   </data>
   <data name="Officials_string" xml:space="preserve">
-    <value>Officials</value>
+    <value>Official members</value>
   </data>
   <data name="Phases_string" xml:space="preserve">
     <value>Phases</value>
@@ -563,5 +563,26 @@
   </data>
   <data name="Min_Speed_string" xml:space="preserve">
     <value>Min Speed</value>
+  </data>
+  <data name="Average_speed" xml:space="preserve">
+    <value>Average speed:</value>
+  </data>
+  <data name="Eliminated_with_colon_string" xml:space="preserve">
+    <value>Eliminated:</value>
+  </data>
+  <data name="Eliminated_string" xml:space="preserve">
+    <value>Eliminated</value>
+  </data>
+  <data name="Competition_ongoing_string" xml:space="preserve">
+    <value>Competition is ongoing</value>
+  </data>
+  <data name="Club_string" xml:space="preserve">
+    <value>Club</value>
+  </data>
+  <data name="Rider_string" xml:space="preserve">
+    <value>Rider</value>
+  </data>
+  <data name="Component_missing_required_value_string" xml:space="preserve">
+    <value>{0} couldn't be created. Please contact developer.</value>
   </data>
 </root>

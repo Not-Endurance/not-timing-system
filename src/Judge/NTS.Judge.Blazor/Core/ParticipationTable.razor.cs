@@ -22,20 +22,24 @@ public partial class ParticipationTable
     [Parameter]
     public PhaseCollection? Phases { get; set; }
 
+    [Parameter]
+    public bool AlignVertically { get; set; } = default;
+
     protected override void OnParametersSet()
     {
         _anyRepresentation = Phases != null && Phases.Any(x => x.IsReinspectionRequested);
         _anyRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionRequested);
         _anyCompulsoryRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionCompulsory);
+        FlipAxis();
     }
 
 #pragma warning disable IDE0051 // Remove unused private members
     void FlipAxis()
 #pragma warning restore IDE0051 // Remove unused private members
     {
-        if (_axisClass == FLIPPED_AXIS_CLASS)
+        if (AlignVertically)
         {
-            _axisClass = "";
+            _axisClass = "size-xs";
         }
         else
         {

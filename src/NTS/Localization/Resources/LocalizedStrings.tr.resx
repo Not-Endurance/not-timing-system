@@ -564,4 +564,25 @@
   <data name="Min_Speed_string" xml:space="preserve">
     <value>Minimum Hız Cezası</value>
   </data>
+  <data name="Average_speed" xml:space="preserve">
+    <value>Ortalama hız:</value>
+  </data>
+  <data name="Eliminated_with_colon_string" xml:space="preserve">
+    <value>Elendi:</value>
+  </data>
+  <data name="Eliminated_string" xml:space="preserve">
+    <value>Elendi</value>
+  </data>
+  <data name="Competition_ongoing_string" xml:space="preserve">
+    <value>Yarışma devam ediyor</value>
+  </data>
+  <data name="Club_string" xml:space="preserve">
+    <value>Kulüp</value>
+  </data>
+  <data name="Rider_string" xml:space="preserve">
+    <value>Binici</value>
+  </data>
+  <data name="Component_missing_required_value_string" xml:space="preserve">
+    <value>{0} oluşturulamadı. Lütfen geliştiriciyle iletişime geçin.</value>
+  </data>
 </root>

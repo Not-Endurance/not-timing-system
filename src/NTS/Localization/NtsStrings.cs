@@ -155,6 +155,15 @@ namespace NTS.Localization
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
         public static string Null_or_malformed_string => LocalizeString(nameof(Null_or_malformed_string));
         public static string Main_menu_string => LocalizeString(nameof(Main_menu_string));
+        public static string Rider_string => LocalizeString(nameof(Rider_string));
+        public static string Club_string => LocalizeString(nameof(Clubs_string));
+
+        public static string Average_speed => LocalizeString(nameof(Average_speed));
+        public static string Eliminated_string => LocalizeString(nameof(Eliminated_string));
+        public static string Eliminated_with_colon_string => LocalizeString(nameof(Eliminated_with_colon_string));
+        public static string Competition_ongoing_string => LocalizeString(nameof(Competition_ongoing_string));
+        public static string Component_missing_required_value_string =>
+            LocalizeString(nameof(Component_missing_required_value_string));
     }
 }
 #pragma warning restore NA0004

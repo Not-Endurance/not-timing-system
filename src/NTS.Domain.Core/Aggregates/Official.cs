@@ -1,4 +1,5 @@
-﻿using Not.Domain.Base;
+﻿using System.Xml.Linq;
+using Not.Domain.Base;
 
 namespace NTS.Domain.Core.Aggregates;
 
@@ -21,6 +22,6 @@ public class Official : AggregateRoot, IAggregateRoot
 
     public override string ToString()
     {
-        return $"{Role}: {Person}";
+        return $"{Role.GetDescription()}: {Person}";
     }
 }
