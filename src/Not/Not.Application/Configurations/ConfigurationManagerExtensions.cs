@@ -23,11 +23,13 @@ public static class ConfigurationManagerExtensions
         this IConfigurationBuilder builder,
         string fileName,
         bool optional = false,
-        Assembly? assembly = null)
+        Assembly? assembly = null
+    )
     {
         assembly ??= Assembly.GetExecutingAssembly();
 
-        var resourceName = assembly.GetManifestResourceNames()
+        var resourceName = assembly
+            .GetManifestResourceNames()
             .FirstOrDefault(name => name.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
 
         if (resourceName == null)
@@ -36,16 +38,19 @@ public static class ConfigurationManagerExtensions
             {
                 return builder;
             }
-                
 
-            throw new FileNotFoundException($"Embedded resource '{fileName}' not found in assembly '{assembly.FullName}'.");
+            throw new FileNotFoundException(
+                $"Embedded resource '{fileName}' not found in assembly '{assembly.FullName}'."
+            );
         }
 
         var stream = assembly.GetManifestResourceStream(resourceName);
         if (stream == null)
         {
-            if (optional) { return builder; }
-                
+            if (optional)
+            {
+                return builder;
+            }
 
             throw new InvalidOperationException($"Could not load stream for embedded resource '{resourceName}'.");
         }
