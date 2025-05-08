@@ -4,7 +4,7 @@
 @attribute [Route(HANDOUTS_PAGE)]
 @inherits PrintableComponent
 
-<NContent Title="@Handouts_string" HasContent="@Behind.Documents.Any()" RightBarXS="2">
+<NContent Title="@Handouts_string" HasContent="@Behind.Documents.Any()" EmptyMessage="@Handouts_list_empty_message_string" RightBarXS="2">
 
     <Main>
         <HandoutsList Documents="Behind.Documents" />

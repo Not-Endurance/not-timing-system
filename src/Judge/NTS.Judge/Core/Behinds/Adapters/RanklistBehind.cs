@@ -5,6 +5,7 @@ using Not.Notify;
 using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Blazor.Core.Rankings;
 using NTS.Judge.Core.FeiExport;
@@ -12,7 +13,7 @@ using NTS.Judge.HTTP;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
-public class RanklistBehind : ObservableBehind, IRankingBehind
+public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocumentBehind
 {
     readonly IFeiExportBusiness _feiExportBusiness;
     readonly IRepository<Ranking> _rankings;
@@ -91,6 +92,15 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
         await File.WriteAllTextAsync(path, xml);
     }
 
+    public async Task<RanklistDocument> CreateDocument()
+    {
+        var enduranceEvent = await _events.Read(0);
+        GuardHelper.ThrowIfDefault(enduranceEvent);
+        var officials = await _officials.ReadAll();
+        GuardHelper.ThrowIfDefault(Ranklist);
+        return new RanklistDocument(Ranklist, enduranceEvent, officials);
+    }
+
     async Task<IEnumerable<Ranking>> SafeGetRankings()
     {
         return await _rankings.ReadAll();
@@ -100,7 +110,6 @@ public class RanklistBehind : ObservableBehind, IRankingBehind
     {
         var ranking = await _rankings.Read(id);
         GuardHelper.ThrowIfDefault(ranking);
-
         Ranklist = new Ranklist(ranking);
         EmitChange();
     }

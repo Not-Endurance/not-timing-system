@@ -15,12 +15,12 @@ using Not.Blazor.Components.Mud;
 
             <MudSpacer />
 
-            <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+            <NHeadline3 Content="NTS Judge v0.2" />
         </MudAppBar>
 
         <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
             <MudDrawerHeader>
-                <NHeadline3 Content="NTS Judge v0.2" Style="color:#9ca2b8" />
+                <NHeadline3 Content="@Main_menu_string" />
             </MudDrawerHeader>
 
             <NavMenu />

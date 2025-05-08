@@ -18,6 +18,7 @@ public class Participation : AggregateRoot, IReflect<Combination>
         bool isNotRanked,
         Combination? combination,
         double? maxSpeedOverride,
+        double? minSpeedOverride,
         double? minAverageSpeed = null,
         double? maxAverageSpeed = null
     )
@@ -27,6 +28,7 @@ public class Participation : AggregateRoot, IReflect<Combination>
         IsNotRanked = isNotRanked;
         Combination = Required(nameof(Combination), combination);
         MaxSpeedOverride = maxSpeedOverride;
+        MinSpeedOverride = minSpeedOverride;
         if (minAverageSpeed.HasValue)
         {
             MinAverageSpeed = minAverageSpeed;
@@ -41,14 +43,16 @@ public class Participation : AggregateRoot, IReflect<Combination>
         DateTimeOffset? startTimeOverride,
         bool isNotRanked,
         Combination? combination,
-        double? maxSpeedOverride
+        double? maxSpeedOverride,
+        double? minSpeedOverride
     )
-        : this(GenerateId(), startTimeOverride, isNotRanked, combination, maxSpeedOverride) { }
+        : this(GenerateId(), startTimeOverride, isNotRanked, combination, maxSpeedOverride, minSpeedOverride) { }
 
     public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
     public DateTimeOffset? StartTimeOverride { get; }
     public double? MaxSpeedOverride { get; }
+    public double? MinSpeedOverride { get; }
     public double? MinAverageSpeed { get; private set; }
     public double? MaxAverageSpeed { get; private set; }
 
@@ -71,6 +75,10 @@ public class Participation : AggregateRoot, IReflect<Combination>
         if (MaxSpeedOverride != null)
         {
             MaxAverageSpeed = MaxSpeedOverride;
+        }
+        if (MinSpeedOverride != null)
+        {
+            MinAverageSpeed = MinSpeedOverride;
         }
     }
 

@@ -370,7 +370,7 @@
     <value>Print Preview</value>
   </data>
   <data name="Manual_handout_strings" xml:space="preserve">
-    <value>Manaul handout</value>
+    <value>Create handout:</value>
   </data>
   <data name="Yes_string" xml:space="preserve">
     <value>Yes</value>
@@ -436,7 +436,7 @@
     <value>Competitions</value>
   </data>
   <data name="Officials_string" xml:space="preserve">
-    <value>Officials</value>
+    <value>Official members</value>
   </data>
   <data name="Phases_string" xml:space="preserve">
     <value>Phases</value>
@@ -474,8 +474,8 @@
   <data name="Start_Time_string" xml:space="preserve">
     <value>Start Time</value>
   </data>
-  <data name="Max_Speed_Penalty_string" xml:space="preserve">
-    <value>Max Speed Penalty</value>
+  <data name="Max_Speed_string" xml:space="preserve">
+    <value>Max Speed </value>
   </data>
   <data name="Presentation_string" xml:space="preserve">
     <value>Present</value>
@@ -548,5 +548,41 @@
   </data>
   <data name="Select_event_string" xml:space="preserve">
     <value>Select event</value>
+  </data>
+  <data name="Disqualify_Reason_string" xml:space="preserve">
+    <value>Disqualify Reason</value>
+  </data>
+  <data name="Handouts_list_empty_message_string" xml:space="preserve">
+    <value>Create Handouts manually to print...</value>
+  </data>
+  <data name="Null_or_malformed_string" xml:space="preserve">
+    <value>{0} value is missing or malformed. Please enter a correct value and try again</value>
+  </data>
+  <data name="Main_menu_string" xml:space="preserve">
+    <value>Main Menu</value>
+  </data>
+  <data name="Min_Speed_string" xml:space="preserve">
+    <value>Min Speed</value>
+  </data>
+  <data name="Average_speed" xml:space="preserve">
+    <value>Average speed:</value>
+  </data>
+  <data name="Eliminated_with_colon_string" xml:space="preserve">
+    <value>Eliminated:</value>
+  </data>
+  <data name="Eliminated_string" xml:space="preserve">
+    <value>Eliminated</value>
+  </data>
+  <data name="Competition_ongoing_string" xml:space="preserve">
+    <value>Competition is ongoing</value>
+  </data>
+  <data name="Club_string" xml:space="preserve">
+    <value>Club</value>
+  </data>
+  <data name="Rider_string" xml:space="preserve">
+    <value>Rider</value>
+  </data>
+  <data name="Component_missing_required_value_string" xml:space="preserve">
+    <value>{0} couldn't be created. Please contact developer.</value>
   </data>
 </root>

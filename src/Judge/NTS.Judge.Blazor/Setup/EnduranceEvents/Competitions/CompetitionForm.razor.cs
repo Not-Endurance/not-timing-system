@@ -2,11 +2,14 @@ using MudBlazor;
 using Not.Blazor.Components;
 using Not.Structures;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Judge.Blazor.Shared.Constants;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions;
 
 public partial class CompetitionForm
 {
+    static readonly PatternMask TIME_MASK = new(Masks.MINUTES_TIME_MASK_FORMAT);
+
     MudNumericField<int?> _requiredInspectionCompulsoryThreshold = default!;
     MudTextField<string?> _nameField = default!;
     NSelect<CompetitionType> _typeField = default!;
@@ -21,6 +24,7 @@ public partial class CompetitionForm
         RegisterInjector(nameof(Competition.Name), () => _nameField);
         RegisterInjector(nameof(Competition.Start), () => _dayField);
         RegisterInjector(nameof(Competition.Start), () => _timeField);
+        RegisterInjector(nameof(CompetitionFormModel.Time), () => _timeField);
         RegisterInjector(nameof(Competition.Type), () => _typeField);
         RegisterInjector(nameof(Competition.Ruleset), () => _rulesetField);
         RegisterInjector(nameof(Competition.CompulsoryThresholdSpan), () => _requiredInspectionCompulsoryThreshold);

@@ -28,12 +28,46 @@ public record Retired : Eliminated
 
 public record Disqualified : Eliminated
 {
-    public Disqualified(string complement)
-        : base(DISQUALIFIED, complement) { }
+    public Disqualified()
+        : base(DISQUALIFIED) { }
+
+    [JsonConstructor]
+    public Disqualified(DisqualifyCode[] dqCodes, string? complement)
+        : base(DISQUALIFIED)
+    {
+        PreventInvalidDq(dqCodes, complement);
+        DqCodes = dqCodes;
+        Complement = complement; // Doesn't use base ctor with complement, because it is not required here
+    }
+
+    public IEnumerable<DisqualifyCode> DqCodes { get; private set; } = [];
 
     public override string ToString()
     {
-        return base.ToString();
+        if (DqCodes.Any())
+        {
+            var codes = string.Join('+', DqCodes.Where(code => code != DisqualifyCode.other));
+            return $"DQ {codes}";
+        }
+        else
+        {
+            return base.ToString();
+        }
+    }
+
+    static void PreventInvalidDq(DisqualifyCode[] codes, string? complement)
+    {
+        if (codes.Length == 0)
+        {
+            throw new DomainException(Please_provide_reason_to_eliminate_as__, $"{Eliminated.DISQUALIFIED}");
+        }
+        if (codes.Contains(DisqualifyCode.other) && string.IsNullOrWhiteSpace(complement))
+        {
+            throw new DomainException(
+                Please_provide_reason_to_eliminate_as__,
+                $"{Eliminated.DISQUALIFIED} {DisqualifyCode.other}"
+            );
+        }
     }
 }
 
@@ -51,7 +85,7 @@ public record FinishedNotRanked : Eliminated
 public record FailedToQualify : Eliminated
 {
     [JsonConstructor]
-    public FailedToQualify(FtqCode[] ftqCodes, string? complement)
+    public FailedToQualify(FailToQualifyCode[] ftqCodes, string? complement)
         : base(FAILED_TO_QUALIFY)
     {
         PreventInvalidFTC(ftqCodes, complement);
@@ -59,10 +93,10 @@ public record FailedToQualify : Eliminated
         Complement = complement; // Doesn't use base ctor with complement, because it is not required here
     }
 
-    public FailedToQualify(FtqCode[] codes)
+    public FailedToQualify(FailToQualifyCode[] codes)
         : this(IsNotEmpty(codes), null) { }
 
-    public IEnumerable<FtqCode> FtqCodes { get; private set; } = [];
+    public IEnumerable<FailToQualifyCode> FtqCodes { get; private set; } = [];
 
     public override string ToString()
     {
@@ -70,23 +104,23 @@ public record FailedToQualify : Eliminated
         return $"FTQ {codes}";
     }
 
-    static FtqCode[] IsNotEmpty(FtqCode[] codes)
+    static FailToQualifyCode[] IsNotEmpty(FailToQualifyCode[] codes)
     {
         if (codes == null || codes.Length == 0)
         {
             throw new DomainException(Select_FTQ_codes);
         }
-        if (codes.Contains(FtqCode.FTC)) { }
+        if (codes.Contains(FailToQualifyCode.FTC)) { }
         return codes;
     }
 
-    static void PreventInvalidFTC(FtqCode[] codes, string? complement)
+    static void PreventInvalidFTC(FailToQualifyCode[] codes, string? complement)
     {
-        if (codes.Contains(FtqCode.FTC) && string.IsNullOrWhiteSpace(complement))
+        if (codes.Contains(FailToQualifyCode.FTC) && string.IsNullOrWhiteSpace(complement))
         {
             throw new DomainException(
                 Please_provide_reason_to_eliminate_as__,
-                $"{Eliminated.FAILED_TO_QUALIFY} {FtqCode.FTC}"
+                $"{Eliminated.FAILED_TO_QUALIFY} {FailToQualifyCode.FTC}"
             );
         }
     }
