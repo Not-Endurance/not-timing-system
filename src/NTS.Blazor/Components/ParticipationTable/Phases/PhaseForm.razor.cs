@@ -1,7 +1,7 @@
 using MudBlazor;
 using NTS.Domain.Core.Aggregates.Participations;
 
-namespace NTS.Judge.Blazor.Core.Dashboards.Phases;
+namespace NTS.Blazor.Components.ParticipationTable.Phases;
 
 public partial class PhaseForm
 {

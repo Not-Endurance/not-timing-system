@@ -1,6 +1,8 @@
 ﻿@using NTS.Domain.Core.Aggregates.Participations
-@using NTS.Judge.Blazor.Core.Dashboards.Phases
+@using NTS.Blazor.Components.ParticipationTable.Phases
+@using Not.Blazor.Components
 @using Not.Blazor.Dialogs
+
 
 @inherits NComponent
 
@@ -15,6 +17,7 @@
 
             @if (_anyRepresentation)
             {
+
                 <th>Represent</th>
             }
             @if (_anyRequiredInspection)
