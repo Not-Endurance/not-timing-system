@@ -1,12 +1,12 @@
 using Not.Blazor.Components;
+using Not.Blazor.Components.Mud;
 using Not.Startup;
-using NTS.Judge.Blazor.Setup.Settings;
 
 namespace NTS.Judge.Blazor.Shared.Components;
 
 public partial class MainLayout
 {
-    NTheme _mudTheme = default!;
+    NTheme _theme = default!;
     bool _hideLayout;
     bool _drawerOpen = true;
 

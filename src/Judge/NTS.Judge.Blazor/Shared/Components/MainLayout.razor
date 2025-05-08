@@ -1,11 +1,11 @@
 ﻿@using NTS.Judge.Blazor.Shared.Components.Nav
 @using NTS.Judge.Blazor.Shared.Components.SidePanels
 @using Not.Blazor.Notifier
-@using Not.Blazor.Components.Mud;
+using Not.Blazor.Components.Mud;
 
 @inherits LayoutComponentBase
 
-<NTheme @ref="_mudTheme"/>
+<NTheme @ref="_theme"/>
 
 <MudLayout>
     @if (!_hideLayout)
@@ -30,7 +30,7 @@
     }
 
     <MudMainContent>
-        <CascadingValue Value="@_mudTheme.ThemeProvider">
+        <CascadingValue Value="@_theme.ThemeProvider">
             <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
                 @Body
             </MudContainer>
