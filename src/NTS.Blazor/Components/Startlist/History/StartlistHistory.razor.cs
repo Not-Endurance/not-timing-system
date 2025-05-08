@@ -1,4 +1,6 @@
-namespace NTS.Judge.Blazor.Core.Startlists.History;
+using Microsoft.AspNetCore.Components;
+
+namespace NTS.Blazor.Components.Startlist.History;
 
 public partial class StartlistHistory
 {
@@ -7,7 +9,7 @@ public partial class StartlistHistory
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Behind);
+        await Observe(Behind, []);
         CreateStartlistsByStage(Behind.History);
     }
 

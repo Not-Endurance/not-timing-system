@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Formatting;
 
-namespace NTS.Judge.Blazor.Core.Startlists.Upcoming;
+namespace NTS.Blazor.Components.Startlist.Upcoming;
 
 public partial class StartlistTimer
 {

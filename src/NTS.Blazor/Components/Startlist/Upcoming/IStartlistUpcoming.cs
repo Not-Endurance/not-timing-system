@@ -3,7 +3,7 @@ using Not.Injection;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Startlists;
 
-namespace NTS.Judge.Blazor.Core.Startlists.Upcoming;
+namespace NTS.Blazor.Components.Startlist.Upcoming;
 
 public interface IStartlistUpcoming : IObservableBehind, ISingleton
 {

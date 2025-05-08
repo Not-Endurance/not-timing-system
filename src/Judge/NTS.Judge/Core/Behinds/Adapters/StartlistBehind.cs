@@ -2,8 +2,8 @@
 using Not.Application.CRUD.Ports;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Startlists;
-using NTS.Judge.Blazor.Core.Startlists.History;
-using NTS.Judge.Blazor.Core.Startlists.Upcoming;
+using NTS.Blazor.Components.Startlist.History;
+using NTS.Blazor.Components.Startlist.Upcoming;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
@@ -24,7 +24,7 @@ public class StartlistBehind : ObservableBehind, IStartlistUpcoming, IStartlistH
     {
         var participations = await _participationRepository.ReadAll();
         _startlist = new StartList(participations, EmitChange);
-        ;
+
         return _startlist.Any();
     }
 }

@@ -1,7 +1,8 @@
 ﻿using Not.Blazor.Components;
 using NTS.Domain.Core.Objects.Startlists;
+using static NTS.Localization.NtsStrings;
 
-namespace NTS.Judge.Blazor.Core.Startlists;
+namespace NTS.Blazor.Components.Startlist;
 
 public abstract class StartlistTabs : NComponent
 {

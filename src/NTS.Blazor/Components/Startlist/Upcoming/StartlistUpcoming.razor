@@ -5,7 +5,7 @@
 
 @inherits StartlistTabs
 
-@if (Behind.Upcoming.Count() != 0)
+@if (Behind.Upcoming.Count() != 0 || Entries.Count() != 0)
 {
     <MudTabs PanelClass="px-4 py-6" Elevation="0" Rounded ApplyEffectsToContainer Class="@Class">
         @foreach (var tabHeader in StartlistsByStage.Keys)
