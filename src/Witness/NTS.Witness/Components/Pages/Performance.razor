@@ -1,4 +1,9 @@
-﻿@attribute [Route(PHASE_DETAILS)]
+﻿@using NTS.Blazor.Components.ParticipationTable
+@using NTS.Domain.Core.Aggregates.Participations
 
-We are waiting for a developer to finish their nap to put some content here. 
-Thank you for patience!
+@attribute [Route(PHASE_DETAILS)]
+
+<MudStack style="height:100%" Justify="Justify.Center" AlignItems="AlignItems.Center">
+    <NHeadline3 Content="@_participant"></NHeadline3>
+    <ParticipationTable Number="1" Phases="_phasesCollection" />
+</MudStack>
