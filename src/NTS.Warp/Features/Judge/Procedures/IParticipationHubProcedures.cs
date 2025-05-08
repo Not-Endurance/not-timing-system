@@ -4,7 +4,7 @@ namespace NTS.Warp.Features.Judge.Procedures;
 
 public interface IParticipationHubProcedures
 {
-    Task OnPhaseCompleted(PhaseCompleted completed);
-    Task OnParticipationEliminated(ParticipationEliminated eliminated);
-    Task OnParticipationRestored(ParticipationRestored restored);
+    Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request);
+    Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request);
+    Task OnParticipationRestored(WarpRequest<ParticipationRestored> request);
 }

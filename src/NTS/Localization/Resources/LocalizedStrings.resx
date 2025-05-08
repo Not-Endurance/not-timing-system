@@ -543,4 +543,10 @@
   <data name="Invalid_phase_configuration_in_competition__missing_rest" xml:space="preserve">
     <value>Invalid phase configuration in competition '{0}': missing Rest time in a non-final phase</value>
   </data>
+  <data name="Upcoming_events_string" xml:space="preserve">
+    <value>Upcoming еvents</value>
+  </data>
+  <data name="Select_event_string" xml:space="preserve">
+    <value>Select event</value>
+  </data>
 </root>

@@ -1,5 +1,6 @@
 name: "[net8] deploy nexus functions"
 on:
+  workflow_dispatch:
   push:
     branches:
     - develop
@@ -69,7 +70,7 @@ jobs:
     - name: Zip function
       run: |
         cd ${{ env.ARTIFACT_PATH }}
-        zip -r ../../../${{ env.AZURE_RESOURCE }}.zip .
+        zip -r ../../${{ env.AZURE_RESOURCE }}.zip .
         cd -
 
     - name: Login to Azure

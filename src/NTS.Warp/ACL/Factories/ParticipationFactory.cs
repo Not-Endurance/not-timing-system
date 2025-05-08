@@ -1,9 +1,9 @@
 ﻿using NTS.Domain.Core.Aggregates;
 using NTS.Warp.ACL.Entities.LapRecords;
 using NTS.Warp.ACL.Entities.Participants;
+using NTS.Warp.ACL.Entities.Participations;
 using NTS.Warp.ACL.Models;
 using NTS.Warp.Features.Judge.Models;
-using EmsParticipation = NTS.Warp.ACL.Entities.Participations.EmsParticipation;
 
 namespace NTS.Warp.ACL.Factories;
 
@@ -32,6 +32,7 @@ public class ParticipationFactory
             }
             var emsRecord = new EmsLapRecord(phase.StartTime.Value.Date, emsLap)
             {
+                StartTime = phase.StartTime.Value.DateTime,
                 ArrivalTime = phase.ArriveTime?.DateTime,
                 InspectionTime = phase.PresentTime?.DateTime,
                 ReInspectionTime = phase.RepresentTime?.DateTime,

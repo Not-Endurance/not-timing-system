@@ -9,6 +9,7 @@ namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 public partial class EnduranceEventForm
 {
     MudTextField<string?> _placeField = default!;
+    MudTextField<string?> _nameField = default!;
     NAutocomplete<Country?> _countryField = default!;
 
     [Inject]
@@ -16,7 +17,8 @@ public partial class EnduranceEventForm
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(EnduranceEvent.Place), () => _placeField);
-        RegisterInjector(nameof(EnduranceEvent.Country), () => _countryField);
+        RegisterInjector(nameof(UpcomingEvent.Place), () => _placeField);
+        RegisterInjector(nameof(UpcomingEvent.Name), () => _nameField);
+        RegisterInjector(nameof(UpcomingEvent.Country), () => _countryField);
     }
 }

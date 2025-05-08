@@ -1,22 +1,25 @@
-using Not.Blazor.CRUD.Forms;
+using Not.Application.RPC.SignalR;
+using Not.Blazor.Navigation;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 
 public partial class EnduranceEventPage
 {
-    [Inject]
-    IEnduranceEventBehind Behind { get; set; } = default!;
+    EnduranceEventFormModel? _upcomingEvent;
 
     [Inject]
-    FormManager<EnduranceEventFormModel, EnduranceEventForm> FormManager { get; set; } = default!;
+    ICrumbsNavigator Navigator { get; set; } = default!;
+
+    [Inject]
+    IRpcSocket RpcSocket { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        _upcomingEvent = Navigator.ConsumeParameter<EnduranceEventFormModel>();
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Behind);
-    }
-
-    async Task OpenCreateForm()
-    {
-        await FormManager.Create();
+        await RpcSocket.Connect();
     }
 }

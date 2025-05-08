@@ -12,10 +12,10 @@ public abstract class SetRepository<T, TState> : ReadonlySetRepository<T, TState
     public SetRepository(IStore<TState> store)
         : base(store) { }
 
-    public async Task Create(T entity)
+    public async Task Create(T item)
     {
         var state = await Store.Transact();
-        state.EntitySet.Add(entity);
+        state.EntitySet.Add(item);
         await Store.Commit(state);
     }
 
@@ -34,30 +34,30 @@ public abstract class SetRepository<T, TState> : ReadonlySetRepository<T, TState
         await Store.Commit(state);
     }
 
-    public virtual async Task Delete(T entity)
+    public virtual async Task Delete(T item)
     {
         var state = await Store.Transact();
-        state.EntitySet.Remove(entity);
+        state.EntitySet.Remove(item);
         await Store.Commit(state);
     }
 
-    public async Task Delete(IEnumerable<T> entities)
+    public async Task Delete(IEnumerable<T> items)
     {
         var state = await Store.Transact();
-        foreach (var entity in entities)
+        foreach (var entity in items)
         {
             state.EntitySet.Remove(entity);
         }
         await Store.Commit(state);
     }
 
-    public virtual async Task Update(T entity)
+    public virtual async Task Update(T items)
     {
         var state = await Store.Transact();
 
-        var index = state.EntitySet.IndexOf(entity);
-        state.EntitySet.Remove(entity);
-        state.EntitySet.Insert(index, entity);
+        var index = state.EntitySet.IndexOf(items);
+        state.EntitySet.Remove(items);
+        state.EntitySet.Insert(index, items);
 
         await Store.Commit(state);
     }
