@@ -4,11 +4,15 @@
 
 @if(_document != null)
 {
-    <MudItem Class="d-flex flex-row justify-space-around">
-        <MudImage Class="pb-5" Height="150" Width="135" Src="images/logo-fei.png" />
+    <MudItem Class="d-flex flex-row justify-space-around printable">
+        <MudImage Class="pb-5" Height="150" Width="135" Src="images/logo-nak.jpg" />
         <MudItem Class="d-flex flex-column justify-center">
             <NHeadline2 Content="@_document.Header.Title" Class="mb-4" />
-            <NHeadline2 Content="@_documentSubtitle" />
+            <MudStack Class="d-flex mb-3" Row="true" Justify="Justify.Center">
+                <NHeadline2 Content="@_document.Header.PopulatedPlace.City" />
+                <NHeadline2 Content="@_document.Header.EventSpan.ToString()" />
+                <NHeadline2 Content="@_document.Header.PopulatedPlace.Country.ToString()" />
+            </MudStack>
         </MudItem>
         <MudImage Class="pt-2 " Height="115" Width="135" Src="images/logo-bfks.png" />
         @* available images in wwwroot/images are: logo-fei.png; logo-nak.jpg; logo-bfks.png *@
@@ -75,5 +79,5 @@
 }
 else
 {
-    <NHeadline3 Color="Color.Error" Content="@string.Format(Component_missing_required_value_string, Ranklist_string)" />
+    <NHeadline3 Color="Color.Error" Content="@string.Format(Component_missing_required_value_string, Protocol_string)" />
 }
