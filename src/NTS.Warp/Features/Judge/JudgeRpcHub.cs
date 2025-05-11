@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using NTS.Application.RPC;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
@@ -71,11 +72,13 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
         
         var emsParticipation = Convert(request.Payload.Participation);
         var entry = new EmsStartlistEntry(emsParticipation);
-        
+
+        var serialized = JsonConvert.SerializeObject(entry);
         _logger.LogInformation(
-            "Phase completed OUT: #{number}, OUT: {outTime}",
+            "Phase completed OUT: #{number}, OUT: {outTime}, serialized: {serialized}",
             entry.Number,
-            entry.StartTime);
+            entry.StartTime,
+            serialized);
         
         await _witnessRelay
             .Clients.Group(request.EnduranceEventId)
