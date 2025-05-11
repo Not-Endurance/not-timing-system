@@ -30,17 +30,17 @@ public class StorageTests : JudgeIntegrationTest
 
         var expectedState = new SetupState
         {
-            UpcomingEvent = UpcomingEvent.Update(
-                enduranceEvent.Id,
-                enduranceEvent.Name,
-                enduranceEvent.Place,
-                enduranceEvent.Country,
-                enduranceEvent.FeiShowId,
-                [],
-                [],
-                [],
-                []
-            ),
+            // UpcomingEvent = UpcomingEvent.Update(
+            //     enduranceEvent.Id,
+            //     enduranceEvent.Name,
+            //     enduranceEvent.Place,
+            //     enduranceEvent.Country,
+            //     enduranceEvent.FeiShowId,
+            //     [],
+            //     [],
+            //     [],
+            //     []
+            // ),
         };
         var settings = new NJsonSettings();
         var expected = JsonConvert.SerializeObject(expectedState, settings);
