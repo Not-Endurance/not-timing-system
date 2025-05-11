@@ -594,4 +594,19 @@
   <data name="Cannot_select_another_event_without_resetting__string" xml:space="preserve">
     <value>Cannot select another event without resetting '{0}'. If you connected to the wrong event by accident, please Reset the event(using the button on the left)</value>
   </data>
+  <data name="Hard_reset_string" xml:space="preserve">
+    <value>Hard reset</value>
+  </data>
+  <data name="Soft_reset_string" xml:space="preserve">
+    <value>Soft reset</value>
+  </data>
+  <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
+    <value>Setup configuration will not be deleted</value>
+  </data>
+  <data name="Soft_reset_dialog_option_1_string" xml:space="preserve">
+    <value>Soft reset - reset the event connection. Make sure to select the correct event before Starting</value>
+  </data>
+  <data name="Soft_reset_dialog_option_2_string" xml:space="preserve">
+    <value>Hard reset - reset the connection and delete all phase data</value>
+  </data>
 </root>

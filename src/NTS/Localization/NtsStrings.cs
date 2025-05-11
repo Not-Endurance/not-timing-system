@@ -75,7 +75,12 @@ namespace NTS.Localization
         public static string Settings_string => LocalizeString(nameof(Settings_string));
         public static string Start_string => LocalizeString(nameof(Start_string));
         public static string Reset_string => LocalizeString(nameof(Reset_string));
+        public static string Hard_reset_string => LocalizeString(nameof(Hard_reset_string));
+        public static string Soft_reset_string => LocalizeString(nameof(Soft_reset_string));
+        public static string Soft_reset_dialog_option_1_string => LocalizeString(nameof(Soft_reset_dialog_option_1_string));
+        public static string Soft_reset_dialog_option_2_string => LocalizeString(nameof(Soft_reset_dialog_option_2_string));
         public static string Are_you_sure_you_want_to_reset_string => LocalizeString(nameof(Are_you_sure_you_want_to_reset_string));
+        public static string Setup_configuration_will_not_be_deleted_string => LocalizeString(nameof(Setup_configuration_will_not_be_deleted_string));
         public static string Configure_Endurance_Event_string =>
             LocalizeString(nameof(Configure_Endurance_Event_string));
         public static string Endurance_Event_does_not_exist_yet_string =>

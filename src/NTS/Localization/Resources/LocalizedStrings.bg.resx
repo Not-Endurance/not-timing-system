@@ -594,4 +594,19 @@
   <data name="Cannot_select_another_event_without_resetting__string" xml:space="preserve">
     <value>Не може да изберете друго събитие докато сте свързани с '{0}'. Ако сте се свързали с грешно събитие моля да го Ресетнете (чрез бутона в ляво) </value>
   </data>
+  <data name="Hard_reset_string" xml:space="preserve">
+    <value>Хард ресет</value>
+  </data>
+  <data name="Soft_reset_string" xml:space="preserve">
+    <value>Софт ресет</value>
+  </data>
+  <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
+    <value>Конфигурацията на събитието няма да бъде изтрита</value>
+  </data>
+  <data name="Soft_reset_dialog_option_1_string" xml:space="preserve">
+    <value>Софт ресет - промени връзката със събирие. Подсигури се че правилното събитие е избрано преди Старт</value>
+  </data>
+  <data name="Soft_reset_dialog_option_2_string" xml:space="preserve">
+    <value>Хард ресет - ресетни връзката към събитие и изтрий всички данни на Фази</value>
+  </data>
 </root>

@@ -59,10 +59,15 @@ public class CoreBehind : ObservableBehind, ICoreBehind
         return SafeHelper.Run(SafeStart);
     }
 
-    public async Task Reset()
+    public async Task SoftReset()
+    {
+        await _eventsRpcContext.ResetEvent();
+    }
+
+    public async Task HardReset()
     {
         await _coreStore.Delete();
-        await _eventsRpcContext.ResetEvent();
+        await SoftReset();
         IsStarted = false;
     }
 

@@ -7,7 +7,7 @@
     {
         <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
     }
-    <NButtonDanger OnClick="OpenResetCompetitionDialog" Text="@Reset_string" />
+    <NButtonWarning OnClick="OpenSoftResetDialog" Text="@Reset_string" />
     @* else if (StaticOption.IsRfidDetectionEnabled()) *@
     @* { *@
     @*     <RfidPanel EnduranceEventStarted="CoreBehind.IsStarted" /> *@

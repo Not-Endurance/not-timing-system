@@ -7,6 +7,7 @@ public interface ICoreBehind : IObservableBehind
 {
     bool IsStarted { get; }
     Task Start();
-    Task Reset();
+    Task SoftReset();
+    Task HardReset();
     Task LoadArchive(int archiveId);
 }

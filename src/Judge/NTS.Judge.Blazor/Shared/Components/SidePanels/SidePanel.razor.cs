@@ -1,5 +1,7 @@
 using MudBlazor;
 using Not.Blazor.Dialogs;
+using NTS.Judge.Blazor.Shared.Components.SidePanels.Reset;
+using NTS.Judge.Blazor.Shared.Constants;
 
 namespace NTS.Judge.Blazor.Shared.Components.SidePanels;
 
@@ -10,7 +12,7 @@ public partial class SidePanel
     
     [Inject]
     IDialogService DialogService { get; set; } = default!;
-    
+
     [Inject]
     NavigationManager NavManager { get; set; } = default!;
     
@@ -24,15 +26,13 @@ public partial class SidePanel
         await CoreBehind.Start();
     }
 
-    async Task OpenResetCompetitionDialog()
+    async Task OpenSoftResetDialog()
     {
-        var dialog = await DialogService.ShowAsync<ResetCompetitionsDialog>();
+        var dialog = await DialogService.ShowAsync<SoftResetDialog>();
         if (await dialog.IsCanceled())
         {
             return;
         }
-
-        await CoreBehind.Reset();
-        NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+        NavManager.NavigateTo(BlazorPages.HOME, forceLoad: true);
     }
 }
