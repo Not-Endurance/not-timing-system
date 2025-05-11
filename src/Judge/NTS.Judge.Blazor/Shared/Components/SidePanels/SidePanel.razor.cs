@@ -9,13 +9,13 @@ public partial class SidePanel
 {
     [Inject]
     ICoreBehind CoreBehind { get; set; } = default!;
-    
+
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
     NavigationManager NavManager { get; set; } = default!;
-    
+
     protected override async Task OnInitializedAsync()
     {
         await Observe(CoreBehind);

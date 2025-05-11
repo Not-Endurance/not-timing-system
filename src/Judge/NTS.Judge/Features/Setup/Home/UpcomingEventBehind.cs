@@ -58,7 +58,7 @@ public class UpcomingEventBehind
         NotifyHelper.Inform("Upcoming events cannot be deleted");
         return Task.CompletedTask;
     }
-    
+
     public async Task Reflect(Loop loop)
     {
         foreach (var competitions in ((ICrudeParent<Competition>)_crudeContext).Children)
