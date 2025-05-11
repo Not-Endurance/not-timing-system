@@ -321,8 +321,8 @@
   <data name="Settings_string" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="Start_Competitions_string" xml:space="preserve">
-    <value>Start competitions</value>
+  <data name="Start_string" xml:space="preserve">
+    <value>Start</value>
   </data>
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Configure Endurance Event</value>
@@ -584,5 +584,11 @@
   </data>
   <data name="Component_missing_required_value_string" xml:space="preserve">
     <value>{0} couldn't be created. Please contact developer.</value>
+  </data>
+  <data name="Reset_string" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
+    <value>Are you sure you want to reset? This action will delete ALL PHASE TIMES and cannot be undone! </value>
   </data>
 </root>

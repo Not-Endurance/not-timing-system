@@ -73,7 +73,9 @@ namespace NTS.Localization
             LocalizeString(nameof(Witnesses_connected__colon_string));
         public static string Loops_string => LocalizeString(nameof(Loops_string));
         public static string Settings_string => LocalizeString(nameof(Settings_string));
-        public static string Start_Competitions_string => LocalizeString(nameof(Start_Competitions_string));
+        public static string Start_string => LocalizeString(nameof(Start_string));
+        public static string Reset_string => LocalizeString(nameof(Reset_string));
+        public static string Are_you_sure_you_want_to_reset_string => LocalizeString(nameof(Are_you_sure_you_want_to_reset_string));
         public static string Configure_Endurance_Event_string =>
             LocalizeString(nameof(Configure_Endurance_Event_string));
         public static string Endurance_Event_does_not_exist_yet_string =>

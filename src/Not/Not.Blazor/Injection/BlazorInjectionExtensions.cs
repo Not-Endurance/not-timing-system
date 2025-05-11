@@ -15,7 +15,7 @@ public static class BlazorInjectionExtensions
     {
         return services
             .AddNotMudBlazor()
-            .AddTransient(typeof(Dialog<,>))
+            .AddTransient(typeof(CrudeDialog<,>))
             .AddTransient(typeof(FormManager<,>))
             .AddTransient<ILandNavigator, BlazorCrumbsNavigator>()
             .AddTransient<ICrumbsNavigator, BlazorCrumbsNavigator>();

@@ -1,0 +1,12 @@
+using MudBlazor;
+
+namespace Not.Blazor.Dialogs;
+
+public static class MudDialogExtensions
+{
+    public static async Task<bool> IsCanceled(this IDialogReference dialog)
+    {
+        var result = await dialog.Result;
+        return result?.Canceled ?? false;
+    }    
+}

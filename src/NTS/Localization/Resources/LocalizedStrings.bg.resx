@@ -321,8 +321,8 @@
   <data name="Settings_string" xml:space="preserve">
     <value>Настройки</value>
   </data>
-  <data name="Start_Competitions_string" xml:space="preserve">
-    <value>Стартирай състезанията</value>
+  <data name="Start_string" xml:space="preserve">
+    <value>Стартирай</value>
   </data>
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Конфигурирай Събитие</value>
@@ -585,7 +585,10 @@
   <data name="Component_missing_required_value_string" xml:space="preserve">
     <value>{0} не беше създаден успешно. Моля свържете се с разработчика.</value>
   </data>
-  <data name="Protocol_is_null_string" xml:space="preserve">
-    <value>Протоколът не беше създаден успешно. Моля свържете се с разработчик.</value>
+  <data name="Reset_string" xml:space="preserve">
+    <value>Ресетни</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
+    <value>Сигурни ли сте че искате да ресетнете състезанията? Това ще ИЗТРИЕ ВСИЧКИ ЗАПИСАНИ ВРЕМЕНА НА ФАЗИ и няма да можете да ги въстановите. </value>
   </data>
 </root>

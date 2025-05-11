@@ -2,15 +2,18 @@
 using Not.Application.CRUD.Ports;
 using Not.Notify;
 using Not.Safe;
+using Not.Storage.Stores;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Blazor.Shared.Components.SidePanels;
 using NTS.Judge.Core.Start;
 using NTS.Judge.HTTP;
+using NTS.Storage.Core;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
 public class CoreBehind : ObservableBehind, ICoreBehind
 {
+    readonly IStore<CoreState> _coreStore;
     readonly ICoreStarter _coreStarter;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
@@ -19,6 +22,7 @@ public class CoreBehind : ObservableBehind, ICoreBehind
     readonly IArchiveRepository _archive;
 
     public CoreBehind(
+        IStore<CoreState> coreStore,
         ICoreStarter coreStarter,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
@@ -27,6 +31,7 @@ public class CoreBehind : ObservableBehind, ICoreBehind
         IArchiveRepository archive
     )
     {
+        _coreStore = coreStore;
         _coreStarter = coreStarter;
         _rankings = rankings;
         _events = events;
@@ -47,6 +52,12 @@ public class CoreBehind : ObservableBehind, ICoreBehind
     public Task Start()
     {
         return SafeHelper.Run(SafeStart);
+    }
+
+    public async Task Reset()
+    {
+        await _coreStore.Delete();
+        IsStarted = false;
     }
 
     public async Task LoadArchive(int archiveId)
