@@ -6,7 +6,7 @@ public interface IEmsCompetitionState : IEmsIdentifiable
 {
     EmsCompetitionType Type { get; }
     string Name { get; }
-    DateTime StartTime { get; }
+    DateTimeOffset StartTime { get; }
     string FeiCategoryEventNumber { get; }
     string FeiScheduleNumber { get; }
     string Rule { get; }
