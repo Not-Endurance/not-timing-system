@@ -39,7 +39,7 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
             await _repository.Update((T)item);
         }
     }
-    
+
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
         if (ObservableList.Any())
