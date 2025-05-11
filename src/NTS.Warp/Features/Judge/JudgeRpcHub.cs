@@ -68,8 +68,9 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
         _logger.LogInformation(
             "Phase completed IN: #{number}, OUT: {outTime}",
             request.Payload.Participation.Combination.Number,
-            request.Payload.Participation.Phases.Last(x => x.StartTime != null).StartTime);
-        
+            request.Payload.Participation.Phases.Last(x => x.StartTime != null).StartTime
+        );
+
         var emsParticipation = Convert(request.Payload.Participation);
         var entry = new EmsStartlistEntry(emsParticipation);
 
@@ -78,8 +79,9 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
             "Phase completed OUT: #{number}, OUT: {outTime}, serialized: {serialized}",
             entry.Number,
             entry.StartTime,
-            serialized);
-        
+            serialized
+        );
+
         await _witnessRelay
             .Clients.Group(request.EnduranceEventId)
             .ReceiveEntry(entry, EmsCollectionAction.AddOrUpdate);

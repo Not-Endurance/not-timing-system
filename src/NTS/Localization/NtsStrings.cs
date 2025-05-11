@@ -77,10 +77,14 @@ namespace NTS.Localization
         public static string Reset_string => LocalizeString(nameof(Reset_string));
         public static string Hard_reset_string => LocalizeString(nameof(Hard_reset_string));
         public static string Soft_reset_string => LocalizeString(nameof(Soft_reset_string));
-        public static string Soft_reset_dialog_option_1_string => LocalizeString(nameof(Soft_reset_dialog_option_1_string));
-        public static string Soft_reset_dialog_option_2_string => LocalizeString(nameof(Soft_reset_dialog_option_2_string));
-        public static string Are_you_sure_you_want_to_reset_string => LocalizeString(nameof(Are_you_sure_you_want_to_reset_string));
-        public static string Setup_configuration_will_not_be_deleted_string => LocalizeString(nameof(Setup_configuration_will_not_be_deleted_string));
+        public static string Soft_reset_dialog_option_1_string =>
+            LocalizeString(nameof(Soft_reset_dialog_option_1_string));
+        public static string Soft_reset_dialog_option_2_string =>
+            LocalizeString(nameof(Soft_reset_dialog_option_2_string));
+        public static string Are_you_sure_you_want_to_reset_string =>
+            LocalizeString(nameof(Are_you_sure_you_want_to_reset_string));
+        public static string Setup_configuration_will_not_be_deleted_string =>
+            LocalizeString(nameof(Setup_configuration_will_not_be_deleted_string));
         public static string Configure_Endurance_Event_string =>
             LocalizeString(nameof(Configure_Endurance_Event_string));
         public static string Endurance_Event_does_not_exist_yet_string =>
@@ -169,7 +173,8 @@ namespace NTS.Localization
         public static string Eliminated_string => LocalizeString(nameof(Eliminated_string));
         public static string Eliminated_with_colon_string => LocalizeString(nameof(Eliminated_with_colon_string));
         public static string Competition_ongoing_string => LocalizeString(nameof(Competition_ongoing_string));
-        public static string Cannot_select_another_event_without_resetting__string => LocalizeString(nameof(Cannot_select_another_event_without_resetting__string));
+        public static string Cannot_select_another_event_without_resetting__string =>
+            LocalizeString(nameof(Cannot_select_another_event_without_resetting__string));
         public static string Component_missing_required_value_string =>
             LocalizeString(nameof(Component_missing_required_value_string));
     }

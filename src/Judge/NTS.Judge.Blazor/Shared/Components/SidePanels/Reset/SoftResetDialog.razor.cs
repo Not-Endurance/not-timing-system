@@ -8,7 +8,7 @@ public partial class SoftResetDialog : NDialog
 {
     [Inject]
     ICoreBehind CoreBehind { get; set; } = default!;
-    
+
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
@@ -17,7 +17,7 @@ public partial class SoftResetDialog : NDialog
         await CoreBehind.SoftReset();
         Confirm();
     }
-    
+
     async Task OpenHardResetDialog()
     {
         var hardResetDialog = await DialogService.ShowAsync<HardResetDialog>();
@@ -29,4 +29,3 @@ public partial class SoftResetDialog : NDialog
         Confirm();
     }
 }
-

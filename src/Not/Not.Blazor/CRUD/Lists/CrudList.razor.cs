@@ -46,7 +46,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         try
         {
             IEnumerable<object> args = ParentId != null ? [ParentId] : [];
-            await Observe(Behind, args);   
+            await Observe(Behind, args);
         }
         catch (Exception ex)
         {
@@ -72,7 +72,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         {
             await SetParentContext(item);
             var model = CreateModel(item);
-            await FormNavigator.Update(UpdateRoute, model);   
+            await FormNavigator.Update(UpdateRoute, model);
         }
         catch (Exception ex)
         {
@@ -84,7 +84,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     {
         try
         {
-            await Behind.Delete(item);  
+            await Behind.Delete(item);
         }
         catch (Exception ex)
         {
@@ -101,7 +101,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         foreach (var context in ParentContexts)
         {
             await context.Set(parent);
-        }    
+        }
     }
 
     TModel CreateModel(T entity)

@@ -12,5 +12,5 @@ public static class MudDialogExtensions
         }
         var result = await dialog.Result;
         return result?.Canceled ?? false;
-    }    
+    }
 }
