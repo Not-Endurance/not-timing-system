@@ -16,7 +16,7 @@ namespace NTS.Warp.Features.Judge;
 
 internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 {
-    private readonly ILogger<JudgeRpcHub> _logger;
+    readonly ILogger<JudgeRpcHub> _logger;
     readonly IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> _witnessRelay;
     readonly PrimaryConnectionsContext _primaryConnections;
 
