@@ -16,7 +16,7 @@ public partial class ConnectionStatus : NComponent, IDisposable
         _timer = new Timer(TimeSpan.FromSeconds(1));
         _timer.Elapsed += HandleElapsed;
     }
-    
+
     [Inject]
     IConnectionsBehind ConnectionsBehind { get; set; } = default!;
 
