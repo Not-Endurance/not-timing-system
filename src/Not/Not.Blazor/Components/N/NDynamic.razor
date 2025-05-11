@@ -1,7 +1,4 @@
-﻿@using Not.Blazor.CRUD.Forms.Components
-@using Not.Exceptions
-
-@namespace Not.Blazor.Components
+﻿@namespace Not.Blazor.Components
 @inherits NComponent
 @typeparam T
 @typeparam TForm
@@ -9,9 +6,6 @@
 @if (Model == null)
 {
     <p>Model parameter is null at NDynamic</p>
-}
-else
-{
 }
 
 <DynamicComponent Type="typeof(TForm)" @ref="_dynamicComponent" Parameters="_parameters" />

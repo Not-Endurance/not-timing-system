@@ -1,14 +1,13 @@
-﻿using Not.Application.Behinds.Adapters;
-using Not.Application.RPC;
+﻿using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Notify;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
-public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IConnectionsRegistry, IDisposable
+public class ConnectionsBehind : IConnectionsBehind, IConnectionsRegistry, IDisposable
 {
     readonly IRpcSocket _rpcSocket;
-    HashSet<string> _connections = [];
+    readonly HashSet<string> _connections = [];
 
     public ConnectionsBehind(IRpcSocket rpcSocket)
     {
@@ -18,26 +17,17 @@ public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IConnecti
     }
 
     public RpcConnectionStatus ServerConnectionStatus { get; private set; }
-    public bool IsServerConnected { get; private set; }
+    public bool IsServerConnected => _rpcSocket?.IsConnected ?? false;
     public IEnumerable<string> RemoteConnections => _connections;
-
-    protected override Task<bool> PerformInitialization(params IEnumerable<object> arguments)
-    {
-        IsServerConnected = _rpcSocket.IsConnected;
-        var result = _connections.Any();
-        return Task.FromResult(result);
-    }
 
     public void Add(string connectionId)
     {
         _connections.Add(connectionId);
-        EmitChange();
     }
 
     public void Remove(string connectionId)
     {
         _connections.Remove(connectionId);
-        EmitChange();
     }
 
     public void Dispose()
@@ -49,15 +39,11 @@ public class ConnectionsBehind : ObservableBehind, IConnectionsBehind, IConnecti
     void HandleRpcErrors(object? sender, RpcError rpcError)
     {
         ServerConnectionStatus = RpcConnectionStatus.Disconnected;
-        IsServerConnected = ServerConnectionStatus == RpcConnectionStatus.Connected;
         NotifyHelper.Error(rpcError.Exception);
-        EmitChange();
     }
 
     void HandleServerConnectionChanged(object? sender, RpcConnectionStatus e)
     {
         ServerConnectionStatus = e;
-        IsServerConnected = ServerConnectionStatus == RpcConnectionStatus.Connected;
-        EmitChange();
     }
 }
