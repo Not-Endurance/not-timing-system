@@ -1,10 +1,11 @@
-﻿@inherits NDialog
+@inherits NDialog
 
 <MudDialog>
-    <TitleContent>@Print_confirmation_string</TitleContent>
+    <TitleContent>@Hard_reset_string</TitleContent>
 
     <DialogContent>
-        @Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string
+        <p>@Are_you_sure_you_want_to_reset_string</p>
+        <p>*@Setup_configuration_will_not_be_deleted_string</p>
     </DialogContent>
 
     <DialogActions>

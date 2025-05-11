@@ -30,7 +30,7 @@ public class StorageTests : JudgeIntegrationTest
 
         var expectedState = new SetupState
         {
-            EnduranceEvent = UpcomingEvent.Update(
+            UpcomingEvent = UpcomingEvent.Update(
                 enduranceEvent.Id,
                 enduranceEvent.Name,
                 enduranceEvent.Place,

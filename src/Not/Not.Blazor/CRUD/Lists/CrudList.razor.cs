@@ -6,6 +6,7 @@ using Not.Blazor.CRUD.Lists.Ports;
 using Not.Blazor.CRUD.Ports;
 using Not.Domain;
 using Not.Domain.Base;
+using Not.Safe;
 
 namespace Not.Blazor.CRUD.Lists;
 
@@ -37,42 +38,69 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     protected override void OnInitialized()
     {
         GuardHelper.ThrowIfDefault(UpdateRoute);
-        //Name = Localizer.Get(Name ?? $"{typeof(T).Name}s");
-        //TODO: RefactorLocalizer.Get to use string.Format
         EmptyMessage = string.Format(No__have_been_created_for_this_event_string, Name);
     }
 
     protected override async Task OnInitializedAsync()
     {
-        IEnumerable<object> args = ParentId != null ? [ParentId] : [];
-        await Observe(Behind, args);
+        try
+        {
+            IEnumerable<object> args = ParentId != null ? [ParentId] : [];
+            await Observe(Behind, args);
+        }
+        catch (Exception ex)
+        {
+            await SafeHelper.HandleException(ex);
+        }
     }
 
     protected async Task CreateHandler()
     {
-        await FormNavigator.Create();
+        try
+        {
+            await FormNavigator.Create();
+        }
+        catch (Exception ex)
+        {
+            await SafeHelper.HandleException(ex);
+        }
     }
 
     protected async Task UpdateHandler(T item)
     {
-        SetParentContext(item);
-        var model = CreateModel(item);
-        await FormNavigator.Update(UpdateRoute, model);
+        try
+        {
+            await SetParentContext(item);
+            var model = CreateModel(item);
+            await FormNavigator.Update(UpdateRoute, model);
+        }
+        catch (Exception ex)
+        {
+            await SafeHelper.HandleException(ex);
+        }
     }
 
     protected async Task DeleteHandler(T item)
     {
-        await Behind.Delete(item);
+        try
+        {
+            await Behind.Delete(item);
+        }
+        catch (Exception ex)
+        {
+            await SafeHelper.HandleException(ex);
+        }
     }
 
-    void SetParentContext(T entity)
+    async Task SetParentContext(T entity)
     {
-        if (entity is IParent parent)
+        if (entity is not IParent parent)
         {
-            foreach (var context in ParentContexts)
-            {
-                context.Set(parent);
-            }
+            return;
+        }
+        foreach (var context in ParentContexts)
+        {
+            await context.Set(parent);
         }
     }
 

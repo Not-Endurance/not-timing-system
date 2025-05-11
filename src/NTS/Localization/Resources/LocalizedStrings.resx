@@ -321,8 +321,8 @@
   <data name="Settings_string" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="Start_Competitions_string" xml:space="preserve">
-    <value>Start competitions</value>
+  <data name="Start_string" xml:space="preserve">
+    <value>Start</value>
   </data>
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Configure Endurance Event</value>
@@ -584,5 +584,29 @@
   </data>
   <data name="Component_missing_required_value_string" xml:space="preserve">
     <value>{0} couldn't be created. Please contact developer.</value>
+  </data>
+  <data name="Reset_string" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
+    <value>Are you sure you want to reset? This action will delete ALL PHASE TIMES and cannot be undone! </value>
+  </data>
+  <data name="Cannot_select_another_event_without_resetting__string" xml:space="preserve">
+    <value>Cannot select another event without resetting '{0}'. If you connected to the wrong event by accident, please Reset the event(using the button on the left)</value>
+  </data>
+  <data name="Hard_reset_string" xml:space="preserve">
+    <value>Hard reset</value>
+  </data>
+  <data name="Soft_reset_string" xml:space="preserve">
+    <value>Soft reset</value>
+  </data>
+  <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
+    <value>Setup configuration will not be deleted</value>
+  </data>
+  <data name="Soft_reset_dialog_option_1_string" xml:space="preserve">
+    <value>Soft reset - reset the event connection. Make sure to select the correct event before Starting</value>
+  </data>
+  <data name="Soft_reset_dialog_option_2_string" xml:space="preserve">
+    <value>Hard reset - reset the connection and delete all phase data</value>
   </data>
 </root>

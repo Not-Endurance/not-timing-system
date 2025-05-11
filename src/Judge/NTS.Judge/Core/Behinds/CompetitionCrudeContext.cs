@@ -14,13 +14,13 @@ public class CompetitionCrudeContext : CrudeContext<Competition>, ICrudeParent<P
     IReadOnlyList<Phase> ICrudeParent<Phase>.Children => _competition?.Phases ?? [];
     IReadOnlyList<Participation> ICrudeParent<Participation>.Children => _competition?.Participations ?? [];
 
-    public override void Set(IParent parent)
+    public override Task Set(IParent parent)
     {
-        if (parent is not Competition competition)
+        if (parent is Competition competition)
         {
-            return;
+            _competition = competition;
         }
-        _competition = competition;
+        return Task.CompletedTask;
     }
 
     public async Task Create(Phase item)

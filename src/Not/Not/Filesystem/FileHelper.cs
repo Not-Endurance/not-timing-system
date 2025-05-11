@@ -38,6 +38,12 @@ public class FileHelper
         }
     }
 
+    public static Task Delete(string path)
+    {
+        File.Delete(path);
+        return Task.CompletedTask;
+    }
+
     static void CreateDirectoryIfDoesNotExist(string path)
     {
         if (!File.Exists(path))

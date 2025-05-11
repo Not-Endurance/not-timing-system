@@ -3,14 +3,14 @@ using Not.Blazor.CRUD.Forms.Components;
 
 namespace Not.Blazor.Dialogs;
 
-public class Dialog<T, TForm>
+public class CrudeDialog<T, TForm>
     where T : new()
     where TForm : NForm<T>
 {
     readonly IDialogService _mudDialogService;
     readonly DialogOptions _options = new() { BackdropClick = false };
 
-    public Dialog(IDialogService mudDialogService)
+    public CrudeDialog(IDialogService mudDialogService)
     {
         _mudDialogService = mudDialogService;
     }

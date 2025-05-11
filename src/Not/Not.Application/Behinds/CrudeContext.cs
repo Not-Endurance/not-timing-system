@@ -19,7 +19,7 @@ public abstract class CrudeContext<T> : ICrudeParentContext
         _parent = parent;
     }
 
-    public abstract void Set(IParent parent);
+    public abstract Task Set(IParent parent);
     public Event Changed { get; } = new();
 
     public async Task Add<TParent, TChild>(TParent? parent, TChild child)

@@ -321,7 +321,7 @@
   <data name="Settings_string" xml:space="preserve">
     <value>Ayarlar</value>
   </data>
-  <data name="Start_Competitions_string" xml:space="preserve">
+  <data name="Start_string" xml:space="preserve">
     <value>Yarışları başlat</value>
   </data>
   <data name="Configure_Endurance_Event_string" xml:space="preserve">

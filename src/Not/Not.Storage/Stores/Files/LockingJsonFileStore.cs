@@ -51,4 +51,9 @@ public class LockingJsonFileStore<T> : IStore<T>
         await JsonFileStore.Write(_path, state);
         _timeoutLock.Release(state.TransactionId.Value);
     }
+
+    public async Task Delete()
+    {
+        await JsonFileStore.BackupAndDelete(_path);
+    }
 }
