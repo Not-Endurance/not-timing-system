@@ -1,11 +1,11 @@
 ﻿using Not.Application.Behinds;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Application.RPC.SignalR;
 using Not.Notify;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.EnduranceEvents;
 using NTS.Judge.Core.Behinds;
+using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Features.Setup.Home;
 
@@ -53,12 +53,12 @@ public class UpcomingEventBehind
         );
     }
 
-    protected override Task SafeDelete(UpcomingEvent entity)
+    public override Task Delete(UpcomingEvent entity)
     {
         NotifyHelper.Inform("Upcoming events cannot be deleted");
         return Task.CompletedTask;
     }
-
+    
     public async Task Reflect(Loop loop)
     {
         foreach (var competitions in ((ICrudeParent<Competition>)_crudeContext).Children)

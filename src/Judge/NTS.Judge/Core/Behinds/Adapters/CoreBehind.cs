@@ -6,6 +6,8 @@ using Not.Storage.Stores;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Blazor.Shared.Components.SidePanels;
 using NTS.Judge.Core.Start;
+using NTS.Judge.Features;
+using NTS.Judge.Features.Warp;
 using NTS.Judge.HTTP;
 using NTS.Storage.Core;
 
@@ -13,6 +15,7 @@ namespace NTS.Judge.Core.Behinds.Adapters;
 
 public class CoreBehind : ObservableBehind, ICoreBehind
 {
+    readonly EventRpcContext _eventsRpcContext;
     readonly IStore<CoreState> _coreStore;
     readonly ICoreStarter _coreStarter;
     readonly IRepository<Ranking> _rankings;
@@ -22,6 +25,7 @@ public class CoreBehind : ObservableBehind, ICoreBehind
     readonly IArchiveRepository _archive;
 
     public CoreBehind(
+        EventRpcContext eventsRpcContext,
         IStore<CoreState> coreStore,
         ICoreStarter coreStarter,
         IRepository<Ranking> rankings,
@@ -31,6 +35,7 @@ public class CoreBehind : ObservableBehind, ICoreBehind
         IArchiveRepository archive
     )
     {
+        _eventsRpcContext = eventsRpcContext;
         _coreStore = coreStore;
         _coreStarter = coreStarter;
         _rankings = rankings;
@@ -57,6 +62,7 @@ public class CoreBehind : ObservableBehind, ICoreBehind
     public async Task Reset()
     {
         await _coreStore.Delete();
+        await _eventsRpcContext.ResetEvent();
         IsStarted = false;
     }
 

@@ -4,7 +4,6 @@ using Not.Blazor.CRUD.Lists.Ports;
 using Not.Domain;
 using Not.Domain.Base;
 using Not.Exceptions;
-using Not.Safe;
 
 namespace Not.Application.Behinds.Adapters;
 
@@ -40,8 +39,7 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
             await _repository.Update((T)item);
         }
     }
-
-    // TODO: reevaluate the usefullnes around the complexities of this method - return for example
+    
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
         if (ObservableList.Any())
@@ -51,12 +49,6 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
         var entities = await _repository.ReadAll();
         ObservableList.AddRange(entities);
         return entities.Any();
-    }
-
-    protected virtual async Task SafeDelete(T entity)
-    {
-        await _repository.Delete(entity);
-        ObservableList.Remove(entity);
     }
 
     public virtual async Task Update(TModel model)
@@ -74,8 +66,9 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
         ObservableList.AddOrReplace(entity);
     }
 
-    public async Task Delete(T entity)
+    public virtual async Task Delete(T entity)
     {
-        await SafeHelper.Run(() => SafeDelete(entity));
+        await _repository.Delete(entity);
+        ObservableList.Remove(entity);
     }
 }

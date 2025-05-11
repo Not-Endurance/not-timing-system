@@ -3,6 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Domain;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features;
+using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Core.Behinds;
 
@@ -13,9 +14,9 @@ public class UpcomingEventCrudeContext
         ICrudeParent<Loop>,
         ICrudeParent<Combination>
 {
-    readonly EventContext _eventContext;
+    readonly EventRpcContext _eventContext;
 
-    public UpcomingEventCrudeContext(IRepository<UpcomingEvent> parent, EventContext eventContext)
+    public UpcomingEventCrudeContext(IRepository<UpcomingEvent> parent, EventRpcContext eventContext)
         : base(parent)
     {
         _eventContext = eventContext;
@@ -26,13 +27,13 @@ public class UpcomingEventCrudeContext
     IReadOnlyList<Loop> ICrudeParent<Loop>.Children => _eventContext.Event?.Loops ?? [];
     IReadOnlyList<Combination> ICrudeParent<Combination>.Children => _eventContext.Event?.Combinations ?? [];
 
-    public override void Set(IParent parent)
+    public override async Task Set(IParent parent)
     {
         if (parent is not UpcomingEvent upcomingEvent)
         {
             return;
         }
-        _eventContext.Event = upcomingEvent;
+        await _eventContext.SetEvent(upcomingEvent);
     }
 
     public async Task Create(Competition item)

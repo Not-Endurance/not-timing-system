@@ -3,14 +3,11 @@
 @inherits NComponent
 
 <MudStack Class="ma-6">
-    @if (CoreBehind.IsStarted)
+    @if (!CoreBehind.IsStarted)
     {
-        <NButtonDanger OnClick="OpenResetCompetitionDialog" Text="@Reset_string" />
+        <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
     }
-    else
-    {
-        <NButtonPrimary OnClick="Start" Text="@Start_string" />
-    }
+    <NButtonDanger OnClick="OpenResetCompetitionDialog" Text="@Reset_string" />
     @* else if (StaticOption.IsRfidDetectionEnabled()) *@
     @* { *@
     @*     <RfidPanel EnduranceEventStarted="CoreBehind.IsStarted" /> *@
