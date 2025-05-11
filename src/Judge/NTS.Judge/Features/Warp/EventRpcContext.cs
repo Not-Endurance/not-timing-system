@@ -16,14 +16,19 @@ public class EventRpcContext : IEventContext, IStartupInitializerAsync
     readonly WarpContext _warpContext;
     readonly IRepository<UpcomingEvent> _upcomingEvents;
 
-    public EventRpcContext(IStore<SetupState> setupStore, IRpcSocket socket, WarpContext warpContext, IRepository<UpcomingEvent> upcomingEvents)
+    public EventRpcContext(
+        IStore<SetupState> setupStore,
+        IRpcSocket socket,
+        WarpContext warpContext,
+        IRepository<UpcomingEvent> upcomingEvents
+    )
     {
         _setupStore = setupStore;
         _socket = socket;
         _warpContext = warpContext;
         _upcomingEvents = upcomingEvents;
     }
-    
+
     public UpcomingEvent? Event { get; private set; }
 
     public async Task ResetEvent()
@@ -31,7 +36,7 @@ public class EventRpcContext : IEventContext, IStartupInitializerAsync
         await InternalSetEvent(null);
         await _socket.Disconnect();
     }
-    
+
     public async Task SetEvent(UpcomingEvent upcomingEvent)
     {
         if (Event != null && Event != upcomingEvent)
@@ -41,7 +46,7 @@ public class EventRpcContext : IEventContext, IStartupInitializerAsync
         await InternalSetEvent(upcomingEvent);
         await _socket.Connect();
     }
-    
+
     public async Task RunAtStartupAsync()
     {
         var setup = await _setupStore.Readonly();

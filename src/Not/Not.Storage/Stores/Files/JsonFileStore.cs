@@ -71,7 +71,7 @@ public static class JsonFileStore
             }
             await FileHelper.Delete(backupPath);
             await FileHelper.WriteAsync(backupPath, json);
-            await FileHelper.Delete(path);            
+            await FileHelper.Delete(path);
         }
         finally
         {
