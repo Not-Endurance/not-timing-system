@@ -91,15 +91,15 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
             ServerConnectionInfo?.Invoke(this, message);
             return;
         }
-        if (Connection == null)
-        {
-            ConfigureConnection();
-        }
         try
         {
+            ConfigureConnection();
             _reconnectTokenSource = new CancellationTokenSource();
             RaiseConnecting();
-            await Connection!.StartAsync();
+            if (!IsConnected)
+            {
+                await Connection!.StartAsync();
+            }
             RaiseConnected();
         }
         catch (Exception ex)
