@@ -15,7 +15,7 @@ public class EmsCompetition : EmsDomainBase<EmsCompetitionException>
     {
         Type = type;
         Name = name;
-        StartTime = DateTime.Now;
+        StartTime = DateTimeOffset.Now;
     }
 
     public EmsCompetition(IEmsCompetitionState state)
@@ -44,7 +44,7 @@ public class EmsCompetition : EmsDomainBase<EmsCompetitionException>
     public string FeiScheduleNumber { get; internal set; } = string.Empty;
     public string EventCode { get; internal set; }
     public string Rule { get; internal set; } = string.Empty;
-    public DateTime StartTime { get; set; }
+    public DateTimeOffset StartTime { get; set; }
     public IReadOnlyList<EmsLap> Laps
     {
         get => _laps.OrderBy(x => x.OrderBy).ToList().AsReadOnly();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using NTS.Application.RPC;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
@@ -15,6 +16,7 @@ namespace NTS.Warp.Features.Judge;
 
 internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 {
+    readonly ILogger<JudgeRpcHub> _logger;
     readonly IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> _witnessRelay;
     readonly PrimaryConnectionsContext _primaryConnections;
 
@@ -25,6 +27,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
     )
         : base(logger)
     {
+        _logger = logger;
         _witnessRelay = witnessRelay;
         _primaryConnections = primaryConnections;
     }
@@ -62,8 +65,23 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
     {
+        _logger.LogInformation(
+            "Phase completed IN: #{number}, OUT: {outTime}",
+            request.Payload.Participation.Combination.Number,
+            request.Payload.Participation.Phases.Last(x => x.StartTime != null).StartTime
+        );
+
         var emsParticipation = Convert(request.Payload.Participation);
         var entry = new EmsStartlistEntry(emsParticipation);
+
+        var serialized = JsonConvert.SerializeObject(entry);
+        _logger.LogInformation(
+            "Phase completed OUT: #{number}, OUT: {outTime}, serialized: {serialized}",
+            entry.Number,
+            entry.StartTime,
+            serialized
+        );
+
         await _witnessRelay
             .Clients.Group(request.EnduranceEventId)
             .ReceiveEntry(entry, EmsCollectionAction.AddOrUpdate);
