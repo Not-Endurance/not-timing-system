@@ -12,12 +12,13 @@ public class EmsParticipantEntry : IComparable<EmsParticipantEntry>, IEquatable<
         Name = participation.Participant.Athlete.Name;
         LapNumber = participation.Participant.LapRecords.Count;
         LapDistance = participation.Distance ?? 0;
+        ArriveTime = participation.Participant.LapRecords.LastOrDefault(x => x.ArrivalTime != null)?.ArrivalTime;
     }
 
     public int LapNumber { get; init; }
     public string Number { get; init; }
     public string Name { get; init; }
-    public DateTime? ArriveTime { get; set; }
+    public DateTimeOffset? ArriveTime { get; set; }
     public double LapDistance { get; set; }
 
     public int CompareTo(EmsParticipantEntry other)
