@@ -8,4 +8,3 @@ internal abstract class Ranker
 
     public string? CountryIsoCode { get; protected init; }
 }
-
