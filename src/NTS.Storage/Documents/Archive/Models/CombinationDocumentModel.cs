@@ -39,6 +39,7 @@ public class CombinationDocumentModel
             Number,
             athlete,
             horse,
+            athlete.Club,
             Distance,
             minSpeed,
             maxSpeed
