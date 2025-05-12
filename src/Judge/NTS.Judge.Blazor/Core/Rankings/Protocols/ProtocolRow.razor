@@ -1,23 +1,23 @@
 ﻿@inherits NComponent
 
-<MudStack Row="true" Justify="Justify.FlexStart">
+<MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
 
-    <MudStack >
-        <MudText Typo="Typo.button" Align="Align.Center">@_rankText</MudText>
+    <MudText Typo="Typo.button" Align="Align.Center" Style="width:50px">@_rankText</MudText>
+    
+    <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2" Style="width:80px">
+        @{
+            const Align align = Align.Center;
+        }
+        <MudText Typo="Typo.caption" Align="align">@_combination.Athlete.Names</MudText>
 
-        <MudStack Justify="Justify.FlexStart" Spacing="1" Style="height:100%; width:80px">
-            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Athlete.Names</MudText>
+        <MudText Typo="Typo.caption" Align="align">@_combination.Horse</MudText>
 
-            <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Horse</MudText>
-            @if (_combination.Club != null)
-            {
-                <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Club</MudText>
-            }
-            else
-            {
-                <MudText Typo="Typo.caption" Align="Align.Right">@_combination.Athlete.Country</MudText>
-            }
-        </MudStack>
+        @if (_combination.Club != null)
+        {
+            <MudText Typo="Typo.caption" Align="align">@_combination.Club</MudText>
+        }
+
+        <MudText Typo="Typo.caption" Align="align">@_combination.Athlete.Country</MudText>
     </MudStack>
 
     <ParticipationTable Number="_combination.Number" Phases="_phases" AlignVertically="true" />
@@ -26,10 +26,6 @@
     {
         var total = Entry.Participation.GetTotal()!;
         <MudStack Class="d-flex" Style="width:140px;" Spacing="1">
-            <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">
-                @Total_string
-            </MudText>
-
             <MudStack Justify="Justify.FlexStart" Style="height:100%;">
                 <MudText Typo="Typo.caption" Align="Align.Center">
                     @Finished_at_colon_string
