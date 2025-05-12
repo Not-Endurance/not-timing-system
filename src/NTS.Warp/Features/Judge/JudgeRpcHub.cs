@@ -57,10 +57,15 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
     public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
     {
         var emsParticipation = Convert(request.Payload.Participation);
-        var entry = new EmsParticipantEntry(emsParticipation);
+        var participationEntry = new EmsParticipantEntry(emsParticipation);
         await _witnessRelay
             .Clients.Group(request.EnduranceEventId)
-            .ReceiveEntryUpdate(entry, EmsCollectionAction.AddOrUpdate);
+            .ReceiveEntryUpdate(participationEntry, EmsCollectionAction.AddOrUpdate);
+        
+        var startlistEntry = CreateStartlistEntry(request.Payload.Participation);
+        await _witnessRelay
+            .Clients.Group(request.EnduranceEventId)
+            .ReceiveEntry(startlistEntry, EmsCollectionAction.AddOrUpdate);
     }
 
     public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
@@ -71,8 +76,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
             request.Payload.Participation.Phases.Last(x => x.StartTime != null).StartTime
         );
 
-        var emsParticipation = Convert(request.Payload.Participation);
-        var entry = new EmsStartlistEntry(emsParticipation);
+        var entry = CreateStartlistEntry(request.Payload.Participation);
 
         var serialized = JsonConvert.SerializeObject(entry);
         _logger.LogInformation(
@@ -85,6 +89,12 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
         await _witnessRelay
             .Clients.Group(request.EnduranceEventId)
             .ReceiveEntry(entry, EmsCollectionAction.AddOrUpdate);
+    }
+
+    EmsStartlistEntry CreateStartlistEntry(Participation participation)
+    {
+        var emsParticipation = Convert(participation);
+        return new EmsStartlistEntry(emsParticipation);
     }
 
     EmsParticipation Convert(Participation participation)
