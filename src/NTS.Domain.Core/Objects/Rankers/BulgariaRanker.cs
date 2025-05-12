@@ -17,9 +17,6 @@ internal class BulgariaRanker : FeiRanker
                 .ThenBy(x => x.Participation.GetTotal()?.RecoveryIntervalWithoutFinal)
                 .ToList();
         }
-        else
-        {
-            return base.Rank(ranking);
-        }
+        return base.Rank(ranking);
     }
 }

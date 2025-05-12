@@ -19,10 +19,3 @@ internal class FeiRanker : Ranker
             .ToList();
     }
 }
-
-internal abstract class Ranker
-{
-    public abstract List<RankingEntry> Rank(Ranking ranking);
-
-    public string? CountryIsoCode { get; protected set; }
-}
