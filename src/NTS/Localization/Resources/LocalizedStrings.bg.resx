@@ -322,7 +322,7 @@
     <value>Настройки</value>
   </data>
   <data name="Start_string" xml:space="preserve">
-    <value>Стартирай</value>
+    <value>старт</value>
   </data>
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Конфигурирай Събитие</value>
@@ -416,9 +416,6 @@
   </data>
   <data name="Official__already_exists" xml:space="preserve">
     <value>Официално лице '{0}' вече съществува</value>
-  </data>
-  <data name="start_string" xml:space="preserve">
-    <value>старт</value>
   </data>
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Моля изберете време в бъдещето</value>
@@ -608,5 +605,8 @@
   </data>
   <data name="Soft_reset_dialog_option_2_string" xml:space="preserve">
     <value>Хард ресет - ресетни връзката към събитие и изтрий всички данни на Фази</value>
+  </data>
+  <data name="Download_string" xml:space="preserve">
+    <value>Свали мобилното приложение</value>
   </data>
 </root>
