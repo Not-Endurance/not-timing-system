@@ -22,7 +22,6 @@ namespace NTS.Localization
             LocalizeString(nameof(Distance_cannot_be_zero_or_less_string));
         public static string Setup_string => LocalizeString(nameof(Setup_string));
         public static string Dashboard_string => LocalizeString(nameof(Dashboard_string));
-        public static string Endurance_Event_string => LocalizeString(nameof(Endurance_Event_string));
         public static string Athletes_and_Horses_string => LocalizeString(nameof(Athletes_and_Horses_string));
         public static string Combinations_string => LocalizeString(nameof(Combinations_string));
         public static string Clubs_string => LocalizeString(nameof(Clubs_string));
@@ -43,7 +42,6 @@ namespace NTS.Localization
         public static string Total_string => LocalizeString(nameof(Total_string));
         public static string Finished_at_colon_string => LocalizeString(nameof(Finished_at_colon_string));
         public static string Ride_time_in_hours_colon_string => LocalizeString(nameof(Ride_time_in_hours_colon_string));
-        public static string Recovery_in_hours_colon_string => LocalizeString(nameof(Recovery_in_hours_colon_string));
         public static string Incomplete_string => LocalizeString(nameof(Incomplete_string));
         public static string Protocol_string => LocalizeString(nameof(Protocol_string));
         public static string Rank_string => LocalizeString(nameof(Rank_string));
@@ -118,12 +116,7 @@ namespace NTS.Localization
             LocalizeString(
                 nameof(Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category)
             );
-        public static string Competition_start_cannot_be_in_the_past =>
-            LocalizeString(nameof(Competition_start_cannot_be_in_the_past));
         public static string Official__already_exists => LocalizeString(nameof(Official__already_exists));
-        public static string start_string => LocalizeString(nameof(start_string));
-        public static string Please_select_future_time_string =>
-            LocalizeString(nameof(Please_select_future_time_string));
         public static string Athletes_string => LocalizeString(nameof(Athletes_string));
         public static string Horses_string => LocalizeString(nameof(Horses_string));
         public static string Competitions_string => LocalizeString(nameof(Competitions_string));
@@ -166,12 +159,8 @@ namespace NTS.Localization
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
         public static string Null_or_malformed_string => LocalizeString(nameof(Null_or_malformed_string));
         public static string Main_menu_string => LocalizeString(nameof(Main_menu_string));
-        public static string Rider_string => LocalizeString(nameof(Rider_string));
-        public static string Club_string => LocalizeString(nameof(Clubs_string));
-
         public static string Average_speed => LocalizeString(nameof(Average_speed));
         public static string Eliminated_string => LocalizeString(nameof(Eliminated_string));
-        public static string Eliminated_with_colon_string => LocalizeString(nameof(Eliminated_with_colon_string));
         public static string Competition_ongoing_string => LocalizeString(nameof(Competition_ongoing_string));
         public static string Cannot_select_another_event_without_resetting__string =>
             LocalizeString(nameof(Cannot_select_another_event_without_resetting__string));
