@@ -31,7 +31,6 @@ public class EmsStartlistEntry : IComparable<EmsStartlistEntry>, IEquatable<EmsS
         IsRestOver = false;
         Stage = participation.Participant.LapRecords.Count;
         StartTime = GetLastNextStartTime(participation) ?? throw new Exception("Missing NextStartTime on record");
-        ;
     }
 
     public string Number { get; init; }
@@ -113,7 +112,7 @@ public class EmsStartlistEntry : IComparable<EmsStartlistEntry>, IEquatable<EmsS
 
     DateTimeOffset? GetLastNextStartTime(EmsParticipation participation)
     {
-        var currentRecord = participation.Participant.LapRecords.Last(x => x.NextStarTime != null);
-        return currentRecord.NextStarTime;
+        var currentRecord = participation.Participant.LapRecords.LastOrDefault(x => x.NextStarTime != null);
+        return currentRecord?.NextStarTime;
     }
 }

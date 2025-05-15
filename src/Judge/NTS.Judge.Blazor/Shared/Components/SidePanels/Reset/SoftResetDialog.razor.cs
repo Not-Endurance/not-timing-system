@@ -24,6 +24,7 @@ public partial class SoftResetDialog : NDialog
         if (await hardResetDialog.IsCanceled())
         {
             Cancel();
+            return;
         }
         await CoreBehind.HardReset();
         Confirm();
