@@ -12,6 +12,7 @@ dotnet publish \
 if [ $? -eq 1 ]; then
     echo 'publish failed'
 else
+    rm -rf "bin/$build/$target/$architecture/publish"
     cd "bin/$build/$target/"
     explorer .
     cd -

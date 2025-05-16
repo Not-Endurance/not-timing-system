@@ -17,6 +17,7 @@ public class Combination : AggregateRoot
         int number,
         Athlete athlete,
         Horse horse,
+        IClub? club,
         string distance,
         Speed? minAverageSpeed,
         Speed? maxAverageSpeed
@@ -26,6 +27,7 @@ public class Combination : AggregateRoot
         Number = number;
         Athlete = athlete;
         Horse = horse;
+        Club = club;
         Distance = distance;
         MinAverageSpeed = minAverageSpeed;
         MaxAverageSpeed = maxAverageSpeed;
@@ -44,6 +46,7 @@ public class Combination : AggregateRoot
             number,
             new Athlete(athlete),
             new Horse(horse),
+            athlete.Club,
             FormatDistance(distance),
             Speed.Create(minAverageSpeedlimit),
             Speed.Create(maxAverageSpeedLimit)
@@ -55,7 +58,7 @@ public class Combination : AggregateRoot
     public int Number { get; }
     public Athlete Athlete { get; }
     public Horse Horse { get; }
-    public Club? Club { get; }
+    public IClub? Club { get; }
     public Speed? MinAverageSpeed { get; }
     public Speed? MaxAverageSpeed { get; }
     public string Distance

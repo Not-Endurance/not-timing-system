@@ -37,7 +37,7 @@ public class DateTimeOffsetUtcSerializer : JsonConverter<DateTimeOffset>
 
     public override void WriteJson(JsonWriter writer, DateTimeOffset value, JsonSerializer serializer)
     {
-        // Always write UTC time
-        writer.WriteValue(value.UtcDateTime);
+        // Write plain value
+        writer.WriteValue(value);
     }
 }

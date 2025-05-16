@@ -28,10 +28,9 @@ public class EmsStartlistEntry : IComparable<EmsStartlistEntry>, IEquatable<EmsS
         AthleteName = participation.Participant.Athlete.Name;
         CountryName = participation.Participant.Athlete.Country.Name;
         Distance = participation.Distance!.Value;
-        IsRestOver = StartTime < DateTime.Now;
+        IsRestOver = false;
         Stage = participation.Participant.LapRecords.Count;
         StartTime = GetLastNextStartTime(participation) ?? throw new Exception("Missing NextStartTime on record");
-        ;
     }
 
     public string Number { get; init; }
@@ -111,9 +110,9 @@ public class EmsStartlistEntry : IComparable<EmsStartlistEntry>, IEquatable<EmsS
         return Number == other?.Number;
     }
 
-    DateTime? GetLastNextStartTime(EmsParticipation participation)
+    DateTimeOffset? GetLastNextStartTime(EmsParticipation participation)
     {
-        var currentRecord = participation.Participant.LapRecords.Last(x => x.NextStarTime != null);
-        return currentRecord.NextStarTime;
+        var currentRecord = participation.Participant.LapRecords.LastOrDefault(x => x.NextStarTime != null);
+        return currentRecord?.NextStarTime;
     }
 }

@@ -1,6 +1,7 @@
 using Not.Application.Behinds;
 using Not.Storage.Repositories;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Features.Setup.Officials;
 

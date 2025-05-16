@@ -1,10 +1,8 @@
-﻿using Not.Application.RPC.SignalR;
-using Not.Blazor.Ports;
-using Not.Injection;
+﻿using Not.Injection;
 
 namespace Not.Application.RPC;
 
-public interface IConnectionsRegistry
+public interface IConnectionsRegistry : ISingleton
 {
     void Add(string connectionId);
     void Remove(string connectionId);

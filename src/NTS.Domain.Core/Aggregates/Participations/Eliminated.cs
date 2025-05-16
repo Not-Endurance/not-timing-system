@@ -35,7 +35,7 @@ public record Disqualified : Eliminated
     public Disqualified(DisqualifyCode[] dqCodes, string? complement)
         : base(DISQUALIFIED)
     {
-        PreventInvalidDq(dqCodes, complement);
+        PreventInvalidDisqualify(dqCodes, complement);
         DqCodes = dqCodes;
         Complement = complement; // Doesn't use base ctor with complement, because it is not required here
     }
@@ -55,7 +55,7 @@ public record Disqualified : Eliminated
         }
     }
 
-    static void PreventInvalidDq(DisqualifyCode[] codes, string? complement)
+    static void PreventInvalidDisqualify(DisqualifyCode[] codes, string? complement)
     {
         if (codes.Length == 0)
         {

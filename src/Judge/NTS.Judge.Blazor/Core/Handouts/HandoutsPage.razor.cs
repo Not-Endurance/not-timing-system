@@ -1,4 +1,5 @@
 using MudBlazor;
+using Not.Blazor.Dialogs;
 
 namespace NTS.Judge.Blazor.Core.Handouts;
 
@@ -18,13 +19,12 @@ public partial class HandoutsPage
     async Task OpenPrintPreview()
     {
         var handouts = Behind.Documents.ToList();
-
         await OpenPrintDialog();
         var dialog = await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>();
-        var result = await dialog.Result;
-        if (!result?.Canceled ?? false)
+        if (await dialog.IsCanceled())
         {
-            await Behind.Delete(handouts);
+            return;
         }
+        await Behind.Delete(handouts);
     }
 }
