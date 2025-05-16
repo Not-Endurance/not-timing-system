@@ -11,21 +11,14 @@ public partial class StartlistUpcoming
     [Inject]
     public IStartlistUpcoming Behind { get; set; } = default!;
 
-    //TEST PARAMETER REMOVE AFTER WITNESS STARTS USING BEHINDS
-    [Parameter]
-    public List<StartlistEntry> Entries { get; set; } = [];
-
-
     protected override async Task OnInitializedAsync()
     {
         await Observe(Behind, []);
         CreateStartlistsByStage(Behind.Upcoming);
-        CreateStartlistsByStage(Entries);
     }
 
     protected override void OnBeforeRender()
     {
         CreateStartlistsByStage(Behind.Upcoming);
-        CreateStartlistsByStage(Entries);
     }
 }
