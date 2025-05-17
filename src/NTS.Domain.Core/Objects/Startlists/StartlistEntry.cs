@@ -37,7 +37,7 @@ public record StartlistEntry : DomainObject
     public override string ToString()
     {
         var distance = Distance + km_string;
-        var result = Combine(Number, Athlete, distance, Time.TimeOfDay);
+        var result = Combine(Number, Athlete, distance, Time.TimeOfDay.ToString(@"hh\:mm\:ss"));
         return result;
     }
 }
