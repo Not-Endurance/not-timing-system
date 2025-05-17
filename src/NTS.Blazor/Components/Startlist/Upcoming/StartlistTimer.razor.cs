@@ -13,12 +13,16 @@ public partial class StartlistTimer
     TimeSpan _timeInterval = default!;
     string _displayTime = default!;
     Color _color = default!;
+    string _class = "";
 
     [Parameter]
     public DateTimeOffset StartTime { get; set; } = default!;
 
     [Parameter]
     public double StopTimerAtTime { get; set; } = default!;
+
+    [Parameter]
+    public bool Mobile { get; set; } = false;
 
     protected override void OnInitialized()
     {
@@ -33,6 +37,10 @@ public partial class StartlistTimer
         _timeInterval = StartTime.TimeOfDay - now;
         FormatTime();
         _timer.Enabled = _timeInterval > TimeSpan.FromMinutes(StopTimerAtTime);
+        if (Mobile)
+        {
+            _class = "mobile";
+        }
     }
 
     public void Dispose()

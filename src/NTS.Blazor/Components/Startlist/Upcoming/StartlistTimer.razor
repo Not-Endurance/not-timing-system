@@ -6,6 +6,12 @@
 @inherits NComponent
 @implements IDisposable
 
-<MudText Color="_color">
+<MudText Class="@_class" Color="_color">
     @_displayTime
 </MudText>
+
+<style>
+    .mobile{
+        font-size: 12px;
+    }
+</style>

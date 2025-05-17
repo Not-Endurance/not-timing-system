@@ -2,6 +2,8 @@ namespace Not.Blazor.Components;
 
 public partial class NSimpleTable<T>
 {
+    string _class = "";
+
     [Parameter, EditorRequired]
     public IEnumerable<T> Items { get; set; } = [];
 
@@ -12,5 +14,16 @@ public partial class NSimpleTable<T>
     public string EmptyMessage { get; set; } = "This table is still empty";
 
     [Parameter]
+    public bool Mobile { get; set; } = false;
+
+    [Parameter]
     public RenderFragment<T> CustomCell { get; set; } = default!;
+
+    protected override void OnParametersSet()
+    {
+        if (Mobile)
+        {
+            _class = "mobile";
+        }
+    }
 }

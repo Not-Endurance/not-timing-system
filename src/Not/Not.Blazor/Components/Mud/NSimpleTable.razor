@@ -8,7 +8,7 @@
         <tr>
             @foreach (var heading in Headings)
             {
-                <th>@heading</th>
+                <th class="@_class">@heading</th>
             }
         </tr>
     </thead>
@@ -24,7 +24,7 @@
             <tr>
                 @foreach (var cellValue in itemToString.Split("|"))
                 {
-                    <td>@cellValue</td>
+                    <td class="@_class">@cellValue</td>
                 }
                 @if (CustomCell != default)
                 {
@@ -36,3 +36,10 @@
         }
     </tbody>
 </MudSimpleTable>
+<style>
+    .mobile{
+        display: flex;
+        justify-content: center;
+        font-size: 12px !important;
+    }
+</style>

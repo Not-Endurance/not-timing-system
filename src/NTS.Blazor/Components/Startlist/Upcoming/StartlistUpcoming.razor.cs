@@ -8,6 +8,9 @@ public partial class StartlistUpcoming
 {
     protected override string[] TableHeaders => [.. base.TableHeaders, "Start In"];
 
+    [Parameter]
+    public bool Mobile { get; set; } = false;
+
     [Inject]
     public IStartlistUpcoming Behind { get; set; } = default!;
 
