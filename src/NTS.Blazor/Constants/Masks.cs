@@ -1,4 +1,4 @@
-﻿namespace NTS.Judge.Blazor.Shared.Constants;
+﻿namespace NTS.Blazor.Constants;
 
 public static class Masks
 {

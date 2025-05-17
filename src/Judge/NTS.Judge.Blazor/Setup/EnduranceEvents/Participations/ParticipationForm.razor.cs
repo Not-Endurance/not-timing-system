@@ -3,7 +3,7 @@ using Not.Blazor.Components;
 using Not.Blazor.CRUD.Lists.Ports;
 using Not.Strings;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Shared.Constants;
+using NTS.Blazor.Constants;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 

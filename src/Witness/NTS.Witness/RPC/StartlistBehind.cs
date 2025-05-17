@@ -1,10 +1,7 @@
 ﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
-using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Startlists;
 using NTS.Blazor.Components.Startlist.History;
 using NTS.Blazor.Components.Startlist.Upcoming;
-using NTS.Domain.Setup.Aggregates;
 using Participation = NTS.Domain.Core.Aggregates.Participation;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
 using Combination = NTS.Domain.Core.Aggregates.Participations.Combination;
@@ -31,7 +28,7 @@ public StartlistBehind()
         var person = new Person(["Todomir", "Stroinov"]);
         var athlete = new Athlete(99, person, Domain.Enums.AthleteCategory.Senior,country, null,"guz");
         var horse = new Horse(100, "Rozomir", null);
-        var combination = new Combination(199, 1, athlete, horse, "40", null,  null);
+        var combination = new Combination(199, 1, athlete, horse, null, "40", null,  null);
         var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(20, 15, 40, NTS.Domain.Enums.CompetitionRuleset.Regional, false, null, DateTimeOffset.Now.AddMinutes(23));
         var phase2 = new NTS.Domain.Core.Aggregates.Participations.Phase(20, 20, 40, NTS.Domain.Enums.CompetitionRuleset.Regional, true, null, null);
         var phases = new List<NTS.Domain.Core.Aggregates.Participations.Phase>() { phase1, phase2 };

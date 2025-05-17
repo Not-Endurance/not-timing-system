@@ -2,7 +2,7 @@
 using Not.Injection;
 using NTS.Localization.Resources;
 
-namespace NTS.Judge.Blazor.Shared.Services;
+namespace NTS.Blazor.Services;
 
 public class ResxLocalizer : IStringLocalizer, ISingleton
 {
