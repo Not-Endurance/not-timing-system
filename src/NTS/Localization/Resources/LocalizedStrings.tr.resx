@@ -321,7 +321,7 @@
   <data name="Settings_string" xml:space="preserve">
     <value>Ayarlar</value>
   </data>
-  <data name="Start_Competitions_string" xml:space="preserve">
+  <data name="Start_string" xml:space="preserve">
     <value>Yarışları başlat</value>
   </data>
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
@@ -370,7 +370,7 @@
     <value>Yazdırma Önizleme</value>
   </data>
   <data name="Manual_handout_strings" xml:space="preserve">
-    <value>Manuel çıktı</value>
+    <value>Manuel çıktı:</value>
   </data>
   <data name="Yes_string" xml:space="preserve">
     <value>Evet</value>
@@ -474,7 +474,7 @@
   <data name="Start_Time_string" xml:space="preserve">
     <value>Başlangıç Zamanı</value>
   </data>
-  <data name="Max_Speed_Penalty_string" xml:space="preserve">
+  <data name="Max_Speed_string" xml:space="preserve">
     <value>Maksimum Hız Cezası</value>
   </data>
   <data name="Presentation_string" xml:space="preserve">
@@ -525,17 +525,17 @@
   <data name="FEI_Show_ID" xml:space="preserve">
     <value>FEI Show ID</value>
   </data>
-  <data name="FEI_Category_Event_NR" xml:space="preserve">
-    <value>FEI Category Event NR</value>
-  </data>
   <data name="FEI_Event_Code" xml:space="preserve">
     <value>FEI Event Code</value>
   </data>
-  <data name="FEI_Rule" xml:space="preserve">
-    <value>FEI Rule</value>
+  <data name="FEI_Category_Event_NR" xml:space="preserve">
+    <value>FEI Category Event NR</value>
   </data>
   <data name="FEI_Schedule_NR" xml:space="preserve">
     <value>FEI Schedule NR</value>
+  </data>
+  <data name="FEI_Rule" xml:space="preserve">
+    <value>FEI Rule</value>
   </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Sunum zamanı olmadan Temsil talep edilemez</value>
@@ -548,5 +548,41 @@
   </data>
   <data name="Select_event_string" xml:space="preserve">
     <value>Etkinlik seç</value>
+  </data>
+  <data name="Disqualify_Reason_string" xml:space="preserve">
+    <value>Diskalifiye olma nedeni</value>
+  </data>
+  <data name="Handouts_list_empty_message_string" xml:space="preserve">
+    <value>Yazdırmadan önce çıktıları manuel olarak oluşturun...</value>
+  </data>
+  <data name="Null_or_malformed_string" xml:space="preserve">
+    <value>'{0}' alanının değeri eksik veya yanlış biçimde. Lütfen doğru bir değer girip tekrar deneyin</value>
+  </data>
+  <data name="Main_menu_string" xml:space="preserve">
+    <value>Ana Menü</value>
+  </data>
+  <data name="Min_Speed_string" xml:space="preserve">
+    <value>Minimum Hız Cezası</value>
+  </data>
+  <data name="Average_speed" xml:space="preserve">
+    <value>Ortalama hız:</value>
+  </data>
+  <data name="Eliminated_with_colon_string" xml:space="preserve">
+    <value>Elendi:</value>
+  </data>
+  <data name="Eliminated_string" xml:space="preserve">
+    <value>Elendi</value>
+  </data>
+  <data name="Competition_ongoing_string" xml:space="preserve">
+    <value>Yarışma devam ediyor</value>
+  </data>
+  <data name="Club_string" xml:space="preserve">
+    <value>Kulüp</value>
+  </data>
+  <data name="Rider_string" xml:space="preserve">
+    <value>Binici</value>
+  </data>
+  <data name="Component_missing_required_value_string" xml:space="preserve">
+    <value>{0} oluşturulamadı. Lütfen geliştiriciyle iletişime geçin.</value>
   </data>
 </root>

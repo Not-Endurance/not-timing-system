@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "NTS.Nexus.HTTP": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 8080"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "DockerfileRunArguments": "--init",
+      "httpPort": 8080,
+      "useSSL": false
+    }
+  }
+}

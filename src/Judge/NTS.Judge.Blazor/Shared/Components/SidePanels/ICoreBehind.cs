@@ -3,9 +3,11 @@ using Not.Injection;
 
 namespace NTS.Judge.Blazor.Shared.Components.SidePanels;
 
-public interface ICoreBehind : IObservableBehind, ISingleton
+public interface ICoreBehind : IObservableBehind
 {
     bool IsStarted { get; }
     Task Start();
+    Task SoftReset();
+    Task HardReset();
     Task LoadArchive(int archiveId);
 }

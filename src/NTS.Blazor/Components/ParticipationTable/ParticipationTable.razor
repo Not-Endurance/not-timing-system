@@ -15,16 +15,16 @@
             <th>Arrive</th>
             <th>Present</th>
 
-            @if (_anyRepresentation)
+            @if (_anyRepresentation && !AlignVertically)
             {
 
                 <th>Represent</th>
             }
-            @if (_anyRequiredInspection)
+            @if (_anyRequiredInspection && !AlignVertically)
             {
                 <th>RI Time</th>
             }
-            @if (_anyCompulsoryRequiredInspection)
+            @if (_anyCompulsoryRequiredInspection && !AlignVertically)
             {
                 <th>CRI Time</th>
             }
@@ -48,15 +48,15 @@
                 <NTd Value="@phase.ArriveTime" />
                 <NTd Value="@phase.PresentTime" />
 
-                @if (_anyRepresentation)
+                @if (_anyRepresentation && !AlignVertically)
                 {
                     <NTd Value="@phase.RepresentTime" />
                 }
-                @if (_anyRequiredInspection)
+                @if (_anyRequiredInspection && !AlignVertically)
                 {
                     <NTd Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
                 }
-                @if (_anyCompulsoryRequiredInspection)
+                @if (_anyCompulsoryRequiredInspection && !AlignVertically)
                 {
                     <NTd Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
                 }
@@ -78,6 +78,16 @@
         // http://dbushell.com/2016/03/04/css-only-responsive-tables/
         // by David Bushell
         */
+    .size-xs{
+        font-size:10px;
+    }
+
+    .size-xs td, size-xs th{
+        font-size: 10px;
+        width: fit-content;
+        padding: 6px 6px !important;
+    }
+
     .rtable {
         /*!
           // IE needs inline-block to position scrolling shadows otherwise use:

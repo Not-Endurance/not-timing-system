@@ -321,8 +321,8 @@
   <data name="Settings_string" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="Start_Competitions_string" xml:space="preserve">
-    <value>Start competitions</value>
+  <data name="Start_string" xml:space="preserve">
+    <value>Start</value>
   </data>
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Configure Endurance Event</value>
@@ -370,7 +370,7 @@
     <value>Print Preview</value>
   </data>
   <data name="Manual_handout_strings" xml:space="preserve">
-    <value>Manaul handout</value>
+    <value>Create handout:</value>
   </data>
   <data name="Yes_string" xml:space="preserve">
     <value>Yes</value>
@@ -436,7 +436,7 @@
     <value>Competitions</value>
   </data>
   <data name="Officials_string" xml:space="preserve">
-    <value>Officials</value>
+    <value>Official members</value>
   </data>
   <data name="Phases_string" xml:space="preserve">
     <value>Phases</value>
@@ -474,8 +474,8 @@
   <data name="Start_Time_string" xml:space="preserve">
     <value>Start Time</value>
   </data>
-  <data name="Max_Speed_Penalty_string" xml:space="preserve">
-    <value>Max Speed Penalty</value>
+  <data name="Max_Speed_string" xml:space="preserve">
+    <value>Max Speed </value>
   </data>
   <data name="Presentation_string" xml:space="preserve">
     <value>Present</value>
@@ -548,5 +548,65 @@
   </data>
   <data name="Select_event_string" xml:space="preserve">
     <value>Select event</value>
+  </data>
+  <data name="Disqualify_Reason_string" xml:space="preserve">
+    <value>Disqualify Reason</value>
+  </data>
+  <data name="Handouts_list_empty_message_string" xml:space="preserve">
+    <value>Create Handouts manually to print...</value>
+  </data>
+  <data name="Null_or_malformed_string" xml:space="preserve">
+    <value>{0} value is missing or malformed. Please enter a correct value and try again</value>
+  </data>
+  <data name="Main_menu_string" xml:space="preserve">
+    <value>Main Menu</value>
+  </data>
+  <data name="Min_Speed_string" xml:space="preserve">
+    <value>Min Speed</value>
+  </data>
+  <data name="Average_speed" xml:space="preserve">
+    <value>Average speed:</value>
+  </data>
+  <data name="Eliminated_with_colon_string" xml:space="preserve">
+    <value>Eliminated:</value>
+  </data>
+  <data name="Eliminated_string" xml:space="preserve">
+    <value>Eliminated</value>
+  </data>
+  <data name="Competition_ongoing_string" xml:space="preserve">
+    <value>Competition is ongoing</value>
+  </data>
+  <data name="Club_string" xml:space="preserve">
+    <value>Club</value>
+  </data>
+  <data name="Rider_string" xml:space="preserve">
+    <value>Rider</value>
+  </data>
+  <data name="Component_missing_required_value_string" xml:space="preserve">
+    <value>{0} couldn't be created. Please contact developer.</value>
+  </data>
+  <data name="Reset_string" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
+    <value>Are you sure you want to reset? This action will delete ALL PHASE TIMES and cannot be undone! </value>
+  </data>
+  <data name="Cannot_select_another_event_without_resetting__string" xml:space="preserve">
+    <value>Cannot select another event without resetting '{0}'. If you connected to the wrong event by accident, please Reset the event(using the button on the left)</value>
+  </data>
+  <data name="Hard_reset_string" xml:space="preserve">
+    <value>Hard reset</value>
+  </data>
+  <data name="Soft_reset_string" xml:space="preserve">
+    <value>Soft reset</value>
+  </data>
+  <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
+    <value>Setup configuration will not be deleted</value>
+  </data>
+  <data name="Soft_reset_dialog_option_1_string" xml:space="preserve">
+    <value>Soft reset - reset the event connection. Make sure to select the correct event before Starting</value>
+  </data>
+  <data name="Soft_reset_dialog_option_2_string" xml:space="preserve">
+    <value>Hard reset - reset the connection and delete all phase data</value>
   </data>
 </root>

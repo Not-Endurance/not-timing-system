@@ -10,7 +10,7 @@ public enum OfficialRole
     [Description("Chief Steward")]
     ChiefSteward = 2,
 
-    [Description("Veterinary Commission Member")]
+    [Description("Veterinary Commission")]
     VeterinaryCommissionMember = 3,
 
     [Description("President Veterinary Commission")]

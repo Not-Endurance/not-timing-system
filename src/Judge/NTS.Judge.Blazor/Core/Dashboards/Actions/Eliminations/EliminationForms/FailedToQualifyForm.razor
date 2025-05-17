@@ -10,7 +10,7 @@
     <MudSelect @bind-SelectedValues="@Codes" MultiSelection="true" Delimiter="+" Class="mt-4"
         Label="@Failed_to_Qualify_Reason_string" Placeholder="@Select_a_reason_string">
     
-        @foreach (var ftqCode in SelectListModel.FromEnum<FtqCode>())
+        @foreach (var ftqCode in SelectListModel.FromEnum<FailToQualifyCode>())
         {
              <MudTooltip Text="@ftqCode.Description" Inline="false" RootStyle="width:inherit;">
                 <MudSelectItem Value="@ftqCode.Value">
@@ -21,7 +21,7 @@
         }
     </MudSelect>
 
-    <MudCollapse Expanded="Codes.Contains(FtqCode.FTC)">
+    <MudCollapse Expanded="Codes.Contains(FailToQualifyCode.FTC)">
         <EliminationFormReason @bind-Value="_reason" />
     </MudCollapse>
 

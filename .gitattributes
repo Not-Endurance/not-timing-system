@@ -6,5 +6,8 @@
 *.{bat,[bB][aA][tT]} text eol=crlf
 
 # Treat DLL files as binary to prevent line ending modifications
+*.jpeg binary
+*.jpg binary
+*.png binary
 *.dll binary
 *.pdb binary

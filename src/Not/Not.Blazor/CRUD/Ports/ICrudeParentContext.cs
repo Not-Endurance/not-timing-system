@@ -12,5 +12,5 @@ public interface ICrudeParentContext : ISingleton
     /// Set the parent reference
     /// </summary>
     /// <param name="parent"></param>
-    void Set(IParent parent);
+    Task Set(IParent parent);
 }

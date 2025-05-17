@@ -15,4 +15,5 @@ public interface IStore<T>
         [CallerMemberName] string callerMember = default!
     );
     public Task Commit(T state);
+    public Task Delete();
 }

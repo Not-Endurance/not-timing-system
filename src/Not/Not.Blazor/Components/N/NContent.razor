@@ -7,7 +7,7 @@
 }
 else if (_showOnlyMain)
 {
-    @Main
+    <MudPaper Elevation="0" Class="@CombineClass("pa-4 ")" Style="@Style">@Main</MudPaper>
 }
 else
 {
@@ -35,7 +35,7 @@ else
         else
         {
             <MudItem xs="@MainXs" Class="not-page-content">
-                <MudPaper Elevation="3" Class="pa-4">@Main</MudPaper>
+                <MudPaper Elevation="3" Class="@CombineClass("pa-4 ")" Style="@Style">@Main</MudPaper>
             </MudItem>
 
             if (Main2 != null)

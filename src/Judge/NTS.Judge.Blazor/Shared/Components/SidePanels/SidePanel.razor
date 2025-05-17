@@ -1,17 +1,16 @@
-﻿@using NTS.Domain.Core.StaticOptions
-@using NTS.Judge.Blazor.Shared.Components.ConnectionStatus
-@using NTS.Judge.Blazor.Shared.Components.SidePanels.RFID
+﻿@using NTS.Judge.Blazor.Shared.Components.ConnectionStatus
 
 @inherits NComponent
 
 <MudStack Class="ma-6">
     @if (!CoreBehind.IsStarted)
     {
-        <NButtonPrimary OnClick="Start" Text="@Start_Competitions_string" />
+        <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
     }
-    else if (StaticOption.IsRfidDetectionEnabled())
-    {
-        <RfidPanel EnduranceEventStarted="CoreBehind.IsStarted" />
-    }
-    <ConnectionStatus/>
+    <NButtonWarning OnClick="OpenSoftResetDialog" Text="@Reset_string" />
+    @* else if (StaticOption.IsRfidDetectionEnabled()) *@
+    @* { *@
+    @*     <RfidPanel EnduranceEventStarted="CoreBehind.IsStarted" /> *@
+    @* } *@
+    <ConnectionStatus />
 </MudStack>

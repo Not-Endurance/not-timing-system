@@ -10,8 +10,8 @@ namespace NTS.Domain.Core.Aggregates;
 public class Participation : AggregateRoot, IAggregateRoot
 {
     //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
-    static readonly FailedToQualify OUT_OF_TIME = new([FtqCode.OT]);
-    static readonly FailedToQualify SPEED_RESTRICTION = new([FtqCode.SP]);
+    static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);
+    static readonly FailedToQualify SPEED_RESTRICTION = new([FailToQualifyCode.SP]);
     public static readonly Event<PhaseCompleted> PHASE_COMPLETED_EVENT = new();
     public static readonly Event<ParticipationEliminated> ELIMINATED_EVENT = new();
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
@@ -129,9 +129,9 @@ public class Participation : AggregateRoot, IAggregateRoot
         Eliminate(new Retired());
     }
 
-    public void Disqualify(string reason)
+    public void Disqualify(DisqualifyCode[] codes, string? reason)
     {
-        Eliminate(new Disqualified(reason));
+        Eliminate(new Disqualified(codes, reason));
     }
 
     public void FinishNotRanked(string reason)
@@ -139,7 +139,7 @@ public class Participation : AggregateRoot, IAggregateRoot
         Eliminate(new FinishedNotRanked(reason));
     }
 
-    public void FailToQualify(FtqCode[] codes, string? reason)
+    public void FailToQualify(FailToQualifyCode[] codes, string? reason)
     {
         Eliminate(new FailedToQualify(codes, reason));
     }
