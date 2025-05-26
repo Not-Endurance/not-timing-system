@@ -1,6 +1,4 @@
 ﻿using Not.Application.Configurations;
-using Not.Logging.Builder;
-using Not.MAUI.Logging;
 using Serilog;
 
 namespace NTS.Witness;
