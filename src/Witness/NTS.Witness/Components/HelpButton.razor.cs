@@ -6,14 +6,9 @@ namespace NTS.Witness.Components;
 
 public partial class HelpButton
 {
-    [Inject]
-    ICrumbsNavigator Navigator { get; set; } = default!;
-    public bool IsEmergencyContactsConfigured { get; set; } = true;
-    public bool IsCurrentPageEmergencyContacts => Navigator.CurrentEndpoint == Endpoints.EMERGENCY_CONTACTS;
+    [Parameter]
+    public Action ClickHandler { get; set; } = default!;
 
-    void HelpHandler()
-    {
-        Navigator.NavigateTo(Endpoints.EMERGENCY_CONTACTS);
-    }
+    public bool IsEmergencyContactsConfigured { get; set; } = true;
 }
 

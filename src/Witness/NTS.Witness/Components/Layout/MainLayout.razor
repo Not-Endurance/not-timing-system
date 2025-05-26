@@ -1,4 +1,6 @@
-﻿@inherits LayoutComponentBase
+﻿@using Not.Blazor.Notifier
+
+@inherits LayoutComponentBase
 
 <NTheme/>
 
@@ -16,10 +18,12 @@
         <NavMenu AfterNavigationAction="CloseDrawer" />
     </MudDrawer>
     <MudMainContent Style="height:100%;">
-        <MudPaper  Class="d-flex absolute pa-5" Style="width:100%;" Elevation="0">
-            <MudSpacer />
-            <HelpButton/>
-        </MudPaper>
+        @if (!IsCurrentPageEmergencyContacts)
+        {
+            <HelpButton Class="help-button" ClickHandler="HelpHandler"/>
+            <MudSpacer/>
+        }
         @Body
+        <BlazorNotifier />
     </MudMainContent>
 </MudLayout>
