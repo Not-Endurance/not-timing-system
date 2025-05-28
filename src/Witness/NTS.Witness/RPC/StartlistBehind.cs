@@ -41,7 +41,7 @@ public StartlistBehind()
     public IReadOnlyList<StartlistEntry> Upcoming => _startlist?.Upcoming ?? [];
     public IReadOnlyList<StartlistEntry> History => _startlist?.History ?? [];
 
-    protected override Task<bool> PerformInitialization(params IEnumerable<object> arguments)
+    protected override Task<bool> PerformInitialization(IEnumerable<object> arguments)
     {
         _startlist = new StartList(_participations, _action);
 
