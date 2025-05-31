@@ -1,0 +1,10 @@
+﻿@using NTS.Blazor.Constants
+@using NTS.Domain.Core.Aggregates.Participations
+@using NTS.Domain.Watcher
+@using Not.Blazor.CRUD.Forms.Components
+
+@inherits NForm<SnapshotParticipantUpdateModel>
+
+<EditForm Model="Model">
+    <MudTextField @ref="_timestampField" @bind-Value="Model.TimestampInput" Label="Timestamp" Mask="TIME_MASK" />
+</EditForm>

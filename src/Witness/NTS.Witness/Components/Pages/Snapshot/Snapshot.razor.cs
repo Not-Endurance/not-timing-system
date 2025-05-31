@@ -1,5 +1,4 @@
-﻿using MudBlazor;
-using Not.Notify;
+﻿using Not.Notify;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
@@ -7,8 +6,12 @@ using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Domain.Enums;
 using Color = MudBlazor.Color;
+using Microsoft.AspNetCore.Components;
+using Not.Blazor.Dialogs;
+using NTS.Blazor.Components.ParticipationChips;
+using Not.Formatting;
 
-namespace NTS.Witness.Components.Pages;
+namespace NTS.Witness.Components.Pages.Snapshot;
 
 public partial class Snapshot
 {
@@ -18,12 +21,15 @@ public partial class Snapshot
     string[] _snapshotTableHeaders = ["Participant", "Time"];
     string _buttonText = "Arrival";
 
+    [Inject]
+    CrudeDialog<SnapshotParticipantUpdateModel, TimestampForm> Dialog { get; set; } = default!;
+
     protected override void OnInitialized()
     {
-        for (var i = 0; i < 10; i++)
+        for (var i = 0; i < 2; ++i)
         {
             var country = new Country(1000 + i, null, null, null, null);
-            var names = new List<string> { $"FirstName{i}", $"LastName{i}" };
+            var names = new List<string> { $"FirstName{i + 1}", $"LastName{i + 1}" };
             var person = new Person(names.ToArray());
 
             var athlete = new Athlete(
@@ -32,10 +38,10 @@ public partial class Snapshot
                 Domain.Enums.AthleteCategory.Senior,
                 country,
                 null,
-                $"username{i}"
+                $"username{i+1}"
             );
 
-            var horse = new Horse(100 + i, $"HorseName{i}", null);
+            var horse = new Horse(100 + i, $"HorseName{i+1}", null);
 
             var combination = new Combination(
                 199 + i,
@@ -126,25 +132,27 @@ public partial class Snapshot
         //consider backup before clear
         _snapshotParticipations.ForEach(p => _selectedParticipations.Remove(p));
         _snapshotParticipations.Clear();
-        NotifyHelper.Success($"Hello and welcome!\nYes, yes, yes! We are doing it.\n Keep up the good work my man! \n Let's gooooooooooo...");
-    }
-
-    void EditSnapshot(SnapshotParticipant snapshotParticipant)
-    {
-
+        NotifyHelper.Success($"Hello and welcome!\nYes, yes, yes! We are doing it.\n I have received word for {snapshotType}!\n Keep up the good work my man! \n Let's gooooooooooo...");
     }
 
     Color GetColor(Participation participation)
     {
+        if (_snapshotParticipations.Exists(p => p.Number == participation.Combination.Number))
+        {
+            return Color.Success;
+        }
         if (_selectedParticipations.Exists(p => p.Number == participation.Combination.Number))
         {
             return Color.Info;
         }
-        if(_snapshotParticipations.Exists(p => p.Number == participation.Combination.Number))
-        {
-            return Color.Success;
-        }
         return Color.Primary;
+    }
+
+    async Task EditSnapshot(SnapshotParticipant snapshotParticipant)
+    {
+        var model = new SnapshotParticipantUpdateModel(snapshotParticipant);
+        await Dialog.RenderUpdate(model);
+        await Render();
     }
 }
 
