@@ -9,7 +9,7 @@
 <table class="rtable @_axisClass">
     <thead>
         <tr>
-            <MudButton Variant="Variant.Text" Disabled="true">#@Number</MudButton>
+            <MudButton Variant="Variant.Text" Style="pointer-events:none">#@Number</MudButton>
 
             <th>Start</th>
             <th>Arrive</th>
@@ -40,9 +40,16 @@
         @foreach (var phase in Phases ?? Enumerable.Empty<Phase>())
         {
             <tr>
-                <MudTooltip Text="@Edit_times_string" Inline="false" RootStyle="width:inherit;">
-                    <MudButton Variant="Variant.Text" OnClick="() => ShowUpdate(phase)">@phase.Gate</MudButton>
-                </MudTooltip>
+                @if (Editable)
+                {
+                    <MudTooltip Text="@Edit_times_string" Inline="false" RootStyle="width:inherit;">
+                        <MudButton Variant="Variant.Text" OnClick="() => ShowUpdate(phase)">@phase.Gate</MudButton>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Text" Style="pointer-events:none">@phase.Gate</MudButton>
+                }
 
                 <NTd Value="@phase.StartTime" />
                 <NTd Value="@phase.ArriveTime" />

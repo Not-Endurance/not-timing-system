@@ -24,6 +24,9 @@ public partial class ParticipationTable
     public PhaseCollection? Phases { get; set; }
 
     [Parameter]
+    public bool Editable { get; set; } = true;
+
+    [Parameter]
     public bool AlignVertically { get; set; } = default;
 
     protected override void OnParametersSet()
