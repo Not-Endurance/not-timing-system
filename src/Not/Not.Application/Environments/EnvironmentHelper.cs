@@ -24,7 +24,10 @@ public static class EnvironmentHelper
         {
             return "ANDROID";
         }
-        return Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE) ?? "Staging"
+        return Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE)
             ?? throw new ApplicationException("Environment variable not found");
+=========
+        return Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE) ?? "Staging"; // TODO: figure out how to pass this
+>>>>>>>>> Temporary merge branch 2
     }
 }
