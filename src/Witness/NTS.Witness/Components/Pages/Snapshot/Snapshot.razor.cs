@@ -24,7 +24,7 @@ public partial class Snapshot
 
     protected override void OnInitialized()
     {
-        for (var i = 0; i < 2; ++i)
+        for (var i = 0; i < 10; ++i)
         {
             var country = new Country(1000 + i, null, null, null, null);
             var names = new List<string> { $"FirstName{i + 1}", $"LastName{i + 1}" };
@@ -53,9 +53,9 @@ public partial class Snapshot
             );
 
             var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
-                20,
+                i > 10 ? 30 : 20,
                 15,
-                40,
+                i > 10 ? 60 : 40,
                 NTS.Domain.Enums.CompetitionRuleset.Regional,
                 false,
                 null,
@@ -63,9 +63,9 @@ public partial class Snapshot
             );
 
             var phase2 = new NTS.Domain.Core.Aggregates.Participations.Phase(
+                i > 10 ? 30 : 20,
                 20,
-                20,
-                40,
+                i > 10 ? 60 : 40,
                 NTS.Domain.Enums.CompetitionRuleset.Regional,
                 true,
                 null,
