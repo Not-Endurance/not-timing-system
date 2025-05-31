@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
+		
         <TargetFrameworks>net8.0-android;net8.0-ios</TargetFrameworks>
         <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
@@ -79,10 +80,12 @@
     </ItemGroup>
 
     <ItemGroup>
+	  <ProjectReference Include="..\..\Not\Not.Blazor\Not.Blazor.csproj" />
 	  <ProjectReference Include="..\..\Not\Not.MAUI\Not.MAUI.csproj" />
       <ProjectReference Include="..\..\Not\Not.Application\Not.Application.csproj" />
       <ProjectReference Include="..\..\Not\Not\Not.csproj" />
       <ProjectReference Include="..\..\NTS.Blazor\NTS.Blazor.csproj" />
+      <ProjectReference Include="..\..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
       <ProjectReference Include="..\..\NTS\NTS.csproj" />
     </ItemGroup>
 

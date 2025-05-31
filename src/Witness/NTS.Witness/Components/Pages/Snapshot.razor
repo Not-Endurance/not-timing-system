@@ -1,4 +1,42 @@
 ﻿@attribute [Route(SNAPSHOT)]
+@using NTS.Domain.Core.Aggregates;
+@using MudBlazor
+@using Not.Blazor.Components
+@using NTS.Domain.Watcher;
+@using NTS.Blazor.Components.ParticipationChips;
 
-We are waiting for a developer to finish their nap to put some content here. 
-Thank you for patience!
+<MudPaper Height="100%">
+    <MudPaper Class="justify-center pa-2">
+            <ParticipationChips ParticipationCollection="_participations" ClickAction="SelectHandler" GetColorAction="GetColor" ChipSize="Size.Large" />
+    </MudPaper>
+    
+    <MudPaper Elevation="0" Class="pa-2">
+        <NSimpleTable T="SnapshotParticipant" Items="_selectedParticipations" EmptyMessage="No participants have been selected for Snapshot."
+                        Mobile="true" Headings="@_snapshotTableHeaders" FixedHeader="true" Height="65vh">
+                        <CustomCell>
+                            @if(context.Timestamp == null)
+                            {
+                                <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => SnapshotHandler(context)">Snapshot</MudButton>    
+                            }else{
+                                <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="() => EditSnapshot(context)">@context.Timestamp</MudButton>    
+                            }
+                        </CustomCell>
+            </NSimpleTable>
+    </MudPaper>
+    
+    @if(_snapshotParticipations.Count > 0)
+    {
+        <MudPaper Class="position-bottom absolute justify-center-absolute pa-2">
+            <MudStack Row AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.overline">Send @_snapshotParticipations.Count snapshots to Judge as</MudText>
+                <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+                    <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Style="align-self: auto;">
+                        <MudMenuItem OnClick="() => SetButtonText(0)">Arrival</MudMenuItem>
+                        <MudMenuItem OnClick="() => SetButtonText(1)">VetIn</MudMenuItem>
+                    </MudMenu>
+                    <MudButton OnClick="() => SendHandler(_buttonText)">@_buttonText</MudButton>
+                </MudButtonGroup>
+            </MudStack>
+        </MudPaper>
+    }
+</MudPaper>

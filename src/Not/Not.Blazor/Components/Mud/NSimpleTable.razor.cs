@@ -14,6 +14,9 @@ public partial class NSimpleTable<T>
     public string EmptyMessage { get; set; } = "This table is still empty";
 
     [Parameter]
+    public string Height { get; set; } = default!;
+
+    [Parameter]
     public bool Mobile { get; set; } = false;
 
     [Parameter]

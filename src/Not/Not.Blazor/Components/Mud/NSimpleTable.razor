@@ -3,7 +3,7 @@
 @inherits MudSimpleTable
 @typeparam T where T : class
 
-<MudSimpleTable Style="overflow-x: auto;">
+<MudSimpleTable Style="@("overflow-x: auto; max-height:"+Height)" FixedHeader="FixedHeader">
     <thead>
         <tr>
             @foreach (var heading in Headings)
@@ -15,7 +15,7 @@
     <tbody>
         @if(Items.Count() == 0)
         {
-            <MudText Typo="Typo.body1">@EmptyMessage</MudText>
+            <MudText Typo="Typo.body1" Class="pa-4">@EmptyMessage</MudText>
         }
         @foreach (var item in Items)
         {
