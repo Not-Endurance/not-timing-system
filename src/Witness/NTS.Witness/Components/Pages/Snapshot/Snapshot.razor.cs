@@ -8,8 +8,6 @@ using NTS.Domain.Enums;
 using Color = MudBlazor.Color;
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Dialogs;
-using NTS.Blazor.Components.ParticipationChips;
-using Not.Formatting;
 
 namespace NTS.Witness.Components.Pages.Snapshot;
 

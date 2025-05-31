@@ -5,7 +5,6 @@
 @using NTS.Domain.Watcher;
 @using NTS.Blazor.Components.ParticipationChips;
 @using Not.Blazor.Dialogs
-@using Not.Formatting
 
 @inherits NComponent
 
@@ -16,7 +15,7 @@
     
     <MudPaper Elevation="0" Class="pa-2">
         <NSimpleTable T="SnapshotParticipant" Items="_selectedParticipations" EmptyMessage="No participants have been selected for Snapshot."
-                        Mobile="true" Headings="@_snapshotTableHeaders" FixedHeader="true" Height="65vh" TextFormatter="_textFormatter">
+                        Mobile="true" Headings="@_snapshotTableHeaders" FixedHeader="true" Height="65vh">
                         <CustomCell>
                             @if(context.Timestamp == null)
                             {
