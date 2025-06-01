@@ -322,7 +322,7 @@
     <value>Ayarlar</value>
   </data>
   <data name="Start_string" xml:space="preserve">
-    <value>Yarışları başlat</value>
+    <value>başla</value>
   </data>
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Dayanıklılık Etkinliğini Yapılandır</value>
@@ -416,9 +416,6 @@
   </data>
   <data name="Official__already_exists" xml:space="preserve">
     <value>'{0}' adlı resmi görevli zaten mevcut</value>
-  </data>
-  <data name="start_string" xml:space="preserve">
-    <value>başla</value>
   </data>
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Lütfen gelecekteki bir zaman seçin</value>
@@ -584,5 +581,8 @@
   </data>
   <data name="Component_missing_required_value_string" xml:space="preserve">
     <value>{0} oluşturulamadı. Lütfen geliştiriciyle iletişime geçin.</value>
+  </data>
+  <data name="Download_string" xml:space="preserve">
+    <value />
   </data>
 </root>
