@@ -4,6 +4,7 @@ using Not.Blazor.CRUD.Ports;
 using Not.Exceptions;
 using Not.Safe;
 using Not.Startup;
+using NTS.Blazor.Components.ParticipationTable.Phases;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
@@ -13,7 +14,6 @@ using NTS.Judge.Blazor.Core.Dashboards.Actions.Eliminations;
 using NTS.Judge.Blazor.Core.Dashboards.Actions.Inspections;
 using NTS.Judge.Blazor.Core.Dashboards.Actions.Snapshots;
 using NTS.Judge.Blazor.Core.Dashboards.Component;
-using NTS.Blazor.Components.ParticipationTable.Phases;
 using NTS.Judge.RPC;
 
 namespace NTS.Judge.Core.Behinds.Adapters;

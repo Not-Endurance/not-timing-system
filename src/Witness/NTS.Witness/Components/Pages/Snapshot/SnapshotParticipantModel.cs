@@ -6,7 +6,9 @@ using NTS.Domain.Watcher;
 
 namespace NTS.Witness.Components.Pages.Snapshot;
 
-public class SnapshotParticipantUpdateModel : /*ISnapshotParticipantState,*/ IFormModel<SnapshotParticipant>
+public class SnapshotParticipantUpdateModel
+    : /*ISnapshotParticipantState,*/
+    IFormModel<SnapshotParticipant>
 {
     public SnapshotParticipantUpdateModel() { }
 
@@ -25,7 +27,7 @@ public class SnapshotParticipantUpdateModel : /*ISnapshotParticipantState,*/ IFo
         get => Parse(TimestampInput);
         set => TimestampInput = ToInputString(value);
     }
-   
+
     public void FromEntity(SnapshotParticipant entity)
     {
         Id = entity.Number;
@@ -33,7 +35,7 @@ public class SnapshotParticipantUpdateModel : /*ISnapshotParticipantState,*/ IFo
     }
 
     Timestamp? Parse(string? input)
-    { 
+    {
         if (string.IsNullOrWhiteSpace(input))
         {
             return null;

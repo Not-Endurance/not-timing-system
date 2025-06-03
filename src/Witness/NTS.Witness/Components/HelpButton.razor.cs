@@ -11,4 +11,3 @@ public partial class HelpButton
 
     public bool IsEmergencyContactsConfigured { get; set; } = true;
 }
-

@@ -3,7 +3,4 @@ using NTS.Domain.Objects;
 
 namespace NTS.Witness.Components.Pages;
 
-public partial class Startlist
-{
-}
-
+public partial class Startlist { }

@@ -17,7 +17,6 @@ public partial class MainLayout
 
     public void OnSwipeEnd(SwipeEventArgs e)
     {
-
         if (e.SwipeDirection == SwipeDirection.LeftToRight && _drawerOpen)
         {
             _drawerOpen = false;

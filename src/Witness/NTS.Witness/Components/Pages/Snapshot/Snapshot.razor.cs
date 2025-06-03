@@ -1,13 +1,13 @@
-﻿using Not.Notify;
+﻿using Microsoft.AspNetCore.Components;
+using Not.Blazor.Dialogs;
+using Not.Notify;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
-using NTS.Domain.Enums;
 using Color = MudBlazor.Color;
-using Microsoft.AspNetCore.Components;
-using Not.Blazor.Dialogs;
 
 namespace NTS.Witness.Components.Pages.Snapshot;
 
@@ -36,21 +36,12 @@ public partial class Snapshot
                 Domain.Enums.AthleteCategory.Senior,
                 country,
                 null,
-                $"username{i+1}"
+                $"username{i + 1}"
             );
 
-            var horse = new Horse(100 + i, $"HorseName{i+1}", null);
+            var horse = new Horse(100 + i, $"HorseName{i + 1}", null);
 
-            var combination = new Combination(
-                199 + i,
-                i + 1,
-                athlete,
-                horse,
-                null,
-                (40 + i).ToString(),
-                null,
-                null
-            );
+            var combination = new Combination(199 + i, i + 1, athlete, horse, null, (40 + i).ToString(), null, null);
 
             var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
                 i > 10 ? 30 : 20,
@@ -82,14 +73,8 @@ public partial class Snapshot
                 Domain.Enums.CompetitionType.Qualification
             );
 
-            var participation = new Participation(
-                2001 + i,
-                competition,
-                combination,
-                phaseCollection,
-                null
-            );
-           
+            var participation = new Participation(2001 + i, competition, combination, phaseCollection, null);
+
             _participations.Add(participation);
         }
     }
@@ -109,7 +94,10 @@ public partial class Snapshot
 
     void SelectHandler(Participation participation)
     {
-        var snapshotParticipant = new SnapshotParticipant(participation.Combination.Number, participation.Combination.Athlete.Names);
+        var snapshotParticipant = new SnapshotParticipant(
+            participation.Combination.Number,
+            participation.Combination.Athlete.Names
+        );
         if (!_selectedParticipations.Contains(snapshotParticipant))
         {
             _selectedParticipations.Add(snapshotParticipant);
@@ -130,7 +118,9 @@ public partial class Snapshot
         //consider backup before clear
         _snapshotParticipations.ForEach(p => _selectedParticipations.Remove(p));
         _snapshotParticipations.Clear();
-        NotifyHelper.Success($"Hello and welcome!\nYes, yes, yes! We are doing it.\n I have received word for {snapshotType}!\n Keep up the good work my man! \n Let's gooooooooooo...");
+        NotifyHelper.Success(
+            $"Hello and welcome!\nYes, yes, yes! We are doing it.\n I have received word for {snapshotType}!\n Keep up the good work my man! \n Let's gooooooooooo..."
+        );
     }
 
     Color GetColor(Participation participation)
@@ -153,4 +143,3 @@ public partial class Snapshot
         await Render();
     }
 }
-

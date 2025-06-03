@@ -1,6 +1,6 @@
 using MudBlazor;
-using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Blazor.Constants;
+using NTS.Domain.Core.Aggregates.Participations;
 
 namespace NTS.Blazor.Components.ParticipationTable.Phases;
 

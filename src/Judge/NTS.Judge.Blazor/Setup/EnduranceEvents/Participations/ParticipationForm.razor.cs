@@ -2,8 +2,8 @@ using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Lists.Ports;
 using Not.Strings;
-using NTS.Domain.Setup.Aggregates;
 using NTS.Blazor.Constants;
+using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 

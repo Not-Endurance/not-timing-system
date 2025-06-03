@@ -28,5 +28,3 @@ public record SnapshotParticipant : DomainObject
         return $"#{Number}: {Athlete}";
     }
 }
-
-

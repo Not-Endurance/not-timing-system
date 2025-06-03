@@ -1,6 +1,3 @@
 ﻿namespace NTS.Witness.Components.Pages;
 
-public partial class Login
-{
-}
-
+public partial class Login { }

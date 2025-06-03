@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Dialogs;
-using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Blazor.Components.ParticipationTable.Phases;
+using NTS.Domain.Core.Aggregates.Participations;
 
 namespace NTS.Blazor.Components.ParticipationTable;
 
