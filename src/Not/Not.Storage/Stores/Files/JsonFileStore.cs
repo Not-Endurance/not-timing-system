@@ -58,6 +58,27 @@ public static class JsonFileStore
         }
     }
 
+    public static async Task BackupAndDelete(string path)
+    {
+        await SEMAPHORE.WaitAsync();
+        try
+        {
+            var backupPath = $"{path}.backup";
+            var json = await FileHelper.SafeReadStringAsync(path);
+            if (json == null)
+            {
+                return;
+            }
+            await FileHelper.Delete(backupPath);
+            await FileHelper.WriteAsync(backupPath, json);
+            await FileHelper.Delete(path);
+        }
+        finally
+        {
+            SEMAPHORE.Release();
+        }
+    }
+
     static void ResetConverters()
     {
         foreach (var converter in CONVERTERS)

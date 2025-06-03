@@ -321,8 +321,8 @@
   <data name="Settings_string" xml:space="preserve">
     <value>Настройки</value>
   </data>
-  <data name="Start_Competitions_string" xml:space="preserve">
-    <value>Стартирай състезанията</value>
+  <data name="Start_string" xml:space="preserve">
+    <value>старт</value>
   </data>
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Конфигурирай Събитие</value>
@@ -416,9 +416,6 @@
   </data>
   <data name="Official__already_exists" xml:space="preserve">
     <value>Официално лице '{0}' вече съществува</value>
-  </data>
-  <data name="start_string" xml:space="preserve">
-    <value>старт</value>
   </data>
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Моля изберете време в бъдещето</value>
@@ -585,7 +582,31 @@
   <data name="Component_missing_required_value_string" xml:space="preserve">
     <value>{0} не беше създаден успешно. Моля свържете се с разработчика.</value>
   </data>
-  <data name="Protocol_is_null_string" xml:space="preserve">
-    <value>Протоколът не беше създаден успешно. Моля свържете се с разработчик.</value>
+  <data name="Reset_string" xml:space="preserve">
+    <value>Ресетни</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
+    <value>Сигурни ли сте че искате да ресетнете състезанията? Това ще ИЗТРИЕ ВСИЧКИ ЗАПИСАНИ ВРЕМЕНА НА ФАЗИ и няма да можете да ги въстановите. </value>
+  </data>
+  <data name="Cannot_select_another_event_without_resetting__string" xml:space="preserve">
+    <value>Не може да изберете друго събитие докато сте свързани с '{0}'. Ако сте се свързали с грешно събитие моля да го Ресетнете (чрез бутона в ляво) </value>
+  </data>
+  <data name="Hard_reset_string" xml:space="preserve">
+    <value>Хард ресет</value>
+  </data>
+  <data name="Soft_reset_string" xml:space="preserve">
+    <value>Софт ресет</value>
+  </data>
+  <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
+    <value>Конфигурацията на събитието няма да бъде изтрита</value>
+  </data>
+  <data name="Soft_reset_dialog_option_1_string" xml:space="preserve">
+    <value>Софт ресет - промени връзката със събирие. Подсигури се че правилното събитие е избрано преди Старт</value>
+  </data>
+  <data name="Soft_reset_dialog_option_2_string" xml:space="preserve">
+    <value>Хард ресет - ресетни връзката към събитие и изтрий всички данни на Фази</value>
+  </data>
+  <data name="Download_string" xml:space="preserve">
+    <value>Свали мобилното приложение</value>
   </data>
 </root>

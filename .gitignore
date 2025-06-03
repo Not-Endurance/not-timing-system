@@ -362,8 +362,6 @@ data/*
 # Mac
 .DS_Store
 
-# Ignore Judge API Properties
-src/**/Properties
 # Ignore Judge settings
 src/**/judge-settings.json
 

@@ -1,53 +1,48 @@
-﻿@using NTS.Domain.Core.Aggregates
-@using NTS.Domain.Core.Aggregates.Participations
+﻿@inherits NComponent
 
-@inherits NComponent
+<MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
 
-<MudStack Row="true" Justify="Justify.FlexStart">
+    <MudText Typo="Typo.button" Align="Align.Center" Style="width:50px">@_rankText</MudText>
+    
+    <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2" Style="width:80px">
+        @{
+            const Align align = Align.Center;
+        }
+        <MudText Typo="Typo.caption" Align="align">@_combination.Athlete.Names</MudText>
 
-    <MudStack >
-        <MudText Typo="Typo.button" Align="Align.Center">@_rankText</MudText>
+        <MudText Typo="Typo.caption" Align="align">@_combination.Horse</MudText>
 
-        <MudStack Justify="Justify.FlexStart" Spacing="1" Style="height:100%; width:80px">
-            <MudText Typo="Typo.caption" Align="Align.Right">@Rider_string:<br/>@_combination.Athlete.Names</MudText>
+        @if (_combination.Club != null)
+        {
+            <MudText Typo="Typo.caption" Align="align">@_combination.Club</MudText>
+        }
 
-            <MudText Typo="Typo.caption" Align="Align.Right">@Horse_string:<br/>@_combination.Horse</MudText>
-            @if(_combination.Club != null)
-            {
-                <MudText Typo="Typo.caption" Align="Align.Right">@Club_string:<br/>@_combination.Club</MudText>
-            }else{
-                <MudText Typo="Typo.caption" Align="Align.Right">@Country_string:<br/>@_combination.Athlete.Country</MudText>
-            }
-        </MudStack>
+        <MudText Typo="Typo.caption" Align="align">@_combination.Athlete.Country</MudText>
     </MudStack>
 
     <ParticipationTable Number="_combination.Number" Phases="_phases" AlignVertically="true" />
 
     @if (Entry.Participation.IsComplete())
     {
-        var total = Entry.Participation.GetTotal();
+        var total = Entry.Participation.GetTotal()!;
         <MudStack Class="d-flex" Style="width:140px;" Spacing="1">
-            <MudText Typo="Typo.button" Align="Align.Center" Class="mud-button-text">
-                @Total_string
-            </MudText>
-
             <MudStack Justify="Justify.FlexStart" Style="height:100%;">
                 <MudText Typo="Typo.caption" Align="Align.Center">
                     @Finished_at_colon_string
                     <strong>
-                        @total!.FinishTime
+                        @total.FinishTime
                     </strong>
                 </MudText>
 
                 <MudText Typo="Typo.caption" Align="Align.Center">
                     @Ride_time_in_hours_colon_string
-                    <strong>@total!.RideInterval</strong>
+                    <strong>@total.RideInterval</strong>
                 </MudText>
 
                 <MudText Typo="Typo.caption" Align="Align.Center">
                     @Average_speed
                     <br />
-                    <strong>@total!.AverageSpeed.ToString()</strong> km/h
+                    <strong>@total.AverageSpeed</strong> km/h
                 </MudText>
             </MudStack>
         </MudStack>

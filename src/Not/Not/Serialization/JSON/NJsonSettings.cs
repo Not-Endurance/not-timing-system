@@ -10,7 +10,7 @@ public class NJsonSettings : JsonSerializerSettings
     public static NJsonSettings ConfigureServerSerialization()
     {
         var settings = new NJsonSettings();
-        settings.ConfigureServer();
+        //settings.ConfigureServer();
         return settings;
     }
 

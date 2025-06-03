@@ -14,7 +14,7 @@ public partial class ParticipationTable
     bool _anyCompulsoryRequiredInspection;
 
     [Inject]
-    Dialog<PhaseUpdateModel, PhaseForm> Dialog { get; set; } = default!;
+    CrudeDialog<PhaseUpdateModel, PhaseForm> Dialog { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public int Number { get; set; }

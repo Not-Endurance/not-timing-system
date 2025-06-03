@@ -38,7 +38,7 @@
         {
             <tr>
                 <MudTooltip Text="@Edit_times_string" Inline="false" RootStyle="width:inherit;">
-                    <MudButton Variant="Variant.Text" class="font-size-12" OnClick="() => ShowUpdate(phase)">@phase.Gate</MudButton>
+                    <MudButton Variant="Variant.Text" OnClick="() => ShowUpdate(phase)">@phase.Gate</MudButton>
                 </MudTooltip>
 
                 <NTd Value="@phase.StartTime" />

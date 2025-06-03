@@ -38,7 +38,7 @@ public static class SafeHelper
 
     public static Task RunAsync(Func<Task> action)
     {
-        return Task.Run(() => Run(action, DefaultValidationHandler));
+        return Task.Run(() => Run(action, HandleDefaultValidation));
     }
 
     public static Task RunAsync(Func<Task> action, Func<ValidationException, Task> validationHandler)
@@ -80,12 +80,12 @@ public static class SafeHelper
 
     public static Task Run(Func<Task> action)
     {
-        return Run(action, DefaultValidationHandler);
+        return Run(action, HandleDefaultValidation);
     }
 
     public static void Run(Action action)
     {
-        Run(action, DefaultValidationHandler);
+        Run(action, HandleDefaultValidation);
     }
 
     public static async Task<T?> Run<T>(Func<Task<T>> action, Func<ValidationException, Task> validationHandler)
@@ -108,7 +108,7 @@ public static class SafeHelper
 
     public static Task<T?> Run<T>(Func<Task<T>> action)
     {
-        return Run(action, DefaultValidationHandler);
+        return Run(action, HandleDefaultValidation);
     }
 
     public static Task RunAsync<T>(Func<T, Task> action, T argument)
@@ -137,7 +137,19 @@ public static class SafeHelper
         return Run(action, argument, NotifyHelper.Warn);
     }
 
-    static Task DefaultValidationHandler(ValidationException validation)
+    public static async Task HandleException(Exception exception)
+    {
+        if (exception is ValidationException validation)
+        {
+            await HandleDefaultValidation(validation);
+        }
+        else
+        {
+            HandleError(exception);
+        }
+    }
+
+    static Task HandleDefaultValidation(ValidationException validation)
     {
         NotifyHelper.Warn(validation);
         return Task.CompletedTask;

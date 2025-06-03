@@ -1,10 +1,9 @@
 ﻿using Not.Application.RPC.SignalR;
-using Not.Blazor.Ports;
 using Not.Injection;
 
 namespace Not.Application.RPC;
 
-public interface IConnectionsBehind : IObservableBehind
+public interface IConnectionsBehind : ISingleton
 {
     IEnumerable<string> RemoteConnections { get; }
     bool IsServerConnected { get; }

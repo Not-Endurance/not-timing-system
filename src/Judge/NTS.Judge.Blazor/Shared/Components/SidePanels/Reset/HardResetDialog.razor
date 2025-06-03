@@ -1,0 +1,15 @@
+@inherits NDialog
+
+<MudDialog>
+    <TitleContent>@Hard_reset_string</TitleContent>
+
+    <DialogContent>
+        <p>@Are_you_sure_you_want_to_reset_string</p>
+        <p>*@Setup_configuration_will_not_be_deleted_string</p>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonDanger Text="@Yes_string" OnClick="Confirm" />
+        <NButtonSecondary Text="@Cancel_string" OnClick="Cancel" />
+    </DialogActions>
+</MudDialog>
