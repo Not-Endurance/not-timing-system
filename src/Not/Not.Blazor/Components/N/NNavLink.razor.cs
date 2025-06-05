@@ -17,8 +17,15 @@ public partial class NNavLink : NComponent
     [Parameter]
     public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
 
+    [Parameter]
+    public Action? AfterNavigation { get; set; } = default!;
+
+    [Parameter]
+    public string Icon { get; set; } = default!;
+
     void Land()
     {
         LandNavigator.LandTo(Endpoint);
+        AfterNavigation?.Invoke();
     }
 }

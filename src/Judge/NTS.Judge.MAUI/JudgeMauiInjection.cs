@@ -17,7 +17,7 @@ public static class JudgeMauiInjection
         builder
             .Services.ConfigureStorage()
             .ConfigureJudge(builder.Configuration)
-            .ConfigureJudgeBlazor(builder.Configuration)
+            .ConfigureNtsBlazor(builder.Configuration)
             .RegisterConventionalServices();
 
         builder.ConfigureLogging().AddFilesystemLogger();

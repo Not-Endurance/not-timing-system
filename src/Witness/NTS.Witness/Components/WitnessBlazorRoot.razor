@@ -1,0 +1,33 @@
+﻿@using System.Reflection
+@using NTS.Witness.Components
+@using NTS.Witness.Components.Layout
+@using Not.Blazor.Components
+
+<NErrorBoundary @ref="this._errorBoundary">
+    <ChildContent>
+        <Router AppAssembly="Assembly" AdditionalAssemblies="_routeAssemblies">
+
+            <Found Context="routeData">
+                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+
+            <NotFound>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </ChildContent>
+
+    <ErrorContent>
+        <br />
+        <br />
+        <div class="container">
+            <pre>@context.Message</pre>
+            <pre>@context.StackTrace</pre>
+        </div>
+
+        <button class="btn btn-primary" @onclick="_ => this._errorBoundary.Recover()">Back</button>
+    </ErrorContent>
+</NErrorBoundary>
