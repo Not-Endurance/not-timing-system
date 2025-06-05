@@ -19,11 +19,6 @@ public static class EnvironmentHelper
 
     public static string GetEnvironment()
     {
-        // TODO: add an environment variable for iOS
-        if (Environment.GetEnvironmentVariables().Contains("ANDROID_ROOT"))
-        {
-            return "ANDROID";
-        }
         return Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE) ?? "Staging"; // TODO: figure out how to pass this
     }
 }
