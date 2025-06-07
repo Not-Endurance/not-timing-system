@@ -4,16 +4,16 @@ using NTS.Domain.Objects;
 
 namespace NTS.Domain.Watcher;
 
-public record SnapshotParticipant : DomainObject
+public record IntermediateSnapshot : DomainObject
 {
-    public SnapshotParticipant(int number, Person athlete, Timestamp timestamp)
+    public IntermediateSnapshot(int number, Person athlete, Timestamp timestamp)
     {
         Number = number;
         Athlete = athlete;
         Timestamp = timestamp;
     }
 
-    public SnapshotParticipant(int number, Person athlete)
+    public IntermediateSnapshot(int number, Person athlete)
     {
         Number = number;
         Athlete = athlete;

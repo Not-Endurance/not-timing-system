@@ -8,11 +8,11 @@ namespace NTS.Witness.Components.Pages.Snapshot;
 
 public class SnapshotParticipantUpdateModel
     : /*ISnapshotParticipantState,*/
-    IFormModel<SnapshotParticipant>
+    IFormModel<IntermediateSnapshot>
 {
     public SnapshotParticipantUpdateModel() { }
 
-    public SnapshotParticipantUpdateModel(SnapshotParticipant SnapshotParticipant)
+    public SnapshotParticipantUpdateModel(IntermediateSnapshot SnapshotParticipant)
     {
         FromEntity(SnapshotParticipant);
     }
@@ -28,7 +28,7 @@ public class SnapshotParticipantUpdateModel
         set => TimestampInput = ToInputString(value);
     }
 
-    public void FromEntity(SnapshotParticipant entity)
+    public void FromEntity(IntermediateSnapshot entity)
     {
         Id = entity.Number;
         Timestamp = entity.Timestamp;

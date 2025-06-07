@@ -14,8 +14,8 @@ namespace NTS.Witness.Components.Pages.Snapshot;
 public partial class Snapshot
 {
     List<Participation> _participations = [];
-    List<SnapshotParticipant> _selectedParticipations = [];
-    List<SnapshotParticipant> _snapshotParticipations = [];
+    List<IntermediateSnapshot> _selectedParticipations = [];
+    List<IntermediateSnapshot> _snapshotParticipations = [];
     string[] _snapshotTableHeaders = ["Participant", "Time"];
     string _buttonText = "Arrival";
 
@@ -94,7 +94,7 @@ public partial class Snapshot
 
     void SelectHandler(Participation participation)
     {
-        var snapshotParticipant = new SnapshotParticipant(
+        var snapshotParticipant = new IntermediateSnapshot(
             participation.Combination.Number,
             participation.Combination.Athlete.Names
         );
@@ -105,7 +105,7 @@ public partial class Snapshot
         StateHasChanged();
     }
 
-    void SnapshotHandler(SnapshotParticipant snapshotParticipant)
+    void SnapshotHandler(IntermediateSnapshot snapshotParticipant)
     {
         var currentTime = DateTimeOffset.Now;
         var timestamp = new Timestamp(currentTime);
@@ -136,7 +136,7 @@ public partial class Snapshot
         return Color.Primary;
     }
 
-    async Task EditSnapshot(SnapshotParticipant snapshotParticipant)
+    async Task EditSnapshot(IntermediateSnapshot snapshotParticipant)
     {
         var model = new SnapshotParticipantUpdateModel(snapshotParticipant);
         await Dialog.RenderUpdate(model);

@@ -17,6 +17,6 @@ public partial class TimestampForm
 
     public override void RegisterValidationInjectors()
     {
-        RegisterInjector(nameof(SnapshotParticipant), () => _timestampField);
+        RegisterInjector(nameof(IntermediateSnapshot), () => _timestampField);
     }
 }
