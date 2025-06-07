@@ -1,4 +1,5 @@
 ﻿using Not.Domain.Base;
+using Not.Formatting;
 using Not.Localization;
 using NTS.Domain.Core.Aggregates;
 
@@ -37,7 +38,7 @@ public record StartlistEntry : DomainObject
     public override string ToString()
     {
         var distance = Distance + km_string;
-        var result = Combine(Number, Athlete, distance, Time.TimeOfDay.ToString(@"hh\:mm\:ss"));
+        var result = Combine(Number, Athlete, distance, FormattingHelper.Format(Time.TimeOfDay));
         return result;
     }
 }

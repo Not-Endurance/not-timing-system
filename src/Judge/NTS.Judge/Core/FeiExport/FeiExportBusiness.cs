@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Exceptions;
+using Not.Formatting;
 using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
@@ -273,7 +274,7 @@ public class FeiExportBusiness : IFeiExportBusiness
 
     string FormatTime(TimeSpan value)
     {
-        return value.ToString(@"hh\:mm\:ss");
+        return FormattingHelper.Format(value);
     }
 }
 
