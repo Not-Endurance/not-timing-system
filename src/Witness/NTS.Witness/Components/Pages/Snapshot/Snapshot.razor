@@ -20,7 +20,9 @@
                             @if(context.Timestamp == null)
                             {
                                 <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => SnapshotHandler(context)">Snapshot</MudButton>    
-                            }else{
+                            }
+                            else
+                            {
                                 <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="() => EditSnapshot(context)">@context.Timestamp</MudButton>    
                             }
                         </CustomCell>
