@@ -1,6 +1,6 @@
 ﻿@using NTS.Domain.Extensions;
 
-<MudChipSet @bind-SelectedValue="InitialBinding" SelectionMode="SelectionMode.SingleSelection">
+<MudChipSet @bind-SelectedValue="SelectedParticipation" SelectionMode="SelectionMode.SingleSelection">
 
     @foreach (var grouping in ParticipationCollection.GroupBy(x => x.Phases.Distance)) // TODO: move grouping in field
     {

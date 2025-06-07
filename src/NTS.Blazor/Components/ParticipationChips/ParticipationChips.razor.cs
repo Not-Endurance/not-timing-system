@@ -7,7 +7,7 @@ namespace NTS.Blazor.Components.ParticipationChips;
 public partial class ParticipationChips
 {
     [Parameter]
-    public Participation InitialBinding { get; set; } = default!;
+    public Participation SelectedParticipation { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public IEnumerable<Participation> ParticipationCollection { get; set; } = default!;
