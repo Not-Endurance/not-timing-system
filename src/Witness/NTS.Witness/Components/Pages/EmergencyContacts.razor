@@ -3,7 +3,7 @@
 @inherits NComponent;
 
 <MudStack style="height:100%;" Justify="Justify.Center" Spacing="10" AlignItems="AlignItems.Center">
-    <NHeadline Content="Emergency Contacts"/>
+    <NHeadline Content="@Contacts_string"/>
     @foreach(var contact in Contacts)
     {
         <MudStack Row Spacing="5">

@@ -14,7 +14,7 @@
         </MudAppBar>
         <MudDrawer @bind-Open="@_drawerOpen" Elevation="2" Anchor="Anchor.Right" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
             <MudDrawerHeader>
-                <MudText Typo="Typo.h6">Main Menu</MudText>
+                <MudText Typo="Typo.h6">@Main_menu_string</MudText>
             </MudDrawerHeader>
 
             <NavMenu AfterNavigationAction="CloseDrawer" />

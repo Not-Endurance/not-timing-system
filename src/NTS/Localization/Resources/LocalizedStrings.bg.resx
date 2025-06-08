@@ -609,4 +609,43 @@
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
   </data>
+  <data name="Help_string" xml:space="preserve">
+    <value>Помощ</value>
+  </data>
+  <data name="Home_string" xml:space="preserve">
+    <value>Начало</value>
+  </data>
+  <data name="Login_string" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="Contacts_string" xml:space="preserve">
+    <value>Спешни Oбаждания</value>
+  </data>
+  <data name="Snapshot_string" xml:space="preserve">
+    <value>Запис</value>
+  </data>
+  <data name="Performance_string" xml:space="preserve">
+    <value>Резултати</value>
+  </data>
+  <data name="Vetin_string" xml:space="preserve">
+    <value>Презентиране</value>
+  </data>
+  <data name="Participant_string" xml:space="preserve">
+    <value>Участник</value>
+  </data>
+  <data name="Login_page_string" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="Snapshot_page_string" xml:space="preserve">
+    <value>Времеизмерване</value>
+  </data>
+  <data name="Username_string" xml:space="preserve">
+    <value>Име</value>
+  </data>
+  <data name="Password_string" xml:space="preserve">
+    <value>Парола</value>
+  </data>
+  <data name="Send_snapshot_string" xml:space="preserve">
+    <value>Изпрати {0} записа за</value>
+  </data>
 </root>

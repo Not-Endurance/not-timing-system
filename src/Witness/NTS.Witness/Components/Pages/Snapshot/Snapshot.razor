@@ -19,7 +19,7 @@
                         <CustomCell>
                             @if(context.Timestamp == null)
                             {
-                                <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => SnapshotHandler(context)">Snapshot</MudButton>    
+                                <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => SnapshotHandler(context)">@Snapshot_string</MudButton>    
                             }
                             else
                             {
@@ -33,11 +33,11 @@
     {
         <MudPaper Class="position-bottom absolute justify-center-absolute pa-2">
             <MudStack Row AlignItems="AlignItems.Center">
-                <MudText Typo="Typo.overline">Send @_snapshotParticipations.Count snapshots to Judge as</MudText>
+                <MudText Typo="Typo.overline">@string.Format(Send_snapshot_string, _snapshotParticipations.Count)</MudText>
                 <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
                     <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Style="align-self: auto;">
-                        <MudMenuItem OnClick="() => SetButtonText(0)">Arrival</MudMenuItem>
-                        <MudMenuItem OnClick="() => SetButtonText(1)">VetIn</MudMenuItem>
+                        <MudMenuItem OnClick="() => SetButtonText(0)">@Arrival_string</MudMenuItem>
+                        <MudMenuItem OnClick="() => SetButtonText(1)">@Vetin_string</MudMenuItem>
                     </MudMenu>
                     <MudButton OnClick="() => SendHandler(_buttonText)">@_buttonText</MudButton>
                 </MudButtonGroup>

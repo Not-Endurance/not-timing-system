@@ -609,4 +609,43 @@
   <data name="Download_string" xml:space="preserve">
     <value>Download Mobile App</value>
   </data>
+  <data name="Help_string" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="Home_string" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Login_string" xml:space="preserve">
+    <value>Log In</value>
+  </data>
+  <data name="Contacts_string" xml:space="preserve">
+    <value>Emergency Contacts</value>
+  </data>
+  <data name="Snapshot_string" xml:space="preserve">
+    <value>Snapshot</value>
+  </data>
+  <data name="Performance_string" xml:space="preserve">
+    <value>Performance</value>
+  </data>
+  <data name="Vetin_string" xml:space="preserve">
+    <value>VetIn</value>
+  </data>
+  <data name="Participant_string" xml:space="preserve">
+    <value>Participant</value>
+  </data>
+  <data name="Login_page_string" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Snapshot_page_string" xml:space="preserve">
+    <value>Snapshot</value>
+  </data>
+  <data name="Username_string" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="Password_string" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Send_snapshot_string" xml:space="preserve">
+    <value>Send {0} snapshots to Judge as</value>
+  </data>
 </root>

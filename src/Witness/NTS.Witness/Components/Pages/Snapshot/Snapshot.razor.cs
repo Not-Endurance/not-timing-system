@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
-using Not.Blazor.Dialogs;
+﻿using Not.Blazor.Dialogs;
 using Not.Notify;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using Color = MudBlazor.Color;
@@ -16,8 +14,8 @@ public partial class Snapshot
     List<Participation> _participations = [];
     List<IntermediateSnapshot> _selectedParticipations = [];
     List<IntermediateSnapshot> _snapshotParticipations = [];
-    string[] _snapshotTableHeaders = ["Participant", "Time"];
-    string _buttonText = "Arrival";
+    string[] _snapshotTableHeaders = [Participant_string, Time_string];
+    string _buttonText = Arrival_string;
 
     [Inject]
     CrudeDialog<SnapshotParticipantUpdateModel, TimestampForm> Dialog { get; set; } = default!;
@@ -84,10 +82,10 @@ public partial class Snapshot
         switch (id)
         {
             case 0:
-                _buttonText = "Arrival";
+                _buttonText = Arrival_string;
                 break;
             case 1:
-                _buttonText = "VetIn";
+                _buttonText = Vetin_string;
                 break;
         }
     }

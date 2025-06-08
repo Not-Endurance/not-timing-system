@@ -4,11 +4,11 @@
 @inherits NComponent
 
 <MudNavMenu>
-    <NNavLink Icon="@Icons.Material.Filled.Home" Endpoint="@WITNESS_HOME" Match="NavLinkMatch.All" AfterNavigation="AfterNavigationAction">Home</NNavLink>
-    <NNavLink Icon="@Icons.Material.Filled.Login" Endpoint="@LOGIN" AfterNavigation="AfterNavigationAction">Login</NNavLink>
+    <NNavLink Icon="@Icons.Material.Filled.Home" Endpoint="@WITNESS_HOME" Match="NavLinkMatch.All" AfterNavigation="AfterNavigationAction">@Home_string</NNavLink>
+    <NNavLink Icon="@Icons.Material.Filled.Login" Endpoint="@LOGIN" AfterNavigation="AfterNavigationAction">@Login_page_string</NNavLink>
     @* TODO: use User Authority condition and hide emergency contacts, if help button is displayed *@
-    <NNavLink Icon="@Icons.Material.Filled.LocalPhone" Endpoint="@EMERGENCY_CONTACTS" AfterNavigation="AfterNavigationAction">Contacts</NNavLink>
-    <NNavLink Icon="@Icons.Material.Filled.Timer" Endpoint="@SNAPSHOT" AfterNavigation="AfterNavigationAction">Snapshot</NNavLink>
-    <NNavLink Icon="@Icons.Material.Filled.Checklist" Endpoint="@STARTLIST" AfterNavigation="AfterNavigationAction">Startlist</NNavLink>
-    <NNavLink Icon="@Icons.Material.Filled.ShowChart" Endpoint="@PERFORMANCE" AfterNavigation="AfterNavigationAction">Performance</NNavLink>
+    <NNavLink Icon="@Icons.Material.Filled.LocalPhone" Endpoint="@EMERGENCY_CONTACTS" AfterNavigation="AfterNavigationAction">@Contacts_string</NNavLink>
+    <NNavLink Icon="@Icons.Material.Filled.Timer" Endpoint="@SNAPSHOT" AfterNavigation="AfterNavigationAction">@Snapshot_page_string</NNavLink>
+    <NNavLink Icon="@Icons.Material.Filled.Checklist" Endpoint="@STARTLIST" AfterNavigation="AfterNavigationAction">@Startlist_string</NNavLink>
+    <NNavLink Icon="@Icons.Material.Filled.ShowChart" Endpoint="@PERFORMANCE" AfterNavigation="AfterNavigationAction">@Performance_string</NNavLink>
 </MudNavMenu>
