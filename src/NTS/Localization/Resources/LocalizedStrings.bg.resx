@@ -622,7 +622,7 @@
     <value>Спешни Oбаждания</value>
   </data>
   <data name="Snapshot_string" xml:space="preserve">
-    <value>Запис</value>
+    <value>Засечи</value>
   </data>
   <data name="Performance_string" xml:space="preserve">
     <value>Резултати</value>
@@ -647,5 +647,8 @@
   </data>
   <data name="Send_snapshot_string" xml:space="preserve">
     <value>Изпрати {0} записа за</value>
+  </data>
+  <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
+    <value>Няма избрани участници за засичане</value>
   </data>
 </root>

@@ -180,6 +180,8 @@ namespace NTS.Localization
         public static string Username_string => LocalizeString(nameof(Username_string));
         public static string Password_string => LocalizeString(nameof(Password_string));
         public static string Send_snapshot_string => LocalizeString(nameof(Send_snapshot_string));
+        public static string Empty_intermediate_snapshot_list_string =>
+            LocalizeString(nameof(Empty_intermediate_snapshot_list_string));
     }
 }
 #pragma warning restore NA0004

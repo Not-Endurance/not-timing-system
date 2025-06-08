@@ -14,7 +14,7 @@
     </MudPaper>
     
     <MudPaper Elevation="0" Class="pa-2">
-        <NSimpleTable T="IntermediateSnapshot" Items="_selectedParticipations" EmptyMessage="No participants have been selected for Snapshot."
+        <NSimpleTable T="IntermediateSnapshot" Items="_selectedParticipations" EmptyMessage="@Empty_intermediate_snapshot_list_string"
                         Mobile="true" Headings="@_snapshotTableHeaders" FixedHeader="true" Height="65vh">
                         <CustomCell>
                             @if(context.Timestamp == null)

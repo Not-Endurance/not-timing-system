@@ -648,4 +648,7 @@
   <data name="Send_snapshot_string" xml:space="preserve">
     <value>Send {0} snapshots to Judge as</value>
   </data>
+  <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
+    <value>No participants have been selected for Snapshot</value>
+  </data>
 </root>

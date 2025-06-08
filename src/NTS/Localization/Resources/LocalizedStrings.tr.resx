@@ -624,4 +624,7 @@
   <data name="Send_snapshot_string" xml:space="preserve">
     <value />
   </data>
+  <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
+    <value />
+  </data>
 </root>
