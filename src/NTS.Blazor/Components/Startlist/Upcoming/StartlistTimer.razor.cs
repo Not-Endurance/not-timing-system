@@ -13,7 +13,7 @@ public partial class StartlistTimer
     TimeSpan _timeInterval = default!;
     string _displayTime = default!;
     Color _color = default!;
-    string _class = "";
+    Typo _typography = Typo.inherit;
 
     [Parameter]
     public DateTimeOffset StartTime { get; set; } = default!;
@@ -39,7 +39,7 @@ public partial class StartlistTimer
         _timer.Enabled = _timeInterval > TimeSpan.FromMinutes(StopTimerAtTime);
         if (Mobile)
         {
-            _class = "mobile";
+            _typography = Typo.caption;
         }
     }
 
