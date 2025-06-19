@@ -1,16 +1,15 @@
-<Project>
+    <Project>
 
-  <PropertyGroup>
-   <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
+      <PropertyGroup>
+       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+      </PropertyGroup>
 
-  <ItemGroup>
-    <!-- Attempt to use as a local nuget package.
-    <PackageReference Include="Not.Analyzers" Version="0.2.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference> -->
-    <Analyzer Include="$(SolutionDir)/../analyzers/build/Not.Analyzers.dll" />
-  </ItemGroup>
-
-</Project>
+	  <ItemGroup Condition=" '$(SolutionDir)' != '' And Exists('$(SolutionDir)..\analyzers\build\Not.Analyzers.dll') ">
+        <!-- Attempt to use as a local nuget package.
+        <PackageReference Include="Not.Analyzers" Version="0.2.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference> -->
+        <Analyzer Include="$(SolutionDir)/../analyzers/build/Not.Analyzers.dll" />
+      </ItemGroup>
+	</Project>
