@@ -149,7 +149,11 @@ public partial class Snapshot
         var model = new TimestampUpdateModel(time);
         var parameters = new DialogParameters<TimestampUpdateDialog> { { x => x.Model, model } };
         var options = new DialogOptions() { Position = DialogPosition.Center };
-        var dialog = await MudDialogService.ShowAsync<TimestampUpdateDialog>(Edit_timestamp_string, parameters, options);
+        var dialog = await MudDialogService.ShowAsync<TimestampUpdateDialog>(
+            Edit_timestamp_string,
+            parameters,
+            options
+        );
         var result = await dialog.Result;
 
         if (result != null && !result.Canceled)
