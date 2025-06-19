@@ -94,4 +94,13 @@
       </MauiXaml>
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Platforms\iOS\Services\DialService.cs">
+        <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
+      </Compile>
+      <Compile Update="Platforms\Windows\Services\DialService.cs">
+        <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
+      </Compile>
+    </ItemGroup>
+
 </Project>

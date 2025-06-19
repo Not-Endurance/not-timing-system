@@ -1,12 +1,12 @@
-﻿using Not.Notify;
-#if ANDROID
-
-#endif
+﻿using NTS.Witness.Platforms.Services;
 
 namespace NTS.Witness.Components.Pages;
 
 public partial class EmergencyContacts
 {
+    [Inject]
+    IDialService DialService { get; set; } = default!;
+
     public Dictionary<string, string> Contacts { get; set; } = default!;
 
     protected override void OnInitialized()
@@ -20,46 +20,6 @@ public partial class EmergencyContacts
 
     public void OnNumberClick(string phoneNumber)
     {
-#if ANDROID
-        DialAndroid(phoneNumber);
-#elif IOS
-        DialiOS(phoneNumber);
-#else
-        NotifyHelper.Warn(
-            "Dialing is not supported on desktop devices. It seems you are running in a test environment."
-        );
-#endif
+        DialService.DialNumber(phoneNumber);
     }
-
-#if ANDROID
-    public void DialAndroid(string phoneNumber)
-    {
-        var context = Android.App.Application.Context;
-        var uri = Android.Net.Uri.Parse($"tel:{phoneNumber}");
-        var intent = new Android.Content.Intent(Android.Content.Intent.ActionDial, uri);
-        intent.AddFlags(Android.Content.ActivityFlags.NewTask);
-        context.StartActivity(intent);
-    }
-
-#endif
-
-#if IOS
-    static void DialiOS(string phoneNumber)
-    {
-        var url = new Foundation.NSUrl($"tel:{phoneNumber}");
-        if (UIKit.UIApplication.SharedApplication.CanOpenUrl(url))
-        {
-            UIKit.UIApplication.SharedApplication.OpenUrl(
-                url,
-                new Foundation.NSDictionary(),
-                (success) =>
-                {
-                    // Optional: handle success/failure of dialer launch
-                    Console.WriteLine($"Dialer opened: {success}");
-                }
-            );
-        }
-    }
-
-#endif
 }

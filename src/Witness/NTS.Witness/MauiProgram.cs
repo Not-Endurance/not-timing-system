@@ -1,4 +1,5 @@
 ﻿using Not.Application.Configurations;
+using NTS.Witness.Platforms.Services;
 using Serilog;
 
 namespace NTS.Witness;
@@ -27,7 +28,7 @@ public static class MauiProgram
         builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
         builder.Services.AddWitnessServices(builder.Configuration);
-
+        builder.Services.AddSingleton<IDialService, DialService>();
         return builder.Build();
     }
 }
