@@ -10,7 +10,7 @@ public partial class SplashPage : ContentPage
 
     async void SplashPage_Loaded(object? sender, EventArgs e)
     {
-        await Task.Delay(2000); // simulate load
+        await Task.Delay(2000);
         Application.Current!.MainPage = new MainPage();
     }
 }
