@@ -328,7 +328,7 @@
     <value>Конфигурирай Събитие</value>
   </data>
   <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
-    <value>Събитие не съществува</value>
+    <value>Не е създадено събитие</value>
   </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Конфигурирай Състезание</value>
@@ -650,5 +650,14 @@
   </data>
   <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
     <value>Няма избрани участници за засичане</value>
+  </data>
+  <data name="Edit_timestamp_string" xml:space="preserve">
+    <value>Редактиране на време</value>
+  </data>
+  <data name="Timestamp_string" xml:space="preserve">
+    <value>Засечено време</value>
+  </data>
+  <data name="Save_string" xml:space="preserve">
+    <value />
   </data>
 </root>

@@ -182,6 +182,9 @@ namespace NTS.Localization
         public static string Send_snapshot_string => LocalizeString(nameof(Send_snapshot_string));
         public static string Empty_intermediate_snapshot_list_string =>
             LocalizeString(nameof(Empty_intermediate_snapshot_list_string));
+        public static string Edit_timestamp_string => LocalizeString(nameof(Edit_timestamp_string));
+        public static string Timestamp_string => LocalizeString(nameof(Timestamp_string));
+        public static string Save_string => LocalizeString(nameof(Save_string));
     }
 }
 #pragma warning restore NA0004

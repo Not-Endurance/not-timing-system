@@ -11,27 +11,6 @@ public class TimestampUpdateModel
         TimestampTime = initial;
     }
 
-    //string? _timestampInput;
-
-    //public TimestampUpdateModel(Timestamp timestamp)
-    //{
-    //    TimestampInput = timestamp.ToString();
-    //}
-
-    //public string? TimestampInput
-    //{
-    //    get
-    //    {
-    //        return _timestampInput;
-    //    }
-    //    set
-    //    {
-    //        if (!string.IsNullOrWhiteSpace(value) && Regex.IsMatch(value, @"^\d{2}:\d{2}:\d{2}$"))
-    //        {
-    //            _timestampInput = value;
-    //        }
-    //    }
-
     public TimeSpan TimestampTime { get; set; }
 
     public string TimestampInput

@@ -651,4 +651,13 @@
   <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
     <value>No participants have been selected for Snapshot</value>
   </data>
+  <data name="Edit_timestamp_string" xml:space="preserve">
+    <value>Edit Timestamp</value>
+  </data>
+  <data name="Timestamp_string" xml:space="preserve">
+    <value>Timestamp</value>
+  </data>
+  <data name="Save_string" xml:space="preserve">
+    <value>Save</value>
+  </data>
 </root>
