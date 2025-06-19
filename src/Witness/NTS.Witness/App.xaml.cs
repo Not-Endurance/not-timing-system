@@ -10,7 +10,7 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        MainPage = new MainPage();
+        MainPage = new SplashPage();
 
         FileContextHelper.ConfigureApplicationName("nts-witness");
 
