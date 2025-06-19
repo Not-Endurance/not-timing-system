@@ -84,6 +84,14 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
         _stamp = dateTimeOffset;
     }
 
+    public Timestamp(string timeText)
+    {
+        if (DateTimeOffset.TryParseExact(timeText, "HH:mm:ss", null, DateTimeStyles.None, out DateTimeOffset result))
+        {
+            _stamp = result;
+        }
+    }
+
     [JsonProperty]
 #pragma warning disable IDE1006 // TODO: serialize private setter using custom JsonConverter<Timestamp>
     public DateTimeOffset _stamp { get; set; }

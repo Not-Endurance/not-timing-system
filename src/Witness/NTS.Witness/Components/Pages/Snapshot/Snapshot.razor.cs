@@ -1,4 +1,6 @@
-﻿using Not.Blazor.Dialogs;
+﻿using MudBlazor;
+using Not.Blazor.Dialogs;
+using Not.Exceptions;
 using Not.Notify;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
@@ -18,7 +20,7 @@ public partial class Snapshot
     string _buttonText = Arrival_string;
 
     [Inject]
-    CrudeDialog<SnapshotParticipantUpdateModel, TimestampForm> Dialog { get; set; } = default!;
+    IDialogService MudDialogService { get; set; } = null!;
 
     protected override void OnInitialized()
     {
@@ -96,7 +98,7 @@ public partial class Snapshot
             participation.Combination.Number,
             participation.Combination.Athlete.Names
         );
-        if (!_selectedParticipations.Contains(snapshotParticipant))
+        if (!_selectedParticipations.Exists(sp => sp.Number == snapshotParticipant.Number))
         {
             _selectedParticipations.Add(snapshotParticipant);
         }
@@ -114,10 +116,14 @@ public partial class Snapshot
     void SendHandler(string snapshotType)
     {
         //consider backup before clear
+        foreach(var participation in _snapshotParticipations)
+        {
+            NotifyHelper.Inform($"Participation #{participation.Number} is being sent with Timestamp:{participation.Timestamp}");
+        }
         _snapshotParticipations.ForEach(p => _selectedParticipations.Remove(p));
         _snapshotParticipations.Clear();
         NotifyHelper.Success(
-            $"Hello and welcome!\nYes, yes, yes! We are doing it.\n I have received word for {snapshotType}!\n Keep up the good work my man! \n Let's gooooooooooo..."
+            $"Hello and welcome!\nYes, yes, yes! We are doing it.\n I have received word for {snapshotType }!\n Keep up the good work my man! \n Let's gooooooooooo..."
         );
     }
 
@@ -136,8 +142,26 @@ public partial class Snapshot
 
     async Task EditSnapshot(IntermediateSnapshot snapshotParticipant)
     {
-        var model = new SnapshotParticipantUpdateModel(snapshotParticipant);
-        await Dialog.RenderUpdate(model);
-        await Render();
+        GuardHelper.ThrowIfDefault(snapshotParticipant.Timestamp);
+        var time = snapshotParticipant.Timestamp._stamp.TimeOfDay;
+        var model = new TimestampUpdateModel(time);
+        var parameters = new DialogParameters<TimestampUpdateDialog>
+        {
+            { x => x.Model, model }
+        };
+        var options = new DialogOptions()
+        { 
+            Position = DialogPosition.Center
+        };
+        var dialog = await MudDialogService.ShowAsync<TimestampUpdateDialog>("Edit Timestamp", parameters, options);
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled)
+        {
+            var updatedTimestamp = result.Data as TimestampUpdateModel;
+            GuardHelper.ThrowIfDefault(updatedTimestamp);
+            GuardHelper.ThrowIfDefault(updatedTimestamp.TimestampInput);
+            snapshotParticipant.Timestamp = new Timestamp(updatedTimestamp.TimestampInput);
+        }
     }
 }
