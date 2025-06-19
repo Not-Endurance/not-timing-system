@@ -8,7 +8,9 @@
         <tr>
             @foreach (var heading in Headings)
             {
-                <th class="@_class">@heading</th>
+                <th>
+                    <MudText Typo="_typography">@heading</MudText>
+                </th>
             }
         </tr>
     </thead>
@@ -24,7 +26,9 @@
             <tr>
                 @foreach (var cellValue in itemToString.Split("|"))
                 {
-                    <td class="@_class">@cellValue</td>
+                    <td>
+                        <MudText Typo="_typography">@cellValue</MudText>
+                    </td>
                 }
                 @if (CustomCell != default)
                 {

@@ -1,8 +1,10 @@
+using MudBlazor;
+
 namespace Not.Blazor.Components;
 
 public partial class NSimpleTable<T>
 {
-    string _class = "";
+    Typo _typography = Typo.inherit;
 
     [Parameter, EditorRequired]
     public IEnumerable<T> Items { get; set; } = [];
@@ -26,7 +28,7 @@ public partial class NSimpleTable<T>
     {
         if (Mobile)
         {
-            _class = "mobile";
+            _typography = Typo.caption;
         }
     }
 }
