@@ -116,14 +116,16 @@ public partial class Snapshot
     void SendHandler(string snapshotType)
     {
         //consider backup before clear
-        foreach(var participation in _snapshotParticipations)
+        foreach (var participation in _snapshotParticipations)
         {
-            NotifyHelper.Inform($"Participation #{participation.Number} is being sent with Timestamp:{participation.Timestamp}");
+            NotifyHelper.Inform(
+                $"Participation #{participation.Number} is being sent with Timestamp:{participation.Timestamp}"
+            );
         }
         _snapshotParticipations.ForEach(p => _selectedParticipations.Remove(p));
         _snapshotParticipations.Clear();
         NotifyHelper.Success(
-            $"Hello and welcome!\nYes, yes, yes! We are doing it.\n I have received word for {snapshotType }!\n Keep up the good work my man! \n Let's gooooooooooo..."
+            $"Hello and welcome!\nYes, yes, yes! We are doing it.\n I have received word for {snapshotType}!\n Keep up the good work my man! \n Let's gooooooooooo..."
         );
     }
 
@@ -145,14 +147,8 @@ public partial class Snapshot
         GuardHelper.ThrowIfDefault(snapshotParticipant.Timestamp);
         var time = snapshotParticipant.Timestamp._stamp.TimeOfDay;
         var model = new TimestampUpdateModel(time);
-        var parameters = new DialogParameters<TimestampUpdateDialog>
-        {
-            { x => x.Model, model }
-        };
-        var options = new DialogOptions()
-        { 
-            Position = DialogPosition.Center
-        };
+        var parameters = new DialogParameters<TimestampUpdateDialog> { { x => x.Model, model } };
+        var options = new DialogOptions() { Position = DialogPosition.Center };
         var dialog = await MudDialogService.ShowAsync<TimestampUpdateDialog>("Edit Timestamp", parameters, options);
         var result = await dialog.Result;
 

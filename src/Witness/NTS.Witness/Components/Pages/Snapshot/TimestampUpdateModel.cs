@@ -1,15 +1,16 @@
-﻿using NTS.Domain.Objects;
+﻿using System.Text.RegularExpressions;
 using NTS.Blazor.Constants;
-using System.Text.RegularExpressions;
+using NTS.Domain.Objects;
 
 namespace NTS.Witness.Components.Pages.Snapshot;
 
 public class TimestampUpdateModel
 {
-        public TimestampUpdateModel(TimeSpan initial)
-        {
-            TimestampTime = initial;
-        }
+    public TimestampUpdateModel(TimeSpan initial)
+    {
+        TimestampTime = initial;
+    }
+
     //string? _timestampInput;
 
     //public TimestampUpdateModel(Timestamp timestamp)
@@ -31,18 +32,17 @@ public class TimestampUpdateModel
     //        }
     //    }
 
-        public TimeSpan TimestampTime { get; set; }
+    public TimeSpan TimestampTime { get; set; }
 
-        public string TimestampInput
+    public string TimestampInput
+    {
+        get => TimestampTime.ToString(@"hh\:mm\:ss");
+        set
         {
-            get => TimestampTime.ToString(@"hh\:mm\:ss");
-            set
+            if (TimeSpan.TryParseExact(value, @"hh\:mm\:ss", null, out var ts))
             {
-                if (TimeSpan.TryParseExact(value, @"hh\:mm\:ss", null, out var ts))
-                {
-                    TimestampTime = ts;
-                }
-                
+                TimestampTime = ts;
             }
         }
+    }
 }

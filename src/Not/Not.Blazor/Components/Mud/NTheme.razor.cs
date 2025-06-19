@@ -38,9 +38,9 @@ public partial class NTheme
                     FontSize = "12px",
                     FontWeight = 400,
                     LineHeight = 1.0,
-                    LetterSpacing = ".0075em"
-                }
-            }
+                    LetterSpacing = ".0075em",
+                },
+            },
         };
     }
 }

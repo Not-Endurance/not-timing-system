@@ -1,5 +1,4 @@
-﻿
-namespace NTS.Witness.Platforms.Services
+﻿namespace NTS.Witness.Platforms.Services
 {
     public interface IDialService
     {

@@ -35,6 +35,6 @@ public partial class TimestampUpdateDialog
 
     void Cancel()
     {
-         MudDialog.Cancel();
+        MudDialog.Cancel();
     }
 }
