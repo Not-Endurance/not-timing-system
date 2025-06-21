@@ -469,7 +469,7 @@
     <value>Override Start Time for this Participant</value>
   </data>
   <data name="Start_Time_string" xml:space="preserve">
-    <value>Start Time</value>
+    <value>Start</value>
   </data>
   <data name="Max_Speed_string" xml:space="preserve">
     <value>Max Speed </value>
