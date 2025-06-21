@@ -12,10 +12,10 @@
     <LangVersion>preview</LangVersion>
     
     <!-- Display name -->
-    <ApplicationTitle>EMS.Judge</ApplicationTitle>
+    <ApplicationTitle>NTS Judge</ApplicationTitle>
 
     <!-- App Identifier -->
-    <ApplicationId>com.es.ems.judge</ApplicationId>
+    <ApplicationId>com.nts.judge</ApplicationId>
     <ApplicationIdGuid>1E77FD41-17C0-4D75-A08F-00D4390F5485</ApplicationIdGuid>
 
     <!-- Versions -->
@@ -41,17 +41,16 @@
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
-
+	
   <ItemGroup>
     <!-- App Icon -->
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" />
 
     <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
-
+	<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="white" BaseSize="128,128" />
+	  
     <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
-    <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
 
     <!-- Custom Fonts -->
     <MauiFont Include="Resources\Fonts\*" />
@@ -80,6 +79,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <MauiXaml Update="SplashPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
   </ItemGroup>
   
 </Project>
