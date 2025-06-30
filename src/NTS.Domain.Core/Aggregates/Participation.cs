@@ -54,7 +54,7 @@ public class Participation : AggregateRoot, IAggregateRoot
 
     public bool IsComplete()
     {
-        return Phases.All(x => x.IsComplete());
+        return !IsEliminated() && Phases.All(x => x.IsComplete());
     }
 
     public Total? GetTotal()
