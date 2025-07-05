@@ -219,21 +219,25 @@ public class FeiExportBusiness : IFeiExportBusiness
                 ctPhases = [ctPhase];
             }
         }
-        if (participation.Eliminated != null)
+        day.Phase = ctPhases.ToArray();
+        days.Add(day);
+        
+        if (participation.Eliminated == null)
         {
-            var eliminationCode = participation.Eliminated.Code;
-            if (participation.Eliminated is FailedToQualify failedToQualify)
-            {
-                var codes = failedToQualify.FtqCodes.Select(x => x.ToString());
-                eliminationCode = string.Join(" ", codes);
-            }
-            var ctPhase = days.Last().Phase.Last();
-            ctPhase.VetInspection = new ctEnduranceVetInspection
-            {
-                Type = stEnduranceVetTypeCode.Standard,
-                EliminationCode = eliminationCode,
-            };
+            return days;
         }
+        var eliminationCode = participation.Eliminated.Code;
+        if (participation.Eliminated is FailedToQualify failedToQualify)
+        {
+            var codes = failedToQualify.FtqCodes.Select(x => x.ToString());
+            eliminationCode = string.Join(" ", codes);
+        }
+        var lastCtPhase = days.Last().Phase.Last();
+        lastCtPhase.VetInspection = new ctEnduranceVetInspection
+        {
+            Type = stEnduranceVetTypeCode.Standard,
+            EliminationCode = eliminationCode,
+        };
 
         return days;
     }

@@ -1,6 +1,8 @@
-﻿using Not.Application.Behinds.Adapters;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
+using Not.Filesystem;
 using Not.Notify;
 using Not.Safe;
 using NTS.Domain.Core.Aggregates;
@@ -15,6 +17,7 @@ namespace NTS.Judge.Core.Behinds.Adapters;
 
 public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocumentBehind
 {
+    readonly IFileContext _configuration;
     readonly IFeiExportBusiness _feiExportBusiness;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
@@ -22,6 +25,7 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
     readonly IArchiveRepository _archive;
 
     public RanklistBehind(
+        [FromKeyedServices("NDataKey")] IFileContext configuration,
         IFeiExportBusiness feiExportBusiness,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
@@ -29,6 +33,7 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
         IArchiveRepository archive
     )
     {
+        _configuration = configuration;
         _feiExportBusiness = feiExportBusiness;
         _rankings = rankings;
         _events = events;
@@ -88,8 +93,8 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
             return;
         }
         var xml = await _feiExportBusiness.Create(Ranklist);
-        var path = $"C:/Users/User/Documents/fei-exrt-{Ranklist.Name.Replace(" ", "").Replace("*", "")}.xml";
-        await File.WriteAllTextAsync(path, xml);
+        var path = $"{_configuration.Path}/fei-export-{Ranklist.Name.Replace(" ", "").Replace("*", "")}.xml";
+        await FileHelper.WriteAsync(path, xml);
     }
 
     public async Task<RanklistDocument> CreateDocument()
