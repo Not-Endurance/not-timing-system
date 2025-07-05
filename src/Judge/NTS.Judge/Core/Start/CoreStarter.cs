@@ -1,12 +1,15 @@
-﻿using Not.Application.CRUD.Ports;
+﻿using System.Text;
+using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Core.Start.Factories;
-using NTS.Judge.Features;
 using NTS.Judge.Features.Warp;
+using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
+using Official = NTS.Domain.Core.Aggregates.Official;
+using Participation = NTS.Domain.Core.Aggregates.Participation;
 
 namespace NTS.Judge.Core.Start;
 
@@ -42,6 +45,8 @@ public class CoreStarter : ICoreStarter
             throw new DomainException("Cannot start - Event is not configured");
         }
 
+        ValidateFeiConfiguration(setupEvent);
+
         var enduranceEvent = EnduranceEventFactory.Create(setupEvent);
         var officials = setupEvent.Officials.Select(OfficialFactory.Create);
         var (participations, rankings) = CreateParticipationsAndRankings(setupEvent);
@@ -72,7 +77,9 @@ public class CoreStarter : ICoreStarter
         foreach (var setupCompetition in setupEvent.Competitions)
         {
             var (p, rankingEntriesByCategory) = ParticipationAndRankingFactory.Create(setupCompetition, participations);
-            var r = rankingEntriesByCategory.Where(x => x.Value.Any()).Select(x => CreateRanking(setupCompetition, x));
+            var r = rankingEntriesByCategory
+                .Where(x => x.Value.Any())
+                .Select(x => CreateRanking(setupEvent, setupCompetition, x));
 
             participations.AddRange(p);
             rankings.AddRange(r);
@@ -81,20 +88,86 @@ public class CoreStarter : ICoreStarter
     }
 
     Ranking CreateRanking(
+        Domain.Setup.Aggregates.UpcomingEvent setupEvent,
         Domain.Setup.Aggregates.Competition setupCompetition,
         KeyValuePair<AthleteCategory, List<RankingEntry>> entriesByCategory
     )
     {
         var competition = new Competition(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type);
-        return RankingFactory.Create(
+        return new Ranking(
             competition,
             entriesByCategory.Key,
-            entriesByCategory.Value,
+            setupCompetition.FeiId,
             setupCompetition.FeiRule,
-            setupCompetition.FeiEventCode,
             setupCompetition.FeiScheduleNumber,
-            setupCompetition.FeiCategoryEventNumber
+            entriesByCategory.Value
         );
+    }
+
+    void ValidateFeiConfiguration(UpcomingEvent setupEvent)
+    {
+        if (
+            !string.IsNullOrWhiteSpace(setupEvent.FeiId)
+            || !string.IsNullOrWhiteSpace(setupEvent.ShowFeiId)
+            || !string.IsNullOrWhiteSpace(setupEvent.FeiEventCode)
+        )
+        {
+            var validationBuilder = new StringBuilder();
+            if (string.IsNullOrWhiteSpace(setupEvent.FeiId))
+            {
+                validationBuilder.AppendLine(FEI_ID);
+            }
+            if (string.IsNullOrWhiteSpace(setupEvent.FeiEventCode))
+            {
+                validationBuilder.AppendLine(FEI_Event_Code);
+            }
+            if (string.IsNullOrWhiteSpace(setupEvent.ShowFeiId))
+            {
+                validationBuilder.AppendLine(FEI_Show_ID);
+            }
+            foreach (var competition in setupEvent.Competitions)
+            {
+                if (
+                    string.IsNullOrWhiteSpace(competition.FeiId)
+                    && string.IsNullOrWhiteSpace(competition.FeiRule)
+                    && string.IsNullOrWhiteSpace(competition.FeiScheduleNumber)
+                )
+                {
+                    continue;
+                }
+                if (string.IsNullOrWhiteSpace(competition.FeiRule))
+                {
+                    validationBuilder.AppendLine($"{competition.Name}: {FEI_Rule}");
+                }
+                if (string.IsNullOrWhiteSpace(competition.FeiScheduleNumber))
+                {
+                    validationBuilder.AppendLine($"{competition.Name}: {FEI_Schedule_NR}");
+                }
+                foreach (var participation in competition.Participations)
+                {
+                    if (string.IsNullOrWhiteSpace(participation.Combination.Horse.FeiId))
+                    {
+                        validationBuilder.AppendLine(
+                            $"#{participation.Combination.Number}, {participation.Combination.Horse.Name}: {FEI_ID}"
+                        );
+                    }
+                    if (string.IsNullOrWhiteSpace(participation.Combination.Athlete.FeiId))
+                    {
+                        var name = string.Join(' ', participation.Combination.Athlete.Names);
+                        validationBuilder.AppendLine($"#{participation.Combination.Number}, {name}: {FEI_ID}");
+                    }
+                }
+            }
+            var validation = validationBuilder.ToString();
+            if (!string.IsNullOrWhiteSpace(validation))
+            {
+                var message = string.Format(
+                    Missing_FEI_export_configurations_colon__,
+                    Environment.NewLine + validation
+                );
+                throw new DomainException(message);
+            }
+        }
     }
 }
 

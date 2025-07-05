@@ -517,22 +517,19 @@
     <value>No results found in archive</value>
   </data>
   <data name="required_for_FEI_export" xml:space="preserve">
-    <value>(required for FEI export)</value>
+    <value>*required only for FEI export</value>
   </data>
-  <data name="FEI_Show_ID" xml:space="preserve">
-    <value>FEI Show ID</value>
+  <data name="FEI_Show_ID_label" xml:space="preserve">
+    <value>FEI Show ID (See FEI database -&gt; "Show Detail" section -&gt; top; example: "2024_CI_1474")</value>
   </data>
-  <data name="FEI_Event_Code" xml:space="preserve">
-    <value>FEI Event Code</value>
+  <data name="FEI_Event_Code_label" xml:space="preserve">
+    <value>FEI Event Code (See FEI database -&gt; "Event Detail" section -&gt; Event Code (left)</value>
   </data>
-  <data name="FEI_Category_Event_NR" xml:space="preserve">
-    <value>FEI Category Event NR</value>
+  <data name="FEI_Schedule_NR_label" xml:space="preserve">
+    <value>FEI Schedule NR (See FEI Database -&gt; "Competition Detail" section -&gt; "Schedule Competition Nr *"; example: "01")</value>
   </data>
-  <data name="FEI_Schedule_NR" xml:space="preserve">
-    <value>FEI Schedule NR</value>
-  </data>
-  <data name="FEI_Rule" xml:space="preserve">
-    <value>FEI Rule</value>
+  <data name="FEI_Rule_label" xml:space="preserve">
+    <value>FEI Rule (See FEI Database -&gt; "Competition Detail" section -&gt; Rule*; example: E-Comp)</value>
   </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Cannot require Representation without Presentation time</value>
@@ -608,5 +605,35 @@
   </data>
   <data name="Download_string" xml:space="preserve">
     <value>Download Mobile App</value>
+  </data>
+  <data name="FEI_Competition_ID_label" xml:space="preserve">
+    <value>FEI Competition ID (See FEI Database -&gt; "Competition Detail" section -&gt; Top right; example: "2024_CI_1474_E_S_02_01")</value>
+  </data>
+  <data name="FEI_Еvent_ID_Label" xml:space="preserve">
+    <value>FEI Event ID (See FEI Database -&gt; "Event Detail" section -&gt; Top right; example: "2024_CI_1474_E_S_02")</value>
+  </data>
+  <data name="Missing_FEI_export_configurations_colon__" xml:space="preserve">
+    <value>Missing configurations for  FEI export: {0}</value>
+  </data>
+  <data name="FEI_Event_Code" xml:space="preserve">
+    <value>FEI Event Code</value>
+  </data>
+  <data name="FEI_Show_ID" xml:space="preserve">
+    <value>FEI Show ID</value>
+  </data>
+  <data name="FEI_Rule" xml:space="preserve">
+    <value>FEI Rule</value>
+  </data>
+  <data name="FEI_Schedule_NR" xml:space="preserve">
+    <value>FEI Schedule NR</value>
+  </data>
+  <data name="FEI_ID" xml:space="preserve">
+    <value>FEI ID</value>
+  </data>
+  <data name="FEI_Event_ID_label" xml:space="preserve">
+    <value>FEI Event ID (See FEI Database -&gt; "Event Detail" section -&gt; Top right; example: "2024_CI_1474_E_S_02")</value>
+  </data>
+  <data name="Actions_string" xml:space="preserve">
+    <value>Actions</value>
   </data>
 </root>

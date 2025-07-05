@@ -517,22 +517,19 @@
     <value>Няма резултати в архива</value>
   </data>
   <data name="required_for_FEI_export" xml:space="preserve">
-    <value>(задължително за ФЕИ експорт)</value>
+    <value>*задължително само за ФЕИ експорт</value>
   </data>
-  <data name="FEI_Show_ID" xml:space="preserve">
-    <value>FEI Show ID</value>
+  <data name="FEI_Show_ID_label" xml:space="preserve">
+    <value>FEI Шоу ID (От ФЕИ база данни -&gt; "Show Detail" секция -&gt; горе вдясно; пример: "2024_CI_1474)</value>
   </data>
-  <data name="FEI_Event_Code" xml:space="preserve">
-    <value>FEI Event Code</value>
+  <data name="FEI_Event_Code_label" xml:space="preserve">
+    <value>FEI Код на събитие (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; Event Code (в ляво)</value>
   </data>
-  <data name="FEI_Category_Event_NR" xml:space="preserve">
-    <value>FEI Category Event NR</value>
+  <data name="FEI_Schedule_NR_label" xml:space="preserve">
+    <value>ФЕИ Номер на състезание (От ФЕИ база данни -&gt; "Competition Detail" секция -&gt; "Schedule Competition Nr *"; пример: "01")</value>
   </data>
-  <data name="FEI_Schedule_NR" xml:space="preserve">
-    <value>FEI Schedule NR</value>
-  </data>
-  <data name="FEI_Rule" xml:space="preserve">
-    <value>FEI Rule</value>
+  <data name="FEI_Rule_label" xml:space="preserve">
+    <value>ФЕИ Правилник (От ФЕИ база данни -&gt; "Competition Detail" секция-&gt; Rule*; пример: E-Comp)</value>
   </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Не може да поискаме Реинспекция без време на инспекция</value>
@@ -608,5 +605,35 @@
   </data>
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
+  </data>
+  <data name="FEI_Competition_ID_label" xml:space="preserve">
+    <value>FEI Събитие ID (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; горе,  дясно; пример: "2024_CI_1474_E_S_02")</value>
+  </data>
+  <data name="FEI_Еvent_ID_Label" xml:space="preserve">
+    <value>FEI Събитие ID (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; горе в дясно; пример: "2024_CI_1474_E_S_02")</value>
+  </data>
+  <data name="Missing_FEI_export_configurations_colon__" xml:space="preserve">
+    <value>Липсват нужни конфигурации за ФЕИ експорт: {0}</value>
+  </data>
+  <data name="FEI_Event_Code" xml:space="preserve">
+    <value>ФЕИ Код на събитие</value>
+  </data>
+  <data name="FEI_Show_ID" xml:space="preserve">
+    <value>ФЕИ Шоу ID</value>
+  </data>
+  <data name="FEI_Rule" xml:space="preserve">
+    <value>ФЕИ Правилник</value>
+  </data>
+  <data name="FEI_Schedule_NR" xml:space="preserve">
+    <value>ФЕИ Номер на състезание</value>
+  </data>
+  <data name="FEI_ID" xml:space="preserve">
+    <value>ФЕИ ID</value>
+  </data>
+  <data name="FEI_Event_ID_label" xml:space="preserve">
+    <value>ФЕИ Събитие ID (От ФЕИ база данни-&gt; "Event Detail" секция -&gt; горе дясно; пример: "2024_CI_1474_E_S_02")</value>
+  </data>
+  <data name="Actions_string" xml:space="preserve">
+    <value>Действия</value>
   </data>
 </root>
