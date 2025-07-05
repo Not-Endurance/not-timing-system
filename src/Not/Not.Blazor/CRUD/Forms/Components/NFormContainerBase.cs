@@ -7,7 +7,7 @@ public abstract class NFormContainerBase<T, TForm> : NComponent
     where TForm : NForm<T>
 {
     public NDynamic<T, TForm> Form = default!;
-    
+
     public abstract Task Submit();
 
     [Inject]
@@ -15,7 +15,7 @@ public abstract class NFormContainerBase<T, TForm> : NComponent
 
     [Parameter]
     public T Model { get; set; } = default!;
-    
+
     [Parameter]
     public bool DisableBack { get; set; }
 

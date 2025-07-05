@@ -15,7 +15,7 @@ public class RankingsPageBehind : PrintableComponent
     IDialogService DialogService { get; set; } = default!;
 
     public bool HasContent => Service.Ranklist != null;
-    
+
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);
@@ -30,7 +30,7 @@ public class RankingsPageBehind : PrintableComponent
     {
         await SafeHelper.Run(Service.ArchiveEnduranceEvent);
     }
-    
+
     public void ShowProtocol()
     {
         IsProtocolVisible = true;

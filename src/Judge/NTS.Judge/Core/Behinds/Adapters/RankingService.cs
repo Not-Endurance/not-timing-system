@@ -16,7 +16,11 @@ using NTS.Judge.HTTP;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
-public class RankingService : ObservableListBehind<Ranking>, IRankingService, IRankingMenuService, IRanklistDocumentService
+public class RankingService
+    : ObservableListBehind<Ranking>,
+        IRankingService,
+        IRankingMenuService,
+        IRanklistDocumentService
 {
     readonly IFileContext _configuration;
     readonly IFeiExportBusiness _feiExportBusiness;
@@ -31,7 +35,8 @@ public class RankingService : ObservableListBehind<Ranking>, IRankingService, IR
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Official> officials,
-        IArchiveRepository archive)
+        IArchiveRepository archive
+    )
     {
         _configuration = configuration;
         _feiExportBusiness = feiExportBusiness;
@@ -60,18 +65,18 @@ public class RankingService : ObservableListBehind<Ranking>, IRankingService, IR
         await Select(rankings.First());
         return true;
     }
-    
+
     public async Task Select(Ranking ranking)
     {
         var enduranceEvent = await _events.Read(0);
-        var  officials = await _officials.ReadAll();
+        var officials = await _officials.ReadAll();
         GuardHelper.ThrowIfDefault(enduranceEvent);
         SelectedRanking = ranking;
         Ranklist = new Ranklist(SelectedRanking);
         Document = new RanklistDocument(Ranklist, enduranceEvent, officials);
         EmitChange();
     }
-    
+
     public async Task GenerateFeiExport()
     {
         if (Ranklist == null)
@@ -98,7 +103,7 @@ public class RankingService : ObservableListBehind<Ranking>, IRankingService, IR
         var entry = new ArchiveEntry(enduranceEvent, officials, ranklists);
         await _archive.Create(entry);
     }
-    
+
     void UpdateRanklist(ParticipationPayload payload)
     {
         Ranklist?.Update(payload.Participation);

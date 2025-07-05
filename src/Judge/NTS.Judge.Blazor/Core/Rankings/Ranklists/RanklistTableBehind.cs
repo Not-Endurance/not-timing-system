@@ -7,9 +7,9 @@ public class RanklistTableBehind : NComponent
 {
     [Inject]
     IRanklistDocumentService Service { get; set; } = default!;
-    
+
     public Ranklist? Ranklist => Service.Document?.Ranklist;
-    
+
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);

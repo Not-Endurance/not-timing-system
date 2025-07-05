@@ -12,7 +12,7 @@ public class RankingMenuBehind : NComponent
 
     public Ranking? SelectedRanking => Service.SelectedRanking;
     public ObservableList<Ranking> Rankings => Service.Rankings;
-    
+
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);
@@ -24,6 +24,6 @@ public class RankingMenuBehind : NComponent
         {
             return;
         }
-        await SafeHelper.Run(() => Service.Select(ranking)); 
+        await SafeHelper.Run(() => Service.Select(ranking));
     }
 }
