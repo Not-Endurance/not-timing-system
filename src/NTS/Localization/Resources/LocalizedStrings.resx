@@ -633,4 +633,7 @@
   <data name="FEI_Event_ID_label" xml:space="preserve">
     <value>FEI Event ID (See FEI Database -&gt; "Event Detail" section -&gt; Top right; example: "2024_CI_1474_E_S_02")</value>
   </data>
+  <data name="Actions_string" xml:space="preserve">
+    <value>Actions</value>
+  </data>
 </root>

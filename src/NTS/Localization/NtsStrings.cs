@@ -147,6 +147,7 @@ namespace NTS.Localization
         public static string No_results_found_in_archive_string =>
             LocalizeString(nameof(No_results_found_in_archive_string));
         public static string FEI_ID => LocalizeString(nameof(FEI_ID));
+        public static string Actions_string => LocalizeString(nameof(Actions_string));
         public static string FEI_Show_ID_label => LocalizeString(nameof(FEI_Show_ID_label));
         public static string FEI_Show_ID => LocalizeString(nameof(FEI_Show_ID));
         public static string FEI_Event_ID_label => LocalizeString(nameof(FEI_Event_ID_label));

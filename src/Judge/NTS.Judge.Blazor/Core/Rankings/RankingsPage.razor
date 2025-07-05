@@ -7,14 +7,14 @@
 
 <NContent Title="@Ranklist_string"
     Class="@Class"
-    HasContent="_behind.Ranklist != null" 
+    HasContent="Behind.Ranklist != null" 
     EmptyMessage="@The_Competitions_havent_started_yet_string">
     @* // TODO: Add Start button in EmptyContent *@
 
     <Main>
         @if (_showProtocol)
         {
-           <Protocol Ranklist="_behind.Ranklist!" />
+           <Protocol Ranklist="Behind.Ranklist!" />
         }
         else
         {
@@ -23,31 +23,30 @@
     </Main>
 
     <Rightbar>
-        <NTextDivider Text="Export" />
+        <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
+            <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
+                     Color="Color.Primary"
+                     Variant="Variant.Outlined"
+                     Class="sidebar-menu-button align-center"
+                     Style="align-self:auto">
 
-        <MudStack Row="@true">
+                <MudMenuItem OnClick="ShowProtocol">@Protocol_string</MudMenuItem>
+                
+                <MudMenuItem OnClick="ShowRanklist">@Ranklist_string</MudMenuItem>
+            </MudMenu>
 
-            <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
-                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
-                         Color="Color.Primary"
-                         Variant="Variant.Outlined"
-                         Class="sidebar-menu-button align-center"
-                         Style="align-self:auto">
+            <NotButtonPrint OnClick="OpenPrintDialog" />
+        </MudButtonGroup>
+        
+        <NTextDivider Text="@Actions_string" Class="mt-4" />
 
-                    <MudMenuItem OnClick="ShowRanklist">@Ranklist_string</MudMenuItem>
-
-                    <MudMenuItem OnClick="ShowProtocol">@Protocol_string</MudMenuItem>
-                </MudMenu>
-
-                <NotButtonPrint OnClick="OpenPrintDialog" />
-            </MudButtonGroup>
-
-            <NButtonPrimary OnClick="Archive" Text="@Archive_string" />
-
-            <NButtonPrimary OnClick="ExportFei" Text="Export FEI" /> @* TODO: localization *@
+        <MudStack Row Wrap="Wrap.Wrap">
+            <NButtonPrimary OnClick="Archive" Text="@Archive_string"/>
+            
+            <NButtonPrimary OnClick="ExportFei" Text="Export FEI"/> @* TODO: localization *@
         </MudStack>
 
-        <RankingMenu Class="mt-4" />
+        <RankingMenu Class="mt-4"/>
     </Rightbar>
 
 </NContent>
