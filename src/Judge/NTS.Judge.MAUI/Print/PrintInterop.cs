@@ -16,7 +16,10 @@ public class PrintInterop : IPrintInterop
     // I've left it as such as there isn't any realistic chance of dropping Mud any time soon
     public async Task OpenPrintDialog()
     {
-        await using var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts/print-custom.js");
+        await using var module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./scripts/print-custom.js"
+        );
         await module.InvokeVoidAsync("printCustom");
     }
 }

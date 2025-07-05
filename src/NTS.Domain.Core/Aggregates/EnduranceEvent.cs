@@ -8,7 +8,14 @@ namespace NTS.Domain.Core.Aggregates;
 public class EnduranceEvent : AggregateRoot
 {
     [JsonConstructor]
-    EnduranceEvent(int id, PopulatedPlace populatedPlace, EventSpan eventSpan, string? feiShowId, string? feiId, string? feiEventCode)
+    EnduranceEvent(
+        int id,
+        PopulatedPlace populatedPlace,
+        EventSpan eventSpan,
+        string? feiShowId,
+        string? feiId,
+        string? feiEventCode
+    )
         : base(id)
     {
         PopulatedPlace = populatedPlace;
@@ -29,7 +36,14 @@ public class EnduranceEvent : AggregateRoot
         string? feiId,
         string? feiEventCode
     )
-        : this(id, new PopulatedPlace(country, city, place), new EventSpan(startDate, endDate), feiShowId, feiId, feiEventCode) { }
+        : this(
+            id,
+            new PopulatedPlace(country, city, place),
+            new EventSpan(startDate, endDate),
+            feiShowId,
+            feiId,
+            feiEventCode
+        ) { }
 
     public PopulatedPlace PopulatedPlace { get; set; }
     public EventSpan EventSpan { get; }

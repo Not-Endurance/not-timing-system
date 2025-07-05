@@ -44,7 +44,7 @@ public class CoreStarter : ICoreStarter
             // TODO: Create ValidationException containing localization logic and inherit form it in DomainException. Use that here instead
             throw new DomainException("Cannot start - Event is not configured");
         }
-        
+
         ValidateFeiConfiguration(setupEvent);
 
         var enduranceEvent = EnduranceEventFactory.Create(setupEvent);
@@ -77,7 +77,9 @@ public class CoreStarter : ICoreStarter
         foreach (var setupCompetition in setupEvent.Competitions)
         {
             var (p, rankingEntriesByCategory) = ParticipationAndRankingFactory.Create(setupCompetition, participations);
-            var r = rankingEntriesByCategory.Where(x => x.Value.Any()).Select(x => CreateRanking(setupEvent, setupCompetition, x));
+            var r = rankingEntriesByCategory
+                .Where(x => x.Value.Any())
+                .Select(x => CreateRanking(setupEvent, setupCompetition, x));
 
             participations.AddRange(p);
             rankings.AddRange(r);
@@ -104,7 +106,11 @@ public class CoreStarter : ICoreStarter
 
     void ValidateFeiConfiguration(UpcomingEvent setupEvent)
     {
-        if (!string.IsNullOrWhiteSpace(setupEvent.FeiId) || !string.IsNullOrWhiteSpace(setupEvent.ShowFeiId) || !string.IsNullOrWhiteSpace(setupEvent.FeiEventCode))
+        if (
+            !string.IsNullOrWhiteSpace(setupEvent.FeiId)
+            || !string.IsNullOrWhiteSpace(setupEvent.ShowFeiId)
+            || !string.IsNullOrWhiteSpace(setupEvent.FeiEventCode)
+        )
         {
             var validationBuilder = new StringBuilder();
             if (string.IsNullOrWhiteSpace(setupEvent.FeiId))
@@ -121,13 +127,17 @@ public class CoreStarter : ICoreStarter
             }
             foreach (var competition in setupEvent.Competitions)
             {
-                if (string.IsNullOrWhiteSpace(competition.FeiId) && string.IsNullOrWhiteSpace(competition.FeiRule) && string.IsNullOrWhiteSpace(competition.FeiScheduleNumber))
+                if (
+                    string.IsNullOrWhiteSpace(competition.FeiId)
+                    && string.IsNullOrWhiteSpace(competition.FeiRule)
+                    && string.IsNullOrWhiteSpace(competition.FeiScheduleNumber)
+                )
                 {
                     continue;
                 }
                 if (string.IsNullOrWhiteSpace(competition.FeiRule))
                 {
-                    validationBuilder.AppendLine($"{competition.Name}: {FEI_Rule}");        
+                    validationBuilder.AppendLine($"{competition.Name}: {FEI_Rule}");
                 }
                 if (string.IsNullOrWhiteSpace(competition.FeiScheduleNumber))
                 {
@@ -137,7 +147,9 @@ public class CoreStarter : ICoreStarter
                 {
                     if (string.IsNullOrWhiteSpace(participation.Combination.Horse.FeiId))
                     {
-                        validationBuilder.AppendLine($"#{participation.Combination.Number}, {participation.Combination.Horse.Name}: {FEI_ID}");
+                        validationBuilder.AppendLine(
+                            $"#{participation.Combination.Number}, {participation.Combination.Horse.Name}: {FEI_ID}"
+                        );
                     }
                     if (string.IsNullOrWhiteSpace(participation.Combination.Athlete.FeiId))
                     {
@@ -149,7 +161,10 @@ public class CoreStarter : ICoreStarter
             var validation = validationBuilder.ToString();
             if (!string.IsNullOrWhiteSpace(validation))
             {
-                var message = string.Format(Missing_FEI_export_configurations_colon__, Environment.NewLine + validation);
+                var message = string.Format(
+                    Missing_FEI_export_configurations_colon__,
+                    Environment.NewLine + validation
+                );
                 throw new DomainException(message);
             }
         }

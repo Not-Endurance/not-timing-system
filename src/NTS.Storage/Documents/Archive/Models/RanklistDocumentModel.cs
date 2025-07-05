@@ -35,14 +35,7 @@ public class RanklistDocumentModel
     {
         var entries = Entries.Select(x => x.ToDomain());
         var competition = new Competition(Name, Ruleset, Type);
-        var ranking = new Ranking(
-            competition,
-            Category,
-            CompetitionFeiId,
-            FeiRule,
-            FeiScheduleNumber,
-            entries
-        );
+        var ranking = new Ranking(competition, Category, CompetitionFeiId, FeiRule, FeiScheduleNumber, entries);
         return new Ranklist(ranking, entries);
     }
 }

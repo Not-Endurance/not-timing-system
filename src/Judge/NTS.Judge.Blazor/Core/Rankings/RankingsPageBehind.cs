@@ -1,7 +1,6 @@
 using MudBlazor;
 using Not.Blazor.Components;
 using Not.Safe;
-using NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 
 namespace NTS.Judge.Blazor.Core.Rankings;
 
@@ -20,11 +19,6 @@ public class RankingsPageBehind : PrintableComponent
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);
-    }
-
-    public async Task OpenCustomRanklistDialog()
-    {
-        await DialogService.ShowAsync<CreateCustomRankingDialog>();
     }
 
     public async Task GenerateFeiExport()

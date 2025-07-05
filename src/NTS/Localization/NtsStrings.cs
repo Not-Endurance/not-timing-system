@@ -151,7 +151,8 @@ namespace NTS.Localization
         public static string FEI_Show_ID_label => LocalizeString(nameof(FEI_Show_ID_label));
         public static string FEI_Show_ID => LocalizeString(nameof(FEI_Show_ID));
         public static string FEI_Event_ID_label => LocalizeString(nameof(FEI_Event_ID_label));
-        public static string Missing_FEI_export_configurations_colon__ => LocalizeString(nameof(Missing_FEI_export_configurations_colon__));
+        public static string Missing_FEI_export_configurations_colon__ =>
+            LocalizeString(nameof(Missing_FEI_export_configurations_colon__));
         public static string FEI_Rule_label => LocalizeString(nameof(FEI_Rule_label));
         public static string FEI_Rule => LocalizeString(nameof(FEI_Rule));
         public static string FEI_Event_Code_label => LocalizeString(nameof(FEI_Event_Code_label));

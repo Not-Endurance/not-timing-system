@@ -41,8 +41,15 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         _combinations = combinations.ToList();
     }
 
-    public UpcomingEvent(string? name, string? place, Country? country, string? showFeiId, string? feiId, string? feiEventCode)
-        : this(GenerateId(), name, place, country, showFeiId, feiId, feiEventCode,[], [], [], []) { }
+    public UpcomingEvent(
+        string? name,
+        string? place,
+        Country? country,
+        string? showFeiId,
+        string? feiId,
+        string? feiEventCode
+    )
+        : this(GenerateId(), name, place, country, showFeiId, feiId, feiEventCode, [], [], [], []) { }
 
     public string Name { get; }
     public string Place { get; }
