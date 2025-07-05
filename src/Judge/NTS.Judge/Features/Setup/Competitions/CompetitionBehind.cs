@@ -48,9 +48,10 @@ public class CompetitionBehind : CrudChildBehind<Competition, CompetitionFormMod
         ValidateDateTime(model);
         var date = (DateTime)model.Date!;
         var startTime = date.ToDateTimeOffset().Add((TimeSpan)model.Time!);
-        var compulsoryThreshold = model.CompulsoryThresholdMinutes != null
-            ? TimeSpan.FromMinutes(model.CompulsoryThresholdMinutes.Value)
-            : (TimeSpan?)null; 
+        var compulsoryThreshold =
+            model.CompulsoryThresholdMinutes != null
+                ? TimeSpan.FromMinutes(model.CompulsoryThresholdMinutes.Value)
+                : (TimeSpan?)null;
         return new Competition(
             model.Id,
             model.Name,

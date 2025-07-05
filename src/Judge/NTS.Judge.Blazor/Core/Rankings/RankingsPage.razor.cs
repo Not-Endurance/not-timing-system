@@ -24,7 +24,7 @@ public partial class RankingsPage : PrintableComponent
     {
         await SafeHelper.Run(Behind.Archive);
     }
-    
+
     void ShowProtocol()
     {
         _showProtocol = true;

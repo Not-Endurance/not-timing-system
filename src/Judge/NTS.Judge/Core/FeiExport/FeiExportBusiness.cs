@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
@@ -8,8 +10,6 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
-using System.Text;
-using System.Xml;
 
 namespace NTS.Judge.Core.FeiExport;
 
@@ -91,11 +91,7 @@ public class FeiExportBusiness : IFeiExportBusiness
             {
                 Show = new ctShowResult
                 {
-                    Venue = new ctVenue
-                    {
-                        Name = enduranceEvent.PopulatedPlace.Location,
-                        Country = countryCode,
-                    },
+                    Venue = new ctVenue { Name = enduranceEvent.PopulatedPlace.Location, Country = countryCode },
                     EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
                     StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
                     EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
@@ -220,7 +216,7 @@ public class FeiExportBusiness : IFeiExportBusiness
         }
         day.Phase = ctPhases.ToArray();
         days.Add(day);
-        
+
         if (participation.Eliminated == null)
         {
             return days;
@@ -258,11 +254,7 @@ public class FeiExportBusiness : IFeiExportBusiness
     {
         var serializer = new XmlSerializer(typeof(HorseSport));
         using var memoryStream = new MemoryStream();
-        var settings = new XmlWriterSettings
-        {
-            Encoding = Encoding.UTF8,
-            Indent = true
-        };
+        var settings = new XmlWriterSettings { Encoding = Encoding.UTF8, Indent = true };
         using var writer = XmlWriter.Create(memoryStream, settings);
         serializer.Serialize(writer, horseSport);
         return Encoding.UTF8.GetString(memoryStream.ToArray());
