@@ -35,7 +35,15 @@ public class FeiExportBusiness : IFeiExportBusiness
         var ranking = ranklist.Ranking;
         if (string.IsNullOrWhiteSpace(enduranceEvent.FeiShowId))
         {
-            throw new DomainException("Missing Show FEIID");
+            throw new DomainException("Missing Show FEI ID");
+        }
+        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiId))
+        {
+            throw new DomainException("Missing Event FEI ID");
+        }
+        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiEventCode))
+        {
+            throw new DomainException("Missing FEI Event code");
         }
         if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace?.Location))
         {
@@ -45,9 +53,9 @@ public class FeiExportBusiness : IFeiExportBusiness
         {
             throw new DomainException("Missing ranking Name");
         }
-        if (string.IsNullOrEmpty(ranking.FeiCategoryEventNumber))
+        if (string.IsNullOrEmpty(ranking.CompetitionFeiId))
         {
-            throw new DomainException("Missing FEI Category Event NR");
+            throw new DomainException("Missing FEI Competition ID");
         }
         if (string.IsNullOrEmpty(ranking.FeiScheduleNumber))
         {
@@ -57,28 +65,19 @@ public class FeiExportBusiness : IFeiExportBusiness
         {
             throw new DomainException("Missing FEI Rule");
         }
-        if (string.IsNullOrEmpty(ranking.FeiEventCode))
-        {
-            throw new DomainException("Missing FEI Event Code");
-        }
-        if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace.Country.NfCode))
-        {
-            throw new DomainException(
-                $"Country '{enduranceEvent.PopulatedPlace.Country}' does not have 'NF' code. Contact developer"
-            );
-        }
 
-        var feiCategory = GetFeiCategory(ranking.Category);
-        var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{feiCategory}_{ranking.FeiCategoryEventNumber}";
+        // IsoCode is not accepted by FEI, but they have representatives which can correct that in case a country
+        // without NF code is used. This shouldn't happen anyway
+        var countryCode = enduranceEvent.PopulatedPlace.Country.NfCode ?? enduranceEvent.PopulatedPlace.Country.IsoCode;
         var ctEnduranceCompetition = CreateCompetitions(enduranceEvent!, ranklist);
         var ctEnduranceEvent = new ctEnduranceEvent
         {
-            FEIID = competitionFeiId,
-            Code = ranking.FeiEventCode,
+            FEIID = enduranceEvent.FeiId,
+            Code = enduranceEvent.FeiEventCode,
             StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
             EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
-            NF = enduranceEvent.PopulatedPlace.Country.NfCode,
-            Competitions = new ctEnduranceCompetition[] { ctEnduranceCompetition },
+            NF = countryCode,
+            Competitions = [ctEnduranceCompetition],
         };
         var horseSport = new HorseSport()
         {
@@ -95,7 +94,7 @@ public class FeiExportBusiness : IFeiExportBusiness
                     Venue = new ctVenue
                     {
                         Name = enduranceEvent.PopulatedPlace.Location,
-                        Country = enduranceEvent.PopulatedPlace.Country.NfCode,
+                        Country = countryCode,
                     },
                     EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
                     StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
@@ -110,9 +109,7 @@ public class FeiExportBusiness : IFeiExportBusiness
     ctEnduranceCompetition CreateCompetitions(EnduranceEvent enduranceEvent, Ranklist ranklist)
     {
         var ranking = ranklist.Ranking;
-        var categoryString = GetFeiCategory(ranking.Category);
-        var competitionFeiId =
-            $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}_{ranking.FeiScheduleNumber}";
+        var competitionFeiId = ranklist.Ranking.CompetitionFeiId!;
         var ctCompetition = new ctEnduranceCompetition
         {
             FEIID = competitionFeiId,
@@ -155,7 +152,7 @@ public class FeiExportBusiness : IFeiExportBusiness
                     AthleteNumber = entry.Participation.Combination.Number,
                     FirstName = athlete.Names.Names.First(),
                     FamilyName = athlete.Names.Names.Last(),
-                    CompetingFor = athlete.Country.NfCode!,
+                    CompetingFor = athlete.Country.NfCode ?? athlete.Country.IsoCode,
                 },
                 Horse = new ctHorse { FEIID = horse.FeiId!, Name = horse.Name },
                 Complement = new ctEnduranceComplement { BestCondition = false },

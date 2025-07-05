@@ -30,10 +30,9 @@ public class CompetitionFormModel : IFormModel<Competition>
         get => UseCompulsoryThreshold ? _requiredInspectionCompulsoryThreshold : null;
         set => _requiredInspectionCompulsoryThreshold = value;
     }
+    public string? FeiId { get; set; }
     public string? FeiRule { get; set; }
-    public string? FeiEventCode { get; set; }
     public string? FeiScheduleNumber { get; set; }
-    public string? FeiCategoryEventNumber { get; set; }
     public IReadOnlyCollection<Phase> Phases { get; private set; } = [];
     public IReadOnlyCollection<Participation> Participations { get; private set; } = [];
 
@@ -49,9 +48,8 @@ public class CompetitionFormModel : IFormModel<Competition>
         Participations = competition.Participations;
         CompulsoryThresholdMinutes = competition.CompulsoryThresholdSpan?.Minutes;
         UseCompulsoryThreshold = competition.CompulsoryThresholdSpan != null;
+        FeiId = competition.FeiId;
         FeiRule = competition.FeiRule;
-        FeiEventCode = competition.FeiEventCode;
         FeiScheduleNumber = competition.FeiScheduleNumber;
-        FeiCategoryEventNumber = competition.FeiCategoryEventNumber;
     }
 }

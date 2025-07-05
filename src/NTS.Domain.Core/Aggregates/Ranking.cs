@@ -14,10 +14,9 @@ public class Ranking : AggregateRoot
         CompetitionRuleset ruleset,
         CompetitionType type,
         AthleteCategory category,
+        string? competitionFeiId,
         string? feiRule,
-        string? feiEventCode,
         string? feiScheduleNumber,
-        string? feiCategoryEventNumber,
         ReadOnlyCollection<RankingEntry> entries
     )
         : base(id)
@@ -26,20 +25,18 @@ public class Ranking : AggregateRoot
         Ruleset = ruleset;
         Category = category;
         Type = type;
+        CompetitionFeiId = competitionFeiId;
         FeiRule = feiRule;
-        FeiEventCode = feiEventCode;
         FeiScheduleNumber = feiScheduleNumber;
-        FeiCategoryEventNumber = feiCategoryEventNumber;
         Entries = entries;
     }
 
     public Ranking(
         Competition competition,
         AthleteCategory category,
+        string? competitionFeiId,
         string? feiRule,
-        string? feiEventCode,
         string? feiScheduleNumber,
-        string? feiCategoryEventNumber,
         IEnumerable<RankingEntry> entries
     )
         : this(
@@ -48,10 +45,9 @@ public class Ranking : AggregateRoot
             competition.Ruleset,
             competition.Type,
             category,
+            competitionFeiId,
             feiRule,
-            feiEventCode,
             feiScheduleNumber,
-            feiCategoryEventNumber,
             new(entries.ToList())
         ) { }
 
@@ -59,10 +55,9 @@ public class Ranking : AggregateRoot
     public CompetitionRuleset Ruleset { get; }
     public CompetitionType Type { get; }
     public AthleteCategory Category { get; }
+    public string? CompetitionFeiId { get; }
     public string? FeiRule { get; }
-    public string? FeiEventCode { get; }
     public string? FeiScheduleNumber { get; }
-    public string? FeiCategoryEventNumber { get; }
     public ReadOnlyCollection<RankingEntry> Entries { get; }
 
     public override string ToString()

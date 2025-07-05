@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Not.Random;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
@@ -20,6 +22,8 @@ public class UpcomingEventDocument : Document
             Place = evt.Place,
             Country = CountryDocument.Create(evt.Country),
             ShowFeiId = evt.ShowFeiId,
+            FeiId = evt.FeiId,
+            FeiEventCode = evt.FeiEventCode,
             Competitions = evt.Competitions.Select(CompetitionModel.Create).ToArray(),
             Officials = evt.Officials.Select(OfficialDocument.Create).ToArray(),
             Loops = evt.Loops.Select(LoopModel.Create).ToArray(),
@@ -30,6 +34,8 @@ public class UpcomingEventDocument : Document
     public string Place { get; init; } = default!;
     public CountryDocument Country { get; init; } = default!;
     public string? ShowFeiId { get; init; }
+    public string? FeiId { get; init; }
+    public string? FeiEventCode { get; init; }
     public CompetitionModel[] Competitions { get; init; } = default!;
     public OfficialDocument[] Officials { get; init; } = default!;
     public LoopModel[] Loops { get; init; } = default!;
@@ -38,12 +44,14 @@ public class UpcomingEventDocument : Document
 
     public UpcomingEvent ToDomain()
     {
-        return UpcomingEvent.Update(
+        return new UpcomingEvent(
             Id,
             Name,
             Place,
             Country.ToDomain(),
             ShowFeiId,
+            FeiId,
+            FeiEventCode,
             Competitions.Select(x => x.ToSetupDomain()),
             Officials.Select(x => x.ToSetupDomain()),
             Loops.Select(x => x.ToSetupDomain()),
@@ -68,10 +76,9 @@ public class UpcomingEventDocument : Document
                 Ruleset = competition.Ruleset,
                 Start = competition.Start,
                 CompulsoryThreshold = competition.CompulsoryThresholdSpan,
+                FeiId = competition.FeiId,
                 FeiRule = competition.FeiRule,
-                FeiEventCode = competition.FeiEventCode,
                 FeiScheduleNumber = competition.FeiScheduleNumber,
-                FeiCategoryEventNumber = competition.FeiCategoryEventNumber,
                 Phases = competition.Phases.Select(PhaseModel.Create).ToArray(),
                 Participations = competition.Participations.Select(ParticipationModel.Create).ToArray(),
             };
@@ -83,10 +90,9 @@ public class UpcomingEventDocument : Document
         public CompetitionRuleset Ruleset { get; init; }
         public DateTimeOffset Start { get; init; }
         public TimeSpan? CompulsoryThreshold { get; init; }
+        public string? FeiId { get; init; }
         public string? FeiRule { get; init; }
-        public string? FeiEventCode { get; init; }
         public string? FeiScheduleNumber { get; init; }
-        public string? FeiCategoryEventNumber { get; init; }
         public PhaseModel[] Phases { get; init; } = default!;
         public ParticipationModel[] Participations { get; init; } = default!;
 
@@ -99,10 +105,9 @@ public class UpcomingEventDocument : Document
                 Ruleset,
                 Start,
                 CompulsoryThreshold,
+                FeiId,
                 FeiRule,
-                FeiEventCode,
                 FeiScheduleNumber,
-                FeiCategoryEventNumber,
                 Phases.Select(x => x.ToSetupDomain()),
                 Participations.Select(x => x.ToSetupDomain())
             );

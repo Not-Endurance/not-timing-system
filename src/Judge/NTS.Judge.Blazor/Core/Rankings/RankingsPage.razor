@@ -7,14 +7,14 @@
 
 <NContent Title="@Ranklist_string"
     Class="@Class"
-    HasContent="Behind.Ranklist != null" 
+    HasContent="_behind.Ranklist != null" 
     EmptyMessage="@The_Competitions_havent_started_yet_string">
     @* // TODO: Add Start button in EmptyContent *@
 
     <Main>
         @if (_showProtocol)
         {
-           <Protocol Ranklist="Behind.Ranklist!" />
+           <Protocol Ranklist="_behind.Ranklist!" />
         }
         else
         {
@@ -42,9 +42,9 @@
                 <NotButtonPrint OnClick="OpenPrintDialog" />
             </MudButtonGroup>
 
-            <NButtonPrimary OnClick="Behind.Archive" Text="@Archive_string" />
+            <NButtonPrimary OnClick="Archive" Text="@Archive_string" />
 
-            <NButtonPrimary OnClick="Behind.ExportFei" Text="Export FEI" /> @* TODO: localization *@
+            <NButtonPrimary OnClick="ExportFei" Text="Export FEI" /> @* TODO: localization *@
         </MudStack>
 
         <RankingMenu Class="mt-4" />
