@@ -1,61 +1,60 @@
-﻿@using NTS.Domain.Core.Aggregates
-@using NTS.Domain.Core.Aggregates.Participations
-@using NTS.Domain.Objects
+﻿@inherits RanklistRowBehind
 
-@inherits NComponent
-
-@if (_phases != null)
+@if (!Entry.Participation.Phases.Any())
 {
-    <RanklistTableFrame Class="printable">
-        <One>
-            @if (_eliminated != null)
-            {
-                <MudText Typo="Typo.caption" Class="mr-4 pl-2" Style="width: 1rem;">@_eliminated</MudText>
-                <MudIcon Icon="@Icons.Material.TwoTone.Flag" Color="Color.Error" Size="Size.Large" />
-            }
-            else if (_phases.Any(x => !x.IsComplete()))
-            {
-                <MudIcon Icon="@Icons.Material.TwoTone.Flag" Color="Color.Default" Size="Size.Large" />
-            }
-            else
-            {
-                <MudText Class="mr-4 pl-2" Style="width: 1rem;">@_rank</MudText>
-                <MudIcon Icon="@Icons.Material.Filled.Flag" Color="Color.Success" Size="Size.Large" />
-            }
-        </One>
-        <Two>
-            <MudStack>
-                <MudItem>
-                    <MudText><strong>@_combination.Number</strong> @_combination.Athlete</MudText>
-                </MudItem>
-                <MudItem>
-                    <MudText>@_combination.Horse</MudText>
-                </MudItem>
-            </MudStack>
-        </Two>
-        <Three>
-            @_phases.Current.ArriveTime
-        </Three>
-        <Four>
-            @_total?.AverageSpeed
-        </Four>
-        <Five>
-            @_total?.RideInterval
-        </Five>
-        <Six>
-            @_total?.RecoveryIntervalWithoutFinal
-        </Six>
-        <Seven>
-            @_totalInterval
-        </Seven>
-        <Eight>
-            <MudIcon Icon="@(_expanded ? Icons.Material.Filled.KeyboardArrowDown : @Icons.Material.Filled.KeyboardArrowRight)"
-                     @onclick="Toggle"
-                     Style="width:100%; cursor:pointer;" />
-        </Eight>
-    </RanklistTableFrame>
-    <MudCollapse Expanded="_expanded">
-        <MudDivider />
-        <ParticipationTable Number="_combination.Number" Phases="_phases" />
-    </MudCollapse>
+    return;
 }
+
+<RanklistTableFrame Class="printable">
+    <One>
+        @if (Eliminated != null)
+        {
+            <MudText Typo="Typo.caption" Class="mr-4 pl-2" Style="width: 1rem;">@Eliminated</MudText>
+            <MudIcon Icon="@Icons.Material.TwoTone.Flag" Color="Color.Error" Size="Size.Large" />
+        }
+        else if (Phases.Any(x => !x.IsComplete()))
+        {
+            <MudIcon Icon="@Icons.Material.TwoTone.Flag" Color="Color.Default" Size="Size.Large" />
+        }
+        else
+        {
+            <MudText Class="mr-4 pl-2" Style="width: 1rem;">@Rank</MudText>
+            <MudIcon Icon="@Icons.Material.Filled.Flag" Color="Color.Success" Size="Size.Large" />
+        }
+    </One>
+    <Two>
+        <MudStack>
+            <MudItem>
+                <MudText><strong>@Combination.Number</strong> @Combination.Athlete</MudText>
+            </MudItem>
+            <MudItem>
+                <MudText>@Combination.Horse</MudText>
+            </MudItem>
+        </MudStack>
+    </Two>
+    <Three>
+        @Phases.Current.ArriveTime
+    </Three>
+    <Four>
+        @Total?.AverageSpeed
+    </Four>
+    <Five>
+        @Total?.RideInterval
+    </Five>
+    <Six>
+        @Total?.RecoveryIntervalWithoutFinal
+    </Six>
+    <Seven>
+        @TotalInterval
+    </Seven>
+    <Eight>
+        <MudIcon Icon="@(Expanded ? Icons.Material.Filled.KeyboardArrowDown : @Icons.Material.Filled.KeyboardArrowRight)"
+                 @onclick="Toggle"
+                 Style="width:100%; cursor:pointer;" />
+    </Eight>
+</RanklistTableFrame>
+
+<MudCollapse Expanded="Expanded">
+    <MudDivider />
+    <ParticipationTable Number="Combination.Number" Phases="Phases" />
+</MudCollapse>

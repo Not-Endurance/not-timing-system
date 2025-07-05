@@ -3,18 +3,18 @@
 @using NTS.Judge.Blazor.Core.Rankings.Ranklists
 
 @attribute [Route(RANKLIST_PAGE)]
-@inherits PrintableComponent
+@inherits RankingsPageBehind
 
 <NContent Title="@Ranklist_string"
     Class="@Class"
-    HasContent="Behind.Ranklist != null" 
+    HasContent="@HasContent" 
     EmptyMessage="@The_Competitions_havent_started_yet_string">
     @* // TODO: Add Start button in EmptyContent *@
 
     <Main>
-        @if (_showProtocol)
+        @if (IsProtocolVisible)
         {
-           <Protocol Ranklist="Behind.Ranklist!" />
+           <Protocol />
         }
         else
         {
@@ -41,9 +41,11 @@
         <NTextDivider Text="@Actions_string" Class="mt-4" />
 
         <MudStack Row Wrap="Wrap.Wrap">
-            <NButtonPrimary OnClick="Archive" Text="@Archive_string"/>
+            <NButtonPrimary OnClick="ArchiveEnduranceEvent" Text="@Archive_string"/>
             
-            <NButtonPrimary OnClick="ExportFei" Text="Export FEI"/> @* TODO: localization *@
+            <NButtonPrimary OnClick="GenerateFeiExport" Text="Export FEI"/> @* TODO: localization *@
+            
+            <NButtonPrimary OnClick="OpenCustomRanklistDialog" Text="Custom Dialog"/> @* TODO: localization *@
         </MudStack>
 
         <RankingMenu Class="mt-4"/>

@@ -1,24 +1,19 @@
 ﻿@using NTS.Domain.Core.Aggregates
-@using Not.Events
-
-@inherits NComponent;
+@inherits RankingMenuBehind;
 
 @* //TODO: probably extract this chipset into NotChipGroup component or something similar. Also used in DashboardComponent *@
-@if (Behind.Ranklist != null)
+@if (SelectedRanking != null)
 {
-    <MudChipSet T="int" 
-        SelectedValue="Behind.Ranklist.RankingId" 
-        SelectedValueChanged="Behind.SelectRanking" 
-        Class="@Class" 
-        Style="@Style">
+    <MudChipSet T="Ranking" SelectedValue="@SelectedRanking" SelectedValueChanged="Select" Class="@Class" Style="@Style">
 
-        @foreach (var grouping in _rankingsByDistance)
+        @foreach (var grouping in Rankings.GroupBy(x => x.Name))
         {
             <NTextDivider Text="@grouping.Key" />
             @foreach (var ranking in grouping.OrderBy(x => x.Category))
             {
-                <MudChip Text="@ranking.Category.ToString()" Value="@ranking.Id" Color="Color.Primary" Style="min-width: 1rem" />
+                <MudChip Text="@ranking.Category.ToString()" Value="@ranking" Color="Color.Primary" Style="min-width: 1rem" />
             }
         }
-    </MudChipSet>
+    </MudChipSet>    
 }
+
