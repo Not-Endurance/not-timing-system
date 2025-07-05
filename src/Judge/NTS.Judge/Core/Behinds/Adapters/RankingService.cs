@@ -4,18 +4,23 @@ using Not.Application.CRUD.Ports;
 using Not.Exceptions;
 using Not.Filesystem;
 using Not.Notify;
-using Not.Safe;
+using Not.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Blazor.Core.Rankings;
+using NTS.Judge.Blazor.Core.Rankings.Menu;
 using NTS.Judge.Core.FeiExport;
 using NTS.Judge.HTTP;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
-public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocumentBehind
+public class RankingService
+    : ObservableListBehind<Ranking>,
+        IRankingService,
+        IRankingMenuService,
+        IRanklistDocumentService
 {
     readonly IFileContext _configuration;
     readonly IFeiExportBusiness _feiExportBusiness;
@@ -24,7 +29,7 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
     readonly IRepository<Official> _officials;
     readonly IArchiveRepository _archive;
 
-    public RanklistBehind(
+    public RankingService(
         [FromKeyedServices("NDataKey")] IFileContext configuration,
         IFeiExportBusiness feiExportBusiness,
         IRepository<Ranking> rankings,
@@ -44,33 +49,46 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
         Participation.RESTORED_EVENT.Subscribe(UpdateRanklist);
     }
 
-    public Ranklist? Ranklist { get; private set; }
-
-    public int? ArchiveId { get; set; }
+    public Ranking? SelectedRanking { get; set; }
+    public Ranklist? Ranklist { get; set; }
+    public RanklistDocument? Document { get; private set; }
+    public ObservableList<Ranking> Rankings => ObservableList;
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
-        var ranking = await _rankings.Read(x => true);
-        if (ranking == null)
+        var rankings = await _rankings.ReadAll();
+        if (!rankings.Any())
         {
             return false;
         }
-        Ranklist = new Ranklist(ranking);
+        Rankings.AddRange(rankings);
+        await Select(rankings.First());
         return true;
     }
 
-    public async Task<IEnumerable<Ranking>> GetRankings()
+    public async Task Select(Ranking ranking)
     {
-        return await SafeHelper.Run(SafeGetRankings) ?? [];
+        var enduranceEvent = await _events.Read(0);
+        var officials = await _officials.ReadAll();
+        GuardHelper.ThrowIfDefault(enduranceEvent);
+        SelectedRanking = ranking;
+        Ranklist = new Ranklist(SelectedRanking);
+        Document = new RanklistDocument(Ranklist, enduranceEvent, officials);
+        EmitChange();
     }
 
-    public async Task SelectRanking(int id)
+    public async Task GenerateFeiExport()
     {
-        Task action() => SafeSelectRanking(id);
-        await SafeHelper.Run(action);
+        if (Ranklist == null)
+        {
+            return;
+        }
+        var xml = await _feiExportBusiness.Create(Ranklist);
+        var path = $"{_configuration.Path}/fei-export-{Ranklist.Name.Replace(" ", "").Replace("*", "")}.xml";
+        await FileHelper.WriteAsync(path, xml);
     }
 
-    public async Task Archive()
+    public async Task ArchiveEnduranceEvent()
     {
         var enduranceEvent = await _events.Read(0);
         if (enduranceEvent == null)
@@ -84,39 +102,6 @@ public class RanklistBehind : ObservableBehind, IRankingBehind, IRankingDocument
 
         var entry = new ArchiveEntry(enduranceEvent, officials, ranklists);
         await _archive.Create(entry);
-    }
-
-    public async Task ExportFei()
-    {
-        if (Ranklist == null)
-        {
-            return;
-        }
-        var xml = await _feiExportBusiness.Create(Ranklist);
-        var path = $"{_configuration.Path}/fei-export-{Ranklist.Name.Replace(" ", "").Replace("*", "")}.xml";
-        await FileHelper.WriteAsync(path, xml);
-    }
-
-    public async Task<RanklistDocument> CreateDocument()
-    {
-        var enduranceEvent = await _events.Read(0);
-        GuardHelper.ThrowIfDefault(enduranceEvent);
-        var officials = await _officials.ReadAll();
-        GuardHelper.ThrowIfDefault(Ranklist);
-        return new RanklistDocument(Ranklist, enduranceEvent, officials);
-    }
-
-    async Task<IEnumerable<Ranking>> SafeGetRankings()
-    {
-        return await _rankings.ReadAll();
-    }
-
-    async Task SafeSelectRanking(int id)
-    {
-        var ranking = await _rankings.Read(id);
-        GuardHelper.ThrowIfDefault(ranking);
-        Ranklist = new Ranklist(ranking);
-        EmitChange();
     }
 
     void UpdateRanklist(ParticipationPayload payload)

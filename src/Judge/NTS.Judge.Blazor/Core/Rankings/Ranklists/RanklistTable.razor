@@ -1,57 +1,54 @@
-﻿@using NTS.Domain.Core.Objects
+﻿@inherits RanklistTableBehind
 
-@inherits NComponent
-
-@if (Behind.Ranklist != null)
-{
-    <NHeadline2 Content="@Behind.Ranklist.Title" Class="printable mb-4" />
-
-    <RanklistTableFrame Class="printable">
-        <One>
-            <MudText Typo="Typo.subtitle2">
-                @Rank_string
-            </MudText>
-        </One>
-        <Two>
-            <MudText Typo="Typo.subtitle2">
-                @Combination_string
-            </MudText>
-        </Two>
-        <Three>
-            <MudText Typo="Typo.subtitle2">
-                @Arrival_string
-            </MudText>
-        </Three>
-        <Four>
-            <MudText Typo="Typo.subtitle2">
-                @Speed_string
-            </MudText>
-        </Four>
-        <Five>
-            <MudText Typo="Typo.subtitle2">
-                @Loop_string
-            </MudText>
-        </Five>
-        <Six>
-            <MudText Typo="Typo.subtitle2">
-                @Recovery_string
-            </MudText>
-        </Six>
-        <Seven>
-            <MudText Typo="Typo.subtitle2">
-                @Total_string
-            </MudText>
-        </Seven>
-    </RanklistTableFrame>
-
-    @foreach (var entry in Behind.Ranklist.Entries)
-    {
-        <RanklistRow Entry="entry"/>
-
-        <MudDivider Class="printable" />
-    }
-}
-else
+@if (Ranklist == null)
 {
     <NHeadline3 Color="Color.Error" Content="@string.Format(Component_missing_required_value_string, Ranklist_string)"/>
+    return;
+}
+
+<NHeadline2 Content="@Ranklist.Title" Class="printable mb-4" />
+
+<RanklistTableFrame Class="printable">
+    <One>
+        <MudText Typo="Typo.subtitle2">
+            @Rank_string
+        </MudText>
+    </One>
+    <Two>
+        <MudText Typo="Typo.subtitle2">
+            @Combination_string
+        </MudText>
+    </Two>
+    <Three>
+        <MudText Typo="Typo.subtitle2">
+            @Arrival_string
+        </MudText>
+    </Three>
+    <Four>
+        <MudText Typo="Typo.subtitle2">
+            @Speed_string
+        </MudText>
+    </Four>
+    <Five>
+        <MudText Typo="Typo.subtitle2">
+            @Loop_string
+        </MudText>
+    </Five>
+    <Six>
+        <MudText Typo="Typo.subtitle2">
+            @Recovery_string
+        </MudText>
+    </Six>
+    <Seven>
+        <MudText Typo="Typo.subtitle2">
+            @Total_string
+        </MudText>
+    </Seven>
+</RanklistTableFrame>
+
+@foreach (var entry in Ranklist.Entries)
+{
+    <RanklistRow Entry="entry"/>
+
+    <MudDivider Class="printable" />
 }
