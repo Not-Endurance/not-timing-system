@@ -26,7 +26,7 @@ public abstract class PrintableComponent : NComponent, IDisposable
 
     protected async Task OpenPrintDialog()
     {
-        await Task.Delay(2000);
+        await Task.Delay(5000);
         InvokeToggle();
         await PrintInterop.OpenPrintDialog();
         InvokeToggle();

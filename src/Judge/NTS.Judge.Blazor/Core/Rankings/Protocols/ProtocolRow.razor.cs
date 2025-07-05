@@ -1,3 +1,4 @@
+using MudBlazor;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 
@@ -8,6 +9,7 @@ public partial class ProtocolRow
     Combination _combination = default!;
     PhaseCollection _phases = default!;
     string _rankText = " "; //TODO: implement NText component to display string with value null as white space
+    Align _align = Align.Center;
 
     [Parameter, EditorRequired]
     public RankingEntry Entry { get; set; } = default!;
