@@ -8,6 +8,8 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
+using System.Text;
+using System.Xml;
 
 namespace NTS.Judge.Core.FeiExport;
 
@@ -258,9 +260,15 @@ public class FeiExportBusiness : IFeiExportBusiness
     string Serialize(HorseSport horseSport)
     {
         var serializer = new XmlSerializer(typeof(HorseSport));
-        using var stream = new StringWriter();
-        serializer.Serialize(stream, horseSport);
-        return stream.ToString();
+        using var memoryStream = new MemoryStream();
+        var settings = new XmlWriterSettings
+        {
+            Encoding = Encoding.UTF8,
+            Indent = true
+        };
+        using var writer = XmlWriter.Create(memoryStream, settings);
+        serializer.Serialize(writer, horseSport);
+        return Encoding.UTF8.GetString(memoryStream.ToArray());
     }
 
     string InsertGeneratedDate(string xml)
