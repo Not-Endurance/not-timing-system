@@ -1,0 +1,51 @@
+@* ReSharper disable once CheckNamespace *@
+@namespace Not.Blazor.Components
+@typeparam T
+@inherits NListBehind<T>
+
+<MudStack Row Class="mb-2">
+    @if (Title != null)
+    {
+        <NHeadline3 Content="@Title" Class="pt-1"/>
+    }
+
+    <MudSpacer/>
+
+    @if (CreateHandler != null)
+    {
+        <NButtonCreate Variant="Variant.Outlined" OnClick="CreateHandler"/>
+    }
+</MudStack>
+
+<MudContainer Class="not-page-mid-width">
+    @if (IsLoading)
+    {
+        <NSkeleton />
+    }
+    else if (!Items.Any())
+    {
+        <MudText Typo="Typo.body1">@List_is_empty_string</MudText>
+    }
+    else
+    {
+        foreach (var item in Items)
+        {
+            <MudStack Row>
+                <MudText Typo="Typo.body1" Class="pa-4">@item</MudText>
+
+                <MudSpacer />
+
+                @if (UpdateHandler != null)
+                {
+                    <NIconUpdate OnClick="() => UpdateHandler(item)" />
+                }
+                @if (DeleteHandler != null)
+                {
+                    <NIconDelete OnClick="() => DeleteHandler(item)" />
+                }
+            </MudStack>
+
+            <MudDivider />
+        }
+    }
+</MudContainer>

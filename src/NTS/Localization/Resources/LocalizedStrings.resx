@@ -147,9 +147,6 @@
   <data name="Print_string" xml:space="preserve">
     <value>Print</value>
   </data>
-  <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
-    <value>No  have been created for this event</value>
-  </data>
   <data name="Date_string" xml:space="preserve">
     <value>Date</value>
   </data>
@@ -635,5 +632,41 @@
   </data>
   <data name="Actions_string" xml:space="preserve">
     <value>Actions</value>
+  </data>
+  <data name="Template_ranking_string" xml:space="preserve">
+    <value>Template Ranking </value>
+  </data>
+  <data name="List_is_empty_string" xml:space="preserve">
+    <value>The list is empty</value>
+  </data>
+  <data name="Custom_ranking_string" xml:space="preserve">
+    <value>Custom ranking</value>
+  </data>
+  <data name="Create_Custom_Ranking_string" xml:space="preserve">
+    <value>Create Custom Ranking</value>
+  </data>
+  <data name="Optionally_select_existing_ranking_to_prepopulate_the_form_string" xml:space="preserve">
+    <value>Optionally select an existing Ranking in order to prepopulate the form. Then you can modify it's values and entries to achive the desired ouput</value>
+  </data>
+  <data name="Add_string" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Select_participation_to_add_string" xml:space="preserve">
+    <value>Select a Participation to add</value>
+  </data>
+  <data name="Ranking_string" xml:space="preserve">
+    <value>Ranking</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_delete__string" xml:space="preserve">
+    <value>Are you sure you want to delete '{0}'?</value>
+  </data>
+  <data name="Delete_string" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Back_string" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Export_FEI_string" xml:space="preserve">
+    <value>Export FEI</value>
   </data>
 </root>

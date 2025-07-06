@@ -1,4 +1,6 @@
+using MudBlazor;
 using Not.Blazor.Components;
+using Not.Blazor.Dialogs;
 using Not.Safe;
 using Not.Structures;
 using NTS.Domain.Core.Aggregates;
@@ -10,6 +12,9 @@ public class RankingMenuBehind : NComponent
     [Inject]
     IRankingMenuService Service { get; set; } = default!;
 
+    [Inject]
+    IDialogService DialogService { get; set; } = default!;
+    
     public Ranking? SelectedRanking => Service.SelectedRanking;
     public ObservableList<Ranking> Rankings => Service.Rankings;
 
@@ -25,5 +30,17 @@ public class RankingMenuBehind : NComponent
             return;
         }
         await SafeHelper.Run(() => Service.Select(ranking));
+    }
+
+    public async Task OpenDeleteDialog(MudChip<Ranking> chip)
+    {
+        var ranking = chip.Value!;
+        var arguments = new DialogParameters<NConfirmDeleteDialog> {{ x => x.Item, ranking.Name }};
+        var dialog = await DialogService.ShowAsync<NConfirmDeleteDialog>(Delete_string, arguments);
+        if (await dialog.IsCanceled())
+        {
+            return;
+        }
+        await SafeHelper.Run(() => Service.Delete(ranking));
     }
 }

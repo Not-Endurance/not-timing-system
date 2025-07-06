@@ -9,4 +9,5 @@ public interface IRankingMenuService : IObservableBehind
     Ranking? SelectedRanking { get; }
     ObservableList<Ranking> Rankings { get; }
     Task Select(Ranking ranking);
+    Task Delete(Ranking ranking);
 }

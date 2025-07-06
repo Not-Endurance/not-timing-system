@@ -147,9 +147,6 @@
   <data name="Print_string" xml:space="preserve">
     <value>Yazdır</value>
   </data>
-  <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
-    <value>Bu etkinlik için hiçbir şey oluşturulmadı</value>
-  </data>
   <data name="Date_string" xml:space="preserve">
     <value>Tarih</value>
   </data>

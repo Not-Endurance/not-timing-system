@@ -5,37 +5,11 @@
 
 <MudPaper Elevation="0" Class="@("pa-4 " + Class)" Style="@Style">
 
-    <MudStack Row="true" Class="mb-2">
-        <NHeadline2 Content="@Name" Class="pt-1" />
-
-        <MudSpacer />
-
-        <NButtonCreate Variant="Variant.Outlined" OnClick="CreateHandler" />
-    </MudStack>
-
-    @if (!IsInitialized)
-    {
-        <NSkeleton />
-    }
-    else if (Behind.Items.Count == 0)
-    {
-        <MudText Typo="Typo.body1">@EmptyMessage</MudText>
-    }
-    else
-    {
-        @foreach (var item in Behind.Items)
-        {
-            <MudStack Row="true">
-                <MudText Typo="Typo.body1" Class="pa-4">@item</MudText>
-
-                <MudSpacer />
-
-                <NIconUpdate OnClick="() => UpdateHandler(item)" />
-
-                <NIconDelete OnClick="() => DeleteHandler(item)" />
-            </MudStack>
-
-            <MudDivider />
-        }        
-    }
+    <NList Items="Behind.Items" 
+           Title="@Name" 
+           IsLoading="!IsInitialized" 
+           CreateHandler="CreateHandler" 
+           UpdateHandler="UpdateHandler" 
+           DeleteHandler="DeleteHandler"/>
+    
 </MudPaper>

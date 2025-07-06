@@ -4,12 +4,14 @@ using Not.Application.CRUD.Ports;
 using Not.Exceptions;
 using Not.Filesystem;
 using Not.Notify;
+using Not.Random;
 using Not.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Blazor.Core.Rankings;
+using NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 using NTS.Judge.Blazor.Core.Rankings.Menu;
 using NTS.Judge.Core.FeiExport;
 using NTS.Judge.HTTP;
@@ -20,7 +22,8 @@ public class RankingService
     : ObservableListBehind<Ranking>,
         IRankingService,
         IRankingMenuService,
-        IRanklistDocumentService
+        IRanklistDocumentService,
+        ICustomRankingService
 {
     readonly IFileContext _configuration;
     readonly IFeiExportBusiness _feiExportBusiness;
@@ -65,7 +68,23 @@ public class RankingService
         await Select(rankings.First());
         return true;
     }
-
+    
+    public async Task Create(CustomRankingModel model)
+    {
+        var ranking = new Ranking(
+            RandomHelper.GenerateUniqueInteger(),
+            model.Name,
+            model.Ruleset,
+            model.Type,
+            model.Category,
+            model.CompetitionFeiId,
+            model.FeiRule,
+            model.FeiScheduleNumber,
+            new (model.Entries));
+        await _rankings.Create(ranking);
+        Rankings.AddOrReplace(ranking);
+    }
+    
     public async Task Select(Ranking ranking)
     {
         var enduranceEvent = await _events.Read(0);
@@ -74,6 +93,13 @@ public class RankingService
         SelectedRanking = ranking;
         Ranklist = new Ranklist(SelectedRanking);
         Document = new RanklistDocument(Ranklist, enduranceEvent, officials);
+        EmitChange();
+    }
+
+    public async Task Delete(Ranking ranking)
+    {
+        await _rankings.Delete(ranking);
+        Rankings.Remove(ranking);
         EmitChange();
     }
 
@@ -104,8 +130,17 @@ public class RankingService
         await _archive.Create(entry);
     }
 
-    void UpdateRanklist(ParticipationPayload payload)
+    // ReSharper disable once AsyncVoidMethod
+    async void UpdateRanklist(ParticipationPayload payload)
     {
-        Ranklist?.Update(payload.Participation);
+        if (SelectedRanking == null)
+        {
+            return;
+        }
+        foreach (var ranking in Rankings)
+        {
+            ranking.Update(payload.Participation);
+        }
+        await Select(SelectedRanking);
     }
 }

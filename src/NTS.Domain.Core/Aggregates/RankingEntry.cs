@@ -6,15 +6,15 @@ public class RankingEntry : AggregateRoot
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public RankingEntry(int id, Participation participation, int? rank, bool isNotRanked)
+    public RankingEntry(int id, Participation? participation, int? rank, bool isNotRanked)
         : base(id)
     {
-        Participation = participation;
+        Participation = Required(nameof(Participation), participation);
         Rank = rank;
         IsNotRanked = isNotRanked;
     }
 
-    public RankingEntry(Participation participation, bool isNotRanked)
+    public RankingEntry(Participation? participation, bool isNotRanked)
         : this(GenerateId(), participation, null, isNotRanked) { }
 
     public Participation Participation { get; internal set; }

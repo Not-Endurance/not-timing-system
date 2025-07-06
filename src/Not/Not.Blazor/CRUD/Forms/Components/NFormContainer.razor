@@ -6,7 +6,7 @@
     <NDynamic @ref="Form" T="T" TForm="TForm" Model="Model" />
     
     <MudStack Row="true" Class="mt-4">
-        <NButtonUpdate OnClick="Submit" />
+        <NButtonPrimary OnClick="Submit" Text="@ButtonText"/>
 
         @if (CanNavigateBack())
         {

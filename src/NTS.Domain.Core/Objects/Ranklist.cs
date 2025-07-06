@@ -33,16 +33,9 @@ public class Ranklist
     public CompetitionRuleset Ruleset => Ranking.Ruleset;
     public string Title => $"{Category}: {Name}";
 
-    public void Update(Participation participation)
-    {
-        var existing = Ranking.Entries.FirstOrDefault(x => x.Participation == participation);
-        if (existing == null)
-        {
-            return;
-        }
-        existing.Participation = participation;
-        Entries = Rank(Ranking);
-    }
+    public bool IsFeiExportConfigured => !string.IsNullOrWhiteSpace(Ranking.CompetitionFeiId) &&
+                                         !string.IsNullOrWhiteSpace(Ranking.FeiRule) &&
+                                         !string.IsNullOrWhiteSpace(Ranking.FeiScheduleNumber);
 
     static List<RankingEntry> Rank(Ranking ranking)
     {

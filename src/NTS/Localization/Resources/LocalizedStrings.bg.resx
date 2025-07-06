@@ -147,9 +147,6 @@
   <data name="Print_string" xml:space="preserve">
     <value>Отпечатай</value>
   </data>
-  <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
-    <value>Нищо не е създадено за това събитие</value>
-  </data>
   <data name="Date_string" xml:space="preserve">
     <value>Дата</value>
   </data>
@@ -635,5 +632,41 @@
   </data>
   <data name="Actions_string" xml:space="preserve">
     <value>Действия</value>
+  </data>
+  <data name="Template_ranking_string" xml:space="preserve">
+    <value>Класация за темплейт</value>
+  </data>
+  <data name="List_is_empty_string" xml:space="preserve">
+    <value>Списъкът е празен</value>
+  </data>
+  <data name="Custom_ranking_string" xml:space="preserve">
+    <value>Ръчна класация</value>
+  </data>
+  <data name="Optionally_select_existing_ranking_to_prepopulate_the_form_string" xml:space="preserve">
+    <value>Опционално изберете съществуваща Класация да служи като темплейт и я коригирайте за да постигнете нужния резултат. </value>
+  </data>
+  <data name="Add_string" xml:space="preserve">
+    <value>Добави</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Ranking_string" xml:space="preserve">
+    <value>Класация</value>
+  </data>
+  <data name="Create_Custom_Ranking_string" xml:space="preserve">
+    <value>Създай Ръчно Класиране</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_delete__string" xml:space="preserve">
+    <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
+  </data>
+  <data name="Delete_string" xml:space="preserve">
+    <value>Изтрий</value>
+  </data>
+  <data name="Back_string" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="Export_FEI_string" xml:space="preserve">
+    <value>Експорт ФЕИ</value>
   </data>
 </root>

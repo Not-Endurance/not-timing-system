@@ -42,6 +42,9 @@
     <Compile Update="Core\Rankings\RankingsPageBehind.cs">
       <DependentUpon>RankingsPage.razor</DependentUpon>
     </Compile>
+    <Compile Update="Core\Rankings\CustomRanking\CustomRankingControlsBehind.cs">
+      <DependentUpon>CustomRankingControls.razor</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
