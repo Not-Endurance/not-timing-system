@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+﻿using Not.Domain.Base;
 using Not.Events;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects.Payloads;
@@ -20,6 +19,7 @@ public class Participation : AggregateRoot, IAggregateRoot
     [System.Text.Json.Serialization.JsonConstructor]
     public Participation(
         int id,
+        ParticipationCategory category,
         Competition competition,
         Combination combination,
         PhaseCollection phases,
@@ -27,6 +27,7 @@ public class Participation : AggregateRoot, IAggregateRoot
     )
         : base(id)
     {
+        Category = category;
         Competition = competition;
         Combination = combination;
         Phases = phases;
@@ -35,15 +36,17 @@ public class Participation : AggregateRoot, IAggregateRoot
 
     public Participation(
         string competitionName,
+        ParticipationCategory category,
         CompetitionRuleset ruleset,
         CompetitionType type,
         Combination combination,
         IEnumerable<Phase> phases
     )
-        : this(GenerateId(), new(competitionName, ruleset, type), combination, new(phases), null) { }
+        : this(GenerateId(), category, new(competitionName, ruleset, type), combination, new(phases), null) { }
 
     public Competition Competition { get; }
     public Combination Combination { get; }
+    public ParticipationCategory Category { get; }
     public PhaseCollection Phases { get; }
     public Eliminated? Eliminated { get; private set; }
 

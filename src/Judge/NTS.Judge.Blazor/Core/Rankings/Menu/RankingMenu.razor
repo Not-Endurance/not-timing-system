@@ -11,7 +11,7 @@
             <NTextDivider Text="@grouping.Key" />
             @foreach (var ranking in grouping.OrderBy(x => x.Category))
             {
-                <MudChip Text="@ranking.Category.ToString()" Value="@ranking" Color="Color.Primary" Style="min-width: 1rem" />
+                <MudChip T="Ranking" Text="@ranking.Category.ToString()" Value="@ranking" OnClose="x => OpenDeleteDialog(x)" Color="Color.Primary" Style="min-width: 1rem"  />
             }
         }
     </MudChipSet>    

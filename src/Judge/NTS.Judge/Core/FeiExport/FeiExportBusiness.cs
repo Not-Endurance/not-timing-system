@@ -237,14 +237,14 @@ public class FeiExportBusiness : IFeiExportBusiness
         return days;
     }
 
-    string GetFeiCategory(AthleteCategory category)
+    string GetFeiCategory(ParticipationCategory category)
     {
         return category switch
         {
-            AthleteCategory.Senior => "S",
-            AthleteCategory.Children => "C",
-            AthleteCategory.JuniorOrYoungAdult => "YJ",
-            AthleteCategory.Training or AthleteCategory.Companion or _ => throw GuardHelper.Exception(
+            ParticipationCategory.Senior => "S",
+            ParticipationCategory.Children => "C",
+            ParticipationCategory.JuniorOrYoungAdult => "YJ",
+            ParticipationCategory.Training or ParticipationCategory.Companion or _ => throw GuardHelper.Exception(
                 "Implement validation for non-fei categories for Star during setup"
             ), //TODO:
         };

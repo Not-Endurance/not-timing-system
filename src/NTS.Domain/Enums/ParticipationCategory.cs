@@ -1,9 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using NTS.Localization.Resources;
+﻿namespace NTS.Domain.Enums;
 
-namespace NTS.Domain.Enums;
-
-public enum AthleteCategory
+public enum ParticipationCategory
 {
     // [Display(Name = "Senior_string", ResourceType = typeof(LocalizedStrings))]
     Senior = 1,

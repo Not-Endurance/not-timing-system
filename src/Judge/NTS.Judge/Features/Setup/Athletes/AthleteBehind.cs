@@ -1,5 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 
@@ -12,12 +13,12 @@ public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflect
 
     protected override Athlete CreateEntity(AthleteFormModel model)
     {
-        return Athlete.Create(model.Name, model.FeiId, model.Country, model.Club, model.Category);
+        return new Athlete(Person.Create(model.Name), model.FeiId, model.Country, model.Club);
     }
 
     protected override Athlete UpdateEntity(AthleteFormModel model)
     {
-        return Athlete.Update(model.Id, model.Name, model.FeiId, model.Country, model.Club, model.Category);
+        return new Athlete(model.Id, Person.Create(model.Name), model.FeiId, model.Country, model.Club);
     }
 
     public async Task Reflect(Club update)

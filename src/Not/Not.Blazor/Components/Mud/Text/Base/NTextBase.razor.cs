@@ -10,7 +10,7 @@ public partial class NTextBase
             : "";
 
     [Parameter, EditorRequired]
-    public string Content { get; set; } = default!;
+    public string Content { get; set; } = default!; //TODO: Change to ChildContent RenderFragment
 
     [Parameter]
     public bool IsAbsoluteCenter { get; set; }

@@ -81,7 +81,6 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
 
     public void Add(Participation child)
     {
-        ValidateAthleteCategory(child);
         child.SetSpeedLimits(Type);
         _participations.Add(child);
     }
@@ -93,7 +92,6 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
 
     public void Update(Participation child)
     {
-        ValidateAthleteCategory(child);
         child.SetSpeedLimits(Type);
         _participations.Update(child);
     }
@@ -111,20 +109,6 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
     public void Update(Phase child)
     {
         _phases.Update(child);
-    }
-
-    void ValidateAthleteCategory(Participation child)
-    {
-        if (
-            child.Combination.Athlete.Category == AthleteCategory.JuniorOrYoungAdult
-            && Type == CompetitionType.Championship
-        )
-        {
-            throw new DomainPropertyException(
-                nameof(Participation.Combination),
-                Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category
-            );
-        }
     }
 
     static TimeSpan? ToTimeSpan(int? minutes)

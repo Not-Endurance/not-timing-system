@@ -41,9 +41,14 @@
         <NTextDivider Text="@Actions_string" Class="mt-4" />
 
         <MudStack Row Wrap="Wrap.Wrap">
-            <NButtonPrimary OnClick="ArchiveEnduranceEvent" Text="@Archive_string"/>
+            <NButtonPrimary OnClick="ArchiveEnduranceEvent" Text="@Archive_string" StartIcon="@Icons.Material.Filled.Archive"/>
             
-            <NButtonPrimary OnClick="GenerateFeiExport" Text="Export FEI"/> @* TODO: localization *@
+            @if (IsFeiExportConfigured)
+            {
+                <NButtonPrimary OnClick="GenerateFeiExport" Text="@Export_FEI_string" StartIcon="@Icons.Material.Filled.ImportExport"/> 
+            }
+            
+            <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
         </MudStack>
 
         <RankingMenu Class="mt-4"/>

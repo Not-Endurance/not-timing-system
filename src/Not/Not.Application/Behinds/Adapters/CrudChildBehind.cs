@@ -24,9 +24,13 @@ public abstract class CrudChildBehind<T, TModel> : ObservableBehind, IListBehind
     }
 
     protected abstract T CreateEntity(TModel model);
-    protected abstract T UpdateEntity(TModel model);
 
     public IReadOnlyList<T> Items => _crudeContext.Children;
+
+    protected virtual T UpdateEntity(TModel model)
+    {
+        return CreateEntity(model);
+    }
 
     protected sealed override Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {

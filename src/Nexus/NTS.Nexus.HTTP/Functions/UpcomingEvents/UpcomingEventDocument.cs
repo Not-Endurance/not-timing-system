@@ -147,6 +147,7 @@ public class UpcomingEventDocument : Document
                 Id = participation.Id,
                 StartTimeOverride = participation.StartTimeOverride,
                 IsNotRanked = participation.IsNotRanked,
+                Category = participation.Category,
                 Combination = CombinationModel.Create(participation.Combination),
                 MaxSpeedOverride = participation.MaxSpeedOverride,
                 MinSpeedOverride = participation.MinSpeedOverride,
@@ -159,6 +160,7 @@ public class UpcomingEventDocument : Document
         public DateTimeOffset? StartTimeOverride { get; init; }
         public bool IsNotRanked { get; init; }
         public CombinationModel Combination { get; init; } = default!;
+        public ParticipationCategory Category { get; set; }
         public double? MaxSpeedOverride { get; init; }
         public double? MinSpeedOverride { get; init; }
         public double? MinAverageSpeed { get; init; }
@@ -168,9 +170,10 @@ public class UpcomingEventDocument : Document
         {
             return new(
                 EnsureId(Id),
-                StartTimeOverride,
                 IsNotRanked,
                 Combination.ToSetupDomain(),
+                Category,
+                StartTimeOverride,
                 MaxSpeedOverride,
                 MinSpeedOverride,
                 MinAverageSpeed,

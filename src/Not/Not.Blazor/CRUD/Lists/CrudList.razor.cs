@@ -33,12 +33,9 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     [Parameter, EditorRequired]
     public string UpdateRoute { get; set; } = default!;
 
-    public string EmptyMessage { get; set; } = default!;
-
     protected override void OnInitialized()
     {
         GuardHelper.ThrowIfDefault(UpdateRoute);
-        EmptyMessage = string.Format(No__have_been_created_for_this_event_string, Name);
     }
 
     protected override async Task OnInitializedAsync()

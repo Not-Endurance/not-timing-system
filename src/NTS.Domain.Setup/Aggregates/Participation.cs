@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+﻿using Not.Domain.Base;
 using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Setup.Aggregates;
@@ -11,12 +10,12 @@ public class Participation : AggregateRoot, IReflect<Combination>
     const double MIN_SPEED = 10;
     const double MAX_SPEED = 16;
 
-    [JsonConstructor]
     public Participation(
         int? id,
-        DateTimeOffset? startTimeOverride,
         bool isNotRanked,
         Combination? combination,
+        ParticipationCategory? category,
+        DateTimeOffset? startTimeOverride,
         double? maxSpeedOverride,
         double? minSpeedOverride,
         double? minAverageSpeed = null,
@@ -27,6 +26,7 @@ public class Participation : AggregateRoot, IReflect<Combination>
         StartTimeOverride = startTimeOverride;
         IsNotRanked = isNotRanked;
         Combination = Required(nameof(Combination), combination);
+        Category = Required(nameof(Category), category);
         MaxSpeedOverride = maxSpeedOverride;
         MinSpeedOverride = minSpeedOverride;
         if (minAverageSpeed.HasValue)
@@ -39,17 +39,9 @@ public class Participation : AggregateRoot, IReflect<Combination>
         }
     }
 
-    public Participation(
-        DateTimeOffset? startTimeOverride,
-        bool isNotRanked,
-        Combination? combination,
-        double? maxSpeedOverride,
-        double? minSpeedOverride
-    )
-        : this(GenerateId(), startTimeOverride, isNotRanked, combination, maxSpeedOverride, minSpeedOverride) { }
-
     public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
+    public ParticipationCategory Category { get; }
     public DateTimeOffset? StartTimeOverride { get; }
     public double? MaxSpeedOverride { get; }
     public double? MinSpeedOverride { get; }
@@ -58,11 +50,10 @@ public class Participation : AggregateRoot, IReflect<Combination>
 
     internal void SetSpeedLimits(CompetitionType competitionType)
     {
-        var athleteCategory = Combination.Athlete.Category;
         MinAverageSpeed = MIN_SPEED;
         if (competitionType == CompetitionType.Qualification)
         {
-            if (athleteCategory == AthleteCategory.Children)
+            if (Category == ParticipationCategory.Children)
             {
                 MinAverageSpeed = CHILDREN_MIN_SPEED;
                 MaxAverageSpeed = CHILDREN_MAX_SPEED;

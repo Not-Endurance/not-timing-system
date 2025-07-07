@@ -14,7 +14,6 @@ public class AthleteRepository : MongoRepository<AthleteDocument>
     {
         return Builders<AthleteDocument>
             .Update.Set(x => x.Names, document.Names)
-            .Set(x => x.Category, document.Category)
             .Set(x => x.Club, document.Club)
             .Set(x => x.Country, document.Country)
             .Set(x => x.FeiId, document.FeiId);

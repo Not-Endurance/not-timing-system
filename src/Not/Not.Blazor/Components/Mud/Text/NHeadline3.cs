@@ -2,7 +2,7 @@
 
 namespace Not.Blazor.Components;
 
-public class NHeadline3 : NTextBase
+public class NHeadline3 : NHeadline
 {
     public NHeadline3()
     {
