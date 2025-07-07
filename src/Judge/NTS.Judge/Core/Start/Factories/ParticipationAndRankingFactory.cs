@@ -9,7 +9,7 @@ public static class ParticipationAndRankingFactory
 {
     public static (
         List<Participation> Participations,
-        Dictionary<AthleteCategory, List<RankingEntry>> RankingEntriesByCategory
+        Dictionary<ParticipationCategory, List<RankingEntry>> RankingEntriesByCategory
     ) Create(Domain.Setup.Aggregates.Competition setupCompetition, IEnumerable<Participation> existingParticipations)
     {
         if (setupCompetition.Phases.Count == 0)
@@ -26,7 +26,7 @@ public static class ParticipationAndRankingFactory
         }
 
         var participations = new List<Participation>();
-        var rankingEntriesByCategory = new Dictionary<AthleteCategory, List<RankingEntry>>();
+        var rankingEntriesByCategory = new Dictionary<ParticipationCategory, List<RankingEntry>>();
         foreach (var setupParticipation in setupCompetition.Participations)
         {
             var participation = CreateParticipation(setupCompetition, setupParticipation);
@@ -107,8 +107,8 @@ public static class ParticipationAndRankingFactory
     }
 
     static void AddRanking(
-        Dictionary<AthleteCategory, List<RankingEntry>> dictionary,
-        AthleteCategory category,
+        Dictionary<ParticipationCategory, List<RankingEntry>> dictionary,
+        ParticipationCategory category,
         RankingEntry entry
     )
     {

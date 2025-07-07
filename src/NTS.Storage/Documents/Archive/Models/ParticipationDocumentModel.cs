@@ -22,7 +22,7 @@ public class ParticipationDocumentModel
         };
     }
 
-    public AthleteCategory Category { get; init; } = default!;
+    public ParticipationCategory Category { get; init; } = default!;
     public CompetitionDocumentModel Competition { get; init; } = default!;
     public CombinationDocumentModel Combination { get; init; } = default!;
     public PhaseDocumentModel[] Phases { get; init; } = default!;

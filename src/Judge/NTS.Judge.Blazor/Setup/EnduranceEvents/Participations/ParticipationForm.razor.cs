@@ -16,7 +16,7 @@ public partial class ParticipationForm
     MudPicker<TimeSpan?> _timeField = default!;
     MudNumericField<double?> _maxSpeedOverrideField = default!;
     MudNumericField<double?> _minSpeedOverrideField = default!;
-    NSelect<AthleteCategory?> _categoryField = default!;
+    NSelect<ParticipationCategory?> _categoryField = default!;
 
     [Inject]
     IListBehind<Combination> Behind { get; set; } = default!;

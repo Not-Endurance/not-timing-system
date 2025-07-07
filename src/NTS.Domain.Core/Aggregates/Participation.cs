@@ -19,7 +19,7 @@ public class Participation : AggregateRoot, IAggregateRoot
     [System.Text.Json.Serialization.JsonConstructor]
     public Participation(
         int id,
-        AthleteCategory category,
+        ParticipationCategory category,
         Competition competition,
         Combination combination,
         PhaseCollection phases,
@@ -36,7 +36,7 @@ public class Participation : AggregateRoot, IAggregateRoot
 
     public Participation(
         string competitionName,
-        AthleteCategory category,
+        ParticipationCategory category,
         CompetitionRuleset ruleset,
         CompetitionType type,
         Combination combination,
@@ -46,7 +46,7 @@ public class Participation : AggregateRoot, IAggregateRoot
 
     public Competition Competition { get; }
     public Combination Combination { get; }
-    public AthleteCategory Category { get; }
+    public ParticipationCategory Category { get; }
     public PhaseCollection Phases { get; }
     public Eliminated? Eliminated { get; private set; }
 

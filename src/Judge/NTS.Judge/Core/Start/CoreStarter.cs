@@ -90,7 +90,7 @@ public class CoreStarter : ICoreStarter
     Ranking CreateRanking(
         Domain.Setup.Aggregates.UpcomingEvent setupEvent,
         Domain.Setup.Aggregates.Competition setupCompetition,
-        KeyValuePair<AthleteCategory, List<RankingEntry>> entriesByCategory
+        KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory
     )
     {
         var competition = new Competition(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type);

@@ -13,7 +13,7 @@ public class Ranking : AggregateRoot
         string? name,
         CompetitionRuleset? ruleset,
         CompetitionType? type,
-        AthleteCategory? category,
+        ParticipationCategory? category,
         string? competitionFeiId,
         string? feiRule,
         string? feiScheduleNumber,
@@ -33,7 +33,7 @@ public class Ranking : AggregateRoot
 
     public Ranking(
         Competition competition,
-        AthleteCategory category,
+        ParticipationCategory category,
         string? competitionFeiId,
         string? feiRule,
         string? feiScheduleNumber,
@@ -54,7 +54,7 @@ public class Ranking : AggregateRoot
     public string Name { get; }
     public CompetitionRuleset Ruleset { get; }
     public CompetitionType Type { get; }
-    public AthleteCategory Category { get; }
+    public ParticipationCategory Category { get; }
     public string? CompetitionFeiId { get; }
     public string? FeiRule { get; }
     public string? FeiScheduleNumber { get; }

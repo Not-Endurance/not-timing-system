@@ -28,7 +28,7 @@ public class Ranklist
 
     public int RankingId => Ranking.Id;
     public string Name => Ranking.Name;
-    public AthleteCategory Category => Ranking.Category;
+    public ParticipationCategory Category => Ranking.Category;
     public CompetitionType Type => Ranking.Type;
     public CompetitionRuleset Ruleset => Ranking.Ruleset;
     public string Title => $"{Category}: {Name}";

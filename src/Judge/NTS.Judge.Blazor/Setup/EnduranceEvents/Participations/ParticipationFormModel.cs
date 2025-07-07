@@ -9,7 +9,7 @@ public class ParticipationFormModel : IFormModel<Participation>
     public int? Id { get; set; } = RandomHelper.GenerateUniqueInteger();
     public bool IsNotRanked { get; set; }
     public Combination? Combination { get; set; }
-    public AthleteCategory? Category { get; set; }
+    public ParticipationCategory? Category { get; set; }
     public bool IsStartTimeOverriden { get; set; }
     public TimeSpan? StartTimeOverride { get; set; }
     public bool IsMaxSpeedOverriden { get; set; }

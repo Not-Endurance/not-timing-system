@@ -25,7 +25,7 @@ public class RanklistDocumentModel
     public string Name { get; init; } = default!;
     public CompetitionRuleset Ruleset { get; init; }
     public CompetitionType Type { get; init; }
-    public AthleteCategory Category { get; init; }
+    public ParticipationCategory Category { get; init; }
     public string? CompetitionFeiId { get; init; }
     public string? FeiRule { get; init; }
     public string? FeiScheduleNumber { get; init; }

@@ -160,7 +160,7 @@ public class UpcomingEventDocument : Document
         public DateTimeOffset? StartTimeOverride { get; init; }
         public bool IsNotRanked { get; init; }
         public CombinationModel Combination { get; init; } = default!;
-        public AthleteCategory Category { get; set; }
+        public ParticipationCategory Category { get; set; }
         public double? MaxSpeedOverride { get; init; }
         public double? MinSpeedOverride { get; init; }
         public double? MinAverageSpeed { get; init; }

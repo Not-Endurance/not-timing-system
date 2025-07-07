@@ -14,7 +14,7 @@ public class Participation : AggregateRoot, IReflect<Combination>
         int? id,
         bool isNotRanked,
         Combination? combination,
-        AthleteCategory? category,
+        ParticipationCategory? category,
         DateTimeOffset? startTimeOverride,
         double? maxSpeedOverride,
         double? minSpeedOverride,
@@ -41,7 +41,7 @@ public class Participation : AggregateRoot, IReflect<Combination>
 
     public Combination Combination { get; private set; }
     public bool IsNotRanked { get; }
-    public AthleteCategory Category { get; }
+    public ParticipationCategory Category { get; }
     public DateTimeOffset? StartTimeOverride { get; }
     public double? MaxSpeedOverride { get; }
     public double? MinSpeedOverride { get; }
@@ -53,7 +53,7 @@ public class Participation : AggregateRoot, IReflect<Combination>
         MinAverageSpeed = MIN_SPEED;
         if (competitionType == CompetitionType.Qualification)
         {
-            if (Category == AthleteCategory.Children)
+            if (Category == ParticipationCategory.Children)
             {
                 MinAverageSpeed = CHILDREN_MIN_SPEED;
                 MaxAverageSpeed = CHILDREN_MAX_SPEED;

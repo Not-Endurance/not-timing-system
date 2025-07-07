@@ -23,7 +23,7 @@ public class CustomRankingModel
     public string? Name { get; set; }
     public CompetitionRuleset? Ruleset { get; set; }
     public CompetitionType? Type { get; set; }
-    public AthleteCategory? Category { get; set; }
+    public ParticipationCategory? Category { get; set; }
     public string? CompetitionFeiId { get; set; }
     public string? FeiRule { get; set; }
     public string? FeiScheduleNumber { get; set; }

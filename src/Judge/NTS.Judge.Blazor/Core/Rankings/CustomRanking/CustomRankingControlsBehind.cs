@@ -9,7 +9,7 @@ public class CustomRankingControlsBehind : NForm<CustomRankingModel>
     protected MudTextField<string?> NameField = default!;
     protected NSelect<CompetitionRuleset?> RulesetField = default!;
     protected NSelect<CompetitionType?> TypeField = default!;
-    protected NSelect<AthleteCategory?> CategoryField = default!;
+    protected NSelect<ParticipationCategory?> CategoryField = default!;
     
     public override void RegisterValidationInjectors()
     {
