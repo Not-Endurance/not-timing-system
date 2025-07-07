@@ -405,9 +405,6 @@
   <data name="Select_FTQ_codes" xml:space="preserve">
     <value>FTQ kodlarını seçin ve tekrar deneyin</value>
   </data>
-  <data name="Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category" xml:space="preserve">
-    <value>Şampiyona yarışlarına katılan biniciler Genç kategoride olamaz</value>
-  </data>
   <data name="Competition_start_cannot_be_in_the_past" xml:space="preserve">
     <value>Yarışma başlangıcı geçmişte olamaz</value>
   </data>

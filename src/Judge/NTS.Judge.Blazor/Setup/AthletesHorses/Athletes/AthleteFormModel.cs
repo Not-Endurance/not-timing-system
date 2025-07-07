@@ -21,7 +21,6 @@ public class AthleteFormModel : IFormModel<Athlete>
     public string? FeiId { get; set; }
     public Country? Country { get; set; }
     public Club? Club { get; set; }
-    public AthleteCategory Category { get; set; } = AthleteCategory.Senior;
 
     public void FromEntity(Athlete athlete)
     {
@@ -30,6 +29,5 @@ public class AthleteFormModel : IFormModel<Athlete>
         FeiId = athlete.FeiId;
         Country = athlete.Country;
         Club = athlete.Club;
-        Category = athlete.Category;
     }
 }

@@ -16,6 +16,7 @@ public partial class ParticipationForm
     MudPicker<TimeSpan?> _timeField = default!;
     MudNumericField<double?> _maxSpeedOverrideField = default!;
     MudNumericField<double?> _minSpeedOverrideField = default!;
+    NSelect<AthleteCategory?> _categoryField = default!;
 
     [Inject]
     IListBehind<Combination> Behind { get; set; } = default!;
@@ -32,6 +33,7 @@ public partial class ParticipationForm
         RegisterInjector(nameof(Participation.StartTimeOverride), () => _timeField);
         RegisterInjector(nameof(Participation.MaxSpeedOverride), () => _maxSpeedOverrideField);
         RegisterInjector(nameof(Participation.MinSpeedOverride), () => _minSpeedOverrideField);
+        RegisterInjector(nameof(Participation.Category), () => _categoryField);
     }
 
     Task<IEnumerable<Combination>> SearchCombinations(string term)

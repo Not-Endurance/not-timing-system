@@ -118,10 +118,6 @@ namespace NTS.Localization
         public static string Please_provide_reason_to_eliminate_as__ =>
             LocalizeString(nameof(Please_provide_reason_to_eliminate_as__));
         public static string Select_FTQ_codes => LocalizeString(nameof(Select_FTQ_codes));
-        public static string Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category =>
-            LocalizeString(
-                nameof(Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category)
-            );
         public static string Official__already_exists => LocalizeString(nameof(Official__already_exists));
         public static string Athletes_string => LocalizeString(nameof(Athletes_string));
         public static string Horses_string => LocalizeString(nameof(Horses_string));

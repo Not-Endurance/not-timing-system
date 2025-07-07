@@ -405,9 +405,6 @@
   <data name="Select_FTQ_codes" xml:space="preserve">
     <value>Select FTQ codes and try again</value>
   </data>
-  <data name="Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category" xml:space="preserve">
-    <value>Athletes participating in Championship competitions cannot be of Junior or yound adult category</value>
-  </data>
   <data name="Competition_start_cannot_be_in_the_past" xml:space="preserve">
     <value>Competition start cannot be in the past</value>
   </data>

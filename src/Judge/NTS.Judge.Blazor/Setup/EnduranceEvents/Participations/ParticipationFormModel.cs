@@ -1,15 +1,17 @@
 ﻿using Not.Blazor.CRUD.Forms.Ports;
+using Not.Random;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 
 public class ParticipationFormModel : IFormModel<Participation>
 {
-    public int? Id { get; set; }
-    public bool IsStartTimeOverriden { get; set; }
-    public TimeSpan? StartTimeOverride { get; set; }
+    public int? Id { get; set; } = RandomHelper.GenerateUniqueInteger();
     public bool IsNotRanked { get; set; }
     public Combination? Combination { get; set; }
+    public AthleteCategory? Category { get; set; }
+    public bool IsStartTimeOverriden { get; set; }
+    public TimeSpan? StartTimeOverride { get; set; }
     public bool IsMaxSpeedOverriden { get; set; }
     public double? MaxSpeedOverride { get; set; }
     public bool IsMinSpeedOverriden { get; set; }
@@ -18,10 +20,11 @@ public class ParticipationFormModel : IFormModel<Participation>
     public void FromEntity(Participation participation)
     {
         Id = participation.Id;
-        IsStartTimeOverriden = participation.StartTimeOverride != null;
-        StartTimeOverride = participation.StartTimeOverride?.LocalDateTime.TimeOfDay;
         IsNotRanked = participation.IsNotRanked;
         Combination = participation.Combination;
+        Category = participation.Category;
+        IsStartTimeOverriden = participation.StartTimeOverride != null;
+        StartTimeOverride = participation.StartTimeOverride?.LocalDateTime.TimeOfDay;
         IsMaxSpeedOverriden = participation.MaxSpeedOverride != null;
         MaxSpeedOverride = participation.MaxSpeedOverride;
         IsMinSpeedOverriden = participation.MinSpeedOverride != null;
