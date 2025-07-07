@@ -28,7 +28,8 @@ public static class NStrings
     public static string Field_is_required_string => LocalizeString(nameof(Field_is_required_string));
     public static string List_is_empty_string => LocalizeString(nameof(List_is_empty_string));
     public static string Add_string => LocalizeString(nameof(Add_string));
-    public static string Are_you_sure_you_want_to_delete__string => LocalizeString(nameof(Are_you_sure_you_want_to_delete__string));
+    public static string Are_you_sure_you_want_to_delete__string =>
+        LocalizeString(nameof(Are_you_sure_you_want_to_delete__string));
     public static string Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection =>
         LocalizeString(
             nameof(

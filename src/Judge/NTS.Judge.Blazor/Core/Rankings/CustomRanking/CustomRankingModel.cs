@@ -4,10 +4,8 @@ namespace NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 
 public class CustomRankingModel
 {
-    public CustomRankingModel()
-    {
-    }
-    
+    public CustomRankingModel() { }
+
     public CustomRankingModel(Ranking ranking)
     {
         Name = ranking.Name;
@@ -19,7 +17,7 @@ public class CustomRankingModel
         FeiScheduleNumber = ranking.FeiScheduleNumber;
         Entries = ranking.Entries.ToList();
     }
-    
+
     public string? Name { get; set; }
     public CompetitionRuleset? Ruleset { get; set; }
     public CompetitionType? Type { get; set; }

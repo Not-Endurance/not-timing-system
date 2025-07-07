@@ -18,7 +18,7 @@ public class Athlete : AggregateRoot, IAthlete, IReflect<Club>
 
     public Athlete(Person? person, string? feiId, Country? country, Club? club)
         : this(GenerateId(), person, feiId, country, club) { }
-    
+
     IClub? IAthlete.Club => Club;
     public string? FeiId { get; }
     public Person Names { get; }

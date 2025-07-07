@@ -147,7 +147,7 @@ public class UpcomingEventDocument : Document
                 Id = participation.Id,
                 StartTimeOverride = participation.StartTimeOverride,
                 IsNotRanked = participation.IsNotRanked,
-                Category = participation.Category, 
+                Category = participation.Category,
                 Combination = CombinationModel.Create(participation.Combination),
                 MaxSpeedOverride = participation.MaxSpeedOverride,
                 MinSpeedOverride = participation.MinSpeedOverride,
