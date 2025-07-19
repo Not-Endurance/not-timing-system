@@ -7,7 +7,7 @@ public class NFormContainerBehind<T, TForm> : NFormContainerBase<T, TForm>
 {
     [Parameter, EditorRequired]
     public Func<Task> FormAction { get; set; } = default!;
-    
+
     [Parameter, EmailAddress]
     public string ButtonText { get; set; } = default!;
 

@@ -9,10 +9,10 @@ namespace NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 public class CreateCustomRankingDialogBehind : NDialog
 {
     Ranking? _templateRanking;
-    
+
     [Inject]
     IRead<Ranking> Rankings { get; set; } = default!;
-    
+
     [Inject]
     IRead<Participation> Participations { get; set; } = default!;
 
@@ -28,7 +28,7 @@ public class CreateCustomRankingDialogBehind : NDialog
             SelectRanking(_templateRanking);
         }
     }
-    
+
     public CustomRankingModel RankingModel { get; set; } = new();
     public RankingEntryModel EntryToAdd { get; set; } = new();
 
@@ -41,7 +41,7 @@ public class CreateCustomRankingDialogBehind : NDialog
         RankingModel = new CustomRankingModel(ranking);
         return Task.CompletedTask;
     }
-    
+
     public async Task<IEnumerable<Ranking?>> ListRankings(string term)
     {
         return await SafeHelper.Run(() => Rankings.ReadAll(x => x.ToString().Contains(term)));

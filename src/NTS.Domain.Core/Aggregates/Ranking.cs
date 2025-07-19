@@ -64,7 +64,7 @@ public class Ranking : AggregateRoot
     {
         return $"{Name} {Category}: {Entries.Count}";
     }
-    
+
     public void Update(Participation participation)
     {
         var existing = Entries.FirstOrDefault(x => x.Participation == participation);

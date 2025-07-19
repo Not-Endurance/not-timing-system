@@ -14,7 +14,7 @@ public class RankingMenuBehind : NComponent
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
-    
+
     public Ranking? SelectedRanking => Service.SelectedRanking;
     public ObservableList<Ranking> Rankings => Service.Rankings;
 
@@ -35,7 +35,7 @@ public class RankingMenuBehind : NComponent
     public async Task OpenDeleteDialog(MudChip<Ranking> chip)
     {
         var ranking = chip.Value!;
-        var arguments = new DialogParameters<NConfirmDeleteDialog> {{ x => x.Item, ranking.Name }};
+        var arguments = new DialogParameters<NConfirmDeleteDialog> { { x => x.Item, ranking.Name } };
         var dialog = await DialogService.ShowAsync<NConfirmDeleteDialog>(Delete_string, arguments);
         if (await dialog.IsCanceled())
         {

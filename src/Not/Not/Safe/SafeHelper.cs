@@ -106,7 +106,10 @@ public static class SafeHelper
         }
     }
 
-    public static async Task<IEnumerable<T>> Run<T>(Func<Task<IEnumerable<T>>> action, Func<ValidationException, Task> validationHandler)
+    public static async Task<IEnumerable<T>> Run<T>(
+        Func<Task<IEnumerable<T>>> action,
+        Func<ValidationException, Task> validationHandler
+    )
     {
         try
         {

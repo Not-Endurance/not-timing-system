@@ -33,9 +33,10 @@ public class Ranklist
     public CompetitionRuleset Ruleset => Ranking.Ruleset;
     public string Title => $"{Category}: {Name}";
 
-    public bool IsFeiExportConfigured => !string.IsNullOrWhiteSpace(Ranking.CompetitionFeiId) &&
-                                         !string.IsNullOrWhiteSpace(Ranking.FeiRule) &&
-                                         !string.IsNullOrWhiteSpace(Ranking.FeiScheduleNumber);
+    public bool IsFeiExportConfigured =>
+        !string.IsNullOrWhiteSpace(Ranking.CompetitionFeiId)
+        && !string.IsNullOrWhiteSpace(Ranking.FeiRule)
+        && !string.IsNullOrWhiteSpace(Ranking.FeiScheduleNumber);
 
     static List<RankingEntry> Rank(Ranking ranking)
     {
