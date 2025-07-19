@@ -666,4 +666,7 @@
   <data name="Export_FEI_string" xml:space="preserve">
     <value>Експорт ФЕИ</value>
   </data>
+  <data name="Automatic_CRI_string" xml:space="preserve">
+    <value>Автоматичнa CRI</value>
+  </data>
 </root>

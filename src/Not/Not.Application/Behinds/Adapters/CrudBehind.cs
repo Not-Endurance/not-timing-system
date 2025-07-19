@@ -1,9 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
-using Not.Domain;
 using Not.Domain.Base;
-using Not.Exceptions;
 
 namespace Not.Application.Behinds.Adapters;
 
@@ -23,22 +21,6 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
     protected abstract T UpdateEntity(TModel model);
 
     public IReadOnlyList<T> Items => ObservableList;
-
-    protected async Task Update<TUpdate>(Func<T, bool> filter, TUpdate update)
-    {
-        var matches = Items.Where(filter).ToList();
-        if (matches is not IEnumerable<IReflect<TUpdate>> reflections)
-        {
-            throw GuardHelper.Exception(
-                $"Invalid update '{typeof(TUpdate).Name}'. Type '{typeof(T).Name}' does not implement 'IReflect<TUpdate>'"
-            );
-        }
-        foreach (var item in reflections)
-        {
-            item.Reflect(update);
-            await _repository.Update((T)item);
-        }
-    }
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
