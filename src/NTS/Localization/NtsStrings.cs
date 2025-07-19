@@ -96,8 +96,10 @@ namespace NTS.Localization
         public static string Configure_Combinations_string => LocalizeString(nameof(Configure_Combinations_string));
         public static string Configure_Participation_string => LocalizeString(nameof(Configure_Participation_string));
         public static string Create_Custom_Ranking_string => LocalizeString(nameof(Create_Custom_Ranking_string));
-        public static string Optionally_select_existing_ranking_to_prepopulate_the_form_string => LocalizeString(nameof(Optionally_select_existing_ranking_to_prepopulate_the_form_string));
-        public static string Select_participation_to_add_string => LocalizeString(nameof(Select_participation_to_add_string));
+        public static string Optionally_select_existing_ranking_to_prepopulate_the_form_string =>
+            LocalizeString(nameof(Optionally_select_existing_ranking_to_prepopulate_the_form_string));
+        public static string Select_participation_to_add_string =>
+            LocalizeString(nameof(Select_participation_to_add_string));
         public static string Configure_Official_string => LocalizeString(nameof(Configure_Official_string));
         public static string Configure_Loops_string => LocalizeString(nameof(Configure_Loops_string));
         public static string Process_string => LocalizeString(nameof(Process_string));

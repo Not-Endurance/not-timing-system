@@ -10,7 +10,7 @@ public class CustomRankingControlsBehind : NForm<CustomRankingModel>
     protected NSelect<CompetitionRuleset?> RulesetField = default!;
     protected NSelect<CompetitionType?> TypeField = default!;
     protected NSelect<ParticipationCategory?> CategoryField = default!;
-    
+
     public override void RegisterValidationInjectors()
     {
         RegisterInjector(nameof(CustomRankingModel.Name), () => NameField);

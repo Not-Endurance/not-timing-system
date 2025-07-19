@@ -68,7 +68,7 @@ public class RankingService
         await Select(rankings.First());
         return true;
     }
-    
+
     public async Task Create(CustomRankingModel model)
     {
         var ranking = new Ranking(
@@ -80,11 +80,12 @@ public class RankingService
             model.CompetitionFeiId,
             model.FeiRule,
             model.FeiScheduleNumber,
-            new (model.Entries));
+            new(model.Entries)
+        );
         await _rankings.Create(ranking);
         Rankings.AddOrReplace(ranking);
     }
-    
+
     public async Task Select(Ranking ranking)
     {
         var enduranceEvent = await _events.Read(0);

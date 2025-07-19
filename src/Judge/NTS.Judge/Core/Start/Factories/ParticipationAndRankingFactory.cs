@@ -30,7 +30,7 @@ public static class ParticipationAndRankingFactory
         foreach (var setupParticipation in setupCompetition.Participations)
         {
             var participation = CreateParticipation(setupCompetition, setupParticipation);
-            
+
             if (existingParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
@@ -54,7 +54,8 @@ public static class ParticipationAndRankingFactory
 
     static Participation CreateParticipation(
         Domain.Setup.Aggregates.Competition setupCompetition,
-        Domain.Setup.Aggregates.Participation setupParticipation)
+        Domain.Setup.Aggregates.Participation setupParticipation
+    )
     {
         var phases = CreatePhases(setupCompetition);
         var totalDistance = setupCompetition.Phases.Sum(x => (decimal)x.Loop!.Distance);
