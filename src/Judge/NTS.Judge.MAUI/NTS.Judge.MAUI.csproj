@@ -34,6 +34,10 @@
 
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
+  <Target Name="GetVersion">
+  	<Message Text="$(ApplicationDisplayVersion)" Importance="High" />
+  	<Message Text="$(ApplicationVersion)" Importance="High" />
+  </Target>
 
   <!-- Windows publish configuration -->
   <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">

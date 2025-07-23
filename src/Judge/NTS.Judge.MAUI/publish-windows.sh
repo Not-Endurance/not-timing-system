@@ -12,6 +12,17 @@ shortcut_name="NTS Judge.lnk"
 # Clean previous build
 rm -rf "bin/$build/$target"
 
+# Set path to your .csproj
+CSPROJ="./NTS.Judge.MAUI.csproj"
+# Extract ApplicationDisplayVersion using grep and sed
+APP_DISPLAY_VERSION=$(grep '<ApplicationDisplayVersion>' "$CSPROJ" | sed -E 's/.*<ApplicationDisplayVersion>(.*)<\/ApplicationDisplayVersion>.*/\1/')
+APP_VERSION=$(grep '<ApplicationVersion>' "$CSPROJ" | sed -E 's/.*<ApplicationVersion>(.*)<\/ApplicationVersion>.*/\1/')
+# Write to app-version.txt
+echo "[App]" > app-version.txt
+echo "DisplayVersion=$APP_DISPLAY_VERSION" > app-version.txt
+echo "ApplicationVersion=$APP_VERSION" >> app-version.txt
+
+
 # Publish the app
 dotnet publish \
  -f "$target" \
@@ -38,24 +49,9 @@ else
     echo "⚠️ Skipping rcedit: icon or rcedit.exe not found."
 fi
 
-# Create desktop shortcut using PowerShell
-# Convert paths to Windows-style
-win_exe_path=$(cd "$(dirname "$exe_path")" && pwd -W)\\$(basename "$exe_path")
-win_icon_path=$(cd "$(dirname "$ico_path")" && pwd -W)\\$(basename "$ico_path")
-win_work_dir=$(cd "$(dirname "$exe_path")" && pwd -W)
-
-echo "📎 Creating desktop shortcut..."
-powershell.exe -Command "
-\$WshShell = New-Object -ComObject WScript.Shell;
-\$Shortcut = \$WshShell.CreateShortcut([Environment]::GetFolderPath('Desktop') + '\\$shortcut_name');
-\$Shortcut.TargetPath = \"$win_exe_path\";
-\$Shortcut.IconLocation = \"$win_icon_path\";
-\$Shortcut.WorkingDirectory = \"$win_work_dir\";
-\$Shortcut.Save();
-"
-echo "✅ Shortcut created on desktop."
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer-script.iss
 
 # Open publish directory in Explorer
 cd "$publish_dir"
-explorer .
+explorer .  
 cd -
