@@ -1,4 +1,5 @@
-﻿using MudBlazor;
+﻿using System.Text;
+using MudBlazor;
 using Not.Blazor.Mud;
 using Not.Notify;
 
@@ -13,7 +14,7 @@ public class BlazorNotifier : ComponentBase
         NotificationEvents.INFORMED.SubscribeAsync(AddInformationSnack);
         NotificationEvents.SUCCEDED.SubscribeAsync(AddSuccessSnack);
         NotificationEvents.WARNED.SubscribeAsync(AddWarningSnack);
-        NotificationEvents.FAILED.SubscribeAsync(AddFailureSnak);
+        NotificationEvents.FAILED.SubscribeAsync(AddFailureSnack);
     }
 
     [Inject]
@@ -21,21 +22,38 @@ public class BlazorNotifier : ComponentBase
 
     void AddInformationSnack(string message)
     {
-        Snackbar.Add(message, Severity.Info);
+        Snackbar.Add(FormatMessage(message), Severity.Info);
     }
 
     void AddWarningSnack(string message)
     {
-        Snackbar.Add(message, Severity.Warning);
+        Snackbar.Add(FormatMessage(message), Severity.Warning);
     }
 
-    void AddFailureSnak(string message)
+    void AddFailureSnack(string message)
     {
-        Snackbar.Add(message, Severity.Error, config => config.SetVisibleDuration(_failedDuration));
+        Snackbar.Add(FormatMessage(message), Severity.Error, config => config.SetVisibleDuration(_failedDuration));
     }
 
     void AddSuccessSnack(string message)
     {
-        Snackbar.Add(message, Severity.Success);
+        Snackbar.Add(FormatMessage(message), Severity.Success);
+    }
+
+    MarkupString FormatMessage(string message)
+    {
+        if (!message.Contains(Environment.NewLine))
+        {
+            return new MarkupString(message);
+        }
+
+        var listBuilder = new StringBuilder();
+        listBuilder.Append("<ul>");
+        foreach (var line in message.Split(Environment.NewLine))
+        {
+            listBuilder.Append($"<li>{line}</li>");
+        }
+        listBuilder.Append("</ul>");
+        return new MarkupString(listBuilder.ToString());
     }
 }

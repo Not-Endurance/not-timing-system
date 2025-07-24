@@ -1,0 +1,34 @@
+@using Not.Blazor.CRUD.Forms.Components
+
+@inherits CreateCustomRankingDialogBehind
+
+<MudDialog>
+    <TitleContent>
+        <NHeadline Content="@Create_Custom_Ranking_string" Class="pt-1"/>
+    </TitleContent>
+    
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudContainer Class="not-page-mid-width">
+                <NAutocomplete @bind-Value="TemplateRanking" Search="ListRankings" Label="@Template_ranking_string"/>
+
+                <MudText Typo="Typo.body2" Color="Color.Info" HtmlTag="i">*@Optionally_select_existing_ranking_to_prepopulate_the_form_string</MudText>
+
+                <MudStack Row AlignItems="AlignItems.Center">
+                    <NAutocomplete @bind-Value="EntryToAdd.Participation" Search="SearchParticipations" Label="@Select_participation_to_add_string"/>
+
+                    <NSwitch @bind-Value="EntryToAdd.IsNotRanked" Label="@Is_not_ranked_string"/>
+
+                    <NButtonSecondary Text="@Add_string" Variant="Variant.Outlined" Size="Size.Medium" OnClick="AddEntry"/>
+                </MudStack>    
+            </MudContainer>
+
+            <NList Items="RankingModel.Entries" DeleteHandler="RemoveEntry" Title="@Participations_string"/>
+
+            <NHeadline3 Content="@Settings_string" Align="Align.Left"/>
+
+            <NFormContainer T="CustomRankingModel" TForm="CustomRankingControls" Model="RankingModel" FormAction="Create" ButtonText="@Create_string" DisableBack/>
+        </MudStack>
+    </DialogContent>
+</MudDialog>
+

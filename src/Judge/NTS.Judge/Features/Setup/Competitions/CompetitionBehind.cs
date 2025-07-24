@@ -31,16 +31,15 @@ public class CompetitionBehind : CrudChildBehind<Competition, CompetitionFormMod
         ValidateDateTime(model);
         var date = (DateTime)model.Date!;
         var startTime = date.ToDateTimeOffset().Add((TimeSpan)model.Time!);
-        return Competition.Create(
+        return new Competition(
             model.Name,
             model.Type,
             model.Ruleset,
             startTime,
             model.CompulsoryThresholdMinutes,
+            model.FeiId,
             model.FeiRule,
-            model.FeiEventCode,
-            model.FeiScheduleNumber,
-            model.FeiCategoryEventNumber
+            model.FeiScheduleNumber
         );
     }
 
@@ -49,17 +48,20 @@ public class CompetitionBehind : CrudChildBehind<Competition, CompetitionFormMod
         ValidateDateTime(model);
         var date = (DateTime)model.Date!;
         var startTime = date.ToDateTimeOffset().Add((TimeSpan)model.Time!);
-        return Competition.Update(
+        var compulsoryThreshold =
+            model.CompulsoryThresholdMinutes != null
+                ? TimeSpan.FromMinutes(model.CompulsoryThresholdMinutes.Value)
+                : (TimeSpan?)null;
+        return new Competition(
             model.Id,
             model.Name,
             model.Type,
             model.Ruleset,
             startTime,
-            model.CompulsoryThresholdMinutes,
+            compulsoryThreshold,
+            model.FeiId,
             model.FeiRule,
-            model.FeiEventCode,
             model.FeiScheduleNumber,
-            model.FeiCategoryEventNumber,
             _phaseParent.Children,
             _participationParent.Children
         );

@@ -11,7 +11,7 @@ internal class BulgariaRanker : FeiRanker
 
     public override List<RankingEntry> Rank(Ranking ranking)
     {
-        if (ranking.Category == AthleteCategory.Children && ranking.Type != CompetitionType.Championship)
+        if (ranking.Category == ParticipationCategory.Children && ranking.Type != CompetitionType.Championship)
         {
             return OrderByNotEliminatedAndRanked(ranking.Entries)
                 .ThenBy(x => x.Participation.GetTotal()?.RecoveryIntervalWithoutFinal)

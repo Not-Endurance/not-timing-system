@@ -1,28 +1,34 @@
-﻿@using NTS.Blazor.Components.ParticipationTable;
+@using NTS.Blazor.Components.ParticipationTable;
 
 @inherits NComponent
+@inherits ProtocolRowBehind
+
+@{
+    var combination = Entry.Participation.Combination;
+    var phases = Entry.Participation.Phases;
+}
 
 <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
 
-    <MudText Typo="Typo.button" Align="Align.Center" Style="width:50px">@_rankText</MudText>
+    <MudText Typo="Typo.button" Align="Align.Center" Style="width:50px">@GetRankText()</MudText>
     
     <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2" Style="width:80px">
         @{
             const Align align = Align.Center;
         }
-        <MudText Typo="Typo.caption" Align="align">@_combination.Athlete.Names</MudText>
+        <MudText Typo="Typo.caption" Align="align">@combination.Athlete.Names</MudText>
 
-        <MudText Typo="Typo.caption" Align="align">@_combination.Horse</MudText>
+        <MudText Typo="Typo.caption" Align="align">@combination.Horse</MudText>
 
-        @if (_combination.Club != null)
+        @if (combination.Club != null)
         {
-            <MudText Typo="Typo.caption" Align="align">@_combination.Club</MudText>
+            <MudText Typo="Typo.caption" Align="align">@combination.Club</MudText>
         }
 
-        <MudText Typo="Typo.caption" Align="align">@_combination.Athlete.Country</MudText>
+        <MudText Typo="Typo.caption" Align="align">@combination.Athlete.Country</MudText>
     </MudStack>
 
-    <ParticipationTable Number="_combination.Number" Phases="_phases" AlignVertically="true" />
+    <ParticipationTable Number="combination.Number" Phases="phases" AlignVertically="true" />
 
     @if (Entry.Participation.IsComplete())
     {

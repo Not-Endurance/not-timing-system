@@ -1,6 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using Not.Domain.Exceptions;
 using Not.Extensions;
+using Not.Structures;
 using static Not.Localization.NStrings;
 
 namespace Not.Domain.Base;
@@ -67,6 +70,16 @@ public abstract class AggregateRoot : IEquatable<AggregateRoot>, IAggregateRoot
             throw GetRequiredException(field);
         }
         return value;
+    }
+
+    protected static ReadOnlyCollection<T> AreUnique<T>(string field, ReadOnlyCollection<T> collection)
+        where T : IIdentifiable
+    {
+        if (collection.GroupBy(x => x.Id).Select(x => x.Count()).Any(x => x != 1))
+        {
+            throw new DomainPropertyException(field, "Collection_contains_duplicate_entries");
+        }
+        return collection;
     }
 
     public bool Equals(AggregateRoot? other)

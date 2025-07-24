@@ -147,9 +147,6 @@
   <data name="Print_string" xml:space="preserve">
     <value>Yazdır</value>
   </data>
-  <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
-    <value>Bu etkinlik için hiçbir şey oluşturulmadı</value>
-  </data>
   <data name="Date_string" xml:space="preserve">
     <value>Tarih</value>
   </data>
@@ -408,9 +405,6 @@
   <data name="Select_FTQ_codes" xml:space="preserve">
     <value>FTQ kodlarını seçin ve tekrar deneyin</value>
   </data>
-  <data name="Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category" xml:space="preserve">
-    <value>Şampiyona yarışlarına katılan biniciler Genç kategoride olamaz</value>
-  </data>
   <data name="Competition_start_cannot_be_in_the_past" xml:space="preserve">
     <value>Yarışma başlangıcı geçmişte olamaz</value>
   </data>
@@ -519,19 +513,16 @@
   <data name="required_for_FEI_export" xml:space="preserve">
     <value>(FEI dışa aktarımı için gerekli)</value>
   </data>
-  <data name="FEI_Show_ID" xml:space="preserve">
+  <data name="FEI_Show_ID_label" xml:space="preserve">
     <value>FEI Show ID</value>
   </data>
-  <data name="FEI_Event_Code" xml:space="preserve">
+  <data name="FEI_Event_Code_label" xml:space="preserve">
     <value>FEI Event Code</value>
   </data>
-  <data name="FEI_Category_Event_NR" xml:space="preserve">
-    <value>FEI Category Event NR</value>
-  </data>
-  <data name="FEI_Schedule_NR" xml:space="preserve">
+  <data name="FEI_Schedule_NR_label" xml:space="preserve">
     <value>FEI Schedule NR</value>
   </data>
-  <data name="FEI_Rule" xml:space="preserve">
+  <data name="FEI_Rule_label" xml:space="preserve">
     <value>FEI Rule</value>
   </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">

@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
@@ -34,7 +36,15 @@ public class FeiExportBusiness : IFeiExportBusiness
         var ranking = ranklist.Ranking;
         if (string.IsNullOrWhiteSpace(enduranceEvent.FeiShowId))
         {
-            throw new DomainException("Missing Show FEIID");
+            throw new DomainException("Missing Show FEI ID");
+        }
+        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiId))
+        {
+            throw new DomainException("Missing Event FEI ID");
+        }
+        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiEventCode))
+        {
+            throw new DomainException("Missing FEI Event code");
         }
         if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace?.Location))
         {
@@ -44,9 +54,9 @@ public class FeiExportBusiness : IFeiExportBusiness
         {
             throw new DomainException("Missing ranking Name");
         }
-        if (string.IsNullOrEmpty(ranking.FeiCategoryEventNumber))
+        if (string.IsNullOrEmpty(ranking.CompetitionFeiId))
         {
-            throw new DomainException("Missing FEI Category Event NR");
+            throw new DomainException("Missing FEI Competition ID");
         }
         if (string.IsNullOrEmpty(ranking.FeiScheduleNumber))
         {
@@ -56,28 +66,19 @@ public class FeiExportBusiness : IFeiExportBusiness
         {
             throw new DomainException("Missing FEI Rule");
         }
-        if (string.IsNullOrEmpty(ranking.FeiEventCode))
-        {
-            throw new DomainException("Missing FEI Event Code");
-        }
-        if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace.Country.NfCode))
-        {
-            throw new DomainException(
-                $"Country '{enduranceEvent.PopulatedPlace.Country}' does not have 'NF' code. Contact developer"
-            );
-        }
 
-        var feiCategory = GetFeiCategory(ranking.Category);
-        var competitionFeiId = $"{enduranceEvent.FeiShowId}_E_{feiCategory}_{ranking.FeiCategoryEventNumber}";
+        // IsoCode is not accepted by FEI, but they have representatives which can correct that in case a country
+        // without NF code is used. This shouldn't happen anyway
+        var countryCode = enduranceEvent.PopulatedPlace.Country.NfCode ?? enduranceEvent.PopulatedPlace.Country.IsoCode;
         var ctEnduranceCompetition = CreateCompetitions(enduranceEvent!, ranklist);
         var ctEnduranceEvent = new ctEnduranceEvent
         {
-            FEIID = competitionFeiId,
-            Code = ranking.FeiEventCode,
+            FEIID = enduranceEvent.FeiId,
+            Code = enduranceEvent.FeiEventCode,
             StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
             EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
-            NF = enduranceEvent.PopulatedPlace.Country.NfCode,
-            Competitions = new ctEnduranceCompetition[] { ctEnduranceCompetition },
+            NF = countryCode,
+            Competitions = [ctEnduranceCompetition],
         };
         var horseSport = new HorseSport()
         {
@@ -91,11 +92,7 @@ public class FeiExportBusiness : IFeiExportBusiness
             {
                 Show = new ctShowResult
                 {
-                    Venue = new ctVenue
-                    {
-                        Name = enduranceEvent.PopulatedPlace.Location,
-                        Country = enduranceEvent.PopulatedPlace.Country.NfCode,
-                    },
+                    Venue = new ctVenue { Name = enduranceEvent.PopulatedPlace.Location, Country = countryCode },
                     EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
                     StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
                     EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
@@ -109,9 +106,7 @@ public class FeiExportBusiness : IFeiExportBusiness
     ctEnduranceCompetition CreateCompetitions(EnduranceEvent enduranceEvent, Ranklist ranklist)
     {
         var ranking = ranklist.Ranking;
-        var categoryString = GetFeiCategory(ranking.Category);
-        var competitionFeiId =
-            $"{enduranceEvent.FeiShowId}_E_{categoryString}_{ranking.FeiCategoryEventNumber}_{ranking.FeiScheduleNumber}";
+        var competitionFeiId = ranklist.Ranking.CompetitionFeiId!;
         var ctCompetition = new ctEnduranceCompetition
         {
             FEIID = competitionFeiId,
@@ -154,7 +149,7 @@ public class FeiExportBusiness : IFeiExportBusiness
                     AthleteNumber = entry.Participation.Combination.Number,
                     FirstName = athlete.Names.Names.First(),
                     FamilyName = athlete.Names.Names.Last(),
-                    CompetingFor = athlete.Country.NfCode!,
+                    CompetingFor = athlete.Country.NfCode ?? athlete.Country.IsoCode,
                 },
                 Horse = new ctHorse { FEIID = horse.FeiId!, Name = horse.Name },
                 Complement = new ctEnduranceComplement { BestCondition = false },
@@ -220,33 +215,37 @@ public class FeiExportBusiness : IFeiExportBusiness
                 ctPhases = [ctPhase];
             }
         }
-        if (participation.Eliminated != null)
+        day.Phase = ctPhases.ToArray();
+        days.Add(day);
+
+        if (participation.Eliminated == null)
         {
-            var eliminationCode = participation.Eliminated.Code;
-            if (participation.Eliminated is FailedToQualify failedToQualify)
-            {
-                var codes = failedToQualify.FtqCodes.Select(x => x.ToString());
-                eliminationCode = string.Join(" ", codes);
-            }
-            var ctPhase = days.Last().Phase.Last();
-            ctPhase.VetInspection = new ctEnduranceVetInspection
-            {
-                Type = stEnduranceVetTypeCode.Standard,
-                EliminationCode = eliminationCode,
-            };
+            return days;
         }
+        var eliminationCode = participation.Eliminated.Code;
+        if (participation.Eliminated is FailedToQualify failedToQualify)
+        {
+            var codes = failedToQualify.FtqCodes.Select(x => x.ToString());
+            eliminationCode = string.Join(" ", codes);
+        }
+        var lastCtPhase = days.Last().Phase.Last();
+        lastCtPhase.VetInspection = new ctEnduranceVetInspection
+        {
+            Type = stEnduranceVetTypeCode.Standard,
+            EliminationCode = eliminationCode,
+        };
 
         return days;
     }
 
-    string GetFeiCategory(AthleteCategory category)
+    string GetFeiCategory(ParticipationCategory category)
     {
         return category switch
         {
-            AthleteCategory.Senior => "S",
-            AthleteCategory.Children => "C",
-            AthleteCategory.JuniorOrYoungAdult => "YJ",
-            AthleteCategory.Training or AthleteCategory.Companion or _ => throw GuardHelper.Exception(
+            ParticipationCategory.Senior => "S",
+            ParticipationCategory.Children => "C",
+            ParticipationCategory.JuniorOrYoungAdult => "YJ",
+            ParticipationCategory.Training or ParticipationCategory.Companion or _ => throw GuardHelper.Exception(
                 "Implement validation for non-fei categories for Star during setup"
             ), //TODO:
         };
@@ -255,9 +254,11 @@ public class FeiExportBusiness : IFeiExportBusiness
     string Serialize(HorseSport horseSport)
     {
         var serializer = new XmlSerializer(typeof(HorseSport));
-        using var stream = new StringWriter();
-        serializer.Serialize(stream, horseSport);
-        return stream.ToString();
+        using var memoryStream = new MemoryStream();
+        var settings = new XmlWriterSettings { Encoding = Encoding.UTF8, Indent = true };
+        using var writer = XmlWriter.Create(memoryStream, settings);
+        serializer.Serialize(writer, horseSport);
+        return Encoding.UTF8.GetString(memoryStream.ToArray());
     }
 
     string InsertGeneratedDate(string xml)

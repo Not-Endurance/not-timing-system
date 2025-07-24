@@ -1,24 +1,21 @@
-﻿@using NTS.Domain.Core.Objects;
+﻿@inherits ProtocolBehind
 
-@inherits NComponent
-
-@if(_document != null)
+@if (Header == null || Ranklist == null)
 {
-    <MudItem Class="d-flex flex-row justify-space-around printable">
-        <MudImage Class="pb-5" Height="150" Width="135" Src="images/logo-nak.jpg" />
-        <MudItem Class="d-flex flex-column justify-center">
-            <NHeadline2 Content="@_document.Header.Title" Class="mb-4" />
-            <MudStack Class="d-flex mb-3" Row="true" Justify="Justify.Center">
-                <NHeadline2 Content="@_document.Header.PopulatedPlace.City" />
-                <NHeadline2 Content="@_document.Header.EventSpan.ToString()" />
-                <NHeadline2 Content="@_document.Header.PopulatedPlace.Country.ToString()" />
-            </MudStack>
-        </MudItem>
-        <MudImage Class="pt-2 " Height="115" Width="135" Src="images/logo-bfks.png" />
-        @* available images in wwwroot/images are: logo-fei.png; logo-nak.jpg; logo-bfks.png *@
-    </MudItem>
+    <NHeadline3 Color="Color.Error" Content="@string.Format(Component_missing_required_value_string, Protocol_string)" />
+    return;
+}
+<MudStack Row StretchItems="StretchItems.Middle" AlignItems="AlignItems.Center">
+    <MudImage Height="120" Width="135" Src="images/logo-nak.jpg" />
+    
+    <MudStack>
+        <NHeadline2 Content="@Header.Title" />
 
-
+        <MudStack Row Class="d-flex" Justify="Justify.Center">
+            <NHeadline2 Content="@Header.PopulatedPlace.City" />
+            <NHeadline2 Content="@Header.EventSpan.ToString()" />
+            <NHeadline2 Content="@Header.PopulatedPlace.Country.ToString()" />
+        </MudStack>
     <MudItem Class="d-flex flex-row justify-center mt-n5">
         <MudText Typo="Typo.overline" Style="font-size:20px;" Class="printable">
             @Officials_string:
@@ -64,20 +61,19 @@
                     @_document.Header.ForeignVeterinaryDelegate
                 </MudText>
             }
+
         </MudStack>
     </MudStack>
+    
+    <MudImage Height="120" Width="135" Src="images/logo-bfks.png" />
+</MudStack>
 
-    <MudStack Spacing="1" AlignItems="AlignItems.Center" Class="mt-n3">
-        <MudDivider Class="mt-1" />
-        @foreach (var entry in Ranklist.Entries)
-        {
-            <ProtocolRow Entry="entry" />
+<MudStack Spacing="0" AlignItems="AlignItems.Center">
+    <MudDivider Class="mt-1" />
+    @foreach (var entry in Ranklist.Entries)
+    {
+        <ProtocolRow Entry="entry" />
 
-            <MudDivider Class="mt-1 printable" />
-        }
-    </MudStack>
-}
-else
-{
-    <NHeadline3 Color="Color.Error" Content="@string.Format(Component_missing_required_value_string, Protocol_string)" />
-}
+        <MudDivider Class="mt-1 printable" />
+    }
+</MudStack>    

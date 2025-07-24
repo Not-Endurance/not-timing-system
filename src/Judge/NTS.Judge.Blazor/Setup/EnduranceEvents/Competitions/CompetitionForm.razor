@@ -20,11 +20,9 @@
         <MudNumericField @ref="_requiredInspectionCompulsoryThreshold" @bind-Value="Model.CompulsoryThresholdMinutes" />
     }
 
-    <MudTextField @bind-Value="Model.FeiRule" Label="@($"{FEI_Rule} {required_for_FEI_export})")" />
+    <MudTextField @bind-Value="Model.FeiId" Label="@($"{required_for_FEI_export} - {FEI_Competition_ID_label}")" />
     
-    <MudTextField @bind-Value="Model.FeiEventCode" Label="@($"{FEI_Event_Code} {required_for_FEI_export})")" />
+    <MudTextField @bind-Value="Model.FeiRule" Label="@($"{required_for_FEI_export} - {FEI_Rule_label}")" />
     
-    <MudTextField @bind-Value="Model.FeiScheduleNumber" Label="@($"{FEI_Schedule_NR} {required_for_FEI_export})")" />
-    
-    <MudTextField @bind-Value="Model.FeiCategoryEventNumber" Label="@($"{FEI_Category_Event_NR} {required_for_FEI_export})")" />
+    <MudTextField @bind-Value="Model.FeiScheduleNumber" Label="@($"{required_for_FEI_export} - {FEI_Schedule_NR_label}")" />
 </EditForm>

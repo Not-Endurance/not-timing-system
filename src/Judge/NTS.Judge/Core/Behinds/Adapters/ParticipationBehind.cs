@@ -63,9 +63,13 @@ public class ParticipationBehind
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
+        if (SelectedParticipation != null)
+        {
+            return true;
+        }
         Participations = await _participationRepository.ReadAll();
         SelectedParticipation = Participations.FirstOrDefault();
-        return Participations.Any();
+        return false;
     }
 
     public async Task RunAtStartupAsync()

@@ -19,6 +19,8 @@ public class EnduranceEventFormModel : IFormModel<UpcomingEvent>
     public string? Place { get; set; }
     public Country? Country { get; set; }
     public string? FeiShowId { get; set; }
+    public string? FeiId { get; set; }
+    public string? FeiEventCode { get; set; }
     public IReadOnlyCollection<Competition> Competitions { get; private set; } = [];
     public IReadOnlyCollection<Official> Officials { get; private set; } = [];
 
@@ -29,6 +31,8 @@ public class EnduranceEventFormModel : IFormModel<UpcomingEvent>
         Place = upcomingEvent.Place;
         Country = upcomingEvent.Country;
         FeiShowId = upcomingEvent.ShowFeiId;
+        FeiId = upcomingEvent.FeiId;
+        FeiEventCode = upcomingEvent.FeiEventCode;
         Competitions = upcomingEvent.Competitions;
         Officials = upcomingEvent.Officials;
     }

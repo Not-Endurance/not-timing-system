@@ -35,7 +35,7 @@ public partial class NAutocomplete<T> : NBindableComponent<T>
 
     Task<IEnumerable<T>> Seek(string term, CancellationToken _)
     {
-        return Search!.Invoke(term);
+        return Search!.Invoke(term ?? "");
     }
 
     void HandleOnClick(MouseEventArgs _)
