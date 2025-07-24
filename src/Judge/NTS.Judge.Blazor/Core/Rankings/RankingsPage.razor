@@ -3,18 +3,18 @@
 @using NTS.Judge.Blazor.Core.Rankings.Ranklists
 
 @attribute [Route(RANKLIST_PAGE)]
-@inherits PrintableComponent
+@inherits RankingsPageBehind
 
 <NContent Title="@Ranklist_string"
     Class="@Class"
-    HasContent="Behind.Ranklist != null" 
+    HasContent="@HasContent" 
     EmptyMessage="@The_Competitions_havent_started_yet_string">
     @* // TODO: Add Start button in EmptyContent *@
 
     <Main>
-        @if (_showProtocol)
+        @if (IsProtocolVisible)
         {
-           <Protocol Ranklist="Behind.Ranklist!" />
+           <Protocol />
         }
         else
         {
@@ -23,31 +23,35 @@
     </Main>
 
     <Rightbar>
-        <NTextDivider Text="Export" />
+        <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
+            <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
+                     Color="Color.Primary"
+                     Variant="Variant.Outlined"
+                     Class="sidebar-menu-button align-center"
+                     Style="align-self:auto">
 
-        <MudStack Row="@true">
+                <MudMenuItem OnClick="ShowProtocol">@Protocol_string</MudMenuItem>
+                
+                <MudMenuItem OnClick="ShowRanklist">@Ranklist_string</MudMenuItem>
+            </MudMenu>
 
-            <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
-                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
-                         Color="Color.Primary"
-                         Variant="Variant.Outlined"
-                         Class="sidebar-menu-button align-center"
-                         Style="align-self:auto">
+            <NotButtonPrint OnClick="OpenPrintDialog" />
+        </MudButtonGroup>
+        
+        <NTextDivider Text="@Actions_string" Class="mt-4" />
 
-                    <MudMenuItem OnClick="ShowRanklist">@Ranklist_string</MudMenuItem>
-
-                    <MudMenuItem OnClick="ShowProtocol">@Protocol_string</MudMenuItem>
-                </MudMenu>
-
-                <NotButtonPrint OnClick="OpenPrintDialog" />
-            </MudButtonGroup>
-
-            <NButtonPrimary OnClick="Behind.Archive" Text="@Archive_string" />
-
-            <NButtonPrimary OnClick="Behind.ExportFei" Text="Export FEI" /> @* TODO: localization *@
+        <MudStack Row Wrap="Wrap.Wrap">
+            <NButtonPrimary OnClick="ArchiveEnduranceEvent" Text="@Archive_string" StartIcon="@Icons.Material.Filled.Archive"/>
+            
+            @if (IsFeiExportConfigured)
+            {
+                <NButtonPrimary OnClick="GenerateFeiExport" Text="@Export_FEI_string" StartIcon="@Icons.Material.Filled.ImportExport"/> 
+            }
+            
+            <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
         </MudStack>
 
-        <RankingMenu Class="mt-4" />
+        <RankingMenu Class="mt-4"/>
     </Rightbar>
 
 </NContent>

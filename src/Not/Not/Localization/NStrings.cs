@@ -15,10 +15,10 @@ public static class NStrings
     public static string hash_string => LocalizeString("#");
     public static string X_string => LocalizeString("X");
     public static string Create_string => LocalizeString(nameof(Create_string));
+    public static string Back_string => LocalizeString(nameof(Back_string));
     public static string Update_string => LocalizeString(nameof(Update_string));
+    public static string Delete_string => LocalizeString(nameof(Delete_string));
     public static string Print_string => LocalizeString(nameof(Print_string));
-    public static string No__have_been_created_for_this_event_string =>
-        LocalizeString(nameof(No__have_been_created_for_this_event_string));
     public static string Date_string => LocalizeString(nameof(Date_string));
     public static string Time_string => LocalizeString(nameof(Time_string));
     public static string Export_string => LocalizeString(nameof(Export_string));
@@ -26,6 +26,10 @@ public static class NStrings
     public static string Yes_string => LocalizeString(nameof(Yes_string));
     public static string Cancel_string => LocalizeString(nameof(Cancel_string));
     public static string Field_is_required_string => LocalizeString(nameof(Field_is_required_string));
+    public static string List_is_empty_string => LocalizeString(nameof(List_is_empty_string));
+    public static string Add_string => LocalizeString(nameof(Add_string));
+    public static string Are_you_sure_you_want_to_delete__string =>
+        LocalizeString(nameof(Are_you_sure_you_want_to_delete__string));
     public static string Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection =>
         LocalizeString(
             nameof(

@@ -20,18 +20,12 @@ public class SetupParticipationBehind : CrudChildBehind<Participation, Participa
     {
         ValidateEntity(model);
         var newStart = OverrideStartTime(model);
-        return new(newStart, model.IsNotRanked, model.Combination, model.MaxSpeedOverride, model.MinSpeedOverride);
-    }
-
-    protected override Participation UpdateEntity(ParticipationFormModel model)
-    {
-        ValidateEntity(model);
-        var newStart = OverrideStartTime(model);
         return new(
             model.Id,
-            newStart,
             model.IsNotRanked,
             model.Combination,
+            model.Category,
+            newStart,
             model.MaxSpeedOverride,
             model.MinSpeedOverride
         );

@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Not.Notify;
 using Not.Serialization.JSON;
 
 namespace Not.Application.HTTP;
@@ -32,6 +34,11 @@ public class NHttpClient
         }
         catch (Exception ex)
         {
+            if (ex is HttpRequestException { StatusCode: HttpStatusCode.NotFound })
+            {
+                NotifyHelper.Inform("Not Found"); // TODO: probably return result instead and let consumer decide
+                return null;
+            }
             _logger.LogError(ex, "Error during GET request to {Url}", url);
             throw;
         }

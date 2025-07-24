@@ -9,7 +9,7 @@ public static class ParticipationAndRankingFactory
 {
     public static (
         List<Participation> Participations,
-        Dictionary<AthleteCategory, List<RankingEntry>> RankingEntriesByCategory
+        Dictionary<ParticipationCategory, List<RankingEntry>> RankingEntriesByCategory
     ) Create(Domain.Setup.Aggregates.Competition setupCompetition, IEnumerable<Participation> existingParticipations)
     {
         if (setupCompetition.Phases.Count == 0)
@@ -25,59 +25,17 @@ public static class ParticipationAndRankingFactory
             );
         }
 
-        var competitionDistance = 0m;
         var participations = new List<Participation>();
-        var rankingEntriesByCategory = new Dictionary<AthleteCategory, List<RankingEntry>>();
+        var rankingEntriesByCategory = new Dictionary<ParticipationCategory, List<RankingEntry>>();
         foreach (var setupParticipation in setupCompetition.Participations)
         {
-            DateTimeOffset? startTime = setupCompetition.Start.ToUniversalTime();
-            var setupPhases = setupCompetition.Phases;
-            var phases = new List<Phase>();
-            foreach (var setupPhase in setupPhases)
-            {
-                var isFinal = setupPhases.Last() == setupPhase;
-                if (!isFinal && setupPhase.Rest == null)
-                {
-                    throw new DomainException(
-                        Invalid_phase_configuration_in_competition__missing_rest,
-                        setupCompetition.Name
-                    );
-                }
+            var participation = CreateParticipation(setupCompetition, setupParticipation);
 
-                var corePhase = new Phase(
-                    setupPhase.Loop!.Distance,
-                    setupPhase.Recovery,
-                    setupPhase.Rest,
-                    setupCompetition.Ruleset,
-                    isFinal,
-                    setupCompetition.CompulsoryThresholdSpan,
-                    startTime
-                );
-                startTime = null; //Set only first phase StartTime
-                phases.Add(corePhase);
-                competitionDistance += (decimal)setupPhase.Loop!.Distance;
-            }
-            var setupCombination = setupParticipation.Combination;
-            var combination = new Combination(
-                setupCombination.Number,
-                setupCombination.Athlete,
-                setupCombination.Horse,
-                competitionDistance,
-                setupParticipation.MinAverageSpeed,
-                setupParticipation.MaxAverageSpeed
-            );
-            var participation = new Participation(
-                setupCompetition.Name,
-                setupCompetition.Ruleset,
-                setupCompetition.Type,
-                combination,
-                phases
-            );
             if (existingParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
                 var rankingEntry = new RankingEntry(participation, setupParticipation.IsNotRanked);
-                AddRanking(rankingEntriesByCategory, setupCombination.Athlete.Category, rankingEntry);
+                AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
             }
             else
             {
@@ -87,16 +45,71 @@ public static class ParticipationAndRankingFactory
                 if (participationRef != null)
                 {
                     var rankingEntry = new RankingEntry(participationRef, setupParticipation.IsNotRanked);
-                    AddRanking(rankingEntriesByCategory, setupCombination.Athlete.Category, rankingEntry);
+                    AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
                 }
             }
         }
         return (participations, rankingEntriesByCategory);
     }
 
+    static Participation CreateParticipation(
+        Domain.Setup.Aggregates.Competition setupCompetition,
+        Domain.Setup.Aggregates.Participation setupParticipation
+    )
+    {
+        var phases = CreatePhases(setupCompetition);
+        var totalDistance = setupCompetition.Phases.Sum(x => (decimal)x.Loop!.Distance);
+        var combination = new Combination(
+            setupParticipation.Combination.Number,
+            setupParticipation.Combination.Athlete,
+            setupParticipation.Combination.Horse,
+            totalDistance,
+            setupParticipation.MinAverageSpeed,
+            setupParticipation.MaxAverageSpeed
+        );
+        return new Participation(
+            setupCompetition.Name,
+            setupParticipation.Category,
+            setupCompetition.Ruleset,
+            setupCompetition.Type,
+            combination,
+            phases
+        );
+    }
+
+    static List<Phase> CreatePhases(Domain.Setup.Aggregates.Competition setupCompetition)
+    {
+        DateTimeOffset? startTime = setupCompetition.Start.ToUniversalTime();
+        var setupPhases = setupCompetition.Phases;
+        var phases = new List<Phase>();
+        foreach (var setupPhase in setupPhases)
+        {
+            var isFinal = setupPhases.Last() == setupPhase;
+            if (!isFinal && setupPhase.Rest == null)
+            {
+                throw new DomainException(
+                    Invalid_phase_configuration_in_competition__missing_rest,
+                    setupCompetition.Name
+                );
+            }
+            var corePhase = new Phase(
+                setupPhase.Loop!.Distance,
+                setupPhase.Recovery,
+                setupPhase.Rest,
+                setupCompetition.Ruleset,
+                isFinal,
+                setupCompetition.CompulsoryThresholdSpan,
+                startTime
+            );
+            startTime = null; //Set only first phase StartTime
+            phases.Add(corePhase);
+        }
+        return phases;
+    }
+
     static void AddRanking(
-        Dictionary<AthleteCategory, List<RankingEntry>> dictionary,
-        AthleteCategory category,
+        Dictionary<ParticipationCategory, List<RankingEntry>> dictionary,
+        ParticipationCategory category,
         RankingEntry entry
     )
     {

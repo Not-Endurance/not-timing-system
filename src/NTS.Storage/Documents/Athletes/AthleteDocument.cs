@@ -15,20 +15,18 @@ public class AthleteDocument : Document
             Id = athlete.Id,
             FeiId = athlete.FeiId,
             Names = athlete.Names,
-            Category = athlete.Category,
             Country = CountryDocument.Create(athlete.Country),
             Club = athlete.Club == null ? null : ClubDocument.Create(athlete.Club),
         };
     }
 
     public string[] Names { get; init; } = default!;
-    public AthleteCategory Category { get; init; }
     public CountryDocument? Country { get; init; } // TODO: should be required
     public ClubDocument? Club { get; init; }
     public string? FeiId { get; init; }
 
     public Athlete ToSetupDomain()
     {
-        return new Athlete(Id, Names, FeiId, Country?.ToDomain(), Club?.ToDomain(), Category);
+        return new Athlete(Id, Names, FeiId, Country?.ToDomain(), Club?.ToDomain());
     }
 }

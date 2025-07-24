@@ -35,17 +35,26 @@ public class UpcomingEventBehind
 
     protected override UpcomingEvent CreateEntity(EnduranceEventFormModel model)
     {
-        return UpcomingEvent.Create(model.Name, model.Place, model.Country, model.FeiShowId);
+        return new UpcomingEvent(
+            model.Name,
+            model.Place,
+            model.Country,
+            model.FeiShowId,
+            model.FeiId,
+            model.FeiEventCode
+        );
     }
 
     protected override UpcomingEvent UpdateEntity(EnduranceEventFormModel model)
     {
-        return UpcomingEvent.Update(
+        return new UpcomingEvent(
             model.Id,
             model.Name,
             model.Place,
             model.Country,
             model.FeiShowId,
+            model.FeiId,
+            model.FeiEventCode,
             ((ICrudeParent<Competition>)_crudeContext).Children,
             ((ICrudeParent<Official>)_crudeContext).Children,
             ((ICrudeParent<Loop>)_crudeContext).Children,

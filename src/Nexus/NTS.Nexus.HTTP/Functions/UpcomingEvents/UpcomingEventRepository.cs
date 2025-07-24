@@ -17,6 +17,8 @@ public class UpcomingEventRepository : MongoRepository<UpcomingEventDocument>, I
             .Set(x => x.Name, document.Name)
             .Set(x => x.Country, document.Country)
             .Set(x => x.ShowFeiId, document.ShowFeiId)
+            .Set(x => x.FeiId, document.FeiId)
+            .Set(x => x.FeiEventCode, document.FeiEventCode)
             .Set(x => x.Competitions, document.Competitions)
             .Set(x => x.Officials, document.Officials)
             .Set(x => x.Loops, document.Loops)

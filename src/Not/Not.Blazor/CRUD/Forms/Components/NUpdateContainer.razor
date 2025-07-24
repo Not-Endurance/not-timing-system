@@ -1,22 +1,5 @@
-﻿@using MudBlazor
-@using Not.Blazor.Components
-@using Not.Blazor.Navigation
-@using Not.Blazor.CRUD.Forms.Components
-@using Not.Safe
-
-@inherits NComponent
-@typeparam T
+﻿@typeparam T
 @typeparam TForm where TForm : NForm<T>
+@inherits NUpdateContainerBehind<T, TForm>
 
-<MudContainer Class="not-page-mid-width">
-    <NDynamic @ref="_form" T="T" TForm="TForm" Model="Model" />
-    
-    <MudStack Row="true" Class="mt-4">
-        <NButtonUpdate OnClick="Update" />
-
-        @if (Navigator.CanNavigateBack())
-        {
-            <NButtonBack OnClick="NavigateBack" />
-        }
-    </MudStack>
-</MudContainer>
+<NFormContainer T="T" Model="Model" TForm="TForm" FormAction="Submit" ButtonText="@Update_string" />

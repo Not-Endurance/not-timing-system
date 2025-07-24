@@ -20,10 +20,12 @@ public static class EnduranceEventFactory
             setupEvent.Id,
             setupEvent.Country,
             setupEvent.Place,
-            "",
+            setupEvent.Place,
             startDate,
             endDate,
-            setupEvent.ShowFeiId
+            setupEvent.ShowFeiId,
+            setupEvent.FeiId,
+            setupEvent.FeiEventCode
         );
         return enduranceEvent;
     }
