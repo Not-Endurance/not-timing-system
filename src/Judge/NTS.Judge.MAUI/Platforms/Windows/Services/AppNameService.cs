@@ -7,12 +7,12 @@ public class AppNameService : IAppName
     public void SetAppName(string appName)
     {
         Microsoft.Maui.Handlers.WindowHandler.Mapper.AppendToMapping(
-           nameof(IWindow),
-           (handler, view) =>
-           {
-               var nativeWindow = handler.PlatformView;
-               nativeWindow.Title = appName;
-           }
-       );
+            nameof(IWindow),
+            (handler, view) =>
+            {
+                var nativeWindow = handler.PlatformView;
+                nativeWindow.Title = appName;
+            }
+        );
     }
 }
