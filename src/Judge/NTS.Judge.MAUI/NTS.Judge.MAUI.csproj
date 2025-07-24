@@ -86,9 +86,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Output\**" />
+    <Content Remove="Output\**" />
+    <EmbeddedResource Remove="Output\**" />
+    <MauiXaml Remove="Output\**" />
+    <None Remove="Output\**" />
+    <None Remove="app-version.txt" />
+    <None Remove="installer-script.iss" />
+  </ItemGroup>
+
+  <ItemGroup>
     <MauiXaml Update="SplashPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PRIResource Remove="Output\**" />
   </ItemGroup>
   
 </Project>

@@ -1,23 +1,16 @@
 using Not.Filesystem;
 using Not.Startup;
+using NTS.Judge.MAUI.Platforms.Services;
 
 namespace NTS.Judge.MAUI;
 
 public partial class App : Microsoft.Maui.Controls.Application
 {
-    public App(IEnumerable<IStartupInitializer> initializers)
+    public App(IEnumerable<IStartupInitializer> initializers, IAppName appNameService)
     {
         InitializeComponent();
-#if WINDOWS
-        Microsoft.Maui.Handlers.WindowHandler.Mapper.AppendToMapping(
-            nameof(IWindow),
-            (handler, view) =>
-            {
-                var nativeWindow = handler.PlatformView;
-                nativeWindow.Title = "NTS Judge";
-            }
-        );
-#endif
+        appNameService.SetAppName("NTS Judge");
+
         MainPage = new SplashPage();
 
         FileContextHelper.ConfigureApplicationName("nts");
