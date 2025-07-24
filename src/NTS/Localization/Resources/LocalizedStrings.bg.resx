@@ -650,6 +650,7 @@
   </data>
   <data name="Save_string" xml:space="preserve">
     <value />
+  </data>
   <data name="FEI_Competition_ID_label" xml:space="preserve">
     <value>FEI Събитие ID (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; горе,  дясно; пример: "2024_CI_1474_E_S_02")</value>
   </data>

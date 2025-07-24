@@ -650,6 +650,7 @@
   </data>
   <data name="Save_string" xml:space="preserve">
     <value>Save</value>
+  </data>
   <data name="FEI_Competition_ID_label" xml:space="preserve">
     <value>FEI Competition ID (See FEI Database -&gt; "Competition Detail" section -&gt; Top right; example: "2024_CI_1474_E_S_02_01")</value>
   </data>
