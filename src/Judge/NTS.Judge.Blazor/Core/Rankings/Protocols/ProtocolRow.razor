@@ -17,7 +17,17 @@
 
     <ParticipationTable Number="_combination.Number" Phases="_phases" AlignVertically="true" />
 
-    @if (Entry.Participation.IsComplete())
+    @if (Entry.Participation.IsEliminated())
+    {
+        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="width:130px;">
+            <MudText Typo="Typo.body2" Align="_align" Class="mud-button-text">
+                @Eliminated_string:
+                <br />
+                <strong>@Entry.Participation.Eliminated</strong>
+            </MudText>
+        </MudStack>
+    }
+    else if (Entry.Participation.IsComplete())
     {
         var total = Entry.Participation.GetTotal()!;
         <MudStack Class="d-flex" Style="width:130px;" Spacing="1">
@@ -37,19 +47,9 @@
                 <MudText Typo="Typo.caption" Align="_align">
                     @Average_speed
                     <br />
-                    <strong>@total.AverageSpeed</strong> km/h
+                    <strong>@total.AverageSpeed.ToStringWithThousands()</strong> km/h
                 </MudText>
             </MudStack>
-        </MudStack>
-    }
-    else if (Entry.Participation.IsEliminated())
-    {
-        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="width:130px;">
-            <MudText Typo="Typo.body2" Align="_align" Class="mud-button-text">
-                @Eliminated_string:
-                <br />
-                <strong>@Entry.Participation.Eliminated</strong>
-            </MudText>
         </MudStack>
     }
     else
