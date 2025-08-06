@@ -106,7 +106,33 @@ public static class SafeHelper
         }
     }
 
+    public static async Task<IEnumerable<T>> Run<T>(
+        Func<Task<IEnumerable<T>>> action,
+        Func<ValidationException, Task> validationHandler
+    )
+    {
+        try
+        {
+            return await action();
+        }
+        catch (ValidationException validation)
+        {
+            await validationHandler(validation);
+            return [];
+        }
+        catch (Exception ex)
+        {
+            HandleError(ex);
+            return [];
+        }
+    }
+
     public static Task<T?> Run<T>(Func<Task<T>> action)
+    {
+        return Run(action, HandleDefaultValidation);
+    }
+
+    public static Task<IEnumerable<T>> Run<T>(Func<Task<IEnumerable<T>>> action)
     {
         return Run(action, HandleDefaultValidation);
     }

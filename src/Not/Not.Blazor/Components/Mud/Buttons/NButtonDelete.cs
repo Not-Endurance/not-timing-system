@@ -7,6 +7,7 @@ public class NButtonDelete : NButtonPrimary
     public NButtonDelete()
     {
         StartIcon = Icons.Material.Filled.Delete;
-        Text = "Delete";
+        Color = Color.Error;
+        Text = Delete_string;
     }
 }

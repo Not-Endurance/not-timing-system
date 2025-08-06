@@ -5,13 +5,13 @@ namespace NTS.Warp.ACL;
 
 public static class Extensions
 {
-    public static AthleteCategory ToNtsCategory(this EmsCategory category)
+    public static ParticipationCategory ToNtsCategory(this EmsCategory category)
     {
         return category switch
         {
-            EmsCategory.Seniors => AthleteCategory.Senior,
-            EmsCategory.Children => AthleteCategory.Children,
-            EmsCategory.JuniorOrYoungAdults => AthleteCategory.JuniorOrYoungAdult,
+            EmsCategory.Seniors => ParticipationCategory.Senior,
+            EmsCategory.Children => ParticipationCategory.Children,
+            EmsCategory.JuniorOrYoungAdults => ParticipationCategory.JuniorOrYoungAdult,
             _ => throw new NotImplementedException(),
         };
     }

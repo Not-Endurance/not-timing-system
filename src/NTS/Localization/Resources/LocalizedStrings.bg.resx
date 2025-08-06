@@ -147,9 +147,6 @@
   <data name="Print_string" xml:space="preserve">
     <value>Отпечатай</value>
   </data>
-  <data name="No__have_been_created_for_this_event_string" xml:space="preserve">
-    <value>Нищо не е създадено за това събитие</value>
-  </data>
   <data name="Date_string" xml:space="preserve">
     <value>Дата</value>
   </data>
@@ -408,9 +405,6 @@
   <data name="Select_FTQ_codes" xml:space="preserve">
     <value>Изберете FTQ кодове и опитайте отново</value>
   </data>
-  <data name="Athletes_participating_in_Championship_Competitions_cannot_be_of_JuniorOrYoungAdult_category" xml:space="preserve">
-    <value>Атлети участващи в Шампионати не могат да бъдат от категория Младши ездачи</value>
-  </data>
   <data name="Competition_start_cannot_be_in_the_past" xml:space="preserve">
     <value>Старт на състезението не може да бъде в миналото</value>
   </data>
@@ -517,22 +511,19 @@
     <value>Няма резултати в архива</value>
   </data>
   <data name="required_for_FEI_export" xml:space="preserve">
-    <value>(задължително за ФЕИ експорт)</value>
+    <value>*задължително само за ФЕИ експорт</value>
   </data>
-  <data name="FEI_Show_ID" xml:space="preserve">
-    <value>FEI Show ID</value>
+  <data name="FEI_Show_ID_label" xml:space="preserve">
+    <value>FEI Шоу ID (От ФЕИ база данни -&gt; "Show Detail" секция -&gt; горе вдясно; пример: "2024_CI_1474)</value>
   </data>
-  <data name="FEI_Event_Code" xml:space="preserve">
-    <value>FEI Event Code</value>
+  <data name="FEI_Event_Code_label" xml:space="preserve">
+    <value>FEI Код на събитие (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; Event Code (в ляво)</value>
   </data>
-  <data name="FEI_Category_Event_NR" xml:space="preserve">
-    <value>FEI Category Event NR</value>
+  <data name="FEI_Schedule_NR_label" xml:space="preserve">
+    <value>ФЕИ Номер на състезание (От ФЕИ база данни -&gt; "Competition Detail" секция -&gt; "Schedule Competition Nr *"; пример: "01")</value>
   </data>
-  <data name="FEI_Schedule_NR" xml:space="preserve">
-    <value>FEI Schedule NR</value>
-  </data>
-  <data name="FEI_Rule" xml:space="preserve">
-    <value>FEI Rule</value>
+  <data name="FEI_Rule_label" xml:space="preserve">
+    <value>ФЕИ Правилник (От ФЕИ база данни -&gt; "Competition Detail" секция-&gt; Rule*; пример: E-Comp)</value>
   </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Не може да поискаме Реинспекция без време на инспекция</value>
@@ -608,5 +599,74 @@
   </data>
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
+  </data>
+  <data name="FEI_Competition_ID_label" xml:space="preserve">
+    <value>FEI Събитие ID (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; горе,  дясно; пример: "2024_CI_1474_E_S_02")</value>
+  </data>
+  <data name="FEI_Еvent_ID_Label" xml:space="preserve">
+    <value>FEI Събитие ID (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; горе в дясно; пример: "2024_CI_1474_E_S_02")</value>
+  </data>
+  <data name="Missing_FEI_export_configurations_colon__" xml:space="preserve">
+    <value>Липсват нужни конфигурации за ФЕИ експорт: {0}</value>
+  </data>
+  <data name="FEI_Event_Code" xml:space="preserve">
+    <value>ФЕИ Код на събитие</value>
+  </data>
+  <data name="FEI_Show_ID" xml:space="preserve">
+    <value>ФЕИ Шоу ID</value>
+  </data>
+  <data name="FEI_Rule" xml:space="preserve">
+    <value>ФЕИ Правилник</value>
+  </data>
+  <data name="FEI_Schedule_NR" xml:space="preserve">
+    <value>ФЕИ Номер на състезание</value>
+  </data>
+  <data name="FEI_ID" xml:space="preserve">
+    <value>ФЕИ ID</value>
+  </data>
+  <data name="FEI_Event_ID_label" xml:space="preserve">
+    <value>ФЕИ Събитие ID (От ФЕИ база данни-&gt; "Event Detail" секция -&gt; горе дясно; пример: "2024_CI_1474_E_S_02")</value>
+  </data>
+  <data name="Actions_string" xml:space="preserve">
+    <value>Действия</value>
+  </data>
+  <data name="Template_ranking_string" xml:space="preserve">
+    <value>Класация за темплейт</value>
+  </data>
+  <data name="List_is_empty_string" xml:space="preserve">
+    <value>Списъкът е празен</value>
+  </data>
+  <data name="Custom_ranking_string" xml:space="preserve">
+    <value>Ръчна класация</value>
+  </data>
+  <data name="Optionally_select_existing_ranking_to_prepopulate_the_form_string" xml:space="preserve">
+    <value>Опционално изберете съществуваща Класация да служи като темплейт и я коригирайте за да постигнете нужния резултат. </value>
+  </data>
+  <data name="Add_string" xml:space="preserve">
+    <value>Добави</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Ranking_string" xml:space="preserve">
+    <value>Класация</value>
+  </data>
+  <data name="Create_Custom_Ranking_string" xml:space="preserve">
+    <value>Създай Ръчно Класиране</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_delete__string" xml:space="preserve">
+    <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
+  </data>
+  <data name="Delete_string" xml:space="preserve">
+    <value>Изтрий</value>
+  </data>
+  <data name="Back_string" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="Export_FEI_string" xml:space="preserve">
+    <value>Експорт ФЕИ</value>
+  </data>
+  <data name="Automatic_CRI_string" xml:space="preserve">
+    <value>Автоматичнa CRI</value>
   </data>
 </root>

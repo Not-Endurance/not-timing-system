@@ -14,7 +14,6 @@ public partial class AthleteForm
     MudTextField<string?> _feiIdField = default!;
     NAutocomplete<Country?> _countryField = default!;
     NAutocomplete<Club?> _clubField = default!;
-    NSelect<AthleteCategory> _categoryField = default!;
 
     [Inject]
     ISeeker<Country> Countries { get; set; } = default!;
@@ -25,6 +24,5 @@ public partial class AthleteForm
         RegisterInjector(nameof(Athlete.Country), () => _countryField);
         RegisterInjector(nameof(Athlete.Club), () => _clubField);
         RegisterInjector(nameof(Athlete.FeiId), () => _feiIdField);
-        RegisterInjector(nameof(Athlete.Category), () => _categoryField);
     }
 }

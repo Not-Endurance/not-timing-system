@@ -42,9 +42,7 @@ public class EmsAthlete : EmsDomainBase<EmsAthleteException>, IAthlete
     public EmsCategory Category { get; internal set; }
     public EmsCountry Country { get; internal set; }
     public string Name => $"{FirstName} {LastName}";
-
     public Person Names => new([FirstName, LastName]);
-    AthleteCategory IAthlete.Category => Category.ToNtsCategory();
     Country IAthlete.Country => new(0, Country.Name, Country.IsoCode, null, null);
     IClub? IAthlete.Club => new EmsClubIntermediate(Club);
 }

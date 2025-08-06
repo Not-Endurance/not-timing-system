@@ -17,4 +17,19 @@
     <ProjectReference Include="..\Not.Domain\Not.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="CRUD\Forms\Components\NFormContainerBehind.cs">
+      <DependentUpon>NFormContainer.razor</DependentUpon>
+    </Compile>
+    <Compile Update="CRUD\Forms\Components\NUpdateContainerBehind.cs">
+      <DependentUpon>NUpdateContainer.razor</DependentUpon>
+    </Compile>
+    <Compile Update="Components\N\NListBehind.cs">
+      <DependentUpon>NList.razor</DependentUpon>
+    </Compile>
+    <Compile Update="Dialogs\NConfirmDeleteDialogBehind.cs">
+      <DependentUpon>NConfirmDeleteDialog.razor</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

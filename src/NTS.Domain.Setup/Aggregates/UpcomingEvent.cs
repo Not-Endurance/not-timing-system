@@ -8,38 +8,20 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competition>, IParent<Loop>, IParent<Combination>
 {
-    public static UpcomingEvent Create(string? name, string? place, Country? country, string? showFeiId)
-    {
-        return new(name, place, country, showFeiId);
-    }
-
-    public static UpcomingEvent Update(
-        int? id,
-        string? name,
-        string? place,
-        Country? country,
-        string? showFeiId,
-        IEnumerable<Competition> competitions,
-        IEnumerable<Official> officials,
-        IEnumerable<Loop> loops,
-        IEnumerable<Combination> combinations
-    )
-    {
-        return new(id, name, place, country, showFeiId, competitions, officials, loops, combinations);
-    }
-
     readonly List<Competition> _competitions = [];
     readonly List<Official> _officials = [];
     readonly List<Loop> _loops = [];
     readonly List<Combination> _combinations = [];
 
     [JsonConstructor]
-    UpcomingEvent(
+    public UpcomingEvent(
         int? id,
         string? name,
         string? place,
         Country? country,
         string? showFeiId,
+        string? feiId,
+        string? feiEventCode,
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials,
         IEnumerable<Loop> loops,
@@ -51,19 +33,30 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         Place = Capitalized(nameof(Place), place);
         Country = Required(nameof(Country), country);
         ShowFeiId = showFeiId;
+        FeiId = feiId;
+        FeiEventCode = feiEventCode;
         _competitions = competitions.ToList();
         _officials = officials.ToList();
         _loops = loops.ToList();
         _combinations = combinations.ToList();
     }
 
-    UpcomingEvent(string? name, string? place, Country? country, string? showFeiId)
-        : this(GenerateId(), name, place, country, showFeiId, [], [], [], []) { }
+    public UpcomingEvent(
+        string? name,
+        string? place,
+        Country? country,
+        string? showFeiId,
+        string? feiId,
+        string? feiEventCode
+    )
+        : this(GenerateId(), name, place, country, showFeiId, feiId, feiEventCode, [], [], [], []) { }
 
     public string Name { get; }
     public string Place { get; }
     public Country Country { get; }
     public string? ShowFeiId { get; }
+    public string? FeiId { get; }
+    public string? FeiEventCode { get; }
     public IReadOnlyList<Competition> Competitions => _competitions.AsReadOnly();
     public IReadOnlyList<Official> Officials => _officials.AsReadOnly();
     public IReadOnlyList<Loop> Loops => _loops.AsReadOnly();

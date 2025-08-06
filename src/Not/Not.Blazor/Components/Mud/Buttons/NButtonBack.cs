@@ -7,6 +7,6 @@ public class NButtonBack : NButtonSecondary
     public NButtonBack()
     {
         StartIcon = Icons.Material.Outlined.ArrowBackIos;
-        Text = "Back";
+        Text = Back_string;
     }
 }

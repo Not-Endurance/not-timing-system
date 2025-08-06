@@ -21,6 +21,8 @@ public class ArchiveDocument : Document
             City = enduranceEvent.PopulatedPlace.City,
             Location = enduranceEvent.PopulatedPlace.Location,
             FeiShowId = enduranceEvent.FeiShowId,
+            FeiId = enduranceEvent.FeiId,
+            FeiEventCode = enduranceEvent.FeiEventCode,
             StartDay = enduranceEvent.EventSpan.StartDay,
             EndDay = enduranceEvent.EventSpan.EndDay,
             Officials = officials.Select(OfficialDocument.Create).ToArray(),
@@ -32,6 +34,8 @@ public class ArchiveDocument : Document
     public string City { get; init; } = default!;
     public string? Location { get; init; }
     public string? FeiShowId { get; init; }
+    public string? FeiId { get; init; }
+    public string? FeiEventCode { get; init; }
     public DateTimeOffset StartDay { get; init; }
     public DateTimeOffset EndDay { get; init; }
     public OfficialDocument[] Officials { get; init; } = default!;
@@ -46,7 +50,9 @@ public class ArchiveDocument : Document
             Location ?? "",
             StartDay,
             EndDay,
-            FeiShowId
+            FeiShowId,
+            FeiId,
+            FeiEventCode
         );
         var officials = Officials.Select(x => x.ToCoreDomain());
         var ranklists = Ranklists.Select(x => x.ToDomain());

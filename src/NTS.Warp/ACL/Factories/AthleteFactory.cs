@@ -24,14 +24,14 @@ public class AthleteFactory
         return new EmsAthlete(athleteState, country);
     }
 
-    public EmsCategory MapCategory(AthleteCategory category)
+    public EmsCategory MapCategory(ParticipationCategory category)
     {
         return category switch
         {
-            AthleteCategory.Senior => EmsCategory.Seniors,
-            AthleteCategory.Children => EmsCategory.Children,
-            AthleteCategory.JuniorOrYoungAdult => EmsCategory.JuniorOrYoungAdults,
-            AthleteCategory.Training or AthleteCategory.Companion => EmsCategory.Seniors,
+            ParticipationCategory.Senior => EmsCategory.Seniors,
+            ParticipationCategory.Children => EmsCategory.Children,
+            ParticipationCategory.JuniorOrYoungAdult => EmsCategory.JuniorOrYoungAdults,
+            ParticipationCategory.Training or ParticipationCategory.Companion => EmsCategory.Seniors,
             _ => throw new ArgumentOutOfRangeException(nameof(category), category, null),
         };
     }

@@ -49,6 +49,9 @@ public class Combination : AggregateRoot, IParent, IReflect<Athlete>, IReflect<H
 
     public void Reflect(Athlete child)
     {
-        Athlete = child;
+        if (Athlete == child)
+        {
+            Athlete = child;
+        }
     }
 }

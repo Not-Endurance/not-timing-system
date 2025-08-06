@@ -1,5 +1,6 @@
 ﻿using Not.Random;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Enums;
 
 namespace NTS.Storage.Documents.Archive.Models;
 
@@ -11,6 +12,7 @@ public class ParticipationDocumentModel
 
         return new ParticipationDocumentModel
         {
+            Category = participation.Category,
             Competition = CompetitionDocumentModel.Create(participation.Competition),
             Combination = CombinationDocumentModel.Create(participation.Combination),
             Phases = participation.Phases.Select(PhaseDocumentModel.Create).ToArray(),
@@ -20,6 +22,7 @@ public class ParticipationDocumentModel
         };
     }
 
+    public ParticipationCategory Category { get; init; } = default!;
     public CompetitionDocumentModel Competition { get; init; } = default!;
     public CombinationDocumentModel Combination { get; init; } = default!;
     public PhaseDocumentModel[] Phases { get; init; } = default!;
@@ -34,6 +37,7 @@ public class ParticipationDocumentModel
         var eliminated = Eliminated?.ToDomain();
         return new Participation(
             RandomHelper.GenerateUniqueInteger(),
+            Category,
             competition,
             combination,
             new(phases),

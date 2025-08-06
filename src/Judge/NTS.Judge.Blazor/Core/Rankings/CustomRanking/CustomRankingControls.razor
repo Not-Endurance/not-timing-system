@@ -1,0 +1,17 @@
+@inherits CustomRankingControlsBehind;
+
+<EditForm Model="Model">
+    <MudTextField @ref="NameField" @bind-Value="Model.Name" Label="@Name_string" />
+    
+    <NSelect @ref="RulesetField" @bind-Value="Model.Ruleset" Label="@Competition_Ruleset_string" />
+    
+    <NSelect @ref="TypeField" @bind-Value="Model.Type" Label="@Competition_Type_string" />
+    
+    <NSelect @ref="CategoryField" @bind-Value="Model.Category" Label="@Category_string" />
+
+    <MudTextField @bind-Value="Model.CompetitionFeiId" Label="@($"{required_for_FEI_export} - {FEI_Competition_ID_label}")" />
+
+    <MudTextField @bind-Value="Model.FeiRule" Label="@($"{required_for_FEI_export} - {FEI_Rule_label}")" />
+
+    <MudTextField @bind-Value="Model.FeiScheduleNumber" Label="@($"{required_for_FEI_export} - {FEI_Schedule_NR_label}")" />
+</EditForm>
