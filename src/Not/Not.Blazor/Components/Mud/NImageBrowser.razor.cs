@@ -13,7 +13,8 @@ public partial class NImageBrowser
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
-    [Parameter] public EventCallback<string> OnImageSelected { get; set; }
+    [Parameter]
+    public EventCallback<string> OnImageSelected { get; set; }
 
     protected override void OnInitialized()
     {
@@ -27,9 +28,9 @@ public partial class NImageBrowser
             Directory.CreateDirectory(ImagesFolder);
         }
 
-        _images = Directory.GetFiles(ImagesFolder)
-            .Where(f => new[] { ".png", ".jpg", ".jpeg", ".gif" }
-            .Contains(Path.GetExtension(f).ToLower()))
+        _images = Directory
+            .GetFiles(ImagesFolder)
+            .Where(f => new[] { ".png", ".jpg", ".jpeg", ".gif" }.Contains(Path.GetExtension(f).ToLower()))
             .ToList();
     }
 
@@ -84,7 +85,9 @@ public partial class NImageBrowser
         var confirmed = await DialogService.ShowMessageBox(
             "Confirm Delete",
             $"Are you sure you want to delete '{Path.GetFileName(imagePath)}'?",
-            yesText: "Delete", cancelText: "Cancel");
+            yesText: "Delete",
+            cancelText: "Cancel"
+        );
 
         if (confirmed == true)
         {

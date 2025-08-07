@@ -8,12 +8,12 @@ namespace NTS.Judge.Blazor.Core.Rankings.Protocols;
 
 public class ProtocolBehind : NComponent
 {
-
     public string headerLogoLeft = "images/logos/logo-nak.jpg";
     public string headerLogoRight = "images/logos/logo-bfks.png";
 
     [Inject]
     IRanklistDocumentService Service { get; set; } = default!;
+
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
@@ -32,7 +32,7 @@ public class ProtocolBehind : NComponent
         {
             MaxWidth = MaxWidth.ExtraLarge,
             FullWidth = true,
-            CloseOnEscapeKey = true
+            CloseOnEscapeKey = true,
         };
         var dialog = await DialogService.ShowAsync<ImageBrowserDialog>("Image Browser", parameters, options);
         var result = await dialog.Result;
@@ -41,7 +41,7 @@ public class ProtocolBehind : NComponent
         {
             var selection = result.Data as string;
             if (forImage == headerLogoLeft)
-            {                
+            {
                 headerLogoLeft = selection!;
             }
             else
