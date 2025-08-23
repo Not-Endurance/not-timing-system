@@ -643,7 +643,7 @@
     <value>Create Custom Ranking</value>
   </data>
   <data name="Optionally_select_existing_ranking_to_prepopulate_the_form_string" xml:space="preserve">
-    <value>Optionally select an existing Ranking in order to prepopulate the form. Then you can modify it's values and entries to achive the desired ouput</value>
+    <value>Optionally select existing Rankings in order to add them to the form. Then you can modify their values and entries to achieve the desired output</value>
   </data>
   <data name="Add_string" xml:space="preserve">
     <value>Add</value>
