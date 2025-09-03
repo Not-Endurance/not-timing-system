@@ -11,15 +11,17 @@ public class ProtocolBehind : NComponent
 {
     string _shortPath = "images\\logos";
     public string src = "wwwroot\\images\\logos";
-    public string headerLogoLeft = "images/logos/logo-bfks.png";
-    public string headerLogoRight = "images/logos/blank.png";
 
+    [Inject]
+    ILogoPersistence HeaderLogo { get; set; } = default!;
 
     [Inject]
     IRanklistDocumentService Service { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
+    public string HeaderLogoLeft => Path.Combine(_shortPath, Path.GetFileName(HeaderLogo.Left));
+    public string HeaderLogoRight => Path.Combine(_shortPath, Path.GetFileName(HeaderLogo.Right));
 
     public DocumentHeader? Header => Service.Document?.Header;
 
@@ -46,14 +48,14 @@ public class ProtocolBehind : NComponent
         {
             var selection = result.Data as string;
             GuardHelper.ThrowIfDefault(selection);
-            var filename = Path.Combine(_shortPath, Path.GetFileName(selection));
-            if (forImage == headerLogoLeft)
+            var filename = Path.GetFileName(selection);
+            if (forImage == HeaderLogoLeft)
             {                
-                headerLogoLeft = filename;
+                HeaderLogo.Left = filename;
             }
             else
             {
-                headerLogoRight = filename;
+                HeaderLogo.Right = filename;
             }
         }
     }
