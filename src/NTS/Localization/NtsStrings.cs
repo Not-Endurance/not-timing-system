@@ -180,6 +180,16 @@ namespace NTS.Localization
             LocalizeString(nameof(Cannot_select_another_event_without_resetting__string));
         public static string Component_missing_required_value_string =>
             LocalizeString(nameof(Component_missing_required_value_string));
+        public static string Upload_string =>
+           LocalizeString(nameof(Upload_string));
+        public static string Delete_selection_string =>
+           LocalizeString(nameof(Delete_selection_string));
+        public static string Image_browser_string =>
+            LocalizeString(nameof(Image_browser_string));
+        public static string Image_browser_empty_string =>
+            LocalizeString(nameof(Image_browser_empty_string));
+        public static string Use_image_string =>
+            LocalizeString(nameof(Use_image_string));
     }
 }
 #pragma warning restore NA0004

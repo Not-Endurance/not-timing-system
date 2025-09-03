@@ -669,4 +669,10 @@
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>
+  <data name="Use_image_string" xml:space="preserve">
+    <value>Използвай изображение</value>
+  </data>
+  <data name="Image_browser_string" xml:space="preserve">
+    <value>Каталог на изображения</value>
+  </data>
 </root>

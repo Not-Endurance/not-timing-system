@@ -669,4 +669,10 @@
   <data name="Automatic_CRI_string" xml:space="preserve">
     <value>Use automatic CRI</value>
   </data>
+  <data name="Use_image_string" xml:space="preserve">
+    <value>Selected Image</value>
+  </data>
+  <data name="Image_browser_string" xml:space="preserve">
+    <value>Image Browser</value>
+  </data>
 </root>

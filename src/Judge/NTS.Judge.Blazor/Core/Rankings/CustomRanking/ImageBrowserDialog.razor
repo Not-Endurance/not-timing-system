@@ -1,12 +1,12 @@
 ﻿<MudDialog>
     <TitleContent>
-        Image Browser
+        @Image_browser_string
     </TitleContent>
     <DialogContent>
         <NImageBrowser Src="@Src" SelectedImage="@SelectedImagePath" OnImageSelected="HandleImageSelection"/>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Primary" OnClick="Submit">Use Selected Image</MudButton>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">@Use_image_string</MudButton>
+        <MudButton OnClick="Cancel">@Cancel_string</MudButton>
     </DialogActions>
 </MudDialog>
