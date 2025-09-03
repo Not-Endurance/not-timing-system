@@ -39,7 +39,7 @@ public class ProtocolBehind : NComponent
         {
             MaxWidth = MaxWidth.ExtraLarge,
             FullWidth = true,
-            CloseOnEscapeKey = true
+            CloseOnEscapeKey = true,
         };
         var dialog = await DialogService.ShowAsync<ImageBrowserDialog>("Image Browser", parameters, options);
         var result = await dialog.Result;
