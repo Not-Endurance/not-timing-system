@@ -8,7 +8,10 @@ public partial class ImageBrowserDialog
     MudDialogInstance MudDialog { get; set; } = default!;
 
     [Parameter]
-    public string SelectedImagePath { get; set; } = "";
+    public string SelectedImagePath { get; set; } = default!;
+
+    [Parameter]
+    public string Src { get; set; } = default!;
 
     void Submit()
     {
@@ -20,8 +23,8 @@ public partial class ImageBrowserDialog
         MudDialog.Cancel();
     }
 
-    void HandleImageSelection(string path)
+    void HandleImageSelection(string imagePath)
     {
-        SelectedImagePath = path;
+        SelectedImagePath = imagePath;
     }
 }

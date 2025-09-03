@@ -7,7 +7,7 @@
 }
 <MudStack>
     <MudItem Class="d-flex flex-row justify-space-around printable">
-        <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(headerLogoLeft)">
+        <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(headerLogoLeft, src)">
             <MudImage Class="pb-5" Height="150" Width="135" Src="@headerLogoLeft" />
         </MudPaper>
         <MudItem Class="d-flex flex-column justify-center">
@@ -18,8 +18,8 @@
                 <NHeadline2 Content="@Header.PopulatedPlace.Country.ToString()" />
             </MudStack>
         </MudItem>
-        <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(headerLogoRight)">
-            <MudImage Class="pt-2 " Height="115" Width="135" Src="@headerLogoRight" />
+        <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(headerLogoRight, src)">
+            <MudImage Class="pt-2 " Height="150" Width="135" Src="@headerLogoRight" />
         </MudPaper>
     </MudItem>
         

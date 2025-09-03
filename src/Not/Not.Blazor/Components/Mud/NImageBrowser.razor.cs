@@ -7,13 +7,20 @@ namespace Not.Blazor.Components.Mud;
 public partial class NImageBrowser
 {
     List<string> _images = [];
-    string _selectedImage = "";
-    string ImagesFolder => Path.Combine(Environment.CurrentDirectory, "wwwroot\\images\\logos");
+    
+    string ImagesFolder => Path.Combine(Environment.CurrentDirectory, Src);
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
-    [Parameter] public EventCallback<string> OnImageSelected { get; set; }
+    [Parameter] 
+    public EventCallback<string> OnImageSelected { get; set; }
+
+    [Parameter]
+    public string Src { get; set; } = default!;
+
+    [Parameter]
+    public string SelectedImage { get; set; } = default!;
 
     protected override void OnInitialized()
     {
@@ -51,10 +58,10 @@ public partial class NImageBrowser
 
     async Task SelectImage(string imagePath)
     {
-        _selectedImage = imagePath;
-        if (!string.IsNullOrEmpty(_selectedImage))
+        SelectedImage = imagePath;
+        if (!string.IsNullOrEmpty(SelectedImage))
         {
-            await OnImageSelected.InvokeAsync(GetBase64Image(_selectedImage));
+            await OnImageSelected.InvokeAsync(imagePath);
         }
     }
 

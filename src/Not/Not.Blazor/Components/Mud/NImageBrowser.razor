@@ -20,7 +20,7 @@
         Color="Color.Error"
         Class="m-5"
         StartIcon="@Icons.Material.Filled.Delete"
-        OnClick="() => PromptDeleteImage(_selectedImage)">
+        OnClick="() => PromptDeleteImage(SelectedImage)">
             Delete Selection
         </MudButton>
     </MudStack>
@@ -37,7 +37,7 @@
         @foreach (var image in _images)
         {
             <MudItem xs="6" sm="4" md="3" lg="2">
-                <MudCard Class="@($"mb-4 cursor-pointer {(_selectedImage == image ? "border border-primary" : "")}")"
+                <MudCard Class="@($"mb-4 cursor-pointer {(Path.GetFileName(SelectedImage) == Path.GetFileName(image) ? "border border-primary" : "")}")"
                 @onclick="() => SelectImage(image)">
                     <MudCardMedia Image="@GetBase64Image(image)" Height="120" />
                     <MudCardContent>

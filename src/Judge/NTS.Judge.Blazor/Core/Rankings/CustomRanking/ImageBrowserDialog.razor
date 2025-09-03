@@ -3,7 +3,7 @@
         Image Browser
     </TitleContent>
     <DialogContent>
-        <NImageBrowser OnImageSelected="HandleImageSelection"/>
+        <NImageBrowser Src="@Src" SelectedImage="@SelectedImagePath" OnImageSelected="HandleImageSelection"/>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Primary" OnClick="Submit">Use Selected Image</MudButton>
