@@ -34,7 +34,11 @@ public class ProtocolBehind : NComponent
 
     public async Task OpenImageBrowser(string forImage, string source)
     {
-        var parameters = new DialogParameters<ImageBrowserDialog> { { x => x.SelectedImagePath, forImage }, { x => x.Src, source } };
+        var parameters = new DialogParameters<ImageBrowserDialog>
+        {
+            { x => x.SelectedImagePath, forImage },
+            { x => x.Src, source },
+        };
         DialogOptions options = new()
         {
             MaxWidth = MaxWidth.ExtraLarge,
@@ -50,7 +54,7 @@ public class ProtocolBehind : NComponent
             GuardHelper.ThrowIfDefault(selection);
             var filename = Path.GetFileName(selection);
             if (forImage == HeaderLogoLeft)
-            {                
+            {
                 HeaderLogo.Left = filename;
             }
             else

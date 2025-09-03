@@ -7,13 +7,13 @@ namespace Not.Blazor.Components.Mud;
 public partial class NImageBrowser
 {
     List<string> _images = [];
-    
+
     string ImagesFolder => Path.Combine(Environment.CurrentDirectory, Src);
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<string> OnImageSelected { get; set; }
 
     [Parameter]

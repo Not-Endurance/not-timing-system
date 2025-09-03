@@ -46,7 +46,7 @@ public class CreateCustomRankingDialogBehind : NDialog
         {
             return Task.CompletedTask;
         }
-        if(RankingModel == null)
+        if (RankingModel == null)
         {
             RankingModel = new CustomRankingModel(ranking);
         }
@@ -55,13 +55,13 @@ public class CreateCustomRankingDialogBehind : NDialog
             foreach (var entry in ranking.Entries)
             {
                 SafeHelper.Run(() =>
-                {                
+                {
                     RankingModel.Entries.Add(entry);
                 });
             }
         }
 
-         return Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
     public async Task<IEnumerable<Ranking>> ListRankings()

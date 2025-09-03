@@ -4,8 +4,10 @@ public partial class NTd<T>
 {
     [Parameter]
     public T? Value { get; set; }
+
     [Parameter]
     public string? TextStyle { get; set; }
-    [Parameter] 
+
+    [Parameter]
     public string? CellStyle { get; set; }
 }

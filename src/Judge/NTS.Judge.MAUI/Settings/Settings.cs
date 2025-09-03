@@ -2,7 +2,7 @@
 
 namespace NTS.Judge.MAUI.Settings;
 
-public sealed class Settings: ILogoPersistence
+public sealed class Settings : ILogoPersistence
 {
     const string HEADER_LOGO_LEFT = "headerLogo.left";
     const string HEADER_LOGO_RIGHT = "headerLogo.right";
