@@ -41,7 +41,7 @@
 
   <!-- Windows publish configuration -->
   <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
@@ -83,16 +83,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Output\**" />
-    <Content Remove="Output\**" />
-    <EmbeddedResource Remove="Output\**" />
-    <MauiXaml Remove="Output\**" />
-    <None Remove="Output\**" />
-    <None Remove="app-version.txt" />
-    <None Remove="installer-script.iss" />
   </ItemGroup>
 
   <ItemGroup>
