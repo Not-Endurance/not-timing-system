@@ -67,6 +67,7 @@ public class RankingService
         {
             return false;
         }
+        Rankings.Clear();
         Rankings.AddRange(rankings);
         await Select(rankings.First());
         return true;
