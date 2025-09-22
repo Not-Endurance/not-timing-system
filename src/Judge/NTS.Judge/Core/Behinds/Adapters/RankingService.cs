@@ -49,6 +49,7 @@ public class RankingService
         _events = events;
         _officials = officials;
         _archive = archive;
+        Participation.PARTICIPATION_COMPLETED_EVENT.Subscribe(UpdateRanklist);
         Participation.PHASE_COMPLETED_EVENT.Subscribe(UpdateRanklist);
         Participation.ELIMINATED_EVENT.Subscribe(UpdateRanklist);
         Participation.RESTORED_EVENT.Subscribe(UpdateRanklist);
