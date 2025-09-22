@@ -7,14 +7,14 @@ namespace NTS.Judge.Blazor.Shared.Components.SidePanels.Reset;
 public partial class SoftResetDialog : NDialog
 {
     [Inject]
-    ICoreBehind CoreBehind { get; set; } = default!;
+    ICoreService CoreService { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
     async Task SoftReset()
     {
-        await CoreBehind.SoftReset();
+        await CoreService.SoftReset();
         Confirm();
     }
 
@@ -26,7 +26,7 @@ public partial class SoftResetDialog : NDialog
             Cancel();
             return;
         }
-        await CoreBehind.HardReset();
+        await CoreService.HardReset();
         Confirm();
     }
 }

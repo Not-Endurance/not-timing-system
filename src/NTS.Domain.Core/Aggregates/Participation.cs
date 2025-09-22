@@ -12,6 +12,7 @@ public class Participation : AggregateRoot, IAggregateRoot
     static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);
     static readonly FailedToQualify SPEED_RESTRICTION = new([FailToQualifyCode.SP]);
     public static readonly Event<PhaseCompleted> PHASE_COMPLETED_EVENT = new();
+    public static readonly Event<PhaseCompleted> PARTICIPATION_COMPLETED_EVENT = new();
     public static readonly Event<ParticipationEliminated> ELIMINATED_EVENT = new();
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
@@ -174,7 +175,14 @@ public class Participation : AggregateRoot, IAggregateRoot
         {
             Phases.StartIfNext();
             var phaseCompleted = new PhaseCompleted(this);
-            PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
+            if (phase.IsFinal)
+            {
+                PARTICIPATION_COMPLETED_EVENT.Emit(phaseCompleted);
+            }
+            else
+            {
+                PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
+            }
         }
     }
 

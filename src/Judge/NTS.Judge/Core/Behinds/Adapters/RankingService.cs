@@ -14,6 +14,7 @@ using NTS.Judge.Blazor.Core.Rankings;
 using NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 using NTS.Judge.Blazor.Core.Rankings.Menu;
 using NTS.Judge.Core.FeiExport;
+using NTS.Judge.Features.Core.Reset;
 using NTS.Judge.HTTP;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
@@ -23,7 +24,8 @@ public class RankingService
         IRankingService,
         IRankingMenuService,
         IRanklistDocumentService,
-        ICustomRankingService
+        ICustomRankingService,
+        ICoreState
 {
     readonly IFileContext _configuration;
     readonly IFeiExportBusiness _feiExportBusiness;
@@ -47,6 +49,7 @@ public class RankingService
         _events = events;
         _officials = officials;
         _archive = archive;
+        Participation.PARTICIPATION_COMPLETED_EVENT.Subscribe(UpdateRanklist);
         Participation.PHASE_COMPLETED_EVENT.Subscribe(UpdateRanklist);
         Participation.ELIMINATED_EVENT.Subscribe(UpdateRanklist);
         Participation.RESTORED_EVENT.Subscribe(UpdateRanklist);
@@ -64,6 +67,7 @@ public class RankingService
         {
             return false;
         }
+        Rankings.Clear();
         Rankings.AddRange(rankings);
         await Select(rankings.First());
         return true;

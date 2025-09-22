@@ -19,11 +19,14 @@ public abstract class ObservableBehind : IObservableBehind
     /// <returns>Indicates weather or not the state has been initialized successfully</returns>
     protected abstract Task<bool> PerformInitialization(params IEnumerable<object> arguments);
 
-    protected bool Initialized { get; } = false;
-
     protected void EmitChange()
     {
         _stateChanged.Emit();
+    }
+
+    public void Reset()
+    {
+        _isInitialized = false;
     }
 
     public async Task Initialize(params IEnumerable<object> arguments)

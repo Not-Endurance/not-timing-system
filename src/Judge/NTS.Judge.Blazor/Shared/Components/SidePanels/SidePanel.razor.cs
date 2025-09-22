@@ -8,7 +8,7 @@ namespace NTS.Judge.Blazor.Shared.Components.SidePanels;
 public partial class SidePanel
 {
     [Inject]
-    ICoreBehind CoreBehind { get; set; } = default!;
+    ICoreService CoreService { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
@@ -18,12 +18,12 @@ public partial class SidePanel
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(CoreBehind);
+        await Observe(CoreService);
     }
 
     public async Task Start()
     {
-        await CoreBehind.Start();
+        await CoreService.Start();
     }
 
     async Task OpenSoftResetDialog()
