@@ -14,6 +14,7 @@ using NTS.Judge.Blazor.Core.Rankings;
 using NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 using NTS.Judge.Blazor.Core.Rankings.Menu;
 using NTS.Judge.Core.FeiExport;
+using NTS.Judge.Features.Core.Reset;
 using NTS.Judge.HTTP;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
@@ -23,7 +24,8 @@ public class RankingService
         IRankingService,
         IRankingMenuService,
         IRanklistDocumentService,
-        ICustomRankingService
+        ICustomRankingService,
+        ICoreState
 {
     readonly IFileContext _configuration;
     readonly IFeiExportBusiness _feiExportBusiness;

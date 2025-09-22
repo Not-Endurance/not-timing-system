@@ -5,15 +5,15 @@ using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Core.Start.Factories;
+using NTS.Judge.Features.Core.Start.Factories;
 using NTS.Judge.Features.Warp;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
 using Official = NTS.Domain.Core.Aggregates.Official;
 using Participation = NTS.Domain.Core.Aggregates.Participation;
 
-namespace NTS.Judge.Core.Start;
+namespace NTS.Judge.Features.Core.Start;
 
-public class CoreStarter : ICoreStarter
+public class CoreStartService : ICoreStarter
 {
     readonly IEventContext _eventContext;
     readonly IRepository<EnduranceEvent> _coreEventRepository;
@@ -21,7 +21,7 @@ public class CoreStarter : ICoreStarter
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<Ranking> _rankingRepository;
 
-    public CoreStarter(
+    public CoreStartService(
         IEventContext eventContext,
         IRepository<EnduranceEvent> coreEventRepository,
         IRepository<Official> coreOfficialRepository,

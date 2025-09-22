@@ -3,7 +3,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
 
-namespace NTS.Judge.Core.Start.Factories;
+namespace NTS.Judge.Features.Core.Start.Factories;
 
 public static class ParticipationAndRankingFactory
 {

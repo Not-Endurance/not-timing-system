@@ -7,12 +7,12 @@ namespace NTS.Judge.Blazor.Core.Dashboards;
 public partial class DashboardPage : NComponent
 {
     [Inject]
-    ICoreBehind CoreBehind { get; set; } = default!;
+    ICoreService CoreService { get; set; } = default!;
     protected int? ArchiveId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(CoreBehind);
+        await Observe(CoreService);
     }
 
     protected async Task LoadArchive()
@@ -22,6 +22,6 @@ public partial class DashboardPage : NComponent
             NotifyHelper.Warn("Provide Archive ID");
             return;
         }
-        await CoreBehind.LoadArchive(ArchiveId.Value);
+        await CoreService.LoadArchive(ArchiveId.Value);
     }
 }
