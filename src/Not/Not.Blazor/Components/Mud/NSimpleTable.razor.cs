@@ -4,7 +4,7 @@ namespace Not.Blazor.Components;
 
 public partial class NSimpleTable<T>
 {
-    Typo _typography = Typo.inherit;
+    Typo _typography = Typo.caption;
 
     [Parameter, EditorRequired]
     public IEnumerable<T> Items { get; set; } = [];
@@ -19,16 +19,5 @@ public partial class NSimpleTable<T>
     public string Height { get; set; } = default!;
 
     [Parameter]
-    public bool Mobile { get; set; } = false;
-
-    [Parameter]
     public RenderFragment<T> CustomCell { get; set; } = default!;
-
-    protected override void OnParametersSet()
-    {
-        if (Mobile)
-        {
-            _typography = Typo.caption;
-        }
-    }
 }

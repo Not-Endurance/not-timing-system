@@ -7,9 +7,6 @@ public partial class StartlistHistory
     [Inject]
     public IStartlistHistory Behind { get; set; } = default!;
 
-    [Parameter]
-    public bool Mobile { get; set; } = false;
-
     protected override async Task OnInitializedAsync()
     {
         await Observe(Behind, []);

@@ -71,10 +71,6 @@
 		<Content Remove="Components\Routes.razor" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Remove="publish-android.sh" />
-	</ItemGroup>
-
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.61" />
         <!--<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
@@ -98,13 +94,13 @@
       </MauiXaml>
     </ItemGroup>
 
-    <ItemGroup>
+    <!--<ItemGroup>
       <Compile Update="Platforms\iOS\Services\DialService.cs">
         <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
       </Compile>
       <Compile Update="Platforms\Windows\Services\DialService.cs">
         <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
       </Compile>
-    </ItemGroup>
+    </ItemGroup>-->
 
 </Project>

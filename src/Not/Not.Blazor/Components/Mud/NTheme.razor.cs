@@ -4,7 +4,6 @@ namespace Not.Blazor.Components.Mud;
 
 public partial class NTheme
 {
-    MudThemeProvider _themeProvider = default!;
     MudTheme _theme = default!;
 
     [Parameter]
@@ -25,21 +24,28 @@ public partial class NTheme
     [Parameter]
     public bool DialogFullWidth { get; set; } = true;
 
-    protected override void OnParametersSet()
+    [Parameter]
+    public bool Mobile { get; set; } = false;
+
+    protected override void OnInitialized()
     {
-        _themeProvider = ThemeProvider;
+        var _caption = new Caption();
+        if (Mobile)
+        {
+            _caption = new Caption()
+            {
+                FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "12px",
+                FontWeight = 400,
+                LineHeight = 1.0,
+                LetterSpacing = ".0075em",
+            };
+        }
         _theme = new MudTheme()
         {
             Typography = new Typography()
             {
-                Caption = new Caption()
-                {
-                    FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" },
-                    FontSize = "12px",
-                    FontWeight = 400,
-                    LineHeight = 1.0,
-                    LetterSpacing = ".0075em",
-                },
+                Caption = _caption
             },
         };
     }

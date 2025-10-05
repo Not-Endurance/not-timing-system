@@ -27,7 +27,7 @@ public class StartlistBehind : ObservableBehind, IStartlistHistory, IStartlistUp
     {
         var country = new Country(1000, null, null, null, null);
         var person = new Person(["Todomir", "Stroinov"]);
-        var athlete = new Athlete(99, person, Domain.Enums.AthleteCategory.Senior, country, null, "guz");
+        var athlete = new Athlete(99, person, country, null, "guz");
         var horse = new Horse(100, "Rozomir", null);
         var combination = new Combination(199, 1, athlete, horse, null, "40", null, null);
         var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
@@ -55,7 +55,7 @@ public class StartlistBehind : ObservableBehind, IStartlistHistory, IStartlistUp
             Domain.Enums.CompetitionRuleset.Regional,
             Domain.Enums.CompetitionType.Qualification
         );
-        var participation = new Participation(2001, competition, combination, phaseCollection, null);
+        var participation = new Participation(2001, ParticipationCategory.Senior, competition, combination, phaseCollection, null);
         _participations = [participation];
     }
 
