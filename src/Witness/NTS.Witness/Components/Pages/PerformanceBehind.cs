@@ -3,11 +3,11 @@ using NTS.Domain.Objects;
 
 namespace NTS.Witness.Components.Pages;
 
-public partial class Performance
+public class PerformanceBehind : ComponentBase
 {
-    List<NTS.Domain.Core.Aggregates.Participations.Phase> _phases = [];
-    PhaseCollection? _phasesCollection;
-    Person? _participant;
+    protected List<NTS.Domain.Core.Aggregates.Participations.Phase> _phases = [];
+    protected PhaseCollection? _phasesCollection;
+    protected Person? _participant;
 
     protected override void OnInitialized()
     {

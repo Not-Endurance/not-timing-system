@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
-using Not.Blazor.Navigation;
-using NTS.Witness.Constants;
+﻿using Not.Blazor.Components;
 
 namespace NTS.Witness.Components;
 
-public partial class HelpButton
+public class HelpButtonBehind : NComponent
 {
     [Parameter]
     public Action ClickHandler { get; set; } = default!;

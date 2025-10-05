@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore.Components;
-using NTS.Witness.RPC;
+﻿using NTS.Witness.RPC;
 
 namespace NTS.Witness.Components.Pages;
 
-public partial class WitnessPage
+public class WitnessPageBehind : ComponentBase
 {
-    bool IsUserOfficial { get; set; } = false;
-
-    bool IsUserLoggedIn { get; set; } = false;
-
     [Inject]
     ITestBehind TestBehind { get; set; } = default!;
+    protected bool IsUserOfficial { get; set; } = false;
+    protected bool IsUserLoggedIn { get; set; } = false;
 
     protected override void OnInitialized()
     {

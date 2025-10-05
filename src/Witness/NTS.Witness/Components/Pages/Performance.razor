@@ -1,7 +1,7 @@
 ﻿@using NTS.Blazor.Components.ParticipationTable
 @using NTS.Domain.Core.Aggregates.Participations
-
 @attribute [Route(PERFORMANCE)]
+@inherits PerformanceBehind
 
 <MudStack AlignItems="AlignItems.Center">
     <NHeadline3 Content="@_participant!.ToString()"></NHeadline3>

@@ -6,16 +6,16 @@
 @using NTS.Blazor.Components.ParticipationChips;
 @using Not.Blazor.Dialogs
 
-@inherits SnapshotBehind;
+@inherits SnapshotBehind
 
 <MudPaper Height="100%">
     <MudPaper Class="justify-center pa-2">
-            <ParticipationChips ParticipationCollection="_participations" ClickAction="SelectHandler" GetColorAction="GetColor" ChipSize="Size.Large" />
+            <ParticipationChips ParticipationCollection="@_participations" ClickAction="SelectHandler" GetColorAction="GetColor" ChipSize="Size.Large" />
     </MudPaper>
     
     <MudPaper Elevation="0" Class="pa-2">
-        <NSimpleTable T="IntermediateSnapshot" Items="_selectedParticipations" EmptyMessage="@Empty_intermediate_snapshot_list_string"
-         Headings="@_snaphotTableHeaders" FixedHeader="true" Height="65vh">
+        <NSimpleTable T="IntermediateSnapshot" Items="@_selectedParticipations" EmptyMessage="@Empty_intermediate_snapshot_list_string"
+            Headings="@snapshotTableHeaders" FixedHeader="true" Height="65vh">
             <CustomCell>
                 @if(context.Timestamp == null)
                 {
@@ -40,7 +40,7 @@
                         <MudMenuItem OnClick="() => SetButtonText(0)">@Arrival_string</MudMenuItem>
                         <MudMenuItem OnClick="() => SetButtonText(1)">@Vetin_string</MudMenuItem>
                     </MudMenu>
-                    <MudButton OnClick="() => SendHandler(_buttonText)">@_buttonText</MudButton>
+                    <MudButton OnClick="() => SendHandler(buttonText)">@buttonText</MudButton>
                 </MudButtonGroup>
             </MudStack>
         </MudPaper>

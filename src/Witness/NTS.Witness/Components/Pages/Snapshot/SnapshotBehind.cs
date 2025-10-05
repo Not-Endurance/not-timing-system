@@ -14,9 +14,9 @@ namespace NTS.Witness.Components.Pages.Snapshot;
 
 public class SnapshotBehind : NComponent
 {
-    List<Participation> _participations = [];
-    List<IntermediateSnapshot> _selectedParticipations = [];
-    List<IntermediateSnapshot> _snapshotParticipations = [];
+    protected List<Participation> _participations = [];
+    protected List<IntermediateSnapshot> _selectedParticipations = [];
+    protected List<IntermediateSnapshot> _snapshotParticipations = [];
     protected string[] snapshotTableHeaders = [Participant_string, Time_string];
     protected string buttonText = Arrival_string;
 
