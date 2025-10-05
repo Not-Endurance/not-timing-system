@@ -3,7 +3,7 @@
 @inherits NComponent
 
 <MudStack Class="ma-6">
-    @if (!CoreBehind.IsStarted)
+    @if (!CoreService.IsStarted)
     {
         <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
     }

@@ -5,16 +5,17 @@ using Not.Safe;
 using Not.Storage.Stores;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Blazor.Shared.Components.SidePanels;
-using NTS.Judge.Core.Start;
-using NTS.Judge.Features;
+using NTS.Judge.Features.Core.Reset;
+using NTS.Judge.Features.Core.Start;
 using NTS.Judge.Features.Warp;
 using NTS.Judge.HTTP;
 using NTS.Storage.Core;
 
-namespace NTS.Judge.Core.Behinds.Adapters;
+namespace NTS.Judge.Features.Core;
 
-public class CoreBehind : ObservableBehind, ICoreBehind
+public class CoreService : ObservableBehind, ICoreService
 {
+    readonly IEnumerable<ICoreState> _coreStates;
     readonly EventRpcContext _eventsRpcContext;
     readonly IStore<CoreState> _coreStore;
     readonly ICoreStarter _coreStarter;
@@ -24,7 +25,8 @@ public class CoreBehind : ObservableBehind, ICoreBehind
     readonly IRepository<Official> _officials;
     readonly IArchiveRepository _archive;
 
-    public CoreBehind(
+    public CoreService(
+        IEnumerable<ICoreState> coreStates,
         EventRpcContext eventsRpcContext,
         IStore<CoreState> coreStore,
         ICoreStarter coreStarter,
@@ -35,6 +37,7 @@ public class CoreBehind : ObservableBehind, ICoreBehind
         IArchiveRepository archive
     )
     {
+        _coreStates = coreStates;
         _eventsRpcContext = eventsRpcContext;
         _coreStore = coreStore;
         _coreStarter = coreStarter;
@@ -69,6 +72,10 @@ public class CoreBehind : ObservableBehind, ICoreBehind
         await _coreStore.Delete();
         await SoftReset();
         IsStarted = false;
+        foreach (var state in _coreStates)
+        {
+            state.Reset();
+        }
     }
 
     public async Task LoadArchive(int archiveId)
