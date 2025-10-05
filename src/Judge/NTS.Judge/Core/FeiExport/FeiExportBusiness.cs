@@ -177,7 +177,7 @@ public class FeiExportBusiness : IFeiExportBusiness
         var total = participation.GetTotal();
         var time = total?.Interval.ToTimeSpan() ?? TimeSpan.Zero;
         var speed = total?.AverageSpeed.ToDouble() ?? default;
-        return new ctEnduranceTotal { AverageSpeed = Round(speed), Time = FormatTime(time) };
+        return new ctEnduranceTotal { AverageSpeed = Round(speed), Time = FormattingHelper.Format(time) };
     }
 
     IEnumerable<ctEnduranceDayResult> CreateDaysAndPhases(Participation participation)
@@ -198,8 +198,8 @@ public class FeiExportBusiness : IFeiExportBusiness
                 Result = new ctEndurancePhaseResultScore
                 {
                     PhaseAverageSpeed = Round(averagePhaseSpeed),
-                    PhaseTime = FormatTime(phaseInterval),
-                    RecoveryTime = FormatTime(recoveryInterval),
+                    PhaseTime = FormattingHelper.Format(phaseInterval),
+                    RecoveryTime = FormattingHelper.Format(recoveryInterval),
                 },
             };
             if (lastDay == phase.StartTime!.ToDateTimeOffset().Day)
@@ -271,11 +271,6 @@ public class FeiExportBusiness : IFeiExportBusiness
     decimal Round(double value)
     {
         return (decimal)Math.Round(value, 2);
-    }
-
-    string FormatTime(TimeSpan value)
-    {
-        return FormattingHelper.Format(value);
     }
 }
 

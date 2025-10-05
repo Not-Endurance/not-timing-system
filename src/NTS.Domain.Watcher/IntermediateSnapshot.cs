@@ -21,7 +21,7 @@ public record IntermediateSnapshot : DomainObject
 
     public int Number { get; }
     public Person Athlete { get; }
-    public Timestamp? Timestamp { get; set; }
+    public Timestamp Timestamp { get; set; } = default!;
 
     public override string ToString()
     {
