@@ -55,7 +55,14 @@ public class StartlistBehind : ObservableBehind, IStartlistHistory, IStartlistUp
             Domain.Enums.CompetitionRuleset.Regional,
             Domain.Enums.CompetitionType.Qualification
         );
-        var participation = new Participation(2001, ParticipationCategory.Senior, competition, combination, phaseCollection, null);
+        var participation = new Participation(
+            2001,
+            ParticipationCategory.Senior,
+            competition,
+            combination,
+            phaseCollection,
+            null
+        );
         _participations = [participation];
     }
 

@@ -41,12 +41,6 @@ public partial class NTheme
                 LetterSpacing = ".0075em",
             };
         }
-        _theme = new MudTheme()
-        {
-            Typography = new Typography()
-            {
-                Caption = _caption
-            },
-        };
+        _theme = new MudTheme() { Typography = new Typography() { Caption = _caption } };
     }
 }

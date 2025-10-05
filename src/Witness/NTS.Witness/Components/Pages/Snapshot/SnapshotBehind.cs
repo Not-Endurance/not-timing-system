@@ -31,13 +31,7 @@ public class SnapshotBehind : NComponent
             var names = new List<string> { $"FirstName{i + 1}", $"LastName{i + 1}" };
             var person = new Person(names.ToArray());
 
-            var athlete = new Athlete(
-                99 + i,
-                person,
-                country,
-                null,
-                $"username{i + 1}"
-            );
+            var athlete = new Athlete(99 + i, person, country, null, $"username{i + 1}");
 
             var horse = new Horse(100 + i, $"HorseName{i + 1}", null);
 
@@ -73,7 +67,14 @@ public class SnapshotBehind : NComponent
                 Domain.Enums.CompetitionType.Qualification
             );
 
-            var participation = new Participation(2001 + i, ParticipationCategory.Senior, competition, combination, phaseCollection, null);
+            var participation = new Participation(
+                2001 + i,
+                ParticipationCategory.Senior,
+                competition,
+                combination,
+                phaseCollection,
+                null
+            );
 
             _participations.Add(participation);
         }
