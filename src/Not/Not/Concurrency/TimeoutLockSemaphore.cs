@@ -14,7 +14,7 @@ public class TimeoutLockSemaphore
 #if DEBUG
         _timout = TimeSpan.FromMinutes(1);
 #else
-        _timout = timout ?? TimeSpan.FromMicroseconds(500);
+        _timout = timout ?? TimeSpan.FromMilliseconds(500);
 #endif
     }
 
