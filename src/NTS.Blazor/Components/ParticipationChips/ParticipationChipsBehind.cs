@@ -4,7 +4,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.ParticipationChips;
 
-public partial class ParticipationChips
+public class ParticipationChipsBehind : ComponentBase
 {
     [Parameter]
     public Participation SelectedParticipation { get; set; } = default!;
@@ -21,7 +21,7 @@ public partial class ParticipationChips
     [Parameter]
     public Action<Participation>? ClickAction { get; set; } = default!;
 
-    void ClickHandler(Participation participation)
+    public void ClickHandler(Participation participation)
     {
         ClickAction?.Invoke(participation);
     }

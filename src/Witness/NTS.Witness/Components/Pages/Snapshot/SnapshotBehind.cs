@@ -1,4 +1,5 @@
 ﻿using MudBlazor;
+using Not.Blazor.Components;
 using Not.Blazor.Dialogs;
 using Not.Exceptions;
 using Not.Notify;
@@ -11,13 +12,13 @@ using Color = MudBlazor.Color;
 
 namespace NTS.Witness.Components.Pages.Snapshot;
 
-public partial class Snapshot
+public class SnapshotBehind : NComponent
 {
     List<Participation> _participations = [];
     List<IntermediateSnapshot> _selectedParticipations = [];
     List<IntermediateSnapshot> _snapshotParticipations = [];
-    string[] _snapshotTableHeaders = [Participant_string, Time_string];
-    string _buttonText = Arrival_string;
+    protected string[] snapshotTableHeaders = [Participant_string, Time_string];
+    protected string buttonText = Arrival_string;
 
     [Inject]
     IDialogService MudDialogService { get; set; } = null!;
@@ -33,7 +34,6 @@ public partial class Snapshot
             var athlete = new Athlete(
                 99 + i,
                 person,
-                Domain.Enums.AthleteCategory.Senior,
                 country,
                 null,
                 $"username{i + 1}"
@@ -73,26 +73,26 @@ public partial class Snapshot
                 Domain.Enums.CompetitionType.Qualification
             );
 
-            var participation = new Participation(2001 + i, competition, combination, phaseCollection, null);
+            var participation = new Participation(2001 + i, ParticipationCategory.Senior, competition, combination, phaseCollection, null);
 
             _participations.Add(participation);
         }
     }
 
-    void SetButtonText(int id)
+    protected void SetButtonText(int id)
     {
         switch (id)
         {
             case 0:
-                _buttonText = Arrival_string;
+                buttonText = Arrival_string;
                 break;
             case 1:
-                _buttonText = Vetin_string;
+                buttonText = Vetin_string;
                 break;
         }
     }
 
-    void SelectHandler(Participation participation)
+    protected void SelectHandler(Participation participation)
     {
         var snapshotParticipant = new IntermediateSnapshot(
             participation.Combination.Number,
@@ -105,7 +105,7 @@ public partial class Snapshot
         StateHasChanged();
     }
 
-    void SnapshotHandler(IntermediateSnapshot snapshotParticipant)
+    protected void SnapshotHandler(IntermediateSnapshot snapshotParticipant)
     {
         var currentTime = DateTimeOffset.Now;
         var timestamp = new Timestamp(currentTime);
@@ -113,7 +113,7 @@ public partial class Snapshot
         _snapshotParticipations.Add(snapshotParticipant);
     }
 
-    void SendHandler(string snapshotType)
+    protected void SendHandler(string snapshotType)
     {
         //consider backup before clear
         foreach (var participation in _snapshotParticipations)
@@ -129,7 +129,7 @@ public partial class Snapshot
         );
     }
 
-    Color GetColor(Participation participation)
+    protected Color GetColor(Participation participation)
     {
         if (_snapshotParticipations.Exists(p => p.Number == participation.Combination.Number))
         {
@@ -142,7 +142,7 @@ public partial class Snapshot
         return Color.Primary;
     }
 
-    async Task EditSnapshot(IntermediateSnapshot snapshotParticipant)
+    protected async Task EditSnapshot(IntermediateSnapshot snapshotParticipant)
     {
         GuardHelper.ThrowIfDefault(snapshotParticipant.Timestamp);
         var time = snapshotParticipant.Timestamp._stamp.TimeOfDay;

@@ -4,9 +4,9 @@ using NTS.Blazor.Constants;
 
 namespace NTS.Witness.Components.Pages.Snapshot;
 
-public partial class TimestampUpdateDialog
+public class TimestampUpdateDialogBehind : ComponentBase
 {
-    static readonly PatternMask TIME_MASK = new("00:00:00");
+    protected static readonly PatternMask TIME_MASK = new("00:00:00");
 
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = default!;
@@ -19,7 +19,7 @@ public partial class TimestampUpdateDialog
         base.OnInitialized();
     }
 
-    void OnTimestampInputChanged(string newValue)
+    protected void OnTimestampInputChanged(string newValue)
     {
         // Only update if valid; avoid partial/incomplete updates
         if (Regex.IsMatch(newValue, @"^\d{2}:\d{2}:\d{2}$"))
@@ -28,12 +28,12 @@ public partial class TimestampUpdateDialog
         }
     }
 
-    void Submit()
+    protected void Submit()
     {
         MudDialog.Close(DialogResult.Ok(Model));
     }
 
-    void Cancel()
+    protected void Cancel()
     {
         MudDialog.Cancel();
     }

@@ -1,9 +1,12 @@
 ﻿@using NTS.Witness.Components.Pages.Snapshot;
 
+@inherits TimestampUpdateDialogBehind
+
 <MudDialog>
     <DialogContent>
-        <MudTextField InputMode="InputMode.numeric" T="string" Value="@Model.TimestampInput" ValueChanged="OnTimestampInputChanged" Immediate="true" Mask="TIME_MASK"
-            Label="@Timestamp_string" />
+        <MudTextField InputMode="InputMode.numeric" T="string" 
+            Value="@Model.TimestampInput" ValueChanged="OnTimestampInputChanged" Immediate="true"
+            Mask="TIME_MASK" Label="@Timestamp_string" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">@Cancel_string</MudButton>

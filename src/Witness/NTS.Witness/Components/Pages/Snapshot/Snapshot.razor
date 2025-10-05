@@ -6,7 +6,7 @@
 @using NTS.Blazor.Components.ParticipationChips;
 @using Not.Blazor.Dialogs
 
-@inherits NComponent
+@inherits SnapshotBehind;
 
 <MudPaper Height="100%">
     <MudPaper Class="justify-center pa-2">
@@ -15,17 +15,17 @@
     
     <MudPaper Elevation="0" Class="pa-2">
         <NSimpleTable T="IntermediateSnapshot" Items="_selectedParticipations" EmptyMessage="@Empty_intermediate_snapshot_list_string"
-                        Mobile="true" Headings="@_snapshotTableHeaders" FixedHeader="true" Height="65vh">
-                        <CustomCell>
-                            @if(context.Timestamp == null)
-                            {
-                                <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => SnapshotHandler(context)">@Snapshot_string</MudButton>    
-                            }
-                            else
-                            {
-                                <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="() => EditSnapshot(context)">@context.Timestamp</MudButton>    
-                            }
-                        </CustomCell>
+         Headings="@_snaphotTableHeaders" FixedHeader="true" Height="65vh">
+            <CustomCell>
+                @if(context.Timestamp == null)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => SnapshotHandler(context)">@Snapshot_string</MudButton>    
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="() => EditSnapshot(context)">@context.Timestamp</MudButton>    
+                }
+            </CustomCell>
             </NSimpleTable>
     </MudPaper>
     
@@ -34,6 +34,7 @@
         <MudPaper Class="position-bottom absolute justify-center-absolute pa-2">
             <MudStack Row AlignItems="AlignItems.Center">
                 <MudText Typo="Typo.overline">@string.Format(Send_snapshot_string, _snapshotParticipations.Count)</MudText>
+
                 <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
                     <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Style="align-self: auto;">
                         <MudMenuItem OnClick="() => SetButtonText(0)">@Arrival_string</MudMenuItem>
