@@ -8,7 +8,7 @@ public sealed class ProtocolLogoSettings : IProtocolLogoState
     const string HEADER_LOGO_RIGHT = "headerLogo.right";
     const string SHORT_PATH = "images\\logos";
 
-    public string DirPath => "wwwroot\\"+SHORT_PATH;
+    public string DirPath => "wwwroot\\" + SHORT_PATH;
 
     public string Left
     {
@@ -24,7 +24,7 @@ public sealed class ProtocolLogoSettings : IProtocolLogoState
 
     public void SetLogo(string newLogo, string oldLogo)
     {
-        if(oldLogo == Left)
+        if (oldLogo == Left)
         {
             Left = newLogo;
         }

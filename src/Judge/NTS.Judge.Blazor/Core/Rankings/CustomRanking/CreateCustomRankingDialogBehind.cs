@@ -13,8 +13,10 @@ public class CreateCustomRankingDialogBehind : NDialog
 
     [Inject]
     IRead<Ranking> Rankings { get; set; } = default!;
+
     [Inject]
     IRead<Participation> Participations { get; set; } = default!;
+
     [Inject]
     ICustomRankingService Service { get; set; } = default!;
     protected List<NotListModel<Ranking>> TemplateRankings { get; set; } = [];
