@@ -4,8 +4,6 @@ using NTS.Blazor.Components.Startlist.History;
 using NTS.Blazor.Components.Startlist.Upcoming;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Startlists;
-using NTS.Judge.Blazor.Core.Startlists.History;
-using NTS.Judge.Blazor.Core.Startlists.Upcoming;
 using NTS.Judge.Features.Core.Reset;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
