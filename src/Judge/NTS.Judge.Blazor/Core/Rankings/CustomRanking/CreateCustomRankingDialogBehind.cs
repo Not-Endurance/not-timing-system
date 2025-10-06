@@ -10,16 +10,14 @@ namespace NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 public class CreateCustomRankingDialogBehind : NDialog
 {
     Ranking? _templateRanking;
-    public List<NotListModel<Ranking>> _templateRankings = [];
 
     [Inject]
     IRead<Ranking> Rankings { get; set; } = default!;
-
     [Inject]
     IRead<Participation> Participations { get; set; } = default!;
-
     [Inject]
     ICustomRankingService Service { get; set; } = default!;
+    protected List<NotListModel<Ranking>> TemplateRankings { get; set; } = [];
 
     public Ranking? TemplateRanking
     {
@@ -27,7 +25,7 @@ public class CreateCustomRankingDialogBehind : NDialog
         set
         {
             _templateRanking = value;
-            SetRanking(_templateRanking);
+            CombineRankings(_templateRanking);
         }
     }
 
@@ -37,10 +35,10 @@ public class CreateCustomRankingDialogBehind : NDialog
     protected override async Task OnParametersSetAsync()
     {
         var listRankings = await ListRankings();
-        _templateRankings = NotListModel.FromEntity<Ranking>(listRankings).ToList();
+        TemplateRankings = NotListModel.FromEntity<Ranking>(listRankings).ToList();
     }
 
-    protected Task SetRanking(Ranking? ranking)
+    protected Task CombineRankings(Ranking? ranking)
     {
         if (ranking == null)
         {
