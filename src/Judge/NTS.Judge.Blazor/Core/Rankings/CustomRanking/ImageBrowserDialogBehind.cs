@@ -3,7 +3,7 @@ using NTS.Judge.Blazor.Core.Rankings.Protocols;
 
 namespace NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 
-public partial class ImageBrowserDialog
+public class ImageBrowserDialogBehind : ComponentBase
 {
     string _oldImagePath = default!;
 
@@ -19,18 +19,18 @@ public partial class ImageBrowserDialog
     [Parameter]
     public string Src { get; set; } = default!;
 
-    void Submit()
+    protected void Submit()
     {
         MudDialog.Close(DialogResult.Ok(SelectedImagePath));
         HeaderLogo.SetLogo(SelectedImagePath, _oldImagePath);
     }
 
-    void Cancel()
+    protected void Cancel()
     {
         MudDialog.Cancel();
     }
 
-    void HandleImageSelection(string imagePath)
+    protected void HandleImageSelection(string imagePath)
     {
         _oldImagePath = SelectedImagePath;
         SelectedImagePath = imagePath;
