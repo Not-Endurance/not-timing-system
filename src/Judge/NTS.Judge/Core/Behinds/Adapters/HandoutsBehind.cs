@@ -9,10 +9,11 @@ using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Blazor.Core.Handouts;
 using NTS.Judge.Blazor.Core.Handouts.Form;
+using NTS.Judge.Features.Core.Reset;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
 
-public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBehind, ICreateHandout
+public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBehind, ICreateHandout, ICoreState
 {
     readonly SemaphoreSlim _semaphore = new(1);
     readonly IRepository<Handout> _handoutRepository;
@@ -49,6 +50,7 @@ public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBe
             return true;
         }
         var documents = handouts.Select(handout => new HandoutDocument(handout, enduranceEvent, officials));
+        ObservableList.Clear();
         ObservableList.AddRange(documents);
         return true;
     }
