@@ -9,19 +9,14 @@ namespace NTS.Judge.Blazor.Core.Rankings.Protocols;
 
 public class ProtocolBehind : NComponent
 {
-    string _shortPath = "images\\logos";
-    public string src = "wwwroot\\images\\logos";
-
-    [Inject]
-    ILogoPersistence HeaderLogo { get; set; } = default!;
-
     [Inject]
     IRanklistDocumentService Service { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
-    public string HeaderLogoLeft => Path.Combine(_shortPath, Path.GetFileName(HeaderLogo.Left));
-    public string HeaderLogoRight => Path.Combine(_shortPath, Path.GetFileName(HeaderLogo.Right));
+
+    [Inject]
+    protected IProtocolLogoPersistence HeaderLogo { get; set; } = default!;
 
     public DocumentHeader? Header => Service.Document?.Header;
 
@@ -47,20 +42,5 @@ public class ProtocolBehind : NComponent
         };
         var dialog = await DialogService.ShowAsync<ImageBrowserDialog>("Image Browser", parameters, options);
         var result = await dialog.Result;
-
-        if (result != null && !result.Canceled)
-        {
-            var selection = result.Data as string;
-            GuardHelper.ThrowIfDefault(selection);
-            var filename = Path.GetFileName(selection);
-            if (forImage == HeaderLogoLeft)
-            {
-                HeaderLogo.Left = filename;
-            }
-            else
-            {
-                HeaderLogo.Right = filename;
-            }
-        }
     }
 }

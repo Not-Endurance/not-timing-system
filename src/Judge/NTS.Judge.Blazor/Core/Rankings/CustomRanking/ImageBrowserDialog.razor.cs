@@ -1,11 +1,17 @@
 ﻿using MudBlazor;
+using NTS.Judge.Blazor.Core.Rankings.Protocols;
 
 namespace NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 
 public partial class ImageBrowserDialog
 {
+    string _oldImagePath = default!;
+
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Inject]
+    IProtocolLogoPersistence HeaderLogo { get; set; } = default!;
 
     [Parameter]
     public string SelectedImagePath { get; set; } = default!;
@@ -16,6 +22,7 @@ public partial class ImageBrowserDialog
     void Submit()
     {
         MudDialog.Close(DialogResult.Ok(SelectedImagePath));
+        HeaderLogo.SetLogo(SelectedImagePath, _oldImagePath);
     }
 
     void Cancel()
@@ -25,6 +32,7 @@ public partial class ImageBrowserDialog
 
     void HandleImageSelection(string imagePath)
     {
+        _oldImagePath = SelectedImagePath;
         SelectedImagePath = imagePath;
     }
 }
