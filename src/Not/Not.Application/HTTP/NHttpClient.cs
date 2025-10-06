@@ -36,7 +36,7 @@ public class NHttpClient
         {
             if (ex is HttpRequestException { StatusCode: HttpStatusCode.NotFound })
             {
-                NotifyHelper.Inform("URL Not Found"); // TODO: probably return result instead and let consumer decide
+                NotifyHelper.Inform("Not Found"); // TODO: probably return result instead and let consumer decide
                 return null;
             }
             _logger.LogError(ex, "Error during GET request to {Url}", url);

@@ -2,7 +2,7 @@
 
 namespace NTS.Judge.MAUI.Settings;
 
-public sealed class ProtocolLogoPersistence : IProtocolLogoPersistence
+public sealed class ProtocolLogoSettings : IProtocolLogoState
 {
     const string HEADER_LOGO_LEFT = "headerLogo.left";
     const string HEADER_LOGO_RIGHT = "headerLogo.right";

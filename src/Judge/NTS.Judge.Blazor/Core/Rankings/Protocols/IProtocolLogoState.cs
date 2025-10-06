@@ -2,7 +2,7 @@
 
 namespace NTS.Judge.Blazor.Core.Rankings.Protocols;
 
-public interface IProtocolLogoPersistence : ISingleton
+public interface IProtocolLogoState : ISingleton
 {
     string DirPath { get; }
     string Left { get; set; }

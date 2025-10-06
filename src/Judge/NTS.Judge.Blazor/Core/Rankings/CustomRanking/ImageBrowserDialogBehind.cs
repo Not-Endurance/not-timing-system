@@ -11,7 +11,7 @@ public class ImageBrowserDialogBehind : ComponentBase
     MudDialogInstance MudDialog { get; set; } = default!;
 
     [Inject]
-    IProtocolLogoPersistence HeaderLogo { get; set; } = default!;
+    IProtocolLogoState HeaderLogo { get; set; } = default!;
 
     [Parameter]
     public string SelectedImagePath { get; set; } = default!;

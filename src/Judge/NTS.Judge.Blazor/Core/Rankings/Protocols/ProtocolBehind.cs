@@ -16,7 +16,7 @@ public class ProtocolBehind : NComponent
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    protected IProtocolLogoPersistence HeaderLogo { get; set; } = default!;
+    protected IProtocolLogoState HeaderLogo { get; set; } = default!;
 
     public DocumentHeader? Header => Service.Document?.Header;
 
