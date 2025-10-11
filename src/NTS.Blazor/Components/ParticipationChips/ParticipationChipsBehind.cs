@@ -32,6 +32,5 @@ public class ParticipationChipsBehind : ComponentBase
         {
             SafeHelper.HandleError(ex);
         }
-        
     }
 }

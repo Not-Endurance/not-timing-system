@@ -41,7 +41,6 @@ public class TimestampUpdateDialogBehind : ComponentBase
         try
         {
             MudDialog.Close(DialogResult.Ok(Model));
-
         }
         catch (Exception ex)
         {

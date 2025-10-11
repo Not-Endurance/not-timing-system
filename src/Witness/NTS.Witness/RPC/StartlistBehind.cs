@@ -3,7 +3,6 @@ using Not.Notify;
 using NTS.Blazor.Components.Startlist.History;
 using NTS.Blazor.Components.Startlist.Upcoming;
 using NTS.Domain.Core.Objects.Startlists;
-
 using Participation = NTS.Domain.Core.Aggregates.Participation;
 
 namespace NTS.Witness.RPC;

@@ -40,7 +40,6 @@ public class Event : EventBase<EventDelegate>, IEventSubscriber
     {
         return InternalSubscribe(() => SafeHelper.RunAsync(() => ReturnCompletedTask(action)));
     }
-
 }
 
 public class Event<T> : EventBase<EventDelegate<T>>, IEventSubscriber<T>

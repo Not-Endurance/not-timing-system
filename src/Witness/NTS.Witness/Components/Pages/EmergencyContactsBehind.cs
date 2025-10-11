@@ -34,5 +34,4 @@ public class EmergencyContactsBehind : NComponent
             SafeHelper.HandleError(ex);
         }
     }
-
 }
