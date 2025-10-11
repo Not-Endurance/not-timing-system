@@ -576,4 +576,10 @@
   <data name="Download_string" xml:space="preserve">
     <value />
   </data>
+  <data name="Use_image_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Image_browser_string" xml:space="preserve">
+    <value />
+  </data>
 </root>

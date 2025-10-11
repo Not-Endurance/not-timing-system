@@ -55,6 +55,11 @@ public record Speed : DomainObject
         return $"{_speed:0.00}";
     }
 
+    public string ToStringWithThousands()
+    {
+        return $"{_speed:0.000}";
+    }
+
     public double ToDouble()
     {
         return _speed;

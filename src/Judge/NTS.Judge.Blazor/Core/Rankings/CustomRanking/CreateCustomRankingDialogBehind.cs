@@ -1,7 +1,8 @@
 using Not.Application.CRUD.Ports;
-using Not.Async;
 using Not.Blazor.Components;
+using Not.Exceptions;
 using Not.Safe;
+using Not.Structures;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Blazor.Core.Rankings.CustomRanking;
@@ -18,6 +19,7 @@ public class CreateCustomRankingDialogBehind : NDialog
 
     [Inject]
     ICustomRankingService Service { get; set; } = default!;
+    protected List<NotListModel<Ranking>> TemplateRankings { get; set; } = [];
 
     public Ranking? TemplateRanking
     {
@@ -25,26 +27,46 @@ public class CreateCustomRankingDialogBehind : NDialog
         set
         {
             _templateRanking = value;
-            SelectRanking(_templateRanking);
+            CombineRankings(_templateRanking);
         }
     }
 
     public CustomRankingModel RankingModel { get; set; } = new();
     public RankingEntryModel EntryToAdd { get; set; } = new();
 
-    protected Task SelectRanking(Ranking? ranking)
+    protected override async Task OnParametersSetAsync()
+    {
+        var listRankings = await ListRankings();
+        TemplateRankings = NotListModel.FromEntity<Ranking>(listRankings).ToList();
+    }
+
+    protected Task CombineRankings(Ranking? ranking)
     {
         if (ranking == null)
         {
             return Task.CompletedTask;
         }
-        RankingModel = new CustomRankingModel(ranking);
+        if (RankingModel == null)
+        {
+            RankingModel = new CustomRankingModel(ranking);
+        }
+        else
+        {
+            foreach (var entry in ranking.Entries)
+            {
+                SafeHelper.Run(() =>
+                {
+                    RankingModel.Entries.Add(entry);
+                });
+            }
+        }
+
         return Task.CompletedTask;
     }
 
-    public async Task<IEnumerable<Ranking?>> ListRankings(string term)
+    public async Task<IEnumerable<Ranking>> ListRankings()
     {
-        return await SafeHelper.Run(() => Rankings.ReadAll(x => x.ToString().Contains(term)));
+        return await SafeHelper.Run(Rankings.ReadAll);
     }
 
     public async Task<IEnumerable<Participation?>> SearchParticipations(string term)
