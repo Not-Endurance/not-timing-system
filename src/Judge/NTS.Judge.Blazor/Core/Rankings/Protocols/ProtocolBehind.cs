@@ -41,6 +41,6 @@ public class ProtocolBehind : NComponent
             CloseOnEscapeKey = true,
         };
         var dialog = await DialogService.ShowAsync<ImageBrowserDialog>("Image Browser", parameters, options);
-        var result = await dialog.Result;
+        await dialog.Result;
     }
 }
