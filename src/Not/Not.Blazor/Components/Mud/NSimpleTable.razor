@@ -17,7 +17,7 @@
     <tbody>
         @if(Items.Count() == 0)
         {
-            <MudText Typo="Typo.body1" Class="pa-4">@EmptyMessage</MudText>
+            <MudText Typo="@_typography" Class="pa-4">@EmptyMessage</MudText>
         }
         @foreach (var item in Items)
         {
