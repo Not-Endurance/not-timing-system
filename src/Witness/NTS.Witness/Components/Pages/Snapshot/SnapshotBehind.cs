@@ -1,12 +1,9 @@
 ﻿using MudBlazor;
 using Not.Blazor.Components;
-using Not.Blazor.Dialogs;
 using Not.Exceptions;
 using Not.Notify;
 using Not.Safe;
-using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using Color = MudBlazor.Color;
@@ -26,59 +23,7 @@ public class SnapshotBehind : NComponent
 
     protected override void OnInitialized()
     {
-        for (var i = 0; i < 10; ++i)
-        {
-            var country = new Country(1000 + i, null, null, null, null);
-            var names = new List<string> { $"FirstName{i + 1}", $"LastName{i + 1}" };
-            var person = new Person(names.ToArray());
-
-            var athlete = new Athlete(99 + i, person, country, null, $"username{i + 1}");
-
-            var horse = new Horse(100 + i, $"HorseName{i + 1}", null);
-
-            var combination = new Combination(199 + i, i + 1, athlete, horse, null, (40 + i).ToString(), null, null);
-
-            var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
-                i > 10 ? 30 : 20,
-                15,
-                i > 10 ? 60 : 40,
-                NTS.Domain.Enums.CompetitionRuleset.Regional,
-                false,
-                null,
-                DateTimeOffset.Now.AddMinutes(23 + i)
-            );
-
-            var phase2 = new NTS.Domain.Core.Aggregates.Participations.Phase(
-                i > 10 ? 30 : 20,
-                20,
-                i > 10 ? 60 : 40,
-                NTS.Domain.Enums.CompetitionRuleset.Regional,
-                true,
-                null,
-                null
-            );
-
-            var phases = new List<NTS.Domain.Core.Aggregates.Participations.Phase> { phase1, phase2 };
-
-            var phaseCollection = new PhaseCollection(phases);
-
-            var competition = new Competition(
-                $"CompetitionName{i}",
-                Domain.Enums.CompetitionRuleset.Regional,
-                Domain.Enums.CompetitionType.Qualification
-            );
-
-            var participation = new Participation(
-                2001 + i,
-                ParticipationCategory.Senior,
-                competition,
-                combination,
-                phaseCollection,
-                null
-            );
-
-            Participations.Add(participation);
-        }
+        Participations = DummyData.CreateParticipationsForSnapshot(10);
     }
 
     protected void SetButtonText(int id)

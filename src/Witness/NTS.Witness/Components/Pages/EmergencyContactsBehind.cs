@@ -15,11 +15,7 @@ public class EmergencyContactsBehind : NComponent
     {
         try
         {
-            Contacts = new Dictionary<string, string>
-            {
-                { "Yo mama", "+359 882312321" },
-                { "Baba yaga", "+359 666666666" },
-            };
+            Contacts = DummyData.CreateContacts();
         }
         catch (Exception ex)
         {
@@ -38,4 +34,5 @@ public class EmergencyContactsBehind : NComponent
             SafeHelper.HandleError(ex);
         }
     }
+
 }
