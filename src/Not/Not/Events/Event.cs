@@ -21,7 +21,6 @@ public class Event : EventBase<EventDelegate>, IEventSubscriber
         _delegate?.Invoke();
     }
 
-#pragma warning disable CS0612
     public Guid Subscribe(Func<Task> action)
     {
         return InternalSubscribe(() => SafeHelper.Run(action));
@@ -83,4 +82,3 @@ public class Event<T> : EventBase<EventDelegate<T>>, IEventSubscriber<T>
         return InternalSubscribe(x => SafeHelper.RunAsync(() => ReturnCompletedTask(action, x)));
     }
 }
-#pragma warning restore CS0612
