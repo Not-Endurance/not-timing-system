@@ -1,4 +1,5 @@
-﻿using NTS.Witness.RPC;
+﻿using Not.Safe;
+using NTS.Witness.RPC;
 
 namespace NTS.Witness.Components.Pages;
 
@@ -11,6 +12,13 @@ public class WitnessPageBehind : ComponentBase
 
     protected override void OnInitialized()
     {
-        TestBehind.Test();
+        try
+        {
+            TestBehind.Test();
+        }
+        catch (Exception ex)
+        {
+            SafeHelper.HandleError(ex);
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace Not.Safe;
 // - public methods with OG names are added to invoke the Safe methods within SafeHelper.Run
 public static class SafeHelper
 {
+    [Obsolete]
     public static T? Run<T>(Func<T> action, Action<ValidationException> validationHandler)
     {
         try
@@ -31,21 +32,25 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete]
     public static T? Run<T>(Func<T> action)
     {
         return Run(action, NotifyHelper.Warn);
     }
 
+    [Obsolete]
     public static Task RunAsync(Func<Task> action)
     {
         return Task.Run(() => Run(action, HandleDefaultValidation));
     }
 
+    [Obsolete]
     public static Task RunAsync(Func<Task> action, Func<ValidationException, Task> validationHandler)
     {
         return Task.Run(() => Run(action, validationHandler));
     }
 
+    [Obsolete]
     public static async Task Run(Func<Task> action, Func<ValidationException, Task> validationHandler)
     {
         try
@@ -62,6 +67,7 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete]
     public static async void Run(Action action, Func<ValidationException, Task> validationHandler)
     {
         try
@@ -78,16 +84,19 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete]
     public static Task Run(Func<Task> action)
     {
         return Run(action, HandleDefaultValidation);
     }
 
+    [Obsolete]
     public static void Run(Action action)
     {
         Run(action, HandleDefaultValidation);
     }
 
+    [Obsolete]
     public static async Task<T?> Run<T>(Func<Task<T>> action, Func<ValidationException, Task> validationHandler)
     {
         try
@@ -106,6 +115,7 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete]
     public static async Task<IEnumerable<T>> Run<T>(
         Func<Task<IEnumerable<T>>> action,
         Func<ValidationException, Task> validationHandler
@@ -127,21 +137,25 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete]
     public static Task<T?> Run<T>(Func<Task<T>> action)
     {
         return Run(action, HandleDefaultValidation);
     }
 
+    [Obsolete]
     public static Task<IEnumerable<T>> Run<T>(Func<Task<IEnumerable<T>>> action)
     {
         return Run(action, HandleDefaultValidation);
     }
 
+    [Obsolete]
     public static Task RunAsync<T>(Func<T, Task> action, T argument)
     {
         return Task.Run(() => Run(action, argument));
     }
 
+    [Obsolete]
     public static async Task Run<T>(Func<T, Task> action, T argument, Action<ValidationException> validationHandler)
     {
         try
@@ -158,6 +172,7 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete]
     public static Task Run<T>(Func<T, Task> action, T argument)
     {
         return Run(action, argument, NotifyHelper.Warn);
@@ -175,13 +190,7 @@ public static class SafeHelper
         }
     }
 
-    static Task HandleDefaultValidation(ValidationException validation)
-    {
-        NotifyHelper.Warn(validation);
-        return Task.CompletedTask;
-    }
-
-    static void HandleError(Exception ex)
+    public static void HandleError(Exception ex)
     {
         //#if DEBUG
         //        throw ex;
@@ -191,6 +200,12 @@ public static class SafeHelper
         LoggingHelper.Error(logMessage);
         WriteToTraceConsole(ex);
         //#endif
+    }
+
+    public static Task HandleDefaultValidation(ValidationException validation)
+    {
+        NotifyHelper.Warn(validation);
+        return Task.CompletedTask;
     }
 
 #pragma warning disable IDE0051 // Used in RELEASE build

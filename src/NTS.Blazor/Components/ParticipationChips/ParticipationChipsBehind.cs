@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.ParticipationChips;
@@ -21,8 +22,16 @@ public class ParticipationChipsBehind : ComponentBase
     [Parameter]
     public Action<Participation>? ClickAction { get; set; } = default!;
 
-    public void ClickHandler(Participation participation)
+    protected void ClickHandler(Participation participation)
     {
-        ClickAction?.Invoke(participation);
+        try
+        {
+            ClickAction?.Invoke(participation);
+        }
+        catch (Exception ex)
+        {
+            SafeHelper.HandleError(ex);
+        }
+        
     }
 }
