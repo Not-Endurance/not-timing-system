@@ -4,13 +4,10 @@ namespace Not.Blazor.Components.Mud;
 
 public partial class NTheme
 {
-    MudTheme _theme = default!;
+    MudTheme Theme { get; set; } = default!;
 
     [Parameter]
     public MudThemeProvider ThemeProvider { get; set; } = default!;
-
-    [Parameter]
-    public MudTheme? Theme { get; set; }
 
     [Parameter]
     public bool DialogCloseOnEscapeKey { get; set; } = true;
@@ -29,10 +26,10 @@ public partial class NTheme
 
     protected override void OnInitialized()
     {
-        var _caption = new Caption();
+        var caption = new Caption();
         if (Mobile)
         {
-            _caption = new Caption()
+            caption = new Caption()
             {
                 FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "12px",
@@ -41,6 +38,6 @@ public partial class NTheme
                 LetterSpacing = ".0075em",
             };
         }
-        _theme = new MudTheme() { Typography = new Typography() { Caption = _caption } };
+        Theme = new MudTheme() { Typography = new Typography() { Caption = caption } };
     }
 }

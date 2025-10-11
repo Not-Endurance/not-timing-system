@@ -13,7 +13,7 @@
             <MudTabPanel Text="@tabHeader">
                 <NSimpleTable T="StartlistEntry" Headings="@TableHeaders" Items="StartlistsByStage[tabHeader]">
                     <CustomCell>
-                        <StartlistTimer StartTime="@context.Time" StopTimerAtTime="-15" />
+                        <StartlistTimer Typo="Typo.caption" StartTime="@context.Time" StopTimerAtTime="-15" />
                     </CustomCell>
                 </NSimpleTable>
             </MudTabPanel>
