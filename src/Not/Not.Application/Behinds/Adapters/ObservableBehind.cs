@@ -38,7 +38,9 @@ public abstract class ObservableBehind : IObservableBehind
             {
                 return;
             }
+#pragma warning disable CS0612
             _isInitialized = await SafeHelper.Run(() => PerformInitialization(arguments));
+#pragma warning restore CS0612
         }
         finally
         {

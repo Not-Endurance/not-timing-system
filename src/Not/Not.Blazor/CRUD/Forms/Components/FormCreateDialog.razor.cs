@@ -20,7 +20,9 @@ public partial class FormCreateDialog<T, TForm>
 
     async Task Create()
     {
+#pragma warning disable CS0612
         await SafeHelper.Run(Submit, InjectValidation);
+#pragma warning restore CS0612
     }
 
     async Task Submit()

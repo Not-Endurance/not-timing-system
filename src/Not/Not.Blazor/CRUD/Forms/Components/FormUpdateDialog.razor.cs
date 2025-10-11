@@ -27,7 +27,9 @@ public partial class FormUpdateDialog<T, TForm>
 
     async Task Update()
     {
+#pragma warning disable CS0612
         await SafeHelper.Run(Submit, InjectValidation);
+#pragma warning restore CS0612
     }
 
     async Task Submit()

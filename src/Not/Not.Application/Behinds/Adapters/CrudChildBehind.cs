@@ -57,6 +57,8 @@ public abstract class CrudChildBehind<T, TModel> : ObservableBehind, IListBehind
 
     public async Task Delete(T entity)
     {
+#pragma warning disable CS0612
         await SafeHelper.Run(() => SafeDelete(entity));
+#pragma warning restore CS0612
     }
 }
