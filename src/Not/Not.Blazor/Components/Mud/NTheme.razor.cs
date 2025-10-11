@@ -26,16 +26,15 @@ public partial class NTheme
 
     protected override void OnInitialized()
     {
-        var caption = new Caption();
+        var caption = new Caption()
+        {
+            FontSize = "14px"
+        };
         if (Mobile)
         {
             caption = new Caption()
             {
-                FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "12px",
-                FontWeight = 400,
-                LineHeight = 1.0,
-                LetterSpacing = ".0075em",
             };
         }
         Theme = new MudTheme() { Typography = new Typography() { Caption = caption } };
