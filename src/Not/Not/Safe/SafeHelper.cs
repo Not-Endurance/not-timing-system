@@ -151,7 +151,7 @@ public static class SafeHelper
     public static Task<IEnumerable<T>> Run<T>(Func<Task<IEnumerable<T>>> action)
     {
         var task = Run(action, HandleDefaultValidation);
-        if(task == null)
+        if (task == null)
         {
             return (Task<IEnumerable<T>>)Task.CompletedTask;
         }
