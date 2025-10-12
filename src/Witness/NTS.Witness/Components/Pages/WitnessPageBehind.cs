@@ -10,7 +10,7 @@ public class WitnessPageBehind : ComponentBase
     protected bool IsUserOfficial { get; set; } = false;
     protected bool IsUserLoggedIn { get; set; } = false;
 
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
         try
         {
@@ -18,7 +18,7 @@ public class WitnessPageBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 }

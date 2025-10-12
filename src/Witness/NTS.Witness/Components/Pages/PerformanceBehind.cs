@@ -11,7 +11,7 @@ public class PerformanceBehind : ComponentBase
     protected PhaseCollection? PhasesCollection { get; set; }
     protected Person? Participant { get; set; }
 
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
         try
         {
@@ -21,7 +21,7 @@ public class PerformanceBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 }

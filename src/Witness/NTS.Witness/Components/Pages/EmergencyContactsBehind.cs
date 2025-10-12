@@ -11,7 +11,7 @@ public class EmergencyContactsBehind : NComponent
 
     protected Dictionary<string, string> Contacts { get; set; } = default!;
 
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
         try
         {
@@ -19,11 +19,11 @@ public class EmergencyContactsBehind : NComponent
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 
-    protected void OnNumberClick(string phoneNumber)
+    protected async void OnNumberClick(string phoneNumber)
     {
         try
         {
@@ -31,7 +31,7 @@ public class EmergencyContactsBehind : NComponent
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 

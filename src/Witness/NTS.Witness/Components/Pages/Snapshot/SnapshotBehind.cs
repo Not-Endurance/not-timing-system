@@ -21,12 +21,20 @@ public class SnapshotBehind : NComponent
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
 
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
-        Participations = DummyData.CreateParticipationsForSnapshot(10);
+        try
+        {
+            Participations = DummyData.CreateParticipationsForSnapshot(10);
+        }
+        catch (Exception ex)
+        {
+            await SafeHelper.HandleException(ex);
+        }
+        
     }
 
-    protected void SetButtonText(int id)
+    protected async void SetButtonText(int id)
     {
         try
         {
@@ -42,11 +50,11 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 
-    protected void SelectHandler(Participation participation)
+    protected async void SelectHandler(Participation participation)
     {
         try
         {
@@ -62,11 +70,11 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 
-    protected void SnapshotHandler(IntermediateSnapshot snapshotParticipant)
+    protected async void SnapshotHandler(IntermediateSnapshot snapshotParticipant)
     {
         try
         {
@@ -77,11 +85,11 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 
-    protected void SendHandler(string snapshotType)
+    protected async void SendHandler(string snapshotType)
     {
         try
         {
@@ -100,11 +108,11 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 
-    protected Color GetColor(Participation participation)
+    protected async Task<Color> GetColor(Participation participation)
     {
         try
         {
@@ -120,7 +128,7 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
             return Color.Primary;
         }
         
@@ -152,7 +160,7 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 }

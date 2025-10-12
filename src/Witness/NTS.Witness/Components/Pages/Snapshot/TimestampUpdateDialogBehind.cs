@@ -20,7 +20,7 @@ public class TimestampUpdateDialogBehind : ComponentBase
         base.OnInitialized();
     }
 
-    protected void OnTimestampInputChanged(string newValue)
+    protected async void OnTimestampInputChanged(string newValue)
     {
         try
         {
@@ -32,24 +32,23 @@ public class TimestampUpdateDialogBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 
-    protected void Submit()
+    protected async void Submit()
     {
         try
         {
             MudDialog.Close(DialogResult.Ok(Model));
-
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 
-    protected void Cancel()
+    protected async void Cancel()
     {
         try
         {
@@ -57,7 +56,7 @@ public class TimestampUpdateDialogBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
     }
 }

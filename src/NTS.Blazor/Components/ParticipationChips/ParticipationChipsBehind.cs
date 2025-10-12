@@ -4,7 +4,6 @@ using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.ParticipationChips;
-
 public class ParticipationChipsBehind : ComponentBase
 {
     [Parameter]
@@ -22,7 +21,7 @@ public class ParticipationChipsBehind : ComponentBase
     [Parameter]
     public Action<Participation>? ClickAction { get; set; } = default!;
 
-    protected void ClickHandler(Participation participation)
+    protected async void ClickHandler(Participation participation)
     {
         try
         {
@@ -30,7 +29,7 @@ public class ParticipationChipsBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            await SafeHelper.HandleException(ex);
         }
         
     }
