@@ -148,9 +148,17 @@ public static class SafeHelper
         }
     }
 
-    public static Task<IEnumerable<T>>? Run<T>(Func<Task<IEnumerable<T>>> action)
+    public static Task<IEnumerable<T>> Run<T>(Func<Task<IEnumerable<T>>> action)
     {
-        return Run(action, HandleDefaultValidation);
+        var task = Run(action, HandleDefaultValidation);
+        if(task == null)
+        {
+            return (Task<IEnumerable<T>>)Task.CompletedTask;
+        }
+        else
+        {
+            return task;
+        }
     }
 
     public static Task RunAsync<T>(Func<T, Task> action, T argument)
