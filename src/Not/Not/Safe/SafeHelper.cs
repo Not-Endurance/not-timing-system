@@ -140,7 +140,7 @@ public static class SafeHelper
         var task = Run(action, HandleDefaultValidation);
         if (task == null)
         {
-            return Task.FromResult(default(T)!);
+            return (Task<T>)Task.CompletedTask;
         }
         else
         {
