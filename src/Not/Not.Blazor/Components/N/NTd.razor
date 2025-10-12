@@ -2,13 +2,13 @@
 @inherits NComponent
 @typeparam T
 
-<td>
+<td style="@CellStyle">
     @if (Value == null)
     {
         <span>-</span>
     }
     else
     {
-        @Value
+        <span style="@TextStyle">@Value</span>
     }
 </td>   

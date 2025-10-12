@@ -21,11 +21,11 @@
             }
             @if (_anyRequiredInspection && !AlignVertically)
             {
-                <th>RI Time</th>
+                <th><b>RI Time</b></th>
             }
             @if (_anyCompulsoryRequiredInspection && !AlignVertically)
             {
-                <th>CRI Time</th>
+                <th><b>CRI Time</b></th>
             }
 
             <th>Recovery</th>
@@ -60,11 +60,11 @@
                 }
                 @if (_anyRequiredInspection && !AlignVertically)
                 {
-                    <NTd Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
+                    <NTd CellStyle="background-color:whitesmoke" TextStyle="font-weight:bold" Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
                 }
                 @if (_anyCompulsoryRequiredInspection && !AlignVertically)
                 {
-                    <NTd Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
+                    <NTd CellStyle="background-color:whitesmoke" TextStyle="font-weight:bold" Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
                 }
 
                 <NTd Value="@phase.GetRecoveryInterval()" />
