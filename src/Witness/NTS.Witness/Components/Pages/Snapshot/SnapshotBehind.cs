@@ -14,7 +14,7 @@ public class SnapshotBehind : NComponent
 {
     [Inject]
     IDialogService MudDialogService { get; set; } = null!;
-    protected List<Participation> Participations { get; set; }  = [];
+    protected List<Participation> Participations { get; set; } = [];
     protected List<IntermediateSnapshot> SelectedParticipations { get; set; } = [];
     protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
@@ -30,7 +30,6 @@ public class SnapshotBehind : NComponent
         {
             await SafeHelper.HandleException(ex);
         }
-        
     }
 
     protected async void SetButtonText(int id)

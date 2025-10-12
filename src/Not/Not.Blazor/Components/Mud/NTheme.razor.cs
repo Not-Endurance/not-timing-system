@@ -29,10 +29,7 @@ public partial class NTheme
         var caption = new Caption() { FontSize = "14px" };
         if (Mobile)
         {
-            caption = new Caption()
-            {
-                FontSize = "13px",
-            };
+            caption = new Caption() { FontSize = "13px" };
         }
         Theme = new MudTheme() { Typography = new Typography() { Caption = caption } };
     }

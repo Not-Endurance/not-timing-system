@@ -4,6 +4,7 @@ using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.ParticipationChips;
+
 public class ParticipationChipsBehind : ComponentBase
 {
     [Parameter]
