@@ -27,10 +27,11 @@ public partial class NTheme
     protected override void OnInitialized()
     {
         var caption = new Caption() { FontSize = "14px" };
+        var subtitle2 = new Subtitle2() { FontSize = "12px" };
         if (Mobile)
         {
             caption = new Caption() { FontSize = "13px" };
         }
-        Theme = new MudTheme() { Typography = new Typography() { Caption = caption } };
+        Theme = new MudTheme() { Typography = new Typography() { Caption = caption, Subtitle2 = subtitle2 } };
     }
 }

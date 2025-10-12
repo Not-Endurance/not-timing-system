@@ -15,7 +15,7 @@
     <One>
         @if (Eliminated != null)
         {
-            <MudText Typo="Typo.caption" Class="mr-4 pl-2" Style="width: 1rem;">@Eliminated</MudText>
+            <MudText Typo="Typo.subtitle2" Class="mr-4 pl-2" Style="width: 1rem;">@Eliminated</MudText>
             <MudIcon Icon="@Icons.Material.TwoTone.Flag" Color="Color.Error" Size="Size.Large" />
         }
         else if (Phases.Any(x => !x.IsComplete()))
