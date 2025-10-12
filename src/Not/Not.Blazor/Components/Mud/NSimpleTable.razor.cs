@@ -4,7 +4,7 @@ namespace Not.Blazor.Components;
 
 public partial class NSimpleTable<T>
 {
-    Typo _typography = Typo.caption;
+    protected Typo Typography { get; set; } = Typo.caption;
 
     [Parameter, EditorRequired]
     public IEnumerable<T> Items { get; set; } = [];

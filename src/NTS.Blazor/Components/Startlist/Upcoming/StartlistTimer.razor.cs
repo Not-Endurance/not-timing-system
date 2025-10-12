@@ -14,14 +14,13 @@ public partial class StartlistTimer
     string _displayTime = default!;
     Color _color = default!;
 
+    protected Typo Typo { get; set; } = Typo.caption;
+
     [Parameter]
     public DateTimeOffset StartTime { get; set; } = default!;
 
     [Parameter]
     public double StopTimerAtTime { get; set; } = default!;
-
-    [Parameter]
-    public Typo Typo { get; set; } = Typo.inherit;
 
     protected override void OnInitialized()
     {

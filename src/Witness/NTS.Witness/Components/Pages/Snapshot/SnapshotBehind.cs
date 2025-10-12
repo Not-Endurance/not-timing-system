@@ -14,7 +14,6 @@ public class SnapshotBehind : NComponent
 {
     [Inject]
     IDialogService MudDialogService { get; set; } = null!;
-
     protected List<Participation> Participations { get; set; }  = [];
     protected List<IntermediateSnapshot> SelectedParticipations { get; set; } = [];
     protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
@@ -112,7 +111,7 @@ public class SnapshotBehind : NComponent
         }
     }
 
-    protected async Task<Color> GetColor(Participation participation)
+    protected Color GetColor(Participation participation)
     {
         try
         {
@@ -128,10 +127,9 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            SafeHelper.HandleError(ex);
             return Color.Primary;
         }
-        
     }
 
     protected async Task EditSnapshot(IntermediateSnapshot snapshotParticipant)

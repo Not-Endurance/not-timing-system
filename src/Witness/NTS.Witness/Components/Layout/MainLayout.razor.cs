@@ -9,7 +9,6 @@ namespace NTS.Witness.Components.Layout;
 
 public partial class MainLayout
 {
-    protected NTheme _theme = default!;
     bool _drawerOpen = false;
 
     [Inject]

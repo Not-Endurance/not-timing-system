@@ -640,7 +640,7 @@
     <value>Send {0} snapshots to Judge as</value>
   </data>
   <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
-    <value>No participants have been selected to snapshot.</value>
+    <value>Select participants to snapshot their time</value>
   </data>
   <data name="Edit_timestamp_string" xml:space="preserve">
     <value>Edit Timestamp</value>
