@@ -32,6 +32,9 @@ public partial class NTheme
         {
             caption = new Caption() { FontSize = "13px" };
         }
-        Theme = new MudTheme() { Typography = new Typography() { Caption = caption, Subtitle2 = subtitle2 } };
+        Theme = new MudTheme()
+        {
+            Typography = new Typography() { Caption = caption, Subtitle2 = subtitle2 },
+        };
     }
 }

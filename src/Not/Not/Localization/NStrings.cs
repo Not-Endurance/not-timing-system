@@ -31,7 +31,11 @@ public static class NStrings
     public static string Are_you_sure_you_want_to_delete__string =>
         LocalizeString(nameof(Are_you_sure_you_want_to_delete__string));
     public static string Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection =>
-        LocalizeString(nameof(Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection));
+        LocalizeString(
+            nameof(
+                Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
+            )
+        );
     public static string Text_formatting_failed_This_is_usually_not_critical_failure_string =>
         LocalizeString(nameof(Text_formatting_failed_This_is_usually_not_critical_failure_string));
     public static string Language_string => LocalizeString(nameof(Language_string));
