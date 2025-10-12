@@ -47,7 +47,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            SafeHelper.HandleException(ex);
         }
     }
 
@@ -59,7 +59,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            SafeHelper.HandleException(ex);
         }
     }
 
@@ -73,7 +73,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            SafeHelper.HandleException(ex);
         }
     }
 
@@ -85,7 +85,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            SafeHelper.HandleException(ex);
         }
     }
 

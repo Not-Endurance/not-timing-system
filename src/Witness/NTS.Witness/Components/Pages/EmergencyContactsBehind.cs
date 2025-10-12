@@ -1,5 +1,4 @@
 ﻿using Not.Blazor.Components;
-using Not.Safe;
 using NTS.Witness.Platforms.Services;
 
 namespace NTS.Witness.Components.Pages;
@@ -11,7 +10,7 @@ public class EmergencyContactsBehind : NComponent
 
     protected Dictionary<string, string> Contacts { get; set; } = default!;
 
-    protected override async void OnInitialized()
+    protected override void OnInitialized()
     {
         try
         {
@@ -19,11 +18,11 @@ public class EmergencyContactsBehind : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 
-    protected async void OnNumberClick(string phoneNumber)
+    protected void OnNumberClick(string phoneNumber)
     {
         try
         {
@@ -31,7 +30,7 @@ public class EmergencyContactsBehind : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 }

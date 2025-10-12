@@ -62,7 +62,7 @@ public static class SafeHelper
         }
     }
 
-    public static async void Run(Action action, Func<ValidationException, Task> validationHandler)
+    public static void Run(Action action, Action<ValidationException> validationHandler)
     {
         try
         {
@@ -70,7 +70,7 @@ public static class SafeHelper
         }
         catch (ValidationException validation)
         {
-            await validationHandler(validation);
+            validationHandler(validation);
         }
         catch (Exception ex)
         {
@@ -80,7 +80,15 @@ public static class SafeHelper
 
     public static Task Run(Func<Task> action)
     {
-        return Run(action, HandleDefaultValidation);
+        var task = Run(action, HandleDefaultValidation);
+        if(task == null)
+        {
+            return Task.CompletedTask;
+        }
+        else
+        {
+            return task;
+        }
     }
 
     public static void Run(Action action)
@@ -127,12 +135,20 @@ public static class SafeHelper
         }
     }
 
-    public static Task<T?> Run<T>(Func<Task<T>> action)
+    public static Task<T> Run<T>(Func<Task<T>> action)
     {
-        return Run(action, HandleDefaultValidation);
+        var task = Run(action, HandleDefaultValidation);
+        if(task == null)
+        {
+            return Task.FromResult(default(T)!);
+        }
+        else
+        {
+            return task;
+        }
     }
 
-    public static Task<IEnumerable<T>> Run<T>(Func<Task<IEnumerable<T>>> action)
+    public static Task<IEnumerable<T>>? Run<T>(Func<Task<IEnumerable<T>>> action)
     {
         return Run(action, HandleDefaultValidation);
     }
@@ -163,11 +179,11 @@ public static class SafeHelper
         return Run(action, argument, NotifyHelper.Warn);
     }
 
-    public static async Task HandleException(Exception exception)
+    public static void HandleException(Exception exception)
     {
         if (exception is ValidationException validation)
         {
-            await HandleDefaultValidation(validation);
+            HandleDefaultValidation(validation);
         }
         else
         {
@@ -187,10 +203,9 @@ public static class SafeHelper
         //#endif
     }
 
-    public static Task HandleDefaultValidation(ValidationException validation)
+    public static void HandleDefaultValidation(ValidationException validation)
     {
         NotifyHelper.Warn(validation);
-        return Task.CompletedTask;
     }
 
 #pragma warning disable IDE0051 // Used in RELEASE build

@@ -1,11 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 using MudBlazor;
-using Not.Safe;
-using NTS.Blazor.Constants;
+using Not.Blazor.Components;
 
 namespace NTS.Witness.Components.Pages.Snapshot;
 
-public class TimestampUpdateDialogBehind : ComponentBase
+public class TimestampUpdateDialogBehind : NComponent
 {
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = default!;
@@ -20,7 +19,7 @@ public class TimestampUpdateDialogBehind : ComponentBase
         base.OnInitialized();
     }
 
-    protected async void OnTimestampInputChanged(string newValue)
+    protected void OnTimestampInputChanged(string newValue)
     {
         try
         {
@@ -32,11 +31,11 @@ public class TimestampUpdateDialogBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 
-    protected async void Submit()
+    protected void Submit()
     {
         try
         {
@@ -44,11 +43,11 @@ public class TimestampUpdateDialogBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 
-    protected async void Cancel()
+    protected void Cancel()
     {
         try
         {
@@ -56,7 +55,7 @@ public class TimestampUpdateDialogBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Not.Blazor.Ports;
+using Not.Safe;
 
 namespace Not.Blazor.Components;
 
@@ -40,6 +41,11 @@ public class NComponent : ComponentBase
     protected string CombineStyle(string customStyle)
     {
         return CombineWithSpace(Style, customStyle);
+    }
+
+    protected void Handle(Exception ex)
+    {
+        SafeHelper.HandleException(ex);
     }
 
     string CombineWithSpace(params string?[] values)

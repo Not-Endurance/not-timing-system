@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Safe;
+using Not.Blazor.Components;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.ParticipationChips;
 
-public class ParticipationChipsBehind : ComponentBase
+public class ParticipationChipsBehind : NComponent
 {
     [Parameter]
     public Participation SelectedParticipation { get; set; } = default!;
@@ -22,7 +22,7 @@ public class ParticipationChipsBehind : ComponentBase
     [Parameter]
     public Action<Participation>? ClickAction { get; set; } = default!;
 
-    protected async void ClickHandler(Participation participation)
+    protected void ClickHandler(Participation participation)
     {
         try
         {
@@ -30,7 +30,7 @@ public class ParticipationChipsBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 }

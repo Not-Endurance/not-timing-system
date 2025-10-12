@@ -2,7 +2,6 @@
 using Not.Blazor.Components;
 using Not.Exceptions;
 using Not.Notify;
-using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
@@ -20,7 +19,7 @@ public class SnapshotBehind : NComponent
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
 
-    protected override async void OnInitialized()
+    protected override void OnInitialized()
     {
         try
         {
@@ -28,11 +27,11 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 
-    protected async void SetButtonText(int id)
+    protected void SetButtonText(int id)
     {
         try
         {
@@ -48,11 +47,11 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 
-    protected async void SelectHandler(Participation participation)
+    protected void SelectHandler(Participation participation)
     {
         try
         {
@@ -68,11 +67,11 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 
-    protected async void SnapshotHandler(IntermediateSnapshot snapshotParticipant)
+    protected void SnapshotHandler(IntermediateSnapshot snapshotParticipant)
     {
         try
         {
@@ -83,11 +82,11 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 
-    protected async void SendHandler(string snapshotType)
+    protected void SendHandler(string snapshotType)
     {
         try
         {
@@ -106,7 +105,7 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 
@@ -126,7 +125,7 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            SafeHelper.HandleError(ex);
+            Handle(ex);
             return Color.Primary;
         }
     }
@@ -157,7 +156,7 @@ public class SnapshotBehind : NComponent
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 }

@@ -1,16 +1,16 @@
-﻿using Not.Safe;
+﻿using Not.Blazor.Components;
 using NTS.Witness.RPC;
 
 namespace NTS.Witness.Components.Pages;
 
-public class WitnessPageBehind : ComponentBase
+public class WitnessPageBehind : NComponent
 {
     [Inject]
     ITestBehind TestBehind { get; set; } = default!;
     protected bool IsUserOfficial { get; set; } = false;
     protected bool IsUserLoggedIn { get; set; } = false;
 
-    protected override async void OnInitialized()
+    protected override void OnInitialized()
     {
         try
         {
@@ -18,7 +18,7 @@ public class WitnessPageBehind : ComponentBase
         }
         catch (Exception ex)
         {
-            await SafeHelper.HandleException(ex);
+            Handle(ex);
         }
     }
 }
