@@ -1,7 +1,11 @@
+using MudBlazor;
+
 namespace Not.Blazor.Components;
 
 public partial class NSimpleTable<T>
 {
+    protected Typo Typography { get; set; } = Typo.caption;
+
     [Parameter, EditorRequired]
     public IEnumerable<T> Items { get; set; } = [];
 
@@ -10,6 +14,9 @@ public partial class NSimpleTable<T>
 
     [Parameter]
     public string EmptyMessage { get; set; } = "This table is still empty";
+
+    [Parameter]
+    public string Height { get; set; } = default!;
 
     [Parameter]
     public RenderFragment<T> CustomCell { get; set; } = default!;

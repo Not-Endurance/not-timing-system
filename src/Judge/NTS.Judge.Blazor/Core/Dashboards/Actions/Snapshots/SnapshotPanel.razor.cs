@@ -1,7 +1,7 @@
 using MudBlazor;
 using Not.Notify;
+using NTS.Blazor.Constants;
 using NTS.Domain.Objects;
-using NTS.Judge.Blazor.Shared.Constants;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Snapshots;
 

@@ -84,3 +84,12 @@ h1:focus {
         padding-left: env(safe-area-inset-left);
     }
 }
+
+.position-bottom{
+    bottom:1rem;
+}
+
+.justify-center-absolute{
+    left:50%;
+    margin-left:-45vw;
+}

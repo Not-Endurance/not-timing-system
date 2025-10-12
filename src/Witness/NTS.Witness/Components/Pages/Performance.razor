@@ -1,4 +1,9 @@
-﻿@attribute [Route(PHASE_DETAILS)]
+﻿@using NTS.Blazor.Components.ParticipationTable
+@using NTS.Domain.Core.Aggregates.Participations
+@attribute [Route(PERFORMANCE)]
+@inherits PerformanceBehind
 
-We are waiting for a developer to finish their nap to put some content here. 
-Thank you for patience!
+<MudStack AlignItems="AlignItems.Center">
+    <NHeadline3 Content="@Participant!.ToString()"></NHeadline3>
+    <ParticipationTable Number="1" Phases="PhasesCollection" Editable="false" />
+</MudStack>

@@ -7,12 +7,14 @@ public class BlazorCrumbsNavigator : ICrumbsNavigator, ILandNavigator
 {
     readonly NavigationManager _blazorNavigationManager;
     static Parameters? _parameters;
-    static Stack<(string endpoint, Parameters? parameters)>? _crumbs;
+    static Stack<(string endpoint, Parameters? parameters)>? _crumbs = [];
 
     public BlazorCrumbsNavigator(NavigationManager blazorNavigationManager)
     {
         _blazorNavigationManager = blazorNavigationManager;
     }
+
+    public string CurrentEndpoint => _blazorNavigationManager.Uri;
 
     public void NavigateTo(string endpoint)
     {
@@ -54,7 +56,6 @@ public class BlazorCrumbsNavigator : ICrumbsNavigator, ILandNavigator
 
     public void LandTo(string landing)
     {
-        _crumbs = [];
         NavigateTo(landing);
     }
 

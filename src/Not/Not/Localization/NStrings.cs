@@ -39,6 +39,11 @@ public static class NStrings
     public static string Text_formatting_failed_This_is_usually_not_critical_failure_string =>
         LocalizeString(nameof(Text_formatting_failed_This_is_usually_not_critical_failure_string));
     public static string Language_string => LocalizeString(nameof(Language_string));
+    public static string Upload_string => LocalizeString(nameof(Upload_string));
+    public static string Delete_selection_string => LocalizeString(nameof(Delete_selection_string));
+    public static string Image_browser_string => LocalizeString(nameof(Image_browser_string));
+    public static string Image_browser_empty_string => LocalizeString(nameof(Image_browser_empty_string));
+    public static string Use_image_string => LocalizeString(nameof(Use_image_string));
 }
 #pragma warning restore NA0004
 #pragma warning restore IDE1006

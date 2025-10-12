@@ -1,20 +1,31 @@
-﻿@inherits LayoutComponentBase
+﻿@using Not.Blazor.Notifier
+@using NTS.Witness.Constants
 
-<NTheme/>
+@inherits LayoutComponentBase
 
-<MudLayout>
-    <MudAppBar Elevation="1">
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
-    </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen" Elevation="2" Anchor="Anchor.Right" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
-        <MudDrawerHeader>
-            <MudText Typo="Typo.h6">Witness</MudText>
-        </MudDrawerHeader>
+<NTheme Mobile="true"/>
 
-        <NavMenu AfterNavigationAction="CloseDrawer" />
-    </MudDrawer>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-</MudLayout>
+<MudSwipeArea OnSwipeEnd="@OnSwipeEnd" Style="width: 100vw;">
+    <MudLayout Style="height: 100vh;">
+        <MudAppBar Elevation="1">
+            <MudText>NTS Witness</MudText>
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
+        </MudAppBar>
+        <MudDrawer @bind-Open="@_drawerOpen" Elevation="2" Anchor="Anchor.Right" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h6">@Main_menu_string</MudText>
+            </MudDrawerHeader>
+
+            <NavMenu AfterNavigationAction="CloseDrawer" />
+        </MudDrawer>
+        <MudMainContent Style="height:100%;">
+            @if (!IsCurrentPageEmergencyContacts && !(Navigator.CurrentEndpoint.Contains(SNAPSHOT) || Navigator.CurrentEndpoint.Contains(STARTLIST))) //TODO: use User Authority for this condition
+            {
+                <HelpButton Class="help-button" ClickHandler="HelpHandler"/>
+            }
+            @Body
+            <BlazorNotifier />
+        </MudMainContent>
+    </MudLayout>
+</MudSwipeArea>

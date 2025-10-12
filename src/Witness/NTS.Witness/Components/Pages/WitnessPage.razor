@@ -1,5 +1,19 @@
-﻿@attribute [Route(WITNESS_HOME  )]
+﻿@using NTS.Witness.Components.Pages.Snapshot
+@attribute [Route(WITNESS_HOME)]
+@inherits WitnessPageBehind
 
-<h1>Hello, world!</h1>
-
-Congratulations, a developer you hired has made an app that works!
+@if (IsUserLoggedIn)
+{
+    @if (IsUserOfficial)
+    {
+        <Snapshot/>
+    }
+    else
+    {
+        <Performance/>
+    }
+}
+else
+{
+    <Login />    
+}

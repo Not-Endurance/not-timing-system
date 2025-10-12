@@ -1,4 +1,6 @@
-﻿@inherits ProtocolRowBehind
+@using NTS.Blazor.Components.ParticipationTable;
+
+@inherits ProtocolRowBehind
 
 @{
     var combination = Entry.Participation.Combination;
@@ -10,16 +12,16 @@
 <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
     <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2" Style="width:80px">
         <MudText Typo="Typo.button" Align="align" Style="width:50px">@GetRankText()</MudText>
-        <MudText Typo="Typo.caption" Align="align">@combination.Athlete.Names</MudText>
+        <MudText Typo="Typo.subtitle2" Align="align">@combination.Athlete.Names</MudText>
 
-        <MudText Typo="Typo.caption" Align="align">@combination.Horse</MudText>
+        <MudText Typo="Typo.subtitle2" Align="align">@combination.Horse</MudText>
 
         @if (combination.Club != null)
         {
-            <MudText Typo="Typo.caption" Align="align">@combination.Club</MudText>
+            <MudText Typo="Typo.subtitle2" Align="align">@combination.Club</MudText>
         }
 
-        <MudText Typo="Typo.caption" Align="align">@combination.Athlete.Country</MudText>
+        <MudText Typo="Typo.subtitle2" Align="align">@combination.Athlete.Country</MudText>
     </MudStack>
 
     <ParticipationTable Number="combination.Number" Phases="phases" AlignVertically="true" />
@@ -39,19 +41,19 @@
         var total = Entry.Participation.GetTotal()!;
         <MudStack Class="d-flex" Style="@mudStackWidth" Spacing="1">
             <MudStack Justify="Justify.FlexStart" Style="height:100%;">
-                <MudText Typo="Typo.caption" Align="align">
+                <MudText Typo="Typo.subtitle2" Align="align">
                     @Finished_at_colon_string
                     <strong>
                         @total.FinishTime
                     </strong>
                 </MudText>
 
-                <MudText Typo="Typo.caption" Align="align">
+                <MudText Typo="Typo.subtitle2" Align="align">
                     @Ride_time_in_hours_colon_string
                     <strong>@total.RideInterval</strong>
                 </MudText>
 
-                <MudText Typo="Typo.caption" Align="align">
+                <MudText Typo="Typo.subtitle2" Align="align">
                     @Average_speed
                     <br />
                     <strong>@total.AverageSpeed.ToStringWithThousands()</strong> km/h

@@ -3,19 +3,23 @@
 @inherits MudSimpleTable
 @typeparam T where T : class
 
-<MudSimpleTable Style="overflow-x: auto;">
+<MudSimpleTable Style="@("overflow-x: auto; max-height:"+Height)" FixedHeader="FixedHeader">
     <thead>
         <tr>
             @foreach (var heading in Headings)
             {
-                <th>@heading</th>
+                <th>
+                    <MudText Typo="@Typography">@heading</MudText>
+                </th>
             }
         </tr>
     </thead>
     <tbody>
         @if(Items.Count() == 0)
         {
-            <MudText Typo="Typo.body1">@EmptyMessage</MudText>
+            <MudPaper Elevation="0" Class="pa-4">
+                <MudText Typo="@Typography">@EmptyMessage</MudText>
+            </MudPaper>
         }
         @foreach (var item in Items)
         {
@@ -24,7 +28,9 @@
             <tr>
                 @foreach (var cellValue in itemToString.Split("|"))
                 {
-                    <td>@cellValue</td>
+                    <td>
+                        <MudText Typo="@Typography">@cellValue</MudText>
+                    </td>
                 }
                 @if (CustomCell != default)
                 {

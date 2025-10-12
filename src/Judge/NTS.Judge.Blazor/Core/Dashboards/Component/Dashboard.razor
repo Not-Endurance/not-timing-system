@@ -3,6 +3,8 @@
 @using Not.Concurrency
 @using Not.Events
 @using Not.Blazor.Components
+@using NTS.Blazor.Components.ParticipationTable
+@using NTS.Blazor.Components.ParticipationChips
 
 @inherits NComponent
 
@@ -14,24 +16,7 @@
         </MudItem>
         
         <MudItem xs="3">
-            <MudChipSet @bind-SelectedValue="Behind.SelectedParticipation" SelectionMode="SelectionMode.SingleSelection">
-                
-                @foreach (var grouping in Behind.Participations.GroupBy(x => x.Phases.Distance)) // TODO: move grouping in field
-                {
-                    <MudText Class="pl-4">
-                        <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
-                    </MudText>
-
-                    <MudDivider /> 
-
-                    @foreach (var participation in grouping.OrderBy(x => x.Combination.Number))
-                    {
-                        var number = participation.Combination.Number;
-                        var color = GetColor(participation);
-                        <MudChip Text="@number.ToString()" Value="@participation" Color="@color" Style="min-width: 1rem" />
-                    }
-                }
-            </MudChipSet>
+            <ParticipationChips SelectedParticipation="Behind.SelectedParticipation" ParticipationCollection="Behind.Participations" GetColorAction="GetColor" />
         </MudItem>
         
         <MudItem xs="9">

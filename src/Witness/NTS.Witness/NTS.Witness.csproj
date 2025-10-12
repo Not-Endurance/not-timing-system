@@ -12,10 +12,10 @@
         <Nullable>enable</Nullable>
 		
         <!-- Display name -->
-        <ApplicationTitle>NTS.Witness</ApplicationTitle>
+        <ApplicationTitle>NTS Witness</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.nts.witness</ApplicationId>
+        <ApplicationId>com.nts.witness</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -43,10 +43,10 @@
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+        <MauiIcon Include="Resources\AppIcon\appicon.png" Color="white" />
 
         <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+        <MauiSplashScreen Include="Resources\Splash\splash.png" Color="white" BaseSize="128,128" />
 
         <!-- Images -->
         <MauiImage Include="Resources\Images\*" />
@@ -79,10 +79,28 @@
     </ItemGroup>
 
     <ItemGroup>
+	  <ProjectReference Include="..\..\Not\Not.Blazor\Not.Blazor.csproj" />
 	  <ProjectReference Include="..\..\Not\Not.MAUI\Not.MAUI.csproj" />
       <ProjectReference Include="..\..\Not\Not.Application\Not.Application.csproj" />
       <ProjectReference Include="..\..\Not\Not\Not.csproj" />
+      <ProjectReference Include="..\..\NTS.Blazor\NTS.Blazor.csproj" />
+      <ProjectReference Include="..\..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
       <ProjectReference Include="..\..\NTS\NTS.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="SplashPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+    </ItemGroup>
+
+    <!--<ItemGroup>
+      <Compile Update="Platforms\iOS\Services\DialService.cs">
+        <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
+      </Compile>
+      <Compile Update="Platforms\Windows\Services\DialService.cs">
+        <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
+      </Compile>
+    </ItemGroup>-->
 
 </Project>

@@ -573,13 +573,74 @@
   <data name="Component_missing_required_value_string" xml:space="preserve">
     <value>{0} oluşturulamadı. Lütfen geliştiriciyle iletişime geçin.</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Setup_configuration_will_not_be_deleted_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
   <data name="Download_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Help_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Home_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Login_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Contacts_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Snapshot_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Performance_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Vetin_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Participant_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Login_page_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Snapshot_page_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Username_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Password_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Send_snapshot_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Edit_timestamp_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Timestamp_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Save_string" xml:space="preserve">
     <value />
   </data>
   <data name="Use_image_string" xml:space="preserve">
     <value />
   </data>
   <data name="Image_browser_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Delete_selection_string" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Upload_string" xml:space="preserve">
     <value />
   </data>
 </root>
