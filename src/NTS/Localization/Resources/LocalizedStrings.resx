@@ -726,4 +726,10 @@
   <data name="Image_browser_string" xml:space="preserve">
     <value>Image Browser</value>
   </data>
+  <data name="Delete_selection_string" xml:space="preserve">
+    <value>Delete Selection</value>
+  </data>
+  <data name="Upload_string" xml:space="preserve">
+    <value>Upload</value>
+  </data>
 </root>

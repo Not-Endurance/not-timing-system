@@ -717,13 +717,19 @@
   <data name="Automatic_CRI_string" xml:space="preserve">
     <value>Автоматичнa CRI</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Use_image_string" xml:space="preserve">
     <value>Използвай изображение</value>
   </data>
   <data name="Image_browser_string" xml:space="preserve">
     <value>Каталог на изображения</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Delete_selection_string" xml:space="preserve">
+    <value>Изтрий избраното</value>
+  </data>
+  <data name="Upload_string" xml:space="preserve">
+    <value>Качи</value>
   </data>
 </root>

@@ -12,7 +12,7 @@
                 Color="Color.Primary"
                 Class="m-5"
                 StartIcon="@Icons.Material.Filled.Upload">
-                    Upload
+                    @Upload_string
                 </MudButton>
             </ActivatorContent>
         </MudFileUpload>
@@ -21,7 +21,7 @@
         Class="m-5"
         StartIcon="@Icons.Material.Filled.Delete"
         OnClick="() => PromptDeleteImage(SelectedImage)">
-            Delete Selection
+            @Delete_selection_string
         </MudButton>
     </MudStack>
 
@@ -30,7 +30,7 @@
         {
             <MudItem xs="12">
                 <MudText Typo="Typo.body1" Class="text-center">
-                    No images found. Please upload images to display.
+                    @Image_browser_empty_string
                 </MudText>
             </MudItem>
         }

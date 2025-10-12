@@ -198,11 +198,6 @@ namespace NTS.Localization
         public static string Edit_timestamp_string => LocalizeString(nameof(Edit_timestamp_string));
         public static string Timestamp_string => LocalizeString(nameof(Timestamp_string));
         public static string Save_string => LocalizeString(nameof(Save_string));
-        public static string Upload_string => LocalizeString(nameof(Upload_string));
-        public static string Delete_selection_string => LocalizeString(nameof(Delete_selection_string));
-        public static string Image_browser_string => LocalizeString(nameof(Image_browser_string));
-        public static string Image_browser_empty_string => LocalizeString(nameof(Image_browser_empty_string));
-        public static string Use_image_string => LocalizeString(nameof(Use_image_string));
     }
 }
 #pragma warning restore NA0004
