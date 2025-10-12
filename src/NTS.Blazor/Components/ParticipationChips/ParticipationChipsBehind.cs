@@ -31,6 +31,5 @@ public class ParticipationChipsBehind : ComponentBase
         {
             await SafeHelper.HandleException(ex);
         }
-        
     }
 }

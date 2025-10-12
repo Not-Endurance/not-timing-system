@@ -26,10 +26,7 @@ public partial class NTheme
 
     protected override void OnInitialized()
     {
-        var caption = new Caption()
-        {
-            FontSize = "14px"
-        };
+        var caption = new Caption() { FontSize = "14px" };
         if (Mobile)
         {
             caption = new Caption()

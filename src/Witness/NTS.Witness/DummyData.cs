@@ -1,12 +1,12 @@
-﻿using NTS.Domain.Objects;
+﻿using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Objects;
 using Athlete = NTS.Domain.Core.Aggregates.Participations.Athlete;
 using Combination = NTS.Domain.Core.Aggregates.Participations.Combination;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
-using Horse = NTS.Domain.Core.Aggregates.Participations.Horse;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Domain.Core.Aggregates;
 using CorePhase = NTS.Domain.Core.Aggregates.Participations.Phase;
+using Horse = NTS.Domain.Core.Aggregates.Participations.Horse;
 
 namespace NTS.Witness;
 
@@ -59,10 +59,10 @@ public class DummyData
     public static Dictionary<string, string> CreateContacts()
     {
         var contacts = new Dictionary<string, string>
-            {
-                { "Yo mama", "+359 882312321" },
-                { "Baba yaga", "+359 666666666" },
-            };
+        {
+            { "Yo mama", "+359 882312321" },
+            { "Baba yaga", "+359 666666666" },
+        };
         return contacts;
     }
 
@@ -134,14 +134,14 @@ public class DummyData
     {
         var phases = new List<CorePhase>();
         var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
-                20,
-                15,
-                40,
-                NTS.Domain.Enums.CompetitionRuleset.Regional,
-                false,
-                null,
-                DateTimeOffset.Now.AddMinutes(23)
-            );
+            20,
+            15,
+            40,
+            NTS.Domain.Enums.CompetitionRuleset.Regional,
+            false,
+            null,
+            DateTimeOffset.Now.AddMinutes(23)
+        );
         var phase2 = new NTS.Domain.Core.Aggregates.Participations.Phase(
             20,
             20,
