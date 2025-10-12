@@ -81,7 +81,7 @@ public static class SafeHelper
     public static Task Run(Func<Task> action)
     {
         var task = Run(action, HandleDefaultValidation);
-        if(task == null)
+        if (task == null)
         {
             return Task.CompletedTask;
         }
@@ -138,7 +138,7 @@ public static class SafeHelper
     public static Task<T> Run<T>(Func<Task<T>> action)
     {
         var task = Run(action, HandleDefaultValidation);
-        if(task == null)
+        if (task == null)
         {
             return Task.FromResult(default(T)!);
         }
