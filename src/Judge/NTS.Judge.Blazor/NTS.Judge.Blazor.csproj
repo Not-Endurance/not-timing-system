@@ -21,31 +21,4 @@
     <ProjectReference Include="..\..\NTS.Storage\NTS.Storage.csproj" /> <!-- Remove when Nexus Document objects are settled -->
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Core\Rankings\CustomRanking\CreateCustomRankingDialogBehind.cs">
-      <DependentUpon>CreateCustomRankingDialog.razor</DependentUpon>
-    </Compile>
-    <Compile Update="Core\Rankings\Menu\RankingMenuBehind.cs">
-      <DependentUpon>RankingMenu.razor</DependentUpon>
-    </Compile>
-    <Compile Update="Core\Rankings\Ranklists\RanklistRowBehind.cs">
-      <DependentUpon>RanklistRow.razor</DependentUpon>
-    </Compile>
-    <Compile Update="Core\Rankings\Ranklists\RanklistTableBehind.cs">
-      <DependentUpon>RanklistTable.razor</DependentUpon>
-    </Compile>
-    <Compile Update="Core\Rankings\Protocols\ProtocolBehind.cs">
-      <DependentUpon>Protocol.razor</DependentUpon>
-    </Compile>
-    <Compile Update="Core\Rankings\Protocols\ProtocolRowBehind.cs">
-      <DependentUpon>ProtocolRow.razor</DependentUpon>
-    </Compile>
-    <Compile Update="Core\Rankings\RankingsPageBehind.cs">
-      <DependentUpon>RankingsPage.razor</DependentUpon>
-    </Compile>
-    <Compile Update="Core\Rankings\CustomRanking\CustomRankingControlsBehind.cs">
-      <DependentUpon>CustomRankingControls.razor</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
 </Project>

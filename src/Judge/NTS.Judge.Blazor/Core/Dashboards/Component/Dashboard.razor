@@ -1,8 +1,4 @@
 ﻿@using NTS.Domain.Core.Aggregates
-@using NTS.Domain.Extensions
-@using Not.Concurrency
-@using Not.Events
-@using Not.Blazor.Components
 @using NTS.Blazor.Components.ParticipationTable
 @using NTS.Blazor.Components.ParticipationChips
 
@@ -16,14 +12,14 @@
         </MudItem>
         
         <MudItem xs="3">
-            <ParticipationChips SelectedParticipation="Behind.SelectedParticipation" ParticipationCollection="Behind.Participations" GetColorAction="GetColor" />
+            <ParticipationChips @bind-Value="Behind.SelectedParticipation" Set="Behind.Participations" SetChipColor="GetColor" />
         </MudItem>
         
         <MudItem xs="9">
             <ParticipationTable Number="Behind.SelectedParticipation.Combination.Number" Phases="Behind.SelectedParticipation.Phases" />
         </MudItem>
     </NGrid>
-}
+}   
 
 <style>
     .dashboard-autocomplete .mud-select-input {
