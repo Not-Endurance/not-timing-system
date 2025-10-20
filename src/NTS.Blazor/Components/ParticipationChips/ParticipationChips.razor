@@ -3,9 +3,9 @@
 
 @inherits ParticipationChipsBehind
 
-<MudChipSet T="Participation" @bind-SelectedValue="SelectedParticipation" SelectionMode="SelectionMode.SingleSelection">
+<MudChipSet T="Participation" @bind-SelectedValue="Value" SelectionMode="SelectionMode.SingleSelection">
 
-    @foreach (var grouping in ParticipationCollection.GroupBy(x => x.Phases.Distance)) // TODO: move grouping in field
+    @foreach (var grouping in Set.GroupBy(x => x.Phases.Distance)) // TODO: move grouping in field
     {
         <MudText Class="pl-4">
             <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
@@ -16,8 +16,8 @@
         @foreach (var participation in grouping.OrderBy(x => x.Combination.Number))
         {
             var number = participation.Combination.Number;
-            var color = GetColorAction != null ? GetColorAction.Invoke(participation) : Color.Primary;
-            <MudChip Text="@number.ToString()" Value="@participation" Color="@color" Style="min-width: 1rem" Size="ChipSize" OnClick="() => ClickHandler(participation)" />
+            var color = SetChipColor?.Invoke(participation) ?? Color.Primary;
+            <MudChip Text="@number.ToString()" Value="@participation" Color="@color" Style="min-width: 1rem" Size="ChipSize"  />
         }
     }
 </MudChipSet>
