@@ -1,4 +1,4 @@
-@using NTS.Blazor.Components.ParticipationTable;
+﻿@using NTS.Blazor.Components.ParticipationTable;
 
 @inherits ProtocolRowBehind
 
@@ -9,7 +9,7 @@
     const Align align = Align.Center;
 }
 
-<MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+<MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Class="printable">
     <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2" Style="width:80px">
         <MudText Typo="Typo.button" Align="align" Style="width:50px">@GetRankText()</MudText>
         <MudText Typo="Typo.subtitle2" Align="align">@combination.Athlete.Names</MudText>
