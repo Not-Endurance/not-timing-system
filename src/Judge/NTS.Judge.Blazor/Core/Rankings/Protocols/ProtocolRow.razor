@@ -10,7 +10,7 @@
 }
 
 <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Class="mt-1 printable" Spacing="0">
-    <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.End" Spacing="4" Style="width:100%">
+    <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.End" Spacing="4" Style="width:100%">
         <MudText Typo="Typo.button" Align="align" Style="width:50px">@GetRankText()</MudText>
         
         <MudText Typo="Typo.button" Align="align">@combination.Athlete.Names</MudText>
@@ -26,7 +26,7 @@
 
     <MudDivider Class="mt-1" />
     
-    <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+    <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
         <ParticipationTable Number="combination.Number" Phases="phases" AlignVertically="true"/>
 
         @if (Entry.Participation.IsEliminated())
