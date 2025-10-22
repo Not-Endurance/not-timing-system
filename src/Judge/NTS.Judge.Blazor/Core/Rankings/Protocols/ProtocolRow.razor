@@ -9,65 +9,65 @@
     const Align align = Align.Center;
 }
 
-<MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Class="printable">
-    <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Spacing="2" Style="width:80px">
+<MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Class="mt-1 printable" Spacing="0">
+    <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.End" Spacing="4" Style="width:100%">
         <MudText Typo="Typo.button" Align="align" Style="width:50px">@GetRankText()</MudText>
-        <MudText Typo="Typo.subtitle2" Align="align">@combination.Athlete.Names</MudText>
+        
+        <MudText Typo="Typo.button" Align="align">@combination.Athlete.Names</MudText>
 
-        <MudText Typo="Typo.subtitle2" Align="align">@combination.Horse</MudText>
+        <MudText Typo="Typo.button" Align="align">@combination.Horse</MudText>
 
         @if (combination.Club != null)
         {
-            <MudText Typo="Typo.subtitle2" Align="align">@combination.Club</MudText>
+            <MudText Typo="Typo.button" Align="align">@combination.Club</MudText>
         }
-
-        <MudText Typo="Typo.subtitle2" Align="align">@combination.Athlete.Country</MudText>
+        <MudText Typo="Typo.button" Align="align">@combination.Athlete.Country</MudText>
     </MudStack>
 
-    <ParticipationTable Number="combination.Number" Phases="phases" AlignVertically="true" />
+    <MudDivider Class="mt-1" />
+    
+    <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+        <ParticipationTable Number="combination.Number" Phases="phases" AlignVertically="true"/>
 
-    @if (Entry.Participation.IsEliminated())
-    {
-        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="@mudStackWidth">
-            <MudText Typo="Typo.body2" Align="align" Class="mud-button-text">
-                @Eliminated_string:
-                <br />
-                <strong>@Entry.Participation.Eliminated</strong>
-            </MudText>
-        </MudStack>
-    }
-    else if (Entry.Participation.IsComplete())
-    {
-        var total = Entry.Participation.GetTotal()!;
-        <MudStack Class="d-flex" Style="@mudStackWidth" Spacing="1">
-            <MudStack Justify="Justify.FlexStart" Style="height:100%;">
-                <MudText Typo="Typo.subtitle2" Align="align">
-                    @Finished_at_colon_string
-                    <strong>
-                        @total.FinishTime
-                    </strong>
-                </MudText>
-
-                <MudText Typo="Typo.subtitle2" Align="align">
-                    @Ride_time_in_hours_colon_string
-                    <strong>@total.RideInterval</strong>
-                </MudText>
-
-                <MudText Typo="Typo.subtitle2" Align="align">
-                    @Average_speed
-                    <br />
-                    <strong>@total.AverageSpeed.ToStringWithThousands()</strong> km/h
+        @if (Entry.Participation.IsEliminated())
+        {
+            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="@mudStackWidth">
+                <MudText Typo="Typo.body2" Align="align" Class="mud-button-text">
+                    @Eliminated_string:
+                    <br/>
+                    <strong>@Entry.Participation.Eliminated</strong>
                 </MudText>
             </MudStack>
-        </MudStack>
-    }
-    else
-    {
-        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="@mudStackWidth">
-            <MudText Typo="Typo.body2" Align="align" Class="mud-button-text">
-                @Competition_ongoing_string
-            </MudText>
-        </MudStack>
-    }
+        }
+        else if (Entry.Participation.IsComplete())
+        {
+            var total = Entry.Participation.GetTotal()!;
+            <MudStack Class="d-flex" Style="@mudStackWidth" Spacing="1">
+                <MudStack Justify="Justify.FlexStart" Style="height:100%;">
+                    <MudText Typo="Typo.subtitle2" Align="align">
+                        @Finished_at_colon_string <strong>@total.FinishTime</strong>
+                    </MudText>
+
+                    <MudText Typo="Typo.subtitle2" Align="align">
+                        @Ride_time_in_hours_colon_string <strong>@total.RideInterval</strong> @hrs_string
+                    </MudText>
+
+                    <MudText Typo="Typo.subtitle2" Align="align">
+                        @Average_speed
+                        <br/>
+                        <strong>@total.AverageSpeed.ToStringWithThousands()</strong> @km_per_hour_string
+                    </MudText>
+                </MudStack>
+            </MudStack>
+        }
+        else
+        {
+            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="@mudStackWidth">
+                <MudText Typo="Typo.body2" Align="align" Class="mud-button-text">
+                    @Competition_ongoing_string
+                </MudText>
+            </MudStack>
+        }
+    </MudStack>
 
 </MudStack>

@@ -10,6 +10,7 @@ namespace NTS.Localization
     public static class NtsStrings // TODO: csharpierignore this file
     {
         public static string km_string => LocalizeString(nameof(km_string));
+        public static string hrs_string => LocalizeString(nameof(hrs_string));
         public static string Export_FEI_string => LocalizeString(nameof(Export_FEI_string));
         public static string rest_string => LocalizeString(nameof(rest_string));
         public static string ARR_string => LocalizeString(nameof(ARR_string));
