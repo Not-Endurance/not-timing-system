@@ -238,7 +238,7 @@
     <value>Финиширал:</value>
   </data>
   <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
-    <value>Време на езда (час):</value>
+    <value>Време:</value>
   </data>
   <data name="Recovery_in_hours_colon_string" xml:space="preserve">
     <value>Възстановяване (час)</value>
@@ -731,5 +731,11 @@
   </data>
   <data name="Upload_string" xml:space="preserve">
     <value>Качи</value>
+  </data>
+  <data name="hrs_string" xml:space="preserve">
+    <value>ч.</value>
+  </data>
+  <data name="Bulgaria" xml:space="preserve">
+    <value>България</value>
   </data>
 </root>

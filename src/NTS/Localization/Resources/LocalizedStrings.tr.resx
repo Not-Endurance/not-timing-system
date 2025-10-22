@@ -643,4 +643,7 @@
   <data name="Upload_string" xml:space="preserve">
     <value />
   </data>
+  <data name="Bulgaria" xml:space="preserve">
+    <value>Булгаристан</value>
+  </data>
 </root>
