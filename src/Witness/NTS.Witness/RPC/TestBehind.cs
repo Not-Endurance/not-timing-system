@@ -1,15 +1,16 @@
-﻿using Not.Application.RPC.SignalR;
-
 namespace NTS.Witness.RPC;
 
 public class TestBehind : ITestBehind
 {
-    readonly IRpcSocket _rpcSocket;
+    readonly WitnessRpcClient _rpcClient;
 
-    public TestBehind(IRpcSocket rpcSocket)
+    public TestBehind(WitnessRpcClient rpcClient)
     {
-        _rpcSocket = rpcSocket;
+        _rpcClient = rpcClient;
     }
 
-    public void Test() { }
+    public void Test()
+    {
+        _rpcClient.EnsureInitialized();
+    }
 }
