@@ -21,8 +21,7 @@ public class WitnessStartlist : List<StartlistEntry>
         get
         {
             var now = DateTimeOffset.Now;
-            return this
-                .Where(entry => now - entry.Time <= RECENT_WINDOW)
+            return this.Where(entry => now - entry.Time <= RECENT_WINDOW)
                 .OrderBy(entry => entry.Time)
                 .ThenBy(entry => entry.PhaseNumber)
                 .ToList();
@@ -34,8 +33,7 @@ public class WitnessStartlist : List<StartlistEntry>
         get
         {
             var now = DateTimeOffset.Now;
-            return this
-                .Where(entry => now - entry.Time > RECENT_WINDOW)
+            return this.Where(entry => now - entry.Time > RECENT_WINDOW)
                 .OrderByDescending(entry => entry.Time)
                 .ThenBy(entry => entry.PhaseNumber)
                 .ToList();
@@ -65,14 +63,16 @@ public class WitnessStartlist : List<StartlistEntry>
 
     void SortInternal()
     {
-        Sort((a, b) =>
-        {
-            var timeComparison = DateTimeOffset.Compare(a.Time, b.Time);
-            if (timeComparison != 0)
+        Sort(
+            (a, b) =>
             {
-                return timeComparison;
+                var timeComparison = DateTimeOffset.Compare(a.Time, b.Time);
+                if (timeComparison != 0)
+                {
+                    return timeComparison;
+                }
+                return a.PhaseNumber.CompareTo(b.PhaseNumber);
             }
-            return a.PhaseNumber.CompareTo(b.PhaseNumber);
-        });
+        );
     }
 }

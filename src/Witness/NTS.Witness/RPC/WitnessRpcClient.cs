@@ -35,7 +35,8 @@ public class WitnessRpcClient
         _snapshots = new();
     }
 
-    public IReadOnlyDictionary<int, WitnessStartlist> Startlists => new ReadOnlyDictionary<int, WitnessStartlist>(_startlists);
+    public IReadOnlyDictionary<int, WitnessStartlist> Startlists =>
+        new ReadOnlyDictionary<int, WitnessStartlist>(_startlists);
 
     public IReadOnlyCollection<Participation> Participants => _participants.AsReadOnly();
 
@@ -153,7 +154,12 @@ public class WitnessRpcClient
         return startlist;
     }
 
-    static void UpdateCollection<T, TKey>(List<T> collection, T item, WitnessCollectionAction action, Func<T, TKey> keySelector)
+    static void UpdateCollection<T, TKey>(
+        List<T> collection,
+        T item,
+        WitnessCollectionAction action,
+        Func<T, TKey> keySelector
+    )
         where TKey : notnull
     {
         var comparer = EqualityComparer<TKey>.Default;
