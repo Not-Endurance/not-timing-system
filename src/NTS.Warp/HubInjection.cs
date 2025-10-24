@@ -15,6 +15,7 @@ internal static class HubInjection
             .AddSignalR(options =>
             {
                 options.EnableDetailedErrors = true;
+                options.MaximumReceiveMessageSize = 1024 * 1024;
                 options.AddFilter<ExceptionHandlingHubFilter>();
             })
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = NJsonSettings.ConfigureServerSerialization());
