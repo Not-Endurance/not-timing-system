@@ -1,0 +1,21 @@
+﻿@using NTS.Witness.Web.Components.Pages.Snapshot
+@using Microsoft.AspNetCore.Components
+
+@attribute [Route(WITNESS_HOME)]
+@inherits WitnessPageBehind
+
+@if (IsUserLoggedIn)
+{
+    @if (IsUserOfficial)
+    {
+        <Snapshot/>
+    }
+    else
+    {
+        <Performance/>
+    }
+}
+else
+{
+    <Login />    
+}
