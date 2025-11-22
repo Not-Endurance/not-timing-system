@@ -3,8 +3,8 @@ using MudBlazor;
 using Not.Blazor.Components.Mud;
 using Not.Blazor.Navigation;
 using NTS.Witness.Web.Constants;
-using SwipeDirection = MudBlazor.SwipeDirection;
 using static NTS.Witness.Web.Constants.Endpoints;
+using SwipeDirection = MudBlazor.SwipeDirection;
 
 namespace NTS.Witness.Web.Components.Layout;
 

@@ -2,6 +2,7 @@ using Not.Application.Configurations;
 using Serilog;
 
 namespace NTS.Witness.Web;
+
 public class Program
 {
     public static void Main(string[] args)
@@ -9,8 +10,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-        builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents();
+        builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
         var assembly = typeof(Program).Assembly;
         builder.Configuration.AddNAppsettings(assembly);
@@ -32,8 +32,7 @@ public class Program
         app.UseStaticFiles();
         app.UseAntiforgery();
 
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode();
+        app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
         app.Run();
     }

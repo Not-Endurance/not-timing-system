@@ -1,9 +1,9 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Components;
 using Not.Application.RPC.SignalR;
 using Not.Blazor.Components;
 using Not.Filesystem;
 using Not.Startup;
-using Microsoft.AspNetCore.Components;
 
 namespace NTS.Witness.Web;
 
@@ -13,8 +13,9 @@ public partial class WitnessBlazorRoot
     IEnumerable<Assembly> _routeAssemblies = [typeof(WitnessBlazorRoot).Assembly];
     NErrorBoundary _errorBoundary = default!;
 
-    [Inject] 
+    [Inject]
     public IEnumerable<IStartupInitializer> Initializers { get; set; } = default!;
+
     [Inject]
     public IRpcSocket RpcSocket { get; set; } = default!;
 
@@ -28,5 +29,5 @@ public partial class WitnessBlazorRoot
         }
 
         RpcSocket.Connect();
-     }
+    }
 }
