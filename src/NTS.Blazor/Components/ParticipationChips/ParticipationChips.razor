@@ -3,7 +3,7 @@
 
 @inherits ParticipationChipsBehind
 
-<MudChipSet T="Participation" @bind-SelectedValue="Value" SelectionMode="SelectionMode.SingleSelection">
+<MudChipSet T="Participation" @bind-SelectedValue="Value"  SelectionMode="SelectionMode.SingleSelection">
 
     @foreach (var grouping in Set.GroupBy(x => x.Phases.Distance)) // TODO: move grouping in field
     {
@@ -17,7 +17,7 @@
         {
             var number = participation.Combination.Number;
             var color = SetChipColor?.Invoke(participation) ?? Color.Primary;
-            <MudChip Text="@number.ToString()" Value="@participation" Color="@color" Style="min-width: 1rem" Size="ChipSize"  />
+            <MudChip Text="@number.ToString()" Value="@participation" Color="@color" OnClick="@(() => _selectAction(participation))" Style="min-width: 1rem" Size="ChipSize"  />
         }
     }
 </MudChipSet>
