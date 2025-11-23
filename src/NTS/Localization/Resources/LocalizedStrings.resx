@@ -607,7 +607,7 @@
     <value>Home</value>
   </data>
   <data name="Login_string" xml:space="preserve">
-    <value>Log In</value>
+    <value>Sign in</value>
   </data>
   <data name="Contacts_string" xml:space="preserve">
     <value>Emergency Contacts</value>
@@ -625,7 +625,7 @@
     <value>Participant</value>
   </data>
   <data name="Login_page_string" xml:space="preserve">
-    <value>Login</value>
+    <value>Sign-in</value>
   </data>
   <data name="Snapshot_page_string" xml:space="preserve">
     <value>Snapshot</value>
@@ -737,5 +737,11 @@
   </data>
   <data name="Bulgaria" xml:space="preserve">
     <value>Bulgaria</value>
+  </data>
+  <data name="Login_invite_string" xml:space="preserve">
+    <value>Please sign in to gain access</value>
+  </data>
+  <data name="Profile_page_string" xml:space="preserve">
+    <value>Profile</value>
   </data>
 </root>
