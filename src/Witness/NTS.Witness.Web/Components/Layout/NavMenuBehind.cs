@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Not.Blazor.Components;
 
 namespace NTS.Witness.Web.Components.Layout;
 
-public partial class NavMenu
+public class NavMenuBehind : NComponent
 {
     [Parameter]
     public Action AfterNavigationAction { get; set; } = default!;
