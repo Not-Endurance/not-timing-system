@@ -1,4 +1,5 @@
 ﻿@using System.Reflection
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components
 @using NTS.Witness.Web.Components.Layout
@@ -6,19 +7,25 @@
 
 <NErrorBoundary @ref="@_errorBoundary">
     <ChildContent>
-        <Router AppAssembly="@_appAssembly" AdditionalAssemblies="@_routeAssemblies">
+        <CascadingAuthenticationState>
+            <Router AppAssembly="@_appAssembly" AdditionalAssemblies="@_routeAssemblies">
 
-            <Found Context="routeData">
-                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-            </Found>
+                <Found Context="routeData">
+                    <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                        <NotAuthorized>
+                            <h1 class="d-flex justify-center align-center">You have no power here!</h1>
+                        </NotAuthorized>
+                    </AuthorizeRouteView>
+                    <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                </Found>
 
-            <NotFound>
-                <LayoutView Layout="@typeof(MainLayout)">
-                    <p role="alert">Sorry, there's nothing at this address.</p>
-                </LayoutView>
-            </NotFound>
-        </Router>
+                <NotFound>
+                    <LayoutView Layout="@typeof(MainLayout)">
+                        <p role="alert">Sorry, there's nothing at this address.</p>
+                    </LayoutView>
+                </NotFound>
+            </Router>
+        </CascadingAuthenticationState>
     </ChildContent>
 
     <ErrorContent>
