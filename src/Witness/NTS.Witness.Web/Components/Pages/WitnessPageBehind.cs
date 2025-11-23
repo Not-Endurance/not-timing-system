@@ -12,7 +12,6 @@ public class WitnessPageBehind : NComponent
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;
 
-
     protected override void OnInitialized()
     {
         try

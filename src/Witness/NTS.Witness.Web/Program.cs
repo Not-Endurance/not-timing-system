@@ -7,6 +7,7 @@ using Not.Application.Configurations;
 using Serilog;
 
 namespace NTS.Witness.Web;
+
 public class Program
 {
     public static void Main(string[] args)
@@ -14,23 +15,17 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-        builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents();
+        builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
         // Authentication - extract in external service
-        var authConfig = builder.Configuration
-        .GetSection("Auth")
-        .Get<AuthConfig>() ?? new AuthConfig();
+        var authConfig = builder.Configuration.GetSection("Auth").Get<AuthConfig>() ?? new AuthConfig();
 
-        var allowedUsersByEmail = authConfig.Users
-            .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-            .ToDictionary(
-                u => u.Email,
-                StringComparer.OrdinalIgnoreCase
-            );
+        var allowedUsersByEmail = authConfig
+            .Users.Where(u => !string.IsNullOrWhiteSpace(u.Email))
+            .ToDictionary(u => u.Email, StringComparer.OrdinalIgnoreCase);
 
-        builder.Services
-            .AddAuthentication(options =>
+        builder
+            .Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
@@ -54,16 +49,18 @@ public class Program
                             oldIdentity.Claims,
                             oldIdentity.AuthenticationType,
                             ClaimTypes.Name,
-                            ClaimTypes.Role  
+                            ClaimTypes.Role
                         );
 
                         // clear old identities and add new one
                         context.Principal = new ClaimsPrincipal(newIdentity);
 
                         // deny if no email / not gmail / not in allow list
-                        if (string.IsNullOrWhiteSpace(email) ||
-                            !email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase) ||
-                            !allowedUsersByEmail.TryGetValue(email, out var authUser))
+                        if (
+                            string.IsNullOrWhiteSpace(email)
+                            || !email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase)
+                            || !allowedUsersByEmail.TryGetValue(email, out var authUser)
+                        )
                         {
                             context.Response.Redirect("/access-denied");
                             context.Response.StatusCode = 403;
@@ -80,10 +77,9 @@ public class Program
                         }
 
                         return Task.CompletedTask;
-                    }
+                    },
                 };
             });
-
 
         builder.Services.AddAuthorization();
 
@@ -94,7 +90,7 @@ public class Program
         builder.Logging.AddSerilog();
 
         var app = builder.Build();
-        
+
         //Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
@@ -104,21 +100,26 @@ public class Program
         }
 
         // Endpoint that triggers Google challenge
-        app.MapGet("/signin", async (HttpContext ctx) =>
-        {
-            await ctx.ChallengeAsync(GoogleDefaults.AuthenticationScheme,
-                new AuthenticationProperties
-                {
-                    RedirectUri = "/profile"
-                });
-        });
+        app.MapGet(
+            "/signin",
+            async (HttpContext ctx) =>
+            {
+                await ctx.ChallengeAsync(
+                    GoogleDefaults.AuthenticationScheme,
+                    new AuthenticationProperties { RedirectUri = "/profile" }
+                );
+            }
+        );
 
         // Endpoint to sign out
-        app.MapGet("/signout", async (HttpContext ctx) =>
-        {
-            await ctx.SignOutAsync();
-            ctx.Response.Redirect("/profile");
-        });
+        app.MapGet(
+            "/signout",
+            async (HttpContext ctx) =>
+            {
+                await ctx.SignOutAsync();
+                ctx.Response.Redirect("/profile");
+            }
+        );
         app.MapGet("/access-denied", () => Results.Text("Access denied."));
 
         app.UseHttpsRedirection();
@@ -126,8 +127,7 @@ public class Program
         app.UseStaticFiles();
         app.UseAntiforgery();
 
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode();
+        app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
         app.Run();
     }

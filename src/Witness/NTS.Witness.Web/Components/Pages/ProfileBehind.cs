@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace NTS.Witness.Web.Components.Pages;
 
-public class ProfileBehind : ComponentBase 
+public class ProfileBehind : ComponentBase
 {
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
+
     [Inject]
     AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
