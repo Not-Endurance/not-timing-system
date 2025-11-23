@@ -1,11 +1,12 @@
-﻿@attribute [Route(SNAPSHOT)]
+﻿@using Microsoft.AspNetCore.Authorization
 @using NTS.Domain.Core.Aggregates;
 @using MudBlazor
 @using Not.Blazor.Components
 @using NTS.Domain.Watcher;
 @using NTS.Blazor.Components.ParticipationChips;
 @using Not.Blazor.Dialogs
-
+@attribute [Route(SNAPSHOT)]
+@attribute [Authorize(Roles = "admin,official")]
 @inherits SnapshotBehind
 
 <MudPaper Height="100%">

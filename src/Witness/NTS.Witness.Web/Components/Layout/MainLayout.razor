@@ -1,4 +1,5 @@
-﻿@using Not.Blazor.Notifier
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Not.Blazor.Notifier
 
 @inherits LayoutComponentBase
 
@@ -19,10 +20,11 @@
             <NavMenu AfterNavigationAction="CloseDrawer" />
         </MudDrawer>
         <MudMainContent Style="height:100%;">
-            @if (!IsCurrentPageEmergencyContacts && !(Navigator.CurrentEndpoint.Contains(SNAPSHOT) || Navigator.CurrentEndpoint.Contains(STARTLIST))) //TODO: use User Authority for this condition
-            {
-                <HelpButton Class="help-button" ClickHandler="HelpHandler"/>
-            }
+            <AuthorizeView Roles="competitor">
+                <Authorized>
+                    <HelpButton Class="help-button" ClickHandler="HelpHandler"/>
+                </Authorized>
+            </AuthorizeView>
             @Body
             <BlazorNotifier />
         </MudMainContent>

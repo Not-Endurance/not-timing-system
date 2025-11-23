@@ -3,7 +3,9 @@
 public static class Endpoints
 {
     public const string WITNESS_HOME = "/";
-    public const string LOGIN = "/login";
+    public const string PROFILE = "/profile";
+    public const string SIGNIN = "/signin";
+    public const string SIGNOUT = "/signout";
     public const string EMERGENCY_CONTACTS = "/emergency-contacts";
     public const string PERFORMANCE = "/performance";
     public const string STARTLIST = "/startlist";

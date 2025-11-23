@@ -1,4 +1,5 @@
 ﻿using Not.Blazor.Components;
+using Not.Blazor.Navigation;
 using NTS.Witness.Web.RPC;
 
 namespace NTS.Witness.Web.Components.Pages;
@@ -7,14 +8,17 @@ public class WitnessPageBehind : NComponent
 {
     [Inject]
     ITestBehind TestBehind { get; set; } = default!;
-    protected bool IsUserOfficial { get; set; } = false;
-    protected bool IsUserLoggedIn { get; set; } = false;
+
+    [Inject]
+    ICrumbsNavigator Navigator { get; set; } = default!;
+
 
     protected override void OnInitialized()
     {
         try
         {
             TestBehind.Test();
+            Navigator.NavigateTo(PROFILE);
         }
         catch (Exception ex)
         {
