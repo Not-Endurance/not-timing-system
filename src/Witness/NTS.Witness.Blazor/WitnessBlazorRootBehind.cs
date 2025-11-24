@@ -9,7 +9,12 @@ namespace NTS.Witness.Blazor;
 
 public class WitnessBlazorRootBehind : NComponent
 {
-    protected IEnumerable<Assembly> _routeAssemblies = [typeof(WitnessBlazorRoot).Assembly, typeof(Performance).Assembly, typeof(WitnessPage).Assembly];
+    protected IEnumerable<Assembly> _routeAssemblies =
+    [
+        typeof(WitnessBlazorRoot).Assembly,
+        typeof(Performance).Assembly,
+        typeof(WitnessPage).Assembly,
+    ];
     protected NErrorBoundary _errorBoundary = default!;
 
     [Inject]
@@ -23,7 +28,7 @@ public class WitnessBlazorRootBehind : NComponent
 
     protected override void OnInitialized()
     {
-        Console.WriteLine("!!!!!!!!!!!!лпззямх йспнбе!!!!!!!!!!!!!!");
+        Console.WriteLine("!!!!!!!!!!!!О©╫О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫!!!!!!!!!!!!!!");
         foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
         {
             Console.WriteLine("ASM: " + asm.FullName);

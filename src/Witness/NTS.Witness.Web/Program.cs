@@ -128,8 +128,7 @@ public class Program
         app.UseStaticFiles();
         app.UseAntiforgery();
         Console.WriteLine("TYPE OF APP: " + typeof(App).Assembly);
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode();
+        app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
         Console.WriteLine("WitnessBlazorRoot assembly:");
         Console.WriteLine(typeof(WitnessBlazorRoot).Assembly.FullName);
 
