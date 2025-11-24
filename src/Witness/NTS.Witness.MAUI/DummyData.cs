@@ -1,7 +1,6 @@
 ﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using Athlete = NTS.Domain.Core.Aggregates.Participations.Athlete;
 using Combination = NTS.Domain.Core.Aggregates.Participations.Combination;

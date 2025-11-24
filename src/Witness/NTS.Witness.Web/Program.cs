@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Not.Application.Configurations;
+using NTS.Witness.Blazor;
 using Serilog;
 
 namespace NTS.Witness.Web;
@@ -126,9 +127,14 @@ public class Program
 
         app.UseStaticFiles();
         app.UseAntiforgery();
+        Console.WriteLine("TYPE OF APP: " + typeof(App).Assembly);
+        app.MapRazorComponents<App>()
+            .AddInteractiveServerRenderMode();
+        Console.WriteLine("WitnessBlazorRoot assembly:");
+        Console.WriteLine(typeof(WitnessBlazorRoot).Assembly.FullName);
 
-        app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
-
+        Console.WriteLine("One sample page assembly:");
+        Console.WriteLine(typeof(NTS.Witness.Blazor.Components.Pages.Startlist).Assembly.FullName);
         app.Run();
     }
 }

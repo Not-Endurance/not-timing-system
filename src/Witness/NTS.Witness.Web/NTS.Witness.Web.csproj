@@ -11,9 +11,6 @@
     <Content Remove="appsettings.Development.json" />
     <Content Remove="appsettings.json" />
     <Content Remove="appsettings.Staging.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
@@ -33,5 +30,6 @@
 		<ProjectReference Include="..\..\NTS.Blazor\NTS.Blazor.csproj" />
 		<ProjectReference Include="..\..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
 		<ProjectReference Include="..\..\NTS\NTS.csproj" />
+		<ProjectReference Include="..\NTS.Witness.Blazor\NTS.Witness.Blazor.csproj" />
 	</ItemGroup>
 </Project>
