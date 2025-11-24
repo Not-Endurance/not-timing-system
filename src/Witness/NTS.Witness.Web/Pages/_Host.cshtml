@@ -1,0 +1,25 @@
+﻿@page "/"
+@namespace NTS.Witness.Web.Pages
+@using Microsoft.AspNetCore.Components.Web
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>NTS.Witness</title>
+
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="NTS.Witness.Web.styles.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+</body>
+</html>

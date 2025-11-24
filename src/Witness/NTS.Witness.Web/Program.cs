@@ -16,7 +16,8 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-        builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+        builder.Services.AddRazorPages();
+        builder.Services.AddServerSideBlazor();
 
         // Authentication - extract in external service
         var authConfig = builder.Configuration.GetSection("Auth").Get<AuthConfig>() ?? new AuthConfig();
@@ -127,13 +128,10 @@ public class Program
 
         app.UseStaticFiles();
         app.UseAntiforgery();
-        Console.WriteLine("TYPE OF APP: " + typeof(App).Assembly);
-        app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
-        Console.WriteLine("WitnessBlazorRoot assembly:");
-        Console.WriteLine(typeof(WitnessBlazorRoot).Assembly.FullName);
 
-        Console.WriteLine("One sample page assembly:");
-        Console.WriteLine(typeof(NTS.Witness.Blazor.Components.Pages.Startlist).Assembly.FullName);
+        app.MapBlazorHub();
+        app.MapFallbackToPage("/_Host");
+
         app.Run();
     }
 }
