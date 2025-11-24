@@ -1,4 +1,4 @@
-﻿namespace NTS.Witness.Web;
+﻿namespace NTS.Witness;
 
 public class AuthUser
 {
