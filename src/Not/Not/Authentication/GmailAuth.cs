@@ -1,14 +1,17 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Not.Authentication;
 
 public static class GmailAuth
 {
-    public static AuthenticationBuilder AddGmailAuth(this AuthenticationBuilder authBuilder, WebApplicationBuilder builder)
+    public static AuthenticationBuilder AddGmailAuth(
+        this AuthenticationBuilder authBuilder,
+        WebApplicationBuilder builder
+    )
     {
         var authConfig = Auth.GetAuthConfigFromAppSettings(builder);
         var allowedUsersByEmail = authConfig
