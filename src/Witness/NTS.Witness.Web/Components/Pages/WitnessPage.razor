@@ -4,18 +4,4 @@
 @attribute [Route(WITNESS_HOME)]
 @inherits WitnessPageBehind
 
-@if (IsUserLoggedIn)
-{
-    @if (IsUserOfficial)
-    {
-        <Snapshot/>
-    }
-    else
-    {
-        <Performance/>
-    }
-}
-else
-{
-    <Login />    
-}
+<p>This page redirects to Signin.</p>

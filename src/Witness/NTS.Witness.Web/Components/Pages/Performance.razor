@@ -1,6 +1,8 @@
-﻿@using NTS.Blazor.Components.ParticipationTable
+﻿@using Microsoft.AspNetCore.Authorization
+@using NTS.Blazor.Components.ParticipationTable
 @using NTS.Domain.Core.Aggregates.Participations
 @attribute [Route(PERFORMANCE)]
+@attribute [Authorize(Roles = "admin,competitor")]
 @inherits PerformanceBehind
 
 <MudStack AlignItems="AlignItems.Center">

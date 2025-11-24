@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>30546649-0533-47b6-be18-89598f794ea1</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +24,9 @@
       <DependentUpon>appsettings.json</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+
   <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.22" />
 		<ProjectReference Include="..\..\Not\Not.Blazor\Not.Blazor.csproj" />
 		<ProjectReference Include="..\..\Not\Not.Application\Not.Application.csproj" />
 		<ProjectReference Include="..\..\Not\Not\Not.csproj" />

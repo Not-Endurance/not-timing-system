@@ -1,6 +1,7 @@
-﻿@using Not.Blazor.Notifier
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Not.Blazor.Notifier
 
-@inherits LayoutComponentBase
+@inherits MainLayoutBehind
 
 <NTheme Mobile="true"/>
 
@@ -11,7 +12,7 @@
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
         </MudAppBar>
-        <MudDrawer @bind-Open="@_drawerOpen" Elevation="2" Anchor="Anchor.Right" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
+        <MudDrawer @bind-Open="@DrawerOpen" Elevation="2" Anchor="Anchor.Right" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
             <MudDrawerHeader>
                 <MudText Typo="Typo.h6">@Main_menu_string</MudText>
             </MudDrawerHeader>
@@ -19,10 +20,11 @@
             <NavMenu AfterNavigationAction="CloseDrawer" />
         </MudDrawer>
         <MudMainContent Style="height:100%;">
-            @if (!IsCurrentPageEmergencyContacts && !(Navigator.CurrentEndpoint.Contains(SNAPSHOT) || Navigator.CurrentEndpoint.Contains(STARTLIST))) //TODO: use User Authority for this condition
-            {
-                <HelpButton Class="help-button" ClickHandler="HelpHandler"/>
-            }
+            <AuthorizeView Roles="competitor">
+                <Authorized>
+                    <HelpButton Class="help-button" ClickHandler="HelpHandler"/>
+                </Authorized>
+            </AuthorizeView>
             @Body
             <BlazorNotifier />
         </MudMainContent>
