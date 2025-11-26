@@ -17,7 +17,7 @@
         {
             var number = participation.Combination.Number;
             var color = SetChipColor?.Invoke(participation) ?? Color.Primary;
-            <MudChip Text="@number.ToString()" Value="@participation" Color="@color" OnClick="@(() => _selectAction(participation))" Style="min-width: 1rem" Size="ChipSize"  />
+            <MudChip Text="@number.ToString()" Value="@participation" Color="@color" OnClick="@(() => OnSelect?.Invoke(participation))" Style="min-width: 1rem" Size="ChipSize"  />
         }
     }
 </MudChipSet>
