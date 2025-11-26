@@ -18,16 +18,10 @@ public class Program
         builder.Services.AddServerSideBlazor();
 
         // Authentication
-        builder
-            .Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-            })
-            .AddCookie()
-            .AddGmailAuth(builder.Configuration);
+        //builder
+        //    .Services
 
-        builder.Services.AddAuthorization();
+        //builder.Services.AddAuthorization();
 
         var assembly = typeof(Program).Assembly;
         builder.Configuration.AddNAppsettings(assembly);

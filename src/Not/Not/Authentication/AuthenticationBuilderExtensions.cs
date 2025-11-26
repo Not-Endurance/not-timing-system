@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Not.Authentication.User;
 
 namespace Not.Authentication;
 
-public static class GmailAuth
+public static class AuthenticationBuilderExtensions
 {
-    public static AuthenticationBuilder AddGmailAuth(this AuthenticationBuilder authBuilder, IConfiguration configuration)
+    public static AuthenticationBuilder AddGoogleAuth(this AuthenticationBuilder authBuilder, IConfiguration configuration)
     {
         authBuilder.Services.AddSingleton<IUserDeserializer,NAuthenticationSettings>();
         authBuilder.Services.AddSingleton<IUserResolver,NUserResolution>();
