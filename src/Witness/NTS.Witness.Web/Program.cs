@@ -39,28 +39,7 @@ public class Program
             app.UseHsts();
         }
 
-        // Endpoint that triggers Google challenge
-        app.MapGet(
-            "/signin",
-            async (HttpContext ctx) =>
-            {
-                await ctx.ChallengeAsync(
-                    GoogleDefaults.AuthenticationScheme,
-                    new AuthenticationProperties { RedirectUri = "/profile" }
-                );
-            }
-        );
-
-        // Endpoint to sign out
-        app.MapGet(
-            "/signout",
-            async (HttpContext ctx) =>
-            {
-                await ctx.SignOutAsync();
-                ctx.Response.Redirect("/profile");
-            }
-        );
-        app.MapGet("/access-denied", () => Results.Text("Access denied."));
+        app.MapAuthEndpoints();
 
         app.UseHttpsRedirection();
 
