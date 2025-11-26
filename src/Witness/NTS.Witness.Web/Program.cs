@@ -25,7 +25,7 @@ public class Program
                 options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
             })
             .AddCookie()
-            .AddGmailAuth(builder);
+            .AddGmailAuth(builder.Configuration);
 
         builder.Services.AddAuthorization();
 
