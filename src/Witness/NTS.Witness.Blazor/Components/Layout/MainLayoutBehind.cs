@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
-using MudBlazor;
-using Not.Blazor.Components.Mud;
+﻿using MudBlazor;
 using Not.Blazor.Navigation;
-using NTS.Witness.Web.Constants;
-using static NTS.Witness.Web.Constants.Endpoints;
 using SwipeDirection = MudBlazor.SwipeDirection;
 
 namespace NTS.Witness.Blazor.Components.Layout;

@@ -27,7 +27,7 @@ public class NUserResolution : IUserResolver
         )
         {
             context.Response.Redirect("/access-denied");
-            context.Response.StatusCode = 403;
+            context.Fail("Not allowed");
             context.HandleResponse();
             return Task.CompletedTask;
         }

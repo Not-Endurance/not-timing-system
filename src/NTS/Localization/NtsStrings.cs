@@ -201,6 +201,9 @@ namespace NTS.Localization
         public static string Timestamp_string => LocalizeString(nameof(Timestamp_string));
         public static string Save_string => LocalizeString(nameof(Save_string));
         public static string Profile_page_string => LocalizeString(nameof(Profile_page_string));
+        public static string Access_denied_string => LocalizeString(nameof(Access_denied_string));
+        public static string Access_denied_next_steps => LocalizeString(nameof(Access_denied_next_steps));
+        public static string Try_another_account_string => LocalizeString(nameof(Try_another_account_string));
     }
 }
 #pragma warning restore NA0004

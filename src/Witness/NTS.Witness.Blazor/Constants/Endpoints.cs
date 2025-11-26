@@ -1,4 +1,4 @@
-﻿namespace NTS.Witness.Web.Constants;
+﻿namespace NTS.Witness.Blazor.Constants;
 
 public static class Endpoints
 {
@@ -6,6 +6,7 @@ public static class Endpoints
     public const string PROFILE = "/profile";
     public const string SIGNIN = "/signin";
     public const string SIGNOUT = "/signout";
+    public const string ACCESS_DENIED = "/access-denied";
     public const string EMERGENCY_CONTACTS = "/emergency-contacts";
     public const string PERFORMANCE = "/performance";
     public const string STARTLIST = "/startlist";

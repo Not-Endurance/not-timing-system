@@ -28,7 +28,7 @@ public static class AuthenticationBuilderExtensions
                     var userResolver = context.HttpContext.RequestServices.GetRequiredService<IUserResolver>();
                     var allowedUsersByEmail = userDeserializer.GetAllowedUsers(configuration);
                     return userResolver.UserResolution(context, allowedUsersByEmail);
-                },
+                }
             };
         });
 
