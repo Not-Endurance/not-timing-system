@@ -17,12 +17,6 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddServerSideBlazor();
 
-        // Authentication
-        //builder
-        //    .Services
-
-        //builder.Services.AddAuthorization();
-
         var assembly = typeof(Program).Assembly;
         builder.Configuration.AddNAppsettings(assembly);
         builder.Services.AddWitnessServices(builder.Configuration);
