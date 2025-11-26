@@ -4,6 +4,6 @@ namespace NTS.Witness.Blazor.Components.Layout;
 
 public class NavMenuBehind : NComponent
 {
-    [Parameter]
+    [Parameter, EditorRequired]
     public Action AfterNavigationAction { get; set; } = default!;
 }

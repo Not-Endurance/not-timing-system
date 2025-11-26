@@ -69,12 +69,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.61" />
-        <!--<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />-->
-    </ItemGroup>
-
-    <ItemGroup>
 	  <ProjectReference Include="..\..\Not\Not.Blazor\Not.Blazor.csproj" />
 	  <ProjectReference Include="..\..\Not\Not.MAUI\Not.MAUI.csproj" />
       <ProjectReference Include="..\..\Not\Not.Application\Not.Application.csproj" />
@@ -89,14 +83,4 @@
         <Generator>MSBuild:Compile</Generator>
       </MauiXaml>
     </ItemGroup>
-
-    <!--<ItemGroup>
-      <Compile Update="Platforms\iOS\Services\DialService.cs">
-        <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
-      </Compile>
-      <Compile Update="Platforms\Windows\Services\DialService.cs">
-        <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
-      </Compile>
-    </ItemGroup>-->
-
 </Project>

@@ -18,7 +18,7 @@ public class WitnessBlazorRootBehind : NComponent
     [Inject]
     public IRpcSocket RpcSocket { get; set; } = default!;
 
-    [Parameter]
+    [Parameter, EditorRequired]
     public Assembly Assembly { get; set; } = default!;
 
     protected override void OnInitialized()

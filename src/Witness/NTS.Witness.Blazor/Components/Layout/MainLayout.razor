@@ -20,7 +20,7 @@
             <NavMenu AfterNavigationAction="CloseDrawer" />
         </MudDrawer>
         <MudMainContent Style="height:100%;">
-            <AuthorizeView Roles="competitor">
+            <AuthorizeView Roles="@COMPETITOR">
                 <Authorized>
                     <HelpButton Class="help-button" ClickHandler="HelpHandler"/>
                 </Authorized>
