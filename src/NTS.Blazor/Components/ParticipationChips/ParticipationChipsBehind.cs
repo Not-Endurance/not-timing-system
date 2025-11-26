@@ -3,6 +3,4 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.ParticipationChips;
 
-public class ParticipationChipsBehind : NChipsBase<Participation>
-{
-}
+public class ParticipationChipsBehind : NChipsBase<Participation> { }

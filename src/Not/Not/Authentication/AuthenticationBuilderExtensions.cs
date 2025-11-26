@@ -9,10 +9,13 @@ namespace Not.Authentication;
 
 public static class AuthenticationBuilderExtensions
 {
-    public static AuthenticationBuilder AddGoogleAuth(this AuthenticationBuilder authBuilder, IConfiguration configuration)
+    public static AuthenticationBuilder AddGoogleAuth(
+        this AuthenticationBuilder authBuilder,
+        IConfiguration configuration
+    )
     {
-        authBuilder.Services.AddSingleton<IUserDeserializer,NAuthenticationSettings>();
-        authBuilder.Services.AddSingleton<IUserResolver,NUserResolution>();
+        authBuilder.Services.AddSingleton<IUserDeserializer, NAuthenticationSettings>();
+        authBuilder.Services.AddSingleton<IUserResolver, NUserResolution>();
 
         authBuilder.AddGoogle(options =>
         {
@@ -28,7 +31,7 @@ public static class AuthenticationBuilderExtensions
                     var userResolver = context.HttpContext.RequestServices.GetRequiredService<IUserResolver>();
                     var allowedUsersByEmail = userDeserializer.GetAllowedUsers(configuration);
                     return userResolver.UserResolution(context, allowedUsersByEmail);
-                }
+                },
             };
         });
 

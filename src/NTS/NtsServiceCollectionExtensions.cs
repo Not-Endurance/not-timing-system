@@ -24,13 +24,17 @@ public static class NtsServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection ConfigureAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        services.AddAuthentication(options =>
-        {
-            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-        })
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            })
             .AddCookie()
             .AddGoogleAuth(configuration);
 

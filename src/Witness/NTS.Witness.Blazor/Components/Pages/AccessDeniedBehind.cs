@@ -2,6 +2,7 @@
 using Not.Blazor.Navigation;
 
 namespace NTS.Witness.Blazor.Components.Pages;
+
 public class AccessDeniedBehind : NComponent
 {
     [Inject]

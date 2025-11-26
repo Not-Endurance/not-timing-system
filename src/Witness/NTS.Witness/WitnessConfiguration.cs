@@ -9,7 +9,11 @@ public static class WitnessConfiguration
 {
     public static IServiceCollection AddWitnessServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.ConfigureNtsBlazor(configuration).AddNHttp(configuration).ConfigureAuthentication(configuration).RegisterConventionalServices();
+        services
+            .ConfigureNtsBlazor(configuration)
+            .AddNHttp(configuration)
+            .ConfigureAuthentication(configuration)
+            .RegisterConventionalServices();
 
         return services;
     }

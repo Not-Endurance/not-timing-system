@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
 namespace NTS.Witness;
+
 public static class AuthEndpointMapping
 {
     public static void MapAuthEndpoints(this WebApplication app)

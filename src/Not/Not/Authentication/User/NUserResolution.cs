@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 
 namespace Not.Authentication.User;
+
 public class NUserResolution : IUserResolver
 {
     public Task UserResolution(TicketReceivedContext context, Dictionary<string, NUser> allowedUsersByEmail)
