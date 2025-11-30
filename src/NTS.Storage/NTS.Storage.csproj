@@ -14,6 +14,7 @@
     <ProjectReference Include="..\NTS.Domain.Setup\NTS.Domain.Setup.csproj" />
     <ProjectReference Include="..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
     <ProjectReference Include="..\NTS.Domain\NTS.Domain.csproj" />
+	  <ProjectReference Include="..\NTS.Application\NTS.Application.csproj" />
   </ItemGroup>
 
 </Project>
