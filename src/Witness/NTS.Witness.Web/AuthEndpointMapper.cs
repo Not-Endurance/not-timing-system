@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 
-namespace NTS.Witness;
+namespace NTS.Witness.Web;
 
 public static class AuthEndpointMapping
 {

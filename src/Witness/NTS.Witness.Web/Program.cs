@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
-using Not.Application.Configurations;
-using Not.Authentication;
+﻿using Not.Application.Configurations;
 using Serilog;
 
 namespace NTS.Witness.Web;
