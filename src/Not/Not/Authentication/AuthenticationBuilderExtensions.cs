@@ -9,13 +9,21 @@ namespace Not.Authentication;
 
 public static class AuthenticationBuilderExtensions
 {
+    public static void RegisterServices(
+        this AuthenticationBuilder authBuilder
+    )
+    {
+        authBuilder.Services.AddSingleton<IUserDeserializer, NAuthenticationSettings>();
+        authBuilder.Services.AddSingleton<IUserResolver, NUserResolver>();
+    }
+
+
     public static AuthenticationBuilder AddGoogleAuth(
         this AuthenticationBuilder authBuilder,
         IConfiguration configuration
     )
     {
-        authBuilder.Services.AddSingleton<IUserDeserializer, NAuthenticationSettings>();
-        authBuilder.Services.AddSingleton<IUserResolver, NUserResolution>();
+        authBuilder.RegisterServices();
 
         authBuilder.AddGoogle(options =>
         {
@@ -36,5 +44,17 @@ public static class AuthenticationBuilderExtensions
         });
 
         return authBuilder;
+    }
+
+    public static bool EndsWithProviderSuffix(this string email, string[] suffixes)
+    {
+        foreach (var suffix in suffixes)
+        {
+            if (email.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

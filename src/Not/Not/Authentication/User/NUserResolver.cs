@@ -1,11 +1,12 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using static Not.Authentication.Provider.SuffixConstants;
 
 namespace Not.Authentication.User;
 
-public class NUserResolution : IUserResolver
+public class NUserResolver : IUserResolver
 {
-    public Task UserResolution(TicketReceivedContext context, Dictionary<string, NUser> allowedUsersByEmail)
+    public Task UserResolution(TicketReceivedContext context, List<NUser> allowedUsersByEmail)
     {
         var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
         var oldIdentity = (ClaimsIdentity)context.Principal!.Identity!;
@@ -20,11 +21,15 @@ public class NUserResolution : IUserResolver
         // clear old identities and add new one
         context.Principal = new ClaimsPrincipal(newIdentity);
 
-        // deny if no email / not gmail / not in allow list
+        // find user in allow list
+        var authUser = allowedUsersByEmail
+            .FirstOrDefault(user => string.Equals(user.Email, email, StringComparison.OrdinalIgnoreCase));
+
+        // deny if: no email / email from unregistered provider / email not in allow list
         if (
             string.IsNullOrWhiteSpace(email)
-            || !email.EndsWith("@gmail.com", StringComparison.OrdinalIgnoreCase)
-            || !allowedUsersByEmail.TryGetValue(email, out var authUser)
+            || !email.EndsWithProviderSuffix([GMAIL])
+            || authUser == null
         )
         {
             context.Response.Redirect("/access-denied");
@@ -32,6 +37,7 @@ public class NUserResolution : IUserResolver
             context.HandleResponse();
             return Task.CompletedTask;
         }
+
 
         foreach (var role in authUser.Roles ?? [])
         {

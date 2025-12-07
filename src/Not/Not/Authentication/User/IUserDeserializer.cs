@@ -4,5 +4,5 @@ namespace Not.Authentication.User;
 
 public interface IUserDeserializer
 {
-    public Dictionary<string, NUser> GetAllowedUsers(IConfiguration configuration);
+    public List<NUser> GetAllowedUsers(IConfiguration configuration);
 }
