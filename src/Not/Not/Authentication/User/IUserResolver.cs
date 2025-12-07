@@ -4,5 +4,5 @@ namespace Not.Authentication.User;
 
 public interface IUserResolver
 {
-    public Task UserResolution(TicketReceivedContext context, List<NUser> allowedUsersByEmail);
+    public Task UserResolution(TicketReceivedContext context);
 }

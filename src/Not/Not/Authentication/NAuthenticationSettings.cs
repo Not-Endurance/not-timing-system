@@ -1,15 +1,21 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Not.Authentication.User;
 
 namespace Not.Authentication;
 
-public class NAuthenticationSettings : IUserDeserializer
+public class NAuthenticationSettings : IAuthenticationSettings
 {
+    public NAuthenticationSettings(IOptions<AuthOptions> authOptions)
+    {
+        Users = authOptions.Value.Users;
+    }
+
     public List<NUser> Users { get; set; } = [];
 
-    public List<NUser> GetAllowedUsers(IConfiguration configuration)
+    public NUser? GetUserByEmail(string email)
     {
-        Users = configuration.GetSection("Auth:Users").Get<List<NUser>>() ?? [];
-        return Users;
+        var user = Users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        return user;
     }
 }
