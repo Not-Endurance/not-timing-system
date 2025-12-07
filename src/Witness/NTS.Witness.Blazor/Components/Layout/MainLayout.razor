@@ -17,7 +17,7 @@
                 <MudText Typo="Typo.h6">@Main_menu_string</MudText>
             </MudDrawerHeader>
 
-            <NavMenu AfterNavigationAction="CloseDrawer" />
+            <NavMenu OnNavigation="CloseDrawer" />
         </MudDrawer>
         <MudMainContent Style="height:100%;">
             <AuthorizeView Roles="@COMPETITOR">

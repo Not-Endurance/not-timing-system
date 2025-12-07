@@ -7,19 +7,19 @@
 <MudNavMenu>
     <AuthorizeView Roles="@($"{ADMIN},{OFFICIAL}")">
         <Authorized>
-            <NNavLink Icon="@Icons.Material.Filled.Timer" Endpoint="@SNAPSHOT" AfterNavigation="AfterNavigationAction">@Snapshot_page_string</NNavLink>
-            <NNavLink Icon="@Icons.Material.Filled.Checklist" Endpoint="@STARTLIST" AfterNavigation="AfterNavigationAction">@Startlist_string</NNavLink>
+            <NNavLink Icon="@Icons.Material.Filled.Timer" Endpoint="@SNAPSHOT" AfterNavigation="OnNavigation">@Snapshot_page_string</NNavLink>
+            <NNavLink Icon="@Icons.Material.Filled.Checklist" Endpoint="@STARTLIST" AfterNavigation="OnNavigation">@Startlist_string</NNavLink>
         </Authorized>
     </AuthorizeView>
     <AuthorizeView Roles="@COMPETITOR">
         <Authorized>
-            <NNavLink Icon="@Icons.Material.Filled.ShowChart" Endpoint="@PERFORMANCE" AfterNavigation="AfterNavigationAction">@Performance_string</NNavLink>
+            <NNavLink Icon="@Icons.Material.Filled.ShowChart" Endpoint="@PERFORMANCE" AfterNavigation="OnNavigation">@Performance_string</NNavLink>
         </Authorized>
     </AuthorizeView>
-    <NNavLink Icon="@Icons.Material.Filled.SupervisorAccount" Endpoint="@PROFILE" AfterNavigation="AfterNavigationAction">@Profile_page_string</NNavLink>
+    <NNavLink Icon="@Icons.Material.Filled.SupervisorAccount" Endpoint="@PROFILE" AfterNavigation="OnNavigation">@Profile_page_string</NNavLink>
     <AuthorizeView Roles="@($"{ADMIN},{OFFICIAL},{VET}")">
         <Authorized>
-            <NNavLink Icon="@Icons.Material.Filled.LocalPhone" Endpoint="@EMERGENCY_CONTACTS" AfterNavigation="AfterNavigationAction">@Contacts_string</NNavLink>
+            <NNavLink Icon="@Icons.Material.Filled.LocalPhone" Endpoint="@EMERGENCY_CONTACTS" AfterNavigation="OnNavigation">@Contacts_string</NNavLink>
         </Authorized>
     </AuthorizeView>
 </MudNavMenu>
