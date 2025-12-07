@@ -41,11 +41,7 @@ public class NUserResolver : IUserResolver
         var authUser = userDeserializer.GetUserByEmail(email);
 
         // deny if: no email / email from unregistered provider / email not in allow list
-        if (
-            string.IsNullOrWhiteSpace(email)
-            || !email.EndsWithProviderSuffix([GMAIL])
-            || authUser == null
-        )
+        if (string.IsNullOrWhiteSpace(email) || !email.EndsWithProviderSuffix([GMAIL]) || authUser == null)
         {
             context.Response.Redirect("/access-denied");
             context.Fail("Not allowed");

@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Authentication.User;
@@ -11,19 +11,17 @@ namespace Not.Authentication;
 
 public static class AuthenticationExtensions
 {
-    public static void RegisterAuthServices(
-        this IServiceCollection services, IConfiguration configuration
-    )
+    public static void RegisterAuthServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<IAuthenticationSettings, NAuthenticationSettings>();
         services.AddSingleton<IUserResolver, NUserResolver>();
-        services.Configure<AuthOptions>(
-        configuration.GetSection(AuthOptions.SectionName));
-        services.AddAuthentication(options =>
-                     {
-                         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-                     })
+        services.Configure<AuthOptions>(configuration.GetSection(AuthOptions.SectionName));
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            })
             .AddCookie()
             .AddGoogleAuth(configuration);
     }
