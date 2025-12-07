@@ -1,22 +1,31 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Authentication.User;
 
 namespace Not.Authentication;
 
-public static class AuthenticationBuilderExtensions
+public static class AuthenticationExtensions
 {
-    public static void RegisterServices(
-        this AuthenticationBuilder authBuilder, IConfiguration configuration
+    public static void RegisterAuthServices(
+        this IServiceCollection services, IConfiguration configuration
     )
     {
-        authBuilder.Services.AddSingleton<IAuthenticationSettings, NAuthenticationSettings>();
-        authBuilder.Services.AddSingleton<IUserResolver, NUserResolver>();
-        authBuilder.Services.Configure<AuthOptions>(
+        services.AddSingleton<IAuthenticationSettings, NAuthenticationSettings>();
+        services.AddSingleton<IUserResolver, NUserResolver>();
+        services.Configure<AuthOptions>(
         configuration.GetSection(AuthOptions.SectionName));
+        services.AddAuthentication(options =>
+                     {
+                         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                     })
+            .AddCookie()
+            .AddGoogleAuth(configuration);
     }
 
     public static AuthenticationBuilder AddGoogleAuth(
@@ -24,7 +33,6 @@ public static class AuthenticationBuilderExtensions
         IConfiguration configuration
     )
     {
-        authBuilder.RegisterServices(configuration);
         authBuilder.AddGoogle(options =>
         {
             options.ClientId = configuration["Authentication:Google:ClientId"]!;

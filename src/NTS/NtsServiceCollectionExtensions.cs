@@ -29,15 +29,7 @@ public static class NtsServiceCollectionExtensions
         IConfiguration configuration
     )
     {
-        services
-            .AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-            })
-            .AddCookie()
-            .AddGoogleAuth(configuration);
-
+        services.RegisterAuthServices(configuration);
         services.AddAuthorization();
         return services;
     }
