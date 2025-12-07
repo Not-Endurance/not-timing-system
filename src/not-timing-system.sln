@@ -68,6 +68,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Nexus.Warp", "Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj", "{06B8CB89-11BC-4902-8404-F8193E113C9C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Witness", "Witness", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.db = Readme.db
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Blazor", "NTS.Blazor\NTS.Blazor.csproj", "{E41807F3-FF44-485E-B4E4-F785485CDADA}"
 EndProject
