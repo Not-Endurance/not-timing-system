@@ -3,8 +3,6 @@ using Not.Async;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Blazor.Nexus;
 using NTS.Judge.Nexus.Repositories;
-using NTS.Storage.Documents.Archive;
-using NTS.Storage.Documents.Archive.Models;
 
 namespace NTS.Judge.Nexus.Behinds;
 
@@ -18,7 +16,7 @@ public class InquiryBehind : ObservableBehind, IInquiryBehind
     }
 
     public IEnumerable<RankingEntry>? Match { get; private set; }
-    public IReadOnlyList<ArchiveDocument> Records { get; private set; } = [];
+    public IReadOnlyList<ArchiveModel> Records { get; private set; } = [];
 
     protected override Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {

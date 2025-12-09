@@ -2,7 +2,6 @@
 using Not.Application.HTTP;
 using Not.Serialization.JSON;
 using NTS.Domain.Core.Aggregates;
-using NTS.Storage.Documents.Archive;
 
 namespace NTS.Judge.HTTP;
 
@@ -23,7 +22,7 @@ public class ArchiveHttpRepository : HttpRepository<ArchiveEntry>, IArchiveRepos
         {
             return [];
         }
-        return contents.FromJson<IEnumerable<ArchiveDocument>>().Select(x => x.ToDomain());
+        return contents.FromJson<IEnumerable<ArchiveModel>>().Select(x => x.ToDomain());
     }
 
     public async Task<ArchiveEntry?> GetEntry(int id)
@@ -33,7 +32,7 @@ public class ArchiveHttpRepository : HttpRepository<ArchiveEntry>, IArchiveRepos
         {
             return null;
         }
-        var documents = contents.FromJson<IEnumerable<ArchiveDocument>>();
+        var documents = contents.FromJson<IEnumerable<ArchiveModel>>();
         var document = documents.FirstOrDefault(x => x.Id == id);
         return document?.ToDomain();
     }
