@@ -5,7 +5,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using static NTS.Application.DataTransferObjects.Models.CommonModel;
-using static NTS.Application.DataTransferObjects.Models.CoreModel;
 using static NTS.Application.DataTransferObjects.Models.SetupModel;
 
 namespace NTS.Application.DataTransferObjects.Models;
@@ -316,15 +315,15 @@ public class CoreModel
         }
     }
 
-    public class ArchiveDocument : Identity
+    public class ArchiveModel : Identity
     {
-        public static ArchiveDocument Create(
+        public static ArchiveModel Create(
             EnduranceEvent enduranceEvent,
             IEnumerable<Official> officials,
             IEnumerable<Ranklist> ranklists
         )
         {
-            return new ArchiveDocument
+            return new ArchiveModel
             {
                 Id = enduranceEvent.Id,
                 Country = CountryModel.Create(enduranceEvent.PopulatedPlace.Country),
