@@ -1,17 +1,11 @@
-using System;
-using System.Linq;
 using Not.Random;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Storage.Documents;
-using NTS.Storage.Documents.Athletes;
-using NTS.Storage.Documents.Countries;
-using NTS.Storage.Documents.Horses;
-using NTS.Storage.Documents.Officials;
+using NTS.Application.DataTransferObjects;
 
 namespace NTS.Nexus.HTTP.Functions.UpcomingEvents;
 
-public class UpcomingEventDocument : Document
+public class UpcomingEventDocument : Identity
 {
     public static UpcomingEventDocument Create(UpcomingEvent evt)
     {
@@ -20,24 +14,24 @@ public class UpcomingEventDocument : Document
             Id = evt.Id,
             Name = evt.Name,
             Place = evt.Place,
-            Country = CountryDocument.Create(evt.Country),
+            Country = CountryModel.Create(evt.Country),
             ShowFeiId = evt.ShowFeiId,
             FeiId = evt.FeiId,
             FeiEventCode = evt.FeiEventCode,
             Competitions = evt.Competitions.Select(CompetitionModel.Create).ToArray(),
-            Officials = evt.Officials.Select(OfficialDocument.Create).ToArray(),
+            Officials = evt.Officials.Select(OfficialModel.Create).ToArray(),
             Loops = evt.Loops.Select(LoopModel.Create).ToArray(),
             Combinations = evt.Combinations.Select(CombinationModel.Create).ToArray(),
         };
     }
 
     public string Place { get; init; } = default!;
-    public CountryDocument Country { get; init; } = default!;
+    public CountryModel Country { get; init; } = default!;
     public string? ShowFeiId { get; init; }
     public string? FeiId { get; init; }
     public string? FeiEventCode { get; init; }
     public CompetitionModel[] Competitions { get; init; } = default!;
-    public OfficialDocument[] Officials { get; init; } = default!;
+    public OfficialModel[] Officials { get; init; } = default!;
     public LoopModel[] Loops { get; init; } = default!;
     public CombinationModel[] Combinations { get; init; } = default!;
     public string Name { get; init; } = default!;
@@ -206,15 +200,15 @@ public class UpcomingEventDocument : Document
             {
                 Id = combination.Id,
                 Number = combination.Number,
-                Athlete = AthleteDocument.Create(combination.Athlete),
-                Horse = HorseDocument.Create(combination.Horse),
+                Athlete = AthleteModel.Create(combination.Athlete),
+                Horse = HorseModel.Create(combination.Horse),
             };
         }
 
         public int Id { get; init; }
         public int Number { get; init; }
-        public AthleteDocument Athlete { get; init; } = default!;
-        public HorseDocument Horse { get; init; } = default!;
+        public AthleteModel Athlete { get; init; } = default!;
+        public HorseModel Horse { get; init; } = default!;
 
         public Combination ToSetupDomain()
         {

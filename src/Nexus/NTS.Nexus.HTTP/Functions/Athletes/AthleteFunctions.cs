@@ -8,23 +8,20 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Serialization.JSON;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Archive;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.Athletes;
 
 namespace NTS.Nexus.HTTP.Functions.Athletes;
 
 public class AthleteFunctions : FunctionBase<AthleteFunctions>
 {
-    readonly IRepository<AthleteDocument> _athletes;
+    readonly IRepository<AthleteModel> _athletes;
     readonly IArchiveRepository _archive;
 
     public AthleteFunctions(
         IFunctionLogger<AthleteFunctions> logger,
-        IRepository<AthleteDocument> athletes,
+        IRepository<AthleteModel> athletes,
         IArchiveRepository archive
     )
         : base(logger)
@@ -42,7 +39,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = AthleteDocument.Create(athlete);
+        var document = AthleteModel.Create(athlete);
         await _athletes.Create(document);
 
         return new OkObjectResult($"Inserted {athlete}");
@@ -57,7 +54,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = AthleteDocument.Create(athlete);
+        var document = AthleteModel.Create(athlete);
         await _athletes.Update(document);
 
         return new OkObjectResult($"Updated {athlete}");

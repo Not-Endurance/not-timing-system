@@ -1,12 +1,9 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Serialization.JSON;
 using NTS.Domain.Core.Aggregates;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.Archive;
 
 namespace NTS.Nexus.HTTP.Functions.Archive;
 
@@ -29,7 +26,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var entry = requestBody.FromJson<ArchiveEntry>();
-        var document = ArchiveDocument.Create(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
+        var document = ArchiveModel.Create(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
 
         if (await _archive.Read(entry.Id) != null) // TODO: investigate this not working
         {

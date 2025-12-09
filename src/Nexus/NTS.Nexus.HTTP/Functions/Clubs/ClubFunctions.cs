@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
@@ -8,15 +6,14 @@ using Not.Async;
 using Not.Serialization.JSON;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.Clubs;
 
 namespace NTS.Nexus.HTTP.Functions.Clubs;
 
 public class ClubFunctions : FunctionBase<ClubFunctions>
 {
-    readonly IRepository<ClubDocument> _clubs;
+    readonly IRepository<ClubModel> _clubs;
 
-    public ClubFunctions(IFunctionLogger<ClubFunctions> logger, IRepository<ClubDocument> clubs)
+    public ClubFunctions(IFunctionLogger<ClubFunctions> logger, IRepository<ClubModel> clubs)
         : base(logger)
     {
         _clubs = clubs;
@@ -31,7 +28,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var club = requestBody.FromJson<Club>();
-        var document = ClubDocument.Create(club);
+        var document = ClubModel.Create(club);
         await _clubs.Create(document);
 
         return new OkObjectResult($"Inserted {club}");
@@ -46,7 +43,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var club = requestBody.FromJson<Club>();
-        var document = ClubDocument.Create(club);
+        var document = ClubModel.Create(club);
         await _clubs.Update(document);
 
         return new OkObjectResult($"Updated {club}");

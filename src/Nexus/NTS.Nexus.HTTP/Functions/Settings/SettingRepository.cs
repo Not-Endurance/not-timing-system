@@ -1,17 +1,16 @@
 ﻿using MongoDB.Driver;
 using NTS.Nexus.HTTP.Mongo;
-using NTS.Storage.Documents.Settings;
 
 namespace NTS.Nexus.HTTP.Functions.Settings;
 
-public class SettingRepository : MongoRepository<SettingDocument>
+public class SettingRepository : MongoRepository<SettingModel>
 {
     public SettingRepository(IMongoContext context)
         : base(context, "nts", "settings") { }
 
-    protected override UpdateDefinition<SettingDocument> GetUpdateDefinition(SettingDocument document)
+    protected override UpdateDefinition<SettingModel> GetUpdateDefinition(SettingModel document)
     {
-        return Builders<SettingDocument>
+        return Builders<SettingModel>
             .Update.Set(x => x.DetectionMode, document.DetectionMode)
             .Set(x => x.Country, document.Country);
     }
