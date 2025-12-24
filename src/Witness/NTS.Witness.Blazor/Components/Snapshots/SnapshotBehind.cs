@@ -12,6 +12,7 @@ public class SnapshotBehind : NComponent
 {
     [Inject]
     IDialogService MudDialogService { get; set; } = null!;
+
     [Inject]
     ISnapshotService SnapshotService { get; set; } = null!;
 

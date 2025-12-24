@@ -22,12 +22,8 @@ public static class NtsWitnessServices
 
         return services;
     }
-    
-    
-    static IServiceCollection ConfigureAuthentication(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+
+    static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.RegisterNAuthentication(configuration);
         services.AddAuthorization();

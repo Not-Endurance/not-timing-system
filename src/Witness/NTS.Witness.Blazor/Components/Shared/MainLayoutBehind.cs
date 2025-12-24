@@ -10,7 +10,8 @@ public class MainLayoutBehind : LayoutComponentBase
     ICrumbsNavigator Navigator { get; set; } = default!;
     protected bool DrawerOpen { get; set; } = false;
 
-    public bool IsCurrentPageEmergencyContacts => Navigator.CurrentEndpoint.Contains(WitnessBlazorConstants.Pages.EMERGENCY_CONTACTS);
+    public bool IsCurrentPageEmergencyContacts =>
+        Navigator.CurrentEndpoint.Contains(WitnessBlazorConstants.Pages.EMERGENCY_CONTACTS);
 
     protected void ToggleDrawer()
     {

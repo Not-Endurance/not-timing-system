@@ -2,7 +2,10 @@
 
 public static class NtsWitnessWebServices
 {
-    public static IServiceCollection ConfigureNtsWitnessWeb(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection ConfigureNtsWitnessWeb(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         return services.ConfigureNtsWitness(configuration);
     }

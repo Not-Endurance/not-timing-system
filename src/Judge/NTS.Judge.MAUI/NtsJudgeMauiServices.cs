@@ -9,8 +9,6 @@ public static class NtsJudgeMauiServices
 {
     public static IServiceCollection ConfigureJudgeMaui(this IServiceCollection services, IConfiguration configuration)
     {
-        return services
-            .AddPlatformServices(configuration)
-            .ConfigureNtsJudge(configuration);
+        return services.AddPlatformServices(configuration).ConfigureNtsJudge(configuration);
     }
 }

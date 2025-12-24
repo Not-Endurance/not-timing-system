@@ -71,7 +71,7 @@ public partial class NImageBrowser
         {
             return;
         }
-        
+
         var fileName = file.Name + Path.GetExtension(file.Name);
         var destination = Path.Combine(ImagesFolder, fileName);
 

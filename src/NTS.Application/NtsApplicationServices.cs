@@ -9,11 +9,12 @@ namespace NTS.Application;
 
 public static class NtsApplicationServices
 {
-    public static IServiceCollection ConfigureNtsApplication(this IServiceCollection services, IConfiguration configuration, Assembly rootAssembly)
+    public static IServiceCollection ConfigureNtsApplication(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Assembly rootAssembly
+    )
     {
-        return services
-            .AddNConventionalServices(rootAssembly)
-            .AddNRpcSocket(configuration)
-            .AddNHttp(configuration);
+        return services.AddNConventionalServices(rootAssembly).AddNRpcSocket(configuration).AddNHttp(configuration);
     }
 }

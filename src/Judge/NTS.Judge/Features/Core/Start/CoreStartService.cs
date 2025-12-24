@@ -77,9 +77,7 @@ public class CoreStartService : ICoreStarter
         foreach (var setupCompetition in setupEvent.Competitions)
         {
             var (p, rankingEntriesByCategory) = ParticipationAndRankingFactory.Create(setupCompetition, participations);
-            var r = rankingEntriesByCategory
-                .Where(x => x.Value.Any())
-                .Select(x => CreateRanking(setupCompetition, x));
+            var r = rankingEntriesByCategory.Where(x => x.Value.Any()).Select(x => CreateRanking(setupCompetition, x));
 
             participations.AddRange(p);
             rankings.AddRange(r);
