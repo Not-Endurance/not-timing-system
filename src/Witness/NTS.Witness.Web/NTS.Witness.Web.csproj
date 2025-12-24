@@ -29,7 +29,7 @@
 		<ProjectReference Include="..\..\Not\Not\Not.csproj" />
 		<ProjectReference Include="..\..\NTS.Blazor\NTS.Blazor.csproj" />
 		<ProjectReference Include="..\..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
-		<ProjectReference Include="..\..\NTS\NTS.csproj" />
+		<ProjectReference Include="..\..\NTS\NTS.Common.csproj" />
 		<ProjectReference Include="..\NTS.Witness.Blazor\NTS.Witness.Blazor.csproj" />
 		<ProjectReference Include="..\NTS.Witness\NTS.Witness.csproj" />
 	</ItemGroup>

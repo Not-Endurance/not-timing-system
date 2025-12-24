@@ -14,7 +14,7 @@
     <ProjectReference Include="..\..\Not\Not.Blazor\Not.Blazor.csproj" />
     <ProjectReference Include="..\..\NTS.Blazor\NTS.Blazor.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
-    <ProjectReference Include="..\..\NTS\NTS.csproj" />
+    <ProjectReference Include="..\..\NTS\NTS.Common.csproj" />
   </ItemGroup>
   
 </Project>
