@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.RPC;
+using Not.Authentication;
 using Not.Blazor.Injection;
 using Not.Localization;
 using NTS.Localization.Resources;
@@ -18,6 +21,16 @@ public static class NtsServiceCollectionExtensions
     {
         services.ConfigureNts(configuration).AddNotBlazor(configuration).AddRpcSocket(configuration);
 
+        return services;
+    }
+
+    public static IServiceCollection ConfigureAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
+        services.RegisterAuthServices(configuration);
+        services.AddAuthorization();
         return services;
     }
 }

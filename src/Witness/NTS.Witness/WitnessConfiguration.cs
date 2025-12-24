@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Not.Application.HTTP;
 using Not.Injection;
 
@@ -8,7 +9,11 @@ public static class WitnessConfiguration
 {
     public static IServiceCollection AddWitnessServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.ConfigureNtsBlazor(configuration).AddNHttp(configuration).RegisterConventionalServices();
+        services
+            .ConfigureNtsBlazor(configuration)
+            .AddNHttp(configuration)
+            .ConfigureAuthentication(configuration)
+            .RegisterConventionalServices();
 
         return services;
     }

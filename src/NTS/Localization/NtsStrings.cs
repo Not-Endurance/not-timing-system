@@ -184,6 +184,7 @@ namespace NTS.Localization
         public static string Help_string => LocalizeString(nameof(Help_string));
         public static string Home_string => LocalizeString(nameof(Home_string));
         public static string Login_string => LocalizeString(nameof(Login_string));
+        public static string Login_invite_string => LocalizeString(nameof(Login_invite_string));
         public static string Login_page_string => LocalizeString(nameof(Login_page_string));
         public static string Contacts_string => LocalizeString(nameof(Contacts_string));
         public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
@@ -199,6 +200,10 @@ namespace NTS.Localization
         public static string Edit_timestamp_string => LocalizeString(nameof(Edit_timestamp_string));
         public static string Timestamp_string => LocalizeString(nameof(Timestamp_string));
         public static string Save_string => LocalizeString(nameof(Save_string));
+        public static string Profile_page_string => LocalizeString(nameof(Profile_page_string));
+        public static string Access_denied_string => LocalizeString(nameof(Access_denied_string));
+        public static string Access_denied_next_steps => LocalizeString(nameof(Access_denied_next_steps));
+        public static string Try_another_account_string => LocalizeString(nameof(Try_another_account_string));
     }
 }
 #pragma warning restore NA0004

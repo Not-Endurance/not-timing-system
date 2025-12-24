@@ -2,7 +2,7 @@
 
 namespace NTS.Witness.RPC
 {
-    interface ITestBehind : ISingleton
+    public interface ITestBehind : ISingleton
     {
         void Test();
     }

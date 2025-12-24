@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Not.Blazor.Notifier
+
+@inherits MainLayoutBehind
+
+<NTheme Mobile="true"/>
+
+<MudSwipeArea OnSwipeEnd="@OnSwipeEnd" Style="width: 100vw;">
+    <MudLayout Style="height: 100vh;">
+        <MudAppBar Elevation="1">
+            <MudText>NTS Witness</MudText>
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
+        </MudAppBar>
+        <MudDrawer @bind-Open="@DrawerOpen" Elevation="2" Anchor="Anchor.Right" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h6">@Main_menu_string</MudText>
+            </MudDrawerHeader>
+
+            <NavMenu OnNavigation="CloseDrawer" />
+        </MudDrawer>
+        <MudMainContent Style="height:100%;">
+            <AuthorizeView Roles="@COMPETITOR">
+                <Authorized>
+                    <HelpButton Class="help-button" ClickHandler="HelpHandler"/>
+                </Authorized>
+            </AuthorizeView>
+            @Body
+            <BlazorNotifier />
+        </MudMainContent>
+    </MudLayout>
+</MudSwipeArea>
