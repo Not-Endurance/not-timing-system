@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
 builder.Services.AddMongo(connectionString);
-builder.Services.RegisterConventionalServices();
+builder.Services.AddNConventionalServices(Assembly.GetExecutingAssembly());
 
 builder.Services.AddApplicationInsightsTelemetryWorkerService().ConfigureFunctionsApplicationInsights();
 

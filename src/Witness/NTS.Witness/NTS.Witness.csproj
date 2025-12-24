@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NTS.Witness.Blazor\NTS.Witness.Blazor.csproj" />
     <ProjectReference Include="..\..\Not\Not.Application\Not.Application.csproj" />
-    <ProjectReference Include="..\..\Not\Not.Blazor\Not.Blazor.csproj" />
     <ProjectReference Include="..\..\Not\Not\Not.csproj" />
-    <ProjectReference Include="..\..\NTS.Blazor\NTS.Blazor.csproj" />
+    <ProjectReference Include="..\..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
   </ItemGroup>
 

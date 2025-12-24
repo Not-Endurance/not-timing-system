@@ -6,21 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-
   <ItemGroup>
-    <SupportedPlatform Include="browser" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.13" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Not\Not\Not.csproj" />
+    <ProjectReference Include="..\Not\Not.Blazor\Not.Blazor.csproj" />
     <ProjectReference Include="..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
     <ProjectReference Include="..\NTS.Domain.Setup\NTS.Domain.Setup.csproj" />
     <ProjectReference Include="..\NTS.Domain\NTS.Domain.csproj" />

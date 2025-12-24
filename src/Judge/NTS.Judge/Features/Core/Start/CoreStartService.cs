@@ -79,7 +79,7 @@ public class CoreStartService : ICoreStarter
             var (p, rankingEntriesByCategory) = ParticipationAndRankingFactory.Create(setupCompetition, participations);
             var r = rankingEntriesByCategory
                 .Where(x => x.Value.Any())
-                .Select(x => CreateRanking(setupEvent, setupCompetition, x));
+                .Select(x => CreateRanking(setupCompetition, x));
 
             participations.AddRange(p);
             rankings.AddRange(r);
@@ -88,7 +88,6 @@ public class CoreStartService : ICoreStarter
     }
 
     Ranking CreateRanking(
-        Domain.Setup.Aggregates.UpcomingEvent setupEvent,
         Domain.Setup.Aggregates.Competition setupCompetition,
         KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory
     )

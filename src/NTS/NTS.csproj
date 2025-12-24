@@ -6,8 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Not\Not.Application\Not.Application.csproj" />
-    <ProjectReference Include="..\Not\Not.Blazor\Not.Blazor.csproj" />
     <ProjectReference Include="..\Not\Not\Not.csproj" />
   </ItemGroup>
 

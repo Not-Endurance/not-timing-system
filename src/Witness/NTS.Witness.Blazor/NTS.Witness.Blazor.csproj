@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,10 +8,13 @@
 
   <ItemGroup>
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.22" />
-	  <ProjectReference Include="..\..\Not\Not.Blazor\Not.Blazor.csproj" />
-	  <ProjectReference Include="..\..\NTS.Blazor\NTS.Blazor.csproj" />
-	  <ProjectReference Include="..\..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
-	  <ProjectReference Include="..\..\NTS\NTS.csproj" />
-	  <ProjectReference Include="..\NTS.Witness\NTS.Witness.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Not\Not.Blazor\Not.Blazor.csproj" />
+    <ProjectReference Include="..\..\NTS.Blazor\NTS.Blazor.csproj" />
+    <ProjectReference Include="..\..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
+    <ProjectReference Include="..\..\NTS\NTS.csproj" />
+  </ItemGroup>
+  
 </Project>
