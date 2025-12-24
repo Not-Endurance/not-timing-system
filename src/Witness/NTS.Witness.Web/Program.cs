@@ -1,11 +1,13 @@
 ﻿using Not.Application.Configurations;
+using Not.Startup;
+using NTS.Witness.Web.Endpoints;
 using Serilog;
 
 namespace NTS.Witness.Web;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,7 @@ public class Program
 
         var assembly = typeof(Program).Assembly;
         builder.Configuration.AddNAppsettings(assembly);
-        builder.Services.AddWitnessServices(builder.Configuration);
+        builder.Services.ConfigureNtsWitnessWeb(builder.Configuration);
 
         builder.Logging.AddSerilog();
 
@@ -39,6 +41,6 @@ public class Program
         app.MapBlazorHub();
         app.MapFallbackToPage("/_Host");
 
-        app.Run();
+        await app.Startup();
     }
 }

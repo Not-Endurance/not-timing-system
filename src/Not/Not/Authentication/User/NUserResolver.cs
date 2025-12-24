@@ -7,25 +7,25 @@ namespace Not.Authentication.User;
 
 public class NUserResolver : IUserResolver
 {
-    public Task UserResolution(TicketReceivedContext context)
+    public Task Resolve(TicketReceivedContext context)
     {
         var userDeserializer = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationSettings>();
         var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
-        if (email == null)
+        if (email == null || context.Principal == null)
         {
             context.Response.Redirect("/error");
             context.Fail("Login error - missing user email");
             context.HandleResponse();
             return Task.CompletedTask;
         }
-        if (context.Principal!.Identity == null)
+        if (context.Principal.Identity == null)
         {
             context.Response.Redirect("/error");
             context.Fail("Login error - missing user identity");
             context.HandleResponse();
             return Task.CompletedTask;
         }
-        var oldIdentity = (ClaimsIdentity)context.Principal!.Identity;
+        var oldIdentity = (ClaimsIdentity)context.Principal.Identity;
 
         var newIdentity = new ClaimsIdentity(
             oldIdentity.Claims,
@@ -41,7 +41,7 @@ public class NUserResolver : IUserResolver
         var authUser = userDeserializer.GetUserByEmail(email);
 
         // deny if: no email / email from unregistered provider / email not in allow list
-        if (string.IsNullOrWhiteSpace(email) || !email.EndsWithProviderSuffix([GMAIL]) || authUser == null)
+        if (string.IsNullOrWhiteSpace(email) || authUser == null)
         {
             context.Response.Redirect("/access-denied");
             context.Fail("Not allowed");

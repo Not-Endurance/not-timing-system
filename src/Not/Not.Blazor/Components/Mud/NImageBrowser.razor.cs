@@ -65,20 +65,22 @@ public partial class NImageBrowser
         }
     }
 
-    async Task OnFileSelected(IBrowserFile file)
+    async Task OnFileSelected(IBrowserFile? file)
     {
-        if (file != null)
+        if (file == null)
         {
-            var fileName = file.Name + Path.GetExtension(file.Name);
-            var destination = Path.Combine(ImagesFolder, fileName);
-
-            await using var fs = File.Create(destination);
-            await file.OpenReadStream(maxAllowedSize: 10_000_000).CopyToAsync(fs);
-
-            LoadImages();
-            StateHasChanged();
-            NotifyHelper.Success("File uploaded successfully.");
+            return;
         }
+
+        var fileName = file.Name + Path.GetExtension(file.Name);
+        var destination = Path.Combine(ImagesFolder, fileName);
+
+        await using var fs = File.Create(destination);
+        await file.OpenReadStream(maxAllowedSize: 10_000_000).CopyToAsync(fs);
+
+        LoadImages();
+        StateHasChanged();
+        NotifyHelper.Success("File uploaded successfully.");
     }
 
     async Task PromptDeleteImage(string imagePath)

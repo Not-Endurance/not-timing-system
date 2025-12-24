@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Not\Not.Domain\Not.Domain.csproj" />
-    <ProjectReference Include="..\NTS\NTS.csproj" />
+    <ProjectReference Include="..\NTS\NTS.Common.csproj" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
