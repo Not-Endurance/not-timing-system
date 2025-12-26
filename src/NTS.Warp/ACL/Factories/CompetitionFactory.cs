@@ -1,4 +1,5 @@
-﻿using NTS.Domain.Core.Aggregates;
+﻿using Not.Extensions;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Competitions;
 using NTS.Warp.ACL.Models;
@@ -8,14 +9,14 @@ namespace NTS.Warp.ACL.Factories;
 
 public class CompetitionFactory
 {
-    public static EmsCompetition Create(ParticipationWarpDto participation)
+    public static EmsCompetition Create(ParticipationModel participation)
     {
         var laps = LapFactory.Create(participation.Phases);
         var state = new EmsCompetitionState
         {
-            Id = participation.Id,
-            Name = participation.CompetitionName,
-            Type = MapEmsCompetitionType(participation.Ruleset),
+            Id = DomainModelHelper.GenerateId(),
+            Name = participation.Competition.Name,
+            Type = MapEmsCompetitionType(participation.Competition.Ruleset),
         };
         var competition = new EmsCompetition(state);
         foreach (var lap in laps)

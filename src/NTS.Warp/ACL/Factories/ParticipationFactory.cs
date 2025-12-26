@@ -1,5 +1,4 @@
-﻿using NTS.Domain.Core.Aggregates;
-using NTS.Warp.ACL.Entities.LapRecords;
+﻿using NTS.Warp.ACL.Entities.LapRecords;
 using NTS.Warp.ACL.Entities.Participants;
 using NTS.Warp.ACL.Entities.Participations;
 using NTS.Warp.ACL.Models;
@@ -9,15 +8,15 @@ namespace NTS.Warp.ACL.Factories;
 
 public class ParticipationFactory
 {
-    public static EmsParticipation CreateEms(ParticipationWarpDto participation)
+    public static EmsParticipation CreateEms(ParticipationModel participation)
     {
-        var athlete = AthleteFactory.Create(participation.Athlete);
-        var horse = HorseFactory.Create(participation.Horse);
+        var athlete = AthleteFactory.Create(participation.Combination.Athlete);
+        var horse = HorseFactory.Create(participation.Combination.Horse);
 
         var state = new EmsParticipantState
         {
-            Number = participation.Number.ToString(),
-            MaxAverageSpeedInKmPh = (int?)participation.MinAverageSpeed,
+            Number = participation.Combination.Number.ToString(),
+            MaxAverageSpeedInKmPh = (int?)participation.Combination.MinAverageSpeed,
             Unranked = true, // Cannot be fixed easy because IsNotRanked is on Ranking level. Not necessary in current Witness
         };
         var emsParticipant = new EmsParticipant(athlete, horse, state);

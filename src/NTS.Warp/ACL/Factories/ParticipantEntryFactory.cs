@@ -5,7 +5,7 @@ namespace NTS.Warp.ACL.Factories;
 
 public class ParticipantEntryFactory
 {
-    public static EmsParticipantEntry Create(ParticipationWarpDto participation)
+    public static EmsParticipantEntry Create(ParticipationModel participation)
     {
         var emsParticipation = ParticipationFactory.CreateEms(participation);
         return new EmsParticipantEntry(emsParticipation);

@@ -91,6 +91,7 @@ public class CoreModel
                 RepresentTime = phase.RepresentTime,
                 IsReinspectionRequested = phase.IsReinspectionRequested,
                 IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested || phase.IsRequiredInspectionCompulsory, // TODO: probably remove compulsory altogether
+                CompulsoryThresholdInterval = phase.CompulsoryThresholdSpan,
                 RequiredInspectionTime = phase.GetRequiredInspectionTime(),
                 OutTime = phase.GetOutTime(),
                 LoopInterval = phase.GetLoopInterval(),
@@ -120,7 +121,7 @@ public class CoreModel
         public TimeSpan? LoopInterval { get; init; }
         public TimeSpan? PhaseInterval { get; init; }
         public TimeSpan? RecoveryInterval { get; init; }
-        public TimeSpan? CompulsoryTresholdInterval { get; init; } = TimeSpan.FromMinutes(10);
+        public TimeSpan? CompulsoryThresholdInterval { get; init; } = TimeSpan.FromMinutes(10);
         public double? AverageLoopSpeed { get; init; }
         public double? AveragePhaseSpeed { get; init; }
         public double? AverageSpeed { get; init; }
@@ -136,7 +137,7 @@ public class CoreModel
                 Rest,
                 Ruleset,
                 IsFinal,
-                CompulsoryTresholdInterval,
+                CompulsoryThresholdInterval,
                 StartTime,
                 ArriveTime,
                 PresentTime,

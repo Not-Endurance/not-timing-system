@@ -6,7 +6,7 @@ namespace NTS.Warp.ACL.Factories;
 
 public class HorseFactory
 {
-    public static EmsHorse Create(ParticipationWarpDto.HorseDto horse)
+    public static EmsHorse Create(HorseModel horse)
     {
         var state = new EmsHorseState { Name = horse.Name };
         return new EmsHorse(state);

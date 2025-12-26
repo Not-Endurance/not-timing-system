@@ -1,4 +1,6 @@
-﻿using NTS.Warp.ACL.Entities.Laps;
+﻿using Not.Extensions;
+using NTS.Domain.Objects;
+using NTS.Warp.ACL.Entities.Laps;
 using NTS.Warp.ACL.Models;
 using NTS.Warp.Features.Judge.Models;
 
@@ -6,16 +8,16 @@ namespace NTS.Warp.ACL.Factories;
 
 public class LapFactory
 {
-    public static IEnumerable<EmsLap> Create(IEnumerable<ParticipationWarpDto.PhaseDto> phases)
+    public static IEnumerable<EmsLap> Create(PhaseModel[] phases)
     {
         var i = 0;
         foreach (var phase in phases)
         {
             var state = new EmsLapState
             {
-                Id = phase.Id,
+                Id = DomainModelHelper.GenerateId(),
                 IsFinal = phases.Last() == phase,
-                IsCompulsoryInspectionRequired = phase.IsRequestedInspectionCompulsory,
+                IsCompulsoryInspectionRequired = CheckCompulsoryTreshold(phase.RecoveryInterval,phase.CompulsoryThresholdInterval,phase.IsFinal),
                 LengthInKm = phase.Length,
                 MaxRecoveryTimeInMins = phase.MaxRecovery,
                 OrderBy = ++i,
@@ -23,5 +25,14 @@ public class LapFactory
             };
             yield return new EmsLap(state);
         }
+}
+
+    private static bool CheckCompulsoryTreshold(TimeSpan? recoveryInterval, TimeSpan? compulsoryThresholdInterval, bool isFinal)
+    {
+        if (compulsoryThresholdInterval == null || isFinal)
+        {
+            return false;
+        }
+        return recoveryInterval >= compulsoryThresholdInterval;
     }
 }
