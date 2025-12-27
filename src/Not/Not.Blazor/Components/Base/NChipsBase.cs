@@ -12,4 +12,7 @@ public class NChipsBase<T> : NBindableComponent<T>
 
     [Parameter]
     public Func<T, Color>? SetChipColor { get; set; }
+
+    [Parameter]
+    public Action<T>? OnSelect { get; set; }
 }

@@ -1,0 +1,13 @@
+﻿@inherits TimestampUpdateDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField InputMode="InputMode.numeric" T="string" 
+            Value="@Model.TimestampInput" ValueChanged="OnTimestampInputChanged" Immediate="true"
+            Mask="TIME_MASK" Label="@Timestamp_string" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@Cancel_string</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">@Save_string</MudButton>
+    </DialogActions>
+</MudDialog>

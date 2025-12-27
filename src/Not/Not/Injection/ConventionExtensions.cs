@@ -11,14 +11,13 @@ public static class InjectionServiceCollectionExtensions
     static readonly Type SCOPED_TYPE = typeof(IScoped);
     static readonly Type SINGLETON_TYPE = typeof(ISingleton);
 
-    public static IServiceCollection RegisterConventionalServices(this IServiceCollection services)
+    public static IServiceCollection AddNConventionalServices(this IServiceCollection services, Assembly rootAssembly)
     {
-        var callingAssembly = Assembly.GetCallingAssembly();
-        var assemblies = callingAssembly.RecursiveGetReferencedAssemblies([]);
-        return RegisterConventionalServices(services, assemblies);
+        var assemblies = rootAssembly.RecursiveGetReferencedAssemblies([]);
+        return RegisterNConventionalServices(services, assemblies);
     }
 
-    static IServiceCollection RegisterConventionalServices(
+    static IServiceCollection RegisterNConventionalServices(
         IServiceCollection services,
         IEnumerable<Assembly> assemblies
     )
