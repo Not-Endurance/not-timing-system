@@ -2,7 +2,6 @@
 using NTS.Warp.ACL.Entities.Participants;
 using NTS.Warp.ACL.Entities.Participations;
 using NTS.Warp.ACL.Models;
-using NTS.Warp.Features.Judge.Models;
 
 namespace NTS.Warp.ACL.Factories;
 

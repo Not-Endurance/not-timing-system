@@ -1,9 +1,7 @@
 ﻿using Not.Extensions;
-using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Competitions;
 using NTS.Warp.ACL.Models;
-using NTS.Warp.Features.Judge.Models;
 
 namespace NTS.Warp.ACL.Factories;
 

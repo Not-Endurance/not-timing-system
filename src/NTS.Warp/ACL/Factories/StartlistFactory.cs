@@ -1,5 +1,4 @@
 using NTS.Warp.ACL.Entities;
-using NTS.Warp.Features.Judge.Models;
 
 namespace NTS.Warp.ACL.Factories;
 

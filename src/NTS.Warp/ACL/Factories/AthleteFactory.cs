@@ -3,8 +3,6 @@ using NTS.Warp.ACL.Entities.Athletes;
 using NTS.Warp.ACL.Entities.Countries;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Models;
-using NTS.Warp.Features.Judge.Models;
-
 
 namespace NTS.Warp.ACL.Factories;
 
