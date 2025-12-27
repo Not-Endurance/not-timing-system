@@ -21,6 +21,14 @@ public static class GuardHelper
         }
     }
 
+    public static void ThrowIfDefault<T>([NotNull] T value, string message)
+    {
+        if (value?.Equals(default(T)) ?? true)
+        {
+            throw new GuardException($"{ReflectionHelper.GetName<T>()} "+message);
+        }
+    }
+
     public static Exception Exception(string message)
     {
         return new GuardException(message);
