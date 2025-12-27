@@ -3,6 +3,7 @@ using NTS.Domain.Setup.Aggregates;
 using static NTS.Application.DataTransferObjects.Models.CommonModel;
 
 namespace NTS.Application.DataTransferObjects.Models;
+
 public class SetupModel
 {
     public class AthleteModel : Identity
@@ -65,5 +66,4 @@ public class SetupModel
             return new Club(Id, Name);
         }
     }
-
 }
