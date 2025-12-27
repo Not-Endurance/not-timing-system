@@ -102,7 +102,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     EmsParticipation Convert(Participation participation)
     {
-        var dto = ParticipationWarpDto.Create(participation);
+        var dto = ParticipationModel.Create(participation);
         return ParticipationFactory.CreateEms(dto);
     }
 }

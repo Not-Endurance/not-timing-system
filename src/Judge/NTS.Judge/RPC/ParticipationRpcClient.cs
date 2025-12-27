@@ -6,10 +6,8 @@ using Not.Async;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
 using NTS.Judge.Core;
-using NTS.Judge.Features;
 using NTS.Judge.Features.Warp;
 using NTS.Warp;
-using NTS.Warp.Features.Judge.Models;
 using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.RPC;
@@ -60,18 +58,18 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     /// Fetches active participations before and after Competitions are started.
     /// </summary>
     /// <returns>Collection of active (not eliminated or completed) participations</returns>
-    public async Task<IEnumerable<ParticipationWarpDto>> GetActiveParticipations()
+    public async Task<IEnumerable<ParticipationModel>> GetActiveParticipations()
     {
         var coreParticipations = await _coreParticipations
             .ReadAll(x => !x.IsComplete() && !x.IsEliminated())
-            .Select(ParticipationWarpDto.Create);
+            .Select(ParticipationModel.Create);
         if (coreParticipations.Any())
         {
             return coreParticipations;
         }
 
         var participations = await _setupParticipations.ReadAll();
-        return participations.Select(ParticipationWarpDto.Create);
+        return participations.Select(ParticipationModel.Create);
     }
 
     public async Task OnParticipationEliminated(ParticipationEliminated eliminated)
