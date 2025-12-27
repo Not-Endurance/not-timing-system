@@ -25,7 +25,7 @@ public static class GuardHelper
     {
         if (value?.Equals(default(T)) ?? true)
         {
-            throw new GuardException($"{ReflectionHelper.GetName<T>()} "+message);
+            throw new GuardException($"{ReflectionHelper.GetName<T>()} " + message);
         }
     }
 

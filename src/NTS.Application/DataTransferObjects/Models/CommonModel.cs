@@ -34,6 +34,7 @@ public class CommonModel
                 Role = official.Role,
             };
         }
+
         public string[] Names { get; init; } = [];
         public OfficialRole Role { get; init; } = default!;
 
@@ -130,10 +131,16 @@ public class CommonModel
 
         public Combination ToCoreDomain()
         {
-            GuardHelper.ThrowIfDefault(Distance,"Distance cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(MinAverageSpeed,"MinAverageSpeed cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(MaxAverageSpeed,"MaxAverageSpeed cannot be null when converting to Core Domain");
-           
+            GuardHelper.ThrowIfDefault(Distance, "Distance cannot be null when converting to Core Domain");
+            GuardHelper.ThrowIfDefault(
+                MinAverageSpeed,
+                "MinAverageSpeed cannot be null when converting to Core Domain"
+            );
+            GuardHelper.ThrowIfDefault(
+                MaxAverageSpeed,
+                "MaxAverageSpeed cannot be null when converting to Core Domain"
+            );
+
             var athlete = new Athlete(Athlete.ToSetupDomain());
             var horse = new Horse(Horse.ToSetupDomain());
             var minSpeed = Speed.Create(MinAverageSpeed);
@@ -177,8 +184,7 @@ public class CommonModel
                 Combination = CombinationModel.Create(participation.Combination),
                 Phases = participation.Phases.Select(PhaseModel.Create).ToArray(),
                 Total = total == null ? null : TotalModel.Create(total),
-                Eliminated =
-                    participation.Eliminated == null ? null : EliminatedModel.Create(participation.Eliminated),
+                Eliminated = participation.Eliminated == null ? null : EliminatedModel.Create(participation.Eliminated),
             };
         }
 
@@ -193,7 +199,7 @@ public class CommonModel
                 MaxSpeedOverride = participation.MaxSpeedOverride,
                 MinSpeedOverride = participation.MinSpeedOverride,
                 MinAverageSpeed = participation.MinAverageSpeed,
-                MaxAverageSpeed = participation.MaxAverageSpeed
+                MaxAverageSpeed = participation.MaxAverageSpeed,
             };
         }
 
@@ -211,12 +217,10 @@ public class CommonModel
 
         public double? MaxAverageSpeed { get; init; }
 
-
         public Participation ToCoreDomain()
         {
-
             GuardHelper.ThrowIfDefault(Competition, "Competition cannot be null when converting to Core Domain");
-            if(Phases == null || Phases.Length == 0)
+            if (Phases == null || Phases.Length == 0)
             {
                 GuardHelper.Exception("Phases cannot be null or empty when converting to Core Domain");
             }

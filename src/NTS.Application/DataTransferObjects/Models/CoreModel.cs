@@ -48,7 +48,8 @@ public class CoreModel
                 PresentTime = phase.PresentTime,
                 RepresentTime = phase.RepresentTime,
                 IsReinspectionRequested = phase.IsReinspectionRequested,
-                IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested || phase.IsRequiredInspectionCompulsory, // TODO: probably remove compulsory altogether
+                IsRequiredInspectionRequested =
+                    phase.IsRequiredInspectionRequested || phase.IsRequiredInspectionCompulsory, // TODO: probably remove compulsory altogether
                 CompulsoryThresholdInterval = phase.CompulsoryThresholdSpan,
                 RequiredInspectionTime = phase.GetRequiredInspectionTime(),
                 OutTime = phase.GetOutTime(),

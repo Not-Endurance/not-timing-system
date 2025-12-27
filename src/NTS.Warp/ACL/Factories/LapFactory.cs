@@ -15,7 +15,11 @@ public class LapFactory
             {
                 Id = DomainModelHelper.GenerateId(),
                 IsFinal = phases.Last() == phase,
-                IsCompulsoryInspectionRequired = CheckCompulsoryTreshold(phase.RecoveryInterval,phase.CompulsoryThresholdInterval,phase.IsFinal),
+                IsCompulsoryInspectionRequired = CheckCompulsoryTreshold(
+                    phase.RecoveryInterval,
+                    phase.CompulsoryThresholdInterval,
+                    phase.IsFinal
+                ),
                 LengthInKm = phase.Length,
                 MaxRecoveryTimeInMins = phase.MaxRecovery,
                 OrderBy = ++i,
@@ -23,9 +27,13 @@ public class LapFactory
             };
             yield return new EmsLap(state);
         }
-}
+    }
 
-    private static bool CheckCompulsoryTreshold(TimeSpan? recoveryInterval, TimeSpan? compulsoryThresholdInterval, bool isFinal)
+    private static bool CheckCompulsoryTreshold(
+        TimeSpan? recoveryInterval,
+        TimeSpan? compulsoryThresholdInterval,
+        bool isFinal
+    )
     {
         if (compulsoryThresholdInterval == null || isFinal)
         {

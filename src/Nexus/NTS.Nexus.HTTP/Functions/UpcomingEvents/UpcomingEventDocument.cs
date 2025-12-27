@@ -1,7 +1,7 @@
 using Not.Random;
+using NTS.Application.DataTransferObjects;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Application.DataTransferObjects;
 
 namespace NTS.Nexus.HTTP.Functions.UpcomingEvents;
 
