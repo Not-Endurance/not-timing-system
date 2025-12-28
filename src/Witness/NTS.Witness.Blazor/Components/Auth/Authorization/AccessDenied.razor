@@ -1,0 +1,14 @@
+﻿@attribute [Route(WitnessBlazorConstants.Pages.ACCESS_DENIED)]
+@inherits AccessDeniedBehind
+
+<MudGrid Justify="Justify.Center" Class="align-center" Style="height:70%;">
+    <MudItem xs="10" sm="4" lg="4" xl="3">
+        <MudStack>
+            <NHeadline Color="Color.Error" Content="@Access_denied_string" />
+
+            <MudText Align="Align.Center" Typo="Typo.h5">@Access_denied_next_steps</MudText>
+
+            <MudButton Variant="Variant.Filled" Size="Size.Large" OnClick="RetrySignin">@Try_another_account_string</MudButton>
+        </MudStack>
+    </MudItem>
+</MudGrid>

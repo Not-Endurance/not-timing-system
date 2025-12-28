@@ -11,7 +11,7 @@ namespace Not.Authentication;
 
 public static class AuthenticationExtensions
 {
-    public static void RegisterAuthServices(this IServiceCollection services, IConfiguration configuration)
+    public static void RegisterNAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<IAuthenticationSettings, NAuthenticationSettings>();
         services.AddSingleton<IUserResolver, NUserResolver>();
@@ -41,23 +41,11 @@ public static class AuthenticationExtensions
                 OnTicketReceived = context =>
                 {
                     var userResolver = context.HttpContext.RequestServices.GetRequiredService<IUserResolver>();
-                    return userResolver.UserResolution(context);
+                    return userResolver.Resolve(context);
                 },
             };
         });
 
         return authBuilder;
-    }
-
-    public static bool EndsWithProviderSuffix(this string email, string[] suffixes)
-    {
-        foreach (var suffix in suffixes)
-        {
-            if (email.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 }

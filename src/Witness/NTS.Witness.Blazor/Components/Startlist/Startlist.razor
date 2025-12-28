@@ -1,0 +1,10 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using NTS.Blazor.Components.Startlist.Upcoming
+
+@attribute [Route(WitnessBlazorConstants.Pages.STARTLIST)]
+@attribute [Authorize(Roles = "admin,official")]
+@inherits StartlistBehind
+
+<MudStack AlignItems="AlignItems.Center">
+    <StartlistUpcoming />
+</MudStack>
