@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Helpers;
 

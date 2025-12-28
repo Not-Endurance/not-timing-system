@@ -1,6 +1,5 @@
 using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Domain.Objects;
 
 namespace NTS.Warp.Features.Judge.Models;
 
@@ -42,7 +41,7 @@ public class ParticipationWarpDto
             MaxAverageSpeed = participation.Combination.MaxAverageSpeed,
             Athlete = new AthleteDto
             {
-                Id = participation.Combination.Athlete.Id,
+                //Id = participation.Combination.Athlete.Id,
                 Person = participation.Combination.Athlete.Names,
                 Country = participation.Combination.Athlete.Country,
                 Club = participation.Combination.Athlete.Club?.Name,

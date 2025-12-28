@@ -22,17 +22,14 @@ public class WitnessRpcClient
     const int DEFAULT_SNAPSHOT_PARTICIPANTS = 10;
 
     readonly IRpcSocket _socket;
-    readonly Dictionary<int, WitnessStartlist> _startlists;
-    readonly List<Participation> _participants;
-    readonly List<IntermediateSnapshot> _snapshots;
+    readonly Dictionary<int, WitnessStartlist> _startlists = [];
+    readonly List<Participation> _participants = [];
+    readonly List<IntermediateSnapshot> _snapshots = [];
 
     public WitnessRpcClient(IRpcSocket socket)
         : base(socket)
     {
         _socket = socket;
-        _startlists = new();
-        _participants = new();
-        _snapshots = new();
     }
 
     public IReadOnlyDictionary<int, WitnessStartlist> Startlists =>
@@ -47,9 +44,6 @@ public class WitnessRpcClient
         RegisterInputProcedure<StartlistEntry, WitnessCollectionAction>(nameof(ReceiveEntry), ReceiveEntry);
         RegisterInputProcedure<Participation, WitnessCollectionAction>(nameof(ReceiveEntryUpdate), ReceiveEntryUpdate);
         RegisterInputProcedure<WitnessSnapshotPayload>(nameof(ReceiveWitnessEvent), ReceiveWitnessEvent);
-
-        RegisterOutputProcedure(nameof(SendStartlist), SendStartlist);
-        RegisterOutputCollectionProcedure(nameof(SendParticipants), SendParticipants);
 
         EnsureInitialized();
     }
@@ -128,7 +122,7 @@ public class WitnessRpcClient
         var entries = startList.Upcoming.Concat(startList.History);
         foreach (var group in entries.GroupBy(entry => entry.PhaseNumber))
         {
-            _startlists[group.Key] = new WitnessStartlist(group);
+            _startlists[group.Key] = [.. group];
         }
     }
 
@@ -147,7 +141,7 @@ public class WitnessRpcClient
     {
         if (!_startlists.TryGetValue(phaseNumber, out var startlist))
         {
-            startlist = new WitnessStartlist();
+            startlist = [];
             _startlists[phaseNumber] = startlist;
         }
 

@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Base;
 
 namespace NTS.Domain.Objects;
 
-public sealed record Timestamp : DomainObject, IComparable<Timestamp>
+public sealed record Timestamp : IComparable<Timestamp>
 {
     public static Timestamp Now()
     {
@@ -71,13 +70,9 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
     Timestamp() { }
 
     Timestamp(Timestamp timestamp)
-        : base(timestamp)
     {
         _stamp = timestamp._stamp;
     }
-
-    Timestamp(TimeSpan timeSpan)
-        : this(DateTimeOffset.Now.Add(timeSpan)) { }
 
     public Timestamp(DateTimeOffset dateTimeOffset)
     {

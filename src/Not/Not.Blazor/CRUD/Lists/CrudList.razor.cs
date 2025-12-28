@@ -5,7 +5,7 @@ using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
 using Not.Blazor.CRUD.Ports;
 using Not.Domain;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using Not.Safe;
 
 namespace Not.Blazor.CRUD.Lists;

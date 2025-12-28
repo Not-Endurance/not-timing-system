@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using Not.Storage.States;
 
 namespace Not.Storage.Repositories;

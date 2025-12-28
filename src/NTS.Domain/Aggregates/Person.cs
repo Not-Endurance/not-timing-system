@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace NTS.Domain.Objects;
+namespace NTS.Domain.Aggregates;
 
 public class Person
 {

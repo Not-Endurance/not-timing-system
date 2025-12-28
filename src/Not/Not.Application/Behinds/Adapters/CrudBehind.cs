@@ -1,7 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 
 namespace Not.Application.Behinds.Adapters;
 

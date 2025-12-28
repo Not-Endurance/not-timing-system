@@ -1,4 +1,4 @@
-﻿using Not.Domain.Base;
+﻿using Not.Domain.Aggregates;
 
 namespace Not.Storage.States;
 

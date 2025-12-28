@@ -1,4 +1,5 @@
-﻿using NTS.Domain.Enums;
+﻿using NTS.Domain.Aggregates;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Warp.ACL.Entities;
 using NTS.Warp.ACL.Enums;

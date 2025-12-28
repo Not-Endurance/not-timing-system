@@ -16,7 +16,7 @@ public class CombinationDocumentModel
             Distance = combination.Distance,
             MinAverageSpeed = combination.MinAverageSpeed,
             MaxAverageSpeed = combination.MaxAverageSpeed,
-            Athlete = AthleteDocument.Create(combination.Athlete),
+            Athlete = CoreAthleteModel.MapFrom(combination.Athlete),
             Horse = HorseDocument.Create(combination.Horse),
         };
     }
@@ -25,12 +25,12 @@ public class CombinationDocumentModel
     public string Distance { get; init; } = default!;
     public double? MinAverageSpeed { get; init; }
     public double? MaxAverageSpeed { get; init; }
-    public AthleteDocument Athlete { get; init; } = default!;
+    public CoreAthleteModel Athlete { get; init; } = default!;
     public HorseDocument Horse { get; init; } = default!;
 
     public Combination ToDomain()
     {
-        var athlete = new Athlete(Athlete.ToSetupDomain());
+        var athlete = new Athlete(Athlete.MapToAthlete());
         var horse = new Horse(Horse.ToSetupDomain());
         var minSpeed = Speed.Create(MinAverageSpeed);
         var maxSpeed = Speed.Create(MaxAverageSpeed);

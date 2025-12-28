@@ -1,6 +1,6 @@
 ﻿using Not.Blazor.Components;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Domain.Objects;
 using CorePhase = NTS.Domain.Core.Aggregates.Participations.Phase;
 
 namespace NTS.Witness.Blazor.Components.Pages;

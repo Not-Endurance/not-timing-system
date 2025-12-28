@@ -1,8 +1,6 @@
-﻿using Not.Domain.Base;
+﻿namespace NTS.Domain.Objects;
 
-namespace NTS.Domain.Objects;
-
-public record Speed : DomainObject
+public record Speed
 {
     public static Speed? Create(double? speed)
     {

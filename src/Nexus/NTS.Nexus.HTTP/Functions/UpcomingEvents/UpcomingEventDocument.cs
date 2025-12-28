@@ -36,10 +36,10 @@ public class UpcomingEventDocument : Document
     public string? ShowFeiId { get; init; }
     public string? FeiId { get; init; }
     public string? FeiEventCode { get; init; }
-    public CompetitionModel[] Competitions { get; init; } = default!;
-    public OfficialDocument[] Officials { get; init; } = default!;
-    public LoopModel[] Loops { get; init; } = default!;
-    public CombinationModel[] Combinations { get; init; } = default!;
+    public CompetitionModel[] Competitions { get; init; } = [];
+    public OfficialDocument[] Officials { get; init; } = [];
+    public LoopModel[] Loops { get; init; } = [];
+    public CombinationModel[] Combinations { get; init; } = [];
     public string Name { get; init; } = default!;
 
     public UpcomingEvent ToDomain()
@@ -206,19 +206,19 @@ public class UpcomingEventDocument : Document
             {
                 Id = combination.Id,
                 Number = combination.Number,
-                Athlete = AthleteDocument.Create(combination.Athlete),
+                Athlete = SetupAthleteDocument.MapFrom(combination.Athlete),
                 Horse = HorseDocument.Create(combination.Horse),
             };
         }
 
         public int Id { get; init; }
         public int Number { get; init; }
-        public AthleteDocument Athlete { get; init; } = default!;
+        public SetupAthleteDocument Athlete { get; init; } = default!;
         public HorseDocument Horse { get; init; } = default!;
 
         public Combination ToSetupDomain()
         {
-            return Combination.Update(EnsureId(Id), Number, Athlete.ToSetupDomain(), Horse.ToSetupDomain(), null);
+            return Combination.Update(EnsureId(Id), Number, Athlete.MapToSetupAggregate(), Horse.ToSetupDomain(), null);
         }
     }
 }

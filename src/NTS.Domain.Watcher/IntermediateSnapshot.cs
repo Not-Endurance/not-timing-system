@@ -1,10 +1,10 @@
-﻿using Not.Domain.Base;
+﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
 namespace NTS.Domain.Watcher;
 
-public record IntermediateSnapshot : DomainObject
+public record IntermediateSnapshot
 {
     public IntermediateSnapshot(int number, Person athlete, Timestamp timestamp)
     {

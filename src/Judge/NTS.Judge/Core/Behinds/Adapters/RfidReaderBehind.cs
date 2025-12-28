@@ -1,5 +1,6 @@
 ﻿using Not.Notify;
 using Not.Safe;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.StaticOptions;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;

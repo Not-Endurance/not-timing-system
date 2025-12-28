@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using NTS.Application.Mongo;
 using NTS.Nexus.HTTP.Mongo;

@@ -1,11 +1,10 @@
-﻿using Not.Domain.Base;
-using Not.Formatting;
-using Not.Localization;
+﻿using Not.Formatting;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Domain.Core.Objects.Startlists;
 
-public record StartlistEntry : DomainObject
+public record StartlistEntry
 {
     public StartlistEntry(Person athlete, int number, int loopNumber, double distance, DateTimeOffset startAt)
     {
@@ -38,7 +37,7 @@ public record StartlistEntry : DomainObject
     public override string ToString()
     {
         var distance = Distance + km_string;
-        var result = Combine(Number, Athlete, distance, FormattingHelper.Format(Time.TimeOfDay));
+        var result = DomainModelHelper.Combine(Number, Athlete, distance, FormattingHelper.Format(Time.TimeOfDay));
         return result;
     }
 }

@@ -2,7 +2,6 @@
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
-using NTS.Domain.Objects;
 using Athlete = NTS.Domain.Core.Aggregates.Participations.Athlete;
 using Combination = NTS.Domain.Core.Aggregates.Participations.Combination;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
@@ -17,7 +16,7 @@ public class DummyData
     {
         var country = new Country(1000, null, null, null, null);
         var person = new Person(["Todomir", "Stroinov"]);
-        var athlete = new Athlete(99, person, country, null, "guz");
+        var athlete = new Athlete(person, country, null, "guz");
         var horse = new Horse(100, "Rozomir", null);
         var combination = new Combination(199, 1, athlete, horse, null, "40", null, null);
         var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
@@ -76,7 +75,7 @@ public class DummyData
             var names = new List<string> { $"FirstName{i + 1}", $"LastName{i + 1}" };
             var person = new Person(names.ToArray());
 
-            var athlete = new Athlete(99 + i, person, country, null, $"username{i + 1}");
+            var athlete = new Athlete(person, country, null, $"username{i + 1}");
 
             var horse = new Horse(100 + i, $"HorseName{i + 1}", null);
 
