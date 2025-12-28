@@ -78,12 +78,8 @@ public class Participation : AggregateRoot, IAggregateRoot
     //TODO rename to smthing better (including ISnapshotProcessor, IManualProcessor and other mentions..)
     public SnapshotResult Process(Snapshot snapshot)
     {
-        if (Eliminated != null)
-        {
-            return SnapshotResult.NotApplied(snapshot, NotAppliedDueToNotQualified);
-        }
         var result = Phases.Process(snapshot);
-        if (result.Type == Applied)
+        if (Eliminated == null && result.Type == Applied)
         {
             EvaluatePhase(Phases.Current);
         }

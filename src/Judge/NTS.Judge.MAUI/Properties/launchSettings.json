@@ -3,7 +3,15 @@
     "Localhost": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+      }
+    },
+
+    "Localhost-no-Warp": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "NO_WARP": "true"
       }
     },
     "Localhost-No-Warp": {

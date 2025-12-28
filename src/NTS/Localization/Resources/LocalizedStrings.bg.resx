@@ -238,7 +238,7 @@
     <value>Финиширал:</value>
   </data>
   <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
-    <value>Време на езда (час):</value>
+    <value>Време:</value>
   </data>
   <data name="Recovery_in_hours_colon_string" xml:space="preserve">
     <value>Възстановяване (час)</value>
@@ -723,13 +723,34 @@
   <data name="Image_browser_string" xml:space="preserve">
     <value>Каталог на изображения</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Delete_selection_string" xml:space="preserve">
     <value>Изтрий избраното</value>
   </data>
   <data name="Upload_string" xml:space="preserve">
     <value>Качи</value>
+  </data>
+  <data name="hrs_string" xml:space="preserve">
+    <value>ч.</value>
+  </data>
+  <data name="Bulgaria" xml:space="preserve">
+    <value>България</value>
+  </data>
+  <data name="Login_invite_string" xml:space="preserve">
+    <value>Моля влезте в акаунта си, за да получите достъп</value>
+  </data>
+  <data name="Profile_page_string" xml:space="preserve">
+    <value>Акаунт</value>
+  </data>
+  <data name="Access_denied_string" xml:space="preserve">
+    <value>Акаунтът, с който се вписвате не е оторизиран.</value>
+  </data>
+  <data name="Try_another_account_string" xml:space="preserve">
+    <value>Опитай с друг акаунт</value>
+  </data>
+  <data name="Access_denied_next_steps" xml:space="preserve">
+    <value>Свържете се с администратор или опитайте с друг.</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

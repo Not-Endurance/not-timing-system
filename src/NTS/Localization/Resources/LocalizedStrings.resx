@@ -235,10 +235,10 @@
     <value>Total</value>
   </data>
   <data name="Finished_at_colon_string" xml:space="preserve">
-    <value>Finished at:</value>
+    <value>Finished:</value>
   </data>
   <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
-    <value>Ride time (hrs):</value>
+    <value>Ride:</value>
   </data>
   <data name="Recovery_in_hours_colon_string" xml:space="preserve">
     <value>Recovery (hrs):</value>
@@ -607,7 +607,7 @@
     <value>Home</value>
   </data>
   <data name="Login_string" xml:space="preserve">
-    <value>Log In</value>
+    <value>Sign in</value>
   </data>
   <data name="Contacts_string" xml:space="preserve">
     <value>Emergency Contacts</value>
@@ -625,7 +625,7 @@
     <value>Participant</value>
   </data>
   <data name="Login_page_string" xml:space="preserve">
-    <value>Login</value>
+    <value>Sign-in</value>
   </data>
   <data name="Snapshot_page_string" xml:space="preserve">
     <value>Snapshot</value>
@@ -731,5 +731,26 @@
   </data>
   <data name="Upload_string" xml:space="preserve">
     <value>Upload</value>
+  </data>
+  <data name="hrs_string" xml:space="preserve">
+    <value>hrs</value>
+  </data>
+  <data name="Bulgaria" xml:space="preserve">
+    <value>Bulgaria</value>
+  </data>
+  <data name="Login_invite_string" xml:space="preserve">
+    <value>Please sign in to gain access</value>
+  </data>
+  <data name="Profile_page_string" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="Access_denied_string" xml:space="preserve">
+    <value>This account doesn't have sufficient privileges.</value>
+  </data>
+  <data name="Try_another_account_string" xml:space="preserve">
+    <value>Try another account</value>
+  </data>
+  <data name="Access_denied_next_steps" xml:space="preserve">
+    <value>Please contact a system Admin or try another.</value>
   </data>
 </root>
