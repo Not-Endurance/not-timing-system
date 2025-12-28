@@ -1,16 +1,15 @@
-﻿using NTS.Domain.Aggregates;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
+﻿using NTS.Domain.Setup.Aggregates;
 using NTS.Storage.Documents.Clubs;
 using NTS.Storage.Documents.Countries;
 
 namespace NTS.Storage.Documents.Athletes;
 
-public class AthleteDocument : Document
+public class SetupAthleteDocument : CoreAthleteModel, IDocument
 {
-    public static AthleteDocument Create(IAthlete athlete)
+    // TODO: if decide to use this approach integrate AutoMapper with specific mappings to solve duplicating mapping logic
+    public static SetupAthleteDocument MapFrom(Athlete athlete)
     {
-        return new AthleteDocument
+        return new SetupAthleteDocument
         {
             Id = athlete.Id,
             FeiId = athlete.FeiId,
@@ -20,12 +19,11 @@ public class AthleteDocument : Document
         };
     }
 
-    public string[] Names { get; init; } = default!;
-    public CountryDocument? Country { get; init; } // TODO: should be required
-    public ClubDocument? Club { get; init; }
-    public string? FeiId { get; init; }
+    public int Id { get; init; }
 
-    public Athlete ToSetupDomain()
+    public string TenantId { get; init; } = DEFAULT_TENANT;
+
+    public Athlete MapToSetupAggregate()
     {
         return new Athlete(Id, Names, FeiId, Country?.ToDomain(), Club?.ToDomain());
     }

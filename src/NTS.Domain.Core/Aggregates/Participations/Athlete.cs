@@ -1,14 +1,14 @@
-﻿using NTS.Domain.Aggregates;
+﻿using Not.Domain.Aggregates;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public class Athlete : IAthlete
+public class Athlete : Aggregate, IAthlete
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Athlete(int id, Person names, Country country, Club? club, string feiId)
+    public Athlete(Person names, Country country, Club? club, string feiId)
     {
-        Id = id;
         Names = names;
         Country = country;
         Club = club;
@@ -17,13 +17,11 @@ public class Athlete : IAthlete
 
     public Athlete(IAthlete athlete)
     {
-        Id = athlete.Id;
         Names = athlete.Names;
         Country = athlete.Country;
         FeiId = athlete.FeiId;
     }
 
-    public int Id { get; }
     public Person Names { get; }
     public Country Country { get; }
     public IClub? Club { get; }
