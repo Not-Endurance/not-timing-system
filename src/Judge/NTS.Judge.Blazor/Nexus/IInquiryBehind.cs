@@ -4,7 +4,7 @@ using NTS.Storage.Documents.Archive;
 
 namespace NTS.Judge.Blazor.Nexus;
 
-public interface IInquiryBehind : IObservableBehind
+public interface IInquiryBehind : INObservable
 {
     IEnumerable<RankingEntry>? Match { get; }
     IReadOnlyList<ArchiveDocument> Records { get; }

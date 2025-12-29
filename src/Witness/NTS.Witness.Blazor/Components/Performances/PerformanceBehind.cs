@@ -1,10 +1,10 @@
 ﻿using Not.Blazor.Components;
-using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Objects;
 
 namespace NTS.Witness.Blazor.Components.Performances;
 
-public class PerformanceBehind : NComponent
+public class PerformanceBehind : NBehind
 {
     [Inject]
     IPerformanceService Service { get; set; } = default!;

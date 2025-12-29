@@ -6,7 +6,7 @@ namespace Not.Application.Behinds.Adapters;
 
 // TODO: Probably rename to EventBehind. However we need to rename the Domain entity Event
 // To EnduranceEvent to avoid name conflicts
-public abstract class ObservableBehind : IObservableBehind
+public abstract class ObservableBehind : INObservable
 {
     readonly SemaphoreSlim _semaphore = new(1);
     readonly Event _stateChanged = new();

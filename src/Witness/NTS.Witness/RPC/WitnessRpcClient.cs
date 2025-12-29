@@ -22,7 +22,7 @@ public class WitnessRpcClient
     const int DEFAULT_SNAPSHOT_PARTICIPANTS = 10;
 
     readonly IRpcSocket _socket;
-    readonly Dictionary<int, WitnessStartlist> _startlists = [];
+    readonly Dictionary<int, Startlist> _startlists = [];
     readonly List<Participation> _participants = [];
     readonly List<IntermediateSnapshot> _snapshots = [];
 
@@ -32,8 +32,8 @@ public class WitnessRpcClient
         _socket = socket;
     }
 
-    public IReadOnlyDictionary<int, WitnessStartlist> Startlists =>
-        new ReadOnlyDictionary<int, WitnessStartlist>(_startlists);
+    public IReadOnlyDictionary<int, Startlist> Startlists =>
+        new ReadOnlyDictionary<int, Startlist>(_startlists);
 
     public IReadOnlyCollection<Participation> Participants => _participants.AsReadOnly();
 
@@ -59,9 +59,9 @@ public class WitnessRpcClient
         return await _socket.InvokeInputProcedure(nameof(ReceiveWitnessEvent), payload);
     }
 
-    public async Task<RpcInvokeResult<Dictionary<int, WitnessStartlist>>> RequestStartlistAsync()
+    public async Task<RpcInvokeResult<Dictionary<int, Startlist>>> RequestStartlistAsync()
     {
-        return await _socket.InvokeOutputProcedure<Dictionary<int, WitnessStartlist>>(nameof(SendStartlist));
+        return await _socket.InvokeOutputProcedure<Dictionary<int, Startlist>>(nameof(SendStartlist));
     }
 
     public async Task<RpcInvokeResult<IEnumerable<Participation>>> RequestParticipantsAsync()
@@ -71,8 +71,13 @@ public class WitnessRpcClient
 
     public Task ReceiveEntry(StartlistEntry entry, WitnessCollectionAction action)
     {
-        var startlist = GetOrCreateStartlist(entry.PhaseNumber);
-        startlist.Update(entry, action);
+        //var startlist = GetOrCreateStartlist(entry.PhaseNumber);
+        //if (action == WitnessCollectionAction.AddOrUpdate)
+        //{
+        //    startlist.Add()
+        //}
+        //startlist.Update(entry, action);
+        //return Task.CompletedTask;
         return Task.CompletedTask;
     }
 
@@ -97,11 +102,10 @@ public class WitnessRpcClient
         return Task.CompletedTask;
     }
 
-    public Task<Dictionary<int, WitnessStartlist>> SendStartlist()
+    public Task<Dictionary<int, Startlist>> SendStartlist()
     {
         EnsureStartlistsLoaded();
-        var copy = _startlists.ToDictionary(x => x.Key, x => new WitnessStartlist(x.Value));
-        return Task.FromResult(copy);
+        return Task.FromResult(new Dictionary<int, Startlist>());
     }
 
     public Task<IEnumerable<Participation>> SendParticipants()
@@ -112,18 +116,18 @@ public class WitnessRpcClient
 
     void EnsureStartlistsLoaded()
     {
-        if (_startlists.Count > 0)
-        {
-            return;
-        }
+        //if (_startlists.Count > 0)
+        //{
+        //    return;
+        //}
 
-        var participations = DummyData.CreateParticipationsForStartlist();
-        var startList = new StartList(participations, () => { });
-        var entries = startList.Upcoming.Concat(startList.History);
-        foreach (var group in entries.GroupBy(entry => entry.PhaseNumber))
-        {
-            _startlists[group.Key] = [.. group];
-        }
+        //var participations = DummyData.CreateParticipationsForStartlist();
+        //var startList = new StartList(participations);
+        //var entries = startList.Upcoming.Concat(startList.History);
+        //foreach (var group in entries.GroupBy(entry => entry.PhaseNumber))
+        //{
+        //    _startlists[group.Key] = [.. group];
+        //}
     }
 
     void EnsureParticipantsLoaded()
@@ -137,16 +141,16 @@ public class WitnessRpcClient
         _participants.AddRange(participations);
     }
 
-    WitnessStartlist GetOrCreateStartlist(int phaseNumber)
-    {
-        if (!_startlists.TryGetValue(phaseNumber, out var startlist))
-        {
-            startlist = [];
-            _startlists[phaseNumber] = startlist;
-        }
+    //StartList GetOrCreateStartlist(int phaseNumber)
+    //{
+    //    if (!_startlists.TryGetValue(phaseNumber, out var startlist))
+    //    {
+    //        startlist = [];
+    //        _startlists[phaseNumber] = startlist;
+    //    }
 
-        return startlist;
-    }
+    //    return startlist;
+    //}
 
     static void UpdateCollection<T, TKey>(
         List<T> collection,

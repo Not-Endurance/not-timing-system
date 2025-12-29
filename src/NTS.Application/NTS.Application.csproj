@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Not\Not.Application\Not.Application.csproj" />
     <ProjectReference Include="..\Not\Not\Not.csproj" />
+    <ProjectReference Include="..\NTS.Blazor\NTS.Blazor.csproj" />
     <ProjectReference Include="..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
   </ItemGroup>
 

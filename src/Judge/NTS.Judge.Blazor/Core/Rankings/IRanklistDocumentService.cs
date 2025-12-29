@@ -3,7 +3,7 @@ using NTS.Domain.Core.Objects.Documents;
 
 namespace NTS.Judge.Blazor.Core.Rankings;
 
-public interface IRanklistDocumentService : IObservableBehind
+public interface IRanklistDocumentService : INObservable
 {
     RanklistDocument? Document { get; }
 }

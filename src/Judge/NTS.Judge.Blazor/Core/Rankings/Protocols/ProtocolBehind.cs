@@ -7,7 +7,7 @@ using NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Protocols;
 
-public class ProtocolBehind : NComponent
+public class ProtocolBehind : NBehind
 {
     [Inject]
     IRanklistDocumentService Service { get; set; } = default!;

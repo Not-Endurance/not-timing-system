@@ -2,7 +2,7 @@
 
 namespace NTS.Witness.Blazor.Components.Shared;
 
-public class HelpButtonBehind : NComponent
+public class HelpButtonBehind : NBehind
 {
     [Parameter]
     public Action ClickHandler { get; set; } = default!;

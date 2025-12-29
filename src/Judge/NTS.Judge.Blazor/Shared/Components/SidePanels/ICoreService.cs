@@ -2,7 +2,7 @@ using Not.Blazor.Ports;
 
 namespace NTS.Judge.Blazor.Shared.Components.SidePanels;
 
-public interface ICoreService : IObservableBehind
+public interface ICoreService : INObservable
 {
     bool IsStarted { get; }
     Task Start();

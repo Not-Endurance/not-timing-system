@@ -2,7 +2,7 @@
 
 namespace NTS.Witness.Blazor.Components.Shared;
 
-public class NavMenuBehind : NComponent
+public class NavMenuBehind : NBehind
 {
     [Parameter, EditorRequired]
     public Action OnNavigation { get; set; } = default!;

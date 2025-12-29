@@ -2,9 +2,9 @@
 @using NTS.Domain.Setup.Aggregates
 @using Not.Blazor.Components
 
-@inherits StartlistTabs
+@inherits StartlistBehindBase
 
-@if (Behind.History.Count() != 0)
+@if (Service.History.Count() != 0)
 {
     <NHeadline2 Content="@History_string" IsAbsoluteCenter Class="mb-4" />
     <MudTabs PanelClass="px-4 py-6" Elevation="0" Rounded ApplyEffectsToContainer>

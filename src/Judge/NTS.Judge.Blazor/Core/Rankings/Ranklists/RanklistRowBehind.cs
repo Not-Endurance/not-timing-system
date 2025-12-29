@@ -5,7 +5,7 @@ using NTS.Domain.Objects;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Ranklists;
 
-public class RanklistRowBehind : NComponent
+public class RanklistRowBehind : NBehind
 {
     protected bool Expanded { get; private set; }
     protected PhaseCollection Phases { get; private set; } = default!;

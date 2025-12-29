@@ -4,6 +4,8 @@ namespace NTS.Domain.Objects;
 
 public sealed record Timestamp : IComparable<Timestamp>
 {
+    public static readonly Timestamp DEFAULT = new(new DateTimeOffset());
+
     public static Timestamp Now()
     {
         return new Timestamp(DateTimeOffset.Now);
@@ -67,6 +69,11 @@ public sealed record Timestamp : IComparable<Timestamp>
         return left == null ? null : new Timestamp(left!._stamp + (right ?? TimeSpan.Zero));
     }
 
+    public static Timestamp? operator -(Timestamp? left, TimeSpan? right)
+    {
+        return left == null ? null : new Timestamp(left!._stamp - (right ?? TimeSpan.Zero));
+    }
+
     Timestamp() { }
 
     Timestamp(Timestamp timestamp)
@@ -120,5 +127,10 @@ public sealed record Timestamp : IComparable<Timestamp>
     public DateTime ToDateTime()
     {
         return _stamp.DateTime;
+    }
+
+    public TimeSpan ToTimeSpan()
+    {
+        return _stamp.TimeOfDay;
     }
 }
