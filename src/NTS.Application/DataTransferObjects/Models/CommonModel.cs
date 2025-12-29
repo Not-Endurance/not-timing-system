@@ -165,7 +165,7 @@ public class CommonModel
                 Participations.Select(x => x.ToSetupDomain())
             );
         }
-    } 
+    }
 
     public class PhaseModel
     {
@@ -236,8 +236,9 @@ public class CommonModel
         public double? AveragePhaseSpeed { get; init; }
         public double? AverageSpeed { get; init; }
         public bool IsComplete { get; init; }
+
         // Setup properties
-        public int? Recovery {get; init;}
+        public int? Recovery { get; init; }
         public LoopModel? Loop { get; init; }
 
         public bool CheckCompulsoryTreshold()
@@ -257,9 +258,18 @@ public class CommonModel
             GuardHelper.ThrowIfDefault(MaxRecovery, "MaxRecovery cannot be null when converting to Core Domain");
             GuardHelper.ThrowIfDefault(Ruleset, "Ruleset cannot be null when converting to Core Domain");
             GuardHelper.ThrowIfDefault(IsFinal, "IsFinal cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(IsReinspectionRequested, "IsReinspectionRequested cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(IsRequiredInspectionRequested, "IsRequiredInspectionRequested cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(IsRequiredInspectionCompulsory, "IsRequiredInspectionCompulsory cannot be null when converting to Core Domain");
+            GuardHelper.ThrowIfDefault(
+                IsReinspectionRequested,
+                "IsReinspectionRequested cannot be null when converting to Core Domain"
+            );
+            GuardHelper.ThrowIfDefault(
+                IsRequiredInspectionRequested,
+                "IsRequiredInspectionRequested cannot be null when converting to Core Domain"
+            );
+            GuardHelper.ThrowIfDefault(
+                IsRequiredInspectionCompulsory,
+                "IsRequiredInspectionCompulsory cannot be null when converting to Core Domain"
+            );
             return new Phase(
                 EnsureId(Id),
                 Gate,
@@ -338,16 +348,7 @@ public class CommonModel
             var horse = new Horse(Horse.ToSetupDomain());
             var minSpeed = Speed.Create(MinAverageSpeed);
             var maxSpeed = Speed.Create(MaxAverageSpeed);
-            return new Combination(
-                EnsureId(Id),
-                Number,
-                athlete,
-                horse,
-                athlete.Club,
-                Distance!,
-                minSpeed,
-                maxSpeed
-            );
+            return new Combination(EnsureId(Id), Number, athlete, horse, athlete.Club, Distance!, minSpeed, maxSpeed);
         }
 
         public Domain.Setup.Aggregates.Combination ToSetupDomain()
@@ -428,14 +429,7 @@ public class CommonModel
             var combination = Combination.ToCoreDomain();
             var phases = Phases!.Select(x => x.ToCoreDomain());
             var eliminated = Eliminated?.ToDomain();
-            return new Participation(
-                EnsureId(Id),
-                Category,
-                competition,
-                combination,
-                new(phases),
-                eliminated
-            );
+            return new Participation(EnsureId(Id), Category, competition, combination, new(phases), eliminated);
         }
 
         public Domain.Setup.Aggregates.Participation ToSetupDomain()
