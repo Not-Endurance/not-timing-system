@@ -5,14 +5,14 @@ using NTS.Nexus.HTTP.Mongo;
 
 namespace NTS.Nexus.HTTP.Functions.UpcomingEvents;
 
-public class UpcomingEventRepository : MongoRepository<UpcomingEventDocument>, IUpcomingEventRepository
+public class UpcomingEventRepository : MongoRepository<UpcomingEventModel>, IRepository<UpcomingEventModel>
 {
     public UpcomingEventRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, "upcomingEvents") { }
 
-    protected override UpdateDefinition<UpcomingEventDocument> GetUpdateDefinition(UpcomingEventDocument document)
+    protected override UpdateDefinition<UpcomingEventModel> GetUpdateDefinition(UpcomingEventModel document)
     {
-        return Builders<UpcomingEventDocument> // TODO: use Reflection to build a full update definition by default
+        return Builders<UpcomingEventModel> // TODO: use Reflection to build a full update definition by default
             .Update.Set(x => x.Place, document.Place)
             .Set(x => x.Name, document.Name)
             .Set(x => x.Country, document.Country)
@@ -26,4 +26,4 @@ public class UpcomingEventRepository : MongoRepository<UpcomingEventDocument>, I
     }
 }
 
-public interface IUpcomingEventRepository : IRepository<UpcomingEventDocument> { }
+public interface IUpcomingEventRepository : IRepository<UpcomingEventModel> { }

@@ -66,4 +66,69 @@ public class SetupModel
             return new Club(Id, Name);
         }
     }
+
+    public class LoopModel
+    {
+        public static LoopModel Create(Loop loop)
+        {
+            return new() { Id = loop.Id, Distance = loop.Distance };
+        }
+
+        public int Id { get; init; }
+        public double Distance { get; init; }
+
+        public Loop ToSetupDomain()
+        {
+            return Loop.Update(EnsureId(Id), Distance);
+        }
+    }
+
+    public class UpcomingEventModel : Identity
+    {
+        public static UpcomingEventModel Create(UpcomingEvent @event)
+        {
+            return new UpcomingEventModel
+            {
+                Id = @event.Id,
+                Name = @event.Name,
+                Place = @event.Place,
+                Country = CountryModel.Create(@event.Country),
+                ShowFeiId = @event.ShowFeiId,
+                FeiId = @event.FeiId,
+                FeiEventCode = @event.FeiEventCode,
+                Competitions = @event.Competitions.Select(CompetitionModel.Create).ToArray(),
+                Officials = @event.Officials.Select(OfficialModel.Create).ToArray(),
+                Loops = @event.Loops.Select(LoopModel.Create).ToArray(),
+                Combinations = @event.Combinations.Select(CombinationModel.Create).ToArray(),
+            };
+        }
+
+        public string Place { get; init; } = default!;
+        public CountryModel Country { get; init; } = default!;
+        public string? ShowFeiId { get; init; }
+        public string? FeiId { get; init; }
+        public string? FeiEventCode { get; init; }
+        public CompetitionModel[] Competitions { get; init; } = default!;
+        public OfficialModel[] Officials { get; init; } = default!;
+        public LoopModel[] Loops { get; init; } = default!;
+        public CombinationModel[] Combinations { get; init; } = default!;
+        public string Name { get; init; } = default!;
+
+        public UpcomingEvent ToDomain()
+        {
+            return new UpcomingEvent(
+                Id,
+                Name,
+                Place,
+                Country.ToDomain(),
+                ShowFeiId,
+                FeiId,
+                FeiEventCode,
+                Competitions.Select(x => x.ToSetupDomain()),
+                Officials.Select(x => x.ToSetupDomain()),
+                Loops.Select(x => x.ToSetupDomain()),
+                Combinations.Select(x => x.ToSetupDomain())
+            );
+        }
+    }
 }

@@ -13,6 +13,59 @@ namespace NTS.Application.DataTransferObjects.Models;
 
 public class CommonModel
 {
+    public static int EnsureId(int id)
+    {
+        return id == default ? RandomHelper.GenerateUniqueInteger() : id;
+    }
+
+    public class SettingModel : Identity
+    {
+        public static SettingModel Create(Setting setting)
+        {
+            return new SettingModel
+            {
+                Id = setting.Id,
+                Country = CountryModel.Create(setting.Country),
+                DetectionMode = setting.DetectionMode,
+                AccountId = setting.AccountId.ToString(),
+            };
+        }
+
+        public string AccountId { get; set; } = default!;
+        public CountryModel Country { get; set; } = default!;
+        public DetectionMode? DetectionMode { get; set; }
+
+        public Setting ToDomain()
+        {
+            return new Setting(EnsureId(Id), Guid.Parse(AccountId), Country.ToDomain(), DetectionMode);
+        }
+    }
+
+    public class CountryModel : Identity
+    {
+        public static CountryModel Create(Country country)
+        {
+            return new CountryModel
+            {
+                Id = country.Id,
+                Name = country.Name,
+                IsoCode = country.IsoCode,
+                NfCode = country.NfCode,
+                Locale = country.Locale,
+            };
+        }
+
+        public string Name { get; init; } = default!;
+        public string? IsoCode { get; init; }
+        public string? NfCode { get; init; }
+        public string? Locale { get; init; }
+
+        public Country ToDomain()
+        {
+            return new Country(EnsureId(Id), Name, IsoCode, NfCode, Locale);
+        }
+    }
+
     public class OfficialModel : Identity
     {
         public static OfficialModel Create(Official official)
@@ -40,60 +93,197 @@ public class CommonModel
 
         public Official ToCoreDomain()
         {
-            return new Official(Id, Names, Role);
+            return new Official(EnsureId(Id), Names, Role);
         }
 
         public Domain.Setup.Aggregates.Official ToSetupDomain()
         {
-            return new Domain.Setup.Aggregates.Official(Id, Names, Role);
+            return new Domain.Setup.Aggregates.Official(EnsureId(Id), Names, Role);
         }
     }
 
-    public class CountryModel : Identity
+    public class CompetitionModel
     {
-        public static CountryModel Create(Country country)
+        public static CompetitionModel Create(Competition competition)
         {
-            return new CountryModel
+            return new CompetitionModel
             {
-                Id = country.Id,
-                Name = country.Name,
-                IsoCode = country.IsoCode,
-                NfCode = country.NfCode,
-                Locale = country.Locale,
+                Name = competition.Name,
+                Ruleset = competition.Ruleset,
+                Type = competition.Type,
             };
         }
 
+        public static CompetitionModel Create(Domain.Setup.Aggregates.Competition competition)
+        {
+            return new CompetitionModel
+            {
+                Id = competition.Id,
+                Name = competition.Name,
+                Type = competition.Type,
+                Ruleset = competition.Ruleset,
+                Start = competition.Start,
+                CompulsoryThreshold = competition.CompulsoryThresholdSpan,
+                FeiId = competition.FeiId,
+                FeiRule = competition.FeiRule,
+                FeiScheduleNumber = competition.FeiScheduleNumber,
+                Phases = competition.Phases.Select(PhaseModel.Create).ToArray(),
+                Participations = competition.Participations.Select(ParticipationModel.Create).ToArray(),
+            };
+        }
+
+        public int Id { get; init; }
         public string Name { get; init; } = default!;
-        public string? IsoCode { get; init; }
-        public string? NfCode { get; init; }
-        public string? Locale { get; init; }
+        public CompetitionType Type { get; init; }
+        public CompetitionRuleset Ruleset { get; init; }
+        public DateTimeOffset? Start { get; init; }
+        public TimeSpan? CompulsoryThreshold { get; init; }
+        public string? FeiId { get; init; }
+        public string? FeiRule { get; init; }
+        public string? FeiScheduleNumber { get; init; }
+        public PhaseModel[] Phases { get; init; } = default!;
+        public ParticipationModel[] Participations { get; init; } = default!;
 
-        public Country ToDomain()
+        public Competition ToCoreDomain()
         {
-            return new Country(Id, Name, IsoCode, NfCode, Locale);
+            return new Competition(Name, Ruleset, Type);
         }
-    }
 
-    public class SettingModel : Identity
-    {
-        public static SettingModel Create(Setting setting)
+        public Domain.Setup.Aggregates.Competition ToSetupDomain()
         {
-            return new SettingModel
+            return new Domain.Setup.Aggregates.Competition(
+                EnsureId(Id),
+                Name,
+                Type,
+                Ruleset,
+                Start,
+                CompulsoryThreshold,
+                FeiId,
+                FeiRule,
+                FeiScheduleNumber,
+                Phases.Select(x => x.ToSetupDomain()),
+                Participations.Select(x => x.ToSetupDomain())
+            );
+        }
+    } 
+
+    public class PhaseModel
+    {
+        public static PhaseModel Create(Phase phase)
+        {
+            return new PhaseModel
             {
-                Id = setting.Id,
-                Country = CountryModel.Create(setting.Country),
-                DetectionMode = setting.DetectionMode,
-                AccountId = setting.AccountId.ToString(),
+                Id = phase.Id,
+                Gate = phase.Gate,
+                Length = phase.Length,
+                MaxRecovery = phase.MaxRecovery,
+                Rest = phase.Rest,
+                Ruleset = phase.Ruleset,
+                IsFinal = phase.IsFinal,
+                StartTime = phase.StartTime,
+                ArriveTime = phase.ArriveTime,
+                PresentTime = phase.PresentTime,
+                RepresentTime = phase.RepresentTime,
+                IsReinspectionRequested = phase.IsReinspectionRequested,
+                IsRequiredInspectionRequested =
+                    phase.IsRequiredInspectionRequested || phase.IsRequiredInspectionCompulsory, // TODO: probably remove compulsory altogether
+                IsRequiredInspectionCompulsory = phase.IsRequiredInspectionCompulsory,
+                CompulsoryThresholdInterval = phase.CompulsoryThresholdSpan,
+                RequiredInspectionTime = phase.GetRequiredInspectionTime(),
+                OutTime = phase.GetOutTime(),
+                LoopInterval = phase.GetLoopInterval(),
+                PhaseInterval = phase.GetPhaseInterval(),
+                RecoveryInterval = phase.GetRecoveryInterval(),
+                AverageLoopSpeed = phase.GetAverageLoopSpeed(),
+                AveragePhaseSpeed = phase.GetAveragePhaseSpeed(),
+                AverageSpeed = phase.GetAverageSpeed(),
+                IsComplete = phase.IsComplete(),
             };
         }
 
-        public string AccountId { get; set; } = default!;
-        public CountryModel Country { get; set; } = default!;
-        public DetectionMode? DetectionMode { get; set; }
-
-        public Setting ToDomain()
+        public static PhaseModel Create(Domain.Setup.Aggregates.Phase phase)
         {
-            return new Setting(Id, Guid.Parse(AccountId), Country.ToDomain(), DetectionMode);
+            return new PhaseModel
+            {
+                Id = phase.Id,
+                Loop = LoopModel.Create(phase.Loop!),
+                Recovery = phase.Recovery,
+                Rest = phase.Rest,
+            };
+        }
+
+        public int Id { get; init; }
+        public string? Gate { get; init; } = default!;
+        public double? Length { get; init; }
+        public int? MaxRecovery { get; init; }
+        public int? Rest { get; init; }
+        public CompetitionRuleset? Ruleset { get; init; }
+        public bool? IsFinal { get; init; }
+        public DateTimeOffset? StartTime { get; init; }
+        public DateTimeOffset? ArriveTime { get; init; }
+        public DateTimeOffset? PresentTime { get; init; }
+        public DateTimeOffset? RepresentTime { get; init; }
+        public bool? IsReinspectionRequested { get; init; }
+        public bool? IsRequiredInspectionRequested { get; init; }
+        public bool? IsRequiredInspectionCompulsory { get; init; }
+        public DateTimeOffset? RequiredInspectionTime { get; init; }
+        public DateTimeOffset? OutTime { get; init; }
+        public TimeSpan? LoopInterval { get; init; }
+        public TimeSpan? PhaseInterval { get; init; }
+        public TimeSpan? RecoveryInterval { get; init; }
+        public TimeSpan? CompulsoryThresholdInterval { get; init; } = TimeSpan.FromMinutes(10);
+        public double? AverageLoopSpeed { get; init; }
+        public double? AveragePhaseSpeed { get; init; }
+        public double? AverageSpeed { get; init; }
+        public bool IsComplete { get; init; }
+        // Setup properties
+        public int? Recovery {get; init;}
+        public LoopModel? Loop { get; init; }
+
+        public bool CheckCompulsoryTreshold()
+        {
+            GuardHelper.ThrowIfDefault(IsFinal);
+            if (CompulsoryThresholdInterval == null || (bool)IsFinal)
+            {
+                return false;
+            }
+            return RecoveryInterval >= CompulsoryThresholdInterval;
+        }
+
+        public Phase ToCoreDomain()
+        {
+            GuardHelper.ThrowIfDefault(Gate, " Gate cannot be null when converting to Core Domain");
+            GuardHelper.ThrowIfDefault(Length, "Length cannot be null when converting to Core Domain");
+            GuardHelper.ThrowIfDefault(MaxRecovery, "MaxRecovery cannot be null when converting to Core Domain");
+            GuardHelper.ThrowIfDefault(Ruleset, "Ruleset cannot be null when converting to Core Domain");
+            GuardHelper.ThrowIfDefault(IsFinal, "IsFinal cannot be null when converting to Core Domain");
+            GuardHelper.ThrowIfDefault(IsReinspectionRequested, "IsReinspectionRequested cannot be null when converting to Core Domain");
+            GuardHelper.ThrowIfDefault(IsRequiredInspectionRequested, "IsRequiredInspectionRequested cannot be null when converting to Core Domain");
+            GuardHelper.ThrowIfDefault(IsRequiredInspectionCompulsory, "IsRequiredInspectionCompulsory cannot be null when converting to Core Domain");
+            return new Phase(
+                EnsureId(Id),
+                Gate,
+                (double)Length,
+                (int)MaxRecovery,
+                Rest,
+                (CompetitionRuleset)Ruleset,
+                (bool)IsFinal,
+                CompulsoryThresholdInterval,
+                StartTime,
+                ArriveTime,
+                PresentTime,
+                RepresentTime,
+                (bool)IsReinspectionRequested,
+                (bool)IsRequiredInspectionRequested,
+                (bool)IsRequiredInspectionCompulsory
+            );
+        }
+
+        public Domain.Setup.Aggregates.Phase ToSetupDomain()
+        {
+            GuardHelper.ThrowIfDefault(Loop, "Loop cannot be null when converting to Setup Domain");
+            var loop = Loop.ToSetupDomain();
+            return new Domain.Setup.Aggregates.Phase(EnsureId(Id), loop, Recovery, Rest);
         }
     }
 
@@ -103,6 +293,7 @@ public class CommonModel
         {
             return new CombinationModel
             {
+                Id = combination.Id,
                 Number = combination.Number,
                 Distance = combination.Distance,
                 MinAverageSpeed = combination.MinAverageSpeed,
@@ -116,12 +307,14 @@ public class CommonModel
         {
             return new CombinationModel
             {
+                Id = combination.Id,
                 Number = combination.Number,
                 Athlete = AthleteModel.Create(combination.Athlete),
                 Horse = HorseModel.Create(combination.Horse),
             };
         }
 
+        public int Id { get; init; }
         public int Number { get; init; }
         public string? Distance { get; init; }
         public double? MinAverageSpeed { get; init; }
@@ -146,7 +339,7 @@ public class CommonModel
             var minSpeed = Speed.Create(MinAverageSpeed);
             var maxSpeed = Speed.Create(MaxAverageSpeed);
             return new Combination(
-                RandomHelper.GenerateUniqueInteger(),
+                EnsureId(Id),
                 Number,
                 athlete,
                 horse,
@@ -162,13 +355,17 @@ public class CommonModel
             var athlete = Athlete.ToSetupDomain();
             var horse = Horse.ToSetupDomain();
             return new Domain.Setup.Aggregates.Combination(
-                RandomHelper.GenerateUniqueInteger(),
+                EnsureId(Id),
                 Number,
                 athlete,
                 horse,
                 null // Tag prop is not used currently
             );
         }
+        //    public Combination ToSetupDomain()
+        //    {
+        //        return Combination.Update(EnsureId(Id), Number, Athlete.ToSetupDomain(), Horse.ToSetupDomain(), null);
+        //    }
     }
 
     public class ParticipationModel
@@ -179,6 +376,7 @@ public class CommonModel
 
             return new ParticipationModel
             {
+                Id = participation.Id,
                 Category = participation.Category,
                 Competition = CompetitionModel.Create(participation.Competition),
                 Combination = CombinationModel.Create(participation.Combination),
@@ -192,6 +390,7 @@ public class CommonModel
         {
             return new ParticipationModel
             {
+                Id = participation.Id,
                 IsNotRanked = participation.IsNotRanked,
                 Category = participation.Category,
                 Combination = CombinationModel.Create(participation.Combination),
@@ -203,6 +402,7 @@ public class CommonModel
             };
         }
 
+        public int Id { get; init; }
         public ParticipationCategory Category { get; init; } = default!;
         public CompetitionModel? Competition { get; init; }
         public CombinationModel Combination { get; init; } = default!;
@@ -224,12 +424,12 @@ public class CommonModel
             {
                 GuardHelper.Exception("Phases cannot be null or empty when converting to Core Domain");
             }
-            var competition = Competition!.ToDomain();
+            var competition = Competition!.ToCoreDomain();
             var combination = Combination.ToCoreDomain();
-            var phases = Phases!.Select(x => x.ToDomain());
+            var phases = Phases!.Select(x => x.ToCoreDomain());
             var eliminated = Eliminated?.ToDomain();
             return new Participation(
-                RandomHelper.GenerateUniqueInteger(),
+                EnsureId(Id),
                 Category,
                 competition,
                 combination,
@@ -243,7 +443,7 @@ public class CommonModel
             GuardHelper.ThrowIfDefault(IsNotRanked, "IsNotRanked cannot be null when converting to Setup Domain");
             var combination = Combination.ToSetupDomain();
             return new Domain.Setup.Aggregates.Participation(
-                RandomHelper.GenerateUniqueInteger(),
+                EnsureId(Id),
                 (bool)IsNotRanked,
                 combination,
                 Category,
