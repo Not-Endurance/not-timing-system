@@ -1,8 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using AngleSharp.Common;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;

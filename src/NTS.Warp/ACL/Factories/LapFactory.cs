@@ -1,5 +1,4 @@
-﻿using Not.Extensions;
-using NTS.Warp.ACL.Entities.Laps;
+﻿using NTS.Warp.ACL.Entities.Laps;
 using NTS.Warp.ACL.Models;
 
 namespace NTS.Warp.ACL.Factories;
