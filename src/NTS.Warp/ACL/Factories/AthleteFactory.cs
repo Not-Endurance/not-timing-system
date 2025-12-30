@@ -13,7 +13,7 @@ public class AthleteFactory
         var athleteState = new EmsAthleteState
         {
             Category = EmsCategory.Seniors, //TODO: after athlete
-            Club = athlete.Club.Name,
+            Club = athlete.Club?.Name,
             FeiId = athlete.FeiId, //TODO: after athlete
             FirstName = athlete.Names.ElementAtOrDefault(0),
             LastName = athlete.Names.ElementAtOrDefault(1),
