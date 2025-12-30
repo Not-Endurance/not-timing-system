@@ -20,23 +20,27 @@ public class ParticipationFactory
         };
         var emsParticipant = new EmsParticipant(athlete, horse, state);
         var emsLaps = LapFactory.Create(participation.Phases).ToList();
-        for (var i = 0; i < participation.Phases.Length; i++)
+        if(participation.Phases != null && participation.Phases.Length > 0)
         {
-            var phase = participation.Phases[i];
-            var emsLap = emsLaps[i];
-            if (phase.StartTime == null)
+            for (var i = 0; i < participation.Phases.Length; i++)
             {
-                break;
+                var phase = participation.Phases[i];
+                var emsLap = emsLaps[i];
+                if (phase.StartTime == null)
+                {
+                    break;
+                }
+                var emsRecord = new EmsLapRecord(phase.StartTime.Value, emsLap)
+                {
+                    StartTime = phase.StartTime.Value,
+                    ArrivalTime = phase.ArriveTime,
+                    InspectionTime = phase.PresentTime,
+                    ReInspectionTime = phase.RepresentTime,
+                };
+                emsParticipant.Add(emsRecord);
             }
-            var emsRecord = new EmsLapRecord(phase.StartTime.Value, emsLap)
-            {
-                StartTime = phase.StartTime.Value,
-                ArrivalTime = phase.ArriveTime,
-                InspectionTime = phase.PresentTime,
-                ReInspectionTime = phase.RepresentTime,
-            };
-            emsParticipant.Add(emsRecord);
         }
+
         var competition = CompetitionFactory.Create(participation);
 
         return new EmsParticipation(emsParticipant, competition);

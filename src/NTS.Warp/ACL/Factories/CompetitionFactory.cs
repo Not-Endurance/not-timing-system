@@ -9,6 +9,16 @@ public class CompetitionFactory
 {
     public static EmsCompetition Create(ParticipationModel participation)
     {
+        if(participation.Competition == null)
+        {
+           var emptyState = new EmsCompetitionState
+            {
+                Id = DomainModelHelper.GenerateId(),
+                Name = "Unknown Competition",
+                Type = EmsCompetitionType.National,
+            };
+            return new EmsCompetition(emptyState);
+        }
         var laps = LapFactory.Create(participation.Phases);
         var state = new EmsCompetitionState
         {

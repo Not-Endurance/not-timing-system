@@ -8,6 +8,10 @@ public class LapFactory
 {
     public static IEnumerable<EmsLap> Create(PhaseModel[] phases)
     {
+        if (phases == null ||  phases.Length == 0 )
+        {
+            yield break;
+        }
         var i = 0;
         foreach (var phase in phases)
         {
