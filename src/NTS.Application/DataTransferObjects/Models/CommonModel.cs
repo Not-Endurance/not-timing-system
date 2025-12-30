@@ -13,6 +13,9 @@ namespace NTS.Application.DataTransferObjects.Models;
 
 public class CommonModel
 {
+    const string SETUP_NULL_ERROR_MESSAGE = " cannot be null when converting to Setup Domain";
+    const string CORE_NULL_ERROR_MESSAGE = " cannot be null when converting to Core Domain";
+
     public static int EnsureId(int id)
     {
         return id == default ? RandomHelper.GenerateUniqueInteger() : id;
@@ -253,23 +256,14 @@ public class CommonModel
 
         public Phase ToCoreDomain()
         {
-            GuardHelper.ThrowIfDefault(Gate, " Gate cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(Length, "Length cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(MaxRecovery, "MaxRecovery cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(Ruleset, "Ruleset cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(IsFinal, "IsFinal cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(
-                IsReinspectionRequested,
-                "IsReinspectionRequested cannot be null when converting to Core Domain"
-            );
-            GuardHelper.ThrowIfDefault(
-                IsRequiredInspectionRequested,
-                "IsRequiredInspectionRequested cannot be null when converting to Core Domain"
-            );
-            GuardHelper.ThrowIfDefault(
-                IsRequiredInspectionCompulsory,
-                "IsRequiredInspectionCompulsory cannot be null when converting to Core Domain"
-            );
+            GuardHelper.ThrowIfDefault(Gate, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(Length, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(MaxRecovery, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(Ruleset, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(IsFinal, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(IsReinspectionRequested, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(IsRequiredInspectionRequested, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(IsRequiredInspectionCompulsory, CORE_NULL_ERROR_MESSAGE);
             return new Phase(
                 EnsureId(Id),
                 Gate,
@@ -291,7 +285,7 @@ public class CommonModel
 
         public Domain.Setup.Aggregates.Phase ToSetupDomain()
         {
-            GuardHelper.ThrowIfDefault(Loop, "Loop cannot be null when converting to Setup Domain");
+            GuardHelper.ThrowIfDefault(Loop, SETUP_NULL_ERROR_MESSAGE);
             var loop = Loop.ToSetupDomain();
             return new Domain.Setup.Aggregates.Phase(EnsureId(Id), loop, Recovery, Rest);
         }
@@ -334,15 +328,9 @@ public class CommonModel
 
         public Combination ToCoreDomain()
         {
-            GuardHelper.ThrowIfDefault(Distance, "Distance cannot be null when converting to Core Domain");
-            GuardHelper.ThrowIfDefault(
-                MinAverageSpeed,
-                "MinAverageSpeed cannot be null when converting to Core Domain"
-            );
-            GuardHelper.ThrowIfDefault(
-                MaxAverageSpeed,
-                "MaxAverageSpeed cannot be null when converting to Core Domain"
-            );
+            GuardHelper.ThrowIfDefault(Distance, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(MinAverageSpeed, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(MaxAverageSpeed, CORE_NULL_ERROR_MESSAGE);
 
             var athlete = new Athlete(Athlete.ToSetupDomain());
             var horse = new Horse(Horse.ToSetupDomain());
@@ -363,10 +351,6 @@ public class CommonModel
                 null // Tag prop is not used currently
             );
         }
-        //    public Combination ToSetupDomain()
-        //    {
-        //        return Combination.Update(EnsureId(Id), Number, Athlete.ToSetupDomain(), Horse.ToSetupDomain(), null);
-        //    }
     }
 
     public class ParticipationModel
@@ -420,11 +404,9 @@ public class CommonModel
 
         public Participation ToCoreDomain()
         {
-            GuardHelper.ThrowIfDefault(Competition, "Competition cannot be null when converting to Core Domain");
-            if (Phases == null || Phases.Length == 0)
-            {
-                GuardHelper.Exception("Phases cannot be null or empty when converting to Core Domain");
-            }
+            GuardHelper.ThrowIfDefault(Competition, CORE_NULL_ERROR_MESSAGE);
+            GuardHelper.ThrowIfDefault(Phases, CORE_NULL_ERROR_MESSAGE);
+
             var competition = Competition!.ToCoreDomain();
             var combination = Combination.ToCoreDomain();
             var phases = Phases!.Select(x => x.ToCoreDomain());
@@ -434,7 +416,7 @@ public class CommonModel
 
         public Domain.Setup.Aggregates.Participation ToSetupDomain()
         {
-            GuardHelper.ThrowIfDefault(IsNotRanked, "IsNotRanked cannot be null when converting to Setup Domain");
+            GuardHelper.ThrowIfDefault(IsNotRanked, SETUP_NULL_ERROR_MESSAGE);
             var combination = Combination.ToSetupDomain();
             return new Domain.Setup.Aggregates.Participation(
                 EnsureId(Id),
