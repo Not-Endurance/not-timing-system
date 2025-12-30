@@ -25,5 +25,3 @@ public class UpcomingEventRepository : MongoRepository<UpcomingEventModel>, IRep
             .Set(x => x.Combinations, document.Combinations);
     }
 }
-
-public interface IUpcomingEventRepository : IRepository<UpcomingEventModel> { }
