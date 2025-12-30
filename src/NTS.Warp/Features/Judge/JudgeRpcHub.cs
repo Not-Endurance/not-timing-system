@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using NTS.Application.RPC;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Warp.ACL.Entities;
@@ -8,7 +7,6 @@ using NTS.Warp.ACL.Entities.Participations;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Factories;
 using NTS.Warp.ACL.RPC.Procedures;
-using NTS.Warp.Features.Judge.Models;
 using NTS.Warp.Features.Judge.Procedures;
 using NTS.Warp.Features.Witness;
 

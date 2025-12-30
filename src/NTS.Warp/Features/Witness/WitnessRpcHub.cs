@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.SignalR;
 using Not.Concurrency.Extensions;
+using Not.Notify;
 using NTS.Warp.ACL.Entities;
 using NTS.Warp.ACL.Factories;
 using NTS.Warp.ACL.RPC.Procedures;
@@ -81,17 +82,17 @@ internal class WitnessRpcHub
         await judgeClient.ProcessSnapshots(snapshots);
     }
 
-    bool TryGetJudgeClient(string enduranceEventId, [NotNullWhen(true)] out IJudgeClientProcedures? judeClient)
+    bool TryGetJudgeClient(string enduranceEventId, [NotNullWhen(true)] out IJudgeClientProcedures? judgeClient)
     {
         var identifier = enduranceEventId.ToString();
         var connectionId = _primaryConnections.GetConnectionId(identifier);
         if (connectionId == null)
         {
-            judeClient = null;
+            judgeClient = null;
             return false;
         }
 
-        judeClient = _judgeRelay.Clients.Client(connectionId);
+        judgeClient = _judgeRelay.Clients.Client(connectionId);
         return true;
     }
 }
