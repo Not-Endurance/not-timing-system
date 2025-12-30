@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Not.Application.CRUD.Ports;
 using Not.Serialization.JSON;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Logger;
@@ -9,10 +10,10 @@ namespace NTS.Nexus.HTTP.Functions.UpcomingEvents;
 
 public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
 {
-    readonly IUpcomingEventRepository _upcomingEventRepository;
+    readonly IRepository<UpcomingEventModel> _upcomingEventRepository;
 
     public UpcomingEventFunctions(
-        IUpcomingEventRepository upcomingEventRepository,
+        IRepository<UpcomingEventModel> upcomingEventRepository,
         IFunctionLogger<UpcomingEventFunctions> logger
     )
         : base(logger)
