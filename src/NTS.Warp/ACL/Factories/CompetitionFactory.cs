@@ -9,9 +9,9 @@ public class CompetitionFactory
 {
     public static EmsCompetition Create(ParticipationModel participation)
     {
-        if(participation.Competition == null)
+        if (participation.Competition == null)
         {
-           var emptyState = new EmsCompetitionState
+            var emptyState = new EmsCompetitionState
             {
                 Id = DomainModelHelper.GenerateId(),
                 Name = "Unknown Competition",

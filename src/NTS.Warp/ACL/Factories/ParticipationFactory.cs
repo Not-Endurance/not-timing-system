@@ -20,7 +20,7 @@ public class ParticipationFactory
         };
         var emsParticipant = new EmsParticipant(athlete, horse, state);
         var emsLaps = LapFactory.Create(participation.Phases).ToList();
-        if(participation.Phases != null && participation.Phases.Length > 0)
+        if (participation.Phases != null && participation.Phases.Length > 0)
         {
             for (var i = 0; i < participation.Phases.Length; i++)
             {

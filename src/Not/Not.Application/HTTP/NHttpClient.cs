@@ -37,7 +37,7 @@ public class NHttpClient
             if (ex is HttpRequestException { StatusCode: HttpStatusCode.NotFound })
             {
 #if DEBUG
-                NotifyHelper.Warn(ex.Message +$"{endpoint}"); // TODO: probably return result instead and let consumer decide
+                NotifyHelper.Warn(ex.Message + $"{endpoint}"); // TODO: probably return result instead and let consumer decide
 #else
                 NotifyHelper.Warn($"The requested resource at {endpoint} was not found. Please contact system admin.");
 #endif

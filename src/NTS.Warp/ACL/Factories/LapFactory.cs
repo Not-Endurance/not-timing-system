@@ -8,7 +8,7 @@ public class LapFactory
 {
     public static IEnumerable<EmsLap> Create(PhaseModel[] phases)
     {
-        if (phases == null ||  phases.Length == 0 )
+        if (phases == null || phases.Length == 0)
         {
             yield break;
         }

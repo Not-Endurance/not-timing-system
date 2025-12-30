@@ -35,7 +35,9 @@ public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
 #if DEBUG
             NotifyHelper.Warn(ex.Message);
 #else
-            NotifyHelper.Warn(Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection);
+            NotifyHelper.Warn(
+                Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
+            );
 #endif
         }
         else
