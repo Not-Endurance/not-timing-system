@@ -17,7 +17,7 @@ public class LapFactory
         {
             var state = new EmsLapState
             {
-                Id = DomainModelHelper.GenerateId(),
+                Id = phase.Id,
                 IsFinal = phases.Last() == phase,
                 IsCompulsoryInspectionRequired = (bool)phase.IsRequiredInspectionCompulsory!,
                 LengthInKm = (double)phase.Length!,

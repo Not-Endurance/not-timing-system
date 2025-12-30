@@ -22,7 +22,7 @@ public class CompetitionFactory
         var laps = LapFactory.Create(participation.Phases);
         var state = new EmsCompetitionState
         {
-            Id = DomainModelHelper.GenerateId(),
+            Id = participation.Competition.Id,
             Name = participation.Competition.Name,
             Type = MapEmsCompetitionType(participation.Competition.Ruleset),
         };
