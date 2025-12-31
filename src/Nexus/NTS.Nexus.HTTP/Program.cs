@@ -8,7 +8,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using Not.Injection;
-using NTS.Application.DataTransferObjects;
+using NTS.Application.Models;
 using NTS.Nexus.HTTP.Mongo;
 
 var connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING");
@@ -22,7 +22,7 @@ builder.Services.AddNConventionalServices(Assembly.GetExecutingAssembly());
 
 builder.Services.AddApplicationInsightsTelemetryWorkerService().ConfigureFunctionsApplicationInsights();
 
-BsonClassMap.RegisterClassMap<Identity>(x =>
+BsonClassMap.RegisterClassMap<Document>(x =>
 {
     x.AutoMap();
     x.MapIdField(x => x.Id);

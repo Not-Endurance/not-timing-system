@@ -1,4 +1,5 @@
-﻿using NTS.Domain.Enums;
+﻿using NTS.Application.Models;
+using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Athletes;
 using NTS.Warp.ACL.Entities.Countries;
 using NTS.Warp.ACL.Enums;

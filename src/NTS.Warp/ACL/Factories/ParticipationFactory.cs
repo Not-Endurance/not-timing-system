@@ -1,4 +1,5 @@
-﻿using NTS.Warp.ACL.Entities.LapRecords;
+﻿using NTS.Application.Models;
+using NTS.Warp.ACL.Entities.LapRecords;
 using NTS.Warp.ACL.Entities.Participants;
 using NTS.Warp.ACL.Entities.Participations;
 using NTS.Warp.ACL.Models;
@@ -7,7 +8,7 @@ namespace NTS.Warp.ACL.Factories;
 
 public class ParticipationFactory
 {
-    public static EmsParticipation CreateEms(ParticipationModel participation)
+    public static EmsParticipation CreateEms(CoreParticipationModel participation)
     {
         var athlete = AthleteFactory.Create(participation.Combination.Athlete);
         var horse = HorseFactory.Create(participation.Combination.Horse);

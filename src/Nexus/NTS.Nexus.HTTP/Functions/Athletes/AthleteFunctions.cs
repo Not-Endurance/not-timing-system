@@ -35,7 +35,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = AthleteModel.Create(athlete);
+        var document = AthleteModel.MapFrom(athlete);
         await _athletes.Create(document);
 
         return new OkObjectResult($"Inserted {athlete}");
@@ -50,7 +50,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = AthleteModel.Create(athlete);
+        var document = AthleteModel.MapFrom(athlete);
         await _athletes.Update(document);
 
         return new OkObjectResult($"Updated {athlete}");
@@ -98,7 +98,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
     {
         LogInformation(request);
         var athlete = await _athletes.Read(id);
-        return new OkObjectResult(athlete?.ToSetupDomain());
+        return new OkObjectResult(athlete?.MapToDomain());
     }
 
     [Function("athletes-list")]
@@ -109,7 +109,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         LogInformation(request);
 
         // TODO: Implement response mapping layer for documents back to aggregates
-        var athletes = await _athletes.ReadAll().Select(x => x.ToSetupDomain());
+        var athletes = await _athletes.ReadAll().Select(x => x.MapToDomain());
         return new OkObjectResult(athletes);
     }
 }

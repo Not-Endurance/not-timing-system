@@ -1,4 +1,5 @@
-﻿using NTS.Warp.ACL.Entities.Horses;
+﻿using NTS.Application.Models;
+using NTS.Warp.ACL.Entities.Horses;
 using NTS.Warp.ACL.Models;
 
 namespace NTS.Warp.ACL.Factories;

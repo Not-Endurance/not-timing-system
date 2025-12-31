@@ -1,4 +1,5 @@
 ﻿using Not.Blazor.Ports;
+using NTS.Application.Models;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Blazor.Nexus;

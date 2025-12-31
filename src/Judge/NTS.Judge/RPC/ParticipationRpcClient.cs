@@ -3,6 +3,7 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Async;
+using NTS.Application.Models;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
 using NTS.Judge.Core;
@@ -17,15 +18,15 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     readonly IEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IRead<Domain.Core.Aggregates.Participation> _coreParticipations;
-    readonly IRead<Domain.Setup.Aggregates.Participation> _setupParticipations;
+    //readonly IRead<Domain.Setup.Aggregates.Participation> _setupParticipations;
     readonly HubProcedures _hubProcedures;
 
     public ParticipationRpcClient(
         IEventContext eventContext,
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
-        IRead<Domain.Core.Aggregates.Participation> coreParticipations,
-        IRead<Domain.Setup.Aggregates.Participation> setupParticipations
+        IRead<Domain.Core.Aggregates.Participation> coreParticipations
+        //IRead<Domain.Setup.Aggregates.Participation> setupParticipations
     )
         : base(socket)
     {
@@ -33,7 +34,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         _eventContext = eventContext;
         _snapshotProcessor = snapshotProcessor;
         _coreParticipations = coreParticipations;
-        _setupParticipations = setupParticipations;
+        //_setupParticipations = setupParticipations;
     }
 
     public override void RunAtStartup()
@@ -58,18 +59,15 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     /// Fetches active participations before and after Competitions are started.
     /// </summary>
     /// <returns>Collection of active (not eliminated or completed) participations</returns>
-    public async Task<IEnumerable<ParticipationModel>> GetActiveParticipations()
+    public async Task<IEnumerable<CoreParticipationModel>> GetActiveParticipations()
     {
         var coreParticipations = await _coreParticipations
             .ReadAll(x => !x.IsComplete() && !x.IsEliminated())
-            .Select(ParticipationModel.Create);
-        if (coreParticipations.Any())
-        {
+            .Select(CoreParticipationModel.MapFrom);
             return coreParticipations;
-        }
-
-        var participations = await _setupParticipations.ReadAll();
-        return participations.Select(ParticipationModel.Create);
+        //move this logic to a new GetConfiguredParticipations after Witness implementation
+        //var participations = await _setupParticipations.ReadAll();
+        //return participations.Select(SetupParticipationModel.MapFrom);
     }
 
     public async Task OnParticipationEliminated(ParticipationEliminated eliminated)

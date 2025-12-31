@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Domain;
-using NTS.Application.DataTransferObjects;
+using NTS.Application.Models;
 
 namespace NTS.Nexus.HTTP.Mongo;
 
 public abstract class MongoRepository<T> : IRepository<T>
-    where T : Identity, IAggregateRoot
+    where T : Document, IAggregateRoot
 {
     readonly IMongoContext _context;
     readonly string _db;

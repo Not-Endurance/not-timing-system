@@ -1,6 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Injection;
+using NTS.Application.Models;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Nexus.Repositories;

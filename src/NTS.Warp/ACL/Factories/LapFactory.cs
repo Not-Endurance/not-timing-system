@@ -1,11 +1,12 @@
-﻿using NTS.Warp.ACL.Entities.Laps;
+﻿using NTS.Application.Models;
+using NTS.Warp.ACL.Entities.Laps;
 using NTS.Warp.ACL.Models;
 
 namespace NTS.Warp.ACL.Factories;
 
 public class LapFactory
 {
-    public static IEnumerable<EmsLap> Create(PhaseModel[] phases)
+    public static IEnumerable<EmsLap> Create(CorePhaseModel[] phases)
     {
         if (phases == null || phases.Length == 0)
         {
