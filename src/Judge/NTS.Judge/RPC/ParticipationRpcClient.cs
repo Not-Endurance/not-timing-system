@@ -18,8 +18,6 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     readonly IEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IRead<Domain.Core.Aggregates.Participation> _coreParticipations;
-
-    //readonly IRead<Domain.Setup.Aggregates.Participation> _setupParticipations;
     readonly HubProcedures _hubProcedures;
 
     public ParticipationRpcClient(
@@ -27,7 +25,6 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
         IRead<Domain.Core.Aggregates.Participation> coreParticipations
-    //IRead<Domain.Setup.Aggregates.Participation> setupParticipations
     )
         : base(socket)
     {
@@ -35,7 +32,6 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         _eventContext = eventContext;
         _snapshotProcessor = snapshotProcessor;
         _coreParticipations = coreParticipations;
-        //_setupParticipations = setupParticipations;
     }
 
     public override void RunAtStartup()
