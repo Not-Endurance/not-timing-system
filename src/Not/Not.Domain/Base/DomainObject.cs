@@ -1,4 +1,4 @@
-using Not.Extensions;
+using Not.DomainUtils;
 
 namespace Not.Domain.Base;
 
@@ -7,6 +7,6 @@ public abstract record DomainObject
 {
     protected string Combine(params object?[] values)
     {
-        return DomainModelHelper.Combine(values);
+        return DomainHelper.Combine(values);
     }
 }

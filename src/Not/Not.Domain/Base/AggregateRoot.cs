@@ -1,8 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using Not.Domain.Exceptions;
-using Not.Extensions;
+using Not.DomainUtils;
 using Not.Structures;
 using static Not.Localization.NStrings;
 
@@ -31,12 +30,12 @@ public abstract class AggregateRoot : IEquatable<AggregateRoot>, IAggregateRoot
 
     protected static string Combine(params object?[] values)
     {
-        return DomainModelHelper.Combine(values);
+        return DomainHelper.Combine(values);
     }
 
     protected static int GenerateId()
     {
-        return DomainModelHelper.GenerateId();
+        return DomainHelper.GenerateId();
     }
 
     protected static T NotDefault<T>(string field, T value)
