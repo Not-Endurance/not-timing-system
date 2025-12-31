@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Serialization.JSON;
+using NTS.Application.Models;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Logger;
 
@@ -30,7 +31,7 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
-        var document = UpcomingEventModel.Create(upcomingEvent);
+        var document = UpcomingEventModel.MapFrom(upcomingEvent);
         await _upcomingEventRepository.Create(document);
 
         return new OkObjectResult($"Upcoming event {upcomingEvent.Place} stored successfully.");
@@ -44,7 +45,7 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
         LogInformation(request);
 
         var documents = await _upcomingEventRepository.ReadAll();
-        var result = documents.Select(x => x.ToDomain());
+        var result = documents.Select(x => x.MapToDomain());
         return new OkObjectResult(result);
     }
 
@@ -62,7 +63,7 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
             return new NotFoundResult();
         }
 
-        return new OkObjectResult(document.ToDomain());
+        return new OkObjectResult(document.MapToDomain());
     }
 
     [Function("upcoming-event-update")]
@@ -74,7 +75,7 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
-        var document = UpcomingEventModel.Create(upcomingEvent);
+        var document = UpcomingEventModel.MapFrom(upcomingEvent);
         await _upcomingEventRepository.Update(document);
 
         return new OkObjectResult($"Updated upcoming event {upcomingEvent.Place}");

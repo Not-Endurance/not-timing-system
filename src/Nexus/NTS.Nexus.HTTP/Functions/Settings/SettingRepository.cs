@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using NTS.Application.Models;
 using NTS.Nexus.HTTP.Mongo;
 
 namespace NTS.Nexus.HTTP.Functions.Settings;

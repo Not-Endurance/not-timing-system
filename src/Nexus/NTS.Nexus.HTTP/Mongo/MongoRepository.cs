@@ -10,7 +10,7 @@ using NTS.Application.Models;
 namespace NTS.Nexus.HTTP.Mongo;
 
 public abstract class MongoRepository<T> : IRepository<T>
-    where T : Document, IAggregateRoot
+    where T : IDocument, IAggregateRoot
 {
     readonly IMongoContext _context;
     readonly string _db;

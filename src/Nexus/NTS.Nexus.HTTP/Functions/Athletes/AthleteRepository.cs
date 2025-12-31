@@ -1,17 +1,18 @@
 ﻿using MongoDB.Driver;
+using NTS.Application.Models;
 using NTS.Application.Mongo;
 using NTS.Nexus.HTTP.Mongo;
 
 namespace NTS.Nexus.HTTP.Functions.Athletes;
 
-public class AthleteRepository : MongoRepository<AthleteModel>
+public class AthleteRepository : MongoRepository<SetupAthleteModel>
 {
     public AthleteRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ATHLETES_COLLECTION) { }
 
-    protected override UpdateDefinition<AthleteModel> GetUpdateDefinition(AthleteModel document)
+    protected override UpdateDefinition<SetupAthleteModel> GetUpdateDefinition(SetupAthleteModel document)
     {
-        return Builders<AthleteModel>
+        return Builders<SetupAthleteModel>
             .Update.Set(x => x.Names, document.Names)
             .Set(x => x.Club, document.Club)
             .Set(x => x.Country, document.Country)

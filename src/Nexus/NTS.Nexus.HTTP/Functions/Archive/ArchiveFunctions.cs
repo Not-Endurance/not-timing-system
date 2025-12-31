@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Serialization.JSON;
+using NTS.Application.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Nexus.HTTP.Logger;
 
@@ -26,7 +27,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var entry = requestBody.FromJson<ArchiveEntry>();
-        var document = ArchiveModel.Create(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
+        var document = ArchiveModel.MapFrom(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
 
         if (await _archive.Read(entry.Id) != null) // TODO: investigate this not working
         {

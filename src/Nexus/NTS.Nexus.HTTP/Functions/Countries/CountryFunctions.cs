@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Serialization.JSON;
+using NTS.Application.Models;
 using NTS.Domain.Aggregates;
 using NTS.Nexus.HTTP.Logger;
 

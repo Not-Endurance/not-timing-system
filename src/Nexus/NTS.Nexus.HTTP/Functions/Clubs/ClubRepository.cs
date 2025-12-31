@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using NTS.Application.Models;
 using NTS.Application.Mongo;
 using NTS.Nexus.HTTP.Mongo;
 
