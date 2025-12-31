@@ -1,6 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Serialization.JSON;
+using NTS.Application.Models;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.HTTP;
@@ -22,7 +23,7 @@ public class ArchiveHttpRepository : HttpRepository<ArchiveEntry>, IArchiveRepos
         {
             return [];
         }
-        return contents.FromJson<IEnumerable<ArchiveModel>>().Select(x => x.ToDomain());
+        return contents.FromJson<IEnumerable<ArchiveModel>>().Select(x => x.MapToDomain());
     }
 
     public async Task<ArchiveEntry?> GetEntry(int id)
@@ -34,7 +35,7 @@ public class ArchiveHttpRepository : HttpRepository<ArchiveEntry>, IArchiveRepos
         }
         var documents = contents.FromJson<IEnumerable<ArchiveModel>>();
         var document = documents.FirstOrDefault(x => x.Id == id);
-        return document?.ToDomain();
+        return document?.MapToDomain();
     }
 }
 
