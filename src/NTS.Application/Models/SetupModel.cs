@@ -51,7 +51,7 @@ public class SetupCombinationModel
         var athlete = Athlete.MapToDomain();
         //intermediate horse will be removed after merge with codex/design-rpc-methods-for-nts.witness
         var intermediateHorse = Horse.MaptoDomain();
-        var horse = new Horse(intermediateHorse.Id,intermediateHorse.Name,intermediateHorse.FeiId);
+        var horse = new Horse(intermediateHorse.Id, intermediateHorse.Name, intermediateHorse.FeiId);
         return new Combination(
             DomainHelper.EnsureId(Id),
             Number,

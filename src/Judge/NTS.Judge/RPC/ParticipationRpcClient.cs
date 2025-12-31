@@ -18,6 +18,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     readonly IEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IRead<Domain.Core.Aggregates.Participation> _coreParticipations;
+
     //readonly IRead<Domain.Setup.Aggregates.Participation> _setupParticipations;
     readonly HubProcedures _hubProcedures;
 
@@ -26,7 +27,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
         IRead<Domain.Core.Aggregates.Participation> coreParticipations
-        //IRead<Domain.Setup.Aggregates.Participation> setupParticipations
+    //IRead<Domain.Setup.Aggregates.Participation> setupParticipations
     )
         : base(socket)
     {
@@ -64,7 +65,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         var coreParticipations = await _coreParticipations
             .ReadAll(x => !x.IsComplete() && !x.IsEliminated())
             .Select(CoreParticipationModel.MapFrom);
-            return coreParticipations;
+        return coreParticipations;
         //move this logic to a new GetConfiguredParticipations after Witness implementation
         //var participations = await _setupParticipations.ReadAll();
         //return participations.Select(SetupParticipationModel.MapFrom);

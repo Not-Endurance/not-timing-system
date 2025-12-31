@@ -60,11 +60,21 @@ public class CoreCombinationModel
         var horse = new Horse(Horse.MaptoDomain());
         var minSpeed = Speed.Create(MinAverageSpeed);
         var maxSpeed = Speed.Create(MaxAverageSpeed);
-        return new Combination(DomainHelper.EnsureId(Id), Number, athlete, horse, athlete.Club, Distance!, minSpeed, maxSpeed);
+        return new Combination(
+            DomainHelper.EnsureId(Id),
+            Number,
+            athlete,
+            horse,
+            athlete.Club,
+            Distance!,
+            minSpeed,
+            maxSpeed
+        );
     }
 }
 
-public class CorePhaseModel {
+public class CorePhaseModel
+{
     public static CorePhaseModel MapFrom(Phase phase)
     {
         return new CorePhaseModel
@@ -81,8 +91,7 @@ public class CorePhaseModel {
             PresentTime = phase.PresentTime,
             RepresentTime = phase.RepresentTime,
             IsReinspectionRequested = phase.IsReinspectionRequested,
-            IsRequiredInspectionRequested =
-                phase.IsRequiredInspectionRequested || phase.IsRequiredInspectionCompulsory, // TODO: probably remove compulsory altogether
+            IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested || phase.IsRequiredInspectionCompulsory, // TODO: probably remove compulsory altogether
             IsRequiredInspectionCompulsory = phase.IsRequiredInspectionCompulsory,
             CompulsoryThresholdInterval = phase.CompulsoryThresholdSpan,
             RequiredInspectionTime = phase.GetRequiredInspectionTime(),
@@ -228,6 +237,7 @@ public class CoreParticipationModel
             Eliminated = participation.Eliminated == null ? null : EliminatedModel.MapFrom(participation.Eliminated),
         };
     }
+
     public int Id { get; init; }
     public ParticipationCategory Category { get; init; } = default!;
     public CoreCompetitionModel? Competition { get; init; }
@@ -242,11 +252,18 @@ public class CoreParticipationModel
         var combination = Combination.MapToDomain();
         var phases = Phases!.Select(x => x.MapToDomain());
         var eliminated = Eliminated?.MapToDomain();
-        return new Participation(DomainHelper.EnsureId(Id), Category, competition, combination, new(phases), eliminated);
+        return new Participation(
+            DomainHelper.EnsureId(Id),
+            Category,
+            competition,
+            combination,
+            new(phases),
+            eliminated
+        );
     }
 }
 
-    public class RankingEntryModel
+public class RankingEntryModel
 {
     public static RankingEntryModel MapFrom(RankingEntry rankingEntry)
     {

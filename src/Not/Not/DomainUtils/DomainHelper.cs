@@ -1,5 +1,4 @@
-﻿
-using Not.Random;
+﻿using Not.Random;
 
 namespace Not.DomainUtils;
 
