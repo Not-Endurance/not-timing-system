@@ -18,6 +18,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     readonly IEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IRead<Domain.Core.Aggregates.Participation> _coreParticipations;
+
     //readonly IRead<Domain.Setup.Aggregates.Participation> _setupParticipations;
     readonly HubProcedures _hubProcedures;
 
