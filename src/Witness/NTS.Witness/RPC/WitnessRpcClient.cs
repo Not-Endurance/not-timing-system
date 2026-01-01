@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
@@ -18,14 +16,14 @@ public class WitnessRpcClient
         IWitnessStartlistClientProcedures
 {
     readonly IRpcSocket _socket;
-    readonly StartlistService _startlistService;
+    readonly IStartlistContext _startlistContex;
     readonly ParticipationService _participationService;
 
-    public WitnessRpcClient(IRpcSocket socket, StartlistService startlistService, ParticipationService participationService)
+    public WitnessRpcClient(IRpcSocket socket, ParticipationService participationService, IStartlistContext startlistContex)
         : base(socket)
     {
         _socket = socket;
-        _startlistService = startlistService;
+        _startlistContex = startlistContex;
         _participationService = participationService;
     }
 
@@ -42,7 +40,7 @@ public class WitnessRpcClient
 
     public Task Receive(StartlistEntry entry, NCollectionAction action)
     {
-        _startlistService.Update(entry, action);
+        _startlistContex.Update(entry, action);
         return Task.CompletedTask;
     }
 

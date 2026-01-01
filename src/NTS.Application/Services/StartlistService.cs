@@ -12,22 +12,23 @@ namespace NTS.Application.Services;
 public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory, IStartupInitializer
 {
     readonly IReadMany<Participation> _participations;
-    Startlist? _startlist;
+    readonly StartlistContext _context;
 
-    public StartlistService(IReadMany<Participation> participations)
+    public StartlistService(IReadMany<Participation> participations, StartlistContext context)
     {
         _participations = participations;
+        _context = context;
     }
 
-    public IReadOnlyList<StartlistEntry> Upcoming => _startlist?.Upcoming ?? [];
-    public IReadOnlyList<StartlistEntry> History => _startlist?.History ?? [];
+    public IReadOnlyList<StartlistEntry> Upcoming => _context.Startlist?.Upcoming ?? [];
+    public IReadOnlyList<StartlistEntry> History => _context.Startlist?.History ?? [];
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
         var participations = await _participations.ReadAll();
-        _startlist = new Startlist(participations);
+        _context.Startlist = new Startlist(participations);
 
-        return _startlist.History.Any() || _startlist.Upcoming.Any();
+        return _context.Startlist.History.Any() || _context.Startlist.Upcoming.Any();
     }
 
     public void RunAtStartup()
@@ -39,29 +40,19 @@ public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory,
 
     public void Refresh()
     {
-        _startlist?.UpdateState();
+        _context.Startlist?.UpdateState();
         EmitChange();
-    }
-
-    public void Update(StartlistEntry entry, NCollectionAction action)
-    {
-        switch (action)
-        {
-            case NCollectionAction.Remove: _startlist?.Remove(entry.Number); break;
-            case NCollectionAction.AddOrUpdate: _startlist?.Add(entry); break;
-            default: break;
-        }
     }
 
     void RemoveEntry(Participation participation)
     {
-        _startlist?.Remove(participation.Combination.Number);
+        _context.Startlist?.Remove(participation.Combination.Number);
         EmitChange();
     }
 
     void AddEntry(Participation participation)
     {
-        _startlist?.Add(new StartlistEntry(participation));
+        _context.Startlist?.Add(new StartlistEntry(participation));
         EmitChange();
     }
 }
