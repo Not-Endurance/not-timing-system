@@ -1,4 +1,4 @@
-using Not.DomainUtils;
+using Not.Extensions;
 
 namespace Not.Domain.Base;
 
