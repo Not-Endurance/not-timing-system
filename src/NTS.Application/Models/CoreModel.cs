@@ -1,5 +1,4 @@
-﻿using Not.DomainUtils;
-using Not.Exceptions;
+﻿using Not.Extensions;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects;
@@ -61,7 +60,7 @@ public class CoreCombinationModel
         var minSpeed = Speed.Create(MinAverageSpeed);
         var maxSpeed = Speed.Create(MaxAverageSpeed);
         return new Combination(
-            DomainHelper.EnsureId(Id),
+            Id,
             Number,
             athlete,
             horse,
@@ -134,7 +133,7 @@ public class CorePhaseModel
     public Phase MapToDomain()
     {
         return new Phase(
-            DomainHelper.EnsureId(Id),
+            Id,
             Gate,
             Length,
             MaxRecovery,
@@ -253,7 +252,7 @@ public class CoreParticipationModel
         var phases = Phases!.Select(x => x.MapToDomain());
         var eliminated = Eliminated?.MapToDomain();
         return new Participation(
-            DomainHelper.EnsureId(Id),
+            Id,
             Category,
             competition,
             combination,
@@ -282,7 +281,7 @@ public class RankingEntryModel
     public RankingEntry MapToDomain()
     {
         var participation = Participation.MapToDomain();
-        return new RankingEntry(DomainHelper.GenerateId(), participation, Rank, IsNotRanked);
+        return new RankingEntry(DomainModelHelper.GenerateId(), participation, Rank, IsNotRanked);
     }
 }
 

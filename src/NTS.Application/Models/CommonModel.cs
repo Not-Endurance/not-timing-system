@@ -1,5 +1,5 @@
-﻿using Not.DomainUtils;
-using Not.Exceptions;
+﻿using Not.Exceptions;
+using Not.Extensions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
@@ -29,7 +29,7 @@ public class SettingModel : IDocument
 
     public Setting ToDomain()
     {
-        return new Setting(DomainHelper.EnsureId(Id), Guid.Parse(AccountId), Country.MapToDomain(), DetectionMode);
+        return new Setting(Id, Guid.Parse(AccountId), Country.MapToDomain(), DetectionMode);
     }
 }
 
@@ -56,7 +56,7 @@ public class CountryModel : IDocument
 
     public Country MapToDomain()
     {
-        return new Country(DomainHelper.EnsureId(Id), Name, IsoCode, NfCode, Locale);
+        return new Country(Id, Name, IsoCode, NfCode, Locale);
     }
 }
 
@@ -90,12 +90,12 @@ public class OfficialModel : IDocument
 
     public Official MapToCoreDomain()
     {
-        return new Official(DomainHelper.EnsureId(Id), Names, Role);
+        return new Official(Id, Names, Role);
     }
 
     public Domain.Setup.Aggregates.Official MapToSetupDomain()
     {
-        return new Domain.Setup.Aggregates.Official(DomainHelper.EnsureId(Id), Names, Role);
+        return new Domain.Setup.Aggregates.Official(Id, Names, Role);
     }
 }
 
@@ -122,7 +122,7 @@ public class AthleteModel
     {
         return new AthleteModel
         {
-            Id = DomainHelper.GenerateId(),
+            Id = DomainModelHelper.GenerateId(),
             FeiId = athlete.FeiId,
             Names = athlete.Names,
             Country = CountryModel.MapFrom(athlete.Country),

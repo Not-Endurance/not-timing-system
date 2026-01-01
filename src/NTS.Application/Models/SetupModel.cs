@@ -1,5 +1,4 @@
-﻿using Not.DomainUtils;
-using NTS.Domain.Enums;
+﻿using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Application.Models;
@@ -53,7 +52,7 @@ public class SetupCombinationModel
         var intermediateHorse = Horse.MaptoDomain();
         var horse = new Horse(intermediateHorse.Id, intermediateHorse.Name, intermediateHorse.FeiId);
         return new Combination(
-            DomainHelper.EnsureId(Id),
+            Id,
             Number,
             athlete,
             horse,
@@ -94,7 +93,7 @@ public class SetupParticipationModel
     {
         var combination = Combination.MapToDomain();
         return new Participation(
-            DomainHelper.EnsureId(Id),
+            Id,
             IsNotRanked,
             combination,
             Category,
@@ -119,7 +118,7 @@ public class LoopModel
 
     public Loop MapToDomain()
     {
-        return Loop.Update(DomainHelper.EnsureId(Id), Distance);
+        return Loop.Update(Id, Distance);
     }
 }
 
@@ -180,7 +179,7 @@ public class SetupCompetitionModel
     public Competition MapToDomain()
     {
         return new Competition(
-            DomainHelper.EnsureId(Id),
+            Id,
             Name,
             Type,
             Ruleset,

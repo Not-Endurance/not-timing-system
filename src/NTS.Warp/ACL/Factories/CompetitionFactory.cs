@@ -15,7 +15,7 @@ public class CompetitionFactory
         {
             var emptyState = new EmsCompetitionState
             {
-                Id = DomainHelper.GenerateId(),
+                Id = DomainModelHelper.GenerateId(),
                 Name = "Unknown Competition",
                 Type = EmsCompetitionType.National,
             };
@@ -24,7 +24,7 @@ public class CompetitionFactory
         var laps = LapFactory.Create(participation.Phases);
         var state = new EmsCompetitionState
         {
-            Id = DomainHelper.GenerateId(),
+            Id = DomainModelHelper.GenerateId(),
             Name = participation.Competition.Name,
             Type = MapEmsCompetitionType(participation.Competition.Ruleset),
         };

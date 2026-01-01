@@ -30,12 +30,12 @@ public abstract class AggregateRoot : IEquatable<AggregateRoot>, IAggregateRoot
 
     protected static string Combine(params object?[] values)
     {
-        return DomainHelper.Combine(values);
+        return DomainModelHelper.Combine(values);
     }
 
     protected static int GenerateId()
     {
-        return DomainHelper.GenerateId();
+        return DomainModelHelper.GenerateId();
     }
 
     protected static T NotDefault<T>(string field, T value)

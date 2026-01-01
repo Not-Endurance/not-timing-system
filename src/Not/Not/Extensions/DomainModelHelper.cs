@@ -1,8 +1,8 @@
 ﻿using Not.Random;
 
-namespace Not.DomainUtils;
+namespace Not.Extensions;
 
-public static class DomainHelper
+public static class DomainModelHelper
 {
     public static string Combine(params object?[] values)
     {
@@ -13,10 +13,5 @@ public static class DomainHelper
     public static int GenerateId()
     {
         return RandomHelper.GenerateUniqueInteger();
-    }
-
-    public static int EnsureId(int id)
-    {
-        return id == default ? RandomHelper.GenerateUniqueInteger() : id;
     }
 }
