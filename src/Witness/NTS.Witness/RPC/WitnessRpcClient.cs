@@ -1,174 +1,66 @@
-using System.Collections.ObjectModel;
+using System.Linq.Expressions;
+using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
+using Not.Collections;
+using NTS.Application.Services;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Startlists;
-using NTS.Domain.Watcher;
 using NTS.Witness.RPC.Procedures;
+using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
 public class WitnessRpcClient
     : RpcClient,
-        IWitnessClientProcedures,
-        IWitnessParticipantsHubProcedures,
-        IWitnessSnapshotsHubProcedures,
-        IWitnessStartlistHubProcedures
+        IWitnessParticipantsClientProcedures,
+        IWitnessStartlistClientProcedures,
+        IReadMany<Participation>
 {
-    const int DEFAULT_SNAPSHOT_PARTICIPANTS = 10;
-
     readonly IRpcSocket _socket;
-    readonly Dictionary<int, Startlist> _startlists = [];
-    readonly List<Participation> _participants = [];
-    readonly List<IntermediateSnapshot> _snapshots = [];
+    readonly StartlistService _startlistService;
+    readonly ParticipationService _participationService;
 
-    public WitnessRpcClient(IRpcSocket socket)
+    public WitnessRpcClient(IRpcSocket socket, StartlistService startlistService, ParticipationService participationService)
         : base(socket)
     {
         _socket = socket;
+        _startlistService = startlistService;
+        _participationService = participationService;
     }
-
-    public IReadOnlyDictionary<int, Startlist> Startlists =>
-        new ReadOnlyDictionary<int, Startlist>(_startlists);
-
-    public IReadOnlyCollection<Participation> Participants => _participants.AsReadOnly();
-
-    public IReadOnlyCollection<IntermediateSnapshot> Snapshots => _snapshots.AsReadOnly();
 
     public override void RunAtStartup()
     {
-        RegisterInputProcedure<StartlistEntry, WitnessCollectionAction>(nameof(ReceiveEntry), ReceiveEntry);
-        RegisterInputProcedure<Participation, WitnessCollectionAction>(nameof(ReceiveEntryUpdate), ReceiveEntryUpdate);
-        RegisterInputProcedure<WitnessSnapshotPayload>(nameof(ReceiveWitnessEvent), ReceiveWitnessEvent);
-
-        EnsureInitialized();
-    }
-
-    public void EnsureInitialized()
-    {
-        EnsureStartlistsLoaded();
-        EnsureParticipantsLoaded();
+        RegisterInputProcedure<StartlistEntry, NCollectionAction>(nameof(Receive), Receive);
+        RegisterInputProcedure<Participation, NCollectionAction>(nameof(Receive), Receive);
     }
 
     public async Task<RpcInvokeResult> PublishSnapshotsAsync(WitnessSnapshotPayload payload)
     {
-        return await _socket.InvokeInputProcedure(nameof(ReceiveWitnessEvent), payload);
+        return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), payload);
     }
 
-    public async Task<RpcInvokeResult<Dictionary<int, Startlist>>> RequestStartlistAsync()
+    public Task Receive(StartlistEntry entry, NCollectionAction action)
     {
-        return await _socket.InvokeOutputProcedure<Dictionary<int, Startlist>>(nameof(SendStartlist));
-    }
-
-    public async Task<RpcInvokeResult<IEnumerable<Participation>>> RequestParticipantsAsync()
-    {
-        return await _socket.InvokeOutputProcedure<IEnumerable<Participation>>(nameof(SendParticipants));
-    }
-
-    public Task ReceiveEntry(StartlistEntry entry, WitnessCollectionAction action)
-    {
-        //var startlist = GetOrCreateStartlist(entry.PhaseNumber);
-        //if (action == WitnessCollectionAction.AddOrUpdate)
-        //{
-        //    startlist.Add()
-        //}
-        //startlist.Update(entry, action);
-        //return Task.CompletedTask;
+        _startlistService.Update(entry, action);
         return Task.CompletedTask;
     }
 
-    public Task ReceiveEntryUpdate(Participation participation, WitnessCollectionAction action)
+    public Task Receive(Participation participation, NCollectionAction action)
     {
-        UpdateCollection(_participants, participation, action, p => p.Id);
+        _participationService.Update(participation, action);
         return Task.CompletedTask;
     }
 
-    public Task ReceiveWitnessEvent(WitnessSnapshotPayload payload)
+    public Task<IEnumerable<Participation>> ReadAll()
     {
-        if (payload?.Entries == null)
-        {
-            return Task.CompletedTask;
-        }
-
-        foreach (var snapshot in payload.Entries)
-        {
-            UpdateCollection(_snapshots, snapshot, WitnessCollectionAction.AddOrUpdate, s => s.Number);
-        }
-
-        return Task.CompletedTask;
+        var participations = DummyData.CreateParticipations(10);
+        return Task.FromResult(participations.AsEnumerable());
     }
 
-    public Task<Dictionary<int, Startlist>> SendStartlist()
+    public Task<IEnumerable<Participation>> ReadAll(Expression<Func<Participation, bool>> filter)
     {
-        EnsureStartlistsLoaded();
-        return Task.FromResult(new Dictionary<int, Startlist>());
-    }
-
-    public Task<IEnumerable<Participation>> SendParticipants()
-    {
-        EnsureParticipantsLoaded();
-        return Task.FromResult<IEnumerable<Participation>>(_participants.ToList());
-    }
-
-    void EnsureStartlistsLoaded()
-    {
-        //if (_startlists.Count > 0)
-        //{
-        //    return;
-        //}
-
-        //var participations = DummyData.CreateParticipationsForStartlist();
-        //var startList = new StartList(participations);
-        //var entries = startList.Upcoming.Concat(startList.History);
-        //foreach (var group in entries.GroupBy(entry => entry.PhaseNumber))
-        //{
-        //    _startlists[group.Key] = [.. group];
-        //}
-    }
-
-    void EnsureParticipantsLoaded()
-    {
-        if (_participants.Count > 0)
-        {
-            return;
-        }
-
-        var participations = DummyData.CreateParticipationsForSnapshot(DEFAULT_SNAPSHOT_PARTICIPANTS);
-        _participants.AddRange(participations);
-    }
-
-    //StartList GetOrCreateStartlist(int phaseNumber)
-    //{
-    //    if (!_startlists.TryGetValue(phaseNumber, out var startlist))
-    //    {
-    //        startlist = [];
-    //        _startlists[phaseNumber] = startlist;
-    //    }
-
-    //    return startlist;
-    //}
-
-    static void UpdateCollection<T, TKey>(
-        List<T> collection,
-        T item,
-        WitnessCollectionAction action,
-        Func<T, TKey> keySelector
-    )
-        where TKey : notnull
-    {
-        var comparer = EqualityComparer<TKey>.Default;
-        var key = keySelector(item);
-        var index = collection.FindIndex(existing => comparer.Equals(keySelector(existing), key));
-
-        if (index >= 0)
-        {
-            collection.RemoveAt(index);
-        }
-
-        if (action == WitnessCollectionAction.AddOrUpdate)
-        {
-            collection.Add(item);
-        }
+        throw new NotImplementedException();
     }
 }

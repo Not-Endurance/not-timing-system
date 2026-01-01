@@ -13,50 +13,6 @@ namespace NTS.Witness;
 
 public class DummyData
 {
-    public static List<Participation> CreateParticipationsForStartlist()
-    {
-        var country = new Country(1000, null, null, null, null);
-        var person = new Person(["Todomir", "Stroinov"]);
-        var athlete = new Athlete(person, country, null, "guz");
-        var horse = new Horse(100, "Rozomir", null);
-        var combination = new Combination(199, 1, athlete, horse, null, "40", null, null);
-        var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
-            20,
-            15,
-            40,
-            NTS.Domain.Enums.CompetitionRuleset.Regional,
-            false,
-            null,
-            DateTimeOffset.Now.AddMinutes(23)
-        );
-        var phase2 = new NTS.Domain.Core.Aggregates.Participations.Phase(
-            20,
-            20,
-            40,
-            NTS.Domain.Enums.CompetitionRuleset.Regional,
-            true,
-            null,
-            null
-        );
-        var phases = new List<NTS.Domain.Core.Aggregates.Participations.Phase>() { phase1, phase2 };
-        var phaseCollection = new PhaseCollection(phases);
-        var competition = new Competition(
-            "Splehnik",
-            Domain.Enums.CompetitionRuleset.Regional,
-            Domain.Enums.CompetitionType.Qualification
-        );
-        var participation = new Participation(
-            2001,
-            ParticipationCategory.Senior,
-            competition,
-            combination,
-            phaseCollection,
-            null
-        );
-        List<Participation>? participations = [participation];
-        return participations;
-    }
-
     public static Dictionary<string, string> CreateContacts()
     {
         var contacts = new Dictionary<string, string>
@@ -67,7 +23,7 @@ public class DummyData
         return contacts;
     }
 
-    public static List<Participation> CreateParticipationsForSnapshot(int number)
+    public static List<Participation> CreateParticipations(int number)
     {
         var participations = new List<Participation>();
         for (var i = 0; i < number; ++i)

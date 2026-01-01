@@ -8,6 +8,4 @@ public interface IRead<T>
 {
     Task<T?> Read(Expression<Func<T, bool>> filter);
     Task<T?> Read(int id);
-    Task<IEnumerable<T>> ReadAll();
-    Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter);
 }

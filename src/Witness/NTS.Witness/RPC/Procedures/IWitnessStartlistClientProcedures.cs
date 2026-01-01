@@ -1,9 +1,9 @@
-using System.Threading.Tasks;
+using Not.Collections;
 using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Witness.RPC.Procedures;
 
 public interface IWitnessStartlistClientProcedures
 {
-    Task ReceiveEntry(StartlistEntry entry, WitnessCollectionAction action);
+    Task Receive(StartlistEntry entry, NCollectionAction action);
 }

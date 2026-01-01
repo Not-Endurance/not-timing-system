@@ -1,5 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Collections;
 using Not.Startup;
 using NTS.Blazor.Components.Startlist.History;
 using NTS.Blazor.Components.Startlist.Upcoming;
@@ -10,12 +11,12 @@ namespace NTS.Application.Services;
 
 public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory, IStartupInitializer
 {
-    readonly IRepository<Participation> _participationRepository;
+    readonly IReadMany<Participation> _participations;
     Startlist? _startlist;
 
-    public StartlistService(IRepository<Participation> participationRepository)
+    public StartlistService(IReadMany<Participation> participations)
     {
-        _participationRepository = participationRepository;
+        _participations = participations;
     }
 
     public IReadOnlyList<StartlistEntry> Upcoming => _startlist?.Upcoming ?? [];
@@ -23,7 +24,7 @@ public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory,
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
-        var participations = await _participationRepository.ReadAll();
+        var participations = await _participations.ReadAll();
         _startlist = new Startlist(participations);
 
         return _startlist.History.Any() || _startlist.Upcoming.Any();
@@ -42,6 +43,16 @@ public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory,
         EmitChange();
     }
 
+    public void Update(StartlistEntry entry, NCollectionAction action)
+    {
+        switch (action)
+        {
+            case NCollectionAction.Remove: _startlist?.Remove(entry.Number); break;
+            case NCollectionAction.AddOrUpdate: _startlist?.Add(entry); break;
+            default: break;
+        }
+    }
+
     void RemoveEntry(Participation participation)
     {
         _startlist?.Remove(participation.Combination.Number);
@@ -50,7 +61,7 @@ public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory,
 
     void AddEntry(Participation participation)
     {
-        _startlist?.Add(participation);
+        _startlist?.Add(new StartlistEntry(participation));
         EmitChange();
     }
 }

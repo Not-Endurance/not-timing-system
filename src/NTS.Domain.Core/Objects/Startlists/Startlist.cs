@@ -89,11 +89,11 @@ public class Startlist
         }
     }
 
-    public void Add(Participation participation)
+    public void Add(StartlistEntry entry)
     {
         lock (_lock)
         {
-            _upcoming = OrderByTimeThenPhase([.. _upcoming, new StartlistEntry(participation)]);
+            _upcoming = OrderByTimeThenPhase([.. _upcoming, entry]);
         }
     }
 

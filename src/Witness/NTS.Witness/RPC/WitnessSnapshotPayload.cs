@@ -1,10 +1,9 @@
-using System.Collections.Generic;
 using NTS.Domain.Enums;
 using NTS.Domain.Watcher;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessSnapshotPayload
+public class WitnessSnapshotPayload // TODO: should be SnapshotModel
 {
     public IEnumerable<IntermediateSnapshot> Entries { get; init; } = [];
 
