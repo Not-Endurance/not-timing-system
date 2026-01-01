@@ -1,4 +1,6 @@
-﻿using Not.Extensions;
+﻿using Not.Exceptions;
+using Not.Extensions;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects;
@@ -6,6 +8,26 @@ using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
 namespace NTS.Application.Models;
+
+public class CoreOfficialModel
+{
+    public static CoreOfficialModel MapFrom(Official official)
+    {
+        return new CoreOfficialModel
+        {
+            Names = official.Person.Names,
+            Role = official.Role,
+        };
+    }
+
+    public string[] Names { get; init; } = [];
+    public OfficialRole Role { get; init; } = default!;
+
+    public Official MapToDomain()
+    {
+        return new Official(Names, Role);
+    }
+}
 
 public class CoreCompetitionModel
 {
@@ -29,6 +51,58 @@ public class CoreCompetitionModel
     }
 }
 
+public class CoreAthleteModel
+{
+    public static CoreAthleteModel MapFrom(IAthlete athlete)
+    {
+        return new CoreAthleteModel
+        {
+            Id = DomainModelHelper.GenerateId(),
+            FeiId = athlete.FeiId,
+            Names = athlete.Names,
+            Country = CountryModel.MapFrom(athlete.Country),
+            Club = athlete.Club == null ? null : ClubModel.MapFrom(athlete.Club),
+        };
+    }
+
+    public int Id { get; init; } = default!;
+    public string[] Names { get; init; } = default!;
+    public CountryModel Country { get; init; } = default!;
+    public ClubModel? Club { get; init; }
+    public string? FeiId { get; init; }
+
+    public IAthlete MapToDomain()
+    {
+        // this guard can be removed after merge with codex/design-rpc-methods-for-nts.witness
+        // when new Athlete accepts params for IAthlete only
+        GuardHelper.ThrowIfDefault(Club, " cannot be null");
+        var club = new Club(Club.MapToDomain());
+        return new Athlete(Id, Names, Country.MapToDomain(), club, FeiId);
+    }
+}
+
+public class CoreHorseModel
+{
+    public static CoreHorseModel MapFrom(IHorse horse)
+    {
+        return new CoreHorseModel
+        {
+            Id = horse.Id,
+            FeiId = horse.FeiId,
+            Name = horse.Name,
+        };
+    }
+
+    public int Id { get; init; } = default!;
+    public string? FeiId { get; init; }
+    public string Name { get; init; } = default!;
+
+    public Horse MaptoDomain()
+    {
+        return new Horse(Id, Name, FeiId);
+    }
+}
+
 public class CoreCombinationModel
 {
     public static CoreCombinationModel MapFrom(Combination combination)
@@ -40,8 +114,8 @@ public class CoreCombinationModel
             Distance = combination.Distance,
             MinAverageSpeed = combination.MinAverageSpeed,
             MaxAverageSpeed = combination.MaxAverageSpeed,
-            Athlete = AthleteModel.MapFrom(combination.Athlete),
-            Horse = HorseModel.MapFrom(combination.Horse),
+            Athlete = CoreAthleteModel.MapFrom(combination.Athlete),
+            Horse = CoreHorseModel.MapFrom(combination.Horse),
         };
     }
 
@@ -50,8 +124,8 @@ public class CoreCombinationModel
     public string? Distance { get; init; }
     public double? MinAverageSpeed { get; init; }
     public double? MaxAverageSpeed { get; init; }
-    public AthleteModel Athlete { get; init; } = default!;
-    public HorseModel Horse { get; init; } = default!;
+    public CoreAthleteModel Athlete { get; init; } = default!;
+    public CoreHorseModel Horse { get; init; } = default!;
 
     public Combination MapToDomain()
     {
@@ -339,7 +413,7 @@ public class ArchiveModel : IDocument
             FeiEventCode = enduranceEvent.FeiEventCode,
             StartDay = enduranceEvent.EventSpan.StartDay,
             EndDay = enduranceEvent.EventSpan.EndDay,
-            Officials = officials.Select(OfficialModel.MapFrom).ToArray(),
+            Officials = officials.Select(CoreOfficialModel.MapFrom).ToArray(),
             Ranklists = ranklists.Select(RanklistModel.MapFrom).ToArray(),
         };
     }
@@ -354,7 +428,7 @@ public class ArchiveModel : IDocument
     public string? FeiEventCode { get; init; }
     public DateTimeOffset StartDay { get; init; }
     public DateTimeOffset EndDay { get; init; }
-    public OfficialModel[] Officials { get; init; } = default!;
+    public CoreOfficialModel[] Officials { get; init; } = default!;
     public RanklistModel[] Ranklists { get; init; } = default!;
 
     public ArchiveEntry MapToDomain()
@@ -370,7 +444,7 @@ public class ArchiveModel : IDocument
             FeiId,
             FeiEventCode
         );
-        var officials = Officials.Select(x => x.MapToCoreDomain());
+        var officials = Officials.Select(x => x.MapToDomain());
         var ranklists = Ranklists.Select(x => x.MapToDomain());
         return new ArchiveEntry(enduranceEvent, officials, ranklists);
     }

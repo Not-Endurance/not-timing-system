@@ -9,7 +9,7 @@ namespace NTS.Warp.ACL.Factories;
 
 public class AthleteFactory
 {
-    public static EmsAthlete Create(AthleteModel athlete)
+    public static EmsAthlete Create(CoreAthleteModel athlete)
     {
         var athleteState = new EmsAthleteState
         {

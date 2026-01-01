@@ -3,7 +3,29 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Application.Models;
 
-public class SetupAthleteModel : AthleteModel, IDocument
+public class SetupOfficialModel : IDocument
+{
+    public static SetupOfficialModel MapFrom(Official official)
+    {
+        return new SetupOfficialModel
+        {
+            Id = official.Id,
+            Names = official.Person.Names,
+            Role = official.Role,
+        };
+    }
+
+    public int Id { get; init; } = default!;
+    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
+    public string[] Names { get; init; } = [];
+    public OfficialRole Role { get; init; } = default!;
+
+    public Official MapToDomain()
+    {
+        return new Official(Id, Names, Role);
+    }
+}
+public class SetupAthleteModel : CoreAthleteModel, IDocument
 {
     // TODO: if decide to use this approach integrate AutoMapper with specific mappings to solve duplicating mapping logic
     public static SetupAthleteModel MapFrom(Athlete athlete)
@@ -27,6 +49,24 @@ public class SetupAthleteModel : AthleteModel, IDocument
     }
 }
 
+public class SetupHorseModel : CoreHorseModel, IDocument
+{
+    public static SetupHorseModel MapFrom(Horse horse)
+    {
+        return new SetupHorseModel
+        {
+            Id = horse.Id,
+            Name = horse.Name,
+            FeiId = horse.FeiId,
+        };
+    }
+    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
+    public new Horse MaptoDomain()
+    {
+        return new Horse(Id, Name, FeiId);
+    }
+}
+
 public class SetupCombinationModel
 {
     public static SetupCombinationModel MapFrom(Combination combination)
@@ -36,14 +76,14 @@ public class SetupCombinationModel
             Id = combination.Id,
             Number = combination.Number,
             Athlete = SetupAthleteModel.MapFrom(combination.Athlete),
-            Horse = HorseModel.MapFrom(combination.Horse),
+            Horse = SetupHorseModel.MapFrom(combination.Horse),
         };
     }
 
     public int Id { get; init; }
     public int Number { get; init; }
     public SetupAthleteModel Athlete { get; init; } = default!;
-    public HorseModel Horse { get; init; } = default!;
+    public SetupHorseModel Horse { get; init; } = default!;
 
     public Combination MapToDomain()
     {
@@ -208,7 +248,7 @@ public class UpcomingEventModel : IDocument
             FeiId = @event.FeiId,
             FeiEventCode = @event.FeiEventCode,
             Competitions = @event.Competitions.Select(SetupCompetitionModel.MapFrom).ToArray(),
-            Officials = @event.Officials.Select(OfficialModel.MapFrom).ToArray(),
+            Officials = @event.Officials.Select(SetupOfficialModel.MapFrom).ToArray(),
             Loops = @event.Loops.Select(LoopModel.MapFrom).ToArray(),
             Combinations = @event.Combinations.Select(SetupCombinationModel.MapFrom).ToArray(),
         };
@@ -222,7 +262,7 @@ public class UpcomingEventModel : IDocument
     public string? FeiId { get; init; }
     public string? FeiEventCode { get; init; }
     public SetupCompetitionModel[] Competitions { get; init; } = default!;
-    public OfficialModel[] Officials { get; init; } = default!;
+    public SetupOfficialModel[] Officials { get; init; } = default!;
     public LoopModel[] Loops { get; init; } = default!;
     public SetupCombinationModel[] Combinations { get; init; } = default!;
     public string Name { get; init; } = default!;
@@ -238,7 +278,7 @@ public class UpcomingEventModel : IDocument
             FeiId,
             FeiEventCode,
             Competitions.Select(x => x.MapToDomain()),
-            Officials.Select(x => x.MapToSetupDomain()),
+            Officials.Select(x => x.MapToDomain()),
             Loops.Select(x => x.MapToDomain()),
             Combinations.Select(x => x.MapToDomain())
         );

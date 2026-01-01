@@ -1,5 +1,4 @@
-﻿using Not.DomainUtils;
-using Not.Extensions;
+﻿using Not.Extensions;
 using NTS.Application.Models;
 using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Competitions;
