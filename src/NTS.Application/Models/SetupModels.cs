@@ -25,6 +25,7 @@ public class SetupOfficialModel : IDocument
         return new Official(Id, Names, Role);
     }
 }
+
 public class SetupAthleteModel : CoreAthleteModel, IDocument
 {
     // TODO: if decide to use this approach integrate AutoMapper with specific mappings to solve duplicating mapping logic
@@ -60,7 +61,9 @@ public class SetupHorseModel : CoreHorseModel, IDocument
             FeiId = horse.FeiId,
         };
     }
+
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
+
     public new Horse MaptoDomain()
     {
         return new Horse(Id, Name, FeiId);

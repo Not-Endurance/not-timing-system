@@ -13,11 +13,7 @@ public class CoreOfficialModel
 {
     public static CoreOfficialModel MapFrom(Official official)
     {
-        return new CoreOfficialModel
-        {
-            Names = official.Person.Names,
-            Role = official.Role,
-        };
+        return new CoreOfficialModel { Names = official.Person.Names, Role = official.Role };
     }
 
     public string[] Names { get; init; } = [];
@@ -133,16 +129,7 @@ public class CoreCombinationModel
         var horse = new Horse(Horse.MaptoDomain());
         var minSpeed = Speed.Create(MinAverageSpeed);
         var maxSpeed = Speed.Create(MaxAverageSpeed);
-        return new Combination(
-            Id,
-            Number,
-            athlete,
-            horse,
-            athlete.Club,
-            Distance!,
-            minSpeed,
-            maxSpeed
-        );
+        return new Combination(Id, Number, athlete, horse, athlete.Club, Distance!, minSpeed, maxSpeed);
     }
 }
 
@@ -325,14 +312,7 @@ public class CoreParticipationModel
         var combination = Combination.MapToDomain();
         var phases = Phases!.Select(x => x.MapToDomain());
         var eliminated = Eliminated?.MapToDomain();
-        return new Participation(
-            Id,
-            Category,
-            competition,
-            combination,
-            new(phases),
-            eliminated
-        );
+        return new Participation(Id, Category, competition, combination, new(phases), eliminated);
     }
 }
 
