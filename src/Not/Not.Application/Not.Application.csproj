@@ -24,4 +24,8 @@
     <InternalsVisibleTo Include="Not.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="RPC\Extensions\" />
+  </ItemGroup>
+
 </Project>

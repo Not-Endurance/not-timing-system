@@ -15,8 +15,7 @@ namespace NTS.Witness.RPC;
 public class WitnessRpcClient
     : RpcClient,
         IWitnessParticipantsClientProcedures,
-        IWitnessStartlistClientProcedures,
-        IReadMany<Participation>
+        IWitnessStartlistClientProcedures
 {
     readonly IRpcSocket _socket;
     readonly StartlistService _startlistService;
@@ -53,14 +52,9 @@ public class WitnessRpcClient
         return Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Participation>> ReadAll()
+    public Task<IEnumerable<Participation>> GetParcipations()
     {
         var participations = DummyData.CreateParticipations(10);
         return Task.FromResult(participations.AsEnumerable());
-    }
-
-    public Task<IEnumerable<Participation>> ReadAll(Expression<Func<Participation, bool>> filter)
-    {
-        throw new NotImplementedException();
     }
 }

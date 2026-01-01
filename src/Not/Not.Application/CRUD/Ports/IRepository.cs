@@ -3,5 +3,5 @@ using Not.Injection;
 
 namespace Not.Application.CRUD.Ports;
 
-public interface IRepository<T> : ICreate<T>, IRead<T>, IReadMany<T>, IUpdate<T>, IDelete<T>, IDeleteMany<T>, ITransient
+public interface IRepository<T> : ICreate<T>, IRead<T>, IReadMany<T>, IUpdate<T>, IDelete<T>, IDeleteMany<T>
     where T : IAggregateRoot { }
