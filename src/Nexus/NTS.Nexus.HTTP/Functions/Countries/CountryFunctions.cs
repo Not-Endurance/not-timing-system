@@ -1,22 +1,20 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Serialization.JSON;
+using NTS.Application.Models;
 using NTS.Domain.Aggregates;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.Countries;
 
 namespace NTS.Nexus.HTTP.Functions.Countries;
 
 public class CountryFunctions : FunctionBase<CountryFunctions>
 {
-    readonly IRepository<CountryDocument> _countries;
+    readonly IRepository<CountryModel> _countries;
 
-    public CountryFunctions(IFunctionLogger<CountryFunctions> logger, IRepository<CountryDocument> countries)
+    public CountryFunctions(IFunctionLogger<CountryFunctions> logger, IRepository<CountryModel> countries)
         : base(logger)
     {
         _countries = countries;
@@ -31,7 +29,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var country = requestBody.FromJson<Country>();
-        var document = CountryDocument.Create(country);
+        var document = CountryModel.MapFrom(country);
         await _countries.Create(document);
 
         return new OkObjectResult($"Inserted {country}");
@@ -46,7 +44,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var country = requestBody.FromJson<Country>();
-        var document = CountryDocument.Create(country);
+        var document = CountryModel.MapFrom(country);
         await _countries.Update(document);
 
         return new OkObjectResult($"Updated {country}");
@@ -59,7 +57,7 @@ public class CountryFunctions : FunctionBase<CountryFunctions>
     {
         LogInformation(request);
 
-        var countries = await _countries.ReadAll().Select(x => x.ToDomain());
+        var countries = await _countries.ReadAll().Select(x => x.MapToDomain());
         return new OkObjectResult(countries);
     }
 }

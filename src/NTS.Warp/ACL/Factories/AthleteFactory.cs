@@ -1,23 +1,23 @@
-﻿using NTS.Domain.Enums;
+﻿using NTS.Application.Models;
+using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Athletes;
 using NTS.Warp.ACL.Entities.Countries;
 using NTS.Warp.ACL.Enums;
 using NTS.Warp.ACL.Models;
-using NTS.Warp.Features.Judge.Models;
 
 namespace NTS.Warp.ACL.Factories;
 
 public class AthleteFactory
 {
-    public static EmsAthlete Create(ParticipationWarpDto.AthleteDto athlete)
+    public static EmsAthlete Create(CoreAthleteModel athlete)
     {
         var athleteState = new EmsAthleteState
         {
             Category = EmsCategory.Seniors, //TODO: after athlete
-            Club = athlete.Club,
+            Club = athlete.Club?.Name,
             FeiId = athlete.FeiId, //TODO: after athlete
-            FirstName = athlete.Person.GetFirstName(),
-            LastName = athlete.Person.GetLastName(),
+            FirstName = athlete.Names.ElementAtOrDefault(0),
+            LastName = athlete.Names.ElementAtOrDefault(1),
             Id = athlete.Id,
         };
         var country = new EmsCountry(athlete.Country?.IsoCode ?? "iso", athlete.Country?.Name ?? "country-name", 1337);
