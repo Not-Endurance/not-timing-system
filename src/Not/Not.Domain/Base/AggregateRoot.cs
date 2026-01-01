@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using Not.Domain.Exceptions;
-using Not.DomainUtils;
+using Not.Extensions;
 using Not.Structures;
 using static Not.Localization.NStrings;
 
