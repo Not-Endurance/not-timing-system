@@ -1,5 +1,5 @@
 ﻿using System.Xml.Linq;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates;
 

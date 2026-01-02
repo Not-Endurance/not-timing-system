@@ -2,7 +2,7 @@
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Eliminations.EliminationForms.Shared;
 
-public abstract class EliminationForm : NComponent
+public abstract class EliminationForm : NBehind
 {
     internal abstract Task Eliminate();
 

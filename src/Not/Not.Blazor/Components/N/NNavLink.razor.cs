@@ -3,7 +3,7 @@ using Not.Blazor.Navigation;
 
 namespace Not.Blazor.Components;
 
-public partial class NNavLink : NComponent
+public partial class NNavLink : NBehind
 {
     [Inject]
     ILandNavigator LandNavigator { get; set; } = default!;

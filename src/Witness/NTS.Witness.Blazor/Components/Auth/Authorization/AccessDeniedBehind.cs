@@ -2,7 +2,7 @@
 
 namespace NTS.Witness.Blazor.Components.Auth.Authorization;
 
-public class AccessDeniedBehind : NComponent
+public class AccessDeniedBehind : NBehind
 {
     [Inject]
     NavigationManager Navigator { get; set; } = default!;

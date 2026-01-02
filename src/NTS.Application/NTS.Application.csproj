@@ -11,6 +11,7 @@
     <ProjectReference Include="..\Not\Not.Application\Not.Application.csproj" />
     <ProjectReference Include="..\Not\Not.Storage\Not.Storage.csproj" />
     <ProjectReference Include="..\Not\Not\Not.csproj" />
+    <ProjectReference Include="..\NTS.Blazor\NTS.Blazor.csproj" />
     <ProjectReference Include="..\NTS.Domain.Setup\NTS.Domain.Setup.csproj" />
 	  <ProjectReference Include="..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
   </ItemGroup>

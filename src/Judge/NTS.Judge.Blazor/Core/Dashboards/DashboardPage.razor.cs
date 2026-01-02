@@ -4,7 +4,7 @@ using NTS.Judge.Blazor.Shared.Components.SidePanels;
 
 namespace NTS.Judge.Blazor.Core.Dashboards;
 
-public partial class DashboardPage : NComponent
+public partial class DashboardPage : NBehind
 {
     [Inject]
     ICoreService CoreService { get; set; } = default!;

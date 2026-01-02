@@ -6,7 +6,6 @@ using Not.Concurrency.Extensions;
 using Not.Serialization.JSON;
 using NTS.Application.Models;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Nexus.HTTP.Functions.Archive;
 using NTS.Nexus.HTTP.Logger;
 
 namespace NTS.Nexus.HTTP.Functions.Athletes;
@@ -14,17 +13,11 @@ namespace NTS.Nexus.HTTP.Functions.Athletes;
 public class AthleteFunctions : FunctionBase<AthleteFunctions>
 {
     readonly IRepository<SetupAthleteModel> _athletes;
-    readonly IArchiveRepository _archive;
 
-    public AthleteFunctions(
-        IFunctionLogger<AthleteFunctions> logger,
-        IRepository<SetupAthleteModel> athletes,
-        IArchiveRepository archive
-    )
+    public AthleteFunctions(IFunctionLogger<AthleteFunctions> logger, IRepository<SetupAthleteModel> athletes)
         : base(logger)
     {
         _athletes = athletes;
-        _archive = archive;
     }
 
     [Function("athletes-insert")]
@@ -55,29 +48,6 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         await _athletes.Update(document);
 
         return new OkObjectResult($"Updated {athlete}");
-    }
-
-    [Function("athletes-safe-delete")]
-    public async Task<IActionResult> SafeDelete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:int}/safe")] HttpRequest request,
-        int id
-    )
-    {
-        LogInformation(request);
-
-        var recordsWithAthlete = await _archive
-            .ReadAll(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Athlete.Id == id)))
-            .ToList();
-
-        if (recordsWithAthlete.Any())
-        {
-            return new OkObjectResult(
-                $"The athlete you want to delete has participated in '{recordsWithAthlete.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
-            );
-        }
-
-        await _athletes.Delete(id);
-        return new OkObjectResult($"Deleted athlete with id '{id}'");
     }
 
     [Function("athletes-delete")]

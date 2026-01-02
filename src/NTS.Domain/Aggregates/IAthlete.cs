@@ -3,7 +3,7 @@ using NTS.Domain.Enums;
 
 namespace NTS.Domain.Aggregates;
 
-public interface IAthlete : IIdentifiable
+public interface IAthlete
 {
     Person Names { get; }
     Country Country { get; }

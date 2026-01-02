@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Helpers;
 
@@ -48,8 +48,8 @@ public class Combination : AggregateRoot
             new Horse(horse),
             athlete.Club,
             FormatDistance(distance),
-            Speed.Create(minAverageSpeedlimit),
-            Speed.Create(maxAverageSpeedLimit)
+            minAverageSpeedlimit,
+            maxAverageSpeedLimit
         )
     {
         _distance = distance;

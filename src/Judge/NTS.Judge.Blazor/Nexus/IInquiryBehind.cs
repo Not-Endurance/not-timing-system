@@ -4,7 +4,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Blazor.Nexus;
 
-public interface IInquiryBehind : IObservableBehind
+public interface IInquiryBehind : INObservable
 {
     IEnumerable<RankingEntry>? Match { get; }
     IReadOnlyList<ArchiveModel> Records { get; }

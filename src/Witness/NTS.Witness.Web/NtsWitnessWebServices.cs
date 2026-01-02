@@ -7,6 +7,8 @@ public static class NtsWitnessWebServices
         IConfiguration configuration
     )
     {
+        services.AddRazorPages();
+        services.AddServerSideBlazor();
         return services.ConfigureNtsWitness(configuration);
     }
 }

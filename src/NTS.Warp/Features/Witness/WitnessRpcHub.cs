@@ -56,7 +56,7 @@ internal class WitnessRpcHub
         {
             return [];
         }
-        var participations = await judgeClient.GetActiveParticipations();
+        var participations = await judgeClient.GetActive();
         return StartlistFactory.Create(participations);
     }
 
@@ -66,7 +66,7 @@ internal class WitnessRpcHub
         {
             return [];
         }
-        var participants = await judgeClient.GetActiveParticipations();
+        var participants = await judgeClient.GetActive();
         var emsPartcipants = participants.Select(ParticipantEntryFactory.Create).ToList();
         return emsPartcipants;
     }
@@ -78,7 +78,7 @@ internal class WitnessRpcHub
             return; // TODO: meaningful message would improve UX here
         }
         var snapshots = request.Payload.Entries.Select(entry => SnapshotFactory.Create(entry, request.Payload.Type));
-        await judgeClient.ProcessSnapshots(snapshots);
+        await judgeClient.Receive(snapshots);
     }
 
     bool TryGetJudgeClient(string enduranceEventId, [NotNullWhen(true)] out IJudgeClientProcedures? judgeClient)

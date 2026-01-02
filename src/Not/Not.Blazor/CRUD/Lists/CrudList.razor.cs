@@ -5,12 +5,12 @@ using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
 using Not.Blazor.CRUD.Ports;
 using Not.Domain;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using Not.Safe;
 
 namespace Not.Blazor.CRUD.Lists;
 
-public partial class CrudList<T, TModel, TForm> : NComponent
+public partial class CrudList<T, TModel, TForm> : NBehind
     where T : AggregateRoot
     where TModel : IFormModel<T>, new()
     where TForm : NForm<TModel>

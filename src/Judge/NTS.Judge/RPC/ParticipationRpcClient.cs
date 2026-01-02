@@ -4,8 +4,9 @@ using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Async;
 using NTS.Application.Models;
+using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Objects;
 using NTS.Judge.Core;
 using NTS.Judge.Features.Warp;
 using NTS.Warp;
@@ -17,14 +18,14 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
 {
     readonly IEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
-    readonly IRead<Domain.Core.Aggregates.Participation> _coreParticipations;
+    readonly IReadMany<Participation> _coreParticipations;
     readonly HubProcedures _hubProcedures;
 
     public ParticipationRpcClient(
         IEventContext eventContext,
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
-        IRead<Domain.Core.Aggregates.Participation> coreParticipations
+        IReadMany<Participation> coreParticipations
     )
         : base(socket)
     {
@@ -40,11 +41,11 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         Domain.Core.Aggregates.Participation.ELIMINATED_EVENT.Subscribe(OnParticipationEliminated);
         Domain.Core.Aggregates.Participation.RESTORED_EVENT.Subscribe(OnParticipationRestored);
 
-        RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(ProcessSnapshots), ProcessSnapshots);
-        RegisterOutputCollectionProcedure(nameof(GetActiveParticipations), GetActiveParticipations);
+        RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(Receive), Receive);
+        RegisterOutputCollectionProcedure(nameof(GetActive), GetActive);
     }
 
-    public async Task ProcessSnapshots(IEnumerable<Snapshot> snapshots)
+    public async Task Receive(IEnumerable<Snapshot> snapshots)
     {
         foreach (Snapshot snapshot in snapshots)
         {
@@ -56,7 +57,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     /// Fetches active participations before and after Competitions are started.
     /// </summary>
     /// <returns>Collection of active (not eliminated or completed) participations</returns>
-    public async Task<IEnumerable<CoreParticipationModel>> GetActiveParticipations()
+    public async Task<IEnumerable<CoreParticipationModel>> GetActive()
     {
         var coreParticipations = await _coreParticipations
             .ReadAll(x => !x.IsComplete() && !x.IsEliminated())

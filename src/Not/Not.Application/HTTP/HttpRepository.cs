@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
-using Not.Domain;
+using Not.Domain.Aggregates;
 using Not.Notify;
 using Not.Serialization.JSON;
 using Not.Structures;

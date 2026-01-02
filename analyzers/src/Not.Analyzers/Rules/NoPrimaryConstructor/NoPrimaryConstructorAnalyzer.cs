@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,7 +15,7 @@ public class NoPrimaryConstructorAnalyzer : AnalyzerBase
     public NoPrimaryConstructorAnalyzer()
         : base(
             RULE_ID,
-            title: "Primary constructor usage detected",
+            title: "Avoid using primary consturctors",
             messageFormat: "Primary constructors are not allowed",
             description: "Use traditional constructors instead of primary constructors."
         ) { }

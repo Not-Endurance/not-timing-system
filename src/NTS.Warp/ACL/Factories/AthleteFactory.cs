@@ -1,4 +1,5 @@
-﻿using NTS.Application.Models;
+﻿using Not.Extensions;
+using NTS.Application.Models;
 using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Athletes;
 using NTS.Warp.ACL.Entities.Countries;
@@ -18,7 +19,7 @@ public class AthleteFactory
             FeiId = athlete.FeiId, //TODO: after athlete
             FirstName = athlete.Names.ElementAtOrDefault(0),
             LastName = athlete.Names.ElementAtOrDefault(1),
-            Id = athlete.Id,
+            Id = DomainModelHelper.GenerateId(),
         };
         var country = new EmsCountry(athlete.Country?.IsoCode ?? "iso", athlete.Country?.Name ?? "country-name", 1337);
         return new EmsAthlete(athleteState, country);

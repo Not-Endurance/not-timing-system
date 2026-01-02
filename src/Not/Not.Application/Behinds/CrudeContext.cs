@@ -2,7 +2,7 @@
 using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Ports;
 using Not.Domain;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using Not.Events;
 using Not.Exceptions;
 

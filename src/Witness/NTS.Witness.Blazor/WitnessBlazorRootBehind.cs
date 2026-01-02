@@ -3,7 +3,7 @@ using Not.Blazor.Components;
 
 namespace NTS.Witness.Blazor;
 
-public class WitnessBlazorRootBehind : NComponent
+public class WitnessBlazorRootBehind : NBehind
 {
     protected IEnumerable<Assembly> _routeAssemblies = [typeof(WitnessBlazorRoot).Assembly];
     protected NErrorBoundary _errorBoundary = default!;

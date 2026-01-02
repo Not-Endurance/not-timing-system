@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using static NTS.Domain.Enums.OfficialRole;
 
 namespace NTS.Domain.Setup.Aggregates;

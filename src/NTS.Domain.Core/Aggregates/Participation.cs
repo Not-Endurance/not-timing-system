@@ -1,12 +1,13 @@
-﻿using Not.Domain.Base;
+﻿using Not.Domain.Aggregates;
 using Not.Events;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects.Payloads;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Participation : AggregateRoot, IAggregateRoot
+public class Participation : AggregateRoot
 {
     //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
     static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);

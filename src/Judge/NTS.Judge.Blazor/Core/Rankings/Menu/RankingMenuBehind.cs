@@ -7,7 +7,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Menu;
 
-public class RankingMenuBehind : NComponent
+public class RankingMenuBehind : NBehind
 {
     [Inject]
     IRankingMenuService Service { get; set; } = default!;

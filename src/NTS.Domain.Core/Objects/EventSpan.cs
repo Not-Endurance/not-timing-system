@@ -1,10 +1,8 @@
 ﻿using System.Globalization;
-using Not.Domain.Base;
-using DateTimeOffset = System.DateTimeOffset;
 
 namespace NTS.Domain.Core.Objects;
 
-public record EventSpan : DomainObject
+public record EventSpan
 {
     public EventSpan(DateTimeOffset startDay, DateTimeOffset endDay)
     {

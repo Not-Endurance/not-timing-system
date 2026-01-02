@@ -4,7 +4,7 @@ using NTS.Domain.Objects;
 
 namespace NTS.Witness.Blazor.Components.Performances;
 
-public class PerformanceBehind : NComponent
+public class PerformanceBehind : NBehind
 {
     [Inject]
     IPerformanceService Service { get; set; } = default!;

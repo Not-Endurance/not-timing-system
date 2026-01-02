@@ -1,8 +1,8 @@
-﻿using Not.Domain.Base;
+﻿using Not.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public record Competition : DomainObject
+public class Competition : Aggregate
 {
     public Competition(string name, CompetitionRuleset ruleset, CompetitionType type)
     {

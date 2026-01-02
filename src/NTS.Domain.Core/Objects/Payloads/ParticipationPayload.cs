@@ -1,9 +1,8 @@
-﻿using Not.Domain.Base;
-using NTS.Domain.Core.Aggregates;
+﻿using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Domain.Core.Objects.Payloads;
 
-public abstract record ParticipationPayload : DomainObject
+public abstract record ParticipationPayload
 {
     public ParticipationPayload(Participation participation)
     {

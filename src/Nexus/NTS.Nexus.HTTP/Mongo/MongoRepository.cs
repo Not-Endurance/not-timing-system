@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
-using Not.Domain;
 using NTS.Application.Models;
 
 namespace NTS.Nexus.HTTP.Mongo;
 
 public abstract class MongoRepository<T> : IRepository<T>
-    where T : IDocument, IAggregateRoot
+    where T : IDocument
 {
     readonly IMongoContext _context;
     readonly string _db;

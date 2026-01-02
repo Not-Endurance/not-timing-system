@@ -14,14 +14,9 @@ public class WitnessTestClient
         IEmsStartlistClientProcedures,
         ITestRpcClient
 {
-    private readonly IRpcSocket _socket;
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public WitnessTestClient(IRpcSocket socket, ITestOutputHelper testOutputHelper)
+    public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
         : base(socket)
     {
-        _socket = socket;
-        _testOutputHelper = testOutputHelper;
         RegisterInputProcedure<EmsStartlistEntry, EmsCollectionAction>(nameof(ReceiveEntry), ReceiveEntry);
         RegisterInputProcedure<EmsParticipantEntry, EmsCollectionAction>(
             nameof(ReceiveEntryUpdate),

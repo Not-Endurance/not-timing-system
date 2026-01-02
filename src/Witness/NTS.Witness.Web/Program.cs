@@ -11,14 +11,8 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
-        builder.Services.AddRazorPages();
-        builder.Services.AddServerSideBlazor();
-
-        var assembly = typeof(Program).Assembly;
-        builder.Configuration.AddNAppsettings(assembly);
+        builder.Configuration.AddNAppsettings(typeof(Program).Assembly);
         builder.Services.ConfigureNtsWitnessWeb(builder.Configuration);
-
         builder.Logging.AddSerilog();
 
         var app = builder.Build();
@@ -32,12 +26,9 @@ public class Program
         }
 
         app.MapAuthEndpoints();
-
         app.UseHttpsRedirection();
-
         app.UseStaticFiles();
         app.UseAntiforgery();
-
         app.MapBlazorHub();
         app.MapFallbackToPage("/_Host");
 

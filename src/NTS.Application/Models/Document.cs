@@ -1,4 +1,4 @@
-﻿using Not.Domain;
+﻿using Not.Domain.Aggregates;
 using Not.Storage.Tenants;
 using Not.Structures;
 

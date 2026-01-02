@@ -55,7 +55,7 @@ public abstract class IntegrationTest : IDisposable
         where T : notnull
     {
         var behind = Provider.GetRequiredService<T>();
-        if (behind is IObservableBehind observableBehind)
+        if (behind is INObservable observableBehind)
         {
             await observableBehind.Initialize([log]);
         }

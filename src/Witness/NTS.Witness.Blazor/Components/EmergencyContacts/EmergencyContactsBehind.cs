@@ -2,7 +2,7 @@
 
 namespace NTS.Witness.Blazor.Components.EmergencyContacts;
 
-public class EmergencyContactsBehind : NComponent
+public class EmergencyContactsBehind : NBehind
 {
     [Inject]
     IEmergencyService Service { get; set; } = default!;

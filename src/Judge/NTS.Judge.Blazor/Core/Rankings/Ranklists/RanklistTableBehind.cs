@@ -3,7 +3,7 @@ using NTS.Domain.Core.Objects;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Ranklists;
 
-public class RanklistTableBehind : NComponent
+public class RanklistTableBehind : NBehind
 {
     [Inject]
     IRanklistDocumentService Service { get; set; } = default!;

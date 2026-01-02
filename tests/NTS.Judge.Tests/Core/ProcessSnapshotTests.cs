@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Not.Application.CRUD.Ports;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Domain.Objects;
 using NTS.Judge.Core;
 using NTS.Judge.Tests.Helpers;
 using NTS.Storage.Core;

@@ -4,7 +4,7 @@ using static NTS.Localization.NtsStrings;
 
 namespace NTS.Blazor.Components.Startlist;
 
-public abstract class StartlistTabs : NComponent
+public abstract class StartlistBehindBase : NBehind
 {
     protected Dictionary<string, List<StartlistEntry>> StartlistsByStage { get; } = [];
 
@@ -15,13 +15,14 @@ public abstract class StartlistTabs : NComponent
         foreach (var start in starts)
         {
             var tabHeader = $"{Stage_string} {start.PhaseNumber}";
-            if (StartlistsByStage.Keys.All(t => t != tabHeader))
+            if (!StartlistsByStage.TryGetValue(tabHeader, out List<StartlistEntry>? value))
             {
-                StartlistsByStage.Add(tabHeader, []);
+                value = [];
+                StartlistsByStage.Add(tabHeader, value);
             }
-            if (StartlistsByStage[tabHeader].All(s => s.Number != start.Number))
+            if (value.All(s => s.Number != start.Number))
             {
-                StartlistsByStage[tabHeader].Add(start);
+                value.Add(start);
             }
         }
     }
