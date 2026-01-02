@@ -7,7 +7,7 @@ public class Athlete : Aggregate, IAthlete
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Athlete(Person names, Country country, Club? club, string feiId)
+    public Athlete(Person names, Country country, Club? club, string? feiId)
     {
         Names = names;
         Country = country;

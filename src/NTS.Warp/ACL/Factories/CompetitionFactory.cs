@@ -1,21 +1,31 @@
-﻿using NTS.Domain.Core.Aggregates;
+﻿using Not.Extensions;
+using NTS.Application.Models;
 using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Competitions;
 using NTS.Warp.ACL.Models;
-using NTS.Warp.Features.Judge.Models;
 
 namespace NTS.Warp.ACL.Factories;
 
 public class CompetitionFactory
 {
-    public static EmsCompetition Create(ParticipationWarpDto participation)
+    public static EmsCompetition Create(CoreParticipationModel participation)
     {
+        if (participation.Competition == null)
+        {
+            var emptyState = new EmsCompetitionState
+            {
+                Id = DomainModelHelper.GenerateId(),
+                Name = "Unknown Competition",
+                Type = EmsCompetitionType.National,
+            };
+            return new EmsCompetition(emptyState);
+        }
         var laps = LapFactory.Create(participation.Phases);
         var state = new EmsCompetitionState
         {
-            Id = participation.Id,
-            Name = participation.CompetitionName,
-            Type = MapEmsCompetitionType(participation.Ruleset),
+            Id = DomainModelHelper.GenerateId(),
+            Name = participation.Competition.Name,
+            Type = MapEmsCompetitionType(participation.Competition.Ruleset),
         };
         var competition = new EmsCompetition(state);
         foreach (var lap in laps)

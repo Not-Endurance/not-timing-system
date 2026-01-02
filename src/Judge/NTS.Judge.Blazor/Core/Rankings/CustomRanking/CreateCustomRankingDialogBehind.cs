@@ -12,10 +12,10 @@ public class CreateCustomRankingDialogBehind : NDialog
     Ranking? _templateRanking;
 
     [Inject]
-    IRead<Ranking> Rankings { get; set; } = default!;
+    IReadMany<Ranking> Rankings { get; set; } = default!;
 
     [Inject]
-    IRead<Participation> Participations { get; set; } = default!;
+    IReadMany<Participation> Participations { get; set; } = default!;
 
     [Inject]
     ICustomRankingService Service { get; set; } = default!;

@@ -1,44 +1,47 @@
-﻿using NTS.Domain.Core.Aggregates;
+﻿using NTS.Application.Models;
 using NTS.Warp.ACL.Entities.LapRecords;
 using NTS.Warp.ACL.Entities.Participants;
 using NTS.Warp.ACL.Entities.Participations;
 using NTS.Warp.ACL.Models;
-using NTS.Warp.Features.Judge.Models;
 
 namespace NTS.Warp.ACL.Factories;
 
 public class ParticipationFactory
 {
-    public static EmsParticipation CreateEms(ParticipationWarpDto participation)
+    public static EmsParticipation CreateEms(CoreParticipationModel participation)
     {
-        var athlete = AthleteFactory.Create(participation.Athlete);
-        var horse = HorseFactory.Create(participation.Horse);
+        var athlete = AthleteFactory.Create(participation.Combination.Athlete);
+        var horse = HorseFactory.Create(participation.Combination.Horse);
 
         var state = new EmsParticipantState
         {
-            Number = participation.Number.ToString(),
-            MaxAverageSpeedInKmPh = (int?)participation.MinAverageSpeed,
+            Number = participation.Combination.Number.ToString(),
+            MaxAverageSpeedInKmPh = (int?)participation.Combination.MinAverageSpeed,
             Unranked = true, // Cannot be fixed easy because IsNotRanked is on Ranking level. Not necessary in current Witness
         };
         var emsParticipant = new EmsParticipant(athlete, horse, state);
         var emsLaps = LapFactory.Create(participation.Phases).ToList();
-        for (var i = 0; i < participation.Phases.Length; i++)
+        if (participation.Phases != null && participation.Phases.Length > 0)
         {
-            var phase = participation.Phases[i];
-            var emsLap = emsLaps[i];
-            if (phase.StartTime == null)
+            for (var i = 0; i < participation.Phases.Length; i++)
             {
-                break;
+                var phase = participation.Phases[i];
+                var emsLap = emsLaps[i];
+                if (phase.StartTime == null)
+                {
+                    break;
+                }
+                var emsRecord = new EmsLapRecord(phase.StartTime.Value, emsLap)
+                {
+                    StartTime = phase.StartTime.Value,
+                    ArrivalTime = phase.ArriveTime,
+                    InspectionTime = phase.PresentTime,
+                    ReInspectionTime = phase.RepresentTime,
+                };
+                emsParticipant.Add(emsRecord);
             }
-            var emsRecord = new EmsLapRecord(phase.StartTime.Value, emsLap)
-            {
-                StartTime = phase.StartTime.Value,
-                ArrivalTime = phase.ArriveTime,
-                InspectionTime = phase.PresentTime,
-                ReInspectionTime = phase.RepresentTime,
-            };
-            emsParticipant.Add(emsRecord);
         }
+
         var competition = CompetitionFactory.Create(participation);
 
         return new EmsParticipation(emsParticipant, competition);

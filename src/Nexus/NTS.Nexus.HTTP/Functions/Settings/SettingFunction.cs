@@ -1,21 +1,19 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Serialization.JSON;
+using NTS.Application.Models;
 using NTS.Domain.Settings;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.Settings;
 
 namespace NTS.Nexus.HTTP.Functions.Settings;
 
 public class SettingFunction : FunctionBase<SettingFunction>
 {
-    readonly IRepository<SettingDocument> _settings;
+    readonly IRepository<SettingModel> _settings;
 
-    public SettingFunction(IFunctionLogger<SettingFunction> logger, IRepository<SettingDocument> settings)
+    public SettingFunction(IFunctionLogger<SettingFunction> logger, IRepository<SettingModel> settings)
         : base(logger)
     {
         _settings = settings;
@@ -30,7 +28,7 @@ public class SettingFunction : FunctionBase<SettingFunction>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var setting = requestBody.FromJson<Setting>();
-        var document = SettingDocument.Create(setting);
+        var document = SettingModel.MapFrom(setting);
         await _settings.Create(document);
 
         return new OkObjectResult($"Inserted {setting}");
@@ -45,7 +43,7 @@ public class SettingFunction : FunctionBase<SettingFunction>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var setting = requestBody.FromJson<Setting>();
-        var document = SettingDocument.Create(setting);
+        var document = SettingModel.MapFrom(setting);
         await _settings.Update(document);
 
         return new OkObjectResult($"Updated {setting}");

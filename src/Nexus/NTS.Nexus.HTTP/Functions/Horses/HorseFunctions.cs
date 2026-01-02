@@ -1,27 +1,24 @@
-﻿using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Serialization.JSON;
+using NTS.Application.Models;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Archive;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.Horses;
 
 namespace NTS.Nexus.HTTP.Functions.Horses;
 
 public class HorseFunctions : FunctionBase<HorseFunctions>
 {
-    readonly IRepository<HorseDocument> _horses;
+    readonly IRepository<SetupHorseModel> _horses;
     readonly IArchiveRepository _archive;
 
     public HorseFunctions(
         IFunctionLogger<HorseFunctions> logger,
-        IRepository<HorseDocument> horses,
+        IRepository<SetupHorseModel> horses,
         IArchiveRepository archive
     )
         : base(logger)
@@ -39,7 +36,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var horse = requestBody.FromJson<Horse>();
-        var document = HorseDocument.Create(horse);
+        var document = SetupHorseModel.MapFrom(horse);
         await _horses.Create(document);
 
         return new OkObjectResult($"Inserted {horse}");
@@ -54,7 +51,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var horse = requestBody.FromJson<Horse>();
-        var document = HorseDocument.Create(horse);
+        var document = SetupHorseModel.MapFrom(horse);
         await _horses.Update(document);
 
         return new OkObjectResult($"Updated {horse}");
@@ -117,7 +114,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     )
     {
         LogInformation(request);
-        var horses = await _horses.ReadAll().Select(x => x.ToSetupDomain());
+        var horses = await _horses.ReadAll().Select(x => x.MaptoDomain());
         return new OkObjectResult(horses);
     }
 }

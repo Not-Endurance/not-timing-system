@@ -4,17 +4,20 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Serialization.JSON;
+using NTS.Application.Models;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.Athletes;
 
 namespace NTS.Nexus.HTTP.Functions.Athletes;
 
 public class AthleteFunctions : FunctionBase<AthleteFunctions>
 {
-    readonly IRepository<SetupAthleteDocument> _athletes;
+    readonly IRepository<SetupAthleteModel> _athletes;
 
-    public AthleteFunctions(IFunctionLogger<AthleteFunctions> logger, IRepository<SetupAthleteDocument> athletes)
+    public AthleteFunctions(
+        IFunctionLogger<AthleteFunctions> logger,
+        IRepository<SetupAthleteModel> athletes
+    )
         : base(logger)
     {
         _athletes = athletes;
@@ -29,7 +32,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = SetupAthleteDocument.MapFrom(athlete);
+        var document = SetupAthleteModel.MapFrom(athlete);
         await _athletes.Create(document);
 
         return new OkObjectResult($"Inserted {athlete}");
@@ -44,7 +47,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = SetupAthleteDocument.MapFrom(athlete);
+        var document = SetupAthleteModel.MapFrom(athlete);
         await _athletes.Update(document);
 
         return new OkObjectResult($"Updated {athlete}");
@@ -69,7 +72,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
     {
         LogInformation(request);
         var athlete = await _athletes.Read(id);
-        return new OkObjectResult(athlete?.MapToSetupAggregate());
+        return new OkObjectResult(athlete?.MapToDomain());
     }
 
     [Function("athletes-list")]
@@ -80,7 +83,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         LogInformation(request);
 
         // TODO: Implement response mapping layer for documents back to aggregates
-        var athletes = await _athletes.ReadAll().Select(x => x.MapToSetupAggregate());
+        var athletes = await _athletes.ReadAll().Select(x => x.MapToDomain());
         return new OkObjectResult(athletes);
     }
 }

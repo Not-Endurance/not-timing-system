@@ -2,7 +2,7 @@
 using Not.Storage.Tenants;
 using Not.Structures;
 
-namespace NTS.Storage.Documents;
+namespace NTS.Application.Models;
 
 public abstract class Document : IDocument
 {
@@ -11,6 +11,4 @@ public abstract class Document : IDocument
 }
 
 // TODO: remove IAggregateRoot once only models are used in repositories and use IDocument in IRepository instead
-public interface IDocument : IIdentifiable, ITenantAware, IAggregateRoot
-{
-}
+public interface IDocument : IIdentifiable, ITenantAware, IAggregateRoot { }

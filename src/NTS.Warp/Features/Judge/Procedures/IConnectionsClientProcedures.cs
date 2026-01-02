@@ -1,4 +1,4 @@
-﻿namespace NTS.Application.RPC;
+﻿namespace NTS.Warp.Features.Judge.Procedures;
 
 public interface IConnectionsClientProcedures
 {
