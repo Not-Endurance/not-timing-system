@@ -1,5 +1,3 @@
 ﻿namespace Not.Domain.Aggregates;
 
-public interface IAggregate
-{
-}
+public interface IAggregate { }

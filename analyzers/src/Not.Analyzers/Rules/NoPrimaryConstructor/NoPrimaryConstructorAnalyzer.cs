@@ -19,7 +19,7 @@ public class NoPrimaryConstructorAnalyzer : AnalyzerBase
             messageFormat: "Primary constructors are not allowed",
             description: "Use traditional constructors instead of primary constructors."
         ) { }
-    
+
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

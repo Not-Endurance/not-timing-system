@@ -10,16 +10,17 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient
-    : RpcClient,
-        IWitnessParticipantsClientProcedures,
-        IWitnessStartlistClientProcedures
+public class WitnessRpcClient : RpcClient, IWitnessParticipantsClientProcedures, IWitnessStartlistClientProcedures
 {
     readonly IRpcSocket _socket;
     readonly IStartlistContext _startlistContex;
     readonly ParticipationService _participationService;
 
-    public WitnessRpcClient(IRpcSocket socket, ParticipationService participationService, IStartlistContext startlistContex)
+    public WitnessRpcClient(
+        IRpcSocket socket,
+        ParticipationService participationService,
+        IStartlistContext startlistContex
+    )
         : base(socket)
     {
         _socket = socket;

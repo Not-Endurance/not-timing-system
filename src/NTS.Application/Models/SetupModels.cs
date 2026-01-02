@@ -46,7 +46,8 @@ public class SetupAthleteModel : CoreAthleteModel, IDocument
 
     public new Athlete MapToDomain()
     {
-        var club = Club == null ? null : new Club(Club.Id, Club.Name);;
+        var club = Club == null ? null : new Club(Club.Id, Club.Name);
+        ;
         return new Athlete(Id, Names, FeiId, Country?.MapToDomain(), club);
     }
 }

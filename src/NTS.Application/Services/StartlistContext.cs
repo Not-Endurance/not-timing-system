@@ -12,9 +12,14 @@ public class StartlistContext : IStartlistContext
     {
         switch (action)
         {
-            case NCollectionAction.Remove: Startlist?.Remove(entry.Number); break;
-            case NCollectionAction.AddOrUpdate: Startlist?.Add(entry); break;
-            default: break;
+            case NCollectionAction.Remove:
+                Startlist?.Remove(entry.Number);
+                break;
+            case NCollectionAction.AddOrUpdate:
+                Startlist?.Add(entry);
+                break;
+            default:
+                break;
         }
     }
 }

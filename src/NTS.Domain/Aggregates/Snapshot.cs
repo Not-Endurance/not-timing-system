@@ -5,7 +5,8 @@ namespace NTS.Domain.Aggregates;
 
 public class Snapshot : AggregateRoot
 {
-    public Snapshot(int number, SnapshotType type, SnapshotMethod method, Timestamp timestamp) : base(GenerateId())
+    public Snapshot(int number, SnapshotType type, SnapshotMethod method, Timestamp timestamp)
+        : base(GenerateId())
     {
         Number = number;
         Type = type;

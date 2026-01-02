@@ -45,7 +45,9 @@ public abstract class AggregateRoot : Aggregate, IEquatable<AggregateRoot>, IAgg
 
     public override string ToString()
     {
-        throw new NotImplementedException($"'{GetType().Name}' is AggregateRoot and is required to override ToString() to provide short info");
+        throw new NotImplementedException(
+            $"'{GetType().Name}' is AggregateRoot and is required to override ToString() to provide short info"
+        );
     }
 
     bool IsEqual(object? other)

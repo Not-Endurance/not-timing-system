@@ -1,5 +1,5 @@
-using NTS.Domain.Aggregates;
 using NTS.Application.Models;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Warp.Features.Judge.Procedures;
 

@@ -14,10 +14,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 {
     readonly IRepository<SetupAthleteModel> _athletes;
 
-    public AthleteFunctions(
-        IFunctionLogger<AthleteFunctions> logger,
-        IRepository<SetupAthleteModel> athletes
-    )
+    public AthleteFunctions(IFunctionLogger<AthleteFunctions> logger, IRepository<SetupAthleteModel> athletes)
         : base(logger)
     {
         _athletes = athletes;

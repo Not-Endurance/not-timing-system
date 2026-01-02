@@ -30,6 +30,7 @@ public record StartlistEntry
     public int PhaseNumber { get; }
     public double Distance { get; }
     public StartlistEntryState State { get; internal set; } = StartlistEntryState.Resting;
+
     // TODO: Use Timestamp instead and use TimeOfDay internally in Timestamp in order to discard Day differences. Should make testing a bit more easier with actual data
     public Timestamp Start { get; }
 

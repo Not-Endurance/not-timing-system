@@ -19,7 +19,7 @@ public class NoPrivateAnalyzer : AnalyzerBase
             messageFormat: "The 'private' keyword is not necessary as members are private by default",
             description: "Avoid using 'private' keyword."
         ) { }
-    
+
     protected override void SafeAnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not MemberDeclarationSyntax declaration)
