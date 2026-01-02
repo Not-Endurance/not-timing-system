@@ -10,8 +10,8 @@ namespace NTS.Judge.Tests.Sample;
 [Collection(nameof(WitnessRpcFixture))]
 public class RpcIntegrationTest : JudgeIntegrationTest
 {
-    private readonly WitnessRpcFixture _witnessFIxture;
-    private readonly ITestOutputHelper _testOutputHelper;
+    readonly WitnessRpcFixture _witnessFIxture;
+    readonly ITestOutputHelper _testOutputHelper;
 
     public RpcIntegrationTest(WitnessRpcFixture witnessFixture, ITestOutputHelper testOutputHelper)
         : base(nameof(CoreState), testOutputHelper)

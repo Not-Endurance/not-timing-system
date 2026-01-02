@@ -5,12 +5,12 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class Combination : AggregateRoot, IParent, IReflect<Athlete>, IReflect<Horse>
 {
-    public static Combination Create(int? number, Athlete? athlete, Horse? horse, Tag? tag)
+    public static Combination Create(int? number, Athlete? athlete, Horse? horse, Tag? _)
     {
-        return new(number, athlete, horse, tag);
+        return new(number, athlete, horse);
     }
 
-    public static Combination Update(int? id, int? number, Athlete? athlete, Horse? horse, Tag? tag)
+    public static Combination Update(int? id, int? number, Athlete? athlete, Horse? horse, Tag? _)
     {
         return new(id, number, athlete, horse);
     }
