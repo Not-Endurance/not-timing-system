@@ -14,8 +14,7 @@ public class WitnessTestClient
         IEmsStartlistClientProcedures,
         ITestRpcClient
 {
-
-    public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _) 
+    public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
         : base(socket)
     {
         RegisterInputProcedure<EmsStartlistEntry, EmsCollectionAction>(nameof(ReceiveEntry), ReceiveEntry);
