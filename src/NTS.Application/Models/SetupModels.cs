@@ -46,7 +46,7 @@ public class SetupAthleteModel : CoreAthleteModel, IDocument
 
     public new Athlete MapToDomain()
     {
-        var club = new Club(Club?.MapToDomain().Name);
+        var club = Club == null ? null : new Club(Club.Id, Club.Name);;
         return new Athlete(Id, Names, FeiId, Country?.MapToDomain(), club);
     }
 }
@@ -92,16 +92,8 @@ public class SetupCombinationModel
     public Combination MapToDomain()
     {
         var athlete = Athlete.MapToDomain();
-        //intermediate horse will be removed after merge with codex/design-rpc-methods-for-nts.witness
-        var intermediateHorse = Horse.MaptoDomain();
-        var horse = new Horse(intermediateHorse.Id, intermediateHorse.Name, intermediateHorse.FeiId);
-        return new Combination(
-            Id,
-            Number,
-            athlete,
-            horse,
-            null // Tag prop is not used currently
-        );
+        var horse = Horse.MaptoDomain();
+        return new Combination(Id, Number, athlete, horse);
     }
 }
 
@@ -184,7 +176,8 @@ public class SetupPhaseModel
 
     public Phase MapToDomain()
     {
-        return new Phase(Loop.MapToDomain(), Recovery, Rest);
+        var loop = Loop.MapToDomain();
+        return new Phase(loop, Recovery, Rest);
     }
 }
 
@@ -222,6 +215,8 @@ public class SetupCompetitionModel
 
     public Competition MapToDomain()
     {
+        var phases = Phases.Select(x => x.MapToDomain());
+        var participations = Participations.Select(x => x.MapToDomain());
         return new Competition(
             Id,
             Name,
@@ -232,8 +227,8 @@ public class SetupCompetitionModel
             FeiId,
             FeiRule,
             FeiScheduleNumber,
-            Phases.Select(x => x.MapToDomain()),
-            Participations.Select(x => x.MapToDomain())
+            phases,
+            participations
         );
     }
 }
@@ -273,18 +268,23 @@ public class UpcomingEventModel : IDocument
 
     public UpcomingEvent MapToDomain()
     {
+        var country = Country.MapToDomain();
+        var competitions = Competitions.Select(x => x.MapToDomain());
+        var officials = Officials.Select(x => x.MapToDomain());
+        var loops = Loops.Select(x => x.MapToDomain());
+        var combinations = Combinations.Select(x => x.MapToDomain());
         return new UpcomingEvent(
             Id,
             Name,
             Place,
-            Country.MapToDomain(),
+            country,
             ShowFeiId,
             FeiId,
             FeiEventCode,
-            Competitions.Select(x => x.MapToDomain()),
-            Officials.Select(x => x.MapToDomain()),
-            Loops.Select(x => x.MapToDomain()),
-            Combinations.Select(x => x.MapToDomain())
+            competitions,
+            officials,
+            loops,
+            combinations
         );
     }
 }

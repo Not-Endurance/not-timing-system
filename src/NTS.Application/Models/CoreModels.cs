@@ -1,5 +1,4 @@
-﻿using Not.Exceptions;
-using Not.Extensions;
+﻿using Not.Extensions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
@@ -65,13 +64,11 @@ public class CoreAthleteModel
     public ClubModel? Club { get; init; }
     public string? FeiId { get; init; }
 
-    public IAthlete MapToDomain()
+    public Athlete MapToDomain()
     {
-        // this guard can be removed after merge with codex/design-rpc-methods-for-nts.witness
-        // when new Athlete accepts params for IAthlete only
-        GuardHelper.ThrowIfDefault(Club, " cannot be null");
-        var club = new Club(Club.MapToDomain());
-        return new Athlete(Names, Country.MapToDomain(), club, FeiId);
+        var country = Country.MapToDomain();
+        var club = Club?.MapToDomain();
+        return new Athlete(Names, country, club, FeiId);
     }
 }
 
@@ -123,11 +120,9 @@ public class CoreCombinationModel
 
     public Combination MapToDomain()
     {
-        var athlete = new Athlete(Athlete.MapToDomain());
-        var horse = new Horse(Horse.MaptoDomain());
-        var minSpeed = Speed.Create(MinAverageSpeed);
-        var maxSpeed = Speed.Create(MaxAverageSpeed);
-        return new Combination(Id, Number, athlete, horse, athlete.Club, Distance!, minSpeed, maxSpeed);
+        var athlete = Athlete.MapToDomain();
+        var horse = Horse.MaptoDomain();
+        return new Combination(Id, Number, athlete, horse, athlete.Club, Distance!, MinAverageSpeed, MaxAverageSpeed);
     }
 }
 
@@ -298,7 +293,7 @@ public class CoreParticipationModel
 
     public int Id { get; init; }
     public ParticipationCategory Category { get; init; } = default!;
-    public CoreCompetitionModel? Competition { get; init; }
+    public CoreCompetitionModel Competition { get; init; } = default!;
     public CoreCombinationModel Combination { get; init; } = default!;
     public CorePhaseModel[] Phases { get; init; } = default!;
     public TotalModel? Total { get; init; }
@@ -306,7 +301,7 @@ public class CoreParticipationModel
 
     public Participation MapToDomain()
     {
-        var competition = Competition!.MapToDomain();
+        var competition = Competition.MapToDomain();
         var combination = Combination.MapToDomain();
         var phases = Phases!.Select(x => x.MapToDomain());
         var eliminated = Eliminated?.MapToDomain();
@@ -411,9 +406,10 @@ public class ArchiveModel : IDocument
 
     public ArchiveEntry MapToDomain()
     {
+        var country = Country.MapToDomain();
         var enduranceEvent = new EnduranceEvent(
             Id,
-            Country.MapToDomain(),
+            country,
             City,
             Location ?? "",
             StartDay,

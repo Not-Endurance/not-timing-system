@@ -2,11 +2,6 @@
 
 public record Speed
 {
-    public static Speed? Create(double? speed)
-    {
-        return speed.HasValue ? new Speed(speed.Value) : null;
-    }
-
     public static implicit operator double?(Speed? speed)
     {
         return speed?._speed;

@@ -71,7 +71,7 @@ public class ClubModel : IDocument
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
     public string Name { get; init; } = default!;
 
-    public IClub MapToDomain()
+    public Club MapToDomain()
     {
         return new Club(Id, Name);
     }
