@@ -13,6 +13,7 @@ public static class ConfigurationManagerExtensions
         var config = new ConfigurationBuilder()
             .AddEmbeddedJsonFile("appsettings.json", optional: false, assembly)
             .AddEmbeddedJsonFile($"appsettings.{environment}.json", optional: true, assembly)
+            .AddSecrets(environment, assembly)
             .Build();
 
         manager.AddConfiguration(config);
@@ -55,5 +56,23 @@ public static class ConfigurationManagerExtensions
         }
 
         return builder.AddJsonStream(stream);
+    }
+
+    public static IConfigurationBuilder AddSecrets(
+    this IConfigurationBuilder builder,
+    string environment,
+    Assembly? assembly = null
+)
+    {
+        assembly ??= Assembly.GetExecutingAssembly();
+#if DEBUG
+        return builder.AddUserSecrets(assembly);
+#else
+        if (environment.Equals("Development", StringComparison.OrdinalIgnoreCase))
+        {
+            return builder.AddUserSecrets(assembly);
+        }
+        return builder.AddEnvironmentVariables();
+#endif
     }
 }
