@@ -59,10 +59,10 @@ public static class ConfigurationManagerExtensions
     }
 
     public static IConfigurationBuilder AddSecrets(
-    this IConfigurationBuilder builder,
-    string environment,
-    Assembly? assembly = null
-)
+        this IConfigurationBuilder builder,
+        string environment,
+        Assembly? assembly = null
+    )
     {
         assembly ??= Assembly.GetExecutingAssembly();
 #if DEBUG
