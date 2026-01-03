@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,8 +8,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using Not.Injection;
+using NTS.Application.Models;
 using NTS.Nexus.HTTP.Mongo;
-using NTS.Storage.Documents;
 
 var connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING");
 
@@ -17,7 +18,7 @@ var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
 builder.Services.AddMongo(connectionString);
-builder.Services.RegisterConventionalServices();
+builder.Services.AddNConventionalServices(Assembly.GetExecutingAssembly());
 
 builder.Services.AddApplicationInsightsTelemetryWorkerService().ConfigureFunctionsApplicationInsights();
 

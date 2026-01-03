@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Extensions;
 
 namespace NTS.Domain.Core.Aggregates.Participations;

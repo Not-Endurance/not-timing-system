@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Base;
 
 namespace NTS.Domain.Objects;
 
-public sealed record Timestamp : DomainObject, IComparable<Timestamp>
+public sealed record Timestamp : IComparable<Timestamp>
 {
+    public static readonly Timestamp DEFAULT = new(new DateTimeOffset());
+
     public static Timestamp Now()
     {
         return new Timestamp(DateTimeOffset.Now);
@@ -68,20 +69,29 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
         return left == null ? null : new Timestamp(left!._stamp + (right ?? TimeSpan.Zero));
     }
 
+    public static Timestamp? operator -(Timestamp? left, TimeSpan? right)
+    {
+        return left == null ? null : new Timestamp(left!._stamp - (right ?? TimeSpan.Zero));
+    }
+
     Timestamp() { }
 
     Timestamp(Timestamp timestamp)
-        : base(timestamp)
     {
         _stamp = timestamp._stamp;
     }
 
-    Timestamp(TimeSpan timeSpan)
-        : this(DateTimeOffset.Now.Add(timeSpan)) { }
-
     public Timestamp(DateTimeOffset dateTimeOffset)
     {
         _stamp = dateTimeOffset;
+    }
+
+    public Timestamp(string timeText)
+    {
+        if (DateTimeOffset.TryParseExact(timeText, "HH:mm:ss", null, DateTimeStyles.None, out DateTimeOffset result))
+        {
+            _stamp = result;
+        }
     }
 
     [JsonProperty]
@@ -117,5 +127,10 @@ public sealed record Timestamp : DomainObject, IComparable<Timestamp>
     public DateTime ToDateTime()
     {
         return _stamp.DateTime;
+    }
+
+    public TimeSpan ToTimeSpan()
+    {
+        return _stamp.TimeOfDay;
     }
 }

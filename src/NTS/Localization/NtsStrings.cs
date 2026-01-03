@@ -10,6 +10,7 @@ namespace NTS.Localization
     public static class NtsStrings // TODO: csharpierignore this file
     {
         public static string km_string => LocalizeString(nameof(km_string));
+        public static string hrs_string => LocalizeString(nameof(hrs_string));
         public static string Export_FEI_string => LocalizeString(nameof(Export_FEI_string));
         public static string rest_string => LocalizeString(nameof(rest_string));
         public static string ARR_string => LocalizeString(nameof(ARR_string));
@@ -180,6 +181,29 @@ namespace NTS.Localization
             LocalizeString(nameof(Cannot_select_another_event_without_resetting__string));
         public static string Component_missing_required_value_string =>
             LocalizeString(nameof(Component_missing_required_value_string));
+        public static string Help_string => LocalizeString(nameof(Help_string));
+        public static string Home_string => LocalizeString(nameof(Home_string));
+        public static string Login_string => LocalizeString(nameof(Login_string));
+        public static string Login_invite_string => LocalizeString(nameof(Login_invite_string));
+        public static string Login_page_string => LocalizeString(nameof(Login_page_string));
+        public static string Contacts_string => LocalizeString(nameof(Contacts_string));
+        public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
+        public static string Snapshot_page_string => LocalizeString(nameof(Snapshot_page_string));
+        public static string Performance_string => LocalizeString(nameof(Performance_string));
+        public static string Vetin_string => LocalizeString(nameof(Vetin_string));
+        public static string Participant_string => LocalizeString(nameof(Participant_string));
+        public static string Username_string => LocalizeString(nameof(Username_string));
+        public static string Password_string => LocalizeString(nameof(Password_string));
+        public static string Send_snapshot_string => LocalizeString(nameof(Send_snapshot_string));
+        public static string Empty_intermediate_snapshot_list_string =>
+            LocalizeString(nameof(Empty_intermediate_snapshot_list_string));
+        public static string Edit_timestamp_string => LocalizeString(nameof(Edit_timestamp_string));
+        public static string Timestamp_string => LocalizeString(nameof(Timestamp_string));
+        public static string Save_string => LocalizeString(nameof(Save_string));
+        public static string Profile_page_string => LocalizeString(nameof(Profile_page_string));
+        public static string Access_denied_string => LocalizeString(nameof(Access_denied_string));
+        public static string Access_denied_next_steps => LocalizeString(nameof(Access_denied_next_steps));
+        public static string Try_another_account_string => LocalizeString(nameof(Try_another_account_string));
     }
 }
 #pragma warning restore NA0004

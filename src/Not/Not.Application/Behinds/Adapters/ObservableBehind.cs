@@ -6,7 +6,7 @@ namespace Not.Application.Behinds.Adapters;
 
 // TODO: Probably rename to EventBehind. However we need to rename the Domain entity Event
 // To EnduranceEvent to avoid name conflicts
-public abstract class ObservableBehind : IObservableBehind
+public abstract class ObservableBehind : INObservable
 {
     readonly SemaphoreSlim _semaphore = new(1);
     readonly Event _stateChanged = new();
@@ -19,11 +19,14 @@ public abstract class ObservableBehind : IObservableBehind
     /// <returns>Indicates weather or not the state has been initialized successfully</returns>
     protected abstract Task<bool> PerformInitialization(params IEnumerable<object> arguments);
 
-    protected bool Initialized { get; } = false;
-
     protected void EmitChange()
     {
         _stateChanged.Emit();
+    }
+
+    public void Reset()
+    {
+        _isInitialized = false;
     }
 
     public async Task Initialize(params IEnumerable<object> arguments)

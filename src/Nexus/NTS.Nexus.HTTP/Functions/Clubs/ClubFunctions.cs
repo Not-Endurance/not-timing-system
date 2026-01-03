@@ -1,22 +1,20 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Serialization.JSON;
+using NTS.Application.Models;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.Clubs;
 
 namespace NTS.Nexus.HTTP.Functions.Clubs;
 
 public class ClubFunctions : FunctionBase<ClubFunctions>
 {
-    readonly IRepository<ClubDocument> _clubs;
+    readonly IRepository<ClubModel> _clubs;
 
-    public ClubFunctions(IFunctionLogger<ClubFunctions> logger, IRepository<ClubDocument> clubs)
+    public ClubFunctions(IFunctionLogger<ClubFunctions> logger, IRepository<ClubModel> clubs)
         : base(logger)
     {
         _clubs = clubs;
@@ -31,7 +29,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var club = requestBody.FromJson<Club>();
-        var document = ClubDocument.Create(club);
+        var document = ClubModel.MapFrom(club);
         await _clubs.Create(document);
 
         return new OkObjectResult($"Inserted {club}");
@@ -46,7 +44,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var club = requestBody.FromJson<Club>();
-        var document = ClubDocument.Create(club);
+        var document = ClubModel.MapFrom(club);
         await _clubs.Update(document);
 
         return new OkObjectResult($"Updated {club}");
@@ -73,7 +71,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
         LogInformation(request);
 
         var club = await _clubs.Read(id);
-        return new OkObjectResult(club?.ToDomain());
+        return new OkObjectResult(club?.MapToDomain());
     }
 
     [Function("clubs-list")]
@@ -83,7 +81,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
     {
         LogInformation(request);
 
-        var clubs = await _clubs.ReadAll().Select(x => x.ToDomain());
+        var clubs = await _clubs.ReadAll().Select(x => x.MapToDomain());
         return new OkObjectResult(clubs);
     }
 }

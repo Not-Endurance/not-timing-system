@@ -3,7 +3,7 @@ using Not.Events;
 
 namespace Not.Blazor.Components;
 
-public abstract class PrintableComponent : NComponent, IDisposable
+public abstract class PrintableComponent : NBehind, IDisposable
 {
     public delegate void ToggleVisibility();
 
@@ -26,7 +26,6 @@ public abstract class PrintableComponent : NComponent, IDisposable
 
     protected async Task OpenPrintDialog()
     {
-        await Task.Delay(2000);
         InvokeToggle();
         await PrintInterop.OpenPrintDialog();
         InvokeToggle();

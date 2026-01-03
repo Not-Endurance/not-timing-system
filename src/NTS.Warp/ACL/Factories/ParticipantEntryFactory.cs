@@ -1,11 +1,11 @@
-﻿using NTS.Warp.ACL.Entities;
-using NTS.Warp.Features.Judge.Models;
+﻿using NTS.Application.Models;
+using NTS.Warp.ACL.Entities;
 
 namespace NTS.Warp.ACL.Factories;
 
 public class ParticipantEntryFactory
 {
-    public static EmsParticipantEntry Create(ParticipationWarpDto participation)
+    public static EmsParticipantEntry Create(CoreParticipationModel participation)
     {
         var emsParticipation = ParticipationFactory.CreateEms(participation);
         return new EmsParticipantEntry(emsParticipation);

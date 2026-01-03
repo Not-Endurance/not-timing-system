@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Not\Not.Blazor\Not.Blazor.csproj" />
+    <ProjectReference Include="..\NTS.Domain.Core\NTS.Domain.Core.csproj" />
+    <ProjectReference Include="..\NTS.Domain.Setup\NTS.Domain.Setup.csproj" />
+    <ProjectReference Include="..\NTS.Domain\NTS.Domain.csproj" />
+    <ProjectReference Include="..\NTS\NTS.Common.csproj" />
+  </ItemGroup>
+
+</Project>

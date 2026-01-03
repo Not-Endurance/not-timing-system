@@ -1,10 +1,10 @@
-using NTS.Domain.Objects;
-using NTS.Warp.Features.Judge.Models;
+using NTS.Application.Models;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Warp.Features.Judge.Procedures;
 
 public interface IParticipationClientProcedures
 {
-    Task ProcessSnapshots(IEnumerable<Snapshot> snapshots);
-    Task<IEnumerable<ParticipationWarpDto>> GetActiveParticipations();
+    Task Receive(IEnumerable<Snapshot> snapshots);
+    Task<IEnumerable<CoreParticipationModel>> GetActive();
 }

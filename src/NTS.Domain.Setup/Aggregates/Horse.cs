@@ -1,4 +1,4 @@
-﻿using Not.Domain.Base;
+﻿using Not.Domain.Aggregates;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;

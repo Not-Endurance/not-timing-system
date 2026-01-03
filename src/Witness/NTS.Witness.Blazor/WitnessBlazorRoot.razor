@@ -1,0 +1,43 @@
+﻿@using System.Reflection
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components
+@using NTS.Witness.Blazor.Components.Shared
+@using Not.Blazor.Components
+
+@inherits WitnessBlazorRootBehind
+
+<NErrorBoundary @ref="@_errorBoundary">
+    <ChildContent>
+        <CascadingAuthenticationState>
+            <Router AppAssembly="@Assembly" AdditionalAssemblies="@_routeAssemblies">
+
+                <Found Context="routeData">
+                    <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                        <NotAuthorized>
+                            <h1 class="d-flex justify-center align-center">You have no power here!</h1>
+                        </NotAuthorized>
+                    </AuthorizeRouteView>
+                    <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                </Found>
+
+                <NotFound>
+                    <LayoutView Layout="@typeof(MainLayout)">
+                        <p role="alert">Sorry, there's nothing at this address.</p>
+                    </LayoutView>
+                </NotFound>
+            </Router>
+        </CascadingAuthenticationState>
+    </ChildContent>
+
+    <ErrorContent>
+        <br />
+        <br />
+        <div class="container">
+            <pre>@context.Message</pre>
+            <pre>@context.StackTrace</pre>
+        </div>
+
+        <button class="btn btn-primary" @onclick="@(() => _errorBoundary.Recover())">Back</button>
+    </ErrorContent>
+</NErrorBoundary>

@@ -1,0 +1,23 @@
+﻿@using NTS.Domain.Extensions;
+@using NTS.Domain.Core.Aggregates;
+
+@inherits ParticipationChipsBehind
+
+<MudChipSet T="Participation" @bind-SelectedValue="Value"  SelectionMode="SelectionMode.SingleSelection">
+
+    @foreach (var grouping in Set.GroupBy(x => x.Phases.Distance)) // TODO: move grouping in field
+    {
+        <MudText Class="pl-4">
+            <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
+        </MudText>
+
+        <MudDivider />
+
+        @foreach (var participation in grouping.OrderBy(x => x.Combination.Number))
+        {
+            var number = participation.Combination.Number;
+            var color = SetChipColor?.Invoke(participation) ?? Color.Primary;
+            <MudChip Text="@number.ToString()" Value="@participation" Color="@color" OnClick="@(() => OnSelect?.Invoke(participation))" Style="min-width: 1rem" Size="ChipSize"  />
+        }
+    }
+</MudChipSet>

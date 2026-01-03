@@ -1,10 +1,12 @@
-﻿namespace Not.Blazor.Components;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class NBindableComponent<T> : NComponent
+namespace Not.Blazor.Components;
+
+public class NBindableComponent<T> : NBehind
 {
     T? _value;
 
-    [Parameter]
+    [Parameter, Required]
 #pragma warning disable BL0007 // Component parameters should be auto properties
     public T? Value
 #pragma warning restore BL0007 // Component parameters should be auto properties

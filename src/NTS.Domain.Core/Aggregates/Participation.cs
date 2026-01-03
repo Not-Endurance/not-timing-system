@@ -1,17 +1,19 @@
-﻿using Not.Domain.Base;
+﻿using Not.Domain.Aggregates;
 using Not.Events;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects.Payloads;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Participation : AggregateRoot, IAggregateRoot
+public class Participation : AggregateRoot
 {
     //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
     static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);
     static readonly FailedToQualify SPEED_RESTRICTION = new([FailToQualifyCode.SP]);
     public static readonly Event<PhaseCompleted> PHASE_COMPLETED_EVENT = new();
+    public static readonly Event<PhaseCompleted> PARTICIPATION_COMPLETED_EVENT = new();
     public static readonly Event<ParticipationEliminated> ELIMINATED_EVENT = new();
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
@@ -77,12 +79,8 @@ public class Participation : AggregateRoot, IAggregateRoot
     //TODO rename to smthing better (including ISnapshotProcessor, IManualProcessor and other mentions..)
     public SnapshotResult Process(Snapshot snapshot)
     {
-        if (Eliminated != null)
-        {
-            return SnapshotResult.NotApplied(snapshot, NotAppliedDueToNotQualified);
-        }
         var result = Phases.Process(snapshot);
-        if (result.Type == Applied)
+        if (Eliminated == null && result.Type == Applied)
         {
             EvaluatePhase(Phases.Current);
         }
@@ -174,7 +172,14 @@ public class Participation : AggregateRoot, IAggregateRoot
         {
             Phases.StartIfNext();
             var phaseCompleted = new PhaseCompleted(this);
-            PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
+            if (phase.IsFinal)
+            {
+                PARTICIPATION_COMPLETED_EVENT.Emit(phaseCompleted);
+            }
+            else
+            {
+                PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
+            }
         }
     }
 

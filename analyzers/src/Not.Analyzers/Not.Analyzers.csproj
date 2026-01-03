@@ -10,7 +10,15 @@
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <NoWarn>RS2008</NoWarn>
+    <NoWarn>RS2002;RS2003;RS2007;NU5128</NoWarn> 
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- NuGet metadata -->
+    <PackageId>NotACompany.Analyzers</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Alexander Chobanov</Authors>
+    <Description>Code style analyzers and fixers according to NotACompany code style standards</Description>
   </PropertyGroup>
 
   <ItemGroup>

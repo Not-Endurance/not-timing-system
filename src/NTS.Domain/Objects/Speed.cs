@@ -1,14 +1,7 @@
-﻿using Not.Domain.Base;
+﻿namespace NTS.Domain.Objects;
 
-namespace NTS.Domain.Objects;
-
-public record Speed : DomainObject
+public record Speed
 {
-    public static Speed? Create(double? speed)
-    {
-        return speed.HasValue ? new Speed(speed.Value) : null;
-    }
-
     public static implicit operator double?(Speed? speed)
     {
         return speed?._speed;
@@ -53,6 +46,11 @@ public record Speed : DomainObject
     public override string ToString()
     {
         return $"{_speed:0.00}";
+    }
+
+    public string ToStringWithThousands()
+    {
+        return $"{_speed:0.000}";
     }
 
     public double ToDouble()

@@ -1,42 +1,47 @@
-﻿@inherits ProtocolBehind
+﻿@using static Not.Localization.LocalizationHelper
+@inherits ProtocolBehind
 
 @if (Header == null || Ranklist == null)
 {
     <NHeadline3 Color="Color.Error" Content="@string.Format(Component_missing_required_value_string, Protocol_string)" />
     return;
 }
-<MudStack Row StretchItems="StretchItems.Middle" AlignItems="AlignItems.Center">
-    <MudImage Height="120" Width="135" Src="images/logo-nak.jpg" />
-    
-    <MudStack>
-        <NHeadline2 Content="@Header.Title" />
-
-        <MudStack Row Class="d-flex" Justify="Justify.Center">
-            <NHeadline2 Content="@Header.PopulatedPlace.City" />
-
-            <NHeadline2 Content="@Header.EventSpan.ToString()" />
-
-            <NHeadline2 Content="@Header.PopulatedPlace.Country.ToString()" />
-        </MudStack>
+<MudStack>
+    <MudItem Class="d-flex flex-row justify-space-around printable">
+        <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(HeaderLogo.Left, HeaderLogo.DirPath)">
+            <MudImage Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@HeaderLogo.Left" />
+        </MudPaper>
+        <MudItem Class="d-flex flex-column justify-center">
+            <NHeadline2 Content="@Header.Title" Class="mb-4" />
+            <MudStack Class="d-flex mb-3" Row="true" Justify="Justify.Center">
+                <NHeadline3 Content="@Header.PopulatedPlace.City" />
+                <NHeadline3 Content="@Header.EventSpan.ToString()" />
+                <NHeadline3 Content="@LocalizeString(Header.PopulatedPlace.Country.ToString())" />
+            </MudStack>
+        </MudItem>
+        <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(HeaderLogo.Right, HeaderLogo.DirPath)">
+            <MudImage Class="pt-2 " Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@HeaderLogo.Right" />
+        </MudPaper>
+    </MudItem>
         
         <MudStack>
             <MudStack Row Class="d-flex mb-3" Justify="Justify.Center">
                 <MudStack>
                     @if (Header.GroundJuryPresident != null)
                     {
-                        <MudText Typo="Typo.caption" Style="font-size:12px;">
+                        <MudText Typo="Typo.subtitle2">
                             @Header.GroundJuryPresident
                         </MudText>
                     }
                     @if (Header.ChiefSteward != null)
                     {
-                        <MudText Typo="Typo.caption" Style="font-size:12px;">
+                        <MudText Typo="Typo.subtitle2">
                             @Header.ChiefSteward
                         </MudText>
                     }
                     @if (Header.ForeignJudge != null)
                     {
-                        <MudText Typo="Typo.caption" Style="font-size:12px;">
+                        <MudText Typo="Typo.subtitle2">
                             @Header.ForeignJudge
                         </MudText>
                     }
@@ -45,19 +50,19 @@
                 <MudStack>
                     @if (Header.VeterinaryCommissionPresident != null)
                     {
-                        <MudText Typo="Typo.caption" Style="font-size:12px;">
+                        <MudText Typo="Typo.subtitle2">
                             @Header.VeterinaryCommissionPresident
                         </MudText>
                     }
                     @if (Header.TechnicalDelegate != null)
                     {
-                        <MudText Typo="Typo.caption" Style="font-size:12px;">
+                        <MudText Typo="Typo.subtitle2">
                             @Header.TechnicalDelegate
                         </MudText>
                     }
                     @if (Header.ForeignVeterinaryDelegate != null)
                     {
-                        <MudText Typo="Typo.caption" Style="font-size:12px;">
+                        <MudText Typo="Typo.subtitle2">
                             @Header.ForeignVeterinaryDelegate
                         </MudText>
                     }
@@ -65,16 +70,17 @@
             </MudStack>
         </MudStack>
     </MudStack>
-    
-    <MudImage Height="120" Width="135" Src="images/logo-bfks.png" />
-</MudStack>
 
 <MudStack Spacing="0" AlignItems="AlignItems.Center">
-    <MudDivider Class="mt-1" />
     @foreach (var entry in Ranklist.Entries)
     {
         <ProtocolRow Entry="entry" />
-
-        <MudDivider Class="mt-1 printable" />
     }
-</MudStack>    
+</MudStack>
+
+<style>
+    h6,
+    .participation-table .mud-button-label {
+        font-weight: normal !important;
+    }
+</style>

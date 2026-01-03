@@ -23,31 +23,28 @@
     </Main>
 
     <Rightbar>
-        <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
-            <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
-                     Color="Color.Primary"
-                     Variant="Variant.Outlined"
-                     Class="sidebar-menu-button align-center"
-                     Style="align-self:auto">
-
-                <MudMenuItem OnClick="ShowProtocol">@Protocol_string</MudMenuItem>
-                
-                <MudMenuItem OnClick="ShowRanklist">@Ranklist_string</MudMenuItem>
-            </MudMenu>
-
-            <NotButtonPrint OnClick="OpenPrintDialog" />
-        </MudButtonGroup>
-        
-        <NTextDivider Text="@Actions_string" Class="mt-4" />
-
         <MudStack Row Wrap="Wrap.Wrap">
-            <NButtonPrimary OnClick="ArchiveEnduranceEvent" Text="@Archive_string" StartIcon="@Icons.Material.Filled.Archive"/>
+            <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
+                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
+                         Color="Color.Primary"
+                         Variant="Variant.Outlined"
+                         Class="sidebar-menu-button align-center">
+
+                    <MudMenuItem OnClick="ShowProtocol">@Protocol_string</MudMenuItem>
+
+                    <MudMenuItem OnClick="ShowRanklist">@Ranklist_string</MudMenuItem>
+                </MudMenu>
+
+                <NotButtonPrint OnClick="OpenPrintDialog" />
+            </MudButtonGroup>
             
+            <NButtonPrimary OnClick="ArchiveEnduranceEvent" Text="@Archive_string" StartIcon="@Icons.Material.Filled.Archive"/>
+
             @if (IsFeiExportConfigured)
             {
-                <NButtonPrimary OnClick="GenerateFeiExport" Text="@Export_FEI_string" StartIcon="@Icons.Material.Filled.ImportExport"/> 
+                <NButtonPrimary OnClick="GenerateFeiExport" Text="@Export_FEI_string" StartIcon="@Icons.Material.Filled.ImportExport"/>
             }
-            
+
             <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
         </MudStack>
 

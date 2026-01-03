@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using Not.Storage.States;
 
 namespace Not.Storage.Repositories;

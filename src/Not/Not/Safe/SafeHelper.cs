@@ -163,11 +163,23 @@ public static class SafeHelper
         return Run(action, argument, NotifyHelper.Warn);
     }
 
-    public static async Task HandleException(Exception exception)
+    public static async Task HandleExceptionAsync(Exception exception)
     {
         if (exception is ValidationException validation)
         {
             await HandleDefaultValidation(validation);
+        }
+        else
+        {
+            HandleError(exception);
+        }
+    }
+
+    public static void HandleException(Exception exception)
+    {
+        if (exception is ValidationException validation)
+        {
+            NotifyHelper.Warn(validation);
         }
         else
         {

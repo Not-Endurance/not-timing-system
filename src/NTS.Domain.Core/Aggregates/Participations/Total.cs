@@ -1,8 +1,8 @@
-﻿using Not.Domain.Base;
+﻿using Not.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public record Total : DomainObject
+public class Total : Aggregate
 {
     public Total(IEnumerable<Phase> phases)
     {

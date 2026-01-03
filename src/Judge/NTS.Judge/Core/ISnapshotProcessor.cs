@@ -1,5 +1,5 @@
 ﻿using Not.Injection;
-using NTS.Domain.Objects;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Judge.Core;
 

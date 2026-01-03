@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public record Withdrawn : Eliminated
+public class Withdrawn : Eliminated
 {
     public Withdrawn()
         : base(WITHDRAWN) { }
@@ -15,7 +15,7 @@ public record Withdrawn : Eliminated
     }
 }
 
-public record Retired : Eliminated
+public class Retired : Eliminated
 {
     public Retired()
         : base(RETIRED) { }
@@ -26,7 +26,7 @@ public record Retired : Eliminated
     }
 }
 
-public record Disqualified : Eliminated
+public class Disqualified : Eliminated
 {
     public Disqualified()
         : base(DISQUALIFIED) { }
@@ -71,7 +71,7 @@ public record Disqualified : Eliminated
     }
 }
 
-public record FinishedNotRanked : Eliminated
+public class FinishedNotRanked : Eliminated
 {
     public FinishedNotRanked(string complement)
         : base(FINISHED_NOT_RANKED, complement) { }
@@ -82,7 +82,7 @@ public record FinishedNotRanked : Eliminated
     }
 }
 
-public record FailedToQualify : Eliminated
+public class FailedToQualify : Eliminated
 {
     [JsonConstructor]
     public FailedToQualify(FailToQualifyCode[] ftqCodes, string? complement)
@@ -126,7 +126,7 @@ public record FailedToQualify : Eliminated
     }
 }
 
-public abstract record Eliminated : DomainObject
+public abstract class Eliminated : Aggregate
 {
     public const string WITHDRAWN = "WD";
     public const string RETIRED = "RET";

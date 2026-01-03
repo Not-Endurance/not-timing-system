@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Not.Application.Behinds;
 using Not.Application.CRUD.Ports;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using Not.Exceptions;
 
 namespace Not.Storage.Repositories;

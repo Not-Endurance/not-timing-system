@@ -1,7 +1,7 @@
 ﻿using Not.Application.Cache;
 using Not.Application.CRUD.Ports;
 using Not.Async;
-using Not.Domain;
+using Not.Domain.Aggregates;
 
 namespace Not.Application.HTTP;
 

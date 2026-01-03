@@ -1,0 +1,24 @@
+﻿@using NTS.Domain.Core.Objects
+@using System.Collections
+@using NTS.Domain.Core.Objects.Startlists
+@using Not.Extensions
+@using Not.Blazor.Components
+@using MudBlazor
+
+@inherits StartlistUpcomingBehind
+
+@if (Service.Upcoming.Count() != 0)
+{
+    <MudTabs PanelClass="px-4 py-6" Elevation="0" Rounded ApplyEffectsToContainer Class="@Class">
+        @foreach (var tabHeader in StartlistsByStage.Keys)
+        {
+            <MudTabPanel Text="@tabHeader">
+                <NSimpleTable T="StartlistEntry" Headings="@TableHeaders" Items="StartlistsByStage[tabHeader]">
+                    <CustomCell>
+                        <StartlistEntryTimer Entry="@context" />
+                    </CustomCell>
+                </NSimpleTable>
+            </MudTabPanel>
+        }
+    </MudTabs>
+}

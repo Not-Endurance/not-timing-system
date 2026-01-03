@@ -1,8 +1,9 @@
-﻿using NTS.Domain.Aggregates;
+﻿using Not.Domain.Aggregates;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public class Club : IClub
+public class Club : Aggregate, IClub
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]

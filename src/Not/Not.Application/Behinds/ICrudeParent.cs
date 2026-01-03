@@ -1,6 +1,6 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Ports;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using Not.Events;
 
 namespace Not.Application.Behinds;

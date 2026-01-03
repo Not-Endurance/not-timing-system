@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.RPC;
 using Not.Filesystem;
@@ -21,9 +22,9 @@ public abstract class JudgeIntegrationTest : IntegrationTest
         var services = new ServiceCollection();
         var configuration = new ConfigurationBuilder().Build();
         return services
-            .ConfigureJudge(configuration)
-            .AddRpcSocket(configuration)
+            .ConfigureNtsJudge(configuration)
+            .AddNRpcSocket(configuration)
             .AddJsonFileStore(x => x.Path = storagePath)
-            .RegisterConventionalServices();
+            .AddNConventionalServices(Assembly.GetExecutingAssembly());
     }
 }

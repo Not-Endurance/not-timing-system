@@ -238,7 +238,7 @@
     <value>Финиширал:</value>
   </data>
   <data name="Ride_time_in_hours_colon_string" xml:space="preserve">
-    <value>Време на езда (час):</value>
+    <value>Време:</value>
   </data>
   <data name="Recovery_in_hours_colon_string" xml:space="preserve">
     <value>Възстановяване (час)</value>
@@ -325,7 +325,7 @@
     <value>Конфигурирай Събитие</value>
   </data>
   <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
-    <value>Събитие не съществува</value>
+    <value>Не е създадено събитие</value>
   </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Конфигурирай Състезание</value>
@@ -600,6 +600,57 @@
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
   </data>
+  <data name="Help_string" xml:space="preserve">
+    <value>Помощ</value>
+  </data>
+  <data name="Home_string" xml:space="preserve">
+    <value>Начало</value>
+  </data>
+  <data name="Login_string" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="Contacts_string" xml:space="preserve">
+    <value>Спешни Oбаждания</value>
+  </data>
+  <data name="Snapshot_string" xml:space="preserve">
+    <value>Засечи</value>
+  </data>
+  <data name="Performance_string" xml:space="preserve">
+    <value>Резултати</value>
+  </data>
+  <data name="Vetin_string" xml:space="preserve">
+    <value>Презентиране</value>
+  </data>
+  <data name="Participant_string" xml:space="preserve">
+    <value>Участник</value>
+  </data>
+  <data name="Login_page_string" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="Snapshot_page_string" xml:space="preserve">
+    <value>Времеизмерване</value>
+  </data>
+  <data name="Username_string" xml:space="preserve">
+    <value>Име</value>
+  </data>
+  <data name="Password_string" xml:space="preserve">
+    <value>Парола</value>
+  </data>
+  <data name="Send_snapshot_string" xml:space="preserve">
+    <value>Изпрати {0} записа за</value>
+  </data>
+  <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
+    <value>Няма избрани участници за засичане</value>
+  </data>
+  <data name="Edit_timestamp_string" xml:space="preserve">
+    <value>Редактиране на време</value>
+  </data>
+  <data name="Timestamp_string" xml:space="preserve">
+    <value>Засечено време</value>
+  </data>
+  <data name="Save_string" xml:space="preserve">
+    <value />
+  </data>
   <data name="FEI_Competition_ID_label" xml:space="preserve">
     <value>FEI Събитие ID (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; горе,  дясно; пример: "2024_CI_1474_E_S_02")</value>
   </data>
@@ -639,20 +690,17 @@
   <data name="Custom_ranking_string" xml:space="preserve">
     <value>Ръчна класация</value>
   </data>
+  <data name="Create_Custom_Ranking_string" xml:space="preserve">
+    <value>Създай Ръчно Класиране</value>
+  </data>
   <data name="Optionally_select_existing_ranking_to_prepopulate_the_form_string" xml:space="preserve">
-    <value>Опционално изберете съществуваща Класация да служи като темплейт и я коригирайте за да постигнете нужния резултат. </value>
+    <value>Опционално добавете съществуваща Класация и я коригирайте, за да постигнете желания резултат. </value>
   </data>
   <data name="Add_string" xml:space="preserve">
     <value>Добави</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Ranking_string" xml:space="preserve">
     <value>Класация</value>
-  </data>
-  <data name="Create_Custom_Ranking_string" xml:space="preserve">
-    <value>Създай Ръчно Класиране</value>
   </data>
   <data name="Are_you_sure_you_want_to_delete__string" xml:space="preserve">
     <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
@@ -668,5 +716,41 @@
   </data>
   <data name="Automatic_CRI_string" xml:space="preserve">
     <value>Автоматичнa CRI</value>
+  </data>
+  <data name="Use_image_string" xml:space="preserve">
+    <value>Използвай изображение</value>
+  </data>
+  <data name="Image_browser_string" xml:space="preserve">
+    <value>Каталог на изображения</value>
+  </data>
+  <data name="Delete_selection_string" xml:space="preserve">
+    <value>Изтрий избраното</value>
+  </data>
+  <data name="Upload_string" xml:space="preserve">
+    <value>Качи</value>
+  </data>
+  <data name="hrs_string" xml:space="preserve">
+    <value>ч.</value>
+  </data>
+  <data name="Bulgaria" xml:space="preserve">
+    <value>България</value>
+  </data>
+  <data name="Login_invite_string" xml:space="preserve">
+    <value>Моля влезте в акаунта си, за да получите достъп</value>
+  </data>
+  <data name="Profile_page_string" xml:space="preserve">
+    <value>Акаунт</value>
+  </data>
+  <data name="Access_denied_string" xml:space="preserve">
+    <value>Акаунтът, с който се вписвате не е оторизиран.</value>
+  </data>
+  <data name="Try_another_account_string" xml:space="preserve">
+    <value>Опитай с друг акаунт</value>
+  </data>
+  <data name="Access_denied_next_steps" xml:space="preserve">
+    <value>Свържете се с администратор или опитайте с друг.</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

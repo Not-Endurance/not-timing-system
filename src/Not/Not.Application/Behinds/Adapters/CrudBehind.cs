@@ -1,7 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 
 namespace Not.Application.Behinds.Adapters;
 
@@ -26,7 +26,7 @@ public abstract class CrudBehind<T, TModel> : ObservableListBehind<T>, IListBehi
     {
         if (ObservableList.Any())
         {
-            return Initialized;
+            return false;
         }
         var entities = await _repository.ReadAll();
         ObservableList.AddRange(entities);

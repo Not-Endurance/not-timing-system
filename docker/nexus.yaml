@@ -12,14 +12,14 @@ services:
   nts-nexus-http:
     container_name: nts-nexus-http
     build:
-      context: ../
-      dockerfile: src/Nexus/NTS.Nexus.HTTP/Dockerfile
+      context: ../src
+      dockerfile: Nexus/NTS.Nexus.HTTP/Dockerfile
     environment:
       MONGO_CONNECTION_STRING: mongodb://mongodb:27017
     depends_on:
       - mongodb
     ports:
-      - "8080:80" 
+      - "8080:80"
 
 volumes:
   mongodb_data:

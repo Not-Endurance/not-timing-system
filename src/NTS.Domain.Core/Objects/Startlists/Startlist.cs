@@ -1,17 +1,21 @@
 ﻿using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Domain.Core.Objects.Startlists;
 
-public class StartList
+// TODO: encapsulate the actual business logic to update entries, rather than having the timer component doing all the work
+public class Startlist
 {
-    static readonly TimeSpan START_EXPIRY_TIME = TimeSpan.FromMinutes(15);
+    static readonly TimeSpan HISTORY_THRESHOLD = TimeSpan.FromMinutes(15);
+    static readonly TimeSpan WARNING_THRESHOLD = TimeSpan.FromMinutes(5);
 
-    readonly List<StartlistEntry> _starts;
+    object _lock = new();
+    List<StartlistEntry> _history = [];
+    List<StartlistEntry> _upcoming = [];
 
-    public StartList(IEnumerable<Participation> participations, Action action)
+    public Startlist(IEnumerable<Participation> participations)
     {
-        _starts = [];
+        var upcoming = new List<StartlistEntry>();
+        var history = new List<StartlistEntry>();
         foreach (var participation in participations)
         {
             if (participation.IsEliminated())
@@ -27,59 +31,91 @@ public class StartList
                 }
                 var phaseIndex = phases.IndexOf(phase);
                 var phaseNumber = phaseIndex + 1;
-                var start = new StartlistEntry(
+                var entry = new StartlistEntry(
                     participation.Combination.Athlete.Names,
                     participation.Combination.Number,
                     phaseNumber,
                     phases[phaseIndex].Length,
-                    phase.StartTime.ToDateTimeOffset()
+                    phase.StartTime.ToDateTimeOffset()!
                 );
-                _starts.Add(start);
+                if (IsHistory(entry))
+                {
+                    history.Add(entry);
+                }
+                else
+                {
+                    upcoming.Add(entry);
+                }
             }
         }
-        Participation.PHASE_COMPLETED_EVENT.Subscribe(OnPhaseComplete);
-        ChangeHandler = action;
+
+        _upcoming = OrderByTimeThenPhase(upcoming);
+        _history = OrderByTimeThenPhase(history);
     }
 
-    Action ChangeHandler { get; set; }
+    public IReadOnlyList<StartlistEntry> History => _history;
 
-    public IReadOnlyList<StartlistEntry> History
+    public IReadOnlyList<StartlistEntry> Upcoming => _upcoming;
+
+    public void UpdateState()
     {
-        get
+        lock (_lock)
         {
-            var history = _starts.Where(s => CurrentTime() - s.Time.TimeOfDay > START_EXPIRY_TIME);
-            return OrderByTimeAndPhase(history);
+            var changedHistory = false;
+            var now = Timestamp.Now();
+            Console.WriteLine(5);
+            foreach (var entry in _upcoming.ToList())
+            {
+                if (IsHistory(entry))
+                {
+                    _upcoming.Remove(entry);
+                    _history.Add(entry);
+                    changedHistory = true;
+                }
+                else if (entry.Start < now)
+                {
+                    entry.State = StartlistEntryState.Late;
+                }
+                else if (entry.Start - WARNING_THRESHOLD < now)
+                {
+                    entry.State = StartlistEntryState.Ready;
+                }
+            }
+
+            if (changedHistory)
+            {
+                _history = OrderByTimeThenPhase(_history);
+            }
         }
     }
 
-    public IReadOnlyList<StartlistEntry> Upcoming
+    public void Add(StartlistEntry entry)
     {
-        get
+        lock (_lock)
         {
-            var upcoming = _starts.Where(s => CurrentTime() - s.Time.TimeOfDay <= START_EXPIRY_TIME);
-            return OrderByTimeAndPhase(upcoming);
+            _upcoming = OrderByTimeThenPhase([.. _upcoming, entry]);
         }
     }
 
-    public bool Any()
+    public void Remove(int number)
     {
-        return _starts.Any();
+        lock (_lock)
+        {
+            var match = _upcoming.FirstOrDefault(x => x.Number == number);
+            if (match != null)
+            {
+                _upcoming.Remove(match);
+            }
+        }
     }
 
-    void OnPhaseComplete(PhaseCompleted phaseCompleted)
+    bool IsHistory(StartlistEntry entry)
     {
-        var newStart = new StartlistEntry(phaseCompleted.Participation);
-        _starts.Add(newStart);
-        ChangeHandler();
+        return entry.Start + HISTORY_THRESHOLD < Timestamp.Now();
     }
 
-    TimeSpan CurrentTime()
+    List<StartlistEntry> OrderByTimeThenPhase(IEnumerable<StartlistEntry> starts)
     {
-        return DateTimeOffset.Now.TimeOfDay;
-    }
-
-    List<StartlistEntry> OrderByTimeAndPhase(IEnumerable<StartlistEntry> starts)
-    {
-        return starts.OrderBy(s => s.Time).ThenBy(s => s.PhaseNumber).ToList();
+        return starts.OrderBy(s => s.Start).ThenBy(s => s.PhaseNumber).ToList();
     }
 }

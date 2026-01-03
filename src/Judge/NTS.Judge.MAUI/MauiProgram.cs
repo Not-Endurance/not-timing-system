@@ -4,6 +4,8 @@ using Not.Application.Configurations;
 using Not.Application.Environments;
 using NTS.Judge.MAUI.Platforms.Services;
 using NTS.Judge.MAUI.Platforms.Windows.Services;
+using Not.Logging.Builder;
+using Not.MAUI;
 using NTS.Judge.Warp;
 
 namespace NTS.Judge.MAUI;
@@ -12,11 +14,12 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var builder = MauiApp
-            .CreateBuilder()
-            .UseMauiApp<App>()
-            .ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"))
-            .ConfigureJudgeMaui();
+        var builder = MauiApp.CreateBuilder();
+        builder.UseMauiApp<App>().ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"));
+
+        builder.Services.ConfigureJudgeMaui(builder.Configuration);
+
+        builder.UseNLog().AddFilesystemLogger();
 
         var assembly = typeof(MauiProgram).Assembly;
         builder.Configuration.AddNAppsettings(assembly);

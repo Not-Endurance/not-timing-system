@@ -1,7 +1,7 @@
 ﻿using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
-using NTS.Application.RPC;
+using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.RPC;
 

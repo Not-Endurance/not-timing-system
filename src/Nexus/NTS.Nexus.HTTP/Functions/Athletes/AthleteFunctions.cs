@@ -1,36 +1,23 @@
-﻿using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using AngleSharp.Common;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Serialization.JSON;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Objects;
+using NTS.Application.Models;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Nexus.HTTP.Functions.Archive;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Documents.Athletes;
 
 namespace NTS.Nexus.HTTP.Functions.Athletes;
 
 public class AthleteFunctions : FunctionBase<AthleteFunctions>
 {
-    readonly IRepository<AthleteDocument> _athletes;
-    readonly IArchiveRepository _archive;
+    readonly IRepository<SetupAthleteModel> _athletes;
 
-    public AthleteFunctions(
-        IFunctionLogger<AthleteFunctions> logger,
-        IRepository<AthleteDocument> athletes,
-        IArchiveRepository archive
-    )
+    public AthleteFunctions(IFunctionLogger<AthleteFunctions> logger, IRepository<SetupAthleteModel> athletes)
         : base(logger)
     {
         _athletes = athletes;
-        _archive = archive;
     }
 
     [Function("athletes-insert")]
@@ -42,7 +29,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = AthleteDocument.Create(athlete);
+        var document = SetupAthleteModel.MapFrom(athlete);
         await _athletes.Create(document);
 
         return new OkObjectResult($"Inserted {athlete}");
@@ -57,33 +44,10 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = AthleteDocument.Create(athlete);
+        var document = SetupAthleteModel.MapFrom(athlete);
         await _athletes.Update(document);
 
         return new OkObjectResult($"Updated {athlete}");
-    }
-
-    [Function("athletes-safe-delete")]
-    public async Task<IActionResult> SafeDelete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "athletes/{id:int}/safe")] HttpRequest request,
-        int id
-    )
-    {
-        LogInformation(request);
-
-        var recordsWithAthlete = await _archive
-            .ReadAll(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Athlete.Id == id)))
-            .ToList();
-
-        if (recordsWithAthlete.Any())
-        {
-            return new OkObjectResult(
-                $"The athlete you want to delete has participated in '{recordsWithAthlete.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
-            );
-        }
-
-        await _athletes.Delete(id);
-        return new OkObjectResult($"Deleted athlete with id '{id}'");
     }
 
     [Function("athletes-delete")]
@@ -105,7 +69,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
     {
         LogInformation(request);
         var athlete = await _athletes.Read(id);
-        return new OkObjectResult(athlete?.ToSetupDomain());
+        return new OkObjectResult(athlete?.MapToDomain());
     }
 
     [Function("athletes-list")]
@@ -116,7 +80,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         LogInformation(request);
 
         // TODO: Implement response mapping layer for documents back to aggregates
-        var athletes = await _athletes.ReadAll().Select(x => x.ToSetupDomain());
+        var athletes = await _athletes.ReadAll().Select(x => x.MapToDomain());
         return new OkObjectResult(athletes);
     }
 }

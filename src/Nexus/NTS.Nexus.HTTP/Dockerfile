@@ -6,7 +6,7 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 
-COPY /src /src
+COPY / /src
 
 # Remove local-source
 RUN dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config

@@ -4,16 +4,17 @@ using Not.Blazor.CRUD.Ports;
 using Not.Exceptions;
 using Not.Safe;
 using Not.Startup;
+using NTS.Blazor.Components.ParticipationTable.Phases;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Judge.Blazor.Core.Dashboards;
 using NTS.Judge.Blazor.Core.Dashboards.Actions.Eliminations;
 using NTS.Judge.Blazor.Core.Dashboards.Actions.Inspections;
 using NTS.Judge.Blazor.Core.Dashboards.Actions.Snapshots;
 using NTS.Judge.Blazor.Core.Dashboards.Component;
-using NTS.Judge.Blazor.Core.Dashboards.Phases;
+using NTS.Judge.Features.Core.Reset;
 using NTS.Judge.RPC;
 
 namespace NTS.Judge.Core.Behinds.Adapters;
@@ -26,7 +27,8 @@ public class ParticipationBehind
         IUpdateBehind<PhaseUpdateModel>,
         ISnapshotProcessor,
         IManualProcessor,
-        IStartupInitializerAsync
+        IStartupInitializerAsync,
+        ICoreState
 {
     readonly List<int> _recentlyProcessed = [];
     readonly IRepository<Participation> _participationRepository;
@@ -63,13 +65,9 @@ public class ParticipationBehind
 
     protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
     {
-        if (SelectedParticipation != null)
-        {
-            return true;
-        }
         Participations = await _participationRepository.ReadAll();
         SelectedParticipation = Participations.FirstOrDefault();
-        return false;
+        return Participations.Any();
     }
 
     public async Task RunAtStartupAsync()

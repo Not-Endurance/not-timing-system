@@ -1,32 +1,31 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
 public class Combination : AggregateRoot, IParent, IReflect<Athlete>, IReflect<Horse>
 {
-    public static Combination Create(int? number, Athlete? athlete, Horse? horse, Tag? tag)
+    public static Combination Create(int? number, Athlete? athlete, Horse? horse, Tag? _)
     {
-        return new(number, athlete, horse, tag);
+        return new(number, athlete, horse);
     }
 
-    public static Combination Update(int? id, int? number, Athlete? athlete, Horse? horse, Tag? tag)
+    public static Combination Update(int? id, int? number, Athlete? athlete, Horse? horse, Tag? _)
     {
-        return new(id, number, athlete, horse, tag);
+        return new(id, number, athlete, horse);
     }
 
     [JsonConstructor]
-    public Combination(int? id, int? number, Athlete? athlete, Horse? horse, Tag? tag)
+    public Combination(int? id, int? number, Athlete? athlete, Horse? horse)
         : base(id!.Value)
     {
         Number = Required(nameof(Number), number);
         Athlete = Required(nameof(Athlete), athlete);
         Horse = Required(nameof(Horse), horse);
-        Tag = tag;
     }
 
-    public Combination(int? number, Athlete? athlete, Horse? horse, Tag? tag)
-        : this(GenerateId(), number, athlete, horse, tag) { }
+    public Combination(int? number, Athlete? athlete, Horse? horse)
+        : this(GenerateId(), number, athlete, horse) { }
 
     public int Number { get; }
     public Athlete Athlete { get; private set; }

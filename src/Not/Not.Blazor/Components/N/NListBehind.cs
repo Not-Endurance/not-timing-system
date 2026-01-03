@@ -1,7 +1,7 @@
 // ReSharper disable once CheckNamespace
 namespace Not.Blazor.Components;
 
-public class NListBehind<T> : NComponent
+public class NListBehind<T> : NBehind
 {
     [Parameter, EditorRequired]
     public IEnumerable<T> Items { get; set; } = [];

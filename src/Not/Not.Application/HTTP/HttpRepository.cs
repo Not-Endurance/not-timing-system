@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
-using Not.Domain;
+using Not.Domain.Aggregates;
 using Not.Notify;
 using Not.Serialization.JSON;
 using Not.Structures;
@@ -32,9 +32,13 @@ public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
             && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
         )
         {
+#if DEBUG
+            NotifyHelper.Warn(ex.Message);
+#else
             NotifyHelper.Warn(
                 Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
             );
+#endif
         }
         else
         {

@@ -1,5 +1,6 @@
-﻿using Not.Domain.Base;
+﻿using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.StaticOptions;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 

@@ -1,8 +1,6 @@
-﻿using Not.Domain.Base;
+﻿namespace NTS.Domain.Objects;
 
-namespace NTS.Domain.Objects;
-
-public record TimeInterval : DomainObject, IComparable<TimeInterval>
+public record TimeInterval : IComparable<TimeInterval>
 {
     public static implicit operator TimeSpan?(TimeInterval? interval)
     {

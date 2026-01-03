@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using Not.Domain.Base;
+using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
 using NTS.Domain.Extensions;
 

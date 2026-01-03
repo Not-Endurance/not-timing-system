@@ -1,9 +1,9 @@
-﻿using Not.Domain.Base;
+﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Domain.Core.Objects.Documents;
 
-public record DocumentHeader : DomainObject
+public record DocumentHeader
 {
     public DocumentHeader(
         string enduranceEvent,

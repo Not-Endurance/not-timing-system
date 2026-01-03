@@ -1,0 +1,50 @@
+﻿@using MudBlazor
+@using Not.Notify;
+
+<MudPaper Elevation="0" Class="m-5 p-4" MaxHeight="600px" Height="300px">
+    <MudStack Row>
+        <MudFileUpload T="IBrowserFile"
+        Accept=".png, .jpg, .jpeg, .gif"
+        FilesChanged="OnFileSelected"
+        MaximumFileCount="1">
+            <ActivatorContent>
+                <MudButton Variant="Variant.Outlined"
+                Color="Color.Primary"
+                Class="m-5"
+                StartIcon="@Icons.Material.Filled.Upload">
+                    @Upload_string
+                </MudButton>
+            </ActivatorContent>
+        </MudFileUpload>
+        <MudButton Variant="Variant.Outlined"
+        Color="Color.Error"
+        Class="m-5"
+        StartIcon="@Icons.Material.Filled.Delete"
+        OnClick="() => PromptDeleteImage(SelectedImage)">
+            @Delete_selection_string
+        </MudButton>
+    </MudStack>
+
+    <MudGrid Class="mt-4" >
+        @if (_images.Count == 0)
+        {
+            <MudItem xs="12">
+                <MudText Typo="Typo.body1" Class="text-center">
+                    @Image_browser_empty_string
+                </MudText>
+            </MudItem>
+        }
+        @foreach (var image in _images)
+        {
+            <MudItem xs="6" sm="4" md="3" lg="2">
+                <MudCard Class="@($"mb-4 cursor-pointer {(Path.GetFileName(SelectedImage) == Path.GetFileName(image) ? "border border-primary" : "")}")"
+                @onclick="() => SelectImage(image)">
+                    <MudCardMedia Image="@GetBase64Image(image)" Height="120" />
+                    <MudCardContent>
+                        <MudText Typo="Typo.body2">@Path.GetFileName(image)</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+</MudPaper>
