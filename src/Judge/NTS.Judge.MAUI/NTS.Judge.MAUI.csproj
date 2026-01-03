@@ -15,7 +15,7 @@
     <ApplicationTitle>NTS Judge</ApplicationTitle>
 
     <!-- App Identifier -->
-    <ApplicationId>com.nts.judge</ApplicationId>
+    <ApplicationId>com.ems.judge</ApplicationId>
     <ApplicationIdGuid>1E77FD41-17C0-4D75-A08F-00D4390F5485</ApplicationIdGuid>
 
     <!-- Versions -->
@@ -34,10 +34,6 @@
 
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
-  <Target Name="GetVersion">
-  	<Message Text="$(ApplicationDisplayVersion)" Importance="High" />
-  	<Message Text="$(ApplicationVersion)" Importance="High" />
-  </Target>
 
   <!-- Windows publish configuration -->
   <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
@@ -89,10 +85,6 @@
     <MauiXaml Update="SplashPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PRIResource Remove="Output\**" />
   </ItemGroup>
   
 </Project>

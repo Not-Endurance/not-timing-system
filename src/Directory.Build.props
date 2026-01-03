@@ -10,8 +10,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference> -->
-    <Analyzer Include="$(SolutionDir)/../analyzers/build/Not.Analyzers.dll"
-			  Condition="Exists('$(SolutionDir)../analyzers/build/Not.Analyzers.dll')" />
+	  <Analyzer Include="$(SolutionDir)/../analyzers/build/Not.Analyzers.dll" />
   </ItemGroup>
 
 </Project>
