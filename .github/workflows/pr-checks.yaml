@@ -11,7 +11,8 @@ env:
   CONFIGURATION: Release
   SOLUTION_FILE: not-timing-system.sln
   BUILD_SOLUTION_FILE: not-timing-system.no-maui.sln
-  MAUI_PROJECT_KEYWORD: MAUI
+  NOT_MAUI_PROJECT_GUID: 80EC3E2B-764F-44C2-BF34-D076C36A79B9
+  JUDGE_MAUI_PROJECT_GUID: 77B487EE-DD87-434C-9236-BF1F8F783C3F
 
 jobs:
   pr-checks-csharpier:
@@ -79,23 +80,39 @@ jobs:
       run: |
         set -euo pipefail
 
-        SLN=${{ env.SOURCE_DIR}}/${{ env.SOLUTION_FILE }}
-        OUT=${{ env.BUILD_SOLUTION_FILE }}
+        SLN="${{ env.SOLUTION_FILE }}"
+        OUT="${{ env.BUILD_SOLUTION_FILE }}"
 
-        awk '
-          BEGIN { skip=0 }
-          /^Project\(/ && $0 ~ /"[^"]*${{ env.MAUI_PROJECT_KEYWORD }}[^"]*"/ { skip=1; next }
-          /^EndProject/ && skip==1 { skip=0; next }
-          skip==0 { print }
-        ' "$SLN" > "$OUT"
+        # MAUI Project GUIDs
+        GUIDS=(
+          "${{ env.NOT_MAUI_PROJECT_GUID }}"
+          "${{ env.JUDGE_MAUI_PROJECT_GUID }}"
+        )
+
+        # Build a single regex alternation like: \{GUID1\}|\{GUID2\}
+        PATTERN="$(printf '%s\n' "${GUIDS[@]}" \
+          | sed -e 's/[{}]/\\&/g' \
+          | paste -sd'|' -)"
+
+        # Pass 1: remove Project blocks whose header contains one of the GUIDs
+        awk -v pat="$PATTERN" '
+          BEGIN { IGNORECASE=1; skip=0 }
+          /^Project\(/ {
+            if ($0 ~ pat) { skip=1; next }
+          }
+          skip==1 {
+            if (/^EndProject$/) { skip=0 }
+            next
+          }
+          { print }
+        ' "$SLN" > "$OUT.tmp"
+
+        # Pass 2: drop any remaining line that contains any of the GUIDs
+        # (cleans NestedProjects, ProjectConfigurationPlatforms, etc.)
+        grep -Eiv "$PATTERN" "$OUT.tmp" > "$OUT"
+        rm -f "$OUT.tmp"
 
         echo "Created filtered solution: $OUT"
-
-    - name: Restore
-      run: dotnet restore ${{ env.BUILD_SOLUTION_FILE }}
-
-    - name: Build
-      run: dotnet build ${{ env.BUILD_SOLUTION_FILE }} -c ${{ env.CONFIGURATION }} --no-restore
 
     - name: Publish filtered solution for debugging
       uses: actions/upload-artifact@v4
@@ -103,3 +120,9 @@ jobs:
         name: ${{ env.BUILD_SOLUTION_FILE }}
         path: /
         include-hidden-files: true
+
+    - name: Restore
+      run: dotnet restore ${{ env.SOURCE_DIR }}/${{ env.BUILD_SOLUTION_FILE }}
+
+    - name: Build
+      run: dotnet build ${{ env.SOURCE_DIR }}/${{ env.BUILD_SOLUTION_FILE }} -c ${{ env.CONFIGURATION }} --no-restore
