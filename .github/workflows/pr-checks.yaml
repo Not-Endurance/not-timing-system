@@ -6,9 +6,11 @@ on:
 env:
   DOTNET_CORE_VERSION: 8.0.x
   SOURCE_DIR: src
-  NEXUS_PATH: Apps/Nexus/NTS.Nexus.HTTP
-  JUDGE_PATH: Apps/Judge/NTS.Judge
   CONFIGURATION: Release
+  SOLUTION_FILE: not-timing-system.sln
+  BUILD_SOLUTION_FILE: not-timing-system.no-maui.sln
+  NOT_MAUI_PROJECT_GUID: 80EC3E2B-764F-44C2-BF34-D076C36A79B9
+  JUDGE_MAUI_PROJECT_GUID: 77B487EE-DD87-434C-9236-BF1F8F783C3F
 
 jobs:
   pr-checks-csharpier:
@@ -67,9 +69,58 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
         
-    #Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
+    # Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
     - name: Remove local-cache NuGet source
       run: dotnet nuget remove source "local-cache" --configfile ./${{ env.SOURCE_DIR }}/NuGet.config
 
-    - name: build solution
-      run: dotnet build ${{ env.SOURCE_DIR }}
+    - name: Create solution without MAUI projects
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        SLN="${{ env.SOURCE_DIR }}/${{ env.SOLUTION_FILE }}"
+        OUT="${{ env.SOURCE_DIR }}/${{ env.BUILD_SOLUTION_FILE }}"
+
+        # MAUI Project GUIDs
+        GUIDS=(
+          "${{ env.NOT_MAUI_PROJECT_GUID }}"
+          "${{ env.JUDGE_MAUI_PROJECT_GUID }}"
+        )
+
+        # Build a single regex alternation like: \{GUID1\}|\{GUID2\}
+        PATTERN="$(printf '%s\n' "${GUIDS[@]}" \
+          | sed -e 's/[{}]/\\&/g' \
+          | paste -sd'|' -)"
+
+        # Pass 1: remove Project blocks whose header contains one of the GUIDs
+        awk -v pat="$PATTERN" '
+          BEGIN { IGNORECASE=1; skip=0 }
+          /^Project\(/ {
+            if ($0 ~ pat) { skip=1; next }
+          }
+          skip==1 {
+            if (/^EndProject$/) { skip=0 }
+            next
+          }
+          { print }
+        ' "$SLN" > "$OUT.tmp"
+
+        # Pass 2: drop any remaining line that contains any of the GUIDs
+        # (cleans NestedProjects, ProjectConfigurationPlatforms, etc.)
+        grep -Eiv "$PATTERN" "$OUT.tmp" > "$OUT"
+        rm -f "$OUT.tmp"
+
+        echo "Created filtered solution: $OUT"
+
+    - name: Publish filtered solution for debugging
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.BUILD_SOLUTION_FILE }}
+        path: ${{ env.SOURCE_DIR}}/${{ env.BUILD_SOLUTION_FILE }}
+        include-hidden-files: true
+
+    - name: Restore
+      run: dotnet restore ${{ env.SOURCE_DIR }}/${{ env.BUILD_SOLUTION_FILE }}
+
+    - name: Build
+      run: dotnet build ${{ env.SOURCE_DIR }}/${{ env.BUILD_SOLUTION_FILE }} -c ${{ env.CONFIGURATION }} --no-restore
