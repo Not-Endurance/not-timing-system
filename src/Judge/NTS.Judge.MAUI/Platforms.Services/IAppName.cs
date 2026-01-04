@@ -1,6 +1,6 @@
 ﻿namespace NTS.Judge.MAUI.Platforms.Services;
 
-public interface IAppName
+public interface IMauiProcessService
 {
     void SetAppName(string appName);
 }

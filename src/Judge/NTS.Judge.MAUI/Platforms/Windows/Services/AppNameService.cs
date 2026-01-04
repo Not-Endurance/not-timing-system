@@ -2,7 +2,7 @@
 
 namespace NTS.Judge.MAUI.Platforms.Windows.Services;
 
-public class AppNameService : IAppName
+public class WindowsProcessService : IMauiProcessService
 {
     public void SetAppName(string appName)
     {

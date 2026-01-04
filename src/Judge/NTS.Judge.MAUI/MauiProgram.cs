@@ -23,7 +23,7 @@ public static class MauiProgram
 
         var assembly = typeof(MauiProgram).Assembly;
         builder.Configuration.AddNAppsettings(assembly);
-        builder.Services.AddSingleton<IAppName, AppNameService>();
+        builder.Services.AddSingleton<IMauiProcessService, WindowsProcessService>();
         var app = builder.Build();
 
         if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))

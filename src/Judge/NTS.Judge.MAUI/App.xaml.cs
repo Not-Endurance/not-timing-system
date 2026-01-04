@@ -6,10 +6,10 @@ namespace NTS.Judge.MAUI;
 
 public partial class App : Microsoft.Maui.Controls.Application
 {
-    public App(IEnumerable<IStartupInitializer> initializers, IAppName appNameService)
+    public App(IEnumerable<IStartupInitializer> initializers, IMauiProcessService mauiProcessService)
     {
         InitializeComponent();
-        appNameService.SetAppName("NTS Judge");
+        mauiProcessService.SetAppName("NTS Judge");
 
         MainPage = new SplashPage();
 
