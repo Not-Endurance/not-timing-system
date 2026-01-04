@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Not.Injection;
@@ -42,8 +41,6 @@ public static class InjectionServiceCollectionExtensions
             )
             .ToList();
 
-        PreventInvalidConventialService(implementation);
-
         if (interfaces.Any(x => x.IsSingleton()))
         {
             AddAsSelfWithInterfaces(services, interfaces, implementation, ServiceLifetime.Singleton);
@@ -56,23 +53,7 @@ public static class InjectionServiceCollectionExtensions
         }
         foreach (var i in interfaces)
         {
-            Add(services, i, implementation);
-        }
-    }
-
-    static void PreventInvalidConventialService(Type implementation)
-    {
-        if (implementation.IsSingleton() && implementation.IsTransient())
-        {
-            throw new Exception($"Service '{implementation}' cannot both both Singleton and Transient");
-        }
-        if (implementation.IsScoped() && implementation.IsTransient())
-        {
-            throw new Exception($"Service '{implementation}' cannot both both Scoped and Transient");
-        }
-        if (implementation.IsSingleton() && implementation.IsScoped())
-        {
-            throw new Exception($"Service '{implementation}' cannot both both Singleton and Scoped");
+            Add(services, i, implementation, ServiceLifetime.Transient);
         }
     }
 
@@ -86,7 +67,7 @@ public static class InjectionServiceCollectionExtensions
         PreventInvalidPolymorphicService(implementation);
 
         // Register as self and use self to fetch the instace for all interfaces
-        Add(services, implementation, implementation);
+        Add(services, implementation, implementation, lifetime);
         foreach (var @interface in interfaces)
         {
             var descriptor = new ServiceDescriptor(@interface, x => x.GetRequiredService(implementation), lifetime);
@@ -94,30 +75,18 @@ public static class InjectionServiceCollectionExtensions
         }
     }
 
-    static void Add(IServiceCollection services, Type @interface, Type implementation)
+    static void Add(IServiceCollection services, Type @interface, Type implementation, ServiceLifetime lifetime)
     {
         var service =
             @interface.IsGenericType && implementation.IsGenericType
                 ? @interface.GetGenericTypeDefinition()
                 : @interface;
 
-        if (implementation.IsTransient())
+        switch (lifetime)
         {
-            services.AddTransient(service, implementation);
-        }
-        else if (implementation.IsScoped())
-        {
-            services.AddScoped(service, implementation);
-        }
-        else if (implementation.IsSingleton())
-        {
-            services.AddSingleton(service, implementation);
-        }
-        else
-        {
-            throw new Exception(
-                $"Cannot determine how to register service '{service}'. implementation: '{implementation}''"
-            );
+            case ServiceLifetime.Singleton: services.AddSingleton(service, implementation); break;
+            case ServiceLifetime.Scoped: services.AddScoped(service, implementation); break;
+            default: services.AddTransient(service, implementation); break;
         }
     }
 
@@ -132,14 +101,13 @@ public static class InjectionServiceCollectionExtensions
             )
         )
         {
-            var sb = new StringBuilder();
-            sb.AppendLine($"'{implementation.Name}' and it's parent '{implementation.BaseType.Name}' cannot be ");
-            sb.AppendLine($"instantiable NonTransient services. Either declare base class as 'abstract' or decouple.");
-            sb.AppendLine(
-                $"This check exists to prevent accidental invokations of the base class instead of the derrived"
-            );
-            sb.AppendLine($"or to prevent unwanted duplications in case of IEnumerable<T> injection");
-            throw new Exception(sb.ToString());
+            var message = $"""
+                '{implementation.Name}' and it's parent '{implementation.BaseType.Name}' cannot be
+                instantiable NonTransient services. Either declare base class as 'abstract' or decouple.
+                This check exists to prevent accidental invokations of the base class instead of the derrived
+                or to prevent unwanted duplications in case of IEnumerable<T> injection
+                """;
+            throw new Exception(message);
         }
     }
 
