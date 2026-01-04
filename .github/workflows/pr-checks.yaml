@@ -6,8 +6,8 @@ on:
 env:
   DOTNET_CORE_VERSION: 8.0.x
   SOURCE_DIR: src
-  NEXUS_PATH: Nexus/NTS.Nexus.HTTP
-  JUDGE_PATH: Judge/NTS.Judge
+  NEXUS_PATH: Apps/Nexus/NTS.Nexus.HTTP
+  JUDGE_PATH: Apps/Judge/NTS.Judge
   CONFIGURATION: Release
 
 jobs:
@@ -68,27 +68,8 @@ jobs:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
         
     #Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
-    - name: Set current workding directory env
-      run: echo "CURRENT_DIR=$(pwd)/src" >> $GITHUB_ENV
     - name: Remove local-cache NuGet source
       run: dotnet nuget remove source "local-cache" --configfile ./${{ env.SOURCE_DIR }}/NuGet.config
 
-    - name: Restore Nexus
-      run: dotnet restore ${{ env.SOURCE_DIR }}/${{ env.NEXUS_PATH }}
-    
-    - name: Build Nexus
-      run: |
-        dotnet build ${{ env.SOURCE_DIR }}/${{ env.NEXUS_PATH }} \
-        --configuration ${{ env.CONFIGURATION }} \
-        --no-restore \
-        -property:SolutionDir="$CURRENT_DIR"
-
-    - name: Restore Judge
-      run: dotnet restore ${{ env.SOURCE_DIR }}/${{ env.JUDGE_PATH }}
-    
-    - name: Build Judge
-      run: |
-        dotnet build ${{ env.SOURCE_DIR }}/${{ env.JUDGE_PATH }} \
-        --configuration ${{ env.CONFIGURATION }} \
-        --no-restore \
-        -property:SolutionDir="$CURRENT_DIR"
+    - name: build solution
+      run: dotnet build ${{ env.SOURCE_DIR }}
