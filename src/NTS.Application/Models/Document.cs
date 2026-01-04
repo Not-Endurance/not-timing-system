@@ -1,5 +1,5 @@
-﻿using Not.Domain.Aggregates;
-using Not.Application.Tenants;
+﻿using Not.Application.Tenants;
+using Not.Domain.Aggregates;
 using Not.Structures;
 
 namespace NTS.Application.Models;

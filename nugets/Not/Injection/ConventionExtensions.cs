@@ -84,9 +84,15 @@ public static class InjectionServiceCollectionExtensions
 
         switch (lifetime)
         {
-            case ServiceLifetime.Singleton: services.AddSingleton(service, implementation); break;
-            case ServiceLifetime.Scoped: services.AddScoped(service, implementation); break;
-            default: services.AddTransient(service, implementation); break;
+            case ServiceLifetime.Singleton:
+                services.AddSingleton(service, implementation);
+                break;
+            case ServiceLifetime.Scoped:
+                services.AddScoped(service, implementation);
+                break;
+            default:
+                services.AddTransient(service, implementation);
+                break;
         }
     }
 
