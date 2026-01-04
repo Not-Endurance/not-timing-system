@@ -10,7 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\nugets\Not.Domain\Not.Domain.csproj" />
     <ProjectReference Include="..\..\NTS\NTS.csproj" />
-    <!--  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" /> -->
   </ItemGroup>
 
 </Project>
