@@ -14,25 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="rfid.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="rfid_core.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vup.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Vup">
-      <HintPath>Vup.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Resources\static-options.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
