@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\..\Warp\NTS.Warp\NTS.Warp.csproj" />
+    <ProjectReference Include="..\NTS.Judge.Blazor\NTS.Judge.Blazor.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\static-options.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
+</Project>
