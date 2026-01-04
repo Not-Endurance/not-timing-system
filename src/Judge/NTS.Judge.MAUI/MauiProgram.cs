@@ -1,8 +1,11 @@
 ﻿using System.Diagnostics;
+using MudBlazor;
 using Not.Application.Configurations;
 using Not.Application.Environments;
 using Not.Logging.Builder;
 using Not.MAUI;
+using NTS.Judge.MAUI.Platforms.Services;
+using NTS.Judge.MAUI.Platforms.Windows.Services;
 using NTS.Judge.Warp;
 
 namespace NTS.Judge.MAUI;
@@ -20,7 +23,7 @@ public static class MauiProgram
 
         var assembly = typeof(MauiProgram).Assembly;
         builder.Configuration.AddNAppsettings(assembly);
-
+        builder.Services.AddSingleton<IMauiProcessService, WindowsProcessService>();
         var app = builder.Build();
 
         if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))
