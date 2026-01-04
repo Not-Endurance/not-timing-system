@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\nugets\Not.Domain\Not.Domain.csproj" />
+    <ProjectReference Include="..\..\NTS\NTS.csproj" />
+    <!--  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" /> -->
+  </ItemGroup>
+
+</Project>
