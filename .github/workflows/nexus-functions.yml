@@ -12,7 +12,7 @@ env:
   ARTIFACT_PATH: NTS.Nexus.API/publish
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
-  SOURCE_PATH: src/Nexus/NTS.Nexus.HTTP
+  SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.HTTP
 
 jobs:
   nexus-functions-build:
