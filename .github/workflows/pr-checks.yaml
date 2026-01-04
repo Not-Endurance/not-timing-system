@@ -9,8 +9,8 @@ env:
   NEXUS_PATH: Apps/Nexus/NTS.Nexus.HTTP
   JUDGE_PATH: Apps/Judge/NTS.Judge
   CONFIGURATION: Release
-  SOLUTION: not-timing-system.sln
-  BUILD_SOLUTION: not-timing-system.no-maui.sln
+  SOLUTION_FILE: not-timing-system.sln
+  BUILD_SOLUTION_FILE: not-timing-system.no-maui.sln
   MAUI_PROJECT_KEYWORD: MAUI
 
 jobs:
@@ -79,8 +79,8 @@ jobs:
       run: |
         set -euo pipefail
 
-        SLN=${{ env.SOLUTION }}
-        OUT=${{ env.BUILD_SOLUTION }}
+        SLN=${{ env.SOURCE_DIR}}/${{ env.SOLUTION_FILE }}
+        OUT=${{ env.BUILD_SOLUTION_FILE }}
 
         awk '
           BEGIN { skip=0 }
@@ -92,14 +92,14 @@ jobs:
         echo "Created filtered solution: $OUT"
 
     - name: Restore
-      run: dotnet restore ${{ env.BUILD_SOLUTION }}
+      run: dotnet restore ${{ env.BUILD_SOLUTION_FILE }}
 
     - name: Build
-      run: dotnet build ${{ env.BUILD_SOLUTION }} -c ${{ env.CONFIGURATION }} --no-restore
+      run: dotnet build ${{ env.BUILD_SOLUTION_FILE }} -c ${{ env.CONFIGURATION }} --no-restore
 
     - name: Publish filtered solution for debugging
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.BUILD_SOLUTION }}
+        name: ${{ env.BUILD_SOLUTION_FILE }}
         path: /
         include-hidden-files: true
