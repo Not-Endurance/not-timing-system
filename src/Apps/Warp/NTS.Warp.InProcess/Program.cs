@@ -2,7 +2,7 @@
 using Not.SystemProcess;
 using NTS.Warp;
 using NTS.Warp.InProcess;
-using static NTS.Warp.InProcess.JudgeWarpConstants;
+using static NTS.Warp.InProcess.WarpInProcessConstants;
 # if RELEASE
 using Not.Filesystem;
 using Not.Logging;

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using MudBlazor;
 using Not.Application.Configurations;
 using Not.Application.Environments;
 using Not.Logging.Builder;
@@ -36,21 +35,14 @@ public static class MauiProgram
 
     static void StartHub()
     {
-        try
+        var parentPid = Environment.ProcessId;
+        var currentDirectory = Directory.GetCurrentDirectory();
+        var info = new ProcessStartInfo
         {
-            var parentPid = Environment.ProcessId;
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var info = new ProcessStartInfo
-            {
-                FileName = Path.Combine(currentDirectory, "NTS.Judge.Warp.exe"),
-                Arguments = JudgeWarpConstants.PARENT_PID_KEY + parentPid,
-            };
-            Process.Start(info);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
+            FileName = Path.Combine(currentDirectory, "NTS.Warp.InProcess.exe"),
+            Arguments = WarpInProcessConstants.PARENT_PID_KEY + parentPid,
+        };
+        Process.Start(info);
     }
 }
 

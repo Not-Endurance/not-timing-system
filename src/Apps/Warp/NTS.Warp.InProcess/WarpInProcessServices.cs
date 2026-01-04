@@ -4,7 +4,7 @@ using Not.Application.UdpHandshake;
 
 namespace NTS.Warp.InProcess;
 
-internal static class JudgeWarpInjection
+internal static class WarpInProcessServices
 {
     public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration _)
     {
