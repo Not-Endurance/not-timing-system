@@ -25,9 +25,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
         
-    #Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
-    - name: Set current workding directory env
-      run: echo "CURRENT_DIR=$(pwd)/src" >> $GITHUB_ENV
+    # Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
     - name: Remove local-cache NuGet source
       run: dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config
 
@@ -38,16 +36,14 @@ jobs:
       run: |
         dotnet build "${{ env.SOURCE_PATH }}" \
         --configuration "${{ env.CONFIGURATION }}" \
-        --no-restore \
-        -property:SolutionDir="$CURRENT_DIR"
+        --no-restore
 
     - name: Publish
       run: |
         dotnet publish "${{ env.SOURCE_PATH }}" \
         --configuration "${{ env.CONFIGURATION }}" \
         --no-build \
-        --output "${{ env.ARTIFACT_PATH }}" \
-        -property:SolutionDir="$CURRENT_DIR"
+        --output "${{ env.ARTIFACT_PATH }}"
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4

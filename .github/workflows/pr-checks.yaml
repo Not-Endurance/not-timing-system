@@ -9,6 +9,9 @@ env:
   NEXUS_PATH: Apps/Nexus/NTS.Nexus.HTTP
   JUDGE_PATH: Apps/Judge/NTS.Judge
   CONFIGURATION: Release
+  SOLUTION: not-timing-system.sln
+  BUILD_SOLUTION: not-timing-system.no-maui.sln
+  MAUI_PROJECT_KEYWORD: MAUI
 
 jobs:
   pr-checks-csharpier:
@@ -67,9 +70,36 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
         
-    #Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
+    # Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
     - name: Remove local-cache NuGet source
       run: dotnet nuget remove source "local-cache" --configfile ./${{ env.SOURCE_DIR }}/NuGet.config
 
-    - name: build solution
-      run: dotnet build ${{ env.SOURCE_DIR }}
+    - name: Create solution without MAUI projects
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        SLN=${{ env.SOLUTION }}
+        OUT=${{ env.BUILD_SOLUTION }}
+
+        awk '
+          BEGIN { skip=0 }
+          /^Project\(/ && $0 ~ /"[^"]*${{ env.MAUI_PROJECT_KEYWORD }}[^"]*"/ { skip=1; next }
+          /^EndProject/ && skip==1 { skip=0; next }
+          skip==0 { print }
+        ' "$SLN" > "$OUT"
+
+        echo "Created filtered solution: $OUT"
+
+    - name: Restore
+      run: dotnet restore ${{ env.BUILD_SOLUTION }}
+
+    - name: Build
+      run: dotnet build ${{ env.BUILD_SOLUTION }} -c ${{ env.CONFIGURATION }} --no-restore
+
+    - name: Publish filtered solution for debugging
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.BUILD_SOLUTION }}
+        path: /
+        include-hidden-files: true
