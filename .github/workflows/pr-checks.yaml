@@ -6,8 +6,6 @@ on:
 env:
   DOTNET_CORE_VERSION: 8.0.x
   SOURCE_DIR: src
-  NEXUS_PATH: Apps/Nexus/NTS.Nexus.HTTP
-  JUDGE_PATH: Apps/Judge/NTS.Judge
   CONFIGURATION: Release
   SOLUTION_FILE: not-timing-system.sln
   BUILD_SOLUTION_FILE: not-timing-system.no-maui.sln
@@ -118,7 +116,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.BUILD_SOLUTION_FILE }}
-        path: tmp
+        path: ${{ env.SOURCE_DIR}}/${{ env.BUILD_SOLUTION_FILE }}
         include-hidden-files: true
 
     - name: Restore
