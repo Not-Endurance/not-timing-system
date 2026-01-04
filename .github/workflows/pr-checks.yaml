@@ -80,8 +80,8 @@ jobs:
       run: |
         set -euo pipefail
 
-        SLN="${{ env.SOLUTION_FILE }}"
-        OUT="${{ env.BUILD_SOLUTION_FILE }}"
+        SLN="${{ env.SOURCE_DIR }}/${{ env.SOLUTION_FILE }}"
+        OUT="${{ env.SOURCE_DIR }}/${{ env.BUILD_SOLUTION_FILE }}"
 
         # MAUI Project GUIDs
         GUIDS=(
