@@ -67,7 +67,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\nugets\Not.MAUI\Not.MAUI.csproj" />
-    <ProjectReference Include="..\NTS.Judge.Warp\NTS.Judge.Warp.csproj" />
+    <ProjectReference Include="..\..\Warp\NTS.Warp.InProcess\NTS.Warp.InProcess.csproj" />
     <ProjectReference Include="..\NTS.Judge\NTS.Judge.csproj" />
   </ItemGroup>
 

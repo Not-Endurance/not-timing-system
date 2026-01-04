@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.UdpHandshake;
 
-namespace NTS.Judge.Warp;
+namespace NTS.Warp.InProcess;
 
 internal static class JudgeWarpInjection
 {

@@ -6,7 +6,7 @@ using Not.Logging.Builder;
 using Not.MAUI;
 using NTS.Judge.MAUI.Platforms.Services;
 using NTS.Judge.MAUI.Platforms.Windows.Services;
-using NTS.Judge.Warp;
+using NTS.Warp.InProcess;
 
 namespace NTS.Judge.MAUI;
 

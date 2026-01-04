@@ -1,4 +1,4 @@
-﻿namespace NTS.Judge.Warp;
+﻿namespace NTS.Warp.InProcess;
 
 public static class JudgeWarpConstants
 {

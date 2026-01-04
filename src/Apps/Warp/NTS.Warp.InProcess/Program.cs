@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Not.SystemProcess;
-using NTS.Judge.Warp;
 using NTS.Warp;
-using static NTS.Judge.Warp.JudgeWarpConstants;
+using NTS.Warp.InProcess;
+using static NTS.Warp.InProcess.JudgeWarpConstants;
 # if RELEASE
 using Not.Filesystem;
 using Not.Logging;
