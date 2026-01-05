@@ -14,9 +14,9 @@ public static class NtsWitnessServices
     {
         FileContextHelper.ConfigureApplicationName("nts-witness");
 
+        services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly()).AddStartlist();
         services
-            .ConfigureNtsCommon(configuration)
-            .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
+            .ConfigureNts(configuration)
             .AddNBlazor(configuration)
             .ConfigureAuthentication(configuration);
 

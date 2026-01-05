@@ -23,7 +23,7 @@ public abstract class JudgeIntegrationTest : IntegrationTest
         var configuration = new ConfigurationBuilder().Build();
         return services
             .ConfigureNtsJudge(configuration)
-            .AddNRpcSocket(configuration)
+            .AddRpcCient(configuration)
             .AddJsonFileStore(x => x.Path = storagePath)
             .AddNConventionalServices(Assembly.GetExecutingAssembly());
     }

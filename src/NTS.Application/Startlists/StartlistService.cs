@@ -6,7 +6,7 @@ using NTS.Blazor.Components.Startlist.Upcoming;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Startlists;
 
-namespace NTS.Application.Services;
+namespace NTS.Application.Startlists;
 
 public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory, IStartupInitializer
 {
