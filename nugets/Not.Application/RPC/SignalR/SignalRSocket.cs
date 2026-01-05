@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using System;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Not.Injection;
 using Not.Logging;
+using Not.Notify;
 using Not.Serialization.JSON;
 
 namespace Not.Application.RPC.SignalR;
@@ -22,7 +24,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     public SignalRSocket(IOptions<RpcSettings> options, IRpcMetadata? metadata = null)
     {
         _metadata = metadata;
-        _context = options.Value;
+        _context = Validate(options.Value);
         _name = GetType().Name;
     }
 
@@ -104,6 +106,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         }
         catch (Exception ex)
         {
+            NotifyHelper.Error(ex);
             if (HasReachedReconnectionAttemptLimit(++reconnectAttempts))
             {
                 RaiseDisconnected(ex);
@@ -223,7 +226,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         return attempts >= AUTOMATIC_RECONNECT_ATTEMPTS;
     }
 
-    void RaiseDisconnected(Exception? _ = default)
+    void RaiseDisconnected(Exception? exception = default)
     {
         ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Disconnected);
     }
@@ -252,6 +255,15 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         {
             ServerConnectionInfo?.Invoke(_name, message);
         }
+    }
+
+    static RpcSettings Validate(RpcSettings settings)
+    {
+        if (string.IsNullOrWhiteSpace(settings.Host) || string.IsNullOrWhiteSpace(settings.HubPattern))
+        {
+            throw new Exception($"Invalid SignalR configuration - Host: '{settings.Host}', Pattern: '{settings.HubPattern}'");
+        }
+        return settings;
     }
 }
 
