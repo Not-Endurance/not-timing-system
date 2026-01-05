@@ -2,7 +2,7 @@
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Objects;
 
-namespace NTS.Witness.Blazor.Components.Performances;
+namespace NTS.Witness.Services;
 
 public interface IPerformanceService : ISingleton
 {

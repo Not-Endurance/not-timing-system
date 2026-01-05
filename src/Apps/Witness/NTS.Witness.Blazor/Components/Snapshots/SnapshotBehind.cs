@@ -5,6 +5,7 @@ using Not.Notify;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
+using NTS.Witness.Services;
 
 namespace NTS.Witness.Blazor.Components.Snapshots;
 

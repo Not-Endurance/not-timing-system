@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\NTS.Blazor\NTS.Blazor.csproj" />
     <ProjectReference Include="..\..\..\Domain\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
+    <ProjectReference Include="..\NTS.Witness\NTS.Witness.csproj" />
   </ItemGroup>
   
 </Project>

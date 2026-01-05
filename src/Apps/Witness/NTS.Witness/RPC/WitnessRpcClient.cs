@@ -13,18 +13,18 @@ namespace NTS.Witness.RPC;
 public class WitnessRpcClient : RpcClient, IWitnessParticipantsClientProcedures, IWitnessStartlistClientProcedures
 {
     readonly IRpcSocket _socket;
-    readonly IStartlistContext _startlistContex;
+    readonly IStartlistContext _startlistContext;
     readonly ParticipationService _participationService;
 
     public WitnessRpcClient(
         IRpcSocket socket,
         ParticipationService participationService,
-        IStartlistContext startlistContex
+        IStartlistContext startlistContext
     )
         : base(socket)
     {
         _socket = socket;
-        _startlistContex = startlistContex;
+        _startlistContext = startlistContext;
         _participationService = participationService;
     }
 
@@ -41,7 +41,7 @@ public class WitnessRpcClient : RpcClient, IWitnessParticipantsClientProcedures,
 
     public Task Receive(StartlistEntry entry, NCollectionAction action)
     {
-        _startlistContex.Update(entry, action);
+        _startlistContext.Update(entry, action);
         return Task.CompletedTask;
     }
 

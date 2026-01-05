@@ -1,6 +1,6 @@
 ﻿using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Witness.Blazor.Components.Snapshots;
+namespace NTS.Witness.Services;
 
 public interface ISnapshotService
 {
