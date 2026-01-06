@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Not.Application.CRUD.Ports;
 using Not.Filesystem;
 using Not.Storage;
-using NTS.Domain.Core.Aggregates;
 using NTS.Storage.Core.Repositories;
+using NTS.Storage.REST;
 
 namespace NTS.Storage;
 
@@ -33,28 +33,41 @@ public static class NtsStorageServices
             _nStorageBuilder = new(services, configuration);
         }
 
-        public void AddCoreJsonStorage()
+        public Builder AddCoreJsonStorage()
         {
 
-            _nStorageBuilder.AddJsonFile();
+            _nStorageBuilder.AddJsonFileStorage();
             
             // TODO: extract conventional logic to apply to IRepository<T> and other interfaces directly instead of listing manually
             _services
-                .AddTransient<IRepository<EnduranceEvent>, EnduranceEventRepository>()
-                .AddTransient<IRepository<Handout>, HandoutRepository>()
-                .AddTransient<IRepository<Official>, OfficialRepository>()
-                .AddTransient<IRepository<Participation>, ParticipationRepository>()
-                .AddTransient<IRepository<Ranking>, RankingRepository>()
-                .AddTransient<IRepository<SnapshotResult>, SnapshotResultRepository>();
+                .AddTransient<IRepository<Domain.Core.Aggregates.EnduranceEvent>, EnduranceEventRepository>()
+                .AddTransient<IRepository<Domain.Core.Aggregates.Handout>, HandoutRepository>()
+                .AddTransient<IRepository<Domain.Core.Aggregates.Official>, OfficialRepository>()
+                .AddTransient<IRepository<Domain.Core.Aggregates.Participation>, ParticipationRepository>()
+                .AddTransient<IRepository<Domain.Core.Aggregates.Ranking>, RankingRepository>()
+                .AddTransient<IRepository<Domain.Core.Aggregates.SnapshotResult>, SnapshotResultRepository>();
+            return this;
         }
 
-        public void AddMongoStorage(string? connectionString)
+        public Builder AddMongoStorage(string? connectionString)
         {
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new ApplicationException("MongoDB connection string is null");
             }
-            _nStorageBuilder.AddMongo(connectionString);
+            _nStorageBuilder.AddMongoStorage(connectionString);
+            return this;
+        }
+
+        public Builder AddSetupRestApiStorage()
+        {
+            _nStorageBuilder.AddRestApiStorage();
+            _services
+                .AddTransient<IRepository<Domain.Setup.Aggregates.Athlete>, AthleteRestApiRepository>()
+                .AddTransient<IRepository<Domain.Setup.Aggregates.Club>, ClubRestApiRepository>()
+                .AddTransient<IRepository<Domain.Setup.Aggregates.Horse>, HorseRestApiRepository>()
+                .AddTransient<IRepository<Domain.Setup.Aggregates.UpcomingEvent>, UpcomingEventRestApiRepository>();
+            return this;
         }
     }
 }

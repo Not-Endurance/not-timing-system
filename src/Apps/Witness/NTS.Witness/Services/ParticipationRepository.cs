@@ -1,11 +1,12 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
+using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 using NTS.Witness.RPC;
 
 namespace NTS.Witness.Services;
 
-public class ParticipationReader : IReadMany<Participation>
+public class ParticipationReader : IReadMany<Participation>, ITransient
 {
     readonly WitnessRpcClient _client;
 

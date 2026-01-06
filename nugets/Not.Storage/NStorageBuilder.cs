@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Serializers;
+using Not.Application;
 using Not.Filesystem;
 using Not.Storage.JsonFile.Stores;
 using Not.Storage.JsonFile.Stores.Files;
@@ -14,13 +15,15 @@ namespace Not.Storage;
 public class NStorageBuilder
 {
     readonly IServiceCollection _services;
+    readonly NApplicationBuilder _nApplicationBuilder;
 
-    public NStorageBuilder(IServiceCollection services, IConfiguration _)
+    public NStorageBuilder(IServiceCollection services, IConfiguration configuration)
     {
         _services = services;
+        _nApplicationBuilder = new(services, configuration);
     }
 
-    public NStorageBuilder AddMongo(string connectionString)
+    public NStorageBuilder AddMongoStorage(string connectionString)
     {
         var pack = new ConventionPack { new EnumRepresentationConvention(BsonType.String) };
         ConventionRegistry.Register("EnumStringConvention", pack, t => true);
@@ -30,11 +33,17 @@ public class NStorageBuilder
         return this;
     }
 
-    public NStorageBuilder AddJsonFile()
+    public NStorageBuilder AddJsonFileStorage()
     {
         var factory = FileContextHelper.CreateFileContextFactory(null, "stores");
         _services.AddKeyedSingleton<IFileContext, FileContext>(StoreConstants.DATA_KEY, factory);
         _services.AddSingleton(typeof(IStore<>), typeof(LockingJsonFileStore<>));
+        return this;
+    }
+
+    public NStorageBuilder AddRestApiStorage()
+    {
+        _nApplicationBuilder.AddHttp();
         return this;
     }
 }

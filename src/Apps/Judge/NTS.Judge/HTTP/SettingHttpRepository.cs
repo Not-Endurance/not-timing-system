@@ -1,10 +1,11 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
+using Not.Storage.REST;
 using NTS.Domain.Settings;
 
 namespace NTS.Judge.HTTP;
 
-public class SettingHttpRepository : HttpRepository<Setting>, ISettingRepository
+public class SettingHttpRepository : RestApiRepository<Setting>, ISettingRepository
 {
     public SettingHttpRepository(NHttpClient client)
         : base("settings", client) { }

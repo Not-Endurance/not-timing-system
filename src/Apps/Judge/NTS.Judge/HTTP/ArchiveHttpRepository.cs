@@ -1,12 +1,13 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Serialization.JSON;
+using Not.Storage.REST;
 using NTS.Application.Models;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.HTTP;
 
-public class ArchiveHttpRepository : HttpRepository<ArchiveEntry>, IArchiveRepository
+public class ArchiveHttpRepository : RestApiRepository<ArchiveEntry>, IArchiveRepository
 {
     readonly NHttpClient _client;
 

@@ -1,18 +1,17 @@
 ﻿using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
-using Not.Domain.Aggregates;
+using Not.Application.HTTP;
 using Not.Notify;
-using Not.Serialization.JSON;
 using Not.Structures;
 
-namespace Not.Application.HTTP;
+namespace Not.Storage.REST;
 
-public abstract class HttpRepository<T> : IRepository<T>, ISafeDelete<T>
-    where T : class, IAggregateRoot, IIdentifiable
+public abstract class RestApiRepository<T> : IRepository<T>
+    where T : class, IIdentifiable
 {
     readonly string _endpoint;
 
-    protected HttpRepository(string endpoint, NHttpClient client)
+    protected RestApiRepository(string endpoint, NHttpClient client)
     {
         _endpoint = endpoint;
         Client = client;

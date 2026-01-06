@@ -17,8 +17,8 @@ public static class NtsJudgeServices
     /// <returns></returns>
     public static IServiceCollection ConfigureNtsJudge(this IServiceCollection services, IConfiguration configuration)
     {
-        services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly()).AddStartlist().AddHttp().AddRpcClient();
-        services.ConfigureNtsStorage(configuration).AddCoreJsonStorage();
+        services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly()).AddStartlist().AddRpcClient();
+        services.ConfigureNtsStorage(configuration).AddCoreJsonStorage().AddSetupRestApiStorage();
         return services
             .ConfigureNts(configuration)
             .AddNBlazor(configuration);
