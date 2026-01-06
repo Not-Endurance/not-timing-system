@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Not.Application.RPC;
 using Not.Filesystem;
 using Not.Injection;
-using Not.Storage.Stores;
+using Not.Storage.JsonFile.Stores;
 using Not.Tests;
 using NTS.Application;
 using Xunit.Abstractions;
@@ -23,8 +23,8 @@ public abstract class JudgeIntegrationTest : IntegrationTest
         var configuration = new ConfigurationBuilder().Build();
         return services
             .ConfigureNtsJudge(configuration)
-            .AddRpcCient(configuration)
-            .AddJsonFileStore(x => x.Path = storagePath)
-            .AddNConventionalServices(Assembly.GetExecutingAssembly());
+            .AddRpcCient(configuration);
+        //        .AddJsonFileStore(x => x.Path = storagePath)
+        //        .AddNConventionalServices(Assembly.GetExecutingAssembly());
     }
 }

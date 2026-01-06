@@ -1,10 +1,7 @@
 ﻿using Not.Domain.Aggregates;
-using Not.Injection;
-
 namespace Not.Application.CRUD.Ports;
 
-public interface ICreate<in T> : ITransient
-    where T : IAggregateRoot
+public interface ICreate<in T>
 {
     Task Create(T item);
 }

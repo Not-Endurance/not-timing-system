@@ -1,6 +1,6 @@
 ﻿using Not.Injection;
 using Not.Startup;
-using Not.Storage.Stores.Files;
+using Not.Storage.JsonFile.Stores.Files;
 using NTS.Storage.JSON.Converters;
 
 namespace NTS.Storage.JSON.Initializers;

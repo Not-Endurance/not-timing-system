@@ -3,7 +3,7 @@ using Not.Application.RPC.SignalR;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Startup;
-using Not.Storage.Stores;
+using Not.Storage.JsonFile.Stores;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Storage.Setup;
 

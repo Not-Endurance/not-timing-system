@@ -32,6 +32,7 @@ public class Program
         app.MapBlazorHub();
         app.MapFallbackToPage("/_Host");
 
-        await app.Startup();
+        await app.Services.Startup();
+        await app.RunAsync();
     }
 }

@@ -1,4 +1,4 @@
-﻿using Not.Storage.States;
+﻿using Not.Storage.JsonFile.States;
 
 namespace NTS.Storage.Setup;
 

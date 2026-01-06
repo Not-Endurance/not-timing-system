@@ -79,6 +79,44 @@ public static class ServiceCollectionExtensions
             .Add<TInterface4, TImplementation>(lifetime);
     }
 
+    public static IServiceCollection Add<TInterface1, TInterface2, TInterface3, TInterface4, TInterface5, TImplementation>(
+        this IServiceCollection services, 
+        ServiceLifetime lifetime)
+        where TImplementation : class, TInterface1, TInterface2, TInterface3, TInterface4, TInterface5
+        where TInterface1 : class
+        where TInterface2 : class
+        where TInterface3 : class
+        where TInterface4 : class
+        where TInterface5 : class
+    {
+        return services
+            .Add<TInterface1, TImplementation>(lifetime)
+            .Add<TInterface2, TImplementation>(lifetime)
+            .Add<TInterface3, TImplementation>(lifetime)
+            .Add<TInterface4, TImplementation>(lifetime)
+            .Add<TInterface5, TImplementation>(lifetime);
+    }
+
+    public static IServiceCollection Add<TInterface1, TInterface2, TInterface3, TInterface4, TInterface5, TInterface6, TImplementation>(
+        this IServiceCollection services, 
+        ServiceLifetime lifetime)
+        where TImplementation : class, TInterface1, TInterface2, TInterface3, TInterface4, TInterface5, TInterface6
+		where TInterface1 : class
+        where TInterface2 : class
+        where TInterface3 : class
+        where TInterface4 : class
+        where TInterface5 : class
+        where TInterface6 : class
+    {
+        return services
+            .Add<TInterface1, TImplementation>(lifetime)
+            .Add<TInterface2, TImplementation>(lifetime)
+            .Add<TInterface3, TImplementation>(lifetime)
+            .Add<TInterface4, TImplementation>(lifetime)
+            .Add<TInterface5, TImplementation>(lifetime)
+            .Add<TInterface6, TImplementation>(lifetime);
+    }
+
     static void PreventDuplicateRegistration(IServiceCollection services, Type @interface)
     {
         if (services.Any(x => x.ServiceType == @interface))

@@ -2,7 +2,7 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Collections;
-using NTS.Application.Services;
+using NTS.Application.Startlists;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Startlists;
 using NTS.Witness.RPC.Procedures;
