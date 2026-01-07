@@ -4,6 +4,7 @@ using Not.Application.CRUD.Ports;
 using Not.Filesystem;
 using Not.Storage;
 using NTS.Judge.Features.Core;
+using NTS.Judge.Features.Setup.Settings;
 using NTS.Storage.Core;
 using NTS.Storage.Core.Repositories;
 using NTS.Storage.JSON;
@@ -71,7 +72,7 @@ public static class NtsStorageServices
                 .AddTransient<IRepository<Domain.Setup.Aggregates.Horse>, HorseRestApiRepository>()
                 .AddTransient<IRepository<Domain.Setup.Aggregates.UpcomingEvent>, UpcomingEventRestApiRepository>()
                 .AddTransient<IRepository<Domain.Aggregates.Country>, CountryRestApiRepository>()
-                .AddTransient<ISettingRepository, SettingHttpRepository>()
+                .AddTransient<ISettingRepository, SettingRestApiRepository>()
                 .AddTransient<IRepository<Domain.Core.Aggregates.ArchiveEntry>, ArchiveRestApiRepository>();
             return this;
         }

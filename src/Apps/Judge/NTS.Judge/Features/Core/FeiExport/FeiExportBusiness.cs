@@ -238,19 +238,6 @@ public class FeiExportBusiness : IFeiExportBusiness
         return days;
     }
 
-    string GetFeiCategory(ParticipationCategory category)
-    {
-        return category switch
-        {
-            ParticipationCategory.Senior => "S",
-            ParticipationCategory.Children => "C",
-            ParticipationCategory.JuniorOrYoungAdult => "YJ",
-            ParticipationCategory.Training or ParticipationCategory.Companion or _ => throw GuardHelper.Exception(
-                "Implement validation for non-fei categories for Star during setup"
-            ), //TODO:
-        };
-    }
-
     string Serialize(HorseSport horseSport)
     {
         var serializer = new XmlSerializer(typeof(HorseSport));

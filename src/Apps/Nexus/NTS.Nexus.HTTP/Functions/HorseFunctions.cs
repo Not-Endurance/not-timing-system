@@ -15,12 +15,12 @@ namespace NTS.Nexus.HTTP.Functions;
 public class HorseFunctions : FunctionBase<HorseFunctions>
 {
     readonly IRepository<SetupHorseModel> _horses;
-    readonly IArchiveRepository _archive;
+    readonly IArchiveMongoRepository _archive;
 
     public HorseFunctions(
         IFunctionLogger<HorseFunctions> logger,
         IRepository<SetupHorseModel> horses,
-        IArchiveRepository archive
+        IArchiveMongoRepository archive
     )
         : base(logger)
     {

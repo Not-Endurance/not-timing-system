@@ -4,6 +4,7 @@ using Not.Exceptions;
 using Not.Safe;
 using Not.Structures;
 using NTS.Domain.Core.Aggregates;
+using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 

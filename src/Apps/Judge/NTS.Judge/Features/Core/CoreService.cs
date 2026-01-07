@@ -3,7 +3,6 @@ using Not.Application.CRUD.Ports;
 using Not.Notify;
 using Not.Safe;
 using NTS.Domain.Core.Aggregates;
-using NTS.Judge.Blazor.Shared.Components.SidePanels;
 using NTS.Judge.Features.Core.Reset;
 using NTS.Judge.Features.Core.Start;
 using NTS.Judge.Features.Warp;
@@ -71,7 +70,7 @@ public class CoreService : ObservableBehind, ICoreService
         IsStarted = false;
         foreach (var observable in _coreDependentObservables)
         {
-            observable.ResetInitialization();
+            observable.Reset();
         }
     }
 

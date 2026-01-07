@@ -4,7 +4,6 @@ using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Extensions;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions;
 using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Competitions;

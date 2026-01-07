@@ -1,18 +1,17 @@
 ﻿using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
 using NTS.Application.Models;
 using NTS.Domain.Core.Aggregates;
-using NTS.Judge.Blazor.Nexus;
-using NTS.Judge.Features.Core.Archive;
 
 namespace NTS.Judge.Features.Nexus;
 
 public class InquiryBehind : ObservableBehind, IInquiryBehind
 {
-    readonly IArchiveRepository _archiveRepository;
+    readonly IRepository<ArchiveEntry> _archive;
 
-    public InquiryBehind(IArchiveRepository archiveRepository)
+    public InquiryBehind(IRepository<ArchiveEntry> archiveRepository)
     {
-        _archiveRepository = archiveRepository;
+        _archive = archiveRepository;
     }
 
     public IEnumerable<RankingEntry>? Match { get; private set; }
@@ -38,7 +37,7 @@ public class InquiryBehind : ObservableBehind, IInquiryBehind
 
     public async Task Search(string term)
     {
-        var archive = await _archiveRepository.GetEntries();
+        var archive = await _archive.ReadAll();
         Match = archive
             .SelectMany(x => x.Ranklists)
             .SelectMany(x => x.Ranking.Entries)

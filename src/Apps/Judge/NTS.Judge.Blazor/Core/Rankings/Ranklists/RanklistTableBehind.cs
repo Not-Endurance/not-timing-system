@@ -1,5 +1,6 @@
 using Not.Blazor.Components;
 using NTS.Domain.Core.Objects;
+using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Ranklists;
 

@@ -1,6 +1,5 @@
 using Not.Blazor.Ports;
 using NTS.Domain.Aggregates;
-using NTS.Judge.Blazor.Setup.Settings;
 
 namespace NTS.Judge.Features.Setup.Services;
 

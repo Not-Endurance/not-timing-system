@@ -3,6 +3,7 @@ using Not.Blazor.Components;
 using Not.Structures;
 using NTS.Blazor.Constants;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions;
 

@@ -15,14 +15,14 @@ namespace NTS.Judge.Features.Core.Start;
 
 public class CoreStartService : ICoreStarter
 {
-    readonly IEventContext _eventContext;
+    readonly ISelectedEventContext _eventContext;
     readonly IRepository<EnduranceEvent> _coreEventRepository;
     readonly IRepository<Official> _coreOfficialRepository;
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<Ranking> _rankingRepository;
 
     public CoreStartService(
-        IEventContext eventContext,
+        ISelectedEventContext eventContext,
         IRepository<EnduranceEvent> coreEventRepository,
         IRepository<Official> coreOfficialRepository,
         IRepository<Participation> participationRepository,

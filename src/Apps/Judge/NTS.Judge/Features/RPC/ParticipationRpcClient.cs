@@ -16,13 +16,13 @@ namespace NTS.Judge.Features.RPC;
 
 public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
 {
-    readonly IEventContext _eventContext;
+    readonly ISelectedEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IReadMany<Participation> _coreParticipations;
     readonly HubProcedures _hubProcedures;
 
     public ParticipationRpcClient(
-        IEventContext eventContext,
+        ISelectedEventContext eventContext,
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
         IReadMany<Participation> coreParticipations

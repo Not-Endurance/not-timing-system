@@ -1,6 +1,7 @@
 using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.Dialogs;
+using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Shared.Components.SidePanels.Reset;
 

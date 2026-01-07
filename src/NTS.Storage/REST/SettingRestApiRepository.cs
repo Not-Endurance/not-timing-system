@@ -1,0 +1,27 @@
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.HTTP;
+using Not.Storage.REST;
+using NTS.Domain.Aggregates;
+using NTS.Judge.Features.Setup.Settings;
+
+namespace NTS.Storage.REST;
+
+public class SettingRestApiRepository : RestApiRepository<Setting>, ISettingRepository
+{
+    public SettingRestApiRepository(NHttpClient client)
+        : base("settings", client) { }
+
+    public async Task<Setting?> Get(Guid accountId)
+    {
+        try
+        {
+            var url = BuildUrl(accountId);
+            return await Client.GetJson<Setting>(url);
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex);
+            return null;
+        }
+    }
+}

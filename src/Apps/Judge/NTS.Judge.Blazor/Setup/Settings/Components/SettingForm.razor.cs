@@ -3,6 +3,8 @@ using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms.Components;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Settings;
+using NTS.Judge.Features.Setup.Services;
+using NTS.Judge.Features.Setup.Settings;
 
 namespace NTS.Judge.Blazor.Setup.Settings.Components;
 

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Not.Blazor.CRUD.Ports;
 using Not.Serialization.JSON;
 using NTS.Domain.Aggregates;
-using NTS.Judge.Blazor.Setup.EnduranceEvents;
+using NTS.Judge.Features.Setup.UpcomingEvents;
 using NTS.Storage.Setup;
 using Xunit.Abstractions;
 

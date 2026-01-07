@@ -3,7 +3,6 @@ using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Notify;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Setup.EnduranceEvents;
 using NTS.Judge.Features.Core.Behinds;
 using NTS.Judge.Features.Warp;
 
@@ -19,12 +18,12 @@ public class UpcomingEventBehind
 {
     readonly UpcomingEventCrudeContext _crudeContext;
     readonly IUpdate<UpcomingEvent> _updater;
-    readonly IEventContext _eventContext;
+    readonly ISelectedEventContext _eventContext;
 
     public UpcomingEventBehind(
         IRepository<UpcomingEvent> events,
         UpcomingEventCrudeContext crudeContext,
-        IEventContext eventContext
+        ISelectedEventContext eventContext
     )
         : base(events, [])
     {

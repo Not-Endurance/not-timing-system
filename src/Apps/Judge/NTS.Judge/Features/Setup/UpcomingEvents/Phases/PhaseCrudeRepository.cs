@@ -1,15 +1,15 @@
 using Not.Application.Behinds;
-using Not.Storage.Repositories;
+using Not.Application.Krud;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Phases;
 
-public class PhaseCrudeRepository : CrudeRepository<Phase>
+public class PhaseCrudeRepository : KrudInMemoryRepository<Phase>
 {
-    readonly IEventContext _rootContext;
+    readonly ISelectedEventContext _rootContext;
 
-    public PhaseCrudeRepository(ICrudeParent<Phase> parentContext, IEventContext rootContext)
+    public PhaseCrudeRepository(ICrudeParent<Phase> parentContext, ISelectedEventContext rootContext)
         : base(parentContext)
     {
         _rootContext = rootContext;
