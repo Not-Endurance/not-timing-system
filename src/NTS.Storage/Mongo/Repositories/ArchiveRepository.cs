@@ -5,7 +5,7 @@ using NTS.Application.Models;
 
 namespace NTS.Storage.Mongo.Repositories;
 
-public class ArchiveRepository : MongoRepository<ArchiveModel>, IArchiveRepository
+public class ArchiveRepository : MongoRepository<ArchiveModel>, IArchiveMongoRepository
 {
     public ArchiveRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ARCHIVE_COLLECTION) { }
@@ -34,7 +34,7 @@ public class ArchiveRepository : MongoRepository<ArchiveModel>, IArchiveReposito
     }
 }
 
-public interface IArchiveRepository : IRepository<ArchiveModel>
+public interface IArchiveMongoRepository : IRepository<ArchiveModel>
 {
     Task<IEnumerable<ArchiveModel>> GetPerformances(int horseId);
 }

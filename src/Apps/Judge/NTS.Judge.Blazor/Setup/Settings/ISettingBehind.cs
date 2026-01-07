@@ -1,6 +1,6 @@
 ﻿using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.Ports;
-using NTS.Domain.Settings;
+using NTS.Domain.Aggregates;
 using NTS.Judge.Blazor.Setup.Settings.Components;
 
 namespace NTS.Judge.Blazor.Setup.Settings;

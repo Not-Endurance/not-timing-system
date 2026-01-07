@@ -6,6 +6,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Serializers;
 using Not.Application;
 using Not.Filesystem;
+using Not.Storage.JsonFile.States;
 using Not.Storage.JsonFile.Stores;
 using Not.Storage.JsonFile.Stores.Files;
 using Not.Storage.Mongo;
@@ -33,11 +34,15 @@ public class NStorageBuilder
         return this;
     }
 
-    public NStorageBuilder AddJsonFileStorage()
+    public NStorageBuilder AddJsonFileStorage<T, TStore, TInterface>()
+        where TInterface : class
+        where TStore : LockingJsonFileStore<T>, TInterface
+        where T : class, IState, new()
     {
         var factory = FileContextHelper.CreateFileContextFactory(null, "stores");
         _services.AddKeyedSingleton<IFileContext, FileContext>(StoreConstants.DATA_KEY, factory);
-        _services.AddSingleton(typeof(IStore<>), typeof(LockingJsonFileStore<>));
+        _services.AddSingleton<TInterface, TStore>();
+        _services.AddSingleton(x => (IStore<T>)x.GetRequiredService<TInterface>());
         return this;
     }
 

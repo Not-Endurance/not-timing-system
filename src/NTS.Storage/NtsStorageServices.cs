@@ -3,7 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Not.Application.CRUD.Ports;
 using Not.Filesystem;
 using Not.Storage;
+using NTS.Judge.Features.Core;
+using NTS.Storage.Core;
 using NTS.Storage.Core.Repositories;
+using NTS.Storage.JSON;
 using NTS.Storage.REST;
 
 namespace NTS.Storage;
@@ -36,7 +39,7 @@ public static class NtsStorageServices
         public Builder AddCoreJsonStorage()
         {
 
-            _nStorageBuilder.AddJsonFileStorage();
+            _nStorageBuilder.AddJsonFileStorage<CoreState, CoreJsonStore, ICoreState>();
             
             // TODO: extract conventional logic to apply to IRepository<T> and other interfaces directly instead of listing manually
             _services
@@ -59,14 +62,17 @@ public static class NtsStorageServices
             return this;
         }
 
-        public Builder AddSetupRestApiStorage()
+        public Builder AddRestApiStorage()
         {
             _nStorageBuilder.AddRestApiStorage();
             _services
                 .AddTransient<IRepository<Domain.Setup.Aggregates.Athlete>, AthleteRestApiRepository>()
                 .AddTransient<IRepository<Domain.Setup.Aggregates.Club>, ClubRestApiRepository>()
                 .AddTransient<IRepository<Domain.Setup.Aggregates.Horse>, HorseRestApiRepository>()
-                .AddTransient<IRepository<Domain.Setup.Aggregates.UpcomingEvent>, UpcomingEventRestApiRepository>();
+                .AddTransient<IRepository<Domain.Setup.Aggregates.UpcomingEvent>, UpcomingEventRestApiRepository>()
+                .AddTransient<IRepository<Domain.Aggregates.Country>, CountryRestApiRepository>()
+                .AddTransient<ISettingRepository, SettingHttpRepository>()
+                .AddTransient<IRepository<Domain.Core.Aggregates.ArchiveEntry>, ArchiveRestApiRepository>();
             return this;
         }
     }
