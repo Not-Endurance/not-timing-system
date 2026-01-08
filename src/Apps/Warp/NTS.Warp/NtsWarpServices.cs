@@ -25,8 +25,6 @@ internal static class NtsWarpServices
         // TODO: Not.Application is getting handshaked..
 
         services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly());
-        return services
-            .AddDummyLocalizer()
-            .AddTransient<INetworkBroadcastService, JudgeHandshakeService>();
+        return services.AddDummyLocalizer().AddTransient<INetworkBroadcastService, JudgeHandshakeService>();
     }
 }

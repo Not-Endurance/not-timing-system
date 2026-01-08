@@ -12,13 +12,20 @@ public static class ServiceCollectionExtensions
     /// <param name="type">Marker type to be registeded, including itself if not abstract</param>
     /// <param name="lifetime">Service lifetime</param>
     /// <param name="assembly">Assembly to scan for items of <paramref name="type"/></param>
-    public static void AddAsInterfaces(this IServiceCollection services, Type type, ServiceLifetime lifetime, Assembly assembly)
+    public static void AddAsInterfaces(
+        this IServiceCollection services,
+        Type type,
+        ServiceLifetime lifetime,
+        Assembly assembly
+    )
     {
-        services.Scan(config => config
-            .FromAssemblies(assembly)
-            .AddClasses(classes => classes.AssignableTo(type))
-            .AsImplementedInterfaces()
-            .WithLifetime(lifetime));
+        services.Scan(config =>
+            config
+                .FromAssemblies(assembly)
+                .AddClasses(classes => classes.AssignableTo(type))
+                .AsImplementedInterfaces()
+                .WithLifetime(lifetime)
+        );
     }
 
     /// <summary>
@@ -45,7 +52,12 @@ public static class ServiceCollectionExtensions
         AddAsInterfaces(services, typeof(T), lifetime, Assembly.GetCallingAssembly());
     }
 
-    public static void Add(this IServiceCollection services, Type @interface, Type implementation, ServiceLifetime lifetime)
+    public static void Add(
+        this IServiceCollection services,
+        Type @interface,
+        Type implementation,
+        ServiceLifetime lifetime
+    )
     {
         var service =
             @interface.IsGenericType && implementation.IsGenericType
@@ -74,7 +86,10 @@ public static class ServiceCollectionExtensions
         }
     }
 
-    public static IServiceCollection Add<TInterface, TImplementation>(this IServiceCollection services, ServiceLifetime lifetime)
+    public static IServiceCollection Add<TInterface, TImplementation>(
+        this IServiceCollection services,
+        ServiceLifetime lifetime
+    )
         where TImplementation : class, TInterface
         where TInterface : class
     {
@@ -82,17 +97,21 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection Add<TInterface1, TInterface2, TImplementation>(this IServiceCollection services, ServiceLifetime lifetime)
+    public static IServiceCollection Add<TInterface1, TInterface2, TImplementation>(
+        this IServiceCollection services,
+        ServiceLifetime lifetime
+    )
         where TImplementation : class, TInterface1, TInterface2
         where TInterface1 : class
         where TInterface2 : class
     {
-        return services
-            .Add<TInterface1, TImplementation>(lifetime)
-            .Add<TInterface2, TImplementation>(lifetime);
+        return services.Add<TInterface1, TImplementation>(lifetime).Add<TInterface2, TImplementation>(lifetime);
     }
 
-    public static IServiceCollection Add<TInterface1, TInterface2, TInterface3, TImplementation>(this IServiceCollection services, ServiceLifetime lifetime)
+    public static IServiceCollection Add<TInterface1, TInterface2, TInterface3, TImplementation>(
+        this IServiceCollection services,
+        ServiceLifetime lifetime
+    )
         where TImplementation : class, TInterface1, TInterface2, TInterface3
         where TInterface1 : class
         where TInterface2 : class
@@ -105,8 +124,9 @@ public static class ServiceCollectionExtensions
     }
 
     public static IServiceCollection Add<TInterface1, TInterface2, TInterface3, TInterface4, TImplementation>(
-        this IServiceCollection services, 
-        ServiceLifetime lifetime)
+        this IServiceCollection services,
+        ServiceLifetime lifetime
+    )
         where TImplementation : class, TInterface1, TInterface2, TInterface3, TInterface4
         where TInterface1 : class
         where TInterface2 : class
@@ -120,9 +140,14 @@ public static class ServiceCollectionExtensions
             .Add<TInterface4, TImplementation>(lifetime);
     }
 
-    public static IServiceCollection Add<TInterface1, TInterface2, TInterface3, TInterface4, TInterface5, TImplementation>(
-        this IServiceCollection services, 
-        ServiceLifetime lifetime)
+    public static IServiceCollection Add<
+        TInterface1,
+        TInterface2,
+        TInterface3,
+        TInterface4,
+        TInterface5,
+        TImplementation
+    >(this IServiceCollection services, ServiceLifetime lifetime)
         where TImplementation : class, TInterface1, TInterface2, TInterface3, TInterface4, TInterface5
         where TInterface1 : class
         where TInterface2 : class
@@ -138,11 +163,17 @@ public static class ServiceCollectionExtensions
             .Add<TInterface5, TImplementation>(lifetime);
     }
 
-    public static IServiceCollection Add<TInterface1, TInterface2, TInterface3, TInterface4, TInterface5, TInterface6, TImplementation>(
-        this IServiceCollection services, 
-        ServiceLifetime lifetime)
+    public static IServiceCollection Add<
+        TInterface1,
+        TInterface2,
+        TInterface3,
+        TInterface4,
+        TInterface5,
+        TInterface6,
+        TImplementation
+    >(this IServiceCollection services, ServiceLifetime lifetime)
         where TImplementation : class, TInterface1, TInterface2, TInterface3, TInterface4, TInterface5, TInterface6
-		where TInterface1 : class
+        where TInterface1 : class
         where TInterface2 : class
         where TInterface3 : class
         where TInterface4 : class

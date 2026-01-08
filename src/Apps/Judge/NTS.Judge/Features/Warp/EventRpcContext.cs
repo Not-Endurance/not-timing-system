@@ -12,11 +12,7 @@ public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync
     readonly IRpcSocket _socket;
     readonly WarpContext _warpContext;
 
-    public EventRpcContext(
-        IConnectedEventContext connectedEventContext,
-        IRpcSocket socket,
-        WarpContext warpContext
-    )
+    public EventRpcContext(IConnectedEventContext connectedEventContext, IRpcSocket socket, WarpContext warpContext)
     {
         _connectedEventContext = connectedEventContext;
         _socket = socket;

@@ -12,7 +12,11 @@ public class SelectedEventStore : LockingJsonFileStore<SetupState>, IConnectedEv
 {
     readonly IRepository<UpcomingEvent> _upcomingEvents;
 
-    public SelectedEventStore([FromKeyedServices("NDataKey")] IFileContext configuration, IRepository<UpcomingEvent> upcomingEvents) : base(configuration)
+    public SelectedEventStore(
+        [FromKeyedServices("NDataKey")] IFileContext configuration,
+        IRepository<UpcomingEvent> upcomingEvents
+    )
+        : base(configuration)
     {
         _upcomingEvents = upcomingEvents;
     }

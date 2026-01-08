@@ -77,7 +77,7 @@ public class CoreService : ObservableBehind, ICoreService
     public async Task LoadArchive(int archiveId)
     {
         var entry = await _archive.Read(archiveId);
-        if (entry == null) 
+        if (entry == null)
         {
             NotifyHelper.Inform($"Archive with id '{archiveId}' does not exist");
             return;

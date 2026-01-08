@@ -8,9 +8,8 @@ namespace NTS.Storage.JSON;
 
 internal class CoreJsonStore : LockingJsonFileStore<CoreState>, ICoreState
 {
-    public CoreJsonStore([FromKeyedServices("NDataKey")] IFileContext configuration) : base(configuration)
-    {
-    }
+    public CoreJsonStore([FromKeyedServices("NDataKey")] IFileContext configuration)
+        : base(configuration) { }
 
     public Task Reset()
     {

@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Not.Domain.Aggregates;
+
 namespace Not.Application.CRUD.Ports;
 
 public interface IRead<T>

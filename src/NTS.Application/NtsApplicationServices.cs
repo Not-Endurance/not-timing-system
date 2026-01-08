@@ -28,7 +28,12 @@ public static class NtsApplicationServices
     {
         readonly IServiceCollection _services;
         readonly IConfiguration _configuration;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0052:Remove unread private members", Justification = "<Pending>")]
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Style",
+            "IDE0052:Remove unread private members",
+            Justification = "<Pending>"
+        )]
         readonly NApplicationBuilder _applicationBuilder;
 
         internal Builder(IServiceCollection services, IConfiguration configuration)
@@ -41,7 +46,9 @@ public static class NtsApplicationServices
         public Builder AddStartlist()
         {
             _services.Add<IStartlistContext, StartlistContext>(ServiceLifetime.Singleton);
-            _services.Add<IStartUpcoming, IStartHistory, IStartupInitializer, StartlistService>(ServiceLifetime.Singleton);
+            _services.Add<IStartUpcoming, IStartHistory, IStartupInitializer, StartlistService>(
+                ServiceLifetime.Singleton
+            );
             return this;
         }
 
@@ -52,4 +59,3 @@ public static class NtsApplicationServices
         }
     }
 }
-

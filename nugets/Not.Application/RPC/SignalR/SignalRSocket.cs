@@ -261,7 +261,9 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     {
         if (string.IsNullOrWhiteSpace(settings.Host) || string.IsNullOrWhiteSpace(settings.HubPattern))
         {
-            throw new Exception($"Invalid SignalR configuration - Host: '{settings.Host}', Pattern: '{settings.HubPattern}'");
+            throw new Exception(
+                $"Invalid SignalR configuration - Host: '{settings.Host}', Pattern: '{settings.HubPattern}'"
+            );
         }
         return settings;
     }

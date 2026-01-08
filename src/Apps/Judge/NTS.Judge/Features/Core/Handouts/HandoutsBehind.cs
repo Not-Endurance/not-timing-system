@@ -11,7 +11,11 @@ using NTS.Judge.Features.Core.Reset;
 
 namespace NTS.Judge.Features.Core.Handouts;
 
-public class HandoutsBehind : ObservableListBehind<HandoutDocument>, IHandoutsBehind, ICreateHandout, ICoreDependentObservables
+public class HandoutsBehind
+    : ObservableListBehind<HandoutDocument>,
+        IHandoutsBehind,
+        ICreateHandout,
+        ICoreDependentObservables
 {
     readonly SemaphoreSlim _semaphore = new(1);
     readonly IRepository<Handout> _handoutRepository;

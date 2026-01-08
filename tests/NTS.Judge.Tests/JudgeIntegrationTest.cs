@@ -21,9 +21,7 @@ public abstract class JudgeIntegrationTest : IntegrationTest
         FileContextHelper.SetDebugRootDirectory("nts");
         var services = new ServiceCollection();
         var configuration = new ConfigurationBuilder().Build();
-        return services
-            .ConfigureNtsJudge(configuration)
-            .AddRpcCient(configuration);
+        return services.ConfigureNtsJudge(configuration).AddRpcCient(configuration);
         //        .AddJsonFileStore(x => x.Path = storagePath)
         //        .AddNConventionalServices(Assembly.GetExecutingAssembly());
     }
