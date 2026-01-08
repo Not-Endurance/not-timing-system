@@ -35,7 +35,7 @@ public abstract class RestApiRepository<T> : IRepository<T>
             NotifyHelper.Warn(ex.Message);
 #else
             NotifyHelper.Warn(
-                Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
+                Not.Localization.NStrings.Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
             );
 #endif
         }
