@@ -28,6 +28,7 @@ public static class NtsApplicationServices
     {
         readonly IServiceCollection _services;
         readonly IConfiguration _configuration;
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Style",
             "IDE0052:Remove unread private members",
