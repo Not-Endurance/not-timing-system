@@ -1,9 +1,50 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Not.Injection;
 
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Registers all public classes of <paramref name="type"/> and it's children. Separate registrations are created for every interface implemented
+    /// </summary>
+    /// <param name="services">ServiceCollection instance</param>
+    /// <param name="type">Marker type to be registeded, including itself if not abstract</param>
+    /// <param name="lifetime">Service lifetime</param>
+    /// <param name="assembly">Assembly to scan for items of <paramref name="type"/></param>
+    public static void AddAsInterfaces(this IServiceCollection services, Type type, ServiceLifetime lifetime, Assembly assembly)
+    {
+        services.Scan(config => config
+            .FromAssemblies(assembly)
+            .AddClasses(classes => classes.AssignableTo(type))
+            .AsImplementedInterfaces()
+            .WithLifetime(lifetime));
+    }
+
+    /// <summary>
+    /// Registers all public classes of <paramref name="type"/> and it's children. Separate registrations are created for every interface implemented.
+    /// Uses <seealso cref="Assembly.GetCallingAssembly" to obtain assembly to scan for <paramref name="type"/> />
+    /// </summary>
+    /// <param name="services">ServiceCollection instance</param>
+    /// <param name="type">Marker type to be registeded, including itself if not abstract</param>
+    /// <param name="lifetime">Service lifetime</param>
+    public static void AddAsInterfaces(this IServiceCollection services, Type type, ServiceLifetime lifetime)
+    {
+        AddAsInterfaces(services, type, lifetime, Assembly.GetCallingAssembly());
+    }
+
+    /// <summary>
+    /// Registers all public classes of <paramref name="type"/> and it's children. Separate registrations are created for every interface implemented.
+    /// Uses <seealso cref="Assembly.GetCallingAssembly" to obtain assembly to scan for <paramref name="type"/> />
+    /// </summary>
+    /// <typeparam name="T">Marker type to be registeded, including itself if not abstract</typeparam>
+    /// <param name="services">ServiceCollection instance</param>
+    /// <param name="lifetime">Service lifetime</param>
+    public static void AddAsInterfaces<T>(this IServiceCollection services, ServiceLifetime lifetime)
+    {
+        AddAsInterfaces(services, typeof(T), lifetime, Assembly.GetCallingAssembly());
+    }
+
     public static void Add(this IServiceCollection services, Type @interface, Type implementation, ServiceLifetime lifetime)
     {
         var service =

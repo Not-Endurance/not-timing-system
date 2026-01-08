@@ -1,14 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.CRUD.Ports;
 using Not.Filesystem;
+using Not.Injection;
 using Not.Storage;
 using NTS.Judge.Features.Core;
-using NTS.Judge.Features.Setup.Settings;
 using NTS.Storage.Core;
-using NTS.Storage.Core.Repositories;
 using NTS.Storage.JSON;
-using NTS.Storage.REST;
 
 namespace NTS.Storage;
 
@@ -28,28 +26,19 @@ public static class NtsStorageServices
 
     public class Builder
     {
-        readonly IServiceCollection _services;
         readonly NStorageBuilder _nStorageBuilder;
+        readonly IServiceCollection _services;
 
         internal Builder(IServiceCollection services, IConfiguration configuration)
         {
-            _services = services;
             _nStorageBuilder = new(services, configuration);
+            _services = services;
         }
 
-        public Builder AddCoreJsonStorage()
+        public Builder AddJsonStorage()
         {
-
-            _nStorageBuilder.AddJsonFileStorage<CoreState, CoreJsonStore, ICoreState>();
-            
-            // TODO: extract conventional logic to apply to IRepository<T> and other interfaces directly instead of listing manually
-            _services
-                .AddTransient<IRepository<Domain.Core.Aggregates.EnduranceEvent>, EnduranceEventRepository>()
-                .AddTransient<IRepository<Domain.Core.Aggregates.Handout>, HandoutRepository>()
-                .AddTransient<IRepository<Domain.Core.Aggregates.Official>, OfficialRepository>()
-                .AddTransient<IRepository<Domain.Core.Aggregates.Participation>, ParticipationRepository>()
-                .AddTransient<IRepository<Domain.Core.Aggregates.Ranking>, RankingRepository>()
-                .AddTransient<IRepository<Domain.Core.Aggregates.SnapshotResult>, SnapshotResultRepository>();
+            _nStorageBuilder.AddJsonFileStorage<CoreState, CoreJsonStore, ICoreState>(Assembly.GetExecutingAssembly());
+            _services.AddAsInterfaces<SelectedEventStore>(ServiceLifetime.Singleton);
             return this;
         }
 
@@ -65,15 +54,7 @@ public static class NtsStorageServices
 
         public Builder AddRestApiStorage()
         {
-            _nStorageBuilder.AddRestApiStorage();
-            _services
-                .AddTransient<IRepository<Domain.Setup.Aggregates.Athlete>, AthleteRestApiRepository>()
-                .AddTransient<IRepository<Domain.Setup.Aggregates.Club>, ClubRestApiRepository>()
-                .AddTransient<IRepository<Domain.Setup.Aggregates.Horse>, HorseRestApiRepository>()
-                .AddTransient<IRepository<Domain.Setup.Aggregates.UpcomingEvent>, UpcomingEventRestApiRepository>()
-                .AddTransient<IRepository<Domain.Aggregates.Country>, CountryRestApiRepository>()
-                .AddTransient<ISettingRepository, SettingRestApiRepository>()
-                .AddTransient<IRepository<Domain.Core.Aggregates.ArchiveEntry>, ArchiveRestApiRepository>();
+            _nStorageBuilder.AddRestApiStorage(Assembly.GetExecutingAssembly());
             return this;
         }
     }

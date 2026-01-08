@@ -8,7 +8,7 @@ public static class NtsJudgeMauiServices
 {
     public static IServiceCollection ConfigureJudgeMaui(this IServiceCollection services, IConfiguration configuration)
     {
-        services.ConfigureNtsStorage(configuration).AddCoreJsonStorage().AddRestApiStorage();
+        services.ConfigureNtsStorage(configuration).AddJsonStorage().AddRestApiStorage();
         return services.AddPlatformServices(configuration).ConfigureNtsJudge(configuration);
     }
 }

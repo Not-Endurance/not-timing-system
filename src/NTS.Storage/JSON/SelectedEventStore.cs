@@ -8,7 +8,7 @@ using NTS.Storage.Setup;
 
 namespace NTS.Storage.JSON;
 
-internal class SelectedEventStore : LockingJsonFileStore<SetupState>, IConnectedEventContext
+public class SelectedEventStore : LockingJsonFileStore<SetupState>, IConnectedEventContext
 {
     readonly IRepository<UpcomingEvent> _upcomingEvents;
 
