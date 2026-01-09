@@ -1,6 +1,6 @@
 ﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Judge.Core;
+using NTS.Judge.Features.Core;
 using NTS.Judge.Tests.Helpers;
 using NTS.Storage.Core;
 using Xunit.Abstractions;

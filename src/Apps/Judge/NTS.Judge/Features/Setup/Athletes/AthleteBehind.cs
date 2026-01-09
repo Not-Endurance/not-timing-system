@@ -3,7 +3,6 @@ using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 
 namespace NTS.Judge.Features.Setup.Athletes;
 

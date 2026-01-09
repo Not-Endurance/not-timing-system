@@ -1,6 +1,6 @@
 using Not.Blazor.Components;
 using Not.Notify;
-using NTS.Judge.Blazor.Shared.Components.SidePanels;
+using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Core.Dashboards;
 

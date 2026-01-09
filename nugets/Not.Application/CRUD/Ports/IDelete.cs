@@ -1,11 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Not.Domain.Aggregates;
-using Not.Injection;
 
 namespace Not.Application.CRUD.Ports;
 
-public interface IDelete<T> : ITransient
-    where T : IAggregateRoot
+public interface IDelete<T>
 {
     Task Delete(int id);
     Task Delete(T item);

@@ -1,9 +1,9 @@
 using MudBlazor;
 using Not.Blazor.Components;
-using Not.Exceptions;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Judge.Blazor.Core.Rankings.CustomRanking;
+using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Protocols;
 

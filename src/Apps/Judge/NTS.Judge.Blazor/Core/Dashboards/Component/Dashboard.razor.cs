@@ -1,5 +1,6 @@
 using MudBlazor;
 using NTS.Domain.Core.Aggregates;
+using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Component;
 

@@ -6,7 +6,7 @@ namespace Not.Application.RPC;
 
 public static class RpcServiceCollectionExtensions
 {
-    public static IServiceCollection AddNRpcSocket(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddRpcCient(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSettings<RpcSettings>(
             configuration,

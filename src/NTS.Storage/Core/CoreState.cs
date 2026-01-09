@@ -1,4 +1,4 @@
-﻿using Not.Storage.States;
+﻿using Not.Storage.JsonFile.States;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Core;

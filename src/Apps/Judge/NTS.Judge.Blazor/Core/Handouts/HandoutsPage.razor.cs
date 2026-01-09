@@ -1,5 +1,6 @@
 using MudBlazor;
 using Not.Blazor.Dialogs;
+using NTS.Judge.Features.Core.Handouts;
 
 namespace NTS.Judge.Blazor.Core.Handouts;
 
