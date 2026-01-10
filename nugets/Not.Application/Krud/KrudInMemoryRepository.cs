@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Not.Application.Behinds;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Aggregates;
 using Not.Exceptions;
@@ -9,9 +8,9 @@ namespace Not.Application.Krud;
 public abstract class KrudInMemoryRepository<T> : IRepository<T>
     where T : AggregateRoot
 {
-    readonly ICrudeParent<T> _parentContext;
+    readonly IKrudParentNodeOf<T> _parentContext;
 
-    protected KrudInMemoryRepository(ICrudeParent<T> parentContext)
+    protected KrudInMemoryRepository(IKrudParentNodeOf<T> parentContext)
     {
         _parentContext = parentContext;
     }

@@ -1,20 +1,20 @@
 ﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+using Not.Application.Krud;
 using NTS.Domain.Aggregates;
 using NTS.Judge.Blazor.Setup.Settings;
 using NTS.Judge.Features.Setup.Services;
 
 namespace NTS.Judge.Features.Setup.Settings;
 
-public class SettingBehind : ObservableBehind, ISettingBehind
+public class SettingBehind : NStatefulService, ISettingBehind
 {
     readonly ISettingRepository _repository;
-    readonly IEnumerable<ICrudReflection<Setting>> _reflections;
+    readonly IEnumerable<IKrudMirror<Setting>> _reflections;
     readonly IAccountBehind _accountBehind;
 
     public SettingBehind(
         ISettingRepository repository,
-        IEnumerable<ICrudReflection<Setting>> reflections,
+        IEnumerable<IKrudMirror<Setting>> reflections,
         IAccountBehind accountBehind
     )
     {
@@ -25,7 +25,7 @@ public class SettingBehind : ObservableBehind, ISettingBehind
 
     public Setting? Setting { get; private set; }
 
-    protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
         Setting = await _repository.Get(_accountBehind.Id);
         return Setting != null;

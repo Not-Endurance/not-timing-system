@@ -1,6 +1,5 @@
-﻿using Not.Application.Behinds;
-using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.Krud;
+using Not.Application.Krud.Services;
 using Not.Domain.Exceptions;
 using Not.Extensions;
 using NTS.Domain.Setup.Aggregates;
@@ -8,16 +7,16 @@ using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 
-public class CompetitionBehind : CrudChildBehind<Competition, CompetitionFormModel>
+public class CompetitionBehind : KrudService<Competition, CompetitionFormModel>
 {
-    readonly ICrudeParent<Phase> _phaseParent;
-    readonly ICrudeParent<Participation> _participationParent;
+    readonly IKrudParentNodeOf<Phase> _phaseParent;
+    readonly IKrudParentNodeOf<Participation> _participationParent;
 
     public CompetitionBehind(
-        UpcomingEventCrudeContext crudeContext,
-        ICrudeParent<Phase> phaseParent,
-        ICrudeParent<Participation> participationParent,
-        IEnumerable<ICrudReflection<Competition>> dependants
+        UpcomingEventKrudRoot crudeContext,
+        IKrudParentNodeOf<Phase> phaseParent,
+        IKrudParentNodeOf<Participation> participationParent,
+        IEnumerable<IKrudMirror<Competition>> dependants
     )
         : base(dependants, crudeContext)
     {

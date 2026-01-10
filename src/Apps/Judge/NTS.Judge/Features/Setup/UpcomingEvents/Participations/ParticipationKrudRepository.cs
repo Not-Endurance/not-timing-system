@@ -1,4 +1,3 @@
-using Not.Application.Behinds;
 using Not.Application.Krud;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Warp;
@@ -9,7 +8,7 @@ public class ParticipationKrudRepository : KrudInMemoryRepository<Participation>
 {
     readonly ISelectedEventContext _rootContext;
 
-    public ParticipationKrudRepository(ICrudeParent<Participation> parentContext, ISelectedEventContext rootContext)
+    public ParticipationKrudRepository(IKrudParentNodeOf<Participation> parentContext, ISelectedEventContext rootContext)
         : base(parentContext)
     {
         _rootContext = rootContext;

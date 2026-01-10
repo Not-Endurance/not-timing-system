@@ -5,7 +5,7 @@ using NTS.Judge.Features.Setup.Settings;
 
 namespace NTS.Judge.Blazor.Setup.Settings;
 
-public interface ISettingBehind : INObservable, IFormBehind<SettingFormModel>
+public interface ISettingBehind : IStatefulService, IFormBehind<SettingFormModel>
 {
     Setting? Setting { get; }
 }

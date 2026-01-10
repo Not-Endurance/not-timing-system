@@ -1,13 +1,13 @@
-﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.Krud;
+using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Phases;
 
-public class PhaseBehind : CrudChildBehind<Phase, PhaseFormModel>
+public class PhaseBehind : KrudService<Phase, PhaseFormModel>
 {
-    public PhaseBehind(CompetitionCrudeContext crudeContext, IEnumerable<ICrudReflection<Phase>> reflections)
+    public PhaseBehind(CompetitionKrudNode crudeContext, IEnumerable<IKrudMirror<Phase>> reflections)
         : base(reflections, crudeContext) { }
 
     protected override Phase CreateEntity(PhaseFormModel model)

@@ -4,8 +4,8 @@ using Not.Application.CRUD.Ports;
 using Not.Exceptions;
 using Not.Filesystem;
 using Not.Notify;
+using Not.Observables.Structures;
 using Not.Random;
-using Not.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
@@ -16,7 +16,7 @@ using NTS.Judge.Features.Core.Reset;
 namespace NTS.Judge.Features.Core.Rankings;
 
 public class RankingService
-    : ObservableListBehind<Ranking>,
+    : NStatefulService<ObservableList<Ranking>>,
         IRankingService,
         IRankingMenuService,
         IRanklistDocumentService,
@@ -54,9 +54,9 @@ public class RankingService
     public Ranking? SelectedRanking { get; set; }
     public Ranklist? Ranklist { get; set; }
     public RanklistDocument? Document { get; private set; }
-    public ObservableList<Ranking> Rankings => ObservableList;
+    public ObservableList<Ranking> Rankings => State;
 
-    protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
         var rankings = await _rankings.ReadAll();
         if (!rankings.Any())
@@ -73,7 +73,7 @@ public class RankingService
     {
         var ranking = new Ranking(
             RandomHelper.GenerateUniqueInteger(),
-            model.Name,
+            null,
             model.Ruleset,
             model.Type,
             model.Category,
@@ -94,14 +94,14 @@ public class RankingService
         SelectedRanking = ranking;
         Ranklist = new Ranklist(SelectedRanking);
         Document = new RanklistDocument(Ranklist, enduranceEvent, officials);
-        EmitChange();
+        EmitChanged();
     }
 
     public async Task Delete(Ranking ranking)
     {
         await _rankings.Delete(ranking);
         Rankings.Remove(ranking);
-        EmitChange();
+        EmitChanged();
     }
 
     public async Task GenerateFeiExport()

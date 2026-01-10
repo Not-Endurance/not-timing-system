@@ -4,7 +4,7 @@ using Not.Blazor.Components;
 
 namespace NTS.Witness.Blazor.Components.Snapshots;
 
-public class TimestampUpdateDialogBehind : NBehind
+public class TimestampUpdateDialogBehind : NComponent
 {
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = default!;

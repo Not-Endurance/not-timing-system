@@ -1,13 +1,13 @@
-﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.Krud;
+using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 
-public class LoopBehind : CrudChildBehind<Loop, LoopFormModel>
+public class LoopBehind : KrudService<Loop, LoopFormModel>
 {
-    public LoopBehind(IEnumerable<ICrudReflection<Loop>> dependants, UpcomingEventCrudeContext parentContext)
+    public LoopBehind(IEnumerable<IKrudMirror<Loop>> dependants, UpcomingEventKrudRoot parentContext)
         : base(dependants, parentContext) { }
 
     protected override Loop CreateEntity(LoopFormModel model)

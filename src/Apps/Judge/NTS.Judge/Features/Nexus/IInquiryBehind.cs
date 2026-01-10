@@ -4,7 +4,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Nexus;
 
-public interface IInquiryBehind : INObservable
+public interface IInquiryBehind : IStatefulService
 {
     IEnumerable<RankingEntry>? Match { get; }
     IReadOnlyList<ArchiveModel> Records { get; }

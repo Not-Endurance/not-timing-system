@@ -3,7 +3,7 @@ using Not.Blazor.Navigation;
 
 namespace NTS.Witness.Blazor.Components.Auth.Authentication;
 
-public class RedirectBehind : NBehind
+public class RedirectBehind : NComponent
 {
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;

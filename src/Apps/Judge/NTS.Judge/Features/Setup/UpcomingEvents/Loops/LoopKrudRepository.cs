@@ -1,4 +1,3 @@
-using Not.Application.Behinds;
 using Not.Application.Krud;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Warp;
@@ -9,7 +8,7 @@ public class LoopKrudRepository : KrudInMemoryRepository<Loop>
 {
     readonly ISelectedEventContext _rootContext;
 
-    public LoopKrudRepository(ICrudeParent<Loop> parentContext, ISelectedEventContext rootContext)
+    public LoopKrudRepository(IKrudParentNodeOf<Loop> parentContext, ISelectedEventContext rootContext)
         : base(parentContext)
     {
         _rootContext = rootContext;

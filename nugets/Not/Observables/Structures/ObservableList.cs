@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using Not.Events;
 using Not.Exceptions;
+using Not.Structures;
 
-namespace Not.Structures;
+namespace Not.Observables.Structures;
 
-public class ObservableList<T> : IReadOnlyList<T>
+public class ObservableList<T> : IReadOnlyList<T>, IObservable
     where T : IIdentifiable
 {
+    Event _changed = new();
     readonly object _lock = new();
     readonly Dictionary<int, T> _dictionary = [];
 
@@ -16,6 +18,7 @@ public class ObservableList<T> : IReadOnlyList<T>
     {
         _dictionary = items.ToDictionary(x => x.Id, x => x);
     }
+    public IEventSubscriber Event => _changed;
 
     public T this[int index]
     {
@@ -38,7 +41,6 @@ public class ObservableList<T> : IReadOnlyList<T>
             }
         }
     }
-    public Event ChangedEvent { get; } = new();
     public int Count => _dictionary.Count;
 
     public void AddOrReplace(T item)
@@ -50,7 +52,7 @@ public class ObservableList<T> : IReadOnlyList<T>
             {
                 _dictionary[item.Id] = item;
             }
-            ChangedEvent.Emit();
+            _changed.Emit();
         }
     }
 
@@ -60,7 +62,7 @@ public class ObservableList<T> : IReadOnlyList<T>
         {
             GuardHelper.ThrowIfDefault(item);
             var result = _dictionary.Remove(item.Id);
-            ChangedEvent.Emit();
+            _changed.Emit();
             return result;
         }
     }
@@ -70,7 +72,7 @@ public class ObservableList<T> : IReadOnlyList<T>
         lock (_lock)
         {
             var result = _dictionary.Remove(id);
-            ChangedEvent.Emit();
+            _changed.Emit();
             return result;
         }
     }
@@ -83,7 +85,7 @@ public class ObservableList<T> : IReadOnlyList<T>
             {
                 _dictionary.Remove(item.Id);
             }
-            ChangedEvent.Emit();
+            _changed.Emit();
         }
     }
 
@@ -95,7 +97,7 @@ public class ObservableList<T> : IReadOnlyList<T>
             {
                 _dictionary.Add(key, value);
             }
-            ChangedEvent.Emit();
+            _changed.Emit();
         }
     }
 
@@ -124,4 +126,5 @@ public class ObservableList<T> : IReadOnlyList<T>
     {
         return GetEnumerator();
     }
+
 }

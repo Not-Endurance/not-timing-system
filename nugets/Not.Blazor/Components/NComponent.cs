@@ -3,7 +3,7 @@ using Not.Safe;
 
 namespace Not.Blazor.Components;
 
-public class NBehind : ComponentBase
+public class NComponent : ComponentBase
 {
     [Parameter]
     public string? Style { get; set; }
@@ -16,17 +16,17 @@ public class NBehind : ComponentBase
 
     public bool IsInitialized { get; private set; } = true;
 
-    protected async Task Observe(INObservable observable)
+    protected async Task Observe(IStatefulService statefulService)
     {
-        await Observe(observable, []);
+        await Observe(statefulService, []);
     }
 
-    protected async Task Observe(INObservable observable, params IEnumerable<object> arguments)
+    protected async Task Observe(IStatefulService statefulService, params IEnumerable<object> arguments)
     {
         IsInitialized = false;
         await Render();
-        observable.Subscribe(OnEmit);
-        await observable.Initialize(arguments);
+        statefulService.Event.Subscribe(Render);
+        await statefulService.Initialize(arguments);
         IsInitialized = true;
         await Render();
     }
@@ -58,10 +58,5 @@ public class NBehind : ComponentBase
     {
         var filtered = values.Where(x => !string.IsNullOrWhiteSpace(x));
         return string.Join(" ", filtered);
-    }
-
-    async Task OnEmit()
-    {
-        await Render();
     }
 }

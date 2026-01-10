@@ -1,6 +1,6 @@
-﻿using Not.Application.Behinds;
-using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.Krud;
+using Not.Application.Krud.Services;
 using Not.Notify;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Behinds;
@@ -8,21 +8,20 @@ using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
-// TODO: Try to decouple Home logic in separate behind and inherit CrudBehind here
 public class UpcomingEventBehind
-    : CrudBehind<UpcomingEvent, EnduranceEventFormModel>,
-        ICrudReflection<Loop>,
-        ICrudReflection<Combination>,
-        ICrudReflection<Athlete>,
-        ICrudReflection<Horse>
+    : KrudRootService<UpcomingEvent, EnduranceEventFormModel>,
+        IKrudMirror<Loop>,
+        IKrudMirror<Combination>,
+        IKrudMirror<Athlete>,
+        IKrudMirror<Horse>
 {
-    readonly UpcomingEventCrudeContext _crudeContext;
+    readonly UpcomingEventKrudRoot _crudeContext;
     readonly IUpdate<UpcomingEvent> _updater;
     readonly ISelectedEventContext _eventContext;
 
     public UpcomingEventBehind(
         IRepository<UpcomingEvent> events,
-        UpcomingEventCrudeContext crudeContext,
+        UpcomingEventKrudRoot crudeContext,
         ISelectedEventContext eventContext
     )
         : base(events, [])
@@ -32,7 +31,7 @@ public class UpcomingEventBehind
         _eventContext = eventContext;
     }
 
-    protected override UpcomingEvent CreateEntity(EnduranceEventFormModel model)
+    protected override UpcomingEvent CreateAggregate(EnduranceEventFormModel model)
     {
         return new UpcomingEvent(
             model.Name,
@@ -44,7 +43,7 @@ public class UpcomingEventBehind
         );
     }
 
-    protected override UpcomingEvent UpdateEntity(EnduranceEventFormModel model)
+    protected override UpcomingEvent UpdateAggregate(EnduranceEventFormModel model)
     {
         return new UpcomingEvent(
             model.Id,
@@ -54,10 +53,10 @@ public class UpcomingEventBehind
             model.FeiShowId,
             model.FeiId,
             model.FeiEventCode,
-            ((ICrudeParent<Competition>)_crudeContext).Children,
-            ((ICrudeParent<Official>)_crudeContext).Children,
-            ((ICrudeParent<Loop>)_crudeContext).Children,
-            ((ICrudeParent<Combination>)_crudeContext).Children
+            ((IKrudParentNodeOf<Competition>)_crudeContext).Children,
+            ((IKrudParentNodeOf<Official>)_crudeContext).Children,
+            ((IKrudParentNodeOf<Loop>)_crudeContext).Children,
+            ((IKrudParentNodeOf<Combination>)_crudeContext).Children
         );
     }
 
@@ -67,9 +66,13 @@ public class UpcomingEventBehind
         return Task.CompletedTask;
     }
 
+    // TODO: Add Analyzer to scan projects for the same aggregates used in as KrudRoot and KrudNode
+    // Or better figure out how to separate the Athlete, Horse, Loop and Combination AggregateRoots
+    // from the UpcomingEvent AggregateRoot and maintain synced state. 
+    // Maybe domain events - Horse updates, which raises a domain Event, which updates UpcomingEvent state
     public async Task Reflect(Loop loop)
     {
-        foreach (var competitions in ((ICrudeParent<Competition>)_crudeContext).Children)
+        foreach (var competitions in ((IKrudParentNodeOf<Competition>)_crudeContext).Children)
         {
             foreach (var phase in competitions.Phases)
             {
@@ -81,7 +84,7 @@ public class UpcomingEventBehind
 
     public async Task Reflect(Combination combination)
     {
-        foreach (var competitions in ((ICrudeParent<Competition>)_crudeContext).Children)
+        foreach (var competitions in ((IKrudParentNodeOf<Competition>)_crudeContext).Children)
         {
             foreach (var participation in competitions.Participations)
             {
@@ -93,10 +96,10 @@ public class UpcomingEventBehind
 
     public async Task Reflect(Athlete athlete)
     {
-        foreach (var combination in ((ICrudeParent<Combination>)_crudeContext).Children)
+        foreach (var combination in ((IKrudParentNodeOf<Combination>)_crudeContext).Children)
         {
             combination.Reflect(athlete);
-            foreach (var competition in ((ICrudeParent<Competition>)_crudeContext).Children)
+            foreach (var competition in ((IKrudParentNodeOf<Competition>)_crudeContext).Children)
             {
                 foreach (var participation in competition.Participations)
                 {
@@ -110,10 +113,10 @@ public class UpcomingEventBehind
 
     public async Task Reflect(Horse horse)
     {
-        foreach (var combination in ((ICrudeParent<Combination>)_crudeContext).Children)
+        foreach (var combination in ((IKrudParentNodeOf<Combination>)_crudeContext).Children)
         {
             combination.Reflect(horse);
-            foreach (var competition in ((ICrudeParent<Competition>)_crudeContext).Children)
+            foreach (var competition in ((IKrudParentNodeOf<Competition>)_crudeContext).Children)
             {
                 foreach (var participation in competition.Participations)
                 {

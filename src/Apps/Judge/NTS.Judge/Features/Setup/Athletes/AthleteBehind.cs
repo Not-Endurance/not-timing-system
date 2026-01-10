@@ -1,27 +1,28 @@
 ﻿using MudBlazor.Extensions;
-using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Application.Krud;
+using Not.Application.Krud.Services;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Athletes;
 
-public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflection<Club>
+public class AthleteBehind : KrudRootService<Athlete, AthleteFormModel>, IKrudMirror<Club>
 {
     readonly IRepository<Athlete> _repository;
 
-    public AthleteBehind(IRepository<Athlete> repository, IEnumerable<ICrudReflection<Athlete>> dependants)
+    public AthleteBehind(IRepository<Athlete> repository, IEnumerable<IKrudMirror<Athlete>> dependants)
         : base(repository, dependants)
     {
         _repository = repository;
     }
 
-    protected override Athlete CreateEntity(AthleteFormModel model)
+    protected override Athlete CreateAggregate(AthleteFormModel model)
     {
         return new Athlete(Person.Create(model.Name), model.FeiId, model.Country, model.Club);
     }
 
-    protected override Athlete UpdateEntity(AthleteFormModel model)
+    protected override Athlete UpdateAggregate(AthleteFormModel model)
     {
         return new Athlete(model.Id, Person.Create(model.Name), model.FeiId, model.Country, model.Club);
     }

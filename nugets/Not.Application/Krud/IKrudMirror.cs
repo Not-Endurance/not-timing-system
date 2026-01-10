@@ -1,9 +1,9 @@
 ﻿using Not.Domain.Aggregates;
 using Not.Injection;
 
-namespace Not.Application.CRUD.Ports;
+namespace Not.Application.Krud;
 
-public interface ICrudReflection<in T> : ISingleton
+public interface IKrudMirror<in T> : ISingleton
     where T : IAggregateRoot
 {
     Task Reflect(T update);

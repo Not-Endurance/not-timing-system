@@ -9,7 +9,7 @@ using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Features.Core;
 
-public class CoreService : ObservableBehind, ICoreService
+public class CoreService : NStatefulService, ICoreService
 {
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly ICoreState _coreState;
@@ -46,7 +46,7 @@ public class CoreService : ObservableBehind, ICoreService
 
     public bool IsStarted { get; private set; }
 
-    protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
         var enduranceEvents = await _events.Read(0);
         IsStarted = enduranceEvents != null;
@@ -70,7 +70,7 @@ public class CoreService : ObservableBehind, ICoreService
         IsStarted = false;
         foreach (var observable in _coreDependentObservables)
         {
-            observable.Reset();
+            observable.ResetState();
         }
     }
 
@@ -104,6 +104,6 @@ public class CoreService : ObservableBehind, ICoreService
         // Currently you need to restart witness after start in order to fetch
         await _coreStarter.Start();
         IsStarted = true;
-        EmitChange();
+        EmitChanged();
     }
 }

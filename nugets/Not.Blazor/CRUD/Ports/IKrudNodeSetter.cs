@@ -1,16 +1,15 @@
-﻿using Not.Domain;
-using Not.Injection;
+﻿using Not.Injection;
 
 namespace Not.Blazor.CRUD.Ports;
 
 /// <summary>
 /// Used in a loop without filtration. Implementations must implement type checking and NOT throw any errors
 /// </summary>
-public interface ICrudeParentContext : ISingleton
+public interface IKrudNodeSetter : ISingleton
 {
     /// <summary>
     /// Set the parent reference
     /// </summary>
-    /// <param name="parent"></param>
-    Task Set(IParent parent);
+    /// <param name="nodeValue"></param>
+    Task Set(object nodeValue);
 }

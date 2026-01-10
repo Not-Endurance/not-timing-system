@@ -1,14 +1,14 @@
 using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.Dialogs;
+using Not.Observables.Structures;
 using Not.Safe;
-using Not.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Menu;
 
-public class RankingMenuBehind : NBehind
+public class RankingMenuBehind : NComponent
 {
     [Inject]
     IRankingMenuService Service { get; set; } = default!;

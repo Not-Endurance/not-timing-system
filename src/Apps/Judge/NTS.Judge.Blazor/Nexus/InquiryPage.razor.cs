@@ -2,7 +2,7 @@ using Not.Blazor.Components;
 
 namespace NTS.Judge.Blazor.Nexus;
 
-public partial class InquiryPage : NBehind
+public partial class InquiryPage : NComponent
 {
     [Inject]
     protected IInquiryBehind Behind { get; set; } = default!;

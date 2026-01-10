@@ -1,58 +1,58 @@
-﻿using Not.Application.CRUD.Ports;
+﻿using Not.Application.Behinds.Adapters;
 using Not.Blazor.CRUD.Forms.Ports;
 using Not.Blazor.CRUD.Lists.Ports;
 using Not.Domain.Aggregates;
 using Not.Safe;
 
-namespace Not.Application.Behinds.Adapters;
+namespace Not.Application.Krud.Services;
 
-public abstract class CrudChildBehind<T, TModel> : ObservableBehind, IListBehind<T>, IFormBehind<TModel>
+public abstract class KrudService<T, TModel> : NStatefulService, IListBehind<T>, IFormBehind<TModel>
     where T : AggregateRoot
 {
-    readonly List<ICrudReflection<T>> _reflections;
-    readonly ICrudeParent<T> _crudeContext;
+    readonly List<IKrudMirror<T>> _reflections;
+    readonly IKrudParentNodeOf<T> _parentNode;
 
     /// <summary>
     /// Attach CRUD parent context to be updated with changes in the state of <typeparamref name="T"/>
     /// <br/> CRUD treats parents as permissinve - delete/updates are not validated by the parent
     /// </summary>
-    protected CrudChildBehind(IEnumerable<ICrudReflection<T>> reflections, ICrudeParent<T> crudeContext)
+    protected KrudService(IEnumerable<IKrudMirror<T>> reflections, IKrudParentNodeOf<T> parentNode)
     {
         _reflections = reflections.ToList();
-        _crudeContext = crudeContext;
-        _crudeContext.Changed.Subscribe(EmitChange);
+        _parentNode = parentNode;
+        _parentNode.Changed.Subscribe(EmitChanged);
     }
 
     protected abstract T CreateEntity(TModel model);
 
-    public IReadOnlyList<T> Items => _crudeContext.Children;
+    public IReadOnlyList<T> Items => _parentNode.Children;
 
     protected virtual T UpdateEntity(TModel model)
     {
         return CreateEntity(model);
     }
 
-    protected sealed override Task<bool> PerformInitialization(params IEnumerable<object> arguments)
+    protected sealed override Task<bool> CreateState(params IEnumerable<object> arguments)
     {
         return Task.FromResult(true);
     }
 
     protected async Task SafeDelete(T entity)
     {
-        await _crudeContext.Delete(entity);
+        await _parentNode.Delete(entity);
     }
 
     public async Task Update(TModel model)
     {
         var entity = UpdateEntity(model);
-        await _crudeContext.Update(entity);
+        await _parentNode.Update(entity);
         _reflections.ForEach(x => x.Reflect(entity));
     }
 
     public async Task Create(TModel model)
     {
         var entity = CreateEntity(model);
-        await _crudeContext.Create(entity);
+        await _parentNode.Create(entity);
     }
 
     public async Task Delete(T entity)

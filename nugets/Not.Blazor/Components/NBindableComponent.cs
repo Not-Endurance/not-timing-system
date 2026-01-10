@@ -2,7 +2,7 @@
 
 namespace Not.Blazor.Components;
 
-public class NBindableComponent<T> : NBehind
+public class NBindableComponent<T> : NComponent
 {
     T? _value;
 

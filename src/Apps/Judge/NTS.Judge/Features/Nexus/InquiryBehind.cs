@@ -5,7 +5,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Nexus;
 
-public class InquiryBehind : ObservableBehind, IInquiryBehind
+public class InquiryBehind : NStatefulService, IInquiryBehind
 {
     readonly IRepository<ArchiveEntry> _archive;
 
@@ -17,7 +17,7 @@ public class InquiryBehind : ObservableBehind, IInquiryBehind
     public IEnumerable<RankingEntry>? Match { get; private set; }
     public IReadOnlyList<ArchiveModel> Records { get; private set; } = [];
 
-    protected override Task<bool> PerformInitialization(params IEnumerable<object> arguments)
+    protected override Task<bool> CreateState(params IEnumerable<object> arguments)
     {
         return Task.FromResult(true);
     }
@@ -43,6 +43,6 @@ public class InquiryBehind : ObservableBehind, IInquiryBehind
             .SelectMany(x => x.Ranking.Entries)
             .Where(x => x.Participation.Combination.Horse.Name == term)
             .OrderByDescending(x => x.Participation.Phases.First().StartTime?.ToDateTimeOffset());
-        EmitChange();
+        EmitChanged();
     }
 }

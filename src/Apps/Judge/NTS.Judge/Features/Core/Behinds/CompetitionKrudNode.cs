@@ -1,22 +1,22 @@
-﻿using Not.Application.Behinds;
-using Not.Domain;
+﻿using Not.Application.Krud;
+using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Core.Behinds;
 
-public class CompetitionCrudeContext : CrudeContext<Competition>, ICrudeParent<Phase>, ICrudeParent<Participation>
+public class CompetitionKrudNode : KrudNode<Competition>, IKrudParentNodeOf<Phase>, IKrudParentNodeOf<Participation>
 {
     Competition? _competition;
 
-    public CompetitionCrudeContext(ICrudeParent<Competition> parentContext)
-        : base(parentContext) { }
+    public CompetitionKrudNode(IKrudParentNodeOf<Competition> parentNode)
+        : base(parentNode) { }
 
-    IReadOnlyList<Phase> ICrudeParent<Phase>.Children => _competition?.Phases ?? [];
-    IReadOnlyList<Participation> ICrudeParent<Participation>.Children => _competition?.Participations ?? [];
+    IReadOnlyList<Phase> IKrudParentNodeOf<Phase>.Children => _competition?.Phases ?? [];
+    IReadOnlyList<Participation> IKrudParentNodeOf<Participation>.Children => _competition?.Participations ?? [];
 
-    public override Task Set(IParent parent)
+    public override Task Set(object aggregate)
     {
-        if (parent is Competition competition)
+        if (aggregate is Competition competition)
         {
             _competition = competition;
         }

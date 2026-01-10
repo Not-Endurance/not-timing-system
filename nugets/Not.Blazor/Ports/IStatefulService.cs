@@ -1,9 +1,8 @@
-﻿using Not.Injection;
+﻿using Not.Observables;
 
 namespace Not.Blazor.Ports;
 
-public interface INObservable
+public interface IStatefulService : IObservable
 {
     Task Initialize(params IEnumerable<object> arguments);
-    void Subscribe(Func<Task> action);
 }

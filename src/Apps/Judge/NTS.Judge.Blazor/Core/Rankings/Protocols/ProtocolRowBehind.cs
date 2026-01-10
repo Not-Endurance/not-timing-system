@@ -3,7 +3,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Protocols;
 
-public class ProtocolRowBehind : NBehind
+public class ProtocolRowBehind : NComponent
 {
     [Parameter, EditorRequired]
     public RankingEntry Entry { get; set; } = default!;

@@ -10,7 +10,7 @@ using Not.Safe;
 
 namespace Not.Blazor.CRUD.Lists;
 
-public partial class CrudList<T, TModel, TForm> : NBehind
+public partial class CrudList<T, TModel, TForm> : NComponent
     where T : AggregateRoot
     where TModel : IFormModel<T>, new()
     where TForm : NForm<TModel>
@@ -22,7 +22,7 @@ public partial class CrudList<T, TModel, TForm> : NBehind
     FormManager<TModel, TForm> FormNavigator { get; set; } = default!;
 
     [Inject] // TODO: Probably refactor this as ICrudParent<T> and make it nullable!!!!
-    IEnumerable<ICrudeParentContext> ParentContexts { get; set; } = default!;
+    IEnumerable<IKrudNodeSetter> ParentContexts { get; set; } = default!;
 
     [Parameter]
     public int? ParentId { get; set; } // TODO: can probably be deleted
@@ -63,12 +63,12 @@ public partial class CrudList<T, TModel, TForm> : NBehind
         }
     }
 
-    protected async Task UpdateHandler(T item)
+    protected async Task UpdateHandler(T aggregate)
     {
         try
         {
-            await SetParentContext(item);
-            var model = CreateModel(item);
+            await SetKrudNode(aggregate);
+            var model = CreateModel(aggregate);
             await FormNavigator.Update(UpdateRoute, model);
         }
         catch (Exception ex)
@@ -77,11 +77,11 @@ public partial class CrudList<T, TModel, TForm> : NBehind
         }
     }
 
-    protected async Task DeleteHandler(T item)
+    protected async Task DeleteHandler(T aggregate)
     {
         try
         {
-            await Behind.Delete(item);
+            await Behind.Delete(aggregate);
         }
         catch (Exception ex)
         {
@@ -89,15 +89,11 @@ public partial class CrudList<T, TModel, TForm> : NBehind
         }
     }
 
-    async Task SetParentContext(T entity)
+    async Task SetKrudNode(T aggregate)
     {
-        if (entity is not IParent parent)
-        {
-            return;
-        }
         foreach (var context in ParentContexts)
         {
-            await context.Set(parent);
+            await context.Set(aggregate);
         }
     }
 

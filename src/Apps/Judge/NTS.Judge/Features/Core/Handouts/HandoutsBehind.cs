@@ -2,6 +2,7 @@
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Exceptions;
+using Not.Observables.Structures;
 using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
@@ -12,7 +13,7 @@ using NTS.Judge.Features.Core.Reset;
 namespace NTS.Judge.Features.Core.Handouts;
 
 public class HandoutsBehind
-    : ObservableListBehind<HandoutDocument>,
+    : NStatefulService<ObservableList<HandoutDocument>>,
         IHandoutsBehind,
         ICreateHandout,
         ICoreDependentObservables
@@ -36,9 +37,9 @@ public class HandoutsBehind
         _officials = officials;
     }
 
-    public IReadOnlyList<HandoutDocument> Documents => ObservableList;
+    public IReadOnlyList<HandoutDocument> Documents => State;
 
-    protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
         var handouts = await _handoutRepository.ReadAll();
         var enduranceEvent = await _events.Read(0);
@@ -47,13 +48,13 @@ public class HandoutsBehind
         {
             return false;
         }
-        if (ObservableList.Count != 0)
+        if (State.Count != 0)
         {
             return true;
         }
         var documents = handouts.Select(handout => new HandoutDocument(handout, enduranceEvent, officials));
-        ObservableList.Clear();
-        ObservableList.AddRange(documents);
+        State.Clear();
+        State.AddRange(documents);
         return true;
     }
 
@@ -99,7 +100,7 @@ public class HandoutsBehind
 
         var ids = documents.Select(x => x.Id);
         await _handoutRepository.Delete(x => ids.Contains(x.Id));
-        ObservableList.RemoveRange(documents);
+        State.RemoveRange(documents);
 
         _semaphore.Release();
     }
@@ -122,7 +123,7 @@ public class HandoutsBehind
 
         await _handoutRepository.Delete(x => x.Participation == participation);
         await _handoutRepository.Create(handout);
-        ObservableList.AddOrReplace(document);
+        State.AddOrReplace(document);
 
         _semaphore.Release();
     }
