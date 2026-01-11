@@ -1,8 +1,8 @@
-﻿using Not.Application.Behinds.Adapters;
+﻿using Not.Observables;
 
 namespace Not.Application.Services;
 
-public interface IListBehind<T> : IDeleteBehind<T>, IStatefulService
+public interface IListBehind<T> : IDeleteBehind<T>
 {
-    IReadOnlyList<T> Items { get; }
+    Task<IEnumerable<T>> ReadMany();
 }

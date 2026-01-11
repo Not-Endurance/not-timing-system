@@ -1,11 +1,9 @@
-﻿using Not.Application.CRUD.Ports;
+﻿using Not.Domain;
 using Not.Domain.Aggregates;
-using Not.Observables;
 
 namespace Not.Application.Krud.Abstractions;
 
-public interface IKrudParentNodeOf<T> : ICreate<T>, IUpdate<T>, IDelete<T>, IKrudNodeSetter, IObservable
-    where T : AggregateRoot
+public interface IKrudParentNodeOf<T> : IParent<T>, IKrudNodeSetter
+    where T : Aggregate
 {
-    IReadOnlyList<T> Children { get; }
 }

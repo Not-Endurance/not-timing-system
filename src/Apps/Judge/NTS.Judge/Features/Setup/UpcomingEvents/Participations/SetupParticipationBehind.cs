@@ -1,4 +1,5 @@
-﻿using Not.Application.Krud.Abstractions;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using Not.Domain.Exceptions;
 using Not.Extensions;
@@ -6,13 +7,13 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
 
-public class SetupParticipationBehind : KrudService<Participation, ParticipationFormModel>
+public class SetupParticipationBehind : KrudServiceBase<Participation, ParticipationFormModel>
 {
     public SetupParticipationBehind(
-        IKrudParentNodeOf<Participation> crudeContext,
+        IRepository<Participation> participations,
         IEnumerable<IKrudMirror<Participation>> dependants
     )
-        : base(dependants, crudeContext) { }
+        : base(participations, dependants) { }
 
     protected override Participation CreateEntity(ParticipationFormModel model)
     {

@@ -1,15 +1,8 @@
-﻿using Not.Injection;
+﻿using Not.Domain.Aggregates;
 
 namespace Not.Application.Krud.Abstractions;
 
-/// <summary>
-/// Used in a loop without filtration. Implementations must implement type checking and NOT throw any errors
-/// </summary>
-public interface IKrudNodeSetter : ISingleton
+public interface IKrudNodeSetter
 {
-    /// <summary>
-    /// Set the parent reference
-    /// </summary>
-    /// <param name="nodeValue"></param>
-    Task Set(object nodeValue);
+    void SetParent(object aggregate);
 }

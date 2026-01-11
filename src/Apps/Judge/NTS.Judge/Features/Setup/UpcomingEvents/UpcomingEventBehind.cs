@@ -1,6 +1,6 @@
 ﻿using Not.Application.CRUD.Ports;
-using Not.Application.Krud;
 using Not.Application.Krud.Abstractions;
+using Not.Application.Krud.Nodes;
 using Not.Application.Krud.Services;
 using Not.Notify;
 using NTS.Domain.Setup.Aggregates;
@@ -9,7 +9,7 @@ using NTS.Judge.Features.Warp;
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
 public class UpcomingEventBehind
-    : KrudRootService<UpcomingEvent, EnduranceEventFormModel>,
+    : KrudServiceBase<UpcomingEvent, EnduranceEventFormModel>,
         IKrudMirror<Loop>,
         IKrudMirror<Combination>,
         IKrudMirror<Athlete>,
@@ -40,7 +40,7 @@ public class UpcomingEventBehind
         _eventContext = eventContext;
     }
 
-    protected override UpcomingEvent CreateAggregate(EnduranceEventFormModel model)
+    protected override UpcomingEvent CreateEntity(EnduranceEventFormModel model)
     {
         return new UpcomingEvent(
             model.Name,
@@ -52,7 +52,7 @@ public class UpcomingEventBehind
         );
     }
 
-    protected override UpcomingEvent UpdateAggregate(EnduranceEventFormModel model)
+    protected override UpcomingEvent UpdateEntity(EnduranceEventFormModel model)
     {
         return new UpcomingEvent(
             model.Id,
@@ -75,10 +75,9 @@ public class UpcomingEventBehind
         return Task.CompletedTask;
     }
 
-    // TODO: Add Analyzer to scan projects for the same aggregates used in as KrudRoot and KrudNode
-    // Or better figure out how to separate the Athlete, Horse, Loop and Combination AggregateRoots
-    // from the UpcomingEvent AggregateRoot and maintain synced state. 
-    // Maybe domain events - Horse updates, which raises a domain Event, which updates UpcomingEvent state
+    // TODO: separate the Athlete, Horse, Loop and Combination AggregateRoots
+    // from the UpcomingEvent AggregateRoot and maintain synced state using a domain event dispatcher
+    // I.e. - Horse updates, raising a domain Event which updates UpcomingEvent state and (maybe?) triggers re-render
     public async Task Reflect(Loop loop)
     {
         foreach (var competitions in _competitionParentNode.Children)

@@ -1,4 +1,5 @@
 ﻿using Not.Application.Behinds.Adapters;
+using Not.Observables;
 using Not.Safe;
 
 namespace Not.Blazor.Components;
@@ -21,11 +22,16 @@ public class NComponent : ComponentBase
         await Observe(statefulService, []);
     }
 
+    protected void Observe(IObservable observable)
+    {
+        observable.Event.Subscribe(Render);
+    }
+
     protected async Task Observe(IStatefulService statefulService, params IEnumerable<object> arguments)
     {
         IsInitialized = false;
         await Render();
-        statefulService.Event.Subscribe(Render);
+        Observe((IObservable)statefulService);
         await statefulService.Initialize(arguments);
         IsInitialized = true;
         await Render();

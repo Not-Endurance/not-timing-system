@@ -21,10 +21,10 @@ public partial class ParticipationForm
     [Inject]
     IListBehind<Combination> Behind { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(Behind);
-    }
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    await Observe(Behind);
+    //}
 
     public override void RegisterValidationInjectors()
     {
@@ -36,10 +36,9 @@ public partial class ParticipationForm
         RegisterInjector(nameof(Participation.Category), () => _categoryField);
     }
 
-    Task<IEnumerable<Combination>> SearchCombinations(string term)
+    async Task<IEnumerable<Combination>> SearchCombinations(string term)
     {
-        var result = Search(Behind.Items, term);
-        return Task.FromResult(result);
+        return Search(await Behind.ReadMany(), term);
     }
 
     // TODO: extract search functionality somehow, because ToString() should be identical (maybe ToString should be configurable)

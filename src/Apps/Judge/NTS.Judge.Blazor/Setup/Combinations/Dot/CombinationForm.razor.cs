@@ -17,11 +17,11 @@ public partial class CombinationForm
     [Inject]
     IListBehind<Horse> HorsesBehind { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(AthletesBehind);
-        await Observe(HorsesBehind);
-    }
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    await Observe(AthletesBehind);
+    //    await Observe(HorsesBehind);
+    //}
 
     public override void RegisterValidationInjectors()
     {
@@ -30,16 +30,14 @@ public partial class CombinationForm
         RegisterInjector(nameof(Combination.Horse), () => _horseField);
     }
 
-    Task<IEnumerable<Athlete?>> SearchAthletes(string term)
+    async Task<IEnumerable<Athlete?>> SearchAthletes(string term)
     {
-        var result = Search(AthletesBehind.Items, term);
-        return Task.FromResult(result);
+        return Search(await AthletesBehind.ReadMany(), term);
     }
 
-    Task<IEnumerable<Horse?>> SearchHorses(string term)
+    async Task<IEnumerable<Horse?>> SearchHorses(string term)
     {
-        var result = Search(HorsesBehind.Items, term);
-        return Task.FromResult(result);
+        return Search(await HorsesBehind.ReadMany(), term);
     }
 
     // TODO: extract search functionality somehow, because ToString() should be identical (maybe ToString should be configurable)

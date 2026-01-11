@@ -25,7 +25,7 @@
                 </MudStack>    
             </MudContainer>
 
-            <NList Items="RankingModel.Entries" DeleteHandler="RemoveEntry" Title="@Participations_string"/>
+            <NList ReadHandler="GetRankingEntries" DeleteHandler="RemoveEntry" Title="@Participations_string" />
 
             <NHeadline3 Content="@Settings_string" Align="Align.Left"/>
 

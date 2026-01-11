@@ -1,6 +1,4 @@
-﻿using MudBlazor.Extensions;
-using Not.Application.CRUD.Ports;
-using Not.Application.Krud;
+﻿using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using NTS.Domain.Objects;
@@ -8,7 +6,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Athletes;
 
-public class AthleteBehind : KrudRootService<Athlete, AthleteFormModel>, IKrudMirror<Club>
+public class AthleteBehind : KrudServiceBase<Athlete, AthleteFormModel>, IKrudMirror<Club>
 {
     readonly IRepository<Athlete> _repository;
 
@@ -18,19 +16,20 @@ public class AthleteBehind : KrudRootService<Athlete, AthleteFormModel>, IKrudMi
         _repository = repository;
     }
 
-    protected override Athlete CreateAggregate(AthleteFormModel model)
+    protected override Athlete CreateEntity(AthleteFormModel model)
     {
         return new Athlete(Person.Create(model.Name), model.FeiId, model.Country, model.Club);
     }
 
-    protected override Athlete UpdateAggregate(AthleteFormModel model)
+    protected override Athlete UpdateEntity(AthleteFormModel model)
     {
         return new Athlete(model.Id, Person.Create(model.Name), model.FeiId, model.Country, model.Club);
     }
 
     public async Task Reflect(Club update)
     {
-        foreach (var athlete in Items.Where(x => x.Club == update))
+        var athlets = await ReadMany();
+        foreach (var athlete in athlets.Where(x => x.Club == update))
         {
             athlete.Reflect(update);
             await _repository.Update(athlete);

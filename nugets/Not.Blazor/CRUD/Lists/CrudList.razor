@@ -5,9 +5,9 @@
 
 <MudPaper Elevation="0" Class="@("pa-4 " + Class)" Style="@Style">
 
-    <NList Items="Behind.Items" 
-           Title="@Name" 
+    <NList Title="@Name" 
            IsLoading="!IsInitialized" 
+           ReadHandler="Behind.ReadMany"
            CreateHandler="CreateHandler" 
            UpdateHandler="UpdateHandler" 
            DeleteHandler="DeleteHandler"/>

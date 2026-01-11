@@ -1,5 +1,6 @@
 using Not.Application.Krud.Abstractions;
 using Not.Application.RPC.SignalR;
+using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Startup;
@@ -7,7 +8,8 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Warp;
 
-public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, IKrudRootContext<UpcomingEvent>
+// TODO: fix RpcContext reset not ressetting correctly
+public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, IRpcContext<UpcomingEvent>
 {
     readonly IConnectedEventContext _connectedEventContext;
     readonly IRpcSocket _socket;
@@ -65,4 +67,11 @@ public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, 
 public interface ISelectedEventContext : ISingleton
 {
     public UpcomingEvent? Event { get; }
+}
+
+public interface IRpcContext<TRoot> : ISingleton
+    where TRoot : AggregateRoot
+{
+    TRoot? Root { get; }
+    Task Set(TRoot root);
 }

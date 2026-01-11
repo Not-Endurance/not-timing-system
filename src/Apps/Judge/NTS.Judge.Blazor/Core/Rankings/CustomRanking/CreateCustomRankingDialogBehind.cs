@@ -41,6 +41,11 @@ public class CreateCustomRankingDialogBehind : NDialog
         TemplateRankings = NotListModel.FromEntity<Ranking>(listRankings).ToList();
     }
 
+    protected Task<IEnumerable<RankingEntry>> GetRankingEntries()
+    {
+        return Task.FromResult(RankingModel.Entries.AsEnumerable());
+    }
+
     protected Task CombineRankings(Ranking? ranking)
     {
         if (ranking == null)

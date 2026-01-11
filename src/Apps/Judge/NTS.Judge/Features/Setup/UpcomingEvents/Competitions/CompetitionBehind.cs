@@ -1,4 +1,5 @@
-﻿using Not.Application.Krud.Abstractions;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using Not.Domain.Exceptions;
 using Not.Extensions;
@@ -7,18 +8,16 @@ using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 
-public class CompetitionBehind : KrudService<Competition, CompetitionFormModel>
+public class CompetitionBehind : KrudServiceBase<Competition, CompetitionFormModel>
 {
     readonly IKrudParentNodeOf<Phase> _phaseParent;
     readonly IKrudParentNodeOf<Participation> _participationParent;
 
     public CompetitionBehind(
-        IKrudParentNodeOf<Competition> crudeContext,
         IKrudParentNodeOf<Phase> phaseParent,
         IKrudParentNodeOf<Participation> participationParent,
-        IEnumerable<IKrudMirror<Competition>> dependants
-    )
-        : base(dependants, crudeContext)
+        IRepository<Competition> competitions)
+        : base(competitions, [])
     {
         _phaseParent = phaseParent;
         _participationParent = participationParent;

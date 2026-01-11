@@ -32,20 +32,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
 
     protected override void OnInitialized()
     {
-        GuardHelper.ThrowIfDefault(UpdateRoute);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            IEnumerable<object> args = ParentId != null ? [ParentId] : [];
-            await Observe(Behind, args);
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
+        //Observe(Behind);
     }
 
     protected async Task CreateHandler()
@@ -64,7 +51,7 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     {
         try
         {
-            await SetKrudNode(aggregate);
+            SetKrudNode(aggregate);
             var model = CreateModel(aggregate);
             await FormNavigator.Update(UpdateRoute, model);
         }
@@ -86,11 +73,11 @@ public partial class CrudList<T, TModel, TForm> : NComponent
         }
     }
 
-    async Task SetKrudNode(T aggregate)
+    void SetKrudNode(T aggregate)
     {
         foreach (var context in ParentContexts)
         {
-            await context.Set(aggregate);
+            context.SetParent(aggregate);
         }
     }
 
