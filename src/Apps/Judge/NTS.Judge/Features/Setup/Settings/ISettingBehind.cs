@@ -1,5 +1,5 @@
-﻿using Not.Blazor.CRUD.Forms.Ports;
-using Not.Blazor.Ports;
+﻿using Not.Application.Behinds.Adapters;
+using Not.Application.Services;
 using NTS.Domain.Aggregates;
 using NTS.Judge.Features.Setup.Settings;
 

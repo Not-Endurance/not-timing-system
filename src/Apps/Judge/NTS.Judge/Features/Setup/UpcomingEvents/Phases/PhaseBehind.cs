@@ -1,4 +1,4 @@
-﻿using Not.Application.Krud;
+﻿using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Behinds;
@@ -7,7 +7,7 @@ namespace NTS.Judge.Features.Setup.UpcomingEvents.Phases;
 
 public class PhaseBehind : KrudService<Phase, PhaseFormModel>
 {
-    public PhaseBehind(CompetitionKrudNode crudeContext, IEnumerable<IKrudMirror<Phase>> reflections)
+    public PhaseBehind(IKrudParentNodeOf<Phase> crudeContext, IEnumerable<IKrudMirror<Phase>> reflections)
         : base(reflections, crudeContext) { }
 
     protected override Phase CreateEntity(PhaseFormModel model)

@@ -1,9 +1,9 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.Krud;
+using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using Not.Notify;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Behinds;
 using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
@@ -15,19 +15,28 @@ public class UpcomingEventBehind
         IKrudMirror<Athlete>,
         IKrudMirror<Horse>
 {
-    readonly UpcomingEventKrudRoot _crudeContext;
+    readonly IKrudParentNodeOf<Competition> _competitionParentNode;
+    readonly IKrudParentNodeOf<Combination> _combinationParentNode;
+    readonly IKrudParentNodeOf<Official> _officialParentNode;
+    readonly IKrudParentNodeOf<Loop> _loopParentNode;
     readonly IUpdate<UpcomingEvent> _updater;
     readonly ISelectedEventContext _eventContext;
 
     public UpcomingEventBehind(
         IRepository<UpcomingEvent> events,
-        UpcomingEventKrudRoot crudeContext,
+        IKrudParentNodeOf<Competition> competitionParentNode,
+        IKrudParentNodeOf<Combination> combinationParentNode,
+        IKrudParentNodeOf<Official> officialParentNode,
+        IKrudParentNodeOf<Loop> loopParentNode,
         ISelectedEventContext eventContext
     )
         : base(events, [])
     {
         _updater = events;
-        _crudeContext = crudeContext;
+        _competitionParentNode = competitionParentNode;
+        _combinationParentNode = combinationParentNode;
+        _officialParentNode = officialParentNode;
+        _loopParentNode = loopParentNode;
         _eventContext = eventContext;
     }
 
@@ -53,10 +62,10 @@ public class UpcomingEventBehind
             model.FeiShowId,
             model.FeiId,
             model.FeiEventCode,
-            ((IKrudParentNodeOf<Competition>)_crudeContext).Children,
-            ((IKrudParentNodeOf<Official>)_crudeContext).Children,
-            ((IKrudParentNodeOf<Loop>)_crudeContext).Children,
-            ((IKrudParentNodeOf<Combination>)_crudeContext).Children
+            _competitionParentNode.Children,
+            _officialParentNode.Children,
+            _loopParentNode.Children,
+            _combinationParentNode.Children
         );
     }
 
@@ -72,7 +81,7 @@ public class UpcomingEventBehind
     // Maybe domain events - Horse updates, which raises a domain Event, which updates UpcomingEvent state
     public async Task Reflect(Loop loop)
     {
-        foreach (var competitions in ((IKrudParentNodeOf<Competition>)_crudeContext).Children)
+        foreach (var competitions in _competitionParentNode.Children)
         {
             foreach (var phase in competitions.Phases)
             {
@@ -84,7 +93,7 @@ public class UpcomingEventBehind
 
     public async Task Reflect(Combination combination)
     {
-        foreach (var competitions in ((IKrudParentNodeOf<Competition>)_crudeContext).Children)
+        foreach (var competitions in _competitionParentNode.Children)
         {
             foreach (var participation in competitions.Participations)
             {
@@ -96,10 +105,10 @@ public class UpcomingEventBehind
 
     public async Task Reflect(Athlete athlete)
     {
-        foreach (var combination in ((IKrudParentNodeOf<Combination>)_crudeContext).Children)
+        foreach (var combination in _combinationParentNode.Children)
         {
             combination.Reflect(athlete);
-            foreach (var competition in ((IKrudParentNodeOf<Competition>)_crudeContext).Children)
+            foreach (var competition in _competitionParentNode.Children)
             {
                 foreach (var participation in competition.Participations)
                 {
@@ -113,10 +122,10 @@ public class UpcomingEventBehind
 
     public async Task Reflect(Horse horse)
     {
-        foreach (var combination in ((IKrudParentNodeOf<Combination>)_crudeContext).Children)
+        foreach (var combination in _combinationParentNode.Children)
         {
             combination.Reflect(horse);
-            foreach (var competition in ((IKrudParentNodeOf<Competition>)_crudeContext).Children)
+            foreach (var competition in _competitionParentNode.Children)
             {
                 foreach (var participation in competition.Participations)
                 {

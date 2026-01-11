@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
+using Not.Application.Krud.Abstractions;
 using Not.Domain.Aggregates;
 using Not.Exceptions;
 
@@ -8,18 +9,18 @@ namespace Not.Application.Krud;
 public abstract class KrudInMemoryRepository<T> : IRepository<T>
     where T : AggregateRoot
 {
-    readonly IKrudParentNodeOf<T> _parentContext;
+    readonly IKrudParentNodeOf<T> _parentNode;
 
-    protected KrudInMemoryRepository(IKrudParentNodeOf<T> parentContext)
+    protected KrudInMemoryRepository(IKrudParentNodeOf<T> parentNode)
     {
-        _parentContext = parentContext;
+        _parentNode = parentNode;
     }
 
     protected abstract IReadOnlyList<T> Aggregates { get; }
 
     public async Task Create(T item)
     {
-        await _parentContext.Create(item);
+        await _parentNode.Create(item);
     }
 
     public Task<T?> Read(Expression<Func<T, bool>> filter)
@@ -50,7 +51,7 @@ public abstract class KrudInMemoryRepository<T> : IRepository<T>
 
     public async Task Update(T items)
     {
-        await _parentContext.Update(items);
+        await _parentNode.Update(items);
     }
 
     public async Task Delete(int id)
@@ -58,12 +59,12 @@ public abstract class KrudInMemoryRepository<T> : IRepository<T>
         var official =
             Aggregates.FirstOrDefault(x => x.Id == id)
             ?? throw GuardHelper.Exception($"{typeof(T).Name} with '{id}' not found");
-        await _parentContext.Delete(official);
+        await _parentNode.Delete(official);
     }
 
-    public async Task Delete(T item)
+    public async Task Delete(T child)
     {
-        await _parentContext.Delete(item);
+        await _parentNode.Delete(child);
     }
 
     public async Task Delete(Expression<Func<T, bool>> filter)
@@ -71,11 +72,6 @@ public abstract class KrudInMemoryRepository<T> : IRepository<T>
         var predicate = filter.Compile();
         var official =
             Aggregates.FirstOrDefault(predicate) ?? throw GuardHelper.Exception($"{typeof(T).Name} Official not found");
-        await _parentContext.Delete(official);
-    }
-
-    public async Task Delete(IEnumerable<T> items)
-    {
-        await _parentContext.Delete(items);
+        await _parentNode.Delete(official);
     }
 }

@@ -2,9 +2,7 @@
 
 namespace Not.Application.CRUD.Ports;
 
-public interface IDelete<T>
+public interface IDeleteOne<T>
 {
-    Task Delete(int id);
     Task Delete(T item);
-    Task Delete(Expression<Func<T, bool>> filter);
 }

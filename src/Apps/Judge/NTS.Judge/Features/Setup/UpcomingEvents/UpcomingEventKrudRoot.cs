@@ -1,13 +1,13 @@
 ﻿using Not.Application.CRUD.Ports;
-using Not.Application.Krud;
+using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Warp;
 
-namespace NTS.Judge.Features.Core.Behinds;
+namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
 public class UpcomingEventKrudRoot
-    : KrudNode<UpcomingEvent>,
+    : ManualKrudNode<UpcomingEvent>,
         IKrudParentNodeOf<Competition>,
         IKrudParentNodeOf<Official>,
         IKrudParentNodeOf<Loop>,
@@ -32,7 +32,7 @@ public class UpcomingEventKrudRoot
         {
             return;
         }
-        await _rootNode.SetEvent(upcomingEvent);
+        await _rootNode.Set(upcomingEvent);
     }
 
     // TODO: replace manual propagation using `IUpdate<T>` with Observable node approach:
@@ -100,5 +100,25 @@ public class UpcomingEventKrudRoot
     public async Task Delete(IEnumerable<Combination> children)
     {
         await Remove(_rootNode.Event, children);
+    }
+
+    public Task Delete(Competition item)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Delete(Official item)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Delete(Loop item)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Delete(Combination item)
+    {
+        throw new NotImplementedException();
     }
 }

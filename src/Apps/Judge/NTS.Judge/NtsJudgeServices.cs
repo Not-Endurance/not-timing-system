@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Not.Application.Krud;
 using Not.Blazor;
 using NTS.Application;
+using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge;
 

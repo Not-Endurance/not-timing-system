@@ -1,7 +1,6 @@
-﻿using Not.Blazor.CRUD.Ports;
-using Not.Blazor.Ports;
+﻿using Not.Application.Behinds.Adapters;
 
-namespace Not.Blazor.CRUD.Lists.Ports;
+namespace Not.Application.Services;
 
 public interface IListBehind<T> : IDeleteBehind<T>, IStatefulService
 {

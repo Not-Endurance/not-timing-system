@@ -1,10 +1,10 @@
-﻿using Not.Application.Krud;
+﻿using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Features.Core.Behinds;
+namespace NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 
-public class CompetitionKrudNode : KrudNode<Competition>, IKrudParentNodeOf<Phase>, IKrudParentNodeOf<Participation>
+public class CompetitionKrudNode : ManualKrudNode<Competition>, IKrudParentNodeOf<Phase>, IKrudParentNodeOf<Participation>
 {
     Competition? _competition;
 
@@ -51,5 +51,15 @@ public class CompetitionKrudNode : KrudNode<Competition>, IKrudParentNodeOf<Phas
     public async Task Delete(IEnumerable<Participation> children)
     {
         await Remove(_competition, children);
+    }
+
+    public Task Delete(Phase item)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Delete(Participation item)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Not.Application.Behinds.Adapters;
-using Not.Application.Krud;
+using Not.Application.Krud.Abstractions;
 using NTS.Domain.Aggregates;
 using NTS.Judge.Blazor.Setup.Settings;
 using NTS.Judge.Features.Setup.Services;

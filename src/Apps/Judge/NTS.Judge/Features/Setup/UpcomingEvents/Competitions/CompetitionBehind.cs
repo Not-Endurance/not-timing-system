@@ -1,4 +1,4 @@
-﻿using Not.Application.Krud;
+﻿using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using Not.Domain.Exceptions;
 using Not.Extensions;
@@ -13,7 +13,7 @@ public class CompetitionBehind : KrudService<Competition, CompetitionFormModel>
     readonly IKrudParentNodeOf<Participation> _participationParent;
 
     public CompetitionBehind(
-        UpcomingEventKrudRoot crudeContext,
+        IKrudParentNodeOf<Competition> crudeContext,
         IKrudParentNodeOf<Phase> phaseParent,
         IKrudParentNodeOf<Participation> participationParent,
         IEnumerable<IKrudMirror<Competition>> dependants

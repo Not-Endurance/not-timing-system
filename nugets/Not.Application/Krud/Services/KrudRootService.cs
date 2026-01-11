@@ -1,7 +1,7 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Blazor.CRUD.Forms.Ports;
-using Not.Blazor.CRUD.Lists.Ports;
+using Not.Application.Krud.Abstractions;
+using Not.Application.Services;
 using Not.Domain.Aggregates;
 using Not.Observables.Structures;
 

@@ -1,3 +1,4 @@
+using Not.Application.Krud.Abstractions;
 using Not.Application.RPC.SignalR;
 using Not.Domain.Exceptions;
 using Not.Injection;
@@ -6,7 +7,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Warp;
 
-public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync
+public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, IKrudRootContext<UpcomingEvent>
 {
     readonly IConnectedEventContext _connectedEventContext;
     readonly IRpcSocket _socket;
@@ -21,13 +22,15 @@ public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync
 
     public UpcomingEvent? Event { get; private set; }
 
+    public UpcomingEvent? Root => Event;
+
     public async Task ResetEvent()
     {
         await InternalSetEvent(null);
         await _socket.Disconnect();
     }
 
-    public async Task SetEvent(UpcomingEvent upcomingEvent)
+    public async Task Set(UpcomingEvent upcomingEvent)
     {
         if (Event != null && Event != upcomingEvent)
         {

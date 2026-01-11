@@ -1,4 +1,4 @@
-﻿using Not.Application.Krud;
+﻿using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Behinds;
@@ -8,7 +8,7 @@ namespace NTS.Judge.Features.Setup.UpcomingEvents.Officials;
 public class OfficialBehind : KrudService<Official, OfficialFormModel>
 {
     public OfficialBehind(
-        UpcomingEventKrudRoot upcomingEventContext,
+        IKrudParentNodeOf<Official> upcomingEventContext,
         IEnumerable<IKrudMirror<Official>> dependants
     )
         : base(dependants, upcomingEventContext) { }

@@ -1,6 +1,6 @@
 ﻿using Not.Observables;
 
-namespace Not.Blazor.Ports;
+namespace Not.Application.Behinds.Adapters;
 
 public interface IStatefulService : IObservable
 {

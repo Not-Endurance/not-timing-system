@@ -1,16 +1,15 @@
-﻿using Not.Application.Krud;
+﻿using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using Not.Domain.Exceptions;
 using Not.Extensions;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
 
 public class SetupParticipationBehind : KrudService<Participation, ParticipationFormModel>
 {
     public SetupParticipationBehind(
-        CompetitionKrudNode crudeContext,
+        IKrudParentNodeOf<Participation> crudeContext,
         IEnumerable<IKrudMirror<Participation>> dependants
     )
         : base(dependants, crudeContext) { }

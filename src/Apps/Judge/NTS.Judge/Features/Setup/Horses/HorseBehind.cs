@@ -1,5 +1,6 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.Krud;
+using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Setup.AthletesHorses.Horses;

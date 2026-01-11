@@ -1,6 +1,6 @@
 ﻿using Not.Injection;
 
-namespace Not.Blazor.CRUD.Ports;
+namespace Not.Application.Services;
 
 public interface IUpdateBehind<T> : ISingleton
 {

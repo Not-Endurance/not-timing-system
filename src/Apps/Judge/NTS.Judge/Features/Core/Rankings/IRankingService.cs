@@ -1,4 +1,4 @@
-﻿using Not.Blazor.Ports;
+﻿using Not.Application.Behinds.Adapters;
 using NTS.Domain.Core.Objects;
 
 namespace NTS.Judge.Features.Core.Rankings;

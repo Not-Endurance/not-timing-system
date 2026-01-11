@@ -62,6 +62,9 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         FeiScheduleNumber = feiScheduleNumber;
     }
 
+    IReadOnlyList<Participation> IParent<Participation>.Chilren => Participations;
+    IReadOnlyList<Phase> IParent<Phase>.Chilren => Phases;
+
     public string Name { get; }
     public CompetitionType Type { get; }
     public CompetitionRuleset Ruleset { get; }

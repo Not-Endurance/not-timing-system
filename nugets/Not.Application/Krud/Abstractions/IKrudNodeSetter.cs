@@ -1,6 +1,6 @@
 ﻿using Not.Injection;
 
-namespace Not.Blazor.CRUD.Ports;
+namespace Not.Application.Krud.Abstractions;
 
 /// <summary>
 /// Used in a loop without filtration. Implementations must implement type checking and NOT throw any errors

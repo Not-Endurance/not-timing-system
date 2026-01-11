@@ -1,7 +1,6 @@
-﻿using Not.Application.Krud;
+﻿using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Combinations;
 
@@ -9,9 +8,9 @@ public class CombinationBehind : KrudService<Combination, CombinationFormModel>
 {
     public CombinationBehind(
         IEnumerable<IKrudMirror<Combination>> reflections,
-        UpcomingEventKrudRoot parentContext
+        IKrudParentNodeOf<Combination> parentNode
     )
-        : base(reflections, parentContext) { }
+        : base(reflections, parentNode) { }
 
     protected override Combination CreateEntity(CombinationFormModel model)
     {
