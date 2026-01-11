@@ -2,5 +2,5 @@
 
 public interface IUpdate<in T>
 {
-    Task Update(T items);
+    Task Update(T item);
 }

@@ -1,6 +1,9 @@
-﻿namespace Not.Application.CRUD.Ports;
+﻿using System.Linq.Expressions;
 
-public interface IDeleteMany<in T>
+namespace Not.Application.CRUD.Ports;
+
+public interface IDeleteMany<T>
 {
-    Task Delete(params IEnumerable<T> items);
+    Task Delete(IEnumerable<T> items);
+    Task Delete(Expression<Func<T, bool>> filter);
 }

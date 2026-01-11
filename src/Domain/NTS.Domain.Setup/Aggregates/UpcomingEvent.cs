@@ -51,10 +51,10 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
     )
         : this(GenerateId(), name, place, country, showFeiId, feiId, feiEventCode, [], [], [], []) { }
 
-    IReadOnlyList<Official> IParent<Official>.Chilren => Officials;
-    IReadOnlyList<Competition> IParent<Competition>.Chilren => Competitions;
-    IReadOnlyList<Loop> IParent<Loop>.Chilren => Loops;
-    IReadOnlyList<Combination> IParent<Combination>.Chilren => Combinations;
+    IReadOnlyList<Official> IParent<Official>.Children => Officials;
+    IReadOnlyList<Competition> IParent<Competition>.Children => Competitions;
+    IReadOnlyList<Loop> IParent<Loop>.Children => Loops;
+    IReadOnlyList<Combination> IParent<Combination>.Children => Combinations;
 
     public string Name { get; }
     public string Place { get; }

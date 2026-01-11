@@ -69,7 +69,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
 
         var recordsWithHorse = await _archive
-            .ReadAll(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
+            .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
             .ToList();
         if (recordsWithHorse.Any())
         {
@@ -77,8 +77,12 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
                 $"The horse you want to delete has participated in '{recordsWithHorse.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
             );
         }
-
-        await _horses.Delete(id);
+        var horse = await _horses.Read(id);
+        if (horse == null)
+        {
+            return new OkObjectResult($"Club wiht id '{id}' did not exist");
+        }
+        await _horses.Delete(horse);
 
         return new OkObjectResult($"Deleted horse with id '{id}'");
     }
@@ -91,7 +95,12 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     {
         LogInformation(request);
 
-        await _horses.Delete(id);
+        var horse = await _horses.Read(id);
+        if (horse == null)
+        {
+            return new OkObjectResult($"Horse wiht id '{id}' did not exist");
+        }
+        await _horses.Delete(horse);
 
         return new OkObjectResult($"Deleted horse with id '{id}'");
     }
@@ -115,7 +124,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     )
     {
         LogInformation(request);
-        var horses = await _horses.ReadAll().Select(x => x.MaptoDomain());
+        var horses = await _horses.ReadMany().Select(x => x.MaptoDomain());
         return new OkObjectResult(horses);
     }
 }

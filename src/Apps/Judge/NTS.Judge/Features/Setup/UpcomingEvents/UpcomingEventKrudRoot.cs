@@ -52,9 +52,9 @@ public class UpcomingEventKrudRoot
         await Update(_rootNode.Event, items);
     }
 
-    public async Task Delete(IEnumerable<Competition> children)
+    public async Task Delete(Competition child)
     {
-        await Remove(_rootNode.Event, children);
+        await Remove(_rootNode.Event, child);
     }
 
     public async Task Create(Official item)
@@ -67,9 +67,9 @@ public class UpcomingEventKrudRoot
         await Update(_rootNode.Event, items);
     }
 
-    public async Task Delete(IEnumerable<Official> children)
+    public async Task Delete(Official child)
     {
-        await Remove(_rootNode.Event, children);
+        await Remove(_rootNode.Event, child);
     }
 
     public async Task Create(Loop item)
@@ -82,9 +82,9 @@ public class UpcomingEventKrudRoot
         await Update(_rootNode.Event, items);
     }
 
-    public async Task Delete(IEnumerable<Loop> children)
+    public async Task Delete(Loop child)
     {
-        await Remove(_rootNode.Event, children);
+        await Remove(_rootNode.Event, child);
     }
 
     public async Task Create(Combination item)
@@ -97,28 +97,8 @@ public class UpcomingEventKrudRoot
         await Update(_rootNode.Event, items);
     }
 
-    public async Task Delete(IEnumerable<Combination> children)
+    public async Task Delete(Combination child)
     {
-        await Remove(_rootNode.Event, children);
-    }
-
-    public Task Delete(Competition item)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Delete(Official item)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Delete(Loop item)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Delete(Combination item)
-    {
-        throw new NotImplementedException();
+        await Remove(_rootNode.Event, child);
     }
 }

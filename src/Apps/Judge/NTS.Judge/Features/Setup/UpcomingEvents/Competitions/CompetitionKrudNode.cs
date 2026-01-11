@@ -33,9 +33,9 @@ public class CompetitionKrudNode : ManualKrudNode<Competition>, IKrudParentNodeO
         await Update(_competition, items);
     }
 
-    public async Task Delete(params IEnumerable<Phase> children)
+    public async Task Delete(Phase item)
     {
-        await Remove(_competition, children);
+        await Remove(_competition, item);
     }
 
     public async Task Create(Participation item)
@@ -48,18 +48,8 @@ public class CompetitionKrudNode : ManualKrudNode<Competition>, IKrudParentNodeO
         await Update(_competition, items);
     }
 
-    public async Task Delete(IEnumerable<Participation> children)
+    public async Task Delete(Participation item)
     {
-        await Remove(_competition, children);
-    }
-
-    public Task Delete(Phase item)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Delete(Participation item)
-    {
-        throw new NotImplementedException();
+        await Remove<Competition, Participation>(_competition, item);
     }
 }

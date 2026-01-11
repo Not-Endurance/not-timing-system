@@ -58,8 +58,12 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
     )
     {
         LogInformation(request);
-
-        await _clubs.Delete(id);
+        var club = await _clubs.Read(id);
+        if (club == null)
+        {
+            return new OkObjectResult($"Club wiht id '{id}' did not exist");
+        }
+        await _clubs.Delete(club);
         return new OkObjectResult($"Deleted club with id '{id}'");
     }
 
@@ -82,7 +86,7 @@ public class ClubFunctions : FunctionBase<ClubFunctions>
     {
         LogInformation(request);
 
-        var clubs = await _clubs.ReadAll().Select(x => x.MapToDomain());
+        var clubs = await _clubs.ReadMany().Select(x => x.MapToDomain());
         return new OkObjectResult(clubs);
     }
 }

@@ -24,7 +24,7 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
 
     protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
-        var participations = await _participations.ReadAll();
+        var participations = await _participations.ReadMany();
         _context.Startlist = new Startlist(participations);
 
         return _context.Startlist.History.Any() || _context.Startlist.Upcoming.Any();

@@ -37,7 +37,7 @@ public class InquiryBehind : NStatefulService, IInquiryBehind
 
     public async Task Search(string term)
     {
-        var archive = await _archive.ReadAll();
+        var archive = await _archive.ReadMany();
         Match = archive
             .SelectMany(x => x.Ranklists)
             .SelectMany(x => x.Ranking.Entries)

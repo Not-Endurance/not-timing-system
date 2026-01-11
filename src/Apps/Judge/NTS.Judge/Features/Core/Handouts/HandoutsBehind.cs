@@ -41,9 +41,9 @@ public class HandoutsBehind
 
     protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
-        var handouts = await _handoutRepository.ReadAll();
+        var handouts = await _handoutRepository.ReadMany();
         var enduranceEvent = await _events.Read(0);
-        var officials = await _officials.ReadAll();
+        var officials = await _officials.ReadMany();
         if (enduranceEvent == null)
         {
             return false;
@@ -91,7 +91,7 @@ public class HandoutsBehind
 
     async Task<IEnumerable<Combination>> SafeGetCombinations()
     {
-        return await _participations.ReadAll().Select(x => x.Combination);
+        return await _participations.ReadMany().Select(x => x.Combination);
     }
 
     async Task SafeDelete(IEnumerable<HandoutDocument> documents)
@@ -113,7 +113,7 @@ public class HandoutsBehind
     async Task CreateDocument(Participation participation)
     {
         var enduranceEvent = await _events.Read(0);
-        var officials = await _officials.ReadAll();
+        var officials = await _officials.ReadMany();
         GuardHelper.ThrowIfDefault(enduranceEvent);
 
         var handout = new Handout(participation);

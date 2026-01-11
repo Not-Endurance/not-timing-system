@@ -8,5 +8,5 @@ public interface IParent<T>
     void Add(T child);
     void Remove(T child);
     void Update(T child);
-    IReadOnlyList<T> Chilren { get; }
+    IReadOnlyList<T> Children { get; }
 }

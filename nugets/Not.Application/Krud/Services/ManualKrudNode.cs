@@ -45,16 +45,13 @@ public abstract class ManualKrudNode<T> : Observer, IKrudNodeSetter, IObservable
         _changed.Emit();
     }
 
-    public async Task Remove<TAggregate, TChild>(TAggregate? aggregate, IEnumerable<TChild> children)
+    public async Task Remove<TAggregate, TChild>(TAggregate? aggregate, TChild child)
         where TAggregate : T, IParent<TChild>, IAggregateRoot
         where TChild : AggregateRoot
     {
         GuardHelper.ThrowIfDefault(aggregate);
 
-        foreach (var child in children)
-        {
-            aggregate.Remove(child);
-        }
+        aggregate.Remove(child);
         await _proppagator.Update(aggregate);
         _changed.Emit();
     }

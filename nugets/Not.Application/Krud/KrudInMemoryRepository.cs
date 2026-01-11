@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
 using Not.Domain.Aggregates;
-using Not.Exceptions;
 
 namespace Not.Application.Krud;
 
@@ -36,13 +35,13 @@ public abstract class KrudInMemoryRepository<T> : IRepository<T>
         return Task.FromResult(result);
     }
 
-    public Task<IEnumerable<T>> ReadAll()
+    public Task<IEnumerable<T>> ReadMany()
     {
         var result = Aggregates.AsEnumerable();
         return Task.FromResult(result);
     }
 
-    public Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter)
+    public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
         var predicate = filter.Compile();
         var result = Aggregates.Where(predicate);
@@ -54,14 +53,6 @@ public abstract class KrudInMemoryRepository<T> : IRepository<T>
         await _parentNode.Update(items);
     }
 
-    public async Task Delete(int id)
-    {
-        var official =
-            Aggregates.FirstOrDefault(x => x.Id == id)
-            ?? throw GuardHelper.Exception($"{typeof(T).Name} with '{id}' not found");
-        await _parentNode.Delete(official);
-    }
-
     public async Task Delete(T child)
     {
         await _parentNode.Delete(child);
@@ -70,8 +61,16 @@ public abstract class KrudInMemoryRepository<T> : IRepository<T>
     public async Task Delete(Expression<Func<T, bool>> filter)
     {
         var predicate = filter.Compile();
-        var official =
-            Aggregates.FirstOrDefault(predicate) ?? throw GuardHelper.Exception($"{typeof(T).Name} Official not found");
-        await _parentNode.Delete(official);
+        var child = Aggregates.FirstOrDefault(predicate);
+        if (child == null)
+        {
+            return;
+        }
+        await _parentNode.Delete(child);
+    }
+
+    public Task Delete(IEnumerable<T> items)
+    {
+        throw new NotImplementedException();
     }
 }

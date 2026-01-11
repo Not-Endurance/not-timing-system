@@ -4,7 +4,7 @@ using Not.Observables;
 
 namespace Not.Application.Krud.Abstractions;
 
-public interface IKrudParentNodeOf<T> : ICreate<T>, IUpdate<T>, IDeleteOne<T>, IKrudNodeSetter, IObservable
+public interface IKrudParentNodeOf<T> : ICreate<T>, IUpdate<T>, IDelete<T>, IKrudNodeSetter, IObservable
     where T : AggregateRoot
 {
     IReadOnlyList<T> Children { get; }

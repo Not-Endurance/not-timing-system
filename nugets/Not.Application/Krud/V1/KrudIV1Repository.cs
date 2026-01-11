@@ -26,30 +26,30 @@ public abstract class KrudIV1Repository<T> : IRepository<T>
     {
         GuardHelper.ThrowIfDefault(_parentNode.Aggregate);
         var predicate = filter.Compile();
-        var result = _parentNode.Aggregate.Chilren.FirstOrDefault(predicate);
+        var result = _parentNode.Aggregate.Children.FirstOrDefault(predicate);
         return Task.FromResult(result);
     }
 
     public Task<T?> Read(int id)
     {
         GuardHelper.ThrowIfDefault(_parentNode.Aggregate);
-        var result = _parentNode.Aggregate.Chilren.FirstOrDefault(x => x.Id == id);
+        var result = _parentNode.Aggregate.Children.FirstOrDefault(x => x.Id == id);
         return Task.FromResult(result);
     }
 
-    public Task<IEnumerable<T>> ReadAll()
+    public Task<IEnumerable<T>> ReadMany()
     {
         GuardHelper.ThrowIfDefault(_parentNode.Aggregate);
-        var result = _parentNode.Aggregate.Chilren.AsEnumerable();
+        var result = _parentNode.Aggregate.Children.AsEnumerable();
         return Task.FromResult(result);
     }
 
-    public Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter)
+    public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
         GuardHelper.ThrowIfDefault(_parentNode.Aggregate);
 
         var predicate = filter.Compile();
-        var result = _parentNode.Aggregate.Chilren.Where(predicate);
+        var result = _parentNode.Aggregate.Children.Where(predicate);
         return Task.FromResult(result);
     }
 
@@ -63,7 +63,7 @@ public abstract class KrudIV1Repository<T> : IRepository<T>
     public Task Delete(int id)
     {
         GuardHelper.ThrowIfDefault(_parentNode.Aggregate);
-        var child = _parentNode.Aggregate.Chilren.FirstOrDefault(x => x.Id == id)
+        var child = _parentNode.Aggregate.Children.FirstOrDefault(x => x.Id == id)
             ?? throw GuardHelper.Exception($"{typeof(T).Name} with '{id}' not found");
         _parentNode.Aggregate.Remove(child);
         return Task.CompletedTask;
@@ -80,11 +80,17 @@ public abstract class KrudIV1Repository<T> : IRepository<T>
     {
         GuardHelper.ThrowIfDefault(_parentNode.Aggregate);
         var predicate = filter.Compile();
-        var children = _parentNode.Aggregate.Chilren.Where(predicate);
+        var children = _parentNode.Aggregate.Children.Where(predicate);
         foreach (var child in children)
         {
             _parentNode.Aggregate.Remove(child);
         }
         return Task.CompletedTask;
+    }
+
+    public Task Delete(IEnumerable<T> items)
+    {
+        var ids = items.Select(x => x.Id).ToList();
+        return Delete(x => ids.Contains(x.Id));
     }
 }

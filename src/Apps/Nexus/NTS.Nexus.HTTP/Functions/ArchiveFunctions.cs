@@ -33,7 +33,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 
         if (await _archive.Read(entry.Id) != null) // TODO: investigate this not working
         {
-            await _archive.Delete(entry.Id);
+            await _archive.Delete(document);
         }
         await _archive.Create(document);
 
@@ -47,7 +47,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
     {
         LogInformation(request);
 
-        var result = await _archive.ReadAll();
+        var result = await _archive.ReadMany();
 
         return new OkObjectResult(result);
     }

@@ -1,8 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿namespace Not.Application.CRUD.Ports;
 
-namespace Not.Application.CRUD.Ports;
-
-public interface IDeleteOne<T>
+public interface IDelete<T>
 {
     Task Delete(T item);
 }

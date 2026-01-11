@@ -60,7 +60,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     public async Task<IEnumerable<CoreParticipationModel>> GetActive()
     {
         var coreParticipations = await _coreParticipations
-            .ReadAll(x => !x.IsComplete() && !x.IsEliminated())
+            .ReadMany(x => !x.IsComplete() && !x.IsEliminated())
             .Select(CoreParticipationModel.MapFrom);
         return coreParticipations;
     }

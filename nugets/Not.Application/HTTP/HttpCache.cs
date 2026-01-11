@@ -19,7 +19,7 @@ public abstract class HttpCache<T> : ICache<T>
 
     protected async Task<IEnumerable<T>> FetchItems()
     {
-        return await _repository.ReadAll();
+        return await _repository.ReadMany();
     }
 
     public async Task<T?> Get(int id)

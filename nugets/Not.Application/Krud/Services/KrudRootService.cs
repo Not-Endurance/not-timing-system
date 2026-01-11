@@ -31,7 +31,7 @@ public abstract class KrudRootService<T, TModel> : NStatefulService<ObservableLi
         {
             return false;
         }
-        var entities = await _repository.ReadAll();
+        var entities = await _repository.ReadMany();
         State.AddRange(entities);
         return entities.Any();
     }

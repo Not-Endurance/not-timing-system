@@ -15,12 +15,12 @@ public class ParticipationReader : IReadMany<Participation>, ITransient
         _client = client;
     }
 
-    public Task<IEnumerable<Participation>> ReadAll()
+    public Task<IEnumerable<Participation>> ReadMany()
     {
         return _client.GetParcipations();
     }
 
-    public Task<IEnumerable<Participation>> ReadAll(Expression<Func<Participation, bool>> filter)
+    public Task<IEnumerable<Participation>> ReadMany(Expression<Func<Participation, bool>> filter)
     {
         throw new NotImplementedException();
     }

@@ -58,7 +58,7 @@ public class RankingService
 
     protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
-        var rankings = await _rankings.ReadAll();
+        var rankings = await _rankings.ReadMany();
         if (!rankings.Any())
         {
             return false;
@@ -89,7 +89,7 @@ public class RankingService
     public async Task Select(Ranking ranking)
     {
         var enduranceEvent = await _events.Read(0);
-        var officials = await _officials.ReadAll();
+        var officials = await _officials.ReadMany();
         GuardHelper.ThrowIfDefault(enduranceEvent);
         SelectedRanking = ranking;
         Ranklist = new Ranklist(SelectedRanking);
@@ -123,8 +123,8 @@ public class RankingService
             NotifyHelper.Warn("Event is not started yet");
             return;
         }
-        var officials = await _officials.ReadAll();
-        var rankings = await _rankings.ReadAll();
+        var officials = await _officials.ReadMany();
+        var rankings = await _rankings.ReadMany();
         var ranklists = rankings.Select(x => new Ranklist(x)).Where(x => x.Entries.Any());
 
         var entry = new ArchiveEntry(enduranceEvent, officials, ranklists);

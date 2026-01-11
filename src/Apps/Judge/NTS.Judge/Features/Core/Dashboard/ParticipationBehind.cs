@@ -60,7 +60,7 @@ public class ParticipationBehind
 
     protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
-        Participations = await _participationRepository.ReadAll();
+        Participations = await _participationRepository.ReadMany();
         SelectedParticipation = Participations.FirstOrDefault();
         return Participations.Any();
     }
