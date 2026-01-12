@@ -31,7 +31,7 @@ public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IFormBehind<T
     public virtual async Task Create(TModel model)
     {
         var entity = CreateEntity(model);
-        await _repository.Delete(entity);
+        await _repository.Create(entity);
     }
 
     public virtual async Task Update(TModel model)
