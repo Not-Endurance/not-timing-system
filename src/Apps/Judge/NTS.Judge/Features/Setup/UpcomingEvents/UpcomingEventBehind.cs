@@ -1,6 +1,5 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
-using Not.Application.Krud.Nodes;
 using Not.Application.Krud.Services;
 using Not.Notify;
 using NTS.Domain.Setup.Aggregates;
@@ -15,28 +14,16 @@ public class UpcomingEventBehind
         IKrudMirror<Athlete>,
         IKrudMirror<Horse>
 {
-    readonly IKrudParentNodeOf<Competition> _competitionParentNode;
-    readonly IKrudParentNodeOf<Combination> _combinationParentNode;
-    readonly IKrudParentNodeOf<Official> _officialParentNode;
-    readonly IKrudParentNodeOf<Loop> _loopParentNode;
     readonly IUpdate<UpcomingEvent> _updater;
     readonly ISelectedEventContext _eventContext;
 
     public UpcomingEventBehind(
         IRepository<UpcomingEvent> events,
-        IKrudParentNodeOf<Competition> competitionParentNode,
-        IKrudParentNodeOf<Combination> combinationParentNode,
-        IKrudParentNodeOf<Official> officialParentNode,
-        IKrudParentNodeOf<Loop> loopParentNode,
         ISelectedEventContext eventContext
     )
         : base(events, [])
     {
         _updater = events;
-        _competitionParentNode = competitionParentNode;
-        _combinationParentNode = combinationParentNode;
-        _officialParentNode = officialParentNode;
-        _loopParentNode = loopParentNode;
         _eventContext = eventContext;
     }
 
@@ -62,10 +49,10 @@ public class UpcomingEventBehind
             model.FeiShowId,
             model.FeiId,
             model.FeiEventCode,
-            _competitionParentNode.Children,
-            _officialParentNode.Children,
-            _loopParentNode.Children,
-            _combinationParentNode.Children
+            model.Competitions,
+            model.Officials,
+            model.Loops,
+            model.Combinations
         );
     }
 
