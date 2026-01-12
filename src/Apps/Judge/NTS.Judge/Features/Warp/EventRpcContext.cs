@@ -34,7 +34,11 @@ public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, 
 
     public async Task Set(UpcomingEvent upcomingEvent)
     {
-        if (Event != null && Event != upcomingEvent)
+        if (Event == upcomingEvent)
+        {
+            return;
+        }
+        if (Event != null)
         {
             throw new DomainException(Cannot_select_another_event_without_resetting__string, Event);
         }
@@ -69,9 +73,9 @@ public interface ISelectedEventContext : ISingleton
     public UpcomingEvent? Event { get; }
 }
 
-public interface IRpcContext<TRoot> : ISingleton
-    where TRoot : AggregateRoot
+public interface IRpcContext<T> : ISingleton
+    where T : AggregateRoot
 {
-    TRoot? Root { get; }
-    Task Set(TRoot root);
+    T? Root { get; }
+    Task Set(T root);
 }

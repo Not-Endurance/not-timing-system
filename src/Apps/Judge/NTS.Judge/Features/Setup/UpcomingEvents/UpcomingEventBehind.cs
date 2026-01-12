@@ -80,34 +80,46 @@ public class UpcomingEventBehind
     // I.e. - Horse updates, raising a domain Event which updates UpcomingEvent state and (maybe?) triggers re-render
     public async Task Reflect(Loop loop)
     {
-        foreach (var competitions in _competitionParentNode.Children)
+        if (_eventContext.Event == null)
+        {
+            return;
+        }
+        foreach (var competitions in _eventContext.Event.Competitions)
         {
             foreach (var phase in competitions.Phases)
             {
                 phase.Reflect(loop);
             }
         }
-        await _updater.Update(_eventContext.Event!);
+        await _updater.Update(_eventContext.Event);
     }
 
     public async Task Reflect(Combination combination)
     {
-        foreach (var competitions in _competitionParentNode.Children)
+        if (_eventContext.Event == null)
+        {
+            return;
+        }
+        foreach (var competitions in _eventContext.Event.Competitions)
         {
             foreach (var participation in competitions.Participations)
             {
                 participation.Reflect(combination);
             }
         }
-        await _updater.Update(_eventContext.Event!);
+        await _updater.Update(_eventContext.Event);
     }
 
     public async Task Reflect(Athlete athlete)
     {
-        foreach (var combination in _combinationParentNode.Children)
+        if (_eventContext.Event == null)
+        {
+            return;
+        }
+        foreach (var combination in _eventContext.Event.Combinations)
         {
             combination.Reflect(athlete);
-            foreach (var competition in _competitionParentNode.Children)
+            foreach (var competition in _eventContext.Event.Competitions)
             {
                 foreach (var participation in competition.Participations)
                 {
@@ -116,15 +128,19 @@ public class UpcomingEventBehind
             }
         }
 
-        await _updater.Update(_eventContext.Event!);
+        await _updater.Update(_eventContext.Event);
     }
 
     public async Task Reflect(Horse horse)
     {
-        foreach (var combination in _combinationParentNode.Children)
+        if (_eventContext.Event == null)
+        {
+            return;
+        }
+        foreach (var combination in _eventContext.Event.Combinations)
         {
             combination.Reflect(horse);
-            foreach (var competition in _competitionParentNode.Children)
+            foreach (var competition in _eventContext.Event.Competitions)
             {
                 foreach (var participation in competition.Participations)
                 {
@@ -132,6 +148,6 @@ public class UpcomingEventBehind
                 }
             }
         }
-        await _updater.Update(_eventContext.Event!);
+        await _updater.Update(_eventContext.Event);
     }
 }
