@@ -1,32 +1,22 @@
-using Not.Application.CRUD.Ports;
 using Not.Application.RPC.SignalR;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Startup;
-using Not.Storage.Stores;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Storage.Setup;
 
 namespace NTS.Judge.Features.Warp;
 
-public class EventRpcContext : IEventContext, IStartupInitializerAsync
+public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync
 {
-    readonly IStore<SetupState> _setupStore;
+    readonly IConnectedEventContext _connectedEventContext;
     readonly IRpcSocket _socket;
     readonly WarpContext _warpContext;
-    readonly IRepository<UpcomingEvent> _upcomingEvents;
 
-    public EventRpcContext(
-        IStore<SetupState> setupStore,
-        IRpcSocket socket,
-        WarpContext warpContext,
-        IRepository<UpcomingEvent> upcomingEvents
-    )
+    public EventRpcContext(IConnectedEventContext connectedEventContext, IRpcSocket socket, WarpContext warpContext)
     {
-        _setupStore = setupStore;
+        _connectedEventContext = connectedEventContext;
         _socket = socket;
         _warpContext = warpContext;
-        _upcomingEvents = upcomingEvents;
     }
 
     public UpcomingEvent? Event { get; private set; }
@@ -49,15 +39,9 @@ public class EventRpcContext : IEventContext, IStartupInitializerAsync
 
     public async Task RunAtStartupAsync()
     {
-        var setup = await _setupStore.Readonly();
-        if (setup.ConnectedEventId == null)
-        {
-            return;
-        }
-        var upcomingEvent = await _upcomingEvents.Read(setup.ConnectedEventId.Value);
+        var upcomingEvent = await _connectedEventContext.Initialize();
         if (upcomingEvent == null)
         {
-            await _setupStore.Delete();
             return;
         }
         _warpContext.Configure(Event = upcomingEvent);
@@ -66,14 +50,16 @@ public class EventRpcContext : IEventContext, IStartupInitializerAsync
 
     async Task InternalSetEvent(UpcomingEvent? upcomingEvent)
     {
-        var setup = await _setupStore.Transact();
-        setup.ConnectedEventId = upcomingEvent?.Id;
-        await _setupStore.Commit(setup);
+        if (upcomingEvent == null)
+        {
+            return;
+        }
+        await _connectedEventContext.Set(upcomingEvent);
         _warpContext.Configure(Event = upcomingEvent);
     }
 }
 
-public interface IEventContext : ISingleton
+public interface ISelectedEventContext : ISingleton
 {
     public UpcomingEvent? Event { get; }
 }

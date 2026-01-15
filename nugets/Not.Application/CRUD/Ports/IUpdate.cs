@@ -1,10 +1,6 @@
-﻿using Not.Domain.Aggregates;
-using Not.Injection;
+﻿namespace Not.Application.CRUD.Ports;
 
-namespace Not.Application.CRUD.Ports;
-
-public interface IUpdate<in T> : ITransient
-    where T : IAggregateRoot
+public interface IUpdate<in T>
 {
     Task Update(T items);
 }

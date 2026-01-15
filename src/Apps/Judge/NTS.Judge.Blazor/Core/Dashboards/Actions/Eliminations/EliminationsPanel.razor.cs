@@ -1,4 +1,5 @@
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Eliminations;
 

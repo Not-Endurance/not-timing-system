@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,7 +6,11 @@
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="3.2.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Not.Application\Not.Application.csproj" />
     <ProjectReference Include="..\Not.Domain\Not.Domain.csproj" />

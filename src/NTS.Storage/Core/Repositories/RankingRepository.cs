@@ -1,4 +1,5 @@
-﻿using Not.Storage.Repositories;
+﻿using Not.Storage.JsonFile.Repositories;
+using Not.Storage.JsonFile.Stores;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Core.Repositories;

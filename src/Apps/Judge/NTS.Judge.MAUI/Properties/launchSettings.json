@@ -14,13 +14,6 @@
         "NO_WARP": "true"
       }
     },
-    "Localhost-No-Warp": {
-      "commandName": "Project",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "NO_WARP": "true"
-      }
-    },
     "Staging": {
       "commandName": "Project",
       "environmentVariables": {

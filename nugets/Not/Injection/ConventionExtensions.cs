@@ -53,7 +53,7 @@ public static class InjectionServiceCollectionExtensions
         }
         foreach (var i in interfaces)
         {
-            Add(services, i, implementation, ServiceLifetime.Transient);
+            services.Add(i, implementation, ServiceLifetime.Transient);
         }
     }
 
@@ -67,32 +67,11 @@ public static class InjectionServiceCollectionExtensions
         PreventInvalidPolymorphicService(implementation);
 
         // Register as self and use self to fetch the instace for all interfaces
-        Add(services, implementation, implementation, lifetime);
+        services.Add(implementation, implementation, lifetime);
         foreach (var @interface in interfaces)
         {
             var descriptor = new ServiceDescriptor(@interface, x => x.GetRequiredService(implementation), lifetime);
             services.Add(descriptor);
-        }
-    }
-
-    static void Add(IServiceCollection services, Type @interface, Type implementation, ServiceLifetime lifetime)
-    {
-        var service =
-            @interface.IsGenericType && implementation.IsGenericType
-                ? @interface.GetGenericTypeDefinition()
-                : @interface;
-
-        switch (lifetime)
-        {
-            case ServiceLifetime.Singleton:
-                services.AddSingleton(service, implementation);
-                break;
-            case ServiceLifetime.Scoped:
-                services.AddScoped(service, implementation);
-                break;
-            default:
-                services.AddTransient(service, implementation);
-                break;
         }
     }
 

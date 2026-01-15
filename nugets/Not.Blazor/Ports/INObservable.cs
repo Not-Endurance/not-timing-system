@@ -2,7 +2,7 @@
 
 namespace Not.Blazor.Ports;
 
-public interface INObservable : ISingleton
+public interface INObservable
 {
     Task Initialize(params IEnumerable<object> arguments);
     void Subscribe(Func<Task> action);

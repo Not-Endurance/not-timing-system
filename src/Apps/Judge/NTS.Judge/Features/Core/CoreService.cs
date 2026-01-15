@@ -2,44 +2,40 @@
 using Not.Application.CRUD.Ports;
 using Not.Notify;
 using Not.Safe;
-using Not.Storage.Stores;
 using NTS.Domain.Core.Aggregates;
-using NTS.Judge.Blazor.Shared.Components.SidePanels;
 using NTS.Judge.Features.Core.Reset;
 using NTS.Judge.Features.Core.Start;
 using NTS.Judge.Features.Warp;
-using NTS.Judge.HTTP;
-using NTS.Storage.Core;
 
 namespace NTS.Judge.Features.Core;
 
 public class CoreService : ObservableBehind, ICoreService
 {
-    readonly IEnumerable<ICoreState> _coreStates;
+    readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
+    readonly ICoreState _coreState;
     readonly EventRpcContext _eventsRpcContext;
-    readonly IStore<CoreState> _coreStore;
     readonly ICoreStarter _coreStarter;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Participation> _participations;
     readonly IRepository<Official> _officials;
-    readonly IArchiveRepository _archive;
+    readonly IRepository<ArchiveEntry> _archive;
 
     public CoreService(
-        IEnumerable<ICoreState> coreStates,
+        IEnumerable<ICoreDependentObservables> coreDependentObservables,
+        ICoreState coreState,
         EventRpcContext eventsRpcContext,
-        IStore<CoreState> coreStore,
         ICoreStarter coreStarter,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Participation> participations,
         IRepository<Official> officials,
-        IArchiveRepository archive
+        IRepository<ArchiveEntry> archive
     )
     {
-        _coreStates = coreStates;
+        _coreDependentObservables = coreDependentObservables;
+        _coreState = coreState;
         _eventsRpcContext = eventsRpcContext;
-        _coreStore = coreStore;
         _coreStarter = coreStarter;
         _rankings = rankings;
         _events = events;
@@ -69,18 +65,18 @@ public class CoreService : ObservableBehind, ICoreService
 
     public async Task HardReset()
     {
-        await _coreStore.Delete();
+        await _coreState.Reset();
         await SoftReset();
         IsStarted = false;
-        foreach (var state in _coreStates)
+        foreach (var observable in _coreDependentObservables)
         {
-            state.Reset();
+            observable.Reset();
         }
     }
 
     public async Task LoadArchive(int archiveId)
     {
-        var entry = await _archive.GetEntry(archiveId);
+        var entry = await _archive.Read(archiveId);
         if (entry == null)
         {
             NotifyHelper.Inform($"Archive with id '{archiveId}' does not exist");

@@ -1,4 +1,5 @@
 using Not.Blazor.Navigation;
+using NTS.Judge.Features.Setup.UpcomingEvents;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 

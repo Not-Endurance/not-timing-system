@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Blazor;
 using NTS.Application;
-using NTS.Storage;
 
 namespace NTS.Judge;
 
@@ -17,10 +16,7 @@ public static class NtsJudgeServices
     /// <returns></returns>
     public static IServiceCollection ConfigureNtsJudge(this IServiceCollection services, IConfiguration configuration)
     {
-        return services
-            .ConfigureNtsCommon(configuration)
-            .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
-            .ConfigureNtsStorage()
-            .AddNBlazor(configuration);
+        services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly()).AddStartlist().AddRpcClient();
+        return services.ConfigureNts(configuration).AddNBlazor(configuration);
     }
 }
