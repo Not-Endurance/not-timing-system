@@ -61,13 +61,16 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         if (_graph.IsFlatAggregate)
         {
             throw new InvalidOperationException(
-                $"Flat aggregate '{typeof(T).FullName}' does not need '{nameof(KrudGraphContext<T>)}' instance");
+                $"Flat aggregate '{typeof(T).FullName}' does not need '{nameof(KrudGraphContext<T>)}' instance"
+            );
         }
 
-        _nodesByClosedParentInterface = _graph.AllNodes
-            .SelectMany(x =>
-                KrudReflectionHelper.GetClosedKrudParentInterfaces(x.GetType())
-                    .Select(y => (@interface: y, node: (object)x)))
+        _nodesByClosedParentInterface = _graph
+            .AllNodes.SelectMany(x =>
+                KrudReflectionHelper
+                    .GetClosedKrudParentInterfaces(x.GetType())
+                    .Select(y => (@interface: y, node: (object)x))
+            )
             .GroupBy(x => x.@interface)
             .ToDictionary(x => x.Key, x => x.First().node);
 

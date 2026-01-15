@@ -11,9 +11,8 @@ public abstract class NStatefulService<T> : NStatefulService, IDisposable
         Observe(observable, EmitChanged);
     }
 
-    protected NStatefulService() : this(new T())
-    {
-    }
+    protected NStatefulService()
+        : this(new T()) { }
 
     protected T State { get; }
 }

@@ -13,13 +13,10 @@ internal sealed record KrudGraphMetadata
             return new KrudGraphMetadata(true, [], []);
         }
 
-        var concrete = graph.AllNodes
-            .Select(n => n.GetType())
-            .Distinct()
-            .ToList();
+        var concrete = graph.AllNodes.Select(n => n.GetType()).Distinct().ToList();
 
-        var interfaces = graph.AllNodes
-            .SelectMany(n => KrudReflectionHelper.GetClosedKrudParentInterfaces(n.GetType()))
+        var interfaces = graph
+            .AllNodes.SelectMany(n => KrudReflectionHelper.GetClosedKrudParentInterfaces(n.GetType()))
             .Distinct()
             .ToList();
 
@@ -29,7 +26,8 @@ internal sealed record KrudGraphMetadata
     public KrudGraphMetadata(
         bool isFlatAggregate,
         IReadOnlyList<Type> concreteNodeTypes,
-        IReadOnlyList<Type> krudParentNodeOfClosedInterfaces)
+        IReadOnlyList<Type> krudParentNodeOfClosedInterfaces
+    )
     {
         IsFlatAggregate = isFlatAggregate;
         ConcreteNodeTypes = concreteNodeTypes;

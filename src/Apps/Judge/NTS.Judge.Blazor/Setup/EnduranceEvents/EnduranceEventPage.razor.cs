@@ -19,6 +19,20 @@ public partial class EnduranceEventPage
     {
         _upcomingEvent = Navigator.ConsumeParameter<EnduranceEventFormModel>();
         // TODO: come up with somethig more elegant. Maybe pass aggregates in navigaion?
-        RpcContext.Set(new UpcomingEvent(_upcomingEvent.Id, _upcomingEvent.Name, _upcomingEvent.Place, _upcomingEvent.Country, _upcomingEvent.FeiShowId, _upcomingEvent.FeiId, _upcomingEvent.FeiEventCode, _upcomingEvent.Competitions, _upcomingEvent.Officials, _upcomingEvent.Loops, _upcomingEvent.Combinations));
+        RpcContext.Set(
+            new UpcomingEvent(
+                _upcomingEvent.Id,
+                _upcomingEvent.Name,
+                _upcomingEvent.Place,
+                _upcomingEvent.Country,
+                _upcomingEvent.FeiShowId,
+                _upcomingEvent.FeiId,
+                _upcomingEvent.FeiEventCode,
+                _upcomingEvent.Competitions,
+                _upcomingEvent.Officials,
+                _upcomingEvent.Loops,
+                _upcomingEvent.Combinations
+            )
+        );
     }
 }

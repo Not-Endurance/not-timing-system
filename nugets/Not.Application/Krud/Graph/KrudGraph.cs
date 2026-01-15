@@ -4,7 +4,11 @@ namespace Not.Application.Krud.Graph;
 
 internal sealed record KrudGraph
 {
-    public KrudGraph(KrudNode? root, IReadOnlyList<KrudNode> allNodes, IReadOnlyDictionary<Type, KrudNode> nodesByParentType)
+    public KrudGraph(
+        KrudNode? root,
+        IReadOnlyList<KrudNode> allNodes,
+        IReadOnlyDictionary<Type, KrudNode> nodesByParentType
+    )
     {
         IsFlatAggregate = root == null;
         Root = root;

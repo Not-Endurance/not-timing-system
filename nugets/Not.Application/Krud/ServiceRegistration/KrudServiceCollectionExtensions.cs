@@ -16,8 +16,8 @@ public static class KrudServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers an Aggregate in the Krud framework. If the aggregate has child entities this method builds a dependency graph 
-    /// and registers individual nodes for every Parent entity that hold the state of the current entity. This state is then used 
+    /// Registers an Aggregate in the Krud framework. If the aggregate has child entities this method builds a dependency graph
+    /// and registers individual nodes for every Parent entity that hold the state of the current entity. This state is then used
     /// by <seealso cref="KrudInMemoryNodeRepository{T}"/> in order to Provide simple CRUD interface for child entities
     /// </summary>
     /// <typeparam name="T">Type of the Domain Aggregate to register</typeparam>
@@ -26,7 +26,8 @@ public static class KrudServiceCollectionExtensions
     /// <returns></returns>
     internal static IServiceCollection AddKrudRoot<T>(
         this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton
+    )
         where T : AggregateRoot
     {
         if (lifetime == ServiceLifetime.Transient)
@@ -40,19 +41,27 @@ public static class KrudServiceCollectionExtensions
             return services;
         }
 
-        services.Add(new (typeof(KrudGraphContext<T>), typeof(KrudGraphContext<T>), lifetime));
-        services.Add(new (typeof(IKrudNodeSetter), sp => sp.GetRequiredService<KrudGraphContext<T>>(), lifetime));
+        services.Add(new(typeof(KrudGraphContext<T>), typeof(KrudGraphContext<T>), lifetime));
+        services.Add(new(typeof(IKrudNodeSetter), sp => sp.GetRequiredService<KrudGraphContext<T>>(), lifetime));
 
         foreach (var @interface in meta.KrudParentNodeOfClosedInterfaces)
         {
-            services.Add(new (
-                @interface, sp => sp.GetRequiredService<KrudGraphContext<T>>().GetNodeByClosedParentInterface(@interface), lifetime));
+            services.Add(
+                new(
+                    @interface,
+                    sp => sp.GetRequiredService<KrudGraphContext<T>>().GetNodeByClosedParentInterface(@interface),
+                    lifetime
+                )
+            );
         }
 
-        services.Add(new (
-            typeof(IEnumerable<IKrudNodeSetter>),
-            sp => sp.GetRequiredService<KrudGraphContext<T>>().GetNodeSetters(), 
-            lifetime));
+        services.Add(
+            new(
+                typeof(IEnumerable<IKrudNodeSetter>),
+                sp => sp.GetRequiredService<KrudGraphContext<T>>().GetNodeSetters(),
+                lifetime
+            )
+        );
 
         return services;
     }

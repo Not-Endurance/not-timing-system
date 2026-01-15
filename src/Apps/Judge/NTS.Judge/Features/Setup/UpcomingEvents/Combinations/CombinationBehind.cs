@@ -7,10 +7,7 @@ namespace NTS.Judge.Features.Setup.UpcomingEvents.Combinations;
 
 public class CombinationBehind : KrudServiceBase<Combination, CombinationFormModel>
 {
-    public CombinationBehind(
-        IRepository<Combination> combinations,
-        IEnumerable<IKrudMirror<Combination>> reflections
-    )
+    public CombinationBehind(IRepository<Combination> combinations, IEnumerable<IKrudMirror<Combination>> reflections)
         : base(combinations, reflections) { }
 
     protected override Combination CreateEntity(CombinationFormModel model)
