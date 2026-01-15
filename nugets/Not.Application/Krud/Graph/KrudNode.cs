@@ -32,4 +32,3 @@ public class KrudNode : Observer, IObservable
         Value = aggregate;
     }
 }
-

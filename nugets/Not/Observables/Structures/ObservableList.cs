@@ -126,5 +126,4 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
     {
         return GetEnumerator();
     }
-
 }

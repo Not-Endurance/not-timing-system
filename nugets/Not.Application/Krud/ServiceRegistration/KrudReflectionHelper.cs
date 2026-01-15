@@ -16,7 +16,8 @@ internal static class KrudReflectionHelper
     /// <returns>All edge types of <paramref name="entityType"/></returns>
     public static IEnumerable<Type> GetEdgeAggregatesOf(Type entityType)
     {
-        return entityType.GetInterfaces()
+        return entityType
+            .GetInterfaces()
             .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IParent<>))
             .Select(i => i.GetGenericArguments()[0])
             .Where(t => typeof(Aggregate).IsAssignableFrom(t));
@@ -45,8 +46,10 @@ internal static class KrudReflectionHelper
             {
                 foreach (var candidate in UnwrapPropertyTypes(p.PropertyType))
                 {
-                    if (typeof(Aggregate).IsAssignableFrom(candidate) ||
-                        typeof(AggregateRoot).IsAssignableFrom(candidate))
+                    if (
+                        typeof(Aggregate).IsAssignableFrom(candidate)
+                        || typeof(AggregateRoot).IsAssignableFrom(candidate)
+                    )
                     {
                         queue.Enqueue(candidate);
                     }
@@ -57,9 +60,7 @@ internal static class KrudReflectionHelper
         return result;
     }
 
-    public static List<Type> OrderUsingDepthFirstSearch(
-        Type root,
-        IDictionary<Type, List<Type>> childrenByParent)
+    public static List<Type> OrderUsingDepthFirstSearch(Type root, IDictionary<Type, List<Type>> childrenByParent)
     {
         var visited = new HashSet<Type>();
         var visiting = new HashSet<Type>(); // cycle detection
@@ -75,8 +76,9 @@ internal static class KrudReflectionHelper
             if (!visiting.Add(type))
             {
                 throw new InvalidOperationException(
-                    $"Reference cycle detected in Domain aggregate '{root.FullName}' while intializing Krud" +
-                    $" - entity '{type.FullName}' has children referencing '{type.FullName}'");
+                    $"Reference cycle detected in Domain aggregate '{root.FullName}' while intializing Krud"
+                        + $" - entity '{type.FullName}' has children referencing '{type.FullName}'"
+                );
             }
 
             if (childrenByParent.TryGetValue(type, out var childrenTypes))
@@ -89,7 +91,7 @@ internal static class KrudReflectionHelper
 
             visiting.Remove(type);
             visited.Add(type);
-            output.Add(type); 
+            output.Add(type);
         }
 
         DepthFirtSearch(root);
@@ -105,10 +107,9 @@ internal static class KrudReflectionHelper
     public static IEnumerable<Type> GetClosedKrudParentInterfaces(Type nodeType)
     {
         // Finds IKrudV1ParentNodeOf<T> (closed) on the node type
-        return nodeType.GetInterfaces()
-            .Where(i =>
-                i.IsGenericType &&
-                i.GetGenericTypeDefinition() == typeof(IKrudParentNodeOf<>));
+        return nodeType
+            .GetInterfaces()
+            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IKrudParentNodeOf<>));
     }
 
     static IEnumerable<Type> UnwrapPropertyTypes(Type type)

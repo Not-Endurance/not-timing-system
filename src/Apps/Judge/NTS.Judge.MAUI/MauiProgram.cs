@@ -44,7 +44,6 @@ public static class MauiProgram
             Console.WriteLine(ex.Message);
             throw;
         }
-        
     }
 
     static void StartHub()

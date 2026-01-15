@@ -8,10 +8,7 @@ namespace NTS.Judge.Features.Setup.UpcomingEvents.Officials;
 
 public class OfficialBehind : KrudServiceBase<Official, OfficialFormModel>
 {
-    public OfficialBehind(
-        IRepository<Official> officials,
-        IEnumerable<IKrudMirror<Official>> dependants
-    )
+    public OfficialBehind(IRepository<Official> officials, IEnumerable<IKrudMirror<Official>> dependants)
         : base(officials, dependants) { }
 
     protected override Official CreateEntity(OfficialFormModel model)

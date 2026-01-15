@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Not.Application.Krud.ServiceRegistration;
 using Not.Blazor;
 using NTS.Application;
 using NTS.Domain.Setup.Aggregates;
-using Not.Application.Krud.ServiceRegistration;
 
 namespace NTS.Judge;
 
@@ -14,7 +14,8 @@ public static class NtsJudgeServices
     {
         services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly()).AddStartlist().AddRpcClient();
 
-        services.ConfigureKrud()
+        services
+            .ConfigureKrud()
             .RegisterAggregate<UpcomingEvent>()
             .RegisterAggregate<Athlete>()
             .RegisterAggregate<Horse>()

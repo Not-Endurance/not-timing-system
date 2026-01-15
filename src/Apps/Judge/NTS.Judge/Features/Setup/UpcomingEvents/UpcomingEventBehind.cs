@@ -17,10 +17,7 @@ public class UpcomingEventBehind
     readonly IUpdate<UpcomingEvent> _updater;
     readonly ISelectedEventContext _eventContext;
 
-    public UpcomingEventBehind(
-        IRepository<UpcomingEvent> events,
-        ISelectedEventContext eventContext
-    )
+    public UpcomingEventBehind(IRepository<UpcomingEvent> events, ISelectedEventContext eventContext)
         : base(events, [])
     {
         _updater = events;

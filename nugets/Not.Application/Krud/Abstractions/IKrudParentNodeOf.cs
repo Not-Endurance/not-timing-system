@@ -4,6 +4,4 @@ using Not.Domain.Aggregates;
 namespace Not.Application.Krud.Abstractions;
 
 public interface IKrudParentNodeOf<T> : IParent<T>, IKrudNodeSetter
-    where T : Aggregate
-{
-}
+    where T : Aggregate { }

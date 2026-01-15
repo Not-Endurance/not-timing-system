@@ -11,10 +11,7 @@ internal static class KrudGraphHelper
 
         var childrenByParent = entityTypes.ToDictionary(
             t => t,
-            t => KrudReflectionHelper.GetEdgeAggregatesOf(t)
-                .Where(entityTypes.Contains)
-                .Distinct()
-                .ToList()
+            t => KrudReflectionHelper.GetEdgeAggregatesOf(t).Where(entityTypes.Contains).Distinct().ToList()
         );
 
         var ordered = KrudReflectionHelper.OrderUsingDepthFirstSearch(rootType, childrenByParent);
@@ -65,7 +62,7 @@ internal static class KrudGraphHelper
             {
                 root = parentNode;
             }
-            
+
             nodesByType[parentType] = parentNode;
         }
 

@@ -16,7 +16,8 @@ public class CompetitionBehind : KrudServiceBase<Competition, CompetitionFormMod
     public CompetitionBehind(
         IKrudParentNodeOf<Phase> phaseParent,
         IKrudParentNodeOf<Participation> participationParent,
-        IRepository<Competition> competitions)
+        IRepository<Competition> competitions
+    )
         : base(competitions, [])
     {
         _phaseParent = phaseParent;

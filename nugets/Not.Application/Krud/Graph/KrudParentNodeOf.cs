@@ -10,7 +10,7 @@ public class KrudParentNodeOf<T> : KrudNode, IKrudParentNodeOf<T>
 {
     IParent<T>? Parent => (IParent<T>?)Value;
 
-    IReadOnlyList<T> IParent<T>.Children => Parent?.Children ?? []; 
+    IReadOnlyList<T> IParent<T>.Children => Parent?.Children ?? [];
 
     public void SetParent(object aggregate)
     {
