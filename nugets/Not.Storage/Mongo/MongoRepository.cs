@@ -59,12 +59,12 @@ public abstract class MongoRepository<T> : IRepository<T>
         return await Read(x => x.Id == id);
     }
 
-    public async Task<IEnumerable<T>> ReadAll()
+    public async Task<IEnumerable<T>> ReadMany()
     {
-        return await ReadAll(x => true);
+        return await ReadMany(x => true);
     }
 
-    public async Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter)
+    public async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
         return await GetCollection().Find(filter).ToListAsync();
     }

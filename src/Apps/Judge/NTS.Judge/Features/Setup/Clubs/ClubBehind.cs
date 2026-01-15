@@ -1,12 +1,13 @@
-﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.Krud.Abstractions;
+using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Clubs;
 
-internal class ClubBehind : CrudBehind<Club, ClubFormModel>
+internal class ClubBehind : KrudServiceBase<Club, ClubFormModel>
 {
-    public ClubBehind(IRepository<Club> repository, IEnumerable<ICrudReflection<Club>> reflections)
+    public ClubBehind(IRepository<Club> repository, IEnumerable<IKrudMirror<Club>> reflections)
         : base(repository, reflections) { }
 
     protected override Club CreateEntity(ClubFormModel model)

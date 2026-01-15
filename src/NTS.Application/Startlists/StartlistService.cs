@@ -8,7 +8,7 @@ using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Application.Startlists;
 
-public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory, IStartupInitializer
+public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory, IStartupInitializer
 {
     readonly IReadMany<Participation> _participations;
     readonly StartlistContext _context;
@@ -22,9 +22,9 @@ public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory,
     public IReadOnlyList<StartlistEntry> Upcoming => _context.Startlist?.Upcoming ?? [];
     public IReadOnlyList<StartlistEntry> History => _context.Startlist?.History ?? [];
 
-    protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
-        var participations = await _participations.ReadAll();
+        var participations = await _participations.ReadMany();
         _context.Startlist = new Startlist(participations);
 
         return _context.Startlist.History.Any() || _context.Startlist.Upcoming.Any();
@@ -40,18 +40,18 @@ public class StartlistService : ObservableBehind, IStartUpcoming, IStartHistory,
     public void Refresh()
     {
         _context.Startlist?.UpdateState();
-        EmitChange();
+        EmitChanged();
     }
 
     void RemoveEntry(Participation participation)
     {
         _context.Startlist?.Remove(participation.Combination.Number);
-        EmitChange();
+        EmitChanged();
     }
 
     void AddEntry(Participation participation)
     {
         _context.Startlist?.Add(new StartlistEntry(participation));
-        EmitChange();
+        EmitChanged();
     }
 }

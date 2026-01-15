@@ -1,19 +1,19 @@
-﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.Krud.Abstractions;
+using Not.Application.Krud.Services;
 using Not.Domain.Exceptions;
 using Not.Extensions;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
 
-public class SetupParticipationBehind : CrudChildBehind<Participation, ParticipationFormModel>
+public class SetupParticipationBehind : KrudServiceBase<Participation, ParticipationFormModel>
 {
     public SetupParticipationBehind(
-        CompetitionCrudeContext crudeContext,
-        IEnumerable<ICrudReflection<Participation>> dependants
+        IRepository<Participation> participations,
+        IEnumerable<IKrudMirror<Participation>> dependants
     )
-        : base(dependants, crudeContext) { }
+        : base(participations, dependants) { }
 
     protected override Participation CreateEntity(ParticipationFormModel model)
     {

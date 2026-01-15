@@ -106,7 +106,7 @@ public abstract class RestApiRepository<T> : IRepository<T>
         }
     }
 
-    public async Task<IEnumerable<T>> ReadAll()
+    public async Task<IEnumerable<T>> ReadMany()
     {
         try
         {
@@ -119,7 +119,7 @@ public abstract class RestApiRepository<T> : IRepository<T>
         }
     }
 
-    public Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter)
+    public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
         throw new NotImplementedException();
     }

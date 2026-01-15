@@ -4,7 +4,7 @@ using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Core.Dashboards;
 
-public partial class DashboardPage : NBehind
+public partial class DashboardPage : NComponent
 {
     [Inject]
     ICoreService CoreService { get; set; } = default!;

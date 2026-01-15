@@ -1,16 +1,16 @@
-﻿using MudBlazor.Extensions;
-using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.Krud.Abstractions;
+using Not.Application.Krud.Services;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Athletes;
 
-public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflection<Club>
+public class AthleteBehind : KrudServiceBase<Athlete, AthleteFormModel>, IKrudMirror<Club>
 {
     readonly IRepository<Athlete> _repository;
 
-    public AthleteBehind(IRepository<Athlete> repository, IEnumerable<ICrudReflection<Athlete>> dependants)
+    public AthleteBehind(IRepository<Athlete> repository, IEnumerable<IKrudMirror<Athlete>> dependants)
         : base(repository, dependants)
     {
         _repository = repository;
@@ -28,7 +28,8 @@ public class AthleteBehind : CrudBehind<Athlete, AthleteFormModel>, ICrudReflect
 
     public async Task Reflect(Club update)
     {
-        foreach (var athlete in Items.Where(x => x.Club == update))
+        var athlets = await ReadMany();
+        foreach (var athlete in athlets.Where(x => x.Club == update))
         {
             athlete.Reflect(update);
             await _repository.Update(athlete);

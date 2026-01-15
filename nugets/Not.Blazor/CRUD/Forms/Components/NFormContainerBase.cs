@@ -3,7 +3,7 @@ using Not.Blazor.Navigation;
 
 namespace Not.Blazor.CRUD.Forms.Components;
 
-public abstract class NFormContainerBase<T, TForm> : NBehind
+public abstract class NFormContainerBase<T, TForm> : NComponent
     where TForm : NForm<T>
 {
     public NDynamic<T, TForm> Form = default!;

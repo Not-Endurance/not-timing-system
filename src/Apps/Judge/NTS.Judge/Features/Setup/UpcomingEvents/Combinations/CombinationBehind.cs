@@ -1,17 +1,14 @@
-﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.Krud.Abstractions;
+using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Combinations;
 
-public class CombinationBehind : CrudChildBehind<Combination, CombinationFormModel>
+public class CombinationBehind : KrudServiceBase<Combination, CombinationFormModel>
 {
-    public CombinationBehind(
-        IEnumerable<ICrudReflection<Combination>> reflections,
-        UpcomingEventCrudeContext parentContext
-    )
-        : base(reflections, parentContext) { }
+    public CombinationBehind(IRepository<Combination> combinations, IEnumerable<IKrudMirror<Combination>> reflections)
+        : base(combinations, reflections) { }
 
     protected override Combination CreateEntity(CombinationFormModel model)
     {

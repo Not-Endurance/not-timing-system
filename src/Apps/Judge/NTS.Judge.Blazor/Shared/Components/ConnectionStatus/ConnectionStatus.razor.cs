@@ -7,7 +7,7 @@ using Timer = System.Timers.Timer;
 
 namespace NTS.Judge.Blazor.Shared.Components.ConnectionStatus;
 
-public partial class ConnectionStatus : NBehind, IDisposable
+public partial class ConnectionStatus : NComponent, IDisposable
 {
     readonly Timer _timer;
 

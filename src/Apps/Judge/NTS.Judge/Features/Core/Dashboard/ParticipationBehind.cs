@@ -1,6 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Blazor.CRUD.Ports;
+using Not.Application.Services;
 using Not.Exceptions;
 using Not.Safe;
 using Not.Startup;
@@ -15,7 +15,7 @@ using NTS.Judge.Features.Core.Reset;
 namespace NTS.Judge.Features.Core.Dashboard;
 
 public class ParticipationBehind
-    : ObservableBehind,
+    : NStatefulService,
         IInspections,
         IEliminations,
         IDashboardBehind,
@@ -54,20 +54,20 @@ public class ParticipationBehind
             {
                 _recentlyProcessed.Remove(number.Value);
             }
-            EmitChange();
+            EmitChanged();
         }
     }
 
-    protected override async Task<bool> PerformInitialization(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
     {
-        Participations = await _participationRepository.ReadAll();
+        Participations = await _participationRepository.ReadMany();
         SelectedParticipation = Participations.FirstOrDefault();
         return Participations.Any();
     }
 
     public async Task RunAtStartupAsync()
     {
-        await PerformInitialization();
+        await CreateState();
     }
 
     public async Task Update(PhaseUpdateModel model)
@@ -75,7 +75,7 @@ public class ParticipationBehind
         Task action() => SafeUpdate(model);
         await SafeHelper.Run(action);
 
-        EmitChange();
+        EmitChanged();
     }
 
     public async Task Process(Snapshot snapshot)
@@ -142,7 +142,7 @@ public class ParticipationBehind
 
         participation.Update(model);
         await _participationRepository.Update(participation);
-        EmitChange();
+        EmitChanged();
     }
 
     async Task SafeRequestReinspection(bool requestFlag)
@@ -150,7 +150,7 @@ public class ParticipationBehind
         SelectedParticipation!.ToggleRepresentation(requestFlag);
         await _participationRepository.Update(SelectedParticipation);
 
-        EmitChange();
+        EmitChanged();
     }
 
     async Task SafeRequestRequiredInspection(bool requestFlag)
@@ -158,7 +158,7 @@ public class ParticipationBehind
         SelectedParticipation!.ToggleRequestedInspection(requestFlag);
         await _participationRepository.Update(SelectedParticipation);
 
-        EmitChange();
+        EmitChanged();
     }
 
     async Task SafeProcess(Timestamp timestamp)
@@ -186,7 +186,7 @@ public class ParticipationBehind
         }
         await _snapshotResultRepository.Create(result);
         _recentlyProcessed.Add(participation.Combination.Number);
-        EmitChange();
+        EmitChanged();
     }
 
     async Task SafeWithdraw()
@@ -195,7 +195,7 @@ public class ParticipationBehind
         SelectedParticipation.Withdraw();
         await _participationRepository.Update(SelectedParticipation);
 
-        EmitChange();
+        EmitChanged();
     }
 
     async Task SafeRetire()
@@ -204,7 +204,7 @@ public class ParticipationBehind
         SelectedParticipation.Retire();
         await _participationRepository.Update(SelectedParticipation);
 
-        EmitChange();
+        EmitChanged();
     }
 
     async Task SafeFinishNotRanked(string reason)
@@ -213,7 +213,7 @@ public class ParticipationBehind
         SelectedParticipation.FinishNotRanked(reason);
         await _participationRepository.Update(SelectedParticipation);
 
-        EmitChange();
+        EmitChanged();
     }
 
     async Task SafeDisqualify(DisqualifyCode[] dqCodes, string? reason)
@@ -222,7 +222,7 @@ public class ParticipationBehind
         SelectedParticipation.Disqualify(dqCodes, reason);
         await _participationRepository.Update(SelectedParticipation);
 
-        EmitChange();
+        EmitChanged();
     }
 
     async Task SafeFailToQualify(FailToQualifyCode[] ftqCodes, string? reason)
@@ -232,7 +232,7 @@ public class ParticipationBehind
         SelectedParticipation.FailToQualify(ftqCodes, reason);
         await _participationRepository.Update(SelectedParticipation);
 
-        EmitChange();
+        EmitChanged();
     }
 
     async Task SafeRestoreQualification()
@@ -241,6 +241,6 @@ public class ParticipationBehind
         SelectedParticipation.Restore();
         await _participationRepository.Update(SelectedParticipation);
 
-        EmitChange();
+        EmitChanged();
     }
 }

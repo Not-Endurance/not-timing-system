@@ -14,14 +14,14 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Not.Blazor\Not.Blazor.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="NTS.Judge.Tests" />
     <InternalsVisibleTo Include="Not.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Not.Domain\Not.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -32,12 +32,12 @@ public abstract class ReadonlyRootRepository<T, TState>
         return state.Root;
     }
 
-    public Task<IEnumerable<T>> ReadAll()
+    public Task<IEnumerable<T>> ReadMany()
     {
         throw NotImplemented();
     }
 
-    public Task<IEnumerable<T>> ReadAll(Expression<Func<T, bool>> filter)
+    public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
         throw NotImplemented();
     }

@@ -1,6 +1,6 @@
 using MudBlazor;
+using Not.Application.Services;
 using Not.Blazor.Components;
-using Not.Blazor.CRUD.Lists.Ports;
 using Not.Strings;
 using NTS.Blazor.Constants;
 using NTS.Domain.Setup.Aggregates;
@@ -21,11 +21,6 @@ public partial class ParticipationForm
     [Inject]
     IListBehind<Combination> Behind { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(Behind);
-    }
-
     public override void RegisterValidationInjectors()
     {
         RegisterInjector(nameof(Participation.Combination), () => _combinationField);
@@ -36,10 +31,9 @@ public partial class ParticipationForm
         RegisterInjector(nameof(Participation.Category), () => _categoryField);
     }
 
-    Task<IEnumerable<Combination>> SearchCombinations(string term)
+    async Task<IEnumerable<Combination>> SearchCombinations(string term)
     {
-        var result = Search(Behind.Items, term);
-        return Task.FromResult(result);
+        return Search(await Behind.ReadMany(), term);
     }
 
     // TODO: extract search functionality somehow, because ToString() should be identical (maybe ToString should be configurable)

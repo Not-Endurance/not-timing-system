@@ -3,7 +3,7 @@ using MudBlazor;
 // ReSharper disable once CheckNamespace
 namespace Not.Blazor.Components;
 
-public abstract class NDialog : NBehind
+public abstract class NDialog : NComponent
 {
     [CascadingParameter]
     protected MudDialogInstance CurrentDialog { get; set; } = default!;

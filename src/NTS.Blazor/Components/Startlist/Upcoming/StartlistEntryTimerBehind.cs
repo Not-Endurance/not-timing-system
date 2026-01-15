@@ -6,7 +6,7 @@ using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;
 
-public class StartlistEntryTimerBehind : NBehind
+public class StartlistEntryTimerBehind : NComponent
 {
     [Inject]
     IStartUpcoming Service { get; set; } = default!;

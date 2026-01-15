@@ -1,14 +1,15 @@
-﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.Krud.Abstractions;
+using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Phases;
 
-public class PhaseBehind : CrudChildBehind<Phase, PhaseFormModel>
+public class PhaseBehind : KrudServiceBase<Phase, PhaseFormModel>
 {
-    public PhaseBehind(CompetitionCrudeContext crudeContext, IEnumerable<ICrudReflection<Phase>> reflections)
-        : base(reflections, crudeContext) { }
+    public PhaseBehind(IRepository<Phase> phases, IEnumerable<IKrudMirror<Phase>> reflections)
+        : base(phases, reflections) { }
 
     protected override Phase CreateEntity(PhaseFormModel model)
     {
@@ -19,9 +20,4 @@ public class PhaseBehind : CrudChildBehind<Phase, PhaseFormModel>
     {
         return Phase.Update(model.Id, model.Loop, model.Recovery, model.Rest);
     }
-    //
-    // public async Task Reflect(Loop loop)
-    // {
-    //     await UpdateReflections(x => x.Loop, loop, phase => phase.Reflect(loop));
-    // }
 }

@@ -1,9 +1,9 @@
-using Not.Blazor.Ports;
+using Not.Application.Behinds.Adapters;
 using Not.Injection;
 
 namespace NTS.Judge.Features.Core;
 
-public interface ICoreService : INObservable, ISingleton
+public interface ICoreService : IStatefulService, ISingleton
 {
     bool IsStarted { get; }
     Task Start();

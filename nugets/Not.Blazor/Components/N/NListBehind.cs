@@ -1,16 +1,17 @@
-// ReSharper disable once CheckNamespace
 namespace Not.Blazor.Components;
 
-public class NListBehind<T> : NBehind
+public class NListBehind<T> : NComponent
 {
-    [Parameter, EditorRequired]
-    public IEnumerable<T> Items { get; set; } = [];
+    protected IEnumerable<T> Items { get; private set; } = [];
 
     [Parameter]
     public string? Title { get; set; }
 
     [Parameter]
     public Func<Task>? CreateHandler { get; set; }
+
+    [Parameter, EditorRequired]
+    public required Func<Task<IEnumerable<T>>> ReadHandler { get; set; }
 
     [Parameter]
     public Func<T, Task>? UpdateHandler { get; set; }
@@ -20,4 +21,9 @@ public class NListBehind<T> : NBehind
 
     [Parameter]
     public bool IsLoading { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Items = await ReadHandler();
+    }
 }

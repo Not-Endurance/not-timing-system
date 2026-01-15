@@ -5,7 +5,7 @@ using Not.Notify;
 
 namespace Not.Blazor.CRUD.Forms.Components;
 
-public abstract class NForm<T> : NBehind
+public abstract class NForm<T> : NComponent
 {
     public abstract void RegisterValidationInjectors();
 

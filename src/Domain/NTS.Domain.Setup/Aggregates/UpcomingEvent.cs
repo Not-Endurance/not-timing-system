@@ -30,7 +30,7 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         : base(id!.Value)
     {
         Name = Required(nameof(Name), name);
-        Place = Capitalized(nameof(Place), place);
+        Place = Required(nameof(Place), place);
         Country = Required(nameof(Country), country);
         ShowFeiId = showFeiId;
         FeiId = feiId;
@@ -50,6 +50,11 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         string? feiEventCode
     )
         : this(GenerateId(), name, place, country, showFeiId, feiId, feiEventCode, [], [], [], []) { }
+
+    IReadOnlyList<Official> IParent<Official>.Children => Officials;
+    IReadOnlyList<Competition> IParent<Competition>.Children => Competitions;
+    IReadOnlyList<Loop> IParent<Loop>.Children => Loops;
+    IReadOnlyList<Combination> IParent<Combination>.Children => Combinations;
 
     public string Name { get; }
     public string Place { get; }
@@ -128,14 +133,6 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
     public void Update(Combination child)
     {
         _combinations.Update(child);
-    }
-
-    static string Capitalized(string name, string? value)
-    {
-        Required(name, value);
-
-        var character = value.First();
-        return value;
     }
 
     void ValidateRole(Official member)
