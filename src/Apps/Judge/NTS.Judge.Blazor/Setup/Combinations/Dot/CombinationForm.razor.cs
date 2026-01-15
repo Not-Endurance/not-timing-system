@@ -17,12 +17,6 @@ public partial class CombinationForm
     [Inject]
     IListBehind<Horse> HorsesBehind { get; set; } = default!;
 
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    await Observe(AthletesBehind);
-    //    await Observe(HorsesBehind);
-    //}
-
     public override void RegisterValidationInjectors()
     {
         RegisterInjector(nameof(Combination.Number), () => _numberField);

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using MudBlazor;
 using Not.Application.Services;
 using Not.Blazor.Components;
@@ -19,9 +18,8 @@ public partial class PhaseForm
 
     protected override async Task OnInitializedAsync()
     {
-        //await Observe(Behind);
         var loops = await Behind.ReadMany();
-        _loops = NotListModel.FromEntity<Loop>(loops).ToList();
+        _loops = NotListModel.FromEntity(loops).ToList();
     }
 
     public override void RegisterValidationInjectors()

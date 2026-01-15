@@ -3,7 +3,6 @@ using Not.Application.Configurations;
 using Not.Application.Environments;
 using Not.Logging.Builder;
 using Not.MAUI;
-using Not.Startup;
 using NTS.Judge.MAUI.Platforms.Services;
 using NTS.Judge.MAUI.Platforms.Windows.Services;
 using NTS.Warp.InProcess;
@@ -16,35 +15,20 @@ public static class MauiProgram
     {
         var builder = MauiApp.CreateBuilder();
         builder.UseMauiApp<App>().ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"));
+        builder.UseNLog().AddFilesystemLogger();
 
-        try
+        builder.Services.ConfigureJudgeMaui(builder.Configuration);
+
+        var assembly = typeof(MauiProgram).Assembly;
+        builder.Configuration.AddNAppsettings(assembly);
+        builder.Services.AddSingleton<IMauiProcessService, WindowsProcessService>();
+        var app = builder.Build();
+
+        if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))
         {
-            builder.Services.ConfigureJudgeMaui(builder.Configuration);
-
-            builder.UseNLog().AddFilesystemLogger();
-
-            var assembly = typeof(MauiProgram).Assembly;
-            builder.Configuration.AddNAppsettings(assembly);
-            builder.Services.AddSingleton<IMauiProcessService, WindowsProcessService>();
-            var app = builder.Build();
-
-            if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))
-            {
-                StartHub();
-            }
-
-            //var krudNode = app.Services.GetRequiredService<IKrudV1ParentNodeOf<Competition>>();
-            //var krudRepo = app.Services.GetRequiredService<IRepository<Competition>>();
-            var zz = app.Services.GetRequiredService<IEnumerable<IStartupInitializer>>();
-
-            return app;
+            StartHub();
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            throw;
-        }
-        
+        return app;
     }
 
     static void StartHub()

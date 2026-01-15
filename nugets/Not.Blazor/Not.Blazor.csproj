@@ -17,8 +17,4 @@
     <ProjectReference Include="..\Not.Application\Not.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CRUD\Forms\Ports\" />
-  </ItemGroup>
-
 </Project>

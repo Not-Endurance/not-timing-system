@@ -21,11 +21,6 @@ public partial class ParticipationForm
     [Inject]
     IListBehind<Combination> Behind { get; set; } = default!;
 
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    await Observe(Behind);
-    //}
-
     public override void RegisterValidationInjectors()
     {
         RegisterInjector(nameof(Participation.Combination), () => _combinationField);

@@ -73,7 +73,7 @@ public class RankingService
     {
         var ranking = new Ranking(
             RandomHelper.GenerateUniqueInteger(),
-            null,
+            model.Name,
             model.Ruleset,
             model.Type,
             model.Category,
