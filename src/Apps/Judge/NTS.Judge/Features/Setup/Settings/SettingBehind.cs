@@ -1,7 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using NTS.Domain.Aggregates;
-using NTS.Judge.Blazor.Setup.Settings;
 using NTS.Judge.Features.Setup.Services;
 
 namespace NTS.Judge.Features.Setup.Settings;
