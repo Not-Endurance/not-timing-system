@@ -1,4 +1,6 @@
-﻿using Not.Application.Krud.Nodes;
+﻿using Not.Application.Krud.Graph;
+using Not.Application.Krud.Nodes;
+using Not.Exceptions;
 
 namespace Not.Application.Krud.ServiceRegistration;
 
@@ -21,7 +23,7 @@ internal static class KrudGraphHelper
         // 4) build group nodes bottom-up
         var nodesByType = new Dictionary<Type, KrudNode>();
         var allNodes = new HashSet<KrudNode>(new ReferenceEqualityComparer<KrudNode>());
-
+        KrudNode? root = null;
         foreach (var parentType in ordered)
         {
             var childTypes = childrenByParent[parentType];
@@ -62,12 +64,12 @@ internal static class KrudGraphHelper
 
             if (parentType == rootType)
             {
-                parentNode.IsRoot = true;
+                root = parentNode;
             }
             
             nodesByType[parentType] = parentNode;
         }
 
-        return new KrudGraph(allNodes.ToList(), nodesByType);
+        return new KrudGraph(root, allNodes.ToList(), nodesByType);
     }
 }

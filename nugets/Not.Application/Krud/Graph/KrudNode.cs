@@ -9,8 +9,6 @@ public class KrudNode : Observer, IObservable
 
     protected Event StateChanged { get; } = new();
 
-    internal bool IsRoot { get; set; }
-
     public object? Value { get; protected set; }
     public IEventSubscriber Event => StateChanged;
 
