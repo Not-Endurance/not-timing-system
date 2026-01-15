@@ -1,4 +1,4 @@
-﻿using Not.Application.Krud.Nodes;
+﻿using Not.Application.Krud.Graph;
 using Not.Domain.Aggregates;
 
 namespace Not.Application.Krud.Abstractions;

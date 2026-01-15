@@ -1,7 +1,7 @@
 ﻿using Not.Events;
 using Not.Observables;
 
-namespace Not.Application.Krud.Nodes;
+namespace Not.Application.Krud.Graph;
 
 public class KrudNode : Observer, IObservable
 {
@@ -14,11 +14,6 @@ public class KrudNode : Observer, IObservable
 
     public IReadOnlyList<KrudNode> Children => _children.AsReadOnly();
 
-    public void Set(object aggregate)
-    {
-        Value = aggregate;
-    }
-
     internal virtual void AttachChildren(IEnumerable<KrudNode> nodes)
     {
         if (_children.Any())
@@ -30,6 +25,11 @@ public class KrudNode : Observer, IObservable
             Observe(node, StateChanged.Emit);
         }
         _children.AddRange(nodes);
+    }
+
+    public void Set(object aggregate)
+    {
+        Value = aggregate;
     }
 }
 

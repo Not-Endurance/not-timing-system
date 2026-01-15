@@ -11,7 +11,7 @@ public class NListBehind<T> : NComponent
     public Func<Task>? CreateHandler { get; set; }
 
     [Parameter, EditorRequired]
-    public Func<Task<IEnumerable<T>>> ReadHandler { get; set; }
+    public required Func<Task<IEnumerable<T>>> ReadHandler { get; set; }
 
     [Parameter]
     public Func<T, Task>? UpdateHandler { get; set; }

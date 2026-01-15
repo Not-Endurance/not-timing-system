@@ -1,12 +1,9 @@
 ﻿using System.Diagnostics;
 using Not.Application.Configurations;
-using Not.Application.CRUD.Ports;
 using Not.Application.Environments;
-using Not.Application.Krud.Nodes;
 using Not.Logging.Builder;
 using Not.MAUI;
 using Not.Startup;
-using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.MAUI.Platforms.Services;
 using NTS.Judge.MAUI.Platforms.Windows.Services;
 using NTS.Warp.InProcess;

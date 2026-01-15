@@ -5,7 +5,7 @@ namespace Not.Application.Krud.ServiceRegistration;
 
 public class KrudBuilder
 {
-    private readonly IServiceCollection _services;
+    readonly IServiceCollection _services;
 
     public KrudBuilder(IServiceCollection services)
     {

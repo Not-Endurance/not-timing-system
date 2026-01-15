@@ -2,10 +2,7 @@
 
 namespace Not.Application.Krud.Graph;
 
-internal sealed record KrudGraphMetadata(
-    bool IsFlatAggregate,
-    IReadOnlyList<Type> ConcreteNodeTypes,
-    IReadOnlyList<Type> KrudParentNodeOfClosedInterfaces)
+internal sealed record KrudGraphMetadata
 {
     public static KrudGraphMetadata Build(Type rootType)
     {
@@ -28,4 +25,18 @@ internal sealed record KrudGraphMetadata(
 
         return new KrudGraphMetadata(false, concrete, interfaces);
     }
+
+    public KrudGraphMetadata(
+        bool isFlatAggregate,
+        IReadOnlyList<Type> concreteNodeTypes,
+        IReadOnlyList<Type> krudParentNodeOfClosedInterfaces)
+    {
+        IsFlatAggregate = isFlatAggregate;
+        ConcreteNodeTypes = concreteNodeTypes;
+        KrudParentNodeOfClosedInterfaces = krudParentNodeOfClosedInterfaces;
+    }
+
+    public bool IsFlatAggregate { get; }
+    public IReadOnlyList<Type> ConcreteNodeTypes { get; }
+    public IReadOnlyList<Type> KrudParentNodeOfClosedInterfaces { get; }
 }

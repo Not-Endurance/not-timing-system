@@ -8,9 +8,9 @@ namespace Not.Observables.Structures;
 public class ObservableList<T> : IReadOnlyList<T>, IObservable
     where T : IIdentifiable
 {
-    Event _changed = new();
     readonly object _lock = new();
     readonly Dictionary<int, T> _dictionary = [];
+    Event _changed = new();
 
     public ObservableList() { }
 
@@ -18,7 +18,6 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
     {
         _dictionary = items.ToDictionary(x => x.Id, x => x);
     }
-    public IEventSubscriber Event => _changed;
 
     public T this[int index]
     {
@@ -41,6 +40,7 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
             }
         }
     }
+    public IEventSubscriber Event => _changed;
     public int Count => _dictionary.Count;
 
     public void AddOrReplace(T item)

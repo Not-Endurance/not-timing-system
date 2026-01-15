@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 using Not.Application.Krud.Abstractions;
-using Not.Application.Krud.Nodes;
+using Not.Application.Krud.Graph;
 using Not.Domain;
 using Not.Domain.Aggregates;
 
@@ -57,21 +57,6 @@ internal static class KrudReflectionHelper
         return result;
     }
 
-    private static IEnumerable<Type> UnwrapPropertyTypes(Type type)
-    {
-        // IEnumerable<T> (except string) -> T
-        if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type))
-        {
-            if (type.IsGenericType)
-            {
-                yield return type.GetGenericArguments()[0];
-                yield break;
-            }
-        }
-
-        yield return type;
-    }
-
     public static List<Type> OrderUsingDepthFirstSearch(
         Type root,
         IDictionary<Type, List<Type>> childrenByParent)
@@ -124,5 +109,20 @@ internal static class KrudReflectionHelper
             .Where(i =>
                 i.IsGenericType &&
                 i.GetGenericTypeDefinition() == typeof(IKrudParentNodeOf<>));
+    }
+
+    static IEnumerable<Type> UnwrapPropertyTypes(Type type)
+    {
+        // IEnumerable<T> (except string) -> T
+        if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type))
+        {
+            if (type.IsGenericType)
+            {
+                yield return type.GetGenericArguments()[0];
+                yield break;
+            }
+        }
+
+        yield return type;
     }
 }

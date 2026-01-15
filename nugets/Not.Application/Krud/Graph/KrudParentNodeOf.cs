@@ -3,7 +3,7 @@ using Not.Domain;
 using Not.Domain.Aggregates;
 using Not.Exceptions;
 
-namespace Not.Application.Krud.Nodes;
+namespace Not.Application.Krud.Graph;
 
 public class KrudParentNodeOf<T> : KrudNode, IKrudParentNodeOf<T>
     where T : Aggregate

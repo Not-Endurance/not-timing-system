@@ -9,7 +9,7 @@ public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IFormBehind<T
     where T : AggregateRoot
 {
     readonly List<IKrudMirror<T>> _mirrors;
-    private readonly IRepository<T> _repository;
+    readonly IRepository<T> _repository;
 
     protected KrudServiceBase(IRepository<T> repository, IEnumerable<IKrudMirror<T>> reflections)
     {
@@ -18,6 +18,7 @@ public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IFormBehind<T
     }
 
     protected abstract T CreateEntity(TModel model);
+
     protected virtual T UpdateEntity(TModel model)
     {
         return CreateEntity(model);

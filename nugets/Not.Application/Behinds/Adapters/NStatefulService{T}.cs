@@ -10,6 +10,7 @@ public abstract class NStatefulService<T> : NStatefulService, IDisposable
         State = observable;
         Observe(observable, EmitChanged);
     }
+
     protected NStatefulService() : this(new T())
     {
     }

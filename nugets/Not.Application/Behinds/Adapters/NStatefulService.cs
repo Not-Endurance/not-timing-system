@@ -11,14 +11,14 @@ public abstract class NStatefulService : Observer, IStatefulService
     readonly Event _changed = new();
     bool _isInitialized;
 
-    public IEventSubscriber Event => _changed;
-
     /// <summary>
     /// Creates the service state. Runs on initial render as long as <seealso cref="Blazor.Components.NComponent.Observe(IStatefulService)"/> is used.
     /// Guaranteed to run only once unless <seealso cref="ResetState" /> is called
     /// </summary>
     /// <returns>Indicates weather or not the state has been initialized successfully</returns>
     protected abstract Task<bool> CreateState(params IEnumerable<object> arguments);
+
+    public IEventSubscriber Event => _changed;
 
     protected void EmitChanged()
     {

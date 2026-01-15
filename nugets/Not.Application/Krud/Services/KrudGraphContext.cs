@@ -14,7 +14,6 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
     readonly IRepository<T> _repository;
     readonly SemaphoreSlim _commitGate = new(1, 1);
     readonly Type _rootType;
-
     int _isCommitPending;
     KrudGraph? _graph;
     Dictionary<Type, object> _nodesByClosedParentInterface = [];
@@ -62,7 +61,7 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         if (_graph.IsFlatAggregate)
         {
             throw new InvalidOperationException(
-                $"Flat aggregate '{typeof(T).FullName}' does not need '{nameof(KrudGraphContext<>)}' instance");
+                $"Flat aggregate '{typeof(T).FullName}' does not need '{nameof(KrudGraphContext<T>)}' instance");
         }
 
         _nodesByClosedParentInterface = _graph.AllNodes
@@ -77,7 +76,7 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
 
     async Task CommitCoalesced()
     {
-        GuardHelper.ThrowIfDefault(_graph?.Root.Value);
+        GuardHelper.ThrowIfDefault(_graph!.Root!.Value);
         Interlocked.Exchange(ref _isCommitPending, 1);
         await StartCommitLoop((T)_graph.Root.Value);
     }
