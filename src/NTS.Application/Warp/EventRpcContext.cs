@@ -4,7 +4,7 @@ using Not.Injection;
 using Not.Startup;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Features.Warp;
+namespace NTS.Application.Warp;
 
 public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync
 {

@@ -1,7 +1,7 @@
 using Not.Application.Behinds;
 using Not.Application.Krud;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Warp;
+using NTS.Application.Warp;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 

@@ -2,8 +2,7 @@
 using Not.Application.CRUD.Ports;
 using Not.Domain;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features;
-using NTS.Judge.Features.Warp;
+using NTS.Application.Warp;
 
 namespace NTS.Judge.Features.Core.Behinds;
 

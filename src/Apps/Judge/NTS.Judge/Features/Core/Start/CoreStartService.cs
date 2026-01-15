@@ -6,7 +6,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Start.Factories;
-using NTS.Judge.Features.Warp;
+using NTS.Application.Warp;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
 using Official = NTS.Domain.Core.Aggregates.Official;
 using Participation = NTS.Domain.Core.Aggregates.Participation;

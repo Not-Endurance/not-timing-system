@@ -4,7 +4,7 @@ using Not.Application.CRUD.Ports;
 using Not.Notify;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Behinds;
-using NTS.Judge.Features.Warp;
+using NTS.Application.Warp;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 

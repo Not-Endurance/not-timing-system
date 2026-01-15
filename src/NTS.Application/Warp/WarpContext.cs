@@ -1,7 +1,7 @@
 using Not.Application.RPC;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Features.Warp;
+namespace NTS.Application.Warp;
 
 public class WarpContext : IRpcMetadata
 {

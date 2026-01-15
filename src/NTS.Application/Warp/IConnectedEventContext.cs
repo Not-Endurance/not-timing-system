@@ -1,6 +1,6 @@
 ﻿using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Features.Warp;
+namespace NTS.Application.Warp;
 
 public interface IConnectedEventContext
 {
