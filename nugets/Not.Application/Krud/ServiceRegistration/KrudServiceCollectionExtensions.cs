@@ -32,7 +32,9 @@ public static class KrudServiceCollectionExtensions
     {
         if (lifetime == ServiceLifetime.Transient)
         {
-            throw new InvalidOperationException($"Krud aggregates cannot be with Transient lifetime. Aggregate '{typeof(T).FullName}'");
+            throw new InvalidOperationException(
+                $"Krud aggregates cannot be with Transient lifetime. Aggregate '{typeof(T).FullName}'"
+            );
         }
 
         var meta = KrudGraphMetadata.Build(typeof(T));
