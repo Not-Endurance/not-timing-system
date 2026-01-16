@@ -1,7 +1,7 @@
 using Not.Blazor.Navigation;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Setup.UpcomingEvents;
-using NTS.Judge.Features.Warp;
+using NTS.Application.Warp;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 
