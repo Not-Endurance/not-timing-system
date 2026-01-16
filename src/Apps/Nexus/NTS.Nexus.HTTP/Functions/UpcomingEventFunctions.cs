@@ -12,7 +12,7 @@ namespace NTS.Nexus.HTTP.Functions;
 
 public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
 {
-    readonly IRepository<UpcomingEventModel> _upcomingEventRepository;
+    readonly IRepository<UpcomingEventModel> _upcomingEvents;
 
     public UpcomingEventFunctions(
         IRepository<UpcomingEventModel> upcomingEventRepository,
@@ -20,7 +20,7 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
     )
         : base(logger)
     {
-        _upcomingEventRepository = upcomingEventRepository;
+        _upcomingEvents = upcomingEventRepository;
     }
 
     [Function("upcoming-event-insert")]
@@ -33,7 +33,7 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
         var document = UpcomingEventModel.MapFrom(upcomingEvent);
-        await _upcomingEventRepository.Create(document);
+        await _upcomingEvents.Create(document);
 
         return new OkObjectResult($"Upcoming event {upcomingEvent.Place} stored successfully.");
     }
@@ -45,7 +45,7 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
     {
         LogInformation(request);
 
-        var documents = await _upcomingEventRepository.ReadAll();
+        var documents = await _upcomingEvents.ReadMany();
         var result = documents.Select(x => x.MapToDomain());
         return new OkObjectResult(result);
     }
@@ -58,7 +58,7 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
     {
         LogInformation(request);
 
-        var document = await _upcomingEventRepository.Read(id);
+        var document = await _upcomingEvents.Read(id);
         if (document == null)
         {
             return new NotFoundResult();
@@ -77,7 +77,7 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
         var document = UpcomingEventModel.MapFrom(upcomingEvent);
-        await _upcomingEventRepository.Update(document);
+        await _upcomingEvents.Update(document);
 
         return new OkObjectResult($"Updated upcoming event {upcomingEvent.Place}");
     }
@@ -90,7 +90,12 @@ public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
     {
         LogInformation(request);
 
-        await _upcomingEventRepository.Delete(id);
+        var upcomingEvent = await _upcomingEvents.Read(id);
+        if (upcomingEvent == null)
+        {
+            return new OkObjectResult($"Event with id '{id}' did not exist");
+        }
+        await _upcomingEvents.Delete(upcomingEvent);
         return new OkObjectResult($"Deleted upcoming event with id '{id}'");
     }
 }

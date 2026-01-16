@@ -58,7 +58,12 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
     )
     {
         LogInformation(request);
-        await _athletes.Delete(id);
+        var athlete = await _athletes.Read(id);
+        if (athlete == null)
+        {
+            return new OkObjectResult($"Club wiht id '{id}' did not exist");
+        }
+        await _athletes.Delete(athlete);
         return new OkObjectResult($"Deleted athlete with id '{id}'");
     }
 
@@ -81,7 +86,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
         LogInformation(request);
 
         // TODO: Implement response mapping layer for documents back to aggregates
-        var athletes = await _athletes.ReadAll().Select(x => x.MapToDomain());
+        var athletes = await _athletes.ReadMany().Select(x => x.MapToDomain());
         return new OkObjectResult(athletes);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Blazor.Ports;
+using Not.Application.Behinds.Adapters;
 using Not.Localization;
 using Not.Startup;
 using Not.Tests.RPC;
@@ -55,7 +55,7 @@ public abstract class IntegrationTest : IDisposable
         where T : notnull
     {
         var behind = Provider.GetRequiredService<T>();
-        if (behind is INObservable observableBehind)
+        if (behind is IStatefulService observableBehind)
         {
             await observableBehind.Initialize([log]);
         }

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Configurations;
 using Not.Application.HTTP;
+using Not.Application.Krud.ServiceRegistration;
 
 namespace Not.Application;
 

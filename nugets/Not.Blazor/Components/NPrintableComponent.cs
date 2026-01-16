@@ -3,7 +3,7 @@ using Not.Events;
 
 namespace Not.Blazor.Components;
 
-public abstract class PrintableComponent : NBehind, IDisposable
+public abstract class PrintableComponent : NComponent, IDisposable
 {
     public delegate void ToggleVisibility();
 

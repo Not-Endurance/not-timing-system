@@ -1,9 +1,9 @@
-using Not.Blazor.Ports;
+using Not.Application.Behinds.Adapters;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Core.Dashboard;
 
-public interface IParticipationContext : INObservable
+public interface IParticipationContext : IStatefulService
 {
     Participation? SelectedParticipation { get; set; }
 }

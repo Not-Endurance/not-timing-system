@@ -1,4 +1,4 @@
-﻿using Not.Blazor.CRUD.Lists.Ports;
+﻿using Not.Application.Services;
 using Not.Blazor.Ports;
 using Not.Strings;
 using NTS.Domain.Setup.Aggregates;
@@ -14,9 +14,9 @@ public class ClubSeeker : ISeeker<Club>
         _clubBehind = clubBehind;
     }
 
-    public Task<IEnumerable<Club>> Search(string term)
+    public async Task<IEnumerable<Club>> Search(string term)
     {
-        var results = _clubBehind.Items.Where(x => term == string.Empty || x.Name.NContains(term));
-        return Task.FromResult(results);
+        var items = await _clubBehind.ReadMany();
+        return items.Where(x => term == string.Empty || x.Name.NContains(term));
     }
 }

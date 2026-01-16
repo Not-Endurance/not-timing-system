@@ -15,10 +15,9 @@ public static class MauiProgram
     {
         var builder = MauiApp.CreateBuilder();
         builder.UseMauiApp<App>().ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"));
+        builder.UseNLog().AddFilesystemLogger();
 
         builder.Services.ConfigureJudgeMaui(builder.Configuration);
-
-        builder.UseNLog().AddFilesystemLogger();
 
         var assembly = typeof(MauiProgram).Assembly;
         builder.Configuration.AddNAppsettings(assembly);
@@ -29,7 +28,6 @@ public static class MauiProgram
         {
             StartHub();
         }
-
         return app;
     }
 

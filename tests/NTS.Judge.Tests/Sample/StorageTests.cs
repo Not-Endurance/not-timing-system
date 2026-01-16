@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Not.Blazor.CRUD.Ports;
+using Not.Application.Services;
 using Not.Serialization.JSON;
 using NTS.Domain.Aggregates;
 using NTS.Judge.Features.Setup.UpcomingEvents;

@@ -9,7 +9,7 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.Blazor.Components.Snapshots;
 
-public class SnapshotBehind : NBehind
+public class SnapshotBehind : NComponent
 {
     [Inject]
     IDialogService MudDialogService { get; set; } = null!;

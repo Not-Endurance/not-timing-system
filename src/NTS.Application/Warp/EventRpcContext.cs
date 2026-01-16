@@ -1,4 +1,6 @@
+using Not.Application.Krud.Abstractions;
 using Not.Application.RPC.SignalR;
+using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Startup;
@@ -6,7 +8,8 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Application.Warp;
 
-public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync
+// TODO: fix RpcContext reset not ressetting correctly
+public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, IRpcContext<UpcomingEvent>
 {
     readonly IConnectedEventContext _connectedEventContext;
     readonly IRpcSocket _socket;
@@ -21,15 +24,21 @@ public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync
 
     public UpcomingEvent? Event { get; private set; }
 
+    public UpcomingEvent? Root => Event;
+
     public async Task ResetEvent()
     {
         await InternalSetEvent(null);
         await _socket.Disconnect();
     }
 
-    public async Task SetEvent(UpcomingEvent upcomingEvent)
+    public async Task Set(UpcomingEvent upcomingEvent)
     {
-        if (Event != null && Event != upcomingEvent)
+        if (Event == upcomingEvent)
+        {
+            return;
+        }
+        if (Event != null)
         {
             throw new DomainException(Cannot_select_another_event_without_resetting__string, Event);
         }
@@ -62,4 +71,11 @@ public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync
 public interface ISelectedEventContext : ISingleton
 {
     public UpcomingEvent? Event { get; }
+}
+
+public interface IRpcContext<T> : ISingleton
+    where T : AggregateRoot
+{
+    T? Root { get; }
+    Task Set(T root);
 }

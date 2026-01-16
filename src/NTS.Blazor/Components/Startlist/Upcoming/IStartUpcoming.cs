@@ -1,9 +1,9 @@
-﻿using Not.Blazor.Ports;
+﻿using Not.Application.Behinds.Adapters;
 using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;
 
-public interface IStartUpcoming : INObservable
+public interface IStartUpcoming : IStatefulService
 {
     IReadOnlyList<StartlistEntry> Upcoming { get; }
     void Refresh();

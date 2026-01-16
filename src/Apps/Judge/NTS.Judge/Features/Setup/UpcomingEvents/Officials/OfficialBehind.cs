@@ -1,17 +1,15 @@
-﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.Krud.Abstractions;
+using Not.Application.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Officials;
 
-public class OfficialBehind : CrudChildBehind<Official, OfficialFormModel>
+public class OfficialBehind : KrudServiceBase<Official, OfficialFormModel>
 {
-    public OfficialBehind(
-        UpcomingEventCrudeContext upcomingEventContext,
-        IEnumerable<ICrudReflection<Official>> dependants
-    )
-        : base(dependants, upcomingEventContext) { }
+    public OfficialBehind(IRepository<Official> officials, IEnumerable<IKrudMirror<Official>> dependants)
+        : base(officials, dependants) { }
 
     protected override Official CreateEntity(OfficialFormModel model)
     {

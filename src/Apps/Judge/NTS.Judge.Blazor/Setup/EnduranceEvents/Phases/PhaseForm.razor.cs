@@ -1,6 +1,6 @@
 using MudBlazor;
+using Not.Application.Services;
 using Not.Blazor.Components;
-using Not.Blazor.CRUD.Lists.Ports;
 using Not.Structures;
 using NTS.Domain.Setup.Aggregates;
 
@@ -18,8 +18,8 @@ public partial class PhaseForm
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Behind);
-        _loops = NotListModel.FromEntity<Loop>(Behind.Items).ToList();
+        var loops = await Behind.ReadMany();
+        _loops = NotListModel.FromEntity(loops).ToList();
     }
 
     public override void RegisterValidationInjectors()

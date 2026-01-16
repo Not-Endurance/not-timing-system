@@ -1,4 +1,4 @@
-﻿using Not.Blazor.CRUD.Forms.Ports;
+﻿using Not.Application.Services;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 
@@ -23,6 +23,8 @@ public class EnduranceEventFormModel : IFormModel<UpcomingEvent>
     public string? FeiEventCode { get; set; }
     public IReadOnlyCollection<Competition> Competitions { get; private set; } = [];
     public IReadOnlyCollection<Official> Officials { get; private set; } = [];
+    public IReadOnlyCollection<Combination> Combinations { get; private set; } = [];
+    public IReadOnlyCollection<Loop> Loops { get; private set; } = [];
 
     public void FromEntity(UpcomingEvent upcomingEvent)
     {
@@ -35,5 +37,7 @@ public class EnduranceEventFormModel : IFormModel<UpcomingEvent>
         FeiEventCode = upcomingEvent.FeiEventCode;
         Competitions = upcomingEvent.Competitions;
         Officials = upcomingEvent.Officials;
+        Combinations = upcomingEvent.Combinations;
+        Loops = upcomingEvent.Loops;
     }
 }

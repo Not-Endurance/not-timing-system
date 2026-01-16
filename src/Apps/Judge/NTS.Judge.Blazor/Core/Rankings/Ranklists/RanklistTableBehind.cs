@@ -4,7 +4,7 @@ using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Ranklists;
 
-public class RanklistTableBehind : NBehind
+public class RanklistTableBehind : NComponent
 {
     [Inject]
     IRanklistDocumentService Service { get; set; } = default!;

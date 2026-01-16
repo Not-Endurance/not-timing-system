@@ -1,10 +1,6 @@
-﻿using System.Linq.Expressions;
-
-namespace Not.Application.CRUD.Ports;
+﻿namespace Not.Application.CRUD.Ports;
 
 public interface IDelete<T>
 {
-    Task Delete(int id);
     Task Delete(T item);
-    Task Delete(Expression<Func<T, bool>> filter);
 }
