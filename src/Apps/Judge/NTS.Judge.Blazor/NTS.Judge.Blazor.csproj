@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <ProjectReference Include="..\..\..\..\nugets\Not.Blazor\Not.Blazor.csproj" />
 	  <ProjectReference Include="..\..\..\NTS.Blazor\NTS.Blazor.csproj" />
 	  <ProjectReference Include="..\NTS.Judge\NTS.Judge.csproj" />
   </ItemGroup>
