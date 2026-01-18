@@ -1,5 +1,4 @@
 ﻿@using NTS.Domain.Core.StaticOptions
-@using NTS.Judge.Blazor.Setup.Combinations.RFID
 @using NTS.Judge.Features.Setup.UpcomingEvents.Combinations
 @using Not.Blazor.CRUD.Forms.Components
 
@@ -11,9 +10,4 @@
     <NAutocomplete @ref="_athleteField" @bind-Value="Model.Athlete" Label="@Athlete_string" Search="SearchAthletes" />
 
     <NAutocomplete @ref="_horseField" @bind-Value="Model.Horse" Label="@Horse_string" Search="SearchHorses"/>
-
-    @if (StaticOption.IsRfidDetectionEnabled() && Model.Number.HasValue)
-    {
-        <RfidTagWriter CombinationNumber="Model.Number.Value" @bind-Value="Model.Tag" />
-    }
 </EditForm>

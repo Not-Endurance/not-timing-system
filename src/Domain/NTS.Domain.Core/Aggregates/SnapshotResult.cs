@@ -4,7 +4,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class SnapshotResult : AggregateRoot, IAggregateRoot
+public class SnapshotResult : Aggregate
 {
     public static SnapshotResult Applied(Snapshot snapshot)
     {

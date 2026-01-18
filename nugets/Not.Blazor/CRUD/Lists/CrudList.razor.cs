@@ -8,7 +8,7 @@ using Not.Domain.Aggregates;
 namespace Not.Blazor.CRUD.Lists;
 
 public partial class CrudList<T, TModel, TForm> : NComponent
-    where T : AggregateRoot
+    where T : Entity
     where TModel : IFormModel<T>, new()
     where TForm : NForm<TModel>
 {
@@ -21,19 +21,14 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     [Inject] // TODO: Probably refactor this as ICrudParent<T> and make it nullable!!!!
     IEnumerable<IKrudNodeSetter> ParentContexts { get; set; } = default!;
 
-    [Parameter]
-    public int? ParentId { get; set; } // TODO: can probably be deleted
+	[Parameter]
+	public int? ParentId { get; set; } // TODO: DELETE THIS
 
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public string UpdateRoute { get; set; } = default!;
-
-    protected override void OnInitialized()
-    {
-        //Observe(Behind);
-    }
 
     protected async Task CreateHandler()
     {

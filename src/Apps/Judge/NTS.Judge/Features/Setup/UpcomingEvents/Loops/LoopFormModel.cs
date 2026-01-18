@@ -1,5 +1,5 @@
 ﻿using Not.Application.Services;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 
@@ -12,12 +12,10 @@ public class LoopFormModel : IFormModel<Loop>
 #endif
     }
 
-    public int? Id { get; set; }
     public double? Distance { get; set; }
 
     public void FromEntity(Loop entity)
     {
-        Id = entity.Id;
         Distance = entity.Distance;
     }
 }

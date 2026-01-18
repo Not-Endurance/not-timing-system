@@ -6,7 +6,7 @@ using Not.Domain.Aggregates;
 namespace Not.Application.Krud.Services;
 
 public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IFormBehind<TModel>
-    where T : AggregateRoot
+    where T : Entity
 {
     readonly List<IKrudMirror<T>> _mirrors;
     readonly IRepository<T> _repository;

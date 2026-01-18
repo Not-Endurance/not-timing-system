@@ -6,7 +6,7 @@ using Not.Domain.Aggregates;
 namespace Not.Application.HTTP;
 
 public abstract class HttpCache<T> : ICache<T>
-    where T : IAggregateRoot
+    where T : IAggregate
 {
     readonly SemaphoreSlim _semaphore = new(1);
     readonly IRepository<T> _repository;

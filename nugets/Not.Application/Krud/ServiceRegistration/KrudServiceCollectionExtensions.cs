@@ -28,7 +28,7 @@ public static class KrudServiceCollectionExtensions
         this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Singleton
     )
-        where T : AggregateRoot
+        where T : Aggregate
     {
         if (lifetime == ServiceLifetime.Transient)
         {

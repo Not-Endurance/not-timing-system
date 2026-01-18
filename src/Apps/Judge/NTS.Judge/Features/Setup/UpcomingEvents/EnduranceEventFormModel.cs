@@ -1,6 +1,7 @@
 ﻿using Not.Application.Services;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 

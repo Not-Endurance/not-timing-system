@@ -1,32 +1,48 @@
-﻿using NTS.Domain.Enums;
+﻿using NTS.Application.Shared;
+using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-namespace NTS.Application.Models;
+namespace NTS.Application.Setup;
 
-public class SetupOfficialModel : IDocument
+public class ClubModel : IDocument
+{
+    public static ClubModel MapFrom(Club club)
+    {
+        return new ClubModel { Id = club.Id, Name = club.Name };
+    }
+
+    public int Id { get; set; }
+    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
+    public string Name { get; init; } = default!;
+
+    public Club MapToDomain()
+    {
+        return new Club(Id, Name);
+    }
+}
+
+public class SetupOfficialModel
 {
     public static SetupOfficialModel MapFrom(Official official)
     {
         return new SetupOfficialModel
         {
-            Id = official.Id,
             Names = official.Person.Names,
             Role = official.Role,
         };
     }
 
-    public int Id { get; init; } = default!;
-    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
     public string[] Names { get; init; } = [];
     public OfficialRole Role { get; init; } = default!;
 
     public Official MapToDomain()
     {
-        return new Official(Id, Names, Role);
+        return new Official(Names, Role);
     }
 }
 
-public class SetupAthleteModel : CoreAthleteModel, IDocument
+public class SetupAthleteModel : IDocument
 {
     // TODO: if decide to use this approach integrate AutoMapper with specific mappings to solve duplicating mapping logic
     public static SetupAthleteModel MapFrom(Athlete athlete)
@@ -35,7 +51,7 @@ public class SetupAthleteModel : CoreAthleteModel, IDocument
         {
             Id = athlete.Id,
             FeiId = athlete.FeiId,
-            Names = athlete.Names,
+            Names = athlete.Names.Names,
             Country = CountryModel.MapFrom(athlete.Country),
             Club = athlete.Club == null ? null : ClubModel.MapFrom(athlete.Club),
         };
@@ -43,16 +59,18 @@ public class SetupAthleteModel : CoreAthleteModel, IDocument
 
     public int Id { get; init; }
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
+    public string[] Names { get; init; } = default!;
+    public CountryModel Country { get; init; } = default!;
+    public ClubModel? Club { get; init; }
+    public string? FeiId { get; init; }
 
-    public new Athlete MapToDomain()
+    public Athlete MapToDomain()
     {
-        var club = Club == null ? null : new Club(Club.Id, Club.Name);
-        ;
-        return new Athlete(Id, Names, FeiId, Country?.MapToDomain(), club);
+        return new Athlete(Id, Names, FeiId, Country?.MapToDomain(), Club?.MapToDomain());
     }
 }
 
-public class SetupHorseModel : CoreHorseModel, IDocument
+public class SetupHorseModel : IDocument
 {
     public static SetupHorseModel MapFrom(Horse horse)
     {
@@ -64,9 +82,12 @@ public class SetupHorseModel : CoreHorseModel, IDocument
         };
     }
 
+    public int Id { get; init; }
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
+    public required string Name { get; init; }
+    public string? FeiId { get; init; }
 
-    public new Horse MaptoDomain()
+    public Horse MaptoDomain()
     {
         return new Horse(Id, Name, FeiId);
     }
@@ -78,14 +99,12 @@ public class SetupCombinationModel
     {
         return new SetupCombinationModel
         {
-            Id = combination.Id,
             Number = combination.Number,
             Athlete = SetupAthleteModel.MapFrom(combination.Athlete),
             Horse = SetupHorseModel.MapFrom(combination.Horse),
         };
     }
 
-    public int Id { get; init; }
     public int Number { get; init; }
     public SetupAthleteModel Athlete { get; init; } = default!;
     public SetupHorseModel Horse { get; init; } = default!;
@@ -94,7 +113,7 @@ public class SetupCombinationModel
     {
         var athlete = Athlete.MapToDomain();
         var horse = Horse.MaptoDomain();
-        return new Combination(Id, Number, athlete, horse);
+        return new Combination(Number, athlete, horse);
     }
 }
 
@@ -104,7 +123,6 @@ public class SetupParticipationModel
     {
         return new SetupParticipationModel
         {
-            Id = participation.Id,
             IsNotRanked = participation.IsNotRanked,
             Category = participation.Category,
             Combination = SetupCombinationModel.MapFrom(participation.Combination),
@@ -116,7 +134,6 @@ public class SetupParticipationModel
         };
     }
 
-    public int Id { get; init; }
     public ParticipationCategory Category { get; init; } = default!;
     public SetupCombinationModel Combination { get; init; } = default!;
     public bool IsNotRanked { get; init; }
@@ -130,7 +147,6 @@ public class SetupParticipationModel
     {
         var combination = Combination.MapToDomain();
         return new Participation(
-            Id,
             IsNotRanked,
             combination,
             Category,
@@ -147,15 +163,14 @@ public class LoopModel
 {
     public static LoopModel MapFrom(Loop loop)
     {
-        return new() { Id = loop.Id, Distance = loop.Distance };
+        return new() { Distance = loop.Distance };
     }
 
-    public int Id { get; init; }
     public double Distance { get; init; }
 
     public Loop MapToDomain()
     {
-        return Loop.Update(Id, Distance);
+        return new Loop(Distance);
     }
 }
 
@@ -165,12 +180,14 @@ public class SetupPhaseModel
     {
         return new SetupPhaseModel
         {
+            Id = phase.Id,
             Loop = LoopModel.MapFrom(phase.Loop!),
             Recovery = phase.Recovery,
             Rest = phase.Rest,
         };
     }
 
+    public int Id { get; set; }
     public int Recovery { get; init; }
     public LoopModel Loop { get; init; } = default!;
     public int? Rest { get; init; }
@@ -178,7 +195,7 @@ public class SetupPhaseModel
     public Phase MapToDomain()
     {
         var loop = Loop.MapToDomain();
-        return new Phase(loop, Recovery, Rest);
+        return new Phase(Id, loop, Recovery, Rest);
     }
 }
 
@@ -188,7 +205,6 @@ public class SetupCompetitionModel
     {
         return new SetupCompetitionModel
         {
-            Id = competition.Id,
             Name = competition.Name,
             Type = competition.Type,
             Ruleset = competition.Ruleset,
@@ -219,7 +235,6 @@ public class SetupCompetitionModel
         var phases = Phases.Select(x => x.MapToDomain());
         var participations = Participations.Select(x => x.MapToDomain());
         return new Competition(
-            Id,
             Name,
             Type,
             Ruleset,

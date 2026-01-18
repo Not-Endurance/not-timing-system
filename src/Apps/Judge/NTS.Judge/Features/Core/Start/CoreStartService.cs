@@ -86,7 +86,7 @@ public class CoreStartService : ICoreStarter
     }
 
     Ranking CreateRanking(
-        Domain.Setup.Aggregates.Competition setupCompetition,
+        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
         KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory
     )
     {

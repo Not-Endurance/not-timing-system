@@ -10,7 +10,7 @@ public static class ParticipationAndRankingFactory
     public static (
         List<Participation> Participations,
         Dictionary<ParticipationCategory, List<RankingEntry>> RankingEntriesByCategory
-    ) Create(Domain.Setup.Aggregates.Competition setupCompetition, IEnumerable<Participation> existingParticipations)
+    ) Create(Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition, IEnumerable<Participation> existingParticipations)
     {
         if (setupCompetition.Phases.Count == 0)
         {
@@ -53,8 +53,8 @@ public static class ParticipationAndRankingFactory
     }
 
     static Participation CreateParticipation(
-        Domain.Setup.Aggregates.Competition setupCompetition,
-        Domain.Setup.Aggregates.Participation setupParticipation
+        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
+        Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation
     )
     {
         var phases = CreatePhases(setupCompetition);
@@ -77,7 +77,7 @@ public static class ParticipationAndRankingFactory
         );
     }
 
-    static List<Phase> CreatePhases(Domain.Setup.Aggregates.Competition setupCompetition)
+    static List<Phase> CreatePhases(Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition)
     {
         DateTimeOffset? startTime = setupCompetition.Start.ToUniversalTime();
         var setupPhases = setupCompetition.Phases;

@@ -7,7 +7,7 @@ using Not.Storage.JsonFile.Stores;
 namespace Not.Storage.JsonFile.Repositories;
 
 public abstract class ReadonlySetRepository<T, TState> : IRead<T>
-    where T : AggregateRoot
+    where T : Aggregate
     where TState : class, ISetState<T>, new()
 {
     protected ReadonlySetRepository(IStore<TState> store)

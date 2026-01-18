@@ -4,7 +4,7 @@ using Not.Domain.Aggregates;
 namespace Not.Application.Krud.Abstractions;
 
 public interface IKrudRootSetter<T>
-    where T : AggregateRoot
+    where T : Aggregate
 {
     void Set(KrudNode node);
 }

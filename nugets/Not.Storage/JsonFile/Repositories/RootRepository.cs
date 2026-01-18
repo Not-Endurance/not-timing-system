@@ -14,7 +14,7 @@ namespace Not.Storage.JsonFile.Repositories;
 /// <typeparam name="T">Type of the Root entity</typeparam>
 /// <typeparam name="TState">Type of the state object containing the Root entity</typeparam>
 public abstract class RootRepository<T, TState> : ReadonlyRootRepository<T, TState>, IRepository<T>
-    where T : AggregateRoot
+    where T : Aggregate
     where TState : class, ITreeState<T>, new()
 {
     protected RootRepository(IStore<TState> store)

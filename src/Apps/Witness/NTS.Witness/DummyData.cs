@@ -34,7 +34,7 @@ public class DummyData
 
             var athlete = new Athlete(person, country, null, $"username{i + 1}");
 
-            var horse = new Horse(100 + i, $"HorseName{i + 1}", null);
+            var horse = new Horse($"HorseName{i + 1}", null);
 
             var combination = new Combination(199 + i, i + 1, athlete, horse, null, (40 + i).ToString(), null, null);
 

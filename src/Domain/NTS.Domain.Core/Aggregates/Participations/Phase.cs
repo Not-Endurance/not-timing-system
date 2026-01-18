@@ -6,7 +6,7 @@ using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public class Phase : AggregateRoot
+public class Phase : Aggregate
 {
     // TODO: settings - Add setting for separate final. This is useful for some events such as Shumen where we need separate detection for the actual final
     bool _isSeparateFinish = false;

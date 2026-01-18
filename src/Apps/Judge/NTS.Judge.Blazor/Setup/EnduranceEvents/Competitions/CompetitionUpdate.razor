@@ -1,4 +1,5 @@
 ﻿@using NTS.Domain.Setup.Aggregates
+@using NTS.Domain.Setup.Aggregates.UpcomingEvents
 @using NTS.Judge.Blazor.Setup.EnduranceEvents.Participations
 @using NTS.Judge.Blazor.Setup.EnduranceEvents.Phases
 @using NTS.Judge.Features.Setup.UpcomingEvents.Competitions
@@ -21,14 +22,13 @@
             </MudItem>
 
             <MudItem xs="6">
-                @* //TODO: behind creates multiple phases at once. *@
-                <CrudList T="Phase" Name="@Phases_string" TModel="PhaseFormModel" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" ParentId="_competition!.Id"/>
+                @* //TODO: behind creates multiple phases at once. ????? *@
+                <CrudList T="Phase" Name="@Phases_string" TModel="PhaseFormModel" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" />
             </MudItem>
 
             <MudItem xs="6">
-                @* //TODO: behind creates multiple contestants at once. *@
-                <CrudList T="Participation" Name="@Participations_string" TModel="ParticipationFormModel" TForm="ParticipationForm" 
-                    UpdateRoute="@PARTICIPATION_UPDATE" ParentId="_competition!.Id" />
+                @* //TODO: behind creates multiple contestants at once. ???? *@
+                <CrudList T="Participation" Name="@Participations_string" TModel="ParticipationFormModel" TForm="ParticipationForm" UpdateRoute="@PARTICIPATION_UPDATE" />
             </MudItem>
 
         </NGrid>

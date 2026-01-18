@@ -2,29 +2,16 @@
 using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
 
-namespace NTS.Domain.Setup.Aggregates;
+namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Loop : AggregateRoot, IAggregateRoot
+public class Loop : Entity
 {
-    public static Loop Create(double? distance)
-    {
-        return new(distance);
-    }
-
-    public static Loop Update(int? id, double? distance)
-    {
-        return new(id, distance);
-    }
-
     [JsonConstructor]
-    public Loop(int? id, double? distance)
-        : base(id!.Value)
+    public Loop(double? distance)
+        : base(distance)
     {
         Distance = PositiveDistance(distance);
     }
-
-    public Loop(double? distance)
-        : this(GenerateId(), distance) { }
 
     public double Distance { get; }
 

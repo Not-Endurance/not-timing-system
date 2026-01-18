@@ -2,26 +2,13 @@
 using Not.Domain.Aggregates;
 using static NTS.Domain.Enums.OfficialRole;
 
-namespace NTS.Domain.Setup.Aggregates;
+namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Official : AggregateRoot
+public class Official : Entity
 {
-    public static Official Create(string? names, OfficialRole? role)
-    {
-        return new(Person.Create(names), role);
-    }
-
-    public static Official Update(int? id, string? names, OfficialRole? role)
-    {
-        return new(id, Person.Create(names), role);
-    }
-
-    Official(Person? person, OfficialRole? role)
-        : this(GenerateId(), person, role) { }
-
     [JsonConstructor]
-    public Official(int? id, Person? person, OfficialRole? role)
-        : base(id!.Value)
+    public Official(Person? person, OfficialRole? role)
+        : base(person)
     {
         Role = Required(nameof(Role), role);
         Person = Required(nameof(Person), person);

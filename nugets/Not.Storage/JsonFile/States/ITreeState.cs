@@ -3,7 +3,7 @@
 namespace Not.Storage.JsonFile.States;
 
 public interface ITreeState<T> : IState
-    where T : AggregateRoot
+    where T : Aggregate
 {
     T? Root { get; set; }
 }

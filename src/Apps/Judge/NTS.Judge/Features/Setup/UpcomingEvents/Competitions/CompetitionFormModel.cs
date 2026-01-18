@@ -1,6 +1,6 @@
 ﻿using Not.Application.Services;
 using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 
@@ -17,7 +17,6 @@ public class CompetitionFormModel : IFormModel<Competition>
 #endif
     }
 
-    public int? Id { get; set; }
     public string? Name { get; set; }
     public CompetitionType Type { get; set; } = CompetitionType.Qualification;
     public CompetitionRuleset Ruleset { get; set; } = CompetitionRuleset.Regional;
@@ -37,7 +36,6 @@ public class CompetitionFormModel : IFormModel<Competition>
 
     public void FromEntity(Competition competition)
     {
-        Id = competition.Id;
         Name = competition.Name;
         Type = competition.Type;
         Date = competition.Start.ToLocalTime().DateTime.Date; // TODO: Create NComponent that's using DateTimeOffset and convert to DateTime correctly

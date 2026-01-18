@@ -1,12 +1,27 @@
 ﻿using Not.Extensions;
-using NTS.Domain.Aggregates;
+using NTS.Application.Shared;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
-using NTS.Domain.Objects;
 
-namespace NTS.Application.Models;
+namespace NTS.Application.Core;
+
+public class ClubModel
+{
+    public static ClubModel MapFrom(Club club)
+    {
+        return new ClubModel { Name = club.Name };
+    }
+
+    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
+    public string Name { get; init; } = default!;
+
+    public Club MapToDomain()
+    {
+        return new Club(Name);
+    }
+}
 
 public class CoreOfficialModel
 {
@@ -48,12 +63,12 @@ public class CoreCompetitionModel
 
 public class CoreAthleteModel
 {
-    public static CoreAthleteModel MapFrom(IAthlete athlete)
+    public static CoreAthleteModel MapFrom(Athlete athlete)
     {
         return new CoreAthleteModel
         {
             FeiId = athlete.FeiId,
-            Names = athlete.Names,
+            Names = athlete.Names.Names,
             Country = CountryModel.MapFrom(athlete.Country),
             Club = athlete.Club == null ? null : ClubModel.MapFrom(athlete.Club),
         };
@@ -74,23 +89,21 @@ public class CoreAthleteModel
 
 public class CoreHorseModel
 {
-    public static CoreHorseModel MapFrom(IHorse horse)
+    public static CoreHorseModel MapFrom(Horse horse)
     {
         return new CoreHorseModel
         {
-            Id = horse.Id,
             FeiId = horse.FeiId,
             Name = horse.Name,
         };
     }
 
-    public int Id { get; init; } = default!;
     public string? FeiId { get; init; }
     public string Name { get; init; } = default!;
 
     public Horse MaptoDomain()
     {
-        return new Horse(Id, Name, FeiId);
+        return new Horse(Name, FeiId);
     }
 }
 

@@ -2,7 +2,7 @@
 
 namespace NTS.Domain.Aggregates;
 
-public interface IClub : IIdentifiable
+public interface IClub
 {
     string Name { get; }
 }

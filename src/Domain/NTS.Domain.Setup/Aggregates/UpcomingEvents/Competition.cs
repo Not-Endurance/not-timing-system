@@ -1,42 +1,16 @@
 using Newtonsoft.Json;
 using Not.Domain.Aggregates;
-using Not.Domain.Exceptions;
 using NTS.Domain.Extensions;
 
-namespace NTS.Domain.Setup.Aggregates;
+namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
+public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase>
 {
     readonly List<Phase> _phases = [];
     readonly List<Participation> _participations = [];
 
-    public Competition(
-        string? name,
-        CompetitionType? type,
-        CompetitionRuleset ruleset,
-        DateTimeOffset start,
-        int? compulsoryThresholdMinutes,
-        string? feiId,
-        string? feiRule,
-        string? feiScheduleNumber
-    )
-        : this(
-            GenerateId(),
-            name,
-            type,
-            ruleset,
-            start,
-            ToTimeSpan(compulsoryThresholdMinutes),
-            feiRule,
-            feiId,
-            feiScheduleNumber,
-            [],
-            []
-        ) { }
-
     [JsonConstructor]
     public Competition(
-        int? id,
         string? name,
         CompetitionType? type,
         CompetitionRuleset? ruleset,
@@ -48,7 +22,7 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         IEnumerable<Phase> phases,
         IEnumerable<Participation> participations
     )
-        : base(id!.Value)
+        : base(name, type, ruleset)
     {
         _phases = phases.ToList();
         _participations = participations.ToList();
@@ -62,8 +36,8 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
         FeiScheduleNumber = feiScheduleNumber;
     }
 
-    IReadOnlyList<Participation> IParent<Participation>.Children => Participations;
-    IReadOnlyList<Phase> IParent<Phase>.Children => Phases;
+    IReadOnlyList<Participation> IKrudParent<Participation>.Children => Participations;
+    IReadOnlyList<Phase> IKrudParent<Phase>.Children => Phases;
 
     public string Name { get; }
     public CompetitionType Type { get; }
@@ -112,10 +86,5 @@ public class Competition : AggregateRoot, IParent<Participation>, IParent<Phase>
     public void Update(Phase child)
     {
         _phases.Update(child);
-    }
-
-    static TimeSpan? ToTimeSpan(int? minutes)
-    {
-        return minutes != null ? TimeSpan.FromMinutes(minutes.Value) : null;
     }
 }

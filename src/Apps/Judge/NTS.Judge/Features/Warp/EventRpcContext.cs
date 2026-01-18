@@ -74,7 +74,7 @@ public interface ISelectedEventContext : ISingleton
 }
 
 public interface IRpcContext<T> : ISingleton
-    where T : AggregateRoot
+    where T : Aggregate
 {
     T? Root { get; }
     Task Set(T root);

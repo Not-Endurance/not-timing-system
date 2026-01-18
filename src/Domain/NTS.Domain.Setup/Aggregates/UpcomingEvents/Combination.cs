@@ -1,36 +1,22 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Aggregates;
 
-namespace NTS.Domain.Setup.Aggregates;
+namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Combination : AggregateRoot, IReflect<Athlete>, IReflect<Horse>
+public class Combination : Entity, IEntityMirror<Athlete>, IEntityMirror<Horse>
 {
-    public static Combination Create(int? number, Athlete? athlete, Horse? horse, Tag? _)
-    {
-        return new(number, athlete, horse);
-    }
-
-    public static Combination Update(int? id, int? number, Athlete? athlete, Horse? horse, Tag? _)
-    {
-        return new(id, number, athlete, horse);
-    }
-
     [JsonConstructor]
-    public Combination(int? id, int? number, Athlete? athlete, Horse? horse)
-        : base(id!.Value)
+    public Combination(int? number, Athlete? athlete, Horse? horse)
+        : base(number)
     {
         Number = Required(nameof(Number), number);
         Athlete = Required(nameof(Athlete), athlete);
         Horse = Required(nameof(Horse), horse);
     }
 
-    public Combination(int? number, Athlete? athlete, Horse? horse)
-        : this(GenerateId(), number, athlete, horse) { }
-
     public int Number { get; }
     public Athlete Athlete { get; private set; }
     public Horse Horse { get; private set; }
-    public Tag? Tag { get; }
 
     public override string ToString()
     {

@@ -3,7 +3,7 @@ using Not.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Handout : AggregateRoot, IAggregateRoot
+public class Handout : Aggregate, IAggregate
 {
     [JsonConstructor]
     Handout(int id, Participation participation)

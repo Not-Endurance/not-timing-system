@@ -226,7 +226,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         return attempts >= AUTOMATIC_RECONNECT_ATTEMPTS;
     }
 
-    void RaiseDisconnected(Exception? exception = default)
+    void RaiseDisconnected(Exception? _ = default)
     {
         ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Disconnected);
     }

@@ -13,7 +13,7 @@ public class KrudBuilder
     }
 
     public KrudBuilder RegisterAggregate<T>()
-        where T : AggregateRoot
+        where T : Aggregate
     {
         _services.AddKrudRoot<T>();
         return this;

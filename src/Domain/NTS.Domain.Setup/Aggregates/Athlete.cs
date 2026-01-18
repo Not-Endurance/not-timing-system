@@ -3,7 +3,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Athlete : AggregateRoot, IAthlete, IReflect<Club>
+public class Athlete : Aggregate, IAthlete, IEntityMirror<Club>
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]

@@ -2,7 +2,7 @@
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class RankingEntry : AggregateRoot
+public class RankingEntry : Aggregate
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]

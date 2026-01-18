@@ -9,7 +9,7 @@ using Not.Observables;
 namespace Not.Application.Krud.Services;
 
 public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
-    where T : AggregateRoot
+    where T : Aggregate
 {
     readonly IRepository<T> _repository;
     readonly SemaphoreSlim _commitGate = new(1, 1);

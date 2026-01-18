@@ -6,10 +6,10 @@ using Not.Serialization.JSON;
 namespace NTS.Storage.JSON.Converters;
 
 public class EntityReferenceConverter<T> : JsonConverterBase
-    where T : AggregateRoot
+    where T : Aggregate
 {
     const string DOMAIN_REF_PROPERTY = "$domainRef";
-    static readonly string DOMAIN_ID_PROPERTY = nameof(AggregateRoot.Id);
+    static readonly string DOMAIN_ID_PROPERTY = nameof(Aggregate.Id);
 
     readonly object _lock = new();
     readonly Type _type = typeof(T);

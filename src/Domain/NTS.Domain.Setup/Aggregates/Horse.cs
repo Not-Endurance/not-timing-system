@@ -3,7 +3,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Horse : AggregateRoot, IHorse, IAggregateRoot
+public class Horse : Aggregate, IHorse
 {
     public static Horse Create(string? name, string? feiId)
     {

@@ -43,7 +43,7 @@ public class NStorageBuilder
         where TStore : LockingJsonFileStore<T>, TInterface
         where T : class, IState, new()
     {
-        var factory = FileContextHelper.CreateFileContextFactory(null, "stores");
+        var factory = FileContextHelper.CreateFileContextFactory("stores");
         _services.AddKeyedSingleton<IFileContext, FileContext>(StoreConstants.DATA_KEY, factory);
         _services.AddSingleton<TInterface, TStore>();
         _services.AddSingleton(x => (IStore<T>)x.GetRequiredService<TInterface>());

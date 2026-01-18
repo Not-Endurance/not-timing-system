@@ -2,10 +2,23 @@
 
 namespace Not.Domain.Aggregates;
 
-public abstract class Aggregate : InLineAggregateValidator, IAggregate
+public abstract class Aggregate : Entity, IAggregate
 {
-    protected string Combine(params object?[] values)
+    protected Aggregate(int id) : base(id) 
     {
-        return DomainModelHelper.Combine(values);
+        Id = id;
+    }
+
+    // TODO: use DomainObject for ID, do private set
+    public int Id { get; }
+
+    protected static int GenerateId()
+    {
+        return DomainModelHelper.GenerateId();
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

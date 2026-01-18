@@ -2,8 +2,8 @@
 
 namespace Not.Domain;
 
-public interface IParent<T>
-    where T : Aggregate
+public interface IKrudParent<T>
+    where T : Entity
 {
     void Add(T child);
     void Remove(T child);

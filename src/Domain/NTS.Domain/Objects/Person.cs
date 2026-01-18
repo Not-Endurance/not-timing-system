@@ -13,10 +13,10 @@ public class Person
         return new Person(names.Split(DELIMITER, StringSplitOptions.RemoveEmptyEntries));
     }
 
-    public static implicit operator string[](Person member)
-    {
-        return member.Names;
-    }
+    //public static implicit operator string[](Person member)
+    //{
+    //    return member.Names;
+    //}
 
     public static implicit operator Person(string[] names)
     {
@@ -31,7 +31,7 @@ public class Person
     internal static string DELIMITER = " ";
 
     [JsonConstructor]
-    public Person(string[] names)
+    public Person(string[] names) // TODO: refactor Person
     {
         Names = names;
     }

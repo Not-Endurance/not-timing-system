@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Storage.Mongo;
-using NTS.Application.Models;
+using NTS.Application.Core;
 
 namespace NTS.Storage.Mongo.Repositories;
 
@@ -22,15 +22,16 @@ public class ArchiveRepository : MongoRepository<ArchiveModel>, IArchiveMongoRep
             .Set(x => x.Location, document.Location);
     }
 
-    public async Task<IEnumerable<ArchiveModel>> GetPerformances(int horseId)
+    public Task<IEnumerable<ArchiveModel>> GetPerformances(int horseId) // TODO: fix
     {
-        return await GetCollection()
-            .Aggregate()
-            .Match(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)))
-            //.Project(x =>
-            //    x.Ranklists.SelectMany(y => y.Entries).First(z => z.Participation.Combination.Horse.Id == horseId)
-            //)
-            .ToListAsync();
+        throw new NotImplementedException();
+        //return await GetCollection()
+        //    .Aggregate()
+        //    .Match(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)))
+        //    //.Project(x =>
+        //    //    x.Ranklists.SelectMany(y => y.Entries).First(z => z.Participation.Combination.Horse.Id == horseId)
+        //    //)
+        //    .ToListAsync();
     }
 }
 

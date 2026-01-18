@@ -4,7 +4,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Club : AggregateRoot, IClub, IAggregateRoot
+public class Club : Aggregate, IClub
 {
     public static Club Create(string? name)
     {

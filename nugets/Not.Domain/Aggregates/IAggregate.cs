@@ -1,3 +1,5 @@
-﻿namespace Not.Domain.Aggregates;
+﻿using Not.Structures;
 
-public interface IAggregate { }
+namespace Not.Domain.Aggregates;
+
+public interface IAggregate : IEntity, IIdentifiable { }

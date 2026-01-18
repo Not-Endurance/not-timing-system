@@ -3,23 +3,19 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public class Club : Aggregate, IClub
+public class Club : Entity, IClub
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Club(int id, string name)
+    public Club(string name) : base(name)
     {
-        Id = id;
         Name = name;
     }
 
-    public Club(IClub club)
+    public Club(IClub club) : this(club.Name)
     {
-        Id = club.Id;
-        Name = club.Name;
     }
 
-    public int Id { get; private set; }
     public string Name { get; private set; }
 
     public override string ToString()

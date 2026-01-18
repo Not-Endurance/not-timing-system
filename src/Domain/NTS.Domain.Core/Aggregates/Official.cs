@@ -3,7 +3,7 @@ using Not.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Official : AggregateRoot, IAggregateRoot
+public class Official : Aggregate, IAggregate
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]

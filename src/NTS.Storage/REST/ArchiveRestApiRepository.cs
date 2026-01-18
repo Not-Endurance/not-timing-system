@@ -1,7 +1,7 @@
 ﻿using Not.Application.HTTP;
 using Not.Serialization.JSON;
 using Not.Storage.REST;
-using NTS.Application.Models;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.REST;

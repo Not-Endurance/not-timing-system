@@ -6,7 +6,7 @@ using static Not.Localization.NStrings;
 
 namespace Not.Domain.Aggregates;
 
-public abstract class InLineAggregateValidator
+public abstract class InLineEntityValidator
 {
     protected static T NotDefault<T>(string field, T value)
         where T : struct

@@ -1,7 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Combinations;
 
@@ -12,11 +12,11 @@ public class CombinationBehind : KrudServiceBase<Combination, CombinationFormMod
 
     protected override Combination CreateEntity(CombinationFormModel model)
     {
-        return Combination.Create(model.Number, model.Athlete, model.Horse, model.Tag);
+        return new(model.Number, model.Athlete, model.Horse);
     }
 
     protected override Combination UpdateEntity(CombinationFormModel model)
     {
-        return Combination.Update(model.Id, model.Number, model.Athlete, model.Horse, model.Tag);
+        return new(model.Number, model.Athlete, model.Horse);
     }
 }

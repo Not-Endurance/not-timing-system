@@ -1,4 +1,4 @@
-﻿using NTS.Application.Models;
+﻿using NTS.Application.Core;
 using NTS.Warp.ACL.Entities.Horses;
 using NTS.Warp.ACL.Models;
 

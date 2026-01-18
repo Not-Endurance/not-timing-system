@@ -1,12 +1,7 @@
-﻿using Not.Exceptions;
-using Not.Extensions;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Domain.Settings;
 
-namespace NTS.Application.Models;
+namespace NTS.Application.Shared;
 
 public class SettingModel : IDocument
 {
@@ -57,22 +52,5 @@ public class CountryModel : IDocument
     public Country MapToDomain()
     {
         return new Country(Id, Name, IsoCode, NfCode, Locale);
-    }
-}
-
-public class ClubModel : IDocument
-{
-    public static ClubModel MapFrom(IClub club)
-    {
-        return new ClubModel { Id = club.Id, Name = club.Name };
-    }
-
-    public int Id { get; init; } = default!;
-    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
-    public string Name { get; init; } = default!;
-
-    public Club MapToDomain()
-    {
-        return new Club(Id, Name);
     }
 }

@@ -2,22 +2,21 @@
 
 namespace Not.Filesystem;
 
-public class FileContext : INConfig, IFileContext // TODO: move to Filesystem
+public class FileContext : IFileContext // TODO: move to Filesystem
 {
-    public string Path { get; set; } = default!;
-    public string? Name { get; set; }
+    readonly Func<string> _getPath;
 
-    void INConfig.Validate()
+    public FileContext(Func<string> getPath)
     {
-        if (string.IsNullOrWhiteSpace(Path))
-        {
-            throw new ArgumentException($"'{nameof(IFileContext)}.{nameof(Path)}' cannot be null or whitespace");
-        }
+        _getPath = getPath;
     }
+
+    public string Path => _getPath();
+    public string? Name { get; set; }
 }
 
-public interface IFileContext : INConfig
+public interface IFileContext
 {
-    string Path { get; set; }
+    string Path { get; }
     string? Name { get; set; }
 }

@@ -3,7 +3,7 @@ using NTS.Domain.Core.Objects;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class ArchiveEntry : AggregateRoot
+public class ArchiveEntry : Aggregate
 {
     public ArchiveEntry(EnduranceEvent enduranceEvent, IEnumerable<Official> officials, IEnumerable<Ranklist> ranklists)
         : base(GenerateId())

@@ -4,7 +4,7 @@ using NTS.Domain.Settings;
 
 namespace NTS.Domain.Aggregates;
 
-public class Setting : AggregateRoot
+public class Setting : Aggregate
 {
     public Setting(Guid accountId, Country? country, DetectionMode? detectionMode)
         : this(GenerateId(), accountId, country, detectionMode) { }

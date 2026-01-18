@@ -1,8 +1,8 @@
-﻿using Not.Domain.Aggregates;
+﻿using NTS.Domain.Aggregates;
 
-namespace NTS.Domain.Aggregates;
+namespace NTS.Domain.Objects;
 
-public class PopulatedPlace : Aggregate
+public record PopulatedPlace
 {
     public PopulatedPlace(Country country, string city, string? location)
     {

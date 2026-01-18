@@ -5,7 +5,7 @@ using NTS.Domain.Core.Objects;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class EnduranceEvent : AggregateRoot
+public class EnduranceEvent : Aggregate
 {
     [JsonConstructor]
     EnduranceEvent(

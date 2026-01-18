@@ -1,8 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Behinds;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 
@@ -13,11 +12,11 @@ public class LoopBehind : KrudServiceBase<Loop, LoopFormModel>
 
     protected override Loop CreateEntity(LoopFormModel model)
     {
-        return Loop.Create(model.Distance);
+        return new(model.Distance);
     }
 
     protected override Loop UpdateEntity(LoopFormModel model)
     {
-        return Loop.Update(model.Id, model.Distance);
+        return new(model.Distance);
     }
 }

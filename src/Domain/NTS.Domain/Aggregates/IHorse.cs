@@ -1,8 +1,6 @@
-﻿using Not.Structures;
+﻿namespace NTS.Domain.Aggregates;
 
-namespace NTS.Domain.Aggregates;
-
-public interface IHorse : IIdentifiable
+public interface IHorse
 {
     string Name { get; }
     string? FeiId { get; }

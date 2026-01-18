@@ -1,6 +1,6 @@
 ﻿using Not.Application.Services;
 using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Officials;
 
@@ -14,13 +14,11 @@ public class OfficialFormModel : IFormModel<Official>
 #endif
     }
 
-    public int? Id { get; set; }
     public string? Name { get; set; }
     public OfficialRole Role { get; set; } = OfficialRole.Steward;
 
     public void FromEntity(Official official)
     {
-        Id = official.Id;
         Name = official.Person;
         Role = official.Role;
     }

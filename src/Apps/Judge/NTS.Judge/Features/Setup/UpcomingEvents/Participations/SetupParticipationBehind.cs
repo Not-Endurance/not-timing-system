@@ -3,7 +3,7 @@ using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using Not.Domain.Exceptions;
 using Not.Extensions;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
 
@@ -20,7 +20,6 @@ public class SetupParticipationBehind : KrudServiceBase<Participation, Participa
         ValidateEntity(model);
         var newStart = OverrideStartTime(model);
         return new(
-            model.Id,
             model.IsNotRanked,
             model.Combination,
             model.Category,

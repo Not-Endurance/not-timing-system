@@ -1,9 +1,9 @@
 ﻿using Not.Domain.Aggregates;
 using NTS.Domain.Helpers;
 
-namespace NTS.Domain.Setup.Aggregates;
+namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Participation : AggregateRoot, IReflect<Combination>
+public class Participation : Entity, IEntityMirror<Combination>
 {
     const double CHILDREN_MIN_SPEED = 8;
     const double CHILDREN_MAX_SPEED = 12;
@@ -11,7 +11,6 @@ public class Participation : AggregateRoot, IReflect<Combination>
     const double MAX_SPEED = 16;
 
     public Participation(
-        int? id,
         bool isNotRanked,
         Combination? combination,
         ParticipationCategory? category,
@@ -21,7 +20,7 @@ public class Participation : AggregateRoot, IReflect<Combination>
         double? minAverageSpeed = null,
         double? maxAverageSpeed = null
     )
-        : base(id!.Value)
+        : base(combination)
     {
         StartTimeOverride = startTimeOverride;
         IsNotRanked = isNotRanked;

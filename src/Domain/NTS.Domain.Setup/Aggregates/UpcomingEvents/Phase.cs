@@ -1,34 +1,24 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
+using Not.Structures;
 
-namespace NTS.Domain.Setup.Aggregates;
+namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Phase : AggregateRoot, IAggregateRoot, IReflect<Loop>
+public class Phase : Entity, IEntityMirror<Loop>, IIdentifiable
 {
-    public static Phase Create(Loop? loop, int? recovery, int? rest)
-    {
-        return new(loop, recovery, rest);
-    }
-
-    public static Phase Update(int? id, Loop? loop, int? recovery, int? rest)
-    {
-        return new(id, loop, recovery, rest);
-    }
-
     [JsonConstructor]
     public Phase(int? id, Loop? loop, int? recovery, int? rest)
-        : base(id!.Value)
+        : base(id)
     {
+        Id = Required(nameof(id), id);
         Loop = Required(nameof(Loop), loop);
-        Recovery = Required(nameof(Recovery), recovery);
-        Rest = rest;
+        Recovery = PositiveRecovery(recovery);
+        Rest = NullOrPositiveRest(rest);
     }
 
-    public Phase(Loop? loop, int? recovery, int? rest)
-        : this(GenerateId(), Required(nameof(Loop), loop), PositiveRecovery(recovery), NullOrPositiveRest(rest)) { }
-
-    public Loop? Loop { get; private set; } // TODO: shouldnt be nullable probably
+    public int Id { get; }
+    public Loop Loop { get; private set; }
     public int Recovery { get; }
     public int? Rest { get; }
 

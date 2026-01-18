@@ -1,5 +1,5 @@
 ﻿using Not.Application.Behinds.Adapters;
-using NTS.Application.Models;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Nexus;

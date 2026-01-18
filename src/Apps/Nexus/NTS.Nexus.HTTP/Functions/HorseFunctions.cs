@@ -4,28 +4,24 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Serialization.JSON;
-using NTS.Application.Models;
+using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Mongo.Repositories;
 
 namespace NTS.Nexus.HTTP.Functions;
 
 public class HorseFunctions : FunctionBase<HorseFunctions>
 {
     readonly IRepository<SetupHorseModel> _horses;
-    readonly IArchiveMongoRepository _archive;
 
     public HorseFunctions(
         IFunctionLogger<HorseFunctions> logger,
-        IRepository<SetupHorseModel> horses,
-        IArchiveMongoRepository archive
+        IRepository<SetupHorseModel> horses
     )
         : base(logger)
     {
         _horses = horses;
-        _archive = archive;
     }
 
     [Function("horses-insert")]
@@ -59,32 +55,33 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     }
 
     [Function("horses-safe-delete")]
-    public async Task<IActionResult> SafeDelete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")] HttpRequest request,
-        int id
+    public Task<IActionResult> SafeDelete( // TODO: fix
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")] HttpRequest _,
+        int __
     )
     {
-        LogInformation(request);
+        return Task.FromResult(new OkObjectResult("ok") as IActionResult);
+        //LogInformation(request);
 
-        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+        //var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
 
-        var recordsWithHorse = await _archive
-            .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
-            .ToList();
-        if (recordsWithHorse.Any())
-        {
-            return new OkObjectResult(
-                $"The horse you want to delete has participated in '{recordsWithHorse.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
-            );
-        }
-        var horse = await _horses.Read(id);
-        if (horse == null)
-        {
-            return new OkObjectResult($"Club wiht id '{id}' did not exist");
-        }
-        await _horses.Delete(horse);
+        //var recordsWithHorse = await _archive
+        //    .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id))) 
+        //    .ToList();
+        //if (recordsWithHorse.Any())
+        //{
+        //    return new OkObjectResult(
+        //        $"The horse you want to delete has participated in '{recordsWithHorse.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
+        //    );
+        //}
+        //var horse = await _horses.Read(id);
+        //if (horse == null)
+        //{
+        //    return new OkObjectResult($"Club wiht id '{id}' did not exist");
+        //}
+        //await _horses.Delete(horse);
 
-        return new OkObjectResult($"Deleted horse with id '{id}'");
+        //return new OkObjectResult($"Deleted horse with id '{id}'");
     }
 
     [Function("horses-delete")]

@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
 using Not.Storage.Mongo;
-using NTS.Application.Models;
+using NTS.Application.Shared;
 
 namespace NTS.Storage.Mongo.Repositories;
 

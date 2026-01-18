@@ -22,6 +22,14 @@ public partial class App : MauiWinUIApplication
 
     protected override MauiApp CreateMauiApp()
     {
-        return MauiProgram.CreateMauiApp();
+        try
+        {
+            return MauiProgram.CreateMauiApp();
+        }
+        catch (Exception ex)
+        {
+            Console.Write(ex.Message);
+            throw;
+        }
     }
 }

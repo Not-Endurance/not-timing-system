@@ -12,7 +12,11 @@ internal static class NtsNexusApiServices
     public static IServiceCollection ConfigureNexusApi(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING");
-        services.ConfigureNtsStorage(configuration).AddMongoStorage(connectionString);
+        
+        services
+            .ConfigureNtsStorage(configuration)
+            .AddMongoStorage(connectionString);
+
         return services
             .AddNConventionalServices(Assembly.GetExecutingAssembly())
             .AddApplicationInsightsTelemetryWorkerService()

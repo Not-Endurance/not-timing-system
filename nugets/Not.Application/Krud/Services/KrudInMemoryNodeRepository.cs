@@ -6,7 +6,7 @@ using Not.Domain.Aggregates;
 namespace Not.Application.Krud.Services;
 
 public class KrudInMemoryNodeRepository<T> : IRepository<T>
-    where T : AggregateRoot
+    where T : Entity
 {
     readonly IKrudParentNodeOf<T> _parentNode;
 
@@ -30,8 +30,7 @@ public class KrudInMemoryNodeRepository<T> : IRepository<T>
 
     public Task<T?> Read(int id)
     {
-        var result = _parentNode.Children.FirstOrDefault(x => x.Id == id);
-        return Task.FromResult(result);
+        throw new NotImplementedException("Krud shouldn't need Read by ID");
     }
 
     public Task<IEnumerable<T>> ReadMany()
@@ -55,12 +54,7 @@ public class KrudInMemoryNodeRepository<T> : IRepository<T>
 
     public Task Delete(int id)
     {
-        var child = _parentNode.Children.FirstOrDefault(x => x.Id == id);
-        if (child != null)
-        {
-            _parentNode.Remove(child);
-        }
-        return Task.CompletedTask;
+        throw new NotImplementedException("Krud shouldn't need Delete by ID");
     }
 
     public Task Delete(T child)
@@ -82,7 +76,6 @@ public class KrudInMemoryNodeRepository<T> : IRepository<T>
 
     public Task Delete(IEnumerable<T> items)
     {
-        var ids = items.Select(x => x.Id).ToList();
-        return Delete(x => ids.Contains(x.Id));
+        return Delete(x => items.Any(y => x == y));
     }
 }

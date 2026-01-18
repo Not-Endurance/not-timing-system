@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿#pragma warning disable CA1416 // We use only Windows
+
+using System.Diagnostics;
 using Not.Application.Configurations;
 using Not.Application.Environments;
 using Not.Logging.Builder;
@@ -48,3 +50,5 @@ public static class JudgeVariables
 {
     public const string NO_WARP = nameof(NO_WARP);
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

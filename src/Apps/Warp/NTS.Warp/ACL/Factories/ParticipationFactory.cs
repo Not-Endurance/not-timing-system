@@ -1,4 +1,4 @@
-﻿using NTS.Application.Models;
+﻿using NTS.Application.Core;
 using NTS.Warp.ACL.Entities.LapRecords;
 using NTS.Warp.ACL.Entities.Participants;
 using NTS.Warp.ACL.Entities.Participations;

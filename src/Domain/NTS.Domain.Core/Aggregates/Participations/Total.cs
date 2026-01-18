@@ -2,9 +2,9 @@
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public class Total : Aggregate
+public class Total : Entity
 {
-    public Total(IEnumerable<Phase> phases)
+    public Total(IEnumerable<Phase> phases) : base(phases)
     {
         if (phases.All(x => !x.IsComplete()))
         {

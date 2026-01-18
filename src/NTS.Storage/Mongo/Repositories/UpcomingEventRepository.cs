@@ -1,7 +1,7 @@
 using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Storage.Mongo;
-using NTS.Application.Models;
+using NTS.Application.Setup;
 
 namespace NTS.Storage.Mongo.Repositories;
 

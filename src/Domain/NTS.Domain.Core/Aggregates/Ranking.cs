@@ -4,7 +4,7 @@ using NTS.Domain.Core.Aggregates.Participations;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Ranking : AggregateRoot
+public class Ranking : Aggregate
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]

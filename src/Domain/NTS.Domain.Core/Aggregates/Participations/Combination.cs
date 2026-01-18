@@ -6,7 +6,7 @@ using NTS.Domain.Helpers;
 namespace NTS.Domain.Core.Aggregates.Participations;
 
 // TODO: probably shoudl be a record
-public class Combination : AggregateRoot
+public class Combination : Aggregate
 {
     decimal _distance;
 
