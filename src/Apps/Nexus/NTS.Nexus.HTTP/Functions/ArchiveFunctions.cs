@@ -6,7 +6,7 @@ using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Mongo.Repositories;
+using NTS.Nexus.HTTP.Mongo.Repositories;
 
 namespace NTS.Nexus.HTTP.Functions;
 

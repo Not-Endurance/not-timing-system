@@ -1,5 +1,6 @@
 ﻿using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
+using Not.Injection;
 using Not.Tests.RPC;
 using NTS.Warp.ACL.Entities;
 using NTS.Warp.ACL.Enums;
@@ -12,7 +13,8 @@ public class WitnessTestClient
     : RpcClient,
         IEmsParticipantsClientProcedures,
         IEmsStartlistClientProcedures,
-        ITestRpcClient
+        ITestRpcClient,
+        ISingleton
 {
     public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
         : base(socket)

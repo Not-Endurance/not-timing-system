@@ -188,12 +188,4 @@ public static class ServiceCollectionExtensions
             .Add<TInterface5, TImplementation>(lifetime)
             .Add<TInterface6, TImplementation>(lifetime);
     }
-
-    static void PreventDuplicateRegistration(IServiceCollection services, Type @interface)
-    {
-        if (services.Any(x => x.ServiceType == @interface))
-        {
-            throw new ApplicationException($"Duplicate registration for service '{@interface.FullName}'");
-        }
-    }
 }

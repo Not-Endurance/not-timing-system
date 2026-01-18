@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Storage.Mongo;
 using NTS.Application.Core;
 
-namespace NTS.Storage.Mongo.Repositories;
+namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
 public class ArchiveRepository : MongoRepository<ArchiveModel>, IArchiveMongoRepository
 {

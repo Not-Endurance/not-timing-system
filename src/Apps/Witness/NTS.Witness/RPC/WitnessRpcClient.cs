@@ -2,6 +2,7 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Collections;
+using Not.Injection;
 using NTS.Application.Startlists;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Startlists;
@@ -10,7 +11,7 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient : RpcClient, IWitnessParticipantsClientProcedures, IWitnessStartlistClientProcedures
+public class WitnessRpcClient : RpcClient, IWitnessParticipantsClientProcedures, IWitnessStartlistClientProcedures, ISingleton
 {
     readonly IRpcSocket _socket;
     readonly IStartlistContext _startlistContex;

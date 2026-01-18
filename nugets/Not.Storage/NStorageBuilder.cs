@@ -28,13 +28,18 @@ public class NStorageBuilder
         _nApplicationBuilder = new(services, configuration);
     }
 
-    public NStorageBuilder AddMongoStorage(string connectionString)
+    public NStorageBuilder AddMongoStorage(string connectionString, Assembly assembly)
     {
-        var pack = new ConventionPack { new EnumRepresentationConvention(BsonType.String) };
-        ConventionRegistry.Register("EnumStringConvention", pack, t => true);
+        var pack = new ConventionPack 
+        { 
+            new IgnoreExtraElementsConvention(true), // TODO: Remove after existing data set is normalized
+            new EnumRepresentationConvention(BsonType.String) 
+        };
+        ConventionRegistry.Register("DefaultConventions", pack, t => true);
         BsonSerializer.RegisterSerializer(typeof(DateTimeOffset), new DateTimeOffsetSerializer(BsonType.DateTime));
 
         _services.AddSingleton<IMongoContext, MongoContext>(x => new MongoContext(connectionString));
+        _services.AddAsInterfaces(typeof(MongoRepository<>), ServiceLifetime.Transient, assembly);
         return this;
     }
 

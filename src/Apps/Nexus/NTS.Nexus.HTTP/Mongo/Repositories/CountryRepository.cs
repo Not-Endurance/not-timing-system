@@ -2,7 +2,7 @@
 using Not.Storage.Mongo;
 using NTS.Application.Shared;
 
-namespace NTS.Storage.Mongo.Repositories;
+namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
 public class CountryRepository : MongoRepository<CountryModel>
 {

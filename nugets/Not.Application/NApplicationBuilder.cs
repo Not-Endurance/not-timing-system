@@ -2,7 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Configurations;
 using Not.Application.HTTP;
-using Not.Application.Krud.ServiceRegistration;
+using Not.Application.RPC;
+using Not.Application.RPC.SignalR;
 
 namespace Not.Application;
 
@@ -22,6 +23,16 @@ public class NApplicationBuilder
         _services.AddHttpClient();
         _services.AddTransient<NHttpClient>();
         _services.AddSettings<NHttpSettings>(_configuration, x => !string.IsNullOrWhiteSpace(x.Host));
+        return this;
+    }
+
+    public NApplicationBuilder AddSignalR()
+    {
+        _services.AddSingleton<IRpcSocket, SignalRSocket>();
+        _services.AddSettings<RpcSettings>(
+            _configuration,
+            x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern)
+        );
         return this;
     }
 }

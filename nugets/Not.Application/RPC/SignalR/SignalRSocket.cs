@@ -269,7 +269,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     }
 }
 
-public interface IRpcSocket : ISingleton
+public interface IRpcSocket
 {
     /// <summary>
     /// 'true' means connected; 'false' - disconnected;

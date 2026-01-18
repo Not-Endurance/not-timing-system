@@ -2,7 +2,7 @@
 using Not.Storage.Mongo;
 using NTS.Application.Setup;
 
-namespace NTS.Storage.Mongo.Repositories;
+namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
 public class AthleteRepository : MongoRepository<SetupAthleteModel>
 {

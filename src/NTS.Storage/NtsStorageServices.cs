@@ -42,16 +42,6 @@ public static class NtsStorageServices
             return this;
         }
 
-        public Builder AddMongoStorage(string? connectionString)
-        {
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                throw new ApplicationException("MongoDB connection string is null");
-            }
-            _nStorageBuilder.AddMongoStorage(connectionString);
-            return this;
-        }
-
         public Builder AddRestApiStorage()
         {
             _nStorageBuilder.AddRestApiStorage(Assembly.GetExecutingAssembly());

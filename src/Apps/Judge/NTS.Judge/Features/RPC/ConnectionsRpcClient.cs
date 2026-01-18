@@ -1,11 +1,12 @@
 ﻿using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
+using Not.Injection;
 using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.Features.RPC;
 
-public class ConnectionsRpcClient : RpcClient, IConnectionsClientProcedures
+public class ConnectionsRpcClient : RpcClient, IConnectionsClientProcedures, ISingleton
 {
     readonly IConnectionsRegistry _connectionsRegistry;
 
