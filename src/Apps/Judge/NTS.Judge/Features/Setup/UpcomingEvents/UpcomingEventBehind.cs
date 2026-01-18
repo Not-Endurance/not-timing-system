@@ -2,9 +2,8 @@
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using Not.Notify;
+using NTS.Application.Warp;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Behinds;
-using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 

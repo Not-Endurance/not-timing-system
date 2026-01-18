@@ -1,9 +1,8 @@
-using Not.Application.Krud.Abstractions;
+using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
-using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
-using Not.Injection;
 using Not.Startup;
+using NTS.Application.Warp;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Warp;
@@ -66,16 +65,4 @@ public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, 
         await _connectedEventContext.Set(upcomingEvent);
         _warpContext.Configure(Event = upcomingEvent);
     }
-}
-
-public interface ISelectedEventContext : ISingleton
-{
-    public UpcomingEvent? Event { get; }
-}
-
-public interface IRpcContext<T> : ISingleton
-    where T : AggregateRoot
-{
-    T? Root { get; }
-    Task Set(T root);
 }
