@@ -36,24 +36,6 @@ public class CompetitionBehind : KrudServiceBase<Competition, CompetitionFormMod
             model.FeiId,
             model.FeiRule,
             model.FeiScheduleNumber,
-            [],
-            []
-        );
-    }
-
-    protected override Competition UpdateEntity(CompetitionFormModel model)
-    {
-        var startTime = ConvertStartTime(model.Date, model.Time);
-        var compulsoryThreshold = ConvertMinutes(model.CompulsoryThresholdMinutes);
-        return new Competition(
-            model.Name,
-            model.Type,
-            model.Ruleset,
-            startTime,
-            compulsoryThreshold,
-            model.FeiId,
-            model.FeiRule,
-            model.FeiScheduleNumber,
             _phaseParent.Children,
             _participationParent.Children
         );

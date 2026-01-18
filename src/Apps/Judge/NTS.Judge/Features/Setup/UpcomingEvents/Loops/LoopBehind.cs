@@ -14,9 +14,4 @@ public class LoopBehind : KrudServiceBase<Loop, LoopFormModel>
     {
         return new(model.Distance);
     }
-
-    protected override Loop UpdateEntity(LoopFormModel model)
-    {
-        return new(model.Distance);
-    }
 }

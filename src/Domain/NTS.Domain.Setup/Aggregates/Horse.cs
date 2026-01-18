@@ -5,17 +5,7 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class Horse : Aggregate, IHorse
 {
-    public static Horse Create(string? name, string? feiId)
-    {
-        return new(name, feiId);
-    }
-
-    public static Horse Update(int? id, string? name, string? feiId)
-    {
-        return new(id, name, feiId);
-    }
-
-    Horse(string? name, string? feiId)
+    public Horse(string? name, string? feiId)
         : this(GenerateId(), name, feiId) { }
 
     [Newtonsoft.Json.JsonConstructor]

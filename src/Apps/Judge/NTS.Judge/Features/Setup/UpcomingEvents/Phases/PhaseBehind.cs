@@ -15,9 +15,4 @@ public class PhaseBehind : KrudServiceBase<Phase, PhaseFormModel>
     {
         return new Phase(DomainModelHelper.GenerateId(), model.Loop, model.Recovery, model.Rest);
     }
-
-    protected override Phase UpdateEntity(PhaseFormModel model)
-    {
-        return new Phase(model.Id, model.Loop, model.Recovery, model.Rest);
-    }
 }

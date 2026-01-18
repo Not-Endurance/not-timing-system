@@ -18,12 +18,6 @@ public class OfficialBehind : KrudServiceBase<Official, OfficialFormModel>
         return new Official(names, model.Role);
     }
 
-    protected override Official UpdateEntity(OfficialFormModel model)
-    {
-        var names = ConvertName(model.Name);
-        return new Official(names, model.Role);
-    }
-
     Person? ConvertName(string? combined)
     {
         return combined == null ? null : new Person(combined.Split(" ", StringSplitOptions.RemoveEmptyEntries));
