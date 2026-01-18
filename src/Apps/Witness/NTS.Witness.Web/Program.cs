@@ -1,5 +1,9 @@
 ﻿using Not.Application.Configurations;
+using Not.Application.CRUD.Ports;
 using Not.Startup;
+using NTS.Domain.Setup.Aggregates;
+using NTS.Witness.Storage;
+using NTS.Witness.Storage.Repositories;
 using NTS.Witness.Web.Endpoints;
 using Serilog;
 
@@ -13,8 +17,13 @@ public class Program
 
         builder.Configuration.AddNAppsettings(typeof(Program).Assembly);
         builder.Services.ConfigureNtsWitnessWeb(builder.Configuration);
+        builder.Services.ConfigureWitnessStorage(
+            builder.Configuration,
+            debugRootDirectoryName: "nts-witness"
+        ).AddRestApiStorage();
+        builder.Services.AddSingleton<IRepository<UpcomingEvent>, UpcomingEventRepository>();
         builder.Logging.AddSerilog();
-
+        
         var app = builder.Build();
 
         //Configure the HTTP request pipeline.
