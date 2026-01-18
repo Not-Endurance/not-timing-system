@@ -1,7 +1,7 @@
 ﻿using Not.Injection;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Application.Warp;
+namespace NTS.Judge.Features.Warp;
 
 public interface IConnectedEventContext : ISingleton
 {

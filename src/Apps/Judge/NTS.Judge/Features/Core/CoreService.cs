@@ -5,7 +5,7 @@ using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Features.Core.Reset;
 using NTS.Judge.Features.Core.Start;
-using NTS.Application.Warp;
+using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Features.Core;
 

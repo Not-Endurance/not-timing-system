@@ -6,7 +6,7 @@ using Not.Injection;
 using Not.Startup;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Application.Warp;
+namespace NTS.Judge.Features.Warp;
 
 // TODO: fix RpcContext reset not ressetting correctly
 public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, IRpcContext<UpcomingEvent>
