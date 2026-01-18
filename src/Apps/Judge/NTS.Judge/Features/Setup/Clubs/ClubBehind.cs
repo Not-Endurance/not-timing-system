@@ -12,11 +12,11 @@ internal class ClubBehind : KrudServiceBase<Club, ClubFormModel>
 
     protected override Club CreateEntity(ClubFormModel model)
     {
-        return new (model.Name);
+        return new(model.Name);
     }
 
     protected override Club UpdateEntity(ClubFormModel model)
     {
-        return new (model.Id, model.Name);
+        return new(model.Id, model.Name);
     }
 }

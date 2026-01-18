@@ -14,11 +14,12 @@ public static class NtsWitnessServices
     {
         FileContextHelper.ConfigureApplicationName("nts-witness");
 
-        services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
+        services
+            .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
             .AddStartlist()
             .ConfigureN()
             .AddSignalR();
-        
+
         services.ConfigureNts(configuration).AddNBlazor(configuration).ConfigureAuthentication(configuration);
 
         return services;

@@ -4,7 +4,8 @@ namespace Not.Domain.Aggregates;
 
 public abstract class Aggregate : Entity, IAggregate
 {
-    protected Aggregate(int id) : base(id) 
+    protected Aggregate(int id)
+        : base(id)
     {
         Id = id;
     }

@@ -26,11 +26,7 @@ public class OfficialModel
 {
     public static OfficialModel MapFrom(Official official)
     {
-        return new OfficialModel
-        {
-            Names = official.Person.Names,
-            Role = official.Role,
-        };
+        return new OfficialModel { Names = official.Person.Names, Role = official.Role };
     }
 
     public string[] Names { get; init; } = [];

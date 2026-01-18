@@ -6,7 +6,7 @@ namespace Not.Domain.Aggregates;
 public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity>
 {
     const int PRIME = 7302013;
-    
+
     public static bool operator ==(Entity? left, Entity? right)
     {
         return left?.Equals(right) ?? right is null;
@@ -19,21 +19,17 @@ public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity
 
     readonly object?[] _equatableValues;
 
-    protected Entity(object? equatableValue) : this([equatableValue])
-	{
-	}
+    protected Entity(object? equatableValue)
+        : this([equatableValue]) { }
 
-    protected Entity(object? equatableValue1, object? equatableValue2) : this([equatableValue1, equatableValue2])
-	{
-	}
+    protected Entity(object? equatableValue1, object? equatableValue2)
+        : this([equatableValue1, equatableValue2]) { }
 
-    protected Entity(object? equatableValue1, object? equatableValue2, object? equatableValue3) : this([equatableValue1, equatableValue2, equatableValue3])
-	{
-	}
+    protected Entity(object? equatableValue1, object? equatableValue2, object? equatableValue3)
+        : this([equatableValue1, equatableValue2, equatableValue3]) { }
 
-    protected Entity(object? equatableValue1, object? equatableValue2, object? equatableValue3, object? equatableValue4) : this([equatableValue1, equatableValue2, equatableValue3, equatableValue4])
-	{
-	}
+    protected Entity(object? equatableValue1, object? equatableValue2, object? equatableValue3, object? equatableValue4)
+        : this([equatableValue1, equatableValue2, equatableValue3, equatableValue4]) { }
 
     protected Entity(object?[] equatableValues)
     {

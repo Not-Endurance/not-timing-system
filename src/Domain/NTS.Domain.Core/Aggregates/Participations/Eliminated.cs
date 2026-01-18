@@ -134,7 +134,8 @@ public abstract class Eliminated : Entity
     public const string DISQUALIFIED = "DQ";
     public const string FAILED_TO_QUALIFY = "FTQ";
 
-    protected Eliminated(string eliminationCode) : base(eliminationCode)
+    protected Eliminated(string eliminationCode)
+        : base(eliminationCode)
     {
         Code = eliminationCode;
     }

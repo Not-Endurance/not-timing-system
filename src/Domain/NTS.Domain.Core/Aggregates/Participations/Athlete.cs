@@ -7,7 +7,8 @@ public class Athlete : Entity, IAthlete
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Athlete(Person names, Country country, Club? club, string? feiId) : base(names, country)
+    public Athlete(Person names, Country country, Club? club, string? feiId)
+        : base(names, country)
     {
         Names = names;
         Country = country;
@@ -16,9 +17,8 @@ public class Athlete : Entity, IAthlete
     }
 
     // TODO: Probably move this applicaiton layer
-    public Athlete(IAthlete athlete) : this(athlete.Names, athlete.Country, athlete.Club as Club, athlete.FeiId)
-    {
-    }
+    public Athlete(IAthlete athlete)
+        : this(athlete.Names, athlete.Country, athlete.Club as Club, athlete.FeiId) { }
 
     IClub? IAthlete.Club => Club;
     public Person Names { get; }

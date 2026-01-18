@@ -4,7 +4,8 @@ namespace NTS.Domain.Core.Aggregates.Participations;
 
 public class Total : Entity
 {
-    public Total(IEnumerable<Phase> phases) : base(phases)
+    public Total(IEnumerable<Phase> phases)
+        : base(phases)
     {
         if (phases.All(x => !x.IsComplete()))
         {

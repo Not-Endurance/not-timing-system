@@ -15,10 +15,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 {
     readonly IRepository<HorseModel> _horses;
 
-    public HorseFunctions(
-        IFunctionLogger<HorseFunctions> logger,
-        IRepository<HorseModel> horses
-    )
+    public HorseFunctions(IFunctionLogger<HorseFunctions> logger, IRepository<HorseModel> horses)
         : base(logger)
     {
         _horses = horses;
@@ -66,7 +63,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         //var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
 
         //var recordsWithHorse = await _archive
-        //    .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id))) 
+        //    .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
         //    .ToList();
         //if (recordsWithHorse.Any())
         //{

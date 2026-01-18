@@ -91,11 +91,7 @@ public class HorseModel
 {
     public static HorseModel MapFrom(Horse horse)
     {
-        return new HorseModel
-        {
-            FeiId = horse.FeiId,
-            Name = horse.Name,
-        };
+        return new HorseModel { FeiId = horse.FeiId, Name = horse.Name };
     }
 
     public string? FeiId { get; init; }
