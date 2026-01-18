@@ -1,0 +1,13 @@
+﻿@inherits EnduranceEventsBehind
+@attribute [Route(WitnessBlazorConstants.Pages.EVENTS)]
+
+<div>
+    @foreach(var eventItem in Events)
+    {
+        <h2>
+            <span>@eventItem.Id</span><br />
+            <span>@eventItem.Name</span><br />
+            <span>@eventItem.Place</span><br />
+        </h2>
+    }
+</div>
