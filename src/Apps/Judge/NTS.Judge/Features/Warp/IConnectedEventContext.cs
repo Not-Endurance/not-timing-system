@@ -1,9 +1,8 @@
-﻿using Not.Injection;
-using NTS.Domain.Setup.Aggregates;
+﻿using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Warp;
 
-public interface IConnectedEventContext : ISingleton
+public interface IConnectedEventContext
 {
     Task<UpcomingEvent?> Initialize();
     Task Set(UpcomingEvent upcomingEvent);
