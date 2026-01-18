@@ -13,9 +13,9 @@ namespace NTS.Nexus.HTTP.Functions;
 
 public class AthleteFunctions : FunctionBase<AthleteFunctions>
 {
-    readonly IRepository<SetupAthleteModel> _athletes;
+    readonly IRepository<AthleteModel> _athletes;
 
-    public AthleteFunctions(IFunctionLogger<AthleteFunctions> logger, IRepository<SetupAthleteModel> athletes)
+    public AthleteFunctions(IFunctionLogger<AthleteFunctions> logger, IRepository<AthleteModel> athletes)
         : base(logger)
     {
         _athletes = athletes;
@@ -30,7 +30,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = SetupAthleteModel.MapFrom(athlete);
+        var document = AthleteModel.MapFrom(athlete);
         await _athletes.Create(document);
 
         return new OkObjectResult($"Inserted {athlete}");
@@ -45,7 +45,7 @@ public class AthleteFunctions : FunctionBase<AthleteFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var athlete = requestBody.FromJson<Athlete>();
-        var document = SetupAthleteModel.MapFrom(athlete);
+        var document = AthleteModel.MapFrom(athlete);
         await _athletes.Update(document);
 
         return new OkObjectResult($"Updated {athlete}");

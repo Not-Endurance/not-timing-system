@@ -19,7 +19,7 @@ public class StorageTests : JudgeIntegrationTest
     {
         await Seed();
 
-        var enduranceEventBehind = Provider.GetRequiredService<ICreateBehind<EnduranceEventFormModel>>();
+        var enduranceEventBehind = Provider.GetRequiredService<ICreateBehind<UpcomingEventFormModel>>();
 
         var country = new Country(0, "testIso", "testNf", "Test", "bg-BG");
         var enduranceEvent = new EnduranceEventTestModel { Country = country, Place = "Sofia" };
@@ -70,7 +70,7 @@ public class StorageTests : JudgeIntegrationTest
     }
 }
 
-public class EnduranceEventTestModel : EnduranceEventFormModel
+public class EnduranceEventTestModel : UpcomingEventFormModel
 {
     public new int Id { get; set; }
 }

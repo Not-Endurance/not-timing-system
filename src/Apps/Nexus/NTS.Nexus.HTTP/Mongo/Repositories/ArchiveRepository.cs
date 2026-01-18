@@ -5,14 +5,14 @@ using NTS.Application.Core;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class ArchiveRepository : MongoRepository<ArchiveModel>, IArchiveMongoRepository
+public class ArchiveRepository : MongoRepository<ArchiveEntryModel>, IArchiveMongoRepository
 {
     public ArchiveRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ARCHIVE_COLLECTION) { }
 
-    protected override UpdateDefinition<ArchiveModel> GetUpdateDefinition(ArchiveModel document)
+    protected override UpdateDefinition<ArchiveEntryModel> GetUpdateDefinition(ArchiveEntryModel document)
     {
-        return Builders<ArchiveModel>
+        return Builders<ArchiveEntryModel>
             .Update.Set(x => x.Officials, document.Officials)
             .Set(x => x.Ranklists, document.Ranklists)
             .Set(x => x.EndDay, document.EndDay)
@@ -22,7 +22,7 @@ public class ArchiveRepository : MongoRepository<ArchiveModel>, IArchiveMongoRep
             .Set(x => x.Location, document.Location);
     }
 
-    public Task<IEnumerable<ArchiveModel>> GetPerformances(int horseId) // TODO: fix
+    public Task<IEnumerable<ArchiveEntryModel>> GetPerformances(int horseId) // TODO: fix
     {
         throw new NotImplementedException();
         //return await GetCollection()
@@ -35,7 +35,7 @@ public class ArchiveRepository : MongoRepository<ArchiveModel>, IArchiveMongoRep
     }
 }
 
-public interface IArchiveMongoRepository : IRepository<ArchiveModel>
+public interface IArchiveMongoRepository : IRepository<ArchiveEntryModel>
 {
-    Task<IEnumerable<ArchiveModel>> GetPerformances(int horseId);
+    Task<IEnumerable<ArchiveEntryModel>> GetPerformances(int horseId);
 }

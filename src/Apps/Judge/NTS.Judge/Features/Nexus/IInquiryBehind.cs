@@ -7,7 +7,7 @@ namespace NTS.Judge.Features.Nexus;
 public interface IInquiryBehind : IStatefulService
 {
     IEnumerable<RankingEntry>? Match { get; }
-    IReadOnlyList<ArchiveModel> Records { get; }
+    IReadOnlyList<ArchiveEntryModel> Records { get; }
     Task Search(int id);
     Task Search(string term);
 }

@@ -8,7 +8,7 @@ namespace NTS.Warp.ACL.Factories;
 
 public class CompetitionFactory
 {
-    public static EmsCompetition Create(CoreParticipationModel participation)
+    public static EmsCompetition Create(ParticipationModel participation)
     {
         if (participation.Competition == null)
         {

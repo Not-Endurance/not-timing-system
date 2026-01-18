@@ -7,7 +7,7 @@ namespace NTS.Judge.Blazor.Nexus;
 public interface IInquiryBehind : IStatefulService
 {
     IEnumerable<RankingEntry>? Match { get; }
-    IReadOnlyList<ArchiveModel> Records { get; }
+    IReadOnlyList<ArchiveEntryModel> Records { get; }
     Task Search(int id);
     Task Search(string term);
 }

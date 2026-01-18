@@ -5,9 +5,9 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
-public class EnduranceEventFormModel : IFormModel<UpcomingEvent>
+public class UpcomingEventFormModel : IFormModel<UpcomingEvent>
 {
-    public EnduranceEventFormModel()
+    public UpcomingEventFormModel()
     {
 #if DEBUG
         Name = "Test";

@@ -23,11 +23,11 @@ public class ClubModel
     }
 }
 
-public class CoreOfficialModel
+public class OfficialModel
 {
-    public static CoreOfficialModel MapFrom(Official official)
+    public static OfficialModel MapFrom(Official official)
     {
-        return new CoreOfficialModel { Names = official.Person.Names, Role = official.Role };
+        return new OfficialModel { Names = official.Person.Names, Role = official.Role };
     }
 
     public string[] Names { get; init; } = [];
@@ -39,11 +39,11 @@ public class CoreOfficialModel
     }
 }
 
-public class CoreCompetitionModel
+public class CompetitionModel
 {
-    public static CoreCompetitionModel MapFrom(Competition competition)
+    public static CompetitionModel MapFrom(Competition competition)
     {
-        return new CoreCompetitionModel
+        return new CompetitionModel
         {
             Name = competition.Name,
             Ruleset = competition.Ruleset,
@@ -61,11 +61,11 @@ public class CoreCompetitionModel
     }
 }
 
-public class CoreAthleteModel
+public class AthleteModel
 {
-    public static CoreAthleteModel MapFrom(Athlete athlete)
+    public static AthleteModel MapFrom(Athlete athlete)
     {
-        return new CoreAthleteModel
+        return new AthleteModel
         {
             FeiId = athlete.FeiId,
             Names = athlete.Names.Names,
@@ -87,11 +87,11 @@ public class CoreAthleteModel
     }
 }
 
-public class CoreHorseModel
+public class HorseModel
 {
-    public static CoreHorseModel MapFrom(Horse horse)
+    public static HorseModel MapFrom(Horse horse)
     {
-        return new CoreHorseModel
+        return new HorseModel
         {
             FeiId = horse.FeiId,
             Name = horse.Name,
@@ -107,19 +107,19 @@ public class CoreHorseModel
     }
 }
 
-public class CoreCombinationModel
+public class CombinationModel
 {
-    public static CoreCombinationModel MapFrom(Combination combination)
+    public static CombinationModel MapFrom(Combination combination)
     {
-        return new CoreCombinationModel
+        return new CombinationModel
         {
             Id = combination.Id,
             Number = combination.Number,
             Distance = combination.Distance,
             MinAverageSpeed = combination.MinAverageSpeed,
             MaxAverageSpeed = combination.MaxAverageSpeed,
-            Athlete = CoreAthleteModel.MapFrom(combination.Athlete),
-            Horse = CoreHorseModel.MapFrom(combination.Horse),
+            Athlete = AthleteModel.MapFrom(combination.Athlete),
+            Horse = HorseModel.MapFrom(combination.Horse),
         };
     }
 
@@ -128,8 +128,8 @@ public class CoreCombinationModel
     public string? Distance { get; init; }
     public double? MinAverageSpeed { get; init; }
     public double? MaxAverageSpeed { get; init; }
-    public CoreAthleteModel Athlete { get; init; } = default!;
-    public CoreHorseModel Horse { get; init; } = default!;
+    public AthleteModel Athlete { get; init; } = default!;
+    public HorseModel Horse { get; init; } = default!;
 
     public Combination MapToDomain()
     {
@@ -139,11 +139,11 @@ public class CoreCombinationModel
     }
 }
 
-public class CorePhaseModel
+public class PhaseModel
 {
-    public static CorePhaseModel MapFrom(Phase phase)
+    public static PhaseModel MapFrom(Phase phase)
     {
-        return new CorePhaseModel
+        return new PhaseModel
         {
             Id = phase.Id,
             Gate = phase.Gate,
@@ -286,19 +286,19 @@ public class EliminatedModel
     }
 }
 
-public class CoreParticipationModel
+public class ParticipationModel
 {
-    public static CoreParticipationModel MapFrom(Participation participation)
+    public static ParticipationModel MapFrom(Participation participation)
     {
         var total = participation.GetTotal();
 
-        return new CoreParticipationModel
+        return new ParticipationModel
         {
             Id = participation.Id,
             Category = participation.Category,
-            Competition = CoreCompetitionModel.MapFrom(participation.Competition),
-            Combination = CoreCombinationModel.MapFrom(participation.Combination),
-            Phases = participation.Phases.Select(CorePhaseModel.MapFrom).ToArray(),
+            Competition = CompetitionModel.MapFrom(participation.Competition),
+            Combination = CombinationModel.MapFrom(participation.Combination),
+            Phases = participation.Phases.Select(PhaseModel.MapFrom).ToArray(),
             Total = total == null ? null : TotalModel.Create(total),
             Eliminated = participation.Eliminated == null ? null : EliminatedModel.MapFrom(participation.Eliminated),
         };
@@ -306,9 +306,9 @@ public class CoreParticipationModel
 
     public int Id { get; init; }
     public ParticipationCategory Category { get; init; } = default!;
-    public CoreCompetitionModel Competition { get; init; } = default!;
-    public CoreCombinationModel Combination { get; init; } = default!;
-    public CorePhaseModel[] Phases { get; init; } = default!;
+    public CompetitionModel Competition { get; init; } = default!;
+    public CombinationModel Combination { get; init; } = default!;
+    public PhaseModel[] Phases { get; init; } = default!;
     public TotalModel? Total { get; init; }
     public EliminatedModel? Eliminated { get; init; }
 
@@ -328,13 +328,13 @@ public class RankingEntryModel
     {
         return new RankingEntryModel
         {
-            Participation = CoreParticipationModel.MapFrom(rankingEntry.Participation),
+            Participation = ParticipationModel.MapFrom(rankingEntry.Participation),
             Rank = rankingEntry.Rank,
             IsNotRanked = rankingEntry.IsNotRanked,
         };
     }
 
-    public CoreParticipationModel Participation { get; init; } = default!;
+    public ParticipationModel Participation { get; init; } = default!;
     public int? Rank { get; init; }
     public bool IsNotRanked { get; init; }
 
@@ -380,15 +380,15 @@ public class RanklistModel
     }
 }
 
-public class ArchiveModel : IDocument
+public class ArchiveEntryModel : IDocument
 {
-    public static ArchiveModel MapFrom(
+    public static ArchiveEntryModel MapFrom(
         EnduranceEvent enduranceEvent,
         IEnumerable<Official> officials,
         IEnumerable<Ranklist> ranklists
     )
     {
-        return new ArchiveModel
+        return new ArchiveEntryModel
         {
             Id = enduranceEvent.Id,
             Country = CountryModel.MapFrom(enduranceEvent.PopulatedPlace.Country),
@@ -399,7 +399,7 @@ public class ArchiveModel : IDocument
             FeiEventCode = enduranceEvent.FeiEventCode,
             StartDay = enduranceEvent.EventSpan.StartDay,
             EndDay = enduranceEvent.EventSpan.EndDay,
-            Officials = officials.Select(CoreOfficialModel.MapFrom).ToArray(),
+            Officials = officials.Select(OfficialModel.MapFrom).ToArray(),
             Ranklists = ranklists.Select(RanklistModel.MapFrom).ToArray(),
         };
     }
@@ -414,7 +414,7 @@ public class ArchiveModel : IDocument
     public string? FeiEventCode { get; init; }
     public DateTimeOffset StartDay { get; init; }
     public DateTimeOffset EndDay { get; init; }
-    public CoreOfficialModel[] Officials { get; init; } = default!;
+    public OfficialModel[] Officials { get; init; } = default!;
     public RanklistModel[] Ranklists { get; init; } = default!;
 
     public ArchiveEntry MapToDomain()

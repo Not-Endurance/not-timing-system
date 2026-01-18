@@ -13,11 +13,11 @@ namespace NTS.Nexus.HTTP.Functions;
 
 public class HorseFunctions : FunctionBase<HorseFunctions>
 {
-    readonly IRepository<SetupHorseModel> _horses;
+    readonly IRepository<HorseModel> _horses;
 
     public HorseFunctions(
         IFunctionLogger<HorseFunctions> logger,
-        IRepository<SetupHorseModel> horses
+        IRepository<HorseModel> horses
     )
         : base(logger)
     {
@@ -33,7 +33,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var horse = requestBody.FromJson<Horse>();
-        var document = SetupHorseModel.MapFrom(horse);
+        var document = HorseModel.MapFrom(horse);
         await _horses.Create(document);
 
         return new OkObjectResult($"Inserted {horse}");
@@ -48,7 +48,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var horse = requestBody.FromJson<Horse>();
-        var document = SetupHorseModel.MapFrom(horse);
+        var document = HorseModel.MapFrom(horse);
         await _horses.Update(document);
 
         return new OkObjectResult($"Updated {horse}");

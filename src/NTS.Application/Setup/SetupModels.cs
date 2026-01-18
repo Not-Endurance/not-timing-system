@@ -22,11 +22,11 @@ public class ClubModel : IDocument
     }
 }
 
-public class SetupOfficialModel
+public class OfficialModel
 {
-    public static SetupOfficialModel MapFrom(Official official)
+    public static OfficialModel MapFrom(Official official)
     {
-        return new SetupOfficialModel
+        return new OfficialModel
         {
             Names = official.Person.Names,
             Role = official.Role,
@@ -42,12 +42,12 @@ public class SetupOfficialModel
     }
 }
 
-public class SetupAthleteModel : IDocument
+public class AthleteModel : IDocument
 {
     // TODO: if decide to use this approach integrate AutoMapper with specific mappings to solve duplicating mapping logic
-    public static SetupAthleteModel MapFrom(Athlete athlete)
+    public static AthleteModel MapFrom(Athlete athlete)
     {
-        return new SetupAthleteModel
+        return new AthleteModel
         {
             Id = athlete.Id,
             FeiId = athlete.FeiId,
@@ -70,11 +70,11 @@ public class SetupAthleteModel : IDocument
     }
 }
 
-public class SetupHorseModel : IDocument
+public class HorseModel : IDocument
 {
-    public static SetupHorseModel MapFrom(Horse horse)
+    public static HorseModel MapFrom(Horse horse)
     {
-        return new SetupHorseModel
+        return new HorseModel
         {
             Id = horse.Id,
             Name = horse.Name,
@@ -93,21 +93,21 @@ public class SetupHorseModel : IDocument
     }
 }
 
-public class SetupCombinationModel
+public class CombinationModel
 {
-    public static SetupCombinationModel MapFrom(Combination combination)
+    public static CombinationModel MapFrom(Combination combination)
     {
-        return new SetupCombinationModel
+        return new CombinationModel
         {
             Number = combination.Number,
-            Athlete = SetupAthleteModel.MapFrom(combination.Athlete),
-            Horse = SetupHorseModel.MapFrom(combination.Horse),
+            Athlete = AthleteModel.MapFrom(combination.Athlete),
+            Horse = HorseModel.MapFrom(combination.Horse),
         };
     }
 
     public int Number { get; init; }
-    public SetupAthleteModel Athlete { get; init; } = default!;
-    public SetupHorseModel Horse { get; init; } = default!;
+    public AthleteModel Athlete { get; init; } = default!;
+    public HorseModel Horse { get; init; } = default!;
 
     public Combination MapToDomain()
     {
@@ -117,15 +117,15 @@ public class SetupCombinationModel
     }
 }
 
-public class SetupParticipationModel
+public class ParticipationModel
 {
-    public static SetupParticipationModel MapFrom(Participation participation)
+    public static ParticipationModel MapFrom(Participation participation)
     {
-        return new SetupParticipationModel
+        return new ParticipationModel
         {
             IsNotRanked = participation.IsNotRanked,
             Category = participation.Category,
-            Combination = SetupCombinationModel.MapFrom(participation.Combination),
+            Combination = CombinationModel.MapFrom(participation.Combination),
             StartTimeOverride = participation.StartTimeOverride,
             MaxSpeedOverride = participation.MaxSpeedOverride,
             MinSpeedOverride = participation.MinSpeedOverride,
@@ -135,7 +135,7 @@ public class SetupParticipationModel
     }
 
     public ParticipationCategory Category { get; init; } = default!;
-    public SetupCombinationModel Combination { get; init; } = default!;
+    public CombinationModel Combination { get; init; } = default!;
     public bool IsNotRanked { get; init; }
     public DateTimeOffset? StartTimeOverride { get; init; }
     public double? MaxSpeedOverride { get; init; }
@@ -174,11 +174,11 @@ public class LoopModel
     }
 }
 
-public class SetupPhaseModel
+public class PhaseModel
 {
-    public static SetupPhaseModel Create(Phase phase)
+    public static PhaseModel Create(Phase phase)
     {
-        return new SetupPhaseModel
+        return new PhaseModel
         {
             Id = phase.Id,
             Loop = LoopModel.MapFrom(phase.Loop!),
@@ -199,11 +199,11 @@ public class SetupPhaseModel
     }
 }
 
-public class SetupCompetitionModel
+public class CompetitionModel
 {
-    public static SetupCompetitionModel MapFrom(Competition competition)
+    public static CompetitionModel MapFrom(Competition competition)
     {
-        return new SetupCompetitionModel
+        return new CompetitionModel
         {
             Name = competition.Name,
             Type = competition.Type,
@@ -213,8 +213,8 @@ public class SetupCompetitionModel
             FeiId = competition.FeiId,
             FeiRule = competition.FeiRule,
             FeiScheduleNumber = competition.FeiScheduleNumber,
-            Phases = competition.Phases.Select(SetupPhaseModel.Create).ToArray(),
-            Participations = competition.Participations.Select(SetupParticipationModel.MapFrom).ToArray(),
+            Phases = competition.Phases.Select(PhaseModel.Create).ToArray(),
+            Participations = competition.Participations.Select(ParticipationModel.MapFrom).ToArray(),
         };
     }
 
@@ -227,8 +227,8 @@ public class SetupCompetitionModel
     public string? FeiId { get; init; }
     public string? FeiRule { get; init; }
     public string? FeiScheduleNumber { get; init; }
-    public SetupPhaseModel[] Phases { get; init; } = default!;
-    public SetupParticipationModel[] Participations { get; init; } = default!;
+    public PhaseModel[] Phases { get; init; } = default!;
+    public ParticipationModel[] Participations { get; init; } = default!;
 
     public Competition MapToDomain()
     {
@@ -262,10 +262,10 @@ public class UpcomingEventModel : IDocument
             ShowFeiId = @event.ShowFeiId,
             FeiId = @event.FeiId,
             FeiEventCode = @event.FeiEventCode,
-            Competitions = @event.Competitions.Select(SetupCompetitionModel.MapFrom).ToArray(),
-            Officials = @event.Officials.Select(SetupOfficialModel.MapFrom).ToArray(),
+            Competitions = @event.Competitions.Select(CompetitionModel.MapFrom).ToArray(),
+            Officials = @event.Officials.Select(OfficialModel.MapFrom).ToArray(),
             Loops = @event.Loops.Select(LoopModel.MapFrom).ToArray(),
-            Combinations = @event.Combinations.Select(SetupCombinationModel.MapFrom).ToArray(),
+            Combinations = @event.Combinations.Select(CombinationModel.MapFrom).ToArray(),
         };
     }
 
@@ -276,10 +276,10 @@ public class UpcomingEventModel : IDocument
     public string? ShowFeiId { get; init; }
     public string? FeiId { get; init; }
     public string? FeiEventCode { get; init; }
-    public SetupCompetitionModel[] Competitions { get; init; } = default!;
-    public SetupOfficialModel[] Officials { get; init; } = default!;
+    public CompetitionModel[] Competitions { get; init; } = default!;
+    public OfficialModel[] Officials { get; init; } = default!;
     public LoopModel[] Loops { get; init; } = default!;
-    public SetupCombinationModel[] Combinations { get; init; } = default!;
+    public CombinationModel[] Combinations { get; init; } = default!;
     public string Name { get; init; } = default!;
 
     public UpcomingEvent MapToDomain()

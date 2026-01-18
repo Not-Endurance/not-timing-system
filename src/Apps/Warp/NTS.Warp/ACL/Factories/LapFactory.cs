@@ -6,7 +6,7 @@ namespace NTS.Warp.ACL.Factories;
 
 public class LapFactory
 {
-    public static IEnumerable<EmsLap> Create(CorePhaseModel[] phases)
+    public static IEnumerable<EmsLap> Create(PhaseModel[] phases)
     {
         if (phases == null || phases.Length == 0)
         {

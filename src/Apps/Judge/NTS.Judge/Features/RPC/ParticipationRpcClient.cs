@@ -58,11 +58,11 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures,
     /// Fetches active participations before and after Competitions are started.
     /// </summary>
     /// <returns>Collection of active (not eliminated or completed) participations</returns>
-    public async Task<IEnumerable<CoreParticipationModel>> GetActive()
+    public async Task<IEnumerable<ParticipationModel>> GetActive()
     {
         var coreParticipations = await _coreParticipations
             .ReadMany(x => !x.IsComplete() && !x.IsEliminated())
-            .Select(CoreParticipationModel.MapFrom);
+            .Select(ParticipationModel.MapFrom);
         return coreParticipations;
     }
 

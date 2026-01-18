@@ -7,7 +7,7 @@ namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 
 public partial class EnduranceEventPage
 {
-    EnduranceEventFormModel? _upcomingEvent;
+    UpcomingEventFormModel? _upcomingEvent;
 
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;
@@ -17,7 +17,7 @@ public partial class EnduranceEventPage
 
     protected override void OnInitialized()
     {
-        _upcomingEvent = Navigator.ConsumeParameter<EnduranceEventFormModel>();
+        _upcomingEvent = Navigator.ConsumeParameter<UpcomingEventFormModel>();
         // TODO: come up with somethig more elegant. Maybe pass aggregates in navigaion?
         RpcContext.Set(
             new UpcomingEvent(

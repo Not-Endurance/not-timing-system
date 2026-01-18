@@ -7,9 +7,9 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
 
-public class SetupParticipationBehind : KrudServiceBase<Participation, ParticipationFormModel>
+public class ParticipationBehind : KrudServiceBase<Participation, ParticipationFormModel>
 {
-    public SetupParticipationBehind(
+    public ParticipationBehind(
         IRepository<Participation> participations,
         IEnumerable<IKrudMirror<Participation>> dependants
     )

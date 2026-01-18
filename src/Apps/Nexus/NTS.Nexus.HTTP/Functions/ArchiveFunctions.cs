@@ -29,7 +29,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var entry = requestBody.FromJson<ArchiveEntry>();
-        var document = ArchiveModel.MapFrom(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
+        var document = ArchiveEntryModel.MapFrom(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
 
         if (await _archive.Read(entry.Id) != null) // TODO: investigate this not working
         {

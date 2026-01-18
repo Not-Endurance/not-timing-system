@@ -4,14 +4,14 @@ using NTS.Application.Setup;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class AthleteRepository : MongoRepository<SetupAthleteModel>
+public class AthleteRepository : MongoRepository<AthleteModel>
 {
     public AthleteRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ATHLETES_COLLECTION) { }
 
-    protected override UpdateDefinition<SetupAthleteModel> GetUpdateDefinition(SetupAthleteModel document)
+    protected override UpdateDefinition<AthleteModel> GetUpdateDefinition(AthleteModel document)
     {
-        return Builders<SetupAthleteModel>
+        return Builders<AthleteModel>
             .Update.Set(x => x.Names, document.Names)
             .Set(x => x.Club, document.Club)
             .Set(x => x.Country, document.Country)

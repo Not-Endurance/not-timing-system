@@ -9,7 +9,7 @@ using NTS.Judge.Features.Warp;
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
 public class UpcomingEventBehind
-    : KrudServiceBase<UpcomingEvent, EnduranceEventFormModel>,
+    : KrudServiceBase<UpcomingEvent, UpcomingEventFormModel>,
         IKrudMirror<Loop>,
         IKrudMirror<Combination>,
         IKrudMirror<Athlete>,
@@ -25,7 +25,7 @@ public class UpcomingEventBehind
         _eventContext = eventContext;
     }
 
-    protected override UpcomingEvent CreateEntity(EnduranceEventFormModel model)
+    protected override UpcomingEvent CreateEntity(UpcomingEventFormModel model)
     {
         return new UpcomingEvent(
             model.Name,
@@ -37,7 +37,7 @@ public class UpcomingEventBehind
         );
     }
 
-    protected override UpcomingEvent UpdateEntity(EnduranceEventFormModel model)
+    protected override UpcomingEvent UpdateEntity(UpcomingEventFormModel model)
     {
         return new UpcomingEvent(
             model.Id,
