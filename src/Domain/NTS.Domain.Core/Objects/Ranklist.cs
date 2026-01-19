@@ -11,7 +11,7 @@ public class Ranklist
 
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Ranklist(Ranking ranking, IEnumerable<RankingEntry> entries)
+    public Ranklist(Ranking ranking, IEnumerable<RankingEntry> entries) // TODO: wtf?
     {
         Ranking = ranking;
         Entries = entries.ToList().AsReadOnly();

@@ -2,8 +2,6 @@
 
 public class Horse : Entity
 {
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Horse(int id, string name, string? feiId) : base(id)
     {
         Name = name;

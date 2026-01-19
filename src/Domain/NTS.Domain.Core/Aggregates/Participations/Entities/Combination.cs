@@ -5,10 +5,13 @@ namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 public class Combination : Entity
 {
+    public static string FormatDistance(decimal distance)
+    {
+        return distance.ToString("#.##");
+    }
+
     decimal _distance;
 
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Combination(
         int? id,
         int number,
@@ -28,29 +31,6 @@ public class Combination : Entity
         Distance = distance;
         MinAverageSpeed = minAverageSpeed;
         MaxAverageSpeed = maxAverageSpeed;
-    }
-
-    // TODO: remove ctor
-    public Combination(
-        int number,
-        Athlete athlete,
-        Horse horse,
-        decimal distance,
-        double? minAverageSpeedlimit,
-        double? maxAverageSpeedLimit
-    )
-        : this(
-            null,
-            number,
-            athlete,
-            horse,
-            athlete.Club,
-            FormatDistance(distance),
-            minAverageSpeedlimit,
-            maxAverageSpeedLimit
-        )
-    {
-        _distance = distance;
     }
 
     public int Number { get; }
@@ -73,10 +53,5 @@ public class Combination : Entity
     {
         var speed = ToStringHelper.FormatSpeedRestrictions(MinAverageSpeed, MaxAverageSpeed);
         return $"{hash_string}{Number}: {Athlete}, {Horse} {speed}";
-    }
-
-    static string FormatDistance(decimal distance)
-    {
-        return distance.ToString("#.##");
     }
 }

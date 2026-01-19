@@ -1,12 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
 
 namespace NTS.Domain.Core.Aggregates;
 
 public class Ranking : Aggregate
 {
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Ranking(
         int? id,
         string? name,
@@ -29,27 +26,6 @@ public class Ranking : Aggregate
         FeiRule = feiRule;
         FeiScheduleNumber = feiScheduleNumber;
     }
-
-    // TODO: remove ctor
-    public Ranking(
-        Competition competition,
-        ParticipationCategory category,
-        string? competitionFeiId,
-        string? feiRule,
-        string? feiScheduleNumber,
-        IEnumerable<RankingEntry> entries
-    )
-        : this(
-            null,
-            competition.Name,
-            competition.Ruleset,
-            competition.Type,
-            category,
-            competitionFeiId,
-            feiRule,
-            feiScheduleNumber,
-            new(entries.ToList())
-        ) { }
 
     public string Name { get; }
     public CompetitionRuleset Ruleset { get; }

@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using System.Xml.Linq;
+using Microsoft.AspNetCore.Rewrite;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
@@ -90,15 +92,16 @@ public class CoreStartService : ICoreStarter
         KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory
     )
     {
-        var competition = new Competition(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type);
         return new Ranking(
-            competition,
+            null,
+            setupCompetition.Name,
+            setupCompetition.Ruleset,
+            setupCompetition.Type,
             entriesByCategory.Key,
             setupCompetition.FeiId,
             setupCompetition.FeiRule,
             setupCompetition.FeiScheduleNumber,
-            entriesByCategory.Value
-        );
+            new(entriesByCategory.Value));
     }
 
     void ValidateFeiConfiguration(UpcomingEvent setupEvent)

@@ -34,21 +34,21 @@ public class DummyData
 
             var combination = new Combination(199 + i, i + 1, athlete, horse, null, (40 + i).ToString(), null, null);
 
-            var phase1 = new Phase(
+            var phase1 = CreatePhase(
                 i > 10 ? 30 : 20,
                 15,
                 i > 10 ? 60 : 40,
-                NTS.Domain.Enums.CompetitionRuleset.Regional,
+                CompetitionRuleset.Regional,
                 false,
                 null,
                 DateTimeOffset.Now.AddMinutes(23 + i)
             );
 
-            var phase2 = new Phase(
+            var phase2 = CreatePhase(
                 i > 10 ? 30 : 20,
                 20,
                 i > 10 ? 60 : 40,
-                NTS.Domain.Enums.CompetitionRuleset.Regional,
+                CompetitionRuleset.Regional,
                 true,
                 null,
                 null
@@ -60,8 +60,8 @@ public class DummyData
 
             var competition = new Competition(
                 $"CompetitionName{i}",
-                Domain.Enums.CompetitionRuleset.Regional,
-                Domain.Enums.CompetitionType.Qualification
+                CompetitionRuleset.Regional,
+                CompetitionType.Qualification
             );
 
             var participation = new Participation(
@@ -86,20 +86,20 @@ public class DummyData
     public static List<Phase> CreatePhases()
     {
         var phases = new List<Phase>();
-        var phase1 = new Phase(
+        var phase1 = CreatePhase(
             20,
             15,
             40,
-            NTS.Domain.Enums.CompetitionRuleset.Regional,
+            CompetitionRuleset.Regional,
             false,
             null,
             DateTimeOffset.Now.AddMinutes(23)
         );
-        var phase2 = new Phase(
+        var phase2 = CreatePhase(
             20,
             20,
             40,
-            NTS.Domain.Enums.CompetitionRuleset.Regional,
+            CompetitionRuleset.Regional,
             true,
             null,
             null
@@ -107,5 +107,32 @@ public class DummyData
         phases.Add(phase1);
         phases.Add(phase2);
         return phases;
+    }
+
+    static Phase CreatePhase(
+        double length,
+        int maxRecovery,
+        int? rest,
+        CompetitionRuleset competitionRuleset,
+        bool isFinal,
+        TimeSpan? compulsoryThresholdSpan,
+        DateTimeOffset? startTime)
+    {
+        return new Phase(
+            null,
+            "",
+            length,
+            maxRecovery,
+            rest,
+            competitionRuleset,
+            isFinal,
+            compulsoryThresholdSpan,
+            Timestamp.Create(startTime),
+            null,
+            null,
+            null,
+            false,
+            false,
+            false);
     }
 }

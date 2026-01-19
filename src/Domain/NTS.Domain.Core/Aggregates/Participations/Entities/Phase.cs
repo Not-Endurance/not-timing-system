@@ -10,8 +10,6 @@ public class Phase : Entity
     // TODO: settings - Add setting for separate final. This is useful for some events such as Shumen where we need separate detection for the actual final
     bool _isSeparateFinish = false;
 
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Phase(
         int? id,
         string gate,
@@ -46,34 +44,6 @@ public class Phase : Entity
         IsRequiredInspectionCompulsory = isRequiredInspectionCompulsory;
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
     }
-
-    // TODO: remove CTOR
-    public Phase(
-        double length,
-        int maxRecovery,
-        int? rest,
-        CompetitionRuleset competitionRuleset,
-        bool isFinal,
-        TimeSpan? compulsoryThresholdSpan,
-        DateTimeOffset? startTime
-    )
-        : this(
-            null,
-            "",
-            length,
-            maxRecovery,
-            rest,
-            competitionRuleset,
-            isFinal,
-            compulsoryThresholdSpan,
-            Timestamp.Create(startTime),
-            null,
-            null,
-            null,
-            false,
-            false,
-            false
-        ) { }
 
     Timestamp? VetTime => RepresentTime ?? PresentTime;
 

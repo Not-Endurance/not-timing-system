@@ -6,6 +6,8 @@ using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
+using NTS.Domain.Objects;
+using static MudBlazor.CategoryTypes;
 
 namespace NTS.Application.Core;
 
@@ -359,6 +361,7 @@ public class RanklistModel
     {
         return new RanklistModel
         {
+            Id = ranklist.RankingId,
             Name = ranklist.Name,
             Ruleset = ranklist.Ruleset,
             Type = ranklist.Type,
@@ -370,6 +373,7 @@ public class RanklistModel
         };
     }
 
+    public int Id { get; init; }
     public string Name { get; init; } = default!;
     public CompetitionRuleset Ruleset { get; init; }
     public CompetitionType Type { get; init; }
@@ -381,9 +385,18 @@ public class RanklistModel
 
     public Ranklist MapToDomain()
     {
-        var entries = Entries.Select(x => x.MapToDomain());
+        var entries = Entries.Select(x => x.MapToDomain()).ToList();
         var competition = new Competition(Name, Ruleset, Type);
-        var ranking = new Ranking(competition, Category, CompetitionFeiId, FeiRule, FeiScheduleNumber, entries);
+        var ranking = new Ranking(
+            Id,
+            Name,
+            Ruleset,
+            Type,
+            Category,
+            CompetitionFeiId,
+            FeiRule,
+            FeiScheduleNumber,
+            new (entries));
         return new Ranklist(ranking, entries);
     }
 }
@@ -430,11 +443,8 @@ public class ArchiveEntryModel : IDocument
         var country = Country.MapToDomain();
         var enduranceEvent = new EnduranceEvent(
             Id,
-            country,
-            City,
-            Location ?? "",
-            StartDay,
-            EndDay,
+            new PopulatedPlace(country, City, Location ?? ""),
+            new EventSpan(StartDay, EndDay),
             FeiShowId,
             FeiId,
             FeiEventCode

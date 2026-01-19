@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
-using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Objects;
+﻿using NTS.Domain.Core.Objects;
 
 namespace NTS.Domain.Core.Aggregates;
 
 public class EnduranceEvent : Aggregate
 {
-    [JsonConstructor]
-    EnduranceEvent(
+    public EnduranceEvent(
         int id,
         PopulatedPlace populatedPlace,
         EventSpan eventSpan,
@@ -23,26 +20,6 @@ public class EnduranceEvent : Aggregate
         FeiId = feiId;
         FeiEventCode = feiEventCode;
     }
-
-    public EnduranceEvent(
-        int id,
-        Country country,
-        string city,
-        string place,
-        DateTimeOffset startDate,
-        DateTimeOffset endDate,
-        string? feiShowId,
-        string? feiId,
-        string? feiEventCode
-    )
-        : this(
-            id,
-            new PopulatedPlace(country, city, place),
-            new EventSpan(startDate, endDate),
-            feiShowId,
-            feiId,
-            feiEventCode
-        ) { }
 
     public PopulatedPlace PopulatedPlace { get; set; }
     public EventSpan EventSpan { get; }

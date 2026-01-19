@@ -2,6 +2,7 @@ using Not.Domain.Exceptions;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Enums;
+using NTS.Domain.Objects;
 
 namespace NTS.Judge.Features.Core.Start.Factories;
 
@@ -66,12 +67,12 @@ public static class ParticipationAndRankingFactory
             setupParticipation.MinAverageSpeed,
             setupParticipation.MaxAverageSpeed);
         return new Participation(
-            setupCompetition.Name,
+            null,
             setupParticipation.Category,
-            setupCompetition.Ruleset,
-            setupCompetition.Type,
+            new(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type),
             combination,
-            phases
+            new (phases),
+            null
         );
     }
 
@@ -89,10 +90,12 @@ public static class ParticipationAndRankingFactory
         var athlete = new Athlete(setupAthlete.Id, setupAthlete.Names, setupAthlete.Country, club, setupAthlete.FeiId);
         var horse = new Horse(setupHorse.Id, setupHorse.Name, setupHorse.FeiId);
         return new Combination(
+            null,
             combination.Number,
             athlete,
             horse,
-            totalDistance,
+            athlete.Club,
+            Combination.FormatDistance(totalDistance),
             minAverageSpeed,
             maxAverageSpeed
         );
@@ -114,13 +117,21 @@ public static class ParticipationAndRankingFactory
                 );
             }
             var corePhase = new Phase(
+                null,
+                "",
                 setupPhase.Loop!.Distance,
                 setupPhase.Recovery,
                 setupPhase.Rest,
                 setupCompetition.Ruleset,
                 isFinal,
                 setupCompetition.CompulsoryThresholdSpan,
-                startTime
+                Timestamp.Create(startTime),
+                null,
+                null,
+                null,
+                false,
+                false,
+                false
             );
             startTime = null; //Set only first phase StartTime
             phases.Add(corePhase);

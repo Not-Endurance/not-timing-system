@@ -4,8 +4,6 @@ namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 public class Athlete : Entity
 {
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Athlete(int id, Person names, Country country, Club? club, string? feiId) : base(id)
     {
         Names = names;

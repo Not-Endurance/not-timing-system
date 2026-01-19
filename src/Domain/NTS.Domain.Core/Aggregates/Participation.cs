@@ -18,8 +18,6 @@ public class Participation : Aggregate
     public static readonly Event<ParticipationEliminated> ELIMINATED_EVENT = new();
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Participation(
         int? id,
         ParticipationCategory category,
@@ -37,16 +35,6 @@ public class Participation : Aggregate
         Eliminated = notQualified;
     }
 
-    // TODO: remove this CTOR
-    public Participation(
-        string competitionName,
-        ParticipationCategory category,
-        CompetitionRuleset ruleset,
-        CompetitionType type,
-        Combination combination,
-        IEnumerable<Phase> phases
-    )
-        : this(null, category, new(competitionName, ruleset, type), combination, new(phases), null) { }
 
     public Competition Competition { get; }
     public Combination Combination { get; }
