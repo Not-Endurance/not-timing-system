@@ -2,6 +2,7 @@
 
 public interface IHorse
 {
+
     string Name { get; }
     string? FeiId { get; }
 }
