@@ -4,7 +4,7 @@ using Not.Domain.Exceptions;
 using Not.Structures;
 using static Not.Localization.NStrings;
 
-namespace Not.Domain.Aggregates;
+namespace Not.Domain;
 
 public abstract class InLineEntityValidator
 {

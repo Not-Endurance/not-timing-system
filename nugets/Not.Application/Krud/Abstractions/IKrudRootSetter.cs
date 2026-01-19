@@ -1,5 +1,5 @@
 ﻿using Not.Application.Krud.Graph;
-using Not.Domain.Aggregates;
+using Not.Domain;
 
 namespace Not.Application.Krud.Abstractions;
 

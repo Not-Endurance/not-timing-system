@@ -1,6 +1,4 @@
-﻿using Not.Domain.Aggregates;
-
-namespace NTS.Domain.Setup.Aggregates;
+﻿namespace NTS.Domain.Setup.Aggregates;
 
 public class Horse : Aggregate
 {

@@ -1,8 +1,6 @@
-﻿using Not.Domain.Aggregates;
+﻿namespace Not.Domain.Krud;
 
-namespace Not.Domain;
-
-public interface IKrudParent<T>
+public interface IParent<T>
     where T : Entity
 {
     void Add(T child);

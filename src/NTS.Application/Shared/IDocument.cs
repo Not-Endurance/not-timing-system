@@ -1,5 +1,5 @@
 ﻿using Not.Application.Tenants;
-using Not.Domain.Aggregates;
+using Not.Domain.Abstractions;
 using Not.Structures;
 
 namespace NTS.Application.Shared;

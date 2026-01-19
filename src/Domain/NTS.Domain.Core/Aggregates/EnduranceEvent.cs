@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Aggregates;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Objects;
 

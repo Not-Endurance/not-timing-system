@@ -1,5 +1,4 @@
-﻿using Not.Domain.Aggregates;
-using Not.Events;
+﻿using Not.Events;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Objects.Payloads;

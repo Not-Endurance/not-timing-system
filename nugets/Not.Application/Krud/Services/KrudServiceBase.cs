@@ -1,7 +1,7 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
 using Not.Application.Services;
-using Not.Domain.Aggregates;
+using Not.Domain;
 
 namespace Not.Application.Krud.Services;
 

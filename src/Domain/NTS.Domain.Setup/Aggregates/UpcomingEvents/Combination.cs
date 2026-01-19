@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Aggregates;
+using Not.Domain.Krud;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 

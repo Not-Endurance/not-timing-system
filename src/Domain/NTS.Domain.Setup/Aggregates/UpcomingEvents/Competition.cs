@@ -1,10 +1,10 @@
 using Newtonsoft.Json;
-using Not.Domain.Aggregates;
+using Not.Domain.Krud;
 using NTS.Domain.Extensions;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase>
+public class Competition : Entity, IParent<Participation>, IParent<Phase>
 {
     readonly List<Phase> _phases = [];
     readonly List<Participation> _participations = [];
@@ -36,8 +36,8 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         FeiScheduleNumber = feiScheduleNumber;
     }
 
-    IReadOnlyList<Participation> IKrudParent<Participation>.Children => Participations;
-    IReadOnlyList<Phase> IKrudParent<Phase>.Children => Phases;
+    IReadOnlyList<Participation> IParent<Participation>.Children => Participations;
+    IReadOnlyList<Phase> IParent<Phase>.Children => Phases;
 
     public string Name { get; }
     public CompetitionType Type { get; }

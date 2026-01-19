@@ -3,14 +3,14 @@ using System.Reflection;
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Graph;
 using Not.Domain;
-using Not.Domain.Aggregates;
+using Not.Domain.Krud;
 
 namespace Not.Application.Krud.ServiceRegistration;
 
 internal static class KrudReflectionHelper
 {
     /// <summary>
-    /// Returns all direct child <seealso cref="Entity"/>s that also implement <seealso cref="IKrudParent{T}"/>
+    /// Returns all direct child <seealso cref="Entity"/>s that also implement <seealso cref="IParent{T}"/>
     /// </summary>
     /// <param name="entityType">Domain entity type</param>
     /// <returns>All edge types of <paramref name="entityType"/></returns>
@@ -18,7 +18,7 @@ internal static class KrudReflectionHelper
     {
         return entityType
             .GetInterfaces()
-            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IKrudParent<>))
+            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IParent<>))
             .Select(i => i.GetGenericArguments()[0])
             .Where(t => typeof(Entity).IsAssignableFrom(t));
     }

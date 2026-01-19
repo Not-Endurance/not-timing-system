@@ -1,4 +1,4 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain.Abstractions;
 using Not.Injection;
 
 namespace Not.Application.Cache;

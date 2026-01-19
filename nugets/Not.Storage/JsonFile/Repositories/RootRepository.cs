@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
-using Not.Domain.Aggregates;
+using Not.Domain;
 using Not.Storage.JsonFile.States;
 using Not.Storage.JsonFile.Stores;
 

@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using Not.Domain.Aggregates;
 using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Core.Aggregates.Participations;

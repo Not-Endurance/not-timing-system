@@ -1,4 +1,4 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain.Krud;
 using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;

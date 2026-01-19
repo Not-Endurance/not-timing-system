@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Graph;
 using Not.Application.Krud.Services;
-using Not.Domain.Aggregates;
+using Not.Domain;
 
 namespace Not.Application.Krud.ServiceRegistration;
 

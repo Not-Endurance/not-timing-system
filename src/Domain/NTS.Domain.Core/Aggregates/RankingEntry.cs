@@ -1,6 +1,4 @@
-﻿using Not.Domain.Aggregates;
-
-namespace NTS.Domain.Core.Aggregates;
+﻿namespace NTS.Domain.Core.Aggregates;
 
 public class RankingEntry : Aggregate
 {

@@ -1,7 +1,8 @@
-﻿using Not.Exceptions;
+﻿using Not.Domain.Abstractions;
+using Not.Exceptions;
 using Not.Extensions;
 
-namespace Not.Domain.Aggregates;
+namespace Not.Domain;
 
 public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity>
 {

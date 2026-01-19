@@ -3,7 +3,7 @@ using Not.Application.Services;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms;
 using Not.Blazor.CRUD.Forms.Components;
-using Not.Domain.Aggregates;
+using Not.Domain;
 
 namespace Not.Blazor.CRUD.Lists;
 

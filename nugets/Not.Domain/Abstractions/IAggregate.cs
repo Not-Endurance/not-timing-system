@@ -1,5 +1,5 @@
 ﻿using Not.Structures;
 
-namespace Not.Domain.Aggregates;
+namespace Not.Domain.Abstractions;
 
 public interface IAggregate : IEntity, IIdentifiable { }

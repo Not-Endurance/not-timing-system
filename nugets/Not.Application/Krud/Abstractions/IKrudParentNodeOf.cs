@@ -1,7 +1,7 @@
 ﻿using Not.Domain;
-using Not.Domain.Aggregates;
+using Not.Domain.Krud;
 
 namespace Not.Application.Krud.Abstractions;
 
-public interface IKrudParentNodeOf<T> : IKrudParent<T>, IKrudNodeSetter
+public interface IKrudParentNodeOf<T> : IParent<T>, IKrudNodeSetter
     where T : Entity { }

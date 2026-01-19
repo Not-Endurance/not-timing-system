@@ -1,6 +1,6 @@
 using Not.Application.Krud.Abstractions;
 using Not.Application.RPC.SignalR;
-using Not.Domain.Aggregates;
+using Not.Domain;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Startup;

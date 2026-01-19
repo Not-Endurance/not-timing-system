@@ -1,4 +1,4 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain;
 using NTS.Domain.Enums;
 using NTS.Domain.Settings;
 

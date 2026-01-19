@@ -2,7 +2,7 @@
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Graph;
 using Not.Application.Krud.ServiceRegistration;
-using Not.Domain.Aggregates;
+using Not.Domain;
 using Not.Exceptions;
 using Not.Observables;
 

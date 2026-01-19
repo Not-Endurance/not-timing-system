@@ -1,6 +1,7 @@
-﻿using Not.Extensions;
+﻿using Not.Domain.Abstractions;
+using Not.Extensions;
 
-namespace Not.Domain.Aggregates;
+namespace Not.Domain;
 
 public abstract class Aggregate : Entity, IAggregate
 {

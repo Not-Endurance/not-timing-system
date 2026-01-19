@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
-using Not.Domain.Aggregates;
+using Not.Domain;
 
 namespace Not.Application.Krud.Services;
 

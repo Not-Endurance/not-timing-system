@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Core.Aggregates.Participations;

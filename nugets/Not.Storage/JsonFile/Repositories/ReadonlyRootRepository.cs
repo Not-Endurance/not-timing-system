@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Not.Domain.Aggregates;
+using Not.Domain;
 using Not.Storage.JsonFile.States;
 using Not.Storage.JsonFile.Stores;
 

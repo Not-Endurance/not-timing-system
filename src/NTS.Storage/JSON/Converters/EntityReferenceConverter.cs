@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Not.Domain.Aggregates;
+using Not.Domain;
 using Not.Serialization.JSON;
 
 namespace NTS.Storage.JSON.Converters;

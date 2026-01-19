@@ -1,4 +1,4 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain;
 using Not.Domain.Exceptions;
 
 namespace NTS.Domain.LocalizationDemo;

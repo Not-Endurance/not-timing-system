@@ -1,6 +1,6 @@
 ﻿using Not.Application.Krud.Abstractions;
 using Not.Domain;
-using Not.Domain.Aggregates;
+using Not.Domain.Krud;
 using Not.Exceptions;
 
 namespace Not.Application.Krud.Graph;
@@ -8,13 +8,13 @@ namespace Not.Application.Krud.Graph;
 public class KrudParentNodeOf<T> : KrudNode, IKrudParentNodeOf<T>
     where T : Entity
 {
-    IKrudParent<T>? Parent => (IKrudParent<T>?)Value;
+    IParent<T>? Parent => (IParent<T>?)Value;
 
-    IReadOnlyList<T> IKrudParent<T>.Children => Parent?.Children ?? [];
+    IReadOnlyList<T> IParent<T>.Children => Parent?.Children ?? [];
 
     public void SetParent(object aggregate)
     {
-        if (aggregate is not IKrudParent<T> parent)
+        if (aggregate is not IParent<T> parent)
         {
             return;
         }

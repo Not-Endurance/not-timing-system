@@ -1,6 +1,4 @@
-﻿using Not.Domain.Aggregates;
-
-namespace NTS.Domain.Core.Aggregates.Participations;
+﻿namespace NTS.Domain.Core.Aggregates.Participations;
 
 public class Competition : Entity
 {

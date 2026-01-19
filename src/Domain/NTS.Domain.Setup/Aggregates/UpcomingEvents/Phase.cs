@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
+using Not.Domain.Krud;
 using Not.Structures;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;

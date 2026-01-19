@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Not.Domain.Aggregates;
+using Not.Domain;
 
 namespace Not.Application.Krud.ServiceRegistration;
 

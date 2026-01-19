@@ -1,4 +1,4 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain;
 
 namespace Not.Storage.JsonFile.States;
 
