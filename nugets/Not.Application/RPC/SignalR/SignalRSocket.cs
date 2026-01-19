@@ -12,14 +12,9 @@ namespace Not.Application.RPC.SignalR;
 
 public class SignalRSocket : IRpcSocket, IAsyncDisposable
 {
-    const int AUTOMATIC_RECONNECT_ATTEMPTS = 3;
-
     readonly IRpcMetadata? _metadata;
     readonly RpcSettings _context;
     readonly string _name;
-    System.Timers.Timer? _reconnectionTimer;
-    int _connectionClosedReconnectAttempts;
-    CancellationTokenSource? _reconnectTokenSource;
 
     public SignalRSocket(IOptions<RpcSettings> options, IRpcMetadata? metadata = null)
     {
@@ -54,7 +49,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     public virtual async Task Connect()
     {
-        await InternalConnect(0);
+        await InternalConnect();
     }
 
     public virtual async Task Disconnect()
@@ -63,7 +58,6 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         {
             return;
         }
-        await _reconnectTokenSource!.CancelAsync();
         await Connection.StopAsync();
         RaiseDisconnected();
     }
@@ -78,14 +72,9 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         Connection.Reconnecting -= HandleReconnecting;
         Connection.Closed -= HandleClosed;
         await Connection.DisposeAsync();
-        _reconnectTokenSource?.Dispose();
-        // Might occasionally tigger ObjectDiscpossedException if timer.Elapsed attempts to run
-        // during or after Dispose. See https://codereview.stackexchange.com/questions/223877/safe-dispose-of-timer
-        // for potential solutions
-        _reconnectionTimer?.Dispose();
     }
 
-    async Task InternalConnect(int reconnectAttempts)
+    async Task InternalConnect()
     {
         if (IsConnected)
         {
@@ -96,7 +85,6 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         try
         {
             ConfigureConnection();
-            _reconnectTokenSource = new CancellationTokenSource();
             RaiseConnecting();
             if (!IsConnected)
             {
@@ -107,14 +95,6 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         catch (Exception ex)
         {
             NotifyHelper.Error(ex);
-            if (HasReachedReconnectionAttemptLimit(++reconnectAttempts))
-            {
-                RaiseDisconnected(ex);
-                return;
-            }
-            var delay = TimeSpan.FromSeconds(5);
-            await Task.Delay(delay);
-            await InternalConnect(reconnectAttempts);
         }
     }
 
@@ -135,6 +115,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         Connection = new HubConnectionBuilder()
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = new NJsonSettings())
             .WithUrl(url)
+            .WithAutomaticReconnect(new AutomaticReconnectSetting())
             .Build();
         Connection.Reconnected += HandleReconnected;
         Connection.Reconnecting += HandleReconnecting;
@@ -159,82 +140,16 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     Task HandleClosed(Exception? exception)
     {
-        if (_reconnectTokenSource?.IsCancellationRequested ?? true)
-        {
-            return Task.CompletedTask;
-        }
         // This check is also necessary here, because if the server hub cannot be constructed (DI error for example)
         // SignalR keeps closing each connection to that hub as soon as it is created
         // Maybe test again with static connection?
-        if (HasReachedReconnectionAttemptLimit(++_connectionClosedReconnectAttempts))
-        {
-            RaiseDisconnected(exception);
-        }
-        else
-        {
-            BeginReconnecting(_reconnectTokenSource!.Token, exception, () => _connectionClosedReconnectAttempts = 0);
-        }
+        RaiseDisconnected(exception);
         return Task.CompletedTask;
-    }
-
-    void BeginReconnecting(CancellationToken cancellationToken, Exception? error, Action onSuccess)
-    {
-        RaiseDisconnected(error);
-        RaiseConnecting();
-        var reconnectAttempts = 0;
-        _reconnectionTimer = new System.Timers.Timer(TimeSpan.FromSeconds(10).TotalMilliseconds);
-        _reconnectionTimer.Elapsed += async (s, e) =>
-        {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                ServerConnectionInfo?.Invoke(this, "Reconnecting stopped due to cancelation request");
-                _reconnectionTimer.Stop();
-                _reconnectionTimer.Dispose();
-            }
-            try
-            {
-                await Connection!.StartAsync();
-                if (Connection.State == HubConnectionState.Connected)
-                {
-                    RaiseConnected();
-                    onSuccess();
-                    _reconnectionTimer.Stop();
-                    _reconnectionTimer.Dispose();
-                }
-            }
-            catch (Exception ex)
-            {
-                RaiseReconnecting(ex);
-            }
-            finally
-            {
-                if (HasReachedReconnectionAttemptLimit(++reconnectAttempts))
-                {
-                    RaiseDisconnected(
-                        new Exception("Automatic reconnection reached attempt limits. Try to reconnect manually")
-                    );
-                    _reconnectionTimer.Stop();
-                    _reconnectionTimer.Dispose();
-                }
-            }
-        };
-        _reconnectionTimer.Start();
-    }
-
-    bool HasReachedReconnectionAttemptLimit(int attempts)
-    {
-        return attempts >= AUTOMATIC_RECONNECT_ATTEMPTS;
     }
 
     void RaiseDisconnected(Exception? exception = default)
     {
         ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Disconnected);
-    }
-
-    void RaiseReconnecting(Exception ex)
-    {
-        ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connecting);
-        ServerConnectionInfo?.Invoke(_name, $"{ex.Message}. Attempting to reconnect");
     }
 
     void RaiseReconnecting(string message)
