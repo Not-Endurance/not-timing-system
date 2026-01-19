@@ -1,12 +1,10 @@
-﻿using NTS.Domain.Aggregates;
-
-namespace NTS.Domain.Core.Aggregates.Participations;
+﻿namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 public class Club : Entity
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Club(string name) : base(name)
+    public Club(int id, string name) : base(id)
     {
         Name = name;
     }

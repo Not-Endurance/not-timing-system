@@ -1,3 +1,5 @@
-﻿namespace Not.Domain.Abstractions;
+﻿using Not.Structures;
 
-public interface IEntity { }
+namespace Not.Domain.Abstractions;
+
+public interface IEntity : IIdentifiable { }

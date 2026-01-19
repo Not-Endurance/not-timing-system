@@ -1,13 +1,9 @@
 ﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using Athlete = NTS.Domain.Core.Aggregates.Participations.Athlete;
-using Combination = NTS.Domain.Core.Aggregates.Participations.Combination;
-using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
-using CorePhase = NTS.Domain.Core.Aggregates.Participations.Phase;
-using Horse = NTS.Domain.Core.Aggregates.Participations.Horse;
 
 namespace NTS.Witness;
 
@@ -32,13 +28,13 @@ public class DummyData
             var names = new List<string> { $"FirstName{i + 1}", $"LastName{i + 1}" };
             var person = new Person(names.ToArray());
 
-            var athlete = new Athlete(person, country, null, $"username{i + 1}");
+            var athlete = new Athlete(200 + i, person, country, null, $"username{i + 1}");
 
-            var horse = new Horse($"HorseName{i + 1}", null);
+            var horse = new Horse(100 + i, $"HorseName{i + 1}", null);
 
             var combination = new Combination(199 + i, i + 1, athlete, horse, null, (40 + i).ToString(), null, null);
 
-            var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
+            var phase1 = new Phase(
                 i > 10 ? 30 : 20,
                 15,
                 i > 10 ? 60 : 40,
@@ -48,7 +44,7 @@ public class DummyData
                 DateTimeOffset.Now.AddMinutes(23 + i)
             );
 
-            var phase2 = new NTS.Domain.Core.Aggregates.Participations.Phase(
+            var phase2 = new Phase(
                 i > 10 ? 30 : 20,
                 20,
                 i > 10 ? 60 : 40,
@@ -58,7 +54,7 @@ public class DummyData
                 null
             );
 
-            var phases = new List<NTS.Domain.Core.Aggregates.Participations.Phase> { phase1, phase2 };
+            var phases = new List<Phase> { phase1, phase2 };
 
             var phaseCollection = new PhaseCollection(phases);
 
@@ -87,10 +83,10 @@ public class DummyData
         return new Person([firstName, secondName]);
     }
 
-    public static List<CorePhase> CreatePhases()
+    public static List<Phase> CreatePhases()
     {
-        var phases = new List<CorePhase>();
-        var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
+        var phases = new List<Phase>();
+        var phase1 = new Phase(
             20,
             15,
             40,
@@ -99,7 +95,7 @@ public class DummyData
             null,
             DateTimeOffset.Now.AddMinutes(23)
         );
-        var phase2 = new NTS.Domain.Core.Aggregates.Participations.Phase(
+        var phase2 = new Phase(
             20,
             20,
             40,

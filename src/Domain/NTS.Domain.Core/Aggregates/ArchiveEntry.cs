@@ -5,7 +5,7 @@ namespace NTS.Domain.Core.Aggregates;
 public class ArchiveEntry : Aggregate
 {
     public ArchiveEntry(EnduranceEvent enduranceEvent, IEnumerable<Official> officials, IEnumerable<Ranklist> ranklists)
-        : base(GenerateId())
+        : base(null)
     {
         EnduranceEvent = enduranceEvent;
         Officials = officials.ToList();

@@ -8,7 +8,7 @@ using Not.Exceptions;
 using Not.Formatting;
 using Not.Injection;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 

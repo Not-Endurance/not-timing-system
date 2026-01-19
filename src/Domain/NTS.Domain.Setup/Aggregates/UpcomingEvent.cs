@@ -14,7 +14,6 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
     readonly List<Loop> _loops = [];
     readonly List<Combination> _combinations = [];
 
-    [JsonConstructor]
     public UpcomingEvent(
         int? id,
         string? name,
@@ -28,7 +27,7 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
         IEnumerable<Loop> loops,
         IEnumerable<Combination> combinations
     )
-        : base(id!.Value)
+        : base(id)
     {
         Name = Required(nameof(Name), name);
         Place = Required(nameof(Place), place);
@@ -41,16 +40,6 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
         _loops = loops.ToList();
         _combinations = combinations.ToList();
     }
-
-    public UpcomingEvent(
-        string? name,
-        string? place,
-        Country? country,
-        string? showFeiId,
-        string? feiId,
-        string? feiEventCode
-    )
-        : this(GenerateId(), name, place, country, showFeiId, feiId, feiEventCode, [], [], [], []) { }
 
     IReadOnlyList<Official> IParent<Official>.Children => Officials;
     IReadOnlyList<Competition> IParent<Competition>.Children => Competitions;

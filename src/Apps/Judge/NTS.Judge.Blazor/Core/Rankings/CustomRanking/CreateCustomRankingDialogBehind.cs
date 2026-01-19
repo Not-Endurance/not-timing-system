@@ -91,7 +91,7 @@ public class CreateCustomRankingDialogBehind : NDialog
     {
         SafeHelper.Run(() =>
         {
-            var entry = new RankingEntry(EntryToAdd.Participation, EntryToAdd.IsNotRanked);
+            var entry = new RankingEntry(null, EntryToAdd.Participation, null, EntryToAdd.IsNotRanked);
             RankingModel.Entries.Add(entry);
         });
         return Task.CompletedTask;

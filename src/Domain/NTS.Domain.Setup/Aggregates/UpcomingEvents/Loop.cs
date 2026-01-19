@@ -5,9 +5,8 @@ namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 public class Loop : Entity
 {
-    [JsonConstructor]
-    public Loop(double? distance)
-        : base(distance)
+    public Loop(int? id, double? distance)
+        : base(id)
     {
         Distance = PositiveDistance(distance);
     }

@@ -1,25 +1,14 @@
 ﻿using Not.Domain.Abstractions;
-using Not.Extensions;
 
 namespace Not.Domain;
 
 public abstract class Aggregate : Entity, IAggregate
 {
-    protected Aggregate(int id) : base(id) 
+    /// <summary>
+    /// Provide <paramref name="id"/> when updating state null to generate it
+    /// </summary>
+    /// <param name="id">Id, generated when null</param>
+    protected Aggregate(int? id) : base(id) 
     {
-        Id = id;
-    }
-
-    // TODO: use DomainObject for ID, do private set
-    public int Id { get; }
-
-    protected static int GenerateId()
-    {
-        return DomainModelHelper.GenerateId();
-    }
-
-    public override int GetHashCode()
-    {
-        return Id.GetHashCode();
     }
 }

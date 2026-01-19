@@ -1,17 +1,16 @@
 ﻿using System.Globalization;
 using NTS.Domain.Helpers;
 
-namespace NTS.Domain.Core.Aggregates.Participations;
+namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
-// TODO: probably shoudl be a record
-public class Combination : Aggregate
+public class Combination : Entity
 {
     decimal _distance;
 
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
     public Combination(
-        int id,
+        int? id,
         int number,
         Athlete athlete,
         Horse horse,
@@ -31,6 +30,7 @@ public class Combination : Aggregate
         MaxAverageSpeed = maxAverageSpeed;
     }
 
+    // TODO: remove ctor
     public Combination(
         int number,
         Athlete athlete,
@@ -40,7 +40,7 @@ public class Combination : Aggregate
         double? maxAverageSpeedLimit
     )
         : this(
-            GenerateId(),
+            null,
             number,
             athlete,
             horse,

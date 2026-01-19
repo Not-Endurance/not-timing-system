@@ -1,13 +1,10 @@
 ﻿using Not.Domain.Abstractions;
-using Not.Exceptions;
 using Not.Extensions;
 
 namespace Not.Domain;
 
 public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity>
 {
-    const int PRIME = 7302013;
-    
     public static bool operator ==(Entity? left, Entity? right)
     {
         return left?.Equals(right) ?? right is null;
@@ -18,33 +15,25 @@ public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity
         return !(left == right);
     }
 
-    readonly object?[] _equatableValues;
-
-    protected Entity(object? equatableValue) : this([equatableValue])
-	{
-	}
-
-    protected Entity(object? equatableValue1, object? equatableValue2) : this([equatableValue1, equatableValue2])
-	{
-	}
-
-    protected Entity(object? equatableValue1, object? equatableValue2, object? equatableValue3) : this([equatableValue1, equatableValue2, equatableValue3])
-	{
-	}
-
-    protected Entity(object? equatableValue1, object? equatableValue2, object? equatableValue3, object? equatableValue4) : this([equatableValue1, equatableValue2, equatableValue3, equatableValue4])
-	{
-	}
-
-    protected Entity(object?[] equatableValues)
+    /// <summary>
+    /// Provide <paramref name="id"/> when updating state null to generate it
+    /// </summary>
+    /// <param name="id">Id, generated when null</param>
+    protected Entity(int? id)
     {
-        GuardHelper.ThrowIfEmpty(equatableValues);
-        _equatableValues = equatableValues;
+        Id = id ?? DomainModelHelper.GenerateId();
     }
+
+    public int Id { get; }
 
     protected string Combine(params object?[] values)
     {
         return DomainModelHelper.Combine(values);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 
     public bool Equals(Entity? other)
@@ -62,19 +51,6 @@ public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity
         throw new NotImplementedException(
             $"'{GetType().Name}' is '{nameof(Entity)}' and is required to override ToString() to provide short info"
         );
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked // Allows int to overflow without exceptions
-        {
-            var hashCode = 1430287;
-            foreach (var value in _equatableValues.Where(x => x != null))
-            {
-                hashCode = hashCode * PRIME ^ value!.GetHashCode();
-            }
-            return hashCode;
-        }
     }
 
     bool IsEqual(object? other)

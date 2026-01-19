@@ -1,6 +1,6 @@
 using Not.Domain.Exceptions;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Enums;
 
 namespace NTS.Judge.Features.Core.Start.Factories;
@@ -34,7 +34,7 @@ public static class ParticipationAndRankingFactory
             if (existingParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
-                var rankingEntry = new RankingEntry(participation, setupParticipation.IsNotRanked);
+                var rankingEntry = new RankingEntry(null, participation, null, setupParticipation.IsNotRanked);
                 AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
             }
             else
@@ -44,7 +44,7 @@ public static class ParticipationAndRankingFactory
                     .Find(p => p.Combination.Number == participation.Combination.Number);
                 if (participationRef != null)
                 {
-                    var rankingEntry = new RankingEntry(participationRef, setupParticipation.IsNotRanked);
+                    var rankingEntry = new RankingEntry(null, participationRef, null, setupParticipation.IsNotRanked);
                     AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
                 }
             }
@@ -85,9 +85,9 @@ public static class ParticipationAndRankingFactory
         var setupHorse = combination.Horse;
         var setupClub = combination.Athlete.Club;
 
-        var club = setupClub == null ? null : new Club(setupClub.Name);
-        var athlete = new Athlete(setupAthlete.Names, setupAthlete.Country, club, setupAthlete.FeiId);
-        var horse = new Horse(setupHorse.Name, setupHorse.FeiId);
+        var club = setupClub == null ? null : new Club(setupClub.Id, setupClub.Name);
+        var athlete = new Athlete(setupAthlete.Id, setupAthlete.Names, setupAthlete.Country, club, setupAthlete.FeiId);
+        var horse = new Horse(setupHorse.Id, setupHorse.Name, setupHorse.FeiId);
         return new Combination(
             combination.Number,
             athlete,

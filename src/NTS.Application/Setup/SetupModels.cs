@@ -28,17 +28,19 @@ public class OfficialModel
     {
         return new OfficialModel
         {
+            Id = official.Id,
             Names = official.Person.Names,
             Role = official.Role,
         };
     }
 
+    public int Id { get; init; }
     public string[] Names { get; init; } = [];
     public OfficialRole Role { get; init; } = default!;
 
     public Official MapToDomain()
     {
-        return new Official(Names, Role);
+        return new Official(Id, Names, Role);
     }
 }
 
@@ -99,12 +101,14 @@ public class CombinationModel
     {
         return new CombinationModel
         {
+            Id = combination.Id,
             Number = combination.Number,
             Athlete = AthleteModel.MapFrom(combination.Athlete),
             Horse = HorseModel.MapFrom(combination.Horse),
         };
     }
 
+    public int Id { get; init; }
     public int Number { get; init; }
     public AthleteModel Athlete { get; init; } = default!;
     public HorseModel Horse { get; init; } = default!;
@@ -113,7 +117,7 @@ public class CombinationModel
     {
         var athlete = Athlete.MapToDomain();
         var horse = Horse.MaptoDomain();
-        return new Combination(Number, athlete, horse);
+        return new Combination(Id, Number, athlete, horse);
     }
 }
 
@@ -123,6 +127,7 @@ public class ParticipationModel
     {
         return new ParticipationModel
         {
+            Id = participation.Id,
             IsNotRanked = participation.IsNotRanked,
             Category = participation.Category,
             Combination = CombinationModel.MapFrom(participation.Combination),
@@ -134,6 +139,7 @@ public class ParticipationModel
         };
     }
 
+    public int Id { get; init; }
     public ParticipationCategory Category { get; init; } = default!;
     public CombinationModel Combination { get; init; } = default!;
     public bool IsNotRanked { get; init; }
@@ -147,6 +153,7 @@ public class ParticipationModel
     {
         var combination = Combination.MapToDomain();
         return new Participation(
+            Id,
             IsNotRanked,
             combination,
             Category,
@@ -163,14 +170,15 @@ public class LoopModel
 {
     public static LoopModel MapFrom(Loop loop)
     {
-        return new() { Distance = loop.Distance };
+        return new() { Id = loop.Id, Distance = loop.Distance };
     }
 
+    public int Id { get; init; }
     public double Distance { get; init; }
 
     public Loop MapToDomain()
     {
-        return new Loop(Distance);
+        return new Loop(Id, Distance);
     }
 }
 
@@ -205,6 +213,7 @@ public class CompetitionModel
     {
         return new CompetitionModel
         {
+            Id = competition.Id,
             Name = competition.Name,
             Type = competition.Type,
             Ruleset = competition.Ruleset,
@@ -235,6 +244,7 @@ public class CompetitionModel
         var phases = Phases.Select(x => x.MapToDomain());
         var participations = Participations.Select(x => x.MapToDomain());
         return new Competition(
+            Id,
             Name,
             Type,
             Ruleset,

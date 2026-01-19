@@ -11,7 +11,8 @@ public class Participation : Entity, IEntityMirror<Combination>
     const double MAX_SPEED = 16;
 
     public Participation(
-        bool isNotRanked,
+        int? id,
+        bool? isNotRanked,
         Combination? combination,
         ParticipationCategory? category,
         DateTimeOffset? startTimeOverride,
@@ -20,10 +21,10 @@ public class Participation : Entity, IEntityMirror<Combination>
         double? minAverageSpeed = null,
         double? maxAverageSpeed = null
     )
-        : base(combination)
+        : base(id)
     {
         StartTimeOverride = startTimeOverride;
-        IsNotRanked = isNotRanked;
+        IsNotRanked = isNotRanked ?? false;
         Combination = Required(nameof(Combination), combination);
         Category = Required(nameof(Category), category);
         MaxSpeedOverride = maxSpeedOverride;

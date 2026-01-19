@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using Not.Application.Services;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NTS.Blazor.Components.ParticipationTable.Phases;
 

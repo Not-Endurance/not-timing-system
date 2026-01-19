@@ -5,19 +5,14 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class Athlete : Aggregate, IEntityMirror<Club>
 {
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Athlete(int? id, Person? names, string? feiId, Country? country, Club? club)
-        : base(id!.Value)
+        : base(id)
     {
         FeiId = feiId;
         Names = Required(nameof(Names), names);
         Country = Required(nameof(Country), country);
         Club = club;
     }
-
-    public Athlete(Person? person, string? feiId, Country? country, Club? club)
-        : this(GenerateId(), person, feiId, country, club) { }
 
     public string? FeiId { get; }
     public Person Names { get; }

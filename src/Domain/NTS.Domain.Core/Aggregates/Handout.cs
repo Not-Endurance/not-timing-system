@@ -1,19 +1,14 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Abstractions;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Handout : Aggregate, IAggregate
+public class Handout : Aggregate
 {
-    [JsonConstructor]
-    Handout(int id, Participation participation)
+    public Handout(int? id, Participation participation)
         : base(id)
     {
         Participation = participation;
     }
-
-    public Handout(Participation participation)
-        : this(GenerateId(), participation) { }
 
     public Participation Participation { get; }
 }

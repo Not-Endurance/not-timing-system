@@ -1,8 +1,10 @@
-﻿namespace NTS.Domain.Core.Aggregates.Participations;
+﻿using NTS.Domain.Core.Aggregates.Participations.Entities;
 
-public class Total : Entity
+namespace NTS.Domain.Core.Aggregates.Participations.Objects;
+
+public record Total
 {
-    public Total(IEnumerable<Phase> phases) : base(phases)
+    public Total(IEnumerable<Phase> phases)
     {
         if (phases.All(x => !x.IsComplete()))
         {

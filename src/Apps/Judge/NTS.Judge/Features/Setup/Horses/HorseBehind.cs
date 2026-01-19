@@ -13,11 +13,6 @@ public class HorseBehind : KrudServiceBase<Horse, HorseFormModel>
 
     protected override Horse CreateEntity(HorseFormModel model)
     {
-        return new (model.Name, model.FeiId);
-    }
-
-    protected override Horse UpdateEntity(HorseFormModel model)
-    {
         return new (model.Id, model.Name, model.FeiId);
     }
 }

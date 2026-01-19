@@ -5,7 +5,7 @@ using Not.Exceptions;
 using Not.Observables.Structures;
 using Not.Safe;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Features.Core.Reset;
@@ -116,7 +116,7 @@ public class HandoutsBehind
         var officials = await _officials.ReadMany();
         GuardHelper.ThrowIfDefault(enduranceEvent);
 
-        var handout = new Handout(participation);
+        var handout = new Handout(null, participation);
         var document = new HandoutDocument(handout, enduranceEvent, officials);
 
         await _semaphore.WaitAsync(); // TODO: Create LockHelper to encapsulate semaphore releases

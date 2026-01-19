@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Not.Domain.Exceptions;
 
-namespace NTS.Domain.Core.Aggregates.Participations;
+namespace NTS.Domain.Core.Aggregates.Participations.Objects;
 
-public class Withdrawn : Eliminated
+public record Withdrawn : Eliminated
 {
     public Withdrawn()
         : base(WITHDRAWN) { }
@@ -14,7 +14,7 @@ public class Withdrawn : Eliminated
     }
 }
 
-public class Retired : Eliminated
+public record Retired : Eliminated
 {
     public Retired()
         : base(RETIRED) { }
@@ -25,7 +25,7 @@ public class Retired : Eliminated
     }
 }
 
-public class Disqualified : Eliminated
+public record Disqualified : Eliminated
 {
     public Disqualified()
         : base(DISQUALIFIED) { }
@@ -58,19 +58,19 @@ public class Disqualified : Eliminated
     {
         if (codes.Length == 0)
         {
-            throw new DomainException(Please_provide_reason_to_eliminate_as__, $"{Eliminated.DISQUALIFIED}");
+            throw new DomainException(Please_provide_reason_to_eliminate_as__, $"{DISQUALIFIED}");
         }
         if (codes.Contains(DisqualifyCode.other) && string.IsNullOrWhiteSpace(complement))
         {
             throw new DomainException(
                 Please_provide_reason_to_eliminate_as__,
-                $"{Eliminated.DISQUALIFIED} {DisqualifyCode.other}"
+                $"{DISQUALIFIED} {DisqualifyCode.other}"
             );
         }
     }
 }
 
-public class FinishedNotRanked : Eliminated
+public record FinishedNotRanked : Eliminated
 {
     public FinishedNotRanked(string complement)
         : base(FINISHED_NOT_RANKED, complement) { }
@@ -81,7 +81,7 @@ public class FinishedNotRanked : Eliminated
     }
 }
 
-public class FailedToQualify : Eliminated
+public record FailedToQualify : Eliminated
 {
     [JsonConstructor]
     public FailedToQualify(FailToQualifyCode[] ftqCodes, string? complement)
@@ -119,13 +119,13 @@ public class FailedToQualify : Eliminated
         {
             throw new DomainException(
                 Please_provide_reason_to_eliminate_as__,
-                $"{Eliminated.FAILED_TO_QUALIFY} {FailToQualifyCode.FTC}"
+                $"{FAILED_TO_QUALIFY} {FailToQualifyCode.FTC}"
             );
         }
     }
 }
 
-public abstract class Eliminated : Entity
+public abstract record Eliminated
 {
     public const string WITHDRAWN = "WD";
     public const string RETIRED = "RET";
@@ -133,7 +133,7 @@ public abstract class Eliminated : Entity
     public const string DISQUALIFIED = "DQ";
     public const string FAILED_TO_QUALIFY = "FTQ";
 
-    protected Eliminated(string eliminationCode) : base(eliminationCode)
+    protected Eliminated(string eliminationCode)
     {
         Code = eliminationCode;
     }

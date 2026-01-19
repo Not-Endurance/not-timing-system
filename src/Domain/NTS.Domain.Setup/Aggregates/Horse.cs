@@ -2,13 +2,8 @@
 
 public class Horse : Aggregate
 {
-    public Horse(string? name, string? feiId)
-        : this(GenerateId(), name, feiId) { }
-
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Horse(int? id, string? name, string? feiId)
-        : base(id!.Value)
+        : base(id)
     {
         Name = Required(nameof(Name), name);
         FeiId = feiId;

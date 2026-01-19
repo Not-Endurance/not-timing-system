@@ -2,6 +2,8 @@
 using NTS.Application.Shared;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 
@@ -11,15 +13,16 @@ public class ClubModel
 {
     public static ClubModel MapFrom(Club club)
     {
-        return new ClubModel { Name = club.Name };
+        return new ClubModel { Id = club.Id, Name = club.Name };
     }
 
+    public int Id { get; init; }
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
     public string Name { get; init; } = default!;
 
     public Club MapToDomain()
     {
-        return new Club(Name);
+        return new Club(Id, Name);
     }
 }
 
@@ -27,15 +30,16 @@ public class OfficialModel
 {
     public static OfficialModel MapFrom(Official official)
     {
-        return new OfficialModel { Names = official.Person.Names, Role = official.Role };
+        return new OfficialModel { Id = official.Id, Names = official.Person.Names, Role = official.Role };
     }
 
+    public int Id { get; init; }
     public string[] Names { get; init; } = [];
     public OfficialRole Role { get; init; } = default!;
 
     public Official MapToDomain()
     {
-        return new Official(Names, Role);
+        return new Official(Id, Names, Role);
     }
 }
 
@@ -67,6 +71,7 @@ public class AthleteModel
     {
         return new AthleteModel
         {
+            Id = athlete.Id,
             FeiId = athlete.FeiId,
             Names = athlete.Names.Names,
             Country = CountryModel.MapFrom(athlete.Country),
@@ -74,6 +79,7 @@ public class AthleteModel
         };
     }
 
+    public int Id { get; init; }
     public string[] Names { get; init; } = default!;
     public CountryModel Country { get; init; } = default!;
     public ClubModel? Club { get; init; }
@@ -83,7 +89,7 @@ public class AthleteModel
     {
         var country = Country.MapToDomain();
         var club = Club?.MapToDomain();
-        return new Athlete(Names, country, club, FeiId);
+        return new Athlete(Id, Names, country, club, FeiId);
     }
 }
 
@@ -93,17 +99,19 @@ public class HorseModel
     {
         return new HorseModel
         {
+            Id = horse.Id,
             FeiId = horse.FeiId,
             Name = horse.Name,
         };
     }
 
+    public int Id { get; init; }
     public string? FeiId { get; init; }
     public string Name { get; init; } = default!;
 
     public Horse MaptoDomain()
     {
-        return new Horse(Name, FeiId);
+        return new Horse(Id, Name, FeiId);
     }
 }
 

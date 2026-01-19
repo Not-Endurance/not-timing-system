@@ -1,6 +1,8 @@
 ﻿using Not.Events;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
@@ -19,7 +21,7 @@ public class Participation : Aggregate
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
     public Participation(
-        int id,
+        int? id,
         ParticipationCategory category,
         Competition competition,
         Combination combination,
@@ -35,6 +37,7 @@ public class Participation : Aggregate
         Eliminated = notQualified;
     }
 
+    // TODO: remove this CTOR
     public Participation(
         string competitionName,
         ParticipationCategory category,
@@ -43,7 +46,7 @@ public class Participation : Aggregate
         Combination combination,
         IEnumerable<Phase> phases
     )
-        : this(GenerateId(), category, new(competitionName, ruleset, type), combination, new(phases), null) { }
+        : this(null, category, new(competitionName, ruleset, type), combination, new(phases), null) { }
 
     public Competition Competition { get; }
     public Combination Combination { get; }

@@ -6,6 +6,7 @@ namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
 
 public class ParticipationFormModel : IFormModel<Participation>
 {
+    public int? Id { get; set; }
     public bool IsNotRanked { get; set; }
     public Combination? Combination { get; set; }
     public ParticipationCategory? Category { get; set; }
@@ -18,6 +19,7 @@ public class ParticipationFormModel : IFormModel<Participation>
 
     public void FromEntity(Participation participation)
     {
+        Id = participation.Id;
         IsNotRanked = participation.IsNotRanked;
         Combination = participation.Combination;
         Category = participation.Category;

@@ -131,7 +131,6 @@ public class RankingService
         await _archive.Create(entry);
     }
 
-    // ReSharper disable once AsyncVoidMethod
     async void UpdateRanklist(ParticipationPayload payload)
     {
         if (SelectedRanking == null)

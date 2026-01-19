@@ -7,17 +7,14 @@ namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 public class Phase : Entity, IEntityMirror<Loop>, IIdentifiable
 {
-    [JsonConstructor]
     public Phase(int? id, Loop? loop, int? recovery, int? rest)
         : base(id)
     {
-        Id = Required(nameof(id), id);
         Loop = Required(nameof(Loop), loop);
         Recovery = PositiveRecovery(recovery);
         Rest = NullOrPositiveRest(rest);
     }
 
-    public int Id { get; }
     public Loop Loop { get; private set; }
     public int Recovery { get; }
     public int? Rest { get; }

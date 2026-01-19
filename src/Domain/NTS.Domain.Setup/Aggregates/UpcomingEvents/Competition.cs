@@ -9,8 +9,8 @@ public class Competition : Entity, IParent<Participation>, IParent<Phase>
     readonly List<Phase> _phases = [];
     readonly List<Participation> _participations = [];
 
-    [JsonConstructor]
     public Competition(
+        int? id,
         string? name,
         CompetitionType? type,
         CompetitionRuleset? ruleset,
@@ -22,7 +22,7 @@ public class Competition : Entity, IParent<Participation>, IParent<Phase>
         IEnumerable<Phase> phases,
         IEnumerable<Participation> participations
     )
-        : base(name, type, ruleset)
+        : base(id)
     {
         _phases = phases.ToList();
         _participations = participations.ToList();

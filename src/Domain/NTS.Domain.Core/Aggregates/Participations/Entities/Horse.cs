@@ -1,12 +1,10 @@
-﻿using NTS.Domain.Aggregates;
+﻿namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
-namespace NTS.Domain.Core.Aggregates.Participations;
-
-public class Horse
+public class Horse : Entity
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Horse(string name, string? feiId)
+    public Horse(int id, string name, string? feiId) : base(id)
     {
         Name = name;
         FeiId = feiId;

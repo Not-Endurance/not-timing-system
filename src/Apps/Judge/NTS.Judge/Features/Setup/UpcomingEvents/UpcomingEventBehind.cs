@@ -28,18 +28,6 @@ public class UpcomingEventBehind
     protected override UpcomingEvent CreateEntity(UpcomingEventFormModel model)
     {
         return new UpcomingEvent(
-            model.Name,
-            model.Place,
-            model.Country,
-            model.FeiShowId,
-            model.FeiId,
-            model.FeiEventCode
-        );
-    }
-
-    protected override UpcomingEvent UpdateEntity(UpcomingEventFormModel model)
-    {
-        return new UpcomingEvent(
             model.Id,
             model.Name,
             model.Place,

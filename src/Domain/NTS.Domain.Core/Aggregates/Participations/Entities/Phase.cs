@@ -3,9 +3,9 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.StaticOptions;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
-namespace NTS.Domain.Core.Aggregates.Participations;
+namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
-public class Phase : Aggregate
+public class Phase : Entity
 {
     // TODO: settings - Add setting for separate final. This is useful for some events such as Shumen where we need separate detection for the actual final
     bool _isSeparateFinish = false;
@@ -13,7 +13,7 @@ public class Phase : Aggregate
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
     public Phase(
-        int id,
+        int? id,
         string gate,
         double length,
         int maxRecovery,
@@ -47,6 +47,7 @@ public class Phase : Aggregate
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
     }
 
+    // TODO: remove CTOR
     public Phase(
         double length,
         int maxRecovery,
@@ -57,7 +58,7 @@ public class Phase : Aggregate
         DateTimeOffset? startTime
     )
         : this(
-            GenerateId(),
+            null,
             "",
             length,
             maxRecovery,

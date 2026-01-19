@@ -1,21 +1,13 @@
-﻿using System.Xml.Linq;
-using Not.Domain.Abstractions;
+﻿namespace NTS.Domain.Core.Aggregates;
 
-namespace NTS.Domain.Core.Aggregates;
-
-public class Official : Aggregate, IAggregate
+public class Official : Aggregate
 {
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
-    public Official(int id, Person? person, OfficialRole? role)
+    public Official(int? id, Person? person, OfficialRole? role)
         : base(id)
     {
         Person = Required(nameof(Person), person);
         Role = Required(nameof(Role), role);
     }
-
-    public Official(Person? person, OfficialRole? role)
-        : this(GenerateId(), person, role) { }
 
     public Person Person { get; }
     public OfficialRole Role { get; }

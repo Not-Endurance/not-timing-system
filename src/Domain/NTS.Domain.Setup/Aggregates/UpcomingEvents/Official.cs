@@ -5,9 +5,8 @@ namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 public class Official : Entity
 {
-    [JsonConstructor]
-    public Official(Person? person, OfficialRole? role)
-        : base(person)
+    public Official(int? id, Person? person, OfficialRole? role)
+        : base(id)
     {
         Role = Required(nameof(Role), role);
         Person = Required(nameof(Person), person);

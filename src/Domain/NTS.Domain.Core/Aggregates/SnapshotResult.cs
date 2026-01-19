@@ -7,24 +7,20 @@ public class SnapshotResult : Aggregate
 {
     public static SnapshotResult Applied(Snapshot snapshot)
     {
-        return new(snapshot, SnapshotResultType.Applied);
+        return new(null, snapshot, SnapshotResultType.Applied);
     }
 
     public static SnapshotResult NotApplied(Snapshot snapshot, SnapshotResultType type)
     {
-        return new(snapshot, type);
+        return new(null, snapshot, type);
     }
 
-    [JsonConstructor]
-    SnapshotResult(int id, Snapshot snapshot, SnapshotResultType type)
+    public SnapshotResult(int? id, Snapshot snapshot, SnapshotResultType type)
         : base(id)
     {
         Snapshot = snapshot;
         Type = type;
     }
-
-    SnapshotResult(Snapshot snapshot, SnapshotResultType type)
-        : this(GenerateId(), snapshot, type) { }
 
     public Snapshot Snapshot { get; }
     public SnapshotResultType Type { get; }

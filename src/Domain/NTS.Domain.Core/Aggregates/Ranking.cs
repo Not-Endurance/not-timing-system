@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 
 namespace NTS.Domain.Core.Aggregates;
 
@@ -8,7 +8,7 @@ public class Ranking : Aggregate
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
     public Ranking(
-        int id,
+        int? id,
         string? name,
         CompetitionRuleset? ruleset,
         CompetitionType? type,
@@ -30,6 +30,7 @@ public class Ranking : Aggregate
         FeiScheduleNumber = feiScheduleNumber;
     }
 
+    // TODO: remove ctor
     public Ranking(
         Competition competition,
         ParticipationCategory category,
@@ -39,7 +40,7 @@ public class Ranking : Aggregate
         IEnumerable<RankingEntry> entries
     )
         : this(
-            GenerateId(),
+            null,
             competition.Name,
             competition.Ruleset,
             competition.Type,

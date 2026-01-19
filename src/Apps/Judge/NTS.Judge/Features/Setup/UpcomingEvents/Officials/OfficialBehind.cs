@@ -15,7 +15,7 @@ public class OfficialBehind : KrudServiceBase<Official, OfficialFormModel>
     protected override Official CreateEntity(OfficialFormModel model)
     {
         var names = ConvertName(model.Name);
-        return new Official(names, model.Role);
+        return new Official(model.Id, names, model.Role);
     }
 
     Person? ConvertName(string? combined)

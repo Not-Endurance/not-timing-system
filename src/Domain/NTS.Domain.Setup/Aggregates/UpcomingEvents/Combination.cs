@@ -5,9 +5,8 @@ namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 public class Combination : Entity, IEntityMirror<Athlete>, IEntityMirror<Horse>
 {
-    [JsonConstructor]
-    public Combination(int? number, Athlete? athlete, Horse? horse)
-        : base(number)
+    public Combination(int? id, int? number, Athlete? athlete, Horse? horse)
+        : base(id)
     {
         Number = Required(nameof(Number), number);
         Athlete = Required(nameof(Athlete), athlete);

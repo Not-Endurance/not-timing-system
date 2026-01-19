@@ -12,6 +12,6 @@ public class CombinationBehind : KrudServiceBase<Combination, CombinationFormMod
 
     protected override Combination CreateEntity(CombinationFormModel model)
     {
-        return new(model.Number, model.Athlete, model.Horse);
+        return new(model.Id, model.Number, model.Athlete, model.Horse);
     }
 }

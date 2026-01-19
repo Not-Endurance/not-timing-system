@@ -1,6 +1,6 @@
 using MudBlazor;
 using Not.Notify;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Judge.Features.Core.Handouts;
 
 namespace NTS.Judge.Blazor.Core.Handouts.Form;

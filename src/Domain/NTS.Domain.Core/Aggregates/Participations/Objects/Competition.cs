@@ -1,8 +1,8 @@
-﻿namespace NTS.Domain.Core.Aggregates.Participations;
+﻿namespace NTS.Domain.Core.Aggregates.Participations.Objects;
 
-public class Competition : Entity
+public record Competition
 {
-    public Competition(string name, CompetitionRuleset ruleset, CompetitionType type) : base(name, ruleset, type)
+    public Competition(string name, CompetitionRuleset ruleset, CompetitionType type)
     {
         Name = name;
         Ruleset = ruleset;

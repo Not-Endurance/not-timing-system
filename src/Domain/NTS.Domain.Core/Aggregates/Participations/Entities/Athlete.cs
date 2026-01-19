@@ -1,12 +1,12 @@
 ﻿using NTS.Domain.Aggregates;
 
-namespace NTS.Domain.Core.Aggregates.Participations;
+namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 public class Athlete : Entity
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
-    public Athlete(Person names, Country country, Club? club, string? feiId) : base(names, country)
+    public Athlete(int id, Person names, Country country, Club? club, string? feiId) : base(id)
     {
         Names = names;
         Country = country;

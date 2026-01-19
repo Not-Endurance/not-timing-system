@@ -1,17 +1,9 @@
-﻿using Newtonsoft.Json;
-using NTS.Domain.Aggregates;
-
-namespace NTS.Domain.Setup.Aggregates;
+﻿namespace NTS.Domain.Setup.Aggregates;
 
 public class Club : Aggregate
 {
-    public Club(string? name)
-        : this(GenerateId(), name) { }
-
-    [System.Text.Json.Serialization.JsonConstructor]
-    [JsonConstructor]
     public Club(int? id, string? name)
-        : base(id!.Value)
+        : base(id)
     {
         Name = Required(nameof(Name), name);
     }

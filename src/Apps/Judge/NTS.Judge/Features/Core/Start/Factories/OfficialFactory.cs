@@ -4,9 +4,8 @@ namespace NTS.Judge.Features.Core.Start.Factories;
 
 public static class OfficialFactory
 {
-    public static Official Create(Domain.Setup.Aggregates.UpcomingEvents.Official official)
+    public static Official Create(Domain.Setup.Aggregates.UpcomingEvents.Official setupOfficial)
     {
-        var coreOfficial = new Official(official.Person, official.Role);
-        return coreOfficial;
+        return new Official(setupOfficial.Id, setupOfficial.Person, setupOfficial.Role);
     }
 }

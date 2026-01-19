@@ -6,7 +6,7 @@ namespace NTS.Domain.LocalizationDemo;
 public class LocalizationTest : Aggregate
 {
     public LocalizationTest()
-        : base(GenerateId()) { }
+        : base(null) { }
 
     public string Success()
     {
