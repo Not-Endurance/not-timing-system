@@ -12,8 +12,6 @@ public static class NtsWitnessServices
 {
     public static IServiceCollection ConfigureNtsWitness(this IServiceCollection services, IConfiguration configuration)
     {
-        FileContextHelper.ConfigureApplicationName("nts-witness");
-
         services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
             .AddStartlist()
             .ConfigureN()

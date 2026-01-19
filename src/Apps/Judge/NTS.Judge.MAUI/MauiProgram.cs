@@ -17,7 +17,7 @@ public static class MauiProgram
     {
         var builder = MauiApp.CreateBuilder();
         builder.UseMauiApp<App>().ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"));
-        builder.UseNLog().AddFilesystemLogger();
+        builder.UseNLog().AddFilesystemLogger("NTS.Judge");
 
         builder.Services.ConfigureJudgeMaui(builder.Configuration);
 

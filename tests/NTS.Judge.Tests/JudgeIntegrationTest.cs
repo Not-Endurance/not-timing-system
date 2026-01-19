@@ -13,7 +13,6 @@ public abstract class JudgeIntegrationTest : IntegrationTest
 
     protected override IServiceCollection ConfigureServices(string storagePath)
     {
-        FileContextHelper.SetDebugRootDirectory("nts");
         var services = new ServiceCollection();
         var configuration = new ConfigurationBuilder().Build();
         return services.ConfigureNtsJudge(configuration);

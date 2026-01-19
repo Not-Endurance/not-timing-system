@@ -12,15 +12,8 @@ namespace NTS.Storage;
 
 public static class NtsStorageServices
 {
-    // Necessary to be called directly from UI project, otherwise the runtime treeshakes this
-    // DLL off, because no resources are explicitly referenced.
-    public static Builder ConfigureNtsStorage(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        string debugRootDirectoryName = "nts"
-    )
+    public static Builder ConfigureNtsStorage(this IServiceCollection services, IConfiguration configuration)
     {
-        FileContextHelper.SetDebugRootDirectory(debugRootDirectoryName);
         return new(services, configuration);
     }
 

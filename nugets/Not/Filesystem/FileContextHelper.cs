@@ -1,44 +1,30 @@
-﻿using System.IO;
-using Not.Exceptions;
-using Not.Injection.Config;
-
+﻿#pragma warning disable IDE0052
 namespace Not.Filesystem;
 
 public static class FileContextHelper
 {
-    /// <summary>
-    /// Only used in DEBUG to provide a more stable app root directory during development<br/>
-    /// PROD builds use the exe directory to store data
-    /// </summary>
-    /// <param name="applicatioName"></param>
-    public static void SetDebugRootDirectory(string applicatioName)
+    // TODO: refactor this mess
+    public static Func<IServiceProvider, object?, FileContext> CreateFileContextFactory(string directoryName, string? appName = null)
     {
-        _applicationName = applicatioName;
-    }
-
-    public static string ConfigureApplicationName(string applicationName)
-    {
-        _applicationName = applicationName;
-        return _applicationName;
-    }
-
-    public static string GetAppDirectory(string subdirectory)
-    {
-        var basePath =
+        if (appName != null && _applicationName == null)
+        {
+            _applicationName = appName;
+        }
+        var context = new FileContext(() =>
+        {
+            var basePath =
 #if DEBUG
-            $"C:\\tmp\\{_applicationName}";
-        GuardHelper.ThrowIfDefault(_applicationName);
+                $"C:\\tmp\\{_applicationName}.debug";
+                Not.Exceptions.GuardHelper.ThrowIfDefault(_applicationName);
 #else
-        Directory.GetCurrentDirectory();
+                Directory.GetCurrentDirectory();
 #endif
-        return Path.Combine(basePath, subdirectory);
-    }
+            return Path.Combine(basePath, directoryName);
+        });
 
-    public static Func<IServiceProvider, object?, FileContext> CreateFileContextFactory(string defaultDirectoryName)
-    {
-        var context = new FileContext(() => GetAppDirectory(defaultDirectoryName));
         return (_, __) => context;
     }
 
     static string? _applicationName;
 }
+#pragma warning restore IDE0052
