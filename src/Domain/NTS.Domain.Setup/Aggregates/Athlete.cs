@@ -3,7 +3,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Athlete : Aggregate, IAthlete, IEntityMirror<Club>
+public class Athlete : Aggregate, IEntityMirror<Club>
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
@@ -19,7 +19,6 @@ public class Athlete : Aggregate, IAthlete, IEntityMirror<Club>
     public Athlete(Person? person, string? feiId, Country? country, Club? club)
         : this(GenerateId(), person, feiId, country, club) { }
 
-    IClub? IAthlete.Club => Club;
     public string? FeiId { get; }
     public Person Names { get; }
     public Country Country { get; }

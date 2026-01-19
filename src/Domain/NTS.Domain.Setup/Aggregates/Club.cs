@@ -4,7 +4,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Club : Aggregate, IClub
+public class Club : Aggregate
 {
     public Club(string? name)
         : this(GenerateId(), name) { }

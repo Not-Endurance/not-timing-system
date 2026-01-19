@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using Not.Domain.Aggregates;
-using NTS.Domain.Aggregates;
 using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
@@ -17,7 +16,7 @@ public class Combination : Aggregate
         int number,
         Athlete athlete,
         Horse horse,
-        IClub? club,
+        Club? club,
         string distance,
         Speed? minAverageSpeed,
         Speed? maxAverageSpeed
@@ -35,8 +34,8 @@ public class Combination : Aggregate
 
     public Combination(
         int number,
-        IAthlete athlete,
-        IHorse horse,
+        Athlete athlete,
+        Horse horse,
         decimal distance,
         double? minAverageSpeedlimit,
         double? maxAverageSpeedLimit
@@ -44,8 +43,8 @@ public class Combination : Aggregate
         : this(
             GenerateId(),
             number,
-            new Athlete(athlete),
-            new Horse(horse),
+            athlete,
+            horse,
             athlete.Club,
             FormatDistance(distance),
             minAverageSpeedlimit,
@@ -58,7 +57,7 @@ public class Combination : Aggregate
     public int Number { get; }
     public Athlete Athlete { get; }
     public Horse Horse { get; }
-    public IClub? Club { get; }
+    public Club? Club { get; }
     public Speed? MinAverageSpeed { get; }
     public Speed? MaxAverageSpeed { get; }
     public string Distance

@@ -7,8 +7,8 @@ public class Country : Aggregate
     public Country(int id, string? name, string? isoCode, string? nfCode, string? locale)
         : base(id)
     {
-        Name = name ?? "Default Name";
-        IsoCode = isoCode ?? "ISO";
+        Name = Required(nameof(Name), name);
+        IsoCode = Required(nameof(IsoCode), isoCode);
         NfCode = nfCode;
         Locale = locale;
     }

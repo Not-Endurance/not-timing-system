@@ -57,16 +57,14 @@ public static class ParticipationAndRankingFactory
         Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation
     )
     {
+
         var phases = CreatePhases(setupCompetition);
         var totalDistance = setupCompetition.Phases.Sum(x => (decimal)x.Loop!.Distance);
-        var combination = new Combination(
-            setupParticipation.Combination.Number,
-            setupParticipation.Combination.Athlete,
-            setupParticipation.Combination.Horse,
+        var combination = CreateCombination(
+            setupParticipation.Combination,
             totalDistance,
             setupParticipation.MinAverageSpeed,
-            setupParticipation.MaxAverageSpeed
-        );
+            setupParticipation.MaxAverageSpeed);
         return new Participation(
             setupCompetition.Name,
             setupParticipation.Category,
@@ -74,6 +72,29 @@ public static class ParticipationAndRankingFactory
             setupCompetition.Type,
             combination,
             phases
+        );
+    }
+
+    static Combination CreateCombination(
+        Domain.Setup.Aggregates.UpcomingEvents.Combination combination,
+        decimal totalDistance,
+        double? minAverageSpeed,
+        double? maxAverageSpeed)
+    {
+        var setupAthlete = combination.Athlete;
+        var setupHorse = combination.Horse;
+        var setupClub = combination.Athlete.Club;
+
+        var club = setupClub == null ? null : new Club(setupClub.Name);
+        var athlete = new Athlete(setupAthlete.Names, setupAthlete.Country, club, setupAthlete.FeiId);
+        var horse = new Horse(setupHorse.Name, setupHorse.FeiId);
+        return new Combination(
+            combination.Number,
+            athlete,
+            horse,
+            totalDistance,
+            minAverageSpeed,
+            maxAverageSpeed
         );
     }
 

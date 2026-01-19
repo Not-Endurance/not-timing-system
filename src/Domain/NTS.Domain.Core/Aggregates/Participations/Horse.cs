@@ -2,7 +2,7 @@
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public class Horse : IHorse
+public class Horse
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
@@ -10,12 +10,6 @@ public class Horse : IHorse
     {
         Name = name;
         FeiId = feiId;
-    }
-
-    public Horse(IHorse horse)
-    {
-        Name = horse.Name;
-        FeiId = horse.FeiId;
     }
 
     public string Name { get; private set; }

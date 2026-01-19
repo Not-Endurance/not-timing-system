@@ -1,9 +1,8 @@
 ﻿using Not.Domain.Aggregates;
-using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Horse : Aggregate, IHorse
+public class Horse : Aggregate
 {
     public Horse(string? name, string? feiId)
         : this(GenerateId(), name, feiId) { }

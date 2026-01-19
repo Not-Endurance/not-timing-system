@@ -3,10 +3,9 @@ using NTS.Domain.Enums;
 
 namespace NTS.Domain.Aggregates;
 
-public class Snapshot : Aggregate
+public record Snapshot
 {
     public Snapshot(int number, SnapshotType type, SnapshotMethod method, Timestamp timestamp)
-        : base(GenerateId())
     {
         Number = number;
         Type = type;

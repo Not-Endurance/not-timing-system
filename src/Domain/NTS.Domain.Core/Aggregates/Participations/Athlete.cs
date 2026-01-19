@@ -3,7 +3,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates.Participations;
 
-public class Athlete : Entity, IAthlete
+public class Athlete : Entity
 {
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
@@ -15,12 +15,6 @@ public class Athlete : Entity, IAthlete
         FeiId = feiId;
     }
 
-    // TODO: Probably move this applicaiton layer
-    public Athlete(IAthlete athlete) : this(athlete.Names, athlete.Country, athlete.Club as Club, athlete.FeiId)
-    {
-    }
-
-    IClub? IAthlete.Club => Club;
     public Person Names { get; }
     public Country Country { get; }
     public Club? Club { get; }
