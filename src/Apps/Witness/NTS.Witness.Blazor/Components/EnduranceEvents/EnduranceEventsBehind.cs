@@ -1,12 +1,9 @@
 ﻿using Not.Application.RPC;
-using Not.Blazor.Components;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
 
 public class EnduranceEventsBehind : ComponentBase
 {
-    protected IEnumerable<UpcomingEvent> Events = [];
-
     [Inject]
     IWitnessEvents WitnessEvents { get; set; } = default!;
 
@@ -15,12 +12,28 @@ public class EnduranceEventsBehind : ComponentBase
 
     [Inject]
     IRpcInitializer RpcInitializer { get; set; } = default!;
+    protected IEnumerable<UpcomingEvent> Events { get; set; } = [];
+    protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
+
+    protected bool IsConnected { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         Events = await WitnessEvents.Get();
-        await RpcContext.Set(Events.First());
-        await RpcInitializer.StartConnection();
     }
 
+    protected async void ConnectTo(UpcomingEvent selectedEvent)
+    {
+        await RpcContext.Set(selectedEvent);
+        await RpcInitializer.StartConnection();
+        IsConnected = RpcInitializer.IsConnected();
+        StateHasChanged();
+    }
+
+    protected async void Disconnect()
+    {
+        await RpcInitializer.Disconnect();
+        IsConnected = RpcInitializer.IsConnected();
+        StateHasChanged();
+    }
 }

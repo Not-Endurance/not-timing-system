@@ -750,7 +750,16 @@
   <data name="Access_denied_next_steps" xml:space="preserve">
     <value>Свържете се с администратор или опитайте с друг.</value>
   </data>
+  <data name="Connect_string" xml:space="preserve">
+    <value>Свържи се</value>
+  </data>
+  <data name="Disconnect_string" xml:space="preserve">
+    <value>Прекъсни връзката</value>
+  </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Empty_event_list_message" xml:space="preserve">
+    <value>Все още не са конфигурирани състезания по издръжливост</value>
   </data>
 </root>

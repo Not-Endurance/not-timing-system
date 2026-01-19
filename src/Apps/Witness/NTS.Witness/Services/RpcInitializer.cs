@@ -11,6 +11,11 @@ public class RpcInitializer : IRpcInitializer
         _rpcSocket = rpcSocket;
     }
 
+    public bool IsConnected()
+    {
+        return _rpcSocket.IsConnected;
+    }
+
     public async Task Disconnect()
     {
         await _rpcSocket.Disconnect();

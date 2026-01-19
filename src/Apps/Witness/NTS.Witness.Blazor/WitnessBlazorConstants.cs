@@ -9,7 +9,6 @@ internal class WitnessBlazorConstants
         public const string SIGNIN = "/signin";
         public const string SIGNOUT = "/signout";
         public const string ACCESS_DENIED = "/access-denied";
-        public const string EVENTS = "/events";
         public const string EMERGENCY_CONTACTS = "/emergency-contacts";
         public const string PERFORMANCE = "/performance";
         public const string STARTLIST = "/startlist";

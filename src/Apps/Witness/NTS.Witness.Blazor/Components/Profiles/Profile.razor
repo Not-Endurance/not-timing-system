@@ -1,26 +1,31 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Not.Blazor.Components
 @using NTS.Witness.Blazor.Components.Auth.Authentication
+@using NTS.Witness.Blazor.Components.EnduranceEvents;
+@using static WitnessBlazorConstants.UserRoles;
 
 @attribute [Route(WitnessBlazorConstants.Pages.PROFILE)]
 @inherits ProfileBehind
 
 <CascadingAuthenticationState>
-    
+    <AuthorizeView Roles="@($"{ADMIN},{OFFICIAL},{VET}")">
+            <Authorized>
+                <MudStack Class="mt-10">
+                    <EnduranceEvents />
+                </MudStack>
+            </Authorized>
+    </AuthorizeView>
     <AuthorizeView>
         <Authorized>
-            <MudGrid Justify="Justify.Center" Class="align-top" Style="height:70%;">
-                <MudItem xs="8" sm="4" lg="6" xl="6">\
-                    <MudStack>
-                        <MudText Typo="Typo.h4" Class="mr-4"> 
-                            <p>Signed in as @context.User.Identity?.Name</p>
+            <MudGrid Justify="Justify.Center" Class="align-top mt-10">
+                <MudStack Row>
+                    <MudText Typo="Typo.caption" Class="mr-4"> 
+                        <p>Signed in as @context.User.Identity?.Name</p>
 
-                            <p>You have <b>@UserRoles</b> privileges.</p>
-
-                            <MudButton Class="ml-4" Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" OnClick="SignoutHandler">Sign Out</MudButton>
-                        </MudText>
-                    </MudStack>
-                </MudItem>
+                        <p>You have <b>@UserRoles</b> privileges.</p>
+                    </MudText>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" OnClick="SignoutHandler">Sign Out <MudIcon Class="ml-2" Icon="@Icons.Material.Filled.Logout" /></MudButton>
+                </MudStack>
             </MudGrid>
         </Authorized>
 
@@ -28,5 +33,4 @@
             <Signin />
         </NotAuthorized>
     </AuthorizeView>
-
 </CascadingAuthenticationState>

@@ -1,13 +1,15 @@
-﻿@inherits EnduranceEventsBehind
-@attribute [Route(WitnessBlazorConstants.Pages.EVENTS)]
+﻿@using NTS.Domain.Setup.Aggregates
+@inherits EnduranceEventsBehind
 
-<div>
-    @foreach(var eventItem in Events)
-    {
-        <h2>
-            <span>@eventItem.Id</span><br />
-            <span>@eventItem.Name</span><br />
-            <span>@eventItem.Place</span><br />
-        </h2>
-    }
-</div>
+<NSimpleTable T="UpcomingEvent" Items="@Events" EmptyMessage="@Empty_event_list_message" Height="30vh" Headings="@EventsTableHeaders">
+    <CustomCell>
+        @if (IsConnected)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => Disconnect()">@Disconnect_string</MudButton>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => ConnectTo(context)">@Connect_string</MudButton>
+        }
+    </CustomCell>
+</NSimpleTable>

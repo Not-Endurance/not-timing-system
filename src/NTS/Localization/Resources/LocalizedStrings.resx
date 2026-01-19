@@ -753,4 +753,13 @@
   <data name="Access_denied_next_steps" xml:space="preserve">
     <value>Please contact a system Admin or try another.</value>
   </data>
+  <data name="Connect_string" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Disconnect_string" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
+  <data name="Empty_event_list_message" xml:space="preserve">
+    <value>Upcoming Events aren't configured yet</value>
+  </data>
 </root>

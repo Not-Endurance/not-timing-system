@@ -661,4 +661,13 @@
   <data name="Access_denied_next_steps" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="Connect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Disconnect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Empty_event_list_message" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
 </root>
