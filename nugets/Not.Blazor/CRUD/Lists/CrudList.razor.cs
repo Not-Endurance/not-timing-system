@@ -21,8 +21,8 @@ public partial class CrudList<T, TModel, TForm> : NComponent
     [Inject] // TODO: Probably refactor this as ICrudParent<T> and make it nullable!!!!
     IEnumerable<IKrudNodeSetter> ParentContexts { get; set; } = default!;
 
-	[Parameter]
-	public int? ParentId { get; set; } // TODO: DELETE THIS
+    [Parameter]
+    public int? ParentId { get; set; } // TODO: DELETE THIS
 
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;

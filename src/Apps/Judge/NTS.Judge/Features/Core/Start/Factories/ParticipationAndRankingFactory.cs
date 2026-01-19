@@ -11,7 +11,10 @@ public static class ParticipationAndRankingFactory
     public static (
         List<Participation> Participations,
         Dictionary<ParticipationCategory, List<RankingEntry>> RankingEntriesByCategory
-    ) Create(Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition, IEnumerable<Participation> existingParticipations)
+    ) Create(
+        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
+        IEnumerable<Participation> existingParticipations
+    )
     {
         if (setupCompetition.Phases.Count == 0)
         {

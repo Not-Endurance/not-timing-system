@@ -25,7 +25,7 @@ internal static class NtsNexusApiServices
         {
             throw new ApplicationException("MongoDB connection string is null");
         }
-        
+
         var builder = new NStorageBuilder(services, configuration);
         builder.AddMongoStorage(connectionString, Assembly.GetExecutingAssembly());
         return services;

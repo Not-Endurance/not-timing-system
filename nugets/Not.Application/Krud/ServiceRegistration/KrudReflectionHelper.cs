@@ -46,10 +46,7 @@ internal static class KrudReflectionHelper
             {
                 foreach (var candidate in UnwrapPropertyTypes(p.PropertyType))
                 {
-                    if (
-                        typeof(Entity).IsAssignableFrom(candidate)
-                        || typeof(Aggregate).IsAssignableFrom(candidate)
-                    )
+                    if (typeof(Entity).IsAssignableFrom(candidate) || typeof(Aggregate).IsAssignableFrom(candidate))
                     {
                         queue.Enqueue(candidate);
                     }

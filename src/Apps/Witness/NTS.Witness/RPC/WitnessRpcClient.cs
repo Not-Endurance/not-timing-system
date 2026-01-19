@@ -11,7 +11,11 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient : RpcClient, IWitnessParticipantsClientProcedures, IWitnessStartlistClientProcedures, ISingleton
+public class WitnessRpcClient
+    : RpcClient,
+        IWitnessParticipantsClientProcedures,
+        IWitnessStartlistClientProcedures,
+        ISingleton
 {
     readonly IRpcSocket _socket;
     readonly IStartlistContext _startlistContex;

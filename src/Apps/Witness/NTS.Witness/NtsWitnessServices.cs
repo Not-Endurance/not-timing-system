@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Authentication;
 using Not.Blazor;
-using Not.Filesystem;
 using NTS.Application;
 
 namespace NTS.Witness;
@@ -16,7 +15,7 @@ public static class NtsWitnessServices
             .AddStartlist()
             .ConfigureN()
             .AddSignalR();
-        
+
         services.ConfigureNts(configuration).AddNBlazor(configuration).ConfigureAuthentication(configuration);
 
         return services;
