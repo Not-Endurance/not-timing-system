@@ -11,7 +11,7 @@ public partial class App : Microsoft.Maui.Controls.Application
         InitializeComponent();
         mauiProcessService.SetAppName("NTS Judge");
 
-        MainPage = new SplashPage();
+        Windows[0].Page = new SplashPage();
 
         FileContextHelper.ConfigureApplicationName("nts");
 
