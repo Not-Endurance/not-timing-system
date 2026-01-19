@@ -13,11 +13,6 @@ public class Person
         return new Person(names.Split(DELIMITER, StringSplitOptions.RemoveEmptyEntries));
     }
 
-    //public static implicit operator string[](Person member)
-    //{
-    //    return member.Names;
-    //}
-
     public static implicit operator Person(string[] names)
     {
         return new Person(names);

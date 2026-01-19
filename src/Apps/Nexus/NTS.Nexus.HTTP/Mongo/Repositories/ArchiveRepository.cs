@@ -22,16 +22,15 @@ public class ArchiveRepository : MongoRepository<ArchiveEntryModel>, IArchiveMon
             .Set(x => x.Location, document.Location);
     }
 
-    public Task<IEnumerable<ArchiveEntryModel>> GetPerformances(int horseId) // TODO: fix
+    public async Task<IEnumerable<ArchiveEntryModel>> GetPerformances(int horseId)
     {
-        throw new NotImplementedException();
-        //return await GetCollection()
-        //    .Aggregate()
-        //    .Match(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)))
-        //    //.Project(x =>
-        //    //    x.Ranklists.SelectMany(y => y.Entries).First(z => z.Participation.Combination.Horse.Id == horseId)
-        //    //)
-        //    .ToListAsync();
+        return await GetCollection()
+            .Aggregate()
+            .Match(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == horseId)))
+            //.Project(x =>
+            //    x.Ranklists.SelectMany(y => y.Entries).First(z => z.Participation.Combination.Horse.Id == horseId)
+            //)
+            .ToListAsync();
     }
 }
 

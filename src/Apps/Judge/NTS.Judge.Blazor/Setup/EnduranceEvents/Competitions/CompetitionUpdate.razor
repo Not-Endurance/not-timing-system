@@ -22,12 +22,10 @@
             </MudItem>
 
             <MudItem xs="6">
-                @* //TODO: behind creates multiple phases at once. ????? *@
                 <CrudList T="Phase" Name="@Phases_string" TModel="PhaseFormModel" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" />
             </MudItem>
 
             <MudItem xs="6">
-                @* //TODO: behind creates multiple contestants at once. ???? *@
                 <CrudList T="Participation" Name="@Participations_string" TModel="ParticipationFormModel" TForm="ParticipationForm" UpdateRoute="@PARTICIPATION_UPDATE" />
             </MudItem>
 

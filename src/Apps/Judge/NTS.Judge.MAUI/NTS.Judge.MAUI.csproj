@@ -84,13 +84,5 @@
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
   </ItemGroup>
-
-  <ItemGroup>
-    <EditorConfigFiles Remove="D:\Source\NTS\not-timing-system\src\Apps\Judge\NTS.Judge.MAUI\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="D:\Source\NTS\not-timing-system\src\Apps\Judge\NTS.Judge.MAUI\.editorconfig" />
-  </ItemGroup>
   
 </Project>

@@ -58,27 +58,27 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     )
     {
         return Task.FromResult(new OkObjectResult("ok") as IActionResult);
-        //LogInformation(request);
+        LogInformation(request);
 
-        //var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
 
-        //var recordsWithHorse = await _archive
-        //    .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
-        //    .ToList();
-        //if (recordsWithHorse.Any())
-        //{
-        //    return new OkObjectResult(
-        //        $"The horse you want to delete has participated in '{recordsWithHorse.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
-        //    );
-        //}
-        //var horse = await _horses.Read(id);
-        //if (horse == null)
-        //{
-        //    return new OkObjectResult($"Club wiht id '{id}' did not exist");
-        //}
-        //await _horses.Delete(horse);
+        var recordsWithHorse = await _archive
+            .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
+            .ToList();
+        if (recordsWithHorse.Any())
+        {
+            return new OkObjectResult(
+                $"The horse you want to delete has participated in '{recordsWithHorse.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
+            );
+        }
+        var horse = await _horses.Read(id);
+        if (horse == null)
+        {
+            return new OkObjectResult($"Club wiht id '{id}' did not exist");
+        }
+        await _horses.Delete(horse);
 
-        //return new OkObjectResult($"Deleted horse with id '{id}'");
+        return new OkObjectResult($"Deleted horse with id '{id}'");
     }
 
     [Function("horses-delete")]
