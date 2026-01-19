@@ -95,15 +95,7 @@ public class DummyData
             null,
             DateTimeOffset.Now.AddMinutes(23)
         );
-        var phase2 = CreatePhase(
-            20,
-            20,
-            40,
-            CompetitionRuleset.Regional,
-            true,
-            null,
-            null
-        );
+        var phase2 = CreatePhase(20, 20, 40, CompetitionRuleset.Regional, true, null, null);
         phases.Add(phase1);
         phases.Add(phase2);
         return phases;
@@ -116,7 +108,8 @@ public class DummyData
         CompetitionRuleset competitionRuleset,
         bool isFinal,
         TimeSpan? compulsoryThresholdSpan,
-        DateTimeOffset? startTime)
+        DateTimeOffset? startTime
+    )
     {
         return new Phase(
             null,
@@ -133,6 +126,7 @@ public class DummyData
             null,
             false,
             false,
-            false);
+            false
+        );
     }
 }

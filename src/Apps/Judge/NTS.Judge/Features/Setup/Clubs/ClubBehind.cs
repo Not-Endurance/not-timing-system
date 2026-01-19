@@ -12,6 +12,6 @@ internal class ClubBehind : KrudServiceBase<Club, ClubFormModel>
 
     protected override Club CreateEntity(ClubFormModel model)
     {
-        return new (model.Id, model.Name);
+        return new(model.Id, model.Name);
     }
 }

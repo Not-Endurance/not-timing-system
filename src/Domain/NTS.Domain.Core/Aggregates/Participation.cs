@@ -35,7 +35,6 @@ public class Participation : Aggregate
         Eliminated = notQualified;
     }
 
-
     public Competition Competition { get; }
     public Combination Combination { get; }
     public ParticipationCategory Category { get; }

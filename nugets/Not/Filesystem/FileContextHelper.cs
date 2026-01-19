@@ -4,7 +4,10 @@ namespace Not.Filesystem;
 public static class FileContextHelper
 {
     // TODO: refactor this mess
-    public static Func<IServiceProvider, object?, FileContext> CreateFileContextFactory(string directoryName, string? appName = null)
+    public static Func<IServiceProvider, object?, FileContext> CreateFileContextFactory(
+        string directoryName,
+        string? appName = null
+    )
     {
         if (appName != null && _applicationName == null)
         {
@@ -15,9 +18,9 @@ public static class FileContextHelper
             var basePath =
 #if DEBUG
                 $"C:\\tmp\\{_applicationName}.debug";
-                Not.Exceptions.GuardHelper.ThrowIfDefault(_applicationName);
+            Not.Exceptions.GuardHelper.ThrowIfDefault(_applicationName);
 #else
-                Directory.GetCurrentDirectory();
+            Directory.GetCurrentDirectory();
 #endif
             return Path.Combine(basePath, directoryName);
         });

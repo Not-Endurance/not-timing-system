@@ -101,7 +101,8 @@ public class CoreStartService : ICoreStarter
             setupCompetition.FeiId,
             setupCompetition.FeiRule,
             setupCompetition.FeiScheduleNumber,
-            new(entriesByCategory.Value));
+            new(entriesByCategory.Value)
+        );
     }
 
     void ValidateFeiConfiguration(UpcomingEvent setupEvent)

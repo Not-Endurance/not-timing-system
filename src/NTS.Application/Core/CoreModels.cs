@@ -32,7 +32,12 @@ public class OfficialModel
 {
     public static OfficialModel MapFrom(Official official)
     {
-        return new OfficialModel { Id = official.Id, Names = official.Person.Names, Role = official.Role };
+        return new OfficialModel
+        {
+            Id = official.Id,
+            Names = official.Person.Names,
+            Role = official.Role,
+        };
     }
 
     public int Id { get; init; }
@@ -396,7 +401,8 @@ public class RanklistModel
             CompetitionFeiId,
             FeiRule,
             FeiScheduleNumber,
-            new (entries));
+            new(entries)
+        );
         return new Ranklist(ranking, entries);
     }
 }

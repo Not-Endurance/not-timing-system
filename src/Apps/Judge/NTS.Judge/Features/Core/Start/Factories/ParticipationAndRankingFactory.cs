@@ -61,20 +61,20 @@ public static class ParticipationAndRankingFactory
         Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation
     )
     {
-
         var phases = CreatePhases(setupCompetition);
         var totalDistance = setupCompetition.Phases.Sum(x => (decimal)x.Loop!.Distance);
         var combination = CreateCombination(
             setupParticipation.Combination,
             totalDistance,
             setupParticipation.MinAverageSpeed,
-            setupParticipation.MaxAverageSpeed);
+            setupParticipation.MaxAverageSpeed
+        );
         return new Participation(
             null,
             setupParticipation.Category,
             new(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type),
             combination,
-            new (phases),
+            new(phases),
             null
         );
     }
@@ -83,7 +83,8 @@ public static class ParticipationAndRankingFactory
         Domain.Setup.Aggregates.UpcomingEvents.Combination combination,
         decimal totalDistance,
         double? minAverageSpeed,
-        double? maxAverageSpeed)
+        double? maxAverageSpeed
+    )
     {
         var setupAthlete = combination.Athlete;
         var setupHorse = combination.Horse;

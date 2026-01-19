@@ -2,7 +2,8 @@
 
 public class Horse : Entity
 {
-    public Horse(int id, string name, string? feiId) : base(id)
+    public Horse(int id, string name, string? feiId)
+        : base(id)
     {
         Name = name;
         FeiId = feiId;
