@@ -1,4 +1,5 @@
 using Not.Blazor.Navigation;
+using NTS.Judge.Features.Core;
 using NTS.Judge.Features.Setup.Settings;
 using static NTS.Judge.Blazor.Shared.Constants.BlazorPages;
 
@@ -12,6 +13,9 @@ public partial class NavMenu
     [Inject]
     protected ISettingBehind SettingBehind { get; set; } = default!;
 
+    [Inject]
+    protected ICoreService CoreService { get; set; } = default!;
+
     protected override void OnInitialized()
     {
         LandNavigator.Initialize(HOME);
@@ -22,5 +26,6 @@ public partial class NavMenu
         // Necessary in order to initialize the settings on startup
         // TODO: what do if no internet?
         await Observe(SettingBehind);
+        await Observe(CoreService);
     }
 }

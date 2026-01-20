@@ -72,6 +72,7 @@ public class CoreService : NStatefulService, ICoreService
         {
             observable.ResetState();
         }
+        EmitChanged();
     }
 
     public async Task LoadArchive(int archiveId)
