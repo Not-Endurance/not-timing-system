@@ -1,9 +1,9 @@
 using Not.Collections;
 using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Witness.RPC.Procedures;
+namespace NTS.Warp.Features.Witness.Procedures;
 
-public interface IWitnessParticipantsClientProcedures
+public interface IParticipantsClientProcedures
 {
     Task Receive(Participation participation, NCollectionAction action);
 }

@@ -1,9 +1,9 @@
 using Not.Collections;
 using NTS.Domain.Core.Objects.Startlists;
 
-namespace NTS.Witness.RPC.Procedures;
+namespace NTS.Warp.Features.Witness.Procedures;
 
-public interface IWitnessStartlistClientProcedures
+public interface IStartlistClientProcedures
 {
     Task Receive(StartlistEntry entry, NCollectionAction action);
 }

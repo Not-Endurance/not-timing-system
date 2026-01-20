@@ -1,29 +1,37 @@
+using System.Collections.Generic;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Collections;
+using Not.Extensions;
+using NTS.Application.Models;
 using NTS.Application.Startlists;
+using NTS.Application.Warp;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Startlists;
-using NTS.Witness.RPC.Procedures;
+using NTS.Warp;
+using NTS.Warp.Features.Witness.Procedures;
 using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient : RpcClient, IWitnessParticipantsClientProcedures, IWitnessStartlistClientProcedures
+public class WitnessRpcClient : RpcClient, IParticipantsClientProcedures, IStartlistClientProcedures, ISnapshotService
 {
     readonly IRpcSocket _socket;
+    readonly ISelectedEventContext _eventContext;
     readonly IStartlistContext _startlistContext;
     readonly ParticipationService _participationService;
 
     public WitnessRpcClient(
         IRpcSocket socket,
+        ISelectedEventContext eventContext,
         ParticipationService participationService,
         IStartlistContext startlistContext
     )
         : base(socket)
     {
         _socket = socket;
+        _eventContext = eventContext;
         _startlistContext = startlistContext;
         _participationService = participationService;
     }
@@ -34,9 +42,10 @@ public class WitnessRpcClient : RpcClient, IWitnessParticipantsClientProcedures,
         RegisterInputProcedure<Participation, NCollectionAction>(nameof(Receive), Receive);
     }
 
-    public async Task<RpcInvokeResult> PublishSnapshotsAsync(WitnessSnapshotPayload payload)
+    public async Task<RpcInvokeResult> PublishSnapshotsAsync(SnapshotModel model)
     {
-        return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), payload);
+        var request = WarpRequest.Create(_eventContext.Event!.Id.ToString(), model);
+        return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), request);
     }
 
     public Task Receive(StartlistEntry entry, NCollectionAction action)
@@ -51,9 +60,10 @@ public class WitnessRpcClient : RpcClient, IWitnessParticipantsClientProcedures,
         return Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Participation>> GetParcipations()
+    public async Task<RpcInvokeResult<IEnumerable<Participation>>> GetParticipations()
     {
-        var participations = DummyData.CreateParticipations(10);
-        return Task.FromResult(participations.AsEnumerable());
+        var request = WarpRequest.Create(_eventContext.Event!.Id.ToString());
+        var result = await _socket.InvokeOutputProcedure<IEnumerable<Participation>, WarpRequest>(nameof(IWitnessHubProcedures.SendParticipants),request);
+        return result;
     }
 }
