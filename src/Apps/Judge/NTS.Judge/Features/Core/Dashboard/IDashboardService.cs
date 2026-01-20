@@ -2,7 +2,7 @@
 
 namespace NTS.Judge.Features.Core.Dashboard;
 
-public interface IDashboardBehind : IParticipationContext
+public interface IDashboardService : IParticipationContext
 {
     // TODO: this should probably be removed and Participations can be returned from Start instead
     IEnumerable<Participation> Participations { get; }

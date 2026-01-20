@@ -7,7 +7,7 @@ namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Inspections;
 public partial class InspectionsPanel
 {
     [Inject]
-    IInspections Inspections { get; set; } = default!;
+    IInspectionService Inspections { get; set; } = default!;
 
     Participation? SelectedParticipation => Inspections.SelectedParticipation; // TODO: fix naming rules should be _ prefixed
     Phase? CurrentPhase => SelectedParticipation?.Phases.Current;
@@ -26,6 +26,6 @@ public partial class InspectionsPanel
 
     async Task ToggleRequiredInspection(bool value)
     {
-        await Inspections.RequireInspection(value);
+        await Inspections.RequireRepresent(value);
     }
 }

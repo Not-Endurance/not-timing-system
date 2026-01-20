@@ -1,37 +1,26 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
-using Not.Exceptions;
 using Not.Formatting;
 using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
-using NTS.Domain.Enums;
 
-namespace NTS.Judge.Features.Core.FeiExport;
+namespace NTS.Judge.Features.Core.Rankings.FeiExport;
 
-public class FeiExportBusiness : IFeiExportBusiness
+internal class FeiExportFeature : IFeiExportFeature
 {
-    readonly IRepository<EnduranceEvent> _events;
-
-    public FeiExportBusiness(IRepository<EnduranceEvent> events)
+    public string CreateXmlContent(Ranklist ranklist, EnduranceEvent enduranceEvent)
     {
-        _events = events;
-    }
-
-    public async Task<string> Create(Ranklist ranklist)
-    {
-        var enduranceEvent = await _events.Read(0);
-        var horseSport = CreateHorseSport(enduranceEvent!, ranklist);
-        var xml = Serialize(horseSport);
+        var model = CreateHorseSport(ranklist, enduranceEvent);
+        var xml = Serialize(model);
         return InsertGeneratedDate(xml);
     }
 
-    HorseSport CreateHorseSport(EnduranceEvent enduranceEvent, Ranklist ranklist)
+    HorseSport CreateHorseSport(Ranklist ranklist, EnduranceEvent enduranceEvent)
     {
         var ranking = ranklist.Ranking;
         if (string.IsNullOrWhiteSpace(enduranceEvent.FeiShowId))
@@ -261,7 +250,7 @@ public class FeiExportBusiness : IFeiExportBusiness
     }
 }
 
-public interface IFeiExportBusiness : ITransient
+public interface IFeiExportFeature : ITransient
 {
-    Task<string> Create(Ranklist ranklist);
+    string CreateXmlContent(Ranklist ranklist, EnduranceEvent enduranceEvent);
 }

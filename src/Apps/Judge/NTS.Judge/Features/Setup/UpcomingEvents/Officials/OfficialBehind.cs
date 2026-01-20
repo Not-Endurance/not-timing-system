@@ -3,7 +3,6 @@ using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
-using NTS.Judge.Features.Core.Behinds;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Officials;
 

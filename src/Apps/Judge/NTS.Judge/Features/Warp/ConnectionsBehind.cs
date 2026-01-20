@@ -2,7 +2,7 @@
 using Not.Application.RPC.SignalR;
 using Not.Notify;
 
-namespace NTS.Judge.Features.Core.Behinds.Adapters;
+namespace NTS.Judge.Features.Warp;
 
 public class ConnectionsBehind : IConnectionsBehind, IConnectionsRegistry, IDisposable
 {

@@ -27,7 +27,7 @@ public static class NLogExtensions
     {
         var factory = FileContextHelper.CreateFileContextFactory("logs", appName);
         builder
-            .Services.AddKeyedSingleton<IFileContext, FileContext>(NLogBuilder.KEY, factory)
+            .Services.AddKeyedSingleton<IFilesystemContext, FilesystemContext>(NLogBuilder.KEY, factory)
             .AddSingleton<IStartupInitializer, FilesystemLoggerInitalizer>();
 
         return builder;

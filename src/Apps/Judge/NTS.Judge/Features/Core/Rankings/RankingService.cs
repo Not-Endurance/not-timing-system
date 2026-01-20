@@ -10,7 +10,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Judge.Features.Core.FeiExport;
+using NTS.Judge.Features.Core.Rankings.FeiExport;
 using NTS.Judge.Features.Core.Reset;
 
 namespace NTS.Judge.Features.Core.Rankings;
@@ -23,24 +23,18 @@ public class RankingService
         ICustomRankingService,
         ICoreDependentObservables
 {
-    readonly IFileContext _configuration;
-    readonly IFeiExportBusiness _feiExportBusiness;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
 
     public RankingService(
-        [FromKeyedServices("NDataKey")] IFileContext configuration,
-        IFeiExportBusiness feiExportBusiness,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Official> officials,
         IRepository<ArchiveEntry> archive
     )
     {
-        _configuration = configuration;
-        _feiExportBusiness = feiExportBusiness;
         _rankings = rankings;
         _events = events;
         _officials = officials;
@@ -102,17 +96,6 @@ public class RankingService
         await _rankings.Delete(ranking);
         Rankings.Remove(ranking);
         EmitChanged();
-    }
-
-    public async Task GenerateFeiExport()
-    {
-        if (Ranklist == null)
-        {
-            return;
-        }
-        var xml = await _feiExportBusiness.Create(Ranklist);
-        var path = $"{_configuration.Path}/fei-export-{Ranklist.Name.Replace(" ", "").Replace("*", "")}.xml";
-        await FileHelper.WriteAsync(path, xml);
     }
 
     public async Task ArchiveEnduranceEvent()

@@ -2,7 +2,7 @@ using NTS.Domain.Core.Aggregates.Participations;
 
 namespace NTS.Judge.Features.Core.Dashboard;
 
-public interface IEliminations : IParticipationContext
+public interface IEliminationService : IParticipationContext
 {
     Task Withdraw();
     Task Retire();

@@ -7,7 +7,7 @@ namespace NTS.Judge.Blazor.Core.Dashboards.Component;
 public partial class Dashboard
 {
     [Inject]
-    IDashboardBehind Behind { get; set; } = default!;
+    IDashboardService Behind { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

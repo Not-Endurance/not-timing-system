@@ -4,7 +4,7 @@ namespace Not.Filesystem;
 public static class FileContextHelper
 {
     // TODO: refactor this mess
-    public static Func<IServiceProvider, object?, FileContext> CreateFileContextFactory(
+    public static Func<IServiceProvider, object?, FilesystemContext> CreateFileContextFactory(
         string directoryName,
         string? appName = null
     )
@@ -13,7 +13,7 @@ public static class FileContextHelper
         {
             _applicationName = appName;
         }
-        var context = new FileContext(() =>
+        var context = new FilesystemContext(() =>
         {
             var basePath =
 #if DEBUG

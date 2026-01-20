@@ -49,7 +49,7 @@ public class NStorageBuilder
         where T : class, IState, new()
     {
         var factory = FileContextHelper.CreateFileContextFactory("stores");
-        _services.AddKeyedSingleton<IFileContext, FileContext>(StoreConstants.DATA_KEY, factory);
+        _services.AddKeyedSingleton<IFilesystemContext, FilesystemContext>(StoreConstants.DATA_KEY, factory);
         _services.AddSingleton<TInterface, TStore>();
         _services.AddSingleton(x => (IStore<T>)x.GetRequiredService<TInterface>());
         _services.AddAsInterfaces(typeof(ReadonlyRootRepository<,>), ServiceLifetime.Transient, assembly);

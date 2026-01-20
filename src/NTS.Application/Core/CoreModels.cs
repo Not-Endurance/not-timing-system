@@ -7,7 +7,6 @@ using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using static MudBlazor.CategoryTypes;
 
 namespace NTS.Application.Core;
 

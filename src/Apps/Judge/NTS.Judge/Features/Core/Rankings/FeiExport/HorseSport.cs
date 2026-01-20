@@ -18,7 +18,7 @@ using System.Xml.Serialization;
 // ReSharper disable ArrangeAccessorOwnerBody
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-namespace NTS.Judge.Features.Core.FeiExport;
+namespace NTS.Judge.Features.Core.Rankings.FeiExport;
 
 /// <remarks/>
 [GeneratedCode("xsd", "4.8.3928.0")]
