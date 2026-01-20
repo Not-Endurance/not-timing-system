@@ -12,9 +12,9 @@ namespace NTS.Nexus.HTTP.Functions;
 
 public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 {
-    readonly IArchiveMongoRepository _archive;
+    readonly IArchiveRepository _archive;
 
-    public ArchiveFunctions(IArchiveMongoRepository archive, IFunctionLogger<ArchiveFunctions> logger)
+    public ArchiveFunctions(IArchiveRepository archive, IFunctionLogger<ArchiveFunctions> logger)
         : base(logger)
     {
         _archive = archive;

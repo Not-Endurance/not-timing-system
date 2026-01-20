@@ -8,17 +8,20 @@ using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Mongo.Repositories;
 
 namespace NTS.Nexus.HTTP.Functions;
 
 public class HorseFunctions : FunctionBase<HorseFunctions>
 {
     readonly IRepository<HorseModel> _horses;
+    readonly IArchiveRepository _archive;
 
-    public HorseFunctions(IFunctionLogger<HorseFunctions> logger, IRepository<HorseModel> horses)
+    public HorseFunctions(IFunctionLogger<HorseFunctions> logger, IRepository<HorseModel> horses, IArchiveRepository archive)
         : base(logger)
     {
         _horses = horses;
+        _archive = archive;
     }
 
     [Function("horses-insert")]
@@ -52,12 +55,10 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     }
 
     [Function("horses-safe-delete")]
-    public Task<IActionResult> SafeDelete( // TODO: fix
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")] HttpRequest _,
-        int __
-    )
+    public async Task<IActionResult> SafeDelete( // TODO: fix
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")] HttpRequest request,
+        int id)
     {
-        return Task.FromResult(new OkObjectResult("ok") as IActionResult);
         LogInformation(request);
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
@@ -74,7 +75,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         var horse = await _horses.Read(id);
         if (horse == null)
         {
-            return new OkObjectResult($"Club wiht id '{id}' did not exist");
+            return new OkObjectResult($"Club with id '{id}' did not exist");
         }
         await _horses.Delete(horse);
 
