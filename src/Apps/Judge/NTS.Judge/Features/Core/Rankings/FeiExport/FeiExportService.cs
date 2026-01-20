@@ -14,9 +14,10 @@ public class FeiExportService : IFeiExportService
     readonly IFilesystemContext _filesystemContext;
 
     public FeiExportService(
-        IRepository<EnduranceEvent> events, 
+        IRepository<EnduranceEvent> events,
         IFeiExportFeature feiExport,
-        [FromKeyedServices("NDataKey")] IFilesystemContext filesystemContext)
+        [FromKeyedServices("NDataKey")] IFilesystemContext filesystemContext
+    )
     {
         _events = events;
         _feiExport = feiExport;

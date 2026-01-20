@@ -20,4 +20,3 @@ public partial class App : Microsoft.Maui.Controls.Application
     }
 }
 #pragma warning restore CA1416 // Validate platform compatibility
-
