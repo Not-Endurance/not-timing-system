@@ -1,6 +1,6 @@
 using Not.Injection;
 
-namespace NTS.Judge.Features.Core.Rankings;
+namespace NTS.Judge.Features.Core.Rankings.CustomRankings;
 
 public interface ICustomRankingService : ISingleton
 {

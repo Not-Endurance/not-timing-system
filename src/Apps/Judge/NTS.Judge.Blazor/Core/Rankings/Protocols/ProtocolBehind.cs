@@ -1,6 +1,5 @@
 using MudBlazor;
 using Not.Blazor.Components;
-using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 using NTS.Judge.Features.Core.Rankings;
@@ -10,7 +9,10 @@ namespace NTS.Judge.Blazor.Core.Rankings.Protocols;
 public class ProtocolBehind : NComponent
 {
     [Inject]
-    IRanklistDocumentService Service { get; set; } = default!;
+    IRankingMenuService RankingService { get; set; } = default!;
+
+    [Inject]
+    IRanklistDocumentFactory Factory { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
@@ -18,13 +20,16 @@ public class ProtocolBehind : NComponent
     [Inject]
     protected IProtocolLogoState HeaderLogo { get; set; } = default!;
 
-    public DocumentHeader? Header => Service.Document?.Header;
-
-    public Ranklist? Ranklist => Service.Document?.Ranklist;
+    protected RanklistDocument Document { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Service);
+        await Observe(RankingService);
+    }
+
+    protected override async Task OnBeforeRenderAsync()
+    {
+        Document = await Factory.Create(RankingService.Current);
     }
 
     public async Task OpenImageBrowser(string forImage, string source)

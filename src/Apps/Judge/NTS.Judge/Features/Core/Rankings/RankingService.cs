@@ -1,16 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Behinds.Adapters;
+﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
-using Not.Filesystem;
 using Not.Notify;
 using Not.Observables.Structures;
-using Not.Random;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Judge.Features.Core.Rankings.FeiExport;
+using NTS.Judge.Features.Core.Rankings.CustomRankings;
 using NTS.Judge.Features.Core.Reset;
 
 namespace NTS.Judge.Features.Core.Rankings;
@@ -19,7 +16,7 @@ public class RankingService
     : NStatefulService<ObservableList<Ranking>>,
         IRankingService,
         IRankingMenuService,
-        IRanklistDocumentService,
+        IRanklistDocumentFactory,
         ICustomRankingService,
         ICoreDependentObservables
 {
@@ -27,6 +24,7 @@ public class RankingService
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
+    Ranking? _current;
 
     public RankingService(
         IRepository<Ranking> rankings,
@@ -45,9 +43,10 @@ public class RankingService
         Participation.RESTORED_EVENT.Subscribe(UpdateRanklist);
     }
 
-    public Ranking? SelectedRanking { get; set; }
-    public Ranklist? Ranklist { get; set; }
-    public RanklistDocument? Document { get; private set; }
+    public Ranking Current => GuardHelper.ThrowIfDefault(
+        _current, 
+        $"'{nameof(RankingService)}.{nameof(Current)}' shouldn't be used before '{CreateState}' has completed. Did you forget to call 'Observe'?");
+
     public ObservableList<Ranking> Rankings => State;
 
     protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
@@ -57,16 +56,15 @@ public class RankingService
         {
             return false;
         }
+        _current = rankings.First();
         Rankings.Clear();
         Rankings.AddRange(rankings);
-        await Select(rankings.First());
         return true;
     }
 
     public async Task Create(CustomRankingModel model)
     {
         var ranking = new Ranking(
-            RandomHelper.GenerateUniqueInteger(),
             model.Name,
             model.Ruleset,
             model.Type,
@@ -78,17 +76,6 @@ public class RankingService
         );
         await _rankings.Create(ranking);
         Rankings.AddOrReplace(ranking);
-    }
-
-    public async Task Select(Ranking ranking)
-    {
-        var enduranceEvent = await _events.Read(0);
-        var officials = await _officials.ReadMany();
-        GuardHelper.ThrowIfDefault(enduranceEvent);
-        SelectedRanking = ranking;
-        Ranklist = new Ranklist(SelectedRanking);
-        Document = new RanklistDocument(Ranklist, enduranceEvent, officials);
-        EmitChanged();
     }
 
     public async Task Delete(Ranking ranking)
@@ -114,9 +101,23 @@ public class RankingService
         await _archive.Create(entry);
     }
 
-    async void UpdateRanklist(ParticipationPayload payload)
+    public async Task<RanklistDocument> Create(Ranking ranking)
     {
-        if (SelectedRanking == null)
+        var enduranceEvent = await _events.Read(0);
+        var officials = await _officials.ReadMany();
+        var ranklist = new Ranklist(ranking);
+        return new RanklistDocument(ranklist, enduranceEvent!, officials);
+    }
+
+    public void Select(Ranking ranking)
+    {
+        _current = ranking;
+        EmitChanged();
+    }
+
+    void UpdateRanklist(ParticipationPayload payload)
+    {
+        if (Current == null)
         {
             return;
         }
@@ -124,6 +125,6 @@ public class RankingService
         {
             ranking.Update(payload.Participation);
         }
-        await Select(SelectedRanking);
+        EmitChanged();
     }
 }

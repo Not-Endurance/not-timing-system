@@ -5,7 +5,6 @@ namespace NTS.Domain.Core.Aggregates;
 public class Ranking : Aggregate
 {
     public Ranking(
-        int? id,
         string? name,
         CompetitionRuleset? ruleset,
         CompetitionType? type,
@@ -13,7 +12,8 @@ public class Ranking : Aggregate
         string? competitionFeiId,
         string? feiRule,
         string? feiScheduleNumber,
-        ReadOnlyCollection<RankingEntry> entries
+        ReadOnlyCollection<RankingEntry> entries,
+        int? id = null
     )
         : base(id)
     {

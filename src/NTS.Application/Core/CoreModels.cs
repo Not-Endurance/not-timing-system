@@ -392,7 +392,6 @@ public class RanklistModel
         var entries = Entries.Select(x => x.MapToDomain()).ToList();
         var competition = new Competition(Name, Ruleset, Type);
         var ranking = new Ranking(
-            Id,
             Name,
             Ruleset,
             Type,
@@ -400,7 +399,8 @@ public class RanklistModel
             CompetitionFeiId,
             FeiRule,
             FeiScheduleNumber,
-            new(entries)
+            new(entries),
+            Id
         );
         return new Ranklist(ranking, entries);
     }

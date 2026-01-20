@@ -1,7 +1,7 @@
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 
-namespace NTS.Judge.Features.Core.Rankings;
+namespace NTS.Judge.Features.Core.Rankings.CustomRankings;
 
 public class CustomRankingModel
 {

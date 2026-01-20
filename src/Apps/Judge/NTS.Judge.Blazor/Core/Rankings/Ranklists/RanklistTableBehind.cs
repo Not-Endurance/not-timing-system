@@ -7,12 +7,17 @@ namespace NTS.Judge.Blazor.Core.Rankings.Ranklists;
 public class RanklistTableBehind : NComponent
 {
     [Inject]
-    IRanklistDocumentService Service { get; set; } = default!;
+    IRankingContext RankingContext { get; set; } = default!;
 
-    public Ranklist? Ranklist => Service.Document?.Ranklist;
+    public Ranklist Ranklist { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Service);
+        await Observe(RankingContext);
+    }
+
+    protected override void OnBeforeRender()
+    {
+        Ranklist = new(RankingContext.Current);
     }
 }

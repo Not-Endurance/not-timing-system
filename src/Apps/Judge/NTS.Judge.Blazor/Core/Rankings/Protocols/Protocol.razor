@@ -1,24 +1,29 @@
 ﻿@using static Not.Localization.LocalizationHelper
 @inherits ProtocolBehind
 
-@if (Header == null || Ranklist == null)
-{
-    <NHeadline3 Color="Color.Error" Content="@string.Format(Component_missing_required_value_string, Protocol_string)" />
-    return;
+@{
+    if (Document == null)
+    {
+        return;
+    }
+    var header = Document.Header;
 }
 <MudStack>
     <MudItem Class="d-flex flex-row justify-space-around printable">
         <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(HeaderLogo.Left, HeaderLogo.DirPath)">
             <MudImage Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@HeaderLogo.Left" />
         </MudPaper>
+
         <MudItem Class="d-flex flex-column justify-center">
-            <NHeadline2 Content="@Header.Title" Class="mb-4" />
+            <NHeadline2 Content="@header.Title" Class="mb-4" />
+
             <MudStack Class="d-flex mb-3" Row="true" Justify="Justify.Center">
-                <NHeadline3 Content="@Header.PopulatedPlace.City" />
-                <NHeadline3 Content="@Header.EventSpan.ToString()" />
-                <NHeadline3 Content="@LocalizeString(Header.PopulatedPlace.Country.ToString())" />
+                <NHeadline3 Content="@header.PopulatedPlace.City" />
+                <NHeadline3 Content="@header.EventSpan.ToString()" />
+                <NHeadline3 Content="@LocalizeString(header.PopulatedPlace.Country.ToString())" />
             </MudStack>
         </MudItem>
+
         <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(HeaderLogo.Right, HeaderLogo.DirPath)">
             <MudImage Class="pt-2 " Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@HeaderLogo.Right" />
         </MudPaper>
@@ -27,43 +32,43 @@
         <MudStack>
             <MudStack Row Class="d-flex mb-3" Justify="Justify.Center">
                 <MudStack>
-                    @if (Header.GroundJuryPresident != null)
+                    @if (header.GroundJuryPresident != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @Header.GroundJuryPresident
+                            @header.GroundJuryPresident
                         </MudText>
                     }
-                    @if (Header.ChiefSteward != null)
+                    @if (header.ChiefSteward != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @Header.ChiefSteward
+                            @header.ChiefSteward
                         </MudText>
                     }
-                    @if (Header.ForeignJudge != null)
+                    @if (header.ForeignJudge != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @Header.ForeignJudge
+                            @header.ForeignJudge
                         </MudText>
                     }
                 </MudStack>
                 
                 <MudStack>
-                    @if (Header.VeterinaryCommissionPresident != null)
+                    @if (header.VeterinaryCommissionPresident != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @Header.VeterinaryCommissionPresident
+                            @header.VeterinaryCommissionPresident
                         </MudText>
                     }
-                    @if (Header.TechnicalDelegate != null)
+                    @if (header.TechnicalDelegate != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @Header.TechnicalDelegate
+                            @header.TechnicalDelegate
                         </MudText>
                     }
-                    @if (Header.ForeignVeterinaryDelegate != null)
+                    @if (header.ForeignVeterinaryDelegate != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @Header.ForeignVeterinaryDelegate
+                            @header.ForeignVeterinaryDelegate
                         </MudText>
                     }
                 </MudStack>
@@ -72,7 +77,7 @@
     </MudStack>
 
 <MudStack Spacing="0" AlignItems="AlignItems.Center">
-    @foreach (var entry in Ranklist.Entries)
+    @foreach (var entry in Document.Ranklist.Entries)
     {
         <ProtocolRow Entry="entry" />
     }

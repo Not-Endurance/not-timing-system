@@ -1,4 +1,5 @@
 ﻿using Not.Application.Behinds.Adapters;
+using Not.Notify;
 using Not.Observables;
 using Not.Safe;
 
@@ -24,13 +25,12 @@ public class NComponent : ComponentBase
 
     protected void Observe(IObservable observable)
     {
-        observable.Event.Subscribe(Render);
+        observable.Event.Subscribe(Render); // TODO: Coalesce renders
     }
 
     protected async Task Observe(IStatefulService statefulService, params IEnumerable<object> arguments)
     {
         IsInitialized = false;
-        await Render();
         Observe((IObservable)statefulService);
         await statefulService.Initialize(arguments);
         IsInitialized = true;
@@ -39,11 +39,24 @@ public class NComponent : ComponentBase
 
     protected async Task Render()
     {
-        OnBeforeRender();
-        await InvokeAsync(StateHasChanged);
+        try
+        {
+            OnBeforeRender();
+            await OnBeforeRenderAsync();
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            NotifyHelper.Error(ex);
+        }
     }
 
     protected virtual void OnBeforeRender() { }
+
+    protected virtual Task OnBeforeRenderAsync() 
+    {
+        return Task.CompletedTask;
+    }
 
     protected string CombineClass(string customClass)
     {

@@ -14,17 +14,19 @@ public static class GuardHelper
     /// </summary>
     /// <exception cref="GuardException"></exception>
     // [DoesNotReturn]
-    public static void ThrowIfDefault<T>([NotNull] T value)
+    public static T ThrowIfDefault<T>([NotNull] T? value)
     {
         ThrowIfDefault(value, " cannot be default.");
+        return value;
     }
 
-    public static void ThrowIfDefault<T>([NotNull] T value, string message)
+    public static T ThrowIfDefault<T>([NotNull] T? value, string message)
     {
         if (value?.Equals(default(T)) ?? true)
         {
             throw new GuardException($"{ReflectionHelper.GetName<T>()} " + message);
         }
+        return value;
     }
 
     public static void ThrowIfEmpty<T>(IEnumerable<T> enumerable)

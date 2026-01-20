@@ -93,7 +93,6 @@ public class CoreStartService : ICoreStarter
     )
     {
         return new Ranking(
-            null,
             setupCompetition.Name,
             setupCompetition.Ruleset,
             setupCompetition.Type,

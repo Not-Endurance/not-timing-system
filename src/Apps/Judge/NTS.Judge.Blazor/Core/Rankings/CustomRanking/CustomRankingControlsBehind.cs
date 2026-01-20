@@ -1,7 +1,7 @@
 using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms.Components;
-using NTS.Judge.Features.Core.Rankings;
+using NTS.Judge.Features.Core.Rankings.CustomRankings;
 
 namespace NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 

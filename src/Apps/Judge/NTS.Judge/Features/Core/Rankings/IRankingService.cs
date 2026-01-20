@@ -1,10 +1,9 @@
 ﻿using Not.Application.Behinds.Adapters;
-using NTS.Domain.Core.Objects;
+using Not.Injection;
 
 namespace NTS.Judge.Features.Core.Rankings;
 
-public interface IRankingService : IStatefulService
+public interface IRankingService : IRankingContext, ITransient
 {
-    Ranklist? Ranklist { get; }
     Task ArchiveEnduranceEvent();
 }

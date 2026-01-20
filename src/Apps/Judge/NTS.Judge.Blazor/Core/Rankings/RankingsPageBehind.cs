@@ -1,6 +1,6 @@
 using MudBlazor;
 using Not.Blazor.Components;
-using Not.Safe;
+using NTS.Domain.Core.Objects;
 using NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 using NTS.Judge.Features.Core.Rankings;
 using NTS.Judge.Features.Core.Rankings.FeiExport;
@@ -20,38 +20,64 @@ public class RankingsPageBehind : PrintableComponent
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
-    public bool HasContent => RankingService.Ranklist != null;
-    public bool IsFeiExportConfigured => RankingService.Ranklist?.IsFeiExportConfigured ?? false;
+    protected Ranklist Ranklist { get; private set; } = default!;
+
+    //public bool HasContent => RankingService.Ranklist != null;
+    public bool IsFeiExportConfigured => Ranklist?.IsFeiExportConfigured ?? false;
 
     protected override async Task OnInitializedAsync()
     {
         await Observe(RankingService);
     }
 
-    public async Task GenerateFeiExport()
+    protected override void OnBeforeRender()
     {
-        await SafeHelper.Run(() => FeiExportService.Create(RankingService.Ranklist!));
+        Ranklist = new Ranklist(RankingService.Current);
     }
 
-    public async Task ArchiveEnduranceEvent()
+    protected async Task GenerateFeiExport()
     {
-        await SafeHelper.Run(RankingService.ArchiveEnduranceEvent);
+        try
+        {
+            await FeiExportService.Create(Ranklist);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
-    public async Task OpenCustomRankingDialog()
+    protected async Task ArchiveEnduranceEvent()
     {
-        await DialogService.ShowAsync<CreateCustomRankingDialog>(
-            "",
-            new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.Medium }
-        );
+        try
+        {
+            await RankingService.ArchiveEnduranceEvent();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
-    public void ShowProtocol()
+    protected async Task OpenCustomRankingDialog()
+    {
+        try
+        {
+            var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.Medium };
+            await DialogService.ShowAsync<CreateCustomRankingDialog>("", options);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    protected void ShowProtocol()
     {
         IsProtocolVisible = true;
     }
 
-    public void ShowRanklist()
+    protected void ShowRanklist()
     {
         IsProtocolVisible = false;
     }
