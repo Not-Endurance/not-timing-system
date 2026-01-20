@@ -2,7 +2,7 @@ namespace NTS.Warp;
 
 public class WarpRequest
 {
-    public static WarpRequest Crate(string enduranceEventId)
+    public static WarpRequest Create(string enduranceEventId)
     {
         return new() { EnduranceEventId = enduranceEventId };
     }

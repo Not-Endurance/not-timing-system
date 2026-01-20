@@ -54,7 +54,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     }
 
     /// <summary>
-    /// Fetches active participations before and after Competitions are started.
+    /// Fetches active participations after Competitions are started.
     /// </summary>
     /// <returns>Collection of active (not eliminated or completed) participations</returns>
     public async Task<IEnumerable<CoreParticipationModel>> GetActive()

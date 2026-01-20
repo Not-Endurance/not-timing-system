@@ -3,5 +3,5 @@
 public interface IConnectionsClientProcedures
 {
     Task OnWitnessConnected(string connectionId);
-    Task OnWitnessDisconnedted(string connectionId);
+    Task OnWitnessDisconnected(string connectionId);
 }
