@@ -5,7 +5,7 @@ using NTS.Domain.Objects;
 
 namespace NTS.Witness.Services;
 
-public class ParticipationService : IPerformanceService, ISnapshotService
+public class ParticipationService : IPerformanceService, IParticipationService
 {
     List<Participation> _participations = [];
 

@@ -15,9 +15,14 @@ public class ParticipationReader : IReadMany<Participation>, ITransient
         _client = client;
     }
 
-    public Task<IEnumerable<Participation>> ReadMany()
+    public async Task<IEnumerable<Participation>> ReadMany()
     {
-        return _client.GetParcipations();
+        var response = await _client.GetParticipations();
+        if (response.Data == null)
+        {
+            return [];
+        }
+        return response.Data;
     }
 
     public Task<IEnumerable<Participation>> ReadMany(Expression<Func<Participation, bool>> filter)

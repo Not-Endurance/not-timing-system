@@ -5,7 +5,7 @@
     <CustomCell>
         @if (IsConnected)
         {
-            <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => Disconnect()">@Disconnect_string</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="() => Disconnect()">@Disconnect_string</MudButton>
         }
         else
         {
