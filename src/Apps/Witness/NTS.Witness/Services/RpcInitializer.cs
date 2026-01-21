@@ -33,6 +33,7 @@ public class RpcInitializer : IRpcInitializer
     {
         if (_rpcSocket.IsConnected)
         {
+            NotifyHelper.Inform("Connected to " + ConnectedEvent?.Name);
             return;
         }
         await _rpcSocket.Connect();

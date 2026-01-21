@@ -7,7 +7,14 @@ public class SnapshotPayload
     public SnapshotPayload(IEnumerable<IntermediateSnapshot> snapshots, string type)
     {
         Entries = snapshots;
-        Type = type == SnapshotType.Stage.ToString() ? SnapshotType.Stage : SnapshotType.Vet;
+        if (Enum.TryParse(type, out SnapshotType snapshotType))
+        {
+            Type = snapshotType;
+        }
+        else
+        {
+            Type = type == Arrival_string ? SnapshotType.Stage : SnapshotType.Vet;
+        }
     }
     public IEnumerable<IntermediateSnapshot> Entries { get; set; } = [];
 

@@ -3,7 +3,7 @@
 
 <NSimpleTable T="UpcomingEvent" Items="@Events" EmptyMessage="@Empty_event_list_message" Height="30vh" Headings="@EventsTableHeaders">
     <CustomCell>
-        @if (IsConnected && ConnectedEvent == context)
+        @if (IsConnected && Selected.Event == context)
         {
             <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="() => Disconnect()">@Disconnect_string</MudButton>
         }

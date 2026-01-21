@@ -1,4 +1,5 @@
 ﻿using Not.Application.RPC;
+using NTS.Application.Warp;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
 
@@ -12,11 +13,13 @@ public class EnduranceEventsBehind : ComponentBase
 
     [Inject]
     IRpcInitializer RpcInitializer { get; set; } = default!;
+
+    [Inject]
+    protected ISelectedEventContext Selected { get; set; } = default!;
     protected IEnumerable<UpcomingEvent> Events { get; set; } = [];
-    protected UpcomingEvent? ConnectedEvent => RpcInitializer.ConnectedEvent;
     protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
 
-    protected bool IsConnected { get; set; } = default!;
+    protected bool IsConnected => RpcInitializer.IsConnected();
 
     protected override async Task OnInitializedAsync()
     {
@@ -27,19 +30,15 @@ public class EnduranceEventsBehind : ComponentBase
     {
         if (IsConnected)
         {
-            await Disconnect();
+            await RpcContext.ResetEvent();
         }
         await RpcContext.Set(enduranceEvent);
-        await RpcInitializer.StartConnection(enduranceEvent);
-        IsConnected = RpcInitializer.IsConnected();
         StateHasChanged();
     }
 
     protected async Task Disconnect()
     {
         await RpcContext.ResetEvent();
-        await RpcInitializer.Disconnect();
-        IsConnected = false;
         StateHasChanged();
     }
 }

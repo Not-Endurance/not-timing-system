@@ -43,10 +43,6 @@ public class RpcContext : ISelectedEventContext, IRpcContext<UpcomingEvent>
 
     void InternalSetEvent(UpcomingEvent? upcomingEvent)
     {
-        if (upcomingEvent == null)
-        {
-            return;
-        }
         _warpContext.Configure(Event = upcomingEvent);
     }
 }
