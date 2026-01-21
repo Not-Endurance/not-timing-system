@@ -43,7 +43,9 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
     public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)
     {
         var participation = request.Payload.Participation;
-        await _witnessRelay.Clients.Group(request.EnduranceEventId).ReceiveParticipation(participation, NCollectionAction.Remove);
+        await _witnessRelay
+            .Clients.Group(request.EnduranceEventId)
+            .ReceiveParticipation(participation, NCollectionAction.Remove);
     }
 
     public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
@@ -80,6 +82,8 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
             serialized
         );
 
-        await _witnessRelay.Clients.Group(request.EnduranceEventId).ReceiveStartlistEntry(entry, NCollectionAction.AddOrUpdate);
+        await _witnessRelay
+            .Clients.Group(request.EnduranceEventId)
+            .ReceiveStartlistEntry(entry, NCollectionAction.AddOrUpdate);
     }
 }
