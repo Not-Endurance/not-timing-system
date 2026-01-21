@@ -15,7 +15,12 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient : RpcClient, IParticipantsClientProcedures, IStartlistClientProcedures, IClientParticipationGetter, ISnapshotService
+public class WitnessRpcClient
+    : RpcClient,
+        IParticipantsClientProcedures,
+        IStartlistClientProcedures,
+        IClientParticipationGetter,
+        ISnapshotService
 {
     readonly IRpcSocket _socket;
     readonly ISelectedEventContext _eventContext;

@@ -8,15 +8,16 @@ using NTS.Domain.Objects;
 
 namespace NTS.Witness.Services;
 
-public class ParticipationService : 
-    NStatefulService<ObservableList<Participation>>, 
-    IParticipationService,
-    IClientParticipationUpdate, 
-    IPerformanceService
+public class ParticipationService
+    : NStatefulService<ObservableList<Participation>>,
+        IParticipationService,
+        IClientParticipationUpdate,
+        IPerformanceService
 {
     IEnumerable<Participation> Participations => State;
 
-    public IEnumerable<Participation> ActiveParticipations {
+    public IEnumerable<Participation> ActiveParticipations
+    {
         get => Participations;
         set
         {
