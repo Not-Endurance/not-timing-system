@@ -15,7 +15,7 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient : RpcClient, IParticipantsClientProcedures, IStartlistClientProcedures, ISnapshotService
+public class WitnessRpcClient : RpcClient, IParticipantsClientProcedures, IStartlistClientProcedures, IClientParticipationGetter, ISnapshotService
 {
     readonly IRpcSocket _socket;
     readonly ISelectedEventContext _eventContext;
@@ -67,6 +67,10 @@ public class WitnessRpcClient : RpcClient, IParticipantsClientProcedures, IStart
             nameof(IWitnessHubProcedures.SendParticipants),
             request
         );
+        if (result.Data != null)
+        {
+            _participationService.ActiveParticipations = result.Data;
+        }
         return result;
     }
 }

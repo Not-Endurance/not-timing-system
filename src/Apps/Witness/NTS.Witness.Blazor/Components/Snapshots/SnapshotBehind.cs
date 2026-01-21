@@ -13,28 +13,22 @@ namespace NTS.Witness.Blazor.Components.Snapshots;
 public class SnapshotBehind : NComponent
 {
     [Inject]
-    IDialogService MudDialogService { get; set; } = null!;
+    IDialogService MudDialogService { get; set; } = default!;
 
     [Inject]
-    ISnapshotService SnapshotService { get; set; } = null!;
+    ISnapshotService SnapshotService { get; set; } = default!;
 
-    protected IEnumerable<Participation> Participations { get; set; } = [];
+    [Inject]
+    protected IParticipationService ParticipationService { get; set; } = default!;
     protected List<IntermediateSnapshot> SelectedParticipations { get; set; } = [];
     protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
+    protected IEnumerable<Participation> Participations => ParticipationService.ActiveParticipations;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var result = await SnapshotService.GetParticipations();
-            Participations = result.Data ?? [];
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
+        await Observe(ParticipationService);
     }
 
     protected void SetButtonText(int id)

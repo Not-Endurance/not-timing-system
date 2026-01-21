@@ -6,6 +6,5 @@ namespace NTS.Witness.Services;
 
 public interface ISnapshotService
 {
-    Task<RpcInvokeResult<IEnumerable<Participation>>> GetParticipations();
     Task<RpcInvokeResult> PublishSnapshotsAsync(SnapshotModel model);
 }

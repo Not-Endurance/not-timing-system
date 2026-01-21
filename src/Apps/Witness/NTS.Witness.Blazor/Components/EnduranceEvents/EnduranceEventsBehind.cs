@@ -15,6 +15,9 @@ public class EnduranceEventsBehind : ComponentBase
     IRpcInitializer RpcInitializer { get; set; } = default!;
 
     [Inject]
+    IClientParticipationGetter ParticipationGetter { get; set; } = default!;
+
+    [Inject]
     protected ISelectedEventContext Selected { get; set; } = default!;
     protected IEnumerable<UpcomingEvent> Events { get; set; } = [];
     protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
@@ -33,6 +36,7 @@ public class EnduranceEventsBehind : ComponentBase
             await RpcContext.ResetEvent();
         }
         await RpcContext.Set(enduranceEvent);
+        await ParticipationGetter.GetParticipations();
         StateHasChanged();
     }
 

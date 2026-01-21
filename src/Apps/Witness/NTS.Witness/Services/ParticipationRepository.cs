@@ -8,21 +8,16 @@ namespace NTS.Witness.Services;
 
 public class ParticipationReader : IReadMany<Participation>, ITransient
 {
-    readonly WitnessRpcClient _client;
+    readonly ParticipationService _participationService;
 
-    public ParticipationReader(WitnessRpcClient client)
+    public ParticipationReader(ParticipationService participationService)
     {
-        _client = client;
+        _participationService = participationService;
     }
 
-    public async Task<IEnumerable<Participation>> ReadMany()
+    public Task<IEnumerable<Participation>> ReadMany()
     {
-        var response = await _client.GetParticipations();
-        if (response.Data == null)
-        {
-            return [];
-        }
-        return response.Data;
+        return Task.FromResult(_participationService.ActiveParticipations);
     }
 
     public Task<IEnumerable<Participation>> ReadMany(Expression<Func<Participation, bool>> filter)

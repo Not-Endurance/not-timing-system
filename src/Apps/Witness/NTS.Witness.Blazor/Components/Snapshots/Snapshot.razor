@@ -12,7 +12,7 @@
 
 <MudPaper Height="100%">
     <MudPaper Class="justify-center pa-2">
-            <ParticipationChips Set="@Participations" OnSelect="SelectHandler" SetChipColor="GetColor" ChipSize="Size.Large" />
+            <ParticipationChips Set="@ParticipationService.ActiveParticipations" OnSelect="SelectHandler" SetChipColor="GetColor" ChipSize="Size.Large" />
     </MudPaper>
     
     <MudPaper Elevation="0" Class="pa-2">

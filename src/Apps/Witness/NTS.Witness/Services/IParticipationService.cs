@@ -1,9 +1,10 @@
-﻿using Not.Collections;
+﻿using Not.Application.Behinds.Adapters;
+using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Witness.Services;
 
-public interface IParticipationService
+public interface IParticipationService : IStatefulService
 {
-    void Update(Participation participation, NCollectionAction action);
+    IEnumerable<Participation> ActiveParticipations { get; }
 }

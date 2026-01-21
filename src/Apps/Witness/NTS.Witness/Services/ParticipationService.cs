@@ -1,24 +1,47 @@
-﻿using Not.Collections;
+﻿using Not.Application.Behinds.Adapters;
+using Not.Collections;
+using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Objects;
 
 namespace NTS.Witness.Services;
 
-public class ParticipationService : IPerformanceService, IParticipationService
+public class ParticipationService : 
+    NStatefulService<ObservableList<Participation>>, 
+    IParticipationService,
+    IClientParticipationUpdate, 
+    IPerformanceService
 {
-    List<Participation> _participations = [];
+    IEnumerable<Participation> Participations => State;
 
-    public IEnumerable<Participation> ActiveParticipations => _participations.AsEnumerable();
+    public IEnumerable<Participation> ActiveParticipations {
+        get => Participations;
+        set
+        {
+            State.Clear();
+            State.AddRange(value);
+        }
+    }
+
+    protected override Task<bool> CreateState(params IEnumerable<object> arguments)
+    {
+        State.AddRange(Participations);
+        return Task.FromResult(true);
+    }
 
     public void Update(Participation participation, NCollectionAction action)
     {
-        _participations.Update(participation, action);
-    }
-
-    public List<Participation> GetParticipations()
-    {
-        return DummyData.CreateParticipations(10);
+        Participations.ToList().Update(participation, action);
+        if (action == NCollectionAction.AddOrUpdate)
+        {
+            State.AddOrReplace(participation);
+        }
+        else if (action == NCollectionAction.Remove)
+        {
+            State.Remove(participation);
+        }
     }
 
     public Person GetPerson()
