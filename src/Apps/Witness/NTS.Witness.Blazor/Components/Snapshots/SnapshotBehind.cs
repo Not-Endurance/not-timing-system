@@ -106,6 +106,7 @@ public class SnapshotBehind : NComponent
             }
             else
             {
+                StateHasChanged();
                 NotifyHelper.Success($"Snapshots sent as {snapshotType}");
             }
             //consider backup before clear

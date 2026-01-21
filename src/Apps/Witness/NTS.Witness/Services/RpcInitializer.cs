@@ -1,5 +1,6 @@
 ﻿using Not.Application.RPC.SignalR;
 using Not.Notify;
+using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Witness.Services;
 public class RpcInitializer : IRpcInitializer
@@ -11,6 +12,8 @@ public class RpcInitializer : IRpcInitializer
         _rpcSocket = rpcSocket;
     }
 
+    public UpcomingEvent? ConnectedEvent { get; set; } = default!;
+
     public bool IsConnected()
     {
         return _rpcSocket.IsConnected;
@@ -18,18 +21,22 @@ public class RpcInitializer : IRpcInitializer
 
     public async Task Disconnect()
     {
-        await _rpcSocket.Disconnect();
-        NotifyHelper.Warn("Disconnected from " + _rpcSocket.Connection);
+        if(ConnectedEvent != null)
+        {
+            await _rpcSocket.Disconnect();
+            NotifyHelper.Warn("Disconnected from " + ConnectedEvent.Name);
+            ConnectedEvent = null;
+        }
     }
 
-    public async Task StartConnection()
+    public async Task StartConnection(UpcomingEvent enduranceEvent)
     {
         if (_rpcSocket.IsConnected)
         {
             return;
         }
-        
         await _rpcSocket.Connect();
-        NotifyHelper.Inform("Connected to " + _rpcSocket.Connection);
+        ConnectedEvent = enduranceEvent;
+        NotifyHelper.Inform("Connected to " + ConnectedEvent.Name);
     }
 }

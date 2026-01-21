@@ -21,6 +21,12 @@ public class RpcContext : ISelectedEventContext, IRpcContext<UpcomingEvent>
 
     public UpcomingEvent? Root => Event;
 
+    public async Task ResetEvent()
+    {
+        InternalSetEvent(null);
+        await _socket.Disconnect();
+    }
+
     public async Task Set(UpcomingEvent upcomingEvent)
     {
         if (Event == upcomingEvent)

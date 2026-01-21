@@ -13,6 +13,7 @@ public class EnduranceEventsBehind : ComponentBase
     [Inject]
     IRpcInitializer RpcInitializer { get; set; } = default!;
     protected IEnumerable<UpcomingEvent> Events { get; set; } = [];
+    protected UpcomingEvent? ConnectedEvent => RpcInitializer.ConnectedEvent;
     protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
 
     protected bool IsConnected { get; set; } = default!;
@@ -22,18 +23,23 @@ public class EnduranceEventsBehind : ComponentBase
         Events = await WitnessEvents.Get();
     }
 
-    protected async void ConnectTo(UpcomingEvent selectedEvent)
+    protected async void ConnectTo(UpcomingEvent enduranceEvent)
     {
-        await RpcContext.Set(selectedEvent);
-        await RpcInitializer.StartConnection();
+        if (IsConnected)
+        {
+            await Disconnect();
+        }
+        await RpcContext.Set(enduranceEvent);
+        await RpcInitializer.StartConnection(enduranceEvent);
         IsConnected = RpcInitializer.IsConnected();
         StateHasChanged();
     }
 
-    protected async void Disconnect()
+    protected async Task Disconnect()
     {
+        await RpcContext.ResetEvent();
         await RpcInitializer.Disconnect();
-        IsConnected = RpcInitializer.IsConnected();
+        IsConnected = false;
         StateHasChanged();
     }
 }

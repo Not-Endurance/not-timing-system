@@ -8,4 +8,5 @@ public interface IRpcContext<T> : ISingleton
 {
     T? Root { get; }
     Task Set(T root);
+    Task ResetEvent();
 }
