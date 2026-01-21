@@ -24,7 +24,6 @@ public class SnapshotBehind : NComponent
     protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
-    protected IEnumerable<Participation> Participations => ParticipationService.ActiveParticipations;
 
     protected override async Task OnInitializedAsync()
     {
