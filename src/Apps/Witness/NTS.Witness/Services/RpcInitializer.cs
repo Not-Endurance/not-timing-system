@@ -3,6 +3,7 @@ using Not.Notify;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Witness.Services;
+
 public class RpcInitializer : IRpcInitializer
 {
     readonly IRpcSocket _rpcSocket;
@@ -21,7 +22,7 @@ public class RpcInitializer : IRpcInitializer
 
     public async Task Disconnect()
     {
-        if(ConnectedEvent != null)
+        if (ConnectedEvent != null)
         {
             await _rpcSocket.Disconnect();
             NotifyHelper.Warn("Disconnected from " + ConnectedEvent.Name);

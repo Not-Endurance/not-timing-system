@@ -99,7 +99,7 @@ public class SnapshotBehind : NComponent
             var snapshotPayload = new SnapshotPayload(SnapshotParticipations, snapshotType);
             var snapshotModel = SnapshotModel.MapFrom(snapshotPayload);
             var result = await SnapshotService.PublishSnapshotsAsync(snapshotModel);
-            if(result.IsSuccessful == false)
+            if (result.IsSuccessful == false)
             {
                 NotifyHelper.Error("An error occurred while sending snapshots. Please try again.");
                 return;
@@ -111,7 +111,7 @@ public class SnapshotBehind : NComponent
             }
             //consider backup before clear
             SnapshotParticipations.ForEach(p => SelectedParticipations.Remove(p));
-            SnapshotParticipations.Clear();  
+            SnapshotParticipations.Clear();
         }
         catch (Exception ex)
         {

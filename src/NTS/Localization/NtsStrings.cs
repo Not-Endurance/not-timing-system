@@ -207,7 +207,6 @@ namespace NTS.Localization
         public static string Connect_string => LocalizeString(nameof(Connect_string));
         public static string Disconnect_string => LocalizeString(nameof(Disconnect_string));
         public static string Empty_event_list_message => LocalizeString(nameof(Empty_event_list_message));
-
     }
 }
 #pragma warning restore NA0004

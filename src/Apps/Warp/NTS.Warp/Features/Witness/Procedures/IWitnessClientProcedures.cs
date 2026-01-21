@@ -1,5 +1,3 @@
 ﻿namespace NTS.Warp.Features.Witness.Procedures;
 
-public interface IWitnessClientProcedures : IParticipantsClientProcedures, IStartlistClientProcedures
-{
-}
+public interface IWitnessClientProcedures : IParticipantsClientProcedures, IStartlistClientProcedures { }

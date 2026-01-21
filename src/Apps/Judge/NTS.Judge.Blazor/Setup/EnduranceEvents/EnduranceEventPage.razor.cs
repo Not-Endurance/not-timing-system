@@ -1,7 +1,7 @@
+using Not.Application.RPC;
 using Not.Blazor.Navigation;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Setup.UpcomingEvents;
-using Not.Application.RPC;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 

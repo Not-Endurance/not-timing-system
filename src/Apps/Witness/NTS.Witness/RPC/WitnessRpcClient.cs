@@ -63,7 +63,10 @@ public class WitnessRpcClient : RpcClient, IParticipantsClientProcedures, IStart
     public async Task<RpcInvokeResult<IEnumerable<Participation>>> GetParticipations()
     {
         var request = WarpRequest.Create(_eventContext.Event!.Id.ToString());
-        var result = await _socket.InvokeOutputProcedure<IEnumerable<Participation>, WarpRequest>(nameof(IWitnessHubProcedures.SendParticipants),request);
+        var result = await _socket.InvokeOutputProcedure<IEnumerable<Participation>, WarpRequest>(
+            nameof(IWitnessHubProcedures.SendParticipants),
+            request
+        );
         return result;
     }
 }

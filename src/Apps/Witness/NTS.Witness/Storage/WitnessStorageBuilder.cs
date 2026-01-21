@@ -5,6 +5,7 @@ using Not.Filesystem;
 using Not.Storage;
 
 namespace NTS.Witness.Storage;
+
 public static class WitnessStorageServices
 {
     // Necessary to be called directly from UI project, otherwise the runtime treeshakes this

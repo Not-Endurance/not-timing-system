@@ -1,5 +1,4 @@
-﻿
-using Not.Application.RPC.Clients;
+﻿using Not.Application.RPC.Clients;
 using NTS.Application.Models;
 using NTS.Domain.Core.Aggregates;
 

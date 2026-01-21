@@ -4,16 +4,15 @@ using NTS.Domain.Watcher;
 
 namespace NTS.Application.Models;
 
-
-public class IntermediateSnapshotModel 
-{ 
+public class IntermediateSnapshotModel
+{
     public static IntermediateSnapshotModel MapFrom(IntermediateSnapshot snapshot)
     {
         return new IntermediateSnapshotModel
         {
             Number = snapshot.Number,
             Names = snapshot.Athlete.Names,
-            Timestamp = snapshot.Timestamp.ToString()
+            Timestamp = snapshot.Timestamp.ToString(),
         };
     }
 
@@ -36,18 +35,16 @@ public class SnapshotModel
         return new SnapshotModel
         {
             Entries = payload.Entries.AsEnumerable().Select(IntermediateSnapshotModel.MapFrom).ToArray(),
-            Type = payload.Type.ToString()
+            Type = payload.Type.ToString(),
         };
     }
 
     public IntermediateSnapshotModel[] Entries { get; set; } = [];
     public string Type { get; set; } = "";
+
     public SnapshotPayload MapToDomain()
     {
         var snapshots = Entries.Select(entry => entry.MapToDomain());
         return new SnapshotPayload(snapshots, Type);
     }
 }
-
-
-

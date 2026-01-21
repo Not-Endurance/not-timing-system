@@ -2,6 +2,7 @@
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Witness.Services;
+
 public interface IRpcInitializer : ISingleton
 {
     UpcomingEvent? ConnectedEvent { get; }

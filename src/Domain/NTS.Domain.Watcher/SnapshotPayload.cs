@@ -16,6 +16,7 @@ public class SnapshotPayload
             Type = type == Arrival_string ? SnapshotType.Stage : SnapshotType.Vet;
         }
     }
+
     public IEnumerable<IntermediateSnapshot> Entries { get; set; } = [];
 
     public SnapshotType Type { get; set; }

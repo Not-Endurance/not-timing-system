@@ -41,7 +41,11 @@ public static class RpcSocketExtensions
         }
     }
 
-    public static async Task<RpcInvokeResult<T1>> InvokeOutputProcedure<T1, T2>(this IRpcSocket socket, string name, T2 parameter)
+    public static async Task<RpcInvokeResult<T1>> InvokeOutputProcedure<T1, T2>(
+        this IRpcSocket socket,
+        string name,
+        T2 parameter
+    )
     {
         try
         {

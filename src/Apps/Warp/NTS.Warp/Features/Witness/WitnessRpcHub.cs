@@ -1,5 +1,4 @@
-﻿
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.SignalR;
 using Not.Application.RPC.Clients;
 using Not.Concurrency.Extensions;
@@ -11,11 +10,9 @@ using NTS.Warp.Features.Judge;
 using NTS.Warp.Features.Judge.Procedures;
 using NTS.Warp.Features.Witness.Procedures;
 
-
 namespace NTS.Warp.Features.Witness;
 
-internal class WitnessRpcHub
-    : NtsHub<IWitnessClientProcedures>, IWitnessHubProcedures
+internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProcedures
 {
     readonly IPrimaryConnectionContext _primaryConnections;
     readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;
@@ -80,9 +77,12 @@ internal class WitnessRpcHub
             return RpcInvokeResult.Error; // TODO: meaningful message would improve UX here
         }
         var payload = request.Payload.MapToDomain();
-        var snapshots = payload.Entries.Select(entry => 
-            new Snapshot(entry.Number, payload.Type, Domain.Enums.SnapshotMethod.Manual, entry.Timestamp)
-        );
+        var snapshots = payload.Entries.Select(entry => new Snapshot(
+            entry.Number,
+            payload.Type,
+            Domain.Enums.SnapshotMethod.Manual,
+            entry.Timestamp
+        ));
         await judgeClient.Receive(snapshots);
         return RpcInvokeResult.Success;
     }
