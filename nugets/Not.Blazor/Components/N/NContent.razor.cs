@@ -42,6 +42,6 @@ public partial class NContent
     async void ToggleVisibilityHandler()
     {
         _showOnlyMain = !_showOnlyMain;
-        await Render();
+        await InvokeRender();
     }
 }

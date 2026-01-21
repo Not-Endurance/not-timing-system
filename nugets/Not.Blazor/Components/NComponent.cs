@@ -1,4 +1,5 @@
 ﻿using Not.Application.Behinds.Adapters;
+using Not.Concurrency;
 using Not.Notify;
 using Not.Observables;
 using Not.Safe;
@@ -7,6 +8,25 @@ namespace Not.Blazor.Components;
 
 public class NComponent : ComponentBase
 {
+    CoalesceInvoker _coalescedRender;
+
+    public NComponent()
+    {
+        _coalescedRender = new(async () =>
+        {
+            try
+            {
+                OnBeforeRender();
+                await OnBeforeRenderAsync();
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (Exception ex)
+            {
+                NotifyHelper.Error(ex);
+            }
+        });
+    }
+
     [Parameter]
     public string? Style { get; set; }
 
@@ -15,6 +35,7 @@ public class NComponent : ComponentBase
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
 
     public bool IsInitialized { get; private set; } = true;
 
@@ -25,30 +46,23 @@ public class NComponent : ComponentBase
 
     protected void Observe(IObservable observable)
     {
-        observable.Event.Subscribe(Render); // TODO: Coalesce renders
+        observable.Event.Subscribe(InvokeRender);
     }
 
+
+    // TODO: remove args, create NObservingComponent<T>, create streamlined loading solution
     protected async Task Observe(IStatefulService statefulService, params IEnumerable<object> arguments)
     {
         IsInitialized = false;
         Observe((IObservable)statefulService);
         await statefulService.Initialize(arguments);
         IsInitialized = true;
-        await Render();
+        await InvokeRender();
     }
 
-    protected async Task Render()
+    protected Task InvokeRender()
     {
-        try
-        {
-            OnBeforeRender();
-            await OnBeforeRenderAsync();
-            await InvokeAsync(StateHasChanged);
-        }
-        catch (Exception ex)
-        {
-            NotifyHelper.Error(ex);
-        }
+        return _coalescedRender.Invoke();
     }
 
     protected virtual void OnBeforeRender() { }

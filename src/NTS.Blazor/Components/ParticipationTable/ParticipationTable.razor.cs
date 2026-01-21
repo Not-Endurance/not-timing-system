@@ -56,6 +56,6 @@ public partial class ParticipationTable
     {
         var model = new PhaseUpdateModel(phase);
         await Dialog.RenderUpdate(model);
-        await Render();
+        await InvokeRender();
     }
 }
