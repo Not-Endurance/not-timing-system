@@ -17,7 +17,11 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     readonly IRepository<HorseModel> _horses;
     readonly IArchiveRepository _archive;
 
-    public HorseFunctions(IFunctionLogger<HorseFunctions> logger, IRepository<HorseModel> horses, IArchiveRepository archive)
+    public HorseFunctions(
+        IFunctionLogger<HorseFunctions> logger,
+        IRepository<HorseModel> horses,
+        IArchiveRepository archive
+    )
         : base(logger)
     {
         _horses = horses;
@@ -57,7 +61,8 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     [Function("horses-safe-delete")]
     public async Task<IActionResult> SafeDelete( // TODO: fix
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")] HttpRequest request,
-        int id)
+        int id
+    )
     {
         LogInformation(request);
 
