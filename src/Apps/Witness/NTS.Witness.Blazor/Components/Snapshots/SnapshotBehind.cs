@@ -96,7 +96,8 @@ public class SnapshotBehind : NComponent
     {
         try
         {
-            var snapshotModel = new SnapshotModel(SnapshotParticipations, snapshotType);
+            var snapshotPayload = new SnapshotPayload(SnapshotParticipations, snapshotType);
+            var snapshotModel = SnapshotModel.MapFrom(snapshotPayload);
             var result = await SnapshotService.PublishSnapshotsAsync(snapshotModel);
             if(result.IsSuccessful == false)
             {

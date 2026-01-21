@@ -79,7 +79,10 @@ internal class WitnessRpcHub
         {
             return RpcInvokeResult.Error; // TODO: meaningful message would improve UX here
         }
-        var snapshots = request.Payload.Entries.Select(entry => new Snapshot(entry.Number, request.Payload.Type, Domain.Enums.SnapshotMethod.Manual, entry.Timestamp));
+        var payload = request.Payload.MapToDomain();
+        var snapshots = payload.Entries.Select(entry => 
+            new Snapshot(entry.Number, payload.Type, Domain.Enums.SnapshotMethod.Manual, entry.Timestamp)
+        );
         await judgeClient.Receive(snapshots);
         return RpcInvokeResult.Success;
     }
