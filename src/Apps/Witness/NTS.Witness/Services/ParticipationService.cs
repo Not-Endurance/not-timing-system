@@ -28,7 +28,6 @@ public class ParticipationService
 
     protected override Task<bool> CreateState(params IEnumerable<object> arguments)
     {
-        State.AddRange(Participations);
         return Task.FromResult(true);
     }
 
