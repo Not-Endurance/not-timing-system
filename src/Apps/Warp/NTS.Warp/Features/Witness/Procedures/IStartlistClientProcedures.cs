@@ -5,5 +5,5 @@ namespace NTS.Warp.Features.Witness.Procedures;
 
 public interface IStartlistClientProcedures
 {
-    Task Receive(StartlistEntry entry, NCollectionAction action);
+    Task ReceiveStartlistEntry(StartlistEntry entry, NCollectionAction action);
 }

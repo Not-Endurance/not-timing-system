@@ -3,7 +3,6 @@ using Not.Collections;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Objects;
 
 namespace NTS.Witness.Services;
