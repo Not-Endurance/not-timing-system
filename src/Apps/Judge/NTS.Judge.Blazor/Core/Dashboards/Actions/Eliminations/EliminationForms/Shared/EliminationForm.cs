@@ -1,4 +1,5 @@
 ﻿using Not.Blazor.Components;
+using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Eliminations.EliminationForms.Shared;
 
