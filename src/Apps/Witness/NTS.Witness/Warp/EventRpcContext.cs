@@ -1,12 +1,14 @@
 ﻿using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Domain.Exceptions;
+using Not.Notify;
 using NTS.Application.Warp;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Witness.Services;
 
 namespace NTS.Witness.Warp;
 
-public class RpcContext : ISelectedEventContext, IRpcContext<UpcomingEvent>
+public class RpcContext : ISelectedEventContext, IConnectionStatus, IRpcContext<UpcomingEvent>
 {
     readonly IRpcSocket _socket;
     readonly WarpContext _warpContext;
@@ -23,8 +25,13 @@ public class RpcContext : ISelectedEventContext, IRpcContext<UpcomingEvent>
 
     public async Task ResetEvent()
     {
+        var @event = Event;
         InternalSetEvent(null);
         await _socket.Disconnect();
+        if (!_socket.IsConnected && @event != null)
+        {
+            NotifyHelper.Warn("Disconnected from " + @event.Name);
+        }
     }
 
     public async Task Set(UpcomingEvent upcomingEvent)
@@ -39,6 +46,16 @@ public class RpcContext : ISelectedEventContext, IRpcContext<UpcomingEvent>
         }
         InternalSetEvent(upcomingEvent);
         await _socket.Connect();
+        if(_socket.IsConnected && Event != null)
+        {
+            NotifyHelper.Inform("Connected to " + Event.Name);
+        }
+        
+    }
+
+    public bool IsConnected()
+    {
+        return _socket.IsConnected;
     }
 
     void InternalSetEvent(UpcomingEvent? upcomingEvent)

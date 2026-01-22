@@ -12,7 +12,7 @@ public class EnduranceEventsBehind : ComponentBase
     IRpcContext<UpcomingEvent> RpcContext { get; set; } = default!;
 
     [Inject]
-    IRpcInitializer RpcInitializer { get; set; } = default!;
+    IConnectionStatus ConnectionStatus { get; set; } = default!;
 
     [Inject]
     IClientParticipationGetter ParticipationGetter { get; set; } = default!;
@@ -22,7 +22,7 @@ public class EnduranceEventsBehind : ComponentBase
     protected IEnumerable<UpcomingEvent> Events { get; set; } = [];
     protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
 
-    protected bool IsConnected => RpcInitializer.IsConnected();
+    protected bool IsConnected => ConnectionStatus.IsConnected();
 
     protected override async Task OnInitializedAsync()
     {
