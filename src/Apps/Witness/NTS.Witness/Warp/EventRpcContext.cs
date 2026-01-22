@@ -46,11 +46,10 @@ public class RpcContext : ISelectedEventContext, IConnectionStatus, IRpcContext<
         }
         InternalSetEvent(upcomingEvent);
         await _socket.Connect();
-        if(_socket.IsConnected && Event != null)
+        if (_socket.IsConnected && Event != null)
         {
             NotifyHelper.Inform("Connected to " + Event.Name);
         }
-        
     }
 
     public bool IsConnected()
