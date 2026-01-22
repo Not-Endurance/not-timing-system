@@ -35,7 +35,10 @@ public partial class ParticipationTable
         _anyRepresentation = Phases != null && Phases.Any(x => x.IsReinspectionRequested);
         _anyRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionRequested);
         _anyCompulsoryRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionCompulsory);
-        if(Number==null){ _numberStyles += "opacity:0;"; }
+        if (Number == null)
+        {
+            _numberStyles += "opacity:0;";
+        }
         FlipAxis();
     }
 
