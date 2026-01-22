@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Collections;
-using Not.Extensions;
 using NTS.Application.Models;
 using NTS.Application.Startlists;
 using NTS.Application.Warp;
@@ -65,7 +63,7 @@ public class WitnessRpcClient
         return Task.CompletedTask;
     }
 
-    public async Task<RpcInvokeResult<IEnumerable<Participation>>> GetParticipations()
+    public async Task GetParticipations()
     {
         var request = WarpRequest.Create(_eventContext.Event!.Id.ToString());
         var result = await _socket.InvokeOutputProcedure<IEnumerable<Participation>, WarpRequest>(
@@ -76,6 +74,5 @@ public class WitnessRpcClient
         {
             _participationService.ActiveParticipations = result.Data;
         }
-        return result;
     }
 }
