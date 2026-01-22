@@ -8,12 +8,12 @@
 @inherits ProfileBehind
 
 <CascadingAuthenticationState>
-    <AuthorizeView Roles="@($"{ADMIN},{OFFICIAL},{VET}")">
-            <Authorized>
-                <MudStack Class="mt-10">
-                    <EnduranceEvents />
-                </MudStack>
-            </Authorized>
+    <AuthorizeView>
+        <Authorized>
+            <MudStack Class="mt-10">
+                <EnduranceEvents />
+            </MudStack>
+        </Authorized>
     </AuthorizeView>
     <AuthorizeView>
         <Authorized>

@@ -5,9 +5,10 @@
 @using NTS.Domain.Watcher;
 @using NTS.Blazor.Components.ParticipationChips;
 @using Not.Blazor.Dialogs
+@using static WitnessBlazorConstants.UserRoles;
 
 @attribute [Route(WitnessBlazorConstants.Pages.SNAPSHOT)]
-@attribute [Authorize(Roles = "admin,official")]
+@attribute [Authorize(Roles = $"{ADMIN},{OFFICIAL}")]
 @inherits SnapshotBehind
 
 <MudPaper Height="100%">
