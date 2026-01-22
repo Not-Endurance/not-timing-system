@@ -762,4 +762,13 @@
   <data name="Empty_event_list_message" xml:space="preserve">
     <value>Upcoming Events aren't configured yet</value>
   </data>
+  <data name="Select_athlete_string" xml:space="preserve">
+    <value>Select an athlete</value>
+  </data>
+  <data name="Empty_performance_competitor_message" xml:space="preserve">
+    <value>Your account is not configured to participate in the current Endurance Event. If this is incorrect please contact an admin</value>
+  </data>
+  <data name="Empty_performance_official_message" xml:space="preserve">
+    <value>Choose a participating athlete above to view performance</value>
+  </data>
 </root>

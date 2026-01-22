@@ -207,6 +207,9 @@ namespace NTS.Localization
         public static string Connect_string => LocalizeString(nameof(Connect_string));
         public static string Disconnect_string => LocalizeString(nameof(Disconnect_string));
         public static string Empty_event_list_message => LocalizeString(nameof(Empty_event_list_message));
+        public static string Select_athlete_string => LocalizeString(nameof(Select_athlete_string));
+        public static string Empty_performance_official_message => LocalizeString(nameof(Empty_performance_official_message));
+        public static string Empty_performance_competitor_message => LocalizeString(nameof(Empty_performance_competitor_message));
     }
 }
 #pragma warning restore NA0004

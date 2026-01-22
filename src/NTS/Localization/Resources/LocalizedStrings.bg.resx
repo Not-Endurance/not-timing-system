@@ -756,10 +756,19 @@
   <data name="Disconnect_string" xml:space="preserve">
     <value>Прекъсни връзката</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Empty_event_list_message" xml:space="preserve">
     <value>Все още не са конфигурирани състезания по издръжливост</value>
+  </data>
+  <data name="Select_athlete_string" xml:space="preserve">
+    <value>Изберете състезател</value>
+  </data>
+  <data name="Empty_performance_competitor_message" xml:space="preserve">
+    <value>Вашият акаунт не е конфигуриран като участник в настоящото състезание по издръжливост. Ако участвате, моля, свържете се с Администратор</value>
+  </data>
+  <data name="Empty_performance_official_message" xml:space="preserve">
+    <value>Изберете участник отгоре, за да видите неговите резултати</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

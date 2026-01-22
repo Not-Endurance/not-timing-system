@@ -1,13 +1,40 @@
 ﻿@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using NTS.Blazor.Components.ParticipationTable
+@using NTS.Domain.Objects;
 @using NTS.Domain.Core.Aggregates.Participations
+@using static WitnessBlazorConstants.UserRoles;
 
 @attribute [Route(WitnessBlazorConstants.Pages.PERFORMANCE)]
-@attribute [Authorize(Roles = "admin,competitor")]
+@attribute [Authorize(Roles = $"admin,competitor")]
 @inherits PerformanceBehind
 
 <MudStack AlignItems="AlignItems.Center">
-    <NHeadline3 Content="@Participant!.ToString()"/>
-
-    <ParticipationTable Number="1" Phases="PhasesCollection" Editable="false" />
+    <AuthorizeView Roles="@($"{ADMIN},{OFFICIAL}")">
+        <Authorized>
+            <MudGrid Class="d-flex justify-center">
+                <MudItem lg="4" md="6" sm="8" xs="10" Class="mt-10">
+                    <NSelect T="Person" Items="@People" Label="@Select_athlete_string" Value="@SelectedPerson" ValueChanged="(person)=>OnPersonChanged(person)" />
+                </MudItem>
+            </MudGrid>
+        </Authorized>
+    </AuthorizeView>
+    @if (Participant != null)
+    {
+            <NHeadline3 Class="mt-10 mb-10" Content="@Participant.ToString()"/>
+            <ParticipationTable Class="mb-10" Phases="Participant.Phases" Editable="false" />
+    }
+    else
+    {
+        <AuthorizeView Roles="@($"{COMPETITOR}")">
+            <Authorized>
+                <NHeadline3 Class="mt-20" Content="@Empty_performance_competitor_message"/>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="@($"{ADMIN},{OFFICIAL}")">
+            <Authorized>
+                <NHeadline3 Class="mt-20" Content="@Empty_performance_official_message"/>
+            </Authorized>
+        </AuthorizeView>
+    }
 </MudStack>

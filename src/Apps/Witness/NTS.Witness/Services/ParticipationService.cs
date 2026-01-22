@@ -43,13 +43,13 @@ public class ParticipationService
         }
     }
 
-    public Person GetPerson()
+    public IEnumerable<Person> GetPeople()
     {
-        return DummyData.CreateParticipant("Pesho", "Goshov");
+        return Participations.Select(p => p.Combination.Athlete.Names).Distinct();
     }
 
-    public List<Phase> GetPhases()
+    public Participation GetParticipationBy(Person person)
     {
-        return DummyData.CreatePhases();
+        return Participations.First(p => p.Combination.Athlete.Names.Equals(person));
     }
 }

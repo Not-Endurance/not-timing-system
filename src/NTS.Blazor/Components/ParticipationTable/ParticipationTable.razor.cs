@@ -13,12 +13,13 @@ public partial class ParticipationTable
     bool _anyRepresentation;
     bool _anyRequiredInspection;
     bool _anyCompulsoryRequiredInspection;
+    string _numberStyles = "pointer-events:none;margin-left:25px;";
 
     [Inject]
     CrudeDialog<PhaseUpdateModel, PhaseForm> Dialog { get; set; } = default!;
 
-    [Parameter, EditorRequired]
-    public int Number { get; set; }
+    [Parameter]
+    public int? Number { get; set; }
 
     [Parameter]
     public PhaseCollection? Phases { get; set; }
@@ -34,6 +35,7 @@ public partial class ParticipationTable
         _anyRepresentation = Phases != null && Phases.Any(x => x.IsReinspectionRequested);
         _anyRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionRequested);
         _anyCompulsoryRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionCompulsory);
+        if(Number==null){ _numberStyles += "opacity:0;"; }
         FlipAxis();
     }
 
