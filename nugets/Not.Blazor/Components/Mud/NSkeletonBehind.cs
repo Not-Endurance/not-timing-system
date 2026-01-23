@@ -10,4 +10,3 @@ public class NSkeletonBehind : NComponent
     [Parameter]
     public SkeletonType Type { get; set; } = SkeletonType.Text;
 }
-

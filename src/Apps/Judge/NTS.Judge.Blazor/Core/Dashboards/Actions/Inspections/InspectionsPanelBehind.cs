@@ -7,7 +7,7 @@ namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Inspections;
 
 public class InspectionsPanelBehind : NStatefulComponent<IInspectionService>
 {
-    protected Participation? SelectedParticipation => Service.SelectedParticipation; 
+    protected Participation? SelectedParticipation => Service.SelectedParticipation;
     protected Phase? CurrentPhase => SelectedParticipation?.Phases.Current;
     protected bool Represent => CurrentPhase?.IsReinspectionRequested ?? false;
     protected bool RequireInspection => CurrentPhase?.IsRequiredInspectionRequested ?? false;
