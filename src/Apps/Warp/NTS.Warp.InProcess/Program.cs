@@ -35,11 +35,7 @@ builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Info
 builder.Logging.AddSerilog();
 builder
     .Services.AddNLogging()
-    .AddFilesystemLogger(logFileConfig =>
-    {
-        logFileConfig.Path = FileContextHelper.GetAppDirectory("logs");
-        logFileConfig.Name = FileContextHelper.ConfigureApplicationName("NTS.Warp");
-    });
+    .AddFilesystemLogger("NTS.Warp");
 #endif
 
 var app = builder.Build();
