@@ -2,21 +2,21 @@
 @using NTS.Domain.Core.Aggregates
 @using NTS.Blazor.Components.ParticipationTable
 
-@inherits NComponent
+@inherits DashboardBehind
 
-@if (Behind.SelectedParticipation != null)
+@if (Service.SelectedParticipation != null)
 {
     <NGrid>
         <MudItem xs="12" Class="mb-4">
-            <NAutocomplete T="Participation" @bind-value="Behind.SelectedParticipation" Search="Search" Class="mb-2 dashboard-autocomplete" />
+            <NAutocomplete T="Participation" @bind-value="Service.SelectedParticipation" Search="Search" Class="mb-2 dashboard-autocomplete" />
         </MudItem>
         
         <MudItem xs="3">
-            <ParticipationChips @bind-Value="Behind.SelectedParticipation" Set="Behind.Participations" SetChipColor="GetColor" />
+            <ParticipationChips @bind-Value="Service.SelectedParticipation" Set="Service.Participations" SetChipColor="GetColor" />
         </MudItem>
         
         <MudItem xs="9">
-            <ParticipationTable Number="Behind.SelectedParticipation.Combination.Number" Phases="Behind.SelectedParticipation.Phases" />
+            <ParticipationTable Number="Service.SelectedParticipation.Combination.Number" Phases="Service.SelectedParticipation.Phases" />
         </MudItem>
     </NGrid>
 }   

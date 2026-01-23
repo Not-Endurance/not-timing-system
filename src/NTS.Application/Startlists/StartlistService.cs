@@ -22,11 +22,10 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
     public IReadOnlyList<StartlistEntry> Upcoming => _context.Startlist?.Upcoming ?? [];
     public IReadOnlyList<StartlistEntry> History => _context.Startlist?.History ?? [];
 
-    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState()
     {
         var participations = await _participations.ReadMany();
         _context.Startlist = new Startlist(participations);
-
         return _context.Startlist.History.Any() || _context.Startlist.Upcoming.Any();
     }
 
@@ -51,7 +50,7 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
 
     void AddEntry(Participation participation)
     {
-        _context.Startlist?.Add(new StartlistEntry(participation));
+        _context.Startlist?.Add(participation);
         EmitChanged();
     }
 }

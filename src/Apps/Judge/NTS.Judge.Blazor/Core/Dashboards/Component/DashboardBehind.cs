@@ -1,32 +1,25 @@
 using MudBlazor;
+using Not.Blazor.Components;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Component;
 
-public partial class Dashboard
+public class DashboardBehind : NStatefulComponent<IDashboardService>
 {
-    [Inject]
-    IDashboardService Behind { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(Behind);
-    }
-
-    Task<IEnumerable<Participation>> Search(string term)
+    protected Task<IEnumerable<Participation>> Search(string term)
     {
         if (string.IsNullOrEmpty(term))
         {
-            return Task.FromResult(Behind.Participations);
+            return Task.FromResult(Service.Participations);
         }
-        var result = Behind.Participations.Where(x => x.ToString().ToLower().Contains(term.ToLower()));
+        var result = Service.Participations.Where(x => x.ToString().ToLower().Contains(term.ToLower()));
         return Task.FromResult(result);
     }
 
-    Color GetColor(Participation participation)
+    protected Color GetColor(Participation participation)
     {
-        if (Behind.RecentlyProcessed.Contains(participation.Combination.Number))
+        if (Service.RecentlyProcessed.Contains(participation.Combination.Number))
         {
             return Color.Warning;
         }

@@ -1,13 +1,13 @@
 ﻿@using NTS.Domain.Core.Aggregates
-@inherits RankingMenuBehind;
+@inherits RankingMenuBehind
 
-@if (Current == null)
+@if (IsLoading)
 {
     return;
 }
 
 @* //TODO: probably extract this chipset into NotChipGroup component or something similar. Also used in DashboardComponent *@
-<MudChipSet T="Ranking" SelectedValue="@Current" SelectedValueChanged="Select" Class="@Class" Style="@Style">
+<MudChipSet T="Ranking" SelectedValue="@Service.Current" SelectedValueChanged="Select" Class="@Class" Style="@Style">
 
     @foreach (var grouping in Rankings.GroupBy(x => x.Name))
     {

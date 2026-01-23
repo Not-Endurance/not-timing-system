@@ -1,28 +1,16 @@
 ﻿using Not.Formatting;
-using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Domain.Core.Objects.Startlists;
 
-public record StartlistEntry
+public record StartlistEntry : ValueObject
 {
-    public StartlistEntry(Person athlete, int number, int loopNumber, double distance, Timestamp startAt)
+    public StartlistEntry(Person athlete, int number, int phaseNumber, double distance, Timestamp start)
     {
         Athlete = athlete;
         Number = number;
-        PhaseNumber = loopNumber;
+        PhaseNumber = phaseNumber;
         Distance = distance;
-        Start = startAt;
-    }
-
-    public StartlistEntry(Participation participation)
-    {
-        Athlete = participation.Combination.Athlete.Names;
-        Number = participation.Combination.Number;
-        var currentIndex = participation.Phases.IndexOf(participation.Phases.Current);
-        var nextPhase = participation.Phases[currentIndex + 1];
-        PhaseNumber = participation.Phases.NumberOf(nextPhase);
-        Distance = nextPhase.Length;
-        Start = new Timestamp((nextPhase.StartTime ?? Timestamp.DEFAULT).ToDateTimeOffset());
+        Start = start;
     }
 
     public Person Athlete { get; }
@@ -30,15 +18,12 @@ public record StartlistEntry
     public int PhaseNumber { get; }
     public double Distance { get; }
     public StartlistEntryState State { get; internal set; } = StartlistEntryState.Resting;
-
-    // TODO: Use Timestamp instead and use TimeOfDay internally in Timestamp in order to discard Day differences. Should make testing a bit more easier with actual data
     public Timestamp Start { get; }
 
     public override string ToString()
     {
         var distance = Distance + km_string;
         var start = FormattingHelper.Format(Start.ToTimeSpan());
-        var result = DomainModelHelper.Combine(Number, Athlete, distance, start);
-        return result;
+        return Combine(Number, Athlete, distance, start);
     }
 }

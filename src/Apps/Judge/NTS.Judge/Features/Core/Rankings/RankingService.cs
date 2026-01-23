@@ -49,7 +49,7 @@ public class RankingService
 
     public ObservableList<Ranking> Rankings => State;
 
-    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState()
     {
         var rankings = await _rankings.ReadMany();
         if (!rankings.Any())
@@ -57,8 +57,7 @@ public class RankingService
             return false;
         }
         _current = rankings.First();
-        Rankings.Clear();
-        Rankings.AddRange(rankings);
+        Rankings.Replace(rankings);
         return true;
     }
 
@@ -82,7 +81,6 @@ public class RankingService
     {
         await _rankings.Delete(ranking);
         Rankings.Remove(ranking);
-        EmitChanged();
     }
 
     public async Task ArchiveEnduranceEvent()

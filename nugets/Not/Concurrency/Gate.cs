@@ -2,9 +2,13 @@
 
 public class Gate : IDisposable
 {
-    SemaphoreSlim _semaphore = new (1, 1);
+    const int MAX_COUNT = 1;
 
-    public bool EnterIfAvailable()
+    SemaphoreSlim _semaphore = new (1, MAX_COUNT);
+
+    public bool IsOpen => _semaphore.CurrentCount == MAX_COUNT;
+
+    public bool EnterIfOpen()
     {
         if (!_semaphore.Wait(0))
         {

@@ -24,7 +24,7 @@ public class SettingBehind : NStatefulService, ISettingBehind
 
     public Setting? Setting { get; private set; }
 
-    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState()
     {
         Setting = await _repository.Get(_accountBehind.Id);
         return Setting != null;

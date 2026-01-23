@@ -57,7 +57,7 @@ public class ParticipationBehind
         }
     }
 
-    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState()
     {
         Participations = await _participationRepository.ReadMany();
         SelectedParticipation = Participations.FirstOrDefault();

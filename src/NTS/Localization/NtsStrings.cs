@@ -204,6 +204,7 @@ namespace NTS.Localization
         public static string Access_denied_string => LocalizeString(nameof(Access_denied_string));
         public static string Access_denied_next_steps => LocalizeString(nameof(Access_denied_next_steps));
         public static string Try_another_account_string => LocalizeString(nameof(Try_another_account_string));
+        public static string Cannot_add_completed_participations_in_startlist => LocalizeString(nameof(Cannot_add_completed_participations_in_startlist));
     }
 }
 #pragma warning restore NA0004

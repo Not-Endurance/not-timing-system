@@ -1,9 +1,9 @@
-﻿using NTS.Domain.Core.Aggregates;
+﻿using Not.Domain.Exceptions;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Domain.Core.Objects.Startlists;
 
-// TODO: encapsulate the actual business logic to update entries, rather than having the timer component doing all the work
-public class Startlist
+public record Startlist
 {
     static readonly TimeSpan HISTORY_THRESHOLD = TimeSpan.FromMinutes(15);
     static readonly TimeSpan WARNING_THRESHOLD = TimeSpan.FromMinutes(5);
@@ -87,6 +87,26 @@ public class Startlist
                 _history = OrderByTimeThenPhase(_history);
             }
         }
+    }
+
+    public void Add(Participation participation)
+    {
+        var index = participation.Phases.IndexOf(participation.Phases.Current);
+        if (participation.Phases.Count <= ++index)
+        {
+            throw new DomainException(Cannot_add_completed_participations_in_startlist);
+        }
+        var nextPhase = participation.Phases[index + 1];
+        var phaseNumber = participation.Phases.NumberOf(nextPhase);
+        var start = new Timestamp((nextPhase.StartTime ?? Timestamp.DEFAULT).ToDateTimeOffset());
+        var entry = new StartlistEntry(
+            participation.Combination.Athlete.Names,
+            participation.Combination.Number,
+            phaseNumber,
+            nextPhase.Length,
+            start);
+
+        Add(entry);
     }
 
     public void Add(StartlistEntry entry)

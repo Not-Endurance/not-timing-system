@@ -7,19 +7,19 @@ using Not.Domain;
 
 namespace Not.Blazor.CRUD.Lists;
 
-public partial class CrudList<T, TModel, TForm> : NComponent
+public class CrudeListBehind<T, TModel, TForm> : NStatefulComponent
     where T : Entity
     where TModel : IFormModel<T>, new()
     where TForm : NForm<TModel>
 {
     [Inject]
-    IListBehind<T> Behind { get; set; } = default!;
-
-    [Inject]
     FormManager<TModel, TForm> FormNavigator { get; set; } = default!;
 
     [Inject] // TODO: Probably refactor this as ICrudParent<T> and make it nullable!!!!
     IEnumerable<IKrudNodeSetter> ParentContexts { get; set; } = default!;
+
+    [Inject]
+    protected IListBehind<T> Behind { get; set; } = default!;
 
     [Parameter]
     public int? ParentId { get; set; } // TODO: DELETE THIS

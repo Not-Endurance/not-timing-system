@@ -19,7 +19,7 @@ public class CoalesceInvoker
 
     async Task RunActionLoop()
     {
-        if (!_gate.EnterIfAvailable())
+        if (!_gate.EnterIfOpen())
         {
             return;
         }

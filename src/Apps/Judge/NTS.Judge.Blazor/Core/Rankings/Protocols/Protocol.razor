@@ -4,10 +4,12 @@
 @{
     if (Document == null)
     {
+        // <NSkeleton />
         return;
     }
     var header = Document.Header;
 }
+
 <MudStack>
     <MudItem Class="d-flex flex-row justify-space-around printable">
         <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(HeaderLogo.Left, HeaderLogo.DirPath)">

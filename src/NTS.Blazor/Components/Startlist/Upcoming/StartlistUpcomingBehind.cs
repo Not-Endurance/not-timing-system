@@ -34,8 +34,9 @@ public class StartlistUpcomingBehind : StartlistBehindBase, IDisposable
         _timer.Start();
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
+        base.Dispose();
         _timer.Elapsed -= OnElapsed;
         _timer.Dispose();
     }

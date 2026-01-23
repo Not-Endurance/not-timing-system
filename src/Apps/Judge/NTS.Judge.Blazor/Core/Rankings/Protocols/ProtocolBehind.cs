@@ -6,11 +6,8 @@ using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Protocols;
 
-public class ProtocolBehind : NComponent
+public class ProtocolBehind : NStatefulComponent<IRankingContext>
 {
-    [Inject]
-    IRankingMenuService RankingService { get; set; } = default!;
-
     [Inject]
     IRanklistDocumentFactory Factory { get; set; } = default!;
 
@@ -20,16 +17,18 @@ public class ProtocolBehind : NComponent
     [Inject]
     protected IProtocolLogoState HeaderLogo { get; set; } = default!;
 
-    protected RanklistDocument Document { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(RankingService);
-    }
+    protected RanklistDocument? Document { get; set; } = default!;
 
     protected override async Task OnBeforeRenderAsync()
     {
-        Document = await Factory.Create(RankingService.Current);
+        try
+        {
+            Document = await Factory.Create(Service.Current);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     public async Task OpenImageBrowser(string forImage, string source)

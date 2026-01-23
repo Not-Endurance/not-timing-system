@@ -1,25 +1,18 @@
+using Not.Blazor.Components;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Eliminations;
 
-public partial class EliminationsPanel
+public class EliminationsPanelBehind : NStatefulComponent<IParticipationContext>
 {
     string? _inputValue;
 
-    [Inject]
-    IParticipationContext ParticipationContext { get; set; } = default!;
-
-    Eliminated? Eliminated => ParticipationContext.SelectedParticipation?.Eliminated;
-    string? ToggleValue
+    protected Eliminated? Eliminated => Service.SelectedParticipation?.Eliminated;
+    protected string? ToggleValue
     {
         get => _inputValue != null ? _inputValue : Eliminated?.Code;
         set => _inputValue = value;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(ParticipationContext);
     }
 
     protected override void OnBeforeRender()

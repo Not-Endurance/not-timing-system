@@ -39,7 +39,7 @@ public class HandoutsBehind
 
     public IReadOnlyList<HandoutDocument> Documents => State;
 
-    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override async Task<bool> CreateState()
     {
         var handouts = await _handoutRepository.ReadMany();
         var enduranceEvent = await _events.Read(0);
@@ -53,8 +53,7 @@ public class HandoutsBehind
             return true;
         }
         var documents = handouts.Select(handout => new HandoutDocument(handout, enduranceEvent, officials));
-        State.Clear();
-        State.AddRange(documents);
+        State.Replace(documents);
         return true;
     }
 

@@ -1,31 +1,32 @@
 using MudBlazor;
+using Not.Blazor.Components;
 using Not.Blazor.Dialogs;
 using NTS.Judge.Features.Core.Handouts;
 
 namespace NTS.Judge.Blazor.Core.Handouts;
 
-public partial class HandoutsPage
+public class HandoutsPageBehind : PrintableComponent
 {
-    [Inject]
-    IHandoutsBehind Behind { get; set; } = default!;
-
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
+    [Inject]
+    protected IHandoutsBehind Service { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Behind);
+        await Observe(Service);
     }
 
-    async Task OpenPrintPreview()
+    protected async Task OpenPrintPreview()
     {
-        var handouts = Behind.Documents.ToList();
+        var handouts = Service.Documents.ToList();
         await OpenPrintDialog();
         var dialog = await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>();
         if (await dialog.IsCanceled())
         {
             return;
         }
-        await Behind.Delete(handouts);
+        await Service.Delete(handouts);
     }
 }

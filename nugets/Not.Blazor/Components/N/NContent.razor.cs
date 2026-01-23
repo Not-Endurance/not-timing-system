@@ -14,6 +14,9 @@ public partial class NContent
     public string Title { get; set; } = default!;
 
     [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
     public RenderFragment? Main { get; set; } = default!;
 
     [Parameter]

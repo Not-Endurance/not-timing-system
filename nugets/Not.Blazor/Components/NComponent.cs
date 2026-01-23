@@ -36,30 +36,6 @@ public class NComponent : ComponentBase
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-
-    public bool IsInitialized { get; private set; } = true;
-
-    protected async Task Observe(IStatefulService statefulService)
-    {
-        await Observe(statefulService, []);
-    }
-
-    protected void Observe(IObservable observable)
-    {
-        observable.Event.Subscribe(InvokeRender);
-    }
-
-
-    // TODO: remove args, create NObservingComponent<T>, create streamlined loading solution
-    protected async Task Observe(IStatefulService statefulService, params IEnumerable<object> arguments)
-    {
-        IsInitialized = false;
-        Observe((IObservable)statefulService);
-        await statefulService.Initialize(arguments);
-        IsInitialized = true;
-        await InvokeRender();
-    }
-
     protected Task InvokeRender()
     {
         return _coalescedRender.Invoke();
