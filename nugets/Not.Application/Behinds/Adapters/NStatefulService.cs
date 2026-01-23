@@ -12,7 +12,7 @@ public abstract class NStatefulService : Observer, IStatefulService
     bool _hasLoaded;
 
     /// <summary>
-    /// Creates the service state. Called internally by <see cref="Load"/> which 
+    /// Creates the service state. Called internally by <see cref="Load"/> which
     /// guarantees single execution and prevents concurrency issues
     /// </summary>
     /// <returns>Indicates weather or not the state has been initialized successfully</returns>

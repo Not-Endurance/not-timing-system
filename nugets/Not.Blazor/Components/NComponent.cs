@@ -43,7 +43,7 @@ public class NComponent : ComponentBase
 
     protected virtual void OnBeforeRender() { }
 
-    protected virtual Task OnBeforeRenderAsync() 
+    protected virtual Task OnBeforeRenderAsync()
     {
         return Task.CompletedTask;
     }

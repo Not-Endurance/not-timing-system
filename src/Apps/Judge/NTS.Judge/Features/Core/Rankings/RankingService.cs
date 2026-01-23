@@ -43,9 +43,11 @@ public class RankingService
         Participation.RESTORED_EVENT.Subscribe(UpdateRanklist);
     }
 
-    public Ranking Current => GuardHelper.ThrowIfDefault(
-        _current, 
-        $"'{nameof(RankingService)}.{nameof(Current)}' shouldn't be used before '{CreateState}' has completed. Did you forget to call 'Observe'?");
+    public Ranking Current =>
+        GuardHelper.ThrowIfDefault(
+            _current,
+            $"'{nameof(RankingService)}.{nameof(Current)}' shouldn't be used before '{CreateState}' has completed. Did you forget to call 'Observe'?"
+        );
 
     public ObservableList<Ranking> Rankings => State;
 

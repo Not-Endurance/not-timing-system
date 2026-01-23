@@ -4,7 +4,7 @@ public class Gate : IDisposable
 {
     const int MAX_COUNT = 1;
 
-    SemaphoreSlim _semaphore = new (1, MAX_COUNT);
+    SemaphoreSlim _semaphore = new(1, MAX_COUNT);
 
     public bool IsOpen => _semaphore.CurrentCount == MAX_COUNT;
 

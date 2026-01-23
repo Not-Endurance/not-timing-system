@@ -104,7 +104,8 @@ public record Startlist
             participation.Combination.Number,
             phaseNumber,
             nextPhase.Length,
-            start);
+            start
+        );
 
         Add(entry);
     }

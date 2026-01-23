@@ -29,7 +29,7 @@ public class RankingsPageBehind : PrintableComponent
     {
         await Observe(RankingService);
     }
-    
+
     protected override void OnBeforeRender()
     {
         Ranklist = new Ranklist(RankingService.Current);
