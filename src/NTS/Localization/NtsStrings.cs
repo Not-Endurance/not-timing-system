@@ -179,6 +179,8 @@ namespace NTS.Localization
         public static string Competition_ongoing_string => LocalizeString(nameof(Competition_ongoing_string));
         public static string Cannot_select_another_event_without_resetting__string =>
             LocalizeString(nameof(Cannot_select_another_event_without_resetting__string));
+        public static string Cannot_select_another_event_before_disconnect__string =>
+            LocalizeString(nameof(Cannot_select_another_event_before_disconnect__string));
         public static string Component_missing_required_value_string =>
             LocalizeString(nameof(Component_missing_required_value_string));
         public static string Help_string => LocalizeString(nameof(Help_string));
@@ -206,6 +208,8 @@ namespace NTS.Localization
         public static string Try_another_account_string => LocalizeString(nameof(Try_another_account_string));
         public static string Connect_string => LocalizeString(nameof(Connect_string));
         public static string Disconnect_string => LocalizeString(nameof(Disconnect_string));
+        public static string Connected_to__string => LocalizeString(nameof(Connected_to__string));
+        public static string Disconnected_from__string => LocalizeString(nameof(Disconnected_from__string));
         public static string Empty_event_list_message => LocalizeString(nameof(Empty_event_list_message));
         public static string Select_athlete_string => LocalizeString(nameof(Select_athlete_string));
         public static string Empty_performance_official_message =>

@@ -771,4 +771,13 @@
   <data name="Empty_performance_official_message" xml:space="preserve">
     <value>Choose a participating athlete above to view performance</value>
   </data>
+  <data name="Cannot_select_another_event_before_disconnect" xml:space="preserve">
+    <value>Already connected to {0}, disconnect first."</value>
+  </data>
+  <data name="Connected_to__string" xml:space="preserve">
+    <value>Connected to {0}</value>
+  </data>
+  <data name="Disconnected_from__string" xml:space="preserve">
+    <value>Disconnected from {0}</value>
+  </data>
 </root>

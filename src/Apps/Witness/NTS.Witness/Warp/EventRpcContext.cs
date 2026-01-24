@@ -30,7 +30,7 @@ public class RpcContext : ISelectedEventContext, IConnectionStatus, IRpcContext<
         await _socket.Disconnect();
         if (!_socket.IsConnected && @event != null)
         {
-            NotifyHelper.Warn("Disconnected from " + @event.Name);
+            NotifyHelper.Warn(string.Format(Disconnected_from__string, @event.Name));
         }
     }
 
@@ -42,13 +42,14 @@ public class RpcContext : ISelectedEventContext, IConnectionStatus, IRpcContext<
         }
         if (Event != null)
         {
-            throw new DomainException(Cannot_select_another_event_without_resetting__string, Event);
+            NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string,Event.Name));
+            return;
         }
         InternalSetEvent(upcomingEvent);
         await _socket.Connect();
         if (_socket.IsConnected && Event != null)
         {
-            NotifyHelper.Inform("Connected to " + Event.Name);
+            NotifyHelper.Inform(string.Format(Connected_to__string, Event.Name));
         }
     }
 
