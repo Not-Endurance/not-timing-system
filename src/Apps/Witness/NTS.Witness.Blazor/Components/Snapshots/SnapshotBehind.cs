@@ -19,7 +19,7 @@ public class SnapshotBehind : NComponent
     ISnapshotService SnapshotService { get; set; } = default!;
 
     [Inject]
-    protected IParticipationService ParticipationService { get; set; } = default!;
+    protected IParticipationContext ParticipationService { get; set; } = default!;
     protected List<IntermediateSnapshot> SelectedParticipations { get; set; } = [];
     protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];

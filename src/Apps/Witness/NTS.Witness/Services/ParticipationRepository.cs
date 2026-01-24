@@ -17,7 +17,7 @@ public class ParticipationReader : IReadMany<Participation>, ITransient
 
     public Task<IEnumerable<Participation>> ReadMany()
     {
-        return Task.FromResult(_participationService.ActiveParticipations);
+        return Task.FromResult(_participationService.Active);
     }
 
     public Task<IEnumerable<Participation>> ReadMany(Expression<Func<Participation, bool>> filter)

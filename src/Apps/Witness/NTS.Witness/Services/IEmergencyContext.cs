@@ -1,6 +1,6 @@
 ﻿namespace NTS.Witness.Services;
 
-public interface IEmergencyService
+public interface IEmergencyContext
 {
     Dictionary<string, string> Contacts { get; }
 }

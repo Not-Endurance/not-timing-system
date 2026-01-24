@@ -71,7 +71,7 @@ public class WitnessRpcClient
         );
         if (result.Data != null)
         {
-            _participationService.ActiveParticipations = result.Data;
+            _participationService.Active = result.Data;
         }
     }
 }

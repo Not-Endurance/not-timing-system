@@ -9,13 +9,13 @@ namespace NTS.Witness.Services;
 
 public class ParticipationService
     : NStatefulService<ObservableList<Participation>>,
-        IParticipationService,
+        IParticipationContext,
         IClientParticipationUpdate,
         IPerformanceService
 {
     IEnumerable<Participation> Participations => State;
 
-    public IEnumerable<Participation> ActiveParticipations
+    public IEnumerable<Participation> Active
     {
         get => Participations;
         set

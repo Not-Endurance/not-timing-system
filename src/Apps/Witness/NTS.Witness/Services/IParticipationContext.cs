@@ -4,7 +4,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Witness.Services;
 
-public interface IParticipationService : IStatefulService
+public interface IParticipationContext : IStatefulService
 {
-    IEnumerable<Participation> ActiveParticipations { get; }
+    IEnumerable<Participation> Active { get; }
 }
