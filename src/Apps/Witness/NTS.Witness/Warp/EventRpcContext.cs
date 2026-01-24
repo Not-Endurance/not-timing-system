@@ -42,7 +42,7 @@ public class RpcContext : ISelectedEventContext, IConnectionStatus, IRpcContext<
         }
         if (Event != null)
         {
-            NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string,Event.Name));
+            NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Event.Name));
             return;
         }
         InternalSetEvent(upcomingEvent);

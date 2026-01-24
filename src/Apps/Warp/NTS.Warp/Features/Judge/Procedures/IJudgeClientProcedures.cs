@@ -2,6 +2,4 @@
 
 namespace NTS.Warp.Features.Judge.Procedures;
 
-public interface IJudgeClientProcedures
-    : IParticipationClientProcedures,
-        IConnectionsClientProcedures { }
+public interface IJudgeClientProcedures : IParticipationClientProcedures, IConnectionsClientProcedures { }

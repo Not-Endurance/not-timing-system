@@ -104,15 +104,15 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
 
     public void Update(T item, NCollectionAction action)
     {
-            switch (action)
-            {
-                case NCollectionAction.AddOrUpdate:
-                    AddOrReplace(item);
-                    break;
-                case NCollectionAction.Remove:
-                    Remove(item);
-                    break;
-            }
+        switch (action)
+        {
+            case NCollectionAction.AddOrUpdate:
+                AddOrReplace(item);
+                break;
+            case NCollectionAction.Remove:
+                Remove(item);
+                break;
+        }
     }
 
     public void Clear()

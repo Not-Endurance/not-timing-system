@@ -32,7 +32,8 @@ public class ProfileBehind : NComponent
 
     protected void SigninHandler()
     {
-        try {
+        try
+        {
             Navigator.NavigateTo(WitnessBlazorConstants.Pages.SIGNIN, forceLoad: true);
         }
         catch (Exception ex)
