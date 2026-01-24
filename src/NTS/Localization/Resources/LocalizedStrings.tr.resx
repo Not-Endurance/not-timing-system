@@ -679,7 +679,7 @@
   <data name="Empty_performance_official_message" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-  <data name="Cannot_select_another_event_before_disconnect" type="System.Resources.ResXNullRef, System.Windows.Forms">
+  <data name="Cannot_select_another_event_before_disconnect__string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
   <data name="Connected_to__string" type="System.Resources.ResXNullRef, System.Windows.Forms">

@@ -771,7 +771,7 @@
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>
-  <data name="Cannot_select_another_event_before_disconnect" xml:space="preserve">
+  <data name="Cannot_select_another_event_before_disconnect__string" xml:space="preserve">
     <value>Прекъснете активната връзка към {0} преди да установите нова</value>
   </data>
   <data name="Connected_to__string" xml:space="preserve">
