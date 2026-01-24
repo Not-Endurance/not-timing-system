@@ -1,7 +1,7 @@
 ﻿using Not.Domain.Aggregates;
 using Not.Injection;
 
-namespace Not.Application.RPC;
+namespace NTS.Application.Warp;
 
 public interface IRpcContext<T> : ISingleton
     where T : AggregateRoot
