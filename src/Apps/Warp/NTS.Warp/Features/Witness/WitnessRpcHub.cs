@@ -61,7 +61,7 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         return new Startlist(participations);
     }
 
-    public async Task<IEnumerable<Participation>> SendParticipants(WarpRequest request)
+    public async Task<IEnumerable<Participation>> SendParticipations(WarpRequest request)
     {
         if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
