@@ -61,13 +61,13 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         return new Startlist(participations);
     }
 
-    public async Task<IEnumerable<Participation>> SendParticipations(WarpRequest request)
+    public async Task<IEnumerable<CoreParticipationModel>> SendParticipations(WarpRequest request)
     {
         if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
             return [];
         }
-        return await judgeClient.GetActive().Select(participationModel => participationModel.MapToDomain());
+        return await judgeClient.GetActive();
     }
 
     public async Task<RpcInvokeResult> Receive(WarpRequest<SnapshotModel> request)

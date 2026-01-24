@@ -8,7 +8,7 @@ namespace NTS.Warp.Features.Witness.Procedures;
 
 public interface IWitnessHubProcedures
 {
-    Task<IEnumerable<Participation>> SendParticipations(WarpRequest request);
+    Task<IEnumerable<CoreParticipationModel>> SendParticipations(WarpRequest request);
     Task<Startlist?> SendStartlist(WarpRequest request);
     Task<RpcInvokeResult> Receive(WarpRequest<SnapshotModel> request);
 }
