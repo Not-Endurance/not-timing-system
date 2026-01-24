@@ -1,3 +1,10 @@
-﻿namespace NTS.Warp.Features.Judge.Procedures;
+﻿using NTS.Domain.Core.Objects.Payloads;
 
-public interface IJudgeHubProcedures : IParticipationHubProcedures { }
+namespace NTS.Warp.Features.Judge.Procedures;
+
+public interface IJudgeHubProcedures
+{
+    Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request);
+    Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request);
+    Task OnParticipationRestored(WarpRequest<ParticipationRestored> request);
+}

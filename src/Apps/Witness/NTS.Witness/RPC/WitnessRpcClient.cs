@@ -15,8 +15,7 @@ namespace NTS.Witness.RPC;
 
 public class WitnessRpcClient
     : RpcClient,
-        IParticipantsClientProcedures,
-        IStartlistClientProcedures,
+        IWitnessClientProcedures,
         IClientParticipationGetter,
         ISnapshotService
 {

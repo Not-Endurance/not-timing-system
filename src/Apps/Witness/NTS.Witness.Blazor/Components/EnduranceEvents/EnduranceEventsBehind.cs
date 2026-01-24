@@ -1,4 +1,5 @@
-﻿using Not.Application.RPC;
+﻿using Not.Application.CRUD.Ports;
+using Not.Application.RPC;
 using NTS.Application.Warp;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
@@ -6,7 +7,7 @@ using NTS.Witness.Services;
 public class EnduranceEventsBehind : ComponentBase
 {
     [Inject]
-    IWitnessEvents WitnessEvents { get; set; } = default!;
+    IRepository<UpcomingEvent> Repository { get; set; } = default!;
 
     [Inject]
     IRpcContext<UpcomingEvent> RpcContext { get; set; } = default!;
@@ -26,7 +27,7 @@ public class EnduranceEventsBehind : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Events = await WitnessEvents.Get();
+        Events = await Repository.ReadMany();
     }
 
     protected async void ConnectTo(UpcomingEvent enduranceEvent)

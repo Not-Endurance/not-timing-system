@@ -88,7 +88,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         return _eventContext.Event!.Id.ToString();
     }
 
-    class HubProcedures : IParticipationHubProcedures
+    class HubProcedures : IJudgeHubProcedures
     {
         readonly IRpcSocket _socket;
 
