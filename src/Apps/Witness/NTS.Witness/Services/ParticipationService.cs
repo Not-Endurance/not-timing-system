@@ -32,15 +32,7 @@ public class ParticipationService
 
     public void Update(Participation participation, NCollectionAction action)
     {
-        Participations.ToList().Update(participation, action);
-        if (action == NCollectionAction.AddOrUpdate)
-        {
-            State.AddOrReplace(participation);
-        }
-        else if (action == NCollectionAction.Remove)
-        {
-            State.Remove(participation);
-        }
+        State.Update(participation, action);
     }
 
     public IEnumerable<Person> GetPeople()
