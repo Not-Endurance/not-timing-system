@@ -12,17 +12,17 @@
 <MudStack AlignItems="AlignItems.Center">
     <AuthorizeView Roles="@($"{ADMIN},{OFFICIAL}")">
         <Authorized>
-            <MudGrid Class="d-flex justify-center">
+            <MudGrid Justify="Justify.Center">
                 <MudItem lg="4" md="6" sm="8" xs="10" Class="mt-10">
                     <NSelect T="Person" Items="@People" Label="@Select_athlete_string" Value="@SelectedPerson" ValueChanged="(person)=>OnPersonChanged(person)" />
                 </MudItem>
             </MudGrid>
         </Authorized>
     </AuthorizeView>
-    @if (Participant != null)
+    @if (Participation != null)
     {
-            <NHeadline3 Class="mx-10 mt-10 mb-8" Content="@Participant.ToString()"/>
-            <ParticipationTable Class="mb-10" Phases="Participant.Phases" Editable="false" />
+            <NHeadline3 Class="mx-10 mt-10 mb-8" Content="@Participation.ToString()"/>
+            <ParticipationTable Class="mb-10" Phases="Participation.Phases" Editable="false" />
     }
     else
     {

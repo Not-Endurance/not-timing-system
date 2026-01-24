@@ -13,7 +13,7 @@ public class PerformanceBehind : NComponent
 
     protected List<NotListModel<Person>> People { get; set; } = [];
     protected Person SelectedPerson { get; set; } = default!;
-    protected Participation? Participant { get; set; } = default!;
+    protected Participation? Participation { get; set; } = default!;
 
     protected override void OnInitialized()
     {
@@ -37,7 +37,7 @@ public class PerformanceBehind : NComponent
         try
         {
             SelectedPerson = person;
-            Participant = Service.GetParticipationBy(person);
+            Participation = Service.GetParticipationBy(person);
             StateHasChanged();
         }
         catch (Exception ex)

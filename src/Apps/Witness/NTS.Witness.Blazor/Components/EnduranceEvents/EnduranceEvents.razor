@@ -5,11 +5,11 @@
     <CustomCell>
         @if (IsConnected && Selected.Event == context)
         {
-            <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="() => Disconnect()">@Disconnect_string</MudButton>
+            <NButtonPrimary Color="Color.Error" Style="width:110px" OnClick="() => Disconnect()">@Disconnect_string</NButtonPrimary>
         }
         else
         {
-            <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => ConnectTo(context)">@Connect_string</MudButton>
+            <NButtonPrimary Color="Color.Success" Style="width:110px" OnClick="() => ConnectTo(context)">@Connect_string</NButtonPrimary>
         }
     </CustomCell>
 </NSimpleTable>

@@ -1,5 +1,5 @@
 ﻿using Not.Application.CRUD.Ports;
-using Not.Application.RPC;
+using Not.Blazor.Components;
 using NTS.Application.Warp;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
