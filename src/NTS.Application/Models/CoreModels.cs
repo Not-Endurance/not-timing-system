@@ -9,7 +9,7 @@ using NTS.Domain.Objects;
 
 namespace NTS.Application.Models;
 
-public class  StartlistEntryModel
+public class StartlistEntryModel
 {
     public static StartlistEntryModel MapFrom(StartlistEntry startlistEntry)
     {
@@ -19,10 +19,9 @@ public class  StartlistEntryModel
             Number = startlistEntry.Number,
             PhaseNumber = startlistEntry.PhaseNumber,
             Distance = startlistEntry.Distance,
-            Start = startlistEntry.Start.ToDateTimeOffset()
+            Start = startlistEntry.Start.ToDateTimeOffset(),
         };
     }
-
 
     public string[] AthleteNames { get; init; } = default!;
     public int Number { get; init; }

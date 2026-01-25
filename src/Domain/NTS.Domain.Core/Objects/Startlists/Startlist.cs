@@ -57,7 +57,7 @@ public class Startlist
     {
         var upcoming = new List<StartlistEntry>();
         var history = new List<StartlistEntry>();
-        foreach(var entry in entries)
+        foreach (var entry in entries)
         {
             if (IsHistory(entry))
             {

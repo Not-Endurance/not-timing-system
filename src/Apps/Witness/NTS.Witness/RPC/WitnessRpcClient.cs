@@ -61,9 +61,10 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IClientPart
     public async Task GetParticipations()
     {
         var request = WarpRequest.Create(_eventContext.Event!.Id.ToString());
-        var result =
-            await _socket.InvokeInputOutputProcedure<IEnumerable<CoreParticipationModel>, WarpRequest>
-            (nameof(IWitnessHubProcedures.SendParticipations), request);
+        var result = await _socket.InvokeInputOutputProcedure<IEnumerable<CoreParticipationModel>, WarpRequest>(
+            nameof(IWitnessHubProcedures.SendParticipations),
+            request
+        );
         if (result.Data != null)
         {
             _participationService.Active = result.Data.Select(dtoModel => dtoModel.MapToDomain());
@@ -73,9 +74,10 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IClientPart
     public async Task InitializeStartlist()
     {
         var request = WarpRequest.Create(_eventContext.Event!.Id.ToString());
-        var initialEntries =
-            await _socket.InvokeInputOutputProcedure<IEnumerable<StartlistEntryModel>, WarpRequest>
-            (nameof(IWitnessHubProcedures.SendStartlistEntries), request);
+        var initialEntries = await _socket.InvokeInputOutputProcedure<IEnumerable<StartlistEntryModel>, WarpRequest>(
+            nameof(IWitnessHubProcedures.SendStartlistEntries),
+            request
+        );
         if (initialEntries.Data != null)
         {
             var startlistEntries = initialEntries.Data.Select(model => model.MapToDomain());
@@ -83,10 +85,11 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IClientPart
             _startlistContext.Startlist = startlist;
         }
 
-        var participationsModel =
-            await _socket.InvokeInputOutputProcedure<IEnumerable<CoreParticipationModel>, WarpRequest>
-            (nameof(IWitnessHubProcedures.SendParticipations), request);
-        if(participationsModel.Data != null)
+        var participationsModel = await _socket.InvokeInputOutputProcedure<
+            IEnumerable<CoreParticipationModel>,
+            WarpRequest
+        >(nameof(IWitnessHubProcedures.SendParticipations), request);
+        if (participationsModel.Data != null)
         {
             var participations = participationsModel.Data.Select(model => model.MapToDomain());
             foreach (var participation in participations)

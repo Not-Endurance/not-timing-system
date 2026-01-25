@@ -30,7 +30,6 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         ISnapshotProcessor snapshotProcessor,
         IReadMany<Participation> coreParticipations,
         IReadMany<Domain.Setup.Aggregates.Competition> competitions
-
     )
         : base(socket)
     {
@@ -64,19 +63,18 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     {
         var startlistEntries = new List<StartlistEntryModel>();
         var competitions = await _competitions.ReadMany(competition =>
-            competition.Participations.Any() && competition.Phases.Count > 0);
+            competition.Participations.Any() && competition.Phases.Count > 0
+        );
         foreach (var competition in competitions)
         {
-            var entries = competition.Participations.Select(participation =>
-                new StartlistEntry(
-                    participation.Combination.Athlete.Names,
-                    participation.Combination.Number,
-                    1,
-                    competition.Phases[0]!.Loop!.Distance,
-                    Timestamp.Create(participation.StartTimeOverride ?? competition.Start)!
-                )
-            );
-            startlistEntries.Concat(entries.Select(StartlistEntryModel.MapFrom)); 
+            var entries = competition.Participations.Select(participation => new StartlistEntry(
+                participation.Combination.Athlete.Names,
+                participation.Combination.Number,
+                1,
+                competition.Phases[0]!.Loop!.Distance,
+                Timestamp.Create(participation.StartTimeOverride ?? competition.Start)!
+            ));
+            startlistEntries.Concat(entries.Select(StartlistEntryModel.MapFrom));
         }
         return startlistEntries;
     }
