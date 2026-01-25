@@ -7,7 +7,6 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Warp;
 
-// TODO: fix RpcContext reset not ressetting correctly
 public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, IRpcContext<UpcomingEvent>
 {
     readonly IConnectedEventContext _connectedEventContext;
@@ -58,11 +57,10 @@ public class EventRpcContext : ISelectedEventContext, IStartupInitializerAsync, 
 
     async Task InternalSetEvent(UpcomingEvent? upcomingEvent)
     {
-        if (upcomingEvent == null)
+        if (upcomingEvent != null)
         {
-            return;
+            await _connectedEventContext.Set(upcomingEvent);
         }
-        await _connectedEventContext.Set(upcomingEvent);
         _warpContext.Configure(Event = upcomingEvent);
     }
 }
