@@ -8,6 +8,8 @@ using NTS.Application.Warp;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
+using NTS.Domain.Core.Objects.Startlists;
+using NTS.Domain.Objects;
 using NTS.Judge.Features.Core;
 using NTS.Warp;
 using NTS.Warp.Features.Judge.Procedures;
@@ -19,13 +21,16 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     readonly ISelectedEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IReadMany<Participation> _coreParticipations;
+    readonly IReadMany<Domain.Setup.Aggregates.Competition> _competitions;
     readonly HubProcedures _hubProcedures;
 
     public ParticipationRpcClient(
         ISelectedEventContext eventContext,
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
-        IReadMany<Participation> coreParticipations
+        IReadMany<Participation> coreParticipations,
+        IReadMany<Domain.Setup.Aggregates.Competition> competitions
+
     )
         : base(socket)
     {
@@ -33,6 +38,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         _eventContext = eventContext;
         _snapshotProcessor = snapshotProcessor;
         _coreParticipations = coreParticipations;
+        _competitions = competitions;
     }
 
     public override void RunAtStartup()
@@ -42,6 +48,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         Participation.RESTORED_EVENT.Subscribe(OnParticipationRestored);
 
         RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(Receive), Receive);
+        RegisterOutputCollectionProcedure(nameof(GetStartlistEntries), GetStartlistEntries);
         RegisterOutputCollectionProcedure(nameof(GetActive), GetActive);
     }
 
@@ -51,6 +58,27 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
         {
             await _snapshotProcessor.Process(snapshot);
         }
+    }
+
+    public async Task<IEnumerable<StartlistEntryModel>> GetStartlistEntries()
+    {
+        var startlistEntries = new List<StartlistEntryModel>();
+        var competitions = await _competitions.ReadMany(competition =>
+            competition.Participations.Any() && competition.Phases.Count > 0);
+        foreach (var competition in competitions)
+        {
+            var entries = competition.Participations.Select(participation =>
+                new StartlistEntry(
+                    participation.Combination.Athlete.Names,
+                    participation.Combination.Number,
+                    1,
+                    competition.Phases[0]!.Loop!.Distance,
+                    Timestamp.Create(participation.StartTimeOverride ?? competition.Start)!
+                )
+            );
+            startlistEntries.Concat(entries.Select(StartlistEntryModel.MapFrom)); 
+        }
+        return startlistEntries;
     }
 
     /// <summary>

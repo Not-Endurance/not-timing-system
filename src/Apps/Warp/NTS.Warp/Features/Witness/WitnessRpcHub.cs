@@ -4,8 +4,6 @@ using Not.Application.RPC.Clients;
 using Not.Concurrency.Extensions;
 using NTS.Application.Models;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Startlists;
 using NTS.Warp.Features.Judge;
 using NTS.Warp.Features.Judge.Procedures;
 using NTS.Warp.Features.Witness.Procedures;
@@ -50,15 +48,13 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         await judgeClient.OnWitnessDisconnected(Context.ConnectionId);
     }
 
-    public async Task<Startlist?> SendStartlist(WarpRequest request)
+    public async Task<IEnumerable<StartlistEntryModel>> SendStartlistEntries(WarpRequest request)
     {
         if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
-            return null;
+            return [];
         }
-        var dtoModels = await judgeClient.GetActive();
-        var participations = dtoModels.Select(participationModel => participationModel.MapToDomain());
-        return new Startlist(participations);
+        return await judgeClient.GetStartlistEntries();
     }
 
     public async Task<IEnumerable<CoreParticipationModel>> SendParticipations(WarpRequest request)

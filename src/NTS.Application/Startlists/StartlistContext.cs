@@ -27,6 +27,6 @@ public class StartlistContext : IStartlistContext
 
 public interface IStartlistContext
 {
-    Startlist? Startlist { get; }
+    Startlist? Startlist { get; set; }
     void Update(StartlistEntry entry, NCollectionAction action);
 }

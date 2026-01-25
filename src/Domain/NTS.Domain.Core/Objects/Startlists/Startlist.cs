@@ -53,6 +53,25 @@ public class Startlist
         _history = OrderByTimeThenPhase(history);
     }
 
+    public Startlist(IEnumerable<StartlistEntry> entries)
+    {
+        var upcoming = new List<StartlistEntry>();
+        var history = new List<StartlistEntry>();
+        foreach(var entry in entries)
+        {
+            if (IsHistory(entry))
+            {
+                history.Add(entry);
+            }
+            else
+            {
+                upcoming.Add(entry);
+            }
+            _upcoming = OrderByTimeThenPhase(upcoming);
+            _history = OrderByTimeThenPhase(history);
+        }
+    }
+
     public IReadOnlyList<StartlistEntry> History => _history;
 
     public IReadOnlyList<StartlistEntry> Upcoming => _upcoming;
