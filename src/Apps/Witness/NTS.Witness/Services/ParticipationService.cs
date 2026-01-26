@@ -2,7 +2,6 @@
 using Not.Collections;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Objects;
 
 namespace NTS.Witness.Services;
@@ -10,14 +9,13 @@ namespace NTS.Witness.Services;
 public class ParticipationService
     : NStatefulService<ObservableList<Participation>>,
         IParticipationContext,
-        IClientParticipationUpdate,
+        IParticipationUpdate,
         IPerformanceService
 {
-    IEnumerable<Participation> Participations => State;
 
     public IEnumerable<Participation> Active
     {
-        get => Participations;
+        get => State;
         set
         {
             State.Clear();
@@ -37,11 +35,11 @@ public class ParticipationService
 
     public IEnumerable<Person> GetPeople()
     {
-        return Participations.Select(p => p.Combination.Athlete.Names).Distinct();
+        return State.Select(p => p.Combination.Athlete.Names).Distinct();
     }
 
     public Participation GetParticipationBy(Person person)
     {
-        return Participations.First(p => p.Combination.Athlete.Names.Equals(person));
+        return State.First(p => p.Combination.Athlete.Names.Equals(person));
     }
 }

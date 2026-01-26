@@ -1,6 +1,6 @@
 ﻿namespace NTS.Witness.Services;
 
-public interface IClientParticipationGetter
+public interface IParticipationGetter
 {
     Task GetParticipations();
 }

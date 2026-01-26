@@ -13,7 +13,7 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IClientParticipationGetter, ISnapshotService
+public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipationGetter, ISnapshotService
 {
     readonly IRpcSocket _socket;
     readonly ISelectedEventContext _eventContext;

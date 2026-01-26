@@ -1,5 +1,5 @@
 ﻿using Not.Application.CRUD.Ports;
-using Not.Blazor.Components;
+using NTS.Application.Startlists;
 using NTS.Application.Warp;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
@@ -16,7 +16,7 @@ public class EnduranceEventsBehind : ComponentBase
     IConnectionStatus ConnectionStatus { get; set; } = default!;
 
     [Inject]
-    IClientParticipationGetter ParticipationGetter { get; set; } = default!;
+    IParticipationGetter ParticipationGetter { get; set; } = default!;
 
     [Inject]
     protected ISelectedEventContext Selected { get; set; } = default!;
