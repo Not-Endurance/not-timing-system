@@ -5,7 +5,7 @@ namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 public class Official : Entity
 {
-    public Official(int? id, Person? person, OfficialRole? role)
+    public Official(Person? person, OfficialRole? role, int? id = null)
         : base(id)
     {
         Role = Required(nameof(Role), role);

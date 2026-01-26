@@ -38,7 +38,7 @@ public static class ParticipationAndRankingFactory
             if (existingParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
-                var rankingEntry = new RankingEntry(null, participation, null, setupParticipation.IsNotRanked);
+                var rankingEntry = new RankingEntry(participation, null, setupParticipation.IsNotRanked);
                 AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
             }
             else
@@ -48,7 +48,7 @@ public static class ParticipationAndRankingFactory
                     .Find(p => p.Combination.Number == participation.Combination.Number);
                 if (participationRef != null)
                 {
-                    var rankingEntry = new RankingEntry(null, participationRef, null, setupParticipation.IsNotRanked);
+                    var rankingEntry = new RankingEntry(participationRef, null, setupParticipation.IsNotRanked);
                     AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
                 }
             }
@@ -70,12 +70,12 @@ public static class ParticipationAndRankingFactory
             setupParticipation.MaxAverageSpeed
         );
         return new Participation(
-            null,
             setupParticipation.Category,
             new(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type),
             combination,
             new(phases),
-            null
+            null,
+            setupParticipation.Id
         );
     }
 
@@ -90,18 +90,18 @@ public static class ParticipationAndRankingFactory
         var setupHorse = combination.Horse;
         var setupClub = combination.Athlete.Club;
 
-        var club = setupClub == null ? null : new Club(setupClub.Id, setupClub.Name);
-        var athlete = new Athlete(setupAthlete.Id, setupAthlete.Names, setupAthlete.Country, club, setupAthlete.FeiId);
-        var horse = new Horse(setupHorse.Id, setupHorse.Name, setupHorse.FeiId);
+        var club = setupClub == null ? null : new Club(setupClub.Name, setupClub.Id);
+        var athlete = new Athlete(setupAthlete.Names, setupAthlete.Country, club, setupAthlete.FeiId, setupAthlete.Id);
+        var horse = new Horse(setupHorse.Name, setupHorse.FeiId, setupHorse.Id);
         return new Combination(
-            null,
             combination.Number,
             athlete,
             horse,
             athlete.Club,
             Combination.FormatDistance(totalDistance),
             minAverageSpeed,
-            maxAverageSpeed
+            maxAverageSpeed,
+            combination.Id
         );
     }
 
@@ -121,7 +121,6 @@ public static class ParticipationAndRankingFactory
                 );
             }
             var corePhase = new Phase(
-                null,
                 "",
                 setupPhase.Loop!.Distance,
                 setupPhase.Recovery,

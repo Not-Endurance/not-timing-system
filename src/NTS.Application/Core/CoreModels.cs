@@ -23,7 +23,7 @@ public class ClubModel
 
     public Club MapToDomain()
     {
-        return new Club(Id, Name);
+        return new Club(Name, Id);
     }
 }
 
@@ -45,7 +45,7 @@ public class OfficialModel
 
     public Official MapToDomain()
     {
-        return new Official(Id, Names, Role);
+        return new Official(Names, Role, Id);
     }
 }
 
@@ -95,7 +95,7 @@ public class AthleteModel
     {
         var country = Country.MapToDomain();
         var club = Club?.MapToDomain();
-        return new Athlete(Id, Names, country, club, FeiId);
+        return new Athlete(Names, country, club, FeiId, Id);
     }
 }
 
@@ -117,7 +117,7 @@ public class HorseModel
 
     public Horse MaptoDomain()
     {
-        return new Horse(Id, Name, FeiId);
+        return new Horse(Name, FeiId, Id);
     }
 }
 
@@ -149,7 +149,7 @@ public class CombinationModel
     {
         var athlete = Athlete.MapToDomain();
         var horse = Horse.MaptoDomain();
-        return new Combination(Id, Number, athlete, horse, athlete.Club, Distance!, MinAverageSpeed, MaxAverageSpeed);
+        return new Combination(Number, athlete, horse, athlete.Club, Distance!, MinAverageSpeed, MaxAverageSpeed, Id);
     }
 }
 
@@ -214,7 +214,6 @@ public class PhaseModel
     public Phase MapToDomain()
     {
         return new Phase(
-            Id,
             Gate,
             Length,
             MaxRecovery,
@@ -228,7 +227,8 @@ public class PhaseModel
             RepresentTime,
             IsReinspectionRequested,
             IsRequiredInspectionRequested,
-            IsRequiredInspectionCompulsory
+            IsRequiredInspectionCompulsory,
+            Id
         );
     }
 }
@@ -332,7 +332,7 @@ public class ParticipationModel
         var combination = Combination.MapToDomain();
         var phases = Phases!.Select(x => x.MapToDomain());
         var eliminated = Eliminated?.MapToDomain();
-        return new Participation(Id, Category, competition, combination, new(phases), eliminated);
+        return new Participation(Category, competition, combination, new(phases), eliminated, Id);
     }
 }
 
@@ -355,7 +355,7 @@ public class RankingEntryModel
     public RankingEntry MapToDomain()
     {
         var participation = Participation.MapToDomain();
-        return new RankingEntry(DomainModelHelper.GenerateId(), participation, Rank, IsNotRanked);
+        return new RankingEntry(participation, Rank, IsNotRanked);
     }
 }
 
@@ -446,14 +446,9 @@ public class ArchiveEntryModel : IDocument
     public ArchiveEntry MapToDomain()
     {
         var country = Country.MapToDomain();
-        var enduranceEvent = new EnduranceEvent(
-            Id,
-            new PopulatedPlace(country, City, Location ?? ""),
-            new EventSpan(StartDay, EndDay),
-            FeiShowId,
-            FeiId,
-            FeiEventCode
-        );
+        var place = new PopulatedPlace(country, City, Location ?? "");
+        var span = new EventSpan(StartDay, EndDay);
+        var enduranceEvent = new EnduranceEvent(place, span, FeiShowId, FeiId, FeiEventCode, Id);
         var officials = Officials.Select(x => x.MapToDomain());
         var ranklists = Ranklists.Select(x => x.MapToDomain());
         return new ArchiveEntry(enduranceEvent, officials, ranklists);

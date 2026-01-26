@@ -15,7 +15,6 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
     readonly List<Combination> _combinations = [];
 
     public UpcomingEvent(
-        int? id,
         string? name,
         string? place,
         Country? country,
@@ -25,7 +24,8 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials,
         IEnumerable<Loop> loops,
-        IEnumerable<Combination> combinations
+        IEnumerable<Combination> combinations,
+        int? id = null
     )
         : base(id)
     {

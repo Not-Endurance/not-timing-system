@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Not.Reflection;
 
 namespace Not.Exceptions;
@@ -27,14 +26,6 @@ public static class GuardHelper
             throw new GuardException($"{ReflectionHelper.GetName<T>()} " + message);
         }
         return value;
-    }
-
-    public static void ThrowIfEmpty<T>(IEnumerable<T> enumerable)
-    {
-        if (!enumerable.Any())
-        {
-            throw new GuardException($"Collection cannot be empty");
-        }
     }
 
     public static Exception Exception(string message)

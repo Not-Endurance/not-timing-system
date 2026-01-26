@@ -19,12 +19,12 @@ public class Participation : Aggregate
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
     public Participation(
-        int? id,
         ParticipationCategory category,
         Competition competition,
         Combination combination,
         PhaseCollection phases,
-        Eliminated? notQualified
+        Eliminated? notQualified,
+        int id
     )
         : base(id)
     {

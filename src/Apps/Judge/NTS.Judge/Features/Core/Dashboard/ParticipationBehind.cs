@@ -57,7 +57,7 @@ public class ParticipationBehind
         }
     }
 
-    protected override async Task<bool> CreateState()
+    protected override async Task<bool> InitializeState()
     {
         Participations = await _participationRepository.ReadMany();
         SelectedParticipation = Participations.FirstOrDefault();
@@ -66,7 +66,7 @@ public class ParticipationBehind
 
     public async Task RunAtStartupAsync()
     {
-        await CreateState();
+        await InitializeState();
     }
 
     public async Task Update(PhaseUpdateModel model)

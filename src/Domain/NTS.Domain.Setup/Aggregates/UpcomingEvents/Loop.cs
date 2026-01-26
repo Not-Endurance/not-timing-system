@@ -5,7 +5,7 @@ namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 public class Loop : Entity
 {
-    public Loop(int? id, double? distance)
+    public Loop(double? distance, int? id = null)
         : base(id)
     {
         Distance = PositiveDistance(distance);

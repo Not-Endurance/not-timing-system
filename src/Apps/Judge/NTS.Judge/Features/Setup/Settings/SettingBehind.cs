@@ -24,7 +24,7 @@ public class SettingBehind : NStatefulService, ISettingBehind
 
     public Setting? Setting { get; private set; }
 
-    protected override async Task<bool> CreateState()
+    protected override async Task<bool> InitializeState()
     {
         Setting = await _repository.Get(_accountBehind.Id);
         return Setting != null;
@@ -47,7 +47,7 @@ public class SettingBehind : NStatefulService, ISettingBehind
 
     Setting CreateSetting(SettingFormModel model)
     {
-        return new Setting(model.Id, _accountBehind.Id, model.Country, model.DetectionMode);
+        return new Setting(_accountBehind.Id, model.Country, model.DetectionMode, id: model.Id);
     }
 
     async Task UpdateReflections()

@@ -28,7 +28,6 @@ public class UpcomingEventBehind
     protected override UpcomingEvent CreateEntity(UpcomingEventFormModel model)
     {
         return new UpcomingEvent(
-            model.Id,
             model.Name,
             model.Place,
             model.Country,
@@ -38,7 +37,8 @@ public class UpcomingEventBehind
             model.Competitions,
             model.Officials,
             model.Loops,
-            model.Combinations
+            model.Combinations,
+            model.Id
         );
     }
 

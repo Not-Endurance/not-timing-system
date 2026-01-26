@@ -17,7 +17,7 @@ public class InquiryBehind : NStatefulService, IInquiryBehind
     public IEnumerable<RankingEntry>? Match { get; private set; }
     public IReadOnlyList<ArchiveEntryModel> Records { get; private set; } = [];
 
-    protected override Task<bool> CreateState()
+    protected override Task<bool> InitializeState()
     {
         return Task.FromResult(true);
     }

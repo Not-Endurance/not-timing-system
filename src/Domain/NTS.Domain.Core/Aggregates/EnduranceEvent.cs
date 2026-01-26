@@ -5,12 +5,12 @@ namespace NTS.Domain.Core.Aggregates;
 public class EnduranceEvent : Aggregate
 {
     public EnduranceEvent(
-        int id,
         PopulatedPlace populatedPlace,
         EventSpan eventSpan,
         string? feiShowId,
         string? feiId,
-        string? feiEventCode
+        string? feiEventCode,
+        int id
     )
         : base(id)
     {

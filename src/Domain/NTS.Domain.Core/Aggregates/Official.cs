@@ -2,7 +2,7 @@
 
 public class Official : Aggregate
 {
-    public Official(int? id, Person? person, OfficialRole? role)
+    public Official(Person? person, OfficialRole? role, int id)
         : base(id)
     {
         Person = Required(nameof(Person), person);

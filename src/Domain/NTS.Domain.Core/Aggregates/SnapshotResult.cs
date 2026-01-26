@@ -7,15 +7,15 @@ public class SnapshotResult : Aggregate
 {
     public static SnapshotResult Applied(Snapshot snapshot)
     {
-        return new(null, snapshot, SnapshotResultType.Applied);
+        return new(snapshot, SnapshotResultType.Applied);
     }
 
     public static SnapshotResult NotApplied(Snapshot snapshot, SnapshotResultType type)
     {
-        return new(null, snapshot, type);
+        return new(snapshot, type);
     }
 
-    public SnapshotResult(int? id, Snapshot snapshot, SnapshotResultType type)
+    public SnapshotResult(Snapshot snapshot, SnapshotResultType type, int? id = null)
         : base(id)
     {
         Snapshot = snapshot;

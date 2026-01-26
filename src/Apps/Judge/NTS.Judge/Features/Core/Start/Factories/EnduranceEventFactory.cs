@@ -18,12 +18,12 @@ public static class EnduranceEventFactory
         var endDate = competitionStartTimes.Last();
 
         var enduranceEvent = new EnduranceEvent(
-            setupEvent.Id,
             new PopulatedPlace(setupEvent.Country, setupEvent.Place, setupEvent.Place), // TODO: fix City, place
             new EventSpan(startDate, endDate),
             setupEvent.ShowFeiId,
             setupEvent.FeiId,
-            setupEvent.FeiEventCode
+            setupEvent.FeiEventCode,
+            setupEvent.Id
         );
         return enduranceEvent;
     }

@@ -20,13 +20,13 @@ public class ParticipationBehind : KrudServiceBase<Participation, ParticipationF
         ValidateEntity(model);
         var newStart = OverrideStartTime(model);
         return new(
-            model.Id,
             model.IsNotRanked,
             model.Combination,
             model.Category,
             newStart,
             model.MaxSpeedOverride,
-            model.MinSpeedOverride
+            model.MinSpeedOverride,
+            model.Id
         );
     }
 

@@ -2,7 +2,7 @@
 
 public class Club : Aggregate
 {
-    public Club(int? id, string? name)
+    public Club(string? name, int? id = null)
         : base(id)
     {
         Name = Required(nameof(Name), name);

@@ -11,7 +11,6 @@ public class Phase : Entity
     bool _isSeparateFinish = false;
 
     public Phase(
-        int? id,
         string gate,
         double length,
         int maxRecovery,
@@ -25,7 +24,8 @@ public class Phase : Entity
         Timestamp? representTime,
         bool isRepresentationRequested,
         bool isRequiredInspectionRequested,
-        bool isRequiredInspectionCompulsory
+        bool isRequiredInspectionCompulsory,
+        int? id = null
     )
         : base(id)
     {

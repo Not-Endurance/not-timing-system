@@ -1,8 +1,8 @@
 ﻿namespace NTS.Domain.Core.Aggregates;
 
-public class RankingEntry : Aggregate // TODO:
+public class RankingEntry : Aggregate // TODO: refacator in a proper aggregate
 {
-    public RankingEntry(int? id, Participation? participation, int? rank, bool isNotRanked)
+    public RankingEntry(Participation? participation, int? rank, bool isNotRanked, int? id = null)
         : base(id)
     {
         Participation = Required(nameof(Participation), participation);

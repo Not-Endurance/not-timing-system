@@ -6,6 +6,6 @@ public static class OfficialFactory
 {
     public static Official Create(Domain.Setup.Aggregates.UpcomingEvents.Official setupOfficial)
     {
-        return new Official(setupOfficial.Id, setupOfficial.Person, setupOfficial.Role);
+        return new Official(setupOfficial.Person, setupOfficial.Role, setupOfficial.Id);
     }
 }

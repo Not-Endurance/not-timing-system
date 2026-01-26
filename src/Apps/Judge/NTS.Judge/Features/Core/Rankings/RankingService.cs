@@ -46,12 +46,12 @@ public class RankingService
     public Ranking Current =>
         GuardHelper.ThrowIfDefault(
             _current,
-            $"'{nameof(RankingService)}.{nameof(Current)}' shouldn't be used before '{CreateState}' has completed. Did you forget to call 'Observe'?"
+            $"'{nameof(RankingService)}.{nameof(Current)}' shouldn't be used before '{InitializeState}' has completed. Did you forget to call 'Observe'?"
         );
 
     public ObservableList<Ranking> Rankings => State;
 
-    protected override async Task<bool> CreateState()
+    protected override async Task<bool> InitializeState()
     {
         var rankings = await _rankings.ReadMany();
         if (!rankings.Any())

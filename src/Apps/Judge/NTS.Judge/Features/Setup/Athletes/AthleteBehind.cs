@@ -18,7 +18,7 @@ public class AthleteBehind : KrudServiceBase<Athlete, AthleteFormModel>, IKrudMi
 
     protected override Athlete CreateEntity(AthleteFormModel model)
     {
-        return new Athlete(model.Id, Person.Create(model.Name), model.FeiId, model.Country, model.Club);
+        return new Athlete(Person.Create(model.Name), model.FeiId, model.Country, model.Club, model.Id);
     }
 
     public async Task Reflect(Club update)

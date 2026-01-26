@@ -24,7 +24,7 @@ public class SettingModel : IDocument
 
     public Setting ToDomain()
     {
-        return new Setting(Id, Guid.Parse(AccountId), Country.MapToDomain(), DetectionMode);
+        return new Setting(Guid.Parse(AccountId), Country.MapToDomain(), DetectionMode, id: Id);
     }
 }
 

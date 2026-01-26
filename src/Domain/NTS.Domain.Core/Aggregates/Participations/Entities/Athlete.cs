@@ -4,7 +4,7 @@ namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 public class Athlete : Entity
 {
-    public Athlete(int id, Person names, Country country, Club? club, string? feiId)
+    public Athlete(Person names, Country country, Club? club, string? feiId, int id)
         : base(id)
     {
         Names = names;

@@ -11,14 +11,17 @@ public abstract class NStatefulService : Observer, IStatefulService
     readonly Event _changed = new();
     bool _hasLoaded;
 
+    public IEventSubscriber Event => _changed;
+
     /// <summary>
     /// Creates the service state. Called internally by <see cref="Load"/> which
     /// guarantees single execution and prevents concurrency issues
     /// </summary>
     /// <returns>Indicates weather or not the state has been initialized successfully</returns>
-    protected abstract Task<bool> CreateState();
-
-    public IEventSubscriber Event => _changed;
+    protected virtual Task<bool> InitializeState()
+    {
+        return Task.FromResult(true);
+    }
 
     protected void EmitChanged()
     {
@@ -26,7 +29,7 @@ public abstract class NStatefulService : Observer, IStatefulService
     }
 
     /// <summary>
-    /// Resets the service state, which will cause <seealso cref="CreateState(IEnumerable{object})"/> to execute again on next Render.
+    /// Resets the service state, which will cause <seealso cref="InitializeState"/> to execute again on next Render.
     /// </summary>
     public void ResetState()
     {
@@ -42,7 +45,7 @@ public abstract class NStatefulService : Observer, IStatefulService
             {
                 return;
             }
-            _hasLoaded = await CreateState();
+            _hasLoaded = await InitializeState();
         }
         catch (Exception ex)
         {

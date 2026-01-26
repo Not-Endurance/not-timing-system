@@ -28,7 +28,6 @@ public class CompetitionBehind : KrudServiceBase<Competition, CompetitionFormMod
         var startTime = ConvertStartTime(model.Date, model.Time);
         var compulsoryThreshold = ConvertMinutes(model.CompulsoryThresholdMinutes);
         return new Competition(
-            model.Id,
             model.Name,
             model.Type,
             model.Ruleset,
@@ -38,7 +37,8 @@ public class CompetitionBehind : KrudServiceBase<Competition, CompetitionFormMod
             model.FeiRule,
             model.FeiScheduleNumber,
             _phaseParent.Children,
-            _participationParent.Children
+            _participationParent.Children,
+            model.Id
         );
     }
 

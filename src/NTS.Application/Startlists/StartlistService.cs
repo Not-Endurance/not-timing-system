@@ -22,7 +22,7 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
     public IReadOnlyList<StartlistEntry> Upcoming => _context.Startlist?.Upcoming ?? [];
     public IReadOnlyList<StartlistEntry> History => _context.Startlist?.History ?? [];
 
-    protected override async Task<bool> CreateState()
+    protected override async Task<bool> InitializeState()
     {
         var participations = await _participations.ReadMany();
         _context.Startlist = new Startlist(participations);
@@ -33,7 +33,7 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
     {
         Participation.PHASE_COMPLETED_EVENT.Subscribe(x => AddEntry(x.Participation));
         Participation.RESTORED_EVENT.Subscribe(x => AddEntry(x.Participation));
-        Participation.ELIMINATED_EVENT.Subscribe(x => RemoveEntry(x.Participation));
+        Participation.ELIMINATED_EVENT.Subscribe(x => RemoveEntry(x.Participation)); 
     }
 
     public void Refresh()

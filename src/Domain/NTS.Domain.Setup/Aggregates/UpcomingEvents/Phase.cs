@@ -7,7 +7,7 @@ namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 public class Phase : Entity, IEntityMirror<Loop>, IIdentifiable
 {
-    public Phase(int? id, Loop? loop, int? recovery, int? rest)
+    public Phase(Loop? loop, int? recovery, int? rest, int? id = null)
         : base(id)
     {
         Loop = Required(nameof(Loop), loop);

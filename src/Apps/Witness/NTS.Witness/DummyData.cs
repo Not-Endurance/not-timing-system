@@ -28,11 +28,11 @@ public class DummyData
             var names = new List<string> { $"FirstName{i + 1}", $"LastName{i + 1}" };
             var person = new Person(names.ToArray());
 
-            var athlete = new Athlete(200 + i, person, country, null, $"username{i + 1}");
+            var athlete = new Athlete(person, country, null, $"username{i + 1}", 200 + i);
 
-            var horse = new Horse(100 + i, $"HorseName{i + 1}", null);
+            var horse = new Horse($"HorseName{i + 1}", null, 100 + i);
 
-            var combination = new Combination(199 + i, i + 1, athlete, horse, null, (40 + i).ToString(), null, null);
+            var combination = new Combination(i + 1, athlete, horse, null, (40 + i).ToString(), null, null, 199 + i);
 
             var phase1 = CreatePhase(
                 i > 10 ? 30 : 20,
@@ -65,12 +65,12 @@ public class DummyData
             );
 
             var participation = new Participation(
-                2001 + i,
                 ParticipationCategory.Senior,
                 competition,
                 combination,
                 phaseCollection,
-                null
+                null,
+                id: 2001 + i
             );
 
             participations.Add(participation);
@@ -112,7 +112,6 @@ public class DummyData
     )
     {
         return new Phase(
-            null,
             "",
             length,
             maxRecovery,

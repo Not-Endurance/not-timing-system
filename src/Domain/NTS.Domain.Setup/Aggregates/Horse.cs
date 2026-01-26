@@ -2,7 +2,7 @@
 
 public class Horse : Aggregate
 {
-    public Horse(int? id, string? name, string? feiId)
+    public Horse(string? name, string? feiId, int? id = null)
         : base(id)
     {
         Name = Required(nameof(Name), name);

@@ -11,7 +11,6 @@ public class Participation : Entity, IEntityMirror<Combination>
     const double MAX_SPEED = 16;
 
     public Participation(
-        int? id,
         bool? isNotRanked,
         Combination? combination,
         ParticipationCategory? category,
@@ -19,7 +18,8 @@ public class Participation : Entity, IEntityMirror<Combination>
         double? maxSpeedOverride,
         double? minSpeedOverride,
         double? minAverageSpeed = null,
-        double? maxAverageSpeed = null
+        double? maxAverageSpeed = null,
+        int? id = null
     )
         : base(id)
     {

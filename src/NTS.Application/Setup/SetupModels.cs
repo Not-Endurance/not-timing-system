@@ -18,7 +18,7 @@ public class ClubModel : IDocument
 
     public Club MapToDomain()
     {
-        return new Club(Id, Name);
+        return new Club(Name, Id);
     }
 }
 
@@ -40,7 +40,7 @@ public class OfficialModel
 
     public Official MapToDomain()
     {
-        return new Official(Id, Names, Role);
+        return new Official(Names, Role, Id);
     }
 }
 
@@ -68,7 +68,7 @@ public class AthleteModel : IDocument
 
     public Athlete MapToDomain()
     {
-        return new Athlete(Id, Names, FeiId, Country?.MapToDomain(), Club?.MapToDomain());
+        return new Athlete(Names, FeiId, Country?.MapToDomain(), Club?.MapToDomain(), Id);
     }
 }
 
@@ -91,7 +91,7 @@ public class HorseModel : IDocument
 
     public Horse MaptoDomain()
     {
-        return new Horse(Id, Name, FeiId);
+        return new Horse(Name, FeiId, Id);
     }
 }
 
@@ -117,7 +117,7 @@ public class CombinationModel
     {
         var athlete = Athlete.MapToDomain();
         var horse = Horse.MaptoDomain();
-        return new Combination(Id, Number, athlete, horse);
+        return new Combination(Number, athlete, horse, Id);
     }
 }
 
@@ -153,7 +153,6 @@ public class ParticipationModel
     {
         var combination = Combination.MapToDomain();
         return new Participation(
-            Id,
             IsNotRanked,
             combination,
             Category,
@@ -161,7 +160,8 @@ public class ParticipationModel
             MaxSpeedOverride,
             MinSpeedOverride,
             MinAverageSpeed,
-            MaxAverageSpeed
+            MaxAverageSpeed,
+            Id
         );
     }
 }
@@ -178,7 +178,7 @@ public class LoopModel
 
     public Loop MapToDomain()
     {
-        return new Loop(Id, Distance);
+        return new Loop(Distance, Id);
     }
 }
 
@@ -203,7 +203,7 @@ public class PhaseModel
     public Phase MapToDomain()
     {
         var loop = Loop.MapToDomain();
-        return new Phase(Id, loop, Recovery, Rest);
+        return new Phase(loop, Recovery, Rest, Id);
     }
 }
 
@@ -244,7 +244,6 @@ public class CompetitionModel
         var phases = Phases.Select(x => x.MapToDomain());
         var participations = Participations.Select(x => x.MapToDomain());
         return new Competition(
-            Id,
             Name,
             Type,
             Ruleset,
@@ -254,7 +253,8 @@ public class CompetitionModel
             FeiRule,
             FeiScheduleNumber,
             phases,
-            participations
+            participations,
+            Id
         );
     }
 }
@@ -300,7 +300,6 @@ public class UpcomingEventModel : IDocument
         var loops = Loops.Select(x => x.MapToDomain());
         var combinations = Combinations.Select(x => x.MapToDomain());
         return new UpcomingEvent(
-            Id,
             Name,
             Place,
             country,
@@ -310,7 +309,8 @@ public class UpcomingEventModel : IDocument
             competitions,
             officials,
             loops,
-            combinations
+            combinations,
+            Id
         );
     }
 }

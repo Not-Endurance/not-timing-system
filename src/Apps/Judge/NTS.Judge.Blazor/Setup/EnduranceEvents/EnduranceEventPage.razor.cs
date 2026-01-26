@@ -21,7 +21,6 @@ public partial class EnduranceEventPage
         // TODO: come up with somethig more elegant. Maybe pass aggregates in navigaion?
         RpcContext.Set(
             new UpcomingEvent(
-                _upcomingEvent.Id,
                 _upcomingEvent.Name,
                 _upcomingEvent.Place,
                 _upcomingEvent.Country,
@@ -31,7 +30,8 @@ public partial class EnduranceEventPage
                 _upcomingEvent.Competitions,
                 _upcomingEvent.Officials,
                 _upcomingEvent.Loops,
-                _upcomingEvent.Combinations
+                _upcomingEvent.Combinations,
+                _upcomingEvent.Id
             )
         );
     }

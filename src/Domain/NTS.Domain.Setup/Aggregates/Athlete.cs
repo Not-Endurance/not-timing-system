@@ -5,7 +5,7 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class Athlete : Aggregate, IEntityMirror<Club>
 {
-    public Athlete(int? id, Person? names, string? feiId, Country? country, Club? club)
+    public Athlete(Person? names, string? feiId, Country? country, Club? club, int? id = null)
         : base(id)
     {
         FeiId = feiId;

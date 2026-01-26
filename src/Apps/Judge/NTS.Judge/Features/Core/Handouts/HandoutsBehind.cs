@@ -39,7 +39,7 @@ public class HandoutsBehind
 
     public IReadOnlyList<HandoutDocument> Documents => State;
 
-    protected override async Task<bool> CreateState()
+    protected override async Task<bool> InitializeState()
     {
         var handouts = await _handoutRepository.ReadMany();
         var enduranceEvent = await _events.Read(0);
@@ -115,7 +115,7 @@ public class HandoutsBehind
         var officials = await _officials.ReadMany();
         GuardHelper.ThrowIfDefault(enduranceEvent);
 
-        var handout = new Handout(null, participation);
+        var handout = new Handout(participation);
         var document = new HandoutDocument(handout, enduranceEvent, officials);
 
         await _semaphore.WaitAsync(); // TODO: Create LockHelper to encapsulate semaphore releases

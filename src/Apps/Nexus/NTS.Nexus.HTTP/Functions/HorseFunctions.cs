@@ -59,7 +59,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
     }
 
     [Function("horses-safe-delete")]
-    public async Task<IActionResult> SafeDelete( // TODO: fix
+    public async Task<IActionResult> SafeDelete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")] HttpRequest request,
         int id
     )

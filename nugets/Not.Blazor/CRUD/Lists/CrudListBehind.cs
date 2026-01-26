@@ -21,9 +21,6 @@ public class CrudeListBehind<T, TModel, TForm> : NStatefulComponent
     [Inject]
     protected IListBehind<T> Behind { get; set; } = default!;
 
-    [Parameter]
-    public int? ParentId { get; set; } // TODO: DELETE THIS
-
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;
 

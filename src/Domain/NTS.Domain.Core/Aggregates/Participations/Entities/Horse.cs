@@ -2,7 +2,7 @@
 
 public class Horse : Entity
 {
-    public Horse(int id, string name, string? feiId)
+    public Horse(string name, string? feiId, int id)
         : base(id)
     {
         Name = name;

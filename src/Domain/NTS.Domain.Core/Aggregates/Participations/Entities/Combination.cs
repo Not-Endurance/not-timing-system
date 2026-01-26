@@ -13,14 +13,14 @@ public class Combination : Entity
     decimal _distance;
 
     public Combination(
-        int? id,
         int number,
         Athlete athlete,
         Horse horse,
         Club? club,
         string distance,
         Speed? minAverageSpeed,
-        Speed? maxAverageSpeed
+        Speed? maxAverageSpeed,
+        int id
     )
         : base(id)
     {

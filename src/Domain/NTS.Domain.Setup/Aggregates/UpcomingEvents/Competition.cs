@@ -10,7 +10,6 @@ public class Competition : Entity, IParent<Participation>, IParent<Phase>
     readonly List<Participation> _participations = [];
 
     public Competition(
-        int? id,
         string? name,
         CompetitionType? type,
         CompetitionRuleset? ruleset,
@@ -20,7 +19,8 @@ public class Competition : Entity, IParent<Participation>, IParent<Phase>
         string? feiRule,
         string? feiScheduleNumber,
         IEnumerable<Phase> phases,
-        IEnumerable<Participation> participations
+        IEnumerable<Participation> participations,
+        int? id = null
     )
         : base(id)
     {
