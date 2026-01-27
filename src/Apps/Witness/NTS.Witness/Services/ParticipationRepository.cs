@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
 using NTS.Domain.Core.Aggregates;
-using NTS.Witness.RPC;
 
 namespace NTS.Witness.Services;
 

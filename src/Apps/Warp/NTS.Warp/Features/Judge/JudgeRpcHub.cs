@@ -46,6 +46,10 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
         await _witnessRelay
             .Clients.Group(request.EnduranceEventId)
             .ReceiveParticipation(participation, NCollectionAction.Remove);
+
+        var startlistEntry = new StartlistEntry(participation);
+        await _witnessRelay.Clients.Group(request.EnduranceEventId)
+            .ReceiveStartlistEntry(startlistEntry, NCollectionAction.Remove);
     }
 
     public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
@@ -66,24 +70,32 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
     {
+        var participation = request.Payload.Participation;
         _logger.LogInformation(
             "Phase completed IN: #{number}, OUT: {outTime}",
-            request.Payload.Participation.Combination.Number,
-            request.Payload.Participation.Phases.Last(x => x.StartTime != null).StartTime
+            participation.Combination.Number,
+            participation.Phases.Last(x => x.StartTime != null).StartTime
         );
+        if (participation.Phases.Current.IsFinal)
+        {
+            await _witnessRelay.Clients.Group(request.EnduranceEventId)
+                .ReceiveParticipation(participation, NCollectionAction.Remove);
+        }
+        else
+        {
+            var entry = new StartlistEntry(participation);
 
-        var entry = new StartlistEntry(request.Payload.Participation);
+            var serialized = JsonConvert.SerializeObject(entry);
+            _logger.LogInformation(
+                "Phase completed OUT: #{number}, OUT: {outTime}, serialized: {serialized}",
+                entry.Number,
+                entry.Start,
+                serialized
+            );
 
-        var serialized = JsonConvert.SerializeObject(entry);
-        _logger.LogInformation(
-            "Phase completed OUT: #{number}, OUT: {outTime}, serialized: {serialized}",
-            entry.Number,
-            entry.Start,
-            serialized
-        );
-
-        await _witnessRelay
-            .Clients.Group(request.EnduranceEventId)
-            .ReceiveStartlistEntry(entry, NCollectionAction.AddOrUpdate);
+            await _witnessRelay
+                .Clients.Group(request.EnduranceEventId)
+                .ReceiveStartlistEntry(entry, NCollectionAction.AddOrUpdate);
+        }
     }
 }
