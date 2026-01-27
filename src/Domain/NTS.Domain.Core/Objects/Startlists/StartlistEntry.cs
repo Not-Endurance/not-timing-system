@@ -1,4 +1,5 @@
-﻿using Not.Formatting;
+﻿using Not.Domain.Exceptions;
+using Not.Formatting;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Domain.Core.Objects.Startlists;
@@ -22,7 +23,11 @@ public record StartlistEntry
         var nextPhase = participation.Phases[currentIndex + 1];
         PhaseNumber = participation.Phases.NumberOf(nextPhase);
         Distance = nextPhase.Length;
-        Start = new Timestamp((nextPhase.StartTime ?? Timestamp.DEFAULT).ToDateTimeOffset());
+        if(nextPhase.StartTime == null)
+        {
+            throw new DomainException("StartlistEntry cannot be initialized for Phase with null StartTime.");
+        }
+        Start = nextPhase.StartTime;
     }
 
     public Person Athlete { get; }

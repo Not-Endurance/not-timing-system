@@ -1,5 +1,4 @@
 using Not.Collections;
-using Not.Injection;
 using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Application.Startlists;

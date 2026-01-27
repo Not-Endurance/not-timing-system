@@ -55,9 +55,9 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
             .Clients.Group(request.EnduranceEventId)
             .ReceiveParticipation(participation, NCollectionAction.AddOrUpdate);
 
-        if (request.Payload.Participation.Phases.Any(x => x.IsComplete()))
+        if (participation.Phases.Any(x => x.IsComplete()))
         {
-            var startlistEntry = new StartlistEntry(request.Payload.Participation);
+            var startlistEntry = new StartlistEntry(participation);
             await _witnessRelay
                 .Clients.Group(request.EnduranceEventId)
                 .ReceiveStartlistEntry(startlistEntry, NCollectionAction.AddOrUpdate);

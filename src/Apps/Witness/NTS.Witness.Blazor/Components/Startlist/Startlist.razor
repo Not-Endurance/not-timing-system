@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @using NTS.Blazor.Components.Startlist.Upcoming
+@using NTS.Blazor.Components.Startlist.History
 @using static WitnessBlazorConstants.UserRoles;
 
 @attribute [Route(WitnessBlazorConstants.Pages.STARTLIST)]
@@ -8,4 +9,5 @@
 
 <MudStack AlignItems="AlignItems.Center">
     <StartlistUpcoming />
+    <StartlistHistory />
 </MudStack>

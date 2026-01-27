@@ -7,5 +7,4 @@ public interface IParticipationClientProcedures
 {
     Task Receive(IEnumerable<Snapshot> snapshots);
     Task<IEnumerable<CoreParticipationModel>> GetActive();
-    Task<IEnumerable<StartlistEntryModel>> GetStartlistEntries();
 }

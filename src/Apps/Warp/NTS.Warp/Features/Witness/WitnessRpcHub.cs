@@ -48,15 +48,6 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         await judgeClient.OnWitnessDisconnected(Context.ConnectionId);
     }
 
-    public async Task<IEnumerable<StartlistEntryModel>> SendStartlistEntries(WarpRequest request)
-    {
-        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
-        {
-            return [];
-        }
-        return await judgeClient.GetStartlistEntries();
-    }
-
     public async Task<IEnumerable<CoreParticipationModel>> SendParticipations(WarpRequest request)
     {
         if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))

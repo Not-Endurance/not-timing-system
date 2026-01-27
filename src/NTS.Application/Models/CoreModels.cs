@@ -9,35 +9,6 @@ using NTS.Domain.Objects;
 
 namespace NTS.Application.Models;
 
-public class StartlistEntryModel
-{
-    public static StartlistEntryModel MapFrom(StartlistEntry startlistEntry)
-    {
-        return new StartlistEntryModel
-        {
-            AthleteNames = startlistEntry.Athlete.Names,
-            Number = startlistEntry.Number,
-            PhaseNumber = startlistEntry.PhaseNumber,
-            Distance = startlistEntry.Distance,
-            Start = startlistEntry.Start.ToDateTimeOffset(),
-        };
-    }
-
-    public string[] AthleteNames { get; init; } = default!;
-    public int Number { get; init; }
-    public int PhaseNumber { get; init; }
-    public double Distance { get; init; }
-    public DateTimeOffset Start { get; init; }
-
-    public StartlistEntry MapToDomain()
-    {
-        var athlete = new Person(AthleteNames);
-        var timestamp = new Timestamp(Start);
-        var entry = new StartlistEntry(athlete, Number, PhaseNumber, Distance, timestamp);
-        return entry;
-    }
-}
-
 public class CoreOfficialModel
 {
     public static CoreOfficialModel MapFrom(Official official)
