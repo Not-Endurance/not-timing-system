@@ -10,7 +10,7 @@ using NTS.Nexus.HTTP.Logger;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class SettingFunction : FunctionBase<SettingFunction>
+public class SettingFunction : FunctionBase
 {
     readonly IRepository<SettingModel> _settings;
 

@@ -1,4 +1,5 @@
-﻿using NTS.Application.Shared;
+﻿using Not.Models;
+using NTS.Application.Shared;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
@@ -44,29 +45,33 @@ public class OfficialModel
     }
 }
 
-public class AthleteModel : IDocument
+public class AthleteModel : IDocument, IMapFrom<Athlete>, IMapTo<Athlete>
 {
     // TODO: if decide to use this approach integrate AutoMapper with specific mappings to solve duplicating mapping logic
-    public static AthleteModel MapFrom(Athlete athlete)
+    public static AthleteModel From(Athlete athlete)
     {
-        return new AthleteModel
-        {
-            Id = athlete.Id,
-            FeiId = athlete.FeiId,
-            Names = athlete.Names.Names,
-            Country = CountryModel.MapFrom(athlete.Country),
-            Club = athlete.Club == null ? null : ClubModel.MapFrom(athlete.Club),
-        };
+        var model = new AthleteModel();
+        model.MapFrom(athlete);
+        return model;
+    }
+    
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public string[] Names { get; set; } = default!;
+    public CountryModel Country { get; set; } = default!;
+    public ClubModel? Club { get; set; }
+    public string? FeiId { get; set; }
+
+    public void MapFrom(Athlete athlete)
+    {
+        Id = athlete.Id;
+        FeiId = athlete.FeiId;
+        Names = athlete.Names.Names;
+        Country = CountryModel.MapFrom(athlete.Country);
+        Club = athlete.Club == null ? null : ClubModel.MapFrom(athlete.Club);
     }
 
-    public int Id { get; init; }
-    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
-    public string[] Names { get; init; } = default!;
-    public CountryModel Country { get; init; } = default!;
-    public ClubModel? Club { get; init; }
-    public string? FeiId { get; init; }
-
-    public Athlete MapToDomain()
+    public Athlete MapTo()
     {
         return new Athlete(Names, FeiId, Country?.MapToDomain(), Club?.MapToDomain(), Id);
     }
@@ -103,7 +108,7 @@ public class CombinationModel
         {
             Id = combination.Id,
             Number = combination.Number,
-            Athlete = AthleteModel.MapFrom(combination.Athlete),
+            Athlete = AthleteModel.From(combination.Athlete),
             Horse = HorseModel.MapFrom(combination.Horse),
         };
     }
@@ -115,7 +120,7 @@ public class CombinationModel
 
     public Combination MapToDomain()
     {
-        var athlete = Athlete.MapToDomain();
+        var athlete = Athlete.MapTo();
         var horse = Horse.MaptoDomain();
         return new Combination(Number, athlete, horse, Id);
     }

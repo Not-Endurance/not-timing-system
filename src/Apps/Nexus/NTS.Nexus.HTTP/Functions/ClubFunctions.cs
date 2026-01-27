@@ -11,7 +11,7 @@ using NTS.Nexus.HTTP.Logger;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class ClubFunctions : FunctionBase<ClubFunctions>
+public class ClubFunctions : FunctionBase
 {
     readonly IRepository<ClubModel> _clubs;
 

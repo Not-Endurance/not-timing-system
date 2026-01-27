@@ -19,7 +19,7 @@ public static class JsonSerializationExtensions
     public static T FromJson<T>(this string json)
         where T : class
     {
-        lock (LOCK) // TODO: investigate serialization locking as a whole (reference serializer locks as well)
+        lock (LOCK)
         {
             var result = JsonConvert.DeserializeObject<T>(json, SETTINGS);
             if (result == default)
@@ -27,6 +27,15 @@ public static class JsonSerializationExtensions
                 throw new Exception($"Cannot serialize '{json}' to type of '{typeof(T)}'");
             }
             return result;
+        }
+    }
+
+    public static T? TryFromJson<T>(this string json)
+        where T : class
+    {
+        lock (LOCK)
+        {
+            return JsonConvert.DeserializeObject<T>(json, SETTINGS);
         }
     }
 }

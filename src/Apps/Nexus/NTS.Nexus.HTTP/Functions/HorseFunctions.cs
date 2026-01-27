@@ -12,7 +12,7 @@ using NTS.Nexus.HTTP.Mongo.Repositories;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class HorseFunctions : FunctionBase<HorseFunctions>
+public class HorseFunctions : FunctionBase
 {
     readonly IRepository<HorseModel> _horses;
     readonly IArchiveRepository _archive;

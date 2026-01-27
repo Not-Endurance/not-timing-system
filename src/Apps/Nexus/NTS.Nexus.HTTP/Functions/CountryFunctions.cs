@@ -11,7 +11,7 @@ using NTS.Nexus.HTTP.Logger;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class CountryFunctions : FunctionBase<CountryFunctions>
+public class CountryFunctions : FunctionBase
 {
     readonly IRepository<CountryModel> _countries;
 

@@ -10,7 +10,7 @@ using NTS.Nexus.HTTP.Mongo.Repositories;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
+public class ArchiveFunctions : FunctionBase
 {
     readonly IArchiveRepository _archive;
 

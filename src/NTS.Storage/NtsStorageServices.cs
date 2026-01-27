@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Not.Filesystem;
 using Not.Injection;
 using Not.Storage;
+using Not.Storage.REST;
 using NTS.Judge.Features.Core;
 using NTS.Storage.Core;
 using NTS.Storage.JSON;

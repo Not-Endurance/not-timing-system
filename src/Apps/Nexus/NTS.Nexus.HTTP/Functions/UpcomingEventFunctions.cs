@@ -10,7 +10,7 @@ using NTS.Nexus.HTTP.Logger;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class UpcomingEventFunctions : FunctionBase<UpcomingEventFunctions>
+public class UpcomingEventFunctions : FunctionBase
 {
     readonly IRepository<UpcomingEventModel> _upcomingEvents;
 

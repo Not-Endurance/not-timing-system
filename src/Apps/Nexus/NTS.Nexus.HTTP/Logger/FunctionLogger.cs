@@ -51,7 +51,7 @@ internal class FunctionLogger<T> : IFunctionLogger<T>
     }
 }
 
-public interface IFunctionLogger<T> : ITransient
+public interface IFunctionLogger<out T> : ITransient
 {
     void LogDebug(HttpRequest request, [CallerMemberName] string method = "");
     void LogDebug(string template, HttpRequest request, object[] args, [CallerMemberName] string method = "");
