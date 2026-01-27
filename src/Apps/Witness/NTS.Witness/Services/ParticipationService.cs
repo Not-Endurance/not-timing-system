@@ -12,7 +12,6 @@ public class ParticipationService
         IParticipationUpdate,
         IPerformanceService
 {
-
     public IEnumerable<Participation> Active
     {
         get => State;

@@ -9,19 +9,13 @@ using Xunit.Abstractions;
 
 namespace NTS.Judge.Tests;
 
-public class WitnessTestClient
-    : RpcClient,
-        IWitnessClientProcedures,
-        ITestRpcClient
+public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcClient
 {
     public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
         : base(socket)
     {
         RegisterInputProcedure<StartlistEntry, NCollectionAction>(nameof(ReceiveStartlistEntry), ReceiveStartlistEntry);
-        RegisterInputProcedure<Participation, NCollectionAction>(
-            nameof(ReceiveParticipation),
-            ReceiveParticipation
-        );
+        RegisterInputProcedure<Participation, NCollectionAction>(nameof(ReceiveParticipation), ReceiveParticipation);
     }
 
     public int Id { get; }

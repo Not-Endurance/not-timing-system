@@ -16,7 +16,11 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
     readonly ISelectedEventContext _eventContext;
     readonly StartlistContext _context;
 
-    public StartlistService(IReadMany<Participation> participations, ISelectedEventContext eventContext, StartlistContext context)
+    public StartlistService(
+        IReadMany<Participation> participations,
+        ISelectedEventContext eventContext,
+        StartlistContext context
+    )
     {
         _participations = participations;
         _eventContext = eventContext;
@@ -37,18 +41,17 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
         {
             var startlistEntries = new List<StartlistEntry>();
             var competitions = _eventContext.Event!.Competitions.Where(competition =>
-                competition.Participations.Any() && competition.Phases.Count > 0);
+                competition.Participations.Any() && competition.Phases.Count > 0
+            );
             foreach (var competition in competitions)
             {
-                var entries = competition.Participations.Select(participation =>
-                    new StartlistEntry(
-                        participation.Combination.Athlete.Names,
-                        participation.Combination.Number,
-                        1,
-                        competition.Phases[0]!.Loop!.Distance,
-                        Timestamp.Create((participation.StartTimeOverride ?? competition.Start).ToUniversalTime())!
-                    )
-                );
+                var entries = competition.Participations.Select(participation => new StartlistEntry(
+                    participation.Combination.Athlete.Names,
+                    participation.Combination.Number,
+                    1,
+                    competition.Phases[0]!.Loop!.Distance,
+                    Timestamp.Create((participation.StartTimeOverride ?? competition.Start).ToUniversalTime())!
+                ));
                 startlistEntries.AddRange(entries);
             }
             _context.Startlist = new Startlist(startlistEntries);

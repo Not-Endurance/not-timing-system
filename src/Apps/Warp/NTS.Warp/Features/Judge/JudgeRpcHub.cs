@@ -48,7 +48,8 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
             .ReceiveParticipation(participation, NCollectionAction.Remove);
 
         var startlistEntry = new StartlistEntry(participation);
-        await _witnessRelay.Clients.Group(request.EnduranceEventId)
+        await _witnessRelay
+            .Clients.Group(request.EnduranceEventId)
             .ReceiveStartlistEntry(startlistEntry, NCollectionAction.Remove);
     }
 
@@ -78,7 +79,8 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
         );
         if (participation.Phases.Current.IsFinal)
         {
-            await _witnessRelay.Clients.Group(request.EnduranceEventId)
+            await _witnessRelay
+                .Clients.Group(request.EnduranceEventId)
                 .ReceiveParticipation(participation, NCollectionAction.Remove);
         }
         else

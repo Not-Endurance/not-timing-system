@@ -19,7 +19,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
     readonly ISelectedEventContext _eventContext;
     readonly IStartlistContext _startlistContext;
     readonly ParticipationService _participationService;
-    
+
     public WitnessRpcClient(
         IRpcSocket socket,
         ISelectedEventContext eventContext,
