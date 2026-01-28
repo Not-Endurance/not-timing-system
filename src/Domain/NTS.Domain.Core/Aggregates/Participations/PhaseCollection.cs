@@ -67,7 +67,7 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
         return $"{Distance.RoundNumberToTens()}{km_string}: {completed}/{Count}";
     }
 
-    Phase GetNext()
+    public Phase GetNext()
     {
         var currentIndex = IndexOf(Current);
         return this[++currentIndex];

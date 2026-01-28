@@ -19,8 +19,7 @@ public record StartlistEntry
     {
         Athlete = participation.Combination.Athlete.Names;
         Number = participation.Combination.Number;
-        var currentIndex = participation.Phases.IndexOf(participation.Phases.Current);
-        var nextPhase = participation.Phases[currentIndex + 1];
+        var nextPhase = participation.Phases.GetNext();
         PhaseNumber = participation.Phases.NumberOf(nextPhase);
         Distance = nextPhase.Length;
         if (nextPhase.StartTime == null)
