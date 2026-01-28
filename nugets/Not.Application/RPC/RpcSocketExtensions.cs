@@ -41,7 +41,7 @@ public static class RpcSocketExtensions
         }
     }
 
-    public static async Task<RpcInvokeResult<TResult>> InvokeInputOutputProcedure<TResult, T>(
+    public static async Task<RpcInvokeResult<TResult>> InvokeInputOutputProcedure<T, TResult>(
         this IRpcSocket socket,
         string name,
         T parameter

@@ -61,7 +61,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
     public async Task GetParticipations()
     {
         var request = WarpRequest.Create(_eventContext.Event!.Id.ToString());
-        var result = await _socket.InvokeInputOutputProcedure<IEnumerable<CoreParticipationModel>, WarpRequest>(
+        var result = await _socket.InvokeInputOutputProcedure<WarpRequest, IEnumerable<CoreParticipationModel>>(
             nameof(IWitnessHubProcedures.SendParticipations),
             request
         );
