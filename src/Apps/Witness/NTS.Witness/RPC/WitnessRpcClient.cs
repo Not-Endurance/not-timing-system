@@ -1,3 +1,4 @@
+using System;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
@@ -36,8 +37,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
 
     public override void RunAtStartup()
     {
-        RegisterInputProcedure<StartlistEntry, NCollectionAction>(nameof(ReceiveStartlistEntry), ReceiveStartlistEntry);
-        RegisterInputProcedure<Participation, NCollectionAction>(nameof(ReceiveParticipation), ReceiveParticipation);
+        RegisterInputProcedure<Participation>(nameof(Receive), Receive);
     }
 
     public async Task<RpcInvokeResult> PublishSnapshotsAsync(SnapshotModel model)
@@ -46,15 +46,23 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), request);
     }
 
-    public Task ReceiveStartlistEntry(StartlistEntry entry, NCollectionAction action)
+    public Task Receive(Participation participation)
     {
-        _startlistContext.Update(entry, action);
-        return Task.CompletedTask;
-    }
-
-    public Task ReceiveParticipation(Participation participation, NCollectionAction action)
-    {
-        _participationService.Update(participation, action);
+        var startlistEntry = new StartlistEntry(participation);
+        if (participation.IsEliminated())
+        {
+            _participationService.Update(participation, NCollectionAction.Remove);
+            _startlistContext.Update(startlistEntry, NCollectionAction.Remove);
+        }
+        if (participation.Phases.Current.IsComplete())
+        {
+            _startlistContext.Update(startlistEntry, NCollectionAction.AddOrUpdate);
+            if (participation.Phases.Current.IsFinal)
+            {
+                _participationService.Update(participation, NCollectionAction.Remove);
+            }
+        } 
+        _participationService.Update(participation,NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;
     }
 

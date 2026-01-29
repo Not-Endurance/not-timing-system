@@ -22,11 +22,7 @@ public record StartlistEntry
         var nextPhase = participation.Phases.GetNext();
         PhaseNumber = participation.Phases.NumberOf(nextPhase);
         Distance = nextPhase.Length;
-        if (nextPhase.StartTime == null)
-        {
-            throw new DomainException("StartlistEntry cannot be initialized for Phase with null StartTime.");
-        }
-        Start = nextPhase.StartTime;
+        Start = new Timestamp((nextPhase.StartTime ?? Timestamp.DEFAULT).ToDateTimeOffset());
     }
 
     public Person Athlete { get; }

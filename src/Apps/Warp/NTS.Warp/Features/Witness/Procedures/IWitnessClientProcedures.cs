@@ -6,6 +6,5 @@ namespace NTS.Warp.Features.Witness.Procedures;
 
 public interface IWitnessClientProcedures
 {
-    Task ReceiveParticipation(Participation participation, NCollectionAction action);
-    Task ReceiveStartlistEntry(StartlistEntry entry, NCollectionAction action);
+    Task Receive(Participation participation);
 }

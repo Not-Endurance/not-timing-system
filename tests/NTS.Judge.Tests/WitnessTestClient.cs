@@ -14,8 +14,7 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
     public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
         : base(socket)
     {
-        RegisterInputProcedure<StartlistEntry, NCollectionAction>(nameof(ReceiveStartlistEntry), ReceiveStartlistEntry);
-        RegisterInputProcedure<Participation, NCollectionAction>(nameof(ReceiveParticipation), ReceiveParticipation);
+        RegisterInputProcedure<Participation>(nameof(Receive), Receive);
     }
 
     public int Id { get; }
@@ -27,15 +26,9 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
         InvokedMethods.Clear();
     }
 
-    public Task ReceiveStartlistEntry(StartlistEntry entry, NCollectionAction action)
+    public Task Receive(Participation entry)
     {
-        InvokedMethods.Add(nameof(ReceiveStartlistEntry));
-        return Task.CompletedTask;
-    }
-
-    public Task ReceiveParticipation(Participation entry, NCollectionAction action)
-    {
-        InvokedMethods.Add(nameof(ReceiveParticipation));
+        InvokedMethods.Add(nameof(Receive));
         return Task.CompletedTask;
     }
 
