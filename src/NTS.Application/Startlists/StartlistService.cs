@@ -13,10 +13,7 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
     readonly IReadMany<Participation> _participations;
     readonly StartlistContext _context;
 
-    public StartlistService(
-        IReadMany<Participation> participations,
-        StartlistContext context
-    )
+    public StartlistService(IReadMany<Participation> participations, StartlistContext context)
     {
         _participations = participations;
         _context = context;

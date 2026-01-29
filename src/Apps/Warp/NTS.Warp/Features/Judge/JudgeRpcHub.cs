@@ -41,17 +41,13 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
     public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)
     {
         var participation = request.Payload.Participation;
-        await _witnessRelay
-            .Clients.Group(request.EnduranceEventId)
-            .Receive(participation);
+        await _witnessRelay.Clients.Group(request.EnduranceEventId).Receive(participation);
     }
 
     public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
     {
         var participation = request.Payload.Participation;
-        await _witnessRelay
-            .Clients.Group(request.EnduranceEventId)
-            .Receive(participation);
+        await _witnessRelay.Clients.Group(request.EnduranceEventId).Receive(participation);
     }
 
     public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
@@ -63,9 +59,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
             participation.Phases.Last(x => x.StartTime != null).StartTime
         );
 
-        await _witnessRelay
-            .Clients.Group(request.EnduranceEventId)
-            .Receive(participation);
+        await _witnessRelay.Clients.Group(request.EnduranceEventId).Receive(participation);
 
         var serialized = JsonConvert.SerializeObject(participation);
         _logger.LogInformation(

@@ -61,8 +61,8 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
             {
                 _participationService.Update(participation, NCollectionAction.Remove);
             }
-        } 
-        _participationService.Update(participation,NCollectionAction.AddOrUpdate);
+        }
+        _participationService.Update(participation, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;
     }
 

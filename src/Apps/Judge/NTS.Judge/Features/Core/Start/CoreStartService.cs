@@ -2,11 +2,11 @@
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
+using NTS.Application.Factories;
 using NTS.Application.Warp;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Application.Factories;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
 using Official = NTS.Domain.Core.Aggregates.Official;
 using Participation = NTS.Domain.Core.Aggregates.Participation;
