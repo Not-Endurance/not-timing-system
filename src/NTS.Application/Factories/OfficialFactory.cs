@@ -1,6 +1,6 @@
 using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Judge.Features.Core.Start.Factories;
+namespace NTS.Application.Factories;
 
 public static class OfficialFactory
 {

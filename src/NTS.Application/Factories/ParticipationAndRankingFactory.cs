@@ -3,7 +3,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Enums;
 
-namespace NTS.Judge.Features.Core.Start.Factories;
+namespace NTS.Application.Factories;
 
 public static class ParticipationAndRankingFactory
 {
@@ -52,7 +52,7 @@ public static class ParticipationAndRankingFactory
         return (participations, rankingEntriesByCategory);
     }
 
-    static Participation CreateParticipation(
+    public static Participation CreateParticipation(
         Domain.Setup.Aggregates.Competition setupCompetition,
         Domain.Setup.Aggregates.Participation setupParticipation
     )
