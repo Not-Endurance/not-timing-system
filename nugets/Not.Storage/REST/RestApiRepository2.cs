@@ -9,7 +9,7 @@ namespace Not.Storage.REST;
 
 public abstract class RestApiRepository2<T, TModel> : IRepository<T>
     where T : class, IIdentifiable
-    where TModel: class, IMapFrom<T>, IMapTo<T>, new()
+    where TModel : class, IMapFrom<T>, IMapTo<T>, new()
 {
     readonly string _endpoint;
 

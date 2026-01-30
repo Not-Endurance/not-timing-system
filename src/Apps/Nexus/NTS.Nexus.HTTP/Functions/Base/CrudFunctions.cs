@@ -10,7 +10,8 @@ public class CrudFunctions<T> : FunctionBase
 {
     readonly IRepository<T> _repository;
 
-    public CrudFunctions(IFunctionLogger<CrudFunctions<T>> logger, IRepository<T> repository) : base(logger)
+    public CrudFunctions(IFunctionLogger<CrudFunctions<T>> logger, IRepository<T> repository)
+        : base(logger)
     {
         _repository = repository;
     }

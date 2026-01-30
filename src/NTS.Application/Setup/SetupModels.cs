@@ -54,7 +54,7 @@ public class AthleteModel : IDocument, IMapFrom<Athlete>, IMapTo<Athlete>
         model.MapFrom(athlete);
         return model;
     }
-    
+
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string[] Names { get; set; } = default!;

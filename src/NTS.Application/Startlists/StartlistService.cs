@@ -33,7 +33,7 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
     {
         Participation.PHASE_COMPLETED_EVENT.Subscribe(x => AddEntry(x.Participation));
         Participation.RESTORED_EVENT.Subscribe(x => AddEntry(x.Participation));
-        Participation.ELIMINATED_EVENT.Subscribe(x => RemoveEntry(x.Participation)); 
+        Participation.ELIMINATED_EVENT.Subscribe(x => RemoveEntry(x.Participation));
     }
 
     public void Refresh()

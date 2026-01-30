@@ -11,9 +11,7 @@ namespace NTS.Nexus.HTTP.Functions;
 public class AthleteFunctions : CrudFunctions<AthleteModel>
 {
     public AthleteFunctions(IFunctionLogger<AthleteFunctions> logger, IRepository<AthleteModel> athletes)
-        : base(logger, athletes)
-    {
-    }
+        : base(logger, athletes) { }
 
     [Function("athletes-create")]
     public Task<IActionResult> Create(
