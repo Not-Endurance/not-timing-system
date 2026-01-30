@@ -33,7 +33,7 @@ public class RpcIntegrationTest : JudgeIntegrationTest
         await AssertRpcInvoked(
             _witnessFIxture,
             () => processor.Process(snapshot),
-            nameof(WitnessTestClient.ReceiveParticipation)
+            nameof(WitnessTestClient.Receive)
         );
     }
 }
