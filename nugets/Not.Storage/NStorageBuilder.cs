@@ -28,13 +28,18 @@ public class NStorageBuilder
         _nApplicationBuilder = new(services, configuration);
     }
 
-    public NStorageBuilder AddMongoStorage(string connectionString)
+    public NStorageBuilder AddMongoStorage(string connectionString, Assembly assembly)
     {
-        var pack = new ConventionPack { new EnumRepresentationConvention(BsonType.String) };
-        ConventionRegistry.Register("EnumStringConvention", pack, t => true);
+        var pack = new ConventionPack
+        {
+            new IgnoreExtraElementsConvention(true), // TODO: Remove after existing data set is normalized
+            new EnumRepresentationConvention(BsonType.String),
+        };
+        ConventionRegistry.Register("DefaultConventions", pack, t => true);
         BsonSerializer.RegisterSerializer(typeof(DateTimeOffset), new DateTimeOffsetSerializer(BsonType.DateTime));
 
         _services.AddSingleton<IMongoContext, MongoContext>(x => new MongoContext(connectionString));
+        _services.AddAsInterfaces(typeof(MongoRepository<>), ServiceLifetime.Transient, assembly);
         return this;
     }
 
@@ -43,8 +48,8 @@ public class NStorageBuilder
         where TStore : LockingJsonFileStore<T>, TInterface
         where T : class, IState, new()
     {
-        var factory = FileContextHelper.CreateFileContextFactory(null, "stores");
-        _services.AddKeyedSingleton<IFileContext, FileContext>(StoreConstants.DATA_KEY, factory);
+        var factory = FileContextHelper.CreateFileContextFactory("stores");
+        _services.AddKeyedSingleton<IFilesystemContext, FilesystemContext>(StoreConstants.DATA_KEY, factory);
         _services.AddSingleton<TInterface, TStore>();
         _services.AddSingleton(x => (IStore<T>)x.GetRequiredService<TInterface>());
         _services.AddAsInterfaces(typeof(ReadonlyRootRepository<,>), ServiceLifetime.Transient, assembly);

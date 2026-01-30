@@ -1,7 +1,7 @@
 ﻿using Not.Application.HTTP;
 using Not.Serialization.JSON;
 using Not.Storage.REST;
-using NTS.Application.Models;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.REST;
@@ -24,7 +24,7 @@ public class ArchiveRestApiRepository : RestApiRepository<ArchiveEntry>
         {
             return [];
         }
-        return contents.FromJson<IEnumerable<ArchiveModel>>().Select(x => x.MapToDomain());
+        return contents.FromJson<IEnumerable<ArchiveEntryModel>>().Select(x => x.MapToDomain());
     }
 
     public async Task<ArchiveEntry?> GetEntry(int id)
@@ -34,7 +34,7 @@ public class ArchiveRestApiRepository : RestApiRepository<ArchiveEntry>
         {
             return null;
         }
-        var documents = contents.FromJson<IEnumerable<ArchiveModel>>();
+        var documents = contents.FromJson<IEnumerable<ArchiveEntryModel>>();
         var document = documents.FirstOrDefault(x => x.Id == id);
         return document?.MapToDomain();
     }

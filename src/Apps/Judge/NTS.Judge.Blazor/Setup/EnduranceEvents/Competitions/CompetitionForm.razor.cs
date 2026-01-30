@@ -2,7 +2,7 @@ using MudBlazor;
 using Not.Blazor.Components;
 using Not.Structures;
 using NTS.Blazor.Constants;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 using NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions;

@@ -4,23 +4,23 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Concurrency.Extensions;
 using Not.Serialization.JSON;
-using NTS.Application.Models;
+using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Mongo.Repositories;
+using NTS.Nexus.HTTP.Mongo.Repositories;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class HorseFunctions : FunctionBase<HorseFunctions>
+public class HorseFunctions : FunctionBase
 {
-    readonly IRepository<SetupHorseModel> _horses;
-    readonly IArchiveMongoRepository _archive;
+    readonly IRepository<HorseModel> _horses;
+    readonly IArchiveRepository _archive;
 
     public HorseFunctions(
         IFunctionLogger<HorseFunctions> logger,
-        IRepository<SetupHorseModel> horses,
-        IArchiveMongoRepository archive
+        IRepository<HorseModel> horses,
+        IArchiveRepository archive
     )
         : base(logger)
     {
@@ -37,7 +37,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var horse = requestBody.FromJson<Horse>();
-        var document = SetupHorseModel.MapFrom(horse);
+        var document = HorseModel.MapFrom(horse);
         await _horses.Create(document);
 
         return new OkObjectResult($"Inserted {horse}");
@@ -52,7 +52,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var horse = requestBody.FromJson<Horse>();
-        var document = SetupHorseModel.MapFrom(horse);
+        var document = HorseModel.MapFrom(horse);
         await _horses.Update(document);
 
         return new OkObjectResult($"Updated {horse}");
@@ -80,7 +80,7 @@ public class HorseFunctions : FunctionBase<HorseFunctions>
         var horse = await _horses.Read(id);
         if (horse == null)
         {
-            return new OkObjectResult($"Club wiht id '{id}' did not exist");
+            return new OkObjectResult($"Club with id '{id}' did not exist");
         }
         await _horses.Delete(horse);
 

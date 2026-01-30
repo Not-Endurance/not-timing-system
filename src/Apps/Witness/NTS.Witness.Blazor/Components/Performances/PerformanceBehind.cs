@@ -6,11 +6,8 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.Blazor.Components.Performances;
 
-public class PerformanceBehind : NComponent
+public class PerformanceBehind : NStatefulComponent<IPerformanceService>
 {
-    [Inject]
-    IPerformanceService Service { get; set; } = default!;
-
     protected List<NotListModel<Person>> People { get; set; } = [];
     protected Person SelectedPerson { get; set; } = default!;
     protected Participation? Participation { get; set; } = default!;
@@ -37,7 +34,7 @@ public class PerformanceBehind : NComponent
         try
         {
             SelectedPerson = person;
-            Participation = Service.GetParticipationBy(person);
+            Participation = Service.GetParticipation(person);
             StateHasChanged();
         }
         catch (Exception ex)

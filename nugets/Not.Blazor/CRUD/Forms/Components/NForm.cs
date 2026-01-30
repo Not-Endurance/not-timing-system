@@ -66,7 +66,7 @@ public abstract class NForm<T> : NComponent
         {
             injector.Inject(message);
         }
-        await Render();
+        await InvokeRender();
     }
 
     void AddInjector(string field, MudValidationInjector injector)

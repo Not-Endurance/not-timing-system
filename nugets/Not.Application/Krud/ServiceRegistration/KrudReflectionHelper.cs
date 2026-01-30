@@ -3,14 +3,14 @@ using System.Reflection;
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Graph;
 using Not.Domain;
-using Not.Domain.Aggregates;
+using Not.Domain.Krud;
 
 namespace Not.Application.Krud.ServiceRegistration;
 
 internal static class KrudReflectionHelper
 {
     /// <summary>
-    /// Returns all direct child <seealso cref="Aggregate"/>s that also implement <seealso cref="IParent{T}"/>
+    /// Returns all direct child <seealso cref="Entity"/>s that also implement <seealso cref="IParent{T}"/>
     /// </summary>
     /// <param name="entityType">Domain entity type</param>
     /// <returns>All edge types of <paramref name="entityType"/></returns>
@@ -20,7 +20,7 @@ internal static class KrudReflectionHelper
             .GetInterfaces()
             .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IParent<>))
             .Select(i => i.GetGenericArguments()[0])
-            .Where(t => typeof(Aggregate).IsAssignableFrom(t));
+            .Where(t => typeof(Entity).IsAssignableFrom(t));
     }
 
     /// <summary>
@@ -46,10 +46,7 @@ internal static class KrudReflectionHelper
             {
                 foreach (var candidate in UnwrapPropertyTypes(p.PropertyType))
                 {
-                    if (
-                        typeof(Aggregate).IsAssignableFrom(candidate)
-                        || typeof(AggregateRoot).IsAssignableFrom(candidate)
-                    )
+                    if (typeof(Entity).IsAssignableFrom(candidate) || typeof(Aggregate).IsAssignableFrom(candidate))
                     {
                         queue.Enqueue(candidate);
                     }

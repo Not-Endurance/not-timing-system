@@ -12,9 +12,9 @@ public class LockingJsonFileStore<T> : IStore<T>
     readonly TimeoutLockSemaphore _timeoutLock;
     readonly string _path;
 
-    public LockingJsonFileStore([FromKeyedServices(StoreConstants.DATA_KEY)] IFileContext configuration)
+    public LockingJsonFileStore([FromKeyedServices(StoreConstants.DATA_KEY)] IFilesystemContext configuration)
     {
-        _path = Path.Combine(configuration.Path, $"{typeof(T).Name}.json");
+        _path = Path.Combine(configuration.AppDirectory, $"{typeof(T).Name}.json");
         _timeoutLock = new TimeoutLockSemaphore();
     }
 

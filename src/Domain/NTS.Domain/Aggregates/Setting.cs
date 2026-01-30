@@ -1,18 +1,13 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain;
 using NTS.Domain.Enums;
 using NTS.Domain.Settings;
 
 namespace NTS.Domain.Aggregates;
 
-public class Setting : AggregateRoot
+public class Setting : Aggregate
 {
-    public Setting(Guid accountId, Country? country, DetectionMode? detectionMode)
-        : this(GenerateId(), accountId, country, detectionMode) { }
-
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
-    public Setting(int? id, Guid? accountId, Country? country, DetectionMode? detectionMode)
-        : base(id!.Value)
+    public Setting(Guid? accountId, Country? country, DetectionMode? detectionMode, int? id = null)
+        : base(id)
     {
         AccountId = Required(nameof(AccountId), accountId);
         Country = Required(nameof(Country), country);

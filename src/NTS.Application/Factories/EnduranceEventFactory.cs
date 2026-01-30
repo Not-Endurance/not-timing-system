@@ -1,5 +1,7 @@
 using Not.Domain.Exceptions;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects;
+using NTS.Domain.Objects;
 
 namespace NTS.Application.Factories;
 
@@ -15,17 +17,13 @@ public static class EnduranceEventFactory
         var startDate = competitionStartTimes.First();
         var endDate = competitionStartTimes.Last();
 
-        // TODO: fix city and pla
         var enduranceEvent = new EnduranceEvent(
-            setupEvent.Id,
-            setupEvent.Country,
-            setupEvent.Place,
-            setupEvent.Place,
-            startDate,
-            endDate,
+            new PopulatedPlace(setupEvent.Country, setupEvent.Place, setupEvent.Place), // TODO: fix City, place
+            new EventSpan(startDate, endDate),
             setupEvent.ShowFeiId,
             setupEvent.FeiId,
-            setupEvent.FeiEventCode
+            setupEvent.FeiEventCode,
+            setupEvent.Id
         );
         return enduranceEvent;
     }

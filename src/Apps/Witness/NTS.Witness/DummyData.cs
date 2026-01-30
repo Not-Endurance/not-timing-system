@@ -1,13 +1,9 @@
 ﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using Athlete = NTS.Domain.Core.Aggregates.Participations.Athlete;
-using Combination = NTS.Domain.Core.Aggregates.Participations.Combination;
-using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
-using CorePhase = NTS.Domain.Core.Aggregates.Participations.Phase;
-using Horse = NTS.Domain.Core.Aggregates.Participations.Horse;
 
 namespace NTS.Witness;
 
@@ -32,49 +28,49 @@ public class DummyData
             var names = new List<string> { $"FirstName{i + 1}", $"LastName{i + 1}" };
             var person = new Person(names.ToArray());
 
-            var athlete = new Athlete(person, country, null, $"username{i + 1}");
+            var athlete = new Athlete(person, country, null, $"username{i + 1}", 200 + i);
 
-            var horse = new Horse(100 + i, $"HorseName{i + 1}", null);
+            var horse = new Horse($"HorseName{i + 1}", null, 100 + i);
 
-            var combination = new Combination(199 + i, i + 1, athlete, horse, null, (40 + i).ToString(), null, null);
+            var combination = new Combination(i + 1, athlete, horse, null, (40 + i).ToString(), null, null, 199 + i);
 
-            var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
+            var phase1 = CreatePhase(
                 i > 10 ? 30 : 20,
                 15,
                 i > 10 ? 60 : 40,
-                NTS.Domain.Enums.CompetitionRuleset.Regional,
+                CompetitionRuleset.Regional,
                 false,
                 null,
                 DateTimeOffset.Now.AddMinutes(23 + i)
             );
 
-            var phase2 = new NTS.Domain.Core.Aggregates.Participations.Phase(
+            var phase2 = CreatePhase(
                 i > 10 ? 30 : 20,
                 20,
                 i > 10 ? 60 : 40,
-                NTS.Domain.Enums.CompetitionRuleset.Regional,
+                CompetitionRuleset.Regional,
                 true,
                 null,
                 null
             );
 
-            var phases = new List<NTS.Domain.Core.Aggregates.Participations.Phase> { phase1, phase2 };
+            var phases = new List<Phase> { phase1, phase2 };
 
             var phaseCollection = new PhaseCollection(phases);
 
             var competition = new Competition(
                 $"CompetitionName{i}",
-                Domain.Enums.CompetitionRuleset.Regional,
-                Domain.Enums.CompetitionType.Qualification
+                CompetitionRuleset.Regional,
+                CompetitionType.Qualification
             );
 
             var participation = new Participation(
-                2001 + i,
                 ParticipationCategory.Senior,
                 competition,
                 combination,
                 phaseCollection,
-                null
+                null,
+                id: 2001 + i
             );
 
             participations.Add(participation);
@@ -87,29 +83,49 @@ public class DummyData
         return new Person([firstName, secondName]);
     }
 
-    public static List<CorePhase> CreatePhases()
+    public static List<Phase> CreatePhases()
     {
-        var phases = new List<CorePhase>();
-        var phase1 = new NTS.Domain.Core.Aggregates.Participations.Phase(
+        var phases = new List<Phase>();
+        var phase1 = CreatePhase(
             20,
             15,
             40,
-            NTS.Domain.Enums.CompetitionRuleset.Regional,
+            CompetitionRuleset.Regional,
             false,
             null,
             DateTimeOffset.Now.AddMinutes(23)
         );
-        var phase2 = new NTS.Domain.Core.Aggregates.Participations.Phase(
-            20,
-            20,
-            40,
-            NTS.Domain.Enums.CompetitionRuleset.Regional,
-            true,
-            null,
-            null
-        );
+        var phase2 = CreatePhase(20, 20, 40, CompetitionRuleset.Regional, true, null, null);
         phases.Add(phase1);
         phases.Add(phase2);
         return phases;
+    }
+
+    static Phase CreatePhase(
+        double length,
+        int maxRecovery,
+        int? rest,
+        CompetitionRuleset competitionRuleset,
+        bool isFinal,
+        TimeSpan? compulsoryThresholdSpan,
+        DateTimeOffset? startTime
+    )
+    {
+        return new Phase(
+            "",
+            length,
+            maxRecovery,
+            rest,
+            competitionRuleset,
+            isFinal,
+            compulsoryThresholdSpan,
+            Timestamp.Create(startTime),
+            null,
+            null,
+            null,
+            false,
+            false,
+            false
+        );
     }
 }

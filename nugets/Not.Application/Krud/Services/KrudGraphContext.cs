@@ -2,19 +2,19 @@
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Graph;
 using Not.Application.Krud.ServiceRegistration;
-using Not.Domain.Aggregates;
+using Not.Concurrency;
+using Not.Domain;
 using Not.Exceptions;
 using Not.Observables;
 
 namespace Not.Application.Krud.Services;
 
 public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
-    where T : AggregateRoot
+    where T : Aggregate
 {
+    readonly CoalesceInvoker _coalescedCommit;
     readonly IRepository<T> _repository;
-    readonly SemaphoreSlim _commitGate = new(1, 1);
     readonly Type _rootType;
-    int _isCommitPending;
     KrudGraph? _graph;
     Dictionary<Type, object> _nodesByClosedParentInterface = [];
 
@@ -22,7 +22,10 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
     {
         _repository = repository;
         _rootType = typeof(T);
+        _coalescedCommit = new(() => _repository.Update(Aggregate));
     }
+
+    protected T Aggregate => (T)_graph!.Root!.Value!;
 
     public void SetParent(object aggregate)
     {
@@ -74,34 +77,7 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
             .GroupBy(x => x.@interface)
             .ToDictionary(x => x.Key, x => x.First().node);
 
-        Observe(_graph.Root, CommitCoalesced);
-    }
-
-    async Task CommitCoalesced()
-    {
-        GuardHelper.ThrowIfDefault(_graph!.Root!.Value);
-        Interlocked.Exchange(ref _isCommitPending, 1);
-        await StartCommitLoop((T)_graph.Root.Value);
-    }
-
-    async Task StartCommitLoop(T aggregate)
-    {
-        if (!await _commitGate.WaitAsync(0))
-        {
-            return;
-        }
-
-        try
-        {
-            while (Interlocked.Exchange(ref _isCommitPending, 0) == 1)
-            {
-                await _repository.Update(aggregate);
-            }
-        }
-        finally
-        {
-            _commitGate.Release();
-        }
+        Observe(_graph.Root, _coalescedCommit.Invoke);
     }
 }
 

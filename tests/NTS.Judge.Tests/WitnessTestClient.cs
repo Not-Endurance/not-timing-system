@@ -1,15 +1,14 @@
 ﻿using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
-using Not.Collections;
+using Not.Injection;
 using Not.Tests.RPC;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Startlists;
 using NTS.Warp.Features.Witness.Procedures;
 using Xunit.Abstractions;
 
 namespace NTS.Judge.Tests;
 
-public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcClient
+public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcClient, ISingleton
 {
     public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
         : base(socket)

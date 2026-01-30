@@ -1,12 +1,12 @@
 ﻿using Not.Application.Krud.Abstractions;
 using Not.Domain;
-using Not.Domain.Aggregates;
+using Not.Domain.Krud;
 using Not.Exceptions;
 
 namespace Not.Application.Krud.Graph;
 
 public class KrudParentNodeOf<T> : KrudNode, IKrudParentNodeOf<T>
-    where T : Aggregate
+    where T : Entity
 {
     IParent<T>? Parent => (IParent<T>?)Value;
 

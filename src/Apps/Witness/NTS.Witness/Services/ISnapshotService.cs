@@ -1,5 +1,5 @@
 ﻿using Not.Application.RPC.Clients;
-using NTS.Application.Models;
+using NTS.Application.Watcher;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Witness.Services;

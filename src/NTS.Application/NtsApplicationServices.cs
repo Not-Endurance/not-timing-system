@@ -44,10 +44,9 @@ public static class NtsApplicationServices
             return this;
         }
 
-        public Builder AddRpcClient()
+        public NApplicationBuilder ConfigureN()
         {
-            _services.AddRpcCient(_configuration);
-            return this;
+            return new NApplicationBuilder(_services, _configuration);
         }
     }
 }

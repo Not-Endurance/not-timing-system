@@ -2,7 +2,10 @@
   "profiles": {
     "NTS.Nexus.HTTP": {
       "commandName": "Project",
-      "commandLineArgs": "--port 8080"
+      "commandLineArgs": "--port 8080",
+      "environmentVariables": {
+        "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/NTS"
+      }
     },
     "Container (Dockerfile)": {
       "commandName": "Docker",

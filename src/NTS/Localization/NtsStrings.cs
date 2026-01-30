@@ -7,7 +7,7 @@
 
 namespace NTS.Localization
 {
-    public static class NtsStrings // TODO: csharpierignore this file
+    public static class NtsStrings // TODO: csharpierignore this files
     {
         public static string km_string => LocalizeString(nameof(km_string));
         public static string hrs_string => LocalizeString(nameof(hrs_string));
@@ -216,6 +216,8 @@ namespace NTS.Localization
             LocalizeString(nameof(Empty_performance_official_message));
         public static string Empty_performance_competitor_message =>
             LocalizeString(nameof(Empty_performance_competitor_message));
+        public static string Cannot_add_completed_participations_in_startlist =>
+            LocalizeString(nameof(Cannot_add_completed_participations_in_startlist));
     }
 }
 #pragma warning restore NA0004

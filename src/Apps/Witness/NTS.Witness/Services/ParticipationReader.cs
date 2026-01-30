@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
-using NTS.Application.Warp;
+using NTS.Application.SignalR;
 using NTS.Domain.Core.Aggregates;
 using static NTS.Application.Factories.ParticipationAndRankingFactory;
 
@@ -9,20 +9,20 @@ namespace NTS.Witness.Services;
 
 public class ParticipationReader : IReadMany<Participation>, ITransient
 {
-    readonly ParticipationService _participationService;
+    readonly IParticipationContext _participationContext;
     readonly ISelectedEventContext _eventContext;
 
-    public ParticipationReader(ParticipationService participationService, ISelectedEventContext selectedEventContext)
+    public ParticipationReader(IParticipationContext participationContext, ISelectedEventContext selectedEventContext)
     {
-        _participationService = participationService;
+        _participationContext = participationContext;
         _eventContext = selectedEventContext;
     }
 
     public Task<IEnumerable<Participation>> ReadMany()
     {
-        if (_participationService.Active.Any())
+        if (_participationContext.Active.Any())
         {
-            return Task.FromResult(_participationService.Active);
+            return Task.FromResult(_participationContext.Active);
         }
         var participations = new List<Participation>();
         var setupCompetitions = _eventContext.Event!.Competitions.Where(competition => competition.Phases.Count > 0);

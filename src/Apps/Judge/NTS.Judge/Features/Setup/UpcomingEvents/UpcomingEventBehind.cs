@@ -2,13 +2,14 @@
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
 using Not.Notify;
-using NTS.Application.Warp;
+using NTS.Application.SignalR;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
 public class UpcomingEventBehind
-    : KrudServiceBase<UpcomingEvent, EnduranceEventFormModel>,
+    : KrudServiceBase<UpcomingEvent, UpcomingEventFormModel>,
         IKrudMirror<Loop>,
         IKrudMirror<Combination>,
         IKrudMirror<Athlete>,
@@ -24,22 +25,9 @@ public class UpcomingEventBehind
         _eventContext = eventContext;
     }
 
-    protected override UpcomingEvent CreateEntity(EnduranceEventFormModel model)
+    protected override UpcomingEvent CreateEntity(UpcomingEventFormModel model)
     {
         return new UpcomingEvent(
-            model.Name,
-            model.Place,
-            model.Country,
-            model.FeiShowId,
-            model.FeiId,
-            model.FeiEventCode
-        );
-    }
-
-    protected override UpcomingEvent UpdateEntity(EnduranceEventFormModel model)
-    {
-        return new UpcomingEvent(
-            model.Id,
             model.Name,
             model.Place,
             model.Country,
@@ -49,7 +37,8 @@ public class UpcomingEventBehind
             model.Competitions,
             model.Officials,
             model.Loops,
-            model.Combinations
+            model.Combinations,
+            model.Id
         );
     }
 

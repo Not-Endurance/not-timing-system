@@ -1,4 +1,4 @@
-@inherits NComponent
+@inherits NavMenuBehind
 
 <MudNavMenu>
 
@@ -11,13 +11,16 @@
         <NNavLink Endpoint="@SETTINGS_PAGE">@Settings_string</NNavLink>
     </MudNavGroup>
 
-    <MudNavGroup Title="@Dashboard_string" Expanded="true">
-        <NNavLink Endpoint="@DASHBOARD_PAGE">@Dashboard_string</NNavLink>
-        <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
-        <NNavLink Endpoint="@RANKLIST_PAGE">@Ranklist_string</NNavLink>
-        <NNavLink Endpoint="@HANDOUTS_PAGE">@Handouts_string</NNavLink>
-        <NNavLink Endpoint="@DOWNLOAD_PAGE">@Download_string</NNavLink>
-    </MudNavGroup>
+    @if (CoreService.IsStarted)
+    {
+        <MudNavGroup Title="@Dashboard_string" Expanded="true">
+            <NNavLink Endpoint="@DASHBOARD_PAGE">@Dashboard_string</NNavLink>
+            <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
+            <NNavLink Endpoint="@RANKLIST_PAGE">@Ranklist_string</NNavLink>
+            <NNavLink Endpoint="@HANDOUTS_PAGE">@Handouts_string</NNavLink>
+            <NNavLink Endpoint="@DOWNLOAD_PAGE">@Download_string</NNavLink>
+        </MudNavGroup>    
+    }
 
     <NNavLink Endpoint="@INQUIRY_PAGE">@Inquiry_string</NNavLink>
 </MudNavMenu>

@@ -1,24 +1,27 @@
-﻿using Not.Events;
+﻿using Not.Concurrency;
+using Not.Events;
 using Not.Observables;
 using Not.Safe;
 
 namespace Not.Application.Behinds.Adapters;
 
-// TODO: Implement IObservable; Create and Implement IObserver in NBehind since it already inherits ComponentBase
 public abstract class NStatefulService : Observer, IStatefulService
 {
-    readonly SemaphoreSlim _semaphore = new(1);
+    readonly Gate _gate = new();
     readonly Event _changed = new();
-    bool _isInitialized;
-
-    /// <summary>
-    /// Creates the service state. Runs on initial render as long as <seealso cref="Blazor.Components.NComponent.Observe(IStatefulService)"/> is used.
-    /// Guaranteed to run only once unless <seealso cref="ResetState" /> is called
-    /// </summary>
-    /// <returns>Indicates weather or not the state has been initialized successfully</returns>
-    protected abstract Task<bool> CreateState(params IEnumerable<object> arguments);
+    bool _hasLoaded;
 
     public IEventSubscriber Event => _changed;
+
+    /// <summary>
+    /// Creates the service state. Called internally by <see cref="Load"/> which
+    /// guarantees single execution and prevents concurrency issues
+    /// </summary>
+    /// <returns>Indicates weather or not the state has been initialized successfully</returns>
+    protected virtual Task<bool> InitializeState()
+    {
+        return Task.FromResult(true);
+    }
 
     protected void EmitChanged()
     {
@@ -26,27 +29,31 @@ public abstract class NStatefulService : Observer, IStatefulService
     }
 
     /// <summary>
-    /// Resets the service state, which will cause <seealso cref="CreateState(IEnumerable{object})"/> to execute again on next Render.
+    /// Resets the service state, which will cause <seealso cref="InitializeState"/> to execute again on next Render.
     /// </summary>
     public void ResetState()
     {
-        _isInitialized = false;
+        _hasLoaded = false;
     }
 
-    public async Task Initialize(params IEnumerable<object> arguments)
+    public async Task Load()
     {
         try
         {
-            await _semaphore.WaitAsync();
-            if (_isInitialized)
+            await _gate.WaitToEnter();
+            if (_hasLoaded)
             {
                 return;
             }
-            _isInitialized = await SafeHelper.Run(() => CreateState(arguments));
+            _hasLoaded = await InitializeState();
+        }
+        catch (Exception ex)
+        {
+            SafeHelper.HandleException(ex);
         }
         finally
         {
-            _semaphore.Release();
+            _gate.Exit();
         }
     }
 }

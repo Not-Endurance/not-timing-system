@@ -13,12 +13,13 @@
 
 <MudPaper Height="100%">
     <MudPaper Class="justify-center pa-2">
-            <ParticipationChips Set="@ParticipationService.Active" OnSelect="SelectHandler" SetChipColor="GetColor" ChipSize="Size.Large" />
+        <ParticipationChips Set="@Service.Active" OnSelect="SelectHandler" SetChipColor="GetColor" ChipSize="Size.Large" />
     </MudPaper>
     
     <MudPaper Elevation="0" Class="pa-2">
         <NSimpleTable T="IntermediateSnapshot" Items="@SelectedParticipations" EmptyMessage="@Empty_intermediate_snapshot_list_string"
             Headings="@SnapshotTableHeaders" FixedHeader="true" Height="65vh">
+
             <CustomCell>
                 @if(context.Timestamp == null)
                 {
@@ -29,6 +30,7 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="() => EditSnapshot(context)">@context.Timestamp</MudButton>    
                 }
             </CustomCell>
+
             </NSimpleTable>
     </MudPaper>
     
@@ -41,8 +43,10 @@
                 <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
                     <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Style="align-self: auto;">
                         <MudMenuItem OnClick="() => SetButtonText(0)">@Arrival_string</MudMenuItem>
+
                         <MudMenuItem OnClick="() => SetButtonText(1)">@Vetin_string</MudMenuItem>
                     </MudMenu>
+
                     <MudButton OnClick="() => SendHandler(ButtonText)">@ButtonText</MudButton>
                 </MudButtonGroup>
             </MudStack>

@@ -4,7 +4,7 @@ using Not.Exceptions;
 using Not.Safe;
 using Not.Structures;
 using NTS.Domain.Core.Aggregates;
-using NTS.Judge.Features.Core.Rankings;
+using NTS.Judge.Features.Core.Rankings.CustomRankings;
 
 namespace NTS.Judge.Blazor.Core.Rankings.CustomRanking;
 
@@ -91,7 +91,7 @@ public class CreateCustomRankingDialogBehind : NDialog
     {
         SafeHelper.Run(() =>
         {
-            var entry = new RankingEntry(EntryToAdd.Participation, EntryToAdd.IsNotRanked);
+            var entry = new RankingEntry(EntryToAdd.Participation, null, EntryToAdd.IsNotRanked);
             RankingModel.Entries.Add(entry);
         });
         return Task.CompletedTask;

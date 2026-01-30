@@ -780,4 +780,7 @@
   <data name="Disconnected_from__string" xml:space="preserve">
     <value>Disconnected from {0}</value>
   </data>
+  <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
+    <value>Cannot add a completed participation in Startlist</value>
+  </data>
 </root>

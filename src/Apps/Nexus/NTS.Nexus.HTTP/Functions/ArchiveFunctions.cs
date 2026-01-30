@@ -2,19 +2,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Serialization.JSON;
-using NTS.Application.Models;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Storage.Mongo.Repositories;
+using NTS.Nexus.HTTP.Mongo.Repositories;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
+public class ArchiveFunctions : FunctionBase
 {
-    readonly IArchiveMongoRepository _archive;
+    readonly IArchiveRepository _archive;
 
-    public ArchiveFunctions(IArchiveMongoRepository archive, IFunctionLogger<ArchiveFunctions> logger)
+    public ArchiveFunctions(IArchiveRepository archive, IFunctionLogger<ArchiveFunctions> logger)
         : base(logger)
     {
         _archive = archive;
@@ -29,7 +29,7 @@ public class ArchiveFunctions : FunctionBase<ArchiveFunctions>
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var entry = requestBody.FromJson<ArchiveEntry>();
-        var document = ArchiveModel.MapFrom(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
+        var document = ArchiveEntryModel.MapFrom(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
 
         if (await _archive.Read(entry.Id) != null) // TODO: investigate this not working
         {

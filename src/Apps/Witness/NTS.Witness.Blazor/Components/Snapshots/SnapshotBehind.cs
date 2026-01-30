@@ -2,7 +2,7 @@
 using Not.Blazor.Components;
 using Not.Exceptions;
 using Not.Notify;
-using NTS.Application.Models;
+using NTS.Application.Watcher;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
@@ -10,7 +10,7 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.Blazor.Components.Snapshots;
 
-public class SnapshotBehind : NComponent
+public class SnapshotBehind : NStatefulComponent<IParticipationContext>
 {
     [Inject]
     IDialogService MudDialogService { get; set; } = default!;
@@ -18,17 +18,10 @@ public class SnapshotBehind : NComponent
     [Inject]
     ISnapshotService SnapshotService { get; set; } = default!;
 
-    [Inject]
-    protected IParticipationContext ParticipationService { get; set; } = default!;
     protected List<IntermediateSnapshot> SelectedParticipations { get; set; } = [];
     protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(ParticipationService);
-    }
 
     protected void SetButtonText(int id)
     {

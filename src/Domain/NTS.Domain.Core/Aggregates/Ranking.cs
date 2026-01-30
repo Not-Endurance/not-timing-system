@@ -1,15 +1,10 @@
 ﻿using System.Collections.ObjectModel;
-using Not.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Ranking : AggregateRoot
+public class Ranking : Aggregate
 {
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Ranking(
-        int id,
         string? name,
         CompetitionRuleset? ruleset,
         CompetitionType? type,
@@ -17,7 +12,8 @@ public class Ranking : AggregateRoot
         string? competitionFeiId,
         string? feiRule,
         string? feiScheduleNumber,
-        ReadOnlyCollection<RankingEntry> entries
+        ReadOnlyCollection<RankingEntry> entries,
+        int? id = null
     )
         : base(id)
     {
@@ -30,26 +26,6 @@ public class Ranking : AggregateRoot
         FeiRule = feiRule;
         FeiScheduleNumber = feiScheduleNumber;
     }
-
-    public Ranking(
-        Competition competition,
-        ParticipationCategory category,
-        string? competitionFeiId,
-        string? feiRule,
-        string? feiScheduleNumber,
-        IEnumerable<RankingEntry> entries
-    )
-        : this(
-            GenerateId(),
-            competition.Name,
-            competition.Ruleset,
-            competition.Type,
-            category,
-            competitionFeiId,
-            feiRule,
-            feiScheduleNumber,
-            new(entries.ToList())
-        ) { }
 
     public string Name { get; }
     public CompetitionRuleset Ruleset { get; }

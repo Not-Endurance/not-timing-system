@@ -1,13 +1,14 @@
-﻿using Not.Domain.Aggregates;
-using Not.Events;
+﻿using Not.Events;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Participation : AggregateRoot
+public class Participation : Aggregate
 {
     //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
     static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);
@@ -17,15 +18,13 @@ public class Participation : AggregateRoot
     public static readonly Event<ParticipationEliminated> ELIMINATED_EVENT = new();
     public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
     public Participation(
-        int id,
         ParticipationCategory category,
         Competition competition,
         Combination combination,
         PhaseCollection phases,
-        Eliminated? notQualified
+        Eliminated? notQualified,
+        int id
     )
         : base(id)
     {
@@ -35,16 +34,6 @@ public class Participation : AggregateRoot
         Phases = phases;
         Eliminated = notQualified;
     }
-
-    public Participation(
-        string competitionName,
-        ParticipationCategory category,
-        CompetitionRuleset ruleset,
-        CompetitionType type,
-        Combination combination,
-        IEnumerable<Phase> phases
-    )
-        : this(GenerateId(), category, new(competitionName, ruleset, type), combination, new(phases), null) { }
 
     public Competition Competition { get; }
     public Combination Combination { get; }

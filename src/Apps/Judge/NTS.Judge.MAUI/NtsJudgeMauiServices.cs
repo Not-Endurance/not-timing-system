@@ -6,9 +6,9 @@ namespace NTS.Judge.MAUI;
 
 public static class NtsJudgeMauiServices
 {
-    public static IServiceCollection ConfigureJudgeMaui(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddJudgeMaui(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureNtsStorage(configuration).AddJsonStorage().AddRestApiStorage();
-        return services.AddPlatformServices(configuration).ConfigureNtsJudge(configuration);
+        return services.AddMauiPlatformServices(configuration).AddNtsJudge(configuration);
     }
 }

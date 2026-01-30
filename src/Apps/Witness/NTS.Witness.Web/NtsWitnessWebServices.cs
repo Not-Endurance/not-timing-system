@@ -1,4 +1,6 @@
-﻿namespace NTS.Witness.Web;
+﻿using NTS.Witness.Storage;
+
+namespace NTS.Witness.Web;
 
 public static class NtsWitnessWebServices
 {
@@ -9,6 +11,7 @@ public static class NtsWitnessWebServices
     {
         services.AddRazorPages();
         services.AddServerSideBlazor();
-        return services.ConfigureNtsWitness(configuration);
+        services.ConfigureWitnessStorage(configuration).AddRestApiStorage();
+        return services.AddNtsWitness(configuration);
     }
 }

@@ -201,7 +201,7 @@ public abstract class RpcClient : IRpcClient
     }
 }
 
-public interface IRpcClient : IStartupInitializer, ISingleton
+public interface IRpcClient : IStartupInitializer
 {
     Task Connect();
     Task Disconnect();

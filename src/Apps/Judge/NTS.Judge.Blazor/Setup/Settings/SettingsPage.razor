@@ -3,12 +3,12 @@
 @using Not.Blazor.CRUD.Forms.Components
 
 @attribute [Route(SETTINGS_PAGE)]
-@inherits NComponent
+@inherits SettingsPageBehind
 
 <NContent Title="@Settings_string" Class="not-mid-width">
 
     <Main>
-        @if (Behind.Setting == null)
+        @if (Service.Setting == null)
         {
             <NButtonCreate OnClick="OpenCreateForm" />
         }

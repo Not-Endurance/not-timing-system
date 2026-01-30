@@ -1,12 +1,12 @@
 ﻿using Not.Application.Cache;
 using Not.Application.CRUD.Ports;
 using Not.Async;
-using Not.Domain.Aggregates;
+using Not.Domain.Abstractions;
 
 namespace Not.Application.HTTP;
 
 public abstract class HttpCache<T> : ICache<T>
-    where T : IAggregateRoot
+    where T : IAggregate
 {
     readonly SemaphoreSlim _semaphore = new(1);
     readonly IRepository<T> _repository;

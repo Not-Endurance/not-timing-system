@@ -1,11 +1,11 @@
-﻿using Not.Injection;
+﻿using Not.Application.Behinds.Adapters;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 
 namespace NTS.Witness.Services;
 
-public interface IPerformanceService : ISingleton
+public interface IPerformanceService : IStatefulService
 {
     IEnumerable<Person> GetPeople();
-    Participation GetParticipationBy(Person person);
+    Participation GetParticipation(Person person);
 }

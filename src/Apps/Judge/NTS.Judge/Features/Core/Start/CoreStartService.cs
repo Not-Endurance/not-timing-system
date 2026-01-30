@@ -3,13 +3,10 @@ using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using NTS.Application.Factories;
-using NTS.Application.Warp;
+using NTS.Application.SignalR;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
-using Competition = NTS.Domain.Core.Aggregates.Participations.Competition;
-using Official = NTS.Domain.Core.Aggregates.Official;
-using Participation = NTS.Domain.Core.Aggregates.Participation;
 
 namespace NTS.Judge.Features.Core.Start;
 
@@ -86,18 +83,19 @@ public class CoreStartService : ICoreStarter
     }
 
     Ranking CreateRanking(
-        Domain.Setup.Aggregates.Competition setupCompetition,
+        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
         KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory
     )
     {
-        var competition = new Competition(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type);
         return new Ranking(
-            competition,
+            setupCompetition.Name,
+            setupCompetition.Ruleset,
+            setupCompetition.Type,
             entriesByCategory.Key,
             setupCompetition.FeiId,
             setupCompetition.FeiRule,
             setupCompetition.FeiScheduleNumber,
-            entriesByCategory.Value
+            new(entriesByCategory.Value)
         );
     }
 

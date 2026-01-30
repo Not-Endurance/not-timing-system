@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Not.Injection;
 using Not.Logging;
 using Not.Notify;
 using Not.Serialization.JSON;
@@ -147,7 +146,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         return Task.CompletedTask;
     }
 
-    void RaiseDisconnected(Exception? exception = default)
+    void RaiseDisconnected(Exception? _ = default)
     {
         ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Disconnected);
     }
@@ -184,7 +183,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     }
 }
 
-public interface IRpcSocket : ISingleton
+public interface IRpcSocket
 {
     /// <summary>
     /// 'true' means connected; 'false' - disconnected;

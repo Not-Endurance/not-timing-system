@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.SignalR;
 using Not.Application.RPC.Clients;
 using Not.Concurrency.Extensions;
-using NTS.Application.Models;
+using NTS.Application.Core;
+using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;
 using NTS.Warp.Features.Judge;
 using NTS.Warp.Features.Judge.Procedures;
@@ -48,7 +49,7 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         await judgeClient.OnWitnessDisconnected(Context.ConnectionId);
     }
 
-    public async Task<IEnumerable<CoreParticipationModel>> SendParticipations(WarpRequest request)
+    public async Task<IEnumerable<ParticipationModel>> SendParticipations(WarpRequest request)
     {
         if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {

@@ -23,11 +23,11 @@ public static class NLogExtensions
     /// <param name="services"></param>
     /// <param name="configure">Custom configuration</param>
     /// <returns></returns>
-    public static NLogBuilder AddFilesystemLogger(this NLogBuilder builder, Action<FileContext>? configure = null)
+    public static NLogBuilder AddFilesystemLogger(this NLogBuilder builder, string appName)
     {
-        var factory = FileContextHelper.CreateFileContextFactory(configure, "logs");
+        var factory = FileContextHelper.CreateFileContextFactory("logs", appName);
         builder
-            .Services.AddKeyedSingleton<IFileContext, FileContext>(NLogBuilder.KEY, factory)
+            .Services.AddKeyedSingleton<IFilesystemContext, FilesystemContext>(NLogBuilder.KEY, factory)
             .AddSingleton<IStartupInitializer, FilesystemLoggerInitalizer>();
 
         return builder;

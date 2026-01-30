@@ -1,30 +1,30 @@
-using System;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Collections;
-using NTS.Application.Models;
+using Not.Injection;
+using NTS.Application.Core;
+using NTS.Application.SignalR;
 using NTS.Application.Startlists;
-using NTS.Application.Warp;
+using NTS.Application.Watcher;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Startlists;
 using NTS.Warp;
 using NTS.Warp.Features.Witness.Procedures;
 using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipationGetter, ISnapshotService
+public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipationGetter, ISnapshotService, ISingleton
 {
     readonly IRpcSocket _socket;
     readonly ISelectedEventContext _eventContext;
     readonly IStartlistContext _startlistContext;
-    readonly ParticipationService _participationService;
+    readonly IParticipationService _participationService;
 
     public WitnessRpcClient(
         IRpcSocket socket,
         ISelectedEventContext eventContext,
-        ParticipationService participationService,
+        IParticipationService participationService,
         IStartlistContext startlistContext
     )
         : base(socket)
@@ -48,15 +48,14 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
 
     public Task Receive(Participation participation)
     {
-        var startlistEntry = new StartlistEntry(participation);
         if (participation.IsEliminated())
         {
             _participationService.Update(participation, NCollectionAction.Remove);
-            _startlistContext.Update(startlistEntry, NCollectionAction.Remove);
+            _startlistContext.Update(participation, NCollectionAction.Remove);
         }
         if (participation.Phases.Current.IsComplete())
         {
-            _startlistContext.Update(startlistEntry, NCollectionAction.AddOrUpdate);
+            _startlistContext.Update(participation, NCollectionAction.AddOrUpdate);
             if (participation.Phases.Current.IsFinal)
             {
                 _participationService.Update(participation, NCollectionAction.Remove);
@@ -69,13 +68,13 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
     public async Task GetParticipations()
     {
         var request = WarpRequest.Create(_eventContext.Event!.Id.ToString());
-        var result = await _socket.InvokeInputOutputProcedure<WarpRequest, IEnumerable<CoreParticipationModel>>(
+        var result = await _socket.InvokeInputOutputProcedure<WarpRequest, IEnumerable<ParticipationModel>>(
             nameof(IWitnessHubProcedures.SendParticipations),
             request
         );
         if (result.Data != null)
         {
-            _participationService.Active = result.Data.Select(dtoModel => dtoModel.MapToDomain());
+            _participationService.Active = result.Data.Select(x => x.MapToDomain());
         }
     }
 }

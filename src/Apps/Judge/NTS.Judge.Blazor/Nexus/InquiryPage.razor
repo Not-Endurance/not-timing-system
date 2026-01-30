@@ -1,5 +1,5 @@
 ﻿@attribute [Route(INQUIRY_PAGE)]
-@inherits NComponent
+@inherits InquiryPageBehind
 
 <NContent Title="@Inquiry_string">
 
@@ -12,7 +12,7 @@
                 <MudNumericField @bind-Value="SearchInt" Label="@Search_by_ID_colon_string" />
                 if (SearchInt != null)
                 {
-                    <NButtonPrimary OnClick="x => Behind.Search(SearchInt.Value)" Text="Search" />
+                    <NButtonPrimary OnClick="x => Service.Search(SearchInt.Value)" Text="Search" />
                 }
             }
             else
@@ -20,19 +20,19 @@
                 <MudTextField @bind-Value="SearchTerm" Label="@Search_by_name_colon_string" />
                 if (SearchTerm != null)
                 {
-                    <NButtonPrimary OnClick="x => Behind.Search(SearchTerm!)" Text="Search" />
+                    <NButtonPrimary OnClick="x => Service.Search(SearchTerm!)" Text="Search" />
                 }
             }
 
         </MudStack>
 
-        @if (!Behind.Match?.Any() ?? true)
+        @if (!Service.Match?.Any() ?? true)
         {
             <MudTextField Value="@No_results_found_in_archive_string" />
         }
         else 
         {
-            <MudTextField Value="Behind.Match?.First()?.ToString()" />
+            <MudTextField Value="Service.Match?.First()?.ToString()" />
 
             <MudSimpleTable>
 
@@ -60,7 +60,7 @@
                     </MudTh>
                 </MudTr>
 
-                @foreach (var zz in Behind.Match ?? [])
+                @foreach (var zz in Service.Match ?? [])
                 {
 
                     var archive = zz.Participation;

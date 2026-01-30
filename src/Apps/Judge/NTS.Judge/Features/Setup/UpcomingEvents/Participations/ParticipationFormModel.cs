@@ -1,13 +1,12 @@
 ﻿using Not.Application.Services;
-using Not.Random;
 using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
 
 public class ParticipationFormModel : IFormModel<Participation>
 {
-    public int? Id { get; set; } = RandomHelper.GenerateUniqueInteger();
+    public int? Id { get; set; }
     public bool IsNotRanked { get; set; }
     public Combination? Combination { get; set; }
     public ParticipationCategory? Category { get; set; }

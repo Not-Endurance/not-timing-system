@@ -1,4 +1,5 @@
 using Not.Collections;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Application.Startlists;
@@ -8,15 +9,15 @@ public class StartlistContext : IStartlistContext
 {
     public Startlist? Startlist { get; set; }
 
-    public void Update(StartlistEntry entry, NCollectionAction action)
+    public void Update(Participation participation, NCollectionAction action)
     {
         switch (action)
         {
             case NCollectionAction.Remove:
-                Startlist?.Remove(entry.Number);
+                Startlist?.Remove(participation.Combination.Number);
                 break;
             case NCollectionAction.AddOrUpdate:
-                Startlist?.Add(entry);
+                Startlist?.Add(participation);
                 break;
             default:
                 break;
@@ -27,5 +28,5 @@ public class StartlistContext : IStartlistContext
 public interface IStartlistContext
 {
     Startlist? Startlist { get; set; }
-    void Update(StartlistEntry entry, NCollectionAction action);
+    void Update(Participation participation, NCollectionAction action);
 }

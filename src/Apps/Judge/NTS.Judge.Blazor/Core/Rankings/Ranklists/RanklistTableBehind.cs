@@ -4,15 +4,12 @@ using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Ranklists;
 
-public class RanklistTableBehind : NComponent
+public class RanklistTableBehind : NStatefulComponent<IRankingContext>
 {
-    [Inject]
-    IRanklistDocumentService Service { get; set; } = default!;
+    public Ranklist Ranklist { get; set; } = default!;
 
-    public Ranklist? Ranklist => Service.Document?.Ranklist;
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnBeforeRender()
     {
-        await Observe(Service);
+        Ranklist = new(Service.Current);
     }
 }

@@ -780,4 +780,7 @@
   <data name="Disconnected_from__string" xml:space="preserve">
     <value>Прекъсната връзка със събитие: {0}</value>
   </data>
+  <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
+    <value>Не може да бъде добавен в Стартлист защото участникът е завършил</value>
+  </data>
 </root>

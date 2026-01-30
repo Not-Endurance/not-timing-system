@@ -5,5 +5,5 @@ namespace NTS.Witness.Services;
 
 public interface IParticipationContext : IStatefulService
 {
-    IEnumerable<Participation> Active { get; }
+    IEnumerable<Participation> Active { get; set; }
 }

@@ -17,10 +17,6 @@ public class Program
 
         builder.Configuration.AddNAppsettings(typeof(Program).Assembly);
         builder.Services.ConfigureNtsWitnessWeb(builder.Configuration);
-        builder
-            .Services.ConfigureWitnessStorage(builder.Configuration, debugRootDirectoryName: "nts-witness")
-            .AddRestApiStorage();
-        builder.Services.AddSingleton<IRepository<UpcomingEvent>, UpcomingEventRepository>();
         builder.Logging.AddSerilog();
 
         var app = builder.Build();

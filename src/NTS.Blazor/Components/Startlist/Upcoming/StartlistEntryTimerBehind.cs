@@ -6,10 +6,8 @@ using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;
 
-public class StartlistEntryTimerBehind : NComponent
+public class StartlistEntryTimerBehind : NStatefulComponent<IStartUpcoming>
 {
-    [Inject]
-    IStartUpcoming Service { get; set; } = default!;
     protected string DisplayTime { get; private set; } = "--:--:--";
     protected Color Color { get; private set; } = Color.Success;
 
@@ -17,11 +15,6 @@ public class StartlistEntryTimerBehind : NComponent
 
     [Parameter, EditorRequired]
     public required StartlistEntry Entry { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(Service);
-    }
 
     protected override void OnBeforeRender()
     {

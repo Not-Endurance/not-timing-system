@@ -4,9 +4,8 @@ namespace NTS.Application.Factories;
 
 public static class OfficialFactory
 {
-    public static Official Create(Domain.Setup.Aggregates.Official official)
+    public static Official Create(Domain.Setup.Aggregates.UpcomingEvents.Official setupOfficial)
     {
-        var coreOfficial = new Official(official.Person, official.Role);
-        return coreOfficial;
+        return new Official(setupOfficial.Person, setupOfficial.Role, setupOfficial.Id);
     }
 }

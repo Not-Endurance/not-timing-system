@@ -3,18 +3,20 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Authentication;
 using Not.Blazor;
-using Not.Filesystem;
 using NTS.Application;
 
 namespace NTS.Witness;
 
 public static class NtsWitnessServices
 {
-    public static IServiceCollection ConfigureNtsWitness(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNtsWitness(this IServiceCollection services, IConfiguration configuration)
     {
-        FileContextHelper.ConfigureApplicationName("nts-witness");
+        services
+            .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
+            .AddStartlist()
+            .ConfigureN()
+            .AddSignalR();
 
-        services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly()).AddStartlist().AddRpcClient();
         services.ConfigureNts(configuration).AddNBlazor(configuration).ConfigureAuthentication(configuration);
 
         return services;

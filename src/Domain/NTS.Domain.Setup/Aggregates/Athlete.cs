@@ -1,14 +1,12 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain.Krud;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Athlete : AggregateRoot, IAthlete, IReflect<Club>
+public class Athlete : Aggregate, IEntityMirror<Club>
 {
-    [Newtonsoft.Json.JsonConstructor]
-    [System.Text.Json.Serialization.JsonConstructor]
-    public Athlete(int? id, Person? names, string? feiId, Country? country, Club? club)
-        : base(id!.Value)
+    public Athlete(Person? names, string? feiId, Country? country, Club? club, int? id = null)
+        : base(id)
     {
         FeiId = feiId;
         Names = Required(nameof(Names), names);
@@ -16,10 +14,6 @@ public class Athlete : AggregateRoot, IAthlete, IReflect<Club>
         Club = club;
     }
 
-    public Athlete(Person? person, string? feiId, Country? country, Club? club)
-        : this(GenerateId(), person, feiId, country, club) { }
-
-    IClub? IAthlete.Club => Club;
     public string? FeiId { get; }
     public Person Names { get; }
     public Country Country { get; }

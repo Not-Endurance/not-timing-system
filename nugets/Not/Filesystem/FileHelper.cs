@@ -4,12 +4,14 @@ public class FileHelper
 {
     public static async Task WriteAsync(string path, string content)
     {
+        path = SanitizePath(path);
         CreateDirectoryIfDoesNotExist(path);
         await File.WriteAllTextAsync(path, content);
     }
 
     public static void Write(string path, string content)
     {
+        path = SanitizePath(path);
         CreateDirectoryIfDoesNotExist(path);
         File.WriteAllText(path, content);
     }
@@ -18,6 +20,7 @@ public class FileHelper
     {
         try
         {
+            path = SanitizePath(path);
             return await File.ReadAllTextAsync(path);
         }
         catch (Exception)
@@ -30,6 +33,7 @@ public class FileHelper
     {
         try
         {
+            path = SanitizePath(path);
             return File.ReadAllText(path);
         }
         catch (Exception)
@@ -40,8 +44,14 @@ public class FileHelper
 
     public static Task Delete(string path)
     {
+        path = SanitizePath(path);
         File.Delete(path);
         return Task.CompletedTask;
+    }
+
+    static string SanitizePath(string path)
+    {
+        return path.Replace(' ', '.').Replace("*", "");
     }
 
     static void CreateDirectoryIfDoesNotExist(string path)

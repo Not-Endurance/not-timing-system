@@ -13,7 +13,7 @@ public class CoreService : NStatefulService, ICoreService
 {
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly ICoreState _coreState;
-    readonly EventRpcContext _eventsRpcContext;
+    readonly JudgeSocketContext _eventsRpcContext;
     readonly ICoreStarter _coreStarter;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
@@ -24,7 +24,7 @@ public class CoreService : NStatefulService, ICoreService
     public CoreService(
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
         ICoreState coreState,
-        EventRpcContext eventsRpcContext,
+        JudgeSocketContext eventsRpcContext,
         ICoreStarter coreStarter,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
@@ -46,7 +46,7 @@ public class CoreService : NStatefulService, ICoreService
 
     public bool IsStarted { get; private set; }
 
-    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override async Task<bool> InitializeState()
     {
         var enduranceEvents = await _events.Read(0);
         IsStarted = enduranceEvents != null;
@@ -60,7 +60,7 @@ public class CoreService : NStatefulService, ICoreService
 
     public async Task SoftReset()
     {
-        await _eventsRpcContext.ResetEvent();
+        await _eventsRpcContext.Disconnect();
     }
 
     public async Task HardReset()
@@ -72,6 +72,7 @@ public class CoreService : NStatefulService, ICoreService
         {
             observable.ResetState();
         }
+        EmitChanged();
     }
 
     public async Task LoadArchive(int archiveId)

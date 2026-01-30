@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Features.Core.Dashboard;
 using NTS.Judge.Tests.Helpers;
 using NTS.Storage.Core;
 using Xunit.Abstractions;

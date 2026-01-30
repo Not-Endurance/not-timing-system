@@ -1,8 +1,8 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Services;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Behinds;
+using NTS.Domain.Objects;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Officials;
 
@@ -13,11 +13,12 @@ public class OfficialBehind : KrudServiceBase<Official, OfficialFormModel>
 
     protected override Official CreateEntity(OfficialFormModel model)
     {
-        return Official.Create(model.Name, model.Role);
+        var names = ConvertName(model.Name);
+        return new Official(names, model.Role, model.Id);
     }
 
-    protected override Official UpdateEntity(OfficialFormModel model)
+    Person? ConvertName(string? combined)
     {
-        return Official.Update(model.Id, model.Name, model.Role);
+        return combined == null ? null : new Person(combined.Split(" ", StringSplitOptions.RemoveEmptyEntries));
     }
 }

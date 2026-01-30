@@ -1,10 +1,10 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain.Abstractions;
 using Not.Injection;
 
 namespace Not.Application.Krud.Abstractions;
 
 public interface IKrudMirror<in T> : ISingleton
-    where T : IAggregateRoot
+    where T : IEntity
 {
-    Task Reflect(T update);
+    Task Reflect(T entity);
 }

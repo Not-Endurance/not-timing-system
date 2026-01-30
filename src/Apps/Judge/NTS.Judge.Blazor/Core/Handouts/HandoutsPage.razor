@@ -2,12 +2,12 @@
 @using NTS.Judge.Blazor.Core.Handouts.Form
 
 @attribute [Route(HANDOUTS_PAGE)]
-@inherits PrintableComponent
+@inherits HandoutsPageBehind
 
-<NContent Title="@Handouts_string" HasContent="@Behind.Documents.Any()" EmptyMessage="@Handouts_list_empty_message_string" RightBarXS="2">
+<NContent Title="@Handouts_string" HasContent="@Service.Documents.Any()" EmptyMessage="@Handouts_list_empty_message_string" RightBarXS="2">
 
     <Main>
-        <HandoutsList Documents="Behind.Documents" />
+        <HandoutsList Documents="Service.Documents" />
     </Main>
 
     <Rightbar>

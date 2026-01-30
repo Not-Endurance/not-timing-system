@@ -1,12 +1,12 @@
 ﻿using System.Linq.Expressions;
-using Not.Domain.Aggregates;
+using Not.Domain;
 using Not.Storage.JsonFile.States;
 using Not.Storage.JsonFile.Stores;
 
 namespace Not.Storage.JsonFile.Repositories;
 
 public abstract class ReadonlyRootRepository<T, TState>
-    where T : AggregateRoot
+    where T : Aggregate
     where TState : class, ITreeState<T>, new()
 {
     protected ReadonlyRootRepository(IStore<TState> store)

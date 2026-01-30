@@ -1,13 +1,13 @@
 using Not.Application.Behinds.Adapters;
+using Not.Injection;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Core.Rankings;
 
-public interface IRankingMenuService : IStatefulService
+public interface IRankingMenuService : IRankingContext, ISingleton
 {
-    Ranking? SelectedRanking { get; }
     ObservableList<Ranking> Rankings { get; }
-    Task Select(Ranking ranking);
+    void Select(Ranking ranking);
     Task Delete(Ranking ranking);
 }

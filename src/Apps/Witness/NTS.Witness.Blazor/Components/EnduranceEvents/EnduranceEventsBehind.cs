@@ -1,7 +1,9 @@
 ﻿using Not.Application.CRUD.Ports;
-using NTS.Application.Warp;
+using NTS.Application.SignalR;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
+
+namespace NTS.Witness.Blazor.Components.EnduranceEvents;
 
 public class EnduranceEventsBehind : ComponentBase
 {
@@ -9,7 +11,7 @@ public class EnduranceEventsBehind : ComponentBase
     IRepository<UpcomingEvent> Repository { get; set; } = default!;
 
     [Inject]
-    IRpcContext<UpcomingEvent> RpcContext { get; set; } = default!;
+    ISocketContext<UpcomingEvent> RpcContext { get; set; } = default!;
 
     [Inject]
     IConnectionStatus ConnectionStatus { get; set; } = default!;
@@ -33,16 +35,16 @@ public class EnduranceEventsBehind : ComponentBase
     {
         if (IsConnected)
         {
-            await RpcContext.ResetEvent();
+            await RpcContext.Disconnect();
         }
-        await RpcContext.Set(enduranceEvent);
+        await RpcContext.Connect(enduranceEvent);
         await ParticipationGetter.GetParticipations();
         StateHasChanged();
     }
 
     protected async Task Disconnect()
     {
-        await RpcContext.ResetEvent();
+        await RpcContext.Disconnect();
         StateHasChanged();
     }
 }

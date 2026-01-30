@@ -1,16 +1,15 @@
 ﻿@using NTS.Judge.Blazor.Shared.Components.ConnectionStatus
 
-@inherits NComponent
+@inherits SidePanelBehind
 
 <MudStack Class="ma-6">
-    @if (!CoreService.IsStarted)
+
+    @if (!Service.IsStarted)
     {
         <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
     }
+
     <NButtonWarning OnClick="OpenSoftResetDialog" Text="@Reset_string" />
-    @* else if (StaticOption.IsRfidDetectionEnabled()) *@
-    @* { *@
-    @*     <RfidPanel EnduranceEventStarted="CoreBehind.IsStarted" /> *@
-    @* } *@
+
     <ConnectionStatus />
 </MudStack>

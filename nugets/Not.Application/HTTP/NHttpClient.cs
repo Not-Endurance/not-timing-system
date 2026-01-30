@@ -93,12 +93,12 @@ public class NHttpClient
         try
         {
             var content = payload.ToJson();
-            var request = new HttpRequestMessage(method, url)
+            using var request = new HttpRequestMessage(method, url)
             {
                 Content = new StringContent(content, Encoding.UTF8, "application/json"),
             };
 
-            var response = await _httpClient.SendAsync(request);
+            using var response = await _httpClient.SendAsync(request);
             return await ReadResponse(response);
         }
         catch (Exception ex)

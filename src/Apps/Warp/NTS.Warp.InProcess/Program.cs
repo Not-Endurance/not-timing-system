@@ -33,13 +33,7 @@ builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Information);
 builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Information);
 # if RELEASE
 builder.Logging.AddSerilog();
-builder
-    .Services.AddNLogging()
-    .AddFilesystemLogger(logFileConfig =>
-    {
-        logFileConfig.Path = FileContextHelper.GetAppDirectory("logs");
-        logFileConfig.Name = FileContextHelper.ConfigureApplicationName("NTS.Warp");
-    });
+builder.Services.AddNLogging().AddFilesystemLogger("NTS.Warp");
 #endif
 
 var app = builder.Build();

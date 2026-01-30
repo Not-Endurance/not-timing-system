@@ -48,6 +48,6 @@ public partial class ConnectionStatus : NComponent, IDisposable
     // ReSharper disable once AsyncVoidMethod
     async void HandleElapsed(object? sender, ElapsedEventArgs e)
     {
-        await Render();
+        await InvokeRender();
     }
 }

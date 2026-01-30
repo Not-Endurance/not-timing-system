@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Aggregates;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class SnapshotResult : AggregateRoot, IAggregateRoot
+public class SnapshotResult : Aggregate
 {
     public static SnapshotResult Applied(Snapshot snapshot)
     {
@@ -16,16 +15,12 @@ public class SnapshotResult : AggregateRoot, IAggregateRoot
         return new(snapshot, type);
     }
 
-    [JsonConstructor]
-    SnapshotResult(int id, Snapshot snapshot, SnapshotResultType type)
+    public SnapshotResult(Snapshot snapshot, SnapshotResultType type, int? id = null)
         : base(id)
     {
         Snapshot = snapshot;
         Type = type;
     }
-
-    SnapshotResult(Snapshot snapshot, SnapshotResultType type)
-        : this(GenerateId(), snapshot, type) { }
 
     public Snapshot Snapshot { get; }
     public SnapshotResultType Type { get; }

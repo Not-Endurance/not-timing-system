@@ -11,7 +11,7 @@ public class AthleteFormModel : IFormModel<Athlete>
     {
 #if DEBUG
         Name = "Gucci Petrov";
-        Club = Club.Create("Конярче ЕООД");
+        Club = new(1337, "Конярче ЕООД");
 #endif
         Country = StaticOption.SelectedCountry;
     }

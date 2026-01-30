@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Application.Krud.Abstractions;
 using Not.Application.Krud.Graph;
 using Not.Application.Krud.Services;
-using Not.Domain.Aggregates;
+using Not.Domain;
 
 namespace Not.Application.Krud.ServiceRegistration;
 
@@ -28,7 +28,7 @@ public static class KrudServiceCollectionExtensions
         this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Singleton
     )
-        where T : AggregateRoot
+        where T : Aggregate
     {
         if (lifetime == ServiceLifetime.Transient)
         {

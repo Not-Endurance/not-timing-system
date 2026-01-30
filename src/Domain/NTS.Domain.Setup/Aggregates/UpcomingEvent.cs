@@ -1,21 +1,20 @@
 ﻿using Newtonsoft.Json;
-using Not.Domain.Aggregates;
 using Not.Domain.Exceptions;
+using Not.Domain.Krud;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Extensions;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competition>, IParent<Loop>, IParent<Combination>
+public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>, IParent<Loop>, IParent<Combination>
 {
     readonly List<Competition> _competitions = [];
     readonly List<Official> _officials = [];
     readonly List<Loop> _loops = [];
     readonly List<Combination> _combinations = [];
 
-    [JsonConstructor]
     public UpcomingEvent(
-        int? id,
         string? name,
         string? place,
         Country? country,
@@ -25,9 +24,10 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials,
         IEnumerable<Loop> loops,
-        IEnumerable<Combination> combinations
+        IEnumerable<Combination> combinations,
+        int? id = null
     )
-        : base(id!.Value)
+        : base(id)
     {
         Name = Required(nameof(Name), name);
         Place = Required(nameof(Place), place);
@@ -40,16 +40,6 @@ public class UpcomingEvent : AggregateRoot, IParent<Official>, IParent<Competiti
         _loops = loops.ToList();
         _combinations = combinations.ToList();
     }
-
-    public UpcomingEvent(
-        string? name,
-        string? place,
-        Country? country,
-        string? showFeiId,
-        string? feiId,
-        string? feiEventCode
-    )
-        : this(GenerateId(), name, place, country, showFeiId, feiId, feiEventCode, [], [], [], []) { }
 
     IReadOnlyList<Official> IParent<Official>.Children => Officials;
     IReadOnlyList<Competition> IParent<Competition>.Children => Competitions;

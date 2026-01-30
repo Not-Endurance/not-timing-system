@@ -94,10 +94,17 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
     {
         lock (_lock)
         {
-            foreach (var (key, value) in items.ToDictionary(x => x.Id, x => x))
-            {
-                _dictionary.Add(key, value);
-            }
+            Add(items);
+            _changed.Emit();
+        }
+    }
+
+    public void Replace(IEnumerable<T> items)
+    {
+        lock (_lock)
+        {
+            _dictionary.Clear();
+            Add(items);
             _changed.Emit();
         }
     }
@@ -120,6 +127,7 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
         lock (_lock)
         {
             _dictionary.Clear();
+            _changed.Emit();
         }
     }
 
@@ -134,6 +142,14 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
     public IEnumerator<T> GetEnumerator()
     {
         return _dictionary.Values.GetEnumerator();
+    }
+
+    void Add(IEnumerable<T> items)
+    {
+        foreach (var (key, value) in items.ToDictionary(x => x.Id, x => x))
+        {
+            _dictionary.Add(key, value);
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator()
