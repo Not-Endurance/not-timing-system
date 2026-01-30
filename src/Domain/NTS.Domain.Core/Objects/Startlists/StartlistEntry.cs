@@ -10,19 +10,19 @@ public record StartlistEntry : ValueObject
         Number = number;
         PhaseNumber = phaseNumber;
         Distance = distance;
-//<<<<<<< HEAD
-//        Start = startAt;
-//    }
+        //<<<<<<< HEAD
+        //        Start = startAt;
+        //    }
 
-//    public StartlistEntry(Participation participation)
-//    {
-//        Athlete = participation.Combination.Athlete.Names;
-//        Number = participation.Combination.Number;
-//        var nextPhase = participation.Phases.GetNext();
-//        PhaseNumber = participation.Phases.NumberOf(nextPhase);
-//        Distance = nextPhase.Length;
-//        Start = new Timestamp((nextPhase.StartTime ?? Timestamp.DEFAULT).ToDateTimeOffset());
-//=======
+        //    public StartlistEntry(Participation participation)
+        //    {
+        //        Athlete = participation.Combination.Athlete.Names;
+        //        Number = participation.Combination.Number;
+        //        var nextPhase = participation.Phases.GetNext();
+        //        PhaseNumber = participation.Phases.NumberOf(nextPhase);
+        //        Distance = nextPhase.Length;
+        //        Start = new Timestamp((nextPhase.StartTime ?? Timestamp.DEFAULT).ToDateTimeOffset());
+        //=======
         Start = start;
     }
 
