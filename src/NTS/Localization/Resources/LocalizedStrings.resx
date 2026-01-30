@@ -753,6 +753,33 @@
   <data name="Access_denied_next_steps" xml:space="preserve">
     <value>Please contact a system Admin or try another.</value>
   </data>
+  <data name="Connect_string" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Disconnect_string" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
+  <data name="Empty_event_list_message" xml:space="preserve">
+    <value>Upcoming Events aren't configured yet</value>
+  </data>
+  <data name="Select_athlete_string" xml:space="preserve">
+    <value>Select an athlete</value>
+  </data>
+  <data name="Empty_performance_competitor_message" xml:space="preserve">
+    <value>Your account is not configured to participate in the current Endurance Event. If this is incorrect please contact an admin</value>
+  </data>
+  <data name="Empty_performance_official_message" xml:space="preserve">
+    <value>Choose a participating athlete above to view performance</value>
+  </data>
+  <data name="Cannot_select_another_event_before_disconnect__string" xml:space="preserve">
+    <value>Already connected to {0}, disconnect first."</value>
+  </data>
+  <data name="Connected_to__string" xml:space="preserve">
+    <value>Connected to {0}</value>
+  </data>
+  <data name="Disconnected_from__string" xml:space="preserve">
+    <value>Disconnected from {0}</value>
+  </data>
   <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
     <value>Cannot add a completed participation in Startlist</value>
   </data>

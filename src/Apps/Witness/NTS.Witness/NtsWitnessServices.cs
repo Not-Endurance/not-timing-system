@@ -9,7 +9,7 @@ namespace NTS.Witness;
 
 public static class NtsWitnessServices
 {
-    public static IServiceCollection ConfigureNtsWitness(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNtsWitness(this IServiceCollection services, IConfiguration configuration)
     {
         services
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())

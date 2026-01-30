@@ -2,28 +2,18 @@
 using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Tests.RPC;
-using NTS.Warp.ACL.Entities;
-using NTS.Warp.ACL.Enums;
-using NTS.Warp.ACL.RPC.Procedures;
+using NTS.Domain.Core.Aggregates;
+using NTS.Warp.Features.Witness.Procedures;
 using Xunit.Abstractions;
 
 namespace NTS.Judge.Tests;
 
-public class WitnessTestClient
-    : RpcClient,
-        IEmsParticipantsClientProcedures,
-        IEmsStartlistClientProcedures,
-        ITestRpcClient,
-        ISingleton
+public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcClient, ISingleton
 {
     public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
         : base(socket)
     {
-        RegisterInputProcedure<EmsStartlistEntry, EmsCollectionAction>(nameof(ReceiveEntry), ReceiveEntry);
-        RegisterInputProcedure<EmsParticipantEntry, EmsCollectionAction>(
-            nameof(ReceiveEntryUpdate),
-            ReceiveEntryUpdate
-        );
+        RegisterInputProcedure<Participation>(nameof(Receive), Receive);
     }
 
     public int Id { get; }
@@ -35,15 +25,9 @@ public class WitnessTestClient
         InvokedMethods.Clear();
     }
 
-    public Task ReceiveEntry(EmsStartlistEntry entry, EmsCollectionAction action)
+    public Task Receive(Participation entry)
     {
-        InvokedMethods.Add(nameof(ReceiveEntry));
-        return Task.CompletedTask;
-    }
-
-    public Task ReceiveEntryUpdate(EmsParticipantEntry entry, EmsCollectionAction action)
-    {
-        InvokedMethods.Add(nameof(ReceiveEntryUpdate));
+        InvokedMethods.Add(nameof(Receive));
         return Task.CompletedTask;
     }
 

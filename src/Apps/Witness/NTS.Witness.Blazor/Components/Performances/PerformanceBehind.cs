@@ -1,26 +1,41 @@
 ﻿using Not.Blazor.Components;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
+using Not.Structures;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
+using NTS.Witness.Services;
 
 namespace NTS.Witness.Blazor.Components.Performances;
 
-public class PerformanceBehind : NComponent
+public class PerformanceBehind : NStatefulComponent<IPerformanceService>
 {
-    [Inject]
-    IPerformanceService Service { get; set; } = default!;
-
-    protected List<Phase> Phases { get; set; } = [];
-    protected PhaseCollection? PhasesCollection { get; set; }
-    protected Person? Participant { get; set; }
+    protected List<NotListModel<Person>> People { get; set; } = [];
+    protected Person SelectedPerson { get; set; } = default!;
+    protected Participation? Participation { get; set; } = default!;
 
     protected override void OnInitialized()
     {
         try
         {
-            Participant = Service.GetPerson();
-            Phases = Service.GetPhases();
-            PhasesCollection = new(Phases);
+            var people = Service.GetPeople();
+            People = NotListModel.FromEntity(people).ToList();
+            //to auto assign competitor based on profile
+            //check if competitor profile name matches any person in the people list
+            //might be beneficial to have team relations so that we can show their team the performance
+            //consider showing temporary Ranking in Performance as well
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    protected void OnPersonChanged(Person person)
+    {
+        try
+        {
+            SelectedPerson = person;
+            Participation = Service.GetParticipation(person);
+            StateHasChanged();
         }
         catch (Exception ex)
         {

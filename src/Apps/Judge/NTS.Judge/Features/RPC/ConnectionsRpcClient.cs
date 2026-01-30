@@ -19,7 +19,7 @@ public class ConnectionsRpcClient : RpcClient, IConnectionsClientProcedures, ISi
     public override void RunAtStartup()
     {
         RegisterInputProcedure<string>(nameof(OnWitnessConnected), OnWitnessConnected);
-        RegisterInputProcedure<string>(nameof(OnWitnessDisconnedted), OnWitnessDisconnedted);
+        RegisterInputProcedure<string>(nameof(OnWitnessDisconnected), OnWitnessDisconnected);
     }
 
     public Task OnWitnessConnected(string connectionId)
@@ -28,7 +28,7 @@ public class ConnectionsRpcClient : RpcClient, IConnectionsClientProcedures, ISi
         return Task.CompletedTask;
     }
 
-    public Task OnWitnessDisconnedted(string connectionId)
+    public Task OnWitnessDisconnected(string connectionId)
     {
         _connectionsRegistry.Remove(connectionId);
         return Task.CompletedTask;

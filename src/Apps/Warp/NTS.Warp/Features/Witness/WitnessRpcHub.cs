@@ -1,18 +1,17 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.SignalR;
+using Not.Application.RPC.Clients;
 using Not.Concurrency.Extensions;
-using NTS.Warp.ACL.Entities;
-using NTS.Warp.ACL.Factories;
-using NTS.Warp.ACL.RPC.Procedures;
+using NTS.Application.Core;
+using NTS.Application.Watcher;
+using NTS.Domain.Aggregates;
 using NTS.Warp.Features.Judge;
-using NTS.Warp.Features.Witness.ProcessSnapshots;
+using NTS.Warp.Features.Judge.Procedures;
+using NTS.Warp.Features.Witness.Procedures;
 
 namespace NTS.Warp.Features.Witness;
 
-internal class WitnessRpcHub
-    : NtsHub<ILegacyWitnessClientProcedures>,
-        IEmsStartlistHubProcedures,
-        IEmsParticipantsHubProcedures
+internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProcedures
 {
     readonly IPrimaryConnectionContext _primaryConnections;
     readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;
@@ -47,38 +46,33 @@ internal class WitnessRpcHub
         {
             return;
         }
-        await judgeClient.OnWitnessDisconnedted(Context.ConnectionId);
+        await judgeClient.OnWitnessDisconnected(Context.ConnectionId);
     }
 
-    public async Task<Dictionary<int, EmsStartlist>> SendStartlist(WarpRequest request)
+    public async Task<IEnumerable<ParticipationModel>> SendParticipations(WarpRequest request)
     {
         if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
             return [];
         }
-        var participations = await judgeClient.GetActive();
-        return StartlistFactory.Create(participations);
+        return await judgeClient.GetActive();
     }
 
-    public async Task<IEnumerable<EmsParticipantEntry>> SendParticipants(WarpRequest request)
+    public async Task<RpcInvokeResult> Receive(WarpRequest<SnapshotModel> request)
     {
         if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
         {
-            return [];
+            return RpcInvokeResult.Error; // TODO: meaningful message would improve UX here
         }
-        var participants = await judgeClient.GetActive();
-        var emsPartcipants = participants.Select(ParticipantEntryFactory.Create).ToList();
-        return emsPartcipants;
-    }
-
-    public async Task ReceiveWitnessEvent(WarpRequest<ProcessSnapshotsPayload> request)
-    {
-        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
-        {
-            return; // TODO: meaningful message would improve UX here
-        }
-        var snapshots = request.Payload.Entries.Select(entry => SnapshotFactory.Create(entry, request.Payload.Type));
+        var payload = request.Payload.MapToDomain();
+        var snapshots = payload.Entries.Select(entry => new Snapshot(
+            entry.Number,
+            payload.Type,
+            Domain.Enums.SnapshotMethod.Manual,
+            entry.Timestamp
+        ));
         await judgeClient.Receive(snapshots);
+        return RpcInvokeResult.Success;
     }
 
     bool TryGetJudgeClient(string enduranceEventId, [NotNullWhen(true)] out IJudgeClientProcedures? judgeClient)

@@ -5,6 +5,7 @@ using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Core.Objects.Startlists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 

@@ -1,4 +1,4 @@
-﻿using Not.Formatting;
+using Not.Formatting;
 
 namespace NTS.Domain.Core.Objects.Startlists;
 
@@ -10,6 +10,19 @@ public record StartlistEntry : ValueObject
         Number = number;
         PhaseNumber = phaseNumber;
         Distance = distance;
+        //<<<<<<< HEAD
+        //        Start = startAt;
+        //    }
+
+        //    public StartlistEntry(Participation participation)
+        //    {
+        //        Athlete = participation.Combination.Athlete.Names;
+        //        Number = participation.Combination.Number;
+        //        var nextPhase = participation.Phases.GetNext();
+        //        PhaseNumber = participation.Phases.NumberOf(nextPhase);
+        //        Distance = nextPhase.Length;
+        //        Start = new Timestamp((nextPhase.StartTime ?? Timestamp.DEFAULT).ToDateTimeOffset());
+        //=======
         Start = start;
     }
 

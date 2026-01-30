@@ -15,7 +15,7 @@ public abstract class JudgeIntegrationTest : IntegrationTest
     {
         var services = new ServiceCollection();
         var configuration = new ConfigurationBuilder().Build();
-        return services.ConfigureNtsJudge(configuration);
+        return services.AddNtsJudge(configuration);
         //        .AddJsonFileStore(x => x.Path = storagePath)
         //        .AddNConventionalServices(Assembly.GetExecutingAssembly());
     }

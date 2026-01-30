@@ -3,62 +3,78 @@ using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Collections;
 using Not.Injection;
+using NTS.Application.Core;
+using NTS.Application.SignalR;
 using NTS.Application.Startlists;
+using NTS.Application.Watcher;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects.Startlists;
-using NTS.Witness.RPC.Procedures;
+using NTS.Warp;
+using NTS.Warp.Features.Witness.Procedures;
 using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient
-    : RpcClient,
-        IWitnessParticipantsClientProcedures,
-        IWitnessStartlistClientProcedures,
-        ISingleton
+public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipationGetter, ISnapshotService, ISingleton
 {
     readonly IRpcSocket _socket;
-    readonly IStartlistContext _startlistContex;
-    readonly ParticipationService _participationService;
+    readonly ISelectedEventContext _eventContext;
+    readonly IStartlistContext _startlistContext;
+    readonly IParticipationService _participationService;
 
     public WitnessRpcClient(
         IRpcSocket socket,
-        ParticipationService participationService,
-        IStartlistContext startlistContex
+        ISelectedEventContext eventContext,
+        IParticipationService participationService,
+        IStartlistContext startlistContext
     )
         : base(socket)
     {
         _socket = socket;
-        _startlistContex = startlistContex;
+        _eventContext = eventContext;
+        _startlistContext = startlistContext;
         _participationService = participationService;
     }
 
     public override void RunAtStartup()
     {
-        RegisterInputProcedure<StartlistEntry, NCollectionAction>(nameof(Receive), Receive);
-        RegisterInputProcedure<Participation, NCollectionAction>(nameof(Receive), Receive);
+        RegisterInputProcedure<Participation>(nameof(Receive), Receive);
     }
 
-    public async Task<RpcInvokeResult> PublishSnapshotsAsync(WitnessSnapshotPayload payload)
+    public async Task<RpcInvokeResult> PublishSnapshotsAsync(SnapshotModel model)
     {
-        return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), payload);
+        var request = WarpRequest.Create(_eventContext.Event!.Id.ToString(), model);
+        return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), request);
     }
 
-    public Task Receive(StartlistEntry entry, NCollectionAction action)
+    public Task Receive(Participation participation)
     {
-        _startlistContex.Update(entry, action);
+        if (participation.IsEliminated())
+        {
+            _participationService.Update(participation, NCollectionAction.Remove);
+            _startlistContext.Update(participation, NCollectionAction.Remove);
+        }
+        if (participation.Phases.Current.IsComplete())
+        {
+            _startlistContext.Update(participation, NCollectionAction.AddOrUpdate);
+            if (participation.Phases.Current.IsFinal)
+            {
+                _participationService.Update(participation, NCollectionAction.Remove);
+            }
+        }
+        _participationService.Update(participation, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;
     }
 
-    public Task Receive(Participation participation, NCollectionAction action)
+    public async Task GetParticipations()
     {
-        _participationService.Update(participation, action);
-        return Task.CompletedTask;
-    }
-
-    public Task<IEnumerable<Participation>> GetParcipations()
-    {
-        var participations = DummyData.CreateParticipations(10);
-        return Task.FromResult(participations.AsEnumerable());
+        var request = WarpRequest.Create(_eventContext.Event!.Id.ToString());
+        var result = await _socket.InvokeInputOutputProcedure<WarpRequest, IEnumerable<ParticipationModel>>(
+            nameof(IWitnessHubProcedures.SendParticipations),
+            request
+        );
+        if (result.Data != null)
+        {
+            _participationService.Active = result.Data.Select(x => x.MapToDomain());
+        }
     }
 }

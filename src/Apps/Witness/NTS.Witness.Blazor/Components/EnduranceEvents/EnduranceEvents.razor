@@ -1,0 +1,15 @@
+﻿@using NTS.Domain.Setup.Aggregates
+@inherits EnduranceEventsBehind
+
+<NSimpleTable T="UpcomingEvent" Items="@Events" EmptyMessage="@Empty_event_list_message" Height="30vh" Headings="@EventsTableHeaders">
+    <CustomCell>
+        @if (IsConnected && Selected.Event == context)
+        {
+            <NButtonPrimary Color="Color.Error" Style="width:120px" OnClick="() => Disconnect()">@Disconnect_string</NButtonPrimary>
+        }
+        else
+        {
+            <NButtonPrimary Color="Color.Success" Style="width:120px" OnClick="() => ConnectTo(context)">@Connect_string</NButtonPrimary>
+        }
+    </CustomCell>
+</NSimpleTable>

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Not.Collections;
 using Not.Events;
 using Not.Exceptions;
 using Not.Structures;
@@ -105,6 +106,19 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
             _dictionary.Clear();
             Add(items);
             _changed.Emit();
+        }
+    }
+
+    public void Update(T item, NCollectionAction action)
+    {
+        switch (action)
+        {
+            case NCollectionAction.AddOrUpdate:
+                AddOrReplace(item);
+                break;
+            case NCollectionAction.Remove:
+                Remove(item);
+                break;
         }
     }
 

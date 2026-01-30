@@ -1,35 +1,40 @@
-﻿using Not.Collections;
+﻿using Not.Application.Behinds.Adapters;
+using Not.Collections;
+using Not.Injection;
+using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Objects;
-using NTS.Witness.Blazor.Components.Performances;
-using NTS.Witness.Blazor.Components.Snapshots;
 
 namespace NTS.Witness.Services;
 
-public class ParticipationService : IPerformanceService, ISnapshotService
+public class ParticipationService
+    : NStatefulService<ObservableList<Participation>>,
+        IParticipationService,
+        IPerformanceService,
+        ISingleton
 {
-    List<Participation> _participations = [];
-
-    public IEnumerable<Participation> ActiveParticipations => _participations.AsEnumerable();
+    public IEnumerable<Participation> Active
+    {
+        get => State;
+        set
+        {
+            State.Clear();
+            State.AddRange(value);
+        }
+    }
 
     public void Update(Participation participation, NCollectionAction action)
     {
-        _participations.Update(participation, action);
+        State.Update(participation, action);
     }
 
-    public List<Participation> GetParticipations()
+    public IEnumerable<Person> GetPeople()
     {
-        return DummyData.CreateParticipations(10);
+        return State.Select(p => p.Combination.Athlete.Names).Distinct();
     }
 
-    public Person GetPerson()
+    public Participation GetParticipation(Person person)
     {
-        return DummyData.CreateParticipant("Pesho", "Goshov");
-    }
-
-    public List<Phase> GetPhases()
-    {
-        return DummyData.CreatePhases();
+        return State.First(p => p.Combination.Athlete.Names.Equals(person));
     }
 }

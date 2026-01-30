@@ -2,37 +2,26 @@
 using Not.Blazor.Components;
 using Not.Exceptions;
 using Not.Notify;
+using NTS.Application.Watcher;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
+using NTS.Witness.Services;
 
 namespace NTS.Witness.Blazor.Components.Snapshots;
 
-public class SnapshotBehind : NComponent
+public class SnapshotBehind : NStatefulComponent<IParticipationContext>
 {
     [Inject]
-    IDialogService MudDialogService { get; set; } = null!;
+    IDialogService MudDialogService { get; set; } = default!;
 
     [Inject]
-    ISnapshotService SnapshotService { get; set; } = null!;
+    ISnapshotService SnapshotService { get; set; } = default!;
 
-    protected List<Participation> Participations { get; set; } = [];
     protected List<IntermediateSnapshot> SelectedParticipations { get; set; } = [];
     protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
-
-    protected override void OnInitialized()
-    {
-        try
-        {
-            Participations = SnapshotService.GetParticipations();
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-    }
 
     protected void SetButtonText(int id)
     {
@@ -89,22 +78,26 @@ public class SnapshotBehind : NComponent
         }
     }
 
-    protected void SendHandler(string snapshotType)
+    protected async Task SendHandler(string snapshotType)
     {
         try
         {
-            //consider backup before clear
-            foreach (var participation in SnapshotParticipations)
+            var snapshotPayload = new SnapshotPayload(SnapshotParticipations, snapshotType);
+            var snapshotModel = SnapshotModel.MapFrom(snapshotPayload);
+            var result = await SnapshotService.PublishSnapshotsAsync(snapshotModel);
+            if (result.IsSuccessful == false)
             {
-                NotifyHelper.Inform(
-                    $"Participation #{participation.Number} is being sent with Timestamp:{participation.Timestamp}"
-                );
+                NotifyHelper.Error("An error occurred while sending snapshots. Please try again.");
+                return;
             }
+            else
+            {
+                StateHasChanged();
+                NotifyHelper.Success($"Snapshots sent as {snapshotType}");
+            }
+            //consider backup before clear
             SnapshotParticipations.ForEach(p => SelectedParticipations.Remove(p));
             SnapshotParticipations.Clear();
-            NotifyHelper.Success(
-                $"Hello and welcome!\nYes, yes, yes! We are doing it.\n I have received word for {snapshotType}!\n Keep up the good work my man! \n Let's gooooooooooo..."
-            );
         }
         catch (Exception ex)
         {

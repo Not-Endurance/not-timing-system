@@ -1,27 +1,21 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using NTS.Application.Core;
-using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Warp.ACL.Entities;
-using NTS.Warp.ACL.Entities.Participations;
-using NTS.Warp.ACL.Enums;
-using NTS.Warp.ACL.Factories;
-using NTS.Warp.ACL.RPC.Procedures;
 using NTS.Warp.Features.Judge.Procedures;
 using NTS.Warp.Features.Witness;
+using NTS.Warp.Features.Witness.Procedures;
 
 namespace NTS.Warp.Features.Judge;
 
 internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 {
     readonly ILogger<JudgeRpcHub> _logger;
-    readonly IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> _witnessRelay;
+    readonly IHubContext<WitnessRpcHub, IWitnessClientProcedures> _witnessRelay;
     readonly PrimaryConnectionsContext _primaryConnections;
 
     public JudgeRpcHub(
         ILogger<JudgeRpcHub> logger,
-        IHubContext<WitnessRpcHub, ILegacyWitnessClientProcedures> witnessRelay,
+        IHubContext<WitnessRpcHub, IWitnessClientProcedures> witnessRelay,
         PrimaryConnectionsContext primaryConnections
     )
         : base(logger)
@@ -46,69 +40,33 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)
     {
-        var emsParticipation = Convert(request.Payload.Participation);
-        var entry = new EmsParticipantEntry(emsParticipation);
-        await _witnessRelay
-            .Clients.Group(request.EnduranceEventId)
-            .ReceiveEntryUpdate(entry, EmsCollectionAction.Remove);
+        var participation = request.Payload.Participation;
+        await _witnessRelay.Clients.Group(request.EnduranceEventId).Receive(participation);
     }
 
     public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
     {
-        var emsParticipation = Convert(request.Payload.Participation);
-        var participationEntry = new EmsParticipantEntry(emsParticipation);
-        await _witnessRelay
-            .Clients.Group(request.EnduranceEventId)
-            .ReceiveEntryUpdate(participationEntry, EmsCollectionAction.AddOrUpdate);
-
-        if (request.Payload.Participation.Phases.Any(x => x.IsComplete()))
-        {
-            var startlistEntry = CreateStartlistEntry(request.Payload.Participation);
-            await _witnessRelay
-                .Clients.Group(request.EnduranceEventId)
-                .ReceiveEntry(startlistEntry, EmsCollectionAction.AddOrUpdate);
-        }
+        var participation = request.Payload.Participation;
+        await _witnessRelay.Clients.Group(request.EnduranceEventId).Receive(participation);
     }
 
     public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
     {
+        var participation = request.Payload.Participation;
         _logger.LogInformation(
             "Phase completed IN: #{number}, OUT: {outTime}",
-            request.Payload.Participation.Combination.Number,
-            request.Payload.Participation.Phases.Last(x => x.StartTime != null).StartTime
+            participation.Combination.Number,
+            participation.Phases.Last(x => x.StartTime != null).StartTime
         );
 
-        var entry = CreateStartlistEntry(request.Payload.Participation);
+        await _witnessRelay.Clients.Group(request.EnduranceEventId).Receive(participation);
 
-        var serialized = JsonConvert.SerializeObject(entry);
+        var serialized = JsonConvert.SerializeObject(participation);
         _logger.LogInformation(
             "Phase completed OUT: #{number}, OUT: {outTime}, serialized: {serialized}",
-            entry.Number,
-            entry.StartTime,
+            participation.Combination.Number,
+            participation.Phases.Current.StartTime,
             serialized
         );
-
-        await _witnessRelay
-            .Clients.Group(request.EnduranceEventId)
-            .ReceiveEntry(entry, EmsCollectionAction.AddOrUpdate);
-    }
-
-    EmsStartlistEntry CreateStartlistEntry(Participation participation)
-    {
-        var emsParticipation = Convert(participation);
-        return new EmsStartlistEntry(emsParticipation);
-    }
-
-    EmsParticipation Convert(Participation participation)
-    {
-        var dto = ParticipationModel.MapFrom(participation);
-        return ParticipationFactory.CreateEms(dto);
     }
 }
-
-public interface IJudgeClientProcedures
-    : IParticipationClientProcedures,
-        IConnectionsClientProcedures,
-        IEnduranceEventClientProcedures { }
-
-public interface IJudgeHubProcedures : IParticipationHubProcedures { }

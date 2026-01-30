@@ -1,9 +1,10 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
+using Not.Blazor.Components;
 
 namespace NTS.Witness.Blazor.Components.Profiles;
 
-public class ProfileBehind : ComponentBase
+public class ProfileBehind : NComponent
 {
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
@@ -15,20 +16,41 @@ public class ProfileBehind : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        var roles = user.FindAll(ClaimTypes.Role);
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            var roles = user.FindAll(ClaimTypes.Role);
 
-        UserRoles = roles.Any() ? string.Join(", ", roles.Select(r => r.Value)) : "No roles assigned";
+            UserRoles = roles.Any() ? string.Join(", ", roles.Select(r => r.Value)) : "No roles assigned";
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected void SigninHandler()
     {
-        Navigator.NavigateTo(WitnessBlazorConstants.Pages.SIGNIN, forceLoad: true);
+        try
+        {
+            Navigator.NavigateTo(WitnessBlazorConstants.Pages.SIGNIN, forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected void SignoutHandler()
     {
-        Navigator.NavigateTo(WitnessBlazorConstants.Pages.SIGNOUT, forceLoad: true);
+        try
+        {
+            Navigator.NavigateTo(WitnessBlazorConstants.Pages.SIGNOUT, forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 }

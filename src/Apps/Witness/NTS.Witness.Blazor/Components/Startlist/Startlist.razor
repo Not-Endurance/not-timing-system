@@ -1,10 +1,15 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @using NTS.Blazor.Components.Startlist.Upcoming
+@using NTS.Blazor.Components.Startlist.History
+@using static WitnessBlazorConstants.UserRoles;
 
 @attribute [Route(WitnessBlazorConstants.Pages.STARTLIST)]
-@attribute [Authorize(Roles = "admin,official")]
+@attribute [Authorize(Roles = $"{ADMIN},{OFFICIAL}")]
 @inherits StartlistBehind
 
 <MudStack AlignItems="AlignItems.Center">
-    <StartlistUpcoming />
+    <MudPaper Elevation="0">
+        <StartlistUpcoming Class="my-10" />
+        <StartlistHistory />
+    </MudPaper>
 </MudStack>

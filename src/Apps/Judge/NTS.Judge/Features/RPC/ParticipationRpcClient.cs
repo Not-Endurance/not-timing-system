@@ -5,11 +5,11 @@ using Not.Application.RPC.SignalR;
 using Not.Async;
 using Not.Injection;
 using NTS.Application.Core;
+using NTS.Application.SignalR;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Features.Core.Dashboard;
-using NTS.Judge.Features.Warp;
 using NTS.Warp;
 using NTS.Warp.Features.Judge.Procedures;
 
@@ -55,7 +55,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures,
     }
 
     /// <summary>
-    /// Fetches active participations before and after Competitions are started.
+    /// Fetches active participations after Competitions are started.
     /// </summary>
     /// <returns>Collection of active (not eliminated or completed) participations</returns>
     public async Task<IEnumerable<ParticipationModel>> GetActive()
@@ -89,7 +89,7 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures,
         return _eventContext.Event!.Id.ToString();
     }
 
-    class HubProcedures : IParticipationHubProcedures
+    class HubProcedures : IJudgeHubProcedures
     {
         readonly IRpcSocket _socket;
 

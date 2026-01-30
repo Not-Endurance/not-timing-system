@@ -1,7 +1,7 @@
 using Not.Blazor.Navigation;
+using NTS.Application.SignalR;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Setup.UpcomingEvents;
-using NTS.Judge.Features.Warp;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents;
 
@@ -13,13 +13,13 @@ public partial class EnduranceEventPage
     ICrumbsNavigator Navigator { get; set; } = default!;
 
     [Inject]
-    IRpcContext<UpcomingEvent> RpcContext { get; set; } = default!;
+    IGroupSocketContext<UpcomingEvent> RpcContext { get; set; } = default!;
 
     protected override void OnInitialized()
     {
         _upcomingEvent = Navigator.ConsumeParameter<UpcomingEventFormModel>();
         // TODO: come up with somethig more elegant. Maybe pass aggregates in navigaion?
-        RpcContext.Set(
+        RpcContext.Connect(
             new UpcomingEvent(
                 _upcomingEvent.Name,
                 _upcomingEvent.Place,

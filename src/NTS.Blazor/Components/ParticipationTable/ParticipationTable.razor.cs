@@ -18,9 +18,6 @@ public partial class ParticipationTable
     [Inject]
     CrudeDialog<PhaseUpdateModel, PhaseForm> Dialog { get; set; } = default!;
 
-    [Parameter, EditorRequired]
-    public int Number { get; set; }
-
     [Parameter]
     public PhaseCollection? Phases { get; set; }
 

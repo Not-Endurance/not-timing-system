@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NTS.Witness.Blazor\NTS.Witness.Blazor.csproj" />
     <ProjectReference Include="..\NTS.Witness\NTS.Witness.csproj" />
 	</ItemGroup>
 

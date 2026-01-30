@@ -1,17 +1,12 @@
 ﻿using System.Text;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.Rewrite;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
+using NTS.Application.Factories;
+using NTS.Application.SignalR;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Start.Factories;
-using NTS.Judge.Features.Warp;
-using Competition = NTS.Domain.Core.Aggregates.Participations.Objects.Competition;
-using Official = NTS.Domain.Core.Aggregates.Official;
-using Participation = NTS.Domain.Core.Aggregates.Participation;
 
 namespace NTS.Judge.Features.Core.Start;
 

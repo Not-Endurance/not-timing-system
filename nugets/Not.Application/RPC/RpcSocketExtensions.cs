@@ -41,18 +41,22 @@ public static class RpcSocketExtensions
         }
     }
 
-    public static async Task<RpcInvokeResult<T>> InvokeOutputProcedure<T>(this IRpcSocket socket, string name)
+    public static async Task<RpcInvokeResult<TResult>> InvokeInputOutputProcedure<T, TResult>(
+        this IRpcSocket socket,
+        string name,
+        T parameter
+    )
     {
         try
         {
             await EnsureConnected(socket);
-            var result = await socket.Connection!.InvokeAsync<T>(name);
-            return RpcInvokeResult<T>.Success(result);
+            var result = await socket.Connection!.InvokeAsync<TResult>(name, parameter);
+            return RpcInvokeResult<TResult>.Success(result);
         }
         catch (Exception exception)
         {
             socket.RaiseError(exception, name);
-            return RpcInvokeResult<T>.Error;
+            return RpcInvokeResult<TResult>.Error;
         }
     }
 
