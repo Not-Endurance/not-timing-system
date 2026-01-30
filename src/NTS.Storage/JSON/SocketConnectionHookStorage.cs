@@ -8,11 +8,11 @@ using NTS.Storage.Setup;
 
 namespace NTS.Storage.JSON;
 
-public class SelectedEventStore : LockingJsonFileStore<SetupState>, IConnectedEventContext
+public class SocketConnectionHookStorage : LockingJsonFileStore<SetupState>, ISocketConnectionHookStorage
 {
     readonly IRepository<UpcomingEvent> _upcomingEvents;
 
-    public SelectedEventStore(
+    public SocketConnectionHookStorage(
         [FromKeyedServices("NDataKey")] IFilesystemContext configuration,
         IRepository<UpcomingEvent> upcomingEvents
     )
@@ -21,7 +21,7 @@ public class SelectedEventStore : LockingJsonFileStore<SetupState>, IConnectedEv
         _upcomingEvents = upcomingEvents;
     }
 
-    public async Task<UpcomingEvent?> Initialize()
+    public async Task<UpcomingEvent?> GetConnectionHook()
     {
         var setup = await Readonly();
         if (setup.ConnectedEventId == null)
@@ -37,7 +37,7 @@ public class SelectedEventStore : LockingJsonFileStore<SetupState>, IConnectedEv
         return upcomingEvent;
     }
 
-    public async Task Set(UpcomingEvent upcomingEvent)
+    public async Task CommitConnectionHook(UpcomingEvent upcomingEvent)
     {
         var setup = await Transact();
         setup.ConnectedEventId = upcomingEvent?.Id;

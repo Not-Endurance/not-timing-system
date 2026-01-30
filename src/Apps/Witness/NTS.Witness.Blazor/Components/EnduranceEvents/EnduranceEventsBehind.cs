@@ -11,7 +11,7 @@ public class EnduranceEventsBehind : ComponentBase
     IRepository<UpcomingEvent> Repository { get; set; } = default!;
 
     [Inject]
-    ISocketContext<UpcomingEvent> RpcContext { get; set; } = default!;
+    IGroupSocketContext<UpcomingEvent> RpcContext { get; set; } = default!;
 
     [Inject]
     IConnectionStatus ConnectionStatus { get; set; } = default!;

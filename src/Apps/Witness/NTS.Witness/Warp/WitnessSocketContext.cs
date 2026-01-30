@@ -6,25 +6,23 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.Warp;
 
-public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, ISocketContext<UpcomingEvent>
+public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IGroupSocketContext<UpcomingEvent>
 {
     readonly IRpcSocket _socket;
-    readonly WarpContext _warpContext;
 
-    public WitnessSocketContext(IRpcSocket socket, WarpContext warpContext)
+    public WitnessSocketContext(IRpcSocket socket)
     {
         _socket = socket;
-        _warpContext = warpContext;
     }
 
-    public UpcomingEvent? Event { get; private set; }
-
-    public UpcomingEvent? Anchor => Event;
+    public UpcomingEvent? Hook { get; private set; }
+    public string? ConnectionGroupKey => Hook?.Id.ToString();
+    public UpcomingEvent? Event => Hook;
 
     public async Task Disconnect()
     {
-        var @event = Event;
-        InternalSetEvent(null);
+        var @event = Hook;
+        Hook = null;
         await _socket.Disconnect();
         if (!_socket.IsConnected && @event != null)
         {
@@ -34,30 +32,25 @@ public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IS
 
     public async Task Connect(UpcomingEvent upcomingEvent)
     {
-        if (Event == upcomingEvent)
+        if (Hook == upcomingEvent)
         {
             return;
         }
-        if (Event != null)
+        if (Hook != null)
         {
-            NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Event.Name));
+            NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Hook.Name));
             return;
         }
-        InternalSetEvent(upcomingEvent);
+        Hook = upcomingEvent;
         await _socket.Connect();
-        if (_socket.IsConnected && Event != null)
+        if (_socket.IsConnected && Hook != null)
         {
-            NotifyHelper.Inform(string.Format(Connected_to__string, Event.Name));
+            NotifyHelper.Inform(string.Format(Connected_to__string, Hook.Name));
         }
     }
 
     public bool IsConnected()
     {
         return _socket.IsConnected;
-    }
-
-    void InternalSetEvent(UpcomingEvent? upcomingEvent)
-    {
-        _warpContext.Configure(Event = upcomingEvent);
     }
 }

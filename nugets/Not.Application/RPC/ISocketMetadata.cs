@@ -2,7 +2,7 @@ using Not.Injection;
 
 namespace Not.Application.RPC;
 
-public interface IRpcMetadata : ISingleton
+public interface ISocketMetadata : ISingleton
 {
     string? ConnectionGroupKey { get; }
 }

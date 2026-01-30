@@ -11,11 +11,11 @@ namespace Not.Application.RPC.SignalR;
 
 public class SignalRSocket : IRpcSocket, IAsyncDisposable
 {
-    readonly IRpcMetadata? _metadata;
+    readonly ISocketMetadata? _metadata;
     readonly RpcSettings _context;
     readonly string _name;
 
-    public SignalRSocket(IOptions<RpcSettings> options, IRpcMetadata? metadata = null)
+    public SignalRSocket(IOptions<RpcSettings> options, ISocketMetadata? metadata = null)
     {
         _metadata = metadata;
         _context = Validate(options.Value);

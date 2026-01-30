@@ -6,22 +6,22 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Warp;
 
-public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsync, ISocketContext<UpcomingEvent>
+public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsync, IGroupSocketContext<UpcomingEvent>
 {
-    readonly IConnectedEventContext _connectedEventContext;
+    readonly ISocketConnectionHookStorage _socketConnectionHookStorage;
     readonly IRpcSocket _socket;
-    readonly WarpContext _warpContext;
 
-    public JudgeSocketContext(IConnectedEventContext connectedEventContext, IRpcSocket socket, WarpContext warpContext)
+    public JudgeSocketContext(ISocketConnectionHookStorage socketConnectionHookStorage, IRpcSocket socket)
     {
-        _connectedEventContext = connectedEventContext;
+        _socketConnectionHookStorage = socketConnectionHookStorage;
         _socket = socket;
-        _warpContext = warpContext;
     }
 
-    public UpcomingEvent? Event { get; private set; }
+    public UpcomingEvent? Hook { get; private set; }
 
-    public UpcomingEvent? Anchor => Event;
+    public UpcomingEvent? Event => Hook;
+
+    public string? ConnectionGroupKey => throw new NotImplementedException();
 
     public async Task Disconnect()
     {
@@ -31,13 +31,13 @@ public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsyn
 
     public async Task Connect(UpcomingEvent upcomingEvent)
     {
-        if (Event == upcomingEvent)
+        if (Hook == upcomingEvent)
         {
             return;
         }
-        if (Event != null)
+        if (Hook != null)
         {
-            throw new DomainException(Cannot_select_another_event_without_resetting__string, Event);
+            throw new DomainException(Cannot_select_another_event_without_resetting__string, Hook);
         }
         await InternalSetEvent(upcomingEvent);
         await _socket.Connect();
@@ -45,12 +45,12 @@ public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsyn
 
     public async Task RunAtStartupAsync()
     {
-        var upcomingEvent = await _connectedEventContext.Initialize();
-        if (upcomingEvent == null)
+        var hook = await _socketConnectionHookStorage.GetConnectionHook();
+        if (hook == null)
         {
             return;
         }
-        _warpContext.Configure(Event = upcomingEvent);
+        Hook = hook;
         await _socket.Connect();
     }
 
@@ -58,8 +58,8 @@ public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsyn
     {
         if (upcomingEvent != null)
         {
-            await _connectedEventContext.Set(upcomingEvent);
+            await _socketConnectionHookStorage.CommitConnectionHook(upcomingEvent);
         }
-        _warpContext.Configure(Event = upcomingEvent);
+        Hook = upcomingEvent;
     }
 }

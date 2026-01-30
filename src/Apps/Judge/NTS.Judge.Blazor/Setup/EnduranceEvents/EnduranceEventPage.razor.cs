@@ -13,7 +13,7 @@ public partial class EnduranceEventPage
     ICrumbsNavigator Navigator { get; set; } = default!;
 
     [Inject]
-    ISocketContext<UpcomingEvent> RpcContext { get; set; } = default!;
+    IGroupSocketContext<UpcomingEvent> RpcContext { get; set; } = default!;
 
     protected override void OnInitialized()
     {
