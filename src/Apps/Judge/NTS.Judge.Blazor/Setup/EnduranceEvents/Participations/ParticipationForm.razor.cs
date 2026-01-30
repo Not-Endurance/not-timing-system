@@ -3,7 +3,7 @@ using Not.Application.Services;
 using Not.Blazor.Components;
 using Not.Strings;
 using NTS.Blazor.Constants;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Participations;
 

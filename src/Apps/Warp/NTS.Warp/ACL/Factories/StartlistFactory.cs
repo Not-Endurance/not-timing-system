@@ -1,11 +1,11 @@
-using NTS.Application.Models;
+using NTS.Application.Core;
 using NTS.Warp.ACL.Entities;
 
 namespace NTS.Warp.ACL.Factories;
 
 public static class StartlistFactory
 {
-    public static Dictionary<int, EmsStartlist> Create(IEnumerable<CoreParticipationModel> participations)
+    public static Dictionary<int, EmsStartlist> Create(IEnumerable<ParticipationModel> participations)
     {
         var emsParticipations = participations.Select(ParticipationFactory.CreateEms);
         var startlists = new Dictionary<int, EmsStartlist>();

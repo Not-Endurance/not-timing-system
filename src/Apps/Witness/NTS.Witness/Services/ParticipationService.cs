@@ -1,6 +1,6 @@
 ﻿using Not.Collections;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Objects;
 using NTS.Witness.Blazor.Components.Performances;
 using NTS.Witness.Blazor.Components.Snapshots;

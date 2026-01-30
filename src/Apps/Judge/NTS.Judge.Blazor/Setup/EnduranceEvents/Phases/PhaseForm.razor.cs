@@ -2,7 +2,7 @@ using MudBlazor;
 using Not.Application.Services;
 using Not.Blazor.Components;
 using Not.Structures;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Blazor.Setup.EnduranceEvents.Phases;
 

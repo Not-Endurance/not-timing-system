@@ -4,11 +4,11 @@
 @using NTS.Judge.Blazor.Shared.Components.SidePanels
 
 @attribute [Route(DASHBOARD_PAGE)]
-@inherits NComponent
+@inherits DashboardPageBehind
 
 <NContent Title="@Dashboard_string" HasContent="@true" EmptyMessage="@The_Competitions_havent_started_yet_string">
     <Main>
-        @if (CoreService.IsStarted) @* Add Empty RenderFragment instead of EmptyMessage *@
+        @if (Service.IsStarted) @* Add Empty RenderFragment instead of EmptyMessage *@
         {
             <Dashboard />
         }

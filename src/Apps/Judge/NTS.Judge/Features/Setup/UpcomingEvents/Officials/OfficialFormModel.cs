@@ -1,6 +1,6 @@
 ﻿using Not.Application.Services;
 using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Officials;
 

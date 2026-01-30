@@ -1,5 +1,4 @@
-﻿using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
+﻿using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Domain.Core.Objects.Documents;
 

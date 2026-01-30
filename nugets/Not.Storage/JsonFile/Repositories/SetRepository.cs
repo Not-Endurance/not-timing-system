@@ -1,13 +1,13 @@
 ﻿using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
-using Not.Domain.Aggregates;
+using Not.Domain;
 using Not.Storage.JsonFile.States;
 using Not.Storage.JsonFile.Stores;
 
 namespace Not.Storage.JsonFile.Repositories;
 
 public abstract class SetRepository<T, TState> : ReadonlySetRepository<T, TState>, IRepository<T>
-    where T : AggregateRoot
+    where T : Aggregate
     where TState : class, ISetState<T>, new()
 {
     public SetRepository(IStore<TState> store)

@@ -1,12 +1,10 @@
-﻿using Not.Domain.Aggregates;
-using NTS.Domain.Enums;
+﻿using NTS.Domain.Enums;
 
 namespace NTS.Domain.Aggregates;
 
-public class Snapshot : AggregateRoot
+public record Snapshot
 {
     public Snapshot(int number, SnapshotType type, SnapshotMethod method, Timestamp timestamp)
-        : base(GenerateId())
     {
         Number = number;
         Type = type;

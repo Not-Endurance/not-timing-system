@@ -1,5 +1,6 @@
 using Not.Notify;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 
 namespace NTS.Judge.Blazor.Core.Dashboards.Actions.Eliminations.EliminationForms;
 

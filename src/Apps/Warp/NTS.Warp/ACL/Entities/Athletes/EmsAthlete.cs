@@ -1,5 +1,3 @@
-using NTS.Domain.Aggregates;
-using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Warp.ACL.Abstractions;
 using NTS.Warp.ACL.Entities.Countries;
@@ -7,7 +5,7 @@ using NTS.Warp.ACL.Enums;
 
 namespace NTS.Warp.ACL.Entities.Athletes;
 
-public class EmsAthlete : EmsDomainBase<EmsAthleteException>, IAthlete
+public class EmsAthlete : EmsDomainBase<EmsAthleteException>
 {
     const int ADULT_AGE_IN_YEARS = 18;
 
@@ -43,11 +41,9 @@ public class EmsAthlete : EmsDomainBase<EmsAthleteException>, IAthlete
     public EmsCountry Country { get; internal set; }
     public string Name => $"{FirstName} {LastName}";
     public Person Names => new([FirstName, LastName]);
-    Country IAthlete.Country => new(0, Country.Name, Country.IsoCode, null, null);
-    IClub? IAthlete.Club => new EmsClubIntermediate(Club);
 }
 
-public class EmsClubIntermediate : IClub
+public class EmsClubIntermediate
 {
     public EmsClubIntermediate(string name)
     {

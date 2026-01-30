@@ -5,7 +5,7 @@ using Not.Exceptions;
 using Not.Observables.Structures;
 using Not.Safe;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Features.Core.Reset;
@@ -39,7 +39,7 @@ public class HandoutsBehind
 
     public IReadOnlyList<HandoutDocument> Documents => State;
 
-    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override async Task<bool> InitializeState()
     {
         var handouts = await _handoutRepository.ReadMany();
         var enduranceEvent = await _events.Read(0);
@@ -53,8 +53,7 @@ public class HandoutsBehind
             return true;
         }
         var documents = handouts.Select(handout => new HandoutDocument(handout, enduranceEvent, officials));
-        State.Clear();
-        State.AddRange(documents);
+        State.Replace(documents);
         return true;
     }
 

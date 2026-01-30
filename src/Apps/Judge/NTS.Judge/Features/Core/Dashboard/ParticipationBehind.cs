@@ -16,12 +16,11 @@ namespace NTS.Judge.Features.Core.Dashboard;
 
 public class ParticipationBehind
     : NStatefulService,
-        IInspections,
-        IEliminations,
-        IDashboardBehind,
+        IInspectionService,
+        IEliminationService,
+        IDashboardService,
         IUpdateBehind<PhaseUpdateModel>,
         ISnapshotProcessor,
-        IManualProcessor,
         IStartupInitializerAsync,
         ICoreDependentObservables
 {
@@ -58,7 +57,7 @@ public class ParticipationBehind
         }
     }
 
-    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override async Task<bool> InitializeState()
     {
         Participations = await _participationRepository.ReadMany();
         SelectedParticipation = Participations.FirstOrDefault();
@@ -67,7 +66,7 @@ public class ParticipationBehind
 
     public async Task RunAtStartupAsync()
     {
-        await CreateState();
+        await InitializeState();
     }
 
     public async Task Update(PhaseUpdateModel model)
@@ -90,7 +89,7 @@ public class ParticipationBehind
         await SafeHelper.Run(action);
     }
 
-    public async Task RequireInspection(bool isRequested)
+    public async Task RequireRepresent(bool isRequested)
     {
         Task action() => SafeRequestRequiredInspection(isRequested);
         await SafeHelper.Run(action);
@@ -129,12 +128,6 @@ public class ParticipationBehind
         await SafeHelper.Run(SafeRestoreQualification);
     }
 
-    public async Task Process(Timestamp timestamp)
-    {
-        Task action() => SafeProcess(timestamp);
-        await SafeHelper.Run(action);
-    }
-
     async Task SafeUpdate(PhaseUpdateModel model)
     {
         var participation = Participations.FirstOrDefault(x => x.Phases.Any(y => y.Id == model.Id));
@@ -159,17 +152,6 @@ public class ParticipationBehind
         await _participationRepository.Update(SelectedParticipation);
 
         EmitChanged();
-    }
-
-    async Task SafeProcess(Timestamp timestamp)
-    {
-        var snapshot = new Snapshot(
-            SelectedParticipation!.Combination.Number,
-            SnapshotType.Automatic,
-            SnapshotMethod.Manual,
-            timestamp
-        );
-        await SafeProcess(snapshot);
     }
 
     async Task SafeProcess(Snapshot snapshot)

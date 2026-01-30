@@ -1,6 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using NTS.Application.Models;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Nexus;
@@ -15,9 +15,9 @@ public class InquiryBehind : NStatefulService, IInquiryBehind
     }
 
     public IEnumerable<RankingEntry>? Match { get; private set; }
-    public IReadOnlyList<ArchiveModel> Records { get; private set; } = [];
+    public IReadOnlyList<ArchiveEntryModel> Records { get; private set; } = [];
 
-    protected override Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override Task<bool> InitializeState()
     {
         return Task.FromResult(true);
     }

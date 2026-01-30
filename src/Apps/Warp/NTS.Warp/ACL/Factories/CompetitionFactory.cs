@@ -1,5 +1,5 @@
 ﻿using Not.Extensions;
-using NTS.Application.Models;
+using NTS.Application.Core;
 using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Competitions;
 using NTS.Warp.ACL.Models;
@@ -8,7 +8,7 @@ namespace NTS.Warp.ACL.Factories;
 
 public class CompetitionFactory
 {
-    public static EmsCompetition Create(CoreParticipationModel participation)
+    public static EmsCompetition Create(ParticipationModel participation)
     {
         if (participation.Competition == null)
         {

@@ -5,16 +5,15 @@ namespace NTS.Blazor.Components.Startlist.History;
 public class StartlistHistoryBehind : StartlistBehindBase
 {
     [Inject]
-    public IStartHistory Behind { get; set; } = default!;
+    protected IStartHistory Service { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Behind, []);
-        CreateStartlistsByStage(Behind.History);
+        await Observe(Service);
     }
 
     protected override void OnBeforeRender()
     {
-        CreateStartlistsByStage(Behind.History);
+        CreateStartlistsByStage(Service.History);
     }
 }

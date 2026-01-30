@@ -1,13 +1,16 @@
 ﻿@namespace Not.Blazor.Components
 @inherits NComponent
 
-@if (!IsInitialized)
+@if (_showOnlyMain)
 {
-    <NSkeleton />
-}
-else if (_showOnlyMain)
-{
-    <MudPaper Elevation="0" Class="@CombineClass("pa-4 ")" Style="@Style">@Main</MudPaper>
+    if (IsLoading)
+    {
+        <NSkeleton Lines="10"/>
+    }
+    else
+    {
+        <MudPaper Elevation="0" Class="@CombineClass("pa-4 ")" Style="@Style">@Main</MudPaper>
+    }
 }
 else
 {
@@ -16,41 +19,66 @@ else
             <NHeadline Content="@Title" IsAbsoluteCenter />
         </MudItem>
 
-        @if (!HasContent)
+        @if (IsLoading)
         {
             <MudItem xs="@MainXs">
-                <MudPaper Elevation="3" Class="not-mid-height pa-12">
-                    @if (EmptyMessage != null)
-                    {
-                        <NHeadline2 Content="@EmptyMessage" IsAbsoluteCenter/>
-                    }
-
-                    @if (EmptyContent != null)
-                    {
-                        @EmptyContent
-                    }
-                </MudPaper>
+                <NSkeleton Lines="10" />
             </MudItem>
         }
         else
         {
-            <MudItem xs="@MainXs" Class="not-page-content">
-                <MudPaper Elevation="3" Class="@CombineClass("pa-4 ")" Style="@Style">@Main</MudPaper>
-            </MudItem>
+            if (!HasContent)
+            {
+                <MudItem xs="@MainXs">
+                    <MudPaper Elevation="3" Class="not-mid-height pa-12">
+                        @if (EmptyMessage != null)
+                        {
+                            <NHeadline2 Content="@EmptyMessage" IsAbsoluteCenter />
+                        }
 
-            if (Main2 != null)
+                        @if (EmptyContent != null)
+                        {
+                            @EmptyContent
+                        }
+                    </MudPaper>
+                </MudItem>
+            }
+            else
             {
                 <MudItem xs="@MainXs" Class="not-page-content">
-                    <MudPaper Elevation="3" Class="pa-4">@Main2</MudPaper>
+                    <MudPaper Elevation="3" Class="@CombineClass("pa-4 ")" Style="@Style">@Main</MudPaper>
                 </MudItem>
+
+                if (Main2 != null)
+                {
+                    if (IsLoading)
+                    {
+                        <NSkeleton Lines="4" />
+                    }
+                    else
+                    {
+                        <MudItem xs="@MainXs" Class="not-page-content">
+                            <MudPaper Elevation="3" Class="pa-4">@Main2</MudPaper>
+                        </MudItem>
+                    }
+                }
             }
         }
 
         @if (Rightbar != null)
         {
-            <MudItem xs="@RightBarXS" Class="not-page-rightbar">
-                @Rightbar
-            </MudItem>
+            if (IsLoading)
+            {
+                <MudItem xs="@RightBarXS" Class="not-page-rightbar">
+                    <NSkeleton Lines="6" />
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="@RightBarXS" Class="not-page-rightbar">
+                    @Rightbar
+                </MudItem>
+            }
         }
     </NGrid>
 }

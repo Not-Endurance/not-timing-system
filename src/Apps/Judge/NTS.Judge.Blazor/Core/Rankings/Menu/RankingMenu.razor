@@ -1,19 +1,26 @@
 ﻿@using NTS.Domain.Core.Aggregates
-@inherits RankingMenuBehind;
+@inherits RankingMenuBehind
+
+@if (IsLoading)
+{
+    return;
+}
 
 @* //TODO: probably extract this chipset into NotChipGroup component or something similar. Also used in DashboardComponent *@
-@if (SelectedRanking != null)
-{
-    <MudChipSet T="Ranking" SelectedValue="@SelectedRanking" SelectedValueChanged="Select" Class="@Class" Style="@Style">
+<MudChipSet T="Ranking" SelectedValue="@Service.Current" SelectedValueChanged="Select" Class="@Class" Style="@Style">
 
-        @foreach (var grouping in Rankings.GroupBy(x => x.Name))
+    @foreach (var grouping in Rankings.GroupBy(x => x.Name))
+    {
+        <NTextDivider Text="@grouping.Key" />
+        @foreach (var ranking in grouping.OrderBy(x => x.Category))
         {
-            <NTextDivider Text="@grouping.Key" />
-            @foreach (var ranking in grouping.OrderBy(x => x.Category))
-            {
-                <MudChip T="Ranking" Text="@ranking.Category.ToString()" Value="@ranking" OnClose="x => OpenDeleteDialog(x)" Color="Color.Primary" Style="min-width: 1rem"  />
-            }
+            <MudChip T="Ranking"
+                     Text="@ranking.Category.ToString()"
+                     Value="@ranking"
+                     OnClose="x => OpenDeleteDialog(x)"
+                     Color="Color.Primary"
+                     Style="min-width: 1rem" />
         }
-    </MudChipSet>    
-}
+    }
+</MudChipSet>
 

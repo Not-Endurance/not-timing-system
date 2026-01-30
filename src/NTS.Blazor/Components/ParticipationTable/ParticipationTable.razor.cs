@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Dialogs;
 using NTS.Blazor.Components.ParticipationTable.Phases;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 
 namespace NTS.Blazor.Components.ParticipationTable;
 
@@ -55,6 +56,6 @@ public partial class ParticipationTable
     {
         var model = new PhaseUpdateModel(phase);
         await Dialog.RenderUpdate(model);
-        await Render();
+        await InvokeRender();
     }
 }

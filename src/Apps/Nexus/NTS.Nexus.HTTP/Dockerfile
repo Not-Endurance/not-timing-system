@@ -6,14 +6,18 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 
-COPY / /src
+COPY /src /nexus/src
+COPY /nugets /nexus/nugets
+COPY .editorconfig /nexus/.editorconfig
+
+WORKDIR /nexus
 
 # Remove local-source
-RUN dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config
+RUN dotnet nuget remove source "local-cache" --configfile src/NuGet.config
 # Remove analyzers dll reference
 RUN rm -f ./src/Directory.Build.props
 
-WORKDIR /src/Nexus/NTS.Nexus.HTTP
+WORKDIR /nexus/src/Apps/Nexus/NTS.Nexus.HTTP
 
 # 2. Restore + Build
 RUN dotnet restore "NTS.Nexus.HTTP.csproj" 

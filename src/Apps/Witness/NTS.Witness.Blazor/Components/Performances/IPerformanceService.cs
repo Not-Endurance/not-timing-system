@@ -1,5 +1,5 @@
 ﻿using Not.Injection;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Objects;
 
 namespace NTS.Witness.Blazor.Components.Performances;

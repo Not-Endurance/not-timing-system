@@ -1,6 +1,4 @@
-﻿using Not.Domain.Aggregates;
-
-namespace Not.Application.Krud.Abstractions;
+﻿namespace Not.Application.Krud.Abstractions;
 
 public interface IKrudNodeSetter
 {

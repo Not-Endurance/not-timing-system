@@ -3,7 +3,7 @@ using Not.Events;
 
 namespace Not.Blazor.Components;
 
-public abstract class PrintableComponent : NComponent, IDisposable
+public abstract class PrintableComponent : NStatefulComponent, IDisposable
 {
     public delegate void ToggleVisibility();
 
@@ -36,8 +36,9 @@ public abstract class PrintableComponent : NComponent, IDisposable
     /// </summary>
     protected virtual void VisibilityToggleHook() { }
 
-    public void Dispose()
+    public override void Dispose()
     {
+        base.Dispose();
         // Figure out how to unsubscribe at instance level. Consider ditching static events?
         //_toggleEvent.UnsubscribeAll();
     }

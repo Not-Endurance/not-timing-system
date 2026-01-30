@@ -1,7 +1,8 @@
 using Not.Domain.Exceptions;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Enums;
+using NTS.Domain.Objects;
 
 namespace NTS.Judge.Features.Core.Start.Factories;
 
@@ -10,7 +11,10 @@ public static class ParticipationAndRankingFactory
     public static (
         List<Participation> Participations,
         Dictionary<ParticipationCategory, List<RankingEntry>> RankingEntriesByCategory
-    ) Create(Domain.Setup.Aggregates.Competition setupCompetition, IEnumerable<Participation> existingParticipations)
+    ) Create(
+        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
+        IEnumerable<Participation> existingParticipations
+    )
     {
         if (setupCompetition.Phases.Count == 0)
         {
@@ -34,7 +38,7 @@ public static class ParticipationAndRankingFactory
             if (existingParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
-                var rankingEntry = new RankingEntry(participation, setupParticipation.IsNotRanked);
+                var rankingEntry = new RankingEntry(participation, null, setupParticipation.IsNotRanked);
                 AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
             }
             else
@@ -44,7 +48,7 @@ public static class ParticipationAndRankingFactory
                     .Find(p => p.Combination.Number == participation.Combination.Number);
                 if (participationRef != null)
                 {
-                    var rankingEntry = new RankingEntry(participationRef, setupParticipation.IsNotRanked);
+                    var rankingEntry = new RankingEntry(participationRef, null, setupParticipation.IsNotRanked);
                     AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
                 }
             }
@@ -53,31 +57,55 @@ public static class ParticipationAndRankingFactory
     }
 
     static Participation CreateParticipation(
-        Domain.Setup.Aggregates.Competition setupCompetition,
-        Domain.Setup.Aggregates.Participation setupParticipation
+        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
+        Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation
     )
     {
         var phases = CreatePhases(setupCompetition);
         var totalDistance = setupCompetition.Phases.Sum(x => (decimal)x.Loop!.Distance);
-        var combination = new Combination(
-            setupParticipation.Combination.Number,
-            setupParticipation.Combination.Athlete,
-            setupParticipation.Combination.Horse,
+        var combination = CreateCombination(
+            setupParticipation.Combination,
             totalDistance,
             setupParticipation.MinAverageSpeed,
             setupParticipation.MaxAverageSpeed
         );
         return new Participation(
-            setupCompetition.Name,
             setupParticipation.Category,
-            setupCompetition.Ruleset,
-            setupCompetition.Type,
+            new(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type),
             combination,
-            phases
+            new(phases),
+            null,
+            setupParticipation.Id
         );
     }
 
-    static List<Phase> CreatePhases(Domain.Setup.Aggregates.Competition setupCompetition)
+    static Combination CreateCombination(
+        Domain.Setup.Aggregates.UpcomingEvents.Combination combination,
+        decimal totalDistance,
+        double? minAverageSpeed,
+        double? maxAverageSpeed
+    )
+    {
+        var setupAthlete = combination.Athlete;
+        var setupHorse = combination.Horse;
+        var setupClub = combination.Athlete.Club;
+
+        var club = setupClub == null ? null : new Club(setupClub.Name, setupClub.Id);
+        var athlete = new Athlete(setupAthlete.Names, setupAthlete.Country, club, setupAthlete.FeiId, setupAthlete.Id);
+        var horse = new Horse(setupHorse.Name, setupHorse.FeiId, setupHorse.Id);
+        return new Combination(
+            combination.Number,
+            athlete,
+            horse,
+            athlete.Club,
+            Combination.FormatDistance(totalDistance),
+            minAverageSpeed,
+            maxAverageSpeed,
+            combination.Id
+        );
+    }
+
+    static List<Phase> CreatePhases(Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition)
     {
         DateTimeOffset? startTime = setupCompetition.Start.ToUniversalTime();
         var setupPhases = setupCompetition.Phases;
@@ -93,13 +121,20 @@ public static class ParticipationAndRankingFactory
                 );
             }
             var corePhase = new Phase(
+                "",
                 setupPhase.Loop!.Distance,
                 setupPhase.Recovery,
                 setupPhase.Rest,
                 setupCompetition.Ruleset,
                 isFinal,
                 setupCompetition.CompulsoryThresholdSpan,
-                startTime
+                Timestamp.Create(startTime),
+                null,
+                null,
+                null,
+                false,
+                false,
+                false
             );
             startTime = null; //Set only first phase StartTime
             phases.Add(corePhase);

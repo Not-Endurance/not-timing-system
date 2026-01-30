@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using NTS.Application.Models;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Warp.ACL.Entities;
@@ -101,7 +101,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     EmsParticipation Convert(Participation participation)
     {
-        var dto = CoreParticipationModel.MapFrom(participation);
+        var dto = ParticipationModel.MapFrom(participation);
         return ParticipationFactory.CreateEms(dto);
     }
 }

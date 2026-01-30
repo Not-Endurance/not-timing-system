@@ -1,5 +1,5 @@
 ﻿using Not.Extensions;
-using NTS.Application.Models;
+using NTS.Application.Core;
 using NTS.Domain.Enums;
 using NTS.Warp.ACL.Entities.Athletes;
 using NTS.Warp.ACL.Entities.Countries;
@@ -10,7 +10,7 @@ namespace NTS.Warp.ACL.Factories;
 
 public class AthleteFactory
 {
-    public static EmsAthlete Create(CoreAthleteModel athlete)
+    public static EmsAthlete Create(AthleteModel athlete)
     {
         var athleteState = new EmsAthleteState
         {

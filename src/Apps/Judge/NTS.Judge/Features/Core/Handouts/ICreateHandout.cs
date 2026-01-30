@@ -1,4 +1,4 @@
-﻿using NTS.Domain.Core.Aggregates.Participations;
+﻿using NTS.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NTS.Judge.Features.Core.Handouts;
 

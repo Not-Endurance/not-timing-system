@@ -1,12 +1,12 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain;
 using Not.Domain.Exceptions;
 
 namespace NTS.Domain.LocalizationDemo;
 
-public class LocalizationTest : AggregateRoot
+public class LocalizationTest : Aggregate
 {
     public LocalizationTest()
-        : base(GenerateId()) { }
+        : base(null) { }
 
     public string Success()
     {

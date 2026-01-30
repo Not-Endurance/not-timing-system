@@ -51,13 +51,13 @@ public abstract class IntegrationTest : IDisposable
 
     protected IServiceProvider Provider { get; private set; }
 
-    protected async Task<T> GetBehind<T>(Action<string> log)
+    protected async Task<T> GetBehind<T>(Action<string> _)
         where T : notnull
     {
         var behind = Provider.GetRequiredService<T>();
         if (behind is IStatefulService observableBehind)
         {
-            await observableBehind.Initialize([log]);
+            await observableBehind.Load();
         }
         return behind;
     }

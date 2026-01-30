@@ -46,7 +46,7 @@ public class CoreService : NStatefulService, ICoreService
 
     public bool IsStarted { get; private set; }
 
-    protected override async Task<bool> CreateState(params IEnumerable<object> arguments)
+    protected override async Task<bool> InitializeState()
     {
         var enduranceEvents = await _events.Read(0);
         IsStarted = enduranceEvents != null;
@@ -72,6 +72,7 @@ public class CoreService : NStatefulService, ICoreService
         {
             observable.ResetState();
         }
+        EmitChanged();
     }
 
     public async Task LoadArchive(int archiveId)

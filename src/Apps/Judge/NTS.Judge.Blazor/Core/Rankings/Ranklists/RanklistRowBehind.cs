@@ -1,6 +1,7 @@
 using Not.Blazor.Components;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Objects;
 
 namespace NTS.Judge.Blazor.Core.Rankings.Ranklists;

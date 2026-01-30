@@ -1,6 +1,7 @@
 using MudBlazor;
 using Not.Notify;
 using NTS.Blazor.Constants;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Judge.Features.Core.Dashboard;
 
@@ -14,7 +15,10 @@ public partial class SnapshotPanel
     string? _input = DEFAULT_TIME;
 
     [Inject]
-    IManualProcessor ManualProcessor { get; set; } = default!;
+    IParticipationContext ParticipationContext { get; set; } = default!;
+
+    [Inject]
+    ISnapshotProcessor ManualProcessor { get; set; } = default!;
 
     Task Snapshot()
     {
@@ -37,7 +41,13 @@ public partial class SnapshotPanel
         }
         var time = DateTime.Today + timeSpan;
         var timestamp = new Timestamp(time);
-        await ManualProcessor.Process(timestamp);
+        var snapshot = new Snapshot(
+            ParticipationContext.SelectedParticipation!.Combination.Number,
+            SnapshotType.Automatic,
+            SnapshotMethod.Manual,
+            timestamp
+        );
+        await ManualProcessor.Process(snapshot);
     }
 
     string NormalizeInput(string input)

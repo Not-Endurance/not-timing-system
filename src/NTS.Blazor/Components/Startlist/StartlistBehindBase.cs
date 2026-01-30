@@ -4,7 +4,7 @@ using static NTS.Localization.NtsStrings;
 
 namespace NTS.Blazor.Components.Startlist;
 
-public abstract class StartlistBehindBase : NComponent
+public abstract class StartlistBehindBase : NStatefulComponent
 {
     protected Dictionary<string, List<StartlistEntry>> StartlistsByStage { get; } = [];
 

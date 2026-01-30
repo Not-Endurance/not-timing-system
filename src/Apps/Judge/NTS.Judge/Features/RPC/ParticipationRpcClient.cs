@@ -3,18 +3,19 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Async;
-using NTS.Application.Models;
+using Not.Injection;
+using NTS.Application.Core;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Features.Core.Dashboard;
 using NTS.Judge.Features.Warp;
 using NTS.Warp;
 using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.Features.RPC;
 
-public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
+public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures, ISingleton
 {
     readonly ISelectedEventContext _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
@@ -57,11 +58,11 @@ public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures
     /// Fetches active participations before and after Competitions are started.
     /// </summary>
     /// <returns>Collection of active (not eliminated or completed) participations</returns>
-    public async Task<IEnumerable<CoreParticipationModel>> GetActive()
+    public async Task<IEnumerable<ParticipationModel>> GetActive()
     {
         var coreParticipations = await _coreParticipations
             .ReadMany(x => !x.IsComplete() && !x.IsEliminated())
-            .Select(CoreParticipationModel.MapFrom);
+            .Select(ParticipationModel.MapFrom);
         return coreParticipations;
     }
 

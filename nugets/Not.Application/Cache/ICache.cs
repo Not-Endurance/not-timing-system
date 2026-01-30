@@ -1,10 +1,10 @@
-﻿using Not.Domain.Aggregates;
+﻿using Not.Domain.Abstractions;
 using Not.Injection;
 
 namespace Not.Application.Cache;
 
 public interface ICache<T> : ISingleton
-    where T : IAggregateRoot
+    where T : IAggregate
 {
     Task<IEnumerable<T>> List();
     Task<T?> Get(int id);

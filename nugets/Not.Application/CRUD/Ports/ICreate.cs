@@ -1,6 +1,4 @@
-﻿using Not.Domain.Aggregates;
-
-namespace Not.Application.CRUD.Ports;
+﻿namespace Not.Application.CRUD.Ports;
 
 public interface ICreate<in T>
 {
