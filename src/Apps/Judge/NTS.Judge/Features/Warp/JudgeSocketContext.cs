@@ -1,18 +1,26 @@
+using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Domain.Exceptions;
+using Not.Injection;
+using Not.Notify;
 using Not.Startup;
 using NTS.Application.SignalR;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Warp;
 
-public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsync, IGroupSocketContext<UpcomingEvent>
+public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsync, IGroupSocketContext<UpcomingEvent>, ISingleton
 {
     readonly ISocketConnectionHookStorage _socketConnectionHookStorage;
     readonly IRpcSocket _socket;
+    SocketMetadata _eventConnectionSocketMetadata;
 
-    public JudgeSocketContext(ISocketConnectionHookStorage socketConnectionHookStorage, IRpcSocket socket)
+    public JudgeSocketContext(
+        SocketMetadata eventConnectionSocketMetadata,
+        ISocketConnectionHookStorage socketConnectionHookStorage,
+        IRpcSocket socket)
     {
+        _eventConnectionSocketMetadata = eventConnectionSocketMetadata;
         _socketConnectionHookStorage = socketConnectionHookStorage;
         _socket = socket;
     }
@@ -20,8 +28,6 @@ public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsyn
     public UpcomingEvent? Hook { get; private set; }
 
     public UpcomingEvent? Event => Hook;
-
-    public string? ConnectionGroupKey => throw new NotImplementedException();
 
     public async Task Disconnect()
     {
@@ -37,7 +43,8 @@ public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsyn
         }
         if (Hook != null)
         {
-            throw new DomainException(Cannot_select_another_event_without_resetting__string, Hook);
+            NotifyHelper.Warn(string.Format(Cannot_select_another_event_without_resetting__string, Hook));
+            return;
         }
         await InternalSetEvent(upcomingEvent);
         await _socket.Connect();
@@ -45,13 +52,11 @@ public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsyn
 
     public async Task RunAtStartupAsync()
     {
-        var hook = await _socketConnectionHookStorage.GetConnectionHook();
-        if (hook == null)
+        var upcomingEvent = await _socketConnectionHookStorage.GetConnectionHook();
+        if (upcomingEvent != null)
         {
-            return;
+            await Connect(upcomingEvent);
         }
-        Hook = hook;
-        await _socket.Connect();
     }
 
     async Task InternalSetEvent(UpcomingEvent? upcomingEvent)
@@ -61,5 +66,6 @@ public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsyn
             await _socketConnectionHookStorage.CommitConnectionHook(upcomingEvent);
         }
         Hook = upcomingEvent;
+        _eventConnectionSocketMetadata.ConnectionGroupKey = Hook?.Id.ToString();
     }
 }

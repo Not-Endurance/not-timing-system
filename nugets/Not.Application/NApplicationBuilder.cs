@@ -26,13 +26,15 @@ public class NApplicationBuilder
         return this;
     }
 
-    public NApplicationBuilder AddSignalR()
+    public NApplicationBuilder AddRpcClient()
     {
         _services.AddSingleton<IRpcSocket, SignalRSocket>();
         _services.AddSettings<RpcSettings>(
             _configuration,
             x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern)
         );
+        _services.AddSingleton<SocketMetadata>();
+        _services.AddSingleton<ISocketMetadata>(x => x.GetRequiredService<SocketMetadata>());
         return this;
     }
 }

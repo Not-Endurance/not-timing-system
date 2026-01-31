@@ -2,7 +2,9 @@
 using Not.Application.CRUD.Ports;
 using Not.Notify;
 using Not.Safe;
+using NTS.Application.SignalR;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Core.Reset;
 using NTS.Judge.Features.Core.Start;
 using NTS.Judge.Features.Warp;
@@ -13,7 +15,7 @@ public class CoreService : NStatefulService, ICoreService
 {
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly ICoreState _coreState;
-    readonly JudgeSocketContext _eventsRpcContext;
+    readonly IGroupSocketContext<UpcomingEvent> _socketContext;
     readonly ICoreStarter _coreStarter;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
@@ -24,7 +26,7 @@ public class CoreService : NStatefulService, ICoreService
     public CoreService(
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
         ICoreState coreState,
-        JudgeSocketContext eventsRpcContext,
+        IGroupSocketContext<UpcomingEvent> socketContext,
         ICoreStarter coreStarter,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
@@ -35,7 +37,7 @@ public class CoreService : NStatefulService, ICoreService
     {
         _coreDependentObservables = coreDependentObservables;
         _coreState = coreState;
-        _eventsRpcContext = eventsRpcContext;
+        _socketContext = socketContext;
         _coreStarter = coreStarter;
         _rankings = rankings;
         _events = events;
@@ -60,7 +62,7 @@ public class CoreService : NStatefulService, ICoreService
 
     public async Task SoftReset()
     {
-        await _eventsRpcContext.Disconnect();
+        await _socketContext.Disconnect();
     }
 
     public async Task HardReset()

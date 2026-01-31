@@ -19,12 +19,12 @@ public class CoalesceInvoker
 
     async Task RunActionLoop()
     {
+        if (!_gate.EnterIfOpen())
+        {
+            return;
+        }
         try
         {
-            if (!_gate.EnterIfOpen())
-            {
-                return;
-            }
             while (Interlocked.Exchange(ref _isPending, 0) == 1)
             {
                 await _action();

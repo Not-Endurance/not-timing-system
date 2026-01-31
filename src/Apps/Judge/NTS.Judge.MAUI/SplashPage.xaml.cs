@@ -1,3 +1,5 @@
+#pragma warning disable CA1416 // Validate platform compatibility
+
 namespace NTS.Judge.MAUI;
 
 public partial class SplashPage : ContentPage
@@ -14,3 +16,4 @@ public partial class SplashPage : ContentPage
         Microsoft.Maui.Controls.Application.Current!.MainPage = new MainPage();
     }
 }
+#pragma warning restore CA1416 // Validate platform compatibility

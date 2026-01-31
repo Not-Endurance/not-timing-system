@@ -16,7 +16,7 @@ public static class NtsJudgeServices
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
             .AddStartlist()
             .ConfigureN()
-            .AddSignalR();
+            .AddRpcClient();
 
         services
             .ConfigureKrud()
