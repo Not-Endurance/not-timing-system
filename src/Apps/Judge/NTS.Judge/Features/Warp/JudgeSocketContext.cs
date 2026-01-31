@@ -1,6 +1,5 @@
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
-using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Notify;
 using Not.Startup;

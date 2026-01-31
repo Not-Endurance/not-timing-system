@@ -17,7 +17,7 @@ public static class NtsWitnessServices
             .ConfigureN()
             .AddRpcClient();
 
-        services.ConfigureNts(configuration).AddNBlazor(configuration).ConfigureAuthentication(configuration);
+        services.AddNts(configuration).AddNBlazor(configuration).ConfigureAuthentication(configuration);
 
         return services;
     }

@@ -4,7 +4,7 @@ using Not.Application.Services;
 using Not.Exceptions;
 using Not.Safe;
 using Not.Startup;
-using NTS.Blazor.Components.ParticipationTable.Phases;
+using NTS.Application.Core;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;

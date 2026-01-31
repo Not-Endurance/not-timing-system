@@ -21,7 +21,7 @@ public static class NBlazorServices
             .AddTransient<ICrumbsNavigator, BlazorCrumbsNavigator>();
     }
 
-    public static IServiceCollection AddMudBlazor(
+    static IServiceCollection AddMudBlazor(
         this IServiceCollection services,
         Action<MudServicesConfiguration>? customConfiguration = null
     )

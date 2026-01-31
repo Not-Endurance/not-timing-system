@@ -1,5 +1,4 @@
-﻿using AngleSharp.Dom;
-using Not.Application.Services;
+﻿using Not.Application.Services;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 

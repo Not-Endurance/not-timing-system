@@ -1,6 +1,6 @@
 ﻿using Not.Application.CRUD.Ports;
-using Not.Application.Krud.Abstractions;
-using Not.Application.Krud.Services;
+using Not.Krud.Abstractions;
+using Not.Krud.Services;
 using Not.Notify;
 using NTS.Application.SignalR;
 using NTS.Domain.Setup.Aggregates;

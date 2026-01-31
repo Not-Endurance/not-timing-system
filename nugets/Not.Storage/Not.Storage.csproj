@@ -12,8 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Not.Application\Not.Application.csproj" />
-    <ProjectReference Include="..\Not.Domain\Not.Domain.csproj" />
+    <ProjectReference Include="..\Not.Krud\Not.Krud.csproj" />
   </ItemGroup>
 
 </Project>

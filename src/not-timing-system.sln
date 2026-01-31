@@ -83,6 +83,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Warp.InProcess", "Apps\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Warp.Nexus", "Apps\Warp\NTS.Warp.Nexus\NTS.Warp.Nexus.csproj", "{24A8A4BD-283D-CB7B-64E0-381E0EB7517F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Krud", "..\nugets\Not.Krud\Not.Krud.csproj", "{F436B1E5-91EB-4671-9C2E-448BF1864C2E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -193,6 +195,10 @@ Global
 		{24A8A4BD-283D-CB7B-64E0-381E0EB7517F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24A8A4BD-283D-CB7B-64E0-381E0EB7517F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24A8A4BD-283D-CB7B-64E0-381E0EB7517F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F436B1E5-91EB-4671-9C2E-448BF1864C2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F436B1E5-91EB-4671-9C2E-448BF1864C2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F436B1E5-91EB-4671-9C2E-448BF1864C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F436B1E5-91EB-4671-9C2E-448BF1864C2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -224,6 +230,7 @@ Global
 		{FAA5A641-0440-FAA4-5740-E09BB17FC91F} = {06233005-CC56-4846-8760-F7AFF5F72F4C}
 		{1D128487-E599-AD33-6ADC-DD9A8CA59025} = {5F4886E8-8E6B-45E1-BDDA-70BA01BEA576}
 		{24A8A4BD-283D-CB7B-64E0-381E0EB7517F} = {5F4886E8-8E6B-45E1-BDDA-70BA01BEA576}
+		{F436B1E5-91EB-4671-9C2E-448BF1864C2E} = {06233005-CC56-4846-8760-F7AFF5F72F4C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3CB609D9-5D54-4C11-A371-DAAC8B74E430}

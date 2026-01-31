@@ -1,4 +1,4 @@
-﻿using Not.Application.Krud.Abstractions;
+﻿using Not.Krud.Abstractions;
 using NTS.Application.Shared;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;

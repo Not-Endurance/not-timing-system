@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Dialogs;
+using NTS.Application.Core;
 using NTS.Blazor.Components.ParticipationTable.Phases;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;

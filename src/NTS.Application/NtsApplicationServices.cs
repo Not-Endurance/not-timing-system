@@ -7,8 +7,6 @@ using Not.Application.RPC;
 using Not.Injection;
 using Not.Startup;
 using NTS.Application.Startlists;
-using NTS.Blazor.Components.Startlist.History;
-using NTS.Blazor.Components.Startlist.Upcoming;
 
 namespace NTS.Application;
 

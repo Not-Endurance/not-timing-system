@@ -1,8 +1,8 @@
 ﻿using Not.Application.CRUD.Ports;
-using Not.Application.Krud.Abstractions;
-using Not.Application.Krud.Services;
 using Not.Domain.Exceptions;
 using Not.Extensions;
+using Not.Krud.Abstractions;
+using Not.Krud.Services;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
