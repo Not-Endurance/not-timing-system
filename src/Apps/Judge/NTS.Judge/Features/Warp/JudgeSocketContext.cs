@@ -9,7 +9,11 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Warp;
 
-public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsync, IGroupSocketContext<UpcomingEvent>, ISingleton
+public class JudgeSocketContext
+    : ISelectedEventContext,
+        IStartupInitializerAsync,
+        IGroupSocketContext<UpcomingEvent>,
+        ISingleton
 {
     readonly ISocketConnectionHookStorage _socketConnectionHookStorage;
     readonly IRpcSocket _socket;
@@ -18,7 +22,8 @@ public class JudgeSocketContext : ISelectedEventContext, IStartupInitializerAsyn
     public JudgeSocketContext(
         SocketMetadata eventConnectionSocketMetadata,
         ISocketConnectionHookStorage socketConnectionHookStorage,
-        IRpcSocket socket)
+        IRpcSocket socket
+    )
     {
         _eventConnectionSocketMetadata = eventConnectionSocketMetadata;
         _socketConnectionHookStorage = socketConnectionHookStorage;

@@ -57,7 +57,7 @@ public static class InjectionServiceCollectionExtensions
         }
     }
 
-    static void AddAsSelfWithInterfaces( 
+    static void AddAsSelfWithInterfaces(
         IServiceCollection services,
         IEnumerable<Type> interfaces,
         Type implementation,
