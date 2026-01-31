@@ -1,4 +1,4 @@
-﻿using Not.Models;
+﻿using Not.Application.Krud.Abstractions;
 using NTS.Application.Shared;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
@@ -45,7 +45,7 @@ public class OfficialModel
     }
 }
 
-public class AthleteModel : IDocument, IMapFrom<Athlete>, IMapTo<Athlete>
+public class AthleteModel : IDocument, IKrudModel<Athlete>
 {
     // TODO: if decide to use this approach integrate AutoMapper with specific mappings to solve duplicating mapping logic
     public static AthleteModel From(Athlete athlete)
@@ -71,7 +71,7 @@ public class AthleteModel : IDocument, IMapFrom<Athlete>, IMapTo<Athlete>
         Club = athlete.Club == null ? null : ClubModel.MapFrom(athlete.Club);
     }
 
-    public Athlete MapTo()
+    public Athlete MapToEntity()
     {
         return new Athlete(Names, FeiId, Country?.MapToDomain(), Club?.MapToDomain(), Id);
     }
@@ -120,7 +120,7 @@ public class CombinationModel
 
     public Combination MapToDomain()
     {
-        var athlete = Athlete.MapTo();
+        var athlete = Athlete.MapToEntity();
         var horse = Horse.MaptoDomain();
         return new Combination(Number, athlete, horse, Id);
     }

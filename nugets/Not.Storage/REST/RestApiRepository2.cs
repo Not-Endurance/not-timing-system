@@ -1,15 +1,15 @@
 ﻿using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
-using Not.Models;
+using Not.Application.Krud.Abstractions;
+using Not.Domain.Abstractions;
 using Not.Notify;
-using Not.Structures;
 
 namespace Not.Storage.REST;
 
 public abstract class RestApiRepository2<T, TModel> : IRepository<T>
-    where T : class, IIdentifiable
-    where TModel : class, IMapFrom<T>, IMapTo<T>, new()
+    where T : class, IEntity
+    where TModel : class, IKrudModel<T>, new()
 {
     readonly string _endpoint;
 
@@ -164,6 +164,6 @@ public abstract class RestApiRepository2<T, TModel> : IRepository<T>
 
     T? MapEntity(TModel? model)
     {
-        return model?.MapTo();
+        return model?.MapToEntity();
     }
 }
