@@ -17,22 +17,29 @@ public partial class EnduranceEventPage
 
     protected override void OnInitialized()
     {
-        _upcomingEvent = Navigator.ConsumeParameter<UpcomingEventFormModel>();
-        // TODO: come up with somethig more elegant. Maybe pass aggregates in navigaion?
-        RpcContext.Connect(
-            new UpcomingEvent(
-                _upcomingEvent.Name,
-                _upcomingEvent.Place,
-                _upcomingEvent.Country,
-                _upcomingEvent.FeiShowId,
-                _upcomingEvent.FeiId,
-                _upcomingEvent.FeiEventCode,
-                _upcomingEvent.Competitions,
-                _upcomingEvent.Officials,
-                _upcomingEvent.Loops,
-                _upcomingEvent.Combinations,
-                _upcomingEvent.Id
-            )
-        );
+        try
+        {
+            _upcomingEvent = Navigator.ConsumeParameter<UpcomingEventFormModel>();
+            // TODO: come up with somethig more elegant. Maybe pass aggregates in navigaion?
+            RpcContext.Connect(
+                new UpcomingEvent(
+                    _upcomingEvent.Name,
+                    _upcomingEvent.Place,
+                    _upcomingEvent.Country,
+                    _upcomingEvent.FeiShowId,
+                    _upcomingEvent.FeiId,
+                    _upcomingEvent.FeiEventCode,
+                    _upcomingEvent.Competitions,
+                    _upcomingEvent.Officials,
+                    _upcomingEvent.Loops,
+                    _upcomingEvent.Combinations,
+                    _upcomingEvent.Id
+                )
+            );
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 }

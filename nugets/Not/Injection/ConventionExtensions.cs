@@ -41,12 +41,12 @@ public static class InjectionServiceCollectionExtensions
             )
             .ToList();
 
-        if (interfaces.Any(x => x.IsSingleton()))
+        if (implementation.IsSingleton())
         {
             AddAsSelfWithInterfaces(services, interfaces, implementation, ServiceLifetime.Singleton);
             return;
         }
-        if (interfaces.Any(x => x.IsScoped()))
+        if (implementation.IsScoped())
         {
             AddAsSelfWithInterfaces(services, interfaces, implementation, ServiceLifetime.Scoped);
             return;

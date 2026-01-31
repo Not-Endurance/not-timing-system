@@ -23,8 +23,9 @@ public class NtsHub<T> : Hub<T>
         var query = Context.GetHttpContext()!.Request.Query;
         if (!query.TryGetValue(RpcConstants.CONNECTION_GROUP_KEY, out var value))
         {
-            _logger.LogInformation("******* Aborting connection due to missing event ID ******* "); // TODO: create base logger or extension
+            _logger.LogInformation("******* Aborting connection due to missing event ID ******* ");
             Context.Abort();
+            return;
         }
         var enduranceEventId = value.ToString();
         await Groups.AddToGroupAsync(Context.ConnectionId, enduranceEventId);
