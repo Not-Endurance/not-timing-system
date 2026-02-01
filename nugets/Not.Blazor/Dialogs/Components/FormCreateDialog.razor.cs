@@ -1,9 +1,10 @@
 using MudBlazor;
 using Not.Application.Services;
 using Not.Blazor.Components;
+using Not.Blazor.CRUD.Forms.Components;
 using Not.Safe;
 
-namespace Not.Blazor.CRUD.Forms.Components;
+namespace Not.Blazor.Dialogs.Components;
 
 public partial class FormCreateDialog<T, TForm>
     where T : new()

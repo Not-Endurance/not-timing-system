@@ -1,0 +1,10 @@
+﻿@typeparam TModel
+@typeparam TForm where TForm : KrudFormBehindNotSure<TModel>
+@inherits KrudDynamicBehind<TModel, TForm>
+
+@if (Model == null)
+{
+    <p>Model parameter is null at NDynamic</p>
+}
+
+<DynamicComponent Type="typeof(TForm)" @ref="_dynamicComponent" Parameters="_parameters" />

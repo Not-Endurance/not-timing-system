@@ -1,18 +1,18 @@
 ﻿@using NTS.Domain.Aggregates
-@using NTS.Domain.Objects
 @using NTS.Domain.Setup.Aggregates
+@using Not.Krud.Blazor.Components
 @using NTS.Judge.Features.Setup.Athletes
-@using Not.Blazor.CRUD.Forms.Components
-@using Not.Structures
 
-@inherits NForm<AthleteFormModel>
+@inherits AthleteFormBehind
 
-<EditForm Model="Model">
-    <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
+<KrudForm Model="Model" ButtonText="Test" FormAction="Update">
 
-    <MudTextField @ref="_feiIdField" @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Required_only_for_FEI_export_string" Variant="Variant.Text" Margin="Margin.Dense" />
+    <MudTextField @ref="NameField" @bind-Value="Model.Name" Label="@Name_string" />
 
-    <NAutocomplete T="Country" @ref="_countryField" @bind-Value="Model.Country" Label="@nameof(Athlete.Country)" Search="Countries.Search" />
+    <MudTextField @ref="FeiIdField" @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Required_only_for_FEI_export_string" Variant="Variant.Text" Margin="Margin.Dense" />
 
-    <NAutocomplete @ref="_clubField" @bind-Value="Model.Club" Label="@nameof(Athlete.Club)" />
-</EditForm>
+    <NAutocomplete T="Country" @ref="CountryField" @bind-Value="Model.Country" Label="@nameof(Athlete.Country)" Search="Countries.Search" />
+
+    <NAutocomplete @ref="ClubField" @bind-Value="Model.Club" Label="@nameof(Athlete.Club)" />
+
+</KrudForm>

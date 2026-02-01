@@ -1,17 +1,12 @@
-﻿@using NTS.Domain.Setup.Aggregates
-@using NTS.Judge.Features.Setup.Athletes
-@using Not.Blazor.CRUD.Forms.Components
-@using Not.Blazor.Components
-@using Not.Blazor.Navigation
-@using Not.Blazor.Pages
+﻿@using Not.Blazor.Pages
 
 @attribute [Route(ATHLETE_UPDATE)]
-@inherits NUpdatePage
+@inherits AthleteUpdateBehind
 
 <NContent Title="@Configure_Athlete_string">
 
     <Main>
-        <NUpdateContainer T="AthleteFormModel" TForm="AthleteForm" Model="Navigator.ConsumeParameter<AthleteFormModel>()" />
+        <AthleteForm Model="Model" />
     </Main>
 
 </NContent>

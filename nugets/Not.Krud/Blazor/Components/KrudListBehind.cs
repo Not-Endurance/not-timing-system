@@ -2,23 +2,25 @@ using Microsoft.AspNetCore.Components;
 using Not.Application.Services;
 using Not.Async;
 using Not.Blazor.Components;
-using Not.Blazor.CRUD.Forms;
-using Not.Blazor.CRUD.Forms.Components;
+using Not.Blazor.Navigation;
 using Not.Collections;
 using Not.Domain;
 using Not.Krud.Abstractions;
 
 namespace Not.Krud.Blazor.Components;
 
-public class KrudeListBehind<T, TModel, TForm> : NStatefulComponent
+public class KrudListBehind<T, TModel, TForm> : NStatefulComponent
     where T : Entity
     where TModel : IKrudModel<T>, new()
-    where TForm : NForm<TModel>
+    where TForm : KrudFormBehindNotSure<TModel>
 {
     List<T> _entities = [];
 
     [Inject]
-    FormManager<TModel, TForm> FormNavigator { get; set; } = default!;
+    ICrumbsNavigator Navigator { get; set; } = default!;
+
+    [Inject]
+    KrudDialogService<TModel, TForm> DialogService { get; set; } = default!;
 
     [Inject]
     IEnumerable<IKrudNodeSetter> ParentContexts { get; set; } = default!;
@@ -42,7 +44,7 @@ public class KrudeListBehind<T, TModel, TForm> : NStatefulComponent
 
     protected async Task CreateSafe()
     {
-        var model = await FormNavigator.Create();
+        var model = await DialogService.ShowCreateForm();
         if (model == null)
         {
             return;
@@ -50,12 +52,13 @@ public class KrudeListBehind<T, TModel, TForm> : NStatefulComponent
         _entities.Add(MapEntity(model));
     }
 
-    protected async Task UpdateSafe(T entity)
+    protected Task UpdateSafe(T entity)
     {
         SetKrudNodeValue(entity);
         var model = CreateModel(entity);
-        await FormNavigator.Update(UpdateRoute, model);
+        Navigator.NavigateTo(UpdateRoute, model);
         _entities.Update(entity, NCollectionAction.AddOrUpdate);
+        return Task.CompletedTask;
     }
 
     protected async Task DeleteSafe(T entity)

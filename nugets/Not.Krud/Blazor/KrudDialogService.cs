@@ -1,29 +1,30 @@
-﻿using MudBlazor;
-using Not.Blazor.CRUD.Forms.Components;
-using Not.Blazor.Dialogs.Components;
+﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
+using Not.Exceptions;
+using Not.Krud.Blazor.Components;
 
-namespace Not.Blazor.Dialogs;
+namespace Not.Krud.Blazor;
 
-public class FormDialogService<T, TForm>
+public class KrudDialogService<T, TForm>
     where T : new()
-    where TForm : NForm<T>
+    where TForm : KrudFormBehindNotSure<T>
 {
     readonly IDialogService _mudDialogService;
     readonly DialogOptions _options = new() { BackdropClick = false };
 
-    public FormDialogService(IDialogService mudDialogService)
+    public KrudDialogService(IDialogService mudDialogService)
     {
         _mudDialogService = mudDialogService;
     }
 
     public async Task<T> ShowCreateForm()
     {
-        return await Show<FormCreateDialog<T, TForm>>(Create_string, []);
+        return await Show<KrudCreateFormDialog<T, TForm>>(Create_string, []);
     }
 
     public async Task ShowUpdateForm(T model)
     {
-        var parameters = new DialogParameters<FormUpdateDialog<T, TForm>> { { x => x.Model, model } };
+        var parameters = new DialogParameters<KrudUpdateFormDialog<T, TForm>> { { x => x.Model, model } };
         await Show(Update_string, parameters);
     }
 

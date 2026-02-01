@@ -1,36 +1,33 @@
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Application.Services;
 using Not.Blazor.Components;
+using Not.Exceptions;
 using Not.Safe;
 
-namespace Not.Blazor.CRUD.Forms.Components;
+namespace Not.Krud.Blazor.Components;
 
-public partial class FormUpdateDialog<T, TForm>
-    where T : new()
-    where TForm : NForm<T>
+public class KrudUpdateFormDialogBehind<TModel, TForm> : NComponent
+    where TModel : new()
+    where TForm : KrudFormBehindNotSure<TModel>
 {
-    NDynamic<T, TForm>? _dynamicForm;
+    protected KrudDynamic<TModel, TForm>? _dynamicForm;
 
     [Inject]
-    IUpdateBehind<T> Behind { get; set; } = default!;
+    IUpdateBehind<TModel> Behind { get; set; } = default!;
 
     [CascadingParameter]
     protected MudDialogInstance Dialog { get; set; } = default!;
 
     [Parameter, EditorRequired]
-    public T Model { get; set; } = default!;
+    public TModel Model { get; set; } = default!;
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-    }
-
-    async Task Update()
+    protected async Task Update()
     {
         await SafeHelper.Run(Submit, InjectValidation);
     }
 
-    async Task Submit()
+    protected async Task Submit()
     {
         await Behind.Update(Model);
         var dialogResult = DialogResult.Ok(true);

@@ -1,0 +1,15 @@
+﻿@using Not.Blazor.CRUD.Forms.Components
+    
+@typeparam TModel where TModel : new()
+@typeparam TForm where TForm : KrudFormBehindNotSure<TModel>
+@inherits KrudCreateFormDialogBehind<TModel, TForm>
+
+<MudDialog>
+    <DialogContent>
+        <KrudDynamic TModel="TModel" TForm="TForm" @ref="_dynamicForm" Model="_model" />
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonCreate OnClick="Create" />
+    </DialogActions>
+</MudDialog>

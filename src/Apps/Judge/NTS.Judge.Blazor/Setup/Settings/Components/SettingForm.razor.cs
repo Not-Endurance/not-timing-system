@@ -1,6 +1,7 @@
 using System.Globalization;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms.Components;
+using Not.Krud.Blazor.Components;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Settings;
 using NTS.Judge.Features.Setup.Services;

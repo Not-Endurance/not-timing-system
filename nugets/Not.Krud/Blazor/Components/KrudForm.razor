@@ -1,0 +1,21 @@
+@using Microsoft.AspNetCore.Components.Forms
+
+@typeparam TModel
+@inherits KrudFormBehind<TModel>
+
+<MudContainer Class="not-page-mid-width">
+  
+    <EditForm Model="Model">
+        @ChildContent
+    </EditForm>
+
+    <MudStack Row="true" Class="mt-4">
+        <NButtonPrimary OnClick="Submit" Text="@ButtonText"/>
+
+        @if (CanNavigateBack())
+        {
+            <NButtonBack OnClick="NavigateBack" />
+        }
+    </MudStack>
+
+</MudContainer>

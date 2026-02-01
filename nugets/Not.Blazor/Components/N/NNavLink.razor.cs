@@ -8,9 +8,6 @@ public partial class NNavLink : NComponent
     [Inject]
     ILandNavigator LandNavigator { get; set; } = default!;
 
-    [Inject]
-    NavigationManager NavigationManager { get; set; } = default!;
-
     [Parameter, EditorRequired]
     public string Endpoint { get; set; } = default!;
 
@@ -22,6 +19,9 @@ public partial class NNavLink : NComponent
 
     [Parameter]
     public string Icon { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
 
     void Land()
     {

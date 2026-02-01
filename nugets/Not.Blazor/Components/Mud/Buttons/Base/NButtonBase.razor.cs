@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
-using Not.Localization;
 
 namespace Not.Blazor.Components;
 

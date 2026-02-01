@@ -31,9 +31,6 @@ public class NComponent : ComponentBase
     [Parameter]
     public string? Class { get; set; }
 
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
     protected Task InvokeRender()
     {
         return _coalescedRender.Invoke();
