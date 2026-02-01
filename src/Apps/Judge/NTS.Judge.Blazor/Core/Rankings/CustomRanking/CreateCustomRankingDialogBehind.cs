@@ -1,6 +1,5 @@
 using Not.Application.CRUD.Ports;
 using Not.Blazor.Components;
-using Not.Exceptions;
 using Not.Safe;
 using Not.Structures;
 using NTS.Domain.Core.Aggregates;
@@ -20,6 +19,7 @@ public class CreateCustomRankingDialogBehind : NDialog
 
     [Inject]
     ICustomRankingService Service { get; set; } = default!;
+
     protected List<NotListModel<Ranking>> TemplateRankings { get; set; } = [];
 
     public Ranking? TemplateRanking
@@ -70,6 +70,12 @@ public class CreateCustomRankingDialogBehind : NDialog
         return Task.CompletedTask;
     }
 
+    protected Task DeleteSafe(RankingEntry entry)
+    {
+        RankingModel.Entries.Remove(entry);
+        return Task.CompletedTask;
+    }
+
     public async Task<IEnumerable<Ranking>> ListRankings()
     {
         return await SafeHelper.Run(Rankings.ReadMany);
@@ -94,12 +100,6 @@ public class CreateCustomRankingDialogBehind : NDialog
             var entry = new RankingEntry(EntryToAdd.Participation, null, EntryToAdd.IsNotRanked);
             RankingModel.Entries.Add(entry);
         });
-        return Task.CompletedTask;
-    }
-
-    public Task RemoveEntry(RankingEntry entry)
-    {
-        RankingModel.Entries.Remove(entry);
         return Task.CompletedTask;
     }
 }

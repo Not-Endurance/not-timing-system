@@ -1,8 +1,7 @@
 ﻿@using NTS.Domain.Aggregates
 @using NTS.Domain.Setup.Aggregates
-@using NTS.Judge.Blazor.Setup.Loops.Dot
 @using NTS.Judge.Features.Setup.Clubs
-@using Not.Blazor.CRUD.Lists
+@using Not.Krud.Blazor.Components
 
 @attribute [Route(CLUBS_PAGE)]
 @inherits NComponent
@@ -10,7 +9,7 @@
 <NContent Title="Configure Clubs" Class="not-mid-width">
 
     <Main>
-        <CrudList T="Club" Name="@Clubs_string" TModel="ClubFormModel" TForm="ClubForm" UpdateRoute="@CLUB_UPDATE" />
+        <KrudList T="Club" Name="@Clubs_string" TModel="ClubFormModel" TForm="ClubForm" UpdateRoute="@CLUB_UPDATE" />
     </Main>
 
 </NContent>

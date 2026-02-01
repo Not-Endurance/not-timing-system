@@ -9,9 +9,4 @@ public class PhaseBehind : KrudServiceBase<Phase, PhaseFormModel>
 {
     public PhaseBehind(IRepository<Phase> phases, IEnumerable<IKrudMirror<Phase>> reflections)
         : base(phases, reflections) { }
-
-    protected override Phase CreateEntity(PhaseFormModel model)
-    {
-        return new Phase(model.Loop, model.Recovery, model.Rest, model.Id);
-    }
 }

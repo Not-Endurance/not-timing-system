@@ -1,10 +1,9 @@
-﻿using Not.Application.Services;
-using NTS.Domain.Aggregates;
+﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 
 namespace NTS.Judge.Features.Setup.Settings;
 
-public class SettingFormModel : IFormModel<Setting>
+public class SettingFormModel
 {
     static Country? _languageCountry;
 

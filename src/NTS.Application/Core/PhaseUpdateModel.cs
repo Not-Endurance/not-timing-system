@@ -1,16 +1,15 @@
 ﻿using System.Globalization;
-using Not.Application.Services;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NTS.Application.Core;
 
-public class PhaseUpdateModel : IPhaseState, IFormModel<Phase>
+public class PhaseUpdateModel : IPhaseState
 {
     public PhaseUpdateModel() { }
 
     public PhaseUpdateModel(Phase phase)
     {
-        FromEntity(phase);
+        MapFrom(phase);
     }
 
     int IPhaseState.Id => Id ?? default;
@@ -42,7 +41,7 @@ public class PhaseUpdateModel : IPhaseState, IFormModel<Phase>
         set => RepresentTimeInput = ToInputString(value);
     }
 
-    public void FromEntity(Phase entity)
+    public void MapFrom(Phase entity)
     {
         Id = entity.Id;
         StartTime = entity.StartTime?.ToDateTimeOffset();

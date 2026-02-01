@@ -2,8 +2,9 @@
 @using NTS.Judge.Blazor.Setup.AthletesHorses.Athletes
 @using NTS.Judge.Blazor.Setup.AthletesHorses.Horses
 @using NTS.Judge.Features.Setup.Athletes
-@using Not.Blazor.CRUD.Lists
+@using NTS.Judge.Features.Setup.Horses
 @using Not.Krud.Blazor
+@using Not.Krud.Blazor.Components
 
 @attribute [Route(ATHLETES_HORSES_PAGE)]
 @inherits NComponent
@@ -13,11 +14,11 @@
     <Main>
         <MudGrid Spacing="8" Style="margin-top:0!important;">
             <MudItem xs="6">
-                <CrudList T="Athlete" Name="@Athletes_string" TForm="AthleteForm" TModel="AthleteFormModel" UpdateRoute="@ATHLETE_UPDATE" />
+                <KrudList T="Athlete" Name="@Athletes_string" TForm="AthleteForm" TModel="AthleteFormModel" UpdateRoute="@ATHLETE_UPDATE" />
             </MudItem>
             
             <MudItem xs="6">
-                <CrudList T="Horse" Name="@Horses_string" TForm="HorseForm" TModel="HorseFormModel" UpdateRoute="@HORSE_UPDATE" />
+                <KrudList T="Horse" Name="@Horses_string" TForm="HorseForm" TModel="HorseFormModel" UpdateRoute="@HORSE_UPDATE" />
             </MudItem>
         </MudGrid>
     </Main>

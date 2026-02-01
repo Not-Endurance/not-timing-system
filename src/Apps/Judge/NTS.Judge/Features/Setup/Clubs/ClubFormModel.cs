@@ -1,9 +1,9 @@
-﻿using Not.Application.Services;
+﻿using Not.Krud.Models;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Clubs;
 
-public class ClubFormModel : IFormModel<Club>
+public class ClubFormModel : KrudFormModel<Club>
 {
     public ClubFormModel()
     {
@@ -12,10 +12,14 @@ public class ClubFormModel : IFormModel<Club>
 #endif
     }
 
-    public int? Id { get; set; }
     public string? Name { get; set; }
 
-    public void FromEntity(Club entity)
+    protected override Club MapTo()
+    {
+        return new(Name, Id);
+    }
+
+    public override void MapFrom(Club entity)
     {
         Id = entity.Id;
         Name = entity.Name;

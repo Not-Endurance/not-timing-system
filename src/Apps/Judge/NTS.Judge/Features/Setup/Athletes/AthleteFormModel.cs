@@ -1,11 +1,12 @@
-﻿using Not.Application.Services;
+﻿using Not.Krud.Models;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.StaticOptions;
+using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Athletes;
 
-public class AthleteFormModel : IFormModel<Athlete>
+public class AthleteFormModel : KrudFormModel<Athlete>
 {
     public AthleteFormModel()
     {
@@ -16,13 +17,17 @@ public class AthleteFormModel : IFormModel<Athlete>
         Country = StaticOption.SelectedCountry;
     }
 
-    public int? Id { get; set; }
     public string? Name { get; set; }
     public string? FeiId { get; set; }
     public Country? Country { get; set; }
     public Club? Club { get; set; }
 
-    public void FromEntity(Athlete athlete)
+    protected override Athlete MapTo()
+    {
+        return new Athlete(Person.Create(Name), FeiId, Country, Club, Id);
+    }
+
+    public override void MapFrom(Athlete athlete)
     {
         Id = athlete.Id;
         Name = athlete.Names;

@@ -9,9 +9,4 @@ internal class ClubBehind : KrudServiceBase<Club, ClubFormModel>
 {
     public ClubBehind(IRepository<Club> repository, IEnumerable<IKrudMirror<Club>> reflections)
         : base(repository, reflections) { }
-
-    protected override Club CreateEntity(ClubFormModel model)
-    {
-        return new(model.Name, model.Id);
-    }
 }

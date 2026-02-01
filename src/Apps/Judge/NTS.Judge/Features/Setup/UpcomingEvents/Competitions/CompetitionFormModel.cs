@@ -1,10 +1,13 @@
-﻿using Not.Application.Services;
+﻿using Not.DateAndTime;
+using Not.Domain.Exceptions;
+using Not.Krud.Abstractions;
+using Not.Krud.Models;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 
-public class CompetitionFormModel : IFormModel<Competition>
+public class CompetitionFormModel : KrudFormModel<Competition>
 {
     int? _requiredInspectionCompulsoryThreshold;
 
@@ -17,7 +20,6 @@ public class CompetitionFormModel : IFormModel<Competition>
 #endif
     }
 
-    public int? Id { get; set; }
     public string? Name { get; set; }
     public CompetitionType Type { get; set; } = CompetitionType.Qualification;
     public CompetitionRuleset Ruleset { get; set; } = CompetitionRuleset.Regional;
@@ -35,7 +37,26 @@ public class CompetitionFormModel : IFormModel<Competition>
     public IReadOnlyCollection<Phase> Phases { get; private set; } = [];
     public IReadOnlyCollection<Participation> Participations { get; private set; } = [];
 
-    public void FromEntity(Competition competition)
+    protected override Competition MapTo()
+    {
+        var startTime = ConvertStartTime(Date, Time);
+        var compulsoryThreshold = ConvertMinutes(CompulsoryThresholdMinutes);
+        return new Competition(
+            Name,
+            Type,
+            Ruleset,
+            startTime,
+            compulsoryThreshold,
+            FeiId,
+            FeiRule,
+            FeiScheduleNumber,
+            Phases,
+            Participations,
+            Id
+        );
+    }
+
+    public override void MapFrom(Competition competition)
     {
         Id = competition.Id;
         Name = competition.Name;
@@ -50,5 +71,24 @@ public class CompetitionFormModel : IFormModel<Competition>
         FeiId = competition.FeiId;
         FeiRule = competition.FeiRule;
         FeiScheduleNumber = competition.FeiScheduleNumber;
+    }
+
+    TimeSpan? ConvertMinutes(int? minutes)
+    {
+        return minutes == null ? null : TimeSpan.FromMinutes(minutes.Value);
+    }
+
+    DateTimeOffset ConvertStartTime(DateTime? date, TimeSpan? time)
+    {
+        if (date == null)
+        {
+            throw new DomainPropertyException(nameof(CompetitionFormModel.Date), Null_or_malformed_string, Time_string);
+        }
+        if (time == null)
+        {
+            throw new DomainPropertyException(nameof(CompetitionFormModel.Time), Null_or_malformed_string, Time_string);
+        }
+
+        return date.Value.ToLocalDateTime().Add(time.Value);
     }
 }

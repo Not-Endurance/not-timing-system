@@ -25,23 +25,6 @@ public class UpcomingEventBehind
         _eventContext = eventContext;
     }
 
-    protected override UpcomingEvent CreateEntity(UpcomingEventFormModel model)
-    {
-        return new UpcomingEvent(
-            model.Name,
-            model.Place,
-            model.Country,
-            model.FeiShowId,
-            model.FeiId,
-            model.FeiEventCode,
-            model.Competitions,
-            model.Officials,
-            model.Loops,
-            model.Combinations,
-            model.Id
-        );
-    }
-
     public override Task Delete(UpcomingEvent entity)
     {
         NotifyHelper.Inform("Upcoming events cannot be deleted");

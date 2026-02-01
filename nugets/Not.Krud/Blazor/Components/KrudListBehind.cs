@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Not.Application.Services;
+using Not.Async;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms;
 using Not.Blazor.CRUD.Forms.Components;
+using Not.Collections;
 using Not.Domain;
 using Not.Krud.Abstractions;
 
@@ -10,9 +12,11 @@ namespace Not.Krud.Blazor.Components;
 
 public class KrudeListBehind<T, TModel, TForm> : NStatefulComponent
     where T : Entity
-    where TModel : IFormModel<T>, new()
+    where TModel : IKrudModel<T>, new()
     where TForm : NForm<TModel>
 {
+    List<T> _entities = [];
+
     [Inject]
     FormManager<TModel, TForm> FormNavigator { get; set; } = default!;
 
@@ -20,7 +24,9 @@ public class KrudeListBehind<T, TModel, TForm> : NStatefulComponent
     IEnumerable<IKrudNodeSetter> ParentContexts { get; set; } = default!;
 
     [Inject]
-    protected IListBehind<T> Behind { get; set; } = default!;
+    IListBehind<T> Service { get; set; } = default!;
+
+    protected IReadOnlyList<T> Entities => _entities.AsReadOnly();
 
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;
@@ -28,56 +34,53 @@ public class KrudeListBehind<T, TModel, TForm> : NStatefulComponent
     [Parameter, EditorRequired]
     public string UpdateRoute { get; set; } = default!;
 
-    protected async Task CreateHandler()
+    protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            await FormNavigator.Create();
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
+        _entities = await Service.ReadMany().ToList();
+        IsLoading = false;
     }
 
-    protected async Task UpdateHandler(T aggregate)
+    protected async Task CreateSafe()
     {
-        try
+        var model = await FormNavigator.Create();
+        if (model == null)
         {
-            SetKrudNode(aggregate);
-            var model = CreateModel(aggregate);
-            await FormNavigator.Update(UpdateRoute, model);
+            return;
         }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
+        _entities.Add(MapEntity(model));
     }
 
-    protected async Task DeleteHandler(T aggregate)
+    protected async Task UpdateSafe(T entity)
     {
-        try
-        {
-            await Behind.Delete(aggregate);
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
+        SetKrudNodeValue(entity);
+        var model = CreateModel(entity);
+        await FormNavigator.Update(UpdateRoute, model);
+        _entities.Update(entity, NCollectionAction.AddOrUpdate);
     }
 
-    void SetKrudNode(T aggregate)
+    protected async Task DeleteSafe(T entity)
+    {
+        await Service.Delete(entity);
+        _entities.Remove(entity);
+    }
+
+    void SetKrudNodeValue(T entity)
     {
         foreach (var context in ParentContexts)
         {
-            context.SetParent(aggregate);
+            context.SetParent(entity);
         }
     }
 
     TModel CreateModel(T entity)
     {
         var model = new TModel();
-        model.FromEntity(entity);
+        model.MapFrom(entity);
         return model;
+    }
+
+    T MapEntity(TModel model)
+    {
+        return model.MapToEntity();
     }
 }

@@ -1,18 +1,18 @@
 ﻿@using Not.Application.Services
 @using Not.Blazor.CRUD.Forms.Components
 @using Not.Domain
+@using Not.Krud.Abstractions
 
 @typeparam T where T : Entity
-@typeparam TModel where TModel : IFormModel<T>, new()
+@typeparam TModel where TModel : IKrudModel<T>, new()
 @typeparam TForm where TForm : NForm<TModel>
 @inherits KrudeListBehind<T, TModel, TForm>
 
 <MudPaper Elevation="0" Class="@("pa-4 " + Class)" Style="@Style">
 
-    <NList Title="@Name" 
-           ReadHandler="Behind.ReadMany"
-           CreateHandler="CreateHandler" 
-           UpdateHandler="UpdateHandler" 
-           DeleteHandler="DeleteHandler"/>
+    <NList Items="Entities" Title="@Name"  IsLoading="@IsLoading"
+           Create="CreateSafe"
+           Update="UpdateSafe" 
+           Delete="DeleteSafe"/>
     
 </MudPaper>

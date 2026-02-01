@@ -1,32 +1,61 @@
 namespace Not.Blazor.Components;
 
-public class NListBehind<T> : NStatefulComponent
+public class NListBehind<T> : NComponent
 {
-    protected IEnumerable<T> Items { get; private set; } = [];
+    [Parameter]
+    public IReadOnlyList<T> Items { get; set; } = [];
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public Func<Task>? Create { get; set; }
+
+    [Parameter]
+    public Func<T, Task>? Update { get; set; }
+
+    [Parameter]
+    public Func<T, Task>? Delete { get; set; }
 
     [Parameter]
     public string? Title { get; set; }
 
-    [Parameter]
-    public Func<Task>? CreateHandler { get; set; }
-
-    [Parameter, EditorRequired]
-    public required Func<Task<IEnumerable<T>>> ReadHandler { get; set; }
-
-    [Parameter]
-    public Func<T, Task>? UpdateHandler { get; set; }
-
-    [Parameter]
-    public Func<T, Task>? DeleteHandler { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    protected async Task OnCreate()
     {
-        Items = await ReadHandler();
-        IsLoading = false;
+        try
+        {
+            GuardHelper.ThrowIfDefault(Create);
+            await Create();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
-    protected override void OnBeforeRender()
+    protected async Task OnUpdate(T item)
     {
-        base.OnBeforeRender();
+        try
+        {
+            GuardHelper.ThrowIfDefault(Update);
+            await Update(item);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    protected async Task OnDelete(T item)
+    {
+        try
+        {
+            GuardHelper.ThrowIfDefault(Delete);
+            await Delete(item);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 }

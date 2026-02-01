@@ -11,9 +11,9 @@
 
     <MudSpacer/>
 
-    @if (CreateHandler != null)
+    @if (Create != null)
     {
-        <NButtonCreate Variant="Variant.Outlined" OnClick="CreateHandler"/>
+        <NButtonCreate Variant="Variant.Outlined" OnClick="OnCreate"/>
     }
 </MudStack>
 
@@ -35,13 +35,13 @@
 
                 <MudSpacer />
 
-                @if (UpdateHandler != null)
+                @if (Update != null)
                 {
-                    <NIconUpdate OnClick="() => UpdateHandler(item)" />
+                    <NIconUpdate OnClick="() => OnUpdate(item)" />
                 }
-                @if (DeleteHandler != null)
+                @if (Delete != null)
                 {
-                    <NIconDelete OnClick="() => DeleteHandler(item)" />
+                    <NIconDelete OnClick="() => OnDelete(item)" />
                 }
             </MudStack>
 

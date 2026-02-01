@@ -1,6 +1,6 @@
 using Not.Blazor.Navigation;
 
-namespace NTS.Judge.Blazor.Setup.Loops.Dot;
+namespace NTS.Judge.Blazor.Setup.Loops;
 
 public partial class LoopUpdate
 {

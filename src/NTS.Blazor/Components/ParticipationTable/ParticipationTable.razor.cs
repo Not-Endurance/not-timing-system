@@ -17,7 +17,7 @@ public partial class ParticipationTable
     bool _anyCompulsoryRequiredInspection;
 
     [Inject]
-    CrudeDialog<PhaseUpdateModel, PhaseForm> Dialog { get; set; } = default!;
+    FormDialogService<PhaseUpdateModel, PhaseForm> Dialog { get; set; } = default!;
 
     [Parameter]
     public PhaseCollection? Phases { get; set; }
@@ -53,7 +53,7 @@ public partial class ParticipationTable
     async Task ShowUpdate(Phase phase)
     {
         var model = new PhaseUpdateModel(phase);
-        await Dialog.RenderUpdate(model);
+        await Dialog.ShowUpdateForm(model);
         await InvokeRender();
     }
 }

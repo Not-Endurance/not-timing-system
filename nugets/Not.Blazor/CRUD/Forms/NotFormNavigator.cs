@@ -8,18 +8,18 @@ public class FormManager<T, TForm>
     where T : new()
     where TForm : NForm<T>
 {
-    readonly CrudeDialog<T, TForm> _dialog;
+    readonly FormDialogService<T, TForm> _dialog;
     readonly ICrumbsNavigator _navigator;
 
-    public FormManager(CrudeDialog<T, TForm> dialog, ICrumbsNavigator navigator)
+    public FormManager(FormDialogService<T, TForm> dialog, ICrumbsNavigator navigator)
     {
         _dialog = dialog;
         _navigator = navigator;
     }
 
-    public async Task Create()
+    public async Task<T?> Create()
     {
-        await _dialog.RenderCreate();
+        return await _dialog.ShowCreateForm();
     }
 
     public Task Update(string endpoint, T entity)

@@ -7,6 +7,7 @@ namespace Not.Krud.Services;
 
 public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IFormBehind<TModel>
     where T : Entity
+    where TModel: IKrudModel<T>
 {
     readonly List<IKrudMirror<T>> _mirrors;
     readonly IRepository<T> _repository;
@@ -17,11 +18,9 @@ public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IFormBehind<T
         _mirrors = reflections.ToList();
     }
 
-    protected abstract T CreateEntity(TModel model);
-
-    protected virtual T UpdateEntity(TModel model)
+    protected virtual T MapEntity(TModel model)
     {
-        return CreateEntity(model);
+        return model.MapToEntity();
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany()
@@ -31,13 +30,13 @@ public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IFormBehind<T
 
     public virtual async Task Create(TModel model)
     {
-        var entity = CreateEntity(model);
+        var entity = MapEntity(model);
         await _repository.Create(entity);
     }
 
     public virtual async Task Update(TModel model)
     {
-        var entity = UpdateEntity(model);
+        var entity = MapEntity(model);
         await _repository.Update(entity);
         foreach (var mirror in _mirrors)
         {

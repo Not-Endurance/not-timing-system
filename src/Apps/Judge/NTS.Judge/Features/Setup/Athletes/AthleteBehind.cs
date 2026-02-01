@@ -1,7 +1,6 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
-using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Athletes;
@@ -14,11 +13,6 @@ public class AthleteBehind : KrudServiceBase<Athlete, AthleteFormModel>, IKrudMi
         : base(repository, dependants)
     {
         _repository = repository;
-    }
-
-    protected override Athlete CreateEntity(AthleteFormModel model)
-    {
-        return new Athlete(Person.Create(model.Name), model.FeiId, model.Country, model.Club, model.Id);
     }
 
     public async Task Reflect(Club update)

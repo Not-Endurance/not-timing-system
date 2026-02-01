@@ -6,7 +6,7 @@
 @using NTS.Judge.Features.Setup.UpcomingEvents.Competitions
 @using NTS.Judge.Features.Setup.UpcomingEvents.Officials
 @using Not.Blazor.CRUD.Forms.Components
-@using Not.Blazor.CRUD.Lists
+@using Not.Krud.Blazor.Components
 
 @attribute [Route(ENDURANCE_EVENT_PAGE)]
 @inherits NComponent
@@ -21,11 +21,11 @@
         <NGrid Spacing="8">
 
             <MudItem xs="6">
-                <CrudList T="Competition" Name="@Competitions_string" TModel="CompetitionFormModel" TForm="CompetitionForm" UpdateRoute="@COMPETITION_UPDATE" />
+                <KrudList T="Competition" Name="@Competitions_string" TModel="CompetitionFormModel" TForm="CompetitionForm" UpdateRoute="@COMPETITION_UPDATE" />
             </MudItem>
 
             <MudItem xs="6">
-                <CrudList T="Official" Name="@Officials_string" TModel="OfficialFormModel" TForm="OfficialForm" UpdateRoute="@OFFICIAL_UPDATE" />
+                <KrudList T="Official" Name="@Officials_string" TModel="OfficialFormModel" TForm="OfficialForm" UpdateRoute="@OFFICIAL_UPDATE" />
             </MudItem>
 
         </NGrid>

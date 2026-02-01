@@ -3,33 +3,38 @@ using Not.Blazor.CRUD.Forms.Components;
 
 namespace Not.Blazor.Dialogs;
 
-public class CrudeDialog<T, TForm>
+public class FormDialogService<T, TForm>
     where T : new()
     where TForm : NForm<T>
 {
     readonly IDialogService _mudDialogService;
     readonly DialogOptions _options = new() { BackdropClick = false };
 
-    public CrudeDialog(IDialogService mudDialogService)
+    public FormDialogService(IDialogService mudDialogService)
     {
         _mudDialogService = mudDialogService;
     }
 
-    public async Task RenderCreate()
+    public async Task<T> ShowCreateForm()
     {
-        await Show<FormCreateDialog<T, TForm>>(Create_string, []);
+        return await Show<FormCreateDialog<T, TForm>>(Create_string, []);
     }
 
-    public async Task RenderUpdate(T model)
+    public async Task ShowUpdateForm(T model)
     {
         var parameters = new DialogParameters<FormUpdateDialog<T, TForm>> { { x => x.Model, model } };
         await Show(Update_string, parameters);
     }
 
-    async Task Show<TDialog>(string title, DialogParameters<TDialog> parameters)
+    async Task<T> Show<TDialog>(string title, DialogParameters<TDialog> parameters)
         where TDialog : IComponent
     {
         var dialog = await _mudDialogService.ShowAsync<TDialog>(title, parameters, _options);
-        await dialog.Result;
+        var result = await dialog.Result;
+        if (result?.Data is not T entity)
+        {
+            throw GuardHelper.Exception($"Mud dialogr result returned '{result?.Data}'. Expected '{typeof(T).FullName}' instead");
+        }
+        return entity;
     }
 }

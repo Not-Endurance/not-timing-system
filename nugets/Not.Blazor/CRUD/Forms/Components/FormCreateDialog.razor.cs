@@ -26,7 +26,7 @@ public partial class FormCreateDialog<T, TForm>
     async Task Submit()
     {
         await Behind.Create(_model);
-        var dialogResult = DialogResult.Ok(true);
+        var dialogResult = DialogResult.Ok(_model);
         Dialog.Close(dialogResult);
     }
 

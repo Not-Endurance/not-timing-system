@@ -15,7 +15,7 @@ public static class NBlazorServices
     {
         return services
             .AddMudBlazor()
-            .AddTransient(typeof(CrudeDialog<,>))
+            .AddTransient(typeof(FormDialogService<,>))
             .AddTransient(typeof(FormManager<,>))
             .AddTransient<ILandNavigator, BlazorCrumbsNavigator>()
             .AddTransient<ICrumbsNavigator, BlazorCrumbsNavigator>();

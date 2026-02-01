@@ -1,6 +1,6 @@
 using Not.Blazor.Navigation;
 
-namespace NTS.Judge.Blazor.Setup.Combinations.Dot;
+namespace NTS.Judge.Blazor.Setup.Combinations;
 
 public partial class CombinationUpdate
 {

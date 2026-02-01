@@ -1,7 +1,7 @@
 using MudBlazor;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-namespace NTS.Judge.Blazor.Setup.Loops.Dot;
+namespace NTS.Judge.Blazor.Setup.Loops;
 
 public partial class LoopForm
 {

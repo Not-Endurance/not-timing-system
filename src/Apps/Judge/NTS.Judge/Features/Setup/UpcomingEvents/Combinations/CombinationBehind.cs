@@ -9,9 +9,4 @@ public class CombinationBehind : KrudServiceBase<Combination, CombinationFormMod
 {
     public CombinationBehind(IRepository<Combination> combinations, IEnumerable<IKrudMirror<Combination>> reflections)
         : base(combinations, reflections) { }
-
-    protected override Combination CreateEntity(CombinationFormModel model)
-    {
-        return new(model.Number, model.Athlete, model.Horse, model.Id);
-    }
 }

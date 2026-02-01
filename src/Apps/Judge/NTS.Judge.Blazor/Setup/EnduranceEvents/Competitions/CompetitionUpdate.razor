@@ -1,13 +1,11 @@
-﻿@using NTS.Domain.Setup.Aggregates
-@using NTS.Domain.Setup.Aggregates.UpcomingEvents
+﻿@using NTS.Domain.Setup.Aggregates.UpcomingEvents
 @using NTS.Judge.Blazor.Setup.EnduranceEvents.Participations
 @using NTS.Judge.Blazor.Setup.EnduranceEvents.Phases
 @using NTS.Judge.Features.Setup.UpcomingEvents.Competitions
 @using NTS.Judge.Features.Setup.UpcomingEvents.Participations
 @using NTS.Judge.Features.Setup.UpcomingEvents.Phases
 @using Not.Blazor.CRUD.Forms.Components
-@using Not.Blazor.CRUD.Lists
-@using Not.Blazor.Navigation
+@using Not.Krud.Blazor.Components
 
 @attribute [Route(COMPETITION_UPDATE)]
 @inherits NComponent
@@ -22,11 +20,11 @@
             </MudItem>
 
             <MudItem xs="6">
-                <CrudList T="Phase" Name="@Phases_string" TModel="PhaseFormModel" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" />
+                <KrudList T="Phase" Name="@Phases_string" TModel="PhaseFormModel" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" />
             </MudItem>
 
             <MudItem xs="6">
-                <CrudList T="Participation" Name="@Participations_string" TModel="ParticipationFormModel" TForm="ParticipationForm" UpdateRoute="@PARTICIPATION_UPDATE" />
+                <KrudList T="Participation" Name="@Participations_string" TModel="ParticipationFormModel" TForm="ParticipationForm" UpdateRoute="@PARTICIPATION_UPDATE" />
             </MudItem>
 
         </NGrid>
