@@ -1,6 +1,4 @@
-﻿using Not.Observables;
-
-namespace Not.Application.Services;
+﻿namespace Not.Application.Services;
 
 public interface IListBehind<T> : IDeleteBehind<T>
 {

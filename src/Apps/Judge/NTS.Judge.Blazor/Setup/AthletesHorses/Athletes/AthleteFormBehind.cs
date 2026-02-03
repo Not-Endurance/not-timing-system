@@ -1,15 +1,14 @@
 using MudBlazor;
 using Not.Application.Services;
 using Not.Blazor.Components;
-using Not.Blazor.Navigation;
-using Not.Krud.Blazor.Components;
+using Not.Krud.Blazor.Components.Abstractions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Setup.Athletes;
 
 namespace NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 
-public class AthleteFormBehind : KrudFormBehindNotSure<AthleteFormModel>
+public class AthleteFormBehind : KrudFormContainer<AthleteFormModel>
 {
     [Inject]
     IUpdateBehind<AthleteFormModel> Service { get; set; } = default!;

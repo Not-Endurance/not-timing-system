@@ -1,11 +1,13 @@
-﻿using Not.Application.Behinds.Adapters;
+﻿using Microsoft.AspNetCore.SignalR;
+using Not.Application.Behinds.Adapters;
+using Not.Injection;
 using Not.Krud.Abstractions;
 using NTS.Domain.Aggregates;
 using NTS.Judge.Features.Setup.Services;
 
 namespace NTS.Judge.Features.Setup.Settings;
 
-public class SettingBehind : NStatefulService, ISettingBehind
+public class SettingBehind : NStatefulService, ISettingBehind, ISingleton
 {
     readonly ISettingRepository _repository;
     readonly IEnumerable<IKrudMirror<Setting>> _reflections;

@@ -1,4 +1,5 @@
-﻿using MudBlazor;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms.Validation;
 using Not.Notify;
@@ -11,7 +12,8 @@ public abstract class NForm<T> : NComponent
 
     /// <summary>
     /// Contains refs to the actual field components, necessary in order to render Mud validation messages from the DomainException
-    /// This is a workaround until: https://github.com/eSolutions-EMS/endurance-management-system/issues/185
+    /// See discussion about Cascading EditContext and custom validator: https://github.com/MudBlazor/MudBlazor/issues/8175#issuecomment-3837793584
+    /// Example: https://github.com/MudBlazor/MudBlazor/issues/7658
     /// </summary>
     protected Dictionary<string, List<MudValidationInjector>> ValidationInjectors { get; set; } = [];
 

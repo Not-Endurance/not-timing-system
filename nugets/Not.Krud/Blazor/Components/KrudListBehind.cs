@@ -6,13 +6,14 @@ using Not.Blazor.Navigation;
 using Not.Collections;
 using Not.Domain;
 using Not.Krud.Abstractions;
+using Not.Krud.Blazor.Components.Abstractions;
 
 namespace Not.Krud.Blazor.Components;
 
 public class KrudListBehind<T, TModel, TForm> : NStatefulComponent
     where T : Entity
     where TModel : IKrudModel<T>, new()
-    where TForm : KrudFormBehindNotSure<TModel>
+    where TForm : KrudFormContainer<TModel>
 {
     List<T> _entities = [];
 

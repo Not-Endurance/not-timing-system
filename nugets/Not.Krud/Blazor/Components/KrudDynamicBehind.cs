@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms.Components;
 using Not.Exceptions;
+using Not.Krud.Blazor.Components.Abstractions;
 
 namespace Not.Krud.Blazor.Components;
 
 public class KrudDynamicBehind<TModel, TForm> : NComponent
-    where TForm : KrudFormBehindNotSure<TModel>
+    where TForm : KrudFormContainer<TModel>
 {
     protected DynamicComponent? _dynamicComponent;
     protected Dictionary<string, object> _parameters = [];

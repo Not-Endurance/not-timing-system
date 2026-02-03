@@ -1,5 +1,6 @@
-﻿@typeparam TModel
-@typeparam TForm where TForm : KrudFormBehindNotSure<TModel>
+﻿@using Not.Krud.Blazor.Components.Abstractions
+@typeparam TModel
+@typeparam TForm where TForm : KrudFormContainer<TModel>
 @inherits KrudDynamicBehind<TModel, TForm>
 
 @if (Model == null)

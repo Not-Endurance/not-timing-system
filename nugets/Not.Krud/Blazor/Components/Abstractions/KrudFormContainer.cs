@@ -4,9 +4,9 @@ using Not.Blazor.CRUD.Forms.Validation;
 using Not.Exceptions;
 using Not.Notify;
 
-namespace Not.Krud.Blazor.Components;
+namespace Not.Krud.Blazor.Components.Abstractions;
 
-public abstract class KrudFormBehindNotSure<T> : NComponent
+public abstract class KrudFormContainer<T> : NComponent
 {
     public abstract void RegisterValidationInjectors();
 

@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Components;
 using Not.Blazor.Navigation;
 using Not.Exceptions;
+using Not.Krud.Blazor.Components.Abstractions;
 
 namespace Not.Krud.Blazor.Components;
 
-public class KrudFormBehind<TModel> : NComponent
+public abstract class KrudFormBehind<TModel> : KrudFormContainer<TModel>
 {
     //public NDynamic<TModel, TForm> Form = default!;
 
