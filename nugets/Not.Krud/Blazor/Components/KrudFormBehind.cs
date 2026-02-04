@@ -44,7 +44,7 @@ public abstract class KrudFormBehind<TModel> : NComponent
             }
             else
             {
-                await Shell.Up();
+                await Shell.Update();
             }
         }
         catch (ValidationException ex)

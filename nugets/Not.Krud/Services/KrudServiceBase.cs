@@ -1,13 +1,14 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.Services;
 using Not.Domain;
+using Not.Exceptions;
 using Not.Krud.Abstractions;
 
 namespace Not.Krud.Services;
 
-public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IFormBehind<TModel>
+public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IKrudFormService<TModel>
     where T : Entity
-    where TModel: IKrudModel<T>
+    where TModel: IKrudModel<T>, IKrudFormModel, new()
 {
     readonly List<IKrudMirror<T>> _mirrors;
     readonly IRepository<T> _repository;
@@ -30,12 +31,19 @@ public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IFormBehind<T
 
     public virtual async Task Create(TModel model)
     {
+        if (model.Id != null)
+        {
+            throw GuardHelper.Exception($"'{nameof(Create)}' requires null value for Id, otherwise it might result in an '{nameof(Update)}'");
+        }
         var entity = MapEntity(model);
         await _repository.Create(entity);
     }
 
     public virtual async Task Update(TModel model)
     {
+        GuardHelper.ThrowIfDefault(
+            model.Id,
+            $"'{nameof(Update)}' does not allow Id to be null as it might result in '{nameof(Create)}'");
         var entity = MapEntity(model);
         await _repository.Update(entity);
         foreach (var mirror in _mirrors)

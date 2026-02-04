@@ -1,25 +1,18 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Not.Application.Services;
 using Not.Blazor.Components;
 using Not.Blazor.Navigation;
+using Not.Krud.Abstractions;
 
 namespace Not.Krud.Blazor.Components.Abstractions;
 
 public abstract class KrudFormShell<TModel> : NComponent
-    where TModel : new()
+    where TModel : IKrudFormModel, new()
 {
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;
 
     [Inject]
-    IFormBehind<TModel> Service { get; set; } = default!;
-
-    /// <summary>
-    /// Define the action called on Form submission. Make sure not to swallow <seealso cref="Not.Exceptions.ValidationException"/>
-    /// because Krud validation relies internally on them to render Form validation messages
-    /// </summary>
-    /// <returns></returns>
-    //protected abstract Task SubmitActionSafe();
+    IKrudFormService<TModel> Service { get; set; } = default!;
 
     [Parameter]
     public TModel Model { get; set; } = new();
