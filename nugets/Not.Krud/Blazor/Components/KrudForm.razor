@@ -3,18 +3,18 @@
 @using Not.Krud.Blazor.Components.Form
 @using Not.Structures
 
-@typeparam TModel where TModel : IKrudFormModel
+@typeparam TModel where TModel : IKrudFormModel, new()
 @inherits KrudFormBehind<TModel>
 
 <MudContainer Class="not-page-mid-width">
   
-    <EditForm Model="Model" OnSubmit="OnSubmit">
+    <EditForm Model="Shell.Model" OnSubmit="OnSubmit">
         <ExceptionValidator @ref="ValidatorRef"/>
 
         @ChildContent
 
         <MudStack Row="true" Class="mt-4">
-            @if (Model.Id == null)
+            @if (IsCreateForm)
             {
                 <NButtonCreate ButtonType="ButtonType.Submit" />
             }

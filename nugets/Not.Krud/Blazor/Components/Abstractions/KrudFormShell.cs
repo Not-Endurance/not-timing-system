@@ -30,7 +30,15 @@ public abstract class KrudFormShell<TModel> : NComponent
     [Parameter]
     public Func<TModel, Task>? OnSubmit { get; set; } = default!;
 
-    protected async Task Create()
+    protected void NavigateBack()
+    {
+        if (Navigator.CanNavigateBack())
+        {
+            Navigator.NavigateBack();
+        }
+    }
+
+    internal async Task Create()
     {
         await Service.Create(Model);
         if (OnSubmit != null)
@@ -39,7 +47,7 @@ public abstract class KrudFormShell<TModel> : NComponent
         }
     }
 
-    protected async Task Update()
+    internal async Task Update()
     {
         await Service.Update(Model);
         if (OnSubmit != null)
@@ -47,13 +55,5 @@ public abstract class KrudFormShell<TModel> : NComponent
             await OnSubmit(Model);
         }
         NavigateBack();
-    }
-
-    protected void NavigateBack()
-    {
-        if (Navigator.CanNavigateBack())
-        {
-            Navigator.NavigateBack();
-        }
     }
 }

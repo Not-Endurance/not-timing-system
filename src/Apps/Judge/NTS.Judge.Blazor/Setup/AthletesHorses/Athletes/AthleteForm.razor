@@ -5,7 +5,7 @@
 
 @inherits AthleteFormBehind
 
-<KrudForm Model="Model" Create="Create" Update="Update">
+<KrudForm Shell="this">
 
     <MudTextField @bind-Value="Model.Names" For="() => Model.Names" Label="@Name_string" />
 

@@ -3,31 +3,31 @@ using Not.Blazor.Components;
 using Not.Blazor.Navigation;
 using Not.Exceptions;
 using Not.Krud.Abstractions;
+using Not.Krud.Blazor.Components.Abstractions;
 using Not.Krud.Blazor.Components.Form;
 
 namespace Not.Krud.Blazor.Components;
 
 public abstract class KrudFormBehind<TModel> : NComponent
-    where TModel : IKrudFormModel
+    where TModel : IKrudFormModel, new()
 {
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;
 
     protected ExceptionValidator ValidatorRef { get; set; } = default!;
 
-    protected bool IsCreateForm => Model.Id == null;
+    protected bool IsCreateForm => Shell.Model.Id == null;
     
+    /// <summary>
+    /// The calling components should provide a reference to a Shell instance. 
+    /// The intended usage is for the calling component to inherit from <see cref="KrudFormShell{TModel}"/>
+    /// but you can also create a separate shell component and pass a reference here. 
+    /// </summary>
     [Parameter, EditorRequired]
-    public Func<Task> Create { get; set; } = default!;
-
-    [Parameter, EditorRequired]
-    public Func<Task> Update { get; set; } = default!;
+    public KrudFormShell<TModel> Shell { get; set; } = default!;
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
-
-    [Parameter, EditorRequired]
-    public TModel Model { get; set; } = default!;
 
     [Parameter]
     public bool DisableBack { get; set; }
@@ -40,11 +40,11 @@ public abstract class KrudFormBehind<TModel> : NComponent
 
             if (IsCreateForm)
             {
-                await Create();
+                await Shell.Create();
             }
             else
             {
-                await Update();
+                await Shell.Up();
             }
         }
         catch (ValidationException ex)
