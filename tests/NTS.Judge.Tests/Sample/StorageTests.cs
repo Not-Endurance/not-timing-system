@@ -70,7 +70,7 @@ public class StorageTests : JudgeIntegrationTest
     }
 }
 
-public class EnduranceEventTestModel : UpcomingEventFormModel
+public record EnduranceEventTestModel : UpcomingEventFormModel
 {
     public new int Id { get; set; }
 }

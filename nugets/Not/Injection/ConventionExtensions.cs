@@ -27,12 +27,12 @@ public static class InjectionServiceCollectionExtensions
             .ToList();
         foreach (var implementation in classes)
         {
-            RegisterImplemenationByConvention(implementation.Name, implementation, services);
+            RegisterImplemenationByConvention(implementation, services);
         }
         return services;
     }
 
-    static void RegisterImplemenationByConvention(string name, Type implementation, IServiceCollection services)
+    static void RegisterImplemenationByConvention(Type implementation, IServiceCollection services)
     {
         var interfaces = implementation
             .GetInterfaces()

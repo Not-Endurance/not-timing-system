@@ -12,8 +12,8 @@ namespace Not.Krud.Blazor.Components;
 
 public class KrudListBehind<T, TModel, TForm> : NStatefulComponent
     where T : Entity
-    where TModel : IKrudModel<T>, new()
-    where TForm : KrudFormContainer<TModel>
+    where TModel : IKrudModel<T>, IKrudFormModel, new()
+    where TForm : KrudFormShell<TModel>
 {
     List<T> _entities = [];
 

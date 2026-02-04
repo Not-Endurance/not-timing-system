@@ -1,12 +1,11 @@
-﻿using Not.Krud.Abstractions;
-using Not.Krud.Models;
+﻿using Not.Krud.Models;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Officials;
 
-public class OfficialFormModel : KrudFormModel<Official>
+public record OfficialFormModel : KrudFormModel<Official>
 {
     public OfficialFormModel()
     {

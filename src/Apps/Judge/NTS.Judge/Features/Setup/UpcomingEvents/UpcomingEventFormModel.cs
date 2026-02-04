@@ -5,7 +5,7 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
-public class UpcomingEventFormModel : KrudFormModel<UpcomingEvent>
+public record UpcomingEventFormModel : KrudFormModel<UpcomingEvent>
 {
     public UpcomingEventFormModel()
     {

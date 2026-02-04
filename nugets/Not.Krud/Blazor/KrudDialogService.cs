@@ -1,49 +1,50 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Application.Services;
+using Not.Blazor.Mud;
 using Not.Exceptions;
-using Not.Krud.Blazor.Components;
+using Not.Krud.Abstractions;
 using Not.Krud.Blazor.Components.Abstractions;
+using Not.Krud.Blazor.Components.Form;
 
 namespace Not.Krud.Blazor;
 
-public class KrudDialogService<T, TForm>
-    where T : new()
-    where TForm : KrudFormContainer<T>
+public class KrudDialogService<TModel, TForm>
+    where TModel : IKrudFormModel, new()
+    where TForm : KrudFormShell<TModel>
 {
     readonly IDialogService _mudDialogService;
-    readonly IFormBehind<T> _service;
     readonly DialogOptions _options = new() { BackdropClick = false };
 
-    public KrudDialogService(IDialogService mudDialogService, IFormBehind<T> service)
+    public KrudDialogService(IDialogService mudDialogService)
     {
         _mudDialogService = mudDialogService;
-        _service = service;
     }
 
-    public async Task<T> ShowCreateForm()
+    public async Task<TModel?> ShowCreateForm()
     {
-        var parameters = new DialogParameters<KrudFormDialog<T, TForm>> { { x => x.Submit, _service.Create } };
-        return await Show(Create_string, parameters);
+        return await Show<KrudFormDialog<TModel, TForm>>(Create_string, []);
     }
 
-    public async Task ShowUpdateForm(T model)
+    public async Task ShowUpdateForm(TModel model)
     {
-        var parameters = new DialogParameters<KrudFormDialog<T, TForm>> { 
-            { x => x.Model, model },
-            { x => x.Submit, _service.Update }
+        var parameters = new DialogParameters<KrudFormDialog<TModel, TForm>> { 
+            { x => x.Model, model }
         };
         await Show(Update_string, parameters);
     }
 
-    async Task<T> Show<TDialog>(string title, DialogParameters<TDialog> parameters)
+    async Task<TModel?> Show<TDialog>(string title, DialogParameters<TDialog> parameters)
         where TDialog : IComponent
     {
         var dialog = await _mudDialogService.ShowAsync<TDialog>(title, parameters, _options);
-        var result = await dialog.Result;
-        if (result?.Data is not T entity)
+        if (await dialog.IsCanceled())
         {
-            throw GuardHelper.Exception($"Mud dialogr result returned '{result?.Data}'. Expected '{typeof(T).FullName}' instead");
+            return default;
+        }
+        var result = await dialog.Result;
+        if (result?.Data is not TModel entity)
+        {
+            throw GuardHelper.Exception($"Mud dialogr result returned '{result?.Data}'. Expected '{typeof(TModel).FullName}' instead");
         }
         return entity;
     }

@@ -3,7 +3,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Clubs;
 
-public class ClubFormModel : KrudFormModel<Club>
+public record ClubFormModel : KrudFormModel<Club>
 {
     public ClubFormModel()
     {

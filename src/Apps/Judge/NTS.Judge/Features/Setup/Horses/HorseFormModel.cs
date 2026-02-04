@@ -4,7 +4,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Horses;
 
-public class HorseFormModel : KrudFormModel<Horse>
+public record HorseFormModel : KrudFormModel<Horse>
 {
     public HorseFormModel()
     {

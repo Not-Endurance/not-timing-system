@@ -5,14 +5,14 @@
 
 @inherits AthleteFormBehind
 
-<KrudForm Model="Model" ButtonText="Test" FormAction="Update">
+<KrudForm Model="Model" Create="Create" Update="Update">
 
-    <MudTextField @ref="NameField" @bind-Value="Model.Name" Label="@Name_string" />
+    <MudTextField @bind-Value="Model.Names" For="() => Model.Names" Label="@Name_string" />
 
-    <MudTextField @ref="FeiIdField" @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Required_only_for_FEI_export_string" Variant="Variant.Text" Margin="Margin.Dense" />
+    <MudTextField @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Required_only_for_FEI_export_string" Variant="Variant.Text" Margin="Margin.Dense" />
 
-    <NAutocomplete T="Country" @ref="CountryField" @bind-Value="Model.Country" Label="@nameof(Athlete.Country)" Search="Countries.Search" />
+    <NAutocomplete T="Country" @bind-Value="Model.Country" Label="@nameof(Athlete.Country)" Search="Countries.Search" />
 
-    <NAutocomplete @ref="ClubField" @bind-Value="Model.Club" Label="@nameof(Athlete.Club)" />
+    <NAutocomplete @bind-Value="Model.Club" Label="@nameof(Athlete.Club)" />
 
 </KrudForm>

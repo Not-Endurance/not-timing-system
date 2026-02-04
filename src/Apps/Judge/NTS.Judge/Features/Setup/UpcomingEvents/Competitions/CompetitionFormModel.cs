@@ -1,13 +1,12 @@
 ﻿using Not.DateAndTime;
 using Not.Domain.Exceptions;
-using Not.Krud.Abstractions;
 using Not.Krud.Models;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 
-public class CompetitionFormModel : KrudFormModel<Competition>
+public record CompetitionFormModel : KrudFormModel<Competition>
 {
     int? _requiredInspectionCompulsoryThreshold;
 

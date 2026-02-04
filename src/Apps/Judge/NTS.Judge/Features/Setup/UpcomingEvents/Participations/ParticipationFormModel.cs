@@ -1,13 +1,12 @@
 ﻿using Not.DateAndTime;
 using Not.Domain.Exceptions;
-using Not.Krud.Abstractions;
 using Not.Krud.Models;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
 
-public class ParticipationFormModel : KrudFormModel<Participation>
+public record ParticipationFormModel : KrudFormModel<Participation>
 {
     public bool IsNotRanked { get; set; }
     public Combination? Combination { get; set; }

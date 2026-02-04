@@ -9,7 +9,7 @@ namespace Not.Blazor.CRUD.Forms.Validation;
 // event-driven validation is implemented for MudBaseInput<T>
 public class MudValidationInjector
 {
-    static readonly Type _listOfStringType = typeof(List<string>);
+    static readonly Type LIST_OF_STRING_TYPE = typeof(List<string>);
 
     public static MudValidationInjector Create<T>(Func<MudFormComponent<T, string>> getter)
     {
@@ -40,7 +40,7 @@ public class MudValidationInjector
         ErrorProperty = mudInputType.Property("Error");
         ErrorTextProperty = mudInputType.Property("ErrorText");
         ValidationErrorsProperty = mudInputType.Property("ValidationErrors");
-        AddValidationErrorMethod = _listOfStringType.Method(nameof(List<string>.Add));
+        AddValidationErrorMethod = LIST_OF_STRING_TYPE.Method(nameof(List<string>.Add));
     }
 
     protected Func<object> InstanceGetter { get; }

@@ -1,10 +1,9 @@
-﻿using Not.Krud.Abstractions;
-using Not.Krud.Models;
+﻿using Not.Krud.Models;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 
-public class LoopFormModel : KrudFormModel<Loop>
+public record LoopFormModel : KrudFormModel<Loop>
 {
     public LoopFormModel()
     {

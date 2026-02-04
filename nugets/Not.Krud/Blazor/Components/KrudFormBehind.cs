@@ -1,22 +1,27 @@
 using Microsoft.AspNetCore.Components;
+using Not.Blazor.Components;
 using Not.Blazor.Navigation;
 using Not.Exceptions;
-using Not.Krud.Blazor.Components.Abstractions;
+using Not.Krud.Abstractions;
+using Not.Krud.Blazor.Components.Form;
 
 namespace Not.Krud.Blazor.Components;
 
-public abstract class KrudFormBehind<TModel> : KrudFormContainer<TModel>
+public abstract class KrudFormBehind<TModel> : NComponent
+    where TModel : IKrudFormModel
 {
-    //public NDynamic<TModel, TForm> Form = default!;
-
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;
+
+    protected ExceptionValidator ValidatorRef { get; set; } = default!;
+
+    protected bool IsCreateForm => Model.Id == null;
     
     [Parameter, EditorRequired]
-    public Func<TModel, Task> FormAction { get; set; } = default!;
+    public Func<Task> Create { get; set; } = default!;
 
     [Parameter, EditorRequired]
-    public string ButtonText { get; set; } = default!;
+    public Func<Task> Update { get; set; } = default!;
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
@@ -27,27 +32,56 @@ public abstract class KrudFormBehind<TModel> : KrudFormContainer<TModel>
     [Parameter]
     public bool DisableBack { get; set; }
 
-    protected async Task InjectValidation(ValidationException _)
+    public async Task OnSubmit()
     {
-        await Task.CompletedTask;
-        //await Form!.Instance.AddValidationError(validation.Property, validation.Message);
-    }
+        try
+        {
+            ValidatorRef.Reset();
 
-    public async Task Submit()
-    {
-        await FormAction(Model);
+            if (IsCreateForm)
+            {
+                await Create();
+            }
+            else
+            {
+                await Update();
+            }
+        }
+        catch (ValidationException ex)
+        {
+            ValidatorRef.ShowErrors([ex]);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     public bool CanNavigateBack()
     {
-        return !DisableBack && Navigator.CanNavigateBack();
+        try
+        {
+            return !DisableBack && Navigator.CanNavigateBack();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+            return false;
+        }
     }
 
     public void NavigateBack()
     {
-        if (CanNavigateBack())
+        try
         {
-            Navigator.NavigateBack();
+            if (CanNavigateBack())
+            {
+                Navigator.NavigateBack();
+            }
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
         }
     }
 }

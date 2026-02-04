@@ -1,11 +1,10 @@
-﻿using Not.Krud.Abstractions;
-using Not.Krud.Models;
+﻿using Not.Krud.Models;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Combinations;
 
-public class CombinationFormModel : KrudFormModel<Combination>
+public record CombinationFormModel : KrudFormModel<Combination>
 {
     public CombinationFormModel()
     {

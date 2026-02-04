@@ -1,10 +1,9 @@
-﻿using Not.Krud.Abstractions;
-using Not.Krud.Models;
+﻿using Not.Krud.Models;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Phases;
 
-public class PhaseFormModel : KrudFormModel<Phase>
+public record PhaseFormModel : KrudFormModel<Phase>
 {
     public PhaseFormModel()
     {

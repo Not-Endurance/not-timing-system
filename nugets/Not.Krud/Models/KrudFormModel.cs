@@ -3,7 +3,7 @@ using Not.Krud.Abstractions;
 
 namespace Not.Krud.Models;
 
-public abstract class KrudFormModel<T> : IKrudModel<T>
+public abstract record KrudFormModel<T> : IKrudModel<T>, IKrudFormModel
     where T : IEntity
 {
     public abstract void MapFrom(T entity);
