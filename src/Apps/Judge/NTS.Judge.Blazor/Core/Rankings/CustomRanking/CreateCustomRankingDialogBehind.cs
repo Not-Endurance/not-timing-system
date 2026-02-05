@@ -81,10 +81,10 @@ public class CreateCustomRankingDialogBehind : NDialog
         return await SafeHelper.Run(Rankings.ReadMany);
     }
 
-    public async Task<IEnumerable<Participation?>> SearchParticipations(string term)
+    public async Task<IEnumerable<Participation?>> SearchParticipations(string term, CancellationToken _)
     {
         // TODO: convert to IRepository.Search
-        return await SafeHelper.Run(() => Participations.ReadMany(x => x.ToString().Contains(term)));
+        return await Participations.ReadMany(x => x.ToString().Contains(term));
     }
 
     public async Task Create()

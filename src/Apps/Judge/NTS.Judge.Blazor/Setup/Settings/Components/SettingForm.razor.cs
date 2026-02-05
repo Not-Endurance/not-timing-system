@@ -1,9 +1,8 @@
 using System.Globalization;
-using Not.Blazor.Components;
+using Not.Application.Services;
+using Not.Blazor.Components.Input;
 using Not.Blazor.CRUD.Forms.Components;
-using Not.Krud.Blazor.Components;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Settings;
 using NTS.Judge.Features.Setup.Services;
 using NTS.Judge.Features.Setup.Settings;
 
@@ -15,6 +14,9 @@ public partial class SettingForm : NForm<SettingFormModel>
 
     [Inject]
     ILanguageSeeker LanguageSeeker { get; set; } = default!;
+
+    [Inject]
+    ISeeker<Country> CountrySeeker { get; set; } = default!;
 
     [Inject]
     NavigationManager NavManager { get; set; } = default!;
@@ -32,11 +34,13 @@ public partial class SettingForm : NForm<SettingFormModel>
         return Task.CompletedTask;
     }
 
-    // NSelect<DetectionMode?> _detectionModeField = default!;
+    protected async Task<IEnumerable<Country?>> SearchCountrySafe(string term, CancellationToken ct)
+    {
+        return await CountrySeeker.Search(term, ct);
+    }
 
     public override void RegisterValidationInjectors()
     {
         RegisterInjector(nameof(Setting.Country), () => _countryField);
-        // RegisterInjector(nameof(Setting.DetectionMode), () => _detectionModeField);
     }
 }

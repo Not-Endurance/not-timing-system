@@ -3,6 +3,7 @@
 @using NTS.Domain.Setup.Aggregates
 @using NTS.Judge.Features.Setup.UpcomingEvents
 @using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 
 @inherits NForm<UpcomingEventFormModel>;
@@ -12,7 +13,7 @@
     
     <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
 
-    <NAutocomplete T="Country" @ref="_countryField" @bind-Value="Model.Country" Label="@Country_string" Search="Countries.Search" />
+    <NAutocomplete T="Country" @bind-Value="Model.Country" Label="@Country_string" SearchSafe="(term, ct) => Countries.Search(term, ct)" />
     
     <MudTextField @bind-Value="Model.FeiShowId" Label="@($"{required_for_FEI_export} - {FEI_Show_ID_label}")" />
     

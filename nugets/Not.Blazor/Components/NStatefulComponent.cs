@@ -33,6 +33,7 @@ public class NStatefulComponent : NComponent, IDisposable
     }
 }
 
+// TODO: Delete
 public class NStatefulComponent<T> : NStatefulComponent, IDisposable
     where T : IStatefulService
 {

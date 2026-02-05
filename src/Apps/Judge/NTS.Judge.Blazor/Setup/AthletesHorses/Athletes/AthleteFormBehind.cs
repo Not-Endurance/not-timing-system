@@ -1,7 +1,10 @@
 using MudBlazor;
+using Not.Application.CRUD.Ports;
 using Not.Application.Services;
 using Not.Krud.Blazor.Components.Abstractions;
+using Not.Strings;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Features.Setup.Athletes;
 
 namespace NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
@@ -9,5 +12,19 @@ namespace NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 public class AthleteFormBehind : KrudFormShell<AthleteFormModel>
 {
     [Inject]
-    protected ISeeker<Country> Countries { get; set; } = default!;
+    IRepository<Club> ClubBehind { get; set; } = default!;
+
+    [Inject]
+    ISeeker<Country> Countries { get; set; } = default!;
+
+    protected async Task<IEnumerable<Country?>> SearchCountriesSafe(string term, CancellationToken ct)
+    {
+        return await Countries.Search(term, ct);
+    }
+
+    protected async Task<IEnumerable<Club?>> SearchClubsSafe(string term, CancellationToken _)
+    {
+        var items = await ClubBehind.ReadMany();
+        return items.Where(x => term == string.Empty || x.Name.NContains(term));
+    }
 }

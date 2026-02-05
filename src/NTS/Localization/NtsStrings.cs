@@ -27,6 +27,7 @@ namespace NTS.Localization
         public static string Athletes_and_Horses_string => LocalizeString(nameof(Athletes_and_Horses_string));
         public static string Combinations_string => LocalizeString(nameof(Combinations_string));
         public static string Clubs_string => LocalizeString(nameof(Clubs_string));
+        public static string Club_string => LocalizeString(nameof(Club_string));
         public static string Startlist_string => LocalizeString(nameof(Startlist_string));
         public static string Ranklist_string => LocalizeString(nameof(Ranklist_string));
         public static string Handouts_string => LocalizeString(nameof(Handouts_string));
@@ -152,6 +153,7 @@ namespace NTS.Localization
         public static string No_results_found_in_archive_string =>
             LocalizeString(nameof(No_results_found_in_archive_string));
         public static string FEI_ID => LocalizeString(nameof(FEI_ID));
+        public static string FEI_Id_string => LocalizeString(nameof(FEI_Id_string));
         public static string Actions_string => LocalizeString(nameof(Actions_string));
         public static string FEI_Show_ID_label => LocalizeString(nameof(FEI_Show_ID_label));
         public static string FEI_Show_ID => LocalizeString(nameof(FEI_Show_ID));

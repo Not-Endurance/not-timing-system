@@ -1,5 +1,6 @@
 ﻿@using NTS.Domain.Aggregates
 @using NTS.Domain.Setup.Aggregates
+@using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 @using NTS.Judge.Features.Setup.Athletes
 
@@ -7,12 +8,12 @@
 
 <KrudForm Shell="this">
 
-    <MudTextField @bind-Value="Model.Names" For="() => Model.Names" Label="@Name_string" />
+    <NTextField @bind-Value="Model.Names" For="() => Model.Names" Label="@Name_string" />
 
-    <MudTextField @bind-Value="Model.FeiId" Label="Fei Id" HelperText="@Required_only_for_FEI_export_string" Variant="Variant.Text" Margin="Margin.Dense" />
+    <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@FEI_Id_string" HelperText="@Required_only_for_FEI_export_string" />
 
-    <NAutocomplete T="Country" @bind-Value="Model.Country" Label="@nameof(Athlete.Country)" Search="Countries.Search" />
+    <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountriesSafe" />
 
-    <NAutocomplete @bind-Value="Model.Club" Label="@nameof(Athlete.Club)" />
+    <NAutocomplete @bind-Value="Model.Club" For="() => Model.Club" Label="@Clubs_string" SearchSafe="SearchClubsSafe" />
 
 </KrudForm>

@@ -1,6 +1,7 @@
 using MudBlazor;
 using Not.Application.Services;
 using Not.Blazor.Components;
+using Not.Blazor.Components.Input;
 using Not.Strings;
 using NTS.Blazor.Constants;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
@@ -31,7 +32,7 @@ public partial class ParticipationForm
         RegisterInjector(nameof(Participation.Category), () => _categoryField);
     }
 
-    async Task<IEnumerable<Combination>> SearchCombinations(string term)
+    async Task<IEnumerable<Combination>> SearchCombinations(string term, CancellationToken _)
     {
         return Search(await Behind.ReadMany(), term);
     }

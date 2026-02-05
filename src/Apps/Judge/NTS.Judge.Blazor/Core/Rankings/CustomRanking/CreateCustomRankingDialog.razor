@@ -2,6 +2,7 @@
 @using NTS.Judge.Features.Core.Rankings;
 @using NTS.Judge.Features.Core.Rankings.CustomRankings
 @using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Input
 
 @inherits CreateCustomRankingDialogBehind
 
@@ -18,7 +19,7 @@
                 <MudText Typo="Typo.body2" Color="Color.Info" HtmlTag="i">*@Optionally_select_existing_ranking_to_prepopulate_the_form_string</MudText>
 
                 <MudStack Row AlignItems="AlignItems.Center">
-                    <NAutocomplete @bind-Value="EntryToAdd.Participation" Search="SearchParticipations" Label="@Select_participation_to_add_string"/>
+                    <NAutocomplete @bind-Value="EntryToAdd.Participation" SearchSafe="SearchParticipations" Label="@Select_participation_to_add_string"/>
 
                     <NSwitch @bind-Value="EntryToAdd.IsNotRanked" Label="@Is_not_ranked_string"/>
 

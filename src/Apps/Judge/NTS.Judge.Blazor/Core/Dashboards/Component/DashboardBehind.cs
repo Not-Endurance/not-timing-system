@@ -7,7 +7,7 @@ namespace NTS.Judge.Blazor.Core.Dashboards.Component;
 
 public class DashboardBehind : NStatefulComponent<IDashboardService>
 {
-    protected Task<IEnumerable<Participation>> Search(string term)
+    protected Task<IEnumerable<Participation>> Search(string term, CancellationToken _)
     {
         if (string.IsNullOrEmpty(term))
         {

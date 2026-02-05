@@ -783,4 +783,7 @@
   <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
     <value>Cannot add a completed participation in Startlist</value>
   </data>
+  <data name="Fei_Id_string" xml:space="preserve">
+    <value>FEI Id</value>
+  </data>
 </root>

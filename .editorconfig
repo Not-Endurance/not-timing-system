@@ -279,3 +279,8 @@ dotnet_diagnostic.CA1865.severity = warning
 dotnet_diagnostic.NA0006.severity = none
 
 #<<<<<<<<<<<<<< Disable custom rules ##############
+
+# CS0612: Type or member is obsolete.
+# We want to have the ability to use obsolete attribute without breaking the build
+dotnet_diagnostic.CS0612.severity = none
+dotnet_diagnostic.CS0618.severity = none

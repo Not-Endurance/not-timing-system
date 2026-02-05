@@ -1,15 +1,14 @@
 ﻿@using NTS.Judge.Features.Setup.Settings
 @using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 
 @inherits NForm<SettingFormModel>
 
 <EditForm Model="Model">
 
-    <NAutocomplete @ref="_countryField" @bind-Value="Model.Country" Label="@Country_string" />
+    <NAutocomplete @ref="_countryField" @bind-Value="Model.Country" Label="@Country_string" SearchSafe="SearchCountrySafe"/>
     
-    <NAutocomplete @bind-Value="Model.LanguageCountry" @bind-Value:after="SetUiCulture" Label="@Language_string" Search="LanguageSeeker.SearchLocalizedCountries" />
-    
-    @* <NSelect @ref="_detectionModeField" @bind-Value="Model.DetectionMode" Label="Detection Mode" /> *@
+    <NAutocomplete @bind-Value="Model.LanguageCountry" @bind-Value:after="SetUiCulture" Label="@Language_string" SearchSafe="LanguageSeeker.SearchLocalizedCountries" />
 
 </EditForm>

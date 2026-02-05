@@ -22,7 +22,7 @@ public partial class HandoutForm
         await Behind.Create(_combination.Number);
     }
 
-    async Task<IEnumerable<Combination?>> Search(string term)
+    async Task<IEnumerable<Combination?>> Search(string term, CancellationToken _)
     {
         var combinations = await Behind.GetCombinations();
         if (string.IsNullOrEmpty(term))

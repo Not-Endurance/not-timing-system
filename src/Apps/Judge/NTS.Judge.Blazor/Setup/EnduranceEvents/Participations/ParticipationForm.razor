@@ -2,13 +2,14 @@
 @using NTS.Domain.Setup.Aggregates.UpcomingEvents
 @using NTS.Judge.Features.Setup.UpcomingEvents.Participations
 @using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 
 @inherits NForm<ParticipationFormModel>;
 
 <EditForm Model="Model">
     <NAutocomplete @ref="_combinationField" T="Combination" Label="@Combination_string" @bind-Value="Model.Combination"
-        Search="SearchCombinations" />
+        SearchSafe="SearchCombinations" />
 
     <NSelect @ref="_categoryField" @bind-Value="Model.Category" Label="@Category_string" />
     

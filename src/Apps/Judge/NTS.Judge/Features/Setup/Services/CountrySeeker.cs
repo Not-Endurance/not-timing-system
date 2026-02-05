@@ -14,7 +14,7 @@ public class CountrySeeker : ISeeker<Country>
         _countriesCache = countriesCache;
     }
 
-    public async Task<IEnumerable<Country>> Search(string term)
+    public async Task<IEnumerable<Country>> Search(string term, CancellationToken _)
     {
         var items = await _countriesCache.List(); // TODO: convert to CountryBehind
         return items.Where(x => x.Name.NContains(term));

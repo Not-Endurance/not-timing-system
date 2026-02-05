@@ -691,4 +691,7 @@
   <data name="Cannot_add_completed_participations_in_startlist" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="Fei_Id_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
 </root>

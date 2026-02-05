@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using Not.Reflection;
 
 namespace Not.Exceptions;
 
@@ -19,7 +18,7 @@ public static class GuardHelper
         [CallerFilePath] string? callerFilePath = null,
         [CallerMemberName] string? callerMemberName = null)
     {
-        ThrowIfDefault(value, $"'{0}' cannot be default in {callerFilePath}.{callerMemberName}");
+        ThrowIfDefault(value, $"'{typeof(T).Name}' cannot be default in {callerFilePath}.{callerMemberName}");
         return value;
     }
 
@@ -27,7 +26,7 @@ public static class GuardHelper
     {
         if (value?.Equals(default(T)) ?? true)
         {
-            throw new GuardException($"{ReflectionHelper.GetName<T>()} " + message);
+            throw new GuardException(message);
         }
         return value;
     }

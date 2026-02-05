@@ -1,6 +1,7 @@
 ﻿@using NTS.Blazor.Components.ParticipationChips
 @using NTS.Domain.Core.Aggregates
 @using NTS.Blazor.Components.ParticipationTable
+@using Not.Blazor.Components.Input
 
 @inherits DashboardBehind
 
@@ -8,7 +9,7 @@
 {
     <NGrid>
         <MudItem xs="12" Class="mb-4">
-            <NAutocomplete T="Participation" @bind-value="Service.SelectedParticipation" Search="Search" Class="mb-2 dashboard-autocomplete" />
+            <NAutocomplete T="Participation" @bind-value="Service.SelectedParticipation" SearchSafe="Search" Class="mb-2 dashboard-autocomplete" />
         </MudItem>
         
         <MudItem xs="3">

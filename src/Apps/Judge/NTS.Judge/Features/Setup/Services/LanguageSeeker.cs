@@ -12,9 +12,9 @@ public class LanguageSeeker : ILanguageSeeker
         _countrySeeker = countrySeeker;
     }
 
-    public async Task<IEnumerable<Country?>> SearchLocalizedCountries(string term)
+    public async Task<IEnumerable<Country?>> SearchLocalizedCountries(string term, CancellationToken ct)
     {
-        var foundCountries = await _countrySeeker.Search(term);
+        var foundCountries = await _countrySeeker.Search(term, ct);
         return foundCountries.Where(x => x.Locale != null);
     }
 }

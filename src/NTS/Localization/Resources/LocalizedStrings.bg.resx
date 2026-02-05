@@ -768,9 +768,6 @@
   <data name="Empty_performance_official_message" xml:space="preserve">
     <value>Изберете участник отгоре, за да видите неговите резултати</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Cannot_select_another_event_before_disconnect__string" xml:space="preserve">
     <value>Прекъснете активната връзка към {0} преди да установите нова</value>
   </data>
@@ -782,5 +779,11 @@
   </data>
   <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
     <value>Не може да бъде добавен в Стартлист защото участникът е завършил</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Fei_Id_string" xml:space="preserve">
+    <value>FEI Id</value>
   </data>
 </root>

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Not.Exceptions;
 using Not.Logging;
@@ -36,16 +37,19 @@ public static class SafeHelper
         return Run(action, NotifyHelper.Warn);
     }
 
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static Task RunAsync(Func<Task> action)
     {
         return Task.Run(() => Run(action, HandleDefaultValidation));
     }
 
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static Task RunAsync(Func<Task> action, Func<ValidationException, Task> validationHandler)
     {
         return Task.Run(() => Run(action, validationHandler));
     }
 
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static async Task Run(Func<Task> action, Func<ValidationException, Task> validationHandler)
     {
         try
@@ -62,6 +66,7 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static async void Run(Action action, Func<ValidationException, Task> validationHandler)
     {
         try
@@ -78,11 +83,13 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static Task Run(Func<Task> action)
     {
         return Run(action, HandleDefaultValidation);
     }
 
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static void Run(Action action)
     {
         Run(action, HandleDefaultValidation);
@@ -127,16 +134,32 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static Task<T?> Run<T>(Func<Task<T>> action)
     {
         return Run(action, HandleDefaultValidation);
     }
 
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static Task<IEnumerable<T>> Run<T>(Func<Task<IEnumerable<T>>> action)
     {
         return Run(action, HandleDefaultValidation);
     }
 
+    public static async Task<IEnumerable<T>> RunWithError<T>(Func<Task<IEnumerable<T>>> action)
+    {
+        try
+        {
+            return await action();
+        }
+        catch (Exception ex)
+        {
+            HandleError(ex);
+            return [];
+        }
+    }
+
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static Task RunAsync<T>(Func<T, Task> action, T argument)
     {
         return Task.Run(() => Run(action, argument));
@@ -158,6 +181,7 @@ public static class SafeHelper
         }
     }
 
+    [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static Task Run<T>(Func<T, Task> action, T argument)
     {
         return Run(action, argument, NotifyHelper.Warn);
