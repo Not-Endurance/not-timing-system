@@ -6,12 +6,12 @@
 @using Not.Blazor.Pages
 
 @attribute [Route(CLUB_UPDATE)]
-@inherits NUpdatePage
+@inherits ClubContentBehind
 
 <NContent Title="@Configure_Club_string">
 
     <Main>
-        <NUpdateContainer T="ClubFormModel" TForm="ClubForm" Model="Navigator.ConsumeParameter<ClubFormModel>()" />
+        <ClubShell Model="Model" />
     </Main>
 
 </NContent>

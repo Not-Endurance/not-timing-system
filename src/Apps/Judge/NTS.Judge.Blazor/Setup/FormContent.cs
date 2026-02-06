@@ -3,7 +3,7 @@ using Not.Exceptions;
 
 namespace NTS.Judge.Blazor.Setup;
 
-public class FormMainContent<T> : NMainContent
+public class FormContent<T> : NMainContent
 {
     protected T Model { get; set; } = default!;
 
