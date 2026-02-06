@@ -14,7 +14,7 @@ public abstract class KrudShell<TModel> : NComponent
     [Inject]
     IKrudFormService<TModel> Service { get; set; } = default!;
 
-    [Parameter]
+    [Parameter, EditorRequired]
     public TModel Model { get; set; } = new();
 
     /// <summary>

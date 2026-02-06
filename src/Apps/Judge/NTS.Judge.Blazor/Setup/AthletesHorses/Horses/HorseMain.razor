@@ -3,12 +3,12 @@
 @using Not.Blazor.Navigation
 
 @attribute [Route(HORSE_UPDATE)]
-@inherits NComponent
+@inherits HorseMainBehind
 
-<NContent Title="@Configure_Horse_string">
+<NContent Title="@Configure_Horse_string" HasContent="Model != null">
 
     <Main>
-        <NUpdateContainer T="HorseFormModel" TForm="HorseForm" Model="Navigator.ConsumeParameter<HorseFormModel>()" />
+        <HorseShell Model="Model" />
     </Main>
 
 </NContent>

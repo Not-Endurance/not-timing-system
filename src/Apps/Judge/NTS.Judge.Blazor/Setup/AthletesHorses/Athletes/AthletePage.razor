@@ -3,7 +3,7 @@
 @attribute [Route(ATHLETE_UPDATE)]
 @inherits AthletePageBehind
 
-<NContent Title="@Configure_Athlete_string">
+<NContent Title="@Configure_Athlete_string" HasContent="Model != null">
 
     <Main>
         <AthleteShell Model="Model" />

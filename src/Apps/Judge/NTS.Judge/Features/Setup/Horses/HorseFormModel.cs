@@ -1,5 +1,4 @@
-﻿using Not.Krud.Abstractions;
-using Not.Krud.Models;
+﻿using Not.Krud.Models;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Horses;
