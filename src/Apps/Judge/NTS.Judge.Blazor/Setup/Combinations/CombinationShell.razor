@@ -1,0 +1,15 @@
+﻿@using NTS.Domain.Core.StaticOptions
+@using NTS.Judge.Features.Setup.UpcomingEvents.Combinations
+@using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+
+@inherits CombinationShellBehind
+
+<KrudForm Shell="this">
+    <MudNumericField @bind-Value="Model.Number" For="() => Model.Number" Min="@((int?)0)" Label="@Combination_Number_string" />
+
+    <NAutocomplete @bind-Value="Model.Athlete" For="() => Model.Athlete" Label="@Athlete_string" SearchSafe="SearchAthletes" />
+
+    <NAutocomplete @bind-Value="Model.Horse" For="() => Model.Horse" Label="@Horse_string" SearchSafe="SearchHorses"/>
+</KrudForm>
