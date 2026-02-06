@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using MudBlazor;
-using Not.Blazor.Components;
 using Not.Reflection;
 
 namespace Not.Blazor.CRUD.Forms.Validation;
@@ -19,11 +18,6 @@ public class MudValidationInjector
     public static MudValidationInjector Create<T>(Func<MudBooleanInput<T>> wrapperGetter)
     {
         return new MudValidationInjector(typeof(MudFormComponent<T, string>), () => wrapperGetter());
-    }
-
-    public static MudValidationInjector Create<T, TInternal>(Func<NSwitch> wrapperGetter)
-    {
-        return new MudValidationInjector(typeof(NSwitch), () => wrapperGetter());
     }
 
     public static MudValidationInjector Create<T>(Func<IMudBaseInputWrapper<T>> wrapperGetter)

@@ -1,0 +1,21 @@
+﻿@typeparam T
+@inherits NSelectBehind<T>
+
+<MudSelect
+    T="T"
+    @bind-Value="Value"
+    Placeholder="@Placeholder"
+    Label="@Label"
+    For="@For"
+    HelperText="@HelperText">
+    
+    @foreach (var item in Items)
+    {
+        <MudSelectItem Value="@item.Value">@item.Label</MudSelectItem>
+    }
+    @if(!Items.Any())
+    {
+        <MudSelectItem T="T" Class="pa-4">@List_is_empty_string</MudSelectItem>
+    }
+</MudSelect>
+ 

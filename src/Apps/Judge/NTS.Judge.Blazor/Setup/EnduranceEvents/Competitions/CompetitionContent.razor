@@ -8,19 +8,19 @@
 @using Not.Krud.Blazor.Components
 
 @attribute [Route(COMPETITION_UPDATE)]
-@inherits NComponent
+@inherits CompetitionContentBehind
 
-<NContent Title="@Configure_Competition_string" HasContent="_competition != null">
+<NContent Title="@Configure_Competition_string" HasContent="Model != null">
 
     <Main>
         <NGrid Spacing="8">
             
             <MudItem xs="12">
-                <NUpdateContainer T="CompetitionFormModel" TForm="CompetitionForm" Model="_competition" />
+                <CompetitionShell Model="Model" />
             </MudItem>
 
             <MudItem xs="6">
-                @* <KrudList T="Phase" Name="@Phases_string" TModel="PhaseFormModel" TForm="PhaseForm" UpdateRoute="@PHASE_UPDATE" /> *@
+                @* <KrudList T="Phase"TModel="PhaseFormModel"  TShell="PhaseForm" Name="@Phases_string" /> *@
             </MudItem>
 
             <MudItem xs="6">

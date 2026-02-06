@@ -2,13 +2,14 @@
 @using NTS.Domain.Setup.Aggregates.UpcomingEvents
 @using NTS.Judge.Features.Setup.UpcomingEvents.Phases
 @using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 @using Not.Structures
 
 @inherits NForm<PhaseFormModel>
 
 <EditForm Model="Model">
-    <NSelect @ref="_loopField" T="Loop" Label="@Loop_string" Placeholder="@Select_a_loop_string" Items="_loops" @bind-Value="Model.Loop" />
+    <NSelect T="Loop" @bind-Value="Model.Loop" Label="@Loop_string" Placeholder="@Select_a_loop_string" Items="_loops" />
 
     <MudNumericField @ref="_recoveryField" @bind-Value="Model.Recovery" Min="@((int?)0)" Label="@Recovery_time_string" />
 

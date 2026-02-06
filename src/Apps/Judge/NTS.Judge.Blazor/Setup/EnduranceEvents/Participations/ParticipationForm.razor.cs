@@ -13,7 +13,6 @@ public partial class ParticipationForm
     static readonly PatternMask TIME_MASK = new(Masks.MINUTES_TIME_MASK_FORMAT);
 
     NAutocomplete<Combination> _combinationField = default!;
-    NSwitch _isNotRankedField = default!;
     MudPicker<TimeSpan?> _timeField = default!;
     MudNumericField<double?> _maxSpeedOverrideField = default!;
     MudNumericField<double?> _minSpeedOverrideField = default!;
@@ -25,7 +24,6 @@ public partial class ParticipationForm
     public override void RegisterValidationInjectors()
     {
         RegisterInjector(nameof(Participation.Combination), () => _combinationField);
-        RegisterInjector(nameof(Participation.IsNotRanked), () => _isNotRankedField);
         RegisterInjector(nameof(Participation.StartTimeOverride), () => _timeField);
         RegisterInjector(nameof(Participation.MaxSpeedOverride), () => _maxSpeedOverrideField);
         RegisterInjector(nameof(Participation.MinSpeedOverride), () => _minSpeedOverrideField);

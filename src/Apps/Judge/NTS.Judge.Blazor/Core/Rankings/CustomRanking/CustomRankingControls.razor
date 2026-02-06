@@ -1,13 +1,14 @@
+@using Not.Blazor.Components.Input
 @inherits CustomRankingControlsBehind;
 
 <EditForm Model="Model">
     <MudTextField @ref="NameField" @bind-Value="Model.Name" Label="@Name_string" />
     
-    <NSelect @ref="RulesetField" @bind-Value="Model.Ruleset" Label="@Competition_Ruleset_string" />
+    <NSelect @bind-Value="Model.Ruleset" Label="@Competition_Ruleset_string" />
     
-    <NSelect @ref="TypeField" @bind-Value="Model.Type" Label="@Competition_Type_string" />
+    <NSelect @bind-Value="Model.Type" Label="@Competition_Type_string" />
     
-    <NSelect @ref="CategoryField" @bind-Value="Model.Category" Label="@Category_string" />
+    <NSelect @bind-Value="Model.Category" Label="@Category_string" />
 
     <MudTextField @bind-Value="Model.CompetitionFeiId" Label="@($"{required_for_FEI_export} - {FEI_Competition_ID_label}")" />
 

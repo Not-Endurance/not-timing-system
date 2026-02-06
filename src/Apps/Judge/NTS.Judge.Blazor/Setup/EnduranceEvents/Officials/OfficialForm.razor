@@ -1,5 +1,6 @@
 ﻿@using NTS.Judge.Features.Setup.UpcomingEvents.Officials
 @using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 
 @inherits NForm<OfficialFormModel>;
@@ -7,5 +8,5 @@
 <EditForm Model="Model">
     <MudTextField @ref="_nameField" @bind-Value="Model.Name" Label="@Name_string" />
 
-    <NSelect @ref="_roleField" Items="_roles" @bind-Value="Model.Role" Label="@Official_Role_string" Placeholder="@Select_a_role_string"/>
+    <NSelect @bind-Value="Model.Role" Items="_roles" Label="@Official_Role_string" Placeholder="@Select_a_role_string" />
 </EditForm>

@@ -10,10 +10,29 @@ internal class ForRequiredValidator
     {
         if (mudBaseInput.For == null)
         {
-            var fieldIdentifier = mudBaseInput.Label ?? $"{mudBaseInput.GetType().Name}({typeof(T).Name})";
-            NotifyHelper.Error(
-                $"Parameter '{nameof(mudBaseInput.For)}' is not provided on '{fieldIdentifier}'. " +
-                $"Form validation will not work for that field");
+            Validate(mudBaseInput.Label, mudBaseInput.GetType(), typeof(T));
         }
+    }
+
+    public static void ValidateFor<T>(MudSwitch<T> switchInput)
+    {
+        if (switchInput.For == null)
+        {
+            Validate(switchInput.Label, switchInput.GetType(), typeof(T));
+        }
+    }
+
+    public static void ValidateFor<T>(MudPicker<T> mudDatePicker)
+    {
+        if (mudDatePicker.For == null)
+        {
+            Validate(mudDatePicker.Label, mudDatePicker.GetType(), typeof(T));
+        }
+    }
+
+    static void Validate(string? label, Type inputType, Type genericType)
+    {
+        var identifier = label ?? $"{inputType.Name}({genericType.Name})";
+        NotifyHelper.Error($"Parameter 'For' is not provided on '{identifier}'. Form validation will not work for that field");
     }
 }

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using MudBlazor;
+﻿using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.CRUD.Forms.Validation;
 using Not.Notify;
@@ -40,12 +39,6 @@ public abstract class NForm<T> : NComponent
     protected void RegisterInjector<TInput>(string field, Func<MudPicker<TInput>> mudInputInstanceGetter)
     {
         var injector = MudValidationInjector.Create(mudInputInstanceGetter);
-        AddInjector(field, injector);
-    }
-
-    protected void RegisterInjector(string field, Func<NSwitch> mudInputInstanceGetter)
-    {
-        var injector = MudValidationInjector.Create<bool, bool>(mudInputInstanceGetter);
         AddInjector(field, injector);
     }
 
