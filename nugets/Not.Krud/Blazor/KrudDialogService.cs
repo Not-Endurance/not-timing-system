@@ -10,7 +10,7 @@ namespace Not.Krud.Blazor;
 
 public class KrudDialogService<TModel, TForm>
     where TModel : IKrudFormModel, new()
-    where TForm : KrudFormShell<TModel>
+    where TForm : KrudShell<TModel>
 {
     readonly IDialogService _mudDialogService;
     readonly DialogOptions _options = new() { BackdropClick = false };

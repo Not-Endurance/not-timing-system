@@ -10,18 +10,19 @@ using Not.Krud.Blazor.Components.Abstractions;
 
 namespace Not.Krud.Blazor.Components;
 
-public class KrudListBehind<T, TModel, TForm> : NStatefulComponent
+public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     where T : Entity
     where TModel : IKrudModel<T>, IKrudFormModel, new()
-    where TForm : KrudFormShell<TModel>
+    where TShell : KrudShell<TModel>
 {
+    Type? _aggregateType;
     List<T> _entities = [];
 
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;
 
     [Inject]
-    KrudDialogService<TModel, TForm> DialogService { get; set; } = default!;
+    KrudDialogService<TModel, TShell> DialogService { get; set; } = default!;
 
     [Inject]
     IEnumerable<IKrudNodeSetter> ParentContexts { get; set; } = default!;
@@ -34,13 +35,22 @@ public class KrudListBehind<T, TModel, TForm> : NStatefulComponent
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;
 
-    [Parameter, EditorRequired]
+    [Parameter]
     public string UpdateRoute { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         _entities = await Service.ReadMany().ToList();
         IsLoading = false;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (UpdateRoute == null)
+        {
+            var aggregate = (_aggregateType ??= typeof(T)).Name.ToLower();
+            UpdateRoute = $"/{aggregate}-update";
+        }
     }
 
     protected async Task CreateSafe()

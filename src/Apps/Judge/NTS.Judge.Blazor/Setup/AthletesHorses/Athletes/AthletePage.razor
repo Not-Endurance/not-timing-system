@@ -1,12 +1,12 @@
 ﻿@using Not.Blazor.Pages
 
 @attribute [Route(ATHLETE_UPDATE)]
-@inherits AthleteUpdateBehind
+@inherits AthletePageBehind
 
 <NContent Title="@Configure_Athlete_string">
 
     <Main>
-        <AthleteForm Model="Model" />
+        <AthleteShell Model="Model" />
     </Main>
 
 </NContent>

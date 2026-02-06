@@ -20,11 +20,11 @@ public abstract class KrudFormBehind<TModel> : NComponent
     
     /// <summary>
     /// The calling components should provide a reference to a Shell instance. 
-    /// The intended usage is for the calling component to inherit from <see cref="KrudFormShell{TModel}"/>
+    /// The intended usage is for the calling component to inherit from <see cref="KrudShell{TModel}"/>
     /// but you can also create a separate shell component and pass a reference here. 
     /// </summary>
     [Parameter, EditorRequired]
-    public KrudFormShell<TModel> Shell { get; set; } = default!;
+    public KrudShell<TModel> Shell { get; set; } = default!;
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }

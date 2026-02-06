@@ -9,7 +9,7 @@ using NTS.Judge.Features.Setup.Athletes;
 
 namespace NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 
-public class AthleteFormBehind : KrudFormShell<AthleteFormModel>
+public class AthleteShellBehind : KrudShell<AthleteFormModel>
 {
     [Inject]
     IRepository<Club> ClubBehind { get; set; } = default!;

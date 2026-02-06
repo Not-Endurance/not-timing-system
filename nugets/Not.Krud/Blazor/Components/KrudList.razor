@@ -6,8 +6,8 @@
 
 @typeparam T where T : Entity
 @typeparam TModel where TModel : IKrudModel<T>, IKrudFormModel, new()
-@typeparam TForm where TForm : KrudFormShell<TModel>
-@inherits KrudListBehind<T, TModel, TForm>
+@typeparam TShell where TShell : KrudShell<TModel>
+@inherits KrudListBehind<T, TModel, TShell>
 
 <MudPaper Elevation="0" Class="@("pa-4 " + Class)" Style="@Style">
 

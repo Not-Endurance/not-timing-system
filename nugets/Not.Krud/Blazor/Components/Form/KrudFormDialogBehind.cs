@@ -7,7 +7,7 @@ using Not.Krud.Blazor.Components.Abstractions;
 namespace Not.Krud.Blazor.Components.Form;
 
 public class KrudFormDialogBehind<TModel, TForm> : NComponent
-    where TForm : KrudFormShell<TModel>
+    where TForm : KrudShell<TModel>
     where TModel : IKrudFormModel, new()
 {
     protected KrudDynamicForm<TForm, TModel>? DynamicFormRef { get; set; } = default!;

@@ -4,7 +4,7 @@ using NTS.Judge.Features.Setup.Athletes;
 
 namespace NTS.Judge.Blazor.Setup.AthletesHorses.Athletes;
 
-public class AthleteUpdateBehind : NComponent
+public class AthletePageBehind : NComponent
 {
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;

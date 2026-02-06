@@ -6,8 +6,8 @@ using Not.Krud.Blazor.Components.Abstractions;
 
 namespace Not.Krud.Blazor.Components.Form;
 
-public class KrudDynamicFormBehind<TForm, TModel> : NComponent
-    where TForm : KrudFormShell<TModel>
+public class KrudDynamicFormBehind<TShell, TModel> : NComponent
+    where TShell : KrudShell<TModel>
     where TModel : IKrudFormModel, new()
 {
     protected DynamicComponent? DynamicComponentRef { get; set; }
@@ -19,23 +19,23 @@ public class KrudDynamicFormBehind<TForm, TModel> : NComponent
     [Parameter, EditorRequired]
     public Func<TModel, Task> OnSubmit { get; set; } = default!;
 
-    public TForm Instance
+    public TShell Instance
     {
         get
         {
             GuardHelper.ThrowIfDefault(DynamicComponentRef?.Instance);
-            return (TForm)DynamicComponentRef.Instance;
+            return (TShell)DynamicComponentRef.Instance;
         }
     }
 
     protected override void OnParametersSet()
     {
-        OverwriteParameter(nameof(KrudFormShell<TModel>.OnSubmit), OnSubmit);
+        OverwriteParameter(nameof(KrudShell<TModel>.OnSubmit), OnSubmit);
         if (Model == null)
         {
             return;
         }
-        OverwriteParameter(nameof(KrudFormShell<TModel>.Model), Model);
+        OverwriteParameter(nameof(KrudShell<TModel>.Model), Model);
     }
 
     void OverwriteParameter(string key, object value)

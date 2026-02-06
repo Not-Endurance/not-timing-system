@@ -2,13 +2,13 @@
 @using Not.Krud.Blazor.Components.Abstractions
 
 @typeparam TModel where TModel : IKrudFormModel, new()
-@typeparam TForm where TForm : KrudFormShell<TModel>
-@inherits KrudFormDialogBehind<TModel, TForm>
+@typeparam TShell where TShell : KrudShell<TModel>
+@inherits KrudFormDialogBehind<TModel, TShell>
 
 <MudDialog>
 
     <DialogContent>
-        <KrudDynamicForm TForm="TForm" TModel="TModel" Model="Model" OnSubmit="OnSubmit" @ref="DynamicFormRef"  />
+        <KrudDynamicForm TShell="TShell" TModel="TModel" Model="Model" OnSubmit="OnSubmit" @ref="DynamicFormRef"  />
     </DialogContent>
 
 </MudDialog>

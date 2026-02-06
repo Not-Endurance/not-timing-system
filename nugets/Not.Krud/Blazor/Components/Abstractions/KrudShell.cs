@@ -5,7 +5,7 @@ using Not.Krud.Abstractions;
 
 namespace Not.Krud.Blazor.Components.Abstractions;
 
-public abstract class KrudFormShell<TModel> : NComponent
+public abstract class KrudShell<TModel> : NComponent
     where TModel : IKrudFormModel, new()
 {
     [Inject]
