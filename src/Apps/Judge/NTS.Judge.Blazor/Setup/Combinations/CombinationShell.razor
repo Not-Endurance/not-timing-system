@@ -7,7 +7,7 @@
 @inherits CombinationShellBehind
 
 <KrudForm Shell="this">
-    <MudNumericField @bind-Value="Model.Number" For="() => Model.Number" Min="@((int?)0)" Label="@Combination_Number_string" />
+    <NNumberField @bind-Value="Model.Number" For="() => Model.Number" Min="0" Label="@Combination_Number_string" />
 
     <NAutocomplete @bind-Value="Model.Athlete" For="() => Model.Athlete" Label="@Athlete_string" SearchSafe="SearchAthletes" />
 
