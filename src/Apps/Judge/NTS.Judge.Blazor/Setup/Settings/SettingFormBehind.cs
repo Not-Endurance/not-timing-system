@@ -6,9 +6,9 @@ using NTS.Domain.Aggregates;
 using NTS.Judge.Features.Setup.Services;
 using NTS.Judge.Features.Setup.Settings;
 
-namespace NTS.Judge.Blazor.Setup.Settings.Components;
+namespace NTS.Judge.Blazor.Setup.Settings;
 
-public partial class SettingForm : NForm<SettingFormModel>
+public class SettingFormBehind : NForm<SettingFormModel>
 {
     NAutocomplete<Country?> _countryField = default!;
 
@@ -32,6 +32,11 @@ public partial class SettingForm : NForm<SettingFormModel>
         CultureInfo.DefaultThreadCurrentUICulture = culture;
         NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
         return Task.CompletedTask;
+    }
+
+    protected async Task<IEnumerable<Country?>> SearchLocalizedCountry(string term, CancellationToken ct)
+    {
+        return await LanguageSeeker.SearchLocalizedCountries(term, ct);
     }
 
     protected async Task<IEnumerable<Country?>> SearchCountrySafe(string term, CancellationToken ct)

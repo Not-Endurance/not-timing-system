@@ -1,10 +1,10 @@
 ﻿@using NTS.Judge.Features.Setup.UpcomingEvents.Combinations
-@using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Layout
 
 @attribute [Route(COMBINATION_UPDATE)]
 @inherits CombinationContentBehind
 
-<NContent Title="Configure Combination">
+<NContent Title="Configure Combination" IsEmpty="Model == null">
 
     <Main>
         <CombinationShell Model="Model" />

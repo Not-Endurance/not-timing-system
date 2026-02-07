@@ -3,6 +3,7 @@
 @using NTS.Domain.Setup.Aggregates
 @using NTS.Judge.Blazor.Setup.EnduranceEvents
 @using NTS.Judge.Features.Setup.UpcomingEvents
+@using Not.Blazor.Components.Layout
 @using Not.Krud.Blazor.Components
 
 @inherits NComponent
@@ -10,7 +11,7 @@
 <NContent Title="@Select_event_string">
    
     <Main>
-        @* <KrudList T="UpcomingEvent" TForm="EnduranceEventForm" TModel="UpcomingEventFormModel" Name="@Upcoming_events_string" UpdateRoute="@ENDURANCE_EVENT_PAGE" /> *@
+        <KrudList T="UpcomingEvent" TModel="UpcomingEventFormModel" TShell="UpcomingEventShell" Name="@Upcoming_events_string" />
     </Main>
     
 </NContent>

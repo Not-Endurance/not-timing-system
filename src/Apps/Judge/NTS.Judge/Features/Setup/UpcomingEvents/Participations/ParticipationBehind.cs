@@ -1,11 +1,12 @@
 ﻿using Not.Application.CRUD.Ports;
+using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Participations;
 
-public class ParticipationBehind : KrudServiceBase<Participation, ParticipationFormModel>
+public class ParticipationBehind : KrudServiceBase<Participation, ParticipationFormModel>, ITransient
 {
     public ParticipationBehind(
         IRepository<Participation> participations,

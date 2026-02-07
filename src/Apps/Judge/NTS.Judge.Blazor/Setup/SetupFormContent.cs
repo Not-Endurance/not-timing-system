@@ -1,9 +1,10 @@
-﻿using Not.Blazor.Components.Layout;
+﻿using Not.Blazor.Components;
+using Not.Blazor.Components.Layout;
 using Not.Exceptions;
 
 namespace NTS.Judge.Blazor.Setup;
 
-public class FormContent<T> : NMainContent
+public class SetupFormContent<T> : NContentBehind
 {
     protected T Model { get; set; } = default!;
 

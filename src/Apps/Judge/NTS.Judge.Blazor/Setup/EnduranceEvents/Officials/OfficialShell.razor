@@ -1,0 +1,12 @@
+﻿@using NTS.Judge.Features.Setup.UpcomingEvents.Officials
+@using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+
+@inherits OfficialShellBehind
+
+<KrudForm Shell="this">
+    <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+
+    <NSelect @bind-Value="Model.Role" For="() => Model.Role" Label="@Official_Role_string" Placeholder="@Select_a_role_string" />
+</KrudForm>

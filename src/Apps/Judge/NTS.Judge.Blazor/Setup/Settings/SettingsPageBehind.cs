@@ -1,6 +1,5 @@
 using Not.Blazor.Components;
 using Not.Blazor.Dialogs;
-using NTS.Judge.Blazor.Setup.Settings.Components;
 using NTS.Judge.Features.Setup.Settings;
 
 namespace NTS.Judge.Blazor.Setup.Settings;

@@ -1,7 +1,6 @@
-﻿@namespace Not.Blazor.Components
-@inherits NComponent
+﻿@inherits NContentBehind
 
-@if (_showOnlyMain)
+@if (ShowOnlyMain)
 {
     if (IsLoading)
     {
@@ -27,7 +26,7 @@ else
         }
         else
         {
-            if (!HasContent)
+            if (IsEmpty)
             {
                 <MudItem xs="@MainXs">
                     <MudPaper Elevation="3" Class="not-mid-height pa-12">

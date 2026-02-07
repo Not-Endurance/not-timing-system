@@ -3,7 +3,7 @@
 public static class BlazorPages
 {
     public const string HOME = "/";
-    public const string ENDURANCE_EVENT_PAGE = "/upcoming-events";
+    public const string UPCOMING_EVENT_PAGE = "/upcomingevent-update";
     public const string ATHLETES_HORSES_PAGE = "/athletes-horses";
     public const string COMBINATIONS_PAGE = "/combinations";
     public const string LOOPS_PAGE = "/loops";

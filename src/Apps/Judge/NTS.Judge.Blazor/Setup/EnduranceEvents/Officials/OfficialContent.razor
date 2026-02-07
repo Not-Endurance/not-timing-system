@@ -1,15 +1,16 @@
 ﻿@using NTS.Domain.Setup.Aggregates
 @using NTS.Judge.Features.Setup.UpcomingEvents.Officials
 @using Not.Blazor.CRUD.Forms.Components
+@using Not.Blazor.Components.Layout
 @using Not.Blazor.Navigation
 
 @attribute [Route(OFFICIAL_UPDATE)]
-@inherits NComponent
+@inherits OfficialContentBehind
 
-<NContent Title="@Configure_Official_string">
+<NContent Title="@Configure_Official_string" IsEmpty="Model == null">
 
     <Main>
-        <NUpdateContainer T="OfficialFormModel" TForm="OfficialForm" Model="Navigator.ConsumeParameter<OfficialFormModel>()" />
+        <OfficialShell Model="Model" />
     </Main>
 
 </NContent>

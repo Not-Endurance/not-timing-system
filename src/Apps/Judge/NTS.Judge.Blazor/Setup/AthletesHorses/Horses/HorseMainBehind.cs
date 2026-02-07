@@ -2,6 +2,6 @@ using NTS.Judge.Features.Setup.Horses;
 
 namespace NTS.Judge.Blazor.Setup.AthletesHorses.Horses;
 
-public class HorseContentBehind : FormContent<HorseFormModel>
+public class HorseContentBehind : SetupFormContent<HorseFormModel>
 {
 }

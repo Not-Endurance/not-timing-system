@@ -1,0 +1,32 @@
+@using NTS.Domain.Setup.Aggregates.UpcomingEvents
+@using NTS.Judge.Blazor.Setup.EnduranceEvents.Competitions
+@using NTS.Judge.Blazor.Setup.EnduranceEvents.Officials
+@using NTS.Judge.Features.Setup.UpcomingEvents.Competitions
+@using NTS.Judge.Features.Setup.UpcomingEvents.Officials
+@using Not.Blazor.Components.Layout
+@using Not.Krud.Blazor.Components
+
+@attribute [Route(UPCOMING_EVENT_PAGE)]
+@inherits UpcomingEventContentBehind
+
+<NContent Title="@Configure_Endurance_Event_string" IsEmpty="Model == null" EmptyMessage="@Endurance_Event_does_not_exist_yet_string"> @* TODO: remove string *@
+
+    <Main>
+        <UpcomingEventShell Model="Model" />
+    </Main>
+
+    <Main2>
+        <NGrid Spacing="8">
+
+            <MudItem xs="6">
+                <KrudList T="Competition" TModel="CompetitionFormModel" TShell="CompetitionShell" Name="@Competitions_string" />
+            </MudItem>
+
+            <MudItem xs="6">
+                <KrudList T="Official" TModel="OfficialFormModel" TShell="OfficialShell" Name="@Officials_string" />
+            </MudItem>
+
+        </NGrid>
+    </Main2>
+
+</NContent>

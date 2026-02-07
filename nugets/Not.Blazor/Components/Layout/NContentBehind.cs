@@ -1,17 +1,28 @@
-namespace Not.Blazor.Components;
+using Not.Blazor.Navigation;
 
-public partial class NContent
+namespace Not.Blazor.Components.Layout;
+
+public class NContentBehind : NComponent
 {
     const int GRID_MAX_WIDTH = 12;
 
-    bool _showOnlyMain;
-    int MainXs =>
-        Rightbar == null //TODO: fix naming rules for this case - should be _mainXs
+    [Inject]
+    ICrumbsNavigator Navigator { get; set; } = default!;
+
+    protected bool ShowOnlyMain { get; private set; }
+    protected int MainXs =>
+        Rightbar == null
             ? GRID_MAX_WIDTH
             : GRID_MAX_WIDTH - RightBarXS;
 
     [Parameter, EditorRequired]
     public string Title { get; set; } = default!;
+
+    /// <summary>
+    /// If <see cref="true"/> renders an empty message instead of the contents to prevent exceptions
+    /// </summary>
+    [Parameter]
+    public bool IsEmpty { get; set; } = false;
 
     [Parameter]
     public bool IsLoading { get; set; }
@@ -29,13 +40,15 @@ public partial class NContent
     public int RightBarXS { get; set; } = 3;
 
     [Parameter]
-    public bool HasContent { get; set; } = true;
-
-    [Parameter]
-    public string? EmptyMessage { get; set; }
+    public string? EmptyMessage { get; set; } = Empty_string;
 
     [Parameter]
     public RenderFragment? EmptyContent { get; set; }
+
+    protected T GetRouteParameter<T>()
+    {
+        return Navigator.ConsumeParameter<T>();
+    }
 
     protected override void OnInitialized()
     {
@@ -44,7 +57,7 @@ public partial class NContent
 
     async void ToggleVisibilityHandler()
     {
-        _showOnlyMain = !_showOnlyMain;
+        ShowOnlyMain = !ShowOnlyMain;
         await InvokeRender();
     }
 }

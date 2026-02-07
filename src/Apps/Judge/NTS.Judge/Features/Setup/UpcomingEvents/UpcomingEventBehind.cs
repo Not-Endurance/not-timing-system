@@ -1,4 +1,5 @@
 ﻿using Not.Application.CRUD.Ports;
+using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
 using Not.Notify;
@@ -13,7 +14,8 @@ public class UpcomingEventBehind
         IKrudMirror<Loop>,
         IKrudMirror<Combination>,
         IKrudMirror<Athlete>,
-        IKrudMirror<Horse>
+        IKrudMirror<Horse>, 
+    ITransient
 {
     readonly IUpdate<UpcomingEvent> _updater;
     readonly ISelectedEventContext _eventContext;
