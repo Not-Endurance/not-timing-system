@@ -1,33 +1,27 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Injection;
 using Not.Notify;
 using Not.Safe;
-using NTS.Application.SignalR;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Core.Reset;
-using NTS.Judge.Features.Core.Start;
-using NTS.Judge.Features.Socket;
 
-namespace NTS.Judge.Features.Core;
+namespace NTS.Judge.Features.Core.State;
 
-public class CoreService : NStatefulService, ICoreService
+public class TimingStateService : NStatefulService, ITimingStateService, ISingleton
 {
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly ICoreState _coreState;
-    readonly IGroupSocketContext<UpcomingEvent> _socketContext;
-    readonly ICoreStarter _coreStarter;
+    readonly ITimingStartService _coreStarter;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Participation> _participations;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
 
-    public CoreService(
+    public TimingStateService(
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
         ICoreState coreState,
-        IGroupSocketContext<UpcomingEvent> socketContext,
-        ICoreStarter coreStarter,
+        ITimingStartService coreStarter,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Participation> participations,
@@ -37,7 +31,6 @@ public class CoreService : NStatefulService, ICoreService
     {
         _coreDependentObservables = coreDependentObservables;
         _coreState = coreState;
-        _socketContext = socketContext;
         _coreStarter = coreStarter;
         _rankings = rankings;
         _events = events;
@@ -55,21 +48,16 @@ public class CoreService : NStatefulService, ICoreService
         return IsStarted;
     }
 
-    public Task Start()
+    public Task StartTiming()
     {
         return SafeHelper.Run(SafeStart);
     }
 
-    public async Task SoftReset()
-    {
-        await _socketContext.Disconnect();
-    }
-
-    public async Task HardReset()
+    public async Task Reset()
     {
         await _coreState.Reset();
-        await SoftReset();
         IsStarted = false;
+        // TODO: replace with events when implement domain event dispatcher and handlers
         foreach (var observable in _coreDependentObservables)
         {
             observable.ResetState();
@@ -109,4 +97,11 @@ public class CoreService : NStatefulService, ICoreService
         IsStarted = true;
         EmitChanged();
     }
+}
+public interface ITimingStateService : IStatefulService
+{
+    bool IsStarted { get; }
+    Task StartTiming();
+    Task LoadArchive(int archiveId);
+    Task Reset();
 }

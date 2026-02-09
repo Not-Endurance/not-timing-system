@@ -1,6 +1,6 @@
 using Not.Blazor.Components;
 using Not.Notify;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards;
 
@@ -9,7 +9,7 @@ public class DashboardPageBehind : NStatefulComponent
     protected int? ArchiveId { get; set; }
 
     [Inject]
-    protected ICoreService Service { get; set; } = default!;
+    protected ITimingStateService Service { get; set; } = default!;
 
     protected async Task LoadArchive()
     {

@@ -8,7 +8,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Features.Core.Rankings.CustomRankings;
-using NTS.Judge.Features.Core.Reset;
+using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core.Rankings;
 

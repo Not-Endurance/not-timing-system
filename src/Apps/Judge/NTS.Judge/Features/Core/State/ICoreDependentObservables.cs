@@ -1,4 +1,4 @@
-namespace NTS.Judge.Features.Core.Reset;
+namespace NTS.Judge.Features.Core.State;
 
 public interface ICoreDependentObservables
 {

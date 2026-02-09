@@ -8,7 +8,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Judge.Features.Core.Reset;
+using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core.Handouts;
 

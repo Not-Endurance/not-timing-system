@@ -1,9 +1,0 @@
-{
-  "$id": "1",
-  "$type": "NTS.Domain.Core.StaticOptions.StaticOption+Model, NTS.Domain.Core",
-  "DetectionMode": "Rfid",
-  "RfidSnapshotType": "Stage",
-  "SelectedCountry": {
-    "$ref": "37"
-  }
-}

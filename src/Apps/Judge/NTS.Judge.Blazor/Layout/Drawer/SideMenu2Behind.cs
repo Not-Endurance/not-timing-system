@@ -2,7 +2,7 @@ using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.Mud;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Blazor.Layout.Drawer;
 
@@ -15,11 +15,13 @@ public class SideMenu2Behind : NStatefulComponent
     NavigationManager NavManager { get; set; } = default!;
 
     [Inject]
-    protected ICoreService Service { get; set; } = default!;
+    ITimingStateService Service { get; set; } = default!;
+
+    protected bool IsStarted => Service.IsStarted;
 
     protected async Task Start()
     {
-        await Service.Start();
+        await Service.StartTiming();
     }
 
     protected async Task OpenSoftResetDialog()

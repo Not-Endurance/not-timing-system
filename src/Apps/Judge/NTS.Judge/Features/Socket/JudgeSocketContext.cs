@@ -11,7 +11,7 @@ namespace NTS.Judge.Features.Socket;
 public class JudgeSocketContext
     : ISelectedEventContext,
         IStartupInitializerAsync,
-        IGroupSocketContext<UpcomingEvent>,
+        IGroupSocketService<UpcomingEvent>,
         ISingleton
 {
     readonly ISocketPrincipalStorage _socketPrincialStorage;

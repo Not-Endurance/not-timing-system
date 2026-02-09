@@ -8,7 +8,7 @@ namespace NTS.Judge.Blazor.Features.Setup.UpcomingEvents;
 public class UpcomingEventContentBehind : SetupFormContent<UpcomingEventFormModel>
 {
     [Inject]
-    IGroupSocketContext<UpcomingEvent> RpcContext { get; set; } = default!;
+    IGroupSocketService<UpcomingEvent> RpcContext { get; set; } = default!;
 
     protected override void OnInitialized()
     {

@@ -7,7 +7,7 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.Warp;
 
-public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IGroupSocketContext<UpcomingEvent>
+public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IGroupSocketService<UpcomingEvent>
 {
     readonly IRpcSocket _socket;
     readonly SocketMetadata _metadata;

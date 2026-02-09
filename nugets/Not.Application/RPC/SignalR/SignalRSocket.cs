@@ -47,7 +47,26 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     public virtual async Task Connect()
     {
-        await InternalConnect();
+        if (IsConnected)
+        {
+            var message = $"{GetType().Name} is already connected";
+            ServerConnectionInfo?.Invoke(this, message);
+            return;
+        }
+        try
+        {
+            ConfigureConnection();
+            RaiseConnecting();
+            if (!IsConnected)
+            {
+                await Connection!.StartAsync();
+            }
+            RaiseConnected();
+        }
+        catch (Exception ex)
+        {
+            NotifyHelper.Error(ex);
+        }
     }
 
     public virtual async Task Disconnect()
@@ -70,30 +89,6 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         Connection.Reconnecting -= HandleReconnecting;
         Connection.Closed -= HandleClosed;
         await Connection.DisposeAsync();
-    }
-
-    async Task InternalConnect()
-    {
-        if (IsConnected)
-        {
-            var message = $"{GetType().Name} is already connected";
-            ServerConnectionInfo?.Invoke(this, message);
-            return;
-        }
-        try
-        {
-            ConfigureConnection();
-            RaiseConnecting();
-            if (!IsConnected)
-            {
-                await Connection!.StartAsync();
-            }
-            RaiseConnected();
-        }
-        catch (Exception ex)
-        {
-            NotifyHelper.Error(ex);
-        }
     }
 
     void ConfigureConnection()

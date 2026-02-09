@@ -1,6 +1,6 @@
 using Not.Blazor.Components;
 using Not.Blazor.Navigation;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Features.Core.State;
 using NTS.Judge.Features.Settings;
 using static NTS.Judge.Blazor.Routes;
 
@@ -15,7 +15,7 @@ public class NavMenuBehind : NStatefulComponent
     protected ISettingBehind SettingBehind { get; set; } = default!;
 
     [Inject]
-    protected ICoreService CoreService { get; set; } = default!;
+    protected ITimingStateService TimingStateService { get; set; } = default!;
 
     protected override void OnInitialized()
     {
@@ -27,6 +27,6 @@ public class NavMenuBehind : NStatefulComponent
         // Necessary in order to initialize the settings on startup
         // TODO: what do if no internet?
         await Observe(SettingBehind);
-        await Observe(CoreService);
+        await Observe(TimingStateService);
     }
 }

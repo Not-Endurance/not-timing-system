@@ -8,9 +8,9 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Features.Core.Start;
+namespace NTS.Judge.Features.Core.State;
 
-public class CoreStartService : ICoreStarter
+public class TimingStartService : ITimingStartService
 {
     readonly ISelectedEventContext _eventContext;
     readonly IRepository<EnduranceEvent> _coreEventRepository;
@@ -18,7 +18,7 @@ public class CoreStartService : ICoreStarter
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<Ranking> _rankingRepository;
 
-    public CoreStartService(
+    public TimingStartService(
         ISelectedEventContext eventContext,
         IRepository<EnduranceEvent> coreEventRepository,
         IRepository<Official> coreOfficialRepository,
@@ -65,7 +65,7 @@ public class CoreStartService : ICoreStarter
     }
 
     (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(
-        Domain.Setup.Aggregates.UpcomingEvent setupEvent
+        UpcomingEvent setupEvent
     )
     {
         var participations = new List<Participation>();
@@ -166,7 +166,7 @@ public class CoreStartService : ICoreStarter
     }
 }
 
-public interface ICoreStarter : ITransient
+public interface ITimingStartService : ITransient
 {
     Task<bool> Start();
 }

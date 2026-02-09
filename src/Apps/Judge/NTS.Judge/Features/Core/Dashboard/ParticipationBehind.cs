@@ -2,15 +2,14 @@
 using Not.Application.CRUD.Ports;
 using Not.Application.Services;
 using Not.Exceptions;
+using Not.Injection;
 using Not.Safe;
 using Not.Startup;
 using NTS.Application.Core;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
-using NTS.Judge.Features.Core.Reset;
+using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core.Dashboard;
 
@@ -22,7 +21,8 @@ public class ParticipationBehind
         IUpdateBehind<PhaseUpdateModel>,
         ISnapshotProcessor,
         IStartupInitializerAsync,
-        ICoreDependentObservables
+        ICoreDependentObservables,
+        ISingleton
 {
     readonly List<int> _recentlyProcessed = [];
     readonly IRepository<Participation> _participationRepository;

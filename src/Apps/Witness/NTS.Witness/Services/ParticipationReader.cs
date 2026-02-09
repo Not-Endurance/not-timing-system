@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Injection;
 using NTS.Application.SignalR;
 using NTS.Domain.Core.Aggregates;
-using static NTS.Application.Factories.ParticipationAndRankingFactory;
+using NTS.Application.Factories;
 
 namespace NTS.Witness.Services;
 
@@ -31,7 +31,8 @@ public class ParticipationReader : IReadMany<Participation>, ITransient
             var setupParticipations = setupCompetition.Participations;
             foreach (var setupParticipation in setupParticipations)
             {
-                participations.Add(CreateParticipation(setupCompetition, setupParticipation));
+                var participation = ParticipationAndRankingFactory.CreateParticipation(setupCompetition, setupParticipation);
+                participations.Add(participation);
             }
         }
         return Task.FromResult(participations.AsEnumerable());
