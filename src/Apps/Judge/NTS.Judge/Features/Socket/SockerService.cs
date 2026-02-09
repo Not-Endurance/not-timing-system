@@ -1,23 +1,24 @@
 ﻿using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
+using Not.Injection;
 using Not.Notify;
 
-namespace NTS.Judge.Features.RPC;
+namespace NTS.Judge.Features.Socket;
 
-public class ConnectionsBehind : IConnectionsBehind, IConnectionsRegistry, IDisposable
+public class SockerService : ISocketService, ISocketConnectionsRegistry, ISingleton, IDisposable
 {
     readonly IRpcSocket _rpcSocket;
     readonly HashSet<string> _connections = [];
 
-    public ConnectionsBehind(IRpcSocket rpcSocket)
+    public SockerService(IRpcSocket rpcSocket)
     {
         _rpcSocket = rpcSocket;
         _rpcSocket.Error += HandleRpcErrors;
         _rpcSocket.ServerConnectionChanged += HandleServerConnectionChanged;
     }
 
-    public RpcConnectionStatus ServerConnectionStatus { get; private set; }
-    public bool IsServerConnected => _rpcSocket?.IsConnected ?? false;
+    public SocketConnectionStatus Status { get; private set; }
+    public bool IsConnected => _rpcSocket?.IsConnected ?? false;
     public IEnumerable<string> RemoteConnections => _connections;
 
     public void Add(string connectionId)
@@ -38,12 +39,12 @@ public class ConnectionsBehind : IConnectionsBehind, IConnectionsRegistry, IDisp
 
     void HandleRpcErrors(object? sender, RpcError rpcError)
     {
-        ServerConnectionStatus = RpcConnectionStatus.Disconnected;
+        Status = SocketConnectionStatus.Disconnected;
         NotifyHelper.Error(rpcError.Exception);
     }
 
-    void HandleServerConnectionChanged(object? sender, RpcConnectionStatus e)
+    void HandleServerConnectionChanged(object? sender, SocketConnectionStatus e)
     {
-        ServerConnectionStatus = e;
+        Status = e;
     }
 }

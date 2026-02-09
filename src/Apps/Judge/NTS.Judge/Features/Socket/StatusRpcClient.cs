@@ -4,13 +4,13 @@ using Not.Application.RPC.SignalR;
 using Not.Injection;
 using NTS.Warp.Features.Judge.Procedures;
 
-namespace NTS.Judge.Features.RPC;
+namespace NTS.Judge.Features.Socket;
 
-public class ConnectionsRpcClient : RpcClient, IConnectionsClientProcedures, ISingleton
+public class StatusRpcClient : RpcClient, IStatusClientProcedures, ISingleton
 {
-    readonly IConnectionsRegistry _connectionsRegistry;
+    readonly ISocketConnectionsRegistry _connectionsRegistry;
 
-    public ConnectionsRpcClient(IRpcSocket socket, IConnectionsRegistry connectionsRegistry)
+    public StatusRpcClient(IRpcSocket socket, ISocketConnectionsRegistry connectionsRegistry)
         : base(socket)
     {
         _connectionsRegistry = connectionsRegistry;

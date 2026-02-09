@@ -1,6 +1,6 @@
-﻿@using NTS.Judge.Blazor.Shared.Components.ConnectionStatus
+﻿@using NTS.Judge.Blazor.Features.Socket
 
-@inherits SidePanelBehind
+@inherits SideMenu2Behind
 
 <MudStack Class="ma-6">
 
@@ -11,5 +11,5 @@
 
     <NButtonWarning OnClick="OpenSoftResetDialog" Text="@Reset_string" />
 
-    <ConnectionStatus />
+    <SocketStatus />
 </MudStack>

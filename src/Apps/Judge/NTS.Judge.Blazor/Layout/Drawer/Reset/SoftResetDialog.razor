@@ -1,6 +1,7 @@
 @inherits NDialog
 
 <MudDialog>
+
     <TitleContent>@Soft_reset_string</TitleContent>
 
     <DialogContent>
@@ -12,7 +13,10 @@
 
     <DialogActions>
         <NButtonPrimary Text="@Soft_reset_string" OnClick="SoftReset" />
+
         <NButtonWarning Text="@Hard_reset_string" OnClick="OpenHardResetDialog" />
+
         <NButtonSecondary Text="@Cancel_string" OnClick="Cancel" />
     </DialogActions>
+
 </MudDialog>

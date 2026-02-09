@@ -18,12 +18,12 @@ public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IG
         _metadata = metadata;
     }
 
-    public UpcomingEvent? Hook { get; private set; }
-    public UpcomingEvent? Event => Hook;
+    public UpcomingEvent? Principal { get; private set; }
+    public UpcomingEvent? Event => Principal;
 
     public async Task Disconnect()
     {
-        var @event = Hook;
+        var @event = Principal;
         InternalSet(null);
         await _socket.Disconnect();
         if (!_socket.IsConnected && @event != null)
@@ -34,20 +34,20 @@ public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IG
 
     public async Task Connect(UpcomingEvent upcomingEvent)
     {
-        if (Hook == upcomingEvent)
+        if (Principal == upcomingEvent)
         {
             return;
         }
-        if (Hook != null)
+        if (Principal != null)
         {
-            NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Hook.Name));
+            NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Principal.Name));
             return;
         }
         InternalSet(upcomingEvent);
         await _socket.Connect();
-        if (_socket.IsConnected && Hook != null)
+        if (_socket.IsConnected && Principal != null)
         {
-            NotifyHelper.Inform(string.Format(Connected_to__string, Hook.Name));
+            NotifyHelper.Inform(string.Format(Connected_to__string, Principal.Name));
         }
     }
 
@@ -58,7 +58,7 @@ public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IG
 
     void InternalSet(UpcomingEvent? upcomingEvent)
     {
-        Hook = upcomingEvent;
+        Principal = upcomingEvent;
         _metadata.ConnectionGroupKey = upcomingEvent?.Id.ToString();
     }
 }

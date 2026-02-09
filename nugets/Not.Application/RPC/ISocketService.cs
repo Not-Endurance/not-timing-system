@@ -3,9 +3,9 @@ using Not.Injection;
 
 namespace Not.Application.RPC;
 
-public interface IConnectionsBehind : ISingleton
+public interface ISocketService
 {
+    bool IsConnected { get; }
     IEnumerable<string> RemoteConnections { get; }
-    bool IsServerConnected { get; }
-    RpcConnectionStatus ServerConnectionStatus { get; }
+    SocketConnectionStatus Status { get; }
 }

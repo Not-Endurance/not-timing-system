@@ -1,6 +1,6 @@
-﻿namespace NTS.Judge.Blazor.Shared.Constants;
+﻿namespace NTS.Judge.Blazor;
 
-public static class BlazorPages
+public static class Routes
 {
     public const string HOME = "/";
     public const string UPCOMING_EVENT_PAGE = "/upcomingevent-update";

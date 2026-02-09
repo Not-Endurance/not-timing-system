@@ -13,7 +13,7 @@ using NTS.Judge.Features.Core.Dashboard;
 using NTS.Warp;
 using NTS.Warp.Features.Judge.Procedures;
 
-namespace NTS.Judge.Features.RPC;
+namespace NTS.Judge.Features.Socket;
 
 public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures, ISingleton
 {

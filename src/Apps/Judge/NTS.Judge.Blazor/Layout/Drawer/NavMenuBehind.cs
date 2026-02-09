@@ -2,9 +2,9 @@ using Not.Blazor.Components;
 using Not.Blazor.Navigation;
 using NTS.Judge.Features.Core;
 using NTS.Judge.Features.Settings;
-using static NTS.Judge.Blazor.Shared.Constants.BlazorPages;
+using static NTS.Judge.Blazor.Routes;
 
-namespace NTS.Judge.Blazor.Shared.Components.Nav;
+namespace NTS.Judge.Blazor.Layout.Drawer;
 
 public class NavMenuBehind : NStatefulComponent
 {

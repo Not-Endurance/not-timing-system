@@ -1,9 +1,9 @@
-﻿@using NTS.Judge.Blazor.Shared
-@using System.Reflection
-@using NTS.Judge.Blazor.Shared.Components
+﻿@using System.Reflection
+@using NTS.Judge.Blazor.Layout
 @using Not.Blazor.Components
 
 <NErrorBoundary @ref="this._errorBoundary">
+
     <ChildContent>
         <Router AppAssembly="Assembly" AdditionalAssemblies="_routeAssemblies">
 
@@ -17,17 +17,22 @@
                     <p role="alert">Sorry, there's nothing at this address.</p>
                 </LayoutView>
             </NotFound>
+
         </Router>
     </ChildContent>
 
     <ErrorContent>
         <br />
+
         <br />
+
         <div class="container">
             <pre>@context.Message</pre>
+
             <pre>@context.StackTrace</pre>
         </div>
 
         <button class="btn btn-primary" @onclick="_ => this._errorBoundary.Recover()">Back</button>
     </ErrorContent>
+
 </NErrorBoundary>

@@ -2,7 +2,7 @@
 
 namespace Not.Application.RPC;
 
-public interface IConnectionsRegistry : ISingleton
+public interface ISocketConnectionsRegistry
 {
     void Add(string connectionId);
     void Remove(string connectionId);

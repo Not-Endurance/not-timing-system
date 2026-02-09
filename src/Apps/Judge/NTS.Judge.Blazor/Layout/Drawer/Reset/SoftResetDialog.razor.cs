@@ -3,7 +3,7 @@ using Not.Blazor.Components;
 using Not.Blazor.Mud;
 using NTS.Judge.Features.Core;
 
-namespace NTS.Judge.Blazor.Shared.Components.SidePanels.Reset;
+namespace NTS.Judge.Blazor.Layout.Drawer.Reset;
 
 public partial class SoftResetDialog : NDialog
 {

@@ -1,0 +1,18 @@
+﻿@using NTS.Judge.Blazor.Layout.Drawer
+@using Not.Blazor.Components.Layout
+
+@inherits MainLayoutBehind
+
+<NLayout Watermark="NTS Judge v0.4" MenuTitle="@Main_menu_string">
+
+    <Drawer>
+        <NavMenu />
+
+        <SideMenu2 />
+    </Drawer>
+    
+    <Content>
+        @Body
+    </Content>
+
+</NLayout>

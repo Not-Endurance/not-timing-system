@@ -1,13 +1,12 @@
 using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.Mud;
-using NTS.Judge.Blazor.Shared.Components.SidePanels.Reset;
-using NTS.Judge.Blazor.Shared.Constants;
+using NTS.Judge.Blazor.Layout.Drawer.Reset;
 using NTS.Judge.Features.Core;
 
-namespace NTS.Judge.Blazor.Shared.Components.SidePanels;
+namespace NTS.Judge.Blazor.Layout.Drawer;
 
-public class SidePanelBehind : NStatefulComponent<ICoreService>
+public class SideMenu2Behind : NStatefulComponent<ICoreService>
 {
     [Inject]
     IDialogService DialogService { get; set; } = default!;
@@ -27,6 +26,6 @@ public class SidePanelBehind : NStatefulComponent<ICoreService>
         {
             return;
         }
-        NavManager.NavigateTo(BlazorPages.HOME, forceLoad: true);
+        NavManager.NavigateTo(Routes.HOME, forceLoad: true);
     }
 }

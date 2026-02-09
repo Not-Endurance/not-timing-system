@@ -3,16 +3,16 @@ using Not.Application.CRUD.Ports;
 using Not.Filesystem;
 using Not.Storage.JsonFile.Stores.Files;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.RPC;
+using NTS.Judge.Features.Socket;
 using NTS.Storage.Setup;
 
 namespace NTS.Storage.JSON;
 
-public class SocketConnectionHookStorage : LockingJsonFileStore<SetupState>, ISocketConnectionHookStorage
+public class SocketPrincipalStorage : LockingJsonFileStore<SetupState>, ISocketPrincipalStorage
 {
     readonly IRepository<UpcomingEvent> _upcomingEvents;
 
-    public SocketConnectionHookStorage(
+    public SocketPrincipalStorage(
         [FromKeyedServices("NDataKey")] IFilesystemContext configuration,
         IRepository<UpcomingEvent> upcomingEvents
     )
@@ -21,7 +21,7 @@ public class SocketConnectionHookStorage : LockingJsonFileStore<SetupState>, ISo
         _upcomingEvents = upcomingEvents;
     }
 
-    public async Task<UpcomingEvent?> GetConnectionHook()
+    public async Task<UpcomingEvent?> Get()
     {
         var setup = await Readonly();
         if (setup.ConnectedEventId == null)
@@ -37,7 +37,7 @@ public class SocketConnectionHookStorage : LockingJsonFileStore<SetupState>, ISo
         return upcomingEvent;
     }
 
-    public async Task CommitConnectionHook(UpcomingEvent upcomingEvent)
+    public async Task Commit(UpcomingEvent upcomingEvent)
     {
         var setup = await Transact();
         setup.ConnectedEventId = upcomingEvent?.Id;

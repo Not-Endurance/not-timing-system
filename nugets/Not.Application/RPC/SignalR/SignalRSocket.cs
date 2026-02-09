@@ -25,7 +25,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     // when procedures are reigstered in the child constructor
     internal List<Action<HubConnection>> Procedures { get; } = [];
 
-    public event EventHandler<RpcConnectionStatus>? ServerConnectionChanged;
+    public event EventHandler<SocketConnectionStatus>? ServerConnectionChanged;
     public event EventHandler<string>? ServerConnectionInfo;
     public event EventHandler<RpcError>? Error;
 
@@ -147,23 +147,23 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     void RaiseDisconnected(Exception? _ = default)
     {
-        ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Disconnected);
+        ServerConnectionChanged?.Invoke(_name, SocketConnectionStatus.Disconnected);
     }
 
     void RaiseReconnecting(string message)
     {
-        ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connecting);
+        ServerConnectionChanged?.Invoke(_name, SocketConnectionStatus.Connecting);
         ServerConnectionInfo?.Invoke(_name, $"{message}. Attempting to reconnect");
     }
 
     void RaiseConnecting()
     {
-        ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connecting);
+        ServerConnectionChanged?.Invoke(_name, SocketConnectionStatus.Connecting);
     }
 
     void RaiseConnected(string? message = null)
     {
-        ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connected);
+        ServerConnectionChanged?.Invoke(_name, SocketConnectionStatus.Connected);
         if (message != null)
         {
             ServerConnectionInfo?.Invoke(_name, message);
@@ -187,7 +187,7 @@ public interface IRpcSocket
     /// <summary>
     /// 'true' means connected; 'false' - disconnected;
     /// </summary>
-    event EventHandler<RpcConnectionStatus>? ServerConnectionChanged;
+    event EventHandler<SocketConnectionStatus>? ServerConnectionChanged;
     event EventHandler<string>? ServerConnectionInfo;
     event EventHandler<RpcError>? Error;
     HubConnection? Connection { get; }
@@ -197,7 +197,7 @@ public interface IRpcSocket
     void RaiseError(Exception exception, string? procedure, params object?[] arguments);
 }
 
-public enum RpcConnectionStatus
+public enum SocketConnectionStatus
 {
     Disconnected = 0,
     Connecting = 1,
