@@ -1,30 +1,32 @@
-﻿using NTS.Domain.Aggregates;
+﻿using Not.Krud.Models;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 
 namespace NTS.Judge.Features.Settings;
 
-public class SettingFormModel
+public record SettingFormModel : KrudFormModel<Setting>
 {
-    static Country? _languageCountry;
-
     public SettingFormModel() { }
 
-    public SettingFormModel(Setting entity)
+    public SettingFormModel(Setting setting)
     {
-        FromEntity(entity);
+        MapFrom(setting);
     }
 
-    public int? Id { get; set; }
+    public SettingFormModel(KrudFormModel<Setting> original) : base(original)
+    {
+    }
+
     public Country? Country { get; set; }
-
-    public Country? LanguageCountry
-    {
-        get => _languageCountry;
-        set => _languageCountry = value;
-    }
+    public Country? LanguageCountry { get; set; }
     public DetectionMode? DetectionMode { get; set; }
 
-    public void FromEntity(Setting entity)
+    protected override Setting MapTo()
+    {
+        return new Setting(Country, DetectionMode);
+    }
+
+    public override void MapFrom(Setting entity)
     {
         Id = entity.Id;
         Country = entity.Country;

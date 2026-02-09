@@ -1,21 +1,37 @@
 using Not.Blazor.Components;
-using Not.Blazor.Dialogs;
+using Not.Krud.Blazor;
 using NTS.Judge.Features.Settings;
 
 namespace NTS.Judge.Blazor.Features.Settings;
 
-public class SettingsPageBehind : NStatefulComponent<ISettingBehind>
+public class SettingsPageBehind : NStatefulComponent
 {
     [Inject]
-    FormDialogService<SettingFormModel, SettingForm> DialogService { get; set; } = default!;
+    ISettingBehind SettingsService { get; set; } = default!;
 
-    protected SettingFormModel? FormModel => Service.Setting == null ? null : new SettingFormModel(Service.Setting);
+    [Inject]
+    KrudDialogService<SettingFormModel, SettingShell> KrudService { get; set; } = default!;
+
+    protected SettingFormModel? Model { get; private set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(SettingsService);
+    }
+
+    protected override void OnBeforeRender()
+    {
+        if (SettingsService.Setting != null)
+        {
+            Model = new SettingFormModel(SettingsService.Setting);
+        }
+    }
 
     protected async Task OpenCreateForm()
     {
         try
         {
-            await DialogService.ShowCreateForm();
+            await KrudService.ShowCreateForm();
         }
         catch (Exception ex)
         {

@@ -8,9 +8,9 @@ using Not.Krud.Blazor.Components.Form;
 
 namespace Not.Krud.Blazor;
 
-public class KrudDialogService<TModel, TForm>
+public class KrudDialogService<TModel, TShell>
     where TModel : IKrudFormModel, new()
-    where TForm : KrudShell<TModel>
+    where TShell : KrudShell<TModel>
 {
     readonly IDialogService _mudDialogService;
     readonly DialogOptions _options = new() { BackdropClick = false };
@@ -22,12 +22,12 @@ public class KrudDialogService<TModel, TForm>
 
     public async Task<TModel?> ShowCreateForm()
     {
-        return await Show<KrudFormDialog<TModel, TForm>>(Create_string, []);
+        return await Show<KrudFormDialog<TModel, TShell>>(Create_string, []);
     }
 
     public async Task ShowUpdateForm(TModel model)
     {
-        var parameters = new DialogParameters<KrudFormDialog<TModel, TForm>> { 
+        var parameters = new DialogParameters<KrudFormDialog<TModel, TShell>> { 
             { x => x.Model, model }
         };
         await Show(Update_string, parameters);

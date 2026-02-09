@@ -6,18 +6,19 @@ namespace NTS.Domain.Aggregates;
 
 public class Setting : Aggregate
 {
-    public Setting(Guid? accountId, Country? country, DetectionMode? detectionMode, int? id = null)
+    public Setting(Country? country, DetectionMode? detectionMode, int? id = null)
         : base(id)
     {
-        AccountId = Required(nameof(AccountId), accountId);
         Country = Required(nameof(Country), country);
         DetectionMode = detectionMode;
         StaticSettings.Instance = this;
     }
 
-    public Guid AccountId { get; }
+    // TODO: Keep Id on Profile level, decouple settings
+    public Guid AccountId { get; } = Guid.Parse("ec6d8f0d-ecad-4fb6-a10f-fdb190dc0cd4");
     public Country Country { get; }
     public DetectionMode? DetectionMode { get; }
+    // TODO: Add Language here
 
     public override string ToString()
     {

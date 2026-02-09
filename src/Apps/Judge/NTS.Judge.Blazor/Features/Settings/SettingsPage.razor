@@ -8,13 +8,13 @@
 <NContent Title="@Settings_string" Class="not-mid-width">
 
     <Main>
-        @if (Service.Setting == null)
+        @if (Model == null)
         {
             <NButtonCreate OnClick="OpenCreateForm" />
         }
         else
         {
-            <NUpdateContainer T="SettingFormModel" TForm="SettingForm" Model="FormModel!" />
+            <SettingShell Model="Model" />
         }
     </Main>
 
