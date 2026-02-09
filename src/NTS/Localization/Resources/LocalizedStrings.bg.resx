@@ -324,9 +324,6 @@
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Конфигурирай Събитие</value>
   </data>
-  <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
-    <value>Не е създадено събитие</value>
-  </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Конфигурирай Състезание</value>
   </data>

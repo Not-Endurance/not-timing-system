@@ -324,9 +324,6 @@
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Configure Endurance Event</value>
   </data>
-  <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
-    <value>Endurance event does not exist yet</value>
-  </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Configure Competition</value>
   </data>

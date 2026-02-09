@@ -9,7 +9,7 @@ public static class BlazorPages
     public const string LOOPS_PAGE = "/loops";
     public const string CLUBS_PAGE = "/clubs";
     public const string OFFICIAL_UPDATE = "/official-update";
-    public const string LOOP_UPDATE = "/loop-update";
+    public const string LOOP_CONTENT = "/loop-update";
     public const string COMPETITION_UPDATE = "/competition-update";
     public const string PARTICIPATION_UPDATE = "/participation-update";
     public const string PHASE_UPDATE = "/phase-update";

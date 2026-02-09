@@ -89,8 +89,6 @@ namespace NTS.Localization
             LocalizeString(nameof(Setup_configuration_will_not_be_deleted_string));
         public static string Configure_Endurance_Event_string =>
             LocalizeString(nameof(Configure_Endurance_Event_string));
-        public static string Endurance_Event_does_not_exist_yet_string =>
-            LocalizeString(nameof(Endurance_Event_does_not_exist_yet_string));
         public static string Configure_Competition_string => LocalizeString(nameof(Configure_Competition_string));
         public static string Configure_Club_string => LocalizeString(nameof(Configure_Club_string));
         public static string Configure_Horse_string => LocalizeString(nameof(Configure_Horse_string));

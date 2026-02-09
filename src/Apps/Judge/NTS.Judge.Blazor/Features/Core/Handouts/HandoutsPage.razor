@@ -1,0 +1,24 @@
+﻿@using NTS.Judge.Blazor.Features.Core.Handouts.Documents
+@using NTS.Judge.Blazor.Features.Core.Handouts.Form
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(HANDOUTS_PAGE)]
+@inherits HandoutsPageBehind
+
+<NContent Title="@Handouts_string" IsEmpty="! Service.Documents.Any()" EmptyMessage="@Handouts_list_empty_message_string" RightBarXS="2">
+
+    <Main>
+        <HandoutsList Documents="Service.Documents" />
+    </Main>
+
+    <Rightbar>
+        <NTextDivider Text="@Export_string" />
+
+        <NotButtonPrint Text="@Print_Preview_string" OnClick="OpenPrintPreview" />
+
+        <NTextDivider Text="@Manual_handout_strings" Class="mt-4" />
+
+        <HandoutForm />
+    </Rightbar>
+
+</NContent>

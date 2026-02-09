@@ -1,0 +1,12 @@
+﻿@using System.Diagnostics
+@using NTS.Domain.Core.Aggregates.Participations
+@using Not.Notify
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Actions.Eliminations.EliminationForms.Shared
+
+@inherits EliminationForm
+
+<MudPaper Elevation="1" Class="pa-2">
+    <EliminationFormReason @bind-Value="_reason" />
+
+    <EliminationFormActions Form="this" />
+</MudPaper>

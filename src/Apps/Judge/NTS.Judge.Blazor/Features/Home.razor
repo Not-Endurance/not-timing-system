@@ -1,0 +1,19 @@
+@attribute [Route(HOME)]
+
+@using NTS.Domain.Setup.Aggregates
+@using NTS.Judge.Features.Setup.UpcomingEvents
+@using NTS.Judge.Blazor.Features.Setup.UpcomingEvents
+@using Not.Blazor.Components.Layout
+@using Not.Krud.Blazor.Components
+
+@inherits UpcomingEventsListBehind
+
+<NContent Title="@Select_event_string">
+   
+    <Main>
+        <KrudList T="UpcomingEvent" TModel="UpcomingEventFormModel" TShell="UpcomingEventShell" Name="@Upcoming_events_string" />
+    </Main>
+    
+</NContent>
+
+    

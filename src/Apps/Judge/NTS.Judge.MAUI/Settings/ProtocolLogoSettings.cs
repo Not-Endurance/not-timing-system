@@ -1,4 +1,4 @@
-﻿using NTS.Judge.Blazor.Core.Rankings.Protocols;
+﻿using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 
 namespace NTS.Judge.MAUI.Settings;
 

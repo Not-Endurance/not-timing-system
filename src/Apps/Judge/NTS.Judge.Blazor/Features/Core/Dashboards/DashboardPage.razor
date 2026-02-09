@@ -1,0 +1,25 @@
+﻿@using NTS.Domain.Setup.Aggregates
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Actions
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Component
+@using NTS.Judge.Blazor.Shared.Components.SidePanels
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(DASHBOARD_PAGE)]
+@inherits DashboardPageBehind
+
+<NContent Title="@Dashboard_string" IsEmpty="false" EmptyMessage="@The_Competitions_havent_started_yet_string">
+    <Main>
+        @if (Service.IsStarted) @* Add Empty RenderFragment instead of EmptyMessage *@
+        {
+            <Dashboard />
+        }
+        else {
+            <MudNumericField @bind-Value="ArchiveId" Label="ID of archive to load" />
+            <NButtonPrimary OnClick="LoadArchive">Load</NButtonPrimary>
+        }
+    </Main>
+
+    <Rightbar>
+        <ActionsMenu />
+    </Rightbar>
+</NContent>

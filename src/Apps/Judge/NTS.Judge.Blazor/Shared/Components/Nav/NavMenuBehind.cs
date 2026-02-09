@@ -1,7 +1,7 @@
 using Not.Blazor.Components;
 using Not.Blazor.Navigation;
 using NTS.Judge.Features.Core;
-using NTS.Judge.Features.Setup.Settings;
+using NTS.Judge.Features.Settings;
 using static NTS.Judge.Blazor.Shared.Constants.BlazorPages;
 
 namespace NTS.Judge.Blazor.Shared.Components.Nav;

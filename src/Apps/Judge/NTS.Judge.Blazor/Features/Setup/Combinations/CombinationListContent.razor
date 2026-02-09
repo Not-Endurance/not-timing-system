@@ -1,0 +1,17 @@
+﻿@using NTS.Domain.Setup.Aggregates
+@using NTS.Domain.Setup.Aggregates.UpcomingEvents
+@using NTS.Judge.Blazor.Features.Setup.Combinations
+@using NTS.Judge.Features.Setup.UpcomingEvents.Combinations
+@using Not.Blazor.Components.Layout
+@using Not.Krud.Blazor.Components
+
+@attribute [Route(COMBINATIONS_PAGE)]
+@inherits CombinationListContentBehind
+
+<NContent Title="@Configure_Combinations_string" Class="not-mid-width">
+    
+    <Main>
+        <KrudList T="Combination" TModel="CombinationFormModel" TShell="CombinationShell" Name="@Combinations_string" />
+    </Main>
+
+</NContent>

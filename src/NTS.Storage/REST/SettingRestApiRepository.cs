@@ -2,7 +2,7 @@
 using Not.Application.HTTP;
 using Not.Storage.REST;
 using NTS.Domain.Aggregates;
-using NTS.Judge.Features.Setup.Settings;
+using NTS.Judge.Features.Settings;
 
 namespace NTS.Storage.REST;
 
