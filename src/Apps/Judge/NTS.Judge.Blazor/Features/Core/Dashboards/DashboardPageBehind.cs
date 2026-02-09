@@ -4,9 +4,12 @@ using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards;
 
-public class DashboardPageBehind : NStatefulComponent<ICoreService>
+public class DashboardPageBehind : NStatefulComponent
 {
     protected int? ArchiveId { get; set; }
+
+    [Inject]
+    protected ICoreService Service { get; set; } = default!;
 
     protected async Task LoadArchive()
     {
@@ -16,5 +19,10 @@ public class DashboardPageBehind : NStatefulComponent<ICoreService>
             return;
         }
         await Service.LoadArchive(ArchiveId.Value);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
     }
 }

@@ -5,8 +5,10 @@ using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Component;
 
-public class DashboardBehind : NStatefulComponent<IDashboardService>
+public class DashboardBehind : NStatefulComponent
 {
+    [Inject]
+    protected IDashboardService Service { get; set; } = default!;
     protected Task<IEnumerable<Participation>> Search(string term, CancellationToken _)
     {
         if (string.IsNullOrEmpty(term))
@@ -15,6 +17,11 @@ public class DashboardBehind : NStatefulComponent<IDashboardService>
         }
         var result = Service.Participations.Where(x => x.ToString().ToLower().Contains(term.ToLower()));
         return Task.FromResult(result);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
     }
 
     protected Color GetColor(Participation participation)

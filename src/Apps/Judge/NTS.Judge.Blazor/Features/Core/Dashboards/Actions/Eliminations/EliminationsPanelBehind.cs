@@ -4,7 +4,7 @@ using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Actions.Eliminations;
 
-public class EliminationsPanelBehind : NStatefulComponent<IParticipationContext>
+public class EliminationsPanelBehind : NStatefulComponent
 {
     string? _inputValue;
 
@@ -13,6 +13,14 @@ public class EliminationsPanelBehind : NStatefulComponent<IParticipationContext>
     {
         get => _inputValue != null ? _inputValue : Eliminated?.Code;
         set => _inputValue = value;
+    }
+
+    [Inject]
+    protected IParticipationContext Service { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
     }
 
     protected override void OnBeforeRender()

@@ -5,7 +5,7 @@ using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Actions.Inspections;
 
-public class InspectionsPanelBehind : NStatefulComponent<IInspectionService>
+public class InspectionsPanelBehind : NStatefulComponent
 {
     public InspectionsPanelBehind()
     {
@@ -18,4 +18,12 @@ public class InspectionsPanelBehind : NStatefulComponent<IInspectionService>
     protected Phase? CurrentPhase => SelectedParticipation?.Phases.Current;
     protected bool Represent => CurrentPhase?.IsReinspectionRequested ?? false;
     protected bool RequireInspection => CurrentPhase?.IsRequiredInspectionRequested ?? false;
+
+    [Inject]
+    protected IInspectionService Service { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
+    }
 }

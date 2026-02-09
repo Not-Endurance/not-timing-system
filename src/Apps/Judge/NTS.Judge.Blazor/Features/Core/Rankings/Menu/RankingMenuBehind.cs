@@ -8,12 +8,15 @@ using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.Menu;
 
-public class RankingMenuBehind : NStatefulComponent<IRankingMenuService>
+public class RankingMenuBehind : NStatefulComponent
 {
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
     protected ObservableList<Ranking> Rankings => Service.Rankings;
+
+    [Inject]
+    protected IRankingMenuService Service { get; set; } = default!;
 
     protected void Select(Ranking ranking)
     {
@@ -25,6 +28,11 @@ public class RankingMenuBehind : NStatefulComponent<IRankingMenuService>
         {
             Handle(ex);
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
     }
 
     protected async Task OpenDeleteDialog(MudChip<Ranking> chip)

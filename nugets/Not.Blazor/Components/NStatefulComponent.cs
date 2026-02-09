@@ -32,16 +32,3 @@ public class NStatefulComponent : NComponent, IDisposable
         _subscriptions.Add(id, observable);
     }
 }
-
-// TODO: Delete
-public class NStatefulComponent<T> : NStatefulComponent, IDisposable
-    where T : IStatefulService
-{
-    [Inject]
-    protected T Service { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(Service);
-    }
-}

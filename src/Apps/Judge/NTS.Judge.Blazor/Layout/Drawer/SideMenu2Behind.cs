@@ -6,13 +6,16 @@ using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Layout.Drawer;
 
-public class SideMenu2Behind : NStatefulComponent<ICoreService>
+public class SideMenu2Behind : NStatefulComponent
 {
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
     NavigationManager NavManager { get; set; } = default!;
+
+    [Inject]
+    protected ICoreService Service { get; set; } = default!;
 
     protected async Task Start()
     {
@@ -27,5 +30,10 @@ public class SideMenu2Behind : NStatefulComponent<ICoreService>
             return;
         }
         NavManager.NavigateTo(Routes.HOME, forceLoad: true);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
     }
 }

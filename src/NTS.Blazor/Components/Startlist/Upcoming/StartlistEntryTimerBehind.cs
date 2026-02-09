@@ -7,15 +7,24 @@ using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;
 
-public class StartlistEntryTimerBehind : NStatefulComponent<IStartUpcoming>
+public class StartlistEntryTimerBehind : NStatefulComponent
 {
     protected string DisplayTime { get; private set; } = "--:--:--";
+
     protected Color Color { get; private set; } = Color.Success;
 
     protected Typo Typo { get; set; } = Typo.caption;
 
+    [Inject]
+    protected IStartUpcoming Service { get; set; } = default!;
+
     [Parameter, EditorRequired]
     public required StartlistEntry Entry { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
+    }
 
     protected override void OnBeforeRender()
     {

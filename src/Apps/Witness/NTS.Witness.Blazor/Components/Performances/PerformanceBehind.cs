@@ -6,11 +6,14 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.Blazor.Components.Performances;
 
-public class PerformanceBehind : NStatefulComponent<IPerformanceService>
+public class PerformanceBehind : NStatefulComponent
 {
     protected List<NotListModel<Person>> People { get; set; } = [];
     protected Person SelectedPerson { get; set; } = default!;
     protected Participation? Participation { get; set; } = default!;
+
+    [Inject]
+    protected IPerformanceService Service { get; set; } = default!;
 
     protected override void OnInitialized()
     {
@@ -27,6 +30,11 @@ public class PerformanceBehind : NStatefulComponent<IPerformanceService>
         {
             Handle(ex);
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
     }
 
     protected void OnPersonChanged(Person person)

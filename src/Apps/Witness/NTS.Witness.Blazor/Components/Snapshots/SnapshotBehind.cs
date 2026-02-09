@@ -10,7 +10,7 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.Blazor.Components.Snapshots;
 
-public class SnapshotBehind : NStatefulComponent<IParticipationContext>
+public class SnapshotBehind : NStatefulComponent
 {
     [Inject]
     IDialogService MudDialogService { get; set; } = default!;
@@ -23,7 +23,15 @@ public class SnapshotBehind : NStatefulComponent<IParticipationContext>
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
 
-    protected void SetButtonText(int id)
+	[Inject]
+	protected IParticipationContext Service { get; set; } = default!;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Observe(Service);
+	}
+
+	protected void SetButtonText(int id)
     {
         try
         {
