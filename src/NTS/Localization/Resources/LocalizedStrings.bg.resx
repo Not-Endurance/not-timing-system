@@ -576,9 +576,6 @@
   <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
     <value>Сигурни ли сте че искате да ресетнете състезанията? Това ще ИЗТРИЕ ВСИЧКИ ЗАПИСАНИ ВРЕМЕНА НА ФАЗИ и няма да можете да ги въстановите. </value>
   </data>
-  <data name="Cannot_select_another_event_without_resetting__string" xml:space="preserve">
-    <value>Не може да изберете друго събитие докато сте свързани с '{0}'. Ако сте се свързали с грешно събитие моля да го Ресетнете (чрез бутона в ляво) </value>
-  </data>
   <data name="Hard_reset_string" xml:space="preserve">
     <value>Хард ресет</value>
   </data>
@@ -780,10 +777,10 @@
   <data name="Fei_Id_string" xml:space="preserve">
     <value>FEI Id</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Empty_string" xml:space="preserve">
     <value>Празно</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using NTS.Application.Factories;
-using NTS.Application.SignalR;
+using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
@@ -12,14 +12,14 @@ namespace NTS.Judge.Features.Core.State;
 
 public class TimingStartService : ITimingStartService
 {
-    readonly ISelectedEventContext _eventContext;
+    readonly INtsSocketService _eventContext;
     readonly IRepository<EnduranceEvent> _coreEventRepository;
     readonly IRepository<Official> _coreOfficialRepository;
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<Ranking> _rankingRepository;
 
     public TimingStartService(
-        ISelectedEventContext eventContext,
+        INtsSocketService eventContext,
         IRepository<EnduranceEvent> coreEventRepository,
         IRepository<Official> coreOfficialRepository,
         IRepository<Participation> participationRepository,

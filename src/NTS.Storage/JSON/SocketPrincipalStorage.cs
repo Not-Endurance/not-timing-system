@@ -37,7 +37,7 @@ public class SocketPrincipalStorage : LockingJsonFileStore<SetupState>, ISocketP
         return upcomingEvent;
     }
 
-    public async Task Commit(UpcomingEvent upcomingEvent)
+    public async Task Commit(UpcomingEvent? upcomingEvent)
     {
         var setup = await Transact();
         setup.ConnectedEventId = upcomingEvent?.Id;

@@ -177,8 +177,6 @@ namespace NTS.Localization
         public static string Average_speed => LocalizeString(nameof(Average_speed));
         public static string Eliminated_string => LocalizeString(nameof(Eliminated_string));
         public static string Competition_ongoing_string => LocalizeString(nameof(Competition_ongoing_string));
-        public static string Cannot_select_another_event_without_resetting__string =>
-            LocalizeString(nameof(Cannot_select_another_event_without_resetting__string));
         public static string Cannot_select_another_event_before_disconnect__string =>
             LocalizeString(nameof(Cannot_select_another_event_before_disconnect__string));
         public static string Component_missing_required_value_string =>

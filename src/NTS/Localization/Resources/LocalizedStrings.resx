@@ -576,9 +576,6 @@
   <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
     <value>Are you sure you want to reset? This action will delete ALL PHASE TIMES and cannot be undone! </value>
   </data>
-  <data name="Cannot_select_another_event_without_resetting__string" xml:space="preserve">
-    <value>Cannot select another event without resetting '{0}'. If you connected to the wrong event by accident, please Reset the event(using the button on the left)</value>
-  </data>
   <data name="Hard_reset_string" xml:space="preserve">
     <value>Hard reset</value>
   </data>

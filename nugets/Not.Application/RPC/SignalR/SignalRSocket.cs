@@ -10,13 +10,11 @@ namespace Not.Application.RPC.SignalR;
 
 public class SignalRSocket : IRpcSocket, IAsyncDisposable
 {
-    readonly ISocketMetadata? _metadata;
     readonly RpcSettings _context;
     readonly string _name;
 
-    public SignalRSocket(IOptions<RpcSettings> options, ISocketMetadata? metadata = null)
+    public SignalRSocket(IOptions<RpcSettings> options)
     {
-        _metadata = metadata;
         _context = Validate(options.Value);
         _name = GetType().Name;
     }
@@ -45,28 +43,14 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         Error?.Invoke(this, error);
     }
 
+    public virtual async Task Connect(string groupId)
+    {
+        await InternalConnect(groupId);
+    }
+
     public virtual async Task Connect()
     {
-        if (IsConnected)
-        {
-            var message = $"{GetType().Name} is already connected";
-            ServerConnectionInfo?.Invoke(this, message);
-            return;
-        }
-        try
-        {
-            ConfigureConnection();
-            RaiseConnecting();
-            if (!IsConnected)
-            {
-                await Connection!.StartAsync();
-            }
-            RaiseConnected();
-        }
-        catch (Exception ex)
-        {
-            NotifyHelper.Error(ex);
-        }
+        await InternalConnect(null);
     }
 
     public virtual async Task Disconnect()
@@ -91,17 +75,39 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         await Connection.DisposeAsync();
     }
 
-    void ConfigureConnection()
+    async Task InternalConnect(string? groupId)
+    {
+        if (IsConnected)
+        {
+            var message = $"{GetType().Name} is already connected";
+            ServerConnectionInfo?.Invoke(this, message);
+            return;
+        }
+        try
+        {
+            ConfigureConnection(groupId);
+            RaiseConnecting();
+            if (!IsConnected)
+            {
+                await Connection!.StartAsync();
+            }
+            RaiseConnected();
+        }
+        catch (Exception ex)
+        {
+            NotifyHelper.Error(ex);
+        }
+    }
+
+    void ConfigureConnection(string? groupId)
     {
         var url = _context.Url;
-        if (_metadata != null)
+        if (groupId != null)
         {
-            var query = new Dictionary<string, string?>();
-            if (_metadata.ConnectionGroupKey != null)
+            var query = new Dictionary<string, string?>
             {
-                query.Add(RpcConstants.CONNECTION_GROUP_KEY, _metadata.ConnectionGroupKey);
-            }
-
+                { RpcConstants.CONNECTION_GROUP_KEY, groupId }
+            };
             url = QueryHelpers.AddQueryString(url, query);
         }
 
@@ -188,6 +194,7 @@ public interface IRpcSocket
     HubConnection? Connection { get; }
     bool IsConnected { get; }
     Task Connect();
+    Task Connect(string groupId);
     Task Disconnect();
     void RaiseError(Exception exception, string? procedure, params object?[] arguments);
 }

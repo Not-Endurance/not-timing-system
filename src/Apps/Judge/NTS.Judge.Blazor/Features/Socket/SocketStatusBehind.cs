@@ -17,7 +17,7 @@ public class SocketStatusBehind : NComponent, IDisposable
     }
 
     [Inject]
-    ISocketService ConnectionsBehind { get; set; } = default!;
+    ISocketStatusContext ConnectionsBehind { get; set; } = default!;
 
     protected bool IsConnected => ConnectionsBehind.IsConnected;
     protected int ConnectionsCount => ConnectionsBehind.RemoteConnections.Count();

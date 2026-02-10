@@ -1,18 +1,18 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
-using NTS.Application.SignalR;
 using NTS.Domain.Core.Aggregates;
 using NTS.Application.Factories;
+using NTS.Application.Socket;
 
 namespace NTS.Witness.Services;
 
 public class ParticipationReader : IReadMany<Participation>, ITransient
 {
     readonly IParticipationContext _participationContext;
-    readonly ISelectedEventContext _eventContext;
+    readonly INtsSocketService _eventContext;
 
-    public ParticipationReader(IParticipationContext participationContext, ISelectedEventContext selectedEventContext)
+    public ParticipationReader(IParticipationContext participationContext, INtsSocketService selectedEventContext)
     {
         _participationContext = participationContext;
         _eventContext = selectedEventContext;

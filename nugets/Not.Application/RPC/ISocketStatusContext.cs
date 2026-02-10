@@ -1,9 +1,8 @@
 ﻿using Not.Application.RPC.SignalR;
-using Not.Injection;
 
 namespace Not.Application.RPC;
 
-public interface ISocketService
+public interface ISocketStatusContext
 {
     bool IsConnected { get; }
     IEnumerable<string> RemoteConnections { get; }

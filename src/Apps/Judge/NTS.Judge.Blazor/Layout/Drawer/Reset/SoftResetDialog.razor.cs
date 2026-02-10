@@ -1,8 +1,7 @@
 using MudBlazor;
 using Not.Blazor.Components;
 using Not.Blazor.Mud;
-using NTS.Application.SignalR;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Application.Socket;
 using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Blazor.Layout.Drawer.Reset;
@@ -13,7 +12,7 @@ public partial class SoftResetDialog : NDialog
     ITimingStateService TimingStateService { get; set; } = default!;
 
     [Inject]
-    IGroupSocketService<UpcomingEvent> SocketService { get; set; } = default!;
+    INtsSocketService SocketService { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;

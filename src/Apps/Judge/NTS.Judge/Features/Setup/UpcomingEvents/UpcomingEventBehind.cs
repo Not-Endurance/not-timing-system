@@ -3,7 +3,7 @@ using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
 using Not.Notify;
-using NTS.Application.SignalR;
+using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
@@ -18,9 +18,9 @@ public class UpcomingEventBehind
     ITransient
 {
     readonly IUpdate<UpcomingEvent> _updater;
-    readonly ISelectedEventContext _eventContext;
+    readonly INtsSocketService _eventContext;
 
-    public UpcomingEventBehind(IRepository<UpcomingEvent> events, ISelectedEventContext eventContext)
+    public UpcomingEventBehind(IRepository<UpcomingEvent> events, INtsSocketService eventContext)
         : base(events, [])
     {
         _updater = events;

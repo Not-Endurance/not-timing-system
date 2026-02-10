@@ -33,8 +33,6 @@ public class NApplicationBuilder
             _configuration,
             x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern)
         );
-        _services.AddSingleton<SocketMetadata>();
-        _services.AddSingleton<ISocketMetadata>(x => x.GetRequiredService<SocketMetadata>());
         return this;
     }
 }

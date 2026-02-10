@@ -1,21 +1,18 @@
-﻿using Not.Application.RPC;
-using Not.Application.RPC.SignalR;
+﻿using Not.Application.RPC.SignalR;
 using Not.Notify;
-using NTS.Application.SignalR;
+using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
 
 namespace NTS.Witness.Warp;
 
-public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IGroupSocketService<UpcomingEvent>
+public class WitnessSocketContext : IConnectionStatus, INtsSocketService
 {
     readonly IRpcSocket _socket;
-    readonly SocketMetadata _metadata;
 
-    public WitnessSocketContext(IRpcSocket socket, SocketMetadata metadata)
+    public WitnessSocketContext(IRpcSocket socket)
     {
         _socket = socket;
-        _metadata = metadata;
     }
 
     public UpcomingEvent? Principal { get; private set; }
@@ -24,7 +21,7 @@ public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IG
     public async Task Disconnect()
     {
         var @event = Principal;
-        InternalSet(null);
+        Principal = null;
         await _socket.Disconnect();
         if (!_socket.IsConnected && @event != null)
         {
@@ -43,7 +40,7 @@ public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IG
             NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Principal.Name));
             return;
         }
-        InternalSet(upcomingEvent);
+        Principal = upcomingEvent;
         await _socket.Connect();
         if (_socket.IsConnected && Principal != null)
         {
@@ -54,11 +51,5 @@ public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IG
     public bool IsConnected()
     {
         return _socket.IsConnected;
-    }
-
-    void InternalSet(UpcomingEvent? upcomingEvent)
-    {
-        Principal = upcomingEvent;
-        _metadata.ConnectionGroupKey = upcomingEvent?.Id.ToString();
     }
 }

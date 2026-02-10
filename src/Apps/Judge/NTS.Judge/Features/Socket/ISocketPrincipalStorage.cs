@@ -5,5 +5,5 @@ namespace NTS.Judge.Features.Socket;
 public interface ISocketPrincipalStorage
 {
     Task<UpcomingEvent?> Get();
-    Task Commit(UpcomingEvent upcomingEvent);
+    Task Commit(UpcomingEvent? upcomingEvent);
 }

@@ -4,7 +4,7 @@ using Not.Application.RPC.SignalR;
 using Not.Collections;
 using Not.Injection;
 using NTS.Application.Core;
-using NTS.Application.SignalR;
+using NTS.Application.Socket;
 using NTS.Application.Startlists;
 using NTS.Application.Watcher;
 using NTS.Domain.Core.Aggregates;
@@ -17,13 +17,13 @@ namespace NTS.Witness.RPC;
 public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipationGetter, ISnapshotService, ISingleton
 {
     readonly IRpcSocket _socket;
-    readonly ISelectedEventContext _eventContext;
+    readonly INtsSocketService _eventContext;
     readonly IStartlistContext _startlistContext;
     readonly IParticipationService _participationService;
 
     public WitnessRpcClient(
         IRpcSocket socket,
-        ISelectedEventContext eventContext,
+        INtsSocketService eventContext,
         IParticipationService participationService,
         IStartlistContext startlistContext
     )

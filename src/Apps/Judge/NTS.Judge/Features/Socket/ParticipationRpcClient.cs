@@ -5,7 +5,7 @@ using Not.Application.RPC.SignalR;
 using Not.Async;
 using Not.Injection;
 using NTS.Application.Core;
-using NTS.Application.SignalR;
+using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
@@ -17,13 +17,13 @@ namespace NTS.Judge.Features.Socket;
 
 public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures, ISingleton
 {
-    readonly ISelectedEventContext _eventContext;
+    readonly INtsSocketService _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IReadMany<Participation> _coreParticipations;
     readonly HubProcedures _hubProcedures;
 
     public ParticipationRpcClient(
-        ISelectedEventContext eventContext,
+        INtsSocketService eventContext,
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,
         IReadMany<Participation> coreParticipations
