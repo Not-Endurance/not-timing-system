@@ -1,8 +1,8 @@
 ﻿using System.Timers;
 using MudBlazor;
-using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Blazor.Components;
+using NTS.Judge.Features.Socket;
 
 namespace NTS.Judge.Blazor.Features.Socket;
 
@@ -17,10 +17,11 @@ public class SocketStatusBehind : NComponent, IDisposable
     }
 
     [Inject]
-    ISocketStatusContext ConnectionsBehind { get; set; } = default!;
+    INtsSocketContext SocketContext { get; set; } = default!;
 
-    protected bool IsConnected => ConnectionsBehind.IsConnected;
-    protected int ConnectionsCount => ConnectionsBehind.RemoteConnections.Count();
+    protected bool IsConnected => SocketContext.IsConnected;
+
+    protected string? EventName => SocketContext.Event?.Name;
 
     protected override void OnInitialized()
     {
@@ -29,7 +30,7 @@ public class SocketStatusBehind : NComponent, IDisposable
 
     protected Color GetSpinnerColor()
     {
-        if (ConnectionsBehind.Status == SocketConnectionStatus.Disconnected)
+        if (SocketContext.Status == SocketConnectionStatus.Disconnected)
         {
             return Color.Error;
         }
@@ -45,7 +46,6 @@ public class SocketStatusBehind : NComponent, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    // ReSharper disable once AsyncVoidMethod
     async void HandleElapsed(object? sender, ElapsedEventArgs e)
     {
         await InvokeRender();

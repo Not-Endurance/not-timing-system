@@ -783,4 +783,7 @@
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>
+  <data name="Connected_to_string" xml:space="preserve">
+    <value>Свързан към</value>
+  </data>
 </root>

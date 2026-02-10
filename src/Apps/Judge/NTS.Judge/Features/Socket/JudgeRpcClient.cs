@@ -15,14 +15,14 @@ using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.Features.Socket;
 
-public class ParticipationRpcClient : RpcClient, IParticipationClientProcedures, ISingleton
+public class JudgeRpcClient : RpcClient, IJudgeClientProcedures, ISingleton
 {
     readonly INtsSocketService _eventContext;
     readonly ISnapshotProcessor _snapshotProcessor;
     readonly IReadMany<Participation> _coreParticipations;
     readonly HubProcedures _hubProcedures;
 
-    public ParticipationRpcClient(
+    public JudgeRpcClient(
         INtsSocketService eventContext,
         IRpcSocket socket,
         ISnapshotProcessor snapshotProcessor,

@@ -207,6 +207,7 @@ namespace NTS.Localization
         public static string Connect_string => LocalizeString(nameof(Connect_string));
         public static string Disconnect_string => LocalizeString(nameof(Disconnect_string));
         public static string Connected_to__string => LocalizeString(nameof(Connected_to__string));
+        public static string Connected_to_string => LocalizeString(nameof(Connected_to_string));
         public static string Disconnected_from__string => LocalizeString(nameof(Disconnected_from__string));
         public static string Empty_event_list_message => LocalizeString(nameof(Empty_event_list_message));
         public static string Select_athlete_string => LocalizeString(nameof(Select_athlete_string));

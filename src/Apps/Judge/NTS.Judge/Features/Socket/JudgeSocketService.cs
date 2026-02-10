@@ -10,12 +10,10 @@ namespace NTS.Judge.Features.Socket;
 
 public class JudgeSocketService
     : INtsSocketService,
-        ISocketConnectionsRegistry,
-        ISocketStatusContext,
+        INtsSocketContext,
         IStartupInitializerAsync,
         ISingleton
 {
-    readonly HashSet<string> _connections = [];
     readonly ISocketPrincipalStorage _socketPrincialStorage;
     readonly IRpcSocket _socket;
 
@@ -29,19 +27,7 @@ public class JudgeSocketService
 
     public SocketConnectionStatus Status { get; private set; }
     public bool IsConnected => _socket?.IsConnected ?? false;
-    public IEnumerable<string> RemoteConnections => _connections;
-
     public UpcomingEvent? Event { get; private set; }
-
-    public void Add(string connectionId)
-    {
-        _connections.Add(connectionId);
-    }
-
-    public void Remove(string connectionId)
-    {
-        _connections.Remove(connectionId);
-    }
 
     public void Dispose()
     {

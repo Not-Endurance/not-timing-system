@@ -2,9 +2,8 @@
 
 namespace Not.Application.RPC;
 
-public interface ISocketStatusContext
+public interface ISocketContext
 {
     bool IsConnected { get; }
-    IEnumerable<string> RemoteConnections { get; }
     SocketConnectionStatus Status { get; }
 }
