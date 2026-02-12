@@ -1,7 +1,7 @@
 using Not.Blazor.Components;
 using NTS.Application.Core;
+using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations;
 
@@ -9,7 +9,7 @@ public class EliminationsPanelBehind : NStatefulComponent
 {
     string? _inputValue;
 
-    protected Eliminated? Eliminated => Service.Selected?.Eliminated;
+    protected Eliminated? Eliminated => ParticipationContext.Selected?.Eliminated;
     protected string? ToggleValue
     {
         get => _inputValue != null ? _inputValue : Eliminated?.Code;
@@ -17,11 +17,15 @@ public class EliminationsPanelBehind : NStatefulComponent
     }
 
     [Inject]
-    protected IParticipationContext Service { get; set; } = default!;
+    protected IParticipationContext ParticipationContext { get; set; } = default!;
+
+    protected string? Reason { get; set; }
+
+    protected IEnumerable<DisqualifyCode> DisqualificationCodes { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Service);
+        await Observe(ParticipationContext);
     }
 
     protected override void OnBeforeRender()

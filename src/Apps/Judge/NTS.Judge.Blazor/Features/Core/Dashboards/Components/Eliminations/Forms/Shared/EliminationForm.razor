@@ -1,0 +1,18 @@
+﻿@inherits EliminationFormBehind
+
+<MudPaper Elevation="1" Class="pa-2">
+    
+    @ChildContent
+
+    <MudStack Row="true" Class="mt-4" Justify="Justify.FlexEnd">
+        @if (IsEliminated)
+        {
+            <NButtonSecondary Text="Update" OnClick="OnSubmitSafe" StartIcon="@Icons.Material.Outlined.Cancel" />
+        }
+        else
+        {
+            <NButtonDanger Text="Eliminate" OnClick="OnSubmitSafe" StartIcon="@Icons.Material.Outlined.Cancel" />
+        }
+        <NButtonPrimary Text="Restore" OnClick="OnRestoreSafe" Disabled="! IsEliminated" StartIcon="@Icons.Material.Outlined.SettingsBackupRestore" />
+    </MudStack>
+</MudPaper>

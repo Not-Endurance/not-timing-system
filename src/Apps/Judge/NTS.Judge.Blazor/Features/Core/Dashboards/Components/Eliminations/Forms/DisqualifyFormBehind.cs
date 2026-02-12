@@ -1,14 +1,19 @@
+using Not.Blazor.Components;
 using Not.Notify;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
+using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms;
 
-public partial class DisqualifyForm
+public abstract class DisqualifyFormBehind : NComponent
 {
-    string? Reason { get; set; }
+    [Inject]
+    IEliminationService EliminationService { get; set; } = default!;
 
-    IEnumerable<DisqualifyCode> Codes { get; set; } = [];
+    protected string? Reason { get; set; }
+
+    protected IEnumerable<DisqualifyCode> Codes { get; set; } = [];
 
     [Parameter]
     public Disqualified? Disqualified { get; set; }
@@ -22,7 +27,7 @@ public partial class DisqualifyForm
         }
     }
 
-    internal override async Task Eliminate()
+    protected async Task DisqualifySafe()
     {
         if (Reason == null && !Codes.Any())
         {
@@ -30,6 +35,6 @@ public partial class DisqualifyForm
             return;
         }
         var dqCodes = Codes.ToArray();
-        await Eliminations.Disqualify(dqCodes, Reason);
+        await EliminationService.Disqualify(dqCodes, Reason);
     }
 }

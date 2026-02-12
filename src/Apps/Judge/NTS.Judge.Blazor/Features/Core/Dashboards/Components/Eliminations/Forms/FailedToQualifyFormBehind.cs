@@ -1,13 +1,17 @@
+using Not.Blazor.Components;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms.Shared;
+using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms;
 
-public partial class FailedToQualifyForm : EliminationForm
+public abstract class FailedToQualifyFormBehind : NComponent
 {
-    string? _reason;
-    IEnumerable<FailToQualifyCode> Codes { get; set; } = [];
+    [Inject]
+    IEliminationService EliminationService { get; set; } = default!;
+    protected IEnumerable<FailToQualifyCode> Codes { get; set; } = [];
+
+    protected string? Reason { get; set; }
 
     [Parameter]
     public FailedToQualify? FailedToQualify { get; set; }
@@ -17,13 +21,13 @@ public partial class FailedToQualifyForm : EliminationForm
         if (FailedToQualify != null)
         {
             Codes = FailedToQualify.FtqCodes.ToList();
-            _reason = FailedToQualify.Complement;
+            Reason = FailedToQualify.Complement;
         }
     }
 
-    internal override async Task Eliminate()
+    protected async Task FailToQualifySafe()
     {
         var ftqCodes = Codes.ToArray();
-        await Eliminations.FailToQualify(ftqCodes, _reason);
+        await EliminationService.FailToQualify(ftqCodes, Reason);
     }
 }
