@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.SignalR;
 using Not.Application.RPC.Clients;
-using Not.Concurrency.Extensions;
+using Not.Async.Extensions;
 using NTS.Application.Core;
 using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;

@@ -1,6 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Concurrency.Extensions;
+using Not.Async.Extensions;
 using Not.Exceptions;
 using Not.Observables.Structures;
 using Not.Safe;

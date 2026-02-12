@@ -1,0 +1,26 @@
+﻿@using NTS.Domain.Setup.Aggregates
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(DASHBOARD_PAGE)]
+@inherits DashboardContentBehind
+
+<NContent Title="@Dashboard_string" IsEmpty="false">
+    
+    <Main>
+        @if (Service.IsStarted)
+        {
+            <Dashboard />
+        }
+        else 
+        {
+            <MudNumericField @bind-Value="ArchiveId" Label="ID of archive to load" />
+            <NButtonPrimary OnClick="LoadArchive">Load</NButtonPrimary>
+        }
+    </Main>
+
+    <Rightbar>
+        <ActionsMenu />
+    </Rightbar>
+
+</NContent>

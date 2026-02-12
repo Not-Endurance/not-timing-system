@@ -6,11 +6,7 @@
 @attribute [Route(RANKLIST_PAGE)]
 @inherits RankingsPageBehind
 
-<NContent Title="@Ranklist_string"
-    IsLoading="@IsLoading"
-    Class="@Class"
-    EmptyMessage="@The_Competitions_havent_started_yet_string">
-    @* // TODO: Add Start button in EmptyContent *@
+<NContent Title="@Ranklist_string" IsLoading="@IsLoading" Class="@Class">
 
     <Main>
         @if (IsProtocolVisible)

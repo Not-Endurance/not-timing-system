@@ -372,9 +372,6 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>İptal</value>
   </data>
-  <data name="The_Competitions_havent_started_yet_string" xml:space="preserve">
-    <value>Yarışlar henüz başlamadı</value>
-  </data>
   <data name="Archive_string" xml:space="preserve">
     <value>Arşivle</value>
   </data>

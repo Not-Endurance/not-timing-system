@@ -109,8 +109,6 @@ namespace NTS.Localization
         public static string Template_ranking_string => LocalizeString(nameof(Template_ranking_string));
         public static string Handouts_list_empty_message_string =>
             LocalizeString(nameof(Handouts_list_empty_message_string));
-        public static string The_Competitions_havent_started_yet_string =>
-            LocalizeString(nameof(The_Competitions_havent_started_yet_string));
         public static string Archive_string => LocalizeString(nameof(Archive_string));
         public static string History_string => LocalizeString(nameof(History_string));
         public static string Required_inspection_is_compulsory_string =>

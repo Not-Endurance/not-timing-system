@@ -4,6 +4,7 @@ using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 using NTS.Application.Factories;
 using NTS.Application.Socket;
+using NTS.Application.Core;
 
 namespace NTS.Witness.Services;
 
@@ -20,9 +21,9 @@ public class ParticipationReader : IReadMany<Participation>, ITransient
 
     public Task<IEnumerable<Participation>> ReadMany()
     {
-        if (_participationContext.Active.Any())
+        if (_participationContext.Participations.Any())
         {
-            return Task.FromResult(_participationContext.Active);
+            return Task.FromResult(_participationContext.Participations.AsEnumerable());
         }
         var participations = new List<Participation>();
         var setupCompetitions = _eventContext.Event!.Competitions.Where(competition => competition.Phases.Count > 0);

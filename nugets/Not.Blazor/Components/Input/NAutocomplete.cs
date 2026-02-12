@@ -1,5 +1,4 @@
 using MudBlazor;
-using Not.Blazor.Components.Input.Internal;
 using Not.Safe;
 
 namespace Not.Blazor.Components.Input;
@@ -20,10 +19,4 @@ public class NAutocomplete<T> : MudAutocomplete<T?>
 	/// </summary>
 	[Parameter]
     public Func<string, CancellationToken, Task<IEnumerable<T?>>> SearchSafe { get; set; } = default!;
-
-    protected override void OnParametersSet()
-    {
-        ForRequiredValidator.ValidateFor(this);
-        base.OnParametersSet();
-    }
 }

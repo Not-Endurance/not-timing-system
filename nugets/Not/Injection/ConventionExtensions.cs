@@ -27,13 +27,14 @@ public static class InjectionServiceCollectionExtensions
             .ToList();
         foreach (var implementation in classes)
         {
-            RegisterImplemenationByConvention(implementation, services);
+            RegisterImplemenationByConvention(implementation.Name, implementation, services);
         }
         return services;
     }
 
-    static void RegisterImplemenationByConvention(Type implementation, IServiceCollection services)
+    static void RegisterImplemenationByConvention(string name, Type implementation, IServiceCollection services)
     {
+        Console.WriteLine(name);
         var interfaces = implementation
             .GetInterfaces()
             .Where(x =>
@@ -68,9 +69,9 @@ public static class InjectionServiceCollectionExtensions
 
         // Register as self and use self to fetch the instace for all interfaces
         services.Add(implementation, implementation, lifetime);
-        foreach (var @interface in interfaces)
+        foreach (var iface in interfaces)
         {
-            var descriptor = new ServiceDescriptor(@interface, x => x.GetRequiredService(implementation), lifetime);
+            var descriptor = new ServiceDescriptor(iface, x => x.GetRequiredService(implementation), lifetime);
             services.Add(descriptor);
         }
     }

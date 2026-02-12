@@ -2,7 +2,7 @@
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
-using Not.Async;
+using Not.Async.Extensions;
 using Not.Injection;
 using NTS.Application.Core;
 using NTS.Application.Socket;

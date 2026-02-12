@@ -1,6 +1,7 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Application.Services;
+using Not.Async.Extensions;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Safe;
@@ -17,7 +18,7 @@ public class ParticipationBehind
     : NStatefulService,
         IInspectionService,
         IEliminationService,
-        IDashboardService,
+        IParticipationContext,
         IUpdateBehind<PhaseUpdateModel>,
         ISnapshotProcessor,
         IStartupInitializerAsync,
@@ -38,11 +39,12 @@ public class ParticipationBehind
         _snapshotResultRepository = snapshotResultRepository;
     }
 
-    public IReadOnlyList<int> RecentlyProcessed => _recentlyProcessed;
-
-    public IEnumerable<Participation> Participations { get; private set; } = [];
-
-    public Participation? SelectedParticipation
+    public IReadOnlyList<int> RecentlyTimed => _recentlyProcessed;
+    public IReadOnlyList<Participation> Participations { get; private set; } = [];
+    public bool IsRepresentRequested => Selected?.Phases.Current.IsReinspectionRequested ?? false;
+    public bool IsRepresentRequired => Selected?.Phases.Current.IsRequiredInspectionRequested ?? false;
+    public bool IsEliminated => Selected?.Eliminated != null;
+    public Participation? Selected
     {
         get => _selectedParticipation;
         set
@@ -59,8 +61,8 @@ public class ParticipationBehind
 
     protected override async Task<bool> InitializeState()
     {
-        Participations = await _participationRepository.ReadMany();
-        SelectedParticipation = Participations.FirstOrDefault();
+        Participations = await _participationRepository.ReadMany().AsReadOnly();
+        Selected = Participations.FirstOrDefault();
         return Participations.Any();
     }
 
@@ -140,16 +142,16 @@ public class ParticipationBehind
 
     async Task SafeRequestReinspection(bool requestFlag)
     {
-        SelectedParticipation!.ToggleRepresentation(requestFlag);
-        await _participationRepository.Update(SelectedParticipation);
+        Selected!.ToggleRepresentation(requestFlag);
+        await _participationRepository.Update(Selected);
 
         EmitChanged();
     }
 
     async Task SafeRequestRequiredInspection(bool requestFlag)
     {
-        SelectedParticipation!.ToggleRequestedInspection(requestFlag);
-        await _participationRepository.Update(SelectedParticipation);
+        Selected!.ToggleRequestedInspection(requestFlag);
+        await _participationRepository.Update(Selected);
 
         EmitChanged();
     }
@@ -173,55 +175,55 @@ public class ParticipationBehind
 
     async Task SafeWithdraw()
     {
-        GuardHelper.ThrowIfDefault(SelectedParticipation);
-        SelectedParticipation.Withdraw();
-        await _participationRepository.Update(SelectedParticipation);
+        GuardHelper.ThrowIfDefault(Selected);
+        Selected.Withdraw();
+        await _participationRepository.Update(Selected);
 
         EmitChanged();
     }
 
     async Task SafeRetire()
     {
-        GuardHelper.ThrowIfDefault(SelectedParticipation);
-        SelectedParticipation.Retire();
-        await _participationRepository.Update(SelectedParticipation);
+        GuardHelper.ThrowIfDefault(Selected);
+        Selected.Retire();
+        await _participationRepository.Update(Selected);
 
         EmitChanged();
     }
 
     async Task SafeFinishNotRanked(string reason)
     {
-        GuardHelper.ThrowIfDefault(SelectedParticipation);
-        SelectedParticipation.FinishNotRanked(reason);
-        await _participationRepository.Update(SelectedParticipation);
+        GuardHelper.ThrowIfDefault(Selected);
+        Selected.FinishNotRanked(reason);
+        await _participationRepository.Update(Selected);
 
         EmitChanged();
     }
 
     async Task SafeDisqualify(DisqualifyCode[] dqCodes, string? reason)
     {
-        GuardHelper.ThrowIfDefault(SelectedParticipation);
-        SelectedParticipation.Disqualify(dqCodes, reason);
-        await _participationRepository.Update(SelectedParticipation);
+        GuardHelper.ThrowIfDefault(Selected);
+        Selected.Disqualify(dqCodes, reason);
+        await _participationRepository.Update(Selected);
 
         EmitChanged();
     }
 
     async Task SafeFailToQualify(FailToQualifyCode[] ftqCodes, string? reason)
     {
-        GuardHelper.ThrowIfDefault(SelectedParticipation);
+        GuardHelper.ThrowIfDefault(Selected);
 
-        SelectedParticipation.FailToQualify(ftqCodes, reason);
-        await _participationRepository.Update(SelectedParticipation);
+        Selected.FailToQualify(ftqCodes, reason);
+        await _participationRepository.Update(Selected);
 
         EmitChanged();
     }
 
     async Task SafeRestoreQualification()
     {
-        GuardHelper.ThrowIfDefault(SelectedParticipation);
-        SelectedParticipation.Restore();
-        await _participationRepository.Update(SelectedParticipation);
+        GuardHelper.ThrowIfDefault(Selected);
+        Selected.Restore();
+        await _participationRepository.Update(Selected);
 
         EmitChanged();
     }

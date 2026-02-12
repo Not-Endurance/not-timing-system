@@ -22,6 +22,9 @@ public class ParticipationService
             State.AddRange(value);
         }
     }
+    public Participation? Selected { get; set; }
+    public IReadOnlyList<Participation> Participations { get; set; } = [];
+    public IReadOnlyList<int> RecentlyTimed { get; set; } = [];
 
     public void Update(Participation participation, NCollectionAction action)
     {
@@ -36,5 +39,10 @@ public class ParticipationService
     public Participation GetParticipation(Person person)
     {
         return State.First(p => p.Combination.Athlete.Names.Equals(person));
+    }
+
+    public void Set(IEnumerable<Participation> participations)
+    {
+        Participations = participations.ToList().AsReadOnly();
     }
 }

@@ -117,7 +117,7 @@ public class RankingService
 
     void UpdateRanklist(ParticipationPayload payload)
     {
-        if (Current == null)
+        if (_current == null)
         {
             return;
         }

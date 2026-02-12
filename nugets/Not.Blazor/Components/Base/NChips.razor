@@ -1,0 +1,34 @@
+﻿@typeparam T
+@inherits NChipsBehind<T>
+
+<MudChipSet 
+    @bind-SelectedValue="SelectedValue" 
+    SelectionMode="SelectionMode.SingleSelection"
+    AllClosable="AllClosable"
+    CheckedIcon="CheckedIcon"
+    CheckMark="CheckMark"
+    Color="Color"
+    Disabled="Disabled"
+    Label="Label"
+    OnClose="OnClose"
+    ReadOnly="ReadOnly"
+    Ripple="Ripple"
+    SelectedColor="SelectedColor"
+    Size="Size"
+    UserAttributes="UserAttributes"
+    Style="@Style"
+    Class="@Class">
+
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        @foreach (var item in Items)
+        {
+            <MudChip Text="@GetText(item)" Value="@item" Color="@GetColor(item)" OnClick="@(() => OnSelect?.Invoke(item))"
+                     Size="ChipSize" Style="min-width: 1rem" />
+        }
+    }
+</MudChipSet>

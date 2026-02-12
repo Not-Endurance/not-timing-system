@@ -372,9 +372,6 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>Откажи</value>
   </data>
-  <data name="The_Competitions_havent_started_yet_string" xml:space="preserve">
-    <value>Състезанията не са стартирани</value>
-  </data>
   <data name="Archive_string" xml:space="preserve">
     <value>Архивирай</value>
   </data>
