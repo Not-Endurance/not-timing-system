@@ -2,7 +2,7 @@
 
 namespace NTS.Judge.Features.Core.Dashboard;
 
-public interface ISnapshotProcessor
+public interface ITimingService
 {
-    Task Process(Snapshot snapshot);
+    Task Record(Snapshot snapshot);
 }

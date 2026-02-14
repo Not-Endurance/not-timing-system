@@ -1,5 +1,8 @@
 ﻿@using NTS.Domain.Setup.Aggregates
 @using NTS.Judge.Blazor.Features.Core.Dashboards.Components
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Inspections
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Snapshots
 @using Not.Blazor.Components.Layout
 
 @attribute [Route(DASHBOARD_PAGE)]
@@ -20,7 +23,11 @@
     </Main>
 
     <Rightbar>
-        <ActionsMenu />
+        <SnapshotPanel Class="mb-2" />
+
+        <InspectionsPanel Class="mb-2" />
+
+        <EliminationsPanel Class="mb-2" />
     </Rightbar>
 
 </NContent>

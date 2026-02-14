@@ -18,21 +18,21 @@ namespace NTS.Judge.Features.Socket;
 public class JudgeRpcClient : RpcClient, IJudgeClientProcedures, ISingleton
 {
     readonly INtsSocketService _eventContext;
-    readonly ISnapshotProcessor _snapshotProcessor;
+    readonly ITimingService _timingService;
     readonly IReadMany<Participation> _coreParticipations;
     readonly HubProcedures _hubProcedures;
 
     public JudgeRpcClient(
         INtsSocketService eventContext,
         IRpcSocket socket,
-        ISnapshotProcessor snapshotProcessor,
+        ITimingService timingService,
         IReadMany<Participation> coreParticipations
     )
         : base(socket)
     {
         _hubProcedures = new HubProcedures(socket);
         _eventContext = eventContext;
-        _snapshotProcessor = snapshotProcessor;
+        _timingService = timingService;
         _coreParticipations = coreParticipations;
     }
 
@@ -50,7 +50,7 @@ public class JudgeRpcClient : RpcClient, IJudgeClientProcedures, ISingleton
     {
         foreach (Snapshot snapshot in snapshots)
         {
-            await _snapshotProcessor.Process(snapshot);
+            await _timingService.Record(snapshot);
         }
     }
 

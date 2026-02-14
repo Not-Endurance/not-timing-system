@@ -19,7 +19,7 @@ public partial class SnapshotPanel
     IParticipationContext ParticipationContext { get; set; } = default!;
 
     [Inject]
-    ISnapshotProcessor ManualProcessor { get; set; } = default!;
+    ITimingService TimingService { get; set; } = default!;
 
     Task Snapshot()
     {
@@ -28,45 +28,60 @@ public partial class SnapshotPanel
         return Task.CompletedTask;
     }
 
-    async Task Process()
+    async Task SnapshotTime()
     {
-        if (_input is null or DEFAULT_TIME)
+        try
         {
-            return;
+            if (_input is null or DEFAULT_TIME)
+            {
+                return;
+            }
+            var timeString = NormalizeInput(_input);
+            if (!TimeSpan.TryParse(timeString, out var timeSpan))
+            {
+                NotifyHelper.Inform(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string);
+                return;
+            }
+            var time = DateTime.Today + timeSpan;
+            var timestamp = new Timestamp(time);
+            var snapshot = new Snapshot(
+                ParticipationContext.Selected!.Combination.Number,
+                SnapshotType.Automatic,
+                SnapshotMethod.Manual,
+                timestamp
+            );
+            await TimingService.Record(snapshot);
         }
-        var timeString = NormalizeInput(_input);
-        if (!TimeSpan.TryParse(timeString, out var timeSpan))
+        catch (Exception ex)
         {
-            NotifyHelper.Inform(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string);
-            return;
+            Handle(ex);
         }
-        var time = DateTime.Today + timeSpan;
-        var timestamp = new Timestamp(time);
-        var snapshot = new Snapshot(
-            ParticipationContext.Selected!.Combination.Number,
-            SnapshotType.Automatic,
-            SnapshotMethod.Manual,
-            timestamp
-        );
-        await ManualProcessor.Process(snapshot);
     }
 
     string NormalizeInput(string input)
     {
-        var values = input
-            .Split(':')
-            .Select(x =>
-            {
-                if (x == string.Empty)
+        try
+        {
+            var values = input
+                .Split(':')
+                .Select(x =>
                 {
-                    return "00";
-                }
-                if (x.Length == 1)
-                {
-                    return '0' + x;
-                }
-                return x;
-            });
-        return string.Join(':', values);
+                    if (x == string.Empty)
+                    {
+                        return "00";
+                    }
+                    if (x.Length == 1)
+                    {
+                        return '0' + x;
+                    }
+                    return x;
+                });
+            return string.Join(':', values);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+            return input;
+        }
     }
 }

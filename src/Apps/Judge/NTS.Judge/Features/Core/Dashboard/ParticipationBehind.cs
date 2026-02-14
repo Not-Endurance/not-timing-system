@@ -20,7 +20,7 @@ public class ParticipationBehind
         IEliminationService,
         IParticipationContext,
         IUpdateBehind<PhaseUpdateModel>,
-        ISnapshotProcessor,
+        ITimingService,
         IStartupInitializerAsync,
         ICoreDependentObservables,
         ISingleton
@@ -79,10 +79,21 @@ public class ParticipationBehind
         EmitChanged();
     }
 
-    public async Task Process(Snapshot snapshot)
+    public async Task Record(Snapshot snapshot)
     {
-        Task action() => SafeProcess(snapshot);
-        await SafeHelper.Run(action);
+        var participation = Participations.FirstOrDefault(x => x.Combination.Number == snapshot.Number);
+        if (participation == null)
+        {
+            return;
+        }
+        var result = participation.Process(snapshot);
+        if (result.Type == SnapshotResultType.Applied)
+        {
+            await _participationRepository.Update(participation);
+        }
+        await _snapshotResultRepository.Create(result);
+        _recentlyProcessed.Add(participation.Combination.Number);
+        EmitChanged();
     }
 
     public async Task RequestRepresent(bool isRequested)
@@ -153,23 +164,6 @@ public class ParticipationBehind
         Selected!.ToggleRequestedInspection(requestFlag);
         await _participationRepository.Update(Selected);
 
-        EmitChanged();
-    }
-
-    async Task SafeProcess(Snapshot snapshot)
-    {
-        var participation = Participations.FirstOrDefault(x => x.Combination.Number == snapshot.Number);
-        if (participation == null)
-        {
-            return;
-        }
-        var result = participation.Process(snapshot);
-        if (result.Type == SnapshotResultType.Applied)
-        {
-            await _participationRepository.Update(participation);
-        }
-        await _snapshotResultRepository.Create(result);
-        _recentlyProcessed.Add(participation.Combination.Number);
         EmitChanged();
     }
 
