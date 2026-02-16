@@ -10,10 +10,7 @@ public class SettingBehind : NStatefulService, ISettingBehind, IKrudFormService<
     readonly ISettingRepository _repository;
     readonly IEnumerable<IKrudMirror<Setting>> _reflections;
 
-    public SettingBehind(
-        ISettingRepository repository,
-        IEnumerable<IKrudMirror<Setting>> reflections
-    )
+    public SettingBehind(ISettingRepository repository, IEnumerable<IKrudMirror<Setting>> reflections)
     {
         _repository = repository;
         _reflections = reflections;

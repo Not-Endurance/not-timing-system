@@ -28,7 +28,19 @@ public record UpcomingEventFormModel : KrudFormModel<UpcomingEvent>
 
     protected override UpcomingEvent MapTo()
     {
-        return new UpcomingEvent(Name, Place, Country, FeiShowId, FeiId, FeiEventCode, Competitions, Officials, Loops, Combinations, Id);
+        return new UpcomingEvent(
+            Name,
+            Place,
+            Country,
+            FeiShowId,
+            FeiId,
+            FeiEventCode,
+            Competitions,
+            Officials,
+            Loops,
+            Combinations,
+            Id
+        );
     }
 
     public override void MapFrom(UpcomingEvent upcomingEvent)

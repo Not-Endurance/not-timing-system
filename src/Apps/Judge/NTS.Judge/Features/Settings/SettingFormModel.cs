@@ -13,9 +13,8 @@ public record SettingFormModel : KrudFormModel<Setting>
         MapFrom(setting);
     }
 
-    public SettingFormModel(KrudFormModel<Setting> original) : base(original)
-    {
-    }
+    public SettingFormModel(KrudFormModel<Setting> original)
+        : base(original) { }
 
     public Country? Country { get; set; }
     public Country? LanguageCountry { get; set; }

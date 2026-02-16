@@ -16,7 +16,8 @@ public static class GuardHelper
     public static T ThrowIfDefault<T>(
         [NotNull] T? value,
         [CallerFilePath] string? callerFilePath = null,
-        [CallerMemberName] string? callerMemberName = null)
+        [CallerMemberName] string? callerMemberName = null
+    )
     {
         ThrowIfDefault(value, $"'{typeof(T).Name}' cannot be default in {callerFilePath}.{callerMemberName}");
         return value;

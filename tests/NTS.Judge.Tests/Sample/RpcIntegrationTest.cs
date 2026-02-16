@@ -30,6 +30,10 @@ public class RpcIntegrationTest : JudgeIntegrationTest
 
         var processor = await GetBehind<ISnapshotProcessor>(_testOutputHelper.WriteLine);
 
-        await AssertRpcInvoked(_witnessFIxture, () => processor.Process(snapshot), nameof(WitnessTestClient.ReceiveParticipation));
+        await AssertRpcInvoked(
+            _witnessFIxture,
+            () => processor.Process(snapshot),
+            nameof(WitnessTestClient.ReceiveParticipation)
+        );
     }
 }

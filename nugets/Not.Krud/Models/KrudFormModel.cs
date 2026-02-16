@@ -7,8 +7,9 @@ public abstract record KrudFormModel<T> : IKrudModel<T>, IKrudFormModel
     where T : IEntity
 {
     public abstract void MapFrom(T entity);
+
     protected abstract T MapTo();
-    
+
     public int? Id { get; set; }
 
     public T MapToEntity()

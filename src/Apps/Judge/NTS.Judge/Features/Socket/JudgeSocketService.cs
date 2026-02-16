@@ -8,11 +8,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Socket;
 
-public class JudgeSocketService
-    : INtsSocketService,
-        INtsSocketContext,
-        IStartupInitializerAsync,
-        ISingleton
+public class JudgeSocketService : INtsSocketService, INtsSocketContext, IStartupInitializerAsync, ISingleton
 {
     readonly ISocketPrincipalStorage _socketPrincialStorage;
     readonly IRpcSocket _socket;

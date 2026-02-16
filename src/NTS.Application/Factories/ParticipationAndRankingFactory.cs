@@ -6,7 +6,6 @@ using NTS.Domain.Objects;
 
 namespace NTS.Application.Factories;
 
-
 // TODO: Move in Judge/Features/Core/State and drop the initializaiton in Witness.
 // We can restore it when we migrate Core storage to Mongo
 public static class ParticipationAndRankingFactory

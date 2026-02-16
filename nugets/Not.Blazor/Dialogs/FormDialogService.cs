@@ -34,7 +34,9 @@ public class FormDialogService<T, TForm>
         var result = await dialog.Result;
         if (result?.Data is not T entity)
         {
-            throw GuardHelper.Exception($"Mud dialogr result returned '{result?.Data}'. Expected '{typeof(T).FullName}' instead");
+            throw GuardHelper.Exception(
+                $"Mud dialogr result returned '{result?.Data}'. Expected '{typeof(T).FullName}' instead"
+            );
         }
         return entity;
     }
