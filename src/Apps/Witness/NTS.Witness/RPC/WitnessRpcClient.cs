@@ -56,12 +56,12 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         }
         if (participation.Phases.Current.IsComplete())
         {
-            _startlistContext.Update(participation, NCollectionAction.AddOrUpdate);
             if (participation.Phases.Current.IsFinal)
             {
                 _participationService.Update(participation, NCollectionAction.Remove);
+                return Task.CompletedTask;
             }
-            return Task.CompletedTask;
+            _startlistContext.Update(participation, NCollectionAction.AddOrUpdate);
         }
         _participationService.Update(participation, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;
