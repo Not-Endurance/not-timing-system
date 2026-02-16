@@ -17,6 +17,7 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
     {
         _participations = participations;
     }
+
     public Startlist? Startlist { get; set; }
 
     public IReadOnlyList<StartlistEntry> Upcoming => Startlist?.Upcoming ?? [];
