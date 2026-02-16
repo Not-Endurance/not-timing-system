@@ -63,7 +63,6 @@ public record Startlist
         {
             var changedHistory = false;
             var now = Timestamp.Now();
-            Console.WriteLine(5);
             foreach (var entry in _upcoming.ToList())
             {
                 if (IsHistory(entry))
@@ -92,7 +91,7 @@ public record Startlist
     public void Add(Participation participation)
     {
         var index = participation.Phases.IndexOf(participation.Phases.Current);
-        if (participation.Phases.Count <= ++index)
+        if (participation.Phases.Count <= index+1)
         {
             throw new DomainException(Cannot_add_completed_participations_in_startlist);
         }

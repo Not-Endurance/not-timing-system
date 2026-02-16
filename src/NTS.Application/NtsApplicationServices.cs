@@ -37,7 +37,7 @@ public static class NtsApplicationServices
 
         public Builder AddStartlist()
         {
-            _services.Add<IStartlistContext, StartlistContext>(ServiceLifetime.Singleton);
+            _services.Add<IStartlistContext, StartlistService>(ServiceLifetime.Singleton);
             _services.Add<IStartUpcoming, IStartHistory, IStartupInitializer, StartlistService>(
                 ServiceLifetime.Singleton
             );

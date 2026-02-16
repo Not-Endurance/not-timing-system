@@ -52,6 +52,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         {
             _participationService.Update(participation, NCollectionAction.Remove);
             _startlistContext.Update(participation, NCollectionAction.Remove);
+            return Task.CompletedTask;
         }
         if (participation.Phases.Current.IsComplete())
         {
@@ -60,6 +61,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
             {
                 _participationService.Update(participation, NCollectionAction.Remove);
             }
+            return Task.CompletedTask;
         }
         _participationService.Update(participation, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;
