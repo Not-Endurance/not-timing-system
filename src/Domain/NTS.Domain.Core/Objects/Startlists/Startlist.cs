@@ -63,7 +63,6 @@ public record Startlist
         {
             var changedHistory = false;
             var now = Timestamp.Now();
-            Console.WriteLine(5);
             foreach (var entry in _upcoming.ToList())
             {
                 if (IsHistory(entry))

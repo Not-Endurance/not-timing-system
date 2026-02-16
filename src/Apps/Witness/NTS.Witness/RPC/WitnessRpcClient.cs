@@ -37,7 +37,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
 
     public override void RunAtStartup()
     {
-        RegisterInputProcedure<Participation>(nameof(Receive), Receive);
+        RegisterInputProcedure<Participation>(nameof(ReceiveParticipation), ReceiveParticipation);
     }
 
     public async Task<RpcInvokeResult> PublishSnapshotsAsync(SnapshotModel model)
@@ -46,7 +46,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), request);
     }
 
-    public Task Receive(Participation participation)
+    public Task ReceiveParticipation(Participation participation)
     {
         if (participation.IsEliminated())
         {
