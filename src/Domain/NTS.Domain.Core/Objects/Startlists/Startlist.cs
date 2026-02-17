@@ -95,14 +95,15 @@ public record Startlist
         {
             throw new DomainException(Cannot_add_completed_participations_in_startlist);
         }
-        var nextPhase = participation.Phases[index + 1];
-        var phaseNumber = participation.Phases.NumberOf(nextPhase);
-        var start = new Timestamp((nextPhase.StartTime ?? Timestamp.DEFAULT).ToDateTimeOffset());
+        var phase = participation.Phases[index + 1].StartTime != null ? 
+            participation.Phases[index + 1] : participation.Phases.Current;
+        var phaseNumber = participation.Phases.NumberOf(phase);
+        var start = new Timestamp(phase.StartTime!.ToDateTimeOffset());
         var entry = new StartlistEntry(
             participation.Combination.Athlete.Names,
             participation.Combination.Number,
             phaseNumber,
-            nextPhase.Length,
+            phase.Length,
             start
         );
 
