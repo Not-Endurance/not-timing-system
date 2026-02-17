@@ -114,6 +114,10 @@ public record Startlist
     {
         lock (_lock)
         {
+            if (IsHistory(entry))
+            {
+                return;
+            }
             _upcoming = OrderByTimeThenPhase([.. _upcoming, entry]);
         }
     }
