@@ -91,13 +91,13 @@ public record Startlist
     public void Add(Participation participation)
     {
         var index = participation.Phases.IndexOf(participation.Phases.Current);
-        if (participation.Phases.Count <= index + 1)
+        if (participation.Phases.Count <= ++index)
         {
             throw new DomainException(Cannot_add_completed_participations_in_startlist);
         }
         var phase =
-            participation.Phases[index + 1].StartTime != null
-                ? participation.Phases[index + 1]
+            participation.Phases[index].StartTime != null
+                ? participation.Phases[index]
                 : participation.Phases.Current;
         var phaseNumber = participation.Phases.NumberOf(phase);
         var start = new Timestamp(phase.StartTime!.ToDateTimeOffset());
