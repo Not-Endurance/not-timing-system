@@ -96,9 +96,7 @@ public record Startlist
             throw new DomainException(Cannot_add_completed_participations_in_startlist);
         }
         var phase =
-            participation.Phases[index].StartTime != null
-                ? participation.Phases[index]
-                : participation.Phases.Current;
+            participation.Phases[index].StartTime != null ? participation.Phases[index] : participation.Phases.Current;
         var phaseNumber = participation.Phases.NumberOf(phase);
         var start = new Timestamp(phase.StartTime!.ToDateTimeOffset());
         var entry = new StartlistEntry(
