@@ -16,6 +16,6 @@ public class NSelectBehind<T> : MudSelect<T>
             Items = NotListModel.FromEnum<T>(type).ToList();
         }
 
-        base.OnParametersSet();
+        base.OnInitialized();
     }
 }

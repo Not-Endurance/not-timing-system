@@ -7,7 +7,7 @@ using NTS.Judge.Features.Core.Rankings.CustomRankings;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 
-public class CreateCustomRankingDialogBehind : NDialog
+public class CustomRankingDialogBehind : NDialog<CustomRankingModel>
 {
     Ranking? _templateRanking;
 
@@ -30,7 +30,7 @@ public class CreateCustomRankingDialogBehind : NDialog
     }
 
     public CustomRankingModel RankingModel { get; set; } = new();
-    public RankingEntryModel EntryToAdd { get; set; } = new();
+    public CustomRankingEntryModel EntryToAdd { get; set; } = new();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -43,30 +43,29 @@ public class CreateCustomRankingDialogBehind : NDialog
         return Task.FromResult(RankingModel.Entries.AsEnumerable());
     }
 
-    protected Task Test(CustomRankingModel _)
+    protected Task CombineRankings(Ranking? ranking) // TODO: split this into template and add participants
     {
-        return Task.CompletedTask;
-    }
-
-    protected Task CombineRankings(Ranking? ranking)
-    {
-        if (ranking == null)
+        try
         {
-            return Task.CompletedTask;
-        }
-        if (RankingModel == null)
-        {
-            RankingModel = new CustomRankingModel(ranking);
-        }
-        else
-        {
-            foreach (var entry in ranking.Entries)
+            if (ranking == null)
             {
-                SafeHelper.Run(() =>
+                return Task.CompletedTask;
+            }
+            if (RankingModel.Name == null || RankingModel.Category == null || RankingModel.Ruleset == null || RankingModel.Type == null)
+            {
+                RankingModel = new CustomRankingModel(ranking);
+            }
+            else
+            {
+                foreach (var entry in ranking.Entries)
                 {
                     RankingModel.Entries.Add(entry);
-                });
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
         }
 
         return Task.CompletedTask;

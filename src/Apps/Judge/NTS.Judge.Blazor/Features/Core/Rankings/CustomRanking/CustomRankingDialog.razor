@@ -4,7 +4,7 @@
 @using NTS.Judge.Features.Core.Rankings.CustomRankings
 @using Not.Blazor.Components.Input
 
-@inherits CreateCustomRankingDialogBehind
+@inherits CustomRankingDialogBehind
 
 <MudDialog>
     <TitleContent>
@@ -31,7 +31,7 @@
 
             <NHeadline3 Content="@Settings_string" Align="Align.Left"/>
 
-            <CustomRankingShell OnSubmit="Test" />
+            <CustomRankingShell Model="RankingModel" OnSubmit="CloseDialog" />
         </MudStack>
     </DialogContent>
 </MudDialog>

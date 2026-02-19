@@ -20,7 +20,7 @@ public partial class SoftResetDialog : NDialog
     async Task SoftReset()
     {
         await SocketService.Disconnect();
-        Confirm();
+        await CloseDialog();
     }
 
     async Task OpenHardResetDialog()
@@ -28,11 +28,11 @@ public partial class SoftResetDialog : NDialog
         var hardResetDialog = await DialogService.ShowAsync<HardResetDialog>();
         if (await hardResetDialog.IsCanceled())
         {
-            Cancel();
+            await CancelDialog();
             return;
         }
         await TimingStateService.Reset();
         await SocketService.Disconnect();
-        Confirm();
+        await CancelDialog();
     }
 }

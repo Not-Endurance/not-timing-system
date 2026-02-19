@@ -29,8 +29,10 @@ public record CustomRankingModel : KrudFormModel<Ranking>
 
     public override void MapFrom(Ranking ranking)
     {
-        Id = ranking.Id;
-        Name = ranking.Name;
+        // Do not assign ID, as in this case even if we want to map from existing
+        // entry we want to copy the values and always perform Create on submit
+        // Same goes for Name - we want to prompt the user to provide name. 
+        // TODO: above commends suggest this should be a separate flow
         Ruleset = ranking.Ruleset;
         Type = ranking.Type;
         Category = ranking.Category;

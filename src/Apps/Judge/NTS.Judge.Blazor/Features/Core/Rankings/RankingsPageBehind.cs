@@ -64,7 +64,7 @@ public class RankingsPageBehind : PrintableComponent
         try
         {
             var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.Medium };
-            await DialogService.ShowAsync<CreateCustomRankingDialog>("", options);
+            await DialogService.ShowAsync<CustomRankingDialog>("", options);
         }
         catch (Exception ex)
         {
