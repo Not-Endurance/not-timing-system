@@ -28,8 +28,8 @@ public class RpcIntegrationTest : JudgeIntegrationTest
         var timestamp = TimestampHelper.Create(hour: 18, minute: 10);
         var snapshot = new Snapshot(1337, SnapshotType.Vet, SnapshotMethod.Manual, timestamp);
 
-        var processor = await GetBehind<ITimingService>(_testOutputHelper.WriteLine);
+        var timingService = await GetBehind<ITimingService>(_testOutputHelper.WriteLine);
 
-        await AssertRpcInvoked(_witnessFIxture, () => processor.Record(snapshot), nameof(WitnessTestClient.Receive));
+        await AssertRpcInvoked(_witnessFIxture, () => timingService.Record(snapshot), nameof(WitnessTestClient.Receive));
     }
 }
