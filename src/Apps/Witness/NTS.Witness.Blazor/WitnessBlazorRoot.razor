@@ -3,11 +3,10 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components
 @using NTS.Witness.Blazor.Components.Shared
-@using Not.Blazor.Components
 
 @inherits WitnessBlazorRootBehind
 
-<NErrorBoundary @ref="@_errorBoundary">
+<ErrorBoundary @ref="@_errorBoundary">
     <ChildContent>
         <CascadingAuthenticationState>
             <Router AppAssembly="@Assembly" AdditionalAssemblies="@_routeAssemblies">
@@ -40,4 +39,4 @@
 
         <button class="btn btn-primary" @onclick="@(() => _errorBoundary.Recover())">Back</button>
     </ErrorContent>
-</NErrorBoundary>
+</ErrorBoundary>

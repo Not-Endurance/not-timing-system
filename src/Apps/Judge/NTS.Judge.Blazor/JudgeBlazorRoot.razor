@@ -1,8 +1,7 @@
 ﻿@using System.Reflection
 @using NTS.Judge.Blazor.Layout
-@using Not.Blazor.Components
 
-<NErrorBoundary @ref="this._errorBoundary">
+<ErrorBoundary @ref="this._errorBoundary">
 
     <ChildContent>
         <Router AppAssembly="Assembly" AdditionalAssemblies="_routeAssemblies">
@@ -35,4 +34,4 @@
         <button class="btn btn-primary" @onclick="_ => this._errorBoundary.Recover()">Back</button>
     </ErrorContent>
 
-</NErrorBoundary>
+</ErrorBoundary>

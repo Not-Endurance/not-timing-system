@@ -1,12 +1,12 @@
 using System.Reflection;
-using Not.Blazor.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace NTS.Judge.Blazor;
 
 public partial class JudgeBlazorRoot
 {
     IEnumerable<Assembly> _routeAssemblies = [typeof(JudgeBlazorRoot).Assembly];
-    NErrorBoundary _errorBoundary = default!;
+    ErrorBoundary _errorBoundary = default!;
 
     [Parameter]
     public Assembly Assembly { get; set; } = default!;
