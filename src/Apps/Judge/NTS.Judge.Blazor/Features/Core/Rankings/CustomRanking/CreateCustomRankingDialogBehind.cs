@@ -17,9 +17,6 @@ public class CreateCustomRankingDialogBehind : NDialog
     [Inject]
     IReadMany<Participation> Participations { get; set; } = default!;
 
-    [Inject]
-    ICustomRankingService Service { get; set; } = default!;
-
     protected List<NotListModel<Ranking>> TemplateRankings { get; set; } = [];
 
     public Ranking? TemplateRanking
@@ -44,6 +41,11 @@ public class CreateCustomRankingDialogBehind : NDialog
     protected Task<IEnumerable<RankingEntry>> GetRankingEntries()
     {
         return Task.FromResult(RankingModel.Entries.AsEnumerable());
+    }
+
+    protected Task Test(CustomRankingModel _)
+    {
+        return Task.CompletedTask;
     }
 
     protected Task CombineRankings(Ranking? ranking)
@@ -85,12 +87,6 @@ public class CreateCustomRankingDialogBehind : NDialog
     {
         // TODO: convert to IRepository.Search
         return await Participations.ReadMany(x => x.ToString().Contains(term));
-    }
-
-    public async Task Create()
-    {
-        await SafeHelper.Run(() => Service.Create(RankingModel));
-        Confirm();
     }
 
     public Task AddEntry()

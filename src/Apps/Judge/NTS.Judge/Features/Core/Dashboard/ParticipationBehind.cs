@@ -4,6 +4,7 @@ using Not.Application.Services;
 using Not.Async.Extensions;
 using Not.Exceptions;
 using Not.Injection;
+using Not.Krud.Abstractions;
 using Not.Safe;
 using Not.Startup;
 using NTS.Application.Core;
@@ -16,6 +17,7 @@ namespace NTS.Judge.Features.Core.Dashboard;
 
 public class ParticipationBehind
     : NStatefulService,
+        IKrudFormService<PhaseUpdateModel>,
         IInspectionService,
         IEliminationService,
         IParticipationContext,
@@ -71,11 +73,18 @@ public class ParticipationBehind
         await InitializeState();
     }
 
+    public Task Create(PhaseUpdateModel item)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task Update(PhaseUpdateModel model)
     {
-        Task action() => SafeUpdate(model);
-        await SafeHelper.Run(action);
+        var participation = Participations.FirstOrDefault(x => x.Phases.Any(y => y.Id == model.Id));
+        GuardHelper.ThrowIfDefault(participation);
 
+        participation.Update(model);
+        await _participationRepository.Update(participation);
         EmitChanged();
     }
 
@@ -141,16 +150,6 @@ public class ParticipationBehind
     public async Task RestoreQualification()
     {
         await SafeHelper.Run(SafeRestoreQualification);
-    }
-
-    async Task SafeUpdate(PhaseUpdateModel model)
-    {
-        var participation = Participations.FirstOrDefault(x => x.Phases.Any(y => y.Id == model.Id));
-        GuardHelper.ThrowIfDefault(participation);
-
-        participation.Update(model);
-        await _participationRepository.Update(participation);
-        EmitChanged();
     }
 
     async Task SafeWithdraw()

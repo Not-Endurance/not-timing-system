@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Not.Blazor.Dialogs;
 using Not.Krud.Blazor;
 using NTS.Application.Core;
 using NTS.Blazor.Components.ParticipationTable.Phases;
@@ -18,7 +17,7 @@ public partial class ParticipationTable
     bool _anyCompulsoryRequiredInspection;
 
     [Inject]
-    FormDialogService<PhaseUpdateModel, PhaseForm> Dialog { get; set; } = default!;
+    KrudDialogService<PhaseUpdateModel, PhaseUpdateShell> Dialog { get; set; } = default!;
 
     [Parameter]
     public PhaseCollection? Phases { get; set; }

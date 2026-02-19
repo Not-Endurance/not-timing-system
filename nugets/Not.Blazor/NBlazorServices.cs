@@ -2,8 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using MudBlazor.Services;
-using Not.Blazor.CRUD.Forms;
-using Not.Blazor.Dialogs;
 using Not.Blazor.Mud;
 using Not.Blazor.Navigation;
 
@@ -15,8 +13,6 @@ public static class NBlazorServices
     {
         return services
             .AddMudBlazor()
-            .AddTransient(typeof(FormDialogService<,>))
-            .AddTransient(typeof(FormManager<,>))
             .AddTransient<ILandNavigator, BlazorCrumbsNavigator>()
             .AddTransient<ICrumbsNavigator, BlazorCrumbsNavigator>();
     }

@@ -95,7 +95,7 @@ public class TimingStartService : ITimingStartService
             setupCompetition.FeiId,
             setupCompetition.FeiRule,
             setupCompetition.FeiScheduleNumber,
-            new(entriesByCategory.Value)
+            entriesByCategory.Value
         );
     }
 

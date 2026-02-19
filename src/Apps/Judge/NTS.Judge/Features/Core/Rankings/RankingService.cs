@@ -1,6 +1,8 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
+using Not.Injection;
+using Not.Krud.Abstractions;
 using Not.Notify;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
@@ -14,11 +16,13 @@ namespace NTS.Judge.Features.Core.Rankings;
 
 public class RankingService
     : NStatefulService<ObservableList<Ranking>>,
+    IKrudFormService<CustomRankingModel>,
         IRankingService,
         IRankingMenuService,
         IRanklistDocumentFactory,
         ICustomRankingService,
-        ICoreDependentObservables
+        ICoreDependentObservables,
+    ISingleton
 {
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
@@ -65,18 +69,14 @@ public class RankingService
 
     public async Task Create(CustomRankingModel model)
     {
-        var ranking = new Ranking(
-            model.Name,
-            model.Ruleset,
-            model.Type,
-            model.Category,
-            model.CompetitionFeiId,
-            model.FeiRule,
-            model.FeiScheduleNumber,
-            new(model.Entries)
-        );
+        var ranking = model.MapToEntity();
         await _rankings.Create(ranking);
         Rankings.AddOrReplace(ranking);
+    }
+
+    public Task Update(CustomRankingModel item)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task Delete(Ranking ranking)

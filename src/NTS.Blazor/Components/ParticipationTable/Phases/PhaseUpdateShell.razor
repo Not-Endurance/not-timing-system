@@ -1,0 +1,16 @@
+﻿
+@using NTS.Application.Core
+@using NTS.Domain.Core.Aggregates.Participations
+@using Not.Krud.Blazor.Components
+
+@inherits PhaseUpdateShellBehind
+
+<KrudForm Shell="this">
+    <MudTextField @bind-Value="Model.StartTimeInput" For="() => Model.StartTimeInput" Label="Start" Mask="TIME_MASK" />
+
+    <MudTextField @bind-Value="Model.ArriveTimeInput" For="() => Model.ArriveTimeInput" Label="Arrive" Mask="TIME_MASK" />
+
+    <MudTextField @bind-Value="Model.PresentTimeInput" For="() => Model.PresentTimeInput" Label="Present" Mask="TIME_MASK" />
+
+    <MudTextField @bind-Value="Model.RepresentTimeInput" For="() => Model.RepresentTimeInput" Label="Represent" Mask="TIME_MASK" />
+</KrudForm>
