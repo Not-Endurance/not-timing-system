@@ -11,7 +11,7 @@
 
     @foreach (var grouping in Rankings.GroupBy(x => x.Name))
     {
-        <NTextDivider Text="@grouping.Key" />
+        <NDivider Text="@grouping.Key" />
         @foreach (var ranking in grouping.OrderBy(x => x.Category))
         {
             <MudChip T="Ranking"

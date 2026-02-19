@@ -1,7 +1,7 @@
 namespace Not.Blazor.Components;
 
-public partial class NTextDivider
+public partial class NDivider
 {
-    [Parameter, EditorRequired]
+    [Parameter]
     public string Text { get; set; } = default!;
 }

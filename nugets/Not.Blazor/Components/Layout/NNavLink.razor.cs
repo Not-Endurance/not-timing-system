@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components.Routing;
 using Not.Blazor.Navigation;
 
-namespace Not.Blazor.Components;
+namespace Not.Blazor.Components.Layout;
 
 public partial class NNavLink : NComponent
 {

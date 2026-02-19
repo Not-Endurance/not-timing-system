@@ -1,4 +1,4 @@
-namespace Not.Blazor.Components;
+namespace Not.Blazor.Components.Tables;
 
 public partial class NTd<T>
 {
