@@ -41,8 +41,8 @@ public class ParticipationBehind
 
     public IReadOnlyList<int> RecentlyTimed => _recentlyProcessed;
     public IReadOnlyList<Participation> Participations { get; private set; } = [];
+    public bool IsInspectionRequested => Selected?.Phases.Current.IsRequiredInspectionRequested ?? false;
     public bool IsRepresentRequested => Selected?.Phases.Current.IsReinspectionRequested ?? false;
-    public bool IsRepresentRequired => Selected?.Phases.Current.IsRequiredInspectionRequested ?? false;
     public bool IsEliminated => Selected?.Eliminated != null;
     public Participation? Selected
     {
@@ -98,14 +98,16 @@ public class ParticipationBehind
 
     public async Task RequestRepresent(bool isRequested)
     {
-        Task action() => SafeRequestReinspection(isRequested);
-        await SafeHelper.Run(action);
+        Selected!.ToggleRepresentation(isRequested);
+        await _participationRepository.Update(Selected);
+        EmitChanged();
     }
 
-    public async Task RequireRepresent(bool isRequested)
-    {
-        Task action() => SafeRequestRequiredInspection(isRequested);
-        await SafeHelper.Run(action);
+    public async Task RequestInspection(bool isRequested)
+    {   
+        Selected!.ToggleInspection(isRequested);
+        await _participationRepository.Update(Selected);
+        EmitChanged();
     }
 
     public async Task Withdraw()
@@ -148,22 +150,6 @@ public class ParticipationBehind
 
         participation.Update(model);
         await _participationRepository.Update(participation);
-        EmitChanged();
-    }
-
-    async Task SafeRequestReinspection(bool requestFlag)
-    {
-        Selected!.ToggleRepresentation(requestFlag);
-        await _participationRepository.Update(Selected);
-
-        EmitChanged();
-    }
-
-    async Task SafeRequestRequiredInspection(bool requestFlag)
-    {
-        Selected!.ToggleRequestedInspection(requestFlag);
-        await _participationRepository.Update(Selected);
-
         EmitChanged();
     }
 

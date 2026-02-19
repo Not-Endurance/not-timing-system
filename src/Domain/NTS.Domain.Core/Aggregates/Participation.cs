@@ -97,14 +97,15 @@ public class Participation : Aggregate
         }
     }
 
-    public void ToggleRequestedInspection(bool isRequested)
+    public void ToggleInspection(bool isRequested)
     {
         if (isRequested)
         {
-            Phases.Current.RequestRequiredInspection();
+            Phases.Current.RequestInspection();
         }
         else
         {
+            // TODO: rename to IsInspectionRequested
             Phases.Current.IsRequiredInspectionRequested = false;
         }
     }

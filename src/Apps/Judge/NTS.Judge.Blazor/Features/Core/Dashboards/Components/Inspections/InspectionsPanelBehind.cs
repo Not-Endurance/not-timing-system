@@ -3,24 +3,42 @@ using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Inspections;
 
-public class InspectionsPanelBehind : NStatefulComponent
-{ 
+public class InspectionsPanelBehind : NStatefulComponent 
+{
     [Inject]
     IInspectionService Service { get; set; } = default!;
 
-    protected EventCallback<bool> ToggleRequested { get; private set;}
-    protected EventCallback<bool> ToggleRequired { get; private set; }
-    protected bool IsRepresentRequired => Service.IsRepresentRequired;
     protected bool IsRepresentRequested => Service.IsRepresentRequested;
-
-    protected override void OnInitialized()
-    {
-        ToggleRequested = EventCallback.Factory.Create<bool>(this, Service.RequestRepresent);
-        ToggleRequired = EventCallback.Factory.Create<bool>(this, Service.RequireRepresent);
-    }
+    protected bool IsInspectionRequested => Service.IsInspectionRequested;
 
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);
+    }
+
+    protected async Task HandleRepresentChanged(bool isRequested)
+    {
+        try
+        {
+            await Service.RequestRepresent(isRequested);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+            await InvokeRender();
+        }
+    }
+
+    protected async Task HandleInspectionChanged(bool isRequested)
+    {
+        try
+        {
+            await Service.RequestInspection(isRequested);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+            await InvokeRender();
+        }
     }
 }
