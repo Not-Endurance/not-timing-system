@@ -63,7 +63,6 @@ public record Startlist
         {
             var changedHistory = false;
             var now = Timestamp.Now();
-            Console.WriteLine(5);
             foreach (var entry in _upcoming.ToList())
             {
                 if (IsHistory(entry))
@@ -96,14 +95,15 @@ public record Startlist
         {
             throw new DomainException(Cannot_add_completed_participations_in_startlist);
         }
-        var nextPhase = participation.Phases[index + 1];
-        var phaseNumber = participation.Phases.NumberOf(nextPhase);
-        var start = new Timestamp((nextPhase.StartTime ?? Timestamp.DEFAULT).ToDateTimeOffset());
+        var phase =
+            participation.Phases[index].StartTime != null ? participation.Phases[index] : participation.Phases.Current;
+        var phaseNumber = participation.Phases.NumberOf(phase);
+        var start = new Timestamp(phase.StartTime!.ToDateTimeOffset());
         var entry = new StartlistEntry(
             participation.Combination.Athlete.Names,
             participation.Combination.Number,
             phaseNumber,
-            nextPhase.Length,
+            phase.Length,
             start
         );
 
@@ -114,6 +114,10 @@ public record Startlist
     {
         lock (_lock)
         {
+            if (IsHistory(entry))
+            {
+                return;
+            }
             _upcoming = OrderByTimeThenPhase([.. _upcoming, entry]);
         }
     }
