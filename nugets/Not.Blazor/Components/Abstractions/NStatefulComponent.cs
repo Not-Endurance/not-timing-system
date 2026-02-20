@@ -1,7 +1,7 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Observables;
 
-namespace Not.Blazor.Components;
+namespace Not.Blazor.Components.Abstractions;
 
 public class NStatefulComponent : NComponent, IDisposable
 {

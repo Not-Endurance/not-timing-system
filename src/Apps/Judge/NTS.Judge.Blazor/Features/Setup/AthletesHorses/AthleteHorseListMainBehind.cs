@@ -1,4 +1,4 @@
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Components.Layout;
 
 namespace NTS.Judge.Blazor.Features.Setup.AthletesHorses;

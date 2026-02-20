@@ -1,7 +1,7 @@
 ﻿using Not.Blazor.Ports;
 using Not.Events;
 
-namespace Not.Blazor.Components;
+namespace Not.Blazor.Components.Abstractions;
 
 public abstract class PrintableComponent : NStatefulComponent, IDisposable
 {

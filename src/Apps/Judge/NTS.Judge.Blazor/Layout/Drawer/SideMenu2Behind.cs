@@ -1,5 +1,5 @@
 using MudBlazor;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Mud;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
 using NTS.Judge.Features.Core.State;

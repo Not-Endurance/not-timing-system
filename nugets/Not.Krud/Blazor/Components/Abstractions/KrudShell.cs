@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation;
 using Not.Krud.Abstractions;
 

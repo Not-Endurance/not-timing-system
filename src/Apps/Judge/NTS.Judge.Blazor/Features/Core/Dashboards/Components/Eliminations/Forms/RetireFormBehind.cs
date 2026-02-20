@@ -1,4 +1,4 @@
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Judge.Features.Core.Dashboard;
 

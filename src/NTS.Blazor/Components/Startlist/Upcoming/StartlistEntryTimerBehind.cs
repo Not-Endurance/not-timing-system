@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Formatting;
 using NTS.Application.Startlists;
 using NTS.Domain.Core.Objects.Startlists;

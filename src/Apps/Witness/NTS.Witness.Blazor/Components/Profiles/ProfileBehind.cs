@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 
 namespace NTS.Witness.Blazor.Components.Profiles;
 

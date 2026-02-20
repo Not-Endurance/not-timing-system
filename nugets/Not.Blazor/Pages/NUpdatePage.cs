@@ -1,4 +1,4 @@
-﻿using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation;
 
 namespace Not.Blazor.Pages;

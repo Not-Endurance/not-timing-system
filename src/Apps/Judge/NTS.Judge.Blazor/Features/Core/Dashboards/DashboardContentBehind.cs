@@ -1,4 +1,4 @@
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Notify;
 using NTS.Judge.Features.Core.State;
 

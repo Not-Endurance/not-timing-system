@@ -1,4 +1,4 @@
-﻿using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation;
 
 namespace NTS.Witness.Blazor.Components.Auth.Authentication;

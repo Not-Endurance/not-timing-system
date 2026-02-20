@@ -2,7 +2,7 @@
 using Not.Notify;
 using Not.Safe;
 
-namespace Not.Blazor.Components;
+namespace Not.Blazor.Components.Abstractions;
 
 public class NComponent : ComponentBase
 {

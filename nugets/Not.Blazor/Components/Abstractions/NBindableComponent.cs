@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Not.Blazor.Components;
+namespace Not.Blazor.Components.Abstractions;
 
 public class NBindableComponent<T> : NComponent
 {

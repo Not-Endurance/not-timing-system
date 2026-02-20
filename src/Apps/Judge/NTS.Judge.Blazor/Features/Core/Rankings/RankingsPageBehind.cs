@@ -1,5 +1,5 @@
 using MudBlazor;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Objects;
 using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 using NTS.Judge.Features.Core.Rankings;

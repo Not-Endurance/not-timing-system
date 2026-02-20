@@ -1,5 +1,5 @@
 using MudBlazor;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 

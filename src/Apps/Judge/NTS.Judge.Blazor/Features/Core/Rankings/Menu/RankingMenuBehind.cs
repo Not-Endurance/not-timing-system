@@ -1,5 +1,5 @@
 using MudBlazor;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Dialogs;
 using Not.Blazor.Mud;
 using Not.Observables.Structures;

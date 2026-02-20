@@ -1,4 +1,4 @@
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Krud.Blazor;
 using NTS.Judge.Features.Settings;
 
