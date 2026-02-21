@@ -1,5 +1,5 @@
 using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Navigation;
+using Not.Blazor.Navigation.Abstractions;
 using NTS.Judge.Features.Core.State;
 using NTS.Judge.Features.Settings;
 using static NTS.Judge.Blazor.Routes;

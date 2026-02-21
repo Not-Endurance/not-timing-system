@@ -1,5 +1,5 @@
 using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Components;
+using Not.Blazor.Dialogs.Abstractions;
 
 namespace NTS.Judge.Blazor.Features.Core.Handouts;
 

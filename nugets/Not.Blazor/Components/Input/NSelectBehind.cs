@@ -1,7 +1,7 @@
 using MudBlazor;
 using Not.Structures;
 
-namespace Not.Blazor.Components;
+namespace Not.Blazor.Components.Input;
 
 public class NSelectBehind<T> : MudSelect<T>
 {

@@ -1,4 +1,4 @@
-using Not.Blazor.Components.Layout;
+using Not.Blazor.Components;
 
 namespace NTS.Judge.Blazor.Features.Setup.Clubs;
 

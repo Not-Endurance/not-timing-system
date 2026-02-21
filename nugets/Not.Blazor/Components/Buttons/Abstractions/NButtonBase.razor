@@ -1,0 +1,38 @@
+@namespace Not.Blazor.Components.Buttons.Abstractions
+@inherits MudButton
+
+<MudButton 
+    Variant="@Variant"
+    ButtonType="@ButtonType" 
+    Color="@Color" 
+    Class="@Class" 
+    Style="@Style" 
+    StartIcon="@StartIcon" 
+    EndIcon="@EndIcon" 
+    Disabled="@Disabled"
+    ClickPropagation="@ClickPropagation"
+    DropShadow="@DropShadow"
+    FullWidth="@FullWidth"
+    IconClass="@IconClass"
+    IconColor="@IconColor"
+    IconSize="@IconSize"
+    OnClick="@HandleClick"
+    Rel="@Rel"
+    Ripple="@Ripple"
+    Size="@Size"
+    Href="@Href"
+    HtmlTag="@HtmlTag"
+    Tag="@Tag"
+    Target="@Target"
+    UserAttributes="@UserAttributes">
+
+    @if (IsLoading)
+    {
+        <MudProgressCircular Class="mt-2" Color="SelectColor()" Size="Size.Small" Indeterminate="true" />
+    }
+    else
+    {
+        @ChildContent
+    }
+
+</MudButton>

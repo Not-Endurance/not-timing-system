@@ -2,8 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using MudBlazor.Services;
-using Not.Blazor.Mud;
+using Not.Blazor.Helpers;
 using Not.Blazor.Navigation;
+using Not.Blazor.Navigation.Abstractions;
 
 namespace Not.Blazor;
 

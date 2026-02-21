@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Not.Application.Services;
 using Not.Async.Extensions;
 using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Navigation;
+using Not.Blazor.Navigation.Abstractions;
 using Not.Collections;
 using Not.Domain;
 using Not.Krud.Abstractions;

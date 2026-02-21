@@ -4,7 +4,7 @@ using Not.Safe;
 using Not.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Features.Core.Rankings.CustomRankings;
-using Not.Blazor.Components;
+using Not.Blazor.Dialogs.Abstractions;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 

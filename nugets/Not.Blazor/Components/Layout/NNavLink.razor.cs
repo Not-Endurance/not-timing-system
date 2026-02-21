@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components.Routing;
-using Not.Blazor.Navigation;
 using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Navigation.Abstractions;
 
 namespace Not.Blazor.Components.Layout;
 

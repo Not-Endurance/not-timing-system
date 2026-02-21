@@ -1,4 +1,4 @@
-﻿using Not.Blazor.Components.Layout;
+using Not.Blazor.Components;
 using Not.Exceptions;
 
 namespace NTS.Judge.Blazor.Features.Setup;

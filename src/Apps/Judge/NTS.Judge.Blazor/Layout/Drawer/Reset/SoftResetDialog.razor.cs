@@ -1,9 +1,8 @@
 using MudBlazor;
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Mud;
+using Not.Blazor.Dialogs.Abstractions;
+using Not.Blazor.Helpers;
 using NTS.Application.Socket;
 using NTS.Judge.Features.Core.State;
-using Not.Blazor.Components;
 
 namespace NTS.Judge.Blazor.Layout.Drawer.Reset;
 
@@ -32,6 +31,7 @@ public partial class SoftResetDialog : NDialog
             await CancelDialog();
             return;
         }
+
         await TimingStateService.Reset();
         await SocketService.Disconnect();
         await CancelDialog();

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Navigation;
+using Not.Blazor.Navigation.Abstractions;
 using Not.Krud.Abstractions;
 
 namespace Not.Krud.Blazor.Components.Abstractions;

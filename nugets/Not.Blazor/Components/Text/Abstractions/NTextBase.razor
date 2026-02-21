@@ -1,0 +1,16 @@
+@using Microsoft.AspNetCore.Components.Rendering
+
+@namespace Not.Blazor.Components.Text.Abstractions
+@inherits MudText
+
+<MudText Align="Align" Typo="Typo" Color="Color" Class="@Class" Style="@(Style + AbsoluteCenterStyle)" >
+    @Content
+</MudText>
+
+@* position:absolute removes the element from the natural stack thus a second identical element issed to preserve vertical layout *@
+@if (IsAbsoluteCenter) 
+{
+    <MudText Align="Align" Typo="Typo" Color="Color" Class="Class" Style="@(Style + "visibility:hidden")">
+        @Content
+    </MudText>
+}
