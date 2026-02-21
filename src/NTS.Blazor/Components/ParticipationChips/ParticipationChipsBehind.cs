@@ -11,16 +11,19 @@ public abstract class ParticipationChipsBehind : NStatefulComponent
     [Inject]
     IParticipationContext RecentService { get; set; } = default!;
 
-    protected Participation? Selected { get; set; }
+    protected Participation? Selected => RecentService.Selected;
 
     protected IReadOnlyList<Participation> Participations => RecentService.Participations;
 
-    [Parameter]
-    public Action<Participation>? OnSelected { get; set; } = default!;
-
     protected override async Task OnInitializedAsync()
     {
-        await Observe(RecentService);    
+        await Observe(RecentService);
+    }
+
+    protected Task Select(Participation participation)
+    {
+        RecentService.Selected = participation;
+        return Task.CompletedTask;
     }
 
     protected Color GetColor(Participation participation)
