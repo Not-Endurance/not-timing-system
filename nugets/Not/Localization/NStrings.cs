@@ -17,6 +17,7 @@ public static class NStrings
     public static string Create_string => LocalizeString(nameof(Create_string));
     public static string Back_string => LocalizeString(nameof(Back_string));
     public static string Update_string => LocalizeString(nameof(Update_string));
+    public static string Updated_string => LocalizeString(nameof(Updated_string));
     public static string Delete_string => LocalizeString(nameof(Delete_string));
     public static string Print_string => LocalizeString(nameof(Print_string));
     public static string Date_string => LocalizeString(nameof(Date_string));

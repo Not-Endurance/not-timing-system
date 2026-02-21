@@ -2,6 +2,7 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
 using Not.Krud.Abstractions;
+using Not.Notify;
 
 namespace Not.Krud.Blazor.Components.Abstractions;
 
@@ -47,6 +48,6 @@ public abstract class KrudShell<TModel> : NComponent
         {
             await OnSubmit(Model);
         }
-        NavigateBack();
+        NotifyHelper.Success(Updated_string);
     }
 }

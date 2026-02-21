@@ -783,4 +783,7 @@
   <data name="Connected_to_string" xml:space="preserve">
     <value>Connected to</value>
   </data>
+  <data name="Updated_string" xml:space="preserve">
+    <value>Updated</value>
+  </data>
 </root>

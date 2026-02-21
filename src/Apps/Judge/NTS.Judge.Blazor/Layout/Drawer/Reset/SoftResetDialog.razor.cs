@@ -34,6 +34,6 @@ public partial class SoftResetDialog : NDialog
 
         await TimingStateService.Reset();
         await SocketService.Disconnect();
-        await CancelDialog();
+        await CloseDialog();
     }
 }
