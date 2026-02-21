@@ -1,5 +1,6 @@
-﻿using Not.Application.Behinds.Adapters;
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Application.DomainEvents;
 using Not.Application.Services;
 using Not.Async.Extensions;
 using Not.Exceptions;
@@ -30,15 +31,18 @@ public class ParticipationBehind
     readonly List<int> _recentlyProcessed = [];
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<SnapshotResult> _snapshotResultRepository;
+    readonly IDomainEventDispatcher _domainEventDispatcher;
     Participation? _selectedParticipation;
 
     public ParticipationBehind(
         IRepository<Participation> participationRepository,
-        IRepository<SnapshotResult> snapshotResultRepository
+        IRepository<SnapshotResult> snapshotResultRepository,
+        IDomainEventDispatcher domainEventDispatcher
     )
     {
         _participationRepository = participationRepository;
         _snapshotResultRepository = snapshotResultRepository;
+        _domainEventDispatcher = domainEventDispatcher;
     }
 
     public IReadOnlyList<int> RecentlyTimed => _recentlyProcessed;
@@ -84,7 +88,7 @@ public class ParticipationBehind
         GuardHelper.ThrowIfDefault(participation);
 
         participation.Update(model);
-        await _participationRepository.Update(participation);
+        await UpdateAndDispatch(participation);
         EmitChanged();
     }
 
@@ -98,7 +102,7 @@ public class ParticipationBehind
         var result = participation.Process(snapshot);
         if (result.Type == SnapshotResultType.Applied)
         {
-            await _participationRepository.Update(participation);
+            await UpdateAndDispatch(participation);
         }
         await _snapshotResultRepository.Create(result);
         _recentlyProcessed.Add(participation.Combination.Number);
@@ -108,14 +112,14 @@ public class ParticipationBehind
     public async Task RequestRepresent(bool isRequested)
     {
         Selected!.ToggleRepresentation(isRequested);
-        await _participationRepository.Update(Selected);
+        await UpdateAndDispatch(Selected);
         EmitChanged();
     }
 
     public async Task RequestInspection(bool isRequested)
-    {   
+    {
         Selected!.ToggleInspection(isRequested);
-        await _participationRepository.Update(Selected);
+        await UpdateAndDispatch(Selected);
         EmitChanged();
     }
 
@@ -156,7 +160,7 @@ public class ParticipationBehind
     {
         GuardHelper.ThrowIfDefault(Selected);
         Selected.Withdraw();
-        await _participationRepository.Update(Selected);
+        await UpdateAndDispatch(Selected);
 
         EmitChanged();
     }
@@ -165,7 +169,7 @@ public class ParticipationBehind
     {
         GuardHelper.ThrowIfDefault(Selected);
         Selected.Retire();
-        await _participationRepository.Update(Selected);
+        await UpdateAndDispatch(Selected);
 
         EmitChanged();
     }
@@ -174,7 +178,7 @@ public class ParticipationBehind
     {
         GuardHelper.ThrowIfDefault(Selected);
         Selected.FinishNotRanked(reason);
-        await _participationRepository.Update(Selected);
+        await UpdateAndDispatch(Selected);
 
         EmitChanged();
     }
@@ -183,7 +187,7 @@ public class ParticipationBehind
     {
         GuardHelper.ThrowIfDefault(Selected);
         Selected.Disqualify(dqCodes, reason);
-        await _participationRepository.Update(Selected);
+        await UpdateAndDispatch(Selected);
 
         EmitChanged();
     }
@@ -193,7 +197,7 @@ public class ParticipationBehind
         GuardHelper.ThrowIfDefault(Selected);
 
         Selected.FailToQualify(ftqCodes, reason);
-        await _participationRepository.Update(Selected);
+        await UpdateAndDispatch(Selected);
 
         EmitChanged();
     }
@@ -202,8 +206,14 @@ public class ParticipationBehind
     {
         GuardHelper.ThrowIfDefault(Selected);
         Selected.Restore();
-        await _participationRepository.Update(Selected);
+        await UpdateAndDispatch(Selected);
 
         EmitChanged();
+    }
+
+    async Task UpdateAndDispatch(Participation participation)
+    {
+        await _participationRepository.Update(participation);
+        await _domainEventDispatcher.Dispatch(participation);
     }
 }

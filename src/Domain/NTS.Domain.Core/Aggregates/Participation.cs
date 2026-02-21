@@ -1,4 +1,3 @@
-﻿using Not.Events;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -10,13 +9,9 @@ namespace NTS.Domain.Core.Aggregates;
 
 public class Participation : Aggregate
 {
-    //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
+    //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);    
     static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);
     static readonly FailedToQualify SPEED_RESTRICTION = new([FailToQualifyCode.SP]);
-    public static readonly Event<PhaseCompleted> PHASE_COMPLETED_EVENT = new();
-    public static readonly Event<PhaseCompleted> PARTICIPATION_COMPLETED_EVENT = new();
-    public static readonly Event<ParticipationEliminated> ELIMINATED_EVENT = new();
-    public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
     public Participation(
         ParticipationCategory category,
@@ -135,6 +130,13 @@ public class Participation : Aggregate
         Eliminate(new FailedToQualify(codes, reason));
     }
 
+    public void Restore()
+    {
+        Eliminated = null;
+        var qualificationRestored = new ParticipationRestored(this);
+        Raise(qualificationRestored);
+    }
+
     void EvaluatePhase(Phase phase)
     {
         if (phase.ViolatesRecoveryTime())
@@ -158,27 +160,13 @@ public class Participation : Aggregate
 
         Phases.StartIfNext();
         var phaseCompleted = new PhaseCompleted(this);
-        if (phase.IsFinal)
-        {
-            PARTICIPATION_COMPLETED_EVENT.Emit(phaseCompleted);
-        }
-        else
-        {
-            PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
-        }
-    }
-
-    void Restore()
-    {
-        Eliminated = null;
-        var qualificationRestored = new ParticipationRestored(this);
-        RESTORED_EVENT.Emit(qualificationRestored);
+        Raise(phaseCompleted);
     }
 
     void Eliminate(Eliminated notQualified)
     {
         Eliminated = notQualified;
         var qualificationRevoked = new ParticipationEliminated(this);
-        ELIMINATED_EVENT.Emit(qualificationRevoked);
+        Raise(qualificationRevoked);
     }
 }

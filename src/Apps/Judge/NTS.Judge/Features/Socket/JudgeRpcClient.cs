@@ -1,4 +1,5 @@
-﻿using Not.Application.CRUD.Ports;
+using MediatR;
+using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
@@ -15,7 +16,13 @@ using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.Features.Socket;
 
-public class JudgeRpcClient : RpcClient, IJudgeClientProcedures, ISingleton
+public class JudgeRpcClient
+    : RpcClient,
+        IJudgeClientProcedures,
+        INotificationHandler<PhaseCompleted>,
+        INotificationHandler<ParticipationEliminated>,
+        INotificationHandler<ParticipationRestored>,
+        ISingleton
 {
     readonly INtsSocketService _eventContext;
     readonly ITimingService _timingService;
@@ -38,10 +45,6 @@ public class JudgeRpcClient : RpcClient, IJudgeClientProcedures, ISingleton
 
     public override void RunAtStartup()
     {
-        Participation.PHASE_COMPLETED_EVENT.Subscribe(OnPhaseCompleted);
-        Participation.ELIMINATED_EVENT.Subscribe(OnParticipationEliminated);
-        Participation.RESTORED_EVENT.Subscribe(OnParticipationRestored);
-
         RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(Receive), Receive);
         RegisterOutputCollectionProcedure(nameof(GetActive), GetActive);
     }
@@ -64,6 +67,21 @@ public class JudgeRpcClient : RpcClient, IJudgeClientProcedures, ISingleton
             .ReadMany(x => !x.IsComplete() && !x.IsEliminated())
             .Select(ParticipationModel.MapFrom);
         return coreParticipations;
+    }
+
+    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    {
+        return OnPhaseCompleted(notification);
+    }
+
+    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
+    {
+        return OnParticipationEliminated(notification);
+    }
+
+    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
+    {
+        return OnParticipationRestored(notification);
     }
 
     public async Task OnParticipationEliminated(ParticipationEliminated eliminated)

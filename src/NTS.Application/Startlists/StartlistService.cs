@@ -1,13 +1,21 @@
-﻿using Not.Application.Behinds.Adapters;
+using MediatR;
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Collections;
-using Not.Startup;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Application.Startlists;
 
-public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory, IStartupInitializer, IStartlistContext
+public class StartlistService
+    : NStatefulService,
+        IStartUpcoming,
+        IStartHistory,
+        IStartlistContext,
+        INotificationHandler<PhaseCompleted>,
+        INotificationHandler<ParticipationRestored>,
+        INotificationHandler<ParticipationEliminated>
 {
     readonly IReadMany<Participation> _participations;
 
@@ -43,11 +51,22 @@ public class StartlistService : NStatefulService, IStartUpcoming, IStartHistory,
         }
     }
 
-    public void RunAtStartup()
+    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
-        Participation.PHASE_COMPLETED_EVENT.Subscribe(x => AddEntry(x.Participation));
-        Participation.RESTORED_EVENT.Subscribe(x => AddEntry(x.Participation));
-        Participation.ELIMINATED_EVENT.Subscribe(x => RemoveEntry(x.Participation));
+        AddEntry(notification.Participation);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
+    {
+        AddEntry(notification.Participation);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
+    {
+        RemoveEntry(notification.Participation);
+        return Task.CompletedTask;
     }
 
     public void Refresh()

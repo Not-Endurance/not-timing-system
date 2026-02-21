@@ -1,4 +1,5 @@
-﻿using Not.Application.Behinds.Adapters;
+using MediatR;
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Async.Extensions;
 using Not.Exceptions;
@@ -16,7 +17,8 @@ public class HandoutsBehind
     : NStatefulService<ObservableList<HandoutDocument>>,
         IHandoutsBehind,
         ICreateHandout,
-        ICoreDependentObservables
+        ICoreDependentObservables,
+        INotificationHandler<PhaseCompleted>
 {
     readonly SemaphoreSlim _semaphore = new(1);
     readonly IRepository<Handout> _handoutRepository;
@@ -57,12 +59,6 @@ public class HandoutsBehind
         return true;
     }
 
-    public void RunAtStartup()
-    {
-        // TODO: subscribe to updates for Event, Official
-        Participation.PHASE_COMPLETED_EVENT.SubscribeAsync(PhaseCompletedHandler);
-    }
-
     public async Task Delete(IEnumerable<HandoutDocument> documents)
     {
         Task action() => SafeDelete(documents);
@@ -78,6 +74,11 @@ public class HandoutsBehind
     public async Task<IEnumerable<Combination>> GetCombinations()
     {
         return await SafeHelper.Run(SafeGetCombinations) ?? [];
+    }
+
+    public async Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    {
+        await CreateDocument(notification.Participation);
     }
 
     async Task SafeCreate(int number)
@@ -102,11 +103,6 @@ public class HandoutsBehind
         State.RemoveRange(documents);
 
         _semaphore.Release();
-    }
-
-    async Task PhaseCompletedHandler(PhaseCompleted phaseCompleted) // TODO: change to Task
-    {
-        await CreateDocument(phaseCompleted.Participation);
     }
 
     async Task CreateDocument(Participation participation)

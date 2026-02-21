@@ -1,6 +1,6 @@
 ﻿using Not.Injection;
 
-namespace Not.Blazor.Ports;
+namespace Not.Blazor.Components.Abstractions;
 
 public interface IPrintInterop : ITransient
 {

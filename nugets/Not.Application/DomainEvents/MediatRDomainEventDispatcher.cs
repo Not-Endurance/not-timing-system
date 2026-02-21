@@ -1,0 +1,42 @@
+using MediatR;
+using Not.Domain;
+
+namespace Not.Application.DomainEvents;
+
+public class MediatRDomainEventDispatcher : IDomainEventDispatcher
+{
+    readonly IPublisher _publisher;
+
+    public MediatRDomainEventDispatcher(IPublisher publisher)
+    {
+        _publisher = publisher;
+    }
+
+    public async Task Dispatch(Aggregate aggregate, CancellationToken ct = default)
+    {
+        foreach (var @event in aggregate.DequeueDomainEvents())
+        {
+            await PublishIgnoringValidation(@event, ct);
+        }
+    }
+
+    async Task PublishIgnoringValidation(INotification @event, CancellationToken ct)
+    {
+#if DEBUG
+        await _publisher.Publish(@event, ct);
+#else
+        try
+        {
+            await _publisher.Publish(@event, cancellationToken);
+        }
+        catch (ValidationException validation)
+        {
+            var message = $"""
+                Validation was suppressed while dispatching '{@event.GetType().Name}' in RELEASE.
+                Message: {validation.Message}
+                """;
+            LoggingHelper.Debug(message);
+        }
+#endif
+    }
+}

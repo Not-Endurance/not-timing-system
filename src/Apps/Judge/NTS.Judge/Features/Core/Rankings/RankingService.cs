@@ -1,4 +1,5 @@
-﻿using Not.Application.Behinds.Adapters;
+using MediatR;
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
 using Not.Injection;
@@ -16,13 +17,16 @@ namespace NTS.Judge.Features.Core.Rankings;
 
 public class RankingService
     : NStatefulService<ObservableList<Ranking>>,
-    IKrudFormService<CustomRankingModel>,
+        IKrudFormService<CustomRankingModel>,
         IRankingService,
         IRankingMenuService,
         IRanklistDocumentFactory,
         ICustomRankingService,
         ICoreDependentObservables,
-    ISingleton
+        INotificationHandler<PhaseCompleted>,
+        INotificationHandler<ParticipationEliminated>,
+        INotificationHandler<ParticipationRestored>,
+        ISingleton
 {
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
@@ -41,10 +45,6 @@ public class RankingService
         _events = events;
         _officials = officials;
         _archive = archive;
-        Participation.PARTICIPATION_COMPLETED_EVENT.Subscribe(UpdateRanklist);
-        Participation.PHASE_COMPLETED_EVENT.Subscribe(UpdateRanklist);
-        Participation.ELIMINATED_EVENT.Subscribe(UpdateRanklist);
-        Participation.RESTORED_EVENT.Subscribe(UpdateRanklist);
     }
 
     public Ranking Current =>
@@ -113,6 +113,24 @@ public class RankingService
     {
         _current = ranking;
         EmitChanged();
+    }
+
+    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    {
+        UpdateRanklist(notification);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
+    {
+        UpdateRanklist(notification);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
+    {
+        UpdateRanklist(notification);
+        return Task.CompletedTask;
     }
 
     void UpdateRanklist(ParticipationPayload payload)

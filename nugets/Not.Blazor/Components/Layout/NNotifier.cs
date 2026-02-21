@@ -3,13 +3,13 @@ using MudBlazor;
 using Not.Blazor.Helpers;
 using Not.Notify;
 
-namespace Not.Blazor.Notifier;
+namespace Not.Blazor.Components.Layout;
 
-public class BlazorNotifier : ComponentBase
+public class NNotifier : ComponentBase
 {
     readonly TimeSpan _failedDuration = TimeSpan.FromSeconds(30);
 
-    public BlazorNotifier()
+    public NNotifier()
     {
         NotificationEvents.INFORMED.SubscribeAsync(AddInformationSnack);
         NotificationEvents.SUCCEDED.SubscribeAsync(AddSuccessSnack);
