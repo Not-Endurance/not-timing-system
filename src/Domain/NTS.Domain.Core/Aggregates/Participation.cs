@@ -135,13 +135,6 @@ public class Participation : Aggregate
         Eliminate(new FailedToQualify(codes, reason));
     }
 
-    public void Restore()
-    {
-        Eliminated = null;
-        var qualificationRestored = new ParticipationRestored(this);
-        RESTORED_EVENT.Emit(qualificationRestored);
-    }
-
     void EvaluatePhase(Phase phase)
     {
         if (phase.ViolatesRecoveryTime())
@@ -158,19 +151,28 @@ public class Participation : Aggregate
         {
             Restore();
         }
-        if (phase.IsComplete() && !phase.IsFinal)
+        if (! phase.IsComplete())
         {
-            Phases.StartIfNext();
-            var phaseCompleted = new PhaseCompleted(this);
-            if (phase.IsFinal)
-            {
-                PARTICIPATION_COMPLETED_EVENT.Emit(phaseCompleted);
-            }
-            else
-            {
-                PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
-            }
+            return;
         }
+
+        Phases.StartIfNext();
+        var phaseCompleted = new PhaseCompleted(this);
+        if (phase.IsFinal)
+        {
+            PARTICIPATION_COMPLETED_EVENT.Emit(phaseCompleted);
+        }
+        else
+        {
+            PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
+        }
+    }
+
+    void Restore()
+    {
+        Eliminated = null;
+        var qualificationRestored = new ParticipationRestored(this);
+        RESTORED_EVENT.Emit(qualificationRestored);
     }
 
     void Eliminate(Eliminated notQualified)
