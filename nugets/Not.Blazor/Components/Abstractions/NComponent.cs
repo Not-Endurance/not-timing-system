@@ -1,6 +1,7 @@
-﻿using Not.Async;
+using Not.Async;
 using Not.Notify;
 using Not.Safe;
+using Not.Strings;
 
 namespace Not.Blazor.Components.Abstractions;
 
@@ -20,10 +21,13 @@ public class NComponent : ComponentBase
             }
             catch (Exception ex)
             {
-                NotifyHelper.Error(ex);
+                NotifyError(ex);
             }
         });
     }
+
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
 
     [Parameter]
     public string? Style { get; set; }
@@ -56,6 +60,13 @@ public class NComponent : ComponentBase
     protected void Handle(Exception ex)
     {
         SafeHelper.HandleException(ex);
+    }
+
+    void NotifyError(Exception exception)
+    {
+        exception = exception.GetBaseException();
+        var message = exception.Message + Environment.NewLine + exception.StackTrace?.NTrim(1000);
+        Notifier.Error(message);
     }
 
     string CombineWithSpace(params string?[] values)

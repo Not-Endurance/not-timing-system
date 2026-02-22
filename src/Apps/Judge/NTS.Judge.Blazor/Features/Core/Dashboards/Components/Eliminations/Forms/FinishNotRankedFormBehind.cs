@@ -9,6 +9,10 @@ public abstract class FinishNotRankedFormBehind : NComponent
 {
     [Inject]
     IEliminationService EliminationService { get; set; } = default!;
+
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
+
     protected string? Reason { get; set; }
 
     [Parameter]
@@ -23,7 +27,7 @@ public abstract class FinishNotRankedFormBehind : NComponent
     {
         if (Reason == null)
         {
-            NotifyHelper.Warn("Reason is required");
+            Notifier.Warn("Reason is required");
             return;
         }
 

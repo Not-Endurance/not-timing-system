@@ -1,5 +1,6 @@
 using MediatR;
 using Not.Domain;
+using Not.Domain.Abstractions;
 
 namespace Not.Application.DomainEvents;
 
@@ -12,11 +13,16 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
         _publisher = publisher;
     }
 
+    public Task Dispatch(IDomainEvent @event, CancellationToken ct = default)
+    {
+        return PublishIgnoringValidation(@event, ct);
+    }
+
     public async Task Dispatch(Aggregate aggregate, CancellationToken ct = default)
     {
         foreach (var @event in aggregate.DequeueDomainEvents())
         {
-            await PublishIgnoringValidation(@event, ct);
+            await Dispatch(@event, ct);
         }
     }
 
@@ -27,7 +33,7 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
 #else
         try
         {
-            await _publisher.Publish(@event, cancellationToken);
+            await _publisher.Publish(@event, ct);
         }
         catch (ValidationException validation)
         {

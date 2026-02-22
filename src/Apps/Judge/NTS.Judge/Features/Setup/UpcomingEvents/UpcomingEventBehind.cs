@@ -1,4 +1,4 @@
-﻿using Not.Application.CRUD.Ports;
+using Not.Application.CRUD.Ports;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
@@ -14,22 +14,24 @@ public class UpcomingEventBehind
         IKrudMirror<Loop>,
         IKrudMirror<Combination>,
         IKrudMirror<Athlete>,
-        IKrudMirror<Horse>, 
-    ITransient
+        IKrudMirror<Horse>,
+        ITransient
 {
     readonly IUpdate<UpcomingEvent> _updater;
     readonly INtsSocketService _eventContext;
+    readonly INotifier _notifier;
 
-    public UpcomingEventBehind(IRepository<UpcomingEvent> events, INtsSocketService eventContext)
+    public UpcomingEventBehind(IRepository<UpcomingEvent> events, INtsSocketService eventContext, INotifier notifier)
         : base(events, [])
     {
         _updater = events;
         _eventContext = eventContext;
+        _notifier = notifier;
     }
 
     public override Task Delete(UpcomingEvent entity)
     {
-        NotifyHelper.Inform("Upcoming events cannot be deleted");
+        _notifier.Inform("Upcoming events cannot be deleted");
         return Task.CompletedTask;
     }
 

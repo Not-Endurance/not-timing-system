@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Localization;
 using Not.Injection;
 using Not.Notify;
@@ -9,6 +9,7 @@ namespace Not.Localization;
 public static class LocalizationHelper
 {
     static readonly IStringLocalizer LOCALIZER = ServiceLocator.Get<IStringLocalizer>();
+    static readonly INotifier NOTIFIER = ServiceLocator.Get<INotifier>();
 
     public static string LocalizeString(string resource)
     {
@@ -28,7 +29,7 @@ public static class LocalizationHelper
                 Text_formatting_failed_This_is_usually_not_critical_failure_string
                 + Environment.NewLine
                 + $"Localization resource is missing key for '{value}'";
-            NotifyHelper.Error(message);
+            NOTIFIER.Error(message);
             return value.ToString();
         }
     }

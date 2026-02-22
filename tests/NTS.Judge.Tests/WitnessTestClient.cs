@@ -2,7 +2,7 @@
 using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Tests.RPC;
-using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects.Payloads;
 using NTS.Warp.Features.Witness.Procedures;
 using Xunit.Abstractions;
 
@@ -13,7 +13,9 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
     public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
         : base(socket)
     {
-        RegisterInputProcedure<Participation>(nameof(ReceiveParticipation), ReceiveParticipation);
+        RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
+        RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
+        RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
     }
 
     public int Id { get; }
@@ -25,9 +27,21 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
         InvokedMethods.Clear();
     }
 
-    public Task ReceiveParticipation(Participation entry)
+    public Task OnParticipationEliminated(ParticipationEliminated payload)
     {
-        InvokedMethods.Add(nameof(ReceiveParticipation));
+        InvokedMethods.Add(nameof(OnParticipationEliminated));
+        return Task.CompletedTask;
+    }
+
+    public Task OnParticipationRestored(ParticipationRestored payload)
+    {
+        InvokedMethods.Add(nameof(OnParticipationRestored));
+        return Task.CompletedTask;
+    }
+
+    public Task OnPhaseCompleted(PhaseCompleted payload)
+    {
+        InvokedMethods.Add(nameof(OnPhaseCompleted));
         return Task.CompletedTask;
     }
 

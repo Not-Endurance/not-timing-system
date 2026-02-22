@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,16 +12,19 @@ public class NHttpClient
     readonly string _host;
     readonly HttpClient _httpClient;
     readonly ILogger<NHttpClient> _logger;
+    readonly INotifier _notifier;
 
     public NHttpClient(
         IHttpClientFactory httpClientFactory,
         ILogger<NHttpClient> logger,
-        IOptions<NHttpSettings> options
+        IOptions<NHttpSettings> options,
+        INotifier notifier
     )
     {
         _host = options.Value.Host;
         _httpClient = httpClientFactory.CreateClient("NHttpClient");
         _logger = logger;
+        _notifier = notifier;
     }
 
     public async Task<string?> Get(string endpoint)
@@ -37,9 +40,9 @@ public class NHttpClient
             if (ex is HttpRequestException { StatusCode: HttpStatusCode.NotFound })
             {
 #if DEBUG
-                NotifyHelper.Warn(ex.Message + $"{endpoint}"); // TODO: probably return result instead and let consumer decide
+                _notifier.Warn(ex.Message + $"{endpoint}"); // TODO: probably return result instead and let consumer decide
 #else
-                NotifyHelper.Warn($"The requested resource at {endpoint} was not found. Please contact system admin.");
+                _notifier.Warn($"The requested resource at {endpoint} was not found. Please contact system admin.");
 #endif
                 return null;
             }

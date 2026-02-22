@@ -3,6 +3,7 @@ using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Notify;
 using Not.Startup;
+using Not.Strings;
 using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 
@@ -16,11 +17,13 @@ public class JudgeSocketService
 {
     readonly ISocketPrincipalStorage _socketPrincialStorage;
     readonly IRpcSocket _socket;
+    readonly INotifier _notifier;
 
-    public JudgeSocketService(ISocketPrincipalStorage socketPrincipaStorage, IRpcSocket socket)
+    public JudgeSocketService(ISocketPrincipalStorage socketPrincipaStorage, IRpcSocket socket, INotifier notifier)
     {
         _socketPrincialStorage = socketPrincipaStorage;
         _socket = socket;
+        _notifier = notifier;
         _socket.Error += HandleRpcErrors;
         _socket.ServerConnectionChanged += HandleServerConnectionChanged;
     }
@@ -63,7 +66,7 @@ public class JudgeSocketService
     void HandleRpcErrors(object? sender, RpcError rpcError)
     {
         Status = SocketConnectionStatus.Disconnected;
-        NotifyHelper.Error(rpcError.Exception);
+        _notifier.Error(rpcError.Exception);
     }
 
     void HandleServerConnectionChanged(object? sender, SocketConnectionStatus e)

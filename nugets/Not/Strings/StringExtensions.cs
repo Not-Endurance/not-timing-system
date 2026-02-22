@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Text;
+using Not.Injection;
 using Not.Notify;
 
 namespace Not.Strings;
@@ -50,8 +51,9 @@ public static class StringExtensions
                 + $"Format: {format}"
                 + Environment.NewLine
                 + $"args: {string.Join(", ", args)}";
-            NotifyHelper.Error(message);
+            Notifier.Error(message);
             return format;
         }
     }
+    static INotifier Notifier => ServiceLocator.Get<INotifier>();
 }

@@ -1,24 +1,45 @@
-﻿using System.Text;
+using System.Text;
 using MudBlazor;
 using Not.Blazor.Helpers;
+using Not.Events;
 using Not.Notify;
 
 namespace Not.Blazor.Components.Layout;
 
-public class NNotifier : ComponentBase
+public class NNotifier : ComponentBase, IDisposable
 {
+    readonly List<(Guid Id, IEventSubscriber<string> Subscriber)> _subscriptions = [];
     readonly TimeSpan _failedDuration = TimeSpan.FromSeconds(30);
-
-    public NNotifier()
-    {
-        NotificationEvents.INFORMED.SubscribeAsync(AddInformationSnack);
-        NotificationEvents.SUCCEDED.SubscribeAsync(AddSuccessSnack);
-        NotificationEvents.WARNED.SubscribeAsync(AddWarningSnack);
-        NotificationEvents.FAILED.SubscribeAsync(AddFailureSnack);
-    }
 
     [Inject]
     ISnackbar Snackbar { get; set; } = default!;
+
+    [Inject]
+    INotificationStream NotificationStream { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        Subscribe(NotificationStream.Informed, AddInformationSnack);
+        Subscribe(NotificationStream.Succeeded, AddSuccessSnack);
+        Subscribe(NotificationStream.Warned, AddWarningSnack);
+        Subscribe(NotificationStream.Failed, AddFailureSnack);
+    }
+
+    public void Dispose()
+    {
+        foreach (var (id, subscriber) in _subscriptions)
+        {
+            subscriber.Unsubscribe(id);
+        }
+        _subscriptions.Clear();
+        GC.SuppressFinalize(this);
+    }
+
+    void Subscribe(IEventSubscriber<string> subscriber, Action<string> callback)
+    {
+        var id = subscriber.SubscribeAsync(callback);
+        _subscriptions.Add((id, subscriber));
+    }
 
     void AddInformationSnack(string message)
     {

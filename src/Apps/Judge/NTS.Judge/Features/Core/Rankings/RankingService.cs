@@ -32,19 +32,22 @@ public class RankingService
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
+    readonly INotifier _notifier;
     Ranking? _current;
 
     public RankingService(
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Official> officials,
-        IRepository<ArchiveEntry> archive
+        IRepository<ArchiveEntry> archive,
+        INotifier notifier
     )
     {
         _rankings = rankings;
         _events = events;
         _officials = officials;
         _archive = archive;
+        _notifier = notifier;
     }
 
     public Ranking Current =>
@@ -90,7 +93,7 @@ public class RankingService
         var enduranceEvent = await _events.Read(0);
         if (enduranceEvent == null)
         {
-            NotifyHelper.Warn("Event is not started yet");
+            _notifier.Warn("Event is not started yet");
             return;
         }
         var officials = await _officials.ReadMany();

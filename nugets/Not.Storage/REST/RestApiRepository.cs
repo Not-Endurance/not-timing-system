@@ -1,6 +1,7 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
+using Not.Injection;
 using Not.Notify;
 using Not.Structures;
 
@@ -16,6 +17,7 @@ public abstract class RestApiRepository<T> : IRepository<T>
         _endpoint = endpoint;
         Client = client;
     }
+    static INotifier Notifier => ServiceLocator.Get<INotifier>();
 
     protected NHttpClient Client { get; }
 
@@ -32,9 +34,9 @@ public abstract class RestApiRepository<T> : IRepository<T>
         )
         {
 #if DEBUG
-            NotifyHelper.Warn(ex.Message);
+            Notifier.Warn(ex.Message);
 #else
-            NotifyHelper.Warn(
+            Notifier.Warn(
                 Localization
                     .NStrings
                     .Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
@@ -43,7 +45,7 @@ public abstract class RestApiRepository<T> : IRepository<T>
         }
         else
         {
-            NotifyHelper.Error(ex);
+            Notifier.Error(ex);
         }
     }
 

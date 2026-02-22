@@ -11,6 +11,9 @@ public abstract class DisqualifyFormBehind : NComponent
     [Inject]
     IEliminationService EliminationService { get; set; } = default!;
 
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
+
     protected string? Reason { get; set; }
 
     protected IEnumerable<DisqualifyCode> Codes { get; set; } = [];
@@ -31,7 +34,7 @@ public abstract class DisqualifyFormBehind : NComponent
     {
         if (Reason == null && !Codes.Any())
         {
-            NotifyHelper.Warn("Reason is required");
+            Notifier.Warn("Reason is required");
             return;
         }
         var dqCodes = Codes.ToArray();

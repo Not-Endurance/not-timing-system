@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using Not.Notify;
+using Not.Strings;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 
@@ -12,6 +13,9 @@ public partial class ImageBrowser
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
 
     [Parameter]
     public EventCallback<string> OnImageSelected { get; set; }
@@ -80,14 +84,14 @@ public partial class ImageBrowser
 
         LoadImages();
         StateHasChanged();
-        NotifyHelper.Success("File uploaded successfully.");
+        Notifier.Success("File uploaded successfully.");
     }
 
     async Task PromptDeleteImage(string imagePath)
     {
         if (imagePath.EndsWith("blank.png", StringComparison.InvariantCulture))
         {
-            NotifyHelper.Error("Cannot delete default image.");
+            Notifier.Error("Cannot delete default image.");
             return;
         }
         var confirmed = await DialogService.ShowMessageBox(
@@ -110,18 +114,18 @@ public partial class ImageBrowser
             if (File.Exists(imagePath))
             {
                 File.Delete(imagePath);
-                NotifyHelper.Warn("Image deleted.");
+                Notifier.Warn("Image deleted.");
                 LoadImages();
                 StateHasChanged();
             }
             else
             {
-                NotifyHelper.Error("File not found.");
+                Notifier.Error("File not found.");
             }
         }
         catch (Exception exception)
         {
-            NotifyHelper.Error(exception);
+            Notifier.Error(exception);
         }
     }
 }

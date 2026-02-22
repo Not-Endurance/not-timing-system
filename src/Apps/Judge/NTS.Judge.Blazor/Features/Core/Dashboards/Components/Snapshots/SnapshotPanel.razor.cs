@@ -21,6 +21,9 @@ public partial class SnapshotPanel
     [Inject]
     ITimingService TimingService { get; set; } = default!;
 
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
+
     Task Snapshot()
     {
         var currentTime = DateTime.Now.TimeOfDay;
@@ -39,7 +42,7 @@ public partial class SnapshotPanel
             var timeString = NormalizeInput(_input);
             if (!TimeSpan.TryParse(timeString, out var timeSpan))
             {
-                NotifyHelper.Inform(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string);
+                Notifier.Inform(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string);
                 return;
             }
             var time = DateTime.Today + timeSpan;

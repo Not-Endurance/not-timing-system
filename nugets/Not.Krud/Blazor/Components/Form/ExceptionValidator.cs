@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Not.Exceptions;
 using Not.Notify;
@@ -15,6 +15,9 @@ public class ExceptionValidator : ComponentBase
     [Inject]
     IServiceProvider ServiceProvider { get; set; } = default!;
 
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
+
     protected override void OnInitialized()
     {
         _messages = new(EditContext);
@@ -26,7 +29,7 @@ public class ExceptionValidator : ComponentBase
             _messages.Clear(e.FieldIdentifier);
             EditContext.NotifyValidationStateChanged();
         };
-	}
+    }
 
     internal void Reset()
     {
@@ -43,7 +46,7 @@ public class ExceptionValidator : ComponentBase
         {
             if (exception.Property == null)
             {
-                NotifyHelper.Warn(exception.Message);
+                Notifier.Warn(exception.Message);
             }
             else
             {

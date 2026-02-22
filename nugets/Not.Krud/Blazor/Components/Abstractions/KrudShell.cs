@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
 using Not.Krud.Abstractions;
@@ -14,6 +14,9 @@ public abstract class KrudShell<TModel> : NComponent
 
     [Inject]
     IKrudFormService<TModel> Service { get; set; } = default!;
+
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
 
     [Parameter]
     public TModel Model { get; set; } = new();
@@ -48,6 +51,6 @@ public abstract class KrudShell<TModel> : NComponent
         {
             await OnSubmit(Model);
         }
-        NotifyHelper.Success(Updated_string);
+        Notifier.Success(Updated_string);
     }
 }

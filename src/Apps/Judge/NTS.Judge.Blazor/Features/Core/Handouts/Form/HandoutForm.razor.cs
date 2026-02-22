@@ -12,11 +12,14 @@ public partial class HandoutForm
     [Inject]
     ICreateHandout Behind { get; set; } = default!;
 
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
+
     async Task Create()
     {
         if (_combination == null)
         {
-            NotifyHelper.Warn("Please select the combination");
+            Notifier.Warn("Please select the combination");
             return;
         }
         await Behind.Create(_combination.Number);
