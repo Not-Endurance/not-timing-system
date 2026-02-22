@@ -1,10 +1,11 @@
-﻿using MudBlazor;
+using MudBlazor;
+using Not.Blazor.Components.Abstractions;
 
 namespace Not.Blazor.Components.Layout;
 
-public partial class NTheme
+public class NThemeBehind : NComponent
 {
-    MudTheme Theme { get; set; } = default!;
+    protected MudTheme Theme { get; set; } = default!;
 
     [Parameter]
     public MudThemeProvider ThemeProvider { get; set; } = default!;
@@ -22,19 +23,20 @@ public partial class NTheme
     public bool DialogFullWidth { get; set; } = true;
 
     [Parameter]
-    public bool Mobile { get; set; } = false;
+    public bool Mobile { get; set; }
 
     protected override void OnInitialized()
     {
-        var caption = new Caption() { FontSize = "14px" };
-        var subtitle2 = new Subtitle2() { FontSize = "12px" };
+        var caption = new Caption { FontSize = "14px" };
+        var subtitle2 = new Subtitle2 { FontSize = "12px" };
         if (Mobile)
         {
-            caption = new Caption() { FontSize = "13px" };
+            caption = new Caption { FontSize = "13px" };
         }
-        Theme = new MudTheme()
+
+        Theme = new MudTheme
         {
-            Typography = new Typography() { Caption = caption, Subtitle2 = subtitle2 },
+            Typography = new Typography { Caption = caption, Subtitle2 = subtitle2 },
         };
     }
 }

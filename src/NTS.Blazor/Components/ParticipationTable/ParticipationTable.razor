@@ -5,9 +5,9 @@
 @using Not.Blazor.Components.Tables
 @using Not.Blazor.Dialogs
 
-@inherits NComponent
+@inherits ParticipationTableBehind
 
-<table class="participation-table rtable @_axisClass">
+<table class="participation-table rtable @AxisClass">
     <thead>
         <tr>
             <MudButton Variant="Variant.Text" Style="visibility:hidden;">#</MudButton>
@@ -15,15 +15,15 @@
             <th>Arrive</th>
             <th>Present</th>
 
-            @if (_anyRepresentation && !AlignVertically)
+            @if (AnyRepresentation && !AlignVertically)
             {
                 <th>Represent</th>
             }
-            @if (_anyRequiredInspection && !AlignVertically)
+            @if (AnyRequiredInspection && !AlignVertically)
             {
                 <th><b>RI Time</b></th>
             }
-            @if (_anyCompulsoryRequiredInspection && !AlignVertically)
+            @if (AnyCompulsoryRequiredInspection && !AlignVertically)
             {
                 <th><b>CRI Time</b></th>
             }
@@ -54,15 +54,15 @@
                 <NTd Value="@phase.ArriveTime" />
                 <NTd Value="@phase.PresentTime" />
 
-                @if (_anyRepresentation && !AlignVertically)
+                @if (AnyRepresentation && !AlignVertically)
                 {
                     <NTd Value="@phase.RepresentTime" />
                 }
-                @if (_anyRequiredInspection && !AlignVertically)
+                @if (AnyRequiredInspection && !AlignVertically)
                 {
                     <NTd CellStyle="background-color:whitesmoke" TextStyle="font-weight:bold" Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
                 }
-                @if (_anyCompulsoryRequiredInspection && !AlignVertically)
+                @if (AnyCompulsoryRequiredInspection && !AlignVertically)
                 {
                     <NTd CellStyle="background-color:whitesmoke" TextStyle="font-weight:bold" Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
                 }

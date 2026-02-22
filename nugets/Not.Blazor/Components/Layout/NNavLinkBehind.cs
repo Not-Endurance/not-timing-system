@@ -4,7 +4,7 @@ using Not.Blazor.Navigation.Abstractions;
 
 namespace Not.Blazor.Components.Layout;
 
-public partial class NNavLink : NComponent
+public class NNavLinkBehind : NComponent
 {
     [Inject]
     ILandNavigator LandNavigator { get; set; } = default!;
@@ -16,7 +16,7 @@ public partial class NNavLink : NComponent
     public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
 
     [Parameter]
-    public Action? AfterNavigation { get; set; } = default!;
+    public Action? AfterNavigation { get; set; }
 
     [Parameter]
     public string Icon { get; set; } = default!;
@@ -24,9 +24,16 @@ public partial class NNavLink : NComponent
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    void Land()
+    protected void Land()
     {
-        LandNavigator.LandTo(Endpoint);
-        AfterNavigation?.Invoke();
+        try
+        {
+            LandNavigator.LandTo(Endpoint);
+            AfterNavigation?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 }

@@ -25,7 +25,8 @@ NTS stands for *No Timing System*, the Brand of the current product - a cheap al
 Component rules
 - Components should inherit from `NComponent` or one of it's derivatives almost always. Exceptions can be made for example if exteding an external component such as `ErrorBoundary` or `MudTextField`. 
 - Component `.razor` files should not contain code-behind, instead they should *inherit* from a `Behind.cs` class of the same name - i.e `Component.razor` inherits `ComponentBehind.cs`. Components shouldn't use `partial` code behinds as this inheritance offers a better control on what to expose to the razor file. 
-- Component behinds should never expose services directly, as exception in service execution leads to poor Blazor experience - `ErrorBoundaries` cannot handle some async exceptions gracefully in my experience. Instead `NComponent` defines a `Handle(Exception ex)` method which is used to that end. Hence Component Behinds 
-- Component behinds should expose only *Safe* methods - the executing logic is wrapped in a `try-catch` block which uses `NComponent.Handle`. Alternatively a method is considered Safe if it's being passed to an `N*` component parameter with `Safe` suffix. This indicates the method is already invoked in a `try-catch` block. In this case the method has to also be suffixed with `Safe` to indicate this.
+- Component behinds should never expose services directly, as exception in service execution leads to poor Blazor experience - `ErrorBoundaries` cannot handle some async exceptions gracefully in my experience. Instead `NComponent` defines a `Handle(Exception ex)` method which is used to that end. 
+- Component behinds should expose only properties and not fields 
+- Component behinds should expose only *Safe* methods - a method is safe if it's wrapped with a `try-catch` that users `NComponentHandle` or if its name is suffixed with `Safe`. The latter should only be used if the method is passed to a Safe component parameter (also suffixed by safe).
 - Base classes for internal use should be suffixed with `Base` - example `Event : EventBase`. Base classes that are intended to be implemented by the user don't have to follow that rule - example `KrudShell`
-- Base classes and interfaces should be in `Abstractions` directory
+- Base classes and interfaces should be in `Abstractions`zw

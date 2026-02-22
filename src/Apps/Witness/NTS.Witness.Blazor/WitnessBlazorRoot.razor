@@ -6,10 +6,10 @@
 
 @inherits WitnessBlazorRootBehind
 
-<ErrorBoundary @ref="@_errorBoundary">
+<ErrorBoundary @ref="@ErrorBoundary">
     <ChildContent>
         <CascadingAuthenticationState>
-            <Router AppAssembly="@Assembly" AdditionalAssemblies="@_routeAssemblies">
+            <Router AppAssembly="@Assembly" AdditionalAssemblies="@RouteAssemblies">
 
                 <Found Context="routeData">
                     <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
@@ -37,6 +37,6 @@
             <pre>@context.StackTrace</pre>
         </div>
 
-        <button class="btn btn-primary" @onclick="@(() => _errorBoundary.Recover())">Back</button>
+        <button class="btn btn-primary" @onclick="@(() => ErrorBoundary.Recover())">Back</button>
     </ErrorContent>
 </ErrorBoundary>

@@ -1,5 +1,6 @@
 ﻿@using MudBlazor
 @using Not.Notify;
+@inherits ImageBrowserBehind
 
 <MudPaper Elevation="0" Class="m-5 p-4" MaxHeight="600px" Height="300px">
 
@@ -19,7 +20,7 @@
     </MudStack>
 
     <MudGrid Class="mt-4" >
-        @if (_images.Count == 0)
+        @if (Images.Count == 0)
         {
             <MudItem xs="12">
                 <MudText Typo="Typo.body1" Class="text-center">
@@ -27,7 +28,7 @@
                 </MudText>
             </MudItem>
         }
-        @foreach (var image in _images)
+        @foreach (var image in Images)
         {
             var isSelectedClass = Path.GetFileName(SelectedImage) == Path.GetFileName(image) ? "border border-primary" : "";
 

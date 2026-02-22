@@ -1,37 +1,45 @@
-using MudBlazor;
+using Not.Blazor.Components.Abstractions;
 using Not.Notify;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Judge.Features.Core.Handouts;
 
 namespace NTS.Judge.Blazor.Features.Core.Handouts.Form;
 
-public partial class HandoutForm
+public class HandoutFormBehind : NComponent
 {
-    Combination? _combination;
-
     [Inject]
     ICreateHandout Behind { get; set; } = default!;
 
     [Inject]
     INotifier Notifier { get; set; } = default!;
+    protected Combination? Combination { get; set; }
 
-    async Task Create()
+    protected async Task Create()
     {
-        if (_combination == null)
+        try
         {
-            Notifier.Warn("Please select the combination");
-            return;
+            if (Combination == null)
+            {
+                Notifier.Warn("Please select the combination");
+                return;
+            }
+
+            await Behind.Create(Combination.Number);
         }
-        await Behind.Create(_combination.Number);
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
-    async Task<IEnumerable<Combination?>> Search(string term, CancellationToken _)
+    protected async Task<IEnumerable<Combination?>> SearchSafe(string term, CancellationToken _)
     {
         var combinations = await Behind.GetCombinations();
         if (string.IsNullOrEmpty(term))
         {
             return combinations;
         }
+
         return combinations.Where(x => x.ToString().Contains(term, StringComparison.InvariantCultureIgnoreCase));
     }
 }

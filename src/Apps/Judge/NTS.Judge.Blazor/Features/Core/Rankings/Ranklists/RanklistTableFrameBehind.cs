@@ -1,6 +1,8 @@
+using MudBlazor;
+
 namespace NTS.Judge.Blazor.Features.Core.Rankings.Ranklists;
 
-public partial class RanklistTableFrame
+public class RanklistTableFrameBehind : MudGrid
 {
     [Parameter]
     public RenderFragment One { get; set; } = default!;

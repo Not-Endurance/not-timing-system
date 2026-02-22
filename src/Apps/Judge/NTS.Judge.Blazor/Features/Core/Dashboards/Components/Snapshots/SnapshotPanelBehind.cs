@@ -1,4 +1,5 @@
 using MudBlazor;
+using Not.Blazor.Components.Abstractions;
 using Not.Notify;
 using NTS.Application.Core;
 using NTS.Blazor.Constants;
@@ -8,12 +9,9 @@ using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Snapshots;
 
-public partial class SnapshotPanel
+public class SnapshotPanelBehind : NComponent
 {
     const string DEFAULT_TIME = "00:00:00";
-    static readonly PatternMask TIME_MASK = new(Masks.SECONDS_TIME_MASK_FORMAT);
-
-    string? _input = DEFAULT_TIME;
 
     [Inject]
     IParticipationContext ParticipationContext { get; set; } = default!;
@@ -24,27 +22,41 @@ public partial class SnapshotPanel
     [Inject]
     INotifier Notifier { get; set; } = default!;
 
-    Task Snapshot()
-    {
-        var currentTime = DateTime.Now.TimeOfDay;
-        _input = currentTime.ToString();
-        return Task.CompletedTask;
-    }
+    protected static PatternMask TimeMask { get; } = new(Masks.SECONDS_TIME_MASK_FORMAT);
 
-    async Task SnapshotTime()
+    protected string? Input { get; set; } = DEFAULT_TIME;
+
+    protected Task Snapshot()
     {
         try
         {
-            if (_input is null or DEFAULT_TIME)
+            var currentTime = DateTime.Now.TimeOfDay;
+            Input = currentTime.ToString();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected async Task SnapshotTime()
+    {
+        try
+        {
+            if (Input is null or DEFAULT_TIME)
             {
                 return;
             }
-            var timeString = NormalizeInput(_input);
+
+            var timeString = NormalizeInput(Input);
             if (!TimeSpan.TryParse(timeString, out var timeSpan))
             {
                 Notifier.Inform(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string);
                 return;
             }
+
             var time = DateTime.Today + timeSpan;
             var timestamp = new Timestamp(time);
             var snapshot = new Snapshot(
@@ -61,7 +73,7 @@ public partial class SnapshotPanel
         }
     }
 
-    string NormalizeInput(string input)
+    protected string NormalizeInput(string input)
     {
         try
         {

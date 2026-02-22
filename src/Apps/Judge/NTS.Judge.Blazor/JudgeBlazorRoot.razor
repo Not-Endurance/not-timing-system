@@ -1,10 +1,11 @@
 ﻿@using System.Reflection
 @using NTS.Judge.Blazor.Layout
+@inherits JudgeBlazorRootBehind
 
-<ErrorBoundary @ref="this._errorBoundary">
+<ErrorBoundary @ref="this.ErrorBoundary">
 
     <ChildContent>
-        <Router AppAssembly="Assembly" AdditionalAssemblies="_routeAssemblies">
+        <Router AppAssembly="Assembly" AdditionalAssemblies="RouteAssemblies">
 
             <Found Context="routeData">
                 <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
@@ -31,7 +32,7 @@
             <pre>@context.StackTrace</pre>
         </div>
 
-        <button class="btn btn-primary" @onclick="_ => this._errorBoundary.Recover()">Back</button>
+        <button class="btn btn-primary" @onclick="_ => this.ErrorBoundary.Recover()">Back</button>
     </ErrorContent>
 
 </ErrorBoundary>

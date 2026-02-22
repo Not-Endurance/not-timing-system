@@ -1,6 +1,8 @@
+using Not.Blazor.Components.Abstractions;
+
 namespace Not.Blazor.Components.Tables;
 
-public partial class NTd<T>
+public class NTdBehind<T> : NComponent
 {
     [Parameter]
     public T? Value { get; set; }

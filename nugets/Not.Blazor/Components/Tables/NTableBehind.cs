@@ -2,7 +2,7 @@ using MudBlazor;
 
 namespace Not.Blazor.Components.Tables;
 
-public partial class NTable
+public class NTableBehind : MudSimpleTable
 {
     protected Typo Typography { get; set; } = Typo.caption;
 

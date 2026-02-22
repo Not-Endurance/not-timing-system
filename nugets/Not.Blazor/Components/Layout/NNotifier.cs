@@ -1,12 +1,13 @@
 using System.Text;
 using MudBlazor;
+using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Helpers;
 using Not.Events;
 using Not.Notify;
 
 namespace Not.Blazor.Components.Layout;
 
-public class NNotifier : ComponentBase, IDisposable
+public class NNotifier : NComponent, IDisposable
 {
     readonly List<(Guid Id, IEventSubscriber<string> Subscriber)> _subscriptions = [];
     readonly TimeSpan _failedDuration = TimeSpan.FromSeconds(30);

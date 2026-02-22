@@ -18,25 +18,11 @@ public abstract class EliminationFormBehind : NComponent
 
     protected async Task OnRestoreSafe()
     {
-        try
-        {
-            await Eliminations.RestoreQualification();
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
+        await Eliminations.RestoreQualification();
     }
 
     protected async Task OnSubmitSafe()
     {
-        try
-        {
-            await SubmitSafe();
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
+        await SubmitSafe();
     }
 }

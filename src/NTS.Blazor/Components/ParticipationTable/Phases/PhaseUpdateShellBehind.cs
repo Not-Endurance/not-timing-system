@@ -7,5 +7,5 @@ namespace NTS.Blazor.Components.ParticipationTable.Phases;
 
 public abstract class PhaseUpdateShellBehind : KrudShell<PhaseUpdateModel>
 {
-    protected readonly PatternMask TIME_MASK = new(Masks.SECONDS_TIME_MASK_FORMAT);
+    protected PatternMask TimeMask { get; } = new(Masks.SECONDS_TIME_MASK_FORMAT);
 }

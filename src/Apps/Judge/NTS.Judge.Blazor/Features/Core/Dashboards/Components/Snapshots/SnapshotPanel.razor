@@ -1,7 +1,7 @@
-﻿@inherits NComponent
+@inherits SnapshotPanelBehind
 
 <MudStack Row="true" AlignItems="AlignItems.Center" Class="@Class">
-    <MudTextField @bind-Value="_input" Label="@Time_string" Mask="TIME_MASK" />
+    <MudTextField @bind-Value="Input" Label="@Time_string" Mask="TimeMask" />
 
     <MudSpacer />
 
@@ -11,3 +11,4 @@
         <MudIconButton Icon="@Icons.Material.Outlined.Timer" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Snapshot" />
     </MudButtonGroup>
 </MudStack>
+

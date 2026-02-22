@@ -1,10 +1,10 @@
-using Not.Localization;
+using MudBlazor;
 
 namespace Not.Blazor.Components.Text.Abstractions;
 
-public partial class NTextBase
+public class NTextBaseBehind : MudText
 {
-    string AbsoluteCenterStyle =>
+    protected string AbsoluteCenterStyle =>
         IsAbsoluteCenter //TODO: fix naming rule here should be_absoluteCenterStyle
             ? "position: absolute; left: 0; width: 100%"
             : "";

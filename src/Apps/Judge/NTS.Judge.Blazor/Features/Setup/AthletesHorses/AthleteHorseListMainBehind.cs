@@ -3,5 +3,5 @@ using Not.Blazor.Components;
 
 namespace NTS.Judge.Blazor.Features.Setup.AthletesHorses;
 
-public class AthleteHorseListContentBehind : NContentBehind
+public class AthleteHorseListMainBehind : NContentBehind
 { }

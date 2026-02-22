@@ -3,12 +3,12 @@ using MudBlazor;
 
 namespace Not.Blazor.Components.Buttons.Abstractions;
 
-public abstract partial class NButtonBase : MudButton
+public abstract class NButtonBaseBehind : MudButton
 {
+    protected bool IsLoading { get; set; }
+
     [Parameter]
     public string? Text { get; set; }
-
-    public bool IsLoading { get; protected set; }
 
     protected override void OnParametersSet()
     {
