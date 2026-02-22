@@ -1,7 +1,6 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using Not.Collections;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Startlists;
@@ -12,7 +11,6 @@ public class StartlistService
     : NStatefulService,
         IStartUpcoming,
         IStartHistory,
-        IStartlistContext,
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationRestored>,
         INotificationHandler<ParticipationEliminated>
@@ -36,24 +34,16 @@ public class StartlistService
         return Startlist.History.Any() || Startlist.Upcoming.Any();
     }
 
-    public void Update(Participation participation, NCollectionAction action)
-    {
-        switch (action)
-        {
-            case NCollectionAction.Remove:
-                RemoveEntry(participation);
-                break;
-            case NCollectionAction.AddOrUpdate:
-                AddEntry(participation);
-                break;
-            default:
-                break;
-        }
-    }
-
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
-        AddEntry(notification.Participation);
+        var participation = notification.Participation;
+        if (participation.Phases.Current.IsComplete() && participation.Phases.Current.IsFinal)
+        {
+            RemoveEntry(participation);
+            return Task.CompletedTask;
+        }
+
+        AddEntry(participation);
         return Task.CompletedTask;
     }
 

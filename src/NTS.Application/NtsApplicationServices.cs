@@ -37,7 +37,6 @@ public static class NtsApplicationServices
         public Builder AddStartlist()
         {
             _services.Add<
-                IStartlistContext,
                 IStartUpcoming,
                 IStartHistory,
                 INotificationHandler<PhaseCompleted>,
