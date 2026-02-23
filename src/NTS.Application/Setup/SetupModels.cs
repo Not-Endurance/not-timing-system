@@ -17,7 +17,7 @@ public class ClubModel : IDocument
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
     public string Name { get; init; } = default!;
 
-    public Club MapToDomain()
+    public Club MapToEntity()
     {
         return new Club(Name, Id);
     }
@@ -39,7 +39,7 @@ public class OfficialModel
     public string[] Names { get; init; } = [];
     public OfficialRole Role { get; init; } = default!;
 
-    public Official MapToDomain()
+    public Official MapToEntity()
     {
         return new Official(Names, Role, Id);
     }
@@ -73,7 +73,7 @@ public class AthleteModel : IDocument, IKrudModel<Athlete>
 
     public Athlete MapToEntity()
     {
-        return new Athlete(Names, FeiId, Country?.MapToDomain(), Club?.MapToDomain(), Id);
+        return new Athlete(Names, FeiId, Country?.MapToEntity(), Club?.MapToEntity(), Id);
     }
 }
 
@@ -94,7 +94,7 @@ public class HorseModel : IDocument
     public required string Name { get; init; }
     public string? FeiId { get; init; }
 
-    public Horse MaptoDomain()
+    public Horse MapToEntity()
     {
         return new Horse(Name, FeiId, Id);
     }
@@ -118,10 +118,10 @@ public class CombinationModel
     public AthleteModel Athlete { get; init; } = default!;
     public HorseModel Horse { get; init; } = default!;
 
-    public Combination MapToDomain()
+    public Combination MapToEntity()
     {
         var athlete = Athlete.MapToEntity();
-        var horse = Horse.MaptoDomain();
+        var horse = Horse.MapToEntity();
         return new Combination(Number, athlete, horse, Id);
     }
 }
@@ -154,7 +154,7 @@ public class ParticipationModel
     public double? MinAverageSpeed { get; init; }
     public double? MaxAverageSpeed { get; init; }
 
-    public Participation MapToDomain()
+    public Participation MapToEntity()
     {
         var combination = Combination.MapToDomain();
         return new Participation(
@@ -181,7 +181,7 @@ public class LoopModel
     public int Id { get; init; }
     public double Distance { get; init; }
 
-    public Loop MapToDomain()
+    public Loop MapToEntity()
     {
         return new Loop(Distance, Id);
     }
@@ -205,9 +205,9 @@ public class PhaseModel
     public LoopModel Loop { get; init; } = default!;
     public int? Rest { get; init; }
 
-    public Phase MapToDomain()
+    public Phase MapToEntity()
     {
-        var loop = Loop.MapToDomain();
+        var loop = Loop.MapToEntity();
         return new Phase(loop, Recovery, Rest, Id);
     }
 }
@@ -244,10 +244,10 @@ public class CompetitionModel
     public PhaseModel[] Phases { get; init; } = default!;
     public ParticipationModel[] Participations { get; init; } = default!;
 
-    public Competition MapToDomain()
+    public Competition MapToEntity()
     {
-        var phases = Phases.Select(x => x.MapToDomain());
-        var participations = Participations.Select(x => x.MapToDomain());
+        var phases = Phases.Select(x => x.MapToEntity());
+        var participations = Participations.Select(x => x.MapToEntity());
         return new Competition(
             Name,
             Type,
@@ -297,13 +297,13 @@ public class UpcomingEventModel : IDocument
     public CombinationModel[] Combinations { get; init; } = default!;
     public string Name { get; init; } = default!;
 
-    public UpcomingEvent MapToDomain()
+    public UpcomingEvent MapToEntity()
     {
-        var country = Country.MapToDomain();
-        var competitions = Competitions.Select(x => x.MapToDomain());
-        var officials = Officials.Select(x => x.MapToDomain());
-        var loops = Loops.Select(x => x.MapToDomain());
-        var combinations = Combinations.Select(x => x.MapToDomain());
+        var country = Country.MapToEntity();
+        var competitions = Competitions.Select(x => x.MapToEntity());
+        var officials = Officials.Select(x => x.MapToEntity());
+        var loops = Loops.Select(x => x.MapToEntity());
+        var combinations = Combinations.Select(x => x.MapToEntity());
         return new UpcomingEvent(
             Name,
             Place,

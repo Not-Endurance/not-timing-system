@@ -22,9 +22,9 @@ public class SettingModel : IDocument
     public CountryModel Country { get; set; } = default!;
     public DetectionMode? DetectionMode { get; set; }
 
-    public Setting ToDomain()
+    public Setting MapToEntity()
     {
-        return new Setting(Country.MapToDomain(), DetectionMode, id: Id);
+        return new Setting(Country.MapToEntity(), DetectionMode, id: Id);
     }
 }
 
@@ -49,7 +49,7 @@ public class CountryModel : IDocument
     public string? NfCode { get; init; }
     public string? Locale { get; init; }
 
-    public Country MapToDomain()
+    public Country MapToEntity()
     {
         return new Country(Id, Name, IsoCode, NfCode, Locale);
     }

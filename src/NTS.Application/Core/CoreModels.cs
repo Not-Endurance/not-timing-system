@@ -1,11 +1,9 @@
-﻿using Not.Extensions;
-using NTS.Application.Shared;
+﻿using NTS.Application.Shared;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
-using NTS.Domain.Core.Objects.Startlists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
@@ -22,7 +20,7 @@ public class ClubModel
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
     public string Name { get; init; } = default!;
 
-    public Club MapToDomain()
+    public Club MapToEntity()
     {
         return new Club(Name, Id);
     }
@@ -44,7 +42,7 @@ public class OfficialModel
     public string[] Names { get; init; } = [];
     public OfficialRole Role { get; init; } = default!;
 
-    public Official MapToDomain()
+    public Official MapToEntity()
     {
         return new Official(Names, Role, Id);
     }
@@ -66,7 +64,7 @@ public class CompetitionModel
     public CompetitionType Type { get; init; }
     public CompetitionRuleset Ruleset { get; init; }
 
-    public Competition MapToDomain()
+    public Competition MapToEntity()
     {
         return new Competition(Name, Ruleset, Type);
     }
@@ -92,10 +90,10 @@ public class AthleteModel
     public ClubModel? Club { get; init; }
     public string? FeiId { get; init; }
 
-    public Athlete MapToDomain()
+    public Athlete MapToEntity()
     {
-        var country = Country.MapToDomain();
-        var club = Club?.MapToDomain();
+        var country = Country.MapToEntity();
+        var club = Club?.MapToEntity();
         return new Athlete(Names, country, club, FeiId, Id);
     }
 }
@@ -116,7 +114,7 @@ public class HorseModel
     public string? FeiId { get; init; }
     public string Name { get; init; } = default!;
 
-    public Horse MaptoDomain()
+    public Horse MapToEntity()
     {
         return new Horse(Name, FeiId, Id);
     }
@@ -146,10 +144,10 @@ public class CombinationModel
     public AthleteModel Athlete { get; init; } = default!;
     public HorseModel Horse { get; init; } = default!;
 
-    public Combination MapToDomain()
+    public Combination MapToEntity()
     {
-        var athlete = Athlete.MapToDomain();
-        var horse = Horse.MaptoDomain();
+        var athlete = Athlete.MapToEntity();
+        var horse = Horse.MapToEntity();
         return new Combination(Number, athlete, horse, athlete.Club, Distance!, MinAverageSpeed, MaxAverageSpeed, Id);
     }
 }
@@ -212,7 +210,7 @@ public class PhaseModel
     public double? AverageSpeed { get; init; }
     public bool IsComplete { get; init; }
 
-    public Phase MapToDomain()
+    public Phase MapToEntity()
     {
         return new Phase(
             Gate,
@@ -287,7 +285,7 @@ public class EliminatedModel
     public FailToQualifyCode[]? FtqCodes { get; init; }
     public DisqualifyCode[] DqCodes { get; init; } = default!;
 
-    public Eliminated MapToDomain()
+    public Eliminated MapToEntity()
     {
         return Code switch // TODO refactor Eliminated to non-abstract and only FTQ as separate class
         {
@@ -327,12 +325,12 @@ public class ParticipationModel
     public TotalModel? Total { get; init; }
     public EliminatedModel? Eliminated { get; init; }
 
-    public Participation MapToDomain()
+    public Participation MapToEntity()
     {
-        var competition = Competition.MapToDomain();
-        var combination = Combination.MapToDomain();
-        var phases = Phases!.Select(x => x.MapToDomain());
-        var eliminated = Eliminated?.MapToDomain();
+        var competition = Competition.MapToEntity();
+        var combination = Combination.MapToEntity();
+        var phases = Phases!.Select(x => x.MapToEntity());
+        var eliminated = Eliminated?.MapToEntity();
         return new Participation(Category, competition, combination, new(phases), eliminated, Id);
     }
 }
@@ -353,9 +351,9 @@ public class RankingEntryModel
     public int? Rank { get; init; }
     public bool IsNotRanked { get; init; }
 
-    public RankingEntry MapToDomain()
+    public RankingEntry MapToEntity()
     {
-        var participation = Participation.MapToDomain();
+        var participation = Participation.MapToEntity();
         return new RankingEntry(participation, Rank, IsNotRanked);
     }
 }
@@ -388,9 +386,9 @@ public class RanklistModel
     public string? FeiScheduleNumber { get; init; }
     public RankingEntryModel[] Entries { get; init; } = [];
 
-    public Ranklist MapToDomain()
+    public Ranklist MapToEntity()
     {
-        var entries = Entries.Select(x => x.MapToDomain()).ToList();
+        var entries = Entries.Select(x => x.MapToEntity()).ToList();
         var competition = new Competition(Name, Ruleset, Type);
         var ranking = new Ranking(
             Name,
@@ -444,14 +442,14 @@ public class ArchiveEntryModel : IDocument
     public OfficialModel[] Officials { get; init; } = default!;
     public RanklistModel[] Ranklists { get; init; } = default!;
 
-    public ArchiveEntry MapToDomain()
+    public ArchiveEntry MapToEntity()
     {
-        var country = Country.MapToDomain();
+        var country = Country.MapToEntity();
         var place = new PopulatedPlace(country, City, Location ?? "");
         var span = new EventSpan(StartDay, EndDay);
         var enduranceEvent = new EnduranceEvent(place, span, FeiShowId, FeiId, FeiEventCode, Id);
-        var officials = Officials.Select(x => x.MapToDomain());
-        var ranklists = Ranklists.Select(x => x.MapToDomain());
+        var officials = Officials.Select(x => x.MapToEntity());
+        var ranklists = Ranklists.Select(x => x.MapToEntity());
         return new ArchiveEntry(enduranceEvent, officials, ranklists);
     }
 }

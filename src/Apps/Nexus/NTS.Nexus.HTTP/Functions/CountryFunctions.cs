@@ -59,7 +59,7 @@ public class CountryFunctions : FunctionBase
     {
         LogInformation(request);
 
-        var countries = await _countries.ReadMany().Select(x => x.MapToDomain());
+        var countries = await _countries.ReadMany().Select(x => x.MapToEntity());
         return new OkObjectResult(countries);
     }
 }

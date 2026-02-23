@@ -46,7 +46,7 @@ public class UpcomingEventFunctions : FunctionBase
         LogInformation(request);
 
         var documents = await _upcomingEvents.ReadMany();
-        var result = documents.Select(x => x.MapToDomain());
+        var result = documents.Select(x => x.MapToEntity());
         return new OkObjectResult(result);
     }
 
@@ -64,7 +64,7 @@ public class UpcomingEventFunctions : FunctionBase
             return new NotFoundResult();
         }
 
-        return new OkObjectResult(document.MapToDomain());
+        return new OkObjectResult(document.MapToEntity());
     }
 
     [Function("upcoming-event-update")]

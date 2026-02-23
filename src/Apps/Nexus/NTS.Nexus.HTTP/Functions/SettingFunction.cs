@@ -60,6 +60,6 @@ public class SettingFunction : FunctionBase
 
         var setting = await _settings.Read(x => x.AccountId == accountId);
 
-        return new OkObjectResult(setting?.ToDomain());
+        return new OkObjectResult(setting?.MapToEntity());
     }
 }

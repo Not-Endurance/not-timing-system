@@ -124,7 +124,7 @@ public class HorseFunctions : FunctionBase
     )
     {
         LogInformation(request);
-        var horses = await _horses.ReadMany().Select(x => x.MaptoDomain());
+        var horses = await _horses.ReadMany().Select(x => x.MapToEntity());
         return new OkObjectResult(horses);
     }
 }
