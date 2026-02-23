@@ -26,7 +26,7 @@ public class ExceptionValidator : ComponentBase
             _messages.Clear(e.FieldIdentifier);
             EditContext.NotifyValidationStateChanged();
         };
-	}
+    }
 
     internal void Reset()
     {

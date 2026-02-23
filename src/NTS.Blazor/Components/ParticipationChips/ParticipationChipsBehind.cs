@@ -20,7 +20,7 @@ public abstract class ParticipationChipsBehind : NStatefulComponent
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(RecentService);    
+        await Observe(RecentService);
     }
 
     protected Color GetColor(Participation participation)

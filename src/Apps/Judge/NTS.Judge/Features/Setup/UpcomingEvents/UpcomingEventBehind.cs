@@ -14,8 +14,8 @@ public class UpcomingEventBehind
         IKrudMirror<Loop>,
         IKrudMirror<Combination>,
         IKrudMirror<Athlete>,
-        IKrudMirror<Horse>, 
-    ITransient
+        IKrudMirror<Horse>,
+        ITransient
 {
     readonly IUpdate<UpcomingEvent> _updater;
     readonly INtsSocketService _eventContext;

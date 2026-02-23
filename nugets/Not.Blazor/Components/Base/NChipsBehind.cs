@@ -21,8 +21,11 @@ public abstract class NChipsBehind<T> : MudChipSet<T>
 
     protected string GetText(T item)
     {
-        return TextSelector?.Invoke(item) ?? item!.ToString()
-            ?? throw new Exception($"Either provide '{nameof(TextSelector)}' or ensure '{typeof(T).FullName}' provides non-null value from '{nameof(ToString)}'");
+        return TextSelector?.Invoke(item)
+            ?? item!.ToString()
+            ?? throw new Exception(
+                $"Either provide '{nameof(TextSelector)}' or ensure '{typeof(T).FullName}' provides non-null value from '{nameof(ToString)}'"
+            );
     }
 
     protected Color GetColor(T item)
