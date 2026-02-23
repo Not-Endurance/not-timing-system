@@ -5,7 +5,7 @@ using Not.Notify;
 
 namespace Not.Krud.Blazor.Components.Form;
 
-public class ExceptionValidator : ComponentBase
+public class ExceptionFormValidator : ComponentBase
 {
     ValidationMessageStore? _messages;
 

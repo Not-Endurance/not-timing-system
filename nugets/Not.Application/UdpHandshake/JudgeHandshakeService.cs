@@ -68,7 +68,6 @@ public class JudgeHandshakeService : INetworkBroadcastService, IHandshakeService
         }
         catch (Exception)
         {
-            // TODO: logging/error handling
         }
 
         return (IPAddress)null!;

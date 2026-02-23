@@ -56,7 +56,7 @@ public class NContentBehind : NComponent
         PrintableComponent.OnToggle(ToggleVisibilityHandler);
     }
 
-    async void ToggleVisibilityHandler()
+    async Task ToggleVisibilityHandler()
     {
         ShowOnlyMain = !ShowOnlyMain;
         await InvokeRender();

@@ -7,7 +7,7 @@
 
 namespace NTS.Localization
 {
-    public static class NtsStrings // TODO: csharpierignore this files
+    public static class NtsStrings
     {
         public static string km_string => LocalizeString(nameof(km_string));
         public static string hrs_string => LocalizeString(nameof(hrs_string));

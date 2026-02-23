@@ -6,7 +6,7 @@ public abstract class PrintableComponent : NStatefulComponent, IDisposable
 {
     public delegate void ToggleVisibility();
 
-    public static void OnToggle(Action handler)
+    public static void OnToggle(Func<Task> handler)
     {
         _toggleEvent.Subscribe(handler);
     }

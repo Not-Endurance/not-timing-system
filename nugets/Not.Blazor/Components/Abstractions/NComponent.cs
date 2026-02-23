@@ -21,7 +21,7 @@ public class NComponent : ComponentBase
             }
             catch (Exception ex)
             {
-                NotifyError(ex);
+                Notifier.Error(ex);
             }
         });
     }
@@ -60,13 +60,6 @@ public class NComponent : ComponentBase
     protected void Handle(Exception ex)
     {
         SafeHelper.HandleException(ex);
-    }
-
-    void NotifyError(Exception exception)
-    {
-        exception = exception.GetBaseException();
-        var message = exception.Message + Environment.NewLine + exception.StackTrace?.NTrim(1000);
-        Notifier.Error(message);
     }
 
     string CombineWithSpace(params string?[] values)

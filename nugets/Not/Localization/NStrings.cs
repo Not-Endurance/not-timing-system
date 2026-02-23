@@ -7,7 +7,7 @@ namespace Not.Localization;
 
 public static class NStrings
 {
-    public static string Localize(Enum value) // TODO: Use DisplayAttribute
+    public static string Localize(Enum value)
     {
         return LocalizeEnum(value);
     }

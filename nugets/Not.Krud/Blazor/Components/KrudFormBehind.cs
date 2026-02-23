@@ -14,7 +14,7 @@ public abstract class KrudFormBehind<TModel> : NComponent
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;
 
-    protected ExceptionValidator ValidatorRef { get; set; } = default!;
+    protected ExceptionFormValidator ValidatorRef { get; set; } = default!;
 
     protected bool IsCreateForm => Shell.Model.Id == null;
     
