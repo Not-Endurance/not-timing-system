@@ -31,7 +31,7 @@ public class CountryFunctions : FunctionBase
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var country = requestBody.FromJson<Country>();
-        var document = CountryModel.MapFrom(country);
+        var document = CountryModel.From(country);
         await _countries.Create(document);
 
         return new OkObjectResult($"Inserted {country}");
@@ -46,7 +46,7 @@ public class CountryFunctions : FunctionBase
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var country = requestBody.FromJson<Country>();
-        var document = CountryModel.MapFrom(country);
+        var document = CountryModel.From(country);
         await _countries.Update(document);
 
         return new OkObjectResult($"Updated {country}");

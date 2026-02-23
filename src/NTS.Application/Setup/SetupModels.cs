@@ -6,20 +6,28 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Application.Setup;
 
-public class ClubModel : IDocument
+public class ClubModel : IDocument, IKrudModel<Club>
 {
-    public static ClubModel MapFrom(Club club)
+    public static ClubModel From(Club club)
     {
-        return new ClubModel { Id = club.Id, Name = club.Name };
+        var model = new ClubModel();
+        model.MapFrom(club);
+        return model;
     }
 
     public int Id { get; set; }
-    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
-    public string Name { get; init; } = default!;
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public string Name { get; set; } = default!;
 
     public Club MapToEntity()
     {
         return new Club(Name, Id);
+    }
+
+    public void MapFrom(Club club)
+    {
+        Id = club.Id;
+        Name = club.Name;
     }
 }
 
@@ -67,8 +75,8 @@ public class AthleteModel : IDocument, IKrudModel<Athlete>
         Id = athlete.Id;
         FeiId = athlete.FeiId;
         Names = athlete.Names.Names;
-        Country = CountryModel.MapFrom(athlete.Country);
-        Club = athlete.Club == null ? null : ClubModel.MapFrom(athlete.Club);
+        Country = CountryModel.From(athlete.Country);
+        Club = athlete.Club == null ? null : ClubModel.From(athlete.Club);
     }
 
     public Athlete MapToEntity()
@@ -77,22 +85,26 @@ public class AthleteModel : IDocument, IKrudModel<Athlete>
     }
 }
 
-public class HorseModel : IDocument
+public class HorseModel : IDocument, IKrudModel<Horse>
 {
-    public static HorseModel MapFrom(Horse horse)
+    public static HorseModel From(Horse horse)
     {
-        return new HorseModel
-        {
-            Id = horse.Id,
-            Name = horse.Name,
-            FeiId = horse.FeiId,
-        };
+        var model = new HorseModel();
+        model.MapFrom(horse);
+        return model;
     }
 
-    public int Id { get; init; }
-    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
-    public required string Name { get; init; }
-    public string? FeiId { get; init; }
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public string Name { get; set; } = default!;
+    public string? FeiId { get; set; }
+
+    public void MapFrom(Horse horse)
+    {
+        Id = horse.Id;
+        Name = horse.Name;
+        FeiId = horse.FeiId;
+    }
 
     public Horse MapToEntity()
     {
@@ -109,7 +121,7 @@ public class CombinationModel
             Id = combination.Id,
             Number = combination.Number,
             Athlete = AthleteModel.From(combination.Athlete),
-            Horse = HorseModel.MapFrom(combination.Horse),
+            Horse = HorseModel.From(combination.Horse),
         };
     }
 
@@ -156,7 +168,7 @@ public class ParticipationModel
 
     public Participation MapToEntity()
     {
-        var combination = Combination.MapToDomain();
+        var combination = Combination.MapToEntity();
         return new Participation(
             IsNotRanked,
             combination,
@@ -264,38 +276,27 @@ public class CompetitionModel
     }
 }
 
-public class UpcomingEventModel : IDocument
+public class UpcomingEventModel : IDocument, IKrudModel<UpcomingEvent>
 {
-    public static UpcomingEventModel MapFrom(UpcomingEvent @event)
+    public static UpcomingEventModel From(UpcomingEvent @event)
     {
-        return new UpcomingEventModel
-        {
-            Id = @event.Id,
-            Name = @event.Name,
-            Place = @event.Place,
-            Country = CountryModel.MapFrom(@event.Country),
-            ShowFeiId = @event.ShowFeiId,
-            FeiId = @event.FeiId,
-            FeiEventCode = @event.FeiEventCode,
-            Competitions = @event.Competitions.Select(CompetitionModel.MapFrom).ToArray(),
-            Officials = @event.Officials.Select(OfficialModel.MapFrom).ToArray(),
-            Loops = @event.Loops.Select(LoopModel.MapFrom).ToArray(),
-            Combinations = @event.Combinations.Select(CombinationModel.MapFrom).ToArray(),
-        };
+        var model = new UpcomingEventModel();
+        model.MapFrom(@event);
+        return model;
     }
 
-    public int Id { get; init; } = default!;
-    public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
-    public string Place { get; init; } = default!;
-    public CountryModel Country { get; init; } = default!;
-    public string? ShowFeiId { get; init; }
-    public string? FeiId { get; init; }
-    public string? FeiEventCode { get; init; }
-    public CompetitionModel[] Competitions { get; init; } = default!;
-    public OfficialModel[] Officials { get; init; } = default!;
-    public LoopModel[] Loops { get; init; } = default!;
-    public CombinationModel[] Combinations { get; init; } = default!;
-    public string Name { get; init; } = default!;
+    public int Id { get; set; } = default!;
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public string Place { get; set; } = default!;
+    public CountryModel Country { get; set; } = default!;
+    public string? ShowFeiId { get; set; }
+    public string? FeiId { get; set; }
+    public string? FeiEventCode { get; set; }
+    public CompetitionModel[] Competitions { get; set; } = default!;
+    public OfficialModel[] Officials { get; set; } = default!;
+    public LoopModel[] Loops { get; set; } = default!;
+    public CombinationModel[] Combinations { get; set; } = default!;
+    public string Name { get; set; } = default!;
 
     public UpcomingEvent MapToEntity()
     {
@@ -317,5 +318,20 @@ public class UpcomingEventModel : IDocument
             combinations,
             Id
         );
+    }
+
+    public void MapFrom(UpcomingEvent @event)
+    {
+        Id = @event.Id;
+        Name = @event.Name;
+        Place = @event.Place;
+        Country = CountryModel.From(@event.Country);
+        ShowFeiId = @event.ShowFeiId;
+        FeiId = @event.FeiId;
+        FeiEventCode = @event.FeiEventCode;
+        Competitions = @event.Competitions.Select(CompetitionModel.MapFrom).ToArray();
+        Officials = @event.Officials.Select(OfficialModel.MapFrom).ToArray();
+        Loops = @event.Loops.Select(LoopModel.MapFrom).ToArray();
+        Combinations = @event.Combinations.Select(CombinationModel.MapFrom).ToArray();
     }
 }

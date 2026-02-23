@@ -32,7 +32,7 @@ public class UpcomingEventFunctions : FunctionBase
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
-        var document = UpcomingEventModel.MapFrom(upcomingEvent);
+        var document = UpcomingEventModel.From(upcomingEvent);
         await _upcomingEvents.Create(document);
 
         return new OkObjectResult($"Upcoming event {upcomingEvent.Place} stored successfully.");
@@ -76,7 +76,7 @@ public class UpcomingEventFunctions : FunctionBase
 
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
         var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
-        var document = UpcomingEventModel.MapFrom(upcomingEvent);
+        var document = UpcomingEventModel.From(upcomingEvent);
         await _upcomingEvents.Update(document);
 
         return new OkObjectResult($"Updated upcoming event {upcomingEvent.Place}");
