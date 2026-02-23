@@ -12,7 +12,7 @@ namespace NTS.Judge.Blazor.Features.Setup.AthletesHorses.Athletes;
 public class AthleteShellBehind : KrudShell<AthleteFormModel>
 {
     [Inject]
-    IRepository<Club> ClubBehind { get; set; } = default!;
+    IRepository<Club> ClubService { get; set; } = default!;
 
     [Inject]
     ISeeker<Country> Countries { get; set; } = default!;
@@ -24,7 +24,7 @@ public class AthleteShellBehind : KrudShell<AthleteFormModel>
 
     protected async Task<IEnumerable<Club?>> SearchClubsSafe(string term, CancellationToken _)
     {
-        var items = await ClubBehind.ReadMany();
+        var items = await ClubService.ReadMany();
         return items.Where(x => term == string.Empty || x.Name.NContains(term));
     }
 }

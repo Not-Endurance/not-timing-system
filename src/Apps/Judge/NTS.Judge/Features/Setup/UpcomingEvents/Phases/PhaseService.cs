@@ -1,4 +1,4 @@
-﻿using Not.Application.CRUD.Ports;
+using Not.Application.CRUD.Ports;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
@@ -6,8 +6,8 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Phases;
 
-public class PhaseBehind : KrudServiceBase<Phase, PhaseFormModel>, ITransient
+public class PhaseService : KrudServiceBase<Phase, PhaseFormModel>, ITransient
 {
-    public PhaseBehind(IRepository<Phase> phases, IEnumerable<IKrudMirror<Phase>> reflections)
+    public PhaseService(IRepository<Phase> phases, IEnumerable<IKrudMirror<Phase>> reflections)
         : base(phases, reflections) { }
 }

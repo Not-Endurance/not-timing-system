@@ -12,7 +12,7 @@ public class NavMenuBehind : NStatefulComponent
     ILandNavigator LandNavigator { get; set; } = default!;
 
     [Inject]
-    protected ISettingBehind SettingBehind { get; set; } = default!;
+    protected ISettingService SettingService { get; set; } = default!;
 
     [Inject]
     protected ITimingStateService TimingStateService { get; set; } = default!;
@@ -26,7 +26,7 @@ public class NavMenuBehind : NStatefulComponent
     {
         // Necessary in order to initialize the settings on startup
         // TODO: what do if no internet?
-        await Observe(SettingBehind);
+        await Observe(SettingService);
         await Observe(TimingStateService);
     }
 }

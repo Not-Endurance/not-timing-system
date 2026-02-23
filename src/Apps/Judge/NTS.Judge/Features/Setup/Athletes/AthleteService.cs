@@ -1,4 +1,4 @@
-﻿using Not.Application.CRUD.Ports;
+using Not.Application.CRUD.Ports;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
@@ -6,11 +6,11 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Setup.Athletes;
 
-public class AthleteBehind : KrudServiceBase<Athlete, AthleteFormModel>, IKrudMirror<Club>, ITransient
+public class AthleteService : KrudServiceBase<Athlete, AthleteFormModel>, IKrudMirror<Club>, ITransient
 {
     readonly IRepository<Athlete> _repository;
 
-    public AthleteBehind(IRepository<Athlete> repository, IEnumerable<IKrudMirror<Athlete>> dependants)
+    public AthleteService(IRepository<Athlete> repository, IEnumerable<IKrudMirror<Athlete>> dependants)
         : base(repository, dependants)
     {
         _repository = repository;

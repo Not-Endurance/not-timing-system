@@ -1,4 +1,4 @@
-﻿using Not.Application.CRUD.Ports;
+using Not.Application.CRUD.Ports;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
@@ -6,9 +6,9 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 
-public class LoopBehind : KrudServiceBase<Loop, LoopFormModel>, ITransient
+public class LoopService : KrudServiceBase<Loop, LoopFormModel>, ITransient
 {
-    public LoopBehind(IEnumerable<IKrudMirror<Loop>> dependants, IRepository<Loop> loops)
+    public LoopService(IEnumerable<IKrudMirror<Loop>> dependants, IRepository<Loop> loops)
         : base(loops, dependants) { }
 
     protected override Loop MapEntity(LoopFormModel model)

@@ -13,9 +13,9 @@ using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core.Handouts;
 
-public class HandoutsBehind
+public class HandoutsService
     : NStatefulService<ObservableList<HandoutDocument>>,
-        IHandoutsBehind,
+        IHandoutsService,
         ICreateHandout,
         ICoreDependentObservables,
         INotificationHandler<PhaseCompleted>
@@ -26,7 +26,7 @@ public class HandoutsBehind
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
 
-    public HandoutsBehind(
+    public HandoutsService(
         IRepository<Handout> handouts,
         IRepository<Participation> participations,
         IRepository<EnduranceEvent> events,

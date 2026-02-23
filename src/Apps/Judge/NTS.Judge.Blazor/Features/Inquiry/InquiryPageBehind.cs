@@ -9,7 +9,7 @@ public class InquiryPageBehind : NStatefulComponent
     protected string? SearchTerm { get; set; }
 
     [Inject]
-    protected IInquiryBehind Service { get; set; } = default!;
+    protected IInquiryService Service { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

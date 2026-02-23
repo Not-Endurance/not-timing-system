@@ -1,15 +1,15 @@
-﻿using Not.Application.Behinds.Adapters;
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Inquiry;
 
-public class InquiryBehind : NStatefulService, IInquiryBehind
+public class InquiryService : NStatefulService, IInquiryService
 {
     readonly IRepository<ArchiveEntry> _archive;
 
-    public InquiryBehind(IRepository<ArchiveEntry> archiveRepository)
+    public InquiryService(IRepository<ArchiveEntry> archiveRepository)
     {
         _archive = archiveRepository;
     }

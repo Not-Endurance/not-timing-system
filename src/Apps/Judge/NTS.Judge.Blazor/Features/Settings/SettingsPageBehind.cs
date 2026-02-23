@@ -7,7 +7,7 @@ namespace NTS.Judge.Blazor.Features.Settings;
 public class SettingsPageBehind : NStatefulComponent
 {
     [Inject]
-    ISettingBehind SettingsService { get; set; } = default!;
+    ISettingService SettingsService { get; set; } = default!;
 
     [Inject]
     KrudDialogService<SettingFormModel, SettingShell> KrudService { get; set; } = default!;

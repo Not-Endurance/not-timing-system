@@ -9,7 +9,7 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
-public class UpcomingEventBehind
+public class UpcomingEventService
     : KrudServiceBase<UpcomingEvent, UpcomingEventFormModel>,
         IKrudMirror<Loop>,
         IKrudMirror<Combination>,
@@ -21,7 +21,7 @@ public class UpcomingEventBehind
     readonly INtsSocketService _eventContext;
     readonly INotifier _notifier;
 
-    public UpcomingEventBehind(IRepository<UpcomingEvent> events, INtsSocketService eventContext, INotifier notifier)
+    public UpcomingEventService(IRepository<UpcomingEvent> events, INtsSocketService eventContext, INotifier notifier)
         : base(events, [])
     {
         _updater = events;

@@ -16,7 +16,7 @@ using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core.Dashboard;
 
-public class ParticipationBehind
+public class ParticipationService
     : NStatefulService,
         IKrudFormService<PhaseUpdateModel>,
         IInspectionService,
@@ -34,7 +34,7 @@ public class ParticipationBehind
     readonly IDomainEventDispatcher _domainEventDispatcher;
     Participation? _selectedParticipation;
 
-    public ParticipationBehind(
+    public ParticipationService(
         IRepository<Participation> participationRepository,
         IRepository<SnapshotResult> snapshotResultRepository,
         IDomainEventDispatcher domainEventDispatcher

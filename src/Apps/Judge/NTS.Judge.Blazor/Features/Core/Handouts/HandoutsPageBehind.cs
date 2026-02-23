@@ -11,7 +11,7 @@ public class HandoutsPageBehind : PrintableComponent
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    protected IHandoutsBehind Service { get; set; } = default!;
+    protected IHandoutsService Service { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

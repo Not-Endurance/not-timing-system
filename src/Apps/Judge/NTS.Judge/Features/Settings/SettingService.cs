@@ -1,16 +1,16 @@
-﻿using Not.Application.Behinds.Adapters;
+using Not.Application.Behinds.Adapters;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Judge.Features.Settings;
 
-public class SettingBehind : NStatefulService, ISettingBehind, IKrudFormService<SettingFormModel>, ISingleton
+public class SettingService : NStatefulService, ISettingService, IKrudFormService<SettingFormModel>, ISingleton
 {
     readonly ISettingRepository _repository;
     readonly IEnumerable<IKrudMirror<Setting>> _reflections;
 
-    public SettingBehind(
+    public SettingService(
         ISettingRepository repository,
         IEnumerable<IKrudMirror<Setting>> reflections
     )

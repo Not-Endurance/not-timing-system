@@ -1,10 +1,10 @@
-﻿using Not.Application.Behinds.Adapters;
+using Not.Application.Behinds.Adapters;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Inquiry;
 
-public interface IInquiryBehind : IStatefulService
+public interface IInquiryService : IStatefulService
 {
     IEnumerable<RankingEntry>? Match { get; }
     IReadOnlyList<ArchiveEntryModel> Records { get; }
