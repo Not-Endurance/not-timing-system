@@ -10,7 +10,10 @@ public class NContentBehind : NComponent
     ICrumbsNavigator Navigator { get; set; } = default!;
 
     protected bool ShowOnlyMain { get; private set; }
-    protected int MainXs => Rightbar == null ? GRID_MAX_WIDTH : GRID_MAX_WIDTH - RightBarXS;
+    protected int MainXs =>
+        Rightbar == null
+            ? GRID_MAX_WIDTH
+            : GRID_MAX_WIDTH - RightBarXS;
 
     [Parameter, EditorRequired]
     public string Title { get; set; } = default!;

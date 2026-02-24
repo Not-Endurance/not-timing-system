@@ -18,7 +18,6 @@ public class Setting : Aggregate
     public Guid AccountId { get; } = Guid.Parse("ec6d8f0d-ecad-4fb6-a10f-fdb190dc0cd4");
     public Country Country { get; }
     public DetectionMode? DetectionMode { get; }
-
     // TODO: Add Language here
 
     public override string ToString()

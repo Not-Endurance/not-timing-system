@@ -17,11 +17,11 @@ public abstract class KrudFormBehind<TModel> : NComponent
     protected ExceptionValidator ValidatorRef { get; set; } = default!;
 
     protected bool IsCreateForm => Shell.Model.Id == null;
-
+    
     /// <summary>
-    /// The calling components should provide a reference to a Shell instance.
+    /// The calling components should provide a reference to a Shell instance. 
     /// The intended usage is for the calling component to inherit from <see cref="KrudShell{TModel}"/>
-    /// but you can also create a separate shell component and pass a reference here.
+    /// but you can also create a separate shell component and pass a reference here. 
     /// </summary>
     [Parameter, EditorRequired]
     public KrudShell<TModel> Shell { get; set; } = default!;

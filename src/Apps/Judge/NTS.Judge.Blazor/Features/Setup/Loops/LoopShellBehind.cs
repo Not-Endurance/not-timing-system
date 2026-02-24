@@ -4,4 +4,6 @@ using NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 
 namespace NTS.Judge.Blazor.Features.Setup.Loops;
 
-public class LoopShellBehind : KrudShell<LoopFormModel> { }
+public class LoopShellBehind : KrudShell<LoopFormModel>
+{
+}

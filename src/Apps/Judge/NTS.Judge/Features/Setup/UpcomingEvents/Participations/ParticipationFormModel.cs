@@ -39,6 +39,7 @@ public record ParticipationFormModel : KrudFormModel<Participation>
         MinSpeedOverride = participation.MinSpeedOverride;
     }
 
+
     void ValidateOverrideInput(ParticipationFormModel model)
     {
         if (model.IsStartTimeOverriden && model.StartTimeOverride == null)

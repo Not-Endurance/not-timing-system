@@ -415,7 +415,7 @@ public class ArchiveEntryModel : IDocument, IKrudModel<ArchiveEntry>
     )
     {
         var model = new ArchiveEntryModel();
-
+        
         return new ArchiveEntryModel
         {
             Id = enduranceEvent.Id,

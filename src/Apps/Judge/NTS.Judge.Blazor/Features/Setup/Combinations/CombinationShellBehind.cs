@@ -8,6 +8,7 @@ namespace NTS.Judge.Blazor.Features.Setup.Combinations;
 
 public class CombinationShellBehind : KrudShell<CombinationFormModel>
 {
+
     [Inject]
     IListBehind<Athlete> AthletesService { get; set; } = default!;
 

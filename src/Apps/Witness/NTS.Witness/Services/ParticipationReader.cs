@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
-using NTS.Application.Core;
+using NTS.Domain.Core.Aggregates;
 using NTS.Application.Factories;
 using NTS.Application.Socket;
-using NTS.Domain.Core.Aggregates;
+using NTS.Application.Core;
 
 namespace NTS.Witness.Services;
 
@@ -32,10 +32,7 @@ public class ParticipationReader : IReadMany<Participation>, ITransient
             var setupParticipations = setupCompetition.Participations;
             foreach (var setupParticipation in setupParticipations)
             {
-                var participation = ParticipationAndRankingFactory.CreateParticipation(
-                    setupCompetition,
-                    setupParticipation
-                );
+                var participation = ParticipationAndRankingFactory.CreateParticipation(setupCompetition, setupParticipation);
                 participations.Add(participation);
             }
         }

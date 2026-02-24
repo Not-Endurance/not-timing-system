@@ -8,3 +8,4 @@ public interface IJudgeClientProcedures
     Task Receive(IEnumerable<Snapshot> snapshots);
     Task<IEnumerable<ParticipationModel>> GetActive();
 }
+

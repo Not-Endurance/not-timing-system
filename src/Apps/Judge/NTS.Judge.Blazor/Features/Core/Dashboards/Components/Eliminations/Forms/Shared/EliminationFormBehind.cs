@@ -7,7 +7,7 @@ public abstract class EliminationFormBehind : NComponent
 {
     [Inject]
     IEliminationService Eliminations { get; set; } = default!;
-
+    
     protected bool IsEliminated => Eliminations.IsEliminated;
 
     [Parameter, EditorRequired]

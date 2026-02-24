@@ -98,7 +98,6 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
         EmitChanged();
     }
 }
-
 public interface ITimingStateService : IStatefulService
 {
     bool IsStarted { get; }

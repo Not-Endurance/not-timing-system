@@ -9,5 +9,6 @@ namespace NTS.Storage.REST;
 public class ArchiveRestApiRepository : RestApiRepository2<ArchiveEntry, ArchiveEntryModel>, ITransient
 {
     public ArchiveRestApiRepository(NHttpClient client)
-        : base("archive", client) { }
+        : base("archive", client)
+    {}
 }

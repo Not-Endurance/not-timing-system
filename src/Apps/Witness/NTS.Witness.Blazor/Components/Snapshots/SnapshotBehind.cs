@@ -24,15 +24,15 @@ public class SnapshotBehind : NStatefulComponent
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
 
-    [Inject]
-    protected IParticipationContext Service { get; set; } = default!;
+	[Inject]
+	protected IParticipationContext Service { get; set; } = default!;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(Service);
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		await Observe(Service);
+	}
 
-    protected void SetButtonText(int id)
+	protected void SetButtonText(int id)
     {
         try
         {

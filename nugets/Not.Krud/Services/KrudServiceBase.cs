@@ -8,7 +8,7 @@ namespace Not.Krud.Services;
 
 public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IKrudFormService<TModel>
     where T : Entity
-    where TModel : IKrudModel<T>, IKrudFormModel, new()
+    where TModel: IKrudModel<T>, IKrudFormModel, new()
 {
     readonly List<IKrudMirror<T>> _mirrors;
     readonly IRepository<T> _repository;
@@ -33,9 +33,7 @@ public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IKrudFormServ
     {
         if (model.Id != null)
         {
-            throw GuardHelper.Exception(
-                $"'{nameof(Create)}' requires null value for Id, otherwise it might result in an '{nameof(Update)}'"
-            );
+            throw GuardHelper.Exception($"'{nameof(Create)}' requires null value for Id, otherwise it might result in an '{nameof(Update)}'");
         }
         var entity = MapEntity(model);
         await _repository.Create(entity);
@@ -45,8 +43,7 @@ public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IKrudFormServ
     {
         GuardHelper.ThrowIfDefault(
             model.Id,
-            $"'{nameof(Update)}' does not allow Id to be null as it might result in '{nameof(Create)}'"
-        );
+            $"'{nameof(Update)}' does not allow Id to be null as it might result in '{nameof(Create)}'");
         var entity = MapEntity(model);
         await _repository.Update(entity);
         foreach (var mirror in _mirrors)
