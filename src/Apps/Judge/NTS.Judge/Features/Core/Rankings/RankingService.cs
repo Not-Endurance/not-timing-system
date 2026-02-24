@@ -93,7 +93,7 @@ public class RankingService
         var enduranceEvent = await _events.Read(0);
         if (enduranceEvent == null)
         {
-            _notifier.Warn("Event is not started yet");
+            _notifier.Warn(Event_is_not_started_yet_string);
             return;
         }
         var officials = await _officials.ReadMany();

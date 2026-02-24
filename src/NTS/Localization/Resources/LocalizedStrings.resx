@@ -786,4 +786,112 @@
   <data name="Updated_string" xml:space="preserve">
     <value>Updated</value>
   </data>
+  <data name="Arrive_string" xml:space="preserve">
+    <value>Arrive</value>
+  </data>
+  <data name="Represent_string" xml:space="preserve">
+    <value>Represent</value>
+  </data>
+  <data name="RI_Time_string" xml:space="preserve">
+    <value>RI Time</value>
+  </data>
+  <data name="CRI_Time_string" xml:space="preserve">
+    <value>CRI Time</value>
+  </data>
+  <data name="Loop_T_string" xml:space="preserve">
+    <value>Loop T</value>
+  </data>
+  <data name="Phase_T_string" xml:space="preserve">
+    <value>Phase T</value>
+  </data>
+  <data name="Loop_S_string" xml:space="preserve">
+    <value>Loop S</value>
+  </data>
+  <data name="Phase_S_string" xml:space="preserve">
+    <value>Phase S</value>
+  </data>
+  <data name="Start_In_string" xml:space="preserve">
+    <value>Start In</value>
+  </data>
+  <data name="ID_of_archive_to_load_string" xml:space="preserve">
+    <value>ID of archive to load</value>
+  </data>
+  <data name="Load_string" xml:space="preserve">
+    <value>Load</value>
+  </data>
+  <data name="Search_string" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Configure_Phase_string" xml:space="preserve">
+    <value>Configure Phase</value>
+  </data>
+  <data name="Configure_Combination_string" xml:space="preserve">
+    <value>Configure Combination</value>
+  </data>
+  <data name="Configure_Clubs_string" xml:space="preserve">
+    <value>Configure Clubs</value>
+  </data>
+  <data name="Eliminate_string" xml:space="preserve">
+    <value>Eliminate</value>
+  </data>
+  <data name="Restore_string" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
+    <value>Sorry, there's nothing at this address.</value>
+  </data>
+  <data name="Sign_in_with_Google_string" xml:space="preserve">
+    <value>Sign in with Google</value>
+  </data>
+  <data name="This_page_redirects_to_Signin_string" xml:space="preserve">
+    <value>This page redirects to Signin.</value>
+  </data>
+  <data name="Signed_in_as__string" xml:space="preserve">
+    <value>Signed in as {0}</value>
+  </data>
+  <data name="You_have___privileges_string" xml:space="preserve">
+    <value>You have {0} privileges.</value>
+  </data>
+  <data name="Sign_Out_string" xml:space="preserve">
+    <value>Sign Out</value>
+  </data>
+  <data name="No_roles_assigned_string" xml:space="preserve">
+    <value>No roles assigned</value>
+  </data>
+  <data name="An_error_occurred_while_sending_snapshots_Please_try_again_string" xml:space="preserve">
+    <value>An error occurred while sending snapshots. Please try again.</value>
+  </data>
+  <data name="Snapshots_sent_as__string" xml:space="preserve">
+    <value>Snapshots sent as {0}</value>
+  </data>
+  <data name="Provide_Archive_ID_string" xml:space="preserve">
+    <value>Provide Archive ID</value>
+  </data>
+  <data name="Please_select_the_combination_string" xml:space="preserve">
+    <value>Please select the combination</value>
+  </data>
+  <data name="Reason_is_required_string" xml:space="preserve">
+    <value>Reason is required</value>
+  </data>
+  <data name="Event_is_not_started_yet_string" xml:space="preserve">
+    <value>Event is not started yet</value>
+  </data>
+  <data name="File_uploaded_successfully_string" xml:space="preserve">
+    <value>File uploaded successfully.</value>
+  </data>
+  <data name="Cannot_delete_default_image_string" xml:space="preserve">
+    <value>Cannot delete default image.</value>
+  </data>
+  <data name="Confirm_Delete_string" xml:space="preserve">
+    <value>Confirm Delete</value>
+  </data>
+  <data name="Image_deleted_string" xml:space="preserve">
+    <value>Image deleted.</value>
+  </data>
+  <data name="File_not_found_string" xml:space="preserve">
+    <value>File not found.</value>
+  </data>
+  <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
+    <value>Upcoming events cannot be deleted</value>
+  </data>
 </root>

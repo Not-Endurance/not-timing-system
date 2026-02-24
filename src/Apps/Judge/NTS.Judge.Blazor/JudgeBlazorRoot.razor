@@ -14,7 +14,7 @@
 
             <NotFound>
                 <LayoutView Layout="@typeof(MainLayout)">
-                    <p role="alert">Sorry, there's nothing at this address.</p>
+                    <p role="alert">@Sorry_theres_nothing_at_this_address_string</p>
                 </LayoutView>
             </NotFound>
 
@@ -32,7 +32,7 @@
             <pre>@context.StackTrace</pre>
         </div>
 
-        <button class="btn btn-primary" @onclick="_ => this.ErrorBoundary.Recover()">Back</button>
+        <button class="btn btn-primary" @onclick="_ => this.ErrorBoundary.Recover()">@Back_string</button>
     </ErrorContent>
 
 </ErrorBoundary>

@@ -20,7 +20,7 @@ public class HandoutFormBehind : NComponent
         {
             if (Combination == null)
             {
-                Notifier.Warn("Please select the combination");
+                Notifier.Warn(Please_select_the_combination_string);
                 return;
             }
 

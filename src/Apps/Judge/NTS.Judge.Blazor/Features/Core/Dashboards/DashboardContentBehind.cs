@@ -18,7 +18,7 @@ public class DashboardContentBehind : NStatefulComponent
     {
         if (!ArchiveId.HasValue)
         {
-            Notifier.Warn("Provide Archive ID");
+            Notifier.Warn(Provide_Archive_ID_string);
             return;
         }
         await Service.LoadArchive(ArchiveId.Value);

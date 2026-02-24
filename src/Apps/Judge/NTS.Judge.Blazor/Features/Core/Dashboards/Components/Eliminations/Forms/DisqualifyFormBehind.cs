@@ -34,7 +34,7 @@ public abstract class DisqualifyFormBehind : NComponent
     {
         if (Reason == null && !Codes.Any())
         {
-            Notifier.Warn("Reason is required");
+            Notifier.Warn(Reason_is_required_string);
             return;
         }
         var dqCodes = Codes.ToArray();

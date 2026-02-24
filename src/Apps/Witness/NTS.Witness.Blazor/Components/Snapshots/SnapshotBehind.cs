@@ -99,13 +99,13 @@ public class SnapshotBehind : NStatefulComponent
             var result = await SnapshotService.PublishSnapshotsAsync(snapshotModel);
             if (result.IsSuccessful == false)
             {
-                Notifier.Error("An error occurred while sending snapshots. Please try again.");
+                Notifier.Error(An_error_occurred_while_sending_snapshots_Please_try_again_string);
                 return;
             }
             else
             {
                 StateHasChanged();
-                Notifier.Success($"Snapshots sent as {snapshotType}");
+                Notifier.Success(string.Format(Snapshots_sent_as__string, snapshotType));
             }
             //consider backup before clear
             SnapshotParticipations.ForEach(p => SelectedParticipations.Remove(p));

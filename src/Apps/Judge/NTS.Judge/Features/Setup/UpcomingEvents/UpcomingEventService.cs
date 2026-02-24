@@ -31,7 +31,7 @@ public class UpcomingEventService
 
     public override Task Delete(UpcomingEvent entity)
     {
-        _notifier.Inform("Upcoming events cannot be deleted");
+        _notifier.Inform(Upcoming_events_cannot_be_deleted_string);
         return Task.CompletedTask;
     }
 

@@ -11,28 +11,28 @@
     <thead>
         <tr>
             <MudButton Variant="Variant.Text" Style="visibility:hidden;">#</MudButton>
-            <th>Start</th>
-            <th>Arrive</th>
-            <th>Present</th>
+            <th>@Start_Time_string</th>
+            <th>@Arrive_string</th>
+            <th>@Presentation_string</th>
 
             @if (AnyRepresentation && !AlignVertically)
             {
-                <th>Represent</th>
+                <th>@Represent_string</th>
             }
             @if (AnyRequiredInspection && !AlignVertically)
             {
-                <th><b>RI Time</b></th>
+                <th><b>@RI_Time_string</b></th>
             }
             @if (AnyCompulsoryRequiredInspection && !AlignVertically)
             {
-                <th><b>CRI Time</b></th>
+                <th><b>@CRI_Time_string</b></th>
             }
 
-            <th>Recovery</th>
-            <th>Loop T</th>
-            <th>Phase T</th>
-            <th>Loop S</th>
-            <th>Phase S</th>
+            <th>@Recovery_string</th>
+            <th>@Loop_T_string</th>
+            <th>@Phase_T_string</th>
+            <th>@Loop_S_string</th>
+            <th>@Phase_S_string</th>
         </tr>
     </thead>
     <tbody>

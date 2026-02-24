@@ -15,7 +15,7 @@
                 <MudNumericField @bind-Value="SearchInt" Label="@Search_by_ID_colon_string" />
                 if (SearchInt != null)
                 {
-                    <NButtonPrimary OnClick="x => Service.Search(SearchInt.Value)" Text="Search" />
+                    <NButtonPrimary OnClick="x => Service.Search(SearchInt.Value)" Text="@Search_string" />
                 }
             }
             else
@@ -23,7 +23,7 @@
                 <MudTextField @bind-Value="SearchTerm" Label="@Search_by_name_colon_string" />
                 if (SearchTerm != null)
                 {
-                    <NButtonPrimary OnClick="x => Service.Search(SearchTerm!)" Text="Search" />
+                    <NButtonPrimary OnClick="x => Service.Search(SearchTerm!)" Text="@Search_string" />
                 }
             }
 
@@ -108,5 +108,4 @@
     </Main>
 
 </NContent>
-
 

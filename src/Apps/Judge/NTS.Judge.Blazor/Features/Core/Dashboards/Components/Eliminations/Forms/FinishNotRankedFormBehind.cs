@@ -27,7 +27,7 @@ public abstract class FinishNotRankedFormBehind : NComponent
     {
         if (Reason == null)
         {
-            Notifier.Warn("Reason is required");
+            Notifier.Warn(Reason_is_required_string);
             return;
         }
 

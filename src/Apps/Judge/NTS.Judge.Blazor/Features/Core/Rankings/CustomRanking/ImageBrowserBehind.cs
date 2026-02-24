@@ -103,7 +103,7 @@ public class ImageBrowserBehind : NComponent
 
             LoadImages();
             await InvokeRender();
-            Notifier.Success("File uploaded successfully.");
+            Notifier.Success(File_uploaded_successfully_string);
         }
         catch (Exception ex)
         {
@@ -117,15 +117,15 @@ public class ImageBrowserBehind : NComponent
         {
             if (imagePath.EndsWith("blank.png", StringComparison.InvariantCulture))
             {
-                Notifier.Error("Cannot delete default image.");
+                Notifier.Error(Cannot_delete_default_image_string);
                 return;
             }
 
             var confirmed = await DialogService.ShowMessageBox(
-                "Confirm Delete",
-                $"Are you sure you want to delete '{Path.GetFileName(imagePath)}'?",
-                yesText: "Delete",
-                cancelText: "Cancel"
+                Confirm_Delete_string,
+                string.Format(Are_you_sure_you_want_to_delete__string, Path.GetFileName(imagePath)),
+                yesText: Delete_string,
+                cancelText: Cancel_string
             );
 
             if (confirmed == true)
@@ -146,13 +146,13 @@ public class ImageBrowserBehind : NComponent
             if (File.Exists(imagePath))
             {
                 File.Delete(imagePath);
-                Notifier.Warn("Image deleted.");
+                Notifier.Warn(Image_deleted_string);
                 LoadImages();
                 _ = InvokeRender();
             }
             else
             {
-                Notifier.Error("File not found.");
+                Notifier.Error(File_not_found_string);
             }
         }
         catch (Exception ex)

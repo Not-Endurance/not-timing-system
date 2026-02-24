@@ -52,7 +52,7 @@ public class ProtocolBehind : NStatefulComponent
             FullWidth = true,
             CloseOnEscapeKey = true,
         };
-        var dialog = await DialogService.ShowAsync<ImageBrowserDialog>("Image Browser", parameters, options);
+        var dialog = await DialogService.ShowAsync<ImageBrowserDialog>(Image_browser_string, parameters, options);
         await dialog.Result;
     }
 }
