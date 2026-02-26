@@ -1,8 +1,8 @@
-﻿using Not.Authentication.User;
+using Not.Authentication.User;
 
 namespace Not.Authentication;
 
 public interface IAuthenticationSettings
 {
-    public NUser? GetUserByEmail(string email);
+    public Task<NUser?> ResolveUser(string email, string? name);
 }

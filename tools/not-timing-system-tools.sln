@@ -7,10 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Tools", "NTS.Tools\NTS.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EMS", "EMS", "{C48F3BDB-AC29-4054-937C-47F46F9F2E82}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Application", "..\..\src\Core.Application\Core.Application.csproj", "{5AB0641E-C400-4FAF-A162-54F5DCE72497}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Domain", "..\..\src\Core.Domain\Core.Domain.csproj", "{587B6226-039A-42EC-857A-2AC30750AEB5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,21 +17,11 @@ Global
 		{CE076382-04EB-4292-AFF5-ED225FC9DA4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE076382-04EB-4292-AFF5-ED225FC9DA4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE076382-04EB-4292-AFF5-ED225FC9DA4E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5AB0641E-C400-4FAF-A162-54F5DCE72497}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5AB0641E-C400-4FAF-A162-54F5DCE72497}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5AB0641E-C400-4FAF-A162-54F5DCE72497}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5AB0641E-C400-4FAF-A162-54F5DCE72497}.Release|Any CPU.Build.0 = Release|Any CPU
-		{587B6226-039A-42EC-857A-2AC30750AEB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{587B6226-039A-42EC-857A-2AC30750AEB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{587B6226-039A-42EC-857A-2AC30750AEB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{587B6226-039A-42EC-857A-2AC30750AEB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{5AB0641E-C400-4FAF-A162-54F5DCE72497} = {C48F3BDB-AC29-4054-937C-47F46F9F2E82}
-		{587B6226-039A-42EC-857A-2AC30750AEB5} = {C48F3BDB-AC29-4054-937C-47F46F9F2E82}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C6BFA806-EC48-4361-B92A-03F6D557E791}

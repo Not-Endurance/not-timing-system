@@ -15,6 +15,7 @@ public class AthleteRepository : MongoRepository<AthleteModel>
             .Update.Set(x => x.Names, document.Names)
             .Set(x => x.Club, document.Club)
             .Set(x => x.Country, document.Country)
-            .Set(x => x.FeiId, document.FeiId);
+            .Set(x => x.FeiId, document.FeiId)
+            .Set(x => x.User, document.User);
     }
 }

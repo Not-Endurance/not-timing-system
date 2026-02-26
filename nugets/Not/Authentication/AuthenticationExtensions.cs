@@ -11,19 +11,31 @@ namespace Not.Authentication;
 
 public static class AuthenticationExtensions
 {
-    public static void RegisterNAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static void RegisterNAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Action<AuthenticationBuilder, IConfiguration>? providerConfiguration = null
+    )
     {
-        services.AddSingleton<IAuthenticationSettings, NAuthenticationSettings>();
+        services.AddScoped<IAuthenticationSettings, NAuthenticationSettings>();
         services.AddSingleton<IUserResolver, NUserResolver>();
-        services.Configure<AuthOptions>(configuration.GetSection(AuthOptions.SectionName));
-        services
+        var defaultChallengeScheme =
+            configuration["Authentication:DefaultChallengeScheme"] ?? GoogleDefaults.AuthenticationScheme;
+        var authBuilder = services
             .AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = defaultChallengeScheme;
             })
-            .AddCookie()
-            .AddGoogleAuth(configuration);
+            .AddCookie();
+
+        if (providerConfiguration == null)
+        {
+            authBuilder.AddGoogleAuth(configuration);
+            return;
+        }
+
+        providerConfiguration(authBuilder, configuration);
     }
 
     public static AuthenticationBuilder AddGoogleAuth(
@@ -38,14 +50,16 @@ public static class AuthenticationExtensions
             options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
             options.Events = new OAuthEvents
             {
-                OnTicketReceived = context =>
-                {
-                    var userResolver = context.HttpContext.RequestServices.GetRequiredService<IUserResolver>();
-                    return userResolver.Resolve(context);
-                },
+                OnTicketReceived = ResolveTicketReceived,
             };
         });
 
         return authBuilder;
+    }
+
+    public static Task ResolveTicketReceived(TicketReceivedContext context)
+    {
+        var userResolver = context.HttpContext.RequestServices.GetRequiredService<IUserResolver>();
+        return userResolver.Resolve(context);
     }
 }

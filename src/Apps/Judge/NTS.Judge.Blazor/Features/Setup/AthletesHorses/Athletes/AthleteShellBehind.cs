@@ -15,6 +15,9 @@ public class AthleteShellBehind : KrudShell<AthleteFormModel>
     IRepository<Club> ClubService { get; set; } = default!;
 
     [Inject]
+    IRepository<User> Users { get; set; } = default!;
+
+    [Inject]
     ISeeker<Country> Countries { get; set; } = default!;
 
     protected async Task<IEnumerable<Country?>> SearchCountriesSafe(string term, CancellationToken ct)
@@ -26,5 +29,13 @@ public class AthleteShellBehind : KrudShell<AthleteFormModel>
     {
         var items = await ClubService.ReadMany();
         return items.Where(x => term == string.Empty || x.Name.NContains(term));
+    }
+
+    protected async Task<IEnumerable<User?>> SearchUsersSafe(string term, CancellationToken _)
+    {
+        var users = await Users.ReadMany();
+        return users.Where(x =>
+            term == string.Empty || x.Name.NContains(term) || x.Email.NContains(term)
+        );
     }
 }

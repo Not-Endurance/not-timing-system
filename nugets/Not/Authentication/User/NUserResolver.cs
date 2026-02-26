@@ -1,32 +1,36 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
-using static Not.Authentication.Provider.SuffixConstants;
 
 namespace Not.Authentication.User;
 
 public class NUserResolver : IUserResolver
 {
-    public Task Resolve(TicketReceivedContext context)
+    public async Task Resolve(TicketReceivedContext context)
     {
-        var userDeserializer = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationSettings>();
-        var email = context.Principal?.FindFirst(ClaimTypes.Email)?.Value;
-        if (email == null || context.Principal == null)
+        var settings = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationSettings>();
+        var claimEnrichers = context.HttpContext.RequestServices.GetServices<IAuthenticationClaimsEnricher>();
+        var principal = context.Principal;
+        var email = principal?.FindFirst(ClaimTypes.Email)?.Value ?? principal?.FindFirst("email")?.Value;
+        var name = principal?.Identity?.Name ?? principal?.FindFirst(ClaimTypes.Name)?.Value;
+
+        if (email == null || principal == null)
         {
             context.Response.Redirect("/error");
             context.Fail("Login error - missing user email");
             context.HandleResponse();
-            return Task.CompletedTask;
+            return;
         }
-        if (context.Principal.Identity == null)
+
+        if (principal.Identity == null)
         {
             context.Response.Redirect("/error");
             context.Fail("Login error - missing user identity");
             context.HandleResponse();
-            return Task.CompletedTask;
+            return;
         }
-        var oldIdentity = (ClaimsIdentity)context.Principal.Identity;
 
+        var oldIdentity = (ClaimsIdentity)principal.Identity;
         var newIdentity = new ClaimsIdentity(
             oldIdentity.Claims,
             oldIdentity.AuthenticationType,
@@ -34,29 +38,21 @@ public class NUserResolver : IUserResolver
             ClaimTypes.Role
         );
 
-        // clear old identities and add new one
+        // Replace the incoming identity so role claims are controlled by local user resolution.
         context.Principal = new ClaimsPrincipal(newIdentity);
 
-        // find user in allow list
-        var authUser = userDeserializer.GetUserByEmail(email);
-
-        // deny if: no email / email from unregistered provider / email not in allow list
-        if (string.IsNullOrWhiteSpace(email) || authUser == null)
+        var authUser = await settings.ResolveUser(email, name);
+        if (authUser == null)
         {
             context.Response.Redirect("/access-denied");
             context.Fail("Not allowed");
             context.HandleResponse();
-            return Task.CompletedTask;
+            return;
         }
 
-        foreach (var role in authUser.Roles ?? [])
+        foreach (var enricher in claimEnrichers)
         {
-            if (!string.IsNullOrWhiteSpace(role))
-            {
-                newIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
-            }
+            await enricher.Enrich(newIdentity, authUser, context);
         }
-
-        return Task.CompletedTask;
     }
 }

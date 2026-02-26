@@ -1,20 +1,24 @@
-﻿using Microsoft.Extensions.Options;
 using Not.Authentication.User;
 
 namespace Not.Authentication;
 
 public class NAuthenticationSettings : IAuthenticationSettings
 {
-    public NAuthenticationSettings(IOptions<AuthOptions> authOptions)
+    readonly IAuthenticationUserStore _users;
+
+    public NAuthenticationSettings(IAuthenticationUserStore users)
     {
-        Users = authOptions.Value.Users;
+        _users = users;
     }
 
-    public List<NUser> Users { get; set; } = [];
-
-    public NUser? GetUserByEmail(string email)
+    public async Task<NUser?> ResolveUser(string email, string? name)
     {
-        var user = Users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-        return user;
+        var user = await _users.ReadByEmail(email);
+        if (user != null)
+        {
+            return user;
+        }
+
+        return await _users.Create(email, name);
     }
 }

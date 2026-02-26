@@ -25,10 +25,11 @@ public record AthleteFormModel : KrudFormModel<Athlete>
     public string? FeiId { get; set; }
     public Country? Country { get; set; }
     public Club? Club { get; set; }
+    public User? User { get; set; }
 
     protected override Athlete MapTo()
     {
-        return new Athlete(Person.Create(Names), FeiId, Country, Club, Id);
+        return new Athlete(Person.Create(Names), FeiId, Country, Club, Id, User);
     }
 
     public override void MapFrom(Athlete athlete)
@@ -38,5 +39,6 @@ public record AthleteFormModel : KrudFormModel<Athlete>
         FeiId = athlete.FeiId;
         Country = athlete.Country;
         Club = athlete.Club;
+        User = athlete.User;
     }
 }
