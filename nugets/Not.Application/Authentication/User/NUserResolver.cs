@@ -8,6 +8,9 @@ namespace Not.Application.Authentication.User;
 
 internal class NUserResolver : IUserResolver
 {
+    const string ERROR_PAGE = "/error";
+    const string ACCESS_DENIED_PAGE = "/access-denied";
+
     readonly IUserRegister _userRegister;
     readonly ILogger<NUserResolver> _logger;
 
@@ -17,28 +20,19 @@ internal class NUserResolver : IUserResolver
         _logger = logger;
     }
 
-    public async Task Resolve(TicketReceivedContext context)
+    internal async Task<NUserResolutionResult> ResolvePrincipal(ClaimsPrincipal? principal)
     {
-        var principal = context.Principal;
         var email = ResolveEmail(principal);
-
         if (email == null || principal == null)
         {
-            context.Response.Redirect("/error");
-            context.Fail("Login error - missing user email");
-            context.HandleResponse();
-            return;
+            return NUserResolutionResult.Failure("Login error - missing user email", ERROR_PAGE);
         }
 
-        if (principal.Identity == null)
+        if (principal.Identity is not ClaimsIdentity oldIdentity)
         {
-            context.Response.Redirect("/error");
-            context.Fail("Login error - missing user identity");
-            context.HandleResponse();
-            return;
+            return NUserResolutionResult.Failure("Login error - missing user identity", ERROR_PAGE);
         }
 
-        var oldIdentity = (ClaimsIdentity)principal.Identity;
         var newIdentity = new ClaimsIdentity(
             oldIdentity.Claims,
             oldIdentity.AuthenticationType,
@@ -47,7 +41,7 @@ internal class NUserResolver : IUserResolver
         );
 
         // Replace the incoming identity so role claims are controlled by local user resolution.
-        context.Principal = new ClaimsPrincipal(newIdentity);
+        var resolvedPrincipal = new ClaimsPrincipal(newIdentity);
 
         var userResult = await _userRegister.Get(email);
         if (userResult.IsError || userResult.Data == null)
@@ -56,10 +50,7 @@ internal class NUserResolver : IUserResolver
             if (userResult.IsError)
             {
                 _logger.LogError("Authentication failed: {errors}", string.Join(",", userResult.Errors));
-                context.Response.Redirect("/access-denied"); // TODO: parameterize this or use some sort of user feedback.
-                context.Fail("Not allowed");
-                context.HandleResponse();
-                return;
+                return NUserResolutionResult.Failure("Not allowed", ACCESS_DENIED_PAGE);
             }
         }
 
@@ -71,6 +62,22 @@ internal class NUserResolver : IUserResolver
                 newIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
         }
+
+        return NUserResolutionResult.Success(resolvedPrincipal);
+    }
+
+    public async Task Resolve(TicketReceivedContext context)
+    {
+        var result = await ResolvePrincipal(context.Principal);
+        if (!result.IsSuccess)
+        {
+            context.Response.Redirect(result.FailurePath);
+            context.Fail(result.Error);
+            context.HandleResponse();
+            return;
+        }
+
+        context.Principal = result.Principal;
     }
 
     static string? ResolveEmail(ClaimsPrincipal? principal)
@@ -106,6 +113,29 @@ internal class NUserResolver : IUserResolver
         {
             return rawEmail;
         }
+    }
+}
+
+internal readonly record struct NUserResolutionResult(
+    ClaimsPrincipal Principal,
+    string Error,
+    string FailurePath,
+    bool IsSuccess
+)
+{
+    public static NUserResolutionResult Success(ClaimsPrincipal principal)
+    {
+        return new NUserResolutionResult(principal, string.Empty, string.Empty, IsSuccess: true);
+    }
+
+    public static NUserResolutionResult Failure(string error, string failurePath)
+    {
+        return new NUserResolutionResult(
+            new ClaimsPrincipal(new ClaimsIdentity()),
+            error,
+            failurePath,
+            IsSuccess: false
+        );
     }
 }
 
