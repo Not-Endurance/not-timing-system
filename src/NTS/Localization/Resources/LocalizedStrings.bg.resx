@@ -840,8 +840,8 @@
   <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
     <value>Съжаляваме, няма нищо на този адрес.</value>
   </data>
-  <data name="Sign_in_with_Google_string" xml:space="preserve">
-    <value>Вход с Google</value>
+  <data name="Sign_in_with_Microsoft_string" xml:space="preserve">
+    <value>Вход с Microsoft</value>
   </data>
   <data name="This_page_redirects_to_Signin_string" xml:space="preserve">
     <value>Тази страница пренасочва към вход.</value>

@@ -29,10 +29,13 @@ public class Program
             app.UseHsts();
         }
 
-        app.MapAuthEndpoints();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseAntiforgery();
+
+        app.MapAuthEndpoints();
         app.MapBlazorHub();
         app.MapFallbackToPage("/_Host");
 

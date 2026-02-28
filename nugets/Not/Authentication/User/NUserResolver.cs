@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,8 +12,8 @@ public class NUserResolver : IUserResolver
         var settings = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationSettings>();
         var claimEnrichers = context.HttpContext.RequestServices.GetServices<IAuthenticationClaimsEnricher>();
         var principal = context.Principal;
-        var email = principal?.FindFirst(ClaimTypes.Email)?.Value ?? principal?.FindFirst("email")?.Value;
-        var name = principal?.Identity?.Name ?? principal?.FindFirst(ClaimTypes.Name)?.Value;
+        var email = ResolveEmail(principal);
+        var name = ResolveName(principal);
 
         if (email == null || principal == null)
         {
@@ -54,5 +55,54 @@ public class NUserResolver : IUserResolver
         {
             await enricher.Enrich(newIdentity, authUser, context);
         }
+    }
+
+    static string? ResolveEmail(ClaimsPrincipal? principal)
+    {
+        if (principal == null)
+        {
+            return null;
+        }
+
+        var rawEmail =
+            principal.FindFirst(ClaimTypes.Email)?.Value
+            ?? principal.FindFirst("email")?.Value
+            ?? principal.FindFirst("emails")?.Value
+            ?? principal.FindFirst("preferred_username")?.Value
+            ?? principal.FindFirst(ClaimTypes.Upn)?.Value;
+
+        if (string.IsNullOrWhiteSpace(rawEmail))
+        {
+            return null;
+        }
+
+        if (!rawEmail.StartsWith('['))
+        {
+            return rawEmail;
+        }
+
+        try
+        {
+            var emails = JsonSerializer.Deserialize<string[]>(rawEmail);
+            return emails?.FirstOrDefault(email => !string.IsNullOrWhiteSpace(email));
+        }
+        catch (JsonException)
+        {
+            return rawEmail;
+        }
+    }
+
+    static string? ResolveName(ClaimsPrincipal? principal)
+    {
+        if (principal == null)
+        {
+            return null;
+        }
+
+        return
+            principal.Identity?.Name
+            ?? principal.FindFirst(ClaimTypes.Name)?.Value
+            ?? principal.FindFirst("name")?.Value
+            ?? principal.FindFirst("given_name")?.Value;
     }
 }
