@@ -1,5 +1,6 @@
 ﻿using Not.Domain.Abstractions;
 using Not.Extensions;
+using Not.Objects;
 
 namespace Not.Domain;
 
@@ -59,10 +60,6 @@ public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity
         {
             return false;
         }
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-        return GetHashCode() == other.GetHashCode() && GetType() == other.GetType();
+        return ObjectHelper.AreEqual(this, other);
     }
 }

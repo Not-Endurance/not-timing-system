@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Authentication;
+using Not.Application.Authentication;
 using Not.Blazor;
 using NTS.Application;
 

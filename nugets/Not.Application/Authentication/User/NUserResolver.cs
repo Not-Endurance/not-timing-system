@@ -1,19 +1,26 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Not.Application.Authentication.Abstractions;
 
-namespace Not.Authentication.User;
+namespace Not.Application.Authentication.User;
 
-public class NUserResolver : IUserResolver
+internal class NUserResolver : IUserResolver
 {
+    readonly IUserRegister _userRegister;
+    readonly ILogger<NUserResolver> _logger;
+
+    public NUserResolver(IUserRegister userRegister, ILogger<NUserResolver> logger)
+    {
+        _userRegister = userRegister;
+        _logger = logger;
+    }
+
     public async Task Resolve(TicketReceivedContext context)
     {
-        var settings = context.HttpContext.RequestServices.GetRequiredService<IAuthenticationSettings>();
-        var claimEnrichers = context.HttpContext.RequestServices.GetServices<IAuthenticationClaimsEnricher>();
         var principal = context.Principal;
         var email = ResolveEmail(principal);
-        var name = ResolveName(principal);
 
         if (email == null || principal == null)
         {
@@ -42,18 +49,27 @@ public class NUserResolver : IUserResolver
         // Replace the incoming identity so role claims are controlled by local user resolution.
         context.Principal = new ClaimsPrincipal(newIdentity);
 
-        var authUser = await settings.ResolveUser(email, name);
-        if (authUser == null)
+        var userResult = await _userRegister.Get(email);
+        if (userResult.IsError || userResult.Data == null)
         {
-            context.Response.Redirect("/access-denied");
-            context.Fail("Not allowed");
-            context.HandleResponse();
-            return;
+            userResult = await _userRegister.Register(email);
+            if (userResult.IsError)
+            {
+                _logger.LogError("Authentication failed: {errors}", string.Join(",", userResult.Errors));
+                context.Response.Redirect("/access-denied"); // TODO: parameterize this or use some sort of user feedback.
+                context.Fail("Not allowed");
+                context.HandleResponse();
+                return;
+            }
         }
 
-        foreach (var enricher in claimEnrichers)
+        var user = userResult.Data;
+        foreach (var role in user.Roles ?? [])
         {
-            await enricher.Enrich(newIdentity, authUser, context);
+            if (!string.IsNullOrWhiteSpace(role))
+            {
+                newIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
         }
     }
 
@@ -91,18 +107,9 @@ public class NUserResolver : IUserResolver
             return rawEmail;
         }
     }
+}
 
-    static string? ResolveName(ClaimsPrincipal? principal)
-    {
-        if (principal == null)
-        {
-            return null;
-        }
-
-        return
-            principal.Identity?.Name
-            ?? principal.FindFirst(ClaimTypes.Name)?.Value
-            ?? principal.FindFirst("name")?.Value
-            ?? principal.FindFirst("given_name")?.Value;
-    }
+public interface IUserResolver
+{
+    public Task Resolve(TicketReceivedContext context);
 }

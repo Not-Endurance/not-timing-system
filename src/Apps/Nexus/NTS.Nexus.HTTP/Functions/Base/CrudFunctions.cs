@@ -23,7 +23,7 @@ public class CrudFunctions<T> : FunctionBase
         var payload = await ReadBody<T>(request);
         if (payload == null)
         {
-            return BadRequest();
+            return UnexpectedPayload<T>();
         }
         await _repository.Create(payload);
         return Ok();
@@ -56,7 +56,7 @@ public class CrudFunctions<T> : FunctionBase
         var payload = await ReadBody<T>(request);
         if (payload == null)
         {
-            return BadRequest();
+            return UnexpectedPayload<T>();
         }
         await _repository.Update(payload);
         return Ok();
@@ -73,10 +73,5 @@ public class CrudFunctions<T> : FunctionBase
         }
         await _repository.Delete(result);
         return Ok();
-    }
-
-    IActionResult BadRequest()
-    {
-        return new BadRequestObjectResult($"Payload couldn't be parsed to '{typeof(T).FullName}'");
     }
 }

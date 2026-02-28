@@ -1,57 +1,55 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Not.Application.CRUD.Ports;
-using NTS.Application.Setup;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Mongo.Repositories;
+using NTS.Witness.Contracts.API;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class UserFunctions : CrudFunctions<UserModel>
+public class UserFunctions : FunctionBase
 {
-    public UserFunctions(IFunctionLogger<UserFunctions> logger, IRepository<UserModel> users)
-        : base(logger, users) { }
+    readonly IUserRepository _users;
 
-    [Function("users-create")]
-    public Task<IActionResult> Create(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "users")] HttpRequest request
-    )
+    public UserFunctions(IFunctionLogger<UserFunctions> logger, IUserRepository users)
+        : base(logger)
     {
-        return InternalCreate(request);
+        _users = users;
     }
 
-    [Function("users-update")]
-    public Task<IActionResult> Update(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "users")] HttpRequest request
+    [Function("users-read-by-email")]
+    public async Task<IActionResult> ReadByEmail(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{email}")]
+            HttpRequest request,
+        string email
     )
     {
-        return InternalUpdate(request);
+        LogInformation(request);
+
+        var user = await _users.ReadByEmail(email);
+        if (user == null)
+        {
+            return NotFound(email);
+        }
+
+        return Ok(user);
     }
 
-    [Function("users-delete")]
-    public Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "users/{id:int}")] HttpRequest request,
-        int id
+    [Function("users-register")]
+    public async Task<IActionResult> Register(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "users/register")] HttpRequest request
     )
     {
-        return InternalDelete(request, id);
-    }
+        LogInformation(request);
 
-    [Function("users-read")]
-    public Task<IActionResult> Read(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{id:int}")] HttpRequest request,
-        int id
-    )
-    {
-        return InternalRead(request, id);
-    }
+        var payload = await ReadBody<RegisterUserPaload>(request);
+        if (string.IsNullOrWhiteSpace(payload?.Email))
+        {
+            return InvalidPayload($"Value '{payload?.Email}' is not a valid email");
+        }
 
-    [Function("users-read-many")]
-    public Task<IActionResult> ReadMany(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users")] HttpRequest request
-    )
-    {
-        return InternalReadMany(request);
+        var user = await _users.Register(payload.Email);
+        return Ok(user);
     }
 }

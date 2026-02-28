@@ -1,6 +1,8 @@
 using MediatR;
 using Not.Domain;
 using Not.Domain.Abstractions;
+using Not.Exceptions;
+using Not.Logging;
 
 namespace Not.Application.DomainEvents;
 

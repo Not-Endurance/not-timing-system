@@ -1,29 +1,16 @@
 ﻿using System.Linq.Expressions;
 using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
+using Not.Storage.Mongo.Abstractions;
 using Not.Structures;
 
 namespace Not.Storage.Mongo;
 
-public abstract class MongoRepository<T> : IRepository<T>
+public abstract class MongoRepository<T> : MongoRepositoryBase<T>, IRepository<T>
     where T : IIdentifiable
 {
-    readonly IMongoContext _context;
-    readonly string _db;
-    readonly string _collection;
-
-    public MongoRepository(IMongoContext context, string db, string collection)
+    public MongoRepository(IMongoContext context, string db, string collection) : base(context, db, collection)
     {
-        _context = context;
-        _db = db;
-        _collection = collection;
-    }
-
-    protected abstract UpdateDefinition<T> GetUpdateDefinition(T document);
-
-    protected IMongoCollection<T> GetCollection()
-    {
-        return _context.Client.GetDatabase(_db).GetCollection<T>(_collection);
     }
 
     public async Task Create(T item)

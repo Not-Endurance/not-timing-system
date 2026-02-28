@@ -1,4 +1,4 @@
-﻿namespace Not.Authentication.Provider;
+﻿namespace Not.Application.Authentication.Provider;
 
 public static class SuffixConstants
 {

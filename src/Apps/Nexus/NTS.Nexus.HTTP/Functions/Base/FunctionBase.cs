@@ -40,4 +40,19 @@ public abstract class FunctionBase
     {
         return new OkObjectResult(payload);
     }
+
+    protected IActionResult UnexpectedPayload<TPayload>()
+    {
+        return new BadRequestObjectResult($"Payload couldn't be parsed to '{typeof(TPayload).FullName}'");
+    }
+
+    protected IActionResult InvalidPayload(string message)
+    {
+        return new BadRequestObjectResult(message);
+    }
+
+    protected IActionResult NotFound(object? criteria)
+    {
+        return new NotFoundObjectResult($"Entity with '{criteria}' not found");
+    }
 }
