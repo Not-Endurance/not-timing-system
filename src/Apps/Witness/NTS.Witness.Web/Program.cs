@@ -1,9 +1,5 @@
 ﻿using Not.Application.Configurations;
-using Not.Application.CRUD.Ports;
 using Not.Startup;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Witness.Storage;
-using NTS.Witness.Storage.Repositories;
 using NTS.Witness.Web.Endpoints;
 using Serilog;
 
@@ -15,7 +11,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Configuration.AddNAppsettings(typeof(Program).Assembly);
+        builder.Configuration.AddNAppsettings(typeof(Program).Assembly, "nts");
         builder.Services.ConfigureNtsWitnessWeb(builder.Configuration);
         builder.Logging.AddSerilog();
 

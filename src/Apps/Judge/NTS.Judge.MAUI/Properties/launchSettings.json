@@ -3,7 +3,8 @@
     "Localhost": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "IS_LOCALHOST": "true"
       }
     },
 
@@ -11,13 +12,22 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
+        "IS_LOCALHOST": "true",
         "NO_WARP": "true"
       }
     },
     "Staging": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Staging"
+        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "IS_LOCALHOST": "true"
+      }
+    },
+    "Production": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "IS_LOCALHOST": "true"
       }
     }
   }

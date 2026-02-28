@@ -4,7 +4,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>30546649-0533-47b6-be18-89598f794ea1</UserSecretsId> <!-- TODO: use same solution as ZigZag -->
   </PropertyGroup>
 
   <ItemGroup>

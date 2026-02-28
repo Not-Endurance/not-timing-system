@@ -3,11 +3,13 @@
 public static class EnvironmentHelper
 {
     const string ENVIRONMENT_VARIABLE = "ASPNETCORE_ENVIRONMENT";
-    public const string LOCALHOST = "Development";
+    const string IS_LOCALHOST_VARIABLE = "IS_LOCALHOST";
+    public const string DEVELOPMENT = "Development";
+    public const string LOCALHOST = "Localhost";
     public const string STAGING = "Staging";
     public const string PRODUCTION = "Production";
 
-    public static bool IsLocalhost()
+    public static bool UsesLocalhostInfrastructure()
     {
         return Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE) == LOCALHOST;
     }
@@ -19,6 +21,22 @@ public static class EnvironmentHelper
 
     public static string GetEnvironment()
     {
-        return Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE) ?? "Staging"; // TODO: figure out how to pass this
+        var aspnetEnvironment = Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE) ?? "Staging"; // TODO: figure out how to pass this
+        return MapNEnvironment(aspnetEnvironment);
+    }
+
+    public static bool IsLocalhost()
+    {
+        var isLocalhost = Environment.GetEnvironmentVariable(IS_LOCALHOST_VARIABLE);
+        return !string.IsNullOrEmpty(isLocalhost);
+    }
+
+    static string MapNEnvironment(string aspEnvironment)
+    {
+        if (aspEnvironment == DEVELOPMENT)
+        {
+            return LOCALHOST;
+        }
+        return aspEnvironment;
     }
 }
