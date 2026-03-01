@@ -10,7 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\nugets\Not.Storage\Not.Storage.csproj" />
     <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
-    <ProjectReference Include="..\..\Warp\NTS.Warp\NTS.Warp.csproj" />
+    <ProjectReference Include="..\..\Warp\NTS.Warp.Contracts\NTS.Warp.Contracts.csproj" />
     <ProjectReference Include="..\NTS.Witness.Contracts\NTS.Witness.Contracts.csproj" />
   </ItemGroup>
 

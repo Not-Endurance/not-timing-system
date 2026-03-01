@@ -1,14 +1,15 @@
-﻿using Not.Application.CRUD.Ports;
+﻿using Not.Blazor.Components.Abstractions;
 using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
+using NTS.Witness.UpcomingEvents;
 
 namespace NTS.Witness.Blazor.Components.EnduranceEvents;
 
-public class EnduranceEventsBehind : ComponentBase
+public class EnduranceEventsBehind : NComponent
 {
     [Inject]
-    IRepository<UpcomingEvent> Repository { get; set; } = default!;
+    IUpcomingEventService Service { get; set; } = default!;
 
     [Inject]
     INtsSocketService SocketService { get; set; } = default!;
@@ -28,7 +29,14 @@ public class EnduranceEventsBehind : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Events = await Repository.ReadMany();
+        try
+        {
+            Events = await Service.GetEvents();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected async void ConnectTo(UpcomingEvent enduranceEvent)

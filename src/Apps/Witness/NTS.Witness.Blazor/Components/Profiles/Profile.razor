@@ -10,10 +10,13 @@
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
+
             <MudStack Class="mt-10">
                 <EnduranceEvents />
             </MudStack>
+
             <MudGrid Justify="Justify.Center" Class="align-top mt-10">
+
                 <MudStack Row>
                     <MudText Typo="Typo.caption" Class="mr-4"> 
                         <p>@string.Format(Signed_in_as__string, context.User.Identity?.Name)</p>
@@ -22,11 +25,13 @@
                     </MudText>
                     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" OnClick="SignoutHandler">@Sign_Out_string <MudIcon Class="ml-2" Icon="@Icons.Material.Filled.Logout" /></MudButton>
                 </MudStack>
+
             </MudGrid>
         </Authorized>
 
         <NotAuthorized>
             <Signin />
         </NotAuthorized>
+
     </AuthorizeView>
 </CascadingAuthenticationState>

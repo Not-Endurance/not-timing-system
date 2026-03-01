@@ -16,6 +16,11 @@ services:
       dockerfile: src/Apps/Nexus/NTS.Nexus.HTTP/Dockerfile
     environment:
       MONGO_CONNECTION_STRING: mongodb://mongodb:27017
+      # CORS
+      CORS_ALLOWED_ORIGINS: '["https://localhost:7077","http://localhost:7077"]'
+      CORS_SUPPORT_CREDENTIALS: 'true'
+      FUNCTIONS_ENABLE_CORS_CONFIGURATION: "1"
+      CONTAINER_NAME: "local"
     depends_on:
       - mongodb
     ports:

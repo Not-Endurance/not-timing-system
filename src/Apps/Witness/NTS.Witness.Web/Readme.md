@@ -1,13 +1,9 @@
-## Authentication - Microsoft Entra ID
-Configuration - Authentication:MicrosoftEntra
+## Authentication - Microsoft Entra ID (WASM)
+Configuration key: `NAuthenticationSettings`
 
-Note: `ClientSecret` is not committed for obvious reasons. Locally it's hooked with dotnet UserSecrets
+`NTS.Witness.Web` is now a client-side Blazor WebAssembly app. It does not use confidential client secrets.
 
-### Localhost
-Run `dotnet user-secrets --id nts-localhost set "Authentication:MicrosoftEntra:ClientSecret" "<value>"`
-
-### Staging 
-Run `dotnet user-secrets --id nts-staging set "Authentication:MicrosoftEntra:ClientSecret" "<value>"`
-
-### Production
-Run `dotnet user-secrets --id nts-production set "Authentication:MicrosoftEntra:ClientSecret" "<value>"`
+Environment configuration files are loaded from:
+- `wwwroot/appsettings.json`
+- `wwwroot/appsettings.Development.json`
+- `wwwroot/appsettings.Staging.json`

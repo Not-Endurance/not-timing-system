@@ -73,6 +73,6 @@ public static class ConfigurationManagerExtensions
         GuardHelper.ThrowIfDefault(secretId);
 
         builder.AddUserSecrets(secretId.ToLower());
-        return builder.AddEnvironmentVariables();
+        return builder;
     }
 }

@@ -1,12 +1,11 @@
 using System.Security.Claims;
 using System.Text.Json;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Not.Application.Authentication.Abstractions;
 
 namespace Not.Application.Authentication.User;
 
-internal class NUserResolver : IUserResolver
+public class NUserResolver
 {
     const string ERROR_PAGE = "/error";
     const string ACCESS_DENIED_PAGE = "/access-denied";
@@ -20,7 +19,7 @@ internal class NUserResolver : IUserResolver
         _logger = logger;
     }
 
-    internal async Task<NUserResolutionResult> ResolvePrincipal(ClaimsPrincipal? principal)
+    public async Task<NUserResolutionResult> ResolvePrincipal(ClaimsPrincipal? principal)
     {
         var email = ResolveEmail(principal);
         if (email == null || principal == null)
@@ -66,20 +65,6 @@ internal class NUserResolver : IUserResolver
         return NUserResolutionResult.Success(resolvedPrincipal);
     }
 
-    public async Task Resolve(TicketReceivedContext context)
-    {
-        var result = await ResolvePrincipal(context.Principal);
-        if (!result.IsSuccess)
-        {
-            context.Response.Redirect(result.FailurePath);
-            context.Fail(result.Error);
-            context.HandleResponse();
-            return;
-        }
-
-        context.Principal = result.Principal;
-    }
-
     static string? ResolveEmail(ClaimsPrincipal? principal)
     {
         if (principal == null)
@@ -116,7 +101,7 @@ internal class NUserResolver : IUserResolver
     }
 }
 
-internal readonly record struct NUserResolutionResult(
+public readonly record struct NUserResolutionResult(
     ClaimsPrincipal Principal,
     string Error,
     string FailurePath,
@@ -137,9 +122,4 @@ internal readonly record struct NUserResolutionResult(
             IsSuccess: false
         );
     }
-}
-
-public interface IUserResolver
-{
-    public Task Resolve(TicketReceivedContext context);
 }

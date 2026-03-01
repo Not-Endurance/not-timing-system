@@ -1,7 +1,4 @@
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Authentication.WebAssembly.Msal.Models;
 using Microsoft.Extensions.Configuration;
@@ -13,61 +10,15 @@ namespace Not.Application.Authentication;
 
 public static class AuthenticationExtensions
 {
-    public static void RegisterNAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNClientAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<NUserResolver>();
-        services.AddScoped<IUserResolver>(provider => provider.GetRequiredService<NUserResolver>());
-        services.Configure<NAuthenticationSettings>(configuration);
-
-        services
-            .AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = NAuthenticationSettings.Scheme;
-            })
-            .AddCookie()
-            .AddMicrosoftEntra(configuration);
-    }
-
-    public static void RegisterNAuthenticationWasm(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddScoped<NUserResolver>();
-        services.AddScoped<IUserResolver>(provider => provider.GetRequiredService<NUserResolver>());
-        services.Configure<NAuthenticationSettings>(configuration);
-
         services
             .AddMsalAuthentication(options => ConfigureWasmAuthenticationOptions(options, configuration))
             .AddAccountClaimsPrincipalFactory<NWasmAccountClaimsPrincipalFactory>();
-    }
 
-    public static AuthenticationBuilder AddMicrosoftEntra(
-        this AuthenticationBuilder authBuilder,
-        IConfiguration configuration
-    )
-    {
-        var settings = CreateSettings(configuration, requireClientSecret: true);
-        var callbackPath = ResolveCallbackPath(settings);
-        var signedOutCallbackPath = ResolveSignedOutCallbackPath(settings);
-
-        authBuilder.AddOpenIdConnect(
-            NAuthenticationSettings.Scheme,
-            options =>
-            {
-                options.Authority = ResolveAuthority(settings);
-                options.ClientId = settings.ClientId;
-                options.ClientSecret = settings.ClientSecret;
-                options.CallbackPath = callbackPath;
-                options.SignedOutCallbackPath = signedOutCallbackPath;
-                options.ResponseType = "code";
-                options.SaveTokens = true;
-                options.Events = new OpenIdConnectEvents
-                {
-                    OnTicketReceived = ResolveTicketReceived,
-                };
-            }
-        );
-
-        return authBuilder;
+        return services
+            .AddScoped<NUserResolver>()
+            .Configure<NAuthenticationSettings>(configuration);
     }
 
     static void ConfigureWasmAuthenticationOptions(
@@ -75,7 +26,7 @@ public static class AuthenticationExtensions
         IConfiguration configuration
     )
     {
-        var settings = CreateSettings(configuration, requireClientSecret: false);
+        var settings = CreateSettings(configuration);
         options.ProviderOptions.Authentication.Authority = ResolveAuthority(settings);
         options.ProviderOptions.Authentication.ClientId = settings.ClientId;
 
@@ -91,50 +42,52 @@ public static class AuthenticationExtensions
         options.AuthenticationPaths.LogOutSucceededPath = "/profile";
     }
 
-    static Task ResolveTicketReceived(TicketReceivedContext context)
-    {
-        var userResolver = context.HttpContext.RequestServices.GetRequiredService<IUserResolver>();
-        return userResolver.Resolve(context);
-    }
-
-    static NAuthenticationSettings CreateSettings(IConfiguration configuration, bool requireClientSecret)
+    static NAuthenticationSettings CreateSettings(IConfiguration configuration)
     {
         var section = configuration.GetSection(nameof(NAuthenticationSettings));
         var settings = new NAuthenticationSettings();
         section.Bind(settings);
 
-        Validate(settings, requireClientSecret);
+        Validate(settings);
         return settings;
     }
 
-    static void Validate(NAuthenticationSettings settings, bool requireClientSecret)
+    static void Validate(NAuthenticationSettings settings)
     {
         RequireConfigValue(settings.ClientId, nameof(NAuthenticationSettings.ClientId));
-        if (requireClientSecret)
-        {
-            RequireConfigValue(settings.ClientSecret, nameof(NAuthenticationSettings.ClientSecret));
-        }
         RequireConfigValue(settings.Instance, nameof(NAuthenticationSettings.Instance));
         RequireConfigValue(settings.TenantId, nameof(NAuthenticationSettings.TenantId));
     }
 
     static string ResolveCallbackPath(NAuthenticationSettings settings)
     {
-        return string.IsNullOrWhiteSpace(settings.CallbackPath) ? "/signin-oidc" : settings.CallbackPath;
+        return string.IsNullOrWhiteSpace(settings.CallbackPath)
+            ? "/authentication/login-callback"
+            : settings.CallbackPath;
     }
 
     static string ResolveSignedOutCallbackPath(NAuthenticationSettings settings)
     {
         return string.IsNullOrWhiteSpace(settings.SignedOutCallbackPath)
-            ? "/signout-callback-oidc"
+            ? "/authentication/logout-callback"
             : settings.SignedOutCallbackPath;
     }
 
     static string ResolveAuthority(NAuthenticationSettings settings)
     {
         var instance = settings.Instance!.TrimEnd('/');
+        if (instance.EndsWith("/v2.0", StringComparison.OrdinalIgnoreCase))
+        {
+            instance = instance[..^"/v2.0".Length];
+        }
+
         var tenantId = settings.TenantId!.Trim('/');
-        return $"{instance}/{tenantId}/v2.0";
+        if (instance.EndsWith($"/{tenantId}", StringComparison.OrdinalIgnoreCase))
+        {
+            return instance;
+        }
+
+        return $"{instance}/{tenantId}";
     }
 
     static string RequireConfigValue(string? value, string settingPath)

@@ -1,4 +1,4 @@
-﻿using NTS.Domain.Core.Objects.Payloads;
+using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Warp.Features.Judge.Procedures;
 

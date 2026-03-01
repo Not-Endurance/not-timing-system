@@ -1,4 +1,4 @@
-﻿using Not.Application.RPC.Clients;
+using Not.Application.RPC.Clients;
 using NTS.Application.Core;
 using NTS.Application.Watcher;
 

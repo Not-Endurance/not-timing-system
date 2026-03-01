@@ -1,17 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AnalysisLevel>latest</AnalysisLevel>
-    <OutputType>Library</OutputType>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
-    <ProjectReference Include="..\NTS.Warp.Contracts\NTS.Warp.Contracts.csproj" />
   </ItemGroup>
-  
+
 </Project>
