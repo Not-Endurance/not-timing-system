@@ -7,7 +7,7 @@ public abstract record KrudFormModel<T> : IKrudModel<T>, IKrudFormModel
     where T : IEntity
 {
     public abstract void MapFrom(T entity);
-    // Fixes build: if you remove this Csharpier puts a space which fails the build for NA0004
+
     protected abstract T MapTo();
 
     public int? Id { get; set; }

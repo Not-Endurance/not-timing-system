@@ -18,6 +18,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.Http" Version="9.0.0" />
     <PackageReference Include="Scrutor" Version="6.1.0" />
+    <PackageReference Include="NotACompany.Analyzers" Version="0.1.1" />
   </ItemGroup>
 
 </Project>

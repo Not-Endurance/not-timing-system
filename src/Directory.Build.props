@@ -1,10 +1,7 @@
 <Project>
+  
   <PropertyGroup>
    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NotACompany.Analyzers" Version="0.1.0" />
-  </ItemGroup>
 
 </Project>
