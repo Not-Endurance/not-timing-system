@@ -11,18 +11,12 @@ env:
   APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
   API_LOCATION: src/Apps/Nexus/NTS.Nexus.HTTP
   OUTPUT_LOCATION: wwwroot
-  SWA_NAME: lively-rock-07e20cd03
-  SWA_RESOURCE_GROUP: NTS
 
 jobs:
   build-and-deploy:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Witness - Build & Deploy to a temporary Staging evnironment
-    env:
-      AZURE_SUBSCRIPTION_DEV_CREDENTIALS: ${{ secrets.AZURE_SUBSCRIPTION_DEV_CREDENTIALS }}
-      MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
-      AZURE_NTSSTORAGEDEV_CONNECTION_STRING: ${{ secrets.AZURE_NTSSTORAGEDEV_CONNECTION_STRING }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,36 +31,6 @@ jobs:
       # Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
       - name: Remove local-cache NuGet source
         run: dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config
-
-      - name: Login to Azure
-        if: ${{ env.AZURE_SUBSCRIPTION_DEV_CREDENTIALS != '' && env.MONGO_CONNECTION_STRING != '' }}
-        uses: azure/login@v1
-        with:
-          creds: ${{ env.AZURE_SUBSCRIPTION_DEV_CREDENTIALS }}
-
-      - name: Configure SWA managed API settings
-        if: ${{ env.AZURE_SUBSCRIPTION_DEV_CREDENTIALS != '' && env.MONGO_CONNECTION_STRING != '' }}
-        shell: bash
-        run: |
-          settings=()
-          settings+=("MONGO_CONNECTION_STRING=${MONGO_CONNECTION_STRING}")
-          settings+=("FUNCTIONS_WORKER_RUNTIME=dotnet-isolated")
-
-          if [ -n "${AZURE_NTSSTORAGEDEV_CONNECTION_STRING}" ]; then
-            settings+=("AzureWebJobsStorage=${AZURE_NTSSTORAGEDEV_CONNECTION_STRING}")
-          fi
-
-          az staticwebapp appsettings set \
-            --name "${{ env.SWA_NAME }}" \
-            --resource-group "${{ env.SWA_RESOURCE_GROUP }}" \
-            --setting-names "${settings[@]}" \
-            --output none
-
-      - name: Validate managed API configuration
-        if: ${{ env.MONGO_CONNECTION_STRING == '' }}
-        shell: bash
-        run: |
-          echo "::warning::Secret 'MONGO_CONNECTION_STRING' is not set. Ensure the Static Web App has an app setting named MONGO_CONNECTION_STRING, otherwise managed Functions deployment will fail."
       
       - name: Build And Deploy
         id: builddeploy
