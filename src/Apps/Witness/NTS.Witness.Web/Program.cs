@@ -9,7 +9,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddNtsWitness(builder.Configuration);
+builder.Services.AddNtsWitness(builder.Configuration, builder.HostEnvironment.BaseAddress);
 
 var host = builder.Build();
 await host.Services.Startup();
