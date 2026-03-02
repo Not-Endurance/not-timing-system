@@ -8,8 +8,8 @@ on:
 
 env:
   DOTNET_CORE_VERSION: 8.0.x
-  APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
-  API_LOCATION: src/Apps/Nexus/NTS.Nexus.HTTP
+  APP_LOCATION: /src/Apps/Witness/NTS.Witness.Web
+  API_LOCATION: /src/Apps/Nexus/NTS.Nexus.HTTP
   OUTPUT_LOCATION: wwwroot
 
 jobs:
@@ -52,6 +52,9 @@ jobs:
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LIVELY_ROCK_07E20CD03 }}
           action: "close"
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LIVELY_ROCK_07E20CD03 }}
+          app_location: ${{ env.APP_LOCATION }}
+          api_location: ${{ env.API_LOCATION }}
+          output_location: ${{ env.OUTPUT_LOCATION }}
 
