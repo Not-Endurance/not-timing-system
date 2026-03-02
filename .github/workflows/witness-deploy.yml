@@ -1,39 +1,49 @@
 name: Azure Static Web Apps CI/CD
 
 on:
-  push:
-    branches:
-      - witness/blazor-client-migration
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - witness/blazor-client-migration
+      - develop
+
+env:
+  DOTNET_CORE_VERSION: 8.0.x
+  APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
+  API_LOCATION: src/Apps/Nexus/NTS.Nexus.HTTP
+  OUTPUT_LOCATION: wwwroot
 
 jobs:
-  build_and_deploy_job:
+  witness-build-and-deploy-staging-virtual:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
           lfs: false
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+        
+      # Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
+      - name: Remove local-cache NuGet source
+        run: dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config
+      
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
+          action: "upload"
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LIVELY_ROCK_07E20CD03 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
-          action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "src/Apps/Witness/NTS.Witness.Web" # App source code path
-          api_location: "src/Apps/Nexus/NTS.Nexus.API" # Api source code path - optional
-          output_location: "wwwroot" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          app_location: ${{ env.APP_LOCATION }}
+          api_location: ${{ env.API_LOCATION }}
+          output_location: ${{ env.OUTPUT_LOCATION }}
 
-  close_pull_request_job:
+  witness-deploy-staging:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     name: Close Pull Request Job
@@ -44,3 +54,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LIVELY_ROCK_07E20CD03 }}
           action: "close"
+
