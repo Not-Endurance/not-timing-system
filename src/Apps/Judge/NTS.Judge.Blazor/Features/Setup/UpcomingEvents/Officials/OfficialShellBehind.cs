@@ -14,8 +14,6 @@ public class OfficialShellBehind : KrudShell<OfficialFormModel>
     protected async Task<IEnumerable<User?>> SearchUsersSafe(string term, CancellationToken _)
     {
         var users = await Users.ReadMany();
-        return users.Where(x =>
-            term == string.Empty || x.Name.NContains(term) || x.Email.NContains(term)
-        );
+        return users.Where(x => term == string.Empty || x.Name.NContains(term) || x.Email.NContains(term));
     }
 }

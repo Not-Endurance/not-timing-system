@@ -9,9 +9,8 @@ namespace Not.Storage.Mongo;
 public abstract class MongoRepository<T> : MongoRepositoryBase<T>, IRepository<T>
     where T : IIdentifiable
 {
-    public MongoRepository(IMongoContext context, string db, string collection) : base(context, db, collection)
-    {
-    }
+    public MongoRepository(IMongoContext context, string db, string collection)
+        : base(context, db, collection) { }
 
     public async Task Create(T item)
     {

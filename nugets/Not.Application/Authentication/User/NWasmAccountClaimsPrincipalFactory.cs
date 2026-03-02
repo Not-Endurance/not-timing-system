@@ -47,10 +47,7 @@ internal class NWasmAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactor
             return result.Principal;
         }
 
-        _logger.LogWarning(
-            "Client authentication failed during local user resolution. Reason: {reason}",
-            result.Error
-        );
+        _logger.LogWarning("Client authentication failed during local user resolution. Reason: {reason}", result.Error);
 
         var failedPath =
             _authOptions.Value.AuthenticationPaths.LogInFailedPath

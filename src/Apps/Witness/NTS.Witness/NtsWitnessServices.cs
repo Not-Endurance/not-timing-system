@@ -19,9 +19,6 @@ public static class NtsWitnessServices
             .AddDomainEvents()
             .AddHttp();
 
-        return services
-            .AddNts(configuration)
-            .AddNBlazor(configuration)
-            .AddNClientAuthentication(configuration);
+        return services.AddNts(configuration).AddNBlazor(configuration).AddNClientAuthentication(configuration);
     }
 }

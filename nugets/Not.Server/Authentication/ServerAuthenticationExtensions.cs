@@ -45,10 +45,7 @@ public static class ServerAuthenticationExtensions
                 options.SignedOutCallbackPath = signedOutCallbackPath;
                 options.ResponseType = "code";
                 options.SaveTokens = true;
-                options.Events = new OpenIdConnectEvents
-                {
-                    OnTicketReceived = ResolveTicketReceived,
-                };
+                options.Events = new OpenIdConnectEvents { OnTicketReceived = ResolveTicketReceived };
             }
         );
 

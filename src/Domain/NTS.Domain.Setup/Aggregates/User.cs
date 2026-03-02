@@ -7,11 +7,12 @@ public class User : Aggregate
     {
         Email = Required(nameof(Email), email).Trim();
         Name = string.IsNullOrWhiteSpace(name) ? Email : name.Trim();
-        Roles = roles?
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Select(x => x.Trim())
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray() ?? [];
+        Roles =
+            roles
+                ?.Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray() ?? [];
     }
 
     public string Email { get; }

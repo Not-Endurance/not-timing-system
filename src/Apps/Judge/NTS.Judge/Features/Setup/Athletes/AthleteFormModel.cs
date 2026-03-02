@@ -17,9 +17,8 @@ public record AthleteFormModel : KrudFormModel<Athlete>
         Country = StaticOption.SelectedCountry;
     }
 
-    public AthleteFormModel(KrudFormModel<Athlete> original) : base(original)
-    {
-    }
+    public AthleteFormModel(KrudFormModel<Athlete> original)
+        : base(original) { }
 
     public string? Names { get; set; }
     public string? FeiId { get; set; }

@@ -107,10 +107,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         var url = _context.Url;
         if (groupId != null)
         {
-            var query = new Dictionary<string, string?>
-            {
-                { RpcConstants.CONNECTION_GROUP_KEY, groupId }
-            };
+            var query = new Dictionary<string, string?> { { RpcConstants.CONNECTION_GROUP_KEY, groupId } };
             url = QueryHelpers.AddQueryString(url, query);
         }
 

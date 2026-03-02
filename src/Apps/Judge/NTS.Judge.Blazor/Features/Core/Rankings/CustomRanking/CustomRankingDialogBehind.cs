@@ -1,10 +1,10 @@
 using Not.Application.CRUD.Ports;
 using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Dialogs.Abstractions;
 using Not.Safe;
 using Not.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Features.Core.Rankings.CustomRankings;
-using Not.Blazor.Dialogs.Abstractions;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 
@@ -52,7 +52,12 @@ public class CustomRankingDialogBehind : NDialog<CustomRankingModel>
             {
                 return Task.CompletedTask;
             }
-            if (RankingModel.Name == null || RankingModel.Category == null || RankingModel.Ruleset == null || RankingModel.Type == null)
+            if (
+                RankingModel.Name == null
+                || RankingModel.Category == null
+                || RankingModel.Ruleset == null
+                || RankingModel.Type == null
+            )
             {
                 RankingModel = new CustomRankingModel(ranking);
             }

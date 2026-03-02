@@ -10,15 +10,16 @@ namespace Not.Application.Authentication;
 
 public static class AuthenticationExtensions
 {
-    public static IServiceCollection AddNClientAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNClientAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services
             .AddMsalAuthentication(options => ConfigureWasmAuthenticationOptions(options, configuration))
             .AddAccountClaimsPrincipalFactory<NWasmAccountClaimsPrincipalFactory>();
 
-        return services
-            .AddScoped<NUserResolver>()
-            .Configure<NAuthenticationSettings>(configuration);
+        return services.AddScoped<NUserResolver>().Configure<NAuthenticationSettings>(configuration);
     }
 
     static void ConfigureWasmAuthenticationOptions(

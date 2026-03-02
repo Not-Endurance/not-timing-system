@@ -15,9 +15,9 @@ public class UserMongoRepository : IUserRepository, ITransient
 
     public UserMongoRepository(IMongoContext context)
     {
-        _collection = context.Client.GetDatabase(MongoConstants.NTS_DATABASE).GetCollection<NUserDocument>(
-            MongoConstants.USERS_COLLECTION
-        );
+        _collection = context
+            .Client.GetDatabase(MongoConstants.NTS_DATABASE)
+            .GetCollection<NUserDocument>(MongoConstants.USERS_COLLECTION);
     }
 
     public async Task<NUserModel?> ReadByEmail(string email)
@@ -34,7 +34,8 @@ public class UserMongoRepository : IUserRepository, ITransient
 
     public async Task<NUserModel> Register(string email)
     {
-        var normalizedEmail = NormalizeEmail(email) ?? throw new ArgumentException("Email cannot be empty", nameof(email));
+        var normalizedEmail =
+            NormalizeEmail(email) ?? throw new ArgumentException("Email cannot be empty", nameof(email));
         var existing = await ReadByEmail(normalizedEmail);
         if (existing != null)
         {

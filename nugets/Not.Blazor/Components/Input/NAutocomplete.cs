@@ -14,9 +14,9 @@ public class NAutocomplete<T> : MudAutocomplete<T?>
         SearchFunc = (term, ct) => SafeHelper.RunWithError(() => SearchSafe(term, ct));
     }
 
-	/// <summary>
-	/// Calls <see cref="MudAutocomplete{T}.SearchFunc" /> within a try-catch block
-	/// </summary>
-	[Parameter]
+    /// <summary>
+    /// Calls <see cref="MudAutocomplete{T}.SearchFunc" /> within a try-catch block
+    /// </summary>
+    [Parameter]
     public Func<string, CancellationToken, Task<IEnumerable<T?>>> SearchSafe { get; set; } = default!;
 }

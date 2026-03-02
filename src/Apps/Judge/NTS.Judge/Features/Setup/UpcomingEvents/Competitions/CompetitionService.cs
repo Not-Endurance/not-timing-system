@@ -8,7 +8,5 @@ namespace NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 public class CompetitionService : KrudServiceBase<Competition, CompetitionFormModel>, ITransient
 {
     public CompetitionService(IRepository<Competition> competitions)
-        : base(competitions, [])
-    {
-    }
+        : base(competitions, []) { }
 }

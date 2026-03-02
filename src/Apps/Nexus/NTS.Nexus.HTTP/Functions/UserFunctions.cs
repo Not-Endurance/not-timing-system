@@ -20,8 +20,7 @@ public class UserFunctions : FunctionBase
 
     [Function("users-read-by-email")]
     public async Task<IActionResult> ReadByEmail(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{email}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{email}")] HttpRequest request,
         string email
     )
     {

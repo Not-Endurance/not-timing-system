@@ -8,11 +8,7 @@ public class NUserDocument : IDocument
 {
     public static NUserDocument Create(string email)
     {
-        return new NUserDocument
-        {
-            Id = RandomHelper.GenerateUniqueInteger(),
-            Email = email,
-        };
+        return new NUserDocument { Id = RandomHelper.GenerateUniqueInteger(), Email = email };
     }
 
     public static NUserDocument From(NUserModel user)

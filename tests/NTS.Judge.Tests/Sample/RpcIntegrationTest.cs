@@ -30,6 +30,10 @@ public class RpcIntegrationTest : JudgeIntegrationTest
 
         var timingService = await GetBehind<ITimingService>(_testOutputHelper.WriteLine);
 
-        await AssertRpcInvoked(_witnessFIxture, () => timingService.Record(snapshot), nameof(WitnessTestClient.OnParticipationEliminated));
+        await AssertRpcInvoked(
+            _witnessFIxture,
+            () => timingService.Record(snapshot),
+            nameof(WitnessTestClient.OnParticipationEliminated)
+        );
     }
 }

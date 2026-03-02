@@ -10,7 +10,6 @@ public abstract class MongoRepositoryBase<T>
 
     protected MongoRepositoryBase(IMongoContext context, string db, string collection)
     {
-
         _context = context;
         _db = db;
         _collection = collection;
