@@ -13,10 +13,10 @@ env:
   OUTPUT_LOCATION: wwwroot
 
 jobs:
-  witness-build-and-deploy-staging-virtual:
+  build-and-deploy:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    name: Witness - Build & Deploy to a temporary Staging evnironment
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,10 +43,10 @@ jobs:
           api_location: ${{ env.API_LOCATION }}
           output_location: ${{ env.OUTPUT_LOCATION }}
 
-  witness-deploy-staging:
+  deploy-staging:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
-    name: Close Pull Request Job
+    name: Witness - Deploy to Staging
     steps:
       - name: Close Pull Request
         id: closepullrequest
