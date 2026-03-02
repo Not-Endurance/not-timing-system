@@ -11,7 +11,11 @@ namespace NTS.Witness;
 
 public static class NtsWitnessServices
 {
-    public static IServiceCollection AddNtsWitness(this IServiceCollection services, IConfiguration configuration, string baseUrl)
+    public static IServiceCollection AddNtsWitness(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string baseUrl
+    )
     {
         services
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
@@ -21,15 +25,18 @@ public static class NtsWitnessServices
             .AddDomainEvents()
             .AddHttp();
 
-        services.AddHttpClient(nameof(NHttpClient), client =>
-        {
-            // Keep localhost to target containers, but in environments use same-host of Azure Static Web Apps
-            if (EnvironmentHelper.IsLocalhost())
+        services.AddHttpClient(
+            nameof(NHttpClient),
+            client =>
             {
-                return;
+                // Keep localhost to target containers, but in environments use same-host of Azure Static Web Apps
+                if (EnvironmentHelper.IsLocalhost())
+                {
+                    return;
+                }
+                client.BaseAddress = new Uri(baseUrl);
             }
-            client.BaseAddress = new Uri(baseUrl);
-        });
+        );
 
         return services.AddNts(configuration).AddNBlazor(configuration).AddNClientAuthentication(configuration);
     }
