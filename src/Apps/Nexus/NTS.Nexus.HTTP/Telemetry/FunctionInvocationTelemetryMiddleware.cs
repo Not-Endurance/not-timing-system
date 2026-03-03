@@ -24,8 +24,8 @@ internal class FunctionInvocationTelemetryMiddleware : IFunctionsWorkerMiddlewar
         var (className, methodName) = Resolve(context.FunctionDefinition);
         using var activity = _telemetry.StartActivity(className, methodName);
 
-        Activity.Current
-            .Tag("faas.name", context.FunctionDefinition.Name)
+        Activity
+            .Current.Tag("faas.name", context.FunctionDefinition.Name)
             .Tag("faas.invocation_id", context.InvocationId)
             .Tag("code.namespace", className)
             .Tag("code.function", methodName);
@@ -37,11 +37,7 @@ internal class FunctionInvocationTelemetryMiddleware : IFunctionsWorkerMiddlewar
         catch (Exception ex)
         {
             Activity.Current.TagException(ex);
-            _logger.LogError(
-                ex,
-                "Unhandled exception in function {FunctionName}",
-                context.FunctionDefinition.Name
-            );
+            _logger.LogError(ex, "Unhandled exception in function {FunctionName}", context.FunctionDefinition.Name);
             throw;
         }
     }

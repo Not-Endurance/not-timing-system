@@ -75,9 +75,7 @@ public class HorseFunctions : FunctionBase
         LogInformation(request, nameof(SafeDelete));
 
         var recordsWithHorse = await _archive
-            .ReadMany(x =>
-                x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id))
-            )
+            .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
             .ToList();
 
         if (recordsWithHorse.Any())

@@ -18,8 +18,8 @@ public abstract class FunctionBase
 
     protected void TagRequest(HttpRequest request)
     {
-        Activity.Current
-            .Tag("http.request.method", request.Method)
+        Activity
+            .Current.Tag("http.request.method", request.Method)
             .Tag("url.path", request.Path.ToString())
             .Tag("url.query", request.QueryString.ToString());
     }

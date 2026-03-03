@@ -10,7 +10,6 @@ namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
 public class UserMongoRepository : IUserRepository, ITransient
 {
-
     readonly IMongoCollection<NUserDocument> _collection;
     readonly ITelemetryService _telemetry;
 
@@ -24,75 +23,90 @@ public class UserMongoRepository : IUserRepository, ITransient
 
     public Task<NUserModel?> ReadByEmail(string email)
     {
-        return Execute(nameof(ReadByEmail), async () =>
-        {
-            var normalizedEmail = NormalizeEmail(email);
-            if (normalizedEmail == null)
+        return Execute(
+            nameof(ReadByEmail),
+            async () =>
             {
-                return null;
-            }
+                var normalizedEmail = NormalizeEmail(email);
+                if (normalizedEmail == null)
+                {
+                    return null;
+                }
 
-            var user = await _collection.Find(x => x.Email == normalizedEmail).FirstOrDefaultAsync();
-            return user?.ToUser();
-        });
+                var user = await _collection.Find(x => x.Email == normalizedEmail).FirstOrDefaultAsync();
+                return user?.ToUser();
+            }
+        );
     }
 
     public Task<NUserModel> Register(string email)
     {
-        return Execute(nameof(Register), async () =>
-        {
-            var normalizedEmail =
-                NormalizeEmail(email) ?? throw new ArgumentException("Email cannot be empty", nameof(email));
-            var existing = await ReadByEmail(normalizedEmail);
-            if (existing != null)
+        return Execute(
+            nameof(Register),
+            async () =>
             {
-                return existing;
-            }
-
-            var user = NUserDocument.Create(normalizedEmail);
-
-            try
-            {
-                await _collection.InsertOneAsync(user);
-                return user.ToUser();
-            }
-            catch (MongoWriteException ex) when (ex.WriteError.Code == 11000)
-            {
-                var registeredUser = await ReadByEmail(normalizedEmail);
-                if (registeredUser != null)
+                var normalizedEmail =
+                    NormalizeEmail(email) ?? throw new ArgumentException("Email cannot be empty", nameof(email));
+                var existing = await ReadByEmail(normalizedEmail);
+                if (existing != null)
                 {
-                    return registeredUser;
+                    return existing;
                 }
-                throw new ApplicationException($"Could not register user '{normalizedEmail}'", ex);
+
+                var user = NUserDocument.Create(normalizedEmail);
+
+                try
+                {
+                    await _collection.InsertOneAsync(user);
+                    return user.ToUser();
+                }
+                catch (MongoWriteException ex) when (ex.WriteError.Code == 11000)
+                {
+                    var registeredUser = await ReadByEmail(normalizedEmail);
+                    if (registeredUser != null)
+                    {
+                        return registeredUser;
+                    }
+                    throw new ApplicationException($"Could not register user '{normalizedEmail}'", ex);
+                }
             }
-        });
+        );
     }
 
     public Task Create(NUserModel item)
     {
-        return Execute(nameof(Create), async () =>
-        {
-            var model = NUserDocument.From(item);
-            model.Email = NormalizeEmail(model.Email) ?? throw new ApplicationException("Email cannot be empty");
+        return Execute(
+            nameof(Create),
+            async () =>
+            {
+                var model = NUserDocument.From(item);
+                model.Email = NormalizeEmail(model.Email) ?? throw new ApplicationException("Email cannot be empty");
 
-            try
-            {
-                await _collection.InsertOneAsync(model);
+                try
+                {
+                    await _collection.InsertOneAsync(model);
+                }
+                catch (MongoWriteException ex) when (ex.WriteError.Code == 11000)
+                {
+                    throw new ApplicationException(
+                        $"Could not insert. Document with ID '{model.Id}' already exists",
+                        ex
+                    );
+                }
             }
-            catch (MongoWriteException ex) when (ex.WriteError.Code == 11000)
-            {
-                throw new ApplicationException($"Could not insert. Document with ID '{model.Id}' already exists", ex);
-            }
-        });
+        );
     }
 
     public Task<IEnumerable<NUserModel>> ReadMany()
     {
-        return Execute(nameof(ReadMany), async () =>
-        {
-            var users = await _collection.Find(_ => true).ToListAsync();
-            return users.Select(x => x.ToUser()).ToArray().AsEnumerable();
-        });
+        return Execute(
+            nameof(ReadMany),
+            async () =>
+            {
+                var users = await _collection.Find(_ => true).ToListAsync();
+                return users.Select(x => x.ToUser()).ToArray().AsEnumerable();
+            }
+        );
     }
 
     static string? NormalizeEmail(string? email)
@@ -141,4 +155,3 @@ public interface IUserRepository
     Task<NUserModel?> ReadByEmail(string email);
     Task<NUserModel> Register(string email);
 }
-
