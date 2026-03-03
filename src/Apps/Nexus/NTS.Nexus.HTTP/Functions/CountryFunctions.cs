@@ -8,7 +8,6 @@ using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -16,63 +15,59 @@ public class CountryFunctions : FunctionBase
 {
     readonly IRepository<CountryModel> _countries;
 
-    public CountryFunctions(
-        IFunctionLogger<CountryFunctions> logger,
-        IRepository<CountryModel> countries,
-        ITelemetryService telemetry
-    )
-        : base(logger, telemetry)
+    public CountryFunctions(IFunctionLogger<CountryFunctions> logger, IRepository<CountryModel> countries)
+        : base(logger)
     {
         _countries = countries;
     }
 
     [Function("countries-insert")]
-    public Task<IActionResult> Insert(
+    public async Task<IActionResult> Insert(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "countries")] HttpRequest request
     )
     {
-        return ExecuteHttp(request, nameof(Insert), async () =>
-        {
-            var country = await ReadBody<Country>(request);
-            if (country == null)
-            {
-                return UnexpectedPayload<Country>();
-            }
+        TagRequest(request);
+        LogInformation(request, nameof(Insert));
 
-            var document = CountryModel.MapFrom(country);
-            await ExecuteWithTelemetry("RepositoryCreate", () => _countries.Create(document));
-            return new OkObjectResult($"Inserted {country}");
-        });
+        var country = await ReadBody<Country>(request);
+        if (country == null)
+        {
+            return UnexpectedPayload<Country>();
+        }
+
+        var document = CountryModel.MapFrom(country);
+        await _countries.Create(document);
+        return new OkObjectResult($"Inserted {country}");
     }
 
     [Function("countries-update")]
-    public Task<IActionResult> Update(
+    public async Task<IActionResult> Update(
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "countries")] HttpRequest request
     )
     {
-        return ExecuteHttp(request, nameof(Update), async () =>
-        {
-            var country = await ReadBody<Country>(request);
-            if (country == null)
-            {
-                return UnexpectedPayload<Country>();
-            }
+        TagRequest(request);
+        LogInformation(request, nameof(Update));
 
-            var document = CountryModel.MapFrom(country);
-            await ExecuteWithTelemetry("RepositoryUpdate", () => _countries.Update(document));
-            return new OkObjectResult($"Updated {country}");
-        });
+        var country = await ReadBody<Country>(request);
+        if (country == null)
+        {
+            return UnexpectedPayload<Country>();
+        }
+
+        var document = CountryModel.MapFrom(country);
+        await _countries.Update(document);
+        return new OkObjectResult($"Updated {country}");
     }
 
     [Function("countries-list")]
-    public Task<IActionResult> List(
+    public async Task<IActionResult> List(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "countries")] HttpRequest request
     )
     {
-        return ExecuteHttp(request, nameof(List), async () =>
-        {
-            var countries = await ExecuteWithTelemetry("RepositoryReadMany", () => _countries.ReadMany().Select(x => x.MapToDomain()));
-            return new OkObjectResult(countries);
-        });
+        TagRequest(request);
+        LogInformation(request, nameof(List));
+
+        var countries = await _countries.ReadMany().Select(x => x.MapToDomain());
+        return new OkObjectResult(countries);
     }
 }

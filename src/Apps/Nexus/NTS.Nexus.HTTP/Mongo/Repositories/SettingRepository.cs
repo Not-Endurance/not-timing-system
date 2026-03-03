@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Shared;
@@ -27,8 +28,9 @@ public class SettingRepository : MongoRepository<SettingModel>
         }
         catch (Exception ex)
         {
-            ex.AttachToCurrentActivity();
+            Activity.Current.TagException(ex);
             throw;
         }
     }
 }
+

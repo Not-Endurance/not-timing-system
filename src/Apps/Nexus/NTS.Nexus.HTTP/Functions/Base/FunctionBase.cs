@@ -10,79 +10,18 @@ namespace NTS.Nexus.HTTP.Functions.Base;
 public abstract class FunctionBase
 {
     readonly IFunctionLogger<FunctionBase> _logger;
-    readonly ITelemetryService _telemetry;
 
-    protected FunctionBase(IFunctionLogger<FunctionBase> logger, ITelemetryService telemetry)
+    protected FunctionBase(IFunctionLogger<FunctionBase> logger)
     {
         _logger = logger;
-        _telemetry = telemetry;
     }
 
-    protected Task<IActionResult> ExecuteHttp(
-        HttpRequest request,
-        string methodName,
-        Func<Task<IActionResult>> action
-    )
+    protected void TagRequest(HttpRequest request)
     {
-        return ExecuteWithTelemetry(methodName, async () =>
-        {
-            Activity.Current?.SetTag("http.request.method", request.Method);
-            Activity.Current?.SetTag("url.path", request.Path.ToString());
-            Activity.Current?.SetTag("url.query", request.QueryString.ToString());
-
-            LogInformation(request, methodName);
-            try
-            {
-                return await action();
-            }
-            catch (Exception ex)
-            {
-                ex.AttachToCurrentActivity();
-                _logger.LogError(request, ex, methodName);
-                throw;
-            }
-        });
-    }
-
-    protected Task<TResult> ExecuteWithTelemetry<TResult>(string methodName, Func<Task<TResult>> action)
-    {
-        return ExecuteWithTelemetry(GetType().Name, methodName, action);
-    }
-
-    protected Task ExecuteWithTelemetry(string methodName, Func<Task> action)
-    {
-        return ExecuteWithTelemetry(
-            methodName,
-            async () =>
-            {
-                await action();
-                return true;
-            }
-        );
-    }
-
-    protected async Task<TResult> ExecuteWithTelemetry<TResult>(
-        string className,
-        string methodName,
-        Func<Task<TResult>> action
-    )
-    {
-        using var activity = _telemetry.StartActivity(className, methodName);
-
-        try
-        {
-            return await action();
-        }
-        catch (Exception ex)
-        {
-            ex.AttachToCurrentActivity();
-            throw;
-        }
-    }
-
-    protected void LogInformation(HttpRequest request)
-    {
-        _logger.LogInformation(request);
+        Activity.Current
+            .Tag("http.request.method", request.Method)
+            .Tag("url.path", request.Path.ToString())
+            .Tag("url.query", request.QueryString.ToString());
     }
 
     protected void LogInformation(HttpRequest request, string methodName)
@@ -95,14 +34,17 @@ public abstract class FunctionBase
         _logger.LogError(request);
     }
 
-    protected Task<TPayload?> ReadBody<TPayload>(HttpRequest request)
+    protected void LogError(HttpRequest request, Exception exception, string methodName)
+    {
+        Activity.Current.TagException(exception);
+        _logger.LogError(request, exception, methodName);
+    }
+
+    protected async Task<TPayload?> ReadBody<TPayload>(HttpRequest request)
         where TPayload : class
     {
-        return ExecuteWithTelemetry(nameof(ReadBody), async () =>
-        {
-            var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-            return requestBody.TryFromJson<TPayload>();
-        });
+        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+        return requestBody.TryFromJson<TPayload>();
     }
 
     protected IActionResult Ok()

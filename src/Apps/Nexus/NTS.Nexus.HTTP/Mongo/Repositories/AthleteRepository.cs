@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Setup;
@@ -30,8 +31,9 @@ public class AthleteRepository : MongoRepository<AthleteModel>
         }
         catch (Exception ex)
         {
-            ex.AttachToCurrentActivity();
+            Activity.Current.TagException(ex);
             throw;
         }
     }
 }
+

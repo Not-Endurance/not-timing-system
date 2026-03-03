@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Storage.Mongo;
@@ -36,8 +37,9 @@ public class UpcomingEventRepository : MongoRepository<UpcomingEventModel>, IRep
         }
         catch (Exception ex)
         {
-            ex.AttachToCurrentActivity();
+            Activity.Current.TagException(ex);
             throw;
         }
     }
 }
+

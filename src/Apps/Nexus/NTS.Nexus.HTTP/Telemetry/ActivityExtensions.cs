@@ -2,14 +2,24 @@ using System.Diagnostics;
 
 namespace NTS.Nexus.HTTP.Telemetry;
 
-internal static class ActivityErrorExtensions
+internal static class ActivityExtensions
 {
-    public static void AttachToCurrentActivity(this Exception exception)
+    public static Activity? Tag(this Activity? activity, string key, object? value)
     {
-        var activity = Activity.Current;
         if (activity == null)
         {
-            return;
+            return null;
+        }
+
+        activity.SetTag(key, value);
+        return activity;
+    }
+
+    public static Activity? TagException(this Activity? activity, Exception exception)
+    {
+        if (activity == null)
+        {
+            return null;
         }
 
         activity.SetStatus(ActivityStatusCode.Error, exception.Message);
@@ -27,5 +37,7 @@ internal static class ActivityErrorExtensions
                 }
             )
         );
+
+        return activity;
     }
 }

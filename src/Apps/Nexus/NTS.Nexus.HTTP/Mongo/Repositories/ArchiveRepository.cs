@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Storage.Mongo;
@@ -33,7 +34,7 @@ public class ArchiveRepository : MongoRepository<ArchiveEntryModel>, IArchiveRep
         }
         catch (Exception ex)
         {
-            ex.AttachToCurrentActivity();
+            Activity.Current.TagException(ex);
             throw;
         }
     }
@@ -51,7 +52,7 @@ public class ArchiveRepository : MongoRepository<ArchiveEntryModel>, IArchiveRep
         }
         catch (Exception ex)
         {
-            ex.AttachToCurrentActivity();
+            Activity.Current.TagException(ex);
             throw;
         }
     }
@@ -61,3 +62,4 @@ public interface IArchiveRepository : IRepository<ArchiveEntryModel>
 {
     Task<IEnumerable<ArchiveEntryModel>> GetPerformances(int horseId);
 }
+
