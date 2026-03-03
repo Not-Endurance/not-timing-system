@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Application.Authentication.User;
 using Not.Injection;
@@ -9,11 +10,9 @@ namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
 public class UserMongoRepository : IUserRepository, ITransient
 {
-    static readonly SemaphoreSlim INDEX_LOCK = new(1, 1);
 
     readonly IMongoCollection<NUserDocument> _collection;
     readonly ITelemetryService _telemetry;
-    static bool _emailIndexInitialized;
 
     public UserMongoRepository(IMongoContext context, ITelemetryService telemetry)
     {
@@ -51,7 +50,6 @@ public class UserMongoRepository : IUserRepository, ITransient
             }
 
             var user = NUserDocument.Create(normalizedEmail);
-            await EnsureEmailIndex();
 
             try
             {
@@ -76,7 +74,6 @@ public class UserMongoRepository : IUserRepository, ITransient
         {
             var model = NUserDocument.From(item);
             model.Email = NormalizeEmail(model.Email) ?? throw new ApplicationException("Email cannot be empty");
-            await EnsureEmailIndex();
 
             try
             {
@@ -108,37 +105,6 @@ public class UserMongoRepository : IUserRepository, ITransient
         return email.Trim().ToLowerInvariant();
     }
 
-    Task EnsureEmailIndex()
-    {
-        return Execute(nameof(EnsureEmailIndex), async () =>
-        {
-            if (_emailIndexInitialized)
-            {
-                return;
-            }
-
-            await INDEX_LOCK.WaitAsync();
-            try
-            {
-                if (_emailIndexInitialized)
-                {
-                    return;
-                }
-
-                var index = new CreateIndexModel<NUserDocument>(
-                    Builders<NUserDocument>.IndexKeys.Ascending(x => x.Email),
-                    new CreateIndexOptions { Unique = true, Name = "email_unique" }
-                );
-                await _collection.Indexes.CreateOneAsync(index);
-                _emailIndexInitialized = true;
-            }
-            finally
-            {
-                INDEX_LOCK.Release();
-            }
-        });
-    }
-
     async Task Execute(string methodName, Func<Task> action)
     {
         using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), methodName);
@@ -149,7 +115,7 @@ public class UserMongoRepository : IUserRepository, ITransient
         }
         catch (Exception ex)
         {
-            ex.AttachToCurrentActivity();
+            Activity.Current.TagException(ex);
             throw;
         }
     }
@@ -164,7 +130,7 @@ public class UserMongoRepository : IUserRepository, ITransient
         }
         catch (Exception ex)
         {
-            ex.AttachToCurrentActivity();
+            Activity.Current.TagException(ex);
             throw;
         }
     }
@@ -175,3 +141,4 @@ public interface IUserRepository
     Task<NUserModel?> ReadByEmail(string email);
     Task<NUserModel> Register(string email);
 }
+
