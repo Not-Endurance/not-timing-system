@@ -21,6 +21,19 @@
 
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script>
+        let environment
+        if (window.location.hostname.includes("localhost")) {
+            environment = "Development";
+        }
+        if (window.location.hostname.includes("lively-rock")) {
+            environment = "Staging";
+        }
+        if (window.location.hostname.includes("production-url")) {
+            environment = "Production";
+        }
+        Blazor.start({ environment: environment });
+    </script>
 </body>
 </html>
