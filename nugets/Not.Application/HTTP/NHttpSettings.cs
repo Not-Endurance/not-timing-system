@@ -2,9 +2,6 @@ namespace Not.Application.HTTP;
 
 public class NHttpSettings
 {
-    const string HTTP = "http";
-    const string HTTPS = "https";
-
     string? _customUrl;
 
     public string? Url
@@ -15,7 +12,7 @@ public class NHttpSettings
 
     public bool UseHttps { get; set; } = true;
     public string? Host { get; set; }
-    public string? Endpoint { get; set; }
+    public string? EndpointPrefix { get; set; }
 
     string? BuildUrl()
     {
@@ -23,10 +20,10 @@ public class NHttpSettings
         {
             return null;
         }
-        var url = $"{(UseHttps ? HTTPS : HTTP)}://{HttpHelper.NormalizeUri(Host)}";
-        if (Endpoint != null)
+        var url = HttpHelper.NormalizeUri(Host);
+        if (EndpointPrefix != null)
         {
-            url = $"{url}/{HttpHelper.NormalizeUri(Endpoint)}";
+            url = $"{url}/{HttpHelper.NormalizeUri(EndpointPrefix)}";
         }
         return url;
     }
