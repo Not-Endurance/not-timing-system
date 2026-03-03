@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Repositories;
+using NTS.Nexus.HTTP.Telemetry;
 using NTS.Witness.Contracts.API;
 
 namespace NTS.Nexus.HTTP.Functions;
@@ -12,43 +13,49 @@ public class UserFunctions : FunctionBase
 {
     readonly IUserRepository _users;
 
-    public UserFunctions(IFunctionLogger<UserFunctions> logger, IUserRepository users)
-        : base(logger)
+    public UserFunctions(
+        IFunctionLogger<UserFunctions> logger,
+        IUserRepository users,
+        ITelemetryService telemetry
+    )
+        : base(logger, telemetry)
     {
         _users = users;
     }
 
     [Function("users-read-by-email")]
-    public async Task<IActionResult> ReadByEmail(
+    public Task<IActionResult> ReadByEmail(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{email}")] HttpRequest request,
         string email
     )
     {
-        LogInformation(request);
-
-        var user = await _users.ReadByEmail(email);
-        if (user == null)
+        return ExecuteHttp(request, nameof(ReadByEmail), async () =>
         {
-            return NotFound(email);
-        }
+            var user = await ExecuteWithTelemetry("RepositoryReadByEmail", () => _users.ReadByEmail(email));
+            if (user == null)
+            {
+                return NotFound(email);
+            }
 
-        return Ok(user);
+            return Ok(user);
+        });
     }
 
     [Function("users-register")]
-    public async Task<IActionResult> Register(
+    public Task<IActionResult> Register(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "users/register")] HttpRequest request
     )
     {
-        LogInformation(request);
-
-        var payload = await ReadBody<RegisterUserPaload>(request);
-        if (string.IsNullOrWhiteSpace(payload?.Email))
+        return ExecuteHttp(request, nameof(Register), async () =>
         {
-            return InvalidPayload($"Value '{payload?.Email}' is not a valid email");
-        }
+            var payload = await ReadBody<RegisterUserPaload>(request);
+            if (string.IsNullOrWhiteSpace(payload?.Email))
+            {
+                return InvalidPayload($"Value '{payload?.Email}' is not a valid email");
+            }
 
-        var user = await _users.Register(payload.Email);
-        return Ok(user);
+            var user = await ExecuteWithTelemetry("RepositoryRegister", () => _users.Register(payload.Email));
+            return Ok(user);
+        });
     }
 }

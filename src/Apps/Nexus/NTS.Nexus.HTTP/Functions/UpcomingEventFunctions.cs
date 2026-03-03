@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using Not.Serialization.JSON;
 using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -16,86 +16,99 @@ public class UpcomingEventFunctions : FunctionBase
 
     public UpcomingEventFunctions(
         IRepository<UpcomingEventModel> upcomingEventRepository,
-        IFunctionLogger<UpcomingEventFunctions> logger
+        IFunctionLogger<UpcomingEventFunctions> logger,
+        ITelemetryService telemetry
     )
-        : base(logger)
+        : base(logger, telemetry)
     {
         _upcomingEvents = upcomingEventRepository;
     }
 
     [Function("upcoming-event-insert")]
-    public async Task<IActionResult> Insert(
+    public Task<IActionResult> Insert(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "upcoming-event")] HttpRequest request
     )
     {
-        LogInformation(request);
+        return ExecuteHttp(request, nameof(Insert), async () =>
+        {
+            var upcomingEvent = await ReadBody<UpcomingEvent>(request);
+            if (upcomingEvent == null)
+            {
+                return UnexpectedPayload<UpcomingEvent>();
+            }
 
-        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
-        var document = UpcomingEventModel.MapFrom(upcomingEvent);
-        await _upcomingEvents.Create(document);
-
-        return new OkObjectResult($"Upcoming event {upcomingEvent.Place} stored successfully.");
+            var document = UpcomingEventModel.MapFrom(upcomingEvent);
+            await ExecuteWithTelemetry("RepositoryCreate", () => _upcomingEvents.Create(document));
+            return new OkObjectResult($"Upcoming event {upcomingEvent.Place} stored successfully.");
+        });
     }
 
     [Function("upcoming-event-list")]
-    public async Task<IActionResult> List(
+    public Task<IActionResult> List(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "upcoming-event")] HttpRequest request
     )
     {
-        LogInformation(request);
-
-        var documents = await _upcomingEvents.ReadMany();
-        var result = documents.Select(x => x.MapToDomain());
-        return new OkObjectResult(result);
+        return ExecuteHttp(request, nameof(List), async () =>
+        {
+            var documents = await ExecuteWithTelemetry("RepositoryReadMany", () => _upcomingEvents.ReadMany());
+            var result = documents.Select(x => x.MapToDomain());
+            return new OkObjectResult(result);
+        });
     }
 
     [Function("upcoming-event-query-by-id")]
-    public async Task<IActionResult> QueryById(
+    public Task<IActionResult> QueryById(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "upcoming-event/{id:int}")] HttpRequest request,
         int id
     )
     {
-        LogInformation(request);
-
-        var document = await _upcomingEvents.Read(id);
-        if (document == null)
+        return ExecuteHttp(request, nameof(QueryById), async () =>
         {
-            return new NotFoundResult();
-        }
+            var document = await ExecuteWithTelemetry("RepositoryRead", () => _upcomingEvents.Read(id));
+            if (document == null)
+            {
+                return new NotFoundResult();
+            }
 
-        return new OkObjectResult(document.MapToDomain());
+            return new OkObjectResult(document.MapToDomain());
+        });
     }
 
     [Function("upcoming-event-update")]
-    public async Task<IActionResult> Update(
+    public Task<IActionResult> Update(
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "upcoming-event")] HttpRequest request
     )
     {
-        LogInformation(request);
+        return ExecuteHttp(request, nameof(Update), async () =>
+        {
+            var upcomingEvent = await ReadBody<UpcomingEvent>(request);
+            if (upcomingEvent == null)
+            {
+                return UnexpectedPayload<UpcomingEvent>();
+            }
 
-        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
-        var document = UpcomingEventModel.MapFrom(upcomingEvent);
-        await _upcomingEvents.Update(document);
-
-        return new OkObjectResult($"Updated upcoming event {upcomingEvent.Place}");
+            var document = UpcomingEventModel.MapFrom(upcomingEvent);
+            await ExecuteWithTelemetry("RepositoryUpdate", () => _upcomingEvents.Update(document));
+            return new OkObjectResult($"Updated upcoming event {upcomingEvent.Place}");
+        });
     }
 
     [Function("upcoming-event-delete")]
-    public async Task<IActionResult> Delete(
+    public Task<IActionResult> Delete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "upcoming-event/{id:int}")] HttpRequest request,
         int id
     )
     {
-        LogInformation(request);
-
-        var upcomingEvent = await _upcomingEvents.Read(id);
-        if (upcomingEvent == null)
+        return ExecuteHttp(request, nameof(Delete), async () =>
         {
-            return new OkObjectResult($"Event with id '{id}' did not exist");
-        }
-        await _upcomingEvents.Delete(upcomingEvent);
-        return new OkObjectResult($"Deleted upcoming event with id '{id}'");
+            var upcomingEvent = await ExecuteWithTelemetry("RepositoryRead", () => _upcomingEvents.Read(id));
+            if (upcomingEvent == null)
+            {
+                return new OkObjectResult($"Event with id '{id}' did not exist");
+            }
+
+            await ExecuteWithTelemetry("RepositoryDelete", () => _upcomingEvents.Delete(upcomingEvent));
+            return new OkObjectResult($"Deleted upcoming event with id '{id}'");
+        });
     }
 }

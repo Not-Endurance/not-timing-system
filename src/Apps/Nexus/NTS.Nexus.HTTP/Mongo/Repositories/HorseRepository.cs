@@ -1,16 +1,32 @@
-﻿using MongoDB.Driver;
+using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Setup;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
 public class HorseRepository : MongoRepository<HorseModel>
 {
-    public HorseRepository(IMongoContext context)
-        : base(context, MongoConstants.NTS_DATABASE, MongoConstants.HORSES_COLLECTION) { }
+    readonly ITelemetryService _telemetry;
+
+    public HorseRepository(IMongoContext context, ITelemetryService telemetry)
+        : base(context, MongoConstants.NTS_DATABASE, MongoConstants.HORSES_COLLECTION)
+    {
+        _telemetry = telemetry;
+    }
 
     protected override UpdateDefinition<HorseModel> GetUpdateDefinition(HorseModel document)
     {
-        return Builders<HorseModel>.Update.Set(x => x.Name, document.Name).Set(x => x.FeiId, document.FeiId);
+        using var activity = _telemetry.StartActivity(nameof(HorseRepository), nameof(GetUpdateDefinition));
+
+        try
+        {
+            return Builders<HorseModel>.Update.Set(x => x.Name, document.Name).Set(x => x.FeiId, document.FeiId);
+        }
+        catch (Exception ex)
+        {
+            ex.AttachToCurrentActivity();
+            throw;
+        }
     }
 }

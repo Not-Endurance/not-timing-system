@@ -1,6 +1,15 @@
 version: "3.8"
 
 services:
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    container_name: aspire-dashboard
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+    ports:
+      - "18888:18888"
+      - "18889:18889"
+
   mongodb:
     image: mongo:6.0
     container_name: mongodb
@@ -16,12 +25,17 @@ services:
       dockerfile: src/Apps/Nexus/NTS.Nexus.HTTP/Dockerfile
     environment:
       MONGO_CONNECTION_STRING: mongodb://mongodb:27017
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://aspire-dashboard:18889
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_ENABLE_CONSOLE_EXPORTER: "true"
+      OTEL_DEBUG_ACTIVITY_SOURCE: "true"
       # CORS
       CORS_ALLOWED_ORIGINS: '["https://localhost:7077","http://localhost:7077"]'
       CORS_SUPPORT_CREDENTIALS: 'true'
       FUNCTIONS_ENABLE_CORS_CONFIGURATION: "1"
       CONTAINER_NAME: "local"
     depends_on:
+      - aspire-dashboard
       - mongodb
     ports:
       - "8080:80"
