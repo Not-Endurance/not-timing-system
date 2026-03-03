@@ -25,7 +25,7 @@ public static class OptionServiceCollectionExtensions
         services
             .AddOptions<T>()
             .Bind(section)
-            .Validate(validator, $"Section '{name}' is required and not found in appsettings")
+            .Validate(validator, $"Section '{name}' is required and missing or invalid")
             .ValidateOnStart();
         return services;
     }

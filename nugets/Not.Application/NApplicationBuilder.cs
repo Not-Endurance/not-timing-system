@@ -1,5 +1,4 @@
 using System.Reflection;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Configurations;
@@ -25,7 +24,7 @@ public class NApplicationBuilder
     {
         _services.AddHttpClient();
         _services.AddTransient<NHttpClient>();
-        _services.AddSettings<NHttpSettings>(_configuration, x => !string.IsNullOrWhiteSpace(x.Host));
+        _services.AddSettings<NHttpSettings>(_configuration, x => !string.IsNullOrWhiteSpace(x.Url));
         return this;
     }
 
