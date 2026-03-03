@@ -16,14 +16,20 @@ public static class OptionServiceCollectionExtensions
     public static IServiceCollection AddSettings<T>(
         this IServiceCollection services,
         IConfiguration configuration,
-        Func<T, bool> validator
+        Func<T, bool> validator,
+        Action<T>? configure = null
     )
         where T : class
     {
         var name = typeof(T).Name;
         var section = configuration.GetSection(name);
-        services
-            .AddOptions<T>()
+
+        var builder = services.AddOptions<T>().Bind(section);
+        if (configure != null)
+        {
+            builder.Configure(configure);
+        }
+        builder
             .Bind(section)
             .Validate(validator, $"Section '{name}' is required and missing or invalid")
             .ValidateOnStart();

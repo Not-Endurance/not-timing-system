@@ -27,10 +27,10 @@
         if (window.location.hostname.includes("localhost")) {
             environment = "Development";
         }
-        if (window.location.hostname.includes("lively-rock")) {
+        else if (window.location.hostname.includes("lively-rock")) {
             environment = "Staging";
         }
-        if (window.location.hostname.includes("production-url")) {
+        else if (window.location.hostname.includes("production-url")) {
             environment = "Production";
         }
         Blazor.start({ environment: environment });

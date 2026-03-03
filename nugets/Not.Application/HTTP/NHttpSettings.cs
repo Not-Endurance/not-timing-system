@@ -1,5 +1,3 @@
-using Not.Application.Configurations;
-
 namespace Not.Application.HTTP;
 
 public class NHttpSettings
@@ -12,12 +10,12 @@ public class NHttpSettings
     public string? Url
     {
         get => _customUrl ?? BuildUrl();
-        init => _customUrl = value;
+        set => _customUrl = value;
     }
 
-    public bool UseHttps { get; init; } = true;
-    public string? Host { get; init; }
-    public string? Endpoint { get; init; }
+    public bool UseHttps { get; set; } = true;
+    public string? Host { get; set; }
+    public string? Endpoint { get; set; }
 
     string? BuildUrl()
     {

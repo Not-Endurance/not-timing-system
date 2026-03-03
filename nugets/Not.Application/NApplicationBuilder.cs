@@ -20,11 +20,11 @@ public class NApplicationBuilder
         _configuration = configuration;
     }
 
-    public NApplicationBuilder AddHttp()
+    public NApplicationBuilder AddHttp(Action<NHttpSettings>? configure = null)
     {
         _services.AddHttpClient();
         _services.AddTransient<NHttpClient>();
-        _services.AddSettings<NHttpSettings>(_configuration, x => !string.IsNullOrWhiteSpace(x.Url));
+        _services.AddSettings(_configuration, x => !string.IsNullOrWhiteSpace(x.Url), configure);
         return this;
     }
 
