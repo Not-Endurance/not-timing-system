@@ -6,8 +6,6 @@ public static class EnvironmentHelper
     const string IS_LOCALHOST_VARIABLE = "IS_LOCALHOST";
     public const string DEVELOPMENT = "Development";
     public const string LOCALHOST = "Localhost";
-    public const string STAGING = "Staging";
-    public const string PRODUCTION = "Production";
 
     public static bool UsesLocalhostInfrastructure()
     {

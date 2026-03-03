@@ -11,6 +11,9 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddNtsWitness(builder.Configuration, builder.HostEnvironment.BaseAddress);
 
+Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
+Console.WriteLine($"WasmApplicationEnvironmentName: {Environment.GetEnvironmentVariable("WasmApplicationEnvironmentName")}");
+
 var host = builder.Build();
 await host.Services.Startup();
 await host.RunAsync();
