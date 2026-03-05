@@ -3,5 +3,4 @@
 public interface IKrudFormModel
 {
     int? Id { get; }
-
 }

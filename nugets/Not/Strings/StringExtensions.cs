@@ -55,5 +55,6 @@ public static class StringExtensions
             return format;
         }
     }
+
     static INotifier Notifier => ServiceLocator.Get<INotifier>();
 }

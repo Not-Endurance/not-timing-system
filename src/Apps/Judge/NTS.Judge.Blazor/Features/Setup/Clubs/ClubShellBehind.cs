@@ -3,6 +3,4 @@ using NTS.Judge.Features.Setup.Clubs;
 
 namespace NTS.Judge.Blazor.Features.Setup.Clubs;
 
-public class ClubShellBehind : KrudShell<ClubFormModel>
-{
-}
+public class ClubShellBehind : KrudShell<ClubFormModel> { }

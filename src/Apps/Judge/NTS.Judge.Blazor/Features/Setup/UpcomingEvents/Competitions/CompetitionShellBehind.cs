@@ -16,8 +16,8 @@ public class CompetitionShellBehind : KrudShell<CompetitionFormModel>
     }
 
     protected PatternMask TimeMask { get; }
-    
-    protected List<NotListModel<CompetitionType>> Types { get; } 
+
+    protected List<NotListModel<CompetitionType>> Types { get; }
 
     protected List<NotListModel<CompetitionRuleset>> Rules { get; }
 }

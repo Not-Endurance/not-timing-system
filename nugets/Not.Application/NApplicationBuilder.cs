@@ -42,9 +42,9 @@ public class NApplicationBuilder
     public NApplicationBuilder AddDomainEvents()
     {
         _services.AddMediatR(config =>
-            config.RegisterServicesFromAssembly(typeof(NApplicationBuilder).Assembly).RegisterServicesFromAssembly(
-                Assembly.GetCallingAssembly()
-            )
+            config
+                .RegisterServicesFromAssembly(typeof(NApplicationBuilder).Assembly)
+                .RegisterServicesFromAssembly(Assembly.GetCallingAssembly())
         );
         _services.AddTransient<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
         return this;

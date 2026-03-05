@@ -9,7 +9,7 @@ namespace NTS.Domain.Core.Aggregates;
 
 public class Participation : Aggregate
 {
-    //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);    
+    //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
     static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);
     static readonly FailedToQualify SPEED_RESTRICTION = new([FailToQualifyCode.SP]);
 
@@ -153,7 +153,7 @@ public class Participation : Aggregate
         {
             Restore();
         }
-        if (! phase.IsComplete())
+        if (!phase.IsComplete())
         {
             return;
         }

@@ -8,5 +8,4 @@ public abstract class NSwitchBehind : MudSwitch<bool>
     {
         Color = Color.Primary;
     }
-
 }

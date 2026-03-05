@@ -3,7 +3,7 @@ using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Inspections;
 
-public class InspectionsPanelBehind : NStatefulComponent 
+public class InspectionsPanelBehind : NStatefulComponent
 {
     [Inject]
     IInspectionService Service { get; set; } = default!;

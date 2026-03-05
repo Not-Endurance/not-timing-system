@@ -231,7 +231,6 @@ public static class SafeHelper
         //#endif
     }
 
-
 #pragma warning disable IDE0051 // Used in RELEASE build
     static void WriteToTraceConsole(Exception exception)
 #pragma warning restore IDE0051
@@ -250,4 +249,3 @@ public static class SafeHelper
         Trace.WriteLine(message, "console");
     }
 }
-

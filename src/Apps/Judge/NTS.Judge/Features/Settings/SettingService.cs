@@ -10,10 +10,7 @@ public class SettingService : NStatefulService, ISettingService, IKrudFormServic
     readonly ISettingRepository _repository;
     readonly IEnumerable<IKrudMirror<Setting>> _reflections;
 
-    public SettingService(
-        ISettingRepository repository,
-        IEnumerable<IKrudMirror<Setting>> reflections
-    )
+    public SettingService(ISettingRepository repository, IEnumerable<IKrudMirror<Setting>> reflections)
     {
         _repository = repository;
         _reflections = reflections;

@@ -31,7 +31,7 @@ public record CustomRankingModel : KrudFormModel<Ranking>
     {
         // Do not assign ID, as in this case even if we want to map from existing
         // entry we want to copy the values and always perform Create on submit
-        // Same goes for Name - we want to prompt the user to provide name. 
+        // Same goes for Name - we want to prompt the user to provide name.
         // TODO: above commends suggest this should be a separate flow
         Ruleset = ranking.Ruleset;
         Type = ranking.Type;
