@@ -25,10 +25,17 @@ public class SocketStatusBehind : NComponent, IDisposable
 
     protected override void OnInitialized()
     {
-        _timer.Start();
+        try
+        {
+            _timer.Start();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
-    protected Color GetSpinnerColor()
+    protected Color GetSpinnerColorSafe()
     {
         if (SocketContext.Status == SocketConnectionStatus.Disconnected)
         {

@@ -36,8 +36,8 @@ public class UserMongoRepository : IUserRepository, ITransient
     {
         using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(Register));
 
-        var normalizedEmail =
-            NormalizeEmail(email) ?? throw new ArgumentException("Email cannot be empty", nameof(email));
+        var normalizedEmail = NormalizeEmail(email)
+            ?? throw new ArgumentException("Email cannot be empty", nameof(email));
         var existing = await ReadByEmail(normalizedEmail);
         if (existing != null)
         {
@@ -53,12 +53,6 @@ public class UserMongoRepository : IUserRepository, ITransient
         }
         catch (MongoWriteException ex) when (ex.WriteError.Code == 11000)
         {
-            var registeredUser = await ReadByEmail(normalizedEmail);
-            if (registeredUser != null)
-            {
-                return registeredUser;
-            }
-
             throw new ApplicationException($"Could not register user '{normalizedEmail}'", ex);
         }
     }
@@ -80,17 +74,9 @@ public class UserMongoRepository : IUserRepository, ITransient
         }
     }
 
-    public async Task<IEnumerable<NUserModel>> ReadMany()
-    {
-        using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(ReadMany));
-
-        var users = await GetCollection().Find(_ => true).ToListAsync();
-        return users.Select(x => x.ToUser()).ToArray().AsEnumerable();
-    }
-
     IMongoCollection<NUserDocument> GetCollection()
     {
-        return _context.Client.GetDatabase(MongoConstants.NTS_DATABASE).GetCollection<T>(MongoConstants.USERS_COLLECTION);
+        return _context.Client.GetDatabase(MongoConstants.NTS_DATABASE).GetCollection<NUserDocument>(MongoConstants.USERS_COLLECTION);
     }
 
     static string? NormalizeEmail(string? email)
@@ -102,7 +88,6 @@ public class UserMongoRepository : IUserRepository, ITransient
 
         return email.Trim().ToLowerInvariant();
     }
-
 }
 
 public interface IUserRepository

@@ -14,12 +14,12 @@ public class CombinationShellBehind : KrudShell<CombinationFormModel>
     [Inject]
     IListBehind<Horse> HorsesService { get; set; } = default!;
 
-    protected async Task<IEnumerable<Athlete?>> SearchAthletes(string term, CancellationToken _)
+    protected async Task<IEnumerable<Athlete?>> SearchAthletesSafe(string term, CancellationToken _)
     {
         return Search(await AthletesService.ReadMany(), term);
     }
 
-    protected async Task<IEnumerable<Horse?>> SearchHorses(string term, CancellationToken _)
+    protected async Task<IEnumerable<Horse?>> SearchHorsesSafe(string term, CancellationToken _)
     {
         return Search(await HorsesService.ReadMany(), term);
     }

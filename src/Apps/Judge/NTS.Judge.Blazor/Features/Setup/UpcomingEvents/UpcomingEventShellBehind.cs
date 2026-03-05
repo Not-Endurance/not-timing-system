@@ -10,7 +10,7 @@ public class UpcomingEventShellBehind : KrudShell<UpcomingEventFormModel>
     [Inject]
     ISeeker<Country> Countries { get; set; } = default!;
 
-    protected async Task<IEnumerable<Country?>> SearchCountries(string term, CancellationToken ct)
+    protected async Task<IEnumerable<Country?>> SearchCountriesSafe(string term, CancellationToken ct)
     {
         return await Countries.Search(term, ct);
     }

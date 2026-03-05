@@ -31,4 +31,3 @@ public class ClubRepository : MongoRepository<ClubModel>
         }
     }
 }
-

@@ -24,8 +24,6 @@ public class NavMenuBehind : NStatefulComponent
 
     protected override async Task OnInitializedAsync()
     {
-        // Necessary in order to initialize the settings on startup
-        // TODO: what do if no internet?
         await Observe(SettingService);
         await Observe(TimingStateService);
     }

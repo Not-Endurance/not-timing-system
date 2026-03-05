@@ -8,7 +8,7 @@
 <KrudForm Shell="this">
     <NNumberField @bind-Value="Model.Number" For="() => Model.Number" Min="0" Label="@Combination_Number_string" />
 
-    <NAutocomplete @bind-Value="Model.Athlete" For="() => Model.Athlete" Label="@Athlete_string" SearchSafe="SearchAthletes" />
+    <NAutocomplete @bind-Value="Model.Athlete" For="() => Model.Athlete" Label="@Athlete_string" SearchSafe="SearchAthletesSafe" />
 
-    <NAutocomplete @bind-Value="Model.Horse" For="() => Model.Horse" Label="@Horse_string" SearchSafe="SearchHorses"/>
+    <NAutocomplete @bind-Value="Model.Horse" For="() => Model.Horse" Label="@Horse_string" SearchSafe="SearchHorsesSafe"/>
 </KrudForm>

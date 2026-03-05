@@ -40,19 +40,6 @@ public class ImageBrowserBehind : NComponent
         }
     }
 
-    protected void LoadImages()
-    {
-        if (!Directory.Exists(ImagesFolder))
-        {
-            Directory.CreateDirectory(ImagesFolder);
-        }
-
-        _images = Directory
-            .GetFiles(ImagesFolder)
-            .Where(f => new[] { ".png", ".jpg", ".jpeg", ".gif" }.Contains(Path.GetExtension(f).ToLower()))
-            .ToList();
-    }
-
     protected string GetBase64Image(string imagePath)
     {
         try
@@ -159,5 +146,18 @@ public class ImageBrowserBehind : NComponent
         {
             Handle(ex);
         }
+    }
+
+    void LoadImages()
+    {
+        if (!Directory.Exists(ImagesFolder))
+        {
+            Directory.CreateDirectory(ImagesFolder);
+        }
+
+        _images = Directory
+            .GetFiles(ImagesFolder)
+            .Where(f => new[] { ".png", ".jpg", ".jpeg", ".gif" }.Contains(Path.GetExtension(f).ToLower()))
+            .ToList();
     }
 }

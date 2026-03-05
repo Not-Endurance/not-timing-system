@@ -62,10 +62,8 @@ internal static class NtsNexusApiServices
                     builder.AddOtlpExporter();
                 }
 
-                var enableConsoleExporter = bool.TryParse(
-                        Environment.GetEnvironmentVariable("OTEL_ENABLE_CONSOLE_EXPORTER"),
-                        out var enabled
-                    )
+                var enableConsoleExporter =
+                    bool.TryParse(Environment.GetEnvironmentVariable("OTEL_ENABLE_CONSOLE_EXPORTER"), out var enabled)
                     && enabled;
                 if (enableConsoleExporter)
                 {

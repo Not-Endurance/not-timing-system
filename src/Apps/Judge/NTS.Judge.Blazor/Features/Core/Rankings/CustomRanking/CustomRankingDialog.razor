@@ -14,25 +14,24 @@
     <DialogContent>
         <MudStack Spacing="2">
             <MudContainer Class="not-page-mid-width">
-                <NSelect T="Ranking" @bind-Value="TemplateRanking" Items="@TemplateRankings" Label="@Template_ranking_string" />
+                <NSelect T="Ranking" @bind-Value="Template" Items="@TemplateRankings" Label="@Template_ranking_string" />
 
                 <MudText Typo="Typo.body2" Color="Color.Info" HtmlTag="i">*@Optionally_select_existing_ranking_to_prepopulate_the_form_string</MudText>
 
                 <MudStack Row AlignItems="AlignItems.Center">
-                    <NAutocomplete @bind-Value="EntryToAdd.Participation" SearchSafe="SearchParticipations" Label="@Select_participation_to_add_string"/>
+                    <NAutocomplete @bind-Value="EntryToAdd.Participation" SearchSafe="SearchParticipationsSafe" Label="@Select_participation_to_add_string"/>
 
                     <NSwitch @bind-Value="EntryToAdd.IsNotRanked" Label="@Is_not_ranked_string"/>
 
-                    <NButtonSecondary Text="@Add_string" Variant="Variant.Outlined" Size="Size.Medium" OnClick="AddEntry"/>
+                    <NButtonSecondary Text="@Add_string" Variant="Variant.Outlined" Size="Size.Medium" OnClick="AddParticipation"/>
                 </MudStack>    
             </MudContainer>
 
-            <NList Items="RankingModel.Entries" Delete="DeleteSafe" Title="@Participations_string" />
+            <NList Items="CustomModel.Entries" DeleteSafe="RemoveParticipationSafe" Title="@Participations_string" />
 
             <NHeadline3 Content="@Settings_string" Align="Align.Left"/>
 
-            <CustomRankingShell Model="RankingModel" OnSubmit="CloseDialog" />
+            <CustomRankingShell Model="CustomModel" OnSubmit="CloseDialog" />
         </MudStack>
     </DialogContent>
 </MudDialog>
-

@@ -62,4 +62,3 @@ public interface IArchiveRepository : IRepository<ArchiveEntryModel>
 {
     Task<IEnumerable<ArchiveEntryModel>> GetPerformances(int horseId);
 }
-

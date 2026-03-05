@@ -22,23 +22,37 @@ public abstract class ParticipationChipsBehind : NStatefulComponent
 
     protected Task Select(Participation participation)
     {
-        RecentService.Selected = participation;
+        try
+        {
+            RecentService.Selected = participation;
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
         return Task.CompletedTask;
     }
 
     protected Color GetColor(Participation participation)
     {
-        if (RecentService.RecentlyTimed.Contains(participation.Combination.Number))
+        try
         {
-            return Color.Warning;
+            if (RecentService.RecentlyTimed.Contains(participation.Combination.Number))
+            {
+                return Color.Warning;
+            }
+            if (participation.IsEliminated())
+            {
+                return Color.Error;
+            }
+            if (participation.IsComplete())
+            {
+                return Color.Success;
+            }
         }
-        if (participation.IsEliminated())
+        catch (Exception ex)
         {
-            return Color.Error;
-        }
-        if (participation.IsComplete())
-        {
-            return Color.Success;
+            Handle(ex);
         }
         return Color.Primary;
     }

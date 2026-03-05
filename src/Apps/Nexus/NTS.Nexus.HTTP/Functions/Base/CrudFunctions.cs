@@ -11,11 +11,7 @@ public class CrudFunctions<T> : FunctionBase
 {
     readonly IRepository<T> _repository;
 
-    public CrudFunctions(
-        IFunctionLogger<CrudFunctions<T>> logger,
-        IRepository<T> repository,
-        ITelemetryService telemetry
-    )
+    public CrudFunctions(IFunctionLogger<CrudFunctions<T>> logger, IRepository<T> repository, ITelemetryService telemetry)
         : base(logger, telemetry)
     {
         _repository = repository;
@@ -33,7 +29,7 @@ public class CrudFunctions<T> : FunctionBase
         return Ok();
     }
 
-    protected async Task<IActionResult> InternalRead(HttpRequest request, int id)
+    protected async Task<IActionResult> InternalRead(HttpRequest _, int id)
     {
         var result = await _repository.Read(id);
         if (result == null)
@@ -44,7 +40,7 @@ public class CrudFunctions<T> : FunctionBase
         return Ok(result);
     }
 
-    protected async Task<IActionResult> InternalReadMany(HttpRequest request)
+    protected async Task<IActionResult> InternalReadMany(HttpRequest _)
     {
         var result = await _repository.ReadMany();
         return Ok(result);
@@ -62,7 +58,7 @@ public class CrudFunctions<T> : FunctionBase
         return Ok();
     }
 
-    protected async Task<IActionResult> InternalDelete(HttpRequest request, int id)
+    protected async Task<IActionResult> InternalDelete(HttpRequest _, int id)
     {
         var result = await _repository.Read(id);
         if (result == null)

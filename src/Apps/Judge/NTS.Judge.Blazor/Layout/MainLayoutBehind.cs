@@ -1,4 +1,5 @@
 using Not.Blazor.Components.Layout;
+using Not.Safe;
 using Not.Startup;
 
 namespace NTS.Judge.Blazor.Layout;
@@ -10,9 +11,16 @@ public class MainLayoutBehind : NLayoutBehind
 
     protected override async Task OnInitializedAsync()
     {
-        foreach (var initializer in AsyncInitializers)
+        try
         {
-            await initializer.RunAtStartupAsync();
+            foreach (var initializer in AsyncInitializers)
+            {
+                await initializer.RunAtStartupAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            SafeHelper.HandleException(ex);
         }
     }
 }

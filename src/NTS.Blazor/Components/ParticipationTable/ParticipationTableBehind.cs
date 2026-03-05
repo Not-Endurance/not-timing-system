@@ -34,21 +34,24 @@ public class ParticipationTableBehind : NComponent
 
     protected override void OnParametersSet()
     {
-        AnyRepresentation = Phases != null && Phases.Any(x => x.IsReinspectionRequested);
-        AnyRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionRequested);
-        AnyCompulsoryRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionCompulsory);
-        FlipAxis();
-    }
+        try
+        {
+            AnyRepresentation = Phases != null && Phases.Any(x => x.IsReinspectionRequested);
+            AnyRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionRequested);
+            AnyCompulsoryRequiredInspection = Phases != null && Phases.Any(x => x.IsRequiredInspectionCompulsory);
 
-    protected void FlipAxis()
-    {
-        if (AlignVertically)
-        {
-            AxisClass = "size-xs";
+            if (AlignVertically)
+            {
+                AxisClass = "size-xs";
+            }
+            else
+            {
+                AxisClass = FLIPPED_AXIS_CLASS;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            AxisClass = FLIPPED_AXIS_CLASS;
+            Handle(ex);
         }
     }
 

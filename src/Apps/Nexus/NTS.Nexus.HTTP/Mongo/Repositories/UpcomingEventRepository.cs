@@ -42,4 +42,3 @@ public class UpcomingEventRepository : MongoRepository<UpcomingEventModel>, IRep
         }
     }
 }
-

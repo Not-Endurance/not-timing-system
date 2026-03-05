@@ -69,37 +69,22 @@ public class JudgeRpcClient
         return coreParticipations;
     }
 
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    public async Task Handle(PhaseCompleted completed, CancellationToken cancellationToken)
     {
-        return OnPhaseCompleted(notification);
+        var request = WarpRequest.Create(GetGroupId(), completed);
+        await _hubProcedures.OnPhaseCompleted(request);
     }
 
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        return OnParticipationEliminated(notification);
-    }
-
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
-        return OnParticipationRestored(notification);
-    }
-
-    public async Task OnParticipationEliminated(ParticipationEliminated eliminated)
+    public async Task Handle(ParticipationEliminated eliminated, CancellationToken cancellationToken)
     {
         var request = WarpRequest.Create(GetGroupId(), eliminated);
         await _hubProcedures.OnParticipationEliminated(request);
     }
 
-    public async Task OnParticipationRestored(ParticipationRestored restored)
+    public async Task Handle(ParticipationRestored restored, CancellationToken cancellationToken)
     {
         var request = WarpRequest.Create(GetGroupId(), restored);
         await _hubProcedures.OnParticipationRestored(request);
-    }
-
-    public async Task OnPhaseCompleted(PhaseCompleted phaseCompleted)
-    {
-        var request = WarpRequest.Create(GetGroupId(), phaseCompleted);
-        await _hubProcedures.OnPhaseCompleted(request);
     }
 
     string GetGroupId()

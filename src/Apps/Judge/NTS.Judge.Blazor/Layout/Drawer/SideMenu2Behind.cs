@@ -21,17 +21,31 @@ public class SideMenu2Behind : NStatefulComponent
 
     protected async Task Start()
     {
-        await Service.StartTiming();
+        try
+        {
+            await Service.StartTiming();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected async Task OpenSoftResetDialog()
     {
-        var dialog = await DialogService.ShowAsync<SoftResetDialog>();
-        if (await dialog.IsCanceled())
+        try
         {
-            return;
+            var dialog = await DialogService.ShowAsync<SoftResetDialog>();
+            if (await dialog.IsCanceled())
+            {
+                return;
+            }
+            NavManager.NavigateTo(Routes.HOME, forceLoad: true);
         }
-        NavManager.NavigateTo(Routes.HOME, forceLoad: true);
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected override async Task OnInitializedAsync()

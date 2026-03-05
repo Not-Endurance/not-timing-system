@@ -25,6 +25,11 @@ public abstract class MongoRepository<T> : IRepository<T>
 
     protected abstract UpdateDefinition<T> GetUpdateDefinition(T document);
 
+    protected IMongoCollection<T> GetCollection()
+    {
+        return _context.Client.GetDatabase(_db).GetCollection<T>(_collection);
+    }
+
     public async Task Create(T item)
     {
         using var activity = StartActivity(nameof(Create));
@@ -106,11 +111,6 @@ public abstract class MongoRepository<T> : IRepository<T>
         throw new NotImplementedException(
             "Batch delete with full entities isn't supported. Probably remove this method"
         );
-    }
-
-    IMongoCollection<T> GetCollection()
-    {
-        return _context.Client.GetDatabase(_db).GetCollection<T>(_collection);
     }
 
     Activity? StartActivity(string methodName)

@@ -34,4 +34,3 @@ public class CountryRepository : MongoRepository<CountryModel>
         }
     }
 }
-

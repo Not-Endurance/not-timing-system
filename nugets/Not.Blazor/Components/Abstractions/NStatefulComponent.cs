@@ -11,10 +11,17 @@ public class NStatefulComponent : NComponent, IDisposable
 
     protected async Task Observe(IStatefulService statefulService)
     {
-        await statefulService.Load();
-        IsLoading = false;
-        await InvokeRender();
-        InternalObserve(statefulService);
+        try
+        {
+            await statefulService.Load();
+            IsLoading = false;
+            await InvokeRender();
+            InternalObserve(statefulService);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     public virtual void Dispose()

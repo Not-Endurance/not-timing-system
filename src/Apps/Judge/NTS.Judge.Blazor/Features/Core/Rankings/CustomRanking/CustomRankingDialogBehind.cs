@@ -1,7 +1,5 @@
 using Not.Application.CRUD.Ports;
-using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Dialogs.Abstractions;
-using Not.Safe;
 using Not.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Features.Core.Rankings.CustomRankings;
@@ -20,53 +18,51 @@ public class CustomRankingDialogBehind : NDialog<CustomRankingModel>
 
     protected List<NotListModel<Ranking>> TemplateRankings { get; set; } = [];
 
-    public Ranking? TemplateRanking
+    public Ranking? Template
     {
         get => _templateRanking;
         set
         {
             _templateRanking = value;
-            CombineRankings(_templateRanking);
+            if (value != null)
+            {
+                CustomModel = new CustomRankingModel(value);
+            }
         }
     }
 
-    public CustomRankingModel RankingModel { get; set; } = new();
+    public CustomRankingModel CustomModel { get; set; } = new();
     public CustomRankingEntryModel EntryToAdd { get; set; } = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        var listRankings = await ListRankings();
-        TemplateRankings = NotListModel.FromEntity<Ranking>(listRankings).ToList();
+        try
+        {
+            var listRankings = await Rankings.ReadMany();
+            TemplateRankings = NotListModel.FromEntity(listRankings).ToList();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected Task<IEnumerable<RankingEntry>> GetRankingEntries()
     {
-        return Task.FromResult(RankingModel.Entries.AsEnumerable());
+        return Task.FromResult(CustomModel.Entries.AsEnumerable());
     }
 
-    protected Task CombineRankings(Ranking? ranking) // TODO: split this into template and add participants
+    protected Task AddParticipants(Ranking ranking)
     {
         try
         {
-            if (ranking == null)
+            if (ranking == null || CustomModel == null)
             {
                 return Task.CompletedTask;
             }
-            if (
-                RankingModel.Name == null
-                || RankingModel.Category == null
-                || RankingModel.Ruleset == null
-                || RankingModel.Type == null
-            )
+            foreach (var entry in ranking.Entries)
             {
-                RankingModel = new CustomRankingModel(ranking);
-            }
-            else
-            {
-                foreach (var entry in ranking.Entries)
-                {
-                    RankingModel.Entries.Add(entry);
-                }
+                CustomModel.Entries.Add(entry);
             }
         }
         catch (Exception ex)
@@ -77,30 +73,29 @@ public class CustomRankingDialogBehind : NDialog<CustomRankingModel>
         return Task.CompletedTask;
     }
 
-    protected Task DeleteSafe(RankingEntry entry)
+    protected Task RemoveParticipationSafe(RankingEntry entry)
     {
-        RankingModel.Entries.Remove(entry);
+        CustomModel.Entries.Remove(entry);
         return Task.CompletedTask;
     }
 
-    public async Task<IEnumerable<Ranking>> ListRankings()
+    protected Task AddParticipation()
     {
-        return await SafeHelper.Run(Rankings.ReadMany);
+        try
+        {
+            var entry = new RankingEntry(EntryToAdd.Participation, null, EntryToAdd.IsNotRanked);
+            CustomModel.Entries.Add(entry);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+        return Task.CompletedTask;
     }
 
-    public async Task<IEnumerable<Participation?>> SearchParticipations(string term, CancellationToken _)
+    protected async Task<IEnumerable<Participation?>> SearchParticipationsSafe(string term, CancellationToken _)
     {
         // TODO: convert to IRepository.Search
         return await Participations.ReadMany(x => x.ToString().Contains(term));
-    }
-
-    public Task AddEntry()
-    {
-        SafeHelper.Run(() =>
-        {
-            var entry = new RankingEntry(EntryToAdd.Participation, null, EntryToAdd.IsNotRanked);
-            RankingModel.Entries.Add(entry);
-        });
-        return Task.CompletedTask;
     }
 }

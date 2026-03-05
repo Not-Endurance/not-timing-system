@@ -11,7 +11,7 @@
 
     <MudSpacer/>
 
-    @if (Create != null)
+    @if (CreateSafe != null)
     {
         <NButtonCreate Variant="Variant.Outlined" OnClick="OnCreate"/>
     }
@@ -35,11 +35,11 @@
 
                 <MudSpacer />
 
-                @if (Update != null)
+                @if (UpdateSafe != null)
                 {
                     <NIconUpdate OnClick="() => OnUpdate(item)" />
                 }
-                @if (Delete != null)
+                @if (DeleteSafe != null)
                 {
                     <NIconDelete OnClick="() => OnDelete(item)" />
                 }
