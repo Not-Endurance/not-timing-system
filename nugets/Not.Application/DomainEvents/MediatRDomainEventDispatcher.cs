@@ -35,13 +35,13 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
         {
             await _publisher.Publish(@event, ct);
         }
-        catch (ValidationException validation)
+        catch (Not.Exceptions.ValidationException validation)
         {
             var message = $"""
                 Validation was suppressed while dispatching '{@event.GetType().Name}' in RELEASE.
                 Message: {validation.Message}
                 """;
-            LoggingHelper.Debug(message);
+            Not.Logging.LoggingHelper.Debug(message);
         }
 #endif
     }
