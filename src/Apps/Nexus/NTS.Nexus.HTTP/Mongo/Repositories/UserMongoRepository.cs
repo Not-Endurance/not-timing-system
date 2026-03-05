@@ -36,8 +36,8 @@ public class UserMongoRepository : IUserRepository, ITransient
     {
         using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(Register));
 
-        var normalizedEmail = NormalizeEmail(email)
-            ?? throw new ArgumentException("Email cannot be empty", nameof(email));
+        var normalizedEmail =
+            NormalizeEmail(email) ?? throw new ArgumentException("Email cannot be empty", nameof(email));
         var existing = await ReadByEmail(normalizedEmail);
         if (existing != null)
         {
@@ -76,7 +76,9 @@ public class UserMongoRepository : IUserRepository, ITransient
 
     IMongoCollection<NUserDocument> GetCollection()
     {
-        return _context.Client.GetDatabase(MongoConstants.NTS_DATABASE).GetCollection<NUserDocument>(MongoConstants.USERS_COLLECTION);
+        return _context
+            .Client.GetDatabase(MongoConstants.NTS_DATABASE)
+            .GetCollection<NUserDocument>(MongoConstants.USERS_COLLECTION);
     }
 
     static string? NormalizeEmail(string? email)

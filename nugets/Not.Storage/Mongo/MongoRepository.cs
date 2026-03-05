@@ -22,7 +22,6 @@ public abstract class MongoRepository<T> : IRepository<T>
         _collection = collection;
     }
 
-
     protected abstract UpdateDefinition<T> GetUpdateDefinition(T document);
 
     protected IMongoCollection<T> GetCollection()
