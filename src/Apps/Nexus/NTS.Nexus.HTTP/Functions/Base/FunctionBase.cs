@@ -10,10 +10,17 @@ namespace NTS.Nexus.HTTP.Functions.Base;
 public abstract class FunctionBase
 {
     readonly IFunctionLogger<FunctionBase> _logger;
+    readonly ITelemetryService _telemetry;
 
-    protected FunctionBase(IFunctionLogger<FunctionBase> logger)
+    protected FunctionBase(IFunctionLogger<FunctionBase> logger, ITelemetryService telemetry)
     {
         _logger = logger;
+        _telemetry = telemetry;
+    }
+
+    protected Activity? StartFunctionActivity(string methodName)
+    {
+        return _telemetry.StartActivity(GetType().Name, methodName);
     }
 
     protected void TagRequest(HttpRequest request)

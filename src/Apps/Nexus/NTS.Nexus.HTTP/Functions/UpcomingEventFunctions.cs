@@ -6,6 +6,7 @@ using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -15,9 +16,10 @@ public class UpcomingEventFunctions : FunctionBase
 
     public UpcomingEventFunctions(
         IRepository<UpcomingEventModel> upcomingEventRepository,
-        IFunctionLogger<UpcomingEventFunctions> logger
+        IFunctionLogger<UpcomingEventFunctions> logger,
+        ITelemetryService telemetry
     )
-        : base(logger)
+        : base(logger, telemetry)
     {
         _upcomingEvents = upcomingEventRepository;
     }
@@ -27,6 +29,7 @@ public class UpcomingEventFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "upcoming-event")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Insert));
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
@@ -46,6 +49,7 @@ public class UpcomingEventFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "upcoming-event")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(List));
         TagRequest(request);
         LogInformation(request, nameof(List));
 
@@ -60,6 +64,7 @@ public class UpcomingEventFunctions : FunctionBase
         int id
     )
     {
+        using var activity = StartFunctionActivity(nameof(QueryById));
         TagRequest(request);
         LogInformation(request, nameof(QueryById));
 
@@ -77,6 +82,7 @@ public class UpcomingEventFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "upcoming-event")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
@@ -97,6 +103,7 @@ public class UpcomingEventFunctions : FunctionBase
         int id
     )
     {
+        using var activity = StartFunctionActivity(nameof(Delete));
         TagRequest(request);
         LogInformation(request, nameof(Delete));
 

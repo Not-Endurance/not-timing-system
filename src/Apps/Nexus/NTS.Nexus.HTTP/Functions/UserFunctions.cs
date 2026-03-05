@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Repositories;
+using NTS.Nexus.HTTP.Telemetry;
 using NTS.Witness.Contracts.API;
 
 namespace NTS.Nexus.HTTP.Functions;
@@ -12,8 +13,12 @@ public class UserFunctions : FunctionBase
 {
     readonly IUserRepository _users;
 
-    public UserFunctions(IFunctionLogger<UserFunctions> logger, IUserRepository users)
-        : base(logger)
+    public UserFunctions(
+        IFunctionLogger<UserFunctions> logger,
+        IUserRepository users,
+        ITelemetryService telemetry
+    )
+        : base(logger, telemetry)
     {
         _users = users;
     }
@@ -24,6 +29,7 @@ public class UserFunctions : FunctionBase
         string email
     )
     {
+        using var activity = StartFunctionActivity(nameof(ReadByEmail));
         TagRequest(request);
         LogInformation(request, nameof(ReadByEmail));
 
@@ -41,6 +47,7 @@ public class UserFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "users/register")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Register));
         TagRequest(request);
         LogInformation(request, nameof(Register));
 

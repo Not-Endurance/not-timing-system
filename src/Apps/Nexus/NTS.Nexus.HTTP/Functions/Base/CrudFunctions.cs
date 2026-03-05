@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Not.Application.CRUD.Ports;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions.Base;
 
@@ -12,9 +13,10 @@ public class CrudFunctions<T> : FunctionBase
 
     public CrudFunctions(
         IFunctionLogger<CrudFunctions<T>> logger,
-        IRepository<T> repository
+        IRepository<T> repository,
+        ITelemetryService telemetry
     )
-        : base(logger)
+        : base(logger, telemetry)
     {
         _repository = repository;
     }

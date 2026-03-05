@@ -52,6 +52,7 @@ internal static class NtsNexusApiServices
                 builder
                     .SetSampler(new AlwaysOnSampler())
                     .AddSource(NexusTelemetryConstants.ACTIVITY_SOURCE_NAME)
+                    .AddSource(NexusTelemetryConstants.STORAGE_ACTIVITY_SOURCE_NAME)
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation();
 

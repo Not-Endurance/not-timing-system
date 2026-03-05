@@ -8,6 +8,7 @@ using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Repositories;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -19,9 +20,10 @@ public class HorseFunctions : FunctionBase
     public HorseFunctions(
         IFunctionLogger<HorseFunctions> logger,
         IRepository<HorseModel> horses,
-        IArchiveRepository archive
+        IArchiveRepository archive,
+        ITelemetryService telemetry
     )
-        : base(logger)
+        : base(logger, telemetry)
     {
         _horses = horses;
         _archive = archive;
@@ -32,6 +34,7 @@ public class HorseFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "horses")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Insert));
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
@@ -51,6 +54,7 @@ public class HorseFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "horses")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
@@ -71,6 +75,7 @@ public class HorseFunctions : FunctionBase
         int id
     )
     {
+        using var activity = StartFunctionActivity(nameof(SafeDelete));
         TagRequest(request);
         LogInformation(request, nameof(SafeDelete));
 
@@ -103,6 +108,7 @@ public class HorseFunctions : FunctionBase
         int id
     )
     {
+        using var activity = StartFunctionActivity(nameof(Delete));
         TagRequest(request);
         LogInformation(request, nameof(Delete));
 
@@ -122,6 +128,7 @@ public class HorseFunctions : FunctionBase
         int id
     )
     {
+        using var activity = StartFunctionActivity(nameof(GetOne));
         TagRequest(request);
         LogInformation(request, nameof(GetOne));
 
@@ -134,6 +141,7 @@ public class HorseFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(List));
         TagRequest(request);
         LogInformation(request, nameof(List));
 

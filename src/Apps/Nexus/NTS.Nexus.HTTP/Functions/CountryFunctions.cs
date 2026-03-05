@@ -8,6 +8,7 @@ using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -15,8 +16,12 @@ public class CountryFunctions : FunctionBase
 {
     readonly IRepository<CountryModel> _countries;
 
-    public CountryFunctions(IFunctionLogger<CountryFunctions> logger, IRepository<CountryModel> countries)
-        : base(logger)
+    public CountryFunctions(
+        IFunctionLogger<CountryFunctions> logger,
+        IRepository<CountryModel> countries,
+        ITelemetryService telemetry
+    )
+        : base(logger, telemetry)
     {
         _countries = countries;
     }
@@ -26,6 +31,7 @@ public class CountryFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "countries")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Insert));
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
@@ -45,6 +51,7 @@ public class CountryFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "countries")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
@@ -64,6 +71,7 @@ public class CountryFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "countries")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(List));
         TagRequest(request);
         LogInformation(request, nameof(List));
 

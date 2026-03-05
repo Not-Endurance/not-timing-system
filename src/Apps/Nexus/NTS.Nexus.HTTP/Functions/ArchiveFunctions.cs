@@ -6,6 +6,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Repositories;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -13,8 +14,12 @@ public class ArchiveFunctions : FunctionBase
 {
     readonly IArchiveRepository _archive;
 
-    public ArchiveFunctions(IArchiveRepository archive, IFunctionLogger<ArchiveFunctions> logger)
-        : base(logger)
+    public ArchiveFunctions(
+        IArchiveRepository archive,
+        IFunctionLogger<ArchiveFunctions> logger,
+        ITelemetryService telemetry
+    )
+        : base(logger, telemetry)
     {
         _archive = archive;
     }
@@ -24,6 +29,7 @@ public class ArchiveFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "archive")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Insert));
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
@@ -49,6 +55,7 @@ public class ArchiveFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "archive")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(List));
         TagRequest(request);
         LogInformation(request, nameof(List));
 
@@ -62,6 +69,7 @@ public class ArchiveFunctions : FunctionBase
         int horseId
     )
     {
+        using var activity = StartFunctionActivity(nameof(QueryByHorse));
         TagRequest(request);
         LogInformation(request, nameof(QueryByHorse));
 

@@ -7,23 +7,16 @@ namespace NTS.Nexus.HTTP.Telemetry;
 
 internal class FunctionInvocationTelemetryMiddleware : IFunctionsWorkerMiddleware
 {
-    readonly ITelemetryService _telemetry;
     readonly ILogger<FunctionInvocationTelemetryMiddleware> _logger;
 
-    public FunctionInvocationTelemetryMiddleware(
-        ITelemetryService telemetry,
-        ILogger<FunctionInvocationTelemetryMiddleware> logger
-    )
+    public FunctionInvocationTelemetryMiddleware(ILogger<FunctionInvocationTelemetryMiddleware> logger)
     {
-        _telemetry = telemetry;
         _logger = logger;
     }
 
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
         var (className, methodName) = Resolve(context.FunctionDefinition);
-        using var activity = _telemetry.StartActivity(className, methodName);
-
         Activity.Current
             .Tag("faas.name", context.FunctionDefinition.Name)
             .Tag("faas.invocation_id", context.InvocationId)

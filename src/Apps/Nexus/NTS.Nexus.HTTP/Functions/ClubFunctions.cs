@@ -8,6 +8,7 @@ using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -15,8 +16,12 @@ public class ClubFunctions : FunctionBase
 {
     readonly IRepository<ClubModel> _clubs;
 
-    public ClubFunctions(IFunctionLogger<ClubFunctions> logger, IRepository<ClubModel> clubs)
-        : base(logger)
+    public ClubFunctions(
+        IFunctionLogger<ClubFunctions> logger,
+        IRepository<ClubModel> clubs,
+        ITelemetryService telemetry
+    )
+        : base(logger, telemetry)
     {
         _clubs = clubs;
     }
@@ -26,6 +31,7 @@ public class ClubFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "clubs")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Insert));
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
@@ -45,6 +51,7 @@ public class ClubFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "clubs")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
@@ -65,6 +72,7 @@ public class ClubFunctions : FunctionBase
         int id
     )
     {
+        using var activity = StartFunctionActivity(nameof(Delete));
         TagRequest(request);
         LogInformation(request, nameof(Delete));
 
@@ -84,6 +92,7 @@ public class ClubFunctions : FunctionBase
         int id
     )
     {
+        using var activity = StartFunctionActivity(nameof(GetOne));
         TagRequest(request);
         LogInformation(request, nameof(GetOne));
 
@@ -96,6 +105,7 @@ public class ClubFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(List));
         TagRequest(request);
         LogInformation(request, nameof(List));
 

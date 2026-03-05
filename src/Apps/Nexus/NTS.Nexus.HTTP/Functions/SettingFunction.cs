@@ -6,6 +6,7 @@ using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -13,8 +14,12 @@ public class SettingFunction : FunctionBase
 {
     readonly IRepository<SettingModel> _settings;
 
-    public SettingFunction(IFunctionLogger<SettingFunction> logger, IRepository<SettingModel> settings)
-        : base(logger)
+    public SettingFunction(
+        IFunctionLogger<SettingFunction> logger,
+        IRepository<SettingModel> settings,
+        ITelemetryService telemetry
+    )
+        : base(logger, telemetry)
     {
         _settings = settings;
     }
@@ -24,6 +29,7 @@ public class SettingFunction : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "settings")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Insert));
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
@@ -43,6 +49,7 @@ public class SettingFunction : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "settings")] HttpRequest request
     )
     {
+        using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
@@ -63,6 +70,7 @@ public class SettingFunction : FunctionBase
         string accountId
     )
     {
+        using var activity = StartFunctionActivity(nameof(GetOne));
         TagRequest(request);
         LogInformation(request, nameof(GetOne));
 
