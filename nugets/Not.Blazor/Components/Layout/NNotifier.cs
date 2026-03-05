@@ -44,22 +44,26 @@ public class NNotifier : NComponent, IDisposable
 
     void AddInformationSnack(string message)
     {
-        Snackbar.Add(FormatMessage(message), Severity.Info);
+        var formattedMessage = FormatMessage(message);
+        Snackbar.Add(formattedMessage, Severity.Info);
     }
 
     void AddWarningSnack(string message)
     {
-        Snackbar.Add(FormatMessage(message), Severity.Warning);
+        var formattedMessage = FormatMessage(message);
+        Snackbar.Add(formattedMessage, Severity.Warning);
     }
 
     void AddFailureSnack(string message)
     {
-        Snackbar.Add(FormatMessage(message), Severity.Error, config => config.SetVisibleDuration(_failedDuration));
+        var formattedMessage = FormatMessage(message);
+        Snackbar.Add(formattedMessage, Severity.Error, config => config.SetVisibleDuration(_failedDuration));
     }
 
     void AddSuccessSnack(string message)
     {
-        Snackbar.Add(FormatMessage(message), Severity.Success);
+        var formattedMessage = FormatMessage(message);
+        Snackbar.Add(formattedMessage, Severity.Success);
     }
 
     MarkupString FormatMessage(string message)

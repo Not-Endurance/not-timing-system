@@ -11,13 +11,13 @@ public class NListBehind<T> : NComponent
     public bool IsLoading { get; set; }
 
     [Parameter]
-    public Func<Task>? Create { get; set; }
+    public Func<Task>? CreateSafe { get; set; }
 
     [Parameter]
-    public Func<T, Task>? Update { get; set; }
+    public Func<T, Task>? UpdateSafe { get; set; }
 
     [Parameter]
-    public Func<T, Task>? Delete { get; set; }
+    public Func<T, Task>? DeleteSafe { get; set; }
 
     [Parameter]
     public string? Title { get; set; }
@@ -26,8 +26,8 @@ public class NListBehind<T> : NComponent
     {
         try
         {
-            GuardHelper.ThrowIfDefault(Create);
-            await Create();
+            GuardHelper.ThrowIfDefault(CreateSafe);
+            await CreateSafe();
         }
         catch (Exception ex)
         {
@@ -39,8 +39,8 @@ public class NListBehind<T> : NComponent
     {
         try
         {
-            GuardHelper.ThrowIfDefault(Update);
-            await Update(item);
+            GuardHelper.ThrowIfDefault(UpdateSafe);
+            await UpdateSafe(item);
         }
         catch (Exception ex)
         {
@@ -52,8 +52,8 @@ public class NListBehind<T> : NComponent
     {
         try
         {
-            GuardHelper.ThrowIfDefault(Delete);
-            await Delete(item);
+            GuardHelper.ThrowIfDefault(DeleteSafe);
+            await DeleteSafe(item);
         }
         catch (Exception ex)
         {

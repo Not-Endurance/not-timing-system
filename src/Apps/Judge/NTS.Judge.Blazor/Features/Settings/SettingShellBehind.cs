@@ -14,21 +14,23 @@ public class SettingShellBehind : KrudShell<SettingFormModel>
     [Inject]
     NavigationManager NavManager { get; set; } = default!;
 
-    protected override void OnInitialized()
-    {
-        ;
-    }
-
     protected Task SetUiCulture()
     {
-        if (Model.LanguageCountry == null)
+        try
         {
-            return Task.CompletedTask;
-        }
+            if (Model.LanguageCountry == null)
+            {
+                return Task.CompletedTask;
+            }
 
-        var culture = new CultureInfo(Model.LanguageCountry.Locale!);
-        CultureInfo.DefaultThreadCurrentUICulture = culture;
-        NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+            var culture = new CultureInfo(Model.LanguageCountry.Locale!);
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+            NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
         return Task.CompletedTask;
     }
 

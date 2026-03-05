@@ -20,7 +20,7 @@ public class ParticipationShellBehind : KrudShell<ParticipationFormModel>
 
     protected PatternMask TimeMask { get; }
 
-    protected async Task<IEnumerable<Combination>> SearchCombinations(string term, CancellationToken _)
+    protected async Task<IEnumerable<Combination>> SearchCombinationsSafe(string term, CancellationToken _)
     {
         return Search(await Behind.ReadMany(), term);
     }

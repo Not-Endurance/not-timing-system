@@ -16,13 +16,27 @@ public abstract class EliminationFormBehind : NComponent
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    protected async Task OnRestoreSafe()
+    protected async Task OnRestore()
     {
-        await Eliminations.RestoreQualification();
+        try
+        {
+            await Eliminations.RestoreQualification();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
-    protected async Task OnSubmitSafe()
+    protected async Task OnSubmit()
     {
-        await SubmitSafe();
+        try
+        {
+            await SubmitSafe();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 }
