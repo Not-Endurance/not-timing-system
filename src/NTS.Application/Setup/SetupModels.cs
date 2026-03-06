@@ -23,6 +23,35 @@ public class ClubModel : IDocument
     }
 }
 
+public class UserModel : IDocument, IKrudModel<User>
+{
+    public static UserModel From(User user)
+    {
+        var model = new UserModel();
+        model.MapFrom(user);
+        return model;
+    }
+
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public string Email { get; set; } = default!;
+    public string Name { get; set; } = default!;
+    public string[] Roles { get; set; } = [];
+
+    public void MapFrom(User user)
+    {
+        Id = user.Id;
+        Email = user.Email;
+        Name = user.Name;
+        Roles = user.Roles.ToArray();
+    }
+
+    public User MapToEntity()
+    {
+        return new User(Email, Name, Roles, Id);
+    }
+}
+
 public class OfficialModel
 {
     public static OfficialModel MapFrom(Official official)
@@ -32,16 +61,18 @@ public class OfficialModel
             Id = official.Id,
             Names = official.Person.Names,
             Role = official.Role,
+            User = official.User == null ? null : UserModel.From(official.User),
         };
     }
 
     public int Id { get; init; }
     public string[] Names { get; init; } = [];
     public OfficialRole Role { get; init; } = default!;
+    public UserModel? User { get; init; }
 
     public Official MapToDomain()
     {
-        return new Official(Names, Role, Id);
+        return new Official(Names, Role, Id, User?.MapToEntity());
     }
 }
 
@@ -61,6 +92,7 @@ public class AthleteModel : IDocument, IKrudModel<Athlete>
     public CountryModel Country { get; set; } = default!;
     public ClubModel? Club { get; set; }
     public string? FeiId { get; set; }
+    public UserModel? User { get; set; }
 
     public void MapFrom(Athlete athlete)
     {
@@ -69,11 +101,12 @@ public class AthleteModel : IDocument, IKrudModel<Athlete>
         Names = athlete.Names.Names;
         Country = CountryModel.MapFrom(athlete.Country);
         Club = athlete.Club == null ? null : ClubModel.MapFrom(athlete.Club);
+        User = athlete.User == null ? null : UserModel.From(athlete.User);
     }
 
     public Athlete MapToEntity()
     {
-        return new Athlete(Names, FeiId, Country?.MapToDomain(), Club?.MapToDomain(), Id);
+        return new Athlete(Names, FeiId, Country?.MapToDomain(), Club?.MapToDomain(), Id, User?.MapToEntity());
     }
 }
 

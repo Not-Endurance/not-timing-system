@@ -1,19 +1,21 @@
-﻿using Newtonsoft.Json;
+using NTS.Domain.Setup.Aggregates;
 using static NTS.Domain.Enums.OfficialRole;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 public class Official : Entity
 {
-    public Official(Person? person, OfficialRole? role, int? id = null)
+    public Official(Person? person, OfficialRole? role, int? id = null, User? user = null)
         : base(id)
     {
         Role = Required(nameof(Role), role);
         Person = Required(nameof(Person), person);
+        User = user;
     }
 
     public Person Person { get; }
     public OfficialRole Role { get; }
+    public User? User { get; }
 
     public override string ToString()
     {

@@ -22,11 +22,11 @@ public static class MauiProgram
         builder.Services.AddJudgeMaui(builder.Configuration);
 
         var assembly = typeof(MauiProgram).Assembly;
-        builder.Configuration.AddNAppsettings(assembly);
+        builder.Configuration.AddNAppsettings(assembly, "judge");
         builder.Services.AddSingleton<IMauiProcessService, WindowsProcessService>();
         var app = builder.Build();
 
-        if (EnvironmentHelper.IsLocalhost() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))
+        if (EnvironmentHelper.UsesLocalhostInfrastructure() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))
         {
             StartHub();
         }

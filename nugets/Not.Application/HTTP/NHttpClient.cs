@@ -9,7 +9,7 @@ namespace Not.Application.HTTP;
 
 public class NHttpClient
 {
-    readonly string _host;
+    readonly string _baseUrl;
     readonly HttpClient _httpClient;
     readonly ILogger<NHttpClient> _logger;
     readonly INotifier _notifier;
@@ -21,7 +21,7 @@ public class NHttpClient
         INotifier notifier
     )
     {
-        _host = options.Value.Host;
+        _baseUrl = options.Value.Url!;
         _httpClient = httpClientFactory.CreateClient("NHttpClient");
         _logger = logger;
         _notifier = notifier;
@@ -119,6 +119,6 @@ public class NHttpClient
 
     Uri BuildUrl(string endpoint)
     {
-        return new Uri($"{_host}/{endpoint}");
+        return new Uri($"{_baseUrl}/{endpoint}");
     }
 }

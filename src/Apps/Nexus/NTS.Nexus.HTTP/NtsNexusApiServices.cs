@@ -1,9 +1,12 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Injection;
 using Not.Storage;
+using NTS.Nexus.HTTP.Telemetry;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace NTS.Nexus.HTTP;
 
@@ -14,6 +17,7 @@ internal static class NtsNexusApiServices
         return services
             .AddNConventionalServices(Assembly.GetExecutingAssembly())
             .AddMongoStorage(configuration)
+            .AddNexusTelemetry()
             .AddApplicationInsightsTelemetryWorkerService()
             .ConfigureFunctionsApplicationInsights();
     }
@@ -28,6 +32,45 @@ internal static class NtsNexusApiServices
 
         var builder = new NStorageBuilder(services, configuration);
         builder.AddMongoStorage(connectionString, Assembly.GetExecutingAssembly());
+        return services;
+    }
+
+    static IServiceCollection AddNexusTelemetry(this IServiceCollection services)
+    {
+        services.AddSingleton<ITelemetryService, TelemetryService>();
+
+        services
+            .AddOpenTelemetry()
+            .ConfigureResource(resource =>
+                resource.AddService(
+                    NexusTelemetryConstants.SERVICE_NAME,
+                    serviceVersion: Assembly.GetExecutingAssembly().GetName().Version?.ToString()
+                )
+            )
+            .WithTracing(builder =>
+            {
+                builder
+                    .SetSampler(new AlwaysOnSampler())
+                    .AddSource(NexusTelemetryConstants.ACTIVITY_SOURCE_NAME)
+                    .AddSource(NexusTelemetryConstants.STORAGE_ACTIVITY_SOURCE_NAME)
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+
+                var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
+                if (!string.IsNullOrWhiteSpace(otlpEndpoint))
+                {
+                    builder.AddOtlpExporter();
+                }
+
+                var enableConsoleExporter =
+                    bool.TryParse(Environment.GetEnvironmentVariable("OTEL_ENABLE_CONSOLE_EXPORTER"), out var enabled)
+                    && enabled;
+                if (enableConsoleExporter)
+                {
+                    builder.AddConsoleExporter();
+                }
+            });
+
         return services;
     }
 }

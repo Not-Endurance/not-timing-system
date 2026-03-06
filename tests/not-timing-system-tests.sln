@@ -9,40 +9,38 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Judge", "Judge", "{24307454
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Not", "Not", "{33F6935E-EA68-4CC6-849F-5E42DAABD6DA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not", "..\src\Not\Not\Not.csproj", "{70C49361-E118-4335-A90A-3A93493B636C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not", "..\nugets\Not\Not.csproj", "{70C49361-E118-4335-A90A-3A93493B636C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Application", "..\src\Not\Not.Application\Not.Application.csproj", "{AF0919D9-9E6D-431C-A141-2EDB3EA9465F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Application", "..\nugets\Not.Application\Not.Application.csproj", "{AF0919D9-9E6D-431C-A141-2EDB3EA9465F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Domain", "..\src\Not\Not.Domain\Not.Domain.csproj", "{E39FC7C6-6780-4B39-9850-032C8A139331}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Domain", "..\nugets\Not.Domain\Not.Domain.csproj", "{E39FC7C6-6780-4B39-9850-032C8A139331}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Storage", "..\src\Not\Not.Storage\Not.Storage.csproj", "{D2A8807F-2DBE-4A10-996F-93F23614C61B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Storage", "..\nugets\Not.Storage\Not.Storage.csproj", "{D2A8807F-2DBE-4A10-996F-93F23614C61B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge", "..\src\Judge\NTS.Judge\NTS.Judge.csproj", "{30FD99FC-3E59-48D1-9D44-89CC4311E3E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge", "..\src\Apps\Judge\NTS.Judge\NTS.Judge.csproj", "{30FD99FC-3E59-48D1-9D44-89CC4311E3E7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge.Blazor", "..\src\Judge\NTS.Judge.Blazor\NTS.Judge.Blazor.csproj", "{8455C13B-E838-4025-8083-4935C086462C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge.Blazor", "..\src\Apps\Judge\NTS.Judge.Blazor\NTS.Judge.Blazor.csproj", "{8455C13B-E838-4025-8083-4935C086462C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Blazor", "..\src\Not\Not.Blazor\Not.Blazor.csproj", "{2BE584A5-AA80-43E1-AF8F-E3204AD0BA88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Not.Blazor", "..\nugets\Not.Blazor\Not.Blazor.csproj", "{2BE584A5-AA80-43E1-AF8F-E3204AD0BA88}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Storage", "..\src\NTS.Storage\NTS.Storage.csproj", "{ED7F43B0-EBB5-4A5E-B1C9-E97AD3FB1F28}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain.Setup", "..\src\NTS.Domain.Setup\NTS.Domain.Setup.csproj", "{CE507ACD-4ACC-4022-A675-D94DBB8089BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain.Setup", "..\src\Domain\NTS.Domain.Setup\NTS.Domain.Setup.csproj", "{CE507ACD-4ACC-4022-A675-D94DBB8089BB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain", "..\src\NTS.Domain\NTS.Domain.csproj", "{A641F6F5-8B99-4E00-B36D-95AD0509037C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Domain", "..\src\Domain\NTS.Domain\NTS.Domain.csproj", "{A641F6F5-8B99-4E00-B36D-95AD0509037C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RPC", "RPC", "{64D80DF7-A0E2-432B-B360-ADBAC6952CB2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge.MAUI.Server", "..\src\Judge\NTS.Judge.MAUI.Server\NTS.Judge.MAUI.Server.csproj", "{0E521A25-A39C-42AD-AC4E-2EDD488BDCE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge.MAUI", "..\src\Apps\Judge\NTS.Judge.MAUI\NTS.Judge.MAUI.csproj", "{0E521A25-A39C-42AD-AC4E-2EDD488BDCE4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Application", "..\src\NTS.Application\NTS.Application.csproj", "{D54B62EF-80FD-4C24-A0D0-FDE85200DAF2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.ACL", "..\src\NTS.ACL\NTS.ACL.csproj", "{9970F661-AD35-487F-8148-428384209DAB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_confg", "_confg", "{6AAA82B5-6008-4CE4-94F1-D5BE91B3E593}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Tests", "..\src\Not\Not.Tests\Not.Tests.csproj", "{46969AA7-60B3-4664-99B8-42CA1942CC1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Tests", "..\nugets\Not.Tests\Not.Tests.csproj", "{46969AA7-60B3-4664-99B8-42CA1942CC1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -102,10 +100,6 @@ Global
 		{D54B62EF-80FD-4C24-A0D0-FDE85200DAF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D54B62EF-80FD-4C24-A0D0-FDE85200DAF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D54B62EF-80FD-4C24-A0D0-FDE85200DAF2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9970F661-AD35-487F-8148-428384209DAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9970F661-AD35-487F-8148-428384209DAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9970F661-AD35-487F-8148-428384209DAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9970F661-AD35-487F-8148-428384209DAB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -127,7 +121,6 @@ Global
 		{A641F6F5-8B99-4E00-B36D-95AD0509037C} = {24307454-DBEC-4205-951C-E4272A55CDCD}
 		{0E521A25-A39C-42AD-AC4E-2EDD488BDCE4} = {64D80DF7-A0E2-432B-B360-ADBAC6952CB2}
 		{D54B62EF-80FD-4C24-A0D0-FDE85200DAF2} = {64D80DF7-A0E2-432B-B360-ADBAC6952CB2}
-		{9970F661-AD35-487F-8148-428384209DAB} = {64D80DF7-A0E2-432B-B360-ADBAC6952CB2}
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C} = {33F6935E-EA68-4CC6-849F-5E42DAABD6DA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

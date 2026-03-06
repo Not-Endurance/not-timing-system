@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Async.Extensions;
-using Not.Serialization.JSON;
 using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -16,8 +16,12 @@ public class ClubFunctions : FunctionBase
 {
     readonly IRepository<ClubModel> _clubs;
 
-    public ClubFunctions(IFunctionLogger<ClubFunctions> logger, IRepository<ClubModel> clubs)
-        : base(logger)
+    public ClubFunctions(
+        IFunctionLogger<ClubFunctions> logger,
+        IRepository<ClubModel> clubs,
+        ITelemetryService telemetry
+    )
+        : base(logger, telemetry)
     {
         _clubs = clubs;
     }
@@ -27,13 +31,18 @@ public class ClubFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "clubs")] HttpRequest request
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(Insert));
+        TagRequest(request);
+        LogInformation(request, nameof(Insert));
 
-        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var club = requestBody.FromJson<Club>();
+        var club = await ReadBody<Club>(request);
+        if (club == null)
+        {
+            return UnexpectedPayload<Club>();
+        }
+
         var document = ClubModel.MapFrom(club);
         await _clubs.Create(document);
-
         return new OkObjectResult($"Inserted {club}");
     }
 
@@ -42,13 +51,18 @@ public class ClubFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "clubs")] HttpRequest request
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(Update));
+        TagRequest(request);
+        LogInformation(request, nameof(Update));
 
-        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var club = requestBody.FromJson<Club>();
+        var club = await ReadBody<Club>(request);
+        if (club == null)
+        {
+            return UnexpectedPayload<Club>();
+        }
+
         var document = ClubModel.MapFrom(club);
         await _clubs.Update(document);
-
         return new OkObjectResult($"Updated {club}");
     }
 
@@ -58,12 +72,16 @@ public class ClubFunctions : FunctionBase
         int id
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(Delete));
+        TagRequest(request);
+        LogInformation(request, nameof(Delete));
+
         var club = await _clubs.Read(id);
         if (club == null)
         {
             return new OkObjectResult($"Club wiht id '{id}' did not exist");
         }
+
         await _clubs.Delete(club);
         return new OkObjectResult($"Deleted club with id '{id}'");
     }
@@ -74,7 +92,9 @@ public class ClubFunctions : FunctionBase
         int id
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(GetOne));
+        TagRequest(request);
+        LogInformation(request, nameof(GetOne));
 
         var club = await _clubs.Read(id);
         return new OkObjectResult(club?.MapToDomain());
@@ -85,7 +105,9 @@ public class ClubFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "clubs")] HttpRequest request
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(List));
+        TagRequest(request);
+        LogInformation(request, nameof(List));
 
         var clubs = await _clubs.ReadMany().Select(x => x.MapToDomain());
         return new OkObjectResult(clubs);

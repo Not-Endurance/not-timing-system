@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Not.Serialization.JSON;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Repositories;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -14,8 +14,12 @@ public class ArchiveFunctions : FunctionBase
 {
     readonly IArchiveRepository _archive;
 
-    public ArchiveFunctions(IArchiveRepository archive, IFunctionLogger<ArchiveFunctions> logger)
-        : base(logger)
+    public ArchiveFunctions(
+        IArchiveRepository archive,
+        IFunctionLogger<ArchiveFunctions> logger,
+        ITelemetryService telemetry
+    )
+        : base(logger, telemetry)
     {
         _archive = archive;
     }
@@ -25,18 +29,24 @@ public class ArchiveFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "archive")] HttpRequest request
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(Insert));
+        TagRequest(request);
+        LogInformation(request, nameof(Insert));
 
-        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var entry = requestBody.FromJson<ArchiveEntry>();
+        var entry = await ReadBody<ArchiveEntry>(request);
+        if (entry == null)
+        {
+            return UnexpectedPayload<ArchiveEntry>();
+        }
+
         var document = ArchiveEntryModel.MapFrom(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
-
-        if (await _archive.Read(entry.Id) != null) // TODO: investigate this not working
+        var existing = await _archive.Read(entry.Id);
+        if (existing != null) // TODO: investigate this not working
         {
             await _archive.Delete(document);
         }
-        await _archive.Create(document);
 
+        await _archive.Create(document);
         return new OkObjectResult($"Archived event {entry.EnduranceEvent}");
     }
 
@@ -45,10 +55,11 @@ public class ArchiveFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "archive")] HttpRequest request
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(List));
+        TagRequest(request);
+        LogInformation(request, nameof(List));
 
         var result = await _archive.ReadMany();
-
         return new OkObjectResult(result);
     }
 
@@ -58,10 +69,11 @@ public class ArchiveFunctions : FunctionBase
         int horseId
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(QueryByHorse));
+        TagRequest(request);
+        LogInformation(request, nameof(QueryByHorse));
 
         var archives = await _archive.GetPerformances(horseId);
-
         return new OkObjectResult(archives);
     }
 }

@@ -36,7 +36,8 @@ public record StartlistEntry : ValueObject
     public override string ToString()
     {
         var distance = Distance + km_string;
-        var start = FormattingHelper.Format(Start.ToTimeSpan());
+        var startTime = Start.ToTimeSpan();
+        var start = FormattingHelper.Format(startTime);
         return Combine(Number, Athlete, distance, start);
     }
 }

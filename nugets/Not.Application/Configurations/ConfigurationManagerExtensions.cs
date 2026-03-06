@@ -1,20 +1,30 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Not.Application.Environments;
+using Not.Exceptions;
 
 namespace Not.Application.Configurations;
 
 public static class ConfigurationManagerExtensions
 {
-    public static void AddNAppsettings(this IConfigurationManager manager, Assembly assembly)
+    /// <summary>
+    /// Embeds appsettings.json and appsettins.{env}.json and environment based user-secrets for localhost
+    /// </summary>
+    /// <param name="manager">Configuration manager</param>
+    /// <param name="assembly">Assembly to embed settings in</param>
+    /// <param name="prefix">Application prefix used to identify app-specific environment secrets in localhost</param>
+    public static void AddNAppsettings(this IConfigurationManager manager, Assembly assembly, string prefix)
     {
         var environment = EnvironmentHelper.GetEnvironment();
 
-        var config = new ConfigurationBuilder()
+        var builder = new ConfigurationBuilder()
             .AddEmbeddedJsonFile("appsettings.json", optional: false, assembly)
-            .AddEmbeddedJsonFile($"appsettings.{environment}.json", optional: true, assembly)
-            .AddSecrets(environment, assembly)
-            .Build();
+            .AddEmbeddedJsonFile($"appsettings.{environment}.json", optional: true, assembly);
+        if (EnvironmentHelper.IsLocalhost())
+        {
+            builder.AddSecrets($"{prefix}-{environment}");
+        }
+        var config = builder.Build();
 
         manager.AddConfiguration(config);
     }
@@ -58,21 +68,11 @@ public static class ConfigurationManagerExtensions
         return builder.AddJsonStream(stream);
     }
 
-    public static IConfigurationBuilder AddSecrets(
-        this IConfigurationBuilder builder,
-        string environment,
-        Assembly? assembly = null
-    )
+    public static IConfigurationBuilder AddSecrets(this IConfigurationBuilder builder, string secretId)
     {
-        assembly ??= Assembly.GetExecutingAssembly();
-#if DEBUG
-        return builder.AddUserSecrets(assembly);
-#else
-        if (environment.Equals("Development", StringComparison.OrdinalIgnoreCase))
-        {
-            return builder.AddUserSecrets(assembly);
-        }
-        return builder.AddEnvironmentVariables();
-#endif
+        GuardHelper.ThrowIfDefault(secretId);
+
+        builder.AddUserSecrets(secretId.ToLower());
+        return builder;
     }
 }

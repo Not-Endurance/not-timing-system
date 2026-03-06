@@ -45,7 +45,8 @@ public record Disqualified : Eliminated
     {
         if (DqCodes.Any())
         {
-            var codes = string.Join('+', DqCodes.Where(code => code != DisqualifyCode.other));
+            var visibleCodes = DqCodes.Where(code => code != DisqualifyCode.other);
+            var codes = string.Join('+', visibleCodes);
             return $"DQ {codes}";
         }
         else

@@ -234,7 +234,8 @@ namespace NTS.Localization
         public static string Restore_string => LocalizeString(nameof(Restore_string));
         public static string Sorry_theres_nothing_at_this_address_string =>
             LocalizeString(nameof(Sorry_theres_nothing_at_this_address_string));
-        public static string Sign_in_with_Google_string => LocalizeString(nameof(Sign_in_with_Google_string));
+        public static string Sign_in_with_Microsoft_string => LocalizeString(nameof(Sign_in_with_Microsoft_string));
+        public static string Sign_in_with_Google_string => Sign_in_with_Microsoft_string;
         public static string This_page_redirects_to_Signin_string =>
             LocalizeString(nameof(This_page_redirects_to_Signin_string));
         public static string Signed_in_as__string => LocalizeString(nameof(Signed_in_as__string));

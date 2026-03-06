@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Authentication;
+using Not.Application.Authentication;
 using Not.Blazor;
 using NTS.Application;
 
@@ -9,24 +9,20 @@ namespace NTS.Witness;
 
 public static class NtsWitnessServices
 {
-    public static IServiceCollection AddNtsWitness(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNtsWitness(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string baseUrl
+    )
     {
         services
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
             .AddStartlist()
             .ConfigureN()
             .AddRpcClient()
-            .AddDomainEvents();
+            .AddDomainEvents()
+            .AddHttp(settings => settings.Host = baseUrl);
 
-        services.AddNts(configuration).AddNBlazor(configuration).ConfigureAuthentication(configuration);
-
-        return services;
-    }
-
-    static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.RegisterNAuthentication(configuration);
-        services.AddAuthorization();
-        return services;
+        return services.AddNts(configuration).AddNBlazor(configuration).AddNClientAuthentication(configuration);
     }
 }

@@ -1,42 +1,21 @@
-﻿using Not.Application.Configurations;
-using Not.Application.CRUD.Ports;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Not.Startup;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Witness.Storage;
-using NTS.Witness.Storage.Repositories;
-using NTS.Witness.Web.Endpoints;
-using Serilog;
+using NTS.Witness;
+using NTS.Witness.Web;
 
-namespace NTS.Witness.Web;
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-public class Program
-{
-    public static async Task Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
 
-        builder.Configuration.AddNAppsettings(typeof(Program).Assembly);
-        builder.Services.ConfigureNtsWitnessWeb(builder.Configuration);
-        builder.Logging.AddSerilog();
+builder.Services.AddNtsWitness(builder.Configuration, builder.HostEnvironment.BaseAddress);
 
-        var app = builder.Build();
+Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
+Console.WriteLine(
+    $"WasmApplicationEnvironmentName: {Environment.GetEnvironmentVariable("WasmApplicationEnvironmentName")}"
+);
 
-        //Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
-        }
-
-        app.MapAuthEndpoints();
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
-        app.UseAntiforgery();
-        app.MapBlazorHub();
-        app.MapFallbackToPage("/_Host");
-
-        await app.Services.Startup();
-        await app.RunAsync();
-    }
-}
+var host = builder.Build();
+await host.Services.Startup();
+await host.RunAsync();
