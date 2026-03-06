@@ -21,10 +21,37 @@ public static class Warp
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         Console.WriteLine(@$"******* WARP: Starting in '{environment}' environment *******");
 
-        app.Urls.Add($"http://*:{port}");
+        var judgeHubPath = new PathString($"/{ApplicationConstants.JUDGE_HUB}");
+        var witnessHubPath = new PathString($"/{ApplicationConstants.WITNESS_HUB}");
+        var originValidator = app.Services.GetRequiredService<CorsOriginValidator>();
 
-        app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB);
-        app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB);
+        app.Urls.Add($"http://*:{port}");
+        app.Use(async (context, next) =>
+        {
+            var isHubWebSocketRequest =
+                context.WebSockets.IsWebSocketRequest
+                && (
+                    context.Request.Path.StartsWithSegments(judgeHubPath)
+                    || context.Request.Path.StartsWithSegments(witnessHubPath)
+                );
+
+            if (isHubWebSocketRequest)
+            {
+                var origin = context.Request.Headers.Origin.ToString();
+                if (!string.IsNullOrWhiteSpace(origin) && !originValidator.IsAllowed(origin))
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return;
+                }
+            }
+
+            await next();
+        });
+
+        app.UseCors(CorsSettings.POLICY_NAME);
+
+        app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB).RequireCors(CorsSettings.POLICY_NAME);
+        app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB).RequireCors(CorsSettings.POLICY_NAME);
 
         foreach (var initializer in app.Services.GetServices<IStartupInitializer>())
         {
