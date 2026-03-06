@@ -1,6 +1,9 @@
-name: Azure Static Web Apps CI/CD
+name: Witness CI/CD
 
 on:
+  push:
+    branches:
+      - develop
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
@@ -8,7 +11,6 @@ on:
 
 env:
   DOTNET_CORE_VERSION: 8.0.x
-  WasmApplicationEnvironmentName: Staging
   APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
   API_LOCATION: src/Apps/Nexus/NTS.Nexus.HTTP
   OUTPUT_LOCATION: wwwroot
@@ -17,7 +19,7 @@ jobs:
   build-and-deploy:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Witness - Build & Deploy to a temporary Staging evnironment
+    name: Witness - Deploy to Staging
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,11 +38,9 @@ jobs:
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
-        env:
-          ASPNETCORE_ENVIRONMENT: Staging
-          WasmApplicationEnvironmentName: Staging
         with:
           action: "upload"
+          production_branch: develop
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LIVELY_ROCK_07E20CD03 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           app_location: ${{ env.APP_LOCATION }}
@@ -50,7 +50,7 @@ jobs:
   deploy-staging:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
-    name: Witness - Deploy to Staging
+    name: Witness - Close PR
     steps:
       - name: Close Pull Request
         id: closepullrequest
@@ -61,4 +61,3 @@ jobs:
           app_location: ${{ env.APP_LOCATION }}
           api_location: ${{ env.API_LOCATION }}
           output_location: ${{ env.OUTPUT_LOCATION }}
-
