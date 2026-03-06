@@ -1,0 +1,14 @@
+﻿@inherits SocketStatusBehind
+
+<MudStack Class="mt-3 mb-n3" AlignItems="AlignItems.Center" Row="false">
+	@if (IsConnected)
+	{ 
+		<MudInputLabel>@Connected_to_string.ToUpper()</MudInputLabel>
+		<MudInputLabel><strong>@EventName</strong></MudInputLabel>
+	}
+	else
+	{
+		<MudInputLabel>@Connection_Status_string.ToUpper()</MudInputLabel>
+		<MudProgressCircular Class="mt-2" Color="GetSpinnerColorSafe()" Size="Size.Medium" Indeterminate="true" />
+	}
+</MudStack>

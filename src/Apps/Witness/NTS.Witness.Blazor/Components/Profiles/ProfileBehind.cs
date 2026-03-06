@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 
 namespace NTS.Witness.Blazor.Components.Profiles;
 
@@ -22,7 +22,7 @@ public class ProfileBehind : NComponent
             var user = authState.User;
             var roles = user.FindAll(ClaimTypes.Role);
 
-            UserRoles = roles.Any() ? string.Join(", ", roles.Select(r => r.Value)) : "No roles assigned";
+            UserRoles = roles.Any() ? string.Join(", ", roles.Select(r => r.Value)) : No_roles_assigned_string;
         }
         catch (Exception ex)
         {

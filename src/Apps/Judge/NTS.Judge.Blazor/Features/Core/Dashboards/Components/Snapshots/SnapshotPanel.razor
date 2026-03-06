@@ -1,0 +1,14 @@
+@inherits SnapshotPanelBehind
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="@Class">
+    <MudTextField @bind-Value="Input" Label="@Time_string" Mask="TimeMask" />
+
+    <MudSpacer />
+
+    <MudButtonGroup OverrideStyles="false" Size="Size.Medium">
+        <NButtonPrimary Text="@Process_string" OnClick="SnapshotTime" />
+
+        <MudIconButton Icon="@Icons.Material.Outlined.Timer" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Snapshot" />
+    </MudButtonGroup>
+</MudStack>
+

@@ -1,5 +1,5 @@
 ﻿using Not.Application.CRUD.Ports;
-using NTS.Application.SignalR;
+using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
 
@@ -11,7 +11,7 @@ public class EnduranceEventsBehind : ComponentBase
     IRepository<UpcomingEvent> Repository { get; set; } = default!;
 
     [Inject]
-    IGroupSocketContext<UpcomingEvent> RpcContext { get; set; } = default!;
+    INtsSocketService SocketService { get; set; } = default!;
 
     [Inject]
     IConnectionStatus ConnectionStatus { get; set; } = default!;
@@ -20,7 +20,7 @@ public class EnduranceEventsBehind : ComponentBase
     IParticipationGetter ParticipationGetter { get; set; } = default!;
 
     [Inject]
-    protected ISelectedEventContext Selected { get; set; } = default!;
+    protected INtsSocketService Selected { get; set; } = default!;
     protected IEnumerable<UpcomingEvent> Events { get; set; } = [];
     protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
 
@@ -35,16 +35,16 @@ public class EnduranceEventsBehind : ComponentBase
     {
         if (IsConnected)
         {
-            await RpcContext.Disconnect();
+            await SocketService.Disconnect();
         }
-        await RpcContext.Connect(enduranceEvent);
+        await SocketService.Connect(enduranceEvent);
         await ParticipationGetter.GetParticipations();
         StateHasChanged();
     }
 
     protected async Task Disconnect()
     {
-        await RpcContext.Disconnect();
+        await SocketService.Disconnect();
         StateHasChanged();
     }
 }

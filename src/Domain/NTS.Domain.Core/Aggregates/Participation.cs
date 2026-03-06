@@ -1,4 +1,3 @@
-﻿using Not.Events;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -13,10 +12,6 @@ public class Participation : Aggregate
     //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
     static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);
     static readonly FailedToQualify SPEED_RESTRICTION = new([FailToQualifyCode.SP]);
-    public static readonly Event<PhaseCompleted> PHASE_COMPLETED_EVENT = new();
-    public static readonly Event<PhaseCompleted> PARTICIPATION_COMPLETED_EVENT = new();
-    public static readonly Event<ParticipationEliminated> ELIMINATED_EVENT = new();
-    public static readonly Event<ParticipationRestored> RESTORED_EVENT = new();
 
     public Participation(
         ParticipationCategory category,
@@ -97,14 +92,15 @@ public class Participation : Aggregate
         }
     }
 
-    public void ToggleRequestedInspection(bool isRequested)
+    public void ToggleInspection(bool isRequested)
     {
         if (isRequested)
         {
-            Phases.Current.RequestRequiredInspection();
+            Phases.Current.RequestInspection();
         }
         else
         {
+            // TODO: rename to IsInspectionRequested
             Phases.Current.IsRequiredInspectionRequested = false;
         }
     }
@@ -138,7 +134,7 @@ public class Participation : Aggregate
     {
         Eliminated = null;
         var qualificationRestored = new ParticipationRestored(this);
-        RESTORED_EVENT.Emit(qualificationRestored);
+        Raise(qualificationRestored);
     }
 
     void EvaluatePhase(Phase phase)
@@ -157,25 +153,20 @@ public class Participation : Aggregate
         {
             Restore();
         }
-        if (phase.IsComplete() && !phase.IsFinal)
+        if (!phase.IsComplete())
         {
-            Phases.StartIfNext();
-            var phaseCompleted = new PhaseCompleted(this);
-            if (phase.IsFinal)
-            {
-                PARTICIPATION_COMPLETED_EVENT.Emit(phaseCompleted);
-            }
-            else
-            {
-                PHASE_COMPLETED_EVENT.Emit(phaseCompleted);
-            }
+            return;
         }
+
+        Phases.StartIfNext();
+        var phaseCompleted = new PhaseCompleted(this);
+        Raise(phaseCompleted);
     }
 
     void Eliminate(Eliminated notQualified)
     {
         Eliminated = notQualified;
         var qualificationRevoked = new ParticipationEliminated(this);
-        ELIMINATED_EVENT.Emit(qualificationRevoked);
+        Raise(qualificationRevoked);
     }
 }

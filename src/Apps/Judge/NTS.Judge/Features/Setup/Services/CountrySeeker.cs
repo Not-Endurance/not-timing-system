@@ -1,5 +1,5 @@
 ﻿using Not.Application.Cache;
-using Not.Blazor.Ports;
+using Not.Application.Services;
 using Not.Strings;
 using NTS.Domain.Aggregates;
 
@@ -14,9 +14,9 @@ public class CountrySeeker : ISeeker<Country>
         _countriesCache = countriesCache;
     }
 
-    public async Task<IEnumerable<Country>> Search(string term)
+    public async Task<IEnumerable<Country>> Search(string term, CancellationToken _)
     {
-        var items = await _countriesCache.List(); // TODO: convert to CountryBehind
+        var items = await _countriesCache.List(); // TODO: convert to CountryService
         return items.Where(x => x.Name.NContains(term));
     }
 }

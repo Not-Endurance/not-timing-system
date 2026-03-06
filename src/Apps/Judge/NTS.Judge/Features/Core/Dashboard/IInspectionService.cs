@@ -1,7 +1,11 @@
-﻿namespace NTS.Judge.Features.Core.Dashboard;
+﻿using Not.Application.Behinds.Adapters;
 
-public interface IInspectionService : IParticipationContext
+namespace NTS.Judge.Features.Core.Dashboard;
+
+public interface IInspectionService : IStatefulService
 {
+    bool IsRepresentRequested { get; }
+    bool IsInspectionRequested { get; }
     Task RequestRepresent(bool requestFlag);
-    Task RequireRepresent(bool requestFlag);
+    Task RequestInspection(bool requestFlag);
 }

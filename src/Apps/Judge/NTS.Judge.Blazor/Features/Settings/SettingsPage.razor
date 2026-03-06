@@ -1,0 +1,20 @@
+﻿@using NTS.Judge.Features.Settings
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(SETTINGS_PAGE)]
+@inherits SettingsPageBehind
+
+<NContent Title="@Settings_string" Class="not-mid-width">
+
+    <Main>
+        @if (Model == null)
+        {
+            <NButtonCreate OnClick="OpenCreateForm" />
+        }
+        else
+        {
+            <SettingShell Model="Model" />
+        }
+    </Main>
+
+</NContent>

@@ -1,4 +1,4 @@
-﻿using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using NTS.Witness.Services;
 
 namespace NTS.Witness.Blazor.Components.EmergencyContacts;

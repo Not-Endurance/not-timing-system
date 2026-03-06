@@ -32,7 +32,7 @@ public static class NtsStorageServices
         public Builder AddJsonStorage()
         {
             _nStorageBuilder.AddJsonFileStorage<CoreState, CoreJsonStore, ICoreState>(Assembly.GetExecutingAssembly());
-            _services.AddAsInterfaces<SocketConnectionHookStorage>(ServiceLifetime.Singleton);
+            _services.AddAsInterfaces<SocketPrincipalStorage>(ServiceLifetime.Singleton);
             return this;
         }
 

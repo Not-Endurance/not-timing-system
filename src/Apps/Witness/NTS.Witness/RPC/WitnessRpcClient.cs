@@ -1,13 +1,12 @@
+using Not.Application.DomainEvents;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
-using Not.Collections;
 using Not.Injection;
 using NTS.Application.Core;
-using NTS.Application.SignalR;
-using NTS.Application.Startlists;
+using NTS.Application.Socket;
 using NTS.Application.Watcher;
-using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects.Payloads;
 using NTS.Warp;
 using NTS.Warp.Features.Witness.Procedures;
 using NTS.Witness.Services;
@@ -17,27 +16,29 @@ namespace NTS.Witness.RPC;
 public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipationGetter, ISnapshotService, ISingleton
 {
     readonly IRpcSocket _socket;
-    readonly ISelectedEventContext _eventContext;
-    readonly IStartlistContext _startlistContext;
+    readonly INtsSocketService _eventContext;
+    readonly IDomainEventDispatcher _domainEventDispatcher;
     readonly IParticipationService _participationService;
 
     public WitnessRpcClient(
         IRpcSocket socket,
-        ISelectedEventContext eventContext,
+        INtsSocketService eventContext,
         IParticipationService participationService,
-        IStartlistContext startlistContext
+        IDomainEventDispatcher domainEventDispatcher
     )
         : base(socket)
     {
         _socket = socket;
         _eventContext = eventContext;
-        _startlistContext = startlistContext;
+        _domainEventDispatcher = domainEventDispatcher;
         _participationService = participationService;
     }
 
     public override void RunAtStartup()
     {
-        RegisterInputProcedure<Participation>(nameof(ReceiveParticipation), ReceiveParticipation);
+        RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
+        RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
+        RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
     }
 
     public async Task<RpcInvokeResult> PublishSnapshotsAsync(SnapshotModel model)
@@ -46,25 +47,19 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), request);
     }
 
-    public Task ReceiveParticipation(Participation participation)
+    public Task OnPhaseCompleted(PhaseCompleted payload)
     {
-        if (participation.IsEliminated())
-        {
-            _participationService.Update(participation, NCollectionAction.Remove);
-            _startlistContext.Update(participation, NCollectionAction.Remove);
-            return Task.CompletedTask;
-        }
-        if (participation.Phases.Current.IsComplete())
-        {
-            if (participation.Phases.Current.IsFinal)
-            {
-                _participationService.Update(participation, NCollectionAction.Remove);
-                return Task.CompletedTask;
-            }
-        }
-        _participationService.Update(participation, NCollectionAction.AddOrUpdate);
-        _startlistContext.Update(participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
+        return _domainEventDispatcher.Dispatch(payload);
+    }
+
+    public Task OnParticipationEliminated(ParticipationEliminated payload)
+    {
+        return _domainEventDispatcher.Dispatch(payload);
+    }
+
+    public Task OnParticipationRestored(ParticipationRestored payload)
+    {
+        return _domainEventDispatcher.Dispatch(payload);
     }
 
     public async Task GetParticipations()
@@ -76,7 +71,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         );
         if (result.Data != null)
         {
-            _participationService.Active = result.Data.Select(x => x.MapToDomain());
+            _participationService.Set(result.Data.Select(x => x.MapToDomain()));
         }
     }
 }

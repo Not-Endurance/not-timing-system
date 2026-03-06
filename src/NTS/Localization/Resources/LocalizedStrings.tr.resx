@@ -324,9 +324,6 @@
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Dayanıklılık Etkinliğini Yapılandır</value>
   </data>
-  <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
-    <value>Dayanıklılık etkinliği henüz yok</value>
-  </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Yarışmayı Yapılandır</value>
   </data>
@@ -374,9 +371,6 @@
   </data>
   <data name="Cancel_string" xml:space="preserve">
     <value>İptal</value>
-  </data>
-  <data name="The_Competitions_havent_started_yet_string" xml:space="preserve">
-    <value>Yarışlar henüz başlamadı</value>
   </data>
   <data name="Archive_string" xml:space="preserve">
     <value>Arşivle</value>
@@ -689,6 +683,12 @@
     <value />
   </data>
   <data name="Cannot_add_completed_participations_in_startlist" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Fei_Id_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Empty_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
 </root>

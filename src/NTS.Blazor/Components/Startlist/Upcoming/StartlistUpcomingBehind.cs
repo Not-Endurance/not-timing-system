@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using NTS.Application.Startlists;
+using static NTS.Localization.NtsStrings;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;
 
@@ -9,7 +11,7 @@ public class StartlistUpcomingBehind : StartlistBehindBase, IDisposable
 
     System.Timers.Timer _timer = default!;
 
-    protected override string[] TableHeaders => [.. base.TableHeaders, "Start In"];
+    protected override string[] TableHeaders => [.. base.TableHeaders, Start_In_string];
 
     [Parameter]
     public bool Mobile { get; set; } = false;

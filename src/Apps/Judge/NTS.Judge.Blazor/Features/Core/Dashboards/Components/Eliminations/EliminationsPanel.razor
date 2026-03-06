@@ -1,0 +1,48 @@
+﻿@using NTS.Domain.Core.Aggregates.Participations
+@using NTS.Domain.Core.Aggregates.Participations.Objects
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms.Shared
+@using Not.Structures
+
+@inherits EliminationsPanelBehind
+
+<MudStack Class="@Class">
+
+    <MudPaper Elevation="1">
+        <MudToggleGroup @bind-Value="ToggleValue" Delimiters="true" Color="Color.Error" SelectionMode="SelectionMode.ToggleSelection">
+
+            <MudToggleItem Value="Eliminated.WITHDRAWN" />
+
+            <MudToggleItem Value="Eliminated.RETIRED" />
+
+            <MudToggleItem Value="Eliminated.FINISHED_NOT_RANKED" />
+
+            <MudToggleItem Value="Eliminated.DISQUALIFIED" />
+
+            <MudToggleItem Value="Eliminated.FAILED_TO_QUALIFY" />
+        </MudToggleGroup>
+
+        <MudCollapse Expanded="ToggleValue != null">
+            @if (ToggleValue == Eliminated.WITHDRAWN)
+            {
+                <WithdrawForm Withdrawn="Eliminated as Withdrawn" />
+            }
+            else if (ToggleValue == Eliminated.RETIRED)
+            {
+                <RetireForm Retired="Eliminated as Retired" />
+            }
+            else if (ToggleValue == Eliminated.FINISHED_NOT_RANKED)
+            {
+                <FinishNotRankedForm FinishedNotRanked="Eliminated as FinishedNotRanked" />
+            }
+            else if (ToggleValue == Eliminated.DISQUALIFIED)
+            {
+                <DisqualifyForm Disqualified="Eliminated as Disqualified" />
+            }
+            else if (ToggleValue == Eliminated.FAILED_TO_QUALIFY)
+            {
+                <FailedToQualifyForm FailedToQualify="Eliminated as FailedToQualify" />
+            }
+        </MudCollapse>
+    </MudPaper>
+</MudStack>

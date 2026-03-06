@@ -1,0 +1,12 @@
+﻿@using Not.Blazor.Components.Layout
+
+@attribute [Route(LOOP_CONTENT)]
+@inherits LoopContentBehind
+
+<NContent Title="@Configure_Loops_string" IsEmpty="Model == null">
+
+    <Main>
+        <LoopShell Model="Model" />
+    </Main>
+
+</NContent>

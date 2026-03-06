@@ -1,0 +1,16 @@
+﻿@using Not.Blazor.Dialogs.Abstractions
+@inherits HandoutsPrintConfirmationDialogBehind
+
+<MudDialog>
+    <TitleContent>@Print_confirmation_string</TitleContent>
+
+    <DialogContent>
+        @Are_handouts_printed_successfully_Yes_will_delete_all_handouts_This_cannot_be_undone_string
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonDanger Text="@Yes_string" OnClick="CloseDialog" />
+
+        <NButtonSecondary Text="@Cancel_string" OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

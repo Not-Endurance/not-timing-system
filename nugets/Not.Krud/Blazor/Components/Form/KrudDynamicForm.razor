@@ -1,0 +1,13 @@
+﻿@using Not.Krud.Abstractions
+@using Not.Krud.Blazor.Components.Abstractions
+
+@typeparam TShell where TShell : KrudShell<TModel>
+@typeparam TModel where TModel : IKrudFormModel, new()
+@inherits KrudDynamicFormBehind<TShell, TModel>
+
+@if (Model == null)
+{
+    <p>Model parameter is null at NDynamic</p>
+}
+
+<DynamicComponent Type="typeof(TShell)" @ref="DynamicComponentRef" Parameters="ComponentParameters" />

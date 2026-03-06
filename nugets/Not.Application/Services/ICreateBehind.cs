@@ -1,9 +1,7 @@
-﻿using Not.Injection;
-
-namespace Not.Application.Services;
+﻿namespace Not.Application.Services;
 
 // TODO: Remove and use IRepository instead
-public interface ICreateBehind<T> : ISingleton
+public interface ICreateBehind<T>
 {
     Task Create(T model);
 }

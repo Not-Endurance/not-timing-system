@@ -1,4 +1,4 @@
-﻿using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Objects.Startlists;
 using static NTS.Localization.NtsStrings;
 

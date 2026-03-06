@@ -1,0 +1,14 @@
+@inherits NTdBehind<T>
+@typeparam T
+
+<td style="@CellStyle">
+    @if (Value == null)
+    {
+        <span>-</span>
+    }
+    else
+    {
+        <span style="@TextStyle">@Value</span>
+    }
+</td>   
+

@@ -1,0 +1,14 @@
+﻿@using NTS.Judge.Features.Setup.Horses
+@using Not.Blazor.Components.Layout
+@using Not.Blazor.Navigation
+
+@attribute [Route(HORSE_UPDATE)]
+@inherits HorseContentBehind
+
+<NContent Title="@Configure_Horse_string" IsEmpty="Model == null">
+
+    <Main>
+        <HorseShell Model="Model" />
+    </Main>
+
+</NContent>

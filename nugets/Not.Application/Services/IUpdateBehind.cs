@@ -1,8 +1,6 @@
-﻿using Not.Injection;
+﻿namespace Not.Application.Services;
 
-namespace Not.Application.Services;
-
-public interface IUpdateBehind<T> : ISingleton
+public interface IUpdateBehind<T>
 {
     Task Update(T model);
 }

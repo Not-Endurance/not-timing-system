@@ -1,11 +1,11 @@
-﻿@using NTS.Judge.Blazor.Shared
-@using System.Reflection
-@using NTS.Judge.Blazor.Shared.Components
-@using Not.Blazor.Components
+﻿@using System.Reflection
+@using NTS.Judge.Blazor.Layout
+@inherits JudgeBlazorRootBehind
 
-<NErrorBoundary @ref="this._errorBoundary">
+<ErrorBoundary @ref="this.ErrorBoundary">
+
     <ChildContent>
-        <Router AppAssembly="Assembly" AdditionalAssemblies="_routeAssemblies">
+        <Router AppAssembly="Assembly" AdditionalAssemblies="RouteAssemblies">
 
             <Found Context="routeData">
                 <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
@@ -14,20 +14,25 @@
 
             <NotFound>
                 <LayoutView Layout="@typeof(MainLayout)">
-                    <p role="alert">Sorry, there's nothing at this address.</p>
+                    <p role="alert">@Sorry_theres_nothing_at_this_address_string</p>
                 </LayoutView>
             </NotFound>
+
         </Router>
     </ChildContent>
 
     <ErrorContent>
         <br />
+
         <br />
+
         <div class="container">
             <pre>@context.Message</pre>
+
             <pre>@context.StackTrace</pre>
         </div>
 
-        <button class="btn btn-primary" @onclick="_ => this._errorBoundary.Recover()">Back</button>
+        <button class="btn btn-primary" @onclick="_ => this.ErrorBoundary.Recover()">@Back_string</button>
     </ErrorContent>
-</NErrorBoundary>
+
+</ErrorBoundary>

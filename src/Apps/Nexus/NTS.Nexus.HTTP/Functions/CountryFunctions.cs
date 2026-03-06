@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Async;
+using Not.Async.Extensions;
 using Not.Serialization.JSON;
 using NTS.Application.Shared;
 using NTS.Domain.Aggregates;

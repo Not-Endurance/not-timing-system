@@ -1,0 +1,37 @@
+﻿@using NTS.Blazor.Components.ParticipationChips
+@using NTS.Domain.Core.Aggregates
+@using NTS.Blazor.Components.ParticipationTable
+@using Not.Blazor.Components.Input
+
+@inherits DashboardBehind
+
+@if (Selected == null)
+{
+    return;
+}
+
+<NGrid>
+    <MudItem xs="12" Class="mb-4">
+        <NAutocomplete @bind-value="Selected" SearchSafe="Search" Class="mb-2 dashboard-autocomplete" />
+    </MudItem>
+
+    <MudItem xs="3">
+        <ParticipationChips />
+    </MudItem>
+
+    <MudItem xs="9">
+        <ParticipationTable Phases="Selected.Phases" />
+    </MudItem>
+</NGrid>
+
+<style>
+    .dashboard-autocomplete .mud-select-input {
+        margin-top: 0 !important;
+    }
+    .dashboard-autocomplete input {
+        font-size: 1.5rem !important;
+    }
+    .dashboard-autocomplete label {
+        font-size: 1.25rem !important;
+    }
+</style>

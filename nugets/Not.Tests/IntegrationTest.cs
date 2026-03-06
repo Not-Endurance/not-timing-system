@@ -105,7 +105,7 @@ public abstract class IntegrationTest : IDisposable
             using var client = fixture.GetClient(_testOutputHelper);
             await client.Connect();
             await action();
-            await Task.Delay(RPC_DELAY); //TODO: a more sophisticated method maybe necessary with a lot of tests
+            await Task.Delay(RPC_DELAY);
             Assert.Contains(rpcName, client.InvokedMethods, EqualityComparer<string>.Default);
         }
         finally

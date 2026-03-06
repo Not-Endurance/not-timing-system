@@ -57,7 +57,7 @@ public class Phase : Entity
     public Timestamp? ArriveTime { get; private set; }
     public Timestamp? PresentTime { get; private set; }
     public Timestamp? RepresentTime { get; private set; }
-    public bool IsReinspectionRequested { get; internal set; }
+    public bool IsReinspectionRequested { get; internal set; } // TODO: rename to IsRepresentRequested
     public bool IsRequiredInspectionRequested { get; internal set; }
     public bool IsRequiredInspectionCompulsory { get; private set; }
     public TimeSpan? CompulsoryThresholdSpan { get; private set; }
@@ -138,7 +138,7 @@ public class Phase : Entity
         return averageSpeed < minSpeed || averageSpeed > maxSpeed;
     }
 
-    internal void RequestRequiredInspection()
+    internal void RequestInspection()
     {
         if (IsRequiredInspectionRequested)
         {
@@ -172,7 +172,7 @@ public class Phase : Entity
                 Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string
             );
         }
-        IsReinspectionRequested = false; // TODO:rename to IsRepresentation requested
+        IsReinspectionRequested = false;
     }
 
     internal void SetGate(int number, double totalDistanceSoFar)

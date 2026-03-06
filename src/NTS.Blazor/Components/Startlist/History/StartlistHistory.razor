@@ -11,7 +11,7 @@
         @foreach (var tabHeader in StartlistsByStage.Keys)
         {
             <MudTabPanel Text="@tabHeader">
-                <NSimpleTable T="StartlistEntry" Headings="TableHeaders" Items="StartlistsByStage[tabHeader]" />
+                <NTable Headings="TableHeaders" Items="StartlistsByStage[tabHeader]" />
             </MudTabPanel>
         }
     </MudTabs>

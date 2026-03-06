@@ -2,7 +2,7 @@
 
 namespace Not.Application.Services;
 
-public interface IDeleteBehind<T> : ISingleton
+public interface IDeleteBehind<T>
 {
     Task Delete(T entity);
 }

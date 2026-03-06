@@ -55,11 +55,6 @@ public class NotListModel
             yield return new NotListModel<T>(value);
         }
     }
-
-    public static NotListModel<T> Empty<T>()
-    {
-        return new NotListModel<T>();
-    }
 }
 
 public class NotListModel<T>
@@ -68,12 +63,6 @@ public class NotListModel<T>
     {
         Value = value;
         Label = label ?? value!.ToString()!;
-    }
-
-    public NotListModel()
-    {
-        //TODO: Localize no items label
-        Label = "No items in this list yet.";
     }
 
     public T? Value { get; } = default!;

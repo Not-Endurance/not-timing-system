@@ -1,31 +1,32 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Not.Logging;
 using Not.Notify;
 using Not.Serialization.JSON;
+using Not.Strings;
 
 namespace Not.Application.RPC.SignalR;
 
 public class SignalRSocket : IRpcSocket, IAsyncDisposable
 {
-    readonly ISocketMetadata? _metadata;
     readonly RpcSettings _context;
     readonly string _name;
+    readonly INotifier _notifier;
 
-    public SignalRSocket(IOptions<RpcSettings> options, ISocketMetadata? metadata = null)
+    public SignalRSocket(IOptions<RpcSettings> options, INotifier notifier)
     {
-        _metadata = metadata;
         _context = Validate(options.Value);
         _name = GetType().Name;
+        _notifier = notifier;
     }
 
     // Necessary because this.Connection instance is not intialized
     // when procedures are reigstered in the child constructor
     internal List<Action<HubConnection>> Procedures { get; } = [];
 
-    public event EventHandler<RpcConnectionStatus>? ServerConnectionChanged;
+    public event EventHandler<SocketConnectionStatus>? ServerConnectionChanged;
     public event EventHandler<string>? ServerConnectionInfo;
     public event EventHandler<RpcError>? Error;
 
@@ -45,9 +46,14 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         Error?.Invoke(this, error);
     }
 
+    public virtual async Task Connect(string groupId)
+    {
+        await InternalConnect(groupId);
+    }
+
     public virtual async Task Connect()
     {
-        await InternalConnect();
+        await InternalConnect(null);
     }
 
     public virtual async Task Disconnect()
@@ -72,7 +78,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         await Connection.DisposeAsync();
     }
 
-    async Task InternalConnect()
+    async Task InternalConnect(string? groupId)
     {
         if (IsConnected)
         {
@@ -82,7 +88,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         }
         try
         {
-            ConfigureConnection();
+            ConfigureConnection(groupId);
             RaiseConnecting();
             if (!IsConnected)
             {
@@ -92,21 +98,16 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         }
         catch (Exception ex)
         {
-            NotifyHelper.Error(ex);
+            _notifier.Error(ex);
         }
     }
 
-    void ConfigureConnection()
+    void ConfigureConnection(string? groupId)
     {
         var url = _context.Url;
-        if (_metadata != null)
+        if (groupId != null)
         {
-            var query = new Dictionary<string, string?>();
-            if (_metadata.ConnectionGroupKey != null)
-            {
-                query.Add(RpcConstants.CONNECTION_GROUP_KEY, _metadata.ConnectionGroupKey);
-            }
-
+            var query = new Dictionary<string, string?> { { RpcConstants.CONNECTION_GROUP_KEY, groupId } };
             url = QueryHelpers.AddQueryString(url, query);
         }
 
@@ -147,23 +148,23 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
     void RaiseDisconnected(Exception? _ = default)
     {
-        ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Disconnected);
+        ServerConnectionChanged?.Invoke(_name, SocketConnectionStatus.Disconnected);
     }
 
     void RaiseReconnecting(string message)
     {
-        ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connecting);
+        ServerConnectionChanged?.Invoke(_name, SocketConnectionStatus.Connecting);
         ServerConnectionInfo?.Invoke(_name, $"{message}. Attempting to reconnect");
     }
 
     void RaiseConnecting()
     {
-        ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connecting);
+        ServerConnectionChanged?.Invoke(_name, SocketConnectionStatus.Connecting);
     }
 
     void RaiseConnected(string? message = null)
     {
-        ServerConnectionChanged?.Invoke(_name, RpcConnectionStatus.Connected);
+        ServerConnectionChanged?.Invoke(_name, SocketConnectionStatus.Connected);
         if (message != null)
         {
             ServerConnectionInfo?.Invoke(_name, message);
@@ -187,17 +188,18 @@ public interface IRpcSocket
     /// <summary>
     /// 'true' means connected; 'false' - disconnected;
     /// </summary>
-    event EventHandler<RpcConnectionStatus>? ServerConnectionChanged;
+    event EventHandler<SocketConnectionStatus>? ServerConnectionChanged;
     event EventHandler<string>? ServerConnectionInfo;
     event EventHandler<RpcError>? Error;
     HubConnection? Connection { get; }
     bool IsConnected { get; }
     Task Connect();
+    Task Connect(string groupId);
     Task Disconnect();
     void RaiseError(Exception exception, string? procedure, params object?[] arguments);
 }
 
-public enum RpcConnectionStatus
+public enum SocketConnectionStatus
 {
     Disconnected = 0,
     Connecting = 1,

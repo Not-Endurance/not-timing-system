@@ -1,5 +1,5 @@
 ﻿using MudBlazor;
-using Not.Blazor.Navigation;
+using Not.Blazor.Navigation.Abstractions;
 using SwipeDirection = MudBlazor.SwipeDirection;
 
 namespace NTS.Witness.Blazor.Components.Shared;

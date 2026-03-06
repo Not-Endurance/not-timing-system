@@ -15,9 +15,10 @@ public static class NtsWitnessServices
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
             .AddStartlist()
             .ConfigureN()
-            .AddRpcClient();
+            .AddRpcClient()
+            .AddDomainEvents();
 
-        services.ConfigureNts(configuration).AddNBlazor(configuration).ConfigureAuthentication(configuration);
+        services.AddNts(configuration).AddNBlazor(configuration).ConfigureAuthentication(configuration);
 
         return services;
     }

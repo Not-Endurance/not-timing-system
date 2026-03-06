@@ -1,9 +1,9 @@
-﻿using Not.Application.Services;
+﻿using Not.Krud.Models;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 
-public class LoopFormModel : IFormModel<Loop>
+public record LoopFormModel : KrudFormModel<Loop>
 {
     public LoopFormModel()
     {
@@ -12,12 +12,16 @@ public class LoopFormModel : IFormModel<Loop>
 #endif
     }
 
-    public int? Id { get; set; }
     public double? Distance { get; set; }
 
-    public void FromEntity(Loop entity)
+    protected override Loop MapTo()
     {
-        Id = entity.Id;
-        Distance = entity.Distance;
+        return new(Distance, Id);
+    }
+
+    public override void MapFrom(Loop loop)
+    {
+        Id = loop.Id;
+        Distance = loop.Distance;
     }
 }

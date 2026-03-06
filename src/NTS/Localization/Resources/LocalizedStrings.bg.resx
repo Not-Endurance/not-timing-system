@@ -324,9 +324,6 @@
   <data name="Configure_Endurance_Event_string" xml:space="preserve">
     <value>Конфигурирай Събитие</value>
   </data>
-  <data name="Endurance_Event_does_not_exist_yet_string" xml:space="preserve">
-    <value>Не е създадено събитие</value>
-  </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Конфигурирай Състезание</value>
   </data>
@@ -374,9 +371,6 @@
   </data>
   <data name="Cancel_string" xml:space="preserve">
     <value>Откажи</value>
-  </data>
-  <data name="The_Competitions_havent_started_yet_string" xml:space="preserve">
-    <value>Състезанията не са стартирани</value>
   </data>
   <data name="Archive_string" xml:space="preserve">
     <value>Архивирай</value>
@@ -579,9 +573,6 @@
   <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
     <value>Сигурни ли сте че искате да ресетнете състезанията? Това ще ИЗТРИЕ ВСИЧКИ ЗАПИСАНИ ВРЕМЕНА НА ФАЗИ и няма да можете да ги въстановите. </value>
   </data>
-  <data name="Cannot_select_another_event_without_resetting__string" xml:space="preserve">
-    <value>Не може да изберете друго събитие докато сте свързани с '{0}'. Ако сте се свързали с грешно събитие моля да го Ресетнете (чрез бутона в ляво) </value>
-  </data>
   <data name="Hard_reset_string" xml:space="preserve">
     <value>Хард ресет</value>
   </data>
@@ -768,9 +759,6 @@
   <data name="Empty_performance_official_message" xml:space="preserve">
     <value>Изберете участник отгоре, за да видите неговите резултати</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Cannot_select_another_event_before_disconnect__string" xml:space="preserve">
     <value>Прекъснете активната връзка към {0} преди да установите нова</value>
   </data>
@@ -782,5 +770,128 @@
   </data>
   <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
     <value>Не може да бъде добавен в Стартлист защото участникът е завършил</value>
+  </data>
+  <data name="Fei_Id_string" xml:space="preserve">
+    <value>FEI Id</value>
+  </data>
+  <data name="Empty_string" xml:space="preserve">
+    <value>Празно</value>
+  </data>
+  <data name="Connected_to_string" xml:space="preserve">
+    <value>Свързан към</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Updated_string" xml:space="preserve">
+    <value>Обновено</value>
+  </data>
+  <data name="Arrive_string" xml:space="preserve">
+    <value>Пристигане</value>
+  </data>
+  <data name="Represent_string" xml:space="preserve">
+    <value>Реинспекция</value>
+  </data>
+  <data name="RI_Time_string" xml:space="preserve">
+    <value>RI време</value>
+  </data>
+  <data name="CRI_Time_string" xml:space="preserve">
+    <value>CRI време</value>
+  </data>
+  <data name="Loop_T_string" xml:space="preserve">
+    <value>Кръг В</value>
+  </data>
+  <data name="Phase_T_string" xml:space="preserve">
+    <value>Фаза В</value>
+  </data>
+  <data name="Loop_S_string" xml:space="preserve">
+    <value>Кръг С</value>
+  </data>
+  <data name="Phase_S_string" xml:space="preserve">
+    <value>Фаза С</value>
+  </data>
+  <data name="Start_In_string" xml:space="preserve">
+    <value>Старт след</value>
+  </data>
+  <data name="ID_of_archive_to_load_string" xml:space="preserve">
+    <value>ID на архив за зареждане</value>
+  </data>
+  <data name="Load_string" xml:space="preserve">
+    <value>Зареди</value>
+  </data>
+  <data name="Search_string" xml:space="preserve">
+    <value>Търси</value>
+  </data>
+  <data name="Configure_Phase_string" xml:space="preserve">
+    <value>Конфигурирай Фаза</value>
+  </data>
+  <data name="Configure_Combination_string" xml:space="preserve">
+    <value>Конфигурирай Комбинация</value>
+  </data>
+  <data name="Configure_Clubs_string" xml:space="preserve">
+    <value>Конфигурирай Клубове</value>
+  </data>
+  <data name="Eliminate_string" xml:space="preserve">
+    <value>Елиминирай</value>
+  </data>
+  <data name="Restore_string" xml:space="preserve">
+    <value>Възстанови</value>
+  </data>
+  <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
+    <value>Съжаляваме, няма нищо на този адрес.</value>
+  </data>
+  <data name="Sign_in_with_Google_string" xml:space="preserve">
+    <value>Вход с Google</value>
+  </data>
+  <data name="This_page_redirects_to_Signin_string" xml:space="preserve">
+    <value>Тази страница пренасочва към вход.</value>
+  </data>
+  <data name="Signed_in_as__string" xml:space="preserve">
+    <value>Вписан като {0}</value>
+  </data>
+  <data name="You_have___privileges_string" xml:space="preserve">
+    <value>Имате права: {0}.</value>
+  </data>
+  <data name="Sign_Out_string" xml:space="preserve">
+    <value>Изход</value>
+  </data>
+  <data name="No_roles_assigned_string" xml:space="preserve">
+    <value>Няма зададени роли</value>
+  </data>
+  <data name="An_error_occurred_while_sending_snapshots_Please_try_again_string" xml:space="preserve">
+    <value>Възникна грешка при изпращане на снимките. Моля, опитайте отново.</value>
+  </data>
+  <data name="Snapshots_sent_as__string" xml:space="preserve">
+    <value>Снимките са изпратени като {0}</value>
+  </data>
+  <data name="Provide_Archive_ID_string" xml:space="preserve">
+    <value>Въведете ID на архива</value>
+  </data>
+  <data name="Please_select_the_combination_string" xml:space="preserve">
+    <value>Моля, изберете комбинация</value>
+  </data>
+  <data name="Reason_is_required_string" xml:space="preserve">
+    <value>Причината е задължителна</value>
+  </data>
+  <data name="Event_is_not_started_yet_string" xml:space="preserve">
+    <value>Събитието все още не е стартирало</value>
+  </data>
+  <data name="File_uploaded_successfully_string" xml:space="preserve">
+    <value>Файлът е качен успешно.</value>
+  </data>
+  <data name="Cannot_delete_default_image_string" xml:space="preserve">
+    <value>Изображението по подразбиране не може да се изтрие.</value>
+  </data>
+  <data name="Confirm_Delete_string" xml:space="preserve">
+    <value>Потвърди изтриване</value>
+  </data>
+  <data name="Image_deleted_string" xml:space="preserve">
+    <value>Изображението е изтрито.</value>
+  </data>
+  <data name="File_not_found_string" xml:space="preserve">
+    <value>Файлът не е намерен.</value>
+  </data>
+  <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
+    <value>Предстоящите събития не могат да бъдат изтрити</value>
   </data>
 </root>

@@ -1,0 +1,18 @@
+﻿@using Not.Application.Services
+@using Not.Domain
+@using Not.Krud.Abstractions
+@using Not.Krud.Blazor.Components.Abstractions
+
+@typeparam T where T : Entity
+@typeparam TModel where TModel : IKrudModel<T>, IKrudFormModel, new()
+@typeparam TShell where TShell : KrudShell<TModel>
+@inherits KrudListBehind<T, TModel, TShell>
+
+<MudPaper Elevation="0" Class="@("pa-4 " + Class)" Style="@Style">
+
+    <NList Items="Entities" Title="@Name"  IsLoading="@IsLoading"
+           CreateSafe="CreateSafe"
+           UpdateSafe="UpdateSafe" 
+           DeleteSafe="DeleteSafe"/>
+    
+</MudPaper>

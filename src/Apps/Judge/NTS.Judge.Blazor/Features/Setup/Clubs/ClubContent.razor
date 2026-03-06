@@ -1,0 +1,14 @@
+﻿@using NTS.Judge.Features.Setup.Clubs
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(CLUB_UPDATE)]
+@inherits ClubContentBehind
+
+<NContent Title="@Configure_Club_string" IsEmpty="Model == null">
+
+    <Main>
+        <ClubShell Model="Model" />
+    </Main>
+
+</NContent>
+

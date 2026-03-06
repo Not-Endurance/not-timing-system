@@ -1,0 +1,19 @@
+﻿@using NTS.Domain.Aggregates
+@using NTS.Domain.Setup.Aggregates
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+@using NTS.Judge.Features.Setup.Athletes
+
+@inherits AthleteShellBehind
+
+<KrudForm Shell="this">
+
+    <NTextField @bind-Value="Model.Names" For="() => Model.Names" Label="@Name_string" />
+
+    <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@FEI_Id_string" HelperText="@Required_only_for_FEI_export_string" />
+
+    <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountriesSafe" />
+
+    <NAutocomplete @bind-Value="Model.Club" For="() => Model.Club" Label="@Clubs_string" SearchSafe="SearchClubsSafe" />
+
+</KrudForm>

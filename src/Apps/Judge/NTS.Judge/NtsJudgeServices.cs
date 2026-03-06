@@ -1,8 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Krud.ServiceRegistration;
-using Not.Blazor;
+using Not.Krud.ServiceRegistration;
 using NTS.Application;
 using NTS.Domain.Setup.Aggregates;
 
@@ -16,7 +15,8 @@ public static class NtsJudgeServices
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
             .AddStartlist()
             .ConfigureN()
-            .AddRpcClient();
+            .AddRpcClient()
+            .AddDomainEvents();
 
         services
             .ConfigureKrud()
@@ -25,6 +25,6 @@ public static class NtsJudgeServices
             .RegisterAggregate<Horse>()
             .RegisterAggregate<Club>();
 
-        return services.ConfigureNts(configuration).AddNBlazor(configuration);
+        return services.AddNts(configuration);
     }
 }

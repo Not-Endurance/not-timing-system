@@ -1,4 +1,4 @@
-﻿using Not.Concurrency;
+﻿using Not.Async;
 using Not.Events;
 using Not.Observables;
 using Not.Safe;

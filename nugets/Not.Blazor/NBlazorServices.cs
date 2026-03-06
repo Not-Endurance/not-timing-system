@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MudBlazor;
 using MudBlazor.Services;
-using Not.Blazor.CRUD.Forms;
-using Not.Blazor.Dialogs;
-using Not.Blazor.Mud;
+using Not.Blazor.Helpers;
 using Not.Blazor.Navigation;
+using Not.Blazor.Navigation.Abstractions;
+using Not.Notify;
 
 namespace Not.Blazor;
 
@@ -13,15 +14,17 @@ public static class NBlazorServices
 {
     public static IServiceCollection AddNBlazor(this IServiceCollection services, IConfiguration _)
     {
+        services.TryAddSingleton<Notifier>();
+        services.TryAddSingleton<INotifier>(provider => provider.GetRequiredService<Notifier>());
+        services.TryAddSingleton<INotificationStream>(provider => provider.GetRequiredService<Notifier>());
+
         return services
             .AddMudBlazor()
-            .AddTransient(typeof(CrudeDialog<,>))
-            .AddTransient(typeof(FormManager<,>))
             .AddTransient<ILandNavigator, BlazorCrumbsNavigator>()
             .AddTransient<ICrumbsNavigator, BlazorCrumbsNavigator>();
     }
 
-    public static IServiceCollection AddMudBlazor(
+    static IServiceCollection AddMudBlazor(
         this IServiceCollection services,
         Action<MudServicesConfiguration>? customConfiguration = null
     )

@@ -1,0 +1,33 @@
+﻿@using NTS.Domain.Setup.Aggregates
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Inspections
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Snapshots
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(DASHBOARD_PAGE)]
+@inherits DashboardContentBehind
+
+<NContent Title="@Dashboard_string" IsEmpty="false">
+    
+    <Main>
+        @if (Service.IsStarted)
+        {
+            <Dashboard />
+        }
+        else 
+        {
+            <MudNumericField @bind-Value="ArchiveId" Label="@ID_of_archive_to_load_string" />
+            <NButtonPrimary OnClick="LoadArchive">@Load_string</NButtonPrimary>
+        }
+    </Main>
+
+    <Rightbar>
+        <SnapshotPanel Class="mb-2" />
+
+        <InspectionsPanel Class="mb-2" />
+
+        <EliminationsPanel Class="mb-2" />
+    </Rightbar>
+
+</NContent>

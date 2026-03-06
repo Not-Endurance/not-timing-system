@@ -1,0 +1,13 @@
+﻿@using NTS.Judge.Features.Setup.UpcomingEvents.Combinations
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(COMBINATION_UPDATE)]
+@inherits CombinationContentBehind
+
+<NContent Title="@Configure_Combination_string" IsEmpty="Model == null">
+
+    <Main>
+        <CombinationShell Model="Model" />
+    </Main>
+
+</NContent>

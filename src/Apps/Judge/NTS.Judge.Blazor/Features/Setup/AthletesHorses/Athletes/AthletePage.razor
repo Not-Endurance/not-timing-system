@@ -1,0 +1,12 @@
+﻿@using Not.Blazor.Components.Layout
+
+@attribute [Route(ATHLETE_UPDATE)]
+@inherits AthletePageBehind
+
+<NContent Title="@Configure_Athlete_string" IsEmpty="Model == null">
+
+    <Main>
+        <AthleteShell Model="Model" />
+    </Main>
+
+</NContent>

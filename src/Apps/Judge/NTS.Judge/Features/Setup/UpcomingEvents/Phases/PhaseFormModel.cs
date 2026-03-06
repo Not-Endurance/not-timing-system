@@ -1,9 +1,9 @@
-﻿using Not.Application.Services;
+﻿using Not.Krud.Models;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents.Phases;
 
-public class PhaseFormModel : IFormModel<Phase>
+public record PhaseFormModel : KrudFormModel<Phase>
 {
     public PhaseFormModel()
     {
@@ -13,12 +13,16 @@ public class PhaseFormModel : IFormModel<Phase>
 #endif
     }
 
-    public int? Id { get; set; }
     public Loop? Loop { get; set; }
     public int? Recovery { get; set; }
     public int? Rest { get; set; }
 
-    public void FromEntity(Phase phase)
+    protected override Phase MapTo()
+    {
+        return new Phase(Loop, Recovery, Rest, Id);
+    }
+
+    public override void MapFrom(Phase phase)
     {
         Id = phase.Id;
         Loop = phase.Loop;

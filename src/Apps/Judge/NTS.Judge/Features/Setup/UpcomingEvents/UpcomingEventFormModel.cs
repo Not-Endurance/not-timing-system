@@ -1,11 +1,11 @@
-﻿using Not.Application.Services;
+﻿using Not.Krud.Models;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
-public class UpcomingEventFormModel : IFormModel<UpcomingEvent>
+public record UpcomingEventFormModel : KrudFormModel<UpcomingEvent>
 {
     public UpcomingEventFormModel()
     {
@@ -15,7 +15,6 @@ public class UpcomingEventFormModel : IFormModel<UpcomingEvent>
 #endif
     }
 
-    public int? Id { get; set; }
     public string? Name { get; set; }
     public string? Place { get; set; }
     public Country? Country { get; set; }
@@ -27,7 +26,24 @@ public class UpcomingEventFormModel : IFormModel<UpcomingEvent>
     public IReadOnlyCollection<Combination> Combinations { get; private set; } = [];
     public IReadOnlyCollection<Loop> Loops { get; private set; } = [];
 
-    public void FromEntity(UpcomingEvent upcomingEvent)
+    protected override UpcomingEvent MapTo()
+    {
+        return new UpcomingEvent(
+            Name,
+            Place,
+            Country,
+            FeiShowId,
+            FeiId,
+            FeiEventCode,
+            Competitions,
+            Officials,
+            Loops,
+            Combinations,
+            Id
+        );
+    }
+
+    public override void MapFrom(UpcomingEvent upcomingEvent)
     {
         Id = upcomingEvent.Id;
         Name = upcomingEvent.Name;

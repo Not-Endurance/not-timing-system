@@ -1,0 +1,22 @@
+@using NTS.Domain.Aggregates
+@using NTS.Domain.Objects
+@using NTS.Domain.Setup.Aggregates
+@using NTS.Judge.Features.Setup.UpcomingEvents
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+
+@inherits UpcomingEventShellBehind
+
+<KrudForm Shell="this">
+    <NTextField @bind-Value="Model.Place" For="() => Model.Place" Label="@Place_string" />
+    
+    <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+
+    <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountriesSafe" />
+    
+    <NTextField @bind-Value="Model.FeiShowId" For="() => Model.FeiShowId" Label="@($"{required_for_FEI_export} - {FEI_Show_ID_label}")" />
+    
+    <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@($"{required_for_FEI_export} - {FEI_Event_ID_label}")" />
+
+    <NTextField @bind-Value="Model.FeiEventCode" For="() => Model.FeiEventCode" Label="@($"{required_for_FEI_export} - {FEI_Event_Code_label}")" />
+</KrudForm>

@@ -1,9 +1,9 @@
-﻿using Not.Application.Services;
+﻿using Not.Krud.Models;
 using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Blazor.Setup.AthletesHorses.Horses;
+namespace NTS.Judge.Features.Setup.Horses;
 
-public class HorseFormModel : IFormModel<Horse>
+public record HorseFormModel : KrudFormModel<Horse>
 {
     public HorseFormModel()
     {
@@ -12,11 +12,15 @@ public class HorseFormModel : IFormModel<Horse>
 #endif
     }
 
-    public int? Id { get; set; }
     public string? FeiId { get; set; }
     public string? Name { get; set; }
 
-    public void FromEntity(Horse horse)
+    protected override Horse MapTo()
+    {
+        return new(Name, FeiId, Id);
+    }
+
+    public override void MapFrom(Horse horse)
     {
         Id = horse.Id;
         FeiId = horse.FeiId;

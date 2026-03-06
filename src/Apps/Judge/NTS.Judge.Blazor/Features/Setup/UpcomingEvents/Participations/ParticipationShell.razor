@@ -1,0 +1,36 @@
+﻿@using NTS.Domain.Setup.Aggregates.UpcomingEvents
+@using NTS.Judge.Features.Setup.UpcomingEvents.Participations
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+
+@inherits ParticipationShellBehind
+
+<KrudForm Shell="this">
+    <NAutocomplete T="Combination" @bind-Value="Model.Combination" For="() => Model.Combination" Label="@Combination_string"
+        SearchSafe="SearchCombinationsSafe" />
+
+    <NSelect @bind-Value="Model.Category" For="() => Model.Category" Label="@Category_string" />
+    
+    <NSwitch @bind-Value="Model.IsNotRanked" For="() => Model.IsNotRanked" Label="@Is_not_ranked_string" />
+
+    <NSwitch @bind-Value="Model.IsStartTimeOverriden" For="() => Model.IsStartTimeOverriden" Label="@Override_Start_Time_string" />
+
+    @if (Model.IsStartTimeOverriden)
+    {
+        <NTimePicker @bind-Time="Model.StartTimeOverride" For="() => Model.StartTimeOverride" ShowToolbar="false" Label="@Start_Time_string" Editable="true" Mask="TimeMask" />
+    }
+
+    <NSwitch @bind-Value="Model.IsMaxSpeedOverriden" For="() => Model.IsMaxSpeedOverriden" Label="@Max_Speed_string" />
+
+    @if (Model.IsMaxSpeedOverriden)
+    {
+        <NNumberField @bind-Value="Model.MaxSpeedOverride" For="() => Model.MaxSpeedOverride" Label="@Max_Speed_string" Variant="Variant.Text" /> // TODO: is necessary?
+    }
+
+    <NSwitch @bind-Value="Model.IsMinSpeedOverriden" For="() => Model.IsMinSpeedOverriden" Label="@Min_Speed_string" />
+
+    @if (Model.IsMinSpeedOverriden)
+    {
+        <NNumberField @bind-Value="Model.MinSpeedOverride" For="() => Model.MinSpeedOverride" Label="@Min_Speed_string" />
+    }
+</KrudForm>

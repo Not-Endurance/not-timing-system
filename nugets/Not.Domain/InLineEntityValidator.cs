@@ -41,7 +41,7 @@ public abstract class InLineEntityValidator
         return value;
     }
 
-    protected static ReadOnlyCollection<T> AreUnique<T>(string field, ReadOnlyCollection<T> collection)
+    protected static IEnumerable<T> AreUnique<T>(string field, IEnumerable<T> collection)
         where T : IIdentifiable
     {
         if (collection.GroupBy(x => x.Id).Select(x => x.Count()).Any(x => x != 1))

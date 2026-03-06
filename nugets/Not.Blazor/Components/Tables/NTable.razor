@@ -1,0 +1,41 @@
+
+@inherits NTableBehind
+
+<MudSimpleTable Style="@($"overflow-x: auto; {Style}")" FixedHeader="FixedHeader">
+    <thead>
+        <tr>
+            @foreach (var heading in Headings)
+            {
+                <th>
+                    <MudText Typo="@Typography">@heading</MudText>
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @if(Items.Count() == 0)
+        {
+            <MudPaper Elevation="0" Class="pa-4">
+                <MudText Typo="@Typography">@EmptyMessage</MudText>
+            </MudPaper>
+        }
+        @foreach (var item in Items)
+        {
+            <tr>
+                @foreach (var value in Transform(item))
+                {
+                    <td>
+                        <MudText Typo="@Typography">@value</MudText>
+                    </td>
+                }
+                @if (TrailingCell != default)
+                {
+                    <td>
+                        @TrailingCell.Invoke(item)
+                    </td>
+                }                   
+            </tr>
+        }
+    </tbody>
+</MudSimpleTable>
+

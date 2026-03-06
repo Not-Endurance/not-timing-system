@@ -1,0 +1,15 @@
+﻿@using NTS.Judge.Blazor.Features.Socket
+
+@inherits SideMenu2Behind
+
+<MudStack Class="ma-6">
+
+    @if (! IsStarted)
+    {
+        <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
+    }
+
+    <NButtonWarning OnClick="OpenSoftResetDialog" Text="@Reset_string" />
+
+    <SocketStatus />
+</MudStack>

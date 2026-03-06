@@ -1,0 +1,16 @@
+﻿@using NTS.Domain.Aggregates
+@using NTS.Domain.Setup.Aggregates
+@using NTS.Judge.Features.Setup.Clubs
+@using Not.Blazor.Components.Layout
+@using Not.Krud.Blazor.Components
+
+@attribute [Route(CLUBS_PAGE)]
+@inherits ClubListContentBehind
+
+<NContent Title="@Configure_Clubs_string" Class="not-mid-width">
+
+    <Main>
+        <KrudList T="Club" TModel="ClubFormModel" TShell="ClubShell"  Name="@Clubs_string" />
+    </Main>
+
+</NContent>

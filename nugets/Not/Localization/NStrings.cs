@@ -7,7 +7,7 @@ namespace Not.Localization;
 
 public static class NStrings
 {
-    public static string Localize(Enum value) // TODO: Use DisplayAttribute
+    public static string Localize(Enum value)
     {
         return LocalizeEnum(value);
     }
@@ -17,6 +17,7 @@ public static class NStrings
     public static string Create_string => LocalizeString(nameof(Create_string));
     public static string Back_string => LocalizeString(nameof(Back_string));
     public static string Update_string => LocalizeString(nameof(Update_string));
+    public static string Updated_string => LocalizeString(nameof(Updated_string));
     public static string Delete_string => LocalizeString(nameof(Delete_string));
     public static string Print_string => LocalizeString(nameof(Print_string));
     public static string Date_string => LocalizeString(nameof(Date_string));
@@ -44,6 +45,7 @@ public static class NStrings
     public static string Image_browser_string => LocalizeString(nameof(Image_browser_string));
     public static string Image_browser_empty_string => LocalizeString(nameof(Image_browser_empty_string));
     public static string Use_image_string => LocalizeString(nameof(Use_image_string));
+    public static string Empty_string => LocalizeString(nameof(Empty_string));
 }
 #pragma warning restore NA0004
 #pragma warning restore IDE1006

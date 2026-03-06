@@ -11,11 +11,5 @@
     <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\..\Warp\NTS.Warp\NTS.Warp.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Resources\static-options.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   
 </Project>

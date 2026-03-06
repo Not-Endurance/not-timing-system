@@ -1,7 +1,11 @@
-﻿namespace Not.Structures;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Not.Structures;
 
 public class Result : ResultBase
 {
+    const string CANCELLED_ERROR = "Cancelled by user";
+
     public static Result Success()
     {
         return new();
@@ -17,6 +21,11 @@ public class Result : ResultBase
         return new(errors);
     }
 
+    public static Result<T> Cancel<T>()
+    {
+        return new Result<T>([CANCELLED_ERROR]);
+    }
+
     internal Result() { }
 
     internal Result(IEnumerable<string> errors)
@@ -29,6 +38,12 @@ public class Result<T> : ResultBase
     {
         Data = data;
     }
+
+    internal Result(IEnumerable<string> errors)
+        : base(errors) { }
+
+    [MemberNotNullWhen(false, nameof(Data))]
+    public new bool IsError => base.IsError;
 
     public T? Data { get; }
 }
@@ -43,5 +58,5 @@ public abstract class ResultBase
     }
 
     public bool IsError => Errors.Any();
-    public string[] Errors { get; } = Array.Empty<string>();
+    public string[] Errors { get; } = [];
 }

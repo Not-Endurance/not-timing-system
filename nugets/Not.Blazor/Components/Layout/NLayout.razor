@@ -1,0 +1,41 @@
+@using Not.Blazor.Components.Layout
+@using Not.Blazor.Components.Text
+
+@inherits NLayoutBehind
+
+<NTheme @ref="Theme"/>
+
+<MudLayout>
+    @if (! HideLayout)
+    {
+        <MudAppBar Elevation="1">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="(e) => ToggleDrawer()" />
+
+            <MudSpacer />
+
+            <NHeadline3 Content="@Watermark" />
+        </MudAppBar>
+
+        <MudDrawer @bind-Open="DrawerOpen" Elevation="2">
+            @if (MenuTitle != null)
+            {
+                <MudDrawerHeader>
+                    <NHeadline3 Content="@MenuTitle" />
+                </MudDrawerHeader>
+            }
+                
+            @Drawer
+        </MudDrawer>
+    }
+
+    <MudMainContent>
+        <CascadingValue Value="@Theme.ThemeProvider">
+            <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+                @Content
+            </MudContainer>
+
+            <NNotifier />
+        </CascadingValue>
+    </MudMainContent>
+
+</MudLayout>

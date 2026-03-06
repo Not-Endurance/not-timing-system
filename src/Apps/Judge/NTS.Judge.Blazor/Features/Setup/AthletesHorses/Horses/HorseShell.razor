@@ -1,0 +1,12 @@
+﻿@using NTS.Judge.Features.Setup.Horses
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+@using Not.Krud.Blazor.Components.Abstractions
+
+@inherits KrudShell<HorseFormModel>
+
+<KrudForm Shell="this">
+    <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+
+    <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@FEI_Id_string" HelperText="@Required_only_for_FEI_export_string" />
+</KrudForm>

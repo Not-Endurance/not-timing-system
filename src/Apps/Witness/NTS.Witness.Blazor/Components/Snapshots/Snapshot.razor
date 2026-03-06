@@ -13,14 +13,17 @@
 
 <MudPaper Height="100%">
     <MudPaper Class="justify-center pa-2">
-        <ParticipationChips Set="@Service.Active" OnSelect="SelectHandler" SetChipColor="GetColor" ChipSize="Size.Large" />
+        <ParticipationChips Set="@Service.Participations" OnSelect="SelectHandler" />
     </MudPaper>
     
     <MudPaper Elevation="0" Class="pa-2">
-        <NSimpleTable T="IntermediateSnapshot" Items="@SelectedParticipations" EmptyMessage="@Empty_intermediate_snapshot_list_string"
-            Headings="@SnapshotTableHeaders" FixedHeader="true" Height="65vh">
+        <NTable Items="@SelectedParticipations" EmptyMessage="@Empty_intermediate_snapshot_list_string"
+            Headings="@SnapshotTableHeaders" FixedHeader="true" Style="height: 65vh;">
 
-            <CustomCell>
+            <TrailingCell Context="item">
+                @{
+                    var context = (IntermediateSnapshot)item;
+                }
                 @if(context.Timestamp == null)
                 {
                     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => SnapshotHandler(context)">@Snapshot_string</MudButton>    
@@ -29,9 +32,9 @@
                 {
                     <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="() => EditSnapshot(context)">@context.Timestamp</MudButton>    
                 }
-            </CustomCell>
+            </TrailingCell>
 
-            </NSimpleTable>
+            </NTable>
     </MudPaper>
     
     @if(SnapshotParticipations.Count > 0)

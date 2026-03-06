@@ -15,4 +15,5 @@ public interface IEventSubscriber<T>
     Guid Subscribe(Action<T> action);
     Guid SubscribeAsync(Func<T, Task> action);
     Guid SubscribeAsync(Action<T> action);
+    void Unsubscribe(Guid guid);
 }

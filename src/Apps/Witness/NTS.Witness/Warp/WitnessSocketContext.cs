@@ -1,64 +1,57 @@
-﻿using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Notify;
-using NTS.Application.SignalR;
+using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
 
 namespace NTS.Witness.Warp;
 
-public class WitnessSocketContext : ISelectedEventContext, IConnectionStatus, IGroupSocketContext<UpcomingEvent>
+public class WitnessSocketContext : IConnectionStatus, INtsSocketService
 {
     readonly IRpcSocket _socket;
-    readonly SocketMetadata _metadata;
+    readonly INotifier _notifier;
 
-    public WitnessSocketContext(IRpcSocket socket, SocketMetadata metadata)
+    public WitnessSocketContext(IRpcSocket socket, INotifier notifier)
     {
         _socket = socket;
-        _metadata = metadata;
+        _notifier = notifier;
     }
 
-    public UpcomingEvent? Hook { get; private set; }
-    public UpcomingEvent? Event => Hook;
+    public UpcomingEvent? Principal { get; private set; }
+    public UpcomingEvent? Event => Principal;
 
     public async Task Disconnect()
     {
-        var @event = Hook;
-        InternalSet(null);
+        var @event = Principal;
+        Principal = null;
         await _socket.Disconnect();
         if (!_socket.IsConnected && @event != null)
         {
-            NotifyHelper.Warn(string.Format(Disconnected_from__string, @event.Name));
+            _notifier.Warn(string.Format(Disconnected_from__string, @event.Name));
         }
     }
 
     public async Task Connect(UpcomingEvent upcomingEvent)
     {
-        if (Hook == upcomingEvent)
+        if (Principal == upcomingEvent)
         {
             return;
         }
-        if (Hook != null)
+        if (Principal != null)
         {
-            NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Hook.Name));
+            _notifier.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Principal.Name));
             return;
         }
-        InternalSet(upcomingEvent);
+        Principal = upcomingEvent;
         await _socket.Connect();
-        if (_socket.IsConnected && Hook != null)
+        if (_socket.IsConnected && Principal != null)
         {
-            NotifyHelper.Inform(string.Format(Connected_to__string, Hook.Name));
+            _notifier.Inform(string.Format(Connected_to__string, Principal.Name));
         }
     }
 
     public bool IsConnected()
     {
         return _socket.IsConnected;
-    }
-
-    void InternalSet(UpcomingEvent? upcomingEvent)
-    {
-        Hook = upcomingEvent;
-        _metadata.ConnectionGroupKey = upcomingEvent?.Id.ToString();
     }
 }

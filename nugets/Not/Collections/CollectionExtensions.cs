@@ -12,7 +12,6 @@ public static class CollectionExtensions
     }
 
     public static void Update<T>(this IList<T> list, T item, NCollectionAction action)
-        where T : notnull
     {
         if (action == NCollectionAction.Remove)
         {
@@ -21,7 +20,7 @@ public static class CollectionExtensions
         }
         if (action == NCollectionAction.AddOrUpdate)
         {
-            var match = list.FirstOrDefault(x => x.Equals(item));
+            var match = list.FirstOrDefault(x => x?.Equals(item) == true);
             if (match == null)
             {
                 list.Add(item);

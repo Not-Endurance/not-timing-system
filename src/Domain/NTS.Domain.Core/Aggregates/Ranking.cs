@@ -12,7 +12,7 @@ public class Ranking : Aggregate
         string? competitionFeiId,
         string? feiRule,
         string? feiScheduleNumber,
-        ReadOnlyCollection<RankingEntry> entries,
+        IEnumerable<RankingEntry> entries,
         int? id = null
     )
         : base(id)
@@ -21,7 +21,7 @@ public class Ranking : Aggregate
         Ruleset = Required(nameof(Ruleset), ruleset);
         Category = Required(nameof(Category), category);
         Type = Required(nameof(Type), type);
-        Entries = AreUnique(nameof(Entries), entries);
+        Entries = new(AreUnique(nameof(Entries), entries).ToList());
         CompetitionFeiId = competitionFeiId;
         FeiRule = feiRule;
         FeiScheduleNumber = feiScheduleNumber;

@@ -7,7 +7,7 @@ namespace NTS;
 
 public static class NtsCommonServices
 {
-    public static IServiceCollection ConfigureNts(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNts(this IServiceCollection services, IConfiguration configuration)
     {
         return services.AddNLocalization<LocalizedStrings>(configuration);
     }
