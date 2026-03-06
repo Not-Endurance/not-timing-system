@@ -16,9 +16,10 @@ internal sealed class CorsOriginValidator
 
         _allowedOriginPatterns = (settings.AllowedOriginHostPatterns ?? [])
             .Where(pattern => !string.IsNullOrWhiteSpace(pattern))
-            .Select(pattern =>
-                new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant)
-            )
+            .Select(pattern => new Regex(
+                pattern,
+                RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant
+            ))
             .ToArray();
     }
 

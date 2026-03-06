@@ -26,27 +26,29 @@ public static class Warp
         var originValidator = app.Services.GetRequiredService<CorsOriginValidator>();
 
         app.Urls.Add($"http://*:{port}");
-        app.Use(async (context, next) =>
-        {
-            var isHubWebSocketRequest =
-                context.WebSockets.IsWebSocketRequest
-                && (
-                    context.Request.Path.StartsWithSegments(judgeHubPath)
-                    || context.Request.Path.StartsWithSegments(witnessHubPath)
-                );
-
-            if (isHubWebSocketRequest)
+        app.Use(
+            async (context, next) =>
             {
-                var origin = context.Request.Headers.Origin.ToString();
-                if (!string.IsNullOrWhiteSpace(origin) && !originValidator.IsAllowed(origin))
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return;
-                }
-            }
+                var isHubWebSocketRequest =
+                    context.WebSockets.IsWebSocketRequest
+                    && (
+                        context.Request.Path.StartsWithSegments(judgeHubPath)
+                        || context.Request.Path.StartsWithSegments(witnessHubPath)
+                    );
 
-            await next();
-        });
+                if (isHubWebSocketRequest)
+                {
+                    var origin = context.Request.Headers.Origin.ToString();
+                    if (!string.IsNullOrWhiteSpace(origin) && !originValidator.IsAllowed(origin))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        return;
+                    }
+                }
+
+                await next();
+            }
+        );
 
         app.UseCors(CorsSettings.POLICY_NAME);
 
