@@ -11,7 +11,11 @@ public class CrudFunctions<T> : FunctionBase
 {
     readonly IRepository<T> _repository;
 
-    public CrudFunctions(IFunctionLogger<CrudFunctions<T>> logger, IRepository<T> repository, ITelemetryService telemetry)
+    public CrudFunctions(
+        IFunctionLogger<CrudFunctions<T>> logger,
+        IRepository<T> repository,
+        ITelemetryService telemetry
+    )
         : base(logger, telemetry)
     {
         _repository = repository;

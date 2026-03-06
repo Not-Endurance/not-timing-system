@@ -13,11 +13,7 @@ public class UserFunctions : FunctionBase
 {
     readonly IUserRepository _users;
 
-    public UserFunctions(
-        IFunctionLogger<UserFunctions> logger,
-        IUserRepository users,
-        ITelemetryService telemetry
-    )
+    public UserFunctions(IFunctionLogger<UserFunctions> logger, IUserRepository users, ITelemetryService telemetry)
         : base(logger, telemetry)
     {
         _users = users;
