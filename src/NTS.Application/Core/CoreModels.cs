@@ -399,7 +399,7 @@ public class RanklistModel
             CompetitionFeiId,
             FeiRule,
             FeiScheduleNumber,
-            new(entries),
+            entries,
             Id
         );
         return new Ranklist(ranking, entries);

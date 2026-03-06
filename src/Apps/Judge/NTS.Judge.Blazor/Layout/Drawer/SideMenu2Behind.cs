@@ -1,6 +1,6 @@
 using MudBlazor;
-using Not.Blazor.Components;
-using Not.Blazor.Mud;
+using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Helpers;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
 using NTS.Judge.Features.Core.State;
 
@@ -21,17 +21,31 @@ public class SideMenu2Behind : NStatefulComponent
 
     protected async Task Start()
     {
-        await Service.StartTiming();
+        try
+        {
+            await Service.StartTiming();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected async Task OpenSoftResetDialog()
     {
-        var dialog = await DialogService.ShowAsync<SoftResetDialog>();
-        if (await dialog.IsCanceled())
+        try
         {
-            return;
+            var dialog = await DialogService.ShowAsync<SoftResetDialog>();
+            if (await dialog.IsCanceled())
+            {
+                return;
+            }
+            NavManager.NavigateTo(Routes.HOME, forceLoad: true);
         }
-        NavManager.NavigateTo(Routes.HOME, forceLoad: true);
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected override async Task OnInitializedAsync()

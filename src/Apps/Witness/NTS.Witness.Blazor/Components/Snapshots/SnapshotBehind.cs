@@ -1,5 +1,5 @@
-﻿using MudBlazor;
-using Not.Blazor.Components;
+using MudBlazor;
+using Not.Blazor.Components.Abstractions;
 using Not.Exceptions;
 using Not.Notify;
 using NTS.Application.Core;
@@ -19,20 +19,23 @@ public class SnapshotBehind : NStatefulComponent
     [Inject]
     ISnapshotService SnapshotService { get; set; } = default!;
 
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
+
     protected List<IntermediateSnapshot> SelectedParticipations { get; set; } = [];
     protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
 
-	[Inject]
-	protected IParticipationContext Service { get; set; } = default!;
+    [Inject]
+    protected IParticipationContext Service { get; set; } = default!;
 
-	protected override async Task OnInitializedAsync()
-	{
-		await Observe(Service);
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
+    }
 
-	protected void SetButtonText(int id)
+    protected void SetButtonText(int id)
     {
         try
         {
@@ -96,13 +99,13 @@ public class SnapshotBehind : NStatefulComponent
             var result = await SnapshotService.PublishSnapshotsAsync(snapshotModel);
             if (result.IsSuccessful == false)
             {
-                NotifyHelper.Error("An error occurred while sending snapshots. Please try again.");
+                Notifier.Error(An_error_occurred_while_sending_snapshots_Please_try_again_string);
                 return;
             }
             else
             {
                 StateHasChanged();
-                NotifyHelper.Success($"Snapshots sent as {snapshotType}");
+                Notifier.Success(string.Format(Snapshots_sent_as__string, snapshotType));
             }
             //consider backup before clear
             SnapshotParticipations.ForEach(p => SelectedParticipations.Remove(p));

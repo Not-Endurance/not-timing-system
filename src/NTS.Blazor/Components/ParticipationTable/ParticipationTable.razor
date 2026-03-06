@@ -2,37 +2,37 @@
 @using NTS.Domain.Core.Aggregates.Participations
 @using NTS.Domain.Core.Aggregates.Participations.Entities
 @using Not.Blazor.Components
+@using Not.Blazor.Components.Tables
 @using Not.Blazor.Dialogs
 
+@inherits ParticipationTableBehind
 
-@inherits NComponent
-
-<table class="participation-table rtable @_axisClass">
+<table class="participation-table rtable @AxisClass">
     <thead>
         <tr>
             <MudButton Variant="Variant.Text" Style="visibility:hidden;">#</MudButton>
-            <th>Start</th>
-            <th>Arrive</th>
-            <th>Present</th>
+            <th>@Start_Time_string</th>
+            <th>@Arrive_string</th>
+            <th>@Presentation_string</th>
 
-            @if (_anyRepresentation && !AlignVertically)
+            @if (AnyRepresentation && !AlignVertically)
             {
-                <th>Represent</th>
+                <th>@Represent_string</th>
             }
-            @if (_anyRequiredInspection && !AlignVertically)
+            @if (AnyRequiredInspection && !AlignVertically)
             {
-                <th><b>RI Time</b></th>
+                <th><b>@RI_Time_string</b></th>
             }
-            @if (_anyCompulsoryRequiredInspection && !AlignVertically)
+            @if (AnyCompulsoryRequiredInspection && !AlignVertically)
             {
-                <th><b>CRI Time</b></th>
+                <th><b>@CRI_Time_string</b></th>
             }
 
-            <th>Recovery</th>
-            <th>Loop T</th>
-            <th>Phase T</th>
-            <th>Loop S</th>
-            <th>Phase S</th>
+            <th>@Recovery_string</th>
+            <th>@Loop_T_string</th>
+            <th>@Phase_T_string</th>
+            <th>@Loop_S_string</th>
+            <th>@Phase_S_string</th>
         </tr>
     </thead>
     <tbody>
@@ -54,15 +54,15 @@
                 <NTd Value="@phase.ArriveTime" />
                 <NTd Value="@phase.PresentTime" />
 
-                @if (_anyRepresentation && !AlignVertically)
+                @if (AnyRepresentation && !AlignVertically)
                 {
                     <NTd Value="@phase.RepresentTime" />
                 }
-                @if (_anyRequiredInspection && !AlignVertically)
+                @if (AnyRequiredInspection && !AlignVertically)
                 {
                     <NTd CellStyle="background-color:whitesmoke" TextStyle="font-weight:bold" Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
                 }
-                @if (_anyCompulsoryRequiredInspection && !AlignVertically)
+                @if (AnyCompulsoryRequiredInspection && !AlignVertically)
                 {
                     <NTd CellStyle="background-color:whitesmoke" TextStyle="font-weight:bold" Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
                 }
@@ -77,7 +77,6 @@
     </tbody>
 </table>
 
-@* // TODO: extract styles in tableflip.css :DD *@
 <style>
     /*!
         // CSS only Responsive Tables
@@ -104,7 +103,7 @@
         vertical-align: top;
         max-width: 100%;
         overflow-x: auto;
-        // optional - looks better for small cell values white-space: nowrap;
+        white-space: nowrap;
         border-collapse: collapse;
         border-spacing: 0;
     }

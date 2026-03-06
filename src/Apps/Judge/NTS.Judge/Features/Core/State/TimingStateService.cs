@@ -1,4 +1,4 @@
-﻿using Not.Application.Behinds.Adapters;
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
 using Not.Notify;
@@ -17,6 +17,7 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
     readonly IRepository<Participation> _participations;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
+    readonly INotifier _notifier;
 
     public TimingStateService(
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
@@ -26,7 +27,8 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
         IRepository<EnduranceEvent> events,
         IRepository<Participation> participations,
         IRepository<Official> officials,
-        IRepository<ArchiveEntry> archive
+        IRepository<ArchiveEntry> archive,
+        INotifier notifier
     )
     {
         _coreDependentObservables = coreDependentObservables;
@@ -37,6 +39,7 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
         _participations = participations;
         _officials = officials;
         _archive = archive;
+        _notifier = notifier;
     }
 
     public bool IsStarted { get; private set; }
@@ -70,7 +73,7 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
         var entry = await _archive.Read(archiveId);
         if (entry == null)
         {
-            NotifyHelper.Inform($"Archive with id '{archiveId}' does not exist");
+            _notifier.Inform($"Archive with id '{archiveId}' does not exist");
             return;
         }
         await _events.Create(entry.EnduranceEvent);
@@ -98,6 +101,7 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
         EmitChanged();
     }
 }
+
 public interface ITimingStateService : IStatefulService
 {
     bool IsStarted { get; }

@@ -1,4 +1,4 @@
-using Not.Blazor.Components.Mud;
+using Not.Blazor.Components.Abstractions;
 
 namespace Not.Blazor.Components.Layout;
 
@@ -30,7 +30,7 @@ public class NLayoutBehind : LayoutComponentBase
         DrawerOpen = !DrawerOpen;
     }
 
-    protected async void ToggleLayoutVisibility() // TODO: fix all async voids possible
+    protected async Task ToggleLayoutVisibility() // TODO: fix all async voids possible
     {
         HideLayout = !HideLayout;
         await InvokeAsync(StateHasChanged);

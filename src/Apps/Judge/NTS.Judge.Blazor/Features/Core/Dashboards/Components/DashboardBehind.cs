@@ -1,5 +1,5 @@
 using MudBlazor;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 
@@ -8,7 +8,13 @@ namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components;
 public class DashboardBehind : NStatefulComponent
 {
     [Inject]
-    protected IParticipationContext Service { get; set; } = default!;
+    IParticipationContext Service { get; set; } = default!;
+
+    protected Participation? Selected
+    {
+        get => Service.Selected;
+        set => Service.Selected = value;
+    }
 
     protected Task<IEnumerable<Participation>> Search(string term, CancellationToken _)
     {

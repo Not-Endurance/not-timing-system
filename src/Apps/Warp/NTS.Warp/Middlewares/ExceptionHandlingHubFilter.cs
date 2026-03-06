@@ -1,11 +1,19 @@
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Not.Logging;
 using Not.Notify;
+using Not.Strings;
 
 namespace NTS.Warp.Middlewares;
 
 internal class ExceptionHandlingHubFilter : IHubFilter
 {
+    readonly INotifier _notifier;
+
+    public ExceptionHandlingHubFilter(INotifier notifier)
+    {
+        _notifier = notifier;
+    }
+
     public async ValueTask<object?> InvokeMethodAsync(
         HubInvocationContext invocationContext,
         Func<HubInvocationContext, ValueTask<object?>> next
@@ -53,7 +61,7 @@ internal class ExceptionHandlingHubFilter : IHubFilter
 
     public void HandleHubException(HubException hubException, string methodName)
     {
-        NotifyHelper.Error(hubException);
+        _notifier.Error(hubException);
         var logMessage =
             $"An error {hubException.Message} was thrown calling {methodName} "
             + $"at {hubException.Source} with trace \n {hubException.StackTrace}";

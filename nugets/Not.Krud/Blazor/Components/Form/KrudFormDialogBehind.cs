@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Not.Blazor.Components;
+using Not.Blazor.Dialogs.Abstractions;
 using Not.Krud.Abstractions;
 using Not.Krud.Blazor.Components.Abstractions;
 
 namespace Not.Krud.Blazor.Components.Form;
 
-public class KrudFormDialogBehind<TModel, TForm> : NComponent
+public class KrudFormDialogBehind<TModel, TForm> : NDialog<TModel>
     where TForm : KrudShell<TModel>
     where TModel : IKrudFormModel, new()
 {
@@ -17,11 +17,4 @@ public class KrudFormDialogBehind<TModel, TForm> : NComponent
 
     [Parameter]
     public TModel Model { get; set; } = new();
-
-    protected Task OnSubmit(TModel model)
-    {
-        var dialogResult = DialogResult.Ok(model);
-        Dialog.Close(dialogResult);
-        return Task.CompletedTask;
-    }
 }

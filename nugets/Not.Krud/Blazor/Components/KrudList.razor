@@ -1,5 +1,4 @@
 ﻿@using Not.Application.Services
-@using Not.Blazor.CRUD.Forms.Components
 @using Not.Domain
 @using Not.Krud.Abstractions
 @using Not.Krud.Blazor.Components.Abstractions
@@ -12,8 +11,8 @@
 <MudPaper Elevation="0" Class="@("pa-4 " + Class)" Style="@Style">
 
     <NList Items="Entities" Title="@Name"  IsLoading="@IsLoading"
-           Create="CreateSafe"
-           Update="UpdateSafe" 
-           Delete="DeleteSafe"/>
+           CreateSafe="CreateSafe"
+           UpdateSafe="UpdateSafe" 
+           DeleteSafe="DeleteSafe"/>
     
 </MudPaper>

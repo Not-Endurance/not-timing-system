@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
+using Not.Blazor.Navigation.Abstractions;
 
 namespace Not.Blazor.Navigation;
 

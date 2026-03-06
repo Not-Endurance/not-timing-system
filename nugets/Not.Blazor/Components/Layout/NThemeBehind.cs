@@ -1,0 +1,42 @@
+using MudBlazor;
+using Not.Blazor.Components.Abstractions;
+
+namespace Not.Blazor.Components.Layout;
+
+public class NThemeBehind : NComponent
+{
+    protected MudTheme Theme { get; set; } = default!;
+
+    [Parameter]
+    public MudThemeProvider ThemeProvider { get; set; } = default!;
+
+    [Parameter]
+    public bool DialogCloseOnEscapeKey { get; set; } = true;
+
+    [Parameter]
+    public bool DialogCloseButton { get; set; } = true;
+
+    [Parameter]
+    public MaxWidth DialogMaxWidth { get; set; } = MaxWidth.Small;
+
+    [Parameter]
+    public bool DialogFullWidth { get; set; } = true;
+
+    [Parameter]
+    public bool Mobile { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var caption = new Caption { FontSize = "14px" };
+        var subtitle2 = new Subtitle2 { FontSize = "12px" };
+        if (Mobile)
+        {
+            caption = new Caption { FontSize = "13px" };
+        }
+
+        Theme = new MudTheme
+        {
+            Typography = new Typography { Caption = caption, Subtitle2 = subtitle2 },
+        };
+    }
+}

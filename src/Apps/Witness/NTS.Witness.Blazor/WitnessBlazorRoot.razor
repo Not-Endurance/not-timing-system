@@ -3,19 +3,18 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components
 @using NTS.Witness.Blazor.Components.Shared
-@using Not.Blazor.Components
 
 @inherits WitnessBlazorRootBehind
 
-<NErrorBoundary @ref="@_errorBoundary">
+<ErrorBoundary @ref="@ErrorBoundary">
     <ChildContent>
         <CascadingAuthenticationState>
-            <Router AppAssembly="@Assembly" AdditionalAssemblies="@_routeAssemblies">
+            <Router AppAssembly="@Assembly" AdditionalAssemblies="@RouteAssemblies">
 
                 <Found Context="routeData">
                     <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                         <NotAuthorized>
-                            <h1 class="d-flex justify-center align-center">You have no power here!</h1>
+                            <h1 class="d-flex justify-center align-center">@Access_denied_string</h1>
                         </NotAuthorized>
                     </AuthorizeRouteView>
                     <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -23,7 +22,7 @@
 
                 <NotFound>
                     <LayoutView Layout="@typeof(MainLayout)">
-                        <p role="alert">Sorry, there's nothing at this address.</p>
+                        <p role="alert">@Sorry_theres_nothing_at_this_address_string</p>
                     </LayoutView>
                 </NotFound>
             </Router>
@@ -38,6 +37,6 @@
             <pre>@context.StackTrace</pre>
         </div>
 
-        <button class="btn btn-primary" @onclick="@(() => _errorBoundary.Recover())">Back</button>
+        <button class="btn btn-primary" @onclick="@(() => ErrorBoundary.Recover())">@Back_string</button>
     </ErrorContent>
-</NErrorBoundary>
+</ErrorBoundary>

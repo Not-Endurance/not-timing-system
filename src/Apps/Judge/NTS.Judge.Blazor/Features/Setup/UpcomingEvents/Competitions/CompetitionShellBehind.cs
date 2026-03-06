@@ -6,9 +6,9 @@ using NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
 
 namespace NTS.Judge.Blazor.Features.Setup.UpcomingEvents.Competitions;
 
-public class CompetitionShellbehind : KrudShell<CompetitionFormModel>
+public class CompetitionShellBehind : KrudShell<CompetitionFormModel>
 {
-    public CompetitionShellbehind()
+    public CompetitionShellBehind()
     {
         TimeMask = new(Masks.MINUTES_TIME_MASK_FORMAT);
         Types = NotListModel.FromEnum<CompetitionType>().ToList();
@@ -16,8 +16,8 @@ public class CompetitionShellbehind : KrudShell<CompetitionFormModel>
     }
 
     protected PatternMask TimeMask { get; }
-    
-    protected List<NotListModel<CompetitionType>> Types { get; } 
+
+    protected List<NotListModel<CompetitionType>> Types { get; }
 
     protected List<NotListModel<CompetitionRuleset>> Rules { get; }
 }

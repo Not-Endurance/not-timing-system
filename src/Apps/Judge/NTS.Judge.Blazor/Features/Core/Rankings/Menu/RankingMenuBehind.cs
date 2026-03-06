@@ -1,7 +1,7 @@
 using MudBlazor;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Dialogs;
-using Not.Blazor.Mud;
+using Not.Blazor.Helpers;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge.Features.Core.Rankings;
@@ -40,8 +40,8 @@ public class RankingMenuBehind : NStatefulComponent
         try
         {
             var ranking = chip.Value!;
-            var arguments = new DialogParameters<NConfirmDeleteDialog> { { x => x.Item, ranking.Name } };
-            var dialog = await DialogService.ShowAsync<NConfirmDeleteDialog>(Delete_string, arguments);
+            var arguments = new DialogParameters<NDeleteDialog> { { x => x.Item, ranking.Name } };
+            var dialog = await DialogService.ShowAsync<NDeleteDialog>(Delete_string, arguments);
             if (await dialog.IsCanceled())
             {
                 return;

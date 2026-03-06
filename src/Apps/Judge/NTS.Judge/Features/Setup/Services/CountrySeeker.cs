@@ -16,7 +16,7 @@ public class CountrySeeker : ISeeker<Country>
 
     public async Task<IEnumerable<Country>> Search(string term, CancellationToken _)
     {
-        var items = await _countriesCache.List(); // TODO: convert to CountryBehind
+        var items = await _countriesCache.List(); // TODO: convert to CountryService
         return items.Where(x => x.Name.NContains(term));
     }
 }

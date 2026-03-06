@@ -1,4 +1,4 @@
-﻿using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using NTS.Judge.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms.Shared;
@@ -7,7 +7,7 @@ public abstract class EliminationFormBehind : NComponent
 {
     [Inject]
     IEliminationService Eliminations { get; set; } = default!;
-    
+
     protected bool IsEliminated => Eliminations.IsEliminated;
 
     [Parameter, EditorRequired]
@@ -16,7 +16,7 @@ public abstract class EliminationFormBehind : NComponent
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    protected async Task OnRestoreSafe()
+    protected async Task OnRestore()
     {
         try
         {
@@ -28,7 +28,7 @@ public abstract class EliminationFormBehind : NComponent
         }
     }
 
-    protected async Task OnSubmitSafe()
+    protected async Task OnSubmit()
     {
         try
         {

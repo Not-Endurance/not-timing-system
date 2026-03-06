@@ -1,9 +1,10 @@
 ﻿using System.Globalization;
+using Not.Krud.Models;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NTS.Application.Core;
 
-public class PhaseUpdateModel : IPhaseState
+public record PhaseUpdateModel : KrudFormModel<Phase>, IPhaseState
 {
     public PhaseUpdateModel() { }
 
@@ -18,7 +19,6 @@ public class PhaseUpdateModel : IPhaseState
     public string? ArriveTimeInput { get; set; }
     public string? PresentTimeInput { get; set; }
     public string? RepresentTimeInput { get; set; }
-    public int? Id { get; set; }
 
     public DateTimeOffset? StartTime
     {
@@ -41,7 +41,12 @@ public class PhaseUpdateModel : IPhaseState
         set => RepresentTimeInput = ToInputString(value);
     }
 
-    public void MapFrom(Phase entity)
+    protected override Phase MapTo()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void MapFrom(Phase entity)
     {
         Id = entity.Id;
         StartTime = entity.StartTime?.ToDateTimeOffset();

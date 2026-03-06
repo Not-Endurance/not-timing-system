@@ -1,10 +1,17 @@
-﻿using Not.Injection;
+using Not.Injection;
 using Not.Notify;
 
 namespace NTS.Domain.LocalizationDemo;
 
 public class LocalizationTestService : ILocalizationTestService
 {
+    readonly INotifier _notifier;
+
+    public LocalizationTestService(INotifier notifier)
+    {
+        _notifier = notifier;
+    }
+
     public string Polite()
     {
         return new LocalizationTest().Success();
@@ -18,7 +25,7 @@ public class LocalizationTestService : ILocalizationTestService
         }
         catch (Exception ex)
         {
-            NotifyHelper.Warn(ex.Message);
+            _notifier.Warn(ex.Message);
             return ex.Message;
         }
     }

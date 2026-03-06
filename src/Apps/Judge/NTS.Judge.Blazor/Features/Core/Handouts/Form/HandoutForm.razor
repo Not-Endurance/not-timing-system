@@ -2,8 +2,8 @@
 @using Not.Blazor.Components.Input
 @using Not.Notify
 
-@inherits NComponent
+@inherits HandoutFormBehind
 
-<NAutocomplete @bind-value="_combination" SearchSafe="Search" Style="@Style" Class="@Class" />
+<NAutocomplete @bind-value="Combination" SearchSafe="SearchSafe" Style="@Style" Class="@Class" />
 
 <NButtonCreate OnClick="Create" Class="mt-2" />

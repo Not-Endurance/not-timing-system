@@ -1,5 +1,8 @@
 ﻿@using NTS.Domain.Setup.Aggregates
 @using NTS.Judge.Blazor.Features.Core.Dashboards.Components
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Inspections
+@using NTS.Judge.Blazor.Features.Core.Dashboards.Components.Snapshots
 @using Not.Blazor.Components.Layout
 
 @attribute [Route(DASHBOARD_PAGE)]
@@ -14,13 +17,17 @@
         }
         else 
         {
-            <MudNumericField @bind-Value="ArchiveId" Label="ID of archive to load" />
-            <NButtonPrimary OnClick="LoadArchive">Load</NButtonPrimary>
+            <MudNumericField @bind-Value="ArchiveId" Label="@ID_of_archive_to_load_string" />
+            <NButtonPrimary OnClick="LoadArchive">@Load_string</NButtonPrimary>
         }
     </Main>
 
     <Rightbar>
-        <ActionsMenu />
+        <SnapshotPanel Class="mb-2" />
+
+        <InspectionsPanel Class="mb-2" />
+
+        <EliminationsPanel Class="mb-2" />
     </Rightbar>
 
 </NContent>

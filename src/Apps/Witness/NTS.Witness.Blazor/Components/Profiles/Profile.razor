@@ -16,11 +16,11 @@
             <MudGrid Justify="Justify.Center" Class="align-top mt-10">
                 <MudStack Row>
                     <MudText Typo="Typo.caption" Class="mr-4"> 
-                        <p>Signed in as @context.User.Identity?.Name</p>
+                        <p>@string.Format(Signed_in_as__string, context.User.Identity?.Name)</p>
 
-                        <p>You have <b>@UserRoles</b> privileges.</p>
+                        <p>@string.Format(You_have___privileges_string, UserRoles)</p>
                     </MudText>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" OnClick="SignoutHandler">Sign Out <MudIcon Class="ml-2" Icon="@Icons.Material.Filled.Logout" /></MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small" OnClick="SignoutHandler">@Sign_Out_string <MudIcon Class="ml-2" Icon="@Icons.Material.Filled.Logout" /></MudButton>
                 </MudStack>
             </MudGrid>
         </Authorized>

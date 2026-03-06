@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Not.Logging;
 using Not.Notify;
 using Not.Serialization.JSON;
+using Not.Strings;
 
 namespace Not.Application.RPC.SignalR;
 
@@ -12,11 +13,13 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 {
     readonly RpcSettings _context;
     readonly string _name;
+    readonly INotifier _notifier;
 
-    public SignalRSocket(IOptions<RpcSettings> options)
+    public SignalRSocket(IOptions<RpcSettings> options, INotifier notifier)
     {
         _context = Validate(options.Value);
         _name = GetType().Name;
+        _notifier = notifier;
     }
 
     // Necessary because this.Connection instance is not intialized
@@ -95,7 +98,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         }
         catch (Exception ex)
         {
-            NotifyHelper.Error(ex);
+            _notifier.Error(ex);
         }
     }
 
@@ -104,10 +107,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         var url = _context.Url;
         if (groupId != null)
         {
-            var query = new Dictionary<string, string?>
-            {
-                { RpcConstants.CONNECTION_GROUP_KEY, groupId }
-            };
+            var query = new Dictionary<string, string?> { { RpcConstants.CONNECTION_GROUP_KEY, groupId } };
             url = QueryHelpers.AddQueryString(url, query);
         }
 

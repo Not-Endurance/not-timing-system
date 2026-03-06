@@ -1,4 +1,4 @@
-﻿using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 
 namespace NTS.Witness.Blazor.Components.Shared;
 

@@ -1,4 +1,4 @@
-﻿using Not.Application.RPC.SignalR;
+using Not.Application.RPC.SignalR;
 using Not.Notify;
 using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
@@ -9,10 +9,12 @@ namespace NTS.Witness.Warp;
 public class WitnessSocketContext : IConnectionStatus, INtsSocketService
 {
     readonly IRpcSocket _socket;
+    readonly INotifier _notifier;
 
-    public WitnessSocketContext(IRpcSocket socket)
+    public WitnessSocketContext(IRpcSocket socket, INotifier notifier)
     {
         _socket = socket;
+        _notifier = notifier;
     }
 
     public UpcomingEvent? Principal { get; private set; }
@@ -25,7 +27,7 @@ public class WitnessSocketContext : IConnectionStatus, INtsSocketService
         await _socket.Disconnect();
         if (!_socket.IsConnected && @event != null)
         {
-            NotifyHelper.Warn(string.Format(Disconnected_from__string, @event.Name));
+            _notifier.Warn(string.Format(Disconnected_from__string, @event.Name));
         }
     }
 
@@ -37,14 +39,14 @@ public class WitnessSocketContext : IConnectionStatus, INtsSocketService
         }
         if (Principal != null)
         {
-            NotifyHelper.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Principal.Name));
+            _notifier.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Principal.Name));
             return;
         }
         Principal = upcomingEvent;
         await _socket.Connect();
         if (_socket.IsConnected && Principal != null)
         {
-            NotifyHelper.Inform(string.Format(Connected_to__string, Principal.Name));
+            _notifier.Inform(string.Format(Connected_to__string, Principal.Name));
         }
     }
 

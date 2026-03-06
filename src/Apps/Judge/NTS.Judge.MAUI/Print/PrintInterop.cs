@@ -1,5 +1,5 @@
-﻿using Microsoft.JSInterop;
-using Not.Blazor.Ports;
+using Microsoft.JSInterop;
+using Not.Blazor.Components.Abstractions;
 
 namespace NTS.Judge.MAUI.Print;
 

@@ -1,6 +1,9 @@
-﻿using Not.Application.Behinds.Adapters;
+using MediatR;
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
+using Not.Injection;
+using Not.Krud.Abstractions;
 using Not.Notify;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
@@ -14,33 +17,37 @@ namespace NTS.Judge.Features.Core.Rankings;
 
 public class RankingService
     : NStatefulService<ObservableList<Ranking>>,
+        IKrudFormService<CustomRankingModel>,
         IRankingService,
         IRankingMenuService,
         IRanklistDocumentFactory,
         ICustomRankingService,
-        ICoreDependentObservables
+        ICoreDependentObservables,
+        INotificationHandler<PhaseCompleted>,
+        INotificationHandler<ParticipationEliminated>,
+        INotificationHandler<ParticipationRestored>,
+        ISingleton
 {
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
+    readonly INotifier _notifier;
     Ranking? _current;
 
     public RankingService(
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Official> officials,
-        IRepository<ArchiveEntry> archive
+        IRepository<ArchiveEntry> archive,
+        INotifier notifier
     )
     {
         _rankings = rankings;
         _events = events;
         _officials = officials;
         _archive = archive;
-        Participation.PARTICIPATION_COMPLETED_EVENT.Subscribe(UpdateRanklist);
-        Participation.PHASE_COMPLETED_EVENT.Subscribe(UpdateRanklist);
-        Participation.ELIMINATED_EVENT.Subscribe(UpdateRanklist);
-        Participation.RESTORED_EVENT.Subscribe(UpdateRanklist);
+        _notifier = notifier;
     }
 
     public Ranking Current =>
@@ -65,18 +72,14 @@ public class RankingService
 
     public async Task Create(CustomRankingModel model)
     {
-        var ranking = new Ranking(
-            model.Name,
-            model.Ruleset,
-            model.Type,
-            model.Category,
-            model.CompetitionFeiId,
-            model.FeiRule,
-            model.FeiScheduleNumber,
-            new(model.Entries)
-        );
+        var ranking = model.MapToEntity();
         await _rankings.Create(ranking);
         Rankings.AddOrReplace(ranking);
+    }
+
+    public Task Update(CustomRankingModel item)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task Delete(Ranking ranking)
@@ -90,7 +93,7 @@ public class RankingService
         var enduranceEvent = await _events.Read(0);
         if (enduranceEvent == null)
         {
-            NotifyHelper.Warn("Event is not started yet");
+            _notifier.Warn(Event_is_not_started_yet_string);
             return;
         }
         var officials = await _officials.ReadMany();
@@ -113,6 +116,24 @@ public class RankingService
     {
         _current = ranking;
         EmitChanged();
+    }
+
+    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    {
+        UpdateRanklist(notification);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
+    {
+        UpdateRanklist(notification);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
+    {
+        UpdateRanklist(notification);
+        return Task.CompletedTask;
     }
 
     void UpdateRanklist(ParticipationPayload payload)

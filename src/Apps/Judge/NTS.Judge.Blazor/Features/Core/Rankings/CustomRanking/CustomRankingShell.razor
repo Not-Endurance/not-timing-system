@@ -1,0 +1,19 @@
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+@inherits CustomRankingShellBehind
+
+<KrudForm Shell="this">
+    <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+
+    <NSelect @bind-Value="Model.Ruleset" For="() => Model.Ruleset" Label="@Competition_Ruleset_string" />
+
+    <NSelect @bind-Value="Model.Type" For="() => Model.Type" Label="@Competition_Type_string" />
+
+    <NSelect @bind-Value="Model.Category" For="() => Model.Category" Label="@Category_string" />
+
+    <NTextField @bind-Value="Model.CompetitionFeiId" For="() => Model.CompetitionFeiId" Label="@($"{required_for_FEI_export} - {FEI_Competition_ID_label}")" />
+
+    <NTextField @bind-Value="Model.FeiRule" For="() => Model.FeiRule" Label="@($"{required_for_FEI_export} - {FEI_Rule_label}")" />
+
+    <NTextField @bind-Value="Model.FeiScheduleNumber" For="() => Model.FeiScheduleNumber" Label="@($"{required_for_FEI_export} - {FEI_Schedule_NR_label}")" />
+</KrudForm>

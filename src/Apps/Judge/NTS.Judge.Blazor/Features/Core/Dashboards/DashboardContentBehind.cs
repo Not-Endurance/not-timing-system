@@ -1,4 +1,4 @@
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using Not.Notify;
 using NTS.Judge.Features.Core.State;
 
@@ -6,6 +6,9 @@ namespace NTS.Judge.Blazor.Features.Core.Dashboards;
 
 public class DashboardContentBehind : NStatefulComponent
 {
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
+
     protected int? ArchiveId { get; set; }
 
     [Inject]
@@ -15,7 +18,7 @@ public class DashboardContentBehind : NStatefulComponent
     {
         if (!ArchiveId.HasValue)
         {
-            NotifyHelper.Warn("Provide Archive ID");
+            Notifier.Warn(Provide_Archive_ID_string);
             return;
         }
         await Service.LoadArchive(ArchiveId.Value);

@@ -1,0 +1,14 @@
+@using Not.Blazor.Components.Buttons
+@inherits NDeleteDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body1">@Message</MudText>
+    </DialogContent>
+    
+    <DialogActions>
+        <NButtonDelete OnClick="CloseDialog" />
+
+        <NButtonCancel OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

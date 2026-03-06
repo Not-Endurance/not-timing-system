@@ -1,5 +1,5 @@
 using MudBlazor;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Objects;
 using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 using NTS.Judge.Features.Core.Rankings;
@@ -64,7 +64,7 @@ public class RankingsPageBehind : PrintableComponent
         try
         {
             var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.Medium };
-            await DialogService.ShowAsync<CreateCustomRankingDialog>("", options);
+            await DialogService.ShowAsync<CustomRankingDialog>("", options);
         }
         catch (Exception ex)
         {

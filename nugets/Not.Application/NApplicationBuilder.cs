@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+using System.Reflection;
+using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Configurations;
+using Not.Application.DomainEvents;
 using Not.Application.HTTP;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
@@ -33,6 +36,17 @@ public class NApplicationBuilder
             _configuration,
             x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern)
         );
+        return this;
+    }
+
+    public NApplicationBuilder AddDomainEvents()
+    {
+        _services.AddMediatR(config =>
+            config
+                .RegisterServicesFromAssembly(typeof(NApplicationBuilder).Assembly)
+                .RegisterServicesFromAssembly(Assembly.GetCallingAssembly())
+        );
+        _services.AddTransient<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
         return this;
     }
 }

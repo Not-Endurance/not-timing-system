@@ -2,7 +2,6 @@
 @using NTS.Domain.Objects
 @using NTS.Domain.Setup.Aggregates
 @using NTS.Judge.Features.Setup.UpcomingEvents
-@using Not.Blazor.CRUD.Forms.Components
 @using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 
@@ -13,7 +12,7 @@
     
     <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
 
-    <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountries" />
+    <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountriesSafe" />
     
     <NTextField @bind-Value="Model.FeiShowId" For="() => Model.FeiShowId" Label="@($"{required_for_FEI_export} - {FEI_Show_ID_label}")" />
     

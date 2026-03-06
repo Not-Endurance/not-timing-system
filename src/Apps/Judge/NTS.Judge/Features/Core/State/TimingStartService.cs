@@ -64,9 +64,7 @@ public class TimingStartService : ITimingStartService
         return true;
     }
 
-    (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(
-        UpcomingEvent setupEvent
-    )
+    (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(UpcomingEvent setupEvent)
     {
         var participations = new List<Participation>();
         var rankings = new List<Ranking>();
@@ -95,7 +93,7 @@ public class TimingStartService : ITimingStartService
             setupCompetition.FeiId,
             setupCompetition.FeiRule,
             setupCompetition.FeiScheduleNumber,
-            new(entriesByCategory.Value)
+            entriesByCategory.Value
         );
     }
 

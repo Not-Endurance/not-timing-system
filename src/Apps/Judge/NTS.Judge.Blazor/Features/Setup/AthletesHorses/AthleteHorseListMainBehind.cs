@@ -1,7 +1,6 @@
 using Not.Blazor.Components;
-using Not.Blazor.Components.Layout;
+using Not.Blazor.Components.Abstractions;
 
 namespace NTS.Judge.Blazor.Features.Setup.AthletesHorses;
 
-public class AthleteHorseListContentBehind : NContentBehind
-{ }
+public class AthleteHorseListMainBehind : NContentBehind { }

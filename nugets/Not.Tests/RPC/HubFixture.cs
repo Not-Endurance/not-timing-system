@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
+using Not.Notify;
 using Xunit.Abstractions;
 
 namespace Not.Tests.RPC;
@@ -9,7 +10,6 @@ namespace Not.Tests.RPC;
 public abstract class HubFixture<T> : IDisposable
     where T : ITestRpcClient
 {
-    readonly RpcProtocol _rpcProtocol;
     readonly int _hubPort;
     readonly string _hubPattern;
     readonly string _hubExecutable;
@@ -17,9 +17,8 @@ public abstract class HubFixture<T> : IDisposable
     T? _client;
     Process? _hubProcess;
 
-    public HubFixture(RpcProtocol rpcProtocol, int hubPort, string hubPattern, string hubExecutable)
+    public HubFixture(RpcProtocol _, int hubPort, string hubPattern, string hubExecutable)
     {
-        _rpcProtocol = rpcProtocol;
         _hubPort = hubPort;
         _hubPattern = hubPattern;
         _hubExecutable = hubExecutable;
@@ -63,7 +62,8 @@ public abstract class HubFixture<T> : IDisposable
             Host = $"http://localhost",
         };
         var options = new TestOptions<RpcSettings>(settings);
-        return new SignalRSocket(options);
+
+        return new SignalRSocket(options, new Notifier());
     }
 }
 

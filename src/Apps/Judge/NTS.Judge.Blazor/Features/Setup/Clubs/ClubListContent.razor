@@ -5,14 +5,12 @@
 @using Not.Krud.Blazor.Components
 
 @attribute [Route(CLUBS_PAGE)]
-@inherits ClubListContentbehind
+@inherits ClubListContentBehind
 
-<NContent Title="Configure Clubs" Class="not-mid-width">
+<NContent Title="@Configure_Clubs_string" Class="not-mid-width">
 
     <Main>
         <KrudList T="Club" TModel="ClubFormModel" TShell="ClubShell"  Name="@Clubs_string" />
     </Main>
 
 </NContent>
-
-

@@ -1,12 +1,13 @@
 using System.Reflection;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application;
 using Not.Application.HTTP;
 using Not.Application.RPC;
 using Not.Injection;
-using Not.Startup;
 using NTS.Application.Startlists;
+using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Application;
 
@@ -35,10 +36,14 @@ public static class NtsApplicationServices
 
         public Builder AddStartlist()
         {
-            _services.Add<IStartlistContext, StartlistContext>(ServiceLifetime.Singleton);
-            _services.Add<IStartUpcoming, IStartHistory, IStartupInitializer, StartlistService>(
-                ServiceLifetime.Singleton
-            );
+            _services.Add<
+                IStartUpcoming,
+                IStartHistory,
+                INotificationHandler<PhaseCompleted>,
+                INotificationHandler<ParticipationRestored>,
+                INotificationHandler<ParticipationEliminated>,
+                StartlistService
+            >(ServiceLifetime.Singleton);
             return this;
         }
 

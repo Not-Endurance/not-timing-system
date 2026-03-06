@@ -1,4 +1,3 @@
-using MudBlazor;
 using Not.Application.Services;
 using Not.Krud.Blazor.Components.Abstractions;
 using Not.Structures;
@@ -16,7 +15,14 @@ public class PhaseShellBehind : KrudShell<PhaseFormModel>
 
     protected override async Task OnInitializedAsync()
     {
-        var loops = await Behind.ReadMany();
-        Loops = NotListModel.FromEntity(loops);
+        try
+        {
+            var loops = await Behind.ReadMany();
+            Loops = NotListModel.FromEntity(loops);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 }

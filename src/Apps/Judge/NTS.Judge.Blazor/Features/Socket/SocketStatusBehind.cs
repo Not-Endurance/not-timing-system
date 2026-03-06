@@ -1,7 +1,7 @@
-﻿using System.Timers;
+using System.Timers;
 using MudBlazor;
 using Not.Application.RPC.SignalR;
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 using NTS.Judge.Features.Socket;
 
 namespace NTS.Judge.Blazor.Features.Socket;
@@ -25,10 +25,17 @@ public class SocketStatusBehind : NComponent, IDisposable
 
     protected override void OnInitialized()
     {
-        _timer.Start();
+        try
+        {
+            _timer.Start();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
-    protected Color GetSpinnerColor()
+    protected Color GetSpinnerColorSafe()
     {
         if (SocketContext.Status == SocketConnectionStatus.Disconnected)
         {

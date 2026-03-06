@@ -66,10 +66,7 @@ public class JudgeHandshakeService : INetworkBroadcastService, IHandshakeService
                 return response.RemoteEndPoint.Address;
             }
         }
-        catch (Exception)
-        {
-            // TODO: logging/error handling
-        }
+        catch (Exception) { }
 
         return (IPAddress)null!;
     }

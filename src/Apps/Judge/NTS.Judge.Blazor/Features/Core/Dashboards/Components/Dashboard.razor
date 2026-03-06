@@ -5,22 +5,24 @@
 
 @inherits DashboardBehind
 
-@if (Service.Selected != null)
+@if (Selected == null)
 {
-    <NGrid>
-        <MudItem xs="12" Class="mb-4">
-            <NAutocomplete @bind-value="Service.Selected" SearchSafe="Search" Class="mb-2 dashboard-autocomplete" />
-        </MudItem>
-        
-        <MudItem xs="3">
-            <ParticipationChips />
-        </MudItem>
-        
-        <MudItem xs="9">
-            <ParticipationTable Phases="Service.Selected.Phases" />
-        </MudItem>
-    </NGrid>
-}   
+    return;
+}
+
+<NGrid>
+    <MudItem xs="12" Class="mb-4">
+        <NAutocomplete @bind-value="Selected" SearchSafe="Search" Class="mb-2 dashboard-autocomplete" />
+    </MudItem>
+
+    <MudItem xs="3">
+        <ParticipationChips />
+    </MudItem>
+
+    <MudItem xs="9">
+        <ParticipationTable Phases="Selected.Phases" />
+    </MudItem>
+</NGrid>
 
 <style>
     .dashboard-autocomplete .mud-select-input {

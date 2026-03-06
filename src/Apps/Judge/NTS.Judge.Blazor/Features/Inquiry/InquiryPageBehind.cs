@@ -1,4 +1,4 @@
-using Not.Blazor.Components;
+using Not.Blazor.Components.Abstractions;
 
 namespace NTS.Judge.Blazor.Features.Inquiry;
 
@@ -9,7 +9,7 @@ public class InquiryPageBehind : NStatefulComponent
     protected string? SearchTerm { get; set; }
 
     [Inject]
-    protected IInquiryBehind Service { get; set; } = default!;
+    protected IInquiryService Service { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {

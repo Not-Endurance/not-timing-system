@@ -1,4 +1,5 @@
-﻿using Not.Application.CRUD.Ports;
+using MediatR;
+using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
@@ -15,33 +16,35 @@ using NTS.Warp.Features.Judge.Procedures;
 
 namespace NTS.Judge.Features.Socket;
 
-public class JudgeRpcClient : RpcClient, IJudgeClientProcedures, ISingleton
+public class JudgeRpcClient
+    : RpcClient,
+        IJudgeClientProcedures,
+        INotificationHandler<PhaseCompleted>,
+        INotificationHandler<ParticipationEliminated>,
+        INotificationHandler<ParticipationRestored>,
+        ISingleton
 {
     readonly INtsSocketService _eventContext;
-    readonly ISnapshotProcessor _snapshotProcessor;
+    readonly ITimingService _timingService;
     readonly IReadMany<Participation> _coreParticipations;
     readonly HubProcedures _hubProcedures;
 
     public JudgeRpcClient(
         INtsSocketService eventContext,
         IRpcSocket socket,
-        ISnapshotProcessor snapshotProcessor,
+        ITimingService timingService,
         IReadMany<Participation> coreParticipations
     )
         : base(socket)
     {
         _hubProcedures = new HubProcedures(socket);
         _eventContext = eventContext;
-        _snapshotProcessor = snapshotProcessor;
+        _timingService = timingService;
         _coreParticipations = coreParticipations;
     }
 
     public override void RunAtStartup()
     {
-        Participation.PHASE_COMPLETED_EVENT.Subscribe(OnPhaseCompleted);
-        Participation.ELIMINATED_EVENT.Subscribe(OnParticipationEliminated);
-        Participation.RESTORED_EVENT.Subscribe(OnParticipationRestored);
-
         RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(Receive), Receive);
         RegisterOutputCollectionProcedure(nameof(GetActive), GetActive);
     }
@@ -50,7 +53,7 @@ public class JudgeRpcClient : RpcClient, IJudgeClientProcedures, ISingleton
     {
         foreach (Snapshot snapshot in snapshots)
         {
-            await _snapshotProcessor.Process(snapshot);
+            await _timingService.Record(snapshot);
         }
     }
 
@@ -66,22 +69,22 @@ public class JudgeRpcClient : RpcClient, IJudgeClientProcedures, ISingleton
         return coreParticipations;
     }
 
-    public async Task OnParticipationEliminated(ParticipationEliminated eliminated)
+    public async Task Handle(PhaseCompleted completed, CancellationToken cancellationToken)
+    {
+        var request = WarpRequest.Create(GetGroupId(), completed);
+        await _hubProcedures.OnPhaseCompleted(request);
+    }
+
+    public async Task Handle(ParticipationEliminated eliminated, CancellationToken cancellationToken)
     {
         var request = WarpRequest.Create(GetGroupId(), eliminated);
         await _hubProcedures.OnParticipationEliminated(request);
     }
 
-    public async Task OnParticipationRestored(ParticipationRestored restored)
+    public async Task Handle(ParticipationRestored restored, CancellationToken cancellationToken)
     {
         var request = WarpRequest.Create(GetGroupId(), restored);
         await _hubProcedures.OnParticipationRestored(request);
-    }
-
-    public async Task OnPhaseCompleted(PhaseCompleted phaseCompleted)
-    {
-        var request = WarpRequest.Create(GetGroupId(), phaseCompleted);
-        await _hubProcedures.OnPhaseCompleted(request);
     }
 
     string GetGroupId()
