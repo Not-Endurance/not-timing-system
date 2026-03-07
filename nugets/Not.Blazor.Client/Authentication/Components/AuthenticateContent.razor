@@ -1,8 +1,9 @@
 @using Microsoft.AspNetCore.Authorization
 @using MudBlazor
+@using Not.Blazor.Client.Authentication
 @using Not.Blazor.Components.Text
 
-@attribute [Route(NBlazorContents.AUTHENTICATE)]
+@attribute [Route(AuthenticationContents.AUTHENTICATION)]
 @attribute [AllowAnonymous]
 @inherits AuthenticateContentBehind
 

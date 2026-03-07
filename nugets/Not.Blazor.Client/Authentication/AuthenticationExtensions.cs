@@ -25,17 +25,14 @@ public static class AuthenticationExtensions
         var settings = CreateSettings(configuration);
         options.ProviderOptions.Authentication.Authority = ResolveAuthority(settings);
         options.ProviderOptions.Authentication.ClientId = settings.ClientId;
+        options.ProviderOptions.Authentication.RedirectUri = RemoteAuthenticationDefaults.LoginCallbackPath;
+        options.ProviderOptions.Authentication.PostLogoutRedirectUri = RemoteAuthenticationDefaults.LogoutCallbackPath;
 
         // User roles are injected from local user resolution, not from incoming provider role claims.
         options.UserOptions.RoleClaim = ClaimTypes.Role;
 
-        options.AuthenticationPaths.LogInPath = NBlazorContents.SIGNIN;
-        options.AuthenticationPaths.LogOutPath = NBlazorContents.SIGNOUT;
-        options.AuthenticationPaths.LogInCallbackPath = ResolveCallbackPath(settings);
-        options.AuthenticationPaths.LogOutCallbackPath = ResolveSignedOutCallbackPath(settings);
-        options.AuthenticationPaths.LogInFailedPath = NBlazorContents.AUTHENTICATE;
-        options.AuthenticationPaths.LogOutFailedPath = NBlazorContents.AUTHENTICATE;
-        options.AuthenticationPaths.LogOutSucceededPath = NBlazorContents.AUTHENTICATE;
+        options.AuthenticationPaths.LogOutSucceededPath = AuthenticationContents.AUTHENTICATION;
+        options.AuthenticationPaths.LogOutFailedPath = AuthenticationContents.AUTHENTICATION;
     }
 
     static NAuthenticationSettings CreateSettings(IConfiguration configuration)
@@ -53,18 +50,6 @@ public static class AuthenticationExtensions
         RequireConfigValue(settings.ClientId, nameof(NAuthenticationSettings.ClientId));
         RequireConfigValue(settings.Instance, nameof(NAuthenticationSettings.Instance));
         RequireConfigValue(settings.TenantId, nameof(NAuthenticationSettings.TenantId));
-    }
-
-    static string ResolveCallbackPath(NAuthenticationSettings settings)
-    {
-        return string.IsNullOrWhiteSpace(settings.CallbackPath) ? NBlazorContents.SIGNIN_CALLBACK : settings.CallbackPath;
-    }
-
-    static string ResolveSignedOutCallbackPath(NAuthenticationSettings settings)
-    {
-        return string.IsNullOrWhiteSpace(settings.SignedOutCallbackPath)
-            ? NBlazorContents.SIGNOUT_CALLBACK
-            : settings.SignedOutCallbackPath;
     }
 
     static string ResolveAuthority(NAuthenticationSettings settings)

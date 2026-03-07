@@ -1,4 +1,4 @@
-﻿using MudBlazor;
+using MudBlazor;
 using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
 using SwipeDirection = MudBlazor.SwipeDirection;

@@ -1,0 +1,9 @@
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Not.Blazor.Client.Authentication
+
+@attribute [Route(AuthenticationContents.AUTHENTICATION_REDIRECT)]
+@attribute [AllowAnonymous]
+@inherits AuthenticateRedirectContentBehind
+
+<RemoteAuthenticatorView Action="@Action" />

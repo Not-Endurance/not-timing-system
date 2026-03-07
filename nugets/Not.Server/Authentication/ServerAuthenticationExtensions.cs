@@ -31,8 +31,6 @@ public static class ServerAuthenticationExtensions
     )
     {
         var settings = CreateSettings(configuration);
-        var callbackPath = ResolveCallbackPath(settings);
-        var signedOutCallbackPath = ResolveSignedOutCallbackPath(settings);
 
         authBuilder.AddOpenIdConnect(
             OpenIdConnectDefaults.AuthenticationScheme,
@@ -41,8 +39,6 @@ public static class ServerAuthenticationExtensions
                 options.Authority = ResolveAuthority(settings);
                 options.ClientId = settings.ClientId;
                 options.ClientSecret = settings.ClientSecret;
-                options.CallbackPath = callbackPath;
-                options.SignedOutCallbackPath = signedOutCallbackPath;
                 options.ResponseType = "code";
                 options.SaveTokens = true;
                 options.Events = new OpenIdConnectEvents { OnTicketReceived = ResolveTicketReceived };
@@ -83,18 +79,6 @@ public static class ServerAuthenticationExtensions
         RequireConfigValue(settings.ClientSecret, nameof(NAuthenticationSettings.ClientSecret));
         RequireConfigValue(settings.Instance, nameof(NAuthenticationSettings.Instance));
         RequireConfigValue(settings.TenantId, nameof(NAuthenticationSettings.TenantId));
-    }
-
-    static string ResolveCallbackPath(NAuthenticationSettings settings)
-    {
-        return string.IsNullOrWhiteSpace(settings.CallbackPath) ? "/signin-oidc" : settings.CallbackPath;
-    }
-
-    static string ResolveSignedOutCallbackPath(NAuthenticationSettings settings)
-    {
-        return string.IsNullOrWhiteSpace(settings.SignedOutCallbackPath)
-            ? "/signout-callback-oidc"
-            : settings.SignedOutCallbackPath;
     }
 
     static string ResolveAuthority(NAuthenticationSettings settings)
