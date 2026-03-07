@@ -1,4 +1,4 @@
-﻿namespace Not.Blazor;
+namespace Not.Blazor.Client;
 
 public static class NBlazorContents
 {

@@ -5,28 +5,22 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Authentication.Provider;
 using Not.Application.Authentication.User;
-using Not.Blazor.Client.Authentication.User;
+using Not.Blazor.Client.Authentication.Services;
 
-namespace Not.Blazor.Client;
+namespace Not.Blazor.Client.Authentication;
 
 public static class AuthenticationExtensions
 {
-    public static IServiceCollection AddNClientAuthentication(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static IServiceCollection AddNClientAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddMsalAuthentication(options => ConfigureWasmAuthenticationOptions(options, configuration))
-            .AddAccountClaimsPrincipalFactory<NWasmAccountClaimsPrincipalFactory>();
+            .AddMsalAuthentication(options => Configure(options, configuration))
+            .AddAccountClaimsPrincipalFactory<ClientSideAccountClaimsPrincipalFactory>();
 
         return services.AddScoped<NUserResolver>().Configure<NAuthenticationSettings>(configuration);
     }
 
-    static void ConfigureWasmAuthenticationOptions(
-        RemoteAuthenticationOptions<MsalProviderOptions> options,
-        IConfiguration configuration
-    )
+    static void Configure(RemoteAuthenticationOptions<MsalProviderOptions> options, IConfiguration configuration)
     {
         var settings = CreateSettings(configuration);
         options.ProviderOptions.Authentication.Authority = ResolveAuthority(settings);
@@ -35,13 +29,13 @@ public static class AuthenticationExtensions
         // User roles are injected from local user resolution, not from incoming provider role claims.
         options.UserOptions.RoleClaim = ClaimTypes.Role;
 
-        options.AuthenticationPaths.LogInPath = "/signin";
-        options.AuthenticationPaths.LogOutPath = "/signout";
+        options.AuthenticationPaths.LogInPath = NBlazorContents.SIGNIN;
+        options.AuthenticationPaths.LogOutPath = NBlazorContents.SIGNOUT;
         options.AuthenticationPaths.LogInCallbackPath = ResolveCallbackPath(settings);
         options.AuthenticationPaths.LogOutCallbackPath = ResolveSignedOutCallbackPath(settings);
-        options.AuthenticationPaths.LogInFailedPath = "/authenticate";
-        options.AuthenticationPaths.LogOutFailedPath = "/authenticate";
-        options.AuthenticationPaths.LogOutSucceededPath = "/authenticate";
+        options.AuthenticationPaths.LogInFailedPath = NBlazorContents.AUTHENTICATE;
+        options.AuthenticationPaths.LogOutFailedPath = NBlazorContents.AUTHENTICATE;
+        options.AuthenticationPaths.LogOutSucceededPath = NBlazorContents.AUTHENTICATE;
     }
 
     static NAuthenticationSettings CreateSettings(IConfiguration configuration)
@@ -63,15 +57,13 @@ public static class AuthenticationExtensions
 
     static string ResolveCallbackPath(NAuthenticationSettings settings)
     {
-        return string.IsNullOrWhiteSpace(settings.CallbackPath)
-            ? "/authentication/login-callback"
-            : settings.CallbackPath;
+        return string.IsNullOrWhiteSpace(settings.CallbackPath) ? NBlazorContents.SIGNIN_CALLBACK : settings.CallbackPath;
     }
 
     static string ResolveSignedOutCallbackPath(NAuthenticationSettings settings)
     {
         return string.IsNullOrWhiteSpace(settings.SignedOutCallbackPath)
-            ? "/authentication/logout-callback"
+            ? NBlazorContents.SIGNOUT_CALLBACK
             : settings.SignedOutCallbackPath;
     }
 

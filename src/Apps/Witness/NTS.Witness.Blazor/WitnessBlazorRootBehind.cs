@@ -1,6 +1,6 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Components.Web;
-using Not.Blazor;
+using Not.Blazor.Client;
 using Not.Blazor.Components.Abstractions;
 
 namespace NTS.Witness.Blazor;

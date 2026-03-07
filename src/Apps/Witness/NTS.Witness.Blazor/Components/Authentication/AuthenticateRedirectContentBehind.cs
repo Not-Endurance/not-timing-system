@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Not.Blazor;
+using Not.Blazor.Client;
 
 namespace NTS.Witness.Blazor.Components.Authentication;
 

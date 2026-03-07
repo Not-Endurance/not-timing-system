@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Not.Application.Authentication.Abstractions;
-using Not.Blazor;
 
-namespace Not.Blazor.Client.Auth;
+namespace Not.Blazor.Client.Authentication.Services;
 
 internal class BlazorClientSideAuthenticationService : INAuthentication
 {

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Authentication.Abstractions;
-using Not.Blazor;
-using Not.Blazor.Client.Auth;
+using Not.Blazor.Client.Authentication;
+using Not.Blazor.Client.Authentication.Services;
 
 namespace Not.Blazor.Client;
 
@@ -11,6 +11,6 @@ public static class NBlazorClientServices
     public static IServiceCollection NClientSideBlazor(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTransient<INAuthentication, BlazorClientSideAuthenticationService>();
-        return services.AddNBlazor(configuration);
+        return services.AddNBlazor(configuration).AddNClientAuthentication(configuration);
     }
 }

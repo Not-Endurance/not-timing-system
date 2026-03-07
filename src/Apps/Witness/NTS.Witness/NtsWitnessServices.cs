@@ -22,6 +22,6 @@ public static class NtsWitnessServices
             .AddDomainEvents()
             .AddHttp(settings => settings.Host = baseUrl);
 
-        return services.AddNts(configuration).NClientSideBlazor(configuration).AddNClientAuthentication(configuration);
+        return services.AddNts(configuration).NClientSideBlazor(configuration);
     }
 }

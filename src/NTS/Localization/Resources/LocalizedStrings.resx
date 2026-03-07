@@ -729,8 +729,8 @@
   <data name="Bulgaria" xml:space="preserve">
     <value>Bulgaria</value>
   </data>
-  <data name="Login_invite_string" xml:space="preserve">
-    <value>Please sign in to gain access</value>
+  <data name="Sign_in_to_continue_string" xml:space="preserve">
+    <value>Sign in to continue</value>
   </data>
   <data name="Profile_page_string" xml:space="preserve">
     <value>Profile</value>

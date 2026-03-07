@@ -640,7 +640,7 @@
   <data name="Bulgaria" xml:space="preserve">
     <value>Булгаристан</value>
   </data>
-  <data name="Login_invite_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+  <data name="Sign_in_to_continue_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
   <data name="Profile_page_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
