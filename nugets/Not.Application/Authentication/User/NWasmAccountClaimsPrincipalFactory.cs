@@ -52,9 +52,9 @@ internal class NWasmAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactor
         var failedPath =
             _authOptions.Value.AuthenticationPaths.LogInFailedPath
             ?? _authOptions.Value.AuthenticationPaths.LogOutFailedPath
-            ?? "/access-denied";
+            ?? "/unauthorized";
 
         _navigator.NavigateTo(failedPath, forceLoad: false);
-        return result.Principal;
+        return new ClaimsPrincipal(new ClaimsIdentity());
     }
 }

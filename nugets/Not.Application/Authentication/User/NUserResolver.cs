@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
@@ -101,25 +102,30 @@ public class NUserResolver
     }
 }
 
-public readonly record struct NUserResolutionResult(
-    ClaimsPrincipal Principal,
-    string Error,
-    string FailurePath,
-    bool IsSuccess
-)
+public readonly record struct NUserResolutionResult
 {
     public static NUserResolutionResult Success(ClaimsPrincipal principal)
     {
-        return new NUserResolutionResult(principal, string.Empty, string.Empty, IsSuccess: true);
+        return new NUserResolutionResult(true, principal: principal);
     }
 
-    public static NUserResolutionResult Failure(string error, string failurePath)
+    public static NUserResolutionResult Failure(string error, string serverRedirect)
     {
-        return new NUserResolutionResult(
-            new ClaimsPrincipal(new ClaimsIdentity()),
-            error,
-            failurePath,
-            IsSuccess: false
-        );
+        return new NUserResolutionResult(false, error: error, serverRedirect: serverRedirect);
     }
+
+    public NUserResolutionResult(bool isSuccess, ClaimsPrincipal? principal = null, string? error = null, string? serverRedirect = null)
+    {
+        IsSuccess = isSuccess;
+        Principal = principal;
+        Error = error;
+        ServerRedirect = serverRedirect;
+    }
+
+    [MemberNotNullWhen(true, nameof(Principal))]
+    [MemberNotNullWhen(false, nameof(Error), nameof(ServerRedirect))]
+    public bool IsSuccess { get; }
+    public ClaimsPrincipal? Principal { get; }
+    public string? Error { get; }
+    public string? ServerRedirect { get; }
 }

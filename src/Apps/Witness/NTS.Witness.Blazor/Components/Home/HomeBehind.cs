@@ -1,16 +1,19 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
+using Not.Blazor;
 using Not.Blazor.Components.Abstractions;
 
-namespace NTS.Witness.Blazor.Components.Profiles;
+namespace NTS.Witness.Blazor.Components.Home;
 
-public class ProfileBehind : NComponent
+public class HomeBehind : NComponent
 {
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
 
     [Inject]
     AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
+
+    protected string UserName { get; set; } = string.Empty;
 
     protected string UserRoles { get; set; } = string.Empty;
 
@@ -22,6 +25,7 @@ public class ProfileBehind : NComponent
             var user = authState.User;
             var roles = user.FindAll(ClaimTypes.Role);
 
+            UserName = user.Identity?.Name ?? string.Empty;
             UserRoles = roles.Any() ? string.Join(", ", roles.Select(r => r.Value)) : No_roles_assigned_string;
         }
         catch (Exception ex)
@@ -34,7 +38,7 @@ public class ProfileBehind : NComponent
     {
         try
         {
-            Navigator.NavigateTo(WitnessBlazorConstants.Pages.SIGNIN, forceLoad: true);
+            Navigator.NavigateTo(NBlazorContents.SIGNIN, forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -46,7 +50,7 @@ public class ProfileBehind : NComponent
     {
         try
         {
-            Navigator.NavigateTo(WitnessBlazorConstants.Pages.SIGNOUT, forceLoad: true);
+            Navigator.NavigateTo(NBlazorContents.SIGNOUT, forceLoad: true);
         }
         catch (Exception ex)
         {

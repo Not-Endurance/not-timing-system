@@ -57,15 +57,14 @@ public static class ServerAuthenticationExtensions
         var resolver = context.HttpContext.RequestServices.GetRequiredService<NUserResolver>();
         var result = await resolver.ResolvePrincipal(context.Principal);
 
-        if (result.IsSuccess)
+        if (!result.IsSuccess)
         {
-            context.Principal = result.Principal;
-            return;
+            context.Response.Redirect(result.ServerRedirect);
+            context.Fail(result.Error);
+            context.HandleResponse();
         }
-
-        context.Response.Redirect(result.FailurePath);
-        context.Fail(result.Error);
-        context.HandleResponse();
+        context.Principal = result.Principal;
+        return;
     }
 
     static NAuthenticationSettings CreateSettings(IConfiguration configuration)
