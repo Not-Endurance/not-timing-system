@@ -3,8 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MudBlazor;
 using MudBlazor.Services;
-using Not.Application.Authentication.Abstractions;
-using Not.Blazor.Auth;
 using Not.Blazor.Helpers;
 using Not.Blazor.Navigation;
 using Not.Blazor.Navigation.Abstractions;
@@ -14,12 +12,6 @@ namespace Not.Blazor;
 
 public static class NBlazorServices
 {
-    public static IServiceCollection NClientSideBlazor(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddTransient<INAuthentication, ClientSideBlazorAuthenticationService>();
-        return services.AddNBlazor(configuration);
-    }
-
     public static IServiceCollection AddNBlazor(this IServiceCollection services, IConfiguration _)
     {
         services.TryAddSingleton<Notifier>();

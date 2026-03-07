@@ -1,12 +1,14 @@
-﻿using Not.Application.Authentication.Abstractions;
+using Microsoft.AspNetCore.Components;
+using Not.Application.Authentication.Abstractions;
+using Not.Blazor;
 
-namespace Not.Blazor.Auth;
+namespace Not.Blazor.Client.Auth;
 
-internal class ClientSideBlazorAuthenticationService : INAuthentication
+internal class BlazorClientSideAuthenticationService : INAuthentication
 {
     readonly NavigationManager _navigationManager;
 
-    public ClientSideBlazorAuthenticationService(NavigationManager navigationManager)
+    public BlazorClientSideAuthenticationService(NavigationManager navigationManager)
     {
         _navigationManager = navigationManager;
     }

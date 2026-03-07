@@ -5,8 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Authentication.Provider;
 using Not.Application.Authentication.User;
+using Not.Blazor.Client.Authentication.User;
 
-namespace Not.Application.Authentication;
+namespace Not.Blazor.Client;
 
 public static class AuthenticationExtensions
 {

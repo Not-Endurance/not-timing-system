@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
 using Microsoft.Authentication.WebAssembly.Msal.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Not.Application.Authentication.User;
 
-namespace Not.Application.Authentication.User;
+namespace Not.Blazor.Client.Authentication.User;
 
 internal class NWasmAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactory<RemoteUserAccount>
 {
