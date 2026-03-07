@@ -9,7 +9,7 @@ namespace Not.Application.Authentication.User;
 public class NUserResolver
 {
     const string ERROR_PAGE = "/error";
-    const string ACCESS_DENIED_PAGE = "/access-denied";
+    const string ACCESS_DENIED_PAGE = "/authenticate";
 
     readonly IUserRegister _userRegister;
     readonly ILogger<NUserResolver> _logger;

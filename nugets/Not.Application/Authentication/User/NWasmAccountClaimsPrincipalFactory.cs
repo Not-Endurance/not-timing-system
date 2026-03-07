@@ -41,6 +41,13 @@ internal class NWasmAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactor
             return principal;
         }
 
+        if (IsLogoutFlow())
+        {
+            // During logout routes we should not attempt local user resolution,
+            // otherwise an authenticated principal can be recreated before sign-out completes.
+            return new ClaimsPrincipal(new ClaimsIdentity());
+        }
+
         var result = await _userResolver.ResolvePrincipal(principal);
         if (result.IsSuccess)
         {
@@ -49,12 +56,21 @@ internal class NWasmAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactor
 
         _logger.LogWarning("Client authentication failed during local user resolution. Reason: {reason}", result.Error);
 
-        var failedPath =
-            _authOptions.Value.AuthenticationPaths.LogInFailedPath
-            ?? _authOptions.Value.AuthenticationPaths.LogOutFailedPath
-            ?? "/unauthorized";
+        var isLogoutFlow = IsLogoutFlow();
+        var paths = _authOptions.Value.AuthenticationPaths;
+        var failedPath = isLogoutFlow
+            ? (paths.LogOutFailedPath ?? paths.LogInFailedPath ?? "/unauthorized")
+            : (paths.LogInFailedPath ?? paths.LogOutFailedPath ?? "/unauthorized");
 
         _navigator.NavigateTo(failedPath, forceLoad: false);
         return new ClaimsPrincipal(new ClaimsIdentity());
+    }
+
+    bool IsLogoutFlow()
+    {
+        var endpoint = _navigator.ToBaseRelativePath(_navigator.Uri);
+        endpoint = endpoint.Split('?')[0].Split('#')[0].Trim('/').ToLowerInvariant();
+
+        return endpoint is "signout" or "authentication/logout-callback" or "signout-callback";
     }
 }

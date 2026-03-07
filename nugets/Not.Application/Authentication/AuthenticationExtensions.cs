@@ -38,9 +38,9 @@ public static class AuthenticationExtensions
         options.AuthenticationPaths.LogOutPath = "/signout";
         options.AuthenticationPaths.LogInCallbackPath = ResolveCallbackPath(settings);
         options.AuthenticationPaths.LogOutCallbackPath = ResolveSignedOutCallbackPath(settings);
-        options.AuthenticationPaths.LogInFailedPath = "/access-denied";
-        options.AuthenticationPaths.LogOutFailedPath = "/access-denied";
-        options.AuthenticationPaths.LogOutSucceededPath = "/profile";
+        options.AuthenticationPaths.LogInFailedPath = "/authenticate";
+        options.AuthenticationPaths.LogOutFailedPath = "/authenticate";
+        options.AuthenticationPaths.LogOutSucceededPath = "/authenticate";
     }
 
     static NAuthenticationSettings CreateSettings(IConfiguration configuration)
