@@ -14,8 +14,8 @@ public sealed class CorsOriginValidator : ICorsOriginValidator
             .Select(NormalizeOrigin)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        _allowedOriginPatterns = settings.AllowedOriginPatterns
-            .Where(pattern => !string.IsNullOrWhiteSpace(pattern))
+        _allowedOriginPatterns = settings
+            .AllowedOriginPatterns.Where(pattern => !string.IsNullOrWhiteSpace(pattern))
             .Select(pattern => new Regex(
                 pattern,
                 RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant
