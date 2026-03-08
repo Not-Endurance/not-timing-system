@@ -23,9 +23,14 @@ public class WitnessSocketContext : IConnectionStatus, INtsSocketService
     public async Task Disconnect()
     {
         var @event = Principal;
-        Principal = null;
         await _socket.Disconnect();
-        if (!_socket.IsConnected && @event != null)
+        if (_socket.IsConnected)
+        {
+            return;
+        }
+
+        Principal = null;
+        if (@event != null)
         {
             _notifier.Warn(string.Format(Disconnected_from__string, @event.Name));
         }
@@ -33,18 +38,30 @@ public class WitnessSocketContext : IConnectionStatus, INtsSocketService
 
     public async Task Connect(UpcomingEvent upcomingEvent)
     {
-        if (Principal == upcomingEvent)
-        {
-            return;
-        }
         if (Principal != null)
         {
-            _notifier.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Principal.Name));
+            if (Principal.Id != upcomingEvent.Id)
+            {
+                _notifier.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Principal.Name));
+                return;
+            }
+            if (_socket.IsConnected)
+            {
+                return;
+            }
+
+            // Previous connection attempt may have failed; clear stale state and retry.
+            Principal = null;
+        }
+
+        await _socket.Connect();
+        if (!_socket.IsConnected)
+        {
             return;
         }
+
         Principal = upcomingEvent;
-        await _socket.Connect();
-        if (_socket.IsConnected && Principal != null)
+        if (Principal != null)
         {
             _notifier.Inform(string.Format(Connected_to__string, Principal.Name));
         }

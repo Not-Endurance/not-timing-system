@@ -43,7 +43,13 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
 
     public async Task<RpcInvokeResult> PublishSnapshotsAsync(SnapshotModel model)
     {
-        var request = WarpRequest.Create(_eventContext.Event!.Id.ToString(), model);
+        var @event = _eventContext.Event;
+        if (@event == null)
+        {
+            return RpcInvokeResult.Error;
+        }
+
+        var request = WarpRequest.Create(@event.Id.ToString(), model);
         return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), request);
     }
 
@@ -64,7 +70,14 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
 
     public async Task GetParticipations()
     {
-        var request = WarpRequest.Create(_eventContext.Event!.Id.ToString());
+        var @event = _eventContext.Event;
+        if (@event == null)
+        {
+            _participationService.Set([]);
+            return;
+        }
+
+        var request = WarpRequest.Create(@event.Id.ToString());
         var result = await _socket.InvokeInputOutputProcedure<WarpRequest, IEnumerable<ParticipationModel>>(
             nameof(IWitnessHubProcedures.SendParticipations),
             request
@@ -72,6 +85,9 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         if (result.Data != null)
         {
             _participationService.Set(result.Data.Select(x => x.MapToDomain()));
+            return;
         }
+
+        _participationService.Set([]);
     }
 }

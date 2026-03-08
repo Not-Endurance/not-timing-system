@@ -25,8 +25,15 @@ public class ParticipationReader : IReadMany<Participation>, ITransient
         {
             return Task.FromResult(_participationContext.Participations.AsEnumerable());
         }
+
+        var @event = _eventContext.Event;
+        if (@event == null)
+        {
+            return Task.FromResult(Enumerable.Empty<Participation>());
+        }
+
         var participations = new List<Participation>();
-        var setupCompetitions = _eventContext.Event!.Competitions.Where(competition => competition.Phases.Count > 0);
+        var setupCompetitions = @event.Competitions.Where(competition => competition.Phases.Count > 0);
         foreach (var setupCompetition in setupCompetitions)
         {
             var setupParticipations = setupCompetition.Participations;
@@ -42,8 +49,9 @@ public class ParticipationReader : IReadMany<Participation>, ITransient
         return Task.FromResult(participations.AsEnumerable());
     }
 
-    public Task<IEnumerable<Participation>> ReadMany(Expression<Func<Participation, bool>> filter)
+    public async Task<IEnumerable<Participation>> ReadMany(Expression<Func<Participation, bool>> filter)
     {
-        throw new NotImplementedException();
+        var participations = await ReadMany();
+        return participations.AsQueryable().Where(filter).ToList();
     }
 }

@@ -62,7 +62,7 @@ public static class RpcSocketExtensions
 
     static async Task EnsureConnected(this IRpcSocket socket)
     {
-        if (!socket.IsConnected)
+        if (socket.IsConnected)
         {
             return;
         }
