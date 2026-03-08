@@ -1,4 +1,5 @@
-﻿using MudBlazor;
+using MudBlazor;
+using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
 using SwipeDirection = MudBlazor.SwipeDirection;
 
@@ -8,6 +9,10 @@ public class MainLayoutBehind : LayoutComponentBase
 {
     [Inject]
     ICrumbsNavigator Navigator { get; set; } = default!;
+
+    [Inject]
+    INAuthentication Authentication { get; set; } = default!;
+
     protected bool DrawerOpen { get; set; } = false;
 
     public bool IsCurrentPageEmergencyContacts =>
@@ -26,6 +31,12 @@ public class MainLayoutBehind : LayoutComponentBase
     protected void HelpHandler()
     {
         Navigator.NavigateTo(WitnessBlazorConstants.Pages.EMERGENCY_CONTACTS);
+    }
+
+    protected Task Signout()
+    {
+        Authentication.Signout();
+        return Task.CompletedTask;
     }
 
     public void OnSwipeEnd(SwipeEventArgs e)

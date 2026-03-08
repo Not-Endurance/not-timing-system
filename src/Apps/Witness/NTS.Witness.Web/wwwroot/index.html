@@ -23,17 +23,25 @@
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script>
-        let environment
-        if (window.location.hostname.includes("localhost")) {
+        const queryEnvironment = new URLSearchParams(window.location.search).get("environment");
+        const supportedEnvironments = ["Development", "Staging", "Production"];
+        let environment = supportedEnvironments.includes(queryEnvironment) ? queryEnvironment : undefined;
+
+        if (!environment && window.location.hostname.includes("localhost")) {
             environment = "Development";
         }
-        else if (window.location.hostname.includes("lively-rock")) {
+        else if (!environment && window.location.hostname.includes("lively-rock")) {
             environment = "Staging";
         }
-        else if (window.location.hostname.includes("production-url")) {
+        else if (!environment && window.location.hostname.includes("production-url")) {
             environment = "Production";
         }
-        Blazor.start({ environment: environment });
+
+        if (environment) {
+            Blazor.start({ environment: environment });
+        } else {
+            Blazor.start();
+        }
     </script>
 </body>
 </html>

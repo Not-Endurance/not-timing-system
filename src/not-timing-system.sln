@@ -91,6 +91,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Warp.Contracts", "Apps\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Server", "..\nugets\Not.Server\Not.Server.csproj", "{F7BBFBE0-A6DF-4650-BCFA-74A97D2C8B1E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Blazor.Client", "..\nugets\Not.Blazor.Client\Not.Blazor.Client.csproj", "{B7F6A9FE-3F68-40F0-96CD-916BEA63500F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -217,6 +219,10 @@ Global
 		{F7BBFBE0-A6DF-4650-BCFA-74A97D2C8B1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7BBFBE0-A6DF-4650-BCFA-74A97D2C8B1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7BBFBE0-A6DF-4650-BCFA-74A97D2C8B1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7F6A9FE-3F68-40F0-96CD-916BEA63500F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7F6A9FE-3F68-40F0-96CD-916BEA63500F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7F6A9FE-3F68-40F0-96CD-916BEA63500F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7F6A9FE-3F68-40F0-96CD-916BEA63500F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -252,6 +258,7 @@ Global
 		{81DAFA13-F85F-4E19-9259-5B72EFD70D1F} = {0B1034D7-3A6A-48F9-BBB3-411A4BA87446}
 		{1064F25D-273E-483A-9EDE-33F7A4CCC632} = {5F4886E8-8E6B-45E1-BDDA-70BA01BEA576}
 		{F7BBFBE0-A6DF-4650-BCFA-74A97D2C8B1E} = {06233005-CC56-4846-8760-F7AFF5F72F4C}
+		{B7F6A9FE-3F68-40F0-96CD-916BEA63500F} = {06233005-CC56-4846-8760-F7AFF5F72F4C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3CB609D9-5D54-4C11-A371-DAAC8B74E430}

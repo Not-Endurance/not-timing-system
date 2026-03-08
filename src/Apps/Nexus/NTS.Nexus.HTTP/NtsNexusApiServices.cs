@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Injection;
 using Not.Storage;
+using NTS.Application.Cors;
 using NTS.Nexus.HTTP.Telemetry;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -14,6 +15,8 @@ internal static class NtsNexusApiServices
 {
     public static IServiceCollection ConfigureNexusApi(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddNtsCorsOriginValidation(configuration);
+
         return services
             .AddNConventionalServices(Assembly.GetExecutingAssembly())
             .AddMongoStorage(configuration)

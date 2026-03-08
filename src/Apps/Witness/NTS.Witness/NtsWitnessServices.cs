@@ -1,8 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Authentication;
-using Not.Blazor;
+using Not.Blazor.Client;
 using NTS.Application;
 
 namespace NTS.Witness;
@@ -23,6 +22,6 @@ public static class NtsWitnessServices
             .AddDomainEvents()
             .AddHttp(settings => settings.Host = baseUrl);
 
-        return services.AddNts(configuration).AddNBlazor(configuration).AddNClientAuthentication(configuration);
+        return services.AddNts(configuration).NClientSideBlazor(configuration);
     }
 }

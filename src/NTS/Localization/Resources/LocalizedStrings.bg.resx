@@ -726,8 +726,8 @@
   <data name="Bulgaria" xml:space="preserve">
     <value>България</value>
   </data>
-  <data name="Login_invite_string" xml:space="preserve">
-    <value>Моля влезте в акаунта си, за да получите достъп</value>
+  <data name="Sign_in_to_continue_string" xml:space="preserve">
+    <value>Логнете се за да продължите</value>
   </data>
   <data name="Profile_page_string" xml:space="preserve">
     <value>Акаунт</value>
@@ -779,9 +779,6 @@
   </data>
   <data name="Connected_to_string" xml:space="preserve">
     <value>Свързан към</value>
-  </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
   </data>
   <data name="Updated_string" xml:space="preserve">
     <value>Обновено</value>
@@ -893,5 +890,8 @@
   </data>
   <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
     <value>Предстоящите събития не могат да бъдат изтрити</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

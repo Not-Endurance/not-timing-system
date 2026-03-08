@@ -2,31 +2,30 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
-using Microsoft.Authentication.WebAssembly.Msal.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Not.Application.Authentication.User;
 
-namespace Not.Application.Authentication.User;
+namespace Not.Blazor.Client.Authentication.Services;
 
-internal class NWasmAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactory<RemoteUserAccount>
+internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactory<RemoteUserAccount>
 {
+    readonly ILocalStorageMarkerService _localStorageMarkerService;
     readonly NUserResolver _userResolver;
     readonly NavigationManager _navigator;
-    readonly IOptionsSnapshot<RemoteAuthenticationOptions<MsalProviderOptions>> _authOptions;
-    readonly ILogger<NWasmAccountClaimsPrincipalFactory> _logger;
+    readonly ILogger<ClientSideAccountClaimsPrincipalFactory> _logger;
 
-    public NWasmAccountClaimsPrincipalFactory(
+    public ClientSideAccountClaimsPrincipalFactory(
+        ILocalStorageMarkerService localStorageMarkerService,
         IAccessTokenProviderAccessor accessor,
         NUserResolver userResolver,
         NavigationManager navigator,
-        IOptionsSnapshot<RemoteAuthenticationOptions<MsalProviderOptions>> authOptions,
-        ILogger<NWasmAccountClaimsPrincipalFactory> logger
+        ILogger<ClientSideAccountClaimsPrincipalFactory> logger
     )
         : base(accessor)
     {
+        _localStorageMarkerService = localStorageMarkerService;
         _userResolver = userResolver;
         _navigator = navigator;
-        _authOptions = authOptions;
         _logger = logger;
     }
 
@@ -41,6 +40,11 @@ internal class NWasmAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactor
             return principal;
         }
 
+        if (await _localStorageMarkerService.IsSignedOut())
+        {
+            return new ClaimsPrincipal(new ClaimsIdentity());
+        }
+
         var result = await _userResolver.ResolvePrincipal(principal);
         if (result.IsSuccess)
         {
@@ -48,13 +52,7 @@ internal class NWasmAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactor
         }
 
         _logger.LogWarning("Client authentication failed during local user resolution. Reason: {reason}", result.Error);
-
-        var failedPath =
-            _authOptions.Value.AuthenticationPaths.LogInFailedPath
-            ?? _authOptions.Value.AuthenticationPaths.LogOutFailedPath
-            ?? "/access-denied";
-
-        _navigator.NavigateTo(failedPath, forceLoad: false);
-        return result.Principal;
+        _navigator.NavigateTo(AuthenticationContents.AUTHENTICATION, forceLoad: false);
+        return new ClaimsPrincipal(new ClaimsIdentity());
     }
 }

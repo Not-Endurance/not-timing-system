@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\nugets\Not.Blazor.Client\Not.Blazor.Client.csproj" />
     <ProjectReference Include="..\..\..\..\nugets\Not.Storage\Not.Storage.csproj" />
     <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\..\Warp\NTS.Warp.Contracts\NTS.Warp.Contracts.csproj" />

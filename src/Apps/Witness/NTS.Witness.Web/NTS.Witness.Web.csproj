@@ -17,4 +17,9 @@
     <ProjectReference Include="..\NTS.Witness\NTS.Witness.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="localhostsettings.Staging.json" />
+    <EmbeddedResource Include="localhostsettings.Production.json" />
+  </ItemGroup>
+
 </Project>

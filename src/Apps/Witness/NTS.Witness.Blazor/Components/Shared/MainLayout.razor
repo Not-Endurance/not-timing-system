@@ -1,4 +1,3 @@
-@using Microsoft.AspNetCore.Components.Authorization
 @using Not.Blazor.Components.Layout
 
 @inherits MainLayoutBehind
@@ -21,14 +20,15 @@
             </MudDrawerHeader>
 
             <NavMenu OnNavigation="CloseDrawer" />
+
+            <NButtonSecondary Size="Size.Small" OnClick="Signout">
+                @Sign_Out_string 
+                <MudIcon Class="ml-2" Icon="@Icons.Material.Filled.Logout" />
+            </NButtonSecondary>
         </MudDrawer>
 
         <MudMainContent Style="height:100%;">
-            <AuthorizeView Roles="@WitnessBlazorConstants.UserRoles.COMPETITOR">
-                <Authorized>
-                    <HelpButton Class="help-button" ClickHandler="HelpHandler"/>
-                </Authorized>
-            </AuthorizeView>
+            <HelpButton Class="help-button" ClickHandler="HelpHandler" />
 
             @Body
 
