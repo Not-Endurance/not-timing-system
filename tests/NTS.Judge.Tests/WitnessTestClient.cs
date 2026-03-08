@@ -1,9 +1,9 @@
-﻿using Not.Application.RPC.Clients;
+using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Tests.RPC;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Warp.Features.Witness.Procedures;
+using NTS.Nexus.Warp.Features.Witness.Procedures;
 using Xunit.Abstractions;
 
 namespace NTS.Judge.Tests;
@@ -50,3 +50,5 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
         throw new NotImplementedException();
     }
 }
+
+

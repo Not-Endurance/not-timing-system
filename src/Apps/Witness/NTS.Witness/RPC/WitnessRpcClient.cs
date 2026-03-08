@@ -7,8 +7,8 @@ using NTS.Application.Core;
 using NTS.Application.Socket;
 using NTS.Application.Watcher;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Warp;
-using NTS.Warp.Features.Witness.Procedures;
+using NTS.Nexus.Warp;
+using NTS.Nexus.Warp.Features.Witness.Procedures;
 using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
@@ -91,3 +91,5 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         _participationService.Set([]);
     }
 }
+
+

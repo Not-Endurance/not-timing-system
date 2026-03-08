@@ -12,7 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\nugets\Not.Tests\Not.Tests.csproj" />
     <ProjectReference Include="..\..\src\Apps\Judge\NTS.Judge\NTS.Judge.csproj" />
-    <ProjectReference Include="..\..\src\Apps\Warp\NTS.Warp\NTS.Warp.csproj" />
+    <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj" />
     <ProjectReference Include="..\..\src\NTS.Storage\NTS.Storage.csproj" />
   </ItemGroup>
 
