@@ -26,14 +26,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<IMauiProcessService, WindowsProcessService>();
         var app = builder.Build();
 
-        if (EnvironmentHelper.UsesLocalhostInfrastructure() && EnvironmentHelper.Is(JudgeVariables.NO_WARP))
+        if (EnvironmentHelper.IsLocalhost() && !EnvironmentHelper.Is(JudgeVariables.NO_WARP))
         {
-            StartHub();
+            StartWarp();
         }
         return app;
     }
 
-    static void StartHub()
+    static void StartWarp()
     {
         var parentPid = Environment.ProcessId;
         var currentDirectory = Directory.GetCurrentDirectory();
