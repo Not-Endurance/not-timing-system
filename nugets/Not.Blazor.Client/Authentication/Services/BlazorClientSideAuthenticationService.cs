@@ -21,11 +21,7 @@ internal class BlazorClientSideAuthenticationService : INAuthentication
     public void Signin()
     {
         _localStorageMarkerService.ClearSignedOut();
-        var requestOptions = new InteractiveRequestOptions
-        {
-            Interaction = InteractionType.SignIn,
-            ReturnUrl = "/",
-        };
+        var requestOptions = new InteractiveRequestOptions { Interaction = InteractionType.SignIn, ReturnUrl = "/" };
         _navigationManager.NavigateToLogin(RemoteAuthenticationDefaults.LoginPath, requestOptions);
     }
 

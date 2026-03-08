@@ -114,7 +114,12 @@ public readonly record struct NUserResolutionResult
         return new NUserResolutionResult(false, error: error, serverRedirect: serverRedirect);
     }
 
-    public NUserResolutionResult(bool isSuccess, ClaimsPrincipal? principal = null, string? error = null, string? serverRedirect = null)
+    public NUserResolutionResult(
+        bool isSuccess,
+        ClaimsPrincipal? principal = null,
+        string? error = null,
+        string? serverRedirect = null
+    )
     {
         IsSuccess = isSuccess;
         Principal = principal;

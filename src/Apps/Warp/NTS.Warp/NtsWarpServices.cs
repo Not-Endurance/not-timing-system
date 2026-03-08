@@ -20,11 +20,12 @@ internal static class NtsWarpServices
         services.AddCors(options =>
             options.AddPolicy(
                 CORS_POLICY_NAME,
-                policy => policy
-                    .SetIsOriginAllowed(originValidator.IsAllowed)
-                    .WithMethods("GET", "POST")
-                    .AllowAnyHeader()
-                    .AllowCredentials()
+                policy =>
+                    policy
+                        .SetIsOriginAllowed(originValidator.IsAllowed)
+                        .WithMethods("GET", "POST")
+                        .AllowAnyHeader()
+                        .AllowCredentials()
             )
         );
 

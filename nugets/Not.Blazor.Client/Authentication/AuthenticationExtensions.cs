@@ -11,7 +11,10 @@ namespace Not.Blazor.Client.Authentication;
 
 public static class AuthenticationExtensions
 {
-    public static IServiceCollection AddNClientAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNClientAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services
             .AddMsalAuthentication(options => Configure(options, configuration))
