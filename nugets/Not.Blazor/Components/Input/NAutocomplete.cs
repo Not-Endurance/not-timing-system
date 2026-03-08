@@ -8,7 +8,7 @@ public class NAutocomplete<T> : MudAutocomplete<T?>
     public NAutocomplete()
     {
         CoerceText = true;
-        ResetValueOnEmptyText = true;
+        ResetValueOnEmptyText = false;
         ShowProgressIndicator = true;
         SelectOnActivation = false;
         SearchFunc = (term, ct) => SafeHelper.RunWithError(() => SearchSafe(term, ct));
