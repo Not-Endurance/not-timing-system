@@ -405,6 +405,21 @@
   <data name="Official__already_exists" xml:space="preserve">
     <value>Official '{0}' already exists</value>
   </data>
+  <data name="Competition__already_exists" xml:space="preserve">
+    <value>Competition '{0}' already exists</value>
+  </data>
+  <data name="Loop_distance__already_exists" xml:space="preserve">
+    <value>Loop distance '{0}' already exists</value>
+  </data>
+  <data name="Combination_number__already_exists" xml:space="preserve">
+    <value>Combination number '{0}' already exists</value>
+  </data>
+  <data name="Combination_athlete__already_exists" xml:space="preserve">
+    <value>Athlete '{0}' is already assigned to another combination</value>
+  </data>
+  <data name="Combination_horse__already_exists" xml:space="preserve">
+    <value>Horse '{0}' is already assigned to another combination</value>
+  </data>
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Please select a future time</value>
   </data>

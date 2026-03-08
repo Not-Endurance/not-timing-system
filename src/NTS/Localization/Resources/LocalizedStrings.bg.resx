@@ -405,6 +405,21 @@
   <data name="Official__already_exists" xml:space="preserve">
     <value>Официално лице '{0}' вече съществува</value>
   </data>
+  <data name="Competition__already_exists" xml:space="preserve">
+    <value>Състезание '{0}' вече съществува</value>
+  </data>
+  <data name="Loop_distance__already_exists" xml:space="preserve">
+    <value>Дължина на обиколка '{0}' вече съществува</value>
+  </data>
+  <data name="Combination_number__already_exists" xml:space="preserve">
+    <value>Номер на комбинация '{0}' вече съществува</value>
+  </data>
+  <data name="Combination_athlete__already_exists" xml:space="preserve">
+    <value>Състезател '{0}' вече е включен в друга комбинация</value>
+  </data>
+  <data name="Combination_horse__already_exists" xml:space="preserve">
+    <value>Кон '{0}' вече е включен в друга комбинация</value>
+  </data>
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Моля изберете време в бъдещето</value>
   </data>

@@ -119,6 +119,14 @@ namespace NTS.Localization
             LocalizeString(nameof(Please_provide_reason_to_eliminate_as__));
         public static string Select_FTQ_codes => LocalizeString(nameof(Select_FTQ_codes));
         public static string Official__already_exists => LocalizeString(nameof(Official__already_exists));
+        public static string Competition__already_exists => LocalizeString(nameof(Competition__already_exists));
+        public static string Loop_distance__already_exists => LocalizeString(nameof(Loop_distance__already_exists));
+        public static string Combination_number__already_exists =>
+            LocalizeString(nameof(Combination_number__already_exists));
+        public static string Combination_athlete__already_exists =>
+            LocalizeString(nameof(Combination_athlete__already_exists));
+        public static string Combination_horse__already_exists =>
+            LocalizeString(nameof(Combination_horse__already_exists));
         public static string Athletes_string => LocalizeString(nameof(Athletes_string));
         public static string Horses_string => LocalizeString(nameof(Horses_string));
         public static string Competitions_string => LocalizeString(nameof(Competitions_string));

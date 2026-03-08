@@ -405,6 +405,21 @@
   <data name="Official__already_exists" xml:space="preserve">
     <value>'{0}' adlı resmi görevli zaten mevcut</value>
   </data>
+  <data name="Competition__already_exists" xml:space="preserve">
+    <value>Yarışma '{0}' zaten mevcut</value>
+  </data>
+  <data name="Loop_distance__already_exists" xml:space="preserve">
+    <value>Tur mesafesi '{0}' zaten mevcut</value>
+  </data>
+  <data name="Combination_number__already_exists" xml:space="preserve">
+    <value>Kombinasyon numarası '{0}' zaten mevcut</value>
+  </data>
+  <data name="Combination_athlete__already_exists" xml:space="preserve">
+    <value>Sporcu '{0}' zaten başka bir kombinasyonda</value>
+  </data>
+  <data name="Combination_horse__already_exists" xml:space="preserve">
+    <value>At '{0}' zaten başka bir kombinasyonda</value>
+  </data>
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Lütfen gelecekteki bir zaman seçin</value>
   </data>
