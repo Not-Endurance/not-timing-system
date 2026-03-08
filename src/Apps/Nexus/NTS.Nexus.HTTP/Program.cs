@@ -10,7 +10,7 @@ using NTS.Nexus.HTTP.Telemetry;
 var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
-builder.UseMiddleware<NexusCorsMiddleware>();
+builder.UseMiddleware<FunctionsCorsMiddleware>();
 builder.UseMiddleware<FunctionInvocationTelemetryMiddleware>();
 builder.Services.ConfigureNexusApi(builder.Configuration);
 

@@ -5,13 +5,13 @@ using NTS.Application.Cors;
 
 namespace NTS.Nexus.HTTP.Cors;
 
-internal sealed class NexusCorsMiddleware : IFunctionsWorkerMiddleware
+internal sealed class FunctionsCorsMiddleware : IFunctionsWorkerMiddleware
 {
-    static readonly string[] DefaultMethods = ["GET", "POST", "PATCH", "DELETE", "OPTIONS"];
+    static readonly string[] DEFAULT_METHODS = ["GET", "POST", "PATCH", "DELETE", "OPTIONS"];
 
     readonly ICorsOriginValidator _originValidator;
 
-    public NexusCorsMiddleware(ICorsOriginValidator originValidator)
+    public FunctionsCorsMiddleware(ICorsOriginValidator originValidator)
     {
         _originValidator = originValidator;
     }
@@ -66,7 +66,7 @@ internal sealed class NexusCorsMiddleware : IFunctionsWorkerMiddleware
 
         var requestedMethod = context.Request.Headers["Access-Control-Request-Method"].ToString();
         context.Response.Headers["Access-Control-Allow-Methods"] = string.IsNullOrWhiteSpace(requestedMethod)
-            ? string.Join(",", DefaultMethods)
+            ? string.Join(",", DEFAULT_METHODS)
             : requestedMethod;
     }
 }
