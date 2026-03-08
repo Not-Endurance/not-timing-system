@@ -4,27 +4,27 @@ using Not.Application.UdpHandshake;
 using Not.Localization;
 using Not.Serialization.JSON;
 using NTS.Application;
+using NTS.Application.Cors;
 using NTS.Warp.Middlewares;
 
 namespace NTS.Warp;
 
 internal static class NtsWarpServices
 {
+    public const string CORS_POLICY_NAME = "NtsWarpCors";
+
     public static IServiceCollection ConfigureNtsWarp(this IServiceCollection services, IConfiguration configuration)
     {
-        var corsSettings = configuration.GetSection(nameof(CorsSettings)).Get<CorsSettings>() ?? new CorsSettings();
-        var originValidator = new CorsOriginValidator(corsSettings);
-        services.AddSingleton(originValidator);
+        var originValidator = services.AddNtsCorsOriginValidation(configuration);
 
         services.AddCors(options =>
             options.AddPolicy(
-                CorsSettings.POLICY_NAME,
-                policy =>
-                    policy
-                        .SetIsOriginAllowed(originValidator.IsAllowed)
-                        .WithMethods("GET", "POST")
-                        .AllowAnyHeader()
-                        .AllowCredentials()
+                CORS_POLICY_NAME,
+                policy => policy
+                    .SetIsOriginAllowed(originValidator.IsAllowed)
+                    .WithMethods("GET", "POST")
+                    .AllowAnyHeader()
+                    .AllowCredentials()
             )
         );
 

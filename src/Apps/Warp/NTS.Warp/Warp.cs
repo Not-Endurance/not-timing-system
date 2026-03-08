@@ -1,5 +1,6 @@
 ﻿using Not.Startup;
 using NTS.Application;
+using NTS.Application.Cors;
 using NTS.Warp.Features.Judge;
 using NTS.Warp.Features.Witness;
 
@@ -23,7 +24,7 @@ public static class Warp
 
         var judgeHubPath = new PathString($"/{ApplicationConstants.JUDGE_HUB}");
         var witnessHubPath = new PathString($"/{ApplicationConstants.WITNESS_HUB}");
-        var originValidator = app.Services.GetRequiredService<CorsOriginValidator>();
+        var originValidator = app.Services.GetRequiredService<ICorsOriginValidator>();
 
         app.Urls.Add($"http://*:{port}");
         app.Use(
@@ -50,10 +51,10 @@ public static class Warp
             }
         );
 
-        app.UseCors(CorsSettings.POLICY_NAME);
+        app.UseCors(NtsWarpServices.CORS_POLICY_NAME);
 
-        app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB).RequireCors(CorsSettings.POLICY_NAME);
-        app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB).RequireCors(CorsSettings.POLICY_NAME);
+        app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
+        app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
 
         foreach (var initializer in app.Services.GetServices<IStartupInitializer>())
         {

@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
 
-namespace NTS.Warp;
+namespace NTS.Application.Cors;
 
-internal sealed class CorsOriginValidator
+public sealed class CorsOriginValidator : ICorsOriginValidator
 {
     readonly HashSet<string> _allowedOrigins;
     readonly Regex[] _allowedOriginPatterns;
@@ -14,7 +14,7 @@ internal sealed class CorsOriginValidator
             .Select(NormalizeOrigin)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        _allowedOriginPatterns = (settings.AllowedOriginHostPatterns ?? [])
+        _allowedOriginPatterns = settings.AllowedOriginPatterns
             .Where(pattern => !string.IsNullOrWhiteSpace(pattern))
             .Select(pattern => new Regex(
                 pattern,
@@ -41,7 +41,7 @@ internal sealed class CorsOriginValidator
             return true;
         }
 
-        if (uri.Scheme != Uri.UriSchemeHttps)
+        if (uri.Scheme != Uri.UriSchemeHttps && !IsLoopbackHost(uri.Host))
         {
             return false;
         }
@@ -63,5 +63,12 @@ internal sealed class CorsOriginValidator
     static string NormalizeOrigin(Uri uri)
     {
         return $"{uri.Scheme}://{uri.Authority}";
+    }
+
+    static bool IsLoopbackHost(string host)
+    {
+        return host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+            || host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase)
+            || host.Equals("::1", StringComparison.OrdinalIgnoreCase);
     }
 }
