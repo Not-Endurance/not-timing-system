@@ -1,4 +1,4 @@
-﻿@using NTS.Domain.Aggregates
+@using NTS.Domain.Aggregates
 @using NTS.Domain.Setup.Aggregates
 @using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
@@ -6,16 +6,21 @@
 
 @inherits AthleteShellBehind
 
-<KrudForm Shell="this">
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
 
-    <NTextField @bind-Value="Model.Names" For="() => Model.Names" Label="@Name_string" />
+        <NTextField @bind-Value="Model.Names" For="() => Model.Names" Label="@Name_string" />
 
-    <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@FEI_Id_string" HelperText="@Required_only_for_FEI_export_string" />
+        <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@FEI_Id_string" HelperText="@Required_only_for_FEI_export_string" />
 
-    <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountriesSafe" />
+        <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountriesSafe" />
 
-    <NAutocomplete @bind-Value="Model.Club" For="() => Model.Club" Label="@Clubs_string" SearchSafe="SearchClubsSafe" />
+        <NAutocomplete @bind-Value="Model.Club" For="() => Model.Club" Label="@Clubs_string" SearchSafe="SearchClubsSafe" />
 
-    <NAutocomplete T="User" @bind-Value="Model.User" For="() => Model.User" Label="@Username_string" SearchSafe="SearchUsersSafe" />
+        <NAutocomplete T="User" @bind-Value="Model.User" For="() => Model.User" Label="@Username_string" SearchSafe="SearchUsersSafe" />
 
+    </FormFields>
 </KrudForm>
+
+
+

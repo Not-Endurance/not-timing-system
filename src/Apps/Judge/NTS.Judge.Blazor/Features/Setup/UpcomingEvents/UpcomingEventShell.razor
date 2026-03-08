@@ -7,16 +7,21 @@
 
 @inherits UpcomingEventShellBehind
 
-<KrudForm Shell="this">
-    <NTextField @bind-Value="Model.Place" For="() => Model.Place" Label="@Place_string" />
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
+        <NTextField @bind-Value="Model.Place" For="() => Model.Place" Label="@Place_string" />
     
-    <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+        <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
 
-    <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountriesSafe" />
+        <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountriesSafe" />
     
-    <NTextField @bind-Value="Model.FeiShowId" For="() => Model.FeiShowId" Label="@($"{required_for_FEI_export} - {FEI_Show_ID_label}")" />
+        <NTextField @bind-Value="Model.FeiShowId" For="() => Model.FeiShowId" Label="@($"{required_for_FEI_export} - {FEI_Show_ID_label}")" />
     
-    <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@($"{required_for_FEI_export} - {FEI_Event_ID_label}")" />
+        <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@($"{required_for_FEI_export} - {FEI_Event_ID_label}")" />
 
-    <NTextField @bind-Value="Model.FeiEventCode" For="() => Model.FeiEventCode" Label="@($"{required_for_FEI_export} - {FEI_Event_Code_label}")" />
+        <NTextField @bind-Value="Model.FeiEventCode" For="() => Model.FeiEventCode" Label="@($"{required_for_FEI_export} - {FEI_Event_Code_label}")" />
+    </FormFields>
 </KrudForm>
+
+
+

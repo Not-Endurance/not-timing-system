@@ -11,23 +11,32 @@
     <EditForm Model="Shell.Model" OnSubmit="OnSubmit">
         <ExceptionFormValidator @ref="ValidatorRef"/>
 
-        @ChildContent
+        @FormFields
 
-        <MudStack Row="true" Class="mt-4">
-            @if (IsCreateForm)
-            {
-                <NButtonCreate ButtonType="ButtonType.Submit" />
-            }
-            else
-            {
-                <NButtonUpdate ButtonType="ButtonType.Submit" />
-            }    
+        @AdditionalContent
 
-            @if (CanNavigateBack())
-            {
-                <NButtonBack OnClick="NavigateBack" />
-            }
-        </MudStack>
+        @if (FormButtons != null)
+        {
+            @FormButtons
+        }
+        else 
+        {
+            <MudStack Row="true" Class="mt-4" Justify="Justify.FlexEnd">
+                @if (CanNavigateBack())
+                {
+                    <NButtonBack OnClick="NavigateBack" />
+                }
+
+                @if (IsCreateForm)
+                {
+                    <NButtonCreate ButtonType="ButtonType.Submit" />
+                }
+                else
+                {
+                    <NButtonUpdate ButtonType="ButtonType.Submit" />
+                }    
+            </MudStack>
+        }
     </EditForm>
 
 </MudContainer>

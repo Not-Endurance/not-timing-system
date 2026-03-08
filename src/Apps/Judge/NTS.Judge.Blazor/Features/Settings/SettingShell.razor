@@ -1,14 +1,19 @@
-﻿@using NTS.Judge.Features.Settings
+@using NTS.Judge.Features.Settings
 @using Not.Blazor.Components.Input
 @using Not.Blazor.Components.Layout
 @using Not.Krud.Blazor.Components
 
 @inherits SettingShellBehind
 
-<KrudForm Shell="this">
-    <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountrySafe" />
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
+        <NAutocomplete @bind-Value="Model.Country" For="() => Model.Country" Label="@Country_string" SearchSafe="SearchCountrySafe" />
 
-    <NAutocomplete @bind-Value="Model.LanguageCountry" For="() => Model.LanguageCountry" @bind-Value:after="SetUiCulture"
-                    Label="@Language_string"
-                    SearchSafe="SearchLanguageSafe" />
+        <NAutocomplete @bind-Value="Model.LanguageCountry" For="() => Model.LanguageCountry" @bind-Value:after="SetUiCulture"
+                        Label="@Language_string"
+                        SearchSafe="SearchLanguageSafe" />
+    </FormFields>
 </KrudForm>
+
+
+
