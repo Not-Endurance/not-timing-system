@@ -6,25 +6,24 @@
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "IS_LOCALHOST": "true"
       },
     },
     "Staging": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "?environment=Staging",
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Staging",
-        "IS_LOCALHOST": "true"
       }
     },
     "Production": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "?environment=Production",
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production",
-        "IS_LOCALHOST": "true"
       }
     }
   },
