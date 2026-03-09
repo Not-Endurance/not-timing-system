@@ -2,7 +2,9 @@ using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
 using Not.Notify;
+using Not.Structures;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Setup.Services.StartValidation;
 using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core;
@@ -51,13 +53,20 @@ public class DashService : NStatefulService, IDashService, ISingleton
         return IsStarted;
     }
 
-    public async Task Start()
+    public async Task<Result<IReadOnlyList<StartValidationIssue>>> Start()
     {
         // TODO: Ensure witness apps receive the participants list on Start (or before).
         // Currently you need to restart witness after start in order to fetch
+
+        var validationResult = _startDashboardBusiness.Validate();
+        if (validationResult.Data?.Any() == true)
+        {
+            return validationResult;
+        }
         await _startDashboardBusiness.Start();
         IsStarted = true;
         EmitChanged();
+        return Result.Success<IReadOnlyList<StartValidationIssue>>([]);
     }
 
     public async Task Reset()
@@ -100,7 +109,7 @@ public class DashService : NStatefulService, IDashService, ISingleton
 public interface IDashService : IStatefulService
 {
     bool IsStarted { get; }
-    Task Start();
+    Task<Result<IReadOnlyList<StartValidationIssue>>> Start();
     Task LoadArchive(int archiveId);
     Task Reset();
 }

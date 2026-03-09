@@ -4,12 +4,11 @@ using Not.Blazor.Helpers;
 using Not.Domain.Exceptions;
 using NTS.Judge.Blazor.Features.Setup.StartValidation;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
-using NTS.Judge.Features;
 using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Layout.Drawer;
 
-public class SideMenu2Behind : NStatefulComponent
+public class EventMenuBehind : NStatefulComponent
 {
     [Inject]
     IDialogService DialogService { get; set; } = default!;
@@ -20,28 +19,23 @@ public class SideMenu2Behind : NStatefulComponent
     [Inject]
     IDashService Service { get; set; } = default!;
 
-    [Inject]
-    IStartBusiness StartService { get; set; } = default!;
-
-    protected bool IsStarted => Service.IsStarted;
+    protected bool IsEventStarted => Service.IsStarted;
 
     protected async Task Start()
     {
         try
         {
-            var validation = StartService.Validate();
+            var validation = await Service.Start();
             if (validation.Data?.Any() == true)
             {
                 var parameters = new DialogParameters<StartValidationDialog> { { x => x.InitialValidation, validation } };
                 var dialog = await DialogService.ShowAsync<StartValidationDialog>(Start_string, parameters);
-                var result = await dialog.Result;
-                if (result == null || result.Canceled || result.Data is not true)
+                if (await dialog.IsCanceled())
                 {
                     return;
                 }
+                await Service.Start();
             }
-
-            await Service.Start();
         }
         catch (DomainException ex)
         {

@@ -1,10 +1,10 @@
 ﻿@using NTS.Judge.Blazor.Features.Socket
 
-@inherits SideMenu2Behind
+@inherits EventMenuBehind
 
 <MudStack Class="ma-6">
 
-    @if (! IsStarted)
+    @if (! IsEventStarted)
     {
         <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
     }
