@@ -1,22 +1,36 @@
+using MediatR;
 using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Notify;
 using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Objects.Payloads;
 
 namespace NTS.Judge.Features.Socket;
 
-public class JudgeSocketService : NStatefulService, INtsSocketService, INtsSocketContext, ISingleton
+public class JudgeSocketService
+    : NStatefulService,
+        INtsSocketService,
+        INotificationHandler<UpcomingEventUpdatedEvent>,
+        ISingleton
 {
     readonly ISocketPrincipalStorage _socketPrincialStorage;
+    readonly IRead<UpcomingEvent> _upcomingEvents;
     readonly IRpcSocket _socket;
     readonly INotifier _notifier;
 
-    public JudgeSocketService(ISocketPrincipalStorage socketPrincipaStorage, IRpcSocket socket, INotifier notifier)
+    public JudgeSocketService(
+        ISocketPrincipalStorage socketPrincipaStorage,
+        IRead<UpcomingEvent> upcomingEvents,
+        IRpcSocket socket,
+        INotifier notifier
+    )
     {
         _socketPrincialStorage = socketPrincipaStorage;
+        _upcomingEvents = upcomingEvents;
         _socket = socket;
         _notifier = notifier;
         _socket.Error += HandleRpcErrors;
@@ -58,6 +72,17 @@ public class JudgeSocketService : NStatefulService, INtsSocketService, INtsSocke
         }
         await InternalSetEvent(principal);
         await _socket.Connect(principal.Id.ToString());
+    }
+
+    public async Task Handle(UpcomingEventUpdatedEvent notification, CancellationToken cancellationToken)
+    {
+        if (Event?.Id != notification.EventId)
+        {
+            return;
+        }
+
+        Event = await _upcomingEvents.Read(notification.EventId);
+        EmitChanged();
     }
 
     void HandleRpcErrors(object? sender, RpcError rpcError)

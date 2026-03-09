@@ -50,11 +50,21 @@ public abstract class RestApiRepository<T> : IRepository<T>
         }
     }
 
+    protected virtual Task InternalCreate(T item)
+    {
+        return Client.Post(_endpoint, item);
+    }
+
+    protected virtual Task InternalUpdate(T item)
+    {
+        return Client.Patch(_endpoint, item);
+    }
+
     public async Task Create(T item)
     {
         try
         {
-            await Client.Post(_endpoint, item);
+            await InternalCreate(item);
         }
         catch (Exception ex)
         {
@@ -144,11 +154,12 @@ public abstract class RestApiRepository<T> : IRepository<T>
     {
         try
         {
-            await Client.Patch(_endpoint, items);
+            await InternalUpdate(items);
         }
         catch (Exception ex)
         {
             HandleException(ex);
         }
     }
+
 }

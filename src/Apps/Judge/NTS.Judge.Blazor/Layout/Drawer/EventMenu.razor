@@ -9,7 +9,7 @@
         <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
     }
 
-    @if (IsEventStarted)
+    @if (IsEventSelected)
     {
         <NButtonWarning OnClick="OpenDisconnectDialog" Text="@Disconnect_string" />
     }

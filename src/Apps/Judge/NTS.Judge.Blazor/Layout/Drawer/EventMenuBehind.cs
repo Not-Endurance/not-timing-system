@@ -21,7 +21,7 @@ public class EventMenuBehind : NStatefulComponent
     IDashService Service { get; set; } = default!;
 
     [Inject]
-    INtsSocketContext SocketContext { get; set; } = default!;
+    JudgeSocketService SocketContext { get; set; } = default!;
 
     protected bool IsEventStarted => Service.IsStarted;
     protected bool IsEventSelected => SocketContext.Event != null;

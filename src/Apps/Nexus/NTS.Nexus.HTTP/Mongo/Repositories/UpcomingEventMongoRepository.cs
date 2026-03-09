@@ -7,11 +7,11 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class UpcomingEventRepository : MongoRepository<UpcomingEventModel>, IRepository<UpcomingEventModel>
+public class UpcomingEventMongoRepository : MongoRepository<UpcomingEventModel>, IRepository<UpcomingEventModel>
 {
     readonly ITelemetryService _telemetry;
 
-    public UpcomingEventRepository(IMongoContext context, ITelemetryService telemetry)
+    public UpcomingEventMongoRepository(IMongoContext context, ITelemetryService telemetry)
         : base(context, MongoConstants.NTS_DATABASE, "upcomingEvents")
     {
         _telemetry = telemetry;
@@ -19,7 +19,7 @@ public class UpcomingEventRepository : MongoRepository<UpcomingEventModel>, IRep
 
     protected override UpdateDefinition<UpcomingEventModel> GetUpdateDefinition(UpcomingEventModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(UpcomingEventRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(nameof(UpcomingEventMongoRepository), nameof(GetUpdateDefinition));
 
         try
         {
