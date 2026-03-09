@@ -10,7 +10,7 @@ public class KrudNode : Observer, IObservable
     protected Event StateChanged { get; } = new();
 
     public object? Value { get; protected set; }
-    public IEventSubscriber Event => StateChanged;
+    public IEventSubscriber ObservableEvent => StateChanged;
 
     public IReadOnlyList<KrudNode> Children => _children.AsReadOnly();
 

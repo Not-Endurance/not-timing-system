@@ -64,7 +64,7 @@ public class StartValidationDialogBehind : NDialog<bool>
                 var selectedCompetitionId = _selectedCompetitionByParticipation[issue.ParticipationNumber];
                 foreach (var competition in issue.Competitions.Where(x => x.CompetitionId != selectedCompetitionId))
                 {
-                    await StartService.DeleteInvalidParticipation(issue.ParticipationNumber, competition.CompetitionId);
+                    await StartService.DeleteParticipation(issue.ParticipationNumber, competition.CompetitionId);
                 }
             }
 

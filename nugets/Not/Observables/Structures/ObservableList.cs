@@ -41,7 +41,7 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
             }
         }
     }
-    public IEventSubscriber Event => _changed;
+    public IEventSubscriber ObservableEvent => _changed;
     public int Count => _dictionary.Count;
 
     public void AddOrReplace(T item)

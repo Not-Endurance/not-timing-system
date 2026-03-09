@@ -28,14 +28,14 @@ public class NStatefulComponent : NComponent, IDisposable
     {
         foreach (var (id, observable) in _subscriptions)
         {
-            observable.Event.Unsubscribe(id);
+            observable.ObservableEvent.Unsubscribe(id);
         }
         GC.SuppressFinalize(this);
     }
 
     void InternalObserve(IObservable observable)
     {
-        var id = observable.Event.Subscribe(InvokeRender);
+        var id = observable.ObservableEvent.Subscribe(InvokeRender);
         _subscriptions.Add(id, observable);
     }
 }

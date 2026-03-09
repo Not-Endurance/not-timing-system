@@ -5,6 +5,7 @@ using Not.Domain.Exceptions;
 using NTS.Judge.Blazor.Features.Setup.StartValidation;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
 using NTS.Judge.Features.Core;
+using NTS.Judge.Features.Socket;
 
 namespace NTS.Judge.Blazor.Layout.Drawer;
 
@@ -19,7 +20,11 @@ public class EventMenuBehind : NStatefulComponent
     [Inject]
     IDashService Service { get; set; } = default!;
 
+    [Inject]
+    INtsSocketContext SocketContext { get; set; } = default!;
+
     protected bool IsEventStarted => Service.IsStarted;
+    protected bool IsEventSelected => SocketContext.Event != null;
 
     protected async Task Start()
     {
@@ -47,11 +52,11 @@ public class EventMenuBehind : NStatefulComponent
         }
     }
 
-    protected async Task OpenSoftResetDialog()
+    protected async Task OpenDisconnectDialog()
     {
         try
         {
-            var dialog = await DialogService.ShowAsync<SoftResetDialog>();
+            var dialog = await DialogService.ShowAsync<DisconnectEventDialog>();
             if (await dialog.IsCanceled())
             {
                 return;
@@ -67,5 +72,6 @@ public class EventMenuBehind : NStatefulComponent
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);
+        await Observe(SocketContext);
     }
 }

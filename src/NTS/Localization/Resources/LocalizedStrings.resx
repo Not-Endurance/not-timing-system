@@ -597,11 +597,11 @@
   <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
     <value>Setup configuration will not be deleted</value>
   </data>
-  <data name="Soft_reset_dialog_option_1_string" xml:space="preserve">
-    <value>Soft reset - reset the event connection. Make sure to select the correct event before Starting</value>
+  <data name="Disconnect_from_current_Event" xml:space="preserve">
+    <value>Disconnect from current Event</value>
   </data>
-  <data name="Soft_reset_dialog_option_2_string" xml:space="preserve">
-    <value>Hard reset - reset the connection and delete all phase data</value>
+  <data name="Reset_Timing_this_will_DELETE_Timing_data" xml:space="preserve">
+    <value>Reset Timing - this will DELETE Timing data</value>
   </data>
   <data name="Download_string" xml:space="preserve">
     <value>Download Mobile App</value>
@@ -715,23 +715,11 @@
     <value>Are you sure you want to delete '{0}'?</value>
   </data>
   <data name="Delete_string" xml:space="preserve">
-      <value>Delete</value>
-    </data>
-    <data name="Cascading_Delete_string" xml:space="preserve">
-      <value>Cascading Delete</value>
-    </data>
-    <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
-      <value>This is a cascading delete operation for</value>
-    </data>
-    <data name="Cascading_delete_warning_string" xml:space="preserve">
-      <value>Continuing will delete the selected resource and all related resources listed below.</value>
-    </data>
-    <data name="Affected_resources_string" xml:space="preserve">
-      <value>Affected resources</value>
-    </data>
-    <data name="Back_string" xml:space="preserve">
-      <value>Back</value>
-    </data>
+    <value>Delete</value>
+  </data>
+  <data name="Back_string" xml:space="preserve">
+    <value>Back</value>
+  </data>
   <data name="Export_FEI_string" xml:space="preserve">
     <value>Export FEI</value>
   </data>
@@ -938,5 +926,17 @@
   </data>
   <data name="Remove_from__string" xml:space="preserve">
     <value>Remove from {0}</value>
+  </data>
+  <data name="Cascading_Delete_string" xml:space="preserve">
+    <value>Cascading Delete</value>
+  </data>
+  <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
+    <value>This is a cascading delete operation for</value>
+  </data>
+  <data name="Cascading_delete_warning_string" xml:space="preserve">
+    <value>Continuing will delete the selected resource and all related resources listed below.</value>
+  </data>
+  <data name="Affected_resources_string" xml:space="preserve">
+    <value>Affected resources</value>
   </data>
 </root>

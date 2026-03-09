@@ -45,7 +45,7 @@ public class StartBusinessService : IStartBusiness
         return StartValidator.Validate(setupEvent);
     }
 
-    public async Task DeleteInvalidParticipation(int participationNumber, int competitionId)
+    public async Task DeleteParticipation(int participationNumber, int competitionId)
     {
         var setupEvent = GetSetupEvent();
         var competition = setupEvent.Competitions.FirstOrDefault(x => x.Id == competitionId);
@@ -227,6 +227,6 @@ public class StartBusinessService : IStartBusiness
 public interface IStartBusiness : ITransient
 {
     Result<IReadOnlyList<StartValidationIssue>> Validate();
-    Task DeleteInvalidParticipation(int participationNumber, int competitionId);
+    Task DeleteParticipation(int participationNumber, int competitionId);
     Task<bool> Start();
 }

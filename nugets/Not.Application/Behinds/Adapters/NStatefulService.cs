@@ -11,7 +11,7 @@ public abstract class NStatefulService : Observer, IStatefulService
     readonly Event _changed = new();
     bool _hasLoaded;
 
-    public IEventSubscriber Event => _changed;
+    public IEventSubscriber ObservableEvent => _changed;
 
     /// <summary>
     /// Creates the service state. Called internally by <see cref="Load"/> which

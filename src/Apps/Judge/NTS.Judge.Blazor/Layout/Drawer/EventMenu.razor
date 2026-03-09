@@ -4,12 +4,15 @@
 
 <MudStack Class="ma-6">
 
-    @if (! IsEventStarted)
+    @if (IsEventSelected && !IsEventStarted)
     {
         <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
     }
 
-    <NButtonWarning OnClick="OpenSoftResetDialog" Text="@Reset_string" />
+    @if (IsEventStarted)
+    {
+        <NButtonWarning OnClick="OpenDisconnectDialog" Text="@Disconnect_string" />
+    }
 
     <SocketStatus />
 </MudStack>

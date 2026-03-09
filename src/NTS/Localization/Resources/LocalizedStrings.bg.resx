@@ -597,11 +597,11 @@
   <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
     <value>Конфигурацията на събитието няма да бъде изтрита</value>
   </data>
-  <data name="Soft_reset_dialog_option_1_string" xml:space="preserve">
-    <value>Софт ресет - промени връзката със събирие. Подсигури се че правилното събитие е избрано преди Старт</value>
+  <data name="Disconnect_from_current_Event" xml:space="preserve">
+    <value>Разкачи се от текущото Събитие</value>
   </data>
-  <data name="Soft_reset_dialog_option_2_string" xml:space="preserve">
-    <value>Хард ресет - ресетни връзката към събитие и изтрий всички данни на Фази</value>
+  <data name="Reset_Timing_this_will_DELETE_Timing_data" xml:space="preserve">
+    <value>Ресетни времената - това ще ИЗТРИЕ всички времена</value>
   </data>
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
@@ -712,23 +712,11 @@
     <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
   </data>
   <data name="Delete_string" xml:space="preserve">
-      <value>Изтрий</value>
-    </data>
-    <data name="Cascading_Delete_string" xml:space="preserve">
-      <value>Каскадно изтриване</value>
-    </data>
-    <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
-      <value>Това е каскадно изтриване за</value>
-    </data>
-    <data name="Cascading_delete_warning_string" xml:space="preserve">
-      <value>Продължаването ще изтрие избрания ресурс и всички свързани ресурси, изброени по-долу.</value>
-    </data>
-    <data name="Affected_resources_string" xml:space="preserve">
-      <value>Засегнати ресурси</value>
-    </data>
-    <data name="Back_string" xml:space="preserve">
-      <value>Назад</value>
-    </data>
+    <value>Изтрий</value>
+  </data>
+  <data name="Back_string" xml:space="preserve">
+    <value>Назад</value>
+  </data>
   <data name="Export_FEI_string" xml:space="preserve">
     <value>Експорт ФЕИ</value>
   </data>
@@ -938,5 +926,17 @@
   </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Cascading_Delete_string" xml:space="preserve">
+    <value>Каскадно изтриване</value>
+  </data>
+  <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
+    <value>Това е каскадно изтриване за</value>
+  </data>
+  <data name="Cascading_delete_warning_string" xml:space="preserve">
+    <value>Продължаването ще изтрие избрания ресурс и всички свързани ресурси, изброени по-долу.</value>
+  </data>
+  <data name="Affected_resources_string" xml:space="preserve">
+    <value>Засегнати ресурси</value>
   </data>
 </root>

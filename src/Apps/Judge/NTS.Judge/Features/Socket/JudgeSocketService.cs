@@ -1,15 +1,14 @@
+using Not.Application.Behinds.Adapters;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Notify;
-using Not.Startup;
-using Not.Strings;
 using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Features.Socket;
 
-public class JudgeSocketService : INtsSocketService, INtsSocketContext, IStartupInitializerAsync, ISingleton
+public class JudgeSocketService : NStatefulService, INtsSocketService, INtsSocketContext, ISingleton
 {
     readonly ISocketPrincipalStorage _socketPrincialStorage;
     readonly IRpcSocket _socket;
@@ -28,8 +27,19 @@ public class JudgeSocketService : INtsSocketService, INtsSocketContext, IStartup
     public bool IsConnected => _socket?.IsConnected ?? false;
     public UpcomingEvent? Event { get; private set; }
 
-    public void Dispose()
+    protected override async Task<bool> InitializeState()
     {
+        var upcomingEvent = await _socketPrincialStorage.Get();
+        if (upcomingEvent != null)
+        {
+            await Connect(upcomingEvent);
+        }
+        return true;
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
         _socket.Error -= HandleRpcErrors;
         _socket.ServerConnectionChanged -= HandleServerConnectionChanged;
     }
@@ -50,15 +60,6 @@ public class JudgeSocketService : INtsSocketService, INtsSocketContext, IStartup
         await _socket.Connect(principal.Id.ToString());
     }
 
-    public async Task RunAtStartupAsync()
-    {
-        var upcomingEvent = await _socketPrincialStorage.Get();
-        if (upcomingEvent != null)
-        {
-            await Connect(upcomingEvent);
-        }
-    }
-
     void HandleRpcErrors(object? sender, RpcError rpcError)
     {
         Status = SocketConnectionStatus.Disconnected;
@@ -74,5 +75,6 @@ public class JudgeSocketService : INtsSocketService, INtsSocketContext, IStartup
     {
         await _socketPrincialStorage.Commit(principal);
         Event = principal;
+        EmitChanged();
     }
 }

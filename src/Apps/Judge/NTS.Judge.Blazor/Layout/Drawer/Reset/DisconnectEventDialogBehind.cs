@@ -6,7 +6,7 @@ using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Layout.Drawer.Reset;
 
-public class SoftResetDialogBehind : NDialog
+public class DisconnectEventDialogBehind : NDialog
 {
     [Inject]
     IDashService TimingStateService { get; set; } = default!;
@@ -17,7 +17,7 @@ public class SoftResetDialogBehind : NDialog
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
-    protected async Task SoftReset()
+    protected async Task Disconnect()
     {
         try
         {
@@ -30,11 +30,11 @@ public class SoftResetDialogBehind : NDialog
         }
     }
 
-    protected async Task OpenHardResetDialog()
+    protected async Task OpenResetTimingDialog()
     {
         try
         {
-            var hardResetDialog = await DialogService.ShowAsync<HardResetDialog>();
+            var hardResetDialog = await DialogService.ShowAsync<ResetTimingDialog>();
             if (await hardResetDialog.IsCanceled())
             {
                 await CancelDialog();
