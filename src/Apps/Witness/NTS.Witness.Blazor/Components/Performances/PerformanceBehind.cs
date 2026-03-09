@@ -15,26 +15,15 @@ public class PerformanceBehind : NStatefulComponent
     [Inject]
     protected IPerformanceService Service { get; set; } = default!;
 
-    protected override void OnInitialized()
-    {
-        try
-        {
-            var people = Service.GetPeople();
-            People = NotListModel.FromEntity(people).ToList();
-            //to auto assign competitor based on profile
-            //check if competitor profile name matches any person in the people list
-            //might be beneficial to have team relations so that we can show their team the performance
-            //consider showing temporary Ranking in Performance as well
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-    }
-
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);
+        UpdatePeople();
+    }
+
+    protected override void OnBeforeRender()
+    {
+        UpdatePeople();
     }
 
     protected void OnPersonChanged(Person person)
@@ -44,6 +33,23 @@ public class PerformanceBehind : NStatefulComponent
             SelectedPerson = person;
             Participation = Service.GetParticipation(person);
             StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    void UpdatePeople()
+    {
+        try
+        {
+            var people = Service.GetPeople();
+            People = NotListModel.FromEntity(people).ToList();
+            //to auto assign competitor based on profile
+            //check if competitor profile name matches any person in the people list
+            //might be beneficial to have team relations so that we can show their team the performance
+            //consider showing temporary Ranking in Performance as well
         }
         catch (Exception ex)
         {
