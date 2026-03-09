@@ -370,11 +370,23 @@
     <value>Evet</value>
   </data>
   <data name="Cancel_string" xml:space="preserve">
-    <value>İptal</value>
-  </data>
-  <data name="Archive_string" xml:space="preserve">
-    <value>Arşivle</value>
-  </data>
+      <value>İptal</value>
+    </data>
+    <data name="Cascading_Delete_string" xml:space="preserve">
+      <value>Zincirleme Sil</value>
+    </data>
+    <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
+      <value>Bu, şu öğe için zincirleme silme işlemidir</value>
+    </data>
+    <data name="Cascading_delete_warning_string" xml:space="preserve">
+      <value>Devam ederseniz seçilen kaynak ve aşağıda listelenen ilgili tüm kaynaklar silinecektir.</value>
+    </data>
+    <data name="Affected_resources_string" xml:space="preserve">
+      <value>Etkilenen kaynaklar</value>
+    </data>
+    <data name="Archive_string" xml:space="preserve">
+      <value>Arşivle</value>
+    </data>
   <data name="History_string" xml:space="preserve">
     <value>Geçmiş</value>
   </data>

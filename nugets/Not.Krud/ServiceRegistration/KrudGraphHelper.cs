@@ -1,4 +1,5 @@
-﻿using Not.Krud.Graph;
+using Not.Domain;
+using Not.Krud.Graph;
 
 namespace Not.Krud.ServiceRegistration;
 
@@ -15,7 +16,6 @@ internal static class KrudGraphHelper
 
         var ordered = KrudReflectionHelper.OrderUsingDepthFirstSearch(rootType, childrenByParent);
 
-        // 4) build group nodes bottom-up
         var nodesByType = new Dictionary<Type, KrudNode>();
         var allNodes = new HashSet<KrudNode>(new ReferenceEqualityComparer<KrudNode>());
         KrudNode? root = null;
@@ -33,9 +33,6 @@ internal static class KrudGraphHelper
             foreach (var childType in childTypes)
             {
                 var childNode = KrudReflectionHelper.CreateParentNode(childType);
-                // In case there is already a parent we must attach it's node and replace it with the current 'childNode'
-                // in 'nodesByType'. Otherwise if the previous node is a Consolidated node (the parent has multiple children)
-                // then we won't register 'IKrudParentNodeOf<T>' instance which will then cause an error.
                 if (nodesByType.TryGetValue(childType, out var previousChildNode))
                 {
                     childNode.AttachChildren([previousChildNode]);
@@ -65,6 +62,69 @@ internal static class KrudGraphHelper
             nodesByType[parentType] = parentNode;
         }
 
-        return new KrudGraph(root, allNodes.ToList(), nodesByType);
+        var managedEntityTypes = allNodes
+            .SelectMany(node => KrudReflectionHelper.GetClosedKrudParentInterfaces(node.GetType()))
+            .Select(@interface => @interface.GetGenericArguments()[0])
+            .Distinct()
+            .ToList();
+
+        var dependenciesByPrincipalType = BuildDependencies(childrenByParent, managedEntityTypes);
+
+        return new KrudGraph(root, allNodes.ToList(), nodesByType, dependenciesByPrincipalType);
+    }
+
+    static IReadOnlyDictionary<Type, IReadOnlyList<KrudDependency>> BuildDependencies(
+        IReadOnlyDictionary<Type, List<Type>> childrenByParent,
+        IReadOnlyCollection<Type> managedEntityTypes
+    )
+    {
+        var managedSet = managedEntityTypes.ToHashSet();
+        var dependencies = new List<KrudDependency>();
+
+        foreach (var dependentType in managedSet)
+        {
+            var parentTypes = childrenByParent.Where(x => x.Value.Contains(dependentType)).Select(x => x.Key).Distinct().ToList();
+            if (!parentTypes.Any())
+            {
+                continue;
+            }
+
+            var properties = dependentType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            foreach (var property in properties)
+            {
+                var principalType = property.PropertyType;
+                if (principalType == dependentType)
+                {
+                    continue;
+                }
+
+                if (!typeof(Entity).IsAssignableFrom(principalType))
+                {
+                    continue;
+                }
+
+                if (!managedSet.Contains(principalType))
+                {
+                    continue;
+                }
+
+                foreach (var parentType in parentTypes)
+                {
+                    dependencies.Add(
+                        new KrudDependency(
+                            principalType,
+                            parentType,
+                            dependentType,
+                            property,
+                            $"{dependentType.Name}.{property.Name}"
+                        )
+                    );
+                }
+            }
+        }
+
+        return dependencies
+            .GroupBy(x => x.PrincipalType)
+            .ToDictionary(x => x.Key, x => (IReadOnlyList<KrudDependency>)x.ToList());
     }
 }

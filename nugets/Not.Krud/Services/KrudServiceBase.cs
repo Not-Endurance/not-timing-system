@@ -1,12 +1,14 @@
-﻿using Not.Application.CRUD.Ports;
+using Not.Application.CRUD.Ports;
 using Not.Application.Services;
 using Not.Domain;
+using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Krud.Abstractions;
+using Not.Krud.Models;
 
 namespace Not.Krud.Services;
 
-public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IKrudFormService<TModel>
+public abstract class KrudServiceBase<T, TModel> : IKrudListBehind<T>, IKrudFormService<TModel>
     where T : Entity
     where TModel : IKrudModel<T>, IKrudFormModel, new()
 {
@@ -57,6 +59,50 @@ public abstract class KrudServiceBase<T, TModel> : IListBehind<T>, IKrudFormServ
 
     public virtual async Task Delete(T entity)
     {
+        var impact = await PreviewDelete(entity);
+        if (impact.HasUsages)
+        {
+            throw new DomainException(
+                $"'{impact.Target}' is used by {impact.Usages.Count} related item(s). Confirm cascading delete to continue."
+            );
+        }
         await _repository.Delete(entity);
+    }
+
+    public virtual async Task<KrudDeleteImpact> PreviewDelete(T entity)
+    {
+        if (_repository is not IKrudCascadeRepository<T> cascade)
+        {
+            return new KrudDeleteImpact(Label(entity), []);
+        }
+        return await cascade.PreviewDelete(entity);
+    }
+
+    public virtual async Task DeleteCascade(T entity)
+    {
+        if (_repository is IKrudCascadeRepository<T> cascade)
+        {
+            await cascade.DeleteCascade(entity);
+            return;
+        }
+        await _repository.Delete(entity);
+    }
+
+    static string Label(object? value)
+    {
+        if (value == null)
+        {
+            return string.Empty;
+        }
+        try
+        {
+            var text = value.ToString();
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+        }
+        catch { }
+        return value.GetType().Name;
     }
 }

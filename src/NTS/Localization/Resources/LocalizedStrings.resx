@@ -715,11 +715,23 @@
     <value>Are you sure you want to delete '{0}'?</value>
   </data>
   <data name="Delete_string" xml:space="preserve">
-    <value>Delete</value>
-  </data>
-  <data name="Back_string" xml:space="preserve">
-    <value>Back</value>
-  </data>
+      <value>Delete</value>
+    </data>
+    <data name="Cascading_Delete_string" xml:space="preserve">
+      <value>Cascading Delete</value>
+    </data>
+    <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
+      <value>This is a cascading delete operation for</value>
+    </data>
+    <data name="Cascading_delete_warning_string" xml:space="preserve">
+      <value>Continuing will delete the selected resource and all related resources listed below.</value>
+    </data>
+    <data name="Affected_resources_string" xml:space="preserve">
+      <value>Affected resources</value>
+    </data>
+    <data name="Back_string" xml:space="preserve">
+      <value>Back</value>
+    </data>
   <data name="Export_FEI_string" xml:space="preserve">
     <value>Export FEI</value>
   </data>

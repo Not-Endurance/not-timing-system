@@ -22,7 +22,7 @@ public class SoftResetDialogBehind : NDialog
         try
         {
             await SocketService.Disconnect();
-            await CloseDialog();
+            await ConfirmDialog();
         }
         catch (Exception ex)
         {
@@ -43,7 +43,7 @@ public class SoftResetDialogBehind : NDialog
 
             await TimingStateService.Reset();
             await SocketService.Disconnect();
-            await CloseDialog();
+            await ConfirmDialog();
         }
         catch (Exception ex)
         {

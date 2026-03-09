@@ -8,7 +8,7 @@ public abstract class NDialog : NComponent
     [CascadingParameter]
     protected MudDialogInstance CurrentDialog { get; set; } = default!;
 
-    protected Task CloseDialog()
+    protected Task ConfirmDialog()
     {
         var dialogResult = DialogResult.Ok(true);
         CurrentDialog.Close(dialogResult);
@@ -27,7 +27,7 @@ public abstract class NDialog<T> : NComponent
     [CascadingParameter]
     protected MudDialogInstance CurrentDialog { get; set; } = default!;
 
-    protected Task CloseDialog(T value)
+    protected Task ConfirmDialog(T value)
     {
         var dialogResult = DialogResult.Ok(value);
         CurrentDialog.Close(dialogResult);

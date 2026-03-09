@@ -74,7 +74,7 @@ public class StartValidationDialogBehind : NDialog<bool>
                 SyncSelectionsWithCurrentIssues();
                 return;
             }
-            await CloseDialog(true);
+            await ConfirmDialog(true);
         }
         catch (Exception ex)
         {

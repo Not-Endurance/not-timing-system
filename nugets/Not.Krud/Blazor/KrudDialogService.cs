@@ -5,6 +5,8 @@ using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Krud.Blazor.Components.Abstractions;
 using Not.Krud.Blazor.Components.Form;
+using Not.Krud.Blazor.Dialogs;
+using Not.Krud.Models;
 
 namespace Not.Krud.Blazor;
 
@@ -29,6 +31,13 @@ public class KrudDialogService<TModel, TShell>
     {
         var parameters = new DialogParameters<KrudFormDialog<TModel, TShell>> { { x => x.Model, model } };
         await Show(Update_string, parameters);
+    }
+
+    public async Task<bool> ShowCascadingDeleteConfirmation(KrudDeleteImpact impact)
+    {
+        var parameters = new DialogParameters<KrudCascadingDeleteDialog> { { x => x.Impact, impact } };
+        var dialog = await _mudDialogService.ShowAsync<KrudCascadingDeleteDialog>(Cascading_Delete_string, parameters, _options);
+        return !(await dialog.IsCanceled());
     }
 
     async Task<TModel?> Show<TDialog>(string title, DialogParameters<TDialog> parameters)

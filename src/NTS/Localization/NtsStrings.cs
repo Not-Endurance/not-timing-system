@@ -270,6 +270,11 @@ namespace NTS.Localization
         public static string Cannot_delete_default_image_string =>
             LocalizeString(nameof(Cannot_delete_default_image_string));
         public static string Confirm_Delete_string => LocalizeString(nameof(Confirm_Delete_string));
+        public static string Cascading_Delete_string => LocalizeString(nameof(Cascading_Delete_string));
+        public static string Cascading_delete_confirmation_prefix_string =>
+            LocalizeString(nameof(Cascading_delete_confirmation_prefix_string));
+        public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));
+        public static string Affected_resources_string => LocalizeString(nameof(Affected_resources_string));
         public static string Image_deleted_string => LocalizeString(nameof(Image_deleted_string));
         public static string File_not_found_string => LocalizeString(nameof(File_not_found_string));
         public static string Upcoming_events_cannot_be_deleted_string =>

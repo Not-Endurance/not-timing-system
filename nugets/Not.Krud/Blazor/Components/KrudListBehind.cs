@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Not.Application.Services;
 using Not.Async.Extensions;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
@@ -22,13 +21,13 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     ICrumbsNavigator Navigator { get; set; } = default!;
 
     [Inject]
-    KrudDialogService<TModel, TShell> DialogService { get; set; } = default!;
+    KrudDialogService<TModel, TShell> KrudDialogs { get; set; } = default!;
 
     [Inject]
     IEnumerable<IKrudNodeSetter> ParentContexts { get; set; } = default!;
 
     [Inject]
-    IListBehind<T> Service { get; set; } = default!;
+    IKrudListBehind<T> Service { get; set; } = default!;
 
     protected IReadOnlyList<T> Entities => _entities.AsReadOnly();
 
@@ -55,7 +54,7 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
 
     protected async Task CreateSafe()
     {
-        var model = await DialogService.ShowCreateForm();
+        var model = await KrudDialogs.ShowCreateForm();
         if (model == null)
         {
             return;
@@ -74,7 +73,19 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
 
     protected async Task DeleteSafe(T entity)
     {
-        await Service.Delete(entity);
+        var impact = await Service.PreviewDelete(entity);
+        if (impact.HasUsages)
+        {
+            if (!await KrudDialogs.ShowCascadingDeleteConfirmation(impact))
+            {
+                return;
+            }
+            await Service.DeleteCascade(entity);
+        }
+        else
+        {
+            await Service.Delete(entity);
+        }
         _entities.Remove(entity);
     }
 

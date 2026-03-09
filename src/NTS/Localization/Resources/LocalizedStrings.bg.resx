@@ -712,11 +712,23 @@
     <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
   </data>
   <data name="Delete_string" xml:space="preserve">
-    <value>Изтрий</value>
-  </data>
-  <data name="Back_string" xml:space="preserve">
-    <value>Назад</value>
-  </data>
+      <value>Изтрий</value>
+    </data>
+    <data name="Cascading_Delete_string" xml:space="preserve">
+      <value>Каскадно изтриване</value>
+    </data>
+    <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
+      <value>Това е каскадно изтриване за</value>
+    </data>
+    <data name="Cascading_delete_warning_string" xml:space="preserve">
+      <value>Продължаването ще изтрие избрания ресурс и всички свързани ресурси, изброени по-долу.</value>
+    </data>
+    <data name="Affected_resources_string" xml:space="preserve">
+      <value>Засегнати ресурси</value>
+    </data>
+    <data name="Back_string" xml:space="preserve">
+      <value>Назад</value>
+    </data>
   <data name="Export_FEI_string" xml:space="preserve">
     <value>Експорт ФЕИ</value>
   </data>
