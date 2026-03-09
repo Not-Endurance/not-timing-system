@@ -12,9 +12,4 @@ public class StartlistHistoryBehind : StartlistBehindBase
     {
         await Observe(Service);
     }
-
-    protected override void OnBeforeRender()
-    {
-        CreateStartlistsByStage(Service.History);
-    }
 }

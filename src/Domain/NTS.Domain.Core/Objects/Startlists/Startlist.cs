@@ -3,19 +3,19 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Domain.Core.Objects.Startlists;
 
-public record Startlist
+public record Startlist : ValueObject
 {
     static readonly TimeSpan HISTORY_THRESHOLD = TimeSpan.FromMinutes(15);
     static readonly TimeSpan WARNING_THRESHOLD = TimeSpan.FromMinutes(5);
 
     object _lock = new();
-    List<StartlistEntry> _history = [];
-    List<StartlistEntry> _upcoming = [];
+    List<Starter> _history = [];
+    List<Starter> _upcoming = [];
 
     public Startlist(IEnumerable<Participation> participations)
     {
-        var upcoming = new List<StartlistEntry>();
-        var history = new List<StartlistEntry>();
+        var upcoming = new List<Starter>();
+        var history = new List<Starter>();
         foreach (var participation in participations)
         {
             if (participation.IsEliminated())
@@ -31,7 +31,7 @@ public record Startlist
                 }
                 var phaseIndex = phases.IndexOf(phase);
                 var phaseNumber = phaseIndex + 1;
-                var entry = new StartlistEntry(
+                var entry = new Starter(
                     participation.Combination.Athlete.Names,
                     participation.Combination.Number,
                     phaseNumber,
@@ -53,9 +53,13 @@ public record Startlist
         _history = OrderByTimeThenPhase(history);
     }
 
-    public IReadOnlyList<StartlistEntry> History => _history;
+    public IReadOnlyList<Starter> History => _history;
 
-    public IReadOnlyList<StartlistEntry> Upcoming => _upcoming;
+    public IReadOnlyList<Starter> Upcoming => _upcoming;
+
+    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage => GroupByStage(_history);
+
+    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> UpcomingByStage => GroupByStage(_upcoming);
 
     public void UpdateState()
     {
@@ -99,7 +103,7 @@ public record Startlist
             participation.Phases[index].StartTime != null ? participation.Phases[index] : participation.Phases.Current;
         var phaseNumber = participation.Phases.NumberOf(phase);
         var start = new Timestamp(phase.StartTime!.ToDateTimeOffset());
-        var entry = new StartlistEntry(
+        var entry = new Starter(
             participation.Combination.Athlete.Names,
             participation.Combination.Number,
             phaseNumber,
@@ -110,7 +114,7 @@ public record Startlist
         Add(entry);
     }
 
-    public void Add(StartlistEntry entry)
+    public void Add(Starter entry)
     {
         lock (_lock)
         {
@@ -134,13 +138,24 @@ public record Startlist
         }
     }
 
-    bool IsHistory(StartlistEntry entry)
+    bool IsHistory(Starter entry)
     {
         return entry.Start + HISTORY_THRESHOLD < Timestamp.Now();
     }
 
-    List<StartlistEntry> OrderByTimeThenPhase(IEnumerable<StartlistEntry> starts)
+    List<Starter> OrderByTimeThenPhase(IEnumerable<Starter> starts)
     {
         return starts.OrderBy(s => s.Start).ThenBy(s => s.PhaseNumber).ToList();
+    }
+
+    IReadOnlyDictionary<int, IReadOnlyList<Starter>> GroupByStage(IEnumerable<Starter> starts)
+    {
+        lock (_lock)
+        {
+            return starts
+                .GroupBy(x => x.PhaseNumber)
+                .OrderBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => (IReadOnlyList<Starter>)x.ToList().AsReadOnly());
+        }
     }
 }

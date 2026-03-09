@@ -24,11 +24,6 @@ public class StartlistUpcomingBehind : StartlistBehindBase, IDisposable
         await Observe(Service);
     }
 
-    protected override void OnBeforeRender()
-    {
-        CreateStartlistsByStage(Service.Upcoming);
-    }
-
     protected override void OnInitialized()
     {
         _timer = new(TIMER_INTERVAL);

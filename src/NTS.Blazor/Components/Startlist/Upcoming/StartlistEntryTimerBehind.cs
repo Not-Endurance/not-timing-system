@@ -19,7 +19,7 @@ public class StartlistEntryTimerBehind : NStatefulComponent
     protected IStartUpcoming Service { get; set; } = default!;
 
     [Parameter, EditorRequired]
-    public required StartlistEntry Entry { get; set; }
+    public required Starter Entry { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

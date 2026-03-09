@@ -15,6 +15,9 @@ public class StartlistService
         INotificationHandler<ParticipationRestored>,
         INotificationHandler<ParticipationEliminated>
 {
+    static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_BY_STAGE =
+        new Dictionary<int, IReadOnlyList<Starter>>();
+
     readonly IReadMany<Participation> _participations;
 
     public StartlistService(IReadMany<Participation> participations)
@@ -24,8 +27,13 @@ public class StartlistService
 
     public Startlist? Startlist { get; set; }
 
-    public IReadOnlyList<StartlistEntry> Upcoming => Startlist?.Upcoming ?? [];
-    public IReadOnlyList<StartlistEntry> History => Startlist?.History ?? [];
+    public IReadOnlyList<Starter> Upcoming => Startlist?.Upcoming ?? [];
+    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> UpcomingByStage =>
+        Startlist?.UpcomingByStage ?? EMPTY_BY_STAGE;
+
+    public IReadOnlyList<Starter> History => Startlist?.History ?? [];
+    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage =>
+        Startlist?.HistoryByStage ?? EMPTY_BY_STAGE;
 
     protected override async Task<bool> InitializeState()
     {
