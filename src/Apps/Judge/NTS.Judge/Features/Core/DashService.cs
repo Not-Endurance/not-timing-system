@@ -3,14 +3,15 @@ using Not.Application.CRUD.Ports;
 using Not.Injection;
 using Not.Notify;
 using NTS.Domain.Core.Aggregates;
+using NTS.Judge.Features.Core.State;
 
-namespace NTS.Judge.Features.Core.State;
+namespace NTS.Judge.Features.Core;
 
-public class TimingStateService : NStatefulService, ITimingStateService, ISingleton
+public class DashService : NStatefulService, IDashService, ISingleton
 {
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly ICoreState _coreState;
-    readonly ITimingStartService _coreStarter;
+    readonly IStartBusiness _startDashboardBusiness;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Participation> _participations;
@@ -18,10 +19,10 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
     readonly IRepository<ArchiveEntry> _archive;
     readonly INotifier _notifier;
 
-    public TimingStateService(
+    public DashService(
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
         ICoreState coreState,
-        ITimingStartService coreStarter,
+        IStartBusiness startDashboardBusiness,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Participation> participations,
@@ -32,7 +33,7 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
     {
         _coreDependentObservables = coreDependentObservables;
         _coreState = coreState;
-        _coreStarter = coreStarter;
+        _startDashboardBusiness = startDashboardBusiness;
         _rankings = rankings;
         _events = events;
         _participations = participations;
@@ -50,9 +51,13 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
         return IsStarted;
     }
 
-    public Task StartTiming()
+    public async Task Start()
     {
-        return SafeStart();
+        // TODO: Ensure witness apps receive the participants list on Start (or before).
+        // Currently you need to restart witness after start in order to fetch
+        await _startDashboardBusiness.Start();
+        IsStarted = true;
+        EmitChanged();
     }
 
     public async Task Reset()
@@ -90,21 +95,12 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
         }
         IsStarted = true;
     }
-
-    async Task SafeStart()
-    {
-        // TODO: Ensure witness apps receive the participants list on Start (or before).
-        // Currently you need to restart witness after start in order to fetch
-        await _coreStarter.Start();
-        IsStarted = true;
-        EmitChanged();
-    }
 }
 
-public interface ITimingStateService : IStatefulService
+public interface IDashService : IStatefulService
 {
     bool IsStarted { get; }
-    Task StartTiming();
+    Task Start();
     Task LoadArchive(int archiveId);
     Task Reset();
 }

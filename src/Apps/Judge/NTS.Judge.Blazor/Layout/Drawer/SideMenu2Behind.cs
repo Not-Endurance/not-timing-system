@@ -4,7 +4,8 @@ using Not.Blazor.Helpers;
 using Not.Domain.Exceptions;
 using NTS.Judge.Blazor.Features.Setup.StartValidation;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
-using NTS.Judge.Features.Core.State;
+using NTS.Judge.Features;
+using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Layout.Drawer;
 
@@ -17,10 +18,10 @@ public class SideMenu2Behind : NStatefulComponent
     NavigationManager NavManager { get; set; } = default!;
 
     [Inject]
-    ITimingStateService Service { get; set; } = default!;
+    IDashService Service { get; set; } = default!;
 
     [Inject]
-    ITimingStartService StartService { get; set; } = default!;
+    IStartBusiness StartService { get; set; } = default!;
 
     protected bool IsStarted => Service.IsStarted;
 
@@ -40,7 +41,7 @@ public class SideMenu2Behind : NStatefulComponent
                 }
             }
 
-            await Service.StartTiming();
+            await Service.Start();
         }
         catch (DomainException ex)
         {

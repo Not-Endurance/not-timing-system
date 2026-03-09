@@ -1,7 +1,7 @@
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Structures;
 using NTS.Domain.Setup.Services.StartValidation;
-using NTS.Judge.Features.Core.State;
+using NTS.Judge.Features;
 
 namespace NTS.Judge.Blazor.Features.Setup.StartValidation;
 
@@ -10,7 +10,7 @@ public class StartValidationDialogBehind : NDialog<bool>
     readonly Dictionary<int, int> _selectedCompetitionByParticipation = [];
 
     [Inject]
-    ITimingStartService StartService { get; set; } = default!;
+    IStartBusiness StartService { get; set; } = default!;
 
     protected Result<IReadOnlyList<StartValidationIssue>> Validation { get; set; } =
         Result.Success<IReadOnlyList<StartValidationIssue>>([]);
@@ -64,7 +64,7 @@ public class StartValidationDialogBehind : NDialog<bool>
                 var selectedCompetitionId = _selectedCompetitionByParticipation[issue.ParticipationNumber];
                 foreach (var competition in issue.Competitions.Where(x => x.CompetitionId != selectedCompetitionId))
                 {
-                    await StartService.DeleteParticipation(issue.ParticipationNumber, competition.CompetitionId);
+                    await StartService.DeleteInvalidParticipation(issue.ParticipationNumber, competition.CompetitionId);
                 }
             }
 

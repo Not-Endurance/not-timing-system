@@ -1,6 +1,7 @@
 using System.Text;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
+using Not.Exceptions;
 using Not.Injection;
 using Not.Structures;
 using NTS.Application.Factories;
@@ -10,9 +11,9 @@ using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
 
-namespace NTS.Judge.Features.Core.State;
+namespace NTS.Judge.Features;
 
-public class TimingStartService : ITimingStartService
+public class StartBusinessService : IStartBusiness
 {
     readonly INtsSocketService _eventContext;
     readonly IUpdate<UpcomingEvent> _eventUpdater;
@@ -21,7 +22,7 @@ public class TimingStartService : ITimingStartService
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<Ranking> _rankingRepository;
 
-    public TimingStartService(
+    public StartBusinessService(
         INtsSocketService eventContext,
         IUpdate<UpcomingEvent> eventUpdater,
         IRepository<EnduranceEvent> coreEventRepository,
@@ -40,17 +41,17 @@ public class TimingStartService : ITimingStartService
 
     public Result<IReadOnlyList<StartValidationIssue>> Validate()
     {
-        var setupEvent = GetSetupEvent("Cannot update setup - Event is not configured");
+        var setupEvent = GetSetupEvent();
         return StartValidator.Validate(setupEvent);
     }
 
-    public async Task DeleteParticipation(int participationNumber, int competitionId)
+    public async Task DeleteInvalidParticipation(int participationNumber, int competitionId)
     {
-        var setupEvent = GetSetupEvent("Cannot update setup - Event is not configured");
+        var setupEvent = GetSetupEvent();
         var competition = setupEvent.Competitions.FirstOrDefault(x => x.Id == competitionId);
         if (competition == null)
         {
-            throw new DomainException($"Competition with id '{competitionId}' does not exist");
+            throw GuardHelper.Exception($"Competition with id '{competitionId}' does not exist");
         }
 
         var participation = competition.Participations.FirstOrDefault(x => x.Combination.Number == participationNumber);
@@ -65,7 +66,7 @@ public class TimingStartService : ITimingStartService
 
     public async Task<bool> Start()
     {
-        var setupEvent = GetSetupEvent("Cannot start - Event is not configured");
+        var setupEvent = GetSetupEvent();
         var validation = StartValidator.Validate(setupEvent);
         var issues = validation.Data ?? [];
         if (issues.Any())
@@ -118,16 +119,9 @@ public class TimingStartService : ITimingStartService
         return validationBuilder.ToString().TrimEnd();
     }
 
-    UpcomingEvent GetSetupEvent(string message)
+    UpcomingEvent GetSetupEvent()
     {
-        var setupEvent = _eventContext.Event;
-        if (setupEvent == null)
-        {
-            // TODO: Create ValidationException containing localization logic and inherit form it in DomainException. Use that here instead
-            throw new DomainException(message);
-        }
-
-        return setupEvent;
+        return _eventContext.Event ?? throw GuardHelper.Exception("Event is not selected");
     }
 
     (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(UpcomingEvent setupEvent)
@@ -230,9 +224,9 @@ public class TimingStartService : ITimingStartService
     }
 }
 
-public interface ITimingStartService : ITransient
+public interface IStartBusiness : ITransient
 {
     Result<IReadOnlyList<StartValidationIssue>> Validate();
-    Task DeleteParticipation(int participationNumber, int competitionId);
+    Task DeleteInvalidParticipation(int participationNumber, int competitionId);
     Task<bool> Start();
 }

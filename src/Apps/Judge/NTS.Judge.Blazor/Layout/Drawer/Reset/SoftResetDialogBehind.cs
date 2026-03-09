@@ -2,14 +2,14 @@ using MudBlazor;
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Blazor.Helpers;
 using NTS.Application.Socket;
-using NTS.Judge.Features.Core.State;
+using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Layout.Drawer.Reset;
 
 public class SoftResetDialogBehind : NDialog
 {
     [Inject]
-    ITimingStateService TimingStateService { get; set; } = default!;
+    IDashService TimingStateService { get; set; } = default!;
 
     [Inject]
     INtsSocketService SocketService { get; set; } = default!;
