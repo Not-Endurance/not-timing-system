@@ -706,4 +706,22 @@
   <data name="Empty_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
+    <value>Başlatılamıyor - Geçersiz yapılandırma.</value>
+  </data>
+  <data name="Invalid_setup_string" xml:space="preserve">
+    <value>Geçersiz yapılandırma</value>
+  </data>
+  <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
+    <value>Bir katılım birden fazla yarışmaya yalnızca aşama yapısı aynıysa eklenebilir.</value>
+  </data>
+  <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
+    <value>#{0}: aşama yapılandırması yarışmalar arasında farklı:</value>
+  </data>
+  <data name="Start_validation_issue_explanation_string" xml:space="preserve">
+    <value>Katılım, farklı aşamalara sahip birden fazla yarışmaya eklenemez.</value>
+  </data>
+  <data name="Remove_from__string" xml:space="preserve">
+    <value>Şundan kaldır: {0}</value>
+  </data>
 </root>

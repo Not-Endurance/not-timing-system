@@ -909,4 +909,22 @@
   <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
     <value>Upcoming events cannot be deleted</value>
   </data>
+  <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
+    <value>Cannot start - Invalid setup.</value>
+  </data>
+  <data name="Invalid_setup_string" xml:space="preserve">
+    <value>Invalid setup</value>
+  </data>
+  <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
+    <value>A participation can be added to multiple competitions only when the phase structure is identical.</value>
+  </data>
+  <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
+    <value>#{0}: phase configuration differs across competitions:</value>
+  </data>
+  <data name="Start_validation_issue_explanation_string" xml:space="preserve">
+    <value>Participation cannot be added in multiple Competitions with different Phases.</value>
+  </data>
+  <data name="Remove_from__string" xml:space="preserve">
+    <value>Remove from {0}</value>
+  </data>
 </root>

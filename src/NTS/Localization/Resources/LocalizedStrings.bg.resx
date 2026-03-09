@@ -906,6 +906,24 @@
   <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
     <value>Предстоящите събития не могат да бъдат изтрити</value>
   </data>
+  <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
+    <value>Не може да се стартира - невалидна конфигурация.</value>
+  </data>
+  <data name="Invalid_setup_string" xml:space="preserve">
+    <value>Невалидна конфигурация</value>
+  </data>
+  <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
+    <value>Участник може да бъде добавен в няколко състезания само ако конфигурацията на фазите е идентична.</value>
+  </data>
+  <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
+    <value>#{0}: конфигурацията на фазите се различава между състезанията:</value>
+  </data>
+  <data name="Start_validation_issue_explanation_string" xml:space="preserve">
+    <value>Участник не може да бъде добавен в няколко състезания с различни фази.</value>
+  </data>
+  <data name="Remove_from__string" xml:space="preserve">
+    <value>Премахни от {0}</value>
+  </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>

@@ -1,6 +1,8 @@
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Helpers;
+using Not.Domain.Exceptions;
+using NTS.Judge.Blazor.Features.Setup.StartValidation;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
 using NTS.Judge.Features.Core.State;
 
@@ -17,13 +19,32 @@ public class SideMenu2Behind : NStatefulComponent
     [Inject]
     ITimingStateService Service { get; set; } = default!;
 
+    [Inject]
+    ITimingStartService StartService { get; set; } = default!;
+
     protected bool IsStarted => Service.IsStarted;
 
     protected async Task Start()
     {
         try
         {
+            var validation = StartService.Validate();
+            if (validation.Data?.Any() == true)
+            {
+                var parameters = new DialogParameters<StartValidationDialog> { { x => x.InitialValidation, validation } };
+                var dialog = await DialogService.ShowAsync<StartValidationDialog>(Start_string, parameters);
+                var result = await dialog.Result;
+                if (result == null || result.Canceled || result.Data is not true)
+                {
+                    return;
+                }
+            }
+
             await Service.StartTiming();
+        }
+        catch (DomainException ex)
+        {
+            await DialogService.ShowMessageBox(Start_string, ex.Message);
         }
         catch (Exception ex)
         {

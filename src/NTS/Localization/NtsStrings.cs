@@ -76,6 +76,16 @@ namespace NTS.Localization
         public static string Loops_string => LocalizeString(nameof(Loops_string));
         public static string Settings_string => LocalizeString(nameof(Settings_string));
         public static string Start_string => LocalizeString(nameof(Start_string));
+        public static string Invalid_setup_string => LocalizeString(nameof(Invalid_setup_string));
+        public static string Start_validation_invalid_setup_title_string =>
+            LocalizeString(nameof(Start_validation_invalid_setup_title_string));
+        public static string Start_validation_invalid_setup_description_string =>
+            LocalizeString(nameof(Start_validation_invalid_setup_description_string));
+        public static string Start_validation_issue_different_phase_configurations_string =>
+            LocalizeString(nameof(Start_validation_issue_different_phase_configurations_string));
+        public static string Start_validation_issue_explanation_string =>
+            LocalizeString(nameof(Start_validation_issue_explanation_string));
+        public static string Remove_from__string => LocalizeString(nameof(Remove_from__string));
         public static string Reset_string => LocalizeString(nameof(Reset_string));
         public static string Hard_reset_string => LocalizeString(nameof(Hard_reset_string));
         public static string Soft_reset_string => LocalizeString(nameof(Soft_reset_string));

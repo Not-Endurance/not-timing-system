@@ -1,18 +1,21 @@
-﻿using System.Text;
+using System.Text;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
+using Not.Structures;
 using NTS.Application.Factories;
 using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Services.StartValidation;
 
 namespace NTS.Judge.Features.Core.State;
 
 public class TimingStartService : ITimingStartService
 {
     readonly INtsSocketService _eventContext;
+    readonly IUpdate<UpcomingEvent> _eventUpdater;
     readonly IRepository<EnduranceEvent> _coreEventRepository;
     readonly IRepository<Official> _coreOfficialRepository;
     readonly IRepository<Participation> _participationRepository;
@@ -20,6 +23,7 @@ public class TimingStartService : ITimingStartService
 
     public TimingStartService(
         INtsSocketService eventContext,
+        IUpdate<UpcomingEvent> eventUpdater,
         IRepository<EnduranceEvent> coreEventRepository,
         IRepository<Official> coreOfficialRepository,
         IRepository<Participation> participationRepository,
@@ -27,19 +31,46 @@ public class TimingStartService : ITimingStartService
     )
     {
         _eventContext = eventContext;
+        _eventUpdater = eventUpdater;
         _coreEventRepository = coreEventRepository;
         _coreOfficialRepository = coreOfficialRepository;
         _participationRepository = participationRepository;
         _rankingRepository = rankingRepository;
     }
 
+    public Result<IReadOnlyList<StartValidationIssue>> Validate()
+    {
+        var setupEvent = GetSetupEvent("Cannot update setup - Event is not configured");
+        return StartValidator.Validate(setupEvent);
+    }
+
+    public async Task DeleteParticipation(int participationNumber, int competitionId)
+    {
+        var setupEvent = GetSetupEvent("Cannot update setup - Event is not configured");
+        var competition = setupEvent.Competitions.FirstOrDefault(x => x.Id == competitionId);
+        if (competition == null)
+        {
+            throw new DomainException($"Competition with id '{competitionId}' does not exist");
+        }
+
+        var participation = competition.Participations.FirstOrDefault(x => x.Combination.Number == participationNumber);
+        if (participation == null)
+        {
+            return;
+        }
+
+        competition.Remove(participation);
+        await _eventUpdater.Update(setupEvent);
+    }
+
     public async Task<bool> Start()
     {
-        var setupEvent = _eventContext.Event;
-        if (setupEvent == null)
+        var setupEvent = GetSetupEvent("Cannot start - Event is not configured");
+        var validation = StartValidator.Validate(setupEvent);
+        var issues = validation.Data ?? [];
+        if (issues.Any())
         {
-            // TODO: Create ValidationException containing localization logic and inherit form it in DomainException. Use that here instead
-            throw new DomainException("Cannot start - Event is not configured");
+            throw new DomainException(CreateStartValidationMessage(issues));
         }
 
         ValidateFeiConfiguration(setupEvent);
@@ -62,6 +93,41 @@ public class TimingStartService : ITimingStartService
             await _rankingRepository.Create(ranking);
         }
         return true;
+    }
+
+    static string CreateStartValidationMessage(IReadOnlyList<StartValidationIssue> issues)
+    {
+        var validationBuilder = new StringBuilder()
+            .AppendLine(Start_validation_invalid_setup_title_string)
+            .AppendLine(Start_validation_invalid_setup_description_string);
+
+        foreach (var issue in issues)
+        {
+            validationBuilder.AppendLine(
+                string.Format(
+                    Start_validation_issue_different_phase_configurations_string,
+                    issue.ParticipationNumber
+                )
+            );
+            foreach (var competition in issue.Competitions)
+            {
+                validationBuilder.AppendLine($"- {competition.CompetitionName}: {competition.PhaseSignature}");
+            }
+        }
+
+        return validationBuilder.ToString().TrimEnd();
+    }
+
+    UpcomingEvent GetSetupEvent(string message)
+    {
+        var setupEvent = _eventContext.Event;
+        if (setupEvent == null)
+        {
+            // TODO: Create ValidationException containing localization logic and inherit form it in DomainException. Use that here instead
+            throw new DomainException(message);
+        }
+
+        return setupEvent;
     }
 
     (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(UpcomingEvent setupEvent)
@@ -166,5 +232,7 @@ public class TimingStartService : ITimingStartService
 
 public interface ITimingStartService : ITransient
 {
+    Result<IReadOnlyList<StartValidationIssue>> Validate();
+    Task DeleteParticipation(int participationNumber, int competitionId);
     Task<bool> Start();
 }

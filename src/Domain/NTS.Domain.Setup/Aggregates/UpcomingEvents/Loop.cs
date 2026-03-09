@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Exceptions;
+﻿using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
@@ -15,7 +14,7 @@ public class Loop : Entity
 
     public override string ToString()
     {
-        return $"{Distance}{km_string}";
+        return $"{Distance:0.##}{km_string}";
     }
 
     static double PositiveDistance(double? distance)

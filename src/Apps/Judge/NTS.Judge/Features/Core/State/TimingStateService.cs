@@ -2,7 +2,6 @@ using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
 using Not.Notify;
-using Not.Safe;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Core.State;
@@ -53,7 +52,7 @@ public class TimingStateService : NStatefulService, ITimingStateService, ISingle
 
     public Task StartTiming()
     {
-        return SafeHelper.Run(SafeStart);
+        return SafeStart();
     }
 
     public async Task Reset()
