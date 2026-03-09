@@ -14,8 +14,18 @@ public class StartlistTests
     public void UpcomingByStage_WhenConstructed_GroupsByPhaseAndOrdersByStart()
     {
         var now = DateTimeOffset.Now;
-        var first = CreateParticipation(1, 10, now.AddMinutes(20), now.AddMinutes(80));
-        var second = CreateParticipation(2, 11, now.AddMinutes(10), now.AddMinutes(70));
+        var first = CreateParticipation(
+            1,
+            10,
+            FutureOnSameDay(now, TimeSpan.FromMinutes(20)),
+            FutureOnSameDay(now, TimeSpan.FromMinutes(40))
+        );
+        var second = CreateParticipation(
+            2,
+            11,
+            FutureOnSameDay(now, TimeSpan.FromMinutes(10)),
+            FutureOnSameDay(now, TimeSpan.FromMinutes(30))
+        );
 
         var startlist = new Startlist([first, second]);
 
@@ -61,18 +71,13 @@ public class StartlistTests
     public void Add_WhenAddingFutureEntry_CreatesStageGroup()
     {
         var startlist = new Startlist([]);
-        var entry = new Starter(
-            new Person(["Rider", "One"]),
-            number: 50,
-            phaseNumber: 3,
-            distance: 40,
-            start: new Timestamp(DateTimeOffset.Now.AddMinutes(30))
-        );
+        var now = DateTimeOffset.Now;
+        var participation = CreateParticipation(7, 50, now, FutureOnSameDay(now, TimeSpan.FromMinutes(30)));
 
-        startlist.Add(entry);
+        startlist.Add(participation);
 
-        Assert.Equal([3], startlist.UpcomingByStage.Keys.ToArray());
-        Assert.Equal([50], startlist.UpcomingByStage[3].Select(x => x.Number).ToArray());
+        Assert.Equal([2], startlist.UpcomingByStage.Keys.ToArray());
+        Assert.Equal([50], startlist.UpcomingByStage[2].Select(x => x.Number).ToArray());
     }
 
     static Participation CreateParticipation(
@@ -149,5 +154,17 @@ public class StartlistTests
             isRequiredInspectionCompulsory: false,
             id: id
         );
+    }
+
+    static DateTimeOffset FutureOnSameDay(DateTimeOffset now, TimeSpan preferredOffset)
+    {
+        var nextMidnight = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, now.Offset).AddDays(1);
+        var maxOffset = nextMidnight - now - TimeSpan.FromMilliseconds(1);
+        if (maxOffset <= TimeSpan.Zero)
+        {
+            return now;
+        }
+        var offset = preferredOffset <= maxOffset ? preferredOffset : maxOffset;
+        return now + offset;
     }
 }
