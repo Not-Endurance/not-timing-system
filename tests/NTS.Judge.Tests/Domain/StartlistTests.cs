@@ -14,18 +14,8 @@ public class StartlistTests
     public void UpcomingByStage_WhenConstructed_GroupsByPhaseAndOrdersByStart()
     {
         var now = DateTimeOffset.Now;
-        var first = CreateParticipation(
-            1,
-            10,
-            FutureOnSameDay(now, TimeSpan.FromMinutes(20)),
-            FutureOnSameDay(now, TimeSpan.FromMinutes(40))
-        );
-        var second = CreateParticipation(
-            2,
-            11,
-            FutureOnSameDay(now, TimeSpan.FromMinutes(10)),
-            FutureOnSameDay(now, TimeSpan.FromMinutes(30))
-        );
+        var first = CreateParticipation(1, 10, now.AddMinutes(-8), now.AddMinutes(-6));
+        var second = CreateParticipation(2, 11, now.AddMinutes(-10), now.AddMinutes(-7));
 
         var startlist = new Startlist([first, second]);
 
@@ -39,7 +29,7 @@ public class StartlistTests
     {
         var now = DateTimeOffset.Now;
         var history = CreateParticipation(3, 20, now.AddMinutes(-20));
-        var upcoming = CreateParticipation(4, 21, now.AddMinutes(10));
+        var upcoming = CreateParticipation(4, 21, now.AddMinutes(-10));
 
         var startlist = new Startlist([history, upcoming]);
 
@@ -53,8 +43,8 @@ public class StartlistTests
     public void UpcomingByStage_WhenRemovingEntries_DoesNotLeaveStaleStageGroups()
     {
         var now = DateTimeOffset.Now;
-        var first = CreateParticipation(5, 31, now.AddMinutes(10));
-        var second = CreateParticipation(6, 32, now.AddMinutes(20));
+        var first = CreateParticipation(5, 31, now.AddMinutes(-10));
+        var second = CreateParticipation(6, 32, now.AddMinutes(-8));
 
         var startlist = new Startlist([first, second]);
 
@@ -72,7 +62,7 @@ public class StartlistTests
     {
         var startlist = new Startlist([]);
         var now = DateTimeOffset.Now;
-        var participation = CreateParticipation(7, 50, now, FutureOnSameDay(now, TimeSpan.FromMinutes(30)));
+        var participation = CreateParticipation(7, 50, now.AddMinutes(-8), now.AddMinutes(-5));
 
         startlist.Add(participation);
 
@@ -154,17 +144,5 @@ public class StartlistTests
             isRequiredInspectionCompulsory: false,
             id: id
         );
-    }
-
-    static DateTimeOffset FutureOnSameDay(DateTimeOffset now, TimeSpan preferredOffset)
-    {
-        var nextMidnight = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, now.Offset).AddDays(1);
-        var maxOffset = nextMidnight - now - TimeSpan.FromMilliseconds(1);
-        if (maxOffset <= TimeSpan.Zero)
-        {
-            return now;
-        }
-        var offset = preferredOffset <= maxOffset ? preferredOffset : maxOffset;
-        return now + offset;
     }
 }
