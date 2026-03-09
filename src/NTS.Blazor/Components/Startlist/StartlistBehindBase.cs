@@ -12,6 +12,9 @@ public abstract class StartlistBehindBase : NStatefulComponent
 
     protected void CreateStartlistsByStage(IEnumerable<StartlistEntry> starts)
     {
+        // Rebuild from current source to avoid stale rows/tabs from previous renders.
+        StartlistsByStage.Clear();
+
         foreach (var start in starts)
         {
             var tabHeader = $"{Stage_string} {start.PhaseNumber}";
