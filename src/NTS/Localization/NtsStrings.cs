@@ -182,7 +182,6 @@ namespace NTS.Localization
         public static string Help_string => LocalizeString(nameof(Help_string));
         public static string Home_string => LocalizeString(nameof(Home_string));
         public static string Login_string => LocalizeString(nameof(Login_string));
-        public static string Login_invite_string => LocalizeString(nameof(Login_invite_string));
         public static string Login_page_string => LocalizeString(nameof(Login_page_string));
         public static string Contacts_string => LocalizeString(nameof(Contacts_string));
         public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
@@ -234,7 +233,6 @@ namespace NTS.Localization
         public static string Restore_string => LocalizeString(nameof(Restore_string));
         public static string Sorry_theres_nothing_at_this_address_string =>
             LocalizeString(nameof(Sorry_theres_nothing_at_this_address_string));
-        public static string Sign_in_with_Google_string => LocalizeString(nameof(Sign_in_with_Google_string));
         public static string This_page_redirects_to_Signin_string =>
             LocalizeString(nameof(This_page_redirects_to_Signin_string));
         public static string Signed_in_as__string => LocalizeString(nameof(Signed_in_as__string));

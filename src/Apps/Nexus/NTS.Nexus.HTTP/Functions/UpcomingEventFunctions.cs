@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using Not.Serialization.JSON;
 using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
+using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
@@ -16,9 +16,10 @@ public class UpcomingEventFunctions : FunctionBase
 
     public UpcomingEventFunctions(
         IRepository<UpcomingEventModel> upcomingEventRepository,
-        IFunctionLogger<UpcomingEventFunctions> logger
+        IFunctionLogger<UpcomingEventFunctions> logger,
+        ITelemetryService telemetry
     )
-        : base(logger)
+        : base(logger, telemetry)
     {
         _upcomingEvents = upcomingEventRepository;
     }
@@ -28,13 +29,18 @@ public class UpcomingEventFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "upcoming-event")] HttpRequest request
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(Insert));
+        TagRequest(request);
+        LogInformation(request, nameof(Insert));
 
-        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
+        var upcomingEvent = await ReadBody<UpcomingEvent>(request);
+        if (upcomingEvent == null)
+        {
+            return UnexpectedPayload<UpcomingEvent>();
+        }
+
         var document = UpcomingEventModel.From(upcomingEvent);
         await _upcomingEvents.Create(document);
-
         return new OkObjectResult($"Upcoming event {upcomingEvent.Place} stored successfully.");
     }
 
@@ -43,7 +49,9 @@ public class UpcomingEventFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "upcoming-event")] HttpRequest request
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(List));
+        TagRequest(request);
+        LogInformation(request, nameof(List));
 
         var documents = await _upcomingEvents.ReadMany();
         var result = documents.Select(x => x.MapToEntity());
@@ -56,7 +64,9 @@ public class UpcomingEventFunctions : FunctionBase
         int id
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(QueryById));
+        TagRequest(request);
+        LogInformation(request, nameof(QueryById));
 
         var document = await _upcomingEvents.Read(id);
         if (document == null)
@@ -72,13 +82,18 @@ public class UpcomingEventFunctions : FunctionBase
         [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "upcoming-event")] HttpRequest request
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(Update));
+        TagRequest(request);
+        LogInformation(request, nameof(Update));
 
-        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        var upcomingEvent = requestBody.FromJson<UpcomingEvent>();
+        var upcomingEvent = await ReadBody<UpcomingEvent>(request);
+        if (upcomingEvent == null)
+        {
+            return UnexpectedPayload<UpcomingEvent>();
+        }
+
         var document = UpcomingEventModel.From(upcomingEvent);
         await _upcomingEvents.Update(document);
-
         return new OkObjectResult($"Updated upcoming event {upcomingEvent.Place}");
     }
 
@@ -88,13 +103,16 @@ public class UpcomingEventFunctions : FunctionBase
         int id
     )
     {
-        LogInformation(request);
+        using var activity = StartFunctionActivity(nameof(Delete));
+        TagRequest(request);
+        LogInformation(request, nameof(Delete));
 
         var upcomingEvent = await _upcomingEvents.Read(id);
         if (upcomingEvent == null)
         {
             return new OkObjectResult($"Event with id '{id}' did not exist");
         }
+
         await _upcomingEvents.Delete(upcomingEvent);
         return new OkObjectResult($"Deleted upcoming event with id '{id}'");
     }

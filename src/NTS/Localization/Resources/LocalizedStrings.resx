@@ -729,8 +729,8 @@
   <data name="Bulgaria" xml:space="preserve">
     <value>Bulgaria</value>
   </data>
-  <data name="Login_invite_string" xml:space="preserve">
-    <value>Please sign in to gain access</value>
+  <data name="Sign_in_to_continue_string" xml:space="preserve">
+    <value>Sign in to continue</value>
   </data>
   <data name="Profile_page_string" xml:space="preserve">
     <value>Profile</value>
@@ -840,8 +840,8 @@
   <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
     <value>Sorry, there's nothing at this address.</value>
   </data>
-  <data name="Sign_in_with_Google_string" xml:space="preserve">
-    <value>Sign in with Google</value>
+  <data name="Sign_in_with_Microsoft_string" xml:space="preserve">
+    <value>Sign in with Microsoft</value>
   </data>
   <data name="This_page_redirects_to_Signin_string" xml:space="preserve">
     <value>This page redirects to Signin.</value>

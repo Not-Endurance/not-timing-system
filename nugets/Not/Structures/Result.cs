@@ -21,6 +21,11 @@ public class Result : ResultBase
         return new(errors);
     }
 
+    public static Result<T> Failure<T>(params string[] errors)
+    {
+        return new Result<T>(errors);
+    }
+
     public static Result<T> Cancel<T>()
     {
         return new Result<T>([CANCELLED_ERROR]);

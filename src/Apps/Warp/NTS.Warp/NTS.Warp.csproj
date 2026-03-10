@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\NTS.Warp.Contracts\NTS.Warp.Contracts.csproj" />
   </ItemGroup>
   
 </Project>

@@ -35,19 +35,24 @@ internal class FunctionLogger<T> : IFunctionLogger<T>
         _logger.LogError(template, [method, request, .. args]);
     }
 
+    public void LogError(HttpRequest request, Exception exception, [CallerMemberName] string method = "")
+    {
+        _logger.LogError(exception, _defaultTemplate, method, request);
+    }
+
     public void LogDebug(HttpRequest request, [CallerMemberName] string method = "")
     {
-        _logger.LogDebug(_defaultTemplate, request, method);
+        _logger.LogDebug(_defaultTemplate, method, request);
     }
 
     public void LogInformation(HttpRequest request, [CallerMemberName] string method = "")
     {
-        _logger.LogInformation(_defaultTemplate, request, method);
+        _logger.LogInformation(_defaultTemplate, method, request);
     }
 
     public void LogError(HttpRequest request, [CallerMemberName] string method = "")
     {
-        _logger.LogError(_defaultTemplate, request, method);
+        _logger.LogError(_defaultTemplate, method, request);
     }
 }
 
@@ -59,4 +64,5 @@ public interface IFunctionLogger<out T> : ITransient
     void LogInformation(string template, HttpRequest request, object[] args, [CallerMemberName] string method = "");
     void LogError(HttpRequest request, [CallerMemberName] string method = "");
     void LogError(string template, HttpRequest request, object[] args, [CallerMemberName] string method = "");
+    void LogError(HttpRequest request, Exception exception, [CallerMemberName] string method = "");
 }

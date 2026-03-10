@@ -1,0 +1,20 @@
+@using Microsoft.AspNetCore.Authorization
+@using MudBlazor
+@using Not.Blazor.Client.Authentication
+@using Not.Blazor.Components.Text
+
+@attribute [Route(AuthenticationContents.AUTHENTICATION)]
+@attribute [AllowAnonymous]
+@inherits AuthenticateContentBehind
+
+<MudGrid Justify="Justify.Center" Class="align-center" Style="height:70%;">
+    <MudItem xs="8" sm="4" lg="4" xl="3">
+        <MudStack>
+
+            <NHeadline Content="@Sign_in_to_continue_string" />
+
+            <MudButton Variant="Variant.Filled" Size="Size.Large" OnClick="Signin">@Sign_in_with_Microsoft_string</MudButton>
+
+        </MudStack>
+    </MudItem>
+</MudGrid>

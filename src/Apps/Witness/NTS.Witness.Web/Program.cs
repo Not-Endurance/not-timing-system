@@ -1,42 +1,53 @@
-﻿using Not.Application.Configurations;
-using Not.Application.CRUD.Ports;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Not.Application.Configurations;
 using Not.Startup;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Witness.Storage;
-using NTS.Witness.Storage.Repositories;
-using NTS.Witness.Web.Endpoints;
-using Serilog;
+using NTS.Witness;
+using NTS.Witness.Web;
 
-namespace NTS.Witness.Web;
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-public class Program
+await AddLocalhostOverrideSettings(builder);
+
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+
+builder.Services.AddNtsWitness(builder.Configuration, builder.HostEnvironment.BaseAddress);
+
+Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
+Console.WriteLine(
+    $"WasmApplicationEnvironmentName: {Environment.GetEnvironmentVariable("WasmApplicationEnvironmentName")}"
+);
+
+var host = builder.Build();
+await host.Services.Startup();
+await host.RunAsync();
+
+static Task AddLocalhostOverrideSettings(WebAssemblyHostBuilder builder)
 {
-    public static async Task Main(string[] args)
+    if (!IsLocalhost(builder))
     {
-        var builder = WebApplication.CreateBuilder(args);
-
-        builder.Configuration.AddNAppsettings(typeof(Program).Assembly);
-        builder.Services.ConfigureNtsWitnessWeb(builder.Configuration);
-        builder.Logging.AddSerilog();
-
-        var app = builder.Build();
-
-        //Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
-        }
-
-        app.MapAuthEndpoints();
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
-        app.UseAntiforgery();
-        app.MapBlazorHub();
-        app.MapFallbackToPage("/_Host");
-
-        await app.Services.Startup();
-        await app.RunAsync();
+        return Task.CompletedTask;
     }
+
+    var environment = builder.HostEnvironment.Environment;
+    if (environment != "Staging" && environment != "Production")
+    {
+        return Task.CompletedTask;
+    }
+
+    var fileName = $"localhostsettings.{environment}.json";
+    builder.Configuration.AddEmbeddedJsonFile(fileName, optional: true, typeof(App).Assembly);
+    return Task.CompletedTask;
+}
+
+static bool IsLocalhost(WebAssemblyHostBuilder builder)
+{
+    if (!Uri.TryCreate(builder.HostEnvironment.BaseAddress, UriKind.Absolute, out var uri))
+    {
+        return false;
+    }
+
+    return uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+        || uri.Host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase);
 }

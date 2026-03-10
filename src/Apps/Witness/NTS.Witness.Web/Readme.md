@@ -1,9 +1,16 @@
-To run NTS.Witness.Web in Debug mode User Secrets must be registered. The steps are:
+## Authentication - Microsoft Entra ID (WASM)
+Configuration key: `NAuthenticationSettings`
 
-1. Run `dotnet user-secrets set "Authentication:Google:ClientId" "YOUR_CLIENT_ID" --project Witness\NTS.Witness.Web`
-2. Run `dotnet user-secrets set "Authentication:Google:ClientSecret" "YOUR_ACTUAL_SECRET" --project Witness\NTS.Witness.Web`
+`NTS.Witness.Web` is now a client-side Blazor WebAssembly app. It does not use confidential client secrets.
 
-For Release pipeline use:
+Environment configuration files are loaded from:
+- `wwwroot/appsettings.json`
+- `wwwroot/appsettings.Development.json`
+- `wwwroot/appsettings.Staging.json`
 
-Authentication__Google__ClientId = ${{ secrets.GOOGLE_AUTH_CLIENT_ID }}
-Authentication__Google__ClientSecret = ${{ secrets.GOOGLE_AUTH_CLIENT_SECRET }}
+Localhost-only overrides are loaded when `IS_LOCALHOST=true`:
+- `localhostsettings.Staging.json`
+- `localhostsettings.Production.json`
+
+The `Staging` and `Production` launch profiles pass `?environment=...` so localhost can choose
+the target environment file while still running from `localhost`.

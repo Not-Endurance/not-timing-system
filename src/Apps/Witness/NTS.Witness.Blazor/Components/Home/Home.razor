@@ -1,0 +1,22 @@
+@using Not.Blazor.Components
+@using NTS.Witness.Blazor.Components.EnduranceEvents;
+@using static WitnessBlazorConstants.UserRoles;
+
+@attribute [Route(WitnessBlazorConstants.Pages.HOME)]
+@inherits HomeBehind
+
+<MudStack Class="mt-10">
+    <EnduranceEvents />
+</MudStack>
+
+<MudGrid Justify="Justify.Center" Class="align-top mt-10">
+
+    <MudStack Row>
+        <MudText Typo="Typo.caption" Class="mr-4">
+            <p>@string.Format(Signed_in_as__string, UserName)</p>
+
+            <p>@string.Format(You_have___privileges_string, UserRoles)</p>
+        </MudText>
+    </MudStack>
+
+</MudGrid>

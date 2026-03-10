@@ -1,6 +1,26 @@
 version: "3.8"
 
 services:
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    container_name: aspire-dashboard
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+    ports:
+      - "18888:18888"
+      - "18889:18889"
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.35.0
+    container_name: azurite
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - azurite_data:/data
+
   mongodb:
     image: mongo:6.0
     container_name: mongodb
@@ -16,10 +36,23 @@ services:
       dockerfile: src/Apps/Nexus/NTS.Nexus.HTTP/Dockerfile
     environment:
       MONGO_CONNECTION_STRING: mongodb://mongodb:27017
+      AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://aspire-dashboard:18889
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_ENABLE_CONSOLE_EXPORTER: "true"
+      OTEL_DEBUG_ACTIVITY_SOURCE: "true"
+      # CORS
+      CORS_ALLOWED_ORIGINS: '["https://localhost:7077","http://localhost:7077","https://localhost:5001","http://localhost:5001"]'
+      CORS_SUPPORT_CREDENTIALS: 'true'
+      FUNCTIONS_ENABLE_CORS_CONFIGURATION: "1"
+      CONTAINER_NAME: "local"
     depends_on:
+      - aspire-dashboard
+      - azurite
       - mongodb
     ports:
       - "8080:80"
 
 volumes:
+  azurite_data:
   mongodb_data:
