@@ -924,9 +924,6 @@
   <data name="Remove_from__string" xml:space="preserve">
     <value>Премахни от {0}</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Cascading_Delete_string" xml:space="preserve">
     <value>Каскадно изтриване</value>
   </data>
@@ -938,5 +935,11 @@
   </data>
   <data name="Affected_resources_string" xml:space="preserve">
     <value>Засегнати ресурси</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Reset_Timing_string" xml:space="preserve">
+    <value>Ресетни времена</value>
   </data>
 </root>

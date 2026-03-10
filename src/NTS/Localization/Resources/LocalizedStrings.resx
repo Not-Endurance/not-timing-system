@@ -939,4 +939,7 @@
   <data name="Affected_resources_string" xml:space="preserve">
     <value>Affected resources</value>
   </data>
+  <data name="Reset_Timing_string" xml:space="preserve">
+    <value>Reset Timing</value>
+  </data>
 </root>
