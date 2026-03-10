@@ -41,7 +41,7 @@ public class CountryFunctions : FunctionBase
             return UnexpectedPayload<Country>();
         }
 
-        var document = CountryModel.MapFrom(country);
+        var document = CountryModel.From(country);
         await _countries.Create(document);
         return new OkObjectResult($"Inserted {country}");
     }
@@ -61,7 +61,7 @@ public class CountryFunctions : FunctionBase
             return UnexpectedPayload<Country>();
         }
 
-        var document = CountryModel.MapFrom(country);
+        var document = CountryModel.From(country);
         await _countries.Update(document);
         return new OkObjectResult($"Updated {country}");
     }
@@ -75,7 +75,7 @@ public class CountryFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var countries = await _countries.ReadMany().Select(x => x.MapToDomain());
+        var countries = await _countries.ReadMany().Select(x => x.MapToEntity());
         return new OkObjectResult(countries);
     }
 }

@@ -1,12 +1,14 @@
 using Not.Application.DomainEvents;
 using Not.Application.HTTP;
+using Not.Injection;
 using Not.Storage.REST;
+using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Objects.Payloads;
 
 namespace NTS.Storage.REST;
 
-public class UpcomingEventRestApiRepository : RestApiRepository<UpcomingEvent>
+public class UpcomingEventRestApiRepository : RestApiRepository<UpcomingEvent, UpcomingEventModel>, ITransient
 {
     readonly IDomainEventDispatcher _domainEventDispatcher;
 

@@ -41,7 +41,7 @@ public class ClubFunctions : FunctionBase
             return UnexpectedPayload<Club>();
         }
 
-        var document = ClubModel.MapFrom(club);
+        var document = ClubModel.From(club);
         await _clubs.Create(document);
         return new OkObjectResult($"Inserted {club}");
     }
@@ -61,7 +61,7 @@ public class ClubFunctions : FunctionBase
             return UnexpectedPayload<Club>();
         }
 
-        var document = ClubModel.MapFrom(club);
+        var document = ClubModel.From(club);
         await _clubs.Update(document);
         return new OkObjectResult($"Updated {club}");
     }
@@ -97,7 +97,7 @@ public class ClubFunctions : FunctionBase
         LogInformation(request, nameof(GetOne));
 
         var club = await _clubs.Read(id);
-        return new OkObjectResult(club?.MapToDomain());
+        return new OkObjectResult(club?.MapToEntity());
     }
 
     [Function("clubs-list")]
@@ -109,7 +109,7 @@ public class ClubFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var clubs = await _clubs.ReadMany().Select(x => x.MapToDomain());
+        var clubs = await _clubs.ReadMany().Select(x => x.MapToEntity());
         return new OkObjectResult(clubs);
     }
 }

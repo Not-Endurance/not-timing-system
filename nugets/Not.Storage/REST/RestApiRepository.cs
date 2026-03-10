@@ -1,14 +1,16 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
+using Not.Domain.Abstractions;
 using Not.Injection;
+using Not.Krud.Abstractions;
 using Not.Notify;
-using Not.Structures;
 
 namespace Not.Storage.REST;
 
-public abstract class RestApiRepository<T> : IRepository<T>
-    where T : class, IIdentifiable
+public abstract class RestApiRepository<T, TModel> : IRepository<T>
+    where T : class, IEntity
+    where TModel : class, IKrudModel<T>, new()
 {
     readonly string _endpoint;
 
@@ -52,12 +54,26 @@ public abstract class RestApiRepository<T> : IRepository<T>
 
     protected virtual Task InternalCreate(T item)
     {
-        return Client.Post(_endpoint, item);
+        var model = MapModel(item);
+        return Client.Post(_endpoint, model);
     }
 
     protected virtual Task InternalUpdate(T item)
     {
-        return Client.Patch(_endpoint, item);
+        var model = MapModel(item);
+        return Client.Patch(_endpoint, model);
+    }
+
+    protected virtual TModel MapModel(T item)
+    {
+        var model = new TModel();
+        model.MapFrom(item);
+        return model;
+    }
+
+    protected virtual T? MapEntity(TModel? model)
+    {
+        return model?.MapToEntity();
     }
 
     public async Task Create(T item)
@@ -110,7 +126,7 @@ public abstract class RestApiRepository<T> : IRepository<T>
         try
         {
             var url = BuildUrl(id);
-            return await Client.GetJson<T>(url);
+            return MapEntity(await Client.GetJson<TModel>(url));
         }
         catch (Exception ex)
         {
@@ -123,7 +139,8 @@ public abstract class RestApiRepository<T> : IRepository<T>
     {
         try
         {
-            return await Client.GetJson<IEnumerable<T>>(_endpoint) ?? [];
+            var models = await Client.GetJson<IEnumerable<TModel>>(_endpoint) ?? [];
+            return models.Select(x => MapEntity(x)!);
         }
         catch (Exception ex)
         {
@@ -150,16 +167,15 @@ public abstract class RestApiRepository<T> : IRepository<T>
         }
     }
 
-    public async Task Update(T items)
+    public async Task Update(T item)
     {
         try
         {
-            await InternalUpdate(items);
+            await InternalUpdate(item);
         }
         catch (Exception ex)
         {
             HandleException(ex);
         }
     }
-
 }

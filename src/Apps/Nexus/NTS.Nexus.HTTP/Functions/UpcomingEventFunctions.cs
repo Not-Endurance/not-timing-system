@@ -39,7 +39,7 @@ public class UpcomingEventFunctions : FunctionBase
             return UnexpectedPayload<UpcomingEvent>();
         }
 
-        var document = UpcomingEventModel.MapFrom(upcomingEvent);
+        var document = UpcomingEventModel.From(upcomingEvent);
         await _upcomingEvents.Create(document);
         return new OkObjectResult($"Upcoming event {upcomingEvent.Place} stored successfully.");
     }
@@ -54,7 +54,7 @@ public class UpcomingEventFunctions : FunctionBase
         LogInformation(request, nameof(List));
 
         var documents = await _upcomingEvents.ReadMany();
-        var result = documents.Select(x => x.MapToDomain());
+        var result = documents.Select(x => x.MapToEntity());
         return new OkObjectResult(result);
     }
 
@@ -74,7 +74,7 @@ public class UpcomingEventFunctions : FunctionBase
             return new NotFoundResult();
         }
 
-        return new OkObjectResult(document.MapToDomain());
+        return new OkObjectResult(document.MapToEntity());
     }
 
     [Function("upcoming-event-update")]
@@ -92,7 +92,7 @@ public class UpcomingEventFunctions : FunctionBase
             return UnexpectedPayload<UpcomingEvent>();
         }
 
-        var document = UpcomingEventModel.MapFrom(upcomingEvent);
+        var document = UpcomingEventModel.From(upcomingEvent);
         await _upcomingEvents.Update(document);
         return new OkObjectResult($"Updated upcoming event {upcomingEvent.Place}");
     }
