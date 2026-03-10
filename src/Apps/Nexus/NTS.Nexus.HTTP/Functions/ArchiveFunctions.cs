@@ -39,11 +39,11 @@ public class ArchiveFunctions : FunctionBase
             return UnexpectedPayload<ArchiveEntry>();
         }
 
-        var document = ArchiveEntryModel.MapFrom(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
+        var document = ArchiveEntryModel.From(entry.EnduranceEvent, entry.Officials, entry.Ranklists);
         var existing = await _archive.Read(entry.Id);
         if (existing != null) // TODO: investigate this not working
         {
-            await _archive.Delete(document);
+            await _archive.Delete(existing);
         }
 
         await _archive.Create(document);

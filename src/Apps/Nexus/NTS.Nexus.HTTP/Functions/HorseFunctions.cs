@@ -44,7 +44,7 @@ public class HorseFunctions : FunctionBase
             return UnexpectedPayload<Horse>();
         }
 
-        var document = HorseModel.MapFrom(horse);
+        var document = HorseModel.From(horse);
         await _horses.Create(document);
         return new OkObjectResult($"Inserted {horse}");
     }
@@ -64,7 +64,7 @@ public class HorseFunctions : FunctionBase
             return UnexpectedPayload<Horse>();
         }
 
-        var document = HorseModel.MapFrom(horse);
+        var document = HorseModel.From(horse);
         await _horses.Update(document);
         return new OkObjectResult($"Updated {horse}");
     }
@@ -143,7 +143,7 @@ public class HorseFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var horses = await _horses.ReadMany().Select(x => x.MaptoDomain());
+        var horses = await _horses.ReadMany().Select(x => x.MapToEntity());
         return new OkObjectResult(horses);
     }
 }

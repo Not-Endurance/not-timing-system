@@ -71,7 +71,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         );
         if (result.Data != null)
         {
-            _participationService.Set(result.Data.Select(x => x.MapToDomain()));
+            _participationService.Set(result.Data.Select(x => x.MapToEntity()));
         }
     }
 }

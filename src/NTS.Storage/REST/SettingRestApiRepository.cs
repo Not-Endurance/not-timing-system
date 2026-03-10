@@ -1,12 +1,13 @@
-﻿using Not.Application.CRUD.Ports;
-using Not.Application.HTTP;
+﻿using Not.Application.HTTP;
+using Not.Injection;
 using Not.Storage.REST;
+using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
 using NTS.Judge.Features.Settings;
 
 namespace NTS.Storage.REST;
 
-public class SettingRestApiRepository : RestApiRepository<Setting>, ISettingRepository
+public class SettingRestApiRepository : RestApiRepository2<Setting, SettingModel>, ISettingRepository, ITransient
 {
     public SettingRestApiRepository(NHttpClient client)
         : base("settings", client) { }

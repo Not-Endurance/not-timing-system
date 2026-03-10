@@ -39,7 +39,7 @@ public class SettingFunction : FunctionBase
             return UnexpectedPayload<Setting>();
         }
 
-        var document = SettingModel.MapFrom(setting);
+        var document = SettingModel.From(setting);
         await _settings.Create(document);
         return new OkObjectResult($"Inserted {setting}");
     }
@@ -59,7 +59,7 @@ public class SettingFunction : FunctionBase
             return UnexpectedPayload<Setting>();
         }
 
-        var document = SettingModel.MapFrom(setting);
+        var document = SettingModel.From(setting);
         await _settings.Update(document);
         return new OkObjectResult($"Updated {setting}");
     }
@@ -75,6 +75,6 @@ public class SettingFunction : FunctionBase
         LogInformation(request, nameof(GetOne));
 
         var setting = await _settings.Read(x => x.AccountId == accountId);
-        return new OkObjectResult(setting?.ToDomain());
+        return new OkObjectResult(setting?.MapToEntity());
     }
 }
