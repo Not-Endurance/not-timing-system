@@ -17,7 +17,8 @@ public class SettingRestApiRepository : RestApiRepository<Setting, SettingModel>
         try
         {
             var url = BuildUrl(accountId);
-            return await Client.GetJson<Setting>(url);
+            var model = await Client.GetJson<SettingModel>(url);
+            return MapEntity(model);
         }
         catch (Exception ex)
         {

@@ -2,10 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using Not.Async;
-using Not.Async.Extensions;
 using NTS.Application.Shared;
-using NTS.Domain.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -35,15 +32,14 @@ public class CountryFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
-        var country = await ReadBody<Country>(request);
-        if (country == null)
+        var document = await ReadBody<CountryModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<Country>();
+            return UnexpectedPayload<CountryModel>();
         }
 
-        var document = CountryModel.From(country);
         await _countries.Create(document);
-        return new OkObjectResult($"Inserted {country}");
+        return new OkObjectResult($"Inserted country '{document.Name}'");
     }
 
     [Function("countries-update")]
@@ -55,15 +51,14 @@ public class CountryFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
-        var country = await ReadBody<Country>(request);
-        if (country == null)
+        var document = await ReadBody<CountryModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<Country>();
+            return UnexpectedPayload<CountryModel>();
         }
 
-        var document = CountryModel.From(country);
         await _countries.Update(document);
-        return new OkObjectResult($"Updated {country}");
+        return new OkObjectResult($"Updated country '{document.Name}'");
     }
 
     [Function("countries-list")]
@@ -75,7 +70,7 @@ public class CountryFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var countries = await _countries.ReadMany().Select(x => x.MapToEntity());
+        var countries = await _countries.ReadMany();
         return new OkObjectResult(countries);
     }
 }

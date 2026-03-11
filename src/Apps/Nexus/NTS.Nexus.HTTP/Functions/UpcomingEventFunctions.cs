@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using NTS.Application.Setup;
-using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -33,15 +32,14 @@ public class UpcomingEventFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
-        var upcomingEvent = await ReadBody<UpcomingEvent>(request);
-        if (upcomingEvent == null)
+        var document = await ReadBody<UpcomingEventModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<UpcomingEvent>();
+            return UnexpectedPayload<UpcomingEventModel>();
         }
 
-        var document = UpcomingEventModel.From(upcomingEvent);
         await _upcomingEvents.Create(document);
-        return new OkObjectResult($"Upcoming event {upcomingEvent.Place} stored successfully.");
+        return new OkObjectResult($"Upcoming event {document.Place} stored successfully.");
     }
 
     [Function("upcoming-event-list")]
@@ -54,8 +52,7 @@ public class UpcomingEventFunctions : FunctionBase
         LogInformation(request, nameof(List));
 
         var documents = await _upcomingEvents.ReadMany();
-        var result = documents.Select(x => x.MapToEntity());
-        return new OkObjectResult(result);
+        return new OkObjectResult(documents);
     }
 
     [Function("upcoming-event-query-by-id")]
@@ -74,7 +71,7 @@ public class UpcomingEventFunctions : FunctionBase
             return new NotFoundResult();
         }
 
-        return new OkObjectResult(document.MapToEntity());
+        return new OkObjectResult(document);
     }
 
     [Function("upcoming-event-update")]
@@ -86,15 +83,14 @@ public class UpcomingEventFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
-        var upcomingEvent = await ReadBody<UpcomingEvent>(request);
-        if (upcomingEvent == null)
+        var document = await ReadBody<UpcomingEventModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<UpcomingEvent>();
+            return UnexpectedPayload<UpcomingEventModel>();
         }
 
-        var document = UpcomingEventModel.From(upcomingEvent);
         await _upcomingEvents.Update(document);
-        return new OkObjectResult($"Updated upcoming event {upcomingEvent.Place}");
+        return new OkObjectResult($"Updated upcoming event {document.Place}");
     }
 
     [Function("upcoming-event-delete")]

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using NTS.Application.Shared;
-using NTS.Domain.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -33,15 +32,14 @@ public class SettingFunction : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
-        var setting = await ReadBody<Setting>(request);
-        if (setting == null)
+        var document = await ReadBody<SettingModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<Setting>();
+            return UnexpectedPayload<SettingModel>();
         }
 
-        var document = SettingModel.From(setting);
         await _settings.Create(document);
-        return new OkObjectResult($"Inserted {setting}");
+        return new OkObjectResult($"Inserted settings for account '{document.AccountId}'");
     }
 
     [Function("settings-update")]
@@ -53,15 +51,14 @@ public class SettingFunction : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
-        var setting = await ReadBody<Setting>(request);
-        if (setting == null)
+        var document = await ReadBody<SettingModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<Setting>();
+            return UnexpectedPayload<SettingModel>();
         }
 
-        var document = SettingModel.From(setting);
         await _settings.Update(document);
-        return new OkObjectResult($"Updated {setting}");
+        return new OkObjectResult($"Updated settings for account '{document.AccountId}'");
     }
 
     [Function("settings-get")]
@@ -75,6 +72,6 @@ public class SettingFunction : FunctionBase
         LogInformation(request, nameof(GetOne));
 
         var setting = await _settings.Read(x => x.AccountId == accountId);
-        return new OkObjectResult(setting?.MapToEntity());
+        return new OkObjectResult(setting);
     }
 }
