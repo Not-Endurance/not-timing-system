@@ -1,7 +1,5 @@
-using System;
 using Not.Events;
 using Not.Injection;
-using Not.Strings;
 
 namespace Not.Notify;
 
@@ -11,11 +9,13 @@ public class Notifier : INotifier, INotificationStream, ISingleton
     readonly Event<string> _succeeded = new();
     readonly Event<string> _warned = new();
     readonly Event<string> _failed = new();
+    readonly Event<Exception> _unhandledExceptions = new();
 
     public IEventSubscriber<string> Informed => _informed;
     public IEventSubscriber<string> Succeeded => _succeeded;
     public IEventSubscriber<string> Warned => _warned;
     public IEventSubscriber<string> Failed => _failed;
+    public IEventSubscriber<Exception> UnhandledExceptions => _unhandledExceptions;
 
     public void Inform(string message)
     {
@@ -39,8 +39,6 @@ public class Notifier : INotifier, INotificationStream, ISingleton
 
     public void Error(Exception exception)
     {
-        exception = exception.GetBaseException();
-        var message = exception.Message + Environment.NewLine + exception.StackTrace?.NTrim(1000);
-        Error(message);
+        _unhandledExceptions.Emit(exception);
     }
 }

@@ -1,0 +1,11 @@
+.nts-unhandled-exception__viewport {
+    max-height: 70vh;
+    overflow: auto;
+}
+
+.nts-unhandled-exception__details {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: Consolas, "Courier New", monospace;
+}

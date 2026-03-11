@@ -17,4 +17,5 @@ public interface INotificationStream
     IEventSubscriber<string> Succeeded { get; }
     IEventSubscriber<string> Warned { get; }
     IEventSubscriber<string> Failed { get; }
+    IEventSubscriber<Exception> UnhandledExceptions { get; }
 }
