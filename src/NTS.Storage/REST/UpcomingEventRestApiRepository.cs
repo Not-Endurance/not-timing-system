@@ -4,7 +4,7 @@ using Not.Injection;
 using Not.Storage.REST;
 using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Objects.Payloads;
+using NTS.Domain.Setup.Events;
 
 namespace NTS.Storage.REST;
 
@@ -31,6 +31,6 @@ public class UpcomingEventRestApiRepository : RestApiRepository<UpcomingEvent, U
             return Task.CompletedTask;
         }
 
-        return _domainEventDispatcher.Dispatch(new UpcomingEventUpdatedEvent(item.Id));
+        return _domainEventDispatcher.Dispatch(new UpcomingEventUpdated(item.Id));
     }
 }

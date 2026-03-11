@@ -7,14 +7,14 @@ using Not.Injection;
 using Not.Notify;
 using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Objects.Payloads;
+using NTS.Domain.Setup.Events;
 
 namespace NTS.Judge.Features.Socket;
 
 public class JudgeSocketService
     : NStatefulService,
         INtsSocketService,
-        INotificationHandler<UpcomingEventUpdatedEvent>,
+        INotificationHandler<UpcomingEventUpdated>,
         ISingleton
 {
     readonly ISocketPrincipalStorage _socketPrincialStorage;
@@ -74,7 +74,7 @@ public class JudgeSocketService
         await _socket.Connect(principal.Id.ToString());
     }
 
-    public async Task Handle(UpcomingEventUpdatedEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(UpcomingEventUpdated notification, CancellationToken cancellationToken)
     {
         if (Event?.Id != notification.EventId)
         {
