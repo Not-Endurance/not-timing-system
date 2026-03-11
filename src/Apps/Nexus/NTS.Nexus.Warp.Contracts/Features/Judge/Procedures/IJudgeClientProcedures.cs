@@ -1,4 +1,3 @@
-using NTS.Application.Core;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
@@ -6,6 +5,4 @@ namespace NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 public interface IJudgeClientProcedures
 {
     Task Receive(IEnumerable<Snapshot> snapshots);
-    Task<IEnumerable<ParticipationModel>> GetActive();
 }
-

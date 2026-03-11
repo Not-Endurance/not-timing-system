@@ -1,8 +1,8 @@
 using Not.Application.CRUD.Ports;
 using Not.Domain.Abstractions;
 using Not.Injection;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
-using NTS.Judge.Features.Core;
 
 namespace NTS.Storage.REST;
 

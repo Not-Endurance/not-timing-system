@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.SignalR;
 using Not.Application.RPC.Clients;
-using Not.Async.Extensions;
-using NTS.Application.Core;
 using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;
 using NTS.Nexus.Warp.Contracts;
@@ -26,15 +24,6 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
     {
         _primaryConnections = primaryConnections;
         _judgeRelay = judgeRelay;
-    }
-
-    public async Task<IEnumerable<ParticipationModel>> SendParticipations(WarpRequest request)
-    {
-        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
-        {
-            return [];
-        }
-        return await judgeClient.GetActive();
     }
 
     public async Task<RpcInvokeResult> Receive(WarpRequest<SnapshotModel> request)
@@ -68,4 +57,3 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         return true;
     }
 }
-

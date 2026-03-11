@@ -1,6 +1,6 @@
-﻿using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 
-namespace NTS.Judge.Features.Socket;
+namespace NTS.Application.Socket;
 
 public interface ISocketPrincipalStorage
 {

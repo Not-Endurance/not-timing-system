@@ -1,5 +1,7 @@
 ﻿using Not.Blazor.Components.Abstractions;
+using Not.Application.CRUD.Ports;
 using NTS.Application.Socket;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Services;
 using NTS.Witness.UpcomingEvents;
@@ -18,7 +20,10 @@ public class EnduranceEventsBehind : NComponent
     IConnectionStatus ConnectionStatus { get; set; } = default!;
 
     [Inject]
-    IParticipationGetter ParticipationGetter { get; set; } = default!;
+    IReadMany<Participation> Participations { get; set; } = default!;
+
+    [Inject]
+    IParticipationService ParticipationService { get; set; } = default!;
 
     [Inject]
     protected INtsSocketService Selected { get; set; } = default!;
@@ -46,7 +51,8 @@ public class EnduranceEventsBehind : NComponent
             await SocketService.Disconnect();
         }
         await SocketService.Connect(enduranceEvent);
-        await ParticipationGetter.GetParticipations();
+        var activeParticipations = await Participations.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
+        ParticipationService.Set(activeParticipations);
         StateHasChanged();
     }
 

@@ -1,14 +1,10 @@
 using MediatR;
-using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
-using Not.Async.Extensions;
 using Not.Injection;
-using NTS.Application.Core;
 using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Features.Core.Dashboard;
 using NTS.Nexus.Warp.Contracts;
@@ -26,27 +22,23 @@ public class JudgeRpcClient
 {
     readonly INtsSocketService _eventContext;
     readonly ITimingService _timingService;
-    readonly IReadMany<Participation> _coreParticipations;
     readonly HubProcedures _hubProcedures;
 
     public JudgeRpcClient(
         INtsSocketService eventContext,
         IRpcSocket socket,
-        ITimingService timingService,
-        IReadMany<Participation> coreParticipations
+        ITimingService timingService
     )
         : base(socket)
     {
         _hubProcedures = new HubProcedures(socket);
         _eventContext = eventContext;
         _timingService = timingService;
-        _coreParticipations = coreParticipations;
     }
 
     public override void RunAtStartup()
     {
         RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(Receive), Receive);
-        RegisterOutputCollectionProcedure(nameof(GetActive), GetActive);
     }
 
     public async Task Receive(IEnumerable<Snapshot> snapshots)
@@ -55,18 +47,6 @@ public class JudgeRpcClient
         {
             await _timingService.Record(snapshot);
         }
-    }
-
-    /// <summary>
-    /// Fetches active participations after Competitions are started.
-    /// </summary>
-    /// <returns>Collection of active (not eliminated or completed) participations</returns>
-    public async Task<IEnumerable<ParticipationModel>> GetActive()
-    {
-        var coreParticipations = await _coreParticipations
-            .ReadMany(x => !x.IsComplete() && !x.IsEliminated())
-            .Select(ParticipationModel.MapFrom);
-        return coreParticipations;
     }
 
     public async Task Handle(PhaseCompleted completed, CancellationToken cancellationToken)
@@ -117,5 +97,4 @@ public class JudgeRpcClient
         }
     }
 }
-
 

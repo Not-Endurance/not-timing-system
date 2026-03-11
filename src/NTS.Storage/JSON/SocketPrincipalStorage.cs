@@ -2,8 +2,8 @@
 using Not.Application.CRUD.Ports;
 using Not.Filesystem;
 using Not.Storage.JsonFile.Stores.Files;
+using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Features.Socket;
 using NTS.Storage.Setup;
 
 namespace NTS.Storage.JSON;

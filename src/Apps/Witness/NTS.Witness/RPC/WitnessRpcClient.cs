@@ -3,7 +3,6 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
-using NTS.Application.Core;
 using NTS.Application.Socket;
 using NTS.Application.Watcher;
 using NTS.Domain.Core.Objects.Payloads;
@@ -13,17 +12,15 @@ using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;
 
-public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipationGetter, ISnapshotService, ISingleton
+public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotService, ISingleton
 {
     readonly IRpcSocket _socket;
     readonly INtsSocketService _eventContext;
     readonly IDomainEventDispatcher _domainEventDispatcher;
-    readonly IParticipationService _participationService;
 
     public WitnessRpcClient(
         IRpcSocket socket,
         INtsSocketService eventContext,
-        IParticipationService participationService,
         IDomainEventDispatcher domainEventDispatcher
     )
         : base(socket)
@@ -31,7 +28,6 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
         _socket = socket;
         _eventContext = eventContext;
         _domainEventDispatcher = domainEventDispatcher;
-        _participationService = participationService;
     }
 
     public override void RunAtStartup()
@@ -67,27 +63,4 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, IParticipat
     {
         return _domainEventDispatcher.Dispatch(payload);
     }
-
-    public async Task GetParticipations()
-    {
-        var @event = _eventContext.Event;
-        if (@event == null)
-        {
-            _participationService.Set([]);
-            return;
-        }
-
-        var request = WarpRequest.Create(@event.Id.ToString());
-        var result = await _socket.InvokeInputOutputProcedure<WarpRequest, IEnumerable<ParticipationModel>>(
-            nameof(IWitnessHubProcedures.SendParticipations),
-            request
-        );
-        if (result.Data != null)
-        {
-            _participationService.Set(result.Data.Select(x => x.MapToEntity()));
-        }
-
-        _participationService.Set([]);
-    }
 }
-

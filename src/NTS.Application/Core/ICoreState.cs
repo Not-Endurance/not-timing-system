@@ -1,4 +1,4 @@
-﻿namespace NTS.Judge.Features.Core;
+namespace NTS.Application.Core;
 
 public interface ICoreState
 {

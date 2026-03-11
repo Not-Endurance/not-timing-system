@@ -1,9 +1,9 @@
 ﻿using Not.Application.HTTP;
 using Not.Injection;
 using Not.Storage.REST;
+using NTS.Application.Settings;
 using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
-using NTS.Judge.Features.Settings;
 
 namespace NTS.Storage.REST;
 

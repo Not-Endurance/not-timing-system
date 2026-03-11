@@ -6,7 +6,7 @@ using Not.Injection;
 using Not.Storage;
 using Not.Storage.JsonFile.Stores;
 using Not.Storage.REST;
-using NTS.Judge.Features.Core;
+using NTS.Application.Core;
 using NTS.Storage.JSON;
 using NTS.Storage.REST;
 
