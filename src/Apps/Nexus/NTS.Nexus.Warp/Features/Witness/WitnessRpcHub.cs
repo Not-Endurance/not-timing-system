@@ -5,9 +5,10 @@ using Not.Async.Extensions;
 using NTS.Application.Core;
 using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;
+using NTS.Nexus.Warp.Contracts;
+using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
+using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 using NTS.Nexus.Warp.Features.Judge;
-using NTS.Nexus.Warp.Features.Judge.Procedures;
-using NTS.Nexus.Warp.Features.Witness.Procedures;
 
 namespace NTS.Nexus.Warp.Features.Witness;
 

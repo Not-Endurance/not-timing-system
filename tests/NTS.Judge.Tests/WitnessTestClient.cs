@@ -3,7 +3,7 @@ using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Tests.RPC;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Nexus.Warp.Features.Witness.Procedures;
+using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 using Xunit.Abstractions;
 
 namespace NTS.Judge.Tests;

@@ -11,8 +11,8 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Features.Core.Dashboard;
-using NTS.Nexus.Warp;
-using NTS.Nexus.Warp.Features.Judge.Procedures;
+using NTS.Nexus.Warp.Contracts;
+using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 
 namespace NTS.Judge.Features.Socket;
 

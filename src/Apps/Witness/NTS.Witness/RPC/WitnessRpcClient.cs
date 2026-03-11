@@ -7,8 +7,8 @@ using NTS.Application.Core;
 using NTS.Application.Socket;
 using NTS.Application.Watcher;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Nexus.Warp;
-using NTS.Nexus.Warp.Features.Witness.Procedures;
+using NTS.Nexus.Warp.Contracts;
+using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 using NTS.Witness.Services;
 
 namespace NTS.Witness.RPC;

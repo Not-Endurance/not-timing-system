@@ -1,4 +1,4 @@
-namespace NTS.Nexus.Warp;
+namespace NTS.Nexus.Warp.Contracts;
 
 public class WarpRequest
 {

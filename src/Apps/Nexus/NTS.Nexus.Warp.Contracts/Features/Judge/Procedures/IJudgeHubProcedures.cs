@@ -1,6 +1,6 @@
 using NTS.Domain.Core.Objects.Payloads;
 
-namespace NTS.Nexus.Warp.Features.Judge.Procedures;
+namespace NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 
 public interface IJudgeHubProcedures
 {

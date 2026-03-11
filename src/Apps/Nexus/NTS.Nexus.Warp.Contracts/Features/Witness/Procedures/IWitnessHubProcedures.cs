@@ -2,7 +2,7 @@ using Not.Application.RPC.Clients;
 using NTS.Application.Core;
 using NTS.Application.Watcher;
 
-namespace NTS.Nexus.Warp.Features.Witness.Procedures;
+namespace NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 
 public interface IWitnessHubProcedures
 {

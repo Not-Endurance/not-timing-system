@@ -1,7 +1,7 @@
 using NTS.Application.Core;
 using NTS.Domain.Aggregates;
 
-namespace NTS.Nexus.Warp.Features.Judge.Procedures;
+namespace NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 
 public interface IJudgeClientProcedures
 {
