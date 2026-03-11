@@ -106,19 +106,19 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         await Delete(item.Id);
     }
 
-    public Task Delete(Expression<Func<T, bool>> filter)
+    public virtual Task Delete(Expression<Func<T, bool>> filter)
     {
-        throw new NotImplementedException();
+        return DeleteMany(filter);
     }
 
-    public Task Delete(IEnumerable<T> items)
+    public virtual Task Delete(IEnumerable<T> items)
     {
-        throw new NotImplementedException();
+        return DeleteMany(items);
     }
 
-    public Task<T?> Read(Expression<Func<T, bool>> filter)
+    public virtual async Task<T?> Read(Expression<Func<T, bool>> filter)
     {
-        throw new NotImplementedException();
+        return (await ReadMany(filter)).FirstOrDefault();
     }
 
     public async Task<T?> Read(int id)
@@ -135,7 +135,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         }
     }
 
-    public async Task<IEnumerable<T>> ReadMany()
+    public virtual async Task<IEnumerable<T>> ReadMany()
     {
         try
         {
@@ -149,9 +149,10 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         }
     }
 
-    public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
+    public virtual async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
-        throw new NotImplementedException();
+        var predicate = filter.Compile();
+        return (await ReadMany()).Where(predicate);
     }
 
     public async Task SafeDelete(int id)
@@ -176,6 +177,20 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         catch (Exception ex)
         {
             HandleException(ex);
+        }
+    }
+
+    async Task DeleteMany(Expression<Func<T, bool>> filter)
+    {
+        var items = await ReadMany(filter);
+        await DeleteMany(items);
+    }
+
+    async Task DeleteMany(IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            await Delete(item);
         }
     }
 }

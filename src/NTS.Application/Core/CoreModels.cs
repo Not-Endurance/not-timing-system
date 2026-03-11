@@ -1,5 +1,6 @@
 ﻿using Not.Krud.Abstractions;
 using NTS.Application.Shared;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -27,25 +28,30 @@ public class ClubModel
     }
 }
 
-public class OfficialModel
+public class OfficialModel : IDocument, IKrudModel<Official>
 {
     public static OfficialModel MapFrom(Official official)
     {
-        return new OfficialModel
-        {
-            Id = official.Id,
-            Names = official.Person.Names,
-            Role = official.Role,
-        };
+        var model = new OfficialModel();
+        ((IKrudModel<Official>)model).MapFrom(official);
+        return model;
     }
 
-    public int Id { get; init; }
-    public string[] Names { get; init; } = [];
-    public OfficialRole Role { get; init; } = default!;
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public string[] Names { get; set; } = [];
+    public OfficialRole Role { get; set; } = default!;
 
     public Official MapToEntity()
     {
         return new Official(Names, Role, Id);
+    }
+
+    void IKrudModel<Official>.MapFrom(Official official)
+    {
+        Id = official.Id;
+        Names = official.Person.Names;
+        Role = official.Role;
     }
 }
 
@@ -300,7 +306,7 @@ public class EliminatedModel
     }
 }
 
-public class ParticipationModel
+public class ParticipationModel : IDocument, IKrudModel<Participation>
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
@@ -318,13 +324,14 @@ public class ParticipationModel
         };
     }
 
-    public int Id { get; init; }
-    public ParticipationCategory Category { get; init; } = default!;
-    public CompetitionModel Competition { get; init; } = default!;
-    public CombinationModel Combination { get; init; } = default!;
-    public PhaseModel[] Phases { get; init; } = default!;
-    public TotalModel? Total { get; init; }
-    public EliminatedModel? Eliminated { get; init; }
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public ParticipationCategory Category { get; set; } = default!;
+    public CompetitionModel Competition { get; set; } = default!;
+    public CombinationModel Combination { get; set; } = default!;
+    public PhaseModel[] Phases { get; set; } = default!;
+    public TotalModel? Total { get; set; }
+    public EliminatedModel? Eliminated { get; set; }
 
     public Participation MapToEntity()
     {
@@ -333,6 +340,19 @@ public class ParticipationModel
         var phases = Phases!.Select(x => x.MapToEntity());
         var eliminated = Eliminated?.MapToEntity();
         return new Participation(Category, competition, combination, new(phases), eliminated, Id);
+    }
+
+    void IKrudModel<Participation>.MapFrom(Participation participation)
+    {
+        var total = participation.GetTotal();
+
+        Id = participation.Id;
+        Category = participation.Category;
+        Competition = CompetitionModel.MapFrom(participation.Competition);
+        Combination = CombinationModel.MapFrom(participation.Combination);
+        Phases = participation.Phases.Select(PhaseModel.MapFrom).ToArray();
+        Total = total == null ? null : TotalModel.Create(total);
+        Eliminated = participation.Eliminated == null ? null : EliminatedModel.MapFrom(participation.Eliminated);
     }
 }
 
@@ -403,6 +423,164 @@ public class RanklistModel
             Id
         );
         return new Ranklist(ranking, entries);
+    }
+}
+
+public class EnduranceEventModel : IDocument, IKrudModel<EnduranceEvent>
+{
+    public static EnduranceEventModel From(EnduranceEvent enduranceEvent)
+    {
+        var model = new EnduranceEventModel();
+        model.MapFrom(enduranceEvent);
+        return model;
+    }
+
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public CountryModel Country { get; set; } = default!;
+    public string City { get; set; } = default!;
+    public string? Location { get; set; }
+    public string? FeiShowId { get; set; }
+    public string? FeiId { get; set; }
+    public string? FeiEventCode { get; set; }
+    public DateTimeOffset StartDay { get; set; }
+    public DateTimeOffset EndDay { get; set; }
+
+    public void MapFrom(EnduranceEvent enduranceEvent)
+    {
+        Id = enduranceEvent.Id;
+        Country = CountryModel.From(enduranceEvent.PopulatedPlace.Country);
+        City = enduranceEvent.PopulatedPlace.City;
+        Location = enduranceEvent.PopulatedPlace.Location;
+        FeiShowId = enduranceEvent.FeiShowId;
+        FeiId = enduranceEvent.FeiId;
+        FeiEventCode = enduranceEvent.FeiEventCode;
+        StartDay = enduranceEvent.EventSpan.StartDay;
+        EndDay = enduranceEvent.EventSpan.EndDay;
+    }
+
+    public EnduranceEvent MapToEntity()
+    {
+        var country = Country.MapToEntity();
+        var place = new PopulatedPlace(country, City, Location);
+        var span = new EventSpan(StartDay, EndDay);
+        return new EnduranceEvent(place, span, FeiShowId, FeiId, FeiEventCode, Id);
+    }
+}
+
+public class RankingModel : IDocument, IKrudModel<Ranking>
+{
+    public static RankingModel From(Ranking ranking)
+    {
+        var model = new RankingModel();
+        model.MapFrom(ranking);
+        return model;
+    }
+
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public string Name { get; set; } = default!;
+    public CompetitionRuleset Ruleset { get; set; }
+    public CompetitionType Type { get; set; }
+    public ParticipationCategory Category { get; set; }
+    public string? CompetitionFeiId { get; set; }
+    public string? FeiRule { get; set; }
+    public string? FeiScheduleNumber { get; set; }
+    public RankingEntryModel[] Entries { get; set; } = [];
+
+    public void MapFrom(Ranking ranking)
+    {
+        Id = ranking.Id;
+        Name = ranking.Name;
+        Ruleset = ranking.Ruleset;
+        Type = ranking.Type;
+        Category = ranking.Category;
+        CompetitionFeiId = ranking.CompetitionFeiId;
+        FeiRule = ranking.FeiRule;
+        FeiScheduleNumber = ranking.FeiScheduleNumber;
+        Entries = ranking.Entries.Select(RankingEntryModel.MapFrom).ToArray();
+    }
+
+    public Ranking MapToEntity()
+    {
+        var entries = Entries.Select(x => x.MapToEntity()).ToList();
+        return new Ranking(Name, Ruleset, Type, Category, CompetitionFeiId, FeiRule, FeiScheduleNumber, entries, Id);
+    }
+}
+
+public class HandoutModel : IDocument, IKrudModel<Handout>
+{
+    public static HandoutModel From(Handout handout)
+    {
+        var model = new HandoutModel();
+        model.MapFrom(handout);
+        return model;
+    }
+
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public ParticipationModel Participation { get; set; } = default!;
+
+    public void MapFrom(Handout handout)
+    {
+        Id = handout.Id;
+        Participation = ParticipationModel.MapFrom(handout.Participation);
+    }
+
+    public Handout MapToEntity()
+    {
+        return new Handout(Participation.MapToEntity(), Id);
+    }
+}
+
+public class CoreSnapshotModel
+{
+    public static CoreSnapshotModel MapFrom(Snapshot snapshot)
+    {
+        return new CoreSnapshotModel
+        {
+            Number = snapshot.Number,
+            Type = snapshot.Type,
+            Method = snapshot.Method,
+            RecordedAt = snapshot.Timestamp.ToDateTimeOffset(),
+        };
+    }
+
+    public int Number { get; set; }
+    public SnapshotType Type { get; set; }
+    public SnapshotMethod Method { get; set; }
+    public DateTimeOffset RecordedAt { get; set; }
+
+    public Snapshot MapToEntity()
+    {
+        return new Snapshot(Number, Type, Method, new Timestamp(RecordedAt));
+    }
+}
+
+public class SnapshotResultModel : IDocument, IKrudModel<SnapshotResult>
+{
+    public static SnapshotResultModel From(SnapshotResult result)
+    {
+        var model = new SnapshotResultModel();
+        model.MapFrom(result);
+        return model;
+    }
+
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public CoreSnapshotModel Snapshot { get; set; } = default!;
+    public SnapshotResultType Type { get; set; }
+
+    public void MapFrom(SnapshotResult result)
+    {
+        Id = result.Id;
+        Snapshot = CoreSnapshotModel.MapFrom(result.Snapshot);
+        Type = result.Type;
+    }
+
+    public SnapshotResult MapToEntity()
+    {
+        return new SnapshotResult(Snapshot.MapToEntity(), Type, Id);
     }
 }
 

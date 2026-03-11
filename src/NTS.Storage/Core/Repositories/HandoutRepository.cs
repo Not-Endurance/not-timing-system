@@ -1,11 +1,13 @@
-﻿using Not.Storage.JsonFile.Repositories;
-using Not.Storage.JsonFile.Stores;
+using Not.Application.HTTP;
+using Not.Injection;
+using Not.Storage.REST;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class HandoutRepository : SetRepository<Handout, CoreState>
+public class HandoutRepository : RestApiRepository<Handout, HandoutModel>, ITransient
 {
-    public HandoutRepository(IStore<CoreState> store)
-        : base(store) { }
+    public HandoutRepository(NHttpClient client)
+        : base("handouts", client) { }
 }
