@@ -56,7 +56,7 @@ public class WitnessSocketService : IConnectionStatus, INtsSocketService, ISingl
             Principal = null;
         }
 
-        await _socket.Connect();
+        await _socket.Connect(upcomingEvent.Id.ToString());
         if (!_socket.IsConnected)
         {
             return;

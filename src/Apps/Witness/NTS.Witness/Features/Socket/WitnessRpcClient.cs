@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.SignalR.Client;
 using Not.Application.DomainEvents;
-using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
+using Not.Exceptions;
 using Not.Injection;
 using NTS.Application.Socket;
 using NTS.Application.Watcher;
@@ -37,16 +38,13 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotSe
         RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
     }
 
-    public async Task<RpcInvokeResult> PublishSnapshotsAsync(SnapshotModel model)
+    public async Task PublishSnapshotsAsync(SnapshotModel model)
     {
-        var @event = _eventContext.Event;
-        if (@event == null)
-        {
-            return RpcInvokeResult.Error;
-        }
+        GuardHelper.ThrowIfDefault(_eventContext.Event);
+        GuardHelper.ThrowIfDefault(_socket.Connection);
 
-        var request = WarpRequest.Create(@event.Id.ToString(), model);
-        return await _socket.InvokeInputProcedure(nameof(IWitnessHubProcedures.Receive), request);
+        var request = WarpRequest.Create(_eventContext.Event.Id.ToString(), model);
+        await _socket.Connection.InvokeAsync(nameof(IWitnessHubProcedures.Receive), request);
     }
 
     public Task OnPhaseCompleted(PhaseCompleted payload)

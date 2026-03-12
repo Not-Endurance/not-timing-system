@@ -1,6 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.SignalR;
-using Not.Application.RPC.Clients;
 using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;
 using NTS.Nexus.Warp.Contracts;
@@ -26,12 +24,9 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         _judgeRelay = judgeRelay;
     }
 
-    public async Task<RpcInvokeResult> Receive(WarpRequest<SnapshotModel> request)
+    public async Task Receive(WarpRequest<SnapshotModel> request)
     {
-        if (!TryGetJudgeClient(request.EnduranceEventId, out var judgeClient))
-        {
-            return RpcInvokeResult.Error; // TODO: meaningful message would improve UX here
-        }
+        var rpcClient = GetRpcClient(request.EnduranceEventId);
         var payload = request.Payload.MapToDomain();
         var snapshots = payload.Entries.Select(entry => new Snapshot(
             entry.Number,
@@ -39,21 +34,25 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
             Domain.Enums.SnapshotMethod.Manual,
             entry.Timestamp
         ));
-        await judgeClient.Receive(snapshots);
-        return RpcInvokeResult.Success;
+        await rpcClient.Receive(snapshots);
     }
 
-    bool TryGetJudgeClient(string enduranceEventId, [NotNullWhen(true)] out IJudgeClientProcedures? judgeClient)
+    IJudgeClientProcedures GetRpcClient(string enduranceEventId)
     {
+        if (string.IsNullOrWhiteSpace(enduranceEventId))
+        {
+            throw new InvalidOperationException("Message cannot be sent - you're not connected to an Event");
+        }
+
         var identifier = enduranceEventId.ToString();
         var connectionId = _primaryConnections.GetConnectionId(identifier);
         if (connectionId == null)
         {
-            judgeClient = null;
-            return false;
+            // TODO: Implement a queue, which stores, persists and requeues messages when a primary listener connects
+            // That messages that are send are never lost an clients are free to operate
+            throw new InvalidOperationException("Message cannot be sent - No one is connected to that evet");
         }
 
-        judgeClient = _judgeRelay.Clients.Client(connectionId);
-        return true;
+        return _judgeRelay.Clients.Client(connectionId);
     }
 }

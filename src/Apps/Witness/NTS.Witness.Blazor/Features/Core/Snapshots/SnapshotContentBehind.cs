@@ -87,12 +87,7 @@ public class SnapshotContentBehind : NStatefulComponent
 
             var snapshotPayload = new SnapshotPayload(SnapshotParticipations, snapshotType);
             var snapshotModel = SnapshotModel.MapFrom(snapshotPayload);
-            var result = await SnapshotService.PublishSnapshotsAsync(snapshotModel);
-            if (result.IsSuccessful == false)
-            {
-                Notifier.Error(An_error_occurred_while_sending_snapshots_Please_try_again_string);
-                return;
-            }
+            await SnapshotService.PublishSnapshotsAsync(snapshotModel);
 
             StateHasChanged();
             Notifier.Success(string.Format(Snapshots_sent_as__string, snapshotType));

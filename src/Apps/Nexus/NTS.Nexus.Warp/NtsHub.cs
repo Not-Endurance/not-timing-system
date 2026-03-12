@@ -23,9 +23,9 @@ public class NtsHub<T> : Hub<T>
         var query = Context.GetHttpContext()!.Request.Query;
         if (!query.TryGetValue(RpcConstants.CONNECTION_GROUP_KEY, out var value))
         {
-            _logger.LogInformation("******* Aborting connection due to missing event ID ******* ");
-            Context.Abort();
-            return;
+            const string message = "SignalR connection rejected because the event ID query parameter is missing.";
+            _logger.LogInformation("******* {Message} *******", message);
+            throw new InvalidOperationException(message);
         }
         var enduranceEventId = value.ToString();
         await Groups.AddToGroupAsync(Context.ConnectionId, enduranceEventId);
@@ -36,4 +36,3 @@ public class NtsHub<T> : Hub<T>
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, RpcConstants.CONNECTION_GROUP_KEY);
     }
 }
-
