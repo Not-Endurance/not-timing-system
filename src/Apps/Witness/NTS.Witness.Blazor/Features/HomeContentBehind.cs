@@ -5,7 +5,6 @@ using Not.Blazor.Components.Abstractions;
 using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Witness.Features.Core.State;
 using NTS.Witness.Features.Setup.UpcomingEvents;
 using NTS.Witness.Features.Socket;
 
@@ -27,9 +26,6 @@ public class HomeContentBehind : NComponent
 
     [Inject]
     IReadMany<Participation> Participations { get; set; } = default!;
-
-    [Inject]
-    IParticipationService ParticipationService { get; set; } = default!;
 
     protected IEnumerable<UpcomingEvent> Events { get; set; } = [];
     protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
@@ -67,7 +63,6 @@ public class HomeContentBehind : NComponent
 
             await SocketService.Connect(upcomingEvent);
             var activeParticipations = await Participations.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
-            ParticipationService.Set(activeParticipations);
             StateHasChanged();
         }
         catch (Exception ex)

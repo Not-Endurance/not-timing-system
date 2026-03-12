@@ -32,7 +32,13 @@ public class SnapshotContentBehind : NStatefulComponent
 
     protected override async Task OnInitializedAsync()
     {
+        ParticipationContext.Selected = null;
         await Observe(ParticipationContext);
+    }
+
+    protected override void OnBeforeRender()
+    {
+        TrackSelection();
     }
 
     protected void SetButtonText(int id)
@@ -48,26 +54,6 @@ public class SnapshotContentBehind : NStatefulComponent
                     ButtonText = Vetin_string;
                     break;
             }
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-    }
-
-    protected void SelectHandler(Participation participation)
-    {
-        try
-        {
-            var snapshotParticipant = new IntermediateSnapshot(
-                participation.Combination.Number,
-                participation.Combination.Athlete.Names
-            );
-            if (!SelectedParticipations.Exists(sp => sp.Number == snapshotParticipant.Number))
-            {
-                SelectedParticipations.Add(snapshotParticipant);
-            }
-            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -141,6 +127,44 @@ public class SnapshotContentBehind : NStatefulComponent
                 GuardHelper.ThrowIfDefault(updatedTimestamp);
                 GuardHelper.ThrowIfDefault(updatedTimestamp.TimestampInput);
                 snapshotParticipant.Timestamp = new Timestamp(updatedTimestamp.TimestampInput);
+            }
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    void TrackSelection()
+    {
+        try
+        {
+            var participation = ParticipationContext.Selected;
+            if (participation == null)
+            {
+                return;
+            }
+
+            AddParticipation(participation);
+            ParticipationContext.Selected = null;
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    void AddParticipation(Participation participation)
+    {
+        try
+        {
+            var snapshotParticipant = new IntermediateSnapshot(
+                participation.Combination.Number,
+                participation.Combination.Athlete.Names
+            );
+            if (!SelectedParticipations.Exists(sp => sp.Number == snapshotParticipant.Number))
+            {
+                SelectedParticipations.Add(snapshotParticipant);
             }
         }
         catch (Exception ex)

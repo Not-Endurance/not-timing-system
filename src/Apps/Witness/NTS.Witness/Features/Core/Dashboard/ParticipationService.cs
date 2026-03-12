@@ -1,14 +1,14 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
 using Not.Collections;
 using Not.Injection;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
-using NTS.Witness.Features.Core.Dashboard;
 
-namespace NTS.Witness.Features.Core.State;
+namespace NTS.Witness.Features.Core.Dashboard;
 
 public class ParticipationService
     : NStatefulService<ObservableList<Participation>>,
@@ -19,15 +19,33 @@ public class ParticipationService
         INotificationHandler<ParticipationRestored>,
         ISingleton
 {
-    public IEnumerable<Participation> Active
+    readonly IReadMany<Participation> _participationReader;
+    Participation? _selected;
+
+    public ParticipationService(IReadMany<Participation> participationReader)
     {
-        get => State;
-        set => State.Replace(value);
+        _participationReader = participationReader;
     }
 
-    public Participation? Selected { get; set; }
+    public Participation? Selected
+    {
+        get => _selected;
+        set
+        {
+            _selected = value;
+            EmitChanged();
+        }
+    }
+
     public IReadOnlyList<Participation> Participations => State;
-    public IReadOnlyList<int> RecentlyTimed { get; set; } = [];
+    public IReadOnlyList<int> RecentlyTimed { get; } = [];
+
+    protected override async Task<bool> InitializeState()
+    {
+        var participations = await _participationReader.ReadMany();
+        State.ClearAndAddRange(participations);
+        return State.Any();
+    }
 
     public void Update(Participation participation, NCollectionAction action)
     {
@@ -42,11 +60,6 @@ public class ParticipationService
     public Participation GetParticipation(Person person)
     {
         return Participations.First(p => p.Combination.Athlete.Names.Equals(person));
-    }
-
-    public void Set(IEnumerable<Participation> participations)
-    {
-        Active = participations;
     }
 
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)

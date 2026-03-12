@@ -131,6 +131,16 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
         }
     }
 
+    public void ClearAndAddRange(IEnumerable<T> items)
+    {
+        lock (_lock)
+        {
+            _dictionary.Clear();
+            Add(items);
+            _changed.Emit();
+        }
+    }
+
     public bool Contains(T item)
     {
         lock (_lock)
