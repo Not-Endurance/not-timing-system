@@ -3,10 +3,11 @@ using Not.Injection;
 using Not.Notify;
 using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
+using NTS.Witness.Features.Sessions;
 
 namespace NTS.Witness.Features.Socket;
 
-public class WitnessSocketService : IConnectionStatus, INtsSocketService, ISingleton
+public class WitnessSocketService : INtsSocketService, ISingleton
 {
     readonly IRpcSocket _socket;
     readonly INotifier _notifier;
@@ -30,6 +31,7 @@ public class WitnessSocketService : IConnectionStatus, INtsSocketService, ISingl
         }
 
         Principal = null;
+        await ServiceLocator.Get<IUserSessionService>().SetEventId(null);
         if (@event != null)
         {
             _notifier.Warn(string.Format(Disconnected_from__string, @event.Name));
@@ -63,14 +65,10 @@ public class WitnessSocketService : IConnectionStatus, INtsSocketService, ISingl
         }
 
         Principal = upcomingEvent;
+        await ServiceLocator.Get<IUserSessionService>().SetEventId(upcomingEvent.Id);
         if (Principal != null)
         {
             _notifier.Inform(string.Format(Connected_to__string, Principal.Name));
         }
-    }
-
-    public bool IsConnected()
-    {
-        return _socket.IsConnected;
     }
 }

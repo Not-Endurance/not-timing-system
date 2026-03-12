@@ -3,10 +3,12 @@ using Not.Blazor.Components.Abstractions;
 using Not.Exceptions;
 using Not.Notify;
 using NTS.Application.Core;
+using NTS.Application.Socket;
 using NTS.Application.Watcher;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
+using NTS.Witness.Features.Sessions;
 using NTS.Witness.Features.Core.Dashboard;
 
 namespace NTS.Witness.Blazor.Features.Core.Snapshots;
@@ -23,7 +25,13 @@ public class SnapshotContentBehind : NStatefulComponent
     INotifier Notifier { get; set; } = default!;
 
     [Inject]
-    protected IParticipationContext ParticipationContext { get; set; } = default!;
+    IParticipationContext ParticipationContext { get; set; } = default!;
+
+    [Inject]
+    IUserSessionService UserSessionService { get; set; } = default!;
+
+    [Inject]
+    INtsSocketContext SocketContext { get; set; } = default!;
 
     protected List<IntermediateSnapshot> SelectedParticipations { get; set; } = [];
     protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
@@ -88,6 +96,7 @@ public class SnapshotContentBehind : NStatefulComponent
             var snapshotPayload = new SnapshotPayload(SnapshotParticipations, snapshotType);
             var snapshotModel = SnapshotModel.MapFrom(snapshotPayload);
             await SnapshotService.PublishSnapshotsAsync(snapshotModel);
+            await UserSessionService.AppendSnapshot(snapshotPayload, SocketContext.Event?.Id);
 
             StateHasChanged();
             Notifier.Success(string.Format(Snapshots_sent_as__string, snapshotType));

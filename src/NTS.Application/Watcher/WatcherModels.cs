@@ -1,4 +1,7 @@
-﻿using NTS.Domain.Enums;
+using Not.Krud.Abstractions;
+using NTS.Application.Shared;
+using NTS.Domain.Core;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 
@@ -46,5 +49,37 @@ public class SnapshotModel
     {
         var snapshots = Entries.Select(entry => entry.MapToDomain());
         return new SnapshotPayload(snapshots, Type);
+    }
+}
+
+public class UserSessionModel : IDocument, IKrudModel<UserSessionModel>, ICoreSession
+{
+    public static UserSessionModel From(ICoreSession session, int id)
+    {
+        var model = new UserSessionModel();
+        model.Id = id;
+        model.EventId = session.EventId;
+        model.SnapshotHistory = session.SnapshotHistory.Select(SnapshotModel.MapFrom).ToArray();
+        return model;
+    }
+
+    IReadOnlyList<SnapshotPayload> ICoreSession.SnapshotHistory => SnapshotHistory.Select(x => x.MapToDomain()).ToArray();
+    public int Id { get; set; }
+    public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public int? EventId { get; set; }
+    public SnapshotModel[] SnapshotHistory { get; set; } = [];
+
+    public void MapFrom(UserSessionModel session)
+    {
+        Id = session.Id;
+        EventId = session.EventId;
+        SnapshotHistory = [.. session.SnapshotHistory];
+    }
+
+    public UserSessionModel MapToEntity()
+    {
+        var model = new UserSessionModel();
+        model.MapFrom(this);
+        return model;
     }
 }
