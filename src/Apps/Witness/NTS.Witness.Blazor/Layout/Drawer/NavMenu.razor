@@ -1,0 +1,21 @@
+@using Not.Blazor.Components.Layout
+
+@inherits NavMenuBehind
+
+<MudNavMenu>
+
+    <MudNavGroup Title="@Setup_string" Expanded="true">
+        <NNavLink Endpoint="@HOME" Match="NavLinkMatch.All">@Select_event_string</NNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Core" Expanded="true">
+        <NNavLink Endpoint="@SNAPSHOT_PAGE">@Snapshot_page_string</NNavLink>
+        <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
+        <NNavLink Endpoint="@PERFORMANCE_PAGE">@Performance_string</NNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Support" Expanded="true">
+        <NNavLink Endpoint="@EMERGENCY_CONTACTS_PAGE">@Contacts_string</NNavLink>
+    </MudNavGroup>
+
+</MudNavMenu>

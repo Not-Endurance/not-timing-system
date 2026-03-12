@@ -1,0 +1,22 @@
+@using Not.Blazor.Components
+@inherits HelpButtonBehind
+
+@if (IsEmergencyContactsConfigured)
+{
+    <MudFab Color="Color.Surface"
+            StartIcon="@Icons.Material.Filled.LocalPhone"
+            IconColor="Color.Error"
+            Style="color:rgb(244, 67, 54)"
+            Size="Size.Large"
+            Label="@Help_string"
+            OnClick="ClickHandler"
+            Class="@Class" />
+}
+
+<style>
+    .help-button {
+        position: fixed;
+        left: 2rem;
+        bottom: 3rem;
+    }
+</style>

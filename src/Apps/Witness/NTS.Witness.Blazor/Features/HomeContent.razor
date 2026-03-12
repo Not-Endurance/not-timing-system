@@ -1,0 +1,33 @@
+@using NTS.Domain.Setup.Aggregates
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(HOME)]
+@inherits HomeContentBehind
+
+<NContent Title="@Select_event_string">
+
+    <Main>
+        <NTable Items="@Events" EmptyMessage="@Empty_event_list_message" Headings="@EventsTableHeaders">
+            <TrailingCell Context="item">
+                @{
+                    var context = (UpcomingEvent)item;
+                }
+
+                @if (IsConnected && SelectedEvent?.Id == context.Id)
+                {
+                    <NButtonPrimary Color="Color.Error" Style="width:120px" OnClick="() => Disconnect()">@Disconnect_string</NButtonPrimary>
+                }
+                else
+                {
+                    <NButtonPrimary Color="Color.Success" Style="width:120px" OnClick="() => ConnectTo(context)">@Connect_string</NButtonPrimary>
+                }
+            </TrailingCell>
+        </NTable>
+
+        <MudStack Class="mt-4" AlignItems="AlignItems.Start">
+            <MudText Typo="Typo.caption">@string.Format(Signed_in_as__string, UserName)</MudText>
+            <MudText Typo="Typo.caption">@string.Format(You_have___privileges_string, UserRoles)</MudText>
+        </MudStack>
+    </Main>
+
+</NContent>
