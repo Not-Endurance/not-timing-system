@@ -4,8 +4,6 @@
 
 <MudNavMenu>
 
-    <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
-
     <NNavLink Endpoint="@SNAPSHOT_PAGE">@Snapshot_page_string</NNavLink>
     
     <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
@@ -15,5 +13,7 @@
     <MudNavGroup Title="Support" Expanded="true">
         <NNavLink Endpoint="@EMERGENCY_CONTACTS_PAGE">@Contacts_string</NNavLink>
     </MudNavGroup>
+
+    <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
 
 </MudNavMenu>
