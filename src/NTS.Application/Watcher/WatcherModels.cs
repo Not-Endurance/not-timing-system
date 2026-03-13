@@ -36,6 +36,7 @@ public class SnapshotGroupModel
     public static SnapshotGroupModel MapFrom(SnapshotGroup group)
     {
         return new SnapshotGroupModel
+
         {
             Entries = group.Entries.AsEnumerable().Select(SnapshotModel.MapFrom).ToArray(),
             Type = group.Type.ToString(),

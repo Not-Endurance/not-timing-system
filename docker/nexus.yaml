@@ -60,6 +60,7 @@ services:
       dockerfile: src/Apps/Nexus/NTS.Nexus.Warp/Dockerfile
     environment:
       PORT: "80"
+      MONGO_CONNECTION_STRING: mongodb://mongodb:27017
     ports:
       - "11337:80"
 
