@@ -4,5 +4,5 @@ namespace NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 
 public interface IWitnessHubProcedures
 {
-    Task Receive(WarpRequest<SnapshotModel> request);
+    Task Receive(WarpRequest<SnapshotGroupModel> request);
 }

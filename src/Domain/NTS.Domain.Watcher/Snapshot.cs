@@ -1,18 +1,17 @@
-﻿using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
 namespace NTS.Domain.Watcher;
 
-public record IntermediateSnapshot
+public record Snapshot
 {
-    public IntermediateSnapshot(int number, Person athlete, Timestamp timestamp)
+    public Snapshot(int number, Person athlete, Timestamp timestamp)
     {
         Number = number;
         Athlete = athlete;
         Timestamp = timestamp;
     }
 
-    public IntermediateSnapshot(int number, Person athlete)
+    public Snapshot(int number, Person athlete)
     {
         Number = number;
         Athlete = athlete;

@@ -33,8 +33,8 @@ public class SnapshotContentBehind : NStatefulComponent
     [Inject]
     INtsSocketContext SocketContext { get; set; } = default!;
 
-    protected List<IntermediateSnapshot> SelectedParticipations { get; set; } = [];
-    protected List<IntermediateSnapshot> SnapshotParticipations { get; set; } = [];
+    protected List<Snapshot> SelectedParticipations { get; set; } = [];
+    protected List<Snapshot> SnapshotParticipations { get; set; } = [];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
 
@@ -69,7 +69,7 @@ public class SnapshotContentBehind : NStatefulComponent
         }
     }
 
-    protected void SnapshotHandler(IntermediateSnapshot snapshotParticipant)
+    protected void SnapshotHandler(Snapshot snapshotParticipant)
     {
         try
         {
@@ -93,10 +93,10 @@ public class SnapshotContentBehind : NStatefulComponent
                 return;
             }
 
-            var snapshotPayload = new SnapshotPayload(SnapshotParticipations, snapshotType);
-            var snapshotModel = SnapshotModel.MapFrom(snapshotPayload);
-            await SnapshotService.PublishSnapshotsAsync(snapshotModel);
-            await UserSessionService.AppendSnapshot(snapshotPayload, SocketContext.Event?.Id);
+            var snapshotGroup = new SnapshotGroup(SnapshotParticipations, snapshotType);
+            var snapshotGroupModel = SnapshotGroupModel.MapFrom(snapshotGroup);
+            await SnapshotService.PublishSnapshotsAsync(snapshotGroupModel);
+            await UserSessionService.AppendSnapshot(snapshotGroup, SocketContext.Event?.Id);
 
             StateHasChanged();
             Notifier.Success(string.Format(Snapshots_sent_as__string, snapshotType));
@@ -109,7 +109,7 @@ public class SnapshotContentBehind : NStatefulComponent
         }
     }
 
-    protected async Task EditSnapshot(IntermediateSnapshot snapshotParticipant)
+    protected async Task EditSnapshot(Snapshot snapshotParticipant)
     {
         try
         {
@@ -162,7 +162,7 @@ public class SnapshotContentBehind : NStatefulComponent
     {
         try
         {
-            var snapshotParticipant = new IntermediateSnapshot(
+            var snapshotParticipant = new Snapshot(
                 participation.Combination.Number,
                 participation.Combination.Athlete.Names
             );

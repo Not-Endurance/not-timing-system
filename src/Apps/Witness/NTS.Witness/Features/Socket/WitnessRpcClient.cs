@@ -38,7 +38,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotSe
         RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
     }
 
-    public async Task PublishSnapshotsAsync(SnapshotModel model)
+    public async Task PublishSnapshotsAsync(SnapshotGroupModel model)
     {
         GuardHelper.ThrowIfDefault(_eventContext.Event);
         GuardHelper.ThrowIfDefault(_socket.Connection);

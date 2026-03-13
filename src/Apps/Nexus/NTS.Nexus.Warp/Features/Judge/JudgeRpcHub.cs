@@ -13,17 +13,20 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
     readonly ILogger<JudgeRpcHub> _logger;
     readonly IHubContext<WitnessRpcHub, IWitnessClientProcedures> _witnessRelay;
     readonly PrimaryConnectionsContext _primaryConnections;
+    readonly IPendingSnapshotsService _pendingSnapshots;
 
     public JudgeRpcHub(
         ILogger<JudgeRpcHub> logger,
         IHubContext<WitnessRpcHub, IWitnessClientProcedures> witnessRelay,
-        PrimaryConnectionsContext primaryConnections
+        PrimaryConnectionsContext primaryConnections,
+        IPendingSnapshotsService pendingSnapshots
     )
         : base(logger)
     {
         _logger = logger;
         _witnessRelay = witnessRelay;
         _primaryConnections = primaryConnections;
+        _pendingSnapshots = pendingSnapshots;
     }
 
     public override async Task OnConnectedAsync()
@@ -31,6 +34,7 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
         await base.OnConnectedAsync();
         var enduranceEventId = GetConnectionGroup()!;
         _primaryConnections.Add(enduranceEventId, Context.ConnectionId);
+        await FlushPendingSnapshots(enduranceEventId);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -68,5 +72,35 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
             serialized
         );
     }
-}
 
+    async Task FlushPendingSnapshots(string enduranceEventId)
+    {
+        var pendingDocuments = await _pendingSnapshots.Read(enduranceEventId);
+        if (pendingDocuments.Count == 0)
+        {
+            return;
+        }
+
+        var pendingSnapshotCount = pendingDocuments.Sum(x => x.SnapshotGroups.Length);
+        try
+        {
+            foreach (var pendingDocument in pendingDocuments)
+            {
+                foreach (var pendingSnapshotGroup in pendingDocument.SnapshotGroups)
+                {
+                    await Clients.Caller.Receive(pendingSnapshotGroup);
+                }
+                await _pendingSnapshots.Remove(pendingDocument);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Failed to flush {count} pending witness snapshots for event '{enduranceEventId}'. Keeping them persisted.",
+                pendingSnapshotCount,
+                enduranceEventId
+            );
+        }
+    }
+}

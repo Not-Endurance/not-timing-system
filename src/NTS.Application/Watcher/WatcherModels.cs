@@ -7,11 +7,11 @@ using NTS.Domain.Watcher;
 
 namespace NTS.Application.Watcher;
 
-public class IntermediateSnapshotModel
+public class SnapshotModel
 {
-    public static IntermediateSnapshotModel MapFrom(IntermediateSnapshot snapshot)
+    public static SnapshotModel MapFrom(Snapshot snapshot)
     {
-        return new IntermediateSnapshotModel
+        return new SnapshotModel
         {
             Number = snapshot.Number,
             Names = snapshot.Athlete.Names,
@@ -23,32 +23,32 @@ public class IntermediateSnapshotModel
     public string[] Names { get; set; } = [];
     public string Timestamp { get; set; } = "";
 
-    public IntermediateSnapshot MapToDomain()
+    public Snapshot MapToDomain()
     {
         var athlete = new Person(Names);
         var timestamp = new Timestamp(Timestamp);
-        return new IntermediateSnapshot(Number, athlete, timestamp);
+        return new Snapshot(Number, athlete, timestamp);
     }
 }
 
-public class SnapshotModel
+public class SnapshotGroupModel
 {
-    public static SnapshotModel MapFrom(SnapshotPayload payload)
+    public static SnapshotGroupModel MapFrom(SnapshotGroup group)
     {
-        return new SnapshotModel
+        return new SnapshotGroupModel
         {
-            Entries = payload.Entries.AsEnumerable().Select(IntermediateSnapshotModel.MapFrom).ToArray(),
-            Type = payload.Type.ToString(),
+            Entries = group.Entries.AsEnumerable().Select(SnapshotModel.MapFrom).ToArray(),
+            Type = group.Type.ToString(),
         };
     }
 
-    public IntermediateSnapshotModel[] Entries { get; set; } = [];
+    public SnapshotModel[] Entries { get; set; } = [];
     public string Type { get; set; } = "";
 
-    public SnapshotPayload MapToDomain()
+    public SnapshotGroup MapToDomain()
     {
         var snapshots = Entries.Select(entry => entry.MapToDomain());
-        return new SnapshotPayload(snapshots, Type);
+        return new SnapshotGroup(snapshots, Type);
     }
 }
 
@@ -59,15 +59,15 @@ public class UserSessionModel : IDocument, IKrudModel<UserSessionModel>, ICoreSe
         var model = new UserSessionModel();
         model.Id = id;
         model.EventId = session.EventId;
-        model.SnapshotHistory = session.SnapshotHistory.Select(SnapshotModel.MapFrom).ToArray();
+        model.SnapshotHistory = session.SnapshotHistory.Select(SnapshotGroupModel.MapFrom).ToArray();
         return model;
     }
 
-    IReadOnlyList<SnapshotPayload> ICoreSession.SnapshotHistory => SnapshotHistory.Select(x => x.MapToDomain()).ToArray();
+    IReadOnlyList<SnapshotGroup> ICoreSession.SnapshotHistory => SnapshotHistory.Select(x => x.MapToDomain()).ToArray();
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public int? EventId { get; set; }
-    public SnapshotModel[] SnapshotHistory { get; set; } = [];
+    public SnapshotGroupModel[] SnapshotHistory { get; set; } = [];
 
     public void MapFrom(UserSessionModel session)
     {

@@ -3,8 +3,10 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
+using NTS.Application.Watcher;
 using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Enums;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Features.Core.Dashboard;
 using NTS.Nexus.Warp.Contracts;
@@ -38,14 +40,15 @@ public class JudgeRpcClient
 
     public override void RunAtStartup()
     {
-        RegisterInputProcedure<IEnumerable<Snapshot>>(nameof(Receive), Receive);
+        RegisterInputProcedure<SnapshotGroupModel>(nameof(Receive), Receive);
     }
 
-    public async Task Receive(IEnumerable<Snapshot> snapshots)
+    public async Task Receive(SnapshotGroupModel snapshotGroup)
     {
-        foreach (Snapshot snapshot in snapshots)
+        var group = snapshotGroup.MapToDomain();
+        foreach (var entry in group.Entries)
         {
-            await _timingService.Record(snapshot);
+            await _timingService.Record(new Snapshot(entry.Number, group.Type, SnapshotMethod.Manual, entry.Timestamp));
         }
     }
 
@@ -97,4 +100,3 @@ public class JudgeRpcClient
         }
     }
 }
-

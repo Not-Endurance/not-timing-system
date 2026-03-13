@@ -1,8 +1,8 @@
-using NTS.Domain.Aggregates;
+using NTS.Application.Watcher;
 
 namespace NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 
 public interface IJudgeClientProcedures
 {
-    Task Receive(IEnumerable<Snapshot> snapshots);
+    Task Receive(SnapshotGroupModel snapshotGroup);
 }

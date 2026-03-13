@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Not.Application.UdpHandshake;
 using Not.Localization;
 using Not.Serialization.JSON;
+using Not.Storage;
 using NTS.Application;
 using NTS.Application.Cors;
 using NTS.Nexus.Warp.Middlewares;
@@ -38,10 +39,20 @@ internal static class NtsWarpServices
             })
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = NJsonSettings.ConfigureServerSerialization());
 
-        // TODO: Not.Application is getting handshaked..
-
         services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly());
+        services.AddPendingSnapshotsMongoStorage(configuration);
         return services.AddDummyLocalizer().AddTransient<INetworkBroadcastService, JudgeHandshakeService>();
     }
-}
 
+    static void AddPendingSnapshotsMongoStorage(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new ApplicationException("MongoDB connection string is null");
+        }
+
+        var builder = new NStorageBuilder(services, configuration);
+        builder.AddMongoStorage(connectionString, Assembly.GetExecutingAssembly());
+    }
+}

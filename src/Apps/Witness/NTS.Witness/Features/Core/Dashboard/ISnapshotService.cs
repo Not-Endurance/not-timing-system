@@ -4,5 +4,5 @@ namespace NTS.Witness.Features.Core.Dashboard;
 
 public interface ISnapshotService
 {
-    Task PublishSnapshotsAsync(SnapshotModel model);
+    Task PublishSnapshotsAsync(SnapshotGroupModel model);
 }

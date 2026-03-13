@@ -65,7 +65,7 @@ public class UserSessionService : IUserSessionService, IScoped
         await _sessions.Update(session);
     }
 
-    public async Task AppendSnapshot(SnapshotPayload snapshot, int? eventId = null)
+    public async Task AppendSnapshot(SnapshotGroup snapshot, int? eventId = null)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
 
@@ -82,7 +82,7 @@ public class UserSessionService : IUserSessionService, IScoped
             {
                 Id = user.Id,
                 EventId = eventId,
-                SnapshotHistory = [SnapshotModel.MapFrom(snapshot)],
+                SnapshotHistory = [SnapshotGroupModel.MapFrom(snapshot)],
             };
             await _sessions.Create(session);
             return;
@@ -93,7 +93,7 @@ public class UserSessionService : IUserSessionService, IScoped
             session.EventId = eventId.Value;
         }
 
-        session.SnapshotHistory = [.. session.SnapshotHistory, SnapshotModel.MapFrom(snapshot)];
+        session.SnapshotHistory = [.. session.SnapshotHistory, SnapshotGroupModel.MapFrom(snapshot)];
         await _sessions.Update(session);
     }
 
@@ -191,6 +191,6 @@ public interface IUserSessionService
 {
     Task<ICoreSession?> GetCurrent();
     Task SetEventId(int? eventId);
-    Task AppendSnapshot(SnapshotPayload snapshot, int? eventId = null);
+    Task AppendSnapshot(SnapshotGroup snapshot, int? eventId = null);
     Task DeleteCurrent();
 }

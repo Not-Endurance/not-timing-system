@@ -21,7 +21,7 @@
                     Style="height: 65vh;">
                 <TrailingCell Context="item">
                     @{
-                        var context = (IntermediateSnapshot)item;
+                        var context = (Snapshot)item;
                     }
 
                     @if (context.Timestamp == null)

@@ -1,10 +1,10 @@
-﻿using NTS.Domain.Enums;
+using NTS.Domain.Enums;
 
 namespace NTS.Domain.Watcher;
 
-public class SnapshotPayload
+public class SnapshotGroup
 {
-    public SnapshotPayload(IEnumerable<IntermediateSnapshot> snapshots, string type)
+    public SnapshotGroup(IEnumerable<Snapshot> snapshots, string type)
     {
         Entries = snapshots;
         if (Enum.TryParse(type, out SnapshotType snapshotType))
@@ -17,7 +17,7 @@ public class SnapshotPayload
         }
     }
 
-    public IEnumerable<IntermediateSnapshot> Entries { get; set; } = [];
+    public IEnumerable<Snapshot> Entries { get; set; } = [];
 
     public SnapshotType Type { get; set; }
 }
