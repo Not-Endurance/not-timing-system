@@ -77,7 +77,7 @@ public class DashService : NStatefulService, IDashService, ISingleton
         // TODO: replace with events when implement domain event dispatcher and handlers
         foreach (var observable in _coreDependentObservables)
         {
-            observable.ResetState();
+            observable.ResetHasLoaded();
         }
         EmitChanged();
     }

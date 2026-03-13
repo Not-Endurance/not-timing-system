@@ -5,6 +5,7 @@ using Not.Collections;
 using Not.Injection;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
 
@@ -17,6 +18,8 @@ public class ParticipationService
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationEliminated>,
         INotificationHandler<ParticipationRestored>,
+        INotificationHandler<EventConnected>,
+        INotificationHandler<EventDisconnected>,
         ISingleton
 {
     readonly IReadMany<Participation> _participationReader;
@@ -42,7 +45,7 @@ public class ParticipationService
 
     protected override async Task<bool> InitializeState()
     {
-        var participations = await _participationReader.ReadMany();
+        var participations = await _participationReader.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
         State.ClearAndAddRange(participations);
         return State.Any();
     }
@@ -64,14 +67,7 @@ public class ParticipationService
 
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
-        var participation = notification.Participation;
-        if (participation.Phases.Current.IsComplete() && participation.Phases.Current.IsFinal)
-        {
-            Update(participation, NCollectionAction.Remove);
-            return Task.CompletedTask;
-        }
-
-        Update(participation, NCollectionAction.AddOrUpdate);
+        Update(notification.Participation, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;
     }
 
@@ -84,6 +80,19 @@ public class ParticipationService
     public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
     {
         Update(notification.Participation, NCollectionAction.AddOrUpdate);
+        return Task.CompletedTask;
+    }
+
+    public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
+    {
+        await ReloadState();
+    }
+
+    public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
+    {
+        _selected = null;
+        State.Clear();
+        ClearState();
         return Task.CompletedTask;
     }
 }

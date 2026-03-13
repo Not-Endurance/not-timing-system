@@ -9,30 +9,33 @@
 
 <ErrorBoundary @ref="@ErrorBoundary">
     <ChildContent>
-        <CascadingAuthenticationState>
-            <Router AppAssembly="@Assembly" AdditionalAssemblies="@RouteAssemblies">
+        @if (IsSessionInitialized)
+        {
+            <CascadingAuthenticationState>
+                <Router AppAssembly="@Assembly" AdditionalAssemblies="@RouteAssemblies">
 
-                <Found Context="routeData">
+                    <Found Context="routeData">
 
-                    <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                        <NotAuthorized>
-                            <AuthenticateContent />
-                        </NotAuthorized>
-                    </AuthorizeRouteView>
+                        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                            <NotAuthorized>
+                                <AuthenticateContent />
+                            </NotAuthorized>
+                        </AuthorizeRouteView>
 
-                    <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+                        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
 
-                </Found>
+                    </Found>
 
-                <NotFound>
+                    <NotFound>
 
-                    <LayoutView Layout="@typeof(MainLayout)">
-                        <p role="alert">@Sorry_theres_nothing_at_this_address_string</p>
-                    </LayoutView>
+                        <LayoutView Layout="@typeof(MainLayout)">
+                            <p role="alert">@Sorry_theres_nothing_at_this_address_string</p>
+                        </LayoutView>
 
-                </NotFound>
-            </Router>
-        </CascadingAuthenticationState>
+                    </NotFound>
+                </Router>
+            </CascadingAuthenticationState>
+        }
     </ChildContent>
 
     <ErrorContent>

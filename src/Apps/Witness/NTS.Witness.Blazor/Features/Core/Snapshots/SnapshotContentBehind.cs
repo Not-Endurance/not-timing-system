@@ -8,6 +8,7 @@ using NTS.Application.Watcher;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
+using NTS.Witness.Blazor.Features.Socket;
 using NTS.Witness.Features.Sessions;
 using NTS.Witness.Features.Core.Dashboard;
 
@@ -33,6 +34,9 @@ public class SnapshotContentBehind : NStatefulComponent
     [Inject]
     INtsSocketContext SocketContext { get; set; } = default!;
 
+    [Inject]
+    BlazorSocketService BlazorSocketService { get; set; } = default!;
+
     protected List<Snapshot> SelectedParticipations { get; set; } = [];
     protected List<Snapshot> SnapshotParticipations { get; set; } = [];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
@@ -47,6 +51,14 @@ public class SnapshotContentBehind : NStatefulComponent
     protected override void OnBeforeRender()
     {
         TrackSelection();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await BlazorSocketService.EnsureConnected();
+        }
     }
 
     protected void SetButtonText(int id)

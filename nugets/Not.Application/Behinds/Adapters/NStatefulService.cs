@@ -28,10 +28,23 @@ public abstract class NStatefulService : Observer, IStatefulService
         _changed.Emit();
     }
 
+    protected virtual async Task ReloadState()
+    {
+        ResetHasLoaded();
+        await Load();
+        EmitChanged();
+    }
+
+    protected virtual void ClearState()
+    {
+        ResetHasLoaded();
+        EmitChanged();
+    }
+
     /// <summary>
     /// Resets the service state, which will cause <seealso cref="InitializeState"/> to execute again on next Render.
     /// </summary>
-    public void ResetState()
+    public void ResetHasLoaded()
     {
         _hasLoaded = false;
     }

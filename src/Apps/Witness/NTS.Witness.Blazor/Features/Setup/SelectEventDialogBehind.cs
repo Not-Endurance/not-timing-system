@@ -1,14 +1,11 @@
-using Not.Application.Authentication.Abstractions;
-using Not.Application.CRUD.Ports;
-using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Dialogs.Abstractions;
 using NTS.Application.Socket;
-using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Features.Setup.UpcomingEvents;
 
-namespace NTS.Witness.Blazor.Features;
+namespace NTS.Witness.Blazor.Features.Setup;
 
-public class HomeContentBehind : NComponent
+public class SelectEventDialogBehind : NDialog
 {
     [Inject]
     IUpcomingEventService UpcomingEventService { get; set; } = default!;
@@ -16,27 +13,15 @@ public class HomeContentBehind : NComponent
     [Inject]
     INtsSocketService SocketService { get; set; } = default!;
 
-    [Inject]
-    IReadMany<Participation> Participations { get; set; } = default!;
-
-    [Inject]
-    INUserSession? UserSession { get; set; } = default!;
-
     protected IEnumerable<UpcomingEvent> Events { get; set; } = [];
     protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
-    protected string UserName { get; set; } = string.Empty;
-    protected string UserRoles { get; set; } = string.Empty;
-    protected bool IsConnected => SocketService.Event != null;
+    protected bool IsConnected => SocketService.IsConnected;
     protected UpcomingEvent? SelectedEvent => SocketService.Event;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            if (UserSession != null)
-            {
-                await UserSession.Initialize();
-            }
             Events = await UpcomingEventService.GetEvents();
         }
         catch (Exception ex)
@@ -49,14 +34,16 @@ public class HomeContentBehind : NComponent
     {
         try
         {
-            if (IsConnected)
+            if (SocketService.IsConnected && SelectedEvent?.Id != upcomingEvent.Id)
             {
                 await SocketService.Disconnect();
             }
 
             await SocketService.Connect(upcomingEvent);
-            var activeParticipations = await Participations.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
-            StateHasChanged();
+            if (SocketService.IsConnected)
+            {
+                await ConfirmDialog();
+            }
         }
         catch (Exception ex)
         {
@@ -69,7 +56,6 @@ public class HomeContentBehind : NComponent
         try
         {
             await SocketService.Disconnect();
-            StateHasChanged();
         }
         catch (Exception ex)
         {

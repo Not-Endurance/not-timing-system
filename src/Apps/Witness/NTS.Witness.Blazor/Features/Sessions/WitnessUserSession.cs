@@ -13,22 +13,19 @@ public class WitnessUserSession : INUserSession
     readonly IUpcomingEventService _upcomingEvents;
     readonly IRepository<EnduranceEvent> _enduranceEvents;
     readonly INtsSocketService _socketService;
-    readonly NavigationManager _navigationManager;
     bool _isInitialized;
 
     public WitnessUserSession(
         IUserSessionService userSessionService,
         IUpcomingEventService upcomingEvents,
         IRepository<EnduranceEvent> enduranceEvents,
-        INtsSocketService socketService,
-        NavigationManager navigationManager
+        INtsSocketService socketService
     )
     {
         _userSessionService = userSessionService;
         _upcomingEvents = upcomingEvents;
         _enduranceEvents = enduranceEvents;
         _socketService = socketService;
-        _navigationManager = navigationManager;
     }
 
     public async Task Initialize()
@@ -54,11 +51,6 @@ public class WitnessUserSession : INUserSession
             }
 
             await _socketService.Connect(upcomingEvent);
-            if (_socketService.Event != null)
-            {
-                _navigationManager.NavigateTo(Routes.SNAPSHOT_PAGE);
-            }
-
             return;
         }
 
@@ -69,6 +61,5 @@ public class WitnessUserSession : INUserSession
         }
 
         await _userSessionService.DeleteCurrent();
-        _navigationManager.NavigateTo(Routes.HOME);
     }
 }

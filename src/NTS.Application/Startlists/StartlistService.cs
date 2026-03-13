@@ -2,6 +2,7 @@ using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Startlists;
 
@@ -13,7 +14,9 @@ public class StartlistService
         IStartHistory,
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationRestored>,
-        INotificationHandler<ParticipationEliminated>
+        INotificationHandler<ParticipationEliminated>,
+        INotificationHandler<EventConnected>,
+        INotificationHandler<EventDisconnected>
 {
     static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_BY_STAGE =
         new Dictionary<int, IReadOnlyList<Starter>>();
@@ -64,6 +67,18 @@ public class StartlistService
     public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
     {
         RemoveEntry(notification.Participation);
+        return Task.CompletedTask;
+    }
+
+    public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
+    {
+        await ReloadState();
+    }
+
+    public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
+    {
+        Startlist = new Startlist([]);
+        ClearState();
         return Task.CompletedTask;
     }
 

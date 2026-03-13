@@ -1,12 +1,12 @@
 @using NTS.Domain.Setup.Aggregates
 @using Not.Blazor.Components.Layout
+@using Not.Blazor.Dialogs.Abstractions
 
-@attribute [Route(HOME)]
-@inherits HomeContentBehind
+@inherits SelectEventDialogBehind
 
-<NContent Title="@Select_event_string">
+<MudDialog>
 
-    <Main>
+    <DialogContent>
         <NTable Items="@Events" EmptyMessage="@Empty_event_list_message" Headings="@EventsTableHeaders">
             <TrailingCell Context="item">
                 @{
@@ -15,7 +15,7 @@
 
                 @if (IsConnected && SelectedEvent?.Id == context.Id)
                 {
-                    <NButtonPrimary Color="Color.Error" Style="width:120px" OnClick="() => Disconnect()">@Disconnect_string</NButtonPrimary>
+                    <NButtonPrimary Color="Color.Error" Style="width:120px" OnClick="Disconnect">@Disconnect_string</NButtonPrimary>
                 }
                 else
                 {
@@ -23,6 +23,6 @@
                 }
             </TrailingCell>
         </NTable>
-    </Main>
+    </DialogContent>
 
-</NContent>
+</MudDialog>

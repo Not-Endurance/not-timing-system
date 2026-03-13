@@ -1,7 +1,6 @@
 using Not.Krud.Abstractions;
 using NTS.Application.Shared;
 using NTS.Domain.Core;
-using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 
@@ -57,10 +56,12 @@ public class UserSessionModel : IDocument, IKrudModel<UserSessionModel>, ICoreSe
 {
     public static UserSessionModel From(ICoreSession session, int id)
     {
-        var model = new UserSessionModel();
-        model.Id = id;
-        model.EventId = session.EventId;
-        model.SnapshotHistory = session.SnapshotHistory.Select(SnapshotGroupModel.MapFrom).ToArray();
+        var model = new UserSessionModel
+        {
+            Id = id,
+            EventId = session.EventId,
+            SnapshotHistory = session.SnapshotHistory.Select(SnapshotGroupModel.MapFrom).ToArray()
+        };
         return model;
     }
 

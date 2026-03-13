@@ -1,25 +1,41 @@
+using Not.Application.DomainEvents;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Notify;
 using NTS.Application.Socket;
+using NTS.Domain.Core.Events;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Features.Sessions;
 
 namespace NTS.Witness.Features.Socket;
 
-public class WitnessSocketService : INtsSocketService, ISingleton
+public class WitnessSocketService : INtsSocketService, ISingleton, IDisposable
 {
     readonly IRpcSocket _socket;
     readonly INotifier _notifier;
+    readonly IDomainEventDispatcher _domainEventDispatcher;
 
-    public WitnessSocketService(IRpcSocket socket, INotifier notifier)
+    public WitnessSocketService(
+        IRpcSocket socket,
+        INotifier notifier,
+        IDomainEventDispatcher domainEventDispatcher
+    )
     {
         _socket = socket;
         _notifier = notifier;
+        _domainEventDispatcher = domainEventDispatcher;
+        _socket.ServerConnectionChanged += HandleServerConnectionChanged;
     }
 
+    public SocketConnectionStatus Status { get; private set; }
+    public bool IsConnected => _socket.IsConnected;
     public UpcomingEvent? Principal { get; private set; }
     public UpcomingEvent? Event => Principal;
+
+    public void Dispose()
+    {
+        _socket.ServerConnectionChanged -= HandleServerConnectionChanged;
+    }
 
     public async Task Disconnect()
     {
@@ -32,6 +48,7 @@ public class WitnessSocketService : INtsSocketService, ISingleton
 
         Principal = null;
         await ServiceLocator.Get<IUserSessionService>().SetEventId(null);
+        await _domainEventDispatcher.Dispatch(new EventDisconnected(@event?.Id));
         if (@event != null)
         {
             _notifier.Warn(string.Format(Disconnected_from__string, @event.Name));
@@ -44,12 +61,17 @@ public class WitnessSocketService : INtsSocketService, ISingleton
         {
             if (Principal.Id != upcomingEvent.Id)
             {
-                _notifier.Error(
-                    string.Format(Cannot_select_another_event_before_disconnect__string, Principal.Name)
-                );
-                return;
+                if (_socket.IsConnected)
+                {
+                    _notifier.Error(
+                        string.Format(Cannot_select_another_event_before_disconnect__string, Principal.Name)
+                    );
+                    return;
+                }
+
+                Principal = null;
             }
-            if (_socket.IsConnected)
+            else if (_socket.IsConnected)
             {
                 return;
             }
@@ -66,9 +88,21 @@ public class WitnessSocketService : INtsSocketService, ISingleton
 
         Principal = upcomingEvent;
         await ServiceLocator.Get<IUserSessionService>().SetEventId(upcomingEvent.Id);
+        await _domainEventDispatcher.Dispatch(new EventConnected(upcomingEvent.Id));
         if (Principal != null)
         {
             _notifier.Inform(string.Format(Connected_to__string, Principal.Name));
+        }
+    }
+
+    void HandleServerConnectionChanged(object? sender, SocketConnectionStatus status)
+    {
+        var previousStatus = Status;
+        Status = status;
+
+        if (status == SocketConnectionStatus.Connected && previousStatus == SocketConnectionStatus.Connecting && Principal != null)
+        {
+            _ = _domainEventDispatcher.Dispatch(new EventConnected(Principal.Id));
         }
     }
 }
