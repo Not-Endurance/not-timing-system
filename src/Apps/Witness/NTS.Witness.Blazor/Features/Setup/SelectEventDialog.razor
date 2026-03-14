@@ -4,7 +4,7 @@
 
 @inherits SelectEventDialogBehind
 
-<MudDialog>
+<MudDialog DefaultFocus="DefaultFocus.LastChild">
 
     <DialogContent>
         <NTable Items="@Events" EmptyMessage="@Empty_event_list_message" Headings="@EventsTableHeaders">

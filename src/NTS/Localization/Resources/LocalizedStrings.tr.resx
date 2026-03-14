@@ -736,4 +736,7 @@
   <data name="Affected_resources_string" xml:space="preserve">
     <value>Etkilenen kaynaklar</value>
   </data>
+  <data name="Resend_string" xml:space="preserve">
+    <value>Yeniden gonder</value>
+  </data>
 </root>

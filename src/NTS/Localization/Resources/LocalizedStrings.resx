@@ -852,6 +852,9 @@
   <data name="Restore_string" xml:space="preserve">
     <value>Restore</value>
   </data>
+  <data name="Resend_string" xml:space="preserve">
+    <value>Resend</value>
+  </data>
   <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
     <value>Sorry, there's nothing at this address.</value>
   </data>

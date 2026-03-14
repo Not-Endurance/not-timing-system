@@ -57,11 +57,17 @@ public class UserSessionService : IUserSessionService, IScoped
                 return;
             }
 
-            await _sessions.Create(new UserSessionModel { Id = user.Id, EventId = eventId });
+            await _sessions.Create(
+                new UserSessionModel
+                {
+                    Id = user.Id,
+                    EventId = eventId,
+                }
+            );
             return;
         }
 
-        session.EventId = eventId;
+        ScopeHistoryToEvent(session, eventId);
         await _sessions.Update(session);
     }
 
@@ -88,6 +94,7 @@ public class UserSessionService : IUserSessionService, IScoped
             return;
         }
 
+        ScopeHistoryToEvent(session, eventId);
         if (eventId != null)
         {
             session.EventId = eventId.Value;
@@ -112,6 +119,20 @@ public class UserSessionService : IUserSessionService, IScoped
         }
 
         await _sessions.Delete(session);
+    }
+
+    static void ScopeHistoryToEvent(UserSessionModel session, int? eventId)
+    {
+        if (eventId != null)
+        {
+            if (session.EventId != null && session.EventId != eventId)
+            {
+                session.SnapshotHistory = [];
+            }
+
+            session.EventId = eventId;
+            return;
+        }
     }
 
     async Task<NUserModel?> ResolveCurrentUser()

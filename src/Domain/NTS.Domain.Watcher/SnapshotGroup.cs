@@ -1,11 +1,15 @@
 using NTS.Domain.Enums;
+using Not.Structures;
 
 namespace NTS.Domain.Watcher;
 
-public class SnapshotGroup
+public class SnapshotGroup : IIdentifiable
 {
+    static int _nextId;
+
     public SnapshotGroup(IEnumerable<Snapshot> snapshots, string type)
     {
+        Id = Interlocked.Increment(ref _nextId);
         Entries = snapshots;
         if (Enum.TryParse(type, out SnapshotType snapshotType))
         {
@@ -17,6 +21,7 @@ public class SnapshotGroup
         }
     }
 
+    public int Id { get; }
     public IEnumerable<Snapshot> Entries { get; set; } = [];
 
     public SnapshotType Type { get; set; }

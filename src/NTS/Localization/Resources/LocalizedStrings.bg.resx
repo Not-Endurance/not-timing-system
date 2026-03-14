@@ -849,6 +849,9 @@
   <data name="Restore_string" xml:space="preserve">
     <value>Възстанови</value>
   </data>
+  <data name="Resend_string" xml:space="preserve">
+    <value>Изпрати отново</value>
+  </data>
   <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
     <value>Съжаляваме, няма нищо на този адрес.</value>
   </data>

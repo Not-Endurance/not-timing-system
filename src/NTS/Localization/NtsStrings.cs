@@ -206,6 +206,7 @@ namespace NTS.Localization
         public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
         public static string Snapshot_page_string => LocalizeString(nameof(Snapshot_page_string));
         public static string Performance_string => LocalizeString(nameof(Performance_string));
+        public static string Resend_string => LocalizeString(nameof(Resend_string));
         public static string Vetin_string => LocalizeString(nameof(Vetin_string));
         public static string Participant_string => LocalizeString(nameof(Participant_string));
         public static string Username_string => LocalizeString(nameof(Username_string));

@@ -9,7 +9,6 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Witness.Blazor.Features.Socket;
-using NTS.Witness.Features.Sessions;
 using NTS.Witness.Features.Core.Dashboard;
 
 namespace NTS.Witness.Blazor.Features.Core.Snapshots;
@@ -26,10 +25,7 @@ public class SnapshotContentBehind : NStatefulComponent
     INotifier Notifier { get; set; } = default!;
 
     [Inject]
-    IParticipationContext ParticipationContext { get; set; } = default!;
-
-    [Inject]
-    IUserSessionService UserSessionService { get; set; } = default!;
+    IParticipationService ParticipationService { get; set; } = default!;
 
     [Inject]
     INtsSocketContext SocketContext { get; set; } = default!;
@@ -44,8 +40,8 @@ public class SnapshotContentBehind : NStatefulComponent
 
     protected override async Task OnInitializedAsync()
     {
-        ParticipationContext.Selected = null;
-        await Observe(ParticipationContext);
+        ParticipationService.Selected = null;
+        await Observe(ParticipationService);
     }
 
     protected override void OnBeforeRender()
@@ -57,6 +53,7 @@ public class SnapshotContentBehind : NStatefulComponent
     {
         if (firstRender)
         {
+            await Task.Delay(TimeSpan.FromSeconds(1));
             await BlazorSocketService.EnsureConnected();
         }
     }
@@ -108,7 +105,7 @@ public class SnapshotContentBehind : NStatefulComponent
             var snapshotGroup = new SnapshotGroup(SnapshotParticipations, snapshotType);
             var snapshotGroupModel = SnapshotGroupModel.MapFrom(snapshotGroup);
             await SnapshotService.PublishSnapshotsAsync(snapshotGroupModel);
-            await UserSessionService.AppendSnapshot(snapshotGroup, SocketContext.Event?.Id);
+            await ParticipationService.AppendHistory(snapshotGroup, SocketContext.Event?.Id);
 
             StateHasChanged();
             Notifier.Success(string.Format(Snapshots_sent_as__string, snapshotType));
@@ -155,14 +152,14 @@ public class SnapshotContentBehind : NStatefulComponent
     {
         try
         {
-            var participation = ParticipationContext.Selected;
+            var participation = ParticipationService.Selected;
             if (participation == null)
             {
                 return;
             }
 
             AddParticipation(participation);
-            ParticipationContext.Selected = null;
+            ParticipationService.Selected = null;
         }
         catch (Exception ex)
         {
