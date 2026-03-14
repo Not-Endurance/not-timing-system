@@ -1,33 +1,29 @@
 using Not.Blazor.Components.Abstractions;
-using Not.Structures;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Objects;
 using NTS.Witness.Blazor.Features.Socket;
-using NTS.Witness.Features.Core.Dashboard;
 
 namespace NTS.Witness.Blazor.Features.Core.Performance;
 
 public class PerformanceContentBehind : NStatefulComponent
 {
     [Inject]
-    protected IPerformanceService PerformanceService { get; set; } = default!;
+    protected IParticipationContext ParticipationContext { get; set; } = default!;
 
     [Inject]
     protected BlazorSocketService BlazorSocketService { get; set; } = default!;
 
-    protected List<NotListModel<Person>> People { get; set; } = [];
-    protected Person SelectedPerson { get; set; } = default!;
-    protected Participation? Participation { get; set; } = default!;
+    protected Participation? Selected
+    {
+        get => ParticipationContext.Selected;
+        set => ParticipationContext.Selected = value;
+    }
+
+    protected IReadOnlyList<Participation> Participations => ParticipationContext.Participations;
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(PerformanceService);
-        UpdatePeople();
-    }
-
-    protected override void OnBeforeRender()
-    {
-        UpdatePeople();
+        await Observe(ParticipationContext);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -38,30 +34,24 @@ public class PerformanceContentBehind : NStatefulComponent
         }
     }
 
-    protected void OnPersonChanged(Person person)
+    protected Task<IEnumerable<Participation?>> Search(string term, CancellationToken _)
     {
         try
         {
-            SelectedPerson = person;
-            Participation = PerformanceService.GetParticipation(person);
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-    }
+            if (string.IsNullOrWhiteSpace(term))
+            {
+                return Task.FromResult(Participations.Cast<Participation?>());
+            }
 
-    void UpdatePeople()
-    {
-        try
-        {
-            var people = PerformanceService.GetPeople();
-            People = NotListModel.FromEntity(people).ToList();
+            var result = Participations.Where(x =>
+                x.ToString().Contains(term, StringComparison.OrdinalIgnoreCase)
+            ).Cast<Participation?>();
+            return Task.FromResult(result);
         }
         catch (Exception ex)
         {
             Handle(ex);
+            return Task.FromResult(Enumerable.Empty<Participation?>());
         }
     }
 }

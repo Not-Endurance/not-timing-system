@@ -8,7 +8,6 @@ using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Witness.Features.Sessions;
 
@@ -17,7 +16,6 @@ namespace NTS.Witness.Features.Core.Dashboard;
 public class ParticipationService
     : NStatefulService<ObservableList<Participation>>,
         IParticipationService,
-        IPerformanceService,
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationEliminated>,
         INotificationHandler<ParticipationRestored>,
@@ -61,6 +59,12 @@ public class ParticipationService
     public void Update(Participation participation, NCollectionAction action)
     {
         State.Update(participation, action);
+        if (_selected == null)
+        {
+            return;
+        }
+
+        _selected = State.FirstOrDefault(x => x.Id == _selected.Id);
     }
 
     public async Task AppendHistory(SnapshotGroup snapshotGroup, int? eventId = null)
@@ -70,16 +74,6 @@ public class ParticipationService
         History.AddOrReplace(snapshotGroup);
         EmitChanged();
         await _userSessionService.AppendSnapshot(snapshotGroup, eventId);
-    }
-
-    public IEnumerable<Person> GetPeople()
-    {
-        return Participations.Select(p => p.Combination.Athlete.Names).Distinct();
-    }
-
-    public Participation GetParticipation(Person person)
-    {
-        return Participations.First(p => p.Combination.Athlete.Names.Equals(person));
     }
 
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
