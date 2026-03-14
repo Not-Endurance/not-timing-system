@@ -3,18 +3,19 @@
 
 <MudSelect
     T="T"
+    @attributes="UserAttributes"
     Value="@Value"
     ValueChanged="@ValueChanged"
     Placeholder="@Placeholder"
     Label="@Label"
-    For="@For"
+    For="@InputFor"
     HelperText="@HelperText">
     
-    @foreach (var item in Items)
+    @foreach (var item in ResolvedItems)
     {
         <MudSelectItem Value="@item.Value">@item.Label</MudSelectItem>
     }
-    @if(!Items.Any())
+    @if(!ResolvedItems.Any())
     {
         <MudSelectItem T="T" Class="pa-4">@List_is_empty_string</MudSelectItem>
     }
