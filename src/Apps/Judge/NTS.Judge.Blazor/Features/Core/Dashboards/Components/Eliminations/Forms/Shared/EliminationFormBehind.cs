@@ -13,9 +13,6 @@ public abstract class EliminationFormBehind : NComponent
     [Parameter, EditorRequired]
     public Func<Task> SubmitSafe { get; set; } = default!;
 
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
     protected async Task OnRestore()
     {
         try

@@ -3,13 +3,13 @@
 
 <MudSelect
     T="T"
-    @attributes="UserAttributes"
     Value="@Value"
     ValueChanged="@ValueChanged"
     Placeholder="@Placeholder"
     Label="@Label"
-    For="@InputFor"
-    HelperText="@HelperText">
+    Class="@Class"
+    Style="@Style"
+    For="@InputFor">
     
     @foreach (var item in ResolvedItems)
     {

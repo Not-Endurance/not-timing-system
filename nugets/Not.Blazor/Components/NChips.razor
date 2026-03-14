@@ -3,21 +3,9 @@
 
 <MudChipSet 
     @bind-SelectedValue="SelectedValue" 
-    SelectionMode="SelectionMode.SingleSelection"
-    AllClosable="AllClosable"
-    CheckedIcon="CheckedIcon"
-    CheckMark="CheckMark"
-    Color="Color"
-    Disabled="Disabled"
-    Label="Label"
-    OnClose="OnClose"
-    ReadOnly="ReadOnly"
-    Ripple="Ripple"
-    SelectedColor="SelectedColor"
-    Size="Size"
-    UserAttributes="UserAttributes"
+    Class="@Class"
     Style="@Style"
-    Class="@Class">
+    SelectionMode="SelectionMode.SingleSelection">
 
     @if (ChildContent != null)
     {

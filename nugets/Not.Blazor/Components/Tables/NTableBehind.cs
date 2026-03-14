@@ -1,10 +1,14 @@
 using MudBlazor;
+using Not.Blazor.Components.Abstractions;
 
 namespace Not.Blazor.Components.Tables;
 
-public class NTableBehind : MudSimpleTable
+public class NTableBehind : NComponentBase
 {
     protected Typo Typography { get; set; } = Typo.caption;
+
+    [Parameter]
+    public bool FixedHeader { get; set; }
 
     [Parameter, EditorRequired]
     public IEnumerable<object> Items { get; set; } = [];

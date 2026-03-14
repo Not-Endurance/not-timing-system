@@ -1,7 +1,7 @@
 @namespace Not.Blazor.Components
 @inherits NGridBehind
 
-<MudGrid Justify="Justify" Spacing="Spacing" Tag="Tag" Class="@("not-grid " + Class)" Style="@Style">
+<MudGrid Spacing="Spacing" Class="@CombineClass("not-grid")" Style="@Style">
     @ChildContent
 </MudGrid>
 
@@ -10,4 +10,3 @@
         margin-top: 0 !important;
     }
 </style>
-

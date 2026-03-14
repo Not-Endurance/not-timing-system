@@ -3,14 +3,14 @@
 @namespace Not.Blazor.Components.Text.Abstractions
 @inherits NTextBaseBehind
 
-<MudText Align="Align" Typo="Typo" Color="Color" Class="@Class" Style="@(Style + AbsoluteCenterStyle)" >
+<MudText Align="Align" Typo="Typo" Color="Color" Class="@Class" Style="@CombineStyle(AbsoluteCenterStyle)">
     @Content
 </MudText>
 
 @* position:absolute removes the element from the natural stack thus a second identical element issed to preserve vertical layout *@
 @if (IsAbsoluteCenter) 
 {
-    <MudText Align="Align" Typo="Typo" Color="Color" Class="Class" Style="@(Style + "visibility:hidden")">
+    <MudText Align="Align" Typo="Typo" Color="Color" Class="@Class" Style="@CombineStyle("visibility:hidden")">
         @Content
     </MudText>
 }

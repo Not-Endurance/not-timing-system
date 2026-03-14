@@ -1,11 +1,15 @@
 using MudBlazor;
+using Not.Blazor.Components.Abstractions;
 
 namespace Not.Blazor.Components;
 
-public abstract class NChipsBehind<T> : MudChipSet<T>
+public abstract class NChipsBehind<T> : NComponentBase
 {
     [Parameter]
     public IEnumerable<T> Items { get; set; } = [];
+
+    [Parameter]
+    public T? SelectedValue { get; set; }
 
     [Parameter]
     public Func<T, string>? TextSelector { get; set; }

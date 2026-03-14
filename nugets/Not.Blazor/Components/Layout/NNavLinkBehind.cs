@@ -21,9 +21,6 @@ public class NNavLinkBehind : NComponent
     [Parameter]
     public string Icon { get; set; } = default!;
 
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
     protected void Land()
     {
         try

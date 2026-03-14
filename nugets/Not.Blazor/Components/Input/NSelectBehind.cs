@@ -1,9 +1,10 @@
 using System.Linq.Expressions;
+using Not.Blazor.Components.Abstractions;
 using Not.Structures;
 
 namespace Not.Blazor.Components.Input;
 
-public class NSelectBehind<T> : ComponentBase
+public class NSelectBehind<T> : NComponentBase
 {
     protected IEnumerable<NotListModel<T>> ResolvedItems { get; private set; } = [];
 
@@ -29,12 +30,6 @@ public class NSelectBehind<T> : ComponentBase
 
     [Parameter]
     public string? Label { get; set; }
-
-    [Parameter]
-    public string? HelperText { get; set; }
-
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IReadOnlyDictionary<string, object>? UserAttributes { get; set; }
 
     protected override void OnParametersSet()
     {
