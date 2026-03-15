@@ -1,4 +1,4 @@
-namespace NTS.Witness.Blazor.Features.Core.Snapshots;
+namespace NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
 
 public class TimestampUpdateModel
 {

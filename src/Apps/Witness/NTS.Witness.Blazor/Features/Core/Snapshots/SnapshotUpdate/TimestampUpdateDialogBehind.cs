@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 
-namespace NTS.Witness.Blazor.Features.Core.Snapshots;
+namespace NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
 
 public class TimestampUpdateDialogBehind : NComponent
 {

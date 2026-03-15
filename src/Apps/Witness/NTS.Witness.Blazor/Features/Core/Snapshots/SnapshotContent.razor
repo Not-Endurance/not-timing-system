@@ -1,6 +1,5 @@
 @using MudBlazor
-@using NTS.Blazor.Components.ParticipationChips
-@using NTS.Domain.Watcher
+@using NTS.Witness.Blazor.Features.Core.Snapshots.Components
 @using Not.Blazor.Components.Layout
 
 @attribute [Route(HOME)]
@@ -11,29 +10,15 @@
 
     <Main>
         <MudStack Spacing="4">
-            <MudPaper Class="justify-center pa-2">
-                <ParticipationChips Participations="@Participations"
-                                    SelectedChanged="@MoveToSnapshot" />
-            </MudPaper>
+            <SnapshotChips Participations="@Participations"
+                           SelectedChanged="@MoveToSnapshot" />
 
-            <NTable Items="@Snapshots"
-                    EmptyMessage="@Empty_intermediate_snapshot_list_string"
-                    Headings="@SnapshotTableHeaders">
-                <TrailingCell Context="item">
-                    @{
-                        var context = (Snapshot)item;
-                    }
-
-                    @if (context.Timestamp == null)
-                    {
-                        <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="() => SnapshotHandler(context)">@Snapshot_string</MudButton>
-                    }
-                    else
-                    {
-                        <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="() => EditSnapshot(context)">@context.Timestamp</MudButton>
-                    }
-                </TrailingCell>
-            </NTable>
+            <Snapshot Snapshots="@Snapshots"
+                      EmptyMessage="@Empty_intermediate_snapshot_list_string"
+                      Headings="@SnapshotTableHeaders"
+                      SnapshotText="@Snapshot_string"
+                      OnCapture="@SnapshotHandler"
+                      OnEdit="@EditSnapshot" />
 
             <SnapshotHistory />
         </MudStack>
@@ -47,7 +32,7 @@
                 <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
                     <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Style="align-self: auto;">
                         <MudMenuItem OnClick="() => SetButtonText(0)">@Arrival_string</MudMenuItem>
-                        <MudMenuItem OnClick="() => SetButtonText(1)">@Vetin_string</MudMenuItem>
+                        <MudMenuItem OnClick="() => SetButtonText(1)">@Presentation_string</MudMenuItem>
                     </MudMenu>
 
                     <MudButton Disabled="@(!HasReadySnapshots)" OnClick="() => SendHandler(ButtonText)">@ButtonText</MudButton>

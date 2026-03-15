@@ -4,7 +4,7 @@ using NTS.Application.Socket;
 using NTS.Domain.Watcher;
 using NTS.Witness.Features.Core.Dashboard;
 
-namespace NTS.Witness.Blazor.Features.Core.Snapshots;
+namespace NTS.Witness.Blazor.Features.Core.Snapshots.Components;
 
 public class SnapshotHistoryBehind : NStatefulComponent
 {

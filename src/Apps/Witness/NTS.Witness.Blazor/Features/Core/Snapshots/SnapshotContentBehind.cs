@@ -5,6 +5,7 @@ using Not.Notify;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
+using NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
 using NTS.Witness.Blazor.Features.Socket;
 using NTS.Witness.Features.Core.Dashboard;
 
@@ -56,7 +57,7 @@ public class SnapshotContentBehind : NStatefulComponent
                     ButtonText = Arrival_string;
                     break;
                 case 1:
-                    ButtonText = Vetin_string;
+                    ButtonText = Presentation_string;
                     break;
             }
         }
