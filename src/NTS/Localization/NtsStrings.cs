@@ -61,6 +61,7 @@ namespace NTS.Localization
         public static string Event_string => LocalizeString(nameof(Event_string));
         public static string Upcoming_events_string => LocalizeString(nameof(Upcoming_events_string));
         public static string Select_event_string => LocalizeString(nameof(Select_event_string));
+        public static string Change_event_string => LocalizeString(nameof(Change_event_string));
         public static string Stages_string => LocalizeString(nameof(Stages_string));
         public static string Ride_string => LocalizeString(nameof(Ride_string));
         public static string Not_ranked_string => LocalizeString(nameof(Not_ranked_string));
@@ -222,6 +223,10 @@ namespace NTS.Localization
         public static string Access_denied_next_steps => LocalizeString(nameof(Access_denied_next_steps));
         public static string Try_another_account_string => LocalizeString(nameof(Try_another_account_string));
         public static string Connect_string => LocalizeString(nameof(Connect_string));
+        public static string Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string =>
+            LocalizeString(
+                nameof(Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string)
+            );
         public static string Disconnect_string => LocalizeString(nameof(Disconnect_string));
         public static string Connected_to__string => LocalizeString(nameof(Connected_to__string));
         public static string Connected_to_string => LocalizeString(nameof(Connected_to_string));

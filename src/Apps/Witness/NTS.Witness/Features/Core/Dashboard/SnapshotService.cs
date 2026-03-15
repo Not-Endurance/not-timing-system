@@ -6,7 +6,6 @@ using Not.Collections;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Observables.Structures;
-using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
@@ -31,20 +30,17 @@ public class SnapshotService
     readonly IReadMany<Participation> _participationReader;
     readonly List<Participation> _participationsToSnapshot = [];
     readonly ISnapshotPublisher _snapshotPublisher;
-    readonly INtsSocketService _socketService;
     readonly List<Snapshot> _snapshots = [];
     readonly IUserSessionService _userSessionService;
 
     public SnapshotService(
         IReadMany<Participation> participationReader,
         IUserSessionService userSessionService,
-        ISnapshotPublisher snapshotPublisher,
-        INtsSocketService socketService)
+        ISnapshotPublisher snapshotPublisher)
     {
         _participationReader = participationReader;
         _userSessionService = userSessionService;
         _snapshotPublisher = snapshotPublisher;
-        _socketService = socketService;
     }
 
     public ObservableList<Participation> Participations => State;
@@ -101,7 +97,7 @@ public class SnapshotService
 
         var snapshotGroup = new SnapshotGroup(readySnapshots, snapshotType);
         await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroup);
-        await _userSessionService.AppendSnapshot(snapshotGroup, _socketService.Event?.Id);
+        await _userSessionService.AppendSnapshot(snapshotGroup);
 
         _history.Add(snapshotGroup);
         FlushSnapshots(readySnapshots.Select(x => x.Number).ToHashSet());

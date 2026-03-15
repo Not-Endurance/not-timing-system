@@ -546,6 +546,9 @@
   <data name="Select_event_string" xml:space="preserve">
     <value>Изберете събитие</value>
   </data>
+  <data name="Change_event_string" xml:space="preserve">
+    <value>Смяна на събитие</value>
+  </data>
   <data name="Disqualify_Reason_string" xml:space="preserve">
     <value>Причина за дисквалифициране</value>
   </data>
@@ -758,6 +761,9 @@
   </data>
   <data name="Connect_string" xml:space="preserve">
     <value>Свържи се</value>
+  </data>
+  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
+    <value>Свързването към '{0}' ще премахне текущата ви история на снимките. Това действие не може да бъде отменено.</value>
   </data>
   <data name="Disconnect_string" xml:space="preserve">
     <value>Прекъсни връзката</value>

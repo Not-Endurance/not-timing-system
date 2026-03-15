@@ -546,6 +546,9 @@
   <data name="Select_event_string" xml:space="preserve">
     <value>Etkinlik seç</value>
   </data>
+  <data name="Change_event_string" xml:space="preserve">
+    <value>Etkinliği değiştir</value>
+  </data>
   <data name="Disqualify_Reason_string" xml:space="preserve">
     <value>Diskalifiye olma nedeni</value>
   </data>
@@ -669,6 +672,9 @@
   </data>
   <data name="Access_denied_next_steps" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
+  </data>
+  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
+    <value>'{0}' etkinliğine bağlanmak mevcut anlık görüntü geçmişinizi silecektir. Bu işlem geri alınamaz.</value>
   </data>
   <data name="Connect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />

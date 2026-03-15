@@ -546,6 +546,9 @@
   <data name="Select_event_string" xml:space="preserve">
     <value>Select event</value>
   </data>
+  <data name="Change_event_string" xml:space="preserve">
+    <value>Change event</value>
+  </data>
   <data name="Disqualify_Reason_string" xml:space="preserve">
     <value>Disqualify Reason</value>
   </data>
@@ -761,6 +764,9 @@
   </data>
   <data name="Connect_string" xml:space="preserve">
     <value>Connect</value>
+  </data>
+  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
+    <value>Connecting to '{0}' will remove your current snapshot history. This cannot be undone.</value>
   </data>
   <data name="Disconnect_string" xml:space="preserve">
     <value>Disconnect</value>

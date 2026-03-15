@@ -67,11 +67,11 @@ public class UserSessionService : IUserSessionService, IScoped
             return;
         }
 
-        ScopeHistoryToEvent(session, eventId);
+        ResetHistoryOnEventChange(session, eventId);
         await _sessions.Update(session);
     }
 
-    public async Task AppendSnapshot(SnapshotGroup snapshot, int? eventId = null)
+    public async Task AppendSnapshot(SnapshotGroup snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
 
@@ -87,17 +87,10 @@ public class UserSessionService : IUserSessionService, IScoped
             session = new UserSessionModel
             {
                 Id = user.Id,
-                EventId = eventId,
                 SnapshotHistory = [SnapshotGroupModel.MapFrom(snapshot)],
             };
             await _sessions.Create(session);
             return;
-        }
-
-        ScopeHistoryToEvent(session, eventId);
-        if (eventId != null)
-        {
-            session.EventId = eventId.Value;
         }
 
         session.SnapshotHistory = [.. session.SnapshotHistory, SnapshotGroupModel.MapFrom(snapshot)];
@@ -121,18 +114,19 @@ public class UserSessionService : IUserSessionService, IScoped
         await _sessions.Delete(session);
     }
 
-    static void ScopeHistoryToEvent(UserSessionModel session, int? eventId)
+    static void ResetHistoryOnEventChange(UserSessionModel session, int? eventId)
     {
-        if (eventId != null)
+        if (eventId == null)
         {
-            if (session.EventId != null && session.EventId != eventId)
-            {
-                session.SnapshotHistory = [];
-            }
-
-            session.EventId = eventId;
             return;
         }
+
+        if (session.EventId != null && session.EventId != eventId)
+        {
+            session.SnapshotHistory = [];
+        }
+
+        session.EventId = eventId;
     }
 
     async Task<NUserModel?> ResolveCurrentUser()
@@ -212,6 +206,6 @@ public interface IUserSessionService
 {
     Task<ICoreSession?> GetCurrent();
     Task SetEventId(int? eventId);
-    Task AppendSnapshot(SnapshotGroup snapshot, int? eventId = null);
+    Task AppendSnapshot(SnapshotGroup snapshot);
     Task DeleteCurrent();
 }
