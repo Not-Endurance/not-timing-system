@@ -1,43 +1,48 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
-using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.ParticipationChips;
 
 public abstract class ParticipationChipsBehind : NStatefulComponent
 {
-    [Inject]
-    IParticipationContext RecentService { get; set; } = default!;
+    [Parameter]
+    public IReadOnlyList<int> RecentlyTimed { get; set; } = [];
 
-    protected Participation? Selected => RecentService.Selected;
+    [Parameter]
+    [EditorRequired]
+    public required IReadOnlyList<Participation> Participations { get; set; }
 
-    protected IReadOnlyList<Participation> Participations => RecentService.Participations;
+    [Parameter]
+    public Participation? Selected { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(RecentService);
-    }
+    [Parameter]
+    public EventCallback<Participation?> SelectedChanged { get; set; }
 
     protected Task Select(Participation participation)
     {
         try
         {
-            RecentService.Selected = participation;
+            if (!SelectedChanged.HasDelegate)
+            {
+                return Task.CompletedTask;
+            }
+
+            return SelectedChanged.InvokeAsync(participation);
         }
         catch (Exception ex)
         {
             Handle(ex);
+            return Task.CompletedTask;
         }
-        return Task.CompletedTask;
     }
 
     protected Color GetColor(Participation participation)
     {
         try
         {
-            if (RecentService.RecentlyTimed.Contains(participation.Combination.Number))
+            if (RecentlyTimed.Contains(participation.Combination.Number))
             {
                 return Color.Warning;
             }

@@ -12,14 +12,13 @@
     <Main>
         <MudStack Spacing="4">
             <MudPaper Class="justify-center pa-2">
-                <ParticipationChips />
+                <ParticipationChips Participations="@Participations"
+                                    SelectedChanged="@MoveToSnapshot" />
             </MudPaper>
 
-            <NTable Items="@SelectedParticipations"
+            <NTable Items="@Snapshots"
                     EmptyMessage="@Empty_intermediate_snapshot_list_string"
-                    Headings="@SnapshotTableHeaders"
-                    FixedHeader="true"
-                    Style="height: 65vh;">
+                    Headings="@SnapshotTableHeaders">
                 <TrailingCell Context="item">
                     @{
                         var context = (Snapshot)item;
@@ -43,7 +42,7 @@
     <Rightbar>
         <MudPaper Elevation="0" Class="pa-4">
             <MudStack Spacing="2">
-                <MudText Typo="Typo.overline">@string.Format(Send_snapshot_string, SnapshotParticipations.Count)</MudText>
+                <MudText Typo="Typo.overline">@string.Format(Send_snapshot_string, ReadySnapshotCount)</MudText>
 
                 <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
                     <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Style="align-self: auto;">
@@ -51,7 +50,7 @@
                         <MudMenuItem OnClick="() => SetButtonText(1)">@Vetin_string</MudMenuItem>
                     </MudMenu>
 
-                    <MudButton Disabled="@(!SnapshotParticipations.Any())" OnClick="() => SendHandler(ButtonText)">@ButtonText</MudButton>
+                    <MudButton Disabled="@(!HasReadySnapshots)" OnClick="() => SendHandler(ButtonText)">@ButtonText</MudButton>
                 </MudButtonGroup>
             </MudStack>
         </MudPaper>

@@ -21,7 +21,9 @@
                            TextUpdateSuppression="false"
                            Class="performance-autocomplete" />
 
-            <ParticipationChips />
+            <ParticipationChips Participations="@Participations"
+                                RecentlyTimed="@PerformanceService.RecentlyTimed"
+                                @bind-Selected="Selected" />
         </MudStack>
     </Main>
 </NContent>

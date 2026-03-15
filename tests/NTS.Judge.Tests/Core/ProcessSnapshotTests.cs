@@ -26,7 +26,7 @@ public class ProcessSnapshotTests : JudgeIntegrationTest
     {
         await Seed();
         var arriveAt = TimestampHelper.Create(19, 30);
-        var snapshot = new Snapshot(DEFAULT_COMBINATION_NUMBER, SnapshotType.Stage, method, arriveAt);
+        var snapshot = new Snapshot(DEFAULT_COMBINATION_NUMBER, SnapshotType.Arrive, method, arriveAt);
         var behind = await GetBehind<ITimingService>(x => { });
 
         await behind.Record(snapshot);
@@ -43,7 +43,7 @@ public class ProcessSnapshotTests : JudgeIntegrationTest
     {
         await Seed();
         var presentAt = TimestampHelper.Create(19, 35);
-        var snapshot = new Snapshot(DEFAULT_COMBINATION_NUMBER, SnapshotType.Vet, method, presentAt);
+        var snapshot = new Snapshot(DEFAULT_COMBINATION_NUMBER, SnapshotType.Present, method, presentAt);
         var behind = await GetBehind<ITimingService>(x => { });
 
         await behind.Record(snapshot);

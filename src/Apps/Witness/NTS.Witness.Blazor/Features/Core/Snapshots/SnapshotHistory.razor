@@ -2,16 +2,16 @@
 @using Not.Blazor.Components
 @inherits SnapshotHistoryBehind
 
-@if (SnapshotGroups.Count != 0)
+@if (History.Count != 0)
 {
     <MudPaper Class="pa-4">
         <MudStack Spacing="2">
             <NHeadline2 Content="@History_string" IsAbsoluteCenter />
 
-            @for (var index = 0; index < SnapshotGroups.Count; index++)
+            @for (var index = 0; index < History.Count; index++)
             {
                 var currentIndex = index;
-                var group = SnapshotGroups[index];
+                var group = History[index];
 
                 <MudPaper @key="currentIndex" Outlined Class="pa-2">
 
@@ -24,9 +24,9 @@
                                   AlignItems="AlignItems.Center"
                                   Style="width: 100%;">
 
-                            <MudText Typo="Typo.subtitle2">@group.Group.Type</MudText>
+                            <MudText Typo="Typo.subtitle2">@group.Type</MudText>
 
-                            <MudText Typo="Typo.caption">@group.Entries.Count</MudText>
+                            <MudText Typo="Typo.caption">@group.Entries.Count()</MudText>
                         </MudStack>
 
                     </MudButton>

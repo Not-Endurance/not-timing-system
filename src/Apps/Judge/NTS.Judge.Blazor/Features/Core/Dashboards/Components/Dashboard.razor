@@ -20,7 +20,9 @@
     </MudItem>
 
     <MudItem xs="3">
-        <ParticipationChips />
+        <ParticipationChips Participations="@Participations"
+                            RecentlyTimed="@RecentlyTimed"
+                            @bind-Selected="Selected" />
     </MudItem>
 
     <MudItem xs="9">

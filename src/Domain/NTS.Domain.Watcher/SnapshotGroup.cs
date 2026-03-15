@@ -1,5 +1,5 @@
-using NTS.Domain.Enums;
 using Not.Structures;
+using NTS.Domain.Enums;
 
 namespace NTS.Domain.Watcher;
 
@@ -17,7 +17,7 @@ public class SnapshotGroup : IIdentifiable
         }
         else
         {
-            Type = type == Arrival_string ? SnapshotType.Stage : SnapshotType.Vet;
+            Type = type == Arrival_string ? SnapshotType.Arrive : SnapshotType.Present;
         }
     }
 

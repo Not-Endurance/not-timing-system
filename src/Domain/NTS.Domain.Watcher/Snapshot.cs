@@ -1,8 +1,9 @@
 using NTS.Domain.Objects;
+using Not.Structures;
 
 namespace NTS.Domain.Watcher;
 
-public record Snapshot
+public record Snapshot : IIdentifiable
 {
     public Snapshot(int number, Person athlete, Timestamp timestamp)
     {
@@ -18,6 +19,7 @@ public record Snapshot
     }
 
     public int Number { get; }
+    public int Id => Number;
     public Person Athlete { get; }
     public Timestamp Timestamp { get; set; } = default!;
 

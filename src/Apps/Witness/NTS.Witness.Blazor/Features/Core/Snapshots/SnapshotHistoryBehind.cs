@@ -1,7 +1,6 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Notify;
 using NTS.Application.Socket;
-using NTS.Application.Watcher;
 using NTS.Domain.Watcher;
 using NTS.Witness.Features.Core.Dashboard;
 
@@ -14,24 +13,21 @@ public class SnapshotHistoryBehind : NStatefulComponent
     int? _resendingIndex;
 
     [Inject]
-    protected ISnapshotService SnapshotService { get; set; } = default!;
-
-    [Inject]
     protected INotifier Notifier { get; set; } = default!;
 
     [Inject]
     protected INtsSocketContext SocketContext { get; set; } = default!;
 
     [Inject]
-    protected IParticipationService ParticipationService { get; set; } = default!;
+    protected ISnapshotService SnapshotService { get; set; } = default!;
 
-    protected List<SnapshotHistoryGroupItem> SnapshotGroups { get; set; } = [];
+    protected IReadOnlyList<SnapshotGroup> History => [.. SnapshotService.History.Reverse()];
     protected bool CanResend => SocketContext.IsConnected && SocketContext.Event != null;
     protected bool IsResending => _resendingIndex.HasValue;
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(ParticipationService);
+        await Observe(SnapshotService);
     }
 
     protected bool IsExpanded(int index)
@@ -61,14 +57,14 @@ public class SnapshotHistoryBehind : NStatefulComponent
     {
         try
         {
-            if (_resendingIndex.HasValue || !CanResend || index < 0 || index >= SnapshotGroups.Count)
+            if (_resendingIndex.HasValue || !CanResend || index < 0 || index >= History.Count)
             {
                 return;
             }
 
             _resendingIndex = index;
-            var group = SnapshotGroups[index].Group;
-            await SnapshotService.PublishSnapshotsAsync(SnapshotGroupModel.MapFrom(group));
+            var group = History[index];
+            await SnapshotService.RePublish(group);
             Notifier.Success(string.Format(Snapshots_sent_as__string, group.Type));
         }
         catch (Exception ex)
@@ -84,29 +80,10 @@ public class SnapshotHistoryBehind : NStatefulComponent
 
     protected override void OnBeforeRender()
     {
-        if (_historyCount != ParticipationService.History.Count)
+        if (_historyCount != SnapshotService.History.Count)
         {
-            _historyCount = ParticipationService.History.Count;
+            _historyCount = SnapshotService.History.Count;
             _expandedIndex = null;
         }
-
-        SnapshotGroups =
-        [
-            .. ParticipationService.History
-                .Select(group => new SnapshotHistoryGroupItem(group, group.Entries.ToList()))
-                .Reverse() ?? []
-        ];
-    }
-
-    protected sealed class SnapshotHistoryGroupItem
-    {
-        public SnapshotHistoryGroupItem(SnapshotGroup group, IReadOnlyList<Snapshot> entries)
-        {
-            Group = group;
-            Entries = entries;
-        }
-
-        public SnapshotGroup Group { get; }
-        public IReadOnlyList<Snapshot> Entries { get; }
     }
 }

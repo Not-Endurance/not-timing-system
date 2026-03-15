@@ -7,13 +7,14 @@ using Not.Injection;
 using NTS.Application.Socket;
 using NTS.Application.Watcher;
 using NTS.Domain.Core.Objects.Payloads;
+using NTS.Domain.Watcher;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 using NTS.Witness.Features.Core.Dashboard;
 
 namespace NTS.Witness.Features.Socket;
 
-public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotService, IScoped
+public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPublisher, IScoped
 {
     readonly IRpcSocket _socket;
     readonly INtsSocketService _eventContext;
@@ -38,11 +39,12 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotSe
         RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
     }
 
-    public async Task PublishSnapshotsAsync(SnapshotGroupModel model)
+    public async Task PublishSnapshotsAsync(SnapshotGroup snapshotGroup)
     {
         GuardHelper.ThrowIfDefault(_eventContext.Event);
         GuardHelper.ThrowIfDefault(_socket.Connection);
 
+        var model = SnapshotGroupModel.MapFrom(snapshotGroup);
         var request = WarpRequest.Create(_eventContext.Event.Id.ToString(), model);
         await _socket.Connection.InvokeAsync(nameof(IWitnessHubProcedures.Receive), request);
     }

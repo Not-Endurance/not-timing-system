@@ -2,9 +2,6 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Exceptions;
 using Not.Notify;
-using NTS.Application.Core;
-using NTS.Application.Socket;
-using NTS.Application.Watcher;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
@@ -19,34 +16,25 @@ public class SnapshotContentBehind : NStatefulComponent
     IDialogService MudDialogService { get; set; } = default!;
 
     [Inject]
-    ISnapshotService SnapshotService { get; set; } = default!;
-
-    [Inject]
     INotifier Notifier { get; set; } = default!;
 
     [Inject]
-    IParticipationService ParticipationService { get; set; } = default!;
-
-    [Inject]
-    INtsSocketContext SocketContext { get; set; } = default!;
+    ISnapshotService SnapshotState { get; set; } = default!;
 
     [Inject]
     BlazorSocketService BlazorSocketService { get; set; } = default!;
 
-    protected List<Snapshot> SelectedParticipations { get; set; } = [];
-    protected List<Snapshot> SnapshotParticipations { get; set; } = [];
+    protected ISnapshotService SnapshotService => SnapshotState;
+    protected IReadOnlyList<Participation> Participations => SnapshotService.Participations;
+    protected IReadOnlyList<Snapshot> Snapshots => SnapshotService.Snapshots;
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
     protected string ButtonText { get; set; } = Arrival_string;
+    protected int ReadySnapshotCount => Snapshots.Count(x => x.Timestamp != null);
+    protected bool HasReadySnapshots => ReadySnapshotCount != 0;
 
     protected override async Task OnInitializedAsync()
     {
-        ParticipationService.Selected = null;
-        await Observe(ParticipationService);
-    }
-
-    protected override void OnBeforeRender()
-    {
-        TrackSelection();
+        await Observe(SnapshotService);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -78,14 +66,11 @@ public class SnapshotContentBehind : NStatefulComponent
         }
     }
 
-    protected void SnapshotHandler(Snapshot snapshotParticipant)
+    protected void SnapshotHandler(Snapshot snapshot)
     {
         try
         {
-            var currentTime = DateTimeOffset.Now;
-            var timestamp = new Timestamp(currentTime);
-            snapshotParticipant.Timestamp = timestamp;
-            SnapshotParticipations.Add(snapshotParticipant);
+            SnapshotService.CaptureSnapshot(snapshot);
         }
         catch (Exception ex)
         {
@@ -97,20 +82,12 @@ public class SnapshotContentBehind : NStatefulComponent
     {
         try
         {
-            if (SnapshotParticipations.Count == 0)
+            if (!await SnapshotService.Publish(snapshotType))
             {
                 return;
             }
 
-            var snapshotGroup = new SnapshotGroup(SnapshotParticipations, snapshotType);
-            var snapshotGroupModel = SnapshotGroupModel.MapFrom(snapshotGroup);
-            await SnapshotService.PublishSnapshotsAsync(snapshotGroupModel);
-            await ParticipationService.AppendHistory(snapshotGroup, SocketContext.Event?.Id);
-
-            StateHasChanged();
             Notifier.Success(string.Format(Snapshots_sent_as__string, snapshotType));
-            SnapshotParticipations.ForEach(p => SelectedParticipations.Remove(p));
-            SnapshotParticipations.Clear();
         }
         catch (Exception ex)
         {
@@ -118,12 +95,12 @@ public class SnapshotContentBehind : NStatefulComponent
         }
     }
 
-    protected async Task EditSnapshot(Snapshot snapshotParticipant)
+    protected async Task EditSnapshot(Snapshot snapshot)
     {
         try
         {
-            GuardHelper.ThrowIfDefault(snapshotParticipant.Timestamp);
-            var time = snapshotParticipant.Timestamp._stamp.TimeOfDay;
+            GuardHelper.ThrowIfDefault(snapshot.Timestamp);
+            var time = snapshot.Timestamp._stamp.TimeOfDay;
             var model = new TimestampUpdateModel(time);
             var parameters = new DialogParameters<TimestampUpdateDialog> { { x => x.Model, model } };
             var options = new DialogOptions() { Position = DialogPosition.Center };
@@ -139,7 +116,10 @@ public class SnapshotContentBehind : NStatefulComponent
                 var updatedTimestamp = result.Data as TimestampUpdateModel;
                 GuardHelper.ThrowIfDefault(updatedTimestamp);
                 GuardHelper.ThrowIfDefault(updatedTimestamp.TimestampInput);
-                snapshotParticipant.Timestamp = new Timestamp(updatedTimestamp.TimestampInput);
+                SnapshotService.UpdateSnapshotTimestamp(
+                    snapshot,
+                    new Timestamp(updatedTimestamp.TimestampInput)
+                );
             }
         }
         catch (Exception ex)
@@ -148,41 +128,20 @@ public class SnapshotContentBehind : NStatefulComponent
         }
     }
 
-    void TrackSelection()
+    protected Task MoveToSnapshot(Participation? participation)
     {
         try
         {
-            var participation = ParticipationService.Selected;
-            if (participation == null)
+            if (participation != null)
             {
-                return;
-            }
-
-            AddParticipation(participation);
-            ParticipationService.Selected = null;
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-    }
-
-    void AddParticipation(Participation participation)
-    {
-        try
-        {
-            var snapshotParticipant = new Snapshot(
-                participation.Combination.Number,
-                participation.Combination.Athlete.Names
-            );
-            if (!SelectedParticipations.Exists(sp => sp.Number == snapshotParticipant.Number))
-            {
-                SelectedParticipations.Add(snapshotParticipant);
+                SnapshotService.MoveToSnapshot(participation);
             }
         }
         catch (Exception ex)
         {
             Handle(ex);
         }
+
+        return Task.CompletedTask;
     }
 }

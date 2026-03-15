@@ -66,8 +66,8 @@ public class Phase : Entity
     {
         return snapshot.Type switch
         {
-            SnapshotType.Vet => Inspect(snapshot),
-            SnapshotType.Stage => Arrive(snapshot),
+            SnapshotType.Present => Inspect(snapshot),
+            SnapshotType.Arrive => Arrive(snapshot),
             SnapshotType.Final => Finish(snapshot),
             SnapshotType.Automatic => Automatic(snapshot),
             _ => GuardUnknownSnapshot(snapshot),
