@@ -4,6 +4,7 @@ using Not.Injection;
 using Not.Notify;
 using Not.Structures;
 using NTS.Application.Core;
+using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
 using NTS.Judge.Features.Core.State;
@@ -12,6 +13,7 @@ namespace NTS.Judge.Features.Core;
 
 public class DashService : NStatefulService, IDashService, ISingleton
 {
+    readonly INtsSocketContext _socketContext;
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly ICoreState _coreState;
     readonly IStartBusiness _startDashboardBusiness;
@@ -23,6 +25,7 @@ public class DashService : NStatefulService, IDashService, ISingleton
     readonly INotifier _notifier;
 
     public DashService(
+        INtsSocketContext socketContext,
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
         ICoreState coreState,
         IStartBusiness startDashboardBusiness,
@@ -34,6 +37,7 @@ public class DashService : NStatefulService, IDashService, ISingleton
         INotifier notifier
     )
     {
+        _socketContext = socketContext;
         _coreDependentObservables = coreDependentObservables;
         _coreState = coreState;
         _startDashboardBusiness = startDashboardBusiness;
@@ -49,6 +53,10 @@ public class DashService : NStatefulService, IDashService, ISingleton
 
     protected override async Task<bool> InitializeState()
     {
+        if (!_socketContext.IsConnected)
+        {
+            return false;
+        }
         var enduranceEvents = await _events.Read(0);
         IsStarted = enduranceEvents != null;
         return IsStarted;

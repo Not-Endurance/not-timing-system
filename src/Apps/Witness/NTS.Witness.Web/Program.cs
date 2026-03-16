@@ -32,7 +32,7 @@ static Task AddLocalhostOverrideSettings(WebAssemblyHostBuilder builder)
     }
 
     var environment = builder.HostEnvironment.Environment;
-    if (environment != "Staging" && environment != "Production")
+    if (environment is not "Staging" and not "Production")
     {
         return Task.CompletedTask;
     }
