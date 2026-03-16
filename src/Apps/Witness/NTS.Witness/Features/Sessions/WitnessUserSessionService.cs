@@ -5,13 +5,14 @@ using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
+using NTS.Application.UserSession;
 using NTS.Application.Watcher;
 using NTS.Domain.Core;
 using NTS.Domain.Watcher;
 
 namespace NTS.Witness.Features.Sessions;
 
-public class UserSessionService : IUserSessionService, IScoped
+public class WitnessUserSessionService : IUserSessionService, IScoped
 {
     readonly AuthenticationStateProvider _authStateProvider;
     readonly IUserRegister _userRegister;
@@ -19,7 +20,7 @@ public class UserSessionService : IUserSessionService, IScoped
     NUserModel? _currentUser;
     string? _currentEmail;
 
-    public UserSessionService(
+    public WitnessUserSessionService(
         AuthenticationStateProvider authStateProvider,
         IUserRegister userRegister,
         IRepository<UserSessionModel> sessions
@@ -190,12 +191,4 @@ public class UserSessionService : IUserSessionService, IScoped
             return rawEmail;
         }
     }
-}
-
-public interface IUserSessionService
-{
-    Task<ICoreSession?> GetCurrent();
-    Task SetEventId(int? eventId);
-    Task AppendSnapshot(SnapshotGroup snapshot);
-    Task DeleteCurrent();
 }

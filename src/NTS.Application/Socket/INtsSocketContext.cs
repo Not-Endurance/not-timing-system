@@ -1,9 +1,9 @@
 using Not.Application.RPC;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Application.Socket;
 
 public interface INtsSocketContext : ISocketContext
 {
-    UpcomingEvent? Event { get; }
+    EnduranceEvent? Event { get; }
 }

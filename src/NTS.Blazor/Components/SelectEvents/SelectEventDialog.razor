@@ -1,4 +1,4 @@
-@using NTS.Domain.Setup.Aggregates
+@using NTS.Domain.Core.Aggregates
 @using Not.Blazor.Components.Layout
 @using Not.Blazor.Dialogs.Abstractions
 
@@ -10,7 +10,7 @@
         <NTable Items="@Events" EmptyMessage="@Empty_event_list_message" Headings="@EventsTableHeaders">
             <TrailingCell Context="item">
                 @{
-                    var context = (UpcomingEvent)item;
+                    var context = (EnduranceEvent)item;
                 }
 
                 @if (IsConnected && SelectedEvent?.Id == context.Id)

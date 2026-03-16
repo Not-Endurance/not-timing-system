@@ -18,7 +18,7 @@ public static class NtsWitnessServices
         services.ConfigureKrud();
         services
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
-            .AddStartlist()
+            .AddSharedCoreDomainServices()
             .ConfigureN()
             .AddRpcClient()
             .AddDomainEvents()

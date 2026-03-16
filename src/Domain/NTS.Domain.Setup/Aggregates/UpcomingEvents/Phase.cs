@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Exceptions;
+﻿using Not.Domain.Exceptions;
 using Not.Domain.Krud;
 using Not.Structures;
 
@@ -26,12 +25,14 @@ public class Phase : Entity, IEntityMirror<Loop>, IIdentifiable
         return Combine(Loop, recovery, rest);
     }
 
-    public void Reflect(Loop loop)
+    public bool Reflect(Loop loop)
     {
-        if (Loop == loop)
+        if (Loop != loop)
         {
-            Loop = loop;
+            return false;
         }
+        Loop = loop;
+        return true;
     }
 
     static int PositiveRecovery(int? minutes)

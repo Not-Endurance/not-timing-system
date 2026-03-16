@@ -1,17 +1,18 @@
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Blazor.Helpers;
+using NTS.Application.Core;
 using NTS.Application.Socket;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Witness.Features.Sessions;
-using NTS.Witness.Features.Setup.UpcomingEvents;
+using NTS.Application.UserSession;
+using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Witness.Blazor.Features.Setup;
+namespace NTS.Blazor.Components.SelectEvents;
 
 public class SelectEventDialogBehind : NDialog
 {
     [Inject]
-    IUpcomingEventService UpcomingEventService { get; set; } = default!;
+    IEnduranceEventService EnduranceEventService { get; set; } = default!;
 
     [Inject]
     INtsSocketService SocketService { get; set; } = default!;
@@ -22,16 +23,16 @@ public class SelectEventDialogBehind : NDialog
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
-    protected IEnumerable<UpcomingEvent> Events { get; set; } = [];
+    protected IEnumerable<EnduranceEvent> Events { get; set; } = [];
     protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
     protected bool IsConnected => SocketService.IsConnected;
-    protected UpcomingEvent? SelectedEvent => SocketService.Event;
+    protected EnduranceEvent? SelectedEvent => SocketService.Event;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Events = await UpcomingEventService.GetEvents();
+            Events = await EnduranceEventService.GetEvents();
         }
         catch (Exception ex)
         {
@@ -39,21 +40,21 @@ public class SelectEventDialogBehind : NDialog
         }
     }
 
-    protected async Task ConnectTo(UpcomingEvent upcomingEvent)
+    protected async Task ConnectTo(EnduranceEvent enduranceEvent)
     {
         try
         {
-            if (!await ConfirmEventChangeIfHistoryWillBeRemoved(upcomingEvent))
+            if (!await ConfirmEventChangeIfHistoryWillBeRemoved(enduranceEvent))
             {
                 return;
             }
 
-            if (SocketService.IsConnected && SelectedEvent?.Id != upcomingEvent.Id)
+            if (SocketService.IsConnected && SelectedEvent?.Id != enduranceEvent.Id)
             {
                 await SocketService.Disconnect();
             }
 
-            await SocketService.Connect(upcomingEvent);
+            await SocketService.Connect(enduranceEvent);
             if (SocketService.IsConnected)
             {
                 await ConfirmDialog();
@@ -77,15 +78,15 @@ public class SelectEventDialogBehind : NDialog
         }
     }
 
-    async Task<bool> ConfirmEventChangeIfHistoryWillBeRemoved(UpcomingEvent upcomingEvent)
+    async Task<bool> ConfirmEventChangeIfHistoryWillBeRemoved(EnduranceEvent enduranceEvent)
     {
         var session = await UserSessionService.GetCurrent();
-        if (session?.SnapshotHistory.Count is not > 0 || session.EventId == null || session.EventId == upcomingEvent.Id)
+        if (session?.SnapshotHistory.Count is not > 0 || session.EventId == null || session.EventId == enduranceEvent.Id)
         {
             return true;
         }
 
-        var parameters = new DialogParameters<ChangeEventHistoryDialog> { { x => x.EventName, upcomingEvent.Name } };
+        var parameters = new DialogParameters<ChangeEventHistoryDialog> { { x => x.EventName, enduranceEvent.PopulatedPlace.City } };
         var dialog = await DialogService.ShowAsync<ChangeEventHistoryDialog>(Change_event_string, parameters);
         return !await dialog.IsCanceled();
     }

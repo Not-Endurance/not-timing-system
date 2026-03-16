@@ -13,7 +13,7 @@ namespace NTS.Judge.Features.Core;
 
 public class DashService : NStatefulService, IDashService, ISingleton
 {
-    readonly INtsSocketContext _socketContext;
+    readonly INtsSocketService _socketService;
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly ICoreState _coreState;
     readonly IStartBusiness _startDashboardBusiness;
@@ -25,7 +25,7 @@ public class DashService : NStatefulService, IDashService, ISingleton
     readonly INotifier _notifier;
 
     public DashService(
-        INtsSocketContext socketContext,
+        INtsSocketService socketService,
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
         ICoreState coreState,
         IStartBusiness startDashboardBusiness,
@@ -37,7 +37,7 @@ public class DashService : NStatefulService, IDashService, ISingleton
         INotifier notifier
     )
     {
-        _socketContext = socketContext;
+        _socketService = socketService;
         _coreDependentObservables = coreDependentObservables;
         _coreState = coreState;
         _startDashboardBusiness = startDashboardBusiness;
@@ -53,7 +53,7 @@ public class DashService : NStatefulService, IDashService, ISingleton
 
     protected override async Task<bool> InitializeState()
     {
-        if (!_socketContext.IsConnected)
+        if (!_socketService.IsConnected)
         {
             return false;
         }
@@ -67,13 +67,13 @@ public class DashService : NStatefulService, IDashService, ISingleton
         // TODO: Ensure witness apps receive the participants list on Start (or before).
         // Currently you need to restart witness after start in order to fetch
 
-        var validationResult = _startDashboardBusiness.Validate();
+        var validationResult = await _startDashboardBusiness.Validate();
         if (validationResult.Data?.Any() == true)
         {
             return validationResult;
         }
-        await _startDashboardBusiness.Start();
-        IsStarted = true;
+        var endranceEvent = await _startDashboardBusiness.Start();
+        await _socketService.Connect(endranceEvent);
         EmitChanged();
         return Result.Success<IReadOnlyList<StartValidationIssue>>([]);
     }

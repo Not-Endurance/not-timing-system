@@ -2,7 +2,7 @@ using MudBlazor;
 using Not.Injection;
 using Not.Safe;
 using NTS.Application.Socket;
-using NTS.Witness.Blazor.Features.Setup;
+using NTS.Blazor.Components.SelectEvents;
 
 namespace NTS.Witness.Blazor.Features.Socket;
 

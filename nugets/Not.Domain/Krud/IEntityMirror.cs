@@ -6,5 +6,5 @@
 /// <typeparam name="T">Type of reflection</typeparam>
 public interface IEntityMirror<T>
 {
-    void Reflect(T reflection);
+    bool Reflect(T reflection);
 }

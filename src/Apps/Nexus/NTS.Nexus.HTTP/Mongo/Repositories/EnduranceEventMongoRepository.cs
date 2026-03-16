@@ -4,9 +4,9 @@ using NTS.Application.Core;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class EnduranceEventRepository : MongoRepository<EnduranceEventModel>
+public class EnduranceEventMongoRepository : MongoRepository<EnduranceEventModel>
 {
-    public EnduranceEventRepository(IMongoContext context)
+    public EnduranceEventMongoRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ENDURANCE_EVENTS_COLLECTION) { }
 
     protected override UpdateDefinition<EnduranceEventModel> GetUpdateDefinition(EnduranceEventModel document)

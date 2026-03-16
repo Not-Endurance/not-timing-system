@@ -3,7 +3,6 @@ using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
 using Not.Notify;
-using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
@@ -17,16 +16,16 @@ public class UpcomingEventService
         IKrudMirror<Horse>,
         ITransient
 {
-    readonly IUpdate<UpcomingEvent> _updater;
-    readonly INtsSocketService _eventContext;
+    readonly IRepository<UpcomingEvent> _upcomingEvents;
     readonly INotifier _notifier;
+    readonly ISelectedUpcomingEventContext _selectedEventContext;
 
-    public UpcomingEventService(IRepository<UpcomingEvent> events, INtsSocketService eventContext, INotifier notifier)
-        : base(events, [])
+    public UpcomingEventService(IRepository<UpcomingEvent> upcomingEvents, INotifier notifier, ISelectedUpcomingEventContext context)
+        : base(upcomingEvents, [])
     {
-        _updater = events;
-        _eventContext = eventContext;
+        _upcomingEvents = upcomingEvents;
         _notifier = notifier;
+        _selectedEventContext = context;
     }
 
     public override Task Delete(UpcomingEvent entity)
@@ -35,79 +34,96 @@ public class UpcomingEventService
         return Task.CompletedTask;
     }
 
-    // TODO: separate the Athlete, Horse, Loop and Combination AggregateRoots
-    // from the UpcomingEvent AggregateRoot and maintain synced state using a domain event dispatcher
-    // I.e. - Horse updates, raising a domain Event which updates UpcomingEvent state and (maybe?) triggers re-render
+    // TODO: Move Reflection in Krud
     public async Task Reflect(Loop loop)
     {
-        if (_eventContext.Event == null)
+        await UpdateReflectingEvents(upcomingEvent =>
         {
-            return;
-        }
-        foreach (var competitions in _eventContext.Event.Competitions)
-        {
-            foreach (var phase in competitions.Phases)
+            var hasReflected = false;
+            foreach (var competitions in upcomingEvent.Competitions)
             {
-                phase.Reflect(loop);
+                foreach (var phase in competitions.Phases)
+                {
+                    hasReflected = true;
+                    phase.Reflect(loop);
+                }
             }
-        }
-        await _updater.Update(_eventContext.Event);
+            return hasReflected;
+        });
     }
 
     public async Task Reflect(Combination combination)
     {
-        if (_eventContext.Event == null)
+        await UpdateReflectingEvents(upcomingEvent =>
         {
-            return;
-        }
-        foreach (var competitions in _eventContext.Event.Competitions)
-        {
-            foreach (var participation in competitions.Participations)
+            var hasReflected = false;
+            foreach (var competitions in upcomingEvent.Competitions)
             {
-                participation.Reflect(combination);
+                foreach (var participation in competitions.Participations)
+                {
+                    hasReflected = true;
+                    participation.Reflect(combination);
+                }
             }
-        }
-        await _updater.Update(_eventContext.Event);
+            return hasReflected;
+        });
     }
 
     public async Task Reflect(Athlete athlete)
     {
-        if (_eventContext.Event == null)
+        await UpdateReflectingEvents(upcomingEvent =>
         {
-            return;
-        }
-        foreach (var combination in _eventContext.Event.Combinations)
-        {
-            combination.Reflect(athlete);
-            foreach (var competition in _eventContext.Event.Competitions)
+            var hasReflected = false;
+            foreach (var combination in upcomingEvent.Combinations)
             {
-                foreach (var participation in competition.Participations)
+                hasReflected = hasReflected || combination.Reflect(athlete);
+                if (hasReflected)
                 {
-                    participation.Reflect(combination);
+                    foreach (var competition in upcomingEvent.Competitions)
+                    {
+                        foreach (var participation in competition.Participations)
+                        {
+                            participation.Reflect(combination);
+                        }
+                    }
                 }
             }
-        }
-
-        await _updater.Update(_eventContext.Event);
+            return hasReflected;
+        });
     }
 
     public async Task Reflect(Horse horse)
     {
-        if (_eventContext.Event == null)
+        await UpdateReflectingEvents(upcomingEvent =>
+        {
+            var hasReflected = false;
+            foreach (var combination in upcomingEvent.Combinations)
+            {
+                hasReflected = hasReflected || combination.Reflect(horse);
+                if (hasReflected)
+                {
+                    foreach (var competition in upcomingEvent.Competitions)
+                    {
+                        foreach (var participation in competition.Participations)
+                        {
+                            participation.Reflect(combination);
+                        }
+                    }
+                }
+            }
+            return hasReflected;
+        });
+    }
+
+    async Task UpdateReflectingEvents(Func<UpcomingEvent, bool> reflect)
+    {   
+        if (_selectedEventContext.Event == null)
         {
             return;
         }
-        foreach (var combination in _eventContext.Event.Combinations)
+        if (reflect(_selectedEventContext.Event))
         {
-            combination.Reflect(horse);
-            foreach (var competition in _eventContext.Event.Competitions)
-            {
-                foreach (var participation in competition.Participations)
-                {
-                    participation.Reflect(combination);
-                }
-            }
+            await _upcomingEvents.Update(_selectedEventContext.Event);
         }
-        await _updater.Update(_eventContext.Event);
     }
 }

@@ -67,7 +67,7 @@ public class StartValidationDialogBehind : NDialog<bool>
                 }
             }
 
-            Validation = StartService.Validate();
+            Validation = await StartService.Validate();
             if (HasIssues)
             {
                 SyncSelectionsWithCurrentIssues();

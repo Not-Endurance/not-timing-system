@@ -1,9 +1,9 @@
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Application.Socket;
 
 public interface ISocketPrincipalStorage
 {
-    Task<UpcomingEvent?> Get();
-    Task Commit(UpcomingEvent? upcomingEvent);
+    Task<EnduranceEvent?> Get();
+    Task Commit(EnduranceEvent? enduranceEvent);
 }

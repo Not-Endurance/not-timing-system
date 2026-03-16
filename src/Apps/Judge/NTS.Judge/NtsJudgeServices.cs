@@ -13,7 +13,7 @@ public static class NtsJudgeServices
     {
         services
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
-            .AddStartlist()
+            .AddSharedCoreDomainServices()
             .ConfigureN()
             .AddRpcClient()
             .AddDomainEvents();

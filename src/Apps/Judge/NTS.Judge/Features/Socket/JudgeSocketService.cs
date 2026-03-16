@@ -1,4 +1,3 @@
-using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
@@ -6,31 +5,29 @@ using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Notify;
 using NTS.Application.Socket;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Events;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Socket;
 
 public class JudgeSocketService
     : NStatefulService,
         INtsSocketService,
-        INotificationHandler<UpcomingEventUpdated>,
         ISingleton
 {
     readonly ISocketPrincipalStorage _socketPrincialStorage;
-    readonly IRead<UpcomingEvent> _upcomingEvents;
+    readonly IRead<EnduranceEvent> _enduranceEvents;
     readonly IRpcSocket _socket;
     readonly INotifier _notifier;
 
     public JudgeSocketService(
         ISocketPrincipalStorage socketPrincipaStorage,
-        IRead<UpcomingEvent> upcomingEvents,
+        IRead<EnduranceEvent> enduranceEvents,
         IRpcSocket socket,
         INotifier notifier
     )
     {
         _socketPrincialStorage = socketPrincipaStorage;
-        _upcomingEvents = upcomingEvents;
+        _enduranceEvents = enduranceEvents;
         _socket = socket;
         _notifier = notifier;
         _socket.Error += HandleRpcErrors;
@@ -39,14 +36,18 @@ public class JudgeSocketService
 
     public SocketConnectionStatus Status { get; private set; }
     public bool IsConnected => _socket?.IsConnected ?? false;
-    public UpcomingEvent? Event { get; private set; }
+    public EnduranceEvent? Event { get; private set; }
 
     protected override async Task<bool> InitializeState()
     {
         var upcomingEvent = await _socketPrincialStorage.Get();
         if (upcomingEvent != null)
         {
-            await Connect(upcomingEvent);
+            var enduranceEvent = await _enduranceEvents.Read(upcomingEvent.Id);
+            if (enduranceEvent != null)
+            {
+                await Connect(enduranceEvent);
+            }
         }
         return true;
     }
@@ -60,30 +61,30 @@ public class JudgeSocketService
 
     public async Task Disconnect()
     {
-        await InternalSetEvent(null);
         await _socket.Disconnect();
+        await InternalSetEvent(null);
     }
 
-    public async Task Connect(UpcomingEvent principal)
+    public async Task Connect(EnduranceEvent enduranceEvent)
     {
-        if (Event == principal)
+        if (Event == enduranceEvent)
         {
             return;
         }
-        await InternalSetEvent(principal);
-        await _socket.Connect(principal.Id.ToString());
+        await _socket.Connect(enduranceEvent.Id.ToString());
+        await InternalSetEvent(enduranceEvent);
     }
 
-    public async Task Handle(UpcomingEventUpdated notification, CancellationToken cancellationToken)
-    {
-        if (Event?.Id != notification.EventId)
-        {
-            return;
-        }
+    //public async Task Handle(UpcomingEventUpdated notification, CancellationToken cancellationToken)
+    //{
+    //    if (Event?.Id != notification.EventId)
+    //    {
+    //        return;
+    //    }
 
-        Event = await _upcomingEvents.Read(notification.EventId);
-        EmitChanged();
-    }
+    //    Event = await _upcomingEvents.Read(notification.EventId);
+    //    EmitChanged();
+    //}
 
     void HandleRpcErrors(object? sender, RpcError rpcError)
     {
@@ -96,10 +97,10 @@ public class JudgeSocketService
         Status = e;
     }
 
-    async Task InternalSetEvent(UpcomingEvent? principal)
+    async Task InternalSetEvent(EnduranceEvent? enduranceEvent)
     {
-        await _socketPrincialStorage.Commit(principal);
-        Event = principal;
+        await _socketPrincialStorage.Commit(enduranceEvent);
+        Event = enduranceEvent;
         EmitChanged();
     }
 }

@@ -3,25 +3,25 @@ using Not.Application.CRUD.Ports;
 using Not.Filesystem;
 using Not.Storage.JsonFile.Stores.Files;
 using NTS.Application.Socket;
-using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Core.Aggregates;
 using NTS.Storage.Setup;
 
 namespace NTS.Storage.JSON;
 
 public class SocketPrincipalStorage : LockingJsonFileStore<SetupState>, ISocketPrincipalStorage
 {
-    readonly IRepository<UpcomingEvent> _upcomingEvents;
+    readonly IRepository<EnduranceEvent> _upcomingEvents;
 
     public SocketPrincipalStorage(
         [FromKeyedServices("NDataKey")] IFilesystemContext configuration,
-        IRepository<UpcomingEvent> upcomingEvents
+        IRepository<EnduranceEvent> upcomingEvents
     )
         : base(configuration)
     {
         _upcomingEvents = upcomingEvents;
     }
 
-    public async Task<UpcomingEvent?> Get()
+    public async Task<EnduranceEvent?> Get()
     {
         var setup = await Readonly();
         if (setup.ConnectedEventId == null)
@@ -37,10 +37,10 @@ public class SocketPrincipalStorage : LockingJsonFileStore<SetupState>, ISocketP
         return upcomingEvent;
     }
 
-    public async Task Commit(UpcomingEvent? upcomingEvent)
+    public async Task Commit(EnduranceEvent? enduranceEvent)
     {
         var setup = await Transact();
-        setup.ConnectedEventId = upcomingEvent?.Id;
+        setup.ConnectedEventId = enduranceEvent?.Id;
         await Commit(setup);
     }
 }
