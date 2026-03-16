@@ -2,9 +2,8 @@
 
 namespace NTS.Application.Socket;
 
-public interface INtsSocketService
+public interface INtsSocketService : INtsSocketContext
 {
-    UpcomingEvent? Event { get; }
     Task Connect(UpcomingEvent princial);
     Task Disconnect();
 }

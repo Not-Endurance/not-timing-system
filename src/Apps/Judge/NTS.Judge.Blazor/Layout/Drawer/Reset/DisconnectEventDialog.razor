@@ -1,0 +1,23 @@
+@using Not.Blazor.Dialogs.Abstractions
+@inherits DisconnectEventDialogBehind
+
+<MudDialog>
+
+    <TitleContent>@Soft_reset_string</TitleContent>
+
+    <DialogContent>
+        <ul>
+            <li>@Disconnect_from_current_Event</li>
+            <li>@Reset_Timing_this_will_DELETE_Timing_data</li> 
+        </ul>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonPrimary Text="@Disconnect_string" OnClick="Disconnect" />
+
+        <NButtonWarning Text="@Reset_Timing_string" OnClick="OpenResetTimingDialog" />
+
+        <NButtonSecondary Text="@Cancel_string" OnClick="CancelDialog" />
+    </DialogActions>
+
+</MudDialog>

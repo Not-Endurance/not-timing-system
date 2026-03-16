@@ -19,6 +19,7 @@ public static class NStrings
     public static string Update_string => LocalizeString(nameof(Update_string));
     public static string Updated_string => LocalizeString(nameof(Updated_string));
     public static string Delete_string => LocalizeString(nameof(Delete_string));
+    public static string Cascading_Delete_string => LocalizeString(nameof(Cascading_Delete_string));
     public static string Print_string => LocalizeString(nameof(Print_string));
     public static string Date_string => LocalizeString(nameof(Date_string));
     public static string Time_string => LocalizeString(nameof(Time_string));
@@ -31,6 +32,10 @@ public static class NStrings
     public static string Add_string => LocalizeString(nameof(Add_string));
     public static string Are_you_sure_you_want_to_delete__string =>
         LocalizeString(nameof(Are_you_sure_you_want_to_delete__string));
+    public static string Cascading_delete_confirmation_prefix_string =>
+        LocalizeString(nameof(Cascading_delete_confirmation_prefix_string));
+    public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));
+    public static string Affected_resources_string => LocalizeString(nameof(Affected_resources_string));
     public static string Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection =>
         LocalizeString(
             nameof(

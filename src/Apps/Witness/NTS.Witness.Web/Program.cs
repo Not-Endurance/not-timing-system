@@ -12,6 +12,7 @@ await AddLocalhostOverrideSettings(builder);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+builder.Services.AddNtsWitnessWeb(builder.Configuration);
 builder.Services.AddNtsWitness(builder.Configuration, builder.HostEnvironment.BaseAddress);
 
 Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");

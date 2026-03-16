@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Blazor.Client;
+using Not.Krud.ServiceRegistration;
 using NTS.Application;
 
 namespace NTS.Witness;
@@ -14,6 +15,7 @@ public static class NtsWitnessServices
         string baseUrl
     )
     {
+        services.ConfigureKrud();
         services
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
             .AddStartlist()

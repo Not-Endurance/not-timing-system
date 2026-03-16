@@ -6,7 +6,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public class ArchiveRestApiRepository : RestApiRepository2<ArchiveEntry, ArchiveEntryModel>, ITransient
+public class ArchiveRestApiRepository : RestApiRepository<ArchiveEntry, ArchiveEntryModel>, ITransient
 {
     public ArchiveRestApiRepository(NHttpClient client)
         : base("archive", client) { }

@@ -26,8 +26,14 @@ public abstract class KrudFormBehind<TModel> : NComponent
     [Parameter, EditorRequired]
     public KrudShell<TModel> Shell { get; set; } = default!;
 
+    [Parameter, EditorRequired]
+    public RenderFragment FormFields { get; set; } = default!;
+
     [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    public RenderFragment? AdditionalContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? FormButtons { get; set; }
 
     [Parameter]
     public bool DisableBack { get; set; }

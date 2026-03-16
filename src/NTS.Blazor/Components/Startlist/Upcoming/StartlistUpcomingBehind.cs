@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
+using Not.Blazor.Components.Abstractions;
 using NTS.Application.Startlists;
-using static NTS.Localization.NtsStrings;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;
 
-public class StartlistUpcomingBehind : StartlistBehindBase, IDisposable
+public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
 {
     static readonly TimeSpan TIMER_INTERVAL = TimeSpan.FromSeconds(1);
 
     System.Timers.Timer _timer = default!;
 
-    protected override string[] TableHeaders => [.. base.TableHeaders, Start_In_string];
+    protected string[] TableHeaders =>
+        [Number_string, Athlete_string, Loops_string, Start_Time_string, Start_In_string];
 
     [Parameter]
     public bool Mobile { get; set; } = false;
@@ -22,11 +22,6 @@ public class StartlistUpcomingBehind : StartlistBehindBase, IDisposable
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);
-    }
-
-    protected override void OnBeforeRender()
-    {
-        CreateStartlistsByStage(Service.Upcoming);
     }
 
     protected override void OnInitialized()

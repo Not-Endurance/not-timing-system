@@ -15,6 +15,7 @@ public abstract class MongoRepository<T> : IRepository<T>
     readonly string _db;
     readonly string _collection;
 
+    // TODO: Pass telemetry service here
     public MongoRepository(IMongoContext context, string db, string collection)
     {
         _context = context;
@@ -23,6 +24,16 @@ public abstract class MongoRepository<T> : IRepository<T>
     }
 
     protected abstract UpdateDefinition<T> GetUpdateDefinition(T document);
+
+    protected virtual Expression<Func<T, bool>> GetIdFilter(int id)
+    {
+        return x => x.Id == id;
+    }
+
+    protected virtual Expression<Func<T, bool>> GetItemFilter(T item)
+    {
+        return x => x.Id == item.Id;
+    }
 
     protected IMongoCollection<T> GetCollection()
     {
@@ -35,11 +46,6 @@ public abstract class MongoRepository<T> : IRepository<T>
 
         try
         {
-            if (item.Id == default)
-            {
-                throw new ApplicationException($"Invalid ID '{item.Id}'");
-            }
-
             await GetCollection().InsertOneAsync(item);
         }
         catch (MongoWriteException ex)
@@ -62,7 +68,7 @@ public abstract class MongoRepository<T> : IRepository<T>
     public async Task<T?> Read(int id)
     {
         using var activity = StartActivity(nameof(Read));
-        return await GetCollection().Find(x => x.Id == id).FirstOrDefaultAsync();
+        return await GetCollection().Find(GetIdFilter(id)).FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<T>> ReadMany()
@@ -82,19 +88,19 @@ public abstract class MongoRepository<T> : IRepository<T>
         using var activity = StartActivity(nameof(Update));
 
         var updateDefinition = GetUpdateDefinition(items);
-        await GetCollection().UpdateOneAsync(x => x.Id == items.Id, updateDefinition);
+        await GetCollection().UpdateOneAsync(GetItemFilter(items), updateDefinition);
     }
 
     public async Task Delete(int id)
     {
         using var activity = StartActivity(nameof(Delete));
-        await GetCollection().DeleteOneAsync(x => x.Id == id);
+        await GetCollection().DeleteOneAsync(GetIdFilter(id));
     }
 
     public async Task Delete(T item)
     {
         using var activity = StartActivity(nameof(Delete));
-        await GetCollection().DeleteOneAsync(x => x.Id == item.Id);
+        await GetCollection().DeleteOneAsync(GetItemFilter(item));
     }
 
     public async Task Delete(Expression<Func<T, bool>> filter)

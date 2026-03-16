@@ -60,7 +60,7 @@ public class NStorageBuilder
     public NStorageBuilder AddRestApiStorage(Assembly assembly)
     {
         _nApplicationBuilder.AddHttp();
-        _services.AddAsInterfaces(typeof(RestApiRepository<>), ServiceLifetime.Transient, assembly);
+        _services.AddAsInterfaces(typeof(RestApiRepository<,>), ServiceLifetime.Transient, assembly);
         return this;
     }
 }

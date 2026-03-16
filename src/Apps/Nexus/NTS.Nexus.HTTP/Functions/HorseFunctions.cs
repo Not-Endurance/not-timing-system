@@ -4,7 +4,6 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using Not.Async.Extensions;
 using NTS.Application.Setup;
-using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Repositories;
@@ -38,15 +37,14 @@ public class HorseFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
-        var horse = await ReadBody<Horse>(request);
-        if (horse == null)
+        var document = await ReadBody<HorseModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<Horse>();
+            return UnexpectedPayload<HorseModel>();
         }
 
-        var document = HorseModel.From(horse);
         await _horses.Create(document);
-        return new OkObjectResult($"Inserted {horse}");
+        return new OkObjectResult($"Inserted horse '{document.Name}'");
     }
 
     [Function("horses-update")]
@@ -58,15 +56,14 @@ public class HorseFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
-        var horse = await ReadBody<Horse>(request);
-        if (horse == null)
+        var document = await ReadBody<HorseModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<Horse>();
+            return UnexpectedPayload<HorseModel>();
         }
 
-        var document = HorseModel.From(horse);
         await _horses.Update(document);
-        return new OkObjectResult($"Updated {horse}");
+        return new OkObjectResult($"Updated horse '{document.Name}'");
     }
 
     [Function("horses-safe-delete")]
@@ -143,7 +140,7 @@ public class HorseFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var horses = await _horses.ReadMany().Select(x => x.MapToEntity());
+        var horses = await _horses.ReadMany();
         return new OkObjectResult(horses);
     }
 }

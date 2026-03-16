@@ -1,15 +1,19 @@
-﻿using Not.Application.CRUD.Ports;
+using System.Collections;
+using System.Runtime.CompilerServices;
+using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Domain;
+using Not.Domain.Krud;
 using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Krud.Graph;
+using Not.Krud.Models;
 using Not.Krud.ServiceRegistration;
 using Not.Observables;
 
 namespace Not.Krud.Services;
 
-public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
+public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider, IKrudDependencyResolver
     where T : Aggregate
 {
     readonly CoalesceInvoker _coalescedCommit;
@@ -53,6 +57,183 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         return [this, .. _graph!.AllNodes.OfType<IKrudNodeSetter>()];
     }
 
+    public bool Supports(Type principalType)
+    {
+        EnsureGraphBuilt();
+        return FindDependencies(principalType).Any();
+    }
+
+    public KrudDeleteImpact PreviewDelete(Entity principal)
+    {
+        EnsureGraphBuilt();
+        if (_graph?.Root?.Value is not T root)
+        {
+            return new KrudDeleteImpact(Label(principal), []);
+        }
+
+        var usages = ResolveUsages(root, principal);
+        var projection = usages
+            .Select(x => new KrudDeleteUsage(x.Dependency.Relation, Label(x.Parent), Label(x.Dependent)))
+            .ToList();
+
+        return new KrudDeleteImpact(Label(principal), projection);
+    }
+
+    public void CascadeDeleteDependencies(Entity principal)
+    {
+        EnsureGraphBuilt();
+        if (_graph?.Root?.Value is not T root)
+        {
+            return;
+        }
+
+        var usages = ResolveUsages(root, principal);
+        var deleted = new HashSet<string>();
+        foreach (var usage in usages)
+        {
+            var key =
+                $"{RuntimeHelpers.GetHashCode(usage.Parent)}:{usage.Dependency.DependentType.FullName}:{usage.Dependent.Id}";
+            if (!deleted.Add(key))
+            {
+                continue;
+            }
+            RemoveDependent(usage.Parent, usage.Dependency.DependentType, usage.Dependent);
+        }
+    }
+
+    List<KrudDependency> FindDependencies(Type principalType)
+    {
+        GuardHelper.ThrowIfDefault(_graph);
+        return _graph
+            .DependenciesByPrincipalType.Where(x => x.Key.IsAssignableFrom(principalType))
+            .SelectMany(x => x.Value)
+            .ToList();
+    }
+
+    List<DependencyUsage> ResolveUsages(T root, Entity principal)
+    {
+        var dependencies = FindDependencies(principal.GetType());
+        if (!dependencies.Any())
+        {
+            return [];
+        }
+
+        var aggregateNodes = Traverse(root).ToList();
+        var result = new List<DependencyUsage>();
+
+        foreach (var dependency in dependencies)
+        {
+            var parents = aggregateNodes.Where(node => dependency.ParentType.IsAssignableFrom(node.GetType()));
+            foreach (var parent in parents)
+            {
+                var children = ReadChildren(parent, dependency.DependentType);
+                foreach (var child in children)
+                {
+                    if (child is not Entity dependent)
+                    {
+                        continue;
+                    }
+
+                    var principalValue = dependency.Property.GetValue(child);
+                    if (principalValue is not Entity principalEntity)
+                    {
+                        continue;
+                    }
+
+                    if (principalEntity != principal)
+                    {
+                        continue;
+                    }
+
+                    result.Add(new DependencyUsage(parent, dependent, dependency));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    static IEnumerable<object> Traverse(object root)
+    {
+        var visited = new HashSet<object>(new ReferenceEqualityComparer<object>());
+        var queue = new Queue<object>();
+        queue.Enqueue(root);
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            if (!visited.Add(current))
+            {
+                continue;
+            }
+
+            yield return current;
+
+            var parentInterfaces = current
+                .GetType()
+                .GetInterfaces()
+                .Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IParent<>));
+
+            foreach (var parentInterface in parentInterfaces)
+            {
+                var childrenProperty = parentInterface.GetProperty(nameof(IParent<Entity>.Children));
+                if (childrenProperty?.GetValue(current) is not IEnumerable children)
+                {
+                    continue;
+                }
+
+                foreach (var child in children.OfType<object>())
+                {
+                    queue.Enqueue(child);
+                }
+            }
+        }
+    }
+
+    static IEnumerable<object> ReadChildren(object parent, Type dependentType)
+    {
+        var parentInterface = typeof(IParent<>).MakeGenericType(dependentType);
+        if (!parentInterface.IsAssignableFrom(parent.GetType()))
+        {
+            return [];
+        }
+
+        var childrenProperty = parentInterface.GetProperty(nameof(IParent<Entity>.Children));
+        var children = childrenProperty?.GetValue(parent) as IEnumerable;
+        return children?.OfType<object>() ?? [];
+    }
+
+    static void RemoveDependent(object parent, Type dependentType, Entity dependent)
+    {
+        var parentInterface = typeof(IParent<>).MakeGenericType(dependentType);
+        var removeMethod = parentInterface.GetMethod(nameof(IParent<Entity>.Remove));
+        if (removeMethod == null)
+        {
+            throw new InvalidOperationException(
+                $"'{parent.GetType().Name}' does not implement remove for '{dependentType.Name}'."
+            );
+        }
+        removeMethod.Invoke(parent, [dependent]);
+    }
+
+    static string Label(object? value)
+    {
+        if (value == null)
+        {
+            return string.Empty;
+        }
+        try
+        {
+            var text = value.ToString();
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+        }
+        catch { }
+        return value.GetType().Name;
+    }
+
     void EnsureGraphBuilt()
     {
         if (_graph != null)
@@ -78,6 +259,20 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
             .ToDictionary(x => x.Key, x => x.First().node);
 
         Observe(_graph.Root, _coalescedCommit.Invoke);
+    }
+
+    sealed class DependencyUsage
+    {
+        public DependencyUsage(object parent, Entity dependent, KrudDependency dependency)
+        {
+            Parent = parent;
+            Dependent = dependent;
+            Dependency = dependency;
+        }
+
+        public object Parent { get; }
+        public Entity Dependent { get; }
+        public KrudDependency Dependency { get; }
     }
 }
 

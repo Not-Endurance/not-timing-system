@@ -1,6 +1,7 @@
 using Not.Application.Behinds.Adapters;
 using Not.Injection;
 using Not.Krud.Abstractions;
+using NTS.Application.Settings;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Judge.Features.Settings;

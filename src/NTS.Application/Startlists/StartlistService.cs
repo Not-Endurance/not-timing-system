@@ -2,6 +2,7 @@ using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Startlists;
 
@@ -13,8 +14,13 @@ public class StartlistService
         IStartHistory,
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationRestored>,
-        INotificationHandler<ParticipationEliminated>
+        INotificationHandler<ParticipationEliminated>,
+        INotificationHandler<EventConnected>,
+        INotificationHandler<EventDisconnected>
 {
+    static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_BY_STAGE =
+        new Dictionary<int, IReadOnlyList<Starter>>();
+
     readonly IReadMany<Participation> _participations;
 
     public StartlistService(IReadMany<Participation> participations)
@@ -24,8 +30,13 @@ public class StartlistService
 
     public Startlist? Startlist { get; set; }
 
-    public IReadOnlyList<StartlistEntry> Upcoming => Startlist?.Upcoming ?? [];
-    public IReadOnlyList<StartlistEntry> History => Startlist?.History ?? [];
+    public IReadOnlyList<Starter> Upcoming => Startlist?.Upcoming ?? [];
+    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> UpcomingByStage =>
+        Startlist?.UpcomingByStage ?? EMPTY_BY_STAGE;
+
+    public IReadOnlyList<Starter> History => Startlist?.History ?? [];
+    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage =>
+        Startlist?.HistoryByStage ?? EMPTY_BY_STAGE;
 
     protected override async Task<bool> InitializeState()
     {
@@ -56,6 +67,18 @@ public class StartlistService
     public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
     {
         RemoveEntry(notification.Participation);
+        return Task.CompletedTask;
+    }
+
+    public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
+    {
+        await ReloadState();
+    }
+
+    public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
+    {
+        Startlist = new Startlist([]);
+        ClearState();
         return Task.CompletedTask;
     }
 

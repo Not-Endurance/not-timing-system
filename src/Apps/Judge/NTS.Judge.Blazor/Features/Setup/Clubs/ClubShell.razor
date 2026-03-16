@@ -1,13 +1,17 @@
-﻿@using NTS.Judge.Features.Setup.Clubs
+@using NTS.Judge.Features.Setup.Clubs
 @using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 
 @inherits ClubShellBehind
 
-<KrudForm Shell="this">
-
-    <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
-
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    
+    <FormFields>
+        <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+    </FormFields>
+    
 </KrudForm>
 
  
+
+

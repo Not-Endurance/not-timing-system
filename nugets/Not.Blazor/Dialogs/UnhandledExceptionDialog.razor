@@ -1,0 +1,21 @@
+@inherits UnhandledExceptionDialogBehind
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Unhandled Exception</MudText>
+    </TitleContent>
+
+    <DialogContent>
+        <MudAlert Severity="Severity.Error" Dense="true" Variant="Variant.Outlined">
+            Unexpected error details are shown below for troubleshooting.
+        </MudAlert>
+
+        <MudPaper Outlined="true" Class="pa-4 mt-4 nts-unhandled-exception__viewport">
+            <pre class="nts-unhandled-exception__details">@Details</pre>
+        </MudPaper>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Secondary" Variant="Variant.Text" OnClick="CancelDialog">Close</MudButton>
+    </DialogActions>
+</MudDialog>

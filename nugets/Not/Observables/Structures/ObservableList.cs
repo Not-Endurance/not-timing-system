@@ -41,7 +41,7 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
             }
         }
     }
-    public IEventSubscriber Event => _changed;
+    public IEventSubscriber ObservableEvent => _changed;
     public int Count => _dictionary.Count;
 
     public void AddOrReplace(T item)
@@ -127,6 +127,16 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
         lock (_lock)
         {
             _dictionary.Clear();
+            _changed.Emit();
+        }
+    }
+
+    public void ClearAndAddRange(IEnumerable<T> items)
+    {
+        lock (_lock)
+        {
+            _dictionary.Clear();
+            Add(items);
             _changed.Emit();
         }
     }

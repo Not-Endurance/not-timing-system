@@ -1,14 +1,39 @@
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
+using Not.Blazor.Components.Abstractions;
 
 namespace Not.Blazor.Components.Buttons.Abstractions;
 
-public abstract class NButtonBaseBehind : MudButton
+public abstract class NButtonBaseBehind : NComponentBase
 {
     protected bool IsLoading { get; set; }
 
     [Parameter]
     public string? Text { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public ButtonType ButtonType { get; set; }
+
+    [Parameter]
+    public Variant Variant { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; }
+
+    [Parameter]
+    public string? StartIcon { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Size? IconSize { get; set; }
 
     protected override void OnParametersSet()
     {

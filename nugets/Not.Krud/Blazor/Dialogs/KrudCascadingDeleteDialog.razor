@@ -1,0 +1,24 @@
+@inherits KrudCascadingDeleteDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body1">
+            @Cascading_delete_confirmation_prefix_string <strong>@Impact.Target</strong>.
+        </MudText>
+        <MudText Typo="Typo.body2">@Cascading_delete_warning_string</MudText>
+        <MudText Typo="Typo.subtitle2">@Affected_resources_string:</MudText>
+
+        <ul>
+            @foreach (var usage in Impact.Usages)
+            {
+                <li><strong>@usage.Owner</strong> -> <strong>@usage.Dependent</strong> (<strong>@usage.Relation</strong>)</li>
+            }
+        </ul>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonDelete Text="@Cascading_Delete_string" OnClick="ConfirmDialog" />
+
+        <NButtonCancel OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

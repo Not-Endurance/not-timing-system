@@ -1,0 +1,16 @@
+@using NTS.Blazor.Components.Startlist.History
+@using NTS.Blazor.Components.Startlist.Upcoming
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(STARTLIST_PAGE)]
+@inherits StartlistContentBehind
+
+<NContent Title="@Startlist_string">
+
+    <Main>
+        <StartlistUpcoming />
+
+        <StartlistHistory />
+    </Main>
+
+</NContent>

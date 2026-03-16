@@ -1,0 +1,116 @@
+using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
+using Not.Injection;
+using Not.Notify;
+using Not.Structures;
+using NTS.Application.Core;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Setup.Services.StartValidation;
+using NTS.Judge.Features.Core.State;
+
+namespace NTS.Judge.Features.Core;
+
+public class DashService : NStatefulService, IDashService, ISingleton
+{
+    readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
+    readonly ICoreState _coreState;
+    readonly IStartBusiness _startDashboardBusiness;
+    readonly IRepository<Ranking> _rankings;
+    readonly IRepository<EnduranceEvent> _events;
+    readonly IRepository<Participation> _participations;
+    readonly IRepository<Official> _officials;
+    readonly IRepository<ArchiveEntry> _archive;
+    readonly INotifier _notifier;
+
+    public DashService(
+        IEnumerable<ICoreDependentObservables> coreDependentObservables,
+        ICoreState coreState,
+        IStartBusiness startDashboardBusiness,
+        IRepository<Ranking> rankings,
+        IRepository<EnduranceEvent> events,
+        IRepository<Participation> participations,
+        IRepository<Official> officials,
+        IRepository<ArchiveEntry> archive,
+        INotifier notifier
+    )
+    {
+        _coreDependentObservables = coreDependentObservables;
+        _coreState = coreState;
+        _startDashboardBusiness = startDashboardBusiness;
+        _rankings = rankings;
+        _events = events;
+        _participations = participations;
+        _officials = officials;
+        _archive = archive;
+        _notifier = notifier;
+    }
+
+    public bool IsStarted { get; private set; }
+
+    protected override async Task<bool> InitializeState()
+    {
+        var enduranceEvents = await _events.Read(0);
+        IsStarted = enduranceEvents != null;
+        return IsStarted;
+    }
+
+    public async Task<Result<IReadOnlyList<StartValidationIssue>>> Start()
+    {
+        // TODO: Ensure witness apps receive the participants list on Start (or before).
+        // Currently you need to restart witness after start in order to fetch
+
+        var validationResult = _startDashboardBusiness.Validate();
+        if (validationResult.Data?.Any() == true)
+        {
+            return validationResult;
+        }
+        await _startDashboardBusiness.Start();
+        IsStarted = true;
+        EmitChanged();
+        return Result.Success<IReadOnlyList<StartValidationIssue>>([]);
+    }
+
+    public async Task Reset()
+    {
+        await _coreState.Reset();
+        IsStarted = false;
+        // TODO: replace with events when implement domain event dispatcher and handlers
+        foreach (var observable in _coreDependentObservables)
+        {
+            observable.ResetHasLoaded();
+        }
+        EmitChanged();
+    }
+
+    public async Task LoadArchive(int archiveId)
+    {
+        var entry = await _archive.Read(archiveId);
+        if (entry == null)
+        {
+            _notifier.Inform($"Archive with id '{archiveId}' does not exist");
+            return;
+        }
+        await _events.Create(entry.EnduranceEvent);
+        foreach (var official in entry.Officials)
+        {
+            await _officials.Create(official);
+        }
+        foreach (var ranklist in entry.Ranklists)
+        {
+            await _rankings.Create(ranklist.Ranking);
+        }
+        foreach (var participation in entry.Ranklists.SelectMany(x => x.Entries).Select(x => x.Participation))
+        {
+            await _participations.Create(participation);
+        }
+        IsStarted = true;
+    }
+}
+
+public interface IDashService : IStatefulService
+{
+    bool IsStarted { get; }
+    Task<Result<IReadOnlyList<StartValidationIssue>>> Start();
+    Task LoadArchive(int archiveId);
+    Task Reset();
+}

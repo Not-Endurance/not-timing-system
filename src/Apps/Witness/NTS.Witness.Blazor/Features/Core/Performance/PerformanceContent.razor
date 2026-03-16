@@ -1,0 +1,39 @@
+@using NTS.Blazor.Components.ParticipationChips
+@using NTS.Blazor.Components.ParticipationTable
+@using NTS.Domain.Core.Aggregates.Participations
+@using Not.Blazor.Components.Input
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(PERFORMANCE_PAGE)]
+@inherits PerformanceContentBehind
+
+<NContent Title="@Performance_string" IsEmpty="!Participations.Any()">
+    <Main>
+        <MudStack AlignItems="AlignItems.Stretch">
+            @if (Selected != null)
+            {
+                <ParticipationTable Class="mb-10" Phases="Selected.Phases" Editable="false" />
+            }
+        
+            <NAutocomplete @key="Selected?.Combination.Number"
+                           @bind-Value="Selected"
+                           SearchSafe="Search"
+                           TextUpdateSuppression="false"
+                           Class="performance-autocomplete" />
+
+            <ParticipationChips Participations="@Participations"
+                                RecentlyTimed="@PerformanceService.RecentlyTimed"
+                                @bind-Selected="Selected" />
+        </MudStack>
+    </Main>
+</NContent>
+
+<style>
+    .performance-autocomplete .mud-select-input {
+        margin-top: 0 !important;
+    }
+
+    .performance-autocomplete input {
+        font-size: 1.25rem !important;
+    }
+</style>

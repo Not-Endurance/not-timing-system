@@ -1,7 +1,11 @@
 @using NTS.Domain.Setup.Aggregates.UpcomingEvents
+@using NTS.Judge.Blazor.Features.Setup.Combinations
+@using NTS.Judge.Blazor.Features.Setup.Loops
 @using NTS.Judge.Blazor.Features.Setup.UpcomingEvents.Competitions
 @using NTS.Judge.Blazor.Features.Setup.UpcomingEvents.Officials
+@using NTS.Judge.Features.Setup.UpcomingEvents.Combinations
 @using NTS.Judge.Features.Setup.UpcomingEvents.Competitions
+@using NTS.Judge.Features.Setup.UpcomingEvents.Loops
 @using NTS.Judge.Features.Setup.UpcomingEvents.Officials
 @using Not.Blazor.Components.Layout
 @using Not.Krud.Blazor.Components
@@ -12,21 +16,29 @@
 <NContent Title="@Configure_Endurance_Event_string" IsEmpty="Model == null">
 
     <Main>
-        <UpcomingEventShell Model="Model" />
+        <UpcomingEventShell Model="Model">
+            <AdditionalContent>
+                <NGrid Spacing="8">
+
+                    <MudItem xs="6">
+                        <KrudList T="Competition" TModel="CompetitionFormModel" TShell="CompetitionShell" Name="@Competitions_string" />
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <KrudList T="Official" TModel="OfficialFormModel" TShell="OfficialShell" Name="@Officials_string" />
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <KrudList T="Combination" TModel="CombinationFormModel" TShell="CombinationShell" Name="@Combinations_string" />
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <KrudList T="Loop" TModel="LoopFormModel" TShell="LoopShell" Name="@Loops_string" />
+                    </MudItem>
+
+                </NGrid>
+            </AdditionalContent>
+        </UpcomingEventShell>
     </Main>
-
-    <Main2>
-        <NGrid Spacing="8">
-
-            <MudItem xs="6">
-                <KrudList T="Competition" TModel="CompetitionFormModel" TShell="CompetitionShell" Name="@Competitions_string" />
-            </MudItem>
-
-            <MudItem xs="6">
-                <KrudList T="Official" TModel="OfficialFormModel" TShell="OfficialShell" Name="@Officials_string" />
-            </MudItem>
-
-        </NGrid>
-    </Main2>
 
 </NContent>

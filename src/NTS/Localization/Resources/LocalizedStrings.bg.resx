@@ -405,6 +405,21 @@
   <data name="Official__already_exists" xml:space="preserve">
     <value>Официално лице '{0}' вече съществува</value>
   </data>
+  <data name="Competition__already_exists" xml:space="preserve">
+    <value>Състезание '{0}' вече съществува</value>
+  </data>
+  <data name="Loop_distance__already_exists" xml:space="preserve">
+    <value>Дължина на обиколка '{0}' вече съществува</value>
+  </data>
+  <data name="Combination_number__already_exists" xml:space="preserve">
+    <value>Номер на комбинация '{0}' вече съществува</value>
+  </data>
+  <data name="Combination_athlete__already_exists" xml:space="preserve">
+    <value>Състезател '{0}' вече е включен в друга комбинация</value>
+  </data>
+  <data name="Combination_horse__already_exists" xml:space="preserve">
+    <value>Кон '{0}' вече е включен в друга комбинация</value>
+  </data>
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Моля изберете време в бъдещето</value>
   </data>
@@ -531,6 +546,9 @@
   <data name="Select_event_string" xml:space="preserve">
     <value>Изберете събитие</value>
   </data>
+  <data name="Change_event_string" xml:space="preserve">
+    <value>Смяна на събитие</value>
+  </data>
   <data name="Disqualify_Reason_string" xml:space="preserve">
     <value>Причина за дисквалифициране</value>
   </data>
@@ -582,11 +600,11 @@
   <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
     <value>Конфигурацията на събитието няма да бъде изтрита</value>
   </data>
-  <data name="Soft_reset_dialog_option_1_string" xml:space="preserve">
-    <value>Софт ресет - промени връзката със събирие. Подсигури се че правилното събитие е избрано преди Старт</value>
+  <data name="Disconnect_from_current_Event" xml:space="preserve">
+    <value>Разкачи се от текущото Събитие</value>
   </data>
-  <data name="Soft_reset_dialog_option_2_string" xml:space="preserve">
-    <value>Хард ресет - ресетни връзката към събитие и изтрий всички данни на Фази</value>
+  <data name="Reset_Timing_this_will_DELETE_Timing_data" xml:space="preserve">
+    <value>Ресетни времената - това ще ИЗТРИЕ всички времена</value>
   </data>
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
@@ -744,6 +762,9 @@
   <data name="Connect_string" xml:space="preserve">
     <value>Свържи се</value>
   </data>
+  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
+    <value>Свързването към '{0}' ще премахне текущата ви история на снимките. Това действие не може да бъде отменено.</value>
+  </data>
   <data name="Disconnect_string" xml:space="preserve">
     <value>Прекъсни връзката</value>
   </data>
@@ -834,6 +855,9 @@
   <data name="Restore_string" xml:space="preserve">
     <value>Възстанови</value>
   </data>
+  <data name="Resend_string" xml:space="preserve">
+    <value>Изпрати отново</value>
+  </data>
   <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
     <value>Съжаляваме, няма нищо на този адрес.</value>
   </data>
@@ -891,7 +915,40 @@
   <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
     <value>Предстоящите събития не могат да бъдат изтрити</value>
   </data>
+  <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
+    <value>Не може да се стартира - невалидна конфигурация.</value>
+  </data>
+  <data name="Invalid_setup_string" xml:space="preserve">
+    <value>Невалидна конфигурация</value>
+  </data>
+  <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
+    <value>Участник може да бъде добавен в няколко състезания само ако конфигурацията на фазите е идентична.</value>
+  </data>
+  <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
+    <value>#{0}: конфигурацията на фазите се различава между състезанията:</value>
+  </data>
+  <data name="Start_validation_issue_explanation_string" xml:space="preserve">
+    <value>Участник не може да бъде добавен в няколко състезания с различни фази.</value>
+  </data>
+  <data name="Remove_from__string" xml:space="preserve">
+    <value>Премахни от {0}</value>
+  </data>
+  <data name="Cascading_Delete_string" xml:space="preserve">
+    <value>Каскадно изтриване</value>
+  </data>
+  <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
+    <value>Това е каскадно изтриване за</value>
+  </data>
+  <data name="Cascading_delete_warning_string" xml:space="preserve">
+    <value>Продължаването ще изтрие избрания ресурс и всички свързани ресурси, изброени по-долу.</value>
+  </data>
+  <data name="Affected_resources_string" xml:space="preserve">
+    <value>Засегнати ресурси</value>
+  </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Reset_Timing_string" xml:space="preserve">
+    <value>Ресетни времена</value>
   </data>
 </root>

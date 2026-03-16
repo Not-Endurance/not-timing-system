@@ -8,7 +8,9 @@ public class Handout : Aggregate
         : base(id)
     {
         Participation = participation;
+        EventId = participation.EventId;
     }
 
+    public int EventId { get; }
     public Participation Participation { get; }
 }

@@ -1,0 +1,8 @@
+@using NTS.Blazor.Components.ParticipationChips
+@using NTS.Domain.Core.Aggregates
+@inherits SnapshotChipsBehind
+
+<MudPaper Class="justify-center pa-2">
+    <ParticipationChips Participations="@Participations"
+                        SelectedChanged="@SelectedChanged" />
+</MudPaper>

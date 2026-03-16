@@ -17,7 +17,7 @@ public class SocketStatusBehind : NComponent, IDisposable
     }
 
     [Inject]
-    INtsSocketContext SocketContext { get; set; } = default!;
+    JudgeSocketService SocketContext { get; set; } = default!;
 
     protected bool IsConnected => SocketContext.IsConnected;
 

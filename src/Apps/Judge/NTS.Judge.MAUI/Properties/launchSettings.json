@@ -7,15 +7,6 @@
         "IS_LOCALHOST": "true"
       }
     },
-
-    "Localhost-no-Warp": {
-      "commandName": "Project",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "IS_LOCALHOST": "true",
-        "NO_WARP": "true"
-      }
-    },
     "Staging": {
       "commandName": "Project",
       "environmentVariables": {

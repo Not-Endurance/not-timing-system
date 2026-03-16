@@ -1,0 +1,22 @@
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(EMERGENCY_CONTACTS_PAGE)]
+@inherits EmergencyContactsContentBehind
+
+<NContent Title="@Contacts_string">
+
+    <Main>
+        <MudStack Style="height:100%;" Justify="Justify.Center" Spacing="10" AlignItems="AlignItems.Center">
+            @foreach (var contact in Contacts)
+            {
+                var telFormattedHref = "tel:" + contact.Value;
+                <MudStack Row Spacing="5">
+                    <MudText Typo="Typo.h5">@contact.Key:</MudText>
+
+                    <MudLink Typo="Typo.h5" Href="@telFormattedHref">@contact.Value</MudLink>
+                </MudStack>
+            }
+        </MudStack>
+    </Main>
+
+</NContent>

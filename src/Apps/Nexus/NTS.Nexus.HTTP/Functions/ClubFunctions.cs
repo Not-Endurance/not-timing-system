@@ -2,10 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using Not.Async;
-using Not.Async.Extensions;
 using NTS.Application.Setup;
-using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -35,15 +32,14 @@ public class ClubFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Insert));
 
-        var club = await ReadBody<Club>(request);
-        if (club == null)
+        var document = await ReadBody<ClubModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<Club>();
+            return UnexpectedPayload<ClubModel>();
         }
 
-        var document = ClubModel.From(club);
         await _clubs.Create(document);
-        return new OkObjectResult($"Inserted {club}");
+        return new OkObjectResult($"Inserted club '{document.Name}'");
     }
 
     [Function("clubs-update")]
@@ -55,15 +51,14 @@ public class ClubFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Update));
 
-        var club = await ReadBody<Club>(request);
-        if (club == null)
+        var document = await ReadBody<ClubModel>(request);
+        if (document == null)
         {
-            return UnexpectedPayload<Club>();
+            return UnexpectedPayload<ClubModel>();
         }
 
-        var document = ClubModel.From(club);
         await _clubs.Update(document);
-        return new OkObjectResult($"Updated {club}");
+        return new OkObjectResult($"Updated club '{document.Name}'");
     }
 
     [Function("clubs-delete")]
@@ -97,7 +92,7 @@ public class ClubFunctions : FunctionBase
         LogInformation(request, nameof(GetOne));
 
         var club = await _clubs.Read(id);
-        return new OkObjectResult(club?.MapToEntity());
+        return new OkObjectResult(club);
     }
 
     [Function("clubs-list")]
@@ -109,7 +104,7 @@ public class ClubFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var clubs = await _clubs.ReadMany().Select(x => x.MapToEntity());
+        var clubs = await _clubs.ReadMany();
         return new OkObjectResult(clubs);
     }
 }

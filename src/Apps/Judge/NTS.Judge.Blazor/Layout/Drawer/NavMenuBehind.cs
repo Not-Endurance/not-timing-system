@@ -1,6 +1,6 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
-using NTS.Judge.Features.Core.State;
+using NTS.Judge.Features.Core;
 using NTS.Judge.Features.Settings;
 using static NTS.Judge.Blazor.Routes;
 
@@ -15,7 +15,7 @@ public class NavMenuBehind : NStatefulComponent
     protected ISettingService SettingService { get; set; } = default!;
 
     [Inject]
-    protected ITimingStateService TimingStateService { get; set; } = default!;
+    protected IDashService TimingStateService { get; set; } = default!;
 
     protected override void OnInitialized()
     {

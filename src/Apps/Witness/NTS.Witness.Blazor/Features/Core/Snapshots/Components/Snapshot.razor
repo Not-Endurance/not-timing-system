@@ -1,0 +1,31 @@
+@using WatcherSnapshot = NTS.Domain.Watcher.Snapshot
+@inherits SnapshotBehind
+
+<NTable Items="@Snapshots"
+        EmptyMessage="@EmptyMessage"
+        Headings="@Headings">
+    <TrailingCell Context="item">
+        @{
+            var context = (WatcherSnapshot)item;
+        }
+
+        @if (context.Timestamp == null)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Info"
+                       Size="Size.Small"
+                       OnClick="@(() => OnCapture.InvokeAsync(context))">
+                @SnapshotText
+            </MudButton>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Success"
+                       Size="Size.Small"
+                       OnClick="@(() => OnEdit.InvokeAsync(context))">
+                @context.Timestamp
+            </MudButton>
+        }
+    </TrailingCell>
+</NTable>

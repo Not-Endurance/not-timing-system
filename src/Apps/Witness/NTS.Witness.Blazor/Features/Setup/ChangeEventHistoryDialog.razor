@@ -1,0 +1,13 @@
+@using Not.Blazor.Dialogs.Abstractions
+@inherits ChangeEventHistoryDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body1">@Message</MudText>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonWarning Text="@Connect_string" OnClick="ConfirmDialog" />
+        <NButtonSecondary Text="@Cancel_string" OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

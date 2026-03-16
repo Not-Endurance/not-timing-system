@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NTS.Domain\NTS.Domain.csproj" />
+    <ProjectReference Include="..\NTS.Domain.Watcher\NTS.Domain.Watcher.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Exceptions;
+﻿using Not.Domain.Exceptions;
 using Not.Domain.Krud;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Extensions;
@@ -39,6 +38,7 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
         _officials = officials.ToList();
         _loops = loops.ToList();
         _combinations = combinations.ToList();
+        ValidateUniqueSetup();
     }
 
     IReadOnlyList<Official> IParent<Official>.Children => Officials;
@@ -59,11 +59,13 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
 
     public void Add(Competition competition)
     {
+        ValidateUniqueName(competition);
         _competitions.Add(competition);
     }
 
     public void Update(Competition competition)
     {
+        ValidateUniqueName(competition);
         _competitions.Update(competition);
     }
 
@@ -97,6 +99,7 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
 
     public void Add(Loop child)
     {
+        ValidateUniqueDistance(child);
         _loops.Add(child);
     }
 
@@ -107,11 +110,15 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
 
     public void Update(Loop child)
     {
+        ValidateUniqueDistance(child);
         _loops.Update(child);
     }
 
     public void Add(Combination child)
     {
+        ValidateUniqueNumber(child);
+        ValidateUniqueAthlete(child);
+        ValidateUniqueHorse(child);
         _combinations.Add(child);
     }
 
@@ -122,6 +129,9 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
 
     public void Update(Combination child)
     {
+        ValidateUniqueNumber(child);
+        ValidateUniqueAthlete(child);
+        ValidateUniqueHorse(child);
         _combinations.Update(child);
     }
 
@@ -140,5 +150,85 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
         //TODO: Enum localization
         var roleString = member.Role.GetDescription();
         throw new DomainPropertyException(nameof(Official.Role), Official__already_exists, roleString);
+    }
+
+    void ValidateUniqueSetup()
+    {
+        foreach (var competition in _competitions)
+        {
+            ValidateUniqueName(competition);
+        }
+
+        foreach (var loop in _loops)
+        {
+            ValidateUniqueDistance(loop);
+        }
+
+        foreach (var combination in _combinations)
+        {
+            ValidateUniqueNumber(combination);
+            ValidateUniqueAthlete(combination);
+            ValidateUniqueHorse(combination);
+        }
+    }
+
+    void ValidateUniqueName(Competition competition)
+    {
+        var name = competition.Name.Trim();
+        var exists = _competitions.Any(x =>
+            x.Id != competition.Id && string.Equals(x.Name.Trim(), name, StringComparison.OrdinalIgnoreCase)
+        );
+        if (exists)
+        {
+            throw new DomainPropertyException(nameof(Competition.Name), Competition__already_exists, competition.Name);
+        }
+    }
+
+    void ValidateUniqueDistance(Loop loop)
+    {
+        var exists = _loops.Any(x => x.Id != loop.Id && x.Distance == loop.Distance);
+        if (exists)
+        {
+            throw new DomainPropertyException(nameof(Loop.Distance), Loop_distance__already_exists, loop.Distance);
+        }
+    }
+
+    void ValidateUniqueNumber(Combination combination)
+    {
+        var exists = _combinations.Any(x => x.Id != combination.Id && x.Number == combination.Number);
+        if (exists)
+        {
+            throw new DomainPropertyException(
+                nameof(Combination.Number),
+                Combination_number__already_exists,
+                combination.Number
+            );
+        }
+    }
+
+    void ValidateUniqueAthlete(Combination combination)
+    {
+        var exists = _combinations.Any(x => x.Id != combination.Id && x.Athlete.Id == combination.Athlete.Id);
+        if (exists)
+        {
+            throw new DomainPropertyException(
+                nameof(Combination.Athlete),
+                Combination_athlete__already_exists,
+                combination.Athlete
+            );
+        }
+    }
+
+    void ValidateUniqueHorse(Combination combination)
+    {
+        var exists = _combinations.Any(x => x.Id != combination.Id && x.Horse.Id == combination.Horse.Id);
+        if (exists)
+        {
+            throw new DomainPropertyException(
+                nameof(Combination.Horse),
+                Combination_horse__already_exists,
+                combination.Horse
+            );
+        }
     }
 }

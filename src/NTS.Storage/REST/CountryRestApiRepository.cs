@@ -6,7 +6,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public class CountryRestApiRepository : RestApiRepository2<Country, CountryModel>, ITransient
+public class CountryRestApiRepository : RestApiRepository<Country, CountryModel>, ITransient
 {
     public CountryRestApiRepository(NHttpClient client)
         : base("countries", client) { }

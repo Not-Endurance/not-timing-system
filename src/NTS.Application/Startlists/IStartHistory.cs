@@ -5,5 +5,6 @@ namespace NTS.Application.Startlists;
 
 public interface IStartHistory : IStatefulService
 {
-    IReadOnlyList<StartlistEntry> History { get; }
+    IReadOnlyList<Starter> History { get; }
+    IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage { get; }
 }

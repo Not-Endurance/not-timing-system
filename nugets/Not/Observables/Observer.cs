@@ -6,13 +6,13 @@ public abstract class Observer : IDisposable
 
     protected void Observe(IObservable observable, Action action)
     {
-        var id = observable.Event.Subscribe(action);
+        var id = observable.ObservableEvent.Subscribe(action);
         _observables.Add(id, observable);
     }
 
     protected void Observe(IObservable observable, Func<Task> action)
     {
-        var id = observable.Event.Subscribe(action);
+        var id = observable.ObservableEvent.Subscribe(action);
         _observables.Add(id, observable);
     }
 
@@ -20,7 +20,7 @@ public abstract class Observer : IDisposable
     {
         foreach (var (id, observable) in _observables)
         {
-            observable.Event.Unsubscribe(id);
+            observable.ObservableEvent.Unsubscribe(id);
         }
         _observables.Clear();
         GC.SuppressFinalize(this);

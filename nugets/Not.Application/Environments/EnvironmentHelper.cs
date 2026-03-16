@@ -7,14 +7,9 @@ public static class EnvironmentHelper
     public const string DEVELOPMENT = "Development";
     public const string LOCALHOST = "Localhost";
 
-    public static bool UsesLocalhostInfrastructure()
-    {
-        return Environment.GetEnvironmentVariable(ENVIRONMENT_VARIABLE) == LOCALHOST;
-    }
-
     public static bool Is(string env)
     {
-        return Environment.GetEnvironmentVariable(env) == null;
+        return Environment.GetEnvironmentVariable(env) != null;
     }
 
     public static string GetEnvironment()

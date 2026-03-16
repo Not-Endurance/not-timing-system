@@ -1,0 +1,39 @@
+@inherits StartValidationDialogBehind
+
+<MudDialog>
+
+    <TitleContent>
+        <NHeadline3 Content="@Invalid_setup_string" />
+    </TitleContent>
+
+    <DialogContent>
+        @foreach (var issue in Issues)
+        {
+            <MudPaper Class="pa-3 mb-2" Outlined>
+                <NParagraph Content="@($"#{issue.ParticipationNumber}: {issue.AthleteName}, {issue.HorseName}")" />
+
+                <NSubtext Content="@Start_validation_issue_explanation_string" Class="d-block mt-1" />
+
+                <MudRadioGroup T="int?"
+                               Value="GetSelectedCompetition(issue.ParticipationNumber)"
+                               ValueChanged="@(x => SetSelectedCompetition(issue.ParticipationNumber, x))"
+                               Class="mt-2">
+                    @foreach (var competition in issue.Competitions)
+                    {
+                        <MudRadio Size="MudBlazor.Size.Small" T="int?" Value="@competition.CompetitionId">
+                            @string.Format(Remove_from__string, $"{@competition.CompetitionName} ({@competition.PhaseSignature})")
+                        </MudRadio>
+                    }
+                </MudRadioGroup>
+
+            </MudPaper>
+        }
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonPrimary Text="@Start_string" OnClick="Start" Disabled="@(!CanApplyCorrections)" />
+
+        <NButtonSecondary Text="@Cancel_string" OnClick="CancelDialog" />
+    </DialogActions>
+
+</MudDialog>

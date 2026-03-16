@@ -13,10 +13,12 @@ public class Ranking : Aggregate
         string? feiRule,
         string? feiScheduleNumber,
         IEnumerable<RankingEntry> entries,
+        int eventId,
         int? id = null
     )
         : base(id)
     {
+        EventId = eventId;
         Name = Required(nameof(Name), name);
         Ruleset = Required(nameof(Ruleset), ruleset);
         Category = Required(nameof(Category), category);
@@ -27,6 +29,7 @@ public class Ranking : Aggregate
         FeiScheduleNumber = feiScheduleNumber;
     }
 
+    public int EventId { get; }
     public string Name { get; }
     public CompetitionRuleset Ruleset { get; }
     public CompetitionType Type { get; }

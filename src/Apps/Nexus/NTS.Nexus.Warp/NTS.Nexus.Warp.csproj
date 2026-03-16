@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\nugets\Not.Storage\Not.Storage.csproj" />
+    <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\NTS.Nexus.Warp.Contracts\NTS.Nexus.Warp.Contracts.csproj" />
+  </ItemGroup>
+  
+</Project>

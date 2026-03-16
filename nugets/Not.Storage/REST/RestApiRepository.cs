@@ -1,14 +1,16 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
+using Not.Domain.Abstractions;
 using Not.Injection;
+using Not.Krud.Abstractions;
 using Not.Notify;
-using Not.Structures;
 
 namespace Not.Storage.REST;
 
-public abstract class RestApiRepository<T> : IRepository<T>
-    where T : class, IIdentifiable
+public abstract class RestApiRepository<T, TModel> : IRepository<T>
+    where T : class, IEntity
+    where TModel : class, IKrudModel<T>, new()
 {
     readonly string _endpoint;
 
@@ -21,13 +23,19 @@ public abstract class RestApiRepository<T> : IRepository<T>
     static INotifier Notifier => ServiceLocator.Get<INotifier>();
 
     protected NHttpClient Client { get; }
+    protected string Endpoint => _endpoint;
 
-    protected string BuildUrl(object id)
+    protected virtual string ResolveEndpoint()
     {
-        return $"{_endpoint}/{id}";
+        return _endpoint;
     }
 
-    protected void HandleException(Exception ex)
+    protected virtual string BuildUrl(object id)
+    {
+        return $"{ResolveEndpoint()}/{id}";
+    }
+
+    protected virtual void HandleException(Exception ex)
     {
         if (
             ex is HttpRequestException httpRequestException
@@ -50,11 +58,35 @@ public abstract class RestApiRepository<T> : IRepository<T>
         }
     }
 
+    protected virtual Task InternalCreate(T item)
+    {
+        var model = MapModel(item);
+        return Client.Post(ResolveEndpoint(), model);
+    }
+
+    protected virtual Task InternalUpdate(T item)
+    {
+        var model = MapModel(item);
+        return Client.Patch(ResolveEndpoint(), model);
+    }
+
+    protected virtual TModel MapModel(T item)
+    {
+        var model = new TModel();
+        model.MapFrom(item);
+        return model;
+    }
+
+    protected virtual T? MapEntity(TModel? model)
+    {
+        return model?.MapToEntity();
+    }
+
     public async Task Create(T item)
     {
         try
         {
-            await Client.Post(_endpoint, item);
+            await InternalCreate(item);
         }
         catch (Exception ex)
         {
@@ -80,19 +112,19 @@ public abstract class RestApiRepository<T> : IRepository<T>
         await Delete(item.Id);
     }
 
-    public Task Delete(Expression<Func<T, bool>> filter)
+    public virtual Task Delete(Expression<Func<T, bool>> filter)
     {
-        throw new NotImplementedException();
+        return DeleteMany(filter);
     }
 
-    public Task Delete(IEnumerable<T> items)
+    public virtual Task Delete(IEnumerable<T> items)
     {
-        throw new NotImplementedException();
+        return DeleteMany(items);
     }
 
-    public Task<T?> Read(Expression<Func<T, bool>> filter)
+    public virtual async Task<T?> Read(Expression<Func<T, bool>> filter)
     {
-        throw new NotImplementedException();
+        return (await ReadMany(filter)).FirstOrDefault();
     }
 
     public async Task<T?> Read(int id)
@@ -100,7 +132,7 @@ public abstract class RestApiRepository<T> : IRepository<T>
         try
         {
             var url = BuildUrl(id);
-            return await Client.GetJson<T>(url);
+            return MapEntity(await Client.GetJson<TModel>(url));
         }
         catch (Exception ex)
         {
@@ -109,11 +141,12 @@ public abstract class RestApiRepository<T> : IRepository<T>
         }
     }
 
-    public async Task<IEnumerable<T>> ReadMany()
+    public virtual async Task<IEnumerable<T>> ReadMany()
     {
         try
         {
-            return await Client.GetJson<IEnumerable<T>>(_endpoint) ?? [];
+            var models = await Client.GetJson<IEnumerable<TModel>>(ResolveEndpoint()) ?? [];
+            return models.Select(x => MapEntity(x)!);
         }
         catch (Exception ex)
         {
@@ -122,9 +155,10 @@ public abstract class RestApiRepository<T> : IRepository<T>
         }
     }
 
-    public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
+    public virtual async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
-        throw new NotImplementedException();
+        var predicate = filter.Compile();
+        return (await ReadMany()).Where(predicate);
     }
 
     public async Task SafeDelete(int id)
@@ -140,15 +174,29 @@ public abstract class RestApiRepository<T> : IRepository<T>
         }
     }
 
-    public async Task Update(T items)
+    public async Task Update(T item)
     {
         try
         {
-            await Client.Patch(_endpoint, items);
+            await InternalUpdate(item);
         }
         catch (Exception ex)
         {
             HandleException(ex);
+        }
+    }
+
+    async Task DeleteMany(Expression<Func<T, bool>> filter)
+    {
+        var items = await ReadMany(filter);
+        await DeleteMany(items);
+    }
+
+    async Task DeleteMany(IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            await Delete(item);
         }
     }
 }

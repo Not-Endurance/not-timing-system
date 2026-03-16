@@ -5,8 +5,6 @@ public static class Routes
     public const string HOME = "/";
     public const string UPCOMING_EVENT_PAGE = "/upcomingevent-update";
     public const string ATHLETES_HORSES_PAGE = "/athletes-horses";
-    public const string COMBINATIONS_PAGE = "/combinations";
-    public const string LOOPS_PAGE = "/loops";
     public const string CLUBS_PAGE = "/clubs";
     public const string OFFICIAL_UPDATE = "/official-update";
     public const string LOOP_CONTENT = "/loop-update";

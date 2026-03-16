@@ -1,13 +1,18 @@
-﻿@using NTS.Domain.Setup.Aggregates.UpcomingEvents
+@using NTS.Domain.Setup.Aggregates.UpcomingEvents
 @using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 
 @inherits PhaseShellBehind
 
-<KrudForm Shell="this">
-    <NSelect T="Loop" @bind-Value="Model.Loop" For="() => Model.Loop" Items="Loops" Label="@Loop_string" Placeholder="@Select_a_loop_string" />
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
+        <NSelect T="Loop" @bind-Value="Model.Loop" For="() => Model.Loop" Items="Loops" Label="@Loop_string" Placeholder="@Select_a_loop_string" />
 
-    <NNumberField @bind-Value="Model.Recovery" For="() => Model.Recovery" Min="0" Label="@Recovery_time_string" />
+        <NNumberField @bind-Value="Model.Recovery" For="() => Model.Recovery" Min="0" Label="@Recovery_time_string" />
 
-    <NNumberField @bind-Value="Model.Rest" For="() => Model.Rest" Min="0" Label="@Rest_time_string" />
+        <NNumberField @bind-Value="Model.Rest" For="() => Model.Rest" Min="0" Label="@Rest_time_string" />
+    </FormFields>
 </KrudForm>
+
+
+

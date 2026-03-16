@@ -15,4 +15,9 @@ public abstract class NStatefulService<T> : NStatefulService, IDisposable
         : this(new T()) { }
 
     protected T State { get; }
+
+    protected override void ClearState()
+    {
+        base.ClearState();
+    }
 }

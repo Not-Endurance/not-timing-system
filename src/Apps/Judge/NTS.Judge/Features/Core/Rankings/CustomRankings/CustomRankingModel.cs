@@ -20,11 +20,23 @@ public record CustomRankingModel : KrudFormModel<Ranking>
     public string? CompetitionFeiId { get; set; }
     public string? FeiRule { get; set; }
     public string? FeiScheduleNumber { get; set; }
+    public int EventId { get; set; }
     public List<RankingEntry> Entries { get; set; } = [];
 
     protected override Ranking MapTo()
     {
-        return new Ranking(Name, Ruleset, Type, Category, CompetitionFeiId, FeiRule, FeiScheduleNumber, Entries, Id);
+        return new Ranking(
+            Name,
+            Ruleset,
+            Type,
+            Category,
+            CompetitionFeiId,
+            FeiRule,
+            FeiScheduleNumber,
+            Entries,
+            EventId,
+            Id
+        );
     }
 
     public override void MapFrom(Ranking ranking)
@@ -39,6 +51,7 @@ public record CustomRankingModel : KrudFormModel<Ranking>
         CompetitionFeiId = ranking.CompetitionFeiId;
         FeiRule = ranking.FeiRule;
         FeiScheduleNumber = ranking.FeiScheduleNumber;
+        EventId = ranking.EventId;
         Entries = ranking.Entries.ToList();
     }
 }

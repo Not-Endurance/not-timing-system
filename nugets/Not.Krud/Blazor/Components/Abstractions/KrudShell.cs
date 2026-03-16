@@ -21,6 +21,12 @@ public abstract class KrudShell<TModel> : NComponent
     [Parameter]
     public TModel Model { get; set; } = new();
 
+    [Parameter]
+    public RenderFragment? AdditionalContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? FormButtons { get; set; }
+
     /// <summary>
     /// A hook for Form callers to attach Submit handlers such as <seealso cref="Form.KrudFormDialog{TModel, TForm}" closing the dialog />
     /// </summary>

@@ -4,15 +4,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Not.Filesystem;
 using Not.Injection;
 using Not.Storage;
+using Not.Storage.JsonFile.Stores;
 using Not.Storage.REST;
-using NTS.Judge.Features.Core;
-using NTS.Storage.Core;
+using NTS.Application.Core;
 using NTS.Storage.JSON;
+using NTS.Storage.REST;
 
 namespace NTS.Storage;
 
 public static class NtsStorageServices
 {
+    const string DATA_KEY = "NDataKey";
+
     public static Builder ConfigureNtsStorage(this IServiceCollection services, IConfiguration configuration)
     {
         return new(services, configuration);
@@ -31,7 +34,8 @@ public static class NtsStorageServices
 
         public Builder AddJsonStorage()
         {
-            _nStorageBuilder.AddJsonFileStorage<CoreState, CoreJsonStore, ICoreState>(Assembly.GetExecutingAssembly());
+            var factory = FileContextHelper.CreateFileContextFactory("stores");
+            _services.AddKeyedSingleton<IFilesystemContext, FilesystemContext>(DATA_KEY, factory);
             _services.AddAsInterfaces<SocketPrincipalStorage>(ServiceLifetime.Singleton);
             return this;
         }
@@ -39,6 +43,7 @@ public static class NtsStorageServices
         public Builder AddRestApiStorage()
         {
             _nStorageBuilder.AddRestApiStorage(Assembly.GetExecutingAssembly());
+            _services.AddSingleton<ICoreState, RestApiCoreState>();
             return this;
         }
     }

@@ -5,6 +5,7 @@ namespace NTS.Application.Startlists;
 
 public interface IStartUpcoming : IStatefulService
 {
-    IReadOnlyList<StartlistEntry> Upcoming { get; }
+    IReadOnlyList<Starter> Upcoming { get; }
+    IReadOnlyDictionary<int, IReadOnlyList<Starter>> UpcomingByStage { get; }
     void Refresh();
 }

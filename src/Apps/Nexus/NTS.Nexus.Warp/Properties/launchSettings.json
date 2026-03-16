@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "NTS.Nexus.Warp": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "PORT": "11337"
+      },
+      "applicationUrl": "https://localhost:61380;http://localhost:61381"
+    }
+  }
+}

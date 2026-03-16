@@ -2,5 +2,5 @@ namespace NTS.Judge.Features.Core.State;
 
 public interface ICoreDependentObservables
 {
-    void ResetState();
+    void ResetHasLoaded();
 }

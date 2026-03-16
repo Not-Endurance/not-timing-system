@@ -11,6 +11,7 @@ namespace NTS.Localization
     {
         public static string km_string => LocalizeString(nameof(km_string));
         public static string hrs_string => LocalizeString(nameof(hrs_string));
+        public static string Reset_Timing_string => LocalizeString(nameof(Reset_Timing_string));
         public static string Export_FEI_string => LocalizeString(nameof(Export_FEI_string));
         public static string rest_string => LocalizeString(nameof(rest_string));
         public static string ARR_string => LocalizeString(nameof(ARR_string));
@@ -60,6 +61,7 @@ namespace NTS.Localization
         public static string Event_string => LocalizeString(nameof(Event_string));
         public static string Upcoming_events_string => LocalizeString(nameof(Upcoming_events_string));
         public static string Select_event_string => LocalizeString(nameof(Select_event_string));
+        public static string Change_event_string => LocalizeString(nameof(Change_event_string));
         public static string Stages_string => LocalizeString(nameof(Stages_string));
         public static string Ride_string => LocalizeString(nameof(Ride_string));
         public static string Not_ranked_string => LocalizeString(nameof(Not_ranked_string));
@@ -76,13 +78,22 @@ namespace NTS.Localization
         public static string Loops_string => LocalizeString(nameof(Loops_string));
         public static string Settings_string => LocalizeString(nameof(Settings_string));
         public static string Start_string => LocalizeString(nameof(Start_string));
+        public static string Invalid_setup_string => LocalizeString(nameof(Invalid_setup_string));
+        public static string Start_validation_invalid_setup_title_string =>
+            LocalizeString(nameof(Start_validation_invalid_setup_title_string));
+        public static string Start_validation_invalid_setup_description_string =>
+            LocalizeString(nameof(Start_validation_invalid_setup_description_string));
+        public static string Start_validation_issue_different_phase_configurations_string =>
+            LocalizeString(nameof(Start_validation_issue_different_phase_configurations_string));
+        public static string Start_validation_issue_explanation_string =>
+            LocalizeString(nameof(Start_validation_issue_explanation_string));
+        public static string Remove_from__string => LocalizeString(nameof(Remove_from__string));
         public static string Reset_string => LocalizeString(nameof(Reset_string));
         public static string Hard_reset_string => LocalizeString(nameof(Hard_reset_string));
         public static string Soft_reset_string => LocalizeString(nameof(Soft_reset_string));
-        public static string Soft_reset_dialog_option_1_string =>
-            LocalizeString(nameof(Soft_reset_dialog_option_1_string));
-        public static string Soft_reset_dialog_option_2_string =>
-            LocalizeString(nameof(Soft_reset_dialog_option_2_string));
+        public static string Disconnect_from_current_Event => LocalizeString(nameof(Disconnect_from_current_Event));
+        public static string Reset_Timing_this_will_DELETE_Timing_data =>
+            LocalizeString(nameof(Reset_Timing_this_will_DELETE_Timing_data));
         public static string Are_you_sure_you_want_to_reset_string =>
             LocalizeString(nameof(Are_you_sure_you_want_to_reset_string));
         public static string Setup_configuration_will_not_be_deleted_string =>
@@ -119,6 +130,14 @@ namespace NTS.Localization
             LocalizeString(nameof(Please_provide_reason_to_eliminate_as__));
         public static string Select_FTQ_codes => LocalizeString(nameof(Select_FTQ_codes));
         public static string Official__already_exists => LocalizeString(nameof(Official__already_exists));
+        public static string Competition__already_exists => LocalizeString(nameof(Competition__already_exists));
+        public static string Loop_distance__already_exists => LocalizeString(nameof(Loop_distance__already_exists));
+        public static string Combination_number__already_exists =>
+            LocalizeString(nameof(Combination_number__already_exists));
+        public static string Combination_athlete__already_exists =>
+            LocalizeString(nameof(Combination_athlete__already_exists));
+        public static string Combination_horse__already_exists =>
+            LocalizeString(nameof(Combination_horse__already_exists));
         public static string Athletes_string => LocalizeString(nameof(Athletes_string));
         public static string Horses_string => LocalizeString(nameof(Horses_string));
         public static string Competitions_string => LocalizeString(nameof(Competitions_string));
@@ -187,6 +206,7 @@ namespace NTS.Localization
         public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
         public static string Snapshot_page_string => LocalizeString(nameof(Snapshot_page_string));
         public static string Performance_string => LocalizeString(nameof(Performance_string));
+        public static string Resend_string => LocalizeString(nameof(Resend_string));
         public static string Vetin_string => LocalizeString(nameof(Vetin_string));
         public static string Participant_string => LocalizeString(nameof(Participant_string));
         public static string Username_string => LocalizeString(nameof(Username_string));
@@ -202,6 +222,10 @@ namespace NTS.Localization
         public static string Access_denied_next_steps => LocalizeString(nameof(Access_denied_next_steps));
         public static string Try_another_account_string => LocalizeString(nameof(Try_another_account_string));
         public static string Connect_string => LocalizeString(nameof(Connect_string));
+        public static string Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string =>
+            LocalizeString(
+                nameof(Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string)
+            );
         public static string Disconnect_string => LocalizeString(nameof(Disconnect_string));
         public static string Connected_to__string => LocalizeString(nameof(Connected_to__string));
         public static string Connected_to_string => LocalizeString(nameof(Connected_to_string));
@@ -252,6 +276,11 @@ namespace NTS.Localization
         public static string Cannot_delete_default_image_string =>
             LocalizeString(nameof(Cannot_delete_default_image_string));
         public static string Confirm_Delete_string => LocalizeString(nameof(Confirm_Delete_string));
+        public static string Cascading_Delete_string => LocalizeString(nameof(Cascading_Delete_string));
+        public static string Cascading_delete_confirmation_prefix_string =>
+            LocalizeString(nameof(Cascading_delete_confirmation_prefix_string));
+        public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));
+        public static string Affected_resources_string => LocalizeString(nameof(Affected_resources_string));
         public static string Image_deleted_string => LocalizeString(nameof(Image_deleted_string));
         public static string File_not_found_string => LocalizeString(nameof(File_not_found_string));
         public static string Upcoming_events_cannot_be_deleted_string =>

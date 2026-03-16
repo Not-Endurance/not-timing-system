@@ -14,7 +14,8 @@ public static class ParticipationAndRankingFactory
         Dictionary<ParticipationCategory, List<RankingEntry>> RankingEntriesByCategory
     ) Create(
         Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
-        IEnumerable<Participation> existingParticipations
+        IEnumerable<Participation> existingParticipations,
+        int eventId
     )
     {
         if (setupCompetition.Phases.Count == 0)
@@ -34,7 +35,7 @@ public static class ParticipationAndRankingFactory
         var rankingEntriesByCategory = new Dictionary<ParticipationCategory, List<RankingEntry>>();
         foreach (var setupParticipation in setupCompetition.Participations)
         {
-            var participation = CreateParticipation(setupCompetition, setupParticipation);
+            var participation = CreateParticipation(setupCompetition, setupParticipation, eventId);
 
             if (existingParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
@@ -59,7 +60,8 @@ public static class ParticipationAndRankingFactory
 
     public static Participation CreateParticipation(
         Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
-        Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation
+        Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation,
+        int eventId
     )
     {
         var phases = CreatePhases(setupCompetition);
@@ -76,6 +78,7 @@ public static class ParticipationAndRankingFactory
             combination,
             new(phases),
             null,
+            eventId,
             setupParticipation.Id
         );
     }

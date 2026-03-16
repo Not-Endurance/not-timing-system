@@ -12,21 +12,23 @@
 <NContent Title="@Configure_Competition_string" IsEmpty="Model == null">
 
     <Main>
-        <NGrid Spacing="8">
+        <CompetitionShell Model="Model">
             
-            <MudItem xs="12">
-                <CompetitionShell Model="Model" />
-            </MudItem>
+            <AdditionalContent>
+                
+                <NGrid Spacing="8">
+                    <MudItem xs="6">
+                        <KrudList T="Phase" TModel="PhaseFormModel" TShell="PhaseShell" Name="@Phases_string" />
+                    </MudItem>
 
-            <MudItem xs="6">
-                <KrudList T="Phase" TModel="PhaseFormModel" TShell="PhaseShell" Name="@Phases_string" />
-            </MudItem>
+                    <MudItem xs="6">
+                        <KrudList T="Participation" TModel="ParticipationFormModel" TShell="ParticipationShell" Name="@Participations_string"/>
+                    </MudItem>
+                </NGrid>
 
-            <MudItem xs="6">
-                <KrudList T="Participation" TModel="ParticipationFormModel" TShell="ParticipationShell" Name="@Participations_string"/>
-            </MudItem>
+            </AdditionalContent>
 
-        </NGrid>
+        </CompetitionShell>
     </Main>
 
 </NContent>

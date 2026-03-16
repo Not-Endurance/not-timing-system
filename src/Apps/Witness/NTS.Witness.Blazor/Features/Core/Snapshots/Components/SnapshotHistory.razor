@@ -1,0 +1,65 @@
+@using MudBlazor
+@using Not.Blazor.Components
+@inherits SnapshotHistoryBehind
+
+@if (History.Count != 0)
+{
+    <MudPaper Class="pa-4">
+        <MudStack Spacing="2">
+            <NHeadline2 Content="@History_string" IsAbsoluteCenter />
+
+            @for (var index = 0; index < History.Count; index++)
+            {
+                var currentIndex = index;
+                var group = History[index];
+
+                <MudPaper @key="currentIndex" Outlined Class="pa-2">
+
+                    <MudButton Variant="Variant.Text"
+                               FullWidth="true"
+                               OnClick="@(() => ToggleGroup(currentIndex))">
+
+                        <MudStack Row="true"
+                                  Justify="Justify.SpaceBetween"
+                                  AlignItems="AlignItems.Center"
+                                  Style="width: 100%;">
+
+                            <MudText Typo="Typo.subtitle2">@group.Type</MudText>
+
+                            <MudText Typo="Typo.caption">@group.Entries.Count()</MudText>
+                        </MudStack>
+
+                    </MudButton>
+
+                    <MudCollapse Expanded="@IsExpanded(currentIndex)">
+                        <MudStack Spacing="2" Class="pt-2">
+                            @foreach (var snapshot in group.Entries)
+                            {
+                                <MudPaper Class="pa-2">
+
+                                    <MudStack Row="true"
+                                              Justify="Justify.SpaceBetween"
+                                              AlignItems="AlignItems.Center"
+                                              Style="width: 100%;">
+
+                                        <MudText Typo="Typo.body2">@snapshot</MudText>
+
+                                        <MudText Typo="Typo.caption">@snapshot.Timestamp</MudText>
+                                    </MudStack>
+
+                                </MudPaper>
+                            }
+
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       Disabled="@(!CanResend || IsResending)"
+                                       OnClick="@(() => ResendGroup(currentIndex))">
+                                @Resend_string
+                            </MudButton>
+                        </MudStack>
+                    </MudCollapse>
+                </MudPaper>
+            }
+        </MudStack>
+    </MudPaper>
+}

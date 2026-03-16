@@ -1,11 +1,13 @@
-﻿using Not.Storage.JsonFile.Repositories;
-using Not.Storage.JsonFile.Stores;
+using Not.Application.HTTP;
+using Not.Injection;
+using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
+using NTS.Storage.REST;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class OfficialRepository : SetRepository<Official, CoreState>
+public class OfficialRepository : EventScopedApiRepository<Official, OfficialModel>, ITransient
 {
-    public OfficialRepository(IStore<CoreState> store)
-        : base(store) { }
+    public OfficialRepository(NHttpClient client, IServiceProvider serviceProvider)
+        : base("officials", client, serviceProvider) { }
 }

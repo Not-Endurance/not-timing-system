@@ -405,6 +405,21 @@
   <data name="Official__already_exists" xml:space="preserve">
     <value>'{0}' adlı resmi görevli zaten mevcut</value>
   </data>
+  <data name="Competition__already_exists" xml:space="preserve">
+    <value>Yarışma '{0}' zaten mevcut</value>
+  </data>
+  <data name="Loop_distance__already_exists" xml:space="preserve">
+    <value>Tur mesafesi '{0}' zaten mevcut</value>
+  </data>
+  <data name="Combination_number__already_exists" xml:space="preserve">
+    <value>Kombinasyon numarası '{0}' zaten mevcut</value>
+  </data>
+  <data name="Combination_athlete__already_exists" xml:space="preserve">
+    <value>Sporcu '{0}' zaten başka bir kombinasyonda</value>
+  </data>
+  <data name="Combination_horse__already_exists" xml:space="preserve">
+    <value>At '{0}' zaten başka bir kombinasyonda</value>
+  </data>
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Lütfen gelecekteki bir zaman seçin</value>
   </data>
@@ -531,6 +546,9 @@
   <data name="Select_event_string" xml:space="preserve">
     <value>Etkinlik seç</value>
   </data>
+  <data name="Change_event_string" xml:space="preserve">
+    <value>Etkinliği değiştir</value>
+  </data>
   <data name="Disqualify_Reason_string" xml:space="preserve">
     <value>Diskalifiye olma nedeni</value>
   </data>
@@ -655,6 +673,9 @@
   <data name="Access_denied_next_steps" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
+    <value>'{0}' etkinliğine bağlanmak mevcut anlık görüntü geçmişinizi silecektir. Bu işlem geri alınamaz.</value>
+  </data>
   <data name="Connect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
@@ -690,5 +711,38 @@
   </data>
   <data name="Empty_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
+  </data>
+  <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
+    <value>Başlatılamıyor - Geçersiz yapılandırma.</value>
+  </data>
+  <data name="Invalid_setup_string" xml:space="preserve">
+    <value>Geçersiz yapılandırma</value>
+  </data>
+  <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
+    <value>Bir katılım birden fazla yarışmaya yalnızca aşama yapısı aynıysa eklenebilir.</value>
+  </data>
+  <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
+    <value>#{0}: aşama yapılandırması yarışmalar arasında farklı:</value>
+  </data>
+  <data name="Start_validation_issue_explanation_string" xml:space="preserve">
+    <value>Katılım, farklı aşamalara sahip birden fazla yarışmaya eklenemez.</value>
+  </data>
+  <data name="Remove_from__string" xml:space="preserve">
+    <value>Şundan kaldır: {0}</value>
+  </data>
+  <data name="Cascading_Delete_string" xml:space="preserve">
+    <value>Zincirleme Sil</value>
+  </data>
+  <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
+    <value>Bu, şu öğe için zincirleme silme işlemidir</value>
+  </data>
+  <data name="Cascading_delete_warning_string" xml:space="preserve">
+    <value>Devam ederseniz seçilen kaynak ve aşağıda listelenen ilgili tüm kaynaklar silinecektir.</value>
+  </data>
+  <data name="Affected_resources_string" xml:space="preserve">
+    <value>Etkilenen kaynaklar</value>
+  </data>
+  <data name="Resend_string" xml:space="preserve">
+    <value>Yeniden gonder</value>
   </data>
 </root>

@@ -4,7 +4,7 @@
 
 @inherits ParticipationChipsBehind
 
-<NChips SelectedValue="Selected">
+<NChips T="Participation" SelectedValue="@Selected">
 
     @foreach (var grouping in Participations.GroupBy(x => x.Phases.Distance))
     {
@@ -17,8 +17,13 @@
         @foreach (var participation in grouping.OrderBy(x => x.Combination.Number))
         {
             var number = participation.Combination.Number;
-            <MudChip Text="@number.ToString()" Value="participation" Color="GetColor(participation)" Size="Size.Medium"
-                     OnClick="() => Select(participation)" Style="min-width: 1rem" />
+            <MudChip T="Participation"
+                     Text="@number.ToString()"
+                     Value="@participation"
+                     Color="@GetColor(participation)"
+                     Size="Size.Medium"
+                     OnClick="() => Select(participation)"
+                     Style="min-width: 1rem" />
         }
     }
 </NChips>

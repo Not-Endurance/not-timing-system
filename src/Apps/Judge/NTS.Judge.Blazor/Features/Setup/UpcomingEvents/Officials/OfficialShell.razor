@@ -5,10 +5,15 @@
 
 @inherits OfficialShellBehind
 
-<KrudForm Shell="this">
-    <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
+        <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
 
-    <NSelect @bind-Value="Model.Role" For="() => Model.Role" Label="@Official_Role_string" Placeholder="@Select_a_role_string" />
+        <NSelect @bind-Value="Model.Role" For="() => Model.Role" Label="@Official_Role_string" Placeholder="@Select_a_role_string" />
 
-    <NAutocomplete T="User" @bind-Value="Model.User" For="() => Model.User" Label="@Username_string" SearchSafe="SearchUsersSafe" />
+        <NAutocomplete T="User" @bind-Value="Model.User" For="() => Model.User" Label="@Username_string" SearchSafe="SearchUsersSafe" />
+    </FormFields>
 </KrudForm>
+
+
+

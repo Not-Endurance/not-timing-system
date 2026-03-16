@@ -7,17 +7,23 @@
 
 @inherits StartlistUpcomingBehind
 
-@if (Service.Upcoming.Count() != 0)
+@if (Service.UpcomingByStage.Count != 0)
 {
     <MudTabs PanelClass="px-4 py-6" Elevation="0" Rounded ApplyEffectsToContainer Class="@Class">
-        @foreach (var tabHeader in StartlistsByStage.Keys)
+        @foreach (var stage in Service.UpcomingByStage)
         {
-            <MudTabPanel Text="@tabHeader">
-                <NTable Headings="@TableHeaders" Items="StartlistsByStage[tabHeader]">
+            <MudTabPanel Text="@($"{Stage_string} {stage.Key}")">
+
+                <NTable Headings="@TableHeaders" Items="stage.Value">
+
                     <TrailingCell Context="item">
-                        <StartlistEntryTimer Entry="@((StartlistEntry)item)" />
+
+                        <StartlistEntryTimer Entry="@((Starter)item)" />
+
                     </TrailingCell>
+
                 </NTable>
+
             </MudTabPanel>
         }
     </MudTabs>

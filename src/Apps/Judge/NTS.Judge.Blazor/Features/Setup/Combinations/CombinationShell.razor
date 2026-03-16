@@ -1,14 +1,19 @@
-﻿@using NTS.Domain.Core.StaticOptions
+@using NTS.Domain.Core.StaticOptions
 @using NTS.Judge.Features.Setup.UpcomingEvents.Combinations
 @using Not.Blazor.Components.Input
 @using Not.Krud.Blazor.Components
 
 @inherits CombinationShellBehind
 
-<KrudForm Shell="this">
-    <NNumberField @bind-Value="Model.Number" For="() => Model.Number" Min="0" Label="@Combination_Number_string" />
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
+        <NNumberField @bind-Value="Model.Number" For="() => Model.Number" Min="0" Label="@Combination_Number_string" />
 
-    <NAutocomplete @bind-Value="Model.Athlete" For="() => Model.Athlete" Label="@Athlete_string" SearchSafe="SearchAthletesSafe" />
+        <NAutocomplete @bind-Value="Model.Athlete" For="() => Model.Athlete" Label="@Athlete_string" SearchSafe="SearchAthletesSafe" />
 
-    <NAutocomplete @bind-Value="Model.Horse" For="() => Model.Horse" Label="@Horse_string" SearchSafe="SearchHorsesSafe"/>
+        <NAutocomplete @bind-Value="Model.Horse" For="() => Model.Horse" Label="@Horse_string" SearchSafe="SearchHorsesSafe"/>
+    </FormFields>
 </KrudForm>
+
+
+

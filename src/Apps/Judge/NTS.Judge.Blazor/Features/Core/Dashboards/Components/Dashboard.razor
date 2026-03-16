@@ -12,11 +12,17 @@
 
 <NGrid>
     <MudItem xs="12" Class="mb-4">
-        <NAutocomplete @bind-value="Selected" SearchSafe="Search" Class="mb-2 dashboard-autocomplete" />
+        <NAutocomplete @key="Selected!.Combination.Number"
+                       @bind-Value="Selected"
+                       TextUpdateSuppression="false"
+                       SearchSafe="Search"
+                       Class="mb-2 dashboard-autocomplete" />
     </MudItem>
 
     <MudItem xs="3">
-        <ParticipationChips />
+        <ParticipationChips Participations="@Participations"
+                            RecentlyTimed="@RecentlyTimed"
+                            @bind-Selected="Selected" />
     </MudItem>
 
     <MudItem xs="9">

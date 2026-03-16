@@ -1,13 +1,13 @@
 ﻿using Not.Application.HTTP;
 using Not.Injection;
 using Not.Storage.REST;
+using NTS.Application.Settings;
 using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
-using NTS.Judge.Features.Settings;
 
 namespace NTS.Storage.REST;
 
-public class SettingRestApiRepository : RestApiRepository2<Setting, SettingModel>, ISettingRepository, ITransient
+public class SettingRestApiRepository : RestApiRepository<Setting, SettingModel>, ISettingRepository, ITransient
 {
     public SettingRestApiRepository(NHttpClient client)
         : base("settings", client) { }
@@ -17,7 +17,8 @@ public class SettingRestApiRepository : RestApiRepository2<Setting, SettingModel
         try
         {
             var url = BuildUrl(accountId);
-            return await Client.GetJson<Setting>(url);
+            var model = await Client.GetJson<SettingModel>(url);
+            return MapEntity(model);
         }
         catch (Exception ex)
         {

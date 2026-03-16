@@ -53,6 +53,17 @@ services:
     ports:
       - "8080:80"
 
+  nts-nexus-warp:
+    container_name: nts-nexus-warp
+    build:
+      context: ../
+      dockerfile: src/Apps/Nexus/NTS.Nexus.Warp/Dockerfile
+    environment:
+      PORT: "80"
+      MONGO_CONNECTION_STRING: mongodb://mongodb:27017
+    ports:
+      - "11337:80"
+
 volumes:
   azurite_data:
   mongodb_data:
