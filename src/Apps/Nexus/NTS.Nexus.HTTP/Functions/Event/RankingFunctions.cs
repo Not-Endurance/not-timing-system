@@ -74,8 +74,7 @@ public class RankingFunctions : EventScopedCrudFunctions<RankingModel>
 
     [Function("rankings-read-many")]
     public async Task<IActionResult> ReadMany(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "events/{eventId:int}/rankings")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "events/{eventId:int}/rankings")] HttpRequest request,
         int eventId
     )
     {

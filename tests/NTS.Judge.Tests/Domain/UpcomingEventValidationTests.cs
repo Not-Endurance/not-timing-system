@@ -1,8 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Localization;
 using Not.Notify;
-using Microsoft.Extensions.DependencyInjection;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;

@@ -131,7 +131,12 @@ public class KrudServiceBaseTests
         var repository = new CascadingTestRepository();
         var mirror = new TestMirror();
         var service = new TestService(repository, [mirror]);
-        var model = new TestModel { Id = 9, Name = "Updated", ThrowOnMapToEntity = true };
+        var model = new TestModel
+        {
+            Id = 9,
+            Name = "Updated",
+            ThrowOnMapToEntity = true,
+        };
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => service.Update(model));
 
@@ -219,7 +224,7 @@ public class KrudServiceBaseTests
         var entity = new TestEntity("Delete", 77);
         var repository = new CascadingTestRepository
         {
-            PreviewImpact = new KrudDeleteImpact("Delete", [new KrudDeleteUsage("Entity.Ref", "Owner", "Dependent")])
+            PreviewImpact = new KrudDeleteImpact("Delete", [new KrudDeleteUsage("Entity.Ref", "Owner", "Dependent")]),
         };
         var service = new TestService(repository, []);
 

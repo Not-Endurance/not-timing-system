@@ -19,7 +19,10 @@ public class UpcomingEventMongoRepository : MongoRepository<UpcomingEventModel>,
 
     protected override UpdateDefinition<UpcomingEventModel> GetUpdateDefinition(UpcomingEventModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(UpcomingEventMongoRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(
+            nameof(UpcomingEventMongoRepository),
+            nameof(GetUpdateDefinition)
+        );
 
         try
         {

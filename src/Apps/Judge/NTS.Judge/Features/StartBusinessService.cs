@@ -105,10 +105,7 @@ public class StartBusinessService : IStartBusiness
         foreach (var issue in issues)
         {
             validationBuilder.AppendLine(
-                string.Format(
-                    Start_validation_issue_different_phase_configurations_string,
-                    issue.ParticipationNumber
-                )
+                string.Format(Start_validation_issue_different_phase_configurations_string, issue.ParticipationNumber)
             );
             foreach (var competition in issue.Competitions)
             {

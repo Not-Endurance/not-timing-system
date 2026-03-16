@@ -18,8 +18,7 @@ public class StartValidationDialogBehind : NDialog<bool>
     protected IReadOnlyList<StartValidationIssue> Issues => Validation.Data ?? [];
     protected bool HasIssues => Issues.Any();
     protected bool CanApplyCorrections =>
-        HasIssues
-        && Issues.All(issue => _selectedCompetitionByParticipation.ContainsKey(issue.ParticipationNumber));
+        HasIssues && Issues.All(issue => _selectedCompetitionByParticipation.ContainsKey(issue.ParticipationNumber));
 
     [Parameter]
     public Result<IReadOnlyList<StartValidationIssue>> InitialValidation { get; set; } =
@@ -85,8 +84,8 @@ public class StartValidationDialogBehind : NDialog<bool>
     void SyncSelectionsWithCurrentIssues()
     {
         var activeParticipations = Issues.Select(x => x.ParticipationNumber).ToHashSet();
-        var staleSelections = _selectedCompetitionByParticipation.Keys
-            .Where(participationNumber => !activeParticipations.Contains(participationNumber))
+        var staleSelections = _selectedCompetitionByParticipation
+            .Keys.Where(participationNumber => !activeParticipations.Contains(participationNumber))
             .ToList();
         foreach (var participationNumber in staleSelections)
         {

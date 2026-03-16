@@ -97,10 +97,7 @@ public class NNotifier : NComponent, IDisposable
         {
             await InvokeAsync(async () =>
             {
-                var parameters = new DialogParameters<UnhandledExceptionDialog>
-                {
-                    { x => x.Exception, exception },
-                };
+                var parameters = new DialogParameters<UnhandledExceptionDialog> { { x => x.Exception, exception } };
                 await DialogService.ShowAsync<UnhandledExceptionDialog>(
                     "Unhandled Exception",
                     parameters,

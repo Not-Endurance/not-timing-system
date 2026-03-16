@@ -46,13 +46,7 @@ public class SnapshotResultFunctions : EventScopedCrudFunctions<SnapshotResultMo
 
     [Function("snapshot-results-delete")]
     public async Task<IActionResult> Delete(
-        [
-            HttpTrigger(
-                AuthorizationLevel.Anonymous,
-                "delete",
-                Route = "events/{eventId:int}/snapshot-results/{id:int}"
-            )
-        ]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "events/{eventId:int}/snapshot-results/{id:int}")]
             HttpRequest request,
         int eventId,
         int id
@@ -66,13 +60,7 @@ public class SnapshotResultFunctions : EventScopedCrudFunctions<SnapshotResultMo
 
     [Function("snapshot-results-read")]
     public async Task<IActionResult> Read(
-        [
-            HttpTrigger(
-                AuthorizationLevel.Anonymous,
-                "get",
-                Route = "events/{eventId:int}/snapshot-results/{id:int}"
-            )
-        ]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "events/{eventId:int}/snapshot-results/{id:int}")]
             HttpRequest request,
         int eventId,
         int id

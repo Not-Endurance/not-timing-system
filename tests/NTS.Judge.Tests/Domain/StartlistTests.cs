@@ -110,7 +110,11 @@ public class StartlistTests
 
         return new Participation(
             category: ParticipationCategory.Senior,
-            competition: new Competition($"Competition{id}", CompetitionRuleset.Regional, CompetitionType.Qualification),
+            competition: new Competition(
+                $"Competition{id}",
+                CompetitionRuleset.Regional,
+                CompetitionType.Qualification
+            ),
             combination: combination,
             phases: new PhaseCollection(phases),
             notQualified: null,
@@ -119,14 +123,7 @@ public class StartlistTests
         );
     }
 
-    static Phase CreatePhase(
-        double length,
-        int maxRecovery,
-        int? rest,
-        bool isFinal,
-        DateTimeOffset startTime,
-        int id
-    )
+    static Phase CreatePhase(double length, int maxRecovery, int? rest, bool isFinal, DateTimeOffset startTime, int id)
     {
         return new Phase(
             gate: "",

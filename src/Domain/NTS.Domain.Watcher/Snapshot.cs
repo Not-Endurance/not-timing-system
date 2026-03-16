@@ -1,5 +1,5 @@
-using NTS.Domain.Objects;
 using Not.Structures;
+using NTS.Domain.Objects;
 
 namespace NTS.Domain.Watcher;
 

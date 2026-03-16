@@ -91,8 +91,7 @@ namespace NTS.Localization
         public static string Reset_string => LocalizeString(nameof(Reset_string));
         public static string Hard_reset_string => LocalizeString(nameof(Hard_reset_string));
         public static string Soft_reset_string => LocalizeString(nameof(Soft_reset_string));
-        public static string Disconnect_from_current_Event =>
-            LocalizeString(nameof(Disconnect_from_current_Event));
+        public static string Disconnect_from_current_Event => LocalizeString(nameof(Disconnect_from_current_Event));
         public static string Reset_Timing_this_will_DELETE_Timing_data =>
             LocalizeString(nameof(Reset_Timing_this_will_DELETE_Timing_data));
         public static string Are_you_sure_you_want_to_reset_string =>

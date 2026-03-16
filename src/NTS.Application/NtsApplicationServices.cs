@@ -6,8 +6,8 @@ using Not.Application;
 using Not.Application.HTTP;
 using Not.Application.RPC;
 using Not.Injection;
-using NTS.Domain.Core.Events;
 using NTS.Application.Startlists;
+using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Application;
@@ -46,7 +46,9 @@ public static class NtsApplicationServices
                 INotificationHandler<EventConnected>,
                 StartlistService
             >(ServiceLifetime.Singleton);
-            _services.AddSingleton<INotificationHandler<EventDisconnected>>(x => x.GetRequiredService<StartlistService>());
+            _services.AddSingleton<INotificationHandler<EventDisconnected>>(x =>
+                x.GetRequiredService<StartlistService>()
+            );
             return this;
         }
 

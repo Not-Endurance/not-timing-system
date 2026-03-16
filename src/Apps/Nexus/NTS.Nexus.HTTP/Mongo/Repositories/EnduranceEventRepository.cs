@@ -1,7 +1,6 @@
 using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Core;
-using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
@@ -15,8 +14,7 @@ public class EnduranceEventRepository : MongoRepository<EnduranceEventModel>
     protected override UpdateDefinition<EnduranceEventModel> GetUpdateDefinition(EnduranceEventModel document)
     {
         return Builders<EnduranceEventModel>
-            .Update
-            .Set(x => x.Country, document.Country)
+            .Update.Set(x => x.Country, document.Country)
             .Set(x => x.City, document.City)
             .Set(x => x.Location, document.Location)
             .Set(x => x.FeiShowId, document.FeiShowId)

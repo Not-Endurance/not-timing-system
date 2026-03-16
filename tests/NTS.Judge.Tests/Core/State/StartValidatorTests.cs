@@ -12,16 +12,7 @@ public class StartValidatorTests
     [Fact]
     public void Validate_WhenDuplicateParticipationHasSamePhaseConfiguration_ReturnsNoIssues()
     {
-        var setupEvent = CreateEvent(
-            [
-                (40d, 40, 30),
-                (40d, 50, null),
-            ],
-            [
-                (40d, 40, 30),
-                (40d, 50, null),
-            ]
-        );
+        var setupEvent = CreateEvent([(40d, 40, 30), (40d, 50, null)], [(40d, 40, 30), (40d, 50, null)]);
 
         var result = StartValidator.Validate(setupEvent);
 
@@ -31,16 +22,7 @@ public class StartValidatorTests
     [Fact]
     public void Validate_WhenDuplicateParticipationHasDifferentPhaseConfiguration_ReturnsIssues()
     {
-        var setupEvent = CreateEvent(
-            [
-                (40d, 40, 30),
-                (40d, 50, null),
-            ],
-            [
-                (35d, 40, 30),
-                (45d, 50, null),
-            ]
-        );
+        var setupEvent = CreateEvent([(40d, 40, 30), (40d, 50, null)], [(35d, 40, 30), (45d, 50, null)]);
 
         var result = StartValidator.Validate(setupEvent);
 
@@ -65,11 +47,7 @@ public class StartValidatorTests
 
         var competitionOne = CreateCompetition("Competition A", competitionOnePhases, combination, 1);
         var competitionTwo = CreateCompetition("Competition B", competitionTwoPhases, combination, 2);
-        var loops = new List<Loop>
-        {
-            new(100, 100),
-            new(101, 101),
-        };
+        var loops = new List<Loop> { new(100, 100), new(101, 101) };
 
         return new UpcomingEvent(
             "Event",

@@ -4,7 +4,13 @@ namespace Not.Krud.Graph;
 
 internal sealed class KrudDependency
 {
-    public KrudDependency(Type principalType, Type parentType, Type dependentType, PropertyInfo property, string relation)
+    public KrudDependency(
+        Type principalType,
+        Type parentType,
+        Type dependentType,
+        PropertyInfo property,
+        string relation
+    )
     {
         PrincipalType = principalType;
         ParentType = parentType;

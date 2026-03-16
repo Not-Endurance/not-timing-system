@@ -39,4 +39,3 @@ public interface IPrimaryConnectionContext : ISingleton
 {
     string? GetConnectionId(string identifier);
 }
-

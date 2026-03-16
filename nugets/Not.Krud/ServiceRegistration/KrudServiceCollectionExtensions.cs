@@ -47,7 +47,9 @@ public static class KrudServiceCollectionExtensions
 
         services.Add(new(typeof(KrudGraphContext<T>), typeof(KrudGraphContext<T>), lifetime));
         services.Add(new(typeof(IKrudNodeSetter), sp => sp.GetRequiredService<KrudGraphContext<T>>(), lifetime));
-        services.Add(new(typeof(IKrudDependencyResolver), sp => sp.GetRequiredService<KrudGraphContext<T>>(), lifetime));
+        services.Add(
+            new(typeof(IKrudDependencyResolver), sp => sp.GetRequiredService<KrudGraphContext<T>>(), lifetime)
+        );
 
         foreach (var @interface in meta.KrudParentNodeOfClosedInterfaces)
         {

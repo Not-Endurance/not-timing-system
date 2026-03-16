@@ -16,4 +16,3 @@ if (port == null)
     throw new ApplicationException("Cannot bind WARP without port. Provide 'PORT' variable");
 }
 Warp.Start(app, port);
-
