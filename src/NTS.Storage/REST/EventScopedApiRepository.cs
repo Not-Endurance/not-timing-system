@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Not.Application.HTTP;
 using Not.Domain.Abstractions;
 using Not.Exceptions;
@@ -12,17 +11,17 @@ public abstract class EventScopedApiRepository<T, TModel> : RestApiRepository<T,
     where T : class, IEntity
     where TModel : class, IKrudModel<T>, new()
 {
-    readonly IServiceProvider _serviceProvider;
+    readonly INtsSocketContext _socketContext;
 
-    protected EventScopedApiRepository(string endpoint, NHttpClient client, IServiceProvider serviceProvider)
+    protected EventScopedApiRepository(string endpoint, NHttpClient client, INtsSocketContext socketContext)
         : base(endpoint, client)
     {
-        _serviceProvider = serviceProvider;
+        _socketContext = socketContext;
     }
 
     protected override string ResolveEndpoint()
     {
-        var eventId = _serviceProvider.GetService<INtsSocketContext>()?.Event?.Id;
+        var eventId = _socketContext.Event?.Id;
         GuardHelper.ThrowIfDefault(eventId, "Cannot use event-scoped repository before selecting an event.");
 
         return $"events/{eventId.Value}/{Endpoint}";

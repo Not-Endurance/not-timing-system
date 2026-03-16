@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Not.Application.HTTP;
 using Not.Injection;
 using NTS.Application.Core;
+using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Storage.REST;
 
@@ -12,8 +13,8 @@ public class EnduranceEventRepository : EventScopedApiRepository<EnduranceEvent,
     const string ROOT_REPOSITORY_EXCEPTION =
         "Only Create, Read and Update operations are implemented for Root entities.";
 
-    public EnduranceEventRepository(NHttpClient client, IServiceProvider serviceProvider)
-        : base("endurance-event", client, serviceProvider) { }
+    public EnduranceEventRepository(NHttpClient client, INtsSocketContext socketContext)
+        : base("endurance-event", client, socketContext) { }
 
     public override Task<EnduranceEvent?> Read(Expression<Func<EnduranceEvent, bool>> _)
     {
