@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
@@ -5,7 +6,6 @@ using Not.Collections;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Observables.Structures;
-using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
@@ -27,7 +27,6 @@ public class SnapshotService
 {
     readonly Dictionary<int, Participation> _allParticipations = [];
     readonly List<SnapshotGroup> _history = [];
-    readonly INtsSocketContext _socketContext;
     readonly IReadMany<Participation> _participationReader;
     readonly List<Participation> _participationsToSnapshot = [];
     readonly ISnapshotPublisher _snapshotPublisher;
@@ -35,13 +34,11 @@ public class SnapshotService
     readonly IUserSessionService _userSessionService;
 
     public SnapshotService(
-        INtsSocketContext socketContext,
         IReadMany<Participation> participationReader,
         IUserSessionService userSessionService,
         ISnapshotPublisher snapshotPublisher
     )
     {
-        _socketContext = socketContext;
         _participationReader = participationReader;
         _userSessionService = userSessionService;
         _snapshotPublisher = snapshotPublisher;
@@ -54,11 +51,6 @@ public class SnapshotService
 
     protected override async Task<bool> InitializeState()
     {
-        if (_socketContext.Event == null)
-        {
-            return false;
-        }
-
         var participations = await _participationReader.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
         var session = await _userSessionService.GetCurrent();
 

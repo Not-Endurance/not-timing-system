@@ -3,6 +3,8 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application;
+using Not.Application.HTTP;
+using Not.Application.RPC;
 using Not.Injection;
 using NTS.Application.Startlists;
 using NTS.Domain.Core.Events;
@@ -43,7 +45,7 @@ public static class NtsApplicationServices
                 INotificationHandler<ParticipationEliminated>,
                 INotificationHandler<EventConnected>,
                 StartlistService
-            >(ServiceLifetime.Scoped);
+            >(ServiceLifetime.Singleton);
             _services.AddSingleton<INotificationHandler<EventDisconnected>>(x =>
                 x.GetRequiredService<StartlistService>()
             );
