@@ -68,4 +68,3 @@ internal class ExceptionHandlingHubFilter : IHubFilter
         LoggingHelper.Error(logMessage);
     }
 }
-

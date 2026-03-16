@@ -8,8 +8,7 @@ internal class SimultaneousParticipationInDifferantTracksValidationRule : IStart
     public IEnumerable<StartValidationIssue> Evaluate(UpcomingEvent setupEvent)
     {
         var byParticipation = setupEvent
-            .Competitions
-            .SelectMany(
+            .Competitions.SelectMany(
                 (competition, competitionIndex) =>
                     competition.Participations.Select(participation => new
                     {
@@ -23,10 +22,7 @@ internal class SimultaneousParticipationInDifferantTracksValidationRule : IStart
 
         foreach (var group in byParticipation)
         {
-            var competitions = group
-                .GroupBy(x => x.CompetitionIndex)
-                .Select(x => x.First().Competition)
-                .ToList();
+            var competitions = group.GroupBy(x => x.CompetitionIndex).Select(x => x.First().Competition).ToList();
 
             if (competitions.Count < 2)
             {
@@ -34,7 +30,11 @@ internal class SimultaneousParticipationInDifferantTracksValidationRule : IStart
             }
 
             var signatures = competitions
-                .Select(competition => new { Competition = competition, PhaseSignature = CreatePhaseSignature(competition.Phases) })
+                .Select(competition => new
+                {
+                    Competition = competition,
+                    PhaseSignature = CreatePhaseSignature(competition.Phases),
+                })
                 .ToList();
 
             var baseline = signatures[0].PhaseSignature;
@@ -45,7 +45,11 @@ internal class SimultaneousParticipationInDifferantTracksValidationRule : IStart
             }
 
             var competitionDetails = signatures
-                .Select(x => new StartValidationCompetition(x.Competition.Id, x.Competition.Name, FormatPhaseSignature(x.PhaseSignature)))
+                .Select(x => new StartValidationCompetition(
+                    x.Competition.Id,
+                    x.Competition.Name,
+                    FormatPhaseSignature(x.PhaseSignature)
+                ))
                 .ToList();
 
             var combination = group.First().Participation.Combination;
@@ -55,11 +59,11 @@ internal class SimultaneousParticipationInDifferantTracksValidationRule : IStart
         }
     }
 
-    static IReadOnlyList<(decimal Distance, int Recovery, int? RestMinutes)> CreatePhaseSignature(IReadOnlyList<Phase> phases)
+    static IReadOnlyList<(decimal Distance, int Recovery, int? RestMinutes)> CreatePhaseSignature(
+        IReadOnlyList<Phase> phases
+    )
     {
-        return phases
-            .Select(x => ((decimal)x.Loop.Distance, x.Recovery, x.Rest))
-            .ToList();
+        return phases.Select(x => ((decimal)x.Loop.Distance, x.Recovery, x.Rest)).ToList();
     }
 
     static string FormatPhaseSignature(IReadOnlyList<(decimal Distance, int Recovery, int? RestMinutes)> phases)

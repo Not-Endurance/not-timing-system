@@ -105,9 +105,8 @@ public class EventScopingTests
     sealed class TestSocketContext : INtsSocketContext
     {
         public bool IsConnected => Event != null;
-        public SocketConnectionStatus Status => IsConnected
-            ? SocketConnectionStatus.Connected
-            : SocketConnectionStatus.Disconnected;
+        public SocketConnectionStatus Status =>
+            IsConnected ? SocketConnectionStatus.Connected : SocketConnectionStatus.Disconnected;
         public UpcomingEvent? Event { get; set; }
     }
 }

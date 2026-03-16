@@ -33,7 +33,10 @@ public class EventMenuBehind : NStatefulComponent
             var validation = await Service.Start();
             if (validation.Data?.Any() == true)
             {
-                var parameters = new DialogParameters<StartValidationDialog> { { x => x.InitialValidation, validation } };
+                var parameters = new DialogParameters<StartValidationDialog>
+                {
+                    { x => x.InitialValidation, validation },
+                };
                 var dialog = await DialogService.ShowAsync<StartValidationDialog>(Start_string, parameters);
                 if (await dialog.IsCanceled())
                 {

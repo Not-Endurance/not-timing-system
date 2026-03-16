@@ -209,7 +209,9 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         var removeMethod = parentInterface.GetMethod(nameof(IParent<Entity>.Remove));
         if (removeMethod == null)
         {
-            throw new InvalidOperationException($"'{parent.GetType().Name}' does not implement remove for '{dependentType.Name}'.");
+            throw new InvalidOperationException(
+                $"'{parent.GetType().Name}' does not implement remove for '{dependentType.Name}'."
+            );
         }
         removeMethod.Invoke(parent, [dependent]);
     }

@@ -44,9 +44,9 @@ public class PerformanceContentBehind : NStatefulComponent
                 return Task.FromResult(Participations.Cast<Participation?>());
             }
 
-            var result = Participations.Where(x =>
-                x.ToString().Contains(term, StringComparison.OrdinalIgnoreCase)
-            ).Cast<Participation?>();
+            var result = Participations
+                .Where(x => x.ToString().Contains(term, StringComparison.OrdinalIgnoreCase))
+                .Cast<Participation?>();
             return Task.FromResult(result);
         }
         catch (Exception ex)

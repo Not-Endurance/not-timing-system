@@ -35,7 +35,6 @@ public class SnapshotGroupModel
     public static SnapshotGroupModel MapFrom(SnapshotGroup group)
     {
         return new SnapshotGroupModel
-
         {
             Entries = group.Entries.AsEnumerable().Select(SnapshotModel.MapFrom).ToArray(),
             Type = group.Type.ToString(),
@@ -60,7 +59,7 @@ public class UserSessionModel : IDocument, IKrudModel<UserSessionModel>, ICoreSe
         {
             Id = id,
             EventId = session.EventId,
-            SnapshotHistory = session.SnapshotHistory.Select(SnapshotGroupModel.MapFrom).ToArray()
+            SnapshotHistory = session.SnapshotHistory.Select(SnapshotGroupModel.MapFrom).ToArray(),
         };
         return model;
     }

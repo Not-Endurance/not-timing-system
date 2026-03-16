@@ -1,6 +1,6 @@
+using MudBlazor;
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Blazor.Helpers;
-using MudBlazor;
 using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Witness.Features.Sessions;
@@ -85,10 +85,7 @@ public class SelectEventDialogBehind : NDialog
             return true;
         }
 
-        var parameters = new DialogParameters<ChangeEventHistoryDialog>
-        {
-            { x => x.EventName, upcomingEvent.Name }
-        };
+        var parameters = new DialogParameters<ChangeEventHistoryDialog> { { x => x.EventName, upcomingEvent.Name } };
         var dialog = await DialogService.ShowAsync<ChangeEventHistoryDialog>(Change_event_string, parameters);
         return !await dialog.IsCanceled();
     }

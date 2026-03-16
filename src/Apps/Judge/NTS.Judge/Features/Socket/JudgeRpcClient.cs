@@ -3,11 +3,11 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
-using NTS.Application.Watcher;
 using NTS.Application.Socket;
+using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Enums;
 using NTS.Domain.Core.Objects.Payloads;
+using NTS.Domain.Enums;
 using NTS.Judge.Features.Core.Dashboard;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
@@ -26,11 +26,7 @@ public class JudgeRpcClient
     readonly ITimingService _timingService;
     readonly HubProcedures _hubProcedures;
 
-    public JudgeRpcClient(
-        INtsSocketService eventContext,
-        IRpcSocket socket,
-        ITimingService timingService
-    )
+    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, ITimingService timingService)
         : base(socket)
     {
         _hubProcedures = new HubProcedures(socket);

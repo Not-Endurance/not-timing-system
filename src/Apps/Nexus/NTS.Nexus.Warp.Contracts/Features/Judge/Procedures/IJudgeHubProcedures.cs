@@ -8,4 +8,3 @@ public interface IJudgeHubProcedures
     Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request);
     Task OnParticipationRestored(WarpRequest<ParticipationRestored> request);
 }
-

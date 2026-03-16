@@ -8,4 +8,3 @@ public interface IWitnessClientProcedures
     Task OnParticipationEliminated(ParticipationEliminated payload);
     Task OnParticipationRestored(ParticipationRestored payload);
 }
-

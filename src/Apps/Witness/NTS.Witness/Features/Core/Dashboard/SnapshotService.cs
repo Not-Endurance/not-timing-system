@@ -36,7 +36,8 @@ public class SnapshotService
     public SnapshotService(
         IReadMany<Participation> participationReader,
         IUserSessionService userSessionService,
-        ISnapshotPublisher snapshotPublisher)
+        ISnapshotPublisher snapshotPublisher
+    )
     {
         _participationReader = participationReader;
         _userSessionService = userSessionService;

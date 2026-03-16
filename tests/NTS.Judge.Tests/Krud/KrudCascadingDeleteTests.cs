@@ -80,8 +80,13 @@ public class KrudCascadingDeleteTests
 
         Assert.DoesNotContain(scenario.Event.Combinations, x => x == scenario.CombinationInUse);
         Assert.Equal(2, scenario.Event.Competitions.Count);
-        Assert.All(scenario.Event.Competitions, competition =>
-            Assert.DoesNotContain(competition.Participations, participation => participation.Combination == scenario.CombinationInUse)
+        Assert.All(
+            scenario.Event.Competitions,
+            competition =>
+                Assert.DoesNotContain(
+                    competition.Participations,
+                    participation => participation.Combination == scenario.CombinationInUse
+                )
         );
         Assert.Single(scenario.Event.Competitions.SelectMany(x => x.Participations));
     }
@@ -95,8 +100,9 @@ public class KrudCascadingDeleteTests
 
         Assert.DoesNotContain(scenario.Event.Loops, x => x == scenario.LoopInUse);
         Assert.Equal(2, scenario.Event.Competitions.Count);
-        Assert.All(scenario.Event.Competitions, competition =>
-            Assert.DoesNotContain(competition.Phases, phase => phase.Loop == scenario.LoopInUse)
+        Assert.All(
+            scenario.Event.Competitions,
+            competition => Assert.DoesNotContain(competition.Phases, phase => phase.Loop == scenario.LoopInUse)
         );
         Assert.Equal(2, scenario.Event.Competitions.SelectMany(x => x.Phases).Count());
     }
@@ -131,12 +137,12 @@ public class KrudCascadingDeleteTests
             phases:
             [
                 new Phase(loopInUse, recovery: 10, rest: 40, id: 9001),
-                new Phase(loopOther, recovery: 10, rest: 40, id: 9002)
+                new Phase(loopOther, recovery: 10, rest: 40, id: 9002),
             ],
             participations:
             [
                 new Participation(false, combinationInUse, ParticipationCategory.Senior, null, null, null, id: 9101),
-                new Participation(false, combinationOther, ParticipationCategory.Senior, null, null, null, id: 9102)
+                new Participation(false, combinationOther, ParticipationCategory.Senior, null, null, null, id: 9102),
             ],
             id: 9201
         );
@@ -153,9 +159,12 @@ public class KrudCascadingDeleteTests
             phases:
             [
                 new Phase(loopInUse, recovery: 10, rest: 40, id: 9003),
-                new Phase(loopOther, recovery: 10, rest: 40, id: 9004)
+                new Phase(loopOther, recovery: 10, rest: 40, id: 9004),
             ],
-            participations: [new Participation(false, combinationInUse, ParticipationCategory.Senior, null, null, null, id: 9103)],
+            participations:
+            [
+                new Participation(false, combinationInUse, ParticipationCategory.Senior, null, null, null, id: 9103),
+            ],
             id: 9202
         );
 

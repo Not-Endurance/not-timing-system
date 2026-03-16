@@ -69,13 +69,7 @@ public class EnduranceEventFunctions : FunctionBase
 
     [Function("endurance-event-read")]
     public async Task<IActionResult> Read(
-        [
-            HttpTrigger(
-                AuthorizationLevel.Anonymous,
-                "get",
-                Route = "events/{eventId:int}/endurance-event/{id:int}"
-            )
-        ]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "events/{eventId:int}/endurance-event/{id:int}")]
             HttpRequest request,
         int eventId,
         int id
@@ -116,13 +110,7 @@ public class EnduranceEventFunctions : FunctionBase
 
     [Function("endurance-event-delete")]
     public async Task<IActionResult> Delete(
-        [
-            HttpTrigger(
-                AuthorizationLevel.Anonymous,
-                "delete",
-                Route = "events/{eventId:int}/endurance-event/{id:int}"
-            )
-        ]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "events/{eventId:int}/endurance-event/{id:int}")]
             HttpRequest request,
         int eventId,
         int id

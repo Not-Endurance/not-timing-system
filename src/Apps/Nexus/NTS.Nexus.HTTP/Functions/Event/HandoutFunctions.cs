@@ -74,8 +74,7 @@ public class HandoutFunctions : EventScopedCrudFunctions<HandoutModel>
 
     [Function("handouts-read-many")]
     public async Task<IActionResult> ReadMany(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "events/{eventId:int}/handouts")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "events/{eventId:int}/handouts")] HttpRequest request,
         int eventId
     )
     {

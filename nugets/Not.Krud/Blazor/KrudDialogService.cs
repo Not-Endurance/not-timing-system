@@ -36,7 +36,11 @@ public class KrudDialogService<TModel, TShell>
     public async Task<bool> ShowCascadingDeleteConfirmation(KrudDeleteImpact impact)
     {
         var parameters = new DialogParameters<KrudCascadingDeleteDialog> { { x => x.Impact, impact } };
-        var dialog = await _mudDialogService.ShowAsync<KrudCascadingDeleteDialog>(Cascading_Delete_string, parameters, _options);
+        var dialog = await _mudDialogService.ShowAsync<KrudCascadingDeleteDialog>(
+            Cascading_Delete_string,
+            parameters,
+            _options
+        );
         return !(await dialog.IsCanceled());
     }
 

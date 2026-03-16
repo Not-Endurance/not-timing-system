@@ -64,9 +64,7 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
             {
                 if (_socket.IsConnected)
                 {
-                    _notifier.Error(
-                        string.Format(Cannot_select_another_event_before_disconnect__string, Event.Name)
-                    );
+                    _notifier.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Event.Name));
                     return;
                 }
                 Event = null;
@@ -99,7 +97,11 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
         var previousStatus = Status;
         Status = status;
 
-        if (status == SocketConnectionStatus.Connected && previousStatus == SocketConnectionStatus.Connecting && Event != null)
+        if (
+            status == SocketConnectionStatus.Connected
+            && previousStatus == SocketConnectionStatus.Connecting
+            && Event != null
+        )
         {
             _ = _domainEventDispatcher.Dispatch(new EventConnected(Event.Id));
         }

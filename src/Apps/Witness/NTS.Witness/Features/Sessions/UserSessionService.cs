@@ -57,13 +57,7 @@ public class UserSessionService : IUserSessionService, IScoped
                 return;
             }
 
-            await _sessions.Create(
-                new UserSessionModel
-                {
-                    Id = user.Id,
-                    EventId = eventId,
-                }
-            );
+            await _sessions.Create(new UserSessionModel { Id = user.Id, EventId = eventId });
             return;
         }
 
@@ -84,11 +78,7 @@ public class UserSessionService : IUserSessionService, IScoped
         var session = await _sessions.Read(user.Id);
         if (session == null)
         {
-            session = new UserSessionModel
-            {
-                Id = user.Id,
-                SnapshotHistory = [SnapshotGroupModel.MapFrom(snapshot)],
-            };
+            session = new UserSessionModel { Id = user.Id, SnapshotHistory = [SnapshotGroupModel.MapFrom(snapshot)] };
             await _sessions.Create(session);
             return;
         }

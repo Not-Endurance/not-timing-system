@@ -28,7 +28,11 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
         var isComplete = Current.IsComplete();
         if (isComplete && Current.IsFinal)
         {
-            return SnapshotResult.NotApplied(eventId, snapshot, SnapshotResultType.NotAppliedDueToParticipationComplete);
+            return SnapshotResult.NotApplied(
+                eventId,
+                snapshot,
+                SnapshotResultType.NotAppliedDueToParticipationComplete
+            );
         }
         var notProcessingWindow = TimeSpan.FromMinutes(30); // TODO settings: use settings?
         if (isComplete && snapshot.Timestamp > Current.GetOutTime() + notProcessingWindow)

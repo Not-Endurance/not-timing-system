@@ -19,4 +19,3 @@ public class WarpRequest<T> : WarpRequest
 {
     public T Payload { get; init; } = default!;
 }
-

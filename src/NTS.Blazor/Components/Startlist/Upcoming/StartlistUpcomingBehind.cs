@@ -10,7 +10,8 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
 
     System.Timers.Timer _timer = default!;
 
-    protected string[] TableHeaders => [Number_string, Athlete_string, Loops_string, Start_Time_string, Start_In_string];
+    protected string[] TableHeaders =>
+        [Number_string, Athlete_string, Loops_string, Start_Time_string, Start_In_string];
 
     [Parameter]
     public bool Mobile { get; set; } = false;

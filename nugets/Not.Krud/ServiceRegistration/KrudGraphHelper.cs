@@ -83,13 +83,19 @@ internal static class KrudGraphHelper
 
         foreach (var dependentType in managedSet)
         {
-            var parentTypes = childrenByParent.Where(x => x.Value.Contains(dependentType)).Select(x => x.Key).Distinct().ToList();
+            var parentTypes = childrenByParent
+                .Where(x => x.Value.Contains(dependentType))
+                .Select(x => x.Key)
+                .Distinct()
+                .ToList();
             if (!parentTypes.Any())
             {
                 continue;
             }
 
-            var properties = dependentType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var properties = dependentType.GetProperties(
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance
+            );
             foreach (var property in properties)
             {
                 var principalType = property.PropertyType;

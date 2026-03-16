@@ -117,10 +117,7 @@ public class SnapshotContentBehind : NStatefulComponent
                 var updatedTimestamp = result.Data as TimestampUpdateModel;
                 GuardHelper.ThrowIfDefault(updatedTimestamp);
                 GuardHelper.ThrowIfDefault(updatedTimestamp.TimestampInput);
-                SnapshotService.UpdateSnapshotTimestamp(
-                    snapshot,
-                    new Timestamp(updatedTimestamp.TimestampInput)
-                );
+                SnapshotService.UpdateSnapshotTimestamp(snapshot, new Timestamp(updatedTimestamp.TimestampInput));
             }
         }
         catch (Exception ex)

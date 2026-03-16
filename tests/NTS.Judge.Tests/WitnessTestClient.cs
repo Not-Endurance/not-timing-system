@@ -50,5 +50,3 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
         throw new NotImplementedException();
     }
 }
-
-
