@@ -19,10 +19,12 @@ public class Participation : Aggregate
         Combination combination,
         PhaseCollection phases,
         Eliminated? notQualified,
+        int eventId,
         int id
     )
         : base(id)
     {
+        EventId = eventId;
         Category = category;
         Competition = competition;
         Combination = combination;
@@ -30,6 +32,7 @@ public class Participation : Aggregate
         Eliminated = notQualified;
     }
 
+    public int EventId { get; }
     public Competition Competition { get; }
     public Combination Combination { get; }
     public ParticipationCategory Category { get; }
@@ -63,7 +66,7 @@ public class Participation : Aggregate
     //TODO rename to smthing better (including ISnapshotProcessor, IManualProcessor and other mentions..)
     public SnapshotResult Process(Snapshot snapshot)
     {
-        var result = Phases.Process(snapshot);
+        var result = Phases.Process(snapshot, EventId);
         if (Eliminated == null && result.Type == Applied)
         {
             EvaluatePhase(Phases.Current);

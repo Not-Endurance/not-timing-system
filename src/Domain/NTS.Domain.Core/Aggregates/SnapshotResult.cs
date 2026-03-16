@@ -5,23 +5,25 @@ namespace NTS.Domain.Core.Aggregates;
 
 public class SnapshotResult : Aggregate
 {
-    public static SnapshotResult Applied(Snapshot snapshot)
+    public static SnapshotResult Applied(int eventId, Snapshot snapshot)
     {
-        return new(snapshot, SnapshotResultType.Applied);
+        return new(snapshot, SnapshotResultType.Applied, eventId);
     }
 
-    public static SnapshotResult NotApplied(Snapshot snapshot, SnapshotResultType type)
+    public static SnapshotResult NotApplied(int eventId, Snapshot snapshot, SnapshotResultType type)
     {
-        return new(snapshot, type);
+        return new(snapshot, type, eventId);
     }
 
-    public SnapshotResult(Snapshot snapshot, SnapshotResultType type, int? id = null)
+    public SnapshotResult(Snapshot snapshot, SnapshotResultType type, int eventId, int? id = null)
         : base(id)
     {
+        EventId = eventId;
         Snapshot = snapshot;
         Type = type;
     }
 
+    public int EventId { get; }
     public Snapshot Snapshot { get; }
     public SnapshotResultType Type { get; }
 }

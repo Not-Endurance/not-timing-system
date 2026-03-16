@@ -62,14 +62,14 @@ public class Phase : Entity
     public bool IsRequiredInspectionCompulsory { get; private set; }
     public TimeSpan? CompulsoryThresholdSpan { get; private set; }
 
-    internal SnapshotResult Process(Snapshot snapshot)
+    internal SnapshotResult Process(Snapshot snapshot, int eventId)
     {
         return snapshot.Type switch
         {
-            SnapshotType.Present => Inspect(snapshot),
-            SnapshotType.Arrive => Arrive(snapshot),
-            SnapshotType.Final => Finish(snapshot),
-            SnapshotType.Automatic => Automatic(snapshot),
+            SnapshotType.Present => Inspect(snapshot, eventId),
+            SnapshotType.Arrive => Arrive(snapshot, eventId),
+            SnapshotType.Final => Finish(snapshot, eventId),
+            SnapshotType.Automatic => Automatic(snapshot, eventId),
             _ => GuardUnknownSnapshot(snapshot),
         };
         static SnapshotResult GuardUnknownSnapshot(Snapshot snapshot)
@@ -255,32 +255,32 @@ public class Phase : Entity
         return true;
     }
 
-    SnapshotResult Automatic(Snapshot snapshot)
+    SnapshotResult Automatic(Snapshot snapshot, int eventId)
     {
         if (ArriveTime == null && IsFinal)
         {
-            return Finish(snapshot);
+            return Finish(snapshot, eventId);
         }
         if (ArriveTime == null)
         {
-            return Arrive(snapshot);
+            return Arrive(snapshot, eventId);
         }
         if (PresentTime == null || RepresentTime == null && IsReinspectionRequested)
         {
-            return Inspect(snapshot);
+            return Inspect(snapshot, eventId);
         }
-        return SnapshotResult.NotApplied(snapshot, NotAppliedDueToInapplicableAutomatic);
+        return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToInapplicableAutomatic);
     }
 
-    SnapshotResult Finish(Snapshot snapshot)
+    SnapshotResult Finish(Snapshot snapshot, int eventId)
     {
         if (_isSeparateFinish && !IsFinal)
         {
-            return SnapshotResult.NotApplied(snapshot, NotAppliedDueToSeparateStageLine);
+            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToSeparateStageLine);
         }
         if (ArriveTime != null)
         {
-            return SnapshotResult.NotApplied(snapshot, NotAppliedDueToDuplicateArrive);
+            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToDuplicateArrive);
         }
         if (snapshot.Timestamp < StartTime)
         {
@@ -289,18 +289,18 @@ public class Phase : Entity
 
         ArriveTime = snapshot.Timestamp;
         CheckCompulsoryThreshold();
-        return SnapshotResult.Applied(snapshot);
+        return SnapshotResult.Applied(eventId, snapshot);
     }
 
-    SnapshotResult Arrive(Snapshot snapshot)
+    SnapshotResult Arrive(Snapshot snapshot, int eventId)
     {
         if (_isSeparateFinish && IsFinal)
         {
-            return SnapshotResult.NotApplied(snapshot, NotAppliedDueToSeparateFinishLine);
+            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToSeparateFinishLine);
         }
         if (ArriveTime != null)
         {
-            return SnapshotResult.NotApplied(snapshot, NotAppliedDueToDuplicateArrive);
+            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToDuplicateArrive);
         }
         if (snapshot.Timestamp < StartTime)
         {
@@ -309,14 +309,14 @@ public class Phase : Entity
 
         ArriveTime = snapshot.Timestamp;
         CheckCompulsoryThreshold();
-        return SnapshotResult.Applied(snapshot);
+        return SnapshotResult.Applied(eventId, snapshot);
     }
 
-    SnapshotResult Inspect(Snapshot snapshot)
+    SnapshotResult Inspect(Snapshot snapshot, int eventId)
     {
         if (IsReinspectionRequested && RepresentTime != null && PresentTime != null)
         {
-            return SnapshotResult.NotApplied(snapshot, NotAppliedDueToDuplicateInspect);
+            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToDuplicateInspect);
         }
         if (snapshot.Timestamp <= ArriveTime)
         {
@@ -336,7 +336,7 @@ public class Phase : Entity
             PresentTime = snapshot.Timestamp;
         }
         CheckCompulsoryThreshold();
-        return SnapshotResult.Applied(snapshot);
+        return SnapshotResult.Applied(eventId, snapshot);
     }
 
     void CheckCompulsoryThreshold()

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq.Expressions;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Core;
@@ -16,6 +17,11 @@ public class ParticipationRepository : MongoRepository<ParticipationModel>
         _telemetry = telemetry;
     }
 
+    protected override Expression<Func<ParticipationModel, bool>> GetItemFilter(ParticipationModel document)
+    {
+        return x => x.Id == document.Id && x.EventId == document.EventId;
+    }
+
     protected override UpdateDefinition<ParticipationModel> GetUpdateDefinition(ParticipationModel document)
     {
         using var activity = _telemetry.StartActivity(nameof(ParticipationRepository), nameof(GetUpdateDefinition));
@@ -28,6 +34,7 @@ public class ParticipationRepository : MongoRepository<ParticipationModel>
                 .Set(x => x.Combination, document.Combination)
                 .Set(x => x.Phases, document.Phases)
                 .Set(x => x.Total, document.Total)
+                .Set(x => x.EventId, document.EventId)
                 .Set(x => x.Eliminated, document.Eliminated);
         }
         catch (Exception ex)

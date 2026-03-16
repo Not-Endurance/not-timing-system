@@ -1,4 +1,5 @@
 ﻿using Not.Krud.Abstractions;
+using Not.Structures;
 using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
@@ -28,7 +29,7 @@ public class ClubModel
     }
 }
 
-public class OfficialModel : IDocument, IKrudModel<Official>
+public class OfficialModel : IEventScopedDocument, IKrudModel<Official>
 {
     public static OfficialModel MapFrom(Official official)
     {
@@ -39,17 +40,19 @@ public class OfficialModel : IDocument, IKrudModel<Official>
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public int EventId { get; set; }
     public string[] Names { get; set; } = [];
     public OfficialRole Role { get; set; } = default!;
 
     public Official MapToEntity()
     {
-        return new Official(Names, Role, Id);
+        return new Official(Names, Role, EventId, Id);
     }
 
     void IKrudModel<Official>.MapFrom(Official official)
     {
         Id = official.Id;
+        EventId = official.EventId;
         Names = official.Person.Names;
         Role = official.Role;
     }
@@ -306,7 +309,7 @@ public class EliminatedModel
     }
 }
 
-public class ParticipationModel : IDocument, IKrudModel<Participation>
+public class ParticipationModel : IEventScopedDocument, IKrudModel<Participation>
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
@@ -315,6 +318,7 @@ public class ParticipationModel : IDocument, IKrudModel<Participation>
         return new ParticipationModel
         {
             Id = participation.Id,
+            EventId = participation.EventId,
             Category = participation.Category,
             Competition = CompetitionModel.MapFrom(participation.Competition),
             Combination = CombinationModel.MapFrom(participation.Combination),
@@ -326,6 +330,7 @@ public class ParticipationModel : IDocument, IKrudModel<Participation>
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public int EventId { get; set; }
     public ParticipationCategory Category { get; set; } = default!;
     public CompetitionModel Competition { get; set; } = default!;
     public CombinationModel Combination { get; set; } = default!;
@@ -339,7 +344,7 @@ public class ParticipationModel : IDocument, IKrudModel<Participation>
         var combination = Combination.MapToEntity();
         var phases = Phases!.Select(x => x.MapToEntity());
         var eliminated = Eliminated?.MapToEntity();
-        return new Participation(Category, competition, combination, new(phases), eliminated, Id);
+        return new Participation(Category, competition, combination, new(phases), eliminated, EventId, Id);
     }
 
     void IKrudModel<Participation>.MapFrom(Participation participation)
@@ -347,6 +352,7 @@ public class ParticipationModel : IDocument, IKrudModel<Participation>
         var total = participation.GetTotal();
 
         Id = participation.Id;
+        EventId = participation.EventId;
         Category = participation.Category;
         Competition = CompetitionModel.MapFrom(participation.Competition);
         Combination = CombinationModel.MapFrom(participation.Combination);
@@ -411,6 +417,7 @@ public class RanklistModel
     {
         var entries = Entries.Select(x => x.MapToEntity()).ToList();
         var competition = new Competition(Name, Ruleset, Type);
+        var eventId = Entries.FirstOrDefault()?.Participation.EventId ?? Id;
         var ranking = new Ranking(
             Name,
             Ruleset,
@@ -420,13 +427,14 @@ public class RanklistModel
             FeiRule,
             FeiScheduleNumber,
             entries,
+            eventId,
             Id
         );
         return new Ranklist(ranking, entries);
     }
 }
 
-public class EnduranceEventModel : IDocument, IKrudModel<EnduranceEvent>
+public class EnduranceEventModel : IIdentifiable, IKrudModel<EnduranceEvent>
 {
     public static EnduranceEventModel From(EnduranceEvent enduranceEvent)
     {
@@ -468,7 +476,7 @@ public class EnduranceEventModel : IDocument, IKrudModel<EnduranceEvent>
     }
 }
 
-public class RankingModel : IDocument, IKrudModel<Ranking>
+public class RankingModel : IEventScopedDocument, IKrudModel<Ranking>
 {
     public static RankingModel From(Ranking ranking)
     {
@@ -479,6 +487,7 @@ public class RankingModel : IDocument, IKrudModel<Ranking>
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public int EventId { get; set; }
     public string Name { get; set; } = default!;
     public CompetitionRuleset Ruleset { get; set; }
     public CompetitionType Type { get; set; }
@@ -491,6 +500,7 @@ public class RankingModel : IDocument, IKrudModel<Ranking>
     public void MapFrom(Ranking ranking)
     {
         Id = ranking.Id;
+        EventId = ranking.EventId;
         Name = ranking.Name;
         Ruleset = ranking.Ruleset;
         Type = ranking.Type;
@@ -504,11 +514,22 @@ public class RankingModel : IDocument, IKrudModel<Ranking>
     public Ranking MapToEntity()
     {
         var entries = Entries.Select(x => x.MapToEntity()).ToList();
-        return new Ranking(Name, Ruleset, Type, Category, CompetitionFeiId, FeiRule, FeiScheduleNumber, entries, Id);
+        return new Ranking(
+            Name,
+            Ruleset,
+            Type,
+            Category,
+            CompetitionFeiId,
+            FeiRule,
+            FeiScheduleNumber,
+            entries,
+            EventId,
+            Id
+        );
     }
 }
 
-public class HandoutModel : IDocument, IKrudModel<Handout>
+public class HandoutModel : IEventScopedDocument, IKrudModel<Handout>
 {
     public static HandoutModel From(Handout handout)
     {
@@ -519,11 +540,13 @@ public class HandoutModel : IDocument, IKrudModel<Handout>
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public int EventId { get; set; }
     public ParticipationModel Participation { get; set; } = default!;
 
     public void MapFrom(Handout handout)
     {
         Id = handout.Id;
+        EventId = handout.EventId;
         Participation = ParticipationModel.MapFrom(handout.Participation);
     }
 
@@ -557,7 +580,7 @@ public class CoreSnapshotModel
     }
 }
 
-public class SnapshotResultModel : IDocument, IKrudModel<SnapshotResult>
+public class SnapshotResultModel : IEventScopedDocument, IKrudModel<SnapshotResult>
 {
     public static SnapshotResultModel From(SnapshotResult result)
     {
@@ -568,19 +591,21 @@ public class SnapshotResultModel : IDocument, IKrudModel<SnapshotResult>
 
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public int EventId { get; set; }
     public CoreSnapshotModel Snapshot { get; set; } = default!;
     public SnapshotResultType Type { get; set; }
 
     public void MapFrom(SnapshotResult result)
     {
         Id = result.Id;
+        EventId = result.EventId;
         Snapshot = CoreSnapshotModel.MapFrom(result.Snapshot);
         Type = result.Type;
     }
 
     public SnapshotResult MapToEntity()
     {
-        return new SnapshotResult(Snapshot.MapToEntity(), Type, Id);
+        return new SnapshotResult(Snapshot.MapToEntity(), Type, EventId, Id);
     }
 }
 

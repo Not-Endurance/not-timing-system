@@ -2,13 +2,15 @@
 
 public class Official : Aggregate
 {
-    public Official(Person? person, OfficialRole? role, int id)
+    public Official(Person? person, OfficialRole? role, int eventId, int id)
         : base(id)
     {
+        EventId = eventId;
         Person = Required(nameof(Person), person);
         Role = Required(nameof(Role), role);
     }
 
+    public int EventId { get; }
     public Person Person { get; }
     public OfficialRole Role { get; }
 

@@ -1,19 +1,19 @@
 using System.Linq.Expressions;
 using Not.Application.HTTP;
 using Not.Injection;
-using Not.Storage.REST;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
+using NTS.Storage.REST;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class EnduranceEventRepository : RestApiRepository<EnduranceEvent, EnduranceEventModel>, ITransient
+public class EnduranceEventRepository : EventScopedApiRepository<EnduranceEvent, EnduranceEventModel>, ITransient
 {
     const string ROOT_REPOSITORY_EXCEPTION =
         "Only Create, Read and Update operations are implemented for Root entities.";
 
-    public EnduranceEventRepository(NHttpClient client)
-        : base("endurance-event", client) { }
+    public EnduranceEventRepository(NHttpClient client, IServiceProvider serviceProvider)
+        : base("endurance-event", client, serviceProvider) { }
 
     public override Task<EnduranceEvent?> Read(Expression<Func<EnduranceEvent, bool>> _)
     {

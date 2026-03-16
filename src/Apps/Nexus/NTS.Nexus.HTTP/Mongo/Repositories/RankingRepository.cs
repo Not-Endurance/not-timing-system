@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq.Expressions;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Core;
@@ -16,6 +17,11 @@ public class RankingRepository : MongoRepository<RankingModel>
         _telemetry = telemetry;
     }
 
+    protected override Expression<Func<RankingModel, bool>> GetItemFilter(RankingModel document)
+    {
+        return x => x.Id == document.Id && x.EventId == document.EventId;
+    }
+
     protected override UpdateDefinition<RankingModel> GetUpdateDefinition(RankingModel document)
     {
         using var activity = _telemetry.StartActivity(nameof(RankingRepository), nameof(GetUpdateDefinition));
@@ -30,6 +36,7 @@ public class RankingRepository : MongoRepository<RankingModel>
                 .Set(x => x.CompetitionFeiId, document.CompetitionFeiId)
                 .Set(x => x.FeiRule, document.FeiRule)
                 .Set(x => x.FeiScheduleNumber, document.FeiScheduleNumber)
+                .Set(x => x.EventId, document.EventId)
                 .Set(x => x.Entries, document.Entries);
         }
         catch (Exception ex)

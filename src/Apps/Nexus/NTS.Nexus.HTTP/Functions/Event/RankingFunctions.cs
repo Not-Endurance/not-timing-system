@@ -7,9 +7,9 @@ using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
 
-namespace NTS.Nexus.HTTP.Functions;
+namespace NTS.Nexus.HTTP.Functions.Event;
 
-public class RankingFunctions : CrudFunctions<RankingModel>
+public class RankingFunctions : EventScopedCrudFunctions<RankingModel>
 {
     public RankingFunctions(
         IFunctionLogger<RankingFunctions> logger,
@@ -20,58 +20,68 @@ public class RankingFunctions : CrudFunctions<RankingModel>
 
     [Function("rankings-create")]
     public async Task<IActionResult> Create(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "rankings")] HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "events/{eventId:int}/rankings")]
+            HttpRequest request,
+        int eventId
     )
     {
         using var activity = StartFunctionActivity(nameof(Create));
         TagRequest(request);
         LogInformation(request, nameof(Create));
-        return await InternalCreate(request);
+        return await InternalCreate(request, eventId);
     }
 
     [Function("rankings-update")]
     public async Task<IActionResult> Update(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "rankings")] HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "events/{eventId:int}/rankings")]
+            HttpRequest request,
+        int eventId
     )
     {
         using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
-        return await InternalUpdate(request);
+        return await InternalUpdate(request, eventId);
     }
 
     [Function("rankings-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "rankings/{id:int}")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "events/{eventId:int}/rankings/{id:int}")]
+            HttpRequest request,
+        int eventId,
         int id
     )
     {
         using var activity = StartFunctionActivity(nameof(Delete));
         TagRequest(request);
         LogInformation(request, nameof(Delete));
-        return await InternalDelete(request, id);
+        return await InternalDelete(request, eventId, id);
     }
 
     [Function("rankings-read")]
     public async Task<IActionResult> Read(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rankings/{id:int}")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "events/{eventId:int}/rankings/{id:int}")]
+            HttpRequest request,
+        int eventId,
         int id
     )
     {
         using var activity = StartFunctionActivity(nameof(Read));
         TagRequest(request);
         LogInformation(request, nameof(Read));
-        return await InternalRead(request, id);
+        return await InternalRead(request, eventId, id);
     }
 
     [Function("rankings-read-many")]
     public async Task<IActionResult> ReadMany(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rankings")] HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "events/{eventId:int}/rankings")]
+            HttpRequest request,
+        int eventId
     )
     {
         using var activity = StartFunctionActivity(nameof(ReadMany));
         TagRequest(request);
         LogInformation(request, nameof(ReadMany));
-        return await InternalReadMany(request);
+        return await InternalReadMany(request, eventId);
     }
 }

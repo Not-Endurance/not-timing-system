@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq.Expressions;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Core;
@@ -16,13 +17,20 @@ public class HandoutRepository : MongoRepository<HandoutModel>
         _telemetry = telemetry;
     }
 
+    protected override Expression<Func<HandoutModel, bool>> GetItemFilter(HandoutModel document)
+    {
+        return x => x.Id == document.Id && x.EventId == document.EventId;
+    }
+
     protected override UpdateDefinition<HandoutModel> GetUpdateDefinition(HandoutModel document)
     {
         using var activity = _telemetry.StartActivity(nameof(HandoutRepository), nameof(GetUpdateDefinition));
 
         try
         {
-            return Builders<HandoutModel>.Update.Set(x => x.Participation, document.Participation);
+            return Builders<HandoutModel>
+                .Update.Set(x => x.EventId, document.EventId)
+                .Set(x => x.Participation, document.Participation);
         }
         catch (Exception ex)
         {

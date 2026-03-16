@@ -77,7 +77,7 @@ public class StartBusinessService : IStartBusiness
         ValidateFeiConfiguration(setupEvent);
 
         var enduranceEvent = EnduranceEventFactory.Create(setupEvent);
-        var officials = setupEvent.Officials.Select(OfficialFactory.Create);
+        var officials = setupEvent.Officials.Select(x => OfficialFactory.Create(x, setupEvent.Id));
         var (participations, rankings) = CreateParticipationsAndRankings(setupEvent);
 
         await _coreEventRepository.Create(enduranceEvent);
@@ -131,8 +131,14 @@ public class StartBusinessService : IStartBusiness
 
         foreach (var setupCompetition in setupEvent.Competitions)
         {
-            var (p, rankingEntriesByCategory) = ParticipationAndRankingFactory.Create(setupCompetition, participations);
-            var r = rankingEntriesByCategory.Where(x => x.Value.Any()).Select(x => CreateRanking(setupCompetition, x));
+            var (p, rankingEntriesByCategory) = ParticipationAndRankingFactory.Create(
+                setupCompetition,
+                participations,
+                setupEvent.Id
+            );
+            var r = rankingEntriesByCategory
+                .Where(x => x.Value.Any())
+                .Select(x => CreateRanking(setupCompetition, x, setupEvent.Id));
 
             participations.AddRange(p);
             rankings.AddRange(r);
@@ -142,7 +148,8 @@ public class StartBusinessService : IStartBusiness
 
     Ranking CreateRanking(
         Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
-        KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory
+        KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory,
+        int eventId
     )
     {
         return new Ranking(
@@ -153,7 +160,8 @@ public class StartBusinessService : IStartBusiness
             setupCompetition.FeiId,
             setupCompetition.FeiRule,
             setupCompetition.FeiScheduleNumber,
-            entriesByCategory.Value
+            entriesByCategory.Value,
+            eventId
         );
     }
 

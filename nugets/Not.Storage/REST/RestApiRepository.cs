@@ -23,13 +23,19 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
     static INotifier Notifier => ServiceLocator.Get<INotifier>();
 
     protected NHttpClient Client { get; }
+    protected string Endpoint => _endpoint;
 
-    protected string BuildUrl(object id)
+    protected virtual string ResolveEndpoint()
     {
-        return $"{_endpoint}/{id}";
+        return _endpoint;
     }
 
-    protected void HandleException(Exception ex)
+    protected virtual string BuildUrl(object id)
+    {
+        return $"{ResolveEndpoint()}/{id}";
+    }
+
+    protected virtual void HandleException(Exception ex)
     {
         if (
             ex is HttpRequestException httpRequestException
@@ -55,13 +61,13 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
     protected virtual Task InternalCreate(T item)
     {
         var model = MapModel(item);
-        return Client.Post(_endpoint, model);
+        return Client.Post(ResolveEndpoint(), model);
     }
 
     protected virtual Task InternalUpdate(T item)
     {
         var model = MapModel(item);
-        return Client.Patch(_endpoint, model);
+        return Client.Patch(ResolveEndpoint(), model);
     }
 
     protected virtual TModel MapModel(T item)
@@ -139,7 +145,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
     {
         try
         {
-            var models = await Client.GetJson<IEnumerable<TModel>>(_endpoint) ?? [];
+            var models = await Client.GetJson<IEnumerable<TModel>>(ResolveEndpoint()) ?? [];
             return models.Select(x => MapEntity(x)!);
         }
         catch (Exception ex)

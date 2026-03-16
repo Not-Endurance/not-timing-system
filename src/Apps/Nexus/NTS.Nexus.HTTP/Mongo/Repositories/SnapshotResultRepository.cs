@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq.Expressions;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Core;
@@ -16,6 +17,11 @@ public class SnapshotResultRepository : MongoRepository<SnapshotResultModel>
         _telemetry = telemetry;
     }
 
+    protected override Expression<Func<SnapshotResultModel, bool>> GetItemFilter(SnapshotResultModel document)
+    {
+        return x => x.Id == document.Id && x.EventId == document.EventId;
+    }
+
     protected override UpdateDefinition<SnapshotResultModel> GetUpdateDefinition(SnapshotResultModel document)
     {
         using var activity = _telemetry.StartActivity(nameof(SnapshotResultRepository), nameof(GetUpdateDefinition));
@@ -24,6 +30,7 @@ public class SnapshotResultRepository : MongoRepository<SnapshotResultModel>
         {
             return Builders<SnapshotResultModel>
                 .Update.Set(x => x.Snapshot, document.Snapshot)
+                .Set(x => x.EventId, document.EventId)
                 .Set(x => x.Type, document.Type);
         }
         catch (Exception ex)

@@ -114,6 +114,7 @@ public class StartlistTests
             combination: combination,
             phases: new PhaseCollection(phases),
             notQualified: null,
+            eventId: 7000 + id,
             id: 6000 + id
         );
     }

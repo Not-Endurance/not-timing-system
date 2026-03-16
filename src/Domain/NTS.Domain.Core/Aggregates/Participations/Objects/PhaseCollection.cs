@@ -23,19 +23,19 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
     public Phase Current { get; private set; }
     public double Distance => this.Sum(x => x.Length);
 
-    internal SnapshotResult Process(Snapshot snapshot)
+    internal SnapshotResult Process(Snapshot snapshot, int eventId)
     {
         var isComplete = Current.IsComplete();
         if (isComplete && Current.IsFinal)
         {
-            return SnapshotResult.NotApplied(snapshot, SnapshotResultType.NotAppliedDueToParticipationComplete);
+            return SnapshotResult.NotApplied(eventId, snapshot, SnapshotResultType.NotAppliedDueToParticipationComplete);
         }
         var notProcessingWindow = TimeSpan.FromMinutes(30); // TODO settings: use settings?
         if (isComplete && snapshot.Timestamp > Current.GetOutTime() + notProcessingWindow)
         {
             SelectNext();
         }
-        return Current.Process(snapshot);
+        return Current.Process(snapshot, eventId);
     }
 
     internal void StartIfNext()
