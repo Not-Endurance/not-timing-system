@@ -7,9 +7,7 @@ namespace NTS.Nexus.HTTP.Mongo.Repositories;
 public class EnduranceEventRepository : MongoRepository<EnduranceEventModel>
 {
     public EnduranceEventRepository(IMongoContext context)
-        : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ENDURANCE_EVENTS_COLLECTION)
-    {
-    }
+        : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ENDURANCE_EVENTS_COLLECTION) { }
 
     protected override UpdateDefinition<EnduranceEventModel> GetUpdateDefinition(EnduranceEventModel document)
     {
