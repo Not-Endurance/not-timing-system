@@ -4,7 +4,6 @@ using NTS.Application.Core;
 using NTS.Application.Factories;
 using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
@@ -40,7 +39,6 @@ public class EventScopingTests
 
         var result = EnduranceEventFactory.Create(setupEvent);
 
-        Assert.Equal(77, result.EventId);
         Assert.Equal(77, result.Id);
     }
 

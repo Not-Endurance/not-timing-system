@@ -7,7 +7,7 @@ using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
 
-namespace NTS.Nexus.HTTP.Functions;
+namespace NTS.Nexus.HTTP.Functions.Event;
 
 public class EnduranceEventFunctions : FunctionBase
 {
@@ -78,14 +78,14 @@ public class EnduranceEventFunctions : FunctionBase
         ]
             HttpRequest request,
         int eventId,
-        int id
+        int _
     )
     {
         using var activity = StartFunctionActivity(nameof(Read));
         TagRequest(request);
         LogInformation(request, nameof(Read));
 
-        var current = await GetCurrent(id, eventId);
+        var current = await GetCurrent(eventId);
         if (current == null)
         {
             return new NotFoundResult();

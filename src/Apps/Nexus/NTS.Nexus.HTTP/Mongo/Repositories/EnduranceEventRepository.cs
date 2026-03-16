@@ -7,7 +7,7 @@ namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
 public class EnduranceEventRepository : MongoRepository<EnduranceEventModel>
 {
-    public EnduranceEventRepository(IMongoContext context, ITelemetryService telemetry)
+    public EnduranceEventRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ENDURANCE_EVENTS_COLLECTION)
     {
     }
