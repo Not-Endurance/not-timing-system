@@ -1,5 +1,4 @@
 using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
@@ -14,20 +13,14 @@ public class JudgeSocketService
         INtsSocketService,
         ISingleton
 {
-    readonly ISocketPrincipalStorage _socketPrincialStorage;
-    readonly IRead<EnduranceEvent> _enduranceEvents;
     readonly IRpcSocket _socket;
     readonly INotifier _notifier;
 
     public JudgeSocketService(
-        ISocketPrincipalStorage socketPrincipaStorage,
-        IRead<EnduranceEvent> enduranceEvents,
         IRpcSocket socket,
         INotifier notifier
     )
     {
-        _socketPrincialStorage = socketPrincipaStorage;
-        _enduranceEvents = enduranceEvents;
         _socket = socket;
         _notifier = notifier;
         _socket.Error += HandleRpcErrors;
@@ -38,18 +31,9 @@ public class JudgeSocketService
     public bool IsConnected => _socket?.IsConnected ?? false;
     public EnduranceEvent? Event { get; private set; }
 
-    protected override async Task<bool> InitializeState()
+    protected override Task<bool> InitializeState()
     {
-        var upcomingEvent = await _socketPrincialStorage.Get();
-        if (upcomingEvent != null)
-        {
-            var enduranceEvent = await _enduranceEvents.Read(upcomingEvent.Id);
-            if (enduranceEvent != null)
-            {
-                await Connect(enduranceEvent);
-            }
-        }
-        return true;
+        return Task.FromResult(true);
     }
 
     public override void Dispose()
@@ -97,10 +81,10 @@ public class JudgeSocketService
         Status = e;
     }
 
-    async Task InternalSetEvent(EnduranceEvent? enduranceEvent)
+    Task InternalSetEvent(EnduranceEvent? enduranceEvent)
     {
-        await _socketPrincialStorage.Commit(enduranceEvent);
         Event = enduranceEvent;
         EmitChanged();
+        return Task.CompletedTask;
     }
 }

@@ -24,6 +24,9 @@ public class StartValidationDialogBehind : NDialog<bool>
     public Result<IReadOnlyList<StartValidationIssue>> InitialValidation { get; set; } =
         Result.Success<IReadOnlyList<StartValidationIssue>>([]);
 
+    [Parameter]
+    public int UpcomingEventId { get; set; }
+
     protected override void OnParametersSet()
     {
         Validation = InitialValidation;
@@ -63,11 +66,15 @@ public class StartValidationDialogBehind : NDialog<bool>
                 var selectedCompetitionId = _selectedCompetitionByParticipation[issue.ParticipationNumber];
                 foreach (var competition in issue.Competitions.Where(x => x.CompetitionId != selectedCompetitionId))
                 {
-                    await StartService.DeleteParticipation(issue.ParticipationNumber, competition.CompetitionId);
+                    await StartService.DeleteParticipation(
+                        UpcomingEventId,
+                        issue.ParticipationNumber,
+                        competition.CompetitionId
+                    );
                 }
             }
 
-            Validation = await StartService.Validate();
+            Validation = await StartService.Validate(UpcomingEventId);
             if (HasIssues)
             {
                 SyncSelectionsWithCurrentIssues();

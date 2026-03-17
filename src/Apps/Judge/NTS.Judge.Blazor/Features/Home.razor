@@ -1,5 +1,6 @@
 @attribute [Route(HOME)]
 
+@using MudBlazor
 @using NTS.Domain.Setup.Aggregates
 @using NTS.Judge.Features.Setup.UpcomingEvents
 @using NTS.Judge.Blazor.Features.Setup.UpcomingEvents
@@ -11,7 +12,26 @@
 <NContent Title="@Select_event_string">
    
     <Main>
-        <KrudList T="UpcomingEvent" TModel="UpcomingEventFormModel" TShell="UpcomingEventShell" Name="@Upcoming_events_string" />
+        <KrudList T="UpcomingEvent" TModel="UpcomingEventFormModel" TShell="UpcomingEventShell" Name="@Upcoming_events_string">
+            <CustomAction1 Context="upcomingEvent">
+                @if (ShowStartButton())
+                {
+                    <NButtonWarning
+                        OnClick="() => Start(upcomingEvent)"
+                        Text="@Start_string"
+                        StartIcon="@Icons.Material.Filled.NotStarted" />
+                }
+            </CustomAction1>
+
+            <CustomAction2 Context="upcomingEvent">
+                @if (ShowResetTimingButton(upcomingEvent))
+                {
+                    <NButtonDanger
+                        OnClick="() => OpenResetTimingDialog(upcomingEvent)"
+                        Text="@Reset_string" />
+                }
+            </CustomAction2>
+        </KrudList>
     </Main>
     
 </NContent>

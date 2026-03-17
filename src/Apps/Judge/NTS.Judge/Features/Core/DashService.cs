@@ -1,5 +1,6 @@
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Exceptions;
 using Not.Injection;
 using Not.Notify;
 using Not.Structures;
@@ -62,20 +63,24 @@ public class DashService : NStatefulService, IDashService, ISingleton
         return IsStarted;
     }
 
-    public async Task<Result<IReadOnlyList<StartValidationIssue>>> Start()
+    public Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId)
     {
-        // TODO: Ensure witness apps receive the participants list on Start (or before).
-        // Currently you need to restart witness after start in order to fetch
+        return _startDashboardBusiness.Validate(upcomingEventId);
+    }
 
-        var validationResult = await _startDashboardBusiness.Validate();
+    public async Task Start(int upcomingEventId)
+    {
+        var validationResult = await _startDashboardBusiness.Validate(upcomingEventId);
         if (validationResult.Data?.Any() == true)
         {
-            return validationResult;
+            throw GuardHelper.Exception($"Cannot start with invalid state. Ensure to call {nameof(DashService)}.{nameof(Validate)}");
         }
-        var endranceEvent = await _startDashboardBusiness.Start();
+
+        var endranceEvent = await _startDashboardBusiness.CreateEnduranceEvent(upcomingEventId);
         await _socketService.Connect(endranceEvent);
+        await _startDashboardBusiness.StartEnduranceEvent(upcomingEventId);
+        IsStarted = true;
         EmitChanged();
-        return Result.Success<IReadOnlyList<StartValidationIssue>>([]);
     }
 
     public async Task Reset()
@@ -118,7 +123,8 @@ public class DashService : NStatefulService, IDashService, ISingleton
 public interface IDashService : IStatefulService
 {
     bool IsStarted { get; }
-    Task<Result<IReadOnlyList<StartValidationIssue>>> Start();
+    Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId);
+    Task Start(int upcomingEventId);
     Task LoadArchive(int archiveId);
     Task Reset();
 }

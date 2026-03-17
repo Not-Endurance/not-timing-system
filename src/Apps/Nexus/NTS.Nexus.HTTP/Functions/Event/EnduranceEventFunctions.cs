@@ -83,6 +83,20 @@ public class EnduranceEventFunctions : FunctionBase
         return Ok(current);
     }
 
+    [Function("endurance-event-list")]
+    public async Task<IActionResult> List(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event")]
+            HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(List));
+        TagRequest(request);
+        LogInformation(request, nameof(List));
+
+        var events = await _events.ReadMany();
+        return Ok(events);
+    }
+
     [Function("endurance-event-delete")]
     public async Task<IActionResult> Delete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "endurance-event/{id:int}")]

@@ -16,7 +16,7 @@ namespace NTS.Judge.Features;
 public class StartBusinessService : IStartBusiness
 {
     readonly IRepository<UpcomingEvent> _upcomingEvents;
-    readonly IRepository<EnduranceEvent> _coreEventRepository;
+    readonly IRepository<EnduranceEvent> _enduranceEvents;
     readonly IRepository<Official> _coreOfficialRepository;
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<Ranking> _rankingRepository;
@@ -30,21 +30,21 @@ public class StartBusinessService : IStartBusiness
     )
     {
         _upcomingEvents = upcomingEvents;
-        _coreEventRepository = coreEventRepository;
+        _enduranceEvents = coreEventRepository;
         _coreOfficialRepository = coreOfficialRepository;
         _participationRepository = participationRepository;
         _rankingRepository = rankingRepository;
     }
 
-    public async Task<Result<IReadOnlyList<StartValidationIssue>>> Validate()
+    public async Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId)
     {
-        var setupEvent = await GetSetupEvent();
+        var setupEvent = await GetSetupEvent(upcomingEventId);
         return StartValidator.Validate(setupEvent);
     }
 
-    public async Task DeleteParticipation(int participationNumber, int competitionId)
+    public async Task DeleteParticipation(int upcomingEventId, int participationNumber, int competitionId)
     {
-        var setupEvent = await GetSetupEvent();
+        var setupEvent = await GetSetupEvent(upcomingEventId);
         var competition = setupEvent.Competitions.FirstOrDefault(x => x.Id == competitionId);
         if (competition == null)
         {
@@ -61,9 +61,9 @@ public class StartBusinessService : IStartBusiness
         await _upcomingEvents.Update(setupEvent);
     }
 
-    public async Task<EnduranceEvent> Start()
+    public async Task<EnduranceEvent> CreateEnduranceEvent(int upcomingEventId)
     {
-        var setupEvent = await GetSetupEvent();
+        var setupEvent = await GetSetupEvent(upcomingEventId);
         var validation = StartValidator.Validate(setupEvent);
         var issues = validation.Data ?? [];
         if (issues.Any())
@@ -71,13 +71,20 @@ public class StartBusinessService : IStartBusiness
             throw new DomainException(CreateStartValidationMessage(issues));
         }
 
+        // TODO: Convert this to FeiStartValidationRule (IStartValidationRule)
         ValidateFeiConfiguration(setupEvent);
 
         var enduranceEvent = EnduranceEventFactory.Create(setupEvent);
-        var officials = setupEvent.Officials.Select(x => OfficialFactory.Create(x, setupEvent.Id));
-        var (participations, rankings) = CreateParticipationsAndRankings(setupEvent);
+        await _enduranceEvents.Create(enduranceEvent);
 
-        await _coreEventRepository.Create(enduranceEvent);
+        return enduranceEvent;
+    }
+
+    public async Task StartEnduranceEvent(int upcomingEventId)
+    {
+        var upcomingEvent = await GetSetupEvent(upcomingEventId);
+        var officials = upcomingEvent.Officials.Select(x => OfficialFactory.Create(x, upcomingEvent.Id));
+        var (participations, rankings) = CreateParticipationsAndRankings(upcomingEvent);
         foreach (var official in officials)
         {
             await _coreOfficialRepository.Create(official);
@@ -90,7 +97,6 @@ public class StartBusinessService : IStartBusiness
         {
             await _rankingRepository.Create(ranking);
         }
-        return enduranceEvent;
     }
 
     static string CreateStartValidationMessage(IReadOnlyList<StartValidationIssue> issues)
@@ -113,10 +119,10 @@ public class StartBusinessService : IStartBusiness
         return validationBuilder.ToString().TrimEnd();
     }
 
-    async Task<UpcomingEvent> GetSetupEvent()
+    async Task<UpcomingEvent> GetSetupEvent(int upcomingEventId)
     {
-        var upcomingEvent = await _upcomingEvents.Read(0);
-        return upcomingEvent ?? throw GuardHelper.Exception("Event is not selected"); // TODO: fix with Id, by putting on event page
+        var upcomingEvent = await _upcomingEvents.Read(upcomingEventId);
+        return upcomingEvent ?? throw GuardHelper.Exception($"Event with id '{upcomingEventId}' is not selected");
     }
 
     (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(UpcomingEvent setupEvent)
@@ -229,7 +235,8 @@ public class StartBusinessService : IStartBusiness
 
 public interface IStartBusiness : ITransient
 {
-    Task<Result<IReadOnlyList<StartValidationIssue>>> Validate();
-    Task DeleteParticipation(int participationNumber, int competitionId);
-    Task<EnduranceEvent> Start();
+    Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId);
+    Task DeleteParticipation(int upcomingEventId, int participationNumber, int competitionId);
+    Task<EnduranceEvent> CreateEnduranceEvent(int upcomingEventId);
+    Task StartEnduranceEvent(int upcomingEventId);
 }
