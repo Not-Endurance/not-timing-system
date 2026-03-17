@@ -7,6 +7,6 @@ namespace NTS.Application.Socket;
 public interface INtsSocketContext : ISocketContext
 {
     [MemberNotNullWhen(true, nameof(Event))]
-    new bool IsConnected {get;}
+    new bool IsConnected { get; }
     EnduranceEvent? Event { get; }
 }

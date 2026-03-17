@@ -186,8 +186,8 @@ public class RegistrationFlowTests
             RegisterCalls++;
             LastRegistration = registration;
 
-            var result = RegisterResult
-                ?? Result.Success(new NUserModel(registration.Email) { Name = registration.Name });
+            var result =
+                RegisterResult ?? Result.Success(new NUserModel(registration.Email) { Name = registration.Name });
             return Task.FromResult(result);
         }
     }

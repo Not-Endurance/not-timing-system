@@ -59,7 +59,9 @@ public class DashService : IDashService, ISingleton
         var validationResult = await _startDashboardBusiness.Validate(upcomingEventId);
         if (validationResult.Data?.Any() == true)
         {
-            throw GuardHelper.Exception($"Cannot start with invalid state. Ensure to call {nameof(DashService)}.{nameof(Validate)}");
+            throw GuardHelper.Exception(
+                $"Cannot start with invalid state. Ensure to call {nameof(DashService)}.{nameof(Validate)}"
+            );
         }
 
         var endranceEvent = await _startDashboardBusiness.CreateEnduranceEvent(upcomingEventId);

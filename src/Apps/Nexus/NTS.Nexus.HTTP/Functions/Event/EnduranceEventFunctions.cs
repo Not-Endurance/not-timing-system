@@ -25,8 +25,7 @@ public class EnduranceEventFunctions : FunctionBase
 
     [Function("endurance-event-create")]
     public async Task<IActionResult> Create(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "endurance-event")]
-            HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "endurance-event")] HttpRequest request
     )
     {
         using var activity = StartFunctionActivity(nameof(Create));
@@ -45,8 +44,7 @@ public class EnduranceEventFunctions : FunctionBase
 
     [Function("endurance-event-update")]
     public async Task<IActionResult> Update(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "endurance-event")]
-            HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "endurance-event")] HttpRequest request
     )
     {
         using var activity = StartFunctionActivity(nameof(Update));
@@ -65,8 +63,7 @@ public class EnduranceEventFunctions : FunctionBase
 
     [Function("endurance-event-read")]
     public async Task<IActionResult> Read(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event/{id:int}")] HttpRequest request,
         int id
     )
     {
@@ -85,8 +82,7 @@ public class EnduranceEventFunctions : FunctionBase
 
     [Function("endurance-event-list")]
     public async Task<IActionResult> List(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event")]
-            HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event")] HttpRequest request
     )
     {
         using var activity = StartFunctionActivity(nameof(List));
@@ -99,8 +95,7 @@ public class EnduranceEventFunctions : FunctionBase
 
     [Function("endurance-event-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "endurance-event/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "endurance-event/{id:int}")] HttpRequest request,
         int id
     )
     {

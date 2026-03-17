@@ -20,7 +20,11 @@ public class UpcomingEventService
     readonly INotifier _notifier;
     readonly ISelectedUpcomingEventContext _selectedEventContext;
 
-    public UpcomingEventService(IRepository<UpcomingEvent> upcomingEvents, INotifier notifier, ISelectedUpcomingEventContext context)
+    public UpcomingEventService(
+        IRepository<UpcomingEvent> upcomingEvents,
+        INotifier notifier,
+        ISelectedUpcomingEventContext context
+    )
         : base(upcomingEvents, [])
     {
         _upcomingEvents = upcomingEvents;
@@ -116,7 +120,7 @@ public class UpcomingEventService
     }
 
     async Task UpdateReflectingEvents(Func<UpcomingEvent, bool> reflect)
-    {   
+    {
         if (_selectedEventContext.Event == null)
         {
             return;

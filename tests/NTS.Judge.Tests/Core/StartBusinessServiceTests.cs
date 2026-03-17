@@ -34,7 +34,13 @@ public class StartBusinessServiceTests
         var officials = new RecordingRepository<CoreOfficial>();
         var participations = new RecordingRepository<CoreParticipation>();
         var rankings = new RecordingRepository<Ranking>();
-        var service = CreateService([CreateValidEvent(1), CreateValidEvent(2)], events, officials, participations, rankings);
+        var service = CreateService(
+            [CreateValidEvent(1), CreateValidEvent(2)],
+            events,
+            officials,
+            participations,
+            rankings
+        );
 
         var result = await service.CreateEnduranceEvent(2);
 
@@ -185,7 +191,10 @@ public class StartBusinessServiceTests
     )
     {
         var phases = phaseConfig
-            .Select((x, index) => new Phase(new Loop(x.Distance, id * 10 + index + 1), x.Recovery, x.RestMinutes, id * 10 + index + 1))
+            .Select(
+                (x, index) =>
+                    new Phase(new Loop(x.Distance, id * 10 + index + 1), x.Recovery, x.RestMinutes, id * 10 + index + 1)
+            )
             .ToList();
         var participation = new SetupParticipation(
             isNotRanked: false,

@@ -27,7 +27,7 @@ public class FeiExportService : IFeiExportService
     public async Task Create(Ranklist ranklist)
     {
         var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
-        
+
         var contents = _feiExport.CreateXmlContent(ranklist, enduranceEvent);
         var path = $"{_filesystemContext.AppDirectory}/fei-export-{ranklist.Name}.xml";
         await FileHelper.WriteAsync(path, contents);
