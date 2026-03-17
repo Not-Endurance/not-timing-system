@@ -176,7 +176,9 @@ public class RegistrationFlowTests
             },
         };
         var function = new UserFunctions(new TestFunctionLogger(), users, new TestTelemetryService());
-        var request = CreateRequest(new RegisterUserPaload("new.user@example.com", "Jane Doe", "Jane", "Doe", "Bulgaria"));
+        var request = CreateRequest(
+            new RegisterUserPaload("new.user@example.com", "Jane Doe", "Jane", "Doe", "Bulgaria")
+        );
 
         var response = await function.Register(request);
 
@@ -239,7 +241,8 @@ public class RegistrationFlowTests
             RegisterCalls++;
             LastRegistration = registration;
 
-            var result = RegisterResult
+            var result =
+                RegisterResult
                 ?? Result.Success(
                     new NUserModel(registration.Email)
                     {
