@@ -1,4 +1,3 @@
-using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
 using Not.Injection;
@@ -12,14 +11,14 @@ using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core;
 
-public class DashService : NStatefulService, IDashService, ISingleton
+public class DashService : IDashService, ISingleton
 {
     readonly INtsSocketService _socketService;
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly ICoreState _coreState;
     readonly IStartBusiness _startDashboardBusiness;
     readonly IRepository<Ranking> _rankings;
-    readonly IRepository<EnduranceEvent> _events;
+    readonly IRepository<EnduranceEvent> _enduranceEvents;
     readonly IRepository<Participation> _participations;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
@@ -43,24 +42,11 @@ public class DashService : NStatefulService, IDashService, ISingleton
         _coreState = coreState;
         _startDashboardBusiness = startDashboardBusiness;
         _rankings = rankings;
-        _events = events;
+        _enduranceEvents = events;
         _participations = participations;
         _officials = officials;
         _archive = archive;
         _notifier = notifier;
-    }
-
-    public bool IsStarted { get; private set; }
-
-    protected override async Task<bool> InitializeState()
-    {
-        if (!_socketService.IsConnected)
-        {
-            return false;
-        }
-        var enduranceEvents = await _events.Read(0);
-        IsStarted = enduranceEvents != null;
-        return IsStarted;
     }
 
     public Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId)
@@ -79,20 +65,12 @@ public class DashService : NStatefulService, IDashService, ISingleton
         var endranceEvent = await _startDashboardBusiness.CreateEnduranceEvent(upcomingEventId);
         await _socketService.Connect(endranceEvent);
         await _startDashboardBusiness.StartEnduranceEvent(upcomingEventId);
-        IsStarted = true;
-        EmitChanged();
     }
 
     public async Task Reset()
     {
         await _coreState.Reset();
-        IsStarted = false;
-        // TODO: replace with events when implement domain event dispatcher and handlers
-        foreach (var observable in _coreDependentObservables)
-        {
-            observable.ResetHasLoaded();
-        }
-        EmitChanged();
+        ResetCoreDependentObservables();
     }
 
     public async Task LoadArchive(int archiveId)
@@ -103,7 +81,9 @@ public class DashService : NStatefulService, IDashService, ISingleton
             _notifier.Inform($"Archive with id '{archiveId}' does not exist");
             return;
         }
-        await _events.Create(entry.EnduranceEvent);
+
+        await _enduranceEvents.Create(entry.EnduranceEvent);
+        await _socketService.Connect(entry.EnduranceEvent);
         foreach (var official in entry.Officials)
         {
             await _officials.Create(official);
@@ -116,13 +96,21 @@ public class DashService : NStatefulService, IDashService, ISingleton
         {
             await _participations.Create(participation);
         }
-        IsStarted = true;
+        ResetCoreDependentObservables();
+    }
+
+    void ResetCoreDependentObservables()
+    {
+        // TODO: replace with events when implement domain event dispatcher and handlers
+        foreach (var observable in _coreDependentObservables)
+        {
+            observable.ResetHasLoaded();
+        }
     }
 }
 
-public interface IDashService : IStatefulService
+public interface IDashService
 {
-    bool IsStarted { get; }
     Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId);
     Task Start(int upcomingEventId);
     Task LoadArchive(int archiveId);

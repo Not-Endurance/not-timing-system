@@ -1,6 +1,6 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
-using NTS.Judge.Features.Core;
+using NTS.Application.Socket;
 using NTS.Judge.Features.Settings;
 using static NTS.Judge.Blazor.Routes;
 
@@ -15,7 +15,9 @@ public class NavMenuBehind : NStatefulComponent
     protected ISettingService SettingService { get; set; } = default!;
 
     [Inject]
-    protected IDashService TimingStateService { get; set; } = default!;
+    protected INtsSocketService SocketService { get; set; } = default!;
+
+    protected bool HasActiveEvent => SocketService.Event != null;
 
     protected override void OnInitialized()
     {
@@ -25,6 +27,6 @@ public class NavMenuBehind : NStatefulComponent
     protected override async Task OnInitializedAsync()
     {
         await Observe(SettingService);
-        await Observe(TimingStateService);
+        await Observe(SocketService);
     }
 }

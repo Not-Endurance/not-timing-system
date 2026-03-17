@@ -5,6 +5,7 @@ using Not.Async.Extensions;
 using Not.Exceptions;
 using Not.Observables.Structures;
 using Not.Safe;
+using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Objects.Documents;
@@ -21,21 +22,21 @@ public class HandoutsService
         INotificationHandler<PhaseCompleted>
 {
     readonly SemaphoreSlim _semaphore = new(1);
+    readonly INtsSocketContext _socketContext;
     readonly IRepository<Handout> _handoutRepository;
     readonly IRepository<Participation> _participations;
-    readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
 
     public HandoutsService(
+        INtsSocketContext socketContext,
         IRepository<Handout> handouts,
         IRepository<Participation> participations,
-        IRepository<EnduranceEvent> events,
         IRepository<Official> officials
     )
     {
+        _socketContext = socketContext;
         _handoutRepository = handouts;
         _participations = participations;
-        _events = events;
         _officials = officials;
     }
 
@@ -43,32 +44,38 @@ public class HandoutsService
 
     protected override async Task<bool> InitializeState()
     {
-        var handouts = await _handoutRepository.ReadMany();
-        var enduranceEvent = await _events.Read(0);
-        var officials = await _officials.ReadMany();
-        if (enduranceEvent == null)
+        if (!_socketContext.IsConnected)
         {
             return false;
         }
+        var handouts = await _handoutRepository.ReadMany();
+        var officials = await _officials.ReadMany();
         if (State.Count != 0)
         {
             return true;
         }
-        var documents = handouts.Select(handout => new HandoutDocument(handout, enduranceEvent, officials));
+        var documents = handouts.Select(handout => new HandoutDocument(handout, _socketContext.Event, officials));
         State.Replace(documents);
         return true;
     }
 
     public async Task Delete(IEnumerable<HandoutDocument> documents)
     {
-        Task action() => SafeDelete(documents);
-        await SafeHelper.Run(action);
+        await _semaphore.WaitAsync();
+
+        var ids = documents.Select(x => x.Id);
+        await _handoutRepository.Delete(x => ids.Contains(x.Id));
+        State.RemoveRange(documents);
+
+        _semaphore.Release();
     }
 
     public async Task Create(int number)
     {
-        Task action() => SafeCreate(number);
-        await SafeHelper.Run(action);
+        var participation = await _participations.Read(x => x.Combination.Number == number);
+        GuardHelper.ThrowIfDefault(participation);
+
+        await CreateDocument(participation);
     }
 
     public async Task<IEnumerable<Combination>> GetCombinations()
@@ -81,35 +88,15 @@ public class HandoutsService
         await CreateDocument(notification.Participation);
     }
 
-    async Task SafeCreate(int number)
-    {
-        var participation = await _participations.Read(x => x.Combination.Number == number);
-        GuardHelper.ThrowIfDefault(participation);
-
-        await CreateDocument(participation);
-    }
-
     async Task<IEnumerable<Combination>> SafeGetCombinations()
     {
         return await _participations.ReadMany().Select(x => x.Combination);
     }
 
-    async Task SafeDelete(IEnumerable<HandoutDocument> documents)
-    {
-        await _semaphore.WaitAsync();
-
-        var ids = documents.Select(x => x.Id);
-        await _handoutRepository.Delete(x => ids.Contains(x.Id));
-        State.RemoveRange(documents);
-
-        _semaphore.Release();
-    }
-
     async Task CreateDocument(Participation participation)
     {
-        var enduranceEvent = await _events.Read(0);
+        var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var officials = await _officials.ReadMany();
-        GuardHelper.ThrowIfDefault(enduranceEvent);
 
         var handout = new Handout(participation);
         var document = new HandoutDocument(handout, enduranceEvent, officials);

@@ -4,11 +4,11 @@ using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Helpers;
 using Not.Domain.Exceptions;
 using NTS.Application.Core;
+using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Features.Setup.StartValidation;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
 using NTS.Judge.Features.Core;
-using NTS.Judge.Features.Socket;
 
 namespace NTS.Judge.Blazor.Features;
 
@@ -21,7 +21,7 @@ public class UpcomingEventsListBehind : NStatefulComponent
     protected IDashService Service { get; set; } = default!;
 
     [Inject]
-    protected JudgeSocketService SocketContext { get; set; } = default!;
+    protected INtsSocketService SocketService { get; set; } = default!;
 
     [Inject]
     protected IEnduranceEventService EnduranceEventService { get; set; } = default!;
@@ -30,19 +30,18 @@ public class UpcomingEventsListBehind : NStatefulComponent
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Service);
-        await Observe(SocketContext);
+        await Observe(SocketService);
         await RefreshActiveEventCount();
     }
 
     protected bool ShowStartButton()
     {
-        return ActiveEnduranceEventCount == 0 && !Service.IsStarted;
+        return ActiveEnduranceEventCount == 0 && !SocketService.IsConnected;
     }
 
     protected bool ShowResetTimingButton(UpcomingEvent upcomingEvent)
     {
-        return Service.IsStarted && SocketContext.Event?.Id == upcomingEvent.Id;
+        return SocketService.Event?.Id == upcomingEvent.Id;
     }
 
     protected async Task Start(UpcomingEvent upcomingEvent)
@@ -62,10 +61,8 @@ public class UpcomingEventsListBehind : NStatefulComponent
                 {
                     return;
                 }
-
-                await Service.Start(upcomingEvent.Id);
             }
-            
+
             await Service.Start(upcomingEvent.Id);
             await RefreshActiveEventCount();
         }
@@ -95,7 +92,7 @@ public class UpcomingEventsListBehind : NStatefulComponent
             }
 
             await Service.Reset();
-            await SocketContext.Disconnect();
+            await SocketService.Disconnect();
             await RefreshActiveEventCount();
         }
         catch (Exception ex)

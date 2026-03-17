@@ -6,6 +6,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
 using NTS.Judge.Blazor.Features.Socket;
 using Not.Application.RPC.SignalR;
+using Not.Events;
 
 namespace NTS.Judge.Tests.Blazor;
 
@@ -112,6 +113,7 @@ public class JudgeStartupEventCoordinatorTests
     sealed class TestSocketService : INtsSocketService
     {
         public int ConnectCalls { get; private set; }
+        public IEventSubscriber ObservableEvent { get; } = new Event();
         public bool IsConnected { get; set; }
         public SocketConnectionStatus Status { get; set; } = SocketConnectionStatus.Disconnected;
         public EnduranceEvent? Event { get; set; }
@@ -130,6 +132,11 @@ public class JudgeStartupEventCoordinatorTests
             IsConnected = false;
             Status = SocketConnectionStatus.Disconnected;
             Event = null;
+            return Task.CompletedTask;
+        }
+
+        public Task Load()
+        {
             return Task.CompletedTask;
         }
     }

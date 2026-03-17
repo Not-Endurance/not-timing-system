@@ -1,4 +1,5 @@
-﻿using Not.Application.RPC.SignalR;
+﻿using System.Diagnostics.CodeAnalysis;
+using Not.Application.RPC.SignalR;
 
 namespace Not.Application.RPC;
 

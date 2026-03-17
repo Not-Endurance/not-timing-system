@@ -20,13 +20,20 @@ public class HandoutsPageBehind : PrintableComponent
 
     protected async Task OpenPrintPreview()
     {
-        var handouts = Service.Documents.ToList();
-        await OpenPrintDialog();
-        var dialog = await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>();
-        if (await dialog.IsCanceled())
+        try
         {
-            return;
+            var handouts = Service.Documents.ToList();
+            await OpenPrintDialog();
+            var dialog = await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>();
+            if (await dialog.IsCanceled())
+            {
+                return;
+            }
+            await Service.Delete(handouts);    
         }
-        await Service.Delete(handouts);
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 }

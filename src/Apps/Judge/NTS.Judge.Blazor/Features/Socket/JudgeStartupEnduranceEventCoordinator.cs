@@ -11,17 +11,17 @@ public class JudgeStartupEnduranceEventCoordinator : IStartupInitializerAsync, I
 {
     readonly IEnduranceEventService _enduranceEventService;
     readonly INtsSocketService _socketService;
-    readonly IDialogService _dialogService;
+    readonly IJudgeSelectEventDialogLauncher _dialogLauncher;
 
     public JudgeStartupEnduranceEventCoordinator(
         IEnduranceEventService enduranceEventService,
         INtsSocketService socketService,
-        IDialogService dialogService
+        IJudgeSelectEventDialogLauncher dialogLauncher
     )
     {
         _enduranceEventService = enduranceEventService;
         _socketService = socketService;
-        _dialogService = dialogService;
+        _dialogLauncher = dialogLauncher;
     }
 
     public async Task RunAtStartupAsync()
@@ -43,6 +43,26 @@ public class JudgeStartupEnduranceEventCoordinator : IStartupInitializerAsync, I
             return;
         }
 
+        await _dialogLauncher.ShowAsync();
+    }
+}
+
+public interface IJudgeSelectEventDialogLauncher
+{
+    Task ShowAsync();
+}
+
+public class JudgeSelectEventDialogLauncher : IJudgeSelectEventDialogLauncher, IScoped
+{
+    readonly IDialogService _dialogService;
+
+    public JudgeSelectEventDialogLauncher(IDialogService dialogService)
+    {
+        _dialogService = dialogService;
+    }
+
+    public async Task ShowAsync()
+    {
         var dialog = await _dialogService.ShowAsync<SelectEventDialog>(Select_event_string);
         await dialog.Result;
     }

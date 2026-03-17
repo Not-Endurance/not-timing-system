@@ -1,3 +1,4 @@
+using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
@@ -5,9 +6,6 @@ using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Features;
 using NTS.Judge.Features.Core;
-using NTS.Judge.Features.Socket;
-using Not.Application.RPC;
-using Not.Application.RPC.SignalR;
 using Not.Events;
 using Not.Structures;
 
@@ -32,9 +30,9 @@ public class UpcomingEventsListBehindTests
     }
 
     [Fact]
-    public void ShouldShowResetTiming_WhenConnectedEventMatchesAndStarted_ReturnsTrue()
+    public void ShouldShowResetTiming_WhenConnectedEventMatches_ReturnsTrue()
     {
-        var component = CreateComponent(isStarted: true, connectedEventId: 7);
+        var component = CreateComponent(connectedEventId: 7);
 
         Assert.True(component.ShowReset(CreateUpcomingEvent(7)));
     }
@@ -42,30 +40,29 @@ public class UpcomingEventsListBehindTests
     [Fact]
     public void ShouldShowResetTiming_WhenConnectedEventDiffers_ReturnsFalse()
     {
-        var component = CreateComponent(isStarted: true, connectedEventId: 8);
+        var component = CreateComponent(connectedEventId: 8);
 
         Assert.False(component.ShowReset(CreateUpcomingEvent(7)));
     }
 
     [Fact]
-    public void ShouldShowResetTiming_WhenNotStarted_ReturnsFalse()
+    public void ShouldShowResetTiming_WhenNoConnectedEvent_ReturnsFalse()
     {
-        var component = CreateComponent(isStarted: false, connectedEventId: 7);
+        var component = CreateComponent();
 
         Assert.False(component.ShowReset(CreateUpcomingEvent(7)));
     }
 
     static TestUpcomingEventsListBehind CreateComponent(
         int activeEnduranceEventCount = 0,
-        bool isStarted = false,
         int? connectedEventId = null
     )
     {
         var component = new TestUpcomingEventsListBehind
         {
             ActiveCount = activeEnduranceEventCount,
-            Service = new TestDashService { IsStarted = isStarted },
-            SocketContext = new TestJudgeSocketService { Event = connectedEventId == null ? null : CreateEnduranceEvent(connectedEventId.Value) },
+            Service = new TestDashService(),
+            SocketService = new TestSocketService { Event = connectedEventId == null ? null : CreateEnduranceEvent(connectedEventId.Value) },
         };
         return component;
     }
@@ -101,9 +98,9 @@ public class UpcomingEventsListBehindTests
             set => base.Service = value;
         }
 
-        public new JudgeSocketService SocketContext
+        public new INtsSocketService SocketService
         {
-            set => base.SocketContext = value;
+            set => base.SocketService = value;
         }
 
         public bool ShowStart()
@@ -119,89 +116,51 @@ public class UpcomingEventsListBehindTests
 
     sealed class TestDashService : IDashService
     {
-        public IEventSubscriber ObservableEvent { get; } = new Event();
-        public bool IsStarted { get; set; }
-
-        public Task<Result<IReadOnlyList<NTS.Domain.Setup.Services.StartValidation.StartValidationIssue>>> Start(int upcomingEventId)
+        public Task<Result<IReadOnlyList<NTS.Domain.Setup.Services.StartValidation.StartValidationIssue>>> Validate(int upcomingEventId)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(Result.Success<IReadOnlyList<NTS.Domain.Setup.Services.StartValidation.StartValidationIssue>>([]));
+        }
+
+        public Task Start(int upcomingEventId)
+        {
+            return Task.CompletedTask;
         }
 
         public Task LoadArchive(int archiveId)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task Reset()
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
+        }
+    }
+
+    sealed class TestSocketService : INtsSocketService
+    {
+        public IEventSubscriber ObservableEvent { get; } = new Event();
+        public bool IsConnected { get; set; }
+        public Not.Application.RPC.SignalR.SocketConnectionStatus Status { get; set; }
+        public EnduranceEvent? Event { get; set; }
+
+        public Task Connect(EnduranceEvent enduranceEvent)
+        {
+            Event = enduranceEvent;
+            IsConnected = true;
+            return Task.CompletedTask;
+        }
+
+        public Task Disconnect()
+        {
+            Event = null;
+            IsConnected = false;
+            return Task.CompletedTask;
         }
 
         public Task Load()
         {
             return Task.CompletedTask;
         }
-    }
-
-    sealed class TestJudgeSocketService : JudgeSocketService
-    {
-        public TestJudgeSocketService()
-            : base(new TestRpcSocket(), new TestNotifier())
-        {
-        }
-
-        public new EnduranceEvent? Event
-        {
-            get => base.Event;
-            set
-            {
-                var property = typeof(JudgeSocketService).GetProperty(nameof(Event));
-                property!.SetValue(this, value);
-            }
-        }
-    }
-
-    sealed class TestRpcSocket : IRpcSocket
-    {
-        public event EventHandler<RpcError>? Error;
-        public event EventHandler<SocketConnectionStatus>? ServerConnectionChanged;
-        public event EventHandler<string>? ServerConnectionInfo;
-        public Microsoft.AspNetCore.SignalR.Client.HubConnection? Connection => null;
-        public bool IsConnected => false;
-
-        public Task Connect(string groupId)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Connect()
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Disconnect()
-        {
-            return Task.CompletedTask;
-        }
-
-        public void RaiseError(Exception exception, string? procedure, params object?[] arguments)
-        {
-            Error?.Invoke(this, new RpcError(exception, procedure, arguments));
-        }
-    }
-
-    sealed class TestNotifier : Not.Notify.INotifier, Not.Notify.INotificationStream
-    {
-        public Not.Events.IEventSubscriber<string> Informed { get; } = new Event<string>();
-        public Not.Events.IEventSubscriber<string> Succeeded { get; } = new Event<string>();
-        public Not.Events.IEventSubscriber<string> Warned { get; } = new Event<string>();
-        public Not.Events.IEventSubscriber<string> Failed { get; } = new Event<string>();
-        public Not.Events.IEventSubscriber<Exception> UnhandledExceptions { get; } = new Event<Exception>();
-
-        public void Error(Exception exception) { }
-        public void Error(string message) { }
-        public void Inform(string message) { }
-        public void Success(string message) { }
-        public void Warn(string message) { }
     }
 }

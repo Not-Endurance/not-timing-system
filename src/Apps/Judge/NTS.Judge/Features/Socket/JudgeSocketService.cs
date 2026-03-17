@@ -73,12 +73,14 @@ public class JudgeSocketService
     void HandleRpcErrors(object? sender, RpcError rpcError)
     {
         Status = SocketConnectionStatus.Disconnected;
+        EmitChanged();
         _notifier.Error(rpcError.Exception);
     }
 
     void HandleServerConnectionChanged(object? sender, SocketConnectionStatus e)
     {
         Status = e;
+        EmitChanged();
     }
 
     Task InternalSetEvent(EnduranceEvent? enduranceEvent)

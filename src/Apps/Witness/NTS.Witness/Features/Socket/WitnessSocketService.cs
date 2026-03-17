@@ -1,3 +1,4 @@
+using Not.Application.Behinds.Adapters;
 using Not.Application.DomainEvents;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
@@ -9,7 +10,7 @@ using NTS.Domain.Core.Events;
 
 namespace NTS.Witness.Features.Socket;
 
-public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
+public class WitnessSocketService : NStatefulService, INtsSocketService, IScoped, IDisposable
 {
     readonly IUserSessionService _userSessionService;
     readonly IRpcSocket _socket;
@@ -34,8 +35,14 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
     public bool IsConnected => _socket.IsConnected;
     public EnduranceEvent? Event { get; private set; }
 
-    public void Dispose()
+    protected override Task<bool> InitializeState()
     {
+        return Task.FromResult(true);
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
         _socket.ServerConnectionChanged -= HandleServerConnectionChanged;
     }
 
@@ -49,6 +56,7 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
         }
 
         Event = null;
+        EmitChanged();
         await _domainEventDispatcher.Dispatch(new EventDisconnected(@event?.Id));
         if (@event != null)
         {
@@ -68,6 +76,7 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
                     return;
                 }
                 Event = null;
+                EmitChanged();
             }
             else if (_socket.IsConnected)
             {
@@ -75,6 +84,7 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
             }
             // Previous connection attempt may have failed; clear stale state and retry.
             Event = null;
+            EmitChanged();
         }
 
         await _socket.Connect(upcomingEvent.Id.ToString());
@@ -84,6 +94,7 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
         }
 
         Event = upcomingEvent;
+        EmitChanged();
         await _userSessionService.SetEventId(upcomingEvent.Id);
         await _domainEventDispatcher.Dispatch(new EventConnected(upcomingEvent.Id));
         if (Event != null)
@@ -96,6 +107,7 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
     {
         var previousStatus = Status;
         Status = status;
+        EmitChanged();
 
         if (
             status == SocketConnectionStatus.Connected

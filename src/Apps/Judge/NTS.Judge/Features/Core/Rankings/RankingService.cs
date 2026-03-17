@@ -4,8 +4,8 @@ using Not.Application.CRUD.Ports;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
-using Not.Notify;
 using Not.Observables.Structures;
+using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
@@ -28,26 +28,23 @@ public class RankingService
         INotificationHandler<ParticipationRestored>,
         ISingleton
 {
+    readonly INtsSocketContext _socketContext;
     readonly IRepository<Ranking> _rankings;
-    readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
-    readonly INotifier _notifier;
     Ranking? _current;
 
     public RankingService(
+        INtsSocketContext socketContext,
         IRepository<Ranking> rankings,
-        IRepository<EnduranceEvent> events,
         IRepository<Official> officials,
-        IRepository<ArchiveEntry> archive,
-        INotifier notifier
+        IRepository<ArchiveEntry> archive
     )
     {
+        _socketContext = socketContext;
         _rankings = rankings;
-        _events = events;
         _officials = officials;
         _archive = archive;
-        _notifier = notifier;
     }
 
     public Ranking Current =>
@@ -60,6 +57,10 @@ public class RankingService
 
     protected override async Task<bool> InitializeState()
     {
+        if (!_socketContext.IsConnected)
+        {
+            return false;
+        }
         var rankings = await _rankings.ReadMany();
         if (!rankings.Any())
         {
@@ -90,26 +91,21 @@ public class RankingService
 
     public async Task ArchiveEnduranceEvent()
     {
-        var enduranceEvent = await _events.Read(0);
-        if (enduranceEvent == null)
-        {
-            _notifier.Warn(Event_is_not_started_yet_string);
-            return;
-        }
+        GuardHelper.ThrowIfDefault(_socketContext.Event);
+
         var officials = await _officials.ReadMany();
         var rankings = await _rankings.ReadMany();
         var ranklists = rankings.Select(x => new Ranklist(x)).Where(x => x.Entries.Any());
-
-        var entry = new ArchiveEntry(enduranceEvent, officials, ranklists);
+        var entry = new ArchiveEntry(_socketContext.Event, officials, ranklists);
         await _archive.Create(entry);
     }
 
     public async Task<RanklistDocument> Create(Ranking ranking)
     {
-        var enduranceEvent = await _events.Read(0);
+        var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var officials = await _officials.ReadMany();
         var ranklist = new Ranklist(ranking);
-        return new RanklistDocument(ranklist, enduranceEvent!, officials);
+        return new RanklistDocument(ranklist, enduranceEvent, officials);
     }
 
     public void Select(Ranking ranking)

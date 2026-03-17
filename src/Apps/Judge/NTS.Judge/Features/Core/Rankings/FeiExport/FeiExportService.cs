@@ -1,33 +1,34 @@
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.CRUD.Ports;
+using Not.Exceptions;
 using Not.Filesystem;
 using Not.Injection;
-using NTS.Domain.Core.Aggregates;
+using NTS.Application.Socket;
 using NTS.Domain.Core.Objects;
 
 namespace NTS.Judge.Features.Core.Rankings.FeiExport;
 
 public class FeiExportService : IFeiExportService
 {
-    readonly IRepository<EnduranceEvent> _events;
     readonly IFeiExportFeature _feiExport;
     readonly IFilesystemContext _filesystemContext;
+    readonly INtsSocketContext _socketContext;
 
     public FeiExportService(
-        IRepository<EnduranceEvent> events,
+        INtsSocketContext socketContext,
         IFeiExportFeature feiExport,
         [FromKeyedServices("NDataKey")] IFilesystemContext filesystemContext
     )
     {
-        _events = events;
+        _socketContext = socketContext;
         _feiExport = feiExport;
         _filesystemContext = filesystemContext;
     }
 
     public async Task Create(Ranklist ranklist)
     {
-        var enduranceEvent = await _events.Read(0);
-        var contents = _feiExport.CreateXmlContent(ranklist, enduranceEvent!);
+        var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
+        
+        var contents = _feiExport.CreateXmlContent(ranklist, enduranceEvent);
         var path = $"{_filesystemContext.AppDirectory}/fei-export-{ranklist.Name}.xml";
         await FileHelper.WriteAsync(path, contents);
     }

@@ -1,5 +1,6 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Notify;
+using NTS.Application.Socket;
 using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards;
@@ -10,9 +11,14 @@ public class DashboardContentBehind : NStatefulComponent
     INotifier Notifier { get; set; } = default!;
 
     protected int? ArchiveId { get; set; }
+    protected bool IsArchiveLoading { get; set; }
+    protected bool HasActiveEvent => SocketService.Event != null;
 
     [Inject]
     protected IDashService Service { get; set; } = default!;
+
+    [Inject]
+    protected INtsSocketService SocketService { get; set; } = default!;
 
     protected async Task LoadArchive()
     {
@@ -21,11 +27,20 @@ public class DashboardContentBehind : NStatefulComponent
             Notifier.Warn(Provide_Archive_ID_string);
             return;
         }
-        await Service.LoadArchive(ArchiveId.Value);
+
+        try
+        {
+            IsArchiveLoading = true;
+            await Service.LoadArchive(ArchiveId.Value);
+        }
+        finally
+        {
+            IsArchiveLoading = false;
+        }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(Service);
+        await Observe(SocketService);
     }
 }
