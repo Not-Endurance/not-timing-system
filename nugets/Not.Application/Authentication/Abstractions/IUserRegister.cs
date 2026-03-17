@@ -6,5 +6,5 @@ namespace Not.Application.Authentication.Abstractions;
 public interface IUserRegister
 {
     Task<Result<NUserModel>> Get(string email);
-    Task<Result<NUserModel>> Register(string email);
+    Task<Result<NUserModel>> Register(NUserRegistration registration);
 }

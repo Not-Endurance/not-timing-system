@@ -745,4 +745,7 @@
   <data name="Resend_string" xml:space="preserve">
     <value>Yeniden gonder</value>
   </data>
+  <data name="Register_string" xml:space="preserve">
+    <value>Kaydol</value>
+  </data>
 </root>

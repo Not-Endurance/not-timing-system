@@ -32,19 +32,20 @@ public class UserMongoRepository : IUserRepository, ITransient
         return user?.ToUser();
     }
 
-    public async Task<NUserModel> Register(string email)
+    public async Task<NUserModel> Register(NUserRegistration registration)
     {
         using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(Register));
 
         var normalizedEmail =
-            NormalizeEmail(email) ?? throw new ArgumentException("Email cannot be empty", nameof(email));
+            NormalizeEmail(registration.Email)
+            ?? throw new ArgumentException("Email cannot be empty", nameof(registration));
         var existing = await ReadByEmail(normalizedEmail);
         if (existing != null)
         {
             return existing;
         }
 
-        var user = NUserDocument.Create(normalizedEmail);
+        var user = NUserDocument.Create(normalizedEmail, registration.Name);
 
         try
         {
@@ -53,6 +54,12 @@ public class UserMongoRepository : IUserRepository, ITransient
         }
         catch (MongoWriteException ex) when (ex.WriteError.Code == 11000)
         {
+            existing = await ReadByEmail(normalizedEmail);
+            if (existing != null)
+            {
+                return existing;
+            }
+
             throw new ApplicationException($"Could not register user '{normalizedEmail}'", ex);
         }
     }
@@ -95,5 +102,5 @@ public class UserMongoRepository : IUserRepository, ITransient
 public interface IUserRepository
 {
     Task<NUserModel?> ReadByEmail(string email);
-    Task<NUserModel> Register(string email);
+    Task<NUserModel> Register(NUserRegistration registration);
 }

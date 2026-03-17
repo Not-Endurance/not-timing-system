@@ -2,6 +2,7 @@
 Configuration key: `NAuthenticationSettings`
 
 `NTS.Witness.Web` is now a client-side Blazor WebAssembly app. It does not use confidential client secrets.
+The Register button reuses the normal Entra sign-in entrypoint. In workforce-tenant self-service sign-up, Entra decides whether the user signs in or is taken through sign-up.
 
 Environment configuration files are loaded from:
 - `wwwroot/appsettings.json`

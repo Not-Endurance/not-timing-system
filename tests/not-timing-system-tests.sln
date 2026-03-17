@@ -42,6 +42,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_confg", "_confg", "{6AAA82
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Tests", "..\nugets\Not.Tests\Not.Tests.csproj", "{46969AA7-60B3-4664-99B8-42CA1942CC1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Authentication.Tests", "NTS.Authentication.Tests\NTS.Authentication.Tests.csproj", "{F706C890-47BF-41AE-917C-0BA613C2F4CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F706C890-47BF-41AE-917C-0BA613C2F4CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F706C890-47BF-41AE-917C-0BA613C2F4CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F706C890-47BF-41AE-917C-0BA613C2F4CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F706C890-47BF-41AE-917C-0BA613C2F4CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

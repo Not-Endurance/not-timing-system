@@ -14,6 +14,14 @@ public class AuthenticateRedirectContentBehind : NComponent
         if (string.IsNullOrWhiteSpace(Action))
         {
             Action = RemoteAuthenticationActions.LogIn;
+            return;
         }
+
+        if (!string.Equals(Action, RemoteAuthenticationActions.Register, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        Action = RemoteAuthenticationActions.LogIn;
     }
 }

@@ -52,7 +52,7 @@ internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalF
         }
 
         _logger.LogWarning("Client authentication failed during local user resolution. Reason: {reason}", result.Error);
-        _navigator.NavigateTo(AuthenticationContents.AUTHENTICATION, forceLoad: false);
+        _navigator.NavigateTo(result.ServerRedirect ?? AuthenticationContents.AUTHENTICATION, forceLoad: false);
         return new ClaimsPrincipal(new ClaimsIdentity());
     }
 }

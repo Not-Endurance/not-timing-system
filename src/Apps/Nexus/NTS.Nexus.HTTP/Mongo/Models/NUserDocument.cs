@@ -6,9 +6,14 @@ namespace NTS.Nexus.HTTP.Mongo.Models;
 
 public class NUserDocument : IDocument
 {
-    public static NUserDocument Create(string email)
+    public static NUserDocument Create(string email, string? name = null)
     {
-        return new NUserDocument { Id = RandomHelper.GenerateUniqueInteger(), Email = email };
+        return new NUserDocument
+        {
+            Id = RandomHelper.GenerateUniqueInteger(),
+            Email = email,
+            Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim(),
+        };
     }
 
     public static NUserDocument From(NUserModel user)

@@ -3,5 +3,6 @@
 public interface INAuthentication
 {
     void Signin();
+    void Register();
     void Signout();
 }

@@ -951,4 +951,7 @@
   <data name="Reset_Timing_string" xml:space="preserve">
     <value>Reset Timing</value>
   </data>
+  <data name="Register_string" xml:space="preserve">
+    <value>Register</value>
+  </data>
 </root>
