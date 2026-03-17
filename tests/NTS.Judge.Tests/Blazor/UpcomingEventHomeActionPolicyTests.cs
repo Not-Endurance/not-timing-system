@@ -1,3 +1,5 @@
+using Not.Events;
+using Not.Structures;
 using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
@@ -6,8 +8,6 @@ using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Features;
 using NTS.Judge.Features.Core;
-using Not.Events;
-using Not.Structures;
 
 namespace NTS.Judge.Tests.Blazor;
 
@@ -53,16 +53,16 @@ public class UpcomingEventsListBehindTests
         Assert.False(component.ShowReset(CreateUpcomingEvent(7)));
     }
 
-    static TestUpcomingEventsListBehind CreateComponent(
-        int activeEnduranceEventCount = 0,
-        int? connectedEventId = null
-    )
+    static TestUpcomingEventsListBehind CreateComponent(int activeEnduranceEventCount = 0, int? connectedEventId = null)
     {
         var component = new TestUpcomingEventsListBehind
         {
             ActiveCount = activeEnduranceEventCount,
             Service = new TestDashService(),
-            SocketService = new TestSocketService { Event = connectedEventId == null ? null : CreateEnduranceEvent(connectedEventId.Value) },
+            SocketService = new TestSocketService
+            {
+                Event = connectedEventId == null ? null : CreateEnduranceEvent(connectedEventId.Value),
+            },
         };
         return component;
     }
@@ -116,9 +116,13 @@ public class UpcomingEventsListBehindTests
 
     sealed class TestDashService : IDashService
     {
-        public Task<Result<IReadOnlyList<NTS.Domain.Setup.Services.StartValidation.StartValidationIssue>>> Validate(int upcomingEventId)
+        public Task<Result<IReadOnlyList<NTS.Domain.Setup.Services.StartValidation.StartValidationIssue>>> Validate(
+            int upcomingEventId
+        )
         {
-            return Task.FromResult(Result.Success<IReadOnlyList<NTS.Domain.Setup.Services.StartValidation.StartValidationIssue>>([]));
+            return Task.FromResult(
+                Result.Success<IReadOnlyList<NTS.Domain.Setup.Services.StartValidation.StartValidationIssue>>([])
+            );
         }
 
         public Task Start(int upcomingEventId)

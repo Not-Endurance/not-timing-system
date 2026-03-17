@@ -81,12 +81,19 @@ public class SelectEventDialogBehind : NDialog
     async Task<bool> ConfirmEventChangeIfHistoryWillBeRemoved(EnduranceEvent enduranceEvent)
     {
         var session = await UserSessionService.GetCurrent();
-        if (session?.SnapshotHistory.Count is not > 0 || session.EventId == null || session.EventId == enduranceEvent.Id)
+        if (
+            session?.SnapshotHistory.Count is not > 0
+            || session.EventId == null
+            || session.EventId == enduranceEvent.Id
+        )
         {
             return true;
         }
 
-        var parameters = new DialogParameters<ChangeEventHistoryDialog> { { x => x.EventName, enduranceEvent.PopulatedPlace.City } };
+        var parameters = new DialogParameters<ChangeEventHistoryDialog>
+        {
+            { x => x.EventName, enduranceEvent.PopulatedPlace.City },
+        };
         var dialog = await DialogService.ShowAsync<ChangeEventHistoryDialog>(Change_event_string, parameters);
         return !await dialog.IsCanceled();
     }

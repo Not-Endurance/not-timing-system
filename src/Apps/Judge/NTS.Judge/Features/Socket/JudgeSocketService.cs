@@ -8,18 +8,12 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Socket;
 
-public class JudgeSocketService
-    : NStatefulService,
-        INtsSocketService,
-        ISingleton
+public class JudgeSocketService : NStatefulService, INtsSocketService, ISingleton
 {
     readonly IRpcSocket _socket;
     readonly INotifier _notifier;
 
-    public JudgeSocketService(
-        IRpcSocket socket,
-        INotifier notifier
-    )
+    public JudgeSocketService(IRpcSocket socket, INotifier notifier)
     {
         _socket = socket;
         _notifier = notifier;

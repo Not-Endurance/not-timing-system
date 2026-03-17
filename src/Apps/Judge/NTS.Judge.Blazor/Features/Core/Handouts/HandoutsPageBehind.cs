@@ -29,7 +29,7 @@ public class HandoutsPageBehind : PrintableComponent
             {
                 return;
             }
-            await Service.Delete(handouts);    
+            await Service.Delete(handouts);
         }
         catch (Exception ex)
         {

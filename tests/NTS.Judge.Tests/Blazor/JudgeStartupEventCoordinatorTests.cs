@@ -1,3 +1,5 @@
+using Not.Application.RPC.SignalR;
+using Not.Events;
 using NTS.Application.Core;
 using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
@@ -5,8 +7,6 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
 using NTS.Judge.Blazor.Features.Socket;
-using Not.Application.RPC.SignalR;
-using Not.Events;
 
 namespace NTS.Judge.Tests.Blazor;
 

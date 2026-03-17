@@ -72,7 +72,9 @@ public class WitnessSocketService : NStatefulService, INtsSocketService, IScoped
             {
                 if (_socket.IsConnected)
                 {
-                    _notifier.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Event.PopulatedPlace.City));
+                    _notifier.Error(
+                        string.Format(Cannot_select_another_event_before_disconnect__string, Event.PopulatedPlace.City)
+                    );
                     return;
                 }
                 Event = null;
