@@ -17,6 +17,9 @@ public class NUserModel : IIdentifiable, IEquatable<NUserModel>
     public string Email { get; }
     public string[] Roles { get; } = [];
     public string? Name { get; set; }
+    public string? GivenName { get; set; }
+    public string? Surname { get; set; }
+    public string? CountryRegion { get; set; }
 
     public override bool Equals(object? other)
     {

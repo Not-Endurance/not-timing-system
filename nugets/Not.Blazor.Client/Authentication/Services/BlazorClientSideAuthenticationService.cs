@@ -25,12 +25,6 @@ internal class BlazorClientSideAuthenticationService : INAuthentication
         _navigationManager.NavigateToLogin(RemoteAuthenticationDefaults.LoginPath, requestOptions);
     }
 
-    public void Register()
-    {
-        // When using Azure external Tenant Id and MSAL the application url is the same both. The User then has to click on "Create account"
-        Signin();
-    }
-
     public void Signout()
     {
         _localStorageMarkerService.SetSignedOut();

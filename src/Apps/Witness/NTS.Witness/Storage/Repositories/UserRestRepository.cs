@@ -53,7 +53,13 @@ public class UserRestRepository : IUserRegister, ITransient
         {
             var response = await _client.Post(
                 "users/register",
-                new RegisterUserPaload(registration.Email, registration.Name)
+                new RegisterUserPaload(
+                    registration.Email,
+                    registration.Name,
+                    registration.GivenName,
+                    registration.Surname,
+                    registration.CountryRegion
+                )
             );
             var user = response.FromJson<NUserModel>();
             return Result.Success(user);

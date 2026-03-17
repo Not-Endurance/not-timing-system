@@ -54,7 +54,9 @@ public class UserFunctions : FunctionBase
             return InvalidPayload($"Value '{payload?.Email}' is not a valid email");
         }
 
-        var user = await _users.Register(new NUserRegistration(payload.Email, payload.Name));
+        var user = await _users.Register(
+            new NUserRegistration(payload.Email, payload.Name, payload.GivenName, payload.Surname, payload.CountryRegion)
+        );
         return Ok(user);
     }
 }

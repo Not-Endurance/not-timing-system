@@ -37,7 +37,6 @@ public static class AuthenticationExtensions
         options.AuthenticationPaths.LogInPath = RemoteAuthenticationDefaults.LoginPath;
         options.AuthenticationPaths.LogInCallbackPath = RemoteAuthenticationDefaults.LoginCallbackPath;
         options.AuthenticationPaths.LogInFailedPath = AuthenticationContents.AUTHENTICATION;
-        options.AuthenticationPaths.RegisterPath = AuthenticationContents.AUTHENTICATION_REGISTER;
         options.AuthenticationPaths.LogOutPath = RemoteAuthenticationDefaults.LogoutPath;
         options.AuthenticationPaths.LogOutCallbackPath = RemoteAuthenticationDefaults.LogoutCallbackPath;
         options.AuthenticationPaths.LogOutSucceededPath = AuthenticationContents.AUTHENTICATION;

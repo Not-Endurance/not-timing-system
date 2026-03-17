@@ -20,16 +20,4 @@ public abstract class AuthenticateContentBehind : NComponent
             Handle(ex);
         }
     }
-
-    protected void Register()
-    {
-        try
-        {
-            Authentication.Register();
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-    }
 }

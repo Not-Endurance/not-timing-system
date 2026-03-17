@@ -17,11 +17,11 @@ public class AuthenticateRedirectContentBehind : NComponent
             return;
         }
 
-        if (!string.Equals(Action, RemoteAuthenticationActions.Register, StringComparison.OrdinalIgnoreCase))
+        // Keep legacy /authentication/register links working by forwarding them to the
+        // combined Entra sign-in/sign-up entrypoint.
+        if (string.Equals(Action, RemoteAuthenticationActions.Register, StringComparison.OrdinalIgnoreCase))
         {
-            return;
+            Action = RemoteAuthenticationActions.LogIn;
         }
-
-        Action = RemoteAuthenticationActions.LogIn;
     }
 }

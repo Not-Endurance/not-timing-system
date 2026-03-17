@@ -45,7 +45,13 @@ public class UserMongoRepository : IUserRepository, ITransient
             return existing;
         }
 
-        var user = NUserDocument.Create(normalizedEmail, registration.Name);
+        var user = NUserDocument.Create(
+            normalizedEmail,
+            registration.Name,
+            registration.GivenName,
+            registration.Surname,
+            registration.CountryRegion
+        );
 
         try
         {
