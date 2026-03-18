@@ -1,4 +1,6 @@
-﻿using Not.Krud.Abstractions;
+﻿using System.Text.Json.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
+using Not.Krud.Abstractions;
 using Not.Structures;
 using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
@@ -29,7 +31,7 @@ public class ClubModel
     }
 }
 
-public class OfficialModel : IEventScopedDocument, IKrudModel<Official>
+public class OfficialModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Official>
 {
     public static OfficialModel MapFrom(Official official)
     {
@@ -43,6 +45,8 @@ public class OfficialModel : IEventScopedDocument, IKrudModel<Official>
     public int EventId { get; set; }
     public string[] Names { get; set; } = [];
     public OfficialRole Role { get; set; } = default!;
+    public bool IsDeleted { get; set; }
+    public int? DeletedVersion { get; set; }
 
     public Official MapToEntity()
     {
@@ -309,7 +313,7 @@ public class EliminatedModel
     }
 }
 
-public class ParticipationModel : IEventScopedDocument, IKrudModel<Participation>
+public class ParticipationModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Participation>
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
@@ -337,6 +341,8 @@ public class ParticipationModel : IEventScopedDocument, IKrudModel<Participation
     public PhaseModel[] Phases { get; set; } = default!;
     public TotalModel? Total { get; set; }
     public EliminatedModel? Eliminated { get; set; }
+    public bool IsDeleted { get; set; }
+    public int? DeletedVersion { get; set; }
 
     public Participation MapToEntity()
     {
@@ -434,7 +440,11 @@ public class RanklistModel
     }
 }
 
-public class EnduranceEventModel : IIdentifiable, IKrudModel<EnduranceEvent>
+public class EnduranceEventModel
+    : IIdentifiable,
+        IMongoIdentityDocument,
+        ISoftDeletableDocument,
+        IKrudModel<EnduranceEvent>
 {
     public static EnduranceEventModel From(EnduranceEvent enduranceEvent)
     {
@@ -443,6 +453,9 @@ public class EnduranceEventModel : IIdentifiable, IKrudModel<EnduranceEvent>
         return model;
     }
 
+    [JsonIgnore]
+    [BsonId]
+    public string MongoId { get; set; } = "";
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public CountryModel Country { get; set; } = default!;
@@ -453,6 +466,8 @@ public class EnduranceEventModel : IIdentifiable, IKrudModel<EnduranceEvent>
     public string? FeiEventCode { get; set; }
     public DateTimeOffset StartDay { get; set; }
     public DateTimeOffset EndDay { get; set; }
+    public bool IsDeleted { get; set; }
+    public int? DeletedVersion { get; set; }
 
     public void MapFrom(EnduranceEvent enduranceEvent)
     {
@@ -476,7 +491,7 @@ public class EnduranceEventModel : IIdentifiable, IKrudModel<EnduranceEvent>
     }
 }
 
-public class RankingModel : IEventScopedDocument, IKrudModel<Ranking>
+public class RankingModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Ranking>
 {
     public static RankingModel From(Ranking ranking)
     {
@@ -496,6 +511,8 @@ public class RankingModel : IEventScopedDocument, IKrudModel<Ranking>
     public string? FeiRule { get; set; }
     public string? FeiScheduleNumber { get; set; }
     public RankingEntryModel[] Entries { get; set; } = [];
+    public bool IsDeleted { get; set; }
+    public int? DeletedVersion { get; set; }
 
     public void MapFrom(Ranking ranking)
     {
@@ -529,7 +546,7 @@ public class RankingModel : IEventScopedDocument, IKrudModel<Ranking>
     }
 }
 
-public class HandoutModel : IEventScopedDocument, IKrudModel<Handout>
+public class HandoutModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Handout>
 {
     public static HandoutModel From(Handout handout)
     {
@@ -542,6 +559,8 @@ public class HandoutModel : IEventScopedDocument, IKrudModel<Handout>
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public int EventId { get; set; }
     public ParticipationModel Participation { get; set; } = default!;
+    public bool IsDeleted { get; set; }
+    public int? DeletedVersion { get; set; }
 
     public void MapFrom(Handout handout)
     {
@@ -580,7 +599,7 @@ public class CoreSnapshotModel
     }
 }
 
-public class SnapshotResultModel : IEventScopedDocument, IKrudModel<SnapshotResult>
+public class SnapshotResultModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<SnapshotResult>
 {
     public static SnapshotResultModel From(SnapshotResult result)
     {
@@ -594,6 +613,8 @@ public class SnapshotResultModel : IEventScopedDocument, IKrudModel<SnapshotResu
     public int EventId { get; set; }
     public CoreSnapshotModel Snapshot { get; set; } = default!;
     public SnapshotResultType Type { get; set; }
+    public bool IsDeleted { get; set; }
+    public int? DeletedVersion { get; set; }
 
     public void MapFrom(SnapshotResult result)
     {

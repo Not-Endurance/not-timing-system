@@ -20,7 +20,7 @@ public class Participation : Aggregate
         PhaseCollection phases,
         Eliminated? notQualified,
         int eventId,
-        int id
+        int? id = null
     )
         : base(id)
     {

@@ -78,8 +78,7 @@ public static class ParticipationAndRankingFactory
             combination,
             new(phases),
             null,
-            eventId,
-            setupParticipation.Id
+            eventId
         );
     }
 
