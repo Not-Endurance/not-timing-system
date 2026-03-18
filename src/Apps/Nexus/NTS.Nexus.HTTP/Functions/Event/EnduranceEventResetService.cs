@@ -19,7 +19,9 @@ public class EnduranceEventResetService : IEnduranceEventResetService, ITransien
 
     public async Task Reset(int eventId)
     {
-        var currentDeletedVersion = (await Task.WhenAll(_repositories.Select(x => x.GetMaxDeletedVersion(eventId)))).Max();
+        var currentDeletedVersion = (
+            await Task.WhenAll(_repositories.Select(x => x.GetMaxDeletedVersion(eventId)))
+        ).Max();
         var deletedVersion = (currentDeletedVersion ?? 0) + 1;
 
         foreach (var repository in _repositories)

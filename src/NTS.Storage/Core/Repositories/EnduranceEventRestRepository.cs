@@ -7,7 +7,10 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class EnduranceEventRestRepository : RestApiRepository<EnduranceEvent, EnduranceEventModel>, IEnduranceEventRepository, ITransient
+public class EnduranceEventRestRepository
+    : RestApiRepository<EnduranceEvent, EnduranceEventModel>,
+        IEnduranceEventRepository,
+        ITransient
 {
     readonly INtsSocketContext _socketContext;
 

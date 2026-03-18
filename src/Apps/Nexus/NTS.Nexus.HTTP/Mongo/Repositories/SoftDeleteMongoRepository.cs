@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
-using Not.Structures;
 using Not.Storage.Mongo;
+using Not.Structures;
 using NTS.Application.Shared;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;

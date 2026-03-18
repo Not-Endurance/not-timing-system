@@ -15,21 +15,20 @@ public class EnduranceEventResetTests
     [Fact]
     public async Task Reset_service_uses_version_one_when_event_has_no_deleted_documents()
     {
-        var repositories = new[]
-        {
-            new RecordingEventResetRepository(),
-            new RecordingEventResetRepository(),
-        };
+        var repositories = new[] { new RecordingEventResetRepository(), new RecordingEventResetRepository() };
         var service = new EnduranceEventResetService(repositories);
 
         await service.Reset(17);
 
-        Assert.All(repositories, repository =>
-        {
-            var call = Assert.Single(repository.SoftDeleteCalls);
-            Assert.Equal(17, call.EventId);
-            Assert.Equal(1, call.DeletedVersion);
-        });
+        Assert.All(
+            repositories,
+            repository =>
+            {
+                var call = Assert.Single(repository.SoftDeleteCalls);
+                Assert.Equal(17, call.EventId);
+                Assert.Equal(1, call.DeletedVersion);
+            }
+        );
     }
 
     [Fact]
@@ -45,12 +44,15 @@ public class EnduranceEventResetTests
 
         await service.Reset(23);
 
-        Assert.All(repositories.Cast<RecordingEventResetRepository>(), repository =>
-        {
-            var call = Assert.Single(repository.SoftDeleteCalls);
-            Assert.Equal(23, call.EventId);
-            Assert.Equal(6, call.DeletedVersion);
-        });
+        Assert.All(
+            repositories.Cast<RecordingEventResetRepository>(),
+            repository =>
+            {
+                var call = Assert.Single(repository.SoftDeleteCalls);
+                Assert.Equal(23, call.EventId);
+                Assert.Equal(6, call.DeletedVersion);
+            }
+        );
     }
 
     [Fact]

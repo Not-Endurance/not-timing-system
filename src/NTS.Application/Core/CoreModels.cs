@@ -1,4 +1,6 @@
-﻿using Not.Krud.Abstractions;
+﻿using System.Text.Json.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
+using Not.Krud.Abstractions;
 using Not.Structures;
 using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
@@ -9,8 +11,6 @@ using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json.Serialization;
 
 namespace NTS.Application.Core;
 
@@ -440,7 +440,11 @@ public class RanklistModel
     }
 }
 
-public class EnduranceEventModel : IIdentifiable, IMongoIdentityDocument, ISoftDeletableDocument, IKrudModel<EnduranceEvent>
+public class EnduranceEventModel
+    : IIdentifiable,
+        IMongoIdentityDocument,
+        ISoftDeletableDocument,
+        IKrudModel<EnduranceEvent>
 {
     public static EnduranceEventModel From(EnduranceEvent enduranceEvent)
     {
