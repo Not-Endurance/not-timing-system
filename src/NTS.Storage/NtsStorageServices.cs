@@ -2,12 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Filesystem;
-using Not.Injection;
 using Not.Storage;
 using Not.Storage.JsonFile.Stores;
 using Not.Storage.REST;
 using NTS.Application.Core;
-using NTS.Storage.JSON;
 using NTS.Storage.REST;
 
 namespace NTS.Storage;
@@ -36,7 +34,6 @@ public static class NtsStorageServices
         {
             var factory = FileContextHelper.CreateFileContextFactory("stores");
             _services.AddKeyedSingleton<IFilesystemContext, FilesystemContext>(DATA_KEY, factory);
-            _services.AddAsInterfaces<SocketPrincipalStorage>(ServiceLifetime.Singleton);
             return this;
         }
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Not.Application.Authentication.User;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Repositories;
@@ -53,7 +54,15 @@ public class UserFunctions : FunctionBase
             return InvalidPayload($"Value '{payload?.Email}' is not a valid email");
         }
 
-        var user = await _users.Register(payload.Email);
+        var user = await _users.Register(
+            new NUserRegistration(
+                payload.Email,
+                payload.Name,
+                payload.GivenName,
+                payload.Surname,
+                payload.CountryRegion
+            )
+        );
         return Ok(user);
     }
 }

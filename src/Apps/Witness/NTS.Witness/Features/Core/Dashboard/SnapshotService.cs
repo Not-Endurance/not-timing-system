@@ -6,12 +6,12 @@ using Not.Exceptions;
 using Not.Injection;
 using Not.Observables.Structures;
 using NTS.Application.Socket;
+using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
-using NTS.Witness.Features.Sessions;
 
 namespace NTS.Witness.Features.Core.Dashboard;
 

@@ -2,7 +2,7 @@ using System.Timers;
 using MudBlazor;
 using Not.Application.RPC.SignalR;
 using Not.Blazor.Components.Abstractions;
-using NTS.Judge.Features.Socket;
+using NTS.Application.Socket;
 
 namespace NTS.Judge.Blazor.Features.Socket;
 
@@ -17,11 +17,11 @@ public class SocketStatusBehind : NComponent, IDisposable
     }
 
     [Inject]
-    JudgeSocketService SocketContext { get; set; } = default!;
+    INtsSocketService SocketContext { get; set; } = default!;
 
     protected bool IsConnected => SocketContext.IsConnected;
 
-    protected string? EventName => SocketContext.Event?.Name;
+    protected string? EventName => SocketContext.Event?.PopulatedPlace.City;
 
     protected override void OnInitialized()
     {

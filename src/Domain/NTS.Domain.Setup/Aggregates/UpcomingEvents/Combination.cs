@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Not.Domain.Krud;
+﻿using Not.Domain.Krud;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
@@ -23,19 +22,23 @@ public class Combination : Entity, IEntityMirror<Athlete>, IEntityMirror<Horse>
         return Combine(number, Athlete, Horse);
     }
 
-    public void Reflect(Horse child)
+    public bool Reflect(Horse child)
     {
-        if (Horse == child)
+        if (Horse != child)
         {
-            Horse = child;
+            return false;
         }
+        Horse = child;
+        return true;
     }
 
-    public void Reflect(Athlete child)
+    public bool Reflect(Athlete child)
     {
-        if (Athlete == child)
+        if (Athlete != child)
         {
-            Athlete = child;
+            return false;
         }
+        Athlete = child;
+        return true;
     }
 }

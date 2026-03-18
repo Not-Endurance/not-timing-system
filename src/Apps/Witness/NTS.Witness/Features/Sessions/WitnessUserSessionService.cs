@@ -1,17 +1,16 @@
-using System.Security.Claims;
-using System.Text.Json;
 using Microsoft.AspNetCore.Components.Authorization;
 using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
+using NTS.Application.UserSession;
 using NTS.Application.Watcher;
 using NTS.Domain.Core;
 using NTS.Domain.Watcher;
 
 namespace NTS.Witness.Features.Sessions;
 
-public class UserSessionService : IUserSessionService, IScoped
+public class WitnessUserSessionService : IUserSessionService, IScoped
 {
     readonly AuthenticationStateProvider _authStateProvider;
     readonly IUserRegister _userRegister;
@@ -19,7 +18,7 @@ public class UserSessionService : IUserSessionService, IScoped
     NUserModel? _currentUser;
     string? _currentEmail;
 
-    public UserSessionService(
+    public WitnessUserSessionService(
         AuthenticationStateProvider authStateProvider,
         IUserRegister userRegister,
         IRepository<UserSessionModel> sessions
@@ -130,28 +129,31 @@ public class UserSessionService : IUserSessionService, IScoped
             return null;
         }
 
-        var email = ResolveEmail(principal);
-        if (string.IsNullOrWhiteSpace(email))
+        var registration = NUserClaimsHelper.ResolveRegistration(principal);
+        if (registration == null)
         {
             return null;
         }
 
-        if (_currentUser != null && string.Equals(_currentEmail, email, StringComparison.OrdinalIgnoreCase))
+        if (
+            _currentUser != null
+            && string.Equals(_currentEmail, registration.Email, StringComparison.OrdinalIgnoreCase)
+        )
         {
             return _currentUser;
         }
 
-        _currentEmail = email;
+        _currentEmail = registration.Email;
         _currentUser = null;
 
-        var userResult = await _userRegister.Get(email);
+        var userResult = await _userRegister.Get(registration.Email);
         if (!userResult.IsError && userResult.Data != null)
         {
             _currentUser = userResult.Data;
             return _currentUser;
         }
 
-        var registerResult = await _userRegister.Register(email);
+        var registerResult = await _userRegister.Register(registration);
         if (registerResult.IsError || registerResult.Data == null)
         {
             return null;
@@ -160,42 +162,4 @@ public class UserSessionService : IUserSessionService, IScoped
         _currentUser = registerResult.Data;
         return _currentUser;
     }
-
-    static string? ResolveEmail(ClaimsPrincipal principal)
-    {
-        var rawEmail =
-            principal.FindFirst(ClaimTypes.Email)?.Value
-            ?? principal.FindFirst("email")?.Value
-            ?? principal.FindFirst("emails")?.Value
-            ?? principal.FindFirst("preferred_username")?.Value
-            ?? principal.FindFirst(ClaimTypes.Upn)?.Value;
-
-        if (string.IsNullOrWhiteSpace(rawEmail))
-        {
-            return null;
-        }
-
-        if (!rawEmail.StartsWith('['))
-        {
-            return rawEmail;
-        }
-
-        try
-        {
-            var emails = JsonSerializer.Deserialize<string[]>(rawEmail);
-            return emails?.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-        }
-        catch (JsonException)
-        {
-            return rawEmail;
-        }
-    }
-}
-
-public interface IUserSessionService
-{
-    Task<ICoreSession?> GetCurrent();
-    Task SetEventId(int? eventId);
-    Task AppendSnapshot(SnapshotGroup snapshot);
-    Task DeleteCurrent();
 }

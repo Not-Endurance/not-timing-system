@@ -1,18 +1,5 @@
 ﻿@using NTS.Judge.Blazor.Features.Socket
 
-@inherits EventMenuBehind
-
 <MudStack Class="ma-6">
-
-    @if (IsEventSelected && !IsEventStarted)
-    {
-        <NButtonPrimary OnClick="Start" Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" />
-    }
-
-    @if (IsEventSelected)
-    {
-        <NButtonWarning OnClick="OpenDisconnectDialog" Text="@Disconnect_string" />
-    }
-
     <SocketStatus />
 </MudStack>

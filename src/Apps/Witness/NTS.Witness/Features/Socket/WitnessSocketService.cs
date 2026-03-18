@@ -1,15 +1,16 @@
+using Not.Application.Behinds.Adapters;
 using Not.Application.DomainEvents;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Notify;
 using NTS.Application.Socket;
+using NTS.Application.UserSession;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Setup.Aggregates;
-using NTS.Witness.Features.Sessions;
 
 namespace NTS.Witness.Features.Socket;
 
-public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
+public class WitnessSocketService : NStatefulService, INtsSocketService, IScoped, IDisposable
 {
     readonly IUserSessionService _userSessionService;
     readonly IRpcSocket _socket;
@@ -32,10 +33,16 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
 
     public SocketConnectionStatus Status { get; private set; }
     public bool IsConnected => _socket.IsConnected;
-    public UpcomingEvent? Event { get; private set; }
+    public EnduranceEvent? Event { get; private set; }
 
-    public void Dispose()
+    protected override Task<bool> InitializeState()
     {
+        return Task.FromResult(true);
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
         _socket.ServerConnectionChanged -= HandleServerConnectionChanged;
     }
 
@@ -49,14 +56,15 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
         }
 
         Event = null;
+        EmitChanged();
         await _domainEventDispatcher.Dispatch(new EventDisconnected(@event?.Id));
         if (@event != null)
         {
-            _notifier.Warn(string.Format(Disconnected_from__string, @event.Name));
+            _notifier.Warn(string.Format(Disconnected_from__string, @event.PopulatedPlace.City));
         }
     }
 
-    public async Task Connect(UpcomingEvent upcomingEvent)
+    public async Task Connect(EnduranceEvent upcomingEvent)
     {
         if (Event != null)
         {
@@ -64,10 +72,13 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
             {
                 if (_socket.IsConnected)
                 {
-                    _notifier.Error(string.Format(Cannot_select_another_event_before_disconnect__string, Event.Name));
+                    _notifier.Error(
+                        string.Format(Cannot_select_another_event_before_disconnect__string, Event.PopulatedPlace.City)
+                    );
                     return;
                 }
                 Event = null;
+                EmitChanged();
             }
             else if (_socket.IsConnected)
             {
@@ -75,6 +86,7 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
             }
             // Previous connection attempt may have failed; clear stale state and retry.
             Event = null;
+            EmitChanged();
         }
 
         await _socket.Connect(upcomingEvent.Id.ToString());
@@ -84,11 +96,12 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
         }
 
         Event = upcomingEvent;
+        EmitChanged();
         await _userSessionService.SetEventId(upcomingEvent.Id);
         await _domainEventDispatcher.Dispatch(new EventConnected(upcomingEvent.Id));
         if (Event != null)
         {
-            _notifier.Inform(string.Format(Connected_to__string, Event.Name));
+            _notifier.Inform(string.Format(Connected_to__string, Event.PopulatedPlace.City));
         }
     }
 
@@ -96,6 +109,7 @@ public class WitnessSocketService : INtsSocketService, IScoped, IDisposable
     {
         var previousStatus = Status;
         Status = status;
+        EmitChanged();
 
         if (
             status == SocketConnectionStatus.Connected

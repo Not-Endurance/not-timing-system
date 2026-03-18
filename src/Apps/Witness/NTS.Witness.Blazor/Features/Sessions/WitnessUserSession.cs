@@ -1,29 +1,25 @@
 using Not.Application.Authentication.Abstractions;
 using Not.Application.CRUD.Ports;
 using NTS.Application.Socket;
+using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
-using NTS.Witness.Features.Sessions;
-using NTS.Witness.Features.Setup.UpcomingEvents;
 
 namespace NTS.Witness.Blazor.Features.Sessions;
 
 public class WitnessUserSession : INUserSession
 {
     readonly IUserSessionService _userSessionService;
-    readonly IUpcomingEventService _upcomingEvents;
     readonly IRepository<EnduranceEvent> _enduranceEvents;
     readonly INtsSocketService _socketService;
     bool _isInitialized;
 
     public WitnessUserSession(
         IUserSessionService userSessionService,
-        IUpcomingEventService upcomingEvents,
         IRepository<EnduranceEvent> enduranceEvents,
         INtsSocketService socketService
     )
     {
         _userSessionService = userSessionService;
-        _upcomingEvents = upcomingEvents;
         _enduranceEvents = enduranceEvents;
         _socketService = socketService;
     }
@@ -42,24 +38,22 @@ public class WitnessUserSession : INUserSession
             return;
         }
 
-        var upcomingEvent = (await _upcomingEvents.GetEvents()).FirstOrDefault(x => x.Id == session.EventId.Value);
-        if (upcomingEvent != null)
+        var enduranceEvent = await _enduranceEvents.Read(session.EventId.Value);
+        if (enduranceEvent != null)
         {
-            if (_socketService.Event != null && _socketService.Event.Id != upcomingEvent.Id)
+            if (_socketService.Event != null && _socketService.Event.Id != enduranceEvent.Id)
             {
                 await _socketService.Disconnect();
             }
 
-            await _socketService.Connect(upcomingEvent);
+            await _socketService.Connect(enduranceEvent);
             return;
         }
 
-        var enduranceEvent = await _enduranceEvents.Read(0);
         if (enduranceEvent?.Id == session.EventId.Value)
         {
             return;
         }
-
         await _userSessionService.DeleteCurrent();
     }
 }

@@ -80,11 +80,13 @@ public class Participation : Entity, IEntityMirror<Combination>
         return Combine(ex, Combination, restrictions);
     }
 
-    public void Reflect(Combination combination)
+    public bool Reflect(Combination combination)
     {
-        if (Combination == combination)
+        if (Combination != combination)
         {
-            Combination = combination;
+            return false;
         }
+        Combination = combination;
+        return true;
     }
 }

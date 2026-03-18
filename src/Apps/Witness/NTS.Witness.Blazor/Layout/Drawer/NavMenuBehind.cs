@@ -1,6 +1,6 @@
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
-using NTS.Witness.Blazor.Features.Setup;
+using NTS.Blazor.Components.SelectEvents;
 
 namespace NTS.Witness.Blazor.Layout.Drawer;
 

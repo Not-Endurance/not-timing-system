@@ -34,6 +34,11 @@ public static class AuthenticationExtensions
         // User roles are injected from local user resolution, not from incoming provider role claims.
         options.UserOptions.RoleClaim = ClaimTypes.Role;
 
+        options.AuthenticationPaths.LogInPath = RemoteAuthenticationDefaults.LoginPath;
+        options.AuthenticationPaths.LogInCallbackPath = RemoteAuthenticationDefaults.LoginCallbackPath;
+        options.AuthenticationPaths.LogInFailedPath = AuthenticationContents.AUTHENTICATION;
+        options.AuthenticationPaths.LogOutPath = RemoteAuthenticationDefaults.LogoutPath;
+        options.AuthenticationPaths.LogOutCallbackPath = RemoteAuthenticationDefaults.LogoutCallbackPath;
         options.AuthenticationPaths.LogOutSucceededPath = AuthenticationContents.AUTHENTICATION;
         options.AuthenticationPaths.LogOutFailedPath = AuthenticationContents.AUTHENTICATION;
     }

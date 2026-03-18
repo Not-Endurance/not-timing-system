@@ -42,16 +42,25 @@ public class UserRestRepository : IUserRegister, ITransient
         }
     }
 
-    public async Task<Result<NUserModel>> Register(string email)
+    public async Task<Result<NUserModel>> Register(NUserRegistration registration)
     {
-        if (string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(registration.Email))
         {
             return Result.Cancel<NUserModel>();
         }
 
         try
         {
-            var response = await _client.Post("users/register", new RegisterUserPaload(email));
+            var response = await _client.Post(
+                "users/register",
+                new RegisterUserPaload(
+                    registration.Email,
+                    registration.Name,
+                    registration.GivenName,
+                    registration.Surname,
+                    registration.CountryRegion
+                )
+            );
             var user = response.FromJson<NUserModel>();
             return Result.Success(user);
         }

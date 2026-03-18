@@ -30,7 +30,7 @@
     {
         foreach (var item in Items)
         {
-            <MudStack Row>
+            <MudStack Row AlignItems="AlignItems.Center">
                 <MudText Typo="Typo.body1" Class="pa-4">@item</MudText>
 
                 <MudSpacer />
@@ -42,6 +42,14 @@
                 @if (DeleteSafe != null)
                 {
                     <NIconDelete OnClick="() => OnDelete(item)" />
+                }
+                @if (CustomAction1 != null)
+                {
+                    @CustomAction1(item)
+                }
+                @if (CustomAction2 != null)
+                {
+                    @CustomAction2(item)
                 }
             </MudStack>
 

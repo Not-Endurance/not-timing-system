@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\nugets\Not.Tests\Not.Tests.csproj" />
+    <ProjectReference Include="..\..\src\Apps\Judge\NTS.Judge.Blazor\NTS.Judge.Blazor.csproj" />
     <ProjectReference Include="..\..\src\Apps\Judge\NTS.Judge\NTS.Judge.csproj" />
     <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj" />
     <ProjectReference Include="..\..\src\NTS.Storage\NTS.Storage.csproj" />

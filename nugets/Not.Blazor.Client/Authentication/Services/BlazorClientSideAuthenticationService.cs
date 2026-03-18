@@ -28,6 +28,6 @@ internal class BlazorClientSideAuthenticationService : INAuthentication
     public void Signout()
     {
         _localStorageMarkerService.SetSignedOut();
-        _navigationManager.NavigateTo(AuthenticationContents.AUTHENTICATION, forceLoad: false);
+        _navigationManager.NavigateTo(AuthenticationContents.AUTHENTICATION);
     }
 }

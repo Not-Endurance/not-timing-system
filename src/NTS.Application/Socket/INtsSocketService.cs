@@ -1,9 +1,10 @@
-﻿using NTS.Domain.Setup.Aggregates;
+using Not.Application.Behinds.Adapters;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Application.Socket;
 
-public interface INtsSocketService : INtsSocketContext
+public interface INtsSocketService : INtsSocketContext, IStatefulService
 {
-    Task Connect(UpcomingEvent princial);
+    Task Connect(EnduranceEvent enduranceEvent);
     Task Disconnect();
 }

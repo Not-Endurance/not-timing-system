@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Components;
 using Not.Blazor.Dialogs.Abstractions;
 
-namespace NTS.Witness.Blazor.Features.Setup;
+namespace NTS.Blazor.Components.SelectEvents;
 
 public class ChangeEventHistoryDialogBehind : NDialog
 {

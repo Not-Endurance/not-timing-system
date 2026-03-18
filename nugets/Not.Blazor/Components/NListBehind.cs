@@ -20,6 +20,12 @@ public class NListBehind<T> : NComponent
     public Func<T, Task>? DeleteSafe { get; set; }
 
     [Parameter]
+    public RenderFragment<T>? CustomAction1 { get; set; }
+
+    [Parameter]
+    public RenderFragment<T>? CustomAction2 { get; set; }
+
+    [Parameter]
     public string? Title { get; set; }
 
     protected async Task OnCreate()

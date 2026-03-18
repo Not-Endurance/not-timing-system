@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application;
 using Not.Injection;
+using NTS.Application.Core;
 using NTS.Application.Startlists;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
@@ -33,8 +34,9 @@ public static class NtsApplicationServices
             _configuration = configuration;
         }
 
-        public Builder AddStartlist()
+        public Builder AddSharedCoreDomainServices()
         {
+            _services.AddTransient<IEnduranceEventService, EnduranceEventService>();
             _services.Add<
                 IStartUpcoming,
                 IStartHistory,

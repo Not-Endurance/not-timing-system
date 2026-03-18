@@ -26,11 +26,13 @@ public class Athlete : Aggregate, IEntityMirror<Club>
         return Names.ToString();
     }
 
-    public void Reflect(Club club)
+    public bool Reflect(Club club)
     {
-        if (Club == club)
+        if (Club != club)
         {
-            Club = club;
+            return false;
         }
+        Club = club;
+        return true;
     }
 }

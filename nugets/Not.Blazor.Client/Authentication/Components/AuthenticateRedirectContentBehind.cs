@@ -14,6 +14,14 @@ public class AuthenticateRedirectContentBehind : NComponent
         if (string.IsNullOrWhiteSpace(Action))
         {
             Action = RemoteAuthenticationActions.LogIn;
+            return;
+        }
+
+        // Keep legacy /authentication/register links working by forwarding them to the
+        // combined Entra sign-in/sign-up entrypoint.
+        if (string.Equals(Action, RemoteAuthenticationActions.Register, StringComparison.OrdinalIgnoreCase))
+        {
+            Action = RemoteAuthenticationActions.LogIn;
         }
     }
 }

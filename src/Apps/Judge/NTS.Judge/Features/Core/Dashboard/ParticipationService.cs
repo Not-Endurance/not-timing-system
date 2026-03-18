@@ -9,6 +9,7 @@ using Not.Krud.Abstractions;
 using Not.Safe;
 using Not.Startup;
 using NTS.Application.Core;
+using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
@@ -29,17 +30,20 @@ public class ParticipationService
         ISingleton
 {
     readonly List<int> _recentlyProcessed = [];
+    readonly INtsSocketContext _socketContext;
     readonly IRepository<Participation> _participationRepository;
     readonly IRepository<SnapshotResult> _snapshotResultRepository;
     readonly IDomainEventDispatcher _domainEventDispatcher;
     Participation? _selectedParticipation;
 
     public ParticipationService(
+        INtsSocketContext socketContext,
         IRepository<Participation> participationRepository,
         IRepository<SnapshotResult> snapshotResultRepository,
         IDomainEventDispatcher domainEventDispatcher
     )
     {
+        _socketContext = socketContext;
         _participationRepository = participationRepository;
         _snapshotResultRepository = snapshotResultRepository;
         _domainEventDispatcher = domainEventDispatcher;
@@ -67,6 +71,10 @@ public class ParticipationService
 
     protected override async Task<bool> InitializeState()
     {
+        if (!_socketContext.IsConnected)
+        {
+            return false;
+        }
         Participations = await _participationRepository.ReadMany().AsReadOnly();
         Selected = Participations.FirstOrDefault();
         return Participations.Any();

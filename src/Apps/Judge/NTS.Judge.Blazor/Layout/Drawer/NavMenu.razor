@@ -10,7 +10,7 @@
         <NNavLink Endpoint="@SETTINGS_PAGE">@Settings_string</NNavLink>
     </MudNavGroup>
 
-    @if (TimingStateService.IsStarted)
+    @if (HasActiveEvent)
     {
         <MudNavGroup Title="@Dashboard_string" Expanded="true">
             <NNavLink Endpoint="@DASHBOARD_PAGE">@Dashboard_string</NNavLink>
@@ -21,5 +21,5 @@
         </MudNavGroup>    
     }
 
-    <NNavLink Endpoint="@INQUIRY_PAGE">@Inquiry_string</NNavLink>
+    @* <NNavLink Endpoint="@INQUIRY_PAGE">@Inquiry_string</NNavLink> *@
 </MudNavMenu>
