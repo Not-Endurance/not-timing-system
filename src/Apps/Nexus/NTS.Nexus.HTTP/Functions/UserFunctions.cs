@@ -55,7 +55,13 @@ public class UserFunctions : FunctionBase
         }
 
         var user = await _users.Register(
-            new NUserRegistration(payload.Email, payload.Name, payload.GivenName, payload.Surname, payload.CountryRegion)
+            new NUserRegistration(
+                payload.Email,
+                payload.Name,
+                payload.GivenName,
+                payload.Surname,
+                payload.CountryRegion
+            )
         );
         return Ok(user);
     }
