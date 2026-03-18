@@ -20,9 +20,19 @@ public record ParticipationFormModel : KrudFormModel<Participation>
 
     protected override Participation MapTo()
     {
-        ValidateOverrideInput(this);
-        var newStart = OverrideStartTime(this);
-        return new(IsNotRanked, Combination, Category, newStart, MaxSpeedOverride, MinSpeedOverride, Id);
+        ValidateOverrideInput();
+        var newStart = OverrideStartTime();
+        var maxSpeedOverride = OverrideMaxSpeed();
+        var minSpeedOverride = OverrideMinSpeed();
+        return new(
+            IsNotRanked,
+            Combination,
+            Category,
+            newStart,
+            maxSpeedOverride,
+            minSpeedOverride,
+            id: Id
+        );
     }
 
     public override void MapFrom(Participation participation)
@@ -39,40 +49,50 @@ public record ParticipationFormModel : KrudFormModel<Participation>
         MinSpeedOverride = participation.MinSpeedOverride;
     }
 
-    void ValidateOverrideInput(ParticipationFormModel model)
+    void ValidateOverrideInput()
     {
-        if (model.IsStartTimeOverriden && model.StartTimeOverride == null)
+        if (IsStartTimeOverriden && StartTimeOverride == null)
         {
             throw new DomainPropertyException(
-                nameof(model.StartTimeOverride),
+                nameof(StartTimeOverride),
                 Null_or_malformed_string,
                 Start_Time_string
             );
         }
-        if (model.IsMaxSpeedOverriden && model.MaxSpeedOverride == null)
+        if (IsMaxSpeedOverriden && MaxSpeedOverride == null)
         {
             throw new DomainPropertyException(
-                nameof(model.MaxSpeedOverride),
+                nameof(MaxSpeedOverride),
                 Null_or_malformed_string,
                 Max_Speed_string
             );
         }
-        if (model.IsMinSpeedOverriden && model.MinSpeedOverride == null)
+        if (IsMinSpeedOverriden && MinSpeedOverride == null)
         {
             throw new DomainPropertyException(
-                nameof(model.MinSpeedOverride),
+                nameof(MinSpeedOverride),
                 Null_or_malformed_string,
                 Min_Speed_string
             );
         }
     }
 
-    DateTimeOffset? OverrideStartTime(ParticipationFormModel model)
+    DateTimeOffset? OverrideStartTime()
     {
-        if (model.StartTimeOverride == null)
+        if (!IsStartTimeOverriden || StartTimeOverride == null)
         {
             return null;
         }
-        return model.StartTimeOverride.Value.ToTodayDateTime().ToLocalDateTime();
+        return StartTimeOverride.Value.ToTodayDateTime().ToLocalDateTime();
+    }
+
+    double? OverrideMaxSpeed()
+    {
+        return IsMaxSpeedOverriden ? MaxSpeedOverride : null;
+    }
+
+    double? OverrideMinSpeed()
+    {
+        return IsMinSpeedOverriden ? MinSpeedOverride : null;
     }
 }
