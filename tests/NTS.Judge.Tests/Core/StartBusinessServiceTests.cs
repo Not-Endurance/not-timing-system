@@ -11,6 +11,7 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 using NTS.Judge.Features;
 using CoreOfficial = NTS.Domain.Core.Aggregates.Official;
 using CoreParticipation = NTS.Domain.Core.Aggregates.Participation;
+using SetupOfficial = NTS.Domain.Setup.Aggregates.UpcomingEvents.Official;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.UpcomingEvents.Participation;
 
 namespace NTS.Judge.Tests.Core;
@@ -49,6 +50,26 @@ public class StartBusinessServiceTests
         Assert.Single(participations.CreatedItems);
         Assert.Single(rankings.CreatedItems);
         Assert.Empty(officials.CreatedItems);
+    }
+
+    [Fact]
+    public async Task StartEnduranceEvent_generates_new_core_official_and_participation_ids()
+    {
+        var officials = new RecordingRepository<CoreOfficial>();
+        var participations = new RecordingRepository<CoreParticipation>();
+        var service = CreateService(
+            [CreateValidEvent(2)],
+            officials: officials,
+            participations: participations,
+            rankings: new RecordingRepository<Ranking>()
+        );
+
+        await service.StartEnduranceEvent(2);
+
+        Assert.NotEmpty(officials.CreatedItems);
+        Assert.NotEmpty(participations.CreatedItems);
+        Assert.DoesNotContain(officials.CreatedItems, x => x.Id == 21);
+        Assert.DoesNotContain(participations.CreatedItems, x => x.Id == 21);
     }
 
     [Fact]
@@ -131,6 +152,7 @@ public class StartBusinessServiceTests
             [participation],
             competitionId ?? id * 10 + 1
         );
+        var official = new SetupOfficial(new Person(["Judge", $"{id}"]), OfficialRole.GroundJuryPresident, id * 10 + 1);
 
         return new UpcomingEvent(
             $"Event {id}",
@@ -140,7 +162,7 @@ public class StartBusinessServiceTests
             null,
             null,
             [competition],
-            [],
+            [official],
             [loop],
             [combination],
             id

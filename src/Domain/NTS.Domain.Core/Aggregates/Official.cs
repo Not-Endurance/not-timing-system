@@ -2,7 +2,7 @@
 
 public class Official : Aggregate
 {
-    public Official(Person? person, OfficialRole? role, int eventId, int id)
+    public Official(Person? person, OfficialRole? role, int eventId, int? id = null)
         : base(id)
     {
         EventId = eventId;

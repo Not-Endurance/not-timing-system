@@ -15,10 +15,10 @@ public class DashService : IDashService, ISingleton
 {
     readonly INtsSocketService _socketService;
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
-    readonly ICoreState _coreState;
+    readonly IEnduranceEventRepository _enduranceEvents;
     readonly IStartBusiness _startDashboardBusiness;
     readonly IRepository<Ranking> _rankings;
-    readonly IRepository<EnduranceEvent> _enduranceEvents;
+    readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Participation> _participations;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
@@ -27,7 +27,7 @@ public class DashService : IDashService, ISingleton
     public DashService(
         INtsSocketService socketService,
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
-        ICoreState coreState,
+        IEnduranceEventRepository enduranceEvents,
         IStartBusiness startDashboardBusiness,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
@@ -39,10 +39,10 @@ public class DashService : IDashService, ISingleton
     {
         _socketService = socketService;
         _coreDependentObservables = coreDependentObservables;
-        _coreState = coreState;
+        _enduranceEvents = enduranceEvents;
         _startDashboardBusiness = startDashboardBusiness;
         _rankings = rankings;
-        _enduranceEvents = events;
+        _events = events;
         _participations = participations;
         _officials = officials;
         _archive = archive;
@@ -71,7 +71,7 @@ public class DashService : IDashService, ISingleton
 
     public async Task Reset()
     {
-        await _coreState.Reset();
+        await _enduranceEvents.Reset();
         ResetCoreDependentObservables();
     }
 
@@ -84,7 +84,7 @@ public class DashService : IDashService, ISingleton
             return;
         }
 
-        await _enduranceEvents.Create(entry.EnduranceEvent);
+        await _events.Create(entry.EnduranceEvent);
         await _socketService.Connect(entry.EnduranceEvent);
         foreach (var official in entry.Officials)
         {

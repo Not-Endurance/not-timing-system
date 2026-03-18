@@ -12,15 +12,18 @@ namespace NTS.Nexus.HTTP.Functions.Event;
 public class EnduranceEventFunctions : FunctionBase
 {
     readonly IRepository<EnduranceEventModel> _events;
+    readonly IEnduranceEventResetService _resetService;
 
     public EnduranceEventFunctions(
         IFunctionLogger<EnduranceEventFunctions> logger,
         IRepository<EnduranceEventModel> events,
+        IEnduranceEventResetService resetService,
         ITelemetryService telemetry
     )
         : base(logger, telemetry)
     {
         _events = events;
+        _resetService = resetService;
     }
 
     [Function("endurance-event-create")]
@@ -37,7 +40,6 @@ public class EnduranceEventFunctions : FunctionBase
         {
             return UnexpectedPayload<EnduranceEventModel>();
         }
-
         await _events.Create(payload);
         return Ok();
     }
@@ -56,7 +58,6 @@ public class EnduranceEventFunctions : FunctionBase
         {
             return UnexpectedPayload<EnduranceEventModel>();
         }
-
         await _events.Update(payload);
         return Ok();
     }
@@ -110,6 +111,21 @@ public class EnduranceEventFunctions : FunctionBase
         }
 
         await _events.Delete(x => x.Id == id);
+        return Ok();
+    }
+
+    [Function("endurance-event-reset")]
+    public async Task<IActionResult> Reset(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "endurance-event/{id:int}/reset")]
+            HttpRequest request,
+        int id
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(Reset));
+        TagRequest(request);
+        LogInformation(request, nameof(Reset));
+
+        await _resetService.Reset(id);
         return Ok();
     }
 }

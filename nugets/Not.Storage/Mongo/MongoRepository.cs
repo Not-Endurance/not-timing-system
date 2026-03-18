@@ -40,7 +40,7 @@ public abstract class MongoRepository<T> : IRepository<T>
         return _context.Client.GetDatabase(_db).GetCollection<T>(_collection);
     }
 
-    public async Task Create(T item)
+    public virtual async Task Create(T item)
     {
         using var activity = StartActivity(nameof(Create));
 
@@ -59,57 +59,61 @@ public abstract class MongoRepository<T> : IRepository<T>
         }
     }
 
-    public async Task<T?> Read(Expression<Func<T, bool>> filter)
+    public virtual async Task<T?> Read(Expression<Func<T, bool>> filter)
     {
         using var activity = StartActivity(nameof(Read));
         return await GetCollection().Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<T?> Read(int id)
+    public virtual async Task<T?> Read(int id)
     {
         using var activity = StartActivity(nameof(Read));
-        return await GetCollection().Find(GetIdFilter(id)).FirstOrDefaultAsync();
+        var filter = GetIdFilter(id);
+        return await GetCollection().Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<T>> ReadMany()
+    public virtual async Task<IEnumerable<T>> ReadMany()
     {
         using var activity = StartActivity(nameof(ReadMany));
         return await GetCollection().Find(x => true).ToListAsync();
     }
 
-    public async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
+    public virtual async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
         using var activity = StartActivity(nameof(ReadMany));
         return await GetCollection().Find(filter).ToListAsync();
     }
 
-    public async Task Update(T items)
+    public virtual async Task Update(T items)
     {
         using var activity = StartActivity(nameof(Update));
 
         var updateDefinition = GetUpdateDefinition(items);
-        await GetCollection().UpdateOneAsync(GetItemFilter(items), updateDefinition);
+        var filter = GetItemFilter(items);
+        await GetCollection().UpdateOneAsync(filter, updateDefinition);
     }
 
-    public async Task Delete(int id)
+    public virtual async Task Delete(int id)
     {
         using var activity = StartActivity(nameof(Delete));
-        await GetCollection().DeleteOneAsync(GetIdFilter(id));
+        var filter = GetIdFilter(id);
+        await GetCollection().DeleteOneAsync(filter);
     }
 
-    public async Task Delete(T item)
+    public virtual async Task Delete(T item)
     {
         using var activity = StartActivity(nameof(Delete));
-        await GetCollection().DeleteOneAsync(GetItemFilter(item));
+        var filter = GetItemFilter(item);
+        await GetCollection().DeleteOneAsync(filter);
     }
 
-    public async Task Delete(Expression<Func<T, bool>> filter)
+    public virtual async Task Delete(Expression<Func<T, bool>> filter)
     {
         using var activity = StartActivity(nameof(Delete));
         await GetCollection().DeleteManyAsync(filter);
     }
 
-    public Task Delete(IEnumerable<T> items)
+    public virtual Task Delete(IEnumerable<T> items)
     {
         using var activity = StartActivity(nameof(Delete));
 
@@ -120,6 +124,7 @@ public abstract class MongoRepository<T> : IRepository<T>
 
     Activity? StartActivity(string methodName)
     {
-        return SOURCE.StartActivity($"{GetType().Name}.{methodName}", ActivityKind.Internal);
+        var name = $"{GetType().Name}.{methodName}";
+        return SOURCE.StartActivity(name, ActivityKind.Internal);
     }
 }

@@ -8,7 +8,7 @@ using NTS.Nexus.HTTP.Telemetry;
 namespace NTS.Nexus.HTTP.Functions.Base;
 
 public class EventScopedCrudFunctions<T> : FunctionBase
-    where T : class, IEventScopedDocument
+    where T : class, IEventScopedDocument, ISoftDeletableDocument
 {
     readonly IRepository<T> _repository;
 

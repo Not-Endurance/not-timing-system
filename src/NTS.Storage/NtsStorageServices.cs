@@ -5,8 +5,6 @@ using Not.Filesystem;
 using Not.Storage;
 using Not.Storage.JsonFile.Stores;
 using Not.Storage.REST;
-using NTS.Application.Core;
-using NTS.Storage.REST;
 
 namespace NTS.Storage;
 
@@ -40,7 +38,6 @@ public static class NtsStorageServices
         public Builder AddRestApiStorage()
         {
             _nStorageBuilder.AddRestApiStorage(Assembly.GetExecutingAssembly());
-            _services.AddSingleton<ICoreState, RestApiCoreState>();
             return this;
         }
     }
