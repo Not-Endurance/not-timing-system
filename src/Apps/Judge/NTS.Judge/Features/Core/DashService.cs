@@ -1,4 +1,5 @@
 using Not.Application.CRUD.Ports;
+using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Notify;
@@ -56,6 +57,8 @@ public class DashService : IDashService, ISingleton
 
     public async Task Start(int upcomingEventId)
     {
+        await EnsureNoActiveEnduranceEvent();
+
         var validationResult = await _startDashboardBusiness.Validate(upcomingEventId);
         if (validationResult.Data?.Any() == true)
         {
@@ -107,6 +110,14 @@ public class DashService : IDashService, ISingleton
         foreach (var observable in _coreDependentObservables)
         {
             observable.ResetHasLoaded();
+        }
+    }
+
+    async Task EnsureNoActiveEnduranceEvent()
+    {
+        if ((await _enduranceEvents.ReadMany()).Any())
+        {
+            throw new DomainException("Cannot start while an endurance event is already active. Reset timing first.");
         }
     }
 }

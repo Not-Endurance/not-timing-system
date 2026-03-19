@@ -63,6 +63,8 @@ public class StartBusinessService : IStartBusiness
 
     public async Task<EnduranceEvent> CreateEnduranceEvent(int upcomingEventId)
     {
+        await EnsureEnduranceEventNotStarted(upcomingEventId);
+
         var setupEvent = await GetSetupEvent(upcomingEventId);
         var validation = StartValidator.Validate(setupEvent);
         var issues = validation.Data ?? [];
@@ -123,6 +125,17 @@ public class StartBusinessService : IStartBusiness
     {
         var upcomingEvent = await _upcomingEvents.Read(upcomingEventId);
         return upcomingEvent ?? throw GuardHelper.Exception($"Event with id '{upcomingEventId}' is not selected");
+    }
+
+    async Task EnsureEnduranceEventNotStarted(int upcomingEventId)
+    {
+        var existing = await _enduranceEvents.Read(upcomingEventId);
+        if (existing != null)
+        {
+            throw new DomainException(
+                $"Cannot start upcoming event '{upcomingEventId}' because its endurance event is already active."
+            );
+        }
     }
 
     (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(UpcomingEvent setupEvent)
