@@ -57,8 +57,6 @@ public class DashService : IDashService, ISingleton
 
     public async Task Start(int upcomingEventId)
     {
-        await EnsureNoActiveEnduranceEvent();
-
         var validationResult = await _startDashboardBusiness.Validate(upcomingEventId);
         if (validationResult.Data?.Any() == true)
         {
@@ -66,9 +64,13 @@ public class DashService : IDashService, ISingleton
                 $"Cannot start with invalid state. Ensure to call {nameof(DashService)}.{nameof(Validate)}"
             );
         }
+        if (_socketService.IsConnected)
+        {
+            await _socketService.Disconnect();
+        }
 
-        var endranceEvent = await _startDashboardBusiness.CreateEnduranceEvent(upcomingEventId);
-        await _socketService.Connect(endranceEvent);
+        var enduranceEvent = await _startDashboardBusiness.CreateEnduranceEvent(upcomingEventId);
+        await _socketService.Connect(enduranceEvent);
         await _startDashboardBusiness.StartEnduranceEvent(upcomingEventId);
     }
 
@@ -110,14 +112,6 @@ public class DashService : IDashService, ISingleton
         foreach (var observable in _coreDependentObservables)
         {
             observable.ResetHasLoaded();
-        }
-    }
-
-    async Task EnsureNoActiveEnduranceEvent()
-    {
-        if ((await _enduranceEvents.ReadMany()).Any())
-        {
-            throw new DomainException("Cannot start while an endurance event is already active. Reset timing first.");
         }
     }
 }

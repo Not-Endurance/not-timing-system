@@ -1,4 +1,6 @@
+using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Events;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
@@ -31,6 +33,8 @@ public class UpcomingEventService
         _notifier = notifier;
         _selectedEventContext = context;
     }
+
+    public IEventSubscriber ObservableEvent { get; } = new Event();
 
     public override Task Delete(UpcomingEvent entity)
     {

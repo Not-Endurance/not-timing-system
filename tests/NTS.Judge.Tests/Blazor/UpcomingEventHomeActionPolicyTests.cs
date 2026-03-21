@@ -95,7 +95,7 @@ public class UpcomingEventsListBehindTests
 
         public new IDashService Service
         {
-            set => base.Service = value;
+            set => base.DashService = value;
         }
 
         public new INtsSocketService SocketService

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Helpers;
@@ -18,25 +17,25 @@ public class UpcomingEventsListBehind : NStatefulComponent
     protected IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    protected IDashService Service { get; set; } = default!;
+    protected IDashService DashService { get; set; } = default!;
 
     [Inject]
     protected INtsSocketService SocketService { get; set; } = default!;
 
     [Inject]
-    protected IEnduranceEventService EnduranceEventService { get; set; } = default!;
+    protected IEnduranceEventService ActiveEventService { get; set; } = default!;
 
     protected int ActiveEnduranceEventCount { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await Observe(SocketService);
-        await RefreshActiveEventCount();
+        await Observe(ActiveEventService);
     }
 
-    protected bool ShowStartButton()
+    protected bool ShowStartButton(UpcomingEvent upcomingEvent)
     {
-        return ActiveEnduranceEventCount == 0 && !SocketService.IsConnected;
+        return !ActiveEventService.IsActive(upcomingEvent);
     }
 
     protected bool ShowResetTimingButton(UpcomingEvent upcomingEvent)
@@ -48,7 +47,7 @@ public class UpcomingEventsListBehind : NStatefulComponent
     {
         try
         {
-            var validation = await Service.Validate(upcomingEvent.Id);
+            var validation = await DashService.Validate(upcomingEvent.Id);
             if (validation.Data?.Any() == true)
             {
                 var parameters = new DialogParameters<StartValidationDialog>
@@ -63,8 +62,7 @@ public class UpcomingEventsListBehind : NStatefulComponent
                 }
             }
 
-            await Service.Start(upcomingEvent.Id);
-            await RefreshActiveEventCount();
+            await DashService.Start(upcomingEvent.Id);
         }
         catch (DomainException ex)
         {
@@ -91,18 +89,12 @@ public class UpcomingEventsListBehind : NStatefulComponent
                 return;
             }
 
-            await Service.Reset();
+            await DashService.Reset();
             await SocketService.Disconnect();
-            await RefreshActiveEventCount();
         }
         catch (Exception ex)
         {
             Handle(ex);
         }
-    }
-
-    async Task RefreshActiveEventCount()
-    {
-        ActiveEnduranceEventCount = (await EnduranceEventService.GetEvents()).Count();
     }
 }
