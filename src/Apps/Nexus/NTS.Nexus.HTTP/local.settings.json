@@ -3,6 +3,5 @@
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/NTS"
   }
 }
