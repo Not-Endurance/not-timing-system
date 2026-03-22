@@ -1,11 +1,12 @@
 using MongoDB.Driver;
 using Not.Storage.Mongo;
+using NTS.Application.UserSession;
 using NTS.Application.Watcher;
 using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class UserSessionRepository : MongoRepository<UserSessionModel>
+public class UserSessionRepository : MongoRepository<UserSessionModel>, IUserSessionRepository
 {
     readonly ITelemetryService _telemetry;
 
@@ -20,7 +21,20 @@ public class UserSessionRepository : MongoRepository<UserSessionModel>
         using var activity = _telemetry.StartActivity(nameof(UserSessionRepository), nameof(GetUpdateDefinition));
 
         return Builders<UserSessionModel>
-            .Update.Set(x => x.EventId, document.EventId)
+            .Update.Set(x => x.UserIdentifier, document.UserIdentifier)
+            .Set(x => x.EventId, document.EventId)
             .Set(x => x.SnapshotHistory, document.SnapshotHistory);
+    }
+
+    public async Task<UserSessionModel?> ReadByUserIdentifier(string userIdentifier)
+    {
+        using var activity = _telemetry.StartActivity(nameof(UserSessionRepository), nameof(ReadByUserIdentifier));
+
+        if (string.IsNullOrWhiteSpace(userIdentifier))
+        {
+            return null;
+        }
+
+        return await GetCollection().Find(x => x.UserIdentifier == userIdentifier).FirstOrDefaultAsync();
     }
 }

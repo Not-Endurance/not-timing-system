@@ -22,6 +22,17 @@ public static class NUserClaimsHelper
         );
     }
 
+    public static string? ResolveUserIdentifier(ClaimsPrincipal? principal)
+    {
+        return ResolveClaimValue(
+            principal,
+            "oid",
+            "http://schemas.microsoft.com/identity/claims/objectidentifier",
+            "sub",
+            ClaimTypes.NameIdentifier
+        );
+    }
+
     public static string? ResolveEmail(ClaimsPrincipal? principal)
     {
         if (principal == null)

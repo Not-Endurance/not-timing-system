@@ -11,6 +11,7 @@ using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.CRUD.Ports;
 using Not.Structures;
+using NTS.Application.UserSession;
 using NTS.Nexus.HTTP.Functions;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Models;
@@ -141,16 +142,16 @@ public class RegistrationFlowTests
                 }
             ),
         };
-        var sessions = new RecordingRepository<NTS.Application.Watcher.UserSessionModel>();
         var authStateProvider = new StaticAuthenticationStateProvider(
             CreatePrincipal(
                 new Claim(ClaimTypes.Email, "new.user@example.com"),
+                new Claim("oid", "entra-1"),
                 new Claim("given_name", "Jane"),
                 new Claim("family_name", "Doe"),
                 new Claim("country", "Bulgaria")
             )
         );
-        var service = new WitnessUserSessionService(authStateProvider, users, sessions);
+        var service = new WitnessUserSessionService(authStateProvider, users, new RecordingUserSessionRepository());
 
         var current = await service.GetCurrent();
 
@@ -314,6 +315,63 @@ public class RegistrationFlowTests
         }
 
         public Task Delete(Expression<Func<T, bool>> filter)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    sealed class RecordingUserSessionRepository : IUserSessionRepository
+    {
+        public Task Create(NTS.Application.Watcher.UserSessionModel item)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task<NTS.Application.Watcher.UserSessionModel?> ReadByUserIdentifier(string userIdentifier)
+        {
+            return Task.FromResult<NTS.Application.Watcher.UserSessionModel?>(null);
+        }
+
+        public Task<NTS.Application.Watcher.UserSessionModel?> Read(int id)
+        {
+            return Task.FromResult<NTS.Application.Watcher.UserSessionModel?>(null);
+        }
+
+        public Task<NTS.Application.Watcher.UserSessionModel?> Read(
+            Expression<Func<NTS.Application.Watcher.UserSessionModel, bool>> filter
+        )
+        {
+            return Task.FromResult<NTS.Application.Watcher.UserSessionModel?>(null);
+        }
+
+        public Task<IEnumerable<NTS.Application.Watcher.UserSessionModel>> ReadMany()
+        {
+            return Task.FromResult<IEnumerable<NTS.Application.Watcher.UserSessionModel>>([]);
+        }
+
+        public Task<IEnumerable<NTS.Application.Watcher.UserSessionModel>> ReadMany(
+            Expression<Func<NTS.Application.Watcher.UserSessionModel, bool>> filter
+        )
+        {
+            return Task.FromResult<IEnumerable<NTS.Application.Watcher.UserSessionModel>>([]);
+        }
+
+        public Task Update(NTS.Application.Watcher.UserSessionModel item)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task Delete(NTS.Application.Watcher.UserSessionModel item)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task Delete(IEnumerable<NTS.Application.Watcher.UserSessionModel> items)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task Delete(Expression<Func<NTS.Application.Watcher.UserSessionModel, bool>> filter)
         {
             return Task.CompletedTask;
         }

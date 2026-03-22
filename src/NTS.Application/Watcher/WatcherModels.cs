@@ -67,12 +67,14 @@ public class UserSessionModel : IDocument, IKrudModel<UserSessionModel>, ICoreSe
     IReadOnlyList<SnapshotGroup> ICoreSession.SnapshotHistory => SnapshotHistory.Select(x => x.MapToDomain()).ToArray();
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public string? UserIdentifier { get; set; }
     public int? EventId { get; set; }
     public SnapshotGroupModel[] SnapshotHistory { get; set; } = [];
 
     public void MapFrom(UserSessionModel session)
     {
         Id = session.Id;
+        UserIdentifier = session.UserIdentifier;
         EventId = session.EventId;
         SnapshotHistory = [.. session.SnapshotHistory];
     }

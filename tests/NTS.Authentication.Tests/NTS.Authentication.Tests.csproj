@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\nugets\Not.Application\Not.Application.csproj" />
     <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.HTTP\NTS.Nexus.HTTP.csproj" />
     <ProjectReference Include="..\..\src\Apps\Witness\NTS.Witness\NTS.Witness.csproj" />
+    <ProjectReference Include="..\..\src\Apps\Witness\NTS.Witness.Blazor\NTS.Witness.Blazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>

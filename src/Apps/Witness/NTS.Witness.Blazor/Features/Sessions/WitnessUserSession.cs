@@ -11,7 +11,6 @@ public class WitnessUserSession : INUserSession
     readonly IUserSessionService _userSessionService;
     readonly IRepository<EnduranceEvent> _enduranceEvents;
     readonly INtsSocketService _socketService;
-    bool _isInitialized;
 
     public WitnessUserSession(
         IUserSessionService userSessionService,
@@ -26,15 +25,10 @@ public class WitnessUserSession : INUserSession
 
     public async Task Initialize()
     {
-        if (_isInitialized)
-        {
-            return;
-        }
-        _isInitialized = true;
-
         var session = await _userSessionService.GetCurrent();
         if (session?.EventId == null)
         {
+            await DisconnectIfNeeded();
             return;
         }
 
@@ -50,10 +44,17 @@ public class WitnessUserSession : INUserSession
             return;
         }
 
-        if (enduranceEvent?.Id == session.EventId.Value)
+        await _userSessionService.DeleteCurrent();
+        await DisconnectIfNeeded();
+    }
+
+    async Task DisconnectIfNeeded()
+    {
+        if (_socketService.Event == null && !_socketService.IsConnected)
         {
             return;
         }
-        await _userSessionService.DeleteCurrent();
+
+        await _socketService.Disconnect();
     }
 }
