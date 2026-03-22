@@ -49,10 +49,7 @@ public class UpcomingEventService
     {
         var setupEvent = await GetEvent(upcomingEventId);
         var competition = setupEvent.Competitions.FirstOrDefault(x => x.Id == competitionId);
-        if (competition == null)
-        {
-            throw GuardHelper.Exception($"Competition with id '{competitionId}' does not exist");
-        }
+        GuardHelper.ThrowIfDefault(competition, $"Competition with id '{competitionId}' does not exist");
 
         var participation = competition.Participations.FirstOrDefault(x => x.Combination.Number == participationNumber);
         if (participation == null)
