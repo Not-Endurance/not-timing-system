@@ -72,7 +72,11 @@ public class JudgeSocketService : NStatefulService, INtsSocketService, ISingleto
         Status = e;
         EmitChanged();
 
-        if (e == SocketConnectionStatus.Connected && previousStatus == SocketConnectionStatus.Connecting && Event != null)
+        if (
+            e == SocketConnectionStatus.Connected
+            && previousStatus == SocketConnectionStatus.Connecting
+            && Event != null
+        )
         {
             _ = _domainEventDispatcher.Dispatch(new EventConnected(Event.Id));
         }

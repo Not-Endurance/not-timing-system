@@ -118,7 +118,11 @@ public class WitnessUserSessionService : IUserSessionService, IScoped
         session.EventId = eventId;
     }
 
-    static UserSessionModel CreateSession(ResolvedUserContext context, int? eventId = null, SnapshotGroup? snapshot = null)
+    static UserSessionModel CreateSession(
+        ResolvedUserContext context,
+        int? eventId = null,
+        SnapshotGroup? snapshot = null
+    )
     {
         return new UserSessionModel
         {

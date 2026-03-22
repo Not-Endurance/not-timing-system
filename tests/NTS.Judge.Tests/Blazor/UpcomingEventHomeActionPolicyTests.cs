@@ -59,7 +59,9 @@ public class UpcomingEventsListBehindTests
         var component = new TestUpcomingEventsListBehind
         {
             Service = new TestDashService(),
-            ActiveEventService = new TestEnduranceEventService(activeEnduranceEventCount > 0 ? [connectedEventId ?? 7] : []),
+            ActiveEventService = new TestEnduranceEventService(
+                activeEnduranceEventCount > 0 ? [connectedEventId ?? 7] : []
+            ),
             SocketService = new TestSocketService
             {
                 Event = connectedEventId == null ? null : CreateEnduranceEvent(connectedEventId.Value),

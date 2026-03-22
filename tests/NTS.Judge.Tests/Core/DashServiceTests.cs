@@ -31,14 +31,7 @@ public class DashServiceTests
 
         await service.Start(7);
 
-        Assert.Equal(
-            [
-                "Validate(7)",
-                "Start(7)",
-                "Connect(7)",
-            ],
-            calls
-        );
+        Assert.Equal(["Validate(7)", "Start(7)", "Connect(7)"], calls);
     }
 
     [Fact]
@@ -52,15 +45,7 @@ public class DashServiceTests
 
         await service.Start(9);
 
-        Assert.Equal(
-            [
-                "Validate(9)",
-                "Disconnect()",
-                "Start(9)",
-                "Connect(9)",
-            ],
-            calls
-        );
+        Assert.Equal(["Validate(9)", "Disconnect()", "Start(9)", "Connect(9)"], calls);
     }
 
     static DashService CreateService(

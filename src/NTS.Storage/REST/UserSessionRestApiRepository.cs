@@ -7,7 +7,9 @@ using NTS.Application.Watcher;
 namespace NTS.Storage.REST;
 
 public class UserSessionRestApiRepository
-    : RestApiRepository<UserSessionModel, UserSessionModel>, IUserSessionRepository, ITransient
+    : RestApiRepository<UserSessionModel, UserSessionModel>,
+        IUserSessionRepository,
+        ITransient
 {
     public UserSessionRestApiRepository(NHttpClient client)
         : base("user-sessions", client) { }

@@ -18,7 +18,11 @@ public class ParticipationAndRankingFactoryTests
         var setupParticipation = CreateSetupParticipation(overrideStart);
         var setupCompetition = CreateCompetition(competitionStart, setupParticipation, phaseCount: 2);
 
-        var participation = ParticipationAndRankingFactory.CreateParticipation(setupCompetition, setupParticipation, 14);
+        var participation = ParticipationAndRankingFactory.CreateParticipation(
+            setupCompetition,
+            setupParticipation,
+            14
+        );
 
         Assert.Equal(overrideStart.ToUniversalTime(), participation.Phases[0].StartTime?.ToDateTimeOffset());
         Assert.Null(participation.Phases[1].StartTime);
@@ -31,7 +35,11 @@ public class ParticipationAndRankingFactoryTests
         var setupParticipation = CreateSetupParticipation(null);
         var setupCompetition = CreateCompetition(competitionStart, setupParticipation, phaseCount: 2);
 
-        var participation = ParticipationAndRankingFactory.CreateParticipation(setupCompetition, setupParticipation, 14);
+        var participation = ParticipationAndRankingFactory.CreateParticipation(
+            setupCompetition,
+            setupParticipation,
+            14
+        );
 
         Assert.Equal(competitionStart.ToUniversalTime(), participation.Phases[0].StartTime?.ToDateTimeOffset());
         Assert.Null(participation.Phases[1].StartTime);
@@ -45,7 +53,12 @@ public class ParticipationAndRankingFactoryTests
     {
         var phases = Enumerable
             .Range(0, phaseCount)
-            .Select(index => new Phase(new Loop(40 + index, 100 + index), 40, index == phaseCount - 1 ? null : 30, 200 + index))
+            .Select(index => new Phase(
+                new Loop(40 + index, 100 + index),
+                40,
+                index == phaseCount - 1 ? null : 30,
+                200 + index
+            ))
             .ToList();
 
         return new Competition(

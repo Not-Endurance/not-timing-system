@@ -2,12 +2,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
+using Not.Domain.Exceptions;
+using Not.Structures;
 using NTS.Application.Core;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
-using Not.Structures;
-using Not.Domain.Exceptions;
 
 namespace NTS.Nexus.HTTP.Functions.Event;
 

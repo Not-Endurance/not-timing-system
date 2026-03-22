@@ -1,19 +1,19 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Exceptions;
-using CoreEnduranceEventModel = NTS.Application.Core.EnduranceEventModel;
-using CoreOfficialModel = NTS.Application.Core.OfficialModel;
-using CoreParticipationModel = NTS.Application.Core.ParticipationModel;
-using CoreRankingModel = NTS.Application.Core.RankingModel;
-using SetupUpcomingEventModel = NTS.Application.Setup.UpcomingEventModel;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 using NTS.Nexus.HTTP.Functions.Event;
+using CoreEnduranceEventModel = NTS.Application.Core.EnduranceEventModel;
+using CoreOfficialModel = NTS.Application.Core.OfficialModel;
+using CoreParticipationModel = NTS.Application.Core.ParticipationModel;
+using CoreRankingModel = NTS.Application.Core.RankingModel;
 using SetupOfficial = NTS.Domain.Setup.Aggregates.UpcomingEvents.Official;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.UpcomingEvents.Participation;
+using SetupUpcomingEventModel = NTS.Application.Setup.UpcomingEventModel;
 
 namespace NTS.Judge.Tests.Core;
 
@@ -69,7 +69,13 @@ public class EnduranceEventBusinessServiceTests
         var overrideStart = DateTimeOffset.Now.AddHours(2);
         var participations = new RecordingRepository<CoreParticipationModel>();
         var service = CreateService(
-            [CreateValidEventModel(2, competitionStart: DateTimeOffset.Now.AddHours(-2), startTimeOverride: overrideStart)],
+            [
+                CreateValidEventModel(
+                    2,
+                    competitionStart: DateTimeOffset.Now.AddHours(-2),
+                    startTimeOverride: overrideStart
+                ),
+            ],
             participations: participations,
             rankings: new RecordingRepository<CoreRankingModel>()
         );

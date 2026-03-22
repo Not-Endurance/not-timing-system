@@ -10,8 +10,8 @@ using NTS.Domain.Setup.Aggregates;
 using SetupCombination = NTS.Domain.Setup.Aggregates.UpcomingEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.UpcomingEvents.Competition;
 using SetupLoop = NTS.Domain.Setup.Aggregates.UpcomingEvents.Loop;
-using SetupPhase = NTS.Domain.Setup.Aggregates.UpcomingEvents.Phase;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.UpcomingEvents.Participation;
+using SetupPhase = NTS.Domain.Setup.Aggregates.UpcomingEvents.Phase;
 
 namespace NTS.Judge.Tests.Core;
 
@@ -119,11 +119,9 @@ public class StartlistServiceTests
         var now = DateTimeOffset.Now;
         var remaining = TimeSpan.FromDays(1) - now.TimeOfDay - TimeSpan.FromSeconds(1);
         var lead =
-            remaining > TimeSpan.FromMinutes(30)
-                ? TimeSpan.FromMinutes(30)
-                : remaining > TimeSpan.FromMinutes(1)
-                    ? TimeSpan.FromMinutes(1)
-                    : TimeSpan.FromSeconds(5);
+            remaining > TimeSpan.FromMinutes(30) ? TimeSpan.FromMinutes(30)
+            : remaining > TimeSpan.FromMinutes(1) ? TimeSpan.FromMinutes(1)
+            : TimeSpan.FromSeconds(5);
         return CreateUtcTimestamp(now.TimeOfDay + lead);
     }
 
@@ -131,11 +129,9 @@ public class StartlistServiceTests
     {
         var now = DateTimeOffset.Now;
         var lead =
-            now.TimeOfDay > TimeSpan.FromMinutes(30)
-                ? TimeSpan.FromMinutes(30)
-                : now.TimeOfDay > TimeSpan.FromMinutes(1)
-                    ? TimeSpan.FromMinutes(1)
-                    : TimeSpan.FromSeconds(5);
+            now.TimeOfDay > TimeSpan.FromMinutes(30) ? TimeSpan.FromMinutes(30)
+            : now.TimeOfDay > TimeSpan.FromMinutes(1) ? TimeSpan.FromMinutes(1)
+            : TimeSpan.FromSeconds(5);
         return CreateUtcTimestamp(now.TimeOfDay - lead);
     }
 
@@ -169,7 +165,9 @@ public class StartlistServiceTests
             return Task.FromResult<IEnumerable<Participation>>(Items.ToList());
         }
 
-        public Task<IEnumerable<Participation>> ReadMany(System.Linq.Expressions.Expression<Func<Participation, bool>> filter)
+        public Task<IEnumerable<Participation>> ReadMany(
+            System.Linq.Expressions.Expression<Func<Participation, bool>> filter
+        )
         {
             var predicate = filter.Compile();
             return Task.FromResult<IEnumerable<Participation>>(Items.Where(predicate).ToList());

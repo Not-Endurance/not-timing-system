@@ -53,10 +53,7 @@ public class WitnessSessionIdentityTests
     [Fact]
     public void Resolve_user_identifier_falls_back_to_sub_and_nameidentifier()
     {
-        var principal = CreatePrincipal(
-            new Claim("sub", "entra-sub"),
-            new Claim(ClaimTypes.NameIdentifier, "name-id")
-        );
+        var principal = CreatePrincipal(new Claim("sub", "entra-sub"), new Claim(ClaimTypes.NameIdentifier, "name-id"));
 
         var result = NUserClaimsHelper.ResolveUserIdentifier(principal);
 
@@ -69,10 +66,7 @@ public class WitnessSessionIdentityTests
         var authStateProvider = new StaticAuthenticationStateProvider(
             CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"))
         );
-        var users = new RecordingUserRegister
-        {
-            GetResult = Result.Success(new NUserModel("user@example.com", id: 7)),
-        };
+        var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
         var sessions = new RecordingUserSessionRepository();
         var service = new WitnessUserSessionService(authStateProvider, users, sessions);
 
@@ -90,11 +84,13 @@ public class WitnessSessionIdentityTests
         var authStateProvider = new StaticAuthenticationStateProvider(
             CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"))
         );
-        var users = new RecordingUserRegister
+        var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
+        var expected = new UserSessionModel
         {
-            GetResult = Result.Success(new NUserModel("user@example.com", id: 7)),
+            Id = 99,
+            UserIdentifier = "entra-1",
+            EventId = 23,
         };
-        var expected = new UserSessionModel { Id = 99, UserIdentifier = "entra-1", EventId = 23 };
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = expected };
         var service = new WitnessUserSessionService(authStateProvider, users, sessions);
 
@@ -111,10 +107,7 @@ public class WitnessSessionIdentityTests
         var authStateProvider = new StaticAuthenticationStateProvider(
             CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"))
         );
-        var users = new RecordingUserRegister
-        {
-            GetResult = Result.Success(new NUserModel("user@example.com", id: 7)),
-        };
+        var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
         var legacySession = new UserSessionModel { Id = 7, EventId = 5 };
         var sessions = new RecordingUserSessionRepository { ReadByIdResult = legacySession };
         var service = new WitnessUserSessionService(authStateProvider, users, sessions);
@@ -133,11 +126,13 @@ public class WitnessSessionIdentityTests
         var authStateProvider = new StaticAuthenticationStateProvider(
             CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"))
         );
-        var users = new RecordingUserRegister
+        var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
+        var expected = new UserSessionModel
         {
-            GetResult = Result.Success(new NUserModel("user@example.com", id: 7)),
+            Id = 99,
+            UserIdentifier = "entra-1",
+            EventId = 23,
         };
-        var expected = new UserSessionModel { Id = 99, UserIdentifier = "entra-1", EventId = 23 };
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = expected };
         var service = new WitnessUserSessionService(authStateProvider, users, sessions);
 
@@ -154,10 +149,7 @@ public class WitnessSessionIdentityTests
         var authStateProvider = new StaticAuthenticationStateProvider(
             CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"))
         );
-        var users = new RecordingUserRegister
-        {
-            GetResult = Result.Success(new NUserModel("user@example.com", id: 7)),
-        };
+        var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
         var sessions = new RecordingUserSessionRepository();
         var service = new WitnessUserSessionService(authStateProvider, users, sessions);
 
@@ -170,10 +162,7 @@ public class WitnessSessionIdentityTests
     [Fact]
     public async Task Witness_user_session_initialize_disconnects_when_current_user_has_no_session()
     {
-        var sessionService = new SequenceUserSessionService(
-            new UserSessionModel { EventId = 1 },
-            null
-        );
+        var sessionService = new SequenceUserSessionService(new UserSessionModel { EventId = 1 }, null);
         var events = new RecordingEnduranceEventRepository(CreateEnduranceEvent(1));
         var socket = new RecordingSocketService();
         var session = new WitnessUserSession(sessionService, events, socket);
@@ -210,11 +199,7 @@ public class WitnessSessionIdentityTests
     {
         var sessionService = new SequenceUserSessionService(new UserSessionModel { EventId = 42 });
         var events = new RecordingEnduranceEventRepository();
-        var socket = new RecordingSocketService
-        {
-            Event = CreateEnduranceEvent(7),
-            IsConnected = true,
-        };
+        var socket = new RecordingSocketService { Event = CreateEnduranceEvent(7), IsConnected = true };
         var session = new WitnessUserSession(sessionService, events, socket);
 
         await session.Initialize();
@@ -272,10 +257,7 @@ public class WitnessSessionIdentityTests
 
         public Task<Result<NUserModel>> Register(NUserRegistration registration)
         {
-            return Task.FromResult(
-                RegisterResult
-                    ?? Result.Success(new NUserModel(registration.Email, id: 7))
-            );
+            return Task.FromResult(RegisterResult ?? Result.Success(new NUserModel(registration.Email, id: 7)));
         }
     }
 

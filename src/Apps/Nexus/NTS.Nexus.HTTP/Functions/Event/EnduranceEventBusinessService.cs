@@ -3,15 +3,15 @@ using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Injection;
+using NTS.Application.Factories;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Enums;
+using NTS.Domain.Setup.Services.StartValidation;
 using CoreEnduranceEventModel = NTS.Application.Core.EnduranceEventModel;
 using CoreOfficialModel = NTS.Application.Core.OfficialModel;
 using CoreParticipationModel = NTS.Application.Core.ParticipationModel;
 using CoreRankingModel = NTS.Application.Core.RankingModel;
-using NTS.Application.Factories;
 using SetupUpcomingEventModel = NTS.Application.Setup.UpcomingEventModel;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Enums;
-using NTS.Domain.Setup.Services.StartValidation;
 
 namespace NTS.Nexus.HTTP.Functions.Event;
 
@@ -120,10 +120,9 @@ public class EnduranceEventBusinessService : IEnduranceEventBusinessService, ITr
         }
     }
 
-    (
-        IEnumerable<Participation> Participations,
-        IEnumerable<Ranking> Rankings
-    ) CreateParticipationsAndRankings(Domain.Setup.Aggregates.UpcomingEvent setupEvent)
+    (IEnumerable<Participation> Participations, IEnumerable<Ranking> Rankings) CreateParticipationsAndRankings(
+        Domain.Setup.Aggregates.UpcomingEvent setupEvent
+    )
     {
         var participations = new List<Participation>();
         var rankings = new List<Ranking>();

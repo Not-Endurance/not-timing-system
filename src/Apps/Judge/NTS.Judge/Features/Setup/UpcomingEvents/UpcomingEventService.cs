@@ -1,10 +1,10 @@
 using Not.Application.CRUD.Ports;
 using Not.Events;
+using Not.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
 using Not.Notify;
-using Not.Exceptions;
 using Not.Structures;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;

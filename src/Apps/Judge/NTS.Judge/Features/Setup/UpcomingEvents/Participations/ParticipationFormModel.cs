@@ -24,15 +24,7 @@ public record ParticipationFormModel : KrudFormModel<Participation>
         var newStart = OverrideStartTime();
         var maxSpeedOverride = OverrideMaxSpeed();
         var minSpeedOverride = OverrideMinSpeed();
-        return new(
-            IsNotRanked,
-            Combination,
-            Category,
-            newStart,
-            maxSpeedOverride,
-            minSpeedOverride,
-            id: Id
-        );
+        return new(IsNotRanked, Combination, Category, newStart, maxSpeedOverride, minSpeedOverride, id: Id);
     }
 
     public override void MapFrom(Participation participation)
@@ -53,27 +45,15 @@ public record ParticipationFormModel : KrudFormModel<Participation>
     {
         if (IsStartTimeOverriden && StartTimeOverride == null)
         {
-            throw new DomainPropertyException(
-                nameof(StartTimeOverride),
-                Null_or_malformed_string,
-                Start_Time_string
-            );
+            throw new DomainPropertyException(nameof(StartTimeOverride), Null_or_malformed_string, Start_Time_string);
         }
         if (IsMaxSpeedOverriden && MaxSpeedOverride == null)
         {
-            throw new DomainPropertyException(
-                nameof(MaxSpeedOverride),
-                Null_or_malformed_string,
-                Max_Speed_string
-            );
+            throw new DomainPropertyException(nameof(MaxSpeedOverride), Null_or_malformed_string, Max_Speed_string);
         }
         if (IsMinSpeedOverriden && MinSpeedOverride == null)
         {
-            throw new DomainPropertyException(
-                nameof(MinSpeedOverride),
-                Null_or_malformed_string,
-                Min_Speed_string
-            );
+            throw new DomainPropertyException(nameof(MinSpeedOverride), Null_or_malformed_string, Min_Speed_string);
         }
     }
 
