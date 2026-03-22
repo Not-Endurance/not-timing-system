@@ -1,5 +1,6 @@
 using Not.Events;
 using Not.Structures;
+using NTS.Application.Core;
 using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
@@ -18,7 +19,7 @@ public class UpcomingEventsListBehindTests
     {
         var component = CreateComponent(activeEnduranceEventCount: 0);
 
-        Assert.True(component.ShowStart());
+        Assert.True(component.ShowStart(CreateUpcomingEvent(7)));
     }
 
     [Fact]
@@ -26,7 +27,7 @@ public class UpcomingEventsListBehindTests
     {
         var component = CreateComponent(activeEnduranceEventCount: 1);
 
-        Assert.False(component.ShowStart());
+        Assert.False(component.ShowStart(CreateUpcomingEvent(7)));
     }
 
     [Fact]
@@ -57,8 +58,8 @@ public class UpcomingEventsListBehindTests
     {
         var component = new TestUpcomingEventsListBehind
         {
-            ActiveCount = activeEnduranceEventCount,
             Service = new TestDashService(),
+            ActiveEventService = new TestEnduranceEventService(activeEnduranceEventCount > 0 ? [connectedEventId ?? 7] : []),
             SocketService = new TestSocketService
             {
                 Event = connectedEventId == null ? null : CreateEnduranceEvent(connectedEventId.Value),
@@ -88,12 +89,7 @@ public class UpcomingEventsListBehindTests
 
     sealed class TestUpcomingEventsListBehind : UpcomingEventsListBehind
     {
-        public int ActiveCount
-        {
-            set => ActiveEnduranceEventCount = value;
-        }
-
-        public new IDashService Service
+        public IDashService Service
         {
             set => base.DashService = value;
         }
@@ -103,9 +99,14 @@ public class UpcomingEventsListBehindTests
             set => base.SocketService = value;
         }
 
-        public bool ShowStart()
+        public new IEnduranceEventService ActiveEventService
         {
-            return ShowStartButton();
+            set => base.ActiveEventService = value;
+        }
+
+        public bool ShowStart(UpcomingEvent upcomingEvent)
+        {
+            return ShowStartButton(upcomingEvent);
         }
 
         public bool ShowReset(UpcomingEvent upcomingEvent)
@@ -136,6 +137,33 @@ public class UpcomingEventsListBehindTests
         }
 
         public Task Reset()
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    sealed class TestEnduranceEventService : IEnduranceEventService
+    {
+        readonly IReadOnlySet<int> _activeEventIds;
+
+        public TestEnduranceEventService(IEnumerable<int> activeEventIds)
+        {
+            _activeEventIds = activeEventIds.ToHashSet();
+        }
+
+        public IEventSubscriber ObservableEvent { get; } = new Event();
+
+        public bool IsActive(UpcomingEvent upcomingEvent)
+        {
+            return _activeEventIds.Contains(upcomingEvent.Id);
+        }
+
+        public Task<IEnumerable<EnduranceEvent>> GetEvents()
+        {
+            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+        }
+
+        public Task Load()
         {
             return Task.CompletedTask;
         }

@@ -101,12 +101,16 @@ public class HandoutsService
         var handout = new Handout(participation);
         var document = new HandoutDocument(handout, enduranceEvent, officials);
 
-        await _semaphore.WaitAsync(); // TODO: Create LockHelper to encapsulate semaphore releases
-
-        await _handoutRepository.Delete(x => x.Participation == participation);
-        await _handoutRepository.Create(handout);
-        State.AddOrReplace(document);
-
-        _semaphore.Release();
+        await _semaphore.WaitAsync();
+        try
+        {
+            await _handoutRepository.Delete(x => x.Participation == participation);
+            await _handoutRepository.Create(handout);
+            State.AddOrReplace(document);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 }

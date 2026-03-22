@@ -571,7 +571,7 @@ public class HandoutModel : IEventScopedDocument, ISoftDeletableDocument, IKrudM
 
     public Handout MapToEntity()
     {
-        return new Handout(Participation.MapToEntity(), Id);
+        return new Handout(Participation.MapToEntity());
     }
 }
 
