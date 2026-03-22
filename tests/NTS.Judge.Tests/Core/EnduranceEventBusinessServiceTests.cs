@@ -64,6 +64,23 @@ public class EnduranceEventBusinessServiceTests
     }
 
     [Fact]
+    public async Task Start_WhenParticipationHasFutureStartTimeOverride_CreatesParticipationWithOverrideStartTime()
+    {
+        var overrideStart = DateTimeOffset.Now.AddHours(2);
+        var participations = new RecordingRepository<CoreParticipationModel>();
+        var service = CreateService(
+            [CreateValidEventModel(2, competitionStart: DateTimeOffset.Now.AddHours(-2), startTimeOverride: overrideStart)],
+            participations: participations,
+            rankings: new RecordingRepository<CoreRankingModel>()
+        );
+
+        await service.Start(2);
+
+        var createdParticipation = Assert.Single(participations.CreatedItems);
+        Assert.Equal(overrideStart.ToUniversalTime(), createdParticipation.Phases[0].StartTime);
+    }
+
+    [Fact]
     public async Task Start_WhenUpcomingEventIdMissing_ThrowsGuardException()
     {
         var service = CreateService([CreateValidEventModel(1)]);
@@ -90,12 +107,26 @@ public class EnduranceEventBusinessServiceTests
         );
     }
 
-    static SetupUpcomingEventModel CreateValidEventModel(int id, int? competitionId = null, int? participationNumber = null)
+    static SetupUpcomingEventModel CreateValidEventModel(
+        int id,
+        int? competitionId = null,
+        int? participationNumber = null,
+        DateTimeOffset? competitionStart = null,
+        DateTimeOffset? startTimeOverride = null
+    )
     {
-        return SetupUpcomingEventModel.From(CreateValidEvent(id, competitionId, participationNumber));
+        return SetupUpcomingEventModel.From(
+            CreateValidEvent(id, competitionId, participationNumber, competitionStart, startTimeOverride)
+        );
     }
 
-    static UpcomingEvent CreateValidEvent(int id, int? competitionId = null, int? participationNumber = null)
+    static UpcomingEvent CreateValidEvent(
+        int id,
+        int? competitionId = null,
+        int? participationNumber = null,
+        DateTimeOffset? competitionStart = null,
+        DateTimeOffset? startTimeOverride = null
+    )
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
         var athlete = new Athlete(new Person(["John", "Doe"]), null, country, null, id * 10 + 1);
@@ -107,7 +138,7 @@ public class EnduranceEventBusinessServiceTests
             isNotRanked: false,
             combination: combination,
             category: ParticipationCategory.Senior,
-            startTimeOverride: null,
+            startTimeOverride: startTimeOverride,
             maxSpeedOverride: null,
             minSpeedOverride: null,
             id: id * 10 + 1
@@ -116,7 +147,7 @@ public class EnduranceEventBusinessServiceTests
             $"Competition {id}",
             CompetitionType.Qualification,
             CompetitionRuleset.FEI,
-            DateTimeOffset.UtcNow.AddHours(id),
+            competitionStart ?? DateTimeOffset.UtcNow.AddHours(id),
             null,
             null,
             null,

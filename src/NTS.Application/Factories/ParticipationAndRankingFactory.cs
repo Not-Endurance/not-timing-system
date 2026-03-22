@@ -64,7 +64,7 @@ public static class ParticipationAndRankingFactory
         int eventId
     )
     {
-        var phases = CreatePhases(setupCompetition);
+        var phases = CreatePhases(setupCompetition, setupParticipation);
         var totalDistance = setupCompetition.Phases.Sum(x => (decimal)x.Loop!.Distance);
         var combination = CreateCombination(
             setupParticipation.Combination,
@@ -108,9 +108,13 @@ public static class ParticipationAndRankingFactory
         );
     }
 
-    static List<Phase> CreatePhases(Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition)
+    static List<Phase> CreatePhases(
+        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
+        Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation
+    )
     {
-        DateTimeOffset? startTime = setupCompetition.Start.ToUniversalTime();
+        DateTimeOffset? startTime =
+            setupParticipation.StartTimeOverride?.ToUniversalTime() ?? setupCompetition.Start.ToUniversalTime();
         var setupPhases = setupCompetition.Phases;
         var phases = new List<Phase>();
         foreach (var setupPhase in setupPhases)
