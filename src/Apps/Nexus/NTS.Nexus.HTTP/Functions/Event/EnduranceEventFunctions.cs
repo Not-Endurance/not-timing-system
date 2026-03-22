@@ -6,6 +6,8 @@ using NTS.Application.Core;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
+using Not.Structures;
+using Not.Domain.Exceptions;
 
 namespace NTS.Nexus.HTTP.Functions.Event;
 
@@ -13,17 +15,20 @@ public class EnduranceEventFunctions : FunctionBase
 {
     readonly IRepository<EnduranceEventModel> _events;
     readonly IEnduranceEventResetService _resetService;
+    readonly IEnduranceEventBusinessService _businessService;
 
     public EnduranceEventFunctions(
         IFunctionLogger<EnduranceEventFunctions> logger,
         IRepository<EnduranceEventModel> events,
         IEnduranceEventResetService resetService,
+        IEnduranceEventBusinessService businessService,
         ITelemetryService telemetry
     )
         : base(logger, telemetry)
     {
         _events = events;
         _resetService = resetService;
+        _businessService = businessService;
     }
 
     [Function("endurance-event-create")]
@@ -127,5 +132,27 @@ public class EnduranceEventFunctions : FunctionBase
 
         await _resetService.Reset(id);
         return Ok();
+    }
+
+    [Function("endurance-event-start")]
+    public async Task<IActionResult> Start(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "endurance-event/{id:int}/start")]
+            HttpRequest request,
+        int id
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(Start));
+        TagRequest(request);
+        LogInformation(request, nameof(Start));
+
+        try
+        {
+            var startedEvent = await _businessService.Start(id);
+            return Ok(Result.Success(startedEvent));
+        }
+        catch (DomainException ex)
+        {
+            return Ok(Result.Failure<EnduranceEventModel>(ex.Message));
+        }
     }
 }

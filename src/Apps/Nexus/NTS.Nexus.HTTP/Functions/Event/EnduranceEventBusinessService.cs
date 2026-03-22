@@ -1,67 +1,49 @@
 using System.Text;
-using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Injection;
-using Not.Structures;
+using CoreEnduranceEventModel = NTS.Application.Core.EnduranceEventModel;
+using CoreOfficialModel = NTS.Application.Core.OfficialModel;
+using CoreParticipationModel = NTS.Application.Core.ParticipationModel;
+using CoreRankingModel = NTS.Application.Core.RankingModel;
 using NTS.Application.Factories;
+using SetupUpcomingEventModel = NTS.Application.Setup.UpcomingEventModel;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
 
-namespace NTS.Judge.Features;
+namespace NTS.Nexus.HTTP.Functions.Event;
 
-public class StartBusinessService : IStartBusiness
+public interface IEnduranceEventBusinessService
 {
-    readonly IRepository<UpcomingEvent> _upcomingEvents;
-    readonly IRepository<EnduranceEvent> _enduranceEvents;
-    readonly IRepository<Official> _coreOfficialRepository;
-    readonly IRepository<Participation> _participationRepository;
-    readonly IRepository<Ranking> _rankingRepository;
+    Task<CoreEnduranceEventModel> Start(int upcomingEventId);
+}
 
-    public StartBusinessService(
-        IRepository<UpcomingEvent> upcomingEvents,
-        IRepository<EnduranceEvent> coreEventRepository,
-        IRepository<Official> coreOfficialRepository,
-        IRepository<Participation> participationRepository,
-        IRepository<Ranking> rankingRepository
+public class EnduranceEventBusinessService : IEnduranceEventBusinessService, ITransient
+{
+    readonly IRepository<SetupUpcomingEventModel> _upcomingEvents;
+    readonly IRepository<CoreEnduranceEventModel> _enduranceEvents;
+    readonly IRepository<CoreOfficialModel> _officials;
+    readonly IRepository<CoreParticipationModel> _participations;
+    readonly IRepository<CoreRankingModel> _rankings;
+
+    public EnduranceEventBusinessService(
+        IRepository<SetupUpcomingEventModel> upcomingEvents,
+        IRepository<CoreEnduranceEventModel> enduranceEvents,
+        IRepository<CoreOfficialModel> officials,
+        IRepository<CoreParticipationModel> participations,
+        IRepository<CoreRankingModel> rankings
     )
     {
         _upcomingEvents = upcomingEvents;
-        _enduranceEvents = coreEventRepository;
-        _coreOfficialRepository = coreOfficialRepository;
-        _participationRepository = participationRepository;
-        _rankingRepository = rankingRepository;
+        _enduranceEvents = enduranceEvents;
+        _officials = officials;
+        _participations = participations;
+        _rankings = rankings;
     }
 
-    public async Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId)
-    {
-        var setupEvent = await GetSetupEvent(upcomingEventId);
-        return StartValidator.Validate(setupEvent);
-    }
-
-    public async Task DeleteParticipation(int upcomingEventId, int participationNumber, int competitionId)
-    {
-        var setupEvent = await GetSetupEvent(upcomingEventId);
-        var competition = setupEvent.Competitions.FirstOrDefault(x => x.Id == competitionId);
-        if (competition == null)
-        {
-            throw GuardHelper.Exception($"Competition with id '{competitionId}' does not exist");
-        }
-
-        var participation = competition.Participations.FirstOrDefault(x => x.Combination.Number == participationNumber);
-        if (participation == null)
-        {
-            return;
-        }
-
-        competition.Remove(participation);
-        await _upcomingEvents.Update(setupEvent);
-    }
-
-    public async Task<EnduranceEvent> CreateEnduranceEvent(int upcomingEventId)
+    public async Task<CoreEnduranceEventModel> Start(int upcomingEventId)
     {
         await EnsureEnduranceEventNotStarted(upcomingEventId);
 
@@ -73,32 +55,31 @@ public class StartBusinessService : IStartBusiness
             throw new DomainException(CreateStartValidationMessage(issues));
         }
 
-        // TODO: Convert this to FeiStartValidationRule (IStartValidationRule)
         ValidateFeiConfiguration(setupEvent);
 
         var enduranceEvent = EnduranceEventFactory.Create(setupEvent);
-        await _enduranceEvents.Create(enduranceEvent);
+        var enduranceEventModel = CoreEnduranceEventModel.From(enduranceEvent);
+        await _enduranceEvents.Create(enduranceEventModel);
 
-        return enduranceEvent;
-    }
+        var officials = setupEvent.Officials.Select(x =>
+            CoreOfficialModel.MapFrom(OfficialFactory.Create(x, setupEvent.Id))
+        );
+        var (participations, rankings) = CreateParticipationsAndRankings(setupEvent);
 
-    public async Task StartEnduranceEvent(int upcomingEventId)
-    {
-        var upcomingEvent = await GetSetupEvent(upcomingEventId);
-        var officials = upcomingEvent.Officials.Select(x => OfficialFactory.Create(x, upcomingEvent.Id));
-        var (participations, rankings) = CreateParticipationsAndRankings(upcomingEvent);
         foreach (var official in officials)
         {
-            await _coreOfficialRepository.Create(official);
+            await _officials.Create(official);
         }
-        foreach (var participation in participations)
+        foreach (var participation in participations.Select(CoreParticipationModel.MapFrom))
         {
-            await _participationRepository.Create(participation);
+            await _participations.Create(participation);
         }
-        foreach (var ranking in rankings)
+        foreach (var ranking in rankings.Select(CoreRankingModel.From))
         {
-            await _rankingRepository.Create(ranking);
+            await _rankings.Create(ranking);
         }
+
+        return enduranceEventModel;
     }
 
     static string CreateStartValidationMessage(IReadOnlyList<StartValidationIssue> issues)
@@ -121,10 +102,11 @@ public class StartBusinessService : IStartBusiness
         return validationBuilder.ToString().TrimEnd();
     }
 
-    async Task<UpcomingEvent> GetSetupEvent(int upcomingEventId)
+    async Task<Domain.Setup.Aggregates.UpcomingEvent> GetSetupEvent(int upcomingEventId)
     {
         var upcomingEvent = await _upcomingEvents.Read(upcomingEventId);
-        return upcomingEvent ?? throw GuardHelper.Exception($"Event with id '{upcomingEventId}' is not selected");
+        return upcomingEvent?.MapToEntity()
+            ?? throw GuardHelper.Exception($"Event with id '{upcomingEventId}' is not selected");
     }
 
     async Task EnsureEnduranceEventNotStarted(int upcomingEventId)
@@ -138,7 +120,10 @@ public class StartBusinessService : IStartBusiness
         }
     }
 
-    (IEnumerable<Participation>, IEnumerable<Ranking>) CreateParticipationsAndRankings(UpcomingEvent setupEvent)
+    (
+        IEnumerable<Participation> Participations,
+        IEnumerable<Ranking> Rankings
+    ) CreateParticipationsAndRankings(Domain.Setup.Aggregates.UpcomingEvent setupEvent)
     {
         var participations = new List<Participation>();
         var rankings = new List<Ranking>();
@@ -160,7 +145,7 @@ public class StartBusinessService : IStartBusiness
         return (participations, rankings);
     }
 
-    Ranking CreateRanking(
+    static Ranking CreateRanking(
         Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
         KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory,
         int eventId
@@ -179,7 +164,7 @@ public class StartBusinessService : IStartBusiness
         );
     }
 
-    void ValidateFeiConfiguration(UpcomingEvent setupEvent)
+    static void ValidateFeiConfiguration(Domain.Setup.Aggregates.UpcomingEvent setupEvent)
     {
         if (
             !string.IsNullOrWhiteSpace(setupEvent.FeiId)
@@ -244,12 +229,4 @@ public class StartBusinessService : IStartBusiness
             }
         }
     }
-}
-
-public interface IStartBusiness : ITransient
-{
-    Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId);
-    Task DeleteParticipation(int upcomingEventId, int participationNumber, int competitionId);
-    Task<EnduranceEvent> CreateEnduranceEvent(int upcomingEventId);
-    Task StartEnduranceEvent(int upcomingEventId);
 }

@@ -1,9 +1,13 @@
 using Not.Application.HTTP;
+using Not.Domain.Exceptions;
 using Not.Injection;
+using Not.Exceptions;
+using Not.Serialization.JSON;
 using Not.Storage.REST;
 using NTS.Application.Core;
 using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
+using Not.Structures;
 
 namespace NTS.Storage.Core.Repositories;
 
@@ -18,6 +22,19 @@ public class EnduranceEventRestRepository
         : base("endurance-event", client)
     {
         _socketContext = socketContext;
+    }
+
+    public async Task<EnduranceEvent> Start(int upcomingEventId)
+    {
+        var response = await Client.Post($"{Endpoint}/{upcomingEventId}/start", new StartEnduranceEventRequest());
+        var result = response.FromJson<Result<EnduranceEventModel>>();
+        if (result.IsError)
+        {
+            throw new DomainException(string.Join(Environment.NewLine, result.Errors));
+        }
+
+        var enduranceEvent = result.Data?.MapToEntity();
+        return enduranceEvent ?? throw GuardHelper.Exception("Endurance event start returned no event payload.");
     }
 
     /// <summary>
@@ -37,4 +54,6 @@ public class EnduranceEventRestRepository
 
         await Client.Delete($"{Endpoint}/{eventId.Value}/reset");
     }
+
+    sealed class StartEnduranceEventRequest { }
 }
