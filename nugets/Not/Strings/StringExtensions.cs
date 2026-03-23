@@ -56,5 +56,5 @@ public static class StringExtensions
         }
     }
 
-    static INotifier Notifier => ServiceLocator.Get<INotifier>();
+    static INotifier Notifier => ServiceLocator.GetRequired<INotifier>();
 }

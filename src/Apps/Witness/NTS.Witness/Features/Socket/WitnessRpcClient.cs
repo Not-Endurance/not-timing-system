@@ -4,7 +4,7 @@ using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Exceptions;
 using Not.Injection;
-using NTS.Application.Socket;
+using NTS.Application.UserSession;
 using NTS.Application.Watcher;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Watcher;
@@ -17,22 +17,22 @@ namespace NTS.Witness.Features.Socket;
 public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPublisher, IScoped
 {
     readonly IRpcSocket _socket;
-    readonly INtsSocketService _eventContext;
+    readonly IWitnessUserSession _userSessionService;
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
     public WitnessRpcClient(
         IRpcSocket socket,
-        INtsSocketService eventContext,
+        IWitnessUserSession userSessionService,
         IDomainEventDispatcher domainEventDispatcher
     )
         : base(socket)
     {
         _socket = socket;
-        _eventContext = eventContext;
+        _userSessionService = userSessionService;
         _domainEventDispatcher = domainEventDispatcher;
     }
 
-    public override void RunAtStartup()
+    protected override void RegisterProcedures()
     {
         RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
         RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
@@ -41,11 +41,12 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPu
 
     public async Task PublishSnapshotsAsync(SnapshotGroup snapshotGroup)
     {
-        GuardHelper.ThrowIfDefault(_eventContext.Event);
+        var session = await _userSessionService.GetCurrent();
+        GuardHelper.ThrowIfDefault(session?.EventId);
         GuardHelper.ThrowIfDefault(_socket.Connection);
 
         var model = SnapshotGroupModel.MapFrom(snapshotGroup);
-        var request = WarpRequest.Create(_eventContext.Event.Id.ToString(), model);
+        var request = WarpRequest.Create(session.EventId.Value.ToString(), model);
         await _socket.Connection.InvokeAsync(nameof(IWitnessHubProcedures.Receive), request);
     }
 

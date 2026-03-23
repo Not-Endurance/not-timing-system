@@ -1,12 +1,12 @@
 {
   "profiles": {
-    "Localhost": {
+    "Development": {
       "commandName": "Project",
       "launchBrowser": true,
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-      },
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     },
     "Staging": {
       "commandName": "Project",
@@ -14,7 +14,7 @@
       "launchUrl": "?environment=Staging",
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "ASPNETCORE_ENVIRONMENT": "Staging"
       }
     },
     "Production": {
@@ -23,7 +23,7 @@
       "launchUrl": "?environment=Production",
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production",
+        "ASPNETCORE_ENVIRONMENT": "Production"
       }
     }
   },

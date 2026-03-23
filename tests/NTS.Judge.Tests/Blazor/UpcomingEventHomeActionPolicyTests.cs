@@ -192,6 +192,11 @@ public class UpcomingEventsListBehindTests
             return Task.CompletedTask;
         }
 
+        public Task<bool> WillResetSession(EnduranceEvent enduranceEvent)
+        {
+            return Task.FromResult(false);
+        }
+
         public Task Load()
         {
             return Task.CompletedTask;

@@ -1,233 +1,105 @@
-using Microsoft.AspNetCore.Components.Authorization;
 using Not.Application.Authentication.Abstractions;
-using Not.Application.Authentication.User;
 using Not.Injection;
 using NTS.Application.UserSession;
 using NTS.Application.Watcher;
-using NTS.Domain.Core;
 using NTS.Domain.Watcher;
 
 namespace NTS.Witness.Features.Sessions;
 
-public class WitnessUserSessionService : IUserSessionService, IScoped
+public class WitnessUserSessionService : IWitnessUserSession, IScoped
 {
-    readonly AuthenticationStateProvider _authStateProvider;
-    readonly IUserRegister _userRegister;
-    readonly IUserSessionRepository _sessions;
-    NUserModel? _currentUser;
-    string? _currentUserIdentifier;
-    string? _currentEmail;
+    readonly INUserSession _nUserSessionService;
+    readonly INtsUserSessionRepository _userSessions;
 
     public WitnessUserSessionService(
-        AuthenticationStateProvider authStateProvider,
-        IUserRegister userRegister,
-        IUserSessionRepository sessions
+        INUserSession nUserSessionService,
+        INtsUserSessionRepository userSessions
     )
     {
-        _authStateProvider = authStateProvider;
-        _userRegister = userRegister;
-        _sessions = sessions;
+        _nUserSessionService = nUserSessionService;
+        _userSessions = userSessions;
     }
 
-    public async Task<ICoreSession?> GetCurrent()
+    public async Task<NtsUserSessionModel?> GetCurrent()
     {
-        var context = await ResolveCurrentUserContext();
-        if (context == null)
-        {
-            return null;
-        }
-
-        return await ResolveCurrentSession(context);
+        return (await _nUserSessionService.GetCurrent<NtsUserSessionModel>())?.State;
     }
 
     public async Task SetEventId(int? eventId)
-    {
-        var context = await ResolveCurrentUserContext();
-        if (context == null)
-        {
-            return;
-        }
-
-        var session = await ResolveCurrentSession(context);
-        if (session == null)
-        {
-            if (eventId == null)
-            {
-                return;
-            }
-
-            await _sessions.Create(CreateSession(context, eventId: eventId));
-            return;
-        }
-
-        ResetHistoryOnEventChange(session, eventId);
-        await _sessions.Update(session);
-    }
-
-    public async Task AppendSnapshot(SnapshotGroup snapshot)
-    {
-        ArgumentNullException.ThrowIfNull(snapshot);
-
-        var context = await ResolveCurrentUserContext();
-        if (context == null)
-        {
-            return;
-        }
-
-        var session = await ResolveCurrentSession(context);
-        if (session == null)
-        {
-            session = CreateSession(context, snapshot: snapshot);
-            await _sessions.Create(session);
-            return;
-        }
-
-        session.SnapshotHistory = [.. session.SnapshotHistory, SnapshotGroupModel.MapFrom(snapshot)];
-        await _sessions.Update(session);
-    }
-
-    public async Task DeleteCurrent()
-    {
-        var context = await ResolveCurrentUserContext();
-        if (context == null)
-        {
-            return;
-        }
-
-        var session = await ResolveCurrentSession(context);
-        if (session == null)
-        {
-            return;
-        }
-
-        await _sessions.Delete(session);
-    }
-
-    static void ResetHistoryOnEventChange(UserSessionModel session, int? eventId)
     {
         if (eventId == null)
         {
             return;
         }
 
-        if (session.EventId != null && session.EventId != eventId)
+        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionModel>();
+        if (userSession == null)
         {
-            session.SnapshotHistory = [];
+            return;
         }
 
-        session.EventId = eventId;
+        var currentSession = userSession.State;
+        if (currentSession?.EventId == eventId)
+        {
+            return;
+        }
+
+        if (currentSession != null)
+        {
+            await _userSessions.Delete(currentSession);
+        }
+
+        await _userSessions.Create(CreateSession(userSession, eventId: eventId));
     }
 
-    static UserSessionModel CreateSession(
-        ResolvedUserContext context,
-        int? eventId = null,
-        SnapshotGroup? snapshot = null
-    )
+    public async Task AppendSnapshot(SnapshotGroup snapshot)
     {
-        return new UserSessionModel
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionModel>();
+        if (userSession == null)
         {
-            Id = context.User.Id,
-            UserIdentifier = context.UserIdentifier,
+            return;
+        }
+
+        var currentSession = userSession.State;
+        if (currentSession == null)
+        {
+            currentSession = CreateSession(userSession, snapshot: snapshot);
+            await _userSessions.Create(currentSession);
+            return;
+        }
+
+        currentSession.SnapshotHistory = [.. currentSession.SnapshotHistory, SnapshotGroupModel.MapFrom(snapshot)];
+        await _userSessions.Update(currentSession);
+    }
+
+    public async Task DeleteCurrent()
+    {
+        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionModel>();
+        if (userSession == null)
+        {
+            return;
+        }
+
+        var currentSession = userSession.State;
+        if (currentSession == null)
+        {
+            return;
+        }
+
+        await _userSessions.Delete(currentSession);
+    }
+
+    static NtsUserSessionModel CreateSession(INUserSessionModel userSession, int? eventId = null, SnapshotGroup? snapshot = null)
+    {
+        return new NtsUserSessionModel
+        {
+            Id = userSession.User.Id,
+            UserIdentifier = userSession.UserIdentifier,
             EventId = eventId,
             SnapshotHistory = snapshot == null ? [] : [SnapshotGroupModel.MapFrom(snapshot)],
         };
     }
 
-    void ClearCurrentUserCache()
-    {
-        _currentUser = null;
-        _currentUserIdentifier = null;
-        _currentEmail = null;
-    }
-
-    async Task<UserSessionModel?> ResolveCurrentSession(ResolvedUserContext context)
-    {
-        var session = await _sessions.ReadByUserIdentifier(context.UserIdentifier);
-        if (session != null)
-        {
-            return session;
-        }
-
-        session = await _sessions.Read(context.User.Id);
-        if (session == null)
-        {
-            return null;
-        }
-
-        if (
-            !string.IsNullOrWhiteSpace(session.UserIdentifier)
-            && !string.Equals(session.UserIdentifier, context.UserIdentifier, StringComparison.Ordinal)
-        )
-        {
-            return null;
-        }
-
-        if (!string.Equals(session.UserIdentifier, context.UserIdentifier, StringComparison.Ordinal))
-        {
-            session.UserIdentifier = context.UserIdentifier;
-            await _sessions.Update(session);
-        }
-
-        return session;
-    }
-
-    async Task<ResolvedUserContext?> ResolveCurrentUserContext()
-    {
-        var authState = await _authStateProvider.GetAuthenticationStateAsync();
-        var principal = authState.User;
-        if (principal.Identity?.IsAuthenticated != true)
-        {
-            ClearCurrentUserCache();
-            return null;
-        }
-
-        var registration = NUserClaimsHelper.ResolveRegistration(principal);
-        var userIdentifier = NUserClaimsHelper.ResolveUserIdentifier(principal);
-        if (registration == null || string.IsNullOrWhiteSpace(userIdentifier))
-        {
-            ClearCurrentUserCache();
-            return null;
-        }
-
-        if (
-            _currentUser != null
-            && string.Equals(_currentUserIdentifier, userIdentifier, StringComparison.Ordinal)
-            && string.Equals(_currentEmail, registration.Email, StringComparison.OrdinalIgnoreCase)
-        )
-        {
-            return new ResolvedUserContext(userIdentifier, _currentUser);
-        }
-
-        _currentUserIdentifier = userIdentifier;
-        _currentEmail = registration.Email;
-        _currentUser = null;
-
-        var userResult = await _userRegister.Get(registration.Email);
-        if (!userResult.IsError && userResult.Data != null)
-        {
-            _currentUser = userResult.Data;
-            return new ResolvedUserContext(userIdentifier, _currentUser);
-        }
-
-        var registerResult = await _userRegister.Register(registration);
-        if (registerResult.IsError || registerResult.Data == null)
-        {
-            return null;
-        }
-
-        _currentUser = registerResult.Data;
-        return new ResolvedUserContext(userIdentifier, _currentUser);
-    }
-
-    sealed class ResolvedUserContext
-    {
-        public ResolvedUserContext(string userIdentifier, NUserModel user)
-        {
-            UserIdentifier = userIdentifier;
-            User = user;
-        }
-
-        public string UserIdentifier { get; }
-        public NUserModel User { get; }
-    }
 }

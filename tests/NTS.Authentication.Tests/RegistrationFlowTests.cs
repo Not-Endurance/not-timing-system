@@ -11,14 +11,12 @@ using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.CRUD.Ports;
 using Not.Structures;
-using NTS.Application.UserSession;
 using NTS.Nexus.HTTP.Functions;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Models;
 using NTS.Nexus.HTTP.Mongo.Repositories;
 using NTS.Nexus.HTTP.Telemetry;
 using NTS.Witness.Contracts.API;
-using NTS.Witness.Features.Sessions;
 
 namespace NTS.Authentication.Tests;
 
@@ -127,7 +125,7 @@ public class RegistrationFlowTests
     }
 
     [Fact]
-    public async Task Witness_user_session_registers_first_time_user_with_claim_name()
+    public async Task N_user_session_registers_first_time_user_with_claim_name()
     {
         var users = new RecordingUserRegister
         {
@@ -151,16 +149,42 @@ public class RegistrationFlowTests
                 new Claim("country", "Bulgaria")
             )
         );
-        var service = new WitnessUserSessionService(authStateProvider, users, new RecordingUserSessionRepository());
+        var service = new NUserSessionService(authStateProvider, users, new StaticServiceProvider());
 
-        var current = await service.GetCurrent();
+        var current = await service.GetCurrent<object>();
 
-        Assert.Null(current);
+        var session = Assert.IsAssignableFrom<INUserSessionModel<object>>(current);
+        Assert.Equal("entra-1", session.UserIdentifier);
+        Assert.Equal("new.user@example.com", session.User.Email);
+        Assert.Null(session.State);
         Assert.Equal(
             new NUserRegistration("new.user@example.com", "Jane Doe", "Jane", "Doe", "Bulgaria"),
             users.LastRegistration
         );
         Assert.Equal(1, users.RegisterCalls);
+    }
+
+    [Fact]
+    public async Task N_user_session_reads_registered_session_state_by_user_identifier()
+    {
+        var users = new RecordingUserRegister
+        {
+            GetResult = Result.Success(new NUserModel("existing.user@example.com", id: 7)),
+        };
+        var authStateProvider = new StaticAuthenticationStateProvider(
+            CreatePrincipal(new Claim(ClaimTypes.Email, "existing.user@example.com"), new Claim("oid", "entra-1"))
+        );
+        var expected = new TestSessionState("entra-1", 23);
+        var repository = new RecordingSessionStateRepository { ReadByUserIdentifierResult = expected };
+        var serviceProvider = new StaticServiceProvider().Add<IUserSessionRepository<TestSessionState>>(repository);
+        var service = new NUserSessionService(authStateProvider, users, serviceProvider);
+
+        var current = await service.GetCurrent<TestSessionState>();
+
+        var session = Assert.IsAssignableFrom<INUserSessionModel<TestSessionState>>(current);
+        Assert.Equal("entra-1", session.UserIdentifier);
+        Assert.Same(expected, session.State);
+        Assert.Equal(1, repository.ReadByUserIdentifierCalls);
     }
 
     [Fact]
@@ -320,61 +344,45 @@ public class RegistrationFlowTests
         }
     }
 
-    sealed class RecordingUserSessionRepository : IUserSessionRepository
+    sealed class RecordingSessionStateRepository : IUserSessionRepository<TestSessionState>
     {
-        public Task Create(NTS.Application.Watcher.UserSessionModel item)
+        public TestSessionState? ReadByUserIdentifierResult { get; init; }
+        public int ReadByUserIdentifierCalls { get; private set; }
+
+        public Task<TestSessionState?> ReadByUserIdentifier(string userIdentifier)
         {
-            return Task.CompletedTask;
+            ReadByUserIdentifierCalls++;
+            return Task.FromResult(ReadByUserIdentifierResult);
+        }
+    }
+
+    sealed class StaticServiceProvider : IServiceProvider
+    {
+        readonly Dictionary<Type, object> _services = [];
+
+        public StaticServiceProvider Add<TService>(TService service)
+            where TService : class
+        {
+            _services[typeof(TService)] = service;
+            return this;
         }
 
-        public Task<NTS.Application.Watcher.UserSessionModel?> ReadByUserIdentifier(string userIdentifier)
+        public object? GetService(Type serviceType)
         {
-            return Task.FromResult<NTS.Application.Watcher.UserSessionModel?>(null);
+            return _services.TryGetValue(serviceType, out var service) ? service : null;
+        }
+    }
+
+    sealed class TestSessionState
+    {
+        public TestSessionState(string userIdentifier, int eventId)
+        {
+            UserIdentifier = userIdentifier;
+            EventId = eventId;
         }
 
-        public Task<NTS.Application.Watcher.UserSessionModel?> Read(int id)
-        {
-            return Task.FromResult<NTS.Application.Watcher.UserSessionModel?>(null);
-        }
-
-        public Task<NTS.Application.Watcher.UserSessionModel?> Read(
-            Expression<Func<NTS.Application.Watcher.UserSessionModel, bool>> filter
-        )
-        {
-            return Task.FromResult<NTS.Application.Watcher.UserSessionModel?>(null);
-        }
-
-        public Task<IEnumerable<NTS.Application.Watcher.UserSessionModel>> ReadMany()
-        {
-            return Task.FromResult<IEnumerable<NTS.Application.Watcher.UserSessionModel>>([]);
-        }
-
-        public Task<IEnumerable<NTS.Application.Watcher.UserSessionModel>> ReadMany(
-            Expression<Func<NTS.Application.Watcher.UserSessionModel, bool>> filter
-        )
-        {
-            return Task.FromResult<IEnumerable<NTS.Application.Watcher.UserSessionModel>>([]);
-        }
-
-        public Task Update(NTS.Application.Watcher.UserSessionModel item)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(NTS.Application.Watcher.UserSessionModel item)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(IEnumerable<NTS.Application.Watcher.UserSessionModel> items)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(Expression<Func<NTS.Application.Watcher.UserSessionModel, bool>> filter)
-        {
-            return Task.CompletedTask;
-        }
+        public string UserIdentifier { get; }
+        public int EventId { get; }
     }
 
     sealed class RecordingUserRepository : IUserRepository

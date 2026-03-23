@@ -29,12 +29,12 @@ public class JudgeRpcClient
     public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, ITimingService timingService)
         : base(socket)
     {
-        _hubProcedures = new HubProcedures(socket);
         _eventContext = eventContext;
+        _hubProcedures = new HubProcedures(socket);
         _timingService = timingService;
     }
 
-    public override void RunAtStartup()
+    protected override void RegisterProcedures()
     {
         RegisterInputProcedure<SnapshotGroupModel>(nameof(Receive), Receive);
     }

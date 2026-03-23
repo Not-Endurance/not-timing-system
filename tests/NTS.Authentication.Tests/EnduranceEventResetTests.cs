@@ -63,6 +63,7 @@ public class EnduranceEventResetTests
             new TestFunctionLogger(),
             new RecordingRepository<EnduranceEventModel>(),
             resetService,
+            new RecordingEnduranceEventBusinessService(),
             new TestTelemetryService()
         );
         var request = CreateRequest(HttpMethods.Delete, "/api/endurance-event/19/reset");
@@ -106,6 +107,14 @@ public class EnduranceEventResetTests
         {
             LastEventId = eventId;
             return Task.CompletedTask;
+        }
+    }
+
+    sealed class RecordingEnduranceEventBusinessService : IEnduranceEventBusinessService
+    {
+        public Task<EnduranceEventModel> Start(int upcomingEventId)
+        {
+            return Task.FromResult(new EnduranceEventModel());
         }
     }
 

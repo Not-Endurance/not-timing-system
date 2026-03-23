@@ -4,7 +4,6 @@ using Not.Blazor.Dialogs.Abstractions;
 using Not.Blazor.Helpers;
 using NTS.Application.Core;
 using NTS.Application.Socket;
-using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.SelectEvents;
@@ -16,9 +15,6 @@ public class SelectEventDialogBehind : NDialog
 
     [Inject]
     INtsSocketService SocketService { get; set; } = default!;
-
-    [Inject]
-    IUserSessionService UserSessionService { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
@@ -44,7 +40,7 @@ public class SelectEventDialogBehind : NDialog
     {
         try
         {
-            if (!await ConfirmEventChangeIfHistoryWillBeRemoved(enduranceEvent))
+            if (!await ConfirmSessionResetIfNeeded(enduranceEvent))
             {
                 return;
             }
@@ -78,14 +74,9 @@ public class SelectEventDialogBehind : NDialog
         }
     }
 
-    async Task<bool> ConfirmEventChangeIfHistoryWillBeRemoved(EnduranceEvent enduranceEvent)
+    async Task<bool> ConfirmSessionResetIfNeeded(EnduranceEvent enduranceEvent)
     {
-        var session = await UserSessionService.GetCurrent();
-        if (
-            session?.SnapshotHistory.Count is not > 0
-            || session.EventId == null
-            || session.EventId == enduranceEvent.Id
-        )
+        if (!await SocketService.WillResetSession(enduranceEvent))
         {
             return true;
         }

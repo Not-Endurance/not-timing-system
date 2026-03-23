@@ -7,14 +7,14 @@ using NTS.Application.Watcher;
 namespace NTS.Storage.REST;
 
 public class UserSessionRestApiRepository
-    : RestApiRepository<UserSessionModel, UserSessionModel>,
-        IUserSessionRepository,
+    : RestApiRepository<NtsUserSessionModel, NtsUserSessionModel>,
+        INtsUserSessionRepository,
         ITransient
 {
     public UserSessionRestApiRepository(NHttpClient client)
         : base("user-sessions", client) { }
 
-    public async Task<UserSessionModel?> ReadByUserIdentifier(string userIdentifier)
+    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
     {
         if (string.IsNullOrWhiteSpace(userIdentifier))
         {
@@ -24,7 +24,7 @@ public class UserSessionRestApiRepository
         try
         {
             var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
-            return await Client.GetJson<UserSessionModel>($"{Endpoint}/by-user-identifier/{encodedUserIdentifier}");
+            return await Client.GetJson<NtsUserSessionModel>($"{Endpoint}/by-user-identifier/{encodedUserIdentifier}");
         }
         catch (Exception ex)
         {

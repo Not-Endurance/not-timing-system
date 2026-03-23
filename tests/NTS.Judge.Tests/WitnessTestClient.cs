@@ -13,9 +13,6 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
     public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
         : base(socket)
     {
-        RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
-        RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
-        RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
     }
 
     public int Id { get; }
@@ -45,8 +42,10 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
         return Task.CompletedTask;
     }
 
-    public override void RunAtStartup()
+    protected override void RegisterProcedures()
     {
-        throw new NotImplementedException();
+        RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
+        RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
+        RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
     }
 }

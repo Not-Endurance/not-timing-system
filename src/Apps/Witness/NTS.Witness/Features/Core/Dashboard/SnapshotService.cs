@@ -32,12 +32,12 @@ public class SnapshotService
     readonly List<Participation> _participationsToSnapshot = [];
     readonly ISnapshotPublisher _snapshotPublisher;
     readonly List<Snapshot> _snapshots = [];
-    readonly IUserSessionService _userSessionService;
+    readonly IWitnessUserSession _userSessionService;
 
     public SnapshotService(
         INtsSocketContext socketContext,
         IReadMany<Participation> participationReader,
-        IUserSessionService userSessionService,
+        IWitnessUserSession userSessionService,
         ISnapshotPublisher snapshotPublisher
     )
     {
@@ -69,7 +69,7 @@ public class SnapshotService
         }
 
         _history.Clear();
-        _history.AddRange(session?.SnapshotHistory ?? []);
+        _history.AddRange(session?.GetSnapshotHistory() ?? []);
         Participations.ClearAndAddRange(participations);
 
         return Participations.Any() || _participationsToSnapshot.Any() || _history.Any();

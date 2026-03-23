@@ -35,7 +35,7 @@ services:
       context: ../
       dockerfile: src/Apps/Nexus/NTS.Nexus.HTTP/Dockerfile
     environment:
-      MONGO_CONNECTION_STRING: mongodb://mongodb:27017
+      ConnectionStrings__MongoDB: mongodb://mongodb:27017
       AzureWebJobsStorage: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;"
       OTEL_EXPORTER_OTLP_ENDPOINT: http://aspire-dashboard:18889
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc

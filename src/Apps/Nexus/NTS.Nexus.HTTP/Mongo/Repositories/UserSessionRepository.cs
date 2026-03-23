@@ -6,7 +6,7 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class UserSessionRepository : MongoRepository<UserSessionModel>, IUserSessionRepository
+public class UserSessionRepository : MongoRepository<NtsUserSessionModel>, INtsUserSessionRepository
 {
     readonly ITelemetryService _telemetry;
 
@@ -16,17 +16,17 @@ public class UserSessionRepository : MongoRepository<UserSessionModel>, IUserSes
         _telemetry = telemetry;
     }
 
-    protected override UpdateDefinition<UserSessionModel> GetUpdateDefinition(UserSessionModel document)
+    protected override UpdateDefinition<NtsUserSessionModel> GetUpdateDefinition(NtsUserSessionModel document)
     {
         using var activity = _telemetry.StartActivity(nameof(UserSessionRepository), nameof(GetUpdateDefinition));
 
-        return Builders<UserSessionModel>
+        return Builders<NtsUserSessionModel>
             .Update.Set(x => x.UserIdentifier, document.UserIdentifier)
             .Set(x => x.EventId, document.EventId)
             .Set(x => x.SnapshotHistory, document.SnapshotHistory);
     }
 
-    public async Task<UserSessionModel?> ReadByUserIdentifier(string userIdentifier)
+    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
     {
         using var activity = _telemetry.StartActivity(nameof(UserSessionRepository), nameof(ReadByUserIdentifier));
 

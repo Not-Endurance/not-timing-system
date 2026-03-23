@@ -16,7 +16,11 @@ public class JudgeSocketService : NStatefulService, INtsSocketService, ISingleto
     readonly INotifier _notifier;
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
-    public JudgeSocketService(IRpcSocket socket, INotifier notifier, IDomainEventDispatcher domainEventDispatcher)
+    public JudgeSocketService(
+        IRpcSocket socket,
+        INotifier notifier,
+        IDomainEventDispatcher domainEventDispatcher
+    )
     {
         _socket = socket;
         _notifier = notifier;
@@ -57,6 +61,11 @@ public class JudgeSocketService : NStatefulService, INtsSocketService, ISingleto
         }
         await InternalSetEvent(enduranceEvent);
         await _domainEventDispatcher.Dispatch(new EventConnected(enduranceEvent.Id));
+    }
+
+    public Task<bool> WillResetSession(EnduranceEvent enduranceEvent)
+    {
+        return Task.FromResult(false);
     }
 
     void HandleRpcErrors(object? sender, RpcError rpcError)

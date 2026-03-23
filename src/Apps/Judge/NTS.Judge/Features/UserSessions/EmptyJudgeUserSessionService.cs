@@ -1,11 +1,11 @@
-﻿using Not.Injection;
+using Not.Injection;
 using NTS.Application.UserSession;
-using NTS.Domain.Core;
+using NTS.Application.Watcher;
 using NTS.Domain.Watcher;
 
 namespace NTS.Judge.Features.UserSessions;
 
-internal class EmptyJudgeUserSessionService : IUserSessionService, IScoped
+internal class EmptyJudgeUserSessionService : IWitnessUserSession, IScoped
 {
     public Task AppendSnapshot(SnapshotGroup snapshot)
     {
@@ -17,9 +17,9 @@ internal class EmptyJudgeUserSessionService : IUserSessionService, IScoped
         return Task.CompletedTask;
     }
 
-    public Task<ICoreSession?> GetCurrent()
+    public Task<NtsUserSessionModel?> GetCurrent()
     {
-        return Task.FromResult<ICoreSession?>(null);
+        return Task.FromResult<NtsUserSessionModel?>(null);
     }
 
     public Task SetEventId(int? eventId)

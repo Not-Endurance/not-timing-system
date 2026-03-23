@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -152,6 +153,7 @@ public class EnduranceEventFunctions : FunctionBase
         }
         catch (DomainException ex)
         {
+            Activity.Current.TagException(ex);
             return Ok(Result.Failure<EnduranceEventModel>(ex.Message));
         }
     }

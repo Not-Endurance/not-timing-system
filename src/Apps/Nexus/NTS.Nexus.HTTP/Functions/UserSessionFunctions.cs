@@ -9,13 +9,13 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class UserSessionFunctions : CrudFunctions<UserSessionModel>
+public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
 {
-    readonly IUserSessionRepository _sessions;
+    readonly INtsUserSessionRepository _sessions;
 
     public UserSessionFunctions(
         IFunctionLogger<UserSessionFunctions> logger,
-        IUserSessionRepository sessions,
+        INtsUserSessionRepository sessions,
         ITelemetryService telemetry
     )
         : base(logger, sessions, telemetry)

@@ -3,20 +3,13 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
-using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
-using Not.Events;
 using Not.Structures;
-using NTS.Application.Socket;
 using NTS.Application.UserSession;
 using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Core;
-using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
-using NTS.Witness.Blazor.Features.Sessions;
 using NTS.Witness.Features.Sessions;
 
 namespace NTS.Authentication.Tests;
@@ -63,12 +56,8 @@ public class WitnessSessionIdentityTests
     [Fact]
     public async Task Witness_user_session_persists_user_identifier_on_new_session()
     {
-        var authStateProvider = new StaticAuthenticationStateProvider(
-            CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"))
-        );
-        var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
         var sessions = new RecordingUserSessionRepository();
-        var service = new WitnessUserSessionService(authStateProvider, users, sessions);
+        var service = CreateService(sessions);
 
         await service.SetEventId(17);
 
@@ -79,20 +68,16 @@ public class WitnessSessionIdentityTests
     }
 
     [Fact]
-    public async Task Witness_user_session_reads_by_user_identifier_before_local_user_id()
+    public async Task Witness_user_session_reads_by_user_identifier()
     {
-        var authStateProvider = new StaticAuthenticationStateProvider(
-            CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"))
-        );
-        var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
-        var expected = new UserSessionModel
+        var expected = new NtsUserSessionModel
         {
             Id = 99,
             UserIdentifier = "entra-1",
             EventId = 23,
         };
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = expected };
-        var service = new WitnessUserSessionService(authStateProvider, users, sessions);
+        var service = CreateService(sessions);
 
         var current = await service.GetCurrent();
 
@@ -102,39 +87,33 @@ public class WitnessSessionIdentityTests
     }
 
     [Fact]
-    public async Task Witness_user_session_backfills_legacy_session_with_user_identifier()
+    public async Task Witness_user_session_returns_null_when_repository_has_no_user_identifier_match()
     {
-        var authStateProvider = new StaticAuthenticationStateProvider(
-            CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"))
-        );
-        var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
-        var legacySession = new UserSessionModel { Id = 7, EventId = 5 };
-        var sessions = new RecordingUserSessionRepository { ReadByIdResult = legacySession };
-        var service = new WitnessUserSessionService(authStateProvider, users, sessions);
+        var sessions = new RecordingUserSessionRepository
+        {
+            ReadByIdResult = new NtsUserSessionModel { Id = 7, EventId = 5 },
+        };
+        var service = CreateService(sessions);
 
         var current = await service.GetCurrent();
 
-        Assert.Same(legacySession, current);
-        var updated = Assert.Single(sessions.Updated);
-        Assert.Same(legacySession, updated);
-        Assert.Equal("entra-1", updated.UserIdentifier);
+        Assert.Null(current);
+        Assert.Equal(1, sessions.ReadByUserIdentifierCalls);
+        Assert.Equal(0, sessions.ReadIdCalls);
+        Assert.Empty(sessions.Updated);
     }
 
     [Fact]
     public async Task Witness_user_session_deletes_session_resolved_by_user_identifier()
     {
-        var authStateProvider = new StaticAuthenticationStateProvider(
-            CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"))
-        );
-        var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
-        var expected = new UserSessionModel
+        var expected = new NtsUserSessionModel
         {
             Id = 99,
             UserIdentifier = "entra-1",
             EventId = 23,
         };
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = expected };
-        var service = new WitnessUserSessionService(authStateProvider, users, sessions);
+        var service = CreateService(sessions);
 
         await service.DeleteCurrent();
 
@@ -146,12 +125,13 @@ public class WitnessSessionIdentityTests
     [Fact]
     public async Task Witness_user_session_does_not_create_session_when_identifier_is_missing()
     {
-        var authStateProvider = new StaticAuthenticationStateProvider(
-            CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"))
-        );
         var users = new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
         var sessions = new RecordingUserSessionRepository();
-        var service = new WitnessUserSessionService(authStateProvider, users, sessions);
+        var service = CreateService(
+            sessions,
+            principal: CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com")),
+            users: users
+        );
 
         await service.SetEventId(17);
 
@@ -160,72 +140,78 @@ public class WitnessSessionIdentityTests
     }
 
     [Fact]
-    public async Task Witness_user_session_initialize_disconnects_when_current_user_has_no_session()
+    public async Task Witness_user_session_keeps_existing_session_for_same_event()
     {
-        var sessionService = new SequenceUserSessionService(new UserSessionModel { EventId = 1 }, null);
-        var events = new RecordingEnduranceEventRepository(CreateEnduranceEvent(1));
-        var socket = new RecordingSocketService();
-        var session = new WitnessUserSession(sessionService, events, socket);
+        var existing = new NtsUserSessionModel
+        {
+            Id = 7,
+            UserIdentifier = "entra-1",
+            EventId = 23,
+        };
+        var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = existing };
+        var service = CreateService(sessions);
 
-        await session.Initialize();
-        await session.Initialize();
+        await service.SetEventId(23);
 
-        Assert.Equal([1], socket.ConnectCalls);
-        Assert.Equal(1, socket.DisconnectCalls);
-        Assert.Null(socket.Event);
+        Assert.Empty(sessions.Created);
+        Assert.Empty(sessions.Deleted);
+        Assert.Empty(sessions.Updated);
     }
 
     [Fact]
-    public async Task Witness_user_session_initialize_reconnects_when_session_event_changes()
+    public async Task Witness_user_session_replaces_existing_session_for_different_event()
     {
-        var sessionService = new SequenceUserSessionService(
-            new UserSessionModel { EventId = 1 },
-            new UserSessionModel { EventId = 2 }
+        var existing = new NtsUserSessionModel
+        {
+            Id = 7,
+            UserIdentifier = "entra-1",
+            EventId = 5,
+        };
+        var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = existing };
+        var service = CreateService(sessions);
+
+        await service.SetEventId(23);
+
+        var deleted = Assert.Single(sessions.Deleted);
+        Assert.Same(existing, deleted);
+
+        var created = Assert.Single(sessions.Created);
+        Assert.Equal(7, created.Id);
+        Assert.Equal("entra-1", created.UserIdentifier);
+        Assert.Equal(23, created.EventId);
+        Assert.Empty(created.SnapshotHistory);
+        Assert.Empty(sessions.Updated);
+    }
+
+    static WitnessUserSessionService CreateService(
+        RecordingUserSessionRepository sessions,
+        ClaimsPrincipal? principal = null,
+        RecordingUserRegister? users = null
+    )
+    {
+        principal ??= CreatePrincipal(
+            new Claim(ClaimTypes.Email, "user@example.com"),
+            new Claim("oid", "entra-1")
         );
-        var events = new RecordingEnduranceEventRepository(CreateEnduranceEvent(1), CreateEnduranceEvent(2));
-        var socket = new RecordingSocketService();
-        var session = new WitnessUserSession(sessionService, events, socket);
+        users ??= new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
 
-        await session.Initialize();
-        await session.Initialize();
+        var serviceProvider =
+            new StaticServiceProvider().Add<
+                Not.Application.Authentication.Abstractions.IUserSessionRepository<NtsUserSessionModel>
+            >(sessions);
+        var nUserSessionService = new NUserSessionService(
+            new StaticAuthenticationStateProvider(principal),
+            users,
+            serviceProvider
+        );
 
-        Assert.Equal([1, 2], socket.ConnectCalls);
-        Assert.Equal(1, socket.DisconnectCalls);
-        Assert.Equal(2, socket.Event?.Id);
-    }
-
-    [Fact]
-    public async Task Witness_user_session_initialize_deletes_missing_event_session_and_disconnects()
-    {
-        var sessionService = new SequenceUserSessionService(new UserSessionModel { EventId = 42 });
-        var events = new RecordingEnduranceEventRepository();
-        var socket = new RecordingSocketService { Event = CreateEnduranceEvent(7), IsConnected = true };
-        var session = new WitnessUserSession(sessionService, events, socket);
-
-        await session.Initialize();
-
-        Assert.Equal(1, sessionService.DeleteCurrentCalls);
-        Assert.Equal(1, socket.DisconnectCalls);
-        Assert.Null(socket.Event);
+        return new WitnessUserSessionService(nUserSessionService, sessions);
     }
 
     static ClaimsPrincipal CreatePrincipal(params Claim[] claims)
     {
         var identity = new ClaimsIdentity(claims, "TestAuthentication");
         return new ClaimsPrincipal(identity);
-    }
-
-    static EnduranceEvent CreateEnduranceEvent(int id)
-    {
-        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
-            new PopulatedPlace(country, "Sofia", "Sofia"),
-            new EventSpan(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(1)),
-            null,
-            null,
-            null,
-            id
-        );
     }
 
     sealed class StaticAuthenticationStateProvider : AuthenticationStateProvider
@@ -240,6 +226,23 @@ public class WitnessSessionIdentityTests
         public override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             return Task.FromResult(_state);
+        }
+    }
+
+    sealed class StaticServiceProvider : IServiceProvider
+    {
+        readonly Dictionary<Type, object> _services = [];
+
+        public StaticServiceProvider Add<TService>(TService service)
+            where TService : class
+        {
+            _services[typeof(TService)] = service;
+            return this;
+        }
+
+        public object? GetService(Type serviceType)
+        {
+            return _services.TryGetValue(serviceType, out var service) ? service : null;
         }
     }
 
@@ -263,203 +266,68 @@ public class WitnessSessionIdentityTests
 
     sealed class RecordingUserSessionRepository : IUserSessionRepository
     {
-        public UserSessionModel? ReadByUserIdentifierResult { get; init; }
-        public UserSessionModel? ReadByIdResult { get; init; }
-        public List<UserSessionModel> Created { get; } = [];
-        public List<UserSessionModel> Updated { get; } = [];
-        public List<UserSessionModel> Deleted { get; } = [];
+        public NtsUserSessionModel? ReadByUserIdentifierResult { get; init; }
+        public NtsUserSessionModel? ReadByIdResult { get; init; }
+        public List<NtsUserSessionModel> Created { get; } = [];
+        public List<NtsUserSessionModel> Updated { get; } = [];
+        public List<NtsUserSessionModel> Deleted { get; } = [];
         public int ReadByUserIdentifierCalls { get; private set; }
         public int ReadIdCalls { get; private set; }
 
-        public Task Create(UserSessionModel item)
+        public Task Create(NtsUserSessionModel item)
         {
             Created.Add(item);
             return Task.CompletedTask;
         }
 
-        public Task<UserSessionModel?> ReadByUserIdentifier(string userIdentifier)
+        public Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
         {
             ReadByUserIdentifierCalls++;
             return Task.FromResult(ReadByUserIdentifierResult);
         }
 
-        public Task<UserSessionModel?> Read(int id)
+        public Task<NtsUserSessionModel?> Read(int id)
         {
             ReadIdCalls++;
             return Task.FromResult(ReadByIdResult);
         }
 
-        public Task<UserSessionModel?> Read(Expression<Func<UserSessionModel, bool>> filter)
+        public Task<NtsUserSessionModel?> Read(Expression<Func<NtsUserSessionModel, bool>> filter)
         {
-            return Task.FromResult(default(UserSessionModel));
+            return Task.FromResult(default(NtsUserSessionModel));
         }
 
-        public Task<IEnumerable<UserSessionModel>> ReadMany()
+        public Task<IEnumerable<NtsUserSessionModel>> ReadMany()
         {
-            return Task.FromResult<IEnumerable<UserSessionModel>>([]);
+            return Task.FromResult<IEnumerable<NtsUserSessionModel>>([]);
         }
 
-        public Task<IEnumerable<UserSessionModel>> ReadMany(Expression<Func<UserSessionModel, bool>> filter)
+        public Task<IEnumerable<NtsUserSessionModel>> ReadMany(Expression<Func<NtsUserSessionModel, bool>> filter)
         {
-            return Task.FromResult<IEnumerable<UserSessionModel>>([]);
+            return Task.FromResult<IEnumerable<NtsUserSessionModel>>([]);
         }
 
-        public Task Update(UserSessionModel item)
+        public Task Update(NtsUserSessionModel item)
         {
             Updated.Add(item);
             return Task.CompletedTask;
         }
 
-        public Task Delete(UserSessionModel item)
+        public Task Delete(NtsUserSessionModel item)
         {
             Deleted.Add(item);
             return Task.CompletedTask;
         }
 
-        public Task Delete(IEnumerable<UserSessionModel> items)
+        public Task Delete(IEnumerable<NtsUserSessionModel> items)
         {
             return Task.CompletedTask;
         }
 
-        public Task Delete(Expression<Func<UserSessionModel, bool>> filter)
+        public Task Delete(Expression<Func<NtsUserSessionModel, bool>> filter)
         {
-            return Task.CompletedTask;
-        }
-    }
-
-    sealed class SequenceUserSessionService : IUserSessionService
-    {
-        readonly Queue<ICoreSession?> _sessions;
-
-        public SequenceUserSessionService(params ICoreSession?[] sessions)
-        {
-            _sessions = new Queue<ICoreSession?>(sessions);
-        }
-
-        public int DeleteCurrentCalls { get; private set; }
-
-        public Task<ICoreSession?> GetCurrent()
-        {
-            return Task.FromResult(_sessions.Count == 0 ? null : _sessions.Dequeue());
-        }
-
-        public Task SetEventId(int? eventId)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task AppendSnapshot(SnapshotGroup snapshot)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task DeleteCurrent()
-        {
-            DeleteCurrentCalls++;
             return Task.CompletedTask;
         }
     }
 
-    sealed class RecordingEnduranceEventRepository : IRepository<EnduranceEvent>
-    {
-        readonly Dictionary<int, EnduranceEvent> _events;
-
-        public RecordingEnduranceEventRepository(params EnduranceEvent[] events)
-        {
-            _events = events.ToDictionary(x => x.Id);
-        }
-
-        public Task Create(EnduranceEvent item)
-        {
-            _events[item.Id] = item;
-            return Task.CompletedTask;
-        }
-
-        public Task<EnduranceEvent?> Read(int id)
-        {
-            _events.TryGetValue(id, out var item);
-            return Task.FromResult(item);
-        }
-
-        public Task<EnduranceEvent?> Read(Expression<Func<EnduranceEvent, bool>> filter)
-        {
-            var predicate = filter.Compile();
-            return Task.FromResult(_events.Values.FirstOrDefault(predicate));
-        }
-
-        public Task<IEnumerable<EnduranceEvent>> ReadMany()
-        {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>(_events.Values.ToArray());
-        }
-
-        public Task<IEnumerable<EnduranceEvent>> ReadMany(Expression<Func<EnduranceEvent, bool>> filter)
-        {
-            var predicate = filter.Compile();
-            return Task.FromResult<IEnumerable<EnduranceEvent>>(_events.Values.Where(predicate).ToArray());
-        }
-
-        public Task Update(EnduranceEvent item)
-        {
-            _events[item.Id] = item;
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(EnduranceEvent item)
-        {
-            _events.Remove(item.Id);
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(IEnumerable<EnduranceEvent> items)
-        {
-            foreach (var item in items)
-            {
-                _events.Remove(item.Id);
-            }
-
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(Expression<Func<EnduranceEvent, bool>> filter)
-        {
-            var predicate = filter.Compile();
-            foreach (var item in _events.Values.Where(predicate).ToArray())
-            {
-                _events.Remove(item.Id);
-            }
-
-            return Task.CompletedTask;
-        }
-    }
-
-    sealed class RecordingSocketService : INtsSocketService
-    {
-        public IEventSubscriber ObservableEvent { get; } = new Event();
-        public bool IsConnected { get; set; }
-        public Not.Application.RPC.SignalR.SocketConnectionStatus Status { get; set; }
-        public EnduranceEvent? Event { get; set; }
-        public List<int> ConnectCalls { get; } = [];
-        public int DisconnectCalls { get; private set; }
-
-        public Task Connect(EnduranceEvent enduranceEvent)
-        {
-            ConnectCalls.Add(enduranceEvent.Id);
-            Event = enduranceEvent;
-            IsConnected = true;
-            return Task.CompletedTask;
-        }
-
-        public Task Disconnect()
-        {
-            DisconnectCalls++;
-            Event = null;
-            IsConnected = false;
-            return Task.CompletedTask;
-        }
-
-        public Task Load()
-        {
-            return Task.CompletedTask;
-        }
-    }
 }

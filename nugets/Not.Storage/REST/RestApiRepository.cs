@@ -20,7 +20,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         Client = client;
     }
 
-    static INotifier Notifier => ServiceLocator.Get<INotifier>();
+    static INotifier Notifier => ServiceLocator.GetRequired<INotifier>();
 
     protected NHttpClient Client { get; }
     protected string Endpoint => _endpoint;

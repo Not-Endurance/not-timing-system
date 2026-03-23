@@ -211,7 +211,7 @@ public static class SafeHelper
         }
     }
 
-    static INotifier Notifier => ServiceLocator.Get<INotifier>();
+    static INotifier Notifier => ServiceLocator.GetRequired<INotifier>();
 
     static Task HandleDefaultValidation(ValidationException validation)
     {
