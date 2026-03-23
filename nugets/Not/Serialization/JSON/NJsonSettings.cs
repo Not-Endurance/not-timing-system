@@ -1,7 +1,6 @@
 ﻿using JsonNet.PrivatePropertySetterResolver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Not.Serialization.JSON.Converters;
 
 namespace Not.Serialization.JSON;
 
@@ -22,11 +21,5 @@ public class NJsonSettings : JsonSerializerSettings
         TypeNameHandling = TypeNameHandling.Auto;
         ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
         Converters = [new StringEnumConverter()];
-    }
-
-    public void ConfigureServer()
-    {
-        Converters.Add(new DateTimeOffsetUtcSerializer());
-        DateTimeZoneHandling = DateTimeZoneHandling.Utc;
     }
 }
