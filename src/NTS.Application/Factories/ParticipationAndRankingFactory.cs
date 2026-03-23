@@ -113,8 +113,7 @@ public static class ParticipationAndRankingFactory
         Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation
     )
     {
-        DateTimeOffset? startTime =
-            setupParticipation.StartTimeOverride?.ToUniversalTime() ?? setupCompetition.Start.ToUniversalTime();
+        DateTimeOffset? startTime = setupParticipation.StartTimeOverride ?? setupCompetition.Start;
         var setupPhases = setupCompetition.Phases;
         var phases = new List<Phase>();
         foreach (var setupPhase in setupPhases)
