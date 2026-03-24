@@ -44,13 +44,14 @@ public class Ranking : Aggregate
         return $"{Name} {Category}: {Entries.Count}";
     }
 
-    public void Update(Participation participation)
+    public bool Update(Participation participation)
     {
-        var existing = Entries.FirstOrDefault(x => x.Participation == participation);
+        var existing = Entries.FirstOrDefault(x => x.Participation.Id == participation.Id);
         if (existing == null)
         {
-            return;
+            return false;
         }
         existing.Participation = participation;
+        return true;
     }
 }

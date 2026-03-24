@@ -7,7 +7,7 @@ using NTS.Judge.Features.Core.Rankings.FeiExport;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings;
 
-public class RankingsPageBehind : PrintableComponent
+public class RankingsContentBehind : PrintableComponent
 {
     public bool IsProtocolVisible = true;
 
