@@ -39,11 +39,11 @@ public class MainLayoutBehind : LayoutComponentBase
         {
             foreach (var initializer in Initializers)
             {
-               initializer.RunAtStartup();
+                initializer.RunAtStartup();
             }
             foreach (var initializer in AsyncInitializers)
             {
-               await initializer.RunAtStartupAsync();
+                await initializer.RunAtStartupAsync();
             }
         }
         catch (Exception ex)

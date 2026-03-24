@@ -96,18 +96,20 @@ public abstract class RpcClient : IRpcClient
         {
             connection.On(
                 name,
-                (Func<Task<IEnumerable<T>>>)(async () =>
-                {
-                    try
+                (Func<Task<IEnumerable<T>>>)(
+                    async () =>
                     {
-                        return await action();
+                        try
+                        {
+                            return await action();
+                        }
+                        catch (Exception exception)
+                        {
+                            _socket.RaiseError(exception, name);
+                            return [];
+                        }
                     }
-                    catch (Exception exception)
-                    {
-                        _socket.RaiseError(exception, name);
-                        return [];
-                    }
-                })
+                )
             );
         });
     }
@@ -119,18 +121,20 @@ public abstract class RpcClient : IRpcClient
         {
             connection.On(
                 name,
-                (Func<Task<T?>>)(async () =>
-                {
-                    try
+                (Func<Task<T?>>)(
+                    async () =>
                     {
-                        return await action();
+                        try
+                        {
+                            return await action();
+                        }
+                        catch (Exception exception)
+                        {
+                            _socket.RaiseError(exception, name);
+                            return null;
+                        }
                     }
-                    catch (Exception exception)
-                    {
-                        _socket.RaiseError(exception, name);
-                        return null;
-                    }
-                })
+                )
             );
         });
     }
@@ -142,18 +146,20 @@ public abstract class RpcClient : IRpcClient
         {
             connection.On(
                 name,
-                (Func<Task<T?>>)(async () =>
-                {
-                    try
+                (Func<Task<T?>>)(
+                    async () =>
                     {
-                        return await action();
+                        try
+                        {
+                            return await action();
+                        }
+                        catch (Exception exception)
+                        {
+                            _socket.RaiseError(exception, name);
+                            return null;
+                        }
                     }
-                    catch (Exception exception)
-                    {
-                        _socket.RaiseError(exception, name);
-                        return null;
-                    }
-                })
+                )
             );
         });
     }
@@ -220,7 +226,6 @@ public abstract class RpcClient : IRpcClient
             );
         });
     }
-
 }
 
 public interface IRpcClient : IStartupInitializer

@@ -41,7 +41,8 @@ public class Result : ResultBase
 
 public class Result<T> : ResultBase
 {
-    internal Result(T data) : this(data, [])
+    internal Result(T data)
+        : this(data, [])
     {
         Data = data;
     }
@@ -52,7 +53,7 @@ public class Result<T> : ResultBase
     [JsonConstructor]
     Result(T? data, IEnumerable<string> errors)
         : base(errors)
-    { 
+    {
         Data = data;
     }
 

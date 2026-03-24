@@ -8,9 +8,7 @@ public class CoalesceInvoker
     Func<Task>? _action;
     int _isPending;
 
-    public CoalesceInvoker()
-    {
-    }
+    public CoalesceInvoker() { }
 
     public CoalesceInvoker(Func<Task> action)
     {

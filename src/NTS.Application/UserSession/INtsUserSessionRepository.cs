@@ -6,5 +6,4 @@ namespace NTS.Application.UserSession;
 
 public interface INtsUserSessionRepository
     : IRepository<NtsUserSessionModel>,
-        INUserSessionRepository<NtsUserSessionModel>
-{ }
+        INUserSessionRepository<NtsUserSessionModel> { }

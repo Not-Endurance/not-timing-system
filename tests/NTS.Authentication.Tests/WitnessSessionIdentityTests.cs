@@ -189,16 +189,13 @@ public class WitnessSessionIdentityTests
         RecordingUserRegister? users = null
     )
     {
-        principal ??= CreatePrincipal(
-            new Claim(ClaimTypes.Email, "user@example.com"),
-            new Claim("oid", "entra-1")
-        );
+        principal ??= CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"));
         users ??= new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
 
         var serviceProvider =
-            new StaticServiceProvider().Add<
-                Not.Application.Authentication.Abstractions.IUserSessionRepository<NtsUserSessionModel>
-            >(sessions);
+            new StaticServiceProvider().Add<Not.Application.Authentication.Abstractions.IUserSessionRepository<NtsUserSessionModel>>(
+                sessions
+            );
         var nUserSessionService = new NUserSessionService(
             new StaticAuthenticationStateProvider(principal),
             users,
@@ -329,5 +326,4 @@ public class WitnessSessionIdentityTests
             return Task.CompletedTask;
         }
     }
-
 }

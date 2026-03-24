@@ -11,10 +11,7 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
     readonly INUserSession _nUserSessionService;
     readonly INtsUserSessionRepository _userSessions;
 
-    public WitnessUserSessionService(
-        INUserSession nUserSessionService,
-        INtsUserSessionRepository userSessions
-    )
+    public WitnessUserSessionService(INUserSession nUserSessionService, INtsUserSessionRepository userSessions)
     {
         _nUserSessionService = nUserSessionService;
         _userSessions = userSessions;
@@ -91,7 +88,11 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
         await _userSessions.Delete(currentSession);
     }
 
-    static NtsUserSessionModel CreateSession(INUserSessionModel userSession, int? eventId = null, SnapshotGroup? snapshot = null)
+    static NtsUserSessionModel CreateSession(
+        INUserSessionModel userSession,
+        int? eventId = null,
+        SnapshotGroup? snapshot = null
+    )
     {
         return new NtsUserSessionModel
         {
@@ -101,5 +102,4 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
             SnapshotHistory = snapshot == null ? [] : [SnapshotGroupModel.MapFrom(snapshot)],
         };
     }
-
 }

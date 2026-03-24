@@ -16,11 +16,7 @@ public class JudgeSocketService : NStatefulService, INtsSocketService, ISingleto
     readonly INotifier _notifier;
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
-    public JudgeSocketService(
-        IRpcSocket socket,
-        INotifier notifier,
-        IDomainEventDispatcher domainEventDispatcher
-    )
+    public JudgeSocketService(IRpcSocket socket, INotifier notifier, IDomainEventDispatcher domainEventDispatcher)
     {
         _socket = socket;
         _notifier = notifier;

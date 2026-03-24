@@ -51,7 +51,10 @@ public class SnapshotGroupModel
     }
 }
 
-public class NtsUserSessionModel : NUserSessionModel<NtsUserSessionStateModel>, IDocument, IKrudModel<NtsUserSessionModel>
+public class NtsUserSessionModel
+    : NUserSessionModel<NtsUserSessionStateModel>,
+        IDocument,
+        IKrudModel<NtsUserSessionModel>
 {
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;

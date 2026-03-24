@@ -20,8 +20,18 @@ public class RankingServiceTests
     [Fact]
     public async Task Handle_WhenPhaseCompletedArrivesBeforeInitialization_LoadsAndUpdatesRankings()
     {
-        var originalParticipation = CreateParticipation(number: 42, eventId: 14, participationId: 301, combinationId: 201);
-        var updatedParticipation = CreateParticipation(number: 42, eventId: 14, participationId: 301, combinationId: 201);
+        var originalParticipation = CreateParticipation(
+            number: 42,
+            eventId: 14,
+            participationId: 301,
+            combinationId: 201
+        );
+        var updatedParticipation = CreateParticipation(
+            number: 42,
+            eventId: 14,
+            participationId: 301,
+            combinationId: 201
+        );
         var ranking = new Ranking(
             "General Classification",
             CompetitionRuleset.FEI,

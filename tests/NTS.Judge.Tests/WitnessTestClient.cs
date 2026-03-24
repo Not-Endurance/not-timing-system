@@ -11,9 +11,7 @@ namespace NTS.Judge.Tests;
 public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcClient, ISingleton
 {
     public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
-        : base(socket)
-    {
-    }
+        : base(socket) { }
 
     public int Id { get; }
     public List<string> InvokedMethods { get; } = [];
