@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 using Not.Application.RPC.SignalR;
-using Not.Injection;
 using Not.Reflection;
 using Not.Startup;
 
@@ -9,6 +8,7 @@ namespace Not.Application.RPC.Clients;
 public abstract class RpcClient : IRpcClient
 {
     readonly SignalRSocket _socket;
+    bool _isInitialized;
 
     protected RpcClient(IRpcSocket socket)
     {
@@ -19,17 +19,39 @@ public abstract class RpcClient : IRpcClient
         _socket = signalRSocket;
     }
 
-    public abstract void RunAtStartup();
+    protected abstract void RegisterProcedures();
 
     protected SignalRSocket Socket => _socket;
 
+    internal void EnsureInitialized()
+    {
+        if (_isInitialized)
+        {
+            return;
+        }
+
+        RegisterProcedures();
+        _isInitialized = true;
+    }
+
     public virtual async Task Connect()
     {
+        EnsureInitialized();
         if (_socket.IsConnected)
         {
             return;
         }
         await _socket.Connect();
+    }
+
+    public virtual async Task Connect(string groupId)
+    {
+        EnsureInitialized();
+        if (_socket.IsConnected)
+        {
+            return;
+        }
+        await _socket.Connect(groupId);
     }
 
     public async Task Disconnect()
@@ -39,6 +61,11 @@ public abstract class RpcClient : IRpcClient
             return;
         }
         await _socket.Disconnect();
+    }
+
+    public void RunAtStartup()
+    {
+        EnsureInitialized();
     }
 
     public void RegisterInputProcedure(string name, Func<Task> action)
@@ -204,5 +231,6 @@ public abstract class RpcClient : IRpcClient
 public interface IRpcClient : IStartupInitializer
 {
     Task Connect();
+    Task Connect(string groupId);
     Task Disconnect();
 }

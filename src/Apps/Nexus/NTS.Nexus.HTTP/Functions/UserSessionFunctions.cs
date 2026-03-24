@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Not.Application.CRUD.Ports;
+using NTS.Application.UserSession;
 using NTS.Application.Watcher;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
@@ -9,14 +9,19 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class UserSessionFunctions : CrudFunctions<UserSessionModel>
+public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
 {
+    readonly INtsUserSessionRepository _sessions;
+
     public UserSessionFunctions(
         IFunctionLogger<UserSessionFunctions> logger,
-        IRepository<UserSessionModel> sessions,
+        INtsUserSessionRepository sessions,
         ITelemetryService telemetry
     )
-        : base(logger, sessions, telemetry) { }
+        : base(logger, sessions, telemetry)
+    {
+        _sessions = sessions;
+    }
 
     [Function("user-sessions-create")]
     public async Task<IActionResult> Create(
@@ -62,6 +67,26 @@ public class UserSessionFunctions : CrudFunctions<UserSessionModel>
         TagRequest(request);
         LogInformation(request, nameof(Read));
         return await InternalRead(request, id);
+    }
+
+    [Function("user-sessions-read-by-user-identifier")]
+    public async Task<IActionResult> ReadByUserIdentifier(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "user-sessions/by-user-identifier/{userIdentifier}")]
+            HttpRequest request,
+        string userIdentifier
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(ReadByUserIdentifier));
+        TagRequest(request);
+        LogInformation(request, nameof(ReadByUserIdentifier));
+
+        var session = await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier));
+        if (session == null)
+        {
+            return new NotFoundResult();
+        }
+
+        return Ok(session);
     }
 
     [Function("user-sessions-read-many")]

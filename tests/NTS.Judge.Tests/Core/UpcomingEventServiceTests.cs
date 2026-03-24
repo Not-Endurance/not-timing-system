@@ -2,21 +2,19 @@ using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Abstractions;
 using Not.Exceptions;
+using Not.Notify;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
-using NTS.Judge.Features;
-using CoreOfficial = NTS.Domain.Core.Aggregates.Official;
-using CoreParticipation = NTS.Domain.Core.Aggregates.Participation;
+using NTS.Judge.Features.Setup.UpcomingEvents;
 using SetupOfficial = NTS.Domain.Setup.Aggregates.UpcomingEvents.Official;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.UpcomingEvents.Participation;
 
 namespace NTS.Judge.Tests.Core;
 
-public class StartBusinessServiceTests
+public class UpcomingEventServiceTests
 {
     [Fact]
     public async Task Validate_WhenUpcomingEventIdTargetsInvalidEvent_ReturnsIssuesForThatEvent()
@@ -29,55 +27,11 @@ public class StartBusinessServiceTests
     }
 
     [Fact]
-    public async Task Start_WhenUpcomingEventIdTargetsRequestedEvent_CreatesCoreEventWithSameId()
-    {
-        var events = new RecordingRepository<EnduranceEvent>();
-        var officials = new RecordingRepository<CoreOfficial>();
-        var participations = new RecordingRepository<CoreParticipation>();
-        var rankings = new RecordingRepository<Ranking>();
-        var service = CreateService(
-            [CreateValidEvent(1), CreateValidEvent(2)],
-            events,
-            officials,
-            participations,
-            rankings
-        );
-
-        var result = await service.CreateEnduranceEvent(2);
-
-        Assert.Equal(2, result.Id);
-        Assert.Equal(2, Assert.Single(events.CreatedItems).Id);
-        Assert.Single(participations.CreatedItems);
-        Assert.Single(rankings.CreatedItems);
-        Assert.Empty(officials.CreatedItems);
-    }
-
-    [Fact]
-    public async Task StartEnduranceEvent_generates_new_core_official_and_participation_ids()
-    {
-        var officials = new RecordingRepository<CoreOfficial>();
-        var participations = new RecordingRepository<CoreParticipation>();
-        var service = CreateService(
-            [CreateValidEvent(2)],
-            officials: officials,
-            participations: participations,
-            rankings: new RecordingRepository<Ranking>()
-        );
-
-        await service.StartEnduranceEvent(2);
-
-        Assert.NotEmpty(officials.CreatedItems);
-        Assert.NotEmpty(participations.CreatedItems);
-        Assert.DoesNotContain(officials.CreatedItems, x => x.Id == 21);
-        Assert.DoesNotContain(participations.CreatedItems, x => x.Id == 21);
-    }
-
-    [Fact]
-    public async Task Start_WhenUpcomingEventIdMissing_ThrowsGuardException()
+    public async Task Validate_WhenUpcomingEventIdMissing_ThrowsGuardException()
     {
         var service = CreateService([CreateValidEvent(1)]);
 
-        var exception = await Assert.ThrowsAsync<GuardException>(() => service.CreateEnduranceEvent(42));
+        var exception = await Assert.ThrowsAsync<GuardException>(() => service.Validate(42));
 
         Assert.Contains("42", exception.Message);
     }
@@ -91,13 +45,7 @@ public class StartBusinessServiceTests
                 CreateValidEvent(2, competitionId: 1, participationNumber: 101),
             ]
         );
-        var service = new StartBusinessService(
-            repository,
-            new RecordingRepository<EnduranceEvent>(),
-            new RecordingRepository<CoreOfficial>(),
-            new RecordingRepository<CoreParticipation>(),
-            new RecordingRepository<Ranking>()
-        );
+        var service = new UpcomingEventService(repository, new TestNotifier(), new TestSelectedUpcomingEventContext());
 
         await service.DeleteParticipation(2, 101, 1);
 
@@ -105,20 +53,12 @@ public class StartBusinessServiceTests
         Assert.Empty(repository.Items.Single(x => x.Id == 2).Competitions.Single().Participations);
     }
 
-    static StartBusinessService CreateService(
-        IEnumerable<UpcomingEvent> upcomingEvents,
-        RecordingRepository<EnduranceEvent>? events = null,
-        RecordingRepository<CoreOfficial>? officials = null,
-        RecordingRepository<CoreParticipation>? participations = null,
-        RecordingRepository<Ranking>? rankings = null
-    )
+    static UpcomingEventService CreateService(IEnumerable<UpcomingEvent> upcomingEvents)
     {
-        return new StartBusinessService(
+        return new UpcomingEventService(
             new RecordingRepository<UpcomingEvent>(upcomingEvents),
-            events ?? new RecordingRepository<EnduranceEvent>(),
-            officials ?? new RecordingRepository<CoreOfficial>(),
-            participations ?? new RecordingRepository<CoreParticipation>(),
-            rankings ?? new RecordingRepository<Ranking>()
+            new TestNotifier(),
+            new TestSelectedUpcomingEventContext()
         );
     }
 
@@ -318,5 +258,23 @@ public class StartBusinessServiceTests
             _items.RemoveAll(x => ids.Contains(x.Id));
             return Task.CompletedTask;
         }
+    }
+
+    sealed class TestNotifier : INotifier
+    {
+        public void Error(string message) { }
+
+        public void Error(Exception ex) { }
+
+        public void Inform(string message) { }
+
+        public void Success(string message) { }
+
+        public void Warn(string message) { }
+    }
+
+    sealed class TestSelectedUpcomingEventContext : ISelectedUpcomingEventContext
+    {
+        public UpcomingEvent? Event { get; set; }
     }
 }

@@ -27,7 +27,7 @@ internal static class NtsNexusApiServices
 
     static IServiceCollection AddMongoStorage(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING");
+        var connectionString = configuration.GetConnectionString("MongoDB");
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             throw new ApplicationException("MongoDB connection string is null");

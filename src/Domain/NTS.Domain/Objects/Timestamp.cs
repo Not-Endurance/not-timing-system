@@ -78,12 +78,12 @@ public sealed record Timestamp : IComparable<Timestamp>
 
     Timestamp(Timestamp timestamp)
     {
-        _stamp = timestamp._stamp;
+        _stamp = timestamp._stamp.ToLocalTime();
     }
 
     public Timestamp(DateTimeOffset dateTimeOffset)
     {
-        _stamp = dateTimeOffset;
+        _stamp = dateTimeOffset.ToLocalTime();
     }
 
     public Timestamp(string timeText)

@@ -1,6 +1,7 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using Not.Async;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
@@ -32,6 +33,7 @@ public class RankingService
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<Official> _officials;
     readonly IRepository<ArchiveEntry> _archive;
+    readonly CoalesceInvoker _coalesced;
     Ranking? _current;
 
     public RankingService(
@@ -45,11 +47,12 @@ public class RankingService
         _rankings = rankings;
         _officials = officials;
         _archive = archive;
+        _coalesced = new();
     }
 
     public Ranking Current =>
         GuardHelper.ThrowIfDefault(
-            _current,
+            _current ?? Rankings.FirstOrDefault(),
             $"'{nameof(RankingService)}.{nameof(Current)}' shouldn't be used before '{InitializeState}' has completed. Did you forget to call 'Observe'?"
         );
 
@@ -59,15 +62,21 @@ public class RankingService
     {
         if (!_socketContext.IsConnected)
         {
+            Rankings.Clear();
+            _current = null;
             return false;
         }
-        var rankings = await _rankings.ReadMany();
+        var rankings = (await _rankings.ReadMany()).ToList();
         if (!rankings.Any())
         {
+            Rankings.Clear();
+            _current = null;
             return false;
         }
-        _current = rankings.First();
+
+        var currentId = _current?.Id;
         Rankings.Replace(rankings);
+        _current = rankings.FirstOrDefault(x => x.Id == currentId) ?? rankings.First();
         return true;
     }
 
@@ -75,6 +84,7 @@ public class RankingService
     {
         var ranking = model.MapToEntity();
         await _rankings.Create(ranking);
+        _current ??= ranking;
         Rankings.AddOrReplace(ranking);
     }
 
@@ -87,6 +97,11 @@ public class RankingService
     {
         await _rankings.Delete(ranking);
         Rankings.Remove(ranking);
+        if (_current?.Id == ranking.Id)
+        {
+            _current = Rankings.FirstOrDefault();
+            EmitChanged();
+        }
     }
 
     public async Task ArchiveEnduranceEvent()
@@ -114,34 +129,49 @@ public class RankingService
         EmitChanged();
     }
 
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    public async Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
-        UpdateRanklist(notification);
-        return Task.CompletedTask;
+        await _coalesced.Invoke(() => UpdateRanklist(notification));
     }
 
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
+    public async Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
     {
-        UpdateRanklist(notification);
-        return Task.CompletedTask;
+        await _coalesced.Invoke(() => UpdateRanklist(notification));
     }
 
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
+    public async Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
     {
-        UpdateRanklist(notification);
-        return Task.CompletedTask;
+        await _coalesced.Invoke(() => UpdateRanklist(notification));
     }
 
-    void UpdateRanklist(ParticipationPayload payload)
+    async Task UpdateRanklist(ParticipationPayload payload)
     {
-        if (_current == null)
+        await Load();
+
+        if (!Rankings.Any())
         {
             return;
         }
+
+        var currentId = _current?.Id;
+        var isUpdated = false;
         foreach (var ranking in Rankings)
         {
-            ranking.Update(payload.Participation);
+            if (!ranking.Update(payload.Participation))
+            {
+                continue;
+            }
+            //TODO: Implement UpdateMany
+            await _rankings.Update(ranking);
+            isUpdated = true;
         }
+
+        if (!isUpdated)
+        {
+            return;
+        }
+
+        _current = Rankings.FirstOrDefault(x => x.Id == currentId) ?? Rankings.FirstOrDefault();
         EmitChanged();
     }
 }

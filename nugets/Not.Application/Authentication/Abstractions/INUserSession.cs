@@ -1,8 +1,14 @@
-﻿using Not.Injection;
+using Not.Application.Authentication.User;
 
 namespace Not.Application.Authentication.Abstractions;
 
-public interface INUserSession : IScoped
+public interface INUserSessionModel
 {
-    Task Initialize();
+    string UserIdentifier { get; }
+    NUserModel User { get; }
+}
+
+public interface INUserSessionModel<out TSessionState> : INUserSessionModel
+{
+    TSessionState? State { get; }
 }

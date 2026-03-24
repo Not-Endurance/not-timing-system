@@ -63,6 +63,7 @@ public class EnduranceEventResetTests
             new TestFunctionLogger(),
             new RecordingRepository<EnduranceEventModel>(),
             resetService,
+            new RecordingEnduranceEventBusinessService(),
             new TestTelemetryService()
         );
         var request = CreateRequest(HttpMethods.Delete, "/api/endurance-event/19/reset");
@@ -91,7 +92,7 @@ public class EnduranceEventResetTests
             return Task.FromResult(MaxDeletedVersion);
         }
 
-        public Task SoftDeleteActive(int eventId, int deletedVersion)
+        public Task SoftDelete(int eventId, int deletedVersion)
         {
             SoftDeleteCalls.Add((eventId, deletedVersion));
             return Task.CompletedTask;
@@ -109,25 +110,60 @@ public class EnduranceEventResetTests
         }
     }
 
+    sealed class RecordingEnduranceEventBusinessService : IEnduranceEventBusinessService
+    {
+        public Task<EnduranceEventModel> Start(int upcomingEventId)
+        {
+            return Task.FromResult(new EnduranceEventModel());
+        }
+    }
+
     sealed class RecordingRepository<T> : Not.Application.CRUD.Ports.IRepository<T>
     {
-        public Task Create(T item) => Task.CompletedTask;
+        public Task Create(T item)
+        {
+            return Task.CompletedTask;
+        }
 
-        public Task<T?> Read(int id) => Task.FromResult(default(T));
+        public Task<T?> Read(int id)
+        {
+            return Task.FromResult(default(T));
+        }
 
-        public Task<T?> Read(Expression<Func<T, bool>> filter) => Task.FromResult(default(T));
+        public Task<T?> Read(Expression<Func<T, bool>> filter)
+        {
+            return Task.FromResult(default(T));
+        }
 
-        public Task<IEnumerable<T>> ReadMany() => Task.FromResult<IEnumerable<T>>([]);
+        public Task<IEnumerable<T>> ReadMany()
+        {
+            return Task.FromResult<IEnumerable<T>>([]);
+        }
 
-        public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter) => Task.FromResult<IEnumerable<T>>([]);
+        public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
+        {
+            return Task.FromResult<IEnumerable<T>>([]);
+        }
 
-        public Task Update(T item) => Task.CompletedTask;
+        public Task Update(T item)
+        {
+            return Task.CompletedTask;
+        }
 
-        public Task Delete(T item) => Task.CompletedTask;
+        public Task Delete(T item)
+        {
+            return Task.CompletedTask;
+        }
 
-        public Task Delete(IEnumerable<T> items) => Task.CompletedTask;
+        public Task Delete(IEnumerable<T> items)
+        {
+            return Task.CompletedTask;
+        }
 
-        public Task Delete(Expression<Func<T, bool>> filter) => Task.CompletedTask;
+        public Task Delete(Expression<Func<T, bool>> filter)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     sealed class TestFunctionLogger : IFunctionLogger<EnduranceEventFunctions>

@@ -97,16 +97,26 @@ public class HandoutsService
     {
         var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var officials = await _officials.ReadMany();
+        var existingHandout = await _handoutRepository.Read(x => x.Participation.Id == participation.Id);
 
-        var handout = new Handout(participation);
+        var handout = new Handout(participation, existingHandout?.Id);
         var document = new HandoutDocument(handout, enduranceEvent, officials);
 
-        await _semaphore.WaitAsync(); // TODO: Create LockHelper to encapsulate semaphore releases
-
-        await _handoutRepository.Delete(x => x.Participation == participation);
-        await _handoutRepository.Create(handout);
-        State.AddOrReplace(document);
-
-        _semaphore.Release();
+        await _semaphore.WaitAsync();
+        try
+        {
+            await _handoutRepository.Delete(x => x.Participation.Id == participation.Id);
+            var existingDocuments = State.Where(x => x.ParticipationId == participation.Id).ToList();
+            if (existingDocuments.Count != 0)
+            {
+                State.RemoveRange(existingDocuments);
+            }
+            await _handoutRepository.Create(handout);
+            State.AddOrReplace(document);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 }

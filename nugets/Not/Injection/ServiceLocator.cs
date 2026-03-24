@@ -6,12 +6,17 @@ namespace Not.Injection;
 
 public class ServiceLocator : IStartupInitializer, ITransient
 {
-    public static T Get<T>()
+    public static T GetRequired<T>()
         where T : class
     {
         GuardHelper.ThrowIfDefault(_provider);
-
         return _provider.GetRequiredService<T>();
+    }
+
+    public static T? Get<T>()
+        where T : class
+    {
+        return _provider?.GetService<T>();
     }
 
     static IServiceProvider? _provider;

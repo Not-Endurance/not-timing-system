@@ -1,7 +1,7 @@
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Structures;
 using NTS.Domain.Setup.Services.StartValidation;
-using NTS.Judge.Features;
+using NTS.Judge.Features.Setup.UpcomingEvents;
 
 namespace NTS.Judge.Blazor.Features.Setup.StartValidation;
 
@@ -10,7 +10,7 @@ public class StartValidationDialogBehind : NDialog<bool>
     readonly Dictionary<int, int> _selectedCompetitionByParticipation = [];
 
     [Inject]
-    IStartBusiness StartService { get; set; } = default!;
+    IUpcomingEventService UpcomingEventService { get; set; } = default!;
 
     protected Result<IReadOnlyList<StartValidationIssue>> Validation { get; set; } =
         Result.Success<IReadOnlyList<StartValidationIssue>>([]);
@@ -66,7 +66,7 @@ public class StartValidationDialogBehind : NDialog<bool>
                 var selectedCompetitionId = _selectedCompetitionByParticipation[issue.ParticipationNumber];
                 foreach (var competition in issue.Competitions.Where(x => x.CompetitionId != selectedCompetitionId))
                 {
-                    await StartService.DeleteParticipation(
+                    await UpcomingEventService.DeleteParticipation(
                         UpcomingEventId,
                         issue.ParticipationNumber,
                         competition.CompetitionId
@@ -74,7 +74,7 @@ public class StartValidationDialogBehind : NDialog<bool>
                 }
             }
 
-            Validation = await StartService.Validate(UpcomingEventId);
+            Validation = await UpcomingEventService.Validate(UpcomingEventId);
             if (HasIssues)
             {
                 SyncSelectionsWithCurrentIssues();

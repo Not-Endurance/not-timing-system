@@ -1,10 +1,27 @@
 {
   "profiles": {
-    "NTS.Nexus.HTTP": {
+    "Development": {
       "commandName": "Project",
       "commandLineArgs": "--port 8080",
       "environmentVariables": {
-        "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/NTS"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "IS_LOCALHOST": "true"
+      }
+    },
+    "Staging": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 8080",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "IS_LOCALHOST": "true"
+      }
+    },
+    "Production": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 8080",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "IS_LOCALHOST": "true"
       }
     },
     "Container (Dockerfile)": {

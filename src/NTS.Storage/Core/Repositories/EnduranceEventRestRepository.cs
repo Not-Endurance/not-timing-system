@@ -1,6 +1,10 @@
 using Not.Application.HTTP;
+using Not.Domain.Exceptions;
+using Not.Exceptions;
 using Not.Injection;
+using Not.Serialization.JSON;
 using Not.Storage.REST;
+using Not.Structures;
 using NTS.Application.Core;
 using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
@@ -20,6 +24,19 @@ public class EnduranceEventRestRepository
         _socketContext = socketContext;
     }
 
+    public async Task<EnduranceEvent> Start(int upcomingEventId)
+    {
+        var response = await Client.Post($"{Endpoint}/{upcomingEventId}/start", new StartEnduranceEventRequest());
+        var result = response.FromJson<Result<EnduranceEventModel>>();
+        if (result.IsError)
+        {
+            throw new DomainException(string.Join(Environment.NewLine, result.Errors));
+        }
+
+        var enduranceEvent = result.Data?.MapToEntity();
+        return enduranceEvent ?? throw GuardHelper.Exception("Endurance event start returned no event payload.");
+    }
+
     /// <summary>
     /// Soft-resets the currently selected endurance event in Nexus.
     /// </summary>
@@ -37,4 +54,6 @@ public class EnduranceEventRestRepository
 
         await Client.Delete($"{Endpoint}/{eventId.Value}/reset");
     }
+
+    sealed class StartEnduranceEventRequest { }
 }

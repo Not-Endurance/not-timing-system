@@ -1,15 +1,20 @@
 using Not.Application.CRUD.Ports;
+using Not.Events;
+using Not.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Services;
 using Not.Notify;
+using Not.Structures;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
+using NTS.Domain.Setup.Services.StartValidation;
 
 namespace NTS.Judge.Features.Setup.UpcomingEvents;
 
 public class UpcomingEventService
     : KrudServiceBase<UpcomingEvent, UpcomingEventFormModel>,
+        IUpcomingEventService,
         IKrudMirror<Loop>,
         IKrudMirror<Combination>,
         IKrudMirror<Athlete>,
@@ -30,6 +35,30 @@ public class UpcomingEventService
         _upcomingEvents = upcomingEvents;
         _notifier = notifier;
         _selectedEventContext = context;
+    }
+
+    public IEventSubscriber ObservableEvent { get; } = new Event();
+
+    public async Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId)
+    {
+        var setupEvent = await GetEvent(upcomingEventId);
+        return StartValidator.Validate(setupEvent);
+    }
+
+    public async Task DeleteParticipation(int upcomingEventId, int participationNumber, int competitionId)
+    {
+        var setupEvent = await GetEvent(upcomingEventId);
+        var competition = setupEvent.Competitions.FirstOrDefault(x => x.Id == competitionId);
+        GuardHelper.ThrowIfDefault(competition, $"Competition with id '{competitionId}' does not exist");
+
+        var participation = competition.Participations.FirstOrDefault(x => x.Combination.Number == participationNumber);
+        if (participation == null)
+        {
+            return;
+        }
+
+        competition.Remove(participation);
+        await _upcomingEvents.Update(setupEvent);
     }
 
     public override Task Delete(UpcomingEvent entity)
@@ -130,4 +159,16 @@ public class UpcomingEventService
             await _upcomingEvents.Update(_selectedEventContext.Event);
         }
     }
+
+    async Task<UpcomingEvent> GetEvent(int upcomingEventId)
+    {
+        var upcomingEvent = await _upcomingEvents.Read(upcomingEventId);
+        return upcomingEvent ?? throw GuardHelper.Exception($"Event with id '{upcomingEventId}' is not selected");
+    }
+}
+
+public interface IUpcomingEventService : ITransient
+{
+    Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId);
+    Task DeleteParticipation(int upcomingEventId, int participationNumber, int competitionId);
 }

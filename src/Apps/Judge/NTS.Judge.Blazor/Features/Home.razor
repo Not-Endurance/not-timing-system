@@ -14,7 +14,7 @@
     <Main>
         <KrudList T="UpcomingEvent" TModel="UpcomingEventFormModel" TShell="UpcomingEventShell" Name="@Upcoming_events_string">
             <CustomAction1 Context="upcomingEvent">
-                @if (ShowStartButton())
+                @if (ShowStartButton(upcomingEvent))
                 {
                     <NButtonWarning
                         OnClick="() => Start(upcomingEvent)"

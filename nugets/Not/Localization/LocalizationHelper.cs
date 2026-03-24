@@ -8,16 +8,15 @@ namespace Not.Localization;
 
 public static class LocalizationHelper
 {
-    static readonly IStringLocalizer LOCALIZER = ServiceLocator.Get<IStringLocalizer>();
-    static readonly INotifier NOTIFIER = ServiceLocator.Get<INotifier>();
-
     public static string LocalizeString(string resource)
     {
-        return LOCALIZER[resource];
+        TryInitialize();
+        return _localizer != null ? _localizer[resource] : resource;
     }
 
     public static string LocalizeEnum(Enum value)
     {
+        TryInitialize();
         try
         {
             return value.GetType().GetEnumField(value)?.GetAttributes<DisplayAttribute>().FirstOrDefault()?.GetName()
@@ -29,8 +28,17 @@ public static class LocalizationHelper
                 Text_formatting_failed_This_is_usually_not_critical_failure_string
                 + Environment.NewLine
                 + $"Localization resource is missing key for '{value}'";
-            NOTIFIER.Error(message);
+            _notifier?.Error(message);
             return value.ToString();
         }
+    }
+
+    static IStringLocalizer? _localizer;
+    static INotifier? _notifier;
+
+    static void TryInitialize()
+    {
+        _localizer ??= ServiceLocator.Get<IStringLocalizer>();
+        _notifier ??= ServiceLocator.Get<INotifier>();
     }
 }

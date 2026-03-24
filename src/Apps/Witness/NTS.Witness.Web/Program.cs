@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Not.Application.Configurations;
-using Not.Startup;
 using NTS.Witness;
 using NTS.Witness.Web;
 
@@ -21,7 +20,6 @@ Console.WriteLine(
 );
 
 var host = builder.Build();
-await host.Services.Startup();
 await host.RunAsync();
 
 static Task AddLocalhostOverrideSettings(WebAssemblyHostBuilder builder)

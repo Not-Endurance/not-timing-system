@@ -1,11 +1,11 @@
-﻿using NTS.Domain.Core;
+using NTS.Application.Watcher;
 using NTS.Domain.Watcher;
 
 namespace NTS.Application.UserSession;
 
-public interface IUserSessionService
+public interface IWitnessUserSession
 {
-    Task<ICoreSession?> GetCurrent();
+    Task<NtsUserSessionModel?> GetCurrent();
     Task SetEventId(int? eventId);
     Task AppendSnapshot(SnapshotGroup snapshot);
     Task DeleteCurrent();

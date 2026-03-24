@@ -1,6 +1,6 @@
+using Not.Application.Authentication.User;
 using Not.Krud.Abstractions;
 using NTS.Application.Shared;
-using NTS.Domain.Core;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 
@@ -51,36 +51,60 @@ public class SnapshotGroupModel
     }
 }
 
-public class UserSessionModel : IDocument, IKrudModel<UserSessionModel>, ICoreSession
+public class NtsUserSessionModel
+    : NUserSessionModel<NtsUserSessionStateModel>,
+        IDocument,
+        IKrudModel<NtsUserSessionModel>
 {
-    public static UserSessionModel From(ICoreSession session, int id)
-    {
-        var model = new UserSessionModel
-        {
-            Id = id,
-            EventId = session.EventId,
-            SnapshotHistory = session.SnapshotHistory.Select(SnapshotGroupModel.MapFrom).ToArray(),
-        };
-        return model;
-    }
-
-    IReadOnlyList<SnapshotGroup> ICoreSession.SnapshotHistory => SnapshotHistory.Select(x => x.MapToDomain()).ToArray();
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public int? EventId { get; set; }
-    public SnapshotGroupModel[] SnapshotHistory { get; set; } = [];
-
-    public void MapFrom(UserSessionModel session)
+    public int? EventId
     {
-        Id = session.Id;
-        EventId = session.EventId;
-        SnapshotHistory = [.. session.SnapshotHistory];
+        get => State?.EventId;
+        set => ResolveState().EventId = value;
     }
 
-    public UserSessionModel MapToEntity()
+    public SnapshotGroupModel[] SnapshotHistory
     {
-        var model = new UserSessionModel();
+        get => State?.SnapshotHistory ?? [];
+        set => ResolveState().SnapshotHistory = value;
+    }
+
+    public IReadOnlyList<SnapshotGroup> GetSnapshotHistory()
+    {
+        return SnapshotHistory.Select(x => x.MapToDomain()).ToArray();
+    }
+
+    public void MapFrom(NtsUserSessionModel session)
+    {
+        Id = session.Id;
+        UserIdentifier = session.UserIdentifier;
+        State =
+            session.State == null
+                ? null
+                : new NtsUserSessionStateModel
+                {
+                    EventId = session.State.EventId,
+                    SnapshotHistory = [.. session.State.SnapshotHistory],
+                };
+    }
+
+    public NtsUserSessionModel MapToEntity()
+    {
+        var model = new NtsUserSessionModel();
         model.MapFrom(this);
         return model;
     }
+
+    NtsUserSessionStateModel ResolveState()
+    {
+        State ??= new NtsUserSessionStateModel();
+        return State;
+    }
+}
+
+public class NtsUserSessionStateModel
+{
+    public int? EventId { get; set; }
+    public SnapshotGroupModel[] SnapshotHistory { get; set; } = [];
 }

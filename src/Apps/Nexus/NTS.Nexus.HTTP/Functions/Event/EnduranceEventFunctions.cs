@@ -1,7 +1,10 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
+using Not.Domain.Exceptions;
+using Not.Structures;
 using NTS.Application.Core;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
@@ -13,17 +16,20 @@ public class EnduranceEventFunctions : FunctionBase
 {
     readonly IRepository<EnduranceEventModel> _events;
     readonly IEnduranceEventResetService _resetService;
+    readonly IEnduranceEventBusinessService _businessService;
 
     public EnduranceEventFunctions(
         IFunctionLogger<EnduranceEventFunctions> logger,
         IRepository<EnduranceEventModel> events,
         IEnduranceEventResetService resetService,
+        IEnduranceEventBusinessService businessService,
         ITelemetryService telemetry
     )
         : base(logger, telemetry)
     {
         _events = events;
         _resetService = resetService;
+        _businessService = businessService;
     }
 
     [Function("endurance-event-create")]
@@ -127,5 +133,28 @@ public class EnduranceEventFunctions : FunctionBase
 
         await _resetService.Reset(id);
         return Ok();
+    }
+
+    [Function("endurance-event-start")]
+    public async Task<IActionResult> Start(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "endurance-event/{id:int}/start")]
+            HttpRequest request,
+        int id
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(Start));
+        TagRequest(request);
+        LogInformation(request, nameof(Start));
+
+        try
+        {
+            var startedEvent = await _businessService.Start(id);
+            return Ok(Result.Success(startedEvent));
+        }
+        catch (DomainException ex)
+        {
+            Activity.Current.TagException(ex);
+            return Ok(Result.Failure<EnduranceEventModel>(ex.Message));
+        }
     }
 }

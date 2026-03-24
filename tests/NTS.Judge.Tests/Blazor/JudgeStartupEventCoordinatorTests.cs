@@ -6,6 +6,7 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Features.Socket;
 
 namespace NTS.Judge.Tests.Blazor;
@@ -104,9 +105,21 @@ public class JudgeStartupEventCoordinatorTests
             _events = events;
         }
 
+        public IEventSubscriber ObservableEvent => throw new NotImplementedException();
+
         public Task<IEnumerable<EnduranceEvent>> GetEvents()
         {
             return Task.FromResult(_events);
+        }
+
+        public bool IsActive(UpcomingEvent upcomingEvent)
+        {
+            return true;
+        }
+
+        public Task Load()
+        {
+            return Task.CompletedTask;
         }
     }
 
@@ -133,6 +146,11 @@ public class JudgeStartupEventCoordinatorTests
             Status = SocketConnectionStatus.Disconnected;
             Event = null;
             return Task.CompletedTask;
+        }
+
+        public Task<bool> WillResetSession(EnduranceEvent enduranceEvent)
+        {
+            return Task.FromResult(false);
         }
 
         public Task Load()

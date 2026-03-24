@@ -1,4 +1,5 @@
 using Not.Application.CRUD.Ports;
+using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Notify;
@@ -8,6 +9,7 @@ using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
 using NTS.Judge.Features.Core.State;
+using NTS.Judge.Features.Setup.UpcomingEvents;
 
 namespace NTS.Judge.Features.Core;
 
@@ -16,7 +18,7 @@ public class DashService : IDashService, ISingleton
     readonly INtsSocketService _socketService;
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly IEnduranceEventRepository _enduranceEvents;
-    readonly IStartBusiness _startDashboardBusiness;
+    readonly IUpcomingEventService _upcomingEvents;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<EnduranceEvent> _events;
     readonly IRepository<Participation> _participations;
@@ -28,7 +30,7 @@ public class DashService : IDashService, ISingleton
         INtsSocketService socketService,
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
         IEnduranceEventRepository enduranceEvents,
-        IStartBusiness startDashboardBusiness,
+        IUpcomingEventService upcomingEvents,
         IRepository<Ranking> rankings,
         IRepository<EnduranceEvent> events,
         IRepository<Participation> participations,
@@ -40,7 +42,7 @@ public class DashService : IDashService, ISingleton
         _socketService = socketService;
         _coreDependentObservables = coreDependentObservables;
         _enduranceEvents = enduranceEvents;
-        _startDashboardBusiness = startDashboardBusiness;
+        _upcomingEvents = upcomingEvents;
         _rankings = rankings;
         _events = events;
         _participations = participations;
@@ -51,22 +53,25 @@ public class DashService : IDashService, ISingleton
 
     public Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId)
     {
-        return _startDashboardBusiness.Validate(upcomingEventId);
+        return _upcomingEvents.Validate(upcomingEventId);
     }
 
     public async Task Start(int upcomingEventId)
     {
-        var validationResult = await _startDashboardBusiness.Validate(upcomingEventId);
+        var validationResult = await _upcomingEvents.Validate(upcomingEventId);
         if (validationResult.Data?.Any() == true)
         {
             throw GuardHelper.Exception(
                 $"Cannot start with invalid state. Ensure to call {nameof(DashService)}.{nameof(Validate)}"
             );
         }
+        if (_socketService.IsConnected)
+        {
+            await _socketService.Disconnect();
+        }
 
-        var endranceEvent = await _startDashboardBusiness.CreateEnduranceEvent(upcomingEventId);
-        await _socketService.Connect(endranceEvent);
-        await _startDashboardBusiness.StartEnduranceEvent(upcomingEventId);
+        var enduranceEvent = await _enduranceEvents.Start(upcomingEventId);
+        await _socketService.Connect(enduranceEvent);
     }
 
     public async Task Reset()

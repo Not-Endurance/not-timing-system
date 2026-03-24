@@ -1,10 +1,14 @@
-﻿namespace Not.Async;
+﻿using Not.Exceptions;
+
+namespace Not.Async;
 
 public class CoalesceInvoker
 {
-    readonly Func<Task> _action;
     readonly Gate _gate = new();
+    Func<Task>? _action;
     int _isPending;
+
+    public CoalesceInvoker() { }
 
     public CoalesceInvoker(Func<Task> action)
     {
@@ -13,6 +17,13 @@ public class CoalesceInvoker
 
     public async Task Invoke()
     {
+        Interlocked.Exchange(ref _isPending, 1);
+        await RunActionLoop();
+    }
+
+    public async Task Invoke(Func<Task> action)
+    {
+        _action = action;
         Interlocked.Exchange(ref _isPending, 1);
         await RunActionLoop();
     }
@@ -27,6 +38,7 @@ public class CoalesceInvoker
         {
             while (Interlocked.Exchange(ref _isPending, 0) == 1)
             {
+                GuardHelper.ThrowIfDefault(_action);
                 await _action();
             }
         }

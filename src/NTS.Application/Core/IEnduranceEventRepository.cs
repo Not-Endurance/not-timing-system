@@ -5,6 +5,8 @@ namespace NTS.Application.Core;
 
 public interface IEnduranceEventRepository : IRepository<EnduranceEvent>
 {
+    Task<EnduranceEvent> Start(int upcomingEventId);
+
     /// <summary>
     /// Soft-resets the currently selected endurance event in Nexus.
     /// </summary>

@@ -7,4 +7,5 @@ public interface INtsSocketService : INtsSocketContext, IStatefulService
 {
     Task Connect(EnduranceEvent enduranceEvent);
     Task Disconnect();
+    Task<bool> WillResetSession(EnduranceEvent enduranceEvent);
 }

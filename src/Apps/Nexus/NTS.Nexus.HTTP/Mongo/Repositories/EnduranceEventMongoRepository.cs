@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using Not.Exceptions;
 using Not.Storage.Mongo;
 using NTS.Application.Core;
 
@@ -30,6 +31,17 @@ public class EnduranceEventMongoRepository : SoftDeleteMongoRepository<Endurance
             .Set(x => x.FeiEventCode, document.FeiEventCode)
             .Set(x => x.StartDay, document.StartDay)
             .Set(x => x.EndDay, document.EndDay);
+    }
+
+    public override async Task Create(EnduranceEventModel item)
+    {
+        var existing = await Read(item.Id);
+        if (existing != null)
+        {
+            throw GuardHelper.Exception($"Could not insert. Active endurance event with ID '{item.Id}' already exists");
+        }
+
+        await base.Create(item);
     }
 
     public async Task<int?> GetMaxDeletedVersion(int eventId)

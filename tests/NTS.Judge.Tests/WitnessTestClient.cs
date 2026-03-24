@@ -11,12 +11,7 @@ namespace NTS.Judge.Tests;
 public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcClient, ISingleton
 {
     public WitnessTestClient(IRpcSocket socket, ITestOutputHelper _)
-        : base(socket)
-    {
-        RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
-        RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
-        RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
-    }
+        : base(socket) { }
 
     public int Id { get; }
     public List<string> InvokedMethods { get; } = [];
@@ -45,8 +40,10 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
         return Task.CompletedTask;
     }
 
-    public override void RunAtStartup()
+    protected override void RegisterProcedures()
     {
-        throw new NotImplementedException();
+        RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
+        RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
+        RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
     }
 }

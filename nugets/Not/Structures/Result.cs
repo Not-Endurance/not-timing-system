@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
 
 namespace Not.Structures;
 
@@ -33,6 +34,7 @@ public class Result : ResultBase
 
     internal Result() { }
 
+    [JsonConstructor]
     internal Result(IEnumerable<string> errors)
         : base(errors) { }
 }
@@ -40,12 +42,20 @@ public class Result : ResultBase
 public class Result<T> : ResultBase
 {
     internal Result(T data)
+        : this(data, [])
     {
         Data = data;
     }
 
     internal Result(IEnumerable<string> errors)
-        : base(errors) { }
+        : this(default, errors) { }
+
+    [JsonConstructor]
+    Result(T? data, IEnumerable<string> errors)
+        : base(errors)
+    {
+        Data = data;
+    }
 
     [MemberNotNullWhen(false, nameof(Data))]
     public new bool IsError => base.IsError;
