@@ -2,8 +2,8 @@
 
 public class Handout : Aggregate
 {
-    public Handout(Participation participation)
-        : base(participation.Id)
+    public Handout(Participation participation, int? id = null)
+        : base(id)
     {
         Participation = participation;
         EventId = participation.EventId;

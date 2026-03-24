@@ -3,6 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Application.RPC.SignalR;
 using Not.Domain.Abstractions;
 using NTS.Application.Socket;
+using NTS.Application.Core;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -38,6 +39,43 @@ public class HandoutsServiceTests
         var document = Assert.Single(service.Documents);
         Assert.Equal(firstDocument.Id, document.Id);
         Assert.Equal(document.Id, Assert.Single(handouts.Items).Id);
+    }
+
+    [Fact]
+    public async Task Handle_WhenExistingHandoutsShareParticipation_ReplacesThemByParticipationId()
+    {
+        var participation = CreateParticipation(number: 42, eventId: 14, participationId: 301, combinationId: 201);
+        var preservedHandout = new Handout(participation, 901);
+        var duplicateHandout = new Handout(participation, 902);
+        var handouts = new RecordingRepository<Handout>([preservedHandout, duplicateHandout]);
+        var service = new HandoutsService(
+            new TestSocketContext { Event = CreateEvent(14) },
+            handouts,
+            new RecordingRepository<Participation>([participation]),
+            new RecordingRepository<Official>()
+        );
+
+        await service.Handle(new PhaseCompleted(participation), CancellationToken.None);
+
+        var stored = Assert.Single(handouts.Items);
+        var document = Assert.Single(service.Documents);
+
+        Assert.Equal(preservedHandout.Id, stored.Id);
+        Assert.Equal(participation.Id, stored.Participation.Id);
+        Assert.Equal(stored.Id, document.Id);
+        Assert.Equal(participation.Id, document.ParticipationId);
+    }
+
+    [Fact]
+    public void HandoutModel_MapToEntity_PreservesHandoutIdentity()
+    {
+        var participation = CreateParticipation(number: 42, eventId: 14, participationId: 301, combinationId: 201);
+        var model = HandoutModel.From(new Handout(participation, 901));
+
+        var handout = model.MapToEntity();
+
+        Assert.Equal(901, handout.Id);
+        Assert.Equal(participation.Id, handout.Participation.Id);
     }
 
     static EnduranceEvent CreateEvent(int id)
