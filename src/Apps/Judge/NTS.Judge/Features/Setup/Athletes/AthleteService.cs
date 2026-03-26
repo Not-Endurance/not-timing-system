@@ -8,6 +8,6 @@ namespace NTS.Judge.Features.Setup.Athletes;
 
 public class AthleteService : KrudServiceBase<Athlete, AthleteFormModel>, ITransient
 {
-    public AthleteService(IRepository<Athlete> repository, IEnumerable<IKrudMirror<Athlete>> dependants)
+    public AthleteService(IRepository<Athlete> repository, IEnumerable<IKrudMirrorService<Athlete>> dependants)
         : base(repository, dependants) { }
 }

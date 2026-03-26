@@ -2,7 +2,7 @@
 
 namespace Not.Krud.Abstractions;
 
-public interface IKrudMirror<in T>
+public interface IKrudMirrorService<in T>
     where T : IEntity
 {
     Task Reflect(T entity);

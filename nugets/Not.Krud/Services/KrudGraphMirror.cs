@@ -3,7 +3,7 @@ using Not.Krud.Abstractions;
 
 namespace Not.Krud.Services;
 
-internal sealed class KrudGraphMirror<TRoot, TPrincipal> : IKrudMirror<TPrincipal>
+internal sealed class KrudGraphMirror<TRoot, TPrincipal> : IKrudMirrorService<TPrincipal>
     where TRoot : Aggregate
     where TPrincipal : Entity
 {

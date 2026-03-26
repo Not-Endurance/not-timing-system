@@ -4,7 +4,7 @@ using NTS.Domain.Extensions;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Competition : Entity, IParent<Participation>, IParent<Phase>
+public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase>
 {
     readonly List<Phase> _phases = [];
     readonly List<Participation> _participations = [];
@@ -36,8 +36,8 @@ public class Competition : Entity, IParent<Participation>, IParent<Phase>
         FeiScheduleNumber = feiScheduleNumber;
     }
 
-    IReadOnlyList<Participation> IParent<Participation>.Children => Participations;
-    IReadOnlyList<Phase> IParent<Phase>.Children => Phases;
+    IReadOnlyList<Participation> IKrudParent<Participation>.Children => Participations;
+    IReadOnlyList<Phase> IKrudParent<Phase>.Children => Phases;
 
     public string Name { get; }
     public CompetitionType Type { get; }

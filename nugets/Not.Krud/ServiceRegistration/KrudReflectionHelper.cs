@@ -13,7 +13,7 @@ internal static class KrudReflectionHelper
     static readonly ConcurrentDictionary<(Type DependentType, Type PrincipalType), MethodInfo?> MIRROR_METHODS = [];
 
     /// <summary>
-    /// Returns all direct child <seealso cref="Entity"/>s that also implement <seealso cref="IParent{T}"/>
+    /// Returns all direct child <seealso cref="Entity"/>s that also implement <seealso cref="IKrudParent{T}"/>
     /// </summary>
     /// <param name="entityType">Domain entity type</param>
     /// <returns>All edge types of <paramref name="entityType"/></returns>
@@ -21,7 +21,7 @@ internal static class KrudReflectionHelper
     {
         return entityType
             .GetInterfaces()
-            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IParent<>))
+            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IKrudParent<>))
             .Select(i => i.GetGenericArguments()[0])
             .Where(t => typeof(Entity).IsAssignableFrom(t));
     }
@@ -116,7 +116,7 @@ internal static class KrudReflectionHelper
     {
         return type
             .GetInterfaces()
-            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntityMirror<>));
+            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IKurdMirror<>));
     }
 
     public static IReadOnlyList<Type> GetEntityMirrorPrincipalTypes(IEnumerable<Type> types)
@@ -164,6 +164,6 @@ internal static class KrudReflectionHelper
             .OrderByDescending(i => i.GetGenericArguments()[0] == principalType)
             .FirstOrDefault(i => i.GetGenericArguments()[0].IsAssignableFrom(principalType));
 
-        return mirrorInterface?.GetMethod(nameof(IEntityMirror<Entity>.Reflect));
+        return mirrorInterface?.GetMethod(nameof(IKurdMirror<Entity>.Reflect));
     }
 }

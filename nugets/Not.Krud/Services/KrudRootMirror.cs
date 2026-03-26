@@ -5,14 +5,14 @@ using Not.Krud.Abstractions;
 
 namespace Not.Krud.Services;
 
-internal sealed class KrudRootMirror<TRoot, TPrincipal> : IKrudMirror<TPrincipal>
-    where TRoot : Aggregate, IEntityMirror<TPrincipal>
+internal sealed class KrudRootMirror<TRoot, TPrincipal> : IKrudMirrorService<TPrincipal>
+    where TRoot : Aggregate, IKurdMirror<TPrincipal>
     where TPrincipal : Entity
 {
-    readonly List<IKrudMirror<TRoot>> _mirrors;
+    readonly List<IKrudMirrorService<TRoot>> _mirrors;
     readonly IRepository<TRoot> _repository;
 
-    public KrudRootMirror(IRepository<TRoot> repository, IEnumerable<IKrudMirror<TRoot>> mirrors)
+    public KrudRootMirror(IRepository<TRoot> repository, IEnumerable<IKrudMirrorService<TRoot>> mirrors)
     {
         _repository = repository;
         _mirrors = mirrors.ToList();

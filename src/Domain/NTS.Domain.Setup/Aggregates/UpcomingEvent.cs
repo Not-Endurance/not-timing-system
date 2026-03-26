@@ -6,7 +6,7 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>, IParent<Loop>, IParent<Combination>
+public class UpcomingEvent : Aggregate, IKrudParent<Official>, IKrudParent<Competition>, IKrudParent<Loop>, IKrudParent<Combination>
 {
     readonly List<Competition> _competitions = [];
     readonly List<Official> _officials = [];
@@ -41,10 +41,10 @@ public class UpcomingEvent : Aggregate, IParent<Official>, IParent<Competition>,
         ValidateUniqueSetup();
     }
 
-    IReadOnlyList<Official> IParent<Official>.Children => Officials;
-    IReadOnlyList<Competition> IParent<Competition>.Children => Competitions;
-    IReadOnlyList<Loop> IParent<Loop>.Children => Loops;
-    IReadOnlyList<Combination> IParent<Combination>.Children => Combinations;
+    IReadOnlyList<Official> IKrudParent<Official>.Children => Officials;
+    IReadOnlyList<Competition> IKrudParent<Competition>.Children => Competitions;
+    IReadOnlyList<Loop> IKrudParent<Loop>.Children => Loops;
+    IReadOnlyList<Combination> IKrudParent<Combination>.Children => Combinations;
 
     public string Name { get; }
     public string Place { get; }

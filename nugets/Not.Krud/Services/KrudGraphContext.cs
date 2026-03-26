@@ -219,11 +219,11 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
             var parentInterfaces = current
                 .GetType()
                 .GetInterfaces()
-                .Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IParent<>));
+                .Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IKrudParent<>));
 
             foreach (var parentInterface in parentInterfaces)
             {
-                var childrenProperty = parentInterface.GetProperty(nameof(IParent<Entity>.Children));
+                var childrenProperty = parentInterface.GetProperty(nameof(IKrudParent<Entity>.Children));
                 if (childrenProperty?.GetValue(current) is not IEnumerable children)
                 {
                     continue;
@@ -239,21 +239,21 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
 
     static IEnumerable<object> ReadChildren(object parent, Type dependentType)
     {
-        var parentInterface = typeof(IParent<>).MakeGenericType(dependentType);
+        var parentInterface = typeof(IKrudParent<>).MakeGenericType(dependentType);
         if (!parentInterface.IsAssignableFrom(parent.GetType()))
         {
             return [];
         }
 
-        var childrenProperty = parentInterface.GetProperty(nameof(IParent<Entity>.Children));
+        var childrenProperty = parentInterface.GetProperty(nameof(IKrudParent<Entity>.Children));
         var children = childrenProperty?.GetValue(parent) as IEnumerable;
         return children?.OfType<object>() ?? [];
     }
 
     static void RemoveDependent(object parent, Type dependentType, Entity dependent)
     {
-        var parentInterface = typeof(IParent<>).MakeGenericType(dependentType);
-        var removeMethod = parentInterface.GetMethod(nameof(IParent<Entity>.Remove));
+        var parentInterface = typeof(IKrudParent<>).MakeGenericType(dependentType);
+        var removeMethod = parentInterface.GetMethod(nameof(IKrudParent<Entity>.Remove));
         if (removeMethod == null)
         {
             throw new InvalidOperationException(

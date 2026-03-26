@@ -133,7 +133,7 @@ public class KrudGraphRegistrationTests
         }
     }
 
-    sealed class GraphAggregate : Aggregate, IParent<GraphParent>
+    sealed class GraphAggregate : Aggregate, IKrudParent<GraphParent>
     {
         readonly List<GraphParent> _parents = [];
 
@@ -148,7 +148,7 @@ public class KrudGraphRegistrationTests
 
         public IReadOnlyList<GraphParent> Parents => _parents.AsReadOnly();
 
-        IReadOnlyList<GraphParent> IParent<GraphParent>.Children => Parents;
+        IReadOnlyList<GraphParent> IKrudParent<GraphParent>.Children => Parents;
 
         public void Add(GraphParent child)
         {
@@ -175,7 +175,7 @@ public class KrudGraphRegistrationTests
         }
     }
 
-    sealed class GraphParent : Entity, IParent<GraphLeaf>
+    sealed class GraphParent : Entity, IKrudParent<GraphLeaf>
     {
         readonly List<GraphLeaf> _leaves = [];
 
@@ -192,7 +192,7 @@ public class KrudGraphRegistrationTests
         public string Name { get; }
         public IReadOnlyList<GraphLeaf> Leaves => _leaves.AsReadOnly();
 
-        IReadOnlyList<GraphLeaf> IParent<GraphLeaf>.Children => Leaves;
+        IReadOnlyList<GraphLeaf> IKrudParent<GraphLeaf>.Children => Leaves;
 
         public void Add(GraphLeaf child)
         {

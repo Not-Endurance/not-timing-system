@@ -82,7 +82,7 @@ public static class KrudServiceCollectionExtensions
         {
             services.Add(
                 new(
-                    typeof(IKrudMirror<>).MakeGenericType(principalType),
+                    typeof(IKrudMirrorService<>).MakeGenericType(principalType),
                     typeof(KrudRootMirror<,>).MakeGenericType(typeof(T), principalType),
                     lifetime
                 )
@@ -93,7 +93,7 @@ public static class KrudServiceCollectionExtensions
         {
             services.Add(
                 new(
-                    typeof(IKrudMirror<>).MakeGenericType(principalType),
+                    typeof(IKrudMirrorService<>).MakeGenericType(principalType),
                     typeof(KrudGraphMirror<,>).MakeGenericType(typeof(T), principalType),
                     lifetime
                 )

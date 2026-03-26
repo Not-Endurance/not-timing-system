@@ -1,6 +1,7 @@
 ﻿namespace Not.Domain.Krud;
 
-public interface IParent<T>
+// TODO: create Not.Krud.Abstractions project and put interfaces there
+public interface IKrudParent<T>
     where T : Entity
 {
     void Add(T child);

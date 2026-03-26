@@ -288,11 +288,11 @@ public class KrudServiceBaseTests
 
     sealed class TestService : KrudServiceBase<TestEntity, TestModel>
     {
-        public TestService(IRepository<TestEntity> repository, IEnumerable<IKrudMirror<TestEntity>> reflections)
+        public TestService(IRepository<TestEntity> repository, IEnumerable<IKrudMirrorService<TestEntity>> reflections)
             : base(repository, reflections) { }
     }
 
-    sealed class TestMirror : IKrudMirror<TestEntity>
+    sealed class TestMirror : IKrudMirrorService<TestEntity>
     {
         readonly Exception? _exception;
 

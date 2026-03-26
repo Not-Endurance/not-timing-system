@@ -3,7 +3,7 @@ using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Participation : Entity, IEntityMirror<Combination>
+public class Participation : Entity, IKurdMirror<Combination>
 {
     const double CHILDREN_MIN_SPEED = 8;
     const double CHILDREN_MAX_SPEED = 12;

@@ -8,6 +8,6 @@ namespace NTS.Judge.Features.Setup.UpcomingEvents.Officials;
 
 public class OfficialService : KrudServiceBase<Official, OfficialFormModel>, ITransient
 {
-    public OfficialService(IRepository<Official> officials, IEnumerable<IKrudMirror<Official>> dependants)
+    public OfficialService(IRepository<Official> officials, IEnumerable<IKrudMirrorService<Official>> dependants)
         : base(officials, dependants) { }
 }

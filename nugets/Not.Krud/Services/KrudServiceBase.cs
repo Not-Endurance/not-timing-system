@@ -12,10 +12,10 @@ public abstract class KrudServiceBase<T, TModel> : IKrudListBehind<T>, IKrudForm
     where T : Entity
     where TModel : IKrudModel<T>, IKrudFormModel, new()
 {
-    readonly List<IKrudMirror<T>> _mirrors;
+    readonly List<IKrudMirrorService<T>> _mirrors;
     readonly IRepository<T> _repository;
 
-    protected KrudServiceBase(IRepository<T> repository, IEnumerable<IKrudMirror<T>> reflections)
+    protected KrudServiceBase(IRepository<T> repository, IEnumerable<IKrudMirrorService<T>> reflections)
     {
         _repository = repository;
         _mirrors = reflections.ToList();

@@ -2,7 +2,7 @@
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Combination : Entity, IEntityMirror<Athlete>, IEntityMirror<Horse>
+public class Combination : Entity, IKurdMirror<Athlete>, IKurdMirror<Horse>
 {
     public Combination(int? number, Athlete? athlete, Horse? horse, int? id)
         : base(id)

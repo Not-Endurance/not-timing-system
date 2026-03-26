@@ -8,6 +8,6 @@ namespace NTS.Judge.Features.Setup.Horses;
 
 public class HorseService : KrudServiceBase<Horse, HorseFormModel>, ITransient
 {
-    public HorseService(IRepository<Horse> repository, IEnumerable<IKrudMirror<Horse>> dependants)
+    public HorseService(IRepository<Horse> repository, IEnumerable<IKrudMirrorService<Horse>> dependants)
         : base(repository, dependants) { }
 }

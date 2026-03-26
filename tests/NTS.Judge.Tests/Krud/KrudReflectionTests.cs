@@ -24,10 +24,10 @@ public class KrudReflectionTests
     {
         using var scenario = ReflectionScenario.Create();
 
-        Assert.Single(scenario.Provider.GetServices<IKrudMirror<Loop>>());
-        Assert.Single(scenario.Provider.GetServices<IKrudMirror<Combination>>());
-        Assert.Single(scenario.Provider.GetServices<IKrudMirror<Athlete>>());
-        Assert.Single(scenario.Provider.GetServices<IKrudMirror<Horse>>());
+        Assert.Single(scenario.Provider.GetServices<IKrudMirrorService<Loop>>());
+        Assert.Single(scenario.Provider.GetServices<IKrudMirrorService<Combination>>());
+        Assert.Single(scenario.Provider.GetServices<IKrudMirrorService<Athlete>>());
+        Assert.Single(scenario.Provider.GetServices<IKrudMirrorService<Horse>>());
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class KrudReflectionTests
     {
         using var scenario = ReflectionScenario.Create();
 
-        Assert.Single(scenario.Provider.GetServices<IKrudMirror<Club>>());
+        Assert.Single(scenario.Provider.GetServices<IKrudMirrorService<Club>>());
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public class KrudReflectionTests
     {
         using var scenario = ReflectionScenario.Create();
         scenario.ActivateEventContext();
-        var mirror = scenario.Provider.GetServices<IKrudMirror<Club>>().Single();
+        var mirror = scenario.Provider.GetServices<IKrudMirrorService<Club>>().Single();
 
         await mirror.Reflect(new Club("Updated Club", scenario.ClubInUse.Id));
 
@@ -140,7 +140,7 @@ public class KrudReflectionTests
     public async Task GraphMirror_WhenNoActiveRootSet_DoesNotPersist()
     {
         using var scenario = ReflectionScenario.Create();
-        var mirror = scenario.Provider.GetServices<IKrudMirror<Athlete>>().Single();
+        var mirror = scenario.Provider.GetServices<IKrudMirrorService<Athlete>>().Single();
 
         await mirror.Reflect(new Athlete(new Person(["No", "Context"]), null, scenario.Country, null, id: scenario.AthleteInUse.Id));
 
@@ -153,7 +153,7 @@ public class KrudReflectionTests
     {
         using var scenario = ReflectionScenario.Create();
         scenario.ActivateEventContext();
-        var mirror = scenario.Provider.GetServices<IKrudMirror<Athlete>>().Single();
+        var mirror = scenario.Provider.GetServices<IKrudMirrorService<Athlete>>().Single();
 
         await mirror.Reflect(
             new Athlete(new Person(["Unused", "Updated"]), null, scenario.Country, null, id: scenario.AthleteUnused.Id)
@@ -298,14 +298,14 @@ public class KrudReflectionTests
 
         public LoopService CreateLoopService()
         {
-            return new LoopService(Provider.GetServices<IKrudMirror<Loop>>(), Provider.GetRequiredService<IRepository<Loop>>());
+            return new LoopService(Provider.GetServices<IKrudMirrorService<Loop>>(), Provider.GetRequiredService<IRepository<Loop>>());
         }
 
         public CombinationService CreateCombinationService()
         {
             return new CombinationService(
                 Provider.GetRequiredService<IRepository<Combination>>(),
-                Provider.GetServices<IKrudMirror<Combination>>()
+                Provider.GetServices<IKrudMirrorService<Combination>>()
             );
         }
 
@@ -313,7 +313,7 @@ public class KrudReflectionTests
         {
             return new AthleteService(
                 Provider.GetRequiredService<IRepository<Athlete>>(),
-                Provider.GetServices<IKrudMirror<Athlete>>()
+                Provider.GetServices<IKrudMirrorService<Athlete>>()
             );
         }
 
@@ -321,7 +321,7 @@ public class KrudReflectionTests
         {
             return new HorseService(
                 Provider.GetRequiredService<IRepository<Horse>>(),
-                Provider.GetServices<IKrudMirror<Horse>>()
+                Provider.GetServices<IKrudMirrorService<Horse>>()
             );
         }
 

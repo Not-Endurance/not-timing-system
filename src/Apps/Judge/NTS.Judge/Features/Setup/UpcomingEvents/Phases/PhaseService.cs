@@ -8,6 +8,6 @@ namespace NTS.Judge.Features.Setup.UpcomingEvents.Phases;
 
 public class PhaseService : KrudServiceBase<Phase, PhaseFormModel>, ITransient
 {
-    public PhaseService(IRepository<Phase> phases, IEnumerable<IKrudMirror<Phase>> reflections)
+    public PhaseService(IRepository<Phase> phases, IEnumerable<IKrudMirrorService<Phase>> reflections)
         : base(phases, reflections) { }
 }
