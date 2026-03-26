@@ -9,13 +9,13 @@ namespace NTS.Nexus.Warp.Features.Witness;
 
 internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProcedures
 {
-    readonly IPrimaryConnectionContext _primaryConnections;
+    readonly IJudgeConnectionsContext _primaryConnections;
     readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;
     readonly IPendingSnapshotsService _pendingSnapshots;
 
     public WitnessRpcHub(
         ILogger<WitnessRpcHub> logger,
-        IPrimaryConnectionContext primaryConnections,
+        IJudgeConnectionsContext primaryConnections,
         IHubContext<JudgeRpcHub, IJudgeClientProcedures> judgeRelay,
         IPendingSnapshotsService pendingSnapshots
     )

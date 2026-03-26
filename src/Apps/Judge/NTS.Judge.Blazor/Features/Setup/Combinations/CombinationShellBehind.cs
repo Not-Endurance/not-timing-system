@@ -9,10 +9,10 @@ namespace NTS.Judge.Blazor.Features.Setup.Combinations;
 public class CombinationShellBehind : KrudShell<CombinationFormModel>
 {
     [Inject]
-    IListBehind<Athlete> AthletesService { get; set; } = default!;
+    ISettService<Athlete> AthletesService { get; set; } = default!;
 
     [Inject]
-    IListBehind<Horse> HorsesService { get; set; } = default!;
+    ISettService<Horse> HorsesService { get; set; } = default!;
 
     protected async Task<IEnumerable<Athlete?>> SearchAthletesSafe(string term, CancellationToken _)
     {

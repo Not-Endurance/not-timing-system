@@ -1,7 +1,6 @@
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Application.DomainEvents;
-using Not.Application.Services;
 using Not.Async.Extensions;
 using Not.Exceptions;
 using Not.Injection;
@@ -23,11 +22,10 @@ public class ParticipationService
         IInspectionService,
         IEliminationService,
         IParticipationContext,
-        IUpdateBehind<PhaseUpdateModel>,
         ITimingService,
         IStartupInitializerAsync,
         ICoreDependentObservables,
-        ISingleton
+        IScoped
 {
     readonly List<int> _recentlyProcessed = [];
     readonly INtsSocketContext _socketContext;

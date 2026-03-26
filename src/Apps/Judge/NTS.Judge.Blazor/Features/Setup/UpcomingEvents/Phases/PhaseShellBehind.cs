@@ -9,7 +9,7 @@ namespace NTS.Judge.Blazor.Features.Setup.UpcomingEvents.Phases;
 public class PhaseShellBehind : KrudShell<PhaseFormModel>
 {
     [Inject]
-    IListBehind<Loop> Behind { get; set; } = default!;
+    ISettService<Loop> Behind { get; set; } = default!;
 
     protected IEnumerable<NotListModel<Loop>> Loops { get; private set; } = [];
 

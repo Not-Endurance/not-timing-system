@@ -30,7 +30,7 @@ public class NApplicationBuilder
 
     public NApplicationBuilder AddRpcClient()
     {
-        _services.AddSingleton<IRpcSocket, SignalRSocket>();
+        _services.AddScoped<IRpcSocket, SignalRSocket>();
         _services.AddSettings<RpcSettings>(
             _configuration,
             x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern)

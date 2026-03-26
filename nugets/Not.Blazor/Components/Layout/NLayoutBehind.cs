@@ -1,9 +1,19 @@
 using Not.Blazor.Components.Abstractions;
+using Not.Safe;
+using Not.Startup;
 
 namespace Not.Blazor.Components.Layout;
 
 public class NLayoutBehind : LayoutComponentBase
 {
+    bool _hasStarted;
+
+    [Inject]
+    IEnumerable<IStartupInitializer> Initializers { get; set; } = default!;
+
+    [Inject]
+    IEnumerable<IStartupInitializerAsync> AsyncInitializers { get; set; } = default!;
+
     protected bool DrawerOpen { get; set; } = true;
     protected bool HideLayout { get; private set; }
     protected NTheme Theme { get; set; } = default!;
@@ -23,6 +33,32 @@ public class NLayoutBehind : LayoutComponentBase
     protected override void OnInitialized()
     {
         PrintableComponent.OnToggle(ToggleLayoutVisibility);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _hasStarted)
+        {
+            return;
+        }
+
+        _hasStarted = true;
+
+        try
+        {
+            foreach (var initializer in Initializers)
+            {
+                initializer.RunAtStartup();
+            }
+            foreach (var initializer in AsyncInitializers)
+            {
+                await initializer.RunAtStartupAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            SafeHelper.HandleException(ex);
+        }
     }
 
     protected void ToggleDrawer()

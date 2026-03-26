@@ -10,7 +10,7 @@ using NTS.Domain.Core.Events;
 
 namespace NTS.Judge.Features.Socket;
 
-public class JudgeSocketService : NStatefulService, INtsSocketService, ISingleton
+public class JudgeSocketService : NStatefulService, INtsSocketService, IScoped
 {
     readonly IRpcSocket _socket;
     readonly INotifier _notifier;

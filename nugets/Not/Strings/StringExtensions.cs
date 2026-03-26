@@ -51,10 +51,10 @@ public static class StringExtensions
                 + $"Format: {format}"
                 + Environment.NewLine
                 + $"args: {string.Join(", ", args)}";
-            Notifier.Error(message);
+            Notifier?.Error(message);
             return format;
         }
     }
 
-    static INotifier Notifier => ServiceLocator.GetRequired<INotifier>();
+    static INotifier? Notifier => ServiceLocator.Get<INotifier>();
 }

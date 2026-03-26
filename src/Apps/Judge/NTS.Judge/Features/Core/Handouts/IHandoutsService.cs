@@ -4,7 +4,7 @@ using NTS.Domain.Core.Objects.Documents;
 
 namespace NTS.Judge.Features.Core.Handouts;
 
-public interface IHandoutsService : IStatefulService, ISingleton
+public interface IHandoutsService : IStatefulService, IScoped
 {
     IReadOnlyList<HandoutDocument> Documents { get; }
     Task Delete(IEnumerable<HandoutDocument> documents);

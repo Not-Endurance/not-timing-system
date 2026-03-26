@@ -28,7 +28,7 @@ public static class KrudServiceCollectionExtensions
     /// <returns></returns>
     internal static IServiceCollection AddKrudRoot<T>(
         this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton
+        ServiceLifetime lifetime = ServiceLifetime.Scoped
     )
         where T : Aggregate
     {

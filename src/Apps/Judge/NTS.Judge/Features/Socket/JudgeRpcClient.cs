@@ -20,7 +20,7 @@ public class JudgeRpcClient
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationEliminated>,
         INotificationHandler<ParticipationRestored>,
-        ISingleton
+        IScoped
 {
     readonly INtsSocketService _eventContext;
     readonly ITimingService _timingService;

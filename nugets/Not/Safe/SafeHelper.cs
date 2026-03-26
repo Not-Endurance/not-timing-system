@@ -34,7 +34,7 @@ public static class SafeHelper
 
     public static T? Run<T>(Func<T> action)
     {
-        return Run(action, validation => Notifier.Warn(validation.Message));
+        return Run(action, validation => Notifier?.Warn(validation.Message));
     }
 
     [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
@@ -184,7 +184,7 @@ public static class SafeHelper
     [Obsolete("Use 'RunWithError' or 'HandleException'/'HandleExceptionAsync' methods")]
     public static Task Run<T>(Func<T, Task> action, T argument)
     {
-        return Run(action, argument, validation => Notifier.Warn(validation.Message));
+        return Run(action, argument, validation => Notifier?.Warn(validation.Message));
     }
 
     public static async Task HandleExceptionAsync(Exception exception)
@@ -203,7 +203,7 @@ public static class SafeHelper
     {
         if (exception is ValidationException validation)
         {
-            Notifier.Warn(validation.Message);
+            Notifier?.Warn(validation.Message);
         }
         else
         {
@@ -211,11 +211,11 @@ public static class SafeHelper
         }
     }
 
-    static INotifier Notifier => ServiceLocator.GetRequired<INotifier>();
+    static INotifier? Notifier => ServiceLocator.Get<INotifier>();
 
     static Task HandleDefaultValidation(ValidationException validation)
     {
-        Notifier.Warn(validation.Message);
+        Notifier?.Warn(validation.Message);
         return Task.CompletedTask;
     }
 
@@ -224,7 +224,7 @@ public static class SafeHelper
         //#if DEBUG
         //        throw ex;
         //#else
-        Notifier.Error(ex);
+        Notifier?.Error(ex);
         var logMessage = $"An error {ex.Message} was thrown at {ex.Source} with trace \n {ex.StackTrace}";
         LoggingHelper.Error(logMessage);
         WriteToTraceConsole(ex);

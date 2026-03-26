@@ -20,7 +20,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         Client = client;
     }
 
-    static INotifier Notifier => ServiceLocator.GetRequired<INotifier>();
+    static INotifier? Notifier => ServiceLocator.Get<INotifier>();
 
     protected NHttpClient Client { get; }
     protected string Endpoint => _endpoint;
@@ -43,9 +43,9 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         )
         {
 #if DEBUG
-            Notifier.Warn(ex.Message);
+            Notifier?.Warn(ex.Message);
 #else
-            Notifier.Warn(
+            Notifier?.Warn(
                 Localization
                     .NStrings
                     .Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
@@ -54,7 +54,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         }
         else
         {
-            Notifier.Error(ex);
+            Notifier?.Error(ex);
         }
     }
 

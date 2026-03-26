@@ -6,7 +6,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Judge.Features.Settings;
 
-public class SettingService : NStatefulService, ISettingService, IKrudFormService<SettingFormModel>, ISingleton
+public class SettingService : NStatefulService, ISettingService, IKrudFormService<SettingFormModel>, IScoped
 {
     readonly ISettingRepository _repository;
     readonly IEnumerable<IKrudMirror<Setting>> _reflections;

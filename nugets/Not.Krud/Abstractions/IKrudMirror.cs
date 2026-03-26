@@ -1,9 +1,8 @@
 ﻿using Not.Domain.Abstractions;
-using Not.Injection;
 
 namespace Not.Krud.Abstractions;
 
-public interface IKrudMirror<in T> : ISingleton
+public interface IKrudMirror<in T>
     where T : IEntity
 {
     Task Reflect(T entity);

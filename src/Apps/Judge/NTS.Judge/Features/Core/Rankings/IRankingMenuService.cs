@@ -5,7 +5,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Core.Rankings;
 
-public interface IRankingMenuService : IRankingContext, ISingleton
+public interface IRankingMenuService : IRankingContext, IScoped
 {
     ObservableList<Ranking> Rankings { get; }
     void Select(Ranking ranking);

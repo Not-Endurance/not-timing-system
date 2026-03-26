@@ -77,8 +77,7 @@ public class UpcomingEventService
             {
                 foreach (var phase in competitions.Phases)
                 {
-                    hasReflected = true;
-                    phase.Reflect(loop);
+                    hasReflected = hasReflected || phase.Reflect(loop);
                 }
             }
             return hasReflected;
@@ -94,8 +93,7 @@ public class UpcomingEventService
             {
                 foreach (var participation in competitions.Participations)
                 {
-                    hasReflected = true;
-                    participation.Reflect(combination);
+                    hasReflected = hasReflected || participation.Reflect(combination);
                 }
             }
             return hasReflected;
