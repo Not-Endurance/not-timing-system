@@ -63,6 +63,53 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         return FindDependencies(principalType).Any();
     }
 
+    public async Task Reflect<TPrincipal>(TPrincipal principal)
+        where TPrincipal : Entity
+    {
+        EnsureGraphBuilt();
+        if (_graph?.Root?.Value is not T root)
+        {
+            return;
+        }
+
+        var pending = new Queue<Entity>();
+        var seen = new HashSet<(Type Type, int Id)>();
+        pending.Enqueue(principal);
+        seen.Add((principal.GetType(), principal.Id));
+
+        var hasReflected = false;
+        while (pending.Count > 0)
+        {
+            var current = pending.Dequeue();
+            var updatedDependents = new HashSet<(Type Type, int Id)>();
+
+            foreach (var usage in ResolveUsages(root, current))
+            {
+                var dependentKey = (usage.Dependent.GetType(), usage.Dependent.Id);
+                if (!updatedDependents.Add(dependentKey))
+                {
+                    continue;
+                }
+
+                if (!KrudReflectionHelper.TryReflect(usage.Dependent, current))
+                {
+                    continue;
+                }
+
+                hasReflected = true;
+                if (seen.Add(dependentKey))
+                {
+                    pending.Enqueue(usage.Dependent);
+                }
+            }
+        }
+
+        if (hasReflected)
+        {
+            await _coalescedCommit.Invoke();
+        }
+    }
+
     public KrudDeleteImpact PreviewDelete(Entity principal)
     {
         EnsureGraphBuilt();

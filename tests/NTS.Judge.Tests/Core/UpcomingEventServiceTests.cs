@@ -45,7 +45,7 @@ public class UpcomingEventServiceTests
                 CreateValidEvent(2, competitionId: 1, participationNumber: 101),
             ]
         );
-        var service = new UpcomingEventService(repository, new TestNotifier(), new TestSelectedUpcomingEventContext());
+        var service = new UpcomingEventService(repository, new TestNotifier());
 
         await service.DeleteParticipation(2, 101, 1);
 
@@ -53,100 +53,9 @@ public class UpcomingEventServiceTests
         Assert.Empty(repository.Items.Single(x => x.Id == 2).Competitions.Single().Participations);
     }
 
-    [Fact]
-    public async Task ReflectLoop_WhenMatchingPhaseIsNotLast_PersistsUpdatedEvent()
-    {
-        var sharedLoop = new Loop(40, id: 101);
-        var untouchedLoop = new Loop(20, id: 102);
-        var competition = new Competition(
-            "Competition 1",
-            CompetitionType.Qualification,
-            CompetitionRuleset.FEI,
-            DateTimeOffset.UtcNow,
-            null,
-            null,
-            null,
-            null,
-            [
-                new Phase(sharedLoop, 40, null, id: 201),
-                new Phase(untouchedLoop, 30, null, id: 202),
-            ],
-            [CreateParticipation(1)],
-            id: 301
-        );
-        var selectedEvent = CreateEvent(id: 1, competitions: [competition], loops: [sharedLoop, untouchedLoop]);
-        var repository = new RecordingRepository<UpcomingEvent>([selectedEvent]);
-        var selectedContext = new TestSelectedUpcomingEventContext { Event = selectedEvent };
-        var service = new UpcomingEventService(repository, new TestNotifier(), selectedContext);
-
-        await service.Reflect(new Loop(45, id: 101));
-
-        var persisted = repository.Items.Single();
-        Assert.Equal(45, persisted.Competitions.Single().Phases.First().Loop.Distance);
-    }
-
-    [Fact]
-    public async Task ReflectCombination_WhenMatchingParticipationIsNotLast_PersistsUpdatedEvent()
-    {
-        var country = CreateCountry();
-        var updatedCombination = new Combination(
-            number: 10,
-            athlete: new Athlete(new Person(["Updated", "Athlete"]), null, country, null, id: 501),
-            horse: new Horse("Updated Horse", null, id: 601),
-            id: 401
-        );
-        var untouchedCombination = new Combination(
-            number: 11,
-            athlete: new Athlete(new Person(["Other", "Athlete"]), null, country, null, id: 502),
-            horse: new Horse("Other Horse", null, id: 602),
-            id: 402
-        );
-        var competition = new Competition(
-            "Competition 1",
-            CompetitionType.Qualification,
-            CompetitionRuleset.FEI,
-            DateTimeOffset.UtcNow,
-            null,
-            null,
-            null,
-            null,
-            [new Phase(new Loop(40, id: 701), 40, null, id: 702)],
-            [
-                CreateParticipation(updatedCombination, id: 801),
-                CreateParticipation(untouchedCombination, id: 802),
-            ],
-            id: 901
-        );
-        var selectedEvent = CreateEvent(
-            id: 2,
-            competitions: [competition],
-            loops: [new Loop(40, id: 701)],
-            combinations: [updatedCombination, untouchedCombination]
-        );
-        var repository = new RecordingRepository<UpcomingEvent>([selectedEvent]);
-        var selectedContext = new TestSelectedUpcomingEventContext { Event = selectedEvent };
-        var service = new UpcomingEventService(repository, new TestNotifier(), selectedContext);
-
-        await service.Reflect(
-            new Combination(
-                number: 10,
-                athlete: new Athlete(new Person(["Updated", "Again"]), null, country, null, id: 501),
-                horse: new Horse("Updated Horse", null, id: 601),
-                id: 401
-            )
-        );
-
-        var persisted = repository.Items.Single();
-        Assert.Equal("Updated Again", persisted.Competitions.Single().Participations.First().Combination.Athlete.ToString());
-    }
-
     static UpcomingEventService CreateService(IEnumerable<UpcomingEvent> upcomingEvents)
     {
-        return new UpcomingEventService(
-            new RecordingRepository<UpcomingEvent>(upcomingEvents),
-            new TestNotifier(),
-            new TestSelectedUpcomingEventContext()
-        );
+        return new UpcomingEventService(new RecordingRepository<UpcomingEvent>(upcomingEvents), new TestNotifier());
     }
 
     static Country CreateCountry()
@@ -399,10 +308,5 @@ public class UpcomingEventServiceTests
         public void Success(string message) { }
 
         public void Warn(string message) { }
-    }
-
-    sealed class TestSelectedUpcomingEventContext : ISelectedUpcomingEventContext
-    {
-        public UpcomingEvent? Event { get; set; }
     }
 }

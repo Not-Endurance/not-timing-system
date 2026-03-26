@@ -109,11 +109,6 @@ internal static class KrudGraphHelper
                     continue;
                 }
 
-                if (!managedSet.Contains(principalType))
-                {
-                    continue;
-                }
-
                 foreach (var parentType in parentTypes)
                 {
                     dependencies.Add(
