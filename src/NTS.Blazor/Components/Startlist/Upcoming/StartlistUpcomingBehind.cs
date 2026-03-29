@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using NTS.Domain.Core.Objects.Startlists;
 using Not.Blazor.Components.Abstractions;
 using NTS.Application.Startlists;
 
@@ -10,11 +11,7 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
 
     System.Timers.Timer _timer = default!;
 
-    protected string[] TableHeaders =>
-        [Number_string, Athlete_string, Loops_string, Start_Time_string, Start_In_string];
-
-    [Parameter]
-    public bool Mobile { get; set; } = false;
+    protected string NumberAndLoopHeader => $"{Number_string} / {Loops_string}";
 
     [Inject]
     public IStartUpcoming Service { get; set; } = default!;
@@ -29,6 +26,16 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
         _timer = new(TIMER_INTERVAL);
         _timer.Elapsed += OnElapsed;
         _timer.Start();
+    }
+
+    protected string FormatAthlete(Starter entry)
+    {
+        return entry.Athlete.ToString();
+    }
+
+    protected string FormatLoop(Starter entry)
+    {
+        return $"{entry.Distance:0.##}{km_string}";
     }
 
     public override void Dispose()

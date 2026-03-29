@@ -14,10 +14,13 @@
 else
 {
     <NGrid Spacing="4" Class="@("not-page " + Class)">
-        <MudItem xs="12">
-            <NHeadline Content="@Title" IsAbsoluteCenter />
-        </MudItem>
-
+        @if (Title != null) 
+        {
+            <MudItem xs="12">
+                <NHeadline Content="@Title" IsAbsoluteCenter />
+            </MudItem>
+        }
+        
         @if (IsLoading)
         {
             <MudItem xs="@MainXs">
