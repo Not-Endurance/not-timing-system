@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Text;
 using Not.Exceptions;
-using Not.Injection;
 using Not.Logging;
 using Not.Notify;
 
@@ -211,7 +210,7 @@ public static class SafeHelper
         }
     }
 
-    static INotifier? Notifier => ServiceLocator.Get<INotifier>();
+    static INotifier? Notifier => NotificationHelper.Current;
 
     static Task HandleDefaultValidation(ValidationException validation)
     {

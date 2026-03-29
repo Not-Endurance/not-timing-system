@@ -42,11 +42,11 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPu
     public async Task PublishSnapshotsAsync(SnapshotGroup snapshotGroup)
     {
         var session = await _userSessionService.GetCurrent();
-        GuardHelper.ThrowIfDefault(session?.EventId);
+        //GuardHelper.ThrowIfDefault(session?.EventId);
         GuardHelper.ThrowIfDefault(_socket.Connection);
 
         var model = SnapshotGroupModel.MapFrom(snapshotGroup);
-        var request = WarpRequest.Create(session.EventId.Value.ToString(), model);
+        var request = WarpRequest.Create(/*session.EventId.Value.ToString()*/1293742487.ToString(), model);
         await _socket.Connection.InvokeAsync(nameof(IWitnessHubProcedures.Receive), request);
     }
 

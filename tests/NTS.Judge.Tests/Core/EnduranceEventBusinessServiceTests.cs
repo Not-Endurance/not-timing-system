@@ -64,6 +64,36 @@ public class EnduranceEventBusinessServiceTests
     }
 
     [Fact]
+    public async Task Start_WhenSetupOfficialHasLinkedUser_PreservesUserIdOnCreatedCoreOfficial()
+    {
+        var officials = new RecordingRepository<CoreOfficialModel>();
+        var service = CreateService([CreateValidEventModel(2, officialUserId: 222)], officials: officials);
+
+        await service.Start(2);
+
+        var createdOfficial = Assert.Single(officials.CreatedItems);
+        Assert.Equal(222, createdOfficial.UserId);
+    }
+
+    [Fact]
+    public void CoreOfficialModel_RoundTrip_PreservesUserId()
+    {
+        var official = new NTS.Domain.Core.Aggregates.Official(
+            new Person(["Judge", "User"]),
+            OfficialRole.GroundJuryPresident,
+            eventId: 42,
+            id: 7,
+            userId: 99
+        );
+
+        var model = CoreOfficialModel.MapFrom(official);
+        var restored = model.MapToEntity();
+
+        Assert.Equal(99, model.UserId);
+        Assert.Equal(99, restored.UserId);
+    }
+
+    [Fact]
     public async Task Start_WhenParticipationHasFutureStartTimeOverride_CreatesParticipationWithOverrideStartTime()
     {
         var overrideStart = DateTimeOffset.Now.AddHours(2);
@@ -118,12 +148,18 @@ public class EnduranceEventBusinessServiceTests
         int? competitionId = null,
         int? participationNumber = null,
         DateTimeOffset? competitionStart = null,
-        DateTimeOffset? startTimeOverride = null
+        DateTimeOffset? startTimeOverride = null,
+        int? officialUserId = null
     )
     {
-        return SetupUpcomingEventModel.From(
-            CreateValidEvent(id, competitionId, participationNumber, competitionStart, startTimeOverride)
-        );
+        return SetupUpcomingEventModel.From(CreateValidEvent(
+            id,
+            competitionId,
+            participationNumber,
+            competitionStart,
+            startTimeOverride,
+            officialUserId
+        ));
     }
 
     static UpcomingEvent CreateValidEvent(
@@ -131,7 +167,8 @@ public class EnduranceEventBusinessServiceTests
         int? competitionId = null,
         int? participationNumber = null,
         DateTimeOffset? competitionStart = null,
-        DateTimeOffset? startTimeOverride = null
+        DateTimeOffset? startTimeOverride = null,
+        int? officialUserId = null
     )
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
@@ -162,7 +199,14 @@ public class EnduranceEventBusinessServiceTests
             [participation],
             competitionId ?? id * 10 + 1
         );
-        var official = new SetupOfficial(new Person(["Judge", $"{id}"]), OfficialRole.GroundJuryPresident, id * 10 + 1);
+        var officialUser =
+            officialUserId == null ? null : new User($"judge{id}@example.com", $"Judge {id}", id: officialUserId.Value);
+        var official = new SetupOfficial(
+            new Person(["Judge", $"{id}"]),
+            OfficialRole.GroundJuryPresident,
+            id * 10 + 1,
+            officialUser
+        );
 
         return new UpcomingEvent(
             $"Event {id}",

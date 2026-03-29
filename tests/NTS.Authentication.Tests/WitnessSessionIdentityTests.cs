@@ -193,7 +193,7 @@ public class WitnessSessionIdentityTests
         users ??= new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
 
         var serviceProvider =
-            new StaticServiceProvider().Add<Not.Application.Authentication.Abstractions.IUserSessionRepository<NtsUserSessionModel>>(
+            new StaticServiceProvider().Add<INUserSessionRepository<NtsUserSessionModel>>(
                 sessions
             );
         var nUserSessionService = new NUserSessionService(
@@ -261,7 +261,7 @@ public class WitnessSessionIdentityTests
         }
     }
 
-    sealed class RecordingUserSessionRepository : IUserSessionRepository
+    sealed class RecordingUserSessionRepository : INtsUserSessionRepository
     {
         public NtsUserSessionModel? ReadByUserIdentifierResult { get; init; }
         public NtsUserSessionModel? ReadByIdResult { get; init; }

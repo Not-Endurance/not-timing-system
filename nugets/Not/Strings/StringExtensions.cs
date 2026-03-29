@@ -1,5 +1,4 @@
 using System.Text;
-using Not.Injection;
 using Not.Notify;
 
 namespace Not.Strings;
@@ -56,5 +55,5 @@ public static class StringExtensions
         }
     }
 
-    static INotifier? Notifier => ServiceLocator.Get<INotifier>();
+    static INotifier? Notifier => NotificationHelper.Current;
 }

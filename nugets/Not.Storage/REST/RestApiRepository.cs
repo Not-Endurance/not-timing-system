@@ -2,8 +2,8 @@ using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Domain.Abstractions;
-using Not.Injection;
 using Not.Krud.Abstractions;
+using Not.Localization;
 using Not.Notify;
 
 namespace Not.Storage.REST;
@@ -20,7 +20,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         Client = client;
     }
 
-    static INotifier? Notifier => ServiceLocator.Get<INotifier>();
+    static INotifier? Notifier => NotificationHelper.Current;
 
     protected NHttpClient Client { get; }
     protected string Endpoint => _endpoint;
@@ -46,8 +46,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
             Notifier?.Warn(ex.Message);
 #else
             Notifier?.Warn(
-                Localization
-                    .NStrings
+                NStrings
                     .Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
             );
 #endif

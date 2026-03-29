@@ -12,9 +12,8 @@ public class ServiceLocator : IStartupInitializer, ITransient
         var service = _provider?.GetService<T>();
         if (service is IScoped)
         {
-            throw GuardHelper.Exception($"Cannot resolve scoped service '{typeof(T).Name}' via {nameof(ServiceLocator)}.");
+            throw GuardHelper.Exception($"{nameof(ServiceLocator)} cannot guarantee correct service scope resolution. Scoped service '{typeof(T).Name}' is not allowed");
         }
-
         return service;
     }
 

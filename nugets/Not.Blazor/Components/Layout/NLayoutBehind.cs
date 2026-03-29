@@ -1,10 +1,13 @@
+using Microsoft.Extensions.Localization;
 using Not.Blazor.Components.Abstractions;
+using Not.Localization;
+using Not.Notify;
 using Not.Safe;
 using Not.Startup;
 
 namespace Not.Blazor.Components.Layout;
 
-public class NLayoutBehind : LayoutComponentBase
+public class NLayoutBehind : LayoutComponentBase, IDisposable
 {
     bool _hasStarted;
 
@@ -13,6 +16,12 @@ public class NLayoutBehind : LayoutComponentBase
 
     [Inject]
     IEnumerable<IStartupInitializerAsync> AsyncInitializers { get; set; } = default!;
+
+    [Inject]
+    IStringLocalizer? StringLocalizer { get; set; }
+
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
 
     protected bool DrawerOpen { get; set; } = true;
     protected bool HideLayout { get; private set; }
@@ -32,6 +41,8 @@ public class NLayoutBehind : LayoutComponentBase
 
     protected override void OnInitialized()
     {
+        LocalizationHelper.Configure(StringLocalizer);
+        NotificationHelper.Configure(Notifier);
         PrintableComponent.OnToggle(ToggleLayoutVisibility);
     }
 
@@ -70,5 +81,11 @@ public class NLayoutBehind : LayoutComponentBase
     {
         HideLayout = !HideLayout;
         await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LocalizationHelper.Clear(StringLocalizer);
+        NotificationHelper.Clear(Notifier);
     }
 }

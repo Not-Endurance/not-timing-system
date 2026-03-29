@@ -13,12 +13,18 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     readonly RpcSettings _context;
     readonly string _name;
     readonly INotifier _notifier;
+    readonly IRpcAccessTokenProvider? _accessTokenProvider;
 
-    public SignalRSocket(IOptions<RpcSettings> options, INotifier notifier)
+    public SignalRSocket(
+        IOptions<RpcSettings> options,
+        INotifier notifier,
+        IRpcAccessTokenProvider? accessTokenProvider = null
+    )
     {
         _context = Validate(options.Value);
         _name = GetType().Name;
         _notifier = notifier;
+        _accessTokenProvider = accessTokenProvider;
     }
 
     // Necessary because this.Connection instance is not intialized
@@ -112,7 +118,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
         Connection = new HubConnectionBuilder()
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = new NJsonSettings())
-            .WithUrl(url)
+            .WithUrl(url, options => options.AccessTokenProvider = ResolveAccessToken)
             .WithAutomaticReconnect(new AutomaticReconnectSetting())
             .Build();
         Connection.Reconnected += HandleReconnected;
@@ -122,6 +128,17 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         {
             registerProcedure(Connection);
         }
+    }
+
+    async Task<string?> ResolveAccessToken()
+    {
+        if (_accessTokenProvider == null)
+        {
+            return null;
+        }
+
+        var token = await _accessTokenProvider.Get();
+        return token;
     }
 
     Task HandleReconnected(string? connectionId)

@@ -4,6 +4,7 @@ using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 using NTS.Nexus.Warp.Features.Judge;
+using NTS.Nexus.Warp.Features.Witness.Authorization;
 
 namespace NTS.Nexus.Warp.Features.Witness;
 
@@ -12,23 +13,27 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
     readonly IJudgeConnectionsContext _primaryConnections;
     readonly IHubContext<JudgeRpcHub, IJudgeClientProcedures> _judgeRelay;
     readonly IPendingSnapshotsService _pendingSnapshots;
+    readonly IWitnessReceiveAuthorizer _receiveAuthorizer;
 
     public WitnessRpcHub(
         ILogger<WitnessRpcHub> logger,
         IJudgeConnectionsContext primaryConnections,
         IHubContext<JudgeRpcHub, IJudgeClientProcedures> judgeRelay,
-        IPendingSnapshotsService pendingSnapshots
+        IPendingSnapshotsService pendingSnapshots,
+        IWitnessReceiveAuthorizer receiveAuthorizer
     )
         : base(logger)
     {
         _primaryConnections = primaryConnections;
         _judgeRelay = judgeRelay;
         _pendingSnapshots = pendingSnapshots;
+        _receiveAuthorizer = receiveAuthorizer;
     }
 
     public async Task Receive(WarpRequest<SnapshotGroupModel> request)
     {
         var enduranceEventId = GetEnduranceEventId(request.EnduranceEventId);
+        await _receiveAuthorizer.Authorize(Context.User, GetConnectionGroup(), enduranceEventId);
         if (request.Payload.Entries.Length == 0)
         {
             return;
@@ -48,7 +53,7 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
     {
         if (string.IsNullOrWhiteSpace(enduranceEventId))
         {
-            throw new InvalidOperationException("Message cannot be sent - you're not connected to an Event");
+            throw new HubException("Message cannot be sent because no event is selected.");
         }
 
         return enduranceEventId;

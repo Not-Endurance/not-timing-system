@@ -5,6 +5,7 @@ using Not.Notify;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
+using NTS.Witness.Features.Access;
 using NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
 using NTS.Witness.Blazor.Features.Socket;
 using NTS.Witness.Features.Core.Dashboard;
@@ -25,6 +26,12 @@ public class SnapshotContentBehind : NStatefulComponent
     [Inject]
     BlazorSocketService BlazorSocketService { get; set; } = default!;
 
+    [Inject]
+    IWitnessAccessContext AccessState { get; set; } = default!;
+
+    [Inject]
+    NavigationManager Navigator { get; set; } = default!;
+
     protected ISnapshotService SnapshotService => SnapshotState;
     protected IReadOnlyList<Participation> Participations => SnapshotService.Participations;
     protected IReadOnlyList<Snapshot> Snapshots => SnapshotService.Snapshots;
@@ -35,11 +42,18 @@ public class SnapshotContentBehind : NStatefulComponent
 
     protected override async Task OnInitializedAsync()
     {
+        await Observe(AccessState);
         await Observe(SnapshotService);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (WitnessAccessPolicy.ShouldRedirectFromSnapshots(AccessState.AccessLevel))
+        {
+           Navigator.NavigateTo(WitnessAccessPolicy.ResolveSnapshotFallbackRoute());
+           return;
+        }
+
         if (firstRender)
         {
             await Task.Delay(TimeSpan.FromSeconds(1));

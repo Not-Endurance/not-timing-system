@@ -45,12 +45,13 @@ public class OfficialModel : IEventScopedDocument, ISoftDeletableDocument, IKrud
     public int EventId { get; set; }
     public string[] Names { get; set; } = [];
     public OfficialRole Role { get; set; } = default!;
+    public int? UserId { get; set; }
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
 
     public Official MapToEntity()
     {
-        return new Official(Names, Role, EventId, Id);
+        return new Official(Names, Role, EventId, Id, UserId);
     }
 
     void IKrudModel<Official>.MapFrom(Official official)
@@ -59,6 +60,7 @@ public class OfficialModel : IEventScopedDocument, ISoftDeletableDocument, IKrud
         EventId = official.EventId;
         Names = official.Person.Names;
         Role = official.Role;
+        UserId = official.UserId;
     }
 }
 
