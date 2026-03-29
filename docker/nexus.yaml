@@ -61,6 +61,12 @@ services:
     environment:
       PORT: "80"
       MONGO_CONNECTION_STRING: mongodb://mongodb:27017
+      NServerAuthenticationSettings__AuthorityInstance: "https://ntsexternalsandbox.ciamlogin.com"
+      NServerAuthenticationSettings__AuthorityTenantId: "8838b442-b043-466b-8ed6-ccf82cb3641f"
+      NServerAuthenticationSettings__Scope: "nts-client-scope"
+      NServerAuthenticationSettings__ResourceClientId: "e39215c6-5af7-4be7-9b23-1eb25d3c121f"
+      NServerAuthenticationSettings__AccessTokenQueryPaths: '[ "witness-hub" ]'
+
     ports:
       - "11337:80"
 
