@@ -51,6 +51,7 @@ public class Participation : Entity, IKurdMirror<Combination>
     internal void SetSpeedLimits(CompetitionType competitionType)
     {
         MinAverageSpeed = MIN_SPEED;
+        MaxAverageSpeed = null;
         if (competitionType == CompetitionType.Qualification)
         {
             if (Category == ParticipationCategory.Children)

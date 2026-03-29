@@ -92,49 +92,59 @@ public record Startlist : ValueObject
         }
     }
 
-    public void Add(Participation participation)
+    public void UpsertCurrent(Participation participation)
     {
-        var index = participation.Phases.IndexOf(participation.Phases.Current);
-        if (participation.Phases.Count <= ++index)
-        {
-            throw new DomainException(Cannot_add_completed_participations_in_startlist);
-        }
-        var phase =
-            participation.Phases[index].StartTime != null ? participation.Phases[index] : participation.Phases.Current;
-        var phaseNumber = participation.Phases.NumberOf(phase);
-        var start = new Timestamp(phase.StartTime!.ToDateTimeOffset());
-        var entry = new Starter(
-            participation.Combination.Athlete.Names,
-            participation.Combination.Number,
-            phaseNumber,
-            phase.Length,
-            start
-        );
-
-        Add(entry);
+        var current = participation.Phases.Current;
+        var currentIndex = participation.Phases.IndexOf(current);
+        UpsertStarter(participation, currentIndex, current.StartTime);
     }
 
-    public void Add(Starter entry)
+    public void UpsertNext(Participation participation)
     {
-        lock (_lock)
+        var current = participation.Phases.Current;
+        var currentIndex = participation.Phases.IndexOf(current);
+        if (currentIndex + 1 >= participation.Phases.Count)
         {
-            if (IsHistory(entry))
-            {
-                return;
-            }
-            _upcoming = OrderByTimeThenPhase([.. _upcoming, entry]);
+            return;
         }
+
+        var nextIndex = currentIndex + 1;
+        var start = participation.Phases[nextIndex].StartTime ?? current.GetOutTime();
+        UpsertStarter(participation, nextIndex, start);
     }
 
     public void Remove(int number)
     {
         lock (_lock)
         {
-            var match = _upcoming.FirstOrDefault(x => x.Number == number);
-            if (match != null)
+            _upcoming.RemoveAll(x => x.Number == number);
+        }
+    }
+
+    void UpsertStarter(Participation participation, int phaseIndex, Timestamp? start)
+    {
+        if (start == null)
+        {
+            return;
+        }
+
+        var phase = participation.Phases[phaseIndex];
+        var entry = new Starter(
+            participation.Combination.Athlete.Names,
+            participation.Combination.Number,
+            phaseIndex + 1,
+            phase.Length,
+            start
+        );
+
+        lock (_lock)
+        {
+            _upcoming.RemoveAll(x => x.Number == entry.Number);
+            if (IsHistory(entry))
             {
-                _upcoming.Remove(match);
+                return;
             }
+            _upcoming = OrderByTimeThenPhase([.. _upcoming, entry]);
         }
     }
 

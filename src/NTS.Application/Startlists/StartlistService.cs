@@ -50,23 +50,30 @@ public class StartlistService
         var participation = notification.Participation;
         if (participation.Phases.Current.IsComplete() && participation.Phases.Current.IsFinal)
         {
-            RemoveEntry(participation);
-            return Task.CompletedTask;
+            Startlist?.Remove(participation.Combination.Number);
+        }
+        else
+        {
+            Startlist?.UpsertNext(participation);
         }
 
-        AddEntry(participation);
+        EmitChanged();
         return Task.CompletedTask;
     }
 
     public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
     {
-        AddEntry(notification.Participation);
+        if (!notification.Participation.Phases.Current.IsComplete())
+        {
+            Startlist?.UpsertCurrent(notification.Participation);
+        }
         return Task.CompletedTask;
     }
 
     public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
     {
-        RemoveEntry(notification.Participation);
+        Startlist?.Remove(notification.Participation.Combination.Number);
+        EmitChanged();
         return Task.CompletedTask;
     }
 
@@ -85,18 +92,6 @@ public class StartlistService
     public void Refresh()
     {
         Startlist?.UpdateState();
-        EmitChanged();
-    }
-
-    void RemoveEntry(Participation participation)
-    {
-        Startlist?.Remove(participation.Combination.Number);
-        EmitChanged();
-    }
-
-    void AddEntry(Participation participation)
-    {
-        Startlist?.Add(participation);
         EmitChanged();
     }
 }

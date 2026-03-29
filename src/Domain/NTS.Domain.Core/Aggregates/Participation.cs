@@ -138,6 +138,15 @@ public class Participation : Aggregate
         Eliminated = null;
         var qualificationRestored = new ParticipationRestored(this);
         Raise(qualificationRestored);
+
+        if (!Phases.Current.IsComplete())
+        {
+            return;
+        }
+
+        Phases.StartIfNext();
+        var phaseCompleted = new PhaseCompleted(this);
+        Raise(phaseCompleted);
     }
 
     void EvaluatePhase(Phase phase)

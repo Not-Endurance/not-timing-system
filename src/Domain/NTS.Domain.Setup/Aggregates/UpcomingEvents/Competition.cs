@@ -34,6 +34,11 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         FeiId = feiId;
         FeiRule = feiRule;
         FeiScheduleNumber = feiScheduleNumber;
+
+        foreach (var participation in _participations)
+        {
+            participation.SetSpeedLimits(Type);
+        }
     }
 
     IReadOnlyList<Participation> IKrudParent<Participation>.Children => Participations;
