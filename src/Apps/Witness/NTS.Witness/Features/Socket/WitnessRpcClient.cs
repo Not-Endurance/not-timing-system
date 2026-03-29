@@ -4,7 +4,7 @@ using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Exceptions;
 using Not.Injection;
-using NTS.Application.UserSession;
+using NTS.Application.Socket;
 using NTS.Application.Watcher;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Watcher;
@@ -17,18 +17,18 @@ namespace NTS.Witness.Features.Socket;
 public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPublisher, IScoped
 {
     readonly IRpcSocket _socket;
-    readonly IWitnessUserSession _userSessionService;
+    readonly INtsSocketContext _socketContext;
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
     public WitnessRpcClient(
         IRpcSocket socket,
-        IWitnessUserSession userSessionService,
+        INtsSocketContext socketContext,
         IDomainEventDispatcher domainEventDispatcher
     )
         : base(socket)
     {
         _socket = socket;
-        _userSessionService = userSessionService;
+        _socketContext = socketContext;
         _domainEventDispatcher = domainEventDispatcher;
     }
 
@@ -39,15 +39,22 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPu
         RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
     }
 
+    protected virtual Task SendReceiveAsync(WarpRequest<SnapshotGroupModel> request)
+    {
+        return _socket.Connection!.InvokeAsync(nameof(IWitnessHubProcedures.Receive), request);
+    }
+
     public async Task PublishSnapshotsAsync(SnapshotGroup snapshotGroup)
     {
-        var session = await _userSessionService.GetCurrent();
-        //GuardHelper.ThrowIfDefault(session?.EventId);
         GuardHelper.ThrowIfDefault(_socket.Connection);
+        var connectedEvent = GuardHelper.ThrowIfDefault(
+            _socketContext.Event,
+            "Cannot publish witness snapshots before connecting to an event."
+        );
 
         var model = SnapshotGroupModel.MapFrom(snapshotGroup);
-        var request = WarpRequest.Create(/*session.EventId.Value.ToString()*/1293742487.ToString(), model);
-        await _socket.Connection.InvokeAsync(nameof(IWitnessHubProcedures.Receive), request);
+        var request = WarpRequest.Create(connectedEvent.Id.ToString(), model);
+        await SendReceiveAsync(request);
     }
 
     public Task OnPhaseCompleted(PhaseCompleted payload)

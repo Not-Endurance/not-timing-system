@@ -395,6 +395,11 @@ public class RegistrationFlowTests
             return Task.FromResult<NUserModel?>(null);
         }
 
+        public Task<IEnumerable<NUserModel>> ReadMany()
+        {
+            return Task.FromResult<IEnumerable<NUserModel>>([]);
+        }
+
         public Task<NUserModel> Register(NUserRegistration registration)
         {
             LastRegistration = registration;

@@ -5,6 +5,7 @@ using Not.Collections;
 using Not.Injection;
 using Not.Observables.Structures;
 using NTS.Application.Core;
+using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
@@ -22,11 +23,16 @@ public class PerformanceService
         IScoped
 {
     readonly IReadMany<Participation> _participationReader;
+    readonly INtsSocketContext? _socketContext;
     Participation? _selected;
 
     public PerformanceService(IReadMany<Participation> participationReader)
+        : this(participationReader, null) { }
+
+    public PerformanceService(IReadMany<Participation> participationReader, INtsSocketContext? socketContext)
     {
         _participationReader = participationReader;
+        _socketContext = socketContext;
     }
 
     public Participation? Selected
@@ -44,6 +50,12 @@ public class PerformanceService
 
     protected override async Task<bool> InitializeState()
     {
+        if (_socketContext?.Event == null && _socketContext != null)
+        {
+            State.Clear();
+            return false;
+        }
+
         var participations = await _participationReader.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
         State.ClearAndAddRange(participations);
         return State.Any();

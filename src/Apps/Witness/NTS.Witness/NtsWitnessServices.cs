@@ -20,6 +20,7 @@ public static class NtsWitnessServices
     {
         services.ConfigureKrud();
         services.AddScoped<IRpcAccessTokenProvider, NtsClientRpcAccessTokenProvider>();
+        services.AddScoped<IWitnessAuthenticationRedirector, WitnessAuthenticationRedirector>();
         services
             .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
             .AddSharedCoreDomainServices()

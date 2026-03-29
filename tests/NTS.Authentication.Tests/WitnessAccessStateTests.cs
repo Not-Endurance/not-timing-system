@@ -9,6 +9,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
 using NTS.Witness.Blazor;
+using NTS.Witness.Blazor.Features;
 using NTS.Witness.Features.Access;
 
 namespace NTS.Authentication.Tests;
@@ -23,7 +24,7 @@ public class WitnessAccessStateTests
         await service.Load();
 
         Assert.Equal(WitnessAccessLevel.Unknown, service.AccessLevel);
-        Assert.False(service.CanViewSnapshots);
+        Assert.False(WitnessAccessPolicy.CanViewSnapshots(service.AccessLevel));
     }
 
     [Fact]
@@ -41,7 +42,7 @@ public class WitnessAccessStateTests
         await service.Load();
 
         Assert.Equal(WitnessAccessLevel.Official, service.AccessLevel);
-        Assert.True(service.CanViewSnapshots);
+        Assert.True(WitnessAccessPolicy.CanViewSnapshots(service.AccessLevel));
     }
 
     [Fact]
@@ -59,7 +60,7 @@ public class WitnessAccessStateTests
         await service.Load();
 
         Assert.Equal(WitnessAccessLevel.Participant, service.AccessLevel);
-        Assert.False(service.CanViewSnapshots);
+        Assert.False(WitnessAccessPolicy.CanViewSnapshots(service.AccessLevel));
     }
 
     [Fact]
@@ -77,9 +78,9 @@ public class WitnessAccessStateTests
         Assert.False(WitnessAccessPolicy.ShouldRedirectFromSnapshots(WitnessAccessLevel.Unknown));
     }
 
-    static WitnessAccessStateService CreateService(int userId, IEnumerable<Official> officials, int? eventId = null)
+    static WitnessAccessContext CreateService(int userId, IEnumerable<Official> officials, int? eventId = null)
     {
-        return new WitnessAccessStateService(
+        return new WitnessAccessContext(
             new TestSocketContext(eventId),
             new TestUserSession(userId),
             new TestOfficialReader(officials)

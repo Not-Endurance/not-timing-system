@@ -101,8 +101,15 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
             }
             RaiseConnected();
         }
+        catch (OperationCanceledException)
+        {
+            await CleanupFailedConnection();
+            RaiseDisconnected();
+        }
         catch (Exception ex)
         {
+            await CleanupFailedConnection();
+            RaiseDisconnected();
             _notifier.Error(ex);
         }
     }
@@ -139,6 +146,31 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
         var token = await _accessTokenProvider.Get();
         return token;
+    }
+
+    async Task CleanupFailedConnection()
+    {
+        if (Connection == null)
+        {
+            return;
+        }
+
+        Connection.Reconnected -= HandleReconnected;
+        Connection.Reconnecting -= HandleReconnecting;
+        Connection.Closed -= HandleClosed;
+
+        try
+        {
+            await Connection.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            LoggingHelper.Error($"SignalR cleanup failed after unsuccessful connect: {ex.Message}");
+        }
+        finally
+        {
+            Connection = null;
+        }
     }
 
     Task HandleReconnected(string? connectionId)
