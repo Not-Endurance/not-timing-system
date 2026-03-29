@@ -28,6 +28,16 @@ public class SnapshotModel
         var timestamp = new Timestamp(Timestamp);
         return new Snapshot(Number, athlete, timestamp);
     }
+
+    public SnapshotModel Copy()
+    {
+        return new SnapshotModel
+        {
+            Number = Number,
+            Names = [.. Names],
+            Timestamp = Timestamp,
+        };
+    }
 }
 
 public class SnapshotGroupModel
@@ -49,6 +59,15 @@ public class SnapshotGroupModel
         var snapshots = Entries.Select(entry => entry.MapToDomain());
         return new SnapshotGroup(snapshots, Type);
     }
+
+    public SnapshotGroupModel Copy()
+    {
+        return new SnapshotGroupModel
+        {
+            Entries = Entries.Select(entry => entry.Copy()).ToArray(),
+            Type = Type,
+        };
+    }
 }
 
 public class NtsUserSessionModel
@@ -58,35 +77,13 @@ public class NtsUserSessionModel
 {
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public int? EventId
-    {
-        get => State?.EventId;
-        set => ResolveState().EventId = value;
-    }
-
-    public SnapshotGroupModel[] SnapshotHistory
-    {
-        get => State?.SnapshotHistory ?? [];
-        set => ResolveState().SnapshotHistory = value;
-    }
-
-    public IReadOnlyList<SnapshotGroup> GetSnapshotHistory()
-    {
-        return SnapshotHistory.Select(x => x.MapToDomain()).ToArray();
-    }
 
     public void MapFrom(NtsUserSessionModel session)
     {
         Id = session.Id;
+        TenantId = session.TenantId;
         UserIdentifier = session.UserIdentifier;
-        State =
-            session.State == null
-                ? null
-                : new NtsUserSessionStateModel
-                {
-                    EventId = session.State.EventId,
-                    SnapshotHistory = [.. session.State.SnapshotHistory],
-                };
+        ReplaceState(session.State);
     }
 
     public NtsUserSessionModel MapToEntity()
@@ -96,10 +93,9 @@ public class NtsUserSessionModel
         return model;
     }
 
-    NtsUserSessionStateModel ResolveState()
+    public void ReplaceState(NtsUserSessionStateModel? state)
     {
-        State ??= new NtsUserSessionStateModel();
-        return State;
+        State = state?.Copy();
     }
 }
 
@@ -107,4 +103,18 @@ public class NtsUserSessionStateModel
 {
     public int? EventId { get; set; }
     public SnapshotGroupModel[] SnapshotHistory { get; set; } = [];
+
+    public IReadOnlyList<SnapshotGroup> GetSnapshotHistory()
+    {
+        return SnapshotHistory.Select(x => x.MapToDomain()).ToArray();
+    }
+
+    public NtsUserSessionStateModel Copy()
+    {
+        return new NtsUserSessionStateModel
+        {
+            EventId = EventId,
+            SnapshotHistory = SnapshotHistory.Select(group => group.Copy()).ToArray(),
+        };
+    }
 }

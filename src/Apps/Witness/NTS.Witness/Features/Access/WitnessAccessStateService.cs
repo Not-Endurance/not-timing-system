@@ -42,7 +42,7 @@ public class WitnessAccessContext
             return true;
         }
 
-        var session = await _userSessionService.GetCurrent<NtsUserSessionModel>();
+        var session = await _userSessionService.GetCurrent<NtsUserSessionStateModel>();
         var userId = session?.User.Id;
         if (userId == null)
         {

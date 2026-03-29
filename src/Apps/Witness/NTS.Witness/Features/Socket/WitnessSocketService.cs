@@ -45,12 +45,13 @@ public class WitnessSocketService : NStatefulService, INtsSocketService, IScoped
     public async Task<bool> WillResetSession(EnduranceEvent enduranceEvent)
     {
         var session = await _userSessionService.GetCurrent();
-        if (session?.EventId == null)
+        var eventId = session?.EventId;
+        if (eventId == null)
         {
             return false;
         }
 
-        return session.EventId != enduranceEvent.Id;
+        return eventId.Value != enduranceEvent.Id;
     }
 
     public async Task Disconnect()

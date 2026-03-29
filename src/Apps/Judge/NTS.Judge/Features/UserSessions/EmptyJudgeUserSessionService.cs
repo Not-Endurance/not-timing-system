@@ -17,9 +17,9 @@ internal class EmptyJudgeUserSessionService : IWitnessUserSession, IScoped
         return Task.CompletedTask;
     }
 
-    public Task<NtsUserSessionModel?> GetCurrent()
+    public Task<NtsUserSessionStateModel?> GetCurrent()
     {
-        return Task.FromResult<NtsUserSessionModel?>(null);
+        return Task.FromResult<NtsUserSessionStateModel?>(null);
     }
 
     public Task SetEventId(int? eventId)
