@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Linq;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Authentication.WebAssembly.Msal.Models;
 using Microsoft.Extensions.Configuration;
@@ -34,6 +35,7 @@ public static class AuthenticationExtensions
 
         // User roles are injected from local user resolution, not from incoming provider role claims.
         options.UserOptions.RoleClaim = ClaimTypes.Role;
+        AddDefaultAccessTokenScope(options, settings);
 
         options.AuthenticationPaths.LogInPath = RemoteAuthenticationDefaults.LoginPath;
         options.AuthenticationPaths.LogInCallbackPath = RemoteAuthenticationDefaults.LoginCallbackPath;
@@ -76,6 +78,23 @@ public static class AuthenticationExtensions
         }
 
         return $"{instance}/{tenantId}";
+    }
+
+    static void AddDefaultAccessTokenScope(
+        RemoteAuthenticationOptions<MsalProviderOptions> options,
+        NClientAuthenticationSettings settings
+    )
+    {
+        var scope = NClientAuthenticationSettingsScopeResolver.ResolveScope(settings);
+        if (string.IsNullOrWhiteSpace(scope))
+        {
+            return;
+        }
+
+        if (!options.ProviderOptions.DefaultAccessTokenScopes.Contains(scope, StringComparer.OrdinalIgnoreCase))
+        {
+            options.ProviderOptions.DefaultAccessTokenScopes.Add(scope);
+        }
     }
 
     static string RequireConfigValue(string? value, string settingPath)

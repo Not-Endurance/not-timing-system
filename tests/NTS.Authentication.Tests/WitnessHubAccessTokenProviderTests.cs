@@ -13,13 +13,13 @@ public class WitnessHubAccessTokenProviderTests
     public async Task Get_returns_null_when_scope_is_not_configured()
     {
         var accessTokenProvider = new RecordingAccessTokenProvider();
-        var service = CreateService(
+        var context = CreateContext(
             accessTokenProvider,
             new NClientAuthenticationSettings { ResourceClientId = "resource-client" },
             new RecordingAuthenticationRedirector()
         );
 
-        var token = await service.Get();
+        var token = await context.Provider.Get();
 
         Assert.Null(token);
         Assert.Equal(0, accessTokenProvider.RequestCalls);
@@ -43,7 +43,7 @@ public class WitnessHubAccessTokenProviderTests
                 )
             ),
         };
-        var service = CreateService(
+        var context = CreateContext(
             accessTokenProvider,
             new NClientAuthenticationSettings
             {
@@ -53,7 +53,7 @@ public class WitnessHubAccessTokenProviderTests
             new RecordingAuthenticationRedirector()
         );
 
-        var token = await service.Get();
+        var token = await context.Provider.Get();
 
         Assert.Equal("access-token", token);
         Assert.Equal(
@@ -83,7 +83,7 @@ public class WitnessHubAccessTokenProviderTests
             ),
         };
         var redirector = new RecordingAuthenticationRedirector();
-        var service = CreateService(
+        var context = CreateContext(
             accessTokenProvider,
             new NClientAuthenticationSettings
             {
@@ -93,22 +93,24 @@ public class WitnessHubAccessTokenProviderTests
             redirector
         );
 
-        await Assert.ThrowsAsync<OperationCanceledException>(() => service.Get());
+        await Assert.ThrowsAsync<OperationCanceledException>(() => context.Provider.Get());
 
-        Assert.Equal(1, redirector.Calls);
-        Assert.Equal("api://resource-client/nts-client-scope", redirector.LastScope);
-        Assert.Equal("https://localhost/performance", redirector.LastReturnUrl);
+        Assert.Equal(1, redirector.AccessTokenResultRedirectCalls);
+        Assert.Equal("authentication/login", redirector.LastAccessTokenResult?.InteractiveRequestUrl);
+        Assert.Equal("https://localhost/performance", redirector.LastAccessTokenResult?.InteractionOptions?.ReturnUrl);
     }
 
     [Fact]
-    public async Task Get_redirects_when_refresh_required_error_is_thrown()
+    public async Task Get_redirects_when_token_refresh_required_error_is_thrown()
     {
         var accessTokenProvider = new RecordingAccessTokenProvider
         {
-            ExceptionToThrow = new InvalidOperationException("A refresh is required to get the token."),
+            ExceptionToThrow = new InvalidOperationException(
+                "ClientAuthError: token_refresh_required: Cannot return token from cache because it must be refreshed."
+            ),
         };
         var redirector = new RecordingAuthenticationRedirector();
-        var service = CreateService(
+        var context = CreateContext(
             accessTokenProvider,
             new NClientAuthenticationSettings
             {
@@ -118,36 +120,38 @@ public class WitnessHubAccessTokenProviderTests
             redirector
         );
 
-        await Assert.ThrowsAsync<OperationCanceledException>(() => service.Get());
+        await Assert.ThrowsAsync<OperationCanceledException>(() => context.Provider.Get());
 
-        Assert.Equal(1, redirector.Calls);
-        Assert.Equal("api://resource-client/nts-client-scope", redirector.LastScope);
-        Assert.Equal("https://localhost/performance", redirector.LastReturnUrl);
+        Assert.Equal(1, redirector.InteractiveRequestRedirectCalls);
+        Assert.Equal(InteractionType.GetToken, redirector.LastInteractiveRequest?.Interaction);
+        Assert.Equal("https://localhost/performance", redirector.LastInteractiveRequest?.ReturnUrl);
+        Assert.Equal(["api://resource-client/nts-client-scope"], redirector.LastInteractiveRequest?.Scopes?.ToArray());
     }
 
     [Fact]
     public async Task Get_redirects_when_blazor_reports_access_token_not_available()
     {
+        var exception = new AccessTokenNotAvailableException(
+            new TestNavigationManager(),
+            new AccessTokenResult(
+                AccessTokenResultStatus.RequiresRedirect,
+                new AccessToken(),
+                interactiveRequestUrl: "authentication/login",
+                interactiveRequest: new InteractiveRequestOptions
+                {
+                    Interaction = InteractionType.GetToken,
+                    ReturnUrl = "https://localhost/performance",
+                    Scopes = ["api://resource-client/nts-client-scope"],
+                }
+            ),
+            ["api://resource-client/nts-client-scope"]
+        );
         var accessTokenProvider = new RecordingAccessTokenProvider
         {
-            ExceptionToThrow = new AccessTokenNotAvailableException(
-                new TestNavigationManager(),
-                new AccessTokenResult(
-                    AccessTokenResultStatus.RequiresRedirect,
-                    new AccessToken(),
-                    interactiveRequestUrl: "authentication/login",
-                    interactiveRequest: new InteractiveRequestOptions
-                    {
-                        Interaction = InteractionType.GetToken,
-                        ReturnUrl = "https://localhost/performance",
-                        Scopes = ["api://resource-client/nts-client-scope"],
-                    }
-                ),
-                ["api://resource-client/nts-client-scope"]
-            ),
+            ExceptionToThrow = exception,
         };
         var redirector = new RecordingAuthenticationRedirector();
-        var service = CreateService(
+        var context = CreateContext(
             accessTokenProvider,
             new NClientAuthenticationSettings
             {
@@ -157,25 +161,70 @@ public class WitnessHubAccessTokenProviderTests
             redirector
         );
 
-        await Assert.ThrowsAsync<OperationCanceledException>(() => service.Get());
+        await Assert.ThrowsAsync<OperationCanceledException>(() => context.Provider.Get());
 
-        Assert.Equal(1, redirector.Calls);
-        Assert.Equal("api://resource-client/nts-client-scope", redirector.LastScope);
+        Assert.Equal(1, redirector.AccessTokenExceptionRedirectCalls);
+        Assert.Same(exception, redirector.LastAccessTokenException);
     }
 
-    static NtsClientRpcAccessTokenProvider CreateService(
+    [Fact]
+    public async Task Get_warns_and_cancels_when_non_auth_exception_is_thrown()
+    {
+        var accessTokenProvider = new RecordingAccessTokenProvider
+        {
+            ExceptionToThrow = new InvalidOperationException("Something else failed."),
+        };
+        var redirector = new RecordingAuthenticationRedirector();
+        var context = CreateContext(
+            accessTokenProvider,
+            new NClientAuthenticationSettings
+            {
+                ResourceClientId = "resource-client",
+                Scope = "nts-client-scope",
+            },
+            redirector
+        );
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() => context.Provider.Get());
+
+        Assert.Equal(0, redirector.TotalCalls);
+        Assert.Equal(
+            ["Witness could not acquire the Microsoft access token needed to connect. Please sign in again."],
+            context.Notifier.Warnings
+        );
+    }
+
+    static TestContext CreateContext(
         IAccessTokenProvider accessTokenProvider,
         NClientAuthenticationSettings settings,
         RecordingAuthenticationRedirector redirector
     )
     {
-        return new NtsClientRpcAccessTokenProvider(
-            accessTokenProvider,
-            Options.Create(settings),
-            new TestNavigationManager(),
-            redirector,
-            new TestNotifier()
+        var notifier = new TestNotifier();
+
+        return new TestContext(
+            new NtsClientRpcAccessTokenProvider(
+                accessTokenProvider,
+                Options.Create(settings),
+                new TestNavigationManager(),
+                redirector,
+                notifier
+            ),
+            notifier
         );
+    }
+
+    sealed class TestContext
+    {
+        public TestContext(NtsClientRpcAccessTokenProvider provider, TestNotifier notifier)
+        {
+            Provider = provider;
+            Notifier = notifier;
+        }
+
+        public NtsClientRpcAccessTokenProvider Provider { get; }
+
+        public TestNotifier Notifier { get; }
     }
 
     sealed class RecordingAccessTokenProvider : IAccessTokenProvider
@@ -219,15 +268,30 @@ public class WitnessHubAccessTokenProviderTests
 
     sealed class RecordingAuthenticationRedirector : IWitnessAuthenticationRedirector
     {
-        public int Calls { get; private set; }
-        public string? LastScope { get; private set; }
-        public string? LastReturnUrl { get; private set; }
+        public int AccessTokenResultRedirectCalls { get; private set; }
+        public int AccessTokenExceptionRedirectCalls { get; private set; }
+        public int InteractiveRequestRedirectCalls { get; private set; }
+        public int TotalCalls => AccessTokenResultRedirectCalls + AccessTokenExceptionRedirectCalls + InteractiveRequestRedirectCalls;
+        public AccessTokenResult? LastAccessTokenResult { get; private set; }
+        public AccessTokenNotAvailableException? LastAccessTokenException { get; private set; }
+        public InteractiveRequestOptions? LastInteractiveRequest { get; private set; }
 
-        public void RedirectToSignIn(string scope, string returnUrl)
+        public void RedirectToSignIn(AccessTokenResult tokenResult)
         {
-            Calls++;
-            LastScope = scope;
-            LastReturnUrl = returnUrl;
+            AccessTokenResultRedirectCalls++;
+            LastAccessTokenResult = tokenResult;
+        }
+
+        public void RedirectToSignIn(AccessTokenNotAvailableException exception)
+        {
+            AccessTokenExceptionRedirectCalls++;
+            LastAccessTokenException = exception;
+        }
+
+        public void RedirectToSignIn(InteractiveRequestOptions requestOptions)
+        {
+            InteractiveRequestRedirectCalls++;
+            LastInteractiveRequest = requestOptions;
         }
     }
 

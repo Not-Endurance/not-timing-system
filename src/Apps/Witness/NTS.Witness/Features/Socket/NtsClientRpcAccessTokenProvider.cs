@@ -33,7 +33,7 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
 
     public async Task<string?> Get()
     {
-        var scope = ResolveScope();
+        var scope = NClientAuthenticationSettingsScopeResolver.ResolveScope(_clientAuthenticationSettings);
         if (string.IsNullOrWhiteSpace(scope))
         {
             return null;
@@ -50,20 +50,20 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
 
             if (tokenResult.Status == AccessTokenResultStatus.RequiresRedirect)
             {
-                RedirectToAuthentication(scope, requestOptions.ReturnUrl);
+                RedirectToAuthentication(tokenResult);
             }
 
             CancelWithWarning("Witness could not acquire the Microsoft access token needed to connect.");
             return null;
         }
-        catch (AccessTokenNotAvailableException)
+        catch (AccessTokenNotAvailableException ex)
         {
-            RedirectToAuthentication(scope, requestOptions.ReturnUrl);
+            RedirectToAuthentication(ex);
             return null;
         }
-        catch (Exception ex) when (IsRefreshRequired(ex))
+        catch (Exception ex) when (IsInteractiveAuthenticationRequired(ex))
         {
-            RedirectToAuthentication(scope, requestOptions.ReturnUrl, ex);
+            RedirectToAuthentication(CreateInteractiveRequestOptions(scope, requestOptions.ReturnUrl), ex);
             return null;
         }
         catch (Exception ex)
@@ -76,38 +76,31 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
         }
     }
 
-    string? ResolveScope()
+    static InteractiveRequestOptions CreateInteractiveRequestOptions(string scope, string returnUrl)
     {
-        var scope = _clientAuthenticationSettings.Scope?.Trim();
-        if (string.IsNullOrWhiteSpace(scope))
+        return new InteractiveRequestOptions
         {
-            return null;
-        }
-
-        if (scope.Contains("://", StringComparison.Ordinal))
-        {
-            return scope;
-        }
-
-        var audience = ResolveAudience();
-        return string.IsNullOrWhiteSpace(audience) ? null : $"{audience}/{scope.TrimStart('/')}";
+            Interaction = InteractionType.GetToken,
+            ReturnUrl = returnUrl,
+            Scopes = [scope],
+        };
     }
 
-    string? ResolveAudience()
+    void RedirectToAuthentication(AccessTokenResult tokenResult, Exception? exception = null)
     {
-        var explicitAudience = _clientAuthenticationSettings.Audience?.Trim();
-        if (!string.IsNullOrWhiteSpace(explicitAudience))
-        {
-            return explicitAudience;
-        }
-
-        var clientId = _clientAuthenticationSettings.ResourceClientId?.Trim();
-        return string.IsNullOrWhiteSpace(clientId) ? null : $"api://{clientId}";
+        _authenticationRedirector.RedirectToSignIn(tokenResult);
+        throw new OperationCanceledException("Witness authentication redirect started.", exception);
     }
 
-    void RedirectToAuthentication(string scope, string returnUrl, Exception? exception = null)
+    void RedirectToAuthentication(AccessTokenNotAvailableException exception)
     {
-        _authenticationRedirector.RedirectToSignIn(scope, returnUrl);
+        _authenticationRedirector.RedirectToSignIn(exception);
+        throw new OperationCanceledException("Witness authentication redirect started.", exception);
+    }
+
+    void RedirectToAuthentication(InteractiveRequestOptions requestOptions, Exception? exception = null)
+    {
+        _authenticationRedirector.RedirectToSignIn(requestOptions);
         throw new OperationCanceledException("Witness authentication redirect started.", exception);
     }
 
@@ -117,9 +110,19 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
         throw new OperationCanceledException(message, exception);
     }
 
-    static bool IsRefreshRequired(Exception exception)
+    static bool IsInteractiveAuthenticationRequired(Exception exception)
     {
         var message = exception.Message;
+        if (message.Contains("token_refresh_required", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (message.Contains("interaction_required", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
         if (
             message.Contains("refresh", StringComparison.OrdinalIgnoreCase)
             && (
@@ -131,6 +134,6 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
             return true;
         }
 
-        return exception.InnerException != null && IsRefreshRequired(exception.InnerException);
+        return exception.InnerException != null && IsInteractiveAuthenticationRequired(exception.InnerException);
     }
 }
