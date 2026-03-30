@@ -6,17 +6,17 @@ namespace Not.Injection;
 
 public class ServiceLocator : IStartupInitializer, ITransient
 {
-    public static T GetRequired<T>()
-        where T : class
-    {
-        GuardHelper.ThrowIfDefault(_provider);
-        return _provider.GetRequiredService<T>();
-    }
-
     public static T? Get<T>()
         where T : class
     {
-        return _provider?.GetService<T>();
+        var service = _provider?.GetService<T>();
+        if (service is IScoped)
+        {
+            throw GuardHelper.Exception(
+                $"{nameof(ServiceLocator)} cannot guarantee correct service scope resolution. Scoped service '{typeof(T).Name}' is not allowed"
+            );
+        }
+        return service;
     }
 
     static IServiceProvider? _provider;

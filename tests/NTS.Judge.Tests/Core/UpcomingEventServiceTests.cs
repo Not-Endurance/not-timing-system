@@ -45,7 +45,7 @@ public class UpcomingEventServiceTests
                 CreateValidEvent(2, competitionId: 1, participationNumber: 101),
             ]
         );
-        var service = new UpcomingEventService(repository, new TestNotifier(), new TestSelectedUpcomingEventContext());
+        var service = new UpcomingEventService(repository, new TestNotifier());
 
         await service.DeleteParticipation(2, 101, 1);
 
@@ -55,30 +55,23 @@ public class UpcomingEventServiceTests
 
     static UpcomingEventService CreateService(IEnumerable<UpcomingEvent> upcomingEvents)
     {
-        return new UpcomingEventService(
-            new RecordingRepository<UpcomingEvent>(upcomingEvents),
-            new TestNotifier(),
-            new TestSelectedUpcomingEventContext()
-        );
+        return new UpcomingEventService(new RecordingRepository<UpcomingEvent>(upcomingEvents), new TestNotifier());
+    }
+
+    static Country CreateCountry()
+    {
+        return new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
     }
 
     static UpcomingEvent CreateValidEvent(int id, int? competitionId = null, int? participationNumber = null)
     {
-        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var country = CreateCountry();
         var athlete = new Athlete(new Person(["John", "Doe"]), null, country, null, id * 10 + 1);
         var horse = new Horse($"Horse {id}", null, id * 10 + 1);
         var combination = new Combination(participationNumber ?? id * 100 + 1, athlete, horse, id * 10 + 1);
         var loop = new Loop(40, id * 10 + 1);
         var phase = new Phase(loop, 40, null, id * 10 + 1);
-        var participation = new SetupParticipation(
-            isNotRanked: false,
-            combination: combination,
-            category: ParticipationCategory.Senior,
-            startTimeOverride: null,
-            maxSpeedOverride: null,
-            minSpeedOverride: null,
-            id: id * 10 + 1
-        );
+        var participation = CreateParticipation(combination, id * 10 + 1);
         var competition = new Competition(
             $"Competition {id}",
             CompetitionType.Qualification,
@@ -94,24 +87,61 @@ public class UpcomingEventServiceTests
         );
         var official = new SetupOfficial(new Person(["Judge", $"{id}"]), OfficialRole.GroundJuryPresident, id * 10 + 1);
 
+        return CreateEvent(id, country, [competition], [official], [loop], [combination]);
+    }
+
+    static UpcomingEvent CreateEvent(
+        int id,
+        Country? country = null,
+        IReadOnlyCollection<Competition>? competitions = null,
+        IReadOnlyCollection<SetupOfficial>? officials = null,
+        IReadOnlyCollection<Loop>? loops = null,
+        IReadOnlyCollection<Combination>? combinations = null
+    )
+    {
         return new UpcomingEvent(
             $"Event {id}",
             "Sofia",
-            country,
+            country ?? CreateCountry(),
             null,
             null,
             null,
-            [competition],
-            [official],
-            [loop],
-            [combination],
+            competitions ?? [],
+            officials ?? [],
+            loops ?? [],
+            combinations ?? [],
             id
+        );
+    }
+
+    static SetupParticipation CreateParticipation(int id)
+    {
+        var country = CreateCountry();
+        var combination = new Combination(
+            number: id,
+            athlete: new Athlete(new Person(["John", "Doe"]), null, country, null, id * 10 + 1),
+            horse: new Horse($"Horse {id}", null, id * 10 + 2),
+            id: id * 10 + 3
+        );
+        return CreateParticipation(combination, id);
+    }
+
+    static SetupParticipation CreateParticipation(Combination combination, int id)
+    {
+        return new SetupParticipation(
+            isNotRanked: false,
+            combination: combination,
+            category: ParticipationCategory.Senior,
+            startTimeOverride: null,
+            maxSpeedOverride: null,
+            minSpeedOverride: null,
+            id: id
         );
     }
 
     static UpcomingEvent CreateInvalidEvent(int id)
     {
-        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var country = CreateCountry();
         var athlete = new Athlete(new Person(["John", "Doe"]), null, country, null, id * 10 + 1);
         var horse = new Horse($"Horse {id}", null, id * 10 + 1);
         var combination = new Combination(id * 100 + 1, athlete, horse, id * 10 + 1);
@@ -271,10 +301,5 @@ public class UpcomingEventServiceTests
         public void Success(string message) { }
 
         public void Warn(string message) { }
-    }
-
-    sealed class TestSelectedUpcomingEventContext : ISelectedUpcomingEventContext
-    {
-        public UpcomingEvent? Event { get; set; }
     }
 }

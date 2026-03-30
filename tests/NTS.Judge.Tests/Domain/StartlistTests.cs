@@ -58,23 +58,98 @@ public class StartlistTests
     }
 
     [Fact]
-    public void Add_WhenAddingFutureEntry_CreatesStageGroup()
+    public void UpsertNextPhase_WhenAddingFutureEntry_CreatesStageGroup()
     {
         var startlist = new Startlist([]);
         var now = DateTimeOffset.Now;
         var participation = CreateParticipation(7, 50, now.AddMinutes(-8), now.AddMinutes(-5));
 
-        startlist.Add(participation);
+        startlist.UpsertNext(participation);
 
         Assert.Equal([2], startlist.UpcomingByStage.Keys.ToArray());
         Assert.Equal([50], startlist.UpcomingByStage[2].Select(x => x.Number).ToArray());
+    }
+
+    [Fact]
+    public void UpsertNextPhase_WhenCurrentPhaseIsCompleteButNextPhaseHasNoStart_UsesOutTimeForNextPhase()
+    {
+        var now = DateTimeOffset.Now;
+        var participation = CreateParticipation(
+            8,
+            60,
+            phase1Start: now.AddMinutes(-40),
+            phase2Start: null,
+            phase1Arrive: now.AddMinutes(-10),
+            phase1Present: now.AddMinutes(-5),
+            includePhase2: true
+        );
+        var expectedStart = participation.Phases[0].GetOutTime();
+        var startlist = new Startlist([]);
+
+        startlist.UpsertNext(participation);
+
+        var upcoming = Assert.Single(startlist.UpcomingByStage[2]);
+        Assert.Equal(60, upcoming.Number);
+        Assert.Equal(expectedStart, upcoming.Start);
+    }
+
+    [Fact]
+    public void UpsertNextPhase_WhenSameParticipationIsAddedTwice_KeepsSingleUpcomingEntry()
+    {
+        var now = DateTimeOffset.Now;
+        var participation = CreateParticipation(
+            9,
+            61,
+            phase1Start: now.AddMinutes(-40),
+            phase2Start: null,
+            phase1Arrive: now.AddMinutes(-10),
+            phase1Present: now.AddMinutes(-5),
+            includePhase2: true
+        );
+        var startlist = new Startlist([]);
+
+        startlist.UpsertNext(participation);
+        startlist.UpsertNext(participation);
+
+        Assert.Single(startlist.Upcoming);
+        Assert.Single(startlist.UpcomingByStage[2]);
+    }
+
+    [Fact]
+    public void UpsertCurrentPhase_WhenParticipationIsRestoredInCurrentPhase_AddsCurrentStage()
+    {
+        var startlist = new Startlist([]);
+        var now = DateTimeOffset.Now;
+        var participation = CreateParticipation(11, 63, now.AddMinutes(-8), now.AddMinutes(-5));
+
+        startlist.UpsertCurrent(participation);
+
+        var upcoming = Assert.Single(startlist.UpcomingByStage[1]);
+        Assert.Equal(63, upcoming.Number);
+        Assert.Equal(participation.Phases[0].StartTime, upcoming.Start);
+    }
+
+    [Fact]
+    public void Remove_WhenParticipationHasMultipleUpcomingEntries_RemovesAllMatches()
+    {
+        var now = DateTimeOffset.Now;
+        var participation = CreateParticipation(10, 62, now.AddMinutes(-8), now.AddMinutes(-5));
+        var startlist = new Startlist([participation]);
+
+        startlist.Remove(62);
+
+        Assert.Empty(startlist.Upcoming);
+        Assert.Empty(startlist.UpcomingByStage);
     }
 
     static Participation CreateParticipation(
         int id,
         int number,
         DateTimeOffset phase1Start,
-        DateTimeOffset? phase2Start = null
+        DateTimeOffset? phase2Start = null,
+        DateTimeOffset? phase1Arrive = null,
+        DateTimeOffset? phase1Present = null,
+        bool includePhase2 = false
     )
     {
         var country = new Country(1000 + id, "Bulgaria", "BG", "BUL", "bg-BG");
@@ -88,13 +163,15 @@ public class StartlistTests
                 length: 20,
                 maxRecovery: 40,
                 rest: 30,
-                isFinal: phase2Start == null,
+                isFinal: !includePhase2 && phase2Start == null,
                 startTime: phase1Start,
+                arriveTime: phase1Arrive,
+                presentTime: phase1Present,
                 id: 5000 + id * 10 + 1
             ),
         };
 
-        if (phase2Start != null)
+        if (includePhase2 || phase2Start != null)
         {
             phases.Add(
                 CreatePhase(
@@ -102,7 +179,9 @@ public class StartlistTests
                     maxRecovery: 40,
                     rest: null,
                     isFinal: true,
-                    startTime: phase2Start.Value,
+                    startTime: phase2Start,
+                    arriveTime: null,
+                    presentTime: null,
                     id: 5000 + id * 10 + 2
                 )
             );
@@ -123,7 +202,16 @@ public class StartlistTests
         );
     }
 
-    static Phase CreatePhase(double length, int maxRecovery, int? rest, bool isFinal, DateTimeOffset startTime, int id)
+    static Phase CreatePhase(
+        double length,
+        int maxRecovery,
+        int? rest,
+        bool isFinal,
+        DateTimeOffset? startTime,
+        DateTimeOffset? arriveTime,
+        DateTimeOffset? presentTime,
+        int id
+    )
     {
         return new Phase(
             gate: "",
@@ -134,8 +222,8 @@ public class StartlistTests
             isFinal: isFinal,
             compulsoryThresholdSpan: null,
             startTime: Timestamp.Create(startTime),
-            arriveTime: null,
-            presentTime: null,
+            arriveTime: Timestamp.Create(arriveTime),
+            presentTime: Timestamp.Create(presentTime),
             representTime: null,
             isRepresentationRequested: false,
             isRequiredInspectionRequested: false,

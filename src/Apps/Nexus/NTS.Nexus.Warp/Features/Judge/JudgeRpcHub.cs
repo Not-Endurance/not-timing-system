@@ -12,13 +12,13 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 {
     readonly ILogger<JudgeRpcHub> _logger;
     readonly IHubContext<WitnessRpcHub, IWitnessClientProcedures> _witnessRelay;
-    readonly PrimaryConnectionsContext _primaryConnections;
+    readonly JudgeConnectionsContext _primaryConnections;
     readonly IPendingSnapshotsService _pendingSnapshots;
 
     public JudgeRpcHub(
         ILogger<JudgeRpcHub> logger,
         IHubContext<WitnessRpcHub, IWitnessClientProcedures> witnessRelay,
-        PrimaryConnectionsContext primaryConnections,
+        JudgeConnectionsContext primaryConnections,
         IPendingSnapshotsService pendingSnapshots
     )
         : base(logger)

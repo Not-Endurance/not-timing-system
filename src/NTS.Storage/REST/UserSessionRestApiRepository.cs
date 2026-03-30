@@ -1,3 +1,4 @@
+using Not.Application.Authentication.Abstractions;
 using Not.Application.HTTP;
 using Not.Injection;
 using Not.Storage.REST;
@@ -9,6 +10,7 @@ namespace NTS.Storage.REST;
 public class UserSessionRestApiRepository
     : RestApiRepository<NtsUserSessionModel, NtsUserSessionModel>,
         INtsUserSessionRepository,
+        INUserSessionRepository<NtsUserSessionStateModel>,
         ITransient
 {
     public UserSessionRestApiRepository(NHttpClient client)
@@ -31,5 +33,12 @@ public class UserSessionRestApiRepository
             HandleException(ex);
             return null;
         }
+    }
+
+    async Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(
+        string userIdentifier
+    )
+    {
+        return (await ReadByUserIdentifier(userIdentifier))?.State?.Copy();
     }
 }

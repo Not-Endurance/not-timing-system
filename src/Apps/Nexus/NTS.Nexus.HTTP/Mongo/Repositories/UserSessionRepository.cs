@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using Not.Application.Authentication.Abstractions;
 using Not.Storage.Mongo;
 using NTS.Application.UserSession;
 using NTS.Application.Watcher;
@@ -6,7 +7,10 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class UserSessionRepository : MongoRepository<NtsUserSessionModel>, INtsUserSessionRepository
+public class UserSessionRepository
+    : MongoRepository<NtsUserSessionModel>,
+        INtsUserSessionRepository,
+        INUserSessionRepository<NtsUserSessionStateModel>
 {
     readonly ITelemetryService _telemetry;
 
@@ -22,8 +26,7 @@ public class UserSessionRepository : MongoRepository<NtsUserSessionModel>, INtsU
 
         return Builders<NtsUserSessionModel>
             .Update.Set(x => x.UserIdentifier, document.UserIdentifier)
-            .Set(x => x.EventId, document.EventId)
-            .Set(x => x.SnapshotHistory, document.SnapshotHistory);
+            .Set(x => x.State, document.State);
     }
 
     public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
@@ -36,5 +39,12 @@ public class UserSessionRepository : MongoRepository<NtsUserSessionModel>, INtsU
         }
 
         return await GetCollection().Find(x => x.UserIdentifier == userIdentifier).FirstOrDefaultAsync();
+    }
+
+    async Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(
+        string userIdentifier
+    )
+    {
+        return (await ReadByUserIdentifier(userIdentifier))?.State?.Copy();
     }
 }

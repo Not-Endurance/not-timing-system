@@ -88,6 +88,6 @@ public record CompetitionFormModel : KrudFormModel<Competition>
             throw new DomainPropertyException(nameof(CompetitionFormModel.Time), Null_or_malformed_string, Time_string);
         }
 
-        return date.Value.ToLocalDateTime().Add(time.Value);
+        return date.Value.ToLocalDateTime(time.Value);
     }
 }

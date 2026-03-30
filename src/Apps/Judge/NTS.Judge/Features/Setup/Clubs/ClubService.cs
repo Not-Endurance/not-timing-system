@@ -8,6 +8,6 @@ namespace NTS.Judge.Features.Setup.Clubs;
 
 internal class ClubService : KrudServiceBase<Club, ClubFormModel>, ITransient
 {
-    public ClubService(IRepository<Club> repository, IEnumerable<IKrudMirror<Club>> reflections)
+    public ClubService(IRepository<Club> repository, IEnumerable<IKrudMirrorService<Club>> reflections)
         : base(repository, reflections) { }
 }

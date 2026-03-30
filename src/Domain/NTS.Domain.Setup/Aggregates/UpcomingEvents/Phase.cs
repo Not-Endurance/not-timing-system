@@ -4,7 +4,7 @@ using Not.Structures;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Phase : Entity, IEntityMirror<Loop>, IIdentifiable
+public class Phase : Entity, IKurdMirror<Loop>, IIdentifiable
 {
     public Phase(Loop? loop, int? recovery, int? rest, int? id = null)
         : base(id)

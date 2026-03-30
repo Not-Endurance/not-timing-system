@@ -1,5 +1,8 @@
 ## Authentication - Microsoft Entra ID (WASM)
-Configuration key: `NAuthenticationSettings`
+Configuration keys:
+- `NClientAuthenticationSettings` for Witness sign-in and protected server access tokens
+
+`NClientAuthenticationSettings` uses `ResourceClientId` for the target protected API app registration.
 
 `NTS.Witness.Web` is now a client-side Blazor WebAssembly app. It does not use confidential client secrets.
 The app uses the normal Entra sign-in entrypoint for External ID sign-up/sign-in. Entra decides whether the user signs in or is taken through sign-up for the configured user flow.

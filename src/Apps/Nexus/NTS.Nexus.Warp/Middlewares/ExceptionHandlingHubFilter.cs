@@ -27,7 +27,7 @@ internal class ExceptionHandlingHubFilter : IHubFilter
         catch (HubException ex)
         {
             HandleHubException(ex, invocationContext.HubMethodName);
-            return Task.FromException(ex);
+            throw;
         }
     }
 
@@ -40,6 +40,7 @@ internal class ExceptionHandlingHubFilter : IHubFilter
         catch (HubException ex)
         {
             HandleHubException(ex, nameof(OnConnectedAsync));
+            throw;
         }
     }
 

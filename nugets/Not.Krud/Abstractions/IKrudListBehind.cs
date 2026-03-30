@@ -4,7 +4,7 @@ using Not.Krud.Models;
 
 namespace Not.Krud.Abstractions;
 
-public interface IKrudListBehind<T> : IListBehind<T>
+public interface IKrudListBehind<T> : ISettService<T>
     where T : Entity
 {
     Task<KrudDeleteImpact> PreviewDelete(T entity);

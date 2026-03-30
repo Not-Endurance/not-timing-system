@@ -8,7 +8,7 @@ namespace NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 
 public class LoopService : KrudServiceBase<Loop, LoopFormModel>, ITransient
 {
-    public LoopService(IEnumerable<IKrudMirror<Loop>> dependants, IRepository<Loop> loops)
+    public LoopService(IEnumerable<IKrudMirrorService<Loop>> dependants, IRepository<Loop> loops)
         : base(loops, dependants) { }
 
     protected override Loop MapEntity(LoopFormModel model)

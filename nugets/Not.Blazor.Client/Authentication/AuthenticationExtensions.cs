@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Authentication.WebAssembly.Msal.Models;
@@ -5,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Authentication.Provider;
 using Not.Application.Authentication.User;
+using Not.Application.Configurations;
 using Not.Blazor.Client.Authentication.Services;
 
 namespace Not.Blazor.Client.Authentication;
@@ -20,7 +22,7 @@ public static class AuthenticationExtensions
             .AddMsalAuthentication(options => Configure(options, configuration))
             .AddAccountClaimsPrincipalFactory<ClientSideAccountClaimsPrincipalFactory>();
 
-        return services.AddScoped<NUserResolver>().Configure<NAuthenticationSettings>(configuration);
+        return services.AddScoped<NUserResolver>().AddSettings<NClientAuthenticationSettings>(configuration);
     }
 
     static void Configure(RemoteAuthenticationOptions<MsalProviderOptions> options, IConfiguration configuration)
@@ -33,6 +35,7 @@ public static class AuthenticationExtensions
 
         // User roles are injected from local user resolution, not from incoming provider role claims.
         options.UserOptions.RoleClaim = ClaimTypes.Role;
+        AddDefaultAccessTokenScope(options, settings);
 
         options.AuthenticationPaths.LogInPath = RemoteAuthenticationDefaults.LoginPath;
         options.AuthenticationPaths.LogInCallbackPath = RemoteAuthenticationDefaults.LoginCallbackPath;
@@ -43,24 +46,24 @@ public static class AuthenticationExtensions
         options.AuthenticationPaths.LogOutFailedPath = AuthenticationContents.AUTHENTICATION;
     }
 
-    static NAuthenticationSettings CreateSettings(IConfiguration configuration)
+    static NClientAuthenticationSettings CreateSettings(IConfiguration configuration)
     {
-        var section = configuration.GetSection(nameof(NAuthenticationSettings));
-        var settings = new NAuthenticationSettings();
+        var section = configuration.GetSection(nameof(NClientAuthenticationSettings));
+        var settings = new NClientAuthenticationSettings();
         section.Bind(settings);
 
         Validate(settings);
         return settings;
     }
 
-    static void Validate(NAuthenticationSettings settings)
+    static void Validate(NClientAuthenticationSettings settings)
     {
-        RequireConfigValue(settings.ClientId, nameof(NAuthenticationSettings.ClientId));
-        RequireConfigValue(settings.Instance, nameof(NAuthenticationSettings.Instance));
-        RequireConfigValue(settings.TenantId, nameof(NAuthenticationSettings.TenantId));
+        RequireConfigValue(settings.ClientId, nameof(NClientAuthenticationSettings.ClientId));
+        RequireConfigValue(settings.Instance, nameof(NClientAuthenticationSettings.Instance));
+        RequireConfigValue(settings.TenantId, nameof(NClientAuthenticationSettings.TenantId));
     }
 
-    static string ResolveAuthority(NAuthenticationSettings settings)
+    static string ResolveAuthority(NClientAuthenticationSettings settings)
     {
         var instance = settings.Instance!.TrimEnd('/');
         if (instance.EndsWith("/v2.0", StringComparison.OrdinalIgnoreCase))
@@ -75,6 +78,23 @@ public static class AuthenticationExtensions
         }
 
         return $"{instance}/{tenantId}";
+    }
+
+    static void AddDefaultAccessTokenScope(
+        RemoteAuthenticationOptions<MsalProviderOptions> options,
+        NClientAuthenticationSettings settings
+    )
+    {
+        var scope = NClientAuthenticationSettingsScopeResolver.ResolveScope(settings);
+        if (string.IsNullOrWhiteSpace(scope))
+        {
+            return;
+        }
+
+        if (!options.ProviderOptions.DefaultAccessTokenScopes.Contains(scope, StringComparer.OrdinalIgnoreCase))
+        {
+            options.ProviderOptions.DefaultAccessTokenScopes.Add(scope);
+        }
     }
 
     static string RequireConfigValue(string? value, string settingPath)

@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.SignalR;
 using Not.Application.UdpHandshake;
 using Not.Localization;
 using Not.Serialization.JSON;
+using Not.Server.Authentication;
 using Not.Storage;
 using NTS.Application;
 using NTS.Application.Cors;
+using NTS.Nexus.Warp.Features.Witness.Authorization;
 using NTS.Nexus.Warp.Middlewares;
 
 namespace NTS.Nexus.Warp;
@@ -41,6 +43,10 @@ internal static class NtsWarpServices
 
         services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly());
         services.AddPendingSnapshotsMongoStorage(configuration);
+        services.NJwtTokenValidation(configuration);
+        services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoReceiveSnapshotAccessPolicy>();
+        services.AddSingleton<IWitnessReceiveAuthorizer, WitnessReceiveAuthorizer>();
+
         return services.AddDummyLocalizer().AddTransient<INetworkBroadcastService, JudgeHandshakeService>();
     }
 

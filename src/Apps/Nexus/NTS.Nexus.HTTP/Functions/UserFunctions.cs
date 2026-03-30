@@ -20,6 +20,18 @@ public class UserFunctions : FunctionBase
         _users = users;
     }
 
+    [Function("users-read-many")]
+    public async Task<IActionResult> ReadMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(ReadMany));
+        TagRequest(request);
+        LogInformation(request, nameof(ReadMany));
+
+        return Ok(await _users.ReadMany());
+    }
+
     [Function("users-read-by-email")]
     public async Task<IActionResult> ReadByEmail(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{email}")] HttpRequest request,

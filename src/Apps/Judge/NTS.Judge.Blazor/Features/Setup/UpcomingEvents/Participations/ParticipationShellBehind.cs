@@ -16,7 +16,7 @@ public class ParticipationShellBehind : KrudShell<ParticipationFormModel>
     }
 
     [Inject]
-    IListBehind<Combination> Behind { get; set; } = default!;
+    ISettService<Combination> Behind { get; set; } = default!;
 
     protected PatternMask TimeMask { get; }
 

@@ -4,11 +4,20 @@ using NTS.Application.Startlists;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
+using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
+using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
+using CoreCombination = NTS.Domain.Core.Aggregates.Participations.Entities.Combination;
+using CoreCompetition = NTS.Domain.Core.Aggregates.Participations.Objects.Competition;
+using CoreHorse = NTS.Domain.Core.Aggregates.Participations.Entities.Horse;
+using CorePhase = NTS.Domain.Core.Aggregates.Participations.Entities.Phase;
+using CorePhaseCollection = NTS.Domain.Core.Aggregates.Participations.Objects.PhaseCollection;
+using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupCombination = NTS.Domain.Setup.Aggregates.UpcomingEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.UpcomingEvents.Competition;
+using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
 using SetupLoop = NTS.Domain.Setup.Aggregates.UpcomingEvents.Loop;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.UpcomingEvents.Participation;
 using SetupPhase = NTS.Domain.Setup.Aggregates.UpcomingEvents.Phase;
@@ -72,6 +81,51 @@ public class StartlistServiceTests
         Assert.Equal(competitionStart.ToUniversalTime(), upcoming.Start.ToDateTimeOffset());
     }
 
+    [Fact]
+    public async Task Handle_WhenParticipationRestoredAndCurrentPhaseIsActive_AddsCurrentPhaseEntry()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var repository = new MutableParticipationRepository([]);
+        var service = new StartlistService(repository);
+        var participation = CreateCoreParticipation(3, 99, now.AddMinutes(-5), now.AddMinutes(5), null, null);
+
+        await service.Load();
+        await service.Handle(new ParticipationRestored(participation), CancellationToken.None);
+
+        var upcoming = Assert.Single(service.Upcoming);
+        Assert.Equal(99, upcoming.Number);
+        Assert.Equal(1, upcoming.PhaseNumber);
+        Assert.Equal(participation.Phases.Current.StartTime!.ToDateTimeOffset(), upcoming.Start.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public async Task Handle_WhenParticipationRestoredAndCurrentPhaseIsComplete_WaitsForPhaseCompletedToAddNextPhase()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var repository = new MutableParticipationRepository([]);
+        var service = new StartlistService(repository);
+        var participation = CreateCoreParticipation(
+            4,
+            100,
+            now.AddMinutes(-45),
+            null,
+            now.AddMinutes(-10),
+            now.AddMinutes(-5)
+        );
+
+        await service.Load();
+        await service.Handle(new ParticipationRestored(participation), CancellationToken.None);
+
+        Assert.Empty(service.Upcoming);
+
+        await service.Handle(new PhaseCompleted(participation), CancellationToken.None);
+
+        var upcoming = Assert.Single(service.Upcoming);
+        Assert.Equal(100, upcoming.Number);
+        Assert.Equal(2, upcoming.PhaseNumber);
+        Assert.Equal(participation.Phases.Current.GetOutTime()!.ToDateTimeOffset(), upcoming.Start.ToDateTimeOffset());
+    }
+
     static Participation CreateParticipation(int id, int number, DateTimeOffset phase1Start)
     {
         return CreateStartedParticipation(id, number, phase1Start, phase1Start);
@@ -85,8 +139,8 @@ public class StartlistServiceTests
     )
     {
         var country = new Country(1000 + id, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete(new Person([$"Rider{id}", "Test"]), null, country, null, 2000 + id);
-        var horse = new Horse($"Horse{id}", null, 3000 + id);
+        var athlete = new SetupAthlete(new Person([$"Rider{id}", "Test"]), null, country, null, 2000 + id);
+        var horse = new SetupHorse($"Horse{id}", null, 3000 + id);
         var combination = new SetupCombination(number, athlete, horse, 4000 + id);
         var setupParticipation = new SetupParticipation(
             isNotRanked: false,
@@ -112,6 +166,69 @@ public class StartlistServiceTests
         );
 
         return ParticipationAndRankingFactory.CreateParticipation(setupCompetition, setupParticipation, 9000 + id);
+    }
+
+    static Participation CreateCoreParticipation(
+        int id,
+        int number,
+        DateTimeOffset phase1Start,
+        DateTimeOffset? phase2Start,
+        DateTimeOffset? phase1Arrive,
+        DateTimeOffset? phase1Present
+    )
+    {
+        var country = new Country(1000 + id, "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new CoreAthlete(new Person([$"Rider{id}", "Test"]), country, null, null, 2000 + id);
+        var horse = new CoreHorse($"Horse{id}", null, 3000 + id);
+        var combination = new CoreCombination(number, athlete, horse, null, "40", null, null, 4000 + id);
+        var phase1 = new CorePhase(
+            gate: "",
+            length: 20,
+            maxRecovery: 40,
+            rest: 30,
+            ruleset: CompetitionRuleset.Regional,
+            isFinal: false,
+            compulsoryThresholdSpan: null,
+            startTime: Timestamp.Create(phase1Start),
+            arriveTime: Timestamp.Create(phase1Arrive),
+            presentTime: Timestamp.Create(phase1Present),
+            representTime: null,
+            isRepresentationRequested: false,
+            isRequiredInspectionRequested: false,
+            isRequiredInspectionCompulsory: false,
+            id: 5000 + id * 10 + 1
+        );
+        var phase2 = new CorePhase(
+            gate: "",
+            length: 20,
+            maxRecovery: 40,
+            rest: null,
+            ruleset: CompetitionRuleset.Regional,
+            isFinal: true,
+            compulsoryThresholdSpan: null,
+            startTime: Timestamp.Create(phase2Start),
+            arriveTime: null,
+            presentTime: null,
+            representTime: null,
+            isRepresentationRequested: false,
+            isRequiredInspectionRequested: false,
+            isRequiredInspectionCompulsory: false,
+            id: 5000 + id * 10 + 2
+        );
+
+        return new Participation(
+            category: ParticipationCategory.Senior,
+            competition: new CoreCompetition(
+                $"Competition{id}",
+                CompetitionRuleset.Regional,
+                CompetitionType.Qualification
+            ),
+            combination: combination,
+            phases: new CorePhaseCollection([phase1, phase2]),
+            notQualified: null,
+            eventId: 9000 + id,
+            id: 6000 + id
+        );
     }
 
     static DateTimeOffset CreateFutureUtcTimestamp()

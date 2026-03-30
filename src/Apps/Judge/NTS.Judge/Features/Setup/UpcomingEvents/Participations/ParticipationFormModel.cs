@@ -63,7 +63,7 @@ public record ParticipationFormModel : KrudFormModel<Participation>
         {
             return null;
         }
-        return StartTimeOverride.Value.ToTodayDateTime().ToLocalDateTime();
+        return DateTime.Today.ToLocalDateTime(StartTimeOverride.Value);
     }
 
     double? OverrideMaxSpeed()

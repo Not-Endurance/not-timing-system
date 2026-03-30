@@ -4,7 +4,10 @@
 
 <MudNavMenu>
 
-    <NNavLink Endpoint="@SNAPSHOT_PAGE">@Snapshot_page_string</NNavLink>
+    @if (ShowSnapshots)
+    {
+        <NNavLink Endpoint="@SNAPSHOT_PAGE">@Snapshot_page_string</NNavLink>
+    }
     
     <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
     
@@ -17,3 +20,4 @@
     <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
 
 </MudNavMenu>
+ 

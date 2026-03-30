@@ -32,6 +32,14 @@ public class UserMongoRepository : IUserRepository, ITransient
         return user?.ToUser();
     }
 
+    public async Task<IEnumerable<NUserModel>> ReadMany()
+    {
+        using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(ReadMany));
+
+        var users = await GetCollection().Find(_ => true).ToListAsync();
+        return users.Select(x => x.ToUser()).ToArray();
+    }
+
     public async Task<NUserModel> Register(NUserRegistration registration)
     {
         using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(Register));
@@ -108,5 +116,6 @@ public class UserMongoRepository : IUserRepository, ITransient
 public interface IUserRepository
 {
     Task<NUserModel?> ReadByEmail(string email);
+    Task<IEnumerable<NUserModel>> ReadMany();
     Task<NUserModel> Register(NUserRegistration registration);
 }

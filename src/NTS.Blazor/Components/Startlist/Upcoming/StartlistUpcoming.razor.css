@@ -1,0 +1,68 @@
+.startlist-upcoming-tabs {
+    width: 100%;
+}
+
+.startlist-number-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    line-height: 1.1;
+}
+
+.startlist-athlete-text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.startlist-loop-text,
+.startlist-time-text {
+    white-space: nowrap;
+}
+
+::deep .startlist-upcoming-panel {
+    padding: 0.5rem;
+}
+
+::deep .startlist-table .mud-table-container {
+    overflow-x: hidden;
+}
+
+::deep .startlist-table .mud-table-container table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+::deep .startlist-table .mud-table-head .mud-table-cell,
+::deep .startlist-table .mud-table-body .mud-table-cell {
+    padding: 0.35rem 0.5rem;
+}
+
+::deep .startlist-table .mud-table-head .mud-table-cell {
+    white-space: nowrap;
+}
+
+::deep .startlist-table .startlist-athlete-cell {
+    min-width: 0;
+}
+
+::deep .startlist-col-number {
+    width: 5.5rem;
+}
+
+::deep .startlist-col-start,
+::deep .startlist-col-timer {
+    width: 5.75rem;
+}
+
+@media (max-width: 599.98px) {
+    ::deep .startlist-upcoming-panel {
+        padding: 0.25rem;
+    }
+
+    ::deep .startlist-table .mud-table-head .mud-table-cell,
+    ::deep .startlist-table .mud-table-body .mud-table-cell {
+        padding: 0.25rem 0.35rem;
+    }
+}

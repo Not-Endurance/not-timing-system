@@ -2,7 +2,6 @@
 @using NTS.Witness.Blazor.Features.Core.Snapshots.Components
 @using Not.Blazor.Components.Layout
 
-@attribute [Route(HOME)]
 @attribute [Route(SNAPSHOT_PAGE)]
 @inherits SnapshotContentBehind
 
@@ -10,8 +9,6 @@
 
     <Main>
         <MudStack Spacing="4">
-            <SnapshotChips Participations="@Participations"
-                           SelectedChanged="@MoveToSnapshot" />
 
             <Snapshot Snapshots="@Snapshots"
                       EmptyMessage="@Empty_intermediate_snapshot_list_string"
@@ -20,9 +17,15 @@
                       OnCapture="@SnapshotHandler"
                       OnEdit="@EditSnapshot" />
 
-            <SnapshotHistory />
+            <SnapshotChips Participations="@Participations"
+                           SelectedChanged="@MoveToSnapshot" />
+
         </MudStack>
     </Main>
+
+    <Main2>
+        <SnapshotHistory />
+    </Main2>
 
     <Rightbar>
         <MudPaper Elevation="0" Class="pa-4">

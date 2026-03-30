@@ -10,7 +10,7 @@ public class ParticipationService : KrudServiceBase<Participation, Participation
 {
     public ParticipationService(
         IRepository<Participation> participations,
-        IEnumerable<IKrudMirror<Participation>> dependants
+        IEnumerable<IKrudMirrorService<Participation>> dependants
     )
         : base(participations, dependants) { }
 }

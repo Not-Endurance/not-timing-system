@@ -1,6 +1,7 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
+using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
@@ -22,10 +23,15 @@ public class StartlistService
         new Dictionary<int, IReadOnlyList<Starter>>();
 
     readonly IReadMany<Participation> _participations;
+    readonly INtsSocketContext? _socketContext;
 
     public StartlistService(IReadMany<Participation> participations)
+        : this(participations, null) { }
+
+    public StartlistService(IReadMany<Participation> participations, INtsSocketContext? socketContext)
     {
         _participations = participations;
+        _socketContext = socketContext;
     }
 
     public Startlist? Startlist { get; set; }
@@ -40,6 +46,12 @@ public class StartlistService
 
     protected override async Task<bool> InitializeState()
     {
+        if (_socketContext?.Event == null && _socketContext != null)
+        {
+            Startlist = new Startlist([]);
+            return false;
+        }
+
         var participations = await _participations.ReadMany();
         Startlist = new Startlist(participations);
         return Startlist.History.Any() || Startlist.Upcoming.Any();
@@ -50,23 +62,30 @@ public class StartlistService
         var participation = notification.Participation;
         if (participation.Phases.Current.IsComplete() && participation.Phases.Current.IsFinal)
         {
-            RemoveEntry(participation);
-            return Task.CompletedTask;
+            Startlist?.Remove(participation.Combination.Number);
+        }
+        else
+        {
+            Startlist?.UpsertNext(participation);
         }
 
-        AddEntry(participation);
+        EmitChanged();
         return Task.CompletedTask;
     }
 
     public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
     {
-        AddEntry(notification.Participation);
+        if (!notification.Participation.Phases.Current.IsComplete())
+        {
+            Startlist?.UpsertCurrent(notification.Participation);
+        }
         return Task.CompletedTask;
     }
 
     public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
     {
-        RemoveEntry(notification.Participation);
+        Startlist?.Remove(notification.Participation.Combination.Number);
+        EmitChanged();
         return Task.CompletedTask;
     }
 
@@ -85,18 +104,6 @@ public class StartlistService
     public void Refresh()
     {
         Startlist?.UpdateState();
-        EmitChanged();
-    }
-
-    void RemoveEntry(Participation participation)
-    {
-        Startlist?.Remove(participation.Combination.Number);
-        EmitChanged();
-    }
-
-    void AddEntry(Participation participation)
-    {
-        Startlist?.Add(participation);
         EmitChanged();
     }
 }

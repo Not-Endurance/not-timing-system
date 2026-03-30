@@ -63,6 +63,53 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         return FindDependencies(principalType).Any();
     }
 
+    public async Task Reflect<TPrincipal>(TPrincipal principal)
+        where TPrincipal : Entity
+    {
+        EnsureGraphBuilt();
+        if (_graph?.Root?.Value is not T root)
+        {
+            return;
+        }
+
+        var pending = new Queue<Entity>();
+        var seen = new HashSet<(Type Type, int Id)>();
+        pending.Enqueue(principal);
+        seen.Add((principal.GetType(), principal.Id));
+
+        var hasReflected = false;
+        while (pending.Count > 0)
+        {
+            var current = pending.Dequeue();
+            var updatedDependents = new HashSet<(Type Type, int Id)>();
+
+            foreach (var usage in ResolveUsages(root, current))
+            {
+                var dependentKey = (usage.Dependent.GetType(), usage.Dependent.Id);
+                if (!updatedDependents.Add(dependentKey))
+                {
+                    continue;
+                }
+
+                if (!KrudReflectionHelper.TryReflect(usage.Dependent, current))
+                {
+                    continue;
+                }
+
+                hasReflected = true;
+                if (seen.Add(dependentKey))
+                {
+                    pending.Enqueue(usage.Dependent);
+                }
+            }
+        }
+
+        if (hasReflected)
+        {
+            await _coalescedCommit.Invoke();
+        }
+    }
+
     public KrudDeleteImpact PreviewDelete(Entity principal)
     {
         EnsureGraphBuilt();
@@ -172,11 +219,11 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
             var parentInterfaces = current
                 .GetType()
                 .GetInterfaces()
-                .Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IParent<>));
+                .Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IKrudParent<>));
 
             foreach (var parentInterface in parentInterfaces)
             {
-                var childrenProperty = parentInterface.GetProperty(nameof(IParent<Entity>.Children));
+                var childrenProperty = parentInterface.GetProperty(nameof(IKrudParent<Entity>.Children));
                 if (childrenProperty?.GetValue(current) is not IEnumerable children)
                 {
                     continue;
@@ -192,21 +239,21 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
 
     static IEnumerable<object> ReadChildren(object parent, Type dependentType)
     {
-        var parentInterface = typeof(IParent<>).MakeGenericType(dependentType);
+        var parentInterface = typeof(IKrudParent<>).MakeGenericType(dependentType);
         if (!parentInterface.IsAssignableFrom(parent.GetType()))
         {
             return [];
         }
 
-        var childrenProperty = parentInterface.GetProperty(nameof(IParent<Entity>.Children));
+        var childrenProperty = parentInterface.GetProperty(nameof(IKrudParent<Entity>.Children));
         var children = childrenProperty?.GetValue(parent) as IEnumerable;
         return children?.OfType<object>() ?? [];
     }
 
     static void RemoveDependent(object parent, Type dependentType, Entity dependent)
     {
-        var parentInterface = typeof(IParent<>).MakeGenericType(dependentType);
-        var removeMethod = parentInterface.GetMethod(nameof(IParent<Entity>.Remove));
+        var parentInterface = typeof(IKrudParent<>).MakeGenericType(dependentType);
+        var removeMethod = parentInterface.GetMethod(nameof(IKrudParent<Entity>.Remove));
         if (removeMethod == null)
         {
             throw new InvalidOperationException(

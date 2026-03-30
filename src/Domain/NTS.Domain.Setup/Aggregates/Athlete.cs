@@ -3,7 +3,7 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class Athlete : Aggregate, IEntityMirror<Club>
+public class Athlete : Aggregate, IKurdMirror<Club>
 {
     public Athlete(Person? names, string? feiId, Country? country, Club? club, int? id = null, User? user = null)
         : base(id)

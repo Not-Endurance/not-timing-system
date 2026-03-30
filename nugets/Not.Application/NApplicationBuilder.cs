@@ -1,6 +1,8 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Not.Application.Authentication.Abstractions;
+using Not.Application.Authentication.User;
 using Not.Application.Configurations;
 using Not.Application.DomainEvents;
 using Not.Application.HTTP;
@@ -30,7 +32,7 @@ public class NApplicationBuilder
 
     public NApplicationBuilder AddRpcClient()
     {
-        _services.AddSingleton<IRpcSocket, SignalRSocket>();
+        _services.AddScoped<IRpcSocket, SignalRSocket>();
         _services.AddSettings<RpcSettings>(
             _configuration,
             x => !string.IsNullOrWhiteSpace(x.Host) || !string.IsNullOrWhiteSpace(x.HubPattern)
@@ -46,6 +48,12 @@ public class NApplicationBuilder
                 .RegisterServicesFromAssembly(Assembly.GetCallingAssembly())
         );
         _services.AddTransient<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
+        return this;
+    }
+
+    public NApplicationBuilder AddUserSessions()
+    {
+        _services.AddScoped<INUserSession, NUserSessionService>();
         return this;
     }
 }

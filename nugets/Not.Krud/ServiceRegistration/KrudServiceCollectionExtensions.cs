@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Not.Application.CRUD.Ports;
 using Not.Domain;
 using Not.Krud.Abstractions;
@@ -28,7 +28,7 @@ public static class KrudServiceCollectionExtensions
     /// <returns></returns>
     internal static IServiceCollection AddKrudRoot<T>(
         this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton
+        ServiceLifetime lifetime = ServiceLifetime.Scoped
     )
         where T : Aggregate
     {
@@ -40,6 +40,8 @@ public static class KrudServiceCollectionExtensions
         }
 
         var meta = KrudGraphMetadata.Build(typeof(T));
+        RegisterMirrors<T>(services, meta, lifetime);
+
         if (meta.IsFlatAggregate)
         {
             return services;
@@ -71,5 +73,31 @@ public static class KrudServiceCollectionExtensions
         );
 
         return services;
+    }
+
+    static void RegisterMirrors<T>(IServiceCollection services, KrudGraphMetadata meta, ServiceLifetime lifetime)
+        where T : Aggregate
+    {
+        foreach (var principalType in meta.RootMirrorPrincipalTypes)
+        {
+            services.Add(
+                new(
+                    typeof(IKrudMirrorService<>).MakeGenericType(principalType),
+                    typeof(KrudRootMirror<,>).MakeGenericType(typeof(T), principalType),
+                    lifetime
+                )
+            );
+        }
+
+        foreach (var principalType in meta.GraphMirrorPrincipalTypes)
+        {
+            services.Add(
+                new(
+                    typeof(IKrudMirrorService<>).MakeGenericType(principalType),
+                    typeof(KrudGraphMirror<,>).MakeGenericType(typeof(T), principalType),
+                    lifetime
+                )
+            );
+        }
     }
 }

@@ -13,7 +13,7 @@ public class NContentBehind : NComponent
     protected bool ShowOnlyMain { get; private set; }
     protected int MainXs => Rightbar == null ? GRID_MAX_WIDTH : GRID_MAX_WIDTH - RightBarXS;
 
-    [Parameter, EditorRequired]
+    [Parameter]
     public string Title { get; set; } = default!;
 
     /// <summary>

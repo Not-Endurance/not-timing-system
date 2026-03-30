@@ -1,4 +1,5 @@
-﻿using System.Collections;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Reflection;
 using Not.Domain;
 using Not.Domain.Krud;
@@ -9,8 +10,10 @@ namespace Not.Krud.ServiceRegistration;
 
 internal static class KrudReflectionHelper
 {
+    static readonly ConcurrentDictionary<(Type DependentType, Type PrincipalType), MethodInfo?> MIRROR_METHODS = [];
+
     /// <summary>
-    /// Returns all direct child <seealso cref="Entity"/>s that also implement <seealso cref="IParent{T}"/>
+    /// Returns all direct child <seealso cref="Entity"/>s that also implement <seealso cref="IKrudParent{T}"/>
     /// </summary>
     /// <param name="entityType">Domain entity type</param>
     /// <returns>All edge types of <paramref name="entityType"/></returns>
@@ -18,7 +21,7 @@ internal static class KrudReflectionHelper
     {
         return entityType
             .GetInterfaces()
-            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IParent<>))
+            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IKrudParent<>))
             .Select(i => i.GetGenericArguments()[0])
             .Where(t => typeof(Entity).IsAssignableFrom(t));
     }
@@ -109,6 +112,36 @@ internal static class KrudReflectionHelper
             .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IKrudParentNodeOf<>));
     }
 
+    public static IEnumerable<Type> GetClosedEntityMirrorInterfaces(Type type)
+    {
+        return type.GetInterfaces()
+            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IKurdMirror<>));
+    }
+
+    public static IReadOnlyList<Type> GetEntityMirrorPrincipalTypes(IEnumerable<Type> types)
+    {
+        return types
+            .SelectMany(GetClosedEntityMirrorInterfaces)
+            .Select(i => i.GetGenericArguments()[0])
+            .Where(typeof(Entity).IsAssignableFrom)
+            .Distinct()
+            .ToList();
+    }
+
+    public static bool TryReflect(Entity dependent, Entity principal)
+    {
+        var method = MIRROR_METHODS.GetOrAdd(
+            (dependent.GetType(), principal.GetType()),
+            static key => FindMirrorMethod(key.DependentType, key.PrincipalType)
+        );
+        if (method == null)
+        {
+            return false;
+        }
+
+        return (bool)(method.Invoke(dependent, [principal]) ?? false);
+    }
+
     static IEnumerable<Type> UnwrapPropertyTypes(Type type)
     {
         // IEnumerable<T> (except string) -> T
@@ -122,5 +155,14 @@ internal static class KrudReflectionHelper
         }
 
         yield return type;
+    }
+
+    static MethodInfo? FindMirrorMethod(Type dependentType, Type principalType)
+    {
+        var mirrorInterface = GetClosedEntityMirrorInterfaces(dependentType)
+            .OrderByDescending(i => i.GetGenericArguments()[0] == principalType)
+            .FirstOrDefault(i => i.GetGenericArguments()[0].IsAssignableFrom(principalType));
+
+        return mirrorInterface?.GetMethod(nameof(IKurdMirror<Entity>.Reflect));
     }
 }

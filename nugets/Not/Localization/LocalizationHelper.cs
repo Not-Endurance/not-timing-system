@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Localization;
 using Not.Injection;
+using Not.Logging;
 using Not.Notify;
 using Not.Reflection;
 
@@ -10,13 +11,11 @@ public static class LocalizationHelper
 {
     public static string LocalizeString(string resource)
     {
-        TryInitialize();
         return _localizer != null ? _localizer[resource] : resource;
     }
 
     public static string LocalizeEnum(Enum value)
     {
-        TryInitialize();
         try
         {
             return value.GetType().GetEnumField(value)?.GetAttributes<DisplayAttribute>().FirstOrDefault()?.GetName()
@@ -28,17 +27,24 @@ public static class LocalizationHelper
                 Text_formatting_failed_This_is_usually_not_critical_failure_string
                 + Environment.NewLine
                 + $"Localization resource is missing key for '{value}'";
-            _notifier?.Error(message);
+            NotificationHelper.Current?.Error(message);
+            LoggingHelper.Error(message);
             return value.ToString();
         }
     }
 
-    static IStringLocalizer? _localizer;
-    static INotifier? _notifier;
-
-    static void TryInitialize()
+    public static void Configure(IStringLocalizer? localizer)
     {
-        _localizer ??= ServiceLocator.Get<IStringLocalizer>();
-        _notifier ??= ServiceLocator.Get<INotifier>();
+        _localizer = localizer;
     }
+
+    public static void Clear(IStringLocalizer? localizer = null)
+    {
+        if (localizer == null || ReferenceEquals(_localizer, localizer))
+        {
+            _localizer = null;
+        }
+    }
+
+    static IStringLocalizer? _localizer;
 }

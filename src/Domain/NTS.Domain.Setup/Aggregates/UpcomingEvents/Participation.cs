@@ -3,7 +3,7 @@ using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-public class Participation : Entity, IEntityMirror<Combination>
+public class Participation : Entity, IKurdMirror<Combination>
 {
     const double CHILDREN_MIN_SPEED = 8;
     const double CHILDREN_MAX_SPEED = 12;
@@ -51,6 +51,7 @@ public class Participation : Entity, IEntityMirror<Combination>
     internal void SetSpeedLimits(CompetitionType competitionType)
     {
         MinAverageSpeed = MIN_SPEED;
+        MaxAverageSpeed = null;
         if (competitionType == CompetitionType.Qualification)
         {
             if (Category == ParticipationCategory.Children)

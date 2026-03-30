@@ -2,7 +2,7 @@ using Not.Injection;
 
 namespace Not.Application.Authentication.Abstractions;
 
-public interface INUserSession : IScoped
+public interface INUserSession
 {
     Task<INUserSessionModel<TSessionState>?> GetCurrent<TSessionState>()
         where TSessionState : class;

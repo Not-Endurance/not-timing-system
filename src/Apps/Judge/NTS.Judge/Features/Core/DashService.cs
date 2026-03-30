@@ -13,7 +13,7 @@ using NTS.Judge.Features.Setup.UpcomingEvents;
 
 namespace NTS.Judge.Features.Core;
 
-public class DashService : IDashService, ISingleton
+public class DashService : IDashService, IScoped
 {
     readonly INtsSocketService _socketService;
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;

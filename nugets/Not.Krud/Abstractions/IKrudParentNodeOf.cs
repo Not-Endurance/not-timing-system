@@ -3,5 +3,5 @@ using Not.Domain.Krud;
 
 namespace Not.Krud.Abstractions;
 
-public interface IKrudParentNodeOf<T> : IParent<T>, IKrudNodeSetter
+public interface IKrudParentNodeOf<T> : IKrudParent<T>, IKrudNodeSetter
     where T : Entity { }

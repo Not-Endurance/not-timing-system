@@ -3,7 +3,7 @@ using Not.Injection;
 
 namespace Not.Notify;
 
-public class Notifier : INotifier, INotificationStream, ISingleton
+public class Notifier : INotifier, INotificationStream, IScoped
 {
     readonly Event<string> _informed = new();
     readonly Event<string> _succeeded = new();

@@ -52,6 +52,8 @@ public static class Warp
         );
 
         app.UseCors(NtsWarpServices.CORS_POLICY_NAME);
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
         app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);

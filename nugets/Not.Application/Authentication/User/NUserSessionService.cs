@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Authentication.Abstractions;
-using Not.Injection;
 
 namespace Not.Application.Authentication.User;
 
-public class NUserSessionService : INUserSession, IScoped
+public class NUserSessionService : INUserSession
 {
     readonly AuthenticationStateProvider _authStateProvider;
     readonly IServiceProvider _serviceProvider;

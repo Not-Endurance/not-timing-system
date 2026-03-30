@@ -1,6 +1,7 @@
 ﻿namespace Not.Application.Services;
 
-public interface IListBehind<T> : IDeleteBehind<T>
+public interface ISettService<T>
 {
+    Task Delete(T entity);
     Task<IEnumerable<T>> ReadMany();
 }

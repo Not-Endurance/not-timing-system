@@ -27,7 +27,7 @@ public class RankingService
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationEliminated>,
         INotificationHandler<ParticipationRestored>,
-        ISingleton
+        IScoped
 {
     readonly INtsSocketContext _socketContext;
     readonly IRepository<Ranking> _rankings;

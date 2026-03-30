@@ -17,9 +17,9 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
         _userSessions = userSessions;
     }
 
-    public async Task<NtsUserSessionModel?> GetCurrent()
+    public async Task<NtsUserSessionStateModel?> GetCurrent()
     {
-        return (await _nUserSessionService.GetCurrent<NtsUserSessionModel>())?.State;
+        return (await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>())?.State;
     }
 
     public async Task SetEventId(int? eventId)
@@ -29,14 +29,14 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
             return;
         }
 
-        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionModel>();
+        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
         if (userSession == null)
         {
             return;
         }
 
-        var currentSession = userSession.State;
-        if (currentSession?.EventId == eventId)
+        var currentSession = await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier);
+        if (currentSession?.State?.EventId == eventId)
         {
             return;
         }
@@ -46,40 +46,46 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
             await _userSessions.Delete(currentSession);
         }
 
-        await _userSessions.Create(CreateSession(userSession, eventId: eventId));
+        var session = CreateSession(userSession, new NtsUserSessionStateModel { EventId = eventId });
+        await _userSessions.Create(session);
     }
 
     public async Task AppendSnapshot(SnapshotGroup snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
 
-        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionModel>();
+        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
         if (userSession == null)
         {
             return;
         }
 
-        var currentSession = userSession.State;
+        var currentSession = await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier);
         if (currentSession == null)
         {
-            currentSession = CreateSession(userSession, snapshot: snapshot);
+            currentSession = CreateSession(
+                userSession,
+                new NtsUserSessionStateModel { SnapshotHistory = [SnapshotGroupModel.MapFrom(snapshot)] }
+            );
             await _userSessions.Create(currentSession);
             return;
         }
 
-        currentSession.SnapshotHistory = [.. currentSession.SnapshotHistory, SnapshotGroupModel.MapFrom(snapshot)];
+        var currentState = currentSession.State?.Copy() ?? new NtsUserSessionStateModel();
+        currentState.SnapshotHistory = [.. currentState.SnapshotHistory, SnapshotGroupModel.MapFrom(snapshot)];
+        currentSession.ReplaceState(currentState);
         await _userSessions.Update(currentSession);
     }
 
     public async Task DeleteCurrent()
     {
-        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionModel>();
+        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
         if (userSession == null)
         {
             return;
         }
 
-        var currentSession = userSession.State;
+        var currentSession = await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier);
         if (currentSession == null)
         {
             return;
@@ -88,18 +94,10 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
         await _userSessions.Delete(currentSession);
     }
 
-    static NtsUserSessionModel CreateSession(
-        INUserSessionModel userSession,
-        int? eventId = null,
-        SnapshotGroup? snapshot = null
-    )
+    static NtsUserSessionModel CreateSession(INUserSessionModel userSession, NtsUserSessionStateModel? state)
     {
-        return new NtsUserSessionModel
-        {
-            Id = userSession.User.Id,
-            UserIdentifier = userSession.UserIdentifier,
-            EventId = eventId,
-            SnapshotHistory = snapshot == null ? [] : [SnapshotGroupModel.MapFrom(snapshot)],
-        };
+        var session = new NtsUserSessionModel { Id = userSession.User.Id, UserIdentifier = userSession.UserIdentifier };
+        session.ReplaceState(state);
+        return session;
     }
 }

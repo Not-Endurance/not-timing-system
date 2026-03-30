@@ -1,9 +1,28 @@
+using Microsoft.Extensions.Localization;
 using Not.Blazor.Components.Abstractions;
+using Not.Localization;
+using Not.Notify;
+using Not.Safe;
+using Not.Startup;
 
 namespace Not.Blazor.Components.Layout;
 
-public class NLayoutBehind : LayoutComponentBase
+public class NLayoutBehind : LayoutComponentBase, IDisposable
 {
+    bool _hasStarted;
+
+    [Inject]
+    IEnumerable<IStartupInitializer> Initializers { get; set; } = default!;
+
+    [Inject]
+    IEnumerable<IStartupInitializerAsync> AsyncInitializers { get; set; } = default!;
+
+    [Inject]
+    IStringLocalizer? StringLocalizer { get; set; }
+
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
+
     protected bool DrawerOpen { get; set; } = true;
     protected bool HideLayout { get; private set; }
     protected NTheme Theme { get; set; } = default!;
@@ -22,7 +41,35 @@ public class NLayoutBehind : LayoutComponentBase
 
     protected override void OnInitialized()
     {
+        LocalizationHelper.Configure(StringLocalizer);
+        NotificationHelper.Configure(Notifier);
         PrintableComponent.OnToggle(ToggleLayoutVisibility);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _hasStarted)
+        {
+            return;
+        }
+
+        _hasStarted = true;
+
+        try
+        {
+            foreach (var initializer in Initializers)
+            {
+                initializer.RunAtStartup();
+            }
+            foreach (var initializer in AsyncInitializers)
+            {
+                await initializer.RunAtStartupAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            SafeHelper.HandleException(ex);
+        }
     }
 
     protected void ToggleDrawer()
@@ -34,5 +81,11 @@ public class NLayoutBehind : LayoutComponentBase
     {
         HideLayout = !HideLayout;
         await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LocalizationHelper.Clear(StringLocalizer);
+        NotificationHelper.Clear(Notifier);
     }
 }

@@ -176,7 +176,7 @@ public class RegistrationFlowTests
         );
         var expected = new TestSessionState("entra-1", 23);
         var repository = new RecordingSessionStateRepository { ReadByUserIdentifierResult = expected };
-        var serviceProvider = new StaticServiceProvider().Add<IUserSessionRepository<TestSessionState>>(repository);
+        var serviceProvider = new StaticServiceProvider().Add<INUserSessionRepository<TestSessionState>>(repository);
         var service = new NUserSessionService(authStateProvider, users, serviceProvider);
 
         var current = await service.GetCurrent<TestSessionState>();
@@ -344,7 +344,7 @@ public class RegistrationFlowTests
         }
     }
 
-    sealed class RecordingSessionStateRepository : IUserSessionRepository<TestSessionState>
+    sealed class RecordingSessionStateRepository : INUserSessionRepository<TestSessionState>
     {
         public TestSessionState? ReadByUserIdentifierResult { get; init; }
         public int ReadByUserIdentifierCalls { get; private set; }
@@ -393,6 +393,11 @@ public class RegistrationFlowTests
         public Task<NUserModel?> ReadByEmail(string email)
         {
             return Task.FromResult<NUserModel?>(null);
+        }
+
+        public Task<IEnumerable<NUserModel>> ReadMany()
+        {
+            return Task.FromResult<IEnumerable<NUserModel>>([]);
         }
 
         public Task<NUserModel> Register(NUserRegistration registration)

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Not.Logging;
 using Not.Notify;
 using Not.Serialization.JSON;
-using Not.Strings;
 
 namespace Not.Application.RPC.SignalR;
 
@@ -14,12 +13,18 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
     readonly RpcSettings _context;
     readonly string _name;
     readonly INotifier _notifier;
+    readonly IRpcAccessTokenProvider? _accessTokenProvider;
 
-    public SignalRSocket(IOptions<RpcSettings> options, INotifier notifier)
+    public SignalRSocket(
+        IOptions<RpcSettings> options,
+        INotifier notifier,
+        IRpcAccessTokenProvider? accessTokenProvider = null
+    )
     {
         _context = Validate(options.Value);
         _name = GetType().Name;
         _notifier = notifier;
+        _accessTokenProvider = accessTokenProvider;
     }
 
     // Necessary because this.Connection instance is not intialized
@@ -96,8 +101,15 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
             }
             RaiseConnected();
         }
+        catch (OperationCanceledException)
+        {
+            await CleanupFailedConnection();
+            RaiseDisconnected();
+        }
         catch (Exception ex)
         {
+            await CleanupFailedConnection();
+            RaiseDisconnected();
             _notifier.Error(ex);
         }
     }
@@ -113,7 +125,7 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
 
         Connection = new HubConnectionBuilder()
             .AddNewtonsoftJsonProtocol(x => x.PayloadSerializerSettings = new NJsonSettings())
-            .WithUrl(url)
+            .WithUrl(url, options => options.AccessTokenProvider = ResolveAccessToken)
             .WithAutomaticReconnect(new AutomaticReconnectSetting())
             .Build();
         Connection.Reconnected += HandleReconnected;
@@ -122,6 +134,42 @@ public class SignalRSocket : IRpcSocket, IAsyncDisposable
         foreach (var registerProcedure in Procedures)
         {
             registerProcedure(Connection);
+        }
+    }
+
+    async Task<string?> ResolveAccessToken()
+    {
+        if (_accessTokenProvider == null)
+        {
+            return null;
+        }
+
+        var token = await _accessTokenProvider.Get();
+        return token;
+    }
+
+    async Task CleanupFailedConnection()
+    {
+        if (Connection == null)
+        {
+            return;
+        }
+
+        Connection.Reconnected -= HandleReconnected;
+        Connection.Reconnecting -= HandleReconnecting;
+        Connection.Closed -= HandleClosed;
+
+        try
+        {
+            await Connection.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            LoggingHelper.Error($"SignalR cleanup failed after unsuccessful connect: {ex.Message}");
+        }
+        finally
+        {
+            Connection = null;
         }
     }
 

@@ -1,26 +1,29 @@
 using System.Collections.Concurrent;
+using Microsoft.AspNetCore.SignalR;
 using Not.Injection;
 
 namespace NTS.Nexus.Warp.Features;
 
-public class PrimaryConnectionsContext : IPrimaryConnectionContext
+public class JudgeConnectionsContext : IJudgeConnectionsContext
 {
-    readonly ILogger<PrimaryConnectionsContext> _logger;
+    readonly ILogger<JudgeConnectionsContext> _logger;
     readonly ConcurrentDictionary<string, string> _connections = [];
 
-    public PrimaryConnectionsContext(ILogger<PrimaryConnectionsContext> logger)
+    public JudgeConnectionsContext(ILogger<JudgeConnectionsContext> logger)
     {
         _logger = logger;
     }
 
-    public void Add(string identifier, string connectionId)
+    public void Add(string enduranceEventId, string connectionId)
     {
-        if (_connections.TryAdd(identifier, connectionId))
+        if (_connections.TryAdd(enduranceEventId, connectionId))
         {
             return;
         }
-        _logger.LogError("Connection with identifier '{identifier}' already exists", identifier);
-        throw new Exception("Duplicate connection attempt");
+        _logger.LogError("Connection with identifier '{enduranceEventId}' already exists", enduranceEventId);
+        throw new HubException(
+            $"Event '{enduranceEventId}' is already active and managed. Select a different event to proceed"
+        ); // TODO: localize this
     }
 
     public void Remove(string connectionId)
@@ -29,13 +32,13 @@ public class PrimaryConnectionsContext : IPrimaryConnectionContext
         _connections.TryRemove(match);
     }
 
-    public string? GetConnectionId(string identifier)
+    public string? GetConnectionId(string enduranceEventId)
     {
-        return _connections.GetValueOrDefault(identifier);
+        return _connections.GetValueOrDefault(enduranceEventId);
     }
 }
 
-public interface IPrimaryConnectionContext : ISingleton
+public interface IJudgeConnectionsContext : ISingleton
 {
-    string? GetConnectionId(string identifier);
+    string? GetConnectionId(string enduranceEventId);
 }
