@@ -6,14 +6,14 @@ using Not.Application.RPC.SignalR;
 using Not.Exceptions;
 using Not.Notify;
 using NTS.Application.Socket;
-using NTS.Domain.Enums;
+using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Nexus.Warp.Contracts;
-using NTS.Application.Watcher;
 using NTS.Witness.Features.Socket;
 
 namespace NTS.Authentication.Tests;

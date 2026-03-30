@@ -95,7 +95,11 @@ public class WitnessEventScopedStateTests
 
         return new Participation(
             category: ParticipationCategory.Senior,
-            competition: new CoreCompetition($"Competition{number}", CompetitionRuleset.Regional, CompetitionType.Qualification),
+            competition: new CoreCompetition(
+                $"Competition{number}",
+                CompetitionRuleset.Regional,
+                CompetitionType.Qualification
+            ),
             combination: combination,
             phases: new CorePhaseCollection([phase]),
             notQualified: null,

@@ -67,18 +67,24 @@ public class AuthenticationExtensionsTests
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.ClientId)}"] =
-                        "client-id",
-                    [$"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.Instance)}"] =
-                        "https://login.microsoftonline.com",
-                    [$"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.TenantId)}"] =
-                        "tenant-id",
-                    [$"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.ResourceClientId)}"] =
-                        resourceClientId,
-                    [$"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.Audience)}"] =
-                        audience,
-                    [$"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.Scope)}"] =
-                        scope,
+                    [
+                        $"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.ClientId)}"
+                    ] = "client-id",
+                    [
+                        $"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.Instance)}"
+                    ] = "https://login.microsoftonline.com",
+                    [
+                        $"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.TenantId)}"
+                    ] = "tenant-id",
+                    [
+                        $"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.ResourceClientId)}"
+                    ] = resourceClientId,
+                    [
+                        $"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.Audience)}"
+                    ] = audience,
+                    [
+                        $"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.Scope)}"
+                    ] = scope,
                 }
             )
             .Build();

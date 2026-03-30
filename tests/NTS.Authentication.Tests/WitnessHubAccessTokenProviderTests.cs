@@ -45,21 +45,14 @@ public class WitnessHubAccessTokenProviderTests
         };
         var context = CreateContext(
             accessTokenProvider,
-            new NClientAuthenticationSettings
-            {
-                ResourceClientId = "resource-client",
-                Scope = "nts-client-scope",
-            },
+            new NClientAuthenticationSettings { ResourceClientId = "resource-client", Scope = "nts-client-scope" },
             new RecordingAuthenticationRedirector()
         );
 
         var token = await context.Provider.Get();
 
         Assert.Equal("access-token", token);
-        Assert.Equal(
-            ["api://resource-client/nts-client-scope"],
-            accessTokenProvider.LastOptions?.Scopes?.ToArray()
-        );
+        Assert.Equal(["api://resource-client/nts-client-scope"], accessTokenProvider.LastOptions?.Scopes?.ToArray());
         Assert.Equal("https://localhost/performance", accessTokenProvider.LastOptions?.ReturnUrl);
     }
 
@@ -85,11 +78,7 @@ public class WitnessHubAccessTokenProviderTests
         var redirector = new RecordingAuthenticationRedirector();
         var context = CreateContext(
             accessTokenProvider,
-            new NClientAuthenticationSettings
-            {
-                ResourceClientId = "resource-client",
-                Scope = "nts-client-scope",
-            },
+            new NClientAuthenticationSettings { ResourceClientId = "resource-client", Scope = "nts-client-scope" },
             redirector
         );
 
@@ -112,11 +101,7 @@ public class WitnessHubAccessTokenProviderTests
         var redirector = new RecordingAuthenticationRedirector();
         var context = CreateContext(
             accessTokenProvider,
-            new NClientAuthenticationSettings
-            {
-                ResourceClientId = "resource-client",
-                Scope = "nts-client-scope",
-            },
+            new NClientAuthenticationSettings { ResourceClientId = "resource-client", Scope = "nts-client-scope" },
             redirector
         );
 
@@ -146,18 +131,11 @@ public class WitnessHubAccessTokenProviderTests
             ),
             ["api://resource-client/nts-client-scope"]
         );
-        var accessTokenProvider = new RecordingAccessTokenProvider
-        {
-            ExceptionToThrow = exception,
-        };
+        var accessTokenProvider = new RecordingAccessTokenProvider { ExceptionToThrow = exception };
         var redirector = new RecordingAuthenticationRedirector();
         var context = CreateContext(
             accessTokenProvider,
-            new NClientAuthenticationSettings
-            {
-                ResourceClientId = "resource-client",
-                Scope = "nts-client-scope",
-            },
+            new NClientAuthenticationSettings { ResourceClientId = "resource-client", Scope = "nts-client-scope" },
             redirector
         );
 
@@ -177,11 +155,7 @@ public class WitnessHubAccessTokenProviderTests
         var redirector = new RecordingAuthenticationRedirector();
         var context = CreateContext(
             accessTokenProvider,
-            new NClientAuthenticationSettings
-            {
-                ResourceClientId = "resource-client",
-                Scope = "nts-client-scope",
-            },
+            new NClientAuthenticationSettings { ResourceClientId = "resource-client", Scope = "nts-client-scope" },
             redirector
         );
 
@@ -271,7 +245,8 @@ public class WitnessHubAccessTokenProviderTests
         public int AccessTokenResultRedirectCalls { get; private set; }
         public int AccessTokenExceptionRedirectCalls { get; private set; }
         public int InteractiveRequestRedirectCalls { get; private set; }
-        public int TotalCalls => AccessTokenResultRedirectCalls + AccessTokenExceptionRedirectCalls + InteractiveRequestRedirectCalls;
+        public int TotalCalls =>
+            AccessTokenResultRedirectCalls + AccessTokenExceptionRedirectCalls + InteractiveRequestRedirectCalls;
         public AccessTokenResult? LastAccessTokenResult { get; private set; }
         public AccessTokenNotAvailableException? LastAccessTokenException { get; private set; }
         public InteractiveRequestOptions? LastInteractiveRequest { get; private set; }

@@ -12,7 +12,9 @@ public class ServiceLocator : IStartupInitializer, ITransient
         var service = _provider?.GetService<T>();
         if (service is IScoped)
         {
-            throw GuardHelper.Exception($"{nameof(ServiceLocator)} cannot guarantee correct service scope resolution. Scoped service '{typeof(T).Name}' is not allowed");
+            throw GuardHelper.Exception(
+                $"{nameof(ServiceLocator)} cannot guarantee correct service scope resolution. Scoped service '{typeof(T).Name}' is not allowed"
+            );
         }
         return service;
     }

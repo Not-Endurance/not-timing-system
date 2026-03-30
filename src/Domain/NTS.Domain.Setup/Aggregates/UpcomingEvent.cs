@@ -6,7 +6,12 @@ using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
 namespace NTS.Domain.Setup.Aggregates;
 
-public class UpcomingEvent : Aggregate, IKrudParent<Official>, IKrudParent<Competition>, IKrudParent<Loop>, IKrudParent<Combination>
+public class UpcomingEvent
+    : Aggregate,
+        IKrudParent<Official>,
+        IKrudParent<Competition>,
+        IKrudParent<Loop>,
+        IKrudParent<Combination>
 {
     readonly List<Competition> _competitions = [];
     readonly List<Official> _officials = [];

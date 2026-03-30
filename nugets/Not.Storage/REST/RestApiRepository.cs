@@ -46,8 +46,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
             Notifier?.Warn(ex.Message);
 #else
             Notifier?.Warn(
-                NStrings
-                    .Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
+                NStrings.Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
             );
 #endif
         }

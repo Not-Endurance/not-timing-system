@@ -26,12 +26,8 @@ public class DateTimeExtensionsTests
             {
                 return TimeZoneInfo.FindSystemTimeZoneById(id);
             }
-            catch (TimeZoneNotFoundException)
-            {
-            }
-            catch (InvalidTimeZoneException)
-            {
-            }
+            catch (TimeZoneNotFoundException) { }
+            catch (InvalidTimeZoneException) { }
         }
 
         throw new InvalidOperationException("Could not resolve a Sofia time zone on this machine.");

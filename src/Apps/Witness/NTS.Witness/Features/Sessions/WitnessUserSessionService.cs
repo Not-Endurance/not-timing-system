@@ -46,13 +46,7 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
             await _userSessions.Delete(currentSession);
         }
 
-        var session = CreateSession(
-                userSession,
-                new NtsUserSessionStateModel
-                {
-                    EventId = eventId,
-                }
-            );
+        var session = CreateSession(userSession, new NtsUserSessionStateModel { EventId = eventId });
         await _userSessions.Create(session);
     }
 
@@ -71,10 +65,7 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
         {
             currentSession = CreateSession(
                 userSession,
-                new NtsUserSessionStateModel
-                {
-                    SnapshotHistory = [SnapshotGroupModel.MapFrom(snapshot)],
-                }
+                new NtsUserSessionStateModel { SnapshotHistory = [SnapshotGroupModel.MapFrom(snapshot)] }
             );
             await _userSessions.Create(currentSession);
             return;
@@ -103,16 +94,9 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
         await _userSessions.Delete(currentSession);
     }
 
-    static NtsUserSessionModel CreateSession(
-        INUserSessionModel userSession,
-        NtsUserSessionStateModel? state
-    )
+    static NtsUserSessionModel CreateSession(INUserSessionModel userSession, NtsUserSessionStateModel? state)
     {
-        var session = new NtsUserSessionModel
-        {
-            Id = userSession.User.Id,
-            UserIdentifier = userSession.UserIdentifier,
-        };
+        var session = new NtsUserSessionModel { Id = userSession.User.Id, UserIdentifier = userSession.UserIdentifier };
         session.ReplaceState(state);
         return session;
     }

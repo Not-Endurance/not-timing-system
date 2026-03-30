@@ -62,11 +62,7 @@ public class SnapshotGroupModel
 
     public SnapshotGroupModel Copy()
     {
-        return new SnapshotGroupModel
-        {
-            Entries = Entries.Select(entry => entry.Copy()).ToArray(),
-            Type = Type,
-        };
+        return new SnapshotGroupModel { Entries = Entries.Select(entry => entry.Copy()).ToArray(), Type = Type };
     }
 }
 

@@ -7,15 +7,12 @@ internal static class ServerAuthenticationSettingsHelper
 {
     internal static NServerAuthenticationSettings? GetSettings(IConfiguration configuration)
     {
-        return configuration
-            .GetSection(nameof(NServerAuthenticationSettings))
-            .Get<NServerAuthenticationSettings>();
+        return configuration.GetSection(nameof(NServerAuthenticationSettings)).Get<NServerAuthenticationSettings>();
     }
 
     internal static bool HasTokenValidationConfiguration(NServerAuthenticationSettings? settings)
     {
-        return !string.IsNullOrWhiteSpace(ResolveAuthority(settings))
-            && ResolveValidAudiences(settings).Count > 0;
+        return !string.IsNullOrWhiteSpace(ResolveAuthority(settings)) && ResolveValidAudiences(settings).Count > 0;
     }
 
     internal static string? ResolveAuthority(NServerAuthenticationSettings? settings)
@@ -63,13 +60,11 @@ internal static class ServerAuthenticationSettingsHelper
 
     internal static IReadOnlyList<PathString> ResolveAccessTokenQueryPaths(NServerAuthenticationSettings? settings)
     {
-        return settings?
-                .AccessTokenQueryPaths?
-                .Where(x => !string.IsNullOrWhiteSpace(x))
+        return settings
+                ?.AccessTokenQueryPaths?.Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(NormalizePath)
                 .Distinct()
-                .ToArray()
-            ?? [];
+                .ToArray() ?? [];
     }
 
     static string? ResolveAudience(NServerAuthenticationSettings? settings)

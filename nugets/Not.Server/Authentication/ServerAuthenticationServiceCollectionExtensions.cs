@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Not.Application.Configurations;
 using Not.Application.Authentication.User;
+using Not.Application.Configurations;
 
 namespace Not.Server.Authentication;
 
@@ -46,10 +46,7 @@ public static class ServerAuthenticationServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection NJwtTokenValidation(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static IServiceCollection NJwtTokenValidation(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSettings<NServerAuthenticationSettings>(configuration);
 
@@ -64,7 +61,8 @@ public static class ServerAuthenticationServiceCollectionExtensions
             return services;
         }
 
-        var authority = ServerAuthenticationSettingsHelper.ResolveAuthority(settings)
+        var authority =
+            ServerAuthenticationSettingsHelper.ResolveAuthority(settings)
             ?? throw new InvalidOperationException("Missing required token validation authority.");
         var validAudiences = ServerAuthenticationSettingsHelper.ResolveValidAudiences(settings);
         var accessTokenQueryPaths = ServerAuthenticationSettingsHelper.ResolveAccessTokenQueryPaths(settings);
@@ -89,11 +87,7 @@ public static class ServerAuthenticationServiceCollectionExtensions
                             return Task.CompletedTask;
                         }
 
-                        if (
-                            accessTokenQueryPaths.Any(x =>
-                                context.HttpContext.Request.Path.StartsWithSegments(x)
-                            )
-                        )
+                        if (accessTokenQueryPaths.Any(x => context.HttpContext.Request.Path.StartsWithSegments(x)))
                         {
                             context.Token = accessToken;
                         }
@@ -124,7 +118,8 @@ public static class ServerAuthenticationServiceCollectionExtensions
 
     static NServerAuthenticationSettings GetRequiredSettings(IConfiguration configuration)
     {
-        var settings = ServerAuthenticationSettingsHelper.GetSettings(configuration)
+        var settings =
+            ServerAuthenticationSettingsHelper.GetSettings(configuration)
             ?? throw new InvalidOperationException(
                 $"Missing required authentication section '{nameof(NServerAuthenticationSettings)}'."
             );

@@ -9,11 +9,7 @@ public static class DateTimeExtensions
         return DateTime.SpecifyKind(time, DateTimeKind.Local);
     }
 
-    public static DateTimeOffset ToLocalDateTime(
-        this DateTime date,
-        TimeSpan timeSpan,
-        TimeZoneInfo? timeZone = null
-    )
+    public static DateTimeOffset ToLocalDateTime(this DateTime date, TimeSpan timeSpan, TimeZoneInfo? timeZone = null)
     {
         var zone = timeZone ?? TimeZoneInfo.Local;
         var localDateTime = DateTime.SpecifyKind(date.Date.Add(timeSpan), DateTimeKind.Unspecified);

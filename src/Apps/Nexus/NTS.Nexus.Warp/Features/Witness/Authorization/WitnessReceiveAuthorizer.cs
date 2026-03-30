@@ -25,7 +25,7 @@ internal sealed class WitnessReceiveAuthorizer : IWitnessReceiveAuthorizer
         var connectedEvent = ParseEventId(connectedEventId, "connection");
         var requestedEvent = ParseEventId(requestedEventId, "request");
         if (connectedEvent != requestedEvent)
-        { 
+        {
             throw new HubException("Snapshots can only be sent to the currently connected event.");
         }
 

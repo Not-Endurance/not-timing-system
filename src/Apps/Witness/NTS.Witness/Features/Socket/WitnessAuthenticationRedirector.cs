@@ -22,10 +22,9 @@ public class WitnessAuthenticationRedirector : IWitnessAuthenticationRedirector,
 
     public void RedirectToSignIn(AccessTokenResult tokenResult)
     {
-        var requestUrl =
-            string.IsNullOrWhiteSpace(tokenResult.InteractiveRequestUrl)
-                ? RemoteAuthenticationDefaults.LoginPath
-                : tokenResult.InteractiveRequestUrl;
+        var requestUrl = string.IsNullOrWhiteSpace(tokenResult.InteractiveRequestUrl)
+            ? RemoteAuthenticationDefaults.LoginPath
+            : tokenResult.InteractiveRequestUrl;
         var requestOptions =
             tokenResult.InteractionOptions
             ?? new InteractiveRequestOptions

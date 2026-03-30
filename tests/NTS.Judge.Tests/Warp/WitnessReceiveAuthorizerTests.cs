@@ -25,8 +25,8 @@ public class WitnessReceiveAuthorizerTests
     {
         var authorizer = CreateAuthorizer(new TestOfficialAccessService(isOfficial: false));
 
-        var exception = await Assert.ThrowsAsync<HubException>(() =>
-            authorizer.Authorize(CreatePrincipal("participant@example.com", "nts-client-scope"), "17", "17")
+        var exception = await Assert.ThrowsAsync<HubException>(
+            () => authorizer.Authorize(CreatePrincipal("participant@example.com", "nts-client-scope"), "17", "17")
         );
 
         Assert.Contains("Only officials", exception.Message);
@@ -37,8 +37,8 @@ public class WitnessReceiveAuthorizerTests
     {
         var authorizer = CreateAuthorizer(new TestOfficialAccessService(isOfficial: true));
 
-        var exception = await Assert.ThrowsAsync<HubException>(() =>
-            authorizer.Authorize(CreatePrincipal("official@example.com", "nts-client-scope"), "17", "18")
+        var exception = await Assert.ThrowsAsync<HubException>(
+            () => authorizer.Authorize(CreatePrincipal("official@example.com", "nts-client-scope"), "17", "18")
         );
 
         Assert.Contains("currently connected event", exception.Message);
@@ -49,14 +49,15 @@ public class WitnessReceiveAuthorizerTests
     {
         var authorizer = CreateAuthorizer(new TestOfficialAccessService(isOfficial: true));
 
-        var exception = await Assert.ThrowsAsync<HubException>(() =>
-            authorizer.Authorize(
-                new ClaimsPrincipal(
-                    new ClaimsIdentity([new Claim("scp", "nts-client-scope")], authenticationType: "TestAuth")
-                ),
-                "17",
-                "17"
-            )
+        var exception = await Assert.ThrowsAsync<HubException>(
+            () =>
+                authorizer.Authorize(
+                    new ClaimsPrincipal(
+                        new ClaimsIdentity([new Claim("scp", "nts-client-scope")], authenticationType: "TestAuth")
+                    ),
+                    "17",
+                    "17"
+                )
         );
 
         Assert.Contains("email", exception.Message, StringComparison.OrdinalIgnoreCase);
@@ -67,8 +68,8 @@ public class WitnessReceiveAuthorizerTests
     {
         var authorizer = CreateAuthorizer(new TestOfficialAccessService(isOfficial: true));
 
-        var exception = await Assert.ThrowsAsync<HubException>(() =>
-            authorizer.Authorize(new ClaimsPrincipal(new ClaimsIdentity()), "17", "17")
+        var exception = await Assert.ThrowsAsync<HubException>(
+            () => authorizer.Authorize(new ClaimsPrincipal(new ClaimsIdentity()), "17", "17")
         );
 
         Assert.Contains("Authentication is required", exception.Message);
@@ -79,8 +80,8 @@ public class WitnessReceiveAuthorizerTests
     {
         var authorizer = CreateAuthorizer(new TestOfficialAccessService(isOfficial: true));
 
-        var exception = await Assert.ThrowsAsync<HubException>(() =>
-            authorizer.Authorize(CreatePrincipal("official@example.com", "different-scope"), "17", "17")
+        var exception = await Assert.ThrowsAsync<HubException>(
+            () => authorizer.Authorize(CreatePrincipal("official@example.com", "different-scope"), "17", "17")
         );
 
         Assert.Contains("required Warp access scope", exception.Message);
@@ -112,11 +113,7 @@ public class WitnessReceiveAuthorizerTests
         return new WitnessReceiveAuthorizer(officialAccess, options);
     }
 
-    static ClaimsPrincipal CreatePrincipal(
-        string email,
-        string scope,
-        string scopeClaimType = "scp"
-    )
+    static ClaimsPrincipal CreatePrincipal(string email, string scope, string scopeClaimType = "scp")
     {
         return new ClaimsPrincipal(
             new ClaimsIdentity(

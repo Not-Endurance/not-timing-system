@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Localization;
-using Not.Logging;
 using Not.Injection;
+using Not.Logging;
 using Not.Notify;
 using Not.Reflection;
 

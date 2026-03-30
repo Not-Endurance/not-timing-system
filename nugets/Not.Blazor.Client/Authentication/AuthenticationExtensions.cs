@@ -1,12 +1,12 @@
-using System.Security.Claims;
 using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Authentication.WebAssembly.Msal.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Authentication.Provider;
-using Not.Application.Configurations;
 using Not.Application.Authentication.User;
+using Not.Application.Configurations;
 using Not.Blazor.Client.Authentication.Services;
 
 namespace Not.Blazor.Client.Authentication;

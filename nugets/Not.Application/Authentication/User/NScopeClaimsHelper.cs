@@ -4,12 +4,7 @@ namespace Not.Application.Authentication.User;
 
 public static class NScopeClaimsHelper
 {
-    static readonly string[] SCOPE_CLAIMS =
-    [
-        "scp",
-        "scope",
-        "http://schemas.microsoft.com/identity/claims/scope",
-    ];
+    static readonly string[] SCOPE_CLAIMS = ["scp", "scope", "http://schemas.microsoft.com/identity/claims/scope"];
 
     public static bool HasScope(ClaimsPrincipal principal, string? requiredScope)
     {
@@ -19,8 +14,7 @@ public static class NScopeClaimsHelper
         }
 
         return principal
-            .Claims
-            .Where(x => SCOPE_CLAIMS.Contains(x.Type, StringComparer.OrdinalIgnoreCase))
+            .Claims.Where(x => SCOPE_CLAIMS.Contains(x.Type, StringComparer.OrdinalIgnoreCase))
             .SelectMany(x => x.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             .Any(x => string.Equals(x, requiredScope, StringComparison.OrdinalIgnoreCase));
     }

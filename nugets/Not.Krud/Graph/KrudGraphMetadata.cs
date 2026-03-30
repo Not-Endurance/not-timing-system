@@ -24,13 +24,7 @@ internal sealed record KrudGraphMetadata
         var managedEntityTypes = interfaces.Select(i => i.GetGenericArguments()[0]).Distinct().ToList();
         var graphMirrorPrincipalTypes = KrudReflectionHelper.GetEntityMirrorPrincipalTypes(managedEntityTypes);
 
-        return new KrudGraphMetadata(
-            false,
-            concrete,
-            interfaces,
-            graphMirrorPrincipalTypes,
-            rootMirrorPrincipalTypes
-        );
+        return new KrudGraphMetadata(false, concrete, interfaces, graphMirrorPrincipalTypes, rootMirrorPrincipalTypes);
     }
 
     public KrudGraphMetadata(

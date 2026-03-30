@@ -114,8 +114,7 @@ internal static class KrudReflectionHelper
 
     public static IEnumerable<Type> GetClosedEntityMirrorInterfaces(Type type)
     {
-        return type
-            .GetInterfaces()
+        return type.GetInterfaces()
             .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IKurdMirror<>));
     }
 

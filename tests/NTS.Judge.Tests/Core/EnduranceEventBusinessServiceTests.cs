@@ -152,14 +152,16 @@ public class EnduranceEventBusinessServiceTests
         int? officialUserId = null
     )
     {
-        return SetupUpcomingEventModel.From(CreateValidEvent(
-            id,
-            competitionId,
-            participationNumber,
-            competitionStart,
-            startTimeOverride,
-            officialUserId
-        ));
+        return SetupUpcomingEventModel.From(
+            CreateValidEvent(
+                id,
+                competitionId,
+                participationNumber,
+                competitionStart,
+                startTimeOverride,
+                officialUserId
+            )
+        );
     }
 
     static UpcomingEvent CreateValidEvent(

@@ -1,16 +1,16 @@
 using System.Linq.Expressions;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
+using Newtonsoft.Json.Linq;
 using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Serialization.JSON;
 using Not.Structures;
-using Newtonsoft.Json.Linq;
 using NTS.Application.UserSession;
 using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Enums;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Witness.Features.Sessions;
@@ -179,10 +179,7 @@ public class WitnessSessionIdentityTests
             id: 7,
             userIdentifier: "entra-1",
             eventId: 23,
-            snapshotHistory:
-            [
-                SnapshotGroupModel.MapFrom(CreateSnapshotGroup(31, SnapshotType.Arrive.ToString())),
-            ]
+            snapshotHistory: [SnapshotGroupModel.MapFrom(CreateSnapshotGroup(31, SnapshotType.Arrive.ToString()))]
         );
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = existing };
         var service = CreateService(sessions);
@@ -206,10 +203,7 @@ public class WitnessSessionIdentityTests
             id: 7,
             userIdentifier: "entra-1",
             eventId: 23,
-            snapshotHistory:
-            [
-                SnapshotGroupModel.MapFrom(CreateSnapshotGroup(31, SnapshotType.Arrive.ToString())),
-            ]
+            snapshotHistory: [SnapshotGroupModel.MapFrom(CreateSnapshotGroup(31, SnapshotType.Arrive.ToString()))]
         );
 
         var json = JObject.Parse(session.ToJson());
@@ -230,10 +224,9 @@ public class WitnessSessionIdentityTests
         principal ??= CreatePrincipal(new Claim(ClaimTypes.Email, "user@example.com"), new Claim("oid", "entra-1"));
         users ??= new RecordingUserRegister { GetResult = Result.Success(new NUserModel("user@example.com", id: 7)) };
 
-        var serviceProvider =
-            new StaticServiceProvider().Add<INUserSessionRepository<NtsUserSessionStateModel>>(
-                sessions
-            );
+        var serviceProvider = new StaticServiceProvider().Add<INUserSessionRepository<NtsUserSessionStateModel>>(
+            sessions
+        );
         var nUserSessionService = new NUserSessionService(
             new StaticAuthenticationStateProvider(principal),
             users,
@@ -256,17 +249,9 @@ public class WitnessSessionIdentityTests
         SnapshotGroupModel[]? snapshotHistory = null
     )
     {
-        var session = new NtsUserSessionModel
-        {
-            Id = id,
-            UserIdentifier = userIdentifier,
-        };
+        var session = new NtsUserSessionModel { Id = id, UserIdentifier = userIdentifier };
         session.ReplaceState(
-            new NtsUserSessionStateModel
-            {
-                EventId = eventId,
-                SnapshotHistory = snapshotHistory ?? [],
-            }
+            new NtsUserSessionStateModel { EventId = eventId, SnapshotHistory = snapshotHistory ?? [] }
         );
         return session;
     }
@@ -274,7 +259,13 @@ public class WitnessSessionIdentityTests
     static SnapshotGroup CreateSnapshotGroup(int number, string type)
     {
         return new SnapshotGroup(
-            [new NTS.Domain.Watcher.Snapshot(number, new Person(["Test", "Rider"]), new Timestamp(DateTimeOffset.UtcNow))],
+            [
+                new NTS.Domain.Watcher.Snapshot(
+                    number,
+                    new Person(["Test", "Rider"]),
+                    new Timestamp(DateTimeOffset.UtcNow)
+                ),
+            ],
             type
         );
     }

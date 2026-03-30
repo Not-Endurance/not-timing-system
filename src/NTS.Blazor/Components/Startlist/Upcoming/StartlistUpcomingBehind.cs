@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using NTS.Domain.Core.Objects.Startlists;
 using Not.Blazor.Components.Abstractions;
 using NTS.Application.Startlists;
+using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;
 

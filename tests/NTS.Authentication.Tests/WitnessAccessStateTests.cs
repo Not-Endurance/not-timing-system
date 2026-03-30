@@ -34,7 +34,12 @@ public class WitnessAccessStateTests
             userId: 7,
             officials:
             [
-                new Official(new Person(["Judge", "Official"]), NTS.Domain.Enums.OfficialRole.GroundJuryPresident, 11, userId: 7),
+                new Official(
+                    new Person(["Judge", "Official"]),
+                    NTS.Domain.Enums.OfficialRole.GroundJuryPresident,
+                    11,
+                    userId: 7
+                ),
             ],
             eventId: 11
         );
@@ -52,7 +57,12 @@ public class WitnessAccessStateTests
             userId: 7,
             officials:
             [
-                new Official(new Person(["Judge", "Other"]), NTS.Domain.Enums.OfficialRole.GroundJuryPresident, 11, userId: 99),
+                new Official(
+                    new Person(["Judge", "Other"]),
+                    NTS.Domain.Enums.OfficialRole.GroundJuryPresident,
+                    11,
+                    userId: 99
+                ),
             ],
             eventId: 11
         );

@@ -116,7 +116,10 @@ public class KrudReflectionTests
         );
 
         Assert.Equal("Updated Horse", scenario.Event.Combinations.First().Horse.Name);
-        Assert.Equal("Updated Horse", scenario.Event.Competitions.Single().Participations.First().Combination.Horse.Name);
+        Assert.Equal(
+            "Updated Horse",
+            scenario.Event.Competitions.Single().Participations.First().Combination.Horse.Name
+        );
     }
 
     [Fact]
@@ -142,7 +145,9 @@ public class KrudReflectionTests
         using var scenario = ReflectionScenario.Create();
         var mirror = scenario.Provider.GetServices<IKrudMirrorService<Athlete>>().Single();
 
-        await mirror.Reflect(new Athlete(new Person(["No", "Context"]), null, scenario.Country, null, id: scenario.AthleteInUse.Id));
+        await mirror.Reflect(
+            new Athlete(new Person(["No", "Context"]), null, scenario.Country, null, id: scenario.AthleteInUse.Id)
+        );
 
         Assert.Equal(0, scenario.UpcomingEvents.UpdateCalls);
         Assert.Equal("Athlete A", scenario.Event.Combinations.First().Athlete.ToString());
@@ -240,8 +245,24 @@ public class KrudReflectionTests
                 ],
                 participations:
                 [
-                    new Participation(false, combinationInUse, ParticipationCategory.Senior, null, null, null, id: 9101),
-                    new Participation(false, combinationOther, ParticipationCategory.Senior, null, null, null, id: 9102),
+                    new Participation(
+                        false,
+                        combinationInUse,
+                        ParticipationCategory.Senior,
+                        null,
+                        null,
+                        null,
+                        id: 9101
+                    ),
+                    new Participation(
+                        false,
+                        combinationOther,
+                        ParticipationCategory.Senior,
+                        null,
+                        null,
+                        null,
+                        id: 9102
+                    ),
                 ],
                 id: 9201
             );
@@ -298,7 +319,10 @@ public class KrudReflectionTests
 
         public LoopService CreateLoopService()
         {
-            return new LoopService(Provider.GetServices<IKrudMirrorService<Loop>>(), Provider.GetRequiredService<IRepository<Loop>>());
+            return new LoopService(
+                Provider.GetServices<IKrudMirrorService<Loop>>(),
+                Provider.GetRequiredService<IRepository<Loop>>()
+            );
         }
 
         public CombinationService CreateCombinationService()

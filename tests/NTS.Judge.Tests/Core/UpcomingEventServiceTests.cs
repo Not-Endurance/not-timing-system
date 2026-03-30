@@ -87,14 +87,7 @@ public class UpcomingEventServiceTests
         );
         var official = new SetupOfficial(new Person(["Judge", $"{id}"]), OfficialRole.GroundJuryPresident, id * 10 + 1);
 
-        return CreateEvent(
-            id,
-            country,
-            [competition],
-            [official],
-            [loop],
-            [combination]
-        );
+        return CreateEvent(id, country, [competition], [official], [loop], [combination]);
     }
 
     static UpcomingEvent CreateEvent(

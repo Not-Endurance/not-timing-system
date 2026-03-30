@@ -218,7 +218,11 @@ public class StartlistServiceTests
 
         return new Participation(
             category: ParticipationCategory.Senior,
-            competition: new CoreCompetition($"Competition{id}", CompetitionRuleset.Regional, CompetitionType.Qualification),
+            competition: new CoreCompetition(
+                $"Competition{id}",
+                CompetitionRuleset.Regional,
+                CompetitionType.Qualification
+            ),
             combination: combination,
             phases: new CorePhaseCollection([phase1, phase2]),
             notQualified: null,

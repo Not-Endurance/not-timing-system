@@ -5,9 +5,9 @@ using Not.Notify;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
-using NTS.Witness.Features.Access;
 using NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
 using NTS.Witness.Blazor.Features.Socket;
+using NTS.Witness.Features.Access;
 using NTS.Witness.Features.Core.Dashboard;
 
 namespace NTS.Witness.Blazor.Features.Core.Snapshots;
@@ -50,8 +50,8 @@ public class SnapshotContentBehind : NStatefulComponent
     {
         if (WitnessAccessPolicy.ShouldRedirectFromSnapshots(AccessState.AccessLevel))
         {
-           Navigator.NavigateTo(WitnessAccessPolicy.ResolveSnapshotFallbackRoute());
-           return;
+            Navigator.NavigateTo(WitnessAccessPolicy.ResolveSnapshotFallbackRoute());
+            return;
         }
 
         if (firstRender)

@@ -10,10 +10,7 @@ public class OfficialShellBehindTests
     public async Task SearchUsersSafe_WhenTermMatchesEmail_ReturnsUserFromEmailLookup()
     {
         var expected = new User("judge@example.com", "Judge Example", id: 17);
-        var component = new TestOfficialShellBehind
-        {
-            Users = new TestUserEmailLookup(expected),
-        };
+        var component = new TestOfficialShellBehind { Users = new TestUserEmailLookup(expected) };
 
         var result = (await component.Search("judge@example.com")).OfType<User>().ToList();
 
@@ -26,10 +23,7 @@ public class OfficialShellBehindTests
     public async Task SearchUsersSafe_WhenTermMatchesPartOfName_ReturnsMatchingUser()
     {
         var expected = new User("judge@example.com", "Judge Example", id: 17);
-        var component = new TestOfficialShellBehind
-        {
-            Users = new TestUserEmailLookup(expected),
-        };
+        var component = new TestOfficialShellBehind { Users = new TestUserEmailLookup(expected) };
 
         var result = (await component.Search("Example")).OfType<User>().ToList();
 
@@ -63,9 +57,7 @@ public class OfficialShellBehindTests
         public Task<User?> ReadByEmail(string email)
         {
             return Task.FromResult(
-                _user != null && string.Equals(_user.Email, email, StringComparison.OrdinalIgnoreCase)
-                    ? _user
-                    : null
+                _user != null && string.Equals(_user.Email, email, StringComparison.OrdinalIgnoreCase) ? _user : null
             );
         }
 
