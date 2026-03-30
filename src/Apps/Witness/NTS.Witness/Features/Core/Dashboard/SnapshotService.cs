@@ -9,6 +9,7 @@ using NTS.Application.Socket;
 using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
+using NTS.Domain.Enums;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
@@ -96,7 +97,7 @@ public class SnapshotService
         EmitChanged();
     }
 
-    public async Task<bool> Publish(string snapshotType)
+    public async Task<bool> Publish(SnapshotType snapshotType)
     {
         var readySnapshots = _snapshots.Where(x => x.Timestamp != null).ToList();
         if (readySnapshots.Count == 0)
@@ -104,7 +105,7 @@ public class SnapshotService
             return false;
         }
 
-        var snapshotGroup = new SnapshotGroup(readySnapshots, snapshotType);
+        var snapshotGroup = new SnapshotGroup(readySnapshots, snapshotType.ToString());
         await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroup);
         await _userSessionService.AppendSnapshot(snapshotGroup);
 
@@ -114,10 +115,11 @@ public class SnapshotService
         return true;
     }
 
-    public async Task RePublish(SnapshotGroup snapshotGroup)
+    public async Task RePublish(SnapshotGroup snapshotGroup, SnapshotType snapshotType)
     {
         GuardHelper.ThrowIfDefault(snapshotGroup);
-        await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroup);
+        var snapshotGroupToPublish = new SnapshotGroup(snapshotGroup.Entries, snapshotType.ToString());
+        await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroupToPublish);
     }
 
     public void UpdateSnapshotTimestamp(Snapshot snapshot, Timestamp timestamp)

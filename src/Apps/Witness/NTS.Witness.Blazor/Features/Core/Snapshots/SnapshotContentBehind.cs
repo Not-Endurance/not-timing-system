@@ -3,6 +3,7 @@ using Not.Blazor.Components.Abstractions;
 using Not.Exceptions;
 using Not.Notify;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
@@ -36,9 +37,11 @@ public class SnapshotContentBehind : NStatefulComponent
     protected IReadOnlyList<Participation> Participations => SnapshotService.Participations;
     protected IReadOnlyList<Snapshot> Snapshots => SnapshotService.Snapshots;
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
-    protected string ButtonText { get; set; } = Arrival_string;
+    protected SnapshotType SelectedSnapshotType { get; set; } = SnapshotType.Arrive;
     protected int ReadySnapshotCount => Snapshots.Count(x => x.Timestamp != null);
     protected bool HasReadySnapshots => ReadySnapshotCount != 0;
+    protected bool IsPublishing { get; set; }
+    protected string PublishButtonText => GetSnapshotTypeText(SelectedSnapshotType);
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,19 +64,11 @@ public class SnapshotContentBehind : NStatefulComponent
         }
     }
 
-    protected void SetButtonText(int id)
+    protected void SetSnapshotType(SnapshotType snapshotType)
     {
         try
         {
-            switch (id)
-            {
-                case 0:
-                    ButtonText = Arrival_string;
-                    break;
-                case 1:
-                    ButtonText = Presentation_string;
-                    break;
-            }
+            SelectedSnapshotType = snapshotType;
         }
         catch (Exception ex)
         {
@@ -93,20 +88,31 @@ public class SnapshotContentBehind : NStatefulComponent
         }
     }
 
-    protected async Task SendHandler(string snapshotType)
+    protected async Task SendHandler(SnapshotType snapshotType)
     {
         try
         {
+            if (IsPublishing)
+            {
+                return;
+            }
+
+            IsPublishing = true;
             if (!await SnapshotService.Publish(snapshotType))
             {
                 return;
             }
 
-            Notifier.Success(string.Format(Snapshots_sent_as__string, snapshotType));
+            Notifier.Success(string.Format(Snapshots_sent_as__string, GetSnapshotTypeText(snapshotType)));
         }
         catch (Exception ex)
         {
             Handle(ex);
+        }
+        finally
+        {
+            IsPublishing = false;
+            StateHasChanged();
         }
     }
 
@@ -155,5 +161,15 @@ public class SnapshotContentBehind : NStatefulComponent
         }
 
         return Task.CompletedTask;
+    }
+
+    protected string GetSnapshotTypeText(SnapshotType snapshotType)
+    {
+        return snapshotType switch
+        {
+            SnapshotType.Arrive => Arrive_string,
+            SnapshotType.Present => Presentation_string,
+            _ => snapshotType.ToString(),
+        };
     }
 }

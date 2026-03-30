@@ -57,19 +57,20 @@ else
                 @mainContent
             </MudItem>
 
-            @if (showMain2)
-            {
-                <MudItem xs="@MainXs" Class="not-page-content">
-                    @main2Content
-                </MudItem>
-            }
-
             @if (rightbarContent != null)
             {
                 <MudItem xs="@RightBarXS" Class="not-page-rightbar">
                     @rightbarContent
                 </MudItem>
             }
+
+            @if (showMain2)
+            {
+                <MudItem xs="@MainXs" Class="not-page-content">
+                    @main2Content
+                </MudItem>
+            }
+           
         </NGrid>
     </MudHidden>
 

@@ -1,4 +1,6 @@
 @using MudBlazor
+@using NTS.Domain.Enums
+@using Not.Blazor.Components.Buttons
 @using Not.Blazor.Components
 @inherits SnapshotHistoryBehind
 
@@ -26,7 +28,7 @@
                           AlignItems="AlignItems.Center"
                           Style="width: 100%;">
 
-                    <MudText Typo="Typo.subtitle2">@group.Type</MudText>
+                    <MudText Typo="Typo.subtitle2">@GetSnapshotTypeText(group.Type)</MudText>
 
                     <MudText Typo="Typo.caption">@group.Entries.Count()</MudText>
                 </MudStack>
@@ -34,7 +36,7 @@
             </MudButton>
 
             <MudCollapse Expanded="@IsExpanded(currentIndex)">
-                <MudStack Spacing="2" Class="pt-2">
+                <MudStack Spacing="2" Class="pt-2" AlignItems="AlignItems.Stretch">
                     @foreach (var snapshot in group.Entries)
                     {
                         <MudPaper Class="pa-2">
@@ -52,12 +54,22 @@
                         </MudPaper>
                     }
 
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               Disabled="@(!CanResend || IsResending)"
-                               OnClick="@(() => ResendGroup(currentIndex))">
-                        @Resend_string
-                    </MudButton>
+                    <MudButtonGroup OverrideStyles="false" >
+                        <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
+                                 Color="Color.Secondary"
+                                 Variant="Variant.Outlined"
+                                 Style="align-self: auto;">
+                            <MudMenuItem OnClick="() => SetResendType(group, SnapshotType.Arrive)">@Arrive_string</MudMenuItem>
+                            <MudMenuItem OnClick="() => SetResendType(group, SnapshotType.Present)">@Presentation_string</MudMenuItem>
+                        </MudMenu>
+
+                        <NButtonSecondary Color="Color.Tertiary"
+                                          Disabled="@(!CanResend || IsResending)"
+                                          OnClick="@(() => ResendGroup(currentIndex))"
+                                          Text="@GetResendButtonText(group)"
+                                          StartIcon="@Icons.Material.Filled.Replay"
+                                          Style="width:100%" />
+                    </MudButtonGroup>
                 </MudStack>
             </MudCollapse>
         </MudPaper>
