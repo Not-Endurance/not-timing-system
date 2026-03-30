@@ -1,4 +1,35 @@
-﻿@inherits NContentBehind
+@inherits NContentBehind
+
+@{
+    var pageClass = "not-page " + Class;
+    var mainPaperClass = CombineClass("pa-4 ");
+    var mainItemClass = !IsLoading && !IsEmpty ? "not-page-content" : null;
+    var showMain2 = !IsLoading && !IsEmpty && Main2 != null;
+    var showRightbar = Rightbar != null;
+
+    RenderFragment mainContent = IsLoading
+        ? @<NSkeleton Lines="10" />
+        : IsEmpty
+            ? @<MudPaper Elevation="3" Class="not-mid-height pa-12">
+                @if (EmptyMessage != null)
+                {
+                    <NHeadline2 Content="@EmptyMessage" IsAbsoluteCenter />
+                }
+
+                @if (EmptyContent != null)
+                {
+                    @EmptyContent
+                }
+            </MudPaper>
+            : @<MudPaper Elevation="3" Class="@mainPaperClass" Style="@Style">@Main</MudPaper>;
+
+    RenderFragment main2Content = @<MudPaper Elevation="3" Class="pa-4">@Main2</MudPaper>;
+    RenderFragment? rightbarContent = !showRightbar
+        ? null
+        : IsLoading
+            ? @<NSkeleton Lines="6" />
+            : Rightbar;
+}
 
 @if (ShowOnlyMain)
 {
@@ -8,81 +39,61 @@
     }
     else
     {
-        <MudPaper Elevation="0" Class="@CombineClass("pa-4 ")" Style="@Style">@Main</MudPaper>
+        <MudPaper Elevation="0" Class="@mainPaperClass" Style="@Style">@Main</MudPaper>
     }
 }
 else
 {
-    <NGrid Spacing="4" Class="@("not-page " + Class)">
-        @if (Title != null) 
-        {
-            <MudItem xs="12">
-                <NHeadline Content="@Title" IsAbsoluteCenter />
-            </MudItem>
-        }
-        
-        @if (IsLoading)
-        {
-            <MudItem xs="@MainXs">
-                <NSkeleton Lines="10" />
-            </MudItem>
-        }
-        else
-        {
-            if (IsEmpty)
+    <MudHidden Breakpoint="Breakpoint.SmAndDown">
+        <NGrid Spacing="4" Class="@pageClass">
+            @if (Title != null)
             {
-                <MudItem xs="@MainXs">
-                    <MudPaper Elevation="3" Class="not-mid-height pa-12">
-                        @if (EmptyMessage != null)
-                        {
-                            <NHeadline2 Content="@EmptyMessage" IsAbsoluteCenter />
-                        }
-
-                        @if (EmptyContent != null)
-                        {
-                            @EmptyContent
-                        }
-                    </MudPaper>
+                <MudItem xs="12">
+                    <NHeadline Content="@Title" IsAbsoluteCenter />
                 </MudItem>
             }
-            else
+
+            <MudItem xs="@MainXs" Class="@mainItemClass">
+                @mainContent
+            </MudItem>
+
+            @if (showMain2)
             {
                 <MudItem xs="@MainXs" Class="not-page-content">
-                    <MudPaper Elevation="3" Class="@CombineClass("pa-4 ")" Style="@Style">@Main</MudPaper>
+                    @main2Content
                 </MudItem>
-
-                if (Main2 != null)
-                {
-                    if (IsLoading)
-                    {
-                        <NSkeleton Lines="4" />
-                    }
-                    else
-                    {
-                        <MudItem xs="@MainXs" Class="not-page-content">
-                            <MudPaper Elevation="3" Class="pa-4">@Main2</MudPaper>
-                        </MudItem>
-                    }
-                }
             }
-        }
 
-        @if (Rightbar != null)
-        {
-            if (IsLoading)
+            @if (rightbarContent != null)
             {
                 <MudItem xs="@RightBarXS" Class="not-page-rightbar">
-                    <NSkeleton Lines="6" />
+                    @rightbarContent
                 </MudItem>
             }
-            else
+        </NGrid>
+    </MudHidden>
+
+    <MudHidden Breakpoint="Breakpoint.MdAndUp">
+        <NGrid Spacing="4" Class="@pageClass">
+            <MudItem xs="12" Class="@mainItemClass">
+                @mainContent
+            </MudItem>
+
+            @if (rightbarContent != null)
             {
-                <MudItem xs="@RightBarXS" Class="not-page-rightbar">
-                    @Rightbar
+                <MudItem xs="12" Class="not-page-rightbar">
+                    @rightbarContent
                 </MudItem>
             }
-        }
-    </NGrid>
+
+            @if (showMain2)
+            {
+                <MudItem xs="12" Class="not-page-content">
+                    @main2Content
+                </MudItem>
+            }
+        </NGrid>
+    </MudHidden>
 }
 
 <style>
