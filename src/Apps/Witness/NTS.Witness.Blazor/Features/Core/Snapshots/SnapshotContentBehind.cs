@@ -1,5 +1,6 @@
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Components.Buttons;
 using Not.Exceptions;
 using Not.Notify;
 using NTS.Domain.Core.Aggregates;
@@ -36,12 +37,15 @@ public class SnapshotContentBehind : NStatefulComponent
     protected ISnapshotService SnapshotService => SnapshotState;
     protected IReadOnlyList<Participation> Participations => SnapshotService.Participations;
     protected IReadOnlyList<Snapshot> Snapshots => SnapshotService.Snapshots;
+    protected IReadOnlyList<NMultiButtonDescriptor> PublishDescriptors =>
+        [
+            new(Arrive_string, () => SendHandler(SnapshotType.Arrive)),
+            new(Presentation_string, () => SendHandler(SnapshotType.Present)),
+        ];
     protected string[] SnapshotTableHeaders { get; set; } = [Participant_string, Time_string];
-    protected SnapshotType SelectedSnapshotType { get; set; } = SnapshotType.Arrive;
     protected int ReadySnapshotCount => Snapshots.Count(x => x.Timestamp != null);
     protected bool HasReadySnapshots => ReadySnapshotCount != 0;
     protected bool IsPublishing { get; set; }
-    protected string PublishButtonText => GetSnapshotTypeText(SelectedSnapshotType);
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,18 +65,6 @@ public class SnapshotContentBehind : NStatefulComponent
         {
             await Task.Delay(TimeSpan.FromSeconds(1));
             await BlazorSocketService.EnsureConnected();
-        }
-    }
-
-    protected void SetSnapshotType(SnapshotType snapshotType)
-    {
-        try
-        {
-            SelectedSnapshotType = snapshotType;
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
         }
     }
 

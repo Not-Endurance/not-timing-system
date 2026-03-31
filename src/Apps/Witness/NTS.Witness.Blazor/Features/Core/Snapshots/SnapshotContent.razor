@@ -1,5 +1,3 @@
-@using MudBlazor
-@using NTS.Domain.Enums
 @using NTS.Witness.Blazor.Features.Core.Snapshots.Components
 @using Not.Blazor.Components.Buttons
 @using Not.Blazor.Components.Layout
@@ -30,19 +28,9 @@
     </Main2>
 
     <Rightbar>
-
-        <MudButtonGroup OverrideStyles="false" FullWidth>
-            <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Variant="Variant.Outlined" Color="Color.Secondary" Style="align-self: auto;">
-                <MudMenuItem OnClick="() => SetSnapshotType(SnapshotType.Arrive)">@Arrive_string</MudMenuItem>
-                <MudMenuItem OnClick="() => SetSnapshotType(SnapshotType.Present)">@Presentation_string</MudMenuItem>
-            </MudMenu>
-
-            <NButtonPrimary Disabled="@(!HasReadySnapshots || IsPublishing)"
-                            OnClick="() => SendHandler(SelectedSnapshotType)"
-                            Text="@PublishButtonText"
-                            Style="width:100%" />
-        </MudButtonGroup>
-
+        <NMultiButton Descriptors="@PublishDescriptors"
+                      Disabled="@(!HasReadySnapshots || IsPublishing)"
+                      MaxWidth />
     </Rightbar>
 
 </NContent>

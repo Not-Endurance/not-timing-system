@@ -1,0 +1,36 @@
+@using MudBlazor
+@namespace Not.Blazor.Components.Buttons
+@inherits NMultiButtonBehind
+
+@if (Descriptors.Count == 0)
+{
+    return;
+}
+
+<MudButtonGroup OverrideStyles="false"
+                FullWidth="@MaxWidth"
+                Class="@Class"
+                Style="@Style">
+    <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
+             Color="SelectorColor"
+             Variant="Variant.Outlined"
+             Style="align-self: auto;">
+        @for (var index = 0; index < Descriptors.Count; index++)
+        {
+            var currentIndex = index;
+            var descriptor = Descriptors[index];
+
+            <MudMenuItem Icon="@descriptor.Icon"
+                         OnClick="@(() => Select(currentIndex))">
+                @descriptor.Content
+            </MudMenuItem>
+        }
+    </MudMenu>
+
+    <NButtonPrimary Color="@Color"
+                    Disabled="@Disabled"
+                    OnClick="TriggerSelectedAction"
+                    Text="@SelectedDescriptor?.Content"
+                    StartIcon="@SelectedDescriptor?.Icon"
+                    Style="width:100%" />
+</MudButtonGroup>

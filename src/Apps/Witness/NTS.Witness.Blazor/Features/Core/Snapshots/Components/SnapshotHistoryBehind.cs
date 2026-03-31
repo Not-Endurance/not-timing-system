@@ -1,4 +1,6 @@
+using MudBlazor;
 using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Components.Buttons;
 using Not.Notify;
 using NTS.Application.Socket;
 using NTS.Domain.Enums;
@@ -9,10 +11,9 @@ namespace NTS.Witness.Blazor.Features.Core.Snapshots.Components;
 
 public class SnapshotHistoryBehind : NStatefulComponent
 {
-    readonly Dictionary<int, SnapshotType> _selectedResendTypes = [];
     int? _expandedIndex;
     int _historyCount = -1;
-    int? _resendingIndex;
+    bool _isResending;
 
     [Inject]
     protected INotifier Notifier { get; set; } = default!;
@@ -25,7 +26,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
 
     protected IReadOnlyList<SnapshotGroup> History => [.. SnapshotService.History.Reverse()];
     protected bool CanResend => SocketContext.IsConnected && SocketContext.Event != null;
-    protected bool IsResending => _resendingIndex.HasValue;
+    protected bool IsResending => _isResending;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,45 +56,41 @@ public class SnapshotHistoryBehind : NStatefulComponent
         }
     }
 
-    protected SnapshotType GetSelectedResendType(SnapshotGroup group)
+    protected IReadOnlyList<NMultiButtonDescriptor> GetResendDescriptors(SnapshotGroup group)
     {
-        if (_selectedResendTypes.TryGetValue(group.Id, out var snapshotType))
+        var selectedType = group.Type switch
         {
-            return snapshotType;
-        }
-
-        return group.Type switch
-        {
-            SnapshotType.Arrive => SnapshotType.Arrive,
             SnapshotType.Present => SnapshotType.Present,
             _ => SnapshotType.Arrive,
         };
+        var alternateType = selectedType == SnapshotType.Arrive ? SnapshotType.Present : SnapshotType.Arrive;
+
+        return
+        [
+            CreateDescriptor(group, selectedType),
+            CreateDescriptor(group, alternateType),
+        ];
+
+        NMultiButtonDescriptor CreateDescriptor(SnapshotGroup snapshotGroup, SnapshotType snapshotType)
+        {
+            return new(
+                $"{Resend_string}: {GetSnapshotTypeText(snapshotType)}",
+                () => ResendGroup(snapshotGroup, snapshotType),
+                Icons.Material.Filled.Replay
+            );
+        }
     }
 
-    protected void SetResendType(SnapshotGroup group, SnapshotType snapshotType)
+    protected async Task ResendGroup(SnapshotGroup group, SnapshotType snapshotType)
     {
         try
         {
-            _selectedResendTypes[group.Id] = snapshotType;
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-    }
-
-    protected async Task ResendGroup(int index)
-    {
-        try
-        {
-            if (_resendingIndex.HasValue || !CanResend || index < 0 || index >= History.Count)
+            if (_isResending || !CanResend)
             {
                 return;
             }
 
-            _resendingIndex = index;
-            var group = History[index];
-            var snapshotType = GetSelectedResendType(group);
+            _isResending = true;
             await SnapshotService.RePublish(group, snapshotType);
             Notifier.Success(string.Format(Snapshots_sent_as__string, GetSnapshotTypeText(snapshotType)));
         }
@@ -103,7 +100,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
         }
         finally
         {
-            _resendingIndex = null;
+            _isResending = false;
             StateHasChanged();
         }
     }
@@ -118,19 +115,8 @@ public class SnapshotHistoryBehind : NStatefulComponent
         };
     }
 
-    protected string GetResendButtonText(SnapshotGroup group)
-    {
-        return $"{Resend_string}: {GetSnapshotTypeText(GetSelectedResendType(group))}";
-    }
-
     protected override void OnBeforeRender()
     {
-        var historyIds = SnapshotService.History.Select(x => x.Id).ToHashSet();
-        foreach (var id in _selectedResendTypes.Keys.Where(id => !historyIds.Contains(id)).ToArray())
-        {
-            _selectedResendTypes.Remove(id);
-        }
-
         if (_historyCount != SnapshotService.History.Count)
         {
             _historyCount = SnapshotService.History.Count;
