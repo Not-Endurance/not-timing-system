@@ -27,7 +27,7 @@ public class NMultiButtonBehind : NComponent
     public Color Color { get; set; } = Color.Primary;
 
     [Parameter]
-    public Color SelectorColor { get; set; } = Color.Secondary
+    public Color SelectorColor { get; set; } = Color.Secondary;
 
     protected override void OnParametersSet()
     {

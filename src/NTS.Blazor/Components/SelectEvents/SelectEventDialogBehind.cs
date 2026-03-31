@@ -20,7 +20,7 @@ public class SelectEventDialogBehind : NDialog
     IDialogService DialogService { get; set; } = default!;
 
     protected IEnumerable<EnduranceEvent> Events { get; set; } = [];
-    protected string[] EventsTableHeaders { get; set; } = [Event_string, Place_string, Country_string, ""];
+    protected string[] EventsTableHeaders { get; set; } = [Event_string];
     protected bool IsConnected => SocketService.IsConnected;
     protected EnduranceEvent? SelectedEvent => SocketService.Event;
 
