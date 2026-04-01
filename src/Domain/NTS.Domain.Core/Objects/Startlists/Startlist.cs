@@ -18,10 +18,6 @@ public record Startlist : ValueObject
         var history = new List<Starter>();
         foreach (var participation in participations)
         {
-            if (participation.IsEliminated())
-            {
-                continue;
-            }
             var phases = participation.Phases;
             foreach (var phase in phases)
             {
