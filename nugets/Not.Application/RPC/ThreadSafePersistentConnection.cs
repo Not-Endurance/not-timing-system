@@ -31,7 +31,10 @@ public abstract class ThreadSafePersistentConnection<TConnectionContext> : IAsyn
     public event EventHandler<SocketConnectionStatus>? ServerConnectionChanged;
     public event EventHandler<string>? ServerConnectionInfo;
 
-    protected async Task ConnectAsync(TConnectionContext connectionContext, CancellationToken operationCancellationToken)
+    protected async Task ConnectAsync(
+        TConnectionContext connectionContext,
+        CancellationToken operationCancellationToken
+    )
     {
         Task connectTask;
 
@@ -45,7 +48,9 @@ public abstract class ThreadSafePersistentConnection<TConnectionContext> : IAsyn
             else
             {
                 _activeConnectCancellation?.Dispose();
-                _activeConnectCancellation = CancellationTokenSource.CreateLinkedTokenSource(operationCancellationToken);
+                _activeConnectCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+                    operationCancellationToken
+                );
                 connectTask = InternalConnect(connectionContext, _activeConnectCancellation.Token);
                 _activeConnectTask = connectTask;
             }
@@ -282,9 +287,10 @@ public abstract class ThreadSafePersistentConnection<TConnectionContext> : IAsyn
 
         CurrentConnectionContext = connectionContext;
         using var timeoutCancellation = CreateTimeoutCancellation(GetConnectTimeout(connectionContext));
-        using var linkedCancellation = timeoutCancellation == null
-            ? null
-            : CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCancellation.Token);
+        using var linkedCancellation =
+            timeoutCancellation == null
+                ? null
+                : CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCancellation.Token);
         var effectiveCancellationToken = linkedCancellation?.Token ?? cancellationToken;
 
         try

@@ -65,11 +65,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
         };
         var alternateType = selectedType == SnapshotType.Arrive ? SnapshotType.Present : SnapshotType.Arrive;
 
-        return
-        [
-            CreateDescriptor(group, selectedType),
-            CreateDescriptor(group, alternateType),
-        ];
+        return [CreateDescriptor(group, selectedType), CreateDescriptor(group, alternateType)];
 
         NMultiButtonDescriptor CreateDescriptor(SnapshotGroup snapshotGroup, SnapshotType snapshotType)
         {

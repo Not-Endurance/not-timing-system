@@ -14,7 +14,7 @@ public class SnapshotComponentBehind : NComponent
 {
     [Inject]
     ISnapshotService SnapshotService { get; set; } = default!;
-    
+
     [Inject]
     IDialogService MudDialogService { get; set; } = default!;
 
@@ -66,7 +66,6 @@ public class SnapshotComponentBehind : NComponent
         }
     }
 
-    
     protected async Task RemoveSnapshotOrShowDialog(Snapshot snapshot)
     {
         try
@@ -75,13 +74,16 @@ public class SnapshotComponentBehind : NComponent
             {
                 var parameters = new DialogParameters<NConfirmationDialog>
                 {
-                    { x => x.Description, string.Format(Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string, snapshot) }
+                    {
+                        x => x.Description,
+                        string.Format(Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string, snapshot)
+                    },
                 };
                 var dialog = await MudDialogService.ShowAsync<NConfirmationDialog>(Confirm_action_string, parameters);
                 if (await dialog.IsCanceled())
                 {
                     return;
-                }     
+                }
             }
 
             SnapshotService.RemoveSnapshot(snapshot);

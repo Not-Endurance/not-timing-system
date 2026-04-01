@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Not.Notify;
-using Not.Serialization.JSON;
 using System.Diagnostics;
 using System.Reflection;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Not.Notify;
+using Not.Serialization.JSON;
 
 namespace Not.Application.RPC.SignalR;
 
@@ -319,9 +319,7 @@ public class SignalRSocket : ThreadSafePersistentConnection<SignalRSocket.Connec
             attempt?.HubPath ?? _context.HubPattern
         );
 
-        var token = await _accessTokenProvider
-            .Get()
-            .WaitAsync(_currentConnectCancellationToken);
+        var token = await _accessTokenProvider.Get().WaitAsync(_currentConnectCancellationToken);
 
         tokenStopwatch.Stop();
         _logger.LogInformation(
@@ -391,7 +389,9 @@ public class SignalRSocket : ThreadSafePersistentConnection<SignalRSocket.Connec
 
         if (settings.ConnectTimeoutSeconds <= 0)
         {
-            throw new Exception($"Invalid SignalR configuration - ConnectTimeoutSeconds: '{settings.ConnectTimeoutSeconds}'");
+            throw new Exception(
+                $"Invalid SignalR configuration - ConnectTimeoutSeconds: '{settings.ConnectTimeoutSeconds}'"
+            );
         }
 
         return settings;
@@ -399,9 +399,10 @@ public class SignalRSocket : ThreadSafePersistentConnection<SignalRSocket.Connec
 
     static bool IsHubConnectionActive(HubConnection? connection)
     {
-        return connection?.State is HubConnectionState.Connected
-            or HubConnectionState.Connecting
-            or HubConnectionState.Reconnecting;
+        return connection?.State
+            is HubConnectionState.Connected
+                or HubConnectionState.Connecting
+                or HubConnectionState.Reconnecting;
     }
 
     ConnectionAttemptContext CreateAttempt(string? groupId)
@@ -459,7 +460,9 @@ public class SignalRSocket : ThreadSafePersistentConnection<SignalRSocket.Connec
             return informationalVersion;
         }
 
-        return entryAssembly?.GetName().Version?.ToString() ?? typeof(SignalRSocket).Assembly.GetName().Version?.ToString() ?? "unknown";
+        return entryAssembly?.GetName().Version?.ToString()
+            ?? typeof(SignalRSocket).Assembly.GetName().Version?.ToString()
+            ?? "unknown";
     }
 
     public sealed class ConnectionAttemptContext

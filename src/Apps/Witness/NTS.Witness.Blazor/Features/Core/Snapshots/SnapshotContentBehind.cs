@@ -58,8 +58,6 @@ public class SnapshotContentBehind : NStatefulComponent
         }
     }
 
-    
-
     protected async Task SendHandler(SnapshotType snapshotType)
     {
         try

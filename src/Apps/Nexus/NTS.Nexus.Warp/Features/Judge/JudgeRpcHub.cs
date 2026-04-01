@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using NTS.Domain.Core.Objects.Payloads;
@@ -8,7 +9,6 @@ using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 using NTS.Nexus.Warp.Features.Witness;
 using NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
-using System.Diagnostics;
 
 namespace NTS.Nexus.Warp.Features.Judge;
 

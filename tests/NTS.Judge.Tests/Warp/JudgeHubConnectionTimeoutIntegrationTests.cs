@@ -27,17 +27,13 @@ public class JudgeHubConnectionTimeoutIntegrationTests
         builder.Services.AddLogging();
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<JudgeConnectionsContext>();
-        builder.Services.AddSingleton<IPendingSnapshotsService>(
-            new EmptyPendingSnapshotsService()
-        );
+        builder.Services.AddSingleton<IPendingSnapshotsService>(new EmptyPendingSnapshotsService());
 
         await using var app = builder.Build();
         app.Use(
             async (context, next) =>
             {
-                if (
-                    context.Request.Path.StartsWithSegments($"/{ApplicationConstants.JUDGE_HUB}/negotiate")
-                )
+                if (context.Request.Path.StartsWithSegments($"/{ApplicationConstants.JUDGE_HUB}/negotiate"))
                 {
                     await Task.Delay(TimeSpan.FromSeconds(2));
                 }
