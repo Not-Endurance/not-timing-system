@@ -1,5 +1,6 @@
 using Not.Application.Behinds.Adapters;
 using Not.Application.DomainEvents;
+using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
 using NTS.Application.Socket;

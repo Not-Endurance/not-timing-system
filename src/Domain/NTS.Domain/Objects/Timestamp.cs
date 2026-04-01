@@ -25,6 +25,66 @@ public sealed record Timestamp : IComparable<Timestamp>
         return new Timestamp(timestamp);
     }
 
+    Timestamp() { }
+
+    Timestamp(Timestamp timestamp)
+    {
+        _stamp = timestamp._stamp.ToLocalTime();
+    }
+
+    public Timestamp(DateTimeOffset dateTimeOffset)
+    {
+        _stamp = dateTimeOffset.ToLocalTime();
+    }
+
+    public Timestamp(string timeText)
+    {
+        if (DateTimeOffset.TryParseExact(timeText, "HH:mm:ss", null, DateTimeStyles.None, out DateTimeOffset result))
+        {
+            _stamp = result;
+        }
+    }
+
+    [JsonProperty]
+#pragma warning disable IDE1006 // TODO: serialize private setter using custom JsonConverter<Timestamp>
+    public DateTimeOffset _stamp { get; set; }
+
+#pragma warning restore IDE1006 // Naming Styles
+    public Timestamp Add(TimeSpan span)
+    {
+        return new Timestamp(_stamp.Add(span));
+    }
+
+    public string ToString(string format, IFormatProvider formatProvider)
+    {
+        return _stamp.ToString(format, formatProvider);
+    }
+
+    public override string ToString()
+    {
+        return _stamp.ToString("HH:mm:ss");
+    }
+
+    public int CompareTo(Timestamp? other)
+    {
+        return _stamp.CompareTo(other?._stamp ?? DateTimeOffset.MinValue);
+    }
+
+    public DateTimeOffset ToDateTimeOffset()
+    {
+        return _stamp;
+    }
+
+    public DateTime ToDateTime()
+    {
+        return _stamp.DateTime;
+    }
+
+    public TimeSpan ToTimeSpan()
+    {
+        return _stamp.TimeOfDay;
+    }
+
     public static implicit operator Timestamp?(DateTimeOffset? dateTimeOffset)
     {
         return dateTimeOffset == null ? null : new Timestamp(dateTimeOffset.Value);
@@ -72,65 +132,5 @@ public sealed record Timestamp : IComparable<Timestamp>
     public static Timestamp? operator -(Timestamp? left, TimeSpan? right)
     {
         return left == null ? null : new Timestamp(left!._stamp - (right ?? TimeSpan.Zero));
-    }
-
-    Timestamp() { }
-
-    Timestamp(Timestamp timestamp)
-    {
-        _stamp = timestamp._stamp.ToLocalTime();
-    }
-
-    public Timestamp(DateTimeOffset dateTimeOffset)
-    {
-        _stamp = dateTimeOffset.ToLocalTime();
-    }
-
-    public Timestamp(string timeText)
-    {
-        if (DateTimeOffset.TryParseExact(timeText, "HH:mm:ss", null, DateTimeStyles.None, out DateTimeOffset result))
-        {
-            _stamp = result;
-        }
-    }
-
-    [JsonProperty]
-#pragma warning disable IDE1006 // TODO: serialize private setter using custom JsonConverter<Timestamp>
-    public DateTimeOffset _stamp { get; set; }
-#pragma warning restore IDE1006 // Naming Styles
-
-    public Timestamp Add(TimeSpan span)
-    {
-        return new Timestamp(_stamp.Add(span));
-    }
-
-    public string ToString(string format, IFormatProvider formatProvider)
-    {
-        return _stamp.ToString(format, formatProvider);
-    }
-
-    public override string ToString()
-    {
-        return _stamp.ToString("HH:mm:ss");
-    }
-
-    public int CompareTo(Timestamp? other)
-    {
-        return _stamp.CompareTo(other?._stamp ?? DateTimeOffset.MinValue);
-    }
-
-    public DateTimeOffset ToDateTimeOffset()
-    {
-        return _stamp;
-    }
-
-    public DateTime ToDateTime()
-    {
-        return _stamp.DateTime;
-    }
-
-    public TimeSpan ToTimeSpan()
-    {
-        return _stamp.TimeOfDay;
     }
 }

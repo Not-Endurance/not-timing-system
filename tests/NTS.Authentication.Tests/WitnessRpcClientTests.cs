@@ -55,7 +55,7 @@ public class WitnessRpcClientTests
     {
         return new SnapshotGroup(
             [new NTS.Domain.Watcher.Snapshot(31, new Person(["Test", "Rider"]), new Timestamp(DateTimeOffset.UtcNow))],
-            SnapshotType.Arrive.ToString()
+            SnapshotType.Arrive
         );
     }
 

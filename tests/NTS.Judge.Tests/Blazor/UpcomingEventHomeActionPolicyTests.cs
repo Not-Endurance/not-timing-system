@@ -175,7 +175,7 @@ public class UpcomingEventsListBehindTests
     {
         public IEventSubscriber ObservableEvent { get; } = new Event();
         public bool IsConnected { get; set; }
-        public Not.Application.RPC.SignalR.SocketConnectionStatus Status { get; set; }
+        public Not.Application.RPC.SocketConnectionStatus Status { get; set; }
         public EnduranceEvent? Event { get; set; }
 
         public Task Connect(EnduranceEvent enduranceEvent)

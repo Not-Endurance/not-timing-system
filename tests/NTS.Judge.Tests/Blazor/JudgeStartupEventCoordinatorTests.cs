@@ -1,3 +1,4 @@
+using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Events;
 using NTS.Application.Core;

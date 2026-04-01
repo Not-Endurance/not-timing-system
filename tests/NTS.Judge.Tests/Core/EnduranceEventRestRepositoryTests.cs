@@ -108,10 +108,10 @@ public class EnduranceEventRestRepositoryTests
     sealed class TestSocketContext : INtsSocketContext
     {
         public bool IsConnected => Event != null;
-        public Not.Application.RPC.SignalR.SocketConnectionStatus Status =>
+        public Not.Application.RPC.SocketConnectionStatus Status =>
             IsConnected
-                ? Not.Application.RPC.SignalR.SocketConnectionStatus.Connected
-                : Not.Application.RPC.SignalR.SocketConnectionStatus.Disconnected;
+                ? Not.Application.RPC.SocketConnectionStatus.Connected
+                : Not.Application.RPC.SocketConnectionStatus.Disconnected;
         public EnduranceEvent? Event { get; set; }
     }
 }

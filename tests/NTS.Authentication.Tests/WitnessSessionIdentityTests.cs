@@ -179,19 +179,19 @@ public class WitnessSessionIdentityTests
             id: 7,
             userIdentifier: "entra-1",
             eventId: 23,
-            snapshotHistory: [SnapshotGroupModel.MapFrom(CreateSnapshotGroup(31, SnapshotType.Arrive.ToString()))]
+            snapshotHistory: [SnapshotGroupModel.MapFrom(CreateSnapshotGroup(31, SnapshotType.Arrive))]
         );
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = existing };
         var service = CreateService(sessions);
 
-        await service.AppendSnapshot(CreateSnapshotGroup(44, SnapshotType.Present.ToString()));
+        await service.AppendSnapshot(CreateSnapshotGroup(44, SnapshotType.Present));
 
         var updated = Assert.Single(sessions.Updated);
         Assert.Same(existing, updated);
         Assert.NotNull(updated.State);
         Assert.Equal(23, updated.State!.EventId);
         Assert.Equal(2, updated.State.SnapshotHistory.Length);
-        Assert.Equal("Present", updated.State.SnapshotHistory[1].Type);
+        Assert.Equal(SnapshotType.Present, updated.State.SnapshotHistory[1].Type);
         Assert.Null(JObject.Parse(updated.ToJson())["EventId"]);
         Assert.Null(JObject.Parse(updated.ToJson())["SnapshotHistory"]);
     }
@@ -203,7 +203,7 @@ public class WitnessSessionIdentityTests
             id: 7,
             userIdentifier: "entra-1",
             eventId: 23,
-            snapshotHistory: [SnapshotGroupModel.MapFrom(CreateSnapshotGroup(31, SnapshotType.Arrive.ToString()))]
+            snapshotHistory: [SnapshotGroupModel.MapFrom(CreateSnapshotGroup(31, SnapshotType.Arrive))]
         );
 
         var json = JObject.Parse(session.ToJson());
@@ -256,20 +256,6 @@ public class WitnessSessionIdentityTests
         return session;
     }
 
-    static SnapshotGroup CreateSnapshotGroup(int number, string type)
-    {
-        return new SnapshotGroup(
-            [
-                new NTS.Domain.Watcher.Snapshot(
-                    number,
-                    new Person(["Test", "Rider"]),
-                    new Timestamp(DateTimeOffset.UtcNow)
-                ),
-            ],
-            type
-        );
-    }
-
     sealed class StaticAuthenticationStateProvider : AuthenticationStateProvider
     {
         readonly AuthenticationState _state;
@@ -318,6 +304,20 @@ public class WitnessSessionIdentityTests
         {
             return Task.FromResult(RegisterResult ?? Result.Success(new NUserModel(registration.Email, id: 7)));
         }
+    }
+
+    static SnapshotGroup CreateSnapshotGroup(int number, SnapshotType type)
+    {
+        return new SnapshotGroup(
+            [
+                new NTS.Domain.Watcher.Snapshot(
+                    number,
+                    new Person(["Test", "Rider"]),
+                    new Timestamp(DateTimeOffset.UtcNow)
+                ),
+            ],
+            type
+        );
     }
 
     sealed class RecordingUserSessionRepository

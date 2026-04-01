@@ -41,7 +41,7 @@ public class SignalRSocket : ThreadSafePersistentConnection<SignalRSocket.Connec
     // Necessary because this.Connection instance is not intialized
     // when procedures are reigstered in the child constructor
     internal List<Action<HubConnection>> Procedures { get; } = [];
-    protected override bool IsConnectionActive => IsConnectionActive(Connection);
+    protected override bool IsConnectionActive => IsHubConnectionActive(Connection);
 
     public event EventHandler<RpcError>? Error;
 
@@ -397,7 +397,7 @@ public class SignalRSocket : ThreadSafePersistentConnection<SignalRSocket.Connec
         return settings;
     }
 
-    static bool IsConnectionActive(HubConnection? connection)
+    static bool IsHubConnectionActive(HubConnection? connection)
     {
         return connection?.State is HubConnectionState.Connected
             or HubConnectionState.Connecting

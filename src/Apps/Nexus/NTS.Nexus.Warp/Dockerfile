@@ -9,11 +9,6 @@ COPY /src /nexus/src
 COPY /nugets /nexus/nugets
 COPY .editorconfig /nexus/.editorconfig
 
-WORKDIR /nexus
-
-RUN dotnet nuget remove source "local-cache" --configfile src/NuGet.config
-RUN rm -f ./src/Directory.Build.props
-
 WORKDIR /nexus/src/Apps/Nexus/NTS.Nexus.Warp
 
 RUN dotnet restore "NTS.Nexus.Warp.csproj"
