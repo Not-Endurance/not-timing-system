@@ -160,13 +160,9 @@ public class UpcomingEventsListBehindTests
             return _activeEventIds.Contains(upcomingEvent.Id);
         }
 
-        public void Add(EnduranceEvent enduranceEvent)
-        {
-        }
+        public void Add(EnduranceEvent enduranceEvent) { }
 
-        public void Remove(int eventId)
-        {
-        }
+        public void Remove(int eventId) { }
 
         public Task Load()
         {
