@@ -16,6 +16,7 @@ namespace NTS.Judge.Features.Core;
 public class DashService : IDashService, IScoped
 {
     readonly INtsSocketService _socketService;
+    readonly IActiveEventsContext _activeEventService;
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
     readonly IEnduranceEventRepository _enduranceEvents;
     readonly IUpcomingEventService _upcomingEvents;
@@ -28,6 +29,7 @@ public class DashService : IDashService, IScoped
 
     public DashService(
         INtsSocketService socketService,
+        IActiveEventsContext activeEventService,
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
         IEnduranceEventRepository enduranceEvents,
         IUpcomingEventService upcomingEvents,
@@ -40,6 +42,7 @@ public class DashService : IDashService, IScoped
     )
     {
         _socketService = socketService;
+        _activeEventService = activeEventService;
         _coreDependentObservables = coreDependentObservables;
         _enduranceEvents = enduranceEvents;
         _upcomingEvents = upcomingEvents;
@@ -71,12 +74,18 @@ public class DashService : IDashService, IScoped
         }
 
         var enduranceEvent = await _enduranceEvents.Start(upcomingEventId);
+        _activeEventService.Add(enduranceEvent);
         await _socketService.Connect(enduranceEvent);
     }
 
     public async Task Reset()
     {
+        var eventId = _socketService.Event?.Id;
         await _enduranceEvents.Reset();
+        if (eventId != null)
+        {
+            _activeEventService.Remove(eventId.Value);
+        }
         ResetCoreDependentObservables();
     }
 

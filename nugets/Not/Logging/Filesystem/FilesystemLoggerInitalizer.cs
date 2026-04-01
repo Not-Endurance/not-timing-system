@@ -17,7 +17,7 @@ public class FilesystemLoggerInitalizer : IStartupInitializer
 
     public void RunAtStartup()
     {
-        LoggingHelper.Validate();
+        LoggingHelper.PreventDuplicateRegistration();
 
         var filename = _context.Name != null ? _context.Name + ".Log.txt" : "log.txt";
         Log.Logger = new LoggerConfiguration()

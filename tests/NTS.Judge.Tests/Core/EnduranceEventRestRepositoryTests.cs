@@ -2,7 +2,6 @@ using System.Net;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Not.Application.HTTP;
-using Not.Notify;
 using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
@@ -45,8 +44,7 @@ public class EnduranceEventRestRepositoryTests
         return new NHttpClient(
             new TestHttpClientFactory(new HttpClient(handler)),
             NullLogger<NHttpClient>.Instance,
-            Options.Create(new NHttpSettings { Url = "https://nexus.test/api" }),
-            new TestNotifier()
+            Options.Create(new NHttpSettings { Url = "https://nexus.test/api" })
         );
     }
 
@@ -90,19 +88,6 @@ public class EnduranceEventRestRepositoryTests
         {
             return _client;
         }
-    }
-
-    sealed class TestNotifier : INotifier
-    {
-        public void Inform(string message) { }
-
-        public void Success(string message) { }
-
-        public void Warn(string message) { }
-
-        public void Error(string message) { }
-
-        public void Error(Exception ex) { }
     }
 
     sealed class TestSocketContext : INtsSocketContext

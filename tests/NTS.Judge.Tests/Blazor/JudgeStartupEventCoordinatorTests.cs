@@ -113,11 +113,6 @@ public class JudgeStartupEventCoordinatorTests
             return Task.FromResult(_events);
         }
 
-        public bool IsActive(UpcomingEvent upcomingEvent)
-        {
-            return true;
-        }
-
         public Task Load()
         {
             return Task.CompletedTask;

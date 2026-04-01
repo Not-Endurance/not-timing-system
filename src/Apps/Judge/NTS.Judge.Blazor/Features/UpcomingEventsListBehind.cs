@@ -23,19 +23,19 @@ public class UpcomingEventsListBehind : NStatefulComponent
     protected INtsSocketService SocketService { get; set; } = default!;
 
     [Inject]
-    protected IEnduranceEventService ActiveEventService { get; set; } = default!;
+    protected IActiveEventsContext ActiveEventContext { get; set; } = default!;
 
     protected int ActiveEnduranceEventCount { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await Observe(SocketService);
-        await Observe(ActiveEventService);
+        await Observe(ActiveEventContext);
     }
 
     protected bool ShowStartButton(UpcomingEvent upcomingEvent)
     {
-        return !ActiveEventService.IsActive(upcomingEvent);
+        return !ActiveEventContext.IsActive(upcomingEvent);
     }
 
     protected bool ShowResetTimingButton(UpcomingEvent upcomingEvent)

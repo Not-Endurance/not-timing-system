@@ -12,6 +12,7 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
 using NTS.Judge.Features.Core;
 using NTS.Judge.Features.Core.State;
@@ -28,11 +29,12 @@ public class DashServiceTests
         var socketService = new TestSocketService(calls);
         var startBusiness = new TestUpcomingEventService(calls);
         var enduranceEvents = new TestEnduranceEventRepository(calls);
-        var service = CreateService(socketService, startBusiness, enduranceEvents);
+        var activeEvents = new TestActiveEventService(calls);
+        var service = CreateService(socketService, activeEvents, startBusiness, enduranceEvents);
 
         await service.Start(7);
 
-        Assert.Equal(["Validate(7)", "Start(7)", "Connect(7)"], calls);
+        Assert.Equal(["Validate(7)", "Start(7)", "AddActive(7)", "Connect(7)"], calls);
     }
 
     [Fact]
@@ -42,21 +44,39 @@ public class DashServiceTests
         var socketService = new TestSocketService(calls) { IsConnected = true, Event = CreateEvent(3) };
         var startBusiness = new TestUpcomingEventService(calls);
         var enduranceEvents = new TestEnduranceEventRepository(calls);
-        var service = CreateService(socketService, startBusiness, enduranceEvents);
+        var activeEvents = new TestActiveEventService(calls);
+        var service = CreateService(socketService, activeEvents, startBusiness, enduranceEvents);
 
         await service.Start(9);
 
-        Assert.Equal(["Validate(9)", "Disconnect()", "Start(9)", "Connect(9)"], calls);
+        Assert.Equal(["Validate(9)", "Disconnect()", "Start(9)", "AddActive(9)", "Connect(9)"], calls);
+    }
+
+    [Fact]
+    public async Task Reset_WhenSocketHasEvent_RemovesItFromActiveCache()
+    {
+        var calls = new List<string>();
+        var socketService = new TestSocketService(calls) { Event = CreateEvent(11) };
+        var startBusiness = new TestUpcomingEventService(calls);
+        var enduranceEvents = new TestEnduranceEventRepository(calls);
+        var activeEvents = new TestActiveEventService(calls);
+        var service = CreateService(socketService, activeEvents, startBusiness, enduranceEvents);
+
+        await service.Reset();
+
+        Assert.Equal(["Reset()", "RemoveActive(11)"], calls);
     }
 
     static DashService CreateService(
         INtsSocketService socketService,
+        IActiveEventsContext activeEventService,
         IUpcomingEventService upcomingEventService,
         IEnduranceEventRepository enduranceEvents
     )
     {
         return new DashService(
             socketService,
+            activeEventService,
             [],
             enduranceEvents,
             upcomingEventService,
@@ -100,6 +120,38 @@ public class DashServiceTests
         public Task DeleteParticipation(int upcomingEventId, int participationNumber, int competitionId)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    sealed class TestActiveEventService : IActiveEventsContext
+    {
+        readonly List<string> _calls;
+
+        public TestActiveEventService(List<string> calls)
+        {
+            _calls = calls;
+        }
+
+        public IEventSubscriber ObservableEvent { get; } = new Event();
+
+        public bool IsActive(UpcomingEvent upcomingEvent)
+        {
+            return false;
+        }
+
+        public void Add(EnduranceEvent enduranceEvent)
+        {
+            _calls.Add($"AddActive({enduranceEvent.Id})");
+        }
+
+        public void Remove(int eventId)
+        {
+            _calls.Add($"RemoveActive({eventId})");
+        }
+
+        public Task Load()
+        {
+            return Task.CompletedTask;
         }
     }
 
@@ -163,6 +215,7 @@ public class DashServiceTests
 
         public Task Reset()
         {
+            _calls?.Add("Reset()");
             return Task.CompletedTask;
         }
 

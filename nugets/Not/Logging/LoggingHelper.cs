@@ -21,13 +21,11 @@ public static class LoggingHelper
 
     static bool _isLoggerConfigured;
 
-    internal static void Validate()
+    internal static void PreventDuplicateRegistration()
     {
         if (_isLoggerConfigured)
         {
-            throw new Exception(
-                "Serilog static logger is already configured. Second logger is unsupported as it will simply replace the original"
-            );
+            return;
         }
         _isLoggerConfigured = true;
     }

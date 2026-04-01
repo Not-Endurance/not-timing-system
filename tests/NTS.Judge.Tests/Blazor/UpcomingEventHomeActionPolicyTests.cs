@@ -101,9 +101,9 @@ public class UpcomingEventsListBehindTests
             set => base.SocketService = value;
         }
 
-        public new IEnduranceEventService ActiveEventService
+        public new IActiveEventsContext ActiveEventService
         {
-            set => base.ActiveEventService = value;
+            set => base.ActiveEventContext = value;
         }
 
         public bool ShowStart(UpcomingEvent upcomingEvent)
@@ -144,7 +144,7 @@ public class UpcomingEventsListBehindTests
         }
     }
 
-    sealed class TestEnduranceEventService : IEnduranceEventService
+    sealed class TestEnduranceEventService : IActiveEventsContext
     {
         readonly IReadOnlySet<int> _activeEventIds;
 
@@ -160,9 +160,12 @@ public class UpcomingEventsListBehindTests
             return _activeEventIds.Contains(upcomingEvent.Id);
         }
 
-        public Task<IEnumerable<EnduranceEvent>> GetEvents()
+        public void Add(EnduranceEvent enduranceEvent)
         {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+        }
+
+        public void Remove(int eventId)
+        {
         }
 
         public Task Load()
