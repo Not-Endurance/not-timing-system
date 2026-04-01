@@ -3,7 +3,6 @@ using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Domain.Abstractions;
 using Not.Krud.Abstractions;
-using Not.Localization;
 using Not.Notify;
 
 namespace Not.Storage.REST;
@@ -157,19 +156,6 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
     {
         var predicate = filter.Compile();
         return (await ReadMany()).Where(predicate);
-    }
-
-    public async Task SafeDelete(int id)
-    {
-        try
-        {
-            var url = $"{BuildUrl(id)}/safe";
-            await Client.Delete(url);
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-        }
     }
 
     public async Task Update(T item)
