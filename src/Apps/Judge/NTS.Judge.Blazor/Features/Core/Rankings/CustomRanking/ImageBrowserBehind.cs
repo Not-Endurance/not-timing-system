@@ -110,7 +110,10 @@ public class ImageBrowserBehind : NComponent
 
             var confirmed = await DialogService.ShowMessageBox(
                 Confirm_action_string,
-                string.Format(Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string, Path.GetFileName(imagePath)),
+                string.Format(
+                    Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string,
+                    Path.GetFileName(imagePath)
+                ),
                 yesText: Delete_string,
                 cancelText: Cancel_string
             );

@@ -27,12 +27,14 @@ public class ExceptionHandlingHubFilterTests
             Array.Empty<object>()
         );
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            filter.InvokeMethodAsync(
-                    invocationContext,
-                    _ => ValueTask.FromException<object?>(new InvalidOperationException("boom"))
-                )
-                .AsTask()
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () =>
+                filter
+                    .InvokeMethodAsync(
+                        invocationContext,
+                        _ => ValueTask.FromException<object?>(new InvalidOperationException("boom"))
+                    )
+                    .AsTask()
         );
 
         Assert.Single(notifier.Errors);
@@ -51,11 +53,12 @@ public class ExceptionHandlingHubFilterTests
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var lifetimeContext = new HubLifetimeContext(callerContext, serviceProvider, new TestHub());
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            filter.OnConnectedAsync(
-                lifetimeContext,
-                _ => Task.FromException(new InvalidOperationException("connect boom"))
-            )
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () =>
+                filter.OnConnectedAsync(
+                    lifetimeContext,
+                    _ => Task.FromException(new InvalidOperationException("connect boom"))
+                )
         );
 
         Assert.Single(notifier.Errors);

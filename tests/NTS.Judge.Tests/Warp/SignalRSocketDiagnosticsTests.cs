@@ -101,13 +101,7 @@ public class SignalRSocketDiagnosticsTests
     public async Task Disconnect_disposes_the_connection_and_clears_the_cached_group()
     {
         var socket = new TestSignalRSocket(
-            Options.Create(
-                new RpcSettings
-                {
-                    Host = "https://localhost",
-                    HubPattern = "witness-hub",
-                }
-            ),
+            Options.Create(new RpcSettings { Host = "https://localhost", HubPattern = "witness-hub" }),
             new RecordingNotifier()
         );
 
@@ -146,7 +140,10 @@ public class SignalRSocketDiagnosticsTests
             return new HubConnectionBuilder().WithUrl(url).Build();
         }
 
-        protected override async Task StartConnectionAsync(HubConnection connection, CancellationToken cancellationToken)
+        protected override async Task StartConnectionAsync(
+            HubConnection connection,
+            CancellationToken cancellationToken
+        )
         {
             StartCallCount++;
             await StartBehavior(cancellationToken);

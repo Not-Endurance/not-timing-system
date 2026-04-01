@@ -13,7 +13,7 @@ public record Snapshot
     }
 
     public int Number { get; }
-    public SnapshotType Type { get; }   
+    public SnapshotType Type { get; }
     public SnapshotMethod Method { get; }
     public Timestamp Timestamp { get; set; }
 

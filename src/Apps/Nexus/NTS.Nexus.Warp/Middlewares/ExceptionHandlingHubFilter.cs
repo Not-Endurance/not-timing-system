@@ -9,10 +9,7 @@ internal class ExceptionHandlingHubFilter : IHubFilter
     readonly INotifier _notifier;
     readonly ILogger<ExceptionHandlingHubFilter> _logger;
 
-    public ExceptionHandlingHubFilter(
-        INotifier notifier,
-        ILogger<ExceptionHandlingHubFilter> logger
-    )
+    public ExceptionHandlingHubFilter(INotifier notifier, ILogger<ExceptionHandlingHubFilter> logger)
     {
         _notifier = notifier;
         _logger = logger;
@@ -68,12 +65,7 @@ internal class ExceptionHandlingHubFilter : IHubFilter
         }
     }
 
-    void HandleHubException(
-        Exception exception,
-        string methodName,
-        HubCallerContext context,
-        string hubName
-    )
+    void HandleHubException(Exception exception, string methodName, HubCallerContext context, string hubName)
     {
         _notifier.Error(exception);
 

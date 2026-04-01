@@ -7,10 +7,7 @@ internal sealed class ConnectionDiagnosticsMiddleware
     readonly RequestDelegate _next;
     readonly ILogger<ConnectionDiagnosticsMiddleware> _logger;
 
-    public ConnectionDiagnosticsMiddleware(
-        RequestDelegate next,
-        ILogger<ConnectionDiagnosticsMiddleware> logger
-    )
+    public ConnectionDiagnosticsMiddleware(RequestDelegate next, ILogger<ConnectionDiagnosticsMiddleware> logger)
     {
         _next = next;
         _logger = logger;
@@ -34,9 +31,9 @@ internal sealed class ConnectionDiagnosticsMiddleware
             stopwatch.Stop();
             _logger.LogInformation(
                 "Warp transport request {RequestKind} for {HubPath} completed with {StatusCode} in {ElapsedMilliseconds} ms. "
-                + "CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, Method {Method}, "
-                + "Origin {Origin}, Upgrade {Upgrade}, ForwardedProto {ForwardedProto}, "
-                + "ForwardedHost {ForwardedHost}, ArrLogId {ArrLogId}, InstanceId {InstanceId}.",
+                    + "CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, Method {Method}, "
+                    + "Origin {Origin}, Upgrade {Upgrade}, ForwardedProto {ForwardedProto}, "
+                    + "ForwardedHost {ForwardedHost}, ArrLogId {ArrLogId}, InstanceId {InstanceId}.",
                 requestKind,
                 hubPath,
                 context.Response.StatusCode,

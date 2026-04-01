@@ -1,7 +1,7 @@
+using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
 using NTS.Application.Watcher;
-using System.Diagnostics;
 
 namespace NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 
@@ -19,10 +19,7 @@ public class PendingSnapshotsMongoRepository : MongoRepository<PendingSnapshotsM
 
     readonly ILogger<PendingSnapshotsMongoRepository> _logger;
 
-    public PendingSnapshotsMongoRepository(
-        IMongoContext context,
-        ILogger<PendingSnapshotsMongoRepository> logger
-    )
+    public PendingSnapshotsMongoRepository(IMongoContext context, ILogger<PendingSnapshotsMongoRepository> logger)
         : base(context, DATABASE, COLLECTION)
     {
         _logger = logger;
@@ -40,7 +37,7 @@ public class PendingSnapshotsMongoRepository : MongoRepository<PendingSnapshotsM
         {
             await GetCollection()
                 .InsertOneAsync(
-                new PendingSnapshotsModel { EnduranceEventId = enduranceEventId, SnapshotGroups = [snapshotGroup] }
+                    new PendingSnapshotsModel { EnduranceEventId = enduranceEventId, SnapshotGroups = [snapshotGroup] }
                 );
             stopwatch.Stop();
             _logger.LogInformation(

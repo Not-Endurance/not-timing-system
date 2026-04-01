@@ -21,7 +21,8 @@ public static class Warp
     public static void Start(WebApplication app, string port)
     {
         var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("NTS.Nexus.Warp.Startup");
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? app.Environment.EnvironmentName;
+        var environment =
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? app.Environment.EnvironmentName;
 
         var judgeHubPath = new PathString($"/{ApplicationConstants.JUDGE_HUB}");
         var witnessHubPath = new PathString($"/{ApplicationConstants.WITNESS_HUB}");

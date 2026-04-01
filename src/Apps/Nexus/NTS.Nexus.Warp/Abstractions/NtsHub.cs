@@ -1,7 +1,7 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
 using Not.Application.RPC;
 using NTS.Nexus.Warp.ConnectionDiagnostics;
-using System.Diagnostics;
 
 namespace NTS.Nexus.Warp.Abstractions;
 

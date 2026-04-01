@@ -9,8 +9,8 @@ using NTS.Application.Socket;
 using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Enums;
 using NTS.Domain.Core.Objects.Payloads;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 
