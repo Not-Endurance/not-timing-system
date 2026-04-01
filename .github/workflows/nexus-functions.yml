@@ -24,10 +24,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-        
-    # Slap on top of every build: see https://github.com/Not-Endurance/not-timing-system/issues/361
-    - name: Remove local-cache NuGet source
-      run: dotnet nuget remove source "local-cache" --configfile ./src/NuGet.config
 
     - name: Restore
       run: dotnet restore "${{ env.SOURCE_PATH }}"

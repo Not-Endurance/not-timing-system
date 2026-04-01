@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using Not.Application.DomainEvents;
 using Not.Application.RPC;
-using Not.Application.RPC.SignalR;
 using Not.Notify;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;

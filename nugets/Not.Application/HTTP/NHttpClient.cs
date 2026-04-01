@@ -1,8 +1,6 @@
-using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Not.Notify;
 using Not.Serialization.JSON;
 
 namespace Not.Application.HTTP;
@@ -12,43 +10,23 @@ public class NHttpClient
     readonly string _baseUrl;
     readonly HttpClient _httpClient;
     readonly ILogger<NHttpClient> _logger;
-    readonly INotifier _notifier;
 
     public NHttpClient(
         IHttpClientFactory httpClientFactory,
         ILogger<NHttpClient> logger,
-        IOptions<NHttpSettings> options,
-        INotifier notifier
+        IOptions<NHttpSettings> options
     )
     {
         _baseUrl = options.Value.Url!;
         _httpClient = httpClientFactory.CreateClient("NHttpClient");
         _logger = logger;
-        _notifier = notifier;
     }
 
     public async Task<string?> Get(string endpoint)
     {
         var url = BuildUrl(endpoint);
-        try
-        {
-            var response = await _httpClient.GetAsync(url);
-            return await ReadResponse(response);
-        }
-        catch (Exception ex)
-        {
-            if (ex is HttpRequestException { StatusCode: HttpStatusCode.NotFound })
-            {
-#if DEBUG
-                _notifier.Warn(ex.Message + $"{endpoint}"); // TODO: probably return result instead and let consumer decide
-#else
-                _notifier.Warn($"The requested resource at {endpoint} was not found. Please contact system admin.");
-#endif
-                return null;
-            }
-            _logger.LogError(ex, "Error during GET request to {Url}", url);
-            throw;
-        }
+        var response = await _httpClient.GetAsync(url);
+        return await ReadResponse(response);
     }
 
     public async Task<T?> GetJson<T>(string endpoint)

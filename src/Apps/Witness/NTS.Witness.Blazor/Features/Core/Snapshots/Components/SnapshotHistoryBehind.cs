@@ -1,6 +1,9 @@
+using MudBlazor;
 using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Components.Buttons;
 using Not.Notify;
 using NTS.Application.Socket;
+using NTS.Domain.Enums;
 using NTS.Domain.Watcher;
 using NTS.Witness.Features.Core.Dashboard;
 
@@ -10,7 +13,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
 {
     int? _expandedIndex;
     int _historyCount = -1;
-    int? _resendingIndex;
+    bool _isResending;
 
     [Inject]
     protected INotifier Notifier { get; set; } = default!;
@@ -23,7 +26,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
 
     protected IReadOnlyList<SnapshotGroup> History => [.. SnapshotService.History.Reverse()];
     protected bool CanResend => SocketContext.IsConnected && SocketContext.Event != null;
-    protected bool IsResending => _resendingIndex.HasValue;
+    protected bool IsResending => _isResending;
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,19 +56,39 @@ public class SnapshotHistoryBehind : NStatefulComponent
         }
     }
 
-    protected async Task ResendGroup(int index)
+    protected IReadOnlyList<NMultiButtonDescriptor> GetResendDescriptors(SnapshotGroup group)
+    {
+        var selectedType = group.Type switch
+        {
+            SnapshotType.Present => SnapshotType.Present,
+            _ => SnapshotType.Arrive,
+        };
+        var alternateType = selectedType == SnapshotType.Arrive ? SnapshotType.Present : SnapshotType.Arrive;
+
+        return [CreateDescriptor(group, selectedType), CreateDescriptor(group, alternateType)];
+
+        NMultiButtonDescriptor CreateDescriptor(SnapshotGroup snapshotGroup, SnapshotType snapshotType)
+        {
+            return new(
+                $"{Resend_string}: {GetSnapshotTypeText(snapshotType)}",
+                () => ResendGroup(snapshotGroup, snapshotType),
+                Icons.Material.Filled.Replay
+            );
+        }
+    }
+
+    protected async Task ResendGroup(SnapshotGroup group, SnapshotType snapshotType)
     {
         try
         {
-            if (_resendingIndex.HasValue || !CanResend || index < 0 || index >= History.Count)
+            if (_isResending || !CanResend)
             {
                 return;
             }
 
-            _resendingIndex = index;
-            var group = History[index];
-            await SnapshotService.RePublish(group);
-            Notifier.Success(string.Format(Snapshots_sent_as__string, group.Type));
+            _isResending = true;
+            await SnapshotService.RePublish(group, snapshotType);
+            Notifier.Success(string.Format(Snapshots_sent_as__string, GetSnapshotTypeText(snapshotType)));
         }
         catch (Exception ex)
         {
@@ -73,9 +96,19 @@ public class SnapshotHistoryBehind : NStatefulComponent
         }
         finally
         {
-            _resendingIndex = null;
+            _isResending = false;
             StateHasChanged();
         }
+    }
+
+    protected string GetSnapshotTypeText(SnapshotType snapshotType)
+    {
+        return snapshotType switch
+        {
+            SnapshotType.Arrive => Arrive_string,
+            SnapshotType.Present => Presentation_string,
+            _ => snapshotType.ToString(),
+        };
     }
 
     protected override void OnBeforeRender()

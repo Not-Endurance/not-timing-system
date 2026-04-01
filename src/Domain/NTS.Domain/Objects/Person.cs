@@ -13,16 +13,6 @@ public class Person
         return new Person(names.Split(DELIMITER, StringSplitOptions.RemoveEmptyEntries));
     }
 
-    public static implicit operator Person(string[] names)
-    {
-        return new Person(names);
-    }
-
-    public static implicit operator string(Person person)
-    {
-        return person.ToString();
-    }
-
     internal static string DELIMITER = " ";
 
     [JsonConstructor]
@@ -46,5 +36,15 @@ public class Person
     public string? GetLastName()
     {
         return Names.Last();
+    }
+
+    public static implicit operator Person(string[] names)
+    {
+        return new Person(names);
+    }
+
+    public static implicit operator string(Person person)
+    {
+        return person.ToString();
     }
 }

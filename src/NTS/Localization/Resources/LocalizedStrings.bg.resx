@@ -648,8 +648,8 @@
   <data name="Send_snapshot_string" xml:space="preserve">
     <value>Изпрати {0} записа за</value>
   </data>
-  <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
-    <value>Няма избрани участници за засичане</value>
+  <data name="Select_participants_to_snapshot_string" xml:space="preserve">
+    <value>Изберете участници за засичане на време</value>
   </data>
   <data name="Edit_timestamp_string" xml:space="preserve">
     <value>Редактиране на време</value>
@@ -711,8 +711,8 @@
   <data name="Ranking_string" xml:space="preserve">
     <value>Класация</value>
   </data>
-  <data name="Are_you_sure_you_want_to_delete__string" xml:space="preserve">
-    <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
+  <data name="Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string" xml:space="preserve">
+    <value>Сигурни ли сте че искате да изтриете '{0}'? Прихванатото време ще бъде загубено</value>
   </data>
   <data name="Delete_string" xml:space="preserve">
     <value>Изтрий</value>
@@ -903,8 +903,8 @@
   <data name="Cannot_delete_default_image_string" xml:space="preserve">
     <value>Изображението по подразбиране не може да се изтрие.</value>
   </data>
-  <data name="Confirm_Delete_string" xml:space="preserve">
-    <value>Потвърди изтриване</value>
+  <data name="Confirm_action_string" xml:space="preserve">
+    <value>Потвърди действие</value>
   </data>
   <data name="Image_deleted_string" xml:space="preserve">
     <value>Изображението е изтрито.</value>
@@ -945,13 +945,13 @@
   <data name="Affected_resources_string" xml:space="preserve">
     <value>Засегнати ресурси</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Reset_Timing_string" xml:space="preserve">
     <value>Ресетни времена</value>
   </data>
   <data name="Register_string" xml:space="preserve">
     <value>Регистрация</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

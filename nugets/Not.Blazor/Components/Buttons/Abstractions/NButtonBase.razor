@@ -8,7 +8,7 @@
     Class="@Class" 
     Style="@Style" 
     StartIcon="@StartIcon" 
-    Disabled="@Disabled"
+    Disabled="@(Disabled || IsLoading)"
     IconSize="@IconSize"
     OnClick="@HandleClick"
     Size="@Size">

@@ -1,3 +1,4 @@
+using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Events;
 using NTS.Application.Core;
@@ -110,11 +111,6 @@ public class JudgeStartupEventCoordinatorTests
         public Task<IEnumerable<EnduranceEvent>> GetEvents()
         {
             return Task.FromResult(_events);
-        }
-
-        public bool IsActive(UpcomingEvent upcomingEvent)
-        {
-            return true;
         }
 
         public Task Load()

@@ -1,4 +1,5 @@
 @using MudBlazor
+@using Not.Blazor.Components.Buttons
 @using Not.Blazor.Components
 @inherits SnapshotHistoryBehind
 
@@ -12,29 +13,28 @@
 
     @for (var index = 0; index < History.Count; index++)
     {
-        var currentIndex = index;
         var group = History[index];
 
-        <MudPaper @key="currentIndex" Outlined Class="pa-2">
+        <MudPaper @key="group.Id" Outlined Class="pa-2">
 
             <MudButton Variant="Variant.Text"
                        FullWidth="true"
-                       OnClick="@(() => ToggleGroup(currentIndex))">
+                       OnClick="@(() => ToggleGroup(index))">
 
                 <MudStack Row="true"
                           Justify="Justify.SpaceBetween"
                           AlignItems="AlignItems.Center"
                           Style="width: 100%;">
 
-                    <MudText Typo="Typo.subtitle2">@group.Type</MudText>
+                    <MudText Typo="Typo.subtitle2">@GetSnapshotTypeText(group.Type)</MudText>
 
                     <MudText Typo="Typo.caption">@group.Entries.Count()</MudText>
                 </MudStack>
 
             </MudButton>
 
-            <MudCollapse Expanded="@IsExpanded(currentIndex)">
-                <MudStack Spacing="2" Class="pt-2">
+            <MudCollapse Expanded="@IsExpanded(index)">
+                <MudStack Spacing="2" Class="pt-2" AlignItems="AlignItems.Stretch">
                     @foreach (var snapshot in group.Entries)
                     {
                         <MudPaper Class="pa-2">
@@ -52,12 +52,9 @@
                         </MudPaper>
                     }
 
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               Disabled="@(!CanResend || IsResending)"
-                               OnClick="@(() => ResendGroup(currentIndex))">
-                        @Resend_string
-                    </MudButton>
+                    <NMultiButton Descriptors="@GetResendDescriptors(group)"
+                                  Disabled="@(!CanResend || IsResending)"
+                                  Color="Color.Secondary" />
                 </MudStack>
             </MudCollapse>
         </MudPaper>

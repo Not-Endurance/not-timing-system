@@ -3,7 +3,6 @@ using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Domain.Abstractions;
 using Not.Krud.Abstractions;
-using Not.Localization;
 using Not.Notify;
 
 namespace Not.Storage.REST;
@@ -46,7 +45,9 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
             Notifier?.Warn(ex.Message);
 #else
             Notifier?.Warn(
-                NStrings.Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
+                Not.Localization
+                    .NStrings
+                    .Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
             );
 #endif
         }
@@ -157,19 +158,6 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
     {
         var predicate = filter.Compile();
         return (await ReadMany()).Where(predicate);
-    }
-
-    public async Task SafeDelete(int id)
-    {
-        try
-        {
-            var url = $"{BuildUrl(id)}/safe";
-            await Client.Delete(url);
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-        }
     }
 
     public async Task Update(T item)

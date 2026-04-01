@@ -1,0 +1,45 @@
+@using WatcherSnapshot = NTS.Domain.Watcher.Snapshot
+@using Not.Blazor.Components.Buttons
+@inherits SnapshotComponentBehind
+
+<NTable Items="@Snapshots"
+        EmptyMessage="@Select_participants_to_snapshot_string"
+        Headings="@Headings">
+
+    <TrailingCell Context="item">
+        @{
+            var snapshot = (WatcherSnapshot)item;
+            var buttonStyle = "width:100px";
+        }
+
+        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+            @if (snapshot.Timestamp == null)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Info"
+                           Size="Size.Small"
+                           OnClick="@(() => CaptureSnapshot(snapshot))"
+                           Style="@buttonStyle">
+                    @Snapshot_string
+                </MudButton>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Success"
+                           Size="Size.Small"
+                           OnClick="@(() => ShowEditSnapshotDialog(snapshot))"
+                           Style="@buttonStyle">
+                    @snapshot.Timestamp
+                </MudButton>
+            }
+
+            <MudTooltip Text="@Delete_string">
+                <NIconDelete Size="Size.Small"
+                             OnClick="@(() => RemoveSnapshotOrShowDialog(snapshot))" />
+            </MudTooltip>
+        </MudStack>
+
+    </TrailingCell>
+
+</NTable>

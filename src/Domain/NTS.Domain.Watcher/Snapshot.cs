@@ -5,23 +5,17 @@ namespace NTS.Domain.Watcher;
 
 public record Snapshot : IIdentifiable
 {
-    public Snapshot(int number, Person athlete, Timestamp timestamp)
+    public Snapshot(int number, Person athlete, Timestamp? timestamp = null)
     {
         Number = number;
         Athlete = athlete;
         Timestamp = timestamp;
     }
 
-    public Snapshot(int number, Person athlete)
-    {
-        Number = number;
-        Athlete = athlete;
-    }
-
     public int Number { get; }
     public int Id => Number;
     public Person Athlete { get; }
-    public Timestamp Timestamp { get; set; } = default!;
+    public Timestamp? Timestamp { get; set; }
 
     public override string ToString()
     {

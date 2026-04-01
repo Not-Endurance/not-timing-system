@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using Not.Structures;
 using NTS.Application.Watcher;
 
-namespace NTS.Nexus.Warp.Features.Witness;
+namespace NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 
 public class PendingSnapshotsModel : IIdentifiable
 {

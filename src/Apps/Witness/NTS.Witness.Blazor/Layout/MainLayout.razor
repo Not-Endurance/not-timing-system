@@ -1,9 +1,10 @@
+@using NTS.Application
 @using NTS.Witness.Blazor.Layout.Drawer
 @using Not.Blazor.Components.Layout
 
 @inherits MainLayoutBehind
 
-<NLayout Watermark="NTS v1.0.4" MenuTitle="@Main_menu_string">
+<NLayout Watermark="@ApplicationConstants.VERSION_STRING" MenuTitle="@Main_menu_string">
 
     <Drawer>
         <NavMenu />

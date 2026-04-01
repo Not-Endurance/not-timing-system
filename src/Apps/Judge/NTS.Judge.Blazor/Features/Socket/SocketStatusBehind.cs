@@ -1,6 +1,6 @@
 using System.Timers;
 using MudBlazor;
-using Not.Application.RPC.SignalR;
+using Not.Application.RPC;
 using Not.Blazor.Components.Abstractions;
 using NTS.Application.Socket;
 

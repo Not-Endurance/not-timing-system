@@ -1,3 +1,4 @@
+using System.Globalization;
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 
@@ -6,6 +7,14 @@ namespace Not.Blazor.Components.Tables;
 public class NTableBehind : NComponentBase
 {
     protected Typo Typography { get; set; } = Typo.caption;
+    protected bool HasTrailingCell => TrailingCell is not null;
+    protected int TotalColumnCount => Headings.Length + (HasTrailingCell ? 1 : 0);
+    protected string StretchColumnStyle =>
+        Headings.Length == 0
+            ? string.Empty
+            : $"width: {(100d / Headings.Length).ToString("0.###############", CultureInfo.InvariantCulture)}%;";
+    protected string TrailingColumnStyle => "width: 1%;";
+    protected string TrailingCellStyle => "width: 1%; white-space: nowrap;";
 
     [Parameter]
     public bool FixedHeader { get; set; }

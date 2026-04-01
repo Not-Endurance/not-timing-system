@@ -1,5 +1,5 @@
+using Not.Application.RPC;
 using Not.Application.RPC.Clients;
-using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Tests.RPC;
 using NTS.Domain.Core.Objects.Payloads;
@@ -15,6 +15,13 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
 
     public int Id { get; }
     public List<string> InvokedMethods { get; } = [];
+
+    protected override void RegisterProcedures()
+    {
+        RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
+        RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
+        RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
+    }
 
     public void Dispose()
     {
@@ -38,12 +45,5 @@ public class WitnessTestClient : RpcClient, IWitnessClientProcedures, ITestRpcCl
     {
         InvokedMethods.Add(nameof(OnPhaseCompleted));
         return Task.CompletedTask;
-    }
-
-    protected override void RegisterProcedures()
-    {
-        RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
-        RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
-        RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
     }
 }

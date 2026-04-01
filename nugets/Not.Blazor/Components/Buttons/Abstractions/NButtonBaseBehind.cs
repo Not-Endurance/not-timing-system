@@ -44,6 +44,10 @@ public abstract class NButtonBaseBehind : NComponentBase
     {
         try
         {
+            if (IsLoading)
+            {
+                return;
+            }
             IsLoading = true;
             if (OnClick.HasDelegate)
             {

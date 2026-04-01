@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.CRUD.Ports;
-using Not.Application.RPC.SignalR;
+using Not.Application.RPC;
 using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;

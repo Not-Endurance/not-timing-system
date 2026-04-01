@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
+using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Domain.Abstractions;
 using NTS.Application.Socket;

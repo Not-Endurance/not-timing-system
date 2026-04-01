@@ -2,38 +2,6 @@
 
 public record TimeInterval : IComparable<TimeInterval>
 {
-    public static implicit operator TimeSpan?(TimeInterval? interval)
-    {
-        return interval?.ToTimeSpan();
-    }
-
-    public static TimeInterval? operator +(TimeInterval? one, TimeInterval? two)
-    {
-        if (one == null || two == null)
-        {
-            return null;
-        }
-        return new TimeInterval(one!._interval + two!._interval);
-    }
-
-    public static TimeInterval? operator -(TimeInterval? one, TimeInterval? two)
-    {
-        if (one == null || two == null)
-        {
-            return null;
-        }
-        return new TimeInterval(one!._interval - two!._interval);
-    }
-
-    public static Speed? operator /(double num, TimeInterval? interval)
-    {
-        if (interval == null)
-        {
-            return null;
-        }
-        return new Speed(num, interval.ToTotalHours());
-    }
-
     TimeInterval() { }
 
     public TimeInterval(TimeSpan timeSpan)
@@ -65,5 +33,37 @@ public record TimeInterval : IComparable<TimeInterval>
     public int CompareTo(TimeInterval? other)
     {
         return _interval.CompareTo(other?._interval);
+    }
+
+    public static implicit operator TimeSpan?(TimeInterval? interval)
+    {
+        return interval?.ToTimeSpan();
+    }
+
+    public static TimeInterval? operator +(TimeInterval? one, TimeInterval? two)
+    {
+        if (one == null || two == null)
+        {
+            return null;
+        }
+        return new TimeInterval(one!._interval + two!._interval);
+    }
+
+    public static TimeInterval? operator -(TimeInterval? one, TimeInterval? two)
+    {
+        if (one == null || two == null)
+        {
+            return null;
+        }
+        return new TimeInterval(one!._interval - two!._interval);
+    }
+
+    public static Speed? operator /(double num, TimeInterval? interval)
+    {
+        if (interval == null)
+        {
+            return null;
+        }
+        return new Speed(num, interval.ToTotalHours());
     }
 }

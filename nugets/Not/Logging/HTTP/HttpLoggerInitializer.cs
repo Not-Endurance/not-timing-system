@@ -14,7 +14,7 @@ public class HttpLoggerInitializer : IStartupInitializer
 
     public void RunAtStartup()
     {
-        LoggingHelper.Validate();
+        LoggingHelper.PreventDuplicateRegistration();
 
         // TODO: this has to be reworked to accept a hostResolutionTask and await it in the background
         // otherwise Host will always be null

@@ -10,13 +10,6 @@ COPY /src /nexus/src
 COPY /nugets /nexus/nugets
 COPY .editorconfig /nexus/.editorconfig
 
-WORKDIR /nexus
-
-# Remove local-source
-RUN dotnet nuget remove source "local-cache" --configfile src/NuGet.config
-# Remove analyzers dll reference
-RUN rm -f ./src/Directory.Build.props
-
 WORKDIR /nexus/src/Apps/Nexus/NTS.Nexus.HTTP
 
 # 2. Restore + Build

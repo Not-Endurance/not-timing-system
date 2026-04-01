@@ -1,7 +1,7 @@
 using Not.Injection;
 using NTS.Application.Watcher;
 
-namespace NTS.Nexus.Warp.Features.Witness;
+namespace NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 
 public interface IPendingSnapshotsService
 {

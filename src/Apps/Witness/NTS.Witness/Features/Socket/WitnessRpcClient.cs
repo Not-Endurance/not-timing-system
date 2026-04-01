@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using Not.Application.DomainEvents;
+using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Exceptions;

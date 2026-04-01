@@ -6,16 +6,6 @@ namespace Not.Domain;
 
 public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity>
 {
-    public static bool operator ==(Entity? left, Entity? right)
-    {
-        return left?.Equals(right) ?? right is null;
-    }
-
-    public static bool operator !=(Entity? left, Entity? right)
-    {
-        return !(left == right);
-    }
-
     /// <summary>
     /// Provide <paramref name="id"/> when updating state null to generate it
     /// </summary>
@@ -61,5 +51,15 @@ public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity
             return false;
         }
         return ObjectHelper.AreEqual(this, other);
+    }
+
+    public static bool operator ==(Entity? left, Entity? right)
+    {
+        return left?.Equals(right) ?? right is null;
+    }
+
+    public static bool operator !=(Entity? left, Entity? right)
+    {
+        return !(left == right);
     }
 }

@@ -10,6 +10,7 @@ using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 
@@ -96,7 +97,20 @@ public class SnapshotService
         EmitChanged();
     }
 
-    public async Task<bool> Publish(string snapshotType)
+    public void RemoveSnapshot(Snapshot snapshot)
+    {
+        GuardHelper.ThrowIfDefault(snapshot);
+
+        if (_snapshots.All(x => x.Number != snapshot.Number))
+        {
+            return;
+        }
+
+        FlushSnapshots([snapshot.Number]);
+        EmitChanged();
+    }
+
+    public async Task<bool> Publish(SnapshotType snapshotType)
     {
         var readySnapshots = _snapshots.Where(x => x.Timestamp != null).ToList();
         if (readySnapshots.Count == 0)
@@ -114,10 +128,11 @@ public class SnapshotService
         return true;
     }
 
-    public async Task RePublish(SnapshotGroup snapshotGroup)
+    public async Task RePublish(SnapshotGroup snapshotGroup, SnapshotType snapshotType)
     {
         GuardHelper.ThrowIfDefault(snapshotGroup);
-        await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroup);
+        var snapshotGroupToPublish = new SnapshotGroup(snapshotGroup.Entries, snapshotType);
+        await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroupToPublish);
     }
 
     public void UpdateSnapshotTimestamp(Snapshot snapshot, Timestamp timestamp)
