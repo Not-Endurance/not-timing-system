@@ -1,7 +1,17 @@
 
 @inherits NTableBehind
 
-<MudSimpleTable Class="@Class" Style="@($"overflow-x: auto; {Style}")" FixedHeader="FixedHeader">
+<MudSimpleTable Class="@CombineClass("n-table")" Style="@($"overflow-x: auto; {Style}")" FixedHeader="FixedHeader">
+    <colgroup>
+        @foreach (var _ in Headings)
+        {
+            <col style="@StretchColumnStyle" />
+        }
+        @if (HasTrailingCell)
+        {
+            <col style="@TrailingColumnStyle" />
+        }
+    </colgroup>
     <thead>
         <tr>
             @foreach (var heading in Headings)
@@ -10,31 +20,44 @@
                     <MudText Typo="@Typography">@heading</MudText>
                 </th>
             }
+            @if (HasTrailingCell)
+            {
+                <th style="@TrailingCellStyle">
+                    <MudText Typo="@Typography">-</MudText>
+                </th>
+            }
         </tr>
     </thead>
     <tbody>
-        @if(Items.Count() == 0)
-        {
-            <MudPaper Elevation="0" Class="pa-4">
-                <MudText Typo="@Typography">@EmptyMessage</MudText>
-            </MudPaper>
-        }
-        @foreach (var item in Items)
+        @if (!Items.Any())
         {
             <tr>
-                @foreach (var value in Transform(item))
-                {
-                    <td>
-                        <MudText Typo="@Typography">@value</MudText>
-                    </td>
-                }
-                @if (TrailingCell != default)
-                {
-                    <td>
-                        @TrailingCell.Invoke(item)
-                    </td>
-                }                   
+                <td colspan="@TotalColumnCount">
+                    <MudPaper Elevation="0" Class="pa-4">
+                        <MudText Typo="@Typography">@EmptyMessage</MudText>
+                    </MudPaper>
+                </td>
             </tr>
+        }
+        else
+        {
+            @foreach (var item in Items)
+            {
+                <tr>
+                    @foreach (var value in Transform(item))
+                    {
+                        <td>
+                            <MudText Typo="@Typography">@value</MudText>
+                        </td>
+                    }
+                    @if (HasTrailingCell)
+                    {
+                        <td style="@TrailingCellStyle">
+                            @TrailingCell!.Invoke(item)
+                        </td>
+                    }
+                </tr>
+            }
         }
     </tbody>
 </MudSimpleTable>

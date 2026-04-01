@@ -649,7 +649,7 @@
     <value>Send {0} snapshots to Judge as</value>
   </data>
   <data name="Select_participants_to_snapshot_string" xml:space="preserve">
-    <value>Select participants to take snapshots</value>
+    <value>Select participants to capture time snapshots</value>
   </data>
   <data name="Edit_timestamp_string" xml:space="preserve">
     <value>Edit Timestamp</value>

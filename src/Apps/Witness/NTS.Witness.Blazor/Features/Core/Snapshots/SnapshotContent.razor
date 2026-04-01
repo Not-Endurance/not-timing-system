@@ -1,3 +1,4 @@
+@using NTS.Blazor.Components.ParticipationChips
 @using NTS.Witness.Blazor.Features.Core.Snapshots.Components
 @using Not.Blazor.Components.Buttons
 @using Not.Blazor.Components.Layout
@@ -12,8 +13,8 @@
 
             <SnapshotComponent Snapshots="@Snapshots" />
 
-            <SnapshotChips Participations="@Participations"
-                           SelectedChanged="@MoveToSnapshot" />
+            <ParticipationChips Participations="@Participations"
+                                SelectedChanged="@MoveToSnapshot" />
 
         </MudStack>
     </Main>
