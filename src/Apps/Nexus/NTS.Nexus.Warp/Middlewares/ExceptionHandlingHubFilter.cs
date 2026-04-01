@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using Not.Notify;
+using NTS.Nexus.Warp.ConnectionDiagnostics;
 
 namespace NTS.Nexus.Warp.Middlewares;
 

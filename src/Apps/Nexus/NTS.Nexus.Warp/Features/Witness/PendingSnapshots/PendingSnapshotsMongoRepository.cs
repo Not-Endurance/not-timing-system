@@ -3,7 +3,7 @@ using Not.Storage.Mongo;
 using NTS.Application.Watcher;
 using System.Diagnostics;
 
-namespace NTS.Nexus.Warp.Features.Witness;
+namespace NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 
 public interface IPendingSnapshotsRepository
 {
@@ -16,6 +16,7 @@ public class PendingSnapshotsMongoRepository : MongoRepository<PendingSnapshotsM
 {
     const string DATABASE = "nts";
     const string COLLECTION = "pendingSnapshots";
+
     readonly ILogger<PendingSnapshotsMongoRepository> _logger;
 
     public PendingSnapshotsMongoRepository(

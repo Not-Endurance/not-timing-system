@@ -1,13 +1,13 @@
 using Not.Application.RPC;
 using NTS.Application;
 
-namespace NTS.Nexus.Warp;
+namespace NTS.Nexus.Warp.ConnectionDiagnostics;
 
 internal static class WarpConnectionDiagnostics
 {
-    static readonly PathString JudgeHubPath = new($"/{ApplicationConstants.JUDGE_HUB}");
-    static readonly PathString WitnessHubPath = new($"/{ApplicationConstants.WITNESS_HUB}");
-    const string UnknownInstance = "local";
+    const string UNKNOWN_INSTANCE = "local";
+    static readonly PathString JUDGE_HUB_PATH = new($"/{ApplicationConstants.JUDGE_HUB}");
+    static readonly PathString WITNESS_HUB_PATH = new($"/{ApplicationConstants.WITNESS_HUB}");
 
     public static bool TryDescribeTransportRequest(HttpContext context, out string requestKind, out string hubPath)
     {
@@ -58,7 +58,7 @@ internal static class WarpConnectionDiagnostics
 
     public static string GetInstanceId()
     {
-        return Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? UnknownInstance;
+        return Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? UNKNOWN_INSTANCE;
     }
 
     public static string? GetForwardedProto(HttpContext context)
@@ -76,16 +76,16 @@ internal static class WarpConnectionDiagnostics
         hubPath = string.Empty;
         remainingPath = string.Empty;
 
-        if (requestPath.StartsWithSegments(JudgeHubPath, out var judgeRemainingPath))
+        if (requestPath.StartsWithSegments(JUDGE_HUB_PATH, out var judgeRemainingPath))
         {
-            hubPath = JudgeHubPath.Value!;
+            hubPath = JUDGE_HUB_PATH.Value!;
             remainingPath = judgeRemainingPath.Value ?? string.Empty;
             return true;
         }
 
-        if (requestPath.StartsWithSegments(WitnessHubPath, out var witnessRemainingPath))
+        if (requestPath.StartsWithSegments(WITNESS_HUB_PATH, out var witnessRemainingPath))
         {
-            hubPath = WitnessHubPath.Value!;
+            hubPath = WITNESS_HUB_PATH.Value!;
             remainingPath = witnessRemainingPath.Value ?? string.Empty;
             return true;
         }

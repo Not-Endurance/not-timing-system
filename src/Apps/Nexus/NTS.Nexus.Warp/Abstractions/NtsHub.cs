@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.SignalR;
 using Not.Application.RPC;
+using NTS.Nexus.Warp.ConnectionDiagnostics;
 using System.Diagnostics;
 
-namespace NTS.Nexus.Warp;
+namespace NTS.Nexus.Warp.Abstractions;
 
-public class NtsHub<T> : Hub<T>
+public abstract class NtsHub<T> : Hub<T>
     where T : class
 {
     readonly ILogger<NtsHub<T>> _logger;

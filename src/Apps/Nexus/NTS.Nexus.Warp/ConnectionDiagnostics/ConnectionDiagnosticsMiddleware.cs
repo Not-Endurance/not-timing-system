@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace NTS.Nexus.Warp;
+namespace NTS.Nexus.Warp.ConnectionDiagnostics;
 
 internal sealed class ConnectionDiagnosticsMiddleware
 {
@@ -33,7 +33,10 @@ internal sealed class ConnectionDiagnosticsMiddleware
         {
             stopwatch.Stop();
             _logger.LogInformation(
-                "Warp transport request {RequestKind} for {HubPath} completed with {StatusCode} in {ElapsedMilliseconds} ms. CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, Method {Method}, Origin {Origin}, Upgrade {Upgrade}, ForwardedProto {ForwardedProto}, ForwardedHost {ForwardedHost}, ArrLogId {ArrLogId}, InstanceId {InstanceId}.",
+                "Warp transport request {RequestKind} for {HubPath} completed with {StatusCode} in {ElapsedMilliseconds} ms. "
+                + "CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, Method {Method}, "
+                + "Origin {Origin}, Upgrade {Upgrade}, ForwardedProto {ForwardedProto}, "
+                + "ForwardedHost {ForwardedHost}, ArrLogId {ArrLogId}, InstanceId {InstanceId}.",
                 requestKind,
                 hubPath,
                 context.Response.StatusCode,

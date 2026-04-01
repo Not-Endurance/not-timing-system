@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.SignalR;
 using NTS.Application.Watcher;
+using NTS.Nexus.Warp.Abstractions;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 using NTS.Nexus.Warp.Features.Judge;
 using NTS.Nexus.Warp.Features.Witness.Authorization;
+using NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 
 namespace NTS.Nexus.Warp.Features.Witness;
 

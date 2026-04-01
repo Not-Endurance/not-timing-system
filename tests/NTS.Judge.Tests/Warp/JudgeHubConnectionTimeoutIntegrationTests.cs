@@ -12,7 +12,7 @@ using NTS.Application;
 using NTS.Application.Watcher;
 using NTS.Nexus.Warp.Features;
 using NTS.Nexus.Warp.Features.Judge;
-using NTS.Nexus.Warp.Features.Witness;
+using NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 
 namespace NTS.Judge.Tests.Warp;
 
