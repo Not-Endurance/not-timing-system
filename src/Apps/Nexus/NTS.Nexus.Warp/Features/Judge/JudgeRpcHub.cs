@@ -5,6 +5,7 @@ using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 using NTS.Nexus.Warp.Features.Witness;
+using System.Diagnostics;
 
 namespace NTS.Nexus.Warp.Features.Judge;
 
@@ -31,10 +32,19 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     public override async Task OnConnectedAsync()
     {
+        var stopwatch = Stopwatch.StartNew();
         await base.OnConnectedAsync();
         var enduranceEventId = GetConnectionGroup()!;
         _primaryConnections.Add(enduranceEventId, Context.ConnectionId);
         await FlushPendingSnapshots(enduranceEventId);
+        stopwatch.Stop();
+        _logger.LogInformation(
+            "Judge hub OnConnectedAsync finished in {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, EventId {EnduranceEventId}.",
+            stopwatch.ElapsedMilliseconds,
+            Context.ConnectionId,
+            WarpConnectionDiagnostics.GetCorrelationId(Context.GetHttpContext()),
+            enduranceEventId
+        );
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -75,13 +85,39 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
 
     async Task FlushPendingSnapshots(string enduranceEventId)
     {
+        var correlationId = WarpConnectionDiagnostics.GetCorrelationId(Context.GetHttpContext());
+        var stopwatch = Stopwatch.StartNew();
+        _logger.LogInformation(
+            "Judge pending snapshot flush started. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, EventId {EnduranceEventId}.",
+            Context.ConnectionId,
+            correlationId,
+            enduranceEventId
+        );
+
         var pendingDocuments = await _pendingSnapshots.Read(enduranceEventId);
+        var pendingSnapshotCount = pendingDocuments.Sum(x => x.SnapshotGroups.Length);
         if (pendingDocuments.Count == 0)
         {
+            stopwatch.Stop();
+            _logger.LogInformation(
+                "Judge pending snapshot flush completed in {ElapsedMilliseconds} ms with no persisted snapshots. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, EventId {EnduranceEventId}.",
+                stopwatch.ElapsedMilliseconds,
+                Context.ConnectionId,
+                correlationId,
+                enduranceEventId
+            );
             return;
         }
 
-        var pendingSnapshotCount = pendingDocuments.Sum(x => x.SnapshotGroups.Length);
+        _logger.LogInformation(
+            "Judge pending snapshot flush loaded {PendingDocumentCount} documents and {PendingSnapshotCount} snapshot groups. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, EventId {EnduranceEventId}.",
+            pendingDocuments.Count,
+            pendingSnapshotCount,
+            Context.ConnectionId,
+            correlationId,
+            enduranceEventId
+        );
+
         try
         {
             foreach (var pendingDocument in pendingDocuments)
@@ -92,14 +128,28 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
                 }
                 await _pendingSnapshots.Remove(pendingDocument);
             }
+
+            stopwatch.Stop();
+            _logger.LogInformation(
+                "Judge pending snapshot flush completed in {ElapsedMilliseconds} ms. Flushed {PendingSnapshotCount} snapshot groups for event {EnduranceEventId}. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}.",
+                stopwatch.ElapsedMilliseconds,
+                pendingSnapshotCount,
+                enduranceEventId,
+                Context.ConnectionId,
+                correlationId
+            );
         }
         catch (Exception ex)
         {
+            stopwatch.Stop();
             _logger.LogWarning(
                 ex,
-                "Failed to flush {count} pending witness snapshots for event '{enduranceEventId}'. Keeping them persisted.",
+                "Failed to flush {count} pending witness snapshots for event '{enduranceEventId}' after {ElapsedMilliseconds} ms. Keeping them persisted. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}.",
                 pendingSnapshotCount,
-                enduranceEventId
+                enduranceEventId,
+                stopwatch.ElapsedMilliseconds,
+                Context.ConnectionId,
+                correlationId
             );
         }
     }

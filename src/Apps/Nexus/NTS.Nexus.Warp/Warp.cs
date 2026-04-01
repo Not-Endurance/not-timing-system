@@ -19,14 +19,25 @@ public static class Warp
 
     public static void Start(WebApplication app, string port)
     {
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        Console.WriteLine(@$"******* WARP: Starting in '{environment}' environment *******");
+        var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("NTS.Nexus.Warp.Startup");
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? app.Environment.EnvironmentName;
 
         var judgeHubPath = new PathString($"/{ApplicationConstants.JUDGE_HUB}");
         var witnessHubPath = new PathString($"/{ApplicationConstants.WITNESS_HUB}");
         var originValidator = app.Services.GetRequiredService<ICorsOriginValidator>();
 
         app.Urls.Add($"http://*:{port}");
+        logger.LogInformation(
+            "Warp starting in {Environment}. InstanceId {InstanceId}, Port {Port}, JudgeHub {JudgeHub}, WitnessHub {WitnessHub}, Urls {Urls}.",
+            environment,
+            WarpConnectionDiagnostics.GetInstanceId(),
+            port,
+            judgeHubPath.Value,
+            witnessHubPath.Value,
+            string.Join(", ", app.Urls)
+        );
+
+        app.UseMiddleware<ConnectionDiagnosticsMiddleware>();
         app.Use(
             async (context, next) =>
             {
@@ -42,6 +53,15 @@ public static class Warp
                     var origin = context.Request.Headers.Origin.ToString();
                     if (!string.IsNullOrWhiteSpace(origin) && !originValidator.IsAllowed(origin))
                     {
+                        logger.LogWarning(
+                            "Warp rejected WebSocket request for {Path} because origin {Origin} is not allowed. CorrelationId {CorrelationId}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
+                            context.Request.Path,
+                            origin,
+                            WarpConnectionDiagnostics.GetCorrelationId(context),
+                            WarpConnectionDiagnostics.GetClientName(context),
+                            WarpConnectionDiagnostics.GetClientVersion(context),
+                            WarpConnectionDiagnostics.GetInstanceId()
+                        );
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
                         return;
                     }
@@ -55,6 +75,20 @@ public static class Warp
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.MapGet(
+            "/healthz",
+            () =>
+                Results.Ok(
+                    new
+                    {
+                        status = "ok",
+                        environment,
+                        instanceId = WarpConnectionDiagnostics.GetInstanceId(),
+                        judgeHub = judgeHubPath.Value,
+                        witnessHub = witnessHubPath.Value,
+                    }
+                )
+        );
         app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
         app.MapHub<WitnessRpcHub>(ApplicationConstants.WITNESS_HUB).RequireCors(NtsWarpServices.CORS_POLICY_NAME);
 
