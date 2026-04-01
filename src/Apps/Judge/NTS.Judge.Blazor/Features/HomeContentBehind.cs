@@ -11,7 +11,7 @@ using NTS.Judge.Features.Core;
 
 namespace NTS.Judge.Blazor.Features;
 
-public class UpcomingEventsListBehind : NStatefulComponent
+public class HomeContentBehind : NStatefulComponent
 {
     [Inject]
     protected IDialogService DialogService { get; set; } = default!;

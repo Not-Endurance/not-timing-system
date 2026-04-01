@@ -89,7 +89,7 @@ public class UpcomingEventsListBehindTests
         );
     }
 
-    sealed class TestUpcomingEventsListBehind : UpcomingEventsListBehind
+    sealed class TestUpcomingEventsListBehind : HomeContentBehind
     {
         public IDashService Service
         {
