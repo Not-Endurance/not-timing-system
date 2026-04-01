@@ -7,22 +7,20 @@ public class SnapshotGroup : IIdentifiable
 {
     static int _nextId;
 
-    public SnapshotGroup(IEnumerable<Snapshot> snapshots, string type)
+    public SnapshotGroup(IEnumerable<Snapshot> snapshots, SnapshotType type)
     {
         Id = Interlocked.Increment(ref _nextId);
-        Entries = snapshots;
-        if (Enum.TryParse(type, out SnapshotType snapshotType))
-        {
-            Type = snapshotType;
-        }
-        else
-        {
-            Type = type == Arrival_string ? SnapshotType.Arrive : SnapshotType.Present;
-        }
+        Entries = FilterEmptyTimestamps(snapshots);
+        Type = type;
     }
 
     public int Id { get; }
     public IEnumerable<Snapshot> Entries { get; set; } = [];
 
     public SnapshotType Type { get; set; }
+
+    IEnumerable<Snapshot> FilterEmptyTimestamps(IEnumerable<Snapshot> snapshots)
+    {
+        return snapshots.Where(x => x.Timestamp != null).ToList();
+    }
 }

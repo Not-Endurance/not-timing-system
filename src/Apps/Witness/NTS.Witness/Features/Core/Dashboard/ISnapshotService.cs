@@ -17,5 +17,6 @@ public interface ISnapshotService : IStatefulService
     Task RePublish(SnapshotGroup snapshotGroup, SnapshotType snapshotType);
     void CaptureSnapshot(Snapshot snapshot);
     void MoveToSnapshot(Participation participation);
+    void RemoveSnapshot(Snapshot snapshot);
     void UpdateSnapshotTimestamp(Snapshot snapshot, Timestamp timestamp);
 }

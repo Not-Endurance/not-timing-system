@@ -97,6 +97,19 @@ public class SnapshotService
         EmitChanged();
     }
 
+    public void RemoveSnapshot(Snapshot snapshot)
+    {
+        GuardHelper.ThrowIfDefault(snapshot);
+
+        if (_snapshots.All(x => x.Number != snapshot.Number))
+        {
+            return;
+        }
+
+        FlushSnapshots([snapshot.Number]);
+        EmitChanged();
+    }
+
     public async Task<bool> Publish(SnapshotType snapshotType)
     {
         var readySnapshots = _snapshots.Where(x => x.Timestamp != null).ToList();
@@ -105,7 +118,7 @@ public class SnapshotService
             return false;
         }
 
-        var snapshotGroup = new SnapshotGroup(readySnapshots, snapshotType.ToString());
+        var snapshotGroup = new SnapshotGroup(readySnapshots, snapshotType);
         await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroup);
         await _userSessionService.AppendSnapshot(snapshotGroup);
 
@@ -118,7 +131,7 @@ public class SnapshotService
     public async Task RePublish(SnapshotGroup snapshotGroup, SnapshotType snapshotType)
     {
         GuardHelper.ThrowIfDefault(snapshotGroup);
-        var snapshotGroupToPublish = new SnapshotGroup(snapshotGroup.Entries, snapshotType.ToString());
+        var snapshotGroupToPublish = new SnapshotGroup(snapshotGroup.Entries, snapshotType);
         await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroupToPublish);
     }
 

@@ -10,12 +10,7 @@
     <Main>
         <MudStack Spacing="4">
 
-            <Snapshot Snapshots="@Snapshots"
-                      EmptyMessage="@Empty_intermediate_snapshot_list_string"
-                      Headings="@SnapshotTableHeaders"
-                      SnapshotText="@Snapshot_string"
-                      OnCapture="@SnapshotHandler"
-                      OnEdit="@EditSnapshot" />
+            <SnapshotComponent Snapshots="@Snapshots" />
 
             <SnapshotChips Participations="@Participations"
                            SelectedChanged="@MoveToSnapshot" />
@@ -29,7 +24,7 @@
 
     <Rightbar>
         <NMultiButton Descriptors="@PublishDescriptors"
-                      Disabled="@(!HasReadySnapshots || IsPublishing)"
+                      Disabled="CapturedSnapshotsCount == 0"
                       MaxWidth />
     </Rightbar>
 

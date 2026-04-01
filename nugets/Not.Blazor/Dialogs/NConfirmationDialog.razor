@@ -1,0 +1,14 @@
+@using Not.Blazor.Components.Buttons
+@inherits NConfirmationDialogBehind
+
+<MudDialog >
+    <DialogContent>
+        <MudText Typo="Typo.body1">@Description</MudText>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonDanger Text="@Yes_string" OnClick="ConfirmDialog" />
+
+        <NButtonCancel OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

@@ -8,6 +8,7 @@ using NTS.Application.Watcher;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
+using NTS.Domain.Objects;
 using NTS.Judge.Features.Core.Dashboard;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
@@ -39,12 +40,13 @@ public class JudgeRpcClient
         RegisterInputProcedure<SnapshotGroupModel>(nameof(Receive), Receive);
     }
 
-    public async Task Receive(SnapshotGroupModel snapshotGroup)
+    public async Task Receive(SnapshotGroupModel snapshots)
     {
-        var group = snapshotGroup.MapToDomain();
-        foreach (var entry in group.Entries)
+        foreach (var watcherSnapshot in snapshots.Entries.Where(x => x.Timestamp != null))
         {
-            await _timingService.Record(new Snapshot(entry.Number, group.Type, SnapshotMethod.Manual, entry.Timestamp));
+            var stamp = new Timestamp(watcherSnapshot.Timestamp!);
+            var snapshot = new Snapshot(watcherSnapshot.Number, snapshots.Type, SnapshotMethod.Manual, stamp);
+            await _timingService.Record(snapshot);
         }
     }
 

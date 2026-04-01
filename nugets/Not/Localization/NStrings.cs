@@ -30,8 +30,8 @@ public static class NStrings
     public static string Field_is_required_string => LocalizeString(nameof(Field_is_required_string));
     public static string List_is_empty_string => LocalizeString(nameof(List_is_empty_string));
     public static string Add_string => LocalizeString(nameof(Add_string));
-    public static string Are_you_sure_you_want_to_delete__string =>
-        LocalizeString(nameof(Are_you_sure_you_want_to_delete__string));
+    public static string Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string =>
+        LocalizeString(nameof(Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string));
     public static string Cascading_delete_confirmation_prefix_string =>
         LocalizeString(nameof(Cascading_delete_confirmation_prefix_string));
     public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));
@@ -54,6 +54,8 @@ public static class NStrings
     public static string Sign_in_to_continue_string => LocalizeString(nameof(Sign_in_to_continue_string));
     public static string Sign_in_with_Microsoft_string => LocalizeString(nameof(Sign_in_with_Microsoft_string));
     public static string Register_string => LocalizeString(nameof(Register_string));
+    public static string Confirm_action_string => LocalizeString(nameof(Confirm_action_string));
+
 }
 #pragma warning restore NA0004
 #pragma warning restore IDE1006

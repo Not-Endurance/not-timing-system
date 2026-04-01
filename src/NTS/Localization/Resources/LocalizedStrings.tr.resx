@@ -631,7 +631,7 @@
   <data name="Send_snapshot_string" xml:space="preserve">
     <value />
   </data>
-  <data name="Empty_intermediate_snapshot_list_string" xml:space="preserve">
+  <data name="Select_participants_to_snapshot_string" xml:space="preserve">
     <value />
   </data>
   <data name="Edit_timestamp_string" xml:space="preserve">
@@ -673,11 +673,11 @@
   <data name="Access_denied_next_steps" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
-    <value>'{0}' etkinliğine bağlanmak mevcut anlık görüntü geçmişinizi silecektir. Bu işlem geri alınamaz.</value>
-  </data>
   <data name="Connect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
+  </data>
+  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
+    <value>'{0}' etkinliğine bağlanmak mevcut anlık görüntü geçmişinizi silecektir. Bu işlem geri alınamaz.</value>
   </data>
   <data name="Disconnect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
@@ -712,6 +712,9 @@
   <data name="Empty_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="Resend_string" xml:space="preserve">
+    <value>Yeniden gonder</value>
+  </data>
   <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
     <value>Başlatılamıyor - Geçersiz yapılandırma.</value>
   </data>
@@ -741,9 +744,6 @@
   </data>
   <data name="Affected_resources_string" xml:space="preserve">
     <value>Etkilenen kaynaklar</value>
-  </data>
-  <data name="Resend_string" xml:space="preserve">
-    <value>Yeniden gonder</value>
   </data>
   <data name="Register_string" xml:space="preserve">
     <value>Kaydol</value>

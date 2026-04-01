@@ -1,6 +1,7 @@
 using Not.Application.Authentication.User;
 using Not.Krud.Abstractions;
 using NTS.Application.Shared;
+using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 
@@ -14,18 +15,18 @@ public class SnapshotModel
         {
             Number = snapshot.Number,
             Names = snapshot.Athlete.Names,
-            Timestamp = snapshot.Timestamp.ToString(),
+            Timestamp = snapshot.Timestamp?.ToString(),
         };
     }
 
     public int Number { get; set; }
     public string[] Names { get; set; } = [];
-    public string Timestamp { get; set; } = "";
+    public string? Timestamp { get; set; } = "";
 
     public Snapshot MapToDomain()
     {
         var athlete = new Person(Names);
-        var timestamp = new Timestamp(Timestamp);
+        var timestamp = Timestamp == null ? null : new Timestamp(Timestamp);
         return new Snapshot(Number, athlete, timestamp);
     }
 
@@ -47,12 +48,12 @@ public class SnapshotGroupModel
         return new SnapshotGroupModel
         {
             Entries = group.Entries.AsEnumerable().Select(SnapshotModel.MapFrom).ToArray(),
-            Type = group.Type.ToString(),
+            Type = group.Type,
         };
     }
 
     public SnapshotModel[] Entries { get; set; } = [];
-    public string Type { get; set; } = "";
+    public SnapshotType Type { get; set; }
 
     public SnapshotGroup MapToDomain()
     {
