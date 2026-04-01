@@ -112,8 +112,6 @@ public class ExceptionHandlingHubFilterTests
         }
     }
 
-    sealed record LogEntry(LogLevel LogLevel, string Message, Exception? Exception);
-
     sealed class NullScope : IDisposable
     {
         public static NullScope Instance { get; } = new();
@@ -148,4 +146,6 @@ public class ExceptionHandlingHubFilterTests
             return Task.CompletedTask;
         }
     }
+
+    sealed record LogEntry(LogLevel LogLevel, string Message, Exception? Exception);
 }

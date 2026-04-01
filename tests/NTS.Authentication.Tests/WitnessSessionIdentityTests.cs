@@ -256,6 +256,20 @@ public class WitnessSessionIdentityTests
         return session;
     }
 
+    static SnapshotGroup CreateSnapshotGroup(int number, SnapshotType type)
+    {
+        return new SnapshotGroup(
+            [
+                new NTS.Domain.Watcher.Snapshot(
+                    number,
+                    new Person(["Test", "Rider"]),
+                    new Timestamp(DateTimeOffset.UtcNow)
+                ),
+            ],
+            type
+        );
+    }
+
     sealed class StaticAuthenticationStateProvider : AuthenticationStateProvider
     {
         readonly AuthenticationState _state;
@@ -306,20 +320,6 @@ public class WitnessSessionIdentityTests
         }
     }
 
-    static SnapshotGroup CreateSnapshotGroup(int number, SnapshotType type)
-    {
-        return new SnapshotGroup(
-            [
-                new NTS.Domain.Watcher.Snapshot(
-                    number,
-                    new Person(["Test", "Rider"]),
-                    new Timestamp(DateTimeOffset.UtcNow)
-                ),
-            ],
-            type
-        );
-    }
-
     sealed class RecordingUserSessionRepository
         : INtsUserSessionRepository,
             INUserSessionRepository<NtsUserSessionStateModel>
@@ -343,14 +343,6 @@ public class WitnessSessionIdentityTests
         {
             ReadByUserIdentifierDocumentCalls++;
             return Task.FromResult(ReadByUserIdentifierResult);
-        }
-
-        Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(
-            string userIdentifier
-        )
-        {
-            ReadByUserIdentifierStateCalls++;
-            return Task.FromResult(ReadByUserIdentifierResult?.State?.Copy());
         }
 
         public Task<NtsUserSessionModel?> Read(int id)
@@ -394,6 +386,14 @@ public class WitnessSessionIdentityTests
         public Task Delete(Expression<Func<NtsUserSessionModel, bool>> filter)
         {
             return Task.CompletedTask;
+        }
+
+        Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(
+            string userIdentifier
+        )
+        {
+            ReadByUserIdentifierStateCalls++;
+            return Task.FromResult(ReadByUserIdentifierResult?.State?.Copy());
         }
     }
 }

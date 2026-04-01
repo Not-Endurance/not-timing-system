@@ -77,7 +77,7 @@
       <DependentUpon>appsettings.json</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-
+  
   <ItemGroup>
     <MauiXaml Update="SplashPage.xaml">
       <Generator>MSBuild:Compile</Generator>

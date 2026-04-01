@@ -9,11 +9,6 @@ namespace NTS.Application.Core;
 public class EnduranceEventService : NStatefulService, IActiveEventsContext, IEnduranceEventService
 {
     readonly IRepository<EnduranceEvent> _enduranceEvents;
-
-    // TODO: Create and consume ICache<EnduranceEvent> with TTL and invalidate method.
-    // Where should this cache live? Probably shared as it might be useful in both app and UI layers
-    // But usege of the cache should be explicit so that we know that item is cached and has to be invalidated
-    // When values are manipulated. Consumers shouldn't care or know how the cache is repopulated.
     List<EnduranceEvent> _activeEvents = [];
 
     public EnduranceEventService(IRepository<EnduranceEvent> enduranceEvents)
@@ -37,6 +32,10 @@ public class EnduranceEventService : NStatefulService, IActiveEventsContext, IEn
         return _activeEvents.Any(x => x.Id == upcomingEvent.Id);
     }
 
+    // TODO: Create and consume ICache<EnduranceEvent> with TTL and invalidate method.
+    // Where should this cache live? Probably shared as it might be useful in both app and UI layers 
+    // But usege of the cache should be explicit so that we know that item is cached and has to be invalidated    
+    // When values are manipulated. Consumers shouldn't care or know how the cache is repopulated.
     public void Add(EnduranceEvent enduranceEvent)
     {
         _activeEvents.RemoveAll(x => x.Id == enduranceEvent.Id);
