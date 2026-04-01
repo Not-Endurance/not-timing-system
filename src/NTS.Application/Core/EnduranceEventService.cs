@@ -33,8 +33,8 @@ public class EnduranceEventService : NStatefulService, IActiveEventsContext, IEn
     }
 
     // TODO: Create and consume ICache<EnduranceEvent> with TTL and invalidate method.
-    // Where should this cache live? Probably shared as it might be useful in both app and UI layers 
-    // But usege of the cache should be explicit so that we know that item is cached and has to be invalidated    
+    // Where should this cache live? Probably shared as it might be useful in both app and UI layers
+    // But usege of the cache should be explicit so that we know that item is cached and has to be invalidated
     // When values are manipulated. Consumers shouldn't care or know how the cache is repopulated.
     public void Add(EnduranceEvent enduranceEvent)
     {
