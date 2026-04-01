@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using NTS.Application.Core;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
-using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Tests.Core;
