@@ -90,9 +90,12 @@ public class EnduranceEventBusinessService : IEnduranceEventBusinessService, ITr
 
         foreach (var issue in issues)
         {
-            validationBuilder.AppendLine(
-                string.Format(Start_validation_issue_different_phase_configurations_string, issue.ParticipationNumber)
-            );
+            validationBuilder.AppendLine(issue.Summary);
+            if (!issue.IsAutoCorrectable)
+            {
+                continue;
+            }
+
             foreach (var competition in issue.Competitions)
             {
                 validationBuilder.AppendLine($"- {competition.CompetitionName}: {competition.PhaseSignature}");

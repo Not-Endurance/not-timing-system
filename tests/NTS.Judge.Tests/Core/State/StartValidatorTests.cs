@@ -35,6 +35,96 @@ public class StartValidatorTests
         Assert.Contains(issue.Competitions, x => x.CompetitionName == "Competition B");
     }
 
+    [Fact]
+    public void Validate_WhenEventHasNoCompetitions_ReturnsIssue()
+    {
+        var setupEvent = CreateEvent([], []);
+
+        var result = StartValidator.Validate(
+            new UpcomingEvent(
+                setupEvent.Name,
+                setupEvent.Place,
+                setupEvent.Country,
+                setupEvent.ShowFeiId,
+                setupEvent.FeiId,
+                setupEvent.FeiEventCode,
+                [],
+                setupEvent.Officials,
+                setupEvent.Loops,
+                setupEvent.Combinations,
+                setupEvent.Id
+            )
+        );
+
+        var issue = Assert.Single(result.Data ?? []);
+        Assert.Equal("At least one competition must be configured before start.", issue.Summary);
+        Assert.False(issue.IsAutoCorrectable);
+    }
+
+    [Fact]
+    public void Validate_WhenCompetitionHasNoPhases_ReturnsIssue()
+    {
+        var setupEvent = CreateEvent([(40d, 40, null)], [(40d, 40, null)]);
+        var competition = setupEvent.Competitions[0];
+        var invalidCompetition = new Competition(
+            competition.Name,
+            competition.Type,
+            competition.Ruleset,
+            competition.Start,
+            competition.CompulsoryThresholdSpan,
+            competition.FeiId,
+            competition.FeiRule,
+            competition.FeiScheduleNumber,
+            [],
+            competition.Participations,
+            competition.Id
+        );
+
+        var result = StartValidator.Validate(ReplaceCompetition(setupEvent, invalidCompetition, 0));
+
+        var issue = Assert.Single(result.Data ?? []);
+        Assert.Contains("must have at least one phase", issue.Summary);
+        Assert.False(issue.IsAutoCorrectable);
+    }
+
+    [Fact]
+    public void Validate_WhenCompetitionHasNoParticipations_ReturnsIssue()
+    {
+        var setupEvent = CreateEvent([(40d, 40, null)], [(40d, 40, null)]);
+        var competition = setupEvent.Competitions[0];
+        var invalidCompetition = new Competition(
+            competition.Name,
+            competition.Type,
+            competition.Ruleset,
+            competition.Start,
+            competition.CompulsoryThresholdSpan,
+            competition.FeiId,
+            competition.FeiRule,
+            competition.FeiScheduleNumber,
+            competition.Phases,
+            [],
+            competition.Id
+        );
+
+        var result = StartValidator.Validate(ReplaceCompetition(setupEvent, invalidCompetition, 0));
+
+        var issue = Assert.Single(result.Data ?? []);
+        Assert.Contains("must have at least one participation", issue.Summary);
+        Assert.False(issue.IsAutoCorrectable);
+    }
+
+    [Fact]
+    public void Validate_WhenNonFinalPhaseHasNoRest_ReturnsIssue()
+    {
+        var setupEvent = CreateEvent([(40d, 40, null), (40d, 50, null)], [(40d, 40, 30), (40d, 50, null)]);
+
+        var result = StartValidator.Validate(setupEvent);
+
+        var issue = Assert.Single(result.Data ?? []);
+        Assert.Contains("non-final phases without rest: 1", issue.Summary);
+        Assert.False(issue.IsAutoCorrectable);
+    }
+
     static UpcomingEvent CreateEvent(
         (double Distance, int Recovery, int? RestMinutes)[] competitionOnePhases,
         (double Distance, int Recovery, int? RestMinutes)[] competitionTwoPhases
@@ -96,6 +186,25 @@ public class StartValidatorTests
             phases,
             [participation],
             id
+        );
+    }
+
+    static UpcomingEvent ReplaceCompetition(UpcomingEvent setupEvent, Competition competition, int index)
+    {
+        var competitions = setupEvent.Competitions.ToList();
+        competitions[index] = competition;
+        return new UpcomingEvent(
+            setupEvent.Name,
+            setupEvent.Place,
+            setupEvent.Country,
+            setupEvent.ShowFeiId,
+            setupEvent.FeiId,
+            setupEvent.FeiEventCode,
+            competitions,
+            setupEvent.Officials,
+            setupEvent.Loops,
+            setupEvent.Combinations,
+            setupEvent.Id
         );
     }
 }
