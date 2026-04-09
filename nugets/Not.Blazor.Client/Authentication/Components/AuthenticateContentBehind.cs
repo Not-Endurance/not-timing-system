@@ -11,13 +11,6 @@ public abstract class AuthenticateContentBehind : NComponent
 
     protected void Signin()
     {
-        try
-        {
-            Authentication.Signin();
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
+        Authentication.Signin();
     }
 }
