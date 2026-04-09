@@ -32,6 +32,7 @@ public static class AuthenticationExtensions
         options.ProviderOptions.Authentication.ClientId = settings.ClientId;
         options.ProviderOptions.Authentication.RedirectUri = RemoteAuthenticationDefaults.LoginCallbackPath;
         options.ProviderOptions.Authentication.PostLogoutRedirectUri = RemoteAuthenticationDefaults.LogoutCallbackPath;
+        options.ProviderOptions.LoginMode = "redirect";
         options.ProviderOptions.Cache.CacheLocation = "localStorage";
         options.ProviderOptions.Cache.StoreAuthStateInCookie = true;
 
