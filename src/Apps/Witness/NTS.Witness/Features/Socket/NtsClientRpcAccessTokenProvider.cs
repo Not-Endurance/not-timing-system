@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Not.Application.Authentication.Provider;
 using Not.Application.RPC.SignalR;
+using Not.Blazor.Client.Authentication;
 using Not.Injection;
 using Not.Notify;
-using Not.Blazor.Client.Authentication;
 
 namespace NTS.Witness.Features.Socket;
 
@@ -104,7 +104,10 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
                 "Skipping witness auth redirect because the app is already on an authentication route. Status: {Status}",
                 tokenResult.Status
             );
-            throw new OperationCanceledException("Witness authentication redirect suppressed on auth route.", exception);
+            throw new OperationCanceledException(
+                "Witness authentication redirect suppressed on auth route.",
+                exception
+            );
         }
 
         _authenticationRedirector.RedirectToSignIn(tokenResult);
@@ -119,7 +122,10 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
                 exception,
                 "Skipping witness auth redirect because the app is already on an authentication route."
             );
-            throw new OperationCanceledException("Witness authentication redirect suppressed on auth route.", exception);
+            throw new OperationCanceledException(
+                "Witness authentication redirect suppressed on auth route.",
+                exception
+            );
         }
 
         _authenticationRedirector.RedirectToSignIn(exception);
@@ -134,7 +140,10 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
                 exception,
                 "Skipping witness auth redirect because the app is already on an authentication route."
             );
-            throw new OperationCanceledException("Witness authentication redirect suppressed on auth route.", exception);
+            throw new OperationCanceledException(
+                "Witness authentication redirect suppressed on auth route.",
+                exception
+            );
         }
 
         _authenticationRedirector.RedirectToSignIn(requestOptions);
