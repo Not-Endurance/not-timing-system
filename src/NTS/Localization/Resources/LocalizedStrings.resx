@@ -925,7 +925,7 @@
     <value>Invalid setup</value>
   </data>
   <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
-    <value>A participation can be added to multiple competitions only when the phase structure is identical.</value>
+    <value>Resolve the setup issues below before starting the event.</value>
   </data>
   <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
     <value>#{0}: phase configuration differs across competitions:</value>

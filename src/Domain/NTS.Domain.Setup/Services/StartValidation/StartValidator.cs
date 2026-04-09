@@ -8,6 +8,10 @@ public static class StartValidator
 {
     static readonly IReadOnlyList<IStartValidationRule> RULES =
     [
+        new ConfiguredCompetitionsValidationRule(),
+        new ConfiguredCompetitionPhasesValidationRule(),
+        new ConfiguredCompetitionParticipationsValidationRule(),
+        new NonFinalPhasesMustHaveRestValidationRule(),
         new SimultaneousParticipationInDifferantTracksValidationRule(),
     ];
 

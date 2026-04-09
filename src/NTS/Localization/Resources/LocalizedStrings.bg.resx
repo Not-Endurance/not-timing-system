@@ -922,7 +922,7 @@
     <value>Невалидна конфигурация</value>
   </data>
   <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
-    <value>Участник може да бъде добавен в няколко състезания само ако конфигурацията на фазите е идентична.</value>
+    <value>Коригирайте проблемите в конфигурацията по-долу, преди да стартирате събитието.</value>
   </data>
   <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
     <value>#{0}: конфигурацията на фазите се различава между състезанията:</value>

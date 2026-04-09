@@ -722,7 +722,7 @@
     <value>Geçersiz yapılandırma</value>
   </data>
   <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
-    <value>Bir katılım birden fazla yarışmaya yalnızca aşama yapısı aynıysa eklenebilir.</value>
+    <value>Etkinliği başlatmadan önce aşağıdaki yapılandırma sorunlarını düzeltin.</value>
   </data>
   <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
     <value>#{0}: aşama yapılandırması yarışmalar arasında farklı:</value>

@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
+using Not.Domain.Exceptions;
 using Not.Exceptions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
@@ -126,6 +127,21 @@ public class EnduranceEventBusinessServiceTests
         Assert.Contains("42", exception.Message);
     }
 
+    [Fact]
+    public async Task Start_WhenCompetitionHasNoParticipations_ThrowsDomainExceptionBeforeCreatingCoreEntries()
+    {
+        var events = new RecordingRepository<CoreEnduranceEventModel>();
+        var service = CreateService(
+            [SetupUpcomingEventModel.From(CreateInvalidEventWithoutParticipations(2))],
+            events: events
+        );
+
+        var exception = await Assert.ThrowsAsync<DomainException>(() => service.Start(2));
+
+        Assert.Contains("must have at least one participation", exception.Message);
+        Assert.Empty(events.CreatedItems);
+    }
+
     static EnduranceEventBusinessService CreateService(
         IEnumerable<SetupUpcomingEventModel> upcomingEvents,
         RecordingRepository<CoreEnduranceEventModel>? events = null,
@@ -219,6 +235,43 @@ public class EnduranceEventBusinessServiceTests
             null,
             [competition],
             [official],
+            [loop],
+            [combination],
+            id
+        );
+    }
+
+    static UpcomingEvent CreateInvalidEventWithoutParticipations(int id)
+    {
+        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete(new Person(["John", "Doe"]), null, country, null, id * 10 + 1);
+        var horse = new Horse($"Horse {id}", null, id * 10 + 1);
+        var combination = new Combination(id * 100 + 1, athlete, horse, id * 10 + 1);
+        var loop = new Loop(40, id * 10 + 1);
+        var phase = new Phase(loop, 40, null, id * 10 + 1);
+        var competition = new Competition(
+            $"Competition {id}",
+            CompetitionType.Qualification,
+            CompetitionRuleset.FEI,
+            DateTimeOffset.UtcNow.AddHours(id),
+            null,
+            null,
+            null,
+            null,
+            [phase],
+            [],
+            id * 10 + 1
+        );
+
+        return new UpcomingEvent(
+            $"Event {id}",
+            "Sofia",
+            country,
+            null,
+            null,
+            null,
+            [competition],
+            [],
             [loop],
             [combination],
             id
