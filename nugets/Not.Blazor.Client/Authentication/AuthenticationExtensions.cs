@@ -32,6 +32,8 @@ public static class AuthenticationExtensions
         options.ProviderOptions.Authentication.ClientId = settings.ClientId;
         options.ProviderOptions.Authentication.RedirectUri = RemoteAuthenticationDefaults.LoginCallbackPath;
         options.ProviderOptions.Authentication.PostLogoutRedirectUri = RemoteAuthenticationDefaults.LogoutCallbackPath;
+        options.ProviderOptions.Cache.CacheLocation = "localStorage";
+        options.ProviderOptions.Cache.StoreAuthStateInCookie = true;
 
         // User roles are injected from local user resolution, not from incoming provider role claims.
         options.UserOptions.RoleClaim = ClaimTypes.Role;
