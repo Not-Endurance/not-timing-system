@@ -8,6 +8,7 @@ using Not.Krud.Abstractions;
 using Not.Observables.Structures;
 using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
@@ -27,6 +28,8 @@ public class RankingService
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationEliminated>,
         INotificationHandler<ParticipationRestored>,
+        INotificationHandler<EventConnected>,
+        INotificationHandler<EventDisconnected>,
         IScoped
 {
     readonly INtsSocketContext _socketContext;
@@ -35,6 +38,7 @@ public class RankingService
     readonly IRepository<ArchiveEntry> _archive;
     readonly CoalesceInvoker _coalesced;
     Ranking? _current;
+    IReadOnlyList<Official> _loadedOfficials = [];
 
     public RankingService(
         INtsSocketContext socketContext,
@@ -64,8 +68,12 @@ public class RankingService
         {
             Rankings.Clear();
             _current = null;
+            _loadedOfficials = [];
             return false;
         }
+
+        _loadedOfficials = (await _officials.ReadMany()).ToList();
+
         var rankings = (await _rankings.ReadMany()).ToList();
         if (!rankings.Any())
         {
@@ -108,19 +116,17 @@ public class RankingService
     {
         GuardHelper.ThrowIfDefault(_socketContext.Event);
 
-        var officials = await _officials.ReadMany();
         var rankings = await _rankings.ReadMany();
         var ranklists = rankings.Select(x => new Ranklist(x)).Where(x => x.Entries.Any());
-        var entry = new ArchiveEntry(_socketContext.Event, officials, ranklists);
+        var entry = new ArchiveEntry(_socketContext.Event, _loadedOfficials, ranklists);
         await _archive.Create(entry);
     }
 
-    public async Task<RanklistDocument> Create(Ranking ranking)
+    public RanklistDocument Create(Ranking ranking)
     {
         var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
-        var officials = await _officials.ReadMany();
         var ranklist = new Ranklist(ranking);
-        return new RanklistDocument(ranklist, enduranceEvent, officials);
+        return new RanklistDocument(ranklist, enduranceEvent, _loadedOfficials);
     }
 
     public void Select(Ranking ranking)
@@ -142,6 +148,20 @@ public class RankingService
     public async Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
     {
         await _coalesced.Invoke(() => UpdateRanklist(notification));
+    }
+
+    public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
+    {
+        await ReloadState();
+    }
+
+    public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
+    {
+        Rankings.Clear();
+        _current = null;
+        _loadedOfficials = [];
+        ClearState();
+        return Task.CompletedTask;
     }
 
     async Task UpdateRanklist(ParticipationPayload payload)

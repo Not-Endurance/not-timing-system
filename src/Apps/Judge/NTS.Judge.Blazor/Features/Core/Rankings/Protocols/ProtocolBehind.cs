@@ -27,14 +27,15 @@ public class ProtocolBehind : NStatefulComponent
         await Observe(Service);
     }
 
-    protected override async Task OnBeforeRenderAsync()
+    protected override void OnBeforeRender()
     {
         try
         {
-            Document = await Factory.Create(Service.Current);
+            Document = Factory.Create(Service.Current);
         }
         catch (Exception ex)
         {
+            Document = null;
             Handle(ex);
         }
     }
