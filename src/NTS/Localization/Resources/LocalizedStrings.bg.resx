@@ -297,6 +297,9 @@
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Номер на комбинация</value>
   </data>
+  <data name="Location_string" xml:space="preserve">
+    <value>Локация</value>
+  </data>
   <data name="Place_string" xml:space="preserve">
     <value>Място</value>
   </data>

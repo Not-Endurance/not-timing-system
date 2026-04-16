@@ -35,9 +35,9 @@ internal class FeiExportFeature : IFeiExportFeature
         {
             throw new DomainException("Missing FEI Event code");
         }
-        if (string.IsNullOrEmpty(enduranceEvent.PopulatedPlace?.Location))
+        if (string.IsNullOrWhiteSpace(enduranceEvent.Location))
         {
-            throw new DomainException("Missing PopulatedPlace");
+            throw new DomainException("Missing EnduranceEvent location");
         }
         if (string.IsNullOrEmpty(ranking.Name))
         {
@@ -58,7 +58,7 @@ internal class FeiExportFeature : IFeiExportFeature
 
         // IsoCode is not accepted by FEI, but they have representatives which can correct that in case a country
         // without NF code is used. This shouldn't happen anyway
-        var countryCode = enduranceEvent.PopulatedPlace.Country.NfCode ?? enduranceEvent.PopulatedPlace.Country.IsoCode;
+        var countryCode = enduranceEvent.Country.NfCode ?? enduranceEvent.Country.IsoCode;
         var ctEnduranceCompetition = CreateCompetitions(enduranceEvent!, ranklist);
         var ctEnduranceEvent = new ctEnduranceEvent
         {
@@ -81,7 +81,7 @@ internal class FeiExportFeature : IFeiExportFeature
             {
                 Show = new ctShowResult
                 {
-                    Venue = new ctVenue { Name = enduranceEvent.PopulatedPlace.Location, Country = countryCode },
+                    Venue = new ctVenue { Name = enduranceEvent.Location, Country = countryCode },
                     EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
                     StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
                     EndDate = enduranceEvent.EventSpan.EndDay.DateTime,

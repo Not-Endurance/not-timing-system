@@ -11,12 +11,12 @@ public record UpcomingEventFormModel : KrudFormModel<UpcomingEvent>
     {
 #if DEBUG
         Name = "Test";
-        Place = "Каспичан";
+        Location = "Каспичан";
 #endif
     }
 
     public string? Name { get; set; }
-    public string? Place { get; set; }
+    public string? Location { get; set; }
     public Country? Country { get; set; }
     public string? FeiShowId { get; set; }
     public string? FeiId { get; set; }
@@ -30,7 +30,7 @@ public record UpcomingEventFormModel : KrudFormModel<UpcomingEvent>
     {
         return new UpcomingEvent(
             Name,
-            Place,
+            Location,
             Country,
             FeiShowId,
             FeiId,
@@ -47,7 +47,7 @@ public record UpcomingEventFormModel : KrudFormModel<UpcomingEvent>
     {
         Id = upcomingEvent.Id;
         Name = upcomingEvent.Name;
-        Place = upcomingEvent.Place;
+        Location = upcomingEvent.Location;
         Country = upcomingEvent.Country;
         FeiShowId = upcomingEvent.ShowFeiId;
         FeiId = upcomingEvent.FeiId;

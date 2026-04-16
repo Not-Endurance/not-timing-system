@@ -50,6 +50,14 @@ public class Participation : Entity, IKurdMirror<Combination>
 
     internal void SetSpeedLimits(CompetitionType competitionType)
     {
+        if (Category == ParticipationCategory.Training)
+        {
+            MinAverageSpeed = null;
+            MaxAverageSpeed = null;
+            ApplyOverrides();
+            return;
+        }
+
         MinAverageSpeed = MIN_SPEED;
         MaxAverageSpeed = null;
         if (competitionType == CompetitionType.Qualification)
@@ -64,14 +72,7 @@ public class Participation : Entity, IKurdMirror<Combination>
                 MaxAverageSpeed = MAX_SPEED;
             }
         }
-        if (MaxSpeedOverride != null)
-        {
-            MaxAverageSpeed = MaxSpeedOverride;
-        }
-        if (MinSpeedOverride != null)
-        {
-            MinAverageSpeed = MinSpeedOverride;
-        }
+        ApplyOverrides();
     }
 
     public override string ToString()
@@ -89,5 +90,17 @@ public class Participation : Entity, IKurdMirror<Combination>
         }
         Combination = combination;
         return true;
+    }
+
+    void ApplyOverrides()
+    {
+        if (MaxSpeedOverride != null)
+        {
+            MaxAverageSpeed = MaxSpeedOverride;
+        }
+        if (MinSpeedOverride != null)
+        {
+            MinAverageSpeed = MinSpeedOverride;
+        }
     }
 }

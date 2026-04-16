@@ -12,7 +12,8 @@ public record HandoutDocument : Document, IIdentifiable
         : base(
             new DocumentHeader(
                 handout.Participation.Competition.Name,
-                enduranceEvent.PopulatedPlace,
+                enduranceEvent.Country,
+                enduranceEvent.Location,
                 enduranceEvent.EventSpan,
                 officials
             )

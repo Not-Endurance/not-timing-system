@@ -39,7 +39,7 @@ public class UpcomingEventFunctions : FunctionBase
         }
 
         await _upcomingEvents.Create(document);
-        return new OkObjectResult($"Upcoming event {document.Place} stored successfully.");
+        return new OkObjectResult($"Upcoming event {document.Location} stored successfully.");
     }
 
     [Function("upcoming-event-list")]
@@ -90,7 +90,7 @@ public class UpcomingEventFunctions : FunctionBase
         }
 
         await _upcomingEvents.Update(document);
-        return new OkObjectResult($"Updated upcoming event {document.Place}");
+        return new OkObjectResult($"Updated upcoming event {document.Location}");
     }
 
     [Function("upcoming-event-delete")]

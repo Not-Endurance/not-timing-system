@@ -1,12 +1,12 @@
 ﻿{
   "EnduranceEvent": {
-    "PopulatedPlace": {
-      "Country": {
-        "IsoCode": "BG",
-        "NfCode": "zz",
-        "Name": "Bulgaria"
-      }
+    "Country": {
+      "IsoCode": "BG",
+      "NfCode": "zz",
+      "Name": "Bulgaria"
     },
+    "Name": "Test Regional Competition",
+    "Location": "Sofia",
     "EventSpan": {
       "StartDay": "2024-12-20T18:00:00+02:00",
       "EndDay": "2024-12-20T18:00:00+02:00"

@@ -6,24 +6,41 @@
 
 <NChips T="Participation" SelectedValue="@Selected">
 
-    @foreach (var grouping in Participations.GroupBy(x => x.Phases.Distance))
+    @if (Compact)
     {
-        <MudText Class="pl-4">
-            <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
-        </MudText>
-
-        <MudDivider />
-
-        @foreach (var participation in grouping.OrderBy(x => x.Combination.Number))
+        @foreach (var participation in Participations.OrderBy(x => x.Combination.Number))
         {
             var number = participation.Combination.Number;
             <MudChip T="Participation"
                      Text="@number.ToString()"
                      Value="@participation"
                      Color="@GetColor(participation)"
-                     Size="Size.Medium"
+                     Size="@GetChipSize()"
                      OnClick="() => Select(participation)"
-                     Style="min-width: 1rem" />
+                     Style="@GetChipStyle()" />
+        }
+    }
+    else
+    {
+        @foreach (var grouping in Participations.GroupBy(x => x.Phases.Distance))
+        {
+            <MudText Class="@GetGroupTextClass()" Typo="@GetGroupTextTypo()">
+                <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
+            </MudText>
+
+            <MudDivider />
+
+            @foreach (var participation in grouping.OrderBy(x => x.Combination.Number))
+            {
+                var number = participation.Combination.Number;
+                <MudChip T="Participation"
+                         Text="@number.ToString()"
+                         Value="@participation"
+                         Color="@GetColor(participation)"
+                         Size="@GetChipSize()"
+                         OnClick="() => Select(participation)"
+                         Style="@GetChipStyle()" />
+            }
         }
     }
 </NChips>

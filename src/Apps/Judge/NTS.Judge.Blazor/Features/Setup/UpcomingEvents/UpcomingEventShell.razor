@@ -9,7 +9,7 @@
 
 <KrudForm Shell="this" AdditionalContent="AdditionalContent">
     <FormFields>
-        <NTextField @bind-Value="Model.Place" For="() => Model.Place" Label="@Place_string" />
+        <NTextField @bind-Value="Model.Location" For="() => Model.Location" Label="@Location_string" />
     
         <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
 
@@ -22,6 +22,4 @@
         <NTextField @bind-Value="Model.FeiEventCode" For="() => Model.FeiEventCode" Label="@($"{required_for_FEI_export} - {FEI_Event_Code_label}")" />
     </FormFields>
 </KrudForm>
-
-
 

@@ -83,7 +83,7 @@ public class SelectEventDialogBehind : NDialog
 
         var parameters = new DialogParameters<ChangeEventHistoryDialog>
         {
-            { x => x.EventName, enduranceEvent.PopulatedPlace.City },
+            { x => x.EventName, enduranceEvent.Name },
         };
         var dialog = await DialogService.ShowAsync<ChangeEventHistoryDialog>(Change_event_string, parameters);
         return !await dialog.IsCanceled();

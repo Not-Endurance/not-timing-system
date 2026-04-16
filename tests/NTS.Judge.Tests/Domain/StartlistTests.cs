@@ -40,6 +40,36 @@ public class StartlistTests
     }
 
     [Fact]
+    public void UpcomingByStage_WhenEntriesAreMixed_FutureStartsRemainAboveLateStarts()
+    {
+        var now = DateTimeOffset.Now;
+        var late = CreateParticipation(30, 1, now.AddSeconds(-5));
+        var futureA = CreateParticipation(31, 38, now.AddSeconds(30));
+        var futureB = CreateParticipation(32, 80, now.AddSeconds(39));
+
+        var startlist = new Startlist([late, futureA, futureB]);
+
+        Assert.Equal([38, 80, 1], startlist.UpcomingByStage[1].Select(x => x.Number).ToArray());
+        Assert.Equal(StartlistEntryState.Late, startlist.UpcomingByStage[1].Last().State);
+    }
+
+    [Fact]
+    public void UpdateState_WhenFutureEntryBecomesLate_ReordersItBelowPendingEntries()
+    {
+        var now = DateTimeOffset.Now;
+        var firstLate = CreateParticipation(33, 1, now.AddMinutes(-2));
+        var pending = CreateParticipation(34, 38, now.AddMinutes(10));
+
+        var startlist = new Startlist([pending, firstLate]);
+
+        startlist.UpdateState();
+
+        Assert.Equal([38, 1], startlist.UpcomingByStage[1].Select(x => x.Number).ToArray());
+        Assert.Equal(StartlistEntryState.Late, startlist.UpcomingByStage[1].Last().State);
+        Assert.Equal(StartlistEntryState.Resting, startlist.UpcomingByStage[1].First().State);
+    }
+
+    [Fact]
     public void UpcomingByStage_WhenRemovingEntries_DoesNotLeaveStaleStageGroups()
     {
         var now = DateTimeOffset.Now;

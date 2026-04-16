@@ -1,6 +1,7 @@
 {
   "EnduranceEvent": {
-    "Place": "Sofia",
+    "Name": "Test Event",
+    "Location": "Sofia",
     "Country": {
       "IsoCode": "testIso",
       "NfCode": "testNf",

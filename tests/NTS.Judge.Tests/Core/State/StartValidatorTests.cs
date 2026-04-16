@@ -43,7 +43,7 @@ public class StartValidatorTests
         var result = StartValidator.Validate(
             new UpcomingEvent(
                 setupEvent.Name,
-                setupEvent.Place,
+                setupEvent.Location,
                 setupEvent.Country,
                 setupEvent.ShowFeiId,
                 setupEvent.FeiId,
@@ -195,7 +195,7 @@ public class StartValidatorTests
         competitions[index] = competition;
         return new UpcomingEvent(
             setupEvent.Name,
-            setupEvent.Place,
+            setupEvent.Location,
             setupEvent.Country,
             setupEvent.ShowFeiId,
             setupEvent.FeiId,

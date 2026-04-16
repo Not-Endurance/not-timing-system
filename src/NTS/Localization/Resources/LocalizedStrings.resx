@@ -297,6 +297,9 @@
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Combination Number</value>
   </data>
+  <data name="Location_string" xml:space="preserve">
+    <value>Location</value>
+  </data>
   <data name="Place_string" xml:space="preserve">
     <value>Place</value>
   </data>

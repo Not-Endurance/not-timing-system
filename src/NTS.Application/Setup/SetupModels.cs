@@ -320,7 +320,7 @@ public class UpcomingEventModel : IDocument, IKrudModel<UpcomingEvent>
 
     public int Id { get; set; } = default!;
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public string Place { get; set; } = default!;
+    public string Location { get; set; } = default!;
     public CountryModel Country { get; set; } = default!;
     public string? ShowFeiId { get; set; }
     public string? FeiId { get; set; }
@@ -340,7 +340,7 @@ public class UpcomingEventModel : IDocument, IKrudModel<UpcomingEvent>
         var combinations = Combinations.Select(x => x.MapToEntity());
         return new UpcomingEvent(
             Name,
-            Place,
+            Location,
             country,
             ShowFeiId,
             FeiId,
@@ -357,7 +357,7 @@ public class UpcomingEventModel : IDocument, IKrudModel<UpcomingEvent>
     {
         Id = @event.Id;
         Name = @event.Name;
-        Place = @event.Place;
+        Location = @event.Location;
         Country = CountryModel.From(@event.Country);
         ShowFeiId = @event.ShowFeiId;
         FeiId = @event.FeiId;

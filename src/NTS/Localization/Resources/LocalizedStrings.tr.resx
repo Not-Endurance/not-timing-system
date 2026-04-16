@@ -297,6 +297,9 @@
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Kombinasyon Numarası</value>
   </data>
+  <data name="Location_string" xml:space="preserve">
+    <value>Konum</value>
+  </data>
   <data name="Place_string" xml:space="preserve">
     <value>Yer</value>
   </data>

@@ -8,6 +8,9 @@ namespace NTS.Blazor.Components.ParticipationChips;
 public abstract class ParticipationChipsBehind : NStatefulComponent
 {
     [Parameter]
+    public bool Compact { get; set; }
+
+    [Parameter]
     public IReadOnlyList<int> RecentlyTimed { get; set; } = [];
 
     [Parameter]
@@ -60,5 +63,27 @@ public abstract class ParticipationChipsBehind : NStatefulComponent
             Handle(ex);
         }
         return Color.Primary;
+    }
+
+    protected Size GetChipSize()
+    {
+        return Compact ? Size.Small : Size.Medium;
+    }
+
+    protected string GetChipStyle()
+    {
+        return Compact
+            ? "min-width: 2.1rem; padding-inline: 0.15rem; height: 1.8rem; font-size: 1rem; font-weight: 700;"
+            : "min-width: 1rem";
+    }
+
+    protected string GetGroupTextClass()
+    {
+        return Compact ? "pl-2" : "pl-4";
+    }
+
+    protected Typo GetGroupTextTypo()
+    {
+        return Compact ? Typo.caption : Typo.body2;
     }
 }

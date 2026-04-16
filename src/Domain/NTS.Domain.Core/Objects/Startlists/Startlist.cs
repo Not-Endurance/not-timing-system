@@ -47,6 +47,7 @@ public record Startlist : ValueObject
 
         _upcoming = OrderByTimeThenPhase(upcoming);
         _history = OrderByTimeThenPhase(history);
+        UpdateState();
     }
 
     public IReadOnlyList<Starter> History => _history;
@@ -61,7 +62,6 @@ public record Startlist : ValueObject
     {
         lock (_lock)
         {
-            var changedHistory = false;
             var now = Timestamp.Now();
             foreach (var entry in _upcoming.ToList())
             {
@@ -69,9 +69,12 @@ public record Startlist : ValueObject
                 {
                     _upcoming.Remove(entry);
                     _history.Add(entry);
-                    changedHistory = true;
                 }
-                else if (entry.Start < now)
+            }
+
+            foreach (var entry in _upcoming)
+            {
+                if (entry.Start < now)
                 {
                     entry.State = StartlistEntryState.Late;
                 }
@@ -79,12 +82,14 @@ public record Startlist : ValueObject
                 {
                     entry.State = StartlistEntryState.Ready;
                 }
+                else
+                {
+                    entry.State = StartlistEntryState.Resting;
+                }
             }
 
-            if (changedHistory)
-            {
-                _history = OrderByTimeThenPhase(_history);
-            }
+            _upcoming = OrderUpcoming(_upcoming);
+            _history = OrderByTimeThenPhase(_history);
         }
     }
 
@@ -140,7 +145,8 @@ public record Startlist : ValueObject
             {
                 return;
             }
-            _upcoming = OrderByTimeThenPhase([.. _upcoming, entry]);
+            _upcoming = [.. _upcoming, entry];
+            UpdateState();
         }
     }
 
@@ -152,6 +158,15 @@ public record Startlist : ValueObject
     List<Starter> OrderByTimeThenPhase(IEnumerable<Starter> starts)
     {
         return starts.OrderBy(s => s.Start).ThenBy(s => s.PhaseNumber).ToList();
+    }
+
+    List<Starter> OrderUpcoming(IEnumerable<Starter> starts)
+    {
+        return starts
+            .OrderBy(s => s.State == StartlistEntryState.Late ? 1 : 0)
+            .ThenBy(s => s.Start)
+            .ThenBy(s => s.PhaseNumber)
+            .ToList();
     }
 
     IReadOnlyDictionary<int, IReadOnlyList<Starter>> GroupByStage(IEnumerable<Starter> starts)

@@ -27,7 +27,7 @@ public class UpcomingEventMongoRepository : MongoRepository<UpcomingEventModel>,
         try
         {
             return Builders<UpcomingEventModel> // TODO: use Reflection to build a full update definition by default
-                .Update.Set(x => x.Place, document.Place)
+                .Update.Set(x => x.Location, document.Location)
                 .Set(x => x.Name, document.Name)
                 .Set(x => x.Country, document.Country)
                 .Set(x => x.ShowFeiId, document.ShowFeiId)

@@ -151,7 +151,7 @@ public class UpcomingEventValidationTests
     {
         return new UpcomingEvent(
             name: "Event",
-            place: "Place",
+            location: "Place",
             country: Country(),
             showFeiId: null,
             feiId: null,

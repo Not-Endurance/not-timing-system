@@ -54,7 +54,7 @@
                         </MudTd>
 
                         <MudTd DataLabel="@Start_In_string" Class="startlist-time-cell">
-                            <StartlistEntryTimer Entry="context" />
+                            <StartlistEntryTimer @key="GetTimerKey(context)" Entry="context" />
                         </MudTd>
 
                     </RowTemplate>
