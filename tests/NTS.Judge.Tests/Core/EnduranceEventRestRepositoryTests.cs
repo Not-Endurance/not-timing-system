@@ -2,6 +2,10 @@ using System.Net;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Not.Application.HTTP;
+using Not.Domain.Exceptions;
+using Not.Serialization.JSON;
+using Not.Structures;
+using NTS.Application.Core;
 using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
@@ -13,6 +17,42 @@ namespace NTS.Judge.Tests.Core;
 
 public class EnduranceEventRestRepositoryTests
 {
+    [Fact]
+    public async Task Start_returns_mapped_endurance_event_when_response_contains_success_result()
+    {
+        var model = EnduranceEventModel.From(CreateEvent(14));
+        var handler = new RecordingHttpMessageHandler
+        {
+            ResponseFactory = _ => CreateJsonResponse(Result.Success(model)),
+        };
+        var client = CreateClient(handler);
+        var repository = new EnduranceEventRestRepository(client, new TestSocketContext());
+
+        var result = await repository.Start(14);
+
+        Assert.Equal(14, result.Id);
+        Assert.Equal("Sofia", result.Name);
+
+        var request = Assert.Single(handler.Requests);
+        Assert.Equal(HttpMethod.Post, request.Method);
+        Assert.Equal("https://nexus.test/api/endurance-event/14/start", request.RequestUri?.ToString());
+    }
+
+    [Fact]
+    public async Task Start_throws_domain_exception_when_response_contains_errors()
+    {
+        var handler = new RecordingHttpMessageHandler
+        {
+            ResponseFactory = _ => CreateJsonResponse(Result.Failure<EnduranceEventModel>("Start blocked")),
+        };
+        var client = CreateClient(handler);
+        var repository = new EnduranceEventRestRepository(client, new TestSocketContext());
+
+        var exception = await Assert.ThrowsAsync<DomainException>(() => repository.Start(14));
+
+        Assert.Equal("Start blocked", exception.Message);
+    }
+
     [Fact]
     public async Task Reset_calls_endurance_event_reset_endpoint_for_current_event()
     {
@@ -63,9 +103,15 @@ public class EnduranceEventRestRepositoryTests
         );
     }
 
+    static HttpResponseMessage CreateJsonResponse(object payload, HttpStatusCode statusCode = HttpStatusCode.OK)
+    {
+        return new HttpResponseMessage(statusCode) { Content = new StringContent(payload.ToJson()) };
+    }
+
     sealed class RecordingHttpMessageHandler : HttpMessageHandler
     {
         public List<HttpRequestMessage> Requests { get; } = [];
+        public Func<HttpRequestMessage, HttpResponseMessage>? ResponseFactory { get; init; }
 
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
@@ -73,7 +119,10 @@ public class EnduranceEventRestRepositoryTests
         )
         {
             Requests.Add(request);
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("") });
+            return Task.FromResult(
+                ResponseFactory?.Invoke(request)
+                    ?? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Result.Success().ToJson()) }
+            );
         }
     }
 

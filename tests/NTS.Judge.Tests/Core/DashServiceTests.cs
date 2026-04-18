@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
-using Not.Application.RPC.SignalR;
 using Not.Domain.Abstractions;
 using Not.Events;
 using Not.Notify;
@@ -11,12 +10,11 @@ using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
-using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
 using NTS.Judge.Features.Core;
-using NTS.Judge.Features.Core.State;
 using NTS.Judge.Features.Setup.UpcomingEvents;
+using NTS.Judge.Tests.Core.Implementations;
 
 namespace NTS.Judge.Tests.Core;
 
@@ -324,18 +322,5 @@ public class DashServiceTests
         {
             return Task.CompletedTask;
         }
-    }
-
-    sealed class TestNotifier : INotifier
-    {
-        public void Error(string message) { }
-
-        public void Error(Exception ex) { }
-
-        public void Inform(string message) { }
-
-        public void Success(string message) { }
-
-        public void Warn(string message) { }
     }
 }

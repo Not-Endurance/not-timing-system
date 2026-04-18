@@ -20,17 +20,9 @@ public class UserRestApiRepository : RestApiRepository<User, UserModel>, IUserEm
             return null;
         }
 
-        try
-        {
-            var encodedEmail = Uri.EscapeDataString(email.Trim());
-            var user = await Client.GetJson<NUserModel>($"{Endpoint}/{encodedEmail}");
-            return user == null ? null : new User(user.Email, user.Name, user.Roles, user.Id);
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-            return null;
-        }
+        var encodedEmail = Uri.EscapeDataString(email.Trim());
+        var user = await HandleRequest(Client.Get<NUserModel>($"{Endpoint}/{encodedEmail}"));
+        return user == null ? null : new User(user.Email, user.Name, user.Roles, user.Id);
     }
 
     public async Task<IEnumerable<User>> Search(string term)

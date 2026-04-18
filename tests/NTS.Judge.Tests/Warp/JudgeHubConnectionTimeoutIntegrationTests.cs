@@ -10,6 +10,7 @@ using Not.Application.RPC.SignalR;
 using Not.Notify;
 using NTS.Application;
 using NTS.Application.Watcher;
+using NTS.Judge.Tests.Core.Implementations;
 using NTS.Nexus.Warp.Features;
 using NTS.Nexus.Warp.Features.Judge;
 using NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
@@ -44,7 +45,7 @@ public class JudgeHubConnectionTimeoutIntegrationTests
         app.MapHub<JudgeRpcHub>(ApplicationConstants.JUDGE_HUB);
         await app.StartAsync();
 
-        var notifier = new RecordingNotifier();
+        var notifier = new TestNotifier();
         await using var socket = new SignalRSocket(
             Options.Create(
                 new RpcSettings
@@ -95,24 +96,6 @@ public class JudgeHubConnectionTimeoutIntegrationTests
         public Task Remove(PendingSnapshotsModel pendingSnapshots)
         {
             return Task.CompletedTask;
-        }
-    }
-
-    sealed class RecordingNotifier : INotifier
-    {
-        public List<Exception> Errors { get; } = [];
-
-        public void Inform(string message) { }
-
-        public void Success(string message) { }
-
-        public void Warn(string message) { }
-
-        public void Error(string message) { }
-
-        public void Error(Exception ex)
-        {
-            Errors.Add(ex);
         }
     }
 }

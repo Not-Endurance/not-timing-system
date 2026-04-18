@@ -2,7 +2,7 @@ using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.HTTP;
 using Not.Injection;
-using Not.Serialization.JSON;
+using Not.Notify;
 using Not.Structures;
 using NTS.Witness.Contracts.API;
 
@@ -27,17 +27,11 @@ public class UserRestRepository : IUserRegister, ITransient
         try
         {
             var encodedEmail = Uri.EscapeDataString(email);
-            var user = await _client.GetJson<NUserModel>($"users/{encodedEmail}");
-
-            if (user == null)
-            {
-                return Result.Success<NUserModel>(null!);
-            }
-
-            return Result.Success(user);
+            return await _client.Get<NUserModel>($"users/{encodedEmail}");
         }
         catch (Exception ex)
         {
+            NotificationHelper.Current?.Error(ex);
             return Result.Failure<NUserModel>(ex.Message);
         }
     }
@@ -51,7 +45,7 @@ public class UserRestRepository : IUserRegister, ITransient
 
         try
         {
-            var response = await _client.Post(
+            return await _client.Post<NUserModel>(
                 "users/register",
                 new RegisterUserPaload(
                     registration.Email,
@@ -61,11 +55,10 @@ public class UserRestRepository : IUserRegister, ITransient
                     registration.CountryRegion
                 )
             );
-            var user = response.FromJson<NUserModel>();
-            return Result.Success(user);
         }
         catch (Exception ex)
         {
+            NotificationHelper.Current?.Error(ex);
             return Result.Failure<NUserModel>(ex.Message);
         }
     }

@@ -24,40 +24,23 @@ public class CrudFunctions<T> : FunctionBase
     protected async Task<IActionResult> InternalCreate(HttpRequest request)
     {
         var payload = await ReadBody<T>(request);
-        if (payload == null)
-        {
-            return UnexpectedPayload<T>();
-        }
-
         await _repository.Create(payload);
         return Ok();
     }
 
     protected async Task<IActionResult> InternalRead(HttpRequest _, int id)
     {
-        var result = await _repository.Read(id);
-        if (result == null)
-        {
-            return new NotFoundResult();
-        }
-
-        return Ok(result);
+        return Ok(await _repository.Read(id));
     }
 
     protected async Task<IActionResult> InternalReadMany(HttpRequest _)
     {
-        var result = await _repository.ReadMany();
-        return Ok(result);
+        return Ok(await _repository.ReadMany() ?? []);
     }
 
     protected async Task<IActionResult> InternalUpdate(HttpRequest request)
     {
         var payload = await ReadBody<T>(request);
-        if (payload == null)
-        {
-            return UnexpectedPayload<T>();
-        }
-
         await _repository.Update(payload);
         return Ok();
     }

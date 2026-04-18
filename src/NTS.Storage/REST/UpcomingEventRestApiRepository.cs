@@ -2,6 +2,7 @@ using Not.Application.DomainEvents;
 using Not.Application.HTTP;
 using Not.Injection;
 using Not.Storage.REST;
+using Not.Structures;
 using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Events;
@@ -18,10 +19,11 @@ public class UpcomingEventRestApiRepository : RestApiRepository<UpcomingEvent, U
         _domainEventDispatcher = domainEventDispatcher;
     }
 
-    protected override async Task InternalUpdate(UpcomingEvent item)
+    protected override async Task<Result<UpcomingEventModel>> UpdateCore(UpcomingEvent item)
     {
-        await base.InternalUpdate(item);
+        var result = await base.UpdateCore(item);
         await DispatchUpdated(item);
+        return result;
     }
 
     Task DispatchUpdated(UpcomingEvent item)

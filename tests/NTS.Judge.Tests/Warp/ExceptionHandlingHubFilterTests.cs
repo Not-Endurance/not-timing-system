@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Not.Notify;
+using NTS.Judge.Tests.Core.Implementations;
 using NTS.Nexus.Warp.Middlewares;
 
 namespace NTS.Judge.Tests.Warp;
@@ -13,7 +14,7 @@ public class ExceptionHandlingHubFilterTests
     [Fact]
     public async Task InvokeMethodAsync_logs_non_hub_exceptions()
     {
-        var notifier = new RecordingNotifier();
+        var notifier = new TestNotifier();
         var logger = new RecordingLogger<ExceptionHandlingHubFilter>();
         var filter = new ExceptionHandlingHubFilter(notifier, logger);
         var callerContext = new TestHubCallerContext("judge-connection");
@@ -46,7 +47,7 @@ public class ExceptionHandlingHubFilterTests
     [Fact]
     public async Task OnConnectedAsync_logs_non_hub_exceptions()
     {
-        var notifier = new RecordingNotifier();
+        var notifier = new TestNotifier();
         var logger = new RecordingLogger<ExceptionHandlingHubFilter>();
         var filter = new ExceptionHandlingHubFilter(notifier, logger);
         var callerContext = new TestHubCallerContext("judge-connection");
@@ -65,24 +66,6 @@ public class ExceptionHandlingHubFilterTests
         Assert.Single(logger.Entries);
         Assert.Equal(LogLevel.Error, logger.Entries[0].LogLevel);
         Assert.IsType<InvalidOperationException>(logger.Entries[0].Exception);
-    }
-
-    sealed class RecordingNotifier : INotifier
-    {
-        public List<Exception> Errors { get; } = [];
-
-        public void Inform(string message) { }
-
-        public void Success(string message) { }
-
-        public void Warn(string message) { }
-
-        public void Error(string message) { }
-
-        public void Error(Exception ex)
-        {
-            Errors.Add(ex);
-        }
     }
 
     sealed class RecordingLogger<T> : ILogger<T>

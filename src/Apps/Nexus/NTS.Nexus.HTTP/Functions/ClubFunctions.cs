@@ -33,13 +33,8 @@ public class ClubFunctions : FunctionBase
         LogInformation(request, nameof(Insert));
 
         var document = await ReadBody<ClubModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<ClubModel>();
-        }
-
         await _clubs.Create(document);
-        return new OkObjectResult($"Inserted club '{document.Name}'");
+        return Ok();
     }
 
     [Function("clubs-update")]
@@ -52,13 +47,8 @@ public class ClubFunctions : FunctionBase
         LogInformation(request, nameof(Update));
 
         var document = await ReadBody<ClubModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<ClubModel>();
-        }
-
         await _clubs.Update(document);
-        return new OkObjectResult($"Updated club '{document.Name}'");
+        return Ok();
     }
 
     [Function("clubs-delete")]
@@ -74,11 +64,11 @@ public class ClubFunctions : FunctionBase
         var club = await _clubs.Read(id);
         if (club == null)
         {
-            return new OkObjectResult($"Club wiht id '{id}' did not exist");
+            return Ok();
         }
 
         await _clubs.Delete(club);
-        return new OkObjectResult($"Deleted club with id '{id}'");
+        return Ok();
     }
 
     [Function("clubs-get-one")]
@@ -91,8 +81,7 @@ public class ClubFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(GetOne));
 
-        var club = await _clubs.Read(id);
-        return new OkObjectResult(club);
+        return Ok(await _clubs.Read(id));
     }
 
     [Function("clubs-list")]
@@ -104,7 +93,6 @@ public class ClubFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var clubs = await _clubs.ReadMany();
-        return new OkObjectResult(clubs);
+        return Ok(await _clubs.ReadMany() ?? []);
     }
 }

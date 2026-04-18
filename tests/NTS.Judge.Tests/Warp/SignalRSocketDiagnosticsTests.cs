@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Notify;
+using NTS.Judge.Tests.Core.Implementations;
 
 namespace NTS.Judge.Tests.Warp;
 
@@ -12,7 +13,7 @@ public class SignalRSocketDiagnosticsTests
     [Fact]
     public async Task Connect_when_start_async_times_out_returns_to_disconnected_state()
     {
-        var notifier = new RecordingNotifier();
+        var notifier = new TestNotifier();
         var socket = new TestSignalRSocket(
             Options.Create(
                 new RpcSettings
@@ -56,7 +57,7 @@ public class SignalRSocketDiagnosticsTests
                     ConnectTimeoutSeconds = 5,
                 }
             ),
-            new RecordingNotifier()
+            new TestNotifier()
         )
         {
             StartBehavior = cancellationToken => Task.Delay(100, cancellationToken),
@@ -81,7 +82,7 @@ public class SignalRSocketDiagnosticsTests
                     AppVersion = "9.9.9",
                 }
             ),
-            new RecordingNotifier()
+            new TestNotifier()
         );
 
         await socket.Connect("14");
@@ -102,7 +103,7 @@ public class SignalRSocketDiagnosticsTests
     {
         var socket = new TestSignalRSocket(
             Options.Create(new RpcSettings { Host = "https://localhost", HubPattern = "witness-hub" }),
-            new RecordingNotifier()
+            new TestNotifier()
         );
 
         await socket.Connect("14");
@@ -129,11 +130,6 @@ public class SignalRSocketDiagnosticsTests
         public int DisposeCallCount { get; private set; }
         public Func<CancellationToken, Task> StartBehavior { get; init; } = _ => Task.CompletedTask;
 
-        public void DropConnection()
-        {
-            Connection = null;
-        }
-
         protected override HubConnection CreateConnection(string url)
         {
             CreatedUrls.Add(url);
@@ -154,23 +150,10 @@ public class SignalRSocketDiagnosticsTests
             DisposeCallCount++;
             return Task.CompletedTask;
         }
-    }
 
-    sealed class RecordingNotifier : INotifier
-    {
-        public List<Exception> Errors { get; } = [];
-
-        public void Inform(string message) { }
-
-        public void Success(string message) { }
-
-        public void Warn(string message) { }
-
-        public void Error(string message) { }
-
-        public void Error(Exception ex)
+        public void DropConnection()
         {
-            Errors.Add(ex);
+            Connection = null;
         }
     }
 }

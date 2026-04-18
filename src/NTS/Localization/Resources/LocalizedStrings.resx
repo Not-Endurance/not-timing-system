@@ -426,8 +426,8 @@
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Please select a future time</value>
   </data>
-  <data name="Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection" xml:space="preserve">
-    <value>Could not connect to Nexus. Some operations will not be available. Please check your internet connection</value>
+  <data name="Cannot_connect_to_server_string" xml:space="preserve">
+    <value>Could not connect to server</value>
   </data>
   <data name="Athletes_string" xml:space="preserve">
     <value>Athletes</value>
@@ -956,5 +956,8 @@
   </data>
   <data name="Register_string" xml:space="preserve">
     <value>Register</value>
+  </data>
+  <data name="Validation_errors_string" xml:space="preserve">
+    <value>Validation errors</value>
   </data>
 </root>

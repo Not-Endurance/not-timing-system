@@ -10,8 +10,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.CRUD.Ports;
+using Not.Domain.Exceptions;
 using Not.Structures;
+using NTS.Application.Core;
 using NTS.Nexus.HTTP.Functions;
+using NTS.Nexus.HTTP.Functions.Event;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Models;
 using NTS.Nexus.HTTP.Mongo.Repositories;
@@ -200,7 +203,7 @@ public class RegistrationFlowTests
                 CountryRegion = "Bulgaria",
             },
         };
-        var function = new UserFunctions(new TestFunctionLogger(), users, new TestTelemetryService());
+        var function = new UserFunctions(new TestFunctionLogger<UserFunctions>(), users, new TestTelemetryService());
         var request = CreateRequest(
             new RegisterUserPaload("new.user@example.com", "Jane Doe", "Jane", "Doe", "Bulgaria")
         );
@@ -208,7 +211,9 @@ public class RegistrationFlowTests
         var response = await function.Register(request);
 
         var ok = Assert.IsType<OkObjectResult>(response);
-        var payload = Assert.IsType<NUserModel>(ok.Value);
+        var result = Assert.IsType<Result<NUserModel>>(ok.Value);
+        var payload = Assert.IsType<NUserModel>(result.Data);
+        Assert.False(result.IsError);
         Assert.Equal("Jane Doe", payload.Name);
         Assert.Equal("Jane", payload.GivenName);
         Assert.Equal("Doe", payload.Surname);
@@ -217,6 +222,82 @@ public class RegistrationFlowTests
             new NUserRegistration("new.user@example.com", "Jane Doe", "Jane", "Doe", "Bulgaria"),
             users.LastRegistration
         );
+    }
+
+    [Fact]
+    public async Task Users_read_by_email_returns_success_result_with_null_data_when_user_is_missing()
+    {
+        var function = new UserFunctions(
+            new TestFunctionLogger<UserFunctions>(),
+            new RecordingUserRepository(),
+            new TestTelemetryService()
+        );
+        var request = CreateRequest(HttpMethods.Get, "/api/users/missing.user@example.com");
+
+        var response = await function.ReadByEmail(request, "missing.user@example.com");
+
+        var ok = Assert.IsType<OkObjectResult>(response);
+        var result = Assert.IsType<Result<NUserModel>>(ok.Value);
+        Assert.False(result.IsError);
+        Assert.Null(result.Data);
+    }
+
+    [Fact]
+    public async Task Users_read_many_returns_empty_collection_in_result_envelope()
+    {
+        var function = new UserFunctions(
+            new TestFunctionLogger<UserFunctions>(),
+            new RecordingUserRepository(),
+            new TestTelemetryService()
+        );
+        var request = CreateRequest(HttpMethods.Get, "/api/users");
+
+        var response = await function.ReadMany(request);
+
+        var ok = Assert.IsType<OkObjectResult>(response);
+        var result = Assert.IsType<Result<IEnumerable<NUserModel>>>(ok.Value);
+        Assert.False(result.IsError);
+        Assert.Empty(result.Data!);
+    }
+
+    [Fact]
+    public async Task Users_register_returns_bad_request_for_malformed_payload()
+    {
+        var function = new UserFunctions(
+            new TestFunctionLogger<UserFunctions>(),
+            new RecordingUserRepository(),
+            new TestTelemetryService()
+        );
+        var request = CreateRequest(HttpMethods.Post, "/api/users/register", "{ invalid json");
+
+        var response = await function.Register(request);
+
+        var badRequest = Assert.IsType<BadRequestObjectResult>(response);
+        Assert.Equal(
+            $"Payload couldn't be parsed to '{typeof(RegisterUserPaload).FullName}'",
+            badRequest.Value
+        );
+    }
+
+    [Fact]
+    public async Task Endurance_event_start_returns_failure_result_when_business_service_throws_domain_exception()
+    {
+        var function = new EnduranceEventFunctions(
+            new TestFunctionLogger<EnduranceEventFunctions>(),
+            new RecordingRepository<EnduranceEventModel>(),
+            new NoOpEnduranceEventResetService(),
+            new ThrowingEnduranceEventBusinessService(new DomainException("Start blocked")),
+            new TestTelemetryService()
+        );
+        var request = CreateRequest(HttpMethods.Post, "/api/endurance-event/7/start");
+
+        var response = await function.Start(request, 7);
+
+        var ok = Assert.IsType<OkObjectResult>(response);
+        var result = Assert.IsType<Result<EnduranceEventModel>>(ok.Value);
+        Assert.True(result.IsError);
+        Assert.Equal(["Start blocked"], result.Errors);
+        Assert.Null(result.Data);
     }
 
     [Fact]
@@ -241,11 +322,16 @@ public class RegistrationFlowTests
 
     static HttpRequest CreateRequest(RegisterUserPaload payload)
     {
-        var context = new DefaultHttpContext();
         var json = JsonSerializer.Serialize(payload);
-        context.Request.Method = HttpMethods.Post;
-        context.Request.Path = "/api/users/register";
-        context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        return CreateRequest(HttpMethods.Post, "/api/users/register", json);
+    }
+
+    static HttpRequest CreateRequest(string method, string path, string? body = null)
+    {
+        var context = new DefaultHttpContext();
+        context.Request.Method = method;
+        context.Request.Path = path;
+        context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body ?? ""));
         return context.Request;
     }
 
@@ -389,15 +475,17 @@ public class RegistrationFlowTests
     {
         public NUserRegistration? LastRegistration { get; private set; }
         public NUserModel RegisterResult { get; init; } = new("new.user@example.com");
+        public NUserModel? ReadByEmailResult { get; init; }
+        public IEnumerable<NUserModel> ReadManyResult { get; init; } = [];
 
         public Task<NUserModel?> ReadByEmail(string email)
         {
-            return Task.FromResult<NUserModel?>(null);
+            return Task.FromResult(ReadByEmailResult);
         }
 
         public Task<IEnumerable<NUserModel>> ReadMany()
         {
-            return Task.FromResult<IEnumerable<NUserModel>>([]);
+            return Task.FromResult(ReadManyResult);
         }
 
         public Task<NUserModel> Register(NUserRegistration registration)
@@ -407,7 +495,7 @@ public class RegistrationFlowTests
         }
     }
 
-    sealed class TestFunctionLogger : IFunctionLogger<UserFunctions>
+    sealed class TestFunctionLogger<TFunction> : IFunctionLogger<TFunction>
     {
         public void LogDebug(HttpRequest request, string method = "") { }
 
@@ -429,6 +517,29 @@ public class RegistrationFlowTests
         public Activity? StartActivity(string className, string methodName)
         {
             return null;
+        }
+    }
+
+    sealed class NoOpEnduranceEventResetService : IEnduranceEventResetService
+    {
+        public Task Reset(int eventId)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    sealed class ThrowingEnduranceEventBusinessService : IEnduranceEventBusinessService
+    {
+        readonly Exception _exception;
+
+        public ThrowingEnduranceEventBusinessService(Exception exception)
+        {
+            _exception = exception;
+        }
+
+        public Task<EnduranceEventModel> Start(int upcomingEventId)
+        {
+            return Task.FromException<EnduranceEventModel>(_exception);
         }
     }
 }
