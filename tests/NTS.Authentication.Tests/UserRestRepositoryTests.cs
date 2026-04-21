@@ -16,14 +16,8 @@ public class UserRestRepositoryTests
     {
         var handler = new RecordingHttpMessageHandler
         {
-            ResponseFactory = _ => CreateJsonResponse(
-                Result.Success(
-                    new NUserModel("user@example.com", id: 7)
-                    {
-                        Name = "Jane Doe",
-                    }
-                )
-            ),
+            ResponseFactory = _ =>
+                CreateJsonResponse(Result.Success(new NUserModel("user@example.com", id: 7) { Name = "Jane Doe" })),
         };
         var repository = CreateRepository(handler);
 
@@ -78,7 +72,10 @@ public class UserRestRepositoryTests
         {
             return Task.FromResult(
                 ResponseFactory?.Invoke(request)
-                    ?? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Result.Success().ToJson()) }
+                    ?? new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(Result.Success().ToJson()),
+                    }
             );
         }
     }

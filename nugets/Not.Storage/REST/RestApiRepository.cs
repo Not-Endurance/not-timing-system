@@ -79,11 +79,11 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
                 && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
             )
             {
-    #if DEBUG
+#if DEBUG
                 Notifier?.Warn(ex.Message);
-    #else
+#else
                 Notifier?.Warn(Not.Localization.NStrings.Cannot_connect_to_server_string);
-    #endif
+#endif
             }
             else
             {

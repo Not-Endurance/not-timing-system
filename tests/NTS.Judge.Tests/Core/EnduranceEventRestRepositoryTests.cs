@@ -121,7 +121,10 @@ public class EnduranceEventRestRepositoryTests
             Requests.Add(request);
             return Task.FromResult(
                 ResponseFactory?.Invoke(request)
-                    ?? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Result.Success().ToJson()) }
+                    ?? new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(Result.Success().ToJson()),
+                    }
             );
         }
     }
