@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Not.Application.Authentication.Abstractions;
-using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Client.Authentication.Services;
+using Not.Blazor.Components.Abstractions;
 
 namespace Not.Blazor.Client.Authentication.Components;
 

@@ -15,7 +15,11 @@ public static class NClientAuthenticationSessionPolicy
         return DEFAULT_SESSION_LIFETIME;
     }
 
-    public static bool IsSessionActive(DateTimeOffset? startedAtUtc, NClientAuthenticationSettings settings, DateTimeOffset nowUtc)
+    public static bool IsSessionActive(
+        DateTimeOffset? startedAtUtc,
+        NClientAuthenticationSettings settings,
+        DateTimeOffset nowUtc
+    )
     {
         if (!startedAtUtc.HasValue)
         {
