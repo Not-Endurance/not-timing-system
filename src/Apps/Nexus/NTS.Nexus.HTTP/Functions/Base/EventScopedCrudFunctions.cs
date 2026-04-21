@@ -25,11 +25,6 @@ public class EventScopedCrudFunctions<T> : FunctionBase
     protected async Task<IActionResult> InternalCreate(HttpRequest request, int eventId)
     {
         var payload = await ReadBody<T>(request);
-        if (payload == null)
-        {
-            return UnexpectedPayload<T>();
-        }
-
         payload.EventId = eventId;
         await _repository.Create(payload);
         return Ok();
@@ -37,29 +32,17 @@ public class EventScopedCrudFunctions<T> : FunctionBase
 
     protected async Task<IActionResult> InternalRead(HttpRequest _, int eventId, int id)
     {
-        var result = await _repository.Read(x => x.EventId == eventId && x.Id == id);
-        if (result == null)
-        {
-            return new NotFoundResult();
-        }
-
-        return Ok(result);
+        return Ok(await _repository.Read(x => x.EventId == eventId && x.Id == id));
     }
 
     protected async Task<IActionResult> InternalReadMany(HttpRequest _, int eventId)
     {
-        var result = await _repository.ReadMany(x => x.EventId == eventId);
-        return Ok(result);
+        return Ok(await _repository.ReadMany(x => x.EventId == eventId) ?? []);
     }
 
     protected async Task<IActionResult> InternalUpdate(HttpRequest request, int eventId)
     {
         var payload = await ReadBody<T>(request);
-        if (payload == null)
-        {
-            return UnexpectedPayload<T>();
-        }
-
         payload.EventId = eventId;
         await _repository.Update(payload);
         return Ok();

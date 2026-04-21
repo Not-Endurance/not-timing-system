@@ -1,5 +1,6 @@
 @using NTS.Blazor.Components.ParticipationChips
 @using NTS.Witness.Blazor.Features.Core.Snapshots.Components
+@using MudBlazor
 @using Not.Blazor.Components.Buttons
 @using Not.Blazor.Components.Layout
 
@@ -13,8 +14,16 @@
 
             <SnapshotComponent Snapshots="@Snapshots" />
 
-            <ParticipationChips Participations="@Participations"
-                                SelectedChanged="@MoveToSnapshot" />
+            <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                <ParticipationChips Participations="@Participations"
+                                    SelectedChanged="@MoveToSnapshot" />
+            </MudHidden>
+
+            <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                <ParticipationChips Participations="@Participations"
+                                    SelectedChanged="@MoveToSnapshot"
+                                    Compact />
+            </MudHidden>
 
         </MudStack>
     </Main>

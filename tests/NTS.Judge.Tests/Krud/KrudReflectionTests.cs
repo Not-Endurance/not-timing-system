@@ -269,7 +269,7 @@ public class KrudReflectionTests
 
             var @event = new UpcomingEvent(
                 name: "Event",
-                place: "Sofia",
+                location: "Sofia",
                 country,
                 showFeiId: null,
                 feiId: null,

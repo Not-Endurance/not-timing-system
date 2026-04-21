@@ -297,6 +297,9 @@
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Номер на комбинация</value>
   </data>
+  <data name="Location_string" xml:space="preserve">
+    <value>Локация</value>
+  </data>
   <data name="Place_string" xml:space="preserve">
     <value>Място</value>
   </data>
@@ -423,8 +426,8 @@
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Моля изберете време в бъдещето</value>
   </data>
-  <data name="Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection" xml:space="preserve">
-    <value>Не може да бъде установена връзка към Нексус сървъра. Някои функции ще бъдат ограничени. Моля проверете интернет връзката си</value>
+  <data name="Cannot_connect_to_server_string" xml:space="preserve">
+    <value>Няма връзка със сървъра</value>
   </data>
   <data name="Athletes_string" xml:space="preserve">
     <value>Атлети</value>
@@ -950,6 +953,9 @@
   </data>
   <data name="Register_string" xml:space="preserve">
     <value>Регистрация</value>
+  </data>
+  <data name="Validation_errors_string" xml:space="preserve">
+    <value>Валидационни грешки</value>
   </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>

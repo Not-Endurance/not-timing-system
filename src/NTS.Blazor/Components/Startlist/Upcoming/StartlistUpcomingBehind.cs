@@ -38,6 +38,11 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
         return $"{entry.Distance:0.##}{km_string}";
     }
 
+    protected string GetTimerKey(Starter entry)
+    {
+        return $"{entry.PhaseNumber}:{entry.Number}:{entry.Start}";
+    }
+
     public override void Dispose()
     {
         base.Dispose();

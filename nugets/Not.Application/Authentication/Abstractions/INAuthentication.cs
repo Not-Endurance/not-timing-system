@@ -2,6 +2,6 @@
 
 public interface INAuthentication
 {
-    void Signin();
+    void Signin(bool silent = false);
     void Signout();
 }

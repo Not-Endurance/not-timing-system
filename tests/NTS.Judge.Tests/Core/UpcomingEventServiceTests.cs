@@ -9,6 +9,7 @@ using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 using NTS.Judge.Features.Setup.UpcomingEvents;
+using NTS.Judge.Tests.Core.Implementations;
 using SetupOfficial = NTS.Domain.Setup.Aggregates.UpcomingEvents.Official;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.UpcomingEvents.Participation;
 
@@ -288,18 +289,5 @@ public class UpcomingEventServiceTests
             _items.RemoveAll(x => ids.Contains(x.Id));
             return Task.CompletedTask;
         }
-    }
-
-    sealed class TestNotifier : INotifier
-    {
-        public void Error(string message) { }
-
-        public void Error(Exception ex) { }
-
-        public void Inform(string message) { }
-
-        public void Success(string message) { }
-
-        public void Warn(string message) { }
     }
 }

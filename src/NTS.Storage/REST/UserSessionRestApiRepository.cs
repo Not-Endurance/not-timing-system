@@ -23,16 +23,10 @@ public class UserSessionRestApiRepository
             return null;
         }
 
-        try
-        {
-            var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
-            return await Client.GetJson<NtsUserSessionModel>($"{Endpoint}/by-user-identifier/{encodedUserIdentifier}");
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-            return null;
-        }
+        var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
+        return await HandleRequest(
+            Client.Get<NtsUserSessionModel>($"{Endpoint}/by-user-identifier/{encodedUserIdentifier}")
+        );
     }
 
     async Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(

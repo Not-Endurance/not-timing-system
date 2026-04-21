@@ -461,8 +461,8 @@ public class EnduranceEventModel
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public CountryModel Country { get; set; } = default!;
-    public string City { get; set; } = default!;
-    public string? Location { get; set; }
+    public string Name { get; set; } = default!;
+    public string Location { get; set; } = default!;
     public string? FeiShowId { get; set; }
     public string? FeiId { get; set; }
     public string? FeiEventCode { get; set; }
@@ -474,9 +474,9 @@ public class EnduranceEventModel
     public void MapFrom(EnduranceEvent enduranceEvent)
     {
         Id = enduranceEvent.Id;
-        Country = CountryModel.From(enduranceEvent.PopulatedPlace.Country);
-        City = enduranceEvent.PopulatedPlace.City;
-        Location = enduranceEvent.PopulatedPlace.Location;
+        Country = CountryModel.From(enduranceEvent.Country);
+        Name = enduranceEvent.Name;
+        Location = enduranceEvent.Location;
         FeiShowId = enduranceEvent.FeiShowId;
         FeiId = enduranceEvent.FeiId;
         FeiEventCode = enduranceEvent.FeiEventCode;
@@ -487,9 +487,8 @@ public class EnduranceEventModel
     public EnduranceEvent MapToEntity()
     {
         var country = Country.MapToEntity();
-        var place = new PopulatedPlace(country, City, Location);
         var span = new EventSpan(StartDay, EndDay);
-        return new EnduranceEvent(place, span, FeiShowId, FeiId, FeiEventCode, Id);
+        return new EnduranceEvent(country, Name, Location, span, FeiShowId, FeiId, FeiEventCode, Id);
     }
 }
 
@@ -640,14 +639,12 @@ public class ArchiveEntryModel : IDocument, IKrudModel<ArchiveEntry>
         IEnumerable<Ranklist> ranklists
     )
     {
-        var model = new ArchiveEntryModel();
-
         return new ArchiveEntryModel
         {
             Id = enduranceEvent.Id,
-            Country = CountryModel.From(enduranceEvent.PopulatedPlace.Country),
-            City = enduranceEvent.PopulatedPlace.City,
-            Location = enduranceEvent.PopulatedPlace.Location,
+            Country = CountryModel.From(enduranceEvent.Country),
+            Name = enduranceEvent.Name,
+            Location = enduranceEvent.Location,
             FeiShowId = enduranceEvent.FeiShowId,
             FeiId = enduranceEvent.FeiId,
             FeiEventCode = enduranceEvent.FeiEventCode,
@@ -661,8 +658,8 @@ public class ArchiveEntryModel : IDocument, IKrudModel<ArchiveEntry>
     public int Id { get; set; } = default!;
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
     public CountryModel Country { get; set; } = default!;
-    public string City { get; set; } = default!;
-    public string? Location { get; set; }
+    public string Name { get; set; } = default!;
+    public string Location { get; set; } = default!;
     public string? FeiShowId { get; set; }
     public string? FeiId { get; set; }
     public string? FeiEventCode { get; set; }
@@ -674,9 +671,9 @@ public class ArchiveEntryModel : IDocument, IKrudModel<ArchiveEntry>
     public void MapFrom(ArchiveEntry archiveEntry)
     {
         Id = archiveEntry.EnduranceEvent.Id;
-        Country = CountryModel.From(archiveEntry.EnduranceEvent.PopulatedPlace.Country);
-        City = archiveEntry.EnduranceEvent.PopulatedPlace.City;
-        Location = archiveEntry.EnduranceEvent.PopulatedPlace.Location;
+        Country = CountryModel.From(archiveEntry.EnduranceEvent.Country);
+        Name = archiveEntry.EnduranceEvent.Name;
+        Location = archiveEntry.EnduranceEvent.Location;
         FeiShowId = archiveEntry.EnduranceEvent.FeiShowId;
         FeiId = archiveEntry.EnduranceEvent.FeiId;
         FeiEventCode = archiveEntry.EnduranceEvent.FeiEventCode;
@@ -689,9 +686,8 @@ public class ArchiveEntryModel : IDocument, IKrudModel<ArchiveEntry>
     public ArchiveEntry MapToEntity()
     {
         var country = Country.MapToEntity();
-        var place = new PopulatedPlace(country, City, Location ?? "");
         var span = new EventSpan(StartDay, EndDay);
-        var enduranceEvent = new EnduranceEvent(place, span, FeiShowId, FeiId, FeiEventCode, Id);
+        var enduranceEvent = new EnduranceEvent(country, Name, Location, span, FeiShowId, FeiId, FeiEventCode, Id);
         var officials = Officials.Select(x => x.MapToEntity());
         var ranklists = Ranklists.Select(x => x.MapToEntity());
         return new ArchiveEntry(enduranceEvent, officials, ranklists);

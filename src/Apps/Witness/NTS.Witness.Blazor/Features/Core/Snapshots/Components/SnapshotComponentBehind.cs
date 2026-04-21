@@ -20,6 +20,8 @@ public class SnapshotComponentBehind : NComponent
 
     protected string[] Headings { get; set; } = [Participant_string];
 
+    protected IEnumerable<Snapshot> OrderedSnapshots => Snapshots.OrderBy(x => x.Timestamp != null);
+
     [Parameter]
     public IReadOnlyList<Snapshot> Snapshots { get; set; } = [];
 

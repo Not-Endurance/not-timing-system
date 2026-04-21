@@ -29,7 +29,7 @@ public class UserFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(ReadMany));
 
-        return Ok(await _users.ReadMany());
+        return Ok(await _users.ReadMany() ?? []);
     }
 
     [Function("users-read-by-email")]
@@ -42,13 +42,7 @@ public class UserFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(ReadByEmail));
 
-        var user = await _users.ReadByEmail(email);
-        if (user == null)
-        {
-            return NotFound(email);
-        }
-
-        return Ok(user);
+        return Ok(await _users.ReadByEmail(email));
     }
 
     [Function("users-register")]
@@ -61,12 +55,12 @@ public class UserFunctions : FunctionBase
         LogInformation(request, nameof(Register));
 
         var payload = await ReadBody<RegisterUserPaload>(request);
-        if (string.IsNullOrWhiteSpace(payload?.Email))
+        if (string.IsNullOrWhiteSpace(payload.Email))
         {
-            return InvalidPayload($"Value '{payload?.Email}' is not a valid email");
+            return InvalidPayload($"Value '{payload.Email}' is not a valid email");
         }
 
-        var user = await _users.Register(
+        await _users.Register(
             new NUserRegistration(
                 payload.Email,
                 payload.Name,
@@ -75,6 +69,7 @@ public class UserFunctions : FunctionBase
                 payload.CountryRegion
             )
         );
-        return Ok(user);
+
+        return Ok();
     }
 }

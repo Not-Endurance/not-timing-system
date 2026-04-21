@@ -14,16 +14,8 @@ public class SettingRestApiRepository : RestApiRepository<Setting, SettingModel>
 
     public async Task<Setting?> Get(Guid accountId)
     {
-        try
-        {
-            var url = BuildUrl(accountId);
-            var model = await Client.GetJson<SettingModel>(url);
-            return MapEntity(model);
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-            return null;
-        }
+        var url = BuildUrl(accountId);
+        var model = await HandleRequest(Client.Get<SettingModel>(url));
+        return MapEntity(model);
     }
 }

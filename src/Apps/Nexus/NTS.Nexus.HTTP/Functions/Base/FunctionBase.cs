@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Not.Serialization.JSON;
+using Not.Structures;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
 
@@ -47,35 +49,30 @@ public abstract class FunctionBase
         _logger.LogError(request, exception, methodName);
     }
 
-    protected async Task<TPayload?> ReadBody<TPayload>(HttpRequest request)
+    protected async Task<TPayload> ReadBody<TPayload>(HttpRequest request)
         where TPayload : class
     {
         var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-        return requestBody.TryFromJson<TPayload>();
+        return requestBody.FromJson<TPayload>();
     }
 
     protected IActionResult Ok()
     {
-        return new OkResult();
+        return new OkObjectResult(Result.Success());
     }
 
     protected IActionResult Ok<TPayload>(TPayload payload)
     {
-        return new OkObjectResult(payload);
+        return new OkObjectResult(Result.Success(payload!));
     }
 
-    protected IActionResult UnexpectedPayload<TPayload>()
+    protected IActionResult Failure(params string[] errors)
     {
-        return new BadRequestObjectResult($"Payload couldn't be parsed to '{typeof(TPayload).FullName}'");
+        return new OkObjectResult(Result.Failure(errors));
     }
 
     protected IActionResult InvalidPayload(string message)
     {
         return new BadRequestObjectResult(message);
-    }
-
-    protected IActionResult NotFound(object? criteria)
-    {
-        return new NotFoundObjectResult($"Entity with '{criteria}' not found");
     }
 }

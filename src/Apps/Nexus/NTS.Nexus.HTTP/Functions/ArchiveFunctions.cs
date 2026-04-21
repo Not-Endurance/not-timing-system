@@ -33,11 +33,6 @@ public class ArchiveFunctions : FunctionBase
         LogInformation(request, nameof(Insert));
 
         var document = await ReadBody<ArchiveEntryModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<ArchiveEntryModel>();
-        }
-
         var existing = await _archive.Read(document.Id);
         if (existing != null) // TODO: investigate this not working
         {
@@ -45,7 +40,7 @@ public class ArchiveFunctions : FunctionBase
         }
 
         await _archive.Create(document);
-        return new OkObjectResult($"Archived event with id '{document.Id}'");
+        return Ok();
     }
 
     [Function("archive-list")]
@@ -57,8 +52,7 @@ public class ArchiveFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var result = await _archive.ReadMany();
-        return new OkObjectResult(result);
+        return Ok(await _archive.ReadMany() ?? []);
     }
 
     [Function("archive-query-by-horse")]
@@ -71,7 +65,6 @@ public class ArchiveFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(QueryByHorse));
 
-        var archives = await _archive.GetPerformances(horseId);
-        return new OkObjectResult(archives);
+        return Ok(await _archive.GetPerformances(horseId) ?? []);
     }
 }

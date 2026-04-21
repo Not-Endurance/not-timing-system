@@ -1,10 +1,7 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using Not.Domain.Exceptions;
-using Not.Structures;
 using NTS.Application.Core;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
@@ -42,10 +39,6 @@ public class EnduranceEventFunctions : FunctionBase
         LogInformation(request, nameof(Create));
 
         var payload = await ReadBody<EnduranceEventModel>(request);
-        if (payload == null)
-        {
-            return UnexpectedPayload<EnduranceEventModel>();
-        }
         await _events.Create(payload);
         return Ok();
     }
@@ -60,10 +53,6 @@ public class EnduranceEventFunctions : FunctionBase
         LogInformation(request, nameof(Update));
 
         var payload = await ReadBody<EnduranceEventModel>(request);
-        if (payload == null)
-        {
-            return UnexpectedPayload<EnduranceEventModel>();
-        }
         await _events.Update(payload);
         return Ok();
     }
@@ -78,13 +67,7 @@ public class EnduranceEventFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Read));
 
-        var current = await _events.Read(x => x.Id == id);
-        if (current == null)
-        {
-            return new NotFoundResult();
-        }
-
-        return Ok(current);
+        return Ok(await _events.Read(x => x.Id == id));
     }
 
     [Function("endurance-event-list")]
@@ -96,8 +79,7 @@ public class EnduranceEventFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var events = await _events.ReadMany();
-        return Ok(events);
+        return Ok(await _events.ReadMany() ?? []);
     }
 
     [Function("endurance-event-delete")]
@@ -146,15 +128,6 @@ public class EnduranceEventFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Start));
 
-        try
-        {
-            var startedEvent = await _businessService.Start(id);
-            return Ok(Result.Success(startedEvent));
-        }
-        catch (DomainException ex)
-        {
-            Activity.Current.TagException(ex);
-            return Ok(Result.Failure<EnduranceEventModel>(ex.Message));
-        }
+        return Ok(await _businessService.Start(id));
     }
 }

@@ -6,5 +6,5 @@ namespace NTS.Judge.Features.Core.Rankings;
 
 public interface IRanklistDocumentFactory : ITransient
 {
-    Task<RanklistDocument> Create(Ranking ranking);
+    RanklistDocument Create(Ranking ranking);
 }

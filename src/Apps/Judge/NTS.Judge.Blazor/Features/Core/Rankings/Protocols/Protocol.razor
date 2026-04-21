@@ -18,10 +18,10 @@
         <MudItem Class="d-flex flex-column justify-center">
             <NHeadline2 Content="@header.Title" Class="mb-4" />
 
-            <MudStack Class="d-flex mb-3" Row="true" Justify="Justify.Center">
-                <NHeadline3 Content="@header.PopulatedPlace.City" />
+            <MudStack Class="d-flex mb-3" Justify="Justify.Center" Spacing="0">
+                <NHeadline3 Content="@header.Location" />
                 <NHeadline3 Content="@header.EventSpan.ToString()" />
-                <NHeadline3 Content="@LocalizeString(header.PopulatedPlace.Country.ToString())" />
+                <NHeadline3 Content="@LocalizeString(header.Country.ToString())" />
             </MudStack>
         </MudItem>
 

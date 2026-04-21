@@ -41,6 +41,68 @@ public class CompetitionSpeedLimitTests
         Assert.Null(participation.MaxAverageSpeed);
     }
 
+    [Fact]
+    public void Constructor_WhenParticipationIsTraining_ClearsDefaultSpeedLimits()
+    {
+        var participation = new Participation(
+            isNotRanked: false,
+            combination: CreateCombination(42),
+            category: ParticipationCategory.Training,
+            startTimeOverride: null,
+            maxSpeedOverride: null,
+            minSpeedOverride: null,
+            id: 102
+        );
+
+        _ = new Competition(
+            name: "Training",
+            type: CompetitionType.Qualification,
+            ruleset: CompetitionRuleset.Regional,
+            start: DateTimeOffset.UtcNow,
+            compulsoryThresholdSpan: null,
+            feiId: null,
+            feiRule: null,
+            feiScheduleNumber: null,
+            phases: [new Phase(new Loop(40, 302), 40, null, 202)],
+            participations: [participation],
+            id: 402
+        );
+
+        Assert.Null(participation.MinAverageSpeed);
+        Assert.Null(participation.MaxAverageSpeed);
+    }
+
+    [Fact]
+    public void Constructor_WhenTrainingParticipationHasOverrides_PreservesThem()
+    {
+        var participation = new Participation(
+            isNotRanked: false,
+            combination: CreateCombination(43),
+            category: ParticipationCategory.Training,
+            startTimeOverride: null,
+            maxSpeedOverride: 16,
+            minSpeedOverride: 10,
+            id: 103
+        );
+
+        _ = new Competition(
+            name: "Training",
+            type: CompetitionType.Qualification,
+            ruleset: CompetitionRuleset.Regional,
+            start: DateTimeOffset.UtcNow,
+            compulsoryThresholdSpan: null,
+            feiId: null,
+            feiRule: null,
+            feiScheduleNumber: null,
+            phases: [new Phase(new Loop(40, 303), 40, null, 203)],
+            participations: [participation],
+            id: 403
+        );
+
+        Assert.Equal(10, participation.MinAverageSpeed);
+        Assert.Equal(16, participation.MaxAverageSpeed);
+    }
+
     static Combination CreateCombination(int number)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");

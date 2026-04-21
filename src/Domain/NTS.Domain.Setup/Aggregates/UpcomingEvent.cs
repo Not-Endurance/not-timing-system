@@ -20,7 +20,7 @@ public class UpcomingEvent
 
     public UpcomingEvent(
         string? name,
-        string? place,
+        string? location,
         Country? country,
         string? showFeiId,
         string? feiId,
@@ -34,7 +34,7 @@ public class UpcomingEvent
         : base(id)
     {
         Name = Required(nameof(Name), name);
-        Place = Required(nameof(Place), place);
+        Location = Required(nameof(Location), location);
         Country = Required(nameof(Country), country);
         ShowFeiId = showFeiId;
         FeiId = feiId;
@@ -52,7 +52,7 @@ public class UpcomingEvent
     IReadOnlyList<Combination> IKrudParent<Combination>.Children => Combinations;
 
     public string Name { get; }
-    public string Place { get; }
+    public string Location { get; }
     public Country Country { get; }
     public string? ShowFeiId { get; }
     public string? FeiId { get; }
@@ -99,7 +99,7 @@ public class UpcomingEvent
 
     public override string ToString()
     {
-        return Combine(Name, Place, Country);
+        return Combine(Name, Location, Country);
     }
 
     public void Add(Loop child)

@@ -33,13 +33,8 @@ public class UpcomingEventFunctions : FunctionBase
         LogInformation(request, nameof(Insert));
 
         var document = await ReadBody<UpcomingEventModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<UpcomingEventModel>();
-        }
-
         await _upcomingEvents.Create(document);
-        return new OkObjectResult($"Upcoming event {document.Place} stored successfully.");
+        return Ok();
     }
 
     [Function("upcoming-event-list")]
@@ -51,8 +46,7 @@ public class UpcomingEventFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var documents = await _upcomingEvents.ReadMany();
-        return new OkObjectResult(documents);
+        return Ok(await _upcomingEvents.ReadMany() ?? []);
     }
 
     [Function("upcoming-event-query-by-id")]
@@ -65,13 +59,7 @@ public class UpcomingEventFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(QueryById));
 
-        var document = await _upcomingEvents.Read(id);
-        if (document == null)
-        {
-            return new NotFoundResult();
-        }
-
-        return new OkObjectResult(document);
+        return Ok(await _upcomingEvents.Read(id));
     }
 
     [Function("upcoming-event-update")]
@@ -84,13 +72,8 @@ public class UpcomingEventFunctions : FunctionBase
         LogInformation(request, nameof(Update));
 
         var document = await ReadBody<UpcomingEventModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<UpcomingEventModel>();
-        }
-
         await _upcomingEvents.Update(document);
-        return new OkObjectResult($"Updated upcoming event {document.Place}");
+        return Ok();
     }
 
     [Function("upcoming-event-delete")]
@@ -106,10 +89,10 @@ public class UpcomingEventFunctions : FunctionBase
         var upcomingEvent = await _upcomingEvents.Read(id);
         if (upcomingEvent == null)
         {
-            return new OkObjectResult($"Event with id '{id}' did not exist");
+            return Ok();
         }
 
         await _upcomingEvents.Delete(upcomingEvent);
-        return new OkObjectResult($"Deleted upcoming event with id '{id}'");
+        return Ok();
     }
 }

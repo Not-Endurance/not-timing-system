@@ -88,7 +88,9 @@ public class JudgeStartupEventCoordinatorTests
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
         return new EnduranceEvent(
-            new PopulatedPlace(country, "Sofia", "Sofia"),
+            country,
+            $"Event{id}",
+            "Sofia",
             new EventSpan(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(1)),
             null,
             null,

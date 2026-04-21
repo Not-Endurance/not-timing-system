@@ -8,6 +8,7 @@ using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
 using NTS.Judge.Features.Socket;
+using NTS.Judge.Tests.Core.Implementations;
 
 namespace NTS.Judge.Tests.Core;
 
@@ -59,7 +60,9 @@ public class JudgeSocketServiceTests
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
         return new EnduranceEvent(
-            new PopulatedPlace(country, "Sofia", "Sofia"),
+            country,
+            "Sofia",
+            "Sofia",
             new EventSpan(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(1)),
             null,
             null,
@@ -122,18 +125,5 @@ public class JudgeSocketServiceTests
         {
             throw new NotImplementedException();
         }
-    }
-
-    sealed class TestNotifier : INotifier
-    {
-        public void Error(string message) { }
-
-        public void Error(Exception ex) { }
-
-        public void Inform(string message) { }
-
-        public void Success(string message) { }
-
-        public void Warn(string message) { }
     }
 }

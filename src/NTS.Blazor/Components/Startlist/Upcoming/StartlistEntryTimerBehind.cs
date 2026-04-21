@@ -29,16 +29,17 @@ public class StartlistEntryTimerBehind : NStatefulComponent
     protected override void OnBeforeRender()
     {
         var now = DateTimeOffset.Now;
-        var delta = now - Entry.Start;
-        var displayTime = FormattingHelper.Format(delta!.ToTimeSpan());
+        var start = Entry.Start.ToDateTimeOffset();
+        var delta = start - now;
+        var displayTime = FormattingHelper.Format(delta.Duration());
         if (Entry.State == StartlistEntryState.Late)
         {
-            displayTime = $" - {displayTime}";
+            displayTime = $"- {displayTime}";
             Color = Color.Error;
         }
-        else if (Entry.State == StartlistEntryState.Ready)
+        else
         {
-            Color = Color.Warning;
+            Color = Color.Success;
         }
         DisplayTime = displayTime;
     }

@@ -4,6 +4,7 @@ using Not.Application.HTTP;
 using Not.Domain.Abstractions;
 using Not.Krud.Abstractions;
 using Not.Notify;
+using Not.Structures;
 
 namespace Not.Storage.REST;
 
@@ -34,36 +35,13 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         return $"{ResolveEndpoint()}/{id}";
     }
 
-    protected virtual void HandleException(Exception ex)
-    {
-        if (
-            ex is HttpRequestException httpRequestException
-            && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
-        )
-        {
-#if DEBUG
-            Notifier?.Warn(ex.Message);
-#else
-            Notifier?.Warn(
-                Not.Localization
-                    .NStrings
-                    .Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
-            );
-#endif
-        }
-        else
-        {
-            Notifier?.Error(ex);
-        }
-    }
-
-    protected virtual Task InternalCreate(T item)
+    protected virtual Task<Result<TModel>> CreateCore(T item)
     {
         var model = MapModel(item);
         return Client.Post(ResolveEndpoint(), model);
     }
 
-    protected virtual Task InternalUpdate(T item)
+    protected virtual Task<Result<TModel>> UpdateCore(T item)
     {
         var model = MapModel(item);
         return Client.Patch(ResolveEndpoint(), model);
@@ -81,29 +59,49 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         return model?.MapToEntity();
     }
 
-    public async Task Create(T item)
+    protected virtual async Task<TItem?> HandleRequest<TItem>(Task<Result<TItem>> request)
+        where TItem : class
     {
         try
         {
-            await InternalCreate(item);
+            var result = await request;
+            if (!result.IsSuccess)
+            {
+                Notifier?.Warn(string.Join(Environment.NewLine, result.Errors));
+                return null;
+            }
+            return result.Data;
         }
         catch (Exception ex)
         {
-            HandleException(ex);
+            if (
+                ex is HttpRequestException httpRequestException
+                && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
+            )
+            {
+#if DEBUG
+                Notifier?.Warn(ex.Message);
+#else
+                Notifier?.Warn(Not.Localization.NStrings.Cannot_connect_to_server_string);
+#endif
+            }
+            else
+            {
+                Notifier?.Error(ex);
+            }
+            return null;
         }
+    }
+
+    public async Task Create(T item)
+    {
+        await HandleRequest(CreateCore(item));
     }
 
     public async Task Delete(int id)
     {
-        try
-        {
-            var url = BuildUrl(id);
-            await Client.Delete(url);
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-        }
+        var url = BuildUrl(id);
+        await HandleRequest(Client.Delete(url));
     }
 
     public async Task Delete(T item)
@@ -128,30 +126,15 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
 
     public async Task<T?> Read(int id)
     {
-        try
-        {
-            var url = BuildUrl(id);
-            return MapEntity(await Client.GetJson<TModel>(url));
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-            return null;
-        }
+        var url = BuildUrl(id);
+        var model = await HandleRequest(Client.Get<TModel>(url));
+        return MapEntity(model);
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany()
     {
-        try
-        {
-            var models = await Client.GetJson<IEnumerable<TModel>>(ResolveEndpoint()) ?? [];
-            return models.Select(x => MapEntity(x)!);
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-            return [];
-        }
+        var models = await HandleRequest(Client.Get<IEnumerable<TModel>>(ResolveEndpoint())) ?? [];
+        return models.Select(x => MapEntity(x)!);
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
@@ -162,14 +145,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
 
     public async Task Update(T item)
     {
-        try
-        {
-            await InternalUpdate(item);
-        }
-        catch (Exception ex)
-        {
-            HandleException(ex);
-        }
+        await HandleRequest(UpdateCore(item));
     }
 
     async Task DeleteMany(Expression<Func<T, bool>> filter)

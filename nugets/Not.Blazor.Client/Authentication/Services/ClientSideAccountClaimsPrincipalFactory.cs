@@ -9,13 +9,13 @@ namespace Not.Blazor.Client.Authentication.Services;
 
 internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactory<RemoteUserAccount>
 {
-    readonly ILocalStorageMarkerService _localStorageMarkerService;
+    readonly INAuthenticationSession _clientAuthenticationSessionService;
     readonly NUserResolver _userResolver;
     readonly NavigationManager _navigator;
     readonly ILogger<ClientSideAccountClaimsPrincipalFactory> _logger;
 
     public ClientSideAccountClaimsPrincipalFactory(
-        ILocalStorageMarkerService localStorageMarkerService,
+        INAuthenticationSession clientAuthenticationSessionService,
         IAccessTokenProviderAccessor accessor,
         NUserResolver userResolver,
         NavigationManager navigator,
@@ -23,7 +23,7 @@ internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalF
     )
         : base(accessor)
     {
-        _localStorageMarkerService = localStorageMarkerService;
+        _clientAuthenticationSessionService = clientAuthenticationSessionService;
         _userResolver = userResolver;
         _navigator = navigator;
         _logger = logger;
@@ -40,7 +40,7 @@ internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalF
             return principal;
         }
 
-        if (await _localStorageMarkerService.IsSignedOut())
+        if (!await _clientAuthenticationSessionService.HasActiveSession())
         {
             return new ClaimsPrincipal(new ClaimsIdentity());
         }
@@ -48,6 +48,7 @@ internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalF
         var result = await _userResolver.ResolvePrincipal(principal);
         if (result.IsSuccess)
         {
+            await _clientAuthenticationSessionService.Commit();
             return result.Principal;
         }
 

@@ -44,6 +44,14 @@ public class AuthenticationExtensionsTests
         );
     }
 
+    [Fact]
+    public void CreateSettings_binds_session_lifetime_from_configuration()
+    {
+        var settings = CreateSettings(CreateConfiguration(sessionLifetime: "12:00:00"));
+
+        Assert.Equal(TimeSpan.FromHours(12), settings.SessionLifetime);
+    }
+
     static RemoteAuthenticationOptions<MsalProviderOptions> Configure(IConfiguration configuration)
     {
         var options = new RemoteAuthenticationOptions<MsalProviderOptions>();
@@ -57,10 +65,25 @@ public class AuthenticationExtensionsTests
         return options;
     }
 
+    static Not.Application.Authentication.Provider.NClientAuthenticationSettings CreateSettings(
+        IConfiguration configuration
+    )
+    {
+        var createSettings = typeof(AuthenticationExtensions).GetMethod(
+            "CreateSettings",
+            BindingFlags.Static | BindingFlags.NonPublic
+        );
+
+        Assert.NotNull(createSettings);
+        return (Not.Application.Authentication.Provider.NClientAuthenticationSettings)
+            createSettings!.Invoke(null, [configuration])!;
+    }
+
     static IConfiguration CreateConfiguration(
         string? resourceClientId = null,
         string? audience = null,
-        string? scope = null
+        string? scope = null,
+        string? sessionLifetime = null
     )
     {
         return new ConfigurationBuilder()
@@ -85,6 +108,9 @@ public class AuthenticationExtensionsTests
                     [
                         $"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.Scope)}"
                     ] = scope,
+                    [
+                        $"{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings)}:{nameof(Not.Application.Authentication.Provider.NClientAuthenticationSettings.SessionLifetime)}"
+                    ] = sessionLifetime,
                 }
             )
             .Build();

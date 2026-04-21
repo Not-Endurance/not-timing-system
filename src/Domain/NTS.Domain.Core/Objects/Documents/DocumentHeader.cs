@@ -1,4 +1,5 @@
-﻿using NTS.Domain.Core.Aggregates;
+﻿using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Domain.Core.Objects.Documents;
 
@@ -6,13 +7,15 @@ public record DocumentHeader
 {
     public DocumentHeader(
         string enduranceEvent,
-        PopulatedPlace populatedPlace,
+        Country country,
+        string location,
         EventSpan eventSpan,
         IEnumerable<Official> officials
     )
     {
         Title = enduranceEvent;
-        PopulatedPlace = populatedPlace;
+        Country = country;
+        Location = location;
         EventSpan = eventSpan;
         GroundJuryPresident = officials.FirstOrDefault(x => x.Role == OfficialRole.GroundJuryPresident);
         VeterinaryCommissionPresident = officials.FirstOrDefault(x =>
@@ -25,7 +28,8 @@ public record DocumentHeader
     }
 
     public string Title { get; }
-    public PopulatedPlace PopulatedPlace { get; }
+    public Country Country { get; }
+    public string Location { get; }
     public EventSpan EventSpan { get; }
     public Official? GroundJuryPresident { get; }
     public Official? VeterinaryCommissionPresident { get; }

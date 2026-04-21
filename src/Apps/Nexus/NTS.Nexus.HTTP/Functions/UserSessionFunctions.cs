@@ -80,13 +80,7 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         TagRequest(request);
         LogInformation(request, nameof(ReadByUserIdentifier));
 
-        var session = await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier));
-        if (session == null)
-        {
-            return new NotFoundResult();
-        }
-
-        return Ok(session);
+        return Ok(await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier)));
     }
 
     [Function("user-sessions-read-many")]

@@ -112,7 +112,9 @@ public class WitnessEventScopedStateTests
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
         return new EnduranceEvent(
-            new PopulatedPlace(country, "Sofia", "Ring"),
+            country,
+            "Sofia",
+            "Ring",
             new EventSpan(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(1)),
             null,
             null,

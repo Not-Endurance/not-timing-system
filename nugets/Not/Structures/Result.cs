@@ -3,13 +3,13 @@ using Newtonsoft.Json;
 
 namespace Not.Structures;
 
-public class Result : ResultBase
+public class Result : Result<Result.Empty>
 {
     const string CANCELLED_ERROR = "Cancelled by user";
 
     public static Result Success()
     {
-        return new();
+        return new(new Empty());
     }
 
     public static Result<T> Success<T>(T data)
@@ -32,14 +32,17 @@ public class Result : ResultBase
         return new Result<T>([CANCELLED_ERROR]);
     }
 
-    internal Result() { }
+    internal Result(Empty empty)
+        : base(empty) { }
 
     [JsonConstructor]
     internal Result(IEnumerable<string> errors)
         : base(errors) { }
+
+    public class Empty { }
 }
 
-public class Result<T> : ResultBase
+public class Result<T>
 {
     internal Result(T data)
         : this(data, [])
@@ -52,26 +55,13 @@ public class Result<T> : ResultBase
 
     [JsonConstructor]
     Result(T? data, IEnumerable<string> errors)
-        : base(errors)
     {
         Data = data;
-    }
-
-    [MemberNotNullWhen(false, nameof(Data))]
-    public new bool IsError => base.IsError;
-
-    public T? Data { get; }
-}
-
-public abstract class ResultBase
-{
-    protected ResultBase() { }
-
-    protected ResultBase(IEnumerable<string> errors)
-    {
         Errors = errors.ToArray();
     }
 
-    public bool IsError => Errors.Any();
+    [MemberNotNullWhen(true, nameof(Data))]
+    public bool IsSuccess => !Errors.Any();
+    public T? Data { get; }
     public string[] Errors { get; } = [];
 }

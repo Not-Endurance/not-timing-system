@@ -6,7 +6,15 @@ namespace NTS.Domain.Core.Objects.Documents;
 public record RanklistDocument : Document
 {
     public RanklistDocument(Ranklist ranklist, EnduranceEvent enduranceEvent, IEnumerable<Official> officials)
-        : base(new DocumentHeader(ranklist.Name, enduranceEvent.PopulatedPlace, enduranceEvent.EventSpan, officials))
+        : base(
+            new DocumentHeader(
+                ranklist.Name,
+                enduranceEvent.Country,
+                enduranceEvent.Location,
+                enduranceEvent.EventSpan,
+                officials
+            )
+        )
     {
         Ranklist = ranklist;
     }

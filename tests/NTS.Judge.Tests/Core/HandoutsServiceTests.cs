@@ -83,7 +83,9 @@ public class HandoutsServiceTests
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
         return new EnduranceEvent(
-            new PopulatedPlace(country, "Sofia", "Sofia"),
+            country,
+            "Sofia",
+            "Sofia",
             new EventSpan(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddDays(1)),
             null,
             null,

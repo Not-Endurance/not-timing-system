@@ -69,6 +69,7 @@ namespace NTS.Localization
         public static string Required_only_for_FEI_export_string =>
             LocalizeString(nameof(Required_only_for_FEI_export_string));
         public static string Combination_Number_string => LocalizeString(nameof(Combination_Number_string));
+        public static string Location_string => LocalizeString(nameof(Location_string));
         public static string Place_string => LocalizeString(nameof(Place_string));
         public static string Country_string => LocalizeString(nameof(Country_string));
         public static string Connection_Status_string => LocalizeString(nameof(Connection_Status_string));

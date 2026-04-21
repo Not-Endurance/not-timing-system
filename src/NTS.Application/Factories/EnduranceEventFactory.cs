@@ -18,7 +18,9 @@ public static class EnduranceEventFactory
         var endDate = competitionStartTimes.Last();
 
         var enduranceEvent = new EnduranceEvent(
-            new PopulatedPlace(setupEvent.Country, setupEvent.Place, setupEvent.Place), // TODO: fix City, place
+            setupEvent.Country,
+            setupEvent.Name,
+            setupEvent.Location,
             new EventSpan(startDate, endDate),
             setupEvent.ShowFeiId,
             setupEvent.FeiId,

@@ -43,10 +43,10 @@ public class NUserResolver
         var resolvedPrincipal = new ClaimsPrincipal(newIdentity);
 
         var userResult = await _userRegister.Get(registration.Email);
-        if (userResult.IsError || userResult.Data == null)
+        if (!userResult.IsSuccess)
         {
             userResult = await _userRegister.Register(registration);
-            if (userResult.IsError)
+            if (!userResult.IsSuccess)
             {
                 var errors = string.Join(",", userResult.Errors);
                 _logger.LogError("Authentication failed: {errors}", errors);

@@ -1,5 +1,7 @@
+using System.Text;
 using Not.Events;
 using Not.Injection;
+using Not.Localization;
 
 namespace Not.Notify;
 
@@ -30,6 +32,17 @@ public class Notifier : INotifier, INotificationStream, IScoped
     public void Warn(string message)
     {
         _warned.Emit(message);
+    }
+
+    public void Warn(IEnumerable<string> messages)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine(Validation_errors_string);
+        foreach (var message in messages)
+        {
+            sb.AppendLine($" - {message}");
+        }
+        _warned.Emit(sb.ToString());
     }
 
     public void Error(string message)

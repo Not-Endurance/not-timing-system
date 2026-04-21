@@ -33,13 +33,8 @@ public class CountryFunctions : FunctionBase
         LogInformation(request, nameof(Insert));
 
         var document = await ReadBody<CountryModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<CountryModel>();
-        }
-
         await _countries.Create(document);
-        return new OkObjectResult($"Inserted country '{document.Name}'");
+        return Ok();
     }
 
     [Function("countries-update")]
@@ -52,13 +47,8 @@ public class CountryFunctions : FunctionBase
         LogInformation(request, nameof(Update));
 
         var document = await ReadBody<CountryModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<CountryModel>();
-        }
-
         await _countries.Update(document);
-        return new OkObjectResult($"Updated country '{document.Name}'");
+        return Ok();
     }
 
     [Function("countries-list")]
@@ -70,7 +60,6 @@ public class CountryFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var countries = await _countries.ReadMany();
-        return new OkObjectResult(countries);
+        return Ok(await _countries.ReadMany() ?? []);
     }
 }

@@ -28,7 +28,7 @@ public class ArchiveRepository : MongoRepository<ArchiveEntryModel>, IArchiveRep
                 .Set(x => x.Ranklists, document.Ranklists)
                 .Set(x => x.EndDay, document.EndDay)
                 .Set(x => x.StartDay, document.StartDay)
-                .Set(x => x.City, document.City)
+                .Set(x => x.Name, document.Name)
                 .Set(x => x.Country, document.Country)
                 .Set(x => x.Location, document.Location);
         }

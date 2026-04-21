@@ -24,7 +24,7 @@ public class EnduranceEventMongoRepository : SoftDeleteMongoRepository<Endurance
     {
         return Builders<EnduranceEventModel>
             .Update.Set(x => x.Country, document.Country)
-            .Set(x => x.City, document.City)
+            .Set(x => x.Name, document.Name)
             .Set(x => x.Location, document.Location)
             .Set(x => x.FeiShowId, document.FeiShowId)
             .Set(x => x.FeiId, document.FeiId)
