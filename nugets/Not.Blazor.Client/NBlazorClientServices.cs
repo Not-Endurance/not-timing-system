@@ -10,7 +10,7 @@ public static class NBlazorClientServices
 {
     public static IServiceCollection NClientSideBlazor(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddTransient<INAuthentication, BlazorClientSideAuthenticationService>();
+        services.AddTransient<INAuthentication, NBlazorClientAuthenticationService>();
         return services.AddNBlazor(configuration).AddNClientAuthentication(configuration);
     }
 }

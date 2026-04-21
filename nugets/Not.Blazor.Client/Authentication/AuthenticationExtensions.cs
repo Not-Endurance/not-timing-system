@@ -8,6 +8,7 @@ using Not.Application.Authentication.Provider;
 using Not.Application.Authentication.User;
 using Not.Application.Configurations;
 using Not.Blazor.Client.Authentication.Services;
+using Not.BLazor.Client.Browser;
 
 namespace Not.Blazor.Client.Authentication;
 
@@ -22,7 +23,10 @@ public static class AuthenticationExtensions
             .AddMsalAuthentication(options => Configure(options, configuration))
             .AddAccountClaimsPrincipalFactory<ClientSideAccountClaimsPrincipalFactory>();
 
-        return services.AddScoped<NUserResolver>().AddSettings<NClientAuthenticationSettings>(configuration);
+        return services
+            .AddScoped<NUserResolver>()
+            .AddTransient<IBrowserLocalStorage, BrowserLocalStorage>()
+            .AddSettings<NClientAuthenticationSettings>(configuration);
     }
 
     static void Configure(RemoteAuthenticationOptions<MsalProviderOptions> options, IConfiguration configuration)
