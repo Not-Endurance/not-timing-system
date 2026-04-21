@@ -65,7 +65,9 @@ public class AuthenticationExtensionsTests
         return options;
     }
 
-    static Not.Application.Authentication.Provider.NClientAuthenticationSettings CreateSettings(IConfiguration configuration)
+    static Not.Application.Authentication.Provider.NClientAuthenticationSettings CreateSettings(
+        IConfiguration configuration
+    )
     {
         var createSettings = typeof(AuthenticationExtensions).GetMethod(
             "CreateSettings",
@@ -73,10 +75,8 @@ public class AuthenticationExtensionsTests
         );
 
         Assert.NotNull(createSettings);
-        return (Not.Application.Authentication.Provider.NClientAuthenticationSettings)createSettings!.Invoke(
-            null,
-            [configuration]
-        )!;
+        return (Not.Application.Authentication.Provider.NClientAuthenticationSettings)
+            createSettings!.Invoke(null, [configuration])!;
     }
 
     static IConfiguration CreateConfiguration(

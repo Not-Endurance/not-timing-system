@@ -1,8 +1,8 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
-using Not.Injection;
 using Not.Application.Authentication.Abstractions;
 using Not.BLazor.Client.Browser;
+using Not.Injection;
 
 namespace Not.Blazor.Client.Authentication.Services;
 
@@ -14,7 +14,10 @@ internal class NBlazorClientAuthenticationSessionStorage : INAuthenticationSessi
     readonly IBrowserLocalStorage _browserLocalStorage;
     readonly ILogger<NBlazorClientAuthenticationSessionStorage> _logger;
 
-    public NBlazorClientAuthenticationSessionStorage(IBrowserLocalStorage browserLocalStorage, ILogger<NBlazorClientAuthenticationSessionStorage> logger)
+    public NBlazorClientAuthenticationSessionStorage(
+        IBrowserLocalStorage browserLocalStorage,
+        ILogger<NBlazorClientAuthenticationSessionStorage> logger
+    )
     {
         _browserLocalStorage = browserLocalStorage;
         _logger = logger;
@@ -81,6 +84,4 @@ internal class NBlazorClientAuthenticationSessionStorage : INAuthenticationSessi
         var valueString = value.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture);
         await _browserLocalStorage.Write(key, valueString);
     }
-
-    
 }

@@ -84,15 +84,12 @@ public class NBlazorClientAuthenticationSessionStorageTests
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [
-                        $"{nameof(NClientAuthenticationSettings)}:{nameof(NClientAuthenticationSettings.ClientId)}"
-                    ] = "client-id",
-                    [
-                        $"{nameof(NClientAuthenticationSettings)}:{nameof(NClientAuthenticationSettings.Instance)}"
-                    ] = "https://login.microsoftonline.com",
-                    [
-                        $"{nameof(NClientAuthenticationSettings)}:{nameof(NClientAuthenticationSettings.TenantId)}"
-                    ] = "tenant-id",
+                    [$"{nameof(NClientAuthenticationSettings)}:{nameof(NClientAuthenticationSettings.ClientId)}"] =
+                        "client-id",
+                    [$"{nameof(NClientAuthenticationSettings)}:{nameof(NClientAuthenticationSettings.Instance)}"] =
+                        "https://login.microsoftonline.com",
+                    [$"{nameof(NClientAuthenticationSettings)}:{nameof(NClientAuthenticationSettings.TenantId)}"] =
+                        "tenant-id",
                 }
             )
             .Build();
