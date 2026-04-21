@@ -108,7 +108,14 @@ public class EnduranceEventModelMappingTests
             null,
             null,
             null,
-            [new NTS.Domain.Setup.Aggregates.UpcomingEvents.Phase(new NTS.Domain.Setup.Aggregates.UpcomingEvents.Loop(40, 1), 40, null, 2)],
+            [
+                new NTS.Domain.Setup.Aggregates.UpcomingEvents.Phase(
+                    new NTS.Domain.Setup.Aggregates.UpcomingEvents.Loop(40, 1),
+                    40,
+                    null,
+                    2
+                ),
+            ],
             [CreateParticipation()],
             3
         );

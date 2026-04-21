@@ -93,7 +93,10 @@ public class RestApiRepositoryEnvelopeTests
         {
             return Task.FromResult(
                 ResponseFactory?.Invoke(request)
-                    ?? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Result.Success().ToJson()) }
+                    ?? new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(Result.Success().ToJson()),
+                    }
             );
         }
     }

@@ -32,15 +32,14 @@ public class Result : Result<Result.Empty>
         return new Result<T>([CANCELLED_ERROR]);
     }
 
-    internal Result(Empty empty) : base(empty) { }
+    internal Result(Empty empty)
+        : base(empty) { }
 
     [JsonConstructor]
     internal Result(IEnumerable<string> errors)
         : base(errors) { }
 
-    public class Empty
-    {
-    }
+    public class Empty { }
 }
 
 public class Result<T>

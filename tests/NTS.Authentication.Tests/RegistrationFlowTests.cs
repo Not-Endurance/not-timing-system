@@ -273,10 +273,7 @@ public class RegistrationFlowTests
         var response = await function.Register(request);
 
         var badRequest = Assert.IsType<BadRequestObjectResult>(response);
-        Assert.Equal(
-            $"Payload couldn't be parsed to '{typeof(RegisterUserPaload).FullName}'",
-            badRequest.Value
-        );
+        Assert.Equal($"Payload couldn't be parsed to '{typeof(RegisterUserPaload).FullName}'", badRequest.Value);
     }
 
     [Fact]

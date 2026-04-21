@@ -23,9 +23,7 @@ internal class ErrorHandlerMiddleware : IFunctionsWorkerMiddleware
         {
             await next(context);
         }
-        catch (ValidationException ex) when (TryHandleValidationFailure(context, ex))
-        {
-        }
+        catch (ValidationException ex) when (TryHandleValidationFailure(context, ex)) { }
         catch (Exception ex)
         {
             Activity.Current?.TagException(ex);

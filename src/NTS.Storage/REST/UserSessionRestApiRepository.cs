@@ -24,7 +24,9 @@ public class UserSessionRestApiRepository
         }
 
         var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
-        return await HandleRequest(Client.Get<NtsUserSessionModel>($"{Endpoint}/by-user-identifier/{encodedUserIdentifier}"));
+        return await HandleRequest(
+            Client.Get<NtsUserSessionModel>($"{Endpoint}/by-user-identifier/{encodedUserIdentifier}")
+        );
     }
 
     async Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(
