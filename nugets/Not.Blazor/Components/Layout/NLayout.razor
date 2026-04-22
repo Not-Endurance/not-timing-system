@@ -5,37 +5,41 @@
 
 <NTheme @ref="Theme"/>
 
-<MudLayout>
-    @if (! HideLayout)
-    {
-        <MudAppBar Elevation="1">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="(e) => ToggleDrawer()" />
+<div class="n-layout-root">
+    <MudLayout>
+        @if (! HideLayout)
+        {
+            <MudAppBar Elevation="1">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="(e) => ToggleDrawer()" />
 
-            <MudSpacer />
+                <MudSpacer />
 
-            <NHeadline3 Content="@Watermark" />
-        </MudAppBar>
+                <NHeadline3 Content="@Watermark" />
+            </MudAppBar>
 
-        <MudDrawer @bind-Open="DrawerOpen" Elevation="2">
-            @if (MenuTitle != null)
-            {
-                <MudDrawerHeader>
-                    <NHeadline3 Content="@MenuTitle" />
-                </MudDrawerHeader>
-            }
-                
-            @Drawer
-        </MudDrawer>
-    }
+            <MudDrawer @bind-Open="DrawerOpen" Elevation="2">
+                @if (MenuTitle != null)
+                {
+                    <MudDrawerHeader>
+                        <NHeadline3 Content="@MenuTitle" />
+                    </MudDrawerHeader>
+                }
+                    
+                @Drawer
+            </MudDrawer>
+        }
 
-    <MudMainContent>
-        <CascadingValue Value="@Theme.ThemeProvider">
-            <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
-                @Content
-            </MudContainer>
+        <MudMainContent>
+            <CascadingValue Value="@Theme.ThemeProvider">
+                <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+                    <div class="n-route-focus-target" tabindex="-1">
+                        @Content
+                    </div>
+                </MudContainer>
 
-            <NNotifier />
-        </CascadingValue>
-    </MudMainContent>
+                <NNotifier />
+            </CascadingValue>
+        </MudMainContent>
 
-</MudLayout>
+    </MudLayout>
+</div>

@@ -1,9 +1,9 @@
 @inherits NContentBehind
 
 @{
-    var pageClass = "not-page " + Class;
+    var pageClass = "n-content " + Class;
     var mainPaperClass = CombineClass("pa-4 ");
-    var mainItemClass = !IsLoading && !IsEmpty ? "not-page-content" : null;
+    var mainItemClass = !IsLoading && !IsEmpty ? "n-content-content" : null;
     var showMain2 = !IsLoading && !IsEmpty && Main2 != null;
     var showRightbar = Rightbar != null;
 
@@ -59,14 +59,14 @@ else
 
             @if (rightbarContent != null)
             {
-                <MudItem xs="@RightBarXS" Class="not-page-rightbar">
+                <MudItem xs="@RightBarXS" Class="n-content-rightbar">
                     @rightbarContent
                 </MudItem>
             }
 
             @if (showMain2)
             {
-                <MudItem xs="@MainXs" Class="not-page-content">
+                <MudItem xs="@MainXs" Class="n-content-content">
                     @main2Content
                 </MudItem>
             }
@@ -82,14 +82,14 @@ else
 
             @if (rightbarContent != null)
             {
-                <MudItem xs="12" Class="not-page-rightbar">
+                <MudItem xs="12" Class="n-content-rightbar">
                     @rightbarContent
                 </MudItem>
             }
 
             @if (showMain2)
             {
-                <MudItem xs="12" Class="not-page-content">
+                <MudItem xs="12" Class="n-content-content">
                     @main2Content
                 </MudItem>
             }
@@ -98,8 +98,8 @@ else
 }
 
 <style>
-    .not-page .not-page-content > .mud-paper > .mud-grid:first-child > .mud-grid-item,
-    .not-page .not-page-rightbar > .mud-grid:first-child > .mud-grid-item {
+    .n-content .n-content-content > .mud-paper > .mud-grid:first-child > .mud-grid-item,
+    .n-content .n-content-rightbar > .mud-grid:first-child > .mud-grid-item {
         padding-top:0;
     }
 </style>
