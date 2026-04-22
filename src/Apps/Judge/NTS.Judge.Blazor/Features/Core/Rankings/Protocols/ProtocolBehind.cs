@@ -22,6 +22,9 @@ public class ProtocolBehind : NStatefulComponent
     [Inject]
     protected IRankingContext Service { get; set; } = default!;
 
+    [Parameter]
+    public bool CompactParticipationTables { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);

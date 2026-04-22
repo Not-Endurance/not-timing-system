@@ -11,7 +11,7 @@
     <Main>
         @if (IsProtocolVisible)
         {
-           <Protocol />
+           <Protocol CompactParticipationTables="CompactParticipationTables" />
         }
         else
         {
@@ -32,7 +32,7 @@
                     <MudMenuItem OnClick="ShowRanklist">@Ranklist_string</MudMenuItem>
                 </MudMenu>
 
-                <NotButtonPrint OnClick="OpenPrintDialog" />
+                <NotButtonPrint OnClick="Print" />
             </MudButtonGroup>
             
             <NButtonPrimary OnClick="ArchiveEnduranceEvent" Text="@Archive_string" StartIcon="@Icons.Material.Filled.Archive"/>

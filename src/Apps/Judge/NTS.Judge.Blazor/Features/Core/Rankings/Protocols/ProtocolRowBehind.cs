@@ -8,6 +8,9 @@ public class ProtocolRowBehind : NComponent
     [Parameter, EditorRequired]
     public RankingEntry Entry { get; set; } = default!;
 
+    [Parameter]
+    public bool CompactParticipationTables { get; set; }
+
     public string GetRankText()
     {
         if (Entry.Participation.IsEliminated())

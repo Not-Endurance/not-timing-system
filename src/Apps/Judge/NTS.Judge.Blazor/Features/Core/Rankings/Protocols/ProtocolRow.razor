@@ -9,7 +9,7 @@
     const Align align = Align.Center;
 }
 
-<MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Class="mt-1 printable" Spacing="0">
+<MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Class="mt-1 printable" Spacing="0" Style="width:100%;text-align:center">
     <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.End" Spacing="4" Style="width:100%">
         <MudText Typo="Typo.button" Align="align" Style="width:50px">@GetRankText()</MudText>
         
@@ -27,7 +27,10 @@
     <MudDivider Class="mt-1" />
     
     <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
-        <ParticipationTable Phases="phases" AlignVertically="true"/>
+        <ParticipationTable Phases="phases"
+                            Number="combination.Number"
+                            AlignVertically="true"
+                            Compact="CompactParticipationTables" />
 
         @if (Entry.Participation.IsEliminated())
         {

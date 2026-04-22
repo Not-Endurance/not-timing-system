@@ -7,12 +7,15 @@ namespace Not.Blazor.Components.Tables;
 public class NTableBehind : NComponentBase
 {
     protected Typo Typography { get; set; } = Typo.caption;
+    protected bool HasLeadingCell => LeadingCell is not null;
     protected bool HasTrailingCell => TrailingCell is not null;
-    protected int TotalColumnCount => Headings.Length + (HasTrailingCell ? 1 : 0);
+    protected int TotalColumnCount => Headings.Length + (HasLeadingCell ? 1 : 0) + (HasTrailingCell ? 1 : 0);
     protected string StretchColumnStyle =>
         Headings.Length == 0
             ? string.Empty
             : $"width: {(100d / Headings.Length).ToString("0.###############", CultureInfo.InvariantCulture)}%;";
+    protected string LeadingColumnStyle => "width: 1%; white-space: nowrap;";
+    protected string LeadingCellStyle => "width: 1%; white-space: nowrap;";
     protected string TrailingColumnStyle => "width: 1%;";
     protected string TrailingCellStyle => "width: 1%; white-space: nowrap;";
 
@@ -36,4 +39,19 @@ public class NTableBehind : NComponentBase
 
     [Parameter]
     public RenderFragment<object>? TrailingCell { get; set; }
+
+    [Parameter]
+    public string? LeadingHeading { get; set; }
+
+    [Parameter]
+    public RenderFragment<object>? LeadingCell { get; set; }
+
+    [Parameter]
+    public bool LeadingCellAsHeader { get; set; }
+
+    [Parameter]
+    public RenderFragment<int>? HeadingCell { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? UserAttributes { get; set; }
 }

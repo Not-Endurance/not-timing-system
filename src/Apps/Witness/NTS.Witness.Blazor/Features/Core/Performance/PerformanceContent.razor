@@ -12,7 +12,7 @@
         <MudStack AlignItems="AlignItems.Stretch">
             @if (Selected != null)
             {
-                <ParticipationTable Class="mb-10" Phases="Selected.Phases" Editable="false" />
+                <ParticipationTable Class="mb-10" Phases="@Selected.Phases" Number="@Selected.Combination.Number" />
             }
         
             <NAutocomplete @key="Selected?.Combination.Number"
