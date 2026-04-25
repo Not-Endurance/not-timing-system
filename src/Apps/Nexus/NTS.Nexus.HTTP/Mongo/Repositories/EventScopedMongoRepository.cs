@@ -4,7 +4,7 @@ using NTS.Application.Shared;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public abstract class EventScopedMongoRepository<T> : MongoRepository<T>
+public abstract class EventScopedMongoRepository<T> : MongoRepository<T>, IEventResetRepository
     where T : class, IEventScopedDocument
 {
     protected EventScopedMongoRepository(IMongoContext context, string db, string collection)
@@ -13,5 +13,10 @@ public abstract class EventScopedMongoRepository<T> : MongoRepository<T>
     protected override Expression<Func<T, bool>> GetItemFilter(T item)
     {
         return x => x.Id == item.Id && x.EventId == item.EventId;
+    }
+
+    public virtual Task DeleteAllForEvent(int eventId)
+    {
+        return Delete(x => x.EventId == eventId);
     }
 }

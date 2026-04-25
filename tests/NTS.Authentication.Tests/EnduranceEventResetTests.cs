@@ -54,12 +54,37 @@ public class EnduranceEventResetTests
         Assert.Equal(19, resetService.LastEventId);
     }
 
+    [Fact]
+    public void Event_scoped_mongo_repositories_are_registered_for_event_reset()
+    {
+        var repositories = typeof(EventScopedMongoRepository<>)
+            .Assembly.GetTypes()
+            .Where(type => type is { IsClass: true, IsAbstract: false } && IsEventScopedMongoRepository(type));
+
+        Assert.NotEmpty(repositories);
+        Assert.All(repositories, repository => Assert.Contains(typeof(IEventResetRepository), repository.GetInterfaces()));
+    }
+
     static HttpRequest CreateRequest(string method, string path)
     {
         var context = new DefaultHttpContext();
         context.Request.Method = method;
         context.Request.Path = path;
         return context.Request;
+    }
+
+    static bool IsEventScopedMongoRepository(Type type)
+    {
+        while (type != typeof(object) && type.BaseType != null)
+        {
+            type = type.BaseType;
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(EventScopedMongoRepository<>))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     sealed class RecordingEventResetRepository : IEventResetRepository

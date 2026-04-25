@@ -2,5 +2,5 @@ namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
 public interface IEventResetRepository
 {
-    Task ResetEvent(int eventId);
+    Task DeleteAllForEvent(int eventId);
 }

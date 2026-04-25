@@ -6,11 +6,11 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class HandoutRepository : EventScopedMongoRepository<HandoutModel>
+public class HandoutEventScopedMongoRepository : EventScopedMongoRepository<HandoutModel>
 {
     readonly ITelemetryService _telemetry;
 
-    public HandoutRepository(IMongoContext context, ITelemetryService telemetry)
+    public HandoutEventScopedMongoRepository(IMongoContext context, ITelemetryService telemetry)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.HANDOUTS_COLLECTION)
     {
         _telemetry = telemetry;
@@ -18,7 +18,7 @@ public class HandoutRepository : EventScopedMongoRepository<HandoutModel>
 
     protected override UpdateDefinition<HandoutModel> GetUpdateDefinition(HandoutModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(HandoutRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(nameof(HandoutEventScopedMongoRepository), nameof(GetUpdateDefinition));
 
         try
         {

@@ -21,7 +21,7 @@ public class EnduranceEventResetService : IEnduranceEventResetService, ITransien
     {
         foreach (var repository in _repositories)
         {
-            await repository.ResetEvent(eventId);
+            await repository.DeleteAllForEvent(eventId);
         }
     }
 }

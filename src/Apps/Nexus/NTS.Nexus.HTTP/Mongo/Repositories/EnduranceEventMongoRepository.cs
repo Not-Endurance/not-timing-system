@@ -34,7 +34,7 @@ public class EnduranceEventMongoRepository : MongoRepository<EnduranceEventModel
         await base.Create(item);
     }
 
-    public Task ResetEvent(int eventId)
+    public Task DeleteAllForEvent(int eventId)
     {
         return GetCollection().DeleteManyAsync(x => x.Id == eventId);
     }

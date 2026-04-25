@@ -6,11 +6,11 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class RankingRepository : EventScopedMongoRepository<RankingModel>
+public class RankingEventScopedMongoRepository : EventScopedMongoRepository<RankingModel>
 {
     readonly ITelemetryService _telemetry;
 
-    public RankingRepository(IMongoContext context, ITelemetryService telemetry)
+    public RankingEventScopedMongoRepository(IMongoContext context, ITelemetryService telemetry)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.RANKINGS_COLLECTION)
     {
         _telemetry = telemetry;
@@ -18,7 +18,7 @@ public class RankingRepository : EventScopedMongoRepository<RankingModel>
 
     protected override UpdateDefinition<RankingModel> GetUpdateDefinition(RankingModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(RankingRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(nameof(RankingEventScopedMongoRepository), nameof(GetUpdateDefinition));
 
         try
         {
