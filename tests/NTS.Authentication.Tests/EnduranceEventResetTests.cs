@@ -13,44 +13,24 @@ namespace NTS.Authentication.Tests;
 public class EnduranceEventResetTests
 {
     [Fact]
-    public async Task Reset_service_uses_version_one_when_event_has_no_deleted_documents()
+    public async Task Reset_service_deletes_all_repository_records_for_requested_event()
     {
-        var repositories = new[] { new RecordingEventResetRepository(), new RecordingEventResetRepository() };
+        var repositories = new IEventResetRepository[]
+        {
+            new RecordingEventResetRepository(),
+            new RecordingEventResetRepository(),
+            new RecordingEventResetRepository(),
+        };
         var service = new EnduranceEventResetService(repositories);
 
         await service.Reset(17);
 
         Assert.All(
-            repositories,
-            repository =>
-            {
-                var call = Assert.Single(repository.SoftDeleteCalls);
-                Assert.Equal(17, call.EventId);
-                Assert.Equal(1, call.DeletedVersion);
-            }
-        );
-    }
-
-    [Fact]
-    public async Task Reset_service_increments_the_highest_deleted_version_found()
-    {
-        var repositories = new IEventResetRepository[]
-        {
-            new RecordingEventResetRepository { MaxDeletedVersion = 2 },
-            new RecordingEventResetRepository { MaxDeletedVersion = 5 },
-            new RecordingEventResetRepository(),
-        };
-        var service = new EnduranceEventResetService(repositories);
-
-        await service.Reset(23);
-
-        Assert.All(
             repositories.Cast<RecordingEventResetRepository>(),
             repository =>
             {
-                var call = Assert.Single(repository.SoftDeleteCalls);
-                Assert.Equal(23, call.EventId);
-                Assert.Equal(6, call.DeletedVersion);
+                var deletedEventId = Assert.Single(repository.DeleteAllForEventCalls);
+                Assert.Equal(17, deletedEventId);
             }
         );
     }
@@ -84,17 +64,11 @@ public class EnduranceEventResetTests
 
     sealed class RecordingEventResetRepository : IEventResetRepository
     {
-        public int? MaxDeletedVersion { get; init; }
-        public List<(int EventId, int DeletedVersion)> SoftDeleteCalls { get; } = [];
+        public List<int> DeleteAllForEventCalls { get; } = [];
 
-        public Task<int?> GetMaxDeletedVersion(int eventId)
+        public Task DeleteAllForEvent(int eventId)
         {
-            return Task.FromResult(MaxDeletedVersion);
-        }
-
-        public Task SoftDelete(int eventId, int deletedVersion)
-        {
-            SoftDeleteCalls.Add((eventId, deletedVersion));
+            DeleteAllForEventCalls.Add(eventId);
             return Task.CompletedTask;
         }
     }

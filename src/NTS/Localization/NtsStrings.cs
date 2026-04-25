@@ -90,13 +90,19 @@ namespace NTS.Localization
             LocalizeString(nameof(Start_validation_issue_explanation_string));
         public static string Remove_from__string => LocalizeString(nameof(Remove_from__string));
         public static string Reset_string => LocalizeString(nameof(Reset_string));
+        public static string Confirm_string => LocalizeString(nameof(Confirm_string));
         public static string Hard_reset_string => LocalizeString(nameof(Hard_reset_string));
         public static string Soft_reset_string => LocalizeString(nameof(Soft_reset_string));
         public static string Disconnect_from_current_Event => LocalizeString(nameof(Disconnect_from_current_Event));
         public static string Reset_Timing_this_will_DELETE_Timing_data =>
             LocalizeString(nameof(Reset_Timing_this_will_DELETE_Timing_data));
-        public static string Are_you_sure_you_want_to_reset_string =>
-            LocalizeString(nameof(Are_you_sure_you_want_to_reset_string));
+        public static string Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string =>
+            LocalizeString(nameof(Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string));
+        public static string This_action_is_final_There_is_no_recovery_string =>
+            LocalizeString(nameof(This_action_is_final_There_is_no_recovery_string));
+        public static string Type_1337_to_enable_confirmation_string =>
+            LocalizeString(nameof(Type_1337_to_enable_confirmation_string));
+        public static string Confirmation_code_string => LocalizeString(nameof(Confirmation_code_string));
         public static string Setup_configuration_will_not_be_deleted_string =>
             LocalizeString(nameof(Setup_configuration_will_not_be_deleted_string));
         public static string Configure_Endurance_Event_string =>

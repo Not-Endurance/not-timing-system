@@ -38,11 +38,11 @@ public class EnduranceEventRestRepository
     }
 
     /// <summary>
-    /// Soft-resets the currently selected endurance event in Nexus.
+    /// Permanently resets the currently selected endurance event in Nexus.
     /// </summary>
     /// <remarks>
-    /// This resets the active event root together with its Core child documents and hides the event from the
-    /// normal active-event reads used by Home and startup reconnect logic.
+    /// This deletes the active event root together with its event-scoped Core child documents, which removes the
+    /// event from the active-event reads used by Home and startup reconnect logic.
     /// </remarks>
     public async Task Reset()
     {

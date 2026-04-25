@@ -295,6 +295,11 @@ public class WitnessHubAccessTokenProviderTests
             Warnings.Add(message);
         }
 
+        public void Warn(IEnumerable<string> messages)
+        {
+            Warnings.AddRange(messages);
+        }
+
         public void Error(string message) { }
 
         public void Error(Exception ex) { }

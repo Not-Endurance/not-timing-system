@@ -9,7 +9,7 @@ internal sealed class MongoReceiveSnapshotAccessPolicy : IReceiveSnapshotAccessP
 {
     const string DATABASE = "nts";
     const string USERS_COLLECTION = "users";
-    const string OFFICIALS_COLLECTION = "officials";
+    const string OFFICIALS_COLLECTION = "event-officials";
 
     readonly IMongoContext _context;
 
@@ -40,7 +40,7 @@ internal sealed class MongoReceiveSnapshotAccessPolicy : IReceiveSnapshotAccessP
 
         return await database
             .GetCollection<OfficialModel>(OFFICIALS_COLLECTION)
-            .Find(x => x.EventId == eventId && !x.IsDeleted && x.UserId == userId.Value)
+            .Find(x => x.EventId == eventId && x.UserId == userId.Value)
             .AnyAsync();
     }
 

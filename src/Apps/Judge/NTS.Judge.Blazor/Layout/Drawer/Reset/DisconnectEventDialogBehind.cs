@@ -34,7 +34,7 @@ public class DisconnectEventDialogBehind : NDialog
     {
         try
         {
-            var hardResetDialog = await DialogService.ShowAsync<ResetTimingDialog>();
+            var hardResetDialog = await DialogService.ShowAsync<ResetEventDialog>();
             if (await hardResetDialog.IsCanceled())
             {
                 await CancelDialog();

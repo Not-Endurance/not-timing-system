@@ -83,7 +83,7 @@ public class HomeContentBehind : NStatefulComponent
 
         try
         {
-            var dialog = await DialogService.ShowAsync<ResetTimingDialog>();
+            var dialog = await DialogService.ShowAsync<ResetEventDialog>();
             if (await dialog.IsCanceled())
             {
                 return;
