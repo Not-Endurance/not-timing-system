@@ -18,12 +18,25 @@ public class SnapshotComponentBehind : NComponent
     [Inject]
     IDialogService MudDialogService { get; set; } = default!;
 
-    protected string[] Headings { get; set; } = [Participant_string];
-
     protected IEnumerable<Snapshot> OrderedSnapshots => Snapshots.OrderBy(x => x.Timestamp != null);
 
     [Parameter]
+    public bool Compact { get; set; }
+
+    [Parameter]
     public IReadOnlyList<Snapshot> Snapshots { get; set; } = [];
+
+    protected string GetTableClass()
+    {
+        return Compact
+            ? "snapshot-table snapshot-table-compact"
+            : "snapshot-table";
+    }
+
+    protected string GetButtonStyle()
+    {
+        return Compact ? "width:90px" : "width:100px";
+    }
 
     protected void CaptureSnapshot(Snapshot snapshot)
     {

@@ -12,7 +12,14 @@
     <Main>
         <MudStack Spacing="4">
 
-            <SnapshotComponent Snapshots="@Snapshots" />
+            <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                <SnapshotComponent Snapshots="@Snapshots" />
+            </MudHidden>
+
+            <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                <SnapshotComponent Snapshots="@Snapshots"
+                                   Compact />
+            </MudHidden>
 
             <MudHidden Breakpoint="Breakpoint.SmAndDown">
                 <ParticipationChips Participations="@Participations"

@@ -7,7 +7,7 @@
         {
             <col style="@LeadingColumnStyle" />
         }
-        @foreach (var _ in Headings)
+        @for (var index = 0; index < DataColumnCount; index++)
         {
             <col style="@StretchColumnStyle" />
         }
@@ -16,36 +16,39 @@
             <col style="@TrailingColumnStyle" />
         }
     </colgroup>
-    <thead>
-        <tr>
-            @if (HasLeadingCell)
-            {
-                <th style="@LeadingCellStyle">
-                    <MudText Typo="@Typography">@LeadingHeading</MudText>
-                </th>
-            }
-            @for (var index = 0; index < Headings.Length; index++)
-            {
-                var heading = Headings[index];
-                <th>
-                    @if (HeadingCell is null)
-                    {
-                        <MudText Typo="@Typography">@heading</MudText>
-                    }
-                    else
-                    {
-                        @HeadingCell(index)
-                    }
-                </th>
-            }
-            @if (HasTrailingCell)
-            {
-                <th style="@TrailingCellStyle">
-                    <MudText Typo="@Typography">-</MudText>
-                </th>
-            }
-        </tr>
-    </thead>
+    @if (DisplayHeadings.Any())
+    {
+        <thead>
+            <tr>
+                @if (HasLeadingCell)
+                {
+                    <th style="@LeadingCellStyle">
+                        <MudText Typo="@Typography">@LeadingHeading</MudText>
+                    </th>
+                }
+                @for (var index = 0; index < DisplayHeadings.Length; index++)
+                {
+                    var heading = DisplayHeadings[index];
+                    <th>
+                        @if (HeadingCell is null)
+                        {
+                            <MudText Typo="@Typography">@heading</MudText>
+                        }
+                        else
+                        {
+                            @HeadingCell(index)
+                        }
+                    </th>
+                }
+                @if (HasTrailingCell)
+                {
+                    <th style="@TrailingCellStyle">
+                        <MudText Typo="@Typography">-</MudText>
+                    </th>
+                }
+            </tr>
+        </thead>
+    }
     <tbody>
         @if (!Items.Any())
         {
