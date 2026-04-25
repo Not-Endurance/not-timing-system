@@ -17,6 +17,9 @@ public class NListBehind<T> : NComponent
     public Func<T, Task>? UpdateSafe { get; set; }
 
     [Parameter]
+    public Func<T, bool>? CanUpdate { get; set; }
+
+    [Parameter]
     public Func<T, Task>? DeleteSafe { get; set; }
 
     [Parameter]

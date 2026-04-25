@@ -12,7 +12,7 @@
 <NContent Title="@Select_event_string">
    
     <Main>
-        <KrudList T="UpcomingEvent" TModel="UpcomingEventFormModel" TShell="UpcomingEventShell" Name="@Upcoming_events_string">
+        <KrudList T="UpcomingEvent" TModel="UpcomingEventFormModel" TShell="UpcomingEventShell" Name="@Upcoming_events_string" CanUpdate="ShowEditButton">
             <CustomAction1 Context="upcomingEvent">
                 @if (ShowStartButton(upcomingEvent))
                 {

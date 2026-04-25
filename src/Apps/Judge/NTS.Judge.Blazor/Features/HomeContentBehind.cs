@@ -38,6 +38,11 @@ public class HomeContentBehind : NStatefulComponent
         return !ActiveEventContext.IsActive(upcomingEvent);
     }
 
+    protected bool ShowEditButton(UpcomingEvent upcomingEvent)
+    {
+        return ShowStartButton(upcomingEvent) && !ShowResetTimingButton(upcomingEvent);
+    }
+
     protected bool ShowResetTimingButton(UpcomingEvent upcomingEvent)
     {
         return SocketService.Event?.Id == upcomingEvent.Id;

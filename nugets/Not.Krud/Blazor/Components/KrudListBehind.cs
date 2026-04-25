@@ -43,6 +43,9 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     [Parameter]
     public RenderFragment<T>? CustomAction2 { get; set; }
 
+    [Parameter]
+    public Func<T, bool>? CanUpdate { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         _entities = await Service.ReadMany().ToList();

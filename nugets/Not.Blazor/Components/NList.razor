@@ -35,7 +35,7 @@
 
                 <MudSpacer />
 
-                @if (UpdateSafe != null)
+                @if (UpdateSafe != null && (CanUpdate?.Invoke(item) ?? true))
                 {
                     <NIconUpdate OnClick="() => OnUpdate(item)" />
                 }
