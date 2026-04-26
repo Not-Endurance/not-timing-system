@@ -11,22 +11,22 @@ namespace NTS.Judge.Features.Setup;
 
 public class JudgeSetupLookupService : IJudgeSetupLookupService, ITransient
 {
-    readonly IReadMany<Athlete> _athletes;
-    readonly IReadMany<Club> _clubs;
+    readonly IRepository<Athlete> _athletes;
+    readonly IRepository<Club> _clubs;
     readonly ICache<Country> _countries;
-    readonly IReadMany<Combination> _combinations;
-    readonly IReadMany<Horse> _horses;
-    readonly IReadMany<Loop> _loops;
+    readonly IRepository<Combination> _combinations;
+    readonly IRepository<Horse> _horses;
+    readonly IRepository<Loop> _loops;
     readonly IUserEmailLookup _users;
 
     public JudgeSetupLookupService(
         ICache<Country> countries,
-        IReadMany<Club> clubs,
+        IRepository<Club> clubs,
         IUserEmailLookup users,
-        IReadMany<Athlete> athletes,
-        IReadMany<Horse> horses,
-        IReadMany<Loop> loops,
-        IReadMany<Combination> combinations
+        IRepository<Athlete> athletes,
+        IRepository<Horse> horses,
+        IRepository<Loop> loops,
+        IRepository<Combination> combinations
     )
     {
         _countries = countries;

@@ -31,7 +31,7 @@ public class JudgeSetupLookupServiceTests
     {
         var matching = CreateCombination(41, "John", "Cassini", 1001);
         var nonMatching = CreateCombination(52, "Alice", "Boreas", 1002);
-        var service = CreateService(combinations: new RecordingReadMany<Combination>([matching, nonMatching]));
+        var service = CreateService(combinations: new RecordingRepository<Combination>([matching, nonMatching]));
 
         var result = (await service.SearchCombinations("Cass", CancellationToken.None)).ToList();
 
@@ -42,7 +42,7 @@ public class JudgeSetupLookupServiceTests
     public async Task GetLoops_ReturnsAllLoops()
     {
         var loops = new[] { new Loop(40, 1), new Loop(32, 2) };
-        var service = CreateService(loops: new RecordingReadMany<Loop>(loops));
+        var service = CreateService(loops: new RecordingRepository<Loop>(loops));
 
         var result = (await service.GetLoops(CancellationToken.None)).ToList();
 
@@ -51,22 +51,22 @@ public class JudgeSetupLookupServiceTests
 
     static JudgeSetupLookupService CreateService(
         ICache<Country>? countries = null,
-        IReadMany<Club>? clubs = null,
+        IRepository<Club>? clubs = null,
         IUserEmailLookup? users = null,
-        IReadMany<Athlete>? athletes = null,
-        IReadMany<Horse>? horses = null,
-        IReadMany<Loop>? loops = null,
-        IReadMany<Combination>? combinations = null
+        IRepository<Athlete>? athletes = null,
+        IRepository<Horse>? horses = null,
+        IRepository<Loop>? loops = null,
+        IRepository<Combination>? combinations = null
     )
     {
         return new JudgeSetupLookupService(
             countries ?? new TestCountryCache([]),
-            clubs ?? new RecordingReadMany<Club>([]),
+            clubs ?? new RecordingRepository<Club>([]),
             users ?? new TestUserLookup(),
-            athletes ?? new RecordingReadMany<Athlete>([]),
-            horses ?? new RecordingReadMany<Horse>([]),
-            loops ?? new RecordingReadMany<Loop>([]),
-            combinations ?? new RecordingReadMany<Combination>([])
+            athletes ?? new RecordingRepository<Athlete>([]),
+            horses ?? new RecordingRepository<Horse>([]),
+            loops ?? new RecordingRepository<Loop>([]),
+            combinations ?? new RecordingRepository<Combination>([])
         );
     }
 
@@ -148,13 +148,28 @@ public class JudgeSetupLookupServiceTests
         }
     }
 
-    sealed class RecordingReadMany<T> : IReadMany<T>
+    sealed class RecordingRepository<T> : IRepository<T>
     {
         readonly IReadOnlyList<T> _items;
 
-        public RecordingReadMany(IEnumerable<T> items)
+        public RecordingRepository(IEnumerable<T> items)
         {
             _items = items.ToList();
+        }
+
+        public Task Create(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T?> Read(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T?> Read(Expression<Func<T, bool>> filter)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<IEnumerable<T>> ReadMany()
@@ -166,6 +181,26 @@ public class JudgeSetupLookupServiceTests
         {
             var predicate = filter.Compile();
             return Task.FromResult<IEnumerable<T>>(_items.Where(predicate).ToList());
+        }
+
+        public Task Update(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Delete(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Delete(IEnumerable<T> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Delete(Expression<Func<T, bool>> filter)
+        {
+            throw new NotImplementedException();
         }
     }
 }
