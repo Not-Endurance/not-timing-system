@@ -3,7 +3,7 @@ using Not.Domain.Abstractions;
 using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Storage.REST;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 
 namespace NTS.Storage.REST;
 

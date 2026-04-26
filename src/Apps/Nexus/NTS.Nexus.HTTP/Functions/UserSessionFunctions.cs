@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using NTS.Application.Contracts.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
-using NTS.Application.Watcher;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;

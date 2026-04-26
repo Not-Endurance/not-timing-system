@@ -1,7 +1,7 @@
 using MudBlazor;
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Blazor.Helpers;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Judge.Contracts.Features.Core;
 
 namespace NTS.Judge.Blazor.Layout.Drawer.Reset;

@@ -1,7 +1,8 @@
-using NTS.Application.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Setup.Models;
+using NTS.Application.Contracts.Shared;
+using NTS.Application.Contracts.Shared.Models;
 using NTS.Application.Factories;
-using NTS.Application.Setup;
-using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;

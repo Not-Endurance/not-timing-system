@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Not.Filesystem;
 using Not.Storage.JsonFile.Stores.Files;
-using NTS.Application.Core;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
 using NTS.Storage.Core;
 
 namespace NTS.Storage.JSON;

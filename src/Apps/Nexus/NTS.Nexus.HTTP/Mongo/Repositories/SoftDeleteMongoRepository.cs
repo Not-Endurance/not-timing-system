@@ -3,7 +3,8 @@ using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Storage.Mongo;
 using Not.Structures;
-using NTS.Application.Shared;
+using NTS.Application.Contracts.Shared;
+using NTS.Application.Contracts.Shared.Models;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 

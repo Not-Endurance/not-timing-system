@@ -89,6 +89,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Blazor.Client", "..\nug
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Judge.Contracts", "Apps\Judge\NTS.Judge.Contracts\NTS.Judge.Contracts.csproj", "{C18F95E9-A5B7-4067-94EE-319FEEE99EB4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Application.Contracts", "NTS.Application.Contracts\NTS.Application.Contracts.csproj", "{E81D9145-C258-4EF6-89DF-C52FA42DF066}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -215,6 +217,10 @@ Global
 		{C18F95E9-A5B7-4067-94EE-319FEEE99EB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C18F95E9-A5B7-4067-94EE-319FEEE99EB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C18F95E9-A5B7-4067-94EE-319FEEE99EB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E81D9145-C258-4EF6-89DF-C52FA42DF066}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E81D9145-C258-4EF6-89DF-C52FA42DF066}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E81D9145-C258-4EF6-89DF-C52FA42DF066}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E81D9145-C258-4EF6-89DF-C52FA42DF066}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

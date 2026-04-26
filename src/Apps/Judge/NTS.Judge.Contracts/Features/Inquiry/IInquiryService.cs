@@ -1,5 +1,6 @@
 using Not.Application.Behinds.Adapters;
-using NTS.Application.Core;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Contracts.Features.Inquiry;

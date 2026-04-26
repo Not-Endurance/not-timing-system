@@ -7,11 +7,11 @@ using NTS.Application.Factories;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Services.StartValidation;
-using CoreEnduranceEventModel = NTS.Application.Core.EnduranceEventModel;
-using CoreOfficialModel = NTS.Application.Core.OfficialModel;
-using CoreParticipationModel = NTS.Application.Core.ParticipationModel;
-using CoreRankingModel = NTS.Application.Core.RankingModel;
-using SetupUpcomingEventModel = NTS.Application.Setup.UpcomingEventModel;
+using CoreEnduranceEventModel = NTS.Application.Contracts.Core.Models.EnduranceEventModel;
+using CoreOfficialModel = NTS.Application.Contracts.Core.Models.OfficialModel;
+using CoreParticipationModel = NTS.Application.Contracts.Core.Models.ParticipationModel;
+using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
+using SetupUpcomingEventModel = NTS.Application.Contracts.Setup.Models.UpcomingEventModel;
 
 namespace NTS.Nexus.HTTP.Functions.Event;
 

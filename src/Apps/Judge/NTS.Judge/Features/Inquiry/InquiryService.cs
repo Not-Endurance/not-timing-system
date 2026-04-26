@@ -1,6 +1,7 @@
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using NTS.Application.Core;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Inquiry;

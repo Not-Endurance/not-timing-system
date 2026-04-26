@@ -1,5 +1,6 @@
 using Not.Injection;
-using NTS.Application.Watcher;
+using NTS.Application.Contracts.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 
 namespace NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 

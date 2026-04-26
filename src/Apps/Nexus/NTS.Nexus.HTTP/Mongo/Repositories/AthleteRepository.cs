@@ -1,7 +1,8 @@
 using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
-using NTS.Application.Setup;
+using NTS.Application.Contracts.Setup;
+using NTS.Application.Contracts.Setup.Models;
 using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;

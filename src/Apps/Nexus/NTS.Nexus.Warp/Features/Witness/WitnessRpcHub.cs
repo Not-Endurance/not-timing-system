@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
-using NTS.Application.Watcher;
+using NTS.Application.Contracts.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Nexus.Warp.Abstractions;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;

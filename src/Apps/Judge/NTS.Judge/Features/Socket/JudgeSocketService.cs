@@ -4,7 +4,7 @@ using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
 using Not.Notify;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 

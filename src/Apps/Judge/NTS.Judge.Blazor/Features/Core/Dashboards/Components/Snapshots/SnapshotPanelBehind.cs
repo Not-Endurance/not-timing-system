@@ -1,7 +1,8 @@
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Notify;
-using NTS.Application.Core;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
 using NTS.Blazor.Constants;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Objects;

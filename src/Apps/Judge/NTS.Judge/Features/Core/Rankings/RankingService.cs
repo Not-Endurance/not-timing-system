@@ -6,7 +6,7 @@ using Not.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Observables.Structures;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;

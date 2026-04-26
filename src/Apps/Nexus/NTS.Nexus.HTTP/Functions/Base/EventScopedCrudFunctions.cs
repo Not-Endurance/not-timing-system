@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Not.Application.CRUD.Ports;
-using NTS.Application.Shared;
+using NTS.Application.Contracts.Shared;
+using NTS.Application.Contracts.Shared.Models;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
 

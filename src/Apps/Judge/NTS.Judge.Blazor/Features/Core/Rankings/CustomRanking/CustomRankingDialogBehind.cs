@@ -1,6 +1,7 @@
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Structures;
-using NTS.Application.Core;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;

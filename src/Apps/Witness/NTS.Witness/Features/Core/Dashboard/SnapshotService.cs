@@ -5,7 +5,7 @@ using Not.Collections;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Observables.Structures;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;

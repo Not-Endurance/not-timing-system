@@ -1,7 +1,7 @@
 ﻿using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Tests.RPC;
-using NTS.Application;
+using NTS.Application.Contracts;
 using Xunit.Abstractions;
 
 namespace NTS.Judge.Tests;

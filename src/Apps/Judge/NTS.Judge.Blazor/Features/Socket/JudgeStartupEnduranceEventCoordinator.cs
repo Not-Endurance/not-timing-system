@@ -1,8 +1,9 @@
 using MudBlazor;
 using Not.Injection;
 using Not.Startup;
-using NTS.Application.Core;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Socket;
 using NTS.Blazor.Components.SelectEvents;
 
 namespace NTS.Judge.Blazor.Features.Socket;

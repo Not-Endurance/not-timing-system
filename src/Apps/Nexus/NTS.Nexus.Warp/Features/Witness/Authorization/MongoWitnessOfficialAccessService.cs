@@ -1,6 +1,7 @@
 using MongoDB.Driver;
 using Not.Storage.Mongo;
-using NTS.Application.Core;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
 
 namespace NTS.Nexus.Warp.Features.Witness.Authorization;
 

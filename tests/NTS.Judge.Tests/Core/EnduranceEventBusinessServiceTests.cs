@@ -8,13 +8,13 @@ using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 using NTS.Nexus.HTTP.Functions.Event;
-using CoreEnduranceEventModel = NTS.Application.Core.EnduranceEventModel;
-using CoreOfficialModel = NTS.Application.Core.OfficialModel;
-using CoreParticipationModel = NTS.Application.Core.ParticipationModel;
-using CoreRankingModel = NTS.Application.Core.RankingModel;
+using CoreEnduranceEventModel = NTS.Application.Contracts.Core.Models.EnduranceEventModel;
+using CoreOfficialModel = NTS.Application.Contracts.Core.Models.OfficialModel;
+using CoreParticipationModel = NTS.Application.Contracts.Core.Models.ParticipationModel;
+using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
 using SetupOfficial = NTS.Domain.Setup.Aggregates.UpcomingEvents.Official;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.UpcomingEvents.Participation;
-using SetupUpcomingEventModel = NTS.Application.Setup.UpcomingEventModel;
+using SetupUpcomingEventModel = NTS.Application.Contracts.Setup.Models.UpcomingEventModel;
 
 namespace NTS.Judge.Tests.Core;
 

@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Not.Storage.Mongo;
-using NTS.Application.Shared;
+using NTS.Application.Contracts.Shared;
+using NTS.Application.Contracts.Shared.Models;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 

@@ -1,6 +1,8 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Async.Extensions;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 
@@ -48,9 +50,4 @@ public class EnduranceEventService : NStatefulService, IActiveEventsContext, IEn
         _activeEvents.RemoveAll(x => x.Id == eventId);
         EmitChanged();
     }
-}
-
-public interface IEnduranceEventService
-{
-    Task<IEnumerable<EnduranceEvent>> GetEvents();
 }

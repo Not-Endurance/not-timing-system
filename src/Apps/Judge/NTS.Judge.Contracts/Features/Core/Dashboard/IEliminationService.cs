@@ -1,4 +1,3 @@
-using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates.Participations;
 
 namespace NTS.Judge.Contracts.Features.Core.Dashboard;

@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Domain.Abstractions;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
