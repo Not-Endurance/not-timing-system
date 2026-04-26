@@ -19,7 +19,10 @@ public class SnapshotResultEventScopedMongoRepository : EventScopedMongoReposito
 
     protected override UpdateDefinition<SnapshotResultModel> GetUpdateDefinition(SnapshotResultModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(SnapshotResultEventScopedMongoRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(
+            nameof(SnapshotResultEventScopedMongoRepository),
+            nameof(GetUpdateDefinition)
+        );
 
         try
         {

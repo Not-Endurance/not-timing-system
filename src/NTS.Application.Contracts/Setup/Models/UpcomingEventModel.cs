@@ -5,7 +5,6 @@ using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-
 namespace NTS.Application.Contracts.Setup.Models;
 
 public class UpcomingEventModel : IDocument, IKrudModel<UpcomingEvent>
@@ -67,4 +66,3 @@ public class UpcomingEventModel : IDocument, IKrudModel<UpcomingEvent>
         Combinations = @event.Combinations.Select(CombinationModel.MapFrom).ToArray();
     }
 }
-

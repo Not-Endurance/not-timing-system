@@ -5,7 +5,6 @@ using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-
 namespace NTS.Application.Contracts.Setup.Models;
 
 public class AthleteModel : IDocument, IKrudModel<Athlete>
@@ -41,5 +40,3 @@ public class AthleteModel : IDocument, IKrudModel<Athlete>
         return new Athlete(Names, FeiId, Country?.MapToEntity(), Club?.MapToEntity(), Id, User?.MapToEntity());
     }
 }
-
-

@@ -5,7 +5,6 @@ using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-
 namespace NTS.Application.Contracts.Setup.Models;
 
 public class UserModel : IDocument, IKrudModel<User>
@@ -36,5 +35,3 @@ public class UserModel : IDocument, IKrudModel<User>
         return new User(Email, Name, Roles, Id);
     }
 }
-
-

@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class HandoutModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Handout>
@@ -44,5 +43,3 @@ public class HandoutModel : IEventScopedDocument, ISoftDeletableDocument, IKrudM
         return new Handout(Participation.MapToEntity(), Id);
     }
 }
-
-

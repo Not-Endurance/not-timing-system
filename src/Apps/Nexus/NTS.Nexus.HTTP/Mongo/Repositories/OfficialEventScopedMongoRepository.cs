@@ -19,7 +19,10 @@ public class OfficialEventScopedMongoRepository : EventScopedMongoRepository<Off
 
     protected override UpdateDefinition<OfficialModel> GetUpdateDefinition(OfficialModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(OfficialEventScopedMongoRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(
+            nameof(OfficialEventScopedMongoRepository),
+            nameof(GetUpdateDefinition)
+        );
 
         try
         {

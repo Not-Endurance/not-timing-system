@@ -19,7 +19,10 @@ public class RankingEventScopedMongoRepository : EventScopedMongoRepository<Rank
 
     protected override UpdateDefinition<RankingModel> GetUpdateDefinition(RankingModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(RankingEventScopedMongoRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(
+            nameof(RankingEventScopedMongoRepository),
+            nameof(GetUpdateDefinition)
+        );
 
         try
         {

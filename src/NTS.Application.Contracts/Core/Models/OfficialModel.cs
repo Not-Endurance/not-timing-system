@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class OfficialModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Official>
@@ -48,5 +47,3 @@ public class OfficialModel : IEventScopedDocument, ISoftDeletableDocument, IKrud
         UserId = official.UserId;
     }
 }
-
-

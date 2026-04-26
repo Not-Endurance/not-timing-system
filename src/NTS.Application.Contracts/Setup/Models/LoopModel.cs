@@ -5,7 +5,6 @@ using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-
 namespace NTS.Application.Contracts.Setup.Models;
 
 public class LoopModel
@@ -23,5 +22,3 @@ public class LoopModel
         return new Loop(Distance, Id);
     }
 }
-
-

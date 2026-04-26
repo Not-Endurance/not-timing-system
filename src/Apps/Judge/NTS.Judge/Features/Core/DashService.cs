@@ -5,7 +5,6 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
 using NTS.Application.Core;
 using NTS.Domain.Setup.Services.StartValidation;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
 using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core;

@@ -192,7 +192,6 @@ public class ParticipationService
         EmitChanged();
     }
 
-
     async Task UpdateAndDispatch(Participation participation)
     {
         await _participationRepository.Update(participation);

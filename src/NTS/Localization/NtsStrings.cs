@@ -96,7 +96,11 @@ namespace NTS.Localization
         public static string Reset_Timing_this_will_DELETE_Timing_data =>
             LocalizeString(nameof(Reset_Timing_this_will_DELETE_Timing_data));
         public static string Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string =>
-            LocalizeString(nameof(Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string));
+            LocalizeString(
+                nameof(
+                    Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string
+                )
+            );
         public static string This_action_is_final_There_is_no_recovery_string =>
             LocalizeString(nameof(This_action_is_final_There_is_no_recovery_string));
         public static string Type_1337_to_enable_confirmation_string =>

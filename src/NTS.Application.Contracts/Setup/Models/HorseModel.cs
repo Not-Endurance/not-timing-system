@@ -5,7 +5,6 @@ using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-
 namespace NTS.Application.Contracts.Setup.Models;
 
 public class HorseModel : IDocument, IKrudModel<Horse>
@@ -34,5 +33,3 @@ public class HorseModel : IDocument, IKrudModel<Horse>
         return new Horse(Name, FeiId, Id);
     }
 }
-
-

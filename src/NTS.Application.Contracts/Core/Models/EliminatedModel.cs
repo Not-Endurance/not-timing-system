@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class EliminatedModel
@@ -59,5 +58,3 @@ public class EliminatedModel
         };
     }
 }
-
-

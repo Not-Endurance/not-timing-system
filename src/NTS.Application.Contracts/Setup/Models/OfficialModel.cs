@@ -5,7 +5,6 @@ using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-
 namespace NTS.Application.Contracts.Setup.Models;
 
 public class OfficialModel
@@ -31,5 +30,3 @@ public class OfficialModel
         return new Official(Names, Role, Id, User?.MapToEntity());
     }
 }
-
-

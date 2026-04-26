@@ -19,7 +19,10 @@ public class ParticipationEventScopedMongoRepository : EventScopedMongoRepositor
 
     protected override UpdateDefinition<ParticipationModel> GetUpdateDefinition(ParticipationModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(ParticipationEventScopedMongoRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(
+            nameof(ParticipationEventScopedMongoRepository),
+            nameof(GetUpdateDefinition)
+        );
 
         try
         {

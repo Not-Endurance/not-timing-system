@@ -10,7 +10,8 @@ public class NTableBehind : NComponentBase
     protected int DataColumnCount => Headings?.Length ?? GetDataColumnCount();
     protected bool HasLeadingCell => LeadingCell is not null;
     protected bool HasTrailingCell => TrailingCell is not null;
-    protected int TotalColumnCount => Math.Max(1, DataColumnCount + (HasLeadingCell ? 1 : 0) + (HasTrailingCell ? 1 : 0));
+    protected int TotalColumnCount =>
+        Math.Max(1, DataColumnCount + (HasLeadingCell ? 1 : 0) + (HasTrailingCell ? 1 : 0));
     protected string StretchColumnStyle =>
         DataColumnCount == 0
             ? string.Empty
