@@ -6,7 +6,6 @@ using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 
-
 namespace NTS.Application.Contracts.Watcher.Models;
 
 public class NtsUserSessionStateModel
@@ -28,4 +27,3 @@ public class NtsUserSessionStateModel
         };
     }
 }
-

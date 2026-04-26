@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class ArchiveEntryModel : IDocument, IKrudModel<ArchiveEntry>
@@ -78,4 +77,3 @@ public class ArchiveEntryModel : IDocument, IKrudModel<ArchiveEntry>
         return new ArchiveEntry(enduranceEvent, officials, ranklists);
     }
 }
-

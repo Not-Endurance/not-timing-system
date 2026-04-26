@@ -1,5 +1,6 @@
 ﻿global using Microsoft.AspNetCore.Components;
 global using static Not.Localization.NStrings;
+global using NTS.Domain.Enums;
 global using NTS.Judge.Contracts.Features.Core;
 global using NTS.Judge.Contracts.Features.Core.Dashboard;
 global using NTS.Judge.Contracts.Features.Core.Handouts;
@@ -19,5 +20,4 @@ global using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Loops;
 global using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Officials;
 global using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Participations;
 global using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Phases;
-global using NTS.Domain.Enums;
 global using static NTS.Localization.NtsStrings;

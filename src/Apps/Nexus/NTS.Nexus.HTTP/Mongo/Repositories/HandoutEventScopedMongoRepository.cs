@@ -19,7 +19,10 @@ public class HandoutEventScopedMongoRepository : EventScopedMongoRepository<Hand
 
     protected override UpdateDefinition<HandoutModel> GetUpdateDefinition(HandoutModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(HandoutEventScopedMongoRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(
+            nameof(HandoutEventScopedMongoRepository),
+            nameof(GetUpdateDefinition)
+        );
 
         try
         {

@@ -62,7 +62,10 @@ public class EnduranceEventResetTests
             .Where(type => type is { IsClass: true, IsAbstract: false } && IsEventScopedMongoRepository(type));
 
         Assert.NotEmpty(repositories);
-        Assert.All(repositories, repository => Assert.Contains(typeof(IEventResetRepository), repository.GetInterfaces()));
+        Assert.All(
+            repositories,
+            repository => Assert.Contains(typeof(IEventResetRepository), repository.GetInterfaces())
+        );
     }
 
     static HttpRequest CreateRequest(string method, string path)

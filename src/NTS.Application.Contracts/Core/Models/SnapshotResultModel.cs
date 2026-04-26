@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class SnapshotResultModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<SnapshotResult>
@@ -46,5 +45,3 @@ public class SnapshotResultModel : IEventScopedDocument, ISoftDeletableDocument,
         return new SnapshotResult(Snapshot.MapToEntity(), Type, EventId, Id);
     }
 }
-
-

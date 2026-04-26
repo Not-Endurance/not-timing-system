@@ -5,7 +5,6 @@ using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
 
-
 namespace NTS.Application.Contracts.Setup.Models;
 
 public class CombinationModel
@@ -33,5 +32,3 @@ public class CombinationModel
         return new Combination(Number, athlete, horse, Id);
     }
 }
-
-

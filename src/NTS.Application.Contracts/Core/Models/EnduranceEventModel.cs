@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class EnduranceEventModel
@@ -65,5 +64,3 @@ public class EnduranceEventModel
         return new EnduranceEvent(country, Name, Location, span, FeiShowId, FeiId, FeiEventCode, Id);
     }
 }
-
-

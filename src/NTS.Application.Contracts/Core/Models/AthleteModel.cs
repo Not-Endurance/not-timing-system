@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class AthleteModel
@@ -43,5 +42,3 @@ public class AthleteModel
         return new Athlete(Names, country, club, FeiId, Id);
     }
 }
-
-

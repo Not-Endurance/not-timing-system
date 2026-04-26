@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class ParticipationModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Participation>
@@ -70,5 +69,3 @@ public class ParticipationModel : IEventScopedDocument, ISoftDeletableDocument, 
         Eliminated = participation.Eliminated == null ? null : EliminatedModel.MapFrom(participation.Eliminated);
     }
 }
-
-

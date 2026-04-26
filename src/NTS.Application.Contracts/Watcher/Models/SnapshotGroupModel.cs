@@ -6,7 +6,6 @@ using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 
-
 namespace NTS.Application.Contracts.Watcher.Models;
 
 public class SnapshotGroupModel
@@ -34,5 +33,3 @@ public class SnapshotGroupModel
         return new SnapshotGroupModel { Entries = Entries.Select(entry => entry.Copy()).ToArray(), Type = Type };
     }
 }
-
-

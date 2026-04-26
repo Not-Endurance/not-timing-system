@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class CombinationModel
@@ -47,5 +46,3 @@ public class CombinationModel
         return new Combination(Number, athlete, horse, athlete.Club, Distance!, MinAverageSpeed, MaxAverageSpeed, Id);
     }
 }
-
-

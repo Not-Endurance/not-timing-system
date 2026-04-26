@@ -145,6 +145,6 @@ public class ParticipationTableBehind : NComponent
         }
 
         public string Label { get; }
-        public IReadOnlyList<string> Values {get;}
+        public IReadOnlyList<string> Values { get; }
     }
 }

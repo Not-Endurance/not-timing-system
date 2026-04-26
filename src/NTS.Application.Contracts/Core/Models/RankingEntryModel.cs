@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class RankingEntryModel
@@ -38,5 +37,3 @@ public class RankingEntryModel
         return new RankingEntry(participation, Rank, IsNotRanked);
     }
 }
-
-

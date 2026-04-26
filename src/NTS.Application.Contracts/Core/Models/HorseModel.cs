@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class HorseModel
@@ -37,5 +36,3 @@ public class HorseModel
         return new Horse(Name, FeiId, Id);
     }
 }
-
-

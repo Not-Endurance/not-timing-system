@@ -102,10 +102,10 @@ public class CustomRankingDialogBehind : NDialog<CustomRankingModel>
     {
         if (string.IsNullOrWhiteSpace(term))
         {
-            return Task.FromResult< IEnumerable<Participation?>>([]);
+            return Task.FromResult<IEnumerable<Participation?>>([]);
         }
-        var matches = ParticipationsContext.Participations
-            .Where(x => x.ToString().Contains(term))
+        var matches = ParticipationsContext
+            .Participations.Where(x => x.ToString().Contains(term))
             .Cast<Participation?>();
         return Task.FromResult(matches);
     }

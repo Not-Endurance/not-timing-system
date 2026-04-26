@@ -13,7 +13,6 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
-
 namespace NTS.Application.Contracts.Core.Models;
 
 public class CoreSnapshotModel
@@ -39,5 +38,3 @@ public class CoreSnapshotModel
         return new Snapshot(Number, Type, Method, new Timestamp(RecordedAt));
     }
 }
-
-

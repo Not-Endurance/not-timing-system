@@ -28,9 +28,7 @@ public class SnapshotComponentBehind : NComponent
 
     protected string GetTableClass()
     {
-        return Compact
-            ? "snapshot-table snapshot-table-compact"
-            : "snapshot-table";
+        return Compact ? "snapshot-table snapshot-table-compact" : "snapshot-table";
     }
 
     protected string GetButtonStyle()
