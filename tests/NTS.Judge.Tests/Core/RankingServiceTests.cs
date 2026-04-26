@@ -12,6 +12,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
+using NTS.Judge.Contracts.Features.Core.Rankings;
 using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Tests.Core;

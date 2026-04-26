@@ -1,7 +1,7 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Notify;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Judge.Features.Core.Dashboard;
+using NTS.Judge.Contracts.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms;
 

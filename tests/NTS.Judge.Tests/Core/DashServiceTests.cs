@@ -12,8 +12,9 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
+using NTS.Judge.Contracts.Features.Core;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
 using NTS.Judge.Features.Core;
-using NTS.Judge.Features.Setup.UpcomingEvents;
 using NTS.Judge.Tests.Core.Implementations;
 
 namespace NTS.Judge.Tests.Core;

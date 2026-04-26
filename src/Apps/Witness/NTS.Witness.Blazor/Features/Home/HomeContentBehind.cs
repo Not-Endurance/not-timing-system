@@ -1,5 +1,5 @@
 using Not.Blazor.Components.Abstractions;
-using NTS.Witness.Features.Access;
+using NTS.Witness.Contracts.Features.Access;
 
 namespace NTS.Witness.Blazor.Features.Home;
 

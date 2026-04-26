@@ -2,29 +2,30 @@ using Not.Blazor.Components.Abstractions;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Witness.Blazor.Features.Socket;
-using NTS.Witness.Features.Core.Dashboard;
 
 namespace NTS.Witness.Blazor.Features.Core.Performance;
 
 public class PerformanceContentBehind : NStatefulComponent
 {
     [Inject]
-    protected IPerformanceService PerformanceService { get; set; } = default!;
+    IParticipationContext Context { get; set; } = default!;
 
     [Inject]
-    protected BlazorSocketService BlazorSocketService { get; set; } = default!;
+    BlazorSocketService BlazorSocketService { get; set; } = default!;
+
+    protected IReadOnlyList<int> Recent => Context.RecentlyTimed;
 
     protected Participation? Selected
     {
-        get => PerformanceService.Selected;
-        set => PerformanceService.Selected = value;
+        get => Context.Selected;
+        set => Context.Selected = value;
     }
 
-    protected IReadOnlyList<Participation> Participations => PerformanceService.Participations;
+    protected IReadOnlyList<Participation> Participations => Context.Participations;
 
     protected override async Task OnInitializedAsync()
     {
-        await Observe(PerformanceService);
+        await Observe(Context);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

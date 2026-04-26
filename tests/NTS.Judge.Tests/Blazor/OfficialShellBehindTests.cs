@@ -1,6 +1,6 @@
-using NTS.Application.Setup;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Features.Setup.UpcomingEvents.Officials;
+using NTS.Judge.Contracts.Features.Setup;
 
 namespace NTS.Judge.Tests.Blazor;
 
@@ -10,7 +10,7 @@ public class OfficialShellBehindTests
     public async Task SearchUsersSafe_WhenTermMatchesEmail_ReturnsUserFromEmailLookup()
     {
         var expected = new User("judge@example.com", "Judge Example", id: 17);
-        var component = new TestOfficialShellBehind { Users = new TestUserEmailLookup(expected) };
+        var component = new TestOfficialShellBehind { Lookups = new TestJudgeSetupLookupService(expected) };
 
         var result = (await component.Search("judge@example.com")).OfType<User>().ToList();
 
@@ -23,7 +23,7 @@ public class OfficialShellBehindTests
     public async Task SearchUsersSafe_WhenTermMatchesPartOfName_ReturnsMatchingUser()
     {
         var expected = new User("judge@example.com", "Judge Example", id: 17);
-        var component = new TestOfficialShellBehind { Users = new TestUserEmailLookup(expected) };
+        var component = new TestOfficialShellBehind { Lookups = new TestJudgeSetupLookupService(expected) };
 
         var result = (await component.Search("Example")).OfType<User>().ToList();
 
@@ -34,9 +34,9 @@ public class OfficialShellBehindTests
 
     sealed class TestOfficialShellBehind : OfficialShellBehind
     {
-        public new IUserEmailLookup Users
+        public new IJudgeSetupLookupService Lookups
         {
-            set => base.Users = value;
+            set => base.Lookups = value;
         }
 
         public Task<IEnumerable<User?>> Search(string term)
@@ -45,23 +45,26 @@ public class OfficialShellBehindTests
         }
     }
 
-    sealed class TestUserEmailLookup : IUserEmailLookup
+    sealed class TestJudgeSetupLookupService : IJudgeSetupLookupService
     {
         readonly User? _user;
 
-        public TestUserEmailLookup(User? user)
+        public TestJudgeSetupLookupService(User? user)
         {
             _user = user;
         }
 
-        public Task<User?> ReadByEmail(string email)
+        public Task<IEnumerable<NTS.Domain.Aggregates.Country>> SearchCountries(string term, CancellationToken ct)
         {
-            return Task.FromResult(
-                _user != null && string.Equals(_user.Email, email, StringComparison.OrdinalIgnoreCase) ? _user : null
-            );
+            return Task.FromResult(Enumerable.Empty<NTS.Domain.Aggregates.Country>());
         }
 
-        public Task<IEnumerable<User>> Search(string term)
+        public Task<IEnumerable<Club>> SearchClubs(string term, CancellationToken ct)
+        {
+            return Task.FromResult(Enumerable.Empty<Club>());
+        }
+
+        public Task<IEnumerable<User>> SearchUsers(string term, CancellationToken ct)
         {
             if (_user == null)
             {
@@ -74,6 +77,29 @@ public class OfficialShellBehindTests
                 || _user.Name.Contains(term, StringComparison.OrdinalIgnoreCase);
 
             return Task.FromResult<IEnumerable<User>>(matches ? [_user] : []);
+        }
+
+        public Task<IEnumerable<Athlete>> SearchAthletes(string term, CancellationToken ct)
+        {
+            return Task.FromResult(Enumerable.Empty<Athlete>());
+        }
+
+        public Task<IEnumerable<Horse>> SearchHorses(string term, CancellationToken ct)
+        {
+            return Task.FromResult(Enumerable.Empty<Horse>());
+        }
+
+        public Task<IEnumerable<NTS.Domain.Setup.Aggregates.UpcomingEvents.Loop>> GetLoops(CancellationToken ct)
+        {
+            return Task.FromResult(Enumerable.Empty<NTS.Domain.Setup.Aggregates.UpcomingEvents.Loop>());
+        }
+
+        public Task<IEnumerable<NTS.Domain.Setup.Aggregates.UpcomingEvents.Combination>> SearchCombinations(
+            string term,
+            CancellationToken ct
+        )
+        {
+            return Task.FromResult(Enumerable.Empty<NTS.Domain.Setup.Aggregates.UpcomingEvents.Combination>());
         }
     }
 }

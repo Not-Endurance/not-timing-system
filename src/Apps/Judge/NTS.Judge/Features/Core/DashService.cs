@@ -9,7 +9,7 @@ using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
 using NTS.Judge.Features.Core.State;
-using NTS.Judge.Features.Setup.UpcomingEvents;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
 
 namespace NTS.Judge.Features.Core;
 
@@ -123,12 +123,4 @@ public class DashService : IDashService, IScoped
             observable.ResetHasLoaded();
         }
     }
-}
-
-public interface IDashService
-{
-    Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId);
-    Task Start(int upcomingEventId);
-    Task LoadArchive(int archiveId);
-    Task Reset();
 }

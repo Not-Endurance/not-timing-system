@@ -13,7 +13,7 @@
 
   <ItemGroup>
 	  <ProjectReference Include="..\..\..\NTS.Blazor\NTS.Blazor.csproj" />
-	  <ProjectReference Include="..\NTS.Judge\NTS.Judge.csproj" />
+	  <ProjectReference Include="..\NTS.Judge.Contracts\NTS.Judge.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

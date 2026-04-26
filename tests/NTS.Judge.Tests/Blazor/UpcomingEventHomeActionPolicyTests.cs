@@ -8,7 +8,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Features;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Contracts.Features.Core;
 
 namespace NTS.Judge.Tests.Blazor;
 

@@ -1,6 +1,6 @@
 using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Objects;
-using NTS.Judge.Features.Core.Rankings;
+using NTS.Judge.Contracts.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.Ranklists;
 

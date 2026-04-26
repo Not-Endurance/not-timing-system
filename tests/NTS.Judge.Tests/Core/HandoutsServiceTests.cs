@@ -13,6 +13,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
+using NTS.Judge.Contracts.Features.Core.Handouts;
 using NTS.Judge.Features.Core.Handouts;
 
 namespace NTS.Judge.Tests.Core;

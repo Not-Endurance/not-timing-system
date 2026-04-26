@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Judge.Features.Core.Dashboard;
+using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Judge.Tests.Helpers;
 using NTS.Storage.Core;
 using Xunit.Abstractions;
@@ -27,7 +27,7 @@ public class ProcessSnapshotTests : JudgeIntegrationTest
         await Seed();
         var arriveAt = TimestampHelper.Create(19, 30);
         var snapshot = new Snapshot(DEFAULT_COMBINATION_NUMBER, SnapshotType.Arrive, method, arriveAt);
-        var behind = await GetBehind<ITimingService>(x => { });
+        var behind = await GetBehind<ISnapshotService>(x => { });
 
         await behind.Record(snapshot);
 
@@ -44,7 +44,7 @@ public class ProcessSnapshotTests : JudgeIntegrationTest
         await Seed();
         var presentAt = TimestampHelper.Create(19, 35);
         var snapshot = new Snapshot(DEFAULT_COMBINATION_NUMBER, SnapshotType.Present, method, presentAt);
-        var behind = await GetBehind<ITimingService>(x => { });
+        var behind = await GetBehind<ISnapshotService>(x => { });
 
         await behind.Record(snapshot);
 

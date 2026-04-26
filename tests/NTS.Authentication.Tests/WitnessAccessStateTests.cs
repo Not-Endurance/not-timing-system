@@ -10,6 +10,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
 using NTS.Witness.Blazor;
 using NTS.Witness.Blazor.Features;
+using NTS.Witness.Contracts.Features.Access;
 using NTS.Witness.Features.Access;
 
 namespace NTS.Authentication.Tests;

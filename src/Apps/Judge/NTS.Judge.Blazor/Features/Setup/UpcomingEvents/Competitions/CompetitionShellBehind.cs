@@ -2,7 +2,7 @@ using MudBlazor;
 using Not.Krud.Blazor.Components.Abstractions;
 using Not.Structures;
 using NTS.Blazor.Constants;
-using NTS.Judge.Features.Setup.UpcomingEvents.Competitions;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Competitions;
 
 namespace NTS.Judge.Blazor.Features.Setup.UpcomingEvents.Competitions;
 

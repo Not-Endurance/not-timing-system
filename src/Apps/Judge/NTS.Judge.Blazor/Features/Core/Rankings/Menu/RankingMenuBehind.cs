@@ -4,7 +4,7 @@ using Not.Blazor.Dialogs;
 using Not.Blazor.Helpers;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
-using NTS.Judge.Features.Core.Rankings;
+using NTS.Judge.Contracts.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.Menu;
 

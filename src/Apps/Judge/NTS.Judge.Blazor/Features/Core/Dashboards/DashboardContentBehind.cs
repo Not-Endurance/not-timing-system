@@ -1,7 +1,7 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Notify;
 using NTS.Application.Socket;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Contracts.Features.Core;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards;
 

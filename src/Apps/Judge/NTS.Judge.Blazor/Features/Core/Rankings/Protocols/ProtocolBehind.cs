@@ -2,14 +2,14 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
-using NTS.Judge.Features.Core.Rankings;
+using NTS.Judge.Contracts.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 
 public class ProtocolBehind : NStatefulComponent
 {
     [Inject]
-    IRanklistDocumentFactory Factory { get; set; } = default!;
+    IRanklistDocumentService Factory { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;

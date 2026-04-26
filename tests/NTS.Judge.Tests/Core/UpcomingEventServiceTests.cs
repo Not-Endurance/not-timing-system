@@ -8,6 +8,7 @@ using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
 using NTS.Judge.Features.Setup.UpcomingEvents;
 using NTS.Judge.Tests.Core.Implementations;
 using SetupOfficial = NTS.Domain.Setup.Aggregates.UpcomingEvents.Official;

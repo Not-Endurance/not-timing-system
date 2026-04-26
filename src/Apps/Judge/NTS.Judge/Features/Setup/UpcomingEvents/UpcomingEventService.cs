@@ -61,9 +61,3 @@ public class UpcomingEventService
         return upcomingEvent ?? throw GuardHelper.Exception($"Event with id '{upcomingEventId}' is not selected");
     }
 }
-
-public interface IUpcomingEventService : ITransient
-{
-    Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId);
-    Task DeleteParticipation(int upcomingEventId, int participationNumber, int competitionId);
-}

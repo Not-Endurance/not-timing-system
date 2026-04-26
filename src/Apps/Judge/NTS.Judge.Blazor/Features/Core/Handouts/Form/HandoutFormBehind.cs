@@ -1,7 +1,7 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Notify;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Judge.Features.Core.Handouts;
+using NTS.Judge.Contracts.Features.Core.Handouts;
 
 namespace NTS.Judge.Blazor.Features.Core.Handouts.Form;
 

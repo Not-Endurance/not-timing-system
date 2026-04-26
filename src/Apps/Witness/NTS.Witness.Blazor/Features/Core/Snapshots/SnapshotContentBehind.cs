@@ -5,8 +5,8 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Watcher;
 using NTS.Witness.Blazor.Features.Socket;
-using NTS.Witness.Features.Access;
-using NTS.Witness.Features.Core.Dashboard;
+using NTS.Witness.Contracts.Features.Access;
+using NTS.Witness.Contracts.Features.Snapshots;
 
 namespace NTS.Witness.Blazor.Features.Core.Snapshots;
 
@@ -85,7 +85,7 @@ public class SnapshotContentBehind : NStatefulComponent
         {
             if (participation != null)
             {
-                SnapshotService.MoveToSnapshot(participation);
+                SnapshotService.SelectForSnapshot(participation);
             }
         }
         catch (Exception ex)

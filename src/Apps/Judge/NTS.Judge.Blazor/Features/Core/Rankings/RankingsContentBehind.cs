@@ -2,8 +2,8 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Objects;
 using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
-using NTS.Judge.Features.Core.Rankings;
-using NTS.Judge.Features.Core.Rankings.FeiExport;
+using NTS.Judge.Contracts.Features.Core.Rankings;
+using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings;
 

@@ -9,7 +9,7 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Judge.Features.Core.Dashboard;
+using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 
@@ -24,10 +24,10 @@ public class JudgeRpcClient
         IScoped
 {
     readonly INtsSocketService _eventContext;
-    readonly ITimingService _timingService;
+    readonly ISnapshotService _timingService;
     readonly HubProcedures _hubProcedures;
 
-    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, ITimingService timingService)
+    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, ISnapshotService timingService)
         : base(socket)
     {
         _eventContext = eventContext;

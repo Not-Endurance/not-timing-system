@@ -1,0 +1,201 @@
+using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
+using Not.Application.DomainEvents;
+using Not.Async.Extensions;
+using Not.Exceptions;
+using Not.Injection;
+using Not.Krud.Abstractions;
+using Not.Startup;
+using NTS.Application.Core;
+using NTS.Application.Socket;
+using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Judge.Features.Core.State;
+
+namespace NTS.Judge.Features.Core;
+
+public class ParticipationService
+    : NStatefulService,
+        IKrudFormService<PhaseUpdateModel>,
+        IInspectionService,
+        IEliminationService,
+        IParticipationContext,
+        ISnapshotService,
+        IStartupInitializerAsync,
+        ICoreDependentObservables,
+        IScoped
+{
+    readonly List<int> _recentlyProcessed = [];
+    readonly INtsSocketContext _socketContext;
+    readonly IRepository<Participation> _participationRepository;
+    readonly IRepository<SnapshotResult> _snapshotResultRepository;
+    readonly IDomainEventDispatcher _domainEventDispatcher;
+    Participation? _selectedParticipation;
+
+    public ParticipationService(
+        INtsSocketContext socketContext,
+        IRepository<Participation> participationRepository,
+        IRepository<SnapshotResult> snapshotResultRepository,
+        IDomainEventDispatcher domainEventDispatcher
+    )
+    {
+        _socketContext = socketContext;
+        _participationRepository = participationRepository;
+        _snapshotResultRepository = snapshotResultRepository;
+        _domainEventDispatcher = domainEventDispatcher;
+    }
+
+    public IReadOnlyList<int> RecentlyTimed => _recentlyProcessed;
+    public IReadOnlyList<Participation> Participations { get; private set; } = [];
+    public bool IsInspectionRequested => Selected?.Phases.Current.IsRequiredInspectionRequested ?? false;
+    public bool IsRepresentRequested => Selected?.Phases.Current.IsReinspectionRequested ?? false;
+    public bool IsEliminated => Selected?.Eliminated != null;
+    public Participation? Selected
+    {
+        get => _selectedParticipation;
+        set
+        {
+            _selectedParticipation = value;
+            var number = _selectedParticipation?.Combination.Number;
+            if (number != null)
+            {
+                _recentlyProcessed.Remove(number.Value);
+            }
+            EmitChanged();
+        }
+    }
+
+    protected override async Task<bool> InitializeState()
+    {
+        if (!_socketContext.IsConnected)
+        {
+            return false;
+        }
+        Participations = await _participationRepository.ReadMany().AsReadOnly();
+        Selected = Participations.FirstOrDefault();
+        return Participations.Any();
+    }
+
+    public async Task RunAtStartupAsync()
+    {
+        await InitializeState();
+    }
+
+    public Task Create(PhaseUpdateModel item)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task Update(PhaseUpdateModel model)
+    {
+        var participation = Participations.FirstOrDefault(x => x.Phases.Any(y => y.Id == model.Id));
+        GuardHelper.ThrowIfDefault(participation);
+
+        participation.Update(model);
+        await UpdateAndDispatch(participation);
+
+        EmitChanged();
+    }
+
+    public async Task Record(Snapshot snapshot)
+    {
+        var participation = Participations.FirstOrDefault(x => x.Combination.Number == snapshot.Number);
+        if (participation == null)
+        {
+            return;
+        }
+        var result = participation.Process(snapshot);
+        if (result.Type == SnapshotResultType.Applied)
+        {
+            await UpdateAndDispatch(participation);
+        }
+        await _snapshotResultRepository.Create(result);
+        _recentlyProcessed.Add(participation.Combination.Number);
+
+        EmitChanged();
+    }
+
+    public async Task RequestRepresent(bool isRequested)
+    {
+        Selected!.ToggleRepresentation(isRequested);
+        await UpdateAndDispatch(Selected);
+
+        EmitChanged();
+    }
+
+    public async Task RequestInspection(bool isRequested)
+    {
+        Selected!.ToggleInspection(isRequested);
+        await UpdateAndDispatch(Selected);
+
+        EmitChanged();
+    }
+
+    public async Task Withdraw()
+    {
+        GuardHelper.ThrowIfDefault(Selected);
+
+        Selected.Withdraw();
+        await UpdateAndDispatch(Selected);
+
+        EmitChanged();
+    }
+
+    public async Task Retire()
+    {
+        GuardHelper.ThrowIfDefault(Selected);
+
+        Selected.Retire();
+        await UpdateAndDispatch(Selected);
+
+        EmitChanged();
+    }
+
+    public async Task FinishNotRanked(string reason)
+    {
+        GuardHelper.ThrowIfDefault(Selected);
+
+        Selected.FinishNotRanked(reason);
+        await UpdateAndDispatch(Selected);
+
+        EmitChanged();
+    }
+
+    public async Task Disqualify(DisqualifyCode[] dqCodes, string? reason)
+    {
+        GuardHelper.ThrowIfDefault(Selected);
+
+        Selected.Disqualify(dqCodes, reason);
+        await UpdateAndDispatch(Selected);
+
+        EmitChanged();
+    }
+
+    public async Task FailToQualify(FailToQualifyCode[] ftqCodes, string? reason)
+    {
+        GuardHelper.ThrowIfDefault(Selected);
+
+        Selected.FailToQualify(ftqCodes, reason);
+        await UpdateAndDispatch(Selected);
+
+        EmitChanged();
+    }
+
+    public async Task RestoreQualification()
+    {
+        GuardHelper.ThrowIfDefault(Selected);
+
+        Selected.Restore();
+        await UpdateAndDispatch(Selected);
+
+        EmitChanged();
+    }
+
+
+    async Task UpdateAndDispatch(Participation participation)
+    {
+        await _participationRepository.Update(participation);
+        await _domainEventDispatcher.Dispatch(participation);
+    }
+}

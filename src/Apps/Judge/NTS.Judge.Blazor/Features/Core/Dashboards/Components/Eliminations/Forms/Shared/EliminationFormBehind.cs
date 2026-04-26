@@ -1,5 +1,5 @@
 using Not.Blazor.Components.Abstractions;
-using NTS.Judge.Features.Core.Dashboard;
+using NTS.Judge.Contracts.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Eliminations.Forms.Shared;
 

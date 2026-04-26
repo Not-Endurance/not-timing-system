@@ -12,7 +12,6 @@ using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Judge.Features.Core.Rankings.CustomRankings;
 using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core.Rankings;
@@ -22,8 +21,7 @@ public class RankingService
         IKrudFormService<CustomRankingModel>,
         IRankingService,
         IRankingMenuService,
-        IRanklistDocumentFactory,
-        ICustomRankingService,
+        IRanklistDocumentService,
         ICoreDependentObservables,
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationEliminated>,
@@ -181,7 +179,6 @@ public class RankingService
             {
                 continue;
             }
-            //TODO: Implement UpdateMany
             await _rankings.Update(ranking);
             isUpdated = true;
         }

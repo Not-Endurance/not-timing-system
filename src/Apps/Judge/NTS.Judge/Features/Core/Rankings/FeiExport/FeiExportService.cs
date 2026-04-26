@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Not.Exceptions;
 using Not.Filesystem;
-using Not.Injection;
 using NTS.Application.Socket;
 using NTS.Domain.Core.Objects;
 
@@ -32,9 +31,4 @@ public class FeiExportService : IFeiExportService
         var path = $"{_filesystemContext.AppDirectory}/fei-export-{ranklist.Name}.xml";
         await FileHelper.WriteAsync(path, contents);
     }
-}
-
-public interface IFeiExportService : ITransient
-{
-    Task Create(Ranklist ranklist);
 }

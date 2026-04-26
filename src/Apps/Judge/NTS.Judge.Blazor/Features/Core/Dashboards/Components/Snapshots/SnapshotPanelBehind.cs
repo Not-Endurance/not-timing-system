@@ -5,7 +5,7 @@ using NTS.Application.Core;
 using NTS.Blazor.Constants;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Objects;
-using NTS.Judge.Features.Core.Dashboard;
+using NTS.Judge.Contracts.Features.Core.Dashboard;
 
 namespace NTS.Judge.Blazor.Features.Core.Dashboards.Components.Snapshots;
 
@@ -17,7 +17,7 @@ public class SnapshotPanelBehind : NComponent
     IParticipationContext ParticipationContext { get; set; } = default!;
 
     [Inject]
-    ITimingService TimingService { get; set; } = default!;
+    ISnapshotService TimingService { get; set; } = default!;
 
     [Inject]
     INotifier Notifier { get; set; } = default!;

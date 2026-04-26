@@ -1,4 +1,4 @@
-using NTS.Judge.Features.Setup.UpcomingEvents;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
 
 namespace NTS.Judge.Blazor.Features.Setup.UpcomingEvents;
 

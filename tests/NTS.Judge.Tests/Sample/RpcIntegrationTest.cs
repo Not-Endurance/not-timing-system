@@ -1,6 +1,6 @@
 ﻿using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Judge.Features.Core.Dashboard;
+using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Judge.Tests.Helpers;
 using NTS.Storage.Core;
 using Xunit.Abstractions;
@@ -28,7 +28,7 @@ public class RpcIntegrationTest : JudgeIntegrationTest
         var timestamp = TimestampHelper.Create(hour: 18, minute: 10);
         var snapshot = new Snapshot(1337, SnapshotType.Present, SnapshotMethod.Manual, timestamp);
 
-        var timingService = await GetBehind<ITimingService>(_testOutputHelper.WriteLine);
+        var timingService = await GetBehind<ISnapshotService>(_testOutputHelper.WriteLine);
 
         await AssertRpcInvoked(
             _witnessFIxture,

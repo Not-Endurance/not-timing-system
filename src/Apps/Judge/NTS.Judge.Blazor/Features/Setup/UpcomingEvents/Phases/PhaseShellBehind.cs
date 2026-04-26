@@ -1,15 +1,14 @@
-using Not.Application.Services;
 using Not.Krud.Blazor.Components.Abstractions;
 using Not.Structures;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
-using NTS.Judge.Features.Setup.UpcomingEvents.Phases;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Phases;
 
 namespace NTS.Judge.Blazor.Features.Setup.UpcomingEvents.Phases;
 
 public class PhaseShellBehind : KrudShell<PhaseFormModel>
 {
     [Inject]
-    ISettService<Loop> Behind { get; set; } = default!;
+    IJudgeSetupLookupService Lookups { get; set; } = default!;
 
     protected IEnumerable<NotListModel<Loop>> Loops { get; private set; } = [];
 
@@ -17,7 +16,7 @@ public class PhaseShellBehind : KrudShell<PhaseFormModel>
     {
         try
         {
-            var loops = await Behind.ReadMany();
+            var loops = await Lookups.GetLoops(CancellationToken.None);
             Loops = NotListModel.FromEntity(loops);
         }
         catch (Exception ex)

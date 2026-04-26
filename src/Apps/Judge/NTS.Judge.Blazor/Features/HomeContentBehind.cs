@@ -7,7 +7,7 @@ using NTS.Application.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Features.Setup.StartValidation;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Contracts.Features.Core;
 
 namespace NTS.Judge.Blazor.Features;
 

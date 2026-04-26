@@ -6,7 +6,7 @@ using Not.Exceptions;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
-using NTS.Witness.Features.Core.Dashboard;
+using NTS.Witness.Contracts.Features.Snapshots;
 
 namespace NTS.Witness.Blazor.Features.Core.Snapshots.Components;
 
@@ -42,7 +42,7 @@ public class SnapshotComponentBehind : NComponent
     {
         try
         {
-            SnapshotService.CaptureSnapshot(snapshot);
+            SnapshotService.Capture(snapshot);
         }
         catch (Exception ex)
         {
@@ -72,7 +72,7 @@ public class SnapshotComponentBehind : NComponent
                 GuardHelper.ThrowIfDefault(updatedTimestamp);
                 GuardHelper.ThrowIfDefault(updatedTimestamp.TimestampInput);
                 var stamp = new Timestamp(updatedTimestamp.TimestampInput);
-                SnapshotService.UpdateSnapshotTimestamp(snapshot, stamp);
+                SnapshotService.UpdateTimestamp(snapshot, stamp);
             }
         }
         catch (Exception ex)
@@ -101,7 +101,7 @@ public class SnapshotComponentBehind : NComponent
                 }
             }
 
-            SnapshotService.RemoveSnapshot(snapshot);
+            SnapshotService.Remove(snapshot);
         }
         catch (Exception ex)
         {
