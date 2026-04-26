@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Not.Serialization.JSON;
 using Not.Structures;
 using NTS.Nexus.HTTP.Logger;

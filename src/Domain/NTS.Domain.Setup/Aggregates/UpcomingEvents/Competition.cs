@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using Not.Domain.Krud;
 using NTS.Domain.Extensions;
 

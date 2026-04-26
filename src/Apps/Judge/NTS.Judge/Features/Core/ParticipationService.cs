@@ -7,7 +7,6 @@ using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Startup;
 using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;

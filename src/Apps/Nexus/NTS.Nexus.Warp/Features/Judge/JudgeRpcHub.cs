@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Nexus.Warp.Abstractions;
 using NTS.Nexus.Warp.ConnectionDiagnostics;
@@ -76,13 +75,10 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
         );
 
         await _witnessRelay.Clients.Group(request.EnduranceEventId).OnPhaseCompleted(request.Payload);
-
-        var serialized = JsonConvert.SerializeObject(participation);
         _logger.LogInformation(
-            "Phase completed OUT: #{number}, OUT: {outTime}, serialized: {serialized}",
+            "Phase completed OUT: #{number}, OUT: {outTime}",
             participation.Combination.Number,
-            participation.Phases.Current.StartTime,
-            serialized
+            participation.Phases.Current.StartTime
         );
     }
 
