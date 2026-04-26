@@ -20,6 +20,5 @@ public static class Routes
     public const string STARTLIST_PAGE = "/startlist";
     public const string HANDOUTS_PAGE = "/handouts";
     public const string SETTINGS_PAGE = "/settings";
-    public const string INQUIRY_PAGE = "/inquiry";
     public const string DOWNLOAD_PAGE = "/download";
 }

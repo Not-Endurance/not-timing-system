@@ -50,8 +50,7 @@ public class RankingServiceTests
         var service = new RankingService(
             new TestSocketContext { Event = CreateEvent(14) },
             rankings,
-            new RecordingRepository<Official>(),
-            new RecordingRepository<ArchiveEntry>()
+            new RecordingRepository<Official>()
         );
 
         await service.Handle(new PhaseCompleted(updatedParticipation), CancellationToken.None);

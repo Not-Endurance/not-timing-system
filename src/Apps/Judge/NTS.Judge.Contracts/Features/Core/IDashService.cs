@@ -7,6 +7,5 @@ public interface IDashService
 {
     Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId);
     Task Start(int upcomingEventId);
-    Task LoadArchive(int archiveId);
     Task Reset();
 }

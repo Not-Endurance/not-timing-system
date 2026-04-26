@@ -210,9 +210,6 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Handouts</value>
   </data>
-  <data name="Inquiry_string" xml:space="preserve">
-    <value>Inquiry</value>
-  </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Failed to Qualify Reason</value>
   </data>
@@ -375,9 +372,6 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>Cancel</value>
   </data>
-  <data name="Archive_string" xml:space="preserve">
-    <value>Archive</value>
-  </data>
   <data name="History_string" xml:space="preserve">
     <value>History</value>
   </data>
@@ -518,9 +512,6 @@
   </data>
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Time format is incorect 'hours:minutes:seconds'</value>
-  </data>
-  <data name="No_results_found_in_archive_string" xml:space="preserve">
-    <value>No results found in archive</value>
   </data>
   <data name="required_for_FEI_export" xml:space="preserve">
     <value>*required only for FEI export</value>
@@ -849,9 +840,6 @@
   <data name="Start_In_string" xml:space="preserve">
     <value>Start In</value>
   </data>
-  <data name="ID_of_archive_to_load_string" xml:space="preserve">
-    <value>ID of archive to load</value>
-  </data>
   <data name="Load_string" xml:space="preserve">
     <value>Load</value>
   </data>
@@ -902,9 +890,6 @@
   </data>
   <data name="Snapshots_sent_as__string" xml:space="preserve">
     <value>Snapshots sent as {0}</value>
-  </data>
-  <data name="Provide_Archive_ID_string" xml:space="preserve">
-    <value>Provide Archive ID</value>
   </data>
   <data name="Please_select_the_combination_string" xml:space="preserve">
     <value>Please select the combination</value>

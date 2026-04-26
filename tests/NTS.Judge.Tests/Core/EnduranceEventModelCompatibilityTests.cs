@@ -58,27 +58,6 @@ public class EnduranceEventModelMappingTests
     }
 
     [Fact]
-    public void MapToEntity_WhenArchiveEntryModelUsesNameAndLocation_PreservesValues()
-    {
-        var model = new ArchiveEntryModel
-        {
-            Id = 13,
-            Country = CountryModel.From(new Country(1, "Bulgaria", "BG", "BUL", "bg-BG")),
-            Name = "Autumn Final",
-            Location = "Venue",
-            StartDay = DateTimeOffset.UtcNow,
-            EndDay = DateTimeOffset.UtcNow.AddDays(1),
-            Officials = [],
-            Ranklists = [],
-        };
-
-        var archiveEntry = model.MapToEntity();
-
-        Assert.Equal("Autumn Final", archiveEntry.EnduranceEvent.Name);
-        Assert.Equal("Venue", archiveEntry.EnduranceEvent.Location);
-    }
-
-    [Fact]
     public void MapToEntity_WhenUpcomingEventModelUsesLocation_PreservesLocation()
     {
         var model = new UpcomingEventModel

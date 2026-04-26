@@ -50,18 +50,6 @@ public class RankingsContentBehind : PrintableComponent
         }
     }
 
-    protected async Task ArchiveEnduranceEvent()
-    {
-        try
-        {
-            await RankingService.ArchiveEnduranceEvent();
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-    }
-
     protected async Task OpenCustomRankingDialog()
     {
         try

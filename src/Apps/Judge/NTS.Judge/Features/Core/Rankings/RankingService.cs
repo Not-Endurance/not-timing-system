@@ -33,7 +33,6 @@ public class RankingService
     readonly INtsSocketContext _socketContext;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<Official> _officials;
-    readonly IRepository<ArchiveEntry> _archive;
     readonly CoalesceInvoker _coalesced;
     Ranking? _current;
     IReadOnlyList<Official> _loadedOfficials = [];
@@ -41,14 +40,12 @@ public class RankingService
     public RankingService(
         INtsSocketContext socketContext,
         IRepository<Ranking> rankings,
-        IRepository<Official> officials,
-        IRepository<ArchiveEntry> archive
+        IRepository<Official> officials
     )
     {
         _socketContext = socketContext;
         _rankings = rankings;
         _officials = officials;
-        _archive = archive;
         _coalesced = new();
     }
 
@@ -108,16 +105,6 @@ public class RankingService
             _current = Rankings.FirstOrDefault();
             EmitChanged();
         }
-    }
-
-    public async Task ArchiveEnduranceEvent()
-    {
-        GuardHelper.ThrowIfDefault(_socketContext.Event);
-
-        var rankings = await _rankings.ReadMany();
-        var ranklists = rankings.Select(x => new Ranklist(x)).Where(x => x.Entries.Any());
-        var entry = new ArchiveEntry(_socketContext.Event, _loadedOfficials, ranklists);
-        await _archive.Create(entry);
     }
 
     public RanklistDocument Create(Ranking ranking)

@@ -35,8 +35,6 @@
                 <NotButtonPrint OnClick="Print" />
             </MudButtonGroup>
             
-            <NButtonPrimary OnClick="ArchiveEnduranceEvent" Text="@Archive_string" StartIcon="@Icons.Material.Filled.Archive"/>
-
             @if (IsFeiExportConfigured)
             {
                 <NButtonPrimary OnClick="GenerateFeiExport" Text="@Export_FEI_string" StartIcon="@Icons.Material.Filled.ImportExport"/>

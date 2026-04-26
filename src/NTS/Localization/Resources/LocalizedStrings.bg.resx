@@ -210,9 +210,6 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Разпечатки</value>
   </data>
-  <data name="Inquiry_string" xml:space="preserve">
-    <value>Справки</value>
-  </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Причина за отпадане</value>
   </data>
@@ -375,9 +372,6 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>Откажи</value>
   </data>
-  <data name="Archive_string" xml:space="preserve">
-    <value>Архивирай</value>
-  </data>
   <data name="History_string" xml:space="preserve">
     <value>История</value>
   </data>
@@ -518,9 +512,6 @@
   </data>
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Форматът е невалиден 'час:минута:секунда'</value>
-  </data>
-  <data name="No_results_found_in_archive_string" xml:space="preserve">
-    <value>Няма резултати в архива</value>
   </data>
   <data name="required_for_FEI_export" xml:space="preserve">
     <value>*задължително само за ФЕИ експорт</value>
@@ -846,9 +837,6 @@
   <data name="Start_In_string" xml:space="preserve">
     <value>Старт след</value>
   </data>
-  <data name="ID_of_archive_to_load_string" xml:space="preserve">
-    <value>ID на архив за зареждане</value>
-  </data>
   <data name="Load_string" xml:space="preserve">
     <value>Зареди</value>
   </data>
@@ -899,9 +887,6 @@
   </data>
   <data name="Snapshots_sent_as__string" xml:space="preserve">
     <value>Снимките са изпратени като {0}</value>
-  </data>
-  <data name="Provide_Archive_ID_string" xml:space="preserve">
-    <value>Въведете ID на архива</value>
   </data>
   <data name="Please_select_the_combination_string" xml:space="preserve">
     <value>Моля, изберете комбинация</value>

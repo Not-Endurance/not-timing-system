@@ -2,12 +2,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using Not.Async.Extensions;
 using NTS.Application.Contracts.Setup;
 using NTS.Application.Contracts.Setup.Models;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Nexus.HTTP.Mongo.Repositories;
 using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
@@ -15,18 +13,15 @@ namespace NTS.Nexus.HTTP.Functions;
 public class HorseFunctions : FunctionBase
 {
     readonly IRepository<HorseModel> _horses;
-    readonly IArchiveRepository _archive;
 
     public HorseFunctions(
         IFunctionLogger<HorseFunctions> logger,
         IRepository<HorseModel> horses,
-        IArchiveRepository archive,
         ITelemetryService telemetry
     )
         : base(logger, telemetry)
     {
         _horses = horses;
-        _archive = archive;
     }
 
     [Function("horses-insert")]
@@ -66,17 +61,6 @@ public class HorseFunctions : FunctionBase
         using var activity = StartFunctionActivity(nameof(SafeDelete));
         TagRequest(request);
         LogInformation(request, nameof(SafeDelete));
-
-        var recordsWithHorse = await _archive
-            .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
-            .ToList();
-
-        if (recordsWithHorse.Any())
-        {
-            return Failure(
-                $"The horse you want to delete has participated in '{recordsWithHorse.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
-            );
-        }
 
         var horse = await _horses.Read(id);
         if (horse == null)

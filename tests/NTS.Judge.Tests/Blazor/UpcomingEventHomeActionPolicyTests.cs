@@ -136,11 +136,6 @@ public class UpcomingEventsListBehindTests
             return Task.CompletedTask;
         }
 
-        public Task LoadArchive(int archiveId)
-        {
-            return Task.CompletedTask;
-        }
-
         public Task Reset()
         {
             return Task.CompletedTask;

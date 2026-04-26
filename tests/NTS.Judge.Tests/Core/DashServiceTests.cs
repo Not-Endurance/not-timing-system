@@ -80,13 +80,7 @@ public class DashServiceTests
             activeEventService,
             [],
             enduranceEvents,
-            upcomingEventService,
-            new RecordingRepository<Ranking>(),
-            new RecordingRepository<EnduranceEvent>(),
-            new RecordingRepository<Participation>(),
-            new RecordingRepository<Official>(),
-            new RecordingRepository<ArchiveEntry>(),
-            new TestNotifier()
+            upcomingEventService
         );
     }
 
@@ -273,57 +267,4 @@ public class DashServiceTests
         }
     }
 
-    sealed class RecordingRepository<T> : IRepository<T>
-        where T : class, IEntity
-    {
-        public Task Create(T item)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task<T?> Read(Expression<Func<T, bool>> filter)
-        {
-            return Task.FromResult<T?>(null);
-        }
-
-        public Task<T?> Read(int id)
-        {
-            return Task.FromResult<T?>(null);
-        }
-
-        public Task<IEnumerable<T>> ReadMany()
-        {
-            return Task.FromResult<IEnumerable<T>>([]);
-        }
-
-        public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
-        {
-            return Task.FromResult<IEnumerable<T>>([]);
-        }
-
-        public Task Update(T item)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(T item)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(int id)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(Expression<Func<T, bool>> filter)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(IEnumerable<T> items)
-        {
-            return Task.CompletedTask;
-        }
-    }
 }
