@@ -1,6 +1,6 @@
+using MongoDB.Bson;
 using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Contracts.Setup.Models;
-using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
 using NTS.Application.Factories;
 using NTS.Domain.Aggregates;
@@ -13,6 +13,32 @@ namespace NTS.Judge.Tests.Core;
 
 public class EnduranceEventModelMappingTests
 {
+    [Fact]
+    public void ToBsonDocument_WhenSerialized_UsesEventIdAsMongoId()
+    {
+        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var setupEvent = new UpcomingEvent(
+            "National Championship",
+            "Shumen",
+            country,
+            null,
+            null,
+            null,
+            [CreateCompetition()],
+            [],
+            [],
+            [],
+            11
+        );
+        var model = EnduranceEventModel.From(EnduranceEventFactory.Create(setupEvent));
+
+        var document = model.ToBsonDocument();
+
+        Assert.Equal(11, document["_id"].AsInt32);
+        Assert.False(document.Contains("MongoId"));
+        Assert.False(document.Contains("Id"));
+    }
+
     [Fact]
     public void Create_WhenSetupEventIsMapped_PreservesNameLocationAndCountry()
     {

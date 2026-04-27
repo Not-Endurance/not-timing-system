@@ -5,6 +5,7 @@ namespace NTS.Application.Core;
 
 public interface IEnduranceEventRepository : IRepository<EnduranceEvent>
 {
+    Task<IEnumerable<EnduranceEvent>> ReadActive();
     Task<EnduranceEvent> Start(int upcomingEventId);
 
     /// <summary>

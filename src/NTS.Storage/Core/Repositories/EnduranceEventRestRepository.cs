@@ -24,6 +24,12 @@ public class EnduranceEventRestRepository
         _socketContext = socketContext;
     }
 
+    public async Task<IEnumerable<EnduranceEvent>> ReadActive()
+    {
+        var models = await HandleRequest(Client.Get<IEnumerable<EnduranceEventModel>>($"{Endpoint}/active")) ?? [];
+        return models.Select(x => MapEntity(x)!);
+    }
+
     public async Task<EnduranceEvent> Start(int upcomingEventId)
     {
         var result = await Client.Post<EnduranceEventModel>(

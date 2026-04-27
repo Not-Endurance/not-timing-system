@@ -29,7 +29,7 @@ public class SelectEventDialogBehind : NDialog
     {
         try
         {
-            Events = await EnduranceEventService.GetEvents();
+            Events = await EnduranceEventService.GetActiveEvents();
         }
         catch (Exception ex)
         {

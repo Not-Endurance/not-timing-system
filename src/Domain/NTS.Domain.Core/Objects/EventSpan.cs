@@ -4,6 +4,8 @@ namespace NTS.Domain.Core.Objects;
 
 public record EventSpan
 {
+    public static readonly TimeSpan ActiveGracePeriod = TimeSpan.FromDays(7);
+
     public EventSpan(DateTimeOffset startDay, DateTimeOffset endDay)
     {
         StartDay = new DateTimeOffset(startDay.Year, startDay.Month, startDay.Day, 0, 0, 0, startDay.Offset);
@@ -12,6 +14,12 @@ public record EventSpan
 
     public DateTimeOffset StartDay { get; }
     public DateTimeOffset EndDay { get; }
+    public DateTimeOffset ActiveUntil => EndDay.Add(ActiveGracePeriod);
+
+    public bool IsActive(DateTimeOffset now)
+    {
+        return now < ActiveUntil;
+    }
 
     public override string ToString()
     {

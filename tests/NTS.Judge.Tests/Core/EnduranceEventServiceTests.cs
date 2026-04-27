@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Not.Application.CRUD.Ports;
 using NTS.Application.Core;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
@@ -62,13 +61,28 @@ public class EnduranceEventServiceTests
         );
     }
 
-    sealed class TestEnduranceEventRepository : IRepository<EnduranceEvent>
+    sealed class TestEnduranceEventRepository : IEnduranceEventRepository
     {
         readonly IReadOnlyList<EnduranceEvent> _events;
 
         public TestEnduranceEventRepository(IReadOnlyList<EnduranceEvent> events)
         {
             _events = events;
+        }
+
+        public Task<IEnumerable<EnduranceEvent>> ReadActive()
+        {
+            return Task.FromResult<IEnumerable<EnduranceEvent>>(_events);
+        }
+
+        public Task<EnduranceEvent> Start(int upcomingEventId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Reset()
+        {
+            throw new NotImplementedException();
         }
 
         public Task Create(EnduranceEvent item)
@@ -88,7 +102,7 @@ public class EnduranceEventServiceTests
 
         public Task<IEnumerable<EnduranceEvent>> ReadMany()
         {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>(_events);
+            throw new NotImplementedException();
         }
 
         public Task<IEnumerable<EnduranceEvent>> ReadMany(Expression<Func<EnduranceEvent, bool>> filter)

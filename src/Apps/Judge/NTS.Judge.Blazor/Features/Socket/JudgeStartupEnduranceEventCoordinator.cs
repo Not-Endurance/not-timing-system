@@ -1,4 +1,5 @@
 using MudBlazor;
+using Not.Async.Extensions;
 using Not.Injection;
 using Not.Startup;
 using NTS.Application.Contracts.Core;
@@ -32,7 +33,7 @@ public class JudgeStartupEnduranceEventCoordinator : IStartupInitializerAsync, I
             return;
         }
 
-        var events = (await _enduranceEventService.GetEvents()).ToList();
+        var events = await _enduranceEventService.GetActiveEvents().ToList();
         if (events.Count == 0)
         {
             return;

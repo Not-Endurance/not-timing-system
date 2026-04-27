@@ -19,6 +19,30 @@ namespace NTS.Judge.Tests.Core;
 public class EnduranceEventRestRepositoryTests
 {
     [Fact]
+    public async Task ReadActive_calls_active_endpoint_and_maps_events()
+    {
+        var models = new[]
+        {
+            EnduranceEventModel.From(CreateEvent(14)),
+            EnduranceEventModel.From(CreateEvent(21)),
+        };
+        var handler = new RecordingHttpMessageHandler
+        {
+            ResponseFactory = _ => CreateJsonResponse(Result.Success<IEnumerable<EnduranceEventModel>>(models)),
+        };
+        var client = CreateClient(handler);
+        var repository = new EnduranceEventRestRepository(client, new TestSocketContext());
+
+        var result = (await repository.ReadActive()).ToList();
+
+        Assert.Equal([14, 21], result.Select(x => x.Id));
+
+        var request = Assert.Single(handler.Requests);
+        Assert.Equal(HttpMethod.Get, request.Method);
+        Assert.Equal("https://nexus.test/api/endurance-event/active", request.RequestUri?.ToString());
+    }
+
+    [Fact]
     public async Task Start_returns_mapped_endurance_event_when_response_contains_success_result()
     {
         var model = EnduranceEventModel.From(CreateEvent(14));

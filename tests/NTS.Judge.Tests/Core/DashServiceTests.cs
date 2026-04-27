@@ -216,6 +216,11 @@ public class DashServiceTests
             return Task.CompletedTask;
         }
 
+        public Task<IEnumerable<EnduranceEvent>> ReadActive()
+        {
+            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+        }
+
         public Task Create(EnduranceEvent item)
         {
             return Task.CompletedTask;
