@@ -1,0 +1,17 @@
+﻿@using Not.Blazor.Components.Layout
+@using Not.Krud.Blazor.Components
+@using NTS.Domain.Core.Aggregates
+
+@attribute [Route(PAST_EVENTS_PAGE)]
+@inherits PastEventContentBehind
+
+<NContent Title="@Past_events_string">
+    <Main>
+        <KrudList T="EnduranceEvent"
+                  TModel="PastEventModel"
+                  TShell="PastEventShell"
+                  Name="@Past_events_string"
+                  ViewRouteFactory="CreatePastEventRoute" 
+                  AllowView />
+    </Main>
+</NContent>

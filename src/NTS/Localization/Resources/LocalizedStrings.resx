@@ -957,4 +957,7 @@
   <data name="Validation_errors_string" xml:space="preserve">
     <value>Validation errors</value>
   </data>
+  <data name="Past_events_string" xml:space="preserve">
+    <value>Past events</value>
+  </data>
 </root>

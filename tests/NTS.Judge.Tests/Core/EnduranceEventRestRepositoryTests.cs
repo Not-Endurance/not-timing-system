@@ -43,6 +43,30 @@ public class EnduranceEventRestRepositoryTests
     }
 
     [Fact]
+    public async Task ReadPast_calls_past_endpoint_and_maps_events()
+    {
+        var models = new[]
+        {
+            EnduranceEventModel.From(CreateEvent(31)),
+            EnduranceEventModel.From(CreateEvent(32)),
+        };
+        var handler = new RecordingHttpMessageHandler
+        {
+            ResponseFactory = _ => CreateJsonResponse(Result.Success<IEnumerable<EnduranceEventModel>>(models)),
+        };
+        var client = CreateClient(handler);
+        var repository = new EnduranceEventRestRepository(client, new TestSocketContext());
+
+        var result = (await repository.ReadPast()).ToList();
+
+        Assert.Equal([31, 32], result.Select(x => x.Id));
+
+        var request = Assert.Single(handler.Requests);
+        Assert.Equal(HttpMethod.Get, request.Method);
+        Assert.Equal("https://nexus.test/api/endurance-event/past", request.RequestUri?.ToString());
+    }
+
+    [Fact]
     public async Task Start_returns_mapped_endurance_event_when_response_contains_success_result()
     {
         var model = EnduranceEventModel.From(CreateEvent(14));

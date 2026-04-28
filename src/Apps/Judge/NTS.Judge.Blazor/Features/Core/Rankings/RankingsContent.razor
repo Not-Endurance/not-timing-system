@@ -11,7 +11,11 @@
     <Main>
         @if (IsProtocolVisible)
         {
-           <Protocol CompactParticipationTables="CompactParticipationTables" />
+            <Protocol Document="Document"
+                      Compact="CompactParticipationTables"
+                      LeftLogo="@HeaderLogo.Left"
+                      RightLogo="@HeaderLogo.Right"
+                      LogoClicked="OpenImageBrowser" />
         }
         else
         {
@@ -43,7 +47,11 @@
             <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
         </MudStack>
 
-        <RankingMenu Class="mt-4"/>
+        <RankingMenu Rankings="RankingService.Rankings"
+                     Selected="RankingService.Current"
+                     OnSelectedSafe="SelectRanking"
+                     OnDeleteSafe="OpenDeleteDialog"
+                     Class="mt-4" />
     </Rightbar>
 
 </NContent>

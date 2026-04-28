@@ -1,62 +1,36 @@
-using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Objects.Documents;
-using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
-using NTS.Judge.Contracts.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 
-public class ProtocolBehind : NStatefulComponent
+public class ProtocolBehind : NComponent
 {
-    [Inject]
-    IRanklistDocumentService Factory { get; set; } = default!;
-
-    [Inject]
-    IDialogService DialogService { get; set; } = default!;
-
-    [Inject]
-    protected IProtocolLogoState HeaderLogo { get; set; } = default!;
-
-    protected RanklistDocument? Document { get; set; } = default!;
-
-    [Inject]
-    protected IRankingContext Service { get; set; } = default!;
+    protected bool HasLeftLogo => !string.IsNullOrWhiteSpace(LeftLogo);
+    protected bool HasRightLogo => !string.IsNullOrWhiteSpace(RightLogo);
+    protected string LogoClass => LogoClicked.HasDelegate ? "cursor-pointer" : string.Empty;
 
     [Parameter]
-    public bool CompactParticipationTables { get; set; }
+    public RanklistDocument? Document { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(Service);
-    }
+    [Parameter]
+    public bool Compact { get; set; }
 
-    protected override void OnBeforeRender()
+    [Parameter]
+    public string? LeftLogo { get; set; }
+
+    [Parameter]
+    public string? RightLogo { get; set; }
+
+    [Parameter]
+    public EventCallback<string> LogoClicked { get; set; }
+
+    protected async Task OnLogoClicked(string? logo)
     {
-        try
+        if (string.IsNullOrWhiteSpace(logo) || !LogoClicked.HasDelegate)
         {
-            Document = Factory.Create(Service.Current);
+            return;
         }
-        catch (Exception ex)
-        {
-            Document = null;
-            Handle(ex);
-        }
-    }
 
-    public async Task OpenImageBrowser(string forImage, string source)
-    {
-        var parameters = new DialogParameters<ImageBrowserDialog>
-        {
-            { x => x.SelectedImagePath, forImage },
-            { x => x.Src, source },
-        };
-        DialogOptions options = new()
-        {
-            MaxWidth = MaxWidth.ExtraLarge,
-            FullWidth = true,
-            CloseOnEscapeKey = true,
-        };
-        var dialog = await DialogService.ShowAsync<ImageBrowserDialog>(Image_browser_string, parameters, options);
-        await dialog.Result;
+        await LogoClicked.InvokeAsync(logo);
     }
 }

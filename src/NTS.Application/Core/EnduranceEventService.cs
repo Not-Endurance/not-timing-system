@@ -22,9 +22,14 @@ public class EnduranceEventService : NStatefulService, IActiveEventsContext, IEn
         return true;
     }
 
-    public Task<IEnumerable<EnduranceEvent>> GetActiveEvents()
+    public Task<IEnumerable<EnduranceEvent>> GetActive()
     {
         return _enduranceEvents.ReadActive();
+    }
+
+    public Task<IEnumerable<EnduranceEvent>> GetPast()
+    {
+        return _enduranceEvents.ReadPast();
     }
 
     public bool IsActive(UpcomingEvent upcomingEvent)

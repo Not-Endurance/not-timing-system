@@ -1,28 +1,30 @@
-using MudBlazor;
 using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Dialogs;
-using Not.Blazor.Helpers;
-using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
-using NTS.Judge.Contracts.Features.Core.Rankings;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings.Menu;
 
-public class RankingMenuBehind : NStatefulComponent
+public class RankingMenuBehind : NComponent
 {
-    [Inject]
-    IDialogService DialogService { get; set; } = default!;
+    [Parameter]
+    public IReadOnlyList<Ranking> Rankings { get; set; } = [];
 
-    protected ObservableList<Ranking> Rankings => Service.Rankings;
+    [Parameter]
+    public Ranking? Selected { get; set; }
 
-    [Inject]
-    protected IRankingMenuService Service { get; set; } = default!;
+    [Parameter]
+    public EventCallback<Ranking> OnSelectedSafe { get; set; }
 
-    protected void Select(Ranking ranking)
+    [Parameter]
+    public EventCallback<Ranking> OnDeleteSafe { get; set; }
+
+    protected async Task Select(Ranking ranking)
     {
         try
         {
-            Service.Select(ranking);
+            if (OnSelectedSafe.HasDelegate)
+            {
+                await OnSelectedSafe.InvokeAsync(ranking);
+            }
         }
         catch (Exception ex)
         {
@@ -30,23 +32,14 @@ public class RankingMenuBehind : NStatefulComponent
         }
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Observe(Service);
-    }
-
-    protected async Task OpenDeleteDialog(MudChip<Ranking> chip)
+    protected async Task RequestDelete(Ranking ranking)
     {
         try
         {
-            var ranking = chip.Value!;
-            var arguments = new DialogParameters<NDeleteDialog> { { x => x.Item, ranking.Name } };
-            var dialog = await DialogService.ShowAsync<NDeleteDialog>(Delete_string, arguments);
-            if (await dialog.IsCanceled())
+            if (OnDeleteSafe.HasDelegate)
             {
-                return;
+                await OnDeleteSafe.InvokeAsync(ranking);
             }
-            await Service.Delete(ranking);
         }
         catch (Exception ex)
         {

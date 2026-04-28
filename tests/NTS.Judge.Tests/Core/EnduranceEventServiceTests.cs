@@ -75,6 +75,11 @@ public class EnduranceEventServiceTests
             return Task.FromResult<IEnumerable<EnduranceEvent>>(_events);
         }
 
+        public Task<IEnumerable<EnduranceEvent>> ReadPast()
+        {
+            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+        }
+
         public Task<EnduranceEvent> Start(int upcomingEventId)
         {
             throw new NotImplementedException();

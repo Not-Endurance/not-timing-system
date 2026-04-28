@@ -1,5 +1,6 @@
 ﻿using Not.Domain.Exceptions;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NTS.Domain.Core.Objects.Startlists;
 
@@ -109,17 +110,35 @@ public record Startlist : ValueObject
     void Add(Participation participation)
     {
         var phases = participation.Phases;
-        foreach (var phase in phases)
+        for (var phaseIndex = 0; phaseIndex < phases.Count; phaseIndex++)
         {
-            if (phase.StartTime == null)
+            var phase = phases[phaseIndex];
+            var start = ResolveStart(phases, phaseIndex);
+            if (start == null)
             {
                 continue;
             }
 
-            var phaseIndex = phases.IndexOf(phase);
-            var entry = CreateStarter(participation, phaseIndex, phase.StartTime);
+            var entry = CreateStarter(participation, phaseIndex, start);
             Add(entry, phase.IsComplete());
         }
+    }
+
+    Timestamp? ResolveStart(IReadOnlyList<Phase> phases, int phaseIndex)
+    {
+        var phase = phases[phaseIndex];
+        if (phase.StartTime != null)
+        {
+            return phase.StartTime;
+        }
+
+        if (phaseIndex == 0)
+        {
+            return null;
+        }
+
+        var previous = phases[phaseIndex - 1];
+        return previous.IsComplete() ? previous.GetOutTime() : null;
     }
 
     void UpsertStarter(Participation participation, int phaseIndex, Timestamp? start)

@@ -33,7 +33,7 @@ public class JudgeStartupEnduranceEventCoordinator : IStartupInitializerAsync, I
             return;
         }
 
-        var events = await _enduranceEventService.GetActiveEvents().ToList();
+        var events = await _enduranceEventService.GetActive().ToList();
         if (events.Count == 0)
         {
             return;

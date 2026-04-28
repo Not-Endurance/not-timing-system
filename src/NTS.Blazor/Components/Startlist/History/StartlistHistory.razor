@@ -1,21 +1,3 @@
-﻿@using NTS.Domain.Core.Objects.Startlists
-@using NTS.Domain.Setup.Aggregates
-@using Not.Blazor.Components
+﻿@inherits StartlistHistoryBehind
 
-@inherits StartlistHistoryBehind
-
-@if (Service.HistoryByStage.Count != 0)
-{
-    <NHeadline2 Content="@History_string" IsAbsoluteCenter Class="mb-4" />
-
-    <MudTabs PanelClass="px-4 py-6" Elevation="0" Rounded ApplyEffectsToContainer>
-        @foreach (var stage in Service.HistoryByStage)
-        {
-            <MudTabPanel Text="@($"{Stage_string} {stage.Key}")">
-
-                <NTable Headings="@TableHeaders" Items="stage.Value" />
-
-            </MudTabPanel>
-        }
-    </MudTabs>
-}
+<StartlistHistoryView HistoryByStage="Service.HistoryByStage" />

@@ -131,6 +131,7 @@ namespace NTS.Localization
         public static string Handouts_list_empty_message_string =>
             LocalizeString(nameof(Handouts_list_empty_message_string));
         public static string History_string => LocalizeString(nameof(History_string));
+        public static string Past_events_string => LocalizeString(nameof(Past_events_string));
         public static string Required_inspection_is_compulsory_string =>
             LocalizeString(nameof(Required_inspection_is_compulsory_string));
         public static string Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string =>

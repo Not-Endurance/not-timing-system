@@ -9,7 +9,7 @@ public class ProtocolRowBehind : NComponent
     public RankingEntry Entry { get; set; } = default!;
 
     [Parameter]
-    public bool CompactParticipationTables { get; set; }
+    public bool Compact { get; set; }
 
     public string GetRankText()
     {

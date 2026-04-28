@@ -21,4 +21,6 @@ public static class Routes
     public const string HANDOUTS_PAGE = "/handouts";
     public const string SETTINGS_PAGE = "/settings";
     public const string DOWNLOAD_PAGE = "/download";
+    public const string PAST_EVENTS_PAGE = "/past-events";
+    public const string PAST_EVENT_DETAILS_PAGE = "/past-events/{eventId:int}";
 }

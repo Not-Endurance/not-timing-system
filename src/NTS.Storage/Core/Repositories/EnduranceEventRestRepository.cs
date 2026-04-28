@@ -30,6 +30,12 @@ public class EnduranceEventRestRepository
         return models.Select(x => MapEntity(x)!);
     }
 
+    public async Task<IEnumerable<EnduranceEvent>> ReadPast()
+    {
+        var models = await HandleRequest(Client.Get<IEnumerable<EnduranceEventModel>>($"{Endpoint}/past")) ?? [];
+        return models.Select(x => MapEntity(x)!);
+    }
+
     public async Task<EnduranceEvent> Start(int upcomingEventId)
     {
         var result = await Client.Post<EnduranceEventModel>(

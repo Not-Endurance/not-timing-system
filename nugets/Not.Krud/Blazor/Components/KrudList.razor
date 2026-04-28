@@ -11,10 +11,11 @@
 <MudPaper Elevation="0" Class="@("pa-4 " + Class)" Style="@Style">
 
     <NList Items="Entities" Title="@Name"  IsLoading="@IsLoading"
-           CreateSafe="CreateSafe"
-           UpdateSafe="UpdateSafe" 
+           CreateSafe="CreateAction"
+           ViewSafe="ViewAction"
+           UpdateSafe="UpdateAction" 
            CanUpdate="CanUpdate"
-           DeleteSafe="DeleteSafe"
+           DeleteSafe="DeleteAction"
            CustomAction1="CustomAction1"
            CustomAction2="CustomAction2"/>
     

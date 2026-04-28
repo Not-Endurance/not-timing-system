@@ -1,0 +1,25 @@
+﻿@using Not.Blazor.Components.Layout
+@using NTS.Judge.Blazor.Features.Core.Rankings.Menu
+@using NTS.Judge.Blazor.Features.Core.Rankings.Protocols
+
+@attribute [Route(PAST_EVENT_DETAILS_PAGE)]
+@inherits PastEventDetailsContentBehind
+
+<NContent Title="@Past_events_string" IsLoading="@IsLoading" IsEmpty="@IsEmpty">
+    <Main>
+        <Protocol Document="Service.Document" />
+    </Main>
+
+    <Rightbar>
+        <MudStack Spacing="3">
+            <NButtonSecondary OnClick="OpenStartlist"
+                              Text="@Startlist_string"
+                              StartIcon="@Icons.Material.Filled.List"
+                              Disabled="@(!HasStartlist)" />
+
+            <RankingMenu Rankings="Service.Rankings"
+                         Selected="Service.CurrentRanking"
+                         OnSelectedSafe="SelectRanking" />
+        </MudStack>
+    </Rightbar>
+</NContent>

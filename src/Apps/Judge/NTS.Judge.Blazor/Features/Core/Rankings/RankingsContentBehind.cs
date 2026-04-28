@@ -1,7 +1,12 @@
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Dialogs;
+using Not.Blazor.Helpers;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Core.Objects.Documents;
 using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
+using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 using NTS.Judge.Contracts.Features.Core.Rankings;
 using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
 
@@ -16,14 +21,22 @@ public class RankingsContentBehind : PrintableComponent
     IFeiExportService FeiExportService { get; set; } = default!;
 
     [Inject]
-    IRankingService RankingService { get; set; } = default!;
+    IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    IDialogService DialogService { get; set; } = default!;
+    IRanklistDocumentService DocumentService { get; set; } = default!;
+
+    [Inject]
+    protected IRankingMenuService RankingService { get; set; } = default!;
 
     protected bool CompactParticipationTables { get; private set; }
 
     protected Ranklist Ranklist { get; private set; } = default!;
+
+    protected RanklistDocument? Document { get; private set; }
+
+    [Inject]
+    protected IProtocolLogoState HeaderLogo { get; set; } = default!;
 
     //public bool HasContent => RankingService.Ranklist != null;
     public bool IsFeiExportConfigured => Ranklist?.IsFeiExportConfigured ?? false;
@@ -36,6 +49,7 @@ public class RankingsContentBehind : PrintableComponent
     protected override void OnBeforeRender()
     {
         Ranklist = new Ranklist(RankingService.Current);
+        Document = DocumentService.Create(RankingService.Current);
     }
 
     protected async Task GenerateFeiExport()
@@ -71,6 +85,65 @@ public class RankingsContentBehind : PrintableComponent
     protected void ShowRanklist()
     {
         IsProtocolVisible = false;
+    }
+
+    protected void SelectRanking(Ranking ranking)
+    {
+        try
+        {
+            RankingService.Select(ranking);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    protected async Task OpenDeleteDialog(Ranking ranking)
+    {
+        try
+        {
+            var arguments = new DialogParameters<NDeleteDialog> { { x => x.Item, ranking.Name } };
+            var dialog = await DialogService.ShowAsync<NDeleteDialog>(Delete_string, arguments);
+            if (await dialog.IsCanceled())
+            {
+                return;
+            }
+
+            await RankingService.Delete(ranking);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    protected async Task OpenImageBrowser(string forImage)
+    {
+        try
+        {
+            var parameters = new DialogParameters<ImageBrowserDialog>
+            {
+                { x => x.SelectedImagePath, forImage },
+                { x => x.Src, HeaderLogo.DirPath },
+            };
+            DialogOptions options = new()
+            {
+                MaxWidth = MaxWidth.ExtraLarge,
+                FullWidth = true,
+                CloseOnEscapeKey = true,
+            };
+            var dialog = await DialogService.ShowAsync<ImageBrowserDialog>(
+                Image_browser_string,
+                parameters,
+                options
+            );
+            await dialog.Result;
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected async Task Print()

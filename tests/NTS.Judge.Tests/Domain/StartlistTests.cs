@@ -40,6 +40,30 @@ public class StartlistTests
     }
 
     [Fact]
+    public void HistoryByStage_WhenLaterStageHasDerivedStart_IncludesStage()
+    {
+        var now = DateTimeOffset.Now;
+        var participation = CreateParticipation(
+            12,
+            64,
+            phase1Start: now.AddHours(-3),
+            phase2Start: null,
+            phase1Arrive: now.AddHours(-2),
+            phase1Present: now.AddHours(-2).AddMinutes(5),
+            includePhase2: true
+        );
+        var expectedStart = participation.Phases[0].GetOutTime();
+
+        var startlist = new Startlist([participation]);
+
+        Assert.Equal([1, 2], startlist.HistoryByStage.Keys.ToArray());
+        var stage2 = Assert.Single(startlist.HistoryByStage[2]);
+        Assert.Equal(64, stage2.Number);
+        Assert.Equal(2, stage2.PhaseNumber);
+        Assert.Equal(expectedStart, stage2.Start);
+    }
+
+    [Fact]
     public void UpcomingByStage_WhenEntriesAreMixed_FutureStartsRemainAboveLateStarts()
     {
         var now = DateTimeOffset.Now;

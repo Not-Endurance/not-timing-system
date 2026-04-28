@@ -4,5 +4,6 @@ namespace NTS.Application.Contracts.Core;
 
 public interface IEnduranceEventService
 {
-    Task<IEnumerable<EnduranceEvent>> GetActiveEvents();
+    Task<IEnumerable<EnduranceEvent>> GetActive();
+    Task<IEnumerable<EnduranceEvent>> GetPast();
 }

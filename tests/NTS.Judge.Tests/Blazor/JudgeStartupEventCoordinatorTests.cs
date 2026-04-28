@@ -111,9 +111,14 @@ public class JudgeStartupEventCoordinatorTests
 
         public IEventSubscriber ObservableEvent => throw new NotImplementedException();
 
-        public Task<IEnumerable<EnduranceEvent>> GetActiveEvents()
+        public Task<IEnumerable<EnduranceEvent>> GetActive()
         {
             return Task.FromResult(_events);
+        }
+
+        public Task<IEnumerable<EnduranceEvent>> GetPast()
+        {
+            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
         }
 
         public Task Load()

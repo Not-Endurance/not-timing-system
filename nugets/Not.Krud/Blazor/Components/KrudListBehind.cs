@@ -4,6 +4,7 @@ using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
 using Not.Collections;
 using Not.Domain;
+using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Krud.Blazor.Components.Abstractions;
 
@@ -30,12 +31,31 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     IKrudListBehind<T> Service { get; set; } = default!;
 
     protected IReadOnlyList<T> Entities => _entities.AsReadOnly();
+    protected Func<Task>? CreateAction => AllowCreate ? CreateSafe : null;
+    protected Func<T, Task>? ViewAction => AllowView ? ViewSafe : null;
+    protected Func<T, Task>? UpdateAction => AllowUpdate ? UpdateSafe : null;
+    protected Func<T, Task>? DeleteAction => AllowDelete ? DeleteSafe : null;
 
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;
 
     [Parameter]
     public string UpdateRoute { get; set; } = default!;
+
+    [Parameter]
+    public Func<T, string>? ViewRouteFactory { get; set; }
+
+    [Parameter]
+    public bool AllowCreate { get; set; }
+
+    [Parameter]
+    public bool AllowView { get; set; }
+
+    [Parameter]
+    public bool AllowUpdate { get; set; }
+
+    [Parameter]
+    public bool AllowDelete { get; set; }
 
     [Parameter]
     public RenderFragment<T>? CustomAction1 { get; set; }
@@ -77,6 +97,13 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
         var model = CreateModel(entity);
         Navigator.NavigateTo(UpdateRoute, model);
         _entities.Update(entity, NCollectionAction.AddOrUpdate);
+        return Task.CompletedTask;
+    }
+
+    protected Task ViewSafe(T entity)
+    {
+        GuardHelper.ThrowIfDefault(ViewRouteFactory);
+        Navigator.NavigateTo(ViewRouteFactory(entity));
         return Task.CompletedTask;
     }
 

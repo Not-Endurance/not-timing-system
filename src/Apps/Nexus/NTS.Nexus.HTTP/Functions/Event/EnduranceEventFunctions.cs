@@ -98,6 +98,20 @@ public class EnduranceEventFunctions : FunctionBase
         return Ok(await _events.ReadMany(x => x.EndDay > activeCutoff) ?? []);
     }
 
+    [Function("endurance-event-past-list")]
+    public async Task<IActionResult> ListPast(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event/past")]
+            HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(ListPast));
+        TagRequest(request);
+        LogInformation(request, nameof(ListPast));
+
+        var pastCutoff = DateTimeOffset.UtcNow.Subtract(EventSpan.ActiveGracePeriod);
+        return Ok(await _events.ReadMany(x => x.EndDay <= pastCutoff) ?? []);
+    }
+
     [Function("endurance-event-delete")]
     public async Task<IActionResult> Delete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "endurance-event/{id:int}")] HttpRequest request,

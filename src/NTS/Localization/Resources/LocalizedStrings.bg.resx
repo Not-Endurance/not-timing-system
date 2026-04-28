@@ -957,4 +957,7 @@
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>
+  <data name="Past_events_string" xml:space="preserve">
+    <value>Минали събития</value>
+  </data>
 </root>

@@ -11,9 +11,12 @@
 
 <MudStack>
     <MudItem Class="d-flex flex-row justify-space-around printable">
-        <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(HeaderLogo.Left, HeaderLogo.DirPath)">
-            <MudImage Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@HeaderLogo.Left" />
-        </MudPaper>
+        @if (HasLeftLogo)
+        {
+            <MudPaper Class="@LogoClass" Elevation="0" Style="display: inline-block;" @onclick="() => OnLogoClicked(LeftLogo)">
+                <MudImage Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@LeftLogo" />
+            </MudPaper>
+        }
 
         <MudItem Class="d-flex flex-column justify-center">
             <NHeadline2 Content="@header.Title" Class="mb-4" />
@@ -25,9 +28,12 @@
             </MudStack>
         </MudItem>
 
-        <MudPaper Class="cursor-pointer" Elevation="0" Style="display: inline-block;" @onclick="() => OpenImageBrowser(HeaderLogo.Right, HeaderLogo.DirPath)">
-            <MudImage Class="pt-2 " Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@HeaderLogo.Right" />
-        </MudPaper>
+        @if (HasRightLogo)
+        {
+            <MudPaper Class="@LogoClass" Elevation="0" Style="display: inline-block;" @onclick="() => OnLogoClicked(RightLogo)">
+                <MudImage Class="pt-2 " Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@RightLogo" />
+            </MudPaper>
+        }
     </MudItem>
         
         <MudStack>
@@ -80,7 +86,7 @@
 <MudStack Spacing="0" AlignItems="AlignItems.Center">
     @foreach (var entry in Document.Ranklist.Entries)
     {
-        <ProtocolRow Entry="entry" CompactParticipationTables="CompactParticipationTables" />
+        <ProtocolRow Entry="entry" Compact="Compact" />
     }
 </MudStack>
 

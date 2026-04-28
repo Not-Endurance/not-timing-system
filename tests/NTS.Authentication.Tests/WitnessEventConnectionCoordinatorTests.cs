@@ -22,7 +22,7 @@ public class WitnessEventConnectionCoordinatorTests
 
         await coordinator.EnsureConnected();
 
-        Assert.Equal(0, enduranceEventService.GetActiveEventsCalls);
+        Assert.Equal(0, enduranceEventService.GetActiveCalls);
         Assert.Equal(0, socketService.ConnectCalls);
         Assert.Equal(0, dialogLauncher.ShowSelectEventCalls);
     }
@@ -149,12 +149,17 @@ public class WitnessEventConnectionCoordinatorTests
             _events = events;
         }
 
-        public int GetActiveEventsCalls { get; private set; }
+        public int GetActiveCalls { get; private set; }
 
-        public Task<IEnumerable<EnduranceEvent>> GetActiveEvents()
+        public Task<IEnumerable<EnduranceEvent>> GetActive()
         {
-            GetActiveEventsCalls++;
+            GetActiveCalls++;
             return Task.FromResult(_events);
+        }
+
+        public Task<IEnumerable<EnduranceEvent>> GetPast()
+        {
+            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
         }
     }
 
