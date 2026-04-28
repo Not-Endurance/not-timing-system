@@ -25,15 +25,15 @@ public class JudgeRpcClient
         IScoped
 {
     readonly INtsSocketService _eventContext;
-    readonly ISnapshotService _timingService;
+    readonly ISnapshotService _snapshotService;
     readonly HubProcedures _hubProcedures;
 
-    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, ISnapshotService timingService)
+    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, ISnapshotService snapshotService)
         : base(socket)
     {
         _eventContext = eventContext;
         _hubProcedures = new HubProcedures(socket);
-        _timingService = timingService;
+        _snapshotService = snapshotService;
     }
 
     protected override void RegisterProcedures()
@@ -47,7 +47,7 @@ public class JudgeRpcClient
         {
             var stamp = new Timestamp(watcherSnapshot.Timestamp!);
             var snapshot = new Snapshot(watcherSnapshot.Number, snapshots.Type, SnapshotMethod.Manual, stamp);
-            await _timingService.Record(snapshot);
+            await _snapshotService.Record(snapshot);
         }
     }
 
