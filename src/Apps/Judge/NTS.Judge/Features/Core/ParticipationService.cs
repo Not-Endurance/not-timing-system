@@ -100,6 +100,7 @@ public class ParticipationService
 
     public async Task Record(Snapshot snapshot)
     {
+        await InitializeState();
         var participation = Participations.FirstOrDefault(x => x.Combination.Number == snapshot.Number);
         if (participation == null)
         {

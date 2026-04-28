@@ -6,42 +6,30 @@
 
 <NChips T="Participation" SelectedValue="@Selected">
 
-    @if (Compact)
+    @foreach (var grouping in Participations.GroupBy(x => x.Phases.Distance))
     {
-        @foreach (var participation in Participations.OrderBy(x => x.Combination.Number))
+        <MudText Class="@CombineClass($"chip-header {GetGroupTextClass()}")" Typo="@GetGroupTextTypo()">
+            <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
+        </MudText>
+
+        <MudDivider />
+
+        @foreach (var participation in grouping.OrderBy(x => x.Combination.Number))
         {
             var number = participation.Combination.Number;
             <MudChip T="Participation"
-                     Text="@number.ToString()"
-                     Value="@participation"
-                     Color="@GetColor(participation)"
-                     Size="@GetChipSize()"
-                     OnClick="() => Select(participation)"
-                     Style="@GetChipStyle()" />
-        }
-    }
-    else
-    {
-        @foreach (var grouping in Participations.GroupBy(x => x.Phases.Distance))
-        {
-            <MudText Class="@GetGroupTextClass()" Typo="@GetGroupTextTypo()">
-                <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
-            </MudText>
-
-            <MudDivider />
-
-            @foreach (var participation in grouping.OrderBy(x => x.Combination.Number))
-            {
-                var number = participation.Combination.Number;
-                <MudChip T="Participation"
-                         Text="@number.ToString()"
-                         Value="@participation"
-                         Color="@GetColor(participation)"
-                         Size="@GetChipSize()"
-                         OnClick="() => Select(participation)"
-                         Style="@GetChipStyle()" />
-            }
+                        Text="@number.ToString()"
+                        Value="@participation"
+                        Color="@GetColor(participation)"
+                        Size="@GetChipSize()"
+                        OnClick="() => Select(participation)"
+                        Style="@GetChipStyle()" />
         }
     }
 </NChips>
  
+<style>
+    .chip-header {
+        display: block;
+    }
+</style>
