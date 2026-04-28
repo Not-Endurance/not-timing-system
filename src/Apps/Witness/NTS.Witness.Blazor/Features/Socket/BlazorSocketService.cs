@@ -1,33 +1,22 @@
-using MudBlazor;
 using Not.Injection;
 using Not.Safe;
-using NTS.Application.Contracts.Socket;
-using NTS.Blazor.Components.SelectEvents;
 
 namespace NTS.Witness.Blazor.Features.Socket;
 
 public class BlazorSocketService : IScoped
 {
-    readonly IDialogService _dialogService;
-    readonly INtsSocketContext _socketContext;
+    readonly IEventConnectionCoordinator _connectionCoordinator;
 
-    public BlazorSocketService(IDialogService dialogService, INtsSocketContext socketContext)
+    public BlazorSocketService(IEventConnectionCoordinator connectionCoordinator)
     {
-        _dialogService = dialogService;
-        _socketContext = socketContext;
+        _connectionCoordinator = connectionCoordinator;
     }
 
     public async Task EnsureConnected()
     {
         try
         {
-            if (_socketContext.IsConnected)
-            {
-                return;
-            }
-
-            var dialog = await _dialogService.ShowAsync<SelectEventDialog>(Select_event_string);
-            await dialog.Result;
+            await _connectionCoordinator.EnsureConnected();
         }
         catch (Exception ex)
         {

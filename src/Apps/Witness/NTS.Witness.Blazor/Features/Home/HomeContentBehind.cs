@@ -1,4 +1,5 @@
 using Not.Blazor.Components.Abstractions;
+using NTS.Witness.Blazor.Features.Socket;
 using NTS.Witness.Contracts.Features.Access;
 
 namespace NTS.Witness.Blazor.Features.Home;
@@ -13,20 +14,23 @@ public class HomeContentBehind : NStatefulComponent
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
 
+    [Inject]
+    BlazorSocketService BlazorSocketService { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
         await Observe(AccessState);
     }
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender || _hasRedirected)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         _hasRedirected = true;
+        await BlazorSocketService.EnsureConnected();
         Navigator.NavigateTo(WitnessAccessPolicy.ResolveHomeRoute(AccessState.AccessLevel));
-        return Task.CompletedTask;
     }
 }
