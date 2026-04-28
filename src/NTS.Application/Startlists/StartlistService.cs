@@ -61,6 +61,8 @@ public class StartlistService
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
         var participation = notification.Participation;
+        Startlist?.Upsert(participation);
+
         if (participation.Phases.Current.IsComplete() && participation.Phases.Current.IsFinal)
         {
             Startlist?.Remove(participation.Combination.Number);

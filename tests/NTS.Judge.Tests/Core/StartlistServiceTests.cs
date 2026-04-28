@@ -126,6 +126,32 @@ public class StartlistServiceTests
         Assert.Equal(participation.Phases.Current.GetOutTime()!.ToDateTimeOffset(), upcoming.Start.ToDateTimeOffset());
     }
 
+    [Fact]
+    public async Task Handle_WhenFinalPhaseCompletes_KeepsStartedPhasesInHistory()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var repository = new MutableParticipationRepository([]);
+        var service = new StartlistService(repository);
+        var participation = CreateCoreParticipation(
+            5,
+            101,
+            now.AddMinutes(-20),
+            now.AddMinutes(-16),
+            now.AddMinutes(-18),
+            now.AddMinutes(-17),
+            now.AddMinutes(-14),
+            now.AddMinutes(-13)
+        );
+
+        await service.Load();
+        await service.Handle(new PhaseCompleted(participation), CancellationToken.None);
+
+        Assert.Equal([1, 2], service.HistoryByStage.Keys.ToArray());
+        Assert.Equal([101], service.HistoryByStage[1].Select(x => x.Number).ToArray());
+        Assert.Equal([101], service.HistoryByStage[2].Select(x => x.Number).ToArray());
+        Assert.Empty(service.Upcoming);
+    }
+
     static Participation CreateParticipation(int id, int number, DateTimeOffset phase1Start)
     {
         return CreateStartedParticipation(id, number, phase1Start, phase1Start);
@@ -174,7 +200,9 @@ public class StartlistServiceTests
         DateTimeOffset phase1Start,
         DateTimeOffset? phase2Start,
         DateTimeOffset? phase1Arrive,
-        DateTimeOffset? phase1Present
+        DateTimeOffset? phase1Present,
+        DateTimeOffset? phase2Arrive = null,
+        DateTimeOffset? phase2Present = null
     )
     {
         var country = new Country(1000 + id, "Bulgaria", "BG", "BUL", "bg-BG");
@@ -207,8 +235,8 @@ public class StartlistServiceTests
             isFinal: true,
             compulsoryThresholdSpan: null,
             startTime: Timestamp.Create(phase2Start),
-            arriveTime: null,
-            presentTime: null,
+            arriveTime: Timestamp.Create(phase2Arrive),
+            presentTime: Timestamp.Create(phase2Present),
             representTime: null,
             isRepresentationRequested: false,
             isRequiredInspectionRequested: false,
