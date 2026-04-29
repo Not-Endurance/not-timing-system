@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Domain.Abstractions;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -12,6 +12,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
+using NTS.Judge.Contracts.Features.Core.Rankings;
 using NTS.Judge.Features.Core.Rankings;
 
 namespace NTS.Judge.Tests.Core;
@@ -49,8 +50,7 @@ public class RankingServiceTests
         var service = new RankingService(
             new TestSocketContext { Event = CreateEvent(14) },
             rankings,
-            new RecordingRepository<Official>(),
-            new RecordingRepository<ArchiveEntry>()
+            new RecordingRepository<Official>()
         );
 
         await service.Handle(new PhaseCompleted(updatedParticipation), CancellationToken.None);

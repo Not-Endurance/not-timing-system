@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Not.Application.CRUD.Ports;
-using NTS.Application.Shared;
+using NTS.Application.Contracts.Shared;
+using NTS.Application.Contracts.Shared.Models;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions.Base;
 
 public class EventScopedCrudFunctions<T> : FunctionBase
-    where T : class, IEventScopedDocument, ISoftDeletableDocument
+    where T : class, IEventScopedDocument
 {
     readonly IRepository<T> _repository;
 

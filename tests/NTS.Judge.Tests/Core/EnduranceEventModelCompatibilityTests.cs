@@ -1,7 +1,8 @@
-using NTS.Application.Core;
+using MongoDB.Bson;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Setup.Models;
+using NTS.Application.Contracts.Shared.Models;
 using NTS.Application.Factories;
-using NTS.Application.Setup;
-using NTS.Application.Shared;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
@@ -12,6 +13,32 @@ namespace NTS.Judge.Tests.Core;
 
 public class EnduranceEventModelMappingTests
 {
+    [Fact]
+    public void ToBsonDocument_WhenSerialized_UsesEventIdAsMongoId()
+    {
+        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var setupEvent = new UpcomingEvent(
+            "National Championship",
+            "Shumen",
+            country,
+            null,
+            null,
+            null,
+            [CreateCompetition()],
+            [],
+            [],
+            [],
+            11
+        );
+        var model = EnduranceEventModel.From(EnduranceEventFactory.Create(setupEvent));
+
+        var document = model.ToBsonDocument();
+
+        Assert.Equal(11, document["_id"].AsInt32);
+        Assert.False(document.Contains("MongoId"));
+        Assert.False(document.Contains("Id"));
+    }
+
     [Fact]
     public void Create_WhenSetupEventIsMapped_PreservesNameLocationAndCountry()
     {
@@ -54,27 +81,6 @@ public class EnduranceEventModelMappingTests
 
         Assert.Equal("Spring Cup", enduranceEvent.Name);
         Assert.Equal("Ring", enduranceEvent.Location);
-    }
-
-    [Fact]
-    public void MapToEntity_WhenArchiveEntryModelUsesNameAndLocation_PreservesValues()
-    {
-        var model = new ArchiveEntryModel
-        {
-            Id = 13,
-            Country = CountryModel.From(new Country(1, "Bulgaria", "BG", "BUL", "bg-BG")),
-            Name = "Autumn Final",
-            Location = "Venue",
-            StartDay = DateTimeOffset.UtcNow,
-            EndDay = DateTimeOffset.UtcNow.AddDays(1),
-            Officials = [],
-            Ranklists = [],
-        };
-
-        var archiveEntry = model.MapToEntity();
-
-        Assert.Equal("Autumn Final", archiveEntry.EnduranceEvent.Name);
-        Assert.Equal("Venue", archiveEntry.EnduranceEvent.Location);
     }
 
     [Fact]

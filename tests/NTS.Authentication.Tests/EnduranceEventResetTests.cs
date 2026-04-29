@@ -13,44 +13,24 @@ namespace NTS.Authentication.Tests;
 public class EnduranceEventResetTests
 {
     [Fact]
-    public async Task Reset_service_uses_version_one_when_event_has_no_deleted_documents()
+    public async Task Reset_service_deletes_all_repository_records_for_requested_event()
     {
-        var repositories = new[] { new RecordingEventResetRepository(), new RecordingEventResetRepository() };
+        var repositories = new IEventResetRepository[]
+        {
+            new RecordingEventResetRepository(),
+            new RecordingEventResetRepository(),
+            new RecordingEventResetRepository(),
+        };
         var service = new EnduranceEventResetService(repositories);
 
         await service.Reset(17);
 
         Assert.All(
-            repositories,
-            repository =>
-            {
-                var call = Assert.Single(repository.SoftDeleteCalls);
-                Assert.Equal(17, call.EventId);
-                Assert.Equal(1, call.DeletedVersion);
-            }
-        );
-    }
-
-    [Fact]
-    public async Task Reset_service_increments_the_highest_deleted_version_found()
-    {
-        var repositories = new IEventResetRepository[]
-        {
-            new RecordingEventResetRepository { MaxDeletedVersion = 2 },
-            new RecordingEventResetRepository { MaxDeletedVersion = 5 },
-            new RecordingEventResetRepository(),
-        };
-        var service = new EnduranceEventResetService(repositories);
-
-        await service.Reset(23);
-
-        Assert.All(
             repositories.Cast<RecordingEventResetRepository>(),
             repository =>
             {
-                var call = Assert.Single(repository.SoftDeleteCalls);
-                Assert.Equal(23, call.EventId);
-                Assert.Equal(6, call.DeletedVersion);
+                var deletedEventId = Assert.Single(repository.DeleteAllForEventCalls);
+                Assert.Equal(17, deletedEventId);
             }
         );
     }
@@ -74,6 +54,20 @@ public class EnduranceEventResetTests
         Assert.Equal(19, resetService.LastEventId);
     }
 
+    [Fact]
+    public void Event_scoped_mongo_repositories_are_registered_for_event_reset()
+    {
+        var repositories = typeof(EventScopedMongoRepository<>)
+            .Assembly.GetTypes()
+            .Where(type => type is { IsClass: true, IsAbstract: false } && IsEventScopedMongoRepository(type));
+
+        Assert.NotEmpty(repositories);
+        Assert.All(
+            repositories,
+            repository => Assert.Contains(typeof(IEventResetRepository), repository.GetInterfaces())
+        );
+    }
+
     static HttpRequest CreateRequest(string method, string path)
     {
         var context = new DefaultHttpContext();
@@ -82,19 +76,27 @@ public class EnduranceEventResetTests
         return context.Request;
     }
 
-    sealed class RecordingEventResetRepository : IEventResetRepository
+    static bool IsEventScopedMongoRepository(Type type)
     {
-        public int? MaxDeletedVersion { get; init; }
-        public List<(int EventId, int DeletedVersion)> SoftDeleteCalls { get; } = [];
-
-        public Task<int?> GetMaxDeletedVersion(int eventId)
+        while (type != typeof(object) && type.BaseType != null)
         {
-            return Task.FromResult(MaxDeletedVersion);
+            type = type.BaseType;
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(EventScopedMongoRepository<>))
+            {
+                return true;
+            }
         }
 
-        public Task SoftDelete(int eventId, int deletedVersion)
+        return false;
+    }
+
+    sealed class RecordingEventResetRepository : IEventResetRepository
+    {
+        public List<int> DeleteAllForEventCalls { get; } = [];
+
+        public Task DeleteAllForEvent(int eventId)
         {
-            SoftDeleteCalls.Add((eventId, deletedVersion));
+            DeleteAllForEventCalls.Add(eventId);
             return Task.CompletedTask;
         }
     }

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Formatting;
-using NTS.Application.Startlists;
+using NTS.Application.Contracts.Startlists;
 using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;

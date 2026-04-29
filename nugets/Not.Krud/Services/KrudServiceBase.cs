@@ -1,5 +1,4 @@
 using Not.Application.CRUD.Ports;
-using Not.Application.Services;
 using Not.Domain;
 using Not.Domain.Exceptions;
 using Not.Exceptions;

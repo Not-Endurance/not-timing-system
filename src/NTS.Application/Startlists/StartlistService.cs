@@ -1,7 +1,8 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
+using NTS.Application.Contracts.Startlists;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
@@ -60,6 +61,8 @@ public class StartlistService
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
         var participation = notification.Participation;
+        Startlist?.Upsert(participation);
+
         if (participation.Phases.Current.IsComplete() && participation.Phases.Current.IsFinal)
         {
             Startlist?.Remove(participation.Combination.Number);

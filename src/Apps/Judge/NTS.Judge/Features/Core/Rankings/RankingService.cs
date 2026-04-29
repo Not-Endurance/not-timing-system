@@ -6,13 +6,12 @@ using Not.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Observables.Structures;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Judge.Features.Core.Rankings.CustomRankings;
 using NTS.Judge.Features.Core.State;
 
 namespace NTS.Judge.Features.Core.Rankings;
@@ -22,8 +21,7 @@ public class RankingService
         IKrudFormService<CustomRankingModel>,
         IRankingService,
         IRankingMenuService,
-        IRanklistDocumentFactory,
-        ICustomRankingService,
+        IProtocolDocumentService,
         ICoreDependentObservables,
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationEliminated>,
@@ -35,7 +33,6 @@ public class RankingService
     readonly INtsSocketContext _socketContext;
     readonly IRepository<Ranking> _rankings;
     readonly IRepository<Official> _officials;
-    readonly IRepository<ArchiveEntry> _archive;
     readonly CoalesceInvoker _coalesced;
     Ranking? _current;
     IReadOnlyList<Official> _loadedOfficials = [];
@@ -43,14 +40,12 @@ public class RankingService
     public RankingService(
         INtsSocketContext socketContext,
         IRepository<Ranking> rankings,
-        IRepository<Official> officials,
-        IRepository<ArchiveEntry> archive
+        IRepository<Official> officials
     )
     {
         _socketContext = socketContext;
         _rankings = rankings;
         _officials = officials;
-        _archive = archive;
         _coalesced = new();
     }
 
@@ -112,21 +107,11 @@ public class RankingService
         }
     }
 
-    public async Task ArchiveEnduranceEvent()
-    {
-        GuardHelper.ThrowIfDefault(_socketContext.Event);
-
-        var rankings = await _rankings.ReadMany();
-        var ranklists = rankings.Select(x => new Ranklist(x)).Where(x => x.Entries.Any());
-        var entry = new ArchiveEntry(_socketContext.Event, _loadedOfficials, ranklists);
-        await _archive.Create(entry);
-    }
-
-    public RanklistDocument Create(Ranking ranking)
+    public ProtocolDocument Create(Ranking ranking)
     {
         var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var ranklist = new Ranklist(ranking);
-        return new RanklistDocument(ranklist, enduranceEvent, _loadedOfficials);
+        return new ProtocolDocument(ranklist, enduranceEvent, _loadedOfficials);
     }
 
     public void Select(Ranking ranking)
@@ -181,7 +166,6 @@ public class RankingService
             {
                 continue;
             }
-            //TODO: Implement UpdateMany
             await _rankings.Update(ranking);
             isUpdated = true;
         }

@@ -1,14 +1,15 @@
 using Not.Events;
 using Not.Structures;
-using NTS.Application.Core;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Features;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Contracts.Features.Core;
 
 namespace NTS.Judge.Tests.Blazor;
 
@@ -131,11 +132,6 @@ public class UpcomingEventsListBehindTests
         }
 
         public Task Start(int upcomingEventId)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task LoadArchive(int archiveId)
         {
             return Task.CompletedTask;
         }

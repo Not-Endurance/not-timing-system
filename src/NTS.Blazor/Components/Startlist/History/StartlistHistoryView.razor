@@ -1,0 +1,21 @@
+﻿@using NTS.Domain.Core.Objects.Startlists
+@using Not.Blazor.Components
+
+@inherits StartlistHistoryViewBehind
+
+@if (HistoryByStage.Count != 0)
+{
+    @if (ShowTitle)
+    {
+        <NHeadline2 Content="@History_string" IsAbsoluteCenter Class="mb-4" />
+    }
+
+    <MudTabs PanelClass="px-4 py-6" Elevation="0" Rounded ApplyEffectsToContainer>
+        @foreach (var stage in HistoryByStage)
+        {
+            <MudTabPanel Text="@($"{Stage_string} {stage.Key}")">
+                <NTable Headings="@TableHeaders" Items="stage.Value" />
+            </MudTabPanel>
+        }
+    </MudTabs>
+}

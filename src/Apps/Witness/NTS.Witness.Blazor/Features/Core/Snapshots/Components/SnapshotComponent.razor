@@ -4,93 +4,45 @@
 @inherits SnapshotComponentBehind
 
 <div class="snapshot-component">
-    <MudHidden Breakpoint="Breakpoint.SmAndDown">
-        <NTable Items="@OrderedSnapshots"
-                Class="snapshot-table"
-                EmptyMessage="@Select_participants_to_snapshot_string"
-                Headings="@Headings">
+    <NTable Items="@OrderedSnapshots"
+            Class="@GetTableClass()"
+            EmptyMessage="@Select_participants_to_snapshot_string"
+            Headings="@((string[]?)null)">
 
-            <TrailingCell Context="item">
-                @{
-                    var snapshot = (WatcherSnapshot)item;
-                    var buttonStyle = "width:100px";
+        <TrailingCell Context="item">
+            @{
+                var snapshot = (WatcherSnapshot)item;
+            }
+
+            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Class="snapshot-actions">
+                @if (snapshot.Timestamp == null)
+                {
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Info"
+                               Size="Size.Small"
+                               OnClick="@(() => CaptureSnapshot(snapshot))"
+                               Style="@GetButtonStyle()">
+                        @Snapshot_string
+                    </MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Success"
+                               Size="Size.Small"
+                               OnClick="@(() => ShowEditSnapshotDialog(snapshot))"
+                               Style="@GetButtonStyle()">
+                        @snapshot.Timestamp
+                    </MudButton>
                 }
 
-                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Class="snapshot-actions">
-                    @if (snapshot.Timestamp == null)
-                    {
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Info"
-                                   Size="Size.Small"
-                                   OnClick="@(() => CaptureSnapshot(snapshot))"
-                                   Style="@buttonStyle">
-                            @Snapshot_string
-                        </MudButton>
-                    }
-                    else
-                    {
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Success"
-                                   Size="Size.Small"
-                                   OnClick="@(() => ShowEditSnapshotDialog(snapshot))"
-                                   Style="@buttonStyle">
-                            @snapshot.Timestamp
-                        </MudButton>
-                    }
+                <MudTooltip Text="@Delete_string">
+                    <NIconDelete Size="Size.Small"
+                                 OnClick="@(() => RemoveSnapshotOrShowDialog(snapshot))" />
+                </MudTooltip>
+            </MudStack>
 
-                    <MudTooltip Text="@Delete_string">
-                        <NIconDelete Size="Size.Small"
-                                     OnClick="@(() => RemoveSnapshotOrShowDialog(snapshot))" />
-                    </MudTooltip>
-                </MudStack>
+        </TrailingCell>
 
-            </TrailingCell>
-
-        </NTable>
-    </MudHidden>
-
-    <MudHidden Breakpoint="Breakpoint.MdAndUp">
-        <NTable Items="@OrderedSnapshots"
-                Class="snapshot-table snapshot-table-compact"
-                EmptyMessage="@Select_participants_to_snapshot_string"
-                Headings="@Headings">
-
-            <TrailingCell Context="item">
-                @{
-                    var snapshot = (WatcherSnapshot)item;
-                    var buttonStyle = "width:90px";
-                }
-
-                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Class="snapshot-actions">
-                    @if (snapshot.Timestamp == null)
-                    {
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Info"
-                                   Size="Size.Small"
-                                   OnClick="@(() => CaptureSnapshot(snapshot))"
-                                   Style="@buttonStyle">
-                            @Snapshot_string
-                        </MudButton>
-                    }
-                    else
-                    {
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Success"
-                                   Size="Size.Small"
-                                   OnClick="@(() => ShowEditSnapshotDialog(snapshot))"
-                                   Style="@buttonStyle">
-                            @snapshot.Timestamp
-                        </MudButton>
-                    }
-
-                    <MudTooltip Text="@Delete_string">
-                        <NIconDelete Size="Size.Small"
-                                     OnClick="@(() => RemoveSnapshotOrShowDialog(snapshot))" />
-                    </MudTooltip>
-                </MudStack>
-
-            </TrailingCell>
-
-        </NTable>
-    </MudHidden>
+    </NTable>
 </div>

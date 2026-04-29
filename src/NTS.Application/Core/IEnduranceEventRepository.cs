@@ -5,13 +5,15 @@ namespace NTS.Application.Core;
 
 public interface IEnduranceEventRepository : IRepository<EnduranceEvent>
 {
+    Task<IEnumerable<EnduranceEvent>> ReadActive();
+    Task<IEnumerable<EnduranceEvent>> ReadPast();
     Task<EnduranceEvent> Start(int upcomingEventId);
 
     /// <summary>
-    /// Soft-resets the currently selected endurance event in Nexus.
+    /// Permanently resets the currently selected endurance event in Nexus.
     /// </summary>
     /// <remarks>
-    /// This call resets the active event root together with the event-scoped Core documents that belong to it.
+    /// This call deletes the active event root together with the event-scoped Core documents that belong to it.
     /// After a successful reset the event no longer appears in the normal active-event reads, which also affects
     /// Home/startup behavior that relies on the active event list.
     /// </remarks>

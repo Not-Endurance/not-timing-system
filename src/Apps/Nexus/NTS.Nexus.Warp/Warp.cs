@@ -1,5 +1,5 @@
 using Not.Startup;
-using NTS.Application;
+using NTS.Application.Contracts;
 using NTS.Application.Cors;
 using NTS.Nexus.Warp.ConnectionDiagnostics;
 using NTS.Nexus.Warp.Features.Judge;

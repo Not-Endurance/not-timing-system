@@ -1,0 +1,98 @@
+﻿@using static Not.Localization.LocalizationHelper
+@inherits ProtocolBehind
+
+@{
+    if (Document == null)
+    {
+        return;
+    }
+    var header = Document.Header;
+}
+
+<MudStack>
+    <MudItem Class="d-flex flex-row justify-space-around printable">
+        @if (HasLeftLogo)
+        {
+            <MudPaper Class="@LogoClass" Elevation="0" Style="display: inline-block;" @onclick="() => OnLogoClicked(LeftLogo)">
+                <MudImage Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@LeftLogo" />
+            </MudPaper>
+        }
+
+        <MudItem Class="d-flex flex-column justify-center">
+            <NHeadline2 Content="@header.Title" Class="mb-4" />
+
+            <MudStack Class="d-flex mb-3" Justify="Justify.Center" Spacing="0">
+                <NHeadline3 Content="@header.Location" />
+                <NHeadline3 Content="@header.EventSpan.ToString()" />
+                <NHeadline3 Content="@LocalizeString(header.Country.ToString())" />
+            </MudStack>
+        </MudItem>
+
+        @if (HasRightLogo)
+        {
+            <MudPaper Class="@LogoClass" Elevation="0" Style="display: inline-block;" @onclick="() => OnLogoClicked(RightLogo)">
+                <MudImage Class="pt-2 " Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@RightLogo" />
+            </MudPaper>
+        }
+    </MudItem>
+        
+        <MudStack>
+            <MudStack Row Class="d-flex mb-3" Justify="Justify.Center">
+                <MudStack>
+                    @if (header.GroundJuryPresident != null)
+                    {
+                        <MudText Typo="Typo.subtitle2">
+                            @header.GroundJuryPresident
+                        </MudText>
+                    }
+                    @if (header.ChiefSteward != null)
+                    {
+                        <MudText Typo="Typo.subtitle2">
+                            @header.ChiefSteward
+                        </MudText>
+                    }
+                    @if (header.ForeignJudge != null)
+                    {
+                        <MudText Typo="Typo.subtitle2">
+                            @header.ForeignJudge
+                        </MudText>
+                    }
+                </MudStack>
+                
+                <MudStack>
+                    @if (header.VeterinaryCommissionPresident != null)
+                    {
+                        <MudText Typo="Typo.subtitle2">
+                            @header.VeterinaryCommissionPresident
+                        </MudText>
+                    }
+                    @if (header.TechnicalDelegate != null)
+                    {
+                        <MudText Typo="Typo.subtitle2">
+                            @header.TechnicalDelegate
+                        </MudText>
+                    }
+                    @if (header.ForeignVeterinaryDelegate != null)
+                    {
+                        <MudText Typo="Typo.subtitle2">
+                            @header.ForeignVeterinaryDelegate
+                        </MudText>
+                    }
+                </MudStack>
+            </MudStack>
+        </MudStack>
+    </MudStack>
+
+<MudStack Spacing="0" AlignItems="AlignItems.Center">
+    @foreach (var entry in Document.Ranklist.Entries)
+    {
+        <ProtocolRow Entry="entry" Compact="Compact" />
+    }
+</MudStack>
+
+<style>
+    h6,
+    .participation-table .mud-button-label {
+        font-weight: normal !important;
+    }
+</style>

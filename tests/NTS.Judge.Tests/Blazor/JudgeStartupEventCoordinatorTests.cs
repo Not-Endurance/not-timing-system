@@ -1,8 +1,9 @@
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Events;
-using NTS.Application.Core;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
@@ -110,9 +111,14 @@ public class JudgeStartupEventCoordinatorTests
 
         public IEventSubscriber ObservableEvent => throw new NotImplementedException();
 
-        public Task<IEnumerable<EnduranceEvent>> GetEvents()
+        public Task<IEnumerable<EnduranceEvent>> GetActive()
         {
             return Task.FromResult(_events);
+        }
+
+        public Task<IEnumerable<EnduranceEvent>> GetPast()
+        {
+            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
         }
 
         public Task Load()

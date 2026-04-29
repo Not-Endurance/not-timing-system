@@ -2,7 +2,7 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using NTS.Blazor.Components.SelectEvents;
 using NTS.Witness.Blazor.Features;
-using NTS.Witness.Features.Access;
+using NTS.Witness.Contracts.Features.Access;
 
 namespace NTS.Witness.Blazor.Layout.Drawer;
 

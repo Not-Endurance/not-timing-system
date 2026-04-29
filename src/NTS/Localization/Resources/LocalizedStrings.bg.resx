@@ -210,9 +210,6 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Разпечатки</value>
   </data>
-  <data name="Inquiry_string" xml:space="preserve">
-    <value>Справки</value>
-  </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Причина за отпадане</value>
   </data>
@@ -375,9 +372,6 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>Откажи</value>
   </data>
-  <data name="Archive_string" xml:space="preserve">
-    <value>Архивирай</value>
-  </data>
   <data name="History_string" xml:space="preserve">
     <value>История</value>
   </data>
@@ -519,9 +513,6 @@
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Форматът е невалиден 'час:минута:секунда'</value>
   </data>
-  <data name="No_results_found_in_archive_string" xml:space="preserve">
-    <value>Няма резултати в архива</value>
-  </data>
   <data name="required_for_FEI_export" xml:space="preserve">
     <value>*задължително само за ФЕИ експорт</value>
   </data>
@@ -591,8 +582,20 @@
   <data name="Reset_string" xml:space="preserve">
     <value>Ресетни</value>
   </data>
-  <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
-    <value>Сигурни ли сте че искате да ресетнете състезанията? Това ще ИЗТРИЕ ВСИЧКИ ЗАПИСАНИ ВРЕМЕНА НА ФАЗИ и няма да можете да ги въстановите. </value>
+  <data name="Confirm_string" xml:space="preserve">
+    <value>Потвърди</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string" xml:space="preserve">
+    <value>Сигурни ли сте, че искате да ресетнете активен евент? Това ще изтрие текущите Снапшоти, Времена, Протоколи и Хендаути.</value>
+  </data>
+  <data name="This_action_is_final_There_is_no_recovery_string" xml:space="preserve">
+    <value>ТОВА ДЕЙСТВИЕ Е ОКОНЧАТЕЛНО. НЯМА ВЪЗСТАНОВЯВАНЕ.</value>
+  </data>
+  <data name="Type_1337_to_enable_confirmation_string" xml:space="preserve">
+    <value>Въведете 1337, за да активирате потвърждението.</value>
+  </data>
+  <data name="Confirmation_code_string" xml:space="preserve">
+    <value>Код за потвърждение</value>
   </data>
   <data name="Hard_reset_string" xml:space="preserve">
     <value>Хард ресет</value>
@@ -607,7 +610,7 @@
     <value>Разкачи се от текущото Събитие</value>
   </data>
   <data name="Reset_Timing_this_will_DELETE_Timing_data" xml:space="preserve">
-    <value>Ресетни времената - това ще ИЗТРИЕ всички времена</value>
+    <value>Ресетни времената - това ще ИЗТРИЕ текущите данни за събитието</value>
   </data>
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
@@ -834,9 +837,6 @@
   <data name="Start_In_string" xml:space="preserve">
     <value>Старт след</value>
   </data>
-  <data name="ID_of_archive_to_load_string" xml:space="preserve">
-    <value>ID на архив за зареждане</value>
-  </data>
   <data name="Load_string" xml:space="preserve">
     <value>Зареди</value>
   </data>
@@ -887,9 +887,6 @@
   </data>
   <data name="Snapshots_sent_as__string" xml:space="preserve">
     <value>Снимките са изпратени като {0}</value>
-  </data>
-  <data name="Provide_Archive_ID_string" xml:space="preserve">
-    <value>Въведете ID на архива</value>
   </data>
   <data name="Please_select_the_combination_string" xml:space="preserve">
     <value>Моля, изберете комбинация</value>
@@ -959,5 +956,8 @@
   </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Past_events_string" xml:space="preserve">
+    <value>Минали събития</value>
   </data>
 </root>

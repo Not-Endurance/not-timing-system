@@ -6,15 +6,18 @@
     <title>NTS Witness</title>
     <base href="/" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="_content/Not.Blazor/application-shell.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="NTS.Witness.Web.styles.css" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 </head>
 <body>
-    <img class="witness-backdrop" src="appicon.svg" alt="" aria-hidden="true" />
+    <img class="n-application-backdrop" src="appicon.svg" alt="" aria-hidden="true" />
     <div id="app">
         <div class="loading-shell" role="status" aria-live="polite" aria-label="Loading application">
-            <div class="loading-shell__spinner" aria-hidden="true"></div>
+            <div class="loading-shell__body">
+                <div class="loading-shell__spinner" aria-hidden="true"></div>
+            </div>
         </div>
     </div>
 

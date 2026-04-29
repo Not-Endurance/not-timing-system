@@ -1,0 +1,32 @@
+@using Not.Blazor.Components.Input
+@using Not.Blazor.Dialogs.Abstractions
+@inherits ResetEventDialogBehind
+
+<MudDialog>
+
+    <TitleContent>@Hard_reset_string</TitleContent>
+
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.body1">@Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string</MudText>
+
+            <MudText Typo="Typo.body2">@Setup_configuration_will_not_be_deleted_string</MudText>
+
+            <MudText Typo="Typo.h5" Color="Color.Error">@This_action_is_final_There_is_no_recovery_string</MudText>
+
+            <MudText Typo="Typo.body1">@Type_1337_to_enable_confirmation_string</MudText>
+
+            <NTextField T="string"
+                          @bind-Value="ConfirmationCode"
+                          Label="@Confirmation_code_string" 
+                          Immediate="true" />
+        </MudStack>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonDanger Text="@Confirm_string" Disabled="@(!CanConfirm)" OnClick="ConfirmReset" />
+
+        <NButtonSecondary Text="@Cancel_string" OnClick="CancelDialog" />
+    </DialogActions>
+
+</MudDialog>

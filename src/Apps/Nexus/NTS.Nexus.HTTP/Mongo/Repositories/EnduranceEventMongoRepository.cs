@@ -1,24 +1,14 @@
 using MongoDB.Driver;
 using Not.Exceptions;
 using Not.Storage.Mongo;
-using NTS.Application.Core;
+using NTS.Application.Contracts.Core.Models;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class EnduranceEventMongoRepository : SoftDeleteMongoRepository<EnduranceEventModel>, IEventResetRepository
+public class EnduranceEventMongoRepository : MongoRepository<EnduranceEventModel>, IEventResetRepository
 {
     public EnduranceEventMongoRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ENDURANCE_EVENTS_COLLECTION) { }
-
-    protected override void PrepareForCreate(EnduranceEventModel item)
-    {
-        if (string.IsNullOrWhiteSpace(item.MongoId))
-        {
-            item.MongoId = Guid.NewGuid().ToString("N");
-        }
-
-        base.PrepareForCreate(item);
-    }
 
     protected override UpdateDefinition<EnduranceEventModel> GetUpdateDefinition(EnduranceEventModel document)
     {
@@ -44,19 +34,8 @@ public class EnduranceEventMongoRepository : SoftDeleteMongoRepository<Endurance
         await base.Create(item);
     }
 
-    public async Task<int?> GetMaxDeletedVersion(int eventId)
+    public Task DeleteAllForEvent(int eventId)
     {
-        var deleted = await GetCollection()
-            .Find(x => x.Id == eventId && x.IsDeleted)
-            .SortByDescending(x => x.DeletedVersion)
-            .FirstOrDefaultAsync();
-
-        return deleted?.DeletedVersion;
-    }
-
-    public async Task SoftDelete(int eventId, int deletedVersion)
-    {
-        var filter = Builders<EnduranceEventModel>.Filter.Where(x => x.Id == eventId && x.IsDeleted != true);
-        await GetCollection().UpdateManyAsync(filter, SoftDeleteUpdateDefinition(deletedVersion));
+        return GetCollection().DeleteManyAsync(x => x.Id == eventId);
     }
 }

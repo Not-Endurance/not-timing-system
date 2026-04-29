@@ -2,7 +2,7 @@ using System.Timers;
 using MudBlazor;
 using Not.Application.RPC;
 using Not.Blazor.Components.Abstractions;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 
 namespace NTS.Judge.Blazor.Features.Socket;
 

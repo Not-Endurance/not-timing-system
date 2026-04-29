@@ -1,4 +1,4 @@
-using NTS.Judge.Features.Setup.UpcomingEvents.Officials;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Officials;
 
 namespace NTS.Judge.Blazor.Features.Setup.UpcomingEvents.Officials;
 

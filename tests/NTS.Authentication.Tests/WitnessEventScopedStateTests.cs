@@ -9,6 +9,7 @@ using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
+using NTS.Witness.Contracts.Features.Snapshots;
 using NTS.Witness.Features.Core.Dashboard;
 using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
 using CoreCombination = NTS.Domain.Core.Aggregates.Participations.Entities.Combination;

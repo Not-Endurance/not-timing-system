@@ -5,15 +5,18 @@ using Not.Domain.Abstractions;
 using Not.Events;
 using Not.Notify;
 using Not.Structures;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Socket;
 using NTS.Application.Core;
-using NTS.Application.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
+using NTS.Judge.Contracts.Features.Core;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
 using NTS.Judge.Features.Core;
-using NTS.Judge.Features.Setup.UpcomingEvents;
 using NTS.Judge.Tests.Core.Implementations;
 
 namespace NTS.Judge.Tests.Core;
@@ -72,19 +75,7 @@ public class DashServiceTests
         IEnduranceEventRepository enduranceEvents
     )
     {
-        return new DashService(
-            socketService,
-            activeEventService,
-            [],
-            enduranceEvents,
-            upcomingEventService,
-            new RecordingRepository<Ranking>(),
-            new RecordingRepository<EnduranceEvent>(),
-            new RecordingRepository<Participation>(),
-            new RecordingRepository<Official>(),
-            new RecordingRepository<ArchiveEntry>(),
-            new TestNotifier()
-        );
+        return new DashService(socketService, activeEventService, [], enduranceEvents, upcomingEventService);
     }
 
     static EnduranceEvent CreateEvent(int id)
@@ -219,6 +210,16 @@ public class DashServiceTests
             return Task.CompletedTask;
         }
 
+        public Task<IEnumerable<EnduranceEvent>> ReadActive()
+        {
+            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+        }
+
+        public Task<IEnumerable<EnduranceEvent>> ReadPast()
+        {
+            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+        }
+
         public Task Create(EnduranceEvent item)
         {
             return Task.CompletedTask;
@@ -265,60 +266,6 @@ public class DashServiceTests
         }
 
         public Task Delete(IEnumerable<EnduranceEvent> items)
-        {
-            return Task.CompletedTask;
-        }
-    }
-
-    sealed class RecordingRepository<T> : IRepository<T>
-        where T : class, IEntity
-    {
-        public Task Create(T item)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task<T?> Read(Expression<Func<T, bool>> filter)
-        {
-            return Task.FromResult<T?>(null);
-        }
-
-        public Task<T?> Read(int id)
-        {
-            return Task.FromResult<T?>(null);
-        }
-
-        public Task<IEnumerable<T>> ReadMany()
-        {
-            return Task.FromResult<IEnumerable<T>>([]);
-        }
-
-        public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
-        {
-            return Task.FromResult<IEnumerable<T>>([]);
-        }
-
-        public Task Update(T item)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(T item)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(int id)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(Expression<Func<T, bool>> filter)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Delete(IEnumerable<T> items)
         {
             return Task.CompletedTask;
         }

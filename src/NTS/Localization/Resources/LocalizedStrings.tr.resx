@@ -210,9 +210,6 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Dokümanlar</value>
   </data>
-  <data name="Inquiry_string" xml:space="preserve">
-    <value>Sorgu</value>
-  </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Elenme Nedeni</value>
   </data>
@@ -375,9 +372,6 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>İptal</value>
   </data>
-  <data name="Archive_string" xml:space="preserve">
-    <value>Arşivle</value>
-  </data>
   <data name="History_string" xml:space="preserve">
     <value>Geçmiş</value>
   </data>
@@ -519,9 +513,6 @@
   </data>
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Zaman formatı yanlış 'saat:dakika:saniye'</value>
-  </data>
-  <data name="No_results_found_in_archive_string" xml:space="preserve">
-    <value>Arşivde sonuç bulunamadı</value>
   </data>
   <data name="required_for_FEI_export" xml:space="preserve">
     <value>(FEI dışa aktarımı için gerekli)</value>
@@ -752,6 +743,9 @@
     <value>Kaydol</value>
   </data>
   <data name="Validation_errors_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Past_events_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
 </root>

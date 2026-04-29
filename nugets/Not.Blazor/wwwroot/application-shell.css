@@ -1,0 +1,88 @@
+/* Backdrop */
+.n-application-backdrop {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: min(84vw, 56rem);
+    height: auto;
+    max-height: 80vh;
+    transform: translate(-50%, -50%);
+    opacity: 0.08;
+    filter: saturate(0.85) contrast(1.06) brightness(1.04);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+}
+
+/* Transparent components */
+.n-content .mud-container:not(.no-transparent) {
+    background-color: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Loading shell */
+.loading-shell {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--mud-palette-primary, #594ae2);
+    z-index: 10;
+}
+
+.loading-shell__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: min(26rem, calc(100vw - 2.5rem));
+    text-align: center;
+}
+
+.loading-shell__spinner {
+    width: clamp(2.5rem, 6vh, 4rem);
+    height: clamp(2.5rem, 6vh, 4rem);
+    box-sizing: border-box;
+    border: 0.35rem solid rgba(89, 74, 226, 0.14);
+    border-top-color: var(--mud-palette-primary, #594ae2);
+    border-right-color: var(--mud-palette-primary, #594ae2);
+    border-radius: 50%;
+    animation: loading-shell-spin 0.9s linear infinite;
+}
+
+.loading-shell__text {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: #2f3b52;
+    text-wrap: balance;
+}
+
+.loading-shell__text > * {
+    margin: 0;
+}
+
+@keyframes loading-shell-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 640px) {
+    .n-application-backdrop {
+        width: 94vw;
+        max-height: 74vh;
+    }
+}
+
+/* Default focus targed */
+*:focus,
+*:focus-visible {
+    outline: none;
+    box-shadow: none;
+    border-color: transparent;
+}

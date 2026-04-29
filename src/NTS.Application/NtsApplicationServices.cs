@@ -4,8 +4,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application;
 using Not.Injection;
+using Not.Krud.Abstractions;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.PastEvents;
+using NTS.Application.Contracts.Startlists;
 using NTS.Application.Core;
+using NTS.Application.PastEvents;
 using NTS.Application.Startlists;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
 
@@ -37,6 +44,9 @@ public static class NtsApplicationServices
         public Builder AddSharedCoreDomainServices()
         {
             _services.Add<IEnduranceEventService, IActiveEventsContext, EnduranceEventService>(ServiceLifetime.Scoped);
+            _services.Add<IPastEventService, IPastEventContext, IKrudListBehind<EnduranceEvent>, PastEventService>(
+                ServiceLifetime.Scoped
+            );
             _services.Add<
                 IStartUpcoming,
                 IStartHistory,

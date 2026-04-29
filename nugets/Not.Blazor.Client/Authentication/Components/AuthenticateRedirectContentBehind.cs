@@ -6,6 +6,11 @@ namespace Not.Blazor.Client.Authentication.Components;
 
 public class AuthenticateRedirectContentBehind : NComponent
 {
+    protected bool ShouldShowSpinner =>
+        !RemoteAuthenticationActions.IsAction(RemoteAuthenticationActions.LogInFailed, Action ?? string.Empty)
+        && !RemoteAuthenticationActions.IsAction(RemoteAuthenticationActions.LogOutFailed, Action ?? string.Empty)
+        && !RemoteAuthenticationActions.IsAction(RemoteAuthenticationActions.LogOutSucceeded, Action ?? string.Empty);
+
     [Parameter]
     public string? Action { get; set; }
 

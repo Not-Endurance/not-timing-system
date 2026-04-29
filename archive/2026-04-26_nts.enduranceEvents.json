@@ -1,0 +1,624 @@
+[{
+  "_id": "69edfd7ae51c1a91ccf4609f",
+  "Id": 1178656861,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": null
+  },
+  "Name": "Асеновград",
+  "Location": "Асеновград",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2024-10-26T05:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2024-10-26T20:59:59.999Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "1075410c7dd142358598745c565ff400",
+  "Id": 378023333,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "City": "с. Новаково, Асеновград",
+  "Location": "с. Новаково, Асеновград",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2026-04-10T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2026-04-10T23:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f202d",
+  "Id": 388909985,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "CEI",
+  "Location": "CEI",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2022-06-25T03:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2022-06-25T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f202e",
+  "Id": 238616552,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Шумен",
+  "Location": "Шумен",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2022-06-26T03:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2022-06-26T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f202f",
+  "Id": 687541991,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Varna",
+  "Location": "Varna",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2023-04-08T04:30:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2023-04-08T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2030",
+  "Id": 536984650,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Вакарел, 22.04.2023 г.",
+  "Location": "Вакарел, 22.04.2023 г.",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2023-04-22T05:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2023-04-22T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2031",
+  "Id": 1471158099,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Шумен",
+  "Location": "Шумен",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2023-05-13T04:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2023-05-13T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2032",
+  "Id": 1789289536,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Вакарел",
+  "Location": "Вакарел",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2023-07-22T03:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2023-07-22T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2033",
+  "Id": 535563679,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Асеновград",
+  "Location": "Асеновград",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2023-10-21T05:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2023-10-21T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2034",
+  "Id": 898218096,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "с. Доброглед Варна",
+  "Location": "с. Доброглед Варна",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2024-04-06T04:30:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2024-04-06T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2035",
+  "Id": 1418514499,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Вакарел",
+  "Location": "Вакарел",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2024-04-27T04:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2024-04-27T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2036",
+  "Id": 988236819,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BUL",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Shumen",
+  "Location": "Shumen",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2024-06-07T03:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2024-06-07T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2037",
+  "Id": 814701915,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BUL",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Shumen",
+  "Location": "Shumen",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2024-06-08T03:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2024-06-08T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2038",
+  "Id": 1128417682,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Vakarel",
+  "Location": "Vakarel",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2024-06-29T03:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2024-06-29T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2039",
+  "Id": 746304047,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "Бургас",
+  "Location": "Бургас",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2024-07-27T03:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2024-07-27T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f203a",
+  "Id": 154694528,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 0,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BUL",
+    "NfCode": null,
+    "Locale": null
+  },
+  "Name": "с. Дебнево",
+  "Location": "с. Дебнево",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2024-08-24T03:30:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2024-08-24T20:59:59.599Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f203b",
+  "Id": 618111414,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 230,
+    "TenantId": "nts",
+    "Name": "Türkiye",
+    "IsoCode": "TUR",
+    "NfCode": "TUR",
+    "Locale": null
+  },
+  "Name": "Kocaeli",
+  "Location": "Kocaeli",
+  "FeiShowId": "2025_CI_1554",
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2025-04-04T21:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2025-04-05T20:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f203c",
+  "Id": 1160910573,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "Name": "Доброглед",
+  "Location": "Доброглед",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2025-04-26T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2025-04-26T23:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f203d",
+  "Id": 862264202,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "Name": "Shumen",
+  "Location": "Shumen",
+  "FeiShowId": "2025_CI_1390",
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2025-06-28T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2025-06-28T23:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f203e",
+  "Id": 926170192,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "Name": "Shumen",
+  "Location": "Shumen",
+  "FeiShowId": "2025_CI_1390",
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2025-06-29T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2025-06-29T23:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f203f",
+  "Id": 181121932,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "Name": "с. Селянин",
+  "Location": "с. Селянин",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2025-08-09T23:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2040",
+  "Id": 110088525,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "Name": "с. Дебнево",
+  "Location": "с. Дебнево",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2025-08-23T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2025-08-23T23:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2041",
+  "Id": 774743495,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "Name": "ДП Кабиюк",
+  "Location": "ДП Кабиюк",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2025-09-06T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2025-09-06T23:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": "69ee0b0e4736d45ad93f2042",
+  "Id": 1324868820,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "Name": "с. Червен, Асеновград",
+  "Location": "с. Червен, Асеновград",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2025-10-25T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2025-10-25T20:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+}]

@@ -107,56 +107,8 @@ body {
     overflow-x: hidden;
 }
 
-.witness-backdrop {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    height: 78vh;
-    width: auto;
-    max-width: 88vw;
-    transform: translate(-50%, -50%);
-    opacity: 0.08;
-    filter: saturate(0.85) contrast(1.06) brightness(1.04);
-    pointer-events: none;
-    user-select: none;
-    z-index: 0;
-}
-
 #app {
     min-height: 100vh;
     position: relative;
     z-index: 1;
-}
-
-.loading-shell {
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    background: transparent;
-    color: var(--mud-palette-primary, #594ae2);
-}
-
-.loading-shell__spinner {
-    width: clamp(2.5rem, 6vh, 4rem);
-    height: clamp(2.5rem, 6vh, 4rem);
-    box-sizing: border-box;
-    border: 0.35rem solid rgba(89, 74, 226, 0.14);
-    border-top-color: var(--mud-palette-primary, #594ae2);
-    border-right-color: var(--mud-palette-primary, #594ae2);
-    border-radius: 50%;
-    animation: loading-shell-spin 0.9s linear infinite;
-}
-
-@keyframes loading-shell-spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@media (max-width: 640px) {
-    .witness-backdrop {
-        height: 72vh;
-        max-width: 92vw;
-    }
 }

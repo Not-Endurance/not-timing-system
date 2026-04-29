@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Blazor.Helpers;
-using NTS.Application.Core;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.SelectEvents;
@@ -28,7 +29,7 @@ public class SelectEventDialogBehind : NDialog
     {
         try
         {
-            Events = await EnduranceEventService.GetEvents();
+            Events = await EnduranceEventService.GetActive();
         }
         catch (Exception ex)
         {

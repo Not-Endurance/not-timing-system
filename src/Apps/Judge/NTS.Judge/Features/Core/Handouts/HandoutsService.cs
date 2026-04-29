@@ -5,7 +5,7 @@ using Not.Async.Extensions;
 using Not.Exceptions;
 using Not.Observables.Structures;
 using Not.Safe;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Objects.Documents;

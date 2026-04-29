@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Not.Application.HTTP;
 using Not.Serialization.JSON;
 using Not.Structures;
-using NTS.Application.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Storage.REST;
 
 namespace NTS.Judge.Tests.Core;

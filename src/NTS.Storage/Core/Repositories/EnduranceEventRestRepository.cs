@@ -3,8 +3,10 @@ using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Storage.REST;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Socket;
 using NTS.Application.Core;
-using NTS.Application.Socket;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Core.Repositories;
@@ -20,6 +22,18 @@ public class EnduranceEventRestRepository
         : base("endurance-event", client)
     {
         _socketContext = socketContext;
+    }
+
+    public async Task<IEnumerable<EnduranceEvent>> ReadActive()
+    {
+        var models = await HandleRequest(Client.Get<IEnumerable<EnduranceEventModel>>($"{Endpoint}/active")) ?? [];
+        return models.Select(x => MapEntity(x)!);
+    }
+
+    public async Task<IEnumerable<EnduranceEvent>> ReadPast()
+    {
+        var models = await HandleRequest(Client.Get<IEnumerable<EnduranceEventModel>>($"{Endpoint}/past")) ?? [];
+        return models.Select(x => MapEntity(x)!);
     }
 
     public async Task<EnduranceEvent> Start(int upcomingEventId)
@@ -38,11 +52,11 @@ public class EnduranceEventRestRepository
     }
 
     /// <summary>
-    /// Soft-resets the currently selected endurance event in Nexus.
+    /// Permanently resets the currently selected endurance event in Nexus.
     /// </summary>
     /// <remarks>
-    /// This resets the active event root together with its Core child documents and hides the event from the
-    /// normal active-event reads used by Home and startup reconnect logic.
+    /// This deletes the active event root together with its event-scoped Core child documents, which removes the
+    /// event from the active-event reads used by Home and startup reconnect logic.
     /// </remarks>
     public async Task Reset()
     {

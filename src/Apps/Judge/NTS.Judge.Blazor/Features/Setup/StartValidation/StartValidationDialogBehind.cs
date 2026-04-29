@@ -1,7 +1,7 @@
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Structures;
 using NTS.Domain.Setup.Services.StartValidation;
-using NTS.Judge.Features.Setup.UpcomingEvents;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
 
 namespace NTS.Judge.Blazor.Features.Setup.StartValidation;
 

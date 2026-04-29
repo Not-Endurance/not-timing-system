@@ -1,7 +1,8 @@
 ﻿using Not.Application.HTTP;
 using Not.Injection;
 using Not.Storage.REST;
-using NTS.Application.Shared;
+using NTS.Application.Contracts.Shared;
+using NTS.Application.Contracts.Shared.Models;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Storage.REST;

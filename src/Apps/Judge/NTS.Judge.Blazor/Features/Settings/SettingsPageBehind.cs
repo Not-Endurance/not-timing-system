@@ -1,6 +1,6 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Krud.Blazor;
-using NTS.Judge.Features.Settings;
+using NTS.Judge.Contracts.Features.Settings;
 
 namespace NTS.Judge.Blazor.Features.Settings;
 

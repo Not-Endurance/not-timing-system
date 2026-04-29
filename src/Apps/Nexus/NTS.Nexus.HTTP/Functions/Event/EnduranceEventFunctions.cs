@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using NTS.Application.Core;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Domain.Core.Objects;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -80,6 +82,32 @@ public class EnduranceEventFunctions : FunctionBase
         LogInformation(request, nameof(List));
 
         return Ok(await _events.ReadMany() ?? []);
+    }
+
+    [Function("endurance-event-active-list")]
+    public async Task<IActionResult> ListActive(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event/active")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(ListActive));
+        TagRequest(request);
+        LogInformation(request, nameof(ListActive));
+
+        var activeCutoff = DateTimeOffset.UtcNow.Subtract(EventSpan.ActiveGracePeriod);
+        return Ok(await _events.ReadMany(x => x.EndDay > activeCutoff) ?? []);
+    }
+
+    [Function("endurance-event-past-list")]
+    public async Task<IActionResult> ListPast(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event/past")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(ListPast));
+        TagRequest(request);
+        LogInformation(request, nameof(ListPast));
+
+        var pastCutoff = DateTimeOffset.UtcNow.Subtract(EventSpan.ActiveGracePeriod);
+        return Ok(await _events.ReadMany(x => x.EndDay <= pastCutoff) ?? []);
     }
 
     [Function("endurance-event-delete")]

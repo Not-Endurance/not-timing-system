@@ -45,6 +45,8 @@ public class SignalRSocketTests
 
         public void Warn(string message) { }
 
+        public void Warn(IEnumerable<string> messages) { }
+
         public void Error(string message) { }
 
         public void Error(Exception ex)

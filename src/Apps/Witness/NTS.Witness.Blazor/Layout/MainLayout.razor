@@ -1,4 +1,5 @@
 @using NTS.Application
+@using NTS.Application.Contracts
 @using NTS.Witness.Blazor.Layout.Drawer
 @using Not.Blazor.Components.Layout
 
@@ -20,9 +21,7 @@
     <Content>
         <HelpButton Class="help-button" ClickHandler="HelpHandler" />
 
-        <div class="witness-route-focus-target" tabindex="-1">
-            @Body
-        </div>
+        @Body
     </Content>
 
 </NLayout>

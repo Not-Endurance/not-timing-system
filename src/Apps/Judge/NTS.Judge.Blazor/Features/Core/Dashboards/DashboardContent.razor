@@ -8,22 +8,17 @@
 @attribute [Route(DASHBOARD_PAGE)]
 @inherits DashboardContentBehind
 
-<NContent Title="@Dashboard_string" IsEmpty="false">
+<NContent Title="@Dashboard_string" IsEmpty="@(!HasActiveEvent)">
     
     <Main>
-        @if (HasActiveEvent && !IsArchiveLoading)
+        @if (HasActiveEvent)
         {
             <Dashboard />
-        }
-        else 
-        {
-            <MudNumericField @bind-Value="ArchiveId" Label="@ID_of_archive_to_load_string" />
-            <NButtonPrimary OnClick="LoadArchive">@Load_string</NButtonPrimary>
         }
     </Main>
 
     <Rightbar>
-        @if (HasActiveEvent && !IsArchiveLoading)
+        @if (HasActiveEvent)
         {
             <SnapshotPanel Class="mb-2" />
 

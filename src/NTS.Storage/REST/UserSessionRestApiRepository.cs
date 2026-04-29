@@ -2,8 +2,9 @@ using Not.Application.Authentication.Abstractions;
 using Not.Application.HTTP;
 using Not.Injection;
 using Not.Storage.REST;
+using NTS.Application.Contracts.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
-using NTS.Application.Watcher;
 
 namespace NTS.Storage.REST;
 

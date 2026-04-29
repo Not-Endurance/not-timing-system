@@ -1,4 +1,4 @@
-using NTS.Judge.Features.Setup.Horses;
+using NTS.Judge.Contracts.Features.Setup.Horses;
 
 namespace NTS.Judge.Blazor.Features.Setup.AthletesHorses.Horses;
 

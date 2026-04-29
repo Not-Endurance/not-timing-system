@@ -14,7 +14,13 @@ public class NListBehind<T> : NComponent
     public Func<Task>? CreateSafe { get; set; }
 
     [Parameter]
+    public Func<T, Task>? ViewSafe { get; set; }
+
+    [Parameter]
     public Func<T, Task>? UpdateSafe { get; set; }
+
+    [Parameter]
+    public Func<T, bool>? CanUpdate { get; set; }
 
     [Parameter]
     public Func<T, Task>? DeleteSafe { get; set; }
@@ -34,6 +40,19 @@ public class NListBehind<T> : NComponent
         {
             GuardHelper.ThrowIfDefault(CreateSafe);
             await CreateSafe();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    protected async Task OnView(T item)
+    {
+        try
+        {
+            GuardHelper.ThrowIfDefault(ViewSafe);
+            await ViewSafe(item);
         }
         catch (Exception ex)
         {

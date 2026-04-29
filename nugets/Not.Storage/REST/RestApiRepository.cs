@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Domain.Abstractions;
@@ -140,7 +141,8 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
     public virtual async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
         var predicate = filter.Compile();
-        return (await ReadMany()).Where(predicate);
+        var results = await ReadMany();
+        return results.Where(predicate);
     }
 
     public async Task Update(T item)

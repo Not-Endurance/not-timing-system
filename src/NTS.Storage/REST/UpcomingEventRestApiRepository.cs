@@ -3,7 +3,8 @@ using Not.Application.HTTP;
 using Not.Injection;
 using Not.Storage.REST;
 using Not.Structures;
-using NTS.Application.Setup;
+using NTS.Application.Contracts.Setup;
+using NTS.Application.Contracts.Setup.Models;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Events;
 

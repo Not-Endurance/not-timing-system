@@ -1,4 +1,5 @@
-using NTS.Application.Watcher;
+using NTS.Application.Contracts.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Watcher;
 
 namespace NTS.Application.UserSession;

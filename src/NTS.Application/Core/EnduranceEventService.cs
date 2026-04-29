@@ -1,6 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
 using Not.Async.Extensions;
+using NTS.Application.Contracts.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 
@@ -8,23 +8,28 @@ namespace NTS.Application.Core;
 
 public class EnduranceEventService : NStatefulService, IActiveEventsContext, IEnduranceEventService
 {
-    readonly IRepository<EnduranceEvent> _enduranceEvents;
+    readonly IEnduranceEventRepository _enduranceEvents;
     List<EnduranceEvent> _activeEvents = [];
 
-    public EnduranceEventService(IRepository<EnduranceEvent> enduranceEvents)
+    public EnduranceEventService(IEnduranceEventRepository enduranceEvents)
     {
         _enduranceEvents = enduranceEvents;
     }
 
     protected override async Task<bool> InitializeState()
     {
-        _activeEvents = await _enduranceEvents.ReadMany().ToList();
+        _activeEvents = await _enduranceEvents.ReadActive().ToList();
         return true;
     }
 
-    public Task<IEnumerable<EnduranceEvent>> GetEvents()
+    public Task<IEnumerable<EnduranceEvent>> GetActive()
     {
-        return _enduranceEvents.ReadMany();
+        return _enduranceEvents.ReadActive();
+    }
+
+    public Task<IEnumerable<EnduranceEvent>> GetPast()
+    {
+        return _enduranceEvents.ReadPast();
     }
 
     public bool IsActive(UpcomingEvent upcomingEvent)
@@ -48,9 +53,4 @@ public class EnduranceEventService : NStatefulService, IActiveEventsContext, IEn
         _activeEvents.RemoveAll(x => x.Id == eventId);
         EmitChanged();
     }
-}
-
-public interface IEnduranceEventService
-{
-    Task<IEnumerable<EnduranceEvent>> GetEvents();
 }

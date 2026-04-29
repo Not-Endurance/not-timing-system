@@ -1,8 +1,8 @@
 ﻿@using NTS.Domain.Setup.Aggregates
 @using NTS.Judge.Blazor.Features.Setup.AthletesHorses.Athletes
 @using NTS.Judge.Blazor.Features.Setup.AthletesHorses.Horses
-@using NTS.Judge.Features.Setup.Athletes
-@using NTS.Judge.Features.Setup.Horses
+@using NTS.Judge.Contracts.Features.Setup.Athletes
+@using NTS.Judge.Contracts.Features.Setup.Horses
 @using Not.Blazor.Components.Layout
 @using Not.Krud.Blazor
 @using Not.Krud.Blazor.Components
@@ -15,11 +15,11 @@
     <Main>
         <MudGrid Spacing="8" Style="margin-top:0!important;">
             <MudItem xs="6">
-                <KrudList T="Athlete" TShell="AthleteShell" TModel="AthleteFormModel" Name="@Athletes_string" />
+                <KrudList T="Athlete" TShell="AthleteShell" TModel="AthleteFormModel" Name="@Athletes_string" AllowCreate AllowUpdate AllowDelete />
             </MudItem>
             
             <MudItem xs="6">
-                <KrudList T="Horse" TShell="HorseShell" TModel="HorseFormModel" Name="@Horses_string" />
+                <KrudList T="Horse" TShell="HorseShell" TModel="HorseFormModel" Name="@Horses_string" AllowCreate AllowUpdate AllowDelete />
             </MudItem>
         </MudGrid>
     </Main>

@@ -1,8 +1,10 @@
 using MudBlazor;
+using Not.Async.Extensions;
 using Not.Injection;
 using Not.Startup;
-using NTS.Application.Core;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Socket;
 using NTS.Blazor.Components.SelectEvents;
 
 namespace NTS.Judge.Blazor.Features.Socket;
@@ -31,7 +33,7 @@ public class JudgeStartupEnduranceEventCoordinator : IStartupInitializerAsync, I
             return;
         }
 
-        var events = (await _enduranceEventService.GetEvents()).ToList();
+        var events = await _enduranceEventService.GetActive().ToList();
         if (events.Count == 0)
         {
             return;

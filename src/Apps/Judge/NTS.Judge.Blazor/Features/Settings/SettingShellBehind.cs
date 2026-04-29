@@ -1,15 +1,14 @@
 using System.Globalization;
-using Not.Application.Services;
 using Not.Krud.Blazor.Components.Abstractions;
 using NTS.Domain.Aggregates;
-using NTS.Judge.Features.Settings;
+using NTS.Judge.Contracts.Features.Settings;
 
 namespace NTS.Judge.Blazor.Features.Settings;
 
 public class SettingShellBehind : KrudShell<SettingFormModel>
 {
     [Inject]
-    ISeeker<Country> CountrySeeker { get; set; } = default!;
+    IJudgeSetupLookupService Lookups { get; set; } = default!;
 
     [Inject]
     NavigationManager NavManager { get; set; } = default!;
@@ -36,12 +35,12 @@ public class SettingShellBehind : KrudShell<SettingFormModel>
 
     protected async Task<IEnumerable<Country?>> SearchLanguageSafe(string term, CancellationToken ct)
     {
-        var foundCountries = await CountrySeeker.Search(term, ct);
+        var foundCountries = await Lookups.SearchCountries(term, ct);
         return foundCountries.Where(x => x.Locale != null);
     }
 
     protected async Task<IEnumerable<Country?>> SearchCountrySafe(string term, CancellationToken ct)
     {
-        return await CountrySeeker.Search(term, ct);
+        return await Lookups.SearchCountries(term, ct);
     }
 }

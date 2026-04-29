@@ -2,12 +2,13 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Helpers;
 using Not.Domain.Exceptions;
-using NTS.Application.Core;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Blazor.Features.Setup.StartValidation;
 using NTS.Judge.Blazor.Layout.Drawer.Reset;
-using NTS.Judge.Features.Core;
+using NTS.Judge.Contracts.Features.Core;
 
 namespace NTS.Judge.Blazor.Features;
 
@@ -36,6 +37,11 @@ public class HomeContentBehind : NStatefulComponent
     protected bool ShowStartButton(UpcomingEvent upcomingEvent)
     {
         return !ActiveEventContext.IsActive(upcomingEvent);
+    }
+
+    protected bool ShowEditButton(UpcomingEvent upcomingEvent)
+    {
+        return ShowStartButton(upcomingEvent) && !ShowResetTimingButton(upcomingEvent);
     }
 
     protected bool ShowResetTimingButton(UpcomingEvent upcomingEvent)
@@ -83,7 +89,7 @@ public class HomeContentBehind : NStatefulComponent
 
         try
         {
-            var dialog = await DialogService.ShowAsync<ResetTimingDialog>();
+            var dialog = await DialogService.ShowAsync<ResetEventDialog>();
             if (await dialog.IsCanceled())
             {
                 return;

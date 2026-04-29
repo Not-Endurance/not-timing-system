@@ -3,8 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Filesystem;
 using Not.Storage;
-using Not.Storage.JsonFile.Stores;
 using Not.Storage.REST;
+using NTS.Application.PastEvents;
+using NTS.Storage.Core.Repositories;
 
 namespace NTS.Storage;
 
@@ -19,25 +20,24 @@ public static class NtsStorageServices
 
     public class Builder
     {
-        readonly NStorageBuilder _nStorageBuilder;
         readonly IServiceCollection _services;
+        readonly NStorageBuilder _nStorageBuilder;
 
         internal Builder(IServiceCollection services, IConfiguration configuration)
         {
-            _nStorageBuilder = new(services, configuration);
             _services = services;
-        }
-
-        public Builder AddJsonStorage()
-        {
+            // The keyed filesystem context is still used for FEI export output even though JSON file storage is gone.
             var factory = FileContextHelper.CreateFileContextFactory("stores");
-            _services.AddKeyedSingleton<IFilesystemContext, FilesystemContext>(DATA_KEY, factory);
-            return this;
+            services.AddKeyedSingleton<IFilesystemContext, FilesystemContext>(DATA_KEY, factory);
+            _nStorageBuilder = new(services, configuration);
         }
 
         public Builder AddRestApiStorage()
         {
             _nStorageBuilder.AddRestApiStorage(Assembly.GetExecutingAssembly());
+            _services.AddTransient<IPastParticipationRepository, PastParticipationRepository>();
+            _services.AddTransient<IPastRankingRepository, PastRankingRepository>();
+            _services.AddTransient<IPastOfficialRepository, PastOfficialRepository>();
             return this;
         }
     }

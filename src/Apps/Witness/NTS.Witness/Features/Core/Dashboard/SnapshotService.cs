@@ -5,7 +5,7 @@ using Not.Collections;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Observables.Structures;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
@@ -13,6 +13,7 @@ using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
+using NTS.Witness.Contracts.Features.Snapshots;
 
 namespace NTS.Witness.Features.Core.Dashboard;
 
@@ -76,13 +77,13 @@ public class SnapshotService
         return Participations.Any() || _participationsToSnapshot.Any() || _history.Any();
     }
 
-    public void CaptureSnapshot(Snapshot snapshot)
+    public void Capture(Snapshot snapshot)
     {
         GuardHelper.ThrowIfDefault(snapshot);
-        UpdateSnapshotTimestamp(snapshot, new Timestamp(DateTimeOffset.Now));
+        UpdateTimestamp(snapshot, new Timestamp(DateTimeOffset.Now));
     }
 
-    public void MoveToSnapshot(Participation participation)
+    public void SelectForSnapshot(Participation participation)
     {
         GuardHelper.ThrowIfDefault(participation);
 
@@ -97,7 +98,7 @@ public class SnapshotService
         EmitChanged();
     }
 
-    public void RemoveSnapshot(Snapshot snapshot)
+    public void Remove(Snapshot snapshot)
     {
         GuardHelper.ThrowIfDefault(snapshot);
 
@@ -135,7 +136,7 @@ public class SnapshotService
         await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroupToPublish);
     }
 
-    public void UpdateSnapshotTimestamp(Snapshot snapshot, Timestamp timestamp)
+    public void UpdateTimestamp(Snapshot snapshot, Timestamp timestamp)
     {
         GuardHelper.ThrowIfDefault(snapshot);
         GuardHelper.ThrowIfDefault(timestamp);

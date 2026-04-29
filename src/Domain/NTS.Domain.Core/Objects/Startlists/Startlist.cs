@@ -1,5 +1,6 @@
 ﻿using Not.Domain.Exceptions;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 
 namespace NTS.Domain.Core.Objects.Startlists;
 
@@ -14,39 +15,13 @@ public record Startlist : ValueObject
 
     public Startlist(IEnumerable<Participation> participations)
     {
-        var upcoming = new List<Starter>();
-        var history = new List<Starter>();
         foreach (var participation in participations)
         {
-            var phases = participation.Phases;
-            foreach (var phase in phases)
-            {
-                if (phase.StartTime == null)
-                {
-                    continue;
-                }
-                var phaseIndex = phases.IndexOf(phase);
-                var phaseNumber = phaseIndex + 1;
-                var entry = new Starter(
-                    participation.Combination.Athlete.Names,
-                    participation.Combination.Number,
-                    phaseNumber,
-                    phases[phaseIndex].Length,
-                    phase.StartTime.ToDateTimeOffset()!
-                );
-                if (IsHistory(entry))
-                {
-                    history.Add(entry);
-                }
-                else
-                {
-                    upcoming.Add(entry);
-                }
-            }
+            Add(participation);
         }
 
-        _upcoming = OrderByTimeThenPhase(upcoming);
-        _history = OrderByTimeThenPhase(history);
+        _upcoming = OrderByTimeThenPhase(_upcoming);
+        _history = OrderByTimeThenPhase(_history);
         UpdateState();
     }
 
@@ -100,6 +75,16 @@ public record Startlist : ValueObject
         UpsertStarter(participation, currentIndex, current.StartTime);
     }
 
+    public void Upsert(Participation participation)
+    {
+        lock (_lock)
+        {
+            RemoveAll(participation.Combination.Number);
+            Add(participation);
+            UpdateState();
+        }
+    }
+
     public void UpsertNext(Participation participation)
     {
         var current = participation.Phases.Current;
@@ -118,8 +103,42 @@ public record Startlist : ValueObject
     {
         lock (_lock)
         {
-            _upcoming.RemoveAll(x => x.Number == number);
+            RemoveUpcoming(number);
         }
+    }
+
+    void Add(Participation participation)
+    {
+        var phases = participation.Phases;
+        for (var phaseIndex = 0; phaseIndex < phases.Count; phaseIndex++)
+        {
+            var phase = phases[phaseIndex];
+            var start = ResolveStart(phases, phaseIndex);
+            if (start == null)
+            {
+                continue;
+            }
+
+            var entry = CreateStarter(participation, phaseIndex, start);
+            Add(entry, phase.IsComplete());
+        }
+    }
+
+    Timestamp? ResolveStart(IReadOnlyList<Phase> phases, int phaseIndex)
+    {
+        var phase = phases[phaseIndex];
+        if (phase.StartTime != null)
+        {
+            return phase.StartTime;
+        }
+
+        if (phaseIndex == 0)
+        {
+            return null;
+        }
+
+        var previous = phases[phaseIndex - 1];
+        return previous.IsComplete() ? previous.GetOutTime() : null;
     }
 
     void UpsertStarter(Participation participation, int phaseIndex, Timestamp? start)
@@ -129,25 +148,58 @@ public record Startlist : ValueObject
             return;
         }
 
+        var entry = CreateStarter(participation, phaseIndex, start);
+
+        lock (_lock)
+        {
+            RemoveUpcoming(entry.Number);
+            AddUpcoming(entry);
+            UpdateState();
+        }
+    }
+
+    Starter CreateStarter(Participation participation, int phaseIndex, Timestamp start)
+    {
         var phase = participation.Phases[phaseIndex];
-        var entry = new Starter(
+        return new Starter(
             participation.Combination.Athlete.Names,
             participation.Combination.Number,
             phaseIndex + 1,
             phase.Length,
             start
         );
+    }
 
-        lock (_lock)
+    void Add(Starter entry, bool forceHistory = false)
+    {
+        if (forceHistory || IsHistory(entry))
         {
-            _upcoming.RemoveAll(x => x.Number == entry.Number);
-            if (IsHistory(entry))
-            {
-                return;
-            }
-            _upcoming = [.. _upcoming, entry];
-            UpdateState();
+            _history.Add(entry);
+            return;
         }
+
+        _upcoming.Add(entry);
+    }
+
+    void AddUpcoming(Starter entry)
+    {
+        if (IsHistory(entry))
+        {
+            return;
+        }
+
+        _upcoming = [.. _upcoming, entry];
+    }
+
+    void RemoveAll(int number)
+    {
+        RemoveUpcoming(number);
+        _history.RemoveAll(x => x.Number == number);
+    }
+
+    void RemoveUpcoming(int number)
+    {
+        _upcoming.RemoveAll(x => x.Number == number);
     }
 
     bool IsHistory(Starter entry)

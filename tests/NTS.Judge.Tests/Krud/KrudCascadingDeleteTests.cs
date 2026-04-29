@@ -10,6 +10,8 @@ using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.UpcomingEvents;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Combinations;
+using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Loops;
 using NTS.Judge.Features.Setup.UpcomingEvents.Combinations;
 using NTS.Judge.Features.Setup.UpcomingEvents.Loops;
 
