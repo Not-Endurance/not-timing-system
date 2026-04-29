@@ -44,12 +44,9 @@ public static class NtsApplicationServices
         public Builder AddSharedCoreDomainServices()
         {
             _services.Add<IEnduranceEventService, IActiveEventsContext, EnduranceEventService>(ServiceLifetime.Scoped);
-            _services.Add<
-                IPastEventService,
-                IPastEventContext,
-                IKrudListBehind<EnduranceEvent>,
-                PastEventService
-            >(ServiceLifetime.Scoped);
+            _services.Add<IPastEventService, IPastEventContext, IKrudListBehind<EnduranceEvent>, PastEventService>(
+                ServiceLifetime.Scoped
+            );
             _services.Add<
                 IStartUpcoming,
                 IStartHistory,

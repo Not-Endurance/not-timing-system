@@ -122,11 +122,7 @@ public class RankingsContentBehind : PrintableComponent
                 FullWidth = true,
                 CloseOnEscapeKey = true,
             };
-            var dialog = await DialogService.ShowAsync<ImageBrowserDialog>(
-                Image_browser_string,
-                parameters,
-                options
-            );
+            var dialog = await DialogService.ShowAsync<ImageBrowserDialog>(Image_browser_string, parameters, options);
             await dialog.Result;
         }
         catch (Exception ex)

@@ -13,11 +13,7 @@ using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Application.PastEvents;
 
-public class PastEventService
-    : NStatefulService,
-        IPastEventService,
-        IKrudListBehind<EnduranceEvent>,
-        IScoped
+public class PastEventService : NStatefulService, IPastEventService, IKrudListBehind<EnduranceEvent>, IScoped
 {
     static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_STARTLIST =
         new Dictionary<int, IReadOnlyList<Starter>>();
@@ -39,8 +35,7 @@ public class PastEventService
     public IReadOnlyList<EnduranceEvent> Events => _pastEvents.AsReadOnly();
     public EnduranceEvent? Event { get; private set; }
     public int EventId =>
-        Event?.Id
-        ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
+        Event?.Id ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
     public IReadOnlyList<Ranking> Rankings => _rankings;
     public Ranking? CurrentRanking => _currentRanking;
     public IReadOnlyDictionary<int, IReadOnlyList<Starter>> StartlistHistoryByStage =>
@@ -76,7 +71,9 @@ public class PastEventService
             return;
         }
 
-        var participations = await _serviceProvider.GetRequiredService<IPastParticipationRepository>().ReadForEvent(EventId);
+        var participations = await _serviceProvider
+            .GetRequiredService<IPastParticipationRepository>()
+            .ReadForEvent(EventId);
         _rankings = (
             await _serviceProvider.GetRequiredService<IPastRankingRepository>().ReadForEvent(EventId)
         ).ToList();

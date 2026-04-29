@@ -75,13 +75,7 @@ public class DashServiceTests
         IEnduranceEventRepository enduranceEvents
     )
     {
-        return new DashService(
-            socketService,
-            activeEventService,
-            [],
-            enduranceEvents,
-            upcomingEventService
-        );
+        return new DashService(socketService, activeEventService, [], enduranceEvents, upcomingEventService);
     }
 
     static EnduranceEvent CreateEvent(int id)
@@ -276,5 +270,4 @@ public class DashServiceTests
             return Task.CompletedTask;
         }
     }
-
 }

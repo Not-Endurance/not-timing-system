@@ -1,8 +1,8 @@
 using MudBlazor;
-using NTS.Domain.Core.Aggregates;
-using NTS.Blazor.Components.SelectEvents;
 using Not.Blazor.Helpers;
 using Not.Injection;
+using NTS.Blazor.Components.SelectEvents;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Witness.Blazor.Features.Socket;
 
@@ -23,10 +23,7 @@ public class EventConnectionDialogLauncher : IEventConnectionDialogLauncher, ISc
 
     public async Task<bool> ConfirmSessionResetAsync(EnduranceEvent enduranceEvent)
     {
-        var parameters = new DialogParameters<ChangeEventHistoryDialog>
-        {
-            { x => x.EventName, enduranceEvent.Name },
-        };
+        var parameters = new DialogParameters<ChangeEventHistoryDialog> { { x => x.EventName, enduranceEvent.Name } };
         var dialog = await _dialogService.ShowAsync<ChangeEventHistoryDialog>(Change_event_string, parameters);
         return !await dialog.IsCanceled();
     }

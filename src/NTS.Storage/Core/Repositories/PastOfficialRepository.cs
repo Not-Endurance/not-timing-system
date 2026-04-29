@@ -6,9 +6,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class PastOfficialRepository
-    : RestApiRepository<Official, OfficialModel>,
-        IPastOfficialRepository
+public class PastOfficialRepository : RestApiRepository<Official, OfficialModel>, IPastOfficialRepository
 {
     public PastOfficialRepository(NHttpClient client)
         : base("officials", client) { }

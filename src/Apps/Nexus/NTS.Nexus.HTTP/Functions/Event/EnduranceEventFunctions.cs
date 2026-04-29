@@ -86,8 +86,7 @@ public class EnduranceEventFunctions : FunctionBase
 
     [Function("endurance-event-active-list")]
     public async Task<IActionResult> ListActive(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event/active")]
-            HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event/active")] HttpRequest request
     )
     {
         using var activity = StartFunctionActivity(nameof(ListActive));
@@ -100,8 +99,7 @@ public class EnduranceEventFunctions : FunctionBase
 
     [Function("endurance-event-past-list")]
     public async Task<IActionResult> ListPast(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event/past")]
-            HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "endurance-event/past")] HttpRequest request
     )
     {
         using var activity = StartFunctionActivity(nameof(ListPast));

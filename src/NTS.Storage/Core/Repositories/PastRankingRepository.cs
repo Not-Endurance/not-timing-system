@@ -6,9 +6,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class PastRankingRepository
-    : RestApiRepository<Ranking, RankingModel>,
-        IPastRankingRepository
+public class PastRankingRepository : RestApiRepository<Ranking, RankingModel>, IPastRankingRepository
 {
     public PastRankingRepository(NHttpClient client)
         : base("rankings", client) { }

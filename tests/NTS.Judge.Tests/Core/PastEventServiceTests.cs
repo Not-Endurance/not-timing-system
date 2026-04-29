@@ -161,9 +161,7 @@ public class PastEventServiceTests
         }
     }
 
-    sealed class ParticipationPastRepository
-        : RecordingRepository<Participation>,
-            IPastParticipationRepository
+    sealed class ParticipationPastRepository : RecordingRepository<Participation>, IPastParticipationRepository
     {
         public ParticipationPastRepository(IEnumerable<Participation> items)
             : base(items) { }

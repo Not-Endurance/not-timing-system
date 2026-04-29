@@ -7,7 +7,9 @@ using NTS.Storage.REST;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class ParticipationEventScopedApiRepository : EventScopedApiRepository<Participation, ParticipationModel>, ITransient
+public class ParticipationEventScopedApiRepository
+    : EventScopedApiRepository<Participation, ParticipationModel>,
+        ITransient
 {
     public ParticipationEventScopedApiRepository(NHttpClient client, INtsSocketContext socketContext)
         : base("participations", client, socketContext) { }

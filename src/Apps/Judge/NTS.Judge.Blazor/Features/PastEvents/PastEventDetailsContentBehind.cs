@@ -55,11 +55,7 @@ public class PastEventDetailsContentBehind : NStatefulComponent
                 { x => x.HistoryByStage, Service.StartlistHistoryByStage },
             };
             var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.Large };
-            var dialog = await DialogService.ShowAsync<PastEventStartlistDialog>(
-                Startlist_string,
-                parameters,
-                options
-            );
+            var dialog = await DialogService.ShowAsync<PastEventStartlistDialog>(Startlist_string, parameters, options);
             await dialog.Result;
         }
         catch (Exception ex)
