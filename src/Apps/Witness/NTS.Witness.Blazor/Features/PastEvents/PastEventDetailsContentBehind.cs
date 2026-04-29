@@ -5,7 +5,7 @@ using NTS.Application.Contracts.PastEvents;
 using NTS.Blazor.Components.PastEvents;
 using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Judge.Blazor.Features.PastEvents;
+namespace NTS.Witness.Blazor.Features.PastEvents;
 
 public class PastEventDetailsContentBehind : NStatefulComponent
 {

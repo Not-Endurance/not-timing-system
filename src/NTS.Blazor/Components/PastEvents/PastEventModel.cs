@@ -3,7 +3,7 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 
-namespace NTS.Judge.Blazor.Features.PastEvents;
+namespace NTS.Blazor.Components.PastEvents;
 
 public class PastEventModel : IKrudModel<EnduranceEvent>, IKrudFormModel
 {

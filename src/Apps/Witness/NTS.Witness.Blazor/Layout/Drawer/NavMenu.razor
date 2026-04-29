@@ -17,6 +17,10 @@
         <NNavLink Endpoint="@EMERGENCY_CONTACTS_PAGE">@Contacts_string</NNavLink>
     </MudNavGroup>
 
+    <MudNavGroup Title="@History_string" Expanded="true">
+        <NNavLink Endpoint="@PAST_EVENTS_PAGE">@Past_events_string</NNavLink>
+    </MudNavGroup>
+
     <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
 
 </MudNavMenu>

@@ -1,5 +1,5 @@
 using Not.Krud.Blazor.Components.Abstractions;
 
-namespace NTS.Judge.Blazor.Features.PastEvents;
+namespace NTS.Blazor.Components.PastEvents;
 
 public class PastEventShell : KrudShell<PastEventModel> { }

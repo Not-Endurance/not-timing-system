@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Objects.Documents;
 
-namespace NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
+namespace NTS.Blazor.Components.Rankings.Protocols;
 
 public class ProtocolBehind : NComponent
 {
