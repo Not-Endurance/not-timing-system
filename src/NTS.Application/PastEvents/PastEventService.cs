@@ -46,10 +46,10 @@ public class PastEventService
     public IReadOnlyDictionary<int, IReadOnlyList<Starter>> StartlistHistoryByStage =>
         _startlist?.HistoryByStage ?? EMPTY_STARTLIST;
 
-    public RanklistDocument? Document =>
+    public ProtocolDocument? Document =>
         Event == null || CurrentRanking == null
             ? null
-            : new RanklistDocument(new Ranklist(CurrentRanking), Event, _officials);
+            : new ProtocolDocument(new Ranklist(CurrentRanking), Event, _officials);
 
     protected override async Task<bool> InitializeState()
     {

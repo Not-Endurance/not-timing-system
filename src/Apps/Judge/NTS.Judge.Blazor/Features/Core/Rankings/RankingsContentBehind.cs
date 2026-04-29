@@ -15,7 +15,6 @@ namespace NTS.Judge.Blazor.Features.Core.Rankings;
 public class RankingsContentBehind : PrintableComponent
 {
     TaskCompletionSource<bool>? _renderCompletionSource;
-    public bool IsProtocolVisible = true;
 
     [Inject]
     IFeiExportService FeiExportService { get; set; } = default!;
@@ -24,7 +23,7 @@ public class RankingsContentBehind : PrintableComponent
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    IRanklistDocumentService DocumentService { get; set; } = default!;
+    IProtocolDocumentService DocumentService { get; set; } = default!;
 
     [Inject]
     protected IRankingMenuService RankingService { get; set; } = default!;
@@ -33,7 +32,7 @@ public class RankingsContentBehind : PrintableComponent
 
     protected Ranklist Ranklist { get; private set; } = default!;
 
-    protected RanklistDocument? Document { get; private set; }
+    protected ProtocolDocument? Document { get; private set; }
 
     [Inject]
     protected IProtocolLogoState HeaderLogo { get; set; } = default!;
@@ -75,16 +74,6 @@ public class RankingsContentBehind : PrintableComponent
         {
             Handle(ex);
         }
-    }
-
-    protected void ShowProtocol()
-    {
-        IsProtocolVisible = true;
-    }
-
-    protected void ShowRanklist()
-    {
-        IsProtocolVisible = false;
     }
 
     protected void SelectRanking(Ranking ranking)

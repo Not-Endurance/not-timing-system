@@ -21,7 +21,7 @@ public class RankingService
         IKrudFormService<CustomRankingModel>,
         IRankingService,
         IRankingMenuService,
-        IRanklistDocumentService,
+        IProtocolDocumentService,
         ICoreDependentObservables,
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationEliminated>,
@@ -107,11 +107,11 @@ public class RankingService
         }
     }
 
-    public RanklistDocument Create(Ranking ranking)
+    public ProtocolDocument Create(Ranking ranking)
     {
         var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var ranklist = new Ranklist(ranking);
-        return new RanklistDocument(ranklist, enduranceEvent, _loadedOfficials);
+        return new ProtocolDocument(ranklist, enduranceEvent, _loadedOfficials);
     }
 
     public void Select(Ranking ranking)

@@ -11,7 +11,7 @@ public class ProtocolBehind : NComponent
     protected string LogoClass => LogoClicked.HasDelegate ? "cursor-pointer" : string.Empty;
 
     [Parameter]
-    public RanklistDocument? Document { get; set; }
+    public ProtocolDocument? Document { get; set; }
 
     [Parameter]
     public bool Compact { get; set; }

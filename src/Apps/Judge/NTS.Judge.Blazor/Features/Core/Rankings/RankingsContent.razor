@@ -1,6 +1,5 @@
 ﻿@using NTS.Blazor.Components.Rankings.Menu
 @using NTS.Blazor.Components.Rankings.Protocols
-@using NTS.Judge.Blazor.Features.Core.Rankings.Ranklists
 @using Not.Blazor.Components.Layout
 
 @attribute [Route(RANKLIST_PAGE)]
@@ -9,35 +8,16 @@
 <NContent Title="@Ranklist_string" IsLoading="@IsLoading" Class="@Class">
 
     <Main>
-        @if (IsProtocolVisible)
-        {
-            <Protocol Document="Document"
-                      Compact="CompactParticipationTables"
-                      LeftLogo="@HeaderLogo.Left"
-                      RightLogo="@HeaderLogo.Right"
-                      LogoClicked="OpenImageBrowser" />
-        }
-        else
-        {
-            <RanklistTable />
-        }
+        <Protocol Document="Document"
+                  Compact="CompactParticipationTables"
+                  LeftLogo="@HeaderLogo.Left"
+                  RightLogo="@HeaderLogo.Right"
+                  LogoClicked="OpenImageBrowser" />
     </Main>
 
     <Rightbar>
         <MudStack Row Wrap="Wrap.Wrap">
-            <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
-                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
-                         Color="Color.Primary"
-                         Variant="Variant.Outlined"
-                         Class="sidebar-menu-button align-center">
-
-                    <MudMenuItem OnClick="ShowProtocol">@Protocol_string</MudMenuItem>
-
-                    <MudMenuItem OnClick="ShowRanklist">@Ranklist_string</MudMenuItem>
-                </MudMenu>
-
-                <NotButtonPrint OnClick="Print" />
-            </MudButtonGroup>
+            <NotButtonPrint OnClick="Print" />
             
             @if (IsFeiExportConfigured)
             {
@@ -55,10 +35,3 @@
     </Rightbar>
 
 </NContent>
-
-<style>
-    .sidebar-menu-button > button.mud-button-root {
-        padding-top: 6px !important;
-        padding-bottom: 5px !important;
-    }
-</style>
