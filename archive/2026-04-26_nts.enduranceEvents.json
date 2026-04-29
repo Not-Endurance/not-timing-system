@@ -1,6 +1,56 @@
 [{
-  "_id": "69edfd7ae51c1a91ccf4609f",
-  "Id": 1178656861,
+  "_id": 1324868821,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "Name": "ДП млади ездачи и юноши, ДП деца, ДП пони ездачи",
+  "Location": "Test",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2026-03-27T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2026-03-27T23:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 378023333,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "City": "с. Новаково, Асеновград",
+  "Location": "с. Новаково, Асеновград",
+  "FeiShowId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "StartDay": {
+    "$date": "2026-04-10T00:00:00.000Z"
+  },
+  "EndDay": {
+    "$date": "2026-04-10T23:59:59.000Z"
+  },
+  "IsDeleted": false,
+  "DeletedVersion": null,
+  "Name": "KuramiQnko"
+},
+{
+  "_id": 1178656861,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -25,34 +75,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "1075410c7dd142358598745c565ff400",
-  "Id": 378023333,
-  "TenantId": "nts",
-  "Country": {
-    "_id": 37,
-    "TenantId": "nts",
-    "Name": "Bulgaria",
-    "IsoCode": "BGR",
-    "NfCode": "BUL",
-    "Locale": "bg-BG"
-  },
-  "City": "с. Новаково, Асеновград",
-  "Location": "с. Новаково, Асеновград",
-  "FeiShowId": null,
-  "FeiId": null,
-  "FeiEventCode": null,
-  "StartDay": {
-    "$date": "2026-04-10T00:00:00.000Z"
-  },
-  "EndDay": {
-    "$date": "2026-04-10T23:59:59.000Z"
-  },
-  "IsDeleted": false,
-  "DeletedVersion": null
-},
-{
-  "_id": "69ee0b0e4736d45ad93f202d",
-  "Id": 388909985,
+  "_id": 388909985,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -77,8 +100,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f202e",
-  "Id": 238616552,
+  "_id": 238616552,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -103,8 +125,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f202f",
-  "Id": 687541991,
+  "_id": 687541991,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -129,8 +150,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2030",
-  "Id": 536984650,
+  "_id": 536984650,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -155,8 +175,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2031",
-  "Id": 1471158099,
+  "_id": 1471158099,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -181,8 +200,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2032",
-  "Id": 1789289536,
+  "_id": 1789289536,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -207,8 +225,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2033",
-  "Id": 535563679,
+  "_id": 535563679,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -233,8 +250,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2034",
-  "Id": 898218096,
+  "_id": 898218096,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -259,8 +275,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2035",
-  "Id": 1418514499,
+  "_id": 1418514499,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -285,8 +300,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2036",
-  "Id": 988236819,
+  "_id": 988236819,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -311,8 +325,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2037",
-  "Id": 814701915,
+  "_id": 814701915,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -337,8 +350,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2038",
-  "Id": 1128417682,
+  "_id": 1128417682,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -363,8 +375,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2039",
-  "Id": 746304047,
+  "_id": 746304047,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -389,8 +400,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f203a",
-  "Id": 154694528,
+  "_id": 154694528,
   "TenantId": "nts",
   "Country": {
     "_id": 0,
@@ -415,8 +425,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f203b",
-  "Id": 618111414,
+  "_id": 618111414,
   "TenantId": "nts",
   "Country": {
     "_id": 230,
@@ -441,8 +450,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f203c",
-  "Id": 1160910573,
+  "_id": 1160910573,
   "TenantId": "nts",
   "Country": {
     "_id": 37,
@@ -467,8 +475,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f203d",
-  "Id": 862264202,
+  "_id": 862264202,
   "TenantId": "nts",
   "Country": {
     "_id": 37,
@@ -493,8 +500,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f203e",
-  "Id": 926170192,
+  "_id": 926170192,
   "TenantId": "nts",
   "Country": {
     "_id": 37,
@@ -519,8 +525,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f203f",
-  "Id": 181121932,
+  "_id": 181121932,
   "TenantId": "nts",
   "Country": {
     "_id": 37,
@@ -545,8 +550,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2040",
-  "Id": 110088525,
+  "_id": 110088525,
   "TenantId": "nts",
   "Country": {
     "_id": 37,
@@ -571,8 +575,7 @@
   "DeletedVersion": null
 },
 {
-  "_id": "69ee0b0e4736d45ad93f2041",
-  "Id": 774743495,
+  "_id": 774743495,
   "TenantId": "nts",
   "Country": {
     "_id": 37,
@@ -592,32 +595,6 @@
   },
   "EndDay": {
     "$date": "2025-09-06T23:59:59.000Z"
-  },
-  "IsDeleted": false,
-  "DeletedVersion": null
-},
-{
-  "_id": "69ee0b0e4736d45ad93f2042",
-  "Id": 1324868820,
-  "TenantId": "nts",
-  "Country": {
-    "_id": 37,
-    "TenantId": "nts",
-    "Name": "Bulgaria",
-    "IsoCode": "BGR",
-    "NfCode": "BUL",
-    "Locale": "bg-BG"
-  },
-  "Name": "с. Червен, Асеновград",
-  "Location": "с. Червен, Асеновград",
-  "FeiShowId": null,
-  "FeiId": null,
-  "FeiEventCode": null,
-  "StartDay": {
-    "$date": "2025-10-25T00:00:00.000Z"
-  },
-  "EndDay": {
-    "$date": "2025-10-25T20:59:59.000Z"
   },
   "IsDeleted": false,
   "DeletedVersion": null
