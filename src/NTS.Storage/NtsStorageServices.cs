@@ -1,10 +1,12 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Not.Application.CRUD.Ports;
 using Not.Filesystem;
 using Not.Storage;
 using Not.Storage.REST;
 using NTS.Application.PastEvents;
+using NTS.Domain.Core.Aggregates;
 using NTS.Storage.Core.Repositories;
 
 namespace NTS.Storage;
@@ -38,6 +40,12 @@ public static class NtsStorageServices
             _services.AddTransient<IPastParticipationRepository, PastParticipationRepository>();
             _services.AddTransient<IPastRankingRepository, PastRankingRepository>();
             _services.AddTransient<IPastOfficialRepository, PastOfficialRepository>();
+            _services.AddTransient<IRepository<Participation>, ParticipationEventScopedApiRepository>();
+            _services.AddTransient<IReadMany<Participation>, ParticipationEventScopedApiRepository>();
+            _services.AddTransient<IRepository<Ranking>, RankingRepository>();
+            _services.AddTransient<IReadMany<Ranking>, RankingRepository>();
+            _services.AddTransient<IRepository<Official>, OfficialRepository>();
+            _services.AddTransient<IReadMany<Official>, OfficialRepository>();
             return this;
         }
     }

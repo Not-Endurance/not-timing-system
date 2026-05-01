@@ -10,31 +10,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\nugets\Not.Application\Not.Application.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Tests\Not.Tests.csproj" />
     <ProjectReference Include="..\..\src\Apps\Judge\NTS.Judge.Blazor\NTS.Judge.Blazor.csproj" />
     <ProjectReference Include="..\..\src\Apps\Judge\NTS.Judge\NTS.Judge.csproj" />
     <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.HTTP\NTS.Nexus.HTTP.csproj" />
     <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj" />
+    <ProjectReference Include="..\..\src\Apps\Witness\NTS.Witness.Blazor\NTS.Witness.Blazor.csproj" />
+    <ProjectReference Include="..\..\src\Apps\Witness\NTS.Witness\NTS.Witness.csproj" />
     <ProjectReference Include="..\..\src\NTS.Storage\NTS.Storage.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="NUnit" Version="4.3.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" PrivateAssets="all" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Seeds\**">
+    <None Update="Judge\Seeds\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Judge\xunit.runner.json" CopyToOutputDirectory="PreserveNewest" TargetPath="xunit.runner.json" />
   </ItemGroup>
 
 </Project>

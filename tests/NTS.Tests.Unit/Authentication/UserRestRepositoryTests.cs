@@ -23,7 +23,7 @@ public class UserRestRepositoryTests
 
         var result = await repository.Get("user@example.com");
 
-        Assert.False(result.IsError);
+        Assert.True(result.IsSuccess);
         Assert.NotNull(result.Data);
         Assert.Equal("user@example.com", result.Data!.Email);
         Assert.Equal("Jane Doe", result.Data.Name);
@@ -40,7 +40,7 @@ public class UserRestRepositoryTests
 
         var result = await repository.Register(new NUserRegistration("user@example.com"));
 
-        Assert.True(result.IsError);
+        Assert.False(result.IsSuccess);
         Assert.Equal(["Email already exists"], result.Errors);
         Assert.Null(result.Data);
     }

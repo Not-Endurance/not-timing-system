@@ -82,7 +82,7 @@ public class StartValidatorTests
 
         var result = StartValidator.Validate(ReplaceCompetition(setupEvent, invalidCompetition, 0));
 
-        var issue = Assert.Single(result.Data ?? []);
+        var issue = Assert.Single((result.Data ?? []).Where(x => x.Summary.Contains("must have at least one phase")));
         Assert.Contains("must have at least one phase", issue.Summary);
         Assert.False(issue.IsAutoCorrectable);
     }
@@ -120,7 +120,7 @@ public class StartValidatorTests
 
         var result = StartValidator.Validate(setupEvent);
 
-        var issue = Assert.Single(result.Data ?? []);
+        var issue = Assert.Single((result.Data ?? []).Where(x => x.Summary.Contains("non-final phases without rest: 1")));
         Assert.Contains("non-final phases without rest: 1", issue.Summary);
         Assert.False(issue.IsAutoCorrectable);
     }

@@ -18,7 +18,7 @@ public class WitnessEventConnectionCoordinatorTests
         var socketService = new TestSocketService { IsConnected = true, Event = CreateEvent(7) };
         var enduranceEventService = new TestEnduranceEventService([CreateEvent(1)]);
         var dialogLauncher = new TestDialogLauncher();
-        var coordinator = new WitnessEventConnectionCoordinator(enduranceEventService, socketService, dialogLauncher);
+        var coordinator = new EventConnectionCoordinator(enduranceEventService, socketService, dialogLauncher);
 
         await coordinator.EnsureConnected();
 
@@ -32,7 +32,7 @@ public class WitnessEventConnectionCoordinatorTests
     {
         var socketService = new TestSocketService();
         var dialogLauncher = new TestDialogLauncher();
-        var coordinator = new WitnessEventConnectionCoordinator(
+        var coordinator = new EventConnectionCoordinator(
             new TestEnduranceEventService([]),
             socketService,
             dialogLauncher
@@ -51,7 +51,7 @@ public class WitnessEventConnectionCoordinatorTests
         var activeEvent = CreateEvent(11);
         var socketService = new TestSocketService();
         var dialogLauncher = new TestDialogLauncher();
-        var coordinator = new WitnessEventConnectionCoordinator(
+        var coordinator = new EventConnectionCoordinator(
             new TestEnduranceEventService([activeEvent]),
             socketService,
             dialogLauncher
@@ -72,7 +72,7 @@ public class WitnessEventConnectionCoordinatorTests
         var activeEvent = CreateEvent(17);
         var socketService = new TestSocketService { WillResetSessionResult = true };
         var dialogLauncher = new TestDialogLauncher { ConfirmSessionResetResult = true };
-        var coordinator = new WitnessEventConnectionCoordinator(
+        var coordinator = new EventConnectionCoordinator(
             new TestEnduranceEventService([activeEvent]),
             socketService,
             dialogLauncher
@@ -93,7 +93,7 @@ public class WitnessEventConnectionCoordinatorTests
         var activeEvent = CreateEvent(19);
         var socketService = new TestSocketService { WillResetSessionResult = true };
         var dialogLauncher = new TestDialogLauncher { ConfirmSessionResetResult = false };
-        var coordinator = new WitnessEventConnectionCoordinator(
+        var coordinator = new EventConnectionCoordinator(
             new TestEnduranceEventService([activeEvent]),
             socketService,
             dialogLauncher
@@ -112,7 +112,7 @@ public class WitnessEventConnectionCoordinatorTests
     {
         var socketService = new TestSocketService();
         var dialogLauncher = new TestDialogLauncher();
-        var coordinator = new WitnessEventConnectionCoordinator(
+        var coordinator = new EventConnectionCoordinator(
             new TestEnduranceEventService([CreateEvent(1), CreateEvent(2)]),
             socketService,
             dialogLauncher
@@ -202,7 +202,7 @@ public class WitnessEventConnectionCoordinatorTests
         }
     }
 
-    sealed class TestDialogLauncher : IWitnessEventConnectionDialogLauncher
+    sealed class TestDialogLauncher : IEventConnectionDialogLauncher
     {
         public int ShowSelectEventCalls { get; private set; }
         public int ConfirmSessionResetCalls { get; private set; }

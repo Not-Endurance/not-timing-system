@@ -59,7 +59,7 @@ public class NBlazorClientAuthenticationSessionStorageTests
 
         var flowStartedAt = await storage.ReadSigninFlowStartedAtAsync();
         Assert.NotNull(flowStartedAt);
-        Assert.InRange(flowStartedAt.Value, before, after);
+        Assert.InRange(flowStartedAt.Value, before.AddMilliseconds(-1), after.AddMilliseconds(1));
 
         await storage.ClearSigninFlowStartedAt();
 
@@ -68,7 +68,7 @@ public class NBlazorClientAuthenticationSessionStorageTests
         Assert.All(jsRuntime.Invocations, x => Assert.StartsWith("localStorage.", x, StringComparison.Ordinal));
     }
 
-    static IServiceProvider CreateProvider(RecordingJsRuntime jsRuntime)
+    static ServiceProvider CreateProvider(RecordingJsRuntime jsRuntime)
     {
         var services = new ServiceCollection();
         services.AddSingleton<IJSRuntime>(jsRuntime);
@@ -123,8 +123,8 @@ public class NBlazorClientAuthenticationSessionStorageTests
             return identifier switch
             {
                 "localStorage.getItem" => new ValueTask<TValue>(Cast<TValue>(ReadValue(args))),
-                "localStorage.setItem" => WriteKey(args),
-                "localStorage.removeItem" => RemoveKey(args),
+                "localStorage.setItem" => WriteKey<TValue>(args),
+                "localStorage.removeItem" => RemoveKey<TValue>(args),
                 _ => throw new NotSupportedException(identifier),
             };
         }

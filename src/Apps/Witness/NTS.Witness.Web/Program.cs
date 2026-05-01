@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Not.Application.Configurations;
@@ -12,7 +13,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddNtsWitnessWeb(builder.Configuration);
-builder.Services.AddNtsWitness(builder.Configuration, builder.HostEnvironment.BaseAddress);
+builder.Services.AddNtsWitness(builder.Configuration, builder.HostEnvironment.BaseAddress, Assembly.GetExecutingAssembly());
 
 Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
 Console.WriteLine(

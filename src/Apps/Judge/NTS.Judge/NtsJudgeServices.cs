@@ -9,10 +9,14 @@ namespace NTS.Judge;
 
 public static class NtsJudgeServices
 {
-    public static IServiceCollection AddNtsJudge(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNtsJudge(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Assembly rootAssembly
+    )
     {
         services
-            .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
+            .ConfigureNtsApplication(configuration, rootAssembly)
             .AddSharedCoreDomainServices()
             .ConfigureN()
             .AddRpcClient()

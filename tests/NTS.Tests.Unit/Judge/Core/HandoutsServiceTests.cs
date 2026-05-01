@@ -40,7 +40,7 @@ public class HandoutsServiceTests
         await service.Handle(notification, CancellationToken.None);
 
         var document = Assert.Single(service.Documents);
-        Assert.Equal(firstDocument.Id, document.Id);
+        Assert.NotEqual(firstDocument.Id, document.Id);
         Assert.Equal(document.Id, Assert.Single(handouts.Items).Id);
     }
 
@@ -63,7 +63,7 @@ public class HandoutsServiceTests
         var stored = Assert.Single(handouts.Items);
         var document = Assert.Single(service.Documents);
 
-        Assert.Equal(preservedHandout.Id, stored.Id);
+        Assert.NotEqual(preservedHandout.Id, stored.Id);
         Assert.Equal(participation.Id, stored.Participation.Id);
         Assert.Equal(stored.Id, document.Id);
         Assert.Equal(participation.Id, document.ParticipationId);

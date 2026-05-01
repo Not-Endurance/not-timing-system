@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Not.Application.Authentication.Provider;
 using Not.Notify;
@@ -182,7 +183,8 @@ public class WitnessHubAccessTokenProviderTests
                 Options.Create(settings),
                 new TestNavigationManager(),
                 redirector,
-                notifier
+                notifier,
+                NullLogger<NtsClientRpcAccessTokenProvider>.Instance
             ),
             notifier
         );

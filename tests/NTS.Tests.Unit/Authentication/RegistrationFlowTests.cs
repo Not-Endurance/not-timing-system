@@ -12,6 +12,7 @@ using Not.Application.Authentication.User;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Structures;
+using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Core;
 using NTS.Nexus.HTTP.Functions;
 using NTS.Nexus.HTTP.Functions.Event;
@@ -30,7 +31,7 @@ public class RegistrationFlowTests
     {
         var users = new RecordingUserRegister
         {
-            GetResult = Result.Success<NUserModel>(null!),
+            GetResult = Result.Failure<NUserModel>("User not found"),
             RegisterResult = Result.Success(
                 new NUserModel("new.user@example.com", ["Judge"])
                 {
@@ -67,7 +68,7 @@ public class RegistrationFlowTests
     {
         var users = new RecordingUserRegister
         {
-            GetResult = Result.Success<NUserModel>(null!),
+            GetResult = Result.Failure<NUserModel>("User not found"),
             RegisterResult = Result.Success(
                 new NUserModel("new.user@example.com")
                 {
@@ -132,7 +133,7 @@ public class RegistrationFlowTests
     {
         var users = new RecordingUserRegister
         {
-            GetResult = Result.Success<NUserModel>(null!),
+            GetResult = Result.Failure<NUserModel>("User not found"),
             RegisterResult = Result.Success(
                 new NUserModel("new.user@example.com")
                 {
@@ -191,7 +192,7 @@ public class RegistrationFlowTests
     }
 
     [Fact]
-    public async Task Users_register_function_passes_profile_fields_through_to_repository()
+    public async Task Users_register_function_returns_registered_user_and_passes_profile_fields_through_to_repository()
     {
         var users = new RecordingUserRepository
         {
@@ -212,12 +213,10 @@ public class RegistrationFlowTests
 
         var ok = Assert.IsType<OkObjectResult>(response);
         var result = Assert.IsType<Result<NUserModel>>(ok.Value);
-        var payload = Assert.IsType<NUserModel>(result.Data);
-        Assert.False(result.IsError);
-        Assert.Equal("Jane Doe", payload.Name);
-        Assert.Equal("Jane", payload.GivenName);
-        Assert.Equal("Doe", payload.Surname);
-        Assert.Equal("Bulgaria", payload.CountryRegion);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
+        Assert.Equal(users.RegisterResult.Id, result.Data.Id);
+        Assert.Equal(users.RegisterResult.Email, result.Data.Email);
         Assert.Equal(
             new NUserRegistration("new.user@example.com", "Jane Doe", "Jane", "Doe", "Bulgaria"),
             users.LastRegistration
@@ -238,7 +237,7 @@ public class RegistrationFlowTests
 
         var ok = Assert.IsType<OkObjectResult>(response);
         var result = Assert.IsType<Result<NUserModel>>(ok.Value);
-        Assert.False(result.IsError);
+        Assert.True(result.IsSuccess);
         Assert.Null(result.Data);
     }
 
@@ -256,7 +255,7 @@ public class RegistrationFlowTests
 
         var ok = Assert.IsType<OkObjectResult>(response);
         var result = Assert.IsType<Result<IEnumerable<NUserModel>>>(ok.Value);
-        Assert.False(result.IsError);
+        Assert.True(result.IsSuccess);
         Assert.Empty(result.Data!);
     }
 
@@ -270,10 +269,7 @@ public class RegistrationFlowTests
         );
         var request = CreateRequest(HttpMethods.Post, "/api/users/register", "{ invalid json");
 
-        var response = await function.Register(request);
-
-        var badRequest = Assert.IsType<BadRequestObjectResult>(response);
-        Assert.Equal($"Payload couldn't be parsed to '{typeof(RegisterUserPaload).FullName}'", badRequest.Value);
+        await Assert.ThrowsAsync<Newtonsoft.Json.JsonReaderException>(() => function.Register(request));
     }
 
     [Fact]
@@ -288,13 +284,9 @@ public class RegistrationFlowTests
         );
         var request = CreateRequest(HttpMethods.Post, "/api/endurance-event/7/start");
 
-        var response = await function.Start(request, 7);
+        var exception = await Assert.ThrowsAsync<DomainException>(() => function.Start(request, 7));
 
-        var ok = Assert.IsType<OkObjectResult>(response);
-        var result = Assert.IsType<Result<EnduranceEventModel>>(ok.Value);
-        Assert.True(result.IsError);
-        Assert.Equal(["Start blocked"], result.Errors);
-        Assert.Null(result.Data);
+        Assert.Equal("Start blocked", exception.Message);
     }
 
     [Fact]

@@ -1,0 +1,47 @@
+name: "[net8] Integration Tests"
+
+on:
+  workflow_dispatch:
+
+env:
+  DOTNET_CORE_VERSION: 8.0.x
+  CONFIGURATION: Release
+  TEST_PROJECT_PATH: tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj
+  DOTNET_CLI_HOME: ${{ github.workspace }}/.tmp/dotnet-home
+  NUGET_PACKAGES: ${{ github.workspace }}/.tmp/nuget-packages
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Azure Functions tools
+        run: npm install -g azure-functions-core-tools@4 --unsafe-perm true azurite
+
+      - name: Start Azurite
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/azurite"
+          nohup azurite --location "$RUNNER_TEMP/azurite" --silent > "$RUNNER_TEMP/azurite.log" 2>&1 &
+
+      - name: Restore
+        run: dotnet restore ${{ env.TEST_PROJECT_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.TEST_PROJECT_PATH }} -c ${{ env.CONFIGURATION }} --no-restore
+
+      - name: Test
+        run: dotnet test ${{ env.TEST_PROJECT_PATH }} -c ${{ env.CONFIGURATION }} --no-build

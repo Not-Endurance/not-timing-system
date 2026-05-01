@@ -1,14 +1,16 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
-using NTS.Application.Socket;
-using NTS.Application.Startlists;
+using Not.Application.RPC.SignalR;
+using NTS.Application.Contracts.Socket;
+using NTS.Application.Contracts.Watcher.Models;
+using NTS.Application.UserSession;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
+using NTS.Domain.Watcher;
 using NTS.Witness.Contracts.Features.Snapshots;
 using NTS.Witness.Features.Core.Dashboard;
 using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
@@ -20,54 +22,30 @@ using CorePhaseCollection = NTS.Domain.Core.Aggregates.Participations.Objects.Ph
 
 namespace NTS.Authentication.Tests;
 
-public class WitnessEventScopedStateTests
+public class WitnessSnapshotServiceTests
 {
     [Fact]
-    public async Task Performance_service_does_not_read_before_event_connection()
+    public async Task Remove_snapshot_returns_participation_to_available_chips()
     {
-        var socketContext = new MutableSocketContext();
-        var reader = new RecordingParticipationReader([CreateParticipation(11, 77)]);
-        var service = new PerformanceService(reader, socketContext);
+        var socketContext = new MutableSocketContext { Event = CreateEvent(11) };
+        var service = new SnapshotService(
+            socketContext,
+            new RecordingParticipationReader([CreateParticipation(11, 77)]),
+            new TestWitnessUserSession(),
+            new TestSnapshotPublisher()
+        );
 
         await service.Load();
+        service.SelectForSnapshot(service.Participations.Single());
 
-        Assert.Equal(0, reader.ReadManyCalls);
+        var snapshot = Assert.Single(service.Snapshots);
         Assert.Empty(service.Participations);
-    }
 
-    [Fact]
-    public async Task Performance_service_reads_after_event_connection()
-    {
-        var socketContext = new MutableSocketContext();
-        var reader = new RecordingParticipationReader([CreateParticipation(12, 88)]);
-        var service = new PerformanceService(reader, socketContext);
+        service.Remove(snapshot);
 
-        await service.Load();
-        socketContext.Event = CreateEvent(12);
-
-        await service.Handle(new NTS.Domain.Core.Events.EventConnected(12), CancellationToken.None);
-
-        Assert.Equal(1, reader.ReadManyCalls);
-        Assert.Equal([88], service.Participations.Select(x => x.Combination.Number).ToArray());
-    }
-
-    [Fact]
-    public async Task Startlist_service_does_not_read_before_event_connection_and_reloads_after_connect()
-    {
-        var socketContext = new MutableSocketContext();
-        var reader = new RecordingParticipationReader([]);
-        var service = new StartlistService(reader, socketContext);
-
-        await service.Load();
-
-        Assert.Equal(0, reader.ReadManyCalls);
-        Assert.Empty(service.Upcoming);
-
-        socketContext.Event = CreateEvent(19);
-        await service.Handle(new EventConnected(19), CancellationToken.None);
-
-        Assert.Equal(1, reader.ReadManyCalls);
-        Assert.NotNull(service.Startlist);
+        Assert.Empty(service.Snapshots);
+        Assert.Empty(service.ParticipationsToSnapshot);
+        Assert.Equal([77], service.Participations.Select(x => x.Combination.Number).ToArray());
     }
 
     static Participation CreateParticipation(int eventId, int number)
@@ -133,17 +111,13 @@ public class WitnessEventScopedStateTests
             _participations = participations.ToList();
         }
 
-        public int ReadManyCalls { get; private set; }
-
         public Task<IEnumerable<Participation>> ReadMany()
         {
-            ReadManyCalls++;
             return Task.FromResult<IEnumerable<Participation>>(_participations);
         }
 
         public Task<IEnumerable<Participation>> ReadMany(Expression<Func<Participation, bool>> filter)
         {
-            ReadManyCalls++;
             var predicate = filter.Compile();
             return Task.FromResult<IEnumerable<Participation>>(_participations.Where(predicate).ToList());
         }
@@ -155,5 +129,36 @@ public class WitnessEventScopedStateTests
         public SocketConnectionStatus Status =>
             IsConnected ? SocketConnectionStatus.Connected : SocketConnectionStatus.Disconnected;
         public EnduranceEvent? Event { get; set; }
+    }
+
+    sealed class TestWitnessUserSession : IWitnessUserSession
+    {
+        public Task<NtsUserSessionStateModel?> GetCurrent()
+        {
+            return Task.FromResult<NtsUserSessionStateModel?>(null);
+        }
+
+        public Task SetEventId(int? eventId)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task AppendSnapshot(SnapshotGroup snapshot)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteCurrent()
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    sealed class TestSnapshotPublisher : ISnapshotPublisher
+    {
+        public Task PublishSnapshotsAsync(SnapshotGroup snapshoutGroup)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

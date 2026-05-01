@@ -16,8 +16,7 @@ namespace NTS.Application.PastEvents;
 public class PastEventService
     : NStatefulService,
         IPastEventService,
-        IKrudListBehind<EnduranceEvent>,
-        IScoped
+        IKrudListBehind<EnduranceEvent>
 {
     static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_STARTLIST =
         new Dictionary<int, IReadOnlyList<Starter>>();

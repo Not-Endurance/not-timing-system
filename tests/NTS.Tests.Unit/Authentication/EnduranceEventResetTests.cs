@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Core;
 using NTS.Nexus.HTTP.Functions.Event;
 using NTS.Nexus.HTTP.Logger;
@@ -50,7 +51,8 @@ public class EnduranceEventResetTests
 
         var response = await function.Reset(request, 19);
 
-        Assert.IsType<OkResult>(response);
+        var ok = Assert.IsType<OkObjectResult>(response);
+        Assert.IsType<Not.Structures.Result>(ok.Value);
         Assert.Equal(19, resetService.LastEventId);
     }
 
