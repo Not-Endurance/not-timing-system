@@ -49,6 +49,12 @@ internal sealed class WitnessDriver : IAsyncDisposable
 
     public WitnessAccessLevel AccessLevel => _accessContext.AccessLevel;
 
+    public T GetRequiredService<T>()
+        where T : notnull
+    {
+        return _provider.GetRequiredService<T>();
+    }
+
     public Task Start()
     {
         EnsureRpcClientsInitialized();

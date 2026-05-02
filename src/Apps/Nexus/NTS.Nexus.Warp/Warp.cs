@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Not.Startup;
 using NTS.Application.Contracts;
 using NTS.Application.Cors;
@@ -75,6 +76,24 @@ public static class Warp
 
         app.UseCors(NtsWarpServices.CORS_POLICY_NAME);
         app.UseAuthentication();
+        if (IsIntegrationAuthEnabled())
+        {
+            app.Use(
+                async (context, next) =>
+                {
+                    if (context.User?.Identity?.IsAuthenticated != true)
+                    {
+                        var principal = CreateIntegrationPrincipal(context);
+                        if (principal != null)
+                        {
+                            context.User = principal;
+                        }
+                    }
+
+                    await next();
+                }
+            );
+        }
         app.UseAuthorization();
 
         app.MapGet(
@@ -100,5 +119,48 @@ public static class Warp
         }
 
         app.Run();
+    }
+
+    static bool IsIntegrationAuthEnabled()
+    {
+        return string.Equals(
+            Environment.GetEnvironmentVariable("NTS_INTEGRATION_AUTH"),
+            "true",
+            StringComparison.OrdinalIgnoreCase
+        );
+    }
+
+    static ClaimsPrincipal? CreateIntegrationPrincipal(HttpContext context)
+    {
+        var token = context.Request.Query["access_token"].ToString();
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            var authorization = context.Request.Headers.Authorization.ToString();
+            const string bearer = "Bearer ";
+            if (authorization.StartsWith(bearer, StringComparison.OrdinalIgnoreCase))
+            {
+                token = authorization[bearer.Length..];
+            }
+        }
+
+        if (!token.StartsWith("integration|", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var parts = token.Split('|', 4);
+        if (parts.Length < 3 || string.IsNullOrWhiteSpace(parts[1]))
+        {
+            return null;
+        }
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Email, parts[1]),
+            new("email", parts[1]),
+            new("name", string.IsNullOrWhiteSpace(parts[2]) ? parts[1] : parts[2]),
+            new("scp", parts.Length == 4 && !string.IsNullOrWhiteSpace(parts[3]) ? parts[3] : "nts-client-scope"),
+        };
+        return new ClaimsPrincipal(new ClaimsIdentity(claims, "IntegrationTest"));
     }
 }

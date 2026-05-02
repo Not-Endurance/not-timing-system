@@ -7,6 +7,7 @@ using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
+using Not.Krud.Abstractions;
 using Not.Notify;
 using Not.Startup;
 using NTS.Application.Contracts;
@@ -17,7 +18,6 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Judge;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Storage;
-using NTS.Tests.Integration.Infrastructure;
 
 namespace NTS.Tests.Integration.Drivers;
 
@@ -58,6 +58,20 @@ internal sealed class JudgeDriver : IAsyncDisposable
     public string ParticipationRepositoryType => _participationRepository.GetType().FullName ?? "unknown";
     public string HttpBaseUrl => _httpSettings.Value.Url ?? "";
 
+    public T GetRequiredService<T>()
+        where T : notnull
+    {
+        return _provider.GetRequiredService<T>();
+    }
+
+    public void SelectSetupParent(object aggregate)
+    {
+        foreach (var setter in _provider.GetRequiredService<IEnumerable<IKrudNodeSetter>>())
+        {
+            setter.SetParent(aggregate);
+        }
+    }
+
     public async Task<IReadOnlyList<Participation>> ReadParticipations()
     {
         return (await _participationRepository.ReadMany()).ToArray();
@@ -76,6 +90,11 @@ internal sealed class JudgeDriver : IAsyncDisposable
         {
             throw new InvalidOperationException($"Judge did not connect to event {enduranceEvent.Id}.");
         }
+    }
+
+    public Task Disconnect()
+    {
+        return _socketService.IsConnected ? _socketService.Disconnect() : Task.CompletedTask;
     }
 
     public Task Record(Snapshot snapshot)

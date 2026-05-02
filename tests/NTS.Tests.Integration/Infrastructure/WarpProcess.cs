@@ -53,6 +53,7 @@ internal sealed class WarpProcess : IAsyncDisposable
         startInfo.Environment["ASPNETCORE_ENVIRONMENT"] = "Development";
         startInfo.Environment["PORT"] = Port.ToString();
         startInfo.Environment["MONGO_CONNECTION_STRING"] = MongoConnectionString;
+        startInfo.Environment["NTS_INTEGRATION_AUTH"] = "true";
         startInfo.Environment["DOTNET_CLI_HOME"] = dotnetHome;
         startInfo.Environment["NUGET_PACKAGES"] = nugetPackages;
 

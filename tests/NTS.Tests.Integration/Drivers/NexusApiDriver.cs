@@ -6,6 +6,14 @@ using NTS.Application.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
+using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
+using SetupAthleteModel = NTS.Application.Contracts.Setup.Models.AthleteModel;
+using SetupClub = NTS.Domain.Setup.Aggregates.Club;
+using SetupClubModel = NTS.Application.Contracts.Setup.Models.ClubModel;
+using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
+using SetupHorseModel = NTS.Application.Contracts.Setup.Models.HorseModel;
+using SetupUpcomingEvent = NTS.Domain.Setup.Aggregates.UpcomingEvent;
+using SetupUpcomingEventModel = NTS.Application.Contracts.Setup.Models.UpcomingEventModel;
 
 namespace NTS.Tests.Integration.Drivers;
 
@@ -46,6 +54,17 @@ internal sealed class NexusApiDriver : IDisposable
         return Send(HttpMethod.Post, $"api/events/{official.EventId}/officials", OfficialModel.MapFrom(official));
     }
 
+    public Task CreateSetupUpcomingEvent(SetupUpcomingEvent setupEvent)
+    {
+        return Send(HttpMethod.Post, "api/upcoming-event", SetupUpcomingEventModel.From(setupEvent));
+    }
+
+    public async Task<EnduranceEvent> ReadEnduranceEvent(int eventId)
+    {
+        var model = await Send<EnduranceEventModel>(HttpMethod.Get, $"api/endurance-event/{eventId}");
+        return model.MapToEntity();
+    }
+
     public async Task<Participation> ReadParticipation(int eventId, int participationId)
     {
         var model = await Send<ParticipationModel>(
@@ -58,6 +77,18 @@ internal sealed class NexusApiDriver : IDisposable
     public async Task<IReadOnlyList<Participation>> ReadParticipations(int eventId)
     {
         var models = await Send<IEnumerable<ParticipationModel>>(HttpMethod.Get, $"api/events/{eventId}/participations");
+        return models.Select(x => x.MapToEntity()).ToArray();
+    }
+
+    public async Task<IReadOnlyList<Ranking>> ReadRankings(int eventId)
+    {
+        var models = await Send<IEnumerable<RankingModel>>(HttpMethod.Get, $"api/events/{eventId}/rankings");
+        return models.Select(x => x.MapToEntity()).ToArray();
+    }
+
+    public async Task<IReadOnlyList<Handout>> ReadHandouts(int eventId)
+    {
+        var models = await Send<IEnumerable<HandoutModel>>(HttpMethod.Get, $"api/events/{eventId}/handouts");
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
@@ -100,6 +131,36 @@ internal sealed class NexusApiDriver : IDisposable
             $"api/events/{eventId}/snapshot-results"
         );
         return models.ToArray();
+    }
+
+    public async Task<IReadOnlyList<SetupClub>> ReadSetupClubs()
+    {
+        var models = await Send<IEnumerable<SetupClubModel>>(HttpMethod.Get, "api/clubs");
+        return models.Select(x => x.MapToEntity()).ToArray();
+    }
+
+    public async Task<IReadOnlyList<SetupHorse>> ReadSetupHorses()
+    {
+        var models = await Send<IEnumerable<SetupHorseModel>>(HttpMethod.Get, "api/horses");
+        return models.Select(x => x.MapToEntity()).ToArray();
+    }
+
+    public async Task<IReadOnlyList<SetupAthlete>> ReadSetupAthletes()
+    {
+        var models = await Send<IEnumerable<SetupAthleteModel>>(HttpMethod.Get, "api/athletes");
+        return models.Select(x => x.MapToEntity()).ToArray();
+    }
+
+    public async Task<IReadOnlyList<SetupUpcomingEvent>> ReadSetupUpcomingEvents()
+    {
+        var models = await Send<IEnumerable<SetupUpcomingEventModel>>(HttpMethod.Get, "api/upcoming-event");
+        return models.Select(x => x.MapToEntity()).ToArray();
+    }
+
+    public async Task<SetupUpcomingEvent> ReadSetupUpcomingEvent(int id)
+    {
+        var model = await Send<SetupUpcomingEventModel>(HttpMethod.Get, $"api/upcoming-event/{id}");
+        return model.MapToEntity();
     }
 
     public void Dispose()

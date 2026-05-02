@@ -1,0 +1,2304 @@
+{
+  "_id": 1324868821,
+  "TenantId": "nts",
+  "Country": {
+    "_id": 37,
+    "TenantId": "nts",
+    "Name": "Bulgaria",
+    "IsoCode": "BGR",
+    "NfCode": "BUL",
+    "Locale": "bg-BG"
+  },
+  "ShowFeiId": null,
+  "FeiId": null,
+  "FeiEventCode": null,
+  "Competitions": [
+    {
+      "_id": 834244819,
+      "Name": "ДП млади ездачи и юноши до 18 г",
+      "Type": "Star",
+      "Ruleset": "FEI",
+      "Start": {
+        "$date": "2026-04-27T05:00:00.000Z"
+      },
+      "CompulsoryThreshold": "00:10:00",
+      "FeiId": null,
+      "FeiRule": null,
+      "FeiScheduleNumber": null,
+      "Phases": [
+        {
+          "_id": 1769878352,
+          "Recovery": 15,
+          "Loop": {
+            "_id": 465301733,
+            "Distance": 31
+          },
+          "Rest": 40
+        },
+        {
+          "_id": 1508156630,
+          "Recovery": 15,
+          "Loop": {
+            "_id": 465301733,
+            "Distance": 31
+          },
+          "Rest": 40
+        },
+        {
+          "_id": 1801563992,
+          "Recovery": 20,
+          "Loop": {
+            "_id": 1547166911,
+            "Distance": 25
+          },
+          "Rest": null
+        }
+      ],
+      "Participations": [
+        {
+          "_id": 1644672613,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 1000649529,
+            "Number": 76,
+            "Athlete": {
+              "_id": 366937524,
+              "TenantId": "nts",
+              "Names": [
+                "Николета",
+                "Зашева"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1649667335,
+                "TenantId": "nts",
+                "Name": "ККС Хипокамп"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 2134604323,
+              "TenantId": "nts",
+              "Name": "Захразат",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": null,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": null
+        },
+        {
+          "_id": 1065118095,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 868875140,
+            "Number": 50,
+            "Athlete": {
+              "_id": 1620154576,
+              "TenantId": "nts",
+              "Names": [
+                "Криста",
+                "Костанян"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1649667335,
+                "TenantId": "nts",
+                "Name": "ККС Хипокамп"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1401451413,
+              "TenantId": "nts",
+              "Name": "Наслада",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 233838947,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 1912975737,
+            "Number": 44,
+            "Athlete": {
+              "_id": 469022959,
+              "TenantId": "nts",
+              "Names": [
+                "Радост",
+                "Бакалова"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 370606565,
+                "TenantId": "nts",
+                "Name": "ККС Буцефал Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1731888373,
+              "TenantId": "nts",
+              "Name": "Павел",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 233998861,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 621581842,
+            "Number": 80,
+            "Athlete": {
+              "_id": 1513951826,
+              "TenantId": "nts",
+              "Names": [
+                "Кристина",
+                "Петрова"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 370606565,
+                "TenantId": "nts",
+                "Name": "ККС Буцефал Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 562718415,
+              "TenantId": "nts",
+              "Name": "Зизитоп",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 679980613,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 621445191,
+            "Number": 2,
+            "Athlete": {
+              "_id": 278618377,
+              "TenantId": "nts",
+              "Names": [
+                "Никол",
+                "Георгиева"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 398976848,
+                "TenantId": "nts",
+                "Name": "ККС Пирует"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 422762458,
+              "TenantId": "nts",
+              "Name": "Деби Ахмир",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 1863036161,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 442221356,
+            "Number": 72,
+            "Athlete": {
+              "_id": 1424823491,
+              "TenantId": "nts",
+              "Names": [
+                "Вероника",
+                "Козарова"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 398976848,
+                "TenantId": "nts",
+                "Name": "ККС Пирует"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 880648928,
+              "TenantId": "nts",
+              "Name": "Пепино Ди Парме",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 1487018003,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 195979988,
+            "Number": 45,
+            "Athlete": {
+              "_id": 1285793646,
+              "TenantId": "nts",
+              "Names": [
+                "Шахин",
+                "Халибрям"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1032560126,
+                "TenantId": "nts",
+                "Name": "ККС Иван Асен II"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 122962385,
+              "TenantId": "nts",
+              "Name": "Пламък",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 361685277,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 433552815,
+            "Number": 22,
+            "Athlete": {
+              "_id": 1076449614,
+              "TenantId": "nts",
+              "Names": [
+                "Йоана",
+                "Кюмюрджийска"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 287722931,
+                "TenantId": "nts",
+                "Name": "ККС Номад Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 461841147,
+              "TenantId": "nts",
+              "Name": "Маваши",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 141568528,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 1682878006,
+            "Number": 40,
+            "Athlete": {
+              "_id": 855380255,
+              "TenantId": "nts",
+              "Names": [
+                "Карина",
+                "Добрева"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 287722931,
+                "TenantId": "nts",
+                "Name": "ККС Номад Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 438892760,
+              "TenantId": "nts",
+              "Name": "Аржентина",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 1787502521,
+          "Category": "JuniorOrYoungAdult",
+          "Combination": {
+            "_id": 485219756,
+            "Number": 54,
+            "Athlete": {
+              "_id": 1644090398,
+              "TenantId": "nts",
+              "Names": [
+                "Невена",
+                "Гайдарова"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1038934009,
+                "TenantId": "nts",
+                "Name": "ККС Аспарух"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1302852622,
+              "TenantId": "nts",
+              "Name": "Зипо",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        }
+      ]
+    },
+    {
+      "_id": 1557344940,
+      "Name": "ДП юноши до 14 години",
+      "Type": "Star",
+      "Ruleset": "Regional",
+      "Start": {
+        "$date": "2026-04-27T06:00:00.000Z"
+      },
+      "CompulsoryThreshold": "00:10:00",
+      "FeiId": null,
+      "FeiRule": null,
+      "FeiScheduleNumber": null,
+      "Phases": [
+        {
+          "_id": 228804746,
+          "Recovery": 15,
+          "Loop": {
+            "_id": 465301733,
+            "Distance": 31
+          },
+          "Rest": 40
+        },
+        {
+          "_id": 260796380,
+          "Recovery": 20,
+          "Loop": {
+            "_id": 465301733,
+            "Distance": 31
+          },
+          "Rest": null
+        }
+      ],
+      "Participations": [
+        {
+          "_id": 212085556,
+          "Category": "Children",
+          "Combination": {
+            "_id": 1423537438,
+            "Number": 64,
+            "Athlete": {
+              "_id": 476285420,
+              "TenantId": "nts",
+              "Names": [
+                "Андрей",
+                "Юруков"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1038934009,
+                "TenantId": "nts",
+                "Name": "ККС Аспарух"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1683681101,
+              "TenantId": "nts",
+              "Name": "Аспарух",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        }
+      ]
+    },
+    {
+      "_id": 1543847229,
+      "Name": "ДП пони ездачи",
+      "Type": "Qualification",
+      "Ruleset": "Regional",
+      "Start": {
+        "$date": "2026-04-27T06:30:00.000Z"
+      },
+      "CompulsoryThreshold": "00:10:00",
+      "FeiId": null,
+      "FeiRule": null,
+      "FeiScheduleNumber": null,
+      "Phases": [
+        {
+          "_id": 63853241,
+          "Recovery": 15,
+          "Loop": {
+            "_id": 1186929788,
+            "Distance": 15
+          },
+          "Rest": 40
+        },
+        {
+          "_id": 1325776437,
+          "Recovery": 20,
+          "Loop": {
+            "_id": 1186929788,
+            "Distance": 15
+          },
+          "Rest": null
+        }
+      ],
+      "Participations": [
+        {
+          "_id": 1201532281,
+          "Category": "Children",
+          "Combination": {
+            "_id": 1158636416,
+            "Number": 38,
+            "Athlete": {
+              "_id": 1531980220,
+              "TenantId": "nts",
+              "Names": [
+                "Деа",
+                "Панайотова"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1649667335,
+                "TenantId": "nts",
+                "Name": "ККС Хипокамп"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 713113661,
+              "TenantId": "nts",
+              "Name": "Амбър",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 681770676,
+          "Category": "Companion",
+          "Combination": {
+            "_id": 227987334,
+            "Number": 51,
+            "Athlete": {
+              "_id": 1017005199,
+              "TenantId": "nts",
+              "Names": [
+                "Христо",
+                "Кумчев"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1649667335,
+                "TenantId": "nts",
+                "Name": "ККС Хипокамп"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 263879902,
+              "TenantId": "nts",
+              "Name": "Меджик",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 133427800,
+          "Category": "Children",
+          "Combination": {
+            "_id": 2124980372,
+            "Number": 68,
+            "Athlete": {
+              "_id": 2061694513,
+              "TenantId": "nts",
+              "Names": [
+                "София",
+                "Георгиева"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 370606565,
+                "TenantId": "nts",
+                "Name": "ККС Буцефал Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1798900436,
+              "TenantId": "nts",
+              "Name": "Текила",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 2039519853,
+          "Category": "Children",
+          "Combination": {
+            "_id": 1346286463,
+            "Number": 36,
+            "Athlete": {
+              "_id": 1805728072,
+              "TenantId": "nts",
+              "Names": [
+                "Витан",
+                "Иванов"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 370606565,
+                "TenantId": "nts",
+                "Name": "ККС Буцефал Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1367387746,
+              "TenantId": "nts",
+              "Name": "Помпей",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 987938828,
+          "Category": "Companion",
+          "Combination": {
+            "_id": 449671187,
+            "Number": 57,
+            "Athlete": {
+              "_id": 1664792569,
+              "TenantId": "nts",
+              "Names": [
+                "Мартин",
+                "Колев"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 370606565,
+                "TenantId": "nts",
+                "Name": "ККС Буцефал Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 60842893,
+              "TenantId": "nts",
+              "Name": "Седеф",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 757072013,
+          "Category": "Companion",
+          "Combination": {
+            "_id": 1262474185,
+            "Number": 59,
+            "Athlete": {
+              "_id": 1663041866,
+              "TenantId": "nts",
+              "Names": [
+                "Стела",
+                "Миткова"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 370606565,
+                "TenantId": "nts",
+                "Name": "ККС Буцефал Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1962118803,
+              "TenantId": "nts",
+              "Name": "Бохем",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        }
+      ]
+    },
+    {
+      "_id": 1506827012,
+      "Name": "Квалификационен турнир 80 км",
+      "Type": "Qualification",
+      "Ruleset": "Regional",
+      "Start": {
+        "$date": "2026-04-27T05:00:00.000Z"
+      },
+      "CompulsoryThreshold": "00:10:00",
+      "FeiId": null,
+      "FeiRule": null,
+      "FeiScheduleNumber": null,
+      "Phases": [
+        {
+          "_id": 202077460,
+          "Recovery": 15,
+          "Loop": {
+            "_id": 465301733,
+            "Distance": 31
+          },
+          "Rest": 40
+        },
+        {
+          "_id": 888724050,
+          "Recovery": 15,
+          "Loop": {
+            "_id": 465301733,
+            "Distance": 31
+          },
+          "Rest": 40
+        },
+        {
+          "_id": 336917009,
+          "Recovery": 20,
+          "Loop": {
+            "_id": 1547166911,
+            "Distance": 25
+          },
+          "Rest": null
+        }
+      ],
+      "Participations": [
+        {
+          "_id": 1814405795,
+          "Category": "Senior",
+          "Combination": {
+            "_id": 992737684,
+            "Number": 67,
+            "Athlete": {
+              "_id": 115752921,
+              "TenantId": "nts",
+              "Names": [
+                "Николай",
+                "Узунов"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 287722931,
+                "TenantId": "nts",
+                "Name": "ККС Номад Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1724163831,
+              "TenantId": "nts",
+              "Name": "Памира Номад",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        }
+      ]
+    },
+    {
+      "_id": 896167378,
+      "Name": "Квалификационен турнир 40 км",
+      "Type": "Qualification",
+      "Ruleset": "Regional",
+      "Start": {
+        "$date": "2026-04-27T06:00:00.000Z"
+      },
+      "CompulsoryThreshold": "00:10:00",
+      "FeiId": null,
+      "FeiRule": null,
+      "FeiScheduleNumber": null,
+      "Phases": [
+        {
+          "_id": 695572892,
+          "Recovery": 15,
+          "Loop": {
+            "_id": 1547166911,
+            "Distance": 25
+          },
+          "Rest": 40
+        },
+        {
+          "_id": 547025098,
+          "Recovery": 20,
+          "Loop": {
+            "_id": 1547166911,
+            "Distance": 25
+          },
+          "Rest": null
+        }
+      ],
+      "Participations": [
+        {
+          "_id": 1418213704,
+          "Category": "Senior",
+          "Combination": {
+            "_id": 542881568,
+            "Number": 28,
+            "Athlete": {
+              "_id": 431979132,
+              "TenantId": "nts",
+              "Names": [
+                "Мария",
+                "Йорданова"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1649667335,
+                "TenantId": "nts",
+                "Name": "ККС Хипокамп"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 947499459,
+              "TenantId": "nts",
+              "Name": "Алек",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 574958789,
+          "Category": "Senior",
+          "Combination": {
+            "_id": 778290182,
+            "Number": 78,
+            "Athlete": {
+              "_id": 523856865,
+              "TenantId": "nts",
+              "Names": [
+                "Мария",
+                "Влайкова"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1649667335,
+                "TenantId": "nts",
+                "Name": "ККС Хипокамп"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1047807821,
+              "TenantId": "nts",
+              "Name": "Кашмира",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 1923494944,
+          "Category": "Senior",
+          "Combination": {
+            "_id": 1082398365,
+            "Number": 19,
+            "Athlete": {
+              "_id": 1526569693,
+              "TenantId": "nts",
+              "Names": [
+                "Николай",
+                "Николов"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 370606565,
+                "TenantId": "nts",
+                "Name": "ККС Буцефал Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 953193509,
+              "TenantId": "nts",
+              "Name": "Блек Дрийм",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 822866788,
+          "Category": "Senior",
+          "Combination": {
+            "_id": 261757742,
+            "Number": 77,
+            "Athlete": {
+              "_id": 683635597,
+              "TenantId": "nts",
+              "Names": [
+                "Денис",
+                "Фурлански"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 370606565,
+                "TenantId": "nts",
+                "Name": "ККС Буцефал Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 205362310,
+              "TenantId": "nts",
+              "Name": "Джава Ал СЕМ",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 1209714417,
+          "Category": "Senior",
+          "Combination": {
+            "_id": 301607551,
+            "Number": 52,
+            "Athlete": {
+              "_id": 569018213,
+              "TenantId": "nts",
+              "Names": [
+                "Симона",
+                "Несторова"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 370606565,
+                "TenantId": "nts",
+                "Name": "ККС Буцефал Ендюранс"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 926288402,
+              "TenantId": "nts",
+              "Name": "Пандора",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 1959171838,
+          "Category": "Senior",
+          "Combination": {
+            "_id": 2022591792,
+            "Number": 56,
+            "Athlete": {
+              "_id": 1133004815,
+              "TenantId": "nts",
+              "Names": [
+                "Емма",
+                "Нардуци"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1407907269,
+                "TenantId": "nts",
+                "Name": "ККС Тракиец"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1276005079,
+              "TenantId": "nts",
+              "Name": "Миднайт Калърс",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        },
+        {
+          "_id": 1880189413,
+          "Category": "Senior",
+          "Combination": {
+            "_id": 2095370197,
+            "Number": 23,
+            "Athlete": {
+              "_id": 2014371187,
+              "TenantId": "nts",
+              "Names": [
+                "Страхил",
+                "Михайлов"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 2085231160,
+                "TenantId": "nts",
+                "Name": "ККС Цар Асен "
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 405736726,
+              "TenantId": "nts",
+              "Name": "Саламан",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        }
+      ]
+    },
+    {
+      "_id": 1076607645,
+      "Name": "Квалификация 60 км",
+      "Type": "Qualification",
+      "Ruleset": "Regional",
+      "Start": {
+        "$date": "2026-04-27T05:00:00.000Z"
+      },
+      "CompulsoryThreshold": "00:10:00",
+      "FeiId": null,
+      "FeiRule": null,
+      "FeiScheduleNumber": null,
+      "Phases": [
+        {
+          "_id": 632719763,
+          "Recovery": 15,
+          "Loop": {
+            "_id": 465301733,
+            "Distance": 31
+          },
+          "Rest": 40
+        },
+        {
+          "_id": 1370880776,
+          "Recovery": 20,
+          "Loop": {
+            "_id": 465301733,
+            "Distance": 31
+          },
+          "Rest": null
+        }
+      ],
+      "Participations": [
+        {
+          "_id": 1145671529,
+          "Category": "Senior",
+          "Combination": {
+            "_id": 346556309,
+            "Number": 39,
+            "Athlete": {
+              "_id": 718815615,
+              "TenantId": "nts",
+              "Names": [
+                "Керим",
+                "Ходжа"
+              ],
+              "Country": {
+                "_id": 1395739409,
+                "TenantId": "nts",
+                "Name": "Bulgaria",
+                "IsoCode": "BGR",
+                "NfCode": "BGN",
+                "Locale": null
+              },
+              "Club": {
+                "_id": 1649667335,
+                "TenantId": "nts",
+                "Name": "ККС Хипокамп"
+              },
+              "FeiId": null,
+              "User": null
+            },
+            "Horse": {
+              "_id": 1100386149,
+              "TenantId": "nts",
+              "Name": "Ел Ксантос",
+              "FeiId": null
+            }
+          },
+          "IsNotRanked": false,
+          "StartTimeOverride": null,
+          "MaxSpeedOverride": 99999,
+          "MinSpeedOverride": 0,
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999
+        }
+      ]
+    }
+  ],
+  "Officials": [
+    {
+      "_id": 1841013491,
+      "Names": [
+        "Теодора",
+        "Костова"
+      ],
+      "Role": "GroundJuryPresident",
+      "User": {
+        "_id": 1699297500,
+        "TenantId": "nts",
+        "Email": "alexchobanov@gmail.com",
+        "Name": "unknown",
+        "Roles": []
+      }
+    },
+    {
+      "_id": 1888405305,
+      "Names": [
+        "Лилия",
+        "Димитрова"
+      ],
+      "Role": "GroundJury",
+      "User": null
+    },
+    {
+      "_id": 1381476360,
+      "Names": [
+        "Витория",
+        "Чобанова"
+      ],
+      "Role": "Steward",
+      "User": null
+    },
+    {
+      "_id": 336762204,
+      "Names": [
+        "Д-р",
+        "Сашо",
+        "Събев"
+      ],
+      "Role": "VeterinaryCommissionPresident",
+      "User": null
+    },
+    {
+      "_id": 281138971,
+      "Names": [
+        "Д-р",
+        "Жанина",
+        "Иванова"
+      ],
+      "Role": "VeterinaryCommissionMember",
+      "User": null
+    },
+    {
+      "_id": 996598463,
+      "Names": [
+        "Д-р",
+        "Ивана",
+        "Гайдарова"
+      ],
+      "Role": "VeterinaryCommissionMember",
+      "User": null
+    }
+  ],
+  "Loops": [
+    {
+      "_id": 465301733,
+      "Distance": 31
+    },
+    {
+      "_id": 1547166911,
+      "Distance": 20
+    },
+    {
+      "_id": 1186929788,
+      "Distance": 15
+    }
+  ],
+  "Combinations": [
+    {
+      "_id": 1000649529,
+      "Number": 76,
+      "Athlete": {
+        "_id": 366937524,
+        "TenantId": "nts",
+        "Names": [
+          "Николета",
+          "Зашева"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1649667335,
+          "TenantId": "nts",
+          "Name": "ККС Хипокамп"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 2134604323,
+        "TenantId": "nts",
+        "Name": "Захразат",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 868875140,
+      "Number": 50,
+      "Athlete": {
+        "_id": 1620154576,
+        "TenantId": "nts",
+        "Names": [
+          "Криста",
+          "Костанян"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1649667335,
+          "TenantId": "nts",
+          "Name": "ККС Хипокамп"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1401451413,
+        "TenantId": "nts",
+        "Name": "Наслада",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 1912975737,
+      "Number": 44,
+      "Athlete": {
+        "_id": 469022959,
+        "TenantId": "nts",
+        "Names": [
+          "Радост",
+          "Бакалова"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 370606565,
+          "TenantId": "nts",
+          "Name": "ККС Буцефал Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1731888373,
+        "TenantId": "nts",
+        "Name": "Павел",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 621581842,
+      "Number": 80,
+      "Athlete": {
+        "_id": 1513951826,
+        "TenantId": "nts",
+        "Names": [
+          "Кристина",
+          "Петрова"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 370606565,
+          "TenantId": "nts",
+          "Name": "ККС Буцефал Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 562718415,
+        "TenantId": "nts",
+        "Name": "Зизитоп",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 621445191,
+      "Number": 2,
+      "Athlete": {
+        "_id": 278618377,
+        "TenantId": "nts",
+        "Names": [
+          "Никол",
+          "Георгиева"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 398976848,
+          "TenantId": "nts",
+          "Name": "ККС Пирует"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 422762458,
+        "TenantId": "nts",
+        "Name": "Деби Ахмир",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 442221356,
+      "Number": 72,
+      "Athlete": {
+        "_id": 1424823491,
+        "TenantId": "nts",
+        "Names": [
+          "Вероника",
+          "Козарова"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 398976848,
+          "TenantId": "nts",
+          "Name": "ККС Пирует"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 880648928,
+        "TenantId": "nts",
+        "Name": "Пепино Ди Парме",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 195979988,
+      "Number": 45,
+      "Athlete": {
+        "_id": 1285793646,
+        "TenantId": "nts",
+        "Names": [
+          "Шахин",
+          "Халибрям"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1032560126,
+          "TenantId": "nts",
+          "Name": "ККС Иван Асен II"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 122962385,
+        "TenantId": "nts",
+        "Name": "Пламък",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 346556309,
+      "Number": 39,
+      "Athlete": {
+        "_id": 718815615,
+        "TenantId": "nts",
+        "Names": [
+          "Керим",
+          "Ходжа"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1649667335,
+          "TenantId": "nts",
+          "Name": "ККС Хипокамп"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1100386149,
+        "TenantId": "nts",
+        "Name": "Ел Ксантос",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 1423537438,
+      "Number": 64,
+      "Athlete": {
+        "_id": 476285420,
+        "TenantId": "nts",
+        "Names": [
+          "Андрей",
+          "Юруков"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1038934009,
+          "TenantId": "nts",
+          "Name": "ККС Аспарух"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1683681101,
+        "TenantId": "nts",
+        "Name": "Аспарух",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 542881568,
+      "Number": 28,
+      "Athlete": {
+        "_id": 431979132,
+        "TenantId": "nts",
+        "Names": [
+          "Мария",
+          "Йорданова"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1649667335,
+          "TenantId": "nts",
+          "Name": "ККС Хипокамп"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 947499459,
+        "TenantId": "nts",
+        "Name": "Алек",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 778290182,
+      "Number": 78,
+      "Athlete": {
+        "_id": 523856865,
+        "TenantId": "nts",
+        "Names": [
+          "Мария",
+          "Влайкова"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1649667335,
+          "TenantId": "nts",
+          "Name": "ККС Хипокамп"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1047807821,
+        "TenantId": "nts",
+        "Name": "Кашмира",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 1082398365,
+      "Number": 19,
+      "Athlete": {
+        "_id": 1526569693,
+        "TenantId": "nts",
+        "Names": [
+          "Николай",
+          "Николов"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 370606565,
+          "TenantId": "nts",
+          "Name": "ККС Буцефал Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 953193509,
+        "TenantId": "nts",
+        "Name": "Блек Дрийм",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 261757742,
+      "Number": 77,
+      "Athlete": {
+        "_id": 683635597,
+        "TenantId": "nts",
+        "Names": [
+          "Денис",
+          "Фурлански"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 370606565,
+          "TenantId": "nts",
+          "Name": "ККС Буцефал Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 205362310,
+        "TenantId": "nts",
+        "Name": "Джава Ал СЕМ",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 301607551,
+      "Number": 52,
+      "Athlete": {
+        "_id": 569018213,
+        "TenantId": "nts",
+        "Names": [
+          "Симона",
+          "Несторова"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 370606565,
+          "TenantId": "nts",
+          "Name": "ККС Буцефал Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 926288402,
+        "TenantId": "nts",
+        "Name": "Пандора",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 2022591792,
+      "Number": 56,
+      "Athlete": {
+        "_id": 1133004815,
+        "TenantId": "nts",
+        "Names": [
+          "Емма",
+          "Нардуци"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1407907269,
+          "TenantId": "nts",
+          "Name": "ККС Тракиец"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1276005079,
+        "TenantId": "nts",
+        "Name": "Миднайт Калърс",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 2095370197,
+      "Number": 23,
+      "Athlete": {
+        "_id": 2014371187,
+        "TenantId": "nts",
+        "Names": [
+          "Страхил",
+          "Михайлов"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 2085231160,
+          "TenantId": "nts",
+          "Name": "ККС Цар Асен "
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 405736726,
+        "TenantId": "nts",
+        "Name": "Саламан",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 1158636416,
+      "Number": 38,
+      "Athlete": {
+        "_id": 1531980220,
+        "TenantId": "nts",
+        "Names": [
+          "Деа",
+          "Панайотова"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1649667335,
+          "TenantId": "nts",
+          "Name": "ККС Хипокамп"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 713113661,
+        "TenantId": "nts",
+        "Name": "Амбър",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 227987334,
+      "Number": 51,
+      "Athlete": {
+        "_id": 1017005199,
+        "TenantId": "nts",
+        "Names": [
+          "Христо",
+          "Кумчев"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1649667335,
+          "TenantId": "nts",
+          "Name": "ККС Хипокамп"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 263879902,
+        "TenantId": "nts",
+        "Name": "Меджик",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 2124980372,
+      "Number": 68,
+      "Athlete": {
+        "_id": 2061694513,
+        "TenantId": "nts",
+        "Names": [
+          "София",
+          "Георгиева"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 370606565,
+          "TenantId": "nts",
+          "Name": "ККС Буцефал Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1798900436,
+        "TenantId": "nts",
+        "Name": "Текила",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 1346286463,
+      "Number": 36,
+      "Athlete": {
+        "_id": 1805728072,
+        "TenantId": "nts",
+        "Names": [
+          "Витан",
+          "Иванов"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 370606565,
+          "TenantId": "nts",
+          "Name": "ККС Буцефал Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1367387746,
+        "TenantId": "nts",
+        "Name": "Помпей",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 449671187,
+      "Number": 57,
+      "Athlete": {
+        "_id": 1664792569,
+        "TenantId": "nts",
+        "Names": [
+          "Мартин",
+          "Колев"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 370606565,
+          "TenantId": "nts",
+          "Name": "ККС Буцефал Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 60842893,
+        "TenantId": "nts",
+        "Name": "Седеф",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 1262474185,
+      "Number": 59,
+      "Athlete": {
+        "_id": 1663041866,
+        "TenantId": "nts",
+        "Names": [
+          "Стела",
+          "Миткова"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 370606565,
+          "TenantId": "nts",
+          "Name": "ККС Буцефал Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1962118803,
+        "TenantId": "nts",
+        "Name": "Бохем",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 433552815,
+      "Number": 22,
+      "Athlete": {
+        "_id": 1076449614,
+        "TenantId": "nts",
+        "Names": [
+          "Йоана",
+          "Кюмюрджийска"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 287722931,
+          "TenantId": "nts",
+          "Name": "ККС Номад Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 461841147,
+        "TenantId": "nts",
+        "Name": "Маваши",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 1682878006,
+      "Number": 40,
+      "Athlete": {
+        "_id": 855380255,
+        "TenantId": "nts",
+        "Names": [
+          "Карина",
+          "Добрева"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 287722931,
+          "TenantId": "nts",
+          "Name": "ККС Номад Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 438892760,
+        "TenantId": "nts",
+        "Name": "Аржентина",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 485219756,
+      "Number": 54,
+      "Athlete": {
+        "_id": 1644090398,
+        "TenantId": "nts",
+        "Names": [
+          "Невена",
+          "Гайдарова"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 1038934009,
+          "TenantId": "nts",
+          "Name": "ККС Аспарух"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1302852622,
+        "TenantId": "nts",
+        "Name": "Зипо",
+        "FeiId": null
+      }
+    },
+    {
+      "_id": 992737684,
+      "Number": 67,
+      "Athlete": {
+        "_id": 115752921,
+        "TenantId": "nts",
+        "Names": [
+          "Николай",
+          "Узунов"
+        ],
+        "Country": {
+          "_id": 1395739409,
+          "TenantId": "nts",
+          "Name": "Bulgaria",
+          "IsoCode": "BGR",
+          "NfCode": "BGN",
+          "Locale": null
+        },
+        "Club": {
+          "_id": 287722931,
+          "TenantId": "nts",
+          "Name": "ККС Номад Ендюранс"
+        },
+        "FeiId": null,
+        "User": null
+      },
+      "Horse": {
+        "_id": 1724163831,
+        "TenantId": "nts",
+        "Name": "Памира Номад",
+        "FeiId": null
+      }
+    }
+  ],
+  "Name": "ДП млади ездачи и юноши, ДП деца, ДП пони ездачи",
+  "Location": "Test"
+}

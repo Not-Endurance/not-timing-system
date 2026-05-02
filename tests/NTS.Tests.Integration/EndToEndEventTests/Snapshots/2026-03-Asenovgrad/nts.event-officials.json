@@ -1,0 +1,81 @@
+[{
+  "_id": 1651587749,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Names": [
+    "Теодора",
+    "Костова"
+  ],
+  "Role": "GroundJuryPresident",
+  "UserId": 1699297500,
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 1736844825,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Names": [
+    "Лилия",
+    "Димитрова"
+  ],
+  "Role": "GroundJury",
+  "UserId": null,
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 2142214481,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Names": [
+    "Витория",
+    "Чобанова"
+  ],
+  "Role": "Steward",
+  "UserId": null,
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 578319499,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Names": [
+    "Д-р",
+    "Сашо",
+    "Събев"
+  ],
+  "Role": "VeterinaryCommissionPresident",
+  "UserId": null,
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 1703330148,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Names": [
+    "Д-р",
+    "Жанина",
+    "Иванова"
+  ],
+  "Role": "VeterinaryCommissionMember",
+  "UserId": null,
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 1739615451,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Names": [
+    "Д-р",
+    "Ивана",
+    "Гайдарова"
+  ],
+  "Role": "VeterinaryCommissionMember",
+  "UserId": null,
+  "IsDeleted": false,
+  "DeletedVersion": null
+}]
