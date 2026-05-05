@@ -27,6 +27,7 @@ internal static class ODataQueryOptionsFactory
 
     static HttpRequest CreateQueryRequest(HttpRequest source)
     {
+        // TODO: check if this is necessary
         // OData expects a normal ASP.NET Core request; isolate it from Azure Functions host features.
         var context = new DefaultHttpContext { RequestServices = source.HttpContext.RequestServices };
         var request = context.Request;

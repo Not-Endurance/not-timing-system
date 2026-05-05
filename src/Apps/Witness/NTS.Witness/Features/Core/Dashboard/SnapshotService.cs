@@ -1,10 +1,10 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
 using Not.Collections;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Observables.Structures;
+using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
 using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
@@ -30,7 +30,7 @@ public class SnapshotService
     readonly Dictionary<int, Participation> _allParticipations = [];
     readonly List<SnapshotGroup> _history = [];
     readonly INtsSocketContext _socketContext;
-    readonly IReadMany<Participation> _participationReader;
+    readonly IEventScopedRepository<Participation> _participationReader;
     readonly List<Participation> _participationsToSnapshot = [];
     readonly ISnapshotPublisher _snapshotPublisher;
     readonly List<Snapshot> _snapshots = [];
@@ -38,7 +38,7 @@ public class SnapshotService
 
     public SnapshotService(
         INtsSocketContext socketContext,
-        IReadMany<Participation> participationReader,
+        IEventScopedRepository<Participation> participationReader,
         IWitnessUserSession userSessionService,
         ISnapshotPublisher snapshotPublisher
     )

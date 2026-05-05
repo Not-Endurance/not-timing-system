@@ -55,9 +55,6 @@ public static class NtsStorageServices
             where TImplementation : class, IEventScopedRepository<T>
         {
             _services.AddTransient<IEventScopedRepository<T>, TImplementation>();
-            _services.AddTransient<IReadMany<T>>(provider =>
-                provider.GetRequiredService<IEventScopedRepository<T>>()
-            );
         }
     }
 }

@@ -1,4 +1,5 @@
-using Not.Application.CRUD.Ports;
+using System.Linq.Expressions;
+using NTS.Application.Contracts.Core;
 using NTS.Application.Factories;
 using NTS.Application.Startlists;
 using NTS.Domain.Aggregates;
@@ -296,7 +297,7 @@ public class StartlistServiceTests
         return new DateTimeOffset(utcDate + timeOfDay, TimeSpan.Zero);
     }
 
-    sealed class MutableParticipationRepository : IReadMany<Participation>
+    sealed class MutableParticipationRepository : IEventScopedRepository<Participation>
     {
         public MutableParticipationRepository(IEnumerable<Participation> items)
         {
@@ -311,11 +312,55 @@ public class StartlistServiceTests
         }
 
         public Task<IEnumerable<Participation>> ReadMany(
-            System.Linq.Expressions.Expression<Func<Participation, bool>> filter
+            Expression<Func<Participation, bool>> filter
         )
         {
             var predicate = filter.Compile();
             return Task.FromResult<IEnumerable<Participation>>(Items.Where(predicate).ToList());
+        }
+
+        public Task Create(Participation item)
+        {
+            Items.Add(item);
+            return Task.CompletedTask;
+        }
+
+        public Task<Participation?> Read(int id)
+        {
+            return Task.FromResult(Items.FirstOrDefault(x => x.Id == id));
+        }
+
+        public Task<Participation?> Read(Expression<Func<Participation, bool>> filter)
+        {
+            var predicate = filter.Compile();
+            return Task.FromResult(Items.FirstOrDefault(predicate));
+        }
+
+        public Task Update(Participation item)
+        {
+            Items.RemoveAll(x => x.Id == item.Id);
+            Items.Add(item);
+            return Task.CompletedTask;
+        }
+
+        public Task Delete(Participation item)
+        {
+            Items.RemoveAll(x => x.Id == item.Id);
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteMany(IEnumerable<Participation> items)
+        {
+            var ids = items.Select(x => x.Id).ToHashSet();
+            Items.RemoveAll(x => ids.Contains(x.Id));
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteMany(Expression<Func<Participation, bool>> filter)
+        {
+            var predicate = filter.Compile();
+            Items.RemoveAll(x => predicate(x));
+            return Task.CompletedTask;
         }
     }
 }

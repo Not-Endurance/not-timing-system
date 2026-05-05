@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
-using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
+using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
@@ -118,9 +118,9 @@ public class WitnessAccessStateTests
         }
     }
 
-    sealed class TestOfficialReader : IReadMany<Official>
+    sealed class TestOfficialReader : IEventScopedRepository<Official>
     {
-        readonly IReadOnlyList<Official> _officials;
+        readonly List<Official> _officials;
 
         public TestOfficialReader(IEnumerable<Official> officials)
         {
@@ -136,6 +136,50 @@ public class WitnessAccessStateTests
         {
             var predicate = filter.Compile();
             return Task.FromResult<IEnumerable<Official>>(_officials.Where(predicate).ToList());
+        }
+
+        public Task Create(Official item)
+        {
+            _officials.Add(item);
+            return Task.CompletedTask;
+        }
+
+        public Task<Official?> Read(int id)
+        {
+            return Task.FromResult(_officials.FirstOrDefault(x => x.Id == id));
+        }
+
+        public Task<Official?> Read(Expression<Func<Official, bool>> filter)
+        {
+            var predicate = filter.Compile();
+            return Task.FromResult(_officials.FirstOrDefault(predicate));
+        }
+
+        public Task Update(Official item)
+        {
+            _officials.RemoveAll(x => x.Id == item.Id);
+            _officials.Add(item);
+            return Task.CompletedTask;
+        }
+
+        public Task Delete(Official item)
+        {
+            _officials.RemoveAll(x => x.Id == item.Id);
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteMany(IEnumerable<Official> items)
+        {
+            var ids = items.Select(x => x.Id).ToHashSet();
+            _officials.RemoveAll(x => ids.Contains(x.Id));
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteMany(Expression<Func<Official, bool>> filter)
+        {
+            var predicate = filter.Compile();
+            _officials.RemoveAll(x => predicate(x));
+            return Task.CompletedTask;
         }
     }
 
