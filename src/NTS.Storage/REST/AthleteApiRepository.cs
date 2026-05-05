@@ -1,6 +1,5 @@
 ﻿using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
-using Not.Injection;
 using Not.Storage.REST;
 using NTS.Application.Contracts.Setup;
 using NTS.Application.Contracts.Setup.Models;
@@ -8,8 +7,8 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public class AthleteRestApiRepository : ApiRepository<Athlete, AthleteModel>, ITransient
+public class AthleteApiRepository : ApiRepository<Athlete, AthleteModel>
 {
-    public AthleteRestApiRepository(NHttpClient client)
+    public AthleteApiRepository(NHttpClient client)
         : base("athletes", client) { }
 }

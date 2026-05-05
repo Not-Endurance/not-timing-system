@@ -1,6 +1,5 @@
 using Not.Application.DomainEvents;
 using Not.Application.HTTP;
-using Not.Injection;
 using Not.Storage.REST;
 using Not.Structures;
 using NTS.Application.Contracts.Setup;
@@ -10,11 +9,11 @@ using NTS.Domain.Setup.Events;
 
 namespace NTS.Storage.REST;
 
-public class UpcomingEventRestApiRepository : ApiRepository<UpcomingEvent, UpcomingEventModel>, ITransient
+public class UpcomingEventApiRepository : ApiRepository<UpcomingEvent, UpcomingEventModel>
 {
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
-    public UpcomingEventRestApiRepository(NHttpClient httpClient, IDomainEventDispatcher domainEventDispatcher)
+    public UpcomingEventApiRepository(NHttpClient httpClient, IDomainEventDispatcher domainEventDispatcher)
         : base("upcoming-event", httpClient)
     {
         _domainEventDispatcher = domainEventDispatcher;

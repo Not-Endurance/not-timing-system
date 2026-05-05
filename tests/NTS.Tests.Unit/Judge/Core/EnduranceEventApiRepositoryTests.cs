@@ -16,7 +16,7 @@ using NTS.Storage.Core.Repositories;
 
 namespace NTS.Judge.Tests.Core;
 
-public class EnduranceEventRestRepositoryTests
+public class EnduranceEventApiRepositoryTests
 {
     [Fact]
     public async Task ReadActive_calls_active_endpoint_and_maps_events()
@@ -31,7 +31,7 @@ public class EnduranceEventRestRepositoryTests
             ResponseFactory = _ => CreateJsonResponse(Result.Success<IEnumerable<EnduranceEventModel>>(models)),
         };
         var client = CreateClient(handler);
-        var repository = new EnduranceEventRestRepository(client, new TestSocketContext());
+        var repository = new EnduranceEventApiRepository(client, new TestSocketContext());
 
         var result = (await repository.ReadActive()).ToList();
 
@@ -55,7 +55,7 @@ public class EnduranceEventRestRepositoryTests
             ResponseFactory = _ => CreateJsonResponse(Result.Success<IEnumerable<EnduranceEventModel>>(models)),
         };
         var client = CreateClient(handler);
-        var repository = new EnduranceEventRestRepository(client, new TestSocketContext());
+        var repository = new EnduranceEventApiRepository(client, new TestSocketContext());
 
         var result = (await repository.ReadPast()).ToList();
 
@@ -75,7 +75,7 @@ public class EnduranceEventRestRepositoryTests
             ResponseFactory = _ => CreateJsonResponse(Result.Success(model)),
         };
         var client = CreateClient(handler);
-        var repository = new EnduranceEventRestRepository(client, new TestSocketContext());
+        var repository = new EnduranceEventApiRepository(client, new TestSocketContext());
 
         var result = await repository.Start(14);
 
@@ -95,7 +95,7 @@ public class EnduranceEventRestRepositoryTests
             ResponseFactory = _ => CreateJsonResponse(Result.Failure<EnduranceEventModel>("Start blocked")),
         };
         var client = CreateClient(handler);
-        var repository = new EnduranceEventRestRepository(client, new TestSocketContext());
+        var repository = new EnduranceEventApiRepository(client, new TestSocketContext());
 
         var exception = await Assert.ThrowsAsync<DomainException>(() => repository.Start(14));
 
@@ -107,7 +107,7 @@ public class EnduranceEventRestRepositoryTests
     {
         var handler = new RecordingHttpMessageHandler();
         var client = CreateClient(handler);
-        var repository = new EnduranceEventRestRepository(client, new TestSocketContext { Event = CreateEvent(14) });
+        var repository = new EnduranceEventApiRepository(client, new TestSocketContext { Event = CreateEvent(14) });
 
         await repository.Reset();
 
@@ -121,7 +121,7 @@ public class EnduranceEventRestRepositoryTests
     {
         var handler = new RecordingHttpMessageHandler();
         var client = CreateClient(handler);
-        var repository = new EnduranceEventRestRepository(client, new TestSocketContext());
+        var repository = new EnduranceEventApiRepository(client, new TestSocketContext());
 
         await repository.Reset();
 

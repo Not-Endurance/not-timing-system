@@ -1,7 +1,6 @@
 using Not.Application.HTTP;
 using Not.Domain.Exceptions;
 using Not.Exceptions;
-using Not.Injection;
 using Not.Storage.REST;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
@@ -11,14 +10,13 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class EnduranceEventRestRepository
+public class EnduranceEventApiRepository
     : ApiRepository<EnduranceEvent, EnduranceEventModel>,
-        IEnduranceEventRepository,
-        ITransient
+        IEnduranceEventRepository
 {
     readonly INtsSocketContext _socketContext;
 
-    public EnduranceEventRestRepository(NHttpClient client, INtsSocketContext socketContext)
+    public EnduranceEventApiRepository(NHttpClient client, INtsSocketContext socketContext)
         : base("endurance-event", client)
     {
         _socketContext = socketContext;

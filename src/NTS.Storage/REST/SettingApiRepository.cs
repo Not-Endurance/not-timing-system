@@ -1,5 +1,4 @@
 ﻿using Not.Application.HTTP;
-using Not.Injection;
 using Not.Storage.REST;
 using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
@@ -8,9 +7,9 @@ using NTS.Domain.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public class SettingRestApiRepository : ApiRepository<Setting, SettingModel>, ISettingRepository, ITransient
+public class SettingApiRepository : ApiRepository<Setting, SettingModel>, ISettingRepository
 {
-    public SettingRestApiRepository(NHttpClient client)
+    public SettingApiRepository(NHttpClient client)
         : base("settings", client) { }
 
     public async Task<Setting?> Get(Guid accountId)

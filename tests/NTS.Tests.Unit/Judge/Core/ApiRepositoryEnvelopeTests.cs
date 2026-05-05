@@ -12,7 +12,7 @@ using NTS.Judge.Tests.Core.Implementations;
 
 namespace NTS.Judge.Tests.Core;
 
-public class RestApiRepositoryEnvelopeTests
+public class ApiRepositoryEnvelopeTests
 {
     [Fact]
     public async Task Create_warns_when_result_envelope_contains_validation_errors()
@@ -26,7 +26,7 @@ public class RestApiRepositoryEnvelopeTests
             {
                 ResponseFactory = _ => CreateJsonResponse(Result.Failure("Validation warning")),
             };
-            var repository = new TestRestRepository(CreateClient(handler));
+            var repository = new TestApiRepository(CreateClient(handler));
 
             await repository.Create(new TestEntity(7, "Test"));
 
@@ -54,7 +54,7 @@ public class RestApiRepositoryEnvelopeTests
                     Content = new StringContent("boom"),
                 },
             };
-            var repository = new TestRestRepository(CreateClient(handler));
+            var repository = new TestApiRepository(CreateClient(handler));
 
             await repository.Create(new TestEntity(7, "Test"));
 
@@ -116,9 +116,9 @@ public class RestApiRepositoryEnvelopeTests
         }
     }
 
-    sealed class TestRestRepository : RestApiRepository<TestEntity, TestModel>
+    sealed class TestApiRepository : ApiRepository<TestEntity, TestModel>
     {
-        public TestRestRepository(NHttpClient client)
+        public TestApiRepository(NHttpClient client)
             : base("tests", client) { }
     }
 

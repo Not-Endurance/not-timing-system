@@ -266,12 +266,12 @@ public class DashServiceTests
             return Task.CompletedTask;
         }
 
-        public Task Delete(Expression<Func<EnduranceEvent, bool>> filter)
+        public Task DeleteMany(Expression<Func<EnduranceEvent, bool>> filter)
         {
             return Task.CompletedTask;
         }
 
-        public Task Delete(IEnumerable<EnduranceEvent> items)
+        public Task DeleteMany(IEnumerable<EnduranceEvent> items)
         {
             return Task.CompletedTask;
         }

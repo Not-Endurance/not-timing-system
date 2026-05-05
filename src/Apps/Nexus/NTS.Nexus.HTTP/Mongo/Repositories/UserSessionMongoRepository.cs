@@ -8,14 +8,14 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class UserSessionRepository
+public class UserSessionMongoRepository
     : MongoRepository<NtsUserSessionModel>,
         INtsUserSessionRepository,
         INUserSessionRepository<NtsUserSessionStateModel>
 {
     readonly ITelemetryService _telemetry;
 
-    public UserSessionRepository(IMongoContext context, ITelemetryService telemetry)
+    public UserSessionMongoRepository(IMongoContext context, ITelemetryService telemetry)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.USER_SESSIONS_COLLECTION)
     {
         _telemetry = telemetry;
@@ -23,7 +23,7 @@ public class UserSessionRepository
 
     protected override UpdateDefinition<NtsUserSessionModel> GetUpdateDefinition(NtsUserSessionModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(UserSessionRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(nameof(UserSessionMongoRepository), nameof(GetUpdateDefinition));
 
         return Builders<NtsUserSessionModel>
             .Update.Set(x => x.UserIdentifier, document.UserIdentifier)
@@ -32,7 +32,7 @@ public class UserSessionRepository
 
     public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
     {
-        using var activity = _telemetry.StartActivity(nameof(UserSessionRepository), nameof(ReadByUserIdentifier));
+        using var activity = _telemetry.StartActivity(nameof(UserSessionMongoRepository), nameof(ReadByUserIdentifier));
 
         if (string.IsNullOrWhiteSpace(userIdentifier))
         {

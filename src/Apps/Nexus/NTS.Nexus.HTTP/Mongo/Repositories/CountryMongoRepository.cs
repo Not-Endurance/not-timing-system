@@ -7,11 +7,11 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class CountryRepository : MongoRepository<CountryModel>
+public class CountryMongoRepository : MongoRepository<CountryModel>
 {
     readonly ITelemetryService _telemetry;
 
-    public CountryRepository(IMongoContext context, ITelemetryService telemetry)
+    public CountryMongoRepository(IMongoContext context, ITelemetryService telemetry)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.COUNTRIES_COLLECTION)
     {
         _telemetry = telemetry;
@@ -19,7 +19,7 @@ public class CountryRepository : MongoRepository<CountryModel>
 
     protected override UpdateDefinition<CountryModel> GetUpdateDefinition(CountryModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(CountryRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(nameof(CountryMongoRepository), nameof(GetUpdateDefinition));
 
         try
         {

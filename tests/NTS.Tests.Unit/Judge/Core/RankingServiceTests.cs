@@ -181,14 +181,14 @@ public class RankingServiceTests
             return Task.CompletedTask;
         }
 
-        public Task Delete(Expression<Func<T, bool>> filter)
+        public Task DeleteMany(Expression<Func<T, bool>> filter)
         {
             var predicate = filter.Compile();
             _items.RemoveAll(x => predicate(x));
             return Task.CompletedTask;
         }
 
-        public Task Delete(IEnumerable<T> items)
+        public Task DeleteMany(IEnumerable<T> items)
         {
             var ids = items.Select(x => x.Id).ToHashSet();
             _items.RemoveAll(x => ids.Contains(x.Id));

@@ -7,11 +7,11 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class ClubRepository : MongoRepository<ClubModel>
+public class ClubMongoRepository : MongoRepository<ClubModel>
 {
     readonly ITelemetryService _telemetry;
 
-    public ClubRepository(IMongoContext context, ITelemetryService telemetry)
+    public ClubMongoRepository(IMongoContext context, ITelemetryService telemetry)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.CLUBS_COLLECTION)
     {
         _telemetry = telemetry;
@@ -19,7 +19,7 @@ public class ClubRepository : MongoRepository<ClubModel>
 
     protected override UpdateDefinition<ClubModel> GetUpdateDefinition(ClubModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(ClubRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(nameof(ClubMongoRepository), nameof(GetUpdateDefinition));
 
         try
         {

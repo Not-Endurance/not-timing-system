@@ -51,6 +51,16 @@ internal sealed class NexusApiDriver : IDisposable
         return Send(HttpMethod.Post, "api/officials", OfficialModel.MapFrom(official));
     }
 
+    public Task Create(Ranking ranking)
+    {
+        return Send(HttpMethod.Post, "api/rankings", RankingModel.From(ranking));
+    }
+
+    public Task Create(Handout handout)
+    {
+        return Send(HttpMethod.Post, "api/handouts", HandoutModel.From(handout));
+    }
+
     public Task CreateSetupUpcomingEvent(SetupUpcomingEvent setupEvent)
     {
         return Send(HttpMethod.Post, "api/upcoming-event", SetupUpcomingEventModel.From(setupEvent));
@@ -83,6 +93,12 @@ internal sealed class NexusApiDriver : IDisposable
     public async Task<IReadOnlyList<Ranking>> ReadRankings(int eventId)
     {
         var models = await Send<IEnumerable<RankingModel>>(HttpMethod.Get, EventFilter("api/rankings", eventId));
+        return models.Select(x => x.MapToEntity()).ToArray();
+    }
+
+    public async Task<IReadOnlyList<Official>> ReadOfficials(int eventId)
+    {
+        var models = await Send<IEnumerable<OfficialModel>>(HttpMethod.Get, EventFilter("api/officials", eventId));
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 

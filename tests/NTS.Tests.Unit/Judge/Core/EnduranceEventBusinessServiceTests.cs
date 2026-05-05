@@ -335,12 +335,12 @@ public class EnduranceEventBusinessServiceTests
             return Task.CompletedTask;
         }
 
-        public Task Delete(Expression<Func<T, bool>> filter)
+        public Task DeleteMany(Expression<Func<T, bool>> filter)
         {
             return Task.CompletedTask;
         }
 
-        public Task Delete(IEnumerable<T> items)
+        public Task DeleteMany(IEnumerable<T> items)
         {
             return Task.CompletedTask;
         }

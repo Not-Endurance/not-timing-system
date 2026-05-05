@@ -12,14 +12,15 @@ namespace NTS.Tests.Integration.Drivers;
 
 internal static class IntegrationPayloadFactory
 {
-    public static EnduranceEvent EnduranceEvent(int eventId)
+    public static EnduranceEvent EnduranceEvent(int eventId, EventSpan? eventSpan = null, string? name = null)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var today = DateTimeOffset.UtcNow.Date;
         return new EnduranceEvent(
             country,
-            "Integration Event",
+            name ?? "Integration Event",
             "Sofia",
-            new EventSpan(DateTimeOffset.UtcNow.Date, DateTimeOffset.UtcNow.Date.AddDays(1)),
+            eventSpan ?? new EventSpan(today, today.AddDays(1)),
             null,
             null,
             null,
@@ -27,11 +28,15 @@ internal static class IntegrationPayloadFactory
         );
     }
 
-    public static Participation ActiveParticipation(int eventId, int participationNumber)
+    public static Participation ActiveParticipation(int eventId, int participationNumber, int? id = null)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete(new Person(["Integration", "Rider"]), country, null, null, 101);
-        var horse = new Horse("Integration Horse", null, 201);
+        var athleteId = id == null ? 101 : id.Value + 100;
+        var horseId = id == null ? 201 : id.Value + 200;
+        var combinationId = id == null ? 301 : id.Value + 300;
+        var phaseId = id == null ? 401 : id.Value + 400;
+        var athlete = new Athlete(new Person(["Integration", "Rider"]), country, null, null, athleteId);
+        var horse = new Horse("Integration Horse", null, horseId);
         var combination = new Combination(
             participationNumber,
             athlete,
@@ -40,7 +45,7 @@ internal static class IntegrationPayloadFactory
             distance: "40",
             minAverageSpeed: null,
             maxAverageSpeed: null,
-            id: 301
+            id: combinationId
         );
         var competition = new Competition("CEI 1*", CompetitionRuleset.FEI, CompetitionType.Qualification);
         var phase = new Phase(
@@ -58,7 +63,7 @@ internal static class IntegrationPayloadFactory
             isRepresentationRequested: false,
             isRequiredInspectionRequested: false,
             isRequiredInspectionCompulsory: false,
-            id: 401
+            id: phaseId
         );
 
         return new Participation(
@@ -68,19 +73,49 @@ internal static class IntegrationPayloadFactory
             new PhaseCollection([phase]),
             notQualified: null,
             eventId,
-            id: 501
+            id: id ?? 501
         );
     }
 
-    public static Official Official(int eventId, int userId)
+    public static Official Official(int eventId, int? userId, int? id = null)
     {
         return new Official(
             new Person(["Integration", "Official"]),
             OfficialRole.GroundJury,
             eventId,
-            id: 601,
+            id: id ?? 601,
             userId: userId
         );
+    }
+
+    public static Ranking Ranking(
+        int eventId,
+        IEnumerable<Participation> participations,
+        int? id = null,
+        string? name = null
+    )
+    {
+        var entries = participations.Select((participation, index) =>
+            new RankingEntry(participation, index + 1, false, id + index + 1)
+        );
+
+        return new Ranking(
+            name ?? "Integration Ranking",
+            CompetitionRuleset.FEI,
+            CompetitionType.Qualification,
+            ParticipationCategory.Senior,
+            null,
+            null,
+            null,
+            entries,
+            eventId,
+            id ?? 701
+        );
+    }
+
+    public static Handout Handout(Participation participation, int? id = null)
+    {
+        return new Handout(participation, id ?? 801);
     }
 
     public static Snapshot AutomaticSnapshot(int participationNumber, DateTimeOffset timestamp)

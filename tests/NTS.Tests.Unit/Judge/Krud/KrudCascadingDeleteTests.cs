@@ -318,14 +318,14 @@ public class KrudCascadingDeleteTests
             return Task.CompletedTask;
         }
 
-        public Task Delete(Expression<Func<UpcomingEvent, bool>> filter)
+        public Task DeleteMany(Expression<Func<UpcomingEvent, bool>> filter)
         {
             var predicate = filter.Compile();
             _items.RemoveAll(x => predicate(x));
             return Task.CompletedTask;
         }
 
-        public Task Delete(IEnumerable<UpcomingEvent> items)
+        public Task DeleteMany(IEnumerable<UpcomingEvent> items)
         {
             var set = items.ToHashSet();
             _items.RemoveAll(x => set.Contains(x));

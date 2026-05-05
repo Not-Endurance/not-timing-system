@@ -1,11 +1,19 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Not.Application.Authentication.Abstractions;
 using Not.Application.CRUD.Ports;
 using Not.Filesystem;
 using Not.Storage;
 using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Watcher.Models;
+using NTS.Application.Core;
+using NTS.Application.Settings;
+using NTS.Application.Setup;
+using NTS.Application.UserSession;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Storage.Core.Repositories;
 using NTS.Storage.REST;
 
@@ -39,9 +47,19 @@ public static class NtsStorageServices
             _nStorageBuilder.AddRestApiStorage(Assembly.GetExecutingAssembly());
             _services.AddTransient(typeof(EventScopeFactory<>));
 
-            _services.AddTransient<IRepository<Participation>, ParticipationRestApiRepository>();
-            _services.AddTransient<IRepository<Ranking>, RankingRestApiRepository>();
-            _services.AddTransient<IRepository<Official>, OfficialRestApiRepository>();
+            _services.AddTransient<IEnduranceEventRepository, EnduranceEventApiRepository>();
+            _services.AddTransient<ISettingRepository, SettingApiRepository>();
+            _services.AddTransient<INtsUserSessionRepository, UserSessionApiRepository>();
+            _services.AddTransient<INUserSessionRepository<NtsUserSessionStateModel>, UserSessionApiRepository>();
+            _services.AddTransient<IRepository<Participation>, ParticipationApiRepository>();
+            _services.AddTransient<IRepository<Ranking>, RankingApiRepository>();
+            _services.AddTransient<IRepository<Official>, OfficialApiRepository>();
+            _services.AddTransient<IRepository<Country>, CountryApiRepository>();
+            _services.AddTransient<IRepository<Club>, ClubApiRepository>();
+            _services.AddTransient<IRepository<Horse>, HorseApiRepository>();
+            _services.AddTransient<IRepository<Athlete>, AthleteApiRepository>();
+            _services.AddTransient<IRepository<UpcomingEvent>, UpcomingEventApiRepository>();
+            _services.AddTransient<IUserEmailLookup, UserApiRepository>();
 
             AddEventScopedRepository<Participation, ParticipationEventScopedApiRepository>();
             AddEventScopedRepository<Ranking, RankingEventScopedApiRepository>();

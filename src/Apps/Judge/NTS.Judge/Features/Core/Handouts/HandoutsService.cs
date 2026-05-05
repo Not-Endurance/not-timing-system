@@ -80,7 +80,7 @@ public class HandoutsService
 
     public async Task<IEnumerable<Combination>> GetCombinations()
     {
-        return await SafeHelper.Run(SafeGetCombinations) ?? [];
+        return await SafeHelper.RunWithError(SafeGetCombinations);
     }
 
     public async Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)

@@ -12,7 +12,6 @@ public static class KrudServiceCollectionExtensions
 {
     public static KrudBuilder ConfigureKrud(this IServiceCollection services)
     {
-        services.AddTransient(typeof(IRepository<>), typeof(KrudInMemoryNodeRepository<>));
         services.AddTransient(typeof(KrudDialogService<,>));
         return new(services);
     }
@@ -39,21 +38,22 @@ public static class KrudServiceCollectionExtensions
             );
         }
 
-        var meta = KrudGraphMetadata.Build(typeof(T));
-        RegisterMirrors<T>(services, meta, lifetime);
+        var metadata = KrudGraphMetadata.Build(typeof(T));
+        RegisterMirrors<T>(services, metadata, lifetime);
 
-        if (meta.IsFlatAggregate)
+        if (metadata.IsFlatAggregate)
         {
             return services;
         }
 
         services.Add(new(typeof(KrudGraphContext<T>), typeof(KrudGraphContext<T>), lifetime));
+        RegisterKrudNodeRepositories(services, metadata, lifetime);
         services.Add(new(typeof(IKrudNodeSetter), sp => sp.GetRequiredService<KrudGraphContext<T>>(), lifetime));
         services.Add(
             new(typeof(IKrudDependencyResolver), sp => sp.GetRequiredService<KrudGraphContext<T>>(), lifetime)
         );
 
-        foreach (var @interface in meta.KrudParentNodeOfClosedInterfaces)
+        foreach (var @interface in metadata.KrudParentNodeOfClosedInterfaces)
         {
             services.Add(
                 new(
@@ -73,6 +73,91 @@ public static class KrudServiceCollectionExtensions
         );
 
         return services;
+    }
+
+    static void RegisterKrudNodeRepositories(IServiceCollection services, KrudGraphMetadata meta, ServiceLifetime lifetime)
+    {
+        var registrations = meta
+            .KrudParentNodeOfClosedInterfaces.Select(parentNodeInterface => new
+            {
+                ChildType = parentNodeInterface.GetGenericArguments()[0],
+                ParentNodeInterface = parentNodeInterface,
+            })
+            .GroupBy(x => x.ChildType);
+
+        foreach (var registration in registrations)
+        {
+            var closedRegistrations = registration.ToList();
+            if (closedRegistrations.Count > 1)
+            {
+                var parentNodes = string.Join(", ", closedRegistrations.Select(x => x.ParentNodeInterface.FullName));
+                throw new InvalidOperationException(
+                    $"Cannot register Krud in-memory repository for '{registration.Key.FullName}' because multiple parent nodes were found: {parentNodes}"
+                );
+            }
+
+            RegisterKrudNodeRepository(
+                services,
+                closedRegistrations[0].ChildType,
+                closedRegistrations[0].ParentNodeInterface,
+                lifetime
+            );
+        }
+    }
+
+    static void RegisterKrudNodeRepository(
+        IServiceCollection services,
+        Type childType,
+        Type parentNodeInterface,
+        ServiceLifetime lifetime
+    )
+    {
+        var serviceType = typeof(IRepository<>).MakeGenericType(childType);
+        var repositoryType = typeof(KrudInMemoryNodeRepository<>).MakeGenericType(childType);
+
+        EnsureNoExistingRepositoryRegistration(services, serviceType, childType);
+
+        services.Add(
+            new ServiceDescriptor(
+                serviceType,
+                sp =>
+                {
+                    var parentNode = sp.GetRequiredService(parentNodeInterface);
+                    var resolvers = sp.GetServices<IKrudDependencyResolver>();
+                    return ActivatorUtilities.CreateInstance(sp, repositoryType, parentNode, resolvers);
+                },
+                lifetime
+            )
+        );
+    }
+
+    static void EnsureNoExistingRepositoryRegistration(IServiceCollection services, Type serviceType, Type childType)
+    {
+        var existing = services.Where(x => x.ServiceType == serviceType).Select(Describe).ToList();
+        if (!existing.Any())
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"Cannot register Krud in-memory repository for '{childType.FullName}' because '{serviceType.FullName}' is already registered: {string.Join("; ", existing)}"
+        );
+    }
+
+    static string Describe(ServiceDescriptor descriptor)
+    {
+        if (descriptor.ImplementationType != null)
+        {
+            return descriptor.ImplementationType.FullName ?? descriptor.ImplementationType.Name;
+        }
+
+        if (descriptor.ImplementationInstance != null)
+        {
+            return descriptor.ImplementationInstance.GetType().FullName
+                ?? descriptor.ImplementationInstance.GetType().Name;
+        }
+
+        return descriptor.ImplementationFactory == null ? "<unknown>" : "<factory>";
     }
 
     static void RegisterMirrors<T>(IServiceCollection services, KrudGraphMetadata meta, ServiceLifetime lifetime)

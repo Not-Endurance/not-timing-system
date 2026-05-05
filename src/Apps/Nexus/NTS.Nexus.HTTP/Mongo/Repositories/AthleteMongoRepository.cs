@@ -7,11 +7,11 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class AthleteRepository : MongoRepository<AthleteModel>
+public class AthleteMongoRepository : MongoRepository<AthleteModel>
 {
     readonly ITelemetryService _telemetry;
 
-    public AthleteRepository(IMongoContext context, ITelemetryService telemetry)
+    public AthleteMongoRepository(IMongoContext context, ITelemetryService telemetry)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.ATHLETES_COLLECTION)
     {
         _telemetry = telemetry;
@@ -19,7 +19,7 @@ public class AthleteRepository : MongoRepository<AthleteModel>
 
     protected override UpdateDefinition<AthleteModel> GetUpdateDefinition(AthleteModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(AthleteRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(nameof(AthleteMongoRepository), nameof(GetUpdateDefinition));
 
         try
         {

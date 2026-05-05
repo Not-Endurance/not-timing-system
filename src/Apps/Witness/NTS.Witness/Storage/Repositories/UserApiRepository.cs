@@ -1,18 +1,17 @@
 using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.HTTP;
-using Not.Injection;
 using Not.Notify;
 using Not.Structures;
 using NTS.Witness.Contracts.API;
 
 namespace NTS.Witness.Storage.Repositories;
 
-public class UserRestRepository : IUserRegister, ITransient
+public class UserApiRepository : IUserRegister
 {
     readonly NHttpClient _client;
 
-    public UserRestRepository(NHttpClient client)
+    public UserApiRepository(NHttpClient client)
     {
         _client = client;
     }

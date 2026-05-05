@@ -1,6 +1,5 @@
 using Not.Application.Authentication.User;
 using Not.Application.HTTP;
-using Not.Injection;
 using Not.Storage.REST;
 using Not.Strings;
 using NTS.Application.Contracts.Setup;
@@ -10,9 +9,9 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public class UserRestApiRepository : ApiRepository<User, UserModel>, IUserEmailLookup, ITransient
+public class UserApiRepository : ApiRepository<User, UserModel>, IUserEmailLookup
 {
-    public UserRestApiRepository(NHttpClient client)
+    public UserApiRepository(NHttpClient client)
         : base("users", client) { }
 
     public async Task<User?> ReadByEmail(string email)

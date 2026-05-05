@@ -130,12 +130,12 @@ public class EnduranceEventServiceTests
             throw new NotImplementedException();
         }
 
-        public Task Delete(Expression<Func<EnduranceEvent, bool>> filter)
+        public Task DeleteMany(Expression<Func<EnduranceEvent, bool>> filter)
         {
             throw new NotImplementedException();
         }
 
-        public Task Delete(IEnumerable<EnduranceEvent> items)
+        public Task DeleteMany(IEnumerable<EnduranceEvent> items)
         {
             throw new NotImplementedException();
         }

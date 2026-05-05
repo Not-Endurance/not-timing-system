@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Not.Application.Authentication.Abstractions;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Application.RPC;
@@ -19,9 +20,15 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Socket;
+using NTS.Application.Contracts.Watcher.Models;
+using NTS.Application.Core;
+using NTS.Application.Settings;
+using NTS.Application.Setup;
+using NTS.Application.UserSession;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Setup.Aggregates;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -39,7 +46,7 @@ public class PastEventRepositoryTests
     {
         var eventId = 14;
         var handler = CreateHandler(Result.Success<IEnumerable<ParticipationModel>>([]));
-        var repository = new ParticipationRestApiRepository(CreateClient(handler));
+        var repository = new ParticipationApiRepository(CreateClient(handler));
 
         await repository.ReadMany(x => x.EventId == eventId);
 
@@ -51,7 +58,7 @@ public class PastEventRepositoryTests
     {
         var eventId = 14;
         var handler = CreateHandler(Result.Success<IEnumerable<RankingModel>>([]));
-        var repository = new RankingRestApiRepository(CreateClient(handler));
+        var repository = new RankingApiRepository(CreateClient(handler));
 
         await repository.ReadMany(x => x.EventId == eventId);
 
@@ -63,7 +70,7 @@ public class PastEventRepositoryTests
     {
         var eventId = 14;
         var handler = CreateHandler(Result.Success<IEnumerable<OfficialModel>>([]));
-        var repository = new OfficialRestApiRepository(CreateClient(handler));
+        var repository = new OfficialApiRepository(CreateClient(handler));
 
         await repository.ReadMany(x => x.EventId == eventId);
 
@@ -103,7 +110,7 @@ public class PastEventRepositoryTests
     }
 
     [Fact]
-    public async Task EventScopedRepository_Create_UsesSelectedEventQuery()
+    public async Task EventScopedRepository_Create_UsesSelectedEventQueryWithoutMutatingPayload()
     {
         var handler = CreateHandler(Result.Success(new QueryEventModel()));
         var repository = new QueryEventRepository(
@@ -119,7 +126,7 @@ public class PastEventRepositoryTests
             "https://nexus.test/api/query-documents?%24filter=EventId%20eq%2014"
         );
         var body = Assert.Single(handler.Bodies);
-        Assert.Equal(14, body!.FromJson<QueryEventModel>().EventId);
+        Assert.Equal(99, body!.FromJson<QueryEventModel>().EventId);
     }
 
     [Fact]
@@ -129,18 +136,28 @@ public class PastEventRepositoryTests
 
         services.ConfigureNtsStorage(CreateConfiguration()).AddRestApiStorage();
 
-        AssertRegistration<IRepository<Participation>, ParticipationRestApiRepository>(services);
-        AssertRegistration<IRepository<Ranking>, RankingRestApiRepository>(services);
-        AssertRegistration<IRepository<Official>, OfficialRestApiRepository>(services);
+        AssertRegistration<IEnduranceEventRepository, EnduranceEventApiRepository>(services);
+        AssertRegistration<ISettingRepository, SettingApiRepository>(services);
+        AssertRegistration<INtsUserSessionRepository, UserSessionApiRepository>(services);
+        AssertRegistration<INUserSessionRepository<NtsUserSessionStateModel>, UserSessionApiRepository>(services);
+        AssertRegistration<IRepository<Participation>, ParticipationApiRepository>(services);
+        AssertRegistration<IRepository<Ranking>, RankingApiRepository>(services);
+        AssertRegistration<IRepository<Official>, OfficialApiRepository>(services);
+        AssertRegistration<IRepository<Country>, CountryApiRepository>(services);
+        AssertRegistration<IRepository<Club>, ClubApiRepository>(services);
+        AssertRegistration<IRepository<Horse>, HorseApiRepository>(services);
+        AssertRegistration<IRepository<Athlete>, AthleteApiRepository>(services);
+        AssertRegistration<IRepository<UpcomingEvent>, UpcomingEventApiRepository>(services);
+        AssertRegistration<IUserEmailLookup, UserApiRepository>(services);
         AssertRegistration<IEventScopedRepository<Participation>, ParticipationEventScopedApiRepository>(services);
-        AssertRegistration<IEventScopedRepository<Ranking>, RankingRepository>(services);
-        AssertRegistration<IEventScopedRepository<Official>, OfficialRepository>(services);
-        AssertRegistration<IEventScopedRepository<Handout>, HandoutRepository>(services);
-        AssertRegistration<IEventScopedRepository<SnapshotResult>, SnapshotResultRepository>(services);
+        AssertRegistration<IEventScopedRepository<Ranking>, RankingEventScopedApiRepository>(services);
+        AssertRegistration<IEventScopedRepository<Official>, OfficialEventScopedApiRepository>(services);
+        AssertRegistration<IEventScopedRepository<Handout>, HandoutEventScopedApiRepository>(services);
+        AssertRegistration<IEventScopedRepository<SnapshotResult>, SnapshotResultEventScopedApiRepository>(services);
 
         AssertNoRegistration<IRepository<Participation>, ParticipationEventScopedApiRepository>(services);
-        AssertNoRegistration<IRepository<Ranking>, RankingRepository>(services);
-        AssertNoRegistration<IRepository<Official>, OfficialRepository>(services);
+        AssertNoRegistration<IRepository<Ranking>, RankingEventScopedApiRepository>(services);
+        AssertNoRegistration<IRepository<Official>, OfficialEventScopedApiRepository>(services);
     }
 
     [Fact]
@@ -161,7 +178,7 @@ public class PastEventRepositoryTests
     }
 
     [Fact]
-    public async Task CrudFunctions_Read_AppliesRouteIdAndODataFilter()
+    public async Task CrudFunctions_Read_UsesRouteId()
     {
         var repository = new RecordingRepository<QueryDocument>();
         repository.Items.Add(new QueryDocument { Id = 7, EventId = 14 });
@@ -172,13 +189,14 @@ public class PastEventRepositoryTests
 
         var item = AssertOkPayload<QueryDocument>(await functions.Read(context.Request, 7));
 
+        Assert.NotNull(item);
+        Assert.Equal(7, item.Id);
         Assert.Equal(14, item.EventId);
-        Assert.Contains("Id eq 7", repository.LastReadManyOptions?.Filter?.RawValue);
-        Assert.Contains("EventId eq 14", repository.LastReadManyOptions?.Filter?.RawValue);
+        Assert.Null(repository.LastReadManyOptions);
     }
 
     [Fact]
-    public async Task CrudFunctions_Delete_AppliesRouteIdAndODataFilter()
+    public async Task CrudFunctions_Delete_UsesRouteId()
     {
         var repository = new RecordingRepository<QueryDocument>();
         repository.Items.Add(new QueryDocument { Id = 7, EventId = 14 });
@@ -190,9 +208,9 @@ public class PastEventRepositoryTests
         await functions.Delete(context.Request, 7);
 
         var item = Assert.Single(repository.Deleted);
+        Assert.Equal(7, item.Id);
         Assert.Equal(14, item.EventId);
-        Assert.Contains("Id eq 7", repository.LastReadManyOptions?.Filter?.RawValue);
-        Assert.Contains("EventId eq 14", repository.LastReadManyOptions?.Filter?.RawValue);
+        Assert.Null(repository.LastReadManyOptions);
     }
 
     [Fact]
@@ -396,22 +414,22 @@ public class PastEventRepositoryTests
 
         public Task<IActionResult> Create(HttpRequest request)
         {
-            return InternalCreate(request);
+            return CreateCore(request);
         }
 
         public Task<IActionResult> Read(HttpRequest request, int id)
         {
-            return InternalRead(request, id);
+            return ReadCore(id);
         }
 
         public Task<IActionResult> ReadMany(HttpRequest request)
         {
-            return InternalReadMany(request);
+            return ReadManyCore(request);
         }
 
         public Task<IActionResult> Delete(HttpRequest request, int id)
         {
-            return InternalDelete(request, id);
+            return DeleteCore(id);
         }
     }
 
@@ -444,7 +462,7 @@ public class PastEventRepositoryTests
 
         public Task<T?> Read(int id)
         {
-            return Task.FromResult<T?>(null);
+            return Task.FromResult(Items.FirstOrDefault(x => GetId(x) == id));
         }
 
         public Task<T?> Read(Expression<Func<T, bool>> filter)
@@ -476,6 +494,11 @@ public class PastEventRepositoryTests
 
         public Task Delete(int id)
         {
+            var item = Items.FirstOrDefault(x => GetId(x) == id);
+            if (item != null)
+            {
+                Deleted.Add(item);
+            }
             return Task.CompletedTask;
         }
 
@@ -485,14 +508,19 @@ public class PastEventRepositoryTests
             return Task.CompletedTask;
         }
 
-        public Task Delete(Expression<Func<T, bool>> filter)
+        public Task DeleteMany(Expression<Func<T, bool>> filter)
         {
             return Task.CompletedTask;
         }
 
-        public Task Delete(IEnumerable<T> items)
+        public Task DeleteMany(IEnumerable<T> items)
         {
             return Task.CompletedTask;
+        }
+
+        static int? GetId(T item)
+        {
+            return item.GetType().GetProperty("Id")?.GetValue(item) as int?;
         }
     }
 

@@ -378,12 +378,12 @@ public class WitnessSessionIdentityTests
             return Task.CompletedTask;
         }
 
-        public Task Delete(IEnumerable<NtsUserSessionModel> items)
+        public Task DeleteMany(IEnumerable<NtsUserSessionModel> items)
         {
             return Task.CompletedTask;
         }
 
-        public Task Delete(Expression<Func<NtsUserSessionModel, bool>> filter)
+        public Task DeleteMany(Expression<Func<NtsUserSessionModel, bool>> filter)
         {
             return Task.CompletedTask;
         }

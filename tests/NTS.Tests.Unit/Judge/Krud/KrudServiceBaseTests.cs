@@ -442,14 +442,14 @@ public class KrudServiceBaseTests
             return Task.CompletedTask;
         }
 
-        public Task Delete(Expression<Func<TestEntity, bool>> filter)
+        public Task DeleteMany(Expression<Func<TestEntity, bool>> filter)
         {
             var predicate = filter.Compile();
             Items.RemoveAll(x => predicate(x));
             return Task.CompletedTask;
         }
 
-        public Task Delete(IEnumerable<TestEntity> items)
+        public Task DeleteMany(IEnumerable<TestEntity> items)
         {
             var set = items.ToHashSet();
             Items.RemoveAll(x => set.Contains(x));

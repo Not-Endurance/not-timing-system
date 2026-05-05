@@ -9,8 +9,8 @@ public class ODataApiFilterAdapterTests
     {
         var eventId = 14;
 
-        var isCreated = ODataApiFilterAdapter.TryParseFilter<QueryDocument>(
-            x => x.EventId == eventId && x.Name == "Open ride",
+        var isCreated = ODataApiFilterAdapter.TryParseFilters<QueryDocument>(
+            [x => x.EventId == eventId && x.Name == "Open ride"],
             out var queryParameters
         );
 
@@ -24,8 +24,8 @@ public class ODataApiFilterAdapterTests
     [Fact]
     public void TryParseFilter_EscapesODataStrings()
     {
-        var isCreated = ODataApiFilterAdapter.TryParseFilter<QueryDocument>(
-            x => x.Name == "O'Brien",
+        var isCreated = ODataApiFilterAdapter.TryParseFilters<QueryDocument>(
+            [x => x.Name == "O'Brien"],
             out var queryParameters
         );
 
@@ -38,8 +38,8 @@ public class ODataApiFilterAdapterTests
     {
         int[] ids = [1, 2];
 
-        var isCreated = ODataApiFilterAdapter.TryParseFilter<QueryDocument>(
-            x => ids.Contains(x.Id),
+        var isCreated = ODataApiFilterAdapter.TryParseFilters<QueryDocument>(
+            [x => ids.Contains(x.Id)],
             out var queryParameters
         );
 
@@ -63,14 +63,12 @@ public class ODataApiFilterAdapterTests
     [Fact]
     public void CombineQueryParameters_JoinsODataFilters()
     {
-        var selectedEvent = ODataApiFilterAdapter.ParseFilters<QueryDocument>(
-            [document => document.EventId == 14]
+        var queryParameters = ODataApiFilterAdapter.ParseFilters<QueryDocument>(
+            [
+                document => document.EventId == 14,
+                document => document.Id == 7,
+            ]
         );
-        var readFilter = ODataApiFilterAdapter.ParseFilters<QueryDocument>(
-            [document => document.Id == 7]
-        );
-
-        var queryParameters = ODataApiFilterAdapter.CombineQueryParameters(selectedEvent, readFilter);
 
         Assert.Equal("(EventId eq 14) and (Id eq 7)", AssertFilter(queryParameters));
         Assert.Equal(

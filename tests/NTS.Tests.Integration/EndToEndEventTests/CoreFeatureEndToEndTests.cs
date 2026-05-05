@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using NTS.Application.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Features;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
@@ -31,21 +32,19 @@ public sealed class CoreFeatureEndToEndTests
         var configureEvent = new ConfigureEventFeature(judge, nexusApi);
         var startEvent = new StartCoreEventFeature(judge, nexusApi);
 
+        await SeedOtherEventData(nexusApi, snapshot.EventId);
+
         var setup = await configureEvent.Execute(snapshot);
         var enduranceEvent = await startEvent.Execute(setup);
 
-        var startedParticipations = await Eventually.ReadParticipations(
+        var startedDocuments = await ReadStartedDocumentsScopedToCurrentEvent(
             nexusApi,
-            enduranceEvent.Id,
-            items => items.Count == snapshot.Participations.Count,
-            "started participations"
+            enduranceEvent,
+            setup,
+            snapshot
         );
-        var startedRankings = await Eventually.ReadRankings(
-            nexusApi,
-            enduranceEvent.Id,
-            items => items.Count == snapshot.Rankings.Count,
-            "started rankings"
-        );
+        var startedParticipations = startedDocuments.Participations;
+        var startedRankings = startedDocuments.Rankings;
         Assert.Equal(snapshot.Participations.Count, startedParticipations.Count);
         Assert.Equal(snapshot.Rankings.Count, startedRankings.Count);
 
@@ -81,6 +80,152 @@ public sealed class CoreFeatureEndToEndTests
         Assert.True(publishedSnapshotGroups > 0);
 
         await AssertFinalStateMatchesSnapshots(nexusApi, enduranceEvent, setup, snapshot);
+    }
+
+    static async Task SeedOtherEventData(NexusApiDriver api, int testedEventId)
+    {
+        var today = DateTimeOffset.UtcNow.Date;
+        var (pastEventId, activeEventId) = CreateOtherEventIds(testedEventId);
+        var documentBase = Math.Abs(testedEventId % 1_000_000) + 1_000_000;
+
+        await SeedOtherEvent(
+            api,
+            pastEventId,
+            new EventSpan(today.AddDays(-30), today.AddDays(-29)),
+            documentBase,
+            "Past"
+        );
+        await SeedOtherEvent(
+            api,
+            activeEventId,
+            new EventSpan(today, today.AddDays(1)),
+            documentBase + 10_000,
+            "Active"
+        );
+    }
+
+    static (int Past, int Active) CreateOtherEventIds(int testedEventId)
+    {
+        const int pastOffset = 10_000;
+        const int activeOffset = 20_000;
+
+        return testedEventId <= int.MaxValue - activeOffset
+            ? (testedEventId + pastOffset, testedEventId + activeOffset)
+            : (testedEventId - activeOffset, testedEventId - pastOffset);
+    }
+
+    static async Task SeedOtherEvent(
+        NexusApiDriver api,
+        int eventId,
+        EventSpan eventSpan,
+        int idBase,
+        string label
+    )
+    {
+        var enduranceEvent = IntegrationPayloadFactory.EnduranceEvent(
+            eventId,
+            eventSpan,
+            $"Seeded {label} Event"
+        );
+        var participations = new[]
+        {
+            IntegrationPayloadFactory.ActiveParticipation(eventId, idBase + 1, idBase + 101),
+            IntegrationPayloadFactory.ActiveParticipation(eventId, idBase + 2, idBase + 102),
+        };
+        var officials = new[]
+        {
+            IntegrationPayloadFactory.Official(eventId, userId: null, id: idBase + 201),
+            IntegrationPayloadFactory.Official(eventId, userId: null, id: idBase + 202),
+        };
+        var rankings = new[]
+        {
+            IntegrationPayloadFactory.Ranking(eventId, participations, idBase + 301, $"Seeded {label} Ranking A"),
+            IntegrationPayloadFactory.Ranking(eventId, participations, idBase + 302, $"Seeded {label} Ranking B"),
+        };
+        var handouts = participations
+            .Select((participation, index) => IntegrationPayloadFactory.Handout(participation, idBase + 401 + index))
+            .ToArray();
+
+        await api.Create(enduranceEvent);
+        foreach (var participation in participations)
+        {
+            await api.Create(participation);
+        }
+        foreach (var official in officials)
+        {
+            await api.Create(official);
+        }
+        foreach (var ranking in rankings)
+        {
+            await api.Create(ranking);
+        }
+        foreach (var handout in handouts)
+        {
+            await api.Create(handout);
+        }
+    }
+
+    static async Task<StartedEventDocuments> ReadStartedDocumentsScopedToCurrentEvent(
+        NexusApiDriver api,
+        EnduranceEvent enduranceEvent,
+        SetupFeatureResult setup,
+        EndToEndEventSnapshot snapshot
+    )
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        StartedEventDocuments last = new([], [], [], []);
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            last = new StartedEventDocuments(
+                await api.ReadParticipations(enduranceEvent.Id),
+                await api.ReadRankings(enduranceEvent.Id),
+                await api.ReadOfficials(enduranceEvent.Id),
+                await api.ReadHandouts(enduranceEvent.Id)
+            );
+            AssertDocumentsBelongToEvent(enduranceEvent.Id, last);
+
+            if (
+                last.Participations.Count == snapshot.Participations.Count
+                && last.Rankings.Count == snapshot.Rankings.Count
+                && last.Officials.Count == setup.SetupEvent.Officials.Count
+                && last.Handouts.Count == 0
+            )
+            {
+                return last;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException(
+            "Nexus API did not reach the expected started event document counts. "
+                + $"Participations: {last.Participations.Count}/{snapshot.Participations.Count}, "
+                + $"Rankings: {last.Rankings.Count}/{snapshot.Rankings.Count}, "
+                + $"Officials: {last.Officials.Count}/{setup.SetupEvent.Officials.Count}, "
+                + $"Handouts: {last.Handouts.Count}/0."
+        );
+    }
+
+    static void AssertDocumentsBelongToEvent(int eventId, StartedEventDocuments documents)
+    {
+        Assert.All(documents.Participations, participation => Assert.Equal(eventId, participation.EventId));
+        Assert.All(documents.Officials, official => Assert.Equal(eventId, official.EventId));
+        Assert.All(
+            documents.Rankings,
+            ranking =>
+            {
+                Assert.Equal(eventId, ranking.EventId);
+                Assert.All(ranking.Entries, entry => Assert.Equal(eventId, entry.Participation.EventId));
+            }
+        );
+        Assert.All(
+            documents.Handouts,
+            handout =>
+            {
+                Assert.Equal(eventId, handout.EventId);
+                Assert.Equal(eventId, handout.Participation.EventId);
+            }
+        );
     }
 
     static IReadOnlyList<IReadOnlyList<EndToEndPhaseSnapshot>> CreatePhaseWaves(
@@ -154,5 +299,26 @@ public sealed class CoreFeatureEndToEndTests
             rankings.OrderBy(x => x.Name).ThenBy(x => x.Category).Select(RankingModel.From).ToArray()
         );
         Assert.Equal(expectedRankings.ToString(Formatting.None), actualRankings.ToString(Formatting.None));
+    }
+
+    sealed class StartedEventDocuments
+    {
+        public StartedEventDocuments(
+            IReadOnlyList<Participation> participations,
+            IReadOnlyList<Ranking> rankings,
+            IReadOnlyList<Official> officials,
+            IReadOnlyList<Handout> handouts
+        )
+        {
+            Participations = participations;
+            Rankings = rankings;
+            Officials = officials;
+            Handouts = handouts;
+        }
+
+        public IReadOnlyList<Participation> Participations { get; }
+        public IReadOnlyList<Ranking> Rankings { get; }
+        public IReadOnlyList<Official> Officials { get; }
+        public IReadOnlyList<Handout> Handouts { get; }
     }
 }

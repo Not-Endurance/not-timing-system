@@ -7,11 +7,11 @@ using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class HorseRepository : MongoRepository<HorseModel>
+public class HorseMongoRepository : MongoRepository<HorseModel>
 {
     readonly ITelemetryService _telemetry;
 
-    public HorseRepository(IMongoContext context, ITelemetryService telemetry)
+    public HorseMongoRepository(IMongoContext context, ITelemetryService telemetry)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.HORSES_COLLECTION)
     {
         _telemetry = telemetry;
@@ -19,7 +19,7 @@ public class HorseRepository : MongoRepository<HorseModel>
 
     protected override UpdateDefinition<HorseModel> GetUpdateDefinition(HorseModel document)
     {
-        using var activity = _telemetry.StartActivity(nameof(HorseRepository), nameof(GetUpdateDefinition));
+        using var activity = _telemetry.StartActivity(nameof(HorseMongoRepository), nameof(GetUpdateDefinition));
 
         try
         {

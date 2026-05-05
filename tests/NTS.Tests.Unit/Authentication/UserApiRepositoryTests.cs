@@ -9,7 +9,7 @@ using NTS.Witness.Storage.Repositories;
 
 namespace NTS.Authentication.Tests;
 
-public class UserRestRepositoryTests
+public class UserApiRepositoryTests
 {
     [Fact]
     public async Task Get_unwraps_user_from_result_envelope()
@@ -45,7 +45,7 @@ public class UserRestRepositoryTests
         Assert.Null(result.Data);
     }
 
-    static UserRestRepository CreateRepository(HttpMessageHandler handler)
+    static UserApiRepository CreateRepository(HttpMessageHandler handler)
     {
         var client = new NHttpClient(
             new TestHttpClientFactory(new HttpClient(handler)),
@@ -53,7 +53,7 @@ public class UserRestRepositoryTests
             Options.Create(new NHttpSettings { Url = "https://nexus.test/api" })
         );
 
-        return new UserRestRepository(client);
+        return new UserApiRepository(client);
     }
 
     static HttpResponseMessage CreateJsonResponse(object payload, HttpStatusCode statusCode = HttpStatusCode.OK)

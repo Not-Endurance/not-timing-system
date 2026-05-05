@@ -1,13 +1,12 @@
 using MongoDB.Driver;
 using Not.Application.Authentication.User;
-using Not.Injection;
 using Not.Storage.Mongo;
 using NTS.Nexus.HTTP.Mongo.Models;
 using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class UserMongoRepository : IUserRepository, ITransient
+public class UserMongoRepository : IUserRepository
 {
     readonly IMongoContext _context;
     readonly ITelemetryService _telemetry;

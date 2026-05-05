@@ -94,7 +94,7 @@ public class KrudInMemoryNodeRepositoryTests
         var parent = new TestParentNode([first, second, third]);
         var repository = CreateRepository(parent);
 
-        await repository.Delete(x => x.Name == "Match");
+        await repository.DeleteMany(x => x.Name == "Match");
 
         Assert.Equal(2, parent.RemoveCalls);
         Assert.Equal([second], parent.InternalChildren);
@@ -109,7 +109,7 @@ public class KrudInMemoryNodeRepositoryTests
         var parent = new TestParentNode([first, second, third]);
         var repository = CreateRepository(parent);
 
-        await repository.Delete([first, third]);
+        await repository.DeleteMany([first, third]);
 
         Assert.Equal(2, parent.RemoveCalls);
         Assert.Equal([second], parent.InternalChildren);

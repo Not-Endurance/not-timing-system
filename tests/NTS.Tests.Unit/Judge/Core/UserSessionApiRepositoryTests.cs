@@ -9,7 +9,7 @@ using NTS.Storage.REST;
 
 namespace NTS.Judge.Tests.Core;
 
-public class UserSessionRestApiRepositoryTests
+public class UserSessionApiRepositoryTests
 {
     [Fact]
     public async Task Read_by_user_identifier_unwraps_session_from_result_envelope()
@@ -21,7 +21,7 @@ public class UserSessionRestApiRepositoryTests
         {
             ResponseFactory = _ => CreateJsonResponse(Result.Success(expected)),
         };
-        var repository = new UserSessionRestApiRepository(CreateClient(handler));
+        var repository = new UserSessionApiRepository(CreateClient(handler));
 
         var result = await repository.ReadByUserIdentifier("entra-1");
 

@@ -193,12 +193,12 @@ public class JudgeSetupLookupServiceTests
             throw new NotImplementedException();
         }
 
-        public Task Delete(IEnumerable<T> items)
+        public Task DeleteMany(IEnumerable<T> items)
         {
             throw new NotImplementedException();
         }
 
-        public Task Delete(Expression<Func<T, bool>> filter)
+        public Task DeleteMany(Expression<Func<T, bool>> filter)
         {
             throw new NotImplementedException();
         }

@@ -1,6 +1,5 @@
 using Not.Application.Authentication.Abstractions;
 using Not.Application.HTTP;
-using Not.Injection;
 using Not.Storage.REST;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
@@ -8,13 +7,12 @@ using NTS.Application.UserSession;
 
 namespace NTS.Storage.REST;
 
-public class UserSessionRestApiRepository
+public class UserSessionApiRepository
     : ApiRepository<NtsUserSessionModel, NtsUserSessionModel>,
         INtsUserSessionRepository,
-        INUserSessionRepository<NtsUserSessionStateModel>,
-        ITransient
+        INUserSessionRepository<NtsUserSessionStateModel>
 {
-    public UserSessionRestApiRepository(NHttpClient client)
+    public UserSessionApiRepository(NHttpClient client)
         : base("user-sessions", client) { }
 
     public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)

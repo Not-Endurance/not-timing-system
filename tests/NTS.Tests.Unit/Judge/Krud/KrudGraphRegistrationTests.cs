@@ -5,11 +5,62 @@ using Not.Domain;
 using Not.Domain.Krud;
 using Not.Krud.Abstractions;
 using Not.Krud.ServiceRegistration;
+using Not.Krud.Services;
 
 namespace NTS.Judge.Tests.Krud;
 
 public class KrudGraphRegistrationTests
 {
+    [Fact]
+    public void ConfigureKrud_DoesNotRegisterOpenGenericRepository()
+    {
+        var services = new ServiceCollection();
+
+        services.ConfigureKrud();
+
+        Assert.DoesNotContain(
+            services,
+            descriptor =>
+                descriptor.ServiceType == typeof(IRepository<>)
+                && descriptor.ImplementationType == typeof(KrudInMemoryNodeRepository<>)
+        );
+    }
+
+    [Fact]
+    public void RegisterAggregate_FlatAggregate_DoesNotRegisterRootRepository()
+    {
+        var services = new ServiceCollection();
+
+        services.ConfigureKrud().RegisterAggregate<FlatAggregate>();
+
+        AssertNoRepositoryRegistration<FlatAggregate>(services);
+    }
+
+    [Fact]
+    public void RegisterAggregate_GraphAggregate_RegistersOnlyChildRepositories()
+    {
+        var services = new ServiceCollection();
+
+        services.ConfigureKrud().RegisterAggregate<GraphAggregate>();
+
+        AssertNoRepositoryRegistration<GraphAggregate>(services);
+        AssertRepositoryRegistration<GraphParent>(services);
+        AssertRepositoryRegistration<GraphLeaf>(services);
+    }
+
+    [Fact]
+    public void RegisterAggregate_ChildRepositoryAlreadyRegistered_Throws()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IRepository<GraphParent>>(_ => throw new NotSupportedException());
+
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            services.ConfigureKrud().RegisterAggregate<GraphAggregate>()
+        );
+
+        Assert.Contains(typeof(GraphParent).FullName!, exception.Message);
+    }
+
     [Fact]
     public async Task RegisterAggregate_ChildRepositoryMutatesAggregateChildren()
     {
@@ -57,6 +108,27 @@ public class KrudGraphRegistrationTests
         {
             setter.SetParent(value);
         }
+    }
+
+    static void AssertRepositoryRegistration<T>(IServiceCollection services)
+        where T : Entity
+    {
+        var descriptor = Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IRepository<T>));
+
+        Assert.Equal(ServiceLifetime.Scoped, descriptor.Lifetime);
+        Assert.NotNull(descriptor.ImplementationFactory);
+    }
+
+    static void AssertNoRepositoryRegistration<T>(IServiceCollection services)
+        where T : Entity
+    {
+        Assert.DoesNotContain(services, descriptor => descriptor.ServiceType == typeof(IRepository<T>));
+    }
+
+    sealed class FlatAggregate : Aggregate
+    {
+        public FlatAggregate(int? id = null)
+            : base(id) { }
     }
 
     sealed class AggregateRepository : IRepository<GraphAggregate>
@@ -118,14 +190,14 @@ public class KrudGraphRegistrationTests
             return Task.CompletedTask;
         }
 
-        public Task Delete(Expression<Func<GraphAggregate, bool>> filter)
+        public Task DeleteMany(Expression<Func<GraphAggregate, bool>> filter)
         {
             var predicate = filter.Compile();
             _items.RemoveAll(x => predicate(x));
             return Task.CompletedTask;
         }
 
-        public Task Delete(IEnumerable<GraphAggregate> items)
+        public Task DeleteMany(IEnumerable<GraphAggregate> items)
         {
             var set = items.ToHashSet();
             _items.RemoveAll(x => set.Contains(x));
