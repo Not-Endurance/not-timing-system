@@ -1,5 +1,4 @@
 using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
 using Not.Application.DomainEvents;
 using Not.Async.Extensions;
 using Not.Exceptions;
@@ -28,15 +27,15 @@ public class ParticipationService
 {
     readonly List<int> _recentlyProcessed = [];
     readonly INtsSocketContext _socketContext;
-    readonly IRepository<Participation> _participationRepository;
-    readonly IRepository<SnapshotResult> _snapshotResultRepository;
+    readonly IEventScopedRepository<Participation> _participationRepository;
+    readonly IEventScopedRepository<SnapshotResult> _snapshotResultRepository;
     readonly IDomainEventDispatcher _domainEventDispatcher;
     Participation? _selectedParticipation;
 
     public ParticipationService(
         INtsSocketContext socketContext,
-        IRepository<Participation> participationRepository,
-        IRepository<SnapshotResult> snapshotResultRepository,
+        IEventScopedRepository<Participation> participationRepository,
+        IEventScopedRepository<SnapshotResult> snapshotResultRepository,
         IDomainEventDispatcher domainEventDispatcher
     )
     {

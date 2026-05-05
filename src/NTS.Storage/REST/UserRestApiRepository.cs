@@ -10,7 +10,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public class UserRestApiRepository : RestApiRepository<User, UserModel>, IUserEmailLookup, ITransient
+public class UserRestApiRepository : ApiRepository<User, UserModel>, IUserEmailLookup, ITransient
 {
     public UserRestApiRepository(NHttpClient client)
         : base("users", client) { }

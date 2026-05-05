@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Not.Application.CRUD.Ports;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Domain.Abstractions;
@@ -140,7 +139,7 @@ public class HandoutsServiceTests
         public EnduranceEvent? Event { get; set; }
     }
 
-    sealed class RecordingRepository<T> : IRepository<T>
+    sealed class RecordingRepository<T> : IEventScopedRepository<T>
         where T : class, IEntity
     {
         readonly List<T> _items;

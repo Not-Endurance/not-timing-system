@@ -1,7 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
 using Not.Exceptions;
-using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Models;
 using NTS.Application.Contracts.PastEvents;
@@ -22,17 +21,26 @@ public class PastEventService
         new Dictionary<int, IReadOnlyList<Starter>>();
 
     readonly IEnduranceEventRepository _events;
-    readonly IServiceProvider _serviceProvider;
+    readonly IRepository<Participation> _participations;
+    readonly IRepository<Ranking> _rankingRepository;
+    readonly IRepository<Official> _officialRepository;
     readonly List<EnduranceEvent> _pastEvents = [];
     IReadOnlyList<Ranking> _rankings = [];
     IReadOnlyList<Official> _officials = [];
     Startlist? _startlist;
     Ranking? _currentRanking;
 
-    public PastEventService(IEnduranceEventRepository events, IServiceProvider serviceProvider)
+    public PastEventService(
+        IEnduranceEventRepository events,
+        IRepository<Participation> participations,
+        IRepository<Ranking> rankingRepository,
+        IRepository<Official> officialRepository
+    )
     {
         _events = events;
-        _serviceProvider = serviceProvider;
+        _participations = participations;
+        _rankingRepository = rankingRepository;
+        _officialRepository = officialRepository;
     }
 
     public IReadOnlyList<EnduranceEvent> Events => _pastEvents.AsReadOnly();
@@ -75,13 +83,10 @@ public class PastEventService
             return;
         }
 
-        var participations = await _serviceProvider.GetRequiredService<IPastParticipationRepository>().ReadForEvent(EventId);
-        _rankings = (
-            await _serviceProvider.GetRequiredService<IPastRankingRepository>().ReadForEvent(EventId)
-        ).ToList();
-        _officials = (
-            await _serviceProvider.GetRequiredService<IPastOfficialRepository>().ReadForEvent(EventId)
-        ).ToList();
+        var selectedEventId = EventId;
+        var participations = await _participations.ReadMany(x => x.EventId == selectedEventId);
+        _rankings = (await _rankingRepository.ReadMany(x => x.EventId == selectedEventId)).ToList();
+        _officials = (await _officialRepository.ReadMany(x => x.EventId == selectedEventId)).ToList();
         _startlist = new Startlist(participations);
         _currentRanking = _rankings.FirstOrDefault();
         EmitChanged();

@@ -32,6 +32,14 @@ public static class GuardHelper
         return value;
     }
 
+    public static void ThrowIfNullOrWhiteSpace(object value, [CallerArgumentExpression(nameof(value))] string? argument = null)
+    {
+        if (string.IsNullOrWhiteSpace(value?.ToString()))
+        {
+            throw new GuardException($"'{argument}' cannot be null or whitespace");
+        }
+    }
+
     public static Exception Exception(string message)
     {
         return new GuardException(message);

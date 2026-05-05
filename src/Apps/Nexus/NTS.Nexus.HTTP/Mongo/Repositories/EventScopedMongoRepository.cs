@@ -1,12 +1,12 @@
 using System.Linq.Expressions;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Shared;
-using NTS.Application.Contracts.Shared.Models;
+using Not.Structures;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
 public abstract class EventScopedMongoRepository<T> : MongoRepository<T>, IEventResetRepository
-    where T : class, IEventScopedDocument
+    where T : class, IEventScoped, IIdentifiable
 {
     protected EventScopedMongoRepository(IMongoContext context, string db, string collection)
         : base(context, db, collection) { }
@@ -18,6 +18,6 @@ public abstract class EventScopedMongoRepository<T> : MongoRepository<T>, IEvent
 
     public virtual Task DeleteAllForEvent(int eventId)
     {
-        return Delete(x => x.EventId == eventId);
+        return DeleteMany(x => x.EventId == eventId);
     }
 }

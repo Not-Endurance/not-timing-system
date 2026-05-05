@@ -5,7 +5,7 @@ using NTS.Domain.Enums;
 
 namespace NTS.Application.Contracts.Core.Models;
 
-public class RankingModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Ranking>
+public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ranking>
 {
     public static RankingModel From(Ranking ranking)
     {

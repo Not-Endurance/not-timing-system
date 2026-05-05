@@ -12,7 +12,7 @@ using NTS.Domain.Core.Aggregates;
 namespace NTS.Storage.Core.Repositories;
 
 public class EnduranceEventRestRepository
-    : RestApiRepository<EnduranceEvent, EnduranceEventModel>,
+    : ApiRepository<EnduranceEvent, EnduranceEventModel>,
         IEnduranceEventRepository,
         ITransient
 {

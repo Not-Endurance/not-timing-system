@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Microsoft.Extensions.DependencyInjection;
 using Not.Application.CRUD.Ports;
 using Not.Domain.Abstractions;
 using NTS.Application.Core;
@@ -21,20 +20,23 @@ public class PastEventServiceTests
     {
         var enduranceEvent = CreateEvent(14);
         var participation = CreateParticipation(number: 42, eventId: 14, participationId: 301, combinationId: 201);
+        var otherParticipation = CreateParticipation(number: 43, eventId: 99, participationId: 302, combinationId: 202);
         var firstRanking = CreateRanking("General Classification", participation, 601);
         var secondRanking = CreateRanking("Best Condition", participation, 602);
+        var otherRanking = CreateRanking("Other Event", otherParticipation, 603);
         var official = new Official(
             new Person(["Jane", "Doe"]),
             OfficialRole.GroundJuryPresident,
             eventId: 14,
             id: 701
         );
-        var serviceProvider = new ServiceCollection()
-            .AddSingleton<IPastParticipationRepository>(new ParticipationPastRepository([participation]))
-            .AddSingleton<IPastRankingRepository>(new RankingPastRepository([firstRanking, secondRanking]))
-            .AddSingleton<IPastOfficialRepository>(new OfficialPastRepository([official]))
-            .BuildServiceProvider();
-        var service = new PastEventService(new EnduranceEventRepository([enduranceEvent]), serviceProvider);
+        var otherOfficial = new Official(new Person(["Other"]), OfficialRole.Steward, eventId: 99, id: 702);
+        var service = new PastEventService(
+            new EnduranceEventRepository([enduranceEvent]),
+            new RecordingRepository<Participation>([participation, otherParticipation]),
+            new RecordingRepository<Ranking>([firstRanking, secondRanking, otherRanking]),
+            new RecordingRepository<Official>([official, otherOfficial])
+        );
 
         await service.LoadEvent(14);
 
@@ -161,47 +163,12 @@ public class PastEventServiceTests
         }
     }
 
-    sealed class ParticipationPastRepository
-        : RecordingRepository<Participation>,
-            IPastParticipationRepository
-    {
-        public ParticipationPastRepository(IEnumerable<Participation> items)
-            : base(items) { }
-
-        public Task<IEnumerable<Participation>> ReadForEvent(int eventId)
-        {
-            return ReadMany();
-        }
-    }
-
-    sealed class RankingPastRepository : RecordingRepository<Ranking>, IPastRankingRepository
-    {
-        public RankingPastRepository(IEnumerable<Ranking> items)
-            : base(items) { }
-
-        public Task<IEnumerable<Ranking>> ReadForEvent(int eventId)
-        {
-            return ReadMany();
-        }
-    }
-
-    sealed class OfficialPastRepository : RecordingRepository<Official>, IPastOfficialRepository
-    {
-        public OfficialPastRepository(IEnumerable<Official> items)
-            : base(items) { }
-
-        public Task<IEnumerable<Official>> ReadForEvent(int eventId)
-        {
-            return ReadMany();
-        }
-    }
-
-    abstract class RecordingRepository<T> : IRepository<T>
+    class RecordingRepository<T> : IRepository<T>
         where T : class, IEntity
     {
         readonly List<T> _items;
 
-        protected RecordingRepository(IEnumerable<T>? items = null)
+        public RecordingRepository(IEnumerable<T>? items = null)
         {
             _items = items?.ToList() ?? [];
         }

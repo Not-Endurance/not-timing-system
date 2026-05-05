@@ -7,7 +7,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public class ClubRestApiRepository : RestApiRepository<Club, ClubModel>, ITransient
+public class ClubRestApiRepository : ApiRepository<Club, ClubModel>, ITransient
 {
     public ClubRestApiRepository(NHttpClient client)
         : base("clubs", client) { }

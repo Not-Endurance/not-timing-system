@@ -128,7 +128,7 @@ public class EnduranceEventFunctions : FunctionBase
             return Ok();
         }
 
-        await _events.Delete(x => x.Id == id);
+        await _events.DeleteMany(x => x.Id == id);
         return Ok();
     }
 

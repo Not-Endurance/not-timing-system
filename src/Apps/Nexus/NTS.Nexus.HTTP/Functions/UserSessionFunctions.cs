@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Not.Storage.Mongo;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
@@ -17,9 +18,10 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
     public UserSessionFunctions(
         IFunctionLogger<UserSessionFunctions> logger,
         INtsUserSessionRepository sessions,
+        IMongoRepository<NtsUserSessionModel> mongoSessions,
         ITelemetryService telemetry
     )
-        : base(logger, sessions, telemetry)
+        : base(logger, mongoSessions, telemetry)
     {
         _sessions = sessions;
     }
@@ -32,7 +34,7 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(Create));
         TagRequest(request);
         LogInformation(request, nameof(Create));
-        return await InternalCreate(request);
+        return await CreateCore(request);
     }
 
     [Function("user-sessions-update")]
@@ -43,7 +45,7 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
-        return await InternalUpdate(request);
+        return await UpdateCore(request);
     }
 
     [Function("user-sessions-delete")]
@@ -55,7 +57,7 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(Delete));
         TagRequest(request);
         LogInformation(request, nameof(Delete));
-        return await InternalDelete(request, id);
+        return await DeleteCore(id);
     }
 
     [Function("user-sessions-read")]
@@ -67,7 +69,7 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(Read));
         TagRequest(request);
         LogInformation(request, nameof(Read));
-        return await InternalRead(request, id);
+        return await ReadCore(id);
     }
 
     [Function("user-sessions-read-by-user-identifier")]
@@ -92,6 +94,6 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(ReadMany));
         TagRequest(request);
         LogInformation(request, nameof(ReadMany));
-        return await InternalReadMany(request);
+        return await ReadManyCore(request);
     }
 }

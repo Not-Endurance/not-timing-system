@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
@@ -27,7 +26,7 @@ internal sealed class JudgeDriver : IAsyncDisposable
     readonly INtsSocketService _socketService;
     readonly ISnapshotService _snapshotService;
     readonly IParticipationContext _participationContext;
-    readonly IRepository<Participation> _participationRepository;
+    readonly IEventScopedRepository<Participation> _participationRepository;
     readonly IOptions<NHttpSettings> _httpSettings;
 
     public JudgeDriver(Uri warpBaseUrl, Uri nexusBaseUrl)
@@ -49,7 +48,7 @@ internal sealed class JudgeDriver : IAsyncDisposable
         _socketService = _provider.GetRequiredService<INtsSocketService>();
         _snapshotService = _provider.GetRequiredService<ISnapshotService>();
         _participationContext = _provider.GetRequiredService<IParticipationContext>();
-        _participationRepository = _provider.GetRequiredService<IRepository<Participation>>();
+        _participationRepository = _provider.GetRequiredService<IEventScopedRepository<Participation>>();
         _httpSettings = _provider.GetRequiredService<IOptions<NHttpSettings>>();
     }
 

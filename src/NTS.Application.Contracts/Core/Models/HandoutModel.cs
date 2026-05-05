@@ -4,7 +4,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Application.Contracts.Core.Models;
 
-public class HandoutModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Handout>
+public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Handout>
 {
     public static HandoutModel From(Handout handout)
     {

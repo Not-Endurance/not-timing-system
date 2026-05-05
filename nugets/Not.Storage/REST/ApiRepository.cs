@@ -1,24 +1,28 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Domain.Abstractions;
+using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Notify;
 using Not.Structures;
 
 namespace Not.Storage.REST;
 
-public abstract class RestApiRepository<T, TModel> : IRepository<T>
+public abstract class ApiRepository<T, TModel> : IRepository<T>
     where T : class, IEntity
     where TModel : class, IKrudModel<T>, new()
 {
     readonly string _endpoint;
+    readonly IRepositoryScopeFactory<T>? _scopeFactory;
 
-    protected RestApiRepository(string endpoint, NHttpClient client)
+    protected ApiRepository(string endpoint, NHttpClient client, IRepositoryScopeFactory<T>? scopeFactory = null)
     {
         _endpoint = endpoint;
         Client = client;
+        _scopeFactory = scopeFactory;
     }
 
     static INotifier? Notifier => NotificationHelper.Current;
@@ -26,26 +30,42 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
     protected NHttpClient Client { get; }
     protected string Endpoint => _endpoint;
 
-    protected virtual string ResolveEndpoint()
+    protected virtual string BuildEndpoint(object urn, Expression<Func<T, bool>>? filter = null)
     {
-        return _endpoint;
+        GuardHelper.ThrowIfNullOrWhiteSpace(urn);
+        return BuildEndpointCore($"{Endpoint}/{urn}", filter);
     }
 
-    protected virtual string BuildUrl(object id)
+    protected virtual string BuildEndpoint(object urn1, object urn2, Expression<Func<T, bool>>? filter = null)
     {
-        return $"{ResolveEndpoint()}/{id}";
+        GuardHelper.ThrowIfNullOrWhiteSpace(urn1);
+        GuardHelper.ThrowIfNullOrWhiteSpace(urn2);
+        return BuildEndpointCore($"{Endpoint}/{urn1}/{urn2}", filter);
+    }
+
+    protected virtual string BuildEndpoint(object urn1, object urn2, object urn3, Expression<Func<T, bool>>? filter = null)
+    {
+        GuardHelper.ThrowIfNullOrWhiteSpace(urn1);
+        GuardHelper.ThrowIfNullOrWhiteSpace(urn2);
+        GuardHelper.ThrowIfNullOrWhiteSpace(urn3);
+        return BuildEndpointCore($"{Endpoint}/{urn1}/{urn2}/{urn3}", filter);
+    }
+
+    protected virtual string BuildEndpoint(Expression<Func<T, bool>>? filter = null)
+    {
+        return BuildEndpointCore(Endpoint, filter);
     }
 
     protected virtual Task<Result<TModel>> CreateCore(T item)
     {
         var model = MapModel(item);
-        return Client.Post(ResolveEndpoint(), model);
+        return Client.Post(BuildEndpoint(), model);
     }
 
     protected virtual Task<Result<TModel>> UpdateCore(T item)
     {
         var model = MapModel(item);
-        return Client.Patch(ResolveEndpoint(), model);
+        return Client.Patch(BuildEndpoint(), model);
     }
 
     protected virtual TModel MapModel(T item)
@@ -55,6 +75,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         return model;
     }
 
+    [return: NotNullIfNotNull(nameof(model))]
     protected virtual T? MapEntity(TModel? model)
     {
         return model?.MapToEntity();
@@ -81,7 +102,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
             )
             {
 #if DEBUG
-                Notifier?.Warn(ex.Message);
+                Notifier?.Error(ex);
 #else
                 Notifier?.Warn(Not.Localization.NStrings.Cannot_connect_to_server_string);
 #endif
@@ -101,7 +122,7 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
 
     public async Task Delete(int id)
     {
-        var url = BuildUrl(id);
+        var url = BuildEndpoint(id);
         await HandleRequest(Client.Delete(url));
     }
 
@@ -110,14 +131,19 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         await Delete(item.Id);
     }
 
-    public virtual Task Delete(Expression<Func<T, bool>> filter)
+    public virtual async Task DeleteMany(Expression<Func<T, bool>> filter)
     {
-        return DeleteMany(filter);
+        var items = await ReadMany(filter);
+        await DeleteMany(items);
     }
 
-    public virtual Task Delete(IEnumerable<T> items)
+    // TODO: replace with a DeleteMany call
+    public virtual async Task DeleteMany(IEnumerable<T> items)
     {
-        return DeleteMany(items);
+        foreach (var item in items)
+        {
+            await Delete(item);
+        }
     }
 
     public virtual async Task<T?> Read(Expression<Func<T, bool>> filter)
@@ -127,19 +153,27 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
 
     public async Task<T?> Read(int id)
     {
-        var url = BuildUrl(id);
+        var url = BuildEndpoint(id);
         var model = await HandleRequest(Client.Get<TModel>(url));
         return MapEntity(model);
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany()
     {
-        var models = await HandleRequest(Client.Get<IEnumerable<TModel>>(ResolveEndpoint())) ?? [];
+        var models = await HandleRequest(Client.Get<IEnumerable<TModel>>(BuildEndpoint())) ?? [];
         return models.Select(x => MapEntity(x)!);
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
+        if (ODataApiFilterAdapter.TryParseFilters(GetFilters(filter), out _))
+        {
+            var endpoint = BuildEndpoint(filter);
+            var models = await HandleRequest(Client.Get<IEnumerable<TModel>>(endpoint)) ?? [];
+            return models.Select(x => MapEntity(x)!);
+        }
+
+        // TODO: Warning logc with trace measurements for the fallback
         var predicate = filter.Compile();
         var results = await ReadMany();
         return results.Where(predicate);
@@ -150,17 +184,24 @@ public abstract class RestApiRepository<T, TModel> : IRepository<T>
         await HandleRequest(UpdateCore(item));
     }
 
-    async Task DeleteMany(Expression<Func<T, bool>> filter)
+    string  BuildEndpointCore(string endpoint, Expression<Func<T, bool>>? filter = null)
     {
-        var items = await ReadMany(filter);
-        await DeleteMany(items);
+        var queryParams = ODataApiFilterAdapter.ParseFilters(GetFilters(filter));
+        return HttpHelper.AddQueryString(endpoint, queryParams);
     }
 
-    async Task DeleteMany(IEnumerable<T> items)
+    IEnumerable<Expression<Func<T, bool>>> GetFilters(Expression<Func<T, bool>>? filter = null)
     {
-        foreach (var item in items)
+        var filters = new List<Expression<Func<T, bool>>>();
+        if (_scopeFactory != null)
         {
-            await Delete(item);
+            filters.Add(_scopeFactory.Create().Filter);
         }
+        if (filter != null)
+        {
+            filters.Add(filter);
+        }
+
+        return filters;
     }
 }

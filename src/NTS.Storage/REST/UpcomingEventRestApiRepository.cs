@@ -10,7 +10,7 @@ using NTS.Domain.Setup.Events;
 
 namespace NTS.Storage.REST;
 
-public class UpcomingEventRestApiRepository : RestApiRepository<UpcomingEvent, UpcomingEventModel>, ITransient
+public class UpcomingEventRestApiRepository : ApiRepository<UpcomingEvent, UpcomingEventModel>, ITransient
 {
     readonly IDomainEventDispatcher _domainEventDispatcher;
 

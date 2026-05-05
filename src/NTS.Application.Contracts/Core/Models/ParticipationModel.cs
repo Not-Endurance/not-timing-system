@@ -5,7 +5,7 @@ using NTS.Domain.Enums;
 
 namespace NTS.Application.Contracts.Core.Models;
 
-public class ParticipationModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Participation>
+public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Participation>
 {
     public static ParticipationModel MapFrom(Participation participation)
     {

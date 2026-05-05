@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Not.Application.CRUD.Ports;
+using Not.Storage.Mongo;
 using NTS.Application.Contracts.Setup;
 using NTS.Application.Contracts.Setup.Models;
 using NTS.Nexus.HTTP.Functions.Base;
@@ -14,7 +14,7 @@ public class AthleteFunctions : CrudFunctions<AthleteModel>
 {
     public AthleteFunctions(
         IFunctionLogger<AthleteFunctions> logger,
-        IRepository<AthleteModel> athletes,
+        IMongoRepository<AthleteModel> athletes,
         ITelemetryService telemetry
     )
         : base(logger, athletes, telemetry) { }
@@ -27,7 +27,7 @@ public class AthleteFunctions : CrudFunctions<AthleteModel>
         using var activity = StartFunctionActivity(nameof(Create));
         TagRequest(request);
         LogInformation(request, nameof(Create));
-        return await InternalCreate(request);
+        return await CreateCore(request);
     }
 
     [Function("athletes-update")]
@@ -38,7 +38,7 @@ public class AthleteFunctions : CrudFunctions<AthleteModel>
         using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
-        return await InternalUpdate(request);
+        return await UpdateCore(request);
     }
 
     [Function("athletes-delete")]
@@ -50,7 +50,7 @@ public class AthleteFunctions : CrudFunctions<AthleteModel>
         using var activity = StartFunctionActivity(nameof(Delete));
         TagRequest(request);
         LogInformation(request, nameof(Delete));
-        return await InternalDelete(request, id);
+        return await DeleteCore(id);
     }
 
     [Function("athletes-read")]
@@ -62,7 +62,7 @@ public class AthleteFunctions : CrudFunctions<AthleteModel>
         using var activity = StartFunctionActivity(nameof(Read));
         TagRequest(request);
         LogInformation(request, nameof(Read));
-        return await InternalRead(request, id);
+        return await ReadCore(id);
     }
 
     [Function("athletes-read-many")]
@@ -73,6 +73,6 @@ public class AthleteFunctions : CrudFunctions<AthleteModel>
         using var activity = StartFunctionActivity(nameof(ReadMany));
         TagRequest(request);
         LogInformation(request, nameof(ReadMany));
-        return await InternalReadMany(request);
+        return await ReadManyCore(request);
     }
 }

@@ -4,7 +4,7 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Application.Contracts.Core.Models;
 
-public class SnapshotResultModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<SnapshotResult>
+public class SnapshotResultModel : IEventScoped, ISoftDeletableDocument, IKrudModel<SnapshotResult>
 {
     public static SnapshotResultModel From(SnapshotResult result)
     {

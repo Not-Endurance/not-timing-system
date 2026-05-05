@@ -8,7 +8,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public class AthleteRestApiRepository : RestApiRepository<Athlete, AthleteModel>, ITransient
+public class AthleteRestApiRepository : ApiRepository<Athlete, AthleteModel>, ITransient
 {
     public AthleteRestApiRepository(NHttpClient client)
         : base("athletes", client) { }

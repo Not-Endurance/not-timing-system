@@ -5,7 +5,7 @@ using NTS.Domain.Enums;
 
 namespace NTS.Application.Contracts.Core.Models;
 
-public class OfficialModel : IEventScopedDocument, ISoftDeletableDocument, IKrudModel<Official>
+public class OfficialModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Official>
 {
     public static OfficialModel MapFrom(Official official)
     {

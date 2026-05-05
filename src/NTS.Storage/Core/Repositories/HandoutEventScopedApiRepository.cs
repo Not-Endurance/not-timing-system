@@ -8,8 +8,8 @@ using NTS.Storage.REST;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class RankingRepository : EventScopedApiRepository<Ranking, RankingModel>, ITransient
+public class HandoutEventScopedApiRepository : EventScopedApiRepository<Handout, HandoutModel>, ITransient
 {
-    public RankingRepository(NHttpClient client, INtsSocketContext socketContext)
-        : base("rankings", client, socketContext) { }
+    public HandoutEventScopedApiRepository(NHttpClient client, EventScopeFactory<Handout> eventScopeFactory)
+        : base("handouts", client, eventScopeFactory) { }
 }

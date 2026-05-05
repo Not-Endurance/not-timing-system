@@ -9,7 +9,7 @@ using NTS.Application.UserSession;
 namespace NTS.Storage.REST;
 
 public class UserSessionRestApiRepository
-    : RestApiRepository<NtsUserSessionModel, NtsUserSessionModel>,
+    : ApiRepository<NtsUserSessionModel, NtsUserSessionModel>,
         INtsUserSessionRepository,
         INUserSessionRepository<NtsUserSessionStateModel>,
         ITransient

@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.OData.Query;
 using MongoDB.Driver;
-using Not.Application.CRUD.Ports;
+using MongoDB.Driver.Linq;
 using Not.Structures;
 
 namespace Not.Storage.Mongo;
 
-public abstract class MongoRepository<T> : IRepository<T>
+public abstract class MongoRepository<T> : IMongoRepository<T>
     where T : IIdentifiable
 {
     static readonly ActivitySource SOURCE = new("Not.Storage.Mongo");
@@ -25,11 +26,6 @@ public abstract class MongoRepository<T> : IRepository<T>
 
     protected abstract UpdateDefinition<T> GetUpdateDefinition(T document);
 
-    protected virtual Expression<Func<T, bool>> GetIdFilter(int id)
-    {
-        return x => x.Id == id;
-    }
-
     protected virtual Expression<Func<T, bool>> GetItemFilter(T item)
     {
         return x => x.Id == item.Id;
@@ -38,6 +34,14 @@ public abstract class MongoRepository<T> : IRepository<T>
     protected IMongoCollection<T> GetCollection()
     {
         return _context.Client.GetDatabase(_db).GetCollection<T>(_collection);
+    }
+
+    protected virtual IQueryable<T> ApplyODataOptions(
+        IQueryable<T> query,
+        ODataQueryOptions<T> options
+    )
+    {
+        return (IQueryable<T>)options.ApplyTo(query, new ODataQuerySettings());
     }
 
     public virtual async Task Create(T item)
@@ -68,8 +72,7 @@ public abstract class MongoRepository<T> : IRepository<T>
     public virtual async Task<T?> Read(int id)
     {
         using var activity = StartActivity(nameof(Read));
-        var filter = GetIdFilter(id);
-        return await GetCollection().Find(filter).FirstOrDefaultAsync();
+        return await GetCollection().Find(x => x.Id == id).FirstOrDefaultAsync();
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany()
@@ -84,6 +87,12 @@ public abstract class MongoRepository<T> : IRepository<T>
         return await GetCollection().Find(filter).ToListAsync();
     }
 
+    public virtual async Task<IEnumerable<T>> ReadMany(ODataQueryOptions<T> options)
+    {
+        using var activity = StartActivity(nameof(ReadMany));
+        return await ApplyODataOptions(GetCollection().AsQueryable(), options).ToListAsync();
+    }
+
     public virtual async Task Update(T items)
     {
         using var activity = StartActivity(nameof(Update));
@@ -95,27 +104,26 @@ public abstract class MongoRepository<T> : IRepository<T>
 
     public virtual async Task Delete(int id)
     {
-        using var activity = StartActivity(nameof(Delete));
-        var filter = GetIdFilter(id);
-        await GetCollection().DeleteOneAsync(filter);
+        using var activity = StartActivity(nameof(DeleteMany));
+        await GetCollection().DeleteOneAsync(x => x.Id == id);
     }
 
     public virtual async Task Delete(T item)
     {
-        using var activity = StartActivity(nameof(Delete));
+        using var activity = StartActivity(nameof(DeleteMany));
         var filter = GetItemFilter(item);
         await GetCollection().DeleteOneAsync(filter);
     }
 
-    public virtual async Task Delete(Expression<Func<T, bool>> filter)
+    public virtual async Task DeleteMany(Expression<Func<T, bool>> filter)
     {
-        using var activity = StartActivity(nameof(Delete));
+        using var activity = StartActivity(nameof(DeleteMany));
         await GetCollection().DeleteManyAsync(filter);
     }
 
-    public virtual Task Delete(IEnumerable<T> items)
+    public virtual Task DeleteMany(IEnumerable<T> items)
     {
-        using var activity = StartActivity(nameof(Delete));
+        using var activity = StartActivity(nameof(DeleteMany));
 
         throw new NotImplementedException(
             "Batch delete with full entities isn't supported. Probably remove this method"
