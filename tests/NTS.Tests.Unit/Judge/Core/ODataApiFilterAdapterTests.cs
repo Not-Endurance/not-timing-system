@@ -34,17 +34,57 @@ public class ODataApiFilterAdapterTests
     }
 
     [Fact]
-    public void TryParseFilter_ReturnsFalseForUnsupportedExpression()
+    public void TryParseFilter_ReturnsEmptyQueryForTrueExpression()
     {
-        int[] ids = [1, 2];
+        var isCreated = ODataApiFilterAdapter.TryParseFilters<QueryDocument>(
+            [x => true],
+            out var queryParameters
+        );
+
+        Assert.True(isCreated);
+        Assert.Empty(queryParameters);
+
+        queryParameters = ODataApiFilterAdapter.ParseFilters<QueryDocument>(
+            [
+                x => true,
+                x => x.Id == 7,
+            ]
+        );
+
+        Assert.Equal("Id eq 7", AssertFilter(queryParameters));
+    }
+
+    [Fact]
+    public void TryParseFilter_CreatesODataFilterFromComparisonOperators()
+    {
+        var queryParameters = ODataApiFilterAdapter.ParseFilters<QueryDocument>(
+            [
+                x => x.Id != 1,
+                x => x.Id >= 2,
+                x => x.Id <= 3,
+                x => x.Id < 4,
+                x => x.Id > 5,
+            ]
+        );
+
+        Assert.Equal(
+            "(Id ne 1) and (Id ge 2) and (Id le 3) and (Id lt 4) and (Id gt 5)",
+            AssertFilter(queryParameters)
+        );
+    }
+
+    [Fact]
+    public void TryParseFilter_CreatesODataFilterFromListContains()
+    {
+        IList<int> ids = [1, 2];
 
         var isCreated = ODataApiFilterAdapter.TryParseFilters<QueryDocument>(
             [x => ids.Contains(x.Id)],
             out var queryParameters
         );
 
-        Assert.False(isCreated);
-        Assert.Empty(queryParameters);
+        Assert.True(isCreated);
+        Assert.Equal("(Id eq 1 or Id eq 2)", AssertFilter(queryParameters));
     }
 
     [Fact]
