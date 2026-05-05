@@ -52,6 +52,17 @@ public class RankingFunctions : CrudFunctions<RankingModel>
         return await DeleteCore(id);
     }
 
+    [Function("rankings-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "rankings")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+        return await DeleteManyCore(request);
+    }
+
     [Function("rankings-read")]
     public async Task<IActionResult> Read(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rankings/{id:int}")] HttpRequest request,

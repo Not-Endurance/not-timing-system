@@ -96,4 +96,18 @@ public class UpcomingEventFunctions : FunctionBase
         await _upcomingEvents.Delete(upcomingEvent);
         return Ok();
     }
+
+    [Function("upcoming-event-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "upcoming-event")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+
+        var upcomingEvents = await ReadBody<UpcomingEventModel[]>(request);
+        await _upcomingEvents.DeleteMany(upcomingEvents);
+        return Ok();
+    }
 }

@@ -52,6 +52,17 @@ public class HandoutFunctions : CrudFunctions<HandoutModel>
         return await DeleteCore(id);
     }
 
+    [Function("handouts-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "handouts")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+        return await DeleteManyCore(request);
+    }
+
     [Function("handouts-read")]
     public async Task<IActionResult> Read(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "handouts/{id:int}")] HttpRequest request,

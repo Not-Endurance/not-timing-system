@@ -60,6 +60,17 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         return await DeleteCore(id);
     }
 
+    [Function("user-sessions-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user-sessions")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+        return await DeleteManyCore(request);
+    }
+
     [Function("user-sessions-read")]
     public async Task<IActionResult> Read(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "user-sessions/{id:int}")] HttpRequest request,

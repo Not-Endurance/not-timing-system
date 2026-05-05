@@ -121,13 +121,20 @@ public abstract class MongoRepository<T> : IMongoRepository<T>
         await GetCollection().DeleteManyAsync(filter);
     }
 
-    public virtual Task DeleteMany(IEnumerable<T> items)
+    public virtual async Task DeleteMany(IEnumerable<T> items)
     {
         using var activity = StartActivity(nameof(DeleteMany));
 
-        throw new NotImplementedException(
-            "Batch delete with full entities isn't supported. Probably remove this method"
-        );
+        var filters = items
+            .Select(item => Builders<T>.Filter.Where(GetItemFilter(item)))
+            .ToArray();
+        if (filters.Length == 0)
+        {
+            return;
+        }
+
+        var filter = filters.Length == 1 ? filters[0] : Builders<T>.Filter.Or(filters);
+        await GetCollection().DeleteManyAsync(filter);
     }
 
     Activity? StartActivity(string methodName)

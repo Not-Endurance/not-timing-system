@@ -52,6 +52,17 @@ public class ParticipationFunctions : CrudFunctions<ParticipationModel>
         return await DeleteCore(id);
     }
 
+    [Function("participations-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "participations")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+        return await DeleteManyCore(request);
+    }
+
     [Function("participations-read")]
     public async Task<IActionResult> Read(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "participations/{id:int}")] HttpRequest request,

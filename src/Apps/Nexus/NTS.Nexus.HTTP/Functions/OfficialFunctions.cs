@@ -52,6 +52,17 @@ public class OfficialFunctions : CrudFunctions<OfficialModel>
         return await DeleteCore(id);
     }
 
+    [Function("officials-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "officials")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+        return await DeleteManyCore(request);
+    }
+
     [Function("officials-read")]
     public async Task<IActionResult> Read(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "officials/{id:int}")] HttpRequest request,

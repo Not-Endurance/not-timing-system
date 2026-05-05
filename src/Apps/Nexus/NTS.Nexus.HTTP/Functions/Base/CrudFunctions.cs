@@ -65,6 +65,13 @@ public class CrudFunctions<T> : FunctionBase
         return Ok();
     }
 
+    protected async Task<IActionResult> DeleteManyCore(HttpRequest request)
+    {
+        var payload = await ReadBody<T[]>(request);
+        await _repository.DeleteMany(payload);
+        return Ok();
+    }
+
     static bool TryCreateOptions(
         HttpRequest request,
         out ODataQueryOptions<T> options,

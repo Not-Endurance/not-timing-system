@@ -92,6 +92,20 @@ public class HorseFunctions : FunctionBase
         return Ok();
     }
 
+    [Function("horses-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+
+        var horses = await ReadBody<HorseModel[]>(request);
+        await _horses.DeleteMany(horses);
+        return Ok();
+    }
+
     [Function("horses-get")]
     public async Task<IActionResult> GetOne(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses/{id:int}")] HttpRequest request,

@@ -137,13 +137,15 @@ public abstract class ApiRepository<T, TModel> : IRepository<T>
         await DeleteMany(items);
     }
 
-    // TODO: replace with a DeleteMany call
     public virtual async Task DeleteMany(IEnumerable<T> items)
     {
-        foreach (var item in items)
+        var models = items.Select(MapModel).ToArray();
+        if (models.Length == 0)
         {
-            await Delete(item);
+            return;
         }
+
+        await HandleRequest(Client.Delete(BuildEndpoint(), models));
     }
 
     public virtual async Task<T?> Read(Expression<Func<T, bool>> filter)
