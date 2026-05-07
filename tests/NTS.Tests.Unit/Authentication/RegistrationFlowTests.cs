@@ -97,6 +97,87 @@ public class RegistrationFlowTests
         Assert.Equal("BG", users.LastRegistration?.CountryRegion);
     }
 
+    [Theory]
+    [InlineData("club")]
+    [InlineData("extension_1234567890abcdef_club")]
+    public async Task Resolver_registers_new_user_with_club_claim(string clubClaimType)
+    {
+        var users = new RecordingUserRegister
+        {
+            GetResult = Result.Failure<NUserModel>("User not found"),
+            RegisterResult = Result.Success(
+                new NUserModel("new.user@example.com")
+                {
+                    Name = "Jane Doe",
+                    GivenName = "Jane",
+                    Surname = "Doe",
+                    Club = "Konarche",
+                }
+            ),
+        };
+        var resolver = new NUserResolver(users, NullLogger<NUserResolver>.Instance);
+        var principal = CreatePrincipal(
+            new Claim(ClaimTypes.Email, "new.user@example.com"),
+            new Claim("given_name", "Jane"),
+            new Claim("family_name", "Doe"),
+            new Claim(clubClaimType, " Konarche ")
+        );
+
+        var result = await resolver.ResolvePrincipal(principal);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(
+            new NUserRegistration("new.user@example.com", "Jane Doe", "Jane", "Doe", club: "Konarche"),
+            users.LastRegistration
+        );
+    }
+
+    [Fact]
+    public async Task Resolver_registers_new_user_with_pending_registration_profile()
+    {
+        var users = new RecordingUserRegister
+        {
+            GetResult = Result.Failure<NUserModel>("User not found"),
+            RegisterResult = Result.Success(
+                new NUserModel("new.user@example.com")
+                {
+                    Name = "Jane Marie Doe",
+                    GivenName = "Jane",
+                    MiddleName = "Marie",
+                    Surname = "Doe",
+                    Club = "Konarche",
+                    FeiId = "10101010",
+                }
+            ),
+        };
+        var resolver = new NUserResolver(users, NullLogger<NUserResolver>.Instance);
+        var principal = CreatePrincipal(new Claim(ClaimTypes.Email, "new.user@example.com"));
+        var profile = new NUserRegistrationProfile(
+            "Jane Marie Doe",
+            "Jane",
+            "Marie",
+            "Doe",
+            "Konarche",
+            "10101010"
+        );
+
+        var result = await resolver.ResolvePrincipal(principal, profile);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(
+            new NUserRegistration(
+                "new.user@example.com",
+                "Jane Marie Doe",
+                "Jane",
+                "Doe",
+                middleName: "Marie",
+                club: "Konarche",
+                feiId: "10101010"
+            ),
+            users.LastRegistration
+        );
+    }
+
     [Fact]
     public async Task Resolver_uses_existing_user_without_registering_again()
     {
@@ -105,12 +186,31 @@ public class RegistrationFlowTests
         var resolver = new NUserResolver(users, NullLogger<NUserResolver>.Instance);
 
         var principal = CreatePrincipal(new Claim(ClaimTypes.Email, "existing.user@example.com"));
+        var pendingProfile = new NUserRegistrationProfile("Jane Doe", "Jane", surname: "Doe");
 
-        var result = await resolver.ResolvePrincipal(principal);
+        var result = await resolver.ResolvePrincipal(principal, pendingProfile);
 
         Assert.True(result.IsSuccess);
         Assert.Equal(0, users.RegisterCalls);
         Assert.True(result.Principal.IsInRole("Admin"));
+    }
+
+    [Fact]
+    public async Task Resolver_registers_when_get_returns_success_with_null_user()
+    {
+        var users = new RecordingUserRegister
+        {
+            GetResult = Result.Success<NUserModel>(null!),
+            RegisterResult = Result.Success(new NUserModel("new.user@example.com")),
+        };
+        var resolver = new NUserResolver(users, NullLogger<NUserResolver>.Instance);
+        var principal = CreatePrincipal(new Claim(ClaimTypes.Email, "new.user@example.com"));
+
+        var result = await resolver.ResolvePrincipal(principal);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(1, users.RegisterCalls);
+        Assert.Equal("new.user@example.com", users.LastRegistration?.Email);
     }
 
     [Fact]
@@ -169,6 +269,26 @@ public class RegistrationFlowTests
     }
 
     [Fact]
+    public async Task N_user_session_registers_when_get_returns_success_with_null_user()
+    {
+        var users = new RecordingUserRegister
+        {
+            GetResult = Result.Success<NUserModel>(null!),
+            RegisterResult = Result.Success(new NUserModel("new.user@example.com")),
+        };
+        var authStateProvider = new StaticAuthenticationStateProvider(
+            CreatePrincipal(new Claim(ClaimTypes.Email, "new.user@example.com"), new Claim("oid", "entra-1"))
+        );
+        var service = new NUserSessionService(authStateProvider, users, new StaticServiceProvider());
+
+        var current = await service.GetCurrent<object>();
+
+        var session = Assert.IsAssignableFrom<INUserSessionModel<object>>(current);
+        Assert.Equal("new.user@example.com", session.User.Email);
+        Assert.Equal(1, users.RegisterCalls);
+    }
+
+    [Fact]
     public async Task N_user_session_reads_registered_session_state_by_user_identifier()
     {
         var users = new RecordingUserRegister
@@ -198,15 +318,27 @@ public class RegistrationFlowTests
         {
             RegisterResult = new NUserModel("new.user@example.com")
             {
-                Name = "Jane Doe",
+                Name = "Jane Marie Doe",
                 GivenName = "Jane",
+                MiddleName = "Marie",
                 Surname = "Doe",
                 CountryRegion = "Bulgaria",
+                Club = "Konarche",
+                FeiId = "10101010",
             },
         };
         var function = new UserFunctions(new TestFunctionLogger<UserFunctions>(), users, new TestTelemetryService());
         var request = CreateRequest(
-            new RegisterUserPaload("new.user@example.com", "Jane Doe", "Jane", "Doe", "Bulgaria")
+            new RegisterUserPaload(
+                "new.user@example.com",
+                "Jane Marie Doe",
+                "Jane",
+                "Doe",
+                "Bulgaria",
+                "Marie",
+                "Konarche",
+                "10101010"
+            )
         );
 
         var response = await function.Register(request);
@@ -218,7 +350,16 @@ public class RegistrationFlowTests
         Assert.Equal(users.RegisterResult.Id, result.Data.Id);
         Assert.Equal(users.RegisterResult.Email, result.Data.Email);
         Assert.Equal(
-            new NUserRegistration("new.user@example.com", "Jane Doe", "Jane", "Doe", "Bulgaria"),
+            new NUserRegistration(
+                "new.user@example.com",
+                "Jane Marie Doe",
+                "Jane",
+                "Doe",
+                "Bulgaria",
+                "Marie",
+                "Konarche",
+                "10101010"
+            ),
             users.LastRegistration
         );
     }
@@ -292,15 +433,55 @@ public class RegistrationFlowTests
     [Fact]
     public void User_document_create_maps_profile_fields_to_user()
     {
-        var document = NUserDocument.Create("new.user@example.com", "  Jane Doe  ", " Jane ", " Doe ", " Bulgaria ");
+        var document = NUserDocument.Create(
+            "new.user@example.com",
+            "  Jane Marie Doe  ",
+            " Jane ",
+            " Doe ",
+            " Bulgaria ",
+            " Marie ",
+            " Konarche ",
+            " 10101010 "
+        );
 
         var user = document.ToUser();
 
-        Assert.Equal("Jane Doe", user.Name);
+        Assert.Equal("Jane Marie Doe", user.Name);
         Assert.Equal("Jane", user.GivenName);
+        Assert.Equal("Marie", user.MiddleName);
         Assert.Equal("Doe", user.Surname);
         Assert.Equal("Bulgaria", user.CountryRegion);
+        Assert.Equal("Konarche", user.Club);
+        Assert.Equal("10101010", user.FeiId);
         Assert.Equal("new.user@example.com", user.Email);
+    }
+
+    [Fact]
+    public void User_document_from_user_preserves_profile_fields()
+    {
+        var user = new NUserModel("new.user@example.com", ["Judge"], 17)
+        {
+            Name = "Jane Marie Doe",
+            GivenName = "Jane",
+            MiddleName = "Marie",
+            Surname = "Doe",
+            CountryRegion = "Bulgaria",
+            Club = "Konarche",
+            FeiId = "10101010",
+        };
+
+        var document = NUserDocument.From(user);
+        var restored = document.ToUser();
+
+        Assert.Equal(user.Id, restored.Id);
+        Assert.Equal(user.Name, restored.Name);
+        Assert.Equal(user.GivenName, restored.GivenName);
+        Assert.Equal(user.MiddleName, restored.MiddleName);
+        Assert.Equal(user.Surname, restored.Surname);
+        Assert.Equal(user.CountryRegion, restored.CountryRegion);
+        Assert.Equal(user.Club, restored.Club);
+        Assert.Equal(user.FeiId, restored.FeiId);
+        Assert.Equal(user.Roles, restored.Roles);
     }
 
     static ClaimsPrincipal CreatePrincipal(params Claim[] claims)
@@ -348,8 +529,11 @@ public class RegistrationFlowTests
                     {
                         Name = registration.Name,
                         GivenName = registration.GivenName,
+                        MiddleName = registration.MiddleName,
                         Surname = registration.Surname,
                         CountryRegion = registration.CountryRegion,
+                        Club = registration.Club,
+                        FeiId = registration.FeiId,
                     }
                 );
             return Task.FromResult(result);

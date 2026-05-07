@@ -51,7 +51,10 @@ public class UserApiRepository : IUserRegister
                     registration.Name,
                     registration.GivenName,
                     registration.Surname,
-                    registration.CountryRegion
+                    registration.CountryRegion,
+                    registration.MiddleName,
+                    registration.Club,
+                    registration.FeiId
                 )
             );
         }

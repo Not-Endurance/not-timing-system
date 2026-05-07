@@ -25,6 +25,7 @@ public static class AuthenticationExtensions
 
         return services
             .AddScoped<NUserResolver>()
+            .AddScoped<INPendingUserRegistrationProfileStore, PendingUserRegistrationProfileStore>()
             .AddTransient<IBrowserLocalStorage, BrowserLocalStorage>()
             .AddSettings<NClientAuthenticationSettings>(configuration);
     }

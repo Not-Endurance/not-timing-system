@@ -8,21 +8,29 @@ internal class NBlazorClientAuthenticationService : INAuthentication
 {
     readonly INAuthenticationSessionStorage _authenticationMarkers;
     readonly INAuthenticationSession _clientAuthenticationSessionService;
+    readonly INPendingUserRegistrationProfileStore _pendingRegistrationProfiles;
     readonly NavigationManager _navigationManager;
 
     public NBlazorClientAuthenticationService(
         INAuthenticationSessionStorage authenticationMarkers,
         INAuthenticationSession clientAuthenticationSessionService,
+        INPendingUserRegistrationProfileStore pendingRegistrationProfiles,
         NavigationManager navigationManager
     )
     {
         _authenticationMarkers = authenticationMarkers;
         _clientAuthenticationSessionService = clientAuthenticationSessionService;
+        _pendingRegistrationProfiles = pendingRegistrationProfiles;
         _navigationManager = navigationManager;
     }
 
-    public void Signin(bool silent = false)
+    public void Signin(bool silent = false, bool preservePendingRegistrationProfile = false)
     {
+        if (!preservePendingRegistrationProfile)
+        {
+            _pendingRegistrationProfiles.Clear();
+        }
+
         _authenticationMarkers.WriteSigninFlowStartedAt();
 
         var requestOptions = new InteractiveRequestOptions { Interaction = InteractionType.SignIn, ReturnUrl = "/" };
@@ -37,6 +45,7 @@ internal class NBlazorClientAuthenticationService : INAuthentication
     public void Signout()
     {
         _clientAuthenticationSessionService.Clear();
+        _pendingRegistrationProfiles.Clear();
         _navigationManager.NavigateTo(AuthenticationContents.AUTHENTICATION);
     }
 }

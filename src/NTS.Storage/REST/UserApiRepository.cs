@@ -23,7 +23,20 @@ public class UserApiRepository : ApiRepository<User, UserModel>, IUserEmailLooku
 
         var encodedEmail = Uri.EscapeDataString(email.Trim());
         var user = await HandleRequest(Client.Get<NUserModel>($"{Endpoint}/{encodedEmail}"));
-        return user == null ? null : new User(user.Email, user.Name, user.Roles, user.Id);
+        return user == null
+            ? null
+            : new User(
+                user.Email,
+                user.Name,
+                user.Roles,
+                user.Id,
+                user.GivenName,
+                user.MiddleName,
+                user.Surname,
+                user.CountryRegion,
+                user.Club,
+                user.FeiId
+            );
     }
 
     public async Task<IEnumerable<User>> Search(string term)

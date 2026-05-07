@@ -57,7 +57,10 @@ public class UserMongoRepository : IUserRepository
             registration.Name,
             registration.GivenName,
             registration.Surname,
-            registration.CountryRegion
+            registration.CountryRegion,
+            registration.MiddleName,
+            registration.Club,
+            registration.FeiId
         );
 
         try

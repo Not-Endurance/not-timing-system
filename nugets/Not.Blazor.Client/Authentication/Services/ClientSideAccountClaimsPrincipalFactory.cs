@@ -10,12 +10,14 @@ namespace Not.Blazor.Client.Authentication.Services;
 internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalFactory<RemoteUserAccount>
 {
     readonly INAuthenticationSession _clientAuthenticationSessionService;
+    readonly INPendingUserRegistrationProfileStore _pendingRegistrationProfiles;
     readonly NUserResolver _userResolver;
     readonly NavigationManager _navigator;
     readonly ILogger<ClientSideAccountClaimsPrincipalFactory> _logger;
 
     public ClientSideAccountClaimsPrincipalFactory(
         INAuthenticationSession clientAuthenticationSessionService,
+        INPendingUserRegistrationProfileStore pendingRegistrationProfiles,
         IAccessTokenProviderAccessor accessor,
         NUserResolver userResolver,
         NavigationManager navigator,
@@ -24,6 +26,7 @@ internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalF
         : base(accessor)
     {
         _clientAuthenticationSessionService = clientAuthenticationSessionService;
+        _pendingRegistrationProfiles = pendingRegistrationProfiles;
         _userResolver = userResolver;
         _navigator = navigator;
         _logger = logger;
@@ -45,9 +48,11 @@ internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalF
             return new ClaimsPrincipal(new ClaimsIdentity());
         }
 
-        var result = await _userResolver.ResolvePrincipal(principal);
+        var pendingRegistrationProfile = await _pendingRegistrationProfiles.Read();
+        var result = await _userResolver.ResolvePrincipal(principal, pendingRegistrationProfile);
         if (result.IsSuccess)
         {
+            await _pendingRegistrationProfiles.Clear();
             await _clientAuthenticationSessionService.Commit();
             return result.Principal;
         }

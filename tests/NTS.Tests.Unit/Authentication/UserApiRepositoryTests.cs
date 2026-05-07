@@ -1,10 +1,12 @@
 using System.Net;
+using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Not.Application.Authentication.User;
 using Not.Application.HTTP;
 using Not.Serialization.JSON;
 using Not.Structures;
+using NTS.Witness.Contracts.API;
 using NTS.Witness.Storage.Repositories;
 
 namespace NTS.Authentication.Tests;
@@ -45,6 +47,42 @@ public class UserApiRepositoryTests
         Assert.Null(result.Data);
     }
 
+    [Fact]
+    public async Task Register_posts_profile_fields()
+    {
+        var handler = new RecordingHttpMessageHandler
+        {
+            ResponseFactory = _ => CreateJsonResponse(Result.Success(new NUserModel("user@example.com"))),
+        };
+        var repository = CreateRepository(handler);
+        var registration = new NUserRegistration(
+            "user@example.com",
+            "Jane Marie Doe",
+            "Jane",
+            "Doe",
+            "Bulgaria",
+            "Marie",
+            "Konarche",
+            "10101010"
+        );
+
+        var result = await repository.Register(registration);
+
+        Assert.True(result.IsSuccess);
+        var payload = JsonSerializer.Deserialize<RegisterUserPaload>(
+            handler.LastRequestContent ?? throw new InvalidOperationException("Expected request content.")
+        );
+        Assert.NotNull(payload);
+        Assert.Equal(registration.Email, payload!.Email);
+        Assert.Equal(registration.Name, payload.Name);
+        Assert.Equal(registration.GivenName, payload.GivenName);
+        Assert.Equal(registration.MiddleName, payload.MiddleName);
+        Assert.Equal(registration.Surname, payload.Surname);
+        Assert.Equal(registration.CountryRegion, payload.CountryRegion);
+        Assert.Equal(registration.Club, payload.Club);
+        Assert.Equal(registration.FeiId, payload.FeiId);
+    }
+
     static UserApiRepository CreateRepository(HttpMessageHandler handler)
     {
         var client = new NHttpClient(
@@ -64,19 +102,22 @@ public class UserApiRepositoryTests
     sealed class RecordingHttpMessageHandler : HttpMessageHandler
     {
         public Func<HttpRequestMessage, HttpResponseMessage>? ResponseFactory { get; init; }
+        public string? LastRequestContent { get; private set; }
 
-        protected override Task<HttpResponseMessage> SendAsync(
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken
         )
         {
-            return Task.FromResult(
-                ResponseFactory?.Invoke(request)
-                    ?? new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = new StringContent(Result.Success().ToJson()),
-                    }
-            );
+            LastRequestContent = request.Content == null
+                ? null
+                : await request.Content.ReadAsStringAsync(cancellationToken);
+
+            return ResponseFactory?.Invoke(request)
+                ?? new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(Result.Success().ToJson()),
+                };
         }
     }
 

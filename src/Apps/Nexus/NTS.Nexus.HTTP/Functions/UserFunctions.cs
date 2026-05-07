@@ -66,7 +66,10 @@ public class UserFunctions : FunctionBase
                 payload.Name,
                 payload.GivenName,
                 payload.Surname,
-                payload.CountryRegion
+                payload.CountryRegion,
+                payload.MiddleName,
+                payload.Club,
+                payload.FeiId
             )
         );
 
