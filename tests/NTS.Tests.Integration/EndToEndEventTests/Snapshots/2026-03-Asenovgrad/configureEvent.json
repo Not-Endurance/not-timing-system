@@ -1371,6 +1371,12 @@
       "User": {
         "_id": 1699297500,
         "TenantId": "nts",
+        "GivenName": null,
+        "MiddleName": null,
+        "Surname": null,
+        "CountryRegion": null,
+        "Club": null,
+        "FeiId": null,
         "Email": "alexchobanov@gmail.com",
         "Name": "unknown",
         "Roles": []

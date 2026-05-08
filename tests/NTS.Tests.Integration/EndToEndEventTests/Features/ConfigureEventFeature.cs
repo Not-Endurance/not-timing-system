@@ -48,9 +48,30 @@ internal class ConfigureEventFeature
         foreach (var user in snapshot.Users)
         {
             var registered = await _nexusApi.RegisterUser(
-                new IntegrationUser(user.Email, $"setup-user-{user.Id}", user.Name)
+                new IntegrationUser(
+                    user.Email,
+                    $"setup-user-{user.Id}",
+                    user.Name,
+                    user.GivenName,
+                    user.MiddleName,
+                    user.Surname,
+                    user.CountryRegion,
+                    user.Club,
+                    user.FeiId
+                )
             );
-            var created = new User(registered.Email, registered.Name, registered.Roles, registered.Id);
+            var created = new User(
+                registered.Email,
+                registered.Name,
+                registered.Roles,
+                registered.Id,
+                registered.GivenName,
+                registered.MiddleName,
+                registered.Surname,
+                registered.CountryRegion,
+                registered.Club,
+                registered.FeiId
+            );
             Remember(idMap, user.Id, created.Id);
             createdUsers.Add(user.Id, created);
         }
@@ -335,7 +356,17 @@ internal class ConfigureEventFeature
             throw new InvalidOperationException("The setup event snapshot does not include a linked official user.");
         }
 
-        return new IntegrationUser(user.Email, $"setup-official-{user.Id}", user.Name);
+        return new IntegrationUser(
+            user.Email,
+            $"setup-official-{user.Id}",
+            user.Name,
+            user.GivenName,
+            user.MiddleName,
+            user.Surname,
+            user.CountryRegion,
+            user.Club,
+            user.FeiId
+        );
     }
 
     static async Task<ConfigureEvent> WaitForSetupEvent(
