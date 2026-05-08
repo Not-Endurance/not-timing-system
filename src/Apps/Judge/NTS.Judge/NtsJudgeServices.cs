@@ -24,7 +24,7 @@ public static class NtsJudgeServices
 
         services
             .ConfigureKrud()
-            .RegisterAggregate<UpcomingEvent>()
+            .RegisterAggregate<ConfigureEvent>()
             .RegisterAggregate<Athlete>()
             .RegisterAggregate<Horse>()
             .RegisterAggregate<Club>();

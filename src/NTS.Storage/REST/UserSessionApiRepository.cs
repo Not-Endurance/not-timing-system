@@ -15,6 +15,11 @@ public class UserSessionApiRepository
     public UserSessionApiRepository(NHttpClient client)
         : base("user-sessions", client) { }
 
+    public new async Task Delete(NtsUserSessionModel item)
+    {
+        await HandleRequest(Client.Delete($"{Endpoint}/{item.EventId}/{item.Id}"));
+    }
+
     public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
     {
         if (string.IsNullOrWhiteSpace(userIdentifier))
@@ -25,6 +30,19 @@ public class UserSessionApiRepository
         var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
         return await HandleRequest(
             Client.Get<NtsUserSessionModel>($"{Endpoint}/by-user-identifier/{encodedUserIdentifier}")
+        );
+    }
+
+    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId)
+    {
+        if (string.IsNullOrWhiteSpace(userIdentifier))
+        {
+            return null;
+        }
+
+        var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
+        return await HandleRequest(
+            Client.Get<NtsUserSessionModel>($"{Endpoint}/{eventId}/by-user-identifier/{encodedUserIdentifier}")
         );
     }
 

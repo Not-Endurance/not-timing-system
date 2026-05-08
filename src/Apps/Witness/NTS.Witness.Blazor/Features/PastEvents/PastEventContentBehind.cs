@@ -6,8 +6,8 @@ namespace NTS.Witness.Blazor.Features.PastEvents;
 
 public class PastEventContentBehind : NComponent
 {
-    protected string CreatePastEventRoute(EnduranceEvent enduranceEvent)
+    protected string CreatePastEventRoute(EventInformation eventInformation)
     {
-        return $"{PAST_EVENTS_PAGE}/{enduranceEvent.Id}";
+        return $"{PAST_EVENTS_PAGE}/{eventInformation.Id}";
     }
 }

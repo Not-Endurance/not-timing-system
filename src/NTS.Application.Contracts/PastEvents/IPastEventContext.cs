@@ -5,6 +5,6 @@ namespace NTS.Application.Contracts.PastEvents;
 
 public interface IPastEventContext : IStatefulService
 {
-    EnduranceEvent? Event { get; }
+    EventInformation? Event { get; }
     int EventId { get; }
 }

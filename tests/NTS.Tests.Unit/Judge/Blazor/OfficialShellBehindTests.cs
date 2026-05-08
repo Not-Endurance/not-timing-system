@@ -1,5 +1,5 @@
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Blazor.Features.Setup.UpcomingEvents.Officials;
+using NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Officials;
 using NTS.Judge.Contracts.Features.Setup;
 
 namespace NTS.Judge.Tests.Blazor;
@@ -89,17 +89,17 @@ public class OfficialShellBehindTests
             return Task.FromResult(Enumerable.Empty<Horse>());
         }
 
-        public Task<IEnumerable<NTS.Domain.Setup.Aggregates.UpcomingEvents.Loop>> GetLoops(CancellationToken ct)
+        public Task<IEnumerable<NTS.Domain.Setup.Aggregates.ConfigureEvents.Loop>> GetLoops(CancellationToken ct)
         {
-            return Task.FromResult(Enumerable.Empty<NTS.Domain.Setup.Aggregates.UpcomingEvents.Loop>());
+            return Task.FromResult(Enumerable.Empty<NTS.Domain.Setup.Aggregates.ConfigureEvents.Loop>());
         }
 
-        public Task<IEnumerable<NTS.Domain.Setup.Aggregates.UpcomingEvents.Combination>> SearchCombinations(
+        public Task<IEnumerable<NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination>> SearchCombinations(
             string term,
             CancellationToken ct
         )
         {
-            return Task.FromResult(Enumerable.Empty<NTS.Domain.Setup.Aggregates.UpcomingEvents.Combination>());
+            return Task.FromResult(Enumerable.Empty<NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination>());
         }
     }
 }

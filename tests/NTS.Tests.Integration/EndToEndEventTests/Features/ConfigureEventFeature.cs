@@ -2,17 +2,17 @@ using Newtonsoft.Json;
 using Not.Krud.Abstractions;
 using NTS.Application.Contracts.Setup.Models;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.UpcomingEvents;
+using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 using NTS.Judge.Contracts.Features.Setup.Athletes;
 using NTS.Judge.Contracts.Features.Setup.Clubs;
 using NTS.Judge.Contracts.Features.Setup.Horses;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Combinations;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Competitions;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Loops;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Officials;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Participations;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Phases;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Officials;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Infrastructure;
@@ -121,22 +121,22 @@ internal class ConfigureEventFeature
             );
         }
 
-        var eventService = _judge.GetRequiredService<IKrudFormService<UpcomingEventFormModel>>();
-        var eventForm = new UpcomingEventFormModel
+        var eventService = _judge.GetRequiredService<IKrudFormService<ConfigureEventFormModel>>();
+        var eventForm = new ConfigureEventFormModel
         {
-            Name = snapshot.UpcomingEvent.Name,
-            Location = snapshot.UpcomingEvent.Location,
-            Country = snapshot.UpcomingEvent.Country,
-            FeiShowId = snapshot.UpcomingEvent.ShowFeiId,
-            FeiId = snapshot.UpcomingEvent.FeiId,
-            FeiEventCode = snapshot.UpcomingEvent.FeiEventCode,
+            Name = snapshot.ConfigureEvent.Name,
+            Location = snapshot.ConfigureEvent.Location,
+            Country = snapshot.ConfigureEvent.Country,
+            FeiShowId = snapshot.ConfigureEvent.ShowFeiId,
+            FeiId = snapshot.ConfigureEvent.FeiId,
+            FeiEventCode = snapshot.ConfigureEvent.FeiEventCode,
         };
         await eventService.Create(eventForm);
         var setupEventId = RequiredId(eventForm);
-        Remember(idMap, snapshot.UpcomingEvent.Id, setupEventId);
+        Remember(idMap, snapshot.ConfigureEvent.Id, setupEventId);
 
-        var currentEvent = await _nexusApi.ReadSetupUpcomingEvent(setupEventId);
-        Assert.Equal(snapshot.UpcomingEvent.Name, currentEvent.Name);
+        var currentEvent = await _nexusApi.ReadSetupConfigureEvent(setupEventId);
+        Assert.Equal(snapshot.ConfigureEvent.Name, currentEvent.Name);
         Assert.Empty(currentEvent.Loops);
         Assert.Empty(currentEvent.Combinations);
         Assert.Empty(currentEvent.Officials);
@@ -144,7 +144,7 @@ internal class ConfigureEventFeature
         _judge.SelectSetupParent(currentEvent);
 
         var loopService = _judge.GetRequiredService<IKrudFormService<LoopFormModel>>();
-        foreach (var loop in snapshot.UpcomingEvent.Loops)
+        foreach (var loop in snapshot.ConfigureEvent.Loops)
         {
             var form = new LoopFormModel { Distance = loop.Distance };
             await loopService.Create(form);
@@ -164,7 +164,7 @@ internal class ConfigureEventFeature
         }
 
         var combinationService = _judge.GetRequiredService<IKrudFormService<CombinationFormModel>>();
-        foreach (var combination in snapshot.UpcomingEvent.Combinations)
+        foreach (var combination in snapshot.ConfigureEvent.Combinations)
         {
             var form = new CombinationFormModel
             {
@@ -201,7 +201,7 @@ internal class ConfigureEventFeature
         }
 
         var officialService = _judge.GetRequiredService<IKrudFormService<OfficialFormModel>>();
-        foreach (var official in snapshot.UpcomingEvent.Officials)
+        foreach (var official in snapshot.ConfigureEvent.Officials)
         {
             var form = new OfficialFormModel
             {
@@ -233,7 +233,7 @@ internal class ConfigureEventFeature
         var phaseService = _judge.GetRequiredService<IKrudFormService<PhaseFormModel>>();
         var participationService = _judge.GetRequiredService<IKrudFormService<ParticipationFormModel>>();
 
-        foreach (var competition in snapshot.UpcomingEvent.Competitions)
+        foreach (var competition in snapshot.ConfigureEvent.Competitions)
         {
             var competitionForm = CreateCompetitionForm(competition);
             await competitionService.Create(competitionForm);
@@ -319,15 +319,15 @@ internal class ConfigureEventFeature
             }
         }
 
-        currentEvent = await _nexusApi.ReadSetupUpcomingEvent(setupEventId);
-        var expected = snapshot.ExpectedUpcomingEventWith(idMap);
-        var actual = SnapshotJson.Canonicalize(UpcomingEventModel.From(currentEvent));
+        currentEvent = await _nexusApi.ReadSetupConfigureEvent(setupEventId);
+        var expected = snapshot.ExpectedConfigureEventWith(idMap);
+        var actual = SnapshotJson.Canonicalize(ConfigureEventModel.From(currentEvent));
 
         Assert.Equal(expected.ToString(Formatting.None), actual.ToString(Formatting.None));
         return new SetupFeatureResult(currentEvent, new Dictionary<int, int>(idMap), ResolveWitnessOfficial(currentEvent));
     }
 
-    static IntegrationUser ResolveWitnessOfficial(UpcomingEvent setupEvent)
+    static IntegrationUser ResolveWitnessOfficial(ConfigureEvent setupEvent)
     {
         var user = setupEvent.Officials.Select(x => x.User).FirstOrDefault(x => x != null);
         if (user == null)
@@ -338,18 +338,18 @@ internal class ConfigureEventFeature
         return new IntegrationUser(user.Email, $"setup-official-{user.Id}", user.Name);
     }
 
-    static async Task<UpcomingEvent> WaitForSetupEvent(
+    static async Task<ConfigureEvent> WaitForSetupEvent(
         NexusApiDriver api,
         int setupEventId,
-        Func<UpcomingEvent, bool> predicate,
+        Func<ConfigureEvent, bool> predicate,
         string expectedState
     )
     {
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
-        UpcomingEvent? current = null;
+        ConfigureEvent? current = null;
         while (DateTimeOffset.UtcNow < deadline)
         {
-            current = await api.ReadSetupUpcomingEvent(setupEventId);
+            current = await api.ReadSetupConfigureEvent(setupEventId);
             if (predicate(current))
             {
                 return current;
@@ -405,13 +405,13 @@ internal class ConfigureEventFeature
         };
     }
 
-    static void SelectCompetition(JudgeDriver judge, UpcomingEvent setupEvent, int competitionId)
+    static void SelectCompetition(JudgeDriver judge, ConfigureEvent setupEvent, int competitionId)
     {
         judge.SelectSetupParent(setupEvent);
         judge.SelectSetupParent(FindCompetition(setupEvent, competitionId));
     }
 
-    static Competition FindCompetition(UpcomingEvent setupEvent, int competitionId)
+    static Competition FindCompetition(ConfigureEvent setupEvent, int competitionId)
     {
         return setupEvent.Competitions.Single(x => x.Id == competitionId);
     }
@@ -430,7 +430,7 @@ internal class ConfigureEventFeature
 internal sealed class SetupFeatureResult
 {
     public SetupFeatureResult(
-        UpcomingEvent setupEvent,
+        ConfigureEvent setupEvent,
         IReadOnlyDictionary<int, int> idMap,
         IntegrationUser witnessOfficial
     )
@@ -440,7 +440,7 @@ internal sealed class SetupFeatureResult
         WitnessOfficial = witnessOfficial;
     }
 
-    public UpcomingEvent SetupEvent { get; }
+    public ConfigureEvent SetupEvent { get; }
     public IReadOnlyDictionary<int, int> IdMap { get; }
     public IntegrationUser WitnessOfficial { get; }
 }

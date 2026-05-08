@@ -189,8 +189,8 @@
   <data name="Dashboard_string" xml:space="preserve">
     <value>Gösterge Paneli</value>
   </data>
-  <data name="Endurance_Event_string" xml:space="preserve">
-    <value>Dayanıklılık Etkinliği</value>
+  <data name="Event_Information_string" xml:space="preserve">
+    <value>Etkinlik Bilgileri</value>
   </data>
   <data name="Athletes_and_Horses_string" xml:space="preserve">
     <value>Biniciler ve Atlar</value>
@@ -321,8 +321,8 @@
   <data name="Start_string" xml:space="preserve">
     <value>başla</value>
   </data>
-  <data name="Configure_Endurance_Event_string" xml:space="preserve">
-    <value>Dayanıklılık Etkinliğini Yapılandır</value>
+  <data name="Configure_Event_string" xml:space="preserve">
+    <value>Etkinliği Yapılandır</value>
   </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Yarışmayı Yapılandır</value>
@@ -535,7 +535,7 @@
   <data name="Invalid_phase_configuration_in_competition__missing_rest" xml:space="preserve">
     <value>Yarışma '{0}' içinde geçersiz aşama yapılandırması: final olmayan bir aşamada Dinlenme süresi eksik</value>
   </data>
-  <data name="Upcoming_events_string" xml:space="preserve">
+  <data name="Configure_events_string" xml:space="preserve">
     <value>Yaklaşan etkinlikler</value>
   </data>
   <data name="Select_event_string" xml:space="preserve">
@@ -669,9 +669,6 @@
   </data>
   <data name="Connect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
-  </data>
-  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
-    <value>'{0}' etkinliğine bağlanmak mevcut anlık görüntü geçmişinizi silecektir. Bu işlem geri alınamaz.</value>
   </data>
   <data name="Disconnect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />

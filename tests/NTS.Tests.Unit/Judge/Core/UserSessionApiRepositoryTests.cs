@@ -14,8 +14,8 @@ public class UserSessionApiRepositoryTests
     [Fact]
     public async Task Read_by_user_identifier_unwraps_session_from_result_envelope()
     {
-        var expected = new NtsUserSessionModel { Id = 17, UserIdentifier = "entra-1" };
-        expected.ReplaceState(new NtsUserSessionStateModel { EventId = 33 });
+        var expected = new NtsUserSessionModel { Id = 17, EventId = 33, UserIdentifier = "entra-1" };
+        expected.ReplaceState(new NtsUserSessionStateModel());
 
         var handler = new RecordingHttpMessageHandler
         {
@@ -28,7 +28,7 @@ public class UserSessionApiRepositoryTests
         Assert.NotNull(result);
         Assert.Equal(17, result!.Id);
         Assert.Equal("entra-1", result.UserIdentifier);
-        Assert.Equal(33, result.State?.EventId);
+        Assert.Equal(33, result.EventId);
     }
 
     static NHttpClient CreateClient(HttpMessageHandler handler)

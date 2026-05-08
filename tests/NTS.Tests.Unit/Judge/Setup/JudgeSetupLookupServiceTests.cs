@@ -6,7 +6,7 @@ using NTS.Application.Setup;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.UpcomingEvents;
+using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 using NTS.Judge.Features.Setup;
 
 namespace NTS.Judge.Tests.Setup;

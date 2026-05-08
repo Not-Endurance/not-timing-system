@@ -136,7 +136,7 @@ public class PastEventRepositoryTests
 
         services.ConfigureNtsStorage(CreateConfiguration()).AddRestApiStorage();
 
-        AssertRegistration<IEnduranceEventRepository, EnduranceEventApiRepository>(services);
+        AssertRegistration<IEventInformationRepository, EventInformationApiRepository>(services);
         AssertRegistration<ISettingRepository, SettingApiRepository>(services);
         AssertRegistration<INtsUserSessionRepository, UserSessionApiRepository>(services);
         AssertRegistration<INUserSessionRepository<NtsUserSessionStateModel>, UserSessionApiRepository>(services);
@@ -147,7 +147,7 @@ public class PastEventRepositoryTests
         AssertRegistration<IRepository<Club>, ClubApiRepository>(services);
         AssertRegistration<IRepository<Horse>, HorseApiRepository>(services);
         AssertRegistration<IRepository<Athlete>, AthleteApiRepository>(services);
-        AssertRegistration<IRepository<UpcomingEvent>, UpcomingEventApiRepository>(services);
+        AssertRegistration<IRepository<ConfigureEvent>, ConfigureEventApiRepository>(services);
         AssertRegistration<IUserEmailLookup, UserApiRepository>(services);
         AssertRegistration<IEventScopedRepository<Participation>, ParticipationEventScopedApiRepository>(services);
         AssertRegistration<IEventScopedRepository<Ranking>, RankingEventScopedApiRepository>(services);
@@ -341,10 +341,10 @@ public class PastEventRepositoryTests
         return new MemoryStream(Encoding.UTF8.GetBytes(payload.ToJson()));
     }
 
-    static EnduranceEvent CreateEvent(int id)
+    static EventInformation CreateEvent(int id)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             "Sofia",
             "Sofia",
@@ -403,7 +403,7 @@ public class PastEventRepositoryTests
         public bool IsConnected => Event != null;
         public SocketConnectionStatus Status =>
             IsConnected ? SocketConnectionStatus.Connected : SocketConnectionStatus.Disconnected;
-        public EnduranceEvent? Event { get; set; }
+        public EventInformation? Event { get; set; }
     }
 
     sealed class TestCrudFunctions<T> : CrudFunctions<T>

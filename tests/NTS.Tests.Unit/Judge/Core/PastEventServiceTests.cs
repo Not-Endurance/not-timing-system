@@ -18,7 +18,7 @@ public class PastEventServiceTests
     [Fact]
     public async Task LoadEvent_LoadsReadOnlyPastEventDataAndBuildsDocument()
     {
-        var enduranceEvent = CreateEvent(14);
+        var eventInformation = CreateEvent(14);
         var participation = CreateParticipation(number: 42, eventId: 14, participationId: 301, combinationId: 201);
         var otherParticipation = CreateParticipation(number: 43, eventId: 99, participationId: 302, combinationId: 202);
         var firstRanking = CreateRanking("General Classification", participation, 601);
@@ -32,7 +32,7 @@ public class PastEventServiceTests
         );
         var otherOfficial = new Official(new Person(["Other"]), OfficialRole.Steward, eventId: 99, id: 702);
         var service = new PastEventService(
-            new EnduranceEventRepository([enduranceEvent]),
+            new EventInformationRepository([eventInformation]),
             new RecordingRepository<Participation>([participation, otherParticipation]),
             new RecordingRepository<Ranking>([firstRanking, secondRanking, otherRanking]),
             new RecordingRepository<Official>([official, otherOfficial])
@@ -53,10 +53,10 @@ public class PastEventServiceTests
         Assert.Equal(secondRanking.Id, service.Document!.Ranklist.RankingId);
     }
 
-    static EnduranceEvent CreateEvent(int id)
+    static EventInformation CreateEvent(int id)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             "Sofia",
             "Sofia",
@@ -137,22 +137,22 @@ public class PastEventServiceTests
         );
     }
 
-    sealed class EnduranceEventRepository : RecordingRepository<EnduranceEvent>, IEnduranceEventRepository
+    sealed class EventInformationRepository : RecordingRepository<EventInformation>, IEventInformationRepository
     {
-        public EnduranceEventRepository(IEnumerable<EnduranceEvent> items)
+        public EventInformationRepository(IEnumerable<EventInformation> items)
             : base(items) { }
 
-        public Task<IEnumerable<EnduranceEvent>> ReadActive()
+        public Task<IEnumerable<EventInformation>> ReadActive()
         {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+            return Task.FromResult<IEnumerable<EventInformation>>([]);
         }
 
-        public Task<IEnumerable<EnduranceEvent>> ReadPast()
+        public Task<IEnumerable<EventInformation>> ReadPast()
         {
             return ReadMany();
         }
 
-        public Task<EnduranceEvent> Start(int upcomingEventId)
+        public Task<EventInformation> Start(int configureEventId)
         {
             throw new NotSupportedException();
         }

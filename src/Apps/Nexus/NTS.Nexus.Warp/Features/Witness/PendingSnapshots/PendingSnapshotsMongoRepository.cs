@@ -8,15 +8,15 @@ namespace NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 
 public interface IPendingSnapshotsRepository
 {
-    Task Create(string enduranceEventId, SnapshotGroupModel snapshotGroup);
-    Task<IReadOnlyList<PendingSnapshotsModel>> Read(string enduranceEventId);
+    Task Create(string eventId, SnapshotGroupModel snapshotGroup);
+    Task<IReadOnlyList<PendingSnapshotsModel>> Read(string eventId);
     Task Remove(PendingSnapshotsModel pendingSnapshots);
 }
 
 public class PendingSnapshotsMongoRepository : MongoRepository<PendingSnapshotsModel>, IPendingSnapshotsRepository
 {
     const string DATABASE = "nts";
-    const string COLLECTION = "pendingSnapshots";
+    const string COLLECTION = "event_pending_snapshots";
 
     readonly ILogger<PendingSnapshotsMongoRepository> _logger;
 
@@ -31,20 +31,21 @@ public class PendingSnapshotsMongoRepository : MongoRepository<PendingSnapshotsM
         throw new NotSupportedException("Pending snapshots are append-only and should not be updated.");
     }
 
-    public async Task Create(string enduranceEventId, SnapshotGroupModel snapshotGroup)
+    public async Task Create(string eventId, SnapshotGroupModel snapshotGroup)
     {
+        var parsedEventId = ParseEventId(eventId);
         var stopwatch = Stopwatch.StartNew();
         try
         {
             await GetCollection()
                 .InsertOneAsync(
-                    new PendingSnapshotsModel { EnduranceEventId = enduranceEventId, SnapshotGroups = [snapshotGroup] }
+                    new PendingSnapshotsModel { EventId = parsedEventId, SnapshotGroups = [snapshotGroup] }
                 );
             stopwatch.Stop();
             _logger.LogInformation(
-                "Mongo create pending snapshots completed in {ElapsedMilliseconds} ms for event {EnduranceEventId}. SnapshotCount {SnapshotCount}.",
+                "Mongo create pending snapshots completed in {ElapsedMilliseconds} ms for event {EventId}. SnapshotCount {SnapshotCount}.",
                 stopwatch.ElapsedMilliseconds,
-                enduranceEventId,
+                parsedEventId,
                 snapshotGroup.Entries.Length
             );
         }
@@ -53,25 +54,26 @@ public class PendingSnapshotsMongoRepository : MongoRepository<PendingSnapshotsM
             stopwatch.Stop();
             _logger.LogError(
                 ex,
-                "Mongo create pending snapshots failed after {ElapsedMilliseconds} ms for event {EnduranceEventId}.",
+                "Mongo create pending snapshots failed after {ElapsedMilliseconds} ms for event {EventId}.",
                 stopwatch.ElapsedMilliseconds,
-                enduranceEventId
+                parsedEventId
             );
             throw;
         }
     }
 
-    public async Task<IReadOnlyList<PendingSnapshotsModel>> Read(string enduranceEventId)
+    public async Task<IReadOnlyList<PendingSnapshotsModel>> Read(string eventId)
     {
+        var parsedEventId = ParseEventId(eventId);
         var stopwatch = Stopwatch.StartNew();
         try
         {
-            var documents = await GetCollection().Find(x => x.EnduranceEventId == enduranceEventId).ToListAsync();
+            var documents = await GetCollection().Find(x => x.EventId == parsedEventId).ToListAsync();
             stopwatch.Stop();
             _logger.LogInformation(
-                "Mongo read pending snapshots completed in {ElapsedMilliseconds} ms for event {EnduranceEventId}. DocumentCount {DocumentCount}.",
+                "Mongo read pending snapshots completed in {ElapsedMilliseconds} ms for event {EventId}. DocumentCount {DocumentCount}.",
                 stopwatch.ElapsedMilliseconds,
-                enduranceEventId,
+                parsedEventId,
                 documents.Count
             );
             return documents;
@@ -81,9 +83,9 @@ public class PendingSnapshotsMongoRepository : MongoRepository<PendingSnapshotsM
             stopwatch.Stop();
             _logger.LogError(
                 ex,
-                "Mongo read pending snapshots failed after {ElapsedMilliseconds} ms for event {EnduranceEventId}.",
+                "Mongo read pending snapshots failed after {ElapsedMilliseconds} ms for event {EventId}.",
                 stopwatch.ElapsedMilliseconds,
-                enduranceEventId
+                parsedEventId
             );
             throw;
         }
@@ -97,9 +99,9 @@ public class PendingSnapshotsMongoRepository : MongoRepository<PendingSnapshotsM
             await GetCollection().DeleteOneAsync(x => x.MongoId == pendingSnapshots.MongoId);
             stopwatch.Stop();
             _logger.LogInformation(
-                "Mongo delete pending snapshots completed in {ElapsedMilliseconds} ms for event {EnduranceEventId}. MongoId {MongoId}.",
+                "Mongo delete pending snapshots completed in {ElapsedMilliseconds} ms for event {EventId}. MongoId {MongoId}.",
                 stopwatch.ElapsedMilliseconds,
-                pendingSnapshots.EnduranceEventId,
+                pendingSnapshots.EventId,
                 pendingSnapshots.MongoId
             );
         }
@@ -108,12 +110,22 @@ public class PendingSnapshotsMongoRepository : MongoRepository<PendingSnapshotsM
             stopwatch.Stop();
             _logger.LogError(
                 ex,
-                "Mongo delete pending snapshots failed after {ElapsedMilliseconds} ms for event {EnduranceEventId}. MongoId {MongoId}.",
+                "Mongo delete pending snapshots failed after {ElapsedMilliseconds} ms for event {EventId}. MongoId {MongoId}.",
                 stopwatch.ElapsedMilliseconds,
-                pendingSnapshots.EnduranceEventId,
+                pendingSnapshots.EventId,
                 pendingSnapshots.MongoId
             );
             throw;
         }
+    }
+
+    static int ParseEventId(string eventId)
+    {
+        if (int.TryParse(eventId, out var parsedEventId))
+        {
+            return parsedEventId;
+        }
+
+        throw new ArgumentException($"Event id '{eventId}' is not a valid integer.", nameof(eventId));
     }
 }

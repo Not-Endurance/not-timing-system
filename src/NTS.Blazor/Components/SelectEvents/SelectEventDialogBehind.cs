@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 using Not.Blazor.Dialogs.Abstractions;
-using Not.Blazor.Helpers;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Contracts.Socket;
@@ -12,24 +10,21 @@ namespace NTS.Blazor.Components.SelectEvents;
 public class SelectEventDialogBehind : NDialog
 {
     [Inject]
-    IEnduranceEventService EnduranceEventService { get; set; } = default!;
+    IEventInformationService EventInformationService { get; set; } = default!;
 
     [Inject]
     INtsSocketService SocketService { get; set; } = default!;
 
-    [Inject]
-    IDialogService DialogService { get; set; } = default!;
-
-    protected IEnumerable<EnduranceEvent> Events { get; set; } = [];
+    protected IEnumerable<EventInformation> Events { get; set; } = [];
     protected string[] EventsTableHeaders { get; set; } = [Event_string];
     protected bool IsConnected => SocketService.IsConnected;
-    protected EnduranceEvent? SelectedEvent => SocketService.Event;
+    protected EventInformation? SelectedEvent => SocketService.Event;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Events = await EnduranceEventService.GetActive();
+            Events = await EventInformationService.GetActive();
         }
         catch (Exception ex)
         {
@@ -37,21 +32,16 @@ public class SelectEventDialogBehind : NDialog
         }
     }
 
-    protected async Task ConnectTo(EnduranceEvent enduranceEvent)
+    protected async Task ConnectTo(EventInformation eventInformation)
     {
         try
         {
-            if (!await ConfirmSessionResetIfNeeded(enduranceEvent))
-            {
-                return;
-            }
-
-            if (SocketService.IsConnected && SelectedEvent?.Id != enduranceEvent.Id)
+            if (SocketService.IsConnected && SelectedEvent?.Id != eventInformation.Id)
             {
                 await SocketService.Disconnect();
             }
 
-            await SocketService.Connect(enduranceEvent);
+            await SocketService.Connect(eventInformation);
             if (SocketService.IsConnected)
             {
                 await ConfirmDialog();
@@ -73,17 +63,5 @@ public class SelectEventDialogBehind : NDialog
         {
             Handle(ex);
         }
-    }
-
-    async Task<bool> ConfirmSessionResetIfNeeded(EnduranceEvent enduranceEvent)
-    {
-        if (!await SocketService.WillResetSession(enduranceEvent))
-        {
-            return true;
-        }
-
-        var parameters = new DialogParameters<ChangeEventHistoryDialog> { { x => x.EventName, enduranceEvent.Name } };
-        var dialog = await DialogService.ShowAsync<ChangeEventHistoryDialog>(Change_event_string, parameters);
-        return !await dialog.IsCanceled();
     }
 }

@@ -33,7 +33,7 @@ public class WitnessRpcClientTests
         await client.PublishSnapshotsAsync(CreateSnapshotGroup());
 
         Assert.NotNull(client.LastRequest);
-        Assert.Equal("17", client.LastRequest!.EnduranceEventId);
+        Assert.Equal("17", client.LastRequest!.EventId);
         Assert.Single(client.LastRequest.Payload.Entries);
     }
 
@@ -64,10 +64,10 @@ public class WitnessRpcClientTests
         return new HubConnectionBuilder().WithUrl("https://localhost/witness-hub").Build();
     }
 
-    static EnduranceEvent CreateEvent(int eventId)
+    static EventInformation CreateEvent(int eventId)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             "Sofia",
             "Ring",
@@ -124,7 +124,7 @@ public class WitnessRpcClientTests
 
     sealed class TestSocketContext : INtsSocketContext
     {
-        public TestSocketContext(EnduranceEvent? @event)
+        public TestSocketContext(EventInformation? @event)
         {
             Event = @event;
         }
@@ -132,7 +132,7 @@ public class WitnessRpcClientTests
         public bool IsConnected => Event != null;
         public SocketConnectionStatus Status =>
             IsConnected ? SocketConnectionStatus.Connected : SocketConnectionStatus.Disconnected;
-        public EnduranceEvent? Event { get; }
+        public EventInformation? Event { get; }
     }
 
     sealed class TestNotifier : INotifier

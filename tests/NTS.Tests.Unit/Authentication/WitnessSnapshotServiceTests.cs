@@ -87,10 +87,10 @@ public class WitnessSnapshotServiceTests
         );
     }
 
-    static EnduranceEvent CreateEvent(int eventId)
+    static EventInformation CreateEvent(int eventId)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             "Sofia",
             "Ring",
@@ -172,7 +172,7 @@ public class WitnessSnapshotServiceTests
         public bool IsConnected => Event != null;
         public SocketConnectionStatus Status =>
             IsConnected ? SocketConnectionStatus.Connected : SocketConnectionStatus.Disconnected;
-        public EnduranceEvent? Event { get; set; }
+        public EventInformation? Event { get; set; }
     }
 
     sealed class TestWitnessUserSession : IWitnessUserSession

@@ -2,7 +2,7 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.UpcomingEvents;
+using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 using NTS.Domain.Setup.Services.StartValidation;
 
 namespace NTS.Judge.Tests.Core.State;
@@ -41,7 +41,7 @@ public class StartValidatorTests
         var setupEvent = CreateEvent([], []);
 
         var result = StartValidator.Validate(
-            new UpcomingEvent(
+            new ConfigureEvent(
                 setupEvent.Name,
                 setupEvent.Location,
                 setupEvent.Country,
@@ -125,7 +125,7 @@ public class StartValidatorTests
         Assert.False(issue.IsAutoCorrectable);
     }
 
-    static UpcomingEvent CreateEvent(
+    static ConfigureEvent CreateEvent(
         (double Distance, int Recovery, int? RestMinutes)[] competitionOnePhases,
         (double Distance, int Recovery, int? RestMinutes)[] competitionTwoPhases
     )
@@ -139,7 +139,7 @@ public class StartValidatorTests
         var competitionTwo = CreateCompetition("Competition B", competitionTwoPhases, combination, 2);
         var loops = new List<Loop> { new(100, 100), new(101, 101) };
 
-        return new UpcomingEvent(
+        return new ConfigureEvent(
             "Event",
             "Sofia",
             country,
@@ -189,11 +189,11 @@ public class StartValidatorTests
         );
     }
 
-    static UpcomingEvent ReplaceCompetition(UpcomingEvent setupEvent, Competition competition, int index)
+    static ConfigureEvent ReplaceCompetition(ConfigureEvent setupEvent, Competition competition, int index)
     {
         var competitions = setupEvent.Competitions.ToList();
         competitions[index] = competition;
-        return new UpcomingEvent(
+        return new ConfigureEvent(
             setupEvent.Name,
             setupEvent.Location,
             setupEvent.Country,

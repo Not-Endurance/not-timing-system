@@ -15,7 +15,7 @@ using NTS.Domain.Core.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
 using NTS.Judge.Contracts.Features.Core;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents;
 using NTS.Judge.Features.Core;
 using NTS.Judge.Tests.Core.Implementations;
 
@@ -28,10 +28,10 @@ public class DashServiceTests
     {
         var calls = new List<string>();
         var socketService = new TestSocketService(calls);
-        var startBusiness = new TestUpcomingEventService(calls);
-        var enduranceEvents = new TestEnduranceEventRepository(calls);
+        var startBusiness = new TestConfigureEventService(calls);
+        var eventInformation = new TestEventInformationRepository(calls);
         var activeEvents = new TestActiveEventService(calls);
-        var service = CreateService(socketService, activeEvents, startBusiness, enduranceEvents);
+        var service = CreateService(socketService, activeEvents, startBusiness, eventInformation);
 
         await service.Start(7);
 
@@ -43,10 +43,10 @@ public class DashServiceTests
     {
         var calls = new List<string>();
         var socketService = new TestSocketService(calls) { IsConnected = true, Event = CreateEvent(3) };
-        var startBusiness = new TestUpcomingEventService(calls);
-        var enduranceEvents = new TestEnduranceEventRepository(calls);
+        var startBusiness = new TestConfigureEventService(calls);
+        var eventInformation = new TestEventInformationRepository(calls);
         var activeEvents = new TestActiveEventService(calls);
-        var service = CreateService(socketService, activeEvents, startBusiness, enduranceEvents);
+        var service = CreateService(socketService, activeEvents, startBusiness, eventInformation);
 
         await service.Start(9);
 
@@ -58,10 +58,10 @@ public class DashServiceTests
     {
         var calls = new List<string>();
         var socketService = new TestSocketService(calls) { Event = CreateEvent(11) };
-        var startBusiness = new TestUpcomingEventService(calls);
-        var enduranceEvents = new TestEnduranceEventRepository(calls);
+        var startBusiness = new TestConfigureEventService(calls);
+        var eventInformation = new TestEventInformationRepository(calls);
         var activeEvents = new TestActiveEventService(calls);
-        var service = CreateService(socketService, activeEvents, startBusiness, enduranceEvents);
+        var service = CreateService(socketService, activeEvents, startBusiness, eventInformation);
 
         await service.Reset();
 
@@ -71,23 +71,23 @@ public class DashServiceTests
     static DashService CreateService(
         INtsSocketService socketService,
         IActiveEventsContext activeEventService,
-        IUpcomingEventService upcomingEventService,
-        IEnduranceEventRepository enduranceEvents
+        IConfigureEventService configureEventService,
+        IEventInformationRepository eventInformation
     )
     {
         return new DashService(
             socketService,
             activeEventService,
             [],
-            enduranceEvents,
-            upcomingEventService
+            eventInformation,
+            configureEventService
         );
     }
 
-    static EnduranceEvent CreateEvent(int id)
+    static EventInformation CreateEvent(int id)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             "Sofia",
             "Sofia",
@@ -99,22 +99,22 @@ public class DashServiceTests
         );
     }
 
-    sealed class TestUpcomingEventService : IUpcomingEventService
+    sealed class TestConfigureEventService : IConfigureEventService
     {
         readonly List<string> _calls;
 
-        public TestUpcomingEventService(List<string> calls)
+        public TestConfigureEventService(List<string> calls)
         {
             _calls = calls;
         }
 
-        public Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId)
+        public Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int configureEventId)
         {
-            _calls.Add($"Validate({upcomingEventId})");
+            _calls.Add($"Validate({configureEventId})");
             return Task.FromResult(Result.Success<IReadOnlyList<StartValidationIssue>>([]));
         }
 
-        public Task DeleteParticipation(int upcomingEventId, int participationNumber, int competitionId)
+        public Task DeleteParticipation(int configureEventId, int participationNumber, int competitionId)
         {
             throw new NotImplementedException();
         }
@@ -131,14 +131,14 @@ public class DashServiceTests
 
         public IEventSubscriber ObservableEvent { get; } = new Event();
 
-        public bool IsActive(UpcomingEvent upcomingEvent)
+        public bool IsActive(ConfigureEvent configureEvent)
         {
             return false;
         }
 
-        public void Add(EnduranceEvent enduranceEvent)
+        public void Add(EventInformation eventInformation)
         {
-            _calls.Add($"AddActive({enduranceEvent.Id})");
+            _calls.Add($"AddActive({eventInformation.Id})");
         }
 
         public void Remove(int eventId)
@@ -164,13 +164,13 @@ public class DashServiceTests
         public IEventSubscriber ObservableEvent { get; } = new Event();
         public bool IsConnected { get; set; }
         public SocketConnectionStatus Status { get; set; } = SocketConnectionStatus.Disconnected;
-        public EnduranceEvent? Event { get; set; }
+        public EventInformation? Event { get; set; }
 
-        public Task Connect(EnduranceEvent enduranceEvent)
+        public Task Connect(EventInformation eventInformation)
         {
-            _calls.Add($"Connect({enduranceEvent.Id})");
+            _calls.Add($"Connect({eventInformation.Id})");
             IsConnected = true;
-            Event = enduranceEvent;
+            Event = eventInformation;
             Status = SocketConnectionStatus.Connected;
             return Task.CompletedTask;
         }
@@ -184,7 +184,7 @@ public class DashServiceTests
             return Task.CompletedTask;
         }
 
-        public Task<bool> WillResetSession(EnduranceEvent enduranceEvent)
+        public Task<bool> WillResetSession(EventInformation eventInformation)
         {
             return Task.FromResult(false);
         }
@@ -195,19 +195,19 @@ public class DashServiceTests
         }
     }
 
-    sealed class TestEnduranceEventRepository : IEnduranceEventRepository
+    sealed class TestEventInformationRepository : IEventInformationRepository
     {
         readonly List<string>? _calls;
 
-        public TestEnduranceEventRepository(List<string>? calls = null)
+        public TestEventInformationRepository(List<string>? calls = null)
         {
             _calls = calls;
         }
 
-        public Task<EnduranceEvent> Start(int upcomingEventId)
+        public Task<EventInformation> Start(int configureEventId)
         {
-            _calls?.Add($"Start({upcomingEventId})");
-            return Task.FromResult(CreateEvent(upcomingEventId));
+            _calls?.Add($"Start({configureEventId})");
+            return Task.FromResult(CreateEvent(configureEventId));
         }
 
         public Task Reset()
@@ -216,47 +216,47 @@ public class DashServiceTests
             return Task.CompletedTask;
         }
 
-        public Task<IEnumerable<EnduranceEvent>> ReadActive()
+        public Task<IEnumerable<EventInformation>> ReadActive()
         {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+            return Task.FromResult<IEnumerable<EventInformation>>([]);
         }
 
-        public Task<IEnumerable<EnduranceEvent>> ReadPast()
+        public Task<IEnumerable<EventInformation>> ReadPast()
         {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+            return Task.FromResult<IEnumerable<EventInformation>>([]);
         }
 
-        public Task Create(EnduranceEvent item)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task<EnduranceEvent?> Read(Expression<Func<EnduranceEvent, bool>> filter)
-        {
-            return Task.FromResult<EnduranceEvent?>(null);
-        }
-
-        public Task<EnduranceEvent?> Read(int id)
-        {
-            return Task.FromResult<EnduranceEvent?>(null);
-        }
-
-        public Task<IEnumerable<EnduranceEvent>> ReadMany()
-        {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
-        }
-
-        public Task<IEnumerable<EnduranceEvent>> ReadMany(Expression<Func<EnduranceEvent, bool>> filter)
-        {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
-        }
-
-        public Task Update(EnduranceEvent item)
+        public Task Create(EventInformation item)
         {
             return Task.CompletedTask;
         }
 
-        public Task Delete(EnduranceEvent item)
+        public Task<EventInformation?> Read(Expression<Func<EventInformation, bool>> filter)
+        {
+            return Task.FromResult<EventInformation?>(null);
+        }
+
+        public Task<EventInformation?> Read(int id)
+        {
+            return Task.FromResult<EventInformation?>(null);
+        }
+
+        public Task<IEnumerable<EventInformation>> ReadMany()
+        {
+            return Task.FromResult<IEnumerable<EventInformation>>([]);
+        }
+
+        public Task<IEnumerable<EventInformation>> ReadMany(Expression<Func<EventInformation, bool>> filter)
+        {
+            return Task.FromResult<IEnumerable<EventInformation>>([]);
+        }
+
+        public Task Update(EventInformation item)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task Delete(EventInformation item)
         {
             return Task.CompletedTask;
         }
@@ -266,12 +266,12 @@ public class DashServiceTests
             return Task.CompletedTask;
         }
 
-        public Task DeleteMany(Expression<Func<EnduranceEvent, bool>> filter)
+        public Task DeleteMany(Expression<Func<EventInformation, bool>> filter)
         {
             return Task.CompletedTask;
         }
 
-        public Task DeleteMany(IEnumerable<EnduranceEvent> items)
+        public Task DeleteMany(IEnumerable<EventInformation> items)
         {
             return Task.CompletedTask;
         }

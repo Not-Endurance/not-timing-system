@@ -14,15 +14,15 @@ public class JudgeConnectionsContext : IJudgeConnectionsContext
         _logger = logger;
     }
 
-    public void Add(string enduranceEventId, string connectionId)
+    public void Add(string eventId, string connectionId)
     {
-        if (_connections.TryAdd(enduranceEventId, connectionId))
+        if (_connections.TryAdd(eventId, connectionId))
         {
             return;
         }
-        _logger.LogError("Connection with identifier '{enduranceEventId}' already exists", enduranceEventId);
+        _logger.LogError("Connection with identifier '{eventId}' already exists", eventId);
         throw new HubException(
-            $"Event '{enduranceEventId}' is already active and managed. Select a different event to proceed"
+            $"Event '{eventId}' is already active and managed. Select a different event to proceed"
         ); // TODO: localize this
     }
 
@@ -32,13 +32,13 @@ public class JudgeConnectionsContext : IJudgeConnectionsContext
         _connections.TryRemove(match);
     }
 
-    public string? GetConnectionId(string enduranceEventId)
+    public string? GetConnectionId(string eventId)
     {
-        return _connections.GetValueOrDefault(enduranceEventId);
+        return _connections.GetValueOrDefault(eventId);
     }
 }
 
 public interface IJudgeConnectionsContext : ISingleton
 {
-    string? GetConnectionId(string enduranceEventId);
+    string? GetConnectionId(string eventId);
 }

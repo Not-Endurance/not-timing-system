@@ -8,5 +8,5 @@ public interface INtsSocketContext : ISocketContext
 {
     [MemberNotNullWhen(true, nameof(Event))]
     new bool IsConnected { get; }
-    EnduranceEvent? Event { get; }
+    EventInformation? Event { get; }
 }

@@ -16,13 +16,13 @@ internal sealed class StartCoreEventFeature
         _nexusApi = nexusApi;
     }
 
-    public async Task<EnduranceEvent> Execute(SetupFeatureResult setup)
+    public async Task<EventInformation> Execute(SetupFeatureResult setup)
     {
-        var setupEvent = await _nexusApi.ReadSetupUpcomingEvent(setup.SetupEvent.Id);
+        var setupEvent = await _nexusApi.ReadSetupConfigureEvent(setup.SetupEvent.Id);
 
         await _judge.Start();
         await _judge.GetRequiredService<IDashService>().Start(setupEvent.Id);
 
-        return await _nexusApi.ReadEnduranceEvent(setupEvent.Id);
+        return await _nexusApi.ReadEventInformation(setupEvent.Id);
     }
 }

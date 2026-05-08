@@ -20,8 +20,8 @@ public class JudgeStartupEventCoordinatorTests
     {
         var socketService = new TestSocketService { IsConnected = true, Event = CreateEvent(7) };
         var dialogLauncher = new TestDialogLauncher();
-        var coordinator = new JudgeStartupEnduranceEventCoordinator(
-            new TestEnduranceEventService([CreateEvent(1), CreateEvent(2)]),
+        var coordinator = new JudgeStartupEventInformationCoordinator(
+            new TestEventInformationService([CreateEvent(1), CreateEvent(2)]),
             socketService,
             dialogLauncher
         );
@@ -37,8 +37,8 @@ public class JudgeStartupEventCoordinatorTests
     {
         var socketService = new TestSocketService();
         var dialogLauncher = new TestDialogLauncher();
-        var coordinator = new JudgeStartupEnduranceEventCoordinator(
-            new TestEnduranceEventService([]),
+        var coordinator = new JudgeStartupEventInformationCoordinator(
+            new TestEventInformationService([]),
             socketService,
             dialogLauncher
         );
@@ -55,8 +55,8 @@ public class JudgeStartupEventCoordinatorTests
         var activeEvent = CreateEvent(11);
         var socketService = new TestSocketService();
         var dialogLauncher = new TestDialogLauncher();
-        var coordinator = new JudgeStartupEnduranceEventCoordinator(
-            new TestEnduranceEventService([activeEvent]),
+        var coordinator = new JudgeStartupEventInformationCoordinator(
+            new TestEventInformationService([activeEvent]),
             socketService,
             dialogLauncher
         );
@@ -73,8 +73,8 @@ public class JudgeStartupEventCoordinatorTests
     {
         var socketService = new TestSocketService();
         var dialogLauncher = new TestDialogLauncher();
-        var coordinator = new JudgeStartupEnduranceEventCoordinator(
-            new TestEnduranceEventService([CreateEvent(1), CreateEvent(2)]),
+        var coordinator = new JudgeStartupEventInformationCoordinator(
+            new TestEventInformationService([CreateEvent(1), CreateEvent(2)]),
             socketService,
             dialogLauncher
         );
@@ -85,10 +85,10 @@ public class JudgeStartupEventCoordinatorTests
         Assert.Equal(1, dialogLauncher.ShowCalls);
     }
 
-    static EnduranceEvent CreateEvent(int id)
+    static EventInformation CreateEvent(int id)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             $"Event{id}",
             "Sofia",
@@ -100,25 +100,25 @@ public class JudgeStartupEventCoordinatorTests
         );
     }
 
-    sealed class TestEnduranceEventService : IEnduranceEventService
+    sealed class TestEventInformationService : IEventInformationService
     {
-        readonly IEnumerable<EnduranceEvent> _events;
+        readonly IEnumerable<EventInformation> _events;
 
-        public TestEnduranceEventService(IEnumerable<EnduranceEvent> events)
+        public TestEventInformationService(IEnumerable<EventInformation> events)
         {
             _events = events;
         }
 
         public IEventSubscriber ObservableEvent => throw new NotImplementedException();
 
-        public Task<IEnumerable<EnduranceEvent>> GetActive()
+        public Task<IEnumerable<EventInformation>> GetActive()
         {
             return Task.FromResult(_events);
         }
 
-        public Task<IEnumerable<EnduranceEvent>> GetPast()
+        public Task<IEnumerable<EventInformation>> GetPast()
         {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+            return Task.FromResult<IEnumerable<EventInformation>>([]);
         }
 
         public Task Load()
@@ -133,14 +133,14 @@ public class JudgeStartupEventCoordinatorTests
         public IEventSubscriber ObservableEvent { get; } = new Event();
         public bool IsConnected { get; set; }
         public SocketConnectionStatus Status { get; set; } = SocketConnectionStatus.Disconnected;
-        public EnduranceEvent? Event { get; set; }
+        public EventInformation? Event { get; set; }
 
-        public Task Connect(EnduranceEvent enduranceEvent)
+        public Task Connect(EventInformation eventInformation)
         {
             ConnectCalls++;
             IsConnected = true;
             Status = SocketConnectionStatus.Connected;
-            Event = enduranceEvent;
+            Event = eventInformation;
             return Task.CompletedTask;
         }
 
@@ -152,7 +152,7 @@ public class JudgeStartupEventCoordinatorTests
             return Task.CompletedTask;
         }
 
-        public Task<bool> WillResetSession(EnduranceEvent enduranceEvent)
+        public Task<bool> WillResetSession(EventInformation eventInformation)
         {
             return Task.FromResult(false);
         }

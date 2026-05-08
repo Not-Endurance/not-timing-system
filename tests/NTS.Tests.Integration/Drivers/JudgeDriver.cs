@@ -82,12 +82,12 @@ internal sealed class JudgeDriver : IAsyncDisposable
         return _provider.Startup();
     }
 
-    public async Task Connect(EnduranceEvent enduranceEvent)
+    public async Task Connect(EventInformation eventInformation)
     {
-        await _socketService.Connect(enduranceEvent);
+        await _socketService.Connect(eventInformation);
         if (!_socketService.IsConnected)
         {
-            throw new InvalidOperationException($"Judge did not connect to event {enduranceEvent.Id}.");
+            throw new InvalidOperationException($"Judge did not connect to event {eventInformation.Id}.");
         }
     }
 

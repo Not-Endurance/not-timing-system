@@ -189,8 +189,8 @@
   <data name="Dashboard_string" xml:space="preserve">
     <value>Табло</value>
   </data>
-  <data name="Endurance_Event_string" xml:space="preserve">
-    <value>Състезание по издръжливост</value>
+  <data name="Event_Information_string" xml:space="preserve">
+    <value>Информация за събитие</value>
   </data>
   <data name="Athletes_and_Horses_string" xml:space="preserve">
     <value>Състезатели и коне</value>
@@ -321,8 +321,8 @@
   <data name="Start_string" xml:space="preserve">
     <value>старт</value>
   </data>
-  <data name="Configure_Endurance_Event_string" xml:space="preserve">
-    <value>Конфигурирай Събитие</value>
+  <data name="Configure_Event_string" xml:space="preserve">
+    <value>Конфигурирай събитие</value>
   </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Конфигурирай Състезание</value>
@@ -534,8 +534,8 @@
   <data name="Invalid_phase_configuration_in_competition__missing_rest" xml:space="preserve">
     <value>Невалидно състезание '{0}' поради липсващо Време за почивка на не-финална фаза</value>
   </data>
-  <data name="Upcoming_events_string" xml:space="preserve">
-    <value>Предстоящи събития</value>
+  <data name="Configure_events_string" xml:space="preserve">
+    <value>Конфигурирай събития</value>
   </data>
   <data name="Select_event_string" xml:space="preserve">
     <value>Изберете събитие</value>
@@ -768,20 +768,17 @@
   <data name="Connect_string" xml:space="preserve">
     <value>Свържи се</value>
   </data>
-  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
-    <value>Свързването към '{0}' ще премахне текущата ви история на снимките. Това действие не може да бъде отменено.</value>
-  </data>
   <data name="Disconnect_string" xml:space="preserve">
     <value>Прекъсни връзката</value>
   </data>
   <data name="Empty_event_list_message" xml:space="preserve">
-    <value>Все още не са конфигурирани състезания по издръжливост</value>
+    <value>Все още не са конфигурирани събития</value>
   </data>
   <data name="Select_athlete_string" xml:space="preserve">
     <value>Изберете състезател</value>
   </data>
   <data name="Empty_performance_competitor_message" xml:space="preserve">
-    <value>Вашият акаунт не е конфигуриран като участник в настоящото състезание по издръжливост. Ако участвате, моля, свържете се с Администратор</value>
+    <value>Вашият акаунт не е конфигуриран като участник в настоящото събитие. Ако участвате, моля, свържете се с Администратор</value>
   </data>
   <data name="Empty_performance_official_message" xml:space="preserve">
     <value>Изберете участник отгоре, за да видите неговите резултати</value>
@@ -912,8 +909,8 @@
   <data name="File_not_found_string" xml:space="preserve">
     <value>Файлът не е намерен.</value>
   </data>
-  <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
-    <value>Предстоящите събития не могат да бъдат изтрити</value>
+  <data name="Configure_events_cannot_be_deleted_string" xml:space="preserve">
+    <value>Конфигурираните събития не могат да бъдат изтрити</value>
   </data>
   <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
     <value>Не може да се стартира - невалидна конфигурация.</value>
@@ -954,10 +951,10 @@
   <data name="Validation_errors_string" xml:space="preserve">
     <value>Валидационни грешки</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Past_events_string" xml:space="preserve">
     <value>Минали събития</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

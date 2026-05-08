@@ -6,7 +6,7 @@ namespace NTS.Application.Contracts.Core;
 
 public interface IActiveEventsContext : IStatefulService
 {
-    bool IsActive(UpcomingEvent upcomingEvent);
-    void Add(EnduranceEvent enduranceEvent);
+    bool IsActive(ConfigureEvent configureEvent);
+    void Add(EventInformation eventInformation);
     void Remove(int eventId);
 }

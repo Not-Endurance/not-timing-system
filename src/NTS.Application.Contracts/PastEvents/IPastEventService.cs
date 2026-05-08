@@ -6,7 +6,7 @@ namespace NTS.Application.Contracts.PastEvents;
 
 public interface IPastEventService : IPastEventContext
 {
-    IReadOnlyList<EnduranceEvent> Events { get; }
+    IReadOnlyList<EventInformation> Events { get; }
     IReadOnlyList<Ranking> Rankings { get; }
     Ranking? CurrentRanking { get; }
     IReadOnlyDictionary<int, IReadOnlyList<Starter>> StartlistHistoryByStage { get; }

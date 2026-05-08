@@ -80,10 +80,10 @@ public class HandoutsServiceTests
         Assert.Equal(participation.Id, handout.Participation.Id);
     }
 
-    static EnduranceEvent CreateEvent(int id)
+    static EventInformation CreateEvent(int id)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             "Sofia",
             "Sofia",
@@ -136,7 +136,7 @@ public class HandoutsServiceTests
         public bool IsConnected => Event != null;
         public SocketConnectionStatus Status =>
             IsConnected ? SocketConnectionStatus.Connected : SocketConnectionStatus.Disconnected;
-        public EnduranceEvent? Event { get; set; }
+        public EventInformation? Event { get; set; }
     }
 
     sealed class RecordingRepository<T> : IEventScopedRepository<T>

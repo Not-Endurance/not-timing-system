@@ -1,7 +1,7 @@
 using MudBlazor;
 using Not.Krud.Blazor.Components.Abstractions;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Combinations;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 
 namespace NTS.Judge.Blazor.Features.Setup.Combinations;
 

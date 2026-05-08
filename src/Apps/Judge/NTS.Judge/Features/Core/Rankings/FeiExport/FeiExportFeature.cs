@@ -13,31 +13,31 @@ namespace NTS.Judge.Features.Core.Rankings.FeiExport;
 
 internal class FeiExportFeature : IFeiExportFeature
 {
-    public string CreateXmlContent(Ranklist ranklist, EnduranceEvent enduranceEvent)
+    public string CreateXmlContent(Ranklist ranklist, EventInformation eventInformation)
     {
-        var model = CreateHorseSport(ranklist, enduranceEvent);
+        var model = CreateHorseSport(ranklist, eventInformation);
         var xml = Serialize(model);
         return InsertGeneratedDate(xml);
     }
 
-    HorseSport CreateHorseSport(Ranklist ranklist, EnduranceEvent enduranceEvent)
+    HorseSport CreateHorseSport(Ranklist ranklist, EventInformation eventInformation)
     {
         var ranking = ranklist.Ranking;
-        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiShowId))
+        if (string.IsNullOrWhiteSpace(eventInformation.FeiShowId))
         {
             throw new DomainException("Missing Show FEI ID");
         }
-        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiId))
+        if (string.IsNullOrWhiteSpace(eventInformation.FeiId))
         {
             throw new DomainException("Missing Event FEI ID");
         }
-        if (string.IsNullOrWhiteSpace(enduranceEvent.FeiEventCode))
+        if (string.IsNullOrWhiteSpace(eventInformation.FeiEventCode))
         {
             throw new DomainException("Missing FEI Event code");
         }
-        if (string.IsNullOrWhiteSpace(enduranceEvent.Location))
+        if (string.IsNullOrWhiteSpace(eventInformation.Location))
         {
-            throw new DomainException("Missing EnduranceEvent location");
+            throw new DomainException("Missing event information location");
         }
         if (string.IsNullOrEmpty(ranking.Name))
         {
@@ -58,14 +58,14 @@ internal class FeiExportFeature : IFeiExportFeature
 
         // IsoCode is not accepted by FEI, but they have representatives which can correct that in case a country
         // without NF code is used. This shouldn't happen anyway
-        var countryCode = enduranceEvent.Country.NfCode ?? enduranceEvent.Country.IsoCode;
-        var ctEnduranceCompetition = CreateCompetitions(enduranceEvent!, ranklist);
+        var countryCode = eventInformation.Country.NfCode ?? eventInformation.Country.IsoCode;
+        var ctEnduranceCompetition = CreateCompetitions(eventInformation, ranklist);
         var ctEnduranceEvent = new ctEnduranceEvent
         {
-            FEIID = enduranceEvent.FeiId,
-            Code = enduranceEvent.FeiEventCode,
-            StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
-            EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
+            FEIID = eventInformation.FeiId,
+            Code = eventInformation.FeiEventCode,
+            StartDate = eventInformation.EventSpan.StartDay.DateTime,
+            EndDate = eventInformation.EventSpan.EndDay.DateTime,
             NF = countryCode,
             Competitions = [ctEnduranceCompetition],
         };
@@ -81,18 +81,18 @@ internal class FeiExportFeature : IFeiExportFeature
             {
                 Show = new ctShowResult
                 {
-                    Venue = new ctVenue { Name = enduranceEvent.Location, Country = countryCode },
+                    Venue = new ctVenue { Name = eventInformation.Location, Country = countryCode },
                     EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
-                    StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
-                    EndDate = enduranceEvent.EventSpan.EndDay.DateTime,
-                    FEIID = enduranceEvent.FeiShowId,
+                    StartDate = eventInformation.EventSpan.StartDay.DateTime,
+                    EndDate = eventInformation.EventSpan.EndDay.DateTime,
+                    FEIID = eventInformation.FeiShowId,
                 },
             },
         };
         return horseSport;
     }
 
-    ctEnduranceCompetition CreateCompetitions(EnduranceEvent enduranceEvent, Ranklist ranklist)
+    ctEnduranceCompetition CreateCompetitions(EventInformation eventInformation, Ranklist ranklist)
     {
         var ranking = ranklist.Ranking;
         var competitionFeiId = ranklist.Ranking.CompetitionFeiId!;
@@ -102,7 +102,7 @@ internal class FeiExportFeature : IFeiExportFeature
             ScheduleCompetitionNr = ranking.FeiScheduleNumber!,
             Rule = ranking.FeiRule!,
             Name = ranking.Name,
-            StartDate = enduranceEvent.EventSpan.StartDay.DateTime,
+            StartDate = eventInformation.EventSpan.StartDay.DateTime,
             Team = false,
             ParticipationList = new ctEnduranceParticipations(),
         };
@@ -252,5 +252,5 @@ internal class FeiExportFeature : IFeiExportFeature
 
 public interface IFeiExportFeature : ITransient
 {
-    string CreateXmlContent(Ranklist ranklist, EnduranceEvent enduranceEvent);
+    string CreateXmlContent(Ranklist ranklist, EventInformation eventInformation);
 }

@@ -1,5 +1,6 @@
 using MongoDB.Driver;
 using Not.Application.Authentication.Abstractions;
+using Not.Injection;
 using Not.Storage.Mongo;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
@@ -11,7 +12,9 @@ namespace NTS.Nexus.HTTP.Mongo.Repositories;
 public class UserSessionMongoRepository
     : MongoRepository<NtsUserSessionModel>,
         INtsUserSessionRepository,
-        INUserSessionRepository<NtsUserSessionStateModel>
+        INUserSessionRepository<NtsUserSessionStateModel>,
+        IEventResetRepository,
+        ITransient
 {
     readonly ITelemetryService _telemetry;
 
@@ -27,7 +30,15 @@ public class UserSessionMongoRepository
 
         return Builders<NtsUserSessionModel>
             .Update.Set(x => x.UserIdentifier, document.UserIdentifier)
+            .Set(x => x.EventId, document.EventId)
             .Set(x => x.State, document.State);
+    }
+
+    protected override System.Linq.Expressions.Expression<Func<NtsUserSessionModel, bool>> GetItemFilter(
+        NtsUserSessionModel item
+    )
+    {
+        return x => x.Id == item.Id && x.EventId == item.EventId;
     }
 
     public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier)
@@ -40,6 +51,25 @@ public class UserSessionMongoRepository
         }
 
         return await GetCollection().Find(x => x.UserIdentifier == userIdentifier).FirstOrDefaultAsync();
+    }
+
+    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId)
+    {
+        using var activity = _telemetry.StartActivity(nameof(UserSessionMongoRepository), nameof(ReadByUserIdentifier));
+
+        if (string.IsNullOrWhiteSpace(userIdentifier))
+        {
+            return null;
+        }
+
+        return await GetCollection()
+            .Find(x => x.UserIdentifier == userIdentifier && x.EventId == eventId)
+            .FirstOrDefaultAsync();
+    }
+
+    public Task DeleteAllForEvent(int eventId)
+    {
+        return DeleteMany(x => x.EventId == eventId);
     }
 
     async Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(

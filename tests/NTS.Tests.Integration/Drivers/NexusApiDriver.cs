@@ -13,8 +13,8 @@ using SetupClub = NTS.Domain.Setup.Aggregates.Club;
 using SetupClubModel = NTS.Application.Contracts.Setup.Models.ClubModel;
 using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
 using SetupHorseModel = NTS.Application.Contracts.Setup.Models.HorseModel;
-using SetupUpcomingEvent = NTS.Domain.Setup.Aggregates.UpcomingEvent;
-using SetupUpcomingEventModel = NTS.Application.Contracts.Setup.Models.UpcomingEventModel;
+using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
+using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
 
 namespace NTS.Tests.Integration.Drivers;
 
@@ -36,9 +36,9 @@ internal sealed class NexusApiDriver : IDisposable
         );
     }
 
-    public Task Create(EnduranceEvent enduranceEvent)
+    public Task Create(EventInformation eventInformation)
     {
-        return Send(HttpMethod.Post, "api/endurance-event", EnduranceEventModel.From(enduranceEvent));
+        return Send(HttpMethod.Post, "api/event-information", EventInformationModel.From(eventInformation));
     }
 
     public Task Create(Participation participation)
@@ -61,14 +61,14 @@ internal sealed class NexusApiDriver : IDisposable
         return Send(HttpMethod.Post, "api/handouts", HandoutModel.From(handout));
     }
 
-    public Task CreateSetupUpcomingEvent(SetupUpcomingEvent setupEvent)
+    public Task CreateSetupConfigureEvent(SetupConfigureEvent setupEvent)
     {
-        return Send(HttpMethod.Post, "api/upcoming-event", SetupUpcomingEventModel.From(setupEvent));
+        return Send(HttpMethod.Post, "api/configure-event", SetupConfigureEventModel.From(setupEvent));
     }
 
-    public async Task<EnduranceEvent> ReadEnduranceEvent(int eventId)
+    public async Task<EventInformation> ReadEventInformation(int eventId)
     {
-        var model = await Send<EnduranceEventModel>(HttpMethod.Get, $"api/endurance-event/{eventId}");
+        var model = await Send<EventInformationModel>(HttpMethod.Get, $"api/event-information/{eventId}");
         return model.MapToEntity();
     }
 
@@ -167,15 +167,15 @@ internal sealed class NexusApiDriver : IDisposable
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public async Task<IReadOnlyList<SetupUpcomingEvent>> ReadSetupUpcomingEvents()
+    public async Task<IReadOnlyList<SetupConfigureEvent>> ReadSetupConfigureEvents()
     {
-        var models = await Send<IEnumerable<SetupUpcomingEventModel>>(HttpMethod.Get, "api/upcoming-event");
+        var models = await Send<IEnumerable<SetupConfigureEventModel>>(HttpMethod.Get, "api/configure-event");
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public async Task<SetupUpcomingEvent> ReadSetupUpcomingEvent(int id)
+    public async Task<SetupConfigureEvent> ReadSetupConfigureEvent(int id)
     {
-        var model = await Send<SetupUpcomingEventModel>(HttpMethod.Get, $"api/upcoming-event/{id}");
+        var model = await Send<SetupConfigureEventModel>(HttpMethod.Get, $"api/configure-event/{id}");
         return model.MapToEntity();
     }
 

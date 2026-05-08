@@ -8,17 +8,17 @@ namespace NTS.Witness.Blazor.Features.Socket;
 
 public class EventConnectionCoordinator : IEventConnectionCoordinator, IScoped
 {
-    readonly IEnduranceEventService _enduranceEventService;
+    readonly IEventInformationService _eventInformationService;
     readonly INtsSocketService _socketService;
     readonly IEventConnectionDialogLauncher _dialogLauncher;
 
     public EventConnectionCoordinator(
-        IEnduranceEventService enduranceEventService,
+        IEventInformationService eventInformationService,
         INtsSocketService socketService,
         IEventConnectionDialogLauncher dialogLauncher
     )
     {
-        _enduranceEventService = enduranceEventService;
+        _eventInformationService = eventInformationService;
         _socketService = socketService;
         _dialogLauncher = dialogLauncher;
     }
@@ -30,7 +30,7 @@ public class EventConnectionCoordinator : IEventConnectionCoordinator, IScoped
             return;
         }
 
-        var events = await _enduranceEventService.GetActive().ToList();
+        var events = await _eventInformationService.GetActive().ToList();
         if (events.Count == 0)
         {
             return;
@@ -45,17 +45,9 @@ public class EventConnectionCoordinator : IEventConnectionCoordinator, IScoped
         await _dialogLauncher.ShowSelectEventAsync();
     }
 
-    async Task ConnectTo(EnduranceEvent enduranceEvent)
+    async Task ConnectTo(EventInformation eventInformation)
     {
-        if (
-            await _socketService.WillResetSession(enduranceEvent)
-            && !await _dialogLauncher.ConfirmSessionResetAsync(enduranceEvent)
-        )
-        {
-            return;
-        }
-
-        await _socketService.Connect(enduranceEvent);
+        await _socketService.Connect(eventInformation);
     }
 }
 

@@ -84,12 +84,12 @@ public class JudgeHubConnectionTimeoutIntegrationTests
 
     sealed class EmptyPendingSnapshotsService : IPendingSnapshotsService
     {
-        public Task Append(string enduranceEventId, SnapshotGroupModel snapshotGroup)
+        public Task Append(string eventId, SnapshotGroupModel snapshotGroup)
         {
             return Task.CompletedTask;
         }
 
-        public Task<IReadOnlyList<PendingSnapshotsModel>> Read(string enduranceEventId)
+        public Task<IReadOnlyList<PendingSnapshotsModel>> Read(string eventId)
         {
             return Task.FromResult<IReadOnlyList<PendingSnapshotsModel>>([]);
         }

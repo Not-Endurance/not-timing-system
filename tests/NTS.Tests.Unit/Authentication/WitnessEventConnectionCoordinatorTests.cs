@@ -16,13 +16,13 @@ public class WitnessEventConnectionCoordinatorTests
     public async Task EnsureConnected_WhenAlreadyConnected_DoesNothing()
     {
         var socketService = new TestSocketService { IsConnected = true, Event = CreateEvent(7) };
-        var enduranceEventService = new TestEnduranceEventService([CreateEvent(1)]);
+        var eventInformationService = new TestEventInformationService([CreateEvent(1)]);
         var dialogLauncher = new TestDialogLauncher();
-        var coordinator = new EventConnectionCoordinator(enduranceEventService, socketService, dialogLauncher);
+        var coordinator = new EventConnectionCoordinator(eventInformationService, socketService, dialogLauncher);
 
         await coordinator.EnsureConnected();
 
-        Assert.Equal(0, enduranceEventService.GetActiveCalls);
+        Assert.Equal(0, eventInformationService.GetActiveCalls);
         Assert.Equal(0, socketService.ConnectCalls);
         Assert.Equal(0, dialogLauncher.ShowSelectEventCalls);
     }
@@ -33,7 +33,7 @@ public class WitnessEventConnectionCoordinatorTests
         var socketService = new TestSocketService();
         var dialogLauncher = new TestDialogLauncher();
         var coordinator = new EventConnectionCoordinator(
-            new TestEnduranceEventService([]),
+            new TestEventInformationService([]),
             socketService,
             dialogLauncher
         );
@@ -41,70 +41,45 @@ public class WitnessEventConnectionCoordinatorTests
         await coordinator.EnsureConnected();
 
         Assert.Equal(0, socketService.ConnectCalls);
-        Assert.Equal(0, socketService.WillResetSessionCalls);
         Assert.Equal(0, dialogLauncher.ShowSelectEventCalls);
     }
 
     [Fact]
-    public async Task EnsureConnected_WhenSingleActiveEventAndNoSessionReset_ConnectsToIt()
+    public async Task EnsureConnected_WhenSingleActiveEvent_ConnectsToIt()
     {
         var activeEvent = CreateEvent(11);
         var socketService = new TestSocketService();
         var dialogLauncher = new TestDialogLauncher();
         var coordinator = new EventConnectionCoordinator(
-            new TestEnduranceEventService([activeEvent]),
+            new TestEventInformationService([activeEvent]),
             socketService,
             dialogLauncher
         );
 
         await coordinator.EnsureConnected();
 
-        Assert.Equal(1, socketService.WillResetSessionCalls);
         Assert.Equal(1, socketService.ConnectCalls);
         Assert.Equal(activeEvent.Id, socketService.Event?.Id);
-        Assert.Equal(0, dialogLauncher.ConfirmSessionResetCalls);
         Assert.Equal(0, dialogLauncher.ShowSelectEventCalls);
     }
 
     [Fact]
-    public async Task EnsureConnected_WhenSingleActiveEventWouldResetSessionAndUserConfirms_ConnectsToIt()
+    public async Task EnsureConnected_WhenSingleActiveEventWouldResetSession_ConnectsWithoutPrompt()
     {
         var activeEvent = CreateEvent(17);
-        var socketService = new TestSocketService { WillResetSessionResult = true };
-        var dialogLauncher = new TestDialogLauncher { ConfirmSessionResetResult = true };
+        var socketService = new TestSocketService();
+        var dialogLauncher = new TestDialogLauncher();
         var coordinator = new EventConnectionCoordinator(
-            new TestEnduranceEventService([activeEvent]),
+            new TestEventInformationService([activeEvent]),
             socketService,
             dialogLauncher
         );
 
         await coordinator.EnsureConnected();
 
-        Assert.Equal(1, socketService.WillResetSessionCalls);
-        Assert.Equal(1, dialogLauncher.ConfirmSessionResetCalls);
-        Assert.Equal(activeEvent.Id, dialogLauncher.ConfirmedEvent?.Id);
         Assert.Equal(1, socketService.ConnectCalls);
         Assert.Equal(activeEvent.Id, socketService.Event?.Id);
-    }
-
-    [Fact]
-    public async Task EnsureConnected_WhenSingleActiveEventWouldResetSessionAndUserCancels_DoesNotConnect()
-    {
-        var activeEvent = CreateEvent(19);
-        var socketService = new TestSocketService { WillResetSessionResult = true };
-        var dialogLauncher = new TestDialogLauncher { ConfirmSessionResetResult = false };
-        var coordinator = new EventConnectionCoordinator(
-            new TestEnduranceEventService([activeEvent]),
-            socketService,
-            dialogLauncher
-        );
-
-        await coordinator.EnsureConnected();
-
-        Assert.Equal(1, socketService.WillResetSessionCalls);
-        Assert.Equal(1, dialogLauncher.ConfirmSessionResetCalls);
-        Assert.Equal(0, socketService.ConnectCalls);
-        Assert.False(socketService.IsConnected);
+        Assert.Equal(0, dialogLauncher.ShowSelectEventCalls);
     }
 
     [Fact]
@@ -113,7 +88,7 @@ public class WitnessEventConnectionCoordinatorTests
         var socketService = new TestSocketService();
         var dialogLauncher = new TestDialogLauncher();
         var coordinator = new EventConnectionCoordinator(
-            new TestEnduranceEventService([CreateEvent(1), CreateEvent(2)]),
+            new TestEventInformationService([CreateEvent(1), CreateEvent(2)]),
             socketService,
             dialogLauncher
         );
@@ -121,14 +96,13 @@ public class WitnessEventConnectionCoordinatorTests
         await coordinator.EnsureConnected();
 
         Assert.Equal(1, dialogLauncher.ShowSelectEventCalls);
-        Assert.Equal(0, socketService.WillResetSessionCalls);
         Assert.Equal(0, socketService.ConnectCalls);
     }
 
-    static EnduranceEvent CreateEvent(int id)
+    static EventInformation CreateEvent(int id)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             $"Event{id}",
             "Sofia",
@@ -140,45 +114,43 @@ public class WitnessEventConnectionCoordinatorTests
         );
     }
 
-    sealed class TestEnduranceEventService : IEnduranceEventService
+    sealed class TestEventInformationService : IEventInformationService
     {
-        readonly IEnumerable<EnduranceEvent> _events;
+        readonly IEnumerable<EventInformation> _events;
 
-        public TestEnduranceEventService(IEnumerable<EnduranceEvent> events)
+        public TestEventInformationService(IEnumerable<EventInformation> events)
         {
             _events = events;
         }
 
         public int GetActiveCalls { get; private set; }
 
-        public Task<IEnumerable<EnduranceEvent>> GetActive()
+        public Task<IEnumerable<EventInformation>> GetActive()
         {
             GetActiveCalls++;
             return Task.FromResult(_events);
         }
 
-        public Task<IEnumerable<EnduranceEvent>> GetPast()
+        public Task<IEnumerable<EventInformation>> GetPast()
         {
-            return Task.FromResult<IEnumerable<EnduranceEvent>>([]);
+            return Task.FromResult<IEnumerable<EventInformation>>([]);
         }
     }
 
     sealed class TestSocketService : INtsSocketService
     {
         public int ConnectCalls { get; private set; }
-        public int WillResetSessionCalls { get; private set; }
-        public bool WillResetSessionResult { get; init; }
         public IEventSubscriber ObservableEvent { get; } = new Event();
         public bool IsConnected { get; set; }
         public SocketConnectionStatus Status { get; set; } = SocketConnectionStatus.Disconnected;
-        public EnduranceEvent? Event { get; set; }
+        public EventInformation? Event { get; set; }
 
-        public Task Connect(EnduranceEvent enduranceEvent)
+        public Task Connect(EventInformation eventInformation)
         {
             ConnectCalls++;
             IsConnected = true;
             Status = SocketConnectionStatus.Connected;
-            Event = enduranceEvent;
+            Event = eventInformation;
             return Task.CompletedTask;
         }
 
@@ -190,10 +162,9 @@ public class WitnessEventConnectionCoordinatorTests
             return Task.CompletedTask;
         }
 
-        public Task<bool> WillResetSession(EnduranceEvent enduranceEvent)
+        public Task<bool> WillResetSession(EventInformation eventInformation)
         {
-            WillResetSessionCalls++;
-            return Task.FromResult(WillResetSessionResult);
+            return Task.FromResult(false);
         }
 
         public Task Load()
@@ -205,21 +176,11 @@ public class WitnessEventConnectionCoordinatorTests
     sealed class TestDialogLauncher : IEventConnectionDialogLauncher
     {
         public int ShowSelectEventCalls { get; private set; }
-        public int ConfirmSessionResetCalls { get; private set; }
-        public bool ConfirmSessionResetResult { get; init; } = true;
-        public EnduranceEvent? ConfirmedEvent { get; private set; }
 
         public Task ShowSelectEventAsync()
         {
             ShowSelectEventCalls++;
             return Task.CompletedTask;
-        }
-
-        public Task<bool> ConfirmSessionResetAsync(EnduranceEvent enduranceEvent)
-        {
-            ConfirmSessionResetCalls++;
-            ConfirmedEvent = enduranceEvent;
-            return Task.FromResult(ConfirmSessionResetResult);
         }
     }
 }

@@ -29,13 +29,13 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
     {
         var eventId = 1701;
         var participationNumber = 42;
-        var enduranceEvent = IntegrationPayloadFactory.EnduranceEvent(eventId);
+        var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
         var participation = IntegrationPayloadFactory.ActiveParticipation(eventId, participationNumber);
         using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.RegisterUser(PARTICIPANT_USER);
-        await api.Create(enduranceEvent);
+        await api.Create(eventInformation);
         await api.Create(participation);
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id));
         var seededParticipation = await api.ReadParticipation(eventId, participation.Id);
@@ -65,9 +65,9 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         await officialWitness.Start();
         await participantWitness.Start();
 
-        await officialWitness.Connect(enduranceEvent);
-        await participantWitness.Connect(enduranceEvent);
-        await judge.Connect(enduranceEvent);
+        await officialWitness.Connect(eventInformation);
+        await participantWitness.Connect(eventInformation);
+        await judge.Connect(eventInformation);
         var judgeRepositoryParticipations = await judge.ReadParticipations();
         Assert.True(
             judgeRepositoryParticipations.Any(x => x.Combination.Number == participationNumber),

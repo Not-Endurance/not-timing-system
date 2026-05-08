@@ -1,0 +1,44 @@
+@using NTS.Domain.Setup.Aggregates.ConfigureEvents
+@using NTS.Judge.Blazor.Features.Setup.Combinations
+@using NTS.Judge.Blazor.Features.Setup.Loops
+@using NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Competitions
+@using NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Officials
+@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations
+@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions
+@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops
+@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Officials
+@using Not.Blazor.Components.Layout
+@using Not.Krud.Blazor.Components
+
+@attribute [Route(UPCOMING_EVENT_PAGE)]
+@inherits ConfigureEventContentBehind
+
+<NContent Title="@Configure_Event_string" IsEmpty="Model == null">
+
+    <Main>
+        <ConfigureEventShell Model="Model">
+            <AdditionalContent>
+                <NGrid Spacing="8">
+
+                    <MudItem xs="6">
+                        <KrudList T="Competition" TModel="CompetitionFormModel" TShell="CompetitionShell" Name="@Competitions_string" AllowCreate AllowUpdate AllowDelete />
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <KrudList T="Official" TModel="OfficialFormModel" TShell="OfficialShell" Name="@Officials_string" AllowCreate AllowUpdate AllowDelete />
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <KrudList T="Combination" TModel="CombinationFormModel" TShell="CombinationShell" Name="@Combinations_string" AllowCreate AllowUpdate AllowDelete />
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <KrudList T="Loop" TModel="LoopFormModel" TShell="LoopShell" Name="@Loops_string" AllowCreate AllowUpdate AllowDelete />
+                    </MudItem>
+
+                </NGrid>
+            </AdditionalContent>
+        </ConfigureEventShell>
+    </Main>
+
+</NContent>

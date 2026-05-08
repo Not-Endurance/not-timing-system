@@ -2,17 +2,17 @@ namespace NTS.Nexus.Warp.Contracts;
 
 public class WarpRequest
 {
-    public static WarpRequest Create(string enduranceEventId)
+    public static WarpRequest Create(string eventId)
     {
-        return new() { EnduranceEventId = enduranceEventId };
+        return new() { EventId = eventId };
     }
 
-    public static WarpRequest<T> Create<T>(string enduranceEventId, T payload)
+    public static WarpRequest<T> Create<T>(string eventId, T payload)
     {
-        return new WarpRequest<T> { EnduranceEventId = enduranceEventId, Payload = payload };
+        return new WarpRequest<T> { EventId = eventId, Payload = payload };
     }
 
-    public string EnduranceEventId { get; init; } = default!;
+    public string EventId { get; init; } = default!;
 }
 
 public class WarpRequest<T> : WarpRequest

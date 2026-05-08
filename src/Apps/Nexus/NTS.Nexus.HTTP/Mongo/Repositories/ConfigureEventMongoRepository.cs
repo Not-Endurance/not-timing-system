@@ -1,0 +1,48 @@
+using System.Diagnostics;
+using MongoDB.Driver;
+using Not.Application.CRUD.Ports;
+using Not.Storage.Mongo;
+using NTS.Application.Contracts.Setup;
+using NTS.Application.Contracts.Setup.Models;
+using NTS.Nexus.HTTP.Telemetry;
+
+namespace NTS.Nexus.HTTP.Mongo.Repositories;
+
+public class ConfigureEventMongoRepository : MongoRepository<ConfigureEventModel>, IRepository<ConfigureEventModel>
+{
+    readonly ITelemetryService _telemetry;
+
+    public ConfigureEventMongoRepository(IMongoContext context, ITelemetryService telemetry)
+        : base(context, MongoConstants.NTS_DATABASE, MongoConstants.CONFIGURE_EVENTS_COLLECTION)
+    {
+        _telemetry = telemetry;
+    }
+
+    protected override UpdateDefinition<ConfigureEventModel> GetUpdateDefinition(ConfigureEventModel document)
+    {
+        using var activity = _telemetry.StartActivity(
+            nameof(ConfigureEventMongoRepository),
+            nameof(GetUpdateDefinition)
+        );
+
+        try
+        {
+            return Builders<ConfigureEventModel> // TODO: use Reflection to build a full update definition by default
+                .Update.Set(x => x.Location, document.Location)
+                .Set(x => x.Name, document.Name)
+                .Set(x => x.Country, document.Country)
+                .Set(x => x.ShowFeiId, document.ShowFeiId)
+                .Set(x => x.FeiId, document.FeiId)
+                .Set(x => x.FeiEventCode, document.FeiEventCode)
+                .Set(x => x.Competitions, document.Competitions)
+                .Set(x => x.Officials, document.Officials)
+                .Set(x => x.Loops, document.Loops)
+                .Set(x => x.Combinations, document.Combinations);
+        }
+        catch (Exception ex)
+        {
+            Activity.Current.TagException(ex);
+            throw;
+        }
+    }
+}

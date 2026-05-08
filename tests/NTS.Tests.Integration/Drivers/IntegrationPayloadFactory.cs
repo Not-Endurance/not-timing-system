@@ -12,11 +12,11 @@ namespace NTS.Tests.Integration.Drivers;
 
 internal static class IntegrationPayloadFactory
 {
-    public static EnduranceEvent EnduranceEvent(int eventId, EventSpan? eventSpan = null, string? name = null)
+    public static EventInformation EventInformation(int eventId, EventSpan? eventSpan = null, string? name = null)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
         var today = DateTimeOffset.UtcNow.Date;
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             name ?? "Integration Event",
             "Sofia",

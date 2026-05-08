@@ -67,9 +67,9 @@ public class WitnessSessionIdentityTests
         var created = Assert.Single(sessions.Created);
         Assert.Equal(7, created.Id);
         Assert.Equal("entra-1", created.UserIdentifier);
+        Assert.Equal(17, created.EventId);
         Assert.NotNull(created.State);
-        Assert.Equal(17, created.State!.EventId);
-        Assert.Empty(created.State.SnapshotHistory);
+        Assert.Empty(created.State!.SnapshotHistory);
     }
 
     [Fact]
@@ -79,13 +79,14 @@ public class WitnessSessionIdentityTests
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = expected };
         var service = CreateService(sessions);
 
+        await service.SetEventId(23);
         var current = await service.GetCurrent();
 
         Assert.NotNull(current);
-        Assert.Equal(23, current!.EventId);
-        Assert.Empty(current.SnapshotHistory);
-        Assert.Equal(1, sessions.ReadByUserIdentifierStateCalls);
-        Assert.Equal(0, sessions.ReadByUserIdentifierDocumentCalls);
+        Assert.Empty(current!.SnapshotHistory);
+        Assert.Equal(2, sessions.ReadByUserIdentifierStateCalls);
+        Assert.Equal(2, sessions.ReadByUserIdentifierDocumentCalls);
+        Assert.Equal(2, sessions.ReadByUserIdentifierForEventCalls);
         Assert.Equal(0, sessions.ReadIdCalls);
     }
 
@@ -98,7 +99,7 @@ public class WitnessSessionIdentityTests
         var current = await service.GetCurrent();
 
         Assert.Null(current);
-        Assert.Equal(1, sessions.ReadByUserIdentifierStateCalls);
+        Assert.Equal(0, sessions.ReadByUserIdentifierStateCalls);
         Assert.Equal(0, sessions.ReadByUserIdentifierDocumentCalls);
         Assert.Equal(0, sessions.ReadIdCalls);
         Assert.Empty(sessions.Updated);
@@ -111,12 +112,14 @@ public class WitnessSessionIdentityTests
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = expected };
         var service = CreateService(sessions);
 
+        await service.SetEventId(23);
         await service.DeleteCurrent();
 
         var deleted = Assert.Single(sessions.Deleted);
         Assert.Same(expected, deleted);
-        Assert.Equal(1, sessions.ReadByUserIdentifierStateCalls);
-        Assert.Equal(1, sessions.ReadByUserIdentifierDocumentCalls);
+        Assert.Equal(2, sessions.ReadByUserIdentifierStateCalls);
+        Assert.Equal(2, sessions.ReadByUserIdentifierDocumentCalls);
+        Assert.Equal(2, sessions.ReadByUserIdentifierForEventCalls);
         Assert.Equal(0, sessions.ReadIdCalls);
     }
 
@@ -152,7 +155,7 @@ public class WitnessSessionIdentityTests
     }
 
     [Fact]
-    public async Task Witness_user_session_replaces_existing_session_for_different_event()
+    public async Task Witness_user_session_preserves_existing_session_for_different_event()
     {
         var existing = CreateSessionDocument(id: 7, userIdentifier: "entra-1", eventId: 5);
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = existing };
@@ -160,15 +163,13 @@ public class WitnessSessionIdentityTests
 
         await service.SetEventId(23);
 
-        var deleted = Assert.Single(sessions.Deleted);
-        Assert.Same(existing, deleted);
-
         var created = Assert.Single(sessions.Created);
         Assert.Equal(7, created.Id);
         Assert.Equal("entra-1", created.UserIdentifier);
+        Assert.Equal(23, created.EventId);
         Assert.NotNull(created.State);
-        Assert.Equal(23, created.State!.EventId);
-        Assert.Empty(created.State.SnapshotHistory);
+        Assert.Empty(created.State!.SnapshotHistory);
+        Assert.Empty(sessions.Deleted);
         Assert.Empty(sessions.Updated);
     }
 
@@ -184,20 +185,21 @@ public class WitnessSessionIdentityTests
         var sessions = new RecordingUserSessionRepository { ReadByUserIdentifierResult = existing };
         var service = CreateService(sessions);
 
+        await service.SetEventId(23);
         await service.AppendSnapshot(CreateSnapshotGroup(44, SnapshotType.Present));
 
         var updated = Assert.Single(sessions.Updated);
         Assert.Same(existing, updated);
+        Assert.Equal(23, updated.EventId);
         Assert.NotNull(updated.State);
-        Assert.Equal(23, updated.State!.EventId);
-        Assert.Equal(2, updated.State.SnapshotHistory.Length);
+        Assert.Equal(2, updated.State!.SnapshotHistory.Length);
         Assert.Equal(SnapshotType.Present, updated.State.SnapshotHistory[1].Type);
-        Assert.Null(JObject.Parse(updated.ToJson())["EventId"]);
+        Assert.Equal(23, JObject.Parse(updated.ToJson())["EventId"]!.Value<int>());
         Assert.Null(JObject.Parse(updated.ToJson())["SnapshotHistory"]);
     }
 
     [Fact]
-    public void Witness_user_session_serializes_state_without_root_level_event_fields()
+    public void Witness_user_session_serializes_event_id_at_root()
     {
         var session = CreateSessionDocument(
             id: 7,
@@ -208,10 +210,11 @@ public class WitnessSessionIdentityTests
 
         var json = JObject.Parse(session.ToJson());
 
-        Assert.Null(json["EventId"]);
+        Assert.Equal(23, json["EventId"]!.Value<int>());
+        Assert.Null(json["MongoId"]);
         Assert.Null(json["SnapshotHistory"]);
         Assert.NotNull(json["State"]);
-        Assert.Equal(23, json["State"]!["EventId"]!.Value<int>());
+        Assert.Null(json["State"]!["EventId"]);
         Assert.Single((JArray)json["State"]!["SnapshotHistory"]!);
     }
 
@@ -249,9 +252,9 @@ public class WitnessSessionIdentityTests
         SnapshotGroupModel[]? snapshotHistory = null
     )
     {
-        var session = new NtsUserSessionModel { Id = id, UserIdentifier = userIdentifier };
+        var session = new NtsUserSessionModel { Id = id, EventId = eventId ?? default, UserIdentifier = userIdentifier };
         session.ReplaceState(
-            new NtsUserSessionStateModel { EventId = eventId, SnapshotHistory = snapshotHistory ?? [] }
+            new NtsUserSessionStateModel { SnapshotHistory = snapshotHistory ?? [] }
         );
         return session;
     }
@@ -330,6 +333,7 @@ public class WitnessSessionIdentityTests
         public List<NtsUserSessionModel> Updated { get; } = [];
         public List<NtsUserSessionModel> Deleted { get; } = [];
         public int ReadByUserIdentifierDocumentCalls { get; private set; }
+        public int ReadByUserIdentifierForEventCalls { get; private set; }
         public int ReadByUserIdentifierStateCalls { get; private set; }
         public int ReadIdCalls { get; private set; }
 
@@ -343,6 +347,14 @@ public class WitnessSessionIdentityTests
         {
             ReadByUserIdentifierDocumentCalls++;
             return Task.FromResult(ReadByUserIdentifierResult);
+        }
+
+        public Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId)
+        {
+            ReadByUserIdentifierDocumentCalls++;
+            ReadByUserIdentifierForEventCalls++;
+            var result = ReadByUserIdentifierResult?.EventId == eventId ? ReadByUserIdentifierResult : null;
+            return Task.FromResult(result);
         }
 
         public Task<NtsUserSessionModel?> Read(int id)

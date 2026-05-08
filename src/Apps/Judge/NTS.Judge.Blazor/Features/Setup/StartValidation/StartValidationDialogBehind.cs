@@ -1,7 +1,7 @@
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Structures;
 using NTS.Domain.Setup.Services.StartValidation;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents;
 
 namespace NTS.Judge.Blazor.Features.Setup.StartValidation;
 
@@ -10,7 +10,7 @@ public class StartValidationDialogBehind : NDialog<bool>
     readonly Dictionary<int, int> _selectedCompetitionByParticipation = [];
 
     [Inject]
-    IUpcomingEventService UpcomingEventService { get; set; } = default!;
+    IConfigureEventService ConfigureEventService { get; set; } = default!;
 
     protected Result<IReadOnlyList<StartValidationIssue>> Validation { get; set; } =
         Result.Success<IReadOnlyList<StartValidationIssue>>([]);
@@ -30,7 +30,7 @@ public class StartValidationDialogBehind : NDialog<bool>
         Result.Success<IReadOnlyList<StartValidationIssue>>([]);
 
     [Parameter]
-    public int UpcomingEventId { get; set; }
+    public int ConfigureEventId { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -77,15 +77,15 @@ public class StartValidationDialogBehind : NDialog<bool>
                 var selectedCompetitionId = _selectedCompetitionByParticipation[participationNumber];
                 foreach (var competition in issue.Competitions.Where(x => x.CompetitionId != selectedCompetitionId))
                 {
-                    await UpcomingEventService.DeleteParticipation(
-                        UpcomingEventId,
+                    await ConfigureEventService.DeleteParticipation(
+                        ConfigureEventId,
                         participationNumber,
                         competition.CompetitionId
                     );
                 }
             }
 
-            Validation = await UpcomingEventService.Validate(UpcomingEventId);
+            Validation = await ConfigureEventService.Validate(ConfigureEventId);
             if (HasIssues)
             {
                 SyncSelectionsWithCurrentIssues();

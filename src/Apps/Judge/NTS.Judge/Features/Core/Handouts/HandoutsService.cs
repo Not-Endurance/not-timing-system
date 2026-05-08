@@ -95,12 +95,12 @@ public class HandoutsService
 
     async Task CreateDocument(Participation participation)
     {
-        var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
+        var eventInformation = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var officials = await _officials.ReadMany();
         var existingHandout = await _handoutRepository.Read(x => x.Participation.Id == participation.Id);
 
         var handout = new Handout(participation);
-        var document = new HandoutDocument(handout, enduranceEvent, officials);
+        var document = new HandoutDocument(handout, eventInformation, officials);
 
         await _semaphore.WaitAsync();
         try

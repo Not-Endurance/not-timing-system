@@ -416,14 +416,14 @@ public class RegistrationFlowTests
     [Fact]
     public async Task Endurance_event_start_returns_failure_result_when_business_service_throws_domain_exception()
     {
-        var function = new EnduranceEventFunctions(
-            new TestFunctionLogger<EnduranceEventFunctions>(),
-            new RecordingRepository<EnduranceEventModel>(),
-            new NoOpEnduranceEventResetService(),
-            new ThrowingEnduranceEventBusinessService(new DomainException("Start blocked")),
+        var function = new EventInformationFunctions(
+            new TestFunctionLogger<EventInformationFunctions>(),
+            new RecordingRepository<EventInformationModel>(),
+            new NoOpEventInformationResetService(),
+            new ThrowingEventInformationBusinessService(new DomainException("Start blocked")),
             new TestTelemetryService()
         );
-        var request = CreateRequest(HttpMethods.Post, "/api/endurance-event/7/start");
+        var request = CreateRequest(HttpMethods.Post, "/api/event-information/7/start");
 
         var exception = await Assert.ThrowsAsync<DomainException>(() => function.Start(request, 7));
 
@@ -693,7 +693,7 @@ public class RegistrationFlowTests
         }
     }
 
-    sealed class NoOpEnduranceEventResetService : IEnduranceEventResetService
+    sealed class NoOpEventInformationResetService : IEventInformationResetService
     {
         public Task Reset(int eventId)
         {
@@ -701,18 +701,18 @@ public class RegistrationFlowTests
         }
     }
 
-    sealed class ThrowingEnduranceEventBusinessService : IEnduranceEventBusinessService
+    sealed class ThrowingEventInformationBusinessService : IEventInformationBusinessService
     {
         readonly Exception _exception;
 
-        public ThrowingEnduranceEventBusinessService(Exception exception)
+        public ThrowingEventInformationBusinessService(Exception exception)
         {
             _exception = exception;
         }
 
-        public Task<EnduranceEventModel> Start(int upcomingEventId)
+        public Task<EventInformationModel> Start(int configureEventId)
         {
-            return Task.FromException<EnduranceEventModel>(_exception);
+            return Task.FromException<EventInformationModel>(_exception);
         }
     }
 }

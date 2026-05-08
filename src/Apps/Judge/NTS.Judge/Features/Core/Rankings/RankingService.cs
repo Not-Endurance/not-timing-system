@@ -109,9 +109,9 @@ public class RankingService
 
     public ProtocolDocument Create(Ranking ranking)
     {
-        var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
+        var eventInformation = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var ranklist = new Ranklist(ranking);
-        return new ProtocolDocument(ranklist, enduranceEvent, _loadedOfficials);
+        return new ProtocolDocument(ranklist, eventInformation, _loadedOfficials);
     }
 
     public void Select(Ranking ranking)

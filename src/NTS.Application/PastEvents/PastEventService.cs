@@ -15,23 +15,23 @@ namespace NTS.Application.PastEvents;
 public class PastEventService
     : NStatefulService,
         IPastEventService,
-        IKrudListBehind<EnduranceEvent>
+        IKrudListBehind<EventInformation>
 {
     static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_STARTLIST =
         new Dictionary<int, IReadOnlyList<Starter>>();
 
-    readonly IEnduranceEventRepository _events;
+    readonly IEventInformationRepository _events;
     readonly IRepository<Participation> _participations;
     readonly IRepository<Ranking> _rankingRepository;
     readonly IRepository<Official> _officialRepository;
-    readonly List<EnduranceEvent> _pastEvents = [];
+    readonly List<EventInformation> _pastEvents = [];
     IReadOnlyList<Ranking> _rankings = [];
     IReadOnlyList<Official> _officials = [];
     Startlist? _startlist;
     Ranking? _currentRanking;
 
     public PastEventService(
-        IEnduranceEventRepository events,
+        IEventInformationRepository events,
         IRepository<Participation> participations,
         IRepository<Ranking> rankingRepository,
         IRepository<Official> officialRepository
@@ -43,8 +43,8 @@ public class PastEventService
         _officialRepository = officialRepository;
     }
 
-    public IReadOnlyList<EnduranceEvent> Events => _pastEvents.AsReadOnly();
-    public EnduranceEvent? Event { get; private set; }
+    public IReadOnlyList<EventInformation> Events => _pastEvents.AsReadOnly();
+    public EventInformation? Event { get; private set; }
     public int EventId =>
         Event?.Id
         ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
@@ -98,23 +98,23 @@ public class PastEventService
         EmitChanged();
     }
 
-    public async Task<IEnumerable<EnduranceEvent>> ReadMany()
+    public async Task<IEnumerable<EventInformation>> ReadMany()
     {
         await Load();
         return Events;
     }
 
-    public Task Delete(EnduranceEvent entity)
+    public Task Delete(EventInformation entity)
     {
         throw CreateReadOnlyException();
     }
 
-    public Task<KrudDeleteImpact> PreviewDelete(EnduranceEvent entity)
+    public Task<KrudDeleteImpact> PreviewDelete(EventInformation entity)
     {
         return Task.FromResult(new KrudDeleteImpact(entity.ToString(), []));
     }
 
-    public Task DeleteCascade(EnduranceEvent entity)
+    public Task DeleteCascade(EventInformation entity)
     {
         throw CreateReadOnlyException();
     }

@@ -3,8 +3,8 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.UpcomingEvents;
-using SetupParticipation = NTS.Domain.Setup.Aggregates.UpcomingEvents.Participation;
+using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participation;
 
 namespace NTS.Judge.Tests.Core;
 

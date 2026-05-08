@@ -8,23 +8,23 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.UpcomingEvents;
+using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 using NTS.Judge.Contracts.Features.Setup.Athletes;
 using NTS.Judge.Contracts.Features.Setup.Clubs;
 using NTS.Judge.Contracts.Features.Setup.Horses;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Combinations;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Loops;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
 using NTS.Judge.Features.Setup.Athletes;
 using NTS.Judge.Features.Setup.Horses;
-using NTS.Judge.Features.Setup.UpcomingEvents.Combinations;
-using NTS.Judge.Features.Setup.UpcomingEvents.Loops;
+using NTS.Judge.Features.Setup.ConfigureEvents.Combinations;
+using NTS.Judge.Features.Setup.ConfigureEvents.Loops;
 
 namespace NTS.Judge.Tests.Krud;
 
 public class KrudReflectionTests
 {
     [Fact]
-    public void RegisterAggregate_UpcomingEvent_RegistersMirrorsForNestedPrincipals()
+    public void RegisterAggregate_ConfigureEvent_RegistersMirrorsForNestedPrincipals()
     {
         using var scenario = ReflectionScenario.Create();
 
@@ -43,7 +43,7 @@ public class KrudReflectionTests
     }
 
     [Fact]
-    public async Task LoopServiceUpdate_ReflectsMatchingPhasesAndPersistsUpcomingEvent()
+    public async Task LoopServiceUpdate_ReflectsMatchingPhasesAndPersistsConfigureEvent()
     {
         using var scenario = ReflectionScenario.Create();
         scenario.ActivateEventContext();
@@ -51,9 +51,9 @@ public class KrudReflectionTests
 
         await service.Update(new LoopFormModel { Id = scenario.LoopInUse.Id, Distance = 45 });
 
-        var persisted = scenario.UpcomingEvents.Items.Single();
+        var persisted = scenario.ConfigureEvents.Items.Single();
         Assert.Equal(45, persisted.Competitions.Single().Phases.First().Loop.Distance);
-        Assert.True(scenario.UpcomingEvents.UpdateCalls > 0);
+        Assert.True(scenario.ConfigureEvents.UpdateCalls > 0);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class KrudReflectionTests
     }
 
     [Fact]
-    public async Task ClubMirror_ReflectsAthletesAndDispatchesUpcomingEventMirrors()
+    public async Task ClubMirror_ReflectsAthletesAndDispatchesConfigureEventMirrors()
     {
         using var scenario = ReflectionScenario.Create();
         scenario.ActivateEventContext();
@@ -153,7 +153,7 @@ public class KrudReflectionTests
             new Athlete(new Person(["No", "Context"]), null, scenario.Country, null, id: scenario.AthleteInUse.Id)
         );
 
-        Assert.Equal(0, scenario.UpcomingEvents.UpdateCalls);
+        Assert.Equal(0, scenario.ConfigureEvents.UpdateCalls);
         Assert.Equal("Athlete A", scenario.Event.Combinations.First().Athlete.ToString());
     }
 
@@ -168,7 +168,7 @@ public class KrudReflectionTests
             new Athlete(new Person(["Unused", "Updated"]), null, scenario.Country, null, id: scenario.AthleteUnused.Id)
         );
 
-        Assert.Equal(0, scenario.UpcomingEvents.UpdateCalls);
+        Assert.Equal(0, scenario.ConfigureEvents.UpdateCalls);
         Assert.Equal("Athlete A", scenario.Event.Combinations.First().Athlete.ToString());
     }
 
@@ -176,7 +176,7 @@ public class KrudReflectionTests
     {
         ReflectionScenario(
             ServiceProvider provider,
-            RecordingRepository<UpcomingEvent> upcomingEvents,
+            RecordingRepository<ConfigureEvent> configureEvents,
             RecordingRepository<Athlete> athletes,
             Country country,
             Club clubInUse,
@@ -185,11 +185,11 @@ public class KrudReflectionTests
             Horse horseInUse,
             Combination combinationInUse,
             Loop loopInUse,
-            UpcomingEvent @event
+            ConfigureEvent @event
         )
         {
             Provider = provider;
-            UpcomingEvents = upcomingEvents;
+            ConfigureEvents = configureEvents;
             Athletes = athletes;
             Country = country;
             ClubInUse = clubInUse;
@@ -202,7 +202,7 @@ public class KrudReflectionTests
         }
 
         public ServiceProvider Provider { get; }
-        public RecordingRepository<UpcomingEvent> UpcomingEvents { get; }
+        public RecordingRepository<ConfigureEvent> ConfigureEvents { get; }
         public RecordingRepository<Athlete> Athletes { get; }
         public Country Country { get; }
         public Club ClubInUse { get; }
@@ -211,7 +211,7 @@ public class KrudReflectionTests
         public Horse HorseInUse { get; }
         public Combination CombinationInUse { get; }
         public Loop LoopInUse { get; }
-        public UpcomingEvent Event { get; }
+        public ConfigureEvent Event { get; }
 
         public static ReflectionScenario Create()
         {
@@ -271,7 +271,7 @@ public class KrudReflectionTests
                 id: 9201
             );
 
-            var @event = new UpcomingEvent(
+            var @event = new ConfigureEvent(
                 name: "Event",
                 location: "Sofia",
                 country,
@@ -285,22 +285,22 @@ public class KrudReflectionTests
                 id: 10001
             );
 
-            var upcomingEvents = new RecordingRepository<UpcomingEvent>([@event]);
+            var configureEvents = new RecordingRepository<ConfigureEvent>([@event]);
             var athletes = new RecordingRepository<Athlete>([athleteInUse, athleteOther, athleteUnused]);
             var clubs = new RecordingRepository<Club>([clubInUse, otherClub]);
             var horses = new RecordingRepository<Horse>([horseInUse, horseOther, horseUnused]);
 
             var services = new ServiceCollection();
-            services.AddSingleton<IRepository<UpcomingEvent>>(upcomingEvents);
+            services.AddSingleton<IRepository<ConfigureEvent>>(configureEvents);
             services.AddSingleton<IRepository<Athlete>>(athletes);
             services.AddSingleton<IRepository<Club>>(clubs);
             services.AddSingleton<IRepository<Horse>>(horses);
-            services.ConfigureKrud().RegisterAggregate<UpcomingEvent>().RegisterAggregate<Athlete>();
+            services.ConfigureKrud().RegisterAggregate<ConfigureEvent>().RegisterAggregate<Athlete>();
 
             var provider = services.BuildServiceProvider();
             return new ReflectionScenario(
                 provider,
-                upcomingEvents,
+                configureEvents,
                 athletes,
                 country,
                 clubInUse,

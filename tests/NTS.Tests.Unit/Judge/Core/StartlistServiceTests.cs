@@ -16,12 +16,12 @@ using CoreHorse = NTS.Domain.Core.Aggregates.Participations.Entities.Horse;
 using CorePhase = NTS.Domain.Core.Aggregates.Participations.Entities.Phase;
 using CorePhaseCollection = NTS.Domain.Core.Aggregates.Participations.Objects.PhaseCollection;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
-using SetupCombination = NTS.Domain.Setup.Aggregates.UpcomingEvents.Combination;
-using SetupCompetition = NTS.Domain.Setup.Aggregates.UpcomingEvents.Competition;
+using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
+using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
 using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
-using SetupLoop = NTS.Domain.Setup.Aggregates.UpcomingEvents.Loop;
-using SetupParticipation = NTS.Domain.Setup.Aggregates.UpcomingEvents.Participation;
-using SetupPhase = NTS.Domain.Setup.Aggregates.UpcomingEvents.Phase;
+using SetupLoop = NTS.Domain.Setup.Aggregates.ConfigureEvents.Loop;
+using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participation;
+using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
 
 namespace NTS.Judge.Tests.Core;
 

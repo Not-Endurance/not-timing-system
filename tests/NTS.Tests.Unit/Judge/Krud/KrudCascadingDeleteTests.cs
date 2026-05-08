@@ -9,11 +9,11 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.UpcomingEvents;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Combinations;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Loops;
-using NTS.Judge.Features.Setup.UpcomingEvents.Combinations;
-using NTS.Judge.Features.Setup.UpcomingEvents.Loops;
+using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
+using NTS.Judge.Features.Setup.ConfigureEvents.Combinations;
+using NTS.Judge.Features.Setup.ConfigureEvents.Loops;
 
 namespace NTS.Judge.Tests.Krud;
 
@@ -170,7 +170,7 @@ public class KrudCascadingDeleteTests
             id: 9202
         );
 
-        var @event = new UpcomingEvent(
+        var @event = new ConfigureEvent(
             name: "Event",
             location: "Sofia",
             country,
@@ -185,8 +185,8 @@ public class KrudCascadingDeleteTests
         );
 
         var services = new ServiceCollection();
-        services.AddSingleton<IRepository<UpcomingEvent>>(new UpcomingEventRepository(@event));
-        services.ConfigureKrud().RegisterAggregate<UpcomingEvent>();
+        services.AddSingleton<IRepository<ConfigureEvent>>(new ConfigureEventRepository(@event));
+        services.ConfigureKrud().RegisterAggregate<ConfigureEvent>();
         var provider = services.BuildServiceProvider();
 
         SetNodeParents(provider, @event);
@@ -222,7 +222,7 @@ public class KrudCascadingDeleteTests
     {
         public Scenario(
             ServiceProvider provider,
-            UpcomingEvent @event,
+            ConfigureEvent @event,
             Combination combinationInUse,
             Combination unusedCombination,
             Loop loopInUse,
@@ -244,7 +244,7 @@ public class KrudCascadingDeleteTests
         }
 
         public ServiceProvider Provider { get; }
-        public UpcomingEvent Event { get; }
+        public ConfigureEvent Event { get; }
         public Combination CombinationInUse { get; }
         public Combination UnusedCombination { get; }
         public Loop LoopInUse { get; }
@@ -259,44 +259,44 @@ public class KrudCascadingDeleteTests
         }
     }
 
-    sealed class UpcomingEventRepository : IRepository<UpcomingEvent>
+    sealed class ConfigureEventRepository : IRepository<ConfigureEvent>
     {
-        readonly List<UpcomingEvent> _items;
+        readonly List<ConfigureEvent> _items;
 
-        public UpcomingEventRepository(UpcomingEvent item)
+        public ConfigureEventRepository(ConfigureEvent item)
         {
             _items = [item];
         }
 
-        public Task Create(UpcomingEvent item)
+        public Task Create(ConfigureEvent item)
         {
             _items.Add(item);
             return Task.CompletedTask;
         }
 
-        public Task<UpcomingEvent?> Read(Expression<Func<UpcomingEvent, bool>> filter)
+        public Task<ConfigureEvent?> Read(Expression<Func<ConfigureEvent, bool>> filter)
         {
             var predicate = filter.Compile();
             return Task.FromResult(_items.FirstOrDefault(predicate));
         }
 
-        public Task<UpcomingEvent?> Read(int id)
+        public Task<ConfigureEvent?> Read(int id)
         {
             return Task.FromResult(_items.FirstOrDefault(x => x.Id == id));
         }
 
-        public Task<IEnumerable<UpcomingEvent>> ReadMany()
+        public Task<IEnumerable<ConfigureEvent>> ReadMany()
         {
-            return Task.FromResult<IEnumerable<UpcomingEvent>>(_items.ToList());
+            return Task.FromResult<IEnumerable<ConfigureEvent>>(_items.ToList());
         }
 
-        public Task<IEnumerable<UpcomingEvent>> ReadMany(Expression<Func<UpcomingEvent, bool>> filter)
+        public Task<IEnumerable<ConfigureEvent>> ReadMany(Expression<Func<ConfigureEvent, bool>> filter)
         {
             var predicate = filter.Compile();
-            return Task.FromResult<IEnumerable<UpcomingEvent>>(_items.Where(predicate).ToList());
+            return Task.FromResult<IEnumerable<ConfigureEvent>>(_items.Where(predicate).ToList());
         }
 
-        public Task Update(UpcomingEvent item)
+        public Task Update(ConfigureEvent item)
         {
             var index = _items.FindIndex(x => x.Id == item.Id);
             if (index >= 0)
@@ -312,20 +312,20 @@ public class KrudCascadingDeleteTests
             return Task.CompletedTask;
         }
 
-        public Task Delete(UpcomingEvent item)
+        public Task Delete(ConfigureEvent item)
         {
             _items.Remove(item);
             return Task.CompletedTask;
         }
 
-        public Task DeleteMany(Expression<Func<UpcomingEvent, bool>> filter)
+        public Task DeleteMany(Expression<Func<ConfigureEvent, bool>> filter)
         {
             var predicate = filter.Compile();
             _items.RemoveAll(x => predicate(x));
             return Task.CompletedTask;
         }
 
-        public Task DeleteMany(IEnumerable<UpcomingEvent> items)
+        public Task DeleteMany(IEnumerable<ConfigureEvent> items)
         {
             var set = items.ToHashSet();
             _items.RemoveAll(x => set.Contains(x));

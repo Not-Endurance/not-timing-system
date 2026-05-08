@@ -5,7 +5,7 @@ namespace NTS.Application.Contracts.Socket;
 
 public interface INtsSocketService : INtsSocketContext, IStatefulService
 {
-    Task Connect(EnduranceEvent enduranceEvent);
+    Task Connect(EventInformation eventInformation);
     Task Disconnect();
-    Task<bool> WillResetSession(EnduranceEvent enduranceEvent);
+    Task<bool> WillResetSession(EventInformation eventInformation);
 }

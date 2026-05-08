@@ -23,7 +23,7 @@ internal sealed class DashboardFeature
     readonly JudgeDriver _judge;
     readonly WitnessDriver _witness;
     readonly NexusApiDriver _api;
-    readonly EnduranceEvent _enduranceEvent;
+    readonly EventInformation _eventInformation;
     readonly HashSet<int> _manuallyEliminated = [];
     int _innerWaveNumber;
     int _outerWaveNumber;
@@ -32,13 +32,13 @@ internal sealed class DashboardFeature
         JudgeDriver judge,
         WitnessDriver witness,
         NexusApiDriver api,
-        EnduranceEvent enduranceEvent
+        EventInformation eventInformation
     )
     {
         _judge = judge;
         _witness = witness;
         _api = api;
-        _enduranceEvent = enduranceEvent;
+        _eventInformation = eventInformation;
     }
 
     public async Task<DashboardFeatureResult> SnapshotWave(IReadOnlyList<EndToEndPhaseSnapshot> wave)
@@ -69,7 +69,7 @@ internal sealed class DashboardFeature
                 FEATURE,
                 $"Wave {outerWaveNumber}: assert startlists after arrival group",
                 group,
-                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _enduranceEvent.Id)
+                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
             );
         }
 
@@ -158,7 +158,7 @@ internal sealed class DashboardFeature
                 FEATURE,
                 $"Wave {outerWaveNumber}: assert startlists after presentation group",
                 group,
-                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _enduranceEvent.Id)
+                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
             );
         }
 
@@ -218,7 +218,7 @@ internal sealed class DashboardFeature
         {
             if (shouldUsePendingDelivery)
             {
-                await _judge.Connect(_enduranceEvent);
+                await _judge.Connect(_eventInformation);
             }
         }
 
@@ -229,7 +229,7 @@ internal sealed class DashboardFeature
     {
         var persisted = await Eventually.ReadParticipation(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             entry.Number,
             participation => CoreAssertions.SameTimeOfDay(
                 participation.Phases[entry.PhaseIndex].ArriveTime,
@@ -250,7 +250,7 @@ internal sealed class DashboardFeature
     {
         var persisted = await Eventually.ReadParticipation(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             entry.Number,
             participation => CoreAssertions.SameTimeOfDay(
                 participation.Phases[entry.PhaseIndex].PresentTime,
@@ -266,7 +266,7 @@ internal sealed class DashboardFeature
     {
         var persisted = await Eventually.ReadParticipation(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             entry.Number,
             participation => CoreAssertions.SameTimeOfDay(
                 participation.Phases[entry.PhaseIndex].RepresentTime,
@@ -289,7 +289,7 @@ internal sealed class DashboardFeature
         await _judge.GetRequiredService<IInspectionService>().RequestInspection(true);
         await Eventually.ReadParticipation(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             entry.Number,
             participation => participation.Phases[entry.PhaseIndex].IsRequiredInspectionRequested,
             $"requested inspection for #{entry.Number} phase {entry.PhaseNumber}"
@@ -307,7 +307,7 @@ internal sealed class DashboardFeature
         await _judge.GetRequiredService<IInspectionService>().RequestRepresent(true);
         await Eventually.ReadParticipation(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             entry.Number,
             participation => participation.Phases[entry.PhaseIndex].IsReinspectionRequested,
             $"requested representation for #{entry.Number} phase {entry.PhaseNumber}"
@@ -318,7 +318,7 @@ internal sealed class DashboardFeature
     {
         var persisted = await Eventually.ReadParticipation(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             entry.Number,
             participation => PhaseReachedExpectedState(participation, entry),
             $"expected phase state for #{entry.Number} phase {entry.PhaseNumber}"
@@ -338,13 +338,13 @@ internal sealed class DashboardFeature
 
         await Eventually.ReadHandouts(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             items => items.Any(x => x.Participation.Combination.Number == entry.Number),
             $"handout for #{entry.Number}"
         );
         await Eventually.ReadRankings(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             rankings => rankings.SelectMany(x => x.Entries).Any(x =>
                 x.Participation.Combination.Number == entry.Number
                 && x.Participation.Phases[entry.PhaseIndex].IsComplete()
@@ -356,7 +356,7 @@ internal sealed class DashboardFeature
             participation => participation.Phases[entry.PhaseIndex].IsComplete(),
             TimeSpan.FromSeconds(10)
         );
-        await CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _enduranceEvent.Id);
+        await CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id);
     }
 
     async Task ApplyManualElimination(EndToEndPhaseSnapshot entry)
@@ -414,14 +414,14 @@ internal sealed class DashboardFeature
     {
         await Eventually.ReadParticipation(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             number,
             participation => participation.Eliminated?.ToString() == expected.ToString(),
             $"elimination for #{number}"
         );
         await Eventually.ReadRankings(
             _api,
-            _enduranceEvent.Id,
+            _eventInformation.Id,
             rankings => rankings.SelectMany(x => x.Entries).Any(x =>
                 x.Participation.Combination.Number == number
                 && x.Participation.Eliminated?.ToString() == expected.ToString()

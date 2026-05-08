@@ -35,11 +35,11 @@ public sealed class CoreFeatureEndToEndTests
         await SeedOtherEventData(nexusApi, snapshot.EventId);
 
         var setup = await configureEvent.Execute(snapshot);
-        var enduranceEvent = await startEvent.Execute(setup);
+        var eventInformation = await startEvent.Execute(setup);
 
         var startedDocuments = await ReadStartedDocumentsScopedToCurrentEvent(
             nexusApi,
-            enduranceEvent,
+            eventInformation,
             setup,
             snapshot
         );
@@ -55,7 +55,7 @@ public sealed class CoreFeatureEndToEndTests
             $"CoreEndToEndWitness-{snapshot.Name}"
         );
         await witness.Start();
-        await witness.Connect(enduranceEvent);
+        await witness.Connect(eventInformation);
 
         var phaseWaves = CreatePhaseWaves(snapshot.PhasesWithSnapshots);
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, phaseWaves.Sum(x => x.Count));
@@ -65,7 +65,7 @@ public sealed class CoreFeatureEndToEndTests
             judge,
             witness,
             nexusApi,
-            enduranceEvent
+            eventInformation
         );
         var processedPhases = 0;
         var publishedSnapshotGroups = 0;
@@ -79,7 +79,7 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, processedPhases);
         Assert.True(publishedSnapshotGroups > 0);
 
-        await AssertFinalStateMatchesSnapshots(nexusApi, enduranceEvent, setup, snapshot);
+        await AssertFinalStateMatchesSnapshots(nexusApi, eventInformation, setup, snapshot);
     }
 
     static async Task SeedOtherEventData(NexusApiDriver api, int testedEventId)
@@ -122,7 +122,7 @@ public sealed class CoreFeatureEndToEndTests
         string label
     )
     {
-        var enduranceEvent = IntegrationPayloadFactory.EnduranceEvent(
+        var eventInformation = IntegrationPayloadFactory.EventInformation(
             eventId,
             eventSpan,
             $"Seeded {label} Event"
@@ -146,7 +146,7 @@ public sealed class CoreFeatureEndToEndTests
             .Select((participation, index) => IntegrationPayloadFactory.Handout(participation, idBase + 401 + index))
             .ToArray();
 
-        await api.Create(enduranceEvent);
+        await api.Create(eventInformation);
         foreach (var participation in participations)
         {
             await api.Create(participation);
@@ -167,7 +167,7 @@ public sealed class CoreFeatureEndToEndTests
 
     static async Task<StartedEventDocuments> ReadStartedDocumentsScopedToCurrentEvent(
         NexusApiDriver api,
-        EnduranceEvent enduranceEvent,
+        EventInformation eventInformation,
         SetupFeatureResult setup,
         EndToEndEventSnapshot snapshot
     )
@@ -177,12 +177,12 @@ public sealed class CoreFeatureEndToEndTests
         while (DateTimeOffset.UtcNow < deadline)
         {
             last = new StartedEventDocuments(
-                await api.ReadParticipations(enduranceEvent.Id),
-                await api.ReadRankings(enduranceEvent.Id),
-                await api.ReadOfficials(enduranceEvent.Id),
-                await api.ReadHandouts(enduranceEvent.Id)
+                await api.ReadParticipations(eventInformation.Id),
+                await api.ReadRankings(eventInformation.Id),
+                await api.ReadOfficials(eventInformation.Id),
+                await api.ReadHandouts(eventInformation.Id)
             );
-            AssertDocumentsBelongToEvent(enduranceEvent.Id, last);
+            AssertDocumentsBelongToEvent(eventInformation.Id, last);
 
             if (
                 last.Participations.Count == snapshot.Participations.Count
@@ -275,14 +275,14 @@ public sealed class CoreFeatureEndToEndTests
 
     static async Task AssertFinalStateMatchesSnapshots(
         NexusApiDriver api,
-        EnduranceEvent enduranceEvent,
+        EventInformation eventInformation,
         SetupFeatureResult setup,
         EndToEndEventSnapshot snapshot
     )
     {
-        var participations = await api.ReadParticipations(enduranceEvent.Id);
-        var rankings = await api.ReadRankings(enduranceEvent.Id);
-        var idMap = new Dictionary<int, int>(setup.IdMap) { [snapshot.EventId] = enduranceEvent.Id };
+        var participations = await api.ReadParticipations(eventInformation.Id);
+        var rankings = await api.ReadRankings(eventInformation.Id);
+        var idMap = new Dictionary<int, int>(setup.IdMap) { [snapshot.EventId] = eventInformation.Id };
         foreach (var mapping in snapshot.CreateIdMap(participations, rankings))
         {
             idMap[mapping.Key] = mapping.Value;

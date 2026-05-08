@@ -77,7 +77,7 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
         if (UpdateRoute == null)
         {
             var aggregate = (_aggregateType ??= typeof(T)).Name.ToLower();
-            UpdateRoute = $"/{aggregate}-update";
+            UpdateRoute = $"/{aggregate}-krud-update-route";
         }
     }
 

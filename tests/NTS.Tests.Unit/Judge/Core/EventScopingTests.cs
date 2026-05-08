@@ -9,7 +9,7 @@
 //using NTS.Domain.Setup.Aggregates;
 //using NTS.Storage.REST;
 //using CoreOfficial = NTS.Domain.Core.Aggregates.Official;
-//using SetupCompetition = NTS.Domain.Setup.Aggregates.UpcomingEvents.Competition;
+//using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
 
 //namespace NTS.Judge.Tests.Core;
 
@@ -33,11 +33,11 @@
 //    }
 
 //    [Fact]
-//    public void EnduranceEventFactory_Create_SetsEventIdFromUpcomingEvent()
+//    public void EventInformationFactory_Create_SetsEventIdFromConfigureEvent()
 //    {
-//        var setupEvent = CreateUpcomingEvent(77);
+//        var setupEvent = CreateConfigureEvent(77);
 
-//        var result = EnduranceEventFactory.Create(setupEvent);
+//        var result = EventInformationFactory.Create(setupEvent);
 
 //        Assert.Equal(77, result.Id);
 //    }
@@ -45,7 +45,7 @@
 //    [Fact]
 //    public void EventScopedRepository_ResolveEndpoint_UsesCurrentEventId()
 //    {
-//        var context = new TestSocketContext { Event = CreateUpcomingEvent(12) };
+//        var context = new TestSocketContext { Event = CreateConfigureEvent(12) };
 //        var repository = new TestEventScopedRepository(context);
 
 //        var endpoint = repository.GetScopedEndpoint();
@@ -62,7 +62,7 @@
 //        Assert.Throws<InvalidOperationException>(() => repository.GetScopedEndpoint());
 //    }
 
-//    static UpcomingEvent CreateUpcomingEvent(int id)
+//    static ConfigureEvent CreateConfigureEvent(int id)
 //    {
 //        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
 //        var competition = new SetupCompetition(
@@ -79,7 +79,7 @@
 //            1
 //        );
 
-//        return new UpcomingEvent("Event", "Sofia", country, null, null, null, [competition], [], [], [], id);
+//        return new ConfigureEvent("Event", "Sofia", country, null, null, null, [competition], [], [], [], id);
 //    }
 
 //    sealed class TestEventScopedRepository : EventScopedApiRepository<CoreOfficial, OfficialModel>
@@ -105,6 +105,6 @@
 //        public bool IsConnected => Event != null;
 //        public SocketConnectionStatus Status =>
 //            IsConnected ? SocketConnectionStatus.Connected : SocketConnectionStatus.Disconnected;
-//        public UpcomingEvent? Event { get; set; }
+//        public ConfigureEvent? Event { get; set; }
 //    }
 //}

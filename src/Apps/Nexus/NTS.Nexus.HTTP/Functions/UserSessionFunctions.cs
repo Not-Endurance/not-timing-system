@@ -60,6 +60,22 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         return await DeleteCore(id);
     }
 
+    [Function("user-sessions-delete-for-event")]
+    public async Task<IActionResult> DeleteForEvent(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user-sessions/{eventId:int}/{id:int}")]
+            HttpRequest request,
+        int eventId,
+        int id
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteForEvent));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteForEvent));
+
+        await _sessions.Delete(new NtsUserSessionModel { Id = id, EventId = eventId });
+        return Ok();
+    }
+
     [Function("user-sessions-delete-many")]
     public async Task<IActionResult> DeleteMany(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user-sessions")] HttpRequest request
@@ -95,6 +111,25 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         LogInformation(request, nameof(ReadByUserIdentifier));
 
         return Ok(await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier)));
+    }
+
+    [Function("user-sessions-read-by-user-identifier-and-event")]
+    public async Task<IActionResult> ReadByUserIdentifierAndEvent(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "get",
+            Route = "user-sessions/{eventId:int}/by-user-identifier/{userIdentifier}"
+        )]
+            HttpRequest request,
+        int eventId,
+        string userIdentifier
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(ReadByUserIdentifierAndEvent));
+        TagRequest(request);
+        LogInformation(request, nameof(ReadByUserIdentifierAndEvent));
+
+        return Ok(await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier), eventId));
     }
 
     [Function("user-sessions-read-many")]

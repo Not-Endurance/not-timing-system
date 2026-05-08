@@ -20,9 +20,9 @@ public class JudgeSocketServiceTests
         var dispatcher = new RecordingDomainEventDispatcher();
         var socket = new RecordingRpcSocket();
         var service = new JudgeSocketService(socket, new TestNotifier(), dispatcher);
-        var enduranceEvent = CreateEvent(14);
+        var eventInformation = CreateEvent(14);
 
-        await service.Connect(enduranceEvent);
+        await service.Connect(eventInformation);
 
         Assert.Equal("14", socket.LastGroupId);
         Assert.Equal([nameof(EventConnected)], dispatcher.Events);
@@ -56,10 +56,10 @@ public class JudgeSocketServiceTests
         Assert.Null(service.Event);
     }
 
-    static EnduranceEvent CreateEvent(int id)
+    static EventInformation CreateEvent(int id)
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        return new EnduranceEvent(
+        return new EventInformation(
             country,
             "Sofia",
             "Sofia",

@@ -47,7 +47,7 @@ public static class NtsStorageServices
             _nStorageBuilder.AddRestApiStorage(Assembly.GetExecutingAssembly());
             _services.AddTransient(typeof(EventScopeFactory<>));
 
-            _services.AddTransient<IEnduranceEventRepository, EnduranceEventApiRepository>();
+            _services.AddTransient<IEventInformationRepository, EventInformationApiRepository>();
             _services.AddTransient<ISettingRepository, SettingApiRepository>();
             _services.AddTransient<INtsUserSessionRepository, UserSessionApiRepository>();
             _services.AddTransient<INUserSessionRepository<NtsUserSessionStateModel>, UserSessionApiRepository>();
@@ -58,7 +58,7 @@ public static class NtsStorageServices
             _services.AddTransient<IRepository<Club>, ClubApiRepository>();
             _services.AddTransient<IRepository<Horse>, HorseApiRepository>();
             _services.AddTransient<IRepository<Athlete>, AthleteApiRepository>();
-            _services.AddTransient<IRepository<UpcomingEvent>, UpcomingEventApiRepository>();
+            _services.AddTransient<IRepository<ConfigureEvent>, ConfigureEventApiRepository>();
             _services.AddTransient<IUserEmailLookup, UserApiRepository>();
 
             AddEventScopedRepository<Participation, ParticipationEventScopedApiRepository>();

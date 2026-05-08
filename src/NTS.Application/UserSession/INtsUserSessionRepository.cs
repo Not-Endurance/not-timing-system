@@ -7,4 +7,8 @@ namespace NTS.Application.UserSession;
 
 public interface INtsUserSessionRepository
     : IRepository<NtsUserSessionModel>,
-        INUserSessionRepository<NtsUserSessionModel> { }
+        INUserSessionRepository<NtsUserSessionModel>
+{
+    Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId);
+    new Task Delete(NtsUserSessionModel item);
+}

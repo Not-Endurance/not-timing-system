@@ -5,13 +5,13 @@ namespace NTS.Domain.Core.Objects.Documents;
 
 public record ProtocolDocument : Document
 {
-    public ProtocolDocument(Ranklist ranklist, EnduranceEvent enduranceEvent, IEnumerable<Official> officials)
+    public ProtocolDocument(Ranklist ranklist, EventInformation eventInformation, IEnumerable<Official> officials)
         : base(
             new DocumentHeader(
                 ranklist.Name,
-                enduranceEvent.Country,
-                enduranceEvent.Location,
-                enduranceEvent.EventSpan,
+                eventInformation.Country,
+                eventInformation.Location,
+                eventInformation.EventSpan,
                 officials
             )
         )

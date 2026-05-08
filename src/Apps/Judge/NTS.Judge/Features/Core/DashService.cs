@@ -14,32 +14,32 @@ public class DashService : IDashService, IScoped
     readonly INtsSocketService _socketService;
     readonly IActiveEventsContext _activeEventService;
     readonly IEnumerable<ICoreDependentObservables> _coreDependentObservables;
-    readonly IEnduranceEventRepository _enduranceEvents;
-    readonly IUpcomingEventService _upcomingEvents;
+    readonly IEventInformationRepository _eventInformationRepository;
+    readonly IConfigureEventService _configureEvents;
 
     public DashService(
         INtsSocketService socketService,
         IActiveEventsContext activeEventService,
         IEnumerable<ICoreDependentObservables> coreDependentObservables,
-        IEnduranceEventRepository enduranceEvents,
-        IUpcomingEventService upcomingEvents
+        IEventInformationRepository eventInformationRepository,
+        IConfigureEventService configureEvents
     )
     {
         _socketService = socketService;
         _activeEventService = activeEventService;
         _coreDependentObservables = coreDependentObservables;
-        _enduranceEvents = enduranceEvents;
-        _upcomingEvents = upcomingEvents;
+        _eventInformationRepository = eventInformationRepository;
+        _configureEvents = configureEvents;
     }
 
-    public Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId)
+    public Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int configureEventId)
     {
-        return _upcomingEvents.Validate(upcomingEventId);
+        return _configureEvents.Validate(configureEventId);
     }
 
-    public async Task Start(int upcomingEventId)
+    public async Task Start(int configureEventId)
     {
-        var validationResult = await _upcomingEvents.Validate(upcomingEventId);
+        var validationResult = await _configureEvents.Validate(configureEventId);
         if (validationResult.Data?.Any() == true)
         {
             throw GuardHelper.Exception(
@@ -51,15 +51,15 @@ public class DashService : IDashService, IScoped
             await _socketService.Disconnect();
         }
 
-        var enduranceEvent = await _enduranceEvents.Start(upcomingEventId);
-        _activeEventService.Add(enduranceEvent);
-        await _socketService.Connect(enduranceEvent);
+        var eventInformation = await _eventInformationRepository.Start(configureEventId);
+        _activeEventService.Add(eventInformation);
+        await _socketService.Connect(eventInformation);
     }
 
     public async Task Reset()
     {
         var eventId = _socketService.Event?.Id;
-        await _enduranceEvents.Reset();
+        await _eventInformationRepository.Reset();
         if (eventId != null)
         {
             _activeEventService.Remove(eventId.Value);

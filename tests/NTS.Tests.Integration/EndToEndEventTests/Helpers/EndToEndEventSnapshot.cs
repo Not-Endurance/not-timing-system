@@ -9,17 +9,17 @@ using CoreRanking = NTS.Domain.Core.Aggregates.Ranking;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupClub = NTS.Domain.Setup.Aggregates.Club;
 using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
-using SetupUpcomingEvent = NTS.Domain.Setup.Aggregates.UpcomingEvent;
-using SetupUpcomingEventModel = NTS.Application.Contracts.Setup.Models.UpcomingEventModel;
+using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
+using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
 using SetupUser = NTS.Domain.Setup.Aggregates.User;
 
 namespace NTS.Tests.Integration.EndToEndEventTests.Helpers;
 
 internal sealed class EndToEndEventSnapshot
 {
-    const string UPCOMING_EVENT_FILE = "upcomingEvent.json";
-    const string PARTICIPATIONS_FILE = "nts.event-participations.json";
-    const string RANKINGS_FILE = "nts.event-rankings.json";
+    const string CONFIGURE_EVENT_FILE = "configureEvent.json";
+    const string PARTICIPATIONS_FILE = "nts.event_participations.json";
+    const string RANKINGS_FILE = "nts.event_rankings.json";
 
     public static IReadOnlyList<string> DiscoverNames()
     {
@@ -56,7 +56,7 @@ internal sealed class EndToEndEventSnapshot
 
     EndToEndEventSnapshot(
         string name,
-        SetupUpcomingEvent upcomingEvent,
+        SetupConfigureEvent configureEvent,
         IReadOnlyList<CoreParticipation> participations,
         IReadOnlyList<CoreRanking> rankings,
         JToken setupSource,
@@ -65,7 +65,7 @@ internal sealed class EndToEndEventSnapshot
     )
     {
         Name = name;
-        UpcomingEvent = upcomingEvent;
+        ConfigureEvent = configureEvent;
         Participations = participations;
         Rankings = rankings;
         PhasesWithSnapshots = participations
@@ -84,14 +84,14 @@ internal sealed class EndToEndEventSnapshot
     }
 
     public string Name { get; }
-    public SetupUpcomingEvent UpcomingEvent { get; }
+    public SetupConfigureEvent ConfigureEvent { get; }
     public IReadOnlyList<CoreParticipation> Participations { get; }
     public IReadOnlyList<CoreRanking> Rankings { get; }
     public IReadOnlyList<EndToEndPhaseSnapshot> PhasesWithSnapshots { get; }
     public int EventId => Participations.First().EventId;
 
     public IReadOnlyList<SetupClub> Clubs =>
-        UpcomingEvent
+        ConfigureEvent
             .Combinations.Select(x => x.Athlete.Club)
             .Where(x => x != null)
             .Select(x => x!)
@@ -99,15 +99,15 @@ internal sealed class EndToEndEventSnapshot
             .ToArray();
 
     public IReadOnlyList<SetupHorse> Horses =>
-        UpcomingEvent.Combinations.Select(x => x.Horse).DistinctBy(x => x.Id).ToArray();
+        ConfigureEvent.Combinations.Select(x => x.Horse).DistinctBy(x => x.Id).ToArray();
 
     public IReadOnlyList<SetupAthlete> Athletes =>
-        UpcomingEvent.Combinations.Select(x => x.Athlete).DistinctBy(x => x.Id).ToArray();
+        ConfigureEvent.Combinations.Select(x => x.Athlete).DistinctBy(x => x.Id).ToArray();
 
     public IReadOnlyList<SetupUser> Users =>
-        UpcomingEvent
+        ConfigureEvent
             .Officials.Select(x => x.User)
-            .Concat(UpcomingEvent.Combinations.Select(x => x.Athlete.User))
+            .Concat(ConfigureEvent.Combinations.Select(x => x.Athlete.User))
             .Where(x => x != null)
             .Select(x => x!)
             .DistinctBy(x => x.Id)
@@ -152,7 +152,7 @@ internal sealed class EndToEndEventSnapshot
         return ids;
     }
 
-    public JToken ExpectedUpcomingEventWith(IReadOnlyDictionary<int, int> idMap)
+    public JToken ExpectedConfigureEventWith(IReadOnlyDictionary<int, int> idMap)
     {
         var expected = _setupSource.DeepClone();
         SnapshotJson.ReplaceIds(expected, idMap);
@@ -180,8 +180,8 @@ internal sealed class EndToEndEventSnapshot
 
     static EndToEndEventSnapshot LoadDirectory(string directory)
     {
-        var setupSource = LoadJson(directory, UPCOMING_EVENT_FILE);
-        var setupModel = setupSource.ToObject<SetupUpcomingEventModel>(SnapshotJson.Serializer)
+        var setupSource = LoadJson(directory, CONFIGURE_EVENT_FILE);
+        var setupModel = setupSource.ToObject<SetupConfigureEventModel>(SnapshotJson.Serializer)
             ?? throw new InvalidOperationException($"Could not deserialize setup snapshot '{directory}'.");
 
         var participationsSource = LoadJson(directory, PARTICIPATIONS_FILE);
@@ -215,7 +215,7 @@ internal sealed class EndToEndEventSnapshot
 
     static bool IsSnapshotDirectory(string directory)
     {
-        return File.Exists(Path.Combine(directory, UPCOMING_EVENT_FILE))
+        return File.Exists(Path.Combine(directory, CONFIGURE_EVENT_FILE))
             && File.Exists(Path.Combine(directory, PARTICIPATIONS_FILE))
             && File.Exists(Path.Combine(directory, RANKINGS_FILE));
     }

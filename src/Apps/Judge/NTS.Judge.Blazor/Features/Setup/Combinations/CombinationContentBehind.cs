@@ -1,5 +1,5 @@
 using Not.Blazor.Navigation;
-using NTS.Judge.Contracts.Features.Setup.UpcomingEvents.Combinations;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 
 namespace NTS.Judge.Blazor.Features.Setup.Combinations;
 
