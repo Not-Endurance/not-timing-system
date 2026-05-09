@@ -17,7 +17,10 @@ namespace NTS.Nexus.HTTP.Functions.Event;
 
 public interface IEventInformationBusinessService
 {
+    Task<IEnumerable<CoreEventInformationModel>> ReadActive();
+    Task<IEnumerable<CoreEventInformationModel>> ReadPast();
     Task<CoreEventInformationModel> Start(int configureEventId);
+    Task Deactivate(int eventInformationId);
 }
 
 public class EventInformationBusinessService : IEventInformationBusinessService, ITransient
@@ -80,6 +83,40 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         }
 
         return eventInformationModel;
+    }
+
+    public async Task<IEnumerable<CoreEventInformationModel>> ReadActive()
+    {
+        var now = DateTimeOffset.UtcNow;
+        await DeactivateExpiredActiveEvents(now);
+        return await _eventInformation.ReadMany(x => x.IsActive && x.EndDay > now) ?? [];
+    }
+
+    public async Task<IEnumerable<CoreEventInformationModel>> ReadPast()
+    {
+        return await _eventInformation.ReadMany(x => !x.IsActive) ?? [];
+    }
+
+    public async Task Deactivate(int eventInformationId)
+    {
+        var eventInformation = await _eventInformation.Read(eventInformationId);
+        if (eventInformation == null)
+        {
+            return;
+        }
+
+        eventInformation.IsActive = false;
+        await _eventInformation.Update(eventInformation);
+    }
+
+    async Task DeactivateExpiredActiveEvents(DateTimeOffset now)
+    {
+        var expiredEvents = await _eventInformation.ReadMany(x => x.IsActive && x.EndDay <= now) ?? [];
+        foreach (var expiredEvent in expiredEvents)
+        {
+            expiredEvent.IsActive = false;
+            await _eventInformation.Update(expiredEvent);
+        }
     }
 
     static string CreateStartValidationMessage(IReadOnlyList<StartValidationIssue> issues)

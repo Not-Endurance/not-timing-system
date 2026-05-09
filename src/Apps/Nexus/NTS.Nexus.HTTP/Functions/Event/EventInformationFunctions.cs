@@ -4,7 +4,6 @@ using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
-using NTS.Domain.Core.Objects;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -94,8 +93,7 @@ public class EventInformationFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(ListActive));
 
-        var activeCutoff = DateTimeOffset.UtcNow.Subtract(EventSpan.ActiveGracePeriod);
-        return Ok(await _events.ReadMany(x => x.EndDay > activeCutoff) ?? []);
+        return Ok(await _businessService.ReadActive());
     }
 
     [Function("event-information-past-list")]
@@ -108,8 +106,7 @@ public class EventInformationFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(ListPast));
 
-        var pastCutoff = DateTimeOffset.UtcNow.Subtract(EventSpan.ActiveGracePeriod);
-        return Ok(await _events.ReadMany(x => x.EndDay <= pastCutoff) ?? []);
+        return Ok(await _businessService.ReadPast());
     }
 
     [Function("event-information-delete")]
@@ -144,6 +141,21 @@ public class EventInformationFunctions : FunctionBase
         LogInformation(request, nameof(Reset));
 
         await _resetService.Reset(id);
+        return Ok();
+    }
+
+    [Function("event-information-deactivate")]
+    public async Task<IActionResult> Deactivate(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "event-information/{id:int}/deactivate")]
+            HttpRequest request,
+        int id
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(Deactivate));
+        TagRequest(request);
+        LogInformation(request, nameof(Deactivate));
+
+        await _businessService.Deactivate(id);
         return Ok();
     }
 

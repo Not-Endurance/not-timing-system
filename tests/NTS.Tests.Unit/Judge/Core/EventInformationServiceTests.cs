@@ -90,6 +90,11 @@ public class EventInformationServiceTests
             throw new NotImplementedException();
         }
 
+        public Task Deactivate()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task Create(EventInformation item)
         {
             throw new NotImplementedException();

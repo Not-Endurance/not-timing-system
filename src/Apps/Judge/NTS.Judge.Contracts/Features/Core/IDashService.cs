@@ -7,5 +7,6 @@ public interface IDashService
 {
     Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int configureEventId);
     Task Start(int configureEventId);
+    Task Deactivate();
     Task Reset();
 }

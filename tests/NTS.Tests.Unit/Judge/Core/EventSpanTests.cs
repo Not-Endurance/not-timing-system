@@ -29,26 +29,24 @@ public class EventSpanTests
     }
 
     [Fact]
-    public void IsActive_WhenEventIsInsideGracePeriod_ReturnsTrue()
+    public void IsActive_WhenEventHasEnded_ReturnsFalse()
     {
-        var now = new DateTimeOffset(2026, 4, 17, 12, 0, 0, TimeSpan.Zero);
         var span = new EventSpan(
             new DateTimeOffset(2026, 4, 10, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2026, 4, 10, 12, 0, 0, TimeSpan.Zero)
         );
 
-        Assert.True(span.IsActive(now));
+        Assert.False(span.IsActive(span.EndDay.AddTicks(1)));
     }
 
     [Fact]
-    public void IsActive_WhenGracePeriodHasElapsed_ReturnsFalse()
+    public void IsActive_WhenNowEqualsEndDay_ReturnsFalse()
     {
         var span = new EventSpan(
             new DateTimeOffset(2026, 4, 10, 12, 0, 0, TimeSpan.Zero),
             new DateTimeOffset(2026, 4, 10, 12, 0, 0, TimeSpan.Zero)
         );
 
-        Assert.False(span.IsActive(span.ActiveUntil));
-        Assert.False(span.IsActive(span.ActiveUntil.AddTicks(1)));
+        Assert.False(span.IsActive(span.EndDay));
     }
 }

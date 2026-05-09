@@ -8,6 +8,7 @@ public interface IEventInformationRepository : IRepository<EventInformation>
     Task<IEnumerable<EventInformation>> ReadActive();
     Task<IEnumerable<EventInformation>> ReadPast();
     Task<EventInformation> Start(int configureEventId);
+    Task Deactivate();
 
     /// <summary>
     /// Permanently resets the currently selected event information in Nexus.

@@ -56,6 +56,17 @@ public class DashService : IDashService, IScoped
         await _socketService.Connect(eventInformation);
     }
 
+    public async Task Deactivate()
+    {
+        var eventId = _socketService.Event?.Id;
+        await _eventInformationRepository.Deactivate();
+        if (eventId != null)
+        {
+            _activeEventService.Remove(eventId.Value);
+        }
+        ResetCoreDependentObservables();
+    }
+
     public async Task Reset()
     {
         var eventId = _socketService.Event?.Id;

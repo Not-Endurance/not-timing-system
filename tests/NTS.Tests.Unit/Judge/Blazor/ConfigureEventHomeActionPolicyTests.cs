@@ -136,6 +136,11 @@ public class ConfigureEventsListBehindTests
             return Task.CompletedTask;
         }
 
+        public Task Deactivate()
+        {
+            return Task.CompletedTask;
+        }
+
         public Task Reset()
         {
             return Task.CompletedTask;

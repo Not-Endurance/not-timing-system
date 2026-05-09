@@ -2,19 +2,24 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Dialogs;
 using Not.Blazor.Helpers;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
+using NTS.Judge.Blazor.Layout.Drawer.Deactivate;
+using NTS.Judge.Contracts.Features.Core;
 using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 using NTS.Judge.Contracts.Features.Core.Rankings;
 using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
+using static NTS.Judge.Blazor.Routes;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings;
 
 public class RankingsContentBehind : PrintableComponent
 {
     TaskCompletionSource<bool>? _renderCompletionSource;
+    bool _isDeactivatingEvent;
 
     [Inject]
     IFeiExportService FeiExportService { get; set; } = default!;
@@ -23,7 +28,16 @@ public class RankingsContentBehind : PrintableComponent
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
+    IDashService DashService { get; set; } = default!;
+
+    [Inject]
+    INtsSocketService SocketService { get; set; } = default!;
+
+    [Inject]
     IProtocolDocumentService DocumentService { get; set; } = default!;
+
+    [Inject]
+    NavigationManager NavigationManager { get; set; } = default!;
 
     [Inject]
     protected IRankingMenuService RankingService { get; set; } = default!;
@@ -38,15 +52,23 @@ public class RankingsContentBehind : PrintableComponent
     protected IProtocolLogoState HeaderLogo { get; set; } = default!;
 
     //public bool HasContent => RankingService.Ranklist != null;
+    protected bool HasActiveEvent => SocketService.Event != null;
+    protected bool IsDeactivatingEvent => _isDeactivatingEvent;
     public bool IsFeiExportConfigured => Ranklist?.IsFeiExportConfigured ?? false;
 
     protected override async Task OnInitializedAsync()
     {
         await Observe(RankingService);
+        await Observe(SocketService);
     }
 
     protected override void OnBeforeRender()
     {
+        if (_isDeactivatingEvent)
+        {
+            return;
+        }
+
         Ranklist = new Ranklist(RankingService.Current);
         Document = DocumentService.Create(RankingService.Current);
     }
@@ -72,6 +94,39 @@ public class RankingsContentBehind : PrintableComponent
         }
         catch (Exception ex)
         {
+            Handle(ex);
+        }
+    }
+
+    protected async Task OpenDeactivateEventDialog()
+    {
+        if (!HasActiveEvent)
+        {
+            return;
+        }
+
+        var deactivated = false;
+        try
+        {
+            var dialog = await DialogService.ShowAsync<DeactivateEventDialog>();
+            if (await dialog.IsCanceled())
+            {
+                return;
+            }
+
+            _isDeactivatingEvent = true;
+            await DashService.Deactivate();
+            deactivated = true;
+            NavigationManager.NavigateTo(HOME);
+            await SocketService.Disconnect();
+        }
+        catch (Exception ex)
+        {
+            if (!deactivated)
+            {
+                _isDeactivatingEvent = false;
+            }
+
             Handle(ex);
         }
     }

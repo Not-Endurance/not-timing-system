@@ -714,5 +714,20 @@ public class RegistrationFlowTests
         {
             return Task.FromException<EventInformationModel>(_exception);
         }
+
+        public Task<IEnumerable<EventInformationModel>> ReadActive()
+        {
+            return Task.FromException<IEnumerable<EventInformationModel>>(_exception);
+        }
+
+        public Task<IEnumerable<EventInformationModel>> ReadPast()
+        {
+            return Task.FromException<IEnumerable<EventInformationModel>>(_exception);
+        }
+
+        public Task Deactivate(int eventInformationId)
+        {
+            return Task.FromException(_exception);
+        }
     }
 }

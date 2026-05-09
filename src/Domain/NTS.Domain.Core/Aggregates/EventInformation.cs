@@ -13,7 +13,8 @@ public class EventInformation : Aggregate
         string? feiShowId,
         string? feiId,
         string? feiEventCode,
-        int id
+        int id,
+        bool isActive = true
     )
         : base(id)
     {
@@ -24,6 +25,7 @@ public class EventInformation : Aggregate
         FeiShowId = feiShowId;
         FeiId = feiId;
         FeiEventCode = feiEventCode;
+        IsActive = isActive;
     }
 
     public Country Country { get; }
@@ -33,6 +35,7 @@ public class EventInformation : Aggregate
     public string? FeiShowId { get; }
     public string? FeiId { get; }
     public string? FeiEventCode { get; }
+    public bool IsActive { get; }
 
     public override string ToString()
     {

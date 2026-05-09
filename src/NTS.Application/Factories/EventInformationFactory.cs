@@ -25,7 +25,8 @@ public static class EventInformationFactory
             setupEvent.ShowFeiId,
             setupEvent.FeiId,
             setupEvent.FeiEventCode,
-            setupEvent.Id
+            setupEvent.Id,
+            isActive: true
         );
         return eventInformation;
     }

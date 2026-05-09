@@ -128,6 +128,32 @@ public class EventInformationApiRepositoryTests
         Assert.Empty(handler.Requests);
     }
 
+    [Fact]
+    public async Task Deactivate_calls_event_deactivate_endpoint_for_current_event()
+    {
+        var handler = new RecordingHttpMessageHandler();
+        var client = CreateClient(handler);
+        var repository = new EventInformationApiRepository(client, new TestSocketContext { Event = CreateEvent(14) });
+
+        await repository.Deactivate();
+
+        var request = Assert.Single(handler.Requests);
+        Assert.Equal(HttpMethod.Post, request.Method);
+        Assert.Equal("https://nexus.test/api/event-information/14/deactivate", request.RequestUri?.ToString());
+    }
+
+    [Fact]
+    public async Task Deactivate_does_nothing_when_no_event_is_selected()
+    {
+        var handler = new RecordingHttpMessageHandler();
+        var client = CreateClient(handler);
+        var repository = new EventInformationApiRepository(client, new TestSocketContext());
+
+        await repository.Deactivate();
+
+        Assert.Empty(handler.Requests);
+    }
+
     static NHttpClient CreateClient(HttpMessageHandler handler)
     {
         return new NHttpClient(

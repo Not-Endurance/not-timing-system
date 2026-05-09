@@ -4,6 +4,7 @@ using NTS.Application.Contracts.Setup.Models;
 using NTS.Application.Contracts.Shared.Models;
 using NTS.Application.Factories;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -35,6 +36,7 @@ public class EventInformationModelMappingTests
         var document = model.ToBsonDocument();
 
         Assert.Equal(11, document["_id"].AsInt32);
+        Assert.True(document["IsActive"].AsBoolean);
         Assert.False(document.Contains("MongoId"));
         Assert.False(document.Contains("Id"));
     }
@@ -62,6 +64,7 @@ public class EventInformationModelMappingTests
         Assert.Equal("National Championship", eventInformation.Name);
         Assert.Equal("Shumen", eventInformation.Location);
         Assert.Equal(country, eventInformation.Country);
+        Assert.True(eventInformation.IsActive);
     }
 
     [Fact]
@@ -75,12 +78,37 @@ public class EventInformationModelMappingTests
             Location = "Ring",
             StartDay = DateTimeOffset.UtcNow,
             EndDay = DateTimeOffset.UtcNow.AddDays(1),
+            IsActive = true,
         };
 
         var eventInformation = model.MapToEntity();
 
         Assert.Equal("Spring Cup", eventInformation.Name);
         Assert.Equal("Ring", eventInformation.Location);
+        Assert.True(eventInformation.IsActive);
+    }
+
+    [Fact]
+    public void MapRoundTrip_WhenEventInformationIsInactive_PreservesIsActive()
+    {
+        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var eventInformation = new EventInformation(
+            country,
+            "Autumn Cup",
+            "Field",
+            new EventSpan(DateTimeOffset.UtcNow.AddDays(-2), DateTimeOffset.UtcNow.AddDays(-1)),
+            null,
+            null,
+            null,
+            18,
+            isActive: false
+        );
+
+        var model = EventInformationModel.From(eventInformation);
+        var mapped = model.MapToEntity();
+
+        Assert.False(model.IsActive);
+        Assert.False(mapped.IsActive);
     }
 
     [Fact]

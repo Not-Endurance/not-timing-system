@@ -38,7 +38,10 @@ public class EventInformationBusinessServiceTests
         var result = await service.Start(2);
 
         Assert.Equal(2, result.Id);
-        Assert.Equal(2, Assert.Single(events.CreatedItems).Id);
+        Assert.True(result.IsActive);
+        var createdEvent = Assert.Single(events.CreatedItems);
+        Assert.Equal(2, createdEvent.Id);
+        Assert.True(createdEvent.IsActive);
         Assert.Single(officials.CreatedItems);
         Assert.Single(participations.CreatedItems);
         Assert.Single(rankings.CreatedItems);
@@ -142,6 +145,65 @@ public class EventInformationBusinessServiceTests
         Assert.Empty(events.CreatedItems);
     }
 
+    [Fact]
+    public async Task ReadActive_WhenExpiredActiveEventsExist_DeactivatesThemAndReturnsCurrentActiveEvents()
+    {
+        var activeEvent = CreateEventInformationModel(1, DateTimeOffset.UtcNow.AddDays(1), isActive: true);
+        var expiredEvent = CreateEventInformationModel(2, DateTimeOffset.UtcNow.AddDays(-1), isActive: true);
+        var inactiveEvent = CreateEventInformationModel(3, DateTimeOffset.UtcNow.AddDays(1), isActive: false);
+        var events = new RecordingRepository<CoreEventInformationModel>(
+            [activeEvent, expiredEvent, inactiveEvent]
+        );
+        var service = CreateService([], events);
+
+        var result = (await service.ReadActive()).ToList();
+
+        var returnedEvent = Assert.Single(result);
+        Assert.Equal(activeEvent.Id, returnedEvent.Id);
+        Assert.False(expiredEvent.IsActive);
+        Assert.Contains(expiredEvent, events.UpdatedItems);
+    }
+
+    [Fact]
+    public async Task ReadPast_WhenEventsExist_ReturnsInactiveEvents()
+    {
+        var activeEvent = CreateEventInformationModel(1, DateTimeOffset.UtcNow.AddDays(1), isActive: true);
+        var inactiveEvent = CreateEventInformationModel(2, DateTimeOffset.UtcNow.AddDays(1), isActive: false);
+        var expiredInactiveEvent = CreateEventInformationModel(3, DateTimeOffset.UtcNow.AddDays(-1), isActive: false);
+        var events = new RecordingRepository<CoreEventInformationModel>(
+            [activeEvent, inactiveEvent, expiredInactiveEvent]
+        );
+        var service = CreateService([], events);
+
+        var result = (await service.ReadPast()).ToList();
+
+        Assert.Equal([2, 3], result.Select(x => x.Id));
+    }
+
+    [Fact]
+    public async Task Deactivate_WhenEventExists_MarksItInactive()
+    {
+        var eventInformation = CreateEventInformationModel(19, DateTimeOffset.UtcNow.AddDays(1), isActive: true);
+        var events = new RecordingRepository<CoreEventInformationModel>([eventInformation]);
+        var service = CreateService([], events);
+
+        await service.Deactivate(19);
+
+        Assert.False(eventInformation.IsActive);
+        Assert.Contains(eventInformation, events.UpdatedItems);
+    }
+
+    [Fact]
+    public async Task Deactivate_WhenEventIsMissing_DoesNothing()
+    {
+        var events = new RecordingRepository<CoreEventInformationModel>();
+        var service = CreateService([], events);
+
+        await service.Deactivate(19);
+
+        Assert.Empty(events.UpdatedItems);
+    }
+
     static EventInformationBusinessService CreateService(
         IEnumerable<SetupConfigureEventModel> configureEvents,
         RecordingRepository<CoreEventInformationModel>? events = null,
@@ -178,6 +240,19 @@ public class EventInformationBusinessServiceTests
                 officialUserId
             )
         );
+    }
+
+    static CoreEventInformationModel CreateEventInformationModel(int id, DateTimeOffset endDay, bool isActive)
+    {
+        return new CoreEventInformationModel
+        {
+            Id = id,
+            Name = $"Event {id}",
+            Location = "Sofia",
+            StartDay = endDay.AddDays(-1),
+            EndDay = endDay,
+            IsActive = isActive,
+        };
     }
 
     static ConfigureEvent CreateValidEvent(
@@ -289,6 +364,7 @@ public class EventInformationBusinessServiceTests
         }
 
         public List<T> CreatedItems { get; } = [];
+        public List<T> UpdatedItems { get; } = [];
 
         public Task Create(T item)
         {
@@ -322,6 +398,13 @@ public class EventInformationBusinessServiceTests
 
         public Task Update(T item)
         {
+            UpdatedItems.Add(item);
+            var id = GetId(item);
+            var index = _items.FindIndex(x => GetId(x) == id);
+            if (index >= 0)
+            {
+                _items[index] = item;
+            }
             return Task.CompletedTask;
         }
 
@@ -343,6 +426,11 @@ public class EventInformationBusinessServiceTests
         public Task DeleteMany(IEnumerable<T> items)
         {
             return Task.CompletedTask;
+        }
+
+        static int? GetId(T item)
+        {
+            return item.GetType().GetProperty("Id")?.GetValue(item) as int?;
         }
     }
 }

@@ -108,6 +108,11 @@ namespace NTS.Localization
         public static string Confirmation_code_string => LocalizeString(nameof(Confirmation_code_string));
         public static string Setup_configuration_will_not_be_deleted_string =>
             LocalizeString(nameof(Setup_configuration_will_not_be_deleted_string));
+        public static string Deactivate_Event_string => LocalizeString(nameof(Deactivate_Event_string));
+        public static string Deactivate_event_instructions_string =>
+            LocalizeString(nameof(Deactivate_event_instructions_string));
+        public static string Type_1338_to_enable_confirmation_string =>
+            LocalizeString(nameof(Type_1338_to_enable_confirmation_string));
         public static string Configure_Event_string => LocalizeString(nameof(Configure_Event_string));
         public static string Configure_Competition_string => LocalizeString(nameof(Configure_Competition_string));
         public static string Configure_Club_string => LocalizeString(nameof(Configure_Club_string));

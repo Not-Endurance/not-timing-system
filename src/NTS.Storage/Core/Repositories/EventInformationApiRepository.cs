@@ -2,6 +2,7 @@ using Not.Application.HTTP;
 using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Storage.REST;
+using Not.Structures;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Contracts.Socket;
@@ -49,6 +50,17 @@ public class EventInformationApiRepository
         return eventInformation ?? throw GuardHelper.Exception("Event information start returned no event payload.");
     }
 
+    public async Task Deactivate()
+    {
+        var eventId = _socketContext.Event?.Id;
+        if (eventId == null)
+        {
+            return;
+        }
+
+        await Client.Post<Result.Empty>($"{Endpoint}/{eventId.Value}/deactivate", new DeactivateEventInformationRequest());
+    }
+
     /// <summary>
     /// Permanently resets the currently selected event information in Nexus.
     /// </summary>
@@ -68,4 +80,6 @@ public class EventInformationApiRepository
     }
 
     sealed class StartEventInformationRequest { }
+
+    sealed class DeactivateEventInformationRequest { }
 }

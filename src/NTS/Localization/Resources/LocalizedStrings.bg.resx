@@ -606,6 +606,15 @@
   <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
     <value>Конфигурацията на събитието няма да бъде изтрита</value>
   </data>
+  <data name="Deactivate_Event_string" xml:space="preserve">
+    <value>Деактивирай събитието</value>
+  </data>
+  <data name="Deactivate_event_instructions_string" xml:space="preserve">
+    <value>Това ще маркира текущото събитие като неактивно и ще разкачи таблото. Данните за събитието няма да бъдат изтрити и ще останат налични в минали събития.</value>
+  </data>
+  <data name="Type_1338_to_enable_confirmation_string" xml:space="preserve">
+    <value>Въведете 1338, за да активирате потвърждението.</value>
+  </data>
   <data name="Disconnect_from_current_Event" xml:space="preserve">
     <value>Разкачи се от текущото Събитие</value>
   </data>

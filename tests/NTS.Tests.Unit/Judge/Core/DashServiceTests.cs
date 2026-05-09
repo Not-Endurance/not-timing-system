@@ -68,6 +68,21 @@ public class DashServiceTests
         Assert.Equal(["Reset()", "RemoveActive(11)"], calls);
     }
 
+    [Fact]
+    public async Task Deactivate_WhenSocketHasEvent_DeactivatesAndRemovesItFromActiveCache()
+    {
+        var calls = new List<string>();
+        var socketService = new TestSocketService(calls) { Event = CreateEvent(11) };
+        var startBusiness = new TestConfigureEventService(calls);
+        var eventInformation = new TestEventInformationRepository(calls);
+        var activeEvents = new TestActiveEventService(calls);
+        var service = CreateService(socketService, activeEvents, startBusiness, eventInformation);
+
+        await service.Deactivate();
+
+        Assert.Equal(["Deactivate()", "RemoveActive(11)"], calls);
+    }
+
     static DashService CreateService(
         INtsSocketService socketService,
         IActiveEventsContext activeEventService,
@@ -213,6 +228,12 @@ public class DashServiceTests
         public Task Reset()
         {
             _calls?.Add("Reset()");
+            return Task.CompletedTask;
+        }
+
+        public Task Deactivate()
+        {
+            _calls?.Add("Deactivate()");
             return Task.CompletedTask;
         }
 

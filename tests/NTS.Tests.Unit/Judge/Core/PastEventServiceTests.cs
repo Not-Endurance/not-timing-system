@@ -161,6 +161,11 @@ public class PastEventServiceTests
         {
             throw new NotSupportedException();
         }
+
+        public Task Deactivate()
+        {
+            throw new NotSupportedException();
+        }
     }
 
     class RecordingRepository<T> : IRepository<T>
