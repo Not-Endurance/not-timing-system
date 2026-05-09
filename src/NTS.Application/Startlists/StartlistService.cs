@@ -29,10 +29,7 @@ public class StartlistService
     public StartlistService(IEventScopedRepository<Participation> participations)
         : this(participations, null) { }
 
-    public StartlistService(
-        IEventScopedRepository<Participation> participations,
-        INtsSocketContext? socketContext
-    )
+    public StartlistService(IEventScopedRepository<Participation> participations, INtsSocketContext? socketContext)
     {
         _participations = participations;
         _socketContext = socketContext;

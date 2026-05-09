@@ -4,12 +4,7 @@ namespace NTS.Tests.Integration.EndToEndEventTests.Helpers;
 
 internal static class FeatureStep
 {
-    public static async Task Run(
-        string feature,
-        string step,
-        EndToEndPhaseSnapshot entry,
-        Func<Task> action
-    )
+    public static async Task Run(string feature, string step, EndToEndPhaseSnapshot entry, Func<Task> action)
     {
         await Run(feature, step, [entry], action);
     }
@@ -57,12 +52,7 @@ internal static class FeatureStep
         Exception exception
     )
     {
-        var lines = new List<string>
-        {
-            $"Feature: {feature}",
-            $"Step: {step}",
-            "Snapshot data:",
-        };
+        var lines = new List<string> { $"Feature: {feature}", $"Step: {step}", "Snapshot data:" };
 
         if (entries.Count == 0)
         {

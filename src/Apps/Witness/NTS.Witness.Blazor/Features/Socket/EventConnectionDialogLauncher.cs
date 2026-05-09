@@ -1,6 +1,6 @@
 using MudBlazor;
-using NTS.Blazor.Components.SelectEvents;
 using Not.Injection;
+using NTS.Blazor.Components.SelectEvents;
 
 namespace NTS.Witness.Blazor.Features.Socket;
 
@@ -18,7 +18,6 @@ public class EventConnectionDialogLauncher : IEventConnectionDialogLauncher, ISc
         var dialog = await _dialogService.ShowAsync<SelectEventDialog>(Select_event_string);
         await dialog.Result;
     }
-
 }
 
 public interface IEventConnectionDialogLauncher

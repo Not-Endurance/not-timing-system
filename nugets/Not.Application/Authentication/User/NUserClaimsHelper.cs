@@ -10,10 +10,7 @@ public static class NUserClaimsHelper
         return ResolveRegistration(principal, null);
     }
 
-    public static NUserRegistration? ResolveRegistration(
-        ClaimsPrincipal? principal,
-        NUserRegistrationProfile? profile
-    )
+    public static NUserRegistration? ResolveRegistration(ClaimsPrincipal? principal, NUserRegistrationProfile? profile)
     {
         var email = ResolveEmail(principal);
         if (string.IsNullOrWhiteSpace(email))
@@ -121,12 +118,7 @@ public static class NUserClaimsHelper
             ?? ResolveClaimValueBySuffix(principal, "club", "club_name", "clubName");
     }
 
-    static string? ResolveName(
-        ClaimsPrincipal? principal,
-        string? givenName,
-        string? middleName,
-        string? surname
-    )
+    static string? ResolveName(ClaimsPrincipal? principal, string? givenName, string? middleName, string? surname)
     {
         if (principal == null)
         {

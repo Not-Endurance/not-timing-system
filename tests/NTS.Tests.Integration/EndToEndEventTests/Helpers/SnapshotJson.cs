@@ -1,6 +1,6 @@
+using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Globalization;
 using Not.Serialization.JSON;
 
 namespace NTS.Tests.Integration.EndToEndEventTests.Helpers;
@@ -8,13 +8,7 @@ namespace NTS.Tests.Integration.EndToEndEventTests.Helpers;
 internal static class SnapshotJson
 {
     //TODO: extract automatically or provide by consumers
-    static readonly string[] DATE_PROPERTIES =
-    [
-        "Start",
-        "StartDay",
-        "EndDay",
-        "StartTimeOverride",
-    ];
+    static readonly string[] DATE_PROPERTIES = ["Start", "StartDay", "EndDay", "StartTimeOverride"];
     static readonly string[] TIME_PROPERTIES =
     [
         "StartTime",
@@ -175,17 +169,16 @@ internal static class SnapshotJson
 
     static JValue CanonicalizeDateValue(object? value)
     {
-        var date =
-            value switch
-            {
-                DateTimeOffset offset => offset,
-                DateTime dateTime => new DateTimeOffset(dateTime),
-                _ => DateTimeOffset.Parse(
-                    value?.ToString() ?? "",
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind
-                ),
-            };
+        var date = value switch
+        {
+            DateTimeOffset offset => offset,
+            DateTime dateTime => new DateTimeOffset(dateTime),
+            _ => DateTimeOffset.Parse(
+                value?.ToString() ?? "",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind
+            ),
+        };
         return new JValue(date.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture));
     }
 

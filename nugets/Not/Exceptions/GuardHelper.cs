@@ -32,7 +32,10 @@ public static class GuardHelper
         return value;
     }
 
-    public static void ThrowIfNullOrWhiteSpace(object value, [CallerArgumentExpression(nameof(value))] string? argument = null)
+    public static void ThrowIfNullOrWhiteSpace(
+        object value,
+        [CallerArgumentExpression(nameof(value))] string? argument = null
+    )
     {
         if (string.IsNullOrWhiteSpace(value?.ToString()))
         {

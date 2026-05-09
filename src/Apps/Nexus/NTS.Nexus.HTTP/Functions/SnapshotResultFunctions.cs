@@ -42,8 +42,7 @@ public class SnapshotResultFunctions : CrudFunctions<SnapshotResultModel>
 
     [Function("snapshot-results-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "snapshot-results/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "snapshot-results/{id:int}")] HttpRequest request,
         int id
     )
     {
@@ -55,8 +54,7 @@ public class SnapshotResultFunctions : CrudFunctions<SnapshotResultModel>
 
     [Function("snapshot-results-delete-many")]
     public async Task<IActionResult> DeleteMany(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "snapshot-results")]
-            HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "snapshot-results")] HttpRequest request
     )
     {
         using var activity = StartFunctionActivity(nameof(DeleteMany));
@@ -67,8 +65,7 @@ public class SnapshotResultFunctions : CrudFunctions<SnapshotResultModel>
 
     [Function("snapshot-results-read")]
     public async Task<IActionResult> Read(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "snapshot-results/{id:int}")]
-            HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "snapshot-results/{id:int}")] HttpRequest request,
         int id
     )
     {
@@ -80,8 +77,7 @@ public class SnapshotResultFunctions : CrudFunctions<SnapshotResultModel>
 
     [Function("snapshot-results-read-many")]
     public async Task<IActionResult> ReadMany(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "snapshot-results")]
-            HttpRequest request
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "snapshot-results")] HttpRequest request
     )
     {
         using var activity = StartFunctionActivity(nameof(ReadMany));

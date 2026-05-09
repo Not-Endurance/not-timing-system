@@ -21,11 +21,7 @@ public class EventInformationApiRepositoryTests
     [Fact]
     public async Task ReadActive_calls_active_endpoint_and_maps_events()
     {
-        var models = new[]
-        {
-            EventInformationModel.From(CreateEvent(14)),
-            EventInformationModel.From(CreateEvent(21)),
-        };
+        var models = new[] { EventInformationModel.From(CreateEvent(14)), EventInformationModel.From(CreateEvent(21)) };
         var handler = new RecordingHttpMessageHandler
         {
             ResponseFactory = _ => CreateJsonResponse(Result.Success<IEnumerable<EventInformationModel>>(models)),
@@ -45,11 +41,7 @@ public class EventInformationApiRepositoryTests
     [Fact]
     public async Task ReadPast_calls_past_endpoint_and_maps_events()
     {
-        var models = new[]
-        {
-            EventInformationModel.From(CreateEvent(31)),
-            EventInformationModel.From(CreateEvent(32)),
-        };
+        var models = new[] { EventInformationModel.From(CreateEvent(31)), EventInformationModel.From(CreateEvent(32)) };
         var handler = new RecordingHttpMessageHandler
         {
             ResponseFactory = _ => CreateJsonResponse(Result.Success<IEnumerable<EventInformationModel>>(models)),

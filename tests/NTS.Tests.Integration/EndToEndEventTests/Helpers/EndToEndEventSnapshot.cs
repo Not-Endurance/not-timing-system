@@ -1,16 +1,16 @@
 using Newtonsoft.Json.Linq;
 using NTS.Tests.Integration.Infrastructure;
-using CoreParticipationModel = NTS.Application.Contracts.Core.Models.ParticipationModel;
-using CoreParticipation = NTS.Domain.Core.Aggregates.Participation;
-using CorePhase = NTS.Domain.Core.Aggregates.Participations.Entities.Phase;
 using CoreEliminated = NTS.Domain.Core.Aggregates.Participations.Objects.Eliminated;
-using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
+using CoreParticipation = NTS.Domain.Core.Aggregates.Participation;
+using CoreParticipationModel = NTS.Application.Contracts.Core.Models.ParticipationModel;
+using CorePhase = NTS.Domain.Core.Aggregates.Participations.Entities.Phase;
 using CoreRanking = NTS.Domain.Core.Aggregates.Ranking;
+using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupClub = NTS.Domain.Setup.Aggregates.Club;
-using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
 using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
 using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
+using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
 using SetupUser = NTS.Domain.Setup.Aggregates.User;
 
 namespace NTS.Tests.Integration.EndToEndEventTests.Helpers;
@@ -181,14 +181,17 @@ internal sealed class EndToEndEventSnapshot
     static EndToEndEventSnapshot LoadDirectory(string directory)
     {
         var setupSource = LoadJson(directory, CONFIGURE_EVENT_FILE);
-        var setupModel = setupSource.ToObject<SetupConfigureEventModel>(SnapshotJson.Serializer)
+        var setupModel =
+            setupSource.ToObject<SetupConfigureEventModel>(SnapshotJson.Serializer)
             ?? throw new InvalidOperationException($"Could not deserialize setup snapshot '{directory}'.");
 
         var participationsSource = LoadJson(directory, PARTICIPATIONS_FILE);
         var rankingsSource = LoadJson(directory, RANKINGS_FILE);
-        var participationModels = participationsSource.ToObject<CoreParticipationModel[]>(SnapshotJson.Serializer)
+        var participationModels =
+            participationsSource.ToObject<CoreParticipationModel[]>(SnapshotJson.Serializer)
             ?? throw new InvalidOperationException($"Could not deserialize participation snapshot '{directory}'.");
-        var rankingModels = rankingsSource.ToObject<CoreRankingModel[]>(SnapshotJson.Serializer)
+        var rankingModels =
+            rankingsSource.ToObject<CoreRankingModel[]>(SnapshotJson.Serializer)
             ?? throw new InvalidOperationException($"Could not deserialize ranking snapshot '{directory}'.");
 
         return new EndToEndEventSnapshot(

@@ -14,10 +14,10 @@ using NTS.Application.Contracts.Socket;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Storage;
+using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness;
 using NTS.Witness.Contracts.Features.Access;
 using NTS.Witness.Features.Core.Dashboard;
-using NTS.Tests.Integration.Infrastructure;
 
 namespace NTS.Tests.Integration.Drivers;
 
@@ -32,12 +32,21 @@ internal sealed class WitnessDriver : IAsyncDisposable
     public WitnessDriver(Uri warpBaseUrl, Uri nexusBaseUrl, IntegrationUser user, string clientName)
     {
         _clientName = clientName;
-        var configuration = CreateConfiguration(warpBaseUrl, nexusBaseUrl, ApplicationConstants.WITNESS_HUB, clientName);
+        var configuration = CreateConfiguration(
+            warpBaseUrl,
+            nexusBaseUrl,
+            ApplicationConstants.WITNESS_HUB,
+            clientName
+        );
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
-        services.AddNtsWitness(configuration, nexusBaseUrl.ToString().TrimEnd('/'), typeof(NtsWitnessServices).Assembly);
+        services.AddNtsWitness(
+            configuration,
+            nexusBaseUrl.ToString().TrimEnd('/'),
+            typeof(NtsWitnessServices).Assembly
+        );
         services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
         services.AddScoped<AuthenticationStateProvider>(_ => new IntegrationAuthenticationStateProvider(user));
 
@@ -66,7 +75,9 @@ internal sealed class WitnessDriver : IAsyncDisposable
         await _socketService.Connect(eventInformation);
         if (!_socketService.IsConnected)
         {
-            throw new InvalidOperationException($"Witness '{_clientName}' did not connect to event {eventInformation.Id}.");
+            throw new InvalidOperationException(
+                $"Witness '{_clientName}' did not connect to event {eventInformation.Id}."
+            );
         }
     }
 

@@ -152,14 +152,7 @@ public class RegistrationFlowTests
         };
         var resolver = new NUserResolver(users, NullLogger<NUserResolver>.Instance);
         var principal = CreatePrincipal(new Claim(ClaimTypes.Email, "new.user@example.com"));
-        var profile = new NUserRegistrationProfile(
-            "Jane Marie Doe",
-            "Jane",
-            "Marie",
-            "Doe",
-            "Konarche",
-            "10101010"
-        );
+        var profile = new NUserRegistrationProfile("Jane Marie Doe", "Jane", "Marie", "Doe", "Konarche", "10101010");
 
         var result = await resolver.ResolvePrincipal(principal, profile);
 

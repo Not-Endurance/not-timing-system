@@ -58,7 +58,10 @@ public class EventInformationApiRepository
             return;
         }
 
-        await Client.Post<Result.Empty>($"{Endpoint}/{eventId.Value}/deactivate", new DeactivateEventInformationRequest());
+        await Client.Post<Result.Empty>(
+            $"{Endpoint}/{eventId.Value}/deactivate",
+            new DeactivateEventInformationRequest()
+        );
     }
 
     /// <summary>

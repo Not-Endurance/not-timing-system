@@ -16,11 +16,11 @@ internal sealed class WarpProcess : IAsyncDisposable
         BaseUrl = new Uri($"http://127.0.0.1:{Port}");
     }
 
-    static string BuildConfiguration 
+    static string BuildConfiguration
 #if DEBUG
-            => "Debug";
+        => "Debug";
 #else
-            => "Release";
+        => "Release";
 #endif
 
     public int Port { get; }

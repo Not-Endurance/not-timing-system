@@ -11,13 +11,13 @@ using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 using NTS.Judge.Contracts.Features.Setup.Athletes;
 using NTS.Judge.Contracts.Features.Setup.Clubs;
-using NTS.Judge.Contracts.Features.Setup.Horses;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
+using NTS.Judge.Contracts.Features.Setup.Horses;
 using NTS.Judge.Features.Setup.Athletes;
-using NTS.Judge.Features.Setup.Horses;
 using NTS.Judge.Features.Setup.ConfigureEvents.Combinations;
 using NTS.Judge.Features.Setup.ConfigureEvents.Loops;
+using NTS.Judge.Features.Setup.Horses;
 
 namespace NTS.Judge.Tests.Krud;
 

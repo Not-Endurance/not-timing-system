@@ -8,9 +8,7 @@ public static class ODataApiFilterAdapter
 {
     const string FILTER_QUERY = "$filter";
 
-    public static IReadOnlyDictionary<string, string> ParseFilters<T>(
-        IEnumerable<Expression<Func<T, bool>>> filters
-    )
+    public static IReadOnlyDictionary<string, string> ParseFilters<T>(IEnumerable<Expression<Func<T, bool>>> filters)
     {
         if (TryParseFilters(filters, out var queryParameters))
         {
@@ -48,10 +46,7 @@ public static class ODataApiFilterAdapter
         return true;
     }
 
-    static bool TryCreateFilter<T>(
-        Expression<Func<T, bool>> filter,
-        out string oDataFilter
-    )
+    static bool TryCreateFilter<T>(Expression<Func<T, bool>> filter, out string oDataFilter)
     {
         if (TryCreateFilter(filter.Body, out oDataFilter))
         {
@@ -64,35 +59,22 @@ public static class ODataApiFilterAdapter
 
     static string CombineFilterValues(IEnumerable<string?> filters)
     {
-        var values = filters
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Select(x => x!.Trim())
-            .ToArray();
+        var values = filters.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x!.Trim()).ToArray();
         return values.Length == 1 ? values[0] : string.Join(" and ", values.Select(x => $"({x})"));
     }
 
     static string CombineInlineFilterValues(IEnumerable<string?> filters)
     {
-        var values = filters
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Select(x => x!.Trim());
+        var values = filters.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x!.Trim());
         return string.Join(" and ", values);
     }
 
     static bool TryCreateFilter(Expression expression, out string oDataFilter)
     {
         expression = StripConversion(expression);
-        if (
-            expression is BinaryExpression
-            {
-                NodeType: ExpressionType.AndAlso or ExpressionType.And
-            } binary
-        )
+        if (expression is BinaryExpression { NodeType: ExpressionType.AndAlso or ExpressionType.And } binary)
         {
-            if (
-                TryCreateFilter(binary.Left, out var left)
-                && TryCreateFilter(binary.Right, out var right)
-            )
+            if (TryCreateFilter(binary.Left, out var left) && TryCreateFilter(binary.Right, out var right))
             {
                 oDataFilter = CombineInlineFilterValues([left, right]);
                 return true;
@@ -108,10 +90,7 @@ public static class ODataApiFilterAdapter
             return true;
         }
 
-        if (
-            expression is BinaryExpression comparison
-            && TryGetOperator(comparison.NodeType, out var oDataOperator)
-        )
+        if (expression is BinaryExpression comparison && TryGetOperator(comparison.NodeType, out var oDataOperator))
         {
             return TryCreateComparison(comparison.Left, comparison.Right, oDataOperator, out oDataFilter)
                 || TryCreateComparison(
@@ -168,10 +147,7 @@ public static class ODataApiFilterAdapter
             return false;
         }
 
-        var filters = enumerable
-            .Cast<object?>()
-            .Select(value => $"{propertyName} eq {FormatValue(value)}")
-            .ToArray();
+        var filters = enumerable.Cast<object?>().Select(value => $"{propertyName} eq {FormatValue(value)}").ToArray();
 
         oDataFilter = filters.Length switch
         {
@@ -197,10 +173,7 @@ public static class ODataApiFilterAdapter
                 return true;
             }
 
-            if (
-                call is { Object: null, Arguments.Count: 2 }
-                && call.Method.DeclaringType == typeof(Enumerable)
-            )
+            if (call is { Object: null, Arguments.Count: 2 } && call.Method.DeclaringType == typeof(Enumerable))
             {
                 valuesExpression = call.Arguments[0];
                 propertyExpression = call.Arguments[1];
@@ -292,11 +265,7 @@ public static class ODataApiFilterAdapter
                 return true;
             }
 
-            value = Expression.Lambda<Func<object?>>(
-                Expression.Convert(expression, typeof(object))
-            )
-            .Compile()
-            .Invoke();
+            value = Expression.Lambda<Func<object?>>(Expression.Convert(expression, typeof(object))).Compile().Invoke();
             return true;
         }
         catch
@@ -308,7 +277,9 @@ public static class ODataApiFilterAdapter
 
     static Expression StripConversion(Expression expression)
     {
-        while (expression is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } unary)
+        while (
+            expression is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } unary
+        )
         {
             expression = unary.Operand;
         }

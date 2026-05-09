@@ -5,7 +5,6 @@ using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 using NTS.Judge.Contracts.Features.Setup.Athletes;
 using NTS.Judge.Contracts.Features.Setup.Clubs;
-using NTS.Judge.Contracts.Features.Setup.Horses;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
@@ -13,6 +12,7 @@ using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Officials;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
+using NTS.Judge.Contracts.Features.Setup.Horses;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Infrastructure;
@@ -101,10 +101,7 @@ internal class ConfigureEventFeature
             createdHorses.Add(horse.Id, created);
 
             var persisted = await _nexusApi.ReadSetupHorses();
-            Assert.Contains(
-                persisted,
-                x => x.Id == created.Id && x.Name == horse.Name && x.FeiId == horse.FeiId
-            );
+            Assert.Contains(persisted, x => x.Id == created.Id && x.Name == horse.Name && x.FeiId == horse.FeiId);
         }
 
         var athleteService = _judge.GetRequiredService<IKrudFormService<AthleteFormModel>>();
@@ -242,10 +239,7 @@ internal class ConfigureEventFeature
             );
             Assert.Contains(
                 currentEvent.Officials,
-                x =>
-                    x.Id == officialId
-                    && x.Person.ToString() == official.Person.ToString()
-                    && x.Role == official.Role
+                x => x.Id == officialId && x.Person.ToString() == official.Person.ToString() && x.Role == official.Role
             );
             _judge.SelectSetupParent(currentEvent);
         }
@@ -295,9 +289,7 @@ internal class ConfigureEventFeature
                     _nexusApi,
                     setupEventId,
                     setupEvent =>
-                        setupEvent.Competitions.Any(x =>
-                            x.Id == competitionId && x.Phases.Any(y => y.Id == phaseId)
-                        ),
+                        setupEvent.Competitions.Any(x => x.Id == competitionId && x.Phases.Any(y => y.Id == phaseId)),
                     $"phase {phase.Id}"
                 );
                 var persistedCompetition = FindCompetition(currentEvent, competitionId);
@@ -345,7 +337,11 @@ internal class ConfigureEventFeature
         var actual = SnapshotJson.Canonicalize(ConfigureEventModel.From(currentEvent));
 
         Assert.Equal(expected.ToString(Formatting.None), actual.ToString(Formatting.None));
-        return new SetupFeatureResult(currentEvent, new Dictionary<int, int>(idMap), ResolveWitnessOfficial(currentEvent));
+        return new SetupFeatureResult(
+            currentEvent,
+            new Dictionary<int, int>(idMap),
+            ResolveWitnessOfficial(currentEvent)
+        );
     }
 
     static IntegrationUser ResolveWitnessOfficial(ConfigureEvent setupEvent)
@@ -407,9 +403,10 @@ internal class ConfigureEventFeature
             Date = localStart.Date,
             Time = localStart.TimeOfDay,
             UseCompulsoryThreshold = competition.CompulsoryThresholdSpan != null,
-            CompulsoryThresholdMinutes = competition.CompulsoryThresholdSpan == null
-                ? null
-                : (int)competition.CompulsoryThresholdSpan.Value.TotalMinutes,
+            CompulsoryThresholdMinutes =
+                competition.CompulsoryThresholdSpan == null
+                    ? null
+                    : (int)competition.CompulsoryThresholdSpan.Value.TotalMinutes,
             FeiId = competition.FeiId,
             FeiRule = competition.FeiRule,
             FeiScheduleNumber = competition.FeiScheduleNumber,

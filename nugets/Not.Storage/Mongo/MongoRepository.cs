@@ -36,10 +36,7 @@ public abstract class MongoRepository<T> : IMongoRepository<T>
         return _context.Client.GetDatabase(_db).GetCollection<T>(_collection);
     }
 
-    protected virtual IQueryable<T> ApplyODataOptions(
-        IQueryable<T> query,
-        ODataQueryOptions<T> options
-    )
+    protected virtual IQueryable<T> ApplyODataOptions(IQueryable<T> query, ODataQueryOptions<T> options)
     {
         return (IQueryable<T>)options.ApplyTo(query, new ODataQuerySettings());
     }
@@ -125,9 +122,7 @@ public abstract class MongoRepository<T> : IMongoRepository<T>
     {
         using var activity = StartActivity(nameof(DeleteMany));
 
-        var filters = items
-            .Select(item => Builders<T>.Filter.Where(GetItemFilter(item)))
-            .ToArray();
+        var filters = items.Select(item => Builders<T>.Filter.Where(GetItemFilter(item))).ToArray();
         if (filters.Length == 0)
         {
             return;

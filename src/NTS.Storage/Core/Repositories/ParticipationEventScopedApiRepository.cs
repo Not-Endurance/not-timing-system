@@ -6,8 +6,7 @@ using NTS.Storage.REST;
 
 namespace NTS.Storage.Core.Repositories;
 
-public class ParticipationEventScopedApiRepository
-    : EventScopedApiRepository<Participation, ParticipationModel>
+public class ParticipationEventScopedApiRepository : EventScopedApiRepository<Participation, ParticipationModel>
 {
     public ParticipationEventScopedApiRepository(NHttpClient client, EventScopeFactory<Participation> eventScopeFactory)
         : base("participations", client, eventScopeFactory) { }

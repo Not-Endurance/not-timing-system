@@ -2,6 +2,4 @@
 
 namespace NTS.Judge.Contracts.Features.Core.Rankings;
 
-public interface IRankingService : IRankingContext, ITransient
-{
-}
+public interface IRankingService : IRankingContext, ITransient { }

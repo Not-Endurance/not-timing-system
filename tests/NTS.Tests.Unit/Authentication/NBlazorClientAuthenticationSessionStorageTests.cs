@@ -77,14 +77,7 @@ public class NBlazorClientAuthenticationSessionStorageTests
         var jsRuntime = new RecordingJsRuntime();
         using var provider = CreateProvider(jsRuntime);
         var store = provider.GetRequiredService<INPendingUserRegistrationProfileStore>();
-        var profile = new NUserRegistrationProfile(
-            "Jane Marie Doe",
-            "Jane",
-            "Marie",
-            "Doe",
-            "Konarche",
-            "10101010"
-        );
+        var profile = new NUserRegistrationProfile("Jane Marie Doe", "Jane", "Marie", "Doe", "Konarche", "10101010");
 
         await store.Write(profile);
 
@@ -110,15 +103,12 @@ public class NBlazorClientAuthenticationSessionStorageTests
             "Doe",
             "Konarche",
             "10101010",
-            DateTimeOffset.UtcNow
-                .Subtract(PendingUserRegistrationProfileStore.PROFILE_LIFETIME)
+            DateTimeOffset
+                .UtcNow.Subtract(PendingUserRegistrationProfileStore.PROFILE_LIFETIME)
                 .AddSeconds(-1)
                 .ToUnixTimeMilliseconds()
         );
-        jsRuntime.Write(
-            PendingUserRegistrationProfileStore.STORAGE_KEY,
-            JsonSerializer.Serialize(expiredDocument)
-        );
+        jsRuntime.Write(PendingUserRegistrationProfileStore.STORAGE_KEY, JsonSerializer.Serialize(expiredDocument));
 
         Assert.Null(await store.Read());
         Assert.Null(jsRuntime.Read(PendingUserRegistrationProfileStore.STORAGE_KEY));

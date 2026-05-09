@@ -43,7 +43,12 @@ public abstract class ApiRepository<T, TModel> : IRepository<T>
         return BuildEndpointCore($"{Endpoint}/{urn1}/{urn2}", filter);
     }
 
-    protected virtual string BuildEndpoint(object urn1, object urn2, object urn3, Expression<Func<T, bool>>? filter = null)
+    protected virtual string BuildEndpoint(
+        object urn1,
+        object urn2,
+        object urn3,
+        Expression<Func<T, bool>>? filter = null
+    )
     {
         GuardHelper.ThrowIfNullOrWhiteSpace(urn1);
         GuardHelper.ThrowIfNullOrWhiteSpace(urn2);
@@ -186,7 +191,7 @@ public abstract class ApiRepository<T, TModel> : IRepository<T>
         await HandleRequest(UpdateCore(item));
     }
 
-    string  BuildEndpointCore(string endpoint, Expression<Func<T, bool>>? filter = null)
+    string BuildEndpointCore(string endpoint, Expression<Func<T, bool>>? filter = null)
     {
         var queryParams = ODataApiFilterAdapter.ParseFilters(GetFilters(filter));
         return HttpHelper.AddQueryString(endpoint, queryParams);

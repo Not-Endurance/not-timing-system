@@ -72,11 +72,7 @@ public class CrudFunctions<T> : FunctionBase
         return Ok();
     }
 
-    static bool TryCreateOptions(
-        HttpRequest request,
-        out ODataQueryOptions<T> options,
-        out IActionResult badRequest
-    )
+    static bool TryCreateOptions(HttpRequest request, out ODataQueryOptions<T> options, out IActionResult badRequest)
     {
         try
         {

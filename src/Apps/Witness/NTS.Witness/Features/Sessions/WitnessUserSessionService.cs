@@ -104,7 +104,11 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
         await _userSessions.Delete(currentSession);
     }
 
-    static NtsUserSessionModel CreateSession(INUserSessionModel userSession, int eventId, NtsUserSessionStateModel? state)
+    static NtsUserSessionModel CreateSession(
+        INUserSessionModel userSession,
+        int eventId,
+        NtsUserSessionStateModel? state
+    )
     {
         var session = new NtsUserSessionModel
         {

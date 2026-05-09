@@ -29,7 +29,9 @@ public class EventInformationMongoRepository : MongoRepository<EventInformationM
         var existing = await Read(item.Id);
         if (existing != null)
         {
-            throw GuardHelper.Exception($"Could not insert. Active event information with ID '{item.Id}' already exists");
+            throw GuardHelper.Exception(
+                $"Could not insert. Active event information with ID '{item.Id}' already exists"
+            );
         }
 
         await base.Create(item);

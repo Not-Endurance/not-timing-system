@@ -11,16 +11,12 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public abstract class EventScopedApiRepository<T, TModel>
-    : ApiRepository<T, TModel>,
-        IEventScopedRepository<T>
+public abstract class EventScopedApiRepository<T, TModel> : ApiRepository<T, TModel>, IEventScopedRepository<T>
     where T : class, IEntity, IEventScoped
     where TModel : class, IEventScoped, IKrudModel<T>, new()
 {
     protected EventScopedApiRepository(string endpoint, NHttpClient client, EventScopeFactory<T> eventScopeFactory)
-        : base(endpoint, client, eventScopeFactory)
-    {
-    }
+        : base(endpoint, client, eventScopeFactory) { }
 }
 
 public class EventScopeFactory<T> : IRepositoryScopeFactory<T>

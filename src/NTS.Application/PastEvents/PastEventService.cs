@@ -12,10 +12,7 @@ using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Application.PastEvents;
 
-public class PastEventService
-    : NStatefulService,
-        IPastEventService,
-        IKrudListBehind<EventInformation>
+public class PastEventService : NStatefulService, IPastEventService, IKrudListBehind<EventInformation>
 {
     static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_STARTLIST =
         new Dictionary<int, IReadOnlyList<Starter>>();
@@ -46,8 +43,7 @@ public class PastEventService
     public IReadOnlyList<EventInformation> Events => _pastEvents.AsReadOnly();
     public EventInformation? Event { get; private set; }
     public int EventId =>
-        Event?.Id
-        ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
+        Event?.Id ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
     public IReadOnlyList<Ranking> Rankings => _rankings;
     public Ranking? CurrentRanking => _currentRanking;
     public IReadOnlyDictionary<int, IReadOnlyList<Starter>> StartlistHistoryByStage =>

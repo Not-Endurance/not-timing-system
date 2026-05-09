@@ -14,7 +14,12 @@ public class UserSessionApiRepositoryTests
     [Fact]
     public async Task Read_by_user_identifier_unwraps_session_from_result_envelope()
     {
-        var expected = new NtsUserSessionModel { Id = 17, EventId = 33, UserIdentifier = "entra-1" };
+        var expected = new NtsUserSessionModel
+        {
+            Id = 17,
+            EventId = 33,
+            UserIdentifier = "entra-1",
+        };
         expected.ReplaceState(new NtsUserSessionStateModel());
 
         var handler = new RecordingHttpMessageHandler

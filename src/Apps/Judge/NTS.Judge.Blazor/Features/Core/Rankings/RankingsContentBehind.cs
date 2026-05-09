@@ -6,10 +6,10 @@ using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
-using NTS.Judge.Blazor.Layout.Drawer.Deactivate;
-using NTS.Judge.Contracts.Features.Core;
 using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
+using NTS.Judge.Blazor.Layout.Drawer.Deactivate;
+using NTS.Judge.Contracts.Features.Core;
 using NTS.Judge.Contracts.Features.Core.Rankings;
 using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
 using static NTS.Judge.Blazor.Routes;
@@ -177,11 +177,7 @@ public class RankingsContentBehind : PrintableComponent
                 FullWidth = true,
                 CloseOnEscapeKey = true,
             };
-            var dialog = await DialogService.ShowAsync<ImageBrowserDialog>(
-                Image_browser_string,
-                parameters,
-                options
-            );
+            var dialog = await DialogService.ShowAsync<ImageBrowserDialog>(Image_browser_string, parameters, options);
             await dialog.Result;
         }
         catch (Exception ex)

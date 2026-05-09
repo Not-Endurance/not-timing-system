@@ -1,5 +1,5 @@
-using System.Net;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,7 @@ using Not.Application.RPC;
 using Not.Domain.Abstractions;
 using Not.Krud.Abstractions;
 using Not.Serialization.JSON;
+using Not.Storage.Mongo;
 using Not.Structures;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
@@ -35,7 +36,6 @@ using NTS.Nexus.HTTP.Telemetry;
 using NTS.Storage;
 using NTS.Storage.Core.Repositories;
 using NTS.Storage.REST;
-using Not.Storage.Mongo;
 
 namespace NTS.Judge.Tests.Core;
 
@@ -120,11 +120,7 @@ public class PastEventRepositoryTests
 
         await repository.Create(new QueryEntity(1, 99));
 
-        AssertRequest(
-            handler,
-            HttpMethod.Post,
-            "https://nexus.test/api/query-documents?%24filter=EventId%20eq%2014"
-        );
+        AssertRequest(handler, HttpMethod.Post, "https://nexus.test/api/query-documents?%24filter=EventId%20eq%2014");
         var body = Assert.Single(handler.Bodies);
         Assert.Equal(99, body!.FromJson<QueryEventModel>().EventId);
     }
@@ -288,8 +284,7 @@ public class PastEventRepositoryTests
         Assert.Contains(
             services,
             descriptor =>
-                descriptor.ServiceType == typeof(TService)
-                && descriptor.ImplementationType == typeof(TImplementation)
+                descriptor.ServiceType == typeof(TService) && descriptor.ImplementationType == typeof(TImplementation)
         );
     }
 
@@ -298,8 +293,7 @@ public class PastEventRepositoryTests
         Assert.DoesNotContain(
             services,
             descriptor =>
-                descriptor.ServiceType == typeof(TService)
-                && descriptor.ImplementationType == typeof(TImplementation)
+                descriptor.ServiceType == typeof(TService) && descriptor.ImplementationType == typeof(TImplementation)
         );
     }
 
@@ -325,11 +319,7 @@ public class PastEventRepositoryTests
         AssertRequest(handler, HttpMethod.Get, expectedUrl);
     }
 
-    static void AssertRequest(
-        RecordingHttpMessageHandler handler,
-        HttpMethod expectedMethod,
-        string expectedUrl
-    )
+    static void AssertRequest(RecordingHttpMessageHandler handler, HttpMethod expectedMethod, string expectedUrl)
     {
         var request = Assert.Single(handler.Requests);
         Assert.Equal(expectedMethod, request.Method);
@@ -374,12 +364,11 @@ public class PastEventRepositoryTests
         {
             Requests.Add(request);
             Bodies.Add(request.Content == null ? null : await request.Content.ReadAsStringAsync());
-            return
-                ResponseFactory?.Invoke(request)
-                    ?? new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = new StringContent(Result.Success().ToJson()),
-                    };
+            return ResponseFactory?.Invoke(request)
+                ?? new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(Result.Success().ToJson()),
+                };
         }
     }
 

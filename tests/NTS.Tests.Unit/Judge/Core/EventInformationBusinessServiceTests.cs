@@ -12,9 +12,9 @@ using CoreEventInformationModel = NTS.Application.Contracts.Core.Models.EventInf
 using CoreOfficialModel = NTS.Application.Contracts.Core.Models.OfficialModel;
 using CoreParticipationModel = NTS.Application.Contracts.Core.Models.ParticipationModel;
 using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
+using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
 using SetupOfficial = NTS.Domain.Setup.Aggregates.ConfigureEvents.Official;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participation;
-using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
 
 namespace NTS.Judge.Tests.Core;
 
@@ -151,9 +151,7 @@ public class EventInformationBusinessServiceTests
         var activeEvent = CreateEventInformationModel(1, DateTimeOffset.UtcNow.AddDays(1), isActive: true);
         var expiredEvent = CreateEventInformationModel(2, DateTimeOffset.UtcNow.AddDays(-1), isActive: true);
         var inactiveEvent = CreateEventInformationModel(3, DateTimeOffset.UtcNow.AddDays(1), isActive: false);
-        var events = new RecordingRepository<CoreEventInformationModel>(
-            [activeEvent, expiredEvent, inactiveEvent]
-        );
+        var events = new RecordingRepository<CoreEventInformationModel>([activeEvent, expiredEvent, inactiveEvent]);
         var service = CreateService([], events);
 
         var result = (await service.ReadActive()).ToList();

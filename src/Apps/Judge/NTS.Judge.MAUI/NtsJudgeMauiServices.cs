@@ -11,6 +11,9 @@ public static class NtsJudgeMauiServices
     public static IServiceCollection AddJudgeMaui(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
-        return services.AddMauiPlatformServices(configuration).AddNtsJudge(configuration, Assembly.GetExecutingAssembly()).AddJudgeBlazor(configuration);
+        return services
+            .AddMauiPlatformServices(configuration)
+            .AddNtsJudge(configuration, Assembly.GetExecutingAssembly())
+            .AddJudgeBlazor(configuration);
     }
 }

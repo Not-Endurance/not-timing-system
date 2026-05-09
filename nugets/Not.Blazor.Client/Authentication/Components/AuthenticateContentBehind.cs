@@ -78,7 +78,10 @@ public abstract class AuthenticateContentBehind : NComponent
             var firstName = Normalize(FirstName);
             var middleName = Normalize(MiddleName);
             var lastName = Normalize(LastName);
-            var name = string.Join(" ", new[] { firstName, middleName, lastName }.Where(x => !string.IsNullOrWhiteSpace(x)));
+            var name = string.Join(
+                " ",
+                new[] { firstName, middleName, lastName }.Where(x => !string.IsNullOrWhiteSpace(x))
+            );
             return new NUserRegistrationProfile(
                 name,
                 firstName,

@@ -120,7 +120,9 @@ public class StartValidatorTests
 
         var result = StartValidator.Validate(setupEvent);
 
-        var issue = Assert.Single((result.Data ?? []).Where(x => x.Summary.Contains("non-final phases without rest: 1")));
+        var issue = Assert.Single(
+            (result.Data ?? []).Where(x => x.Summary.Contains("non-final phases without rest: 1"))
+        );
         Assert.Contains("non-final phases without rest: 1", issue.Summary);
         Assert.False(issue.IsAutoCorrectable);
     }

@@ -1,6 +1,6 @@
 using System.Reflection;
-using Not.Domain;
 using Not.Blazor.Navigation.Abstractions;
+using Not.Domain;
 using Not.Krud.Abstractions;
 using Not.Krud.Blazor.Components;
 using Not.Krud.Blazor.Components.Abstractions;
@@ -117,10 +117,7 @@ public class KrudListBehindTests
 
     static async Task InvokeShellMethod(TestShell shell, string methodName)
     {
-        var method = typeof(KrudShell<TestModel>).GetMethod(
-            methodName,
-            BindingFlags.Instance | BindingFlags.NonPublic
-        );
+        var method = typeof(KrudShell<TestModel>).GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
         Assert.NotNull(method);
         await (Task)method.Invoke(shell, null)!;
     }

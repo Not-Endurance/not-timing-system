@@ -54,8 +54,8 @@ public class KrudGraphRegistrationTests
         var services = new ServiceCollection();
         services.AddSingleton<IRepository<GraphParent>>(_ => throw new NotSupportedException());
 
-        var exception = Assert.Throws<InvalidOperationException>(() =>
-            services.ConfigureKrud().RegisterAggregate<GraphAggregate>()
+        var exception = Assert.Throws<InvalidOperationException>(
+            () => services.ConfigureKrud().RegisterAggregate<GraphAggregate>()
         );
 
         Assert.Contains(typeof(GraphParent).FullName!, exception.Message);

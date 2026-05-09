@@ -311,9 +311,7 @@ public class StartlistServiceTests
             return Task.FromResult<IEnumerable<Participation>>(Items.ToList());
         }
 
-        public Task<IEnumerable<Participation>> ReadMany(
-            Expression<Func<Participation, bool>> filter
-        )
+        public Task<IEnumerable<Participation>> ReadMany(Expression<Func<Participation, bool>> filter)
         {
             var predicate = filter.Compile();
             return Task.FromResult<IEnumerable<Participation>>(Items.Where(predicate).ToList());

@@ -43,12 +43,15 @@ internal static class ODataQueryOptionsFactory
     static IEdmModel GetModel<T>()
         where T : class
     {
-        return MODELS.GetOrAdd(typeof(T), _ =>
-        {
-            var builder = new ODataConventionModelBuilder();
-            var entitySet = builder.EntitySet<T>(typeof(T).Name);
-            entitySet.EntityType.Filter();
-            return builder.GetEdmModel();
-        });
+        return MODELS.GetOrAdd(
+            typeof(T),
+            _ =>
+            {
+                var builder = new ODataConventionModelBuilder();
+                var entitySet = builder.EntitySet<T>(typeof(T).Name);
+                entitySet.EntityType.Filter();
+                return builder.GetEdmModel();
+            }
+        );
     }
 }

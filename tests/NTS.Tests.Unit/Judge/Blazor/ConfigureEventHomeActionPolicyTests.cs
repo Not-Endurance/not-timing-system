@@ -71,7 +71,10 @@ public class ConfigureEventsListBehindTests
         Assert.False(component.ShowView(CreateConfigureEvent(7)));
     }
 
-    static TestConfigureEventsListBehind CreateComponent(int activeEventInformationCount = 0, int? connectedEventId = null)
+    static TestConfigureEventsListBehind CreateComponent(
+        int activeEventInformationCount = 0,
+        int? connectedEventId = null
+    )
     {
         var component = new TestConfigureEventsListBehind
         {

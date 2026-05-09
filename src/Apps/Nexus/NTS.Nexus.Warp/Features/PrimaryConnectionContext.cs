@@ -21,9 +21,7 @@ public class JudgeConnectionsContext : IJudgeConnectionsContext
             return;
         }
         _logger.LogError("Connection with identifier '{eventId}' already exists", eventId);
-        throw new HubException(
-            $"Event '{eventId}' is already active and managed. Select a different event to proceed"
-        ); // TODO: localize this
+        throw new HubException($"Event '{eventId}' is already active and managed. Select a different event to proceed"); // TODO: localize this
     }
 
     public void Remove(string connectionId)

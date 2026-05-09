@@ -11,10 +11,10 @@ using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupAthleteModel = NTS.Application.Contracts.Setup.Models.AthleteModel;
 using SetupClub = NTS.Domain.Setup.Aggregates.Club;
 using SetupClubModel = NTS.Application.Contracts.Setup.Models.ClubModel;
-using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
-using SetupHorseModel = NTS.Application.Contracts.Setup.Models.HorseModel;
 using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
 using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
+using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
+using SetupHorseModel = NTS.Application.Contracts.Setup.Models.HorseModel;
 
 namespace NTS.Tests.Integration.Drivers;
 
@@ -148,10 +148,13 @@ internal sealed class NexusApiDriver : IDisposable
             await Task.Delay(100);
         }
 
-        var state = lastParticipation == null
-            ? "no participation was returned"
-            : $"phase complete: {lastParticipation.Phases.Current.IsComplete()}";
-        throw new TimeoutException($"Nexus API did not persist participation {participationId} before timeout ({state}).");
+        var state =
+            lastParticipation == null
+                ? "no participation was returned"
+                : $"phase complete: {lastParticipation.Phases.Current.IsComplete()}";
+        throw new TimeoutException(
+            $"Nexus API did not persist participation {participationId} before timeout ({state})."
+        );
     }
 
     public async Task<IReadOnlyList<SnapshotResultModel>> ReadSnapshotResults(int eventId)

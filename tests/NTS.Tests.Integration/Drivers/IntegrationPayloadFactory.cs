@@ -95,8 +95,8 @@ internal static class IntegrationPayloadFactory
         string? name = null
     )
     {
-        var entries = participations.Select((participation, index) =>
-            new RankingEntry(participation, index + 1, false, id + index + 1)
+        var entries = participations.Select(
+            (participation, index) => new RankingEntry(participation, index + 1, false, id + index + 1)
         );
 
         return new Ranking(

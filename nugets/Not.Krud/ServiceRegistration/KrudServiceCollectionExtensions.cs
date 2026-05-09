@@ -75,7 +75,11 @@ public static class KrudServiceCollectionExtensions
         return services;
     }
 
-    static void RegisterKrudNodeRepositories(IServiceCollection services, KrudGraphMetadata meta, ServiceLifetime lifetime)
+    static void RegisterKrudNodeRepositories(
+        IServiceCollection services,
+        KrudGraphMetadata meta,
+        ServiceLifetime lifetime
+    )
     {
         var registrations = meta
             .KrudParentNodeOfClosedInterfaces.Select(parentNodeInterface => new

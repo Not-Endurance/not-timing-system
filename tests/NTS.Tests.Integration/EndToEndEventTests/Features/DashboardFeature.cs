@@ -110,21 +110,19 @@ internal sealed class DashboardFeature
             }
 
             var representEntries = group.Where(x => x.RepresentTime != null).ToArray();
-            foreach (var representGroup in GroupByDelta(
-                representEntries,
-                x => x.RepresentTime!.Value,
-                PRESENT_SNAPSHOT_GROUP_DELTA
-            ))
+            foreach (
+                var representGroup in GroupByDelta(
+                    representEntries,
+                    x => x.RepresentTime!.Value,
+                    PRESENT_SNAPSHOT_GROUP_DELTA
+                )
+            )
             {
                 publishedGroups += await FeatureStep.Run(
                     FEATURE,
                     GroupStep(outerWaveNumber, "publish representation snapshot group"),
                     representGroup,
-                    () => PublishSnapshotGroup(
-                        representGroup,
-                        SnapshotType.Present,
-                        x => x.RepresentTime!.Value
-                    )
+                    () => PublishSnapshotGroup(representGroup, SnapshotType.Present, x => x.RepresentTime!.Value)
                 );
 
                 foreach (var entry in representGroup)
@@ -231,10 +229,11 @@ internal sealed class DashboardFeature
             _api,
             _eventInformation.Id,
             entry.Number,
-            participation => CoreAssertions.SameTimeOfDay(
-                participation.Phases[entry.PhaseIndex].ArriveTime,
-                entry.ArriveTime!.Value
-            ),
+            participation =>
+                CoreAssertions.SameTimeOfDay(
+                    participation.Phases[entry.PhaseIndex].ArriveTime,
+                    entry.ArriveTime!.Value
+                ),
             $"arrival for #{entry.Number} phase {entry.PhaseNumber}"
         );
         CoreAssertions.AssertEqualTimeOfDay(entry.ArriveTime!.Value, persisted.Phases[entry.PhaseIndex].ArriveTime);
@@ -243,7 +242,6 @@ internal sealed class DashboardFeature
         {
             CoreAssertions.AssertPhaseMatches(entry.Phase, persisted.Phases[entry.PhaseIndex]);
         }
-
     }
 
     async Task AssertPresentSnapshot(EndToEndPhaseSnapshot entry)
@@ -252,14 +250,14 @@ internal sealed class DashboardFeature
             _api,
             _eventInformation.Id,
             entry.Number,
-            participation => CoreAssertions.SameTimeOfDay(
-                participation.Phases[entry.PhaseIndex].PresentTime,
-                entry.PresentTime!.Value
-            ),
+            participation =>
+                CoreAssertions.SameTimeOfDay(
+                    participation.Phases[entry.PhaseIndex].PresentTime,
+                    entry.PresentTime!.Value
+                ),
             $"presentation for #{entry.Number} phase {entry.PhaseNumber}"
         );
         CoreAssertions.AssertEqualTimeOfDay(entry.PresentTime!.Value, persisted.Phases[entry.PhaseIndex].PresentTime);
-
     }
 
     async Task AssertRepresentSnapshot(EndToEndPhaseSnapshot entry)
@@ -268,14 +266,17 @@ internal sealed class DashboardFeature
             _api,
             _eventInformation.Id,
             entry.Number,
-            participation => CoreAssertions.SameTimeOfDay(
-                participation.Phases[entry.PhaseIndex].RepresentTime,
-                entry.RepresentTime!.Value
-            ),
+            participation =>
+                CoreAssertions.SameTimeOfDay(
+                    participation.Phases[entry.PhaseIndex].RepresentTime,
+                    entry.RepresentTime!.Value
+                ),
             $"representation for #{entry.Number} phase {entry.PhaseNumber}"
         );
-        CoreAssertions.AssertEqualTimeOfDay(entry.RepresentTime!.Value, persisted.Phases[entry.PhaseIndex].RepresentTime);
-
+        CoreAssertions.AssertEqualTimeOfDay(
+            entry.RepresentTime!.Value,
+            persisted.Phases[entry.PhaseIndex].RepresentTime
+        );
     }
 
     async Task ApplyRequestedInspection(EndToEndPhaseSnapshot entry)
@@ -345,10 +346,13 @@ internal sealed class DashboardFeature
         await Eventually.ReadRankings(
             _api,
             _eventInformation.Id,
-            rankings => rankings.SelectMany(x => x.Entries).Any(x =>
-                x.Participation.Combination.Number == entry.Number
-                && x.Participation.Phases[entry.PhaseIndex].IsComplete()
-            ),
+            rankings =>
+                rankings
+                    .SelectMany(x => x.Entries)
+                    .Any(x =>
+                        x.Participation.Combination.Number == entry.Number
+                        && x.Participation.Phases[entry.PhaseIndex].IsComplete()
+                    ),
             $"ranking update for #{entry.Number} phase {entry.PhaseNumber}"
         );
         await _witness.WaitForParticipation(
@@ -407,10 +411,7 @@ internal sealed class DashboardFeature
             && phase.IsRequiredInspectionCompulsory == entry.Phase.IsRequiredInspectionCompulsory;
     }
 
-    async Task AssertEliminationSideEffects(
-        int number,
-        Eliminated expected
-    )
+    async Task AssertEliminationSideEffects(int number, Eliminated expected)
     {
         await Eventually.ReadParticipation(
             _api,
@@ -422,10 +423,13 @@ internal sealed class DashboardFeature
         await Eventually.ReadRankings(
             _api,
             _eventInformation.Id,
-            rankings => rankings.SelectMany(x => x.Entries).Any(x =>
-                x.Participation.Combination.Number == number
-                && x.Participation.Eliminated?.ToString() == expected.ToString()
-            ),
+            rankings =>
+                rankings
+                    .SelectMany(x => x.Entries)
+                    .Any(x =>
+                        x.Participation.Combination.Number == number
+                        && x.Participation.Eliminated?.ToString() == expected.ToString()
+                    ),
             $"ranking elimination for #{number}"
         );
         await WaitForWitnessAbsence(number);

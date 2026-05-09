@@ -90,13 +90,7 @@ public class DashServiceTests
         IEventInformationRepository eventInformation
     )
     {
-        return new DashService(
-            socketService,
-            activeEventService,
-            [],
-            eventInformation,
-            configureEventService
-        );
+        return new DashService(socketService, activeEventService, [], eventInformation, configureEventService);
     }
 
     static EventInformation CreateEvent(int id)
@@ -297,5 +291,4 @@ public class DashServiceTests
             return Task.CompletedTask;
         }
     }
-
 }

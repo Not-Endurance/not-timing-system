@@ -8,6 +8,9 @@ namespace NTS.Storage.Core.Repositories;
 
 public class SnapshotResultEventScopedApiRepository : EventScopedApiRepository<SnapshotResult, SnapshotResultModel>
 {
-    public SnapshotResultEventScopedApiRepository(NHttpClient client, EventScopeFactory<SnapshotResult> eventScopeFactory)
+    public SnapshotResultEventScopedApiRepository(
+        NHttpClient client,
+        EventScopeFactory<SnapshotResult> eventScopeFactory
+    )
         : base("snapshot-results", client, eventScopeFactory) { }
 }

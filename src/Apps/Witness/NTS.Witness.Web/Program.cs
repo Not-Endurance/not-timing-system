@@ -13,7 +13,11 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddNtsWitnessWeb(builder.Configuration);
-builder.Services.AddNtsWitness(builder.Configuration, builder.HostEnvironment.BaseAddress, Assembly.GetExecutingAssembly());
+builder.Services.AddNtsWitness(
+    builder.Configuration,
+    builder.HostEnvironment.BaseAddress,
+    Assembly.GetExecutingAssembly()
+);
 
 Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
 Console.WriteLine(

@@ -109,9 +109,8 @@ public class UserApiRepositoryTests
             CancellationToken cancellationToken
         )
         {
-            LastRequestContent = request.Content == null
-                ? null
-                : await request.Content.ReadAsStringAsync(cancellationToken);
+            LastRequestContent =
+                request.Content == null ? null : await request.Content.ReadAsStringAsync(cancellationToken);
 
             return ResponseFactory?.Invoke(request)
                 ?? new HttpResponseMessage(HttpStatusCode.OK)

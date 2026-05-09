@@ -63,12 +63,7 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, phaseWaves.Sum(x => x.Count));
         Assert.All(phaseWaves, AssertWaveFitsThirtyMinuteWindow);
 
-        var dashboard = new DashboardFeature(
-            judge,
-            witness,
-            nexusApi,
-            eventInformation
-        );
+        var dashboard = new DashboardFeature(judge, witness, nexusApi, eventInformation);
         var processedPhases = 0;
         var publishedSnapshotGroups = 0;
         foreach (var phaseWave in phaseWaves)
@@ -84,13 +79,10 @@ public sealed class CoreFeatureEndToEndTests
         await AssertFinalStateMatchesSnapshots(nexusApi, eventInformation, setup, snapshot);
     }
 
-    static async Task AssertStartedConfigureEventCannotBeUpdated(
-        NexusApiDriver api,
-        SetupConfigureEvent setupEvent
-    )
+    static async Task AssertStartedConfigureEventCannotBeUpdated(NexusApiDriver api, SetupConfigureEvent setupEvent)
     {
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            api.UpdateSetupConfigureEvent(setupEvent)
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => api.UpdateSetupConfigureEvent(setupEvent)
         );
         Assert.Contains($"Cannot mutate configure event '{setupEvent.Id}'", exception.Message);
         Assert.Contains("started", exception.Message);
@@ -128,19 +120,9 @@ public sealed class CoreFeatureEndToEndTests
             : (testedEventId - activeOffset, testedEventId - pastOffset);
     }
 
-    static async Task SeedOtherEvent(
-        NexusApiDriver api,
-        int eventId,
-        EventSpan eventSpan,
-        int idBase,
-        string label
-    )
+    static async Task SeedOtherEvent(NexusApiDriver api, int eventId, EventSpan eventSpan, int idBase, string label)
     {
-        var eventInformation = IntegrationPayloadFactory.EventInformation(
-            eventId,
-            eventSpan,
-            $"Seeded {label} Event"
-        );
+        var eventInformation = IntegrationPayloadFactory.EventInformation(eventId, eventSpan, $"Seeded {label} Event");
         var participations = new[]
         {
             IntegrationPayloadFactory.ActiveParticipation(eventId, idBase + 1, idBase + 101),
@@ -246,7 +228,11 @@ public sealed class CoreFeatureEndToEndTests
         IReadOnlyList<EndToEndPhaseSnapshot> phases
     )
     {
-        return GroupByDelta(phases.OrderBy(x => x.ArriveTime).ThenBy(x => x.Number), x => x.ArriveTime!.Value, TimeSpan.FromMinutes(30));
+        return GroupByDelta(
+            phases.OrderBy(x => x.ArriveTime).ThenBy(x => x.Number),
+            x => x.ArriveTime!.Value,
+            TimeSpan.FromMinutes(30)
+        );
     }
 
     static void AssertWaveFitsThirtyMinuteWindow(IReadOnlyList<EndToEndPhaseSnapshot> wave)

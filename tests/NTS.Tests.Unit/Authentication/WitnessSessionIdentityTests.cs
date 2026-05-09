@@ -252,10 +252,13 @@ public class WitnessSessionIdentityTests
         SnapshotGroupModel[]? snapshotHistory = null
     )
     {
-        var session = new NtsUserSessionModel { Id = id, EventId = eventId ?? default, UserIdentifier = userIdentifier };
-        session.ReplaceState(
-            new NtsUserSessionStateModel { SnapshotHistory = snapshotHistory ?? [] }
-        );
+        var session = new NtsUserSessionModel
+        {
+            Id = id,
+            EventId = eventId ?? default,
+            UserIdentifier = userIdentifier,
+        };
+        session.ReplaceState(new NtsUserSessionStateModel { SnapshotHistory = snapshotHistory ?? [] });
         return session;
     }
 

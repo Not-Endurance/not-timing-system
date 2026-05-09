@@ -19,9 +19,9 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
 
     static string BuildConfiguration
 #if DEBUG
-            => "Debug";
+        => "Debug";
 #else
-            => "Release";
+        => "Release";
 #endif
 
     public int Port { get; }
@@ -140,6 +140,8 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
             await Task.Delay(250, cancellationToken);
         }
 
-        throw new TimeoutException($"Nexus HTTP did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}");
+        throw new TimeoutException(
+            $"Nexus HTTP did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}"
+        );
     }
 }

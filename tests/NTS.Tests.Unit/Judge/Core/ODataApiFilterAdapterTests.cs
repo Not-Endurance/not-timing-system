@@ -15,10 +15,7 @@ public class ODataApiFilterAdapterTests
         );
 
         Assert.True(isCreated);
-        Assert.Equal(
-            "EventId eq 14 and Name eq 'Open ride'",
-            AssertFilter(queryParameters)
-        );
+        Assert.Equal("EventId eq 14 and Name eq 'Open ride'", AssertFilter(queryParameters));
     }
 
     [Fact]
@@ -36,20 +33,12 @@ public class ODataApiFilterAdapterTests
     [Fact]
     public void TryParseFilter_ReturnsEmptyQueryForTrueExpression()
     {
-        var isCreated = ODataApiFilterAdapter.TryParseFilters<QueryDocument>(
-            [x => true],
-            out var queryParameters
-        );
+        var isCreated = ODataApiFilterAdapter.TryParseFilters<QueryDocument>([x => true], out var queryParameters);
 
         Assert.True(isCreated);
         Assert.Empty(queryParameters);
 
-        queryParameters = ODataApiFilterAdapter.ParseFilters<QueryDocument>(
-            [
-                x => true,
-                x => x.Id == 7,
-            ]
-        );
+        queryParameters = ODataApiFilterAdapter.ParseFilters<QueryDocument>([x => true, x => x.Id == 7]);
 
         Assert.Equal("Id eq 7", AssertFilter(queryParameters));
     }
@@ -58,13 +47,7 @@ public class ODataApiFilterAdapterTests
     public void TryParseFilter_CreatesODataFilterFromComparisonOperators()
     {
         var queryParameters = ODataApiFilterAdapter.ParseFilters<QueryDocument>(
-            [
-                x => x.Id != 1,
-                x => x.Id >= 2,
-                x => x.Id <= 3,
-                x => x.Id < 4,
-                x => x.Id > 5,
-            ]
+            [x => x.Id != 1, x => x.Id >= 2, x => x.Id <= 3, x => x.Id < 4, x => x.Id > 5]
         );
 
         Assert.Equal(
@@ -91,10 +74,7 @@ public class ODataApiFilterAdapterTests
     public void ParseFilters_JoinsMultipleExpressionFilters()
     {
         var queryParameters = ODataApiFilterAdapter.ParseFilters<QueryDocument>(
-            [
-                document => document.EventId == 14,
-                document => document.Name == "O'Brien",
-            ]
+            [document => document.EventId == 14, document => document.Name == "O'Brien"]
         );
 
         Assert.Equal("(EventId eq 14) and (Name eq 'O''Brien')", AssertFilter(queryParameters));
@@ -104,10 +84,7 @@ public class ODataApiFilterAdapterTests
     public void CombineQueryParameters_JoinsODataFilters()
     {
         var queryParameters = ODataApiFilterAdapter.ParseFilters<QueryDocument>(
-            [
-                document => document.EventId == 14,
-                document => document.Id == 7,
-            ]
+            [document => document.EventId == 14, document => document.Id == 7]
         );
 
         Assert.Equal("(EventId eq 14) and (Id eq 7)", AssertFilter(queryParameters));

@@ -8,8 +8,7 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
     NexusHttpProcess? _nexusHttp;
     WarpProcess? _warp;
 
-    public Uri NexusBaseUrl =>
-        _nexusHttp?.BaseUrl ?? throw new InvalidOperationException("Nexus HTTP is not started.");
+    public Uri NexusBaseUrl => _nexusHttp?.BaseUrl ?? throw new InvalidOperationException("Nexus HTTP is not started.");
     public Uri WarpBaseUrl => _warp?.BaseUrl ?? throw new InvalidOperationException("Warp is not started.");
 
     public async Task InitializeAsync()

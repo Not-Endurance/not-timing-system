@@ -19,10 +19,7 @@ public static class HttpHelper
         return uri;
     }
 
-    public static string AddQueryString(
-        string endpoint,
-        IReadOnlyDictionary<string, string>? queryParameters
-    )
+    public static string AddQueryString(string endpoint, IReadOnlyDictionary<string, string>? queryParameters)
     {
         if (queryParameters == null || queryParameters.Count == 0)
         {
@@ -30,9 +27,7 @@ public static class HttpHelper
         }
 
         var separator = endpoint.Contains('?') ? "&" : "?";
-        var values = queryParameters.Select(x =>
-            $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"
-        );
+        var values = queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}");
         return $"{endpoint}{separator}{string.Join("&", values)}";
     }
 }
