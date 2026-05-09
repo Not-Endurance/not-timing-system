@@ -55,8 +55,8 @@ public abstract class NtsHub<T> : Hub<T>
 
         try
         {
-            var enduranceEventId = value.ToString();
-            await Groups.AddToGroupAsync(Context.ConnectionId, enduranceEventId);
+            var eventId = value.ToString();
+            await Groups.AddToGroupAsync(Context.ConnectionId, eventId);
             stopwatch.Stop();
             _logger.LogInformation(
                 "Warp hub {HubName} OnConnectedAsync completed in {ElapsedMilliseconds} ms. ConnectionId {ConnectionId}, CorrelationId {CorrelationId}, Group {ConnectionGroup}.",
@@ -64,7 +64,7 @@ public abstract class NtsHub<T> : Hub<T>
                 stopwatch.ElapsedMilliseconds,
                 Context.ConnectionId,
                 correlationId,
-                enduranceEventId
+                eventId
             );
         }
         catch (Exception ex)

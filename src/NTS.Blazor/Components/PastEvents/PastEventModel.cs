@@ -5,7 +5,7 @@ using NTS.Domain.Core.Objects;
 
 namespace NTS.Blazor.Components.PastEvents;
 
-public class PastEventModel : IKrudModel<EnduranceEvent>, IKrudFormModel
+public class PastEventModel : IKrudModel<EventInformation>, IKrudFormModel
 {
     public int? Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
@@ -16,7 +16,7 @@ public class PastEventModel : IKrudModel<EnduranceEvent>, IKrudFormModel
     public string? FeiId { get; private set; }
     public string? FeiEventCode { get; private set; }
 
-    public void MapFrom(EnduranceEvent entity)
+    public void MapFrom(EventInformation entity)
     {
         Id = entity.Id;
         Name = entity.Name;
@@ -28,9 +28,9 @@ public class PastEventModel : IKrudModel<EnduranceEvent>, IKrudFormModel
         FeiEventCode = entity.FeiEventCode;
     }
 
-    public EnduranceEvent MapToEntity()
+    public EventInformation MapToEntity()
     {
-        return new EnduranceEvent(
+        return new EventInformation(
             Country,
             Name,
             Location,

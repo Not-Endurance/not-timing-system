@@ -1,11 +1,11 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
 using Not.Async;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Observables.Structures;
+using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
@@ -31,16 +31,16 @@ public class RankingService
         IScoped
 {
     readonly INtsSocketContext _socketContext;
-    readonly IRepository<Ranking> _rankings;
-    readonly IRepository<Official> _officials;
+    readonly IEventScopedRepository<Ranking> _rankings;
+    readonly IEventScopedRepository<Official> _officials;
     readonly CoalesceInvoker _coalesced;
     Ranking? _current;
     IReadOnlyList<Official> _loadedOfficials = [];
 
     public RankingService(
         INtsSocketContext socketContext,
-        IRepository<Ranking> rankings,
-        IRepository<Official> officials
+        IEventScopedRepository<Ranking> rankings,
+        IEventScopedRepository<Official> officials
     )
     {
         _socketContext = socketContext;
@@ -109,9 +109,9 @@ public class RankingService
 
     public ProtocolDocument Create(Ranking ranking)
     {
-        var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
+        var eventInformation = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var ranklist = new Ranklist(ranking);
-        return new ProtocolDocument(ranklist, enduranceEvent, _loadedOfficials);
+        return new ProtocolDocument(ranklist, eventInformation, _loadedOfficials);
     }
 
     public void Select(Ranking ranking)

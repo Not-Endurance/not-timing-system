@@ -13,7 +13,7 @@ public static class ParticipationAndRankingFactory
         List<Participation> Participations,
         Dictionary<ParticipationCategory, List<RankingEntry>> RankingEntriesByCategory
     ) Create(
-        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
+        Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
         IEnumerable<Participation> existingParticipations,
         int eventId
     )
@@ -59,8 +59,8 @@ public static class ParticipationAndRankingFactory
     }
 
     public static Participation CreateParticipation(
-        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
-        Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation,
+        Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
+        Domain.Setup.Aggregates.ConfigureEvents.Participation setupParticipation,
         int eventId
     )
     {
@@ -83,7 +83,7 @@ public static class ParticipationAndRankingFactory
     }
 
     static Combination CreateCombination(
-        Domain.Setup.Aggregates.UpcomingEvents.Combination combination,
+        Domain.Setup.Aggregates.ConfigureEvents.Combination combination,
         decimal totalDistance,
         double? minAverageSpeed,
         double? maxAverageSpeed
@@ -109,8 +109,8 @@ public static class ParticipationAndRankingFactory
     }
 
     static List<Phase> CreatePhases(
-        Domain.Setup.Aggregates.UpcomingEvents.Competition setupCompetition,
-        Domain.Setup.Aggregates.UpcomingEvents.Participation setupParticipation
+        Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
+        Domain.Setup.Aggregates.ConfigureEvents.Participation setupParticipation
     )
     {
         DateTimeOffset? startTime = setupParticipation.StartTimeOverride ?? setupCompetition.Start;

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTS.Judge.Tests", "NTS.Judge.Tests\NTS.Judge.Tests.csproj", "{541ED7AB-70A1-47F4-97DF-6B788679ECDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Tests.Unit", "NTS.Tests.Unit\NTS.Tests.Unit.csproj", "{5D3B01C3-D43F-46D2-A0A6-1894144ED271}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Judge", "Judge", "{24307454-DBEC-4205-951C-E4272A55CDCD}"
 EndProject
@@ -42,7 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_confg", "_confg", "{6AAA82
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Not.Tests", "..\nugets\Not.Tests\Not.Tests.csproj", "{46969AA7-60B3-4664-99B8-42CA1942CC1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Authentication.Tests", "NTS.Authentication.Tests\NTS.Authentication.Tests.csproj", "{F706C890-47BF-41AE-917C-0BA613C2F4CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Tests.Integration", "NTS.Tests.Integration\NTS.Tests.Integration.csproj", "{8D93EDAD-85B3-4F75-9B46-8AF33DA9D39D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,10 +50,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{541ED7AB-70A1-47F4-97DF-6B788679ECDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{541ED7AB-70A1-47F4-97DF-6B788679ECDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{541ED7AB-70A1-47F4-97DF-6B788679ECDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{541ED7AB-70A1-47F4-97DF-6B788679ECDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D3B01C3-D43F-46D2-A0A6-1894144ED271}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D3B01C3-D43F-46D2-A0A6-1894144ED271}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D3B01C3-D43F-46D2-A0A6-1894144ED271}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D3B01C3-D43F-46D2-A0A6-1894144ED271}.Release|Any CPU.Build.0 = Release|Any CPU
 		{70C49361-E118-4335-A90A-3A93493B636C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{70C49361-E118-4335-A90A-3A93493B636C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70C49361-E118-4335-A90A-3A93493B636C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -106,10 +106,10 @@ Global
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46969AA7-60B3-4664-99B8-42CA1942CC1C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F706C890-47BF-41AE-917C-0BA613C2F4CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F706C890-47BF-41AE-917C-0BA613C2F4CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F706C890-47BF-41AE-917C-0BA613C2F4CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F706C890-47BF-41AE-917C-0BA613C2F4CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D93EDAD-85B3-4F75-9B46-8AF33DA9D39D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D93EDAD-85B3-4F75-9B46-8AF33DA9D39D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D93EDAD-85B3-4F75-9B46-8AF33DA9D39D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D93EDAD-85B3-4F75-9B46-8AF33DA9D39D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

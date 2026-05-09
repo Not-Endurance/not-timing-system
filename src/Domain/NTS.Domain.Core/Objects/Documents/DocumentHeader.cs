@@ -6,14 +6,14 @@ namespace NTS.Domain.Core.Objects.Documents;
 public record DocumentHeader
 {
     public DocumentHeader(
-        string enduranceEvent,
+        string eventInformation,
         Country country,
         string location,
         EventSpan eventSpan,
         IEnumerable<Official> officials
     )
     {
-        Title = enduranceEvent;
+        Title = eventInformation;
         Country = country;
         Location = location;
         EventSpan = eventSpan;

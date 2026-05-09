@@ -10,7 +10,6 @@ namespace NTS.Application.Contracts.Watcher.Models;
 
 public class NtsUserSessionStateModel
 {
-    public int? EventId { get; set; }
     public SnapshotGroupModel[] SnapshotHistory { get; set; } = [];
 
     public IReadOnlyList<SnapshotGroup> GetSnapshotHistory()
@@ -22,7 +21,6 @@ public class NtsUserSessionStateModel
     {
         return new NtsUserSessionStateModel
         {
-            EventId = EventId,
             SnapshotHistory = SnapshotHistory.Select(group => group.Copy()).ToArray(),
         };
     }

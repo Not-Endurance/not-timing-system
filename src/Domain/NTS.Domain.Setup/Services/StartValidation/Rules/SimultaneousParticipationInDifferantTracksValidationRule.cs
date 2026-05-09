@@ -1,11 +1,11 @@
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.UpcomingEvents;
+using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NTS.Domain.Setup.Services.StartValidation.Rules;
 
 internal class SimultaneousParticipationInDifferantTracksValidationRule : IStartValidationRule
 {
-    public IEnumerable<StartValidationIssue> Evaluate(UpcomingEvent setupEvent)
+    public IEnumerable<StartValidationIssue> Evaluate(ConfigureEvent setupEvent)
     {
         var byParticipation = setupEvent
             .Competitions.SelectMany(

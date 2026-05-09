@@ -15,7 +15,7 @@ public static class StartValidator
         new SimultaneousParticipationInDifferantTracksValidationRule(),
     ];
 
-    public static Result<IReadOnlyList<StartValidationIssue>> Validate(UpcomingEvent setupEvent)
+    public static Result<IReadOnlyList<StartValidationIssue>> Validate(ConfigureEvent setupEvent)
     {
         IReadOnlyList<StartValidationIssue> issues = RULES
             .SelectMany(x => x.Evaluate(setupEvent))

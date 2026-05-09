@@ -10,7 +10,7 @@ internal sealed class MongoReceiveSnapshotAccessPolicy : IReceiveSnapshotAccessP
 {
     const string DATABASE = "nts";
     const string USERS_COLLECTION = "users";
-    const string OFFICIALS_COLLECTION = "event-officials";
+    const string OFFICIALS_COLLECTION = "event_officials";
 
     readonly IMongoContext _context;
 

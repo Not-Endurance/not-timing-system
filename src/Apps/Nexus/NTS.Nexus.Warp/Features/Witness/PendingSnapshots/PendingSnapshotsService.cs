@@ -6,8 +6,8 @@ namespace NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 
 public interface IPendingSnapshotsService
 {
-    Task Append(string enduranceEventId, SnapshotGroupModel snapshotGroup);
-    Task<IReadOnlyList<PendingSnapshotsModel>> Read(string enduranceEventId);
+    Task Append(string eventId, SnapshotGroupModel snapshotGroup);
+    Task<IReadOnlyList<PendingSnapshotsModel>> Read(string eventId);
     Task Remove(PendingSnapshotsModel pendingSnapshots);
 }
 
@@ -20,19 +20,19 @@ public sealed class PendingSnapshotsService : IPendingSnapshotsService, ITransie
         _pendingSnapshots = pendingSnapshots;
     }
 
-    public async Task Append(string enduranceEventId, SnapshotGroupModel snapshotGroup)
+    public async Task Append(string eventId, SnapshotGroupModel snapshotGroup)
     {
         if (snapshotGroup.Entries.Length == 0)
         {
             return;
         }
 
-        await _pendingSnapshots.Create(enduranceEventId, snapshotGroup);
+        await _pendingSnapshots.Create(eventId, snapshotGroup);
     }
 
-    public async Task<IReadOnlyList<PendingSnapshotsModel>> Read(string enduranceEventId)
+    public async Task<IReadOnlyList<PendingSnapshotsModel>> Read(string eventId)
     {
-        return await _pendingSnapshots.Read(enduranceEventId);
+        return await _pendingSnapshots.Read(eventId);
     }
 
     public async Task Remove(PendingSnapshotsModel pendingSnapshots)

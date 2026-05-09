@@ -1,6 +1,5 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
 using Not.Collections;
 using Not.Injection;
 using Not.Observables.Structures;
@@ -23,14 +22,17 @@ public class ParticipationService
         INotificationHandler<EventDisconnected>,
         IScoped
 {
-    readonly IReadMany<Participation> _participationReader;
+    readonly IEventScopedRepository<Participation> _participationReader;
     readonly INtsSocketContext? _socketContext;
     Participation? _selected;
 
-    public ParticipationService(IReadMany<Participation> participationReader)
+    public ParticipationService(IEventScopedRepository<Participation> participationReader)
         : this(participationReader, null) { }
 
-    public ParticipationService(IReadMany<Participation> participationReader, INtsSocketContext? socketContext)
+    public ParticipationService(
+        IEventScopedRepository<Participation> participationReader,
+        INtsSocketContext? socketContext
+    )
     {
         _participationReader = participationReader;
         _socketContext = socketContext;

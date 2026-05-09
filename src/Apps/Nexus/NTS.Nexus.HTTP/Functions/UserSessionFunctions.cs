@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Not.Storage.Mongo;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
@@ -17,9 +18,10 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
     public UserSessionFunctions(
         IFunctionLogger<UserSessionFunctions> logger,
         INtsUserSessionRepository sessions,
+        IMongoRepository<NtsUserSessionModel> mongoSessions,
         ITelemetryService telemetry
     )
-        : base(logger, sessions, telemetry)
+        : base(logger, mongoSessions, telemetry)
     {
         _sessions = sessions;
     }
@@ -32,7 +34,7 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(Create));
         TagRequest(request);
         LogInformation(request, nameof(Create));
-        return await InternalCreate(request);
+        return await CreateCore(request);
     }
 
     [Function("user-sessions-update")]
@@ -43,7 +45,7 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
-        return await InternalUpdate(request);
+        return await UpdateCore(request);
     }
 
     [Function("user-sessions-delete")]
@@ -55,7 +57,34 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(Delete));
         TagRequest(request);
         LogInformation(request, nameof(Delete));
-        return await InternalDelete(request, id);
+        return await DeleteCore(id);
+    }
+
+    [Function("user-sessions-delete-for-event")]
+    public async Task<IActionResult> DeleteForEvent(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user-sessions/{eventId:int}/{id:int}")]
+            HttpRequest request,
+        int eventId,
+        int id
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteForEvent));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteForEvent));
+
+        await _sessions.Delete(new NtsUserSessionModel { Id = id, EventId = eventId });
+        return Ok();
+    }
+
+    [Function("user-sessions-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user-sessions")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+        return await DeleteManyCore(request);
     }
 
     [Function("user-sessions-read")]
@@ -67,7 +96,7 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(Read));
         TagRequest(request);
         LogInformation(request, nameof(Read));
-        return await InternalRead(request, id);
+        return await ReadCore(id);
     }
 
     [Function("user-sessions-read-by-user-identifier")]
@@ -84,6 +113,25 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         return Ok(await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier)));
     }
 
+    [Function("user-sessions-read-by-user-identifier-and-event")]
+    public async Task<IActionResult> ReadByUserIdentifierAndEvent(
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "get",
+            Route = "user-sessions/{eventId:int}/by-user-identifier/{userIdentifier}"
+        )]
+            HttpRequest request,
+        int eventId,
+        string userIdentifier
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(ReadByUserIdentifierAndEvent));
+        TagRequest(request);
+        LogInformation(request, nameof(ReadByUserIdentifierAndEvent));
+
+        return Ok(await _sessions.ReadByUserIdentifier(Uri.UnescapeDataString(userIdentifier), eventId));
+    }
+
     [Function("user-sessions-read-many")]
     public async Task<IActionResult> ReadMany(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "user-sessions")] HttpRequest request
@@ -92,6 +140,6 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         using var activity = StartFunctionActivity(nameof(ReadMany));
         TagRequest(request);
         LogInformation(request, nameof(ReadMany));
-        return await InternalReadMany(request);
+        return await ReadManyCore(request);
     }
 }

@@ -46,6 +46,7 @@ public static class NStrings
     public static string Image_browser_empty_string => LocalizeString(nameof(Image_browser_empty_string));
     public static string Use_image_string => LocalizeString(nameof(Use_image_string));
     public static string Empty_string => LocalizeString(nameof(Empty_string));
+    public static string Login_string => LocalizeString(nameof(Login_string));
     public static string Sign_in_to_continue_string => LocalizeString(nameof(Sign_in_to_continue_string));
     public static string Sign_in_with_Microsoft_string => LocalizeString(nameof(Sign_in_with_Microsoft_string));
     public static string Register_string => LocalizeString(nameof(Register_string));

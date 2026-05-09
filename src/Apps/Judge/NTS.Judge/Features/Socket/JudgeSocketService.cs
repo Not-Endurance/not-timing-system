@@ -27,7 +27,7 @@ public class JudgeSocketService : NStatefulService, INtsSocketService, IScoped
 
     public SocketConnectionStatus Status { get; private set; }
     public bool IsConnected => _socket?.IsConnected ?? false;
-    public EnduranceEvent? Event { get; private set; }
+    public EventInformation? Event { get; private set; }
 
     public override void Dispose()
     {
@@ -44,22 +44,22 @@ public class JudgeSocketService : NStatefulService, INtsSocketService, IScoped
         await _domainEventDispatcher.Dispatch(new EventDisconnected(currentEventId));
     }
 
-    public async Task Connect(EnduranceEvent enduranceEvent)
+    public async Task Connect(EventInformation eventInformation)
     {
-        if (Event == enduranceEvent && IsConnected)
+        if (Event == eventInformation && IsConnected)
         {
             return;
         }
-        await _socket.Connect(enduranceEvent.Id.ToString());
+        await _socket.Connect(eventInformation.Id.ToString());
         if (!_socket.IsConnected)
         {
             return;
         }
-        await InternalSetEvent(enduranceEvent);
-        await _domainEventDispatcher.Dispatch(new EventConnected(enduranceEvent.Id));
+        await InternalSetEvent(eventInformation);
+        await _domainEventDispatcher.Dispatch(new EventConnected(eventInformation.Id));
     }
 
-    public Task<bool> WillResetSession(EnduranceEvent enduranceEvent)
+    public Task<bool> WillResetSession(EventInformation eventInformation)
     {
         return Task.FromResult(false);
     }
@@ -87,9 +87,9 @@ public class JudgeSocketService : NStatefulService, INtsSocketService, IScoped
         }
     }
 
-    Task InternalSetEvent(EnduranceEvent? enduranceEvent)
+    Task InternalSetEvent(EventInformation? eventInformation)
     {
-        Event = enduranceEvent;
+        Event = eventInformation;
         EmitChanged();
         return Task.CompletedTask;
     }

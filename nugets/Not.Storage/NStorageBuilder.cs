@@ -8,7 +8,6 @@ using MongoDB.Bson.Serialization.Serializers;
 using Not.Application;
 using Not.Injection;
 using Not.Storage.Mongo;
-using Not.Storage.REST;
 
 namespace Not.Storage;
 
@@ -38,10 +37,9 @@ public class NStorageBuilder
         return this;
     }
 
-    public NStorageBuilder AddRestApiStorage(Assembly assembly)
+    public NStorageBuilder AddRestApiStorage(Assembly _)
     {
         _nApplicationBuilder.AddHttp();
-        _services.AddAsInterfaces(typeof(RestApiRepository<,>), ServiceLifetime.Transient, assembly);
         return this;
     }
 }

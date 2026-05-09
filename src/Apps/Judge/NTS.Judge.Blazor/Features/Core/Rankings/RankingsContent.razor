@@ -25,13 +25,24 @@
             }
 
             <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
+
+            @if (HasActiveEvent)
+            {
+                <NButtonWarning
+                    Text="@Deactivate_Event_string"
+                    OnClick="OpenDeactivateEventDialog"
+                    StartIcon="@Icons.Material.Filled.EventBusy" />
+            }
         </MudStack>
 
-        <RankingMenu Rankings="RankingService.Rankings"
-                     Selected="RankingService.Current"
-                     OnSelectedSafe="SelectRanking"
-                     OnDeleteSafe="OpenDeleteDialog"
-                     Class="mt-4" />
+        @if (!IsDeactivatingEvent)
+        {
+            <RankingMenu Rankings="RankingService.Rankings"
+                         Selected="RankingService.Current"
+                         OnSelectedSafe="SelectRanking"
+                         OnDeleteSafe="OpenDeleteDialog"
+                         Class="mt-4" />
+        }
     </Rightbar>
 
 </NContent>

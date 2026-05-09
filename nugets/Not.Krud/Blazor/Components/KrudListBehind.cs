@@ -7,6 +7,7 @@ using Not.Domain;
 using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Krud.Blazor.Components.Abstractions;
+using Not.Krud.Models;
 
 namespace Not.Krud.Blazor.Components;
 
@@ -66,6 +67,9 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     [Parameter]
     public Func<T, bool>? CanUpdate { get; set; }
 
+    [Parameter]
+    public Func<T, bool>? CanView { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         _entities = await Service.ReadMany().ToList();
@@ -77,7 +81,7 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
         if (UpdateRoute == null)
         {
             var aggregate = (_aggregateType ??= typeof(T)).Name.ToLower();
-            UpdateRoute = $"/{aggregate}-update";
+            UpdateRoute = $"/{aggregate}-krud-update-route";
         }
     }
 
@@ -95,15 +99,22 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     {
         SetKrudNodeValue(entity);
         var model = CreateModel(entity);
-        Navigator.NavigateTo(UpdateRoute, model);
+        Navigator.NavigateTo(UpdateRoute, new KrudFormRouteParameter<TModel>(model, false));
         _entities.Update(entity, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;
     }
 
     protected Task ViewSafe(T entity)
     {
-        GuardHelper.ThrowIfDefault(ViewRouteFactory);
-        Navigator.NavigateTo(ViewRouteFactory(entity));
+        if (ViewRouteFactory != null)
+        {
+            Navigator.NavigateTo(ViewRouteFactory(entity));
+            return Task.CompletedTask;
+        }
+
+        SetKrudNodeValue(entity);
+        var model = CreateModel(entity);
+        Navigator.NavigateTo(UpdateRoute, new KrudFormRouteParameter<TModel>(model, true));
         return Task.CompletedTask;
     }
 

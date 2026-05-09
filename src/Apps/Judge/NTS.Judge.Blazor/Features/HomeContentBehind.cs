@@ -26,7 +26,7 @@ public class HomeContentBehind : NStatefulComponent
     [Inject]
     protected IActiveEventsContext ActiveEventContext { get; set; } = default!;
 
-    protected int ActiveEnduranceEventCount { get; set; }
+    protected int ActiveEventInformationCount { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -34,32 +34,37 @@ public class HomeContentBehind : NStatefulComponent
         await Observe(ActiveEventContext);
     }
 
-    protected bool ShowStartButton(UpcomingEvent upcomingEvent)
+    protected bool ShowStartButton(ConfigureEvent configureEvent)
     {
-        return !ActiveEventContext.IsActive(upcomingEvent);
+        return !ActiveEventContext.IsActive(configureEvent);
     }
 
-    protected bool ShowEditButton(UpcomingEvent upcomingEvent)
+    protected bool ShowEditButton(ConfigureEvent configureEvent)
     {
-        return ShowStartButton(upcomingEvent) && !ShowResetTimingButton(upcomingEvent);
+        return ShowStartButton(configureEvent) && !ShowResetTimingButton(configureEvent);
     }
 
-    protected bool ShowResetTimingButton(UpcomingEvent upcomingEvent)
+    protected bool ShowViewButton(ConfigureEvent configureEvent)
     {
-        return SocketService.Event?.Id == upcomingEvent.Id;
+        return ActiveEventContext.IsActive(configureEvent);
     }
 
-    protected async Task Start(UpcomingEvent upcomingEvent)
+    protected bool ShowResetTimingButton(ConfigureEvent configureEvent)
+    {
+        return SocketService.Event?.Id == configureEvent.Id;
+    }
+
+    protected async Task Start(ConfigureEvent configureEvent)
     {
         try
         {
-            var validation = await DashService.Validate(upcomingEvent.Id);
+            var validation = await DashService.Validate(configureEvent.Id);
             if (validation.Data?.Any() == true)
             {
                 var parameters = new DialogParameters<StartValidationDialog>
                 {
                     { x => x.InitialValidation, validation },
-                    { x => x.UpcomingEventId, upcomingEvent.Id },
+                    { x => x.ConfigureEventId, configureEvent.Id },
                 };
                 var dialog = await DialogService.ShowAsync<StartValidationDialog>(Start_string, parameters);
                 if (await dialog.IsCanceled())
@@ -68,7 +73,7 @@ public class HomeContentBehind : NStatefulComponent
                 }
             }
 
-            await DashService.Start(upcomingEvent.Id);
+            await DashService.Start(configureEvent.Id);
         }
         catch (DomainException ex)
         {
@@ -80,9 +85,9 @@ public class HomeContentBehind : NStatefulComponent
         }
     }
 
-    protected async Task OpenResetTimingDialog(UpcomingEvent upcomingEvent)
+    protected async Task OpenResetTimingDialog(ConfigureEvent configureEvent)
     {
-        if (!ShowResetTimingButton(upcomingEvent))
+        if (!ShowResetTimingButton(configureEvent))
         {
             return;
         }

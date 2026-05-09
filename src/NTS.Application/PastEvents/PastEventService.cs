@@ -1,7 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Behinds.Adapters;
+using Not.Application.CRUD.Ports;
 using Not.Exceptions;
-using Not.Injection;
 using Not.Krud.Abstractions;
 using Not.Krud.Models;
 using NTS.Application.Contracts.PastEvents;
@@ -13,27 +12,36 @@ using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Application.PastEvents;
 
-public class PastEventService : NStatefulService, IPastEventService, IKrudListBehind<EnduranceEvent>, IScoped
+public class PastEventService : NStatefulService, IPastEventService, IKrudListBehind<EventInformation>
 {
     static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_STARTLIST =
         new Dictionary<int, IReadOnlyList<Starter>>();
 
-    readonly IEnduranceEventRepository _events;
-    readonly IServiceProvider _serviceProvider;
-    readonly List<EnduranceEvent> _pastEvents = [];
+    readonly IEventInformationRepository _events;
+    readonly IRepository<Participation> _participations;
+    readonly IRepository<Ranking> _rankingRepository;
+    readonly IRepository<Official> _officialRepository;
+    readonly List<EventInformation> _pastEvents = [];
     IReadOnlyList<Ranking> _rankings = [];
     IReadOnlyList<Official> _officials = [];
     Startlist? _startlist;
     Ranking? _currentRanking;
 
-    public PastEventService(IEnduranceEventRepository events, IServiceProvider serviceProvider)
+    public PastEventService(
+        IEventInformationRepository events,
+        IRepository<Participation> participations,
+        IRepository<Ranking> rankingRepository,
+        IRepository<Official> officialRepository
+    )
     {
         _events = events;
-        _serviceProvider = serviceProvider;
+        _participations = participations;
+        _rankingRepository = rankingRepository;
+        _officialRepository = officialRepository;
     }
 
-    public IReadOnlyList<EnduranceEvent> Events => _pastEvents.AsReadOnly();
-    public EnduranceEvent? Event { get; private set; }
+    public IReadOnlyList<EventInformation> Events => _pastEvents.AsReadOnly();
+    public EventInformation? Event { get; private set; }
     public int EventId =>
         Event?.Id ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
     public IReadOnlyList<Ranking> Rankings => _rankings;
@@ -71,15 +79,10 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
             return;
         }
 
-        var participations = await _serviceProvider
-            .GetRequiredService<IPastParticipationRepository>()
-            .ReadForEvent(EventId);
-        _rankings = (
-            await _serviceProvider.GetRequiredService<IPastRankingRepository>().ReadForEvent(EventId)
-        ).ToList();
-        _officials = (
-            await _serviceProvider.GetRequiredService<IPastOfficialRepository>().ReadForEvent(EventId)
-        ).ToList();
+        var selectedEventId = EventId;
+        var participations = await _participations.ReadMany(x => x.EventId == selectedEventId);
+        _rankings = (await _rankingRepository.ReadMany(x => x.EventId == selectedEventId)).ToList();
+        _officials = (await _officialRepository.ReadMany(x => x.EventId == selectedEventId)).ToList();
         _startlist = new Startlist(participations);
         _currentRanking = _rankings.FirstOrDefault();
         EmitChanged();
@@ -91,23 +94,23 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
         EmitChanged();
     }
 
-    public async Task<IEnumerable<EnduranceEvent>> ReadMany()
+    public async Task<IEnumerable<EventInformation>> ReadMany()
     {
         await Load();
         return Events;
     }
 
-    public Task Delete(EnduranceEvent entity)
+    public Task Delete(EventInformation entity)
     {
         throw CreateReadOnlyException();
     }
 
-    public Task<KrudDeleteImpact> PreviewDelete(EnduranceEvent entity)
+    public Task<KrudDeleteImpact> PreviewDelete(EventInformation entity)
     {
         return Task.FromResult(new KrudDeleteImpact(entity.ToString(), []));
     }
 
-    public Task DeleteCascade(EnduranceEvent entity)
+    public Task DeleteCascade(EventInformation entity)
     {
         throw CreateReadOnlyException();
     }

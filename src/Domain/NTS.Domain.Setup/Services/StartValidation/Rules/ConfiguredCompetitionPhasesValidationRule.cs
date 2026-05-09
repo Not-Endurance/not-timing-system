@@ -4,7 +4,7 @@ namespace NTS.Domain.Setup.Services.StartValidation.Rules;
 
 internal class ConfiguredCompetitionPhasesValidationRule : IStartValidationRule
 {
-    public IEnumerable<StartValidationIssue> Evaluate(UpcomingEvent setupEvent)
+    public IEnumerable<StartValidationIssue> Evaluate(ConfigureEvent setupEvent)
     {
         foreach (var competition in setupEvent.Competitions.Where(x => x.Phases.Count == 0))
         {

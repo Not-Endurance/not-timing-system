@@ -5,7 +5,8 @@ namespace NTS.Judge.Contracts.Features.Core;
 
 public interface IDashService
 {
-    Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int upcomingEventId);
-    Task Start(int upcomingEventId);
+    Task<Result<IReadOnlyList<StartValidationIssue>>> Validate(int configureEventId);
+    Task Start(int configureEventId);
+    Task Deactivate();
     Task Reset();
 }

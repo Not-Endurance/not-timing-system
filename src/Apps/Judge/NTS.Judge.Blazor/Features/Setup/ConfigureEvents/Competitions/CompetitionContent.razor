@@ -1,0 +1,34 @@
+﻿@using NTS.Domain.Setup.Aggregates.ConfigureEvents
+@using NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Participations
+@using NTS.Judge.Blazor.Features.Setup.ConfigureEvents.Phases
+@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Participations
+@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Phases
+@using Not.Blazor.Components.Layout
+@using Not.Krud.Blazor.Components
+
+@attribute [Route(COMPETITION_UPDATE)]
+@inherits CompetitionContentBehind
+
+<NContent Title="@Configure_Competition_string" IsEmpty="Model == null">
+
+    <Main>
+        <CompetitionShell Model="Model" ReadOnly="@ReadOnly">
+            
+            <AdditionalContent>
+                
+                <NGrid Spacing="8">
+                    <MudItem xs="6">
+                        <KrudList T="Phase" TModel="PhaseFormModel" TShell="PhaseShell" Name="@Phases_string" AllowCreate="@(!ReadOnly)" AllowView="@ReadOnly" AllowUpdate="@(!ReadOnly)" AllowDelete="@(!ReadOnly)" />
+                    </MudItem>
+
+                    <MudItem xs="6">
+                        <KrudList T="Participation" TModel="ParticipationFormModel" TShell="ParticipationShell" Name="@Participations_string" AllowCreate="@(!ReadOnly)" AllowView="@ReadOnly" AllowUpdate="@(!ReadOnly)" AllowDelete="@(!ReadOnly)" />
+                    </MudItem>
+                </NGrid>
+
+            </AdditionalContent>
+
+        </CompetitionShell>
+    </Main>
+
+</NContent>

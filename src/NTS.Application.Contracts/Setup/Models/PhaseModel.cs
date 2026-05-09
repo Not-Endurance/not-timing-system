@@ -3,7 +3,7 @@ using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;
-using NTS.Domain.Setup.Aggregates.UpcomingEvents;
+using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
 namespace NTS.Application.Contracts.Setup.Models;
 

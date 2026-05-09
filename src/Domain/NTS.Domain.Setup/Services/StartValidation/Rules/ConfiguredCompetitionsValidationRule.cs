@@ -4,7 +4,7 @@ namespace NTS.Domain.Setup.Services.StartValidation.Rules;
 
 internal class ConfiguredCompetitionsValidationRule : IStartValidationRule
 {
-    public IEnumerable<StartValidationIssue> Evaluate(UpcomingEvent setupEvent)
+    public IEnumerable<StartValidationIssue> Evaluate(ConfigureEvent setupEvent)
     {
         if (setupEvent.Competitions.Count == 0)
         {

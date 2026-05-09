@@ -189,8 +189,8 @@
   <data name="Dashboard_string" xml:space="preserve">
     <value>Dashboard</value>
   </data>
-  <data name="Endurance_Event_string" xml:space="preserve">
-    <value>Endurance Event</value>
+  <data name="Event_Information_string" xml:space="preserve">
+    <value>Event Information</value>
   </data>
   <data name="Athletes_and_Horses_string" xml:space="preserve">
     <value>Athletes and Horses</value>
@@ -321,8 +321,8 @@
   <data name="Start_string" xml:space="preserve">
     <value>start</value>
   </data>
-  <data name="Configure_Endurance_Event_string" xml:space="preserve">
-    <value>Configure Endurance Event</value>
+  <data name="Configure_Event_string" xml:space="preserve">
+    <value>Configure Event</value>
   </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Configure Competition</value>
@@ -534,8 +534,8 @@
   <data name="Invalid_phase_configuration_in_competition__missing_rest" xml:space="preserve">
     <value>Invalid phase configuration in competition '{0}': missing Rest time in a non-final phase</value>
   </data>
-  <data name="Upcoming_events_string" xml:space="preserve">
-    <value>Upcoming еvents</value>
+  <data name="Configure_events_string" xml:space="preserve">
+    <value>Configure еvents</value>
   </data>
   <data name="Select_event_string" xml:space="preserve">
     <value>Select event</value>
@@ -605,6 +605,15 @@
   </data>
   <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
     <value>Setup configuration will not be deleted</value>
+  </data>
+  <data name="Deactivate_Event_string" xml:space="preserve">
+    <value>Deactivate Event</value>
+  </data>
+  <data name="Deactivate_event_instructions_string" xml:space="preserve">
+    <value>This will mark the current event inactive and disconnect the dashboard. Event data will not be deleted and will remain available in Past Events.</value>
+  </data>
+  <data name="Type_1338_to_enable_confirmation_string" xml:space="preserve">
+    <value>Type 1338 to enable confirmation.</value>
   </data>
   <data name="Disconnect_from_current_Event" xml:space="preserve">
     <value>Disconnect from current Event</value>
@@ -771,20 +780,17 @@
   <data name="Connect_string" xml:space="preserve">
     <value>Connect</value>
   </data>
-  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
-    <value>Connecting to '{0}' will remove your current snapshot history. This cannot be undone.</value>
-  </data>
   <data name="Disconnect_string" xml:space="preserve">
     <value>Disconnect</value>
   </data>
   <data name="Empty_event_list_message" xml:space="preserve">
-    <value>Upcoming Events aren't configured yet</value>
+    <value>Events aren't configured yet</value>
   </data>
   <data name="Select_athlete_string" xml:space="preserve">
     <value>Select an athlete</value>
   </data>
   <data name="Empty_performance_competitor_message" xml:space="preserve">
-    <value>Your account is not configured to participate in the current Endurance Event. If this is incorrect please contact an admin</value>
+    <value>Your account is not configured to participate in the current event. If this is incorrect please contact an admin</value>
   </data>
   <data name="Empty_performance_official_message" xml:space="preserve">
     <value>Choose a participating athlete above to view performance</value>
@@ -915,8 +921,8 @@
   <data name="File_not_found_string" xml:space="preserve">
     <value>File not found.</value>
   </data>
-  <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
-    <value>Upcoming events cannot be deleted</value>
+  <data name="Configure_events_cannot_be_deleted_string" xml:space="preserve">
+    <value>Configure events cannot be deleted</value>
   </data>
   <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
     <value>Cannot start - Invalid setup.</value>

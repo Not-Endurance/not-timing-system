@@ -34,6 +34,11 @@ public class NHttpClient
         return await SendRequest<Result.Empty>(HttpMethod.Delete, endpoint);
     }
 
+    public async Task<Result<Result.Empty>> Delete(string endpoint, object payload)
+    {
+        return await SendRequest<Result.Empty>(HttpMethod.Delete, endpoint, payload);
+    }
+
     public async Task<Result<T>> Post<T>(string endpoint, T payload)
         where T : class
     {

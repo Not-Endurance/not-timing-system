@@ -1,0 +1,144 @@
+﻿{
+  "EventInformation": {
+    "Country": {
+      "IsoCode": "BG",
+      "NfCode": "zz",
+      "Name": "Bulgaria"
+    },
+    "Name": "Test Regional Competition",
+    "Location": "Sofia",
+    "EventSpan": {
+      "StartDay": "2024-12-20T18:00:00+02:00",
+      "EndDay": "2024-12-20T18:00:00+02:00"
+    },
+    "FeiId": null,
+    "FeiCode": null,
+    "ShowFeiId": null,
+    "Id": 1316730790
+  },
+  "Participations": [
+    {
+      "Competition": {
+        "Name": "Test Regional Competition",
+        "Ruleset": 2,
+        "Type": 1
+      },
+      "Combination": {
+        "Number": 1337,
+        "Name": {
+          "Names": [
+            "Test",
+            "Athlete"
+          ]
+        },
+        "Horse": "Test Horse",
+        "Country": {
+          "IsoCode": "BGR",
+          "NfCode": "BUL",
+          "Name": "Bulgaria"
+        },
+        "Club": {
+          "Name": "Конярче ООД"
+        },
+        "MinAverageSpeed": {
+          "_speed": 10.0
+        },
+        "MaxAverageSpeed": {
+          "_speed": 16.0
+        },
+        "Distance": "80",
+        "Id": 1500062436
+      },
+      "Phases": [
+        {
+          "Gate": "GATE1/40",
+          "Length": 40.0,
+          "MaxRecovery": 15,
+          "Rest": 40,
+          "Ruleset": 2,
+          "IsFinal": false,
+          "StartTime": {
+            "_stamp": "1337-01-03T18:00:00+02:00"
+          },
+          "ArriveTime": null,
+          "PresentTime": null,
+          "RepresentTime": null,
+          "IsReinspectionRequested": false,
+          "IsRequiredInspectionRequested": false,
+          "IsRequiredInspectionCompulsory": false,
+          "CompulsoryThresholdSpan": "00:10:00",
+          "Id": 311851861
+        },
+        {
+          "Gate": "GATE2/60",
+          "Length": 20.0,
+          "MaxRecovery": 15,
+          "Rest": 40,
+          "Ruleset": 2,
+          "IsFinal": false,
+          "StartTime": null,
+          "ArriveTime": null,
+          "PresentTime": null,
+          "RepresentTime": null,
+          "IsReinspectionRequested": false,
+          "IsRequiredInspectionRequested": false,
+          "IsRequiredInspectionCompulsory": false,
+          "CompulsoryThresholdSpan": "00:10:00",
+          "Id": 1152709032
+        },
+        {
+          "Gate": "GATE3/80",
+          "Length": 20.0,
+          "MaxRecovery": 20,
+          "Rest": null,
+          "Ruleset": 2,
+          "IsFinal": true,
+          "StartTime": null,
+          "ArriveTime": null,
+          "PresentTime": null,
+          "RepresentTime": null,
+          "IsReinspectionRequested": false,
+          "IsRequiredInspectionRequested": false,
+          "IsRequiredInspectionCompulsory": false,
+          "CompulsoryThresholdSpan": "00:10:00",
+          "Id": 1900848341
+        }
+      ],
+      "Eliminated": null,
+      "Id": 1531774858
+    }
+  ],
+  "Officials": [
+    {
+      "Person": {
+        "Names": [
+          "Test",
+          "Prezidentov"
+        ]
+      },
+      "Role": 6,
+      "Id": 2140994984
+    }
+  ],
+  "Rankings": [
+    {
+      "Name": "Test Regional Competition",
+      "Ruleset": 2,
+      "Type": 1,
+      "Category": 1,
+      "Entries": [
+        {
+          "Participation": {
+            "$domainRef": 1531774858
+          },
+          "Rank": null,
+          "IsNotRanked": false,
+          "Id": 1534816613
+        }
+      ],
+      "Id": 1228225553
+    }
+  ],
+  "SnapshotResults": [],
+  "Handouts": []
+}
