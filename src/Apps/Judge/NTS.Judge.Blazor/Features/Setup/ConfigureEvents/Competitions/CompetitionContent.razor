@@ -12,17 +12,17 @@
 <NContent Title="@Configure_Competition_string" IsEmpty="Model == null">
 
     <Main>
-        <CompetitionShell Model="Model">
+        <CompetitionShell Model="Model" ReadOnly="@ReadOnly">
             
             <AdditionalContent>
                 
                 <NGrid Spacing="8">
                     <MudItem xs="6">
-                        <KrudList T="Phase" TModel="PhaseFormModel" TShell="PhaseShell" Name="@Phases_string" AllowCreate AllowUpdate AllowDelete />
+                        <KrudList T="Phase" TModel="PhaseFormModel" TShell="PhaseShell" Name="@Phases_string" AllowCreate="@(!ReadOnly)" AllowView="@ReadOnly" AllowUpdate="@(!ReadOnly)" AllowDelete="@(!ReadOnly)" />
                     </MudItem>
 
                     <MudItem xs="6">
-                        <KrudList T="Participation" TModel="ParticipationFormModel" TShell="ParticipationShell" Name="@Participations_string" AllowCreate AllowUpdate AllowDelete/>
+                        <KrudList T="Participation" TModel="ParticipationFormModel" TShell="ParticipationShell" Name="@Participations_string" AllowCreate="@(!ReadOnly)" AllowView="@ReadOnly" AllowUpdate="@(!ReadOnly)" AllowDelete="@(!ReadOnly)" />
                     </MudItem>
                 </NGrid>
 

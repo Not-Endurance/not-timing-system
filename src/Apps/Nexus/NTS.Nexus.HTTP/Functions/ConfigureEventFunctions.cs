@@ -13,15 +13,18 @@ namespace NTS.Nexus.HTTP.Functions;
 public class ConfigureEventFunctions : FunctionBase
 {
     readonly IRepository<ConfigureEventModel> _configureEvents;
+    readonly IConfigureEventMutationGuard _mutationGuard;
 
     public ConfigureEventFunctions(
         IRepository<ConfigureEventModel> configureEventRepository,
+        IConfigureEventMutationGuard mutationGuard,
         IFunctionLogger<ConfigureEventFunctions> logger,
         ITelemetryService telemetry
     )
         : base(logger, telemetry)
     {
         _configureEvents = configureEventRepository;
+        _mutationGuard = mutationGuard;
     }
 
     [Function("configure-event-insert")]
@@ -73,6 +76,7 @@ public class ConfigureEventFunctions : FunctionBase
         LogInformation(request, nameof(Update));
 
         var document = await ReadBody<ConfigureEventModel>(request);
+        await _mutationGuard.EnsureCanMutate(document.Id);
         await _configureEvents.Update(document);
         return Ok();
     }
@@ -87,6 +91,7 @@ public class ConfigureEventFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(Delete));
 
+        await _mutationGuard.EnsureCanMutate(id);
         var configureEvent = await _configureEvents.Read(id);
         if (configureEvent == null)
         {
@@ -107,6 +112,7 @@ public class ConfigureEventFunctions : FunctionBase
         LogInformation(request, nameof(DeleteMany));
 
         var configureEvents = await ReadBody<ConfigureEventModel[]>(request);
+        await _mutationGuard.EnsureCanMutate(configureEvents.Select(x => x.Id));
         await _configureEvents.DeleteMany(configureEvents);
         return Ok();
     }

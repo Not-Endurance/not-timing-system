@@ -12,7 +12,15 @@
 <NContent Title="@Select_event_string">
    
     <Main>
-        <KrudList T="ConfigureEvent" TModel="ConfigureEventFormModel" TShell="ConfigureEventShell" Name="@Configure_events_string" CanUpdate="ShowEditButton" AllowCreate AllowUpdate>
+        <KrudList T="ConfigureEvent"
+                  TModel="ConfigureEventFormModel"
+                  TShell="ConfigureEventShell"
+                  Name="@Configure_events_string"
+                  CanView="ShowViewButton"
+                  CanUpdate="ShowEditButton"
+                  AllowCreate
+                  AllowView
+                  AllowUpdate>
             <CustomAction1 Context="configureEvent">
                 @if (ShowStartButton(configureEvent))
                 {

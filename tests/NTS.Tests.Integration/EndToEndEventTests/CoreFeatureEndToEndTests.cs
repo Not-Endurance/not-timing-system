@@ -6,6 +6,7 @@ using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Features;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Infrastructure;
+using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
 
 namespace NTS.Tests.Integration.EndToEndEventTests;
 
@@ -36,6 +37,7 @@ public sealed class CoreFeatureEndToEndTests
 
         var setup = await configureEvent.Execute(snapshot);
         var eventInformation = await startEvent.Execute(setup);
+        await AssertStartedConfigureEventCannotBeUpdated(nexusApi, setup.SetupEvent);
 
         var startedDocuments = await ReadStartedDocumentsScopedToCurrentEvent(
             nexusApi,
@@ -80,6 +82,18 @@ public sealed class CoreFeatureEndToEndTests
         Assert.True(publishedSnapshotGroups > 0);
 
         await AssertFinalStateMatchesSnapshots(nexusApi, eventInformation, setup, snapshot);
+    }
+
+    static async Task AssertStartedConfigureEventCannotBeUpdated(
+        NexusApiDriver api,
+        SetupConfigureEvent setupEvent
+    )
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            api.UpdateSetupConfigureEvent(setupEvent)
+        );
+        Assert.Contains($"Cannot mutate configure event '{setupEvent.Id}'", exception.Message);
+        Assert.Contains("started", exception.Message);
     }
 
     static async Task SeedOtherEventData(NexusApiDriver api, int testedEventId)

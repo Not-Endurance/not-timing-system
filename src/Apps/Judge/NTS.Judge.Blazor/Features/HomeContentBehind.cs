@@ -44,6 +44,11 @@ public class HomeContentBehind : NStatefulComponent
         return ShowStartButton(configureEvent) && !ShowResetTimingButton(configureEvent);
     }
 
+    protected bool ShowViewButton(ConfigureEvent configureEvent)
+    {
+        return ActiveEventContext.IsActive(configureEvent);
+    }
+
     protected bool ShowResetTimingButton(ConfigureEvent configureEvent)
     {
         return SocketService.Event?.Id == configureEvent.Id;

@@ -11,11 +11,22 @@
     <EditForm Model="Shell.Model" OnSubmit="OnSubmit">
         <ExceptionFormValidator @ref="ValidatorRef"/>
 
-        @FormFields
+        <fieldset disabled="@ReadOnly" style="border:0;padding:0;margin:0;">
+            @FormFields
+        </fieldset>
 
         @AdditionalContent
 
-        @if (FormButtons != null)
+        @if (ReadOnly)
+        {
+            <MudStack Row="true" Class="mt-4" Justify="Justify.FlexEnd">
+                @if (CanNavigateBack())
+                {
+                    <NButtonBack OnClick="NavigateBack" />
+                }
+            </MudStack>
+        }
+        else if (FormButtons != null)
         {
             @FormButtons
         }

@@ -4,6 +4,7 @@
 - docker commands which would modify containers, volumes, images or similar
 2. Always dotnet `build`, `restore` with silent output `-v:q` unless instructed otherwise
 3. Run dotnet `test` with minimal output `-v:m`
+4. Verify each feature with successful NTS.Test.Integration run. If the indegration tests fail, don't change them directly. Instead report why they are failing.
 
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker

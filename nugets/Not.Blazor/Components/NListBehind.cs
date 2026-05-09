@@ -17,6 +17,9 @@ public class NListBehind<T> : NComponent
     public Func<T, Task>? ViewSafe { get; set; }
 
     [Parameter]
+    public Func<T, bool>? CanView { get; set; }
+
+    [Parameter]
     public Func<T, Task>? UpdateSafe { get; set; }
 
     [Parameter]

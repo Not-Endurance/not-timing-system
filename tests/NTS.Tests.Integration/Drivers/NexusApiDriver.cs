@@ -75,6 +75,11 @@ internal sealed class NexusApiDriver : IDisposable
         return Send(HttpMethod.Post, "api/configure-event", SetupConfigureEventModel.From(setupEvent));
     }
 
+    public Task UpdateSetupConfigureEvent(SetupConfigureEvent setupEvent)
+    {
+        return Send(HttpMethod.Patch, "api/configure-event", SetupConfigureEventModel.From(setupEvent));
+    }
+
     public async Task<EventInformation> ReadEventInformation(int eventId)
     {
         var model = await Send<EventInformationModel>(HttpMethod.Get, $"api/event-information/{eventId}");

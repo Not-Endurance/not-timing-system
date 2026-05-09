@@ -55,6 +55,22 @@ public class ConfigureEventsListBehindTests
         Assert.False(component.ShowReset(CreateConfigureEvent(7)));
     }
 
+    [Fact]
+    public void ShouldShowView_WhenEventIsActive_ReturnsTrue()
+    {
+        var component = CreateComponent(activeEventInformationCount: 1);
+
+        Assert.True(component.ShowView(CreateConfigureEvent(7)));
+    }
+
+    [Fact]
+    public void ShouldShowView_WhenEventIsNotActive_ReturnsFalse()
+    {
+        var component = CreateComponent();
+
+        Assert.False(component.ShowView(CreateConfigureEvent(7)));
+    }
+
     static TestConfigureEventsListBehind CreateComponent(int activeEventInformationCount = 0, int? connectedEventId = null)
     {
         var component = new TestConfigureEventsListBehind
@@ -117,6 +133,11 @@ public class ConfigureEventsListBehindTests
         public bool ShowReset(ConfigureEvent configureEvent)
         {
             return ShowResetTimingButton(configureEvent);
+        }
+
+        public bool ShowView(ConfigureEvent configureEvent)
+        {
+            return ShowViewButton(configureEvent);
         }
     }
 
