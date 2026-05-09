@@ -1,4 +1,4 @@
-name: NTS Deploy Staging
+name: Deploy Staging
 run-name: Deploy NTS staging from ${{ github.ref_name }}
 
 on:
@@ -25,7 +25,7 @@ jobs:
   nexus-warp-build:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    name: Nexus Warp - Build Staging
+    name: Deploy Staging - Warp Build
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -61,7 +61,7 @@ jobs:
   nexus-warp-deploy:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    name: Nexus Warp - Deploy Staging
+    name: Deploy Staging - Warp
     needs: nexus-warp-build
     steps:
       - name: Download artifact from build job
@@ -93,7 +93,7 @@ jobs:
         )
       }}
     runs-on: ubuntu-latest
-    name: Witness - Build and Deploy Staging
+    name: Deploy Staging - Client
     steps:
       - uses: actions/checkout@v4
         with:
