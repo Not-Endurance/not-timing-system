@@ -24,14 +24,14 @@ internal class NBlazorClientAuthenticationService : INAuthentication
         _navigationManager = navigationManager;
     }
 
-    public void Signin(bool silent = false, bool preservePendingRegistrationProfile = false)
+    public async Task Signin(bool silent = false, bool preservePendingRegistrationProfile = false)
     {
         if (!preservePendingRegistrationProfile)
         {
-            _pendingRegistrationProfiles.Clear();
+            await _pendingRegistrationProfiles.Clear();
         }
 
-        _authenticationMarkers.WriteSigninFlowStartedAt();
+        await _authenticationMarkers.WriteSigninFlowStartedAt();
 
         var requestOptions = new InteractiveRequestOptions { Interaction = InteractionType.SignIn, ReturnUrl = "/" };
         if (silent)
@@ -42,10 +42,10 @@ internal class NBlazorClientAuthenticationService : INAuthentication
         _navigationManager.NavigateToLogin(RemoteAuthenticationDefaults.LoginPath, requestOptions);
     }
 
-    public void Signout()
+    public async Task Signout()
     {
-        _clientAuthenticationSessionService.Clear();
-        _pendingRegistrationProfiles.Clear();
+        await _clientAuthenticationSessionService.Clear();
+        await _pendingRegistrationProfiles.Clear();
         _navigationManager.NavigateTo(AuthenticationContents.AUTHENTICATION);
     }
 }

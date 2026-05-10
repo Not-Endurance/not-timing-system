@@ -41,7 +41,7 @@ internal class ClientAuthenticationSessionService : INAuthenticationSession, ITr
             return true;
         }
 
-        Clear();
+        await Clear();
         return false;
     }
 
@@ -63,13 +63,13 @@ internal class ClientAuthenticationSessionService : INAuthenticationSession, ITr
             return;
         }
 
-        Clear();
+        await Clear();
     }
 
-    public void Clear()
+    public async Task Clear()
     {
-        _authenticationMarkers.ClearSessionStartedAt();
-        _authenticationMarkers.ClearSigninFlowStartedAt();
+        await _authenticationMarkers.ClearSessionStartedAt();
+        await _authenticationMarkers.ClearSigninFlowStartedAt();
     }
 }
 
@@ -78,5 +78,5 @@ internal interface INAuthenticationSession
     Task<bool> ShouldTryAutoSignin();
     Task<bool> HasActiveSession();
     Task Commit();
-    void Clear();
+    Task Clear();
 }

@@ -45,6 +45,12 @@ internal sealed class NexusApiDriver : IDisposable
         );
     }
 
+    public Task<NUserModel?> ReadUser(string email)
+    {
+        var encodedEmail = Uri.EscapeDataString(email);
+        return SendNullable<NUserModel>(HttpMethod.Get, $"api/users/{encodedEmail}");
+    }
+
     public Task Create(EventInformation eventInformation)
     {
         return Send(HttpMethod.Post, "api/event-information", EventInformationModel.From(eventInformation));
@@ -222,6 +228,19 @@ internal sealed class NexusApiDriver : IDisposable
         }
 
         return result.Data ?? throw new InvalidOperationException($"Nexus API returned no payload for '{endpoint}'.");
+    }
+
+    async Task<T?> SendNullable<T>(HttpMethod method, string endpoint, object? payload = null)
+        where T : class
+    {
+        var content = await SendCore(method, endpoint, payload);
+        var result = content.FromJson<Result<T>>();
+        if (!result.IsSuccess)
+        {
+            throw new InvalidOperationException(string.Join(Environment.NewLine, result.Errors));
+        }
+
+        return result.Data;
     }
 
     async Task<string> SendCore(HttpMethod method, string endpoint, object? payload)

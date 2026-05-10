@@ -23,10 +23,10 @@ jobs:
     name: Production - MessageBus
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}  # adjust if needed
 
@@ -47,7 +47,7 @@ jobs:
         --output ${{ env.ARTIFACT_PATH }}
 
     - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
+      uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ env.AZURE_RESOURCE }}
         publish-profile: ${{ secrets.AZURE_NTS_NEXUS_WARP_PRODUCTION_PUBLISH_PROFILE }}
@@ -58,13 +58,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Production - Client
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
           lfs: false
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
 

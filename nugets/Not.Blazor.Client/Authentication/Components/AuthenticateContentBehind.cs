@@ -23,9 +23,9 @@ public abstract class AuthenticateContentBehind : NComponent
     protected bool IsRegistering { get; private set; }
     protected RegistrationProfileFormModel RegistrationProfile { get; } = new();
 
-    protected void Signin()
+    protected async Task Signin()
     {
-        Authentication.Signin();
+        await Authentication.Signin();
     }
 
     protected void ShowRegistration()
@@ -36,7 +36,7 @@ public abstract class AuthenticateContentBehind : NComponent
     protected async Task Register()
     {
         await PendingRegistrationProfiles.Write(RegistrationProfile.ToProfile());
-        Authentication.Signin(preservePendingRegistrationProfile: true);
+        await Authentication.Signin(preservePendingRegistrationProfile: true);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -50,7 +50,10 @@ public abstract class AuthenticateContentBehind : NComponent
         if (await AuthenticationSession.ShouldTryAutoSignin())
         {
             var hasPendingRegistrationProfile = await PendingRegistrationProfiles.Read() != null;
-            Authentication.Signin(silent: true, preservePendingRegistrationProfile: hasPendingRegistrationProfile);
+            await Authentication.Signin(
+                silent: true,
+                preservePendingRegistrationProfile: hasPendingRegistrationProfile
+            );
         }
     }
 

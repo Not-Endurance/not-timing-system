@@ -26,7 +26,7 @@ jobs:
           echo "${{ github.event.pull_request }}"
 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           # Use custom PAT instead of GITHUB_TOKEN in order to allow subsequent workflow execution 
           # based on this csharpier commit. Otherwise the PR is stuc (csharpier commit is never checked):
@@ -35,7 +35,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_CORE_VERSION }}  #
 
@@ -66,10 +66,10 @@ jobs:
     needs: pr-checks-csharpier
     name: Dotnet build
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
    
@@ -114,7 +114,7 @@ jobs:
         echo "Created filtered solution: $OUT"
 
     - name: Publish filtered solution for debugging
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ env.BUILD_SOLUTION_FILE }}
         path: ${{ env.SOURCE_DIR}}/${{ env.BUILD_SOLUTION_FILE }}

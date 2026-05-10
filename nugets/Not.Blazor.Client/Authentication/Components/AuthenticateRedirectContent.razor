@@ -14,7 +14,10 @@
         }
 
         <div class="loading-shell__text">
-            <RemoteAuthenticatorView Action="@Action" />
+            @if (ShouldRenderRemoteAuthenticator)
+            {
+                <RemoteAuthenticatorView Action="@Action" />
+            }
         </div>
     </div>
 </div>
