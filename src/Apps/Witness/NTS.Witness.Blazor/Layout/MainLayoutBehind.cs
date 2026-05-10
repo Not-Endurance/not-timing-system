@@ -21,10 +21,9 @@ public class MainLayoutBehind : LayoutComponentBase
         Navigator.NavigateTo(EMERGENCY_CONTACTS_PAGE);
     }
 
-    protected Task Signout()
+    protected async Task Signout()
     {
-        Authentication.Signout();
-        SocketService.Disconnect();
-        return Task.CompletedTask;
+        await Authentication.Signout();
+        await SocketService.Disconnect();
     }
 }

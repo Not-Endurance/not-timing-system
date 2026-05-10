@@ -58,6 +58,7 @@ internal class ClientSideAccountClaimsPrincipalFactory : AccountClaimsPrincipalF
         }
 
         _logger.LogWarning("Client authentication failed during local user resolution. Reason: {reason}", result.Error);
+        await _clientAuthenticationSessionService.Clear();
         _navigator.NavigateTo(result.ServerRedirect ?? AuthenticationContents.AUTHENTICATION, forceLoad: false);
         return new ClaimsPrincipal(new ClaimsIdentity());
     }
