@@ -43,7 +43,6 @@ jobs:
         dotnet build ${{ env.SOURCE_PATH }} \
         --configuration ${{ env.CONFIGURATION }} \
         --no-restore
-
     - name: Publish
       run: |
         dotnet publish ${{ env.SOURCE_PATH }} \
