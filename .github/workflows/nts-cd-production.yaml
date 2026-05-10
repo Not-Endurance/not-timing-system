@@ -19,7 +19,7 @@ env:
   OUTPUT_LOCATION: wwwroot
   SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
   ARTIFACT_PATH: NTS.Nexus.Warp/publish
-  AZURE_RESOURCE: ${{ vars.AZURE_NTS_NEXUS_WARP_PRODUCTION_APP_NAME }}
+  AZURE_RESOURCE: nts-nexus-warp-prod
 
 jobs:
   nexus-warp-build:
