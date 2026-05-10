@@ -1,4 +1,6 @@
 name: CR
+run-name: CR [${{ github.ref_name }}]
+
 on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
@@ -16,7 +18,7 @@ jobs:
   pr-checks-csharpier:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
-    name: Csharpier
+    name: Csharpier format
     steps:
       - name: Print pull_request event
         run: |
@@ -62,7 +64,7 @@ jobs:
   pr-checks-build:
     runs-on: ubuntu-latest
     needs: pr-checks-csharpier
-    name: Build solution
+    name: Dotnet build
     steps:
     - uses: actions/checkout@v4
     
@@ -70,7 +72,8 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-
+   
+    # Remove when dropping MAUI
     - name: Create solution without MAUI projects
       shell: bash
       run: |
