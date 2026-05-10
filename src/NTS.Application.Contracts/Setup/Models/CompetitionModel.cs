@@ -1,0 +1,60 @@
+﻿using Not.Krud.Abstractions;
+using NTS.Application.Contracts.Shared;
+using NTS.Application.Contracts.Shared.Models;
+using NTS.Domain.Enums;
+using NTS.Domain.Setup.Aggregates;
+using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+
+namespace NTS.Application.Contracts.Setup.Models;
+
+public class CompetitionModel
+{
+    public static CompetitionModel MapFrom(Competition competition)
+    {
+        return new CompetitionModel
+        {
+            Id = competition.Id,
+            Name = competition.Name,
+            Type = competition.Type,
+            Ruleset = competition.Ruleset,
+            Start = competition.Start,
+            CompulsoryThreshold = competition.CompulsoryThresholdSpan,
+            FeiId = competition.FeiId,
+            FeiRule = competition.FeiRule,
+            FeiScheduleNumber = competition.FeiScheduleNumber,
+            Phases = competition.Phases.Select(PhaseModel.Create).ToArray(),
+            Participations = competition.Participations.Select(ParticipationModel.MapFrom).ToArray(),
+        };
+    }
+
+    public int Id { get; init; }
+    public string Name { get; init; } = default!;
+    public CompetitionType Type { get; init; }
+    public CompetitionRuleset Ruleset { get; init; }
+    public DateTimeOffset? Start { get; init; }
+    public TimeSpan? CompulsoryThreshold { get; init; }
+    public string? FeiId { get; init; }
+    public string? FeiRule { get; init; }
+    public string? FeiScheduleNumber { get; init; }
+    public PhaseModel[] Phases { get; init; } = default!;
+    public ParticipationModel[] Participations { get; init; } = default!;
+
+    public Competition MapToEntity()
+    {
+        var phases = Phases.Select(x => x.MapToEntity());
+        var participations = Participations.Select(x => x.MapToEntity());
+        return new Competition(
+            Name,
+            Type,
+            Ruleset,
+            Start,
+            CompulsoryThreshold,
+            FeiId,
+            FeiRule,
+            FeiScheduleNumber,
+            phases,
+            participations,
+            Id
+        );
+    }
+}

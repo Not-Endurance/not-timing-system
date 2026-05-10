@@ -4,6 +4,6 @@ namespace Not.Application.CRUD.Ports;
 
 public interface IDeleteMany<T>
 {
-    Task Delete(IEnumerable<T> items);
-    Task Delete(Expression<Func<T, bool>> filter);
+    Task DeleteMany(IEnumerable<T> items);
+    Task DeleteMany(Expression<Func<T, bool>> filter);
 }

@@ -1,0 +1,132 @@
+name: CD
+run-name: Deploy NTS production from ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - master
+
+env:
+  CONFIGURATION: Release
+  DOTNET_CORE_VERSION: 8.0.x
+  APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
+  API_LOCATION: src/Apps/Nexus/NTS.Nexus.HTTP
+  OUTPUT_LOCATION: wwwroot
+  SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
+  ARTIFACT_PATH: NTS.Nexus.Warp/publish
+  AZURE_RESOURCE: nts-nexus-warp-prod
+
+jobs:
+  nexus-warp-build:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    name: Production - Warp Build
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}  # adjust if needed
+
+    - name: Restore
+      run: dotnet restore "${{ env.SOURCE_PATH }}"
+
+    - name: Build
+      run: |
+        dotnet build ${{ env.SOURCE_PATH }} \
+        --configuration ${{ env.CONFIGURATION }} \
+        --no-restore
+    - name: Publish
+      run: |
+        dotnet publish ${{ env.SOURCE_PATH }} \
+        --configuration ${{ env.CONFIGURATION }} \
+        --no-build \
+        --output ${{ env.ARTIFACT_PATH }}
+
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.AZURE_RESOURCE }}
+        path: ${{ env.ARTIFACT_PATH }}
+        include-hidden-files: true
+
+  nexus-warp-deploy:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    name: Production - Warp
+    needs: nexus-warp-build
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.AZURE_RESOURCE }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_RESOURCE }}
+          publish-profile: ${{ secrets.AZURE_NTS_NEXUS_WARP_PRODUCTION_PUBLISH_PROFILE }}
+          package: ${{ env.ARTIFACT_PATH }}
+
+  witness-build-and-deploy:
+    needs: nexus-warp-deploy
+    if: >-
+      ${{
+        always() &&
+        (
+          github.event_name == 'workflow_dispatch' ||
+          github.event_name == 'push' ||
+          (github.event_name == 'pull_request' && github.event.action != 'closed')
+        ) &&
+        (
+          github.event_name == 'pull_request' ||
+          needs.nexus-warp-deploy.result == 'success'
+        )
+      }}
+    runs-on: ubuntu-latest
+    name: Production - Client
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          lfs: false
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          action: "upload"
+          production_branch: master
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_ISLAND_0DC61C703 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          app_location: ${{ env.APP_LOCATION }}
+          api_location: ${{ env.API_LOCATION }}
+          output_location: ${{ env.OUTPUT_LOCATION }}
+
+  witness-close-pull-request:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Witness - Close Production Pull Request
+    steps:
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          action: "close"
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_ISLAND_0DC61C703 }}
+          app_location: ${{ env.APP_LOCATION }}
+          api_location: ${{ env.API_LOCATION }}
+          output_location: ${{ env.OUTPUT_LOCATION }}

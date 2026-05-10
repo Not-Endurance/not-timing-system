@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Not.Application.Authentication.Provider;
 using Not.Application.RPC.SignalR;
+using Not.Blazor.Client.Authentication;
 using Not.Injection;
 using Not.Notify;
 
@@ -15,13 +17,15 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
     readonly NavigationManager _navigationManager;
     readonly IWitnessAuthenticationRedirector _authenticationRedirector;
     readonly INotifier _notifier;
+    readonly ILogger<NtsClientRpcAccessTokenProvider> _logger;
 
     public NtsClientRpcAccessTokenProvider(
         IAccessTokenProvider accessTokenProvider,
         IOptions<NClientAuthenticationSettings> clientAuthenticationOptions,
         NavigationManager navigationManager,
         IWitnessAuthenticationRedirector authenticationRedirector,
-        INotifier notifier
+        INotifier notifier,
+        ILogger<NtsClientRpcAccessTokenProvider> logger
     )
     {
         _accessTokenProvider = accessTokenProvider;
@@ -29,6 +33,7 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
         _navigationManager = navigationManager;
         _authenticationRedirector = authenticationRedirector;
         _notifier = notifier;
+        _logger = logger;
     }
 
     public async Task<string?> Get()
@@ -39,7 +44,11 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
             return null;
         }
 
-        var requestOptions = new AccessTokenRequestOptions { Scopes = [scope], ReturnUrl = _navigationManager.Uri };
+        var requestOptions = new AccessTokenRequestOptions
+        {
+            Scopes = [scope],
+            ReturnUrl = GetSafeReturnUrl(_navigationManager.Uri),
+        };
         try
         {
             var tokenResult = await _accessTokenProvider.RequestAccessToken(requestOptions);
@@ -81,25 +90,62 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
         return new InteractiveRequestOptions
         {
             Interaction = InteractionType.GetToken,
-            ReturnUrl = returnUrl,
+            ReturnUrl = GetSafeReturnUrl(returnUrl),
             Scopes = [scope],
         };
     }
 
     void RedirectToAuthentication(AccessTokenResult tokenResult, Exception? exception = null)
     {
+        if (IsOnAuthenticationRoute())
+        {
+            _logger.LogWarning(
+                exception,
+                "Skipping witness auth redirect because the app is already on an authentication route. Status: {Status}",
+                tokenResult.Status
+            );
+            throw new OperationCanceledException(
+                "Witness authentication redirect suppressed on auth route.",
+                exception
+            );
+        }
+
         _authenticationRedirector.RedirectToSignIn(tokenResult);
         throw new OperationCanceledException("Witness authentication redirect started.", exception);
     }
 
     void RedirectToAuthentication(AccessTokenNotAvailableException exception)
     {
+        if (IsOnAuthenticationRoute())
+        {
+            _logger.LogWarning(
+                exception,
+                "Skipping witness auth redirect because the app is already on an authentication route."
+            );
+            throw new OperationCanceledException(
+                "Witness authentication redirect suppressed on auth route.",
+                exception
+            );
+        }
+
         _authenticationRedirector.RedirectToSignIn(exception);
         throw new OperationCanceledException("Witness authentication redirect started.", exception);
     }
 
     void RedirectToAuthentication(InteractiveRequestOptions requestOptions, Exception? exception = null)
     {
+        if (IsOnAuthenticationRoute())
+        {
+            _logger.LogWarning(
+                exception,
+                "Skipping witness auth redirect because the app is already on an authentication route."
+            );
+            throw new OperationCanceledException(
+                "Witness authentication redirect suppressed on auth route.",
+                exception
+            );
+        }
+
         _authenticationRedirector.RedirectToSignIn(requestOptions);
         throw new OperationCanceledException("Witness authentication redirect started.", exception);
     }
@@ -135,5 +181,26 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
         }
 
         return exception.InnerException != null && IsInteractiveAuthenticationRequired(exception.InnerException);
+    }
+
+    bool IsOnAuthenticationRoute()
+    {
+        return IsAuthenticationRoute(_navigationManager.Uri);
+    }
+
+    static string GetSafeReturnUrl(string currentUri)
+    {
+        return IsAuthenticationRoute(currentUri) ? "/" : currentUri;
+    }
+
+    static bool IsAuthenticationRoute(string uri)
+    {
+        if (!Uri.TryCreate(uri, UriKind.Absolute, out var absoluteUri))
+        {
+            return false;
+        }
+
+        var path = absoluteUri.AbsolutePath.Trim('/');
+        return path.StartsWith(AuthenticationContents.AUTHENTICATION, StringComparison.OrdinalIgnoreCase);
     }
 }

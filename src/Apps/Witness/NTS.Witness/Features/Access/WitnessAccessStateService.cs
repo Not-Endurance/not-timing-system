@@ -1,10 +1,11 @@
 using MediatR;
 using Not.Application.Authentication.Abstractions;
 using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
 using Not.Injection;
-using NTS.Application.Socket;
-using NTS.Application.Watcher;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Socket;
+using NTS.Application.Contracts.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 
@@ -19,12 +20,12 @@ public class WitnessAccessContext
 {
     readonly INtsSocketContext _socketContext;
     readonly INUserSession _userSessionService;
-    readonly IReadMany<Official> _officialReader;
+    readonly IEventScopedRepository<Official> _officialReader;
 
     public WitnessAccessContext(
         INtsSocketContext socketContext,
         INUserSession userSessionService,
-        IReadMany<Official> officialReader
+        IEventScopedRepository<Official> officialReader
     )
     {
         _socketContext = socketContext;

@@ -10,7 +10,7 @@
         <NTable Items="@Events" EmptyMessage="@Empty_event_list_message" Headings="@EventsTableHeaders">
             <TrailingCell Context="item">
                 @{
-                    var context = (EnduranceEvent)item;
+                    var context = (EventInformation)item;
                 }
 
                 @if (IsConnected && SelectedEvent?.Id == context.Id)

@@ -3,7 +3,7 @@ using Not.Application.DomainEvents;
 using Not.Application.RPC;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
@@ -30,7 +30,7 @@ public class WitnessSocketService : NStatefulService, INtsSocketService, IScoped
 
     public SocketConnectionStatus Status { get; private set; }
     public bool IsConnected => _socket.IsConnected;
-    public EnduranceEvent? Event { get; private set; }
+    public EventInformation? Event { get; private set; }
 
     protected override Task<bool> InitializeState()
     {
@@ -43,16 +43,10 @@ public class WitnessSocketService : NStatefulService, INtsSocketService, IScoped
         _socket.ServerConnectionChanged -= HandleServerConnectionChanged;
     }
 
-    public async Task<bool> WillResetSession(EnduranceEvent enduranceEvent)
+    public async Task<bool> WillResetSession(EventInformation eventInformation)
     {
-        var session = await _userSessionService.GetCurrent();
-        var eventId = session?.EventId;
-        if (eventId == null)
-        {
-            return false;
-        }
-
-        return eventId.Value != enduranceEvent.Id;
+        await Task.CompletedTask;
+        return false;
     }
 
     public async Task Disconnect()
@@ -69,24 +63,24 @@ public class WitnessSocketService : NStatefulService, INtsSocketService, IScoped
         await _domainEventDispatcher.Dispatch(new EventDisconnected(@event?.Id));
     }
 
-    public async Task Connect(EnduranceEvent upcomingEvent)
+    public async Task Connect(EventInformation configureEvent)
     {
-        if (Event?.Id != upcomingEvent.Id && _socket.IsConnected)
+        if (Event?.Id != configureEvent.Id && _socket.IsConnected)
         {
             await _socket.Disconnect();
             Event = null;
         }
 
-        await _socket.Connect(upcomingEvent.Id.ToString());
+        await _socket.Connect(configureEvent.Id.ToString());
         if (!_socket.IsConnected)
         {
             return;
         }
 
-        Event = upcomingEvent;
+        Event = configureEvent;
         EmitChanged();
-        await _userSessionService.SetEventId(upcomingEvent.Id);
-        await _domainEventDispatcher.Dispatch(new EventConnected(upcomingEvent.Id));
+        await _userSessionService.SetEventId(configureEvent.Id);
+        await _domainEventDispatcher.Dispatch(new EventConnected(configureEvent.Id));
     }
 
     void HandleServerConnectionChanged(object? sender, SocketConnectionStatus status)

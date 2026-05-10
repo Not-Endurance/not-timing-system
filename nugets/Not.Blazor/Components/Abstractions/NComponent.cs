@@ -1,7 +1,7 @@
+using MudBlazor;
 using Not.Async;
 using Not.Notify;
 using Not.Safe;
-using Not.Strings;
 
 namespace Not.Blazor.Components.Abstractions;
 
@@ -28,6 +28,9 @@ public class NComponent : NComponentBase
 
     [Inject]
     INotifier Notifier { get; set; } = default!;
+
+    [Inject]
+    protected IBrowserViewportService ViewportService { get; set; } = default!;
 
     protected Task InvokeRender()
     {

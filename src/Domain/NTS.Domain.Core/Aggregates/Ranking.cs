@@ -2,7 +2,7 @@
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Ranking : Aggregate
+public class Ranking : Aggregate, IEventScoped
 {
     public Ranking(
         string? name,

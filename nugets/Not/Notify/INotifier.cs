@@ -7,6 +7,7 @@ public interface INotifier
     void Inform(string message);
     void Success(string message);
     void Warn(string message);
+    void Warn(IEnumerable<string> messages);
     void Error(string message);
     void Error(Exception ex);
 }

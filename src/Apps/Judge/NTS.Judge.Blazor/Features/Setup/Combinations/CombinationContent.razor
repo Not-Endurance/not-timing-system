@@ -1,4 +1,4 @@
-﻿@using NTS.Judge.Features.Setup.UpcomingEvents.Combinations
+﻿@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations
 @using Not.Blazor.Components.Layout
 
 @attribute [Route(COMBINATION_UPDATE)]
@@ -7,7 +7,7 @@
 <NContent Title="@Configure_Combination_string" IsEmpty="Model == null">
 
     <Main>
-        <CombinationShell Model="Model" />
+        <CombinationShell Model="Model" ReadOnly="@ReadOnly" />
     </Main>
 
 </NContent>

@@ -1,7 +1,7 @@
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Structures;
 using NTS.Domain.Setup.Services.StartValidation;
-using NTS.Judge.Features.Setup.UpcomingEvents;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents;
 
 namespace NTS.Judge.Blazor.Features.Setup.StartValidation;
 
@@ -10,7 +10,7 @@ public class StartValidationDialogBehind : NDialog<bool>
     readonly Dictionary<int, int> _selectedCompetitionByParticipation = [];
 
     [Inject]
-    IUpcomingEventService UpcomingEventService { get; set; } = default!;
+    IConfigureEventService ConfigureEventService { get; set; } = default!;
 
     protected Result<IReadOnlyList<StartValidationIssue>> Validation { get; set; } =
         Result.Success<IReadOnlyList<StartValidationIssue>>([]);
@@ -18,14 +18,19 @@ public class StartValidationDialogBehind : NDialog<bool>
     protected IReadOnlyList<StartValidationIssue> Issues => Validation.Data ?? [];
     protected bool HasIssues => Issues.Any();
     protected bool CanApplyCorrections =>
-        HasIssues && Issues.All(issue => _selectedCompetitionByParticipation.ContainsKey(issue.ParticipationNumber));
+        HasIssues
+        && Issues.All(issue => issue.IsAutoCorrectable)
+        && Issues.All(issue =>
+            issue.ParticipationNumber.HasValue
+            && _selectedCompetitionByParticipation.ContainsKey(issue.ParticipationNumber.Value)
+        );
 
     [Parameter]
     public Result<IReadOnlyList<StartValidationIssue>> InitialValidation { get; set; } =
         Result.Success<IReadOnlyList<StartValidationIssue>>([]);
 
     [Parameter]
-    public int UpcomingEventId { get; set; }
+    public int ConfigureEventId { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -63,18 +68,24 @@ public class StartValidationDialogBehind : NDialog<bool>
         {
             foreach (var issue in Issues)
             {
-                var selectedCompetitionId = _selectedCompetitionByParticipation[issue.ParticipationNumber];
+                if (!issue.ParticipationNumber.HasValue)
+                {
+                    continue;
+                }
+
+                var participationNumber = issue.ParticipationNumber.Value;
+                var selectedCompetitionId = _selectedCompetitionByParticipation[participationNumber];
                 foreach (var competition in issue.Competitions.Where(x => x.CompetitionId != selectedCompetitionId))
                 {
-                    await UpcomingEventService.DeleteParticipation(
-                        UpcomingEventId,
-                        issue.ParticipationNumber,
+                    await ConfigureEventService.DeleteParticipation(
+                        ConfigureEventId,
+                        participationNumber,
                         competition.CompetitionId
                     );
                 }
             }
 
-            Validation = await UpcomingEventService.Validate(UpcomingEventId);
+            Validation = await ConfigureEventService.Validate(ConfigureEventId);
             if (HasIssues)
             {
                 SyncSelectionsWithCurrentIssues();
@@ -90,7 +101,10 @@ public class StartValidationDialogBehind : NDialog<bool>
 
     void SyncSelectionsWithCurrentIssues()
     {
-        var activeParticipations = Issues.Select(x => x.ParticipationNumber).ToHashSet();
+        var activeParticipations = Issues
+            .Where(x => x.ParticipationNumber.HasValue)
+            .Select(x => x.ParticipationNumber!.Value)
+            .ToHashSet();
         var staleSelections = _selectedCompetitionByParticipation
             .Keys.Where(participationNumber => !activeParticipations.Contains(participationNumber))
             .ToList();

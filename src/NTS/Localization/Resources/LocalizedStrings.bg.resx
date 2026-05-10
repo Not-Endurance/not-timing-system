@@ -189,8 +189,8 @@
   <data name="Dashboard_string" xml:space="preserve">
     <value>Табло</value>
   </data>
-  <data name="Endurance_Event_string" xml:space="preserve">
-    <value>Състезание по издръжливост</value>
+  <data name="Event_Information_string" xml:space="preserve">
+    <value>Информация за събитие</value>
   </data>
   <data name="Athletes_and_Horses_string" xml:space="preserve">
     <value>Състезатели и коне</value>
@@ -209,9 +209,6 @@
   </data>
   <data name="Handouts_string" xml:space="preserve">
     <value>Разпечатки</value>
-  </data>
-  <data name="Inquiry_string" xml:space="preserve">
-    <value>Справки</value>
   </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Причина за отпадане</value>
@@ -297,6 +294,9 @@
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Номер на комбинация</value>
   </data>
+  <data name="Location_string" xml:space="preserve">
+    <value>Локация</value>
+  </data>
   <data name="Place_string" xml:space="preserve">
     <value>Място</value>
   </data>
@@ -321,8 +321,8 @@
   <data name="Start_string" xml:space="preserve">
     <value>старт</value>
   </data>
-  <data name="Configure_Endurance_Event_string" xml:space="preserve">
-    <value>Конфигурирай Събитие</value>
+  <data name="Configure_Event_string" xml:space="preserve">
+    <value>Конфигурирай събитие</value>
   </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Конфигурирай Състезание</value>
@@ -372,9 +372,6 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>Откажи</value>
   </data>
-  <data name="Archive_string" xml:space="preserve">
-    <value>Архивирай</value>
-  </data>
   <data name="History_string" xml:space="preserve">
     <value>История</value>
   </data>
@@ -423,8 +420,8 @@
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Моля изберете време в бъдещето</value>
   </data>
-  <data name="Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection" xml:space="preserve">
-    <value>Не може да бъде установена връзка към Нексус сървъра. Някои функции ще бъдат ограничени. Моля проверете интернет връзката си</value>
+  <data name="Cannot_connect_to_server_string" xml:space="preserve">
+    <value>Няма връзка със сървъра</value>
   </data>
   <data name="Athletes_string" xml:space="preserve">
     <value>Атлети</value>
@@ -516,9 +513,6 @@
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Форматът е невалиден 'час:минута:секунда'</value>
   </data>
-  <data name="No_results_found_in_archive_string" xml:space="preserve">
-    <value>Няма резултати в архива</value>
-  </data>
   <data name="required_for_FEI_export" xml:space="preserve">
     <value>*задължително само за ФЕИ експорт</value>
   </data>
@@ -540,8 +534,8 @@
   <data name="Invalid_phase_configuration_in_competition__missing_rest" xml:space="preserve">
     <value>Невалидно състезание '{0}' поради липсващо Време за почивка на не-финална фаза</value>
   </data>
-  <data name="Upcoming_events_string" xml:space="preserve">
-    <value>Предстоящи събития</value>
+  <data name="Configure_events_string" xml:space="preserve">
+    <value>Конфигурирай събития</value>
   </data>
   <data name="Select_event_string" xml:space="preserve">
     <value>Изберете събитие</value>
@@ -588,8 +582,20 @@
   <data name="Reset_string" xml:space="preserve">
     <value>Ресетни</value>
   </data>
-  <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
-    <value>Сигурни ли сте че искате да ресетнете състезанията? Това ще ИЗТРИЕ ВСИЧКИ ЗАПИСАНИ ВРЕМЕНА НА ФАЗИ и няма да можете да ги въстановите. </value>
+  <data name="Confirm_string" xml:space="preserve">
+    <value>Потвърди</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string" xml:space="preserve">
+    <value>Сигурни ли сте, че искате да ресетнете активен евент? Това ще изтрие текущите Снапшоти, Времена, Протоколи и Хендаути.</value>
+  </data>
+  <data name="This_action_is_final_There_is_no_recovery_string" xml:space="preserve">
+    <value>ТОВА ДЕЙСТВИЕ Е ОКОНЧАТЕЛНО. НЯМА ВЪЗСТАНОВЯВАНЕ.</value>
+  </data>
+  <data name="Type_1337_to_enable_confirmation_string" xml:space="preserve">
+    <value>Въведете 1337, за да активирате потвърждението.</value>
+  </data>
+  <data name="Confirmation_code_string" xml:space="preserve">
+    <value>Код за потвърждение</value>
   </data>
   <data name="Hard_reset_string" xml:space="preserve">
     <value>Хард ресет</value>
@@ -600,11 +606,20 @@
   <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
     <value>Конфигурацията на събитието няма да бъде изтрита</value>
   </data>
+  <data name="Deactivate_Event_string" xml:space="preserve">
+    <value>Деактивирай събитието</value>
+  </data>
+  <data name="Deactivate_event_instructions_string" xml:space="preserve">
+    <value>Това ще маркира текущото събитие като неактивно и ще разкачи таблото. Данните за събитието няма да бъдат изтрити и ще останат налични в минали събития.</value>
+  </data>
+  <data name="Type_1338_to_enable_confirmation_string" xml:space="preserve">
+    <value>Въведете 1338, за да активирате потвърждението.</value>
+  </data>
   <data name="Disconnect_from_current_Event" xml:space="preserve">
     <value>Разкачи се от текущото Събитие</value>
   </data>
   <data name="Reset_Timing_this_will_DELETE_Timing_data" xml:space="preserve">
-    <value>Ресетни времената - това ще ИЗТРИЕ всички времена</value>
+    <value>Ресетни времената - това ще ИЗТРИЕ текущите данни за събитието</value>
   </data>
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
@@ -762,20 +777,17 @@
   <data name="Connect_string" xml:space="preserve">
     <value>Свържи се</value>
   </data>
-  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
-    <value>Свързването към '{0}' ще премахне текущата ви история на снимките. Това действие не може да бъде отменено.</value>
-  </data>
   <data name="Disconnect_string" xml:space="preserve">
     <value>Прекъсни връзката</value>
   </data>
   <data name="Empty_event_list_message" xml:space="preserve">
-    <value>Все още не са конфигурирани състезания по издръжливост</value>
+    <value>Все още не са конфигурирани събития</value>
   </data>
   <data name="Select_athlete_string" xml:space="preserve">
     <value>Изберете състезател</value>
   </data>
   <data name="Empty_performance_competitor_message" xml:space="preserve">
-    <value>Вашият акаунт не е конфигуриран като участник в настоящото състезание по издръжливост. Ако участвате, моля, свържете се с Администратор</value>
+    <value>Вашият акаунт не е конфигуриран като участник в настоящото събитие. Ако участвате, моля, свържете се с Администратор</value>
   </data>
   <data name="Empty_performance_official_message" xml:space="preserve">
     <value>Изберете участник отгоре, за да видите неговите резултати</value>
@@ -831,9 +843,6 @@
   <data name="Start_In_string" xml:space="preserve">
     <value>Старт след</value>
   </data>
-  <data name="ID_of_archive_to_load_string" xml:space="preserve">
-    <value>ID на архив за зареждане</value>
-  </data>
   <data name="Load_string" xml:space="preserve">
     <value>Зареди</value>
   </data>
@@ -885,9 +894,6 @@
   <data name="Snapshots_sent_as__string" xml:space="preserve">
     <value>Снимките са изпратени като {0}</value>
   </data>
-  <data name="Provide_Archive_ID_string" xml:space="preserve">
-    <value>Въведете ID на архива</value>
-  </data>
   <data name="Please_select_the_combination_string" xml:space="preserve">
     <value>Моля, изберете комбинация</value>
   </data>
@@ -912,8 +918,8 @@
   <data name="File_not_found_string" xml:space="preserve">
     <value>Файлът не е намерен.</value>
   </data>
-  <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
-    <value>Предстоящите събития не могат да бъдат изтрити</value>
+  <data name="Configure_events_cannot_be_deleted_string" xml:space="preserve">
+    <value>Конфигурираните събития не могат да бъдат изтрити</value>
   </data>
   <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
     <value>Не може да се стартира - невалидна конфигурация.</value>
@@ -922,7 +928,7 @@
     <value>Невалидна конфигурация</value>
   </data>
   <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
-    <value>Участник може да бъде добавен в няколко състезания само ако конфигурацията на фазите е идентична.</value>
+    <value>Коригирайте проблемите в конфигурацията по-долу, преди да стартирате събитието.</value>
   </data>
   <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
     <value>#{0}: конфигурацията на фазите се различава между състезанията:</value>
@@ -950,6 +956,12 @@
   </data>
   <data name="Register_string" xml:space="preserve">
     <value>Регистрация</value>
+  </data>
+  <data name="Validation_errors_string" xml:space="preserve">
+    <value>Валидационни грешки</value>
+  </data>
+  <data name="Past_events_string" xml:space="preserve">
+    <value>Минали събития</value>
   </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>

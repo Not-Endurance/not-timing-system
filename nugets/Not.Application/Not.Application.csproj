@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="NTS.Judge.Tests" />
+    <InternalsVisibleTo Include="NTS.Tests.Unit" />
     <InternalsVisibleTo Include="Not.Tests" />
   </ItemGroup>
 

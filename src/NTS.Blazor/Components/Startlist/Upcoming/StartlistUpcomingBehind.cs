@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
-using NTS.Application.Startlists;
+using NTS.Application.Contracts.Startlists;
 using NTS.Domain.Core.Objects.Startlists;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;
@@ -36,6 +36,11 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
     protected string FormatLoop(Starter entry)
     {
         return $"{entry.Distance:0.##}{km_string}";
+    }
+
+    protected string GetTimerKey(Starter entry)
+    {
+        return $"{entry.PhaseNumber}:{entry.Number}:{entry.Start}";
     }
 
     public override void Dispose()

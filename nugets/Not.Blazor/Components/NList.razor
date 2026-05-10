@@ -17,7 +17,7 @@
     }
 </MudStack>
 
-<MudContainer Class="not-page-mid-width">
+<MudContainer Class="n-content-mid-width">
     @if (IsLoading)
     {
         <NSkeleton />
@@ -35,7 +35,11 @@
 
                 <MudSpacer />
 
-                @if (UpdateSafe != null)
+                @if (ViewSafe != null && (CanView?.Invoke(item) ?? true))
+                {
+                    <NIconView OnClick="() => OnView(item)" />
+                }
+                @if (UpdateSafe != null && (CanUpdate?.Invoke(item) ?? true))
                 {
                     <NIconUpdate OnClick="() => OnUpdate(item)" />
                 }

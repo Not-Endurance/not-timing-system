@@ -8,6 +8,7 @@ using Not.Application.Authentication.Provider;
 using Not.Application.Authentication.User;
 using Not.Application.Configurations;
 using Not.Blazor.Client.Authentication.Services;
+using Not.BLazor.Client.Browser;
 
 namespace Not.Blazor.Client.Authentication;
 
@@ -22,7 +23,11 @@ public static class AuthenticationExtensions
             .AddMsalAuthentication(options => Configure(options, configuration))
             .AddAccountClaimsPrincipalFactory<ClientSideAccountClaimsPrincipalFactory>();
 
-        return services.AddScoped<NUserResolver>().AddSettings<NClientAuthenticationSettings>(configuration);
+        return services
+            .AddScoped<NUserResolver>()
+            .AddScoped<INPendingUserRegistrationProfileStore, PendingUserRegistrationProfileStore>()
+            .AddTransient<IBrowserLocalStorage, BrowserLocalStorage>()
+            .AddSettings<NClientAuthenticationSettings>(configuration);
     }
 
     static void Configure(RemoteAuthenticationOptions<MsalProviderOptions> options, IConfiguration configuration)
@@ -32,6 +37,9 @@ public static class AuthenticationExtensions
         options.ProviderOptions.Authentication.ClientId = settings.ClientId;
         options.ProviderOptions.Authentication.RedirectUri = RemoteAuthenticationDefaults.LoginCallbackPath;
         options.ProviderOptions.Authentication.PostLogoutRedirectUri = RemoteAuthenticationDefaults.LogoutCallbackPath;
+        options.ProviderOptions.LoginMode = "redirect";
+        options.ProviderOptions.Cache.CacheLocation = "localStorage";
+        options.ProviderOptions.Cache.StoreAuthStateInCookie = true;
 
         // User roles are injected from local user resolution, not from incoming provider role claims.
         options.UserOptions.RoleClaim = ClaimTypes.Role;

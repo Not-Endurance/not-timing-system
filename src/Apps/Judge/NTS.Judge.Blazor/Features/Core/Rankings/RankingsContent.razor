@@ -1,6 +1,5 @@
-﻿@using NTS.Judge.Blazor.Features.Core.Rankings.Menu
-@using NTS.Judge.Blazor.Features.Core.Rankings.Protocols
-@using NTS.Judge.Blazor.Features.Core.Rankings.Ranklists
+﻿@using NTS.Blazor.Components.Rankings.Menu
+@using NTS.Blazor.Components.Rankings.Protocols
 @using Not.Blazor.Components.Layout
 
 @attribute [Route(RANKLIST_PAGE)]
@@ -9,50 +8,41 @@
 <NContent Title="@Ranklist_string" IsLoading="@IsLoading" Class="@Class">
 
     <Main>
-        @if (IsProtocolVisible)
-        {
-           <Protocol />
-        }
-        else
-        {
-            <RanklistTable />
-        }
+        <Protocol Document="Document"
+                  Compact="CompactParticipationTables"
+                  LeftLogo="@HeaderLogo.Left"
+                  RightLogo="@HeaderLogo.Right"
+                  LogoClicked="OpenImageBrowser" />
     </Main>
 
     <Rightbar>
         <MudStack Row Wrap="Wrap.Wrap">
-            <MudButtonGroup OverrideStyles="false" Variant="Variant.Outlined" Class="align-center">
-                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
-                         Color="Color.Primary"
-                         Variant="Variant.Outlined"
-                         Class="sidebar-menu-button align-center">
-
-                    <MudMenuItem OnClick="ShowProtocol">@Protocol_string</MudMenuItem>
-
-                    <MudMenuItem OnClick="ShowRanklist">@Ranklist_string</MudMenuItem>
-                </MudMenu>
-
-                <NotButtonPrint OnClick="OpenPrintDialog" />
-            </MudButtonGroup>
+            <NotButtonPrint OnClick="Print" />
             
-            <NButtonPrimary OnClick="ArchiveEnduranceEvent" Text="@Archive_string" StartIcon="@Icons.Material.Filled.Archive"/>
-
             @if (IsFeiExportConfigured)
             {
                 <NButtonPrimary OnClick="GenerateFeiExport" Text="@Export_FEI_string" StartIcon="@Icons.Material.Filled.ImportExport"/>
             }
 
             <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
+
+            @if (HasActiveEvent)
+            {
+                <NButtonWarning
+                    Text="@Deactivate_Event_string"
+                    OnClick="OpenDeactivateEventDialog"
+                    StartIcon="@Icons.Material.Filled.EventBusy" />
+            }
         </MudStack>
 
-        <RankingMenu Class="mt-4"/>
+        @if (!IsDeactivatingEvent)
+        {
+            <RankingMenu Rankings="RankingService.Rankings"
+                         Selected="RankingService.Current"
+                         OnSelectedSafe="SelectRanking"
+                         OnDeleteSafe="OpenDeleteDialog"
+                         Class="mt-4" />
+        }
     </Rightbar>
 
 </NContent>
-
-<style>
-    .sidebar-menu-button > button.mud-button-root {
-        padding-top: 6px !important;
-        padding-bottom: 5px !important;
-    }
-</style>

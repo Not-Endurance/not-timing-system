@@ -22,6 +22,9 @@ public abstract class KrudShell<TModel> : NComponent
     public TModel Model { get; set; } = new();
 
     [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
     public RenderFragment? AdditionalContent { get; set; }
 
     [Parameter]
@@ -43,6 +46,11 @@ public abstract class KrudShell<TModel> : NComponent
 
     internal async Task Create()
     {
+        if (ReadOnly)
+        {
+            return;
+        }
+
         await Service.Create(Model);
         if (OnSubmit != null)
         {
@@ -52,6 +60,11 @@ public abstract class KrudShell<TModel> : NComponent
 
     internal async Task Update()
     {
+        if (ReadOnly)
+        {
+            return;
+        }
+
         await Service.Update(Model);
         if (OnSubmit != null)
         {

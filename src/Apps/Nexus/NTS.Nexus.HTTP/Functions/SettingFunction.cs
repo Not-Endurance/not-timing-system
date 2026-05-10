@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using NTS.Application.Shared;
+using NTS.Application.Contracts.Shared;
+using NTS.Application.Contracts.Shared.Models;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -33,13 +34,8 @@ public class SettingFunction : FunctionBase
         LogInformation(request, nameof(Insert));
 
         var document = await ReadBody<SettingModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<SettingModel>();
-        }
-
         await _settings.Create(document);
-        return new OkObjectResult($"Inserted settings for account '{document.AccountId}'");
+        return Ok();
     }
 
     [Function("settings-update")]
@@ -52,13 +48,8 @@ public class SettingFunction : FunctionBase
         LogInformation(request, nameof(Update));
 
         var document = await ReadBody<SettingModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<SettingModel>();
-        }
-
         await _settings.Update(document);
-        return new OkObjectResult($"Updated settings for account '{document.AccountId}'");
+        return Ok();
     }
 
     [Function("settings-get")]
@@ -71,7 +62,6 @@ public class SettingFunction : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(GetOne));
 
-        var setting = await _settings.Read(x => x.AccountId == accountId);
-        return new OkObjectResult(setting);
+        return Ok(await _settings.Read(x => x.AccountId == accountId));
     }
 }

@@ -1,8 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Not.Exceptions;
 using Not.Filesystem;
-using Not.Injection;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Objects;
 
 namespace NTS.Judge.Features.Core.Rankings.FeiExport;
@@ -26,15 +25,10 @@ public class FeiExportService : IFeiExportService
 
     public async Task Create(Ranklist ranklist)
     {
-        var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
+        var eventInformation = GuardHelper.ThrowIfDefault(_socketContext.Event);
 
-        var contents = _feiExport.CreateXmlContent(ranklist, enduranceEvent);
+        var contents = _feiExport.CreateXmlContent(ranklist, eventInformation);
         var path = $"{_filesystemContext.AppDirectory}/fei-export-{ranklist.Name}.xml";
         await FileHelper.WriteAsync(path, contents);
     }
-}
-
-public interface IFeiExportService : ITransient
-{
-    Task Create(Ranklist ranklist);
 }

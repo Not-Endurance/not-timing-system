@@ -4,8 +4,10 @@ using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
 using Not.Collections;
 using Not.Domain;
+using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Krud.Blazor.Components.Abstractions;
+using Not.Krud.Models;
 
 namespace Not.Krud.Blazor.Components;
 
@@ -30,6 +32,10 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     IKrudListBehind<T> Service { get; set; } = default!;
 
     protected IReadOnlyList<T> Entities => _entities.AsReadOnly();
+    protected Func<Task>? CreateAction => AllowCreate ? CreateSafe : null;
+    protected Func<T, Task>? ViewAction => AllowView ? ViewSafe : null;
+    protected Func<T, Task>? UpdateAction => AllowUpdate ? UpdateSafe : null;
+    protected Func<T, Task>? DeleteAction => AllowDelete ? DeleteSafe : null;
 
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;
@@ -38,10 +44,31 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     public string UpdateRoute { get; set; } = default!;
 
     [Parameter]
+    public Func<T, string>? ViewRouteFactory { get; set; }
+
+    [Parameter]
+    public bool AllowCreate { get; set; }
+
+    [Parameter]
+    public bool AllowView { get; set; }
+
+    [Parameter]
+    public bool AllowUpdate { get; set; }
+
+    [Parameter]
+    public bool AllowDelete { get; set; }
+
+    [Parameter]
     public RenderFragment<T>? CustomAction1 { get; set; }
 
     [Parameter]
     public RenderFragment<T>? CustomAction2 { get; set; }
+
+    [Parameter]
+    public Func<T, bool>? CanUpdate { get; set; }
+
+    [Parameter]
+    public Func<T, bool>? CanView { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -54,7 +81,7 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
         if (UpdateRoute == null)
         {
             var aggregate = (_aggregateType ??= typeof(T)).Name.ToLower();
-            UpdateRoute = $"/{aggregate}-update";
+            UpdateRoute = $"/{aggregate}-krud-update-route";
         }
     }
 
@@ -72,8 +99,22 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     {
         SetKrudNodeValue(entity);
         var model = CreateModel(entity);
-        Navigator.NavigateTo(UpdateRoute, model);
+        Navigator.NavigateTo(UpdateRoute, new KrudFormRouteParameter<TModel>(model, false));
         _entities.Update(entity, NCollectionAction.AddOrUpdate);
+        return Task.CompletedTask;
+    }
+
+    protected Task ViewSafe(T entity)
+    {
+        if (ViewRouteFactory != null)
+        {
+            Navigator.NavigateTo(ViewRouteFactory(entity));
+            return Task.CompletedTask;
+        }
+
+        SetKrudNodeValue(entity);
+        var model = CreateModel(entity);
+        Navigator.NavigateTo(UpdateRoute, new KrudFormRouteParameter<TModel>(model, true));
         return Task.CompletedTask;
     }
 

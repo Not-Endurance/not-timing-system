@@ -1,5 +1,5 @@
 using Not.Blazor.Components.Abstractions;
-using NTS.Witness.Features.Support.EmergencyContacts;
+using NTS.Witness.Contracts.Features.Support.EmergencyContacts;
 
 namespace NTS.Witness.Blazor.Features.Support.EmergencyContacts;
 

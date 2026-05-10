@@ -1,193 +1,93 @@
-﻿@using NTS.Blazor.Components.ParticipationTable.Phases
-@using NTS.Domain.Core.Aggregates.Participations
-@using NTS.Domain.Core.Aggregates.Participations.Entities
-@using Not.Blazor.Components
+@using NTS.Blazor.Components.ParticipationTable.Phases
 @using Not.Blazor.Components.Tables
-@using Not.Blazor.Dialogs
 
 @inherits ParticipationTableBehind
 
-<table class="participation-table rtable @AxisClass">
-    <thead>
-        <tr>
-            <MudButton Variant="Variant.Text" Style="visibility:hidden;">#</MudButton>
-            <th>@Start_Time_string</th>
-            <th>@Arrive_string</th>
-            <th>@Presentation_string</th>
+<div class="participation-table-root">
+    <NTable Class="@CombineClass(TableClass)"
+            Style="@CombineStyle("width:100%;")"
+            Items="@Rows"
+            Headings="@PhaseHeadings"
+            LeadingHeading="@LeadingHeaderText"
+            LeadingCellAsHeader="true"
+            Transform="GetRowValues">
 
-            @if (AnyRepresentation && !AlignVertically)
-            {
-                <th>@Represent_string</th>
-            }
-            @if (AnyRequiredInspection && !AlignVertically)
-            {
-                <th><b>@RI_Time_string</b></th>
-            }
-            @if (AnyCompulsoryRequiredInspection && !AlignVertically)
-            {
-                <th><b>@CRI_Time_string</b></th>
+        <LeadingCell Context="item">
+            @{
+                var row = (ParticipationTableRow)item;
             }
 
-            <th>@Recovery_string</th>
-            <th>@Loop_T_string</th>
-            <th>@Phase_T_string</th>
-            <th>@Loop_S_string</th>
-            <th>@Phase_S_string</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var phase in Phases ?? Enumerable.Empty<Phase>())
-        {
-            <tr>
-                @if (Editable)
-                {
-                    <MudTooltip Text="@Edit_times_string" Inline="false" RootStyle="width:inherit;">
-                        <MudButton Variant="Variant.Text" OnClick="() => ShowUpdate(phase)">@phase.Gate</MudButton>
-                    </MudTooltip>
-                }
-                else
-                {
-                    <MudButton Variant="Variant.Text" Style="pointer-events:none">@phase.Gate</MudButton>
-                }
+            <MudText Typo="Typo.caption">@row.Label</MudText>
+        </LeadingCell>
 
-                <NTd Value="@phase.StartTime" />
-                <NTd Value="@phase.ArriveTime" />
-                <NTd Value="@phase.PresentTime" />
+        <HeadingCell Context="index">
+            @{
+                var phase = DisplayPhases[index];
+            }
 
-                @if (AnyRepresentation && !AlignVertically)
-                {
-                    <NTd Value="@phase.RepresentTime" />
-                }
-                @if (AnyRequiredInspection && !AlignVertically)
-                {
-                    <NTd CellStyle="background-color:whitesmoke" TextStyle="font-weight:bold" Value="@(phase.IsRequiredInspectionRequested ? phase.GetRequiredInspectionTime() : null)" />
-                }
-                @if (AnyCompulsoryRequiredInspection && !AlignVertically)
-                {
-                    <NTd CellStyle="background-color:whitesmoke" TextStyle="font-weight:bold" Value="@(phase.IsRequiredInspectionCompulsory ? phase.GetRequiredInspectionTime() : null)" />
-                }
-
-                <NTd Value="@phase.GetRecoveryInterval()" />
-                <NTd Value="@phase.GetLoopInterval()" />
-                <NTd Value="@phase.GetPhaseInterval()" />
-                <NTd Value="@phase.GetAverageLoopSpeed()" />
-                <NTd Value="@phase.GetAveragePhaseSpeed()" />
-            </tr>
-        }
-    </tbody>
-</table>
+            @if (Editable)
+            {
+                <MudTooltip Text="@Edit_times_string" Inline="false">
+                    <MudButton Variant="Variant.Text" Class="participation-table-phase-button" OnClick="() => ShowUpdate(phase)">
+                        <div class="participation-table-phase-heading">
+                            <MudText Typo="Typo.caption">@phase.Gate</MudText>
+                        </div>
+                    </MudButton>
+                </MudTooltip>
+            }
+            else
+            {
+                <div class="participation-table-phase-heading">
+                    <MudText Typo="Typo.caption">@phase.Gate</MudText>
+                </div>
+            }
+        </HeadingCell>
+    </NTable>
+</div>
 
 <style>
-    /*!
-        // CSS only Responsive Tables
-        // http://dbushell.com/2016/03/04/css-only-responsive-tables/
-        // by David Bushell
-        */
-    .size-xs{
-        font-size:10px;
+    .participation-table-root .participation-table table {
+        width: 100%;
     }
 
-    .size-xs td, size-xs th{
-        font-size: 10px;
-        width: fit-content;
-        padding: 6px 6px !important;
-    }
-
-    .rtable {
-        /*!
-          // IE needs inline-block to position scrolling shadows otherwise use:
-          // display: block;
-          // max-width: min-content;
-          */
-        display: inline-block;
-        vertical-align: top;
-        max-width: 100%;
-        overflow-x: auto;
+    .participation-table-root .participation-table thead th,
+    .participation-table-root .participation-table tbody th {
         white-space: nowrap;
-        border-collapse: collapse;
-        border-spacing: 0;
     }
 
-    .rtable,
-    .rtable--flip tbody {
-        /* optional - enable iOS momentum scrolling -webkit-overflow-scrolling: touch;
-            // scrolling shadows background: radial-gradient(left, ellipse, rgba(0,0,0, .2) 0%, rgba(0,0,0, 0) 75%) 0 center, radial-gradient(right, ellipse, rgba(0,0,0, .2) 0%, rgba(0,0,0, 0) 75%) 100% center;
-            */
-        background-size: 10px 100%, 10px 100%;
-        background-attachment: scroll, scroll;
-        background-repeat: no-repeat;
+    .participation-table-root .participation-table table th,
+    .participation-table-root .participation-table table td {
+        padding-top: 4px !important;
+        padding-bottom: 4px !important;
     }
 
-        /* change these gradients from white to your background colour if it differs
-            // gradient on the first cells to hide the left shadow
-            */
-        .rtable td:first-child,
-        .rtable--flip tbody tr:first-child {
-            background-image: linear-gradient(to right, rgba(255,255,255, 1) 50%, rgba(255,255,255, 0) 100%);
-            background-repeat: no-repeat;
-            background-size: 20px 100%;
-        }
+    .participation-table-root .participation-table tbody th {
+        text-align: left;
+        vertical-align: middle;
+    }
 
-        /* gradient on the last cells to hide the right shadow */
-        .rtable td:last-child,
-        .rtable--flip tbody tr:last-child {
-            background-image: linear-gradient(to left, rgba(255,255,255, 1) 50%, rgba(255,255,255, 0) 100%);
-            background-repeat: no-repeat;
-            background-position: 100% 0;
-            background-size: 20px 100%;
-        }
-
-        .rtable th {
-            text-align: left;
-            background: #f2f0e6;
-            font-weight: normal;
-        }
-
-        .rtable th,
-        .rtable td {
-            padding: 6px 12px;
-            border: 1px solid #d9d7ce;
-        }
-
-    .rtable--flip {
+    .participation-table-root .participation-table-phase-heading {
         display: flex;
-        overflow: hidden;
-        background: none;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.125rem;
+        line-height: 1.1;
     }
 
-        .rtable--flip thead {
-            display: flex;
-            flex-shrink: 0;
-            min-width: min-content;
-        }
+    .participation-table-root .participation-table .participation-table-phase-button {
+        min-width: 0;
+        padding: 0;
+        justify-content: flex-start;
+        text-transform: none;
+    }
 
-        .rtable--flip tbody {
-            display: flex;
-            position: relative;
-            overflow-x: auto;
-            overflow-y: hidden;
-        }
+    .participation-table-root .participation-table .participation-table-phase-button .mud-button-label {
+        display: block;
+    }
 
-        .rtable--flip tr {
-            display: flex;
-            flex-direction: column;
-            min-width: min-content;
-            flex-shrink: 0;
-        }
-
-        .rtable--flip td,
-        .rtable--flip th {
-            display: block;
-        }
-
-        .rtable--flip td {
-            background-image: none !important;
-            /* border-collapse is no longer active border-left: 0; */
-        }
-
-            /* border-collapse is no longer active */
-            .rtable--flip th:not(:last-child),
-            .rtable--flip td:not(:last-child) {
-                border-bottom: 0;
-            }
+    .participation-table-root .participation-table-compact table th,
+    .participation-table-root .participation-table-compact table td {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
 </style>

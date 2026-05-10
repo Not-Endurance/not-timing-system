@@ -189,8 +189,8 @@
   <data name="Dashboard_string" xml:space="preserve">
     <value>Dashboard</value>
   </data>
-  <data name="Endurance_Event_string" xml:space="preserve">
-    <value>Endurance Event</value>
+  <data name="Event_Information_string" xml:space="preserve">
+    <value>Event Information</value>
   </data>
   <data name="Athletes_and_Horses_string" xml:space="preserve">
     <value>Athletes and Horses</value>
@@ -209,9 +209,6 @@
   </data>
   <data name="Handouts_string" xml:space="preserve">
     <value>Handouts</value>
-  </data>
-  <data name="Inquiry_string" xml:space="preserve">
-    <value>Inquiry</value>
   </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Failed to Qualify Reason</value>
@@ -297,6 +294,9 @@
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Combination Number</value>
   </data>
+  <data name="Location_string" xml:space="preserve">
+    <value>Location</value>
+  </data>
   <data name="Place_string" xml:space="preserve">
     <value>Place</value>
   </data>
@@ -321,8 +321,8 @@
   <data name="Start_string" xml:space="preserve">
     <value>start</value>
   </data>
-  <data name="Configure_Endurance_Event_string" xml:space="preserve">
-    <value>Configure Endurance Event</value>
+  <data name="Configure_Event_string" xml:space="preserve">
+    <value>Configure Event</value>
   </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Configure Competition</value>
@@ -372,9 +372,6 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>Cancel</value>
   </data>
-  <data name="Archive_string" xml:space="preserve">
-    <value>Archive</value>
-  </data>
   <data name="History_string" xml:space="preserve">
     <value>History</value>
   </data>
@@ -423,8 +420,8 @@
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Please select a future time</value>
   </data>
-  <data name="Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection" xml:space="preserve">
-    <value>Could not connect to Nexus. Some operations will not be available. Please check your internet connection</value>
+  <data name="Cannot_connect_to_server_string" xml:space="preserve">
+    <value>Could not connect to server</value>
   </data>
   <data name="Athletes_string" xml:space="preserve">
     <value>Athletes</value>
@@ -516,9 +513,6 @@
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Time format is incorect 'hours:minutes:seconds'</value>
   </data>
-  <data name="No_results_found_in_archive_string" xml:space="preserve">
-    <value>No results found in archive</value>
-  </data>
   <data name="required_for_FEI_export" xml:space="preserve">
     <value>*required only for FEI export</value>
   </data>
@@ -540,8 +534,8 @@
   <data name="Invalid_phase_configuration_in_competition__missing_rest" xml:space="preserve">
     <value>Invalid phase configuration in competition '{0}': missing Rest time in a non-final phase</value>
   </data>
-  <data name="Upcoming_events_string" xml:space="preserve">
-    <value>Upcoming еvents</value>
+  <data name="Configure_events_string" xml:space="preserve">
+    <value>Configure еvents</value>
   </data>
   <data name="Select_event_string" xml:space="preserve">
     <value>Select event</value>
@@ -588,8 +582,20 @@
   <data name="Reset_string" xml:space="preserve">
     <value>Reset</value>
   </data>
-  <data name="Are_you_sure_you_want_to_reset_string" xml:space="preserve">
-    <value>Are you sure you want to reset? This action will delete ALL PHASE TIMES and cannot be undone! </value>
+  <data name="Confirm_string" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string" xml:space="preserve">
+    <value>Are you sure you want to reset? This will permanently delete Snapshots, Rankings, Protocols and Handouts </value>
+  </data>
+  <data name="This_action_is_final_There_is_no_recovery_string" xml:space="preserve">
+    <value>THIS ACTION IS FINAL. THERE IS NO RECOVERY.</value>
+  </data>
+  <data name="Type_1337_to_enable_confirmation_string" xml:space="preserve">
+    <value>Type 1337 to enable confirmation.</value>
+  </data>
+  <data name="Confirmation_code_string" xml:space="preserve">
+    <value>Confirmation code</value>
   </data>
   <data name="Hard_reset_string" xml:space="preserve">
     <value>Hard reset</value>
@@ -600,11 +606,20 @@
   <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
     <value>Setup configuration will not be deleted</value>
   </data>
+  <data name="Deactivate_Event_string" xml:space="preserve">
+    <value>Deactivate Event</value>
+  </data>
+  <data name="Deactivate_event_instructions_string" xml:space="preserve">
+    <value>This will mark the current event inactive and disconnect the dashboard. Event data will not be deleted and will remain available in Past Events.</value>
+  </data>
+  <data name="Type_1338_to_enable_confirmation_string" xml:space="preserve">
+    <value>Type 1338 to enable confirmation.</value>
+  </data>
   <data name="Disconnect_from_current_Event" xml:space="preserve">
     <value>Disconnect from current Event</value>
   </data>
   <data name="Reset_Timing_this_will_DELETE_Timing_data" xml:space="preserve">
-    <value>Reset Timing - this will DELETE Timing data</value>
+    <value>Reset Timing - this will DELETE current event data</value>
   </data>
   <data name="Download_string" xml:space="preserve">
     <value>Download Mobile App</value>
@@ -765,20 +780,17 @@
   <data name="Connect_string" xml:space="preserve">
     <value>Connect</value>
   </data>
-  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
-    <value>Connecting to '{0}' will remove your current snapshot history. This cannot be undone.</value>
-  </data>
   <data name="Disconnect_string" xml:space="preserve">
     <value>Disconnect</value>
   </data>
   <data name="Empty_event_list_message" xml:space="preserve">
-    <value>Upcoming Events aren't configured yet</value>
+    <value>Events aren't configured yet</value>
   </data>
   <data name="Select_athlete_string" xml:space="preserve">
     <value>Select an athlete</value>
   </data>
   <data name="Empty_performance_competitor_message" xml:space="preserve">
-    <value>Your account is not configured to participate in the current Endurance Event. If this is incorrect please contact an admin</value>
+    <value>Your account is not configured to participate in the current event. If this is incorrect please contact an admin</value>
   </data>
   <data name="Empty_performance_official_message" xml:space="preserve">
     <value>Choose a participating athlete above to view performance</value>
@@ -834,9 +846,6 @@
   <data name="Start_In_string" xml:space="preserve">
     <value>Start In</value>
   </data>
-  <data name="ID_of_archive_to_load_string" xml:space="preserve">
-    <value>ID of archive to load</value>
-  </data>
   <data name="Load_string" xml:space="preserve">
     <value>Load</value>
   </data>
@@ -888,9 +897,6 @@
   <data name="Snapshots_sent_as__string" xml:space="preserve">
     <value>Snapshots sent as {0}</value>
   </data>
-  <data name="Provide_Archive_ID_string" xml:space="preserve">
-    <value>Provide Archive ID</value>
-  </data>
   <data name="Please_select_the_combination_string" xml:space="preserve">
     <value>Please select the combination</value>
   </data>
@@ -915,8 +921,8 @@
   <data name="File_not_found_string" xml:space="preserve">
     <value>File not found.</value>
   </data>
-  <data name="Upcoming_events_cannot_be_deleted_string" xml:space="preserve">
-    <value>Upcoming events cannot be deleted</value>
+  <data name="Configure_events_cannot_be_deleted_string" xml:space="preserve">
+    <value>Configure events cannot be deleted</value>
   </data>
   <data name="Start_validation_invalid_setup_title_string" xml:space="preserve">
     <value>Cannot start - Invalid setup.</value>
@@ -925,7 +931,7 @@
     <value>Invalid setup</value>
   </data>
   <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
-    <value>A participation can be added to multiple competitions only when the phase structure is identical.</value>
+    <value>Resolve the setup issues below before starting the event.</value>
   </data>
   <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
     <value>#{0}: phase configuration differs across competitions:</value>
@@ -953,5 +959,11 @@
   </data>
   <data name="Register_string" xml:space="preserve">
     <value>Register</value>
+  </data>
+  <data name="Validation_errors_string" xml:space="preserve">
+    <value>Validation errors</value>
+  </data>
+  <data name="Past_events_string" xml:space="preserve">
+    <value>Past events</value>
   </data>
 </root>

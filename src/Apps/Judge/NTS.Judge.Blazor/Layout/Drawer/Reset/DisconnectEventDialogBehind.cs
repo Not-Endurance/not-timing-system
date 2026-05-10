@@ -1,8 +1,8 @@
 using MudBlazor;
 using Not.Blazor.Dialogs.Abstractions;
 using Not.Blazor.Helpers;
-using NTS.Application.Socket;
-using NTS.Judge.Features.Core;
+using NTS.Application.Contracts.Socket;
+using NTS.Judge.Contracts.Features.Core;
 
 namespace NTS.Judge.Blazor.Layout.Drawer.Reset;
 
@@ -34,7 +34,7 @@ public class DisconnectEventDialogBehind : NDialog
     {
         try
         {
-            var hardResetDialog = await DialogService.ShowAsync<ResetTimingDialog>();
+            var hardResetDialog = await DialogService.ShowAsync<ResetEventDialog>();
             if (await hardResetDialog.IsCanceled())
             {
                 await CancelDialog();

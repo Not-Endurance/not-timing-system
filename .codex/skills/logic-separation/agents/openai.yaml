@@ -1,0 +1,4 @@
+interface:
+  display_name: "DDD Logic Separation"
+  short_description: "Place domain, application, and infra logic"
+  default_prompt: "Use $logic-separation to review this change and keep domain invariants, application orchestration, adapters, and infrastructure in the right layers."

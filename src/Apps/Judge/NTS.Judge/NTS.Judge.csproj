@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NTS.Judge.Contracts\NTS.Judge.Contracts.csproj" />
     <ProjectReference Include="..\..\..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\..\Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj" />
   </ItemGroup>

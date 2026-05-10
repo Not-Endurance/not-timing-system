@@ -6,14 +6,8 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Serializers;
 using Not.Application;
-using Not.Filesystem;
 using Not.Injection;
-using Not.Storage.JsonFile.Repositories;
-using Not.Storage.JsonFile.States;
-using Not.Storage.JsonFile.Stores;
-using Not.Storage.JsonFile.Stores.Files;
 using Not.Storage.Mongo;
-using Not.Storage.REST;
 
 namespace Not.Storage;
 
@@ -43,24 +37,9 @@ public class NStorageBuilder
         return this;
     }
 
-    public NStorageBuilder AddJsonFileStorage<T, TStore, TInterface>(Assembly assembly)
-        where TInterface : class
-        where TStore : LockingJsonFileStore<T>, TInterface
-        where T : class, IState, new()
-    {
-        var factory = FileContextHelper.CreateFileContextFactory("stores");
-        _services.AddKeyedSingleton<IFilesystemContext, FilesystemContext>(StoreConstants.DATA_KEY, factory);
-        _services.AddSingleton<TInterface, TStore>();
-        _services.AddSingleton(x => (IStore<T>)x.GetRequiredService<TInterface>());
-        _services.AddAsInterfaces(typeof(ReadonlyRootRepository<,>), ServiceLifetime.Transient, assembly);
-        _services.AddAsInterfaces(typeof(ReadonlySetRepository<,>), ServiceLifetime.Transient, assembly);
-        return this;
-    }
-
-    public NStorageBuilder AddRestApiStorage(Assembly assembly)
+    public NStorageBuilder AddRestApiStorage(Assembly _)
     {
         _nApplicationBuilder.AddHttp();
-        _services.AddAsInterfaces(typeof(RestApiRepository<,>), ServiceLifetime.Transient, assembly);
         return this;
     }
 }

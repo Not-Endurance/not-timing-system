@@ -39,7 +39,7 @@ public class NUserSessionService : INUserSession
         }
 
         var userResult = await _userRegister.Get(registration.Email);
-        if (!userResult.IsError && userResult.Data != null)
+        if (userResult.IsSuccess && userResult.Data != null)
         {
             return new NUserSessionModel<TSessionState>(
                 userIdentifier,
@@ -49,7 +49,7 @@ public class NUserSessionService : INUserSession
         }
 
         var registerResult = await _userRegister.Register(registration);
-        if (registerResult.IsError || registerResult.Data == null)
+        if (!registerResult.IsSuccess || registerResult.Data == null)
         {
             return null;
         }

@@ -1,6 +1,6 @@
 using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using static NTS.Witness.Blazor.Routes;
 
 namespace NTS.Witness.Blazor.Layout;

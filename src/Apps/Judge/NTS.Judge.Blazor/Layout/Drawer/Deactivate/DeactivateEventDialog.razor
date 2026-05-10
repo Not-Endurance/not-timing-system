@@ -1,0 +1,28 @@
+@using Not.Blazor.Components.Input
+@using Not.Blazor.Dialogs.Abstractions
+@inherits DeactivateEventDialogBehind
+
+<MudDialog>
+
+    <TitleContent>@Deactivate_Event_string</TitleContent>
+
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.body1">@Deactivate_event_instructions_string</MudText>
+
+            <MudText Typo="Typo.body1">@Type_1338_to_enable_confirmation_string</MudText>
+
+            <NTextField T="string"
+                        @bind-Value="ConfirmationCode"
+                        Label="@Confirmation_code_string"
+                        Immediate="true" />
+        </MudStack>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonWarning Text="@Confirm_string" Disabled="@(!CanConfirm)" OnClick="ConfirmDeactivate" />
+
+        <NButtonSecondary Text="@Cancel_string" OnClick="CancelDialog" />
+    </DialogActions>
+
+</MudDialog>

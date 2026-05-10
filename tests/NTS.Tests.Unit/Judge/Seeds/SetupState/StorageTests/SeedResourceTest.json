@@ -1,0 +1,14 @@
+{
+  "EventInformation": {
+    "Name": "Test Event",
+    "Location": "Sofia",
+    "Country": {
+      "IsoCode": "testIso",
+      "NfCode": "testNf",
+      "Name": "Test"
+    },
+    "Officials": [],
+    "Competitions": [],
+    "Id": 319178201
+  }
+}

@@ -1,0 +1,3223 @@
+[{
+  "_id": 177410474,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Name": "ДП млади ездачи и юноши до 18 г",
+  "Ruleset": "FEI",
+  "Type": "Star",
+  "Category": "JuniorOrYoungAdult",
+  "CompetitionFeiId": null,
+  "FeiRule": null,
+  "FeiScheduleNumber": null,
+  "Entries": [
+    {
+      "Participation": {
+        "_id": 1926599985,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 1000649529,
+          "Number": 76,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": null,
+          "Athlete": {
+            "_id": 366937524,
+            "Names": [
+              "Николета",
+              "Зашева"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1649667335,
+              "TenantId": "nts",
+              "Name": "ККС Хипокамп"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 2134604323,
+            "FeiId": null,
+            "Name": "Захразат"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 255712489,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": {
+              "$date": "2026-04-28T07:00:00.000Z"
+            },
+            "PresentTime": {
+              "$date": "2026-04-28T07:03:00.000Z"
+            },
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": {
+              "$date": "2026-04-28T07:28:00.000Z"
+            },
+            "OutTime": {
+              "$date": "2026-04-28T07:43:00.000Z"
+            },
+            "LoopInterval": "02:00:00",
+            "PhaseInterval": "02:03:00",
+            "RecoveryInterval": "00:03:00",
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": 15.5,
+            "AveragePhaseSpeed": 15.121951219512196,
+            "AverageSpeed": 15.121951219512196,
+            "IsComplete": true
+          },
+          {
+            "_id": 2130618769,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-28T07:43:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 248803262,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": {
+          "LastArriveTime": null,
+          "AverageSpeed": 15.121951219512196,
+          "Interval": "02:03:00",
+          "RideInterval": "02:00:00",
+          "RecoveryInterval": "00:03:00",
+          "RecoveryIntervalWithoutFinal": "00:03:00"
+        },
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1781303650,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 868875140,
+          "Number": 50,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1620154576,
+            "Names": [
+              "Криста",
+              "Костанян"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1649667335,
+              "TenantId": "nts",
+              "Name": "ККС Хипокамп"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1401451413,
+            "FeiId": null,
+            "Name": "Наслада"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1164139825,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1513581063,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 929193749,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1646546851,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 1912975737,
+          "Number": 44,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 469022959,
+            "Names": [
+              "Радост",
+              "Бакалова"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 370606565,
+              "TenantId": "nts",
+              "Name": "ККС Буцефал Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1731888373,
+            "FeiId": null,
+            "Name": "Павел"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 2053418717,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 163500130,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 447125845,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1991309414,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 621581842,
+          "Number": 80,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1513951826,
+            "Names": [
+              "Кристина",
+              "Петрова"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 370606565,
+              "TenantId": "nts",
+              "Name": "ККС Буцефал Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 562718415,
+            "FeiId": null,
+            "Name": "Зизитоп"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 741875938,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1002202825,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1659013488,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1717023518,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 621445191,
+          "Number": 2,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 278618377,
+            "Names": [
+              "Никол",
+              "Георгиева"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 398976848,
+              "TenantId": "nts",
+              "Name": "ККС Пирует"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 422762458,
+            "FeiId": null,
+            "Name": "Деби Ахмир"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1524270646,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1592011426,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 2050734190,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1951822000,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 442221356,
+          "Number": 72,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1424823491,
+            "Names": [
+              "Вероника",
+              "Козарова"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 398976848,
+              "TenantId": "nts",
+              "Name": "ККС Пирует"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 880648928,
+            "FeiId": null,
+            "Name": "Пепино Ди Парме"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 233096899,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 199167269,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1154961095,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1202522178,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 195979988,
+          "Number": 45,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1285793646,
+            "Names": [
+              "Шахин",
+              "Халибрям"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1032560126,
+              "TenantId": "nts",
+              "Name": "ККС Иван Асен II"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 122962385,
+            "FeiId": null,
+            "Name": "Пламък"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1623946715,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 71092993,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 343614742,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 262259298,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 433552815,
+          "Number": 22,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1076449614,
+            "Names": [
+              "Йоана",
+              "Кюмюрджийска"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 287722931,
+              "TenantId": "nts",
+              "Name": "ККС Номад Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 461841147,
+            "FeiId": null,
+            "Name": "Маваши"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1807135389,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 197216190,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 335773179,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 2060043928,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 1682878006,
+          "Number": 40,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 855380255,
+            "Names": [
+              "Карина",
+              "Добрева"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 287722931,
+              "TenantId": "nts",
+              "Name": "ККС Номад Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 438892760,
+            "FeiId": null,
+            "Name": "Аржентина"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1522956693,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 563586447,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1874383203,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1614710756,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "JuniorOrYoungAdult",
+        "Competition": {
+          "Name": "ДП млади ездачи и юноши до 18 г",
+          "Type": "Star",
+          "Ruleset": "FEI"
+        },
+        "Combination": {
+          "_id": 485219756,
+          "Number": 54,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1644090398,
+            "Names": [
+              "Невена",
+              "Гайдарова"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1038934009,
+              "TenantId": "nts",
+              "Name": "ККС Аспарух"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1302852622,
+            "FeiId": null,
+            "Name": "Зипо"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1213782309,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 432135024,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "FEI",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1332492071,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "FEI",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    }
+  ],
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 704622182,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Name": "ДП юноши до 14 години",
+  "Ruleset": "Regional",
+  "Type": "Star",
+  "Category": "Children",
+  "CompetitionFeiId": null,
+  "FeiRule": null,
+  "FeiScheduleNumber": null,
+  "Entries": [
+    {
+      "Participation": {
+        "_id": 1629460309,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Children",
+        "Competition": {
+          "Name": "ДП юноши до 14 години",
+          "Type": "Star",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 1423537438,
+          "Number": 64,
+          "Distance": "62",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 476285420,
+            "Names": [
+              "Андрей",
+              "Юруков"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1038934009,
+              "TenantId": "nts",
+              "Name": "ККС Аспарух"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1683681101,
+            "FeiId": null,
+            "Name": "Аспарух"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 760668280,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 188317112,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    }
+  ],
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 1489759350,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Name": "ДП пони ездачи",
+  "Ruleset": "Regional",
+  "Type": "Qualification",
+  "Category": "Children",
+  "CompetitionFeiId": null,
+  "FeiRule": null,
+  "FeiScheduleNumber": null,
+  "Entries": [
+    {
+      "Participation": {
+        "_id": 1733824915,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Children",
+        "Competition": {
+          "Name": "ДП пони ездачи",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 1158636416,
+          "Number": 38,
+          "Distance": "30",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1531980220,
+            "Names": [
+              "Деа",
+              "Панайотова"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1649667335,
+              "TenantId": "nts",
+              "Name": "ККС Хипокамп"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 713113661,
+            "FeiId": null,
+            "Name": "Амбър"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1150753797,
+            "Gate": "GATE1/15",
+            "Length": 15,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:30:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 567761656,
+            "Gate": "GATE2/30",
+            "Length": 15,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 328295520,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Children",
+        "Competition": {
+          "Name": "ДП пони ездачи",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 2124980372,
+          "Number": 68,
+          "Distance": "30",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 2061694513,
+            "Names": [
+              "София",
+              "Георгиева"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 370606565,
+              "TenantId": "nts",
+              "Name": "ККС Буцефал Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1798900436,
+            "FeiId": null,
+            "Name": "Текила"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1960712618,
+            "Gate": "GATE1/15",
+            "Length": 15,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:30:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 943910534,
+            "Gate": "GATE2/30",
+            "Length": 15,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 772162610,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Children",
+        "Competition": {
+          "Name": "ДП пони ездачи",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 1346286463,
+          "Number": 36,
+          "Distance": "30",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1805728072,
+            "Names": [
+              "Витан",
+              "Иванов"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 370606565,
+              "TenantId": "nts",
+              "Name": "ККС Буцефал Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1367387746,
+            "FeiId": null,
+            "Name": "Помпей"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1185538437,
+            "Gate": "GATE1/15",
+            "Length": 15,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:30:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1534837061,
+            "Gate": "GATE2/30",
+            "Length": 15,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    }
+  ],
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 1042029701,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Name": "ДП пони ездачи",
+  "Ruleset": "Regional",
+  "Type": "Qualification",
+  "Category": "Companion",
+  "CompetitionFeiId": null,
+  "FeiRule": null,
+  "FeiScheduleNumber": null,
+  "Entries": [
+    {
+      "Participation": {
+        "_id": 48188847,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Companion",
+        "Competition": {
+          "Name": "ДП пони ездачи",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 227987334,
+          "Number": 51,
+          "Distance": "30",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1017005199,
+            "Names": [
+              "Христо",
+              "Кумчев"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1649667335,
+              "TenantId": "nts",
+              "Name": "ККС Хипокамп"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 263879902,
+            "FeiId": null,
+            "Name": "Меджик"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 627269168,
+            "Gate": "GATE1/15",
+            "Length": 15,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:30:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1253034015,
+            "Gate": "GATE2/30",
+            "Length": 15,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1302554067,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Companion",
+        "Competition": {
+          "Name": "ДП пони ездачи",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 449671187,
+          "Number": 57,
+          "Distance": "30",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1664792569,
+            "Names": [
+              "Мартин",
+              "Колев"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 370606565,
+              "TenantId": "nts",
+              "Name": "ККС Буцефал Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 60842893,
+            "FeiId": null,
+            "Name": "Седеф"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1006661862,
+            "Gate": "GATE1/15",
+            "Length": 15,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:30:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1970160778,
+            "Gate": "GATE2/30",
+            "Length": 15,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 497212692,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Companion",
+        "Competition": {
+          "Name": "ДП пони ездачи",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 1262474185,
+          "Number": 59,
+          "Distance": "30",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1663041866,
+            "Names": [
+              "Стела",
+              "Миткова"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 370606565,
+              "TenantId": "nts",
+              "Name": "ККС Буцефал Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1962118803,
+            "FeiId": null,
+            "Name": "Бохем"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1373325761,
+            "Gate": "GATE1/15",
+            "Length": 15,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:30:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1517900237,
+            "Gate": "GATE2/30",
+            "Length": 15,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    }
+  ],
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 1525104113,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Name": "Квалификационен турнир 80 км",
+  "Ruleset": "Regional",
+  "Type": "Qualification",
+  "Category": "Senior",
+  "CompetitionFeiId": null,
+  "FeiRule": null,
+  "FeiScheduleNumber": null,
+  "Entries": [
+    {
+      "Participation": {
+        "_id": 477507153,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Senior",
+        "Competition": {
+          "Name": "Квалификационен турнир 80 км",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 992737684,
+          "Number": 67,
+          "Distance": "87",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 115752921,
+            "Names": [
+              "Николай",
+              "Узунов"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 287722931,
+              "TenantId": "nts",
+              "Name": "ККС Номад Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1724163831,
+            "FeiId": null,
+            "Name": "Памира Номад"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 229054495,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1044738320,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 189597733,
+            "Gate": "GATE3/87",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    }
+  ],
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 1848398195,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Name": "Квалификационен турнир 40 км",
+  "Ruleset": "Regional",
+  "Type": "Qualification",
+  "Category": "Senior",
+  "CompetitionFeiId": null,
+  "FeiRule": null,
+  "FeiScheduleNumber": null,
+  "Entries": [
+    {
+      "Participation": {
+        "_id": 1465024039,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Senior",
+        "Competition": {
+          "Name": "Квалификационен турнир 40 км",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 542881568,
+          "Number": 28,
+          "Distance": "50",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 431979132,
+            "Names": [
+              "Мария",
+              "Йорданова"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1649667335,
+              "TenantId": "nts",
+              "Name": "ККС Хипокамп"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 947499459,
+            "FeiId": null,
+            "Name": "Алек"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1534031705,
+            "Gate": "GATE1/25",
+            "Length": 25,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1584411534,
+            "Gate": "GATE2/50",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1904494130,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Senior",
+        "Competition": {
+          "Name": "Квалификационен турнир 40 км",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 778290182,
+          "Number": 78,
+          "Distance": "50",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 523856865,
+            "Names": [
+              "Мария",
+              "Влайкова"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1649667335,
+              "TenantId": "nts",
+              "Name": "ККС Хипокамп"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1047807821,
+            "FeiId": null,
+            "Name": "Кашмира"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 952192810,
+            "Gate": "GATE1/25",
+            "Length": 25,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1611277553,
+            "Gate": "GATE2/50",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1600320700,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Senior",
+        "Competition": {
+          "Name": "Квалификационен турнир 40 км",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 1082398365,
+          "Number": 19,
+          "Distance": "50",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1526569693,
+            "Names": [
+              "Николай",
+              "Николов"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 370606565,
+              "TenantId": "nts",
+              "Name": "ККС Буцефал Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 953193509,
+            "FeiId": null,
+            "Name": "Блек Дрийм"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1706676558,
+            "Gate": "GATE1/25",
+            "Length": 25,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1903668654,
+            "Gate": "GATE2/50",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 281417031,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Senior",
+        "Competition": {
+          "Name": "Квалификационен турнир 40 км",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 261757742,
+          "Number": 77,
+          "Distance": "50",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 683635597,
+            "Names": [
+              "Денис",
+              "Фурлански"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 370606565,
+              "TenantId": "nts",
+              "Name": "ККС Буцефал Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 205362310,
+            "FeiId": null,
+            "Name": "Джава Ал СЕМ"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 774167900,
+            "Gate": "GATE1/25",
+            "Length": 25,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 216174550,
+            "Gate": "GATE2/50",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 1010224448,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Senior",
+        "Competition": {
+          "Name": "Квалификационен турнир 40 км",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 301607551,
+          "Number": 52,
+          "Distance": "50",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 569018213,
+            "Names": [
+              "Симона",
+              "Несторова"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 370606565,
+              "TenantId": "nts",
+              "Name": "ККС Буцефал Ендюранс"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 926288402,
+            "FeiId": null,
+            "Name": "Пандора"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1516358357,
+            "Gate": "GATE1/25",
+            "Length": 25,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1125227314,
+            "Gate": "GATE2/50",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 2004881970,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Senior",
+        "Competition": {
+          "Name": "Квалификационен турнир 40 км",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 2022591792,
+          "Number": 56,
+          "Distance": "50",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 1133004815,
+            "Names": [
+              "Емма",
+              "Нардуци"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1407907269,
+              "TenantId": "nts",
+              "Name": "ККС Тракиец"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1276005079,
+            "FeiId": null,
+            "Name": "Миднайт Калърс"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 825621993,
+            "Gate": "GATE1/25",
+            "Length": 25,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 491747210,
+            "Gate": "GATE2/50",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    },
+    {
+      "Participation": {
+        "_id": 894953536,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Senior",
+        "Competition": {
+          "Name": "Квалификационен турнир 40 км",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 2095370197,
+          "Number": 23,
+          "Distance": "50",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 2014371187,
+            "Names": [
+              "Страхил",
+              "Михайлов"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 2085231160,
+              "TenantId": "nts",
+              "Name": "ККС Цар Асен "
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 405736726,
+            "FeiId": null,
+            "Name": "Саламан"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 1395581146,
+            "Gate": "GATE1/25",
+            "Length": 25,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T06:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 528477663,
+            "Gate": "GATE2/50",
+            "Length": 25,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    }
+  ],
+  "IsDeleted": false,
+  "DeletedVersion": null
+},
+{
+  "_id": 1563836043,
+  "TenantId": "nts",
+  "EventId": 1324868821,
+  "Name": "Квалификация 60 км",
+  "Ruleset": "Regional",
+  "Type": "Qualification",
+  "Category": "Senior",
+  "CompetitionFeiId": null,
+  "FeiRule": null,
+  "FeiScheduleNumber": null,
+  "Entries": [
+    {
+      "Participation": {
+        "_id": 664499704,
+        "TenantId": "nts",
+        "EventId": 1324868821,
+        "Category": "Senior",
+        "Competition": {
+          "Name": "Квалификация 60 км",
+          "Type": "Qualification",
+          "Ruleset": "Regional"
+        },
+        "Combination": {
+          "_id": 346556309,
+          "Number": 39,
+          "Distance": "62",
+          "MinAverageSpeed": 0,
+          "MaxAverageSpeed": 99999,
+          "Athlete": {
+            "_id": 718815615,
+            "Names": [
+              "Керим",
+              "Ходжа"
+            ],
+            "Country": {
+              "_id": 1395739409,
+              "TenantId": "nts",
+              "Name": "Bulgaria",
+              "IsoCode": "BGR",
+              "NfCode": "BGN",
+              "Locale": null
+            },
+            "Club": {
+              "_id": 1649667335,
+              "TenantId": "nts",
+              "Name": "ККС Хипокамп"
+            },
+            "FeiId": null
+          },
+          "Horse": {
+            "_id": 1100386149,
+            "FeiId": null,
+            "Name": "Ел Ксантос"
+          }
+        },
+        "Phases": [
+          {
+            "_id": 382798451,
+            "Gate": "GATE1/31",
+            "Length": 31,
+            "MaxRecovery": 15,
+            "Rest": 40,
+            "Ruleset": "Regional",
+            "IsFinal": false,
+            "StartTime": {
+              "$date": "2026-04-27T05:00:00.000Z"
+            },
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          },
+          {
+            "_id": 1124826584,
+            "Gate": "GATE2/62",
+            "Length": 31,
+            "MaxRecovery": 20,
+            "Rest": null,
+            "Ruleset": "Regional",
+            "IsFinal": true,
+            "StartTime": null,
+            "ArriveTime": null,
+            "PresentTime": null,
+            "RepresentTime": null,
+            "IsReinspectionRequested": false,
+            "IsRequiredInspectionRequested": false,
+            "IsRequiredInspectionCompulsory": false,
+            "RequiredInspectionTime": null,
+            "OutTime": null,
+            "LoopInterval": null,
+            "PhaseInterval": null,
+            "RecoveryInterval": null,
+            "CompulsoryThresholdInterval": "00:10:00",
+            "AverageLoopSpeed": null,
+            "AveragePhaseSpeed": null,
+            "AverageSpeed": null,
+            "IsComplete": false
+          }
+        ],
+        "Total": null,
+        "Eliminated": null,
+        "IsDeleted": false,
+        "DeletedVersion": null
+      },
+      "Rank": null,
+      "IsNotRanked": false
+    }
+  ],
+  "IsDeleted": false,
+  "DeletedVersion": null
+}]

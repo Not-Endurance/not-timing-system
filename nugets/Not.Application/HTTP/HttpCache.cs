@@ -1,6 +1,5 @@
 ﻿using Not.Application.Cache;
 using Not.Application.CRUD.Ports;
-using Not.Async;
 using Not.Async.Extensions;
 using Not.Domain.Abstractions;
 

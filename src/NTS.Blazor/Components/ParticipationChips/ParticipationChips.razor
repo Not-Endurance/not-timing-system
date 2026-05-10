@@ -8,7 +8,7 @@
 
     @foreach (var grouping in Participations.GroupBy(x => x.Phases.Distance))
     {
-        <MudText Class="pl-4">
+        <MudText Class="@CombineClass($"chip-header {GetGroupTextClass()}")" Typo="@GetGroupTextTypo()">
             <strong>@($"{grouping.Key.RoundNumberToTens()} {km_string}")</strong>
         </MudText>
 
@@ -18,13 +18,18 @@
         {
             var number = participation.Combination.Number;
             <MudChip T="Participation"
-                     Text="@number.ToString()"
-                     Value="@participation"
-                     Color="@GetColor(participation)"
-                     Size="Size.Medium"
-                     OnClick="() => Select(participation)"
-                     Style="min-width: 1rem" />
+                        Text="@number.ToString()"
+                        Value="@participation"
+                        Color="@GetColor(participation)"
+                        Size="@GetChipSize()"
+                        OnClick="() => Select(participation)"
+                        Style="@GetChipStyle()" />
         }
     }
 </NChips>
  
+<style>
+    .chip-header {
+        display: block;
+    }
+</style>

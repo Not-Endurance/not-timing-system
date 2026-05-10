@@ -1,4 +1,4 @@
-﻿@using NTS.Judge.Features.Setup.Horses
+﻿@using NTS.Judge.Contracts.Features.Setup.Horses
 @using Not.Blazor.Components.Layout
 @using Not.Blazor.Navigation
 
@@ -8,7 +8,7 @@
 <NContent Title="@Configure_Horse_string" IsEmpty="Model == null">
 
     <Main>
-        <HorseShell Model="Model" />
+        <HorseShell Model="Model" ReadOnly="@ReadOnly" />
     </Main>
 
 </NContent>
