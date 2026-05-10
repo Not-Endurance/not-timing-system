@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Not.Application.Authentication.User;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.Features.Access;
@@ -119,5 +121,79 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         Assert.True(persistedParticipation.Phases.Current.IsComplete());
         Assert.Equal(2, persistedSnapshotResults.Count);
+    }
+
+    [Fact]
+    public async Task Witness_registration_resolution_creates_missing_nexus_user()
+    {
+        var registeringUser = new IntegrationUser(
+            "registering.witness@integration.test",
+            "registering-witness-user",
+            "Rosa Maria Register",
+            "Rosa",
+            "Maria",
+            "Register",
+            "Bulgaria",
+            "Konarche",
+            "10101010"
+        );
+        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        await using var witness = new WitnessDriver(
+            _fixture.WarpBaseUrl,
+            _fixture.NexusBaseUrl,
+            registeringUser,
+            "IntegrationRegisteringWitness"
+        );
+        var resolver = witness.GetRequiredService<NUserResolver>();
+        var principal = CreatePrincipal(registeringUser);
+        var profile = new NUserRegistrationProfile(
+            registeringUser.Name,
+            registeringUser.GivenName,
+            registeringUser.MiddleName,
+            registeringUser.Surname,
+            registeringUser.Club,
+            registeringUser.FeiId
+        );
+
+        Assert.Null(await api.ReadUser(registeringUser.Email));
+
+        var result = await resolver.ResolvePrincipal(principal, profile);
+
+        Assert.True(result.IsSuccess, result.Error);
+        var created = await api.ReadUser(registeringUser.Email);
+        Assert.NotNull(created);
+        Assert.Equal(registeringUser.Email, created!.Email);
+        Assert.Equal(registeringUser.Name, created.Name);
+        Assert.Equal(registeringUser.GivenName, created.GivenName);
+        Assert.Equal(registeringUser.MiddleName, created.MiddleName);
+        Assert.Equal(registeringUser.Surname, created.Surname);
+        Assert.Equal(registeringUser.CountryRegion, created.CountryRegion);
+        Assert.Equal(registeringUser.Club, created.Club);
+        Assert.Equal(registeringUser.FeiId, created.FeiId);
+    }
+
+    static ClaimsPrincipal CreatePrincipal(IntegrationUser user)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Email, user.Email),
+            new("oid", user.UserIdentifier),
+            new("name", user.Name),
+        };
+
+        AddClaim(claims, ClaimTypes.GivenName, user.GivenName);
+        AddClaim(claims, "middle_name", user.MiddleName);
+        AddClaim(claims, ClaimTypes.Surname, user.Surname);
+        AddClaim(claims, ClaimTypes.Country, user.CountryRegion);
+
+        return new ClaimsPrincipal(new ClaimsIdentity(claims, "IntegrationTest"));
+    }
+
+    static void AddClaim(List<Claim> claims, string type, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            claims.Add(new Claim(type, value));
+        }
     }
 }
