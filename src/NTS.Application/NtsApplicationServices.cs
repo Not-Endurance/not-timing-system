@@ -58,7 +58,7 @@ public static class NtsApplicationServices
                 INotificationHandler<EventConnected>,
                 StartlistService
             >(ServiceLifetime.Scoped);
-            _services.AddSingleton<INotificationHandler<EventDisconnected>>(x =>
+            _services.AddScoped<INotificationHandler<EventDisconnected>>(x =>
                 x.GetRequiredService<StartlistService>()
             );
             return this;

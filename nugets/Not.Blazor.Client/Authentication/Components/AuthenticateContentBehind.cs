@@ -23,9 +23,9 @@ public abstract class AuthenticateContentBehind : NComponent
     protected bool IsRegistering { get; private set; }
     protected RegistrationProfileFormModel RegistrationProfile { get; } = new();
 
-    protected Task Signin()
+    protected async Task Signin()
     {
-        Authentication.Signin();
+        await Authentication.Signin();
     }
 
     protected void ShowRegistration()
