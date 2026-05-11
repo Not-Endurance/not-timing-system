@@ -14,8 +14,6 @@ public static class NtsClientDisplayFormatter
         var normalizedEnvironment = NEnvionmentNames.Normalize(environment);
         var title = $"NTS {appName} v{ApplicationConstants.VERSION}";
 
-        return normalizedEnvironment == NEnvionmentNames.PRODUCTION
-            ? $"{title}"
-            : $"{title} [{normalizedEnvironment}]";
+        return normalizedEnvironment == NEnvionmentNames.PRODUCTION ? $"{title}" : $"{title} [{normalizedEnvironment}]";
     }
 }

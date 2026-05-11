@@ -1,7 +1,7 @@
 global using Microsoft.AspNetCore.Components;
 global using Not.Application.Environments;
-global using NTS.Application.Contracts;
 global using static Not.Localization.NStrings;
+global using NTS.Application.Contracts;
 global using NTS.Domain.Enums;
 global using NTS.Judge.Contracts.Features.Core;
 global using NTS.Judge.Contracts.Features.Core.Dashboard;
