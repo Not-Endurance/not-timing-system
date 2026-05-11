@@ -1,6 +1,7 @@
 #pragma warning disable CA1416 // We use only Windows
 
 using Not.Application.Configurations;
+using Not.Application.Environments;
 using Not.Logging.Builder;
 using Not.MAUI;
 using NTS.Judge.MAUI.Platforms.Services;
@@ -15,11 +16,14 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder.UseMauiApp<App>().ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"));
 
+        var assembly = typeof(MauiProgram).Assembly;
+        var targetEnvironment = EnvironmentHelper.UseResolvedEnvironment(assembly);
+        builder.Configuration.AddNAppsettings(assembly, "judge");
+
         builder.UseNLog().AddFilesystemLogger("NTS.Judge");
+        builder.Services.AddSingleton(new NEnvironment(targetEnvironment));
         builder.Services.AddJudgeMaui(builder.Configuration);
 
-        var assembly = typeof(MauiProgram).Assembly;
-        builder.Configuration.AddNAppsettings(assembly, "judge");
         builder.Services.AddSingleton<IMauiProcessService, WindowsProcessService>();
         return builder.Build();
     }
