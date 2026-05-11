@@ -2,8 +2,8 @@
 
 @using MudBlazor
 @using NTS.Domain.Setup.Aggregates
-@using NTS.Judge.Features.Setup.UpcomingEvents
-@using NTS.Judge.Blazor.Features.Setup.UpcomingEvents
+@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents
+@using NTS.Judge.Blazor.Features.Setup.ConfigureEvents
 @using Not.Blazor.Components.Layout
 @using Not.Krud.Blazor.Components
 
@@ -12,22 +12,30 @@
 <NContent Title="@Select_event_string">
    
     <Main>
-        <KrudList T="UpcomingEvent" TModel="UpcomingEventFormModel" TShell="UpcomingEventShell" Name="@Upcoming_events_string">
-            <CustomAction1 Context="upcomingEvent">
-                @if (ShowStartButton(upcomingEvent))
+        <KrudList T="ConfigureEvent"
+                  TModel="ConfigureEventFormModel"
+                  TShell="ConfigureEventShell"
+                  Name="@Configure_events_string"
+                  CanView="ShowViewButton"
+                  CanUpdate="ShowEditButton"
+                  AllowCreate
+                  AllowView
+                  AllowUpdate>
+            <CustomAction1 Context="configureEvent">
+                @if (ShowStartButton(configureEvent))
                 {
                     <NButtonWarning
-                        OnClick="() => Start(upcomingEvent)"
+                        OnClick="() => Start(configureEvent)"
                         Text="@Start_string"
                         StartIcon="@Icons.Material.Filled.NotStarted" />
                 }
             </CustomAction1>
 
-            <CustomAction2 Context="upcomingEvent">
-                @if (ShowResetTimingButton(upcomingEvent))
+            <CustomAction2 Context="configureEvent">
+                @if (ShowResetTimingButton(configureEvent))
                 {
                     <NButtonDanger
-                        OnClick="() => OpenResetTimingDialog(upcomingEvent)"
+                        OnClick="() => OpenResetTimingDialog(configureEvent)"
                         Text="@Reset_string" />
                 }
             </CustomAction2>

@@ -1,12 +1,13 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Configurations;
+using Not.Application.Authentication.Abstractions;
 using Not.Application.RPC.SignalR;
 using Not.Blazor.Client;
 using Not.Krud.ServiceRegistration;
 using NTS.Application;
 using NTS.Witness.Features.Socket;
+using NTS.Witness.Storage.Repositories;
 
 namespace NTS.Witness;
 
@@ -15,14 +16,16 @@ public static class NtsWitnessServices
     public static IServiceCollection AddNtsWitness(
         this IServiceCollection services,
         IConfiguration configuration,
-        string baseUrl
+        string baseUrl,
+        Assembly rootAssembly
     )
     {
         services.ConfigureKrud();
         services.AddScoped<IRpcAccessTokenProvider, NtsClientRpcAccessTokenProvider>();
         services.AddScoped<IWitnessAuthenticationRedirector, WitnessAuthenticationRedirector>();
+        services.AddTransient<IUserRegister, UserApiRepository>();
         services
-            .ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly())
+            .ConfigureNtsApplication(configuration, rootAssembly)
             .AddSharedCoreDomainServices()
             .ConfigureN()
             .AddRpcClient()

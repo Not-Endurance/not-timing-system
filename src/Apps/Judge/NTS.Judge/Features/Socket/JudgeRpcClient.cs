@@ -3,13 +3,14 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Injection;
-using NTS.Application.Socket;
-using NTS.Application.Watcher;
+using NTS.Application.Contracts.Socket;
+using NTS.Application.Contracts.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Judge.Features.Core.Dashboard;
+using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 
@@ -24,15 +25,15 @@ public class JudgeRpcClient
         IScoped
 {
     readonly INtsSocketService _eventContext;
-    readonly ITimingService _timingService;
+    readonly ISnapshotService _snapshotService;
     readonly HubProcedures _hubProcedures;
 
-    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, ITimingService timingService)
+    public JudgeRpcClient(INtsSocketService eventContext, IRpcSocket socket, ISnapshotService snapshotService)
         : base(socket)
     {
         _eventContext = eventContext;
         _hubProcedures = new HubProcedures(socket);
-        _timingService = timingService;
+        _snapshotService = snapshotService;
     }
 
     protected override void RegisterProcedures()
@@ -46,7 +47,7 @@ public class JudgeRpcClient
         {
             var stamp = new Timestamp(watcherSnapshot.Timestamp!);
             var snapshot = new Snapshot(watcherSnapshot.Number, snapshots.Type, SnapshotMethod.Manual, stamp);
-            await _timingService.Record(snapshot);
+            await _snapshotService.Record(snapshot);
         }
     }
 

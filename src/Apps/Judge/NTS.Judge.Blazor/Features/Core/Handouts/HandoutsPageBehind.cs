@@ -1,7 +1,7 @@
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Helpers;
-using NTS.Judge.Features.Core.Handouts;
+using NTS.Judge.Contracts.Features.Core.Handouts;
 
 namespace NTS.Judge.Blazor.Features.Core.Handouts;
 

@@ -17,6 +17,7 @@ public abstract class KrudFormBehind<TModel> : NComponent
     protected ExceptionFormValidator ValidatorRef { get; set; } = default!;
 
     protected bool IsCreateForm => Shell.Model.Id == null;
+    protected bool ReadOnly => Shell.ReadOnly;
 
     /// <summary>
     /// The calling components should provide a reference to a Shell instance.
@@ -40,6 +41,11 @@ public abstract class KrudFormBehind<TModel> : NComponent
 
     public async Task OnSubmit()
     {
+        if (ReadOnly)
+        {
+            return;
+        }
+
         try
         {
             ValidatorRef.Reset();

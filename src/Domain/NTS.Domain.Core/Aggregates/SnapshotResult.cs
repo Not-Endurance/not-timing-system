@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
-using NTS.Domain.Aggregates;
+﻿using NTS.Domain.Aggregates;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class SnapshotResult : Aggregate
+public class SnapshotResult : Aggregate, IEventScoped
 {
     public static SnapshotResult Applied(int eventId, Snapshot snapshot)
     {

@@ -6,4 +6,18 @@
 @attribute [AllowAnonymous]
 @inherits AuthenticateRedirectContentBehind
 
-<RemoteAuthenticatorView Action="@Action" />
+<div class="loading-shell" role="status" aria-live="polite" aria-label="Authentication redirect in progress">
+    <div class="loading-shell__body">
+        @if (ShouldShowSpinner)
+        {
+            <div class="loading-shell__spinner" aria-hidden="true"></div>
+        }
+
+        <div class="loading-shell__text">
+            @if (ShouldRenderRemoteAuthenticator)
+            {
+                <RemoteAuthenticatorView Action="@Action" />
+            }
+        </div>
+    </div>
+</div>

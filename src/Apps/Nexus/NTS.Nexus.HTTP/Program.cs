@@ -16,7 +16,7 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.ConfigureFunctionsWebApplication();
 builder.UseMiddleware<FunctionsCorsMiddleware>();
-builder.UseMiddleware<FunctionInvocationTelemetryMiddleware>();
+builder.UseMiddleware<ErrorHandlerMiddleware>();
 builder.Services.ConfigureNexusApi(builder.Configuration);
 
 var app = builder.Build();

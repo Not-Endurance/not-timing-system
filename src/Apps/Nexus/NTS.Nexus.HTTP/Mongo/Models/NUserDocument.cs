@@ -1,6 +1,7 @@
 using Not.Application.Authentication.User;
 using Not.Random;
-using NTS.Application.Shared;
+using NTS.Application.Contracts.Shared;
+using NTS.Application.Contracts.Shared.Models;
 
 namespace NTS.Nexus.HTTP.Mongo.Models;
 
@@ -11,7 +12,10 @@ public class NUserDocument : IDocument
         string? name = null,
         string? givenName = null,
         string? surname = null,
-        string? countryRegion = null
+        string? countryRegion = null,
+        string? middleName = null,
+        string? club = null,
+        string? feiId = null
     )
     {
         return new NUserDocument
@@ -22,6 +26,9 @@ public class NUserDocument : IDocument
             GivenName = string.IsNullOrWhiteSpace(givenName) ? null : givenName.Trim(),
             Surname = string.IsNullOrWhiteSpace(surname) ? null : surname.Trim(),
             CountryRegion = string.IsNullOrWhiteSpace(countryRegion) ? null : countryRegion.Trim(),
+            MiddleName = string.IsNullOrWhiteSpace(middleName) ? null : middleName.Trim(),
+            Club = string.IsNullOrWhiteSpace(club) ? null : club.Trim(),
+            FeiId = string.IsNullOrWhiteSpace(feiId) ? null : feiId.Trim(),
         };
     }
 
@@ -35,6 +42,9 @@ public class NUserDocument : IDocument
             GivenName = user.GivenName,
             Surname = user.Surname,
             CountryRegion = user.CountryRegion,
+            MiddleName = user.MiddleName,
+            Club = user.Club,
+            FeiId = user.FeiId,
             Roles = user.Roles.ToArray(),
         };
     }
@@ -45,6 +55,9 @@ public class NUserDocument : IDocument
     public string? GivenName { get; set; }
     public string? Surname { get; set; }
     public string? CountryRegion { get; set; }
+    public string? MiddleName { get; set; }
+    public string? Club { get; set; }
+    public string? FeiId { get; set; }
     public string[] Roles { get; set; } = [];
     public string TenantId { get; set; } = "nts";
 
@@ -56,6 +69,9 @@ public class NUserDocument : IDocument
             GivenName = GivenName,
             Surname = Surname,
             CountryRegion = CountryRegion,
+            MiddleName = MiddleName,
+            Club = Club,
+            FeiId = FeiId,
         };
     }
 }

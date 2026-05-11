@@ -1,11 +1,11 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
 using Not.Async.Extensions;
 using Not.Exceptions;
 using Not.Observables.Structures;
 using Not.Safe;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Objects.Documents;
@@ -23,15 +23,15 @@ public class HandoutsService
 {
     readonly SemaphoreSlim _semaphore = new(1);
     readonly INtsSocketContext _socketContext;
-    readonly IRepository<Handout> _handoutRepository;
-    readonly IRepository<Participation> _participations;
-    readonly IRepository<Official> _officials;
+    readonly IEventScopedRepository<Handout> _handoutRepository;
+    readonly IEventScopedRepository<Participation> _participations;
+    readonly IEventScopedRepository<Official> _officials;
 
     public HandoutsService(
         INtsSocketContext socketContext,
-        IRepository<Handout> handouts,
-        IRepository<Participation> participations,
-        IRepository<Official> officials
+        IEventScopedRepository<Handout> handouts,
+        IEventScopedRepository<Participation> participations,
+        IEventScopedRepository<Official> officials
     )
     {
         _socketContext = socketContext;
@@ -64,7 +64,7 @@ public class HandoutsService
         await _semaphore.WaitAsync();
 
         var ids = documents.Select(x => x.Id);
-        await _handoutRepository.Delete(x => ids.Contains(x.Id));
+        await _handoutRepository.DeleteMany(x => ids.Contains(x.Id));
         State.RemoveRange(documents);
 
         _semaphore.Release();
@@ -80,7 +80,7 @@ public class HandoutsService
 
     public async Task<IEnumerable<Combination>> GetCombinations()
     {
-        return await SafeHelper.Run(SafeGetCombinations) ?? [];
+        return await SafeHelper.RunWithError(SafeGetCombinations);
     }
 
     public async Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
@@ -95,17 +95,17 @@ public class HandoutsService
 
     async Task CreateDocument(Participation participation)
     {
-        var enduranceEvent = GuardHelper.ThrowIfDefault(_socketContext.Event);
+        var eventInformation = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var officials = await _officials.ReadMany();
         var existingHandout = await _handoutRepository.Read(x => x.Participation.Id == participation.Id);
 
         var handout = new Handout(participation);
-        var document = new HandoutDocument(handout, enduranceEvent, officials);
+        var document = new HandoutDocument(handout, eventInformation, officials);
 
         await _semaphore.WaitAsync();
         try
         {
-            await _handoutRepository.Delete(x => x.Participation.Id == participation.Id);
+            await _handoutRepository.DeleteMany(x => x.Participation.Id == participation.Id);
             var existingDocuments = State.Where(x => x.ParticipationId == participation.Id).ToList();
             if (existingDocuments.Count != 0)
             {

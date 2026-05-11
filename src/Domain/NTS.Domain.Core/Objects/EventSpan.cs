@@ -13,6 +13,11 @@ public record EventSpan
     public DateTimeOffset StartDay { get; }
     public DateTimeOffset EndDay { get; }
 
+    public bool IsActive(DateTimeOffset now)
+    {
+        return now < EndDay;
+    }
+
     public override string ToString()
     {
         var now = DateTimeOffset.Now;

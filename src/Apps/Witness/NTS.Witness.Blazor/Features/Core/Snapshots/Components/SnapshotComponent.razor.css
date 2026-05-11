@@ -1,0 +1,39 @@
+.snapshot-component {
+    width: 100%;
+}
+
+.snapshot-component ::deep .snapshot-table-compact,
+.snapshot-component ::deep .snapshot-table-compact table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.snapshot-component ::deep .snapshot-table-compact col:first-child {
+    width: calc(100% - 132px) !important;
+}
+
+.snapshot-component ::deep .snapshot-table-compact col:last-child {
+    width: 132px !important;
+}
+
+.snapshot-component ::deep .snapshot-table-compact td:first-child,
+.snapshot-component ::deep .snapshot-table-compact th:first-child {
+    width: auto;
+    overflow: hidden;
+}
+
+.snapshot-component ::deep .snapshot-table-compact td:first-child .mud-typography {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.snapshot-component ::deep .snapshot-table-compact td,
+.snapshot-component ::deep .snapshot-table-compact th {
+    padding: 4px;
+}
+
+.snapshot-component ::deep .snapshot-table-compact .snapshot-actions {
+    flex-wrap: nowrap;
+}

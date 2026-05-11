@@ -1,4 +1,4 @@
-using NTS.Judge.Features.Setup.UpcomingEvents.Loops;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
 
 namespace NTS.Judge.Blazor.Features.Setup.Loops;
 

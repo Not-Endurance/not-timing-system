@@ -1,4 +1,4 @@
-using NTS.Judge.Features.Setup.Clubs;
+using NTS.Judge.Contracts.Features.Setup.Clubs;
 
 namespace NTS.Judge.Blazor.Features.Setup.Clubs;
 

@@ -1,27 +1,23 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Not.Application.CRUD.Ports;
-using NTS.Application.Setup;
+using Not.Storage.Mongo;
+using NTS.Application.Contracts.Setup;
+using NTS.Application.Contracts.Setup.Models;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
 
-public class ClubFunctions : FunctionBase
+public class ClubFunctions : CrudFunctions<ClubModel>
 {
-    readonly IRepository<ClubModel> _clubs;
-
     public ClubFunctions(
         IFunctionLogger<ClubFunctions> logger,
-        IRepository<ClubModel> clubs,
+        IMongoRepository<ClubModel> clubs,
         ITelemetryService telemetry
     )
-        : base(logger, telemetry)
-    {
-        _clubs = clubs;
-    }
+        : base(logger, clubs, telemetry) { }
 
     [Function("clubs-insert")]
     public async Task<IActionResult> Insert(
@@ -31,15 +27,7 @@ public class ClubFunctions : FunctionBase
         using var activity = StartFunctionActivity(nameof(Insert));
         TagRequest(request);
         LogInformation(request, nameof(Insert));
-
-        var document = await ReadBody<ClubModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<ClubModel>();
-        }
-
-        await _clubs.Create(document);
-        return new OkObjectResult($"Inserted club '{document.Name}'");
+        return await CreateCore(request);
     }
 
     [Function("clubs-update")]
@@ -50,15 +38,7 @@ public class ClubFunctions : FunctionBase
         using var activity = StartFunctionActivity(nameof(Update));
         TagRequest(request);
         LogInformation(request, nameof(Update));
-
-        var document = await ReadBody<ClubModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<ClubModel>();
-        }
-
-        await _clubs.Update(document);
-        return new OkObjectResult($"Updated club '{document.Name}'");
+        return await UpdateCore(request);
     }
 
     [Function("clubs-delete")]
@@ -70,15 +50,18 @@ public class ClubFunctions : FunctionBase
         using var activity = StartFunctionActivity(nameof(Delete));
         TagRequest(request);
         LogInformation(request, nameof(Delete));
+        return await DeleteCore(id);
+    }
 
-        var club = await _clubs.Read(id);
-        if (club == null)
-        {
-            return new OkObjectResult($"Club wiht id '{id}' did not exist");
-        }
-
-        await _clubs.Delete(club);
-        return new OkObjectResult($"Deleted club with id '{id}'");
+    [Function("clubs-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "clubs")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+        return await DeleteManyCore(request);
     }
 
     [Function("clubs-get-one")]
@@ -90,9 +73,7 @@ public class ClubFunctions : FunctionBase
         using var activity = StartFunctionActivity(nameof(GetOne));
         TagRequest(request);
         LogInformation(request, nameof(GetOne));
-
-        var club = await _clubs.Read(id);
-        return new OkObjectResult(club);
+        return await ReadCore(id);
     }
 
     [Function("clubs-list")]
@@ -103,8 +84,6 @@ public class ClubFunctions : FunctionBase
         using var activity = StartFunctionActivity(nameof(List));
         TagRequest(request);
         LogInformation(request, nameof(List));
-
-        var clubs = await _clubs.ReadMany();
-        return new OkObjectResult(clubs);
+        return await ReadManyCore(request);
     }
 }

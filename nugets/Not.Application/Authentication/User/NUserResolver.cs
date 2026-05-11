@@ -21,7 +21,15 @@ public class NUserResolver
 
     public async Task<NUserResolutionResult> ResolvePrincipal(ClaimsPrincipal? principal)
     {
-        var registration = NUserClaimsHelper.ResolveRegistration(principal);
+        return await ResolvePrincipal(principal, null);
+    }
+
+    public async Task<NUserResolutionResult> ResolvePrincipal(
+        ClaimsPrincipal? principal,
+        NUserRegistrationProfile? profile
+    )
+    {
+        var registration = NUserClaimsHelper.ResolveRegistration(principal, profile);
         if (registration == null || principal == null)
         {
             return NUserResolutionResult.Failure("Login error - missing user email", ERROR_PAGE);
@@ -43,10 +51,10 @@ public class NUserResolver
         var resolvedPrincipal = new ClaimsPrincipal(newIdentity);
 
         var userResult = await _userRegister.Get(registration.Email);
-        if (userResult.IsError || userResult.Data == null)
+        if (!userResult.IsSuccess || userResult.Data == null)
         {
             userResult = await _userRegister.Register(registration);
-            if (userResult.IsError)
+            if (!userResult.IsSuccess || userResult.Data == null)
             {
                 var errors = string.Join(",", userResult.Errors);
                 _logger.LogError("Authentication failed: {errors}", errors);

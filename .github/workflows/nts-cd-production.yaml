@@ -1,0 +1,81 @@
+name: CD
+run-name: CD Production [${{ github.ref_name }}]
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+env:
+  CONFIGURATION: Release
+  DOTNET_CORE_VERSION: 8.0.x
+  APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
+  API_LOCATION: src/Apps/Nexus/NTS.Nexus.HTTP
+  OUTPUT_LOCATION: wwwroot
+  SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
+  ARTIFACT_PATH: NTS.Nexus.Warp/publish
+  AZURE_RESOURCE: nts-nexus-warp-prod
+
+jobs:
+  deploy-message-bus:
+    runs-on: ubuntu-latest
+    name: Production - MessageBus
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}  # adjust if needed
+
+    - name: Restore
+      run: dotnet restore "${{ env.SOURCE_PATH }}" -v:q
+
+    - name: Build
+      run: |
+        dotnet build ${{ env.SOURCE_PATH }} \
+        --configuration ${{ env.CONFIGURATION }} \
+        --no-restore \
+        -v:q
+    - name: Publish
+      run: |
+        dotnet publish ${{ env.SOURCE_PATH }} \
+        --configuration ${{ env.CONFIGURATION }} \
+        --no-build \
+        --output ${{ env.ARTIFACT_PATH }}
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: ${{ env.AZURE_RESOURCE }}
+        publish-profile: ${{ secrets.AZURE_NTS_NEXUS_WARP_PRODUCTION_PUBLISH_PROFILE }}
+        package: ${{ env.ARTIFACT_PATH }}
+
+  deploy-client:
+    needs: deploy-message-bus
+    runs-on: ubuntu-latest
+    name: Production - Client
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+          lfs: false
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          action: "upload"
+          production_branch: master
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_ISLAND_0DC61C703 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          app_location: ${{ env.APP_LOCATION }}
+          api_location: ${{ env.API_LOCATION }}
+          output_location: ${{ env.OUTPUT_LOCATION }}

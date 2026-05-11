@@ -1,7 +1,8 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
-using Not.Application.CRUD.Ports;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Socket;
+using NTS.Application.Contracts.Startlists;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
@@ -22,13 +23,13 @@ public class StartlistService
     static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_BY_STAGE =
         new Dictionary<int, IReadOnlyList<Starter>>();
 
-    readonly IReadMany<Participation> _participations;
+    readonly IEventScopedRepository<Participation> _participations;
     readonly INtsSocketContext? _socketContext;
 
-    public StartlistService(IReadMany<Participation> participations)
+    public StartlistService(IEventScopedRepository<Participation> participations)
         : this(participations, null) { }
 
-    public StartlistService(IReadMany<Participation> participations, INtsSocketContext? socketContext)
+    public StartlistService(IEventScopedRepository<Participation> participations, INtsSocketContext? socketContext)
     {
         _participations = participations;
         _socketContext = socketContext;
@@ -60,6 +61,8 @@ public class StartlistService
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
         var participation = notification.Participation;
+        Startlist?.Upsert(participation);
+
         if (participation.Phases.Current.IsComplete() && participation.Phases.Current.IsFinal)
         {
             Startlist?.Remove(participation.Combination.Number);

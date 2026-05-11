@@ -1,6 +1,7 @@
 using Not.Injection;
+using NTS.Application.Contracts.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
-using NTS.Application.Watcher;
 using NTS.Domain.Watcher;
 
 namespace NTS.Judge.Features.UserSessions;

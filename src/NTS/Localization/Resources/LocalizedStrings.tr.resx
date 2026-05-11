@@ -189,8 +189,8 @@
   <data name="Dashboard_string" xml:space="preserve">
     <value>Gösterge Paneli</value>
   </data>
-  <data name="Endurance_Event_string" xml:space="preserve">
-    <value>Dayanıklılık Etkinliği</value>
+  <data name="Event_Information_string" xml:space="preserve">
+    <value>Etkinlik Bilgileri</value>
   </data>
   <data name="Athletes_and_Horses_string" xml:space="preserve">
     <value>Biniciler ve Atlar</value>
@@ -209,9 +209,6 @@
   </data>
   <data name="Handouts_string" xml:space="preserve">
     <value>Dokümanlar</value>
-  </data>
-  <data name="Inquiry_string" xml:space="preserve">
-    <value>Sorgu</value>
   </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Elenme Nedeni</value>
@@ -297,6 +294,9 @@
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Kombinasyon Numarası</value>
   </data>
+  <data name="Location_string" xml:space="preserve">
+    <value>Konum</value>
+  </data>
   <data name="Place_string" xml:space="preserve">
     <value>Yer</value>
   </data>
@@ -321,8 +321,8 @@
   <data name="Start_string" xml:space="preserve">
     <value>başla</value>
   </data>
-  <data name="Configure_Endurance_Event_string" xml:space="preserve">
-    <value>Dayanıklılık Etkinliğini Yapılandır</value>
+  <data name="Configure_Event_string" xml:space="preserve">
+    <value>Etkinliği Yapılandır</value>
   </data>
   <data name="Configure_Competition_string" xml:space="preserve">
     <value>Yarışmayı Yapılandır</value>
@@ -372,9 +372,6 @@
   <data name="Cancel_string" xml:space="preserve">
     <value>İptal</value>
   </data>
-  <data name="Archive_string" xml:space="preserve">
-    <value>Arşivle</value>
-  </data>
   <data name="History_string" xml:space="preserve">
     <value>Geçmiş</value>
   </data>
@@ -423,8 +420,9 @@
   <data name="Please_select_future_time_string" xml:space="preserve">
     <value>Lütfen gelecekteki bir zaman seçin</value>
   </data>
-  <data name="Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection" xml:space="preserve">
-    <value>Nexus'a bağlanılamadı. Bazı işlemler kullanılamayacak. Lütfen internet bağlantınızı kontrol edin</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Cannot_connect_to_server_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
   </data>
   <data name="Athletes_string" xml:space="preserve">
     <value>Biniciler</value>
@@ -516,9 +514,6 @@
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Zaman formatı yanlış 'saat:dakika:saniye'</value>
   </data>
-  <data name="No_results_found_in_archive_string" xml:space="preserve">
-    <value>Arşivde sonuç bulunamadı</value>
-  </data>
   <data name="required_for_FEI_export" xml:space="preserve">
     <value>(FEI dışa aktarımı için gerekli)</value>
   </data>
@@ -540,7 +535,7 @@
   <data name="Invalid_phase_configuration_in_competition__missing_rest" xml:space="preserve">
     <value>Yarışma '{0}' içinde geçersiz aşama yapılandırması: final olmayan bir aşamada Dinlenme süresi eksik</value>
   </data>
-  <data name="Upcoming_events_string" xml:space="preserve">
+  <data name="Configure_events_string" xml:space="preserve">
     <value>Yaklaşan etkinlikler</value>
   </data>
   <data name="Select_event_string" xml:space="preserve">
@@ -585,7 +580,6 @@
   <data name="Component_missing_required_value_string" xml:space="preserve">
     <value>{0} oluşturulamadı. Lütfen geliştiriciyle iletişime geçin.</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Setup_configuration_will_not_be_deleted_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
@@ -676,9 +670,6 @@
   <data name="Connect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-  <data name="Connecting_to___will_remove_your_current_snapshot_history_This_cannot_be_undone_string" xml:space="preserve">
-    <value>'{0}' etkinliğine bağlanmak mevcut anlık görüntü geçmişinizi silecektir. Bu işlem geri alınamaz.</value>
-  </data>
   <data name="Disconnect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
@@ -722,7 +713,7 @@
     <value>Geçersiz yapılandırma</value>
   </data>
   <data name="Start_validation_invalid_setup_description_string" xml:space="preserve">
-    <value>Bir katılım birden fazla yarışmaya yalnızca aşama yapısı aynıysa eklenebilir.</value>
+    <value>Etkinliği başlatmadan önce aşağıdaki yapılandırma sorunlarını düzeltin.</value>
   </data>
   <data name="Start_validation_issue_different_phase_configurations_string" xml:space="preserve">
     <value>#{0}: aşama yapılandırması yarışmalar arasında farklı:</value>
@@ -747,5 +738,11 @@
   </data>
   <data name="Register_string" xml:space="preserve">
     <value>Kaydol</value>
+  </data>
+  <data name="Validation_errors_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Past_events_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
   </data>
 </root>

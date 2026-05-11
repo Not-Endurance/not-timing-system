@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
-using NTS.Application.Watcher;
+using NTS.Application.Contracts.Watcher;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Nexus.Warp.Abstractions;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
@@ -34,30 +35,30 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
 
     public async Task Receive(WarpRequest<SnapshotGroupModel> request)
     {
-        var enduranceEventId = GetEnduranceEventId(request.EnduranceEventId);
-        await _receiveAuthorizer.Authorize(Context.User, GetConnectionGroup(), enduranceEventId);
+        var eventId = GetEventId(request.EventId);
+        await _receiveAuthorizer.Authorize(Context.User, GetConnectionGroup(), eventId);
         if (request.Payload.Entries.Length == 0)
         {
             return;
         }
 
-        var connectionId = _primaryConnections.GetConnectionId(enduranceEventId);
+        var connectionId = _primaryConnections.GetConnectionId(eventId);
         if (connectionId == null)
         {
-            await _pendingSnapshots.Append(enduranceEventId, request.Payload);
+            await _pendingSnapshots.Append(eventId, request.Payload);
             return;
         }
 
         await _judgeRelay.Clients.Client(connectionId).Receive(request.Payload);
     }
 
-    static string GetEnduranceEventId(string enduranceEventId)
+    static string GetEventId(string eventId)
     {
-        if (string.IsNullOrWhiteSpace(enduranceEventId))
+        if (string.IsNullOrWhiteSpace(eventId))
         {
             throw new HubException("Message cannot be sent because no event is selected.");
         }
 
-        return enduranceEventId;
+        return eventId;
     }
 }

@@ -1,6 +1,6 @@
 using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
-using NTS.Application.Socket;
+using NTS.Application.Contracts.Socket;
 using static NTS.Witness.Blazor.Routes;
 
 namespace NTS.Witness.Blazor.Layout;
@@ -21,10 +21,9 @@ public class MainLayoutBehind : LayoutComponentBase
         Navigator.NavigateTo(EMERGENCY_CONTACTS_PAGE);
     }
 
-    protected Task Signout()
+    protected async Task Signout()
     {
-        Authentication.Signout();
-        SocketService.Disconnect();
-        return Task.CompletedTask;
+        await Authentication.Signout();
+        await SocketService.Disconnect();
     }
 }

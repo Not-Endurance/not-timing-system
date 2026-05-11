@@ -1,12 +1,12 @@
 using System.Linq.Expressions;
-using MongoDB.Driver;
 using Not.Storage.Mongo;
-using NTS.Application.Shared;
+using Not.Structures;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public abstract class EventScopedMongoRepository<T> : SoftDeleteMongoRepository<T>, IEventResetRepository
-    where T : class, IEventScopedDocument, IDocument, ISoftDeletableDocument
+public abstract class EventScopedMongoRepository<T> : MongoRepository<T>, IEventResetRepository
+    where T : class, IEventScoped, IIdentifiable
 {
     protected EventScopedMongoRepository(IMongoContext context, string db, string collection)
         : base(context, db, collection) { }
@@ -16,19 +16,8 @@ public abstract class EventScopedMongoRepository<T> : SoftDeleteMongoRepository<
         return x => x.Id == item.Id && x.EventId == item.EventId;
     }
 
-    public async Task<int?> GetMaxDeletedVersion(int eventId)
+    public virtual Task DeleteAllForEvent(int eventId)
     {
-        var deleted = await GetCollection()
-            .Find(x => x.EventId == eventId && x.IsDeleted)
-            .SortByDescending(x => x.DeletedVersion)
-            .FirstOrDefaultAsync();
-
-        return deleted?.DeletedVersion;
-    }
-
-    public async Task SoftDelete(int eventId, int deletedVersion)
-    {
-        var filter = Builders<T>.Filter.Where(x => x.EventId == eventId && x.IsDeleted != true);
-        await GetCollection().UpdateManyAsync(filter, SoftDeleteUpdateDefinition(deletedVersion));
+        return DeleteMany(x => x.EventId == eventId);
     }
 }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "NTS WSL Integration"
+  short_description: "Set up NTS integration tests in WSL"
+  default_prompt: "Use $nts-wsl-integration to set up and verify the NTS integration test environment in WSL."

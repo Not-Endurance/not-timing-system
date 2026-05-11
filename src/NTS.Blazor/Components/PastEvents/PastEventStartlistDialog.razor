@@ -1,0 +1,12 @@
+﻿@using NTS.Blazor.Components.Startlist.History
+@inherits PastEventStartlistDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <StartlistHistoryView HistoryByStage="HistoryByStage" ShowTitle="false" />
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonCancel OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

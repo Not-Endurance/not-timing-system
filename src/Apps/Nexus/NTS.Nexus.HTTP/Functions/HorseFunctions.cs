@@ -2,11 +2,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Application.CRUD.Ports;
-using Not.Async.Extensions;
-using NTS.Application.Setup;
+using NTS.Application.Contracts.Setup;
+using NTS.Application.Contracts.Setup.Models;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
-using NTS.Nexus.HTTP.Mongo.Repositories;
 using NTS.Nexus.HTTP.Telemetry;
 
 namespace NTS.Nexus.HTTP.Functions;
@@ -14,18 +13,15 @@ namespace NTS.Nexus.HTTP.Functions;
 public class HorseFunctions : FunctionBase
 {
     readonly IRepository<HorseModel> _horses;
-    readonly IArchiveRepository _archive;
 
     public HorseFunctions(
         IFunctionLogger<HorseFunctions> logger,
         IRepository<HorseModel> horses,
-        IArchiveRepository archive,
         ITelemetryService telemetry
     )
         : base(logger, telemetry)
     {
         _horses = horses;
-        _archive = archive;
     }
 
     [Function("horses-insert")]
@@ -38,13 +34,8 @@ public class HorseFunctions : FunctionBase
         LogInformation(request, nameof(Insert));
 
         var document = await ReadBody<HorseModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<HorseModel>();
-        }
-
         await _horses.Create(document);
-        return new OkObjectResult($"Inserted horse '{document.Name}'");
+        return Ok();
     }
 
     [Function("horses-update")]
@@ -57,13 +48,8 @@ public class HorseFunctions : FunctionBase
         LogInformation(request, nameof(Update));
 
         var document = await ReadBody<HorseModel>(request);
-        if (document == null)
-        {
-            return UnexpectedPayload<HorseModel>();
-        }
-
         await _horses.Update(document);
-        return new OkObjectResult($"Updated horse '{document.Name}'");
+        return Ok();
     }
 
     [Function("horses-safe-delete")]
@@ -76,25 +62,14 @@ public class HorseFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(SafeDelete));
 
-        var recordsWithHorse = await _archive
-            .ReadMany(x => x.Ranklists.Any(y => y.Entries.Any(z => z.Participation.Combination.Horse.Id == id)))
-            .ToList();
-
-        if (recordsWithHorse.Any())
-        {
-            return new OkObjectResult(
-                $"The horse you want to delete has participated in '{recordsWithHorse.Count}' events. It will not be removed from those archives, but will no longer be visible for future events"
-            );
-        }
-
         var horse = await _horses.Read(id);
         if (horse == null)
         {
-            return new OkObjectResult($"Club with id '{id}' did not exist");
+            return Ok();
         }
 
         await _horses.Delete(horse);
-        return new OkObjectResult($"Deleted horse with id '{id}'");
+        return Ok();
     }
 
     [Function("horses-delete")]
@@ -110,11 +85,25 @@ public class HorseFunctions : FunctionBase
         var horse = await _horses.Read(id);
         if (horse == null)
         {
-            return new OkObjectResult($"Horse wiht id '{id}' did not exist");
+            return Ok();
         }
 
         await _horses.Delete(horse);
-        return new OkObjectResult($"Deleted horse with id '{id}'");
+        return Ok();
+    }
+
+    [Function("horses-delete-many")]
+    public async Task<IActionResult> DeleteMany(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses")] HttpRequest request
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(DeleteMany));
+        TagRequest(request);
+        LogInformation(request, nameof(DeleteMany));
+
+        var horses = await ReadBody<HorseModel[]>(request);
+        await _horses.DeleteMany(horses);
+        return Ok();
     }
 
     [Function("horses-get")]
@@ -127,8 +116,7 @@ public class HorseFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(GetOne));
 
-        var horse = await _horses.Read(id);
-        return new OkObjectResult(horse);
+        return Ok(await _horses.Read(id));
     }
 
     [Function("horses-list")]
@@ -140,7 +128,6 @@ public class HorseFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(List));
 
-        var horses = await _horses.ReadMany();
-        return new OkObjectResult(horses);
+        return Ok(await _horses.ReadMany() ?? []);
     }
 }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Service Helper Collaborator Definitions"
+  short_description: "Choose the right collaborator type"
+  default_prompt: "Use $service-helper-processor-definitions to decide whether this logic belongs in a Service or a specific collaborator."

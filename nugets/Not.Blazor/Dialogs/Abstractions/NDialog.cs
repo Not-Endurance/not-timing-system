@@ -3,7 +3,7 @@ using Not.Blazor.Components.Abstractions;
 
 namespace Not.Blazor.Dialogs.Abstractions;
 
-public abstract class NDialog : NComponent
+public abstract class NDialog : NStatefulComponent
 {
     [CascadingParameter]
     protected MudDialogInstance CurrentDialog { get; set; } = default!;
@@ -22,7 +22,7 @@ public abstract class NDialog : NComponent
     }
 }
 
-public abstract class NDialog<T> : NComponent
+public abstract class NDialog<T> : NStatefulComponent
 {
     [CascadingParameter]
     protected MudDialogInstance CurrentDialog { get; set; } = default!;

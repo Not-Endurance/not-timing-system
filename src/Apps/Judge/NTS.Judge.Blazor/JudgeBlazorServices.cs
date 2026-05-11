@@ -12,6 +12,6 @@ public static class JudgeBlazorServices
     {
         return services
             .AddNBlazor(configuration)
-            .AddScoped<IStartupInitializerAsync, JudgeStartupEnduranceEventCoordinator>();
+            .AddScoped<IStartupInitializerAsync, JudgeStartupEventInformationCoordinator>();
     }
 }

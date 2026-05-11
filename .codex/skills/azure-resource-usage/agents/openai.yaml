@@ -1,0 +1,4 @@
+interface:
+  display_name: "Azure Resource Usage"
+  short_description: "Report Azure resource usage metrics"
+  default_prompt: "Use $azure-resource-usage to report CPU usage for an Azure resource ID on YYYY-MM-DD in my timezone."

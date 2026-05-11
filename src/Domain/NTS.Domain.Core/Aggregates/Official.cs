@@ -1,6 +1,6 @@
 ﻿namespace NTS.Domain.Core.Aggregates;
 
-public class Official : Aggregate
+public class Official : Aggregate, IEventScoped
 {
     public Official(Person? person, OfficialRole? role, int eventId, int? id = null, int? userId = null)
         : base(id)

@@ -51,14 +51,14 @@ internal sealed class WitnessReceiveAuthorizer : IWitnessReceiveAuthorizer
         }
     }
 
-    static int ParseEventId(string? enduranceEventId, string source)
+    static int ParseEventId(string? eventId, string source)
     {
-        if (!int.TryParse(enduranceEventId, out var eventId))
+        if (!int.TryParse(eventId, out var parsedEventId))
         {
             throw new HubException($"Witness event ID is missing or invalid for the {source}.");
         }
 
-        return eventId;
+        return parsedEventId;
     }
 
     static string? ResolveScopeName(NServerAuthenticationSettings settings)

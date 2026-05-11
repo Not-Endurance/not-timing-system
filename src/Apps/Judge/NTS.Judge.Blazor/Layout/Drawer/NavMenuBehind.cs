@@ -1,7 +1,7 @@
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Navigation.Abstractions;
-using NTS.Application.Socket;
-using NTS.Judge.Features.Settings;
+using NTS.Application.Contracts.Socket;
+using NTS.Judge.Contracts.Features.Settings;
 using static NTS.Judge.Blazor.Routes;
 
 namespace NTS.Judge.Blazor.Layout.Drawer;

@@ -1,7 +1,7 @@
 @using NTS.Blazor.Components.ParticipationTable.Phases
 @using NTS.Domain.Core.Aggregates;
-@using NTS.Judge.Features.Core.Rankings;
-@using NTS.Judge.Features.Core.Rankings.CustomRankings
+@using NTS.Judge.Contracts.Features.Core.Rankings;
+@using NTS.Judge.Contracts.Features.Core.Rankings.CustomRankings
 @using Not.Blazor.Components.Input
 
 @inherits CustomRankingDialogBehind
@@ -13,10 +13,10 @@
     
     <DialogContent>
         <MudStack Spacing="2">
-            <MudContainer Class="not-page-mid-width">
+            <MudContainer Class="n-content-mid-width">
                 <NSelect T="Ranking" @bind-Value="Template" Items="@TemplateRankings" Label="@Template_ranking_string" />
 
-                <MudText Typo="Typo.body2" Color="Color.Info" HtmlTag="i">*@Optionally_select_existing_ranking_to_prepopulate_the_form_string</MudText>
+                <MudText Typo="Typo.body2" HtmlTag="i">*@Optionally_select_existing_ranking_to_prepopulate_the_form_string</MudText>
 
                 <MudStack Row AlignItems="AlignItems.Center">
                     <NAutocomplete @bind-Value="EntryToAdd.Participation" SearchSafe="SearchParticipationsSafe" Label="@Select_participation_to_add_string"/>

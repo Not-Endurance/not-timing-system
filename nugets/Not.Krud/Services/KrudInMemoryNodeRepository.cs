@@ -66,7 +66,7 @@ public class KrudInMemoryNodeRepository<T> : IRepository<T>, IKrudCascadeReposit
         return Task.CompletedTask;
     }
 
-    public Task Delete(Expression<Func<T, bool>> filter)
+    public Task DeleteMany(Expression<Func<T, bool>> filter)
     {
         var predicate = filter.Compile();
         var children = _parentNode.Children.Where(predicate).ToList();
@@ -77,9 +77,9 @@ public class KrudInMemoryNodeRepository<T> : IRepository<T>, IKrudCascadeReposit
         return Task.CompletedTask;
     }
 
-    public Task Delete(IEnumerable<T> items)
+    public Task DeleteMany(IEnumerable<T> items)
     {
-        return Delete(x => items.Any(y => x == y));
+        return DeleteMany(x => items.Any(y => x == y));
     }
 
     public Task<KrudDeleteImpact> PreviewDelete(T entity)

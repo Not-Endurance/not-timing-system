@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor
 @using Not.Blazor.Client.Authentication
 @using Not.Blazor.Components.Text
@@ -7,14 +8,89 @@
 @attribute [AllowAnonymous]
 @inherits AuthenticateContentBehind
 
-<MudGrid Justify="Justify.Center" Class="align-center" Style="height:70%;">
-    <MudItem xs="8" sm="4" lg="4" xl="3">
-        <MudStack>
+<MudGrid Justify="Justify.Center" Class="align-center" Style="min-height:70vh;align-items:center;">
+    <MudItem xs="12" sm="8" md="6" lg="5" xl="5">
+        <MudPaper Elevation="2" Class="pa-12" Style="opacity:0.7;">
+            <MudStack Spacing="3">
+                <NHeadline Content="@Sign_in_to_continue_string" />
 
-            <NHeadline Content="@Sign_in_to_continue_string" />
+                <MudButton Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        Size="Size.Large"
+                        OnClick="Signin"
+                        FullWidth="true">
+                    @Login_string
+                </MudButton>
 
-            <MudButton Variant="Variant.Filled" Size="Size.Large" OnClick="Signin">@Sign_in_with_Microsoft_string</MudButton>
+                @if (!IsRegistering)
+                {
+                    <MudButton Variant="Variant.Outlined"
+                            Color="Color.Primary"
+                            Size="Size.Large"
+                            OnClick="ShowRegistration"
+                            FullWidth="true">
+                        @Register_string
+                    </MudButton>
+                }
 
-        </MudStack>
+                @if (IsRegistering)
+                {
+                    <MudDivider Class="my-2" />
+
+                    <EditForm Model="RegistrationProfile" OnValidSubmit="Register">
+                        <DataAnnotationsValidator />
+
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12" sm="6">
+                                <MudTextField @bind-Value="RegistrationProfile.FirstName"
+                                            For="() => RegistrationProfile.FirstName"
+                                            Label="First Name"
+                                            Required="true"
+                                            Margin="Margin.Dense" />
+                            </MudItem>
+
+                            <MudItem xs="12" sm="6">
+                                <MudTextField @bind-Value="RegistrationProfile.MiddleName"
+                                            For="() => RegistrationProfile.MiddleName"
+                                            Label="Middle Name"
+                                            Margin="Margin.Dense" />
+                            </MudItem>
+
+                            <MudItem xs="12">
+                                <MudTextField @bind-Value="RegistrationProfile.LastName"
+                                            For="() => RegistrationProfile.LastName"
+                                            Label="Last Name"
+                                            Required="true"
+                                            Margin="Margin.Dense" />
+                            </MudItem>
+
+                            <MudItem xs="12">
+                                <MudTextField @bind-Value="RegistrationProfile.Club"
+                                            For="() => RegistrationProfile.Club"
+                                            Label="Club"
+                                            Margin="Margin.Dense" />
+                            </MudItem>
+
+                            <MudItem xs="12">
+                                <MudTextField @bind-Value="RegistrationProfile.FeiId"
+                                            For="() => RegistrationProfile.FeiId"
+                                            Label="FEI ID"
+                                            Margin="Margin.Dense" />
+                            </MudItem>
+                        </MudGrid>
+
+                        <MudButton Variant="Variant.Outlined"
+                                Color="Color.Primary"
+                                Size="Size.Large"
+                                ButtonType="ButtonType.Submit"
+                                Class="mt-3"
+                                FullWidth="true">
+                            @Register_string
+                        </MudButton>
+                    </EditForm>
+                }
+
+            </MudStack>
+        </MudPaper>
     </MudItem>
 </MudGrid>

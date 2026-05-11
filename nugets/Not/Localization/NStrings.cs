@@ -36,12 +36,7 @@ public static class NStrings
         LocalizeString(nameof(Cascading_delete_confirmation_prefix_string));
     public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));
     public static string Affected_resources_string => LocalizeString(nameof(Affected_resources_string));
-    public static string Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection =>
-        LocalizeString(
-            nameof(
-                Could_not_connect_to_Nexus_Some_operations_will_not_be_available_Please_check_your_internet_connection
-            )
-        );
+    public static string Cannot_connect_to_server_string => LocalizeString(nameof(Cannot_connect_to_server_string));
     public static string Text_formatting_failed_This_is_usually_not_critical_failure_string =>
         LocalizeString(nameof(Text_formatting_failed_This_is_usually_not_critical_failure_string));
     public static string Language_string => LocalizeString(nameof(Language_string));
@@ -51,10 +46,13 @@ public static class NStrings
     public static string Image_browser_empty_string => LocalizeString(nameof(Image_browser_empty_string));
     public static string Use_image_string => LocalizeString(nameof(Use_image_string));
     public static string Empty_string => LocalizeString(nameof(Empty_string));
+    public static string Login_string => LocalizeString(nameof(Login_string));
     public static string Sign_in_to_continue_string => LocalizeString(nameof(Sign_in_to_continue_string));
     public static string Sign_in_with_Microsoft_string => LocalizeString(nameof(Sign_in_with_Microsoft_string));
     public static string Register_string => LocalizeString(nameof(Register_string));
     public static string Confirm_action_string => LocalizeString(nameof(Confirm_action_string));
+
+    public static string? Validation_errors_string => LocalizeString(nameof(Validation_errors_string));
 }
 #pragma warning restore NA0004
 #pragma warning restore IDE1006
