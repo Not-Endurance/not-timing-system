@@ -50,7 +50,10 @@ public abstract class AuthenticateContentBehind : NComponent
         if (await AuthenticationSession.ShouldTryAutoSignin())
         {
             var hasPendingRegistrationProfile = await PendingRegistrationProfiles.Read() != null;
-            await Authentication.Signin(silent: true, preservePendingRegistrationProfile: hasPendingRegistrationProfile);
+            await Authentication.Signin(
+                silent: true,
+                preservePendingRegistrationProfile: hasPendingRegistrationProfile
+            );
         }
     }
 
