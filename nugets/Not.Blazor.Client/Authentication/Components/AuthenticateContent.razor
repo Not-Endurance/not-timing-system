@@ -1,5 +1,4 @@
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor
 @using Not.Blazor.Client.Authentication
 @using Not.Blazor.Components.Text
@@ -21,75 +20,6 @@
                         FullWidth="true">
                     @Login_string
                 </MudButton>
-
-                @if (!IsRegistering)
-                {
-                    <MudButton Variant="Variant.Outlined"
-                            Color="Color.Primary"
-                            Size="Size.Large"
-                            OnClick="ShowRegistration"
-                            FullWidth="true">
-                        @Register_string
-                    </MudButton>
-                }
-
-                @if (IsRegistering)
-                {
-                    <MudDivider Class="my-2" />
-
-                    <EditForm Model="RegistrationProfile" OnValidSubmit="Register">
-                        <DataAnnotationsValidator />
-
-                        <MudGrid Spacing="2">
-                            <MudItem xs="12" sm="6">
-                                <MudTextField @bind-Value="RegistrationProfile.FirstName"
-                                            For="() => RegistrationProfile.FirstName"
-                                            Label="First Name"
-                                            Required="true"
-                                            Margin="Margin.Dense" />
-                            </MudItem>
-
-                            <MudItem xs="12" sm="6">
-                                <MudTextField @bind-Value="RegistrationProfile.MiddleName"
-                                            For="() => RegistrationProfile.MiddleName"
-                                            Label="Middle Name"
-                                            Margin="Margin.Dense" />
-                            </MudItem>
-
-                            <MudItem xs="12">
-                                <MudTextField @bind-Value="RegistrationProfile.LastName"
-                                            For="() => RegistrationProfile.LastName"
-                                            Label="Last Name"
-                                            Required="true"
-                                            Margin="Margin.Dense" />
-                            </MudItem>
-
-                            <MudItem xs="12">
-                                <MudTextField @bind-Value="RegistrationProfile.Club"
-                                            For="() => RegistrationProfile.Club"
-                                            Label="Club"
-                                            Margin="Margin.Dense" />
-                            </MudItem>
-
-                            <MudItem xs="12">
-                                <MudTextField @bind-Value="RegistrationProfile.FeiId"
-                                            For="() => RegistrationProfile.FeiId"
-                                            Label="FEI ID"
-                                            Margin="Margin.Dense" />
-                            </MudItem>
-                        </MudGrid>
-
-                        <MudButton Variant="Variant.Outlined"
-                                Color="Color.Primary"
-                                Size="Size.Large"
-                                ButtonType="ButtonType.Submit"
-                                Class="mt-3"
-                                FullWidth="true">
-                            @Register_string
-                        </MudButton>
-                    </EditForm>
-                }
-
             </MudStack>
         </MudPaper>
     </MudItem>

@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
@@ -69,58 +68,6 @@ public class NBlazorClientAuthenticationSessionStorageTests
         Assert.Null(jsRuntime.Read("not.auth.signin-flow-started-at"));
         Assert.Null(await storage.ReadSigninFlowStartedAtAsync());
         Assert.All(jsRuntime.Invocations, x => Assert.StartsWith("localStorage.", x, StringComparison.Ordinal));
-    }
-
-    [Fact]
-    public async Task Pending_registration_profile_round_trips_through_local_storage()
-    {
-        var jsRuntime = new RecordingJsRuntime();
-        using var provider = CreateProvider(jsRuntime);
-        var store = provider.GetRequiredService<INPendingUserRegistrationProfileStore>();
-        var profile = new NUserRegistrationProfile(
-            "Jane Marie Doe",
-            "Jane",
-            "Marie",
-            "Doe",
-            "Konarche",
-            "10101010",
-            "Jane Display"
-        );
-
-        await store.Write(profile);
-
-        Assert.NotNull(jsRuntime.Read(PendingUserRegistrationProfileStore.STORAGE_KEY));
-        Assert.Equal(profile, await store.Read());
-
-        await store.Clear();
-
-        Assert.Null(jsRuntime.Read(PendingUserRegistrationProfileStore.STORAGE_KEY));
-        Assert.Null(await store.Read());
-    }
-
-    [Fact]
-    public async Task Pending_registration_profile_expires_after_lifetime()
-    {
-        var jsRuntime = new RecordingJsRuntime();
-        using var provider = CreateProvider(jsRuntime);
-        var store = provider.GetRequiredService<INPendingUserRegistrationProfileStore>();
-        var expiredDocument = new PendingUserRegistrationProfileStore.PendingUserRegistrationProfileDocument(
-            "Jane Marie Doe",
-            "Jane",
-            "Marie",
-            "Doe",
-            "Konarche",
-            "10101010",
-            "Jane Display",
-            DateTimeOffset
-                .UtcNow.Subtract(PendingUserRegistrationProfileStore.PROFILE_LIFETIME)
-                .AddSeconds(-1)
-                .ToUnixTimeMilliseconds()
-        );
-        jsRuntime.Write(PendingUserRegistrationProfileStore.STORAGE_KEY, JsonSerializer.Serialize(expiredDocument));
-
-        Assert.Null(await store.Read());
-        Assert.Null(jsRuntime.Read(PendingUserRegistrationProfileStore.STORAGE_KEY));
     }
 
     static ServiceProvider CreateProvider(RecordingJsRuntime jsRuntime)

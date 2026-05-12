@@ -2,6 +2,6 @@
 
 public interface INAuthentication
 {
-    Task Signin(bool silent = false, bool preservePendingRegistrationProfile = false);
+    Task Signin(bool silent = false);
     Task Signout();
 }
