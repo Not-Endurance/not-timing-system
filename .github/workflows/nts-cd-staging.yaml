@@ -3,7 +3,9 @@ run-name: CD Staging [${{ github.ref_name }}]
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - develop
 
@@ -19,6 +21,7 @@ env:
 
 jobs:
   deploy-message-bus:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     name: Staging - MessageBus
     steps:
