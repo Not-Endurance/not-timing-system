@@ -19,7 +19,16 @@ public class UserApiRepositoryTests
         var handler = new RecordingHttpMessageHandler
         {
             ResponseFactory = _ =>
-                CreateJsonResponse(Result.Success(new NUserModel("user@example.com", id: 7) { Name = "Jane Doe" })),
+                CreateJsonResponse(
+                    Result.Success(
+                        new NUserModel("user@example.com", id: 7)
+                        {
+                            DisplayName = "Jane Display",
+                            GivenName = "Jane",
+                            Surname = "Doe",
+                        }
+                    )
+                ),
         };
         var repository = CreateRepository(handler);
 
@@ -29,6 +38,7 @@ public class UserApiRepositoryTests
         Assert.NotNull(result.Data);
         Assert.Equal("user@example.com", result.Data!.Email);
         Assert.Equal("Jane Doe", result.Data.Name);
+        Assert.Equal("Jane Display", result.Data.DisplayName);
     }
 
     [Fact]
@@ -63,7 +73,8 @@ public class UserApiRepositoryTests
             "Bulgaria",
             "Marie",
             "Konarche",
-            "10101010"
+            "10101010",
+            "Jane Display"
         );
 
         var result = await repository.Register(registration);
@@ -81,6 +92,7 @@ public class UserApiRepositoryTests
         Assert.Equal(registration.CountryRegion, payload.CountryRegion);
         Assert.Equal(registration.Club, payload.Club);
         Assert.Equal(registration.FeiId, payload.FeiId);
+        Assert.Equal(registration.DisplayName, payload.DisplayName);
     }
 
     static UserApiRepository CreateRepository(HttpMessageHandler handler)

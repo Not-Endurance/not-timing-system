@@ -2,7 +2,6 @@ using System.Reflection;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Not.Application.Authentication.Abstractions;
-using Not.Application.Authentication.User;
 using Not.Blazor.Client.Authentication.Components;
 using Not.Blazor.Client.Authentication.Services;
 
@@ -15,39 +14,17 @@ public class NBlazorClientAuthenticationServiceTests
     {
         var events = new List<string>();
         var markers = new RecordingAuthenticationSessionStorage(events);
-        var pendingProfiles = new RecordingPendingUserRegistrationProfileStore(events);
         var navigation = new RecordingNavigationManager(events);
         var service = new NBlazorClientAuthenticationService(
             markers,
             new RecordingAuthenticationSession(events),
-            pendingProfiles,
             navigation
         );
 
         await service.Signin();
 
-        Assert.Equal(["pending-clear", "flow-write", "navigate"], events);
-        Assert.Equal(RemoteAuthenticationDefaults.LoginPath, navigation.LastRelativeUri);
-    }
-
-    [Fact]
-    public async Task Registration_signin_preserves_pending_profile_until_local_user_resolution()
-    {
-        var events = new List<string>();
-        var markers = new RecordingAuthenticationSessionStorage(events);
-        var pendingProfiles = new RecordingPendingUserRegistrationProfileStore(events);
-        var navigation = new RecordingNavigationManager(events);
-        var service = new NBlazorClientAuthenticationService(
-            markers,
-            new RecordingAuthenticationSession(events),
-            pendingProfiles,
-            navigation
-        );
-
-        await service.Signin(preservePendingRegistrationProfile: true);
-
         Assert.Equal(["flow-write", "navigate"], events);
-        Assert.Equal(0, pendingProfiles.ClearCalls);
+        Assert.Equal(RemoteAuthenticationDefaults.LoginPath, navigation.LastRelativeUri);
     }
 
     [Fact]
@@ -55,18 +32,16 @@ public class NBlazorClientAuthenticationServiceTests
     {
         var events = new List<string>();
         var markers = new RecordingAuthenticationSessionStorage(events);
-        var pendingProfiles = new RecordingPendingUserRegistrationProfileStore(events);
         var navigation = new RecordingNavigationManager(events);
         var service = new NBlazorClientAuthenticationService(
             markers,
             new RecordingAuthenticationSession(events),
-            pendingProfiles,
             navigation
         );
 
         await service.Signout();
 
-        Assert.Equal(["session-clear", "pending-clear", "navigate"], events);
+        Assert.Equal(["session-clear", "navigate"], events);
         Assert.Equal("authentication", navigation.LastRelativeUri);
     }
 
@@ -170,35 +145,6 @@ public class NBlazorClientAuthenticationServiceTests
         public Task Clear()
         {
             _events.Add("session-clear");
-            return Task.CompletedTask;
-        }
-    }
-
-    sealed class RecordingPendingUserRegistrationProfileStore : INPendingUserRegistrationProfileStore
-    {
-        readonly List<string> _events;
-
-        public RecordingPendingUserRegistrationProfileStore(List<string> events)
-        {
-            _events = events;
-        }
-
-        public int ClearCalls { get; private set; }
-
-        public Task Write(NUserRegistrationProfile profile)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task<NUserRegistrationProfile?> Read()
-        {
-            return Task.FromResult<NUserRegistrationProfile?>(null);
-        }
-
-        public Task Clear()
-        {
-            ClearCalls++;
-            _events.Add("pending-clear");
             return Task.CompletedTask;
         }
     }

@@ -12,10 +12,12 @@ Environment configuration files are loaded from:
 - `wwwroot/appsettings.json`
 - `wwwroot/appsettings.Development.json`
 - `wwwroot/appsettings.Staging.json`
+- `wwwroot/appsettings.Production.json`
 
-Localhost-only overrides are loaded when `IS_LOCALHOST=true`:
+Localhost-only overrides are loaded when running from localhost:
 - `localhostsettings.Staging.json`
 - `localhostsettings.Production.json`
 
-The `Staging` and `Production` launch profiles pass `?environment=...` so localhost can choose
-the target environment file while still running from `localhost`.
+The `Development`, `Staging`, and `Production` launch profiles pass `?environment=...` so localhost can choose
+the target environment file while still running from `localhost`. If no environment is supplied, the client starts
+as `Production`.

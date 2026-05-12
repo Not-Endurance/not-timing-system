@@ -135,7 +135,8 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "Register",
             "Bulgaria",
             "Konarche",
-            "10101010"
+            "10101010",
+            "Rosa Display"
         );
         using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
         await using var witness = new WitnessDriver(
@@ -152,7 +153,8 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             registeringUser.MiddleName,
             registeringUser.Surname,
             registeringUser.Club,
-            registeringUser.FeiId
+            registeringUser.FeiId,
+            registeringUser.DisplayName
         );
 
         Assert.Null(await api.ReadUser(registeringUser.Email));
@@ -164,6 +166,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.NotNull(created);
         Assert.Equal(registeringUser.Email, created!.Email);
         Assert.Equal(registeringUser.Name, created.Name);
+        Assert.Equal(registeringUser.DisplayName, created.DisplayName);
         Assert.Equal(registeringUser.GivenName, created.GivenName);
         Assert.Equal(registeringUser.MiddleName, created.MiddleName);
         Assert.Equal(registeringUser.Surname, created.Surname);
@@ -178,7 +181,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         {
             new(ClaimTypes.Email, user.Email),
             new("oid", user.UserIdentifier),
-            new("name", user.Name),
+            new("name", user.DisplayName ?? user.Name),
         };
 
         AddClaim(claims, ClaimTypes.GivenName, user.GivenName);

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\nugets\Not.Application\Not.Application.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
     <ProjectReference Include="..\Domain\NTS.Domain.Setup\NTS.Domain.Setup.csproj" />
     <ProjectReference Include="..\Domain\NTS.Domain.Core\NTS.Domain.Core.csproj" />

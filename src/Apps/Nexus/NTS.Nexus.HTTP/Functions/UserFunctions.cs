@@ -69,7 +69,8 @@ public class UserFunctions : FunctionBase
                 payload.CountryRegion,
                 payload.MiddleName,
                 payload.Club,
-                payload.FeiId
+                payload.FeiId,
+                payload.DisplayName
             )
         );
 

@@ -1,5 +1,3 @@
-﻿using Not.Safe;
-
 namespace Not.Events;
 
 public class Event : EventBase<EventDelegate>, IEventSubscriber
@@ -23,22 +21,22 @@ public class Event : EventBase<EventDelegate>, IEventSubscriber
 
     public Guid Subscribe(Func<Task> action)
     {
-        return InternalSubscribe(() => SafeHelper.Run(action));
+        return InternalSubscribe(() => _ = RunSafely(action));
     }
 
     public Guid Subscribe(Action action)
     {
-        return InternalSubscribe(() => SafeHelper.Run(() => ReturnCompletedTask(action)));
+        return InternalSubscribe(() => RunSafely(action));
     }
 
     public Guid SubscribeAsync(Func<Task> action)
     {
-        return InternalSubscribe(() => SafeHelper.RunAsync(action));
+        return InternalSubscribe(() => _ = Task.Run(() => RunSafely(action)));
     }
 
     public Guid SubscribeAsync(Action action)
     {
-        return InternalSubscribe(() => SafeHelper.RunAsync(() => ReturnCompletedTask(action)));
+        return InternalSubscribe(() => _ = Task.Run(() => RunSafely(action)));
     }
 }
 
@@ -63,21 +61,21 @@ public class Event<T> : EventBase<EventDelegate<T>>, IEventSubscriber<T>
 
     public Guid Subscribe(Func<T, Task> action)
     {
-        return InternalSubscribe(x => SafeHelper.Run(() => action(x)));
+        return InternalSubscribe(x => _ = RunSafely(() => action(x)));
     }
 
     public Guid Subscribe(Action<T> action)
     {
-        return InternalSubscribe(x => SafeHelper.Run(() => ReturnCompletedTask(action, x)));
+        return InternalSubscribe(x => RunSafely(() => action(x)));
     }
 
     public Guid SubscribeAsync(Func<T, Task> action)
     {
-        return InternalSubscribe(x => SafeHelper.RunAsync(() => action(x)));
+        return InternalSubscribe(x => _ = Task.Run(() => RunSafely(() => action(x))));
     }
 
     public Guid SubscribeAsync(Action<T> action)
     {
-        return InternalSubscribe(x => SafeHelper.RunAsync(() => ReturnCompletedTask(action, x)));
+        return InternalSubscribe(x => _ = Task.Run(() => RunSafely(() => action(x))));
     }
 }

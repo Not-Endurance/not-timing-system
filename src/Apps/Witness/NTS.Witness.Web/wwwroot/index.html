@@ -33,23 +33,8 @@
     <script>
         const queryEnvironment = new URLSearchParams(window.location.search).get("environment");
         const supportedEnvironments = ["Development", "Staging", "Production"];
-        let environment = supportedEnvironments.includes(queryEnvironment) ? queryEnvironment : undefined;
-
-        if (!environment && window.location.hostname.includes("localhost")) {
-            environment = "Development";
-        }
-        else if (!environment && window.location.hostname.includes("lively-rock")) {
-            environment = "Staging";
-        }
-        else if (!environment && window.location.hostname.includes("production-url")) {
-            environment = "Production";
-        }
-
-        if (environment) {
-            Blazor.start({ environment: environment });
-        } else {
-            Blazor.start();
-        }
+        const environment = supportedEnvironments.includes(queryEnvironment) ? queryEnvironment : "Production";
+        Blazor.start({ environment: environment });
     </script>
 </body>
 </html>

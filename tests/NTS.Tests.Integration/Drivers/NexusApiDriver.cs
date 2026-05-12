@@ -40,7 +40,8 @@ internal sealed class NexusApiDriver : IDisposable
                 user.CountryRegion,
                 user.MiddleName,
                 user.Club,
-                user.FeiId
+                user.FeiId,
+                user.DisplayName
             )
         );
     }
