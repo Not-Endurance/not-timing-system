@@ -1,4 +1,5 @@
 ﻿using Not.Krud.Abstractions;
+using Newtonsoft.Json;
 using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
 using NTS.Domain.Enums;
@@ -16,10 +17,18 @@ public class UserModel : IDocument, IKrudModel<User>
         return model;
     }
 
+    string? _name;
+
     public int Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Email { get; set; } = default!;
-    public string Name { get; set; } = default!;
+    public string Name
+    {
+        get => BuildName(GivenName, MiddleName, Surname) ?? _name ?? Email;
+        set => _name = Normalize(value);
+    }
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public string? DisplayName { get; set; }
     public string? GivenName { get; set; }
     public string? MiddleName { get; set; }
     public string? Surname { get; set; }
@@ -33,6 +42,7 @@ public class UserModel : IDocument, IKrudModel<User>
         Id = user.Id;
         Email = user.Email;
         Name = user.Name;
+        DisplayName = user.DisplayName;
         GivenName = user.GivenName;
         MiddleName = user.MiddleName;
         Surname = user.Surname;
@@ -44,6 +54,17 @@ public class UserModel : IDocument, IKrudModel<User>
 
     public User MapToEntity()
     {
-        return new User(Email, Name, Roles, Id, GivenName, MiddleName, Surname, CountryRegion, Club, FeiId);
+        return new User(Email, Name, Roles, Id, GivenName, MiddleName, Surname, CountryRegion, Club, FeiId, DisplayName);
+    }
+
+    static string? BuildName(params string?[] parts)
+    {
+        var nameParts = parts.Where(part => !string.IsNullOrWhiteSpace(part)).ToArray();
+        return nameParts.Length == 0 ? null : string.Join(" ", nameParts);
+    }
+
+    static string? Normalize(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 }

@@ -22,7 +22,9 @@ public static class NUserClaimsHelper
         var middleName = profile?.MiddleName ?? ResolveMiddleName(principal);
         var surname = profile?.Surname ?? ResolveSurname(principal);
         var club = profile?.Club ?? ResolveClub(principal);
-        var name = profile?.Name ?? ResolveName(principal, givenName, middleName, surname);
+        var feiId = profile?.FeiId ?? ResolveFeiId(principal);
+        var displayName = profile?.DisplayName ?? ResolveDisplayName(principal);
+        var name = ResolveName(givenName, middleName, surname);
 
         return new NUserRegistration(
             email,
@@ -32,7 +34,8 @@ public static class NUserClaimsHelper
             ResolveCountryRegion(principal),
             middleName,
             club,
-            profile?.FeiId
+            feiId,
+            displayName
         );
     }
 
@@ -85,11 +88,15 @@ public static class NUserClaimsHelper
     public static string? ResolveName(ClaimsPrincipal? principal)
     {
         return ResolveName(
-            principal,
             ResolveGivenName(principal),
             ResolveMiddleName(principal),
             ResolveSurname(principal)
         );
+    }
+
+    public static string? ResolveDisplayName(ClaimsPrincipal? principal)
+    {
+        return ResolveClaimValue(principal, "DisplayName", "displayName", "name", ClaimTypes.Name);
     }
 
     public static string? ResolveGivenName(ClaimsPrincipal? principal)
@@ -118,19 +125,14 @@ public static class NUserClaimsHelper
             ?? ResolveClaimValueBySuffix(principal, "club", "club_name", "clubName");
     }
 
-    static string? ResolveName(ClaimsPrincipal? principal, string? givenName, string? middleName, string? surname)
+    public static string? ResolveFeiId(ClaimsPrincipal? principal)
     {
-        if (principal == null)
-        {
-            return null;
-        }
+        return ResolveClaimValue(principal, "feiId", "fei_id", "feiid", "FeiId")
+            ?? ResolveClaimValueBySuffix(principal, "feiId", "fei_id", "feiid");
+    }
 
-        var fullName = ResolveClaimValue(principal, ClaimTypes.Name, "name");
-        if (!string.IsNullOrWhiteSpace(fullName))
-        {
-            return Normalize(fullName);
-        }
-
+    static string? ResolveName(string? givenName, string? middleName, string? surname)
+    {
         var parts = new[] { givenName, middleName, surname }.Where(part => !string.IsNullOrWhiteSpace(part)).ToArray();
         return parts.Length == 0 ? null : string.Join(" ", parts);
     }

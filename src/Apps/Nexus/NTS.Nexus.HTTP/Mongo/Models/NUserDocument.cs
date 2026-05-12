@@ -15,20 +15,26 @@ public class NUserDocument : IDocument
         string? countryRegion = null,
         string? middleName = null,
         string? club = null,
-        string? feiId = null
+        string? feiId = null,
+        string? displayName = null
     )
     {
+        var normalizedGivenName = Normalize(givenName);
+        var normalizedSurname = Normalize(surname);
+        var normalizedMiddleName = Normalize(middleName);
+
         return new NUserDocument
         {
             Id = RandomHelper.GenerateUniqueInteger(),
             Email = email,
-            Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim(),
-            GivenName = string.IsNullOrWhiteSpace(givenName) ? null : givenName.Trim(),
-            Surname = string.IsNullOrWhiteSpace(surname) ? null : surname.Trim(),
-            CountryRegion = string.IsNullOrWhiteSpace(countryRegion) ? null : countryRegion.Trim(),
-            MiddleName = string.IsNullOrWhiteSpace(middleName) ? null : middleName.Trim(),
-            Club = string.IsNullOrWhiteSpace(club) ? null : club.Trim(),
-            FeiId = string.IsNullOrWhiteSpace(feiId) ? null : feiId.Trim(),
+            Name = BuildName(normalizedGivenName, normalizedMiddleName, normalizedSurname) ?? Normalize(name),
+            DisplayName = Normalize(displayName),
+            GivenName = normalizedGivenName,
+            Surname = normalizedSurname,
+            CountryRegion = Normalize(countryRegion),
+            MiddleName = normalizedMiddleName,
+            Club = Normalize(club),
+            FeiId = Normalize(feiId),
         };
     }
 
@@ -39,6 +45,7 @@ public class NUserDocument : IDocument
             Id = user.Id == default ? RandomHelper.GenerateUniqueInteger() : user.Id,
             Email = user.Email,
             Name = user.Name,
+            DisplayName = user.DisplayName,
             GivenName = user.GivenName,
             Surname = user.Surname,
             CountryRegion = user.CountryRegion,
@@ -52,6 +59,7 @@ public class NUserDocument : IDocument
     public int Id { get; set; }
     public string Email { get; set; } = default!;
     public string? Name { get; set; }
+    public string? DisplayName { get; set; }
     public string? GivenName { get; set; }
     public string? Surname { get; set; }
     public string? CountryRegion { get; set; }
@@ -66,6 +74,7 @@ public class NUserDocument : IDocument
         return new NUserModel(Email, Roles, Id)
         {
             Name = Name,
+            DisplayName = DisplayName,
             GivenName = GivenName,
             Surname = Surname,
             CountryRegion = CountryRegion,
@@ -73,5 +82,16 @@ public class NUserDocument : IDocument
             Club = Club,
             FeiId = FeiId,
         };
+    }
+
+    static string? BuildName(params string?[] parts)
+    {
+        var nameParts = parts.Where(part => !string.IsNullOrWhiteSpace(part)).ToArray();
+        return nameParts.Length == 0 ? null : string.Join(" ", nameParts);
+    }
+
+    static string? Normalize(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 }

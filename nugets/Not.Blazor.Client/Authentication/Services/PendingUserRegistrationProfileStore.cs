@@ -73,6 +73,7 @@ internal class PendingUserRegistrationProfileStore : INPendingUserRegistrationPr
             string? surname,
             string? club,
             string? feiId,
+            string? displayName,
             long createdAtUnixMilliseconds
         )
         {
@@ -82,10 +83,12 @@ internal class PendingUserRegistrationProfileStore : INPendingUserRegistrationPr
             Surname = surname;
             Club = club;
             FeiId = feiId;
+            DisplayName = displayName;
             CreatedAtUnixMilliseconds = createdAtUnixMilliseconds;
         }
 
         public string? Name { get; set; }
+        public string? DisplayName { get; set; }
         public string? GivenName { get; set; }
         public string? MiddleName { get; set; }
         public string? Surname { get; set; }
@@ -105,6 +108,7 @@ internal class PendingUserRegistrationProfileStore : INPendingUserRegistrationPr
                 profile.Surname,
                 profile.Club,
                 profile.FeiId,
+                profile.DisplayName,
                 createdAt.ToUnixTimeMilliseconds()
             );
         }
@@ -117,7 +121,7 @@ internal class PendingUserRegistrationProfileStore : INPendingUserRegistrationPr
 
         internal NUserRegistrationProfile ToProfile()
         {
-            return new NUserRegistrationProfile(Name, GivenName, MiddleName, Surname, Club, FeiId);
+            return new NUserRegistrationProfile(Name, GivenName, MiddleName, Surname, Club, FeiId, DisplayName);
         }
     }
 }

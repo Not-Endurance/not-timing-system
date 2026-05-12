@@ -27,7 +27,7 @@ namespace NTS.Authentication.Tests;
 public class RegistrationFlowTests
 {
     [Fact]
-    public async Task Resolver_registers_new_user_with_name_claim()
+    public async Task Resolver_registers_new_user_with_display_name_claim()
     {
         var users = new RecordingUserRegister
         {
@@ -35,8 +35,9 @@ public class RegistrationFlowTests
             RegisterResult = Result.Success(
                 new NUserModel("new.user@example.com", ["Judge"])
                 {
-                    Name = "Jane Doe",
+                    DisplayName = "Jane Display",
                     GivenName = "Jane",
+                    MiddleName = "Marie",
                     Surname = "Doe",
                     CountryRegion = "Bulgaria",
                 }
@@ -46,8 +47,9 @@ public class RegistrationFlowTests
 
         var principal = CreatePrincipal(
             new Claim(ClaimTypes.Email, "new.user@example.com"),
-            new Claim("name", "Jane Doe"),
+            new Claim("DisplayName", "Jane Display"),
             new Claim("given_name", "Jane"),
+            new Claim("MiddleName", "Marie"),
             new Claim("family_name", "Doe"),
             new Claim("country", "Bulgaria")
         );
@@ -56,7 +58,15 @@ public class RegistrationFlowTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal(
-            new NUserRegistration("new.user@example.com", "Jane Doe", "Jane", "Doe", "Bulgaria"),
+            new NUserRegistration(
+                "new.user@example.com",
+                "Jane Marie Doe",
+                "Jane",
+                "Doe",
+                "Bulgaria",
+                "Marie",
+                displayName: "Jane Display"
+            ),
             users.LastRegistration
         );
         Assert.True(result.Principal.Identity?.IsAuthenticated);
@@ -72,7 +82,6 @@ public class RegistrationFlowTests
             RegisterResult = Result.Success(
                 new NUserModel("new.user@example.com")
                 {
-                    Name = "Jane Doe",
                     GivenName = "Jane",
                     Surname = "Doe",
                     CountryRegion = "BG",
@@ -108,7 +117,6 @@ public class RegistrationFlowTests
             RegisterResult = Result.Success(
                 new NUserModel("new.user@example.com")
                 {
-                    Name = "Jane Doe",
                     GivenName = "Jane",
                     Surname = "Doe",
                     Club = "Konarche",
@@ -132,6 +140,40 @@ public class RegistrationFlowTests
         );
     }
 
+    [Theory]
+    [InlineData("FeiId")]
+    [InlineData("extension_1234567890abcdef_feiId")]
+    public async Task Resolver_registers_new_user_with_fei_id_claim(string feiIdClaimType)
+    {
+        var users = new RecordingUserRegister
+        {
+            GetResult = Result.Failure<NUserModel>("User not found"),
+            RegisterResult = Result.Success(
+                new NUserModel("new.user@example.com")
+                {
+                    GivenName = "Jane",
+                    Surname = "Doe",
+                    FeiId = "10101010",
+                }
+            ),
+        };
+        var resolver = new NUserResolver(users, NullLogger<NUserResolver>.Instance);
+        var principal = CreatePrincipal(
+            new Claim(ClaimTypes.Email, "new.user@example.com"),
+            new Claim("given_name", "Jane"),
+            new Claim("family_name", "Doe"),
+            new Claim(feiIdClaimType, " 10101010 ")
+        );
+
+        var result = await resolver.ResolvePrincipal(principal);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(
+            new NUserRegistration("new.user@example.com", "Jane Doe", "Jane", "Doe", feiId: "10101010"),
+            users.LastRegistration
+        );
+    }
+
     [Fact]
     public async Task Resolver_registers_new_user_with_pending_registration_profile()
     {
@@ -141,7 +183,7 @@ public class RegistrationFlowTests
             RegisterResult = Result.Success(
                 new NUserModel("new.user@example.com")
                 {
-                    Name = "Jane Marie Doe",
+                    DisplayName = "Jane Display",
                     GivenName = "Jane",
                     MiddleName = "Marie",
                     Surname = "Doe",
@@ -152,7 +194,15 @@ public class RegistrationFlowTests
         };
         var resolver = new NUserResolver(users, NullLogger<NUserResolver>.Instance);
         var principal = CreatePrincipal(new Claim(ClaimTypes.Email, "new.user@example.com"));
-        var profile = new NUserRegistrationProfile("Jane Marie Doe", "Jane", "Marie", "Doe", "Konarche", "10101010");
+        var profile = new NUserRegistrationProfile(
+            "Jane Marie Doe",
+            "Jane",
+            "Marie",
+            "Doe",
+            "Konarche",
+            "10101010",
+            "Jane Display"
+        );
 
         var result = await resolver.ResolvePrincipal(principal, profile);
 
@@ -165,7 +215,8 @@ public class RegistrationFlowTests
                 "Doe",
                 middleName: "Marie",
                 club: "Konarche",
-                feiId: "10101010"
+                feiId: "10101010",
+                displayName: "Jane Display"
             ),
             users.LastRegistration
         );
@@ -230,7 +281,6 @@ public class RegistrationFlowTests
             RegisterResult = Result.Success(
                 new NUserModel("new.user@example.com")
                 {
-                    Name = "Jane Doe",
                     GivenName = "Jane",
                     Surname = "Doe",
                     CountryRegion = "Bulgaria",
@@ -311,7 +361,7 @@ public class RegistrationFlowTests
         {
             RegisterResult = new NUserModel("new.user@example.com")
             {
-                Name = "Jane Marie Doe",
+                DisplayName = "Jane Display",
                 GivenName = "Jane",
                 MiddleName = "Marie",
                 Surname = "Doe",
@@ -330,7 +380,8 @@ public class RegistrationFlowTests
                 "Bulgaria",
                 "Marie",
                 "Konarche",
-                "10101010"
+                "10101010",
+                "Jane Display"
             )
         );
 
@@ -342,6 +393,7 @@ public class RegistrationFlowTests
         Assert.NotNull(result.Data);
         Assert.Equal(users.RegisterResult.Id, result.Data.Id);
         Assert.Equal(users.RegisterResult.Email, result.Data.Email);
+        Assert.Equal(users.RegisterResult.DisplayName, result.Data.DisplayName);
         Assert.Equal(
             new NUserRegistration(
                 "new.user@example.com",
@@ -351,7 +403,8 @@ public class RegistrationFlowTests
                 "Bulgaria",
                 "Marie",
                 "Konarche",
-                "10101010"
+                "10101010",
+                "Jane Display"
             ),
             users.LastRegistration
         );
@@ -434,12 +487,14 @@ public class RegistrationFlowTests
             " Bulgaria ",
             " Marie ",
             " Konarche ",
-            " 10101010 "
+            " 10101010 ",
+            " Jane Display "
         );
 
         var user = document.ToUser();
 
         Assert.Equal("Jane Marie Doe", user.Name);
+        Assert.Equal("Jane Display", user.DisplayName);
         Assert.Equal("Jane", user.GivenName);
         Assert.Equal("Marie", user.MiddleName);
         Assert.Equal("Doe", user.Surname);
@@ -454,7 +509,7 @@ public class RegistrationFlowTests
     {
         var user = new NUserModel("new.user@example.com", ["Judge"], 17)
         {
-            Name = "Jane Marie Doe",
+            DisplayName = "Jane Display",
             GivenName = "Jane",
             MiddleName = "Marie",
             Surname = "Doe",
@@ -468,6 +523,7 @@ public class RegistrationFlowTests
 
         Assert.Equal(user.Id, restored.Id);
         Assert.Equal(user.Name, restored.Name);
+        Assert.Equal(user.DisplayName, restored.DisplayName);
         Assert.Equal(user.GivenName, restored.GivenName);
         Assert.Equal(user.MiddleName, restored.MiddleName);
         Assert.Equal(user.Surname, restored.Surname);
@@ -520,7 +576,7 @@ public class RegistrationFlowTests
                 ?? Result.Success(
                     new NUserModel(registration.Email)
                     {
-                        Name = registration.Name,
+                        DisplayName = registration.DisplayName,
                         GivenName = registration.GivenName,
                         MiddleName = registration.MiddleName,
                         Surname = registration.Surname,
