@@ -4,6 +4,25 @@
 
 <MudNavMenu>
 
+    @if (ShowProfileHeader)
+    {
+        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="px-2 pb-2">
+            <MudStack Spacing="0" Style="min-width:0;">
+                <MudText Typo="Typo.caption">@Welcome_string,</MudText>
+                <MudText Typo="Typo.body2" Style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    @WelcomeName
+                </MudText>
+            </MudStack>
+
+            <MudIconButton Icon="@Icons.Material.Filled.AccountCircle"
+                           Color="Color.Primary"
+                           OnClick="OpenProfile"
+                           aria-label="@Profile_page_string" />
+        </MudStack>
+
+        <MudDivider Class="my-2" />
+    }
+
     @if (ShowSnapshots)
     {
         <NNavLink Endpoint="@SNAPSHOT_PAGE">@Snapshot_page_string</NNavLink>

@@ -411,6 +411,64 @@ public class RegistrationFlowTests
     }
 
     [Fact]
+    public async Task Users_update_profile_returns_updated_user_and_passes_payload_to_repository()
+    {
+        var users = new RecordingUserRepository
+        {
+            UpdateProfileResult = new NUserModel("new.user@example.com", ["Judge"], 17)
+            {
+                DisplayName = "Jane Display",
+                GivenName = "Jane",
+                MiddleName = "Marie",
+                Surname = "Doe",
+                CountryRegion = "Bulgaria",
+                Club = "Konarche",
+                FeiId = "10101010",
+            },
+        };
+        var function = new UserFunctions(new TestFunctionLogger<UserFunctions>(), users, new TestTelemetryService());
+        var payload = new UpdateUserProfilePayload(
+            "Jane",
+            "Doe",
+            "Bulgaria",
+            "Marie",
+            "Konarche",
+            "10101010"
+        );
+        var request = CreateRequest(HttpMethods.Patch, "/api/users/new.user@example.com/profile", JsonSerializer.Serialize(payload));
+
+        var response = await function.UpdateProfile(request, "new.user@example.com");
+
+        var ok = Assert.IsType<OkObjectResult>(response);
+        var result = Assert.IsType<Result<NUserModel>>(ok.Value);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
+        Assert.Equal(17, result.Data.Id);
+        Assert.Equal("Jane", result.Data.GivenName);
+        Assert.Equal("Jane Display", result.Data.DisplayName);
+        Assert.Equal("new.user@example.com", users.LastProfileEmail);
+        Assert.NotNull(users.LastProfilePayload);
+        Assert.Equal(payload.Name, users.LastProfilePayload!.Name);
+        Assert.Equal(payload.CountryRegion, users.LastProfilePayload.CountryRegion);
+    }
+
+    [Fact]
+    public async Task Users_update_profile_returns_bad_request_when_required_profile_fields_are_missing()
+    {
+        var function = new UserFunctions(
+            new TestFunctionLogger<UserFunctions>(),
+            new RecordingUserRepository(),
+            new TestTelemetryService()
+        );
+        var payload = new UpdateUserProfilePayload("Jane", null, "Bulgaria");
+        var request = CreateRequest(HttpMethods.Patch, "/api/users/new.user@example.com/profile", JsonSerializer.Serialize(payload));
+
+        var response = await function.UpdateProfile(request, "new.user@example.com");
+
+        Assert.IsType<BadRequestObjectResult>(response);
+    }
+
+    [Fact]
     public async Task Users_read_by_email_returns_success_result_with_null_data_when_user_is_missing()
     {
         var function = new UserFunctions(
@@ -696,7 +754,10 @@ public class RegistrationFlowTests
     sealed class RecordingUserRepository : IUserRepository
     {
         public NUserRegistration? LastRegistration { get; private set; }
+        public string? LastProfileEmail { get; private set; }
+        public UpdateUserProfilePayload? LastProfilePayload { get; private set; }
         public NUserModel RegisterResult { get; init; } = new("new.user@example.com");
+        public NUserModel? UpdateProfileResult { get; init; }
         public NUserModel? ReadByEmailResult { get; init; }
         public IEnumerable<NUserModel> ReadManyResult { get; init; } = [];
 
@@ -714,6 +775,13 @@ public class RegistrationFlowTests
         {
             LastRegistration = registration;
             return Task.FromResult(RegisterResult);
+        }
+
+        public Task<NUserModel?> UpdateProfile(string email, UpdateUserProfilePayload payload)
+        {
+            LastProfileEmail = email;
+            LastProfilePayload = payload;
+            return Task.FromResult(UpdateProfileResult);
         }
     }
 

@@ -95,6 +95,42 @@ public class UserApiRepositoryTests
         Assert.Equal(registration.DisplayName, payload.DisplayName);
     }
 
+    [Fact]
+    public async Task Update_profile_patches_profile_fields()
+    {
+        var handler = new RecordingHttpMessageHandler
+        {
+            ResponseFactory = _ =>
+                CreateJsonResponse(
+                    Result.Success(
+                        new NUserModel("user@example.com", id: 7)
+                        {
+                            GivenName = "Jane",
+                            Surname = "Doe",
+                            CountryRegion = "Bulgaria",
+                        }
+                    )
+                ),
+        };
+        var repository = CreateRepository(handler);
+        var payload = new UpdateUserProfilePayload("Jane", "Doe", "Bulgaria", club: "Konarche");
+
+        var result = await repository.UpdateProfile("user@example.com", payload);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(HttpMethod.Patch, handler.LastRequestMethod);
+        Assert.EndsWith("/users/user%40example.com/profile", handler.LastRequestUri?.AbsolutePath);
+        var sentPayload = JsonSerializer.Deserialize<UpdateUserProfilePayload>(
+            handler.LastRequestContent ?? throw new InvalidOperationException("Expected request content.")
+        );
+        Assert.NotNull(sentPayload);
+        Assert.Equal(payload.GivenName, sentPayload!.GivenName);
+        Assert.Equal(payload.Surname, sentPayload.Surname);
+        Assert.Equal(payload.CountryRegion, sentPayload.CountryRegion);
+        Assert.Equal(payload.Club, sentPayload.Club);
+    }
+
+
     static UserApiRepository CreateRepository(HttpMessageHandler handler)
     {
         var client = new NHttpClient(
@@ -115,12 +151,16 @@ public class UserApiRepositoryTests
     {
         public Func<HttpRequestMessage, HttpResponseMessage>? ResponseFactory { get; init; }
         public string? LastRequestContent { get; private set; }
+        public HttpMethod? LastRequestMethod { get; private set; }
+        public Uri? LastRequestUri { get; private set; }
 
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken
         )
         {
+            LastRequestMethod = request.Method;
+            LastRequestUri = request.RequestUri;
             LastRequestContent =
                 request.Content == null ? null : await request.Content.ReadAsStringAsync(cancellationToken);
 
