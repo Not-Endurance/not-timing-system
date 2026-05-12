@@ -17,7 +17,7 @@ env:
   OUTPUT_LOCATION: wwwroot
   SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
   ARTIFACT_PATH: NTS.Nexus.Warp/publish
-  AZURE_RESOURCE: nts-nexus-warp-prod
+  AZURE_RESOURCE: nts-warp-prod
 
 jobs:
   deploy-message-bus:
