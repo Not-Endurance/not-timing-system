@@ -20,5 +20,4 @@ public class MainLayoutBehind : LayoutComponentBase
     {
         Navigator.NavigateTo(EMERGENCY_CONTACTS_PAGE);
     }
-
 }

@@ -8,9 +8,7 @@ public static class WitnessProfileRoutePolicy
 {
     public static bool ShouldRedirectToProfile(NUserModel? user, string relativePath)
     {
-        return user != null
-            && !WitnessProfilePolicy.IsComplete(user)
-            && !IsProfileGateBypassRoute(relativePath);
+        return user != null && !WitnessProfilePolicy.IsComplete(user) && !IsProfileGateBypassRoute(relativePath);
     }
 
     public static bool IsProfileGateBypassRoute(string relativePath)

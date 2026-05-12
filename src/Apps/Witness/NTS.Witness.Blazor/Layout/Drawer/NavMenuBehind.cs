@@ -1,8 +1,8 @@
 using MudBlazor;
 using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Components.Abstractions;
-using NTS.Blazor.Components.SelectEvents;
 using NTS.Application.Contracts.Socket;
+using NTS.Blazor.Components.SelectEvents;
 using NTS.Witness.Blazor.Features;
 using NTS.Witness.Contracts.Features.Access;
 using NTS.Witness.Contracts.Features.Profile;
