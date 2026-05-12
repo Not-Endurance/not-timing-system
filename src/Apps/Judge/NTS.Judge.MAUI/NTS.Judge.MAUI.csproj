@@ -21,6 +21,7 @@
     <!-- Versions -->
     <ApplicationDisplayVersion>0.2</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
+    <NtsTargetEnvironment Condition="'$(NtsTargetEnvironment)' == ''">Production</NtsTargetEnvironment>
     
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
@@ -32,6 +33,13 @@
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>NtsTargetEnvironment</_Parameter1>
+      <_Parameter2>$(NtsTargetEnvironment)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
 
   <!-- Windows publish configuration -->
   <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">

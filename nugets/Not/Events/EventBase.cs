@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Not.Safe;
 
 namespace Not.Events;
 
@@ -31,6 +32,30 @@ public abstract class EventBase<T>
     {
         action(argument);
         return Task.CompletedTask;
+    }
+
+    protected static async Task RunSafely(Func<Task> action)
+    {
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            await SafeHelper.HandleExceptionAsync(ex);
+        }
+    }
+
+    protected static void RunSafely(Action action)
+    {
+        try
+        {
+            action();
+        }
+        catch (Exception ex)
+        {
+            SafeHelper.HandleException(ex);
+        }
     }
 
     public void Unsubscribe(Guid key)

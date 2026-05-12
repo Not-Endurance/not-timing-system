@@ -35,7 +35,8 @@ public class UserApiRepository : ApiRepository<User, UserModel>, IUserEmailLooku
                 user.Surname,
                 user.CountryRegion,
                 user.Club,
-                user.FeiId
+                user.FeiId,
+                user.DisplayName
             );
     }
 
@@ -47,6 +48,8 @@ public class UserApiRepository : ApiRepository<User, UserModel>, IUserEmailLooku
             return users;
         }
 
-        return users.Where(x => x.Name.NContains(term) || x.Email.NContains(term));
+        return users.Where(x =>
+            x.Name.NContains(term) || x.Email.NContains(term) || (x.DisplayName?.NContains(term) ?? false)
+        );
     }
 }

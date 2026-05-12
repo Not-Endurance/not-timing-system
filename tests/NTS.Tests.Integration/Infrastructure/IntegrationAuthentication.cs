@@ -14,12 +14,14 @@ internal sealed record IntegrationUser
         string? surname = null,
         string? countryRegion = null,
         string? club = null,
-        string? feiId = null
+        string? feiId = null,
+        string? displayName = null
     )
     {
         Email = email;
         UserIdentifier = userIdentifier;
         Name = name;
+        DisplayName = displayName;
         GivenName = givenName;
         MiddleName = middleName;
         Surname = surname;
@@ -31,6 +33,7 @@ internal sealed record IntegrationUser
     public string Email { get; }
     public string UserIdentifier { get; }
     public string Name { get; }
+    public string? DisplayName { get; }
     public string? GivenName { get; }
     public string? MiddleName { get; }
     public string? Surname { get; }
@@ -49,7 +52,7 @@ internal sealed class IntegrationAuthenticationStateProvider : AuthenticationSta
             [
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim("oid", user.UserIdentifier),
-                new Claim("name", user.Name),
+                new Claim("name", user.DisplayName ?? user.Name),
             ],
             "IntegrationTest"
         );

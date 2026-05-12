@@ -57,7 +57,8 @@ internal class ConfigureEventFeature
                     user.Surname,
                     user.CountryRegion,
                     user.Club,
-                    user.FeiId
+                    user.FeiId,
+                    user.DisplayName
                 )
             );
             var created = new User(
@@ -70,7 +71,8 @@ internal class ConfigureEventFeature
                 registered.Surname,
                 registered.CountryRegion,
                 registered.Club,
-                registered.FeiId
+                registered.FeiId,
+                registered.DisplayName
             );
             Remember(idMap, user.Id, created.Id);
             createdUsers.Add(user.Id, created);
@@ -361,7 +363,8 @@ internal class ConfigureEventFeature
             user.Surname,
             user.CountryRegion,
             user.Club,
-            user.FeiId
+            user.FeiId,
+            user.DisplayName
         );
     }
 

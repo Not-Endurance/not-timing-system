@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "NTS.Nexus.Warp": {
+    "Development": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
@@ -9,6 +9,6 @@
         "MONGO_CONNECTION_STRING": "mongodb://localhost:27017/nts"
       },
       "applicationUrl": "https://localhost:61380;http://localhost:61381"
-    }
+    },
   }
 }
