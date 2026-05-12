@@ -30,14 +30,13 @@ jobs:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}  # adjust if needed
 
     - name: Restore
-      run: dotnet restore "${{ env.SOURCE_PATH }}" -v:q
+      run: dotnet restore "${{ env.SOURCE_PATH }}"
 
     - name: Build
       run: |
         dotnet build ${{ env.SOURCE_PATH }} \
         --configuration ${{ env.CONFIGURATION }} \
-        --no-restore \
-        -v:q
+        --no-restore
 
     - name: Publish
       run: |
