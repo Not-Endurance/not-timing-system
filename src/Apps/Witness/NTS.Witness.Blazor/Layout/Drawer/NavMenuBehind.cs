@@ -34,7 +34,7 @@ public class NavMenuBehind : NStatefulComponent
     protected bool ShowProfileHeader => ProfileContext.User != null;
     protected bool HasActiveEvent => SocketService.IsConnected && SocketService.Event != null;
     protected string ActiveEventTitle => SocketService.Event?.Name ?? Event_string;
-    protected string WelcomeName => ProfileContext.WelcomeName[..12];
+    protected string WelcomeName => ProfileContext.WelcomeName;
 
     protected override async Task OnInitializedAsync()
     {

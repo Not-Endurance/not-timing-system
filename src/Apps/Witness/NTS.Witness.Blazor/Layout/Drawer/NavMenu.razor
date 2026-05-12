@@ -48,19 +48,27 @@
         <MudNavGroup Title="@ActiveEventTitle" Expanded="true">
             @if (ShowSnapshots)
             {
-                <NNavLink Endpoint="@SNAPSHOT_PAGE">@Snapshot_page_string</NNavLink>
+                <NNavLink Endpoint="@SNAPSHOT_PAGE">
+                    <strong>@Snapshot_page_string</strong>
+                </NNavLink>
             }
 
-            <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
+            <NNavLink Endpoint="@STARTLIST_PAGE">
+                <strong>@Startlist_string</strong>
+            </NNavLink>
 
-            <NNavLink Endpoint="@PERFORMANCE_PAGE">@Performance_string</NNavLink>
+            <NNavLink Endpoint="@PERFORMANCE_PAGE">
+                <strong>@Performance_string</strong>
+            </NNavLink>
         </MudNavGroup>
     }
 
     <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
 
     <MudNavGroup Title="@History_string" Expanded="true">
-        <NNavLink Endpoint="@PAST_EVENTS_PAGE">@Past_events_string</NNavLink>
+        <NNavLink Endpoint="@PAST_EVENTS_PAGE">
+            <strong>@Past_events_string</strong>
+        </NNavLink>
     </MudNavGroup>
 
 </MudNavMenu>

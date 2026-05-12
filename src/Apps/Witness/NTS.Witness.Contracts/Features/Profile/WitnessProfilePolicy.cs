@@ -22,7 +22,12 @@ public static class WitnessProfilePolicy
 
     public static string ResolveWelcomeName(NUserModel? user)
     {
-        return FirstNonEmpty(user?.GivenName, user?.DisplayName, user?.Name, user?.Email) ?? string.Empty;
+        var value = FirstNonEmpty(user?.GivenName, user?.DisplayName, user?.Name, user?.Email);
+        if (value?.Length >= 12)
+        {
+            value = value[..12];
+        }
+        return value ?? string.Empty;
     }
 
     static string? FirstNonEmpty(params string?[] values)
