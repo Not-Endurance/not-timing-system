@@ -30,13 +30,14 @@ jobs:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}  # adjust if needed
 
     - name: Restore
-      run: dotnet restore "${{ env.SOURCE_PATH }}"
+      run: dotnet restore "${{ env.SOURCE_PATH }}" -v:q
 
     - name: Build
       run: |
         dotnet build ${{ env.SOURCE_PATH }} \
         --configuration ${{ env.CONFIGURATION }} \
-        --no-restore
+        --no-restore \
+        -v:q
 
     - name: Publish
       run: |
@@ -70,6 +71,8 @@ jobs:
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
+        env:
+          WasmApplicationEnvironmentName: Production
         with:
           action: "upload"
           production_branch: master
