@@ -1,40 +1,61 @@
+@using NTS.Blazor.Components.Startlist.Upcoming
 @using Not.Blazor.Components.Layout
 
 @inherits NavMenuBehind
 
 <MudNavMenu>
 
-    @if (ShowProfileHeader)
-    {
-        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="px-2 pb-2">
-            <MudStack Spacing="0" Style="min-width:0;">
-                <MudText Typo="Typo.caption">@Welcome_string,</MudText>
-                <MudText Typo="Typo.body2" Style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                    @WelcomeName
-                </MudText>
+    <MudDrawerHeader>
+        @if (ShowProfileHeader)
+        {
+            <MudStack AlignItems="AlignItems.End" Justify="Justify.SpaceBetween" Class="px-2 pb-2">
+                <MudStack Spacing="0" Style="min-width:0;">
+
+                    <MudText Typo="Typo.caption">@Welcome_string</MudText>
+
+                    <MudMenu Label="@WelcomeName" 
+                            Color="Color.Tertiary" 
+                            Variant="Variant.Outlined" 
+                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" 
+                            Size="Size.Small"
+                            AnchorOrigin="Origin.BottomRight"
+                            TransformOrigin="Origin.TopRight"
+                            Style="align-self:center;">
+
+                        <MudMenuItem OnClick="OpenProfile">
+                            <MudText Typo="Typo.body2" Color="Color.Primary">@Profile_page_string</MudText>
+                        </MudMenuItem>
+
+                        <MudMenuItem OnClick="Signout">
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@Sign_Out_string</MudText>
+                        </MudMenuItem>
+
+                    </MudMenu>
+
+                </MudStack>
             </MudStack>
+        }
+        else
+        {
+            <NHeadline3 Content="@Welcome_string" />
+        }
+    </MudDrawerHeader>
+    
+    <MudDivider Class="my-2" />
 
-            <MudIconButton Icon="@Icons.Material.Filled.AccountCircle"
-                           Color="Color.Primary"
-                           OnClick="OpenProfile"
-                           aria-label="@Profile_page_string" />
-        </MudStack>
-
-        <MudDivider Class="my-2" />
-    }
-
-    @if (ShowSnapshots)
+    @if (HasActiveEvent)
     {
-        <NNavLink Endpoint="@SNAPSHOT_PAGE">@Snapshot_page_string</NNavLink>
-    }
-    
-    <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
-    
-    <NNavLink Endpoint="@PERFORMANCE_PAGE">@Performance_string</NNavLink>
+        <MudNavGroup Title="@ActiveEventTitle" Expanded="true">
+            @if (ShowSnapshots)
+            {
+                <NNavLink Endpoint="@SNAPSHOT_PAGE">@Snapshot_page_string</NNavLink>
+            }
 
-    <MudNavGroup Title="Support" Expanded="true">
-        <NNavLink Endpoint="@EMERGENCY_CONTACTS_PAGE">@Contacts_string</NNavLink>
-    </MudNavGroup>
+            <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
+
+            <NNavLink Endpoint="@PERFORMANCE_PAGE">@Performance_string</NNavLink>
+        </MudNavGroup>
+    }
 
     <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
 

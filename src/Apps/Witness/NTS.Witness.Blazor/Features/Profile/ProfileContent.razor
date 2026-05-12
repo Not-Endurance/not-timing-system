@@ -9,14 +9,16 @@
 <NContent Title="@Profile_page_string" IsLoading="@IsLoading" Class="not-mid-width">
     <Main>
         <MudStack Spacing="3">
+
             <NTextField @bind-Value="Model.GivenName"
-                        For="() => Model.GivenName"
-                        Label="@First_name_string"
-                        Required />
+                    For="() => Model.GivenName"
+                    Label="@First_name_string"
+                    Required />
 
             <NTextField @bind-Value="Model.MiddleName"
-                        For="() => Model.MiddleName"
-                        Label="@Middle_name_string" />
+                    For="() => Model.MiddleName"
+                    Label="@Middle_name_string" />
+            
 
             <NTextField @bind-Value="Model.Surname"
                         For="() => Model.Surname"
@@ -24,11 +26,11 @@
                         Required />
 
             <NAutocomplete @bind-Value="Model.Country"
-                           For="() => Model.Country"
-                           Label="@Country_string"
-                           SearchSafe="SearchCountriesSafe"
-                           ToStringFunc="@(country => country?.Name ?? string.Empty)"
-                           Required />
+                        For="() => Model.Country"
+                        Label="@Country_string"
+                        SearchSafe="SearchCountriesSafe"
+                        ToStringFunc="@(country => country?.Name ?? string.Empty)"
+                        Required />
 
             <NTextField @bind-Value="Model.Club"
                         For="() => Model.Club"

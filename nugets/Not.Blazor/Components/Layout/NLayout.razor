@@ -17,14 +17,7 @@
                 <NHeadline3 Content="@Watermark" />
             </MudAppBar>
 
-            <MudDrawer @bind-Open="DrawerOpen" Elevation="2">
-                @if (MenuTitle != null)
-                {
-                    <MudDrawerHeader>
-                        <NHeadline3 Content="@MenuTitle" />
-                    </MudDrawerHeader>
-                }
-                    
+            <MudDrawer @bind-Open="DrawerOpen" Elevation="2">                    
                 @Drawer
             </MudDrawer>
         }
