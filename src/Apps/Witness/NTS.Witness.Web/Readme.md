@@ -19,5 +19,6 @@ Localhost-only overrides are loaded when running from localhost:
 - `localhostsettings.Production.json`
 
 The `Development`, `Staging`, and `Production` launch profiles pass `?environment=...` so localhost can choose
-the target environment file while still running from `localhost`. If no environment is supplied, the client starts
-as `Production`.
+the target environment file while still running from `localhost`. If no environment is supplied, the client uses
+Blazor's configured application environment. Azure Static Web Apps deployments set this by writing the
+`Blazor-Environment` header to `staticwebapp.config.json` during the workflow run.
