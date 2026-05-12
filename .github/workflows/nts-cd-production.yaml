@@ -3,7 +3,9 @@ run-name: CD Production [${{ github.ref_name }}]
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - master
 
@@ -15,10 +17,11 @@ env:
   OUTPUT_LOCATION: wwwroot
   SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
   ARTIFACT_PATH: NTS.Nexus.Warp/publish
-  AZURE_RESOURCE: nts-nexus-warp-prod
+  AZURE_RESOURCE: nts-warp-prod
 
 jobs:
   deploy-message-bus:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     name: Production - MessageBus
     steps:
