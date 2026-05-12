@@ -87,11 +87,7 @@ public static class NUserClaimsHelper
 
     public static string? ResolveName(ClaimsPrincipal? principal)
     {
-        return ResolveName(
-            ResolveGivenName(principal),
-            ResolveMiddleName(principal),
-            ResolveSurname(principal)
-        );
+        return ResolveName(ResolveGivenName(principal), ResolveMiddleName(principal), ResolveSurname(principal));
     }
 
     public static string? ResolveDisplayName(ClaimsPrincipal? principal)

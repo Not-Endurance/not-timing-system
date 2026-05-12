@@ -1,5 +1,5 @@
-﻿using Not.Krud.Abstractions;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Not.Krud.Abstractions;
 using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
 using NTS.Domain.Enums;
@@ -27,6 +27,7 @@ public class UserModel : IDocument, IKrudModel<User>
         get => BuildName(GivenName, MiddleName, Surname) ?? _name ?? Email;
         set => _name = Normalize(value);
     }
+
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string? DisplayName { get; set; }
     public string? GivenName { get; set; }
@@ -54,7 +55,19 @@ public class UserModel : IDocument, IKrudModel<User>
 
     public User MapToEntity()
     {
-        return new User(Email, Name, Roles, Id, GivenName, MiddleName, Surname, CountryRegion, Club, FeiId, DisplayName);
+        return new User(
+            Email,
+            Name,
+            Roles,
+            Id,
+            GivenName,
+            MiddleName,
+            Surname,
+            CountryRegion,
+            Club,
+            FeiId,
+            DisplayName
+        );
     }
 
     static string? BuildName(params string?[] parts)
