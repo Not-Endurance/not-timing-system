@@ -201,8 +201,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
                 "Profile",
                 "Bulgaria",
                 club: "Konarche",
-                feiId: "20202020",
-                uiCulture: WitnessLanguagePreference.BulgarianCulture
+                feiId: "20202020"
             )
         );
         var persisted = await api.ReadUser(profileUser.Email);
@@ -215,12 +214,10 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.Equal("Bulgaria", updated.CountryRegion);
         Assert.Equal("Konarche", updated.Club);
         Assert.Equal("20202020", updated.FeiId);
-        Assert.Equal(WitnessLanguagePreference.BulgarianCulture, updated.UiCulture);
         Assert.NotNull(persisted);
         Assert.Equal(updated.Id, persisted!.Id);
         Assert.Equal(updated.Name, persisted.Name);
         Assert.Equal(updated.CountryRegion, persisted.CountryRegion);
-        Assert.Equal(updated.UiCulture, persisted.UiCulture);
     }
 
     static ClaimsPrincipal CreatePrincipal(IntegrationUser user)
