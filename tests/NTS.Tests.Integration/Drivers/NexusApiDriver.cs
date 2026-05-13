@@ -52,6 +52,12 @@ internal sealed class NexusApiDriver : IDisposable
         return SendNullable<NUserModel>(HttpMethod.Get, $"api/users/{encodedEmail}");
     }
 
+    public Task<NUserModel> UpdateUserProfile(string email, UpdateUserProfilePayload payload)
+    {
+        var encodedEmail = Uri.EscapeDataString(email);
+        return Send<NUserModel>(HttpMethod.Patch, $"api/users/{encodedEmail}/profile", payload);
+    }
+
     public Task Create(EventInformation eventInformation)
     {
         return Send(HttpMethod.Post, "api/event-information", EventInformationModel.From(eventInformation));

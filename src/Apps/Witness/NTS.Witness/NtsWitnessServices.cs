@@ -6,6 +6,7 @@ using Not.Application.RPC.SignalR;
 using Not.Blazor.Client;
 using Not.Krud.ServiceRegistration;
 using NTS.Application;
+using NTS.Witness.Features.Profile;
 using NTS.Witness.Features.Socket;
 using NTS.Witness.Storage.Repositories;
 
@@ -24,6 +25,7 @@ public static class NtsWitnessServices
         services.AddScoped<IRpcAccessTokenProvider, NtsClientRpcAccessTokenProvider>();
         services.AddScoped<IWitnessAuthenticationRedirector, WitnessAuthenticationRedirector>();
         services.AddTransient<IUserRegister, UserApiRepository>();
+        services.AddTransient<IWitnessUserProfileRepository, UserApiRepository>();
         services
             .ConfigureNtsApplication(configuration, rootAssembly)
             .AddSharedCoreDomainServices()
