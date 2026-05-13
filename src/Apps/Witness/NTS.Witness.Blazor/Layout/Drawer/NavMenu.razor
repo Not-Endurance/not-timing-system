@@ -1,26 +1,74 @@
+@using NTS.Blazor.Components.Startlist.Upcoming
 @using Not.Blazor.Components.Layout
 
 @inherits NavMenuBehind
 
 <MudNavMenu>
 
-    @if (ShowSnapshots)
-    {
-        <NNavLink Endpoint="@SNAPSHOT_PAGE">@Snapshot_page_string</NNavLink>
-    }
-    
-    <NNavLink Endpoint="@STARTLIST_PAGE">@Startlist_string</NNavLink>
-    
-    <NNavLink Endpoint="@PERFORMANCE_PAGE">@Performance_string</NNavLink>
+    <MudDrawerHeader>
+        @if (ShowProfileHeader)
+        {
+            <MudStack AlignItems="AlignItems.End" Justify="Justify.SpaceBetween" Class="px-2 pb-2">
+                <MudStack Spacing="0" Style="min-width:0;">
 
-    <MudNavGroup Title="Support" Expanded="true">
-        <NNavLink Endpoint="@EMERGENCY_CONTACTS_PAGE">@Contacts_string</NNavLink>
-    </MudNavGroup>
+                    <MudText Typo="Typo.caption">@Welcome_string</MudText>
+
+                    <MudMenu Label="@WelcomeName" 
+                            Color="Color.Tertiary" 
+                            Variant="Variant.Outlined" 
+                            EndIcon="@Icons.Material.Filled.KeyboardArrowDown" 
+                            Size="Size.Small"
+                            AnchorOrigin="Origin.BottomRight"
+                            TransformOrigin="Origin.TopRight"
+                            Style="align-self:center;">
+
+                        <MudMenuItem OnClick="OpenProfile">
+                            <MudText Typo="Typo.body2" Color="Color.Primary">@Profile_page_string</MudText>
+                        </MudMenuItem>
+
+                        <MudMenuItem OnClick="Signout">
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@Sign_Out_string</MudText>
+                        </MudMenuItem>
+
+                    </MudMenu>
+
+                </MudStack>
+            </MudStack>
+        }
+        else
+        {
+            <NHeadline3 Content="@Welcome_string" />
+        }
+    </MudDrawerHeader>
+    
+    <MudDivider Class="my-2" />
+
+    @if (HasActiveEvent)
+    {
+        <MudNavGroup Title="@ActiveEventTitle" Expanded="true">
+            @if (ShowSnapshots)
+            {
+                <NNavLink Endpoint="@SNAPSHOT_PAGE">
+                    <strong>@Snapshot_page_string</strong>
+                </NNavLink>
+            }
+
+            <NNavLink Endpoint="@STARTLIST_PAGE">
+                <strong>@Startlist_string</strong>
+            </NNavLink>
+
+            <NNavLink Endpoint="@PERFORMANCE_PAGE">
+                <strong>@Performance_string</strong>
+            </NNavLink>
+        </MudNavGroup>
+    }
 
     <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
 
     <MudNavGroup Title="@History_string" Expanded="true">
-        <NNavLink Endpoint="@PAST_EVENTS_PAGE">@Past_events_string</NNavLink>
+        <NNavLink Endpoint="@PAST_EVENTS_PAGE">
+            <strong>@Past_events_string</strong>
+        </NNavLink>
     </MudNavGroup>
 
 </MudNavMenu>

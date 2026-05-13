@@ -76,4 +76,29 @@ public class UserFunctions : FunctionBase
 
         return Ok(user);
     }
+
+    [Function("users-update-profile")]
+    public async Task<IActionResult> UpdateProfile(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "users/{email}/profile")] HttpRequest request,
+        string email
+    )
+    {
+        using var activity = StartFunctionActivity(nameof(UpdateProfile));
+        TagRequest(request);
+        LogInformation(request, nameof(UpdateProfile));
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return InvalidPayload($"Value '{email}' is not a valid email");
+        }
+
+        var payload = await ReadBody<UpdateUserProfilePayload>(request);
+        if (!payload.HasRequiredProfile())
+        {
+            return InvalidPayload("Country, first name and last name are required");
+        }
+
+        var user = await _users.UpdateProfile(email, payload);
+        return user == null ? Failure($"User '{email}' was not found") : Ok(user);
+    }
 }

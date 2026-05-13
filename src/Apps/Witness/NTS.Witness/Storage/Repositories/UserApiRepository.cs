@@ -4,10 +4,11 @@ using Not.Application.HTTP;
 using Not.Notify;
 using Not.Structures;
 using NTS.Witness.Contracts.API;
+using NTS.Witness.Features.Profile;
 
 namespace NTS.Witness.Storage.Repositories;
 
-public class UserApiRepository : IUserRegister
+public class UserApiRepository : IUserRegister, IWitnessUserProfileRepository
 {
     readonly NHttpClient _client;
 
@@ -58,6 +59,25 @@ public class UserApiRepository : IUserRegister
                     registration.DisplayName
                 )
             );
+        }
+        catch (Exception ex)
+        {
+            NotificationHelper.Current?.Error(ex);
+            return Result.Failure<NUserModel>(ex.Message);
+        }
+    }
+
+    public async Task<Result<NUserModel>> UpdateProfile(string email, UpdateUserProfilePayload payload)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Result.Cancel<NUserModel>();
+        }
+
+        try
+        {
+            var encodedEmail = Uri.EscapeDataString(email);
+            return await _client.Patch<NUserModel>($"users/{encodedEmail}/profile", payload);
         }
         catch (Exception ex)
         {

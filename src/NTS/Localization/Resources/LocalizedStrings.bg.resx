@@ -288,6 +288,18 @@
   <data name="Name_string" xml:space="preserve">
     <value>Име</value>
   </data>
+  <data name="First_name_string" xml:space="preserve">
+    <value>Име</value>
+  </data>
+  <data name="Middle_name_string" xml:space="preserve">
+    <value>Презиме</value>
+  </data>
+  <data name="Last_name_string" xml:space="preserve">
+    <value>Фамилия</value>
+  </data>
+  <data name="Welcome_string" xml:space="preserve">
+    <value>Добре дошли</value>
+  </data>
   <data name="Required_only_for_FEI_export_string" xml:space="preserve">
     <value>Задължително само за FEI експорт</value>
   </data>

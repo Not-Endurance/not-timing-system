@@ -14,17 +14,10 @@
 
                 <MudSpacer />
 
-                <NHeadline3 Content="@Watermark" />
+                <NHeadline3 Color="Color.Secondary" Content="@Watermark" />
             </MudAppBar>
 
-            <MudDrawer @bind-Open="DrawerOpen" Elevation="2">
-                @if (MenuTitle != null)
-                {
-                    <MudDrawerHeader>
-                        <NHeadline3 Content="@MenuTitle" />
-                    </MudDrawerHeader>
-                }
-                    
+            <MudDrawer @bind-Open="DrawerOpen" Elevation="2">                    
                 @Drawer
             </MudDrawer>
         }

@@ -65,6 +65,10 @@ namespace NTS.Localization
         public static string Ride_string => LocalizeString(nameof(Ride_string));
         public static string Not_ranked_string => LocalizeString(nameof(Not_ranked_string));
         public static string Name_string => LocalizeString(nameof(Name_string));
+        public static string First_name_string => LocalizeString(nameof(First_name_string));
+        public static string Middle_name_string => LocalizeString(nameof(Middle_name_string));
+        public static string Last_name_string => LocalizeString(nameof(Last_name_string));
+        public static string Welcome_string => LocalizeString(nameof(Welcome_string));
         public static string Required_only_for_FEI_export_string =>
             LocalizeString(nameof(Required_only_for_FEI_export_string));
         public static string Combination_Number_string => LocalizeString(nameof(Combination_Number_string));

@@ -3,6 +3,7 @@ using Not.Application.Authentication.User;
 using Not.Storage.Mongo;
 using NTS.Nexus.HTTP.Mongo.Models;
 using NTS.Nexus.HTTP.Telemetry;
+using NTS.Witness.Contracts.API;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
@@ -81,6 +82,32 @@ public class UserMongoRepository : IUserRepository
         }
     }
 
+    public async Task<NUserModel?> UpdateProfile(string email, UpdateUserProfilePayload payload)
+    {
+        using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(UpdateProfile));
+
+        var normalizedEmail =
+            NormalizeEmail(email) ?? throw new ArgumentException("Email cannot be empty", nameof(email));
+
+        var update = Builders<NUserDocument>
+            .Update.Set(x => x.Name, payload.Name)
+            .Set(x => x.GivenName, payload.GivenName)
+            .Set(x => x.MiddleName, payload.MiddleName)
+            .Set(x => x.Surname, payload.Surname)
+            .Set(x => x.CountryRegion, payload.CountryRegion)
+            .Set(x => x.Club, payload.Club)
+            .Set(x => x.FeiId, payload.FeiId);
+
+        var user = await GetCollection()
+            .FindOneAndUpdateAsync(
+                x => x.Email == normalizedEmail,
+                update,
+                new FindOneAndUpdateOptions<NUserDocument> { ReturnDocument = ReturnDocument.After }
+            );
+
+        return user?.ToUser();
+    }
+
     public async Task Create(NUserModel item)
     {
         using var activity = _telemetry.StartActivity(nameof(UserMongoRepository), nameof(Create));
@@ -121,4 +148,5 @@ public interface IUserRepository
     Task<NUserModel?> ReadByEmail(string email);
     Task<IEnumerable<NUserModel>> ReadMany();
     Task<NUserModel> Register(NUserRegistration registration);
+    Task<NUserModel?> UpdateProfile(string email, UpdateUserProfilePayload payload);
 }
