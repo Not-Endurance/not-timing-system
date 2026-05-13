@@ -196,13 +196,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         var updated = await api.UpdateUserProfile(
             profileUser.Email,
-            new UpdateUserProfilePayload(
-                "Petra",
-                "Profile",
-                "Bulgaria",
-                club: "Konarche",
-                feiId: "20202020"
-            )
+            new UpdateUserProfilePayload("Petra", "Profile", "Bulgaria", club: "Konarche", feiId: "20202020")
         );
         var persisted = await api.ReadUser(profileUser.Email);
 
