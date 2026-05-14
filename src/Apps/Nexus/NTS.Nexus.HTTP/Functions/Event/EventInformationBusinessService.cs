@@ -94,7 +94,8 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
 
     public async Task<IEnumerable<CoreEventInformationModel>> ReadPast()
     {
-        return await _eventInformation.ReadMany(x => !x.IsActive) ?? [];
+        var items = await _eventInformation.ReadMany(x => !x.IsActive) ?? [];
+        return items.OrderByDescending(x => x.EndDay);
     }
 
     public async Task Deactivate(int eventInformationId)
