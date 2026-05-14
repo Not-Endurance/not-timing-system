@@ -104,7 +104,8 @@ public class EventInformationFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(ListPast));
 
-        return Ok(await _businessService.ReadPast());
+        var events = await _businessService.ReadPast();
+        return Ok(events);
     }
 
     [Function("event-information-delete")]
