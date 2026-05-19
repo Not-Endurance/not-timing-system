@@ -186,11 +186,15 @@ namespace NTS.Localization
         public static string FEI_Show_ID_string => LocalizeString(nameof(FEI_Show_ID_string));
         public static string FEI_Show_ID_helper_text_string => LocalizeString(nameof(FEI_Show_ID_helper_text_string));
         public static string FEI_Event_ID_string => LocalizeString(nameof(FEI_Event_ID_string));
-        public static string Locate_FEI_Show_data_instructions_string => LocalizeString(nameof(Locate_FEI_Show_data_instructions_string));
-        public static string FEI_Event_Code_helper_text_string => LocalizeString(nameof(FEI_Event_Code_helper_text_string));
-        public static string FEI_Competition_ID_helper_text_string => LocalizeString(nameof(FEI_Competition_ID_helper_text_string));
+        public static string Locate_FEI_Show_data_instructions_string =>
+            LocalizeString(nameof(Locate_FEI_Show_data_instructions_string));
+        public static string FEI_Event_Code_helper_text_string =>
+            LocalizeString(nameof(FEI_Event_Code_helper_text_string));
+        public static string FEI_Competition_ID_helper_text_string =>
+            LocalizeString(nameof(FEI_Competition_ID_helper_text_string));
         public static string FEI_Rule_helper_text_string => LocalizeString(nameof(FEI_Rule_helper_text_string));
-        public static string FEI_Schedule_Number_helper_text_string => LocalizeString(nameof(FEI_Schedule_Number_helper_text_string));
+        public static string FEI_Schedule_Number_helper_text_string =>
+            LocalizeString(nameof(FEI_Schedule_Number_helper_text_string));
         public static string Missing_FEI_export_configurations_colon__ =>
             LocalizeString(nameof(Missing_FEI_export_configurations_colon__));
         public static string FEI_Rule_string => LocalizeString(nameof(FEI_Rule_string));

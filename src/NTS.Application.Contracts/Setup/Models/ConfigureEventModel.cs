@@ -34,17 +34,7 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
         var officials = Officials.Select(x => x.MapToEntity());
         var loops = Loops.Select(x => x.MapToEntity());
         var combinations = Combinations.Select(x => x.MapToEntity());
-        return new ConfigureEvent(
-            Name,
-            Location,
-            country,
-            FeiShowId,
-            competitions,
-            officials,
-            loops,
-            combinations,
-            Id
-        );
+        return new ConfigureEvent(Name, Location, country, FeiShowId, competitions, officials, loops, combinations, Id);
     }
 
     public void MapFrom(ConfigureEvent @event)

@@ -258,10 +258,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         var validation = validationBuilder.ToString();
         if (!string.IsNullOrWhiteSpace(validation))
         {
-            var message = string.Format(
-                Missing_FEI_export_configurations_colon__,
-                Environment.NewLine + validation
-            );
+            var message = string.Format(Missing_FEI_export_configurations_colon__, Environment.NewLine + validation);
             throw new DomainException(message);
         }
     }
