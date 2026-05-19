@@ -523,18 +523,6 @@
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Zaman formatı yanlış 'saat:dakika:saniye'</value>
   </data>
-  <data name="FEI_Show_ID_string" xml:space="preserve">
-    <value>FEI Show ID</value>
-  </data>
-  <data name="FEI_Event_Code_string" xml:space="preserve">
-    <value>FEI Event Code</value>
-  </data>
-  <data name="FEI_Schedule_Number_string" xml:space="preserve">
-    <value>FEI Schedule NR</value>
-  </data>
-  <data name="FEI_Rule_string" xml:space="preserve">
-    <value>FEI Rule</value>
-  </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Sunum zamanı olmadan Temsil talep edilemez</value>
   </data>
@@ -748,6 +736,21 @@
   <data name="Past_events_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="FEI_ID_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Show_ID_string" xml:space="preserve">
+    <value>FEI Show ID</value>
+  </data>
+  <data name="FEI_Event_Code_string" xml:space="preserve">
+    <value>FEI Event Code</value>
+  </data>
+  <data name="FEI_Schedule_Number_string" xml:space="preserve">
+    <value>FEI Schedule NR</value>
+  </data>
+  <data name="FEI_Rule_string" xml:space="preserve">
+    <value>FEI Rule</value>
+  </data>
   <data name="FEI_Show_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
@@ -769,7 +772,7 @@
   <data name="FEI_Schedule_Number_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-  <data name="FEI_ID_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+  <data name="Athlete_FEI_ID_must_be_numeric_value_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
 </root>

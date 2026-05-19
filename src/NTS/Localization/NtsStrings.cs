@@ -11,6 +11,7 @@ namespace NTS.Localization
     {
         public static string km_string => LocalizeString(nameof(km_string));
         public static string hrs_string => LocalizeString(nameof(hrs_string));
+        public static string Athlete_FEI_ID_must_be_numeric_value_string => LocalizeString(nameof(Athlete_FEI_ID_must_be_numeric_value_string));
         public static string Reset_Timing_string => LocalizeString(nameof(Reset_Timing_string));
         public static string Export_FEI_string => LocalizeString(nameof(Export_FEI_string));
         public static string rest_string => LocalizeString(nameof(rest_string));
