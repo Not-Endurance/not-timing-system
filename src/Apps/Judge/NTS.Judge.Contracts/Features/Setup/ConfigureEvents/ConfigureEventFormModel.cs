@@ -26,17 +26,7 @@ public record ConfigureEventFormModel : KrudFormModel<ConfigureEvent>
 
     protected override ConfigureEvent MapTo()
     {
-        return new ConfigureEvent(
-            Name,
-            Location,
-            Country,
-            FeiShowId,
-            Competitions,
-            Officials,
-            Loops,
-            Combinations,
-            Id
-        );
+        return new ConfigureEvent(Name, Location, Country, FeiShowId, Competitions, Officials, Loops, Combinations, Id);
     }
 
     public override void MapFrom(ConfigureEvent configureEvent)

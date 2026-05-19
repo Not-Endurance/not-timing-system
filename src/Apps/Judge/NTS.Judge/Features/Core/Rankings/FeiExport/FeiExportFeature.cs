@@ -46,7 +46,15 @@ internal class FeiExportFeature : IFeiExportFeature
             .OrderBy(x => x.Ranking.FeiEventId)
             .ThenBy(x => x.Ranking.FeiEventCode)
             .GroupBy(x => new { x.Ranking.FeiEventId, x.Ranking.FeiEventCode })
-            .Select(group => CreateEnduranceEvent(eventInformation, countryCode, group.Key.FeiEventId!, group.Key.FeiEventCode!, group))
+            .Select(group =>
+                CreateEnduranceEvent(
+                    eventInformation,
+                    countryCode,
+                    group.Key.FeiEventId!,
+                    group.Key.FeiEventCode!,
+                    group
+                )
+            )
             .ToArray();
 
         var horseSport = new HorseSport()

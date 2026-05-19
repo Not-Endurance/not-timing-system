@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
-using NTS.Application.Contracts.PastEvents;
 using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.PastEvents;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Judge.Contracts.Features.Core;
@@ -357,8 +357,14 @@ public sealed class CoreFeatureEndToEndTests
     static Ranking CreateFeiExportRanking(Ranking source)
     {
         var entries = source
-            .Entries.Select((entry, index) =>
-                new RankingEntry(CreateFeiExportParticipation(entry.Participation), entry.Rank, entry.IsNotRanked, entry.Id)
+            .Entries.Select(
+                (entry, index) =>
+                    new RankingEntry(
+                        CreateFeiExportParticipation(entry.Participation),
+                        entry.Rank,
+                        entry.IsNotRanked,
+                        entry.Id
+                    )
             )
             .ToList();
 

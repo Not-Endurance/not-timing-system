@@ -83,15 +83,7 @@ public sealed class FeiExportTests
     {
         await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"), new Uri("http://127.0.0.1:2"));
         var service = judge.GetRequiredService<IFeiExportService>();
-        var ranking = CreateRanking(
-            "CEI 1*",
-            "FEI-EVENT-1",
-            "CEI1",
-            "FEI-COMP-1",
-            "01",
-            1,
-            horseFeiId: null
-        );
+        var ranking = CreateRanking("CEI 1*", "FEI-EVENT-1", "CEI1", "FEI-COMP-1", "01", 1, horseFeiId: null);
 
         var ex = Assert.Throws<DomainException>(() => service.Create(CreateEventInformation(), [ranking]));
 
