@@ -16,7 +16,9 @@ public class RanklistModel
             Ruleset = ranklist.Ruleset,
             Type = ranklist.Type,
             Category = ranklist.Category,
-            CompetitionFeiId = ranklist.Ranking.CompetitionFeiId,
+            FeiEventId = ranklist.Ranking.FeiEventId,
+            FeiEventCode = ranklist.Ranking.FeiEventCode,
+            FeiCompetitionId = ranklist.Ranking.FeiCompetitionId,
             FeiRule = ranklist.Ranking.FeiRule,
             FeiScheduleNumber = ranklist.Ranking.FeiScheduleNumber,
             Entries = ranklist.Entries.Select(RankingEntryModel.MapFrom).ToArray(),
@@ -28,7 +30,9 @@ public class RanklistModel
     public CompetitionRuleset Ruleset { get; init; }
     public CompetitionType Type { get; init; }
     public ParticipationCategory Category { get; init; }
-    public string? CompetitionFeiId { get; init; }
+    public string? FeiEventId { get; init; }
+    public string? FeiEventCode { get; init; }
+    public string? FeiCompetitionId { get; init; }
     public string? FeiRule { get; init; }
     public string? FeiScheduleNumber { get; init; }
     public RankingEntryModel[] Entries { get; init; } = [];
@@ -43,7 +47,9 @@ public class RanklistModel
             Ruleset,
             Type,
             Category,
-            CompetitionFeiId,
+            FeiEventId,
+            FeiEventCode,
+            FeiCompetitionId,
             FeiRule,
             FeiScheduleNumber,
             entries,

@@ -34,7 +34,9 @@ public class Ranklist
     public string Title => $"{Category}: {Name}";
 
     public bool IsFeiExportConfigured =>
-        !string.IsNullOrWhiteSpace(Ranking.CompetitionFeiId)
+        !string.IsNullOrWhiteSpace(Ranking.FeiEventId)
+        && !string.IsNullOrWhiteSpace(Ranking.FeiEventCode)
+        && !string.IsNullOrWhiteSpace(Ranking.FeiCompetitionId)
         && !string.IsNullOrWhiteSpace(Ranking.FeiRule)
         && !string.IsNullOrWhiteSpace(Ranking.FeiScheduleNumber);
 

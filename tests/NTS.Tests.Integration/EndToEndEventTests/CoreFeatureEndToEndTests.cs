@@ -1,11 +1,17 @@
 using Newtonsoft.Json;
+using NTS.Application.Contracts.PastEvents;
 using NTS.Application.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
+using NTS.Judge.Contracts.Features.Core;
+using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Features;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Infrastructure;
+using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
+using CoreCombination = NTS.Domain.Core.Aggregates.Participations.Entities.Combination;
+using CoreHorse = NTS.Domain.Core.Aggregates.Participations.Entities.Horse;
 using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
 
 namespace NTS.Tests.Integration.EndToEndEventTests;
@@ -77,6 +83,7 @@ public sealed class CoreFeatureEndToEndTests
         Assert.True(publishedSnapshotGroups > 0);
 
         await AssertFinalStateMatchesSnapshots(nexusApi, eventInformation, setup, snapshot);
+        await AssertCompletedEventCanBeDeactivatedAndExported(judge, nexusApi, eventInformation);
     }
 
     static async Task AssertStartedConfigureEventCannotBeUpdated(NexusApiDriver api, SetupConfigureEvent setupEvent)
@@ -299,6 +306,106 @@ public sealed class CoreFeatureEndToEndTests
             rankings.OrderBy(x => x.Name).ThenBy(x => x.Category).Select(RankingModel.From).ToArray()
         );
         Assert.Equal(expectedRankings.ToString(Formatting.None), actualRankings.ToString(Formatting.None));
+    }
+
+    static async Task AssertCompletedEventCanBeDeactivatedAndExported(
+        JudgeDriver judge,
+        NexusApiDriver api,
+        EventInformation eventInformation
+    )
+    {
+        eventInformation = CreateFeiExportEventInformation(eventInformation);
+        await api.Update(eventInformation);
+        var finalRankings = await api.ReadRankings(eventInformation.Id);
+        var exportableRanking = CreateFeiExportRanking(finalRankings.First());
+        await api.Update(exportableRanking);
+
+        Assert.True(judge.IsConnected);
+        await judge.GetRequiredService<IDashService>().Deactivate();
+
+        Assert.False(judge.IsConnected);
+        var activeEvents = await api.ReadActiveEventInformation();
+        Assert.DoesNotContain(activeEvents, x => x.Id == eventInformation.Id);
+        var pastEvents = await api.ReadPastEventInformation();
+        Assert.Contains(pastEvents, x => x.Id == eventInformation.Id);
+
+        var pastEventsService = judge.GetRequiredService<IPastEventService>();
+        await pastEventsService.LoadEvent(eventInformation.Id);
+
+        var pastEvent = Assert.IsType<EventInformation>(pastEventsService.Event);
+        var export = judge.GetRequiredService<IFeiExportService>().Create(pastEvent, pastEventsService.Rankings);
+
+        Assert.Equal("application/xml", export.ContentType);
+        Assert.Contains(eventInformation.FeiShowId!, export.Content);
+        Assert.Contains(exportableRanking.FeiEventId!, export.Content);
+        Assert.Contains(exportableRanking.FeiCompetitionId!, export.Content);
+    }
+
+    static EventInformation CreateFeiExportEventInformation(EventInformation source)
+    {
+        return new EventInformation(
+            source.Country,
+            source.Name,
+            source.Location,
+            source.EventSpan,
+            $"FEI-SHOW-{source.Id}",
+            source.Id,
+            source.IsActive
+        );
+    }
+
+    static Ranking CreateFeiExportRanking(Ranking source)
+    {
+        var entries = source
+            .Entries.Select((entry, index) =>
+                new RankingEntry(CreateFeiExportParticipation(entry.Participation), entry.Rank, entry.IsNotRanked, entry.Id)
+            )
+            .ToList();
+
+        return new Ranking(
+            source.Name,
+            source.Ruleset,
+            source.Type,
+            source.Category,
+            $"FEI-EVENT-{source.Id}",
+            "CEI1",
+            $"FEI-COMPETITION-{source.Id}",
+            "E Comp",
+            "01",
+            entries,
+            source.EventId,
+            source.Id
+        );
+    }
+
+    static Participation CreateFeiExportParticipation(Participation source)
+    {
+        var athlete = source.Combination.Athlete;
+        var horse = source.Combination.Horse;
+        var athleteFeiId = (100000 + source.Combination.Number).ToString();
+        var horseFeiId = (200000 + source.Combination.Number).ToString();
+        var exportAthlete = new CoreAthlete(athlete.Names, athlete.Country, athlete.Club, athleteFeiId, athlete.Id);
+        var exportHorse = new CoreHorse(horse.Name, horseFeiId, horse.Id);
+        var exportCombination = new CoreCombination(
+            source.Combination.Number,
+            exportAthlete,
+            exportHorse,
+            source.Combination.Club,
+            source.Combination.Distance,
+            source.Combination.MinAverageSpeed,
+            source.Combination.MaxAverageSpeed,
+            source.Combination.Id
+        );
+
+        return new Participation(
+            source.Category,
+            source.Competition,
+            exportCombination,
+            source.Phases,
+            source.Eliminated,
+            source.EventId,
+            source.Id
+        );
     }
 
     sealed class StartedEventDocuments

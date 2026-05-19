@@ -300,9 +300,6 @@
   <data name="Welcome_string" xml:space="preserve">
     <value>Welcome</value>
   </data>
-  <data name="Required_only_for_FEI_export_string" xml:space="preserve">
-    <value>Required only for FEI export</value>
-  </data>
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Combination Number</value>
   </data>
@@ -525,20 +522,17 @@
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Time format is incorect 'hours:minutes:seconds'</value>
   </data>
-  <data name="required_for_FEI_export" xml:space="preserve">
-    <value>*required only for FEI export</value>
+  <data name="FEI_Show_ID_string" xml:space="preserve">
+    <value>FEI Show ID</value>
   </data>
-  <data name="FEI_Show_ID_label" xml:space="preserve">
-    <value>FEI Show ID (See FEI database -&gt; "Show Detail" section -&gt; top; example: "2024_CI_1474")</value>
+  <data name="FEI_Event_Code_string" xml:space="preserve">
+    <value>FEI Event Code</value>
   </data>
-  <data name="FEI_Event_Code_label" xml:space="preserve">
-    <value>FEI Event Code (See FEI database -&gt; "Event Detail" section -&gt; Event Code (left)</value>
+  <data name="FEI_Schedule_Number_string" xml:space="preserve">
+    <value>FEI Schedule Number</value>
   </data>
-  <data name="FEI_Schedule_NR_label" xml:space="preserve">
-    <value>FEI Schedule NR (See FEI Database -&gt; "Competition Detail" section -&gt; "Schedule Competition Nr *"; example: "01")</value>
-  </data>
-  <data name="FEI_Rule_label" xml:space="preserve">
-    <value>FEI Rule (See FEI Database -&gt; "Competition Detail" section -&gt; Rule*; example: E-Comp)</value>
+  <data name="FEI_Rule_string" xml:space="preserve">
+    <value>FEI Rule</value>
   </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Cannot require Representation without Presentation time</value>
@@ -687,32 +681,14 @@
   <data name="Save_string" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="FEI_Competition_ID_label" xml:space="preserve">
-    <value>FEI Competition ID (See FEI Database -&gt; "Competition Detail" section -&gt; Top right; example: "2024_CI_1474_E_S_02_01")</value>
-  </data>
-  <data name="FEI_Еvent_ID_Label" xml:space="preserve">
-    <value>FEI Event ID (See FEI Database -&gt; "Event Detail" section -&gt; Top right; example: "2024_CI_1474_E_S_02")</value>
+  <data name="FEI_Competition_ID_string" xml:space="preserve">
+    <value>FEI Competition ID </value>
   </data>
   <data name="Missing_FEI_export_configurations_colon__" xml:space="preserve">
     <value>Missing configurations for  FEI export: {0}</value>
   </data>
-  <data name="FEI_Event_Code" xml:space="preserve">
-    <value>FEI Event Code</value>
-  </data>
-  <data name="FEI_Show_ID" xml:space="preserve">
-    <value>FEI Show ID</value>
-  </data>
-  <data name="FEI_Rule" xml:space="preserve">
-    <value>FEI Rule</value>
-  </data>
-  <data name="FEI_Schedule_NR" xml:space="preserve">
-    <value>FEI Schedule NR</value>
-  </data>
-  <data name="FEI_ID" xml:space="preserve">
-    <value>FEI ID</value>
-  </data>
-  <data name="FEI_Event_ID_label" xml:space="preserve">
-    <value>FEI Event ID (See FEI Database -&gt; "Event Detail" section -&gt; Top right; example: "2024_CI_1474_E_S_02")</value>
+  <data name="FEI_Event_ID_string" xml:space="preserve">
+    <value>FEI Event ID</value>
   </data>
   <data name="Actions_string" xml:space="preserve">
     <value>Actions</value>
@@ -818,9 +794,6 @@
   </data>
   <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
     <value>Cannot add a completed participation in Startlist</value>
-  </data>
-  <data name="Fei_Id_string" xml:space="preserve">
-    <value>FEI Id</value>
   </data>
   <data name="Empty_string" xml:space="preserve">
     <value>Empty</value>
@@ -977,5 +950,29 @@
   </data>
   <data name="Past_events_string" xml:space="preserve">
     <value>Past events</value>
+  </data>
+  <data name="FEI_Show_ID_helper_text_string" xml:space="preserve">
+    <value>Show Detail -&gt; Top right (example: 2026_CI_1446)</value>
+  </data>
+  <data name="Locate_FEI_Show_data_instructions_string" xml:space="preserve">
+    <value>FEI settings are only required for FEI export  functionality. To find the necessary data use the public FEI database: Open data.fei.org -&gt; Click on "Calendar/Results" (not on "Courses") -&gt; Find Show</value>
+  </data>
+  <data name="FEI_Event_ID_helper_text_string" xml:space="preserve">
+    <value>Event Detail -&gt; Top right (example: 2026_CI_1446_E_S_02)</value>
+  </data>
+  <data name="FEI_Event_Code_helper_text_string" xml:space="preserve">
+    <value>Event Detail -&gt; Event Code (example: CEI2* 120 CIM)</value>
+  </data>
+  <data name="FEI_Competition_ID_helper_text_string" xml:space="preserve">
+    <value>Competition Detail -&gt; Top right (example: 2026_CI_1446_E_S_02_01)</value>
+  </data>
+  <data name="FEI_Rule_helper_text_string" xml:space="preserve">
+    <value>Competition Detail -&gt; Rule (example: E-Comp - Endurance Competition)</value>
+  </data>
+  <data name="FEI_Schedule_Number_helper_text_string" xml:space="preserve">
+    <value>Competition Detail -&gt; Schedule Number (example: 01)</value>
+  </data>
+  <data name="FEI_ID_string" xml:space="preserve">
+    <value>FEI Id</value>
   </data>
 </root>

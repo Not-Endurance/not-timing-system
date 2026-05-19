@@ -14,7 +14,9 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         CompetitionRuleset? ruleset,
         DateTimeOffset? start,
         TimeSpan? compulsoryThresholdSpan,
-        string? feiId,
+        string? feiEventId,
+        string? feiEventCode,
+        string? feiCompetitionId,
         string? feiRule,
         string? feiScheduleNumber,
         IEnumerable<Phase> phases,
@@ -30,7 +32,9 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         Ruleset = Required(nameof(Ruleset), ruleset);
         Start = Required(nameof(Start), start);
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
-        FeiId = feiId;
+        FeiEventId = feiEventId;
+        FeiEventCode = feiEventCode;
+        FeiCompetitionId = feiCompetitionId;
         FeiRule = feiRule;
         FeiScheduleNumber = feiScheduleNumber;
 
@@ -48,7 +52,9 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
     public CompetitionRuleset Ruleset { get; }
     public DateTimeOffset Start { get; }
     public TimeSpan? CompulsoryThresholdSpan { get; }
-    public string? FeiId { get; }
+    public string? FeiEventId { get; }
+    public string? FeiEventCode { get; }
+    public string? FeiCompetitionId { get; }
     public string? FeiRule { get; } = "E Comp";
     public string? FeiScheduleNumber { get; }
     public IReadOnlyList<Phase> Phases => _phases.AsReadOnly();

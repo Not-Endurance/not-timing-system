@@ -12,13 +12,16 @@
 
         <NSelect @bind-Value="Model.Category" For="() => Model.Category" Label="@Category_string" />
 
-        <NTextField @bind-Value="Model.CompetitionFeiId" For="() => Model.CompetitionFeiId" Label="@($"{required_for_FEI_export} - {FEI_Competition_ID_label}")" />
+        <NTextField @bind-Value="Model.FeiEventId" For="() => Model.FeiEventId" Label="@FEI_Event_ID_string" HelperText="@FEI_Event_ID_helper_text_string" />
 
-        <NTextField @bind-Value="Model.FeiRule" For="() => Model.FeiRule" Label="@($"{required_for_FEI_export} - {FEI_Rule_label}")" />
+        <NTextField @bind-Value="Model.FeiEventCode" For="() => Model.FeiEventCode" Label="@FEI_Event_Code_string" HelperText="@FEI_Event_Code_helper_text_string" />
 
-        <NTextField @bind-Value="Model.FeiScheduleNumber" For="() => Model.FeiScheduleNumber" Label="@($"{required_for_FEI_export} - {FEI_Schedule_NR_label}")" />
+        <NTextField @bind-Value="Model.FeiCompetitionId" For="() => Model.FeiCompetitionId" Label="@FEI_Competition_ID_string" HelperText="@FEI_Competition_ID_helper_text_string" />
+
+        <NTextField @bind-Value="Model.FeiRule" For="() => Model.FeiRule" Label="@FEI_Rule_string" HelperText="@FEI_Rule_helper_text_string" />
+
+        <NTextField @bind-Value="Model.FeiScheduleNumber" For="() => Model.FeiScheduleNumber" Label="@FEI_Schedule_Number_string" HelperText="@FEI_Schedule_Number_helper_text_string" />
     </FormFields>
 </KrudForm>
-
 
 

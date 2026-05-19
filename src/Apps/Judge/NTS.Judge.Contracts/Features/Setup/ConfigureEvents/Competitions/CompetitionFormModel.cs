@@ -30,7 +30,9 @@ public record CompetitionFormModel : KrudFormModel<Competition>
         get => UseCompulsoryThreshold ? _requiredInspectionCompulsoryThreshold : null;
         set => _requiredInspectionCompulsoryThreshold = value;
     }
-    public string? FeiId { get; set; }
+    public string? FeiEventId { get; set; }
+    public string? FeiEventCode { get; set; }
+    public string? FeiCompetitionId { get; set; }
     public string? FeiRule { get; set; }
     public string? FeiScheduleNumber { get; set; }
     public IReadOnlyCollection<Phase> Phases { get; private set; } = [];
@@ -46,7 +48,9 @@ public record CompetitionFormModel : KrudFormModel<Competition>
             Ruleset,
             startTime,
             compulsoryThreshold,
-            FeiId,
+            FeiEventId,
+            FeiEventCode,
+            FeiCompetitionId,
             FeiRule,
             FeiScheduleNumber,
             Phases,
@@ -67,7 +71,9 @@ public record CompetitionFormModel : KrudFormModel<Competition>
         Participations = competition.Participations;
         CompulsoryThresholdMinutes = competition.CompulsoryThresholdSpan?.Minutes;
         UseCompulsoryThreshold = competition.CompulsoryThresholdSpan != null;
-        FeiId = competition.FeiId;
+        FeiEventId = competition.FeiEventId;
+        FeiEventCode = competition.FeiEventCode;
+        FeiCompetitionId = competition.FeiCompetitionId;
         FeiRule = competition.FeiRule;
         FeiScheduleNumber = competition.FeiScheduleNumber;
     }

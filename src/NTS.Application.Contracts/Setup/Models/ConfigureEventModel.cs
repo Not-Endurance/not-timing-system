@@ -20,9 +20,7 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Location { get; set; } = default!;
     public CountryModel Country { get; set; } = default!;
-    public string? ShowFeiId { get; set; }
-    public string? FeiId { get; set; }
-    public string? FeiEventCode { get; set; }
+    public string? FeiShowId { get; set; }
     public CompetitionModel[] Competitions { get; set; } = default!;
     public OfficialModel[] Officials { get; set; } = default!;
     public LoopModel[] Loops { get; set; } = default!;
@@ -40,9 +38,7 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
             Name,
             Location,
             country,
-            ShowFeiId,
-            FeiId,
-            FeiEventCode,
+            FeiShowId,
             competitions,
             officials,
             loops,
@@ -57,9 +53,7 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
         Name = @event.Name;
         Location = @event.Location;
         Country = CountryModel.From(@event.Country);
-        ShowFeiId = @event.ShowFeiId;
-        FeiId = @event.FeiId;
-        FeiEventCode = @event.FeiEventCode;
+        FeiShowId = @event.FeiShowId;
         Competitions = @event.Competitions.Select(CompetitionModel.MapFrom).ToArray();
         Officials = @event.Officials.Select(OfficialModel.MapFrom).ToArray();
         Loops = @event.Loops.Select(LoopModel.MapFrom).ToArray();

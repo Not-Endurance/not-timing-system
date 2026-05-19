@@ -9,7 +9,9 @@ public class Ranking : Aggregate, IEventScoped
         CompetitionRuleset? ruleset,
         CompetitionType? type,
         ParticipationCategory? category,
-        string? competitionFeiId,
+        string? feiEventId,
+        string? feiEventCode,
+        string? feiCompetitionId,
         string? feiRule,
         string? feiScheduleNumber,
         IEnumerable<RankingEntry> entries,
@@ -24,7 +26,9 @@ public class Ranking : Aggregate, IEventScoped
         Category = Required(nameof(Category), category);
         Type = Required(nameof(Type), type);
         Entries = new(AreUnique(nameof(Entries), entries).ToList());
-        CompetitionFeiId = competitionFeiId;
+        FeiEventId = feiEventId;
+        FeiEventCode = feiEventCode;
+        FeiCompetitionId = feiCompetitionId;
         FeiRule = feiRule;
         FeiScheduleNumber = feiScheduleNumber;
     }
@@ -34,7 +38,9 @@ public class Ranking : Aggregate, IEventScoped
     public CompetitionRuleset Ruleset { get; }
     public CompetitionType Type { get; }
     public ParticipationCategory Category { get; }
-    public string? CompetitionFeiId { get; }
+    public string? FeiEventId { get; }
+    public string? FeiEventCode { get; }
+    public string? FeiCompetitionId { get; }
     public string? FeiRule { get; }
     public string? FeiScheduleNumber { get; }
     public ReadOnlyCollection<RankingEntry> Entries { get; }

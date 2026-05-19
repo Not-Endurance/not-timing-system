@@ -19,8 +19,6 @@ public record ConfigureEventFormModel : KrudFormModel<ConfigureEvent>
     public string? Location { get; set; }
     public Country? Country { get; set; }
     public string? FeiShowId { get; set; }
-    public string? FeiId { get; set; }
-    public string? FeiEventCode { get; set; }
     public IReadOnlyCollection<Competition> Competitions { get; private set; } = [];
     public IReadOnlyCollection<Official> Officials { get; private set; } = [];
     public IReadOnlyCollection<Combination> Combinations { get; private set; } = [];
@@ -33,8 +31,6 @@ public record ConfigureEventFormModel : KrudFormModel<ConfigureEvent>
             Location,
             Country,
             FeiShowId,
-            FeiId,
-            FeiEventCode,
             Competitions,
             Officials,
             Loops,
@@ -49,9 +45,7 @@ public record ConfigureEventFormModel : KrudFormModel<ConfigureEvent>
         Name = configureEvent.Name;
         Location = configureEvent.Location;
         Country = configureEvent.Country;
-        FeiShowId = configureEvent.ShowFeiId;
-        FeiId = configureEvent.FeiId;
-        FeiEventCode = configureEvent.FeiEventCode;
+        FeiShowId = configureEvent.FeiShowId;
         Competitions = configureEvent.Competitions;
         Officials = configureEvent.Officials;
         Combinations = configureEvent.Combinations;

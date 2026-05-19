@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Not.Blazor.Browser;
 using Not.Blazor.Components.Abstractions;
 using NTS.Application.Contracts.PastEvents;
 using NTS.Blazor.Components.PastEvents;
@@ -15,8 +15,15 @@ public class PastEventDetailsContentBehind : NStatefulComponent
     [Inject]
     protected IDialogService DialogService { get; set; } = default!;
 
+    [Inject]
+    protected IFeiExportService FeiExportService { get; set; } = default!;
+
+    [Inject]
+    protected IFileDownloadService FileDownloadService { get; set; } = default!;
+
     protected bool IsEmpty => Service.Event == null || Service.Document == null;
     protected bool HasStartlist => Service.StartlistHistoryByStage.Count != 0;
+    protected bool HasFeiExportConfigured => Service.Rankings.Any(IsFeiExportConfigured);
 
     [Parameter]
     public int EventId { get; set; }
@@ -62,5 +69,32 @@ public class PastEventDetailsContentBehind : NStatefulComponent
         {
             Handle(ex);
         }
+    }
+
+    protected async Task GenerateFeiExport()
+    {
+        try
+        {
+            if (Service.Event == null)
+            {
+                return;
+            }
+
+            var document = FeiExportService.Create(Service.Event, Service.Rankings);
+            await FileDownloadService.DownloadText(document.FileName, document.Content, document.ContentType);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    static bool IsFeiExportConfigured(Ranking ranking)
+    {
+        return !string.IsNullOrWhiteSpace(ranking.FeiEventId)
+            && !string.IsNullOrWhiteSpace(ranking.FeiEventCode)
+            && !string.IsNullOrWhiteSpace(ranking.FeiCompetitionId)
+            && !string.IsNullOrWhiteSpace(ranking.FeiRule)
+            && !string.IsNullOrWhiteSpace(ranking.FeiScheduleNumber);
     }
 }

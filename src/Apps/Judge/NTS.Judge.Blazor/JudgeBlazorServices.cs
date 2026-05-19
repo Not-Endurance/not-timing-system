@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Blazor;
+using Not.Blazor.Client;
 using Not.Startup;
 using NTS.Judge.Blazor.Features.Socket;
 
@@ -12,6 +13,7 @@ public static class JudgeBlazorServices
     {
         return services
             .AddNBlazor(configuration)
+            .NClientSideBlazor(configuration)
             .AddScoped<IStartupInitializerAsync, JudgeStartupEventInformationCoordinator>();
     }
 }

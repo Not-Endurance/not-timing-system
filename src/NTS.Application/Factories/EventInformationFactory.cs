@@ -22,9 +22,7 @@ public static class EventInformationFactory
             setupEvent.Name,
             setupEvent.Location,
             new EventSpan(startDate, endDate),
-            setupEvent.ShowFeiId,
-            setupEvent.FeiId,
-            setupEvent.FeiEventCode,
+            setupEvent.FeiShowId,
             setupEvent.Id,
             isActive: true
         );

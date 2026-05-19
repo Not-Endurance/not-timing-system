@@ -22,8 +22,6 @@ internal static class IntegrationPayloadFactory
             "Sofia",
             eventSpan ?? new EventSpan(today, today.AddDays(1)),
             null,
-            null,
-            null,
             eventId
         );
     }
@@ -104,6 +102,8 @@ internal static class IntegrationPayloadFactory
             CompetitionRuleset.FEI,
             CompetitionType.Qualification,
             ParticipationCategory.Senior,
+            null,
+            null,
             null,
             null,
             null,

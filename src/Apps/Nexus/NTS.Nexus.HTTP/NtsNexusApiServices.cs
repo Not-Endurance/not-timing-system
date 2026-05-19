@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Injection;
 using Not.Storage;
+using NTS;
 using NTS.Application.Cors;
 using NTS.Nexus.HTTP.Mongo.Repositories;
 using NTS.Nexus.HTTP.Telemetry;
@@ -20,6 +21,7 @@ internal static class NtsNexusApiServices
         services.AddTransient<IUserRepository, UserMongoRepository>();
 
         return services
+            .AddNts(configuration)
             .AddNConventionalServices(Assembly.GetExecutingAssembly())
             .AddMongoStorage(configuration)
             .AddNexusTelemetry()
