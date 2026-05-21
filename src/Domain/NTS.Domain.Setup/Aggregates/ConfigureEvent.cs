@@ -22,9 +22,7 @@ public class ConfigureEvent
         string? name,
         string? location,
         Country? country,
-        string? showFeiId,
-        string? feiId,
-        string? feiEventCode,
+        string? feiShowId,
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials,
         IEnumerable<Loop> loops,
@@ -36,9 +34,7 @@ public class ConfigureEvent
         Name = Required(nameof(Name), name);
         Location = Required(nameof(Location), location);
         Country = Required(nameof(Country), country);
-        ShowFeiId = showFeiId;
-        FeiId = feiId;
-        FeiEventCode = feiEventCode;
+        FeiShowId = feiShowId;
         _competitions = competitions.ToList();
         _officials = officials.ToList();
         _loops = loops.ToList();
@@ -54,9 +50,7 @@ public class ConfigureEvent
     public string Name { get; }
     public string Location { get; }
     public Country Country { get; }
-    public string? ShowFeiId { get; }
-    public string? FeiId { get; }
-    public string? FeiEventCode { get; }
+    public string? FeiShowId { get; }
     public IReadOnlyList<Competition> Competitions => _competitions.AsReadOnly();
     public IReadOnlyList<Official> Officials => _officials.AsReadOnly();
     public IReadOnlyList<Loop> Loops => _loops.AsReadOnly();

@@ -4,14 +4,12 @@ using Not.Blazor.Dialogs;
 using Not.Blazor.Helpers;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 using NTS.Judge.Blazor.Layout.Drawer.Deactivate;
 using NTS.Judge.Contracts.Features.Core;
 using NTS.Judge.Contracts.Features.Core.Rankings;
-using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
 using static NTS.Judge.Blazor.Routes;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings;
@@ -20,9 +18,6 @@ public class RankingsContentBehind : PrintableComponent
 {
     TaskCompletionSource<bool>? _renderCompletionSource;
     bool _isDeactivatingEvent;
-
-    [Inject]
-    IFeiExportService FeiExportService { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
@@ -44,8 +39,6 @@ public class RankingsContentBehind : PrintableComponent
 
     protected bool CompactParticipationTables { get; private set; }
 
-    protected Ranklist Ranklist { get; private set; } = default!;
-
     protected ProtocolDocument? Document { get; private set; }
 
     [Inject]
@@ -54,7 +47,6 @@ public class RankingsContentBehind : PrintableComponent
     //public bool HasContent => RankingService.Ranklist != null;
     protected bool HasActiveEvent => SocketService.Event != null;
     protected bool IsDeactivatingEvent => _isDeactivatingEvent;
-    public bool IsFeiExportConfigured => Ranklist?.IsFeiExportConfigured ?? false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,20 +61,7 @@ public class RankingsContentBehind : PrintableComponent
             return;
         }
 
-        Ranklist = new Ranklist(RankingService.Current);
         Document = DocumentService.Create(RankingService.Current);
-    }
-
-    protected async Task GenerateFeiExport()
-    {
-        try
-        {
-            await FeiExportService.Create(Ranklist);
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
     }
 
     protected async Task OpenCustomRankingDialog()
@@ -118,7 +97,6 @@ public class RankingsContentBehind : PrintableComponent
             await DashService.Deactivate();
             deactivated = true;
             NavigationManager.NavigateTo(HOME);
-            await SocketService.Disconnect();
         }
         catch (Exception ex)
         {

@@ -147,9 +147,7 @@ internal class ConfigureEventFeature
             Name = snapshot.ConfigureEvent.Name,
             Location = snapshot.ConfigureEvent.Location,
             Country = snapshot.ConfigureEvent.Country,
-            FeiShowId = snapshot.ConfigureEvent.ShowFeiId,
-            FeiId = snapshot.ConfigureEvent.FeiId,
-            FeiEventCode = snapshot.ConfigureEvent.FeiEventCode,
+            FeiShowId = snapshot.ConfigureEvent.FeiShowId,
         };
         await eventService.Create(eventForm);
         var setupEventId = RequiredId(eventForm);
@@ -410,7 +408,9 @@ internal class ConfigureEventFeature
                 competition.CompulsoryThresholdSpan == null
                     ? null
                     : (int)competition.CompulsoryThresholdSpan.Value.TotalMinutes,
-            FeiId = competition.FeiId,
+            FeiEventId = competition.FeiEventId,
+            FeiEventCode = competition.FeiEventCode,
+            FeiCompetitionId = competition.FeiCompetitionId,
             FeiRule = competition.FeiRule,
             FeiScheduleNumber = competition.FeiScheduleNumber,
         };

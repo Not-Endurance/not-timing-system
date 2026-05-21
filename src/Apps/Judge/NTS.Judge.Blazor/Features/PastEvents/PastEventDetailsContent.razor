@@ -17,6 +17,11 @@
                               StartIcon="@Icons.Material.Filled.List"
                               Disabled="@(!HasStartlist)" />
 
+            <NButtonPrimary OnClick="GenerateFeiExport"
+                            Text="@Export_FEI_string"
+                            StartIcon="@Icons.Material.Filled.ImportExport"
+                            Disabled="@(!HasFeiExportConfigured)" />
+
             <RankingMenu Rankings="Service.Rankings"
                          Selected="Service.CurrentRanking"
                          OnSelectedSafe="SelectRanking" />

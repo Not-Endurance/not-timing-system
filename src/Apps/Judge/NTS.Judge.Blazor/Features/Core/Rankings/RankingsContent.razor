@@ -18,11 +18,6 @@
     <Rightbar>
         <MudStack Row Wrap="Wrap.Wrap">
             <NotButtonPrint OnClick="Print" />
-            
-            @if (IsFeiExportConfigured)
-            {
-                <NButtonPrimary OnClick="GenerateFeiExport" Text="@Export_FEI_string" StartIcon="@Icons.Material.Filled.ImportExport"/>
-            }
 
             <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
 

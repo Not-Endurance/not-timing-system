@@ -19,7 +19,9 @@ public class CompetitionModel
             Ruleset = competition.Ruleset,
             Start = competition.Start,
             CompulsoryThreshold = competition.CompulsoryThresholdSpan,
-            FeiId = competition.FeiId,
+            FeiEventId = competition.FeiEventId,
+            FeiEventCode = competition.FeiEventCode,
+            FeiCompetitionId = competition.FeiCompetitionId,
             FeiRule = competition.FeiRule,
             FeiScheduleNumber = competition.FeiScheduleNumber,
             Phases = competition.Phases.Select(PhaseModel.Create).ToArray(),
@@ -33,7 +35,9 @@ public class CompetitionModel
     public CompetitionRuleset Ruleset { get; init; }
     public DateTimeOffset? Start { get; init; }
     public TimeSpan? CompulsoryThreshold { get; init; }
-    public string? FeiId { get; init; }
+    public string? FeiEventId { get; init; }
+    public string? FeiEventCode { get; init; }
+    public string? FeiCompetitionId { get; init; }
     public string? FeiRule { get; init; }
     public string? FeiScheduleNumber { get; init; }
     public PhaseModel[] Phases { get; init; } = default!;
@@ -49,7 +53,9 @@ public class CompetitionModel
             Ruleset,
             Start,
             CompulsoryThreshold,
-            FeiId,
+            FeiEventId,
+            FeiEventCode,
+            FeiCompetitionId,
             FeiRule,
             FeiScheduleNumber,
             phases,

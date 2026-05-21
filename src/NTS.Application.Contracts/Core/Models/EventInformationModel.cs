@@ -24,8 +24,6 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
     public string Name { get; set; } = default!;
     public string Location { get; set; } = default!;
     public string? FeiShowId { get; set; }
-    public string? FeiId { get; set; }
-    public string? FeiEventCode { get; set; }
     public DateTimeOffset StartDay { get; set; }
     public DateTimeOffset EndDay { get; set; }
     public bool IsActive { get; set; }
@@ -39,8 +37,6 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
         Name = eventInformation.Name;
         Location = eventInformation.Location;
         FeiShowId = eventInformation.FeiShowId;
-        FeiId = eventInformation.FeiId;
-        FeiEventCode = eventInformation.FeiEventCode;
         StartDay = eventInformation.EventSpan.StartDay;
         EndDay = eventInformation.EventSpan.EndDay;
         IsActive = eventInformation.IsActive;
@@ -50,6 +46,6 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
     {
         var country = Country.MapToEntity();
         var span = new EventSpan(StartDay, EndDay);
-        return new EventInformation(country, Name, Location, span, FeiShowId, FeiId, FeiEventCode, Id, IsActive);
+        return new EventInformation(country, Name, Location, span, FeiShowId, Id, IsActive);
     }
 }

@@ -300,9 +300,6 @@
   <data name="Welcome_string" xml:space="preserve">
     <value>Hoş geldiniz</value>
   </data>
-  <data name="Required_only_for_FEI_export_string" xml:space="preserve">
-    <value>Yalnızca FEI dışa aktarma için gerekli</value>
-  </data>
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Kombinasyon Numarası</value>
   </data>
@@ -526,21 +523,6 @@
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Zaman formatı yanlış 'saat:dakika:saniye'</value>
   </data>
-  <data name="required_for_FEI_export" xml:space="preserve">
-    <value>(FEI dışa aktarımı için gerekli)</value>
-  </data>
-  <data name="FEI_Show_ID_label" xml:space="preserve">
-    <value>FEI Show ID</value>
-  </data>
-  <data name="FEI_Event_Code_label" xml:space="preserve">
-    <value>FEI Event Code</value>
-  </data>
-  <data name="FEI_Schedule_NR_label" xml:space="preserve">
-    <value>FEI Schedule NR</value>
-  </data>
-  <data name="FEI_Rule_label" xml:space="preserve">
-    <value>FEI Rule</value>
-  </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Sunum zamanı olmadan Temsil talep edilemez</value>
   </data>
@@ -709,9 +691,6 @@
   <data name="Cannot_add_completed_participations_in_startlist" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-  <data name="Fei_Id_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="Empty_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
@@ -755,6 +734,45 @@
     <value />
   </data>
   <data name="Past_events_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_ID_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Show_ID_string" xml:space="preserve">
+    <value>FEI Show ID</value>
+  </data>
+  <data name="FEI_Event_Code_string" xml:space="preserve">
+    <value>FEI Event Code</value>
+  </data>
+  <data name="FEI_Schedule_Number_string" xml:space="preserve">
+    <value>FEI Schedule NR</value>
+  </data>
+  <data name="FEI_Rule_string" xml:space="preserve">
+    <value>FEI Rule</value>
+  </data>
+  <data name="FEI_Show_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Locate_FEI_Show_data_instructions_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Event_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Event_Code_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Competition_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Rule_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Schedule_Number_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Athlete_FEI_ID_must_be_numeric_value_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
 </root>

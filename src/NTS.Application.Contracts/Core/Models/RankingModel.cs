@@ -21,7 +21,9 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
     public CompetitionRuleset Ruleset { get; set; }
     public CompetitionType Type { get; set; }
     public ParticipationCategory Category { get; set; }
-    public string? CompetitionFeiId { get; set; }
+    public string? FeiEventId { get; set; }
+    public string? FeiEventCode { get; set; }
+    public string? FeiCompetitionId { get; set; }
     public string? FeiRule { get; set; }
     public string? FeiScheduleNumber { get; set; }
     public RankingEntryModel[] Entries { get; set; } = [];
@@ -36,7 +38,9 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
         Ruleset = ranking.Ruleset;
         Type = ranking.Type;
         Category = ranking.Category;
-        CompetitionFeiId = ranking.CompetitionFeiId;
+        FeiEventId = ranking.FeiEventId;
+        FeiEventCode = ranking.FeiEventCode;
+        FeiCompetitionId = ranking.FeiCompetitionId;
         FeiRule = ranking.FeiRule;
         FeiScheduleNumber = ranking.FeiScheduleNumber;
         Entries = ranking.Entries.Select(RankingEntryModel.MapFrom).ToArray();
@@ -50,7 +54,9 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
             Ruleset,
             Type,
             Category,
-            CompetitionFeiId,
+            FeiEventId,
+            FeiEventCode,
+            FeiCompetitionId,
             FeiRule,
             FeiScheduleNumber,
             entries,

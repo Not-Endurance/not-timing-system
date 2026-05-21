@@ -9,9 +9,7 @@
     "NfCode": "BUL",
     "Locale": "bg-BG"
   },
-  "ShowFeiId": null,
-  "FeiId": null,
-  "FeiEventCode": null,
+  "FeiShowId": null,
   "Competitions": [
     {
       "_id": 834244819,
@@ -22,7 +20,9 @@
         "$date": "2026-04-27T05:00:00.000Z"
       },
       "CompulsoryThreshold": "00:10:00",
-      "FeiId": null,
+      "FeiEventId": null,
+      "FeiEventCode": null,
+      "FeiCompetitionId": null,
       "FeiRule": null,
       "FeiScheduleNumber": null,
       "Phases": [
@@ -496,7 +496,9 @@
         "$date": "2026-04-27T06:00:00.000Z"
       },
       "CompulsoryThreshold": "00:10:00",
-      "FeiId": null,
+      "FeiEventId": null,
+      "FeiEventCode": null,
+      "FeiCompetitionId": null,
       "FeiRule": null,
       "FeiScheduleNumber": null,
       "Phases": [
@@ -574,7 +576,9 @@
         "$date": "2026-04-27T06:30:00.000Z"
       },
       "CompulsoryThreshold": "00:10:00",
-      "FeiId": null,
+      "FeiEventId": null,
+      "FeiEventCode": null,
+      "FeiCompetitionId": null,
       "FeiRule": null,
       "FeiScheduleNumber": null,
       "Phases": [
@@ -867,7 +871,9 @@
         "$date": "2026-04-27T05:00:00.000Z"
       },
       "CompulsoryThreshold": "00:10:00",
-      "FeiId": null,
+      "FeiEventId": null,
+      "FeiEventCode": null,
+      "FeiCompetitionId": null,
       "FeiRule": null,
       "FeiScheduleNumber": null,
       "Phases": [
@@ -954,7 +960,9 @@
         "$date": "2026-04-27T06:00:00.000Z"
       },
       "CompulsoryThreshold": "00:10:00",
-      "FeiId": null,
+      "FeiEventId": null,
+      "FeiEventCode": null,
+      "FeiCompetitionId": null,
       "FeiRule": null,
       "FeiScheduleNumber": null,
       "Phases": [
@@ -1290,7 +1298,9 @@
         "$date": "2026-04-27T05:00:00.000Z"
       },
       "CompulsoryThreshold": "00:10:00",
-      "FeiId": null,
+      "FeiEventId": null,
+      "FeiEventCode": null,
+      "FeiCompetitionId": null,
       "FeiRule": null,
       "FeiScheduleNumber": null,
       "Phases": [

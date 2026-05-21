@@ -63,6 +63,11 @@ internal sealed class NexusApiDriver : IDisposable
         return Send(HttpMethod.Post, "api/event-information", EventInformationModel.From(eventInformation));
     }
 
+    public Task Update(EventInformation eventInformation)
+    {
+        return Send(HttpMethod.Patch, "api/event-information", EventInformationModel.From(eventInformation));
+    }
+
     public Task Create(Participation participation)
     {
         return Send(HttpMethod.Post, "api/participations", ParticipationModel.MapFrom(participation));
@@ -76,6 +81,11 @@ internal sealed class NexusApiDriver : IDisposable
     public Task Create(Ranking ranking)
     {
         return Send(HttpMethod.Post, "api/rankings", RankingModel.From(ranking));
+    }
+
+    public Task Update(Ranking ranking)
+    {
+        return Send(HttpMethod.Patch, "api/rankings", RankingModel.From(ranking));
     }
 
     public Task Create(Handout handout)
@@ -97,6 +107,18 @@ internal sealed class NexusApiDriver : IDisposable
     {
         var model = await Send<EventInformationModel>(HttpMethod.Get, $"api/event-information/{eventId}");
         return model.MapToEntity();
+    }
+
+    public async Task<IReadOnlyList<EventInformation>> ReadActiveEventInformation()
+    {
+        var models = await Send<IEnumerable<EventInformationModel>>(HttpMethod.Get, "api/event-information/active");
+        return models.Select(x => x.MapToEntity()).ToArray();
+    }
+
+    public async Task<IReadOnlyList<EventInformation>> ReadPastEventInformation()
+    {
+        var models = await Send<IEnumerable<EventInformationModel>>(HttpMethod.Get, "api/event-information/past");
+        return models.Select(x => x.MapToEntity()).ToArray();
     }
 
     public async Task<Participation> ReadParticipation(int eventId, int participationId)

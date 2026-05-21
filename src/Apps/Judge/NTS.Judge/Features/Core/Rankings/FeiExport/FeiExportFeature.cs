@@ -13,62 +13,50 @@ namespace NTS.Judge.Features.Core.Rankings.FeiExport;
 
 internal class FeiExportFeature : IFeiExportFeature
 {
-    public string CreateXmlContent(Ranklist ranklist, EventInformation eventInformation)
+    const int FEI_RANKING_CONFIGURATION_FIELD_COUNT = 5;
+
+    public string CreateXmlContent(EventInformation eventInformation, IEnumerable<Ranklist> ranklists)
     {
-        var model = CreateHorseSport(ranklist, eventInformation);
+        var model = CreateHorseSport(eventInformation, ranklists.ToList());
         var xml = Serialize(model);
         return InsertGeneratedDate(xml);
     }
 
-    HorseSport CreateHorseSport(Ranklist ranklist, EventInformation eventInformation)
+    HorseSport CreateHorseSport(EventInformation eventInformation, IReadOnlyCollection<Ranklist> ranklists)
     {
-        var ranking = ranklist.Ranking;
         if (string.IsNullOrWhiteSpace(eventInformation.FeiShowId))
         {
             throw new DomainException("Missing Show FEI ID");
-        }
-        if (string.IsNullOrWhiteSpace(eventInformation.FeiId))
-        {
-            throw new DomainException("Missing Event FEI ID");
-        }
-        if (string.IsNullOrWhiteSpace(eventInformation.FeiEventCode))
-        {
-            throw new DomainException("Missing FEI Event code");
         }
         if (string.IsNullOrWhiteSpace(eventInformation.Location))
         {
             throw new DomainException("Missing event information location");
         }
-        if (string.IsNullOrEmpty(ranking.Name))
+
+        var configuredRanklists = GetConfiguredRanklists(ranklists).ToList();
+        if (!configuredRanklists.Any())
         {
-            throw new DomainException("Missing ranking Name");
-        }
-        if (string.IsNullOrEmpty(ranking.CompetitionFeiId))
-        {
-            throw new DomainException("Missing FEI Competition ID");
-        }
-        if (string.IsNullOrEmpty(ranking.FeiScheduleNumber))
-        {
-            throw new DomainException("Missing FEI Schedule NR");
-        }
-        if (string.IsNullOrEmpty(ranking.FeiRule))
-        {
-            throw new DomainException("Missing FEI Rule");
+            throw new DomainException("No rankings are configured for FEI export");
         }
 
         // IsoCode is not accepted by FEI, but they have representatives which can correct that in case a country
         // without NF code is used. This shouldn't happen anyway
         var countryCode = eventInformation.Country.NfCode ?? eventInformation.Country.IsoCode;
-        var ctEnduranceCompetition = CreateCompetitions(eventInformation, ranklist);
-        var ctEnduranceEvent = new ctEnduranceEvent
-        {
-            FEIID = eventInformation.FeiId,
-            Code = eventInformation.FeiEventCode,
-            StartDate = eventInformation.EventSpan.StartDay.DateTime,
-            EndDate = eventInformation.EventSpan.EndDay.DateTime,
-            NF = countryCode,
-            Competitions = [ctEnduranceCompetition],
-        };
+        var enduranceEvents = configuredRanklists
+            .OrderBy(x => x.Ranking.FeiEventId)
+            .ThenBy(x => x.Ranking.FeiEventCode)
+            .GroupBy(x => new { x.Ranking.FeiEventId, x.Ranking.FeiEventCode })
+            .Select(group =>
+                CreateEnduranceEvent(
+                    eventInformation,
+                    countryCode,
+                    group.Key.FeiEventId!,
+                    group.Key.FeiEventCode!,
+                    group
+                )
+            )
+            .ToArray();
+
         var horseSport = new HorseSport()
         {
             Generated = new ctGenerated
@@ -82,7 +70,7 @@ internal class FeiExportFeature : IFeiExportFeature
                 Show = new ctShowResult
                 {
                     Venue = new ctVenue { Name = eventInformation.Location, Country = countryCode },
-                    EnduranceEvent = new List<ctEnduranceEvent> { ctEnduranceEvent }.ToArray(),
+                    EnduranceEvent = enduranceEvents,
                     StartDate = eventInformation.EventSpan.StartDay.DateTime,
                     EndDate = eventInformation.EventSpan.EndDay.DateTime,
                     FEIID = eventInformation.FeiShowId,
@@ -92,13 +80,79 @@ internal class FeiExportFeature : IFeiExportFeature
         return horseSport;
     }
 
-    ctEnduranceCompetition CreateCompetitions(EventInformation eventInformation, Ranklist ranklist)
+    IEnumerable<Ranklist> GetConfiguredRanklists(IEnumerable<Ranklist> ranklists)
+    {
+        foreach (var ranklist in ranklists)
+        {
+            var missing = GetMissingFeiConfiguration(ranklist.Ranking).ToList();
+            if (missing.Count == FEI_RANKING_CONFIGURATION_FIELD_COUNT)
+            {
+                continue;
+            }
+            if (missing.Any())
+            {
+                throw new DomainException(
+                    $"Ranking '{ranklist.Name}' is missing FEI export configuration: {string.Join(", ", missing)}"
+                );
+            }
+            if (string.IsNullOrWhiteSpace(ranklist.Name))
+            {
+                throw new DomainException("Missing ranking Name");
+            }
+
+            yield return ranklist;
+        }
+    }
+
+    static IEnumerable<string> GetMissingFeiConfiguration(Ranking ranking)
+    {
+        if (string.IsNullOrWhiteSpace(ranking.FeiEventId))
+        {
+            yield return "FEI Event ID";
+        }
+        if (string.IsNullOrWhiteSpace(ranking.FeiEventCode))
+        {
+            yield return "FEI Event Code";
+        }
+        if (string.IsNullOrWhiteSpace(ranking.FeiCompetitionId))
+        {
+            yield return "FEI Competition ID";
+        }
+        if (string.IsNullOrWhiteSpace(ranking.FeiRule))
+        {
+            yield return "FEI Rule";
+        }
+        if (string.IsNullOrWhiteSpace(ranking.FeiScheduleNumber))
+        {
+            yield return "FEI Schedule NR";
+        }
+    }
+
+    ctEnduranceEvent CreateEnduranceEvent(
+        EventInformation eventInformation,
+        string countryCode,
+        string feiEventId,
+        string feiEventCode,
+        IEnumerable<Ranklist> ranklists
+    )
+    {
+        return new ctEnduranceEvent
+        {
+            FEIID = feiEventId,
+            Code = feiEventCode,
+            StartDate = eventInformation.EventSpan.StartDay.DateTime,
+            EndDate = eventInformation.EventSpan.EndDay.DateTime,
+            NF = countryCode,
+            Competitions = ranklists.Select(x => CreateCompetition(eventInformation, x)).ToArray(),
+        };
+    }
+
+    ctEnduranceCompetition CreateCompetition(EventInformation eventInformation, Ranklist ranklist)
     {
         var ranking = ranklist.Ranking;
-        var competitionFeiId = ranklist.Ranking.CompetitionFeiId!;
         var ctCompetition = new ctEnduranceCompetition
         {
-            FEIID = competitionFeiId,
+            FEIID = ranking.FeiCompetitionId!,
             ScheduleCompetitionNr = ranking.FeiScheduleNumber!,
             Rule = ranking.FeiRule!,
             Name = ranking.Name,
@@ -231,7 +285,7 @@ internal class FeiExportFeature : IFeiExportFeature
     {
         var serializer = new XmlSerializer(typeof(HorseSport));
         using var memoryStream = new MemoryStream();
-        var settings = new XmlWriterSettings { Encoding = Encoding.UTF8, Indent = true };
+        var settings = new XmlWriterSettings { Encoding = new UTF8Encoding(false), Indent = true };
         using var writer = XmlWriter.Create(memoryStream, settings);
         serializer.Serialize(writer, horseSport);
         return Encoding.UTF8.GetString(memoryStream.ToArray());
@@ -252,5 +306,5 @@ internal class FeiExportFeature : IFeiExportFeature
 
 public interface IFeiExportFeature : ITransient
 {
-    string CreateXmlContent(Ranklist ranklist, EventInformation eventInformation);
+    string CreateXmlContent(EventInformation eventInformation, IEnumerable<Ranklist> ranklists);
 }

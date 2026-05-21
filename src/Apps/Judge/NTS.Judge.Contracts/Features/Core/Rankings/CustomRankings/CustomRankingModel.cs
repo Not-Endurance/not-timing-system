@@ -17,7 +17,9 @@ public record CustomRankingModel : KrudFormModel<Ranking>
     public CompetitionRuleset? Ruleset { get; set; }
     public CompetitionType? Type { get; set; }
     public ParticipationCategory? Category { get; set; }
-    public string? CompetitionFeiId { get; set; }
+    public string? FeiEventId { get; set; }
+    public string? FeiEventCode { get; set; }
+    public string? FeiCompetitionId { get; set; }
     public string? FeiRule { get; set; }
     public string? FeiScheduleNumber { get; set; }
     public int EventId { get; set; }
@@ -30,7 +32,9 @@ public record CustomRankingModel : KrudFormModel<Ranking>
             Ruleset,
             Type,
             Category,
-            CompetitionFeiId,
+            FeiEventId,
+            FeiEventCode,
+            FeiCompetitionId,
             FeiRule,
             FeiScheduleNumber,
             Entries,
@@ -48,7 +52,9 @@ public record CustomRankingModel : KrudFormModel<Ranking>
         Ruleset = ranking.Ruleset;
         Type = ranking.Type;
         Category = ranking.Category;
-        CompetitionFeiId = ranking.CompetitionFeiId;
+        FeiEventId = ranking.FeiEventId;
+        FeiEventCode = ranking.FeiEventCode;
+        FeiCompetitionId = ranking.FeiCompetitionId;
         FeiRule = ranking.FeiRule;
         FeiScheduleNumber = ranking.FeiScheduleNumber;
         EventId = ranking.EventId;
