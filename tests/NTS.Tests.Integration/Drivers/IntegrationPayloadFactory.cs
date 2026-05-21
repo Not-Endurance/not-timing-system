@@ -77,7 +77,14 @@ internal static class IntegrationPayloadFactory
 
     public static Official Official(int eventId, int? userId, int? id = null)
     {
-        return new Official("Integration Official", "Integration Official", OfficialRole.GroundJury, eventId, id: id ?? 601, userId: userId);
+        return new Official(
+            "Integration Official",
+            "Integration Official",
+            OfficialRole.GroundJury,
+            eventId,
+            id: id ?? 601,
+            userId: userId
+        );
     }
 
     public static Ranking Ranking(

@@ -37,6 +37,14 @@ public class AthleteModel : IDocument, IKrudModel<Athlete>
 
     public Athlete MapToEntity()
     {
-        return new Athlete(Name, NameEnglish, FeiId, Country?.MapToEntity(), Club?.MapToEntity(), Id, User?.MapToEntity());
+        return new Athlete(
+            Name,
+            NameEnglish,
+            FeiId,
+            Country?.MapToEntity(),
+            Club?.MapToEntity(),
+            Id,
+            User?.MapToEntity()
+        );
     }
 }

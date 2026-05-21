@@ -95,7 +95,12 @@ internal class ConfigureEventFeature
         var horseService = _judge.GetRequiredService<IKrudFormService<HorseFormModel>>();
         foreach (var horse in snapshot.Horses)
         {
-            var form = new HorseFormModel { Name = horse.Name, NameEnglish = horse.NameEnglish, FeiId = horse.FeiId };
+            var form = new HorseFormModel
+            {
+                Name = horse.Name,
+                NameEnglish = horse.NameEnglish,
+                FeiId = horse.FeiId,
+            };
             await horseService.Create(form);
 
             var created = new Horse(horse.Name, horse.NameEnglish, horse.FeiId, RequiredId(form));

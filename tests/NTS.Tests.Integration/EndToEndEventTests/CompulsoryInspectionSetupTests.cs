@@ -6,13 +6,13 @@ using NTS.Judge.Contracts.Features.Core;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
+using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
 using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
 using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
 using SetupLoop = NTS.Domain.Setup.Aggregates.ConfigureEvents.Loop;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participation;
 using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
-using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
 
 namespace NTS.Tests.Integration.EndToEndEventTests;
 
@@ -62,15 +62,16 @@ public sealed class CompulsoryInspectionSetupTests
 
         var phaseStart = DateTimeOffset.UtcNow.Date.AddDays(30).AddHours(10);
         var explicitCompulsoryPhase = participations[0].Phases[1];
-        participations[0].Update(
-            new PhaseState(
-                explicitCompulsoryPhase.Id,
-                phaseStart,
-                phaseStart.AddHours(1),
-                phaseStart.AddHours(1).AddMinutes(5),
-                null
-            )
-        );
+        participations[0]
+            .Update(
+                new PhaseState(
+                    explicitCompulsoryPhase.Id,
+                    phaseStart,
+                    phaseStart.AddHours(1),
+                    phaseStart.AddHours(1).AddMinutes(5),
+                    null
+                )
+            );
         Assert.True(participations[0].Phases[1].IsRequiredInspectionRequested);
         Assert.True(participations[0].Phases[1].IsRequiredInspectionCompulsory);
     }
