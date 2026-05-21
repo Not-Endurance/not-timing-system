@@ -1,7 +1,6 @@
-﻿using Not.Krud.Models;
+using Not.Krud.Models;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.StaticOptions;
-using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Contracts.Features.Setup.Athletes;
@@ -11,7 +10,8 @@ public record AthleteFormModel : KrudFormModel<Athlete>
     public AthleteFormModel()
     {
 #if DEBUG
-        Names = "Gucci Petrov";
+        Name = "Gucci Petrov";
+        NameEnglish = "Gucci Petrov";
         Club = new("Конярче ЕООД");
 #endif
         Country = StaticOption.SelectedCountry;
@@ -20,7 +20,8 @@ public record AthleteFormModel : KrudFormModel<Athlete>
     public AthleteFormModel(KrudFormModel<Athlete> original)
         : base(original) { }
 
-    public string? Names { get; set; }
+    public string? Name { get; set; }
+    public string? NameEnglish { get; set; }
     public string? FeiId { get; set; }
     public Country? Country { get; set; }
     public Club? Club { get; set; }
@@ -28,13 +29,14 @@ public record AthleteFormModel : KrudFormModel<Athlete>
 
     protected override Athlete MapTo()
     {
-        return new Athlete(Person.Create(Names), FeiId, Country, Club, Id, User);
+        return new Athlete(Name, NameEnglish, FeiId, Country, Club, Id, User);
     }
 
     public override void MapFrom(Athlete athlete)
     {
         Id = athlete.Id;
-        Names = athlete.Names;
+        Name = athlete.Name;
+        NameEnglish = athlete.NameEnglish;
         FeiId = athlete.FeiId;
         Country = athlete.Country;
         Club = athlete.Club;

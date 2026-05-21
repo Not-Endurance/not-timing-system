@@ -8,6 +8,7 @@ using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
+using NTS.Domain.Enums;
 
 namespace NTS.Judge.Features.Core.Rankings.FeiExport;
 
@@ -183,6 +184,7 @@ internal class FeiExportFeature : IFeiExportFeature
         {
             var athlete = entry.Participation.Combination.Athlete;
             var horse = entry.Participation.Combination.Horse;
+            var athleteName = SplitName(athlete.GetDisplayName(CompetitionRuleset.FEI));
 
             var ctParticipation = new ctEnduranceIndivResult
             {
@@ -190,11 +192,11 @@ internal class FeiExportFeature : IFeiExportFeature
                 {
                     FEIID = int.Parse(athlete.FeiId!),
                     AthleteNumber = entry.Participation.Combination.Number,
-                    FirstName = athlete.Names.Names.First(),
-                    FamilyName = athlete.Names.Names.Last(),
+                    FirstName = athleteName.First,
+                    FamilyName = athleteName.Last,
                     CompetingFor = athlete.Country.NfCode ?? athlete.Country.IsoCode,
                 },
-                Horse = new ctHorse { FEIID = horse.FeiId!, Name = horse.Name },
+                Horse = new ctHorse { FEIID = horse.FeiId!, Name = horse.GetDisplayName(CompetitionRuleset.FEI) },
                 Complement = new ctEnduranceComplement { BestCondition = false },
                 Position = new ctPositionIndiv { Status = entry.Participation.Eliminated?.Code ?? "R" },
             };
@@ -213,6 +215,17 @@ internal class FeiExportFeature : IFeiExportFeature
 
             yield return ctParticipation;
         }
+    }
+
+    static (string First, string Last) SplitName(string name)
+    {
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0)
+        {
+            return (name, name);
+        }
+
+        return (parts.First(), parts.Last());
     }
 
     ctEnduranceTotal CreateTotal(Participation participation)

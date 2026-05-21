@@ -4,6 +4,7 @@
 
 @{
     var combination = Entry.Participation.Combination;
+    var ruleset = Entry.Participation.Competition.Ruleset;
     var phases = Entry.Participation.Phases;
     var mudStackWidth = "width:130px;";
     const Align align = Align.Center;
@@ -13,9 +14,9 @@
     <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.End" Spacing="4" Style="width:100%">
         <MudText Typo="Typo.button" Align="align" Style="width:50px">@GetRankText()</MudText>
         
-        <MudText Typo="Typo.button" Align="align">@combination.Athlete.Names</MudText>
+        <MudText Typo="Typo.button" Align="align">@combination.Athlete.GetDisplayName(ruleset)</MudText>
 
-        <MudText Typo="Typo.button" Align="align">@combination.Horse</MudText>
+        <MudText Typo="Typo.button" Align="align">@combination.Horse.GetDisplayName(ruleset)</MudText>
 
         @if (combination.Club != null)
         {

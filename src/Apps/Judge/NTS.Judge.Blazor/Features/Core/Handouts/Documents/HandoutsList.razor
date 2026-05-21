@@ -19,27 +19,27 @@
                         <MudDivider Style="flex-grow:0;" />
                         @if (header.GroundJuryPresident != null)
                         {
-                            <MudText Typo="Typo.body2">@header.GroundJuryPresident</MudText>
+                            <MudText Typo="Typo.body2">@header.GroundJuryPresident.GetDisplayLabel(header.Ruleset)</MudText>
                         }
                         @if (header.VeterinaryCommissionPresident != null)
                         {
-                            <MudText Typo="Typo.body2">@header.VeterinaryCommissionPresident</MudText>
+                            <MudText Typo="Typo.body2">@header.VeterinaryCommissionPresident.GetDisplayLabel(header.Ruleset)</MudText>
                         }
                         @if (header.ForeignJudge != null)
                         {
-                            <MudText Typo="Typo.body2">@header.ForeignJudge</MudText>
+                            <MudText Typo="Typo.body2">@header.ForeignJudge.GetDisplayLabel(header.Ruleset)</MudText>
                         }
                         @if (header.ForeignVeterinaryDelegate != null)
                         {
-                            <MudText Typo="Typo.body2">@header.ForeignVeterinaryDelegate</MudText>
+                            <MudText Typo="Typo.body2">@header.ForeignVeterinaryDelegate.GetDisplayLabel(header.Ruleset)</MudText>
                         }
                         @if (header.TechnicalDelegate != null)
                         {
-                            <MudText Typo="Typo.body2">@header.TechnicalDelegate</MudText>
+                            <MudText Typo="Typo.body2">@header.TechnicalDelegate.GetDisplayLabel(header.Ruleset)</MudText>
                         }
                         @if (header.ChiefSteward != null)
                         {
-                            <MudText Typo="Typo.body2">@header.ChiefSteward</MudText>
+                            <MudText Typo="Typo.body2">@header.ChiefSteward.GetDisplayLabel(header.Ruleset)</MudText>
                         }
                         <MudSpacer />
 
@@ -54,7 +54,7 @@
                 </MudItem>
 
                 <MudItem>
-                    <MudText Typo="Typo.h5">@($"{document.Combination.Number} {document.Combination.Athlete}, {document.Combination.Horse}")</MudText>
+                    <MudText Typo="Typo.h5">@document.Combination.GetDisplayName(header.Ruleset)</MudText>
                     <ParticipationTable Phases="document.Phases" Number="document.Combination.Number" />
                 </MudItem>
             </MudItem>

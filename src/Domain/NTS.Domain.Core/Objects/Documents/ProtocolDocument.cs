@@ -9,6 +9,7 @@ public record ProtocolDocument : Document
         : base(
             new DocumentHeader(
                 ranklist.Name,
+                ranklist.Ruleset,
                 eventInformation.Country,
                 eventInformation.Location,
                 eventInformation.EventSpan,

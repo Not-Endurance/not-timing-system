@@ -390,8 +390,15 @@ public sealed class CoreFeatureEndToEndTests
         var horse = source.Combination.Horse;
         var athleteFeiId = (100000 + source.Combination.Number).ToString();
         var horseFeiId = (200000 + source.Combination.Number).ToString();
-        var exportAthlete = new CoreAthlete(athlete.Names, athlete.Country, athlete.Club, athleteFeiId, athlete.Id);
-        var exportHorse = new CoreHorse(horse.Name, horseFeiId, horse.Id);
+        var exportAthlete = new CoreAthlete(
+            athlete.Name,
+            athlete.NameEnglish,
+            athlete.Country,
+            athlete.Club,
+            athleteFeiId,
+            athlete.Id
+        );
+        var exportHorse = new CoreHorse(horse.Name, horse.NameEnglish, horseFeiId, horse.Id);
         var exportCombination = new CoreCombination(
             source.Combination.Number,
             exportAthlete,

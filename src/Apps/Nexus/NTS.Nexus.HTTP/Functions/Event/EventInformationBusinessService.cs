@@ -250,7 +250,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
                 }
                 if (string.IsNullOrWhiteSpace(participation.Combination.Athlete.FeiId))
                 {
-                    var name = string.Join(' ', participation.Combination.Athlete.Names);
+                    var name = participation.Combination.Athlete.Name;
                     validationBuilder.AppendLine($"#{participation.Combination.Number}, {name}: {FEI_ID_string}");
                 }
             }

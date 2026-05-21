@@ -94,8 +94,15 @@ public static class ParticipationAndRankingFactory
         var setupClub = combination.Athlete.Club;
 
         var club = setupClub == null ? null : new Club(setupClub.Name, setupClub.Id);
-        var athlete = new Athlete(setupAthlete.Names, setupAthlete.Country, club, setupAthlete.FeiId, setupAthlete.Id);
-        var horse = new Horse(setupHorse.Name, setupHorse.FeiId, setupHorse.Id);
+        var athlete = new Athlete(
+            setupAthlete.Name,
+            setupAthlete.NameEnglish,
+            setupAthlete.Country,
+            club,
+            setupAthlete.FeiId,
+            setupAthlete.Id
+        );
+        var horse = new Horse(setupHorse.Name, setupHorse.NameEnglish, setupHorse.FeiId, setupHorse.Id);
         return new Combination(
             combination.Number,
             athlete,

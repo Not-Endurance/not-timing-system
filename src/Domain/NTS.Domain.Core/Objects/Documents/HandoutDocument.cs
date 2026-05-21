@@ -12,6 +12,7 @@ public record HandoutDocument : Document, IIdentifiable
         : base(
             new DocumentHeader(
                 handout.Participation.Competition.Name,
+                handout.Participation.Competition.Ruleset,
                 eventInformation.Country,
                 eventInformation.Location,
                 eventInformation.EventSpan,

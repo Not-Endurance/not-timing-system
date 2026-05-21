@@ -3,6 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Injection;
 using Not.Strings;
 using NTS.Application.Setup;
+using NTS.Domain;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.ConfigureEvents;
@@ -57,12 +58,14 @@ public class JudgeSetupLookupService : IJudgeSetupLookupService, ITransient
 
     public async Task<IEnumerable<Athlete>> SearchAthletes(string term, CancellationToken ct)
     {
-        return Search(await _athletes.ReadMany(), term);
+        var values = await _athletes.ReadMany();
+        return SearchByName(values, term);
     }
 
     public async Task<IEnumerable<Horse>> SearchHorses(string term, CancellationToken ct)
     {
-        return Search(await _horses.ReadMany(), term);
+        var values = await _horses.ReadMany();
+        return SearchByName(values, term);
     }
 
     public Task<IEnumerable<Loop>> GetLoops(CancellationToken ct)
@@ -81,7 +84,8 @@ public class JudgeSetupLookupService : IJudgeSetupLookupService, ITransient
         return values.Where(x => StringExtensions.NContains(x.ToString()!, term));
     }
 
-    static IEnumerable<T> Search<T>(IEnumerable<T> values, string term)
+    static IEnumerable<T> SearchByName<T>(IEnumerable<T> values, string term)
+        where T : INamed
     {
         if (string.IsNullOrWhiteSpace(term))
         {
@@ -89,7 +93,17 @@ public class JudgeSetupLookupService : IJudgeSetupLookupService, ITransient
         }
 
         return values.Where(x =>
-            x != null && x.ToString()!.Contains(term, StringComparison.InvariantCultureIgnoreCase)
+            x != null
+            && (
+                Contains(x.Name, term)
+                || Contains(x.NameEnglish, term)
+                || x.ToString()!.Contains(term, StringComparison.InvariantCultureIgnoreCase)
+            )
         );
+    }
+
+    static bool Contains(string? value, string term)
+    {
+        return value?.Contains(term, StringComparison.InvariantCultureIgnoreCase) == true;
     }
 }

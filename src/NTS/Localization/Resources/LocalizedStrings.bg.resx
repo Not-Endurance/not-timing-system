@@ -981,4 +981,7 @@
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>
+  <data name="Name_in_English_string" xml:space="preserve">
+    <value>Име на английски</value>
+  </data>
 </root>

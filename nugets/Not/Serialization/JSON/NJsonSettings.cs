@@ -19,6 +19,7 @@ public class NJsonSettings : JsonSerializerSettings
         ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
         Formatting = Newtonsoft.Json.Formatting.Indented;
         TypeNameHandling = TypeNameHandling.Auto;
+        NullValueHandling = NullValueHandling.Ignore;
         ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
         Converters = [new StringEnumConverter()];
     }

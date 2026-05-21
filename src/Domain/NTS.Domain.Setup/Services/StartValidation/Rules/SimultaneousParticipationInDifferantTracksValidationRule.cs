@@ -53,8 +53,8 @@ internal class SimultaneousParticipationInDifferantTracksValidationRule : IStart
                 .ToList();
 
             var combination = group.First().Participation.Combination;
-            var athlete = string.Join(' ', combination.Athlete.Names);
-            var horse = combination.Horse.Name;
+            var athlete = combination.Athlete.GetDisplayName();
+            var horse = combination.Horse.GetDisplayName();
             yield return new StartValidationIssue(group.Key, athlete, horse, competitionDetails);
         }
     }

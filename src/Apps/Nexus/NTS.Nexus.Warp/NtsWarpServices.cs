@@ -7,6 +7,7 @@ using Not.Server.Authentication;
 using Not.Storage;
 using NTS.Application;
 using NTS.Application.Cors;
+using NTS.Application.Mongo;
 using NTS.Nexus.Warp.Features.Witness.Authorization;
 using NTS.Nexus.Warp.Middlewares;
 
@@ -59,6 +60,7 @@ internal static class NtsWarpServices
         }
 
         var builder = new NStorageBuilder(services, configuration);
+        NtsMongoSerialization.Configure();
         builder.AddMongoStorage(connectionString, Assembly.GetExecutingAssembly());
     }
 }

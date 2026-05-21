@@ -24,7 +24,8 @@ public class AthleteMongoRepository : MongoRepository<AthleteModel>
         try
         {
             return Builders<AthleteModel>
-                .Update.Set(x => x.Names, document.Names)
+                .Update.Set(x => x.Name, document.Name)
+                .Set(x => x.NameEnglish, document.NameEnglish)
                 .Set(x => x.Club, document.Club)
                 .Set(x => x.Country, document.Country)
                 .Set(x => x.FeiId, document.FeiId)

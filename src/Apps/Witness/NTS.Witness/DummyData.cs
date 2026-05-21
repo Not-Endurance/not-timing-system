@@ -25,12 +25,11 @@ public class DummyData
         for (var i = 0; i < number; ++i)
         {
             var country = new Country(1000 + i, null, null, null, null);
-            var names = new List<string> { $"FirstName{i + 1}", $"LastName{i + 1}" };
-            var person = new Person(names.ToArray());
+            var person = $"FirstName{i + 1} LastName{i + 1}";
 
-            var athlete = new Athlete(person, country, null, $"username{i + 1}", 200 + i);
+            var athlete = new Athlete(person, person, country, null, $"username{i + 1}", 200 + i);
 
-            var horse = new Horse($"HorseName{i + 1}", null, 100 + i);
+            var horse = new Horse($"HorseName{i + 1}", $"HorseName{i + 1}", null, 100 + i);
 
             var combination = new Combination(i + 1, athlete, horse, null, (40 + i).ToString(), null, null, 199 + i);
 
@@ -79,9 +78,9 @@ public class DummyData
         return participations;
     }
 
-    public static Person CreateParticipant(string firstName, string secondName)
+    public static string CreateParticipant(string firstName, string secondName)
     {
-        return new Person([firstName, secondName]);
+        return $"{firstName} {secondName}";
     }
 
     public static List<Phase> CreatePhases()

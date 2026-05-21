@@ -1,4 +1,4 @@
-﻿using Not.Krud.Models;
+using Not.Krud.Models;
 using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Judge.Contracts.Features.Setup.Horses;
@@ -9,15 +9,17 @@ public record HorseFormModel : KrudFormModel<Horse>
     {
 #if DEBUG
         Name = "Хан Аспарух";
+        NameEnglish = "Khan Asparuh";
 #endif
     }
 
     public string? FeiId { get; set; }
     public string? Name { get; set; }
+    public string? NameEnglish { get; set; }
 
     protected override Horse MapTo()
     {
-        return new(Name, FeiId, Id);
+        return new(Name, NameEnglish, FeiId, Id);
     }
 
     public override void MapFrom(Horse horse)
@@ -25,5 +27,6 @@ public record HorseFormModel : KrudFormModel<Horse>
         Id = horse.Id;
         FeiId = horse.FeiId;
         Name = horse.Name;
+        NameEnglish = horse.NameEnglish;
     }
 }

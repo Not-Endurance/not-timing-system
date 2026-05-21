@@ -1,6 +1,5 @@
 using Not.Krud.Models;
 using NTS.Domain.Enums;
-using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
@@ -12,30 +11,27 @@ public record OfficialFormModel : KrudFormModel<Official>
     {
 #if DEBUG
         Name = "Pesho Goshov";
+        NameEnglish = "Pesho Goshov";
         Role = OfficialRole.GroundJuryPresident;
 #endif
     }
 
     public string? Name { get; set; }
+    public string? NameEnglish { get; set; }
     public OfficialRole Role { get; set; } = OfficialRole.Steward;
     public User? User { get; set; }
 
     protected override Official MapTo()
     {
-        var names = ConvertName(Name);
-        return new Official(names, Role, Id, User);
+        return new Official(Name, NameEnglish, Role, Id, User);
     }
 
     public override void MapFrom(Official official)
     {
         Id = official.Id;
-        Name = official.Person;
+        Name = official.Name;
+        NameEnglish = official.NameEnglish;
         Role = official.Role;
         User = official.User;
-    }
-
-    Person? ConvertName(string? combined)
-    {
-        return combined == null ? null : new Person(combined.Split(" ", StringSplitOptions.RemoveEmptyEntries));
     }
 }

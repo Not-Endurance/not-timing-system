@@ -775,4 +775,7 @@
   <data name="Athlete_FEI_ID_must_be_numeric_value_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="Name_in_English_string" xml:space="preserve">
+    <value>İngilizce isim</value>
+  </data>
 </root>

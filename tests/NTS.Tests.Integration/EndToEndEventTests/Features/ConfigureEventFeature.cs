@@ -95,15 +95,22 @@ internal class ConfigureEventFeature
         var horseService = _judge.GetRequiredService<IKrudFormService<HorseFormModel>>();
         foreach (var horse in snapshot.Horses)
         {
-            var form = new HorseFormModel { Name = horse.Name, FeiId = horse.FeiId };
+            var form = new HorseFormModel { Name = horse.Name, NameEnglish = horse.NameEnglish, FeiId = horse.FeiId };
             await horseService.Create(form);
 
-            var created = new Horse(horse.Name, horse.FeiId, RequiredId(form));
+            var created = new Horse(horse.Name, horse.NameEnglish, horse.FeiId, RequiredId(form));
             Remember(idMap, horse.Id, created.Id);
             createdHorses.Add(horse.Id, created);
 
             var persisted = await _nexusApi.ReadSetupHorses();
-            Assert.Contains(persisted, x => x.Id == created.Id && x.Name == horse.Name && x.FeiId == horse.FeiId);
+            Assert.Contains(
+                persisted,
+                x =>
+                    x.Id == created.Id
+                    && x.Name == horse.Name
+                    && x.NameEnglish == horse.NameEnglish
+                    && x.FeiId == horse.FeiId
+            );
         }
 
         var athleteService = _judge.GetRequiredService<IKrudFormService<AthleteFormModel>>();
@@ -111,7 +118,8 @@ internal class ConfigureEventFeature
         {
             var form = new AthleteFormModel
             {
-                Names = athlete.Names.ToString(),
+                Name = athlete.Name,
+                NameEnglish = athlete.NameEnglish,
                 FeiId = athlete.FeiId,
                 Country = athlete.Country,
                 Club = athlete.Club == null ? null : createdClubs[athlete.Club.Id],
@@ -120,7 +128,8 @@ internal class ConfigureEventFeature
             await athleteService.Create(form);
 
             var created = new Athlete(
-                athlete.Names,
+                athlete.Name,
+                athlete.NameEnglish,
                 athlete.FeiId,
                 athlete.Country,
                 athlete.Club == null ? null : createdClubs[athlete.Club.Id],
@@ -135,7 +144,8 @@ internal class ConfigureEventFeature
                 persisted,
                 x =>
                     x.Id == created.Id
-                    && x.Names.ToString() == athlete.Names.ToString()
+                    && x.Name == athlete.Name
+                    && x.NameEnglish == athlete.NameEnglish
                     && x.Country.Id == athlete.Country.Id
                     && x.Club?.Id == created.Club?.Id
             );
@@ -223,7 +233,8 @@ internal class ConfigureEventFeature
         {
             var form = new OfficialFormModel
             {
-                Name = official.Person.ToString(),
+                Name = official.Name,
+                NameEnglish = official.NameEnglish,
                 Role = official.Role,
                 User = official.User == null ? null : createdUsers[official.User.Id],
             };
@@ -235,11 +246,15 @@ internal class ConfigureEventFeature
                 _nexusApi,
                 setupEventId,
                 setupEvent => setupEvent.Officials.Any(x => x.Id == officialId),
-                $"official {official.Person}"
+                $"official {official.Name}"
             );
             Assert.Contains(
                 currentEvent.Officials,
-                x => x.Id == officialId && x.Person.ToString() == official.Person.ToString() && x.Role == official.Role
+                x =>
+                    x.Id == officialId
+                    && x.Name == official.Name
+                    && x.NameEnglish == official.NameEnglish
+                    && x.Role == official.Role
             );
             _judge.SelectSetupParent(currentEvent);
         }

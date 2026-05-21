@@ -23,7 +23,10 @@ public class HorseMongoRepository : MongoRepository<HorseModel>
 
         try
         {
-            return Builders<HorseModel>.Update.Set(x => x.Name, document.Name).Set(x => x.FeiId, document.FeiId);
+            return Builders<HorseModel>
+                .Update.Set(x => x.Name, document.Name)
+                .Set(x => x.NameEnglish, document.NameEnglish)
+                .Set(x => x.FeiId, document.FeiId);
         }
         catch (Exception ex)
         {

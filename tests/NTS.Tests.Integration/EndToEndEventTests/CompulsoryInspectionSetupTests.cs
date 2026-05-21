@@ -137,13 +137,14 @@ public sealed class CompulsoryInspectionSetupTests
     static SetupCombination CreateCombination(int idBase, int number, Country country, string suffix)
     {
         var athlete = new SetupAthlete(
-            new Person(["Setup", $"Rider{suffix}"]),
+            $"Setup Rider{suffix}",
+            $"Setup Rider{suffix}",
             feiId: null,
             country,
             club: null,
             id: idBase + 1
         );
-        var horse = new SetupHorse($"Setup Horse {suffix}", feiId: null, id: idBase + 2);
+        var horse = new SetupHorse($"Setup Horse {suffix}", $"Setup Horse {suffix}", feiId: null, id: idBase + 2);
         return new SetupCombination(number, athlete, horse, idBase + 3);
     }
 
