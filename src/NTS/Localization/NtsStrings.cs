@@ -166,6 +166,8 @@ namespace NTS.Localization
         public static string Competition_Ruleset_string => LocalizeString(nameof(Competition_Ruleset_string));
         public static string Competition_Type_string => LocalizeString(nameof(Competition_Type_string));
         public static string Automatic_CRI_string => LocalizeString(nameof(Automatic_CRI_string));
+        public static string Require_Compulsory_Inspection_string =>
+            LocalizeString(nameof(Require_Compulsory_Inspection_string));
         public static string Official_Role_string => LocalizeString(nameof(Official_Role_string));
         public static string Select_a_role_string => LocalizeString(nameof(Select_a_role_string));
         public static string Is_not_ranked_string => LocalizeString(nameof(Is_not_ranked_string));

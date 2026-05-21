@@ -711,6 +711,9 @@
   <data name="Automatic_CRI_string" xml:space="preserve">
     <value>Автоматичнa CRI</value>
   </data>
+  <data name="Require_Compulsory_Inspection_string" xml:space="preserve">
+    <value>Задължителна инспекция</value>
+  </data>
   <data name="Use_image_string" xml:space="preserve">
     <value>Използвай изображение</value>
   </data>
@@ -930,9 +933,6 @@
   <data name="Past_events_string" xml:space="preserve">
     <value>Минали събития</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="FEI_ID_string" xml:space="preserve">
     <value>ФЕИ Id</value>
   </data>
@@ -977,5 +977,8 @@
   </data>
   <data name="Athlete_FEI_ID_must_be_numeric_value_string" xml:space="preserve">
     <value>ФЕИ ID за Атлети трябва да бъде число</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

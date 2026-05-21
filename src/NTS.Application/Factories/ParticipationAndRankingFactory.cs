@@ -126,6 +126,9 @@ public static class ParticipationAndRankingFactory
                     setupCompetition.Name
                 );
             }
+            var compulsoryThresholdSpan = setupPhase.IsCompulsoryInspectionRequired
+                ? null
+                : setupCompetition.CompulsoryThresholdSpan;
             var corePhase = new Phase(
                 "",
                 setupPhase.Loop!.Distance,
@@ -133,14 +136,14 @@ public static class ParticipationAndRankingFactory
                 setupPhase.Rest,
                 setupCompetition.Ruleset,
                 isFinal,
-                setupCompetition.CompulsoryThresholdSpan,
+                compulsoryThresholdSpan,
                 Timestamp.Create(startTime),
                 null,
                 null,
                 null,
                 false,
-                false,
-                false
+                setupPhase.IsCompulsoryInspectionRequired,
+                setupPhase.IsCompulsoryInspectionRequired
             );
             startTime = null; //Set only first phase StartTime
             phases.Add(corePhase);

@@ -714,6 +714,9 @@
   <data name="Automatic_CRI_string" xml:space="preserve">
     <value>Use automatic CRI</value>
   </data>
+  <data name="Require_Compulsory_Inspection_string" xml:space="preserve">
+    <value>Require Compulsory inspection</value>
+  </data>
   <data name="Use_image_string" xml:space="preserve">
     <value>Use Image</value>
   </data>
