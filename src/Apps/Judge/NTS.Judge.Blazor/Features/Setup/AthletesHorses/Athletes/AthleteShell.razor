@@ -9,7 +9,9 @@
 <KrudForm Shell="this" AdditionalContent="AdditionalContent">
     <FormFields>
 
-        <NTextField @bind-Value="Model.Names" For="() => Model.Names" Label="@Name_string" />
+        <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+
+        <NTextField @bind-Value="Model.NameEnglish" For="() => Model.NameEnglish" Label="@Name_in_English_string" />
 
         <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@FEI_ID_string" />
 
@@ -21,6 +23,5 @@
 
     </FormFields>
 </KrudForm>
-
 
 

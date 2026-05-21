@@ -6,6 +6,7 @@ using Not.Injection;
 using Not.Storage;
 using NTS;
 using NTS.Application.Cors;
+using NTS.Application.Mongo;
 using NTS.Nexus.HTTP.Mongo.Repositories;
 using NTS.Nexus.HTTP.Telemetry;
 using OpenTelemetry.Resources;
@@ -38,6 +39,7 @@ internal static class NtsNexusApiServices
         }
 
         var builder = new NStorageBuilder(services, configuration);
+        NtsMongoSerialization.Configure();
         builder.AddMongoStorage(connectionString, Assembly.GetExecutingAssembly());
         return services;
     }

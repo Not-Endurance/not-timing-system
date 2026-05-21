@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Not.Krud.Abstractions;
+﻿using Not.Krud.Abstractions;
 using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
 using NTS.Domain.Enums;
@@ -28,7 +27,6 @@ public class UserModel : IDocument, IKrudModel<User>
         set => _name = Normalize(value);
     }
 
-    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string? DisplayName { get; set; }
     public string? GivenName { get; set; }
     public string? MiddleName { get; set; }

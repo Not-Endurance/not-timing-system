@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
 using NTS.Application.Contracts.Startlists;
 using NTS.Domain.Core.Objects.Startlists;
+using NTS.Domain.Helpers;
 
 namespace NTS.Blazor.Components.Startlist.Upcoming;
 
@@ -30,7 +31,7 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
 
     protected string FormatAthlete(Starter entry)
     {
-        return entry.Athlete.ToString();
+        return NameRenderingHelper.Render(entry.AthleteName, entry.AthleteNameEnglish, entry.Ruleset);
     }
 
     protected string FormatLoop(Starter entry)

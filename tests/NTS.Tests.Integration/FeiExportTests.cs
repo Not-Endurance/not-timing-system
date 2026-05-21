@@ -46,6 +46,13 @@ public sealed class FeiExportTests
                 Assert.Equal("CEI1", first.Attribute("Code")!.Value);
                 var competition = Assert.Single(first.Element(ns + "Competitions")!.Elements(ns + "Competition"));
                 Assert.Equal("FEI-COMP-1", competition.Attribute("FEIID")!.Value);
+                var participation = Assert.Single(
+                    competition.Element(ns + "ParticipationList")!.Elements(ns + "Participation")
+                );
+                var athlete = participation.Element(ns + "Athlete")!;
+                Assert.Equal("FEI", athlete.Attribute("FirstName")!.Value);
+                Assert.Equal("Rider1", athlete.Attribute("FamilyName")!.Value);
+                Assert.Equal("FEI Horse 1", participation.Element(ns + "Horse")!.Attribute("Name")!.Value);
             },
             second =>
             {
@@ -138,8 +145,15 @@ public sealed class FeiExportTests
     {
         const int eventId = 1001;
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete(new Person(["FEI", $"Rider{number}"]), country, null, athleteFeiId, 100 + number);
-        var horse = new Horse($"FEI Horse {number}", horseFeiId, 200 + number);
+        var athlete = new Athlete(
+            $"Локален Ездач{number}",
+            $"FEI Rider{number}",
+            country,
+            null,
+            athleteFeiId,
+            100 + number
+        );
+        var horse = new Horse($"Локален Кон {number}", $"FEI Horse {number}", horseFeiId, 200 + number);
         var combination = new Combination(number, athlete, horse, null, "40", null, null, 300 + number);
         var competition = new CoreCompetition("CEI 1*", CompetitionRuleset.FEI, CompetitionType.Qualification);
         var start = new Timestamp(new DateTimeOffset(2026, 5, 1, 8, 0, 0, TimeSpan.Zero));

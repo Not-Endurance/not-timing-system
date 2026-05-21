@@ -9,10 +9,11 @@
     <FormFields>
         <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
 
+        <NTextField @bind-Value="Model.NameEnglish" For="() => Model.NameEnglish" Label="@Name_in_English_string" />
+
         <NSelect @bind-Value="Model.Role" For="() => Model.Role" Label="@Official_Role_string" Placeholder="@Select_a_role_string" />
 
         <NAutocomplete T="User" @bind-Value="Model.User" For="() => Model.User" Label="@Username_string" SearchSafe="SearchUsersSafe" ToStringFunc="@(user => user?.Email ?? string.Empty)" />
     </FormFields>
 </KrudForm>
-
 

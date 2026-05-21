@@ -1,7 +1,3 @@
-using Not.Application.Authentication.User;
-using Not.Krud.Abstractions;
-using NTS.Application.Contracts.Shared;
-using NTS.Application.Contracts.Shared.Models;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
@@ -15,20 +11,23 @@ public class SnapshotModel
         return new SnapshotModel
         {
             Number = snapshot.Number,
-            Names = snapshot.Athlete.Names,
+            Name = snapshot.Name,
+            NameEnglish = snapshot.NameEnglish,
+            Ruleset = snapshot.Ruleset,
             Timestamp = snapshot.Timestamp?.ToString(),
         };
     }
 
     public int Number { get; set; }
-    public string[] Names { get; set; } = [];
+    public string Name { get; set; } = default!;
+    public string? NameEnglish { get; set; }
+    public CompetitionRuleset? Ruleset { get; set; }
     public string? Timestamp { get; set; } = "";
 
     public Snapshot MapToDomain()
     {
-        var athlete = new Person(Names);
         var timestamp = Timestamp == null ? null : new Timestamp(Timestamp);
-        return new Snapshot(Number, athlete, timestamp);
+        return new Snapshot(Number, Name, NameEnglish, timestamp, Ruleset);
     }
 
     public SnapshotModel Copy()
@@ -36,7 +35,9 @@ public class SnapshotModel
         return new SnapshotModel
         {
             Number = Number,
-            Names = [.. Names],
+            Name = Name,
+            NameEnglish = NameEnglish,
+            Ruleset = Ruleset,
             Timestamp = Timestamp,
         };
     }

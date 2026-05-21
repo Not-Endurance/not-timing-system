@@ -162,7 +162,9 @@ public record Startlist : ValueObject
     {
         var phase = participation.Phases[phaseIndex];
         return new Starter(
-            participation.Combination.Athlete.Names,
+            participation.Combination.Athlete.Name,
+            participation.Combination.Athlete.NameEnglish,
+            participation.Competition.Ruleset,
             participation.Combination.Number,
             phaseIndex + 1,
             phase.Length,

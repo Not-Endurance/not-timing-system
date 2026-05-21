@@ -55,7 +55,7 @@ public class PhaseModel
     public TimeSpan? LoopInterval { get; init; }
     public TimeSpan? PhaseInterval { get; init; }
     public TimeSpan? RecoveryInterval { get; init; }
-    public TimeSpan? CompulsoryThresholdInterval { get; init; } = TimeSpan.FromMinutes(10);
+    public TimeSpan? CompulsoryThresholdInterval { get; init; }
     public double? AverageLoopSpeed { get; init; }
     public double? AveragePhaseSpeed { get; init; }
     public double? AverageSpeed { get; init; }

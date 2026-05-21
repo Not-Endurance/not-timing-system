@@ -47,6 +47,13 @@ internal static class SnapshotJson
         return result;
     }
 
+    public static JToken NormalizeNames(JToken token)
+    {
+        var normalized = token.DeepClone();
+        NormalizeNamesCore(normalized, context: null);
+        return normalized;
+    }
+
     public static JToken Canonicalize(object value)
     {
         return Canonicalize(JToken.FromObject(value, Serializer));
@@ -112,6 +119,10 @@ internal static class SnapshotJson
         {
             var name = property.Name == "_id" ? "Id" : property.Name;
             var value = Canonicalize(property.Value);
+            if (value.Type == JTokenType.Null)
+            {
+                continue;
+            }
             if (DATE_PROPERTIES.Contains(name) && value.Type == JTokenType.String)
             {
                 value = CanonicalizeDate(value.Value<string>());
@@ -192,5 +203,90 @@ internal static class SnapshotJson
 
         value = 0;
         return false;
+    }
+
+    static void NormalizeNamesCore(JToken token, string? context)
+    {
+        if (token is JArray array)
+        {
+            foreach (var item in array)
+            {
+                NormalizeNamesCore(item, context);
+            }
+
+            return;
+        }
+
+        if (token is not JObject obj)
+        {
+            return;
+        }
+
+        if (TryReadJoinedNames(obj, out var joinedName))
+        {
+            if (string.IsNullOrWhiteSpace(obj.Value<string>("Name")))
+            {
+                obj["Name"] = joinedName;
+            }
+
+            obj.Remove("Names");
+        }
+
+        if (
+            IsActorContext(context)
+            && string.IsNullOrWhiteSpace(obj.Value<string>("Name"))
+            && !string.IsNullOrWhiteSpace(obj.Value<string>("NameEnglish"))
+        )
+        {
+            obj["Name"] = obj.Value<string>("NameEnglish");
+        }
+
+        foreach (var property in obj.Properties().ToArray())
+        {
+            NormalizeNamesCore(property.Value, ResolveContext(property.Name, context));
+        }
+    }
+
+    static bool TryReadJoinedNames(JObject obj, out string joinedName)
+    {
+        joinedName = string.Empty;
+        if (obj["Names"] is JArray names)
+        {
+            joinedName = string.Join(
+                ' ',
+                names.Select(x => x.Value<string>()).Where(x => !string.IsNullOrWhiteSpace(x))
+            );
+            return !string.IsNullOrWhiteSpace(joinedName);
+        }
+
+        if (
+            obj["Names"] is JValue { Type: JTokenType.String } value
+            && !string.IsNullOrWhiteSpace(value.Value<string>())
+        )
+        {
+            joinedName = value.Value<string>()!;
+            return true;
+        }
+
+        return false;
+    }
+
+    static string? ResolveContext(string propertyName, string? context)
+    {
+        return (propertyName, context) switch
+        {
+            ("Athlete", _) => "athlete",
+            ("Horse", _) => "horse",
+            ("Officials", _) => "official",
+            ("SnapshotHistory", _) => "snapshotGroup",
+            ("SnapshotGroups", _) => "snapshotGroup",
+            ("Entries", "snapshotGroup") => "snapshot",
+            _ => null,
+        };
+    }
+
+    static bool IsActorContext(string? context)
+    {
+        return context is "athlete" or "horse" or "official" or "snapshot";
     }
 }

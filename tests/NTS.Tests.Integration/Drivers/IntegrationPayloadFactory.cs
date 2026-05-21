@@ -33,8 +33,8 @@ internal static class IntegrationPayloadFactory
         var horseId = id == null ? 201 : id.Value + 200;
         var combinationId = id == null ? 301 : id.Value + 300;
         var phaseId = id == null ? 401 : id.Value + 400;
-        var athlete = new Athlete(new Person(["Integration", "Rider"]), country, null, null, athleteId);
-        var horse = new Horse("Integration Horse", null, horseId);
+        var athlete = new Athlete("Integration Rider", "Integration Rider", country, null, null, athleteId);
+        var horse = new Horse("Integration Horse", "Integration Horse", null, horseId);
         var combination = new Combination(
             participationNumber,
             athlete,
@@ -78,7 +78,8 @@ internal static class IntegrationPayloadFactory
     public static Official Official(int eventId, int? userId, int? id = null)
     {
         return new Official(
-            new Person(["Integration", "Official"]),
+            "Integration Official",
+            "Integration Official",
             OfficialRole.GroundJury,
             eventId,
             id: id ?? 601,

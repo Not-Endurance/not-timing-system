@@ -1,25 +1,34 @@
-﻿using NTS.Domain.Aggregates;
+using System.Globalization;
+using NTS.Domain.Aggregates;
+using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
-public class Athlete : Entity
+public class Athlete : Entity, INamed, INtsDisplayable
 {
-    public Athlete(Person names, Country country, Club? club, string? feiId, int id)
+    public Athlete(string? name, string? nameEnglish, Country country, Club? club, string? feiId, int id)
         : base(id)
     {
-        Names = names;
+        Name = Required(nameof(Name), name);
+        NameEnglish = string.IsNullOrWhiteSpace(nameEnglish) ? null : nameEnglish;
         Country = country;
         Club = club;
         FeiId = feiId;
     }
 
-    public Person Names { get; }
+    public string Name { get; }
+    public string? NameEnglish { get; }
     public Country Country { get; }
     public Club? Club { get; }
     public string? FeiId { get; }
 
+    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    {
+        return NameRenderingHelper.Render(Name, NameEnglish, ruleset, culture);
+    }
+
     public override string ToString()
     {
-        return $"{Names}, {Country}";
+        return $"{GetDisplayName()}, {Country}";
     }
 }

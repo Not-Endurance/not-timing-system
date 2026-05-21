@@ -1,4 +1,5 @@
-﻿using Not.Krud.Abstractions;
+﻿using Newtonsoft.Json;
+using Not.Krud.Abstractions;
 using NTS.Application.Contracts.Shared;
 using NTS.Application.Contracts.Shared.Models;
 using NTS.Domain.Enums;
@@ -17,6 +18,7 @@ public class PhaseModel
             Loop = LoopModel.MapFrom(phase.Loop!),
             Recovery = phase.Recovery,
             Rest = phase.Rest,
+            IsCompulsoryInspectionRequired = phase.IsCompulsoryInspectionRequired,
         };
     }
 
@@ -25,9 +27,12 @@ public class PhaseModel
     public LoopModel Loop { get; init; } = default!;
     public int? Rest { get; init; }
 
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public bool IsCompulsoryInspectionRequired { get; init; }
+
     public Phase MapToEntity()
     {
         var loop = Loop.MapToEntity();
-        return new Phase(loop, Recovery, Rest, Id);
+        return new Phase(loop, Recovery, Rest, Id, IsCompulsoryInspectionRequired);
     }
 }

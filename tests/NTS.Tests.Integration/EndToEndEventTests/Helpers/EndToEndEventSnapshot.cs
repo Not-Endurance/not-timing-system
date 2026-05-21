@@ -226,7 +226,9 @@ internal sealed class EndToEndEventSnapshot
     static JToken LoadJson(string directory, string fileName)
     {
         var path = Path.Combine(directory, fileName);
-        return SnapshotJson.NormalizeMongoDocument(SnapshotJson.Parse(File.ReadAllText(path)));
+        return SnapshotJson.NormalizeNames(
+            SnapshotJson.NormalizeMongoDocument(SnapshotJson.Parse(File.ReadAllText(path)))
+        );
     }
 
     static JToken SortParticipations(JToken token)

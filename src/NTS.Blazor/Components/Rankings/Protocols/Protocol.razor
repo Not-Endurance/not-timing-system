@@ -42,19 +42,19 @@
                     @if (header.GroundJuryPresident != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @header.GroundJuryPresident
+                            @header.GroundJuryPresident.GetDisplayLabel(header.Ruleset)
                         </MudText>
                     }
                     @if (header.ChiefSteward != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @header.ChiefSteward
+                            @header.ChiefSteward.GetDisplayLabel(header.Ruleset)
                         </MudText>
                     }
                     @if (header.ForeignJudge != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @header.ForeignJudge
+                            @header.ForeignJudge.GetDisplayLabel(header.Ruleset)
                         </MudText>
                     }
                 </MudStack>
@@ -63,19 +63,19 @@
                     @if (header.VeterinaryCommissionPresident != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @header.VeterinaryCommissionPresident
+                            @header.VeterinaryCommissionPresident.GetDisplayLabel(header.Ruleset)
                         </MudText>
                     }
                     @if (header.TechnicalDelegate != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @header.TechnicalDelegate
+                            @header.TechnicalDelegate.GetDisplayLabel(header.Ruleset)
                         </MudText>
                     }
                     @if (header.ForeignVeterinaryDelegate != null)
                     {
                         <MudText Typo="Typo.subtitle2">
-                            @header.ForeignVeterinaryDelegate
+                            @header.ForeignVeterinaryDelegate.GetDisplayLabel(header.Ruleset)
                         </MudText>
                     }
                 </MudStack>

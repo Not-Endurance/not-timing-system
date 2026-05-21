@@ -67,6 +67,7 @@ namespace NTS.Localization
         public static string Ride_string => LocalizeString(nameof(Ride_string));
         public static string Not_ranked_string => LocalizeString(nameof(Not_ranked_string));
         public static string Name_string => LocalizeString(nameof(Name_string));
+        public static string Name_in_English_string => LocalizeString(nameof(Name_in_English_string));
         public static string First_name_string => LocalizeString(nameof(First_name_string));
         public static string Middle_name_string => LocalizeString(nameof(Middle_name_string));
         public static string Last_name_string => LocalizeString(nameof(Last_name_string));
@@ -167,6 +168,8 @@ namespace NTS.Localization
         public static string Competition_Ruleset_string => LocalizeString(nameof(Competition_Ruleset_string));
         public static string Competition_Type_string => LocalizeString(nameof(Competition_Type_string));
         public static string Automatic_CRI_string => LocalizeString(nameof(Automatic_CRI_string));
+        public static string Require_Compulsory_Inspection_string =>
+            LocalizeString(nameof(Require_Compulsory_Inspection_string));
         public static string Official_Role_string => LocalizeString(nameof(Official_Role_string));
         public static string Select_a_role_string => LocalizeString(nameof(Select_a_role_string));
         public static string Is_not_ranked_string => LocalizeString(nameof(Is_not_ranked_string));

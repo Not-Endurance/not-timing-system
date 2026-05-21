@@ -93,7 +93,14 @@ public class SnapshotService
         }
 
         _participationsToSnapshot.Add(participation);
-        _snapshots.Add(new Snapshot(participation.Combination.Number, participation.Combination.Athlete.Names));
+        _snapshots.Add(
+            new Snapshot(
+                participation.Combination.Number,
+                participation.Combination.Athlete.Name,
+                participation.Combination.Athlete.NameEnglish,
+                ruleset: participation.Competition.Ruleset
+            )
+        );
         Participations.Remove(participation);
         EmitChanged();
     }

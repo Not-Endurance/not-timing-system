@@ -6,17 +6,19 @@ namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Phase : Entity, IKurdMirror<Loop>, IIdentifiable
 {
-    public Phase(Loop? loop, int? recovery, int? rest, int? id = null)
+    public Phase(Loop? loop, int? recovery, int? rest, int? id = null, bool isCompulsoryInspectionRequired = false)
         : base(id)
     {
         Loop = Required(nameof(Loop), loop);
         Recovery = PositiveRecovery(recovery);
         Rest = NullOrPositiveRest(rest);
+        IsCompulsoryInspectionRequired = isCompulsoryInspectionRequired;
     }
 
     public Loop Loop { get; private set; }
     public int Recovery { get; }
     public int? Rest { get; }
+    public bool IsCompulsoryInspectionRequired { get; }
 
     public override string ToString()
     {

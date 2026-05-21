@@ -3,7 +3,7 @@ using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
-public class Combination : Entity
+public class Combination : Entity, INtsDisplayable
 {
     public static string FormatDistance(decimal distance)
     {
@@ -49,9 +49,14 @@ public class Combination : Entity
         }
     }
 
-    public override string ToString()
+    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
     {
         var speed = ToStringHelper.FormatSpeedRestrictions(MinAverageSpeed, MaxAverageSpeed);
-        return $"{hash_string}{Number}: {Athlete}, {Horse} {speed}";
+        return $"{hash_string}{Number}: {Athlete.GetDisplayName(ruleset, culture)}, {Horse.GetDisplayName(ruleset, culture)} {speed}";
+    }
+
+    public override string ToString()
+    {
+        return GetDisplayName();
     }
 }
