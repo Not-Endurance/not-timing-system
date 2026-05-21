@@ -9,14 +9,23 @@ public sealed class NameRenderingTests
     [Fact]
     public void Render_UsesEnglishForUnspecifiedOrEnglishCulture()
     {
-        Assert.Equal("English Name", NameRenderingHelper.Render("Local Name", "English Name", culture: CultureInfo.InvariantCulture));
-        Assert.Equal("English Name", NameRenderingHelper.Render("Local Name", "English Name", culture: new CultureInfo("en-US")));
+        Assert.Equal(
+            "English Name",
+            NameRenderingHelper.Render("Local Name", "English Name", culture: CultureInfo.InvariantCulture)
+        );
+        Assert.Equal(
+            "English Name",
+            NameRenderingHelper.Render("Local Name", "English Name", culture: new CultureInfo("en-US"))
+        );
     }
 
     [Fact]
     public void Render_UsesLocalNameForNonEnglishCulture()
     {
-        Assert.Equal("Local Name", NameRenderingHelper.Render("Local Name", "English Name", culture: new CultureInfo("bg-BG")));
+        Assert.Equal(
+            "Local Name",
+            NameRenderingHelper.Render("Local Name", "English Name", culture: new CultureInfo("bg-BG"))
+        );
     }
 
     [Fact]
@@ -35,9 +44,6 @@ public sealed class NameRenderingTests
     [Fact]
     public void Render_FallsBackToEnglishWhenNameIsBlank()
     {
-        Assert.Equal(
-            "English Name",
-            NameRenderingHelper.Render("", "English Name", culture: new CultureInfo("bg-BG"))
-        );
+        Assert.Equal("English Name", NameRenderingHelper.Render("", "English Name", culture: new CultureInfo("bg-BG")));
     }
 }

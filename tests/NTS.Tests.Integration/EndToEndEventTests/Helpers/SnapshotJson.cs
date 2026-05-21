@@ -232,7 +232,11 @@ internal static class SnapshotJson
             obj.Remove("Names");
         }
 
-        if (IsActorContext(context) && string.IsNullOrWhiteSpace(obj.Value<string>("Name")) && !string.IsNullOrWhiteSpace(obj.Value<string>("NameEnglish")))
+        if (
+            IsActorContext(context)
+            && string.IsNullOrWhiteSpace(obj.Value<string>("Name"))
+            && !string.IsNullOrWhiteSpace(obj.Value<string>("NameEnglish"))
+        )
         {
             obj["Name"] = obj.Value<string>("NameEnglish");
         }
@@ -255,7 +259,10 @@ internal static class SnapshotJson
             return !string.IsNullOrWhiteSpace(joinedName);
         }
 
-        if (obj["Names"] is JValue { Type: JTokenType.String } value && !string.IsNullOrWhiteSpace(value.Value<string>()))
+        if (
+            obj["Names"] is JValue { Type: JTokenType.String } value
+            && !string.IsNullOrWhiteSpace(value.Value<string>())
+        )
         {
             joinedName = value.Value<string>()!;
             return true;
