@@ -384,8 +384,8 @@
   <data name="History_string" xml:space="preserve">
     <value>История</value>
   </data>
-  <data name="Field_is_required_string" xml:space="preserve">
-    <value>Полето е задължително</value>
+  <data name="Field_1_is_required_on_2_string" xml:space="preserve">
+    <value>Полето '{0}' е задължително за '{1}'</value>
   </data>
   <data name="Required_inspection_is_compulsory_string" xml:space="preserve">
     <value>Проверка вече е планирана, защото е конфигурирана като задължителна в състезанието</value>

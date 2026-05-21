@@ -384,7 +384,7 @@
   <data name="History_string" xml:space="preserve">
     <value>Geçmiş</value>
   </data>
-  <data name="Field_is_required_string" xml:space="preserve">
+  <data name="Field_1_is_required_on_2_string" xml:space="preserve">
     <value>Bu alan zorunludur</value>
   </data>
   <data name="Required_inspection_is_compulsory_string" xml:space="preserve">
