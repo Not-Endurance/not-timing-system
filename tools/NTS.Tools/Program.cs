@@ -1,5 +1,5 @@
-using NTS.Tools.Watcher;
 using NTS.Tools.NameMigration;
+using NTS.Tools.Watcher;
 
 return args.FirstOrDefault() switch
 {
