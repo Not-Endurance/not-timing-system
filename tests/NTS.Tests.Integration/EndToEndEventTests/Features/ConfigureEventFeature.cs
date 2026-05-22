@@ -283,10 +283,7 @@ internal class ConfigureEventFeature
             );
             Assert.Contains(
                 currentEvent.Competitions,
-                x =>
-                    x.Id == competitionId
-                    && x.Name == competition.Name
-                    && x.Ruleset == competition.Ruleset
+                x => x.Id == competitionId && x.Name == competition.Name && x.Ruleset == competition.Ruleset
             );
 
             SelectCompetition(_judge, currentEvent, competitionId);
