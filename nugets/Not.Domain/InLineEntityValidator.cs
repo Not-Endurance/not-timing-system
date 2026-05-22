@@ -56,6 +56,9 @@ public abstract class InLineEntityValidator
     DomainPropertyException GetRequiredException(string field)
     {
         _thisType ??= GetType();
-        return new DomainPropertyException(field, string.Format(Field_1_is_required_on_2_string, field, _thisType.Name));
+        return new DomainPropertyException(
+            field,
+            string.Format(Field_1_is_required_on_2_string, field, _thisType.Name)
+        );
     }
 }

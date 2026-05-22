@@ -7,11 +7,7 @@ public class CompetitionModel
 {
     public static CompetitionModel MapFrom(Competition competition)
     {
-        return new CompetitionModel
-        {
-            Name = competition.Name,
-            Ruleset = competition.Ruleset,
-        };
+        return new CompetitionModel { Name = competition.Name, Ruleset = competition.Ruleset };
     }
 
     public string Name { get; init; } = default!;
