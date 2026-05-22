@@ -7,7 +7,7 @@ namespace NTS.Domain.Core.Objects;
 public class Ranklist
 {
     static FeiRanker _feiRanker = new();
-    static Ranker[] _regionalRankers = [new BulgariaRanker()];
+    static Ranker[] _regionalRankers = [];
 
     [Newtonsoft.Json.JsonConstructor]
     [System.Text.Json.Serialization.JsonConstructor]
@@ -29,7 +29,6 @@ public class Ranklist
     public int RankingId => Ranking.Id;
     public string Name => Ranking.Name;
     public ParticipationCategory Category => Ranking.Category;
-    public CompetitionType Type => Ranking.Type;
     public CompetitionRuleset Ruleset => Ranking.Ruleset;
     public string Title => $"{Category}: {Name}";
 

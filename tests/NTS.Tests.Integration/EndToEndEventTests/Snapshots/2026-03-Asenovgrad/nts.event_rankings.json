@@ -4,7 +4,6 @@
   "EventId": 1324868821,
   "Name": "ДП млади ездачи и юноши до 18 г",
   "Ruleset": "FEI",
-  "Type": "Star",
   "Category": "JuniorOrYoungAdult",
   "FeiEventId": null,
   "FeiEventCode": null,
@@ -20,7 +19,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -171,7 +169,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -305,7 +302,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -439,7 +435,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -573,7 +568,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -707,7 +701,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -841,7 +834,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -975,7 +967,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -1109,7 +1100,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -1243,7 +1233,6 @@
         "Category": "JuniorOrYoungAdult",
         "Competition": {
           "Name": "ДП млади ездачи и юноши до 18 г",
-          "Type": "Star",
           "Ruleset": "FEI"
         },
         "Combination": {
@@ -1379,7 +1368,6 @@
   "EventId": 1324868821,
   "Name": "ДП юноши до 14 години",
   "Ruleset": "Regional",
-  "Type": "Star",
   "Category": "Children",
   "FeiEventId": null,
   "FeiEventCode": null,
@@ -1395,7 +1383,6 @@
         "Category": "Children",
         "Competition": {
           "Name": "ДП юноши до 14 години",
-          "Type": "Star",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -1505,7 +1492,6 @@
   "EventId": 1324868821,
   "Name": "ДП пони ездачи",
   "Ruleset": "Regional",
-  "Type": "Qualification",
   "Category": "Children",
   "FeiEventId": null,
   "FeiEventCode": null,
@@ -1521,7 +1507,6 @@
         "Category": "Children",
         "Competition": {
           "Name": "ДП пони ездачи",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -1629,7 +1614,6 @@
         "Category": "Children",
         "Competition": {
           "Name": "ДП пони ездачи",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -1737,7 +1721,6 @@
         "Category": "Children",
         "Competition": {
           "Name": "ДП пони ездачи",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -1847,7 +1830,6 @@
   "EventId": 1324868821,
   "Name": "ДП пони ездачи",
   "Ruleset": "Regional",
-  "Type": "Qualification",
   "Category": "Companion",
   "FeiEventId": null,
   "FeiEventCode": null,
@@ -1863,7 +1845,6 @@
         "Category": "Companion",
         "Competition": {
           "Name": "ДП пони ездачи",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -1971,7 +1952,6 @@
         "Category": "Companion",
         "Competition": {
           "Name": "ДП пони ездачи",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -2079,7 +2059,6 @@
         "Category": "Companion",
         "Competition": {
           "Name": "ДП пони ездачи",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -2189,7 +2168,6 @@
   "EventId": 1324868821,
   "Name": "Квалификационен турнир 80 км",
   "Ruleset": "Regional",
-  "Type": "Qualification",
   "Category": "Senior",
   "FeiEventId": null,
   "FeiEventCode": null,
@@ -2205,7 +2183,6 @@
         "Category": "Senior",
         "Competition": {
           "Name": "Квалификационен турнир 80 км",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -2341,7 +2318,6 @@
   "EventId": 1324868821,
   "Name": "Квалификационен турнир 40 км",
   "Ruleset": "Regional",
-  "Type": "Qualification",
   "Category": "Senior",
   "FeiEventId": null,
   "FeiEventCode": null,
@@ -2357,7 +2333,6 @@
         "Category": "Senior",
         "Competition": {
           "Name": "Квалификационен турнир 40 км",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -2465,7 +2440,6 @@
         "Category": "Senior",
         "Competition": {
           "Name": "Квалификационен турнир 40 км",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -2573,7 +2547,6 @@
         "Category": "Senior",
         "Competition": {
           "Name": "Квалификационен турнир 40 км",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -2681,7 +2654,6 @@
         "Category": "Senior",
         "Competition": {
           "Name": "Квалификационен турнир 40 км",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -2789,7 +2761,6 @@
         "Category": "Senior",
         "Competition": {
           "Name": "Квалификационен турнир 40 км",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -2897,7 +2868,6 @@
         "Category": "Senior",
         "Competition": {
           "Name": "Квалификационен турнир 40 км",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -3005,7 +2975,6 @@
         "Category": "Senior",
         "Competition": {
           "Name": "Квалификационен турнир 40 км",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {
@@ -3115,7 +3084,6 @@
   "EventId": 1324868821,
   "Name": "Квалификация 60 км",
   "Ruleset": "Regional",
-  "Type": "Qualification",
   "Category": "Senior",
   "FeiEventId": null,
   "FeiEventCode": null,
@@ -3131,7 +3099,6 @@
         "Category": "Senior",
         "Competition": {
           "Name": "Квалификация 60 км",
-          "Type": "Qualification",
           "Ruleset": "Regional"
         },
         "Combination": {

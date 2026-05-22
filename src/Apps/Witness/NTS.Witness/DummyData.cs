@@ -57,11 +57,7 @@ public class DummyData
 
             var phaseCollection = new PhaseCollection(phases);
 
-            var competition = new Competition(
-                $"CompetitionName{i}",
-                CompetitionRuleset.Regional,
-                CompetitionType.Qualification
-            );
+            var competition = new Competition($"CompetitionName{i}", CompetitionRuleset.Regional);
 
             var participation = new Participation(
                 ParticipationCategory.Senior,

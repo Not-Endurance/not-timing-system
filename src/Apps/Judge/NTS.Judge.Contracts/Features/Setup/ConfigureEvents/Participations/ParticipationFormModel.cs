@@ -49,11 +49,11 @@ public record ParticipationFormModel : KrudFormModel<Participation>
         }
         if (IsMaxSpeedOverriden && MaxSpeedOverride == null)
         {
-            throw new DomainPropertyException(nameof(MaxSpeedOverride), Null_or_malformed_string, Max_Speed_string);
+            throw new DomainPropertyException(nameof(MaxSpeedOverride), Null_or_malformed_string, Max_Speed_Override_string);
         }
         if (IsMinSpeedOverriden && MinSpeedOverride == null)
         {
-            throw new DomainPropertyException(nameof(MinSpeedOverride), Null_or_malformed_string, Min_Speed_string);
+            throw new DomainPropertyException(nameof(MinSpeedOverride), Null_or_malformed_string, Min_Speed_Override_string);
         }
     }
 

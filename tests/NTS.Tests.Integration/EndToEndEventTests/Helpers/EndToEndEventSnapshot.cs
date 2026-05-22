@@ -136,9 +136,7 @@ internal sealed class EndToEndEventSnapshot
 
         foreach (var expected in Rankings)
         {
-            var actual = actualRankings.Single(x =>
-                x.Name == expected.Name && x.Category == expected.Category && x.Type == expected.Type
-            );
+            var actual = actualRankings.Single(x => x.Name == expected.Name && x.Category == expected.Category);
             ids[expected.Id] = actual.Id;
             foreach (var expectedEntry in expected.Entries)
             {

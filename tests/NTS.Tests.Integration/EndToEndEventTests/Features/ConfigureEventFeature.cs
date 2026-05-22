@@ -286,7 +286,6 @@ internal class ConfigureEventFeature
                 x =>
                     x.Id == competitionId
                     && x.Name == competition.Name
-                    && x.Type == competition.Type
                     && x.Ruleset == competition.Ruleset
             );
 
@@ -419,7 +418,6 @@ internal class ConfigureEventFeature
         return new CompetitionFormModel
         {
             Name = competition.Name,
-            Type = competition.Type,
             Ruleset = competition.Ruleset,
             Date = localStart.Date,
             Time = localStart.TimeOfDay,
@@ -428,6 +426,10 @@ internal class ConfigureEventFeature
                 competition.CompulsoryThresholdSpan == null
                     ? null
                     : (int)competition.CompulsoryThresholdSpan.Value.TotalMinutes,
+            UseMinSpeedRestriction = competition.MinSpeedRestriction != null,
+            MinSpeedRestriction = competition.MinSpeedRestriction,
+            UseMaxSpeedRestriction = competition.MaxSpeedRestriction != null,
+            MaxSpeedRestriction = competition.MaxSpeedRestriction,
             FeiEventId = competition.FeiEventId,
             FeiEventCode = competition.FeiEventCode,
             FeiCompetitionId = competition.FeiCompetitionId,

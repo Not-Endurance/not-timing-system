@@ -69,12 +69,12 @@ public static class ParticipationAndRankingFactory
         var combination = CreateCombination(
             setupParticipation.Combination,
             totalDistance,
-            setupParticipation.MinAverageSpeed,
-            setupParticipation.MaxAverageSpeed
+            setupParticipation.MinSpeedOverride ?? setupCompetition.MinSpeedRestriction,
+            setupParticipation.MaxSpeedOverride ?? setupCompetition.MaxSpeedRestriction
         );
         return new Participation(
             setupParticipation.Category,
-            new(setupCompetition.Name, setupCompetition.Ruleset, setupCompetition.Type),
+            new(setupCompetition.Name, setupCompetition.Ruleset),
             combination,
             new(phases),
             null,
@@ -85,8 +85,8 @@ public static class ParticipationAndRankingFactory
     static Combination CreateCombination(
         Domain.Setup.Aggregates.ConfigureEvents.Combination combination,
         decimal totalDistance,
-        double? minAverageSpeed,
-        double? maxAverageSpeed
+        double? minSpeedRestriction,
+        double? maxSpeedRestriction
     )
     {
         var setupAthlete = combination.Athlete;
@@ -109,8 +109,8 @@ public static class ParticipationAndRankingFactory
             horse,
             athlete.Club,
             Combination.FormatDistance(totalDistance),
-            minAverageSpeed,
-            maxAverageSpeed,
+            minSpeedRestriction,
+            maxSpeedRestriction,
             combination.Id
         );
     }

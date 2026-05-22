@@ -10,10 +10,11 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
 
     public Competition(
         string? name,
-        CompetitionType? type,
         CompetitionRuleset? ruleset,
         DateTimeOffset? start,
         TimeSpan? compulsoryThresholdSpan,
+        double? minSpeedRestriction,
+        double? maxSpeedRestriction,
         string? feiEventId,
         string? feiEventCode,
         string? feiCompetitionId,
@@ -28,30 +29,27 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         _phases = phases.ToList();
         _participations = participations.ToList();
         Name = Required(nameof(Name), name);
-        Type = Required(nameof(Type), type);
         Ruleset = Required(nameof(Ruleset), ruleset);
         Start = Required(nameof(Start), start);
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
+        MinSpeedRestriction = minSpeedRestriction;
+        MaxSpeedRestriction = maxSpeedRestriction;
         FeiEventId = feiEventId;
         FeiEventCode = feiEventCode;
         FeiCompetitionId = feiCompetitionId;
         FeiRule = feiRule;
         FeiScheduleNumber = feiScheduleNumber;
-
-        foreach (var participation in _participations)
-        {
-            participation.SetSpeedLimits(Type);
-        }
     }
 
     IReadOnlyList<Participation> IKrudParent<Participation>.Children => Participations;
     IReadOnlyList<Phase> IKrudParent<Phase>.Children => Phases;
 
     public string Name { get; }
-    public CompetitionType Type { get; }
     public CompetitionRuleset Ruleset { get; }
     public DateTimeOffset Start { get; }
     public TimeSpan? CompulsoryThresholdSpan { get; }
+    public double? MinSpeedRestriction { get; }
+    public double? MaxSpeedRestriction { get; }
     public string? FeiEventId { get; }
     public string? FeiEventCode { get; }
     public string? FeiCompetitionId { get; }
@@ -62,13 +60,11 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
 
     public override string ToString()
     {
-        var type = Localize(Type);
-        return Combine($"{Name} ({Phases.Count})", type, $"{Start.LocalDateTime:g}");
+        return Combine($"{Name} ({Phases.Count})", $"{Start.LocalDateTime:g}");
     }
 
     public void Add(Participation child)
     {
-        child.SetSpeedLimits(Type);
         _participations.Add(child);
     }
 
@@ -79,7 +75,6 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
 
     public void Update(Participation child)
     {
-        child.SetSpeedLimits(Type);
         _participations.Update(child);
     }
 

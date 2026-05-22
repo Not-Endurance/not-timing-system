@@ -460,9 +460,6 @@
   <data name="Competition_Ruleset_string" xml:space="preserve">
     <value>Kural seti</value>
   </data>
-  <data name="Competition_Type_string" xml:space="preserve">
-    <value>Tür</value>
-  </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Toparlanma süresine göre zorunlu inceleme</value>
   </data>
@@ -483,6 +480,15 @@
   </data>
   <data name="Max_Speed_string" xml:space="preserve">
     <value>Maksimum Hız Cezası</value>
+  </data>
+  <data name="Max_Speed_Restriction_string" xml:space="preserve">
+    <value>Maksimum Hız Kısıtlaması</value>
+  </data>
+  <data name="Max_Speed_Override_string" xml:space="preserve">
+    <value>Maksimum Hız Geçersiz Kılma</value>
+  </data>
+  <data name="Applies_to_all_Participations_added_to_the_competition_when_set_string" xml:space="preserve">
+    <value>Ayarlandığında yarışmaya eklenen tüm Katılımlara uygulanır. Bunu Katılım düzeyinde geçersiz kılabilirsiniz</value>
   </data>
   <data name="Presentation_string" xml:space="preserve">
     <value>Sunum</value>
@@ -552,6 +558,12 @@
   </data>
   <data name="Min_Speed_string" xml:space="preserve">
     <value>Minimum Hız Cezası</value>
+  </data>
+  <data name="Min_Speed_Restriction_string" xml:space="preserve">
+    <value>Minimum Hız Kısıtlaması</value>
+  </data>
+  <data name="Min_Speed_Override_string" xml:space="preserve">
+    <value>Minimum Hız Geçersiz Kılma</value>
   </data>
   <data name="Average_speed" xml:space="preserve">
     <value>Ortalama hız:</value>

@@ -14,7 +14,6 @@ public class RanklistModel
             Id = ranklist.RankingId,
             Name = ranklist.Name,
             Ruleset = ranklist.Ruleset,
-            Type = ranklist.Type,
             Category = ranklist.Category,
             FeiEventId = ranklist.Ranking.FeiEventId,
             FeiEventCode = ranklist.Ranking.FeiEventCode,
@@ -28,7 +27,6 @@ public class RanklistModel
     public int Id { get; init; }
     public string Name { get; init; } = default!;
     public CompetitionRuleset Ruleset { get; init; }
-    public CompetitionType Type { get; init; }
     public ParticipationCategory Category { get; init; }
     public string? FeiEventId { get; init; }
     public string? FeiEventCode { get; init; }
@@ -40,12 +38,10 @@ public class RanklistModel
     public Ranklist MapToEntity()
     {
         var entries = Entries.Select(x => x.MapToEntity()).ToList();
-        var competition = new Competition(Name, Ruleset, Type);
         var eventId = Entries.FirstOrDefault()?.Participation.EventId ?? Id;
         var ranking = new Ranking(
             Name,
             Ruleset,
-            Type,
             Category,
             FeiEventId,
             FeiEventCode,

@@ -11,16 +11,14 @@ public class CompetitionModel
         {
             Name = competition.Name,
             Ruleset = competition.Ruleset,
-            Type = competition.Type,
         };
     }
 
     public string Name { get; init; } = default!;
-    public CompetitionType Type { get; init; }
     public CompetitionRuleset Ruleset { get; init; }
 
     public Competition MapToEntity()
     {
-        return new Competition(Name, Ruleset, Type);
+        return new Competition(Name, Ruleset);
     }
 }

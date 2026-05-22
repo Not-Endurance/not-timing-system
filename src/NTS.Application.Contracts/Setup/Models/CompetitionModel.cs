@@ -15,10 +15,11 @@ public class CompetitionModel
         {
             Id = competition.Id,
             Name = competition.Name,
-            Type = competition.Type,
             Ruleset = competition.Ruleset,
             Start = competition.Start,
             CompulsoryThreshold = competition.CompulsoryThresholdSpan,
+            MinSpeedRestriction = competition.MinSpeedRestriction,
+            MaxSpeedRestriction = competition.MaxSpeedRestriction,
             FeiEventId = competition.FeiEventId,
             FeiEventCode = competition.FeiEventCode,
             FeiCompetitionId = competition.FeiCompetitionId,
@@ -31,10 +32,11 @@ public class CompetitionModel
 
     public int Id { get; init; }
     public string Name { get; init; } = default!;
-    public CompetitionType Type { get; init; }
     public CompetitionRuleset Ruleset { get; init; }
     public DateTimeOffset? Start { get; init; }
     public TimeSpan? CompulsoryThreshold { get; init; }
+    public double? MinSpeedRestriction { get; init; }
+    public double? MaxSpeedRestriction { get; init; }
     public string? FeiEventId { get; init; }
     public string? FeiEventCode { get; init; }
     public string? FeiCompetitionId { get; init; }
@@ -49,10 +51,11 @@ public class CompetitionModel
         var participations = Participations.Select(x => x.MapToEntity());
         return new Competition(
             Name,
-            Type,
             Ruleset,
             Start,
             CompulsoryThreshold,
+            MinSpeedRestriction,
+            MaxSpeedRestriction,
             FeiEventId,
             FeiEventCode,
             FeiCompetitionId,

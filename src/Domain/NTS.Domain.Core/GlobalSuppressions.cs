@@ -11,13 +11,6 @@ using System.Diagnostics.CodeAnalysis;
     "CS8618:Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.",
     Justification = "<Pending>",
     Scope = "member",
-    Target = "~M:NTS.Domain.Core.Aggregates.Participations.Phase.#ctor(System.Double,System.Int32,System.Int32,NTS.Domain.Enums.CompetitionType,System.Boolean,System.Nullable{System.Int32})"
-)]
-[assembly: SuppressMessage(
-    "Compiler",
-    "CS8618:Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.",
-    Justification = "<Pending>",
-    Scope = "member",
     Target = "~M:NTS.Domain.Core.Aggregates.Participations.SnapshotResult.#ctor(System.Int32)"
 )]
 [assembly: SuppressMessage(

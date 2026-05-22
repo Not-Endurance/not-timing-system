@@ -5,6 +5,9 @@
 2. Always dotnet `build`, `restore` with silent output `-v:q` unless instructed otherwise. Don't modify worklfows to use queit mode. This applies only for localhost verification
 3. Run dotnet `test` with minimal output `-v:m`. 
 4. Verify each feature with successful NTS.Test.Integration run. If the indegration tests fail, don't change them directly. Instead report why they are failing.
+5. Changes and features should be represented in the Integration tests if reasonably possible.
+6. Domain logic should be tested in the NTS.Tests.Unit.Domain namespace.
+7. If unit tests would be a useful task evaluation step, create those tests in NTS.Tests.Unit.Temporary. Expect those tests to be deleted regularly.
 
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker

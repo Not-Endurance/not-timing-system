@@ -45,7 +45,7 @@ internal static class IntegrationPayloadFactory
             maxAverageSpeed: null,
             id: combinationId
         );
-        var competition = new Competition("CEI 1*", CompetitionRuleset.FEI, CompetitionType.Qualification);
+        var competition = new Competition("CEI 1*", CompetitionRuleset.FEI);
         var phase = new Phase(
             gate: "GATE1/40",
             length: 40,
@@ -101,7 +101,6 @@ internal static class IntegrationPayloadFactory
         return new Ranking(
             name ?? "Integration Ranking",
             CompetitionRuleset.FEI,
-            CompetitionType.Qualification,
             ParticipationCategory.Senior,
             null,
             null,
