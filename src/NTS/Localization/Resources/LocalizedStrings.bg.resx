@@ -630,17 +630,11 @@
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
   </data>
-  <data name="Help_string" xml:space="preserve">
-    <value>Помощ</value>
-  </data>
   <data name="Home_string" xml:space="preserve">
     <value>Начало</value>
   </data>
   <data name="Login_string" xml:space="preserve">
     <value>Вход</value>
-  </data>
-  <data name="Contacts_string" xml:space="preserve">
-    <value>Спешни Oбаждания</value>
   </data>
   <data name="Snapshot_string" xml:space="preserve">
     <value>Засечи</value>

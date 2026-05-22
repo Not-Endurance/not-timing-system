@@ -630,17 +630,11 @@
   <data name="Download_string" xml:space="preserve">
     <value>Download Mobile App</value>
   </data>
-  <data name="Help_string" xml:space="preserve">
-    <value>Help</value>
-  </data>
   <data name="Home_string" xml:space="preserve">
     <value>Home</value>
   </data>
   <data name="Login_string" xml:space="preserve">
     <value>Sign in</value>
-  </data>
-  <data name="Contacts_string" xml:space="preserve">
-    <value>Emergency Contacts</value>
   </data>
   <data name="Snapshot_string" xml:space="preserve">
     <value>Snapshot</value>

@@ -227,11 +227,9 @@ namespace NTS.Localization
             LocalizeString(nameof(Cannot_select_another_event_before_disconnect__string));
         public static string Component_missing_required_value_string =>
             LocalizeString(nameof(Component_missing_required_value_string));
-        public static string Help_string => LocalizeString(nameof(Help_string));
         public static string Home_string => LocalizeString(nameof(Home_string));
         public static string Login_string => LocalizeString(nameof(Login_string));
         public static string Login_page_string => LocalizeString(nameof(Login_page_string));
-        public static string Contacts_string => LocalizeString(nameof(Contacts_string));
         public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
         public static string Snapshot_page_string => LocalizeString(nameof(Snapshot_page_string));
         public static string Performance_string => LocalizeString(nameof(Performance_string));

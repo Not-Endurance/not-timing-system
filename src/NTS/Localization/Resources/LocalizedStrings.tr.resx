@@ -592,16 +592,10 @@
   <data name="Download_string" xml:space="preserve">
     <value />
   </data>
-  <data name="Help_string" xml:space="preserve">
-    <value />
-  </data>
   <data name="Home_string" xml:space="preserve">
     <value />
   </data>
   <data name="Login_string" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Contacts_string" xml:space="preserve">
     <value />
   </data>
   <data name="Snapshot_string" xml:space="preserve">
