@@ -7,20 +7,14 @@ public class CompetitionModel
 {
     public static CompetitionModel MapFrom(Competition competition)
     {
-        return new CompetitionModel
-        {
-            Name = competition.Name,
-            Ruleset = competition.Ruleset,
-            Type = competition.Type,
-        };
+        return new CompetitionModel { Name = competition.Name, Ruleset = competition.Ruleset };
     }
 
     public string Name { get; init; } = default!;
-    public CompetitionType Type { get; init; }
     public CompetitionRuleset Ruleset { get; init; }
 
     public Competition MapToEntity()
     {
-        return new Competition(Name, Ruleset, Type);
+        return new Competition(Name, Ruleset);
     }
 }

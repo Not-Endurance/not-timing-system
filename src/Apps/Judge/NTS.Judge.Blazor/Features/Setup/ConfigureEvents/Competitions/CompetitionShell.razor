@@ -11,8 +11,6 @@
 
         <NSelect @bind-Value="Model.Ruleset" For="() => Model.Ruleset" Label="@Competition_Ruleset_string" />
 
-        <NSelect @bind-Value="Model.Type" For="() => Model.Type" Label="@Competition_Type_string" />
-
         <NDatePicker @bind-Date="Model.Date" For="() => Model.Date" Label="@Date_string" ImmediateText="true"/>
 
         <NTimePicker @bind-Time="Model.Time" For="() => Model.Time" Label="@Time_string" ImmediateText="true" Editable="true" Mask="TimeMask" />
@@ -22,6 +20,20 @@
         @if (Model.UseCompulsoryThreshold)
         {
             <NNumberField @bind-Value="Model.CompulsoryThresholdMinutes" For="() => Model.CompulsoryThresholdMinutes" />
+        }
+
+        <NSwitch @bind-Value="Model.UseMinSpeedRestriction" For="() => Model.UseMinSpeedRestriction" Label="@Min_Speed_Restriction_string" />
+
+        @if (Model.UseMinSpeedRestriction)
+        {
+            <NNumberField @bind-Value="Model.MinSpeedRestriction" For="() => Model.MinSpeedRestriction" Label="@Min_Speed_Restriction_string" HelperText="@Applies_to_all_Participations_added_to_the_competition_when_set_string" />
+        }
+
+        <NSwitch @bind-Value="Model.UseMaxSpeedRestriction" For="() => Model.UseMaxSpeedRestriction" Label="@Max_Speed_Restriction_string" />
+
+        @if (Model.UseMaxSpeedRestriction)
+        {
+            <NNumberField @bind-Value="Model.MaxSpeedRestriction" For="() => Model.MaxSpeedRestriction" Label="@Max_Speed_Restriction_string" HelperText="@Applies_to_all_Participations_added_to_the_competition_when_set_string" />
         }
 
         <NParagraph Content="@Locate_FEI_Show_data_instructions_string" Class="mt-8 mb-2" />
@@ -38,5 +50,3 @@
     </FormFields>
 
 </KrudForm>
-
-

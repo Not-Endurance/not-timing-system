@@ -14,7 +14,6 @@
     {
       "_id": 834244819,
       "Name": "ДП млади ездачи и юноши до 18 г",
-      "Type": "Star",
       "Ruleset": "FEI",
       "Start": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -94,9 +93,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": null,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": null
+          "MinSpeedOverride": 0
         },
         {
           "_id": 1065118095,
@@ -137,9 +134,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 233838947,
@@ -180,9 +175,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 233998861,
@@ -223,9 +216,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 679980613,
@@ -266,9 +257,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 1863036161,
@@ -309,9 +298,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 1487018003,
@@ -352,9 +339,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 361685277,
@@ -395,9 +380,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 141568528,
@@ -438,9 +421,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 1787502521,
@@ -481,16 +462,13 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         }
       ]
     },
     {
       "_id": 1557344940,
       "Name": "ДП юноши до 14 години",
-      "Type": "Star",
       "Ruleset": "Regional",
       "Start": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -561,16 +539,13 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         }
       ]
     },
     {
       "_id": 1543847229,
       "Name": "ДП пони ездачи",
-      "Type": "Qualification",
       "Ruleset": "Regional",
       "Start": {
         "$date": "2026-04-27T06:30:00.000Z"
@@ -641,9 +616,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 681770676,
@@ -684,9 +657,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 133427800,
@@ -727,9 +698,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 2039519853,
@@ -770,9 +739,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 987938828,
@@ -813,9 +780,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 757072013,
@@ -856,16 +821,13 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         }
       ]
     },
     {
       "_id": 1506827012,
       "Name": "Квалификационен турнир 80 км",
-      "Type": "Qualification",
       "Ruleset": "Regional",
       "Start": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -945,16 +907,13 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         }
       ]
     },
     {
       "_id": 896167378,
       "Name": "Квалификационен турнир 40 км",
-      "Type": "Qualification",
       "Ruleset": "Regional",
       "Start": {
         "$date": "2026-04-27T06:00:00.000Z"
@@ -1025,9 +984,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 574958789,
@@ -1068,9 +1025,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 1923494944,
@@ -1111,9 +1066,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 822866788,
@@ -1154,9 +1107,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 1209714417,
@@ -1197,9 +1148,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 1959171838,
@@ -1240,9 +1189,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         },
         {
           "_id": 1880189413,
@@ -1283,16 +1230,13 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         }
       ]
     },
     {
       "_id": 1076607645,
       "Name": "Квалификация 60 км",
-      "Type": "Qualification",
       "Ruleset": "Regional",
       "Start": {
         "$date": "2026-04-27T05:00:00.000Z"
@@ -1363,9 +1307,7 @@
           "IsNotRanked": false,
           "StartTimeOverride": null,
           "MaxSpeedOverride": 99999,
-          "MinSpeedOverride": 0,
-          "MinAverageSpeed": 0,
-          "MaxAverageSpeed": 99999
+          "MinSpeedOverride": 0
         }
       ]
     }

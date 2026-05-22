@@ -166,7 +166,6 @@ namespace NTS.Localization
         public static string Athlete_string => LocalizeString(nameof(Athlete_string));
         public static string Horse_string => LocalizeString(nameof(Horse_string));
         public static string Competition_Ruleset_string => LocalizeString(nameof(Competition_Ruleset_string));
-        public static string Competition_Type_string => LocalizeString(nameof(Competition_Type_string));
         public static string Automatic_CRI_string => LocalizeString(nameof(Automatic_CRI_string));
         public static string Require_Compulsory_Inspection_string =>
             LocalizeString(nameof(Require_Compulsory_Inspection_string));
@@ -178,6 +177,12 @@ namespace NTS.Localization
         public static string Start_Time_string => LocalizeString(nameof(Start_Time_string));
         public static string Max_Speed_string => LocalizeString(nameof(Max_Speed_string));
         public static string Min_Speed_string => LocalizeString(nameof(Min_Speed_string));
+        public static string Max_Speed_Restriction_string => LocalizeString(nameof(Max_Speed_Restriction_string));
+        public static string Min_Speed_Restriction_string => LocalizeString(nameof(Min_Speed_Restriction_string));
+        public static string Max_Speed_Override_string => LocalizeString(nameof(Max_Speed_Override_string));
+        public static string Min_Speed_Override_string => LocalizeString(nameof(Min_Speed_Override_string));
+        public static string Applies_to_all_Participations_added_to_the_competition_when_set_string =>
+            LocalizeString(nameof(Applies_to_all_Participations_added_to_the_competition_when_set_string));
         public static string Presentation_string => LocalizeString(nameof(Presentation_string));
         public static string Loop_distance_string => LocalizeString(nameof(Loop_distance_string));
         public static string Select_a_loop_string => LocalizeString(nameof(Select_a_loop_string));

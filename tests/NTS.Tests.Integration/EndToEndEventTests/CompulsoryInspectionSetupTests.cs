@@ -108,10 +108,11 @@ public sealed class CompulsoryInspectionSetupTests
             .ToArray();
         var competition = new SetupCompetition(
             "Compulsory inspection setup test",
-            CompetitionType.Qualification,
             CompetitionRuleset.Regional,
             DateTimeOffset.UtcNow.Date.AddDays(30).AddHours(8),
             compulsoryThresholdSpan: TimeSpan.FromMinutes(10),
+            minSpeedRestriction: null,
+            maxSpeedRestriction: null,
             feiEventId: null,
             feiEventCode: null,
             feiCompetitionId: null,

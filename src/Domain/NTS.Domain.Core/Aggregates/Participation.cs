@@ -169,6 +169,10 @@ public class Participation : Aggregate, IEventScoped
         {
             return;
         }
+        if (phase != Phases.Current)
+        {
+            return;
+        }
 
         Phases.StartIfNext();
         var phaseCompleted = new PhaseCompleted(this);

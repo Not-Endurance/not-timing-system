@@ -19,7 +19,6 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
     public int EventId { get; set; }
     public string Name { get; set; } = default!;
     public CompetitionRuleset Ruleset { get; set; }
-    public CompetitionType Type { get; set; }
     public ParticipationCategory Category { get; set; }
     public string? FeiEventId { get; set; }
     public string? FeiEventCode { get; set; }
@@ -36,7 +35,6 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
         EventId = ranking.EventId;
         Name = ranking.Name;
         Ruleset = ranking.Ruleset;
-        Type = ranking.Type;
         Category = ranking.Category;
         FeiEventId = ranking.FeiEventId;
         FeiEventCode = ranking.FeiEventCode;
@@ -52,7 +50,6 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
         return new Ranking(
             Name,
             Ruleset,
-            Type,
             Category,
             FeiEventId,
             FeiEventCode,

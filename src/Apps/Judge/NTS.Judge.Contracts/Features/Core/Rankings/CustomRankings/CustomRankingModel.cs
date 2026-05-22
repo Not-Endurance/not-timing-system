@@ -15,7 +15,6 @@ public record CustomRankingModel : KrudFormModel<Ranking>
 
     public string? Name { get; set; }
     public CompetitionRuleset? Ruleset { get; set; }
-    public CompetitionType? Type { get; set; }
     public ParticipationCategory? Category { get; set; }
     public string? FeiEventId { get; set; }
     public string? FeiEventCode { get; set; }
@@ -30,7 +29,6 @@ public record CustomRankingModel : KrudFormModel<Ranking>
         return new Ranking(
             Name,
             Ruleset,
-            Type,
             Category,
             FeiEventId,
             FeiEventCode,
@@ -50,7 +48,6 @@ public record CustomRankingModel : KrudFormModel<Ranking>
         // Same goes for Name - we want to prompt the user to provide name.
         // TODO: above commends suggest this should be a separate flow
         Ruleset = ranking.Ruleset;
-        Type = ranking.Type;
         Category = ranking.Category;
         FeiEventId = ranking.FeiEventId;
         FeiEventCode = ranking.FeiEventCode;

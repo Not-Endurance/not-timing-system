@@ -384,8 +384,8 @@
   <data name="History_string" xml:space="preserve">
     <value>History</value>
   </data>
-  <data name="Field_is_required_string" xml:space="preserve">
-    <value>Field is required</value>
+  <data name="Field_1_is_required_on_2_string" xml:space="preserve">
+    <value>Field '{0}' is required on  '{1}'</value>
   </data>
   <data name="Required_inspection_is_compulsory_string" xml:space="preserve">
     <value>Inspection is already configured as compulsory on Competition level</value>
@@ -459,9 +459,6 @@
   <data name="Competition_Ruleset_string" xml:space="preserve">
     <value>Ruleset</value>
   </data>
-  <data name="Competition_Type_string" xml:space="preserve">
-    <value>Type</value>
-  </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Require compulsory inspection based on recovery</value>
   </data>
@@ -482,6 +479,15 @@
   </data>
   <data name="Max_Speed_string" xml:space="preserve">
     <value>Max Speed </value>
+  </data>
+  <data name="Max_Speed_Restriction_string" xml:space="preserve">
+    <value>Max Speed Restriction</value>
+  </data>
+  <data name="Max_Speed_Override_string" xml:space="preserve">
+    <value>Max Speed Override</value>
+  </data>
+  <data name="Applies_to_all_Participations_added_to_the_competition_when_set_string" xml:space="preserve">
+    <value>Applies to all Participations added to the competition when set. You can override that on Participation level</value>
   </data>
   <data name="Presentation_string" xml:space="preserve">
     <value>Present</value>
@@ -551,6 +557,12 @@
   </data>
   <data name="Min_Speed_string" xml:space="preserve">
     <value>Min Speed</value>
+  </data>
+  <data name="Min_Speed_Restriction_string" xml:space="preserve">
+    <value>Min Speed Restriction</value>
+  </data>
+  <data name="Min_Speed_Override_string" xml:space="preserve">
+    <value>Min Speed Override</value>
   </data>
   <data name="Average_speed" xml:space="preserve">
     <value>Average speed:</value>

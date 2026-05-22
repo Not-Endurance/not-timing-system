@@ -7,7 +7,6 @@ public class Ranking : Aggregate, IEventScoped
     public Ranking(
         string? name,
         CompetitionRuleset? ruleset,
-        CompetitionType? type,
         ParticipationCategory? category,
         string? feiEventId,
         string? feiEventCode,
@@ -24,7 +23,6 @@ public class Ranking : Aggregate, IEventScoped
         Name = Required(nameof(Name), name);
         Ruleset = Required(nameof(Ruleset), ruleset);
         Category = Required(nameof(Category), category);
-        Type = Required(nameof(Type), type);
         Entries = new(AreUnique(nameof(Entries), entries).ToList());
         FeiEventId = feiEventId;
         FeiEventCode = feiEventCode;
@@ -36,7 +34,6 @@ public class Ranking : Aggregate, IEventScoped
     public int EventId { get; }
     public string Name { get; }
     public CompetitionRuleset Ruleset { get; }
-    public CompetitionType Type { get; }
     public ParticipationCategory Category { get; }
     public string? FeiEventId { get; }
     public string? FeiEventCode { get; }

@@ -27,7 +27,7 @@ public static class NStrings
     public static string Print_Preview_string => LocalizeString(nameof(Print_Preview_string));
     public static string Yes_string => LocalizeString(nameof(Yes_string));
     public static string Cancel_string => LocalizeString(nameof(Cancel_string));
-    public static string Field_is_required_string => LocalizeString(nameof(Field_is_required_string));
+    public static string Field_1_is_required_on_2_string => LocalizeString(nameof(Field_1_is_required_on_2_string));
     public static string List_is_empty_string => LocalizeString(nameof(List_is_empty_string));
     public static string Add_string => LocalizeString(nameof(Add_string));
     public static string Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string =>

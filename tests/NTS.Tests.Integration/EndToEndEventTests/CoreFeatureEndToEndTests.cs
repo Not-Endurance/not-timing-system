@@ -371,7 +371,6 @@ public sealed class CoreFeatureEndToEndTests
         return new Ranking(
             source.Name,
             source.Ruleset,
-            source.Type,
             source.Category,
             $"FEI-EVENT-{source.Id}",
             "CEI1",
