@@ -38,8 +38,6 @@ public class StartlistService
     public Startlist? Startlist { get; set; }
 
     public IReadOnlyList<Starter> Upcoming => Startlist?.Upcoming ?? [];
-    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> UpcomingByStage =>
-        Startlist?.UpcomingByStage ?? EMPTY_BY_STAGE;
 
     public IReadOnlyList<Starter> History => Startlist?.History ?? [];
     public IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage =>

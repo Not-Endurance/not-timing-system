@@ -12,7 +12,7 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
 
     System.Timers.Timer _timer = default!;
 
-    protected string NumberAndLoopHeader => $"{Number_string} / {Loops_string}";
+    protected string GateHeader => "Gate";
 
     [Inject]
     public IStartUpcoming Service { get; set; } = default!;
@@ -32,11 +32,6 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
     protected string FormatAthlete(Starter entry)
     {
         return NameRenderingHelper.Render(entry.AthleteName, entry.AthleteNameEnglish, entry.Ruleset);
-    }
-
-    protected string FormatLoop(Starter entry)
-    {
-        return $"{entry.Distance:0.##}{km_string}";
     }
 
     protected string GetTimerKey(Starter entry)
