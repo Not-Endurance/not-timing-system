@@ -98,7 +98,11 @@ public static class NameMigrationTool
             changed = true;
         }
 
-        if (IsActorContext(context) && !HasNonEmptyString(document, "Name") && TryReadString(document, "NameEnglish", out var nameEnglish))
+        if (
+            IsActorContext(context)
+            && !HasNonEmptyString(document, "Name")
+            && TryReadString(document, "NameEnglish", out var nameEnglish)
+        )
         {
             document["Name"] = nameEnglish;
             changed = true;
