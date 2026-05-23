@@ -7,6 +7,7 @@ public static class Routes
     public const string ATHLETES_HORSES_PAGE = "/athletes-horses";
     public const string CLUBS_PAGE = "/clubs";
     public const string OFFICIAL_UPDATE = "/official-krud-update-route";
+    public const string OPERATOR_UPDATE = "/operator-krud-update-route";
     public const string LOOP_CONTENT = "/loop-krud-update-route";
     public const string COMPETITION_UPDATE = "/competition-krud-update-route";
     public const string PARTICIPATION_UPDATE = "/participation-krud-update-route";

@@ -10,6 +10,7 @@ using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Officials;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Operators;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
 using NTS.Judge.Contracts.Features.Setup.Horses;
@@ -264,6 +265,30 @@ internal class ConfigureEventFeature
             _judge.SelectSetupParent(currentEvent);
         }
 
+        var operatorService = _judge.GetRequiredService<IKrudFormService<OperatorFormModel>>();
+        foreach (var @operator in snapshot.ConfigureEvent.Operators)
+        {
+            var form = new OperatorFormModel { User = createdUsers[@operator.User.Id] };
+            await operatorService.Create(form);
+            var operatorId = RequiredId(form);
+            Remember(idMap, @operator.Id, operatorId);
+
+            currentEvent = await WaitForSetupEvent(
+                _nexusApi,
+                setupEventId,
+                setupEvent => setupEvent.Operators.Any(x => x.Id == operatorId),
+                $"operator {@operator.User.Email}"
+            );
+            Assert.Contains(
+                currentEvent.Operators,
+                x =>
+                    x.Id == operatorId
+                    && x.User.Id == createdUsers[@operator.User.Id].Id
+                    && x.Role == @operator.Role
+            );
+            _judge.SelectSetupParent(currentEvent);
+        }
+
         var competitionService = _judge.GetRequiredService<IKrudFormService<CompetitionFormModel>>();
         var phaseService = _judge.GetRequiredService<IKrudFormService<PhaseFormModel>>();
         var participationService = _judge.GetRequiredService<IKrudFormService<ParticipationFormModel>>();
@@ -356,7 +381,8 @@ internal class ConfigureEventFeature
         return new SetupFeatureResult(
             currentEvent,
             new Dictionary<int, int>(idMap),
-            ResolveWitnessOfficial(currentEvent)
+            ResolveWitnessOfficial(currentEvent),
+            ResolveWitnessOperator(currentEvent)
         );
     }
 
@@ -371,6 +397,28 @@ internal class ConfigureEventFeature
         return new IntegrationUser(
             user.Email,
             $"setup-official-{user.Id}",
+            user.Name,
+            user.GivenName,
+            user.MiddleName,
+            user.Surname,
+            user.CountryRegion,
+            user.Club,
+            user.FeiId,
+            user.DisplayName
+        );
+    }
+
+    static IntegrationUser ResolveWitnessOperator(ConfigureEvent setupEvent)
+    {
+        var user = setupEvent.Operators.Select(x => x.User).FirstOrDefault();
+        if (user == null)
+        {
+            throw new InvalidOperationException("The setup event snapshot does not include an operator user.");
+        }
+
+        return new IntegrationUser(
+            user.Email,
+            $"setup-operator-{user.Id}",
             user.Name,
             user.GivenName,
             user.MiddleName,
@@ -405,7 +453,7 @@ internal class ConfigureEventFeature
         var summary =
             current == null
                 ? "no event was returned"
-                : $"{current.Loops.Count} loop(s), {current.Combinations.Count} combination(s), {current.Officials.Count} official(s), {current.Competitions.Count} competition(s)";
+                : $"{current.Loops.Count} loop(s), {current.Combinations.Count} combination(s), {current.Officials.Count} official(s), {current.Operators.Count} operator(s), {current.Competitions.Count} competition(s)";
         throw new TimeoutException($"Setup event {setupEventId} did not persist {expectedState}: {summary}.");
     }
 
@@ -482,15 +530,18 @@ internal sealed class SetupFeatureResult
     public SetupFeatureResult(
         ConfigureEvent setupEvent,
         IReadOnlyDictionary<int, int> idMap,
-        IntegrationUser witnessOfficial
+        IntegrationUser witnessOfficial,
+        IntegrationUser witnessOperator
     )
     {
         SetupEvent = setupEvent;
         IdMap = idMap;
         WitnessOfficial = witnessOfficial;
+        WitnessOperator = witnessOperator;
     }
 
     public ConfigureEvent SetupEvent { get; }
     public IReadOnlyDictionary<int, int> IdMap { get; }
     public IntegrationUser WitnessOfficial { get; }
+    public IntegrationUser WitnessOperator { get; }
 }

@@ -278,6 +278,7 @@ internal static class SnapshotJson
             ("Athlete", _) => "athlete",
             ("Horse", _) => "horse",
             ("Officials", _) => "official",
+            ("Operators", _) => "operator",
             ("SnapshotHistory", _) => "snapshotGroup",
             ("SnapshotGroups", _) => "snapshotGroup",
             ("Entries", "snapshotGroup") => "snapshot",
@@ -287,6 +288,6 @@ internal static class SnapshotJson
 
     static bool IsActorContext(string? context)
     {
-        return context is "athlete" or "horse" or "official" or "snapshot";
+        return context is "athlete" or "horse" or "official" or "operator" or "snapshot";
     }
 }

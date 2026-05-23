@@ -87,6 +87,11 @@ internal static class IntegrationPayloadFactory
         );
     }
 
+    public static Operator Operator(int eventId, int userId, int? id = null)
+    {
+        return new Operator(eventId, userId, OfficialRole.Steward, id ?? 602);
+    }
+
     public static Ranking Ranking(
         int eventId,
         IEnumerable<Participation> participations,

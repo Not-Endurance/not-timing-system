@@ -21,12 +21,24 @@ public record ConfigureEventFormModel : KrudFormModel<ConfigureEvent>
     public string? FeiShowId { get; set; }
     public IReadOnlyCollection<Competition> Competitions { get; private set; } = [];
     public IReadOnlyCollection<Official> Officials { get; private set; } = [];
+    public IReadOnlyCollection<Operator> Operators { get; private set; } = [];
     public IReadOnlyCollection<Combination> Combinations { get; private set; } = [];
     public IReadOnlyCollection<Loop> Loops { get; private set; } = [];
 
     protected override ConfigureEvent MapTo()
     {
-        return new ConfigureEvent(Name, Location, Country, FeiShowId, Competitions, Officials, Loops, Combinations, Id);
+        return new ConfigureEvent(
+            Name,
+            Location,
+            Country,
+            FeiShowId,
+            Competitions,
+            Officials,
+            Loops,
+            Combinations,
+            Id,
+            Operators
+        );
     }
 
     public override void MapFrom(ConfigureEvent configureEvent)
@@ -38,6 +50,7 @@ public record ConfigureEventFormModel : KrudFormModel<ConfigureEvent>
         FeiShowId = configureEvent.FeiShowId;
         Competitions = configureEvent.Competitions;
         Officials = configureEvent.Officials;
+        Operators = configureEvent.Operators;
         Combinations = configureEvent.Combinations;
         Loops = configureEvent.Loops;
     }

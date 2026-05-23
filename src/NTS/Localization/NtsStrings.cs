@@ -131,6 +131,7 @@ namespace NTS.Localization
         public static string Select_participation_to_add_string =>
             LocalizeString(nameof(Select_participation_to_add_string));
         public static string Configure_Official_string => LocalizeString(nameof(Configure_Official_string));
+        public static string Configure_Operator_string => LocalizeString(nameof(Configure_Operator_string));
         public static string Configure_Loops_string => LocalizeString(nameof(Configure_Loops_string));
         public static string Process_string => LocalizeString(nameof(Process_string));
         public static string Representation_string => LocalizeString(nameof(Representation_string));
@@ -161,10 +162,12 @@ namespace NTS.Localization
         public static string Horses_string => LocalizeString(nameof(Horses_string));
         public static string Competitions_string => LocalizeString(nameof(Competitions_string));
         public static string Officials_string => LocalizeString(nameof(Officials_string));
+        public static string Operators_string => LocalizeString(nameof(Operators_string));
         public static string Phases_string => LocalizeString(nameof(Phases_string));
         public static string Participations_string => LocalizeString(nameof(Participations_string));
         public static string Athlete_string => LocalizeString(nameof(Athlete_string));
         public static string Horse_string => LocalizeString(nameof(Horse_string));
+        public static string Operator_string => LocalizeString(nameof(Operator_string));
         public static string Competition_Ruleset_string => LocalizeString(nameof(Competition_Ruleset_string));
         public static string Automatic_CRI_string => LocalizeString(nameof(Automatic_CRI_string));
         public static string Require_Compulsory_Inspection_string =>

@@ -9,6 +9,7 @@ using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Features;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Infrastructure;
+using NTS.Witness.Contracts.Features.Access;
 using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
 using CoreCombination = NTS.Domain.Core.Aggregates.Participations.Entities.Combination;
 using CoreHorse = NTS.Domain.Core.Aggregates.Participations.Entities.Horse;
@@ -55,15 +56,17 @@ public sealed class CoreFeatureEndToEndTests
         var startedRankings = startedDocuments.Rankings;
         Assert.Equal(snapshot.Participations.Count, startedParticipations.Count);
         Assert.Equal(snapshot.Rankings.Count, startedRankings.Count);
+        AssertStartedOperatorsMatchSetup(startedDocuments.Operators, setup.SetupEvent, eventInformation.Id);
 
         await using var witness = new WitnessDriver(
             _fixture.WarpBaseUrl,
             _fixture.NexusBaseUrl,
-            setup.WitnessOfficial,
-            $"CoreEndToEndWitness-{snapshot.Name}"
+            setup.WitnessOperator,
+            $"CoreEndToEndOperatorWitness-{snapshot.Name}"
         );
         await witness.Start();
         await witness.Connect(eventInformation);
+        Assert.Equal(WitnessAccessLevel.Official, witness.AccessLevel);
 
         var phaseWaves = CreatePhaseWaves(snapshot.PhasesWithSnapshots);
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, phaseWaves.Sum(x => x.Count));
@@ -140,6 +143,10 @@ public sealed class CoreFeatureEndToEndTests
             IntegrationPayloadFactory.Official(eventId, userId: null, id: idBase + 201),
             IntegrationPayloadFactory.Official(eventId, userId: null, id: idBase + 202),
         };
+        var operators = new[]
+        {
+            IntegrationPayloadFactory.Operator(eventId, userId: idBase + 250, id: idBase + 251),
+        };
         var rankings = new[]
         {
             IntegrationPayloadFactory.Ranking(eventId, participations, idBase + 301, $"Seeded {label} Ranking A"),
@@ -157,6 +164,10 @@ public sealed class CoreFeatureEndToEndTests
         foreach (var official in officials)
         {
             await api.Create(official);
+        }
+        foreach (var @operator in operators)
+        {
+            await api.Create(@operator);
         }
         foreach (var ranking in rankings)
         {
@@ -176,13 +187,14 @@ public sealed class CoreFeatureEndToEndTests
     )
     {
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
-        StartedEventDocuments last = new([], [], [], []);
+        StartedEventDocuments last = new([], [], [], [], []);
         while (DateTimeOffset.UtcNow < deadline)
         {
             last = new StartedEventDocuments(
                 await api.ReadParticipations(eventInformation.Id),
                 await api.ReadRankings(eventInformation.Id),
                 await api.ReadOfficials(eventInformation.Id),
+                await api.ReadOperators(eventInformation.Id),
                 await api.ReadHandouts(eventInformation.Id)
             );
             AssertDocumentsBelongToEvent(eventInformation.Id, last);
@@ -191,6 +203,7 @@ public sealed class CoreFeatureEndToEndTests
                 last.Participations.Count == snapshot.Participations.Count
                 && last.Rankings.Count == snapshot.Rankings.Count
                 && last.Officials.Count == setup.SetupEvent.Officials.Count
+                && last.Operators.Count == setup.SetupEvent.Operators.Count
                 && last.Handouts.Count == 0
             )
             {
@@ -205,6 +218,7 @@ public sealed class CoreFeatureEndToEndTests
                 + $"Participations: {last.Participations.Count}/{snapshot.Participations.Count}, "
                 + $"Rankings: {last.Rankings.Count}/{snapshot.Rankings.Count}, "
                 + $"Officials: {last.Officials.Count}/{setup.SetupEvent.Officials.Count}, "
+                + $"Operators: {last.Operators.Count}/{setup.SetupEvent.Operators.Count}, "
                 + $"Handouts: {last.Handouts.Count}/0."
         );
     }
@@ -213,6 +227,7 @@ public sealed class CoreFeatureEndToEndTests
     {
         Assert.All(documents.Participations, participation => Assert.Equal(eventId, participation.EventId));
         Assert.All(documents.Officials, official => Assert.Equal(eventId, official.EventId));
+        Assert.All(documents.Operators, @operator => Assert.Equal(eventId, @operator.EventId));
         Assert.All(
             documents.Rankings,
             ranking =>
@@ -229,6 +244,21 @@ public sealed class CoreFeatureEndToEndTests
                 Assert.Equal(eventId, handout.Participation.EventId);
             }
         );
+    }
+
+    static void AssertStartedOperatorsMatchSetup(
+        IReadOnlyList<Operator> activeOperators,
+        SetupConfigureEvent setupEvent,
+        int eventId
+    )
+    {
+        Assert.Equal(setupEvent.Operators.Count, activeOperators.Count);
+        foreach (var setupOperator in setupEvent.Operators)
+        {
+            var activeOperator = Assert.Single(activeOperators, x => x.UserId == setupOperator.User.Id);
+            Assert.Equal(eventId, activeOperator.EventId);
+            Assert.Equal(setupOperator.Role, activeOperator.Role);
+        }
     }
 
     static IReadOnlyList<IReadOnlyList<EndToEndPhaseSnapshot>> CreatePhaseWaves(
@@ -426,18 +456,21 @@ public sealed class CoreFeatureEndToEndTests
             IReadOnlyList<Participation> participations,
             IReadOnlyList<Ranking> rankings,
             IReadOnlyList<Official> officials,
+            IReadOnlyList<Operator> operators,
             IReadOnlyList<Handout> handouts
         )
         {
             Participations = participations;
             Rankings = rankings;
             Officials = officials;
+            Operators = operators;
             Handouts = handouts;
         }
 
         public IReadOnlyList<Participation> Participations { get; }
         public IReadOnlyList<Ranking> Rankings { get; }
         public IReadOnlyList<Official> Officials { get; }
+        public IReadOnlyList<Operator> Operators { get; }
         public IReadOnlyList<Handout> Handouts { get; }
     }
 }

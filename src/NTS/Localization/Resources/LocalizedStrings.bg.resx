@@ -354,6 +354,9 @@
   <data name="Configure_Official_string" xml:space="preserve">
     <value>Конфигурирай Официално лице</value>
   </data>
+  <data name="Configure_Operator_string" xml:space="preserve">
+    <value>Конфигурирай Оператор</value>
+  </data>
   <data name="Configure_Loops_string" xml:space="preserve">
     <value>Конфигурирай Обиколка</value>
   </data>
@@ -444,6 +447,9 @@
   <data name="Officials_string" xml:space="preserve">
     <value>Официални лица</value>
   </data>
+  <data name="Operators_string" xml:space="preserve">
+    <value>Оператори</value>
+  </data>
   <data name="Phases_string" xml:space="preserve">
     <value>Фази</value>
   </data>
@@ -455,6 +461,9 @@
   </data>
   <data name="Horse_string" xml:space="preserve">
     <value>Кон</value>
+  </data>
+  <data name="Operator_string" xml:space="preserve">
+    <value>Оператор</value>
   </data>
   <data name="Competition_Ruleset_string" xml:space="preserve">
     <value>Правилник</value>

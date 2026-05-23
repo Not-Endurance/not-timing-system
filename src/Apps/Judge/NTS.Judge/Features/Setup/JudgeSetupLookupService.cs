@@ -18,12 +18,12 @@ public class JudgeSetupLookupService : IJudgeSetupLookupService, ITransient
     readonly IRepository<Combination> _combinations;
     readonly IRepository<Horse> _horses;
     readonly IRepository<Loop> _loops;
-    readonly IUserEmailLookup _users;
+    readonly IUserLookup _users;
 
     public JudgeSetupLookupService(
         ICache<Country> countries,
         IRepository<Club> clubs,
-        IUserEmailLookup users,
+        IUserLookup users,
         IRepository<Athlete> athletes,
         IRepository<Horse> horses,
         IRepository<Loop> loops,

@@ -18,7 +18,7 @@ public class EventInformationApiRepository
     readonly INtsSocketContext _socketContext;
 
     public EventInformationApiRepository(NHttpClient client, INtsSocketContext socketContext)
-        : base("event-information", client)
+        : base("event", client)
     {
         _socketContext = socketContext;
     }

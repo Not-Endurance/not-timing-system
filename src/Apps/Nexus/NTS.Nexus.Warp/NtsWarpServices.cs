@@ -45,7 +45,7 @@ internal static class NtsWarpServices
         services.ConfigureNtsApplication(configuration, Assembly.GetCallingAssembly());
         services.AddPendingSnapshotsMongoStorage(configuration);
         services.NJwtTokenValidation(configuration);
-        services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoReceiveSnapshotAccessPolicy>();
+        services.AddSingleton<IReceiveSnapshotAccessPolicy, MongoWitnessWriteAccessPolicy>();
         services.AddSingleton<IWitnessReceiveAuthorizer, WitnessReceiveAuthorizer>();
 
         return services.AddDummyLocalizer().AddTransient<INetworkBroadcastService, JudgeHandshakeService>();

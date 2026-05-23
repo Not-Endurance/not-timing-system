@@ -34,6 +34,7 @@ public class ConfigureEventMongoRepository : MongoRepository<ConfigureEventModel
                 .Set(x => x.FeiShowId, document.FeiShowId)
                 .Set(x => x.Competitions, document.Competitions)
                 .Set(x => x.Officials, document.Officials)
+                .Set(x => x.Operators, document.Operators)
                 .Set(x => x.Loops, document.Loops)
                 .Set(x => x.Combinations, document.Combinations);
         }

@@ -107,6 +107,7 @@ internal sealed class EndToEndEventSnapshot
     public IReadOnlyList<SetupUser> Users =>
         ConfigureEvent
             .Officials.Select(x => x.User)
+            .Concat(ConfigureEvent.Operators.Select(x => x.User))
             .Concat(ConfigureEvent.Combinations.Select(x => x.Athlete.User))
             .Where(x => x != null)
             .Select(x => x!)
@@ -153,6 +154,10 @@ internal sealed class EndToEndEventSnapshot
     public JToken ExpectedConfigureEventWith(IReadOnlyDictionary<int, int> idMap)
     {
         var expected = _setupSource.DeepClone();
+        if (expected is JObject obj && obj["Operators"] == null)
+        {
+            obj["Operators"] = new JArray();
+        }
         SnapshotJson.ReplaceIds(expected, idMap);
         return SnapshotJson.Canonicalize(expected);
     }

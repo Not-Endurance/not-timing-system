@@ -1383,6 +1383,26 @@
       "User": null
     }
   ],
+  "Operators": [
+    {
+      "_id": 1800000001,
+      "User": {
+        "_id": 1699297600,
+        "TenantId": "nts",
+        "GivenName": "End",
+        "MiddleName": "To",
+        "Surname": "End Operator",
+        "CountryRegion": "Bulgaria",
+        "Club": "Integration Club",
+        "FeiId": "99000001",
+        "Email": "operator.endtoend@integration.test",
+        "Name": "End To End Operator",
+        "DisplayName": "End To End Operator",
+        "Roles": []
+      },
+      "Role": "Steward"
+    }
+  ],
   "Loops": [
     {
       "_id": 465301733,

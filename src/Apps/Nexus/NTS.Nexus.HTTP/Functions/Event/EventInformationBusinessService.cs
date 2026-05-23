@@ -9,6 +9,7 @@ using NTS.Domain.Enums;
 using NTS.Domain.Setup.Services.StartValidation;
 using CoreEventInformationModel = NTS.Application.Contracts.Core.Models.EventInformationModel;
 using CoreOfficialModel = NTS.Application.Contracts.Core.Models.OfficialModel;
+using CoreOperatorModel = NTS.Application.Contracts.Core.Models.OperatorModel;
 using CoreParticipationModel = NTS.Application.Contracts.Core.Models.ParticipationModel;
 using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
 using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
@@ -28,6 +29,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
     readonly IRepository<SetupConfigureEventModel> _configureEvents;
     readonly IRepository<CoreEventInformationModel> _eventInformation;
     readonly IRepository<CoreOfficialModel> _officials;
+    readonly IRepository<CoreOperatorModel> _operators;
     readonly IRepository<CoreParticipationModel> _participations;
     readonly IRepository<CoreRankingModel> _rankings;
 
@@ -35,6 +37,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         IRepository<SetupConfigureEventModel> configureEvents,
         IRepository<CoreEventInformationModel> eventInformation,
         IRepository<CoreOfficialModel> officials,
+        IRepository<CoreOperatorModel> operators,
         IRepository<CoreParticipationModel> participations,
         IRepository<CoreRankingModel> rankings
     )
@@ -42,6 +45,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         _configureEvents = configureEvents;
         _eventInformation = eventInformation;
         _officials = officials;
+        _operators = operators;
         _participations = participations;
         _rankings = rankings;
     }
@@ -67,11 +71,18 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         var officials = setupEvent.Officials.Select(x =>
             CoreOfficialModel.MapFrom(OfficialFactory.Create(x, setupEvent.Id))
         );
+        var operators = setupEvent.Operators.Select(x =>
+            CoreOperatorModel.MapFrom(OperatorFactory.Create(x, setupEvent.Id))
+        );
         var (participations, rankings) = CreateParticipationsAndRankings(setupEvent);
 
         foreach (var official in officials)
         {
             await _officials.Create(official);
+        }
+        foreach (var @operator in operators)
+        {
+            await _operators.Create(@operator);
         }
         foreach (var participation in participations.Select(CoreParticipationModel.MapFrom))
         {

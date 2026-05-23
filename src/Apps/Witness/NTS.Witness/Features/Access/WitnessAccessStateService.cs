@@ -8,6 +8,7 @@ using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
+using NTS.Domain.Core.Objects;
 
 namespace NTS.Witness.Features.Access;
 
@@ -21,16 +22,19 @@ public class WitnessAccessContext
     readonly INtsSocketContext _socketContext;
     readonly INUserSession _userSessionService;
     readonly IEventScopedRepository<Official> _officialReader;
+    readonly IEventScopedRepository<Operator> _operatorReader;
 
     public WitnessAccessContext(
         INtsSocketContext socketContext,
         INUserSession userSessionService,
-        IEventScopedRepository<Official> officialReader
+        IEventScopedRepository<Official> officialRepository,
+        IEventScopedRepository<Operator> operatorRepository
     )
     {
         _socketContext = socketContext;
         _userSessionService = userSessionService;
-        _officialReader = officialReader;
+        _officialReader = officialRepository;
+        _operatorReader = operatorRepository;
     }
 
     public WitnessAccessLevel AccessLevel { get; private set; }
@@ -51,7 +55,8 @@ public class WitnessAccessContext
         }
 
         var officials = await _officialReader.ReadMany();
-        AccessLevel = officials.Any(x => x.UserId == userId.Value)
+        var operators = await _operatorReader.ReadMany();
+        AccessLevel = CanWriteSnapshots(userId.Value, officials, operators)
             ? WitnessAccessLevel.Official
             : WitnessAccessLevel.Participant;
 
@@ -68,5 +73,13 @@ public class WitnessAccessContext
         AccessLevel = WitnessAccessLevel.Unknown;
         ClearState();
         return Task.CompletedTask;
+    }
+
+    static bool CanWriteSnapshots(int userId, IEnumerable<Official> officials, IEnumerable<Operator> operators)
+    {
+        return operators.Any(x => x.UserId == userId && SnapshotAccessPolicy.CanWriteAsOperator(x.Role))
+            || officials.Any(x =>
+                x.UserId == userId && SnapshotAccessPolicy.CanWriteAsOfficial(x.Role)
+            );
     }
 }

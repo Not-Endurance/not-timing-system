@@ -1,0 +1,14 @@
+﻿@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Operators
+@using Not.Blazor.Components.Layout
+@using Not.Blazor.Navigation
+
+@attribute [Route(OPERATOR_UPDATE)]
+@inherits OperatorContentBehind
+
+<NContent Title="@Configure_Operator_string" IsEmpty="Model == null">
+
+    <Main>
+        <OperatorShell Model="Model" ReadOnly="@ReadOnly" />
+    </Main>
+
+</NContent>
