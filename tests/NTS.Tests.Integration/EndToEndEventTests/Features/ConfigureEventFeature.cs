@@ -281,10 +281,7 @@ internal class ConfigureEventFeature
             );
             Assert.Contains(
                 currentEvent.Operators,
-                x =>
-                    x.Id == operatorId
-                    && x.User.Id == createdUsers[@operator.User.Id].Id
-                    && x.Role == @operator.Role
+                x => x.Id == operatorId && x.User.Id == createdUsers[@operator.User.Id].Id && x.Role == @operator.Role
             );
             _judge.SelectSetupParent(currentEvent);
         }

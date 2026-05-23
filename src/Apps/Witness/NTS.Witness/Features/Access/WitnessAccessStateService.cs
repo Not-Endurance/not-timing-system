@@ -78,8 +78,6 @@ public class WitnessAccessContext
     static bool CanWriteSnapshots(int userId, IEnumerable<Official> officials, IEnumerable<Operator> operators)
     {
         return operators.Any(x => x.UserId == userId && SnapshotAccessPolicy.CanWriteAsOperator(x.Role))
-            || officials.Any(x =>
-                x.UserId == userId && SnapshotAccessPolicy.CanWriteAsOfficial(x.Role)
-            );
+            || officials.Any(x => x.UserId == userId && SnapshotAccessPolicy.CanWriteAsOfficial(x.Role));
     }
 }

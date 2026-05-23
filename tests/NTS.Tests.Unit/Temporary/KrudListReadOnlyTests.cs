@@ -72,19 +72,14 @@ public sealed class KrudListReadOnlyTests
             return list;
         }
 
-        public static TestKrudList WithAllowFlags(
-            bool allowCreate,
-            bool allowView,
-            bool allowUpdate,
-            bool allowDelete
-        )
+        public static TestKrudList WithAllowFlags(bool allowCreate, bool allowView, bool allowUpdate, bool allowDelete)
         {
             return new TestKrudList
             {
                 AllowCreate = allowCreate,
                 AllowView = allowView,
                 AllowUpdate = allowUpdate,
-                AllowDelete = allowDelete
+                AllowDelete = allowDelete,
             };
         }
 
