@@ -13,6 +13,7 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Watcher;
 using NTS.Storage;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness;
@@ -68,6 +69,11 @@ internal sealed class WitnessDriver : IAsyncDisposable
     {
         EnsureRpcClientsInitialized();
         return _provider.Startup();
+    }
+
+    public Task Publish(SnapshotGroup snapshotGroup)
+    {
+        return _provider.GetRequiredService<ISnapshotPublisher>().PublishSnapshotsAsync(snapshotGroup);
     }
 
     public async Task Connect(EventInformation eventInformation)

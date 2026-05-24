@@ -31,8 +31,6 @@ public record Startlist : ValueObject
 
     public IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage => GroupByStage(_history);
 
-    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> UpcomingByStage => GroupByStage(_upcoming);
-
     public void UpdateState()
     {
         lock (_lock)
@@ -167,6 +165,7 @@ public record Startlist : ValueObject
             participation.Competition.Ruleset,
             participation.Combination.Number,
             phaseIndex + 1,
+            phase.Gate,
             phase.Length,
             start
         );

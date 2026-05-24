@@ -1,8 +1,10 @@
+using NTS.Tools.NameMigration;
 using NTS.Tools.Watcher;
 
 return args.FirstOrDefault() switch
 {
     "watcher" => await RunWatcher(),
+    "migrate-names" => await RunNameMigration(args.Skip(1).ToArray()),
     "-h" => ShowHelp(),
     "--help" => ShowHelp(),
     "help" => ShowHelp(),
@@ -19,6 +21,7 @@ static int ShowHelp()
 
         Commands:
           watcher              Placeholder watcher command
+          migrate-names        Migrate Athlete, Horse, Official, and snapshot names to Name/NameEnglish
         """
     );
 
@@ -35,4 +38,9 @@ static async Task<int> RunWatcher()
 {
     await WatcherTool.Run();
     return 0;
+}
+
+static async Task<int> RunNameMigration(string[] args)
+{
+    return await NameMigrationTool.Run(args);
 }

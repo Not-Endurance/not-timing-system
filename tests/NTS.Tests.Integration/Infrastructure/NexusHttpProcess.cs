@@ -129,7 +129,7 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
 
             try
             {
-                using var response = await http.GetAsync("/api/event-information", cancellationToken);
+                using var response = await http.GetAsync("/api/event", cancellationToken);
                 if (response.IsSuccessStatusCode)
                 {
                     return;

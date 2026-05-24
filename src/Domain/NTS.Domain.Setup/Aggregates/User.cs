@@ -45,9 +45,26 @@ public class User : Aggregate
     public string? FeiId { get; }
     public IReadOnlyList<string> Roles { get; }
 
+    public string GetDisplayLabel()
+    {
+        var labels = new[] { DisplayName, Name }
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x!.Trim())
+            .Where(x => !string.Equals(x, Email, StringComparison.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        if (labels.Length == 0)
+        {
+            return Email;
+        }
+
+        return $"{string.Join(" / ", labels)} ({Email})";
+    }
+
     public override string ToString()
     {
-        return $"{Name} ({Email})";
+        return GetDisplayLabel();
     }
 
     static string? BuildName(params string?[] parts)

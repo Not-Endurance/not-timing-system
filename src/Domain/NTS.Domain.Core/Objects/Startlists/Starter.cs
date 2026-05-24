@@ -11,6 +11,7 @@ public record Starter : ValueObject
         CompetitionRuleset ruleset,
         int number,
         int phaseNumber,
+        string gate,
         double distance,
         Timestamp start
     )
@@ -20,6 +21,7 @@ public record Starter : ValueObject
         Ruleset = ruleset;
         Number = number;
         PhaseNumber = phaseNumber;
+        Gate = gate;
         Distance = distance;
         Start = start;
     }
@@ -29,6 +31,7 @@ public record Starter : ValueObject
     public CompetitionRuleset Ruleset { get; }
     public int Number { get; }
     public int PhaseNumber { get; }
+    public string Gate { get; }
     public double Distance { get; }
     public StartlistEntryState State { get; internal set; } = StartlistEntryState.Resting;
     public Timestamp Start { get; }

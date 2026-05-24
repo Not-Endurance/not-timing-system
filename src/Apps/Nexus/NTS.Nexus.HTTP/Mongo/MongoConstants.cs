@@ -11,6 +11,7 @@ public static class MongoConstants
     public const string CONFIGURE_EVENTS_COLLECTION = "configure_events";
     public const string EVENT_INFORMATION_COLLECTION = "event_informations";
     public const string OFFICIALS_COLLECTION = "event_officials";
+    public const string OPERATORS_COLLECTION = "event_operators";
     public const string PARTICIPATIONS_COLLECTION = "event_participations";
     public const string RANKINGS_COLLECTION = "event_rankings";
     public const string HANDOUTS_COLLECTION = "event_handouts";

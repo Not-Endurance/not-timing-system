@@ -8,15 +8,15 @@ namespace NTS.Nexus.Warp.Features.Witness.Authorization;
 
 internal sealed class WitnessReceiveAuthorizer : IWitnessReceiveAuthorizer
 {
-    readonly IReceiveSnapshotAccessPolicy _officialAccessService;
+    readonly IReceiveSnapshotAccessPolicy _writeAccessPolicy;
     readonly string? _requiredScope;
 
     public WitnessReceiveAuthorizer(
-        IReceiveSnapshotAccessPolicy officialAccessService,
+        IReceiveSnapshotAccessPolicy writeAccessPolicy,
         IOptions<NServerAuthenticationSettings> serverAuthenticationOptions
     )
     {
-        _officialAccessService = officialAccessService;
+        _writeAccessPolicy = writeAccessPolicy;
         _requiredScope = ResolveScopeName(serverAuthenticationOptions.Value);
     }
 
@@ -45,9 +45,9 @@ internal sealed class WitnessReceiveAuthorizer : IWitnessReceiveAuthorizer
             throw new HubException("Authenticated user email is missing.");
         }
 
-        if (!await _officialAccessService.IsOfficial(email, connectedEvent))
+        if (!await _writeAccessPolicy.CanWriteSnapshots(email, connectedEvent))
         {
-            throw new HubException("Only officials can send snapshots for this event.");
+            throw new HubException("Only authorized event staff can send snapshots for this event.");
         }
     }
 

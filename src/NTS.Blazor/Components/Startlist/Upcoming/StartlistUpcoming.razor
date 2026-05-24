@@ -4,63 +4,53 @@
 
 @inherits StartlistUpcomingBehind
 
-@if (Service.UpcomingByStage.Count != 0)
+@if (Service.Upcoming.Count != 0)
 {
-    <MudTabs PanelClass="startlist-upcoming-panel" Elevation="0" Rounded ApplyEffectsToContainer Class="@($"startlist-upcoming-tabs {Class}")">
-        @foreach (var stage in Service.UpcomingByStage)
-        {
-            <MudTabPanel Text="@($"{Stage_string} {stage.Key}")">
-                <MudTable T="Starter"
-                          Items="stage.Value"
-                          Breakpoint="Breakpoint.Xs"
-                          Dense="true"
-                          Hover="true"
-                          Elevation="0"
-                          Class="startlist-table">
+    <MudTable T="Starter"
+              Items="Service.Upcoming"
+              Breakpoint="Breakpoint.Xs"
+              Dense="true"
+              Hover="true"
+              Elevation="0"
+              Class="@($"startlist-table {Class}")">
 
-                    <ColGroup>
-                        <col class="startlist-col-number" />
-                        <col class="startlist-col-athlete" />
-                        <col class="startlist-col-start" />
-                        <col class="startlist-col-timer" />
-                    </ColGroup>
+        <ColGroup>
+            <col class="startlist-col-number" />
+            <col class="startlist-col-timer" />
+            <col class="startlist-col-athlete" />
+            <col class="startlist-col-gate" />
+        </ColGroup>
 
-                    <HeaderContent>
-                        <MudTh>@NumberAndLoopHeader</MudTh>
-                        <MudTh>@Athlete_string</MudTh>
-                        <MudTh>@Start_Time_string</MudTh>
-                        <MudTh>@Start_In_string</MudTh>
-                    </HeaderContent>
+        <HeaderContent>
+            <MudTh>@Number_string</MudTh>
+            <MudTh>@Start_In_string</MudTh>
+            <MudTh>@Athlete_string</MudTh>
+            <MudTh>@GateHeader</MudTh>
+        </HeaderContent>
 
-                    <RowTemplate>
+        <RowTemplate>
 
-                        <MudTd DataLabel="@NumberAndLoopHeader" Class="startlist-number-cell">
-                            <div class="startlist-number-block">
-                                <MudText Typo="Typo.body2">#@context.Number</MudText>
-                                <MudText Typo="Typo.caption" Class="startlist-loop-text">@FormatLoop(context)</MudText>
-                            </div>
-                        </MudTd>
+            <MudTd DataLabel="@Number_string" Class="startlist-number-cell">
+                <MudText Typo="Typo.body2">#@context.Number</MudText>
+            </MudTd>
 
-                        <MudTd DataLabel="@Athlete_string" Class="startlist-athlete-cell">
-                            <MudText Typo="Typo.caption">
-                                <span class="startlist-athlete-text" title="@FormatAthlete(context)">
-                                    @FormatAthlete(context)
-                                </span>
-                            </MudText>
-                        </MudTd>
+            <MudTd DataLabel="@Start_In_string" Class="startlist-time-cell">
+                <StartlistEntryTimer @key="GetTimerKey(context)" Entry="context" />
+            </MudTd>
 
-                        <MudTd DataLabel="@Start_Time_string" Class="startlist-time-cell">
-                            <MudText Typo="Typo.caption" Class="startlist-time-text">@context.Start</MudText>
-                        </MudTd>
+            <MudTd DataLabel="@Athlete_string" Class="startlist-athlete-cell">
+                <MudText Typo="Typo.caption">
+                    <span class="startlist-athlete-text" title="@FormatAthlete(context)">
+                        @FormatAthlete(context)
+                    </span>
+                </MudText>
+            </MudTd>
 
-                        <MudTd DataLabel="@Start_In_string" Class="startlist-time-cell">
-                            <StartlistEntryTimer @key="GetTimerKey(context)" Entry="context" />
-                        </MudTd>
+            <MudTd DataLabel="@GateHeader" Class="startlist-gate-cell">
+                <MudText Typo="Typo.caption" Class="startlist-gate-text">@context.Gate</MudText>
+            </MudTd>
 
-                    </RowTemplate>
+        </RowTemplate>
 
-                </MudTable>
-            </MudTabPanel>
-        }
-    </MudTabs>
+    </MudTable>
 }

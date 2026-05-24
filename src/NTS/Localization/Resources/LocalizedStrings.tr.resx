@@ -354,6 +354,9 @@
   <data name="Configure_Official_string" xml:space="preserve">
     <value>Resmi Görevliyi Yapılandır</value>
   </data>
+  <data name="Configure_Operator_string" xml:space="preserve">
+    <value>Operatörü Yapılandır</value>
+  </data>
   <data name="Configure_Loops_string" xml:space="preserve">
     <value>Turları Yapılandır</value>
   </data>
@@ -445,6 +448,9 @@
   <data name="Officials_string" xml:space="preserve">
     <value>Resmi Görevliler</value>
   </data>
+  <data name="Operators_string" xml:space="preserve">
+    <value>Operatörler</value>
+  </data>
   <data name="Phases_string" xml:space="preserve">
     <value>Aşamalar</value>
   </data>
@@ -456,6 +462,9 @@
   </data>
   <data name="Horse_string" xml:space="preserve">
     <value>At</value>
+  </data>
+  <data name="Operator_string" xml:space="preserve">
+    <value>Operatör</value>
   </data>
   <data name="Competition_Ruleset_string" xml:space="preserve">
     <value>Kural seti</value>
@@ -592,16 +601,10 @@
   <data name="Download_string" xml:space="preserve">
     <value />
   </data>
-  <data name="Help_string" xml:space="preserve">
-    <value />
-  </data>
   <data name="Home_string" xml:space="preserve">
     <value />
   </data>
   <data name="Login_string" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Contacts_string" xml:space="preserve">
     <value />
   </data>
   <data name="Snapshot_string" xml:space="preserve">

@@ -1,14 +1,3 @@
-.startlist-upcoming-tabs {
-    width: 100%;
-}
-
-.startlist-number-block {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    line-height: 1.1;
-}
-
 .startlist-athlete-text {
     display: block;
     overflow: hidden;
@@ -16,13 +5,13 @@
     white-space: nowrap;
 }
 
-.startlist-loop-text,
+.startlist-gate-text,
 .startlist-time-text {
     white-space: nowrap;
 }
 
-::deep .startlist-upcoming-panel {
-    padding: 0.5rem;
+::deep .startlist-table {
+    width: 100%;
 }
 
 ::deep .startlist-table .mud-table-container {
@@ -47,20 +36,23 @@
     min-width: 0;
 }
 
-::deep .startlist-col-number {
-    width: 5.5rem;
+::deep .startlist-table .startlist-gate-cell {
+    min-width: 0;
 }
 
-::deep .startlist-col-start,
+::deep .startlist-col-number {
+    width: 4.25rem;
+}
+
+::deep .startlist-col-gate {
+    width: 6.5rem;
+}
+
 ::deep .startlist-col-timer {
     width: 5.75rem;
 }
 
 @media (max-width: 599.98px) {
-    ::deep .startlist-upcoming-panel {
-        padding: 0.25rem;
-    }
-
     ::deep .startlist-table .mud-table-head .mud-table-cell,
     ::deep .startlist-table .mud-table-body .mud-table-cell {
         padding: 0.25rem 0.35rem;

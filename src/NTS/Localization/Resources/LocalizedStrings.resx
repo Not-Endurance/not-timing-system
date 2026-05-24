@@ -354,6 +354,9 @@
   <data name="Configure_Official_string" xml:space="preserve">
     <value>Configure Official</value>
   </data>
+  <data name="Configure_Operator_string" xml:space="preserve">
+    <value>Configure Operator</value>
+  </data>
   <data name="Configure_Loops_string" xml:space="preserve">
     <value>Configure Loops</value>
   </data>
@@ -444,6 +447,9 @@
   <data name="Officials_string" xml:space="preserve">
     <value>Official members</value>
   </data>
+  <data name="Operators_string" xml:space="preserve">
+    <value>Operators</value>
+  </data>
   <data name="Phases_string" xml:space="preserve">
     <value>Phases</value>
   </data>
@@ -455,6 +461,9 @@
   </data>
   <data name="Horse_string" xml:space="preserve">
     <value>Horse</value>
+  </data>
+  <data name="Operator_string" xml:space="preserve">
+    <value>Operator</value>
   </data>
   <data name="Competition_Ruleset_string" xml:space="preserve">
     <value>Ruleset</value>
@@ -630,17 +639,11 @@
   <data name="Download_string" xml:space="preserve">
     <value>Download Mobile App</value>
   </data>
-  <data name="Help_string" xml:space="preserve">
-    <value>Help</value>
-  </data>
   <data name="Home_string" xml:space="preserve">
     <value>Home</value>
   </data>
   <data name="Login_string" xml:space="preserve">
     <value>Sign in</value>
-  </data>
-  <data name="Contacts_string" xml:space="preserve">
-    <value>Emergency Contacts</value>
   </data>
   <data name="Snapshot_string" xml:space="preserve">
     <value>Snapshot</value>

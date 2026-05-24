@@ -1,0 +1,12 @@
+@using NTS.Domain.Setup.Aggregates
+@using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Operators
+@using Not.Blazor.Components.Input
+@using Not.Krud.Blazor.Components
+
+@inherits OperatorShellBehind
+
+<KrudForm Shell="this" AdditionalContent="AdditionalContent">
+    <FormFields>
+        <NAutocomplete T="User" @bind-Value="Model.User" For="() => Model.User" Label="@Username_string" SearchSafe="SearchUsersSafe" />
+    </FormFields>
+</KrudForm>
