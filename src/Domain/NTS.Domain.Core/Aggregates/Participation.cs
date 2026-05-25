@@ -71,11 +71,7 @@ public class Participation : Aggregate, IEventScoped
         {
             if (!Phases.SelectNext())
             {
-                return SnapshotResult.NotApplied(
-                    EventId,
-                    snapshot,
-                    NotAppliedDueToParticipationComplete
-                );
+                return SnapshotResult.NotApplied(EventId, snapshot, NotAppliedDueToParticipationComplete);
             }
 
             hasArriveTime = false;

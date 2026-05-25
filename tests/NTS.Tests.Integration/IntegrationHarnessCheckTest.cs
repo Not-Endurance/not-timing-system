@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Not.Application.Authentication.User;
 using NTS.Application.Contracts.Arrivelists;
-using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
@@ -112,10 +112,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         );
 
         await judge.Record(
-            IntegrationPayloadFactory.AutomaticSnapshot(
-                arrivelistParticipationNumber,
-                arrivelistStart.AddHours(2)
-            )
+            IntegrationPayloadFactory.AutomaticSnapshot(arrivelistParticipationNumber, arrivelistStart.AddHours(2))
         );
         await WaitForArrivelist(
             officialArrivelist,

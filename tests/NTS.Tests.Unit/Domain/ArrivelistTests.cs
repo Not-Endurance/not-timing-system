@@ -16,10 +16,7 @@ public sealed class ArrivelistTests
         var now = DateTimeOffset.Now;
         var onCourse = CreateParticipation(1, [CreatePhase(20, now.AddMinutes(-30), isFinal: true)]);
         var future = CreateParticipation(2, [CreatePhase(20, now.AddMinutes(30), isFinal: true)]);
-        var arrived = CreateParticipation(
-            3,
-            [CreatePhase(20, now.AddMinutes(-30), now.AddMinutes(-5), isFinal: true)]
-        );
+        var arrived = CreateParticipation(3, [CreatePhase(20, now.AddMinutes(-30), now.AddMinutes(-5), isFinal: true)]);
         var complete = CreateParticipation(
             4,
             [CreatePhase(20, now.AddMinutes(-30), now.AddMinutes(-5), now, isFinal: true)]
@@ -86,11 +83,7 @@ public sealed class ArrivelistTests
     {
         var day = DateTimeOffset.Now.AddDays(-1).Date;
         var currentStart = new DateTimeOffset(day.AddHours(10), DateTimeOffset.Now.Offset);
-        var slowestOnly = CreateParticipation(
-            1,
-            [CreatePhase(10, currentStart, isFinal: true)],
-            minAverageSpeed: 20
-        );
+        var slowestOnly = CreateParticipation(1, [CreatePhase(10, currentStart, isFinal: true)], minAverageSpeed: 20);
         var averageOnly = CreateParticipation(
             2,
             [
@@ -103,11 +96,7 @@ public sealed class ArrivelistTests
                 CreatePhase(10, currentStart, isFinal: true),
             ]
         );
-        var fastestOnly = CreateParticipation(
-            3,
-            [CreatePhase(10, currentStart, isFinal: true)],
-            maxAverageSpeed: 15
-        );
+        var fastestOnly = CreateParticipation(3, [CreatePhase(10, currentStart, isFinal: true)], maxAverageSpeed: 15);
 
         var arrivelist = new Arrivelist([fastestOnly, slowestOnly, averageOnly]);
 

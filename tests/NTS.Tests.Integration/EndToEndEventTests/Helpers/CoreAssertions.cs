@@ -106,7 +106,8 @@ internal static class CoreAssertions
 
     static IReadOnlyList<string> Flatten(IReadOnlyList<ArrivelistEntry> entries)
     {
-        return entries.Select(entry =>
+        return entries
+            .Select(entry =>
                 $"{entry.Number}:{entry.AthleteName}:{entry.HorseName}:{Format(entry.Fast)}:{Format(entry.Average)}:{Format(entry.Slow)}"
             )
             .ToArray();
