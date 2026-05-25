@@ -4,14 +4,10 @@ using NTS.Application.Contracts.Startlists;
 using NTS.Domain.Core.Objects.Startlists;
 using NTS.Domain.Helpers;
 
-namespace NTS.Blazor.Components.Startlist.Upcoming;
+namespace NTS.Blazor.Components.Startlist;
 
-public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
+public class StartlistTableBehind : NStatefulComponent
 {
-    static readonly TimeSpan TIMER_INTERVAL = TimeSpan.FromSeconds(1);
-
-    System.Timers.Timer _timer = default!;
-
     protected string GateHeader => "Gate";
 
     [Inject]
@@ -20,13 +16,6 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);
-    }
-
-    protected override void OnInitialized()
-    {
-        _timer = new(TIMER_INTERVAL);
-        _timer.Elapsed += OnElapsed;
-        _timer.Start();
     }
 
     protected string FormatAthlete(Starter entry)
@@ -39,15 +28,8 @@ public class StartlistUpcomingBehind : NStatefulComponent, IDisposable
         return $"{entry.PhaseNumber}:{entry.Number}:{entry.Start}";
     }
 
-    public override void Dispose()
+    protected void Tick()
     {
-        base.Dispose();
-        _timer.Elapsed -= OnElapsed;
-        _timer.Dispose();
-    }
-
-    void OnElapsed(object? _, System.Timers.ElapsedEventArgs __)
-    {
-        Service.Refresh();
+        Service.Tick();
     }
 }

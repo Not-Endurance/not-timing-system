@@ -1,0 +1,31 @@
+﻿@using MudBlazor
+
+@typeparam TItem
+@inherits CountdownListBehind<TItem>
+
+@if (Items.Count != 0 && RowTemplate != null)
+{
+    <div class="countdown-list-host">
+        <MudTable T="TItem"
+                  Items="Items"
+                  Breakpoint="Breakpoint.Xs"
+                  Dense="true"
+                  Hover="true"
+                  Elevation="0"
+                  Class="@CombineClass("countdown-list")">
+
+            <ColGroup>
+                @ColGroupContent
+            </ColGroup>
+
+            <HeaderContent>
+                @HeaderContent
+            </HeaderContent>
+
+            <RowTemplate Context="item">
+                @RowTemplate(item)
+            </RowTemplate>
+
+        </MudTable>
+    </div>
+}

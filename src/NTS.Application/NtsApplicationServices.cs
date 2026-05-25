@@ -8,7 +8,9 @@ using Not.Krud.Abstractions;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Contracts.PastEvents;
+using NTS.Application.Contracts.Arrivelists;
 using NTS.Application.Contracts.Startlists;
+using NTS.Application.Arrivelists;
 using NTS.Application.Core;
 using NTS.Application.PastEvents;
 using NTS.Application.Startlists;
@@ -49,6 +51,16 @@ public static class NtsApplicationServices
             _services.Add<IPastEventService, IPastEventContext, IKrudListBehind<EventInformation>, PastEventService>(
                 ServiceLifetime.Scoped
             );
+            _services.Add<
+                IArrivelistService,
+                INotificationHandler<ParticipationArrived>,
+                INotificationHandler<PhaseCompleted>,
+                INotificationHandler<ParticipationRestored>,
+                INotificationHandler<ParticipationEliminated>,
+                INotificationHandler<EventConnected>,
+                ArrivelistService
+            >(ServiceLifetime.Scoped);
+            _services.AddScoped<INotificationHandler<EventDisconnected>>(x => x.GetRequiredService<ArrivelistService>());
             _services.Add<
                 IStartUpcoming,
                 IStartHistory,

@@ -73,6 +73,7 @@ public sealed class CoreFeatureEndToEndTests
         Assert.All(phaseWaves, AssertWaveFitsThirtyMinuteWindow);
 
         var dashboard = new DashboardFeature(judge, witness, nexusApi, eventInformation);
+        await CoreAssertions.AssertArrivelistMatchesPersisted(nexusApi, witness, eventInformation.Id);
         var processedPhases = 0;
         var publishedSnapshotGroups = 0;
         foreach (var phaseWave in phaseWaves)

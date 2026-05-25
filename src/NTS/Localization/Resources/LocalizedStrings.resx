@@ -204,6 +204,9 @@
   <data name="Startlist_string" xml:space="preserve">
     <value>Startlist</value>
   </data>
+  <data name="Arrivelist_string" xml:space="preserve">
+    <value>Arrivelist</value>
+  </data>
   <data name="Ranklist_string" xml:space="preserve">
     <value>Ranklist</value>
   </data>
@@ -563,6 +566,15 @@
   </data>
   <data name="Main_menu_string" xml:space="preserve">
     <value>Main Menu</value>
+  </data>
+  <data name="Fast_string" xml:space="preserve">
+    <value>Fast</value>
+  </data>
+  <data name="Average_string" xml:space="preserve">
+    <value>Average</value>
+  </data>
+  <data name="Slow_string" xml:space="preserve">
+    <value>Slow</value>
   </data>
   <data name="Min_Speed_string" xml:space="preserve">
     <value>Min Speed</value>

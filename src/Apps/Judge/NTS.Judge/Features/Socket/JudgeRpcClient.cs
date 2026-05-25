@@ -20,6 +20,7 @@ public class JudgeRpcClient
     : RpcClient,
         IJudgeClientProcedures,
         INotificationHandler<PhaseCompleted>,
+        INotificationHandler<ParticipationArrived>,
         INotificationHandler<ParticipationEliminated>,
         INotificationHandler<ParticipationRestored>,
         IScoped
@@ -57,6 +58,12 @@ public class JudgeRpcClient
         await _hubProcedures.OnPhaseCompleted(request);
     }
 
+    public async Task Handle(ParticipationArrived arrived, CancellationToken cancellationToken)
+    {
+        var request = WarpRequest.Create(GetGroupId(), arrived);
+        await _hubProcedures.OnParticipationArrived(request);
+    }
+
     public async Task Handle(ParticipationEliminated eliminated, CancellationToken cancellationToken)
     {
         var request = WarpRequest.Create(GetGroupId(), eliminated);
@@ -86,6 +93,11 @@ public class JudgeRpcClient
         public async Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request)
         {
             await _socket.InvokeInputProcedure(nameof(OnPhaseCompleted), request);
+        }
+
+        public async Task OnParticipationArrived(WarpRequest<ParticipationArrived> request)
+        {
+            await _socket.InvokeInputProcedure(nameof(OnParticipationArrived), request);
         }
 
         public async Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request)

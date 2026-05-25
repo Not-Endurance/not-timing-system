@@ -1,20 +1,21 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
+using Not.Collections;
+using NTS.Application.Contracts.Arrivelists;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
-using NTS.Application.Contracts.Startlists;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Events;
+using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Core.Objects.Startlists;
 
-namespace NTS.Application.Startlists;
+namespace NTS.Application.Arrivelists;
 
-public class StartlistService
+public class ArrivelistService
     : NStatefulService,
-        IStartUpcoming,
-        IStartHistory,
+        IArrivelistService,
+        INotificationHandler<ParticipationArrived>,
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationRestored>,
         INotificationHandler<ParticipationEliminated>,
@@ -25,52 +26,54 @@ public class StartlistService
     readonly INtsSocketContext? _socketContext;
     UniqueParticipations _state = new();
 
-    public StartlistService(IEventScopedRepository<Participation> participations)
+    public ArrivelistService(IEventScopedRepository<Participation> participations)
         : this(participations, null) { }
 
-    public StartlistService(IEventScopedRepository<Participation> participations, INtsSocketContext? socketContext)
+    public ArrivelistService(IEventScopedRepository<Participation> participations, INtsSocketContext? socketContext)
     {
         _participations = participations;
         _socketContext = socketContext;
     }
 
-    public Startlist Startlist { get; private set; } = new([]);
-
-    public IReadOnlyList<Starter> Upcoming => Startlist.Upcoming;
-
-    public IReadOnlyList<Starter> History => Startlist.History;
-    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage => Startlist.HistoryByStage;
+    public Arrivelist Arrivelist { get; private set; } = new([]);
+    public IReadOnlyList<ArrivelistEntry> Entries => Arrivelist.Entries;
 
     protected override async Task<bool> InitializeState()
     {
         if (_socketContext?.Event == null && _socketContext != null)
         {
             _state.Clear();
-            Startlist = new Startlist([]);
+            Arrivelist = new Arrivelist([]);
             return false;
         }
 
-        var participations = await _participations.ReadMany();
+        var participations = await _participations.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
         _state = new UniqueParticipations(participations);
-        Startlist = new Startlist(_state);
-        return Startlist.History.Any() || Startlist.Upcoming.Any();
+        Arrivelist = new Arrivelist(_state);
+        return Entries.Any();
+    }
+
+    public Task Handle(ParticipationArrived notification, CancellationToken cancellationToken)
+    {
+        Update(notification.Participation, NCollectionAction.AddOrUpdate);
+        return Task.CompletedTask;
     }
 
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
-        Update(notification.Participation);
+        Update(notification.Participation, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;
     }
 
     public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
     {
-        Update(notification.Participation);
+        Update(notification.Participation, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;
     }
 
     public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
     {
-        Update(notification.Participation);
+        Update(notification.Participation, NCollectionAction.Remove);
         return Task.CompletedTask;
     }
 
@@ -82,21 +85,37 @@ public class StartlistService
     public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
     {
         _state.Clear();
-        Startlist = new Startlist([]);
+        Arrivelist = new Arrivelist([]);
         ClearState();
         return Task.CompletedTask;
     }
 
     public void Tick()
     {
-        Startlist = new Startlist(_state);
+        Arrivelist = new Arrivelist(_state);
         EmitChanged();
     }
 
-    void Update(Participation participation)
+    void Update(Participation participation, NCollectionAction action)
     {
-        _state.Upsert(participation);
-        Startlist = new Startlist(_state);
+        switch (action)
+        {
+            case NCollectionAction.AddOrUpdate:
+                if (!participation.IsComplete() && !participation.IsEliminated())
+                {
+                    _state.Upsert(participation);
+                }
+                else
+                {
+                    _state.Remove(participation);
+                }
+                break;
+            case NCollectionAction.Remove:
+                _state.Remove(participation);
+                break;
+        }
+
+        Arrivelist = new Arrivelist(_state);
         EmitChanged();
     }
 }
