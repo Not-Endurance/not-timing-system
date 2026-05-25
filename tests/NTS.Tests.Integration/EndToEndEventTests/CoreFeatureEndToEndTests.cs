@@ -144,10 +144,7 @@ public sealed class CoreFeatureEndToEndTests
             IntegrationPayloadFactory.Official(eventId, userId: null, id: idBase + 201),
             IntegrationPayloadFactory.Official(eventId, userId: null, id: idBase + 202),
         };
-        var operators = new[]
-        {
-            IntegrationPayloadFactory.Operator(eventId, userId: idBase + 250, id: idBase + 251),
-        };
+        var operators = new[] { IntegrationPayloadFactory.Operator(eventId, userId: idBase + 250, id: idBase + 251) };
         var rankings = new[]
         {
             IntegrationPayloadFactory.Ranking(eventId, participations, idBase + 301, $"Seeded {label} Ranking A"),

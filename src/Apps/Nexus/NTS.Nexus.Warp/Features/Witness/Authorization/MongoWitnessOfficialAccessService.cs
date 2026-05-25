@@ -44,11 +44,7 @@ internal sealed class MongoWitnessWriteAccessPolicy : IReceiveSnapshotAccessPoli
 
         var canWriteAsOperator = await database
             .GetCollection<OperatorModel>(OPERATORS_COLLECTION)
-            .Find(x =>
-                x.EventId == eventId
-                && x.UserId == userId.Value
-                && x.Role == OfficialRole.Steward
-            )
+            .Find(x => x.EventId == eventId && x.UserId == userId.Value && x.Role == OfficialRole.Steward)
             .AnyAsync();
         if (canWriteAsOperator)
         {
@@ -58,11 +54,7 @@ internal sealed class MongoWitnessWriteAccessPolicy : IReceiveSnapshotAccessPoli
         var allowedOfficialRoles = SnapshotAccessPolicy.AllowedOfficialRoles;
         return await database
             .GetCollection<OfficialModel>(OFFICIALS_COLLECTION)
-            .Find(x =>
-                x.EventId == eventId
-                && x.UserId == userId.Value
-                && allowedOfficialRoles.Contains(x.Role)
-            )
+            .Find(x => x.EventId == eventId && x.UserId == userId.Value && allowedOfficialRoles.Contains(x.Role))
             .AnyAsync();
     }
 

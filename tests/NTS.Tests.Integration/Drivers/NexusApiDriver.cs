@@ -110,11 +110,7 @@ internal sealed class NexusApiDriver : IDisposable
 
     public async Task<EventInformation> StartEventInformation(int configureEventId)
     {
-        var model = await Send<EventInformationModel>(
-            HttpMethod.Post,
-            $"api/event/{configureEventId}/start",
-            new { }
-        );
+        var model = await Send<EventInformationModel>(HttpMethod.Post, $"api/event/{configureEventId}/start", new { });
         return model.MapToEntity();
     }
 

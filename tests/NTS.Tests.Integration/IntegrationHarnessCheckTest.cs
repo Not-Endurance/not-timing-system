@@ -201,12 +201,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         var ineligibleOfficialUser = ToSetupUser(await api.RegisterUser(ineligibleOfficialIdentity));
         await api.RegisterUser(participantIdentity);
 
-        var setupEvent = CreateOperatorSetupEvent(
-            eventId,
-            operatorUser,
-            eligibleOfficialUser,
-            ineligibleOfficialUser
-        );
+        var setupEvent = CreateOperatorSetupEvent(eventId, operatorUser, eligibleOfficialUser, ineligibleOfficialUser);
         await api.CreateSetupConfigureEvent(setupEvent);
 
         var persistedSetup = await api.ReadSetupConfigureEvent(eventId);
@@ -266,8 +261,8 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         await operatorWitness.Publish(CreateSnapshotGroup());
         await eligibleOfficialWitness.Publish(CreateSnapshotGroup());
-        var denied = await Assert.ThrowsAnyAsync<Exception>(() =>
-            ineligibleOfficialWitness.Publish(CreateSnapshotGroup())
+        var denied = await Assert.ThrowsAnyAsync<Exception>(
+            () => ineligibleOfficialWitness.Publish(CreateSnapshotGroup())
         );
         Assert.Contains("Only authorized event staff", denied.Message);
     }
