@@ -204,6 +204,9 @@
   <data name="Startlist_string" xml:space="preserve">
     <value>Стартлист</value>
   </data>
+  <data name="Arrivelist_string" xml:space="preserve">
+    <value>Пристигащи</value>
+  </data>
   <data name="Ranklist_string" xml:space="preserve">
     <value>Класиране</value>
   </data>
@@ -563,6 +566,15 @@
   </data>
   <data name="Main_menu_string" xml:space="preserve">
     <value>Главно Меню</value>
+  </data>
+  <data name="Fast_string" xml:space="preserve">
+    <value>Бързо</value>
+  </data>
+  <data name="Average_string" xml:space="preserve">
+    <value>Средно</value>
+  </data>
+  <data name="Slow_string" xml:space="preserve">
+    <value>Бавно</value>
   </data>
   <data name="Min_Speed_string" xml:space="preserve">
     <value>Минимална Скорост</value>

@@ -204,6 +204,9 @@
   <data name="Startlist_string" xml:space="preserve">
     <value>Başlangıç listesi</value>
   </data>
+  <data name="Arrivelist_string" xml:space="preserve">
+    <value>Varış listesi</value>
+  </data>
   <data name="Ranklist_string" xml:space="preserve">
     <value>Sıralama</value>
   </data>
@@ -564,6 +567,15 @@
   </data>
   <data name="Main_menu_string" xml:space="preserve">
     <value>Ana Menü</value>
+  </data>
+  <data name="Fast_string" xml:space="preserve">
+    <value>Hızlı</value>
+  </data>
+  <data name="Average_string" xml:space="preserve">
+    <value>Ortalama</value>
+  </data>
+  <data name="Slow_string" xml:space="preserve">
+    <value>Yavaş</value>
   </data>
   <data name="Min_Speed_string" xml:space="preserve">
     <value>Minimum Hız Cezası</value>

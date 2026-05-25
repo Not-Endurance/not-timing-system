@@ -6,5 +6,5 @@ namespace NTS.Application.Contracts.Startlists;
 public interface IStartUpcoming : IStatefulService
 {
     IReadOnlyList<Starter> Upcoming { get; }
-    void Refresh();
+    void Tick();
 }

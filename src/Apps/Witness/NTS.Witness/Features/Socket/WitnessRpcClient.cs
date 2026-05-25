@@ -35,6 +35,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPu
 
     protected override void RegisterProcedures()
     {
+        RegisterInputProcedure<ParticipationArrived>(nameof(OnParticipationArrived), OnParticipationArrived);
         RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
         RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
         RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
@@ -59,6 +60,11 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPu
     }
 
     public Task OnPhaseCompleted(PhaseCompleted payload)
+    {
+        return _domainEventDispatcher.Dispatch(payload);
+    }
+
+    public Task OnParticipationArrived(ParticipationArrived payload)
     {
         return _domainEventDispatcher.Dispatch(payload);
     }

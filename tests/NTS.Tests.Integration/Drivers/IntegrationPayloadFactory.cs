@@ -26,7 +26,14 @@ internal static class IntegrationPayloadFactory
         );
     }
 
-    public static Participation ActiveParticipation(int eventId, int participationNumber, int? id = null)
+    public static Participation ActiveParticipation(
+        int eventId,
+        int participationNumber,
+        int? id = null,
+        double? minAverageSpeed = null,
+        double? maxAverageSpeed = null,
+        DateTimeOffset? startTime = null
+    )
     {
         var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
         var athleteId = id == null ? 101 : id.Value + 100;
@@ -41,8 +48,8 @@ internal static class IntegrationPayloadFactory
             horse,
             club: null,
             distance: "40",
-            minAverageSpeed: null,
-            maxAverageSpeed: null,
+            minAverageSpeed: minAverageSpeed,
+            maxAverageSpeed: maxAverageSpeed,
             id: combinationId
         );
         var competition = new Competition("CEI 1*", CompetitionRuleset.FEI);
@@ -54,7 +61,7 @@ internal static class IntegrationPayloadFactory
             ruleset: CompetitionRuleset.FEI,
             isFinal: true,
             compulsoryThresholdSpan: null,
-            startTime: new Timestamp(DateTimeOffset.UtcNow.Date.AddHours(8)),
+            startTime: new Timestamp(startTime ?? DateTimeOffset.UtcNow.Date.AddHours(8)),
             arriveTime: null,
             presentTime: null,
             representTime: null,

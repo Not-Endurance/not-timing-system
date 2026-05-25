@@ -37,7 +37,7 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
         var notProcessingWindow = TimeSpan.FromMinutes(30); // TODO settings: use settings?
         if (isComplete && snapshot.Timestamp > Current.GetOutTime() + notProcessingWindow)
         {
-            SelectNext();
+            return SnapshotResult.ActivePhaseComplete(eventId, snapshot);
         }
         return Current.Process(snapshot, eventId);
     }

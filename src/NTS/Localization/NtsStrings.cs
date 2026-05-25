@@ -32,6 +32,7 @@ namespace NTS.Localization
         public static string Clubs_string => LocalizeString(nameof(Clubs_string));
         public static string Club_string => LocalizeString(nameof(Club_string));
         public static string Startlist_string => LocalizeString(nameof(Startlist_string));
+        public static string Arrivelist_string => LocalizeString(nameof(Arrivelist_string));
         public static string Ranklist_string => LocalizeString(nameof(Ranklist_string));
         public static string Handouts_string => LocalizeString(nameof(Handouts_string));
         public static string Download_string => LocalizeString(nameof(Download_string));
@@ -223,6 +224,9 @@ namespace NTS.Localization
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
         public static string Null_or_malformed_string => LocalizeString(nameof(Null_or_malformed_string));
         public static string Main_menu_string => LocalizeString(nameof(Main_menu_string));
+        public static string Fast_string => LocalizeString(nameof(Fast_string));
+        public static string Average_string => LocalizeString(nameof(Average_string));
+        public static string Slow_string => LocalizeString(nameof(Slow_string));
         public static string Average_speed => LocalizeString(nameof(Average_speed));
         public static string Eliminated_string => LocalizeString(nameof(Eliminated_string));
         public static string Competition_ongoing_string => LocalizeString(nameof(Competition_ongoing_string));

@@ -1,7 +1,9 @@
 using Not.Application.Behinds.Adapters;
+using NTS.Application.Contracts.Arrivelists;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Startlists;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Core.Objects.Startlists;
 using NTS.Domain.Objects;
 using NTS.Tests.Integration.Drivers;
@@ -32,6 +34,29 @@ internal static class CoreAssertions
         Assert.Equal(expected.Upcoming.Select(x => x.Number), witnessUpcoming.Upcoming.Select(x => x.Number));
         Assert.Equal(Flatten(expected.HistoryByStage), Flatten(judgeHistory.HistoryByStage));
         Assert.Equal(Flatten(expected.HistoryByStage), Flatten(witnessHistory.HistoryByStage));
+    }
+
+    public static async Task AssertArrivelistMatchesPersisted(NexusApiDriver api, WitnessDriver witness, int eventId)
+    {
+        var arrivelist = witness.GetRequiredService<IArrivelistService>();
+        await arrivelist.Load();
+
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        IReadOnlyList<string> expected = [];
+        IReadOnlyList<string> actual = [];
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            expected = Flatten(new Arrivelist(await api.ReadParticipations(eventId)).Entries);
+            actual = Flatten(arrivelist.Entries);
+            if (expected.SequenceEqual(actual))
+            {
+                return;
+            }
+
+            await Task.Delay(100);
+        }
+
+        Assert.Equal(expected, actual);
     }
 
     public static void AssertPhaseMatches(Phase expected, Phase actual)
@@ -77,6 +102,20 @@ internal static class CoreAssertions
     static IReadOnlyList<string> Flatten(IReadOnlyDictionary<int, IReadOnlyList<Starter>> starters)
     {
         return starters.SelectMany(x => x.Value.Select(starter => $"{x.Key}:{starter.Number}")).ToArray();
+    }
+
+    static IReadOnlyList<string> Flatten(IReadOnlyList<ArrivelistEntry> entries)
+    {
+        return entries
+            .Select(entry =>
+                $"{entry.Number}:{entry.AthleteName}:{entry.HorseName}:{Format(entry.Fast)}:{Format(entry.Average)}:{Format(entry.Slow)}"
+            )
+            .ToArray();
+    }
+
+    static string Format(Timestamp? timestamp)
+    {
+        return timestamp?.ToDateTimeOffset().TimeOfDay.ToString("c") ?? "";
     }
 
     static async Task Reload(IStatefulService service)

@@ -9,7 +9,6 @@ namespace NTS.Domain.Core.Aggregates;
 
 public class Participation : Aggregate, IEventScoped
 {
-    //static readonly TimeSpan NOT_SNAPSHOTABLE_WINDOW = TimeSpan.FromMinutes(30);
     static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);
     static readonly FailedToQualify SPEED_RESTRICTION = new([FailToQualifyCode.SP]);
 
@@ -66,10 +65,21 @@ public class Participation : Aggregate, IEventScoped
     //TODO rename to smthing better (including ISnapshotProcessor, IManualProcessor and other mentions..)
     public SnapshotResult Process(Snapshot snapshot)
     {
+        var hasArriveTime = Phases.Current.ArriveTime != null;
         var result = Phases.Process(snapshot, EventId);
+        if (result.Type == ActivePhaseComplete)
+        {
+            if (!Phases.SelectNext())
+            {
+                return SnapshotResult.NotApplied(EventId, snapshot, NotAppliedDueToParticipationComplete);
+            }
+
+            hasArriveTime = false;
+            result = Phases.Process(snapshot, EventId);
+        }
         if (Eliminated == null && result.Type == Applied)
         {
-            EvaluatePhase(Phases.Current);
+            EvaluatePhase(Phases.Current, hasArriveTime);
         }
         return result;
     }
@@ -79,8 +89,9 @@ public class Participation : Aggregate, IEventScoped
         var phase = Phases.FirstOrDefault(x => x.Id == state.Id);
         GuardHelper.ThrowIfDefault(phase);
 
+        var hasArriveTime = phase.ArriveTime != null;
         phase.Update(state);
-        EvaluatePhase(phase);
+        EvaluatePhase(phase, hasArriveTime);
     }
 
     public void ToggleRepresentation(bool isRequested)
@@ -149,8 +160,17 @@ public class Participation : Aggregate, IEventScoped
         Raise(phaseCompleted);
     }
 
-    void EvaluatePhase(Phase phase)
+    void EvaluatePhase(Phase phase, bool hadArriveTimeBeforeProcess)
     {
+        if (
+            ReferenceEquals(phase, Phases.Current)
+            && !hadArriveTimeBeforeProcess
+            && phase.ArriveTime != null
+            && !phase.IsComplete()
+        )
+        {
+            Arrive();
+        }
         if (phase.ViolatesRecoveryTime())
         {
             Eliminate(OUT_OF_TIME);
@@ -169,7 +189,7 @@ public class Participation : Aggregate, IEventScoped
         {
             return;
         }
-        if (phase != Phases.Current)
+        if (!ReferenceEquals(phase, Phases.Current))
         {
             return;
         }
@@ -177,6 +197,11 @@ public class Participation : Aggregate, IEventScoped
         Phases.StartIfNext();
         var phaseCompleted = new PhaseCompleted(this);
         Raise(phaseCompleted);
+    }
+
+    void Arrive()
+    {
+        Raise(new ParticipationArrived(this));
     }
 
     void Eliminate(Eliminated notQualified)

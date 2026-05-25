@@ -1,4 +1,3 @@
-@using NTS.Blazor.Components.Startlist.Upcoming
 @using Not.Blazor.Components.Layout
 
 @inherits NavMenuBehind
@@ -55,6 +54,10 @@
 
             <NNavLink Endpoint="@STARTLIST_PAGE">
                 <strong>@Startlist_string</strong>
+            </NNavLink>
+
+            <NNavLink Endpoint="@ARRIVELIST_PAGE">
+                <strong>@Arrivelist_string</strong>
             </NNavLink>
 
             <NNavLink Endpoint="@PERFORMANCE_PAGE">

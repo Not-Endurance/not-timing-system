@@ -1,0 +1,60 @@
+﻿@using NTS.Domain.Core.Objects.Arrivelists
+@using NTS.Blazor.Components.CountdownList
+@using MudBlazor
+
+@inherits ArrivelistTableBehind
+
+<CountdownList TItem="ArrivelistEntry" Items="Service.Entries" Class="@Class" OnTick="Tick">
+
+    <HeaderContent>
+        <MudTh>@Number_string</MudTh>
+        <MudTh>@Fast_string</MudTh>
+        <MudTh>@Average_string</MudTh>
+        <MudTh>@Slow_string</MudTh>
+        <MudTh>@Athlete_string</MudTh>
+        <MudTh>@Horse_string</MudTh>
+    </HeaderContent>
+
+    <RowTemplate Context="entry">
+
+        <MudTd DataLabel="@Number_string">
+            <MudText Typo="Typo.body2">#@entry.Number</MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@Fast_string">
+            <MudText Typo="Typo.caption" Color="Color.Success" Class="countdown-list-nowrap">
+                @FormatEstimate(entry.Fast)
+            </MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@Average_string">
+            <MudText Typo="Typo.caption" Color="Color.Warning" Class="countdown-list-nowrap">
+                @FormatEstimate(entry.Average)
+            </MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@Slow_string">
+            <MudText Typo="Typo.caption" Color="Color.Error" Class="countdown-list-nowrap">
+                @FormatEstimate(entry.Slow)
+            </MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@Athlete_string" Class=" countdown-list-min-cell">
+            <MudText Typo="Typo.caption">
+                <span class="countdown-list-person-text">
+                    @entry.AthleteName
+                </span>
+            </MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@Horse_string" Class=" countdown-list-min-cell">
+            <MudText Typo="Typo.caption">
+                <span class="countdown-list-person-text">
+                    @entry.HorseName
+                </span>
+            </MudText>
+        </MudTd>
+
+    </RowTemplate>
+
+</CountdownList>

@@ -1,0 +1,44 @@
+﻿@using NTS.Domain.Core.Objects
+@using NTS.Domain.Core.Objects.Startlists
+@using NTS.Blazor.Components.CountdownList
+@using NTS.Blazor.Components.Startlist.Upcoming
+@using MudBlazor
+
+@inherits StartlistTableBehind
+
+<CountdownList TItem="Starter" Items="Service.Upcoming" Class="@Class" OnTick="Tick">
+
+    <HeaderContent>
+        <MudTh>@Number_string</MudTh>
+        <MudTh>@Start_In_string</MudTh>
+        <MudTh>@Athlete_string</MudTh>
+        <MudTh>@GateHeader</MudTh>
+    </HeaderContent>
+
+    <RowTemplate Context="entry">
+
+        <MudTd DataLabel="@Number_string">
+            <MudText Typo="Typo.body2">#@entry.Number</MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@Start_In_string">
+            <span class="countdown-list-nowrap">
+                <StartlistEntryTimer @key="GetTimerKey(entry)" Entry="entry" />
+            </span>
+        </MudTd>
+
+        <MudTd DataLabel="@Athlete_string" Class="countdown-list-min-cell">
+            <MudText Typo="Typo.caption">
+                <span class="countdown-list-athlete-text" title="@FormatAthlete(entry)">
+                    @FormatAthlete(entry)
+                </span>
+            </MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@GateHeader" Class="countdown-list-min-cell">
+            <MudText Typo="Typo.caption" Class="countdown-list-nowrap">@entry.Gate</MudText>
+        </MudTd>
+
+    </RowTemplate>
+
+</CountdownList>

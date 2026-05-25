@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using Not.Application.Authentication.User;
+using NTS.Application.Contracts.Arrivelists;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
@@ -49,14 +51,25 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
     {
         var eventId = 1701;
         var participationNumber = 42;
+        var arrivelistParticipationNumber = 43;
+        var arrivelistStart = DateTimeOffset.UtcNow.AddHours(-3);
         var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
         var participation = IntegrationPayloadFactory.ActiveParticipation(eventId, participationNumber);
+        var arrivelistParticipation = IntegrationPayloadFactory.ActiveParticipation(
+            eventId,
+            arrivelistParticipationNumber,
+            id: 5501,
+            minAverageSpeed: 10,
+            maxAverageSpeed: 20,
+            startTime: arrivelistStart
+        );
         using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.RegisterUser(PARTICIPANT_USER);
         await api.Create(eventInformation);
         await api.Create(participation);
+        await api.Create(arrivelistParticipation);
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id));
         var seededParticipation = await api.ReadParticipation(eventId, participation.Id);
         var seededParticipations = await api.ReadParticipations(eventId);
@@ -88,10 +101,23 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         await officialWitness.Connect(eventInformation);
         await participantWitness.Connect(eventInformation);
         await judge.Connect(eventInformation);
+        var officialArrivelist = officialWitness.GetRequiredService<IArrivelistService>();
+        await officialArrivelist.Load();
+        Assert.Contains(officialArrivelist.Entries, x => x.Number == arrivelistParticipationNumber);
+
         var judgeRepositoryParticipations = await judge.ReadParticipations();
         Assert.True(
             judgeRepositoryParticipations.Any(x => x.Combination.Number == participationNumber),
             $"Judge repository did not return participation #{participationNumber}. Count: {judgeRepositoryParticipations.Count}, repository: {judge.ParticipationRepositoryType}, http: {judge.HttpBaseUrl}."
+        );
+
+        await judge.Record(
+            IntegrationPayloadFactory.AutomaticSnapshot(arrivelistParticipationNumber, arrivelistStart.AddHours(2))
+        );
+        await WaitForArrivelist(
+            officialArrivelist,
+            entries => entries.All(x => x.Number != arrivelistParticipationNumber),
+            $"remove participation #{arrivelistParticipationNumber} after arrival"
         );
 
         await judge.Record(
@@ -138,7 +164,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         var persistedSnapshotResults = await api.ReadSnapshotResults(eventId);
 
         Assert.True(persistedParticipation.Phases.Current.IsComplete());
-        Assert.Equal(2, persistedSnapshotResults.Count);
+        Assert.Equal(3, persistedSnapshotResults.Count);
     }
 
     [Fact]
@@ -409,6 +435,30 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             user.Club,
             user.FeiId,
             user.DisplayName
+        );
+    }
+
+    static async Task WaitForArrivelist(
+        IArrivelistService arrivelist,
+        Func<IReadOnlyList<ArrivelistEntry>, bool> predicate,
+        string expectedState
+    )
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        IReadOnlyList<ArrivelistEntry> last = [];
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            last = arrivelist.Entries;
+            if (predicate(last))
+            {
+                return;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException(
+            $"Witness Arrivelist did not {expectedState}. Entries: {string.Join(", ", last.Select(x => x.Number))}."
         );
     }
 

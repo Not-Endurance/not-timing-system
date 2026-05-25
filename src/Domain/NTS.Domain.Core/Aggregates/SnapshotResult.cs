@@ -25,6 +25,11 @@ public class SnapshotResult : Aggregate, IEventScoped
     public int EventId { get; }
     public Snapshot Snapshot { get; }
     public SnapshotResultType Type { get; }
+
+    internal static SnapshotResult ActivePhaseComplete(int eventId, Snapshot snapshot)
+    {
+        return new(snapshot, SnapshotResultType.ActivePhaseComplete, eventId);
+    }
 }
 
 public enum SnapshotResultType
@@ -38,4 +43,5 @@ public enum SnapshotResultType
     NotAppliedDueToDuplicateArrive = 7,
     NotAppliedDueToDuplicateInspect = 8,
     NotAppliedDueToInapplicableAutomatic = 9,
+    ActivePhaseComplete = 10,
 }

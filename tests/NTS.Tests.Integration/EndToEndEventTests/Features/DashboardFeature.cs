@@ -71,6 +71,12 @@ internal sealed class DashboardFeature
                 group,
                 () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
             );
+            await FeatureStep.Run(
+                FEATURE,
+                $"Wave {outerWaveNumber}: assert arrivelist after arrival group",
+                group,
+                () => CoreAssertions.AssertArrivelistMatchesPersisted(_api, _witness, _eventInformation.Id)
+            );
         }
 
         var presentEntries = wave.Where(x => x.PresentTime != null).ToArray();
@@ -157,6 +163,12 @@ internal sealed class DashboardFeature
                 $"Wave {outerWaveNumber}: assert startlists after presentation group",
                 group,
                 () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
+            );
+            await FeatureStep.Run(
+                FEATURE,
+                $"Wave {outerWaveNumber}: assert arrivelist after presentation group",
+                group,
+                () => CoreAssertions.AssertArrivelistMatchesPersisted(_api, _witness, _eventInformation.Id)
             );
         }
 
