@@ -307,7 +307,7 @@ namespace NTS.Localization
             LocalizeString(nameof(File_uploaded_successfully_string));
         public static string Cannot_delete_default_image_string =>
             LocalizeString(nameof(Cannot_delete_default_image_string));
-        public static string Cascading_Delete_string => LocalizeString(nameof(Cascading_Delete_string));
+        public static string Deleting_used_record_string => LocalizeString(nameof(Deleting_used_record_string));
         public static string Cascading_delete_confirmation_prefix_string =>
             LocalizeString(nameof(Cascading_delete_confirmation_prefix_string));
         public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));

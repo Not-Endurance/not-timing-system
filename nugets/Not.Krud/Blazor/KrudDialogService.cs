@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Not.Blazor.Dialogs;
 using Not.Blazor.Helpers;
 using Not.Exceptions;
 using Not.Krud.Abstractions;
@@ -41,6 +42,13 @@ public class KrudDialogService<TModel, TShell>
             parameters,
             _options
         );
+        return !(await dialog.IsCanceled());
+    }
+
+    public async Task<bool> ShowDeleteConfirmation(string item)
+    {
+        var parameters = new DialogParameters<NDeleteDialog> { { x => x.Item, item } };
+        var dialog = await _mudDialogService.ShowAsync<NDeleteDialog>(Delete_string, parameters, _options);
         return !(await dialog.IsCanceled());
     }
 

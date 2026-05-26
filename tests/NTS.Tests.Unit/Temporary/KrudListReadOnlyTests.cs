@@ -1,12 +1,17 @@
+using Microsoft.Extensions.Localization;
+using Not.Blazor.Dialogs;
 using Not.Domain;
 using Not.Krud.Abstractions;
 using Not.Krud.Blazor.Components;
 using Not.Krud.Blazor.Components.Abstractions;
+using Not.Localization;
 
 namespace NTS.Tests.Unit.Temporary;
 
 public sealed class KrudListReadOnlyTests
 {
+    const string DeleteConfirmationFormat = "Are you sure you want to delete '{0}'?";
+
     [Fact]
     public void ReadOnly_true_short_circuits_to_view_only()
     {
@@ -57,6 +62,23 @@ public sealed class KrudListReadOnlyTests
         Assert.NotNull(list.Delete);
     }
 
+    [Fact]
+    public void Delete_dialog_message_uses_generic_delete_confirmation()
+    {
+        var localizer = new TestLocalizer();
+        LocalizationHelper.Configure(localizer);
+        try
+        {
+            var dialog = TestDeleteDialog.For("Alpha");
+
+            Assert.Equal("Are you sure you want to delete 'Alpha'?", dialog.PublicMessage);
+        }
+        finally
+        {
+            LocalizationHelper.Clear(localizer);
+        }
+    }
+
     sealed class TestKrudList : KrudListBehind<TestEntity, TestModel, TestShell>
     {
         public static TestKrudList WithReadOnlyShortcut(
@@ -93,12 +115,43 @@ public sealed class KrudListReadOnlyTests
 
     sealed class TestEntity : Entity
     {
-        public TestEntity(int? id = null)
-            : base(id) { }
+        readonly string? _name;
+
+        public TestEntity(int? id = null, string? name = null)
+            : base(id)
+        {
+            _name = name;
+        }
+
+        public TestEntity(string name)
+            : this(id: null, name: name) { }
 
         public override string ToString()
         {
-            return nameof(TestEntity);
+            return _name ?? nameof(TestEntity);
+        }
+    }
+
+    sealed class TestDeleteDialog : NDeleteDialogBehind
+    {
+        public static TestDeleteDialog For(string item)
+        {
+            return new TestDeleteDialog { Item = item };
+        }
+
+        public string PublicMessage => Message;
+    }
+
+    sealed class TestLocalizer : IStringLocalizer
+    {
+        public LocalizedString this[string name] =>
+            new(name, name == nameof(NStrings.Are_you_sure_you_want_to_delete_0_string) ? DeleteConfirmationFormat : name);
+        public LocalizedString this[string name, params object[] arguments] =>
+            new(name, string.Format(this[name].Value, arguments));
+
+        public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
+        {
+            return [];
         }
     }
 
