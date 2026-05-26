@@ -35,8 +35,10 @@ public class SnapshotService
     readonly IEventScopedRepository<Participation> _participationReader;
     readonly List<Participation> _participationsToSnapshot = [];
     readonly ISnapshotPublisher _snapshotPublisher;
+    readonly object _snapshotSelectionPersistenceLock = new();
     readonly List<Snapshot> _snapshots = [];
     readonly IWitnessUserSession _userSessionService;
+    Task _snapshotSelectionPersistence = Task.CompletedTask;
 
     public SnapshotService(
         INtsSocketContext socketContext,
@@ -63,10 +65,12 @@ public class SnapshotService
             return false;
         }
 
-        var participations = await _participationReader.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
+        var participations = (await _participationReader.ReadMany(x => !x.IsComplete() && !x.IsEliminated())).ToList();
         var session = await _userSessionService.GetCurrent();
 
         _allParticipations.Clear();
+        _participationsToSnapshot.Clear();
+        _snapshots.Clear();
         foreach (var participation in participations)
         {
             _allParticipations[participation.Combination.Number] = participation;
@@ -74,7 +78,11 @@ public class SnapshotService
 
         _history.Clear();
         _history.AddRange(session?.GetSnapshotHistory() ?? []);
-        Participations.ClearAndAddRange(participations);
+
+        var selectedNumbers = RestoreSnapshotSelections(session?.GetSnapshotSelections() ?? []);
+        Participations.ClearAndAddRange(
+            participations.Where(participation => !selectedNumbers.Contains(participation.Combination.Number))
+        );
 
         return Participations.Any() || _participationsToSnapshot.Any() || _history.Any();
     }
@@ -104,6 +112,7 @@ public class SnapshotService
             )
         );
         Participations.Remove(participation);
+        QueueSnapshotSelectionPersistence();
         EmitChanged();
     }
 
@@ -117,6 +126,7 @@ public class SnapshotService
         }
 
         FlushSnapshots([snapshot.Number]);
+        QueueSnapshotSelectionPersistence();
         EmitChanged();
     }
 
@@ -130,6 +140,7 @@ public class SnapshotService
 
         var snapshotGroup = new SnapshotGroup(readySnapshots, snapshotType);
         await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroup);
+        await DrainSnapshotSelectionPersistence();
         await _userSessionService.AppendSnapshot(snapshotGroup);
 
         _history.Add(snapshotGroup);
@@ -157,6 +168,7 @@ public class SnapshotService
         }
 
         existingSnapshot.Timestamp = timestamp;
+        QueueSnapshotSelectionPersistence();
         EmitChanged();
     }
 
@@ -247,5 +259,100 @@ public class SnapshotService
         }
 
         Participations.Update(participation, action);
+    }
+
+    HashSet<int> RestoreSnapshotSelections(IReadOnlyList<Snapshot> snapshots)
+    {
+        var selectedNumbers = new HashSet<int>();
+        foreach (var snapshot in snapshots)
+        {
+            if (
+                selectedNumbers.Contains(snapshot.Number)
+                || !_allParticipations.TryGetValue(snapshot.Number, out var participation)
+            )
+            {
+                continue;
+            }
+
+            selectedNumbers.Add(snapshot.Number);
+            _participationsToSnapshot.Add(participation);
+            _snapshots.Add(CopySnapshot(snapshot));
+        }
+
+        return selectedNumbers;
+    }
+
+    void QueueSnapshotSelectionPersistence()
+    {
+        var snapshots = _snapshots.Select(CopySnapshot).ToArray();
+
+        lock (_snapshotSelectionPersistenceLock)
+        {
+            _snapshotSelectionPersistence = PersistSnapshotSelectionsAfter(_snapshotSelectionPersistence, snapshots);
+        }
+    }
+
+    async Task PersistSnapshotSelectionsAfter(Task previous, IReadOnlyCollection<Snapshot> snapshots)
+    {
+        await Task.Yield();
+
+        try
+        {
+            await previous;
+        }
+        catch
+        {
+            // Previous selection persistence is intentionally best effort.
+        }
+
+        try
+        {
+            await _userSessionService.ReplaceSnapshotSelections(snapshots);
+        }
+        catch
+        {
+            // Snapshot selection persistence must not block witness timing flow.
+        }
+    }
+
+    async Task DrainSnapshotSelectionPersistence()
+    {
+        while (true)
+        {
+            var persistence = GetSnapshotSelectionPersistence();
+
+            try
+            {
+                await persistence;
+            }
+            catch
+            {
+                // Background persistence failures are intentionally ignored.
+            }
+
+            if (ReferenceEquals(persistence, GetSnapshotSelectionPersistence()))
+            {
+                return;
+            }
+        }
+    }
+
+    Task GetSnapshotSelectionPersistence()
+    {
+        lock (_snapshotSelectionPersistenceLock)
+        {
+            return _snapshotSelectionPersistence;
+        }
+    }
+
+    static Snapshot CopySnapshot(Snapshot snapshot)
+    {
+        return new Snapshot(
+            snapshot.Number,
+            snapshot.Name,
+            snapshot.NameEnglish,
+            snapshot.Timestamp == null ? null : Timestamp.Copy(snapshot.Timestamp),
+            snapshot.Ruleset
+        );
     }
 }

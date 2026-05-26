@@ -9,5 +9,5 @@ public class MainLayoutBehind : LayoutComponentBase
     NEnvironment Environment { get; set; } = default!;
 
     protected string LayoutWatermark =>
-        NtsClientDisplayFormatter.FormatTitle(ApplicationConstants.Apps.WITNESS, Environment);
+        NtsClientDisplayFormatter.FormatTitle(ApplicationConstants.NO_TIMING_SYSTEM, Environment);
 }
