@@ -21,6 +21,8 @@ public class SnapshotService
     : NStatefulService<ObservableList<Participation>>,
         ISnapshotService,
         INotificationHandler<PhaseCompleted>,
+        INotificationHandler<InspectionRequired>,
+        INotificationHandler<RepresentationRequired>,
         INotificationHandler<ParticipationEliminated>,
         INotificationHandler<ParticipationRestored>,
         INotificationHandler<EventConnected>,
@@ -159,6 +161,18 @@ public class SnapshotService
     }
 
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    {
+        Update(notification.Participation, NCollectionAction.AddOrUpdate);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(InspectionRequired notification, CancellationToken cancellationToken)
+    {
+        Update(notification.Participation, NCollectionAction.AddOrUpdate);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(RepresentationRequired notification, CancellationToken cancellationToken)
     {
         Update(notification.Participation, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;

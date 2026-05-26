@@ -33,6 +33,7 @@ namespace NTS.Localization
         public static string Club_string => LocalizeString(nameof(Club_string));
         public static string Startlist_string => LocalizeString(nameof(Startlist_string));
         public static string Arrivelist_string => LocalizeString(nameof(Arrivelist_string));
+        public static string Presentlist_string => LocalizeString(nameof(Presentlist_string));
         public static string Ranklist_string => LocalizeString(nameof(Ranklist_string));
         public static string Handouts_string => LocalizeString(nameof(Handouts_string));
         public static string Download_string => LocalizeString(nameof(Download_string));
@@ -194,6 +195,7 @@ namespace NTS.Localization
         public static string Rest_time_string => LocalizeString(nameof(Rest_time_string));
         public static string __cannot_be_sooner_than__string => LocalizeString(nameof(__cannot_be_sooner_than__string));
         public static string Number_string => LocalizeString(nameof(Number_string));
+        public static string Type_string => LocalizeString(nameof(Type_string));
         public static string Category_string => LocalizeString(nameof(Category_string));
         public static string FEI_ID_string => LocalizeString(nameof(FEI_ID_string));
         public static string Actions_string => LocalizeString(nameof(Actions_string));
@@ -270,6 +272,8 @@ namespace NTS.Localization
             LocalizeString(nameof(Cannot_add_completed_participations_in_startlist));
         public static string Arrive_string => LocalizeString(nameof(Arrive_string));
         public static string Represent_string => LocalizeString(nameof(Represent_string));
+        public static string RI_string => LocalizeString(nameof(RI_string));
+        public static string CRI_string => LocalizeString(nameof(CRI_string));
         public static string RI_Time_string => LocalizeString(nameof(RI_Time_string));
         public static string CRI_Time_string => LocalizeString(nameof(CRI_Time_string));
         public static string Loop_T_string => LocalizeString(nameof(Loop_T_string));
@@ -312,6 +316,8 @@ namespace NTS.Localization
         public static string File_not_found_string => LocalizeString(nameof(File_not_found_string));
         public static string Configure_events_cannot_be_deleted_string =>
             LocalizeString(nameof(Configure_events_cannot_be_deleted_string));
+        public static string Is_on_time_for_Presentation_Inspection_string =>
+            LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
     }
 }
 #pragma warning restore NA0004

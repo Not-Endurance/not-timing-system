@@ -9,10 +9,12 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Contracts.PastEvents;
 using NTS.Application.Contracts.Arrivelists;
+using NTS.Application.Contracts.Presentlists;
 using NTS.Application.Contracts.Startlists;
 using NTS.Application.Arrivelists;
 using NTS.Application.Core;
 using NTS.Application.PastEvents;
+using NTS.Application.Presentlists;
 using NTS.Application.Startlists;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
@@ -61,6 +63,19 @@ public static class NtsApplicationServices
                 ArrivelistService
             >(ServiceLifetime.Scoped);
             _services.AddScoped<INotificationHandler<EventDisconnected>>(x => x.GetRequiredService<ArrivelistService>());
+            _services.Add<
+                IPresentlistService,
+                INotificationHandler<ParticipationArrived>,
+                INotificationHandler<PhaseCompleted>,
+                INotificationHandler<InspectionRequired>,
+                INotificationHandler<RepresentationRequired>,
+                INotificationHandler<ParticipationRestored>,
+                INotificationHandler<ParticipationEliminated>,
+                INotificationHandler<VetInAcknoledged>,
+                INotificationHandler<EventConnected>,
+                INotificationHandler<EventDisconnected>,
+                PresentlistService
+            >(ServiceLifetime.Scoped);
             _services.Add<
                 IStartUpcoming,
                 IStartHistory,

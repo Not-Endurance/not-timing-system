@@ -207,6 +207,9 @@
   <data name="Arrivelist_string" xml:space="preserve">
     <value>Arrivelist</value>
   </data>
+  <data name="Presentlist_string" xml:space="preserve">
+    <value>Presentlist</value>
+  </data>
   <data name="Ranklist_string" xml:space="preserve">
     <value>Ranklist</value>
   </data>
@@ -525,6 +528,9 @@
   <data name="Number_string" xml:space="preserve">
     <value>Number</value>
   </data>
+  <data name="Type_string" xml:space="preserve">
+    <value>Type</value>
+  </data>
   <data name="Language_string" xml:space="preserve">
     <value>Language</value>
   </data>
@@ -822,6 +828,12 @@
   <data name="Represent_string" xml:space="preserve">
     <value>Represent</value>
   </data>
+  <data name="RI_string" xml:space="preserve">
+    <value>RI</value>
+  </data>
+  <data name="CRI_string" xml:space="preserve">
+    <value>CRI</value>
+  </data>
   <data name="RI_Time_string" xml:space="preserve">
     <value>RI Time</value>
   </data>
@@ -1010,5 +1022,8 @@
   </data>
   <data name="Name_in_English_string" xml:space="preserve">
     <value>Name in English</value>
+  </data>
+  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
+    <value>Is on time for Presentation/Inspection?</value>
   </data>
 </root>

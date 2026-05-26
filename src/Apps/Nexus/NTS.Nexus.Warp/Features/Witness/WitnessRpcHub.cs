@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
+using NTS.Domain.Core.Objects.Payloads;
 using NTS.Nexus.Warp.Abstractions;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
@@ -50,6 +51,13 @@ internal class WitnessRpcHub : NtsHub<IWitnessClientProcedures>, IWitnessHubProc
         }
 
         await _judgeRelay.Clients.Client(connectionId).Receive(request.Payload);
+    }
+
+    public async Task AcknoledgeVetIn(WarpRequest<VetInAcknoledged> request)
+    {
+        var eventId = GetEventId(request.EventId);
+        await _receiveAuthorizer.Authorize(Context.User, GetConnectionGroup(), eventId);
+        await Clients.Group(eventId).OnPresentationAcknoledged(request.Payload);
     }
 
     static string GetEventId(string eventId)
