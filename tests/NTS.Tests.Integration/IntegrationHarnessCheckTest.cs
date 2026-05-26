@@ -15,7 +15,6 @@ using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
 using NTS.Witness.Contracts.Features.Access;
-using NTS.Witness.Contracts.Features.Profile;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
@@ -117,10 +116,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         );
 
         await judge.Record(
-            IntegrationPayloadFactory.AutomaticSnapshot(
-                arrivelistParticipationNumber,
-                arrivelistStart.AddHours(2)
-            )
+            IntegrationPayloadFactory.AutomaticSnapshot(arrivelistParticipationNumber, arrivelistStart.AddHours(2))
         );
         await WaitForArrivelist(
             officialArrivelist,

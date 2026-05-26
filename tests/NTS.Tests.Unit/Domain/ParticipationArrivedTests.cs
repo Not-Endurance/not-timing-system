@@ -34,7 +34,12 @@ public sealed class ParticipationArrivedTests
         participation.DequeueDomainEvents();
 
         participation.Process(
-            new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(start.AddHours(1).AddMinutes(10)))
+            new Snapshot(
+                1,
+                SnapshotType.Present,
+                SnapshotMethod.Manual,
+                new Timestamp(start.AddHours(1).AddMinutes(10))
+            )
         );
 
         Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is ParticipationArrived);
@@ -76,9 +81,7 @@ public sealed class ParticipationArrivedTests
             CreatePhase(secondStart, id: 2)
         );
 
-        participation.Update(
-            new PhaseState(2, secondStart, secondStart.AddMinutes(45), null, null)
-        );
+        participation.Update(new PhaseState(2, secondStart, secondStart.AddMinutes(45), null, null));
 
         Assert.Equal(1, participation.Phases.Current.Id);
         Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is ParticipationArrived);

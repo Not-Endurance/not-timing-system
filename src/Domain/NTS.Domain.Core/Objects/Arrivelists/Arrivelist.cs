@@ -109,10 +109,6 @@ public record Arrivelist : ValueObject
 
     static List<ArrivelistEntry> OrderEntries(IEnumerable<ArrivelistEntry> entries)
     {
-        return entries
-            .OrderBy(x => x.SortEstimate == null)
-            .ThenBy(x => x.SortEstimate)
-            .ThenBy(x => x.Number)
-            .ToList();
+        return entries.OrderBy(x => x.SortEstimate == null).ThenBy(x => x.SortEstimate).ThenBy(x => x.Number).ToList();
     }
 }
