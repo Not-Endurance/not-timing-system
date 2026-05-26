@@ -100,20 +100,12 @@ public sealed class NListSearchTests
 
         public static TestNList WithPartialSearch(params TestItem[] items)
         {
-            return new TestNList
-            {
-                Items = items,
-                SearchLabel = "Search",
-            };
+            return new TestNList { Items = items, SearchLabel = "Search" };
         }
 
         public static TestNList WithoutHeightLimit(params TestItem[] items)
         {
-            return new TestNList
-            {
-                Items = items,
-                NoScroll = true,
-            };
+            return new TestNList { Items = items, NoScroll = true };
         }
 
         public static TestNList Searchable(params TestItem[] items)
@@ -122,8 +114,7 @@ public sealed class NListSearchTests
             {
                 Items = items,
                 SearchLabel = "Search",
-                SearchItem = (item, term) =>
-                    item.Name.Contains(term, StringComparison.InvariantCultureIgnoreCase),
+                SearchItem = (item, term) => item.Name.Contains(term, StringComparison.InvariantCultureIgnoreCase),
             };
         }
 
