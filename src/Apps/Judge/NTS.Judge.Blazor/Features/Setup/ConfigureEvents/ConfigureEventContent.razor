@@ -22,24 +22,19 @@
             <AdditionalContent>
                 <NGrid Spacing="8">
 
-                    <MudItem xs="6">
-                        <KrudList T="Competition" TModel="CompetitionFormModel" TShell="CompetitionShell" Name="@Competitions_string" ReadOnly="@ReadOnly" />
+                    <MudItem xs="12" md="6">
+                        <MudStack Spacing="8">
+                            <KrudList T="Competition" TModel="CompetitionFormModel" TShell="CompetitionShell" Name="@Competitions_string" ReadOnly="@ReadOnly" />
+                            <KrudList T="Operator" TModel="OperatorFormModel" TShell="OperatorShell" Name="@Operators_string" ReadOnly="@ReadOnly" />
+                            <KrudList T="Loop" TModel="LoopFormModel" TShell="LoopShell" Name="@Loops_string" ReadOnly="@ReadOnly" />
+                        </MudStack>
                     </MudItem>
 
-                    <MudItem xs="6">
-                        <KrudList T="Official" TModel="OfficialFormModel" TShell="OfficialShell" Name="@Officials_string" ReadOnly="@ReadOnly" />
-                    </MudItem>
-
-                    <MudItem xs="6">
-                        <KrudList T="Operator" TModel="OperatorFormModel" TShell="OperatorShell" Name="@Operators_string" ReadOnly="@ReadOnly" />
-                    </MudItem>
-
-                    <MudItem xs="6">
-                        <KrudList T="Combination" TModel="CombinationFormModel" TShell="CombinationShell" Name="@Combinations_string" ReadOnly="@ReadOnly" />
-                    </MudItem>
-
-                    <MudItem xs="6">
-                        <KrudList T="Loop" TModel="LoopFormModel" TShell="LoopShell" Name="@Loops_string" ReadOnly="@ReadOnly" />
+                    <MudItem xs="12" md="6">
+                        <MudStack Spacing="8">
+                            <KrudList T="Official" TModel="OfficialFormModel" TShell="OfficialShell" Name="@Officials_string" ReadOnly="@ReadOnly" />
+                            <KrudList T="Combination" TModel="CombinationFormModel" TShell="CombinationShell" Name="@Combinations_string" ReadOnly="@ReadOnly" />
+                        </MudStack>
                     </MudItem>
 
                 </NGrid>

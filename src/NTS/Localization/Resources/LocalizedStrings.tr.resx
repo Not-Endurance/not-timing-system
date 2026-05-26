@@ -727,6 +727,15 @@
   <data name="Empty_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="RI_string" xml:space="preserve">
+    <value>RI</value>
+  </data>
+  <data name="CRI_string" xml:space="preserve">
+    <value>CRI</value>
+  </data>
+  <data name="Search_string" xml:space="preserve">
+    <value>Ara</value>
+  </data>
   <data name="Resend_string" xml:space="preserve">
     <value>Yeniden gonder</value>
   </data>
@@ -748,7 +757,7 @@
   <data name="Remove_from__string" xml:space="preserve">
     <value>Şundan kaldır: {0}</value>
   </data>
-  <data name="Cascading_Delete_string" xml:space="preserve">
+  <data name="Deleting_used_record_string" xml:space="preserve">
     <value>Zincirleme Sil</value>
   </data>
   <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
@@ -811,13 +820,10 @@
   <data name="Name_in_English_string" xml:space="preserve">
     <value>İngilizce isim</value>
   </data>
-  <data name="RI_string" xml:space="preserve">
-    <value>RI</value>
-  </data>
-  <data name="CRI_string" xml:space="preserve">
-    <value>CRI</value>
-  </data>
   <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
     <value>Sunum/Muayene için zamanında mı?</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
+    <value>'{0}' öğesini silmek istediğinizden emin misiniz?</value>
   </data>
 </root>

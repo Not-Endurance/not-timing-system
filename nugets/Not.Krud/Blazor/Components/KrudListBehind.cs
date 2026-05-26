@@ -67,6 +67,9 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     public bool AllowDelete { get; set; }
 
     [Parameter]
+    public bool NoScroll { get; set; }
+
+    [Parameter]
     public RenderFragment<T>? CustomAction1 { get; set; }
 
     [Parameter]
@@ -139,9 +142,18 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
         }
         else
         {
+            if (!await KrudDialogs.ShowDeleteConfirmation(entity.ToString()))
+            {
+                return;
+            }
             await Service.Delete(entity);
         }
         _entities.Remove(entity);
+    }
+
+    protected bool SearchEntity(T entity, string term)
+    {
+        return entity.ToString().Contains(term, StringComparison.InvariantCultureIgnoreCase);
     }
 
     void SetKrudNodeValue(T entity)

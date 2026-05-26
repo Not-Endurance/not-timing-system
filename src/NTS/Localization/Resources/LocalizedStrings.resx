@@ -951,14 +951,14 @@
   <data name="Remove_from__string" xml:space="preserve">
     <value>Remove from {0}</value>
   </data>
-  <data name="Cascading_Delete_string" xml:space="preserve">
-    <value>Cascading Delete</value>
+  <data name="Deleting_used_record_string" xml:space="preserve">
+    <value>Deleting used record</value>
   </data>
   <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
     <value>This is a cascading delete operation for</value>
   </data>
   <data name="Cascading_delete_warning_string" xml:space="preserve">
-    <value>Continuing will delete the selected resource and all related resources listed below.</value>
+    <value>Continuing will delete the selected resource from the following: </value>
   </data>
   <data name="Affected_resources_string" xml:space="preserve">
     <value>Affected resources</value>
@@ -1025,5 +1025,8 @@
   </data>
   <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
     <value>Is on time for Presentation/Inspection?</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
+    <value>Are you sure you want to delete '{0}'?</value>
   </data>
 </root>

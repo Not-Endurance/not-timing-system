@@ -25,6 +25,7 @@ public static class NStrings
     public static string Time_string => LocalizeString(nameof(Time_string));
     public static string Export_string => LocalizeString(nameof(Export_string));
     public static string Print_Preview_string => LocalizeString(nameof(Print_Preview_string));
+    public static string Search_string => LocalizeString(nameof(Search_string));
     public static string Yes_string => LocalizeString(nameof(Yes_string));
     public static string Cancel_string => LocalizeString(nameof(Cancel_string));
     public static string Field_1_is_required_on_2_string => LocalizeString(nameof(Field_1_is_required_on_2_string));
@@ -32,6 +33,8 @@ public static class NStrings
     public static string Add_string => LocalizeString(nameof(Add_string));
     public static string Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string =>
         LocalizeString(nameof(Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string));
+    public static string Are_you_sure_you_want_to_delete_0_string =>
+        LocalizeString(nameof(Are_you_sure_you_want_to_delete_0_string));
     public static string Cascading_delete_confirmation_prefix_string =>
         LocalizeString(nameof(Cascading_delete_confirmation_prefix_string));
     public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));
