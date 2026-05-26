@@ -1,12 +1,12 @@
 using System.Security.Claims;
-using Not.Application.Behinds.Adapters;
 using Not.Application.Authentication.User;
+using Not.Application.Behinds.Adapters;
 using NTS.Application.Contracts.Arrivelists;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Presentlists;
+using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Core.Objects.Presentlists;
-using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
@@ -689,11 +689,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         );
     }
 
-    static bool ContainsPresentlistEntry(
-        IEnumerable<PresentlistEntry> entries,
-        int number,
-        PresentlistEntryType type
-    )
+    static bool ContainsPresentlistEntry(IEnumerable<PresentlistEntry> entries, int number, PresentlistEntryType type)
     {
         return entries.Any(x => x.Number == number && x.Type == type);
     }

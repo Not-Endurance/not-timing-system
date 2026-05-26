@@ -12,7 +12,7 @@ using NTS.Domain.Core.Objects;
 
 namespace NTS.Witness.Features.Access;
 
-public class WitnessAccessContext 
+public class WitnessAccessContext
     : NStatefulService,
         IWitnessAccessContext,
         IPresentlistAccess,
