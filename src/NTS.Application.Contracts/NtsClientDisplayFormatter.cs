@@ -12,7 +12,7 @@ public static class NtsClientDisplayFormatter
     public static string FormatTitle(string appName, string? environment)
     {
         var normalizedEnvironment = NEnvionmentNames.Normalize(environment);
-        var title = $"NTS {appName} v{ApplicationConstants.VERSION}";
+        var title = $"{appName} v{ApplicationConstants.VERSION}";
 
         return normalizedEnvironment == NEnvionmentNames.PRODUCTION ? $"{title}" : $"{title} [{normalizedEnvironment}]";
     }

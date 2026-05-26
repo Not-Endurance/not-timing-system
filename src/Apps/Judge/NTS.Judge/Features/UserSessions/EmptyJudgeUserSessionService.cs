@@ -13,6 +13,11 @@ internal class EmptyJudgeUserSessionService : IWitnessUserSession, IScoped
         return Task.CompletedTask;
     }
 
+    public Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots)
+    {
+        return Task.CompletedTask;
+    }
+
     public Task DeleteCurrent()
     {
         return Task.CompletedTask;

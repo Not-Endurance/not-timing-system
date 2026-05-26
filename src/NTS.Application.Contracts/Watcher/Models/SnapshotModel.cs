@@ -22,11 +22,11 @@ public class SnapshotModel
     public string Name { get; set; } = default!;
     public string? NameEnglish { get; set; }
     public CompetitionRuleset? Ruleset { get; set; }
-    public string? Timestamp { get; set; } = "";
+    public string? Timestamp { get; set; }
 
     public Snapshot MapToDomain()
     {
-        var timestamp = Timestamp == null ? null : new Timestamp(Timestamp);
+        var timestamp = string.IsNullOrWhiteSpace(Timestamp) ? null : new Timestamp(Timestamp);
         return new Snapshot(Number, Name, NameEnglish, timestamp, Ruleset);
     }
 

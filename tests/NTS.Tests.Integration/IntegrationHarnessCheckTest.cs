@@ -4,6 +4,7 @@ using Not.Application.Behinds.Adapters;
 using NTS.Application.Contracts.Arrivelists;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Presentlists;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Core.Objects.Presentlists;
@@ -27,6 +28,7 @@ using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participa
 using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
 using SetupUser = NTS.Domain.Setup.Aggregates.User;
 using WitnessSnapshot = NTS.Domain.Watcher.Snapshot;
+using WitnessSnapshotService = NTS.Witness.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NTS.Tests.Integration;
 
@@ -169,6 +171,106 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         Assert.True(persistedParticipation.Phases.Current.IsComplete());
         Assert.Equal(3, persistedSnapshotResults.Count);
+    }
+
+    [Fact]
+    public async Task Witness_snapshot_selections_restore_from_user_session_until_published()
+    {
+        var eventId = 1901;
+        var participationNumber = 61;
+        var timestamp = DateTimeOffset.UtcNow.Date.AddHours(11).AddMinutes(17);
+        var expectedTimestamp = new Timestamp(timestamp).ToString();
+        var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
+        var participation = IntegrationPayloadFactory.ActiveParticipation(
+            eventId,
+            participationNumber,
+            id: 5701,
+            startTime: timestamp.AddHours(-2)
+        );
+        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+
+        var officialUser = await api.RegisterUser(OFFICIAL_USER);
+        await api.Create(eventInformation);
+        await api.Create(participation);
+        await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6701));
+
+        await using var witness = new WitnessDriver(
+            _fixture.WarpBaseUrl,
+            _fixture.NexusBaseUrl,
+            OFFICIAL_USER,
+            "SnapshotSessionWitness"
+        );
+
+        await witness.Start();
+        await witness.Connect(eventInformation);
+
+        var snapshots = witness.GetRequiredService<WitnessSnapshotService>();
+        await snapshots.Load();
+        snapshots.SelectForSnapshot(snapshots.Participations.Single(x => x.Combination.Number == participationNumber));
+
+        await WaitForUserSession(
+            api,
+            OFFICIAL_USER.UserIdentifier,
+            eventId,
+            state =>
+                state.SnapshotSelections.Length == 1
+                && state.SnapshotSelections[0].Number == participationNumber
+                && state.SnapshotSelections[0].Timestamp == null,
+            "persist the selected snapshot without a timestamp"
+        );
+
+        var selectedSnapshot = snapshots.Snapshots.Single(x => x.Number == participationNumber);
+        snapshots.UpdateTimestamp(selectedSnapshot, new Timestamp(timestamp));
+
+        await WaitForUserSession(
+            api,
+            OFFICIAL_USER.UserIdentifier,
+            eventId,
+            state =>
+                state.SnapshotSelections.Length == 1
+                && state.SnapshotSelections[0].Number == participationNumber
+                && state.SnapshotSelections[0].Timestamp == expectedTimestamp,
+            "persist the captured snapshot timestamp"
+        );
+
+        await witness.Disconnect();
+
+        await using var restoredWitness = new WitnessDriver(
+            _fixture.WarpBaseUrl,
+            _fixture.NexusBaseUrl,
+            OFFICIAL_USER,
+            "SnapshotSessionRestoredWitness"
+        );
+
+        await restoredWitness.Start();
+        await restoredWitness.Connect(eventInformation);
+
+        var restoredSnapshots = restoredWitness.GetRequiredService<WitnessSnapshotService>();
+        await restoredSnapshots.Load();
+        var restoredSnapshot = restoredSnapshots.Snapshots.Single(x => x.Number == participationNumber);
+
+        Assert.Equal(expectedTimestamp, restoredSnapshot.Timestamp?.ToString());
+        Assert.DoesNotContain(restoredSnapshots.Participations, x => x.Combination.Number == participationNumber);
+        Assert.True(await restoredSnapshots.Publish(SnapshotType.Arrive));
+
+        var publishedSession = await WaitForUserSession(
+            api,
+            OFFICIAL_USER.UserIdentifier,
+            eventId,
+            state =>
+                state.SnapshotSelections.Length == 0
+                && state.SnapshotHistory.Any(group =>
+                    group.Type == SnapshotType.Arrive && group.Entries.Any(entry => entry.Number == participationNumber)
+                ),
+            "clear sent selections and append the snapshot history"
+        );
+
+        Assert.Empty(publishedSession.State!.SnapshotSelections);
+        Assert.Contains(
+            publishedSession.State.SnapshotHistory,
+            group =>
+                group.Type == SnapshotType.Arrive && group.Entries.Any(entry => entry.Number == participationNumber)
+        );
     }
 
     [Fact]
@@ -721,6 +823,52 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         throw new TimeoutException(
             $"Witness Arrivelist did not {expectedState}. Entries: {string.Join(", ", last.Select(x => x.Number))}."
         );
+    }
+
+    static async Task<NtsUserSessionModel> WaitForUserSession(
+        NexusApiDriver api,
+        string userIdentifier,
+        int eventId,
+        Func<NtsUserSessionStateModel, bool> predicate,
+        string expectedState
+    )
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        NtsUserSessionModel? last = null;
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            last = await api.ReadUserSession(userIdentifier, eventId);
+            if (last?.State != null && predicate(last.State))
+            {
+                return last;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException(
+            $"Witness user session did not {expectedState}. {FormatUserSessionState(last?.State)}"
+        );
+    }
+
+    static string FormatUserSessionState(NtsUserSessionStateModel? state)
+    {
+        if (state == null)
+        {
+            return "No session state was returned.";
+        }
+
+        var selections = string.Join(
+            ", ",
+            state.SnapshotSelections.Select(selection => $"#{selection.Number}@{selection.Timestamp ?? "<pending>"}")
+        );
+        var history = string.Join(
+            ", ",
+            state.SnapshotHistory.Select(group =>
+                $"{group.Type}: {string.Join(", ", group.Entries.Select(entry => $"#{entry.Number}"))}"
+            )
+        );
+        return $"Selections: [{selections}]. History: [{history}].";
     }
 
     static SnapshotGroup CreateSnapshotGroup()

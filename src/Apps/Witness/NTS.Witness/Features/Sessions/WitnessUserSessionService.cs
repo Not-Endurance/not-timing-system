@@ -62,6 +62,7 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
     public async Task AppendSnapshot(SnapshotGroup snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
+        var sentNumbers = snapshot.Entries.Select(entry => entry.Number).ToHashSet();
 
         var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
         if (userSession == null || _eventId == null)
@@ -83,6 +84,34 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
 
         var currentState = currentSession.State?.Copy() ?? new NtsUserSessionStateModel();
         currentState.SnapshotHistory = [.. currentState.SnapshotHistory, SnapshotGroupModel.MapFrom(snapshot)];
+        currentState.SnapshotSelections = currentState
+            .SnapshotSelections.Where(selection => !sentNumbers.Contains(selection.Number))
+            .ToArray();
+        currentSession.ReplaceState(currentState);
+        await _userSessions.Update(currentSession);
+    }
+
+    public async Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots)
+    {
+        ArgumentNullException.ThrowIfNull(snapshots);
+
+        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
+        if (userSession == null || _eventId == null)
+        {
+            return;
+        }
+
+        var currentSession = await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier, _eventId.Value);
+        var currentState = currentSession?.State?.Copy() ?? new NtsUserSessionStateModel();
+        currentState.SnapshotSelections = snapshots.Select(SnapshotModel.MapFrom).ToArray();
+
+        if (currentSession == null)
+        {
+            currentSession = CreateSession(userSession, _eventId.Value, currentState);
+            await _userSessions.Create(currentSession);
+            return;
+        }
+
         currentSession.ReplaceState(currentState);
         await _userSessions.Update(currentSession);
     }

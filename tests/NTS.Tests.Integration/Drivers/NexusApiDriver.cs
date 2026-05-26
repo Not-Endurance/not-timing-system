@@ -4,6 +4,7 @@ using Not.Application.HTTP;
 using Not.Serialization.JSON;
 using Not.Structures;
 using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
@@ -216,6 +217,15 @@ internal sealed class NexusApiDriver : IDisposable
             EventFilter("api/snapshot-results", eventId)
         );
         return models.ToArray();
+    }
+
+    public Task<NtsUserSessionModel?> ReadUserSession(string userIdentifier, int eventId)
+    {
+        var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
+        return SendNullable<NtsUserSessionModel>(
+            HttpMethod.Get,
+            $"api/user-sessions/{eventId}/by-user-identifier/{encodedUserIdentifier}"
+        );
     }
 
     public async Task<IReadOnlyList<SetupClub>> ReadSetupClubs()
