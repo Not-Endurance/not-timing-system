@@ -21,7 +21,15 @@ public sealed class PresentlistTests
         );
         var completed = CreateParticipation(
             2,
-            [CreatePhase(start: arrive.AddHours(-1), arrive: arrive, present: arrive.AddMinutes(5), rest: null, isFinal: true)]
+            [
+                CreatePhase(
+                    start: arrive.AddHours(-1),
+                    arrive: arrive,
+                    present: arrive.AddMinutes(5),
+                    rest: null,
+                    isFinal: true
+                ),
+            ]
         );
 
         var presentlist = new Presentlist([pending, completed]);

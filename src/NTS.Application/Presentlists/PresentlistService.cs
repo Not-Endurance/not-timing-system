@@ -63,7 +63,7 @@ public class PresentlistService
         }
 
         var participations = await _participations.ReadMany(x => !x.IsEliminated());
-        _state = [..participations];
+        _state = [.. participations];
         Presentlist = new Presentlist(_state);
         return Entries.Any();
     }
@@ -83,12 +83,7 @@ public class PresentlistService
                 break;
             case PresentlistEntryType.RI:
             case PresentlistEntryType.CRI:
-                var acknoledgement = new VetInAcknoledged(
-                    entry.Number,
-                    entry.PhaseId,
-                    entry.Type,
-                    entry.Time
-                );
+                var acknoledgement = new VetInAcknoledged(entry.Number, entry.PhaseId, entry.Type, entry.Time);
                 await _actionPublisher.PublishPresentationAcknoledged(acknoledgement);
                 break;
         }

@@ -15,9 +15,7 @@ public record Presentlist : ValueObject
 
     public Presentlist(IEnumerable<Participation> participations)
     {
-        var entries = new UniqueParticipations(participations)
-            .Where(x => !x.IsEliminated())
-            .SelectMany(CreateEntries);
+        var entries = new UniqueParticipations(participations).Where(x => !x.IsEliminated()).SelectMany(CreateEntries);
 
         _entries = Normalize(entries);
     }
@@ -127,11 +125,7 @@ public record Presentlist : ValueObject
 
     static List<PresentlistEntry> OrderEntries(IEnumerable<PresentlistEntry> entries)
     {
-        return entries
-            .OrderBy(x => x.Time)
-            .ThenBy(x => TypePriority(x.Type))
-            .ThenBy(x => x.Number)
-            .ToList();
+        return entries.OrderBy(x => x.Time).ThenBy(x => TypePriority(x.Type)).ThenBy(x => x.Number).ToList();
     }
 
     static Presentlist FromEntries(IEnumerable<PresentlistEntry> entries)
@@ -141,10 +135,7 @@ public record Presentlist : ValueObject
 
     static List<PresentlistEntry> Normalize(IEnumerable<PresentlistEntry> entries)
     {
-        return OrderEntries(entries)
-            .GroupBy(x => x.Number)
-            .Select(x => x.First())
-            .ToList();
+        return OrderEntries(entries).GroupBy(x => x.Number).Select(x => x.First()).ToList();
     }
 
     static int TypePriority(PresentlistEntryType type)
