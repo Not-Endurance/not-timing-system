@@ -3,8 +3,8 @@ using Not.Application.Authentication.Abstractions;
 using Not.Application.Behinds.Adapters;
 using Not.Injection;
 using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Presentlists;
 using NTS.Application.Contracts.Socket;
-using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
@@ -15,6 +15,7 @@ namespace NTS.Witness.Features.Access;
 public class WitnessAccessContext
     : NStatefulService,
         IWitnessAccessContext,
+        IPresentlistAccess,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
         IScoped
@@ -38,6 +39,7 @@ public class WitnessAccessContext
     }
 
     public WitnessAccessLevel AccessLevel { get; private set; }
+    public bool CanAcknowledgePresentations => AccessLevel == WitnessAccessLevel.Official;
 
     protected override async Task<bool> InitializeState()
     {

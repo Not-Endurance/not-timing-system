@@ -1,16 +1,20 @@
 using System.Security.Claims;
 using Not.Application.Authentication.User;
+using Not.Application.Behinds.Adapters;
 using NTS.Application.Contracts.Arrivelists;
+using NTS.Application.Contracts.Core;
+using NTS.Application.Contracts.Presentlists;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Objects.Arrivelists;
+using NTS.Domain.Core.Objects.Presentlists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
+using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
 using NTS.Witness.Contracts.Features.Access;
-using NTS.Witness.Contracts.Features.Profile;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
@@ -165,6 +169,184 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         Assert.True(persistedParticipation.Phases.Current.IsComplete());
         Assert.Equal(3, persistedSnapshotResults.Count);
+    }
+
+    [Fact]
+    public async Task Presentlist_updates_from_judge_events_and_transient_acknowledgements()
+    {
+        var eventId = 1702;
+        var presentNumber = 51;
+        var representNumber = 52;
+        var riNumber = 53;
+        var criNumber = 54;
+        var baseTime = DateTimeOffset.UtcNow.Date.AddHours(10);
+        var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
+        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+
+        var officialUser = await api.RegisterUser(OFFICIAL_USER);
+        await api.RegisterUser(PARTICIPANT_USER);
+        await api.Create(eventInformation);
+        await api.Create(
+            IntegrationPayloadFactory.ActiveParticipation(
+                eventId,
+                presentNumber,
+                id: 5601,
+                startTime: baseTime.AddHours(-1)
+            )
+        );
+        await api.Create(
+            IntegrationPayloadFactory.ActiveParticipation(
+                eventId,
+                representNumber,
+                id: 5602,
+                startTime: baseTime.AddHours(-1)
+            )
+        );
+        await api.Create(
+            IntegrationPayloadFactory.TwoPhaseParticipation(
+                eventId,
+                riNumber,
+                id: 5603,
+                startTime: baseTime.AddHours(-1)
+            )
+        );
+        await api.Create(
+            IntegrationPayloadFactory.TwoPhaseParticipation(
+                eventId,
+                criNumber,
+                id: 5604,
+                compulsoryThresholdSpan: TimeSpan.FromMinutes(10),
+                startTime: baseTime.AddHours(-1)
+            )
+        );
+        await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6601));
+
+        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var officialWitness = new WitnessDriver(
+            _fixture.WarpBaseUrl,
+            _fixture.NexusBaseUrl,
+            OFFICIAL_USER,
+            "PresentlistOfficialWitness"
+        );
+        await using var participantWitness = new WitnessDriver(
+            _fixture.WarpBaseUrl,
+            _fixture.NexusBaseUrl,
+            PARTICIPANT_USER,
+            "PresentlistParticipantWitness"
+        );
+
+        await judge.Start();
+        await officialWitness.Start();
+        await participantWitness.Start();
+
+        await officialWitness.Connect(eventInformation);
+        await participantWitness.Connect(eventInformation);
+        await judge.Connect(eventInformation);
+
+        var officialPresentlist = officialWitness.GetRequiredService<IPresentlistService>();
+        var participantPresentlist = participantWitness.GetRequiredService<IPresentlistService>();
+        await officialPresentlist.Load();
+        await participantPresentlist.Load();
+
+        Assert.True(officialPresentlist.CanAcknowledge);
+        Assert.False(participantPresentlist.CanAcknowledge);
+
+        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(presentNumber, baseTime));
+        var presentEntry = await WaitForPresentlistEntry(
+            officialPresentlist,
+            presentNumber,
+            PresentlistEntryType.Present,
+            "show a Present entry after arrival"
+        );
+        Assert.Equal(baseTime.AddMinutes(40), presentEntry.Time.ToDateTimeOffset());
+
+        await officialPresentlist.Acknowledge(presentEntry);
+        await WaitForPresentlist(
+            officialPresentlist,
+            entries => entries.All(x => x.Number != presentNumber),
+            "remove the Present entry after acknowledgement publishes a presentation snapshot"
+        );
+
+        await RecordArrivalAndPresentation(judge, representNumber, baseTime.AddMinutes(10), TimeSpan.FromMinutes(5));
+        await SelectJudgeParticipation(judge, representNumber);
+        await judge.GetRequiredService<IInspectionService>().RequestRepresent(true);
+        var representEntry = await WaitForPresentlistEntry(
+            officialPresentlist,
+            representNumber,
+            PresentlistEntryType.Represent,
+            "show a Represent entry after representation is requested"
+        );
+
+        await officialPresentlist.Acknowledge(representEntry);
+        await WaitForPresentlist(
+            officialPresentlist,
+            entries => entries.All(x => x.Number != representNumber),
+            "remove the Represent entry after acknowledgement publishes a presentation snapshot"
+        );
+
+        await RecordArrivalAndPresentation(judge, riNumber, baseTime.AddMinutes(20), TimeSpan.FromMinutes(5));
+        await SelectJudgeParticipation(judge, riNumber);
+        await judge.GetRequiredService<IInspectionService>().RequestInspection(true);
+
+        await RecordArrivalAndPresentation(judge, criNumber, baseTime.AddMinutes(30), TimeSpan.FromMinutes(20));
+
+        var officialRiEntry = await WaitForPresentlistEntry(
+            officialPresentlist,
+            riNumber,
+            PresentlistEntryType.RI,
+            "show an RI entry after required inspection is requested"
+        );
+        var officialCriEntry = await WaitForPresentlistEntry(
+            officialPresentlist,
+            criNumber,
+            PresentlistEntryType.CRI,
+            "show a CRI entry after compulsory inspection is calculated"
+        );
+        await WaitForPresentlistEntry(
+            participantPresentlist,
+            riNumber,
+            PresentlistEntryType.RI,
+            "show an RI entry on another connected Witness"
+        );
+        await WaitForPresentlistEntry(
+            participantPresentlist,
+            criNumber,
+            PresentlistEntryType.CRI,
+            "show a CRI entry on another connected Witness"
+        );
+
+        await officialPresentlist.Acknowledge(officialRiEntry);
+        await officialPresentlist.Acknowledge(officialCriEntry);
+        await WaitForPresentlist(
+            officialPresentlist,
+            entries =>
+                !ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
+                && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
+            "hide acknowledged RI/CRI entries on the acknowledging Witness"
+        );
+        await WaitForPresentlist(
+            participantPresentlist,
+            entries =>
+                !ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
+                && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
+            "hide acknowledged RI/CRI entries on another connected Witness"
+        );
+
+        await participantWitness.Disconnect();
+        await participantWitness.Connect(eventInformation);
+
+        await WaitForPresentlistEntry(
+            participantPresentlist,
+            riNumber,
+            PresentlistEntryType.RI,
+            "restore transiently acknowledged RI from persisted state after reconnect"
+        );
+        await WaitForPresentlistEntry(
+            participantPresentlist,
+            criNumber,
+            PresentlistEntryType.CRI,
+            "restore transiently acknowledged CRI from persisted state after reconnect"
+        );
     }
 
     [Fact]
@@ -436,6 +618,85 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             user.FeiId,
             user.DisplayName
         );
+    }
+
+    static async Task RecordArrivalAndPresentation(
+        JudgeDriver judge,
+        int number,
+        DateTimeOffset arrival,
+        TimeSpan recovery
+    )
+    {
+        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(number, arrival));
+        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(number, arrival.Add(recovery)));
+    }
+
+    static async Task SelectJudgeParticipation(JudgeDriver judge, int number)
+    {
+        var context = judge.GetRequiredService<IParticipationContext>();
+        if (context is NStatefulService stateful)
+        {
+            stateful.ResetHasLoaded();
+        }
+
+        await context.Load();
+        context.Selected = context.Participations.Single(x => x.Combination.Number == number);
+    }
+
+    static async Task<PresentlistEntry> WaitForPresentlistEntry(
+        IPresentlistService presentlist,
+        int number,
+        PresentlistEntryType type,
+        string expectedState
+    )
+    {
+        PresentlistEntry? entry = null;
+        await WaitForPresentlist(
+            presentlist,
+            entries =>
+            {
+                entry = entries.SingleOrDefault(x => x.Number == number && x.Type == type);
+                return entry != null;
+            },
+            expectedState
+        );
+
+        return entry!;
+    }
+
+    static async Task WaitForPresentlist(
+        IPresentlistService presentlist,
+        Func<IReadOnlyList<PresentlistEntry>, bool> predicate,
+        string expectedState
+    )
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        IReadOnlyList<PresentlistEntry> last = [];
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            await presentlist.Load();
+            last = presentlist.Entries;
+            if (predicate(last))
+            {
+                return;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException(
+            $"Witness Presentlist did not {expectedState}. Entries: {FormatPresentlistEntries(last)}."
+        );
+    }
+
+    static bool ContainsPresentlistEntry(IEnumerable<PresentlistEntry> entries, int number, PresentlistEntryType type)
+    {
+        return entries.Any(x => x.Number == number && x.Type == type);
+    }
+
+    static string FormatPresentlistEntries(IEnumerable<PresentlistEntry> entries)
+    {
+        return string.Join(", ", entries.Select(x => $"{x.Number}:{x.Type}@{x.Time}"));
     }
 
     static async Task WaitForArrivelist(

@@ -82,6 +82,74 @@ internal static class IntegrationPayloadFactory
         );
     }
 
+    public static Participation TwoPhaseParticipation(
+        int eventId,
+        int participationNumber,
+        int id,
+        TimeSpan? compulsoryThresholdSpan = null,
+        DateTimeOffset? startTime = null
+    )
+    {
+        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete("Integration Rider", "Integration Rider", country, null, null, id + 100);
+        var horse = new Horse("Integration Horse", "Integration Horse", null, id + 200);
+        var combination = new Combination(
+            participationNumber,
+            athlete,
+            horse,
+            club: null,
+            distance: "40",
+            minAverageSpeed: null,
+            maxAverageSpeed: null,
+            id: id + 300
+        );
+        var competition = new Competition("CEI 1*", CompetitionRuleset.FEI);
+        var firstPhase = new Phase(
+            gate: "GATE1/20",
+            length: 20,
+            maxRecovery: 40,
+            rest: 40,
+            ruleset: CompetitionRuleset.FEI,
+            isFinal: false,
+            compulsoryThresholdSpan: compulsoryThresholdSpan,
+            startTime: new Timestamp(startTime ?? DateTimeOffset.UtcNow.Date.AddHours(8)),
+            arriveTime: null,
+            presentTime: null,
+            representTime: null,
+            isRepresentationRequested: false,
+            isRequiredInspectionRequested: false,
+            isRequiredInspectionCompulsory: false,
+            id: id + 400
+        );
+        var finalPhase = new Phase(
+            gate: "GATE2/40",
+            length: 20,
+            maxRecovery: 40,
+            rest: null,
+            ruleset: CompetitionRuleset.FEI,
+            isFinal: true,
+            compulsoryThresholdSpan: null,
+            startTime: null,
+            arriveTime: null,
+            presentTime: null,
+            representTime: null,
+            isRepresentationRequested: false,
+            isRequiredInspectionRequested: false,
+            isRequiredInspectionCompulsory: false,
+            id: id + 401
+        );
+
+        return new Participation(
+            ParticipationCategory.Senior,
+            competition,
+            combination,
+            new PhaseCollection([firstPhase, finalPhase]),
+            notQualified: null,
+            eventId,
+            id
+        );
+    }
+
     public static Official Official(int eventId, int? userId, int? id = null)
     {
         return new Official(

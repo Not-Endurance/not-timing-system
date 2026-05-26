@@ -207,6 +207,9 @@
   <data name="Arrivelist_string" xml:space="preserve">
     <value>Varış listesi</value>
   </data>
+  <data name="Presentlist_string" xml:space="preserve">
+    <value>Sunum listesi</value>
+  </data>
   <data name="Ranklist_string" xml:space="preserve">
     <value>Sıralama</value>
   </data>
@@ -526,6 +529,9 @@
   <data name="Number_string" xml:space="preserve">
     <value>Numara</value>
   </data>
+  <data name="Type_string" xml:space="preserve">
+    <value>Tür</value>
+  </data>
   <data name="Language_string" xml:space="preserve">
     <value>Dil</value>
   </data>
@@ -804,5 +810,14 @@
   </data>
   <data name="Name_in_English_string" xml:space="preserve">
     <value>İngilizce isim</value>
+  </data>
+  <data name="RI_string" xml:space="preserve">
+    <value>RI</value>
+  </data>
+  <data name="CRI_string" xml:space="preserve">
+    <value>CRI</value>
+  </data>
+  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
+    <value>Sunum/Muayene için zamanında mı?</value>
   </data>
 </root>

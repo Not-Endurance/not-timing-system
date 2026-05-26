@@ -87,6 +87,11 @@ internal sealed class WitnessDriver : IAsyncDisposable
         }
     }
 
+    public Task Disconnect()
+    {
+        return _socketService.IsConnected ? _socketService.Disconnect() : Task.CompletedTask;
+    }
+
     public async Task<Participation> WaitForParticipation(
         int participationNumber,
         Func<Participation, bool> predicate,

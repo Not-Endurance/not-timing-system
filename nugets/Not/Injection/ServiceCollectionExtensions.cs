@@ -188,4 +188,172 @@ public static class ServiceCollectionExtensions
             .Add<TInterface5, TImplementation>(lifetime)
             .Add<TInterface6, TImplementation>(lifetime);
     }
+
+    public static IServiceCollection Add<
+        TInterface1,
+        TInterface2,
+        TInterface3,
+        TInterface4,
+        TInterface5,
+        TInterface6,
+        TInterface7,
+        TImplementation
+    >(this IServiceCollection services, ServiceLifetime lifetime)
+        where TImplementation : class,
+            TInterface1,
+            TInterface2,
+            TInterface3,
+            TInterface4,
+            TInterface5,
+            TInterface6,
+            TInterface7
+        where TInterface1 : class
+        where TInterface2 : class
+        where TInterface3 : class
+        where TInterface4 : class
+        where TInterface5 : class
+        where TInterface6 : class
+        where TInterface7 : class
+    {
+        return services
+            .Add<TInterface1, TImplementation>(lifetime)
+            .Add<TInterface2, TImplementation>(lifetime)
+            .Add<TInterface3, TImplementation>(lifetime)
+            .Add<TInterface4, TImplementation>(lifetime)
+            .Add<TInterface5, TImplementation>(lifetime)
+            .Add<TInterface6, TImplementation>(lifetime)
+            .Add<TInterface7, TImplementation>(lifetime);
+    }
+
+    public static IServiceCollection Add<
+        TInterface1,
+        TInterface2,
+        TInterface3,
+        TInterface4,
+        TInterface5,
+        TInterface6,
+        TInterface7,
+        TInterface8,
+        TImplementation
+    >(this IServiceCollection services, ServiceLifetime lifetime)
+        where TImplementation : class,
+            TInterface1,
+            TInterface2,
+            TInterface3,
+            TInterface4,
+            TInterface5,
+            TInterface6,
+            TInterface7,
+            TInterface8
+        where TInterface1 : class
+        where TInterface2 : class
+        where TInterface3 : class
+        where TInterface4 : class
+        where TInterface5 : class
+        where TInterface6 : class
+        where TInterface7 : class
+        where TInterface8 : class
+    {
+        return services
+            .Add<TInterface1, TImplementation>(lifetime)
+            .Add<TInterface2, TImplementation>(lifetime)
+            .Add<TInterface3, TImplementation>(lifetime)
+            .Add<TInterface4, TImplementation>(lifetime)
+            .Add<TInterface5, TImplementation>(lifetime)
+            .Add<TInterface6, TImplementation>(lifetime)
+            .Add<TInterface7, TImplementation>(lifetime)
+            .Add<TInterface8, TImplementation>(lifetime);
+    }
+
+    public static IServiceCollection Add<
+        TInterface1,
+        TInterface2,
+        TInterface3,
+        TInterface4,
+        TInterface5,
+        TInterface6,
+        TInterface7,
+        TInterface8,
+        TInterface9,
+        TImplementation
+    >(this IServiceCollection services, ServiceLifetime lifetime)
+        where TImplementation : class,
+            TInterface1,
+            TInterface2,
+            TInterface3,
+            TInterface4,
+            TInterface5,
+            TInterface6,
+            TInterface7,
+            TInterface8,
+            TInterface9
+        where TInterface1 : class
+        where TInterface2 : class
+        where TInterface3 : class
+        where TInterface4 : class
+        where TInterface5 : class
+        where TInterface6 : class
+        where TInterface7 : class
+        where TInterface8 : class
+        where TInterface9 : class
+    {
+        return services
+            .Add<TInterface1, TImplementation>(lifetime)
+            .Add<TInterface2, TImplementation>(lifetime)
+            .Add<TInterface3, TImplementation>(lifetime)
+            .Add<TInterface4, TImplementation>(lifetime)
+            .Add<TInterface5, TImplementation>(lifetime)
+            .Add<TInterface6, TImplementation>(lifetime)
+            .Add<TInterface7, TImplementation>(lifetime)
+            .Add<TInterface8, TImplementation>(lifetime)
+            .Add<TInterface9, TImplementation>(lifetime);
+    }
+
+    public static IServiceCollection Add<
+        TInterface1,
+        TInterface2,
+        TInterface3,
+        TInterface4,
+        TInterface5,
+        TInterface6,
+        TInterface7,
+        TInterface8,
+        TInterface9,
+        TInterface10,
+        TImplementation
+    >(this IServiceCollection services, ServiceLifetime lifetime)
+        where TImplementation : class,
+            TInterface1,
+            TInterface2,
+            TInterface3,
+            TInterface4,
+            TInterface5,
+            TInterface6,
+            TInterface7,
+            TInterface8,
+            TInterface9,
+            TInterface10
+        where TInterface1 : class
+        where TInterface2 : class
+        where TInterface3 : class
+        where TInterface4 : class
+        where TInterface5 : class
+        where TInterface6 : class
+        where TInterface7 : class
+        where TInterface8 : class
+        where TInterface9 : class
+        where TInterface10 : class
+    {
+        return services
+            .Add<TInterface1, TImplementation>(lifetime)
+            .Add<TInterface2, TImplementation>(lifetime)
+            .Add<TInterface3, TImplementation>(lifetime)
+            .Add<TInterface4, TImplementation>(lifetime)
+            .Add<TInterface5, TImplementation>(lifetime)
+            .Add<TInterface6, TImplementation>(lifetime)
+            .Add<TInterface7, TImplementation>(lifetime)
+            .Add<TInterface8, TImplementation>(lifetime)
+            .Add<TInterface9, TImplementation>(lifetime)
+            .Add<TInterface10, TImplementation>(lifetime);
+    }
 }

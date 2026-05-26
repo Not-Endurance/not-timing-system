@@ -98,7 +98,12 @@ public class Participation : Aggregate, IEventScoped
     {
         if (isRequested)
         {
+            var wasRequested = Phases.Current.IsReinspectionRequested;
             Phases.Current.RequireRepresentation();
+            if (!wasRequested && Phases.Current.IsReinspectionRequested)
+            {
+                RequireRepresentation();
+            }
         }
         else
         {
@@ -110,7 +115,12 @@ public class Participation : Aggregate, IEventScoped
     {
         if (isRequested)
         {
+            var wasRequested = Phases.Current.IsRequiredInspectionRequested;
             Phases.Current.RequestInspection();
+            if (!wasRequested && Phases.Current.IsRequiredInspectionRequested)
+            {
+                RequireInspection();
+            }
         }
         else
         {
@@ -209,5 +219,15 @@ public class Participation : Aggregate, IEventScoped
         Eliminated = notQualified;
         var qualificationRevoked = new ParticipationEliminated(this);
         Raise(qualificationRevoked);
+    }
+
+    void RequireRepresentation()
+    {
+        Raise(new RepresentationRequired(this));
+    }
+
+    void RequireInspection()
+    {
+        Raise(new InspectionRequired(this));
     }
 }

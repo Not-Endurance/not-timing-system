@@ -207,6 +207,9 @@
   <data name="Arrivelist_string" xml:space="preserve">
     <value>Пристигащи</value>
   </data>
+  <data name="Presentlist_string" xml:space="preserve">
+    <value>Инспекции</value>
+  </data>
   <data name="Ranklist_string" xml:space="preserve">
     <value>Класиране</value>
   </data>
@@ -525,6 +528,9 @@
   <data name="Number_string" xml:space="preserve">
     <value>Номер</value>
   </data>
+  <data name="Type_string" xml:space="preserve">
+    <value>Тип</value>
+  </data>
   <data name="Language_string" xml:space="preserve">
     <value>Език</value>
   </data>
@@ -819,6 +825,12 @@
   <data name="Represent_string" xml:space="preserve">
     <value>Реинспекция</value>
   </data>
+  <data name="RI_string" xml:space="preserve">
+    <value>RI</value>
+  </data>
+  <data name="CRI_string" xml:space="preserve">
+    <value>CRI</value>
+  </data>
   <data name="RI_Time_string" xml:space="preserve">
     <value>RI време</value>
   </data>
@@ -1005,10 +1017,13 @@
   <data name="Athlete_FEI_ID_must_be_numeric_value_string" xml:space="preserve">
     <value>ФЕИ ID за Атлети трябва да бъде число</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Name_in_English_string" xml:space="preserve">
     <value>Име на английски</value>
+  </data>
+  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
+    <value>Навреме ли е за презентация/инспекция?</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

@@ -65,6 +65,16 @@ internal class JudgeRpcHub : NtsHub<IJudgeClientProcedures>, IJudgeHubProcedures
         await _witnessRelay.Clients.Group(request.EventId).OnParticipationArrived(request.Payload);
     }
 
+    public async Task OnInspectionRequired(WarpRequest<InspectionRequired> request)
+    {
+        await _witnessRelay.Clients.Group(request.EventId).OnInspectionRequired(request.Payload);
+    }
+
+    public async Task OnRepresentationRequired(WarpRequest<RepresentationRequired> request)
+    {
+        await _witnessRelay.Clients.Group(request.EventId).OnRepresentationRequired(request.Payload);
+    }
+
     public async Task OnParticipationRestored(WarpRequest<ParticipationRestored> request)
     {
         await _witnessRelay.Clients.Group(request.EventId).OnParticipationRestored(request.Payload);
