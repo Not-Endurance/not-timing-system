@@ -26,10 +26,7 @@ public sealed class NtsUserSessionStateModelTests
             SnapshotHistory =
             [
                 SnapshotGroupModel.MapFrom(
-                    new SnapshotGroup(
-                        [new Snapshot(7, "Sent Rider", "Sent Rider", sentTimestamp)],
-                        SnapshotType.Arrive
-                    )
+                    new SnapshotGroup([new Snapshot(7, "Sent Rider", "Sent Rider", sentTimestamp)], SnapshotType.Arrive)
                 ),
             ],
         };

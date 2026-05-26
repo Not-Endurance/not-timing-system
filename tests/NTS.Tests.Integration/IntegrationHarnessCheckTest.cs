@@ -206,9 +206,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         var snapshots = witness.GetRequiredService<WitnessSnapshotService>();
         await snapshots.Load();
-        snapshots.SelectForSnapshot(
-            snapshots.Participations.Single(x => x.Combination.Number == participationNumber)
-        );
+        snapshots.SelectForSnapshot(snapshots.Participations.Single(x => x.Combination.Number == participationNumber));
 
         await WaitForUserSession(
             api,
@@ -252,10 +250,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         var restoredSnapshot = restoredSnapshots.Snapshots.Single(x => x.Number == participationNumber);
 
         Assert.Equal(expectedTimestamp, restoredSnapshot.Timestamp?.ToString());
-        Assert.DoesNotContain(
-            restoredSnapshots.Participations,
-            x => x.Combination.Number == participationNumber
-        );
+        Assert.DoesNotContain(restoredSnapshots.Participations, x => x.Combination.Number == participationNumber);
         Assert.True(await restoredSnapshots.Publish(SnapshotType.Arrive));
 
         var publishedSession = await WaitForUserSession(
@@ -265,8 +260,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             state =>
                 state.SnapshotSelections.Length == 0
                 && state.SnapshotHistory.Any(group =>
-                    group.Type == SnapshotType.Arrive
-                    && group.Entries.Any(entry => entry.Number == participationNumber)
+                    group.Type == SnapshotType.Arrive && group.Entries.Any(entry => entry.Number == participationNumber)
                 ),
             "clear sent selections and append the snapshot history"
         );
@@ -275,8 +269,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.Contains(
             publishedSession.State.SnapshotHistory,
             group =>
-                group.Type == SnapshotType.Arrive
-                && group.Entries.Any(entry => entry.Number == participationNumber)
+                group.Type == SnapshotType.Arrive && group.Entries.Any(entry => entry.Number == participationNumber)
         );
     }
 
