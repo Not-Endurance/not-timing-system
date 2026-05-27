@@ -1,6 +1,8 @@
 ﻿@using NTS.Judge.Blazor.Features.Core.Handouts.Documents
 @using NTS.Judge.Blazor.Features.Core.Handouts.Form
+@using Not.Blazor.Components.Input
 @using Not.Blazor.Components.Layout
+@using NTS.Application.Contracts.Pdf
 
 @attribute [Route(HANDOUTS_PAGE)]
 @inherits HandoutsPageBehind
@@ -14,7 +16,19 @@
     <Rightbar>
         <NDivider Text="@Export_string" />
 
-        <NotButtonPrint Text="@Print_Preview_string" OnClick="OpenPrintPreview" />
+        <MudStack Spacing="2">
+            <NSelect T="PdfPaperFormat"
+                     @bind-Value="PaperFormat"
+                     Label="@Page_format_string" />
+
+            <NSelect T="PdfOrientation"
+                     @bind-Value="Orientation"
+                     Label="@Orientation_string" />
+
+            <NotButtonPrint Text="@Print_string"
+                            OnClick="PrintHandouts"
+                            Disabled="@(!CanPrint)" />
+        </MudStack>
 
         <NDivider Text="@Manual_handout_strings" Class="mt-4" />
 

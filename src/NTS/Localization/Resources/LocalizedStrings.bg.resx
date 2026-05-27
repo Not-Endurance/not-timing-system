@@ -216,6 +216,27 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Разпечатки</value>
   </data>
+  <data name="Download_results_string" xml:space="preserve">
+    <value>Свали резултати</value>
+  </data>
+  <data name="Page_format_string" xml:space="preserve">
+    <value>Формат</value>
+  </data>
+  <data name="Orientation_string" xml:space="preserve">
+    <value>Ориентация</value>
+  </data>
+  <data name="Landscape_string" xml:space="preserve">
+    <value>Пейзажна</value>
+  </data>
+  <data name="Portrait_string" xml:space="preserve">
+    <value>Портретна</value>
+  </data>
+  <data name="Action_string" xml:space="preserve">
+    <value>Действие</value>
+  </data>
+  <data name="Generating_PDF_string" xml:space="preserve">
+    <value>Генериране на PDF</value>
+  </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Причина за отпадане</value>
   </data>

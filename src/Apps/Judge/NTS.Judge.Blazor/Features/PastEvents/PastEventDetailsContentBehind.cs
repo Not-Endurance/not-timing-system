@@ -1,8 +1,10 @@
 using MudBlazor;
 using Not.Blazor.Browser;
 using Not.Blazor.Components.Abstractions;
+using NTS.Application.Contracts.Pdf;
 using NTS.Application.Contracts.PastEvents;
 using NTS.Blazor.Components.PastEvents;
+using NTS.Judge.Blazor.Features.Print;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Blazor.Features.PastEvents;
@@ -21,9 +23,21 @@ public class PastEventDetailsContentBehind : NStatefulComponent
     [Inject]
     protected IFileDownloadService FileDownloadService { get; set; } = default!;
 
+    [Inject]
+    protected IJudgePdfClient PdfClient { get; set; } = default!;
+
+    [Inject]
+    protected IJudgePdfBrowserService PdfBrowser { get; set; } = default!;
+
     protected bool IsEmpty => Service.Event == null || Service.Document == null;
     protected bool HasStartlist => Service.StartlistHistoryByStage.Count != 0;
     protected bool HasFeiExportConfigured => Service.Rankings.Any(IsFeiExportConfigured);
+    protected bool CanRunResultAction => Service.Event != null && Service.CurrentRanking != null;
+    protected PdfResultAction ResultAction { get; set; } = PdfResultAction.Print;
+    protected string ResultActionText =>
+        ResultAction == PdfResultAction.Print ? Print_string : Download_results_string;
+    protected string ResultActionIcon =>
+        ResultAction == PdfResultAction.Print ? Icons.Material.Outlined.Print : Icons.Material.Filled.Download;
 
     [Parameter]
     public int EventId { get; set; }
@@ -82,6 +96,39 @@ public class PastEventDetailsContentBehind : NStatefulComponent
 
             var document = FeiExportService.Create(Service.Event, Service.Rankings);
             await FileDownloadService.DownloadText(document.FileName, document.Content, document.ContentType);
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    protected async Task RunResultAction()
+    {
+        try
+        {
+            if (Service.Event == null || Service.CurrentRanking == null)
+            {
+                return;
+            }
+
+            if (ResultAction == PdfResultAction.Print)
+            {
+                var file = await PdfClient.CreatePdf(
+                    new PdfDocumentRequest
+                    {
+                        Type = PdfDocumentType.Ranklist,
+                        EventId = Service.Event.Id,
+                        RankingId = Service.CurrentRanking.Id,
+                        FontScale = 0.8m,
+                    }
+                );
+                await PdfBrowser.PrintPdf(file);
+                return;
+            }
+
+            var zip = await PdfClient.CreateResultsZip(new PdfResultsZipRequest { EventId = Service.Event.Id });
+            await PdfBrowser.Download(zip);
         }
         catch (Exception ex)
         {

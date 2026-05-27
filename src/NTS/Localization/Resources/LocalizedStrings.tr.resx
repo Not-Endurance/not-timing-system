@@ -216,6 +216,27 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Dokümanlar</value>
   </data>
+  <data name="Download_results_string" xml:space="preserve">
+    <value>Sonuçları indir</value>
+  </data>
+  <data name="Page_format_string" xml:space="preserve">
+    <value>Sayfa formatı</value>
+  </data>
+  <data name="Orientation_string" xml:space="preserve">
+    <value>Yönlendirme</value>
+  </data>
+  <data name="Landscape_string" xml:space="preserve">
+    <value>Yatay</value>
+  </data>
+  <data name="Portrait_string" xml:space="preserve">
+    <value>Dikey</value>
+  </data>
+  <data name="Action_string" xml:space="preserve">
+    <value>Eylem</value>
+  </data>
+  <data name="Generating_PDF_string" xml:space="preserve">
+    <value>PDF oluşturuluyor</value>
+  </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Elenme Nedeni</value>
   </data>

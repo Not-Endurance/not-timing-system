@@ -216,6 +216,27 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Handouts</value>
   </data>
+  <data name="Download_results_string" xml:space="preserve">
+    <value>Download results</value>
+  </data>
+  <data name="Page_format_string" xml:space="preserve">
+    <value>Page format</value>
+  </data>
+  <data name="Orientation_string" xml:space="preserve">
+    <value>Orientation</value>
+  </data>
+  <data name="Landscape_string" xml:space="preserve">
+    <value>Landscape</value>
+  </data>
+  <data name="Portrait_string" xml:space="preserve">
+    <value>Portrait</value>
+  </data>
+  <data name="Action_string" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="Generating_PDF_string" xml:space="preserve">
+    <value>Generating PDF</value>
+  </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Failed to Qualify Reason</value>
   </data>

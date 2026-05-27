@@ -2,11 +2,13 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Dialogs;
 using Not.Blazor.Helpers;
+using NTS.Application.Contracts.Pdf;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
+using NTS.Judge.Blazor.Features.Print;
 using NTS.Judge.Blazor.Layout.Drawer.Deactivate;
 using NTS.Judge.Contracts.Features.Core;
 using NTS.Judge.Contracts.Features.Core.Rankings;
@@ -14,9 +16,8 @@ using static NTS.Judge.Blazor.Routes;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings;
 
-public class RankingsContentBehind : PrintableComponent
+public class RankingsContentBehind : NStatefulComponent
 {
-    TaskCompletionSource<bool>? _renderCompletionSource;
     bool _isDeactivatingEvent;
 
     [Inject]
@@ -35,18 +36,28 @@ public class RankingsContentBehind : PrintableComponent
     NavigationManager NavigationManager { get; set; } = default!;
 
     [Inject]
+    IJudgePdfClient PdfClient { get; set; } = default!;
+
+    [Inject]
+    IJudgePdfBrowserService PdfBrowser { get; set; } = default!;
+
+    [Inject]
     protected IRankingMenuService RankingService { get; set; } = default!;
-
-    protected bool CompactParticipationTables { get; private set; }
-
-    protected ProtocolDocument? Document { get; private set; }
 
     [Inject]
     protected IProtocolLogoState HeaderLogo { get; set; } = default!;
 
+    protected ProtocolDocument? Document { get; private set; }
+    protected PdfResultAction ResultAction { get; set; } = PdfResultAction.Print;
+
     //public bool HasContent => RankingService.Ranklist != null;
     protected bool HasActiveEvent => SocketService.Event != null;
     protected bool IsDeactivatingEvent => _isDeactivatingEvent;
+    protected bool CanRunResultAction => HasActiveEvent && RankingService.Rankings.Any();
+    protected string ResultActionText =>
+        ResultAction == PdfResultAction.Print ? Print_string : Download_results_string;
+    protected string ResultActionIcon =>
+        ResultAction == PdfResultAction.Print ? Icons.Material.Outlined.Print : Icons.Material.Filled.Download;
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,8 +67,9 @@ public class RankingsContentBehind : PrintableComponent
 
     protected override void OnBeforeRender()
     {
-        if (_isDeactivatingEvent)
+        if (_isDeactivatingEvent || !RankingService.Rankings.Any())
         {
+            Document = null;
             return;
         }
 
@@ -164,36 +176,36 @@ public class RankingsContentBehind : PrintableComponent
         }
     }
 
-    protected async Task Print()
+    protected async Task RunResultAction()
     {
         try
         {
-            CompactParticipationTables = true;
-            await WaitForRender();
-            await OpenPrintDialog();
+            if (!CanRunResultAction || SocketService.Event == null)
+            {
+                return;
+            }
+
+            if (ResultAction == PdfResultAction.Print)
+            {
+                var file = await PdfClient.CreatePdf(
+                    new PdfDocumentRequest
+                    {
+                        Type = PdfDocumentType.Ranklist,
+                        EventId = SocketService.Event.Id,
+                        RankingId = RankingService.Current.Id,
+                        FontScale = 0.8m,
+                    }
+                );
+                await PdfBrowser.PrintPdf(file);
+                return;
+            }
+
+            var zip = await PdfClient.CreateResultsZip(new PdfResultsZipRequest { EventId = SocketService.Event.Id });
+            await PdfBrowser.Download(zip);
         }
         catch (Exception ex)
         {
             Handle(ex);
         }
-        finally
-        {
-            CompactParticipationTables = false;
-            await WaitForRender();
-        }
-    }
-
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        _renderCompletionSource?.TrySetResult(true);
-        _renderCompletionSource = null;
-        return Task.CompletedTask;
-    }
-
-    async Task WaitForRender()
-    {
-        _renderCompletionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        await InvokeRender();
-        await _renderCompletionSource.Task;
     }
 }

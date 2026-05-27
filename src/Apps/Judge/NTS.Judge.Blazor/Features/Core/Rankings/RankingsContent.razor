@@ -1,6 +1,8 @@
 ﻿@using NTS.Blazor.Components.Rankings.Menu
 @using NTS.Blazor.Components.Rankings.Protocols
+@using Not.Blazor.Components.Input
 @using Not.Blazor.Components.Layout
+@using NTS.Application.Contracts.Pdf
 
 @attribute [Route(RANKLIST_PAGE)]
 @inherits RankingsContentBehind
@@ -9,7 +11,7 @@
 
     <Main>
         <Protocol Document="Document"
-                  Compact="CompactParticipationTables"
+                  Compact="false"
                   LeftLogo="@HeaderLogo.Left"
                   RightLogo="@HeaderLogo.Right"
                   LogoClicked="OpenImageBrowser" />
@@ -17,7 +19,17 @@
 
     <Rightbar>
         <MudStack Row Wrap="Wrap.Wrap">
-            <NotButtonPrint OnClick="Print" />
+            <MudStack Row AlignItems="AlignItems.Center">
+                <NSelect T="PdfResultAction"
+                         @bind-Value="ResultAction"
+                         Label="@Action_string"
+                         Style="min-width:180px" />
+
+                <NButtonSecondary OnClick="RunResultAction"
+                                  Text="@ResultActionText"
+                                  StartIcon="@ResultActionIcon"
+                                  Disabled="@(!CanRunResultAction)" />
+            </MudStack>
 
             <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
 

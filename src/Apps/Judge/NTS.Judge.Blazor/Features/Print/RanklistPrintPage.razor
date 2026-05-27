@@ -1,0 +1,22 @@
+@using NTS.Blazor.Components.Rankings.Protocols
+@using NTS.Application.Contracts.Pdf
+@using NTS.Judge.Blazor.Layout
+@layout PrintLayout
+@attribute [Route(PRINT_RANKLIST_PAGE)]
+@inherits RanklistPrintPageBehind
+
+@if (ErrorMessage != null)
+{
+    <div data-print-error>@ErrorMessage</div>
+}
+else if (IsReady)
+{
+    <div data-print-ready="true">
+        <PrintDocumentStyles PaperFormat="PdfPaperFormat.A4"
+                             Orientation="PdfOrientation.Portrait"
+                             FontScale="FontScale" />
+        <div class="print-document print-document-ranklist">
+            <Protocol Document="Document" Compact="true" />
+        </div>
+    </div>
+}

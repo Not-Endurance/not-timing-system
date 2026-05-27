@@ -1,4 +1,6 @@
 ﻿@using Not.Blazor.Components.Layout
+@using Not.Blazor.Components.Input
+@using NTS.Application.Contracts.Pdf
 @using NTS.Blazor.Components.Rankings.Menu
 @using NTS.Blazor.Components.Rankings.Protocols
 
@@ -12,6 +14,18 @@
 
     <Rightbar>
         <MudStack Spacing="3">
+            <MudStack Row AlignItems="AlignItems.Center">
+                <NSelect T="PdfResultAction"
+                         @bind-Value="ResultAction"
+                         Label="@Action_string"
+                         Style="min-width:180px" />
+
+                <NButtonSecondary OnClick="RunResultAction"
+                                  Text="@ResultActionText"
+                                  StartIcon="@ResultActionIcon"
+                                  Disabled="@(!CanRunResultAction)" />
+            </MudStack>
+
             <NButtonSecondary OnClick="OpenStartlist"
                               Text="@Startlist_string"
                               StartIcon="@Icons.Material.Filled.List"
