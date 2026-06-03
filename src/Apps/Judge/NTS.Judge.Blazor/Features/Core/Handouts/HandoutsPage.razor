@@ -1,33 +1,31 @@
-﻿@using NTS.Judge.Blazor.Features.Core.Handouts.Documents
 @using NTS.Judge.Blazor.Features.Core.Handouts.Form
-@using Not.Blazor.Components.Input
 @using Not.Blazor.Components.Layout
-@using NTS.Application.Contracts.Pdf
+@using Not.Blazor.Components.Print
+@using NTS.Blazor.Components.Print
 
 @attribute [Route(HANDOUTS_PAGE)]
 @inherits HandoutsPageBehind
 
-<NContent Title="@Handouts_string" IsEmpty="! Service.Documents.Any()" EmptyMessage="@Handouts_list_empty_message_string" RightBarXS="2">
+<NContent Title="@Handouts_string" IsEmpty="IsEmpty" EmptyMessage="@Handouts_list_empty_message_string" RightBarXS="2">
 
     <Main>
-        <HandoutsList Documents="Service.Documents" />
+        @foreach (var document in Documents)
+        {
+            <HandoutsPrintDocument Documents="@(new[] { document })" />
+        }
     </Main>
 
     <Rightbar>
         <NDivider Text="@Export_string" />
 
         <MudStack Spacing="2">
-            <NSelect T="PdfPaperFormat"
-                     @bind-Value="PaperFormat"
-                     Label="@Page_format_string" />
-
-            <NSelect T="PdfOrientation"
-                     @bind-Value="Orientation"
-                     Label="@Orientation_string" />
-
-            <NotButtonPrint Text="@Print_string"
-                            OnClick="PrintHandouts"
-                            Disabled="@(!CanPrint)" />
+            <NPrintPanel @bind-Scale="PrintFontScale"
+                         @bind-PaperFormat="PaperFormat"
+                         @bind-Orientation="Orientation"
+                         Actions="@PrintActions"
+                         Disabled="@(!CanPrint)"
+                         ConfigurePaperFormat
+                         ConfigureOrientation />
         </MudStack>
 
         <NDivider Text="@Manual_handout_strings" Class="mt-4" />

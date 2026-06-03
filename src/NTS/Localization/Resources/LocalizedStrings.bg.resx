@@ -216,8 +216,11 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Разпечатки</value>
   </data>
-  <data name="Download_results_string" xml:space="preserve">
-    <value>Свали резултати</value>
+  <data name="Download_file_string" xml:space="preserve">
+    <value>Свали</value>
+  </data>
+  <data name="Print_scale_string" xml:space="preserve">
+    <value>Мащаб</value>
   </data>
   <data name="Page_format_string" xml:space="preserve">
     <value>Формат</value>
@@ -230,9 +233,6 @@
   </data>
   <data name="Portrait_string" xml:space="preserve">
     <value>Портретна</value>
-  </data>
-  <data name="Action_string" xml:space="preserve">
-    <value>Действие</value>
   </data>
   <data name="Generating_PDF_string" xml:space="preserve">
     <value>Генериране на PDF</value>
@@ -542,9 +542,6 @@
   </data>
   <data name="Rest_time_string" xml:space="preserve">
     <value>Време за почивка (мин)</value>
-  </data>
-  <data name="Text_formatting_failed_This_is_usually_not_critical_failure_string" xml:space="preserve">
-    <value>Изникна грешка при форматиренето на текст. Обикновено това не е критичен проблем.</value>
   </data>
   <data name="Number_string" xml:space="preserve">
     <value>Номер</value>
@@ -1044,10 +1041,10 @@
   <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
     <value>Навреме ли е за презентация/инспекция?</value>
   </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
-  </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
+  </data>
+  <data name="Select_participant_to_add_string" xml:space="preserve">
+    <value>Изберете участник да добавите</value>
   </data>
 </root>

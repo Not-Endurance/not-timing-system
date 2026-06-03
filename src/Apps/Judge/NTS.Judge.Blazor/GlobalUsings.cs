@@ -9,7 +9,6 @@ global using NTS.Judge.Contracts.Features.Core.Handouts;
 global using NTS.Judge.Contracts.Features.Core.Rankings;
 global using NTS.Judge.Contracts.Features.Core.Rankings.CustomRankings;
 global using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
-global using NTS.Judge.Contracts.Features.Print;
 global using NTS.Judge.Contracts.Features.Settings;
 global using NTS.Judge.Contracts.Features.Setup;
 global using NTS.Judge.Contracts.Features.Setup.Athletes;

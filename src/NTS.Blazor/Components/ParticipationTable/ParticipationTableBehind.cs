@@ -44,8 +44,17 @@ public class ParticipationTableBehind : NComponent
         try
         {
             DisplayPhases = Phases?.ToArray() ?? [];
+            var rows = BuildRows(DisplayPhases);
+
+            if (AlignVertically)
+            {
+                PhaseHeadings = rows.Select(x => x.Label).ToArray();
+                Rows = BuildPhaseRows(DisplayPhases, rows);
+                return;
+            }
+
             PhaseHeadings = DisplayPhases.Select(x => x.Gate).ToArray();
-            Rows = BuildRows(DisplayPhases);
+            Rows = rows;
         }
         catch (Exception ex)
         {
@@ -129,6 +138,16 @@ public class ParticipationTableBehind : NComponent
     ParticipationTableRow CreateRow(string label, IReadOnlyList<Phase> phases, Func<Phase, object?> selector)
     {
         return new ParticipationTableRow(label, phases.Select(x => FormatValue(selector(x))).ToArray());
+    }
+
+    static IReadOnlyList<ParticipationTableRow> BuildPhaseRows(
+        IReadOnlyList<Phase> phases,
+        IReadOnlyList<ParticipationTableRow> rows
+    )
+    {
+        return phases
+            .Select((phase, index) => new ParticipationTableRow(phase.Gate, rows.Select(row => row.Values[index]).ToArray()))
+            .ToArray();
     }
 
     static string FormatValue(object? value)

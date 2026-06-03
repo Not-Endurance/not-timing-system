@@ -1,0 +1,57 @@
+@namespace Not.Blazor.Components.Print
+@using MudBlazor
+@using Not.Blazor.Components.Buttons
+@using Not.Blazor.Components.Input
+@using Not.Print
+@using static Not.Localization.NStrings
+@inherits NPrintPanelBehind
+
+<MudStack Spacing="2" Class="@Class" Style="@Style">
+    @if (ConfigurePaperFormat)
+    {
+        <NSelect T="NPrintPaperFormat"
+                 Value="@PaperFormat"
+                 ValueChanged="SetPaperFormat"
+                 Label="@Page_format_string" />
+    }
+
+    @if (ConfigureOrientation)
+    {
+        <NSelect T="NPrintOrientation"
+                 Value="@Orientation"
+                 ValueChanged="SetOrientation"
+                 Label="@Orientation_string" />
+    }
+
+    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+        <NNumberField T="decimal"
+                      AdornmentColor="@MudBlazor.Color.Primary"
+                      Value="@Scale"
+                      ValueChanged="SetScale"
+                      Label="@Print_scale_string"
+                      Step="@ScaleStep"
+                      Format="0.00"
+                      Immediate="true"
+                      Margin="@Margin.Dense"
+                      Variant="@Variant.Outlined"
+                      Style="@ScaleStyle" />
+
+        @if (SingleDescriptor != null)
+        {
+            <NButtonPrimary Disabled="@Disabled"
+                            OnClick="TriggerSingleAction"
+                            Text="@SingleDescriptor.Content"
+                            StartIcon="@SingleDescriptor.Icon"
+                            Color="@MudBlazor.Color.Secondary"
+                            Style="@ButtonStyle" />
+        }
+        else if (Descriptors.Count > 1)
+        {
+            <NDropdownButton Descriptors="@Descriptors"
+                             Disabled="@Disabled"
+                             Color="@MudBlazor.Color.Secondary"
+                             SelectorColor="@MudBlazor.Color.Secondary"
+                             Style="@ButtonStyle" />
+        }
+    </MudStack>
+</MudStack>

@@ -21,25 +21,30 @@
         </LeadingCell>
 
         <HeadingCell Context="index">
-            @{
-                var phase = DisplayPhases[index];
-            }
-
-            @if (Editable)
+            @if (AlignVertically)
             {
-                <MudTooltip Text="@Edit_times_string" Inline="false">
-                    <MudButton Variant="Variant.Text" Class="participation-table-phase-button" OnClick="() => ShowUpdate(phase)">
-                        <div class="participation-table-phase-heading">
-                            <MudText Typo="Typo.caption">@phase.Gate</MudText>
-                        </div>
-                    </MudButton>
-                </MudTooltip>
+                <MudText Typo="Typo.caption">@PhaseHeadings[index]</MudText>
             }
             else
             {
-                <div class="participation-table-phase-heading">
-                    <MudText Typo="Typo.caption">@phase.Gate</MudText>
-                </div>
+                var phase = DisplayPhases[index];
+
+                if (Editable)
+                {
+                    <MudTooltip Text="@Edit_times_string" Inline="false">
+                        <MudButton Variant="Variant.Text" Class="participation-table-phase-button" OnClick="() => ShowUpdate(phase)">
+                            <div class="participation-table-phase-heading">
+                                <MudText Typo="Typo.caption">@phase.Gate</MudText>
+                            </div>
+                        </MudButton>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <div class="participation-table-phase-heading">
+                        <MudText Typo="Typo.caption">@phase.Gate</MudText>
+                    </div>
+                }
             }
         </HeadingCell>
     </NTable>

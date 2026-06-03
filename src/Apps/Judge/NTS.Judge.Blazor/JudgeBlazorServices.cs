@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Not.Blazor;
 using Not.Blazor.Client;
-using NTS.Judge.Blazor.Features.Print;
 using Not.Startup;
 using NTS.Judge.Blazor.Features.Socket;
 
@@ -15,7 +14,6 @@ public static class JudgeBlazorServices
         return services
             .AddNBlazor(configuration)
             .NClientSideBlazor(configuration)
-            .AddTransient<IJudgePdfBrowserService, JudgePdfBrowserService>()
             .AddScoped<IStartupInitializerAsync, JudgeStartupEventInformationCoordinator>();
     }
 }

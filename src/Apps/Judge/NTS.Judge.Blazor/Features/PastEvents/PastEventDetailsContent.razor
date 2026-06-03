@@ -1,6 +1,5 @@
-﻿@using Not.Blazor.Components.Layout
-@using Not.Blazor.Components.Input
-@using NTS.Application.Contracts.Pdf
+@using Not.Blazor.Components.Layout
+@using Not.Blazor.Components.Print
 @using NTS.Blazor.Components.Rankings.Menu
 @using NTS.Blazor.Components.Rankings.Protocols
 
@@ -9,22 +8,14 @@
 
 <NContent Title="@Past_events_string" IsLoading="@IsLoading" IsEmpty="@IsEmpty">
     <Main>
-        <Protocol Document="Service.Document" />
+        <Protocol Document="Document" />
     </Main>
 
     <Rightbar>
         <MudStack Spacing="3">
-            <MudStack Row AlignItems="AlignItems.Center">
-                <NSelect T="PdfResultAction"
-                         @bind-Value="ResultAction"
-                         Label="@Action_string"
-                         Style="min-width:180px" />
-
-                <NButtonSecondary OnClick="RunResultAction"
-                                  Text="@ResultActionText"
-                                  StartIcon="@ResultActionIcon"
-                                  Disabled="@(!CanRunResultAction)" />
-            </MudStack>
+            <NPrintPanel @bind-Scale="PrintFontScale"
+                         Actions="@ResultActions"
+                         Disabled="@(!CanRunResultAction)" />
 
             <NButtonSecondary OnClick="OpenStartlist"
                               Text="@Startlist_string"
@@ -36,9 +27,9 @@
                             StartIcon="@Icons.Material.Filled.ImportExport"
                             Disabled="@(!HasFeiExportConfigured)" />
 
-            <RankingMenu Rankings="Service.Rankings"
-                         Selected="Service.CurrentRanking"
-                         OnSelectedSafe="SelectRanking" />
+            <RankingMenu Rankings="Rankings"
+                         Selected="CurrentRanking"
+                         OnSelectedSafe="SelectRankingSafe" />
         </MudStack>
     </Rightbar>
 </NContent>

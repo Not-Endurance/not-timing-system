@@ -2,13 +2,15 @@ using System.Reflection;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Not.Blazor;
 using Not.Injection;
 using Not.Application.Configurations;
+using Not.Krud.ServiceRegistration;
+using Not.Server.Print;
 using Not.Storage;
 using NTS;
 using NTS.Application.Cors;
 using NTS.Application.Mongo;
-using NTS.Nexus.HTTP.Functions.Pdf;
 using NTS.Nexus.HTTP.Mongo.Repositories;
 using NTS.Nexus.HTTP.Telemetry;
 using OpenTelemetry.Resources;
@@ -21,16 +23,20 @@ internal static class NtsNexusApiServices
     public static IServiceCollection ConfigureNexusApi(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddNtsCorsOriginValidation(configuration);
-        services.AddSettings<PdfSettings>(configuration);
+        services.AddSettings<NPrintSettings>(configuration);
         services.AddTransient<IUserRepository, UserMongoRepository>();
+        services.AddNBlazor(configuration);
+        services.ConfigureKrud();
 
-        return services
+        services
             .AddNts(configuration)
             .AddNConventionalServices(Assembly.GetExecutingAssembly())
             .AddMongoStorage(configuration)
             .AddNexusTelemetry()
             .AddApplicationInsightsTelemetryWorkerService()
             .ConfigureFunctionsApplicationInsights();
+
+        return services;
     }
 
     static IServiceCollection AddMongoStorage(this IServiceCollection services, IConfiguration configuration)

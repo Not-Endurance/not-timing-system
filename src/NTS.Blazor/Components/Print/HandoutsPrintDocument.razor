@@ -1,0 +1,15 @@
+@inherits HandoutsPrintDocumentBehind
+
+<div class="print-document print-document-handouts">
+    @foreach (var document in Documents)
+    {
+        <section class="handout-print-page">
+            <RanklistPrintDocument Document="CreateProtocolDocument(document)"
+                                   Compact="Compact"
+                                   PhasesAsRows="true"
+                                   ShowRanks="false"
+                                   LeftLogo="@LeftLogo"
+                                   RightLogo="@RightLogo" />
+        </section>
+    }
+</div>

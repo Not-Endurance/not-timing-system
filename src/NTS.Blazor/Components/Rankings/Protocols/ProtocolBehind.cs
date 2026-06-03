@@ -9,12 +9,21 @@ public class ProtocolBehind : NComponent
     protected bool HasLeftLogo => !string.IsNullOrWhiteSpace(LeftLogo);
     protected bool HasRightLogo => !string.IsNullOrWhiteSpace(RightLogo);
     protected string LogoClass => LogoClicked.HasDelegate ? "cursor-pointer" : string.Empty;
+    protected string HeaderLogoClass => string.IsNullOrWhiteSpace(LogoClass)
+        ? "protocol-header-logo"
+        : $"protocol-header-logo {LogoClass}";
 
     [Parameter]
     public ProtocolDocument? Document { get; set; }
 
     [Parameter]
     public bool Compact { get; set; }
+
+    [Parameter]
+    public bool PhasesAsRows { get; set; }
+
+    [Parameter]
+    public bool ShowRanks { get; set; } = true;
 
     [Parameter]
     public string? LeftLogo { get; set; }

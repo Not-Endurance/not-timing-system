@@ -1,43 +1,63 @@
 using MudBlazor;
-using Not.Blazor.Browser;
 using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Components.Print;
+using Not.Files;
+using Not.Print;
 using NTS.Application.Contracts.Pdf;
 using NTS.Application.Contracts.PastEvents;
 using NTS.Blazor.Components.PastEvents;
+using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 using NTS.Judge.Blazor.Features.Print;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects.Documents;
 
 namespace NTS.Judge.Blazor.Features.PastEvents;
 
 public class PastEventDetailsContentBehind : NStatefulComponent
 {
-    [Inject]
-    protected IPastEventService Service { get; set; } = default!;
+    const decimal DefaultPrintScale = 0.85m;
 
     [Inject]
-    protected IDialogService DialogService { get; set; } = default!;
+    IPastEventService Service { get; set; } = default!;
 
     [Inject]
-    protected IFeiExportService FeiExportService { get; set; } = default!;
+    IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    protected IFileDownloadService FileDownloadService { get; set; } = default!;
+    IFeiExportService FeiExportService { get; set; } = default!;
 
     [Inject]
-    protected IJudgePdfClient PdfClient { get; set; } = default!;
+    IFileService FileService { get; set; } = default!;
 
     [Inject]
-    protected IJudgePdfBrowserService PdfBrowser { get; set; } = default!;
+    INtsPrintRequestFactory PrintRequests { get; set; } = default!;
+
+    [Inject]
+    IProtocolLogoState HeaderLogo { get; set; } = default!;
 
     protected bool IsEmpty => Service.Event == null || Service.Document == null;
+    protected ProtocolDocument? Document => Service.Document;
+    protected IReadOnlyList<Ranking> Rankings => Service.Rankings;
+    protected Ranking? CurrentRanking => Service.CurrentRanking;
+    protected string HeaderLogoLeft => HeaderLogo.Left;
+    protected string HeaderLogoRight => HeaderLogo.Right;
     protected bool HasStartlist => Service.StartlistHistoryByStage.Count != 0;
     protected bool HasFeiExportConfigured => Service.Rankings.Any(IsFeiExportConfigured);
-    protected bool CanRunResultAction => Service.Event != null && Service.CurrentRanking != null;
-    protected PdfResultAction ResultAction { get; set; } = PdfResultAction.Print;
-    protected string ResultActionText =>
-        ResultAction == PdfResultAction.Print ? Print_string : Download_results_string;
-    protected string ResultActionIcon =>
-        ResultAction == PdfResultAction.Print ? Icons.Material.Outlined.Print : Icons.Material.Filled.Download;
+    protected bool CanRunResultAction => Service.Event != null && Service.Rankings.Any();
+    protected decimal PrintFontScale { get; set; } = DefaultPrintScale;
+    protected IReadOnlyList<NPrintPanelAction> ResultActions =>
+        [
+            NPrintPanelAction.PrintPdf(
+                Print_string,
+                CreateCurrentRanklistPrintRequest,
+                Icons.Material.Outlined.Print
+            ),
+            NPrintPanelAction.DownloadZip(
+                Download_file_string,
+                CreateResultsZipRequest,
+                Icons.Material.Filled.Download
+            ),
+        ];
 
     [Parameter]
     public int EventId { get; set; }
@@ -55,7 +75,7 @@ public class PastEventDetailsContentBehind : NStatefulComponent
         }
     }
 
-    protected void SelectRanking(Ranking ranking)
+    protected void SelectRankingSafe(Ranking ranking)
     {
         try
         {
@@ -95,7 +115,7 @@ public class PastEventDetailsContentBehind : NStatefulComponent
             }
 
             var document = FeiExportService.Create(Service.Event, Service.Rankings);
-            await FileDownloadService.DownloadText(document.FileName, document.Content, document.ContentType);
+            await FileService.Download(NFileContent.FromText(document.FileName, document.Content, document.ContentType));
         }
         catch (Exception ex)
         {
@@ -103,37 +123,37 @@ public class PastEventDetailsContentBehind : NStatefulComponent
         }
     }
 
-    protected async Task RunResultAction()
+    Task<NPrintDocumentRequest> CreateCurrentRanklistPrintRequest(NPrintPanelContext context)
     {
-        try
+        if (Service.Event == null || CurrentRanking == null || Document == null)
         {
-            if (Service.Event == null || Service.CurrentRanking == null)
-            {
-                return;
-            }
-
-            if (ResultAction == PdfResultAction.Print)
-            {
-                var file = await PdfClient.CreatePdf(
-                    new PdfDocumentRequest
-                    {
-                        Type = PdfDocumentType.Ranklist,
-                        EventId = Service.Event.Id,
-                        RankingId = Service.CurrentRanking.Id,
-                        FontScale = 0.8m,
-                    }
-                );
-                await PdfBrowser.PrintPdf(file);
-                return;
-            }
-
-            var zip = await PdfClient.CreateResultsZip(new PdfResultsZipRequest { EventId = Service.Event.Id });
-            await PdfBrowser.Download(zip);
+            throw new InvalidOperationException("Ranklist print is not available.");
         }
-        catch (Exception ex)
+        return PrintRequests.CreateRanklist(
+            Document,
+            context,
+            PdfFileNameHelper.RanklistPdf(CurrentRanking.Id, CurrentRanking.Name),
+            HeaderLogoLeft,
+            HeaderLogoRight
+        );
+    }
+
+    Task<NPrintBatchRequest> CreateResultsZipRequest(NPrintPanelContext context)
+    {
+        if (Service.Event == null || !Service.Rankings.Any())
         {
-            Handle(ex);
+            throw new InvalidOperationException("Ranklist download is not available.");
         }
+        return PrintRequests.CreateRanklistsZip(
+            Service.Rankings,
+            ranking =>
+                Service.CreateDocument(ranking)
+                ?? throw new InvalidOperationException($"Cannot create print document for ranking '{ranking.Id}'."),
+            context,
+            PdfFileNameHelper.ResultsZip(Service.Event.Id),
+            HeaderLogoLeft,
+            HeaderLogoRight
+        );
     }
 
     static bool IsFeiExportConfigured(Ranking ranking)

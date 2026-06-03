@@ -1,15 +1,22 @@
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Components.Print;
 using Not.Blazor.Helpers;
 using NTS.Application.Contracts.Pdf;
 using NTS.Application.Contracts.Socket;
+using NTS.Domain.Core.Objects.Documents;
 using NTS.Judge.Blazor.Features.Print;
 using NTS.Judge.Contracts.Features.Core.Handouts;
+using Not.Print;
 
 namespace NTS.Judge.Blazor.Features.Core.Handouts;
 
 public class HandoutsPageBehind : NStatefulComponent
 {
+    const decimal DefaultPrintScale = 0.85m;
+
+    IReadOnlyList<HandoutDocument> _lastPrintedHandouts = [];
+
     [Inject]
     IDialogService DialogService { get; set; } = default!;
 
@@ -17,17 +24,26 @@ public class HandoutsPageBehind : NStatefulComponent
     INtsSocketService SocketService { get; set; } = default!;
 
     [Inject]
-    IJudgePdfClient PdfClient { get; set; } = default!;
+    INtsPrintRequestFactory PrintRequests { get; set; } = default!;
 
     [Inject]
-    IJudgePdfBrowserService PdfBrowser { get; set; } = default!;
+    IHandoutsService Service { get; set; } = default!;
 
-    [Inject]
-    protected IHandoutsService Service { get; set; } = default!;
-
-    protected PdfPaperFormat PaperFormat { get; set; } = PdfPaperFormat.A5;
-    protected PdfOrientation Orientation { get; set; } = PdfOrientation.Landscape;
-    protected bool CanPrint => SocketService.Event != null && Service.Documents.Any();
+    protected NPrintPaperFormat PaperFormat { get; set; } = NPrintPaperFormat.A5;
+    protected NPrintOrientation Orientation { get; set; } = NPrintOrientation.Landscape;
+    protected IReadOnlyList<HandoutDocument> Documents => Service.Documents;
+    protected bool IsEmpty => !Documents.Any();
+    protected decimal PrintFontScale { get; set; } = DefaultPrintScale;
+    protected bool CanPrint => SocketService.Event != null && Documents.Any();
+    protected IReadOnlyList<NPrintPanelAction> PrintActions =>
+        [
+            NPrintPanelAction.PrintPdf(
+                Print_string,
+                CreateHandoutsPrintRequest,
+                Icons.Material.Outlined.Print,
+                ConfirmPrintedHandouts
+            ),
+        ];
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,37 +51,34 @@ public class HandoutsPageBehind : NStatefulComponent
         await Observe(SocketService);
     }
 
-    protected async Task PrintHandouts()
+    Task<NPrintDocumentRequest> CreateHandoutsPrintRequest(NPrintPanelContext context)
     {
-        try
+        if (SocketService.Event == null || Documents.Count == 0)
         {
-            if (SocketService.Event == null)
-            {
-                return;
-            }
+            throw new InvalidOperationException("Handout print is not available.");
+        }
 
-            var handouts = Service.Documents.ToList();
-            var file = await PdfClient.CreatePdf(
-                new PdfDocumentRequest
-                {
-                    Type = PdfDocumentType.Handouts,
-                    EventId = SocketService.Event.Id,
-                    PaperFormat = PaperFormat,
-                    Orientation = Orientation,
-                    FontScale = 0.85m,
-                }
-            );
-            await PdfBrowser.PrintPdf(file);
-            var dialog = await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>();
-            if (await dialog.IsCanceled())
-            {
-                return;
-            }
-            await Service.Delete(handouts);
-        }
-        catch (Exception ex)
+        _lastPrintedHandouts = Documents.ToList();
+        return PrintRequests.CreateHandouts(
+            _lastPrintedHandouts,
+            context,
+            PdfFileNameHelper.HandoutsPdf(SocketService.Event.Id)
+        );
+    }
+
+    async Task ConfirmPrintedHandouts()
+    {
+        if (_lastPrintedHandouts.Count == 0)
         {
-            Handle(ex);
+            return;
         }
+
+        var dialog = await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>();
+        if (await dialog.IsCanceled())
+        {
+            return;
+        }
+        await Service.Delete(_lastPrintedHandouts);
+        _lastPrintedHandouts = [];
     }
 }

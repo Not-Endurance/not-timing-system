@@ -12,6 +12,12 @@ public class ProtocolRowBehind : NComponent
     [Parameter]
     public bool Compact { get; set; }
 
+    [Parameter]
+    public bool PhasesAsRows { get; set; }
+
+    [Parameter]
+    public bool ShowRank { get; set; } = true;
+
     public string GetRankText()
     {
         if (Entry.Participation.IsEliminated())

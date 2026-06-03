@@ -13,5 +13,6 @@ public interface IPastEventService : IPastEventContext
     ProtocolDocument? Document { get; }
 
     Task LoadEvent(int eventId);
+    ProtocolDocument? CreateDocument(Ranking ranking);
     void Select(Ranking ranking);
 }

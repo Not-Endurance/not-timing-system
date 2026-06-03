@@ -216,8 +216,11 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Dokümanlar</value>
   </data>
-  <data name="Download_results_string" xml:space="preserve">
-    <value>Sonuçları indir</value>
+  <data name="Download_file_string" xml:space="preserve">
+    <value>İndir</value>
+  </data>
+  <data name="Print_scale_string" xml:space="preserve">
+    <value>Ölçek</value>
   </data>
   <data name="Page_format_string" xml:space="preserve">
     <value>Sayfa formatı</value>
@@ -230,9 +233,6 @@
   </data>
   <data name="Portrait_string" xml:space="preserve">
     <value>Dikey</value>
-  </data>
-  <data name="Action_string" xml:space="preserve">
-    <value>Eylem</value>
   </data>
   <data name="Generating_PDF_string" xml:space="preserve">
     <value>PDF oluşturuluyor</value>
@@ -543,9 +543,6 @@
   </data>
   <data name="Rest_time_string" xml:space="preserve">
     <value>Dinlenme süresi (dak)</value>
-  </data>
-  <data name="Text_formatting_failed_This_is_usually_not_critical_failure_string" xml:space="preserve">
-    <value>Metin biçimlendirmesi başarısız oldu. Genellikle bu kritik bir hata değildir</value>
   </data>
   <data name="Number_string" xml:space="preserve">
     <value>Numara</value>

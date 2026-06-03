@@ -9,88 +9,157 @@
     var header = Document.Header;
 }
 
-<MudStack>
-    <MudItem Class="d-flex flex-row justify-space-around printable">
+<MudStack Spacing="0">
+    <MudStack Row
+              Class="protocol-header printable"
+              AlignItems="AlignItems.Stretch"
+              Justify="Justify.Center"
+              Spacing="3">
         @if (HasLeftLogo)
         {
-            <MudPaper Class="@LogoClass" Elevation="0" Style="display: inline-block;" @onclick="() => OnLogoClicked(LeftLogo)">
-                <MudImage Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@LeftLogo" />
-            </MudPaper>
+            <MudItem Class="protocol-header-logo-slot">
+                <MudPaper Class="@HeaderLogoClass"
+                          Elevation="0"
+                          @onclick="() => OnLogoClicked(LeftLogo)">
+                    <MudImage Class="protocol-header-logo-image"
+                              ObjectFit="ObjectFit.Contain"
+                              Src="@LeftLogo" />
+                </MudPaper>
+            </MudItem>
         }
 
-        <MudItem Class="d-flex flex-column justify-center">
-            <NHeadline2 Content="@header.Title" Class="mb-4" />
+        <MudItem Class="protocol-header-center">
+            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="3" Class="protocol-header-center-stack">
+                <NHeadline2 Content="@header.Title" />
 
-            <MudStack Class="d-flex mb-3" Justify="Justify.Center" Spacing="0">
-                <NHeadline3 Content="@header.Location" />
-                <NHeadline3 Content="@header.EventSpan.ToString()" />
-                <NHeadline3 Content="@LocalizeString(header.Country.ToString())" />
+                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="0">
+                    <NHeadline3 Content="@header.Location" />
+                    <NHeadline3 Content="@header.EventSpan.ToString()" />
+                    <NHeadline3 Content="@LocalizeString(header.Country.ToString())" />
+                </MudStack>
+
+                <MudStack Row
+                          Class="protocol-header-officials"
+                          Justify="Justify.Center"
+                          AlignItems="AlignItems.Start"
+                          Spacing="3">
+                    <MudStack>
+                        @if (header.GroundJuryPresident != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @header.GroundJuryPresident.GetDisplayLabel(header.Ruleset)
+                            </MudText>
+                        }
+                        @if (header.ChiefSteward != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @header.ChiefSteward.GetDisplayLabel(header.Ruleset)
+                            </MudText>
+                        }
+                        @if (header.ForeignJudge != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @header.ForeignJudge.GetDisplayLabel(header.Ruleset)
+                            </MudText>
+                        }
+                    </MudStack>
+
+                    <MudStack>
+                        @if (header.VeterinaryCommissionPresident != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @header.VeterinaryCommissionPresident.GetDisplayLabel(header.Ruleset)
+                            </MudText>
+                        }
+                        @if (header.TechnicalDelegate != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @header.TechnicalDelegate.GetDisplayLabel(header.Ruleset)
+                            </MudText>
+                        }
+                        @if (header.ForeignVeterinaryDelegate != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @header.ForeignVeterinaryDelegate.GetDisplayLabel(header.Ruleset)
+                            </MudText>
+                        }
+                    </MudStack>
+                </MudStack>
             </MudStack>
         </MudItem>
 
         @if (HasRightLogo)
         {
-            <MudPaper Class="@LogoClass" Elevation="0" Style="display: inline-block;" @onclick="() => OnLogoClicked(RightLogo)">
-                <MudImage Class="pt-2 " Height="150" ObjectFit="ObjectFit.ScaleDown" Src="@RightLogo" />
-            </MudPaper>
+            <MudItem Class="protocol-header-logo-slot">
+                <MudPaper Class="@HeaderLogoClass"
+                          Elevation="0"
+                          @onclick="() => OnLogoClicked(RightLogo)">
+                    <MudImage Class="protocol-header-logo-image"
+                              ObjectFit="ObjectFit.Contain"
+                              Src="@RightLogo" />
+                </MudPaper>
+            </MudItem>
         }
-    </MudItem>
-        
-        <MudStack>
-            <MudStack Row Class="d-flex mb-3" Justify="Justify.Center">
-                <MudStack>
-                    @if (header.GroundJuryPresident != null)
-                    {
-                        <MudText Typo="Typo.subtitle2">
-                            @header.GroundJuryPresident.GetDisplayLabel(header.Ruleset)
-                        </MudText>
-                    }
-                    @if (header.ChiefSteward != null)
-                    {
-                        <MudText Typo="Typo.subtitle2">
-                            @header.ChiefSteward.GetDisplayLabel(header.Ruleset)
-                        </MudText>
-                    }
-                    @if (header.ForeignJudge != null)
-                    {
-                        <MudText Typo="Typo.subtitle2">
-                            @header.ForeignJudge.GetDisplayLabel(header.Ruleset)
-                        </MudText>
-                    }
-                </MudStack>
-                
-                <MudStack>
-                    @if (header.VeterinaryCommissionPresident != null)
-                    {
-                        <MudText Typo="Typo.subtitle2">
-                            @header.VeterinaryCommissionPresident.GetDisplayLabel(header.Ruleset)
-                        </MudText>
-                    }
-                    @if (header.TechnicalDelegate != null)
-                    {
-                        <MudText Typo="Typo.subtitle2">
-                            @header.TechnicalDelegate.GetDisplayLabel(header.Ruleset)
-                        </MudText>
-                    }
-                    @if (header.ForeignVeterinaryDelegate != null)
-                    {
-                        <MudText Typo="Typo.subtitle2">
-                            @header.ForeignVeterinaryDelegate.GetDisplayLabel(header.Ruleset)
-                        </MudText>
-                    }
-                </MudStack>
-            </MudStack>
-        </MudStack>
     </MudStack>
+</MudStack>
 
 <MudStack Spacing="0" AlignItems="AlignItems.Center">
     @foreach (var entry in Document.Ranklist.Entries)
     {
-        <ProtocolRow Entry="entry" Compact="Compact" />
+        <div class="protocol-entry print-avoid-break">
+            <ProtocolRow Entry="entry" Compact="Compact" PhasesAsRows="PhasesAsRows" ShowRank="ShowRanks" />
+        </div>
     }
 </MudStack>
 
 <style>
+    .protocol-header {
+        width: 100%;
+    }
+
+    .protocol-header-center {
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: center;
+    }
+
+    .protocol-header-center-stack {
+        height: 100%;
+    }
+
+    .protocol-header-officials {
+        max-width: 100%;
+    }
+
+    .protocol-header-logo-slot {
+        position: relative;
+        flex: 0 1 150px;
+        min-width: 70px;
+        max-width: 150px;
+        align-self: stretch;
+    }
+
+    .protocol-header-logo {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+    }
+
+    .protocol-header-logo-image {
+        width: auto;
+        height: 100%;
+        max-width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: contain;
+    }
+
+    .protocol-entry {
+        width: 100%;
+    }
+
     h6,
     .participation-table .mud-button-label {
         font-weight: normal !important;

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using NTS.Application.Contracts.Pdf;
+using Not.Files;
+using Not.Print;
+using Not.Server.Print;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;
@@ -10,65 +12,86 @@ namespace NTS.Nexus.HTTP.Functions.Pdf;
 
 public class PdfFunctions : FunctionBase
 {
-    readonly IPdfGenerationService _pdfs;
-    readonly IPdfRequestValidator _validator;
+    readonly INPrintService _print;
+    readonly INPrintRequestValidator _validator;
 
     public PdfFunctions(
         IFunctionLogger<PdfFunctions> logger,
         ITelemetryService telemetry,
-        IPdfGenerationService pdfs,
-        IPdfRequestValidator validator
+        INPrintService print,
+        INPrintRequestValidator validator
     )
         : base(logger, telemetry)
     {
-        _pdfs = pdfs;
+        _print = print;
         _validator = validator;
     }
 
-    [Function("pdf-create")]
-    public async Task<IActionResult> Create(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "pdf")] HttpRequest request,
+    [Function("print-pdf-create")]
+    public async Task<IActionResult> CreatePdf(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "print/pdf")] HttpRequest request,
         CancellationToken cancellationToken
     )
     {
-        using var activity = StartFunctionActivity(nameof(Create));
+        using var activity = StartFunctionActivity(nameof(CreatePdf));
         TagRequest(request);
-        LogInformation(request, nameof(Create));
+        LogInformation(request, nameof(CreatePdf));
 
-        var payload = await ReadBody<PdfDocumentRequest>(request);
-        var errors = _validator.Validate(payload);
-        if (errors.Length != 0)
+        try
         {
-            return InvalidPayload(string.Join(Environment.NewLine, errors));
-        }
+            var payload = await ReadBody<NPrintDocumentRequest>(request);
+            var errors = _validator.Validate(payload);
+            if (errors.Length != 0)
+            {
+                return InvalidPayload(string.Join(Environment.NewLine, errors));
+            }
 
-        var file = await _pdfs.Create(payload, cancellationToken);
-        return File(file);
+            var file = await _print.CreatePdf(payload, cancellationToken);
+            return File(file);
+        }
+        catch (Exception ex)
+        {
+            LogError(request, ex, nameof(CreatePdf));
+            return Error(ex);
+        }
     }
 
-    [Function("pdf-create-results")]
-    public async Task<IActionResult> CreateResults(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "pdf/results")] HttpRequest request,
+    [Function("print-zip-create")]
+    public async Task<IActionResult> CreateZip(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "print/zip")] HttpRequest request,
         CancellationToken cancellationToken
     )
     {
-        using var activity = StartFunctionActivity(nameof(CreateResults));
+        using var activity = StartFunctionActivity(nameof(CreateZip));
         TagRequest(request);
-        LogInformation(request, nameof(CreateResults));
+        LogInformation(request, nameof(CreateZip));
 
-        var payload = await ReadBody<PdfResultsZipRequest>(request);
-        var errors = _validator.Validate(payload);
-        if (errors.Length != 0)
+        try
         {
-            return InvalidPayload(string.Join(Environment.NewLine, errors));
-        }
+            var payload = await ReadBody<NPrintBatchRequest>(request);
+            var errors = _validator.Validate(payload);
+            if (errors.Length != 0)
+            {
+                return InvalidPayload(string.Join(Environment.NewLine, errors));
+            }
 
-        var file = await _pdfs.CreateResultsZip(payload, cancellationToken);
-        return File(file);
+            var file = await _print.CreateZip(payload, cancellationToken);
+            return File(file);
+        }
+        catch (Exception ex)
+        {
+            LogError(request, ex, nameof(CreateZip));
+            return Error(ex);
+        }
     }
 
-    static FileContentResult File(PdfGeneratedFile file)
+    static FileContentResult File(NFileContent file)
     {
         return new FileContentResult(file.Content, file.ContentType) { FileDownloadName = file.FileName };
+    }
+
+    static ObjectResult Error(Exception exception)
+    {
+        return new ObjectResult(exception.Message) { StatusCode = StatusCodes.Status500InternalServerError };
     }
 }

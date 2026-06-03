@@ -6,7 +6,8 @@ namespace NTS.Domain.Core.Objects.Documents;
 public record ProtocolDocument : Document
 {
     public ProtocolDocument(Ranklist ranklist, EventInformation eventInformation, IEnumerable<Official> officials)
-        : base(
+        : this(
+            ranklist,
             new DocumentHeader(
                 ranklist.Name,
                 ranklist.Ruleset,
@@ -15,7 +16,10 @@ public record ProtocolDocument : Document
                 eventInformation.EventSpan,
                 officials
             )
-        )
+        ) { }
+
+    public ProtocolDocument(Ranklist ranklist, DocumentHeader header)
+        : base(header)
     {
         Ranklist = ranklist;
     }

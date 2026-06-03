@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\nugets\Not.Server\Not.Server.csproj" />
     <ProjectReference Include="..\..\src\NTS.Application\NTS.Application.csproj" />
   </ItemGroup>
 

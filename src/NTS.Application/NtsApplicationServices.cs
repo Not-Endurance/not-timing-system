@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application;
+using Not.Application.HTTP;
 using Not.Injection;
 using Not.Krud.Abstractions;
 using NTS.Application.Arrivelists;
@@ -29,6 +30,8 @@ public static class NtsApplicationServices
         Assembly rootAssembly
     )
     {
+        services.AddHttpClient();
+        services.AddTransient<NHttpClient>();
         services.AddNConventionalServices(rootAssembly);
         return new(services, configuration);
     }

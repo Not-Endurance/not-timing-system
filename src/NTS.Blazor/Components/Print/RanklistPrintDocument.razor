@@ -1,0 +1,13 @@
+@using NTS.Blazor.Components.Rankings.Protocols
+@using NTS.Domain.Core.Objects.Documents
+@inherits RanklistPrintDocumentBehind
+
+<div class="print-document print-document-ranklist">
+    <Protocol Document="Document"
+              Compact="Compact"
+              PhasesAsRows="PhasesAsRows"
+              ShowRanks="ShowRanks"
+              LeftLogo="@LeftLogo"
+              RightLogo="@RightLogo"
+              LogoClicked="@LogoClicked" />
+</div>

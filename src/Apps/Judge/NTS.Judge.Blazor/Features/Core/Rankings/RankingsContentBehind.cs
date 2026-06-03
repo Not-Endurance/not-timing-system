@@ -1,8 +1,11 @@
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Components.Buttons;
+using Not.Blazor.Components.Print;
 using Not.Blazor.Dialogs;
 using Not.Blazor.Helpers;
 using NTS.Application.Contracts.Pdf;
+using Not.Print;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
@@ -18,6 +21,8 @@ namespace NTS.Judge.Blazor.Features.Core.Rankings;
 
 public class RankingsContentBehind : NStatefulComponent
 {
+    const decimal DefaultPrintScale = 0.85m;
+
     bool _isDeactivatingEvent;
 
     [Inject]
@@ -36,10 +41,7 @@ public class RankingsContentBehind : NStatefulComponent
     NavigationManager NavigationManager { get; set; } = default!;
 
     [Inject]
-    IJudgePdfClient PdfClient { get; set; } = default!;
-
-    [Inject]
-    IJudgePdfBrowserService PdfBrowser { get; set; } = default!;
+    INtsPrintRequestFactory PrintRequests { get; set; } = default!;
 
     [Inject]
     protected IRankingMenuService RankingService { get; set; } = default!;
@@ -48,16 +50,25 @@ public class RankingsContentBehind : NStatefulComponent
     protected IProtocolLogoState HeaderLogo { get; set; } = default!;
 
     protected ProtocolDocument? Document { get; private set; }
-    protected PdfResultAction ResultAction { get; set; } = PdfResultAction.Print;
 
     //public bool HasContent => RankingService.Ranklist != null;
     protected bool HasActiveEvent => SocketService.Event != null;
     protected bool IsDeactivatingEvent => _isDeactivatingEvent;
     protected bool CanRunResultAction => HasActiveEvent && RankingService.Rankings.Any();
-    protected string ResultActionText =>
-        ResultAction == PdfResultAction.Print ? Print_string : Download_results_string;
-    protected string ResultActionIcon =>
-        ResultAction == PdfResultAction.Print ? Icons.Material.Outlined.Print : Icons.Material.Filled.Download;
+    protected decimal PrintFontScale { get; set; } = DefaultPrintScale;
+    protected IReadOnlyList<NPrintPanelAction> ResultActions =>
+        [
+            NPrintPanelAction.PrintPdf(
+                Print_string,
+                CreateCurrentRanklistPrintRequest,
+                Icons.Material.Outlined.Print
+            ),
+            NPrintPanelAction.DownloadZip(
+                Download_file_string,
+                CreateResultsZipRequest,
+                Icons.Material.Filled.Download
+            ),
+        ];
 
     protected override async Task OnInitializedAsync()
     {
@@ -176,36 +187,35 @@ public class RankingsContentBehind : NStatefulComponent
         }
     }
 
-    protected async Task RunResultAction()
+    Task<NPrintDocumentRequest> CreateCurrentRanklistPrintRequest(NPrintPanelContext context)
     {
-        try
+        if (!CanRunResultAction || SocketService.Event == null)
         {
-            if (!CanRunResultAction || SocketService.Event == null)
-            {
-                return;
-            }
-
-            if (ResultAction == PdfResultAction.Print)
-            {
-                var file = await PdfClient.CreatePdf(
-                    new PdfDocumentRequest
-                    {
-                        Type = PdfDocumentType.Ranklist,
-                        EventId = SocketService.Event.Id,
-                        RankingId = RankingService.Current.Id,
-                        FontScale = 0.8m,
-                    }
-                );
-                await PdfBrowser.PrintPdf(file);
-                return;
-            }
-
-            var zip = await PdfClient.CreateResultsZip(new PdfResultsZipRequest { EventId = SocketService.Event.Id });
-            await PdfBrowser.Download(zip);
+            throw new InvalidOperationException("Ranklist print is not available.");
         }
-        catch (Exception ex)
+        var document = Document ?? DocumentService.Create(RankingService.Current);
+        return PrintRequests.CreateRanklist(
+            document,
+            context,
+            PdfFileNameHelper.RanklistPdf(RankingService.Current.Id, RankingService.Current.Name),
+            HeaderLogo.Left,
+            HeaderLogo.Right
+        );
+    }
+
+    Task<NPrintBatchRequest> CreateResultsZipRequest(NPrintPanelContext context)
+    {
+        if (!CanRunResultAction || SocketService.Event == null)
         {
-            Handle(ex);
+            throw new InvalidOperationException("Ranklist download is not available.");
         }
+        return PrintRequests.CreateRanklistsZip(
+            RankingService.Rankings,
+            DocumentService.Create,
+            context,
+            PdfFileNameHelper.ResultsZip(SocketService.Event.Id),
+            HeaderLogo.Left,
+            HeaderLogo.Right
+        );
     }
 }

@@ -22,12 +22,14 @@ public record HandoutDocument : Document, IIdentifiable
     {
         Id = handout.Id;
         ParticipationId = handout.Participation.Id;
-        Combination = handout.Participation.Combination;
-        Phases = handout.Participation.Phases;
+        Participation = handout.Participation;
+        Combination = Participation.Combination;
+        Phases = Participation.Phases;
     }
 
     public int Id { get; }
     public int ParticipationId { get; }
+    public Participation Participation { get; }
     public Combination Combination { get; }
     public PhaseCollection Phases { get; }
 }

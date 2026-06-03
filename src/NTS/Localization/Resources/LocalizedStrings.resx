@@ -216,8 +216,11 @@
   <data name="Handouts_string" xml:space="preserve">
     <value>Handouts</value>
   </data>
-  <data name="Download_results_string" xml:space="preserve">
-    <value>Download results</value>
+  <data name="Download_file_string" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="Print_scale_string" xml:space="preserve">
+    <value>Scale</value>
   </data>
   <data name="Page_format_string" xml:space="preserve">
     <value>Page format</value>
@@ -230,9 +233,6 @@
   </data>
   <data name="Portrait_string" xml:space="preserve">
     <value>Portrait</value>
-  </data>
-  <data name="Action_string" xml:space="preserve">
-    <value>Action</value>
   </data>
   <data name="Generating_PDF_string" xml:space="preserve">
     <value>Generating PDF</value>
@@ -542,9 +542,6 @@
   </data>
   <data name="Rest_time_string" xml:space="preserve">
     <value>Rest time (mins)</value>
-  </data>
-  <data name="Text_formatting_failed_This_is_usually_not_critical_failure_string" xml:space="preserve">
-    <value>Text formatting failed. This is usually not a critical failure</value>
   </data>
   <data name="Number_string" xml:space="preserve">
     <value>Number</value>

@@ -52,7 +52,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
     public ProtocolDocument? Document =>
         Event == null || CurrentRanking == null
             ? null
-            : new ProtocolDocument(new Ranklist(CurrentRanking), Event, _officials);
+            : CreateDocument(CurrentRanking);
 
     protected override async Task<bool> InitializeState()
     {
@@ -92,6 +92,13 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
     {
         _currentRanking = Rankings.FirstOrDefault(x => x.Id == ranking.Id) ?? ranking;
         EmitChanged();
+    }
+
+    public ProtocolDocument? CreateDocument(Ranking ranking)
+    {
+        return Event == null
+            ? null
+            : new ProtocolDocument(new Ranklist(ranking), Event, _officials);
     }
 
     public async Task<IEnumerable<EventInformation>> ReadMany()

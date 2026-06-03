@@ -1,8 +1,7 @@
-﻿@using NTS.Blazor.Components.Rankings.Menu
-@using NTS.Blazor.Components.Rankings.Protocols
-@using Not.Blazor.Components.Input
+@using NTS.Blazor.Components.Rankings.Menu
+@using NTS.Blazor.Components.Print
 @using Not.Blazor.Components.Layout
-@using NTS.Application.Contracts.Pdf
+@using Not.Blazor.Components.Print
 
 @attribute [Route(RANKLIST_PAGE)]
 @inherits RankingsContentBehind
@@ -10,26 +9,18 @@
 <NContent Title="@Ranklist_string" IsLoading="@IsLoading" Class="@Class">
 
     <Main>
-        <Protocol Document="Document"
-                  Compact="false"
-                  LeftLogo="@HeaderLogo.Left"
-                  RightLogo="@HeaderLogo.Right"
-                  LogoClicked="OpenImageBrowser" />
+        <RanklistPrintDocument Document="Document"
+                               Compact="false"
+                               LeftLogo="@HeaderLogo.Left"
+                               RightLogo="@HeaderLogo.Right"
+                               LogoClicked="OpenImageBrowser" />
     </Main>
 
     <Rightbar>
         <MudStack Row Wrap="Wrap.Wrap">
-            <MudStack Row AlignItems="AlignItems.Center">
-                <NSelect T="PdfResultAction"
-                         @bind-Value="ResultAction"
-                         Label="@Action_string"
-                         Style="min-width:180px" />
-
-                <NButtonSecondary OnClick="RunResultAction"
-                                  Text="@ResultActionText"
-                                  StartIcon="@ResultActionIcon"
-                                  Disabled="@(!CanRunResultAction)" />
-            </MudStack>
+            <NPrintPanel @bind-Scale="PrintFontScale"
+                         Actions="@ResultActions"
+                         Disabled="@(!CanRunResultAction)" />
 
             <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
 

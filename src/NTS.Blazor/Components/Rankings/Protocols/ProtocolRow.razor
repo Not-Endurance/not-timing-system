@@ -6,23 +6,62 @@
     var combination = Entry.Participation.Combination;
     var ruleset = Entry.Participation.Competition.Ruleset;
     var phases = Entry.Participation.Phases;
+    var total = Entry.Participation.GetTotal();
+    var totalArriveTime = Entry.Participation.IsComplete()
+        ? total?.FinishTime
+        : phases.LastOrDefault(x => x.IsComplete())?.ArriveTime;
+    var showSummary = Entry.Participation.IsEliminated() || total != null;
     var mudStackWidth = "width:130px;";
     const Align align = Align.Center;
 }
 
 <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Class="mt-1 printable" Spacing="0" Style="width:100%;text-align:center">
-    <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.End" Spacing="4" Style="width:100%">
-        <MudText Typo="Typo.button" Align="align" Style="width:50px">@GetRankText()</MudText>
-        
-        <MudText Typo="Typo.button" Align="align">@combination.Athlete.GetDisplayName(ruleset)</MudText>
+    <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.End" Spacing="4" Class="protocol-row-header">
+        <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.End" Spacing="4" Class="protocol-row-identity">
+            @if (ShowRank)
+            {
+                <MudText Typo="Typo.button" Align="align" Class="protocol-row-rank">@GetRankText()</MudText>
+            }
+            
+            <MudText Typo="Typo.button" Align="align" Class="protocol-row-identity-item">@combination.Athlete.GetDisplayName(ruleset)</MudText>
 
-        <MudText Typo="Typo.button" Align="align">@combination.Horse.GetDisplayName(ruleset)</MudText>
+            <MudText Typo="Typo.button" Align="align" Class="protocol-row-identity-item">@combination.Horse.GetDisplayName(ruleset)</MudText>
 
-        @if (combination.Club != null)
+            @if (combination.Club != null)
+            {
+                <MudText Typo="Typo.button" Align="align" Class="protocol-row-identity-item">@combination.Club</MudText>
+            }
+            <MudText Typo="Typo.button" Align="align" Class="protocol-row-identity-item">@combination.Athlete.Country</MudText>
+        </MudStack>
+
+        @if (PhasesAsRows && showSummary)
         {
-            <MudText Typo="Typo.button" Align="align">@combination.Club</MudText>
+            <MudStack Row Justify="Justify.FlexEnd" AlignItems="AlignItems.End" Spacing="2" Class="protocol-row-inline-summary">
+                @if (Entry.Participation.IsEliminated())
+                {
+                    <MudText Typo="Typo.caption" Align="align" Class="mud-button-text">
+                        @Eliminated_string: <strong>@Entry.Participation.Eliminated</strong>
+                    </MudText>
+                }
+                else if (total != null)
+                {
+                    @if (totalArriveTime != null)
+                    {
+                        <MudText Typo="Typo.caption" Align="align">
+                            @(Entry.Participation.IsComplete() ? Finished_at_colon_string : $"{Arrive_string}:") <strong>@totalArriveTime</strong>
+                        </MudText>
+                    }
+
+                    <MudText Typo="Typo.caption" Align="align">
+                        @Ride_time_in_hours_colon_string <strong>@total.RideInterval</strong> @hrs_string
+                    </MudText>
+
+                    <MudText Typo="Typo.caption" Align="align">
+                        @Average_speed <strong>@total.AverageSpeed.ToStringWithThousands()</strong> @km_per_hour_string
+                    </MudText>
+                }
+            </MudStack>
         }
-        <MudText Typo="Typo.button" Align="align">@combination.Athlete.Country</MudText>
     </MudStack>
 
     <MudDivider Class="mt-1" />
@@ -30,10 +69,10 @@
     <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
         <ParticipationTable Phases="phases"
                             Number="combination.Number"
-                            AlignVertically="true"
+                            AlignVertically="PhasesAsRows"
                             Compact="Compact" />
 
-        @if (Entry.Participation.IsEliminated())
+        @if (!PhasesAsRows && Entry.Participation.IsEliminated())
         {
             <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="@mudStackWidth">
                 <MudText Typo="Typo.body2" Align="align" Class="mud-button-text">
@@ -43,14 +82,16 @@
                 </MudText>
             </MudStack>
         }
-        else if (Entry.Participation.IsComplete())
+        else if (!PhasesAsRows && total != null)
         {
-            var total = Entry.Participation.GetTotal()!;
             <MudStack Class="d-flex" Style="@mudStackWidth" Spacing="1">
                 <MudStack Justify="Justify.FlexStart" Style="height:100%;">
-                    <MudText Typo="Typo.subtitle2" Align="align">
-                        @Finished_at_colon_string <strong>@total.FinishTime</strong>
-                    </MudText>
+                    @if (totalArriveTime != null)
+                    {
+                        <MudText Typo="Typo.subtitle2" Align="align">
+                            @(Entry.Participation.IsComplete() ? Finished_at_colon_string : $"{Arrive_string}:") <strong>@totalArriveTime</strong>
+                        </MudText>
+                    }
 
                     <MudText Typo="Typo.subtitle2" Align="align">
                         @Ride_time_in_hours_colon_string <strong>@total.RideInterval</strong> @hrs_string
@@ -64,14 +105,43 @@
                 </MudStack>
             </MudStack>
         }
-        else
-        {
-            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Style="@mudStackWidth">
-                <MudText Typo="Typo.body2" Align="align" Class="mud-button-text">
-                    @Competition_ongoing_string
-                </MudText>
-            </MudStack>
-        }
     </MudStack>
 
 </MudStack>
+
+<style>
+    .protocol-row-header {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .protocol-row-identity {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .protocol-row-rank {
+        flex: 0 0 50px;
+        min-width: 50px;
+    }
+
+    .protocol-row-identity-item {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .protocol-row-inline-summary {
+        flex: 0 0 auto;
+        min-width: 0;
+        margin-left: auto;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .protocol-row-inline-summary .mud-typography {
+        white-space: nowrap;
+    }
+</style>
