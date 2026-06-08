@@ -6,7 +6,7 @@ using Not.Application.Print;
 using Not.Blazor.Client.Authentication;
 using Not.Blazor.Client.Authentication.Services;
 using Not.Blazor.Client.Browser;
-using Not.Files;
+using Not.Files.Abstractions;
 using Not.Print;
 
 namespace Not.Blazor.Client;

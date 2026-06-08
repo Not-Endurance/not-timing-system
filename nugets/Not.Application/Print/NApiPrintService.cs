@@ -7,12 +7,12 @@ namespace Not.Application.Print;
 
 public interface INPrintApiService : ITransient
 {
-    Task<NFileContent> CreatePdf(
+    Task<NFile> CreatePdf(
         NPrintDocumentRequest request,
         CancellationToken cancellationToken = default
     );
 
-    Task<NFileContent> CreateZip(
+    Task<NFile> CreateZip(
         NPrintBatchRequest request,
         CancellationToken cancellationToken = default
     );
@@ -27,7 +27,7 @@ public class NApiPrintService : INPrintApiService
         _client = client;
     }
 
-    public Task<NFileContent> CreatePdf(
+    public Task<NFile> CreatePdf(
         NPrintDocumentRequest request,
         CancellationToken cancellationToken = default
     )
@@ -41,7 +41,7 @@ public class NApiPrintService : INPrintApiService
         );
     }
 
-    public Task<NFileContent> CreateZip(
+    public Task<NFile> CreateZip(
         NPrintBatchRequest request,
         CancellationToken cancellationToken = default
     )
@@ -55,7 +55,7 @@ public class NApiPrintService : INPrintApiService
         );
     }
 
-    async Task<NFileContent> Post(
+    async Task<NFile> Post(
         string endpoint,
         object payload,
         string contentType,
@@ -66,7 +66,7 @@ public class NApiPrintService : INPrintApiService
         var response = await _client.PostContent(endpoint, payload, cancellationToken);
         var fileName = string.IsNullOrWhiteSpace(response.FileName) ? fallbackName : response.FileName;
         var resolvedContentType = string.IsNullOrWhiteSpace(response.ContentType) ? contentType : response.ContentType;
-        return new NFileContent(fileName, resolvedContentType, response.Content);
+        return new NFile(fileName, resolvedContentType, response.Content);
     }
 
     static string EnsureExtension(string fileName, string extension)

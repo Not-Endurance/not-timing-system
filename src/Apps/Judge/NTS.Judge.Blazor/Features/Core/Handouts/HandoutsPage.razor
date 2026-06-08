@@ -11,7 +11,10 @@
     <Main>
         @foreach (var document in Documents)
         {
-            <HandoutsPrintDocument Documents="@(new[] { document })" />
+            <ResultsPrintDocument 
+                Documents="@(new[] { document })"
+                LeftLogo="@LeftLogo"
+                RightLogo="@RightLogo" />
         }
     </Main>
 

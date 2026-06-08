@@ -7,7 +7,6 @@ using Not.Formatting;
 using Not.Injection;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Objects;
 using NTS.Domain.Enums;
 
 namespace NTS.Judge.Features.Core.Rankings.FeiExport;
@@ -16,14 +15,22 @@ internal class FeiExportFeature : IFeiExportFeature
 {
     const int FEI_RANKING_CONFIGURATION_FIELD_COUNT = 5;
 
-    public string CreateXmlContent(EventInformation eventInformation, IEnumerable<Ranklist> ranklists)
+    public string CreateXmlContent(
+        EventInformation eventInformation,
+        IEnumerable<Result> results,
+        IEnumerable<Ranking> rankings
+    )
     {
-        var model = CreateHorseSport(eventInformation, ranklists.ToList());
+        var model = CreateHorseSport(eventInformation, results.ToList(), rankings.ToList());
         var xml = Serialize(model);
         return InsertGeneratedDate(xml);
     }
 
-    HorseSport CreateHorseSport(EventInformation eventInformation, IReadOnlyCollection<Ranklist> ranklists)
+    HorseSport CreateHorseSport(
+        EventInformation eventInformation,
+        IReadOnlyCollection<Result> results,
+        IReadOnlyCollection<Ranking> rankings
+    )
     {
         if (string.IsNullOrWhiteSpace(eventInformation.FeiShowId))
         {
@@ -34,8 +41,8 @@ internal class FeiExportFeature : IFeiExportFeature
             throw new DomainException("Missing event information location");
         }
 
-        var configuredRanklists = GetConfiguredRanklists(ranklists).ToList();
-        if (!configuredRanklists.Any())
+        var configuredResults = GetConfiguredResults(results, rankings).ToList();
+        if (!configuredResults.Any())
         {
             throw new DomainException("No rankings are configured for FEI export");
         }
@@ -43,7 +50,7 @@ internal class FeiExportFeature : IFeiExportFeature
         // IsoCode is not accepted by FEI, but they have representatives which can correct that in case a country
         // without NF code is used. This shouldn't happen anyway
         var countryCode = eventInformation.Country.NfCode ?? eventInformation.Country.IsoCode;
-        var enduranceEvents = configuredRanklists
+        var enduranceEvents = configuredResults
             .OrderBy(x => x.Ranking.FeiEventId)
             .ThenBy(x => x.Ranking.FeiEventCode)
             .GroupBy(x => new { x.Ranking.FeiEventId, x.Ranking.FeiEventCode })
@@ -81,11 +88,16 @@ internal class FeiExportFeature : IFeiExportFeature
         return horseSport;
     }
 
-    IEnumerable<Ranklist> GetConfiguredRanklists(IEnumerable<Ranklist> ranklists)
+    IEnumerable<ConfiguredResults> GetConfiguredResults(
+        IEnumerable<Result> results,
+        IReadOnlyCollection<Ranking> rankings
+    )
     {
-        foreach (var ranklist in ranklists)
+        var rankingsById = rankings.ToDictionary(x => x.Id);
+        foreach (var result in results)
         {
-            var missing = GetMissingFeiConfiguration(ranklist.Ranking).ToList();
+            var ranking = GetMatchingRanking(result, rankingsById);
+            var missing = GetMissingFeiConfiguration(ranking).ToList();
             if (missing.Count == FEI_RANKING_CONFIGURATION_FIELD_COUNT)
             {
                 continue;
@@ -93,16 +105,26 @@ internal class FeiExportFeature : IFeiExportFeature
             if (missing.Any())
             {
                 throw new DomainException(
-                    $"Ranking '{ranklist.Name}' is missing FEI export configuration: {string.Join(", ", missing)}"
+                    $"Ranking '{ranking.Name}' is missing FEI export configuration: {string.Join(", ", missing)}"
                 );
             }
-            if (string.IsNullOrWhiteSpace(ranklist.Name))
+            if (string.IsNullOrWhiteSpace(result.Name))
             {
                 throw new DomainException("Missing ranking Name");
             }
 
-            yield return ranklist;
+            yield return new ConfiguredResults(result, ranking);
         }
+    }
+
+    static Ranking GetMatchingRanking(Result results, IReadOnlyDictionary<int, Ranking> rankingsById)
+    {
+        if (results.RankingId != null && rankingsById.TryGetValue(results.RankingId.Value, out var ranking))
+        {
+            return ranking;
+        }
+
+        throw new DomainException($"Results '{results.Name}' cannot be matched to a ranking for FEI export");
     }
 
     static IEnumerable<string> GetMissingFeiConfiguration(Ranking ranking)
@@ -134,7 +156,7 @@ internal class FeiExportFeature : IFeiExportFeature
         string countryCode,
         string feiEventId,
         string feiEventCode,
-        IEnumerable<Ranklist> ranklists
+        IEnumerable<ConfiguredResults> results
     )
     {
         return new ctEnduranceEvent
@@ -144,32 +166,33 @@ internal class FeiExportFeature : IFeiExportFeature
             StartDate = eventInformation.EventSpan.StartDay.DateTime,
             EndDate = eventInformation.EventSpan.EndDay.DateTime,
             NF = countryCode,
-            Competitions = ranklists.Select(x => CreateCompetition(eventInformation, x)).ToArray(),
+            Competitions = results.Select(x => CreateCompetition(eventInformation, x)).ToArray(),
         };
     }
 
-    ctEnduranceCompetition CreateCompetition(EventInformation eventInformation, Ranklist ranklist)
+    ctEnduranceCompetition CreateCompetition(EventInformation eventInformation, ConfiguredResults configuredResults)
     {
-        var ranking = ranklist.Ranking;
+        var results = configuredResults.Results;
+        var ranking = configuredResults.Ranking;
         var ctCompetition = new ctEnduranceCompetition
         {
             FEIID = ranking.FeiCompetitionId!,
             ScheduleCompetitionNr = ranking.FeiScheduleNumber!,
             Rule = ranking.FeiRule!,
-            Name = ranking.Name,
+            Name = results.Name,
             StartDate = eventInformation.EventSpan.StartDay.DateTime,
             Team = false,
             ParticipationList = new ctEnduranceParticipations(),
         };
 
-        var ctParticipations = CreateParticipations(ranklist);
+        var ctParticipations = CreateParticipations(results);
         ctCompetition.ParticipationList.Participation = ctParticipations.ToArray();
         return ctCompetition;
     }
 
-    IEnumerable<ctEnduranceIndivResult> CreateParticipations(Ranklist ranklist)
+    IEnumerable<ctEnduranceIndivResult> CreateParticipations(Result results)
     {
-        var entries = ranklist.Entries;
+        var entries = results.Entries;
         var withoutFeiId = entries.Where(x =>
             string.IsNullOrWhiteSpace(x.Participation.Combination.Athlete.FeiId)
             || string.IsNullOrWhiteSpace(x.Participation.Combination.Horse.FeiId)
@@ -184,7 +207,7 @@ internal class FeiExportFeature : IFeiExportFeature
         {
             var athlete = entry.Participation.Combination.Athlete;
             var horse = entry.Participation.Combination.Horse;
-            var athleteName = SplitName(athlete.GetDisplayName(CompetitionRuleset.FEI));
+            var (First, Last) = SplitName(athlete.GetDisplayName(CompetitionRuleset.FEI));
 
             var ctParticipation = new ctEnduranceIndivResult
             {
@@ -192,17 +215,17 @@ internal class FeiExportFeature : IFeiExportFeature
                 {
                     FEIID = int.Parse(athlete.FeiId!),
                     AthleteNumber = entry.Participation.Combination.Number,
-                    FirstName = athleteName.First,
-                    FamilyName = athleteName.Last,
+                    FirstName = First,
+                    FamilyName = Last,
                     CompetingFor = athlete.Country.NfCode ?? athlete.Country.IsoCode,
                 },
                 Horse = new ctHorse { FEIID = horse.FeiId!, Name = horse.GetDisplayName(CompetitionRuleset.FEI) },
                 Complement = new ctEnduranceComplement { BestCondition = false },
                 Position = new ctPositionIndiv { Status = entry.Participation.Eliminated?.Code ?? "R" },
             };
-            if (ctParticipation.Position.Status == "R")
+            if (ctParticipation.Position.Status == "R" && entry.Rank != null)
             {
-                ctParticipation.Position.Rank = entry.Rank!.Value;
+                ctParticipation.Position.Rank = entry.Rank.Value;
             }
 
             var ctDays = CreateDaysAndPhases(entry.Participation);
@@ -319,5 +342,21 @@ internal class FeiExportFeature : IFeiExportFeature
 
 public interface IFeiExportFeature : ITransient
 {
-    string CreateXmlContent(EventInformation eventInformation, IEnumerable<Ranklist> ranklists);
+    string CreateXmlContent(
+        EventInformation eventInformation,
+        IEnumerable<Result> results,
+        IEnumerable<Ranking> rankings
+    );
+}
+
+sealed class ConfiguredResults
+{
+    public ConfiguredResults(Result results, Ranking ranking)
+    {
+        Results = results;
+        Ranking = ranking;
+    }
+
+    public Result Results { get; }
+    public Ranking Ranking { get; }
 }

@@ -106,12 +106,12 @@ internal sealed class NexusApiDriver : IDisposable
         return Send(HttpMethod.Delete, $"api/handouts/{id}");
     }
 
-    public Task<NFileContent> CreatePrintPdf(NPrintDocumentRequest request)
+    public Task<NFile> CreatePrintPdf(NPrintDocumentRequest request)
     {
         return SendFile(HttpMethod.Post, "api/print/pdf", request, request.FileName, NFileContentTypes.Pdf);
     }
 
-    public Task<NFileContent> CreatePrintZip(NPrintBatchRequest request)
+    public Task<NFile> CreatePrintZip(NPrintBatchRequest request)
     {
         return SendFile(HttpMethod.Post, "api/print/zip", request, request.FileName, NFileContentTypes.Zip);
     }
@@ -283,7 +283,7 @@ internal sealed class NexusApiDriver : IDisposable
     async Task Send(HttpMethod method, string endpoint, object? payload = null)
     {
         var content = await SendCore(method, endpoint, payload);
-        var result = content.FromJson<Result>();
+        var result = content.FromJson<Not.Structures.Result>();
         if (!result.IsSuccess)
         {
             throw new InvalidOperationException(string.Join(Environment.NewLine, result.Errors));
@@ -316,7 +316,7 @@ internal sealed class NexusApiDriver : IDisposable
         return result.Data;
     }
 
-    async Task<NFileContent> SendFile(
+    async Task<NFile> SendFile(
         HttpMethod method,
         string endpoint,
         object payload,
@@ -346,7 +346,7 @@ internal sealed class NexusApiDriver : IDisposable
             ?? response.Content.Headers.ContentDisposition?.FileName
             ?? fallbackFileName;
         var contentType = response.Content.Headers.ContentType?.MediaType ?? fallbackContentType;
-        return new NFileContent(fileName.Trim('"'), contentType, content);
+        return new NFile(fileName.Trim('"'), contentType, content);
     }
 
     async Task<string> SendCore(HttpMethod method, string endpoint, object? payload)

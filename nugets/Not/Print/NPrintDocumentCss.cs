@@ -68,14 +68,14 @@ public static class NPrintDocumentCss
                 page-break-inside: avoid;
             }
 
-            .handout-print-page {
+            .results-print-page {
                 break-after: page;
                 page-break-after: always;
                 min-height: calc(100vh - 1px);
                 overflow: hidden;
             }
 
-            .handout-print-page:last-child {
+            .results-print-page:last-child {
                 break-after: auto;
                 page-break-after: auto;
             }

@@ -1,0 +1,94 @@
+@using NTS.Blazor.Components.ParticipationTable
+
+@inherits ResultsDocumentRowBehind
+
+@{
+    var participation = Entry.Participation;
+    var combination = participation.Combination;
+    var ruleset = participation.Competition.Ruleset;
+    const Align align = Align.Center;
+}
+
+<MudStack Justify="Justify.FlexStart"
+          AlignItems="AlignItems.Center"
+          Class="mt-1 printable"
+          Spacing="0"
+          Style="width:100%;text-align:center">
+    <MudStack Row
+              Justify="Justify.FlexStart"
+              AlignItems="AlignItems.End"
+              Spacing="4"
+              Class="results-row-header">
+        <MudStack Row
+                  Justify="Justify.FlexStart"
+                  AlignItems="AlignItems.End"
+                  Spacing="4"
+                  Class="results-row-identity">
+            @if (HasRank)
+            {
+                <MudText Typo="Typo.button" Align="align" Class="results-row-rank">@GetRankText()</MudText>
+            }
+
+            <MudText Typo="Typo.button" Align="align" Class="results-row-identity-item">
+                @combination.Athlete.GetDisplayName(ruleset)
+            </MudText>
+
+            <MudText Typo="Typo.button" Align="align" Class="results-row-identity-item">
+                @combination.Horse.GetDisplayName(ruleset)
+            </MudText>
+
+            @if (combination.Club != null)
+            {
+                <MudText Typo="Typo.button" Align="align" Class="results-row-identity-item">
+                    @combination.Club
+                </MudText>
+            }
+
+            <MudText Typo="Typo.button" Align="align" Class="results-row-identity-item">
+                @combination.Athlete.Country
+            </MudText>
+        </MudStack>
+
+        @if (UseInlineLayout)
+        {
+            <ResultsRowSummary Participation="participation" ShowTotals="ShowTotals" />
+        }
+    </MudStack>
+
+    <MudDivider Class="mt-1" />
+
+    <MudStack Row Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+        <ParticipationTable Phases="participation.Phases"
+                            Number="combination.Number" />
+
+        @if (!UseInlineLayout)
+        {
+            <ResultsRowSummary Participation="participation" ShowTotals="ShowTotals" />
+        }
+    </MudStack>
+</MudStack>
+
+<style>
+    .results-row-header {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .results-row-identity {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .results-row-rank {
+        flex: 0 0 50px;
+        min-width: 50px;
+    }
+
+    .results-row-identity-item {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>

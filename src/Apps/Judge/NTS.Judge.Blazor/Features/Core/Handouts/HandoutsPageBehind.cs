@@ -2,20 +2,21 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Components.Print;
 using Not.Blazor.Helpers;
+using Not.Print;
 using NTS.Application.Contracts.Pdf;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Objects.Documents;
+using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 using NTS.Judge.Blazor.Features.Print;
 using NTS.Judge.Contracts.Features.Core.Handouts;
-using Not.Print;
 
 namespace NTS.Judge.Blazor.Features.Core.Handouts;
 
 public class HandoutsPageBehind : NStatefulComponent
 {
-    const decimal DefaultPrintScale = 0.85m;
+    const decimal DEFAULT_PRINT_SCALE = 0.85m;
 
-    IReadOnlyList<HandoutDocument> _lastPrintedHandouts = [];
+    IReadOnlyList<ResultsDocument> _lastPrintedHandouts = [];
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
@@ -29,11 +30,16 @@ public class HandoutsPageBehind : NStatefulComponent
     [Inject]
     IHandoutsService Service { get; set; } = default!;
 
+    [Inject]
+    IProtocolLogoState HeaderLogo { get; set; } = default!;
+
+    protected string LeftLogo => HeaderLogo.Left;
+    protected string RightLogo => HeaderLogo.Right;
     protected NPrintPaperFormat PaperFormat { get; set; } = NPrintPaperFormat.A5;
     protected NPrintOrientation Orientation { get; set; } = NPrintOrientation.Landscape;
-    protected IReadOnlyList<HandoutDocument> Documents => Service.Documents;
+    protected IReadOnlyList<ResultsDocument> Documents => Service.Documents;
     protected bool IsEmpty => !Documents.Any();
-    protected decimal PrintFontScale { get; set; } = DefaultPrintScale;
+    protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
     protected bool CanPrint => SocketService.Event != null && Documents.Any();
     protected IReadOnlyList<NPrintPanelAction> PrintActions =>
         [

@@ -10,12 +10,13 @@ using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 using NTS.Judge.Blazor.Features.Print;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
+using Not.Files.Abstractions;
 
 namespace NTS.Judge.Blazor.Features.PastEvents;
 
 public class PastEventDetailsContentBehind : NStatefulComponent
 {
-    const decimal DefaultPrintScale = 0.85m;
+    const decimal DEFAULT_PRINT_SCALE = 0.85m;
 
     [Inject]
     IPastEventService Service { get; set; } = default!;
@@ -36,7 +37,8 @@ public class PastEventDetailsContentBehind : NStatefulComponent
     IProtocolLogoState HeaderLogo { get; set; } = default!;
 
     protected bool IsEmpty => Service.Event == null || Service.Document == null;
-    protected ProtocolDocument? Document => Service.Document;
+    protected ResultsDocument? Document => Service.Document;
+    protected IReadOnlyList<ResultsDocument> Documents => Document == null ? [] : [Document];
     protected IReadOnlyList<Ranking> Rankings => Service.Rankings;
     protected Ranking? CurrentRanking => Service.CurrentRanking;
     protected string HeaderLogoLeft => HeaderLogo.Left;
@@ -44,7 +46,7 @@ public class PastEventDetailsContentBehind : NStatefulComponent
     protected bool HasStartlist => Service.StartlistHistoryByStage.Count != 0;
     protected bool HasFeiExportConfigured => Service.Rankings.Any(IsFeiExportConfigured);
     protected bool CanRunResultAction => Service.Event != null && Service.Rankings.Any();
-    protected decimal PrintFontScale { get; set; } = DefaultPrintScale;
+    protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
     protected IReadOnlyList<NPrintPanelAction> ResultActions =>
         [
             NPrintPanelAction.PrintPdf(
@@ -115,7 +117,7 @@ public class PastEventDetailsContentBehind : NStatefulComponent
             }
 
             var document = FeiExportService.Create(Service.Event, Service.Rankings);
-            await FileService.Download(NFileContent.FromText(document.FileName, document.Content, document.ContentType));
+            await FileService.Download(NFile.FromText(document.FileName, document.Content, document.ContentType));
         }
         catch (Exception ex)
         {

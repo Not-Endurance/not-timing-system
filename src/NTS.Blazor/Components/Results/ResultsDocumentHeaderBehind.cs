@@ -2,28 +2,19 @@ using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
 using NTS.Domain.Core.Objects.Documents;
 
-namespace NTS.Blazor.Components.Rankings.Protocols;
+namespace NTS.Blazor.Components.Results;
 
-public class ProtocolBehind : NComponent
+public class ResultsDocumentHeaderBehind : NComponent
 {
     protected bool HasLeftLogo => !string.IsNullOrWhiteSpace(LeftLogo);
     protected bool HasRightLogo => !string.IsNullOrWhiteSpace(RightLogo);
     protected string LogoClass => LogoClicked.HasDelegate ? "cursor-pointer" : string.Empty;
     protected string HeaderLogoClass => string.IsNullOrWhiteSpace(LogoClass)
-        ? "protocol-header-logo"
-        : $"protocol-header-logo {LogoClass}";
+        ? "results-header-logo"
+        : $"results-header-logo {LogoClass}";
 
-    [Parameter]
-    public ProtocolDocument? Document { get; set; }
-
-    [Parameter]
-    public bool Compact { get; set; }
-
-    [Parameter]
-    public bool PhasesAsRows { get; set; }
-
-    [Parameter]
-    public bool ShowRanks { get; set; } = true;
+    [Parameter, EditorRequired]
+    public DocumentHeader Header { get; set; } = default!;
 
     [Parameter]
     public string? LeftLogo { get; set; }

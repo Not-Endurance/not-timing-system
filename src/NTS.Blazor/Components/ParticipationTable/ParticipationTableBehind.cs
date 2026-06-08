@@ -11,6 +11,8 @@ namespace NTS.Blazor.Components.ParticipationTable;
 
 public class ParticipationTableBehind : NComponent
 {
+    protected const string TableClass = "participation-table";
+
     [Inject]
     KrudDialogService<PhaseUpdateModel, PhaseUpdateShell> Dialog { get; set; } = default!;
 
@@ -20,9 +22,9 @@ public class ParticipationTableBehind : NComponent
 
     protected string[] PhaseHeadings { get; private set; } = [];
 
+    protected override bool ObserveBreakpointChanges => true;
+    protected bool UseHorizontalLayout => !IsMdAndDown;
     protected string LeadingHeaderText => Number?.ToString() ?? Number_string;
-
-    protected string TableClass => Compact ? "participation-table participation-table-compact" : "participation-table";
 
     [Parameter]
     public PhaseCollection? Phases { get; set; }
@@ -33,33 +35,22 @@ public class ParticipationTableBehind : NComponent
     [Parameter]
     public bool Editable { get; set; }
 
-    [Parameter]
-    public bool AlignVertically { get; set; }
-
-    [Parameter]
-    public bool Compact { get; set; }
-
     protected override void OnParametersSet()
     {
         try
         {
             DisplayPhases = Phases?.ToArray() ?? [];
-            var rows = BuildRows(DisplayPhases);
-
-            if (AlignVertically)
-            {
-                PhaseHeadings = rows.Select(x => x.Label).ToArray();
-                Rows = BuildPhaseRows(DisplayPhases, rows);
-                return;
-            }
-
-            PhaseHeadings = DisplayPhases.Select(x => x.Gate).ToArray();
-            Rows = rows;
+            RebuildRows();
         }
         catch (Exception ex)
         {
             Handle(ex);
         }
+    }
+
+    protected override void OnBeforeRender()
+    {
+        RebuildRows();
     }
 
     protected async Task ShowUpdate(Phase phase)
@@ -79,6 +70,20 @@ public class ParticipationTableBehind : NComponent
     protected IEnumerable<string> GetRowValues(object item)
     {
         return ((ParticipationTableRow)item).Values;
+    }
+
+    void RebuildRows()
+    {
+        var verticalRows = BuildRows(DisplayPhases);
+        if (UseHorizontalLayout)
+        {
+            PhaseHeadings = verticalRows.Select(x => x.Label).ToArray();
+            Rows = BuildPhaseRows(DisplayPhases, verticalRows);
+            return;
+        }
+
+        PhaseHeadings = DisplayPhases.Select(x => x.Gate).ToArray();
+        Rows = verticalRows;
     }
 
     IReadOnlyList<ParticipationTableRow> BuildRows(IReadOnlyList<Phase> phases)

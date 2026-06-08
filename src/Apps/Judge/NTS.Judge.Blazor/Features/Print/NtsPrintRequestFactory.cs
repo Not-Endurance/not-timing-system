@@ -1,5 +1,4 @@
 using Not.Blazor.Components.Print;
-using Not.Files;
 using Not.Injection;
 using Not.Print;
 using NTS.Application.Contracts.Pdf;
@@ -11,6 +10,9 @@ namespace NTS.Judge.Blazor.Features.Print;
 
 public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
 {
+    const string HANDOUT_PAGE_MARGIN = "6mm 6mm 10mm 6mm";
+    const string RANKLIST_PAGE_MARGIN = "10mm 10mm 12mm 10mm";
+
     readonly INHtmlComponentRenderer _renderer;
 
     public NtsPrintRequestFactory(INHtmlComponentRenderer renderer)
@@ -19,18 +21,17 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
     }
 
     public async Task<NPrintDocumentRequest> CreateHandouts(
-        IReadOnlyList<HandoutDocument> documents,
+        IReadOnlyList<ResultsDocument> documents,
         NPrintPanelContext context,
         string fileName
     )
     {
-        var html = await _renderer.Render<HandoutsPrintDocument>(
+        var html = await _renderer.Render<ResultsPrintDocument>(
             new Dictionary<string, object?>
             {
-                [nameof(HandoutsPrintDocument.Documents)] = documents,
-                [nameof(HandoutsPrintDocument.Compact)] = true,
-                [nameof(HandoutsPrintDocument.LeftLogo)] = ResolveLogo(PrintLogoPath.Fei),
-                [nameof(HandoutsPrintDocument.RightLogo)] = ResolveLogo(PrintLogoPath.Bfks),
+                [nameof(ResultsPrintDocument.Documents)] = documents,
+                [nameof(ResultsPrintDocument.LeftLogo)] = PrintLogoPath.Fei,
+                [nameof(ResultsPrintDocument.RightLogo)] = PrintLogoPath.Bfks,
             }
         );
 
@@ -44,26 +45,26 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
                 PaperFormat = context.PaperFormat,
                 Orientation = context.Orientation,
                 Scale = context.Scale,
-                Margin = "6mm",
+                Margin = HANDOUT_PAGE_MARGIN,
             },
         };
     }
 
     public async Task<NPrintDocumentRequest> CreateRanklist(
-        ProtocolDocument document,
+        ResultsDocument document,
         NPrintPanelContext context,
         string fileName,
         string? leftLogo,
         string? rightLogo
     )
     {
-        var html = await RenderRanklist(document, context, ResolveLogo(leftLogo), ResolveLogo(rightLogo), fileName);
+        var html = await RenderRanklist(document, leftLogo, rightLogo);
         return CreateRanklistRequest(fileName, html, context);
     }
 
     public async Task<NPrintBatchRequest> CreateRanklistsZip(
         IReadOnlyList<Ranking> rankings,
-        Func<Ranking, ProtocolDocument> createDocument,
+        Func<Ranking, ResultsDocument> createDocument,
         NPrintPanelContext context,
         string fileName,
         string? leftLogo,
@@ -80,10 +81,8 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
             var document = createDocument(ranking);
             var html = await RenderRanklist(
                 document,
-                context,
-                ResolveLogo(leftLogo),
-                ResolveLogo(rightLogo),
-                entryName
+                leftLogo,
+                rightLogo
             );
             documents.Add(CreateRanklistRequest(entryName, html, context));
         }
@@ -96,23 +95,17 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
     }
 
     async Task<string> RenderRanklist(
-        ProtocolDocument document,
-        NPrintPanelContext context,
+        ResultsDocument document,
         string? leftLogo,
-        string? rightLogo,
-        string fileName
+        string? rightLogo
     )
     {
-        _ = context;
-        _ = fileName;
-        return await _renderer.Render<RanklistPrintDocument>(
+        return await _renderer.Render<ResultsPrintDocument>(
             new Dictionary<string, object?>
             {
-                [nameof(RanklistPrintDocument.Document)] = document,
-                [nameof(RanklistPrintDocument.Compact)] = true,
-                [nameof(RanklistPrintDocument.PhasesAsRows)] = true,
-                [nameof(RanklistPrintDocument.LeftLogo)] = leftLogo,
-                [nameof(RanklistPrintDocument.RightLogo)] = rightLogo,
+                [nameof(ResultsPrintDocument.Documents)] = new[] { document },
+                [nameof(ResultsPrintDocument.LeftLogo)] = leftLogo,
+                [nameof(ResultsPrintDocument.RightLogo)] = rightLogo,
             }
         );
     }
@@ -133,36 +126,9 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
                 PaperFormat = NPrintPaperFormat.A4,
                 Orientation = NPrintOrientation.Portrait,
                 Scale = context.Scale,
-                Margin = "10mm",
+                Margin = RANKLIST_PAGE_MARGIN,
             },
         };
-    }
-
-    static string? ResolveLogo(string? logo)
-    {
-        if (string.IsNullOrWhiteSpace(logo))
-        {
-            return null;
-        }
-        if (logo.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
-        {
-            return logo;
-        }
-
-        var fullPath = Path.IsPathRooted(logo)
-            ? logo
-            : Path.Combine(Environment.CurrentDirectory, "wwwroot", logo);
-        if (!File.Exists(fullPath))
-        {
-            return null;
-        }
-
-        var file = new NFileContent(
-            Path.GetFileName(fullPath),
-            NFileContentTypes.FromFileName(fullPath),
-            File.ReadAllBytes(fullPath)
-        );
-        return file.ToDataUrl();
     }
 
     static string EnsureExtension(string fileName, string extension)
@@ -171,4 +137,30 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
             ? fileName
             : $"{fileName}{extension}";
     }
+}
+
+public interface INtsPrintRequestFactory
+{
+    Task<NPrintDocumentRequest> CreateHandouts(
+        IReadOnlyList<ResultsDocument> documents,
+        NPrintPanelContext context,
+        string fileName
+    );
+
+    Task<NPrintDocumentRequest> CreateRanklist(
+        ResultsDocument document,
+        NPrintPanelContext context,
+        string fileName,
+        string? leftLogo,
+        string? rightLogo
+    );
+
+    Task<NPrintBatchRequest> CreateRanklistsZip(
+        IReadOnlyList<Ranking> rankings,
+        Func<Ranking, ResultsDocument> createDocument,
+        NPrintPanelContext context,
+        string fileName,
+        string? leftLogo,
+        string? rightLogo
+    );
 }

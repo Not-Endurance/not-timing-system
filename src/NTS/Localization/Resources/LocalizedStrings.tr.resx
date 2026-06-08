@@ -237,6 +237,9 @@
   <data name="Generating_PDF_string" xml:space="preserve">
     <value>PDF oluşturuluyor</value>
   </data>
+  <data name="Generated_by_NoTiming_System_v_string" xml:space="preserve">
+    <value>Oluşturan NoTiming System v</value>
+  </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Elenme Nedeni</value>
   </data>

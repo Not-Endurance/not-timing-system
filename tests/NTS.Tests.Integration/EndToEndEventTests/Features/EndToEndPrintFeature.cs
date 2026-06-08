@@ -14,7 +14,6 @@ using Not.Print;
 using NTS.Application.Contracts.Pdf;
 using NTS.Blazor.Components.Print;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
@@ -24,6 +23,8 @@ namespace NTS.Tests.Integration.EndToEndEventTests.Features;
 internal sealed class EndToEndPrintFeature : IDisposable
 {
     const string FEATURE = "Print";
+    const string HANDOUT_PAGE_MARGIN = "6mm 6mm 10mm 6mm";
+    const string RANKLIST_PAGE_MARGIN = "10mm 10mm 12mm 10mm";
 
     readonly NexusApiDriver _api;
     readonly IStringLocalizer _localizer;
@@ -46,8 +47,8 @@ internal sealed class EndToEndPrintFeature : IDisposable
     {
         var pendingHandouts = await _api.ReadHandouts(eventInformation.Id);
         var selectedHandouts = pendingHandouts
-            .Where(handout => participationNumbers.Contains(handout.Participation.Combination.Number))
-            .OrderBy(handout => handout.Participation.Combination.Number)
+            .Where(handout => participationNumbers.Contains(GetParticipation(handout).Combination.Number))
+            .OrderBy(handout => GetParticipation(handout).Combination.Number)
             .ToArray();
         if (selectedHandouts.Length == 0)
         {
@@ -119,16 +120,16 @@ internal sealed class EndToEndPrintFeature : IDisposable
         int batchNumber
     )
     {
-        var documents = handouts.Select(handout => new HandoutDocument(handout, eventInformation, officials)).ToArray();
-        var html = await _renderer.Render<HandoutsPrintDocument>(
+        var documents = handouts.Select(handout => new ResultsDocument(handout, eventInformation, officials)).ToArray();
+        var html = await _renderer.Render<ResultsPrintDocument>(
             new Dictionary<string, object?>
             {
-                [nameof(HandoutsPrintDocumentBehind.Documents)] = documents,
-                [nameof(HandoutsPrintDocumentBehind.Compact)] = true,
-                [nameof(HandoutsPrintDocumentBehind.LeftLogo)] = string.Empty,
-                [nameof(HandoutsPrintDocumentBehind.RightLogo)] = string.Empty,
+                [nameof(ResultsPrintDocument.Documents)] = documents,
+                [nameof(ResultsPrintDocument.LeftLogo)] = string.Empty,
+                [nameof(ResultsPrintDocument.RightLogo)] = string.Empty,
             }
         );
+        AssertPrintChrome(html);
 
         return new NPrintDocumentRequest
         {
@@ -140,7 +141,7 @@ internal sealed class EndToEndPrintFeature : IDisposable
                 PaperFormat = NPrintPaperFormat.A5,
                 Orientation = NPrintOrientation.Landscape,
                 Scale = 0.85m,
-                Margin = "6mm",
+                Margin = HANDOUT_PAGE_MARGIN,
             },
         };
     }
@@ -157,17 +158,16 @@ internal sealed class EndToEndPrintFeature : IDisposable
         foreach (var (result, entryName) in entries)
         {
             var ranking = rankings.Single(x => x.Id == result.Id);
-            var document = new ProtocolDocument(new Ranklist(ranking), eventInformation, officials);
-            var html = await _renderer.Render<RanklistPrintDocument>(
+            var document = new ResultsDocument(new Result(ranking), eventInformation, officials);
+            var html = await _renderer.Render<ResultsPrintDocument>(
                 new Dictionary<string, object?>
                 {
-                    [nameof(RanklistPrintDocumentBehind.Document)] = document,
-                    [nameof(RanklistPrintDocumentBehind.Compact)] = true,
-                    [nameof(RanklistPrintDocumentBehind.PhasesAsRows)] = true,
-                    [nameof(RanklistPrintDocumentBehind.LeftLogo)] = string.Empty,
-                    [nameof(RanklistPrintDocumentBehind.RightLogo)] = string.Empty,
+                    [nameof(ResultsPrintDocument.Documents)] = new[] { document },
+                    [nameof(ResultsPrintDocument.LeftLogo)] = string.Empty,
+                    [nameof(ResultsPrintDocument.RightLogo)] = string.Empty,
                 }
             );
+            AssertPrintChrome(html);
 
             requests.Add(
                 new NPrintDocumentRequest
@@ -180,7 +180,7 @@ internal sealed class EndToEndPrintFeature : IDisposable
                         PaperFormat = NPrintPaperFormat.A4,
                         Orientation = NPrintOrientation.Portrait,
                         Scale = 0.85m,
-                        Margin = "10mm",
+                        Margin = RANKLIST_PAGE_MARGIN,
                     },
                 }
             );
@@ -202,14 +202,22 @@ internal sealed class EndToEndPrintFeature : IDisposable
         return services.BuildServiceProvider();
     }
 
-    static void AssertPdf(NFileContent file)
+    static void AssertPdf(NFile file)
     {
         Assert.Equal(NFileContentTypes.Pdf, file.ContentType);
-        Assert.True(file.Content.Length > 4, $"{file.FileName} should contain PDF bytes.");
+        Assert.True(file.Content.Length > 4, $"{file.Name} should contain PDF bytes.");
         Assert.Equal("%PDF", Encoding.ASCII.GetString(file.Content, 0, 4));
     }
 
-    static void AssertRanklistZip(NFileContent file, IReadOnlyList<NPrintDocumentRequest> documents)
+    static void AssertPrintChrome(string html)
+    {
+        Assert.Contains("results-print-backdrop", html);
+        Assert.Contains("Resources/AppIcon/appicon.svg", html);
+        Assert.Contains("results-print-footer", html);
+        Assert.Contains("Generated_by_NoTiming_System_v_string", html);
+    }
+
+    static void AssertRanklistZip(NFile file, IReadOnlyList<NPrintDocumentRequest> documents)
     {
         Assert.Equal(NFileContentTypes.Zip, file.ContentType);
         using var stream = new MemoryStream(file.Content);
@@ -239,6 +247,11 @@ internal sealed class EndToEndPrintFeature : IDisposable
         var extension = Path.GetExtension(fileName);
         var name = Path.GetFileNameWithoutExtension(fileName);
         return $"{name}-{batchNumber}{extension}";
+    }
+
+    static Participation GetParticipation(Handout handout)
+    {
+        return handout.Entries.Single().Participation;
     }
 
     sealed class StaticHtmlJsRuntime : IJSRuntime

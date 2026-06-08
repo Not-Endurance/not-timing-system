@@ -47,9 +47,10 @@ public class SocketStatusBehind : NComponent, IDisposable
         }
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _timer.Dispose();
+        base.Dispose();
         GC.SuppressFinalize(this);
     }
 

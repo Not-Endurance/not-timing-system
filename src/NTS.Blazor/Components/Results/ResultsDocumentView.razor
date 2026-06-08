@@ -1,0 +1,33 @@
+@inherits ResultsDocumentViewBehind
+
+@{
+    if (Document == null)
+    {
+        return;
+    }
+}
+
+<ResultsDocumentHeader Header="Document.Header"
+                       LeftLogo="@LeftLogo"
+                       RightLogo="@RightLogo"
+                       LogoClicked="@LogoClicked" />
+
+<MudStack Spacing="0" AlignItems="AlignItems.Center">
+    @foreach (var entry in Document.Entries)
+    {
+        <div class="results-entry print-avoid-break">
+            <ResultsDocumentRow Entry="entry" />
+        </div>
+    }
+</MudStack>
+
+<style>
+    .results-entry {
+        width: 100%;
+    }
+
+    h6,
+    .participation-table .mud-button-label {
+        font-weight: normal !important;
+    }
+</style>

@@ -1,7 +1,17 @@
-﻿namespace Not.Filesystem;
+﻿namespace Not.Files;
 
 public class FileHelper
 {
+    public static string? EncodeAsBase64DataUrl(string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            return null;
+        }
+        var file = new NFile(filePath);
+        return file.ToDataUrl();
+    }
+
     public static async Task WriteAsync(string path, string content)
     {
         path = SanitizePath(path);

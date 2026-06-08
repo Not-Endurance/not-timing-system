@@ -10,9 +10,9 @@ public interface IPastEventService : IPastEventContext
     IReadOnlyList<Ranking> Rankings { get; }
     Ranking? CurrentRanking { get; }
     IReadOnlyDictionary<int, IReadOnlyList<Starter>> StartlistHistoryByStage { get; }
-    ProtocolDocument? Document { get; }
+    ResultsDocument? Document { get; }
 
     Task LoadEvent(int eventId);
-    ProtocolDocument? CreateDocument(Ranking ranking);
+    ResultsDocument? CreateDocument(Ranking ranking);
     void Select(Ranking ranking);
 }

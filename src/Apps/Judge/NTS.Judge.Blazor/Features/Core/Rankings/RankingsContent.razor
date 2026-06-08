@@ -9,11 +9,10 @@
 <NContent Title="@Ranklist_string" IsLoading="@IsLoading" Class="@Class">
 
     <Main>
-        <RanklistPrintDocument Document="Document"
-                               Compact="false"
-                               LeftLogo="@HeaderLogo.Left"
-                               RightLogo="@HeaderLogo.Right"
-                               LogoClicked="OpenImageBrowser" />
+        <ResultsPrintDocument Documents="Documents"
+                              LeftLogo="@LeftLogo"
+                              RightLogo="@RightLogo"
+                              LogoClicked="OpenImageBrowser" />
     </Main>
 
     <Rightbar>
@@ -35,8 +34,8 @@
 
         @if (!IsDeactivatingEvent)
         {
-            <RankingMenu Rankings="RankingService.Rankings"
-                         Selected="RankingService.Current"
+            <RankingMenu Rankings="Rankings"
+                         Selected="CurrentRanking"
                          OnSelectedSafe="SelectRanking"
                          OnDeleteSafe="OpenDeleteDialog"
                          Class="mt-4" />

@@ -1,6 +1,7 @@
 using Microsoft.JSInterop;
 using Not.Application.Print;
 using Not.Files;
+using Not.Files.Abstractions;
 using Not.Print;
 
 namespace Not.Blazor.Client.Browser;
@@ -16,7 +17,7 @@ public class BrowserPrintService : INPrintService, IFileService
         _api = api;
     }
 
-    public Task<NFileContent> CreatePdf(
+    public Task<NFile> CreatePdf(
         NPrintDocumentRequest request,
         CancellationToken cancellationToken = default
     )
@@ -24,7 +25,7 @@ public class BrowserPrintService : INPrintService, IFileService
         return _api.CreatePdf(request, cancellationToken);
     }
 
-    public Task<NFileContent> CreateZip(
+    public Task<NFile> CreateZip(
         NPrintBatchRequest request,
         CancellationToken cancellationToken = default
     )
@@ -60,23 +61,23 @@ public class BrowserPrintService : INPrintService, IFileService
         await Download(file, cancellationToken);
     }
 
-    public Task Download(NFileContent file)
+    public Task Download(NFile file)
     {
         return Download(file, CancellationToken.None);
     }
 
-    public Task DownloadFile(NFileContent file, CancellationToken cancellationToken = default)
+    public Task DownloadFile(NFile file, CancellationToken cancellationToken = default)
     {
         return Download(file, cancellationToken);
     }
 
-    async Task Download(NFileContent file, CancellationToken cancellationToken)
+    async Task Download(NFile file, CancellationToken cancellationToken)
     {
         await using var module = await Import();
         await module.InvokeVoidAsync(
             "downloadBytes",
             cancellationToken,
-            file.FileName,
+            file.Name,
             file.Content,
             file.ContentType
         );

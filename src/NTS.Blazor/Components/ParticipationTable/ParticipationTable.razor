@@ -21,7 +21,7 @@
         </LeadingCell>
 
         <HeadingCell Context="index">
-            @if (AlignVertically)
+            @if (UseHorizontalLayout)
             {
                 <MudText Typo="Typo.caption">@PhaseHeadings[index]</MudText>
             }
@@ -62,8 +62,8 @@
 
     .participation-table-root .participation-table table th,
     .participation-table-root .participation-table table td {
-        padding-top: 4px !important;
-        padding-bottom: 4px !important;
+        padding-block: 4px !important;
+        padding-inline: 8px !important;
     }
 
     .participation-table-root .participation-table tbody th {
@@ -90,9 +90,10 @@
         display: block;
     }
 
-    .participation-table-root .participation-table-compact table th,
-    .participation-table-root .participation-table-compact table td {
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
+    @@media print {
+        .participation-table-root .participation-table table th,
+        .participation-table-root .participation-table table td {
+            padding-block: 0 !important;
+        }
     }
 </style>

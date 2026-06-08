@@ -5,12 +5,12 @@ namespace Not.Print;
 
 public interface INPrintService : ITransient
 {
-    Task<NFileContent> CreatePdf(
+    Task<NFile> CreatePdf(
         NPrintDocumentRequest request,
         CancellationToken cancellationToken = default
     );
 
-    Task<NFileContent> CreateZip(
+    Task<NFile> CreateZip(
         NPrintBatchRequest request,
         CancellationToken cancellationToken = default
     );
@@ -30,5 +30,5 @@ public interface INPrintService : ITransient
         CancellationToken cancellationToken = default
     );
 
-    Task DownloadFile(NFileContent file, CancellationToken cancellationToken = default);
+    Task DownloadFile(NFile file, CancellationToken cancellationToken = default);
 }

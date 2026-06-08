@@ -4,7 +4,7 @@ using NTS.Domain.Core.Objects.Documents;
 
 namespace NTS.Judge.Contracts.Features.Core.Rankings;
 
-public interface IProtocolDocumentService : ITransient
+public interface IResultsDocumentService : ITransient
 {
-    ProtocolDocument Create(Ranking ranking);
+    ResultsDocument Create(Ranking ranking);
 }

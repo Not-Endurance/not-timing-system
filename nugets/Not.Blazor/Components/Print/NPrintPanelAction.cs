@@ -37,7 +37,7 @@ public sealed class NPrintPanelAction
 
     public static NPrintPanelAction DownloadFile(
         string content,
-        Func<NPrintPanelContext, Task<NFileContent>> file,
+        Func<NPrintPanelContext, Task<NFile>> file,
         string? icon = null,
         Func<Task>? afterSuccess = null
     )
@@ -47,7 +47,7 @@ public sealed class NPrintPanelAction
 
     readonly Func<NPrintPanelContext, Task<NPrintDocumentRequest>>? _documentRequest;
     readonly Func<NPrintPanelContext, Task<NPrintBatchRequest>>? _batchRequest;
-    readonly Func<NPrintPanelContext, Task<NFileContent>>? _file;
+    readonly Func<NPrintPanelContext, Task<NFile>>? _file;
     readonly Func<Task>? _afterSuccess;
 
     NPrintPanelAction(
@@ -56,7 +56,7 @@ public sealed class NPrintPanelAction
         NPrintPanelActionKind kind,
         Func<NPrintPanelContext, Task<NPrintDocumentRequest>>? documentRequest,
         Func<NPrintPanelContext, Task<NPrintBatchRequest>>? batchRequest,
-        Func<NPrintPanelContext, Task<NFileContent>>? file,
+        Func<NPrintPanelContext, Task<NFile>>? file,
         Func<Task>? afterSuccess
     )
     {
@@ -85,7 +85,7 @@ public sealed class NPrintPanelAction
             ?? throw new InvalidOperationException("Print batch request factory is missing.");
     }
 
-    internal Task<NFileContent> GetFile(NPrintPanelContext context)
+    internal Task<NFile> GetFile(NPrintPanelContext context)
     {
         return _file?.Invoke(context) ?? throw new InvalidOperationException("File factory is missing.");
     }

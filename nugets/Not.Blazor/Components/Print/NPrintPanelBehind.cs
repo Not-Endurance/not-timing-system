@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Components.Web;
-using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Components.Buttons;
+using Not.Blazor.Helpers;
+using Not.Files;
 using Not.Print;
 
 namespace Not.Blazor.Components.Print;
@@ -118,6 +119,44 @@ public class NPrintPanelBehind : NComponent
         }
     }
 
+    internal static NPrintBatchRequest EncodeStaticImageSources(
+        NPrintBatchRequest request,
+        IReadOnlyList<string> assetRootPaths
+    )
+    {
+        return new NPrintBatchRequest
+        {
+            FileName = request.FileName,
+            Documents = request.Documents
+                .Select(document => EncodeStaticImageSources(document, assetRootPaths))
+                .ToList(),
+        };
+    }
+
+    internal static NPrintDocumentRequest EncodeStaticImageSources(
+        NPrintDocumentRequest request,
+        IReadOnlyList<string> assetRootPaths
+    )
+    {
+        var html = NHtmlHelper.ReplaceImagePaths(
+            request.Html,
+            imagePath => EncodeStaticImagePath(imagePath, assetRootPaths)
+        );
+        if (html == request.Html)
+        {
+            return request;
+        }
+
+        return new NPrintDocumentRequest
+        {
+            TemplateId = request.TemplateId,
+            Title = request.Title,
+            FileName = request.FileName,
+            Html = html,
+            Page = request.Page,
+        };
+    }
+
     async Task Execute(NPrintPanelAction action)
     {
         if (Disabled)
@@ -126,20 +165,30 @@ public class NPrintPanelBehind : NComponent
         }
 
         var context = new NPrintPanelContext(Scale, PaperFormat, Orientation);
+        var assetRootPaths = NStaticAssetHelper.CreateRootPaths();
         switch (action.Kind)
         {
             case NPrintPanelActionKind.PrintPdf:
-                var printRequest = await action.GetDocumentRequest(context);
+                var printRequest = EncodeStaticImageSources(
+                    await action.GetDocumentRequest(context),
+                    assetRootPaths
+                );
                 await PrintService.PrintPdf(printRequest);
                 await action.AfterSuccess();
                 break;
             case NPrintPanelActionKind.DownloadPdf:
-                var pdfRequest = await action.GetDocumentRequest(context);
+                var pdfRequest = EncodeStaticImageSources(
+                    await action.GetDocumentRequest(context),
+                    assetRootPaths
+                );
                 await PrintService.DownloadPdf(pdfRequest);
                 await action.AfterSuccess();
                 break;
             case NPrintPanelActionKind.DownloadZip:
-                var zipRequest = await action.GetBatchRequest(context);
+                var zipRequest = EncodeStaticImageSources(
+                    await action.GetBatchRequest(context),
+                    assetRootPaths
+                );
                 await PrintService.DownloadZip(zipRequest);
                 await action.AfterSuccess();
                 break;
@@ -151,5 +200,11 @@ public class NPrintPanelBehind : NComponent
             default:
                 throw new InvalidOperationException($"Unsupported print action '{action.Kind}'.");
         }
+    }
+
+    static string? EncodeStaticImagePath(string imagePath, IReadOnlyList<string> assetRootPaths)
+    {
+        var assetPath = NStaticAssetHelper.ResolvePath(imagePath, assetRootPaths);
+        return assetPath == null ? null : FileHelper.EncodeAsBase64DataUrl(assetPath);
     }
 }

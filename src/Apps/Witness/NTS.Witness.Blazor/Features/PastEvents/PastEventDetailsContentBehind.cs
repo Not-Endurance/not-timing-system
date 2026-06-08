@@ -4,19 +4,23 @@ using Not.Blazor.Components.Abstractions;
 using NTS.Application.Contracts.PastEvents;
 using NTS.Blazor.Components.PastEvents;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects.Documents;
 
 namespace NTS.Witness.Blazor.Features.PastEvents;
 
 public class PastEventDetailsContentBehind : NStatefulComponent
 {
     [Inject]
-    protected IPastEventService Service { get; set; } = default!;
+    IPastEventService Service { get; set; } = default!;
 
     [Inject]
-    protected IDialogService DialogService { get; set; } = default!;
+    IDialogService DialogService { get; set; } = default!;
 
     protected bool IsEmpty => Service.Event == null || Service.Document == null;
     protected bool HasStartlist => Service.StartlistHistoryByStage.Count != 0;
+    protected IReadOnlyList<ResultsDocument> Documents => Service.Document == null ? [] : [Service.Document];
+    protected IReadOnlyList<Ranking> Rankings => Service.Rankings;
+    protected Ranking? CurrentRanking => Service.CurrentRanking;
 
     [Parameter]
     public int EventId { get; set; }

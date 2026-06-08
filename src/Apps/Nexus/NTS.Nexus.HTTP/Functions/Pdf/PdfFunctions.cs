@@ -85,9 +85,9 @@ public class PdfFunctions : FunctionBase
         }
     }
 
-    static FileContentResult File(NFileContent file)
+    static FileContentResult File(NFile file)
     {
-        return new FileContentResult(file.Content, file.ContentType) { FileDownloadName = file.FileName };
+        return new FileContentResult(file.Content, file.ContentType) { FileDownloadName = file.Name };
     }
 
     static ObjectResult Error(Exception exception)

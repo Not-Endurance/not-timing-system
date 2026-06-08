@@ -241,7 +241,7 @@ public sealed class CoreFeatureEndToEndTests
             handout =>
             {
                 Assert.Equal(eventId, handout.EventId);
-                Assert.Equal(eventId, handout.Participation.EventId);
+                Assert.All(handout.Entries, entry => Assert.Equal(eventId, entry.Participation.EventId));
             }
         );
     }

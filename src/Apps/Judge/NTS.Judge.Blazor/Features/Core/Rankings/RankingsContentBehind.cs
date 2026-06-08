@@ -13,15 +13,13 @@ using NTS.Judge.Blazor.Features.Core.Rankings.CustomRanking;
 using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 using NTS.Judge.Blazor.Features.Print;
 using NTS.Judge.Blazor.Layout.Drawer.Deactivate;
-using NTS.Judge.Contracts.Features.Core;
-using NTS.Judge.Contracts.Features.Core.Rankings;
 using static NTS.Judge.Blazor.Routes;
 
 namespace NTS.Judge.Blazor.Features.Core.Rankings;
 
 public class RankingsContentBehind : NStatefulComponent
 {
-    const decimal DefaultPrintScale = 0.85m;
+    const decimal DEFAULT_PRINT_SCALE = 0.85m;
 
     bool _isDeactivatingEvent;
 
@@ -35,7 +33,7 @@ public class RankingsContentBehind : NStatefulComponent
     INtsSocketService SocketService { get; set; } = default!;
 
     [Inject]
-    IProtocolDocumentService DocumentService { get; set; } = default!;
+    IResultsDocumentService DocumentService { get; set; } = default!;
 
     [Inject]
     NavigationManager NavigationManager { get; set; } = default!;
@@ -44,18 +42,23 @@ public class RankingsContentBehind : NStatefulComponent
     INtsPrintRequestFactory PrintRequests { get; set; } = default!;
 
     [Inject]
-    protected IRankingMenuService RankingService { get; set; } = default!;
+    IProtocolLogoState HeaderLogo { get; set; } = default!;
 
     [Inject]
-    protected IProtocolLogoState HeaderLogo { get; set; } = default!;
+    protected IRankingMenuService RankingService { get; set; } = default!;
 
-    protected ProtocolDocument? Document { get; private set; }
+    protected string LeftLogo => HeaderLogo.Left;
+    protected string RightLogo => HeaderLogo.Right;
 
-    //public bool HasContent => RankingService.Ranklist != null;
+    protected ResultsDocument? Document { get; private set; }
+    protected IReadOnlyList<ResultsDocument> Documents => Document == null ? [] : [Document];
+
     protected bool HasActiveEvent => SocketService.Event != null;
     protected bool IsDeactivatingEvent => _isDeactivatingEvent;
     protected bool CanRunResultAction => HasActiveEvent && RankingService.Rankings.Any();
-    protected decimal PrintFontScale { get; set; } = DefaultPrintScale;
+    protected IReadOnlyList<Ranking> Rankings => RankingService.Rankings;
+    protected Ranking CurrentRanking => RankingService.Current;
+    protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
     protected IReadOnlyList<NPrintPanelAction> ResultActions =>
         [
             NPrintPanelAction.PrintPdf(
