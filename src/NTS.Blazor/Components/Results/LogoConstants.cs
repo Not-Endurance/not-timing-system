@@ -1,6 +1,6 @@
-namespace NTS.Blazor.Components.Print;
+namespace NTS.Blazor.Components.Results;
 
-public static class PrintLogoPath
+public static class LogoConstants
 {
     public const string Directory = "images/logos";
     public const string Nts = "Resources/AppIcon/appicon.svg";

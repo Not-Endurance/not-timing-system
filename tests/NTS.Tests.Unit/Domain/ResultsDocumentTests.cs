@@ -30,7 +30,7 @@ public sealed class ResultsDocumentTests
             id: 99
         );
 
-        var results = new Results(ranking);
+        var results = new Result(ranking);
         var document = new ResultsDocument(results, CreateEvent(), []);
 
         Assert.True(document.IsRanked);
@@ -58,7 +58,7 @@ public sealed class ResultsDocumentTests
             id: 99
         );
 
-        var results = new Results(ranking);
+        var results = new Result(ranking);
         var document = new ResultsDocument(results, CreateEvent(), []);
 
         Assert.False(document.IsRanked);

@@ -1,4 +1,4 @@
-using Not.Blazor.Components.Print;
+using Not.Files;
 
 namespace NTS.Tests.Unit.Temporary;
 
@@ -11,7 +11,7 @@ public class NPrintRequestImageEncoderTests
         Directory.CreateDirectory(Path.GetDirectoryName(imagePath)!);
         File.WriteAllBytes(imagePath, [1, 2, 3]);
 
-        var dataUrl = NPrintRequestImageEncoder.CreateDataUrl(imagePath);
+        var dataUrl = FileHelper.EncodeAsBase64DataUrl(imagePath);
 
         Assert.Equal("data:image/png;base64,AQID", dataUrl);
     }
@@ -21,7 +21,7 @@ public class NPrintRequestImageEncoderTests
     {
         var imagePath = Path.Combine(AppContext.BaseDirectory, "print-encoder", "missing.png");
 
-        var dataUrl = NPrintRequestImageEncoder.CreateDataUrl(imagePath);
+        var dataUrl = FileHelper.EncodeAsBase64DataUrl(imagePath);
 
         Assert.Null(dataUrl);
     }

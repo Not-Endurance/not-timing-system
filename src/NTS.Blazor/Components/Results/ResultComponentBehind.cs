@@ -4,8 +4,13 @@ using NTS.Domain.Core.Objects.Documents;
 
 namespace NTS.Blazor.Components.Results;
 
-public class ResultsDocumentViewBehind : NComponent
+public class ResultComponentBehind : NComponent
 {
+    protected string SectionClass =>
+        Document?.IsRanked == false
+            ? "results-print-section results-print-page"
+            : "results-print-section";
+
     [Parameter]
     public ResultsDocument? Document { get; set; }
 

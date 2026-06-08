@@ -11,12 +11,14 @@ using Not.Files;
 using Not.Krud.ServiceRegistration;
 using Not.Localization;
 using Not.Print;
+using NTS.Application.Contracts;
 using NTS.Application.Contracts.Pdf;
-using NTS.Blazor.Components.Print;
+using NTS.Blazor.Components.Results;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
+using static NTS.Localization.NtsStrings;
 
 namespace NTS.Tests.Integration.EndToEndEventTests.Features;
 
@@ -39,6 +41,8 @@ internal sealed class EndToEndPrintFeature : IDisposable
         _localizer = _services.GetRequiredService<IStringLocalizer>();
         LocalizationHelper.Configure(_localizer);
     }
+
+    static string GeneratedByText => $"{Generated_by_NoTiming_System_v_string}{ApplicationConstants.VERSION}";
 
     public async Task PrintPendingHandouts(
         EventInformation eventInformation,
@@ -121,21 +125,15 @@ internal sealed class EndToEndPrintFeature : IDisposable
     )
     {
         var documents = handouts.Select(handout => new ResultsDocument(handout, eventInformation, officials)).ToArray();
-        var html = await _renderer.Render<ResultsPrintDocument>(
-            new Dictionary<string, object?>
-            {
-                [nameof(ResultsPrintDocument.Documents)] = documents,
-                [nameof(ResultsPrintDocument.LeftLogo)] = string.Empty,
-                [nameof(ResultsPrintDocument.RightLogo)] = string.Empty,
-            }
-        );
-        AssertPrintChrome(html);
+        var html = await RenderResults(documents);
 
-        return new NPrintDocumentRequest
+        var request = new NPrintDocumentRequest
         {
             Title = "Handouts",
             FileName = BatchFileName(PdfFileNameHelper.HandoutsPdf(eventInformation.Id), batchNumber),
             Html = html,
+            FooterText = GeneratedByText,
+            BackdropImage = LogoConstants.Nts,
             Page = new NPrintPageOptions
             {
                 PaperFormat = NPrintPaperFormat.A5,
@@ -144,6 +142,8 @@ internal sealed class EndToEndPrintFeature : IDisposable
                 Margin = HANDOUT_PAGE_MARGIN,
             },
         };
+        AssertPrintChrome(request);
+        return request;
     }
 
     async Task<IReadOnlyList<NPrintDocumentRequest>> CreateRanklistRequests(
@@ -159,34 +159,56 @@ internal sealed class EndToEndPrintFeature : IDisposable
         {
             var ranking = rankings.Single(x => x.Id == result.Id);
             var document = new ResultsDocument(new Result(ranking), eventInformation, officials);
-            var html = await _renderer.Render<ResultsPrintDocument>(
-                new Dictionary<string, object?>
-                {
-                    [nameof(ResultsPrintDocument.Documents)] = new[] { document },
-                    [nameof(ResultsPrintDocument.LeftLogo)] = string.Empty,
-                    [nameof(ResultsPrintDocument.RightLogo)] = string.Empty,
-                }
-            );
-            AssertPrintChrome(html);
+            var html = await RenderResult(document);
 
-            requests.Add(
-                new NPrintDocumentRequest
+            var request = new NPrintDocumentRequest
+            {
+                Title = ranking.Name,
+                FileName = entryName,
+                Html = html,
+                FooterText = GeneratedByText,
+                BackdropImage = LogoConstants.Nts,
+                Page = new NPrintPageOptions
                 {
-                    Title = ranking.Name,
-                    FileName = entryName,
-                    Html = html,
-                    Page = new NPrintPageOptions
-                    {
-                        PaperFormat = NPrintPaperFormat.A4,
-                        Orientation = NPrintOrientation.Portrait,
-                        Scale = 0.85m,
-                        Margin = RANKLIST_PAGE_MARGIN,
-                    },
-                }
-            );
+                    PaperFormat = NPrintPaperFormat.A4,
+                    Orientation = NPrintOrientation.Portrait,
+                    Scale = 0.85m,
+                    Margin = RANKLIST_PAGE_MARGIN,
+                },
+            };
+            AssertPrintChrome(request);
+            requests.Add(request);
         }
 
         return requests;
+    }
+
+    async Task<string> RenderResults(IReadOnlyList<ResultsDocument> documents)
+    {
+        var html = new StringBuilder();
+        foreach (var document in documents)
+        {
+            if (html.Length > 0)
+            {
+                html.AppendLine();
+            }
+
+            html.Append(await RenderResult(document));
+        }
+
+        return html.ToString();
+    }
+
+    async Task<string> RenderResult(ResultsDocument document)
+    {
+        return await _renderer.Render<ResultComponent>(
+            new Dictionary<string, object?>
+            {
+                [nameof(ResultComponent.Document)] = document,
+                [nameof(ResultComponent.LeftLogo)] = string.Empty,
+                [nameof(ResultComponent.RightLogo)] = string.Empty,
+            }
+        );
     }
 
     static ServiceProvider CreateRendererServices()
@@ -209,12 +231,10 @@ internal sealed class EndToEndPrintFeature : IDisposable
         Assert.Equal("%PDF", Encoding.ASCII.GetString(file.Content, 0, 4));
     }
 
-    static void AssertPrintChrome(string html)
+    static void AssertPrintChrome(NPrintDocumentRequest request)
     {
-        Assert.Contains("results-print-backdrop", html);
-        Assert.Contains("Resources/AppIcon/appicon.svg", html);
-        Assert.Contains("results-print-footer", html);
-        Assert.Contains("Generated_by_NoTiming_System_v_string", html);
+        Assert.Equal(LogoConstants.Nts, request.BackdropImage);
+        Assert.Equal(GeneratedByText, request.FooterText);
     }
 
     static void AssertRanklistZip(NFile file, IReadOnlyList<NPrintDocumentRequest> documents)

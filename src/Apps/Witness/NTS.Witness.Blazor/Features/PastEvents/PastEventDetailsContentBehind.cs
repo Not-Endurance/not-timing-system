@@ -18,7 +18,7 @@ public class PastEventDetailsContentBehind : NStatefulComponent
 
     protected bool IsEmpty => Service.Event == null || Service.Document == null;
     protected bool HasStartlist => Service.StartlistHistoryByStage.Count != 0;
-    protected IReadOnlyList<ResultsDocument> Documents => Service.Document == null ? [] : [Service.Document];
+    protected ResultsDocument? Document => Service.Document;
     protected IReadOnlyList<Ranking> Rankings => Service.Rankings;
     protected Ranking? CurrentRanking => Service.CurrentRanking;
 

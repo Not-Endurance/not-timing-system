@@ -17,7 +17,29 @@ public sealed class NPrintTemplateRenderer : INPrintTemplateRenderer
             .Value.Replace("{{Title}}", H(request.Title), StringComparison.Ordinal)
             .Replace("{{MudBlazorStyles}}", MUD_BLAZOR_STYLES.Value, StringComparison.Ordinal)
             .Replace("{{Styles}}", NPrintDocumentCss.Create(request.Page), StringComparison.Ordinal)
+            .Replace("{{Backdrop}}", CreateBackdrop(request), StringComparison.Ordinal)
+            .Replace("{{Footer}}", CreateFooter(request), StringComparison.Ordinal)
             .Replace("{{Body}}", request.Html, StringComparison.Ordinal);
+    }
+
+    static string CreateBackdrop(NPrintDocumentRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.BackdropImage))
+        {
+            return string.Empty;
+        }
+
+        return $"""<div class="print-backdrop" aria-hidden="true"><img src="{H(request.BackdropImage)}" alt=""></div>""";
+    }
+
+    static string CreateFooter(NPrintDocumentRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.FooterText))
+        {
+            return string.Empty;
+        }
+
+        return $"""<div class="print-footer">{H(request.FooterText)}</div>""";
     }
 
     static string H(object? value)

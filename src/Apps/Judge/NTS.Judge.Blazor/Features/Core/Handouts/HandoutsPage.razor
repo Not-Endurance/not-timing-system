@@ -1,7 +1,7 @@
 @using NTS.Judge.Blazor.Features.Core.Handouts.Form
 @using Not.Blazor.Components.Layout
 @using Not.Blazor.Components.Print
-@using NTS.Blazor.Components.Print
+@using NTS.Blazor.Components.Results
 
 @attribute [Route(HANDOUTS_PAGE)]
 @inherits HandoutsPageBehind
@@ -11,10 +11,9 @@
     <Main>
         @foreach (var document in Documents)
         {
-            <ResultsPrintDocument 
-                Documents="@(new[] { document })"
-                LeftLogo="@LeftLogo"
-                RightLogo="@RightLogo" />
+            <ResultComponent Document="document"
+                             LeftLogo="@LeftLogo"
+                             RightLogo="@RightLogo" />
         }
     </Main>
 

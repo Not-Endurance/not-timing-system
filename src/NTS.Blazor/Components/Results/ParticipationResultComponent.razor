@@ -1,6 +1,6 @@
 @using NTS.Blazor.Components.ParticipationTable
 
-@inherits ResultsDocumentRowBehind
+@inherits ParticipationResultComponentBehind
 
 @{
     var participation = Entry.Participation;
@@ -14,11 +14,13 @@
           Class="mt-1 printable"
           Spacing="0"
           Style="width:100%;text-align:center">
+
     <MudStack Row
               Justify="Justify.FlexStart"
               AlignItems="AlignItems.End"
               Spacing="4"
               Class="results-row-header">
+
         <MudStack Row
                   Justify="Justify.FlexStart"
                   AlignItems="AlignItems.End"
@@ -51,7 +53,7 @@
 
         @if (UseInlineLayout)
         {
-            <ResultsRowSummary Participation="participation" ShowTotals="ShowTotals" />
+            <ParticipationSummaryComponent Participation="participation" ShowTotals="ShowTotals" />
         }
     </MudStack>
 
@@ -63,7 +65,7 @@
 
         @if (!UseInlineLayout)
         {
-            <ResultsRowSummary Participation="participation" ShowTotals="ShowTotals" />
+            <ParticipationSummaryComponent Participation="participation" ShowTotals="ShowTotals" />
         }
     </MudStack>
 </MudStack>

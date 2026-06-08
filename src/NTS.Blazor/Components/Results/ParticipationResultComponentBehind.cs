@@ -4,7 +4,7 @@ using NTS.Domain.Core.Aggregates.Results;
 
 namespace NTS.Blazor.Components.Results;
 
-public class ResultsDocumentRowBehind : NComponent
+public class ParticipationResultComponentBehind : NComponent
 {
     protected bool HasRank => Entry.Rank != null;
     protected bool ShowTotals => Entry.Rank != null;

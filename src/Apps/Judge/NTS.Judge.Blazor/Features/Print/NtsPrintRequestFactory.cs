@@ -1,8 +1,10 @@
+using System.Text;
 using Not.Blazor.Components.Print;
 using Not.Injection;
 using Not.Print;
+using NTS.Application.Contracts;
 using NTS.Application.Contracts.Pdf;
-using NTS.Blazor.Components.Print;
+using NTS.Blazor.Components.Results;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
 
@@ -20,26 +22,23 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
         _renderer = renderer;
     }
 
+    static string GeneratedByText => $"{Generated_by_NoTiming_System_v_string}{ApplicationConstants.VERSION}";
+
     public async Task<NPrintDocumentRequest> CreateHandouts(
         IReadOnlyList<ResultsDocument> documents,
         NPrintPanelContext context,
         string fileName
     )
     {
-        var html = await _renderer.Render<ResultsPrintDocument>(
-            new Dictionary<string, object?>
-            {
-                [nameof(ResultsPrintDocument.Documents)] = documents,
-                [nameof(ResultsPrintDocument.LeftLogo)] = PrintLogoPath.Fei,
-                [nameof(ResultsPrintDocument.RightLogo)] = PrintLogoPath.Bfks,
-            }
-        );
+        var html = await RenderResults(documents, LogoConstants.Fei, LogoConstants.Bfks);
 
         return new NPrintDocumentRequest
         {
             Title = Handouts_string,
             FileName = EnsureExtension(fileName, ".pdf"),
             Html = html,
+            FooterText = GeneratedByText,
+            BackdropImage = LogoConstants.Nts,
             Page = new NPrintPageOptions
             {
                 PaperFormat = context.PaperFormat,
@@ -58,7 +57,7 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
         string? rightLogo
     )
     {
-        var html = await RenderRanklist(document, leftLogo, rightLogo);
+        var html = await RenderResult(document, leftLogo, rightLogo);
         return CreateRanklistRequest(fileName, html, context);
     }
 
@@ -79,7 +78,7 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
         {
             var ranking = rankings.Single(x => x.Id == result.Id);
             var document = createDocument(ranking);
-            var html = await RenderRanklist(
+            var html = await RenderResult(
                 document,
                 leftLogo,
                 rightLogo
@@ -94,20 +93,40 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
         };
     }
 
-    async Task<string> RenderRanklist(
+    async Task<string> RenderResult(
         ResultsDocument document,
         string? leftLogo,
         string? rightLogo
     )
     {
-        return await _renderer.Render<ResultsPrintDocument>(
+        return await _renderer.Render<ResultComponent>(
             new Dictionary<string, object?>
             {
-                [nameof(ResultsPrintDocument.Documents)] = new[] { document },
-                [nameof(ResultsPrintDocument.LeftLogo)] = leftLogo,
-                [nameof(ResultsPrintDocument.RightLogo)] = rightLogo,
+                [nameof(ResultComponent.Document)] = document,
+                [nameof(ResultComponent.LeftLogo)] = leftLogo,
+                [nameof(ResultComponent.RightLogo)] = rightLogo,
             }
         );
+    }
+
+    async Task<string> RenderResults(
+        IReadOnlyList<ResultsDocument> documents,
+        string? leftLogo,
+        string? rightLogo
+    )
+    {
+        var html = new StringBuilder();
+        foreach (var document in documents)
+        {
+            if (html.Length > 0)
+            {
+                html.AppendLine();
+            }
+
+            html.Append(await RenderResult(document, leftLogo, rightLogo));
+        }
+
+        return html.ToString();
     }
 
     static NPrintDocumentRequest CreateRanklistRequest(
@@ -121,6 +140,8 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
             Title = Ranklist_string,
             FileName = EnsureExtension(fileName, ".pdf"),
             Html = html,
+            FooterText = GeneratedByText,
+            BackdropImage = LogoConstants.Nts,
             Page = new NPrintPageOptions
             {
                 PaperFormat = NPrintPaperFormat.A4,

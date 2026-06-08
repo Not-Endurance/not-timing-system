@@ -51,7 +51,6 @@ public class RankingsContentBehind : NStatefulComponent
     protected string RightLogo => HeaderLogo.Right;
 
     protected ResultsDocument? Document { get; private set; }
-    protected IReadOnlyList<ResultsDocument> Documents => Document == null ? [] : [Document];
 
     protected bool HasActiveEvent => SocketService.Event != null;
     protected bool IsDeactivatingEvent => _isDeactivatingEvent;

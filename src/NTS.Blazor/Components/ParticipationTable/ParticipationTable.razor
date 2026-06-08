@@ -21,11 +21,7 @@
         </LeadingCell>
 
         <HeadingCell Context="index">
-            @if (UseHorizontalLayout)
-            {
-                <MudText Typo="Typo.caption">@PhaseHeadings[index]</MudText>
-            }
-            else
+            @if (UseVerticalLayout)
             {
                 var phase = DisplayPhases[index];
 
@@ -45,6 +41,10 @@
                         <MudText Typo="Typo.caption">@phase.Gate</MudText>
                     </div>
                 }
+            }
+            else
+            {
+                <MudText Typo="Typo.caption">@PhaseHeadings[index]</MudText>
             }
         </HeadingCell>
     </NTable>

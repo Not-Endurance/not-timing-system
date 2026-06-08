@@ -1,5 +1,5 @@
 @using NTS.Blazor.Components.Rankings.Menu
-@using NTS.Blazor.Components.Print
+@using NTS.Blazor.Components.Results
 @using Not.Blazor.Components.Layout
 @using Not.Blazor.Components.Print
 
@@ -9,10 +9,13 @@
 <NContent Title="@Ranklist_string" IsLoading="@IsLoading" Class="@Class">
 
     <Main>
-        <ResultsPrintDocument Documents="Documents"
-                              LeftLogo="@LeftLogo"
-                              RightLogo="@RightLogo"
-                              LogoClicked="OpenImageBrowser" />
+        @if (Document != null)
+        {
+            <ResultComponent Document="Document"
+                             LeftLogo="@LeftLogo"
+                             RightLogo="@RightLogo"
+                             LogoClicked="OpenImageBrowser" />
+        }
     </Main>
 
     <Rightbar>

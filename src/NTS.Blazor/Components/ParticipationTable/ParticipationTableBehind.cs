@@ -23,7 +23,7 @@ public class ParticipationTableBehind : NComponent
     protected string[] PhaseHeadings { get; private set; } = [];
 
     protected override bool ObserveBreakpointChanges => true;
-    protected bool UseHorizontalLayout => !IsMdAndDown;
+    protected bool UseVerticalLayout => IsMdAndDown || Vertical;
     protected string LeadingHeaderText => Number?.ToString() ?? Number_string;
 
     [Parameter]
@@ -34,6 +34,9 @@ public class ParticipationTableBehind : NComponent
 
     [Parameter]
     public bool Editable { get; set; }
+
+    [Parameter]
+    public bool Vertical { get; set; } 
 
     protected override void OnParametersSet()
     {
@@ -75,15 +78,15 @@ public class ParticipationTableBehind : NComponent
     void RebuildRows()
     {
         var verticalRows = BuildRows(DisplayPhases);
-        if (UseHorizontalLayout)
+        if (UseVerticalLayout)
         {
-            PhaseHeadings = verticalRows.Select(x => x.Label).ToArray();
-            Rows = BuildPhaseRows(DisplayPhases, verticalRows);
+            PhaseHeadings = DisplayPhases.Select(x => x.Gate).ToArray();
+            Rows = verticalRows;
             return;
         }
 
-        PhaseHeadings = DisplayPhases.Select(x => x.Gate).ToArray();
-        Rows = verticalRows;
+        PhaseHeadings = verticalRows.Select(x => x.Label).ToArray();
+        Rows = BuildPhaseRows(DisplayPhases, verticalRows);
     }
 
     IReadOnlyList<ParticipationTableRow> BuildRows(IReadOnlyList<Phase> phases)

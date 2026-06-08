@@ -27,4 +27,16 @@ internal static class NHtmlHelper
             }
         );
     }
+
+    public static string? ReplaceImagePath(string? imagePath, Func<string, string?> replace)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+        {
+            return imagePath;
+        }
+
+        var decodedImagePath = WebUtility.HtmlDecode(imagePath);
+        var replacement = replace(decodedImagePath);
+        return replacement == null || replacement == decodedImagePath ? imagePath : replacement;
+    }
 }

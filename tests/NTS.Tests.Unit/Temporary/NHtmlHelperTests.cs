@@ -36,4 +36,19 @@ public class NHtmlHelperTests
 
         Assert.Equal(html, replaced);
     }
+
+    [Fact]
+    public void ReplaceImagePath_ReplacesSingleDecodedImagePath()
+    {
+        var replaced = NHtmlHelper.ReplaceImagePath(
+            "images/logo.png?version=1&amp;theme=dark",
+            imagePath =>
+            {
+                Assert.Equal("images/logo.png?version=1&theme=dark", imagePath);
+                return "data:image/png;base64,AQID";
+            }
+        );
+
+        Assert.Equal("data:image/png;base64,AQID", replaced);
+    }
 }

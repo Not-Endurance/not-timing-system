@@ -142,7 +142,11 @@ public class NPrintPanelBehind : NComponent
             request.Html,
             imagePath => EncodeStaticImagePath(imagePath, assetRootPaths)
         );
-        if (html == request.Html)
+        var backdropImage = NHtmlHelper.ReplaceImagePath(
+            request.BackdropImage,
+            imagePath => EncodeStaticImagePath(imagePath, assetRootPaths)
+        );
+        if (html == request.Html && backdropImage == request.BackdropImage)
         {
             return request;
         }
@@ -153,6 +157,8 @@ public class NPrintPanelBehind : NComponent
             Title = request.Title,
             FileName = request.FileName,
             Html = html,
+            FooterText = request.FooterText,
+            BackdropImage = backdropImage,
             Page = request.Page,
         };
     }

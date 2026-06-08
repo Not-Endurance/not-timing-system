@@ -4,7 +4,7 @@ using NTS.Domain.Core.Objects.Documents;
 
 namespace NTS.Blazor.Components.Results;
 
-public class ResultsDocumentHeaderBehind : NComponent
+public class ResultHeaderComponentBehind : NComponent
 {
     protected bool HasLeftLogo => !string.IsNullOrWhiteSpace(LeftLogo);
     protected bool HasRightLogo => !string.IsNullOrWhiteSpace(RightLogo);

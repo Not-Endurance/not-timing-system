@@ -15,6 +15,7 @@ public class NPrintPanelBehindTests
 
         var request = new NPrintDocumentRequest
         {
+            FooterText = "Generated",
             Html = """
                 <main>
                     <img src="images/logo.png">
@@ -27,6 +28,7 @@ public class NPrintPanelBehindTests
 
         Assert.Contains("src=\"data:image/png;base64,AQID\"", encoded.Html);
         Assert.Contains("src=\"https://example.com/logo.png\"", encoded.Html);
+        Assert.Equal("Generated", encoded.FooterText);
     }
 
     [Fact]
@@ -43,6 +45,7 @@ public class NPrintPanelBehindTests
 
         var request = new NPrintDocumentRequest
         {
+            BackdropImage = "Resources/AppIcon/appicon.svg",
             Html = """
                 <main>
                     <img src="/images/logo.png">
@@ -55,5 +58,6 @@ public class NPrintPanelBehindTests
 
         Assert.Contains("src=\"data:image/png;base64,AQID\"", encoded.Html);
         Assert.Contains("src=\"data:image/svg+xml;base64,PHN2ZyAvPg==\"", encoded.Html);
+        Assert.Equal("data:image/svg+xml;base64,PHN2ZyAvPg==", encoded.BackdropImage);
     }
 }

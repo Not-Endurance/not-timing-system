@@ -30,7 +30,7 @@ public sealed class NApiPrintServiceTests
         Assert.Equal(HttpMethod.Post, handler.Method);
         Assert.Equal(new Uri("https://example.test/api/print/pdf"), handler.RequestUri);
         Assert.Equal("application/json", handler.RequestContentType);
-        Assert.Equal("generated.pdf", file.FileName);
+        Assert.Equal("generated.pdf", file.Name);
         Assert.Equal(NFileContentTypes.Pdf, file.ContentType);
         Assert.Equal(content, file.Content);
     }
@@ -46,7 +46,7 @@ public sealed class NApiPrintServiceTests
         var file = await service.CreateZip(new NPrintBatchRequest { FileName = "results" });
 
         Assert.Equal(new Uri("https://example.test/api/print/zip"), handler.RequestUri);
-        Assert.Equal("results.zip", file.FileName);
+        Assert.Equal("results.zip", file.Name);
         Assert.Equal(NFileContentTypes.Zip, file.ContentType);
         Assert.Equal(content, file.Content);
     }

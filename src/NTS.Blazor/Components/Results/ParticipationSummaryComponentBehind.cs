@@ -7,7 +7,7 @@ using NTS.Domain.Objects;
 
 namespace NTS.Blazor.Components.Results;
 
-public class ResultsRowSummaryBehind : NComponent
+public class ParticipationSummaryComponentBehind : NComponent
 {
     protected const Align SummaryAlign = Align.Center;
     protected override bool ObserveBreakpointChanges => true;

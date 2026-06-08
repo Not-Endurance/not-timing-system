@@ -34,6 +34,7 @@ public static class NPrintDocumentCss
             }
 
             .print-document {
+                position: relative;
                 box-sizing: border-box;
                 width: 100%;
                 color: #111;
@@ -68,6 +69,15 @@ public static class NPrintDocumentCss
                 page-break-inside: avoid;
             }
 
+            .print-backdrop,
+            .print-footer {
+                display: none;
+            }
+
+            .results-print-section {
+                position: relative;
+            }
+
             .results-print-page {
                 break-after: page;
                 page-break-after: always;
@@ -75,9 +85,43 @@ public static class NPrintDocumentCss
                 overflow: hidden;
             }
 
-            .results-print-page:last-child {
+            .print-document:last-child .results-print-page:last-child {
                 break-after: auto;
                 page-break-after: auto;
+            }
+
+            @media print {
+                .print-backdrop {
+                    display: flex;
+                    position: fixed;
+                    inset: 0;
+                    align-items: center;
+                    justify-content: center;
+                    pointer-events: none;
+                    z-index: 0;
+                }
+
+                .print-backdrop img {
+                    width: min(70vw, 680px);
+                    max-height: 70vh;
+                    opacity: 0.04;
+                }
+
+                .results-print-section {
+                    padding-bottom: 4mm;
+                    z-index: 1;
+                }
+
+                .print-footer {
+                    display: block;
+                    position: fixed;
+                    right: 7mm;
+                    bottom: 5mm;
+                    z-index: 2;
+                    color: #202020;
+                    font-size: 8px;
+                    line-height: 1;
+                }
             }
 
             table {

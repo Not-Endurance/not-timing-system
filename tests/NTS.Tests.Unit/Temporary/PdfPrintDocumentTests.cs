@@ -16,6 +16,8 @@ public class PdfPrintDocumentTests
         Assert.Equal(NPrintOrientation.Portrait, request.Page.Orientation);
         Assert.Equal(1m, request.Page.Scale);
         Assert.Equal("10mm", request.Page.Margin);
+        Assert.Null(request.FooterText);
+        Assert.Null(request.BackdropImage);
     }
 
     [Fact]
@@ -66,11 +68,34 @@ public class PdfPrintDocumentTests
         Assert.DoesNotContain("--print-spacing-scale", css);
         Assert.Contains("font-size: calc(16px * var(--print-font-scale));", css);
         Assert.Contains(".print-document", css);
+        Assert.Contains(".print-backdrop", css);
+        Assert.Contains(".print-footer", css);
+        Assert.Contains(".results-print-section", css);
         Assert.Contains(".results-print-page", css);
     }
 
     [Fact]
-    public void ResultsPrintComponents_UseResponsiveLayoutWithoutHorizontalOrCompactParameters()
+    public void NPrintTemplateRenderer_RendersFooterAndBackdropFromRequest()
+    {
+        var renderer = new NPrintTemplateRenderer();
+        var html = renderer.Render(
+            new NPrintDocumentRequest
+            {
+                FileName = "ranklist.pdf",
+                Html = "<main />",
+                FooterText = "<generated>",
+                BackdropImage = "Resources/AppIcon/appicon.svg",
+            }
+        );
+
+        Assert.Contains("<div class=\"print-backdrop\" aria-hidden=\"true\">", html);
+        Assert.Contains("src=\"Resources/AppIcon/appicon.svg\"", html);
+        Assert.Contains("<div class=\"print-footer\">&lt;generated&gt;</div>", html);
+        Assert.Contains("<main />", html);
+    }
+
+    [Fact]
+    public void ParticipationTable_UsesExplicitModesForDashboardAndResultDocuments()
     {
         var repositoryRoot = FindRepositoryRoot();
         var tableSource = File.ReadAllText(
@@ -93,84 +118,78 @@ public class PdfPrintDocumentTests
                 "ParticipationTableBehind.cs"
             )
         );
-        var resultsPrintDocumentSource = File.ReadAllText(
-            Path.Combine(
-                repositoryRoot,
-                "src",
-                "NTS.Blazor",
-                "Components",
-                "Print",
-                "ResultsPrintDocument.razor"
-            )
-        );
-        var resultsPrintDocumentBehindSource = File.ReadAllText(
-            Path.Combine(
-                repositoryRoot,
-                "src",
-                "NTS.Blazor",
-                "Components",
-                "Print",
-                "ResultsPrintDocumentBehind.cs"
-            )
-        );
-        var resultsDocumentViewSource = File.ReadAllText(
+        var resultComponentSource = File.ReadAllText(
             Path.Combine(
                 repositoryRoot,
                 "src",
                 "NTS.Blazor",
                 "Components",
                 "Results",
-                "ResultsDocumentView.razor"
+                "ResultComponent.razor"
             )
         );
-        var resultsDocumentViewBehindSource = File.ReadAllText(
+        var resultComponentBehindSource = File.ReadAllText(
             Path.Combine(
                 repositoryRoot,
                 "src",
                 "NTS.Blazor",
                 "Components",
                 "Results",
-                "ResultsDocumentViewBehind.cs"
+                "ResultComponentBehind.cs"
             )
         );
-        var resultsRowSource = File.ReadAllText(
+        var participationResultSource = File.ReadAllText(
             Path.Combine(
                 repositoryRoot,
                 "src",
                 "NTS.Blazor",
                 "Components",
                 "Results",
-                "ResultsDocumentRow.razor"
+                "ParticipationResultComponent.razor"
             )
         );
-        var resultsRowBehindSource = File.ReadAllText(
+        var dashboardSource = File.ReadAllText(
+            Path.Combine(
+                repositoryRoot,
+                "src",
+                "Apps",
+                "Judge",
+                "NTS.Judge.Blazor",
+                "Features",
+                "Core",
+                "Dashboards",
+                "Components",
+                "Dashboard.razor"
+            )
+        );
+        var participationResultBehindSource = File.ReadAllText(
             Path.Combine(
                 repositoryRoot,
                 "src",
                 "NTS.Blazor",
                 "Components",
                 "Results",
-                "ResultsDocumentRowBehind.cs"
+                "ParticipationResultComponentBehind.cs"
             )
         );
-        var resultsSummarySource = File.ReadAllText(
+        var participationSummarySource = File.ReadAllText(
             Path.Combine(
                 repositoryRoot,
                 "src",
                 "NTS.Blazor",
                 "Components",
                 "Results",
-                "ResultsRowSummary.razor"
+                "ParticipationSummaryComponent.razor"
             )
         );
-        var resultsSummaryBehindSource = File.ReadAllText(
+        var participationSummaryBehindSource = File.ReadAllText(
             Path.Combine(
                 repositoryRoot,
                 "src",
                 "NTS.Blazor",
                 "Components",
                 "Results",
-                "ResultsRowSummaryBehind.cs"
+                "ParticipationSummaryComponentBehind.cs"
             )
         );
         var componentSource = File.ReadAllText(
@@ -190,7 +209,10 @@ public class PdfPrintDocumentTests
         Assert.Contains("padding-block: 0 !important;", tableSource);
         Assert.Contains("UseHorizontalLayout", tableSource);
         Assert.Contains("protected override bool ObserveBreakpointChanges => true;", tableBehindSource);
-        Assert.Contains("UseHorizontalLayout => !IsMdAndDown", tableBehindSource);
+        Assert.Contains("public ParticipationTableMode Mode { get; set; }", tableBehindSource);
+        Assert.Contains("ParticipationTableMode.Horizontal => true", tableBehindSource);
+        Assert.Contains("ParticipationTableMode.Vertical => false", tableBehindSource);
+        Assert.Contains("_ => !IsMdAndDown", tableBehindSource);
         Assert.Contains("protected bool IsMdAndDown", componentSource);
         Assert.Contains("ViewportService.SubscribeAsync", componentSource);
         Assert.DoesNotContain("--print-spacing-scale", tableSource);
@@ -198,18 +220,31 @@ public class PdfPrintDocumentTests
         Assert.DoesNotContain("participation-table-compact", tableSource);
         Assert.DoesNotContain("Compact", tableBehindSource);
         Assert.DoesNotContain("public bool Horizontal", tableBehindSource);
-        Assert.DoesNotContain("Horizontal=\"", resultsRowSource);
-        Assert.DoesNotContain("Horizontal", resultsPrintDocumentSource);
-        Assert.DoesNotContain("Horizontal", resultsPrintDocumentBehindSource);
-        Assert.DoesNotContain("Horizontal", resultsDocumentViewSource);
-        Assert.DoesNotContain("Horizontal", resultsDocumentViewBehindSource);
-        Assert.DoesNotContain("public bool Horizontal", resultsRowBehindSource);
-        Assert.DoesNotContain("Horizontal", resultsSummarySource);
-        Assert.DoesNotContain("public bool Horizontal", resultsSummaryBehindSource);
-        Assert.Contains("protected override bool ObserveBreakpointChanges => true;", resultsRowBehindSource);
-        Assert.Contains("UseInlineLayout => !IsMdAndDown", resultsRowBehindSource);
-        Assert.Contains("protected override bool ObserveBreakpointChanges => true;", resultsSummaryBehindSource);
-        Assert.Contains("UseInlineLayout => !IsMdAndDown", resultsSummaryBehindSource);
+        Assert.Contains("Mode=\"ParticipationTableMode.Vertical\"", dashboardSource);
+        Assert.Contains("Mode=\"ParticipationTableMode.Horizontal\"", participationResultSource);
+        Assert.DoesNotContain("Horizontal", resultComponentSource);
+        Assert.DoesNotContain("Horizontal", resultComponentBehindSource);
+        Assert.DoesNotContain("public bool Horizontal", participationResultBehindSource);
+        Assert.DoesNotContain("Horizontal", participationSummarySource);
+        Assert.DoesNotContain("public bool Horizontal", participationSummaryBehindSource);
+        Assert.Contains("ResultHeaderComponent", resultComponentSource);
+        Assert.Contains("ParticipationResultComponent", resultComponentSource);
+        Assert.Contains("protected override bool ObserveBreakpointChanges => true;", participationResultBehindSource);
+        Assert.Contains("UseInlineLayout => !IsMdAndDown", participationResultBehindSource);
+        Assert.Contains("protected override bool ObserveBreakpointChanges => true;", participationSummaryBehindSource);
+        Assert.Contains("UseInlineLayout => !IsMdAndDown", participationSummaryBehindSource);
+        Assert.False(
+            File.Exists(
+                Path.Combine(
+                    repositoryRoot,
+                    "src",
+                    "NTS.Blazor",
+                    "Components",
+                    "Print",
+                    "ResultsPrintDocument.razor"
+                )
+            )
+        );
     }
 
     [Fact]

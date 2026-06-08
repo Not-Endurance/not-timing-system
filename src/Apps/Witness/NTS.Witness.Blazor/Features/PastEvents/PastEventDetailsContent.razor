@@ -1,13 +1,16 @@
 @using Not.Blazor.Components.Layout
 @using NTS.Blazor.Components.Rankings.Menu
-@using NTS.Blazor.Components.Print
+@using NTS.Blazor.Components.Results
 
 @attribute [Route(PAST_EVENT_DETAILS_PAGE)]
 @inherits PastEventDetailsContentBehind
 
 <NContent Title="@Past_events_string" IsLoading="@IsLoading" IsEmpty="@IsEmpty">
     <Main>
-        <ResultsPrintDocument Documents="Documents" />
+        @if (Document != null)
+        {
+            <ResultComponent Document="Document" />
+        }
     </Main>
 
     <Rightbar>

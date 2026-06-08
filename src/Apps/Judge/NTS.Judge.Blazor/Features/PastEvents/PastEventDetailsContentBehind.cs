@@ -38,7 +38,6 @@ public class PastEventDetailsContentBehind : NStatefulComponent
 
     protected bool IsEmpty => Service.Event == null || Service.Document == null;
     protected ResultsDocument? Document => Service.Document;
-    protected IReadOnlyList<ResultsDocument> Documents => Document == null ? [] : [Document];
     protected IReadOnlyList<Ranking> Rankings => Service.Rankings;
     protected Ranking? CurrentRanking => Service.CurrentRanking;
     protected string HeaderLogoLeft => HeaderLogo.Left;
