@@ -70,34 +70,20 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
         string? rightLogo
     )
     {
-        var entries = PdfFileNameHelper.ResultPdfEntries(
-            rankings.Select(x => new PdfNamedResult(x.Id, x.Name))
-        );
+        var entries = PdfFileNameHelper.ResultPdfEntries(rankings.Select(x => new PdfNamedResult(x.Id, x.Name)));
         var documents = new List<NPrintDocumentRequest>();
         foreach (var (result, entryName) in entries)
         {
             var ranking = rankings.Single(x => x.Id == result.Id);
             var document = createDocument(ranking);
-            var html = await RenderResult(
-                document,
-                leftLogo,
-                rightLogo
-            );
+            var html = await RenderResult(document, leftLogo, rightLogo);
             documents.Add(CreateRanklistRequest(entryName, html, context));
         }
 
-        return new NPrintBatchRequest
-        {
-            FileName = EnsureExtension(fileName, ".zip"),
-            Documents = documents,
-        };
+        return new NPrintBatchRequest { FileName = EnsureExtension(fileName, ".zip"), Documents = documents };
     }
 
-    async Task<string> RenderResult(
-        ResultsDocument document,
-        string? leftLogo,
-        string? rightLogo
-    )
+    async Task<string> RenderResult(ResultsDocument document, string? leftLogo, string? rightLogo)
     {
         return await _renderer.Render<ResultComponent>(
             new Dictionary<string, object?>
@@ -109,11 +95,7 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
         );
     }
 
-    async Task<string> RenderResults(
-        IReadOnlyList<ResultsDocument> documents,
-        string? leftLogo,
-        string? rightLogo
-    )
+    async Task<string> RenderResults(IReadOnlyList<ResultsDocument> documents, string? leftLogo, string? rightLogo)
     {
         var html = new StringBuilder();
         foreach (var document in documents)
@@ -129,11 +111,7 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
         return html.ToString();
     }
 
-    static NPrintDocumentRequest CreateRanklistRequest(
-        string fileName,
-        string html,
-        NPrintPanelContext context
-    )
+    static NPrintDocumentRequest CreateRanklistRequest(string fileName, string html, NPrintPanelContext context)
     {
         return new NPrintDocumentRequest
         {
@@ -154,9 +132,7 @@ public sealed class NtsPrintRequestFactory : INtsPrintRequestFactory, ITransient
 
     static string EnsureExtension(string fileName, string extension)
     {
-        return fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
-            ? fileName
-            : $"{fileName}{extension}";
+        return fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase) ? fileName : $"{fileName}{extension}";
     }
 }
 

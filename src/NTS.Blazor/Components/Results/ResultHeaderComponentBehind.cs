@@ -9,9 +9,8 @@ public class ResultHeaderComponentBehind : NComponent
     protected bool HasLeftLogo => !string.IsNullOrWhiteSpace(LeftLogo);
     protected bool HasRightLogo => !string.IsNullOrWhiteSpace(RightLogo);
     protected string LogoClass => LogoClicked.HasDelegate ? "cursor-pointer" : string.Empty;
-    protected string HeaderLogoClass => string.IsNullOrWhiteSpace(LogoClass)
-        ? "results-header-logo"
-        : $"results-header-logo {LogoClass}";
+    protected string HeaderLogoClass =>
+        string.IsNullOrWhiteSpace(LogoClass) ? "results-header-logo" : $"results-header-logo {LogoClass}";
 
     [Parameter, EditorRequired]
     public DocumentHeader Header { get; set; } = default!;

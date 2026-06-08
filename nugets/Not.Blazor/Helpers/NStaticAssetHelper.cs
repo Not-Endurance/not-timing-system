@@ -5,12 +5,12 @@ internal static class NStaticAssetHelper
     public static IReadOnlyList<string> CreateRootPaths()
     {
         return new[]
-            {
-                Path.Combine(AppContext.BaseDirectory, "wwwroot"),
-                Path.Combine(Environment.CurrentDirectory, "wwwroot"),
-                AppContext.BaseDirectory,
-                Environment.CurrentDirectory,
-            }
+        {
+            Path.Combine(AppContext.BaseDirectory, "wwwroot"),
+            Path.Combine(Environment.CurrentDirectory, "wwwroot"),
+            AppContext.BaseDirectory,
+            Environment.CurrentDirectory,
+        }
             .Select(Path.GetFullPath)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();

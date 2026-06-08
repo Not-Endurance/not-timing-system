@@ -119,24 +119,10 @@ public class PdfPrintDocumentTests
             )
         );
         var resultComponentSource = File.ReadAllText(
-            Path.Combine(
-                repositoryRoot,
-                "src",
-                "NTS.Blazor",
-                "Components",
-                "Results",
-                "ResultComponent.razor"
-            )
+            Path.Combine(repositoryRoot, "src", "NTS.Blazor", "Components", "Results", "ResultComponent.razor")
         );
         var resultComponentBehindSource = File.ReadAllText(
-            Path.Combine(
-                repositoryRoot,
-                "src",
-                "NTS.Blazor",
-                "Components",
-                "Results",
-                "ResultComponentBehind.cs"
-            )
+            Path.Combine(repositoryRoot, "src", "NTS.Blazor", "Components", "Results", "ResultComponentBehind.cs")
         );
         var participationResultSource = File.ReadAllText(
             Path.Combine(
@@ -193,14 +179,7 @@ public class PdfPrintDocumentTests
             )
         );
         var componentSource = File.ReadAllText(
-            Path.Combine(
-                repositoryRoot,
-                "nugets",
-                "Not.Blazor",
-                "Components",
-                "Abstractions",
-                "NComponent.cs"
-            )
+            Path.Combine(repositoryRoot, "nugets", "Not.Blazor", "Components", "Abstractions", "NComponent.cs")
         );
 
         Assert.Contains("padding-block: 4px !important;", tableSource);
@@ -235,14 +214,7 @@ public class PdfPrintDocumentTests
         Assert.Contains("UseInlineLayout => !IsMdAndDown", participationSummaryBehindSource);
         Assert.False(
             File.Exists(
-                Path.Combine(
-                    repositoryRoot,
-                    "src",
-                    "NTS.Blazor",
-                    "Components",
-                    "Print",
-                    "ResultsPrintDocument.razor"
-                )
+                Path.Combine(repositoryRoot, "src", "NTS.Blazor", "Components", "Print", "ResultsPrintDocument.razor")
             )
         );
     }
@@ -251,11 +223,7 @@ public class PdfPrintDocumentTests
     public void NPrintDocumentCss_UsesNamedPaperFormats()
     {
         var css = NPrintDocumentCss.Create(
-            new NPrintPageOptions
-            {
-                PaperFormat = NPrintPaperFormat.Letter,
-                Orientation = NPrintOrientation.Portrait,
-            }
+            new NPrintPageOptions { PaperFormat = NPrintPaperFormat.Letter, Orientation = NPrintOrientation.Portrait }
         );
 
         Assert.Contains("size: Letter portrait;", css);

@@ -48,10 +48,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
     public IReadOnlyDictionary<int, IReadOnlyList<Starter>> StartlistHistoryByStage =>
         _startlist?.HistoryByStage ?? EMPTY_STARTLIST;
 
-    public ResultsDocument? Document =>
-        Event == null || CurrentRanking == null
-            ? null
-            : CreateDocument(CurrentRanking);
+    public ResultsDocument? Document => Event == null || CurrentRanking == null ? null : CreateDocument(CurrentRanking);
 
     protected override async Task<bool> InitializeState()
     {
@@ -95,9 +92,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
 
     public ResultsDocument? CreateDocument(Ranking ranking)
     {
-        return Event == null
-            ? null
-            : new ResultsDocument(new Result(ranking), Event, _officials);
+        return Event == null ? null : new ResultsDocument(new Result(ranking), Event, _officials);
     }
 
     public async Task<IEnumerable<EventInformation>> ReadMany()

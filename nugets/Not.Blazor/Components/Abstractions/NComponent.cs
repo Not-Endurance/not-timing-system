@@ -18,7 +18,7 @@ public class NComponent : NComponentBase, IDisposable
         {
             try
             {
-                OnBeforeRender(); 
+                OnBeforeRender();
                 await OnBeforeRenderAsync();
                 await InvokeAsync(StateHasChanged);
             }

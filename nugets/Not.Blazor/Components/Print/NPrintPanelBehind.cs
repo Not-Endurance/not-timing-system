@@ -127,8 +127,8 @@ public class NPrintPanelBehind : NComponent
         return new NPrintBatchRequest
         {
             FileName = request.FileName,
-            Documents = request.Documents
-                .Select(document => EncodeStaticImageSources(document, assetRootPaths))
+            Documents = request
+                .Documents.Select(document => EncodeStaticImageSources(document, assetRootPaths))
                 .ToList(),
         };
     }
@@ -175,26 +175,17 @@ public class NPrintPanelBehind : NComponent
         switch (action.Kind)
         {
             case NPrintPanelActionKind.PrintPdf:
-                var printRequest = EncodeStaticImageSources(
-                    await action.GetDocumentRequest(context),
-                    assetRootPaths
-                );
+                var printRequest = EncodeStaticImageSources(await action.GetDocumentRequest(context), assetRootPaths);
                 await PrintService.PrintPdf(printRequest);
                 await action.AfterSuccess();
                 break;
             case NPrintPanelActionKind.DownloadPdf:
-                var pdfRequest = EncodeStaticImageSources(
-                    await action.GetDocumentRequest(context),
-                    assetRootPaths
-                );
+                var pdfRequest = EncodeStaticImageSources(await action.GetDocumentRequest(context), assetRootPaths);
                 await PrintService.DownloadPdf(pdfRequest);
                 await action.AfterSuccess();
                 break;
             case NPrintPanelActionKind.DownloadZip:
-                var zipRequest = EncodeStaticImageSources(
-                    await action.GetBatchRequest(context),
-                    assetRootPaths
-                );
+                var zipRequest = EncodeStaticImageSources(await action.GetBatchRequest(context), assetRootPaths);
                 await PrintService.DownloadZip(zipRequest);
                 await action.AfterSuccess();
                 break;

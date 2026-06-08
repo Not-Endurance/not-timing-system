@@ -7,15 +7,9 @@ namespace Not.Application.Print;
 
 public interface INPrintApiService : ITransient
 {
-    Task<NFile> CreatePdf(
-        NPrintDocumentRequest request,
-        CancellationToken cancellationToken = default
-    );
+    Task<NFile> CreatePdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default);
 
-    Task<NFile> CreateZip(
-        NPrintBatchRequest request,
-        CancellationToken cancellationToken = default
-    );
+    Task<NFile> CreateZip(NPrintBatchRequest request, CancellationToken cancellationToken = default);
 }
 
 public class NApiPrintService : INPrintApiService
@@ -27,10 +21,7 @@ public class NApiPrintService : INPrintApiService
         _client = client;
     }
 
-    public Task<NFile> CreatePdf(
-        NPrintDocumentRequest request,
-        CancellationToken cancellationToken = default
-    )
+    public Task<NFile> CreatePdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default)
     {
         return Post(
             "print/pdf",
@@ -41,10 +32,7 @@ public class NApiPrintService : INPrintApiService
         );
     }
 
-    public Task<NFile> CreateZip(
-        NPrintBatchRequest request,
-        CancellationToken cancellationToken = default
-    )
+    public Task<NFile> CreateZip(NPrintBatchRequest request, CancellationToken cancellationToken = default)
     {
         return Post(
             "print/zip",
@@ -71,8 +59,6 @@ public class NApiPrintService : INPrintApiService
 
     static string EnsureExtension(string fileName, string extension)
     {
-        return fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
-            ? fileName
-            : $"{fileName}{extension}";
+        return fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase) ? fileName : $"{fileName}{extension}";
     }
 }

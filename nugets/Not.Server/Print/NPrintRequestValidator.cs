@@ -31,11 +31,7 @@ public sealed class NPrintRequestValidator : INPrintRequestValidator
         return errors.ToArray();
     }
 
-    static void ValidateDocument(
-        NPrintDocumentRequest request,
-        ICollection<string> errors,
-        bool requirePdfFileName
-    )
+    static void ValidateDocument(NPrintDocumentRequest request, ICollection<string> errors, bool requirePdfFileName)
     {
         if (request.TemplateId != NPrintTemplateIds.Default)
         {
