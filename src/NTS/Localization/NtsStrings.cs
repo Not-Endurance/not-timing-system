@@ -37,6 +37,15 @@ namespace NTS.Localization
         public static string Ranklist_string => LocalizeString(nameof(Ranklist_string));
         public static string Handouts_string => LocalizeString(nameof(Handouts_string));
         public static string Download_string => LocalizeString(nameof(Download_string));
+        public static string Download_file_string => LocalizeString(nameof(Download_file_string));
+        public static string Print_scale_string => LocalizeString(nameof(Print_scale_string));
+        public static string Page_format_string => LocalizeString(nameof(Page_format_string));
+        public static string Orientation_string => LocalizeString(nameof(Orientation_string));
+        public static string Landscape_string => LocalizeString(nameof(Landscape_string));
+        public static string Portrait_string => LocalizeString(nameof(Portrait_string));
+        public static string Generating_PDF_string => LocalizeString(nameof(Generating_PDF_string));
+        public static string Generated_by_NoTiming_System_v_string =>
+            LocalizeString(nameof(Generated_by_NoTiming_System_v_string));
         public static string Failed_to_Qualify_Reason_string => LocalizeString(nameof(Failed_to_Qualify_Reason_string));
         public static string Disqualify_Reason_string => LocalizeString(nameof(Disqualify_Reason_string));
         public static string Select_a_reason_string => LocalizeString(nameof(Select_a_reason_string));

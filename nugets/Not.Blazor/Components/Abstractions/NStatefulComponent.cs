@@ -24,12 +24,13 @@ public class NStatefulComponent : NComponent, IDisposable
         }
     }
 
-    public virtual void Dispose()
+    public override void Dispose()
     {
         foreach (var (id, observable) in _subscriptions)
         {
             observable.ObservableEvent.Unsubscribe(id);
         }
+        base.Dispose();
         GC.SuppressFinalize(this);
     }
 

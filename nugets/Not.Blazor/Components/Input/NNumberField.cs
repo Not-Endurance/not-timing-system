@@ -1,4 +1,5 @@
-﻿using MudBlazor;
+﻿using System.Runtime.CompilerServices;
+using MudBlazor;
 
 namespace Not.Blazor.Components.Input;
 

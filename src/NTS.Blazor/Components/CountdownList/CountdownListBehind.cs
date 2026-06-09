@@ -31,10 +31,11 @@ public class CountdownListBehind<TItem> : NComponent, IDisposable
         _timer.Start();
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _timer.Elapsed -= OnElapsed;
         _timer.Dispose();
+        base.Dispose();
         GC.SuppressFinalize(this);
     }
 

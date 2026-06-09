@@ -39,7 +39,7 @@ public class NNotifier : NComponent, IDisposable
         Subscribe(NotificationStream.UnhandledExceptions, ShowUnhandledExceptionDialog);
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         foreach (var (id, subscriber) in _stringSubscriptions)
         {
@@ -52,6 +52,7 @@ public class NNotifier : NComponent, IDisposable
             subscriber.Unsubscribe(id);
         }
         _exceptionSubscriptions.Clear();
+        base.Dispose();
         GC.SuppressFinalize(this);
     }
 

@@ -1,20 +1,34 @@
-﻿@using NTS.Judge.Blazor.Features.Core.Handouts.Documents
 @using NTS.Judge.Blazor.Features.Core.Handouts.Form
 @using Not.Blazor.Components.Layout
+@using Not.Blazor.Components.Print
+@using NTS.Blazor.Components.Results
 
 @attribute [Route(HANDOUTS_PAGE)]
 @inherits HandoutsPageBehind
 
-<NContent Title="@Handouts_string" IsEmpty="! Service.Documents.Any()" EmptyMessage="@Handouts_list_empty_message_string" RightBarXS="2">
+<NContent Title="@Handouts_string" IsEmpty="IsEmpty" EmptyMessage="@Handouts_list_empty_message_string" RightBarXS="2">
 
     <Main>
-        <HandoutsList Documents="Service.Documents" />
+        @foreach (var document in Documents)
+        {
+            <ResultComponent Document="document"
+                             LeftLogo="@LeftLogo"
+                             RightLogo="@RightLogo" />
+        }
     </Main>
 
     <Rightbar>
         <NDivider Text="@Export_string" />
 
-        <NotButtonPrint Text="@Print_Preview_string" OnClick="OpenPrintPreview" />
+        <MudStack Spacing="2">
+            <NPrintPanel @bind-Scale="PrintFontScale"
+                         @bind-PaperFormat="PaperFormat"
+                         @bind-Orientation="Orientation"
+                         Actions="@PrintActions"
+                         Disabled="@(!CanPrint)"
+                         ConfigurePaperFormat
+                         ConfigureOrientation />
+        </MudStack>
 
         <NDivider Text="@Manual_handout_strings" Class="mt-4" />
 

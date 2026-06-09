@@ -23,6 +23,7 @@ internal sealed class DashboardFeature
     readonly JudgeDriver _judge;
     readonly WitnessDriver _witness;
     readonly NexusApiDriver _api;
+    readonly EndToEndPrintFeature _print;
     readonly EventInformation _eventInformation;
     readonly HashSet<int> _manuallyEliminated = [];
     int _innerWaveNumber;
@@ -32,12 +33,14 @@ internal sealed class DashboardFeature
         JudgeDriver judge,
         WitnessDriver witness,
         NexusApiDriver api,
+        EndToEndPrintFeature print,
         EventInformation eventInformation
     )
     {
         _judge = judge;
         _witness = witness;
         _api = api;
+        _print = print;
         _eventInformation = eventInformation;
     }
 
@@ -352,7 +355,7 @@ internal sealed class DashboardFeature
         await Eventually.ReadHandouts(
             _api,
             _eventInformation.Id,
-            items => items.Any(x => x.Participation.Combination.Number == entry.Number),
+            items => items.Any(x => x.Entries.Any(result => result.Participation.Combination.Number == entry.Number)),
             $"handout for #{entry.Number}"
         );
         await Eventually.ReadRankings(
@@ -372,6 +375,7 @@ internal sealed class DashboardFeature
             participation => participation.Phases[entry.PhaseIndex].IsComplete(),
             TimeSpan.FromSeconds(10)
         );
+        await _print.PrintPendingHandouts(_eventInformation, [entry.Number]);
         await CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id);
     }
 

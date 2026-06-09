@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Not.Filesystem;
+using Not.Files;
 using Not.Injection.Config;
 using Not.Logging.Filesystem;
 using Not.Logging.HTTP;

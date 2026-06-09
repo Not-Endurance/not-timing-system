@@ -1,0 +1,144 @@
+@using static Not.Localization.LocalizationHelper
+@inherits ResultHeaderComponentBehind
+
+<MudStack Spacing="0">
+    <MudStack Row
+              Class="results-header printable"
+              AlignItems="AlignItems.Stretch"
+              Justify="Justify.Center"
+              Spacing="3">
+        @if (HasLeftLogo)
+        {
+            <MudItem Class="results-header-logo-slot">
+                <MudPaper Class="@HeaderLogoClass"
+                          Elevation="0"
+                          @onclick="() => OnLogoClicked(LeftLogo)">
+                    <MudImage Class="results-header-logo-image"
+                              ObjectFit="ObjectFit.Contain"
+                              Src="@LeftLogo" />
+                </MudPaper>
+            </MudItem>
+        }
+
+        <MudItem Class="results-header-center">
+            <MudStack AlignItems="AlignItems.Center"
+                      Justify="Justify.Center"
+                      Spacing="3"
+                      Class="results-header-center-stack">
+                <NHeadline2 Content="@Header.Title" />
+
+                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="0">
+                    <NHeadline3 Content="@Header.Location" />
+                    <NHeadline3 Content="@Header.EventSpan.ToString()" />
+                    <NHeadline3 Content="@LocalizeString(Header.Country.ToString())" />
+                </MudStack>
+
+                <MudStack Row
+                          Class="results-header-officials"
+                          Justify="Justify.Center"
+                          AlignItems="AlignItems.Start"
+                          Spacing="3">
+                    <MudStack>
+                        @if (Header.GroundJuryPresident != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @Header.GroundJuryPresident.GetDisplayLabel(Header.Ruleset)
+                            </MudText>
+                        }
+                        @if (Header.ChiefSteward != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @Header.ChiefSteward.GetDisplayLabel(Header.Ruleset)
+                            </MudText>
+                        }
+                        @if (Header.ForeignJudge != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @Header.ForeignJudge.GetDisplayLabel(Header.Ruleset)
+                            </MudText>
+                        }
+                    </MudStack>
+
+                    <MudStack>
+                        @if (Header.VeterinaryCommissionPresident != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @Header.VeterinaryCommissionPresident.GetDisplayLabel(Header.Ruleset)
+                            </MudText>
+                        }
+                        @if (Header.TechnicalDelegate != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @Header.TechnicalDelegate.GetDisplayLabel(Header.Ruleset)
+                            </MudText>
+                        }
+                        @if (Header.ForeignVeterinaryDelegate != null)
+                        {
+                            <MudText Typo="Typo.subtitle2">
+                                @Header.ForeignVeterinaryDelegate.GetDisplayLabel(Header.Ruleset)
+                            </MudText>
+                        }
+                    </MudStack>
+                </MudStack>
+            </MudStack>
+        </MudItem>
+
+        @if (HasRightLogo)
+        {
+            <MudItem Class="results-header-logo-slot">
+                <MudPaper Class="@HeaderLogoClass"
+                          Elevation="0"
+                          @onclick="() => OnLogoClicked(RightLogo)">
+                    <MudImage Class="results-header-logo-image"
+                              ObjectFit="ObjectFit.Contain"
+                              Src="@RightLogo" />
+                </MudPaper>
+            </MudItem>
+        }
+    </MudStack>
+</MudStack>
+
+<style>
+    .results-header {
+        width: 100%;
+    }
+
+    .results-header-center {
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: center;
+    }
+
+    .results-header-center-stack {
+        height: 100%;
+    }
+
+    .results-header-officials {
+        max-width: 100%;
+    }
+
+    .results-header-logo-slot {
+        position: relative;
+        flex: 0 1 150px;
+        min-width: 70px;
+        max-width: 150px;
+        align-self: stretch;
+    }
+
+    .results-header-logo {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+    }
+
+    .results-header-logo-image {
+        width: auto;
+        height: 100%;
+        max-width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: contain;
+    }
+</style>

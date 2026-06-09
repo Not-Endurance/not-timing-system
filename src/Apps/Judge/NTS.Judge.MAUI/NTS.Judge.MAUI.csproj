@@ -51,6 +51,7 @@
   <ItemGroup>
     <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\appicon.svg" />
+    <Content Include="Resources\AppIcon\appicon.svg" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
 
     <!-- Splash Screen -->
 	<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="white" BaseSize="128,128" />

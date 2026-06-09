@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -51,6 +52,15 @@ public class NHttpClient
         return await SendRequest<TResult>(HttpMethod.Post, endpoint, payload);
     }
 
+    public async Task<NHttpResponseContent> PostContent(
+        string endpoint,
+        object payload,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await SendContentRequest(HttpMethod.Post, endpoint, payload, cancellationToken);
+    }
+
     public async Task<Result<T>> Patch<T>(string endpoint, T payload)
         where T : class
     {
@@ -65,7 +75,12 @@ public class NHttpClient
 
     Uri BuildUrl(string endpoint)
     {
-        return new Uri($"{_baseUrl}/{endpoint}");
+        if (string.IsNullOrWhiteSpace(_baseUrl))
+        {
+            throw new InvalidOperationException("NHttpSettings.Url is required to send HTTP requests.");
+        }
+
+        return new Uri($"{HttpHelper.NormalizeUri(_baseUrl)}/{HttpHelper.NormalizeUri(endpoint)}");
     }
 
     async Task<Result<TResult>> SendRequest<TResult>(HttpMethod method, string endpoint, object? payload = null)
@@ -86,12 +101,7 @@ public class NHttpClient
 
         try
         {
-            using var request = new HttpRequestMessage(method, url);
-            if (payload != null)
-            {
-                request.Content = new StringContent(payload.ToJson(), Encoding.UTF8, "application/json");
-            }
-
+            using var request = CreateRequest(method, url, payload);
             using var response = await _httpClient.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -108,15 +118,66 @@ public class NHttpClient
         }
     }
 
+    async Task<NHttpResponseContent> SendContentRequest(
+        HttpMethod method,
+        string endpoint,
+        object? payload,
+        CancellationToken cancellationToken
+    )
+    {
+        var url = BuildUrl(endpoint);
+
+        try
+        {
+            using var request = CreateRequest(method, url, payload);
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
+            var content = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw CreateUnhandledResponseException(response, Encoding.UTF8.GetString(content));
+            }
+
+            return new NHttpResponseContent(
+                content,
+                response.Content.Headers.ContentType?.MediaType,
+                ResolveFileName(response.Content.Headers.ContentDisposition)
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during {Method} request to {Url}", method, url);
+            throw;
+        }
+    }
+
+    static HttpRequestMessage CreateRequest(HttpMethod method, Uri url, object? payload = null)
+    {
+        var request = new HttpRequestMessage(method, url);
+        if (payload != null)
+        {
+            request.Content = new StringContent(payload.ToJson(), Encoding.UTF8, "application/json");
+        }
+
+        return request;
+    }
+
     static Exception CreateUnhandledResponseException(HttpResponseMessage response, string responseContent)
     {
-        _ = responseContent;
-
         var requestMethod = response.RequestMessage?.Method.Method ?? "HTTP";
         var requestUri = response.RequestMessage?.RequestUri?.ToString() ?? "unknown endpoint";
         var message =
             $"{requestMethod} {requestUri} failed with status code {(int)response.StatusCode} ({response.ReasonPhrase}).";
+        if (!string.IsNullOrWhiteSpace(responseContent))
+        {
+            message = $"{message} {responseContent}";
+        }
 
         return new HttpRequestException(message, null, response.StatusCode);
+    }
+
+    static string? ResolveFileName(ContentDispositionHeaderValue? contentDisposition)
+    {
+        var fileName = contentDisposition?.FileNameStar ?? contentDisposition?.FileName;
+        return string.IsNullOrWhiteSpace(fileName) ? null : fileName.Trim('"');
     }
 }

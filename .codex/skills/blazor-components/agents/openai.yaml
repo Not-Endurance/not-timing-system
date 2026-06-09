@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blazor Code Behind"
+  short_description: "Apply NTS Razor and Behind class conventions."
+  default_prompt: "Use the Blazor code-behind convention for NTS components."

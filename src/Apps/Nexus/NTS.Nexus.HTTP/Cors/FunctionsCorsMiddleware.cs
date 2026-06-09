@@ -54,6 +54,7 @@ internal sealed class FunctionsCorsMiddleware : IFunctionsWorkerMiddleware
     {
         headers["Access-Control-Allow-Origin"] = origin;
         headers["Access-Control-Allow-Credentials"] = "true";
+        headers["Access-Control-Expose-Headers"] = "Content-Disposition";
         headers["Vary"] = "Origin";
     }
 

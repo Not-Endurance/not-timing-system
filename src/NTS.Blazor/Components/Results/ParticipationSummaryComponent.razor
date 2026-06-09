@@ -1,0 +1,67 @@
+@inherits ParticipationSummaryComponentBehind
+
+@if (ShowSummary)
+{
+    <MudStack Row="@UseInlineLayout"
+              Justify="Justify.FlexEnd"
+              AlignItems="AlignItems.End"
+              Spacing="2"
+              Class="@SummaryClass">
+        @if (Participation.IsEliminated())
+        {
+            <MudText Typo="@(UseInlineLayout ? Typo.caption : Typo.body2)"
+                     Align="SummaryAlign"
+                     Class="mud-button-text">
+                @Eliminated_string:
+                @if (!UseInlineLayout)
+                {
+                    <br />
+                }
+                <strong>@Participation.Eliminated</strong>
+            </MudText>
+        }
+        else if (ShowTotals && Total != null)
+        {
+            @if (TotalArriveTime != null)
+            {
+                <MudText Typo="@(UseInlineLayout ? Typo.caption : Typo.subtitle2)" Align="SummaryAlign">
+                    @(Participation.IsComplete() ? Finished_at_colon_string : $"{Arrive_string}:")
+                    <strong>@TotalArriveTime</strong>
+                </MudText>
+            }
+
+            <MudText Typo="@(UseInlineLayout ? Typo.caption : Typo.subtitle2)" Align="SummaryAlign">
+                @Ride_time_in_hours_colon_string <strong>@Total.RideInterval</strong> @hrs_string
+            </MudText>
+
+            <MudText Typo="@(UseInlineLayout ? Typo.caption : Typo.subtitle2)" Align="SummaryAlign">
+                @Average_speed
+                @if (!UseInlineLayout)
+                {
+                    <br />
+                }
+                <strong>@Total.AverageSpeed.ToStringWithThousands()</strong> @km_per_hour_string
+            </MudText>
+        }
+    </MudStack>
+}
+
+<style>
+    .results-row-inline-summary {
+        flex: 0 0 auto;
+        min-width: 0;
+        margin-left: auto;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .results-row-inline-summary .mud-typography {
+        white-space: nowrap;
+    }
+
+    .results-row-side-summary {
+        width: 130px;
+        justify-content: center;
+        align-items: center;
+    }
+</style>

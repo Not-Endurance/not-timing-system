@@ -21,6 +21,9 @@ public static class NStrings
     public static string Delete_string => LocalizeString(nameof(Delete_string));
     public static string Cascading_Delete_string => LocalizeString(nameof(Cascading_Delete_string));
     public static string Print_string => LocalizeString(nameof(Print_string));
+    public static string Print_scale_string => LocalizeString(nameof(Print_scale_string));
+    public static string Page_format_string => LocalizeString(nameof(Page_format_string));
+    public static string Orientation_string => LocalizeString(nameof(Orientation_string));
     public static string Date_string => LocalizeString(nameof(Date_string));
     public static string Time_string => LocalizeString(nameof(Time_string));
     public static string Export_string => LocalizeString(nameof(Export_string));
@@ -40,8 +43,6 @@ public static class NStrings
     public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));
     public static string Affected_resources_string => LocalizeString(nameof(Affected_resources_string));
     public static string Cannot_connect_to_server_string => LocalizeString(nameof(Cannot_connect_to_server_string));
-    public static string Text_formatting_failed_This_is_usually_not_critical_failure_string =>
-        LocalizeString(nameof(Text_formatting_failed_This_is_usually_not_critical_failure_string));
     public static string Language_string => LocalizeString(nameof(Language_string));
     public static string Upload_string => LocalizeString(nameof(Upload_string));
     public static string Delete_selection_string => LocalizeString(nameof(Delete_selection_string));

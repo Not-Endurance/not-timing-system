@@ -49,6 +49,7 @@ public static class NtsStorageServices
             _services.AddTransient<IRepository<Ranking>, RankingApiRepository>();
             _services.AddTransient<IRepository<Official>, OfficialApiRepository>();
             _services.AddTransient<IRepository<Operator>, OperatorApiRepository>();
+            _services.AddTransient<IRepository<Handout>, HandoutApiRepository>();
             _services.AddTransient<IRepository<Country>, CountryApiRepository>();
             _services.AddTransient<IRepository<Club>, ClubApiRepository>();
             _services.AddTransient<IRepository<Horse>, HorseApiRepository>();

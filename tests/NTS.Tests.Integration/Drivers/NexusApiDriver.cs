@@ -1,6 +1,8 @@
 using System.Text;
 using Not.Application.Authentication.User;
 using Not.Application.HTTP;
+using Not.Files;
+using Not.Print;
 using Not.Serialization.JSON;
 using Not.Structures;
 using NTS.Application.Contracts.Core.Models;
@@ -97,6 +99,21 @@ internal sealed class NexusApiDriver : IDisposable
     public Task Create(Handout handout)
     {
         return Send(HttpMethod.Post, "api/handouts", HandoutModel.From(handout));
+    }
+
+    public Task DeleteHandout(int id)
+    {
+        return Send(HttpMethod.Delete, $"api/handouts/{id}");
+    }
+
+    public Task<NFile> CreatePrintPdf(NPrintDocumentRequest request)
+    {
+        return SendFile(HttpMethod.Post, "api/print/pdf", request, request.FileName, NFileContentTypes.Pdf);
+    }
+
+    public Task<NFile> CreatePrintZip(NPrintBatchRequest request)
+    {
+        return SendFile(HttpMethod.Post, "api/print/zip", request, request.FileName, NFileContentTypes.Zip);
     }
 
     public Task CreateSetupConfigureEvent(SetupConfigureEvent setupEvent)
@@ -266,7 +283,7 @@ internal sealed class NexusApiDriver : IDisposable
     async Task Send(HttpMethod method, string endpoint, object? payload = null)
     {
         var content = await SendCore(method, endpoint, payload);
-        var result = content.FromJson<Result>();
+        var result = content.FromJson<Not.Structures.Result>();
         if (!result.IsSuccess)
         {
             throw new InvalidOperationException(string.Join(Environment.NewLine, result.Errors));
@@ -297,6 +314,39 @@ internal sealed class NexusApiDriver : IDisposable
         }
 
         return result.Data;
+    }
+
+    async Task<NFile> SendFile(
+        HttpMethod method,
+        string endpoint,
+        object payload,
+        string fallbackFileName,
+        string fallbackContentType
+    )
+    {
+        using var request = new HttpRequestMessage(method, endpoint)
+        {
+            Content = new StringContent(payload.ToJson(), Encoding.UTF8, "application/json"),
+        };
+
+        using var response = await _client.SendAsync(request);
+        var content = await response.Content.ReadAsByteArrayAsync();
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new HttpRequestException(
+                $"{method} {endpoint} failed with {(int)response.StatusCode} ({response.ReasonPhrase}). "
+                    + Encoding.UTF8.GetString(content),
+                null,
+                response.StatusCode
+            );
+        }
+
+        var fileName =
+            response.Content.Headers.ContentDisposition?.FileNameStar
+            ?? response.Content.Headers.ContentDisposition?.FileName
+            ?? fallbackFileName;
+        var contentType = response.Content.Headers.ContentType?.MediaType ?? fallbackContentType;
+        return new NFile(fileName.Trim('"'), contentType, content);
     }
 
     async Task<string> SendCore(HttpMethod method, string endpoint, object? payload)
