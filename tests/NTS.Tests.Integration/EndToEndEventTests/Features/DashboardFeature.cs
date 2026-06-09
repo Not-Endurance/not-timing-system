@@ -456,6 +456,7 @@ internal sealed class DashboardFeature
             $"ranking elimination for #{number}"
         );
         await WaitForWitnessAbsence(number);
+        await WaitForStartlistUpcomingAbsence(number);
     }
 
     static bool IsAutomaticElimination(Eliminated eliminated)
@@ -509,6 +510,33 @@ internal sealed class DashboardFeature
         }
 
         throw new TimeoutException($"Witness still listed eliminated participation #{number}.");
+    }
+
+    async Task WaitForStartlistUpcomingAbsence(int number)
+    {
+        var judgeUpcoming = _judge.GetRequiredService<IStartUpcoming>();
+        var witnessUpcoming = _witness.GetRequiredService<IStartUpcoming>();
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        IReadOnlyList<int> lastJudgeUpcoming = [];
+        IReadOnlyList<int> lastWitnessUpcoming = [];
+
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            lastJudgeUpcoming = judgeUpcoming.Upcoming.Select(x => x.Number).ToArray();
+            lastWitnessUpcoming = witnessUpcoming.Upcoming.Select(x => x.Number).ToArray();
+            if (!lastJudgeUpcoming.Contains(number) && !lastWitnessUpcoming.Contains(number))
+            {
+                return;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException(
+            $"Startlists still listed eliminated participation #{number}. "
+                + $"Judge upcoming: [{string.Join(", ", lastJudgeUpcoming)}]. "
+                + $"Witness upcoming: [{string.Join(", ", lastWitnessUpcoming)}]."
+        );
     }
 
     static IReadOnlyList<IReadOnlyList<EndToEndPhaseSnapshot>> GroupByDelta(

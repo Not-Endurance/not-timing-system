@@ -426,6 +426,9 @@
   <data name="Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string" xml:space="preserve">
     <value>Не може да изключим Реинспекция защото време на Реинспекция вече е записано</value>
   </data>
+  <data name="Cannot_request_Required_Inspection_without_Representation_time_string" xml:space="preserve">
+    <value>Не може да поискаме Задължителна проверка без време на Реинспекция</value>
+  </data>
   <data name="Presentation_time_cannot_be_before_arrival__" xml:space="preserve">
     <value>Времето на Инспекция не може да бъде преди времето на пристигане '{0}'</value>
   </data>

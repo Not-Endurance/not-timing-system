@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.Extensions.Localization;
 using Not.Application.Authentication.User;
 using Not.Application.Behinds.Adapters;
 using NTS.Application.Contracts.Arrivelists;
@@ -14,6 +15,7 @@ using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Judge.Contracts.Features.Core.Handouts;
+using NTS.Localization;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
@@ -468,6 +470,20 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         await RecordArrivalAndPresentation(judge, representNumber, baseTime.AddMinutes(10), TimeSpan.FromMinutes(5));
         await SelectJudgeParticipation(judge, representNumber);
         await judge.GetRequiredService<IInspectionService>().RequestRepresent(true);
+        var pendingRepresentationInspectionException = await Assert.ThrowsAnyAsync<Exception>(
+            () => judge.GetRequiredService<IInspectionService>().RequestInspection(true)
+        );
+        Assert.Equal(
+            nameof(NtsStrings.Cannot_request_Required_Inspection_without_Representation_time_string),
+            pendingRepresentationInspectionException.Message
+        );
+        Assert.Equal(
+            "Cannot request Required Inspection without Representation time",
+            judge.GetRequiredService<IStringLocalizer>()[pendingRepresentationInspectionException.Message].Value
+        );
+        var pendingRepresentation = await api.ReadParticipation(eventId, 5602);
+        Assert.False(pendingRepresentation.Phases.Current.IsRequiredInspectionRequested);
+
         var representEntry = await WaitForPresentlistEntry(
             officialPresentlist,
             representNumber,

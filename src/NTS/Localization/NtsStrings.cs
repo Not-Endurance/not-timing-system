@@ -157,6 +157,8 @@ namespace NTS.Localization
             LocalizeString(nameof(Required_inspection_is_compulsory_string));
         public static string Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string =>
             LocalizeString(nameof(Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string));
+        public static string Cannot_request_Required_Inspection_without_Representation_time_string =>
+            LocalizeString(nameof(Cannot_request_Required_Inspection_without_Representation_time_string));
         public static string Please_provide_reason_to_eliminate_as__ =>
             LocalizeString(nameof(Please_provide_reason_to_eliminate_as__));
         public static string Select_FTQ_codes => LocalizeString(nameof(Select_FTQ_codes));
