@@ -1,5 +1,4 @@
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects;
 
 namespace NTS.Judge.Features.Core.Rankings.FeiExport;
 
@@ -16,8 +15,9 @@ public class FeiExportService : IFeiExportService
 
     public FeiExportDocument Create(EventInformation eventInformation, IEnumerable<Ranking> rankings)
     {
-        var ranklists = rankings.Select(x => new Ranklist(x)).ToList();
-        var content = _feiExport.CreateXmlContent(eventInformation, ranklists);
+        var rankingList = rankings.ToList();
+        var results = rankingList.Select(x => new Result(x)).ToList();
+        var content = _feiExport.CreateXmlContent(eventInformation, results, rankingList);
         return new FeiExportDocument(CreateFileName(eventInformation), content, CONTENT_TYPE);
     }
 

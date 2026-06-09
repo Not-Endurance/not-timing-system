@@ -1,13 +1,16 @@
-﻿@using Not.Blazor.Components.Layout
+@using Not.Blazor.Components.Layout
 @using NTS.Blazor.Components.Rankings.Menu
-@using NTS.Blazor.Components.Rankings.Protocols
+@using NTS.Blazor.Components.Results
 
 @attribute [Route(PAST_EVENT_DETAILS_PAGE)]
 @inherits PastEventDetailsContentBehind
 
 <NContent Title="@Past_events_string" IsLoading="@IsLoading" IsEmpty="@IsEmpty">
     <Main>
-        <Protocol Document="Service.Document" />
+        @if (Document != null)
+        {
+            <ResultComponent Document="Document" />
+        }
     </Main>
 
     <Rightbar>
@@ -17,8 +20,8 @@
                               StartIcon="@Icons.Material.Filled.List"
                               Disabled="@(!HasStartlist)" />
 
-            <RankingMenu Rankings="Service.Rankings"
-                         Selected="Service.CurrentRanking"
+            <RankingMenu Rankings="Rankings"
+                         Selected="CurrentRanking"
                          OnSelectedSafe="SelectRanking" />
         </MudStack>
     </Rightbar>

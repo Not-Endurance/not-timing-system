@@ -1,3 +1,6 @@
+## Context
+- Primary sln file is src/not-timing-system.sln
+
 ## Rules
 1. Don't execute commands that would create, delete or modify files outside of this working directory. Exceptions of this rule are commands which could cause side effects scoped to the utility that owns the command:
 - dotnet msbuild/nugget/workload or similar caches and or build artifacts

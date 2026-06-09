@@ -1,0 +1,4 @@
+interface:
+  display_name: "Not Infrastructure Conventions"
+  short_description: "Keep Not nugets generic and conventional"
+  default_prompt: "Use $not-infrastructure-conventions to decide whether this behavior belongs in Not infrastructure or NTS business code."

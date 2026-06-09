@@ -14,10 +14,18 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.22" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.22" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.60.0" />
+    <PackageReference Include="MudBlazor" Version="7.8.0" GeneratePathProperty="true" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Not.Application\Not.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Print\Templates\*.html" />
+    <EmbeddedResource Include="$(PkgMudBlazor)\staticwebassets\MudBlazor.min.css"
+                      LogicalName="Not.Server.Print.Assets.MudBlazor.min.css" />
   </ItemGroup>
 
 </Project>

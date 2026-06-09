@@ -9,7 +9,6 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Judge.Features.Core.State;
@@ -21,7 +20,7 @@ public class RankingService
         IKrudFormService<CustomRankingModel>,
         IRankingService,
         IRankingMenuService,
-        IProtocolDocumentService,
+        IResultsDocumentService,
         ICoreDependentObservables,
         INotificationHandler<PhaseCompleted>,
         INotificationHandler<ParticipationEliminated>,
@@ -107,11 +106,11 @@ public class RankingService
         }
     }
 
-    public ProtocolDocument Create(Ranking ranking)
+    public ResultsDocument Create(Ranking ranking)
     {
         var eventInformation = GuardHelper.ThrowIfDefault(_socketContext.Event);
-        var ranklist = new Ranklist(ranking);
-        return new ProtocolDocument(ranklist, eventInformation, _loadedOfficials);
+        var results = new Result(ranking);
+        return new ResultsDocument(results, eventInformation, _loadedOfficials);
     }
 
     public void Select(Ranking ranking)

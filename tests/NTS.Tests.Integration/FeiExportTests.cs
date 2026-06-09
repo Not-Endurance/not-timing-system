@@ -52,6 +52,7 @@ public sealed class FeiExportTests
                 var athlete = participation.Element(ns + "Athlete")!;
                 Assert.Equal("FEI", athlete.Attribute("FirstName")!.Value);
                 Assert.Equal("Rider1", athlete.Attribute("FamilyName")!.Value);
+                Assert.Equal("1", participation.Element(ns + "Position")!.Attribute("Rank")!.Value);
                 Assert.Equal("FEI Horse 1", participation.Element(ns + "Horse")!.Attribute("Name")!.Value);
             },
             second =>

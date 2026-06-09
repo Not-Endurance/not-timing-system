@@ -1,6 +1,14 @@
 @inherits NNavLinkBehind
 
-<MudNavLink Icon="@Icon" OnClick="Land" Match="Match">
-    @ChildContent
-</MudNavLink>
-
+@if (MenuItem)
+{
+    <MudMenuItem Icon="@Icon" OnClick="Land">
+        @ChildContent
+    </MudMenuItem>
+}
+else
+{
+    <MudNavLink Icon="@Icon" OnClick="Land" Match="Match">
+        @ChildContent
+    </MudNavLink>
+}

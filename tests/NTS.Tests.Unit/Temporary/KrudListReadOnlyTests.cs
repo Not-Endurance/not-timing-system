@@ -145,7 +145,10 @@ public sealed class KrudListReadOnlyTests
     sealed class TestLocalizer : IStringLocalizer
     {
         public LocalizedString this[string name] =>
-            new(name, name == nameof(NStrings.Are_you_sure_you_want_to_delete_0_string) ? DeleteConfirmationFormat : name);
+            new(
+                name,
+                name == nameof(NStrings.Are_you_sure_you_want_to_delete_0_string) ? DeleteConfirmationFormat : name
+            );
         public LocalizedString this[string name, params object[] arguments] =>
             new(name, string.Format(this[name].Value, arguments));
 

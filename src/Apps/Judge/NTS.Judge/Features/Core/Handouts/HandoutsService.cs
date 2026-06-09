@@ -15,7 +15,7 @@ using NTS.Judge.Features.Core.State;
 namespace NTS.Judge.Features.Core.Handouts;
 
 public class HandoutsService
-    : NStatefulService<ObservableList<HandoutDocument>>,
+    : NStatefulService<ObservableList<ResultsDocument>>,
         IHandoutsService,
         ICreateHandout,
         ICoreDependentObservables,
@@ -40,7 +40,7 @@ public class HandoutsService
         _officials = officials;
     }
 
-    public IReadOnlyList<HandoutDocument> Documents => State;
+    public IReadOnlyList<ResultsDocument> Documents => State;
 
     protected override async Task<bool> InitializeState()
     {
@@ -54,20 +54,26 @@ public class HandoutsService
         {
             return true;
         }
-        var documents = handouts.Select(handout => new HandoutDocument(handout, _socketContext.Event, officials));
+        var documents = handouts.Select(handout => new ResultsDocument(handout, _socketContext.Event, officials));
         State.Replace(documents);
         return true;
     }
 
-    public async Task Delete(IEnumerable<HandoutDocument> documents)
+    public async Task Delete(IEnumerable<ResultsDocument> documents)
     {
+        var documentList = documents.ToList();
+        var ids = documentList.Select(x => x.Id).ToHashSet();
+
         await _semaphore.WaitAsync();
-
-        var ids = documents.Select(x => x.Id);
-        await _handoutRepository.DeleteMany(x => ids.Contains(x.Id));
-        State.RemoveRange(documents);
-
-        _semaphore.Release();
+        try
+        {
+            await _handoutRepository.DeleteMany(x => ids.Contains(x.Id));
+            State.RemoveRange(documentList);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     public async Task Create(int number)
@@ -85,6 +91,11 @@ public class HandoutsService
 
     public async Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
+        if (notification.Participation.Phases.Current.IsFinal)
+        {
+            return;
+        }
+
         await CreateDocument(notification.Participation);
     }
 
@@ -97,16 +108,17 @@ public class HandoutsService
     {
         var eventInformation = GuardHelper.ThrowIfDefault(_socketContext.Event);
         var officials = await _officials.ReadMany();
-        var existingHandout = await _handoutRepository.Read(x => x.Participation.Id == participation.Id);
 
         var handout = new Handout(participation);
-        var document = new HandoutDocument(handout, eventInformation, officials);
+        var document = new ResultsDocument(handout, eventInformation, officials);
 
         await _semaphore.WaitAsync();
         try
         {
-            await _handoutRepository.DeleteMany(x => x.Participation.Id == participation.Id);
-            var existingDocuments = State.Where(x => x.ParticipationId == participation.Id).ToList();
+            await _handoutRepository.DeleteMany(x => x.Entries.Any(entry => entry.ParticipationId == participation.Id));
+            var existingDocuments = State
+                .Where(x => x.Entries.Any(entry => entry.ParticipationId == participation.Id))
+                .ToList();
             if (existingDocuments.Count != 0)
             {
                 State.RemoveRange(existingDocuments);

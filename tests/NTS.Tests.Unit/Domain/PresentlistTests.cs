@@ -1,3 +1,4 @@
+using Not.Domain.Exceptions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -174,6 +175,46 @@ public sealed class PresentlistTests
         participation.ToggleInspection(true);
 
         Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is InspectionRequired);
+    }
+
+    [Fact]
+    public void ToggleInspection_rejects_required_inspection_while_representation_time_is_pending()
+    {
+        var arrive = DateTimeOffset.Now.AddMinutes(-20);
+        var present = arrive.AddMinutes(5);
+        var participation = CreateParticipation(
+            1,
+            [CreatePhase(start: arrive.AddHours(-1), arrive: arrive, present: present, isRepresentationRequested: true)]
+        );
+
+        Assert.Throws<DomainException>(() => participation.ToggleInspection(true));
+
+        Assert.False(participation.Phases.Current.IsRequiredInspectionRequested);
+        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is InspectionRequired);
+    }
+
+    [Fact]
+    public void ToggleInspection_allows_required_inspection_after_representation_time_is_recorded()
+    {
+        var arrive = DateTimeOffset.Now.AddMinutes(-20);
+        var present = arrive.AddMinutes(5);
+        var participation = CreateParticipation(
+            1,
+            [
+                CreatePhase(
+                    start: arrive.AddHours(-1),
+                    arrive: arrive,
+                    present: present,
+                    represent: present.AddMinutes(5),
+                    isRepresentationRequested: true
+                ),
+            ]
+        );
+
+        participation.ToggleInspection(true);
+
+        Assert.True(participation.Phases.Current.IsRequiredInspectionRequested);
+        Assert.Contains(participation.DequeueDomainEvents(), x => x is InspectionRequired);
     }
 
     [Fact]

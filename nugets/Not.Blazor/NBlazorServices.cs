@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MudBlazor;
 using MudBlazor.Services;
-using Not.Blazor.Browser;
 using Not.Blazor.Helpers;
 using Not.Blazor.Navigation;
 using Not.Blazor.Navigation.Abstractions;

@@ -30,7 +30,7 @@ public class SnapshotContentBehind : NStatefulComponent
     protected ISnapshotService SnapshotService => SnapshotState;
     protected IReadOnlyList<Participation> Participations => SnapshotService.Participations;
     protected IReadOnlyList<Snapshot> Snapshots => SnapshotService.Snapshots;
-    protected IReadOnlyList<NMultiButtonDescriptor> PublishDescriptors =>
+    protected IReadOnlyList<NDropdownButtonDescriptor> PublishDescriptors =>
         [
             new(Arrive_string, () => SendHandler(SnapshotType.Arrive)),
             new(Presentation_string, () => SendHandler(SnapshotType.Present)),

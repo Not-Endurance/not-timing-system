@@ -6,7 +6,6 @@ using NTS.Blazor.Components.SelectEvents;
 using NTS.Witness.Blazor.Features;
 using NTS.Witness.Contracts.Features.Access;
 using NTS.Witness.Contracts.Features.Profile;
-using static NTS.Witness.Blazor.Routes;
 
 namespace NTS.Witness.Blazor.Layout.Drawer;
 
@@ -25,10 +24,10 @@ public class NavMenuBehind : NStatefulComponent
     IWitnessProfileContext ProfileContext { get; set; } = default!;
 
     [Inject]
-    NavigationManager Navigator { get; set; } = default!;
-
-    [Inject]
     INtsSocketService SocketService { get; set; } = default!;
+
+    [CascadingParameter(Name = "CloseResponsiveDrawer")]
+    Func<Task>? CloseResponsiveDrawer { get; set; }
 
     protected bool ShowSnapshots => WitnessAccessPolicy.CanViewSnapshots(AccessState.AccessLevel);
     protected bool ShowProfileHeader => ProfileContext.User != null;
@@ -43,27 +42,39 @@ public class NavMenuBehind : NStatefulComponent
         await Observe(SocketService);
     }
 
-    protected void OpenProfile()
-    {
-        Navigator.NavigateTo(PROFILE_PAGE);
-    }
-
     protected async Task Signout()
     {
-        await Authentication.Signout();
-        await SocketService.Disconnect();
+        try
+        {
+            await Authentication.Signout();
+            await SocketService.Disconnect();
+            await CloseResponsiveDrawerSafe();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected async Task OpenSelectEventDialog()
     {
         try
         {
+            await CloseResponsiveDrawerSafe();
             var dialog = await DialogService.ShowAsync<SelectEventDialog>(Select_event_string);
             await dialog.Result;
         }
         catch (Exception ex)
         {
             Handle(ex);
+        }
+    }
+
+    async Task CloseResponsiveDrawerSafe()
+    {
+        if (CloseResponsiveDrawer != null)
+        {
+            await CloseResponsiveDrawer();
         }
     }
 }

@@ -62,16 +62,14 @@ public class StartlistService
         return Task.CompletedTask;
     }
 
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
+    public async Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
     {
-        Update(notification.Participation);
-        return Task.CompletedTask;
+        await Refresh(notification.Participation);
     }
 
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
+    public async Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
     {
-        Update(notification.Participation);
-        return Task.CompletedTask;
+        await Refresh(notification.Participation);
     }
 
     public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
@@ -98,5 +96,11 @@ public class StartlistService
         _state.Upsert(participation);
         Startlist = new Startlist(_state);
         EmitChanged();
+    }
+
+    async Task Refresh(Participation participation)
+    {
+        var persisted = await _participations.Read(participation.Id);
+        Update(persisted ?? participation);
     }
 }
