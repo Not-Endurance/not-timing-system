@@ -62,7 +62,10 @@ internal static class PlaywrightBrowserEnvironment
             }
         }
 
-        return new Resolution(BrowsersPath: null, RemoveInheritedBrowsersPath: !string.IsNullOrWhiteSpace(inheritedPath));
+        return new Resolution(
+            BrowsersPath: null,
+            RemoveInheritedBrowsersPath: !string.IsNullOrWhiteSpace(inheritedPath)
+        );
     }
 
     static IEnumerable<string> CandidatePaths(RepositoryPaths paths)
@@ -83,11 +86,12 @@ internal static class PlaywrightBrowserEnvironment
             return false;
         }
 
-        return CurrentPlatformExecutableNames().Any(executableName =>
-            Directory
-                .EnumerateFiles(browsersPath, executableName, SearchOption.AllDirectories)
-                .Any(IsCurrentPlatformChromiumExecutable)
-        );
+        return CurrentPlatformExecutableNames()
+            .Any(executableName =>
+                Directory
+                    .EnumerateFiles(browsersPath, executableName, SearchOption.AllDirectories)
+                    .Any(IsCurrentPlatformChromiumExecutable)
+            );
     }
 
     static bool IsCurrentPlatformChromiumExecutable(string file)
