@@ -188,28 +188,13 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         await api.Create(eventInformation);
         await api.Create(
-            IntegrationPayloadFactory.TwoPhaseParticipation(
-                eventId,
-                firstNumber,
-                id: 5901,
-                startTime: start
-            )
+            IntegrationPayloadFactory.TwoPhaseParticipation(eventId, firstNumber, id: 5901, startTime: start)
         );
         await api.Create(
-            IntegrationPayloadFactory.TwoPhaseParticipation(
-                eventId,
-                secondNumber,
-                id: 5902,
-                startTime: start
-            )
+            IntegrationPayloadFactory.TwoPhaseParticipation(eventId, secondNumber, id: 5902, startTime: start)
         );
         await api.Create(
-            IntegrationPayloadFactory.ActiveParticipation(
-                eventId,
-                manualNumber,
-                id: 5903,
-                startTime: start
-            )
+            IntegrationPayloadFactory.ActiveParticipation(eventId, manualNumber, id: 5903, startTime: start)
         );
 
         await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);

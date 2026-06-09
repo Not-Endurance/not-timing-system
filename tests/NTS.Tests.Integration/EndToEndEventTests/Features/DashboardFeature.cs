@@ -357,9 +357,8 @@ internal sealed class DashboardFeature
             await Eventually.ReadHandouts(
                 _api,
                 _eventInformation.Id,
-                items => items.Any(x =>
-                    x.Entries.Any(result => result.Participation.Combination.Number == entry.Number)
-                ),
+                items =>
+                    items.Any(x => x.Entries.Any(result => result.Participation.Combination.Number == entry.Number)),
                 $"handout for #{entry.Number}"
             );
         }
