@@ -71,8 +71,9 @@ public class ParticipationService
         {
             return false;
         }
+        var selected = _selectedParticipation;
         Participations = await _participationRepository.ReadMany().AsReadOnly();
-        Selected = Participations.FirstOrDefault();
+        Selected = ResolveSelectedParticipation(selected);
         return Participations.Any();
     }
 
@@ -196,5 +197,21 @@ public class ParticipationService
     {
         await _participationRepository.Update(participation);
         await _domainEventDispatcher.Dispatch(participation);
+    }
+
+    Participation? ResolveSelectedParticipation(Participation? selected)
+    {
+        if (!Participations.Any())
+        {
+            return null;
+        }
+        if (selected == null)
+        {
+            return Participations.FirstOrDefault();
+        }
+
+        return Participations.FirstOrDefault(x => x.Id == selected.Id)
+            ?? Participations.FirstOrDefault(x => x.Combination.Number == selected.Combination.Number)
+            ?? Participations.FirstOrDefault();
     }
 }

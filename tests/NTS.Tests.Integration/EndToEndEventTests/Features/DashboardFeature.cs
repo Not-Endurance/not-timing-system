@@ -352,12 +352,16 @@ internal sealed class DashboardFeature
             return;
         }
 
-        await Eventually.ReadHandouts(
-            _api,
-            _eventInformation.Id,
-            items => items.Any(x => x.Entries.Any(result => result.Participation.Combination.Number == entry.Number)),
-            $"handout for #{entry.Number}"
-        );
+        if (!entry.Phase.IsFinal)
+        {
+            await Eventually.ReadHandouts(
+                _api,
+                _eventInformation.Id,
+                items =>
+                    items.Any(x => x.Entries.Any(result => result.Participation.Combination.Number == entry.Number)),
+                $"handout for #{entry.Number}"
+            );
+        }
         await Eventually.ReadRankings(
             _api,
             _eventInformation.Id,
@@ -375,7 +379,10 @@ internal sealed class DashboardFeature
             participation => participation.Phases[entry.PhaseIndex].IsComplete(),
             TimeSpan.FromSeconds(10)
         );
-        await _print.PrintPendingHandouts(_eventInformation, [entry.Number]);
+        if (!entry.Phase.IsFinal)
+        {
+            await _print.PrintPendingHandouts(_eventInformation, [entry.Number]);
+        }
         await CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id);
     }
 

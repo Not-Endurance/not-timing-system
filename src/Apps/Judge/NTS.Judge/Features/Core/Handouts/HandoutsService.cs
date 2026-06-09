@@ -61,13 +61,19 @@ public class HandoutsService
 
     public async Task Delete(IEnumerable<ResultsDocument> documents)
     {
+        var documentList = documents.ToList();
+        var ids = documentList.Select(x => x.Id).ToHashSet();
+
         await _semaphore.WaitAsync();
-
-        var ids = documents.Select(x => x.Id);
-        await _handoutRepository.DeleteMany(x => ids.Contains(x.Id));
-        State.RemoveRange(documents);
-
-        _semaphore.Release();
+        try
+        {
+            await _handoutRepository.DeleteMany(x => ids.Contains(x.Id));
+            State.RemoveRange(documentList);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     public async Task Create(int number)
@@ -85,6 +91,11 @@ public class HandoutsService
 
     public async Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
+        if (notification.Participation.Phases.Current.IsFinal)
+        {
+            return;
+        }
+
         await CreateDocument(notification.Participation);
     }
 

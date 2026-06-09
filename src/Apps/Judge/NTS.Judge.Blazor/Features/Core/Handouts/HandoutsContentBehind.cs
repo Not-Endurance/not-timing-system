@@ -8,13 +8,12 @@ using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
 using NTS.Judge.Blazor.Features.Print;
-using NTS.Judge.Contracts.Features.Core.Handouts;
 
 namespace NTS.Judge.Blazor.Features.Core.Handouts;
 
-public class HandoutsPageBehind : NStatefulComponent
+public class HandoutsContentBehind : NStatefulComponent
 {
-    const decimal DEFAULT_PRINT_SCALE = 0.85m;
+    const decimal DEFAULT_PRINT_SCALE = 1m;
 
     IReadOnlyList<ResultsDocument> _lastPrintedHandouts = [];
 
@@ -79,12 +78,15 @@ public class HandoutsPageBehind : NStatefulComponent
             return;
         }
 
-        var dialog = await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>();
+        var parameters = new DialogParameters<HandoutsPrintConfirmationDialog>
+        {
+            { x => x.Documents, _lastPrintedHandouts },
+        };
+        var dialog = await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>(string.Empty, parameters);
         if (await dialog.IsCanceled())
         {
             return;
         }
-        await Service.Delete(_lastPrintedHandouts);
         _lastPrintedHandouts = [];
     }
 }
