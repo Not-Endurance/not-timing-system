@@ -6,12 +6,14 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Presentlists;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Core.Objects.Presentlists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
+using NTS.Judge.Contracts.Features.Core.Handouts;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
@@ -171,6 +173,115 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         Assert.True(persistedParticipation.Phases.Current.IsComplete());
         Assert.Equal(3, persistedSnapshotResults.Count);
+    }
+
+    [Fact]
+    public async Task Judge_handouts_follow_phase_completion_rules_and_snapshot_keeps_selection()
+    {
+        var eventId = 1951;
+        var firstNumber = 71;
+        var secondNumber = 72;
+        var manualNumber = 73;
+        var start = DateTimeOffset.UtcNow.Date.AddHours(8);
+        var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
+        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+
+        await api.Create(eventInformation);
+        await api.Create(
+            IntegrationPayloadFactory.TwoPhaseParticipation(
+                eventId,
+                firstNumber,
+                id: 5901,
+                startTime: start
+            )
+        );
+        await api.Create(
+            IntegrationPayloadFactory.TwoPhaseParticipation(
+                eventId,
+                secondNumber,
+                id: 5902,
+                startTime: start
+            )
+        );
+        await api.Create(
+            IntegrationPayloadFactory.ActiveParticipation(
+                eventId,
+                manualNumber,
+                id: 5903,
+                startTime: start
+            )
+        );
+
+        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await judge.Start();
+        await judge.Connect(eventInformation);
+
+        var context = judge.GetRequiredService<IParticipationContext>();
+        if (context is NStatefulService stateful)
+        {
+            stateful.ResetHasLoaded();
+        }
+
+        await context.Load();
+        var firstLoaded = context.Participations.First();
+        var selectedParticipation = context.Participations.First(x => x.Id != firstLoaded.Id && x.Phases.Count > 1);
+        context.Selected = selectedParticipation;
+        var selectedId = selectedParticipation.Id;
+        var selectedNumber = selectedParticipation.Combination.Number;
+
+        var firstArrival = start.AddMinutes(30);
+        var firstPresentation = firstArrival.AddMinutes(5);
+        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, firstArrival));
+        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, firstPresentation));
+
+        Assert.Equal(selectedId, context.Selected?.Id);
+        var nonFinalHandouts = await WaitForHandouts(
+            api,
+            eventId,
+            handouts => HandoutsForNumber(handouts, selectedNumber).Count == 1,
+            $"create a non-final handout for #{selectedNumber}"
+        );
+        var nonFinalHandout = Assert.Single(HandoutsForNumber(nonFinalHandouts, selectedNumber));
+
+        var finalArrival = firstPresentation.AddMinutes(75);
+        var finalPresentation = finalArrival.AddMinutes(5);
+        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, finalArrival));
+        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, finalPresentation));
+
+        Assert.Equal(selectedId, context.Selected?.Id);
+        await api.WaitForParticipation(
+            eventId,
+            selectedId,
+            participation => participation.Phases.Current.IsComplete(),
+            TimeSpan.FromSeconds(10)
+        );
+        var afterFinalHandouts = await WaitForHandouts(
+            api,
+            eventId,
+            handouts =>
+            {
+                var selectedHandouts = HandoutsForNumber(handouts, selectedNumber);
+                return selectedHandouts.Count == 1 && selectedHandouts.Single().Id == nonFinalHandout.Id;
+            },
+            $"keep only the existing non-final handout for #{selectedNumber}"
+        );
+
+        var manualHandouts = judge.GetRequiredService<ICreateHandout>();
+        await manualHandouts.Create(manualNumber);
+
+        await WaitForHandouts(
+            api,
+            eventId,
+            handouts =>
+            {
+                var selectedHandouts = HandoutsForNumber(handouts, selectedNumber);
+                return selectedHandouts.Count == 1
+                    && selectedHandouts.Single().Id == HandoutsForNumber(afterFinalHandouts, selectedNumber).Single().Id
+                    && HandoutsForNumber(handouts, manualNumber).Count == 1;
+            },
+            $"create a manual handout for #{manualNumber}"
+        );
+        Assert.Equal(selectedId, context.Selected?.Id);
     }
 
     [Fact]
@@ -823,6 +934,36 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         throw new TimeoutException(
             $"Witness Arrivelist did not {expectedState}. Entries: {string.Join(", ", last.Select(x => x.Number))}."
         );
+    }
+
+    static async Task<IReadOnlyList<Handout>> WaitForHandouts(
+        NexusApiDriver api,
+        int eventId,
+        Func<IReadOnlyList<Handout>, bool> predicate,
+        string expectedState
+    )
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        IReadOnlyList<Handout> last = [];
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            last = await api.ReadHandouts(eventId);
+            if (predicate(last))
+            {
+                return last;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException($"Handouts did not {expectedState}. Handout count: {last.Count}.");
+    }
+
+    static IReadOnlyList<Handout> HandoutsForNumber(IEnumerable<Handout> handouts, int number)
+    {
+        return handouts
+            .Where(handout => handout.Entries.Any(entry => entry.Participation.Combination.Number == number))
+            .ToArray();
     }
 
     static async Task<NtsUserSessionModel> WaitForUserSession(
