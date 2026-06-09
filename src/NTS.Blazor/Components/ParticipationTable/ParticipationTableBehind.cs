@@ -36,7 +36,7 @@ public class ParticipationTableBehind : NComponent
     public bool Editable { get; set; }
 
     [Parameter]
-    public bool Vertical { get; set; } 
+    public bool Vertical { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -154,7 +154,9 @@ public class ParticipationTableBehind : NComponent
     )
     {
         return phases
-            .Select((phase, index) => new ParticipationTableRow(phase.Gate, rows.Select(row => row.Values[index]).ToArray()))
+            .Select(
+                (phase, index) => new ParticipationTableRow(phase.Gate, rows.Select(row => row.Values[index]).ToArray())
+            )
             .ToArray();
     }
 

@@ -19,9 +19,7 @@ public static class LocalizationHelper
             var enumField = value.GetType().GetEnumField(value);
             var displayAttribute = enumField?.GetAttributes<DisplayAttribute>().FirstOrDefault();
             var name = displayAttribute?.Name;
-            return name != null
-                ? Localize(name)
-                : value.ToString();
+            return name != null ? Localize(name) : value.ToString();
         }
 # if DEBUG
         catch (InvalidOperationException ex) when (ex.Message.Contains("localization"))
@@ -30,7 +28,7 @@ public static class LocalizationHelper
             Not.Logging.LoggingHelper.Error(ex.ToString());
             return value.ToString();
         }
-# else 
+# else
         catch (Exception)
         {
             return value.ToString();
@@ -55,8 +53,6 @@ public static class LocalizationHelper
 
     static string Localize(string resource)
     {
-        return _localizer != null
-            ? _localizer[resource]
-            : resource;
+        return _localizer != null ? _localizer[resource] : resource;
     }
 }

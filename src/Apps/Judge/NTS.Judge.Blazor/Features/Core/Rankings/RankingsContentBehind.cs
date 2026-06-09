@@ -4,8 +4,8 @@ using Not.Blazor.Components.Buttons;
 using Not.Blazor.Components.Print;
 using Not.Blazor.Dialogs;
 using Not.Blazor.Helpers;
-using NTS.Application.Contracts.Pdf;
 using Not.Print;
+using NTS.Application.Contracts.Pdf;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
@@ -60,11 +60,7 @@ public class RankingsContentBehind : NStatefulComponent
     protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
     protected IReadOnlyList<NPrintPanelAction> ResultActions =>
         [
-            NPrintPanelAction.PrintPdf(
-                Print_string,
-                CreateCurrentRanklistPrintRequest,
-                Icons.Material.Outlined.Print
-            ),
+            NPrintPanelAction.PrintPdf(Print_string, CreateCurrentRanklistPrintRequest, Icons.Material.Outlined.Print),
             NPrintPanelAction.DownloadZip(
                 Download_file_string,
                 CreateResultsZipRequest,

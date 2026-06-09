@@ -56,22 +56,14 @@ public class Result : Aggregate, IEventScoped
         return $"{Name} {Category}: {Entries.Count}";
     }
 
-    static List<ParticipationResult> RankIfRequired(
-        List<ParticipationResult> entries,
-        CompetitionRuleset ruleset
-    )
+    static List<ParticipationResult> RankIfRequired(List<ParticipationResult> entries, CompetitionRuleset ruleset)
     {
         return entries.Count > 1 ? Rank(entries, ruleset) : entries;
     }
 
-    static List<ParticipationResult> Rank(
-        IReadOnlyCollection<ParticipationResult> entries,
-        CompetitionRuleset ruleset
-    )
+    static List<ParticipationResult> Rank(IReadOnlyCollection<ParticipationResult> entries, CompetitionRuleset ruleset)
     {
-        var ranker = StaticOption.ShouldUseRegionalRanker(ruleset)
-            ? GetRanker(StaticOption.Regional)
-            : FEI_RANKER;
+        var ranker = StaticOption.ShouldUseRegionalRanker(ruleset) ? GetRanker(StaticOption.Regional) : FEI_RANKER;
         var ranked = ranker.Rank(entries);
         var rank = 0;
         foreach (var entry in ranked)

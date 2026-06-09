@@ -4,11 +4,7 @@ namespace Not.Blazor.Components.Print;
 
 public sealed record NPrintPanelContext
 {
-    public NPrintPanelContext(
-        decimal scale,
-        NPrintPaperFormat paperFormat,
-        NPrintOrientation orientation
-    )
+    public NPrintPanelContext(decimal scale, NPrintPaperFormat paperFormat, NPrintOrientation orientation)
     {
         Scale = scale;
         PaperFormat = paperFormat;

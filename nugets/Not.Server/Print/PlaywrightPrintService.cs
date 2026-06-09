@@ -15,20 +15,14 @@ public sealed class PlaywrightPrintService : INPrintService
         _renderer = renderer;
     }
 
-    public async Task<NFile> CreatePdf(
-        NPrintDocumentRequest request,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<NFile> CreatePdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default)
     {
         var html = _templates.Render(request);
         var content = await _renderer.Render(html, cancellationToken);
         return new NFile(request.FileName, NFileContentTypes.Pdf, content);
     }
 
-    public async Task<NFile> CreateZip(
-        NPrintBatchRequest request,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<NFile> CreateZip(NPrintBatchRequest request, CancellationToken cancellationToken = default)
     {
         await using var stream = new MemoryStream();
         using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
@@ -46,26 +40,17 @@ public sealed class PlaywrightPrintService : INPrintService
         return new NFile(request.FileName, NFileContentTypes.Zip, stream.ToArray());
     }
 
-    public Task PrintPdf(
-        NPrintDocumentRequest request,
-        CancellationToken cancellationToken = default
-    )
+    public Task PrintPdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default)
     {
         throw BrowserOnly();
     }
 
-    public Task DownloadPdf(
-        NPrintDocumentRequest request,
-        CancellationToken cancellationToken = default
-    )
+    public Task DownloadPdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default)
     {
         throw BrowserOnly();
     }
 
-    public Task DownloadZip(
-        NPrintBatchRequest request,
-        CancellationToken cancellationToken = default
-    )
+    public Task DownloadZip(NPrintBatchRequest request, CancellationToken cancellationToken = default)
     {
         throw BrowserOnly();
     }

@@ -2,15 +2,15 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Components.Print;
 using Not.Files;
+using Not.Files.Abstractions;
 using Not.Print;
-using NTS.Application.Contracts.Pdf;
 using NTS.Application.Contracts.PastEvents;
+using NTS.Application.Contracts.Pdf;
 using NTS.Blazor.Components.PastEvents;
-using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
-using NTS.Judge.Blazor.Features.Print;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
-using Not.Files.Abstractions;
+using NTS.Judge.Blazor.Features.Core.Rankings.Protocols;
+using NTS.Judge.Blazor.Features.Print;
 
 namespace NTS.Judge.Blazor.Features.PastEvents;
 
@@ -48,11 +48,7 @@ public class PastEventDetailsContentBehind : NStatefulComponent
     protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
     protected IReadOnlyList<NPrintPanelAction> ResultActions =>
         [
-            NPrintPanelAction.PrintPdf(
-                Print_string,
-                CreateCurrentRanklistPrintRequest,
-                Icons.Material.Outlined.Print
-            ),
+            NPrintPanelAction.PrintPdf(Print_string, CreateCurrentRanklistPrintRequest, Icons.Material.Outlined.Print),
             NPrintPanelAction.DownloadZip(
                 Download_file_string,
                 CreateResultsZipRequest,

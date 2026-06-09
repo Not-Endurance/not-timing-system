@@ -7,9 +7,7 @@ namespace NTS.Blazor.Components.Results;
 public class ResultComponentBehind : NComponent
 {
     protected string SectionClass =>
-        Document?.IsRanked == false
-            ? "results-print-section results-print-page"
-            : "results-print-section";
+        Document?.IsRanked == false ? "results-print-section results-print-page" : "results-print-section";
 
     [Parameter]
     public ResultsDocument? Document { get; set; }

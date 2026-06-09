@@ -24,9 +24,7 @@ public sealed class NHtmlComponentRenderer : INHtmlComponentRenderer
         return await renderer.Dispatcher.InvokeAsync(async () =>
         {
             var dictionary = parameters.ToDictionary(x => x.Key, x => x.Value);
-            var component = await renderer.RenderComponentAsync<TComponent>(
-                ParameterView.FromDictionary(dictionary)
-            );
+            var component = await renderer.RenderComponentAsync<TComponent>(ParameterView.FromDictionary(dictionary));
             return component.ToHtmlString();
         });
     }

@@ -56,8 +56,6 @@ public static class NFileNameHelper
 
     static char ResolveSafeCharacter(char character)
     {
-        return INVALID_FILE_NAME_CHARS.Contains(character) || char.IsWhiteSpace(character)
-            ? '-'
-            : character;
+        return INVALID_FILE_NAME_CHARS.Contains(character) || char.IsWhiteSpace(character) ? '-' : character;
     }
 }

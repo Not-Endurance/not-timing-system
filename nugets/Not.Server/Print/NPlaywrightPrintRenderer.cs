@@ -36,20 +36,11 @@ public sealed class NPlaywrightPrintRenderer : INPrintRenderer, IAsyncDisposable
         {
             var title = await page.TitleAsync();
             var body = await page.Locator("body").InnerTextAsync(new LocatorInnerTextOptions { Timeout = 1000 });
-            throw new TimeoutException(
-                $"Timed out rendering print HTML. Title: '{title}'. Body: '{Trim(body)}'",
-                ex
-            );
+            throw new TimeoutException($"Timed out rendering print HTML. Title: '{title}'. Body: '{Trim(body)}'", ex);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
-        return await page.PdfAsync(
-            new PagePdfOptions
-            {
-                PrintBackground = true,
-                PreferCSSPageSize = true,
-            }
-        );
+        return await page.PdfAsync(new PagePdfOptions { PrintBackground = true, PreferCSSPageSize = true });
     }
 
     public async ValueTask DisposeAsync()

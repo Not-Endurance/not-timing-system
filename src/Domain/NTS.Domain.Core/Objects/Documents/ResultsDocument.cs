@@ -7,7 +7,11 @@ namespace NTS.Domain.Core.Objects.Documents;
 
 public sealed record ResultsDocument : Document, IIdentifiable
 {
-    public ResultsDocument(Aggregates.Result results, EventInformation eventInformation, IEnumerable<Official> officials)
+    public ResultsDocument(
+        Aggregates.Result results,
+        EventInformation eventInformation,
+        IEnumerable<Official> officials
+    )
         : this(
             results,
             new DocumentHeader(
