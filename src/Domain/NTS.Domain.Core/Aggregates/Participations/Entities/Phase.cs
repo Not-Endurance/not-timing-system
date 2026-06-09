@@ -148,6 +148,10 @@ public class Phase : Entity
         {
             throw new DomainException(Required_inspection_is_compulsory_string);
         }
+        if (IsReinspectionRequested && RepresentTime == null)
+        {
+            throw new DomainException(Cannot_request_Required_Inspection_without_Representation_time_string);
+        }
         IsRequiredInspectionRequested = true;
     }
 

@@ -27,6 +27,17 @@ public sealed class StartlistTests
         Assert.Equal(["GATE2/40", "GATE1/20", "GATE2/40"], startlist.Upcoming.Select(x => x.Gate));
     }
 
+    [Fact]
+    public void Eliminated_participations_keep_history_but_are_excluded_from_upcoming()
+    {
+        var phases = CreateHistoryAndFuturePhases();
+        var startlist = new Startlist([CreateParticipation(201, phases, new Withdrawn())]);
+
+        Assert.DoesNotContain(startlist.Upcoming, x => x.Number == 201);
+        var history = Assert.Single(startlist.History.Where(x => x.Number == 201));
+        Assert.Equal(1, history.PhaseNumber);
+    }
+
     static DateTimeOffset[] CreateUpcomingStarts()
     {
         var now = DateTimeOffset.Now;
@@ -39,6 +50,19 @@ public sealed class StartlistTests
 
         var baseStart = new DateTimeOffset(now.Date.Add(baseTime), now.Offset);
         return [baseStart, baseStart.AddMinutes(1), baseStart.AddMinutes(2)];
+    }
+
+    static Phase[] CreateHistoryAndFuturePhases()
+    {
+        var now = DateTimeOffset.Now;
+        var firstStart = now.AddHours(-2);
+        var firstArrive = firstStart.AddHours(1);
+        var firstPresent = firstArrive.AddMinutes(5);
+        return
+        [
+            CreatePhase(firstStart, firstArrive, firstPresent),
+            CreatePhase(now.AddMinutes(30), isFinal: true),
+        ];
     }
 
     static Participation CreateParticipation(int number, DateTimeOffset start, int phaseNumber)
@@ -63,7 +87,35 @@ public sealed class StartlistTests
         );
     }
 
-    static Phase CreatePhase(DateTimeOffset? start = null, bool isFinal = false)
+    static Participation CreateParticipation(
+        int number,
+        IEnumerable<Phase> phases,
+        Eliminated? eliminated = null
+    )
+    {
+        var phaseList = phases.ToList();
+        var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
+        var horse = new Horse($"Horse {number}", null, null, number);
+        var totalDistance = phaseList.Sum(x => x.Length);
+        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", null, null, number);
+
+        return new Participation(
+            ParticipationCategory.Senior,
+            new Competition("Competition", CompetitionRuleset.Regional),
+            combination,
+            new PhaseCollection(phaseList),
+            eliminated,
+            eventId: 1
+        );
+    }
+
+    static Phase CreatePhase(
+        DateTimeOffset? start = null,
+        DateTimeOffset? arrive = null,
+        DateTimeOffset? present = null,
+        bool isFinal = false
+    )
     {
         return new Phase(
             "",
@@ -74,8 +126,8 @@ public sealed class StartlistTests
             isFinal,
             null,
             Timestamp.Create(start),
-            null,
-            null,
+            Timestamp.Create(arrive),
+            Timestamp.Create(present),
             null,
             false,
             false,
