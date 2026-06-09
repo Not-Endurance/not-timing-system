@@ -64,6 +64,7 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
         startInfo.Environment["IS_LOCALHOST"] = "true";
         startInfo.Environment["DOTNET_CLI_HOME"] = dotnetHome;
         startInfo.Environment["NUGET_PACKAGES"] = nugetPackages;
+        PlaywrightBrowserEnvironment.Configure(startInfo, _paths);
 
         try
         {
