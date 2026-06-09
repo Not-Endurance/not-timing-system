@@ -184,14 +184,7 @@ public sealed class PresentlistTests
         var present = arrive.AddMinutes(5);
         var participation = CreateParticipation(
             1,
-            [
-                CreatePhase(
-                    start: arrive.AddHours(-1),
-                    arrive: arrive,
-                    present: present,
-                    isRepresentationRequested: true
-                ),
-            ]
+            [CreatePhase(start: arrive.AddHours(-1), arrive: arrive, present: present, isRepresentationRequested: true)]
         );
 
         Assert.Throws<DomainException>(() => participation.ToggleInspection(true));

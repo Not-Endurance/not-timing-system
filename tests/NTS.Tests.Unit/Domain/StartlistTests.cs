@@ -58,11 +58,7 @@ public sealed class StartlistTests
         var firstStart = now.AddHours(-2);
         var firstArrive = firstStart.AddHours(1);
         var firstPresent = firstArrive.AddMinutes(5);
-        return
-        [
-            CreatePhase(firstStart, firstArrive, firstPresent),
-            CreatePhase(now.AddMinutes(30), isFinal: true),
-        ];
+        return [CreatePhase(firstStart, firstArrive, firstPresent), CreatePhase(now.AddMinutes(30), isFinal: true)];
     }
 
     static Participation CreateParticipation(int number, DateTimeOffset start, int phaseNumber)
@@ -87,11 +83,7 @@ public sealed class StartlistTests
         );
     }
 
-    static Participation CreateParticipation(
-        int number,
-        IEnumerable<Phase> phases,
-        Eliminated? eliminated = null
-    )
+    static Participation CreateParticipation(int number, IEnumerable<Phase> phases, Eliminated? eliminated = null)
     {
         var phaseList = phases.ToList();
         var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");

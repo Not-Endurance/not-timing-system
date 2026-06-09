@@ -13,9 +13,9 @@ using NTS.Domain.Core.Objects.Presentlists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
-using NTS.Localization;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Judge.Contracts.Features.Core.Handouts;
+using NTS.Localization;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
@@ -479,11 +479,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         );
         Assert.Equal(
             "Cannot request Required Inspection without Representation time",
-            judge
-                .GetRequiredService<IStringLocalizer>()[
-                    pendingRepresentationInspectionException.Message
-                ]
-                .Value
+            judge.GetRequiredService<IStringLocalizer>()[pendingRepresentationInspectionException.Message].Value
         );
         var pendingRepresentation = await api.ReadParticipation(eventId, 5602);
         Assert.False(pendingRepresentation.Phases.Current.IsRequiredInspectionRequested);
