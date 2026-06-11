@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 using Not.Application.Print;
 using Not.Files;
@@ -10,11 +11,13 @@ public class BrowserPrintService : INPrintService, IFileService
 {
     readonly INPrintApiService _api;
     readonly IJSRuntime _jsRuntime;
+    readonly NPrintClientSettings _settings;
 
-    public BrowserPrintService(IJSRuntime jsRuntime, INPrintApiService api)
+    public BrowserPrintService(IJSRuntime jsRuntime, INPrintApiService api, IOptions<NPrintClientSettings> settings)
     {
         _jsRuntime = jsRuntime;
         _api = api;
+        _settings = settings.Value;
     }
 
     public Task<NFile> CreatePdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default)
@@ -29,6 +32,14 @@ public class BrowserPrintService : INPrintService, IFileService
 
     public async Task PrintPdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default)
     {
+        if (_settings.BypassBackendPrinting)
+        {
+            var html = NBrowserPrintHtmlRenderer.Render(request);
+            await using var directModule = await Import();
+            await directModule.InvokeVoidAsync("printHtml", cancellationToken, html);
+            return;
+        }
+
         var file = await CreatePdf(request, cancellationToken);
         await using var module = await Import();
         await module.InvokeVoidAsync("printPdfBytes", cancellationToken, file.Content);

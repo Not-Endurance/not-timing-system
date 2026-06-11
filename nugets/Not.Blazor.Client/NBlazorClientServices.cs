@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Not.Application.Authentication.Abstractions;
+using Not.Application.Configurations;
 using Not.Application.Print;
 using Not.Blazor.Client.Authentication;
 using Not.Blazor.Client.Authentication.Services;
@@ -15,6 +16,7 @@ public static class NBlazorClientServices
 {
     public static IServiceCollection NClientSideBlazor(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSettings<NPrintClientSettings>(configuration);
         services.AddTransient<INAuthentication, NBlazorClientAuthenticationService>();
         services.TryAddTransient<INPrintApiService, NApiPrintService>();
         services.TryAddTransient<BrowserPrintService>();
