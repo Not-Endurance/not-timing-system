@@ -2,7 +2,7 @@
 
 public static class ApplicationConstants
 {
-    public const string VERSION = "1.3.1";
+    public const string VERSION = "1.3.2";
     public const string VERSION_STRING = "NTS v" + VERSION;
     public const int NETWORK_BROADCAST_PORT = 21337;
     public const string JUDGE_HUB = "judge-hub";

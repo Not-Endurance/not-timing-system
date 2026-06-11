@@ -132,12 +132,6 @@ public class Phase : Entity
         return GetRecoveryInterval() > TimeSpan.FromMinutes(MaxRecovery);
     }
 
-    internal bool ViolatesSpeedRestriction(Speed? minSpeed, Speed? maxSpeed)
-    {
-        var averageSpeed = GetAverageSpeed();
-        return averageSpeed < minSpeed || averageSpeed > maxSpeed;
-    }
-
     internal void RequestInspection()
     {
         if (IsRequiredInspectionRequested)
