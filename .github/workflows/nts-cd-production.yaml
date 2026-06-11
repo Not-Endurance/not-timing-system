@@ -11,67 +11,12 @@ env:
   DOTNET_CORE_VERSION: 8.0.x
   APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
   API_LOCATION: src/Apps/Nexus/NTS.Nexus.HTTP
-  API_ARTIFACT_NAME: nts-nexus-http-api
-  API_ARTIFACT_PATH: NTS.Nexus.HTTP/publish
   OUTPUT_LOCATION: wwwroot
   SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
   ARTIFACT_PATH: NTS.Nexus.Warp/publish
   AZURE_RESOURCE: nts-warp-prod
 
 jobs:
-  build-api:
-    runs-on: windows-latest
-    name: Production - Nexus HTTP API
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-
-      - name: Restore
-        run: dotnet restore "${{ env.API_LOCATION }}"
-
-      - name: Build
-        run: dotnet build "${{ env.API_LOCATION }}" --configuration "${{ env.CONFIGURATION }}" --no-restore
-
-      - name: Publish
-        run: dotnet publish "${{ env.API_LOCATION }}" --configuration "${{ env.CONFIGURATION }}" --no-build --output "${{ env.API_ARTIFACT_PATH }}" /p:UseAppHost=false /p:PlaywrightPlatform=win
-
-      - name: Install Playwright Chromium
-        shell: pwsh
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: "0"
-        run: pwsh "${{ env.API_ARTIFACT_PATH }}/playwright.ps1" install --only-shell chromium
-
-      - name: Verify Playwright browser payload
-        shell: pwsh
-        run: |
-          $browserRoot = Join-Path "${{ env.API_ARTIFACT_PATH }}" ".playwright/package/.local-browsers"
-
-          if (-not (Test-Path -LiteralPath $browserRoot)) {
-            throw "Playwright browser payload was not installed under '$browserRoot'."
-          }
-
-          $browser = Get-ChildItem -LiteralPath $browserRoot -Recurse -File |
-            Where-Object { $_.Name -in @("chrome-headless-shell.exe", "chrome.exe") } |
-            Select-Object -First 1
-
-          if ($null -eq $browser) {
-            throw "Playwright Chromium executable was not found under '$browserRoot'."
-          }
-
-          Write-Host "Found Playwright browser: $($browser.FullName)"
-
-      - name: Upload Nexus HTTP API artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.API_ARTIFACT_NAME }}
-          path: ${{ env.API_ARTIFACT_PATH }}
-          include-hidden-files: true
-
   deploy-message-bus:
     runs-on: ubuntu-latest
     name: Production - MessageBus
@@ -108,7 +53,7 @@ jobs:
         package: ${{ env.ARTIFACT_PATH }}
 
   deploy-client:
-    needs: [build-api, deploy-message-bus]
+    needs: deploy-message-bus
     runs-on: ubuntu-latest
     name: Production - Client
     steps:
@@ -137,12 +82,6 @@ jobs:
           $config.globalHeaders | Add-Member -MemberType NoteProperty -Name "Blazor-Environment" -Value $env:WITNESS_ENVIRONMENT -Force
           $config | ConvertTo-Json -Depth 10 | Set-Content -Path $configPath
 
-      - name: Download Nexus HTTP API artifact
-        uses: actions/download-artifact@v7
-        with:
-          name: ${{ env.API_ARTIFACT_NAME }}
-          path: ${{ env.API_ARTIFACT_PATH }}
-
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -152,6 +91,5 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_ISLAND_0DC61C703 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           app_location: ${{ env.APP_LOCATION }}
-          api_location: ${{ env.API_ARTIFACT_PATH }}
+          api_location: ${{ env.API_LOCATION }}
           output_location: ${{ env.OUTPUT_LOCATION }}
-          skip_api_build: true
