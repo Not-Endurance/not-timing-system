@@ -1,4 +1,3 @@
-@using NTS.Blazor.Components.Startlist.Upcoming
 @using Not.Blazor.Components.Layout
 
 @inherits NavMenuBehind
@@ -22,9 +21,9 @@
                             TransformOrigin="Origin.TopRight"
                             Style="align-self:center;">
 
-                        <MudMenuItem OnClick="OpenProfile">
+                        <NNavLink Endpoint="@PROFILE_PAGE" MenuItem="true">
                             <MudText Typo="Typo.body2" Color="Color.Primary">@Profile_page_string</MudText>
-                        </MudMenuItem>
+                        </NNavLink>
 
                         <MudMenuItem OnClick="Signout">
                             <MudText Typo="Typo.body2" Color="Color.Secondary">@Sign_Out_string</MudText>
@@ -55,6 +54,14 @@
 
             <NNavLink Endpoint="@STARTLIST_PAGE">
                 <strong>@Startlist_string</strong>
+            </NNavLink>
+
+            <NNavLink Endpoint="@ARRIVELIST_PAGE">
+                <strong>@Arrivelist_string</strong>
+            </NNavLink>
+
+            <NNavLink Endpoint="@PRESENTLIST_PAGE">
+                <strong>@Presentlist_string</strong>
             </NNavLink>
 
             <NNavLink Endpoint="@PERFORMANCE_PAGE">

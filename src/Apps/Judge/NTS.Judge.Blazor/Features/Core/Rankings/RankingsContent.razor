@@ -1,6 +1,7 @@
-﻿@using NTS.Blazor.Components.Rankings.Menu
-@using NTS.Blazor.Components.Rankings.Protocols
+@using NTS.Blazor.Components.Rankings.Menu
+@using NTS.Blazor.Components.Results
 @using Not.Blazor.Components.Layout
+@using Not.Blazor.Components.Print
 
 @attribute [Route(RANKLIST_PAGE)]
 @inherits RankingsContentBehind
@@ -8,21 +9,20 @@
 <NContent Title="@Ranklist_string" IsLoading="@IsLoading" Class="@Class">
 
     <Main>
-        <Protocol Document="Document"
-                  Compact="CompactParticipationTables"
-                  LeftLogo="@HeaderLogo.Left"
-                  RightLogo="@HeaderLogo.Right"
-                  LogoClicked="OpenImageBrowser" />
+        @if (Document != null)
+        {
+            <ResultComponent Document="Document"
+                             LeftLogo="@LeftLogo"
+                             RightLogo="@RightLogo"
+                             LogoClicked="OpenImageBrowser" />
+        }
     </Main>
 
     <Rightbar>
         <MudStack Row Wrap="Wrap.Wrap">
-            <NotButtonPrint OnClick="Print" />
-            
-            @if (IsFeiExportConfigured)
-            {
-                <NButtonPrimary OnClick="GenerateFeiExport" Text="@Export_FEI_string" StartIcon="@Icons.Material.Filled.ImportExport"/>
-            }
+            <NPrintPanel @bind-Scale="PrintFontScale"
+                         Actions="@ResultActions"
+                         Disabled="@(!CanRunResultAction)" />
 
             <NButtonSecondary OnClick="OpenCustomRankingDialog" Text="@Custom_ranking_string" StartIcon="@Icons.Material.Filled.Add"/>
 
@@ -37,8 +37,8 @@
 
         @if (!IsDeactivatingEvent)
         {
-            <RankingMenu Rankings="RankingService.Rankings"
-                         Selected="RankingService.Current"
+            <RankingMenu Rankings="Rankings"
+                         Selected="CurrentRanking"
                          OnSelectedSafe="SelectRanking"
                          OnDeleteSafe="OpenDeleteDialog"
                          Class="mt-4" />

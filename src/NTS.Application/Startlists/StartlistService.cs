@@ -4,6 +4,7 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
 using NTS.Application.Contracts.Startlists;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Startlists;
@@ -20,11 +21,9 @@ public class StartlistService
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>
 {
-    static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_BY_STAGE =
-        new Dictionary<int, IReadOnlyList<Starter>>();
-
     readonly IEventScopedRepository<Participation> _participations;
     readonly INtsSocketContext? _socketContext;
+    UniqueParticipations _state = new();
 
     public StartlistService(IEventScopedRepository<Participation> participations)
         : this(participations, null) { }
@@ -35,61 +34,42 @@ public class StartlistService
         _socketContext = socketContext;
     }
 
-    public Startlist? Startlist { get; set; }
+    public Startlist Startlist { get; private set; } = new([]);
 
-    public IReadOnlyList<Starter> Upcoming => Startlist?.Upcoming ?? [];
-    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> UpcomingByStage =>
-        Startlist?.UpcomingByStage ?? EMPTY_BY_STAGE;
+    public IReadOnlyList<Starter> Upcoming => Startlist.Upcoming;
 
-    public IReadOnlyList<Starter> History => Startlist?.History ?? [];
-    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage =>
-        Startlist?.HistoryByStage ?? EMPTY_BY_STAGE;
+    public IReadOnlyList<Starter> History => Startlist.History;
+    public IReadOnlyDictionary<int, IReadOnlyList<Starter>> HistoryByStage => Startlist.HistoryByStage;
 
     protected override async Task<bool> InitializeState()
     {
         if (_socketContext?.Event == null && _socketContext != null)
         {
+            _state.Clear();
             Startlist = new Startlist([]);
             return false;
         }
 
         var participations = await _participations.ReadMany();
-        Startlist = new Startlist(participations);
+        _state = new UniqueParticipations(participations);
+        Startlist = new Startlist(_state);
         return Startlist.History.Any() || Startlist.Upcoming.Any();
     }
 
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
     {
-        var participation = notification.Participation;
-        Startlist?.Upsert(participation);
-
-        if (participation.Phases.Current.IsComplete() && participation.Phases.Current.IsFinal)
-        {
-            Startlist?.Remove(participation.Combination.Number);
-        }
-        else
-        {
-            Startlist?.UpsertNext(participation);
-        }
-
-        EmitChanged();
+        Update(notification.Participation);
         return Task.CompletedTask;
     }
 
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
+    public async Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
     {
-        if (!notification.Participation.Phases.Current.IsComplete())
-        {
-            Startlist?.UpsertCurrent(notification.Participation);
-        }
-        return Task.CompletedTask;
+        await Refresh(notification.Participation);
     }
 
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
+    public async Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
     {
-        Startlist?.Remove(notification.Participation.Combination.Number);
-        EmitChanged();
-        return Task.CompletedTask;
+        await Refresh(notification.Participation);
     }
 
     public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
@@ -99,14 +79,28 @@ public class StartlistService
 
     public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
     {
+        _state.Clear();
         Startlist = new Startlist([]);
         ClearState();
         return Task.CompletedTask;
     }
 
-    public void Refresh()
+    public void Tick()
     {
-        Startlist?.UpdateState();
+        Startlist = new Startlist(_state);
         EmitChanged();
+    }
+
+    void Update(Participation participation)
+    {
+        _state.Upsert(participation);
+        Startlist = new Startlist(_state);
+        EmitChanged();
+    }
+
+    async Task Refresh(Participation participation)
+    {
+        var persisted = await _participations.Read(participation.Id);
+        Update(persisted ?? participation);
     }
 }

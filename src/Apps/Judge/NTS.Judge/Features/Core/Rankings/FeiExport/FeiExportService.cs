@@ -1,34 +1,32 @@
-using Microsoft.Extensions.DependencyInjection;
-using Not.Exceptions;
-using Not.Filesystem;
-using NTS.Application.Contracts.Socket;
-using NTS.Domain.Core.Objects;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Judge.Features.Core.Rankings.FeiExport;
 
 public class FeiExportService : IFeiExportService
 {
-    readonly IFeiExportFeature _feiExport;
-    readonly IFilesystemContext _filesystemContext;
-    readonly INtsSocketContext _socketContext;
+    const string CONTENT_TYPE = "application/xml";
 
-    public FeiExportService(
-        INtsSocketContext socketContext,
-        IFeiExportFeature feiExport,
-        [FromKeyedServices("NDataKey")] IFilesystemContext filesystemContext
-    )
+    readonly IFeiExportFeature _feiExport;
+
+    public FeiExportService(IFeiExportFeature feiExport)
     {
-        _socketContext = socketContext;
         _feiExport = feiExport;
-        _filesystemContext = filesystemContext;
     }
 
-    public async Task Create(Ranklist ranklist)
+    public FeiExportDocument Create(EventInformation eventInformation, IEnumerable<Ranking> rankings)
     {
-        var eventInformation = GuardHelper.ThrowIfDefault(_socketContext.Event);
+        var rankingList = rankings.ToList();
+        var results = rankingList.Select(x => new Result(x)).ToList();
+        var content = _feiExport.CreateXmlContent(eventInformation, results, rankingList);
+        return new FeiExportDocument(CreateFileName(eventInformation), content, CONTENT_TYPE);
+    }
 
-        var contents = _feiExport.CreateXmlContent(ranklist, eventInformation);
-        var path = $"{_filesystemContext.AppDirectory}/fei-export-{ranklist.Name}.xml";
-        await FileHelper.WriteAsync(path, contents);
+    static string CreateFileName(EventInformation eventInformation)
+    {
+        var source = string.IsNullOrWhiteSpace(eventInformation.Name)
+            ? eventInformation.Id.ToString()
+            : eventInformation.Name;
+        var sanitized = new string(source.Select(x => char.IsLetterOrDigit(x) ? x : '-').ToArray()).Trim('-');
+        return $"fei-export-{sanitized}.xml";
     }
 }

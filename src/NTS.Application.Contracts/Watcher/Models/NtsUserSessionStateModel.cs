@@ -11,10 +11,16 @@ namespace NTS.Application.Contracts.Watcher.Models;
 public class NtsUserSessionStateModel
 {
     public SnapshotGroupModel[] SnapshotHistory { get; set; } = [];
+    public SnapshotModel[] SnapshotSelections { get; set; } = [];
 
     public IReadOnlyList<SnapshotGroup> GetSnapshotHistory()
     {
         return SnapshotHistory.Select(x => x.MapToDomain()).ToArray();
+    }
+
+    public IReadOnlyList<Snapshot> GetSnapshotSelections()
+    {
+        return SnapshotSelections.Select(x => x.MapToDomain()).ToArray();
     }
 
     public NtsUserSessionStateModel Copy()
@@ -22,6 +28,7 @@ public class NtsUserSessionStateModel
         return new NtsUserSessionStateModel
         {
             SnapshotHistory = SnapshotHistory.Select(group => group.Copy()).ToArray(),
+            SnapshotSelections = SnapshotSelections.Select(snapshot => snapshot.Copy()).ToArray(),
         };
     }
 }

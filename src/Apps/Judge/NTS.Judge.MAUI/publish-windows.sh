@@ -1,9 +1,14 @@
 #!/bin/bash
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+solution_dir="$(cd "$script_dir/../../.." && pwd)"
+cd "$script_dir"
+
 # Configuration
 target="net8.0-windows10.0.19041.0"
 build="Release"
-architecture="win10-x64"
+platform="x64"
+runtime_identifier="win-x64"
 icon_path="appicon.ico"
 rcedit_path="rcedit.exe"
 app_exe="NTS.Judge.MAUI.exe"
@@ -27,7 +32,7 @@ case "${target_environment,,}" in
         ;;
 esac
 
-publish_dir="bin/$build/$target/$architecture/publish/$target_environment"
+publish_dir="bin/$platform/$build/$target/$runtime_identifier/publish/$target_environment"
 
 echo "Publishing NTS Judge for $target_environment..."
 
@@ -37,9 +42,11 @@ rm -rf "$publish_dir"
 # Publish the app
 dotnet publish \
  -f "$target" \
+ -r "$runtime_identifier" \
  --self-contained \
- -c $build \
- -property:SolutionDir="$nts/src" \
+ -c "$build" \
+ -p:Platform="$platform" \
+ -property:SolutionDir="$solution_dir/" \
  -p:NtsTargetEnvironment="$target_environment" \
  -o "$publish_dir"
 

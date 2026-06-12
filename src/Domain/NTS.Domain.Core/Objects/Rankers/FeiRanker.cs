@@ -1,20 +1,12 @@
-﻿using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Results;
 
 namespace NTS.Domain.Core.Objects.Rankers;
 
 internal class FeiRanker : Ranker
 {
-    protected IOrderedEnumerable<RankingEntry> OrderByNotEliminatedAndRanked(IEnumerable<RankingEntry> entries)
+    public override List<ParticipationResult> Rank(IEnumerable<ParticipationResult> entries)
     {
-        return entries
-            .OrderBy(x => x.Participation.IsEliminated())
-            .ThenBy(x => x.IsNotRanked)
-            .ThenBy(x => !x.Participation.IsComplete());
-    }
-
-    public override List<RankingEntry> Rank(Ranking ranking)
-    {
-        return OrderByNotEliminatedAndRanked(ranking.Entries)
+        return OrderByNotEliminatedAndRanked(entries)
             .ThenBy(x => x.Participation.Phases.LastOrDefault(x => x.ArriveTime != null)?.ArriveTime)
             .ToList();
     }

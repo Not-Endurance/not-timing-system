@@ -204,11 +204,41 @@
   <data name="Startlist_string" xml:space="preserve">
     <value>Başlangıç listesi</value>
   </data>
+  <data name="Arrivelist_string" xml:space="preserve">
+    <value>Varış listesi</value>
+  </data>
+  <data name="Presentlist_string" xml:space="preserve">
+    <value>Sunum listesi</value>
+  </data>
   <data name="Ranklist_string" xml:space="preserve">
     <value>Sıralama</value>
   </data>
   <data name="Handouts_string" xml:space="preserve">
     <value>Dokümanlar</value>
+  </data>
+  <data name="Download_file_string" xml:space="preserve">
+    <value>İndir</value>
+  </data>
+  <data name="Print_scale_string" xml:space="preserve">
+    <value>Ölçek</value>
+  </data>
+  <data name="Page_format_string" xml:space="preserve">
+    <value>Sayfa formatı</value>
+  </data>
+  <data name="Orientation_string" xml:space="preserve">
+    <value>Yönlendirme</value>
+  </data>
+  <data name="Landscape_string" xml:space="preserve">
+    <value>Yatay</value>
+  </data>
+  <data name="Portrait_string" xml:space="preserve">
+    <value>Dikey</value>
+  </data>
+  <data name="Generating_PDF_string" xml:space="preserve">
+    <value>PDF oluşturuluyor</value>
+  </data>
+  <data name="Generated_by_NoTiming_System_v_string" xml:space="preserve">
+    <value>Oluşturan NoTiming System v</value>
   </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Elenme Nedeni</value>
@@ -300,9 +330,6 @@
   <data name="Welcome_string" xml:space="preserve">
     <value>Hoş geldiniz</value>
   </data>
-  <data name="Required_only_for_FEI_export_string" xml:space="preserve">
-    <value>Yalnızca FEI dışa aktarma için gerekli</value>
-  </data>
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Kombinasyon Numarası</value>
   </data>
@@ -357,6 +384,9 @@
   <data name="Configure_Official_string" xml:space="preserve">
     <value>Resmi Görevliyi Yapılandır</value>
   </data>
+  <data name="Configure_Operator_string" xml:space="preserve">
+    <value>Operatörü Yapılandır</value>
+  </data>
   <data name="Configure_Loops_string" xml:space="preserve">
     <value>Turları Yapılandır</value>
   </data>
@@ -387,7 +417,7 @@
   <data name="History_string" xml:space="preserve">
     <value>Geçmiş</value>
   </data>
-  <data name="Field_is_required_string" xml:space="preserve">
+  <data name="Field_1_is_required_on_2_string" xml:space="preserve">
     <value>Bu alan zorunludur</value>
   </data>
   <data name="Required_inspection_is_compulsory_string" xml:space="preserve">
@@ -395,6 +425,9 @@
   </data>
   <data name="Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string" xml:space="preserve">
     <value>Yeniden inceleme devre dışı bırakılamaz çünkü Yeniden İnceleme Zamanı zaten mevcut</value>
+  </data>
+  <data name="Cannot_request_Required_Inspection_without_Representation_time_string" xml:space="preserve">
+    <value>Yeniden İnceleme zamanı olmadan Zorunlu İnceleme talep edilemez</value>
   </data>
   <data name="Presentation_time_cannot_be_before_arrival__" xml:space="preserve">
     <value>Sunum zamanı '{0}' zamanından önce olamaz</value>
@@ -448,6 +481,9 @@
   <data name="Officials_string" xml:space="preserve">
     <value>Resmi Görevliler</value>
   </data>
+  <data name="Operators_string" xml:space="preserve">
+    <value>Operatörler</value>
+  </data>
   <data name="Phases_string" xml:space="preserve">
     <value>Aşamalar</value>
   </data>
@@ -460,11 +496,11 @@
   <data name="Horse_string" xml:space="preserve">
     <value>At</value>
   </data>
+  <data name="Operator_string" xml:space="preserve">
+    <value>Operatör</value>
+  </data>
   <data name="Competition_Ruleset_string" xml:space="preserve">
     <value>Kural seti</value>
-  </data>
-  <data name="Competition_Type_string" xml:space="preserve">
-    <value>Tür</value>
   </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Toparlanma süresine göre zorunlu inceleme</value>
@@ -487,6 +523,15 @@
   <data name="Max_Speed_string" xml:space="preserve">
     <value>Maksimum Hız Cezası</value>
   </data>
+  <data name="Max_Speed_Restriction_string" xml:space="preserve">
+    <value>Maksimum Hız Kısıtlaması</value>
+  </data>
+  <data name="Max_Speed_Override_string" xml:space="preserve">
+    <value>Maksimum Hız Geçersiz Kılma</value>
+  </data>
+  <data name="Applies_to_all_Participations_added_to_the_competition_when_set_string" xml:space="preserve">
+    <value>Ayarlandığında yarışmaya eklenen tüm Katılımlara uygulanır. Bunu Katılım düzeyinde geçersiz kılabilirsiniz</value>
+  </data>
   <data name="Presentation_string" xml:space="preserve">
     <value>Sunum</value>
   </data>
@@ -505,11 +550,11 @@
   <data name="Rest_time_string" xml:space="preserve">
     <value>Dinlenme süresi (dak)</value>
   </data>
-  <data name="Text_formatting_failed_This_is_usually_not_critical_failure_string" xml:space="preserve">
-    <value>Metin biçimlendirmesi başarısız oldu. Genellikle bu kritik bir hata değildir</value>
-  </data>
   <data name="Number_string" xml:space="preserve">
     <value>Numara</value>
+  </data>
+  <data name="Type_string" xml:space="preserve">
+    <value>Tür</value>
   </data>
   <data name="Language_string" xml:space="preserve">
     <value>Dil</value>
@@ -525,21 +570,6 @@
   </data>
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Zaman formatı yanlış 'saat:dakika:saniye'</value>
-  </data>
-  <data name="required_for_FEI_export" xml:space="preserve">
-    <value>(FEI dışa aktarımı için gerekli)</value>
-  </data>
-  <data name="FEI_Show_ID_label" xml:space="preserve">
-    <value>FEI Show ID</value>
-  </data>
-  <data name="FEI_Event_Code_label" xml:space="preserve">
-    <value>FEI Event Code</value>
-  </data>
-  <data name="FEI_Schedule_NR_label" xml:space="preserve">
-    <value>FEI Schedule NR</value>
-  </data>
-  <data name="FEI_Rule_label" xml:space="preserve">
-    <value>FEI Rule</value>
   </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Sunum zamanı olmadan Temsil talep edilemez</value>
@@ -568,8 +598,23 @@
   <data name="Main_menu_string" xml:space="preserve">
     <value>Ana Menü</value>
   </data>
+  <data name="Fast_string" xml:space="preserve">
+    <value>Hızlı</value>
+  </data>
+  <data name="Average_string" xml:space="preserve">
+    <value>Ortalama</value>
+  </data>
+  <data name="Slow_string" xml:space="preserve">
+    <value>Yavaş</value>
+  </data>
   <data name="Min_Speed_string" xml:space="preserve">
     <value>Minimum Hız Cezası</value>
+  </data>
+  <data name="Min_Speed_Restriction_string" xml:space="preserve">
+    <value>Minimum Hız Kısıtlaması</value>
+  </data>
+  <data name="Min_Speed_Override_string" xml:space="preserve">
+    <value>Minimum Hız Geçersiz Kılma</value>
   </data>
   <data name="Average_speed" xml:space="preserve">
     <value>Ortalama hız:</value>
@@ -598,16 +643,10 @@
   <data name="Download_string" xml:space="preserve">
     <value />
   </data>
-  <data name="Help_string" xml:space="preserve">
-    <value />
-  </data>
   <data name="Home_string" xml:space="preserve">
     <value />
   </data>
   <data name="Login_string" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Contacts_string" xml:space="preserve">
     <value />
   </data>
   <data name="Snapshot_string" xml:space="preserve">
@@ -709,11 +748,17 @@
   <data name="Cannot_add_completed_participations_in_startlist" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-  <data name="Fei_Id_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="Empty_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
+  </data>
+  <data name="RI_string" xml:space="preserve">
+    <value>RI</value>
+  </data>
+  <data name="CRI_string" xml:space="preserve">
+    <value>CRI</value>
+  </data>
+  <data name="Search_string" xml:space="preserve">
+    <value>Ara</value>
   </data>
   <data name="Resend_string" xml:space="preserve">
     <value>Yeniden gonder</value>
@@ -736,7 +781,7 @@
   <data name="Remove_from__string" xml:space="preserve">
     <value>Şundan kaldır: {0}</value>
   </data>
-  <data name="Cascading_Delete_string" xml:space="preserve">
+  <data name="Deleting_used_record_string" xml:space="preserve">
     <value>Zincirleme Sil</value>
   </data>
   <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
@@ -756,5 +801,53 @@
   </data>
   <data name="Past_events_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
+  </data>
+  <data name="FEI_ID_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Show_ID_string" xml:space="preserve">
+    <value>FEI Show ID</value>
+  </data>
+  <data name="FEI_Event_Code_string" xml:space="preserve">
+    <value>FEI Event Code</value>
+  </data>
+  <data name="FEI_Schedule_Number_string" xml:space="preserve">
+    <value>FEI Schedule NR</value>
+  </data>
+  <data name="FEI_Rule_string" xml:space="preserve">
+    <value>FEI Rule</value>
+  </data>
+  <data name="FEI_Show_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Locate_FEI_Show_data_instructions_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Event_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Event_Code_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Competition_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Rule_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="FEI_Schedule_Number_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Athlete_FEI_ID_must_be_numeric_value_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Name_in_English_string" xml:space="preserve">
+    <value>İngilizce isim</value>
+  </data>
+  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
+    <value>Sunum/Muayene için zamanında mı?</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
+    <value>'{0}' öğesini silmek istediğinizden emin misiniz?</value>
   </data>
 </root>

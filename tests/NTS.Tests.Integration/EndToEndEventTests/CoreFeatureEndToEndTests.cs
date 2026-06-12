@@ -1,11 +1,18 @@
 using Newtonsoft.Json;
 using NTS.Application.Contracts.Core.Models;
+using NTS.Application.Contracts.PastEvents;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
+using NTS.Judge.Contracts.Features.Core;
+using NTS.Judge.Contracts.Features.Core.Rankings.FeiExport;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Features;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Infrastructure;
+using NTS.Witness.Contracts.Features.Access;
+using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
+using CoreCombination = NTS.Domain.Core.Aggregates.Participations.Entities.Combination;
+using CoreHorse = NTS.Domain.Core.Aggregates.Participations.Entities.Horse;
 using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
 
 namespace NTS.Tests.Integration.EndToEndEventTests;
@@ -30,6 +37,7 @@ public sealed class CoreFeatureEndToEndTests
         var snapshot = EndToEndEventSnapshot.Load(snapshotName);
         await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
         using var nexusApi = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var print = new EndToEndPrintFeature(nexusApi);
         var configureEvent = new ConfigureEventFeature(judge, nexusApi);
         var startEvent = new StartCoreEventFeature(judge, nexusApi);
 
@@ -49,21 +57,24 @@ public sealed class CoreFeatureEndToEndTests
         var startedRankings = startedDocuments.Rankings;
         Assert.Equal(snapshot.Participations.Count, startedParticipations.Count);
         Assert.Equal(snapshot.Rankings.Count, startedRankings.Count);
+        AssertStartedOperatorsMatchSetup(startedDocuments.Operators, setup.SetupEvent, eventInformation.Id);
 
         await using var witness = new WitnessDriver(
             _fixture.WarpBaseUrl,
             _fixture.NexusBaseUrl,
-            setup.WitnessOfficial,
-            $"CoreEndToEndWitness-{snapshot.Name}"
+            setup.WitnessOperator,
+            $"CoreEndToEndOperatorWitness-{snapshot.Name}"
         );
         await witness.Start();
         await witness.Connect(eventInformation);
+        Assert.Equal(WitnessAccessLevel.Official, witness.AccessLevel);
 
         var phaseWaves = CreatePhaseWaves(snapshot.PhasesWithSnapshots);
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, phaseWaves.Sum(x => x.Count));
         Assert.All(phaseWaves, AssertWaveFitsThirtyMinuteWindow);
 
-        var dashboard = new DashboardFeature(judge, witness, nexusApi, eventInformation);
+        var dashboard = new DashboardFeature(judge, witness, nexusApi, print, eventInformation);
+        await CoreAssertions.AssertArrivelistMatchesPersisted(nexusApi, witness, eventInformation.Id);
         var processedPhases = 0;
         var publishedSnapshotGroups = 0;
         foreach (var phaseWave in phaseWaves)
@@ -77,6 +88,8 @@ public sealed class CoreFeatureEndToEndTests
         Assert.True(publishedSnapshotGroups > 0);
 
         await AssertFinalStateMatchesSnapshots(nexusApi, eventInformation, setup, snapshot);
+        await print.PrintFinalRanklists(eventInformation);
+        await AssertCompletedEventCanBeDeactivatedAndExported(judge, nexusApi, eventInformation);
     }
 
     static async Task AssertStartedConfigureEventCannotBeUpdated(NexusApiDriver api, SetupConfigureEvent setupEvent)
@@ -133,6 +146,7 @@ public sealed class CoreFeatureEndToEndTests
             IntegrationPayloadFactory.Official(eventId, userId: null, id: idBase + 201),
             IntegrationPayloadFactory.Official(eventId, userId: null, id: idBase + 202),
         };
+        var operators = new[] { IntegrationPayloadFactory.Operator(eventId, userId: idBase + 250, id: idBase + 251) };
         var rankings = new[]
         {
             IntegrationPayloadFactory.Ranking(eventId, participations, idBase + 301, $"Seeded {label} Ranking A"),
@@ -150,6 +164,10 @@ public sealed class CoreFeatureEndToEndTests
         foreach (var official in officials)
         {
             await api.Create(official);
+        }
+        foreach (var @operator in operators)
+        {
+            await api.Create(@operator);
         }
         foreach (var ranking in rankings)
         {
@@ -169,13 +187,14 @@ public sealed class CoreFeatureEndToEndTests
     )
     {
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
-        StartedEventDocuments last = new([], [], [], []);
+        StartedEventDocuments last = new([], [], [], [], []);
         while (DateTimeOffset.UtcNow < deadline)
         {
             last = new StartedEventDocuments(
                 await api.ReadParticipations(eventInformation.Id),
                 await api.ReadRankings(eventInformation.Id),
                 await api.ReadOfficials(eventInformation.Id),
+                await api.ReadOperators(eventInformation.Id),
                 await api.ReadHandouts(eventInformation.Id)
             );
             AssertDocumentsBelongToEvent(eventInformation.Id, last);
@@ -184,6 +203,7 @@ public sealed class CoreFeatureEndToEndTests
                 last.Participations.Count == snapshot.Participations.Count
                 && last.Rankings.Count == snapshot.Rankings.Count
                 && last.Officials.Count == setup.SetupEvent.Officials.Count
+                && last.Operators.Count == setup.SetupEvent.Operators.Count
                 && last.Handouts.Count == 0
             )
             {
@@ -198,6 +218,7 @@ public sealed class CoreFeatureEndToEndTests
                 + $"Participations: {last.Participations.Count}/{snapshot.Participations.Count}, "
                 + $"Rankings: {last.Rankings.Count}/{snapshot.Rankings.Count}, "
                 + $"Officials: {last.Officials.Count}/{setup.SetupEvent.Officials.Count}, "
+                + $"Operators: {last.Operators.Count}/{setup.SetupEvent.Operators.Count}, "
                 + $"Handouts: {last.Handouts.Count}/0."
         );
     }
@@ -206,6 +227,7 @@ public sealed class CoreFeatureEndToEndTests
     {
         Assert.All(documents.Participations, participation => Assert.Equal(eventId, participation.EventId));
         Assert.All(documents.Officials, official => Assert.Equal(eventId, official.EventId));
+        Assert.All(documents.Operators, @operator => Assert.Equal(eventId, @operator.EventId));
         Assert.All(
             documents.Rankings,
             ranking =>
@@ -219,9 +241,24 @@ public sealed class CoreFeatureEndToEndTests
             handout =>
             {
                 Assert.Equal(eventId, handout.EventId);
-                Assert.Equal(eventId, handout.Participation.EventId);
+                Assert.All(handout.Entries, entry => Assert.Equal(eventId, entry.Participation.EventId));
             }
         );
+    }
+
+    static void AssertStartedOperatorsMatchSetup(
+        IReadOnlyList<Operator> activeOperators,
+        SetupConfigureEvent setupEvent,
+        int eventId
+    )
+    {
+        Assert.Equal(setupEvent.Operators.Count, activeOperators.Count);
+        foreach (var setupOperator in setupEvent.Operators)
+        {
+            var activeOperator = Assert.Single(activeOperators, x => x.UserId == setupOperator.User.Id);
+            Assert.Equal(eventId, activeOperator.EventId);
+            Assert.Equal(setupOperator.Role, activeOperator.Role);
+        }
     }
 
     static IReadOnlyList<IReadOnlyList<EndToEndPhaseSnapshot>> CreatePhaseWaves(
@@ -301,24 +338,139 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(expectedRankings.ToString(Formatting.None), actualRankings.ToString(Formatting.None));
     }
 
+    static async Task AssertCompletedEventCanBeDeactivatedAndExported(
+        JudgeDriver judge,
+        NexusApiDriver api,
+        EventInformation eventInformation
+    )
+    {
+        eventInformation = CreateFeiExportEventInformation(eventInformation);
+        await api.Update(eventInformation);
+        var finalRankings = await api.ReadRankings(eventInformation.Id);
+        var exportableRanking = CreateFeiExportRanking(finalRankings.First());
+        await api.Update(exportableRanking);
+
+        Assert.True(judge.IsConnected);
+        await judge.GetRequiredService<IDashService>().Deactivate();
+
+        Assert.False(judge.IsConnected);
+        var activeEvents = await api.ReadActiveEventInformation();
+        Assert.DoesNotContain(activeEvents, x => x.Id == eventInformation.Id);
+        var pastEvents = await api.ReadPastEventInformation();
+        Assert.Contains(pastEvents, x => x.Id == eventInformation.Id);
+
+        var pastEventsService = judge.GetRequiredService<IPastEventService>();
+        await pastEventsService.LoadEvent(eventInformation.Id);
+
+        var pastEvent = Assert.IsType<EventInformation>(pastEventsService.Event);
+        var export = judge.GetRequiredService<IFeiExportService>().Create(pastEvent, pastEventsService.Rankings);
+
+        Assert.Equal("application/xml", export.ContentType);
+        Assert.Contains(eventInformation.FeiShowId!, export.Content);
+        Assert.Contains(exportableRanking.FeiEventId!, export.Content);
+        Assert.Contains(exportableRanking.FeiCompetitionId!, export.Content);
+    }
+
+    static EventInformation CreateFeiExportEventInformation(EventInformation source)
+    {
+        return new EventInformation(
+            source.Country,
+            source.Name,
+            source.Location,
+            source.EventSpan,
+            $"FEI-SHOW-{source.Id}",
+            source.Id,
+            source.IsActive
+        );
+    }
+
+    static Ranking CreateFeiExportRanking(Ranking source)
+    {
+        var entries = source
+            .Entries.Select(
+                (entry, index) =>
+                    new RankingEntry(
+                        CreateFeiExportParticipation(entry.Participation),
+                        entry.Rank,
+                        entry.IsNotRanked,
+                        entry.Id
+                    )
+            )
+            .ToList();
+
+        return new Ranking(
+            source.Name,
+            source.Ruleset,
+            source.Category,
+            $"FEI-EVENT-{source.Id}",
+            "CEI1",
+            $"FEI-COMPETITION-{source.Id}",
+            "E Comp",
+            "01",
+            entries,
+            source.EventId,
+            source.Id
+        );
+    }
+
+    static Participation CreateFeiExportParticipation(Participation source)
+    {
+        var athlete = source.Combination.Athlete;
+        var horse = source.Combination.Horse;
+        var athleteFeiId = (100000 + source.Combination.Number).ToString();
+        var horseFeiId = (200000 + source.Combination.Number).ToString();
+        var exportAthlete = new CoreAthlete(
+            athlete.Name,
+            athlete.NameEnglish,
+            athlete.Country,
+            athlete.Club,
+            athleteFeiId,
+            athlete.Id
+        );
+        var exportHorse = new CoreHorse(horse.Name, horse.NameEnglish, horseFeiId, horse.Id);
+        var exportCombination = new CoreCombination(
+            source.Combination.Number,
+            exportAthlete,
+            exportHorse,
+            source.Combination.Club,
+            source.Combination.Distance,
+            source.Combination.MinAverageSpeed,
+            source.Combination.MaxAverageSpeed,
+            source.Combination.Id
+        );
+
+        return new Participation(
+            source.Category,
+            source.Competition,
+            exportCombination,
+            source.Phases,
+            source.Eliminated,
+            source.EventId,
+            source.Id
+        );
+    }
+
     sealed class StartedEventDocuments
     {
         public StartedEventDocuments(
             IReadOnlyList<Participation> participations,
             IReadOnlyList<Ranking> rankings,
             IReadOnlyList<Official> officials,
+            IReadOnlyList<Operator> operators,
             IReadOnlyList<Handout> handouts
         )
         {
             Participations = participations;
             Rankings = rankings;
             Officials = officials;
+            Operators = operators;
             Handouts = handouts;
         }
 
         public IReadOnlyList<Participation> Participations { get; }
         public IReadOnlyList<Ranking> Rankings { get; }
         public IReadOnlyList<Official> Officials { get; }
+        public IReadOnlyList<Operator> Operators { get; }
         public IReadOnlyList<Handout> Handouts { get; }
     }
 }

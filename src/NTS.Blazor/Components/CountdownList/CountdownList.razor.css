@@ -1,0 +1,114 @@
+.countdown-list-host {
+    width: 100%;
+}
+
+::deep .countdown-list {
+    width: 100%;
+}
+
+::deep .countdown-list .mud-table-container {
+    overflow-x: hidden;
+}
+
+::deep .countdown-list .mud-table-container table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+::deep .countdown-list .mud-table-head .mud-table-cell,
+::deep .countdown-list .mud-table-body .mud-table-cell {
+    padding: 0.35rem 0.5rem;
+}
+
+::deep .countdown-list .mud-table-head .mud-table-cell {
+    white-space: nowrap;
+}
+
+::deep .countdown-list-min-cell {
+    min-width: 0;
+}
+
+::deep .countdown-list-athlete-text,
+::deep .countdown-list-person-text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+::deep .countdown-list-nowrap {
+    white-space: nowrap;
+}
+
+::deep .countdown-list-md-up-cell {
+    display: none;
+}
+
+::deep col.countdown-list-md-up-cell {
+    visibility: collapse;
+    width: 0;
+}
+
+::deep .countdown-list-col-number {
+    width: 4.25rem;
+}
+
+::deep .countdown-list-col-gate {
+    width: 6.5rem;
+}
+
+::deep .countdown-list-col-timer {
+    width: 5.75rem;
+}
+
+::deep .countdown-list-col-time {
+    width: calc((100% - 4.25rem) / 3);
+}
+
+@media (min-width: 960px) {
+    ::deep .countdown-list-md-up-cell {
+        display: table-cell;
+    }
+
+    ::deep col.countdown-list-md-up-cell {
+        display: table-column;
+        visibility: visible;
+    }
+
+    ::deep .countdown-list-col-time {
+        width: 5.75rem;
+    }
+
+    ::deep .countdown-list-col-person {
+        width: calc((100% - 21.5rem) / 2);
+    }
+}
+
+@media (max-width: 599.98px) {
+    ::deep .countdown-list .mud-table-head .mud-table-cell,
+    ::deep .countdown-list .mud-table-body .mud-table-cell {
+        padding: 0.25rem 0.35rem;
+    }
+
+    ::deep .countdown-list.mud-xs-table .mud-table-body .mud-table-cell {
+        gap: 1rem;
+        text-align: right !important;
+    }
+
+    ::deep .countdown-list.mud-xs-table .mud-table-body .mud-table-cell::before {
+        flex: 0 0 auto;
+        padding-right: 0;
+    }
+
+    ::deep .countdown-list.mud-xs-table .mud-table-body .mud-table-cell > * {
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: right;
+    }
+
+    ::deep .countdown-list.mud-xs-table .countdown-list-athlete-text,
+    ::deep .countdown-list.mud-xs-table .countdown-list-person-text,
+    ::deep .countdown-list.mud-xs-table .countdown-list-nowrap {
+        text-align: right;
+    }
+}

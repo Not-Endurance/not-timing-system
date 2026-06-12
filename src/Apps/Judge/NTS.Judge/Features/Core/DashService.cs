@@ -65,6 +65,10 @@ public class DashService : IDashService, IScoped
             _activeEventService.Remove(eventId.Value);
         }
         ResetCoreDependentObservables();
+        if (_socketService.IsConnected)
+        {
+            await _socketService.Disconnect();
+        }
     }
 
     public async Task Reset()

@@ -11,6 +11,8 @@ namespace NTS.Localization
     {
         public static string km_string => LocalizeString(nameof(km_string));
         public static string hrs_string => LocalizeString(nameof(hrs_string));
+        public static string Athlete_FEI_ID_must_be_numeric_value_string =>
+            LocalizeString(nameof(Athlete_FEI_ID_must_be_numeric_value_string));
         public static string Reset_Timing_string => LocalizeString(nameof(Reset_Timing_string));
         public static string Export_FEI_string => LocalizeString(nameof(Export_FEI_string));
         public static string rest_string => LocalizeString(nameof(rest_string));
@@ -30,9 +32,20 @@ namespace NTS.Localization
         public static string Clubs_string => LocalizeString(nameof(Clubs_string));
         public static string Club_string => LocalizeString(nameof(Club_string));
         public static string Startlist_string => LocalizeString(nameof(Startlist_string));
+        public static string Arrivelist_string => LocalizeString(nameof(Arrivelist_string));
+        public static string Presentlist_string => LocalizeString(nameof(Presentlist_string));
         public static string Ranklist_string => LocalizeString(nameof(Ranklist_string));
         public static string Handouts_string => LocalizeString(nameof(Handouts_string));
         public static string Download_string => LocalizeString(nameof(Download_string));
+        public static string Download_file_string => LocalizeString(nameof(Download_file_string));
+        public static string Print_scale_string => LocalizeString(nameof(Print_scale_string));
+        public static string Page_format_string => LocalizeString(nameof(Page_format_string));
+        public static string Orientation_string => LocalizeString(nameof(Orientation_string));
+        public static string Landscape_string => LocalizeString(nameof(Landscape_string));
+        public static string Portrait_string => LocalizeString(nameof(Portrait_string));
+        public static string Generating_PDF_string => LocalizeString(nameof(Generating_PDF_string));
+        public static string Generated_by_NoTiming_System_v_string =>
+            LocalizeString(nameof(Generated_by_NoTiming_System_v_string));
         public static string Failed_to_Qualify_Reason_string => LocalizeString(nameof(Failed_to_Qualify_Reason_string));
         public static string Disqualify_Reason_string => LocalizeString(nameof(Disqualify_Reason_string));
         public static string Select_a_reason_string => LocalizeString(nameof(Select_a_reason_string));
@@ -65,12 +78,11 @@ namespace NTS.Localization
         public static string Ride_string => LocalizeString(nameof(Ride_string));
         public static string Not_ranked_string => LocalizeString(nameof(Not_ranked_string));
         public static string Name_string => LocalizeString(nameof(Name_string));
+        public static string Name_in_English_string => LocalizeString(nameof(Name_in_English_string));
         public static string First_name_string => LocalizeString(nameof(First_name_string));
         public static string Middle_name_string => LocalizeString(nameof(Middle_name_string));
         public static string Last_name_string => LocalizeString(nameof(Last_name_string));
         public static string Welcome_string => LocalizeString(nameof(Welcome_string));
-        public static string Required_only_for_FEI_export_string =>
-            LocalizeString(nameof(Required_only_for_FEI_export_string));
         public static string Combination_Number_string => LocalizeString(nameof(Combination_Number_string));
         public static string Location_string => LocalizeString(nameof(Location_string));
         public static string Place_string => LocalizeString(nameof(Place_string));
@@ -130,6 +142,7 @@ namespace NTS.Localization
         public static string Select_participation_to_add_string =>
             LocalizeString(nameof(Select_participation_to_add_string));
         public static string Configure_Official_string => LocalizeString(nameof(Configure_Official_string));
+        public static string Configure_Operator_string => LocalizeString(nameof(Configure_Operator_string));
         public static string Configure_Loops_string => LocalizeString(nameof(Configure_Loops_string));
         public static string Process_string => LocalizeString(nameof(Process_string));
         public static string Representation_string => LocalizeString(nameof(Representation_string));
@@ -144,6 +157,8 @@ namespace NTS.Localization
             LocalizeString(nameof(Required_inspection_is_compulsory_string));
         public static string Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string =>
             LocalizeString(nameof(Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string));
+        public static string Cannot_request_Required_Inspection_without_Representation_time_string =>
+            LocalizeString(nameof(Cannot_request_Required_Inspection_without_Representation_time_string));
         public static string Please_provide_reason_to_eliminate_as__ =>
             LocalizeString(nameof(Please_provide_reason_to_eliminate_as__));
         public static string Select_FTQ_codes => LocalizeString(nameof(Select_FTQ_codes));
@@ -160,13 +175,16 @@ namespace NTS.Localization
         public static string Horses_string => LocalizeString(nameof(Horses_string));
         public static string Competitions_string => LocalizeString(nameof(Competitions_string));
         public static string Officials_string => LocalizeString(nameof(Officials_string));
+        public static string Operators_string => LocalizeString(nameof(Operators_string));
         public static string Phases_string => LocalizeString(nameof(Phases_string));
         public static string Participations_string => LocalizeString(nameof(Participations_string));
         public static string Athlete_string => LocalizeString(nameof(Athlete_string));
         public static string Horse_string => LocalizeString(nameof(Horse_string));
+        public static string Operator_string => LocalizeString(nameof(Operator_string));
         public static string Competition_Ruleset_string => LocalizeString(nameof(Competition_Ruleset_string));
-        public static string Competition_Type_string => LocalizeString(nameof(Competition_Type_string));
         public static string Automatic_CRI_string => LocalizeString(nameof(Automatic_CRI_string));
+        public static string Require_Compulsory_Inspection_string =>
+            LocalizeString(nameof(Require_Compulsory_Inspection_string));
         public static string Official_Role_string => LocalizeString(nameof(Official_Role_string));
         public static string Select_a_role_string => LocalizeString(nameof(Select_a_role_string));
         public static string Is_not_ranked_string => LocalizeString(nameof(Is_not_ranked_string));
@@ -175,6 +193,12 @@ namespace NTS.Localization
         public static string Start_Time_string => LocalizeString(nameof(Start_Time_string));
         public static string Max_Speed_string => LocalizeString(nameof(Max_Speed_string));
         public static string Min_Speed_string => LocalizeString(nameof(Min_Speed_string));
+        public static string Max_Speed_Restriction_string => LocalizeString(nameof(Max_Speed_Restriction_string));
+        public static string Min_Speed_Restriction_string => LocalizeString(nameof(Min_Speed_Restriction_string));
+        public static string Max_Speed_Override_string => LocalizeString(nameof(Max_Speed_Override_string));
+        public static string Min_Speed_Override_string => LocalizeString(nameof(Min_Speed_Override_string));
+        public static string Applies_to_all_Participations_added_to_the_competition_when_set_string =>
+            LocalizeString(nameof(Applies_to_all_Participations_added_to_the_competition_when_set_string));
         public static string Presentation_string => LocalizeString(nameof(Presentation_string));
         public static string Loop_distance_string => LocalizeString(nameof(Loop_distance_string));
         public static string Select_a_loop_string => LocalizeString(nameof(Select_a_loop_string));
@@ -182,23 +206,29 @@ namespace NTS.Localization
         public static string Rest_time_string => LocalizeString(nameof(Rest_time_string));
         public static string __cannot_be_sooner_than__string => LocalizeString(nameof(__cannot_be_sooner_than__string));
         public static string Number_string => LocalizeString(nameof(Number_string));
+        public static string Type_string => LocalizeString(nameof(Type_string));
         public static string Category_string => LocalizeString(nameof(Category_string));
-        public static string FEI_ID => LocalizeString(nameof(FEI_ID));
-        public static string FEI_Id_string => LocalizeString(nameof(FEI_Id_string));
+        public static string FEI_ID_string => LocalizeString(nameof(FEI_ID_string));
         public static string Actions_string => LocalizeString(nameof(Actions_string));
-        public static string FEI_Show_ID_label => LocalizeString(nameof(FEI_Show_ID_label));
-        public static string FEI_Show_ID => LocalizeString(nameof(FEI_Show_ID));
-        public static string FEI_Event_ID_label => LocalizeString(nameof(FEI_Event_ID_label));
+        public static string FEI_Show_ID_string => LocalizeString(nameof(FEI_Show_ID_string));
+        public static string FEI_Show_ID_helper_text_string => LocalizeString(nameof(FEI_Show_ID_helper_text_string));
+        public static string FEI_Event_ID_string => LocalizeString(nameof(FEI_Event_ID_string));
+        public static string Locate_FEI_Show_data_instructions_string =>
+            LocalizeString(nameof(Locate_FEI_Show_data_instructions_string));
+        public static string FEI_Event_Code_helper_text_string =>
+            LocalizeString(nameof(FEI_Event_Code_helper_text_string));
+        public static string FEI_Competition_ID_helper_text_string =>
+            LocalizeString(nameof(FEI_Competition_ID_helper_text_string));
+        public static string FEI_Rule_helper_text_string => LocalizeString(nameof(FEI_Rule_helper_text_string));
+        public static string FEI_Schedule_Number_helper_text_string =>
+            LocalizeString(nameof(FEI_Schedule_Number_helper_text_string));
         public static string Missing_FEI_export_configurations_colon__ =>
             LocalizeString(nameof(Missing_FEI_export_configurations_colon__));
-        public static string FEI_Rule_label => LocalizeString(nameof(FEI_Rule_label));
-        public static string FEI_Rule => LocalizeString(nameof(FEI_Rule));
-        public static string FEI_Event_Code_label => LocalizeString(nameof(FEI_Event_Code_label));
-        public static string FEI_Event_Code => LocalizeString(nameof(FEI_Event_Code));
-        public static string FEI_Schedule_NR_label => LocalizeString(nameof(FEI_Schedule_NR_label));
-        public static string FEI_Schedule_NR => LocalizeString(nameof(FEI_Schedule_NR));
-        public static string FEI_Competition_ID_label => LocalizeString(nameof(FEI_Competition_ID_label));
-        public static string required_for_FEI_export => LocalizeString(nameof(required_for_FEI_export));
+        public static string FEI_Rule_string => LocalizeString(nameof(FEI_Rule_string));
+        public static string FEI_Event_ID_helper_text_string => LocalizeString(nameof(FEI_Event_ID_helper_text_string));
+        public static string FEI_Event_Code_string => LocalizeString(nameof(FEI_Event_Code_string));
+        public static string FEI_Schedule_Number_string => LocalizeString(nameof(FEI_Schedule_Number_string));
+        public static string FEI_Competition_ID_string => LocalizeString(nameof(FEI_Competition_ID_string));
         public static string Cannot_require_representation_without_presentation_time =>
             LocalizeString(nameof(Cannot_require_representation_without_presentation_time));
         public static string Invalid_phase_configuration_in_competition__missing_rest =>
@@ -207,6 +237,9 @@ namespace NTS.Localization
             LocalizeString(nameof(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string));
         public static string Null_or_malformed_string => LocalizeString(nameof(Null_or_malformed_string));
         public static string Main_menu_string => LocalizeString(nameof(Main_menu_string));
+        public static string Fast_string => LocalizeString(nameof(Fast_string));
+        public static string Average_string => LocalizeString(nameof(Average_string));
+        public static string Slow_string => LocalizeString(nameof(Slow_string));
         public static string Average_speed => LocalizeString(nameof(Average_speed));
         public static string Eliminated_string => LocalizeString(nameof(Eliminated_string));
         public static string Competition_ongoing_string => LocalizeString(nameof(Competition_ongoing_string));
@@ -214,11 +247,9 @@ namespace NTS.Localization
             LocalizeString(nameof(Cannot_select_another_event_before_disconnect__string));
         public static string Component_missing_required_value_string =>
             LocalizeString(nameof(Component_missing_required_value_string));
-        public static string Help_string => LocalizeString(nameof(Help_string));
         public static string Home_string => LocalizeString(nameof(Home_string));
         public static string Login_string => LocalizeString(nameof(Login_string));
         public static string Login_page_string => LocalizeString(nameof(Login_page_string));
-        public static string Contacts_string => LocalizeString(nameof(Contacts_string));
         public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
         public static string Snapshot_page_string => LocalizeString(nameof(Snapshot_page_string));
         public static string Performance_string => LocalizeString(nameof(Performance_string));
@@ -252,6 +283,8 @@ namespace NTS.Localization
             LocalizeString(nameof(Cannot_add_completed_participations_in_startlist));
         public static string Arrive_string => LocalizeString(nameof(Arrive_string));
         public static string Represent_string => LocalizeString(nameof(Represent_string));
+        public static string RI_string => LocalizeString(nameof(RI_string));
+        public static string CRI_string => LocalizeString(nameof(CRI_string));
         public static string RI_Time_string => LocalizeString(nameof(RI_Time_string));
         public static string CRI_Time_string => LocalizeString(nameof(CRI_Time_string));
         public static string Loop_T_string => LocalizeString(nameof(Loop_T_string));
@@ -285,7 +318,7 @@ namespace NTS.Localization
             LocalizeString(nameof(File_uploaded_successfully_string));
         public static string Cannot_delete_default_image_string =>
             LocalizeString(nameof(Cannot_delete_default_image_string));
-        public static string Cascading_Delete_string => LocalizeString(nameof(Cascading_Delete_string));
+        public static string Deleting_used_record_string => LocalizeString(nameof(Deleting_used_record_string));
         public static string Cascading_delete_confirmation_prefix_string =>
             LocalizeString(nameof(Cascading_delete_confirmation_prefix_string));
         public static string Cascading_delete_warning_string => LocalizeString(nameof(Cascading_delete_warning_string));
@@ -294,6 +327,8 @@ namespace NTS.Localization
         public static string File_not_found_string => LocalizeString(nameof(File_not_found_string));
         public static string Configure_events_cannot_be_deleted_string =>
             LocalizeString(nameof(Configure_events_cannot_be_deleted_string));
+        public static string Is_on_time_for_Presentation_Inspection_string =>
+            LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
     }
 }
 #pragma warning restore NA0004

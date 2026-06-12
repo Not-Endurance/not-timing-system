@@ -1,0 +1,7 @@
+@inherits NDrawerBehind
+
+<MudDrawer Open="@Open" OpenChanged="SetOpen" Breakpoint="@Breakpoint" Elevation="2">
+    <CascadingValue Name="CloseResponsiveDrawer" Value="@CloseResponsiveDrawer">
+        @ChildContent
+    </CascadingValue>
+</MudDrawer>

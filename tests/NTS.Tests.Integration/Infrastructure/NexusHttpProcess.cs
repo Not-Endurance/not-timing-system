@@ -64,6 +64,7 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
         startInfo.Environment["IS_LOCALHOST"] = "true";
         startInfo.Environment["DOTNET_CLI_HOME"] = dotnetHome;
         startInfo.Environment["NUGET_PACKAGES"] = nugetPackages;
+        PlaywrightBrowserEnvironment.Configure(startInfo, _paths);
 
         try
         {
@@ -129,7 +130,7 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
 
             try
             {
-                using var response = await http.GetAsync("/api/event-information", cancellationToken);
+                using var response = await http.GetAsync("/api/event", cancellationToken);
                 if (response.IsSuccessStatusCode)
                 {
                     return;

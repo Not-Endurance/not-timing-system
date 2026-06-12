@@ -13,8 +13,6 @@ public class PastEventModel : IKrudModel<EventInformation>, IKrudFormModel
     public EventSpan EventSpan { get; private set; } = default!;
     public Country Country { get; private set; } = default!;
     public string? FeiShowId { get; private set; }
-    public string? FeiId { get; private set; }
-    public string? FeiEventCode { get; private set; }
 
     public void MapFrom(EventInformation entity)
     {
@@ -24,21 +22,10 @@ public class PastEventModel : IKrudModel<EventInformation>, IKrudFormModel
         EventSpan = entity.EventSpan;
         Country = entity.Country;
         FeiShowId = entity.FeiShowId;
-        FeiId = entity.FeiId;
-        FeiEventCode = entity.FeiEventCode;
     }
 
     public EventInformation MapToEntity()
     {
-        return new EventInformation(
-            Country,
-            Name,
-            Location,
-            EventSpan,
-            FeiShowId,
-            FeiId,
-            FeiEventCode,
-            Id.GetValueOrDefault()
-        );
+        return new EventInformation(Country, Name, Location, EventSpan, FeiShowId, Id.GetValueOrDefault());
     }
 }

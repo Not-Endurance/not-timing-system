@@ -13,9 +13,30 @@ Requirements:
 - Docker must be running.
 - Azure Functions Core Tools v4 must be installed and `func` must be on `PATH`.
 - Azurite must be running for the Functions host storage connection (`UseDevelopmentStorage=true`).
+- Chromium must be installed for the Nexus HTTP PDF backend. The harness uses `NTS_INTEGRATION_PLAYWRIGHT_BROWSERS_PATH` when set, otherwise it keeps a valid `PLAYWRIGHT_BROWSERS_PATH`, then probes `/ms-playwright`, `.tools/ms-playwright`, and `.tmp/ms-playwright` for a browser matching the current OS.
 - The test harness starts a MongoDB container with Testcontainers.
 - The test harness starts `NTS.Nexus.HTTP` as a child `func start` process on a random localhost port.
 - The test harness starts `NTS.Nexus.Warp` as a child `dotnet run --no-build` process on a random localhost port.
+
+## PDF Browser Setup
+
+Use one browser cache per operating system. For example:
+
+```powershell
+$env:PLAYWRIGHT_BROWSERS_PATH = "$PWD\.tmp\ms-playwright"
+pwsh .\src\Apps\Nexus\NTS.Nexus.HTTP\bin\Debug\net8.0\playwright.ps1 install chromium
+dotnet test .\tests\NTS.Tests.Integration\NTS.Tests.Integration.csproj -c Debug
+```
+
+```bash
+export PLAYWRIGHT_BROWSERS_PATH="$PWD/.tools/ms-playwright"
+pwsh ./src/Apps/Nexus/NTS.Nexus.HTTP/bin/Debug/net8.0/playwright.ps1 install chromium
+dotnet test ./tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -c Debug
+```
+
+On WSL/Linux, Chromium also needs native OS packages. If the PDF step fails with a missing shared library such as `libnspr4.so`, run `pwsh ./src/Apps/Nexus/NTS.Nexus.HTTP/bin/Debug/net8.0/playwright.ps1 install-deps chromium` once, or run the suite in a container image that already includes those dependencies.
+
+The Nexus HTTP container image uses `/ms-playwright`; keep `PLAYWRIGHT_BROWSERS_PATH=/ms-playwright` for container runs.
 
 ## Current Coverage
 

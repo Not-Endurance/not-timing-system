@@ -16,6 +16,8 @@ public class ParticipationService
     : NStatefulService<ObservableList<Participation>>,
         IParticipationContext,
         INotificationHandler<PhaseCompleted>,
+        INotificationHandler<InspectionRequired>,
+        INotificationHandler<RepresentationRequired>,
         INotificationHandler<ParticipationEliminated>,
         INotificationHandler<ParticipationRestored>,
         INotificationHandler<EventConnected>,
@@ -65,6 +67,18 @@ public class ParticipationService
     }
 
     public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
+    {
+        Update(notification.Participation, NCollectionAction.AddOrUpdate);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(InspectionRequired notification, CancellationToken cancellationToken)
+    {
+        Update(notification.Participation, NCollectionAction.AddOrUpdate);
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(RepresentationRequired notification, CancellationToken cancellationToken)
     {
         Update(notification.Participation, NCollectionAction.AddOrUpdate);
         return Task.CompletedTask;

@@ -11,6 +11,9 @@
 <MudPaper Elevation="0" Class="@("pa-4 " + Class)" Style="@Style">
 
     <NList Items="Entities" Title="@Name"  IsLoading="@IsLoading"
+           NoScroll="@NoScroll"
+           SearchLabel="@Search_string"
+           SearchItem="SearchEntity"
            CreateSafe="CreateAction"
            ViewSafe="ViewAction"
            CanView="CanView"

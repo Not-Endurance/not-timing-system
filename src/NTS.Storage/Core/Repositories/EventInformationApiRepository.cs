@@ -18,7 +18,7 @@ public class EventInformationApiRepository
     readonly INtsSocketContext _socketContext;
 
     public EventInformationApiRepository(NHttpClient client, INtsSocketContext socketContext)
-        : base("event-information", client)
+        : base("event", client)
     {
         _socketContext = socketContext;
     }
@@ -58,7 +58,7 @@ public class EventInformationApiRepository
             return;
         }
 
-        await Client.Post<Result.Empty>(
+        await Client.Post<Not.Structures.Result.Empty>(
             $"{Endpoint}/{eventId.Value}/deactivate",
             new DeactivateEventInformationRequest()
         );

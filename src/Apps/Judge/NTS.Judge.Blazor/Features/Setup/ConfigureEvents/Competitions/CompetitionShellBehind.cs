@@ -11,13 +11,10 @@ public class CompetitionShellBehind : KrudShell<CompetitionFormModel>
     public CompetitionShellBehind()
     {
         TimeMask = new(Masks.MINUTES_TIME_MASK_FORMAT);
-        Types = NotListModel.FromEnum<CompetitionType>().ToList();
         Rules = NotListModel.FromEnum<CompetitionRuleset>().ToList();
     }
 
     protected PatternMask TimeMask { get; }
-
-    protected List<NotListModel<CompetitionType>> Types { get; }
 
     protected List<NotListModel<CompetitionRuleset>> Rules { get; }
 }

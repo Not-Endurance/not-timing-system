@@ -29,9 +29,10 @@ public class RankingEventScopedMongoRepository : EventScopedMongoRepository<Rank
             return Builders<RankingModel>
                 .Update.Set(x => x.Name, document.Name)
                 .Set(x => x.Ruleset, document.Ruleset)
-                .Set(x => x.Type, document.Type)
                 .Set(x => x.Category, document.Category)
-                .Set(x => x.CompetitionFeiId, document.CompetitionFeiId)
+                .Set(x => x.FeiEventId, document.FeiEventId)
+                .Set(x => x.FeiEventCode, document.FeiEventCode)
+                .Set(x => x.FeiCompetitionId, document.FeiCompetitionId)
                 .Set(x => x.FeiRule, document.FeiRule)
                 .Set(x => x.FeiScheduleNumber, document.FeiScheduleNumber)
                 .Set(x => x.EventId, document.EventId)

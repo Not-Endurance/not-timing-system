@@ -56,7 +56,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
         }
     }
 
-    protected IReadOnlyList<NMultiButtonDescriptor> GetResendDescriptors(SnapshotGroup group)
+    protected IReadOnlyList<NDropdownButtonDescriptor> GetResendDescriptors(SnapshotGroup group)
     {
         var selectedType = group.Type switch
         {
@@ -67,7 +67,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
 
         return [CreateDescriptor(group, selectedType), CreateDescriptor(group, alternateType)];
 
-        NMultiButtonDescriptor CreateDescriptor(SnapshotGroup snapshotGroup, SnapshotType snapshotType)
+        NDropdownButtonDescriptor CreateDescriptor(SnapshotGroup snapshotGroup, SnapshotType snapshotType)
         {
             return new(
                 $"{Resend_string}: {GetSnapshotTypeText(snapshotType)}",

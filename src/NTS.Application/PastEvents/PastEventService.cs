@@ -6,7 +6,6 @@ using Not.Krud.Models;
 using NTS.Application.Contracts.PastEvents;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Objects;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Startlists;
 
@@ -49,10 +48,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
     public IReadOnlyDictionary<int, IReadOnlyList<Starter>> StartlistHistoryByStage =>
         _startlist?.HistoryByStage ?? EMPTY_STARTLIST;
 
-    public ProtocolDocument? Document =>
-        Event == null || CurrentRanking == null
-            ? null
-            : new ProtocolDocument(new Ranklist(CurrentRanking), Event, _officials);
+    public ResultsDocument? Document => Event == null || CurrentRanking == null ? null : CreateDocument(CurrentRanking);
 
     protected override async Task<bool> InitializeState()
     {
@@ -92,6 +88,11 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
     {
         _currentRanking = Rankings.FirstOrDefault(x => x.Id == ranking.Id) ?? ranking;
         EmitChanged();
+    }
+
+    public ResultsDocument? CreateDocument(Ranking ranking)
+    {
+        return Event == null ? null : new ResultsDocument(new Result(ranking), Event, _officials);
     }
 
     public async Task<IEnumerable<EventInformation>> ReadMany()

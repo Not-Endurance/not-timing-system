@@ -17,9 +17,9 @@
                 <NHeadline3 Color="Color.Secondary" Content="@Watermark" />
             </MudAppBar>
 
-            <MudDrawer @bind-Open="DrawerOpen" Elevation="2">                    
+            <NDrawer @bind-Open="DrawerOpen">
                 @Drawer
-            </MudDrawer>
+            </NDrawer>
         }
 
         <MudMainContent>
@@ -29,7 +29,6 @@
                         @Content
                     </div>
                 </MudContainer>
-
                 <NNotifier />
             </CascadingValue>
         </MudMainContent>

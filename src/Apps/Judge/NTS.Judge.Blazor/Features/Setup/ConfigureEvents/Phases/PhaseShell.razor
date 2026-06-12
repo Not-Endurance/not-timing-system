@@ -11,8 +11,9 @@
         <NNumberField @bind-Value="Model.Recovery" For="() => Model.Recovery" Min="0" Label="@Recovery_time_string" />
 
         <NNumberField @bind-Value="Model.Rest" For="() => Model.Rest" Min="0" Label="@Rest_time_string" />
+
+        <NSwitch @bind-Value="Model.IsCompulsoryInspectionRequired" For="() => Model.IsCompulsoryInspectionRequired" Label="@Require_Compulsory_Inspection_string" />
     </FormFields>
 </KrudForm>
-
 
 

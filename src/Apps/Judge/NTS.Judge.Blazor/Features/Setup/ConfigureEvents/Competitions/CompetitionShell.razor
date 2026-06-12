@@ -11,8 +11,6 @@
 
         <NSelect @bind-Value="Model.Ruleset" For="() => Model.Ruleset" Label="@Competition_Ruleset_string" />
 
-        <NSelect @bind-Value="Model.Type" For="() => Model.Type" Label="@Competition_Type_string" />
-
         <NDatePicker @bind-Date="Model.Date" For="() => Model.Date" Label="@Date_string" ImmediateText="true"/>
 
         <NTimePicker @bind-Time="Model.Time" For="() => Model.Time" Label="@Time_string" ImmediateText="true" Editable="true" Mask="TimeMask" />
@@ -24,14 +22,31 @@
             <NNumberField @bind-Value="Model.CompulsoryThresholdMinutes" For="() => Model.CompulsoryThresholdMinutes" />
         }
 
-        <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@($"{required_for_FEI_export} - {FEI_Competition_ID_label}")" />
+        <NSwitch @bind-Value="Model.UseMinSpeedRestriction" For="() => Model.UseMinSpeedRestriction" Label="@Min_Speed_Restriction_string" />
 
-        <NTextField @bind-Value="Model.FeiRule" For="() => Model.FeiRule" Label="@($"{required_for_FEI_export} - {FEI_Rule_label}")" />
+        @if (Model.UseMinSpeedRestriction)
+        {
+            <NNumberField @bind-Value="Model.MinSpeedRestriction" For="() => Model.MinSpeedRestriction" Label="@Min_Speed_Restriction_string" HelperText="@Applies_to_all_Participations_added_to_the_competition_when_set_string" />
+        }
 
-        <NTextField @bind-Value="Model.FeiScheduleNumber" For="() => Model.FeiRule" Label="@($"{required_for_FEI_export} - {FEI_Schedule_NR_label}")" />
+        <NSwitch @bind-Value="Model.UseMaxSpeedRestriction" For="() => Model.UseMaxSpeedRestriction" Label="@Max_Speed_Restriction_string" />
+
+        @if (Model.UseMaxSpeedRestriction)
+        {
+            <NNumberField @bind-Value="Model.MaxSpeedRestriction" For="() => Model.MaxSpeedRestriction" Label="@Max_Speed_Restriction_string" HelperText="@Applies_to_all_Participations_added_to_the_competition_when_set_string" />
+        }
+
+        <NParagraph Content="@Locate_FEI_Show_data_instructions_string" Class="mt-8 mb-2" />
+
+        <NTextField @bind-Value="Model.FeiEventId" For="() => Model.FeiEventId" Label="@FEI_Event_ID_string" HelperText="@FEI_Event_ID_helper_text_string" />
+
+        <NTextField @bind-Value="Model.FeiEventCode" For="() => Model.FeiEventCode" Label="@FEI_Event_Code_string" HelperText="@FEI_Event_Code_helper_text_string" />
+
+        <NTextField @bind-Value="Model.FeiCompetitionId" For="() => Model.FeiCompetitionId" Label="@FEI_Competition_ID_string" HelperText="@FEI_Competition_ID_helper_text_string" />
+
+        <NTextField @bind-Value="Model.FeiRule" For="() => Model.FeiRule" Label="@FEI_Rule_string" HelperText="@FEI_Rule_helper_text_string" />
+
+        <NTextField @bind-Value="Model.FeiScheduleNumber" For="() => Model.FeiScheduleNumber" Label="@FEI_Schedule_Number_string" HelperText="@FEI_Schedule_Number_helper_text_string"/>
     </FormFields>
 
 </KrudForm>
-
-
-

@@ -24,7 +24,7 @@ public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Han
     {
         Id = handout.Id;
         EventId = handout.EventId;
-        Participation = ParticipationModel.MapFrom(handout.Participation);
+        Participation = ParticipationModel.MapFrom(handout.Entries.Single().Participation);
     }
 
     public Handout MapToEntity()

@@ -20,11 +20,10 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Location { get; set; } = default!;
     public CountryModel Country { get; set; } = default!;
-    public string? ShowFeiId { get; set; }
-    public string? FeiId { get; set; }
-    public string? FeiEventCode { get; set; }
+    public string? FeiShowId { get; set; }
     public CompetitionModel[] Competitions { get; set; } = default!;
     public OfficialModel[] Officials { get; set; } = default!;
+    public OperatorModel[] Operators { get; set; } = [];
     public LoopModel[] Loops { get; set; } = default!;
     public CombinationModel[] Combinations { get; set; } = default!;
     public string Name { get; set; } = default!;
@@ -33,21 +32,21 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
     {
         var country = Country.MapToEntity();
         var competitions = Competitions.Select(x => x.MapToEntity());
-        var officials = Officials.Select(x => x.MapToEntity());
+        var officials = (Officials ?? []).Select(x => x.MapToEntity());
+        var operators = (Operators ?? []).Select(x => x.MapToEntity());
         var loops = Loops.Select(x => x.MapToEntity());
         var combinations = Combinations.Select(x => x.MapToEntity());
         return new ConfigureEvent(
             Name,
             Location,
             country,
-            ShowFeiId,
-            FeiId,
-            FeiEventCode,
+            FeiShowId,
             competitions,
             officials,
             loops,
             combinations,
-            Id
+            Id,
+            operators
         );
     }
 
@@ -57,11 +56,10 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
         Name = @event.Name;
         Location = @event.Location;
         Country = CountryModel.From(@event.Country);
-        ShowFeiId = @event.ShowFeiId;
-        FeiId = @event.FeiId;
-        FeiEventCode = @event.FeiEventCode;
+        FeiShowId = @event.FeiShowId;
         Competitions = @event.Competitions.Select(CompetitionModel.MapFrom).ToArray();
         Officials = @event.Officials.Select(OfficialModel.MapFrom).ToArray();
+        Operators = @event.Operators.Select(OperatorModel.MapFrom).ToArray();
         Loops = @event.Loops.Select(LoopModel.MapFrom).ToArray();
         Combinations = @event.Combinations.Select(CombinationModel.MapFrom).ToArray();
     }

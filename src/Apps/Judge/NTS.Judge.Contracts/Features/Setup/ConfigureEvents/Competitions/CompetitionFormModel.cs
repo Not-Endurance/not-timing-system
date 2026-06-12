@@ -9,6 +9,8 @@ namespace NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
 public record CompetitionFormModel : KrudFormModel<Competition>
 {
     int? _requiredInspectionCompulsoryThreshold;
+    double? _minSpeedRestriction;
+    double? _maxSpeedRestriction;
 
     public CompetitionFormModel()
     {
@@ -20,7 +22,6 @@ public record CompetitionFormModel : KrudFormModel<Competition>
     }
 
     public string? Name { get; set; }
-    public CompetitionType Type { get; set; } = CompetitionType.Qualification;
     public CompetitionRuleset Ruleset { get; set; } = CompetitionRuleset.Regional;
     public DateTime? Date { get; set; } = DateTime.Now;
     public TimeSpan? Time { get; set; } = DateTime.Now.TimeOfDay;
@@ -30,7 +31,21 @@ public record CompetitionFormModel : KrudFormModel<Competition>
         get => UseCompulsoryThreshold ? _requiredInspectionCompulsoryThreshold : null;
         set => _requiredInspectionCompulsoryThreshold = value;
     }
-    public string? FeiId { get; set; }
+    public bool UseMinSpeedRestriction { get; set; }
+    public double? MinSpeedRestriction
+    {
+        get => UseMinSpeedRestriction ? _minSpeedRestriction : null;
+        set => _minSpeedRestriction = value;
+    }
+    public bool UseMaxSpeedRestriction { get; set; }
+    public double? MaxSpeedRestriction
+    {
+        get => UseMaxSpeedRestriction ? _maxSpeedRestriction : null;
+        set => _maxSpeedRestriction = value;
+    }
+    public string? FeiEventId { get; set; }
+    public string? FeiEventCode { get; set; }
+    public string? FeiCompetitionId { get; set; }
     public string? FeiRule { get; set; }
     public string? FeiScheduleNumber { get; set; }
     public IReadOnlyCollection<Phase> Phases { get; private set; } = [];
@@ -42,11 +57,14 @@ public record CompetitionFormModel : KrudFormModel<Competition>
         var compulsoryThreshold = ConvertMinutes(CompulsoryThresholdMinutes);
         return new Competition(
             Name,
-            Type,
             Ruleset,
             startTime,
             compulsoryThreshold,
-            FeiId,
+            MinSpeedRestriction,
+            MaxSpeedRestriction,
+            FeiEventId,
+            FeiEventCode,
+            FeiCompetitionId,
             FeiRule,
             FeiScheduleNumber,
             Phases,
@@ -59,7 +77,6 @@ public record CompetitionFormModel : KrudFormModel<Competition>
     {
         Id = competition.Id;
         Name = competition.Name;
-        Type = competition.Type;
         Date = competition.Start.ToLocalTime().DateTime.Date; // TODO: Create NComponent that's using DateTimeOffset and convert to DateTime correctly
         Time = competition.Start.ToLocalTime().DateTime.TimeOfDay;
         Ruleset = competition.Ruleset;
@@ -67,7 +84,13 @@ public record CompetitionFormModel : KrudFormModel<Competition>
         Participations = competition.Participations;
         CompulsoryThresholdMinutes = competition.CompulsoryThresholdSpan?.Minutes;
         UseCompulsoryThreshold = competition.CompulsoryThresholdSpan != null;
-        FeiId = competition.FeiId;
+        MinSpeedRestriction = competition.MinSpeedRestriction;
+        UseMinSpeedRestriction = competition.MinSpeedRestriction != null;
+        MaxSpeedRestriction = competition.MaxSpeedRestriction;
+        UseMaxSpeedRestriction = competition.MaxSpeedRestriction != null;
+        FeiEventId = competition.FeiEventId;
+        FeiEventCode = competition.FeiEventCode;
+        FeiCompetitionId = competition.FeiCompetitionId;
         FeiRule = competition.FeiRule;
         FeiScheduleNumber = competition.FeiScheduleNumber;
     }

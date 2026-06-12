@@ -11,8 +11,6 @@ public class EventInformation : Aggregate
         string? location,
         EventSpan eventSpan,
         string? feiShowId,
-        string? feiId,
-        string? feiEventCode,
         int id,
         bool isActive = true
     )
@@ -23,8 +21,6 @@ public class EventInformation : Aggregate
         Location = Required(nameof(Location), location);
         EventSpan = eventSpan;
         FeiShowId = feiShowId;
-        FeiId = feiId;
-        FeiEventCode = feiEventCode;
         IsActive = isActive;
     }
 
@@ -33,8 +29,6 @@ public class EventInformation : Aggregate
     public string Location { get; }
     public EventSpan EventSpan { get; }
     public string? FeiShowId { get; }
-    public string? FeiId { get; }
-    public string? FeiEventCode { get; }
     public bool IsActive { get; }
 
     public override string ToString()

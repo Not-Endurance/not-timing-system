@@ -25,6 +25,17 @@ RUN dotnet publish "NTS.Nexus.HTTP.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /home/site/wwwroot
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates gnupg apt-transport-https \
+    && curl -fsSL https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -o /tmp/packages-microsoft-prod.deb \
+    && dpkg -i /tmp/packages-microsoft-prod.deb \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends powershell \
+    && rm -rf /var/lib/apt/lists/* /tmp/packages-microsoft-prod.deb
+
 COPY --from=publish /app/publish .
 ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
-    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+    AzureFunctionsJobHost__Logging__Console__IsEnabled=true \
+    PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+RUN pwsh ./playwright.ps1 install --with-deps chromium

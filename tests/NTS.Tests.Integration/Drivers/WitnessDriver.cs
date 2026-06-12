@@ -13,6 +13,7 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Watcher;
 using NTS.Storage;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness;
@@ -70,6 +71,11 @@ internal sealed class WitnessDriver : IAsyncDisposable
         return _provider.Startup();
     }
 
+    public Task Publish(SnapshotGroup snapshotGroup)
+    {
+        return _provider.GetRequiredService<ISnapshotPublisher>().PublishSnapshotsAsync(snapshotGroup);
+    }
+
     public async Task Connect(EventInformation eventInformation)
     {
         await _socketService.Connect(eventInformation);
@@ -79,6 +85,11 @@ internal sealed class WitnessDriver : IAsyncDisposable
                 $"Witness '{_clientName}' did not connect to event {eventInformation.Id}."
             );
         }
+    }
+
+    public Task Disconnect()
+    {
+        return _socketService.IsConnected ? _socketService.Disconnect() : Task.CompletedTask;
     }
 
     public async Task<Participation> WaitForParticipation(

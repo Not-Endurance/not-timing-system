@@ -31,11 +31,16 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
     [Inject]
     IKrudListBehind<T> Service { get; set; } = default!;
 
+    bool EffectiveAllowCreate => ReadOnly.HasValue ? !ReadOnly.Value : AllowCreate;
+    bool EffectiveAllowView => ReadOnly.HasValue ? ReadOnly.Value : AllowView;
+    bool EffectiveAllowUpdate => ReadOnly.HasValue ? !ReadOnly.Value : AllowUpdate;
+    bool EffectiveAllowDelete => ReadOnly.HasValue ? !ReadOnly.Value : AllowDelete;
+
     protected IReadOnlyList<T> Entities => _entities.AsReadOnly();
-    protected Func<Task>? CreateAction => AllowCreate ? CreateSafe : null;
-    protected Func<T, Task>? ViewAction => AllowView ? ViewSafe : null;
-    protected Func<T, Task>? UpdateAction => AllowUpdate ? UpdateSafe : null;
-    protected Func<T, Task>? DeleteAction => AllowDelete ? DeleteSafe : null;
+    protected Func<Task>? CreateAction => EffectiveAllowCreate ? CreateSafe : null;
+    protected Func<T, Task>? ViewAction => EffectiveAllowView ? ViewSafe : null;
+    protected Func<T, Task>? UpdateAction => EffectiveAllowUpdate ? UpdateSafe : null;
+    protected Func<T, Task>? DeleteAction => EffectiveAllowDelete ? DeleteSafe : null;
 
     [Parameter, EditorRequired]
     public string Name { get; set; } = default!;
@@ -45,6 +50,9 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
 
     [Parameter]
     public Func<T, string>? ViewRouteFactory { get; set; }
+
+    [Parameter]
+    public bool? ReadOnly { get; set; }
 
     [Parameter]
     public bool AllowCreate { get; set; }
@@ -57,6 +65,9 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
 
     [Parameter]
     public bool AllowDelete { get; set; }
+
+    [Parameter]
+    public bool NoScroll { get; set; }
 
     [Parameter]
     public RenderFragment<T>? CustomAction1 { get; set; }
@@ -131,9 +142,18 @@ public class KrudListBehind<T, TModel, TShell> : NStatefulComponent
         }
         else
         {
+            if (!await KrudDialogs.ShowDeleteConfirmation(entity.ToString()))
+            {
+                return;
+            }
             await Service.Delete(entity);
         }
         _entities.Remove(entity);
+    }
+
+    protected bool SearchEntity(T entity, string term)
+    {
+        return entity.ToString().Contains(term, StringComparison.InvariantCultureIgnoreCase);
     }
 
     void SetKrudNodeValue(T entity)

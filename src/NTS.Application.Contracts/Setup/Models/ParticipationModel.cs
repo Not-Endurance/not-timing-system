@@ -20,8 +20,6 @@ public class ParticipationModel
             StartTimeOverride = participation.StartTimeOverride,
             MaxSpeedOverride = participation.MaxSpeedOverride,
             MinSpeedOverride = participation.MinSpeedOverride,
-            MinAverageSpeed = participation.MinAverageSpeed,
-            MaxAverageSpeed = participation.MaxAverageSpeed,
         };
     }
 
@@ -32,8 +30,6 @@ public class ParticipationModel
     public DateTimeOffset? StartTimeOverride { get; init; }
     public double? MaxSpeedOverride { get; init; }
     public double? MinSpeedOverride { get; init; }
-    public double? MinAverageSpeed { get; init; }
-    public double? MaxAverageSpeed { get; init; }
 
     public Participation MapToEntity()
     {
@@ -45,8 +41,6 @@ public class ParticipationModel
             StartTimeOverride,
             MaxSpeedOverride,
             MinSpeedOverride,
-            MinAverageSpeed,
-            MaxAverageSpeed,
             Id
         );
     }

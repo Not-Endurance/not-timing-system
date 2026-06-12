@@ -28,7 +28,8 @@ public class OfficialEventScopedMongoRepository : EventScopedMongoRepository<Off
         {
             return Builders<OfficialModel>
                 .Update.Set(x => x.EventId, document.EventId)
-                .Set(x => x.Names, document.Names)
+                .Set(x => x.Name, document.Name)
+                .Set(x => x.NameEnglish, document.NameEnglish)
                 .Set(x => x.Role, document.Role);
         }
         catch (Exception ex)

@@ -204,11 +204,41 @@
   <data name="Startlist_string" xml:space="preserve">
     <value>Стартлист</value>
   </data>
+  <data name="Arrivelist_string" xml:space="preserve">
+    <value>Пристигащи</value>
+  </data>
+  <data name="Presentlist_string" xml:space="preserve">
+    <value>Инспекции</value>
+  </data>
   <data name="Ranklist_string" xml:space="preserve">
     <value>Класиране</value>
   </data>
   <data name="Handouts_string" xml:space="preserve">
     <value>Разпечатки</value>
+  </data>
+  <data name="Download_file_string" xml:space="preserve">
+    <value>Свали</value>
+  </data>
+  <data name="Print_scale_string" xml:space="preserve">
+    <value>Мащаб</value>
+  </data>
+  <data name="Page_format_string" xml:space="preserve">
+    <value>Формат</value>
+  </data>
+  <data name="Orientation_string" xml:space="preserve">
+    <value>Ориентация</value>
+  </data>
+  <data name="Landscape_string" xml:space="preserve">
+    <value>Пейзажна</value>
+  </data>
+  <data name="Portrait_string" xml:space="preserve">
+    <value>Портретна</value>
+  </data>
+  <data name="Generating_PDF_string" xml:space="preserve">
+    <value>Генериране на PDF</value>
+  </data>
+  <data name="Generated_by_NoTiming_System_v_string" xml:space="preserve">
+    <value>Генерирано от NoTiming System v</value>
   </data>
   <data name="Failed_to_Qualify_Reason_string" xml:space="preserve">
     <value>Причина за отпадане</value>
@@ -300,9 +330,6 @@
   <data name="Welcome_string" xml:space="preserve">
     <value>Добре дошли</value>
   </data>
-  <data name="Required_only_for_FEI_export_string" xml:space="preserve">
-    <value>Задължително само за FEI експорт</value>
-  </data>
   <data name="Combination_Number_string" xml:space="preserve">
     <value>Номер на комбинация</value>
   </data>
@@ -357,6 +384,9 @@
   <data name="Configure_Official_string" xml:space="preserve">
     <value>Конфигурирай Официално лице</value>
   </data>
+  <data name="Configure_Operator_string" xml:space="preserve">
+    <value>Конфигурирай Оператор</value>
+  </data>
   <data name="Configure_Loops_string" xml:space="preserve">
     <value>Конфигурирай Обиколка</value>
   </data>
@@ -387,14 +417,17 @@
   <data name="History_string" xml:space="preserve">
     <value>История</value>
   </data>
-  <data name="Field_is_required_string" xml:space="preserve">
-    <value>Полето е задължително</value>
+  <data name="Field_1_is_required_on_2_string" xml:space="preserve">
+    <value>Полето '{0}' е задължително за '{1}'</value>
   </data>
   <data name="Required_inspection_is_compulsory_string" xml:space="preserve">
     <value>Проверка вече е планирана, защото е конфигурирана като задължителна в състезанието</value>
   </data>
   <data name="Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string" xml:space="preserve">
     <value>Не може да изключим Реинспекция защото време на Реинспекция вече е записано</value>
+  </data>
+  <data name="Cannot_request_Required_Inspection_without_Representation_time_string" xml:space="preserve">
+    <value>Не може да поискаме Задължителна проверка без време на Реинспекция</value>
   </data>
   <data name="Presentation_time_cannot_be_before_arrival__" xml:space="preserve">
     <value>Времето на Инспекция не може да бъде преди времето на пристигане '{0}'</value>
@@ -447,6 +480,9 @@
   <data name="Officials_string" xml:space="preserve">
     <value>Официални лица</value>
   </data>
+  <data name="Operators_string" xml:space="preserve">
+    <value>Оператори</value>
+  </data>
   <data name="Phases_string" xml:space="preserve">
     <value>Фази</value>
   </data>
@@ -459,11 +495,11 @@
   <data name="Horse_string" xml:space="preserve">
     <value>Кон</value>
   </data>
+  <data name="Operator_string" xml:space="preserve">
+    <value>Оператор</value>
+  </data>
   <data name="Competition_Ruleset_string" xml:space="preserve">
     <value>Правилник</value>
-  </data>
-  <data name="Competition_Type_string" xml:space="preserve">
-    <value>Тип</value>
   </data>
   <data name="Automatic_CRI" xml:space="preserve">
     <value>Задължителна инспекция базирана на време на възстановяване</value>
@@ -486,6 +522,15 @@
   <data name="Max_Speed_string" xml:space="preserve">
     <value>Максимална Скорост</value>
   </data>
+  <data name="Max_Speed_Restriction_string" xml:space="preserve">
+    <value>Ограничение за максимална скорост</value>
+  </data>
+  <data name="Max_Speed_Override_string" xml:space="preserve">
+    <value>Промяна на максимална скорост</value>
+  </data>
+  <data name="Applies_to_all_Participations_added_to_the_competition_when_set_string" xml:space="preserve">
+    <value>Прилага се за всички участия, добавени към състезанието, когато е зададено. Можете да го промените на ниво участие</value>
+  </data>
   <data name="Presentation_string" xml:space="preserve">
     <value>Инспекция</value>
   </data>
@@ -504,11 +549,11 @@
   <data name="Rest_time_string" xml:space="preserve">
     <value>Време за почивка (мин)</value>
   </data>
-  <data name="Text_formatting_failed_This_is_usually_not_critical_failure_string" xml:space="preserve">
-    <value>Изникна грешка при форматиренето на текст. Обикновено това не е критичен проблем.</value>
-  </data>
   <data name="Number_string" xml:space="preserve">
     <value>Номер</value>
+  </data>
+  <data name="Type_string" xml:space="preserve">
+    <value>Тип</value>
   </data>
   <data name="Language_string" xml:space="preserve">
     <value>Език</value>
@@ -524,21 +569,6 @@
   </data>
   <data name="Time_format_is_incorrect_hrs_colon_mins_colon_secs_string" xml:space="preserve">
     <value>Форматът е невалиден 'час:минута:секунда'</value>
-  </data>
-  <data name="required_for_FEI_export" xml:space="preserve">
-    <value>*задължително само за ФЕИ експорт</value>
-  </data>
-  <data name="FEI_Show_ID_label" xml:space="preserve">
-    <value>FEI Шоу ID (От ФЕИ база данни -&gt; "Show Detail" секция -&gt; горе вдясно; пример: "2024_CI_1474)</value>
-  </data>
-  <data name="FEI_Event_Code_label" xml:space="preserve">
-    <value>FEI Код на събитие (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; Event Code (в ляво)</value>
-  </data>
-  <data name="FEI_Schedule_NR_label" xml:space="preserve">
-    <value>ФЕИ Номер на състезание (От ФЕИ база данни -&gt; "Competition Detail" секция -&gt; "Schedule Competition Nr *"; пример: "01")</value>
-  </data>
-  <data name="FEI_Rule_label" xml:space="preserve">
-    <value>ФЕИ Правилник (От ФЕИ база данни -&gt; "Competition Detail" секция-&gt; Rule*; пример: E-Comp)</value>
   </data>
   <data name="Cannot_require_representation_without_presentation_time" xml:space="preserve">
     <value>Не може да поискаме Реинспекция без време на инспекция</value>
@@ -567,8 +597,23 @@
   <data name="Main_menu_string" xml:space="preserve">
     <value>Главно Меню</value>
   </data>
+  <data name="Fast_string" xml:space="preserve">
+    <value>Бързо</value>
+  </data>
+  <data name="Average_string" xml:space="preserve">
+    <value>Средно</value>
+  </data>
+  <data name="Slow_string" xml:space="preserve">
+    <value>Бавно</value>
+  </data>
   <data name="Min_Speed_string" xml:space="preserve">
     <value>Минимална Скорост</value>
+  </data>
+  <data name="Min_Speed_Restriction_string" xml:space="preserve">
+    <value>Ограничение за минимална скорост</value>
+  </data>
+  <data name="Min_Speed_Override_string" xml:space="preserve">
+    <value>Промяна на минимална скорост</value>
   </data>
   <data name="Average_speed" xml:space="preserve">
     <value>Средна скорост:</value>
@@ -636,17 +681,11 @@
   <data name="Download_string" xml:space="preserve">
     <value>Свали мобилното приложение</value>
   </data>
-  <data name="Help_string" xml:space="preserve">
-    <value>Помощ</value>
-  </data>
   <data name="Home_string" xml:space="preserve">
     <value>Начало</value>
   </data>
   <data name="Login_string" xml:space="preserve">
     <value>Вход</value>
-  </data>
-  <data name="Contacts_string" xml:space="preserve">
-    <value>Спешни Oбаждания</value>
   </data>
   <data name="Snapshot_string" xml:space="preserve">
     <value>Засечи</value>
@@ -687,32 +726,8 @@
   <data name="Save_string" xml:space="preserve">
     <value />
   </data>
-  <data name="FEI_Competition_ID_label" xml:space="preserve">
-    <value>FEI Събитие ID (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; горе,  дясно; пример: "2024_CI_1474_E_S_02")</value>
-  </data>
-  <data name="FEI_Еvent_ID_Label" xml:space="preserve">
-    <value>FEI Събитие ID (От ФЕИ база данни -&gt; "Event Detail" секция -&gt; горе в дясно; пример: "2024_CI_1474_E_S_02")</value>
-  </data>
   <data name="Missing_FEI_export_configurations_colon__" xml:space="preserve">
     <value>Липсват нужни конфигурации за ФЕИ експорт: {0}</value>
-  </data>
-  <data name="FEI_Event_Code" xml:space="preserve">
-    <value>ФЕИ Код на събитие</value>
-  </data>
-  <data name="FEI_Show_ID" xml:space="preserve">
-    <value>ФЕИ Шоу ID</value>
-  </data>
-  <data name="FEI_Rule" xml:space="preserve">
-    <value>ФЕИ Правилник</value>
-  </data>
-  <data name="FEI_Schedule_NR" xml:space="preserve">
-    <value>ФЕИ Номер на състезание</value>
-  </data>
-  <data name="FEI_ID" xml:space="preserve">
-    <value>ФЕИ ID</value>
-  </data>
-  <data name="FEI_Event_ID_label" xml:space="preserve">
-    <value>ФЕИ Събитие ID (От ФЕИ база данни-&gt; "Event Detail" секция -&gt; горе дясно; пример: "2024_CI_1474_E_S_02")</value>
   </data>
   <data name="Actions_string" xml:space="preserve">
     <value>Действия</value>
@@ -752,6 +767,9 @@
   </data>
   <data name="Automatic_CRI_string" xml:space="preserve">
     <value>Автоматичнa CRI</value>
+  </data>
+  <data name="Require_Compulsory_Inspection_string" xml:space="preserve">
+    <value>Задължителна инспекция</value>
   </data>
   <data name="Use_image_string" xml:space="preserve">
     <value>Използвай изображение</value>
@@ -816,9 +834,6 @@
   <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
     <value>Не може да бъде добавен в Стартлист защото участникът е завършил</value>
   </data>
-  <data name="Fei_Id_string" xml:space="preserve">
-    <value>FEI Id</value>
-  </data>
   <data name="Empty_string" xml:space="preserve">
     <value>Празно</value>
   </data>
@@ -833,6 +848,12 @@
   </data>
   <data name="Represent_string" xml:space="preserve">
     <value>Реинспекция</value>
+  </data>
+  <data name="RI_string" xml:space="preserve">
+    <value>RI</value>
+  </data>
+  <data name="CRI_string" xml:space="preserve">
+    <value>CRI</value>
   </data>
   <data name="RI_Time_string" xml:space="preserve">
     <value>RI време</value>
@@ -951,14 +972,14 @@
   <data name="Remove_from__string" xml:space="preserve">
     <value>Премахни от {0}</value>
   </data>
-  <data name="Cascading_Delete_string" xml:space="preserve">
-    <value>Каскадно изтриване</value>
+  <data name="Deleting_used_record_string" xml:space="preserve">
+    <value>Изтриване на използван запис</value>
   </data>
   <data name="Cascading_delete_confirmation_prefix_string" xml:space="preserve">
     <value>Това е каскадно изтриване за</value>
   </data>
   <data name="Cascading_delete_warning_string" xml:space="preserve">
-    <value>Продължаването ще изтрие избрания ресурс и всички свързани ресурси, изброени по-долу.</value>
+    <value>Продължаването ще изтрие избрания ресурс и в следните места;</value>
   </data>
   <data name="Affected_resources_string" xml:space="preserve">
     <value>Засегнати ресурси</value>
@@ -974,6 +995,60 @@
   </data>
   <data name="Past_events_string" xml:space="preserve">
     <value>Минали събития</value>
+  </data>
+  <data name="FEI_ID_string" xml:space="preserve">
+    <value>ФЕИ Id</value>
+  </data>
+  <data name="FEI_Show_ID_string" xml:space="preserve">
+    <value>ФЕИ Шоу Id</value>
+  </data>
+  <data name="FEI_Event_Code_string" xml:space="preserve">
+    <value>FEI Код на събитие</value>
+  </data>
+  <data name="FEI_Schedule_Number_string" xml:space="preserve">
+    <value>ФЕИ Номер на състезание</value>
+  </data>
+  <data name="FEI_Rule_string" xml:space="preserve">
+    <value>ФЕИ Правилник </value>
+  </data>
+  <data name="FEI_Show_ID_helper_text_string" xml:space="preserve">
+    <value>Show Detail -&gt; Горе вдясно (пример: 2026_CI_1446)</value>
+  </data>
+  <data name="Locate_FEI_Show_data_instructions_string" xml:space="preserve">
+    <value>ФЕИ настройките са нужни само за ФЕИ експорт. За да намерите нужната информация отворете data.fei.org -&gt; Цъкнете на "Calendar/Results" (не "Courses") - Намерете Шоу</value>
+  </data>
+  <data name="FEI_Event_ID_helper_text_string" xml:space="preserve">
+    <value>Еvent Detail -&gt; Горе вдясно (пример: 2026_CI_1446_E_S_02)</value>
+  </data>
+  <data name="FEI_Event_Code_helper_text_string" xml:space="preserve">
+    <value>Event Detail -&gt; Event Code (пример: CEI2* 120 CIM)</value>
+  </data>
+  <data name="FEI_Competition_ID_helper_text_string" xml:space="preserve">
+    <value>Competition Detail -&gt; Горе вдясно (пример: 2026_CI_1446_E_S_02_01)</value>
+  </data>
+  <data name="FEI_Rule_helper_text_string" xml:space="preserve">
+    <value>Competition Detail -&gt; Rule (пример: E-Comp - Endurance Competition)</value>
+  </data>
+  <data name="FEI_Schedule_Number_helper_text_string" xml:space="preserve">
+    <value>Competition Detail -&gt; Schedule Number (пример: 01)</value>
+  </data>
+  <data name="FEI_Competition_ID_string" xml:space="preserve">
+    <value>FEI Събитие ID</value>
+  </data>
+  <data name="FEI_Event_ID_string" xml:space="preserve">
+    <value>ФЕИ Събитие ID</value>
+  </data>
+  <data name="Athlete_FEI_ID_must_be_numeric_value_string" xml:space="preserve">
+    <value>ФЕИ ID за Атлети трябва да бъде число</value>
+  </data>
+  <data name="Name_in_English_string" xml:space="preserve">
+    <value>Име на английски</value>
+  </data>
+  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
+    <value>Навреме ли е за презентация/инспекция?</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
+    <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
   </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>

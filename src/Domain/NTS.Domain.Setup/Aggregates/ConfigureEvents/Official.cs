@@ -1,26 +1,40 @@
+using System.Globalization;
+using NTS.Domain.Helpers;
 using NTS.Domain.Setup.Aggregates;
 using static NTS.Domain.Enums.OfficialRole;
 
 namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
-public class Official : Entity
+public class Official : Entity, INamed, INtsDisplayable
 {
-    public Official(Person? person, OfficialRole? role, int? id = null, User? user = null)
+    public Official(string? name, string? nameEnglish, OfficialRole? role, int? id = null, User? user = null)
         : base(id)
     {
         Role = Required(nameof(Role), role);
-        Person = Required(nameof(Person), person);
+        Name = Required(nameof(Name), name);
+        NameEnglish = string.IsNullOrWhiteSpace(nameEnglish) ? null : nameEnglish;
         User = user;
     }
 
-    public Person Person { get; }
+    public string Name { get; }
+    public string? NameEnglish { get; }
     public OfficialRole Role { get; }
     public User? User { get; }
 
-    public override string ToString()
+    public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
+    {
+        return NameRenderingHelper.Render(Name, NameEnglish, ruleset, culture);
+    }
+
+    public string GetDisplayLabel(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
     {
         var values = Role.GetDescription();
-        return Combine(values, Person);
+        return Combine(values, GetDisplayName(ruleset, culture));
+    }
+
+    public override string ToString()
+    {
+        return GetDisplayLabel();
     }
 
     public bool IsUniqueRole()

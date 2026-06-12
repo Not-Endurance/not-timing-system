@@ -3,14 +3,18 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application;
+using Not.Application.HTTP;
 using Not.Injection;
 using Not.Krud.Abstractions;
+using NTS.Application.Arrivelists;
+using NTS.Application.Contracts.Arrivelists;
 using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
 using NTS.Application.Contracts.PastEvents;
+using NTS.Application.Contracts.Presentlists;
 using NTS.Application.Contracts.Startlists;
 using NTS.Application.Core;
 using NTS.Application.PastEvents;
+using NTS.Application.Presentlists;
 using NTS.Application.Startlists;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
@@ -26,6 +30,8 @@ public static class NtsApplicationServices
         Assembly rootAssembly
     )
     {
+        services.AddHttpClient();
+        services.AddTransient<NHttpClient>();
         services.AddNConventionalServices(rootAssembly);
         return new(services, configuration);
     }
@@ -49,6 +55,31 @@ public static class NtsApplicationServices
             _services.Add<IPastEventService, IPastEventContext, IKrudListBehind<EventInformation>, PastEventService>(
                 ServiceLifetime.Scoped
             );
+            _services.Add<
+                IArrivelistService,
+                INotificationHandler<ParticipationArrived>,
+                INotificationHandler<PhaseCompleted>,
+                INotificationHandler<ParticipationRestored>,
+                INotificationHandler<ParticipationEliminated>,
+                INotificationHandler<EventConnected>,
+                ArrivelistService
+            >(ServiceLifetime.Scoped);
+            _services.AddScoped<INotificationHandler<EventDisconnected>>(x =>
+                x.GetRequiredService<ArrivelistService>()
+            );
+            _services.Add<
+                IPresentlistService,
+                INotificationHandler<ParticipationArrived>,
+                INotificationHandler<PhaseCompleted>,
+                INotificationHandler<InspectionRequired>,
+                INotificationHandler<RepresentationRequired>,
+                INotificationHandler<ParticipationRestored>,
+                INotificationHandler<ParticipationEliminated>,
+                INotificationHandler<VetInAcknoledged>,
+                INotificationHandler<EventConnected>,
+                INotificationHandler<EventDisconnected>,
+                PresentlistService
+            >(ServiceLifetime.Scoped);
             _services.Add<
                 IStartUpcoming,
                 IStartHistory,

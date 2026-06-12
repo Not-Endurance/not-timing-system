@@ -9,7 +9,7 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Storage.REST;
 
-public class UserApiRepository : ApiRepository<User, UserModel>, IUserEmailLookup
+public class UserApiRepository : ApiRepository<User, UserModel>, IUserLookup
 {
     public UserApiRepository(NHttpClient client)
         : base("users", client) { }
@@ -48,8 +48,6 @@ public class UserApiRepository : ApiRepository<User, UserModel>, IUserEmailLooku
             return users;
         }
 
-        return users.Where(x =>
-            x.Name.NContains(term) || x.Email.NContains(term) || (x.DisplayName?.NContains(term) ?? false)
-        );
+        return users.Where(x => UserSearchPolicy.IsMatch(x, term));
     }
 }

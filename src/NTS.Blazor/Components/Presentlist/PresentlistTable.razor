@@ -1,0 +1,57 @@
+﻿@using NTS.Domain.Core.Objects.Presentlists
+@using NTS.Blazor.Components.CountdownList
+@using MudBlazor
+
+@inherits PresentlistTableBehind
+
+<CountdownList TItem="PresentlistEntry" Items="Service.Entries" Class="@Class" OnTick="Tick">
+
+    <HeaderContent>
+        <MudTh>@Number_string</MudTh>
+        <MudTh>@Time_string</MudTh>
+        <MudTh>@Type_string</MudTh>
+        <MudTh>@Athlete_string</MudTh>
+        @if (CanAcknowledge)
+        {
+            <MudTh></MudTh>
+        }
+    </HeaderContent>
+
+    <RowTemplate Context="entry">
+
+        <MudTd DataLabel="@Number_string">
+            <MudText Typo="Typo.body2">#@entry.Number</MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@Time_string">
+            <MudText Typo="Typo.caption" Color="@GetTimeColor(entry)" Class="countdown-list-nowrap">
+                @FormatTime(entry)
+            </MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@Type_string">
+            <MudText Typo="Typo.caption" Class="countdown-list-nowrap">@FormatType(entry.Type)</MudText>
+        </MudTd>
+
+        <MudTd DataLabel="@Athlete_string" Class="countdown-list-min-cell">
+            <MudText Typo="Typo.caption">
+                <span class="countdown-list-athlete-text" title="@FormatAthlete(entry)">
+                    @FormatAthlete(entry)
+                </span>
+            </MudText>
+        </MudTd>
+
+        @if (CanAcknowledge)
+        {
+            <MudTd DataLabel="@Confirm_action_string">
+                <MudCheckBox T="bool"
+                             Value="false"
+                             ValueChanged="@((bool value) => Acknowledge(entry, value))"
+                             Color="Color.Success"
+                             Size="Size.Small" />
+            </MudTd>
+        }
+
+    </RowTemplate>
+
+</CountdownList>

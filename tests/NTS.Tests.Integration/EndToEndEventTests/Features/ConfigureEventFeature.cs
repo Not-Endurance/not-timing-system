@@ -10,6 +10,7 @@ using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Officials;
+using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Operators;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
 using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
 using NTS.Judge.Contracts.Features.Setup.Horses;
@@ -95,15 +96,27 @@ internal class ConfigureEventFeature
         var horseService = _judge.GetRequiredService<IKrudFormService<HorseFormModel>>();
         foreach (var horse in snapshot.Horses)
         {
-            var form = new HorseFormModel { Name = horse.Name, FeiId = horse.FeiId };
+            var form = new HorseFormModel
+            {
+                Name = horse.Name,
+                NameEnglish = horse.NameEnglish,
+                FeiId = horse.FeiId,
+            };
             await horseService.Create(form);
 
-            var created = new Horse(horse.Name, horse.FeiId, RequiredId(form));
+            var created = new Horse(horse.Name, horse.NameEnglish, horse.FeiId, RequiredId(form));
             Remember(idMap, horse.Id, created.Id);
             createdHorses.Add(horse.Id, created);
 
             var persisted = await _nexusApi.ReadSetupHorses();
-            Assert.Contains(persisted, x => x.Id == created.Id && x.Name == horse.Name && x.FeiId == horse.FeiId);
+            Assert.Contains(
+                persisted,
+                x =>
+                    x.Id == created.Id
+                    && x.Name == horse.Name
+                    && x.NameEnglish == horse.NameEnglish
+                    && x.FeiId == horse.FeiId
+            );
         }
 
         var athleteService = _judge.GetRequiredService<IKrudFormService<AthleteFormModel>>();
@@ -111,7 +124,8 @@ internal class ConfigureEventFeature
         {
             var form = new AthleteFormModel
             {
-                Names = athlete.Names.ToString(),
+                Name = athlete.Name,
+                NameEnglish = athlete.NameEnglish,
                 FeiId = athlete.FeiId,
                 Country = athlete.Country,
                 Club = athlete.Club == null ? null : createdClubs[athlete.Club.Id],
@@ -120,7 +134,8 @@ internal class ConfigureEventFeature
             await athleteService.Create(form);
 
             var created = new Athlete(
-                athlete.Names,
+                athlete.Name,
+                athlete.NameEnglish,
                 athlete.FeiId,
                 athlete.Country,
                 athlete.Club == null ? null : createdClubs[athlete.Club.Id],
@@ -135,7 +150,8 @@ internal class ConfigureEventFeature
                 persisted,
                 x =>
                     x.Id == created.Id
-                    && x.Names.ToString() == athlete.Names.ToString()
+                    && x.Name == athlete.Name
+                    && x.NameEnglish == athlete.NameEnglish
                     && x.Country.Id == athlete.Country.Id
                     && x.Club?.Id == created.Club?.Id
             );
@@ -147,9 +163,7 @@ internal class ConfigureEventFeature
             Name = snapshot.ConfigureEvent.Name,
             Location = snapshot.ConfigureEvent.Location,
             Country = snapshot.ConfigureEvent.Country,
-            FeiShowId = snapshot.ConfigureEvent.ShowFeiId,
-            FeiId = snapshot.ConfigureEvent.FeiId,
-            FeiEventCode = snapshot.ConfigureEvent.FeiEventCode,
+            FeiShowId = snapshot.ConfigureEvent.FeiShowId,
         };
         await eventService.Create(eventForm);
         var setupEventId = RequiredId(eventForm);
@@ -225,7 +239,8 @@ internal class ConfigureEventFeature
         {
             var form = new OfficialFormModel
             {
-                Name = official.Person.ToString(),
+                Name = official.Name,
+                NameEnglish = official.NameEnglish,
                 Role = official.Role,
                 User = official.User == null ? null : createdUsers[official.User.Id],
             };
@@ -237,11 +252,36 @@ internal class ConfigureEventFeature
                 _nexusApi,
                 setupEventId,
                 setupEvent => setupEvent.Officials.Any(x => x.Id == officialId),
-                $"official {official.Person}"
+                $"official {official.Name}"
             );
             Assert.Contains(
                 currentEvent.Officials,
-                x => x.Id == officialId && x.Person.ToString() == official.Person.ToString() && x.Role == official.Role
+                x =>
+                    x.Id == officialId
+                    && x.Name == official.Name
+                    && x.NameEnglish == official.NameEnglish
+                    && x.Role == official.Role
+            );
+            _judge.SelectSetupParent(currentEvent);
+        }
+
+        var operatorService = _judge.GetRequiredService<IKrudFormService<OperatorFormModel>>();
+        foreach (var @operator in snapshot.ConfigureEvent.Operators)
+        {
+            var form = new OperatorFormModel { User = createdUsers[@operator.User.Id] };
+            await operatorService.Create(form);
+            var operatorId = RequiredId(form);
+            Remember(idMap, @operator.Id, operatorId);
+
+            currentEvent = await WaitForSetupEvent(
+                _nexusApi,
+                setupEventId,
+                setupEvent => setupEvent.Operators.Any(x => x.Id == operatorId),
+                $"operator {@operator.User.Email}"
+            );
+            Assert.Contains(
+                currentEvent.Operators,
+                x => x.Id == operatorId && x.User.Id == createdUsers[@operator.User.Id].Id && x.Role == @operator.Role
             );
             _judge.SelectSetupParent(currentEvent);
         }
@@ -265,11 +305,7 @@ internal class ConfigureEventFeature
             );
             Assert.Contains(
                 currentEvent.Competitions,
-                x =>
-                    x.Id == competitionId
-                    && x.Name == competition.Name
-                    && x.Type == competition.Type
-                    && x.Ruleset == competition.Ruleset
+                x => x.Id == competitionId && x.Name == competition.Name && x.Ruleset == competition.Ruleset
             );
 
             SelectCompetition(_judge, currentEvent, competitionId);
@@ -342,7 +378,8 @@ internal class ConfigureEventFeature
         return new SetupFeatureResult(
             currentEvent,
             new Dictionary<int, int>(idMap),
-            ResolveWitnessOfficial(currentEvent)
+            ResolveWitnessOfficial(currentEvent),
+            ResolveWitnessOperator(currentEvent)
         );
     }
 
@@ -357,6 +394,28 @@ internal class ConfigureEventFeature
         return new IntegrationUser(
             user.Email,
             $"setup-official-{user.Id}",
+            user.Name,
+            user.GivenName,
+            user.MiddleName,
+            user.Surname,
+            user.CountryRegion,
+            user.Club,
+            user.FeiId,
+            user.DisplayName
+        );
+    }
+
+    static IntegrationUser ResolveWitnessOperator(ConfigureEvent setupEvent)
+    {
+        var user = setupEvent.Operators.Select(x => x.User).FirstOrDefault();
+        if (user == null)
+        {
+            throw new InvalidOperationException("The setup event snapshot does not include an operator user.");
+        }
+
+        return new IntegrationUser(
+            user.Email,
+            $"setup-operator-{user.Id}",
             user.Name,
             user.GivenName,
             user.MiddleName,
@@ -391,7 +450,7 @@ internal class ConfigureEventFeature
         var summary =
             current == null
                 ? "no event was returned"
-                : $"{current.Loops.Count} loop(s), {current.Combinations.Count} combination(s), {current.Officials.Count} official(s), {current.Competitions.Count} competition(s)";
+                : $"{current.Loops.Count} loop(s), {current.Combinations.Count} combination(s), {current.Officials.Count} official(s), {current.Operators.Count} operator(s), {current.Competitions.Count} competition(s)";
         throw new TimeoutException($"Setup event {setupEventId} did not persist {expectedState}: {summary}.");
     }
 
@@ -401,7 +460,6 @@ internal class ConfigureEventFeature
         return new CompetitionFormModel
         {
             Name = competition.Name,
-            Type = competition.Type,
             Ruleset = competition.Ruleset,
             Date = localStart.Date,
             Time = localStart.TimeOfDay,
@@ -410,7 +468,13 @@ internal class ConfigureEventFeature
                 competition.CompulsoryThresholdSpan == null
                     ? null
                     : (int)competition.CompulsoryThresholdSpan.Value.TotalMinutes,
-            FeiId = competition.FeiId,
+            UseMinSpeedRestriction = competition.MinSpeedRestriction != null,
+            MinSpeedRestriction = competition.MinSpeedRestriction,
+            UseMaxSpeedRestriction = competition.MaxSpeedRestriction != null,
+            MaxSpeedRestriction = competition.MaxSpeedRestriction,
+            FeiEventId = competition.FeiEventId,
+            FeiEventCode = competition.FeiEventCode,
+            FeiCompetitionId = competition.FeiCompetitionId,
             FeiRule = competition.FeiRule,
             FeiScheduleNumber = competition.FeiScheduleNumber,
         };
@@ -463,15 +527,18 @@ internal sealed class SetupFeatureResult
     public SetupFeatureResult(
         ConfigureEvent setupEvent,
         IReadOnlyDictionary<int, int> idMap,
-        IntegrationUser witnessOfficial
+        IntegrationUser witnessOfficial,
+        IntegrationUser witnessOperator
     )
     {
         SetupEvent = setupEvent;
         IdMap = idMap;
         WitnessOfficial = witnessOfficial;
+        WitnessOperator = witnessOperator;
     }
 
     public ConfigureEvent SetupEvent { get; }
     public IReadOnlyDictionary<int, int> IdMap { get; }
     public IntegrationUser WitnessOfficial { get; }
+    public IntegrationUser WitnessOperator { get; }
 }

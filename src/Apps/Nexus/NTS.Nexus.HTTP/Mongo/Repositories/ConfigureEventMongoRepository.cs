@@ -31,11 +31,10 @@ public class ConfigureEventMongoRepository : MongoRepository<ConfigureEventModel
                 .Update.Set(x => x.Location, document.Location)
                 .Set(x => x.Name, document.Name)
                 .Set(x => x.Country, document.Country)
-                .Set(x => x.ShowFeiId, document.ShowFeiId)
-                .Set(x => x.FeiId, document.FeiId)
-                .Set(x => x.FeiEventCode, document.FeiEventCode)
+                .Set(x => x.FeiShowId, document.FeiShowId)
                 .Set(x => x.Competitions, document.Competitions)
                 .Set(x => x.Officials, document.Officials)
+                .Set(x => x.Operators, document.Operators)
                 .Set(x => x.Loops, document.Loops)
                 .Set(x => x.Combinations, document.Combinations);
         }

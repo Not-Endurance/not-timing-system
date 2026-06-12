@@ -17,8 +17,6 @@ public class EventInformationMongoRepository : MongoRepository<EventInformationM
             .Set(x => x.Name, document.Name)
             .Set(x => x.Location, document.Location)
             .Set(x => x.FeiShowId, document.FeiShowId)
-            .Set(x => x.FeiId, document.FeiId)
-            .Set(x => x.FeiEventCode, document.FeiEventCode)
             .Set(x => x.StartDay, document.StartDay)
             .Set(x => x.EndDay, document.EndDay)
             .Set(x => x.IsActive, document.IsActive);

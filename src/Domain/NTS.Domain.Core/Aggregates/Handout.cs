@@ -1,14 +1,17 @@
-﻿namespace NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Results;
 
-public class Handout : Aggregate, IEventScoped
+namespace NTS.Domain.Core.Aggregates;
+
+public sealed class Handout : Result
 {
     public Handout(Participation participation, int? id = null)
-        : base(id)
-    {
-        Participation = participation;
-        EventId = participation.EventId;
-    }
-
-    public int EventId { get; }
-    public Participation Participation { get; }
+        : base(
+            id,
+            null,
+            participation.Competition.Name,
+            participation.Competition.Ruleset,
+            participation.Category,
+            [new ParticipationResult(participation)],
+            participation.EventId
+        ) { }
 }

@@ -107,6 +107,7 @@ internal sealed class EndToEndEventSnapshot
     public IReadOnlyList<SetupUser> Users =>
         ConfigureEvent
             .Officials.Select(x => x.User)
+            .Concat(ConfigureEvent.Operators.Select(x => x.User))
             .Concat(ConfigureEvent.Combinations.Select(x => x.Athlete.User))
             .Where(x => x != null)
             .Select(x => x!)
@@ -136,9 +137,7 @@ internal sealed class EndToEndEventSnapshot
 
         foreach (var expected in Rankings)
         {
-            var actual = actualRankings.Single(x =>
-                x.Name == expected.Name && x.Category == expected.Category && x.Type == expected.Type
-            );
+            var actual = actualRankings.Single(x => x.Name == expected.Name && x.Category == expected.Category);
             ids[expected.Id] = actual.Id;
             foreach (var expectedEntry in expected.Entries)
             {
@@ -155,6 +154,10 @@ internal sealed class EndToEndEventSnapshot
     public JToken ExpectedConfigureEventWith(IReadOnlyDictionary<int, int> idMap)
     {
         var expected = _setupSource.DeepClone();
+        if (expected is JObject obj && obj["Operators"] == null)
+        {
+            obj["Operators"] = new JArray();
+        }
         SnapshotJson.ReplaceIds(expected, idMap);
         return SnapshotJson.Canonicalize(expected);
     }
@@ -226,7 +229,9 @@ internal sealed class EndToEndEventSnapshot
     static JToken LoadJson(string directory, string fileName)
     {
         var path = Path.Combine(directory, fileName);
-        return SnapshotJson.NormalizeMongoDocument(SnapshotJson.Parse(File.ReadAllText(path)));
+        return SnapshotJson.NormalizeNames(
+            SnapshotJson.NormalizeMongoDocument(SnapshotJson.Parse(File.ReadAllText(path)))
+        );
     }
 
     static JToken SortParticipations(JToken token)

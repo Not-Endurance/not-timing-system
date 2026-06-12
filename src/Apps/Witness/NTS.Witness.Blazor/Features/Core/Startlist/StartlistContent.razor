@@ -1,5 +1,5 @@
 @using NTS.Blazor.Components.Startlist.History
-@using NTS.Blazor.Components.Startlist.Upcoming
+@using NTS.Blazor.Components.Startlist
 @using Not.Blazor.Components.Layout
 
 @attribute [Route(STARTLIST_PAGE)]
@@ -8,7 +8,7 @@
 <NContent Title="@Startlist_string">
 
     <Main>
-        <StartlistUpcoming />
+        <StartlistTable />
 
         <StartlistHistory />
     </Main>

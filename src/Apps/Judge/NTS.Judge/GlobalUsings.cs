@@ -14,6 +14,7 @@ global using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Combinations;
 global using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Competitions;
 global using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Loops;
 global using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Officials;
+global using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Operators;
 global using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Participations;
 global using NTS.Judge.Contracts.Features.Setup.ConfigureEvents.Phases;
 global using NTS.Judge.Contracts.Features.Setup.Horses;

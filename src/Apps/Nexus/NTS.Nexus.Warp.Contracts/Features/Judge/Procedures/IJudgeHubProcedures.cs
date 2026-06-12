@@ -4,6 +4,9 @@ namespace NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
 
 public interface IJudgeHubProcedures
 {
+    Task OnParticipationArrived(WarpRequest<ParticipationArrived> request);
+    Task OnInspectionRequired(WarpRequest<InspectionRequired> request);
+    Task OnRepresentationRequired(WarpRequest<RepresentationRequired> request);
     Task OnPhaseCompleted(WarpRequest<PhaseCompleted> request);
     Task OnParticipationEliminated(WarpRequest<ParticipationEliminated> request);
     Task OnParticipationRestored(WarpRequest<ParticipationRestored> request);

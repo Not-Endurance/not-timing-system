@@ -132,12 +132,6 @@ public class Phase : Entity
         return GetRecoveryInterval() > TimeSpan.FromMinutes(MaxRecovery);
     }
 
-    internal bool ViolatesSpeedRestriction(Speed? minSpeed, Speed? maxSpeed)
-    {
-        var averageSpeed = GetAverageSpeed();
-        return averageSpeed < minSpeed || averageSpeed > maxSpeed;
-    }
-
     internal void RequestInspection()
     {
         if (IsRequiredInspectionRequested)
@@ -147,6 +141,10 @@ public class Phase : Entity
         if (IsRequiredInspectionCompulsory)
         {
             throw new DomainException(Required_inspection_is_compulsory_string);
+        }
+        if (IsReinspectionRequested && RepresentTime == null)
+        {
+            throw new DomainException(Cannot_request_Required_Inspection_without_Representation_time_string);
         }
         IsRequiredInspectionRequested = true;
     }

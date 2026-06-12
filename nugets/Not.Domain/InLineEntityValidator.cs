@@ -8,7 +8,9 @@ namespace Not.Domain;
 
 public abstract class InLineEntityValidator
 {
-    protected static T NotDefault<T>(string field, T value)
+    Type? _thisType;
+
+    protected T NotDefault<T>(string field, T value)
         where T : struct
     {
         if (value.Equals(default))
@@ -18,21 +20,21 @@ public abstract class InLineEntityValidator
         return value;
     }
 
-    protected static T Required<T>(string field, T? value)
+    protected T Required<T>(string field, T? value)
         where T : struct
     {
         return value ?? throw GetRequiredException(field);
     }
 
     [return: NotNull]
-    protected static T Required<T>(string field, T? instance)
+    protected T Required<T>(string field, T? instance)
         where T : class
     {
         return instance ?? throw GetRequiredException(field);
     }
 
     [return: NotNull]
-    protected static string Required(string field, [NotNull] string? value)
+    protected string Required(string field, [NotNull] string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -41,7 +43,7 @@ public abstract class InLineEntityValidator
         return value;
     }
 
-    protected static IEnumerable<T> AreUnique<T>(string field, IEnumerable<T> collection)
+    protected IEnumerable<T> AreUnique<T>(string field, IEnumerable<T> collection)
         where T : IIdentifiable
     {
         if (collection.GroupBy(x => x.Id).Select(x => x.Count()).Any(x => x != 1))
@@ -51,8 +53,12 @@ public abstract class InLineEntityValidator
         return collection;
     }
 
-    static DomainPropertyException GetRequiredException(string field)
+    DomainPropertyException GetRequiredException(string field)
     {
-        return new DomainPropertyException(field, Field_is_required_string);
+        _thisType ??= GetType();
+        return new DomainPropertyException(
+            field,
+            string.Format(Field_1_is_required_on_2_string, field, _thisType.Name)
+        );
     }
 }

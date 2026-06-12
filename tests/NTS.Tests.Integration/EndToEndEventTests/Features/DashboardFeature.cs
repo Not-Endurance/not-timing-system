@@ -23,6 +23,7 @@ internal sealed class DashboardFeature
     readonly JudgeDriver _judge;
     readonly WitnessDriver _witness;
     readonly NexusApiDriver _api;
+    readonly EndToEndPrintFeature _print;
     readonly EventInformation _eventInformation;
     readonly HashSet<int> _manuallyEliminated = [];
     int _innerWaveNumber;
@@ -32,12 +33,14 @@ internal sealed class DashboardFeature
         JudgeDriver judge,
         WitnessDriver witness,
         NexusApiDriver api,
+        EndToEndPrintFeature print,
         EventInformation eventInformation
     )
     {
         _judge = judge;
         _witness = witness;
         _api = api;
+        _print = print;
         _eventInformation = eventInformation;
     }
 
@@ -70,6 +73,12 @@ internal sealed class DashboardFeature
                 $"Wave {outerWaveNumber}: assert startlists after arrival group",
                 group,
                 () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
+            );
+            await FeatureStep.Run(
+                FEATURE,
+                $"Wave {outerWaveNumber}: assert arrivelist after arrival group",
+                group,
+                () => CoreAssertions.AssertArrivelistMatchesPersisted(_api, _witness, _eventInformation.Id)
             );
         }
 
@@ -157,6 +166,12 @@ internal sealed class DashboardFeature
                 $"Wave {outerWaveNumber}: assert startlists after presentation group",
                 group,
                 () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
+            );
+            await FeatureStep.Run(
+                FEATURE,
+                $"Wave {outerWaveNumber}: assert arrivelist after presentation group",
+                group,
+                () => CoreAssertions.AssertArrivelistMatchesPersisted(_api, _witness, _eventInformation.Id)
             );
         }
 
@@ -337,12 +352,16 @@ internal sealed class DashboardFeature
             return;
         }
 
-        await Eventually.ReadHandouts(
-            _api,
-            _eventInformation.Id,
-            items => items.Any(x => x.Participation.Combination.Number == entry.Number),
-            $"handout for #{entry.Number}"
-        );
+        if (!entry.Phase.IsFinal)
+        {
+            await Eventually.ReadHandouts(
+                _api,
+                _eventInformation.Id,
+                items =>
+                    items.Any(x => x.Entries.Any(result => result.Participation.Combination.Number == entry.Number)),
+                $"handout for #{entry.Number}"
+            );
+        }
         await Eventually.ReadRankings(
             _api,
             _eventInformation.Id,
@@ -360,6 +379,10 @@ internal sealed class DashboardFeature
             participation => participation.Phases[entry.PhaseIndex].IsComplete(),
             TimeSpan.FromSeconds(10)
         );
+        if (!entry.Phase.IsFinal)
+        {
+            await _print.PrintPendingHandouts(_eventInformation, [entry.Number]);
+        }
         await CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id);
     }
 
@@ -433,6 +456,7 @@ internal sealed class DashboardFeature
             $"ranking elimination for #{number}"
         );
         await WaitForWitnessAbsence(number);
+        await WaitForStartlistUpcomingAbsence(number);
     }
 
     static bool IsAutomaticElimination(Eliminated eliminated)
@@ -486,6 +510,33 @@ internal sealed class DashboardFeature
         }
 
         throw new TimeoutException($"Witness still listed eliminated participation #{number}.");
+    }
+
+    async Task WaitForStartlistUpcomingAbsence(int number)
+    {
+        var judgeUpcoming = _judge.GetRequiredService<IStartUpcoming>();
+        var witnessUpcoming = _witness.GetRequiredService<IStartUpcoming>();
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        IReadOnlyList<int> lastJudgeUpcoming = [];
+        IReadOnlyList<int> lastWitnessUpcoming = [];
+
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            lastJudgeUpcoming = judgeUpcoming.Upcoming.Select(x => x.Number).ToArray();
+            lastWitnessUpcoming = witnessUpcoming.Upcoming.Select(x => x.Number).ToArray();
+            if (!lastJudgeUpcoming.Contains(number) && !lastWitnessUpcoming.Contains(number))
+            {
+                return;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException(
+            $"Startlists still listed eliminated participation #{number}. "
+                + $"Judge upcoming: [{string.Join(", ", lastJudgeUpcoming)}]. "
+                + $"Witness upcoming: [{string.Join(", ", lastWitnessUpcoming)}]."
+        );
     }
 
     static IReadOnlyList<IReadOnlyList<EndToEndPhaseSnapshot>> GroupByDelta(

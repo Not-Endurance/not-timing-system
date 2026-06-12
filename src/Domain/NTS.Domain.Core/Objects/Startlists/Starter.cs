@@ -1,21 +1,37 @@
 using Not.Formatting;
+using NTS.Domain.Helpers;
 
 namespace NTS.Domain.Core.Objects.Startlists;
 
 public record Starter : ValueObject
 {
-    internal Starter(Person athlete, int number, int phaseNumber, double distance, Timestamp start)
+    internal Starter(
+        string athleteName,
+        string? athleteNameEnglish,
+        CompetitionRuleset ruleset,
+        int number,
+        int phaseNumber,
+        string gate,
+        double distance,
+        Timestamp start
+    )
     {
-        Athlete = athlete;
+        AthleteName = athleteName;
+        AthleteNameEnglish = athleteNameEnglish;
+        Ruleset = ruleset;
         Number = number;
         PhaseNumber = phaseNumber;
+        Gate = gate;
         Distance = distance;
         Start = start;
     }
 
-    public Person Athlete { get; }
+    public string AthleteName { get; }
+    public string? AthleteNameEnglish { get; }
+    public CompetitionRuleset Ruleset { get; }
     public int Number { get; }
     public int PhaseNumber { get; }
+    public string Gate { get; }
     public double Distance { get; }
     public StartlistEntryState State { get; internal set; } = StartlistEntryState.Resting;
     public Timestamp Start { get; }
@@ -25,6 +41,6 @@ public record Starter : ValueObject
         var distance = Distance + km_string;
         var startTime = Start.ToTimeSpan();
         var start = FormattingHelper.Format(startTime);
-        return Combine(Number, Athlete, distance, start);
+        return Combine(Number, NameRenderingHelper.Render(AthleteName, AthleteNameEnglish, Ruleset), distance, start);
     }
 }

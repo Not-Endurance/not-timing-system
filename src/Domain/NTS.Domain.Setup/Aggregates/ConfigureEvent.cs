@@ -9,12 +9,14 @@ namespace NTS.Domain.Setup.Aggregates;
 public class ConfigureEvent
     : Aggregate,
         IKrudParent<Official>,
+        IKrudParent<Operator>,
         IKrudParent<Competition>,
         IKrudParent<Loop>,
         IKrudParent<Combination>
 {
     readonly List<Competition> _competitions = [];
     readonly List<Official> _officials = [];
+    readonly List<Operator> _operators = [];
     readonly List<Loop> _loops = [];
     readonly List<Combination> _combinations = [];
 
@@ -22,31 +24,30 @@ public class ConfigureEvent
         string? name,
         string? location,
         Country? country,
-        string? showFeiId,
-        string? feiId,
-        string? feiEventCode,
+        string? feiShowId,
         IEnumerable<Competition> competitions,
         IEnumerable<Official> officials,
         IEnumerable<Loop> loops,
         IEnumerable<Combination> combinations,
-        int? id = null
+        int? id = null,
+        IEnumerable<Operator>? operators = null
     )
         : base(id)
     {
         Name = Required(nameof(Name), name);
         Location = Required(nameof(Location), location);
         Country = Required(nameof(Country), country);
-        ShowFeiId = showFeiId;
-        FeiId = feiId;
-        FeiEventCode = feiEventCode;
+        FeiShowId = feiShowId;
         _competitions = competitions.ToList();
         _officials = officials.ToList();
+        _operators = operators?.ToList() ?? [];
         _loops = loops.ToList();
         _combinations = combinations.ToList();
         ValidateUniqueSetup();
     }
 
     IReadOnlyList<Official> IKrudParent<Official>.Children => Officials;
+    IReadOnlyList<Operator> IKrudParent<Operator>.Children => Operators;
     IReadOnlyList<Competition> IKrudParent<Competition>.Children => Competitions;
     IReadOnlyList<Loop> IKrudParent<Loop>.Children => Loops;
     IReadOnlyList<Combination> IKrudParent<Combination>.Children => Combinations;
@@ -54,11 +55,10 @@ public class ConfigureEvent
     public string Name { get; }
     public string Location { get; }
     public Country Country { get; }
-    public string? ShowFeiId { get; }
-    public string? FeiId { get; }
-    public string? FeiEventCode { get; }
+    public string? FeiShowId { get; }
     public IReadOnlyList<Competition> Competitions => _competitions.AsReadOnly();
     public IReadOnlyList<Official> Officials => _officials.AsReadOnly();
+    public IReadOnlyList<Operator> Operators => _operators.AsReadOnly();
     public IReadOnlyList<Loop> Loops => _loops.AsReadOnly();
     public IReadOnlyList<Combination> Combinations => _combinations.AsReadOnly();
 
@@ -95,6 +95,21 @@ public class ConfigureEvent
     public void Remove(Official official)
     {
         _officials.Remove(official);
+    }
+
+    public void Add(Operator @operator)
+    {
+        _operators.Add(@operator);
+    }
+
+    public void Update(Operator @operator)
+    {
+        _operators.Update(@operator);
+    }
+
+    public void Remove(Operator @operator)
+    {
+        _operators.Remove(@operator);
     }
 
     public override string ToString()

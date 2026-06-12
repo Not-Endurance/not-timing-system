@@ -15,11 +15,11 @@
     <Main>
         <MudGrid Spacing="8" Style="margin-top:0!important;">
             <MudItem xs="6">
-                <KrudList T="Athlete" TShell="AthleteShell" TModel="AthleteFormModel" Name="@Athletes_string" AllowCreate AllowUpdate AllowDelete />
+                <KrudList T="Athlete" TShell="AthleteShell" TModel="AthleteFormModel" Name="@Athletes_string" AllowCreate AllowUpdate AllowDelete NoScroll />
             </MudItem>
             
             <MudItem xs="6">
-                <KrudList T="Horse" TShell="HorseShell" TModel="HorseFormModel" Name="@Horses_string" AllowCreate AllowUpdate AllowDelete />
+                <KrudList T="Horse" TShell="HorseShell" TModel="HorseFormModel" Name="@Horses_string" AllowCreate AllowUpdate AllowDelete NoScroll />
             </MudItem>
         </MudGrid>
     </Main>
