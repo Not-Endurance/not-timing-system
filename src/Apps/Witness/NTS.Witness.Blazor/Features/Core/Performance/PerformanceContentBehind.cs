@@ -3,6 +3,7 @@ using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Witness.Blazor.Features.Socket;
+using NTS.Witness.Contracts.Features.Performance;
 
 namespace NTS.Witness.Blazor.Features.Core.Performance;
 
@@ -10,6 +11,9 @@ public class PerformanceContentBehind : NStatefulComponent
 {
     [Inject]
     IParticipationContext Context { get; set; } = default!;
+
+    [Inject]
+    IPerformanceParticipations PerformanceParticipations { get; set; } = default!;
 
     [Inject]
     BlazorSocketService BlazorSocketService { get; set; } = default!;
@@ -22,11 +26,12 @@ public class PerformanceContentBehind : NStatefulComponent
         set => Context.Selected = value;
     }
 
-    protected IReadOnlyList<Participation> Participations => Context.Participations;
+    protected IReadOnlyList<Participation> Participations => PerformanceParticipations.Participations;
 
     protected override async Task OnInitializedAsync()
     {
         await Observe(Context);
+        await Observe(PerformanceParticipations);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
