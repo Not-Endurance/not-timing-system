@@ -20,6 +20,7 @@ using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
 using NTS.Witness.Contracts.Features.Access;
+using NTS.Witness.Contracts.Features.Performance;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
@@ -170,6 +171,27 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.Equal(eventId, participantReceived.EventId);
         Assert.Equal(WitnessAccessLevel.Official, officialWitness.AccessLevel);
         Assert.Equal(WitnessAccessLevel.Participant, participantWitness.AccessLevel);
+
+        var performanceParticipations = officialWitness.GetRequiredService<IPerformanceParticipations>();
+        if (performanceParticipations is NStatefulService performanceStateful)
+        {
+            performanceStateful.ResetHasLoaded();
+        }
+
+        await performanceParticipations.Load();
+        Assert.Contains(
+            performanceParticipations.Participations,
+            x => x.Combination.Number == participationNumber && x.Phases.Current.IsComplete()
+        );
+
+        var snapshots = officialWitness.GetRequiredService<WitnessSnapshotService>();
+        if (snapshots is NStatefulService snapshotsStateful)
+        {
+            snapshotsStateful.ResetHasLoaded();
+        }
+
+        await snapshots.Load();
+        Assert.DoesNotContain(snapshots.Participations, x => x.Combination.Number == participationNumber);
 
         var persistedSnapshotResults = await api.ReadSnapshotResults(eventId);
 

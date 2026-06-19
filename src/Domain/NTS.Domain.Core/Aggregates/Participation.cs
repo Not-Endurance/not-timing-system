@@ -186,11 +186,6 @@ public class Participation : Aggregate, IEventScoped
             Eliminate(OUT_OF_TIME);
             return;
         }
-        if (phase.ViolatesSpeedRestriction(Combination.MinAverageSpeed, Combination.MaxAverageSpeed))
-        {
-            Eliminate(SPEED_RESTRICTION);
-            return;
-        }
         if (Eliminated == OUT_OF_TIME || Eliminated == SPEED_RESTRICTION)
         {
             Restore();
