@@ -17,7 +17,9 @@ public class NExceptionHandlerContentBehind : NComponent
 
     protected string? BackdropImageUrl => CascadedBackdropImageUrl;
     protected string ErrorText =>
-        string.IsNullOrWhiteSpace(CascadedErrorText) ? string.Empty : LocalizationHelper.LocalizeString(CascadedErrorText);
+        string.IsNullOrWhiteSpace(CascadedErrorText)
+            ? string.Empty
+            : LocalizationHelper.LocalizeString(CascadedErrorText);
 
     protected bool HasBackdropImage => !string.IsNullOrWhiteSpace(BackdropImageUrl);
 

@@ -114,11 +114,7 @@ public class NNotifier : NComponent, IDisposable
                     ? _productionExceptionDialogOptions
                     : _nonProductionExceptionDialogOptions;
 
-                await DialogService.ShowAsync<NExceptionHandlerDialog>(
-                    string.Empty,
-                    parameters,
-                    dialogOptions
-                );
+                await DialogService.ShowAsync<NExceptionHandlerDialog>(string.Empty, parameters, dialogOptions);
             });
         }
         catch (Exception dialogException)

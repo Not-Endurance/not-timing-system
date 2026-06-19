@@ -1,7 +1,7 @@
 using System.Reflection;
+using NTS.Storage;
 using NTS.Witness;
 using NTS.Witness.Blazor;
-using NTS.Storage;
 
 namespace NTS.Witness.Web;
 
