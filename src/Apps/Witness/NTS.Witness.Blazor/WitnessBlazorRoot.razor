@@ -1,14 +1,31 @@
 @using System.Reflection
-@using Microsoft.AspNetCore.Components
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Components.Routing
+
+#nullable disable
+        ;
+#nullable restore
+#line (2, 2) - (2, 39) "D:\Source\NTS\not-timing-system\src\Apps\Witness\NTS.Witness.Blazor\WitnessBlazorRoot.razor"
+    using Microsoft.AspNetCore.Components
+
+#nullable disable
+        ;
+#nullable restore
+#line (3, 2) - (3, 53) "D:\Source\NTS\not-timing-system\src\Apps\Witness\NTS.Witness.Blazor\WitnessBlazorRoot.razor"
+    using Microsoft.AspNetCore.Components.Authorization
+
+#nullable disable
+        ;
+#nullable restore
+#line (4, 2) - (4, 47) "D:\Source\NTS\not-timing-system\src\Apps\Witness\NTS.Witness.Blazor\WitnessBlazorRoot.razor"
+    using Microsoft.AspNetCore.Components.Routing
+
 @using NTS.Witness.Blazor.Layout
 @using NTS.Witness.Blazor.Features.Profile
 @using Not.Blazor.Client.Authentication.Components
+@using Not.Blazor.Components.Exceptions
 
 @inherits WitnessBlazorRootBehind
 
-<ErrorBoundary @ref="@ErrorBoundary">
+<NExceptionHandlerErrorBoundary>
     <ChildContent>
         <CascadingAuthenticationState>
             <Router AppAssembly="@Assembly" AdditionalAssemblies="@RouteAssemblies">
@@ -39,13 +56,8 @@
     </ChildContent>
 
     <ErrorContent>
-        <br />
-        <br />
-        <div class="container">
-            <pre>@context.Message</pre>
-            <pre>@context.StackTrace</pre>
-        </div>
-
-        <button class="btn btn-primary" @onclick="@(() => ErrorBoundary.Recover())">@Back_string</button>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <NExceptionHandlerContent />
+        </LayoutView>
     </ErrorContent>
-</ErrorBoundary>
+</NExceptionHandlerErrorBoundary>

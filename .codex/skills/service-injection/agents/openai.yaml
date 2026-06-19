@@ -1,0 +1,4 @@
+interface:
+  display_name: "Service Injection"
+  short_description: "Prefer interface-based service and context DI."
+  default_prompt: "Use $service-injection to register and inject services or contexts consistently in NTS."

@@ -1,16 +1,27 @@
 namespace Not.Application.Environments;
 
-public sealed class NEnvironment
+public sealed class NEnvironmentContext : IEnvironmentContext
 {
-    public NEnvironment(string? environment)
+    public NEnvironmentContext(string? environment)
     {
-        Environment = NEnvionmentNames.Normalize(environment);
+        Environment = NEnvironmentNames.Normalize(environment);
     }
 
     public string Environment { get; }
+
+    public bool IsProduction()
+    {
+        return Environment == NEnvironmentNames.PRODUCTION;
+    }
 }
 
-public static class NEnvionmentNames
+public interface IEnvironmentContext
+{
+    string Environment { get; }
+    bool IsProduction();
+}
+
+public static class NEnvironmentNames
 {
     public const string DEVELOPMENT = "Development";
     public const string STAGING = "Staging";

@@ -8,11 +8,11 @@ using Not.Structures;
 
 namespace NTS.Nexus.HTTP.Telemetry;
 
-internal class ErrorHandlerMiddleware : IFunctionsWorkerMiddleware
+internal class ExceptionHandlerMiddleware : IFunctionsWorkerMiddleware
 {
-    readonly ILogger<ErrorHandlerMiddleware> _logger;
+    readonly ILogger<ExceptionHandlerMiddleware> _logger;
 
-    public ErrorHandlerMiddleware(ILogger<ErrorHandlerMiddleware> logger)
+    public ExceptionHandlerMiddleware(ILogger<ExceptionHandlerMiddleware> logger)
     {
         _logger = logger;
     }

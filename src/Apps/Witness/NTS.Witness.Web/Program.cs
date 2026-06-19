@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Not.Application.Configurations;
 using Not.Application.Environments;
-using NTS.Witness;
 using NTS.Witness.Web;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -13,9 +12,8 @@ await AddLocalhostOverrideSettings(builder);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddSingleton(new NEnvironment(builder.HostEnvironment.Environment));
-builder.Services.AddNtsWitnessWeb(builder.Configuration);
-builder.Services.AddNtsWitness(
+builder.Services.AddNEnvironmentContext(builder.HostEnvironment.Environment);
+builder.Services.AddNtsWitnessWeb(
     builder.Configuration,
     builder.HostEnvironment.BaseAddress,
     Assembly.GetExecutingAssembly()
