@@ -72,9 +72,7 @@ public sealed class ErrorHandlingTests
         Assert.False(string.IsNullOrWhiteSpace(manager.GetString(key, CultureInfo.GetCultureInfo("bg"))));
         Assert.False(string.IsNullOrWhiteSpace(manager.GetString(key, CultureInfo.GetCultureInfo("tr"))));
         Assert.False(
-            string.IsNullOrWhiteSpace(
-                manager.GetString(nameof(NStrings.Home_string), CultureInfo.GetCultureInfo("tr"))
-            )
+            string.IsNullOrWhiteSpace(manager.GetString(nameof(NStrings.Home_string), CultureInfo.GetCultureInfo("tr")))
         );
         Assert.False(
             string.IsNullOrWhiteSpace(

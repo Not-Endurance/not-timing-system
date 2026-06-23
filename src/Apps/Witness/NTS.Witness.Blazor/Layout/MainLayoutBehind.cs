@@ -7,8 +7,9 @@ namespace NTS.Witness.Blazor.Layout;
 public class MainLayoutBehind : LayoutComponentBase
 {
     const string EXCEPTION_HANDLER_IMAGE_URL = "appicon.svg";
-    const string EXCEPTION_HANDLER_ERROR_TEXT =
-        nameof(NtsStrings.Sorry_we_seem_to_have_fallen_off_the_horseback_string);
+    const string EXCEPTION_HANDLER_ERROR_TEXT = nameof(
+        NtsStrings.Sorry_we_seem_to_have_fallen_off_the_horseback_string
+    );
 
     [Inject]
     IEnvironmentContext Environment { get; set; } = default!;
