@@ -1,5 +1,6 @@
 using System.Text;
 using MudBlazor;
+using Not.Application.Environments;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Dialogs;
 using Not.Blazor.Helpers;
@@ -13,13 +14,23 @@ public class NNotifier : NComponent, IDisposable
     readonly List<(Guid Id, IEventSubscriber<string> Subscriber)> _stringSubscriptions = [];
     readonly List<(Guid Id, IEventSubscriber<Exception> Subscriber)> _exceptionSubscriptions = [];
     readonly TimeSpan _failedDuration = TimeSpan.FromSeconds(30);
-    readonly DialogOptions _unhandledExceptionDialogOptions = new()
+    readonly DialogOptions _nonProductionExceptionDialogOptions = new()
     {
         BackdropClick = false,
         CloseButton = true,
         FullWidth = true,
         MaxWidth = MaxWidth.ExtraLarge,
     };
+    readonly DialogOptions _productionExceptionDialogOptions = new()
+    {
+        BackdropClick = false,
+        CloseButton = true,
+        FullWidth = false,
+        MaxWidth = MaxWidth.Small,
+    };
+
+    [Inject]
+    IEnvironmentContext EnvironmentContext { get; set; } = default!;
 
     [Inject]
     ISnackbar Snackbar { get; set; } = default!;
@@ -36,7 +47,7 @@ public class NNotifier : NComponent, IDisposable
         Subscribe(NotificationStream.Succeeded, AddSuccessSnack);
         Subscribe(NotificationStream.Warned, AddWarningSnack);
         Subscribe(NotificationStream.Failed, AddFailureSnack);
-        Subscribe(NotificationStream.UnhandledExceptions, ShowUnhandledExceptionDialog);
+        Subscribe(NotificationStream.UnhandledExceptions, ShowExceptionHandlerDialog);
     }
 
     public override void Dispose()
@@ -92,18 +103,18 @@ public class NNotifier : NComponent, IDisposable
         Snackbar.Add(formattedMessage, Severity.Success);
     }
 
-    async Task ShowUnhandledExceptionDialog(Exception exception)
+    async Task ShowExceptionHandlerDialog(Exception exception)
     {
         try
         {
             await InvokeAsync(async () =>
             {
-                var parameters = new DialogParameters<UnhandledExceptionDialog> { { x => x.Exception, exception } };
-                await DialogService.ShowAsync<UnhandledExceptionDialog>(
-                    "Unhandled Exception",
-                    parameters,
-                    _unhandledExceptionDialogOptions
-                );
+                var parameters = new DialogParameters<NExceptionHandlerDialog> { { x => x.Exception, exception } };
+                var dialogOptions = EnvironmentContext.IsProduction()
+                    ? _productionExceptionDialogOptions
+                    : _nonProductionExceptionDialogOptions;
+
+                await DialogService.ShowAsync<NExceptionHandlerDialog>(string.Empty, parameters, dialogOptions);
             });
         }
         catch (Exception dialogException)

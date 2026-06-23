@@ -1,0 +1,22 @@
+.n-exception-handler-content {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 22rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 2rem;
+    text-align: center;
+}
+
+.n-exception-handler-content__content {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 34rem);
+}
+
+@media (max-width: 600px) {
+    .n-exception-handler-content {
+        padding: 1.25rem;
+    }
+}

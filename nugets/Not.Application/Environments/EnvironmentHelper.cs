@@ -6,9 +6,9 @@ public static class EnvironmentHelper
 {
     const string IS_LOCALHOST_VARIABLE = "IS_LOCALHOST";
     public const string ENVIRONMENT_VARIABLE = "ASPNETCORE_ENVIRONMENT";
-    public const string DEVELOPMENT = NEnvionmentNames.DEVELOPMENT;
-    public const string STAGING = NEnvionmentNames.STAGING;
-    public const string PRODUCTION = NEnvionmentNames.PRODUCTION;
+    public const string DEVELOPMENT = NEnvironmentNames.DEVELOPMENT;
+    public const string STAGING = NEnvironmentNames.STAGING;
+    public const string PRODUCTION = NEnvironmentNames.PRODUCTION;
     public const string TARGET_ENVIRONMENT_METADATA = "NtsTargetEnvironment";
 
     public static bool Is(string env)
@@ -36,7 +36,7 @@ public static class EnvironmentHelper
 
     public static string Normalize(string? environment)
     {
-        return NEnvionmentNames.Normalize(environment);
+        return NEnvironmentNames.Normalize(environment);
     }
 
     public static bool IsLocalhost()

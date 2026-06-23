@@ -1,0 +1,4 @@
+interface:
+  display_name: "NTS Localization"
+  short_description: "Apply NTS localized string conventions."
+  default_prompt: "Use $localization to add or review user-facing localized text in NTS."

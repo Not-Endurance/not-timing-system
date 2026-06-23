@@ -684,6 +684,15 @@
   <data name="Home_string" xml:space="preserve">
     <value>Home</value>
   </data>
+  <data name="Reload_string" xml:space="preserve">
+    <value>Reload</value>
+  </data>
+  <data name="Sorry_we_seem_to_have_fallen_off_the_horseback_string" xml:space="preserve">
+    <value>Sorry, we seem to have fallen off the horseback</value>
+  </data>
+  <data name="Try_to_Reload_in_order_to_proceed_string" xml:space="preserve">
+    <value>Try to Reload in order to proceed or click the button below to go to Home if the error is persistent.</value>
+  </data>
   <data name="Login_string" xml:space="preserve">
     <value>Sign in</value>
   </data>

@@ -12,6 +12,7 @@
     <ProjectReference Include="..\..\nugets\Not.Blazor.Client\Not.Blazor.Client.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Server\Not.Server.csproj" />
     <ProjectReference Include="..\..\src\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\..\src\NTS.Blazor\NTS.Blazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>

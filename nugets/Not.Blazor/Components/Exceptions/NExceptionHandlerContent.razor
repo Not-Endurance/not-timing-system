@@ -1,0 +1,31 @@
+@inherits NExceptionHandlerContentBehind
+
+<section class="n-exception-handler-content" role="alert">
+    @if (HasBackdropImage)
+    {
+        <MudImage Class="n-backdrop-image" Src="@BackdropImageUrl" Alt="" aria-hidden="true" />
+    }
+
+    <MudStack Class="n-exception-handler-content__content" AlignItems="AlignItems.Center" Spacing="3">
+        <MudText Typo="Typo.h5" Color="Color.Secondary" Align="Align.Center">
+            @ErrorText
+        </MudText>
+
+        <MudText Typo="Typo.body1" Align="Align.Center">
+            @NStrings.Try_to_Reload_in_order_to_proceed_string
+            <br />
+            <br />
+            <br />
+        </MudText>
+
+        <MudStack AlignItems="AlignItems.Center" Spacing="2" Row>
+            <MudButton Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Large" OnClick="Reload">
+                @NStrings.Reload_string
+            </MudButton>
+
+            <MudButton Color="Color.Secondary" Variant="Variant.Filled" Size="Size.Large" OnClick="GoHome">
+                @NStrings.Home_string
+            </MudButton>
+        </MudStack>
+    </MudStack>
+</section>

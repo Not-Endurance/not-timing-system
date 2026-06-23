@@ -21,7 +21,7 @@ public static class MauiProgram
         builder.Configuration.AddNAppsettings(assembly, "judge");
 
         builder.UseNLog().AddFilesystemLogger("NTS.Judge");
-        builder.Services.AddSingleton(new NEnvironment(targetEnvironment));
+        builder.Services.AddNEnvironmentContext(targetEnvironment);
         builder.Services.AddJudgeMaui(builder.Configuration);
 
         builder.Services.AddSingleton<IMauiProcessService, WindowsProcessService>();

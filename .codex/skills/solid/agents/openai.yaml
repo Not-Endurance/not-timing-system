@@ -1,0 +1,4 @@
+interface:
+  display_name: "SOLID Design"
+  short_description: "Apply SOLID principles pragmatically"
+  default_prompt: "Use $solid to review this change through SOLID principles with practical tradeoffs in mind."

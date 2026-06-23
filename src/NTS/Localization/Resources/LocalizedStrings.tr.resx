@@ -644,7 +644,16 @@
     <value />
   </data>
   <data name="Home_string" xml:space="preserve">
-    <value />
+    <value>Ana sayfa</value>
+  </data>
+  <data name="Reload_string" xml:space="preserve">
+    <value>Yeniden yükle</value>
+  </data>
+  <data name="Sorry_we_seem_to_have_fallen_off_the_horseback_string" xml:space="preserve">
+    <value>Üzgünüz, görünüşe göre attan düştük</value>
+  </data>
+  <data name="Try_to_Reload_in_order_to_proceed_string" xml:space="preserve">
+    <value>Devam etmek için yeniden yüklemeyi deneyin veya hata devam ederse Ana sayfaya gitmek için aşağıdaki düğmeye tıklayın.</value>
   </data>
   <data name="Login_string" xml:space="preserve">
     <value />

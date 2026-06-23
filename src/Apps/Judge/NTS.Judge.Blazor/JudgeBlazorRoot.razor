@@ -1,8 +1,11 @@
 ﻿@using System.Reflection
 @using NTS.Judge.Blazor.Layout
+@using Not.Blazor.Dialogs
+@using Not.Blazor.Components.Exceptions;
+
 @inherits JudgeBlazorRootBehind
 
-<ErrorBoundary @ref="this.ErrorBoundary">
+<NExceptionHandlerErrorBoundary>
 
     <ChildContent>
         <Router AppAssembly="Assembly" AdditionalAssemblies="RouteAssemblies">
@@ -22,17 +25,9 @@
     </ChildContent>
 
     <ErrorContent>
-        <br />
-
-        <br />
-
-        <div class="container">
-            <pre>@context.Message</pre>
-
-            <pre>@context.StackTrace</pre>
-        </div>
-
-        <button class="btn btn-primary" @onclick="_ => this.ErrorBoundary.Recover()">@Back_string</button>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <NExceptionHandlerContent />
+        </LayoutView>
     </ErrorContent>
 
-</ErrorBoundary>
+</NExceptionHandlerErrorBoundary>

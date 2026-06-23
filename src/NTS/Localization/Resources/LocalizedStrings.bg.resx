@@ -684,6 +684,15 @@
   <data name="Home_string" xml:space="preserve">
     <value>Начало</value>
   </data>
+  <data name="Reload_string" xml:space="preserve">
+    <value>Презареди</value>
+  </data>
+  <data name="Sorry_we_seem_to_have_fallen_off_the_horseback_string" xml:space="preserve">
+    <value>Съжаляваме, изглежда сме паднали от коня</value>
+  </data>
+  <data name="Try_to_Reload_in_order_to_proceed_string" xml:space="preserve">
+    <value>Опитайте да презаредите, за да продължите, или натиснете бутона по-долу, за да отидете към Начало, ако грешката продължава.</value>
+  </data>
   <data name="Login_string" xml:space="preserve">
     <value>Вход</value>
   </data>
