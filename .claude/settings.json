@@ -3,6 +3,9 @@
     "mattpocock-skills@claude-plugins-official": true
   },
   "permissions": {
-    "defaultMode": "acceptEdits"
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash"
+    ]
   }
 }

@@ -8,6 +8,7 @@
 5. Changes and features should be represented in the Integration tests if reasonably possible.
 6. Domain logic should be tested in the NTS.Tests.Unit.Domain namespace.
 7. If unit tests would be a useful task evaluation step, create those tests in NTS.Tests.Unit.Temporary. Expect those tests to be deleted regularly.
+8. Always use RTK
 
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands

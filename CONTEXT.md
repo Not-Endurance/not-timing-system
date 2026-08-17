@@ -5,6 +5,39 @@ This project employs a Domain Driven Design architecture with strict layer and b
 
 You can see a clear corelation between Not and NTS projects and they are layered identically. 
 
+## Language
+
+### People
+
+**Athlete**:
+The human rider entered into an event. One half of a Combination.
+_Avoid_: Rider, competitor
+
+**Horse**:
+The equine half of a Combination.
+
+**Combination**:
+An Athlete and a Horse entered together as a single competitor, identified by a start number. This is the pair that competes — it is *not* a person, and it is *not* called a Participant.
+_Avoid_: Participant, pair, entry, competitor
+
+**Official**:
+Certified personnel appointed to an event: Ground Jury, Veterinary Commission, Stewards, Technical Delegate, Foreign Judge. Officials are named in produced documents such as Results and FEI exports.
+_Avoid_: Judge, referee, staff, personnel
+
+**Operator**:
+The highest authority in the scope of an Event — full access, writes included, and expected to exceed Official access over time. An Operator is *never* named in Results, FEI exports, or any other produced document; they exist for the system, not for the record. Operator however is not a Platform admin or developer. 
+_Avoid_: Admin, superuser, sysadmin
+
+### Competing
+
+**Participation**:
+One Combination's run through one Competition — its category, phases, and outcome. A record of competing, not a competitor and not a person.
+_Avoid_: Participant, entry, run
+
+> **"Participant" is not a term in this domain.** The competing pair is a **Combination**; its run is a **Participation**. Anything named `Participant` is a misnomer to be corrected — including `WitnessAccessLevel.Participant`, which means "signed in without a write role" and is being renamed to `Registered` (see #592).
+
+> **Write access is not "Official".** Snapshot writes are granted to an Official whose role is one of {Steward, ChiefSteward, GroundJury, GroundJuryPresident}, **or** to any Operator. "Official" alone is not the boundary.
+
 ## Not* projects
 They are separated by function - Blazor, Storage, Application. etcs. *Not* is shared amongs them. These are intended to packaged up and used in other projects to bootsrap functionality, ensure consistent behavior and allow for easier maintenance. Elements of Not should be completely stripped of business logic and should provide a streamlined, generic API striving for a ballance between strict, conssitent behavior and enough configurability to be multi-purposed.
 Notes:
