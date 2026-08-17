@@ -16,3 +16,13 @@
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker
 2. When func is not resolved - ask the user to lift Rule #1 so you can set it up
 3. Ignore MAUI builds in WSL
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as GitHub issues in Not-Endurance/not-timing-system, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context layout — `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
