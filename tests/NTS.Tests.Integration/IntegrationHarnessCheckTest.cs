@@ -394,7 +394,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
     }
 
     [Fact]
-    public async Task Presentlist_updates_from_judge_events_and_transient_acknowledgements()
+    public async Task Presentlist_updates_from_judge_events_on_every_connected_witness()
     {
         var eventId = 1702;
         var presentNumber = 51;
@@ -470,9 +470,6 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         await officialPresentlist.Load();
         await participantPresentlist.Load();
 
-        Assert.True(officialPresentlist.CanAcknowledge);
-        Assert.False(participantPresentlist.CanAcknowledge);
-
         await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(presentNumber, baseTime));
         var presentEntry = await WaitForPresentlistEntry(
             officialPresentlist,
@@ -481,12 +478,11 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "show a Present entry after arrival"
         );
         Assert.Equal(baseTime.AddMinutes(40), presentEntry.Time.ToDateTimeOffset());
-
-        await officialPresentlist.Acknowledge(presentEntry);
-        await WaitForPresentlist(
-            officialPresentlist,
-            entries => entries.All(x => x.Number != presentNumber),
-            "remove the Present entry after acknowledgement publishes a presentation snapshot"
+        await WaitForPresentlistEntry(
+            participantPresentlist,
+            presentNumber,
+            PresentlistEntryType.Present,
+            "show a Present entry on another connected Witness"
         );
 
         await RecordArrivalAndPresentation(judge, representNumber, baseTime.AddMinutes(10), TimeSpan.FromMinutes(5));
@@ -506,18 +502,17 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         var pendingRepresentation = await api.ReadParticipation(eventId, 5602);
         Assert.False(pendingRepresentation.Phases.Current.IsRequiredInspectionRequested);
 
-        var representEntry = await WaitForPresentlistEntry(
+        await WaitForPresentlistEntry(
             officialPresentlist,
             representNumber,
             PresentlistEntryType.Represent,
             "show a Represent entry after representation is requested"
         );
-
-        await officialPresentlist.Acknowledge(representEntry);
-        await WaitForPresentlist(
-            officialPresentlist,
-            entries => entries.All(x => x.Number != representNumber),
-            "remove the Represent entry after acknowledgement publishes a presentation snapshot"
+        await WaitForPresentlistEntry(
+            participantPresentlist,
+            representNumber,
+            PresentlistEntryType.Represent,
+            "show a Represent entry on another connected Witness"
         );
 
         await RecordArrivalAndPresentation(judge, riNumber, baseTime.AddMinutes(20), TimeSpan.FromMinutes(5));
@@ -526,13 +521,13 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         await RecordArrivalAndPresentation(judge, criNumber, baseTime.AddMinutes(30), TimeSpan.FromMinutes(20));
 
-        var officialRiEntry = await WaitForPresentlistEntry(
+        await WaitForPresentlistEntry(
             officialPresentlist,
             riNumber,
             PresentlistEntryType.RI,
             "show an RI entry after required inspection is requested"
         );
-        var officialCriEntry = await WaitForPresentlistEntry(
+        await WaitForPresentlistEntry(
             officialPresentlist,
             criNumber,
             PresentlistEntryType.CRI,
@@ -551,37 +546,17 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "show a CRI entry on another connected Witness"
         );
 
-        await officialPresentlist.Acknowledge(officialRiEntry);
-        await officialPresentlist.Acknowledge(officialCriEntry);
-        await WaitForPresentlist(
-            officialPresentlist,
-            entries =>
-                !ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
-                && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
-            "hide acknowledged RI/CRI entries on the acknowledging Witness"
-        );
-        await WaitForPresentlist(
-            participantPresentlist,
-            entries =>
-                !ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
-                && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
-            "hide acknowledged RI/CRI entries on another connected Witness"
-        );
-
         await participantWitness.Disconnect();
         await participantWitness.Connect(eventInformation);
 
-        await WaitForPresentlistEntry(
+        await WaitForPresentlist(
             participantPresentlist,
-            riNumber,
-            PresentlistEntryType.RI,
-            "restore transiently acknowledged RI from persisted state after reconnect"
-        );
-        await WaitForPresentlistEntry(
-            participantPresentlist,
-            criNumber,
-            PresentlistEntryType.CRI,
-            "restore transiently acknowledged CRI from persisted state after reconnect"
+            entries =>
+                ContainsPresentlistEntry(entries, presentNumber, PresentlistEntryType.Present)
+                && ContainsPresentlistEntry(entries, representNumber, PresentlistEntryType.Represent)
+                && ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
+                && ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
+            "rebuild every entry from persisted state after reconnect"
         );
     }
 

@@ -15,21 +15,9 @@ public class PresentlistTableBehind : NStatefulComponent
     [Inject]
     protected IPresentlistService Service { get; set; } = default!;
 
-    [Inject]
-    protected IEnumerable<IPresentlistAccess> AccessPolicies { get; set; } = [];
-
-    [Inject]
-    protected IDialogService DialogService { get; set; } = default!;
-
-    protected bool CanAcknowledge => Service.CanAcknowledge && AccessPolicies.Any(x => x.CanAcknowledgePresentations);
-
     protected override async Task OnInitializedAsync()
     {
         await Observe(Service);
-        foreach (var access in AccessPolicies)
-        {
-            await Observe(access);
-        }
     }
 
     protected string FormatAthlete(PresentlistEntry entry)
@@ -67,32 +55,6 @@ public class PresentlistTableBehind : NStatefulComponent
             PresentlistEntryType.CRI => CRI_string,
             _ => type.ToString(),
         };
-    }
-
-    protected async Task Acknowledge(PresentlistEntry entry, bool value)
-    {
-        if (!value)
-        {
-            return;
-        }
-
-        try
-        {
-            var confirmed = await DialogService.ShowMessageBox(
-                Confirm_action_string,
-                Is_on_time_for_Presentation_Inspection_string,
-                yesText: Yes_string,
-                cancelText: Cancel_string
-            );
-            if (confirmed == true)
-            {
-                await Service.Acknowledge(entry);
-            }
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
     }
 
     protected void Tick()

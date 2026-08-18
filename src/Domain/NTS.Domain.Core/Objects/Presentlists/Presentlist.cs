@@ -30,11 +30,6 @@ public record Presentlist : ValueObject
         return FromEntries(entries);
     }
 
-    public Presentlist Without(PresentlistEntryKey key)
-    {
-        return FromEntries(_entries.Where(x => x.Key != key));
-    }
-
     public Presentlist WithoutParticipation(int number)
     {
         return FromEntries(_entries.Where(x => x.Number != number));

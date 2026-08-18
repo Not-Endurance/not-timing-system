@@ -853,9 +853,6 @@
   <data name="Name_in_English_string" xml:space="preserve">
     <value>İngilizce isim</value>
   </data>
-  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
-    <value>Sunum/Muayene için zamanında mı?</value>
-  </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>'{0}' öğesini silmek istediğinizden emin misiniz?</value>
   </data>

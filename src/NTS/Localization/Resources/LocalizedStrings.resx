@@ -1056,9 +1056,6 @@
   <data name="Name_in_English_string" xml:space="preserve">
     <value>Name in English</value>
   </data>
-  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
-    <value>Is on time for Presentation/Inspection?</value>
-  </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Are you sure you want to delete '{0}'?</value>
   </data>

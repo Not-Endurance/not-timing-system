@@ -4,14 +4,10 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Exceptions;
 using Not.Injection;
-using NTS.Application.Contracts.Presentlists;
 using NTS.Application.Contracts.Socket;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Core.Objects.Presentlists;
-using NTS.Domain.Enums;
-using NTS.Domain.Objects;
 using NTS.Domain.Watcher;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
@@ -23,7 +19,6 @@ public class WitnessRpcClient
     : RpcClient,
         IWitnessClientProcedures,
         ISnapshotPublisher,
-        IPresentlistActionPublisher,
         IScoped
 {
     readonly IRpcSocket _socket;
@@ -50,7 +45,6 @@ public class WitnessRpcClient
         RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
         RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
         RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
-        RegisterInputProcedure<VetInAcknoledged>(nameof(OnPresentationAcknoledged), OnPresentationAcknoledged);
     }
 
     protected virtual Task SendReceiveAsync(WarpRequest<SnapshotGroupModel> request)
@@ -69,30 +63,6 @@ public class WitnessRpcClient
         var model = SnapshotGroupModel.MapFrom(snapshotGroup);
         var request = WarpRequest.Create(connectedEvent.Id.ToString(), model);
         await SendReceiveAsync(request);
-    }
-
-    public async Task PublishPresentation(PresentlistEntry entry)
-    {
-        var snapshot = new Snapshot(
-            entry.Number,
-            entry.AthleteName,
-            entry.AthleteNameEnglish,
-            Timestamp.Now(),
-            entry.Ruleset
-        );
-        await PublishSnapshotsAsync(new SnapshotGroup([snapshot], SnapshotType.Present));
-    }
-
-    public async Task PublishPresentationAcknoledged(VetInAcknoledged acknoledgement)
-    {
-        GuardHelper.ThrowIfDefault(_socket.Connection);
-        var connectedEvent = GuardHelper.ThrowIfDefault(
-            _socketContext.Event,
-            "Cannot acknowledge presentation before connecting to an event."
-        );
-
-        var request = WarpRequest.Create(connectedEvent.Id.ToString(), acknoledgement);
-        await _socket.Connection!.InvokeAsync(nameof(IWitnessHubProcedures.AcknoledgeVetIn), request);
     }
 
     public Task OnPhaseCompleted(PhaseCompleted payload)
@@ -121,11 +91,6 @@ public class WitnessRpcClient
     }
 
     public Task OnParticipationRestored(ParticipationRestored payload)
-    {
-        return _domainEventDispatcher.Dispatch(payload);
-    }
-
-    public Task OnPresentationAcknoledged(VetInAcknoledged payload)
     {
         return _domainEventDispatcher.Dispatch(payload);
     }

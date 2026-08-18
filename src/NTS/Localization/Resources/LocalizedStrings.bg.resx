@@ -1053,9 +1053,6 @@
   <data name="Name_in_English_string" xml:space="preserve">
     <value>Име на английски</value>
   </data>
-  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
-    <value>Навреме ли е за презентация/инспекция?</value>
-  </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
   </data>
