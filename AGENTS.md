@@ -9,6 +9,24 @@
 6. Domain logic should be tested in the NTS.Tests.Unit.Domain namespace.
 7. If unit tests would be a useful task evaluation step, create those tests in NTS.Tests.Unit.Temporary. Expect those tests to be deleted regularly.
 8. Always use RTK
+9. Multi-line strings must match the shell you are actually in. `@'...'@` is a **PowerShell** here-string; in Bash it is not special syntax and silently becomes a literal `@` on the first and last lines. Passed to `git commit -m`, that makes `@` the commit subject and demotes the real subject into the body. In Bash use a heredoc; reserve `@'...'@` for the PowerShell tool.
+
+```bash
+# ❌ Wrong - PowerShell here-string in Bash, yields a commit subject of "@"
+rtk git commit -m @'
+Subject line
+'@
+
+# ✅ Correct - heredoc into a file, then -F
+cat > /tmp/msg.txt <<'EOF'
+Subject line
+
+Body.
+EOF
+rtk git commit -F /tmp/msg.txt
+```
+
+After committing, check `rtk git log --oneline -1` and confirm the subject is the real subject.
 
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands
