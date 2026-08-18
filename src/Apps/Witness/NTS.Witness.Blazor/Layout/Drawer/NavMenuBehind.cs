@@ -1,6 +1,7 @@
 using MudBlazor;
 using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Components.Abstractions;
+using Not.Safe;
 using NTS.Application.Contracts.Socket;
 using NTS.Blazor.Components.SelectEvents;
 using NTS.Domain.Core.Aggregates;
@@ -64,8 +65,8 @@ public class NavMenuBehind : NStatefulComponent
             var connectedEvent = SocketService.Event;
             await Authentication.Signout();
             await SocketService.Disconnect();
-            await ReconnectAnonymously(connectedEvent);
             await CloseResponsiveDrawerSafe();
+            await ReconnectAnonymously(connectedEvent);
         }
         catch (Exception ex)
         {
@@ -89,7 +90,9 @@ public class NavMenuBehind : NStatefulComponent
 
     /// <summary>
     /// The read-only pages stay public, so signing out on one of them keeps the live socket
-    /// instead of dropping the visitor to a static page.
+    /// instead of dropping the visitor to a static page. Best-effort: sign-out has already
+    /// navigated to the authentication route, so a token request raised on the way back in must
+    /// not surface as a failed sign-out.
     /// </summary>
     async Task ReconnectAnonymously(EventInformation? connectedEvent)
     {
@@ -98,7 +101,14 @@ public class NavMenuBehind : NStatefulComponent
             return;
         }
 
-        await SocketService.Connect(connectedEvent);
+        try
+        {
+            await SocketService.Connect(connectedEvent);
+        }
+        catch (Exception ex)
+        {
+            SafeHelper.HandleException(ex);
+        }
     }
 
     async Task CloseResponsiveDrawerSafe()

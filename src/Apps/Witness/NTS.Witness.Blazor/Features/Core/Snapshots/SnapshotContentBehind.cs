@@ -3,6 +3,7 @@ using Not.Blazor.Components.Buttons;
 using Not.Notify;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
+using NTS.Application.Contracts.Socket;
 using NTS.Domain.Watcher;
 using NTS.Witness.Blazor.Features.Socket;
 using NTS.Witness.Contracts.Features.Access;
@@ -25,6 +26,9 @@ public class SnapshotContentBehind : NStatefulComponent
     IWitnessAccessContext AccessState { get; set; } = default!;
 
     [Inject]
+    INtsSocketService SocketService { get; set; } = default!;
+
+    [Inject]
     NavigationManager Navigator { get; set; } = default!;
 
     protected ISnapshotService SnapshotService => SnapshotState;
@@ -45,16 +49,15 @@ public class SnapshotContentBehind : NStatefulComponent
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (WitnessAccessPolicy.ShouldRedirectFromSnapshots(AccessState.AccessLevel))
-        {
-            Navigator.NavigateTo(WitnessAccessPolicy.ResolveSnapshotFallbackRoute());
-            return;
-        }
-
         if (firstRender)
         {
             await Task.Delay(TimeSpan.FromSeconds(1));
             await BlazorSocketService.EnsureConnected();
+        }
+
+        if (WitnessAccessPolicy.ShouldRedirectFromSnapshots(AccessState.AccessLevel, SocketService.Event != null))
+        {
+            Navigator.NavigateTo(WitnessAccessPolicy.ResolveSnapshotFallbackRoute());
         }
     }
 
