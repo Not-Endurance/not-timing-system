@@ -15,11 +15,7 @@ using NTS.Witness.Features.Core.Dashboard;
 
 namespace NTS.Witness.Features.Socket;
 
-public class WitnessRpcClient
-    : RpcClient,
-        IWitnessClientProcedures,
-        ISnapshotPublisher,
-        IScoped
+public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPublisher, IScoped
 {
     readonly IRpcSocket _socket;
     readonly INtsSocketContext _socketContext;
