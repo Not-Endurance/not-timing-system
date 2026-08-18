@@ -16,7 +16,12 @@ public static class WitnessAccessPolicy
 
     public static bool ShouldRedirectFromSnapshots(WitnessAccessLevel accessLevel)
     {
-        return accessLevel == WitnessAccessLevel.Participant;
+        return accessLevel is WitnessAccessLevel.Anonymous or WitnessAccessLevel.Registered;
+    }
+
+    public static bool CanSignIn(WitnessAccessLevel accessLevel)
+    {
+        return accessLevel == WitnessAccessLevel.Anonymous;
     }
 
     public static string ResolveSnapshotFallbackRoute()

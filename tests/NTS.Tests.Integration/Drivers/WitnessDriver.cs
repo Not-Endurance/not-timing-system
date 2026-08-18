@@ -30,7 +30,8 @@ internal sealed class WitnessDriver : IAsyncDisposable
     readonly IWitnessAccessContext _accessContext;
     readonly string _clientName;
 
-    public WitnessDriver(Uri warpBaseUrl, Uri nexusBaseUrl, IntegrationUser user, string clientName)
+    /// <param name="user">A null user drives the Witness as an anonymous, read-only visitor.</param>
+    public WitnessDriver(Uri warpBaseUrl, Uri nexusBaseUrl, IntegrationUser? user, string clientName)
     {
         _clientName = clientName;
         var configuration = CreateConfiguration(

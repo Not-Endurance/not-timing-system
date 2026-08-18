@@ -658,6 +658,9 @@
   <data name="Login_string" xml:space="preserve">
     <value />
   </data>
+  <data name="Sign_In_string" xml:space="preserve">
+    <value>Giriş Yap</value>
+  </data>
   <data name="Snapshot_string" xml:space="preserve">
     <value />
   </data>

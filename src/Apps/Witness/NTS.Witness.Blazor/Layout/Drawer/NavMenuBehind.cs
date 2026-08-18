@@ -3,6 +3,7 @@ using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Components.Abstractions;
 using NTS.Application.Contracts.Socket;
 using NTS.Blazor.Components.SelectEvents;
+using NTS.Domain.Core.Aggregates;
 using NTS.Witness.Blazor.Features;
 using NTS.Witness.Contracts.Features.Access;
 using NTS.Witness.Contracts.Features.Profile;
@@ -30,6 +31,7 @@ public class NavMenuBehind : NStatefulComponent
     Func<Task>? CloseResponsiveDrawer { get; set; }
 
     protected bool ShowSnapshots => WitnessAccessPolicy.CanViewSnapshots(AccessState.AccessLevel);
+    protected bool ShowSignin => WitnessAccessPolicy.CanSignIn(AccessState.AccessLevel);
     protected bool ShowProfileHeader => ProfileContext.User != null;
     protected bool HasActiveEvent => SocketService.IsConnected && SocketService.Event != null;
     protected string ActiveEventTitle => SocketService.Event?.Name ?? Event_string;
@@ -42,12 +44,27 @@ public class NavMenuBehind : NStatefulComponent
         await Observe(SocketService);
     }
 
+    protected async Task Signin()
+    {
+        try
+        {
+            await CloseResponsiveDrawerSafe();
+            await Authentication.Signin();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
     protected async Task Signout()
     {
         try
         {
+            var connectedEvent = SocketService.Event;
             await Authentication.Signout();
             await SocketService.Disconnect();
+            await ReconnectAnonymously(connectedEvent);
             await CloseResponsiveDrawerSafe();
         }
         catch (Exception ex)
@@ -68,6 +85,20 @@ public class NavMenuBehind : NStatefulComponent
         {
             Handle(ex);
         }
+    }
+
+    /// <summary>
+    /// The read-only pages stay public, so signing out on one of them keeps the live socket
+    /// instead of dropping the visitor to a static page.
+    /// </summary>
+    async Task ReconnectAnonymously(EventInformation? connectedEvent)
+    {
+        if (connectedEvent == null)
+        {
+            return;
+        }
+
+        await SocketService.Connect(connectedEvent);
     }
 
     async Task CloseResponsiveDrawerSafe()

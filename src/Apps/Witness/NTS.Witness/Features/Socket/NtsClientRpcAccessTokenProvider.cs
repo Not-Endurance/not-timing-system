@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,7 @@ namespace NTS.Witness.Features.Socket;
 public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
 {
     readonly IAccessTokenProvider _accessTokenProvider;
+    readonly AuthenticationStateProvider _authenticationStateProvider;
     readonly NClientAuthenticationSettings _clientAuthenticationSettings;
     readonly NavigationManager _navigationManager;
     readonly IWitnessAuthenticationRedirector _authenticationRedirector;
@@ -21,6 +23,7 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
 
     public NtsClientRpcAccessTokenProvider(
         IAccessTokenProvider accessTokenProvider,
+        AuthenticationStateProvider authenticationStateProvider,
         IOptions<NClientAuthenticationSettings> clientAuthenticationOptions,
         NavigationManager navigationManager,
         IWitnessAuthenticationRedirector authenticationRedirector,
@@ -29,6 +32,7 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
     )
     {
         _accessTokenProvider = accessTokenProvider;
+        _authenticationStateProvider = authenticationStateProvider;
         _clientAuthenticationSettings = clientAuthenticationOptions.Value;
         _navigationManager = navigationManager;
         _authenticationRedirector = authenticationRedirector;
@@ -38,6 +42,14 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
 
     public async Task<string?> Get()
     {
+        // An anonymous visitor connects read-only, without a token. Only a signed-in user is worth
+        // redirecting to refresh, so that an Official with an expired token is prompted rather than
+        // silently degraded to read-only.
+        if (!await IsSignedIn())
+        {
+            return null;
+        }
+
         var scope = NClientAuthenticationSettingsScopeResolver.ResolveScope(_clientAuthenticationSettings);
         if (string.IsNullOrWhiteSpace(scope))
         {
@@ -83,6 +95,12 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
             );
             return null;
         }
+    }
+
+    async Task<bool> IsSignedIn()
+    {
+        var state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        return state.User.Identity?.IsAuthenticated == true;
     }
 
     static InteractiveRequestOptions CreateInteractiveRequestOptions(string scope, string returnUrl)

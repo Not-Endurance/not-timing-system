@@ -40,24 +40,26 @@ public class WitnessAccessContext
 
     protected override async Task<bool> InitializeState()
     {
-        AccessLevel = WitnessAccessLevel.Unknown;
-        if (_socketContext.Event == null)
-        {
-            return true;
-        }
-
         var session = await _userSessionService.GetCurrent<NtsUserSessionStateModel>();
         var userId = session?.User.Id;
         if (userId == null)
+        {
+            AccessLevel = WitnessAccessLevel.Anonymous;
+            return true;
+        }
+
+        AccessLevel = WitnessAccessLevel.Registered;
+        if (_socketContext.Event == null)
         {
             return true;
         }
 
         var officials = await _officialReader.ReadMany();
         var operators = await _operatorReader.ReadMany();
-        AccessLevel = CanWriteSnapshots(userId.Value, officials, operators)
-            ? WitnessAccessLevel.Official
-            : WitnessAccessLevel.Participant;
+        if (CanWriteSnapshots(userId.Value, officials, operators))
+        {
+            AccessLevel = WitnessAccessLevel.Official;
+        }
 
         return true;
     }
@@ -67,11 +69,9 @@ public class WitnessAccessContext
         await ReloadState();
     }
 
-    public Task Handle(EventDisconnected notification, CancellationToken ct)
+    public async Task Handle(EventDisconnected notification, CancellationToken ct)
     {
-        AccessLevel = WitnessAccessLevel.Unknown;
-        ClearState();
-        return Task.CompletedTask;
+        await ReloadState();
     }
 
     static bool CanWriteSnapshots(int userId, IEnumerable<Official> officials, IEnumerable<Operator> operators)

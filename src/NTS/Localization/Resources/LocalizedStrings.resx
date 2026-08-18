@@ -927,6 +927,9 @@
   <data name="You_have___privileges_string" xml:space="preserve">
     <value>You have {0} privileges.</value>
   </data>
+  <data name="Sign_In_string" xml:space="preserve">
+    <value>Sign In</value>
+  </data>
   <data name="Sign_Out_string" xml:space="preserve">
     <value>Sign Out</value>
   </data>

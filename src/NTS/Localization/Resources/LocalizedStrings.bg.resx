@@ -924,6 +924,9 @@
   <data name="You_have___privileges_string" xml:space="preserve">
     <value>Имате права: {0}.</value>
   </data>
+  <data name="Sign_In_string" xml:space="preserve">
+    <value>Вход</value>
+  </data>
   <data name="Sign_Out_string" xml:space="preserve">
     <value>Изход</value>
   </data>
