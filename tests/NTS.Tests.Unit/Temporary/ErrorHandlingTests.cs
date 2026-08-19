@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Not.Application.Environments;
 using Not.Blazor.Components;
+using Not.Blazor.Components.Exceptions;
 using Not.Blazor.Dialogs;
 using Not.Localization;
 using NTS.Localization;

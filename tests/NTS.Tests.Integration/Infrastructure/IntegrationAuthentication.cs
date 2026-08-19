@@ -44,23 +44,48 @@ internal sealed record IntegrationUser
 
 internal sealed class IntegrationAuthenticationStateProvider : AuthenticationStateProvider
 {
-    readonly AuthenticationState _state;
+    AuthenticationState _state;
 
-    public IntegrationAuthenticationStateProvider(IntegrationUser user)
+    /// <param name="user">A null user models an anonymous visitor: no session at all.</param>
+    public IntegrationAuthenticationStateProvider(IntegrationUser? user)
     {
-        var identity = new ClaimsIdentity(
-            [
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim("oid", user.UserIdentifier),
-                new Claim("name", user.DisplayName ?? user.Name),
-            ],
-            "IntegrationTest"
-        );
-        _state = new AuthenticationState(new ClaimsPrincipal(identity));
+        _state = CreateState(user);
     }
 
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         return Task.FromResult(_state);
+    }
+
+    /// <summary>
+    /// Models the point where a sign-in round trip completes: the app has already booted as an
+    /// anonymous visitor and only now learns who the user is, exactly as MSAL reports it after the
+    /// login callback.
+    /// </summary>
+    public void SignIn(IntegrationUser user)
+    {
+        _state = CreateState(user);
+        NotifyAuthenticationStateChanged(Task.FromResult(_state));
+    }
+
+    static AuthenticationState CreateState(IntegrationUser? user)
+    {
+        return new AuthenticationState(new ClaimsPrincipal(CreateIdentity(user)));
+    }
+
+    static ClaimsIdentity CreateIdentity(IntegrationUser? user)
+    {
+        // An identity without an authentication type is unauthenticated, which is exactly what an
+        // anonymous Witness visitor looks like to the client.
+        return user == null
+            ? new ClaimsIdentity()
+            : new ClaimsIdentity(
+                [
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim("oid", user.UserIdentifier),
+                    new Claim("name", user.DisplayName ?? user.Name),
+                ],
+                "IntegrationTest"
+            );
     }
 }

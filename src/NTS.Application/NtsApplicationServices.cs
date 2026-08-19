@@ -75,7 +75,6 @@ public static class NtsApplicationServices
                 INotificationHandler<RepresentationRequired>,
                 INotificationHandler<ParticipationRestored>,
                 INotificationHandler<ParticipationEliminated>,
-                INotificationHandler<VetInAcknoledged>,
                 INotificationHandler<EventConnected>,
                 INotificationHandler<EventDisconnected>,
                 PresentlistService

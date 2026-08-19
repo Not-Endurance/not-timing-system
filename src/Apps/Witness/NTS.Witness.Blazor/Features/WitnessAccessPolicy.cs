@@ -14,9 +14,19 @@ public static class WitnessAccessPolicy
         return accessLevel == WitnessAccessLevel.Official ? Routes.SNAPSHOT_PAGE : Routes.PERFORMANCE_PAGE;
     }
 
-    public static bool ShouldRedirectFromSnapshots(WitnessAccessLevel accessLevel)
+    /// <summary>
+    /// Write access is only knowable once an event is connected — until then every signed-in user
+    /// reads as <see cref="WitnessAccessLevel.Registered"/>. Redirecting on that would bounce an
+    /// Official off a deep link to /snapshot before the socket ever connects.
+    /// </summary>
+    public static bool ShouldRedirectFromSnapshots(WitnessAccessLevel accessLevel, bool isEventConnected)
     {
-        return accessLevel == WitnessAccessLevel.Participant;
+        return isEventConnected && accessLevel is WitnessAccessLevel.Anonymous or WitnessAccessLevel.Registered;
+    }
+
+    public static bool CanSignIn(WitnessAccessLevel accessLevel)
+    {
+        return accessLevel == WitnessAccessLevel.Anonymous;
     }
 
     public static string ResolveSnapshotFallbackRoute()

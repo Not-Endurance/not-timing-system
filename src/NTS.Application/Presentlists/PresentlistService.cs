@@ -21,37 +21,22 @@ public class PresentlistService
         INotificationHandler<RepresentationRequired>,
         INotificationHandler<ParticipationRestored>,
         INotificationHandler<ParticipationEliminated>,
-        INotificationHandler<VetInAcknoledged>,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>
 {
     readonly IEventScopedRepository<Participation> _participations;
     readonly INtsSocketContext? _socketContext;
-    readonly IPresentlistActionPublisher? _actionPublisher;
-    readonly IPresentlistAccess? _access;
     UniqueParticipations _state = new();
 
-    public PresentlistService(IEventScopedRepository<Participation> participations)
-        : this(participations, null, [], []) { }
-
-    public PresentlistService(
-        IEventScopedRepository<Participation> participations,
-        INtsSocketContext? socketContext,
-        IEnumerable<IPresentlistActionPublisher> actionPublishers,
-        IEnumerable<IPresentlistAccess> accessPolicies
-    )
+    public PresentlistService(IEventScopedRepository<Participation> participations, INtsSocketContext? socketContext)
     {
         _participations = participations;
         _socketContext = socketContext;
-        _actionPublisher = actionPublishers.FirstOrDefault();
-        _access = accessPolicies.FirstOrDefault();
     }
 
     public Presentlist Presentlist { get; private set; } = new([]);
 
     public IReadOnlyList<PresentlistEntry> Entries => Presentlist.Entries;
-
-    public bool CanAcknowledge => _actionPublisher != null && _access?.CanAcknowledgePresentations == true;
 
     protected override async Task<bool> InitializeState()
     {
@@ -66,27 +51,6 @@ public class PresentlistService
         _state = [.. participations];
         Presentlist = new Presentlist(_state);
         return Entries.Any();
-    }
-
-    public async Task Acknowledge(PresentlistEntry entry)
-    {
-        if (!CanAcknowledge || _actionPublisher == null)
-        {
-            return;
-        }
-
-        switch (entry.Type)
-        {
-            case PresentlistEntryType.Present:
-            case PresentlistEntryType.Represent:
-                await _actionPublisher.PublishPresentation(entry);
-                break;
-            case PresentlistEntryType.RI:
-            case PresentlistEntryType.CRI:
-                var acknoledgement = new VetInAcknoledged(entry.Number, entry.PhaseId, entry.Type, entry.Time);
-                await _actionPublisher.PublishPresentationAcknoledged(acknoledgement);
-                break;
-        }
     }
 
     public Task Handle(ParticipationArrived notification, CancellationToken cancellationToken)
@@ -122,13 +86,6 @@ public class PresentlistService
     public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
     {
         Update(notification.Participation, NCollectionAction.Remove);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(VetInAcknoledged notification, CancellationToken cancellationToken)
-    {
-        Presentlist = Presentlist.Without(notification.Key);
-        EmitChanged();
         return Task.CompletedTask;
     }
 

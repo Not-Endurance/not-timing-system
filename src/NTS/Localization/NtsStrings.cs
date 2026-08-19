@@ -306,6 +306,7 @@ namespace NTS.Localization
             LocalizeString(nameof(This_page_redirects_to_Signin_string));
         public static string Signed_in_as__string => LocalizeString(nameof(Signed_in_as__string));
         public static string You_have___privileges_string => LocalizeString(nameof(You_have___privileges_string));
+        public static string Sign_In_string => LocalizeString(nameof(Sign_In_string));
         public static string Sign_Out_string => LocalizeString(nameof(Sign_Out_string));
         public static string No_roles_assigned_string => LocalizeString(nameof(No_roles_assigned_string));
         public static string An_error_occurred_while_sending_snapshots_Please_try_again_string =>
@@ -328,8 +329,6 @@ namespace NTS.Localization
         public static string File_not_found_string => LocalizeString(nameof(File_not_found_string));
         public static string Configure_events_cannot_be_deleted_string =>
             LocalizeString(nameof(Configure_events_cannot_be_deleted_string));
-        public static string Is_on_time_for_Presentation_Inspection_string =>
-            LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
     }
 }
 #pragma warning restore NA0004

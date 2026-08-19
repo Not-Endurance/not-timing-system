@@ -11,10 +11,6 @@
         <MudTh>@Time_string</MudTh>
         <MudTh>@Type_string</MudTh>
         <MudTh>@Athlete_string</MudTh>
-        @if (CanAcknowledge)
-        {
-            <MudTh></MudTh>
-        }
     </HeaderContent>
 
     <RowTemplate Context="entry">
@@ -40,17 +36,6 @@
                 </span>
             </MudText>
         </MudTd>
-
-        @if (CanAcknowledge)
-        {
-            <MudTd DataLabel="@Confirm_action_string">
-                <MudCheckBox T="bool"
-                             Value="false"
-                             ValueChanged="@((bool value) => Acknowledge(entry, value))"
-                             Color="Color.Success"
-                             Size="Size.Small" />
-            </MudTd>
-        }
 
     </RowTemplate>
 

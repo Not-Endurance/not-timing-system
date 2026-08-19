@@ -1,21 +1,20 @@
 using MediatR;
+using Microsoft.AspNetCore.Components.Authorization;
 using Not.Application.Authentication.Abstractions;
-using Not.Application.Behinds.Adapters;
 using Not.Injection;
 using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Presentlists;
 using NTS.Application.Contracts.Socket;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;
+using NTS.Witness.Features.Sessions;
 
 namespace NTS.Witness.Features.Access;
 
 public class WitnessAccessContext
-    : NStatefulService,
+    : WitnessAuthenticationAwareContext,
         IWitnessAccessContext,
-        IPresentlistAccess,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
         IScoped
@@ -29,8 +28,10 @@ public class WitnessAccessContext
         INtsSocketContext socketContext,
         INUserSession userSessionService,
         IEventScopedRepository<Official> officialRepository,
-        IEventScopedRepository<Operator> operatorRepository
+        IEventScopedRepository<Operator> operatorRepository,
+        AuthenticationStateProvider authenticationStateProvider
     )
+        : base(authenticationStateProvider)
     {
         _socketContext = socketContext;
         _userSessionService = userSessionService;
@@ -39,28 +40,29 @@ public class WitnessAccessContext
     }
 
     public WitnessAccessLevel AccessLevel { get; private set; }
-    public bool CanAcknowledgePresentations => AccessLevel == WitnessAccessLevel.Official;
 
     protected override async Task<bool> InitializeState()
     {
-        AccessLevel = WitnessAccessLevel.Unknown;
-        if (_socketContext.Event == null)
-        {
-            return true;
-        }
-
         var session = await _userSessionService.GetCurrent<NtsUserSessionStateModel>();
         var userId = session?.User.Id;
         if (userId == null)
+        {
+            AccessLevel = WitnessAccessLevel.Anonymous;
+            return true;
+        }
+
+        AccessLevel = WitnessAccessLevel.Registered;
+        if (_socketContext.Event == null)
         {
             return true;
         }
 
         var officials = await _officialReader.ReadMany();
         var operators = await _operatorReader.ReadMany();
-        AccessLevel = CanWriteSnapshots(userId.Value, officials, operators)
-            ? WitnessAccessLevel.Official
-            : WitnessAccessLevel.Participant;
+        if (CanWriteSnapshots(userId.Value, officials, operators))
+        {
+            AccessLevel = WitnessAccessLevel.Official;
+        }
 
         return true;
     }
@@ -70,11 +72,9 @@ public class WitnessAccessContext
         await ReloadState();
     }
 
-    public Task Handle(EventDisconnected notification, CancellationToken ct)
+    public async Task Handle(EventDisconnected notification, CancellationToken ct)
     {
-        AccessLevel = WitnessAccessLevel.Unknown;
-        ClearState();
-        return Task.CompletedTask;
+        await ReloadState();
     }
 
     static bool CanWriteSnapshots(int userId, IEnumerable<Official> officials, IEnumerable<Operator> operators)
