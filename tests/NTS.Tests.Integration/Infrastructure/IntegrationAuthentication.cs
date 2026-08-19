@@ -44,17 +44,33 @@ internal sealed record IntegrationUser
 
 internal sealed class IntegrationAuthenticationStateProvider : AuthenticationStateProvider
 {
-    readonly AuthenticationState _state;
+    AuthenticationState _state;
 
     /// <param name="user">A null user models an anonymous visitor: no session at all.</param>
     public IntegrationAuthenticationStateProvider(IntegrationUser? user)
     {
-        _state = new AuthenticationState(new ClaimsPrincipal(CreateIdentity(user)));
+        _state = CreateState(user);
     }
 
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         return Task.FromResult(_state);
+    }
+
+    /// <summary>
+    /// Models the point where a sign-in round trip completes: the app has already booted as an
+    /// anonymous visitor and only now learns who the user is, exactly as MSAL reports it after the
+    /// login callback.
+    /// </summary>
+    public void SignIn(IntegrationUser user)
+    {
+        _state = CreateState(user);
+        NotifyAuthenticationStateChanged(Task.FromResult(_state));
+    }
+
+    static AuthenticationState CreateState(IntegrationUser? user)
+    {
+        return new AuthenticationState(new ClaimsPrincipal(CreateIdentity(user)));
     }
 
     static ClaimsIdentity CreateIdentity(IntegrationUser? user)

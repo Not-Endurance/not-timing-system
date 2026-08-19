@@ -21,6 +21,7 @@ using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
 using NTS.Witness.Contracts.Features.Access;
 using NTS.Witness.Contracts.Features.Performance;
+using NTS.Witness.Contracts.Features.Profile;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
@@ -765,6 +766,79 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.Equal(updated.Id, persisted!.Id);
         Assert.Equal(updated.Name, persisted.Name);
         Assert.Equal(updated.CountryRegion, persisted.CountryRegion);
+    }
+
+    [Fact]
+    public async Task Witness_contexts_pick_up_the_user_when_signin_completes_after_startup()
+    {
+        var signingInUser = new IntegrationUser(
+            "late-signin.witness@integration.test",
+            "late-signin-witness-user",
+            "Late Signin Witness"
+        );
+        await using var witness = new WitnessDriver(
+            _fixture.WarpBaseUrl,
+            _fixture.NexusBaseUrl,
+            user: null,
+            "IntegrationLateSigninWitness"
+        );
+        var profileContext = witness.GetRequiredService<IWitnessProfileContext>();
+        var accessContext = witness.GetRequiredService<IWitnessAccessContext>();
+
+        // The sign-in round trip hands the browser back to a freshly booted app that is still
+        // anonymous, so both contexts initialize before anyone is signed in.
+        await profileContext.Load();
+        await accessContext.Load();
+
+        Assert.Null(profileContext.User);
+        Assert.Equal(WitnessAccessLevel.Anonymous, accessContext.AccessLevel);
+
+        witness.SignIn(signingInUser);
+
+        var user = await WaitForProfileUser(profileContext);
+        Assert.Equal(signingInUser.Email, user.Email);
+        Assert.Equal(
+            WitnessAccessLevel.Registered,
+            await WaitForAccessLevel(accessContext, WitnessAccessLevel.Registered)
+        );
+    }
+
+    static async Task<NUserModel> WaitForProfileUser(IWitnessProfileContext profileContext)
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            if (profileContext.User != null)
+            {
+                return profileContext.User;
+            }
+
+            await Task.Delay(50);
+        }
+
+        throw new TimeoutException(
+            "Witness profile context did not pick up the signed-in user, so the drawer would keep "
+                + "rendering without its profile header until a full page reload."
+        );
+    }
+
+    static async Task<WitnessAccessLevel> WaitForAccessLevel(
+        IWitnessAccessContext accessContext,
+        WitnessAccessLevel expected
+    )
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            if (accessContext.AccessLevel == expected)
+            {
+                return accessContext.AccessLevel;
+            }
+
+            await Task.Delay(50);
+        }
+
+        return accessContext.AccessLevel;
     }
 
     static SetupConfigureEvent CreateOperatorSetupEvent(

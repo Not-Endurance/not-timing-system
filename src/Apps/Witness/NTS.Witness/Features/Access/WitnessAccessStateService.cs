@@ -1,6 +1,6 @@
 using MediatR;
+using Microsoft.AspNetCore.Components.Authorization;
 using Not.Application.Authentication.Abstractions;
-using Not.Application.Behinds.Adapters;
 using Not.Injection;
 using NTS.Application.Contracts.Core;
 using NTS.Application.Contracts.Socket;
@@ -8,11 +8,12 @@ using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects;
+using NTS.Witness.Features.Sessions;
 
 namespace NTS.Witness.Features.Access;
 
 public class WitnessAccessContext
-    : NStatefulService,
+    : WitnessAuthenticationAwareContext,
         IWitnessAccessContext,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
@@ -27,8 +28,10 @@ public class WitnessAccessContext
         INtsSocketContext socketContext,
         INUserSession userSessionService,
         IEventScopedRepository<Official> officialRepository,
-        IEventScopedRepository<Operator> operatorRepository
+        IEventScopedRepository<Operator> operatorRepository,
+        AuthenticationStateProvider authenticationStateProvider
     )
+        : base(authenticationStateProvider)
     {
         _socketContext = socketContext;
         _userSessionService = userSessionService;

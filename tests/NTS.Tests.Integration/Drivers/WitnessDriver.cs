@@ -28,6 +28,7 @@ internal sealed class WitnessDriver : IAsyncDisposable
     readonly INtsSocketService _socketService;
     readonly IParticipationContext _participationContext;
     readonly IWitnessAccessContext _accessContext;
+    readonly IntegrationAuthenticationStateProvider _authenticationStateProvider;
     readonly string _clientName;
 
     /// <param name="user">A null user drives the Witness as an anonymous, read-only visitor.</param>
@@ -50,7 +51,8 @@ internal sealed class WitnessDriver : IAsyncDisposable
             typeof(NtsWitnessServices).Assembly
         );
         services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
-        services.AddScoped<AuthenticationStateProvider>(_ => new IntegrationAuthenticationStateProvider(user));
+        _authenticationStateProvider = new IntegrationAuthenticationStateProvider(user);
+        services.AddScoped<AuthenticationStateProvider>(_ => _authenticationStateProvider);
 
         _provider = services.BuildServiceProvider();
         _socketService = _provider.GetRequiredService<INtsSocketService>();
@@ -64,6 +66,14 @@ internal sealed class WitnessDriver : IAsyncDisposable
         where T : notnull
     {
         return _provider.GetRequiredService<T>();
+    }
+
+    /// <summary>
+    /// Completes a sign-in on an already running Witness, the way the login callback does.
+    /// </summary>
+    public void SignIn(IntegrationUser user)
+    {
+        _authenticationStateProvider.SignIn(user);
     }
 
     public Task Start()
