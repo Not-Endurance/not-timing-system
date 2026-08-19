@@ -46,10 +46,7 @@ public sealed class NBlazorClientAuthenticationServiceTests
     [Fact]
     public async Task Signout_from_an_authentication_route_returns_to_the_app_root()
     {
-        var navigation = new RecordingNavigationManager(
-            BASE_URI,
-            $"{BASE_URI}{AuthenticationContents.AUTHENTICATION}"
-        );
+        var navigation = new RecordingNavigationManager(BASE_URI, $"{BASE_URI}{AuthenticationContents.AUTHENTICATION}");
 
         await CreateService(new RecordingAuthenticationSession(), navigation).Signout();
 
