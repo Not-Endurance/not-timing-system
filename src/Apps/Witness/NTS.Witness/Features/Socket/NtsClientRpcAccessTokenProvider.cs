@@ -203,22 +203,11 @@ public class NtsClientRpcAccessTokenProvider : IRpcAccessTokenProvider, IScoped
 
     bool IsOnAuthenticationRoute()
     {
-        return IsAuthenticationRoute(_navigationManager.Uri);
+        return AuthenticationContents.IsAuthenticationRoute(_navigationManager.Uri);
     }
 
     static string GetSafeReturnUrl(string currentUri)
     {
-        return IsAuthenticationRoute(currentUri) ? "/" : currentUri;
-    }
-
-    static bool IsAuthenticationRoute(string uri)
-    {
-        if (!Uri.TryCreate(uri, UriKind.Absolute, out var absoluteUri))
-        {
-            return false;
-        }
-
-        var path = absoluteUri.AbsolutePath.Trim('/');
-        return path.StartsWith(AuthenticationContents.AUTHENTICATION, StringComparison.OrdinalIgnoreCase);
+        return AuthenticationContents.IsAuthenticationRoute(currentUri) ? "/" : currentUri;
     }
 }

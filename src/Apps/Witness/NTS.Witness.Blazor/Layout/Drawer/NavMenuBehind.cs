@@ -1,10 +1,8 @@
 using MudBlazor;
 using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Components.Abstractions;
-using Not.Safe;
 using NTS.Application.Contracts.Socket;
 using NTS.Blazor.Components.SelectEvents;
-using NTS.Domain.Core.Aggregates;
 using NTS.Witness.Blazor.Features;
 using NTS.Witness.Contracts.Features.Access;
 using NTS.Witness.Contracts.Features.Profile;
@@ -58,15 +56,20 @@ public class NavMenuBehind : NStatefulComponent
         }
     }
 
+    /// <summary>
+    /// Dropping the socket before signing out both closes the officiating connection while this
+    /// page is still alive and recomputes the access level, which keeps the drawer honest on the
+    /// paths where the logout resolves client-side instead of redirecting. Reconnecting is not
+    /// this component's job: a logout that does redirect reloads the app, and
+    /// <c>EventConnectionCoordinator</c> connects anonymously from there.
+    /// </summary>
     protected async Task Signout()
     {
         try
         {
-            var connectedEvent = SocketService.Event;
-            await Authentication.Signout();
-            await SocketService.Disconnect();
             await CloseResponsiveDrawerSafe();
-            await ReconnectAnonymously(connectedEvent);
+            await SocketService.Disconnect();
+            await Authentication.Signout();
         }
         catch (Exception ex)
         {
@@ -85,29 +88,6 @@ public class NavMenuBehind : NStatefulComponent
         catch (Exception ex)
         {
             Handle(ex);
-        }
-    }
-
-    /// <summary>
-    /// The read-only pages stay public, so signing out on one of them keeps the live socket
-    /// instead of dropping the visitor to a static page. Best-effort: sign-out has already
-    /// navigated to the authentication route, so a token request raised on the way back in must
-    /// not surface as a failed sign-out.
-    /// </summary>
-    async Task ReconnectAnonymously(EventInformation? connectedEvent)
-    {
-        if (connectedEvent == null)
-        {
-            return;
-        }
-
-        try
-        {
-            await SocketService.Connect(connectedEvent);
-        }
-        catch (Exception ex)
-        {
-            SafeHelper.HandleException(ex);
         }
     }
 
