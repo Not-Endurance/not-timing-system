@@ -330,6 +330,10 @@ namespace NTS.Localization
             LocalizeString(nameof(Configure_events_cannot_be_deleted_string));
         public static string Is_on_time_for_Presentation_Inspection_string =>
             LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
+        public static string Estimates_string => LocalizeString(nameof(Estimates_string));
+        public static string FEI_string => LocalizeString(nameof(FEI_string));
+        public static string Regional_string => LocalizeString(nameof(Regional_string));
+        public static string Both_string => LocalizeString(nameof(Both_string));
     }
 }
 #pragma warning restore NA0004

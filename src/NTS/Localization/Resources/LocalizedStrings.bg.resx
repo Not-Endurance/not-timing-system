@@ -1062,4 +1062,16 @@
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>
+  <data name="Estimates_string" xml:space="preserve">
+    <value>Прогнози</value>
+  </data>
+  <data name="FEI_string" xml:space="preserve">
+    <value>FEI</value>
+  </data>
+  <data name="Regional_string" xml:space="preserve">
+    <value>Регионални</value>
+  </data>
+  <data name="Both_string" xml:space="preserve">
+    <value>Двете</value>
+  </data>
 </root>
