@@ -38,10 +38,19 @@ An endurance show held at one location over a span of days. Every Participation,
 _Avoid_: Competition (that is one ride within an Event)
 
 **Participation**:
-One Combination's run through one Competition — its category, phases, and outcome. A record of competing, not a competitor and not a person.
+One Combination's ride at an Event — its category, phases, and outcome. A record of competing, not a competitor and not a person. The same ride can count in the Rankings of more than one Competition.
 _Avoid_: Participant, entry, run
 
-> **"Participant" is not a term in this domain.** The competing pair is a **Combination**; its run is a **Participation**. Anything named `Participant` is a misnomer to be corrected. `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
+> **"Participant" is not a term in this domain.** The competing pair is a **Combination**; its ride is a **Participation**. Anything named `Participant` is a misnomer to be corrected. `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
+
+**Ranking**:
+The Participations that compete for placement in one Competition and Category, each marked ranked or not ranked. It holds no placings; Results derive them.
+
+**Results**:
+The placings of a Ranking, derived from its Participations' latest times whenever they are needed. They are a produced document, not a record of their own.
+
+**Handout**:
+The printable sheet of one Combination's times, produced for it after each Phase. It is a live view of the Participation, not a snapshot: it prints the times as they stand then.
 
 > **Write access is not "Official".** Snapshot writes are granted to an Official whose role is one of {Steward, ChiefSteward, GroundJury, GroundJuryPresident}, **or** to any Operator. "Official" alone is not the boundary.
 

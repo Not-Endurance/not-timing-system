@@ -12,7 +12,7 @@ A Phase stored its Arrive, Present and Represent times as flat properties overwr
 
 **An Update is an acknowledged request, not a fire-and-forget message.** Judge places it with the rule of ADR-0004 using the new time, replaces the latest accepted time of that kind (last write wins), enforces the ordering rules, and answers with what changed or why it was rejected. The Official waits up to 10 seconds and can cancel. With no Judge connected the hub answers "queued" at once and keeps the message in the ordered pending store. Judge serializes every mutation of a participation.
 
-**The data moves once.** `migrate-phase-times` in `tools/NTS.Tools` (a dry run unless `--apply`) turns flat times into accepted events in the participations and in the participation copies embedded in handouts and rankings, and drops the snapshot-results collection. No old Judge is supported afterwards.
+**The data moves once.** `migrate-phase-times` in `tools/NTS.Tools` (a dry run unless `--apply`) turns flat times into accepted events in the participations, and drops the snapshot-results collection. It runs after ADR-0006's `migrate-participation-copies`, which leaves no participation copies in handouts and rankings to migrate. No old Judge is supported afterwards.
 
 ## Considered options
 
@@ -20,7 +20,7 @@ A Phase stored its Arrive, Present and Represent times as flat properties overwr
 
 **Event-sourcing the whole Participation.** Nothing here needs it: eliminations and the request flags stay flat.
 
-**Events in their own staff-only collection, the participation keeping flat projected times.** Would enforce "Staff only" on the wire today and make rollback a collection drop, but every change becomes two writes across REST calls with no transaction, and Witness, handouts and rankings would need a second, flat Phase representation.
+**Events in their own staff-only collection, the participation keeping flat projected times.** Would enforce "Staff only" on the wire today and make rollback a collection drop, but every change becomes two writes across REST calls with no transaction, and Witness would need a second, flat Phase representation.
 
 **Addressing an Update by snapshot id or old time, with a stale guard.** Protects against Updating a previous Phase or overwriting someone else's time. Rejected: updating previous Phases is not an expected use, only the latest History entry per number and type is editable, the ack shows exactly what changed, and the rare timeout is covered by a double check with the main Operator.
 
@@ -30,10 +30,10 @@ A Phase stored its Arrive, Present and Represent times as flat properties overwr
 
 ## Consequences
 
-Participation documents change shape, and so do the copies embedded in handouts and rankings. Rollback is a restore of the backup taken at cutover, so cutover is: stop the API, back up, apply the migration, deploy API and Judge together.
+Participation documents change shape. Rollback is a restore of the backup taken at cutover, so cutover is: stop the API, back up, apply the migrations (ADR-0006's first, then this one), deploy API and Judge together.
 
-Time events are for Staff only. Only Judge shows them for now, and once Judge joins the web UI only Operators and Officials will. Until then they travel in the anonymous participation document, with the Official's user id on Witness-originated events (Judge-originated events are labelled "Main operator"). That is accepted as harmless; there is simply no reason to show them to anyone else.
+Time events are for Staff only. Only Judge shows them for now, and once Judge joins the web UI only Operators and Officials will. Until then they travel in the anonymous participation document, and only there (ADR-0006 leaves no copies of it and its change notification carries no domain content), with the Official's user id on Witness-originated events (Judge-originated events are labelled "Main operator"). That is accepted as harmless; there is simply no reason to show them to anyone else.
 
 An Update can't rescue a snapshot that was rejected in a later Phase while an earlier Phase holds an accepted time. It is rejected, and the Phase form is the remedy. Delivery is at-least-once in the rare case a connection drops after Judge processed a message, and a replay is harmless because an Update sets an absolute value.
 
-The duplicated participation copies in handouts and rankings remain. Removing them is a separate future change.
+The copies of the participation in handouts and rankings no longer exist (ADR-0006), so this change only ever touches the participation documents.
