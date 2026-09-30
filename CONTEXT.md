@@ -22,13 +22,20 @@ _Avoid_: Participant, pair, entry, competitor
 
 **Official**:
 Certified personnel appointed to an event: Ground Jury, Veterinary Commission, Stewards, Technical Delegate, Foreign Judge. Officials are named in produced documents such as Results and FEI exports.
-_Avoid_: Judge, referee, staff, personnel
+_Avoid_: Judge, referee, personnel
 
 **Operator**:
-The highest authority in the scope of an Event — full access, writes included, and expected to exceed Official access over time. An Operator is *never* named in Results, FEI exports, or any other produced document; they exist for the system, not for the record. Operator however is not a Platform admin or developer. 
+The highest authority in the scope of an Event — full access, writes included, and expected to exceed Official access over time. An Operator is *never* named in Results, FEI exports, or any other produced document; they exist for the system, not for the record. Operator however is not a Platform admin or developer. The Operator running the Event's primary Judge app is the main Operator. 
 _Avoid_: Admin, superuser, sysadmin
 
+**Staff**:
+Operators and Officials together — the people who work an Event and may see how its times were recorded. Everyone else, signed in or not, sees only the recorded times.
+
 ### Competing
+
+**Event**:
+An endurance show held at one location over a span of days. Every Participation, Official and Snapshot is scoped to one Event.
+_Avoid_: Competition (that is one ride within an Event)
 
 **Participation**:
 One Combination's run through one Competition — its category, phases, and outcome. A record of competing, not a competitor and not a person.
@@ -37,6 +44,27 @@ _Avoid_: Participant, entry, run
 > **"Participant" is not a term in this domain.** The competing pair is a **Combination**; its run is a **Participation**. Anything named `Participant` is a misnomer to be corrected. `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
 
 > **Write access is not "Official".** Snapshot writes are granted to an Official whose role is one of {Steward, ChiefSteward, GroundJury, GroundJuryPresident}, **or** to any Operator. "Official" alone is not the boundary.
+
+### Timing
+
+**Phase**:
+One leg of a Participation: the loop ridden from Start to Arrival, then the vet gate where the Combination is Presented (again, if re-inspection is requested), then a Rest that ends at the Out time, which is the next Phase's Start.
+
+**Presentation**:
+A Combination presenting at the vet gate, captured as a time. Presenting again after re-inspection is requested is a Represent: the same kind of time, marked as a re-presentation.
+
+**Snapshot**:
+A time an Official captures for a Combination, by start number, and sends to the Judge app as an Arrival or a Presentation. It is an input, not part of the Participation: Judge records every Snapshot as a time event on a Phase, accepted or rejected.
+
+**Time event**:
+A past-tense fact recorded on a Phase — Arrived or Presented, or an Update of one — with an outcome: accepted, or rejected with a reason (including a manual reject by the main Operator). A Phase's times are the latest accepted time event of each kind; rejected ones stay in its history.
+_Avoid_: Event (that is the show), phase event, snapshot event
+
+**Update**:
+Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, or the main Operator editing the Phase in Judge. It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history.
+
+**Disable**:
+The main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again. The event stays in the history and can be enabled again.
 
 ## Not* projects
 They are separated by function - Blazor, Storage, Application. etcs. *Not* is shared amongs them. These are intended to packaged up and used in other projects to bootsrap functionality, ensure consistent behavior and allow for easier maintenance. Elements of Not should be completely stripped of business logic and should provide a streamlined, generic API striving for a ballance between strict, conssitent behavior and enough configurability to be multi-purposed.
