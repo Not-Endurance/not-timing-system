@@ -21,3 +21,5 @@ Requests compare against Judge's clock, so it should agree with the Witness devi
 `SnapshotType.Final` and the separate-finish plumbing are untouched. Nothing produces `Final` today, but it belongs to the planned separate-finish setting.
 
 Nothing persisted changes, so this rolls back by reverting. Two integration helpers still build `Automatic` snapshots and need explicit Arrive and Present ones.
+
+Any endpoint this decision adds or changes follows `.claude/skills/rest-api/SKILL.md` (ADR-0008).

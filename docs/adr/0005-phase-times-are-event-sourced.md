@@ -37,3 +37,5 @@ Time events are for Staff only. Only Judge shows them for now, and once Judge jo
 An Update can't rescue a snapshot that was rejected in a later Phase while an earlier Phase holds an accepted time. It is rejected, and the Phase form is the remedy. Delivery is at-least-once in the rare case a connection drops after Judge processed a message, and a replay is harmless because an Update sets an absolute value.
 
 The copies of the participation in handouts and rankings no longer exist (ADR-0006), so this change only ever touches the participation documents.
+
+Any endpoint this decision adds or changes follows `.claude/skills/rest-api/SKILL.md` (ADR-0008).

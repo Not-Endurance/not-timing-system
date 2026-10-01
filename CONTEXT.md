@@ -37,6 +37,14 @@ Operators and Officials together — the people who work an Event and may see ho
 An endurance show held at one location over a span of days. Every Participation, Official and Snapshot is scoped to one Event.
 _Avoid_: Competition (that is one ride within an Event)
 
+**Live Event**:
+An Event that is still running: its apps stay connected to each other and Staff may record and change times. It becomes a Historic Event at the end of its last day, and from then on changes to it are refused.
+_Avoid_: Active event, current event
+
+**Historic Event**:
+An Event that has ended, viewed as a record: nothing about it can be changed, and its Results, Startlist and other produced documents can still be printed. Opening one never affects a Live Event.
+_Avoid_: Past event, archived event
+
 **Participation**:
 One Combination's ride at an Event — its category, phases, and outcome. A record of competing, not a competitor and not a person. The same ride can count in the Rankings of more than one Competition.
 _Avoid_: Participant, entry, run
@@ -74,6 +82,10 @@ Correcting times already recorded on a Phase — an Official changing a sent Sna
 
 **Disable**:
 The main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again. The event stays in the history and can be enabled again.
+
+**Change notification**:
+The signal Judge sends to every app of an Event when a Participation has been changed and saved. It names the Participation, never describes it: receivers read the Participation again.
+_Avoid_: Event (that is the show), Update (that is a correction of times)
 
 ## Not* projects
 They are separated by function - Blazor, Storage, Application. etcs. *Not* is shared amongs them. These are intended to packaged up and used in other projects to bootsrap functionality, ensure consistent behavior and allow for easier maintenance. Elements of Not should be completely stripped of business logic and should provide a streamlined, generic API striving for a ballance between strict, conssitent behavior and enough configurability to be multi-purposed.

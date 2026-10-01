@@ -39,3 +39,5 @@ The wire no longer depends on the shape of a Phase, so ADR-0005 changes Phase wi
 Deleting five event types deletes the unit tests that pin them. The notification, and the store's coalescing, are tested instead.
 
 No old Judge or Witness build is supported after the wire change. The first slice (store and notification, no data change) rolls back by reverting. The second slice (references and data) rolls back with the backup taken at cutover. One release with ADR-0004 and ADR-0005, in the order: this, then ADR-0004, then ADR-0005.
+
+Any endpoint this decision adds or changes follows `.claude/skills/rest-api/SKILL.md` (ADR-0008).
