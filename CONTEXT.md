@@ -10,11 +10,11 @@ You can see a clear corelation between Not and NTS projects and they are layered
 ### People
 
 **Athlete**:
-The human rider entered into an event. One half of a Combination.
+The human rider, recognised as the same person across Events. One half of a Combination; a Participation shows the Athlete as entered at that Event.
 _Avoid_: Rider, competitor
 
 **Horse**:
-The equine half of a Combination.
+The equine half of a Combination, recognised as the same animal across Events. A Participation shows the Horse as entered at that Event.
 
 **Combination**:
 An Athlete and a Horse entered together as a single competitor, identified by a start number. This is the pair that competes — it is *not* a person, and it is *not* called a Participant.
@@ -30,6 +30,14 @@ _Avoid_: Admin, superuser, sysadmin
 
 **Staff**:
 Operators and Officials together — the people who work an Event and may see how its times were recorded. Everyone else, signed in or not, sees only the recorded times.
+
+### Data
+
+**Setup**:
+The reference data and Event configuration prepared before an Event, such as its Athletes, Horses and Clubs. An Athlete or Horse is registered in Setup once.
+
+**Core**:
+What an Event produces while it runs and afterwards: its Participations, Rankings, Handouts and Officials. Core holds copies of Setup data as entered when the Event started, so a later Setup change does not rewrite a finished Event.
 
 ### Competing
 
