@@ -22,15 +22,6 @@
     <ProjectReference Include="..\NTS.Contracts\NTS.Contracts.csproj" />
   </ItemGroup>
 
-  <!--
-    Both come in through Not.Storage, which brings MongoDB.Driver 3.2.0 into the browser bundle, and only the driver's
-    wire compression uses them. Remove these when Not.Storage moves to MongoDB.Driver 3.11 or later.
-  -->
-  <ItemGroup>
-    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-6c8g-7p36-r338" />
-    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-pggp-6c3x-2xmx" />
-  </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="localhostsettings.Staging.json" />
     <EmbeddedResource Include="localhostsettings.Production.json" />

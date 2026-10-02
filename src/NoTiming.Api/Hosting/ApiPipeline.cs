@@ -14,8 +14,13 @@ internal static class ApiPipeline
             app.UseHsts();
             app.UseHttpsRedirection();
         }
+        else
+        {
+            app.UseWebAssemblyDebugging();
+        }
 
         app.UseMiddleware<SecurityHeadersMiddleware>();
+        app.UseUiStaticFiles();
         app.UseMiddleware<ConnectionDiagnosticsMiddleware>();
         app.UseMiddleware<HubOriginMiddleware>();
         app.UseCors(ApiServices.CORS_POLICY_NAME);
@@ -34,6 +39,31 @@ internal static class ApiPipeline
                 )
         );
         app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
+
+        // An unknown API route is a 404 in the error format of the rest-api skill, never the Ui's page.
+        app.Map(
+            "/api/{**rest}",
+            () =>
+                Results.Json(
+                    new
+                    {
+                        errors = new[]
+                        {
+                            new
+                            {
+                                status = "404",
+                                code = "not-found",
+                                title = "Not found",
+                            },
+                        },
+                    },
+                    statusCode: StatusCodes.Status404NotFound,
+                    contentType: "application/vnd.api+json"
+                )
+        );
+
+        // Deep links into the Ui. A path that looks like a file (it has an extension) that is missing stays a 404.
+        app.MapFallbackToFile("{**path:nonfile}", "index.html");
 
         return app;
     }

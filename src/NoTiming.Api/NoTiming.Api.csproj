@@ -8,16 +8,47 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NTS.Application\NTS.Application.csproj" />
-    <ProjectReference Include="..\NTS.Contracts\NTS.Contracts.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.6.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.12" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.19.1" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.19.1" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.19.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.19.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NoTiming.Ui\NoTiming.Ui.csproj" />
+    <ProjectReference Include="..\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\NTS.Contracts\NTS.Contracts.csproj" />
+  </ItemGroup>
+
+  <!--
+    In development the Api serves the Ui through the static web assets of the project reference. Publishing the Api
+    that way ships the Ui's build assets: untrimmed framework files and the raw index.html. So a publish runs the
+    Ui's own publish (trimmed, fingerprinted, compressed, index.html processed) and ships that as wwwroot instead.
+    Build-time properties of the command line, such as -p:WasmApplicationEnvironmentName, reach the Ui's publish.
+  -->
+  <PropertyGroup>
+    <UiPublishDirectory>$(MSBuildProjectDirectory)\obj\ui-publish\</UiPublishDirectory>
+  </PropertyGroup>
+
+  <Target Name="PublishUiForApi">
+    <MSBuild
+      Projects="..\NoTiming.Ui\NoTiming.Ui.csproj"
+      Targets="Publish"
+      Properties="Configuration=$(Configuration);PublishDir=$(UiPublishDirectory)"
+    />
+  </Target>
+
+  <Target Name="ShipPublishedUi" AfterTargets="Publish" DependsOnTargets="PublishUiForApi">
+    <RemoveDir Directories="$(PublishDir)wwwroot" />
+    <ItemGroup>
+      <_PublishedUiFile Include="$(UiPublishDirectory)wwwroot\**\*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(_PublishedUiFile)"
+      DestinationFiles="@(_PublishedUiFile->'$(PublishDir)wwwroot\%(RecursiveDir)%(Filename)%(Extension)')"
+    />
+  </Target>
 
 </Project>

@@ -5,4 +5,14 @@
    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts/**</DefaultItemExcludes>
   </PropertyGroup>
 
+  <!--
+    The .NET 10 projects audit transitive packages. These two reach NoTiming.Ui, and so NoTiming.Api that serves it,
+    through Not.Storage, which brings MongoDB.Driver 3.2.0 in: only the driver's wire compression uses them, and
+    neither project talks to Mongo through it. Remove them when Not.Storage moves to MongoDB.Driver 3.11 or later.
+  -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-6c8g-7p36-r338" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-pggp-6c3x-2xmx" />
+  </ItemGroup>
+
 </Project>
