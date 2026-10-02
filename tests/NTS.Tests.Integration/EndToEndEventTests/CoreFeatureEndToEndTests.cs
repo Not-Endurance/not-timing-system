@@ -35,7 +35,7 @@ public sealed class CoreFeatureEndToEndTests
     public async Task Event_snapshot_runs_end_to_end(string snapshotName)
     {
         var snapshot = EndToEndEventSnapshot.Load(snapshotName);
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
         using var nexusApi = new NexusApiDriver(_fixture.NexusBaseUrl);
         using var print = new EndToEndPrintFeature(nexusApi);
         var configureEvent = new ConfigureEventFeature(judge, nexusApi);
@@ -60,7 +60,7 @@ public sealed class CoreFeatureEndToEndTests
         AssertStartedOperatorsMatchSetup(startedDocuments.Operators, setup.SetupEvent, eventInformation.Id);
 
         await using var witness = new WitnessDriver(
-            _fixture.WarpBaseUrl,
+            _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             setup.WitnessOperator,
             $"CoreEndToEndOperatorWitness-{snapshot.Name}"

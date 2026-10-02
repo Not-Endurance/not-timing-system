@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace NTS.Nexus.Warp.ConnectionDiagnostics;
+namespace NoTiming.Api.Features.Live;
 
 internal sealed class ConnectionDiagnosticsMiddleware
 {
@@ -15,7 +15,7 @@ internal sealed class ConnectionDiagnosticsMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (!WarpConnectionDiagnostics.TryDescribeTransportRequest(context, out var requestKind, out var hubPath))
+        if (!ConnectionDiagnostics.TryDescribeTransportRequest(context, out var requestKind))
         {
             await _next(context);
             return;
@@ -30,25 +30,24 @@ internal sealed class ConnectionDiagnosticsMiddleware
         {
             stopwatch.Stop();
             _logger.LogInformation(
-                "Warp transport request {RequestKind} for {HubPath} completed with {StatusCode} in {ElapsedMilliseconds} ms. "
+                "Live hub transport request {RequestKind} completed with {StatusCode} in {ElapsedMilliseconds} ms. "
                     + "CorrelationId {CorrelationId}, Group {ConnectionGroup}, Client {ClientName}, Version {ClientVersion}, Method {Method}, "
                     + "Origin {Origin}, Upgrade {Upgrade}, ForwardedProto {ForwardedProto}, "
                     + "ForwardedHost {ForwardedHost}, ArrLogId {ArrLogId}, InstanceId {InstanceId}.",
                 requestKind,
-                hubPath,
                 context.Response.StatusCode,
                 stopwatch.ElapsedMilliseconds,
-                WarpConnectionDiagnostics.GetCorrelationId(context),
-                WarpConnectionDiagnostics.GetConnectionGroup(context),
-                WarpConnectionDiagnostics.GetClientName(context),
-                WarpConnectionDiagnostics.GetClientVersion(context),
+                ConnectionDiagnostics.GetCorrelationId(context),
+                ConnectionDiagnostics.GetConnectionGroup(context),
+                ConnectionDiagnostics.GetClientName(context),
+                ConnectionDiagnostics.GetClientVersion(context),
                 context.Request.Method,
                 context.Request.Headers.Origin.ToString(),
                 context.Request.Headers.Upgrade.ToString(),
-                WarpConnectionDiagnostics.GetForwardedProto(context),
-                WarpConnectionDiagnostics.GetForwardedHost(context),
+                ConnectionDiagnostics.GetForwardedProto(context),
+                ConnectionDiagnostics.GetForwardedHost(context),
                 context.Request.Headers["X-ARR-LOG-ID"].ToString(),
-                WarpConnectionDiagnostics.GetInstanceId()
+                ConnectionDiagnostics.GetInstanceId()
             );
         }
     }

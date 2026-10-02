@@ -1,20 +1,17 @@
 using Not.Application.RPC;
 using NTS.Contracts;
 
-namespace NTS.Nexus.Warp.ConnectionDiagnostics;
+namespace NoTiming.Api.Features.Live;
 
-internal static class WarpConnectionDiagnostics
+internal static class ConnectionDiagnostics
 {
     const string UNKNOWN_INSTANCE = "local";
-    static readonly PathString JUDGE_HUB_PATH = new($"/{ApplicationConstants.JUDGE_HUB}");
-    static readonly PathString WITNESS_HUB_PATH = new($"/{ApplicationConstants.WITNESS_HUB}");
 
-    public static bool TryDescribeTransportRequest(HttpContext context, out string requestKind, out string hubPath)
+    public static bool TryDescribeTransportRequest(HttpContext context, out string requestKind)
     {
         requestKind = string.Empty;
-        hubPath = string.Empty;
 
-        if (!TryResolveHubPath(context.Request.Path, out var resolvedHubPath, out var remainingPath))
+        if (!context.Request.Path.StartsWithSegments(HubPath, out var remainingPath))
         {
             return false;
         }
@@ -22,14 +19,12 @@ internal static class WarpConnectionDiagnostics
         if (remainingPath.Equals("/negotiate", StringComparison.OrdinalIgnoreCase))
         {
             requestKind = "negotiate";
-            hubPath = resolvedHubPath;
             return true;
         }
 
-        if (context.WebSockets.IsWebSocketRequest)
+        if (IsWebSocketUpgrade(context.Request))
         {
             requestKind = "websocket";
-            hubPath = resolvedHubPath;
             return true;
         }
 
@@ -71,27 +66,14 @@ internal static class WarpConnectionDiagnostics
         return GetHeader(context, "X-Forwarded-Host") ?? GetHeader(context, "X-Original-Host");
     }
 
-    static bool TryResolveHubPath(PathString requestPath, out string hubPath, out string remainingPath)
+    public static bool IsWebSocketUpgrade(HttpRequest request)
     {
-        hubPath = string.Empty;
-        remainingPath = string.Empty;
-
-        if (requestPath.StartsWithSegments(JUDGE_HUB_PATH, out var judgeRemainingPath))
-        {
-            hubPath = JUDGE_HUB_PATH.Value!;
-            remainingPath = judgeRemainingPath.Value ?? string.Empty;
-            return true;
-        }
-
-        if (requestPath.StartsWithSegments(WITNESS_HUB_PATH, out var witnessRemainingPath))
-        {
-            hubPath = WITNESS_HUB_PATH.Value!;
-            remainingPath = witnessRemainingPath.Value ?? string.Empty;
-            return true;
-        }
-
-        return false;
+        // The WebSocket feature is only populated inside the hub's own endpoint pipeline, so read the headers.
+        return HttpMethods.IsGet(request.Method)
+            && request.Headers.Upgrade.ToString().Contains("websocket", StringComparison.OrdinalIgnoreCase);
     }
+
+    public static PathString HubPath { get; } = new($"/{ApplicationConstants.LIVE_HUB}");
 
     static string? GetQueryValue(HttpContext? context, string key)
     {

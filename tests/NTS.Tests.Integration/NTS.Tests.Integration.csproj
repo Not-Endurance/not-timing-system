@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -13,8 +13,8 @@
     <ProjectReference Include="..\..\nugets\Not.Blazor\Not.Blazor.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
     <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.HTTP\NTS.Nexus.HTTP.csproj" />
-    <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.Warp\NTS.Nexus.Warp.csproj" />
     <ProjectReference Include="..\..\src\Apps\Witness\NTS.Witness\NTS.Witness.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming.Api\NoTiming.Api.csproj" />
     <ProjectReference Include="..\..\src\NTS.Blazor\NTS.Blazor.csproj" />
     <ProjectReference Include="..\..\src\NTS.Contracts\NTS.Contracts.csproj" />
     <ProjectReference Include="..\..\src\NTS.Storage\NTS.Storage.csproj" />
@@ -28,9 +28,9 @@
   </ItemGroup>
 
   <!--
-    Parked scenarios. Each of these needs a connected Judge, which the platform no longer has (#598, ADR-0011,
-    ADR-0013). They are kept as they were written and are not compiled. Their assertions are edited only with the
-    owner's approval per test (AGENTS.md rule 4, #642). See README.md, "Parked scenarios".
+    Parked scenarios. Each of these needs a connected Judge or the hub write path (Receive), which the platform no
+    longer has (#598, ADR-0011, ADR-0013). They are kept as they were written and are not compiled. Their assertions
+    are edited only with the owner's approval per test (AGENTS.md rule 4, #642). See README.md, "Parked scenarios".
   -->
   <ItemGroup>
     <Compile Remove="Drivers\JudgeDriver.cs" />

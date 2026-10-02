@@ -32,13 +32,13 @@ internal sealed class WitnessDriver : IAsyncDisposable
     readonly string _clientName;
 
     /// <param name="user">A null user drives the Witness as an anonymous, read-only visitor.</param>
-    public WitnessDriver(Uri warpBaseUrl, Uri nexusBaseUrl, IntegrationUser? user, string clientName)
+    public WitnessDriver(Uri apiBaseUrl, Uri nexusBaseUrl, IntegrationUser? user, string clientName)
     {
         _clientName = clientName;
         var configuration = CreateConfiguration(
-            warpBaseUrl,
+            apiBaseUrl,
             nexusBaseUrl,
-            ApplicationConstants.WITNESS_HUB,
+            ApplicationConstants.LIVE_HUB,
             clientName
         );
         var services = new ServiceCollection();
@@ -149,13 +149,13 @@ internal sealed class WitnessDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri warpBaseUrl, Uri nexusBaseUrl, string hub, string clientName)
+    static IConfiguration CreateConfiguration(Uri apiBaseUrl, Uri nexusBaseUrl, string hub, string clientName)
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = warpBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = apiBaseUrl.ToString().TrimEnd('/'),
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.HubPattern)}"] = hub,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",

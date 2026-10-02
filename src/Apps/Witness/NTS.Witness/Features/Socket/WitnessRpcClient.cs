@@ -1,35 +1,21 @@
-using Microsoft.AspNetCore.SignalR.Client;
 using Not.Application.DomainEvents;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
-using Not.Exceptions;
 using Not.Injection;
-using NTS.Contracts.Socket;
-using NTS.Contracts.Watcher;
-using NTS.Contracts.Watcher.Models;
+using NTS.Contracts.Features.Witness.Procedures;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Snapshots;
-using NTS.Contracts;
-using NTS.Contracts.Features.Witness.Procedures;
 using NTS.Witness.Features.Core.Dashboard;
 
 namespace NTS.Witness.Features.Socket;
 
 public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPublisher, IScoped
 {
-    readonly IRpcSocket _socket;
-    readonly INtsSocketContext _socketContext;
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
-    public WitnessRpcClient(
-        IRpcSocket socket,
-        INtsSocketContext socketContext,
-        IDomainEventDispatcher domainEventDispatcher
-    )
+    public WitnessRpcClient(IRpcSocket socket, IDomainEventDispatcher domainEventDispatcher)
         : base(socket)
     {
-        _socket = socket;
-        _socketContext = socketContext;
         _domainEventDispatcher = domainEventDispatcher;
     }
 
@@ -43,22 +29,10 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPu
         RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
     }
 
-    protected virtual Task SendReceiveAsync(WarpRequest<SnapshotGroupModel> request)
+    public Task PublishSnapshotsAsync(SnapshotGroup snapshotGroup)
     {
-        return _socket.Connection!.InvokeAsync(nameof(IWitnessHubProcedures.Receive), request);
-    }
-
-    public async Task PublishSnapshotsAsync(SnapshotGroup snapshotGroup)
-    {
-        GuardHelper.ThrowIfDefault(_socket.Connection);
-        var connectedEvent = GuardHelper.ThrowIfDefault(
-            _socketContext.Event,
-            "Cannot publish witness snapshots before connecting to an event."
-        );
-
-        var model = SnapshotGroupModel.MapFrom(snapshotGroup);
-        var request = WarpRequest.Create(connectedEvent.Id.ToString(), model);
-        await SendReceiveAsync(request);
+        // The hub has no write path (ADR-0013). Snapshots are POSTed to the Api once the server records them (#644).
+        throw new NotSupportedException("Snapshots cannot be sent until the server records them.");
     }
 
     public Task OnPhaseCompleted(PhaseCompleted payload)

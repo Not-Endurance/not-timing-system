@@ -53,20 +53,17 @@ services:
     ports:
       - "8080:80"
 
-  nts-nexus-warp:
-    container_name: nts-nexus-warp
+  nts-api:
+    container_name: nts-api
     build:
       context: ../
-      dockerfile: src/Apps/Nexus/NTS.Nexus.Warp/Dockerfile
+      dockerfile: src/NoTiming.Api/Dockerfile
     environment:
       PORT: "80"
-      MONGO_CONNECTION_STRING: mongodb://mongodb:27017
-      NServerAuthenticationSettings__AuthorityInstance: "https://ntsexternalsandbox.ciamlogin.com"
-      NServerAuthenticationSettings__AuthorityTenantId: "8838b442-b043-466b-8ed6-ccf82cb3641f"
-      NServerAuthenticationSettings__Scope: "nts-client-scope"
-      NServerAuthenticationSettings__ResourceClientId: "16abc36b-4eab-45a0-9230-d2791350f396"
-      NServerAuthenticationSettings__AccessTokenQueryPaths: '[ "witness-hub" ]'
-
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://aspire-dashboard:18889
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+    depends_on:
+      - aspire-dashboard
     ports:
       - "11337:80"
 

@@ -2,17 +2,16 @@ using System.Diagnostics;
 
 namespace NTS.Tests.Integration.Infrastructure;
 
-internal sealed class WarpProcess : IAsyncDisposable
+internal sealed class ApiProcess : IAsyncDisposable
 {
     readonly RepositoryPaths _paths;
     readonly ProcessOutputCollector _output = new();
     Process? _process;
 
-    public WarpProcess(RepositoryPaths paths, int port, string mongoConnectionString)
+    public ApiProcess(RepositoryPaths paths, int port)
     {
         _paths = paths;
         Port = port;
-        MongoConnectionString = mongoConnectionString;
         BaseUrl = new Uri($"http://127.0.0.1:{Port}");
     }
 
@@ -24,7 +23,6 @@ internal sealed class WarpProcess : IAsyncDisposable
 #endif
 
     public int Port { get; }
-    public string MongoConnectionString { get; }
     public Uri BaseUrl { get; }
 
     public async Task Start(CancellationToken cancellationToken = default)
@@ -44,7 +42,7 @@ internal sealed class WarpProcess : IAsyncDisposable
         };
         startInfo.ArgumentList.Add("run");
         startInfo.ArgumentList.Add("--project");
-        startInfo.ArgumentList.Add(_paths.WarpProject);
+        startInfo.ArgumentList.Add(_paths.ApiProject);
         startInfo.ArgumentList.Add("--configuration");
         startInfo.ArgumentList.Add(BuildConfiguration);
         startInfo.ArgumentList.Add("--no-build");
@@ -52,14 +50,12 @@ internal sealed class WarpProcess : IAsyncDisposable
 
         startInfo.Environment["ASPNETCORE_ENVIRONMENT"] = "Development";
         startInfo.Environment["PORT"] = Port.ToString();
-        startInfo.Environment["MONGO_CONNECTION_STRING"] = MongoConnectionString;
-        startInfo.Environment["NTS_INTEGRATION_AUTH"] = "true";
         startInfo.Environment["DOTNET_CLI_HOME"] = dotnetHome;
         startInfo.Environment["NUGET_PACKAGES"] = nugetPackages;
 
-        _process = Process.Start(startInfo) ?? throw new InvalidOperationException("Failed to start Warp process.");
-        _process.OutputDataReceived += (_, args) => _output.Add("warp", args.Data);
-        _process.ErrorDataReceived += (_, args) => _output.Add("warp-error", args.Data);
+        _process = Process.Start(startInfo) ?? throw new InvalidOperationException("Failed to start the Api process.");
+        _process.OutputDataReceived += (_, args) => _output.Add("api", args.Data);
+        _process.ErrorDataReceived += (_, args) => _output.Add("api-error", args.Data);
         _process.BeginOutputReadLine();
         _process.BeginErrorReadLine();
 
@@ -98,7 +94,7 @@ internal sealed class WarpProcess : IAsyncDisposable
             if (_process?.HasExited == true)
             {
                 throw new InvalidOperationException(
-                    $"Warp exited before becoming healthy with exit code {_process.ExitCode}.{Environment.NewLine}{_output.Dump()}"
+                    $"The Api exited before becoming healthy with exit code {_process.ExitCode}.{Environment.NewLine}{_output.Dump()}"
                 );
             }
 
@@ -115,6 +111,6 @@ internal sealed class WarpProcess : IAsyncDisposable
             await Task.Delay(250, timeout.Token);
         }
 
-        throw new TimeoutException($"Warp did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}");
+        throw new TimeoutException($"The Api did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}");
     }
 }

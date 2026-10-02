@@ -38,10 +38,10 @@ using WitnessSnapshotService = NTS.Contracts.Features.Snapshots.ISnapshotService
 
 namespace NTS.Tests.Integration;
 
-// Parked scenarios (see README.md, "Parked scenarios"). Every test in this file needs a connected Judge, which
-// the platform no longer has (#598, ADR-0011, ADR-0013). They are kept exactly as they were written, not
-// compiled (see NTS.Tests.Integration.csproj), and wait for the owner's approval per test before any
-// assertion is edited (AGENTS.md rule 4, #642).
+// Parked scenarios (see README.md, "Parked scenarios"). Every test in this file needs a connected Judge or the hub
+// write path (Receive), which the platform no longer has (#598, ADR-0011, ADR-0013). They are kept exactly as they
+// were written and are not compiled (see NTS.Tests.Integration.csproj). Their assertions are edited only with the
+// owner's approval per test (AGENTS.md rule 4, #642).
 public sealed partial class IntegrationHarnessCheckTest
 {
     [Fact]
@@ -78,21 +78,21 @@ public sealed partial class IntegrationHarnessCheckTest
             $"Nexus API list endpoint did not return participation #{participationNumber}. Raw response: {seededParticipationsRaw}"
         );
 
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
         await using var officialWitness = new WitnessDriver(
-            _fixture.WarpBaseUrl,
+            _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             OFFICIAL_USER,
             "IntegrationOfficialWitness"
         );
         await using var registeredWitness = new WitnessDriver(
-            _fixture.WarpBaseUrl,
+            _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             REGISTERED_USER,
             "IntegrationRegisteredWitness"
         );
         await using var anonymousWitness = new WitnessDriver(
-            _fixture.WarpBaseUrl,
+            _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             user: null,
             "IntegrationAnonymousWitness"
@@ -229,7 +229,7 @@ public sealed partial class IntegrationHarnessCheckTest
             IntegrationPayloadFactory.ActiveParticipation(eventId, manualNumber, id: 5903, startTime: start)
         );
 
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
         await judge.Start();
         await judge.Connect(eventInformation);
 
@@ -351,15 +351,15 @@ public sealed partial class IntegrationHarnessCheckTest
         );
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6601));
 
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
         await using var officialWitness = new WitnessDriver(
-            _fixture.WarpBaseUrl,
+            _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             OFFICIAL_USER,
             "PresentlistOfficialWitness"
         );
         await using var registeredWitness = new WitnessDriver(
-            _fixture.WarpBaseUrl,
+            _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             REGISTERED_USER,
             "PresentlistRegisteredWitness"
@@ -599,5 +599,341 @@ public sealed partial class IntegrationHarnessCheckTest
         return handouts
             .Where(handout => handout.Entries.Any(entry => entry.Participation.Combination.Number == number))
             .ToArray();
+    }
+
+    [Fact]
+    public async Task Witness_snapshot_selections_restore_from_user_session_until_published()
+    {
+        var eventId = 1901;
+        var participationNumber = 61;
+        var timestamp = DateTimeOffset.UtcNow.Date.AddHours(11).AddMinutes(17);
+        var expectedTimestamp = new Timestamp(timestamp).ToString();
+        var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
+        var participation = IntegrationPayloadFactory.ActiveParticipation(
+            eventId,
+            participationNumber,
+            id: 5701,
+            startTime: timestamp.AddHours(-2)
+        );
+        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+
+        var officialUser = await api.RegisterUser(OFFICIAL_USER);
+        await api.Create(eventInformation);
+        await api.Create(participation);
+        await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6701));
+
+        await using var witness = new WitnessDriver(
+            _fixture.ApiBaseUrl,
+            _fixture.NexusBaseUrl,
+            OFFICIAL_USER,
+            "SnapshotSessionWitness"
+        );
+
+        await witness.Start();
+        await witness.Connect(eventInformation);
+
+        var snapshots = witness.GetRequiredService<WitnessSnapshotService>();
+        await snapshots.Load();
+        snapshots.SelectForSnapshot(snapshots.Participations.Single(x => x.Combination.Number == participationNumber));
+
+        await WaitForUserSession(
+            api,
+            OFFICIAL_USER.UserIdentifier,
+            eventId,
+            state =>
+                state.SnapshotSelections.Length == 1
+                && state.SnapshotSelections[0].Number == participationNumber
+                && state.SnapshotSelections[0].Timestamp == null,
+            "persist the selected snapshot without a timestamp"
+        );
+
+        var selectedSnapshot = snapshots.Snapshots.Single(x => x.Number == participationNumber);
+        snapshots.UpdateTimestamp(selectedSnapshot, new Timestamp(timestamp));
+
+        await WaitForUserSession(
+            api,
+            OFFICIAL_USER.UserIdentifier,
+            eventId,
+            state =>
+                state.SnapshotSelections.Length == 1
+                && state.SnapshotSelections[0].Number == participationNumber
+                && state.SnapshotSelections[0].Timestamp == expectedTimestamp,
+            "persist the captured snapshot timestamp"
+        );
+
+        await witness.Disconnect();
+
+        await using var restoredWitness = new WitnessDriver(
+            _fixture.ApiBaseUrl,
+            _fixture.NexusBaseUrl,
+            OFFICIAL_USER,
+            "SnapshotSessionRestoredWitness"
+        );
+
+        await restoredWitness.Start();
+        await restoredWitness.Connect(eventInformation);
+
+        var restoredSnapshots = restoredWitness.GetRequiredService<WitnessSnapshotService>();
+        await restoredSnapshots.Load();
+        var restoredSnapshot = restoredSnapshots.Snapshots.Single(x => x.Number == participationNumber);
+
+        Assert.Equal(expectedTimestamp, restoredSnapshot.Timestamp?.ToString());
+        Assert.DoesNotContain(restoredSnapshots.Participations, x => x.Combination.Number == participationNumber);
+        Assert.True(await restoredSnapshots.Publish(SnapshotType.Arrive));
+
+        var publishedSession = await WaitForUserSession(
+            api,
+            OFFICIAL_USER.UserIdentifier,
+            eventId,
+            state =>
+                state.SnapshotSelections.Length == 0
+                && state.SnapshotHistory.Any(group =>
+                    group.Type == SnapshotType.Arrive && group.Entries.Any(entry => entry.Number == participationNumber)
+                ),
+            "clear sent selections and append the snapshot history"
+        );
+
+        Assert.Empty(publishedSession.State!.SnapshotSelections);
+        Assert.Contains(
+            publishedSession.State.SnapshotHistory,
+            group =>
+                group.Type == SnapshotType.Arrive && group.Entries.Any(entry => entry.Number == participationNumber)
+        );
+    }
+
+    [Fact]
+    public async Task Operators_are_projected_and_gate_witness_write_access()
+    {
+        var eventId = 1801;
+        var operatorIdentity = new IntegrationUser(
+            "operator.witness@integration.test",
+            "operator-witness-user",
+            "Operator Witness"
+        );
+        var eligibleOfficialIdentity = new IntegrationUser(
+            "eligible.official.witness@integration.test",
+            "eligible-official-witness-user",
+            "Eligible Official Witness"
+        );
+        var ineligibleOfficialIdentity = new IntegrationUser(
+            "ineligible.official.witness@integration.test",
+            "ineligible-official-witness-user",
+            "Ineligible Official Witness"
+        );
+        var registeredIdentity = new IntegrationUser(
+            "operator-registered.witness@integration.test",
+            "operator-registered-witness-user",
+            "Operator Registered Witness"
+        );
+        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+
+        var operatorUser = ToSetupUser(await api.RegisterUser(operatorIdentity));
+        var eligibleOfficialUser = ToSetupUser(await api.RegisterUser(eligibleOfficialIdentity));
+        var ineligibleOfficialUser = ToSetupUser(await api.RegisterUser(ineligibleOfficialIdentity));
+        await api.RegisterUser(registeredIdentity);
+
+        var setupEvent = CreateOperatorSetupEvent(eventId, operatorUser, eligibleOfficialUser, ineligibleOfficialUser);
+        await api.CreateSetupConfigureEvent(setupEvent);
+
+        var persistedSetup = await api.ReadSetupConfigureEvent(eventId);
+        Assert.Single(persistedSetup.Operators);
+
+        var eventInformation = await api.StartEventInformation(eventId);
+        var activeOfficials = await api.ReadOfficials(eventInformation.Id);
+        var activeOperators = await api.ReadOperators(eventInformation.Id);
+        var activeRankings = await api.ReadRankings(eventInformation.Id);
+
+        Assert.Equal(2, activeOfficials.Count);
+        Assert.DoesNotContain(activeOfficials, x => x.UserId == operatorUser.Id);
+        Assert.Single(activeOperators);
+        Assert.Equal(operatorUser.Id, activeOperators[0].UserId);
+        Assert.Equal(OfficialRole.Steward, activeOperators[0].Role);
+        Assert.Single(activeRankings);
+
+        await using var operatorWitness = new WitnessDriver(
+            _fixture.ApiBaseUrl,
+            _fixture.NexusBaseUrl,
+            operatorIdentity,
+            "IntegrationOperatorWitness"
+        );
+        await using var eligibleOfficialWitness = new WitnessDriver(
+            _fixture.ApiBaseUrl,
+            _fixture.NexusBaseUrl,
+            eligibleOfficialIdentity,
+            "IntegrationEligibleOfficialWitness"
+        );
+        await using var ineligibleOfficialWitness = new WitnessDriver(
+            _fixture.ApiBaseUrl,
+            _fixture.NexusBaseUrl,
+            ineligibleOfficialIdentity,
+            "IntegrationIneligibleOfficialWitness"
+        );
+        await using var registeredWitness = new WitnessDriver(
+            _fixture.ApiBaseUrl,
+            _fixture.NexusBaseUrl,
+            registeredIdentity,
+            "IntegrationOperatorRegisteredWitness"
+        );
+
+        await operatorWitness.Start();
+        await eligibleOfficialWitness.Start();
+        await ineligibleOfficialWitness.Start();
+        await registeredWitness.Start();
+
+        await operatorWitness.Connect(eventInformation);
+        await eligibleOfficialWitness.Connect(eventInformation);
+        await ineligibleOfficialWitness.Connect(eventInformation);
+        await registeredWitness.Connect(eventInformation);
+
+        Assert.Equal(WitnessAccessLevel.Official, operatorWitness.AccessLevel);
+        Assert.Equal(WitnessAccessLevel.Official, eligibleOfficialWitness.AccessLevel);
+        Assert.Equal(WitnessAccessLevel.Registered, ineligibleOfficialWitness.AccessLevel);
+        Assert.Equal(WitnessAccessLevel.Registered, registeredWitness.AccessLevel);
+
+        await operatorWitness.Publish(CreateSnapshotGroup());
+        await eligibleOfficialWitness.Publish(CreateSnapshotGroup());
+        var denied = await Assert.ThrowsAnyAsync<Exception>(
+            () => ineligibleOfficialWitness.Publish(CreateSnapshotGroup())
+        );
+        Assert.Contains("Only authorized event staff", denied.Message);
+    }
+
+    static SetupConfigureEvent CreateOperatorSetupEvent(
+        int eventId,
+        SetupUser operatorUser,
+        SetupUser eligibleOfficialUser,
+        SetupUser ineligibleOfficialUser
+    )
+    {
+        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var loop = new SetupLoop(20, eventId + 10);
+        var phase = new SetupPhase(loop, recovery: 40, rest: null, id: eventId + 11);
+        var athlete = new SetupAthlete("Operator Rider", "Operator Rider", null, country, null, eventId + 12);
+        var horse = new SetupHorse("Operator Horse", "Operator Horse", null, eventId + 13);
+        var combination = new SetupCombination(1, athlete, horse, eventId + 14);
+        var participation = new SetupParticipation(
+            false,
+            combination,
+            ParticipationCategory.Senior,
+            null,
+            null,
+            null,
+            eventId + 15
+        );
+        var competition = new SetupCompetition(
+            "Operator Access Competition",
+            CompetitionRuleset.Regional,
+            DateTimeOffset.UtcNow.Date.AddHours(8),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [phase],
+            [participation],
+            eventId + 16
+        );
+        var eligibleOfficial = new SetupOfficial(
+            "Eligible Official",
+            "Eligible Official",
+            OfficialRole.GroundJuryPresident,
+            eventId + 20,
+            eligibleOfficialUser
+        );
+        var ineligibleOfficial = new SetupOfficial(
+            "Ineligible Official",
+            "Ineligible Official",
+            OfficialRole.VeterinaryCommissionMember,
+            eventId + 21,
+            ineligibleOfficialUser
+        );
+        var @operator = new SetupOperator(operatorUser, eventId + 30);
+
+        return new SetupConfigureEvent(
+            "Operator Access Event",
+            "Sofia",
+            country,
+            null,
+            [competition],
+            [eligibleOfficial, ineligibleOfficial],
+            [loop],
+            [combination],
+            eventId,
+            [@operator]
+        );
+    }
+
+    static SetupUser ToSetupUser(NUserModel user)
+    {
+        return new SetupUser(
+            user.Email,
+            user.Name,
+            user.Roles,
+            user.Id,
+            user.GivenName,
+            user.MiddleName,
+            user.Surname,
+            user.CountryRegion,
+            user.Club,
+            user.FeiId,
+            user.DisplayName
+        );
+    }
+
+    static async Task<NtsUserSessionModel> WaitForUserSession(
+        NexusApiDriver api,
+        string userIdentifier,
+        int eventId,
+        Func<NtsUserSessionStateModel, bool> predicate,
+        string expectedState
+    )
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        NtsUserSessionModel? last = null;
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            last = await api.ReadUserSession(userIdentifier, eventId);
+            if (last?.State != null && predicate(last.State))
+            {
+                return last;
+            }
+
+            await Task.Delay(100);
+        }
+
+        throw new TimeoutException(
+            $"Witness user session did not {expectedState}. {FormatUserSessionState(last?.State)}"
+        );
+    }
+
+    static string FormatUserSessionState(NtsUserSessionStateModel? state)
+    {
+        if (state == null)
+        {
+            return "No session state was returned.";
+        }
+
+        var selections = string.Join(
+            ", ",
+            state.SnapshotSelections.Select(selection => $"#{selection.Number}@{selection.Timestamp ?? "<pending>"}")
+        );
+        var history = string.Join(
+            ", ",
+            state.SnapshotHistory.Select(group =>
+                $"{group.Type}: {string.Join(", ", group.Entries.Select(entry => $"#{entry.Number}"))}"
+            )
+        );
+        return $"Selections: [{selections}]. History: [{history}].";
+    }
+
+    static SnapshotGroup CreateSnapshotGroup()
+    {
+        return new SnapshotGroup(
+            [new WitnessSnapshot(1, "Operator Rider", "Operator Rider", new Timestamp(DateTimeOffset.UtcNow))],
+            SnapshotType.Automatic
+        );
     }
 }

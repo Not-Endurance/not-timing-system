@@ -29,12 +29,12 @@ internal sealed class JudgeDriver : IAsyncDisposable
     readonly IEventScopedRepository<Participation> _participationRepository;
     readonly IOptions<NHttpSettings> _httpSettings;
 
-    public JudgeDriver(Uri warpBaseUrl, Uri nexusBaseUrl)
+    public JudgeDriver(Uri apiBaseUrl, Uri nexusBaseUrl)
     {
         var configuration = CreateConfiguration(
-            warpBaseUrl,
+            apiBaseUrl,
             nexusBaseUrl,
-            ApplicationConstants.JUDGE_HUB,
+            "judge-hub",
             "IntegrationJudge"
         );
         var services = new ServiceCollection();
@@ -120,13 +120,13 @@ internal sealed class JudgeDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri warpBaseUrl, Uri nexusBaseUrl, string hub, string clientName)
+    static IConfiguration CreateConfiguration(Uri apiBaseUrl, Uri nexusBaseUrl, string hub, string clientName)
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = warpBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = apiBaseUrl.ToString().TrimEnd('/'),
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.HubPattern)}"] = hub,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
