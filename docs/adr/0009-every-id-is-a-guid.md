@@ -29,3 +29,7 @@ Ids are random ints minted in whichever process builds the entity: a static `Ran
 ## Consequences
 
 ADR-0002's "keyed by their int id" and the `rest-api` skill's "an integer in the domain" become "a Guid", and filter examples use a Guid literal, which the OData grammar writes unquoted. Judge, Witness, the API and Warp ship together, as in ADR-0006. Links and bookmarks that carry an int id stop working, as the route renames of ADR-0007 already do for past Events. The old ints survive only in the backup taken at the cutover, which is also the rollback. A hash collision between two ids can no longer pass for equality, and a test pins it.
+
+## Amendments
+
+ADR-0011 moves the shared libraries to .NET 10 once the Functions API retires, so `Guid.CreateVersion7` becomes available to them then; the choice of random Guids stands until index locality matters. Judge, Witness, the API and Warp no longer ship separately: the Api and the Ui do (ADR-0011).

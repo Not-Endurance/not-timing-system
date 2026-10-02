@@ -33,3 +33,7 @@ A Participation embeds the Athlete and the Horse it was entered with, and the co
 Judge's pick lists grow from the Setup rows to everyone who ever competed. A wrong merge puts one person's rides on another's page and is undone only from the backup, which is why anything looser than a FeiId, an exact name, strict transliteration or the same legacy id waits for the owner. Review items still undecided when the tool is deleted stay separate; merging them later is a Setup feature, not a rerun. The migration runs last in the cutover (ADR-0009), after the copies migration of ADR-0006, so Rankings and Handouts already hold references and only Setup, the configure events and the Participations are rewritten.
 
 Any endpoint this decision adds or changes follows `.claude/skills/rest-api/SKILL.md` (ADR-0008).
+
+## Amendments
+
+ADR-0012 settles the scope of the registry: one row per Athlete, Horse, Club or Official across all Tenants, owned by the Tenant that registered it. Other Tenants reference it by Guid through the cross-tenant search and cannot edit it, and the duplicate warning spans Tenants.

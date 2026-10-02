@@ -3,7 +3,7 @@ This project employs a Domain Driven Design architecture with strict layer and b
 - Not* "nugets", located in /nugets
 - NTS* - stands for No Timing System - the name of the product. 
 
-You can see a clear corelation between Not and NTS projects and they are layered identically. 
+The NTS projects follow the layering of the Not projects, except that the application and storage layers live inside the two hosts, `NoTiming.Api` and `NoTiming.Ui` (ADR-0011). 
 
 ## Language
 
@@ -25,11 +25,31 @@ Certified personnel appointed to an event: Ground Jury, Veterinary Commission, S
 _Avoid_: Judge, referee, personnel
 
 **Operator**:
-The highest authority in the scope of an Event — full access, writes included, and expected to exceed Official access over time. An Operator is *never* named in Results, FEI exports, or any other produced document; they exist for the system, not for the record. Operator however is not a Platform admin or developer. The Operator running the Event's primary Judge app is the main Operator. 
+A person who works an Event with Snapshot access, like an Official, and is expected to exceed Official access over time. An Operator is *never* named in Results, FEI exports, or any other produced document; they exist for the system, not for the record. An Operator is not a Developer.
 _Avoid_: Admin, superuser, sysadmin
+
+**Main Operator**:
+The one Operator of an Event who runs it from the Console: the highest authority in the Event's scope, with full access, writes included. An Event has exactly one at a time. It is the Tenant Root who created the Event until that Tenant Root assigns it to someone else, which is only possible while the Event is not yet Live; once the Event is Live only the Main Operator can hand it over, to a named account. The Main Operator links accounts to the Event's Officials and Operators.
 
 **Staff**:
 Operators and Officials together — the people who work an Event and may see how its times were recorded. Everyone else, signed in or not, sees only the recorded times.
+
+### Tenancy
+
+**Account**:
+A person's sign-in identity, one per person across all Tenants. What an Account may do is decided by the roles and grants it holds, not by the Account itself.
+
+**Tenant**:
+A country's equestrian federation (for example the Bulgarian Federation of Equestrian Sports) — the organiser that owns Events and the Setup data it prepares. A Tenant comes into being when the first person from its country registers, and becomes operational — able to hold Events — once the Developer gives it a Tenant Root. It sets the rules its Regional competitions use, such as how loop speed is judged; an Event keeps the rules as they were when it started. A Tenant organises data rather than walling it off: public views of Events and, where allowed, searches for Athletes, Horses, Clubs, Officials and accounts reach across Tenants. Authority never crosses: no access one Tenant grants carries into another Tenant's Events.
+_Avoid_: Organisation, account, customer
+
+**Tenant Root**:
+A role within one Tenant, held by one or more accounts and created by the Developer — a Tenant Root cannot add another. A Tenant Root creates the Tenant's Events and is each one's Main Operator until it assigns that role to someone else, usually so the configuration and running of that single Event is done by another person. Once an Event is Live, a Tenant Root who is not its Main Operator cannot take the role over, and the Tenant Root role itself gives no right to run a Live Event.
+_Avoid_: Admin, owner
+
+**Developer**:
+A platform-level role reserved for the platform owner, with full rights across every Tenant. It is not granted through a Tenant.
+_Avoid_: Admin, superuser
 
 ### Data
 
@@ -46,12 +66,16 @@ An endurance show held at one location over a span of days. Every Participation,
 _Avoid_: Competition (that is one ride within an Event)
 
 **Live Event**:
-An Event that is still running: its apps stay connected to each other and Staff may record and change times. It becomes a Historic Event at the end of its last day, and from then on changes to it are refused.
+An Event that is still running: its Console and its viewers see changes as they are recorded, and Staff may record and change times. It becomes a Historic Event at the end of its last day, and from then on changes to it are refused.
 _Avoid_: Active event, current event
 
 **Historic Event**:
 An Event that has ended, viewed as a record: nothing about it can be changed, and its Results, Startlist and other produced documents can still be printed. Opening one never affects a Live Event.
 _Avoid_: Past event, archived event
+
+**Console**:
+The Operator's workspace for configuring and running an Event: Setup, the live dashboard, startlist, handouts and rankings. Only the Main Operator reaches it, from as many tabs or devices as they like: the Console is one more viewer of what the server records.
+_Avoid_: Judge, Judge app
 
 **Participation**:
 One Combination's ride at an Event — its category, phases, and outcome. A record of competing, not a competitor and not a person. The same ride can count in the Rankings of more than one Competition.
@@ -79,20 +103,20 @@ One leg of a Participation: the loop ridden from Start to Arrival, then the vet 
 A Combination presenting at the vet gate, captured as a time. Presenting again after re-inspection is requested is a Represent: the same kind of time, marked as a re-presentation.
 
 **Snapshot**:
-A time an Official captures for a Combination, by start number, and sends to the Judge app as an Arrival or a Presentation. It is an input, not part of the Participation: Judge records every Snapshot as a time event on a Phase, accepted or rejected.
+A time an Official captures for a Combination, by start number, and sends in for the Event as an Arrival or a Presentation. It is an input, not part of the Participation: every Snapshot is recorded as a time event on a Phase, accepted or rejected.
 
 **Time event**:
-A past-tense fact recorded on a Phase — Arrived or Presented, or an Update of one — with an outcome: accepted, or rejected with a reason (including a manual reject by the main Operator). A Phase's times are the latest accepted time event of each kind; rejected ones stay in its history.
+A past-tense fact recorded on a Phase — Arrived or Presented, or an Update of one — with an outcome: accepted, or rejected with a reason (including a manual reject by the Main Operator). A Phase's times are the latest accepted time event of each kind; rejected ones stay in its history.
 _Avoid_: Event (that is the show), phase event, snapshot event
 
 **Update**:
-Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, or the main Operator editing the Phase in Judge. It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history.
+Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, or the Main Operator editing the Phase in the Console. It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history.
 
 **Disable**:
-The main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again. The event stays in the history and can be enabled again.
+The Main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again. The event stays in the history and can be enabled again.
 
 **Change notification**:
-The signal Judge sends to every app of an Event when a Participation has been changed and saved. It names the Participation, never describes it: receivers read the Participation again.
+The signal sent to everyone viewing an Event when a Participation has been changed and saved. It names the Participation, never describes it: receivers read the Participation again.
 _Avoid_: Event (that is the show), Update (that is a correction of times)
 
 ## Not* projects
@@ -105,11 +129,11 @@ Notes:
 # NTS* projects
 NTS stands for *No Timing System*, the Brand of the current product - a cheap alternative to full-fledged Endurance timing systems.
 - Domain Model - hardcode business logic and validation is contained within the `NTS.Domain.*` namespace, which holds the domain model. It has to be as pure as reasonably possible. Some "pollution" is acceptable - like coupling with `MediatR.INotification` or `Not.Krud` framework, however there are no references to repositories or other infrastructure.
-- Secondary business logic - contained in `NTS.Application`, `NTS.Judge`, `NTS.Witness` or the so-called applicaiton level. It handles interactions between domain boundaries and infrastructure. The key component here and entry point should be the Service. Services should be suffixed with `*Service` and usually implement multiple segregated interfaces (conforms to Interface segregation principle)
-- Storage - contains operations related to storing something. All of the storage should be conform to the `IRepository<T>` abstraction.
-- Blazor - the layout is composed of a Header, Drawer and Main content. Components that are navigated to via Router should be suffixed with `*Content.razor`.
+- Projects - `NTS` (localization), `NTS.Domain` (shared, with Tenant and the Account), `NTS.Domain.Setup`, `NTS.Domain.Core`, `NTS.Contracts`, and the two hosts `NoTiming.Api` and `NoTiming.Ui`. The Api references the Ui to serve it, the Ui never references the Api, and the domain references no infrastructure.
+- Secondary business logic - the so-called application level, which lives in the hosts: server write-side services and access policies in `NoTiming.Api`, one folder per feature, and client view services in `NoTiming.Ui`. It handles interactions between domain boundaries and infrastructure. The key component here and entry point should be the Service. Services should be suffixed with `*Service` and usually implement multiple segregated interfaces (conforms to Interface segregation principle)
+- Storage - contains operations related to storing something: the Mongo wiring in the Api and the REST repositories in the Ui. All of the storage should be conform to the `IRepository<T>` abstraction.
+- Blazor - the Ui is one Blazor WebAssembly app. The layout is composed of a Header, Drawer and Main content. Components that are navigated to via Router should be suffixed with `*Content.razor`.
 - Service registration - services in NTS projects should be registed to the container via the `ITransient`, `IScoped` and `ISingleton` marker interfaces. Those interfaces shouldn't be inherited by other interfaces, but implemented by the classes implementing those interfaces. Services should not be registered manually
-- *Exceptions*: `NTS.Application` - we need to keep service registraiton manual for NTS.Application as it's also being used by NTS.Warp application in order to share RPC contracts. 
 
 ## Blazor
 Component rules

@@ -24,7 +24,7 @@ Endpoints follow JSON:API 1.1 (jsonapi.org). Only the grammar of `filter` is bor
 
 ## Status and errors
 
-- 200 read or update. 201 create. 204 delete. 400 malformed request, filter or parameter. 404 missing item. 409 conflict with current state. 422 domain rule violated. 500 unexpected. An empty collection is 200 with `"data": []`.
+- 200 read or update. 201 create. 204 delete. 400 malformed request, filter or parameter. 401 not signed in. 403 not allowed. 404 missing item. 409 conflict with current state. 422 domain rule violated. 500 unexpected. An empty collection is 200 with `"data": []`.
 - Every error is `{ "status", "code", "title", "detail"? }` in `errors`. `code` is a stable kebab-case identifier (`event-ended`) that clients branch on. `title` and `detail` are for people and change with the wording.
 - The status always reports the outcome.
 
@@ -35,9 +35,20 @@ Endpoints follow JSON:API 1.1 (jsonapi.org). Only the grammar of `filter` is bor
 - `page[size]` and `page[number]` map to `$top` and `$skip`. A collection that can outgrow one screen takes them.
 - `fields[...]`, `include` and any other parameter answer 400 until a consumer needs them.
 
+## Authorization
+
+- Every route requires a signed-in caller unless it is on the public-read allowlist (ADR-0012): one list in the Api, enumerated by a test, read-only, and never a write. An unauthenticated caller gets 401; a signed-in caller who may not do it gets 403 with a code such as `not-main-operator`.
+- Repositories filter by the current Tenant by default. A cross-tenant read is a named view of its collection, never a parameter a caller can send to any resource.
+- There are no anonymous route groups.
+
+## Concurrency
+
+- A Participation carries a `version` in the resource object's `meta`. A manual edit (PATCH) sends the version it was based on in `meta`; a stale one answers 409 `participation-changed` and a missing one 400 `version-required` (ADR-0013). Other resources are last-write-wins.
+- Creating a resource whose id the client mints (a Snapshot, ADR-0013) is idempotent: the same id again returns the first outcome. It never answers 409 for staleness.
+
 ## Legacy resources
 
-Served by the Functions project, in their old shape (`Result<T>` envelope, PascalCase, HTTP 200 for domain errors): athletes, clubs, configure-event, countries, event, handouts, horses, officials, operators, participations, rankings, settings, snapshot-results, user-sessions, users. The ticket that ports a resource removes it from this list.
+Served by the Functions project, in their old shape (`Result<T>` envelope, PascalCase, HTTP 200 for domain errors): athletes, clubs, configure-event, countries, event, handouts, horses, officials, operators, participations, rankings, settings, snapshot-results, user-sessions, users. The ticket that ports a resource removes it from this list. Settings, snapshot-results, the print routes and the routes that list users are not ported: they go with the Functions project (ADR-0011, ADR-0012, ADR-0013).
 
 ## Done
 
