@@ -14,11 +14,11 @@ using NTS.Contracts.Socket;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Snapshots;
-using NTS.Storage;
+using NoTiming.Ui.Storage;
 using NTS.Tests.Integration.Infrastructure;
-using NTS.Witness;
+using NoTiming.Ui;
 using NTS.Contracts.Features.Access;
-using NTS.Witness.Features.Core.Dashboard;
+using NoTiming.Ui.Features.Core.Dashboard;
 
 namespace NTS.Tests.Integration.Drivers;
 

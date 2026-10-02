@@ -1,0 +1,111 @@
+using Not.Blazor.Components.Abstractions;
+using Not.Blazor.Components.Buttons;
+using Not.Notify;
+using NTS.Contracts.Socket;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Enums;
+using NTS.Domain.Core.Objects.Snapshots;
+using NoTiming.Ui.Features.Socket;
+using NTS.Contracts.Features.Access;
+using NTS.Contracts.Features.Snapshots;
+
+namespace NoTiming.Ui.Features.Core.Snapshots;
+
+public class SnapshotContentBehind : NStatefulComponent
+{
+    [Inject]
+    INotifier Notifier { get; set; } = default!;
+
+    [Inject]
+    ISnapshotService SnapshotState { get; set; } = default!;
+
+    [Inject]
+    BlazorSocketService BlazorSocketService { get; set; } = default!;
+
+    [Inject]
+    IWitnessAccessContext AccessState { get; set; } = default!;
+
+    [Inject]
+    INtsSocketService SocketService { get; set; } = default!;
+
+    [Inject]
+    NavigationManager Navigator { get; set; } = default!;
+
+    protected ISnapshotService SnapshotService => SnapshotState;
+    protected IReadOnlyList<Participation> Participations => SnapshotService.Participations;
+    protected IReadOnlyList<Snapshot> Snapshots => SnapshotService.Snapshots;
+    protected IReadOnlyList<NDropdownButtonDescriptor> PublishDescriptors =>
+        [
+            new(Arrive_string, () => SendHandler(SnapshotType.Arrive)),
+            new(Presentation_string, () => SendHandler(SnapshotType.Present)),
+        ];
+    protected int CapturedSnapshotsCount => Snapshots.Count(x => x.Timestamp != null);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(AccessState);
+        await Observe(SnapshotService);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            await BlazorSocketService.EnsureConnected();
+        }
+
+        if (WitnessAccessPolicy.ShouldRedirectFromSnapshots(AccessState.AccessLevel, SocketService.Event != null))
+        {
+            Navigator.NavigateTo(WitnessAccessPolicy.ResolveSnapshotFallbackRoute());
+        }
+    }
+
+    protected async Task SendHandler(SnapshotType snapshotType)
+    {
+        try
+        {
+            if (!await SnapshotService.Publish(snapshotType))
+            {
+                return;
+            }
+
+            Notifier.Success(string.Format(Snapshots_sent_as__string, GetSnapshotTypeText(snapshotType)));
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    protected Task MoveToSnapshot(Participation? participation)
+    {
+        try
+        {
+            if (participation != null)
+            {
+                SnapshotService.SelectForSnapshot(participation);
+            }
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected string GetSnapshotTypeText(SnapshotType snapshotType)
+    {
+        return snapshotType switch
+        {
+            SnapshotType.Arrive => Arrive_string,
+            SnapshotType.Present => Presentation_string,
+            _ => snapshotType.ToString(),
+        };
+    }
+}

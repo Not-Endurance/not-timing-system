@@ -13,7 +13,7 @@ using Not.Localization;
 using Not.Print;
 using NTS.Contracts;
 using NTS.Contracts.Pdf;
-using NTS.Blazor.Components.Results;
+using NoTiming.Ui.Components.Results;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Tests.Integration.Drivers;

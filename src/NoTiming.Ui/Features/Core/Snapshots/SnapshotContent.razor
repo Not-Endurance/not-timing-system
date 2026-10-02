@@ -1,0 +1,49 @@
+@using NoTiming.Ui.Components.ParticipationChips
+@using NoTiming.Ui.Features.Core.Snapshots.Components
+@using MudBlazor
+@using Not.Blazor.Components.Buttons
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(SNAPSHOT_PAGE)]
+@attribute [Authorize]
+@inherits SnapshotContentBehind
+
+<NContent Title="@Snapshot_page_string">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                <SnapshotComponent Snapshots="@Snapshots" />
+            </MudHidden>
+
+            <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                <SnapshotComponent Snapshots="@Snapshots"
+                                   Compact />
+            </MudHidden>
+
+            <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                <ParticipationChips Participations="@Participations"
+                                    SelectedChanged="@MoveToSnapshot" />
+            </MudHidden>
+
+            <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                <ParticipationChips Participations="@Participations"
+                                    SelectedChanged="@MoveToSnapshot"
+                                    Compact />
+            </MudHidden>
+
+        </MudStack>
+    </Main>
+
+    <Main2>
+        <SnapshotHistory />
+    </Main2>
+
+    <Rightbar>
+        <NDropdownButton Descriptors="@PublishDescriptors"
+                         Disabled="CapturedSnapshotsCount == 0"
+                         MaxWidth />
+    </Rightbar>
+
+</NContent>

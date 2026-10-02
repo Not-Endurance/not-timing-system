@@ -3,7 +3,7 @@ using Not.Krud.Abstractions;
 using Not.Krud.Services;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Judge.Contracts.Features.Setup.Clubs;
-using NTS.Storage.REST;
+using NoTiming.Ui.Storage.REST;
 using NTS.Tests.Integration.Drivers;
 
 namespace NTS.Tests.Integration;

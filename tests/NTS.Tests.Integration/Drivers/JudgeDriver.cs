@@ -16,7 +16,7 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
-using NTS.Storage;
+using NoTiming.Ui.Storage;
 
 namespace NTS.Tests.Integration.Drivers;
 

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AddRazorSupportForMvc>false</AddRazorSupportForMvc>
+    <GenerateMvcApplicationPartsAssemblyAttributes>false</GenerateMvcApplicationPartsAssemblyAttributes>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.12" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\nugets\Not.Blazor.Client\Not.Blazor.Client.csproj" />
+    <ProjectReference Include="..\..\nugets\Not.Storage\Not.Storage.csproj" />
+    <ProjectReference Include="..\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\NTS.Contracts\NTS.Contracts.csproj" />
+  </ItemGroup>
+
+  <!--
+    Both come in through Not.Storage, which brings MongoDB.Driver 3.2.0 into the browser bundle, and only the driver's
+    wire compression uses them. Remove these when Not.Storage moves to MongoDB.Driver 3.11 or later.
+  -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-6c8g-7p36-r338" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-pggp-6c3x-2xmx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="localhostsettings.Staging.json" />
+    <EmbeddedResource Include="localhostsettings.Production.json" />
+  </ItemGroup>
+
+</Project>
