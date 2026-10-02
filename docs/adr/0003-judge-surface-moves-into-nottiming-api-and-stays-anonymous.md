@@ -1,6 +1,6 @@
 # The Judge-facing REST surface is ported into NoTiming.Api and stays anonymous until Judge moves in
 
-Status: accepted
+Status: superseded by ADR-0011
 
 Judge (the Windows desktop app) is out of scope for authentication in this work and reaches the backend anonymously, as it does today (tracked in #593). Rather than keep the Static Web Apps Functions API alive beside the new host, we port every route Judge uses into NoTiming.Api under an explicitly anonymous route group and retire the Functions project. The Witness-only routes (registration, profile, session state) are not ported; the Witness read surface stays anonymous per ADR-0001; the print endpoints are dropped. Judge-facing user reads return profile fields only, never identity fields.
 
