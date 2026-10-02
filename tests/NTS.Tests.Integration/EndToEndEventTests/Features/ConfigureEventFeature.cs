@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 using Not.Krud.Abstractions;
-using NTS.Application.Contracts.Setup.Models;
+using NTS.Contracts.Setup.Models;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.ConfigureEvents;
 using NTS.Judge.Contracts.Features.Setup.Athletes;

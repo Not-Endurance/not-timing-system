@@ -3,7 +3,7 @@ using Not.Application.CRUD.Ports;
 using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Krud.Models;
-using NTS.Application.Contracts.PastEvents;
+using NTS.Contracts.PastEvents;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;

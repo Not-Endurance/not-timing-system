@@ -1,6 +1,6 @@
 using Not.Application.Authentication.User;
 using Not.Structures;
-using NTS.Witness.Contracts.API;
+using NTS.Contracts.API;
 
 namespace NTS.Witness.Features.Profile;
 

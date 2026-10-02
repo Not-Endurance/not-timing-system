@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.SignalR;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Nexus.Warp.Abstractions;
 using NTS.Nexus.Warp.ConnectionDiagnostics;
-using NTS.Nexus.Warp.Contracts;
-using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
-using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
+using NTS.Contracts;
+using NTS.Contracts.Features.Judge.Procedures;
+using NTS.Contracts.Features.Witness.Procedures;
 using NTS.Nexus.Warp.Features.Witness;
 using NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 

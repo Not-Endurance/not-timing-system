@@ -4,8 +4,8 @@ using Not.Collections;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Observables.Structures;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Core;
+using NTS.Contracts.Socket;
 using NTS.Application.UserSession;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
@@ -13,7 +13,7 @@ using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Core.Objects.Snapshots;
-using NTS.Witness.Contracts.Features.Snapshots;
+using NTS.Contracts.Features.Snapshots;
 
 namespace NTS.Witness.Features.Core.Dashboard;
 

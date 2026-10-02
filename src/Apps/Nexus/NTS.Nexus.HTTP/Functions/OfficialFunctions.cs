@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Core.Models;
+using NTS.Contracts.Core.Models;
 using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Telemetry;

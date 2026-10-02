@@ -1,6 +1,6 @@
 using Not.Blazor.Components.Abstractions;
 using NTS.Witness.Blazor.Features.Socket;
-using NTS.Witness.Contracts.Features.Access;
+using NTS.Contracts.Features.Access;
 
 namespace NTS.Witness.Blazor.Features.Home;
 

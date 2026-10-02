@@ -3,9 +3,9 @@ using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Storage.REST;
 using Not.Structures;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
+using NTS.Contracts.Socket;
 using NTS.Application.Core;
 using NTS.Domain.Core.Aggregates;
 

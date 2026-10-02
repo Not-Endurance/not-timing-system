@@ -1,7 +1,7 @@
 using Not.Application.Behinds.Adapters;
-using NTS.Application.Contracts.Arrivelists;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Startlists;
+using NTS.Contracts.Arrivelists;
+using NTS.Contracts.Core;
+using NTS.Contracts.Startlists;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Core.Objects.Startlists;

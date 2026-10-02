@@ -2,10 +2,10 @@ using System.Security.Claims;
 using Microsoft.Extensions.Localization;
 using Not.Application.Authentication.User;
 using Not.Application.Behinds.Adapters;
-using NTS.Application.Contracts.Arrivelists;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Presentlists;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Arrivelists;
+using NTS.Contracts.Core;
+using NTS.Contracts.Presentlists;
+using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Arrivelists;
@@ -16,10 +16,10 @@ using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Localization;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
-using NTS.Witness.Contracts.API;
-using NTS.Witness.Contracts.Features.Access;
-using NTS.Witness.Contracts.Features.Performance;
-using NTS.Witness.Contracts.Features.Profile;
+using NTS.Contracts.API;
+using NTS.Contracts.Features.Access;
+using NTS.Contracts.Features.Performance;
+using NTS.Contracts.Features.Profile;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
@@ -32,7 +32,7 @@ using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participa
 using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
 using SetupUser = NTS.Domain.Setup.Aggregates.User;
 using WitnessSnapshot = NTS.Domain.Core.Objects.Snapshots.Snapshot;
-using WitnessSnapshotService = NTS.Witness.Contracts.Features.Snapshots.ISnapshotService;
+using WitnessSnapshotService = NTS.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NTS.Tests.Integration;
 

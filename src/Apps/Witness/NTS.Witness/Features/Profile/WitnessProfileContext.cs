@@ -3,9 +3,9 @@ using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
-using NTS.Witness.Contracts.Features.Profile;
+using NTS.Contracts.Features.Profile;
 using NTS.Witness.Features.Sessions;
 
 namespace NTS.Witness.Features.Profile;

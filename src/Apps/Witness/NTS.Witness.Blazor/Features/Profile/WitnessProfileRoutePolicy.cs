@@ -1,5 +1,5 @@
 using Not.Application.Authentication.User;
-using NTS.Witness.Contracts.Features.Profile;
+using NTS.Contracts.Features.Profile;
 
 namespace NTS.Witness.Blazor.Features.Profile;
 

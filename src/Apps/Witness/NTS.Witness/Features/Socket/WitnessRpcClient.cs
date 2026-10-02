@@ -4,13 +4,13 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Exceptions;
 using Not.Injection;
-using NTS.Application.Contracts.Socket;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Socket;
+using NTS.Contracts.Watcher;
+using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Snapshots;
-using NTS.Nexus.Warp.Contracts;
-using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
+using NTS.Contracts;
+using NTS.Contracts.Features.Witness.Procedures;
 using NTS.Witness.Features.Core.Dashboard;
 
 namespace NTS.Witness.Features.Socket;

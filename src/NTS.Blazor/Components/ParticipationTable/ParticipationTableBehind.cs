@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
 using Not.Krud.Blazor;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
 using NTS.Blazor.Components.ParticipationTable.Phases;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;

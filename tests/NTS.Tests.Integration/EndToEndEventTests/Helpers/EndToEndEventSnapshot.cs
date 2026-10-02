@@ -2,14 +2,14 @@ using Newtonsoft.Json.Linq;
 using NTS.Tests.Integration.Infrastructure;
 using CoreEliminated = NTS.Domain.Core.Aggregates.Participations.Objects.Eliminated;
 using CoreParticipation = NTS.Domain.Core.Aggregates.Participation;
-using CoreParticipationModel = NTS.Application.Contracts.Core.Models.ParticipationModel;
+using CoreParticipationModel = NTS.Contracts.Core.Models.ParticipationModel;
 using CorePhase = NTS.Domain.Core.Aggregates.Participations.Entities.Phase;
 using CoreRanking = NTS.Domain.Core.Aggregates.Ranking;
-using CoreRankingModel = NTS.Application.Contracts.Core.Models.RankingModel;
+using CoreRankingModel = NTS.Contracts.Core.Models.RankingModel;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupClub = NTS.Domain.Setup.Aggregates.Club;
 using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
-using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
+using SetupConfigureEventModel = NTS.Contracts.Setup.Models.ConfigureEventModel;
 using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
 using SetupUser = NTS.Domain.Setup.Aggregates.User;
 

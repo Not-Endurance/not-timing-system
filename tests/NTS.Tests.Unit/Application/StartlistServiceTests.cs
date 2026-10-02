@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using NTS.Application.Contracts.Core;
+using NTS.Contracts.Core;
 using NTS.Application.Startlists;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;

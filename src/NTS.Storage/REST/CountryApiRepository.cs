@@ -1,6 +1,6 @@
 ﻿using Not.Application.HTTP;
 using Not.Storage.REST;
-using NTS.Application.Contracts.Shared.Models;
+using NTS.Contracts.Shared.Models;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Storage.REST;

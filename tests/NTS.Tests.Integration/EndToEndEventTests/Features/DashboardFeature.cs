@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Not.Application.Behinds.Adapters;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Startlists;
+using NTS.Contracts.Core;
+using NTS.Contracts.Startlists;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
@@ -10,7 +10,7 @@ using NTS.Domain.Objects;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
-using WitnessSnapshotService = NTS.Witness.Contracts.Features.Snapshots.ISnapshotService;
+using WitnessSnapshotService = NTS.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NTS.Tests.Integration.EndToEndEventTests.Features;
 

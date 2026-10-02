@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Formatting;
-using NTS.Application.Contracts.Presentlists;
+using NTS.Contracts.Presentlists;
 using NTS.Domain.Core.Objects.Presentlists;
 using NTS.Domain.Helpers;
 

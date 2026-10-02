@@ -5,19 +5,19 @@ using Not.Files;
 using Not.Print;
 using Not.Serialization.JSON;
 using Not.Structures;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Core.Models;
+using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Tests.Integration.Infrastructure;
-using NTS.Witness.Contracts.API;
+using NTS.Contracts.API;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
-using SetupAthleteModel = NTS.Application.Contracts.Setup.Models.AthleteModel;
+using SetupAthleteModel = NTS.Contracts.Setup.Models.AthleteModel;
 using SetupClub = NTS.Domain.Setup.Aggregates.Club;
-using SetupClubModel = NTS.Application.Contracts.Setup.Models.ClubModel;
+using SetupClubModel = NTS.Contracts.Setup.Models.ClubModel;
 using SetupConfigureEvent = NTS.Domain.Setup.Aggregates.ConfigureEvent;
-using SetupConfigureEventModel = NTS.Application.Contracts.Setup.Models.ConfigureEventModel;
+using SetupConfigureEventModel = NTS.Contracts.Setup.Models.ConfigureEventModel;
 using SetupHorse = NTS.Domain.Setup.Aggregates.Horse;
-using SetupHorseModel = NTS.Application.Contracts.Setup.Models.HorseModel;
+using SetupHorseModel = NTS.Contracts.Setup.Models.HorseModel;
 
 namespace NTS.Tests.Integration.Drivers;
 

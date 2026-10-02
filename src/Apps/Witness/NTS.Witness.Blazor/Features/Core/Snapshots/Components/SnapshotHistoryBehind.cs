@@ -2,10 +2,10 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Components.Buttons;
 using Not.Notify;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Socket;
 using NTS.Domain.Enums;
 using NTS.Domain.Core.Objects.Snapshots;
-using NTS.Witness.Contracts.Features.Snapshots;
+using NTS.Contracts.Features.Snapshots;
 
 namespace NTS.Witness.Blazor.Features.Core.Snapshots.Components;
 

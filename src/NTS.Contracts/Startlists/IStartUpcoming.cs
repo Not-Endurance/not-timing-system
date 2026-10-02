@@ -1,0 +1,10 @@
+﻿using Not.Application.Behinds.Adapters;
+using NTS.Domain.Core.Objects.Startlists;
+
+namespace NTS.Contracts.Startlists;
+
+public interface IStartUpcoming : IStatefulService
+{
+    IReadOnlyList<Starter> Upcoming { get; }
+    void Tick();
+}

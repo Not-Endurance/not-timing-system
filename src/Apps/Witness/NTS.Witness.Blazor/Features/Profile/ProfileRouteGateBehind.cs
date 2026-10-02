@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components.Routing;
 using Not.Blazor.Components.Abstractions;
-using NTS.Witness.Contracts.Features.Profile;
+using NTS.Contracts.Features.Profile;
 
 namespace NTS.Witness.Blazor.Features.Profile;
 

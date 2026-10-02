@@ -1,4 +1,4 @@
-using NTS.Witness.Contracts.Features.Access;
+using NTS.Contracts.Features.Access;
 
 namespace NTS.Witness.Blazor.Features;
 

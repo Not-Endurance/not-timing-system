@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.PastEvents;
+using NTS.Contracts.Core.Models;
+using NTS.Contracts.PastEvents;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Judge.Contracts.Features.Core;
@@ -9,7 +9,7 @@ using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Features;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Infrastructure;
-using NTS.Witness.Contracts.Features.Access;
+using NTS.Contracts.Features.Access;
 using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
 using CoreCombination = NTS.Domain.Core.Aggregates.Participations.Entities.Combination;
 using CoreHorse = NTS.Domain.Core.Aggregates.Participations.Entities.Horse;

@@ -1,6 +1,6 @@
 using Not.Application.Authentication.Abstractions;
 using Not.Injection;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
 using NTS.Domain.Core.Objects.Snapshots;
 

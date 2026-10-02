@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.SignalR;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Watcher;
+using NTS.Contracts.Watcher.Models;
 using NTS.Nexus.Warp.Abstractions;
-using NTS.Nexus.Warp.Contracts;
-using NTS.Nexus.Warp.Contracts.Features.Judge.Procedures;
-using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
+using NTS.Contracts;
+using NTS.Contracts.Features.Judge.Procedures;
+using NTS.Contracts.Features.Witness.Procedures;
 using NTS.Nexus.Warp.Features.Judge;
 using NTS.Nexus.Warp.Features.Witness.Authorization;
 using NTS.Nexus.Warp.Features.Witness.PendingSnapshots;

@@ -6,7 +6,7 @@ using NTS.Nexus.HTTP.Functions.Base;
 using NTS.Nexus.HTTP.Logger;
 using NTS.Nexus.HTTP.Mongo.Repositories;
 using NTS.Nexus.HTTP.Telemetry;
-using NTS.Witness.Contracts.API;
+using NTS.Contracts.API;
 
 namespace NTS.Nexus.HTTP.Functions;
 

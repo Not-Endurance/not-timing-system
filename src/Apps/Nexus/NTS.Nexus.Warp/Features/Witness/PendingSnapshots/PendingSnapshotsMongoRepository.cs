@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Watcher;
+using NTS.Contracts.Watcher.Models;
 
 namespace NTS.Nexus.Warp.Features.Witness.PendingSnapshots;
 

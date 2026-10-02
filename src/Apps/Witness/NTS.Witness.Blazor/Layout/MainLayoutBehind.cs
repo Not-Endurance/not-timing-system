@@ -1,5 +1,5 @@
 using Not.Application.Environments;
-using NTS.Application.Contracts;
+using NTS.Contracts;
 using NTS.Localization;
 
 namespace NTS.Witness.Blazor.Layout;

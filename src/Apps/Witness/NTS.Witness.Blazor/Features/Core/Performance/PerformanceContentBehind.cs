@@ -1,9 +1,9 @@
 using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Witness.Blazor.Features.Socket;
-using NTS.Witness.Contracts.Features.Performance;
+using NTS.Contracts.Features.Performance;
 
 namespace NTS.Witness.Blazor.Features.Core.Performance;
 

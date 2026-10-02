@@ -1,11 +1,11 @@
 using MudBlazor;
 using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Components.Abstractions;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Socket;
 using NTS.Blazor.Components.SelectEvents;
 using NTS.Witness.Blazor.Features;
-using NTS.Witness.Contracts.Features.Access;
-using NTS.Witness.Contracts.Features.Profile;
+using NTS.Contracts.Features.Access;
+using NTS.Contracts.Features.Profile;
 
 namespace NTS.Witness.Blazor.Layout.Drawer;
 

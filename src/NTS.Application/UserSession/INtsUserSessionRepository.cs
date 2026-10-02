@@ -1,7 +1,7 @@
 using Not.Application.Authentication.Abstractions;
 using Not.Application.CRUD.Ports;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Watcher;
+using NTS.Contracts.Watcher.Models;
 
 namespace NTS.Application.UserSession;
 

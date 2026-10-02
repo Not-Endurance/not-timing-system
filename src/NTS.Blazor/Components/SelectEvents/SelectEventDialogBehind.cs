@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Dialogs.Abstractions;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
+using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Blazor.Components.SelectEvents;

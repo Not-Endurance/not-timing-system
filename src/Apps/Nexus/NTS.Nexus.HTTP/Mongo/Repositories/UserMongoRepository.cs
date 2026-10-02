@@ -3,7 +3,7 @@ using Not.Application.Authentication.User;
 using Not.Storage.Mongo;
 using NTS.Nexus.HTTP.Mongo.Models;
 using NTS.Nexus.HTTP.Telemetry;
-using NTS.Witness.Contracts.API;
+using NTS.Contracts.API;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 

@@ -3,7 +3,7 @@ using Not.Application.Authentication.User;
 using Not.Application.HTTP;
 using Not.Notify;
 using Not.Structures;
-using NTS.Witness.Contracts.API;
+using NTS.Contracts.API;
 using NTS.Witness.Features.Profile;
 
 namespace NTS.Witness.Storage.Repositories;

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
 using Not.Formatting;
-using NTS.Application.Contracts.Arrivelists;
+using NTS.Contracts.Arrivelists;
 using NTS.Domain.Objects;
 
 namespace NTS.Blazor.Components.Arrivelist;

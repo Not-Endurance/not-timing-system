@@ -6,7 +6,7 @@ using Not.Exceptions;
 using NTS.Domain.Objects;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
-using NTS.Witness.Contracts.Features.Snapshots;
+using NTS.Contracts.Features.Snapshots;
 
 namespace NTS.Witness.Blazor.Features.Core.Snapshots.Components;
 

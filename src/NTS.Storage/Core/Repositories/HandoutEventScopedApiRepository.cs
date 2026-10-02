@@ -1,7 +1,7 @@
 using Not.Application.HTTP;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Core;
+using NTS.Contracts.Core.Models;
+using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Storage.REST;
 

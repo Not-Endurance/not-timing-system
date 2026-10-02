@@ -1,5 +1,5 @@
 using Not.Application.RPC;
-using NTS.Application.Contracts;
+using NTS.Contracts;
 
 namespace NTS.Nexus.Warp.ConnectionDiagnostics;
 

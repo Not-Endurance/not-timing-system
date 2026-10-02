@@ -2,8 +2,8 @@ using MongoDB.Driver;
 using Not.Application.Authentication.Abstractions;
 using Not.Injection;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Watcher;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Watcher;
+using NTS.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
 using NTS.Nexus.HTTP.Telemetry;
 

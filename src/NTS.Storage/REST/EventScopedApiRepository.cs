@@ -5,8 +5,8 @@ using Not.Domain.Abstractions;
 using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Storage.REST;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Core;
+using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Storage.REST;

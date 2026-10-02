@@ -1,7 +1,7 @@
 using Not.Async.Extensions;
 using Not.Injection;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Core;
+using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Witness.Blazor.Features.Socket;

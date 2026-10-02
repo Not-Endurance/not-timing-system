@@ -1,6 +1,6 @@
 ﻿using Not.Application.Behinds.Adapters;
 using Not.Async.Extensions;
-using NTS.Application.Contracts.Core;
+using NTS.Contracts.Core;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 
