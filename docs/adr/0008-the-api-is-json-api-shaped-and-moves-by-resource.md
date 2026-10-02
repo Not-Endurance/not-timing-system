@@ -6,7 +6,7 @@ Every route of the Functions API returns a `Result<T>` envelope, turns a domain 
 
 ## What follows from it
 
-**Resources move one at a time.** The Functions project serves whatever has not moved. ADR-0003 still decides the host and the anonymous route group; ADR-0007 needs events, participations, handouts, rankings and snapshot results first.
+**Resources move one at a time.** The Functions project serves whatever has not moved. ADR-0003 still decides the host and the anonymous route group; ADR-0007 needs the events resource first, then participations, rankings and handouts.
 
 **The client gets a JSON:API variant.** `Not.Storage`'s `ApiRepository` grows a variant that a resource opts into. `Result<T>` disappears per resource as it moves, and the client's request handling reads the error `code` instead of swallowing the failure.
 

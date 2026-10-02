@@ -60,10 +60,10 @@ _Avoid_: Participant, entry, run
 > **"Participant" is not a term in this domain.** The competing pair is a **Combination**; its ride is a **Participation**. Anything named `Participant` is a misnomer to be corrected. `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
 
 **Ranking**:
-The Participations that compete for placement in one Competition and Category, each marked ranked or not ranked. It holds no placings; Results derive them.
+The Participations that compete for placement in one Competition and Category, each marked ranked or not ranked. While its Event is Live it holds no placings and Results derive them; once the Event is Historic it keeps its final placings.
 
 **Results**:
-The placings of a Ranking, derived from its Participations' latest times whenever they are needed. They are a produced document, not a record of their own.
+The placings of a Ranking. While the Event is Live they are derived from its Participations' latest times whenever they are needed, a produced document; for a Historic Event they are the Ranking's final placings, as they were printed.
 
 **Handout**:
 The printable sheet of one Combination's times, produced for it after each Phase. It is a live view of the Participation, not a snapshot: it prints the times as they stand then.
