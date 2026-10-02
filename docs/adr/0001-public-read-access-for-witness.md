@@ -31,3 +31,7 @@ Public read access is hard to walk back once links circulate. That is the main r
 ## Out of scope
 
 The Nexus HTTP API is untouched. Every Function is already `AuthorizationLevel.Anonymous`, destructive ones included; this change does not alter that exposure, but it does change the invitation. Hardening it is tracked separately.
+
+## Amendments
+
+ADR-0011 retires the Witness name and its app: the read surface decided here becomes the public-read allowlist of the one web app, enforced by the Api (ADR-0012), and `WitnessAccessLevel` gives way to the capabilities the Api returns. ADR-0012 also widens writes: any Operator, not only one with role Steward, may send a Snapshot. The anonymity of the Functions API that this ADR left out of scope ends when that API is retired (ADR-0011).
