@@ -42,15 +42,20 @@ The Nexus HTTP container image uses `/ms-playwright`; keep `PLAYWRIGHT_BROWSERS_
 
 - Boots MongoDB, real Nexus HTTP, and real Warp.
 - Seeds events, participations, officials, and users through the actual Nexus HTTP API.
-- Builds one real Judge application service provider and two real Witness application service providers.
-- Wires Judge and Witness to the same REST storage registration used by the apps.
-- Connects all three app instances to the same event through their real `INtsSocketService` implementations.
-- Drives Judge through `ISnapshotService.Record`, so phase completion is produced by the Judge domain/application layer.
-- Verifies both Witness application instances update their real participation state through `WitnessRpcClient` and domain-event handlers.
-- Verifies one Witness resolves official access while the other resolves participant/default access.
-- Reads the persisted participation and snapshot results back through the Nexus HTTP API.
+- Builds real Witness application service providers wired to the same REST storage registration the app uses.
+- Verifies Witness registration resolution, profile completion, and sign-in completing after startup against the Nexus HTTP API.
+
+## Parked scenarios
+
+The Judge app is gone (#598, ADR-0011), and with it the connected Judge that these scenarios were written around. They stay in the repository, unchanged and not compiled (`Compile Remove` in `NTS.Tests.Integration.csproj`), until the owner approves what each becomes (AGENTS.md rule 4, #642):
+
+- `IntegrationHarnessCheckTest.Parked.cs`: `Judge_snapshot_flow_updates_connected_witness_applications`, `Judge_handouts_follow_phase_completion_rules_and_snapshot_keeps_selection`, `Presentlist_updates_from_judge_events_on_every_connected_witness`
+- `JudgeDependencyInjectionTests.cs`
+- `FeiExportTests.cs` (the FEI export lived in the Judge app)
+- `EndToEndEventTests/` (the event replays and the compulsory-inspection setup test, driven through the Judge)
+- `Drivers/JudgeDriver.cs`
 
 ## Next Expansion
 
-- Add snapshot submission and pending-snapshot flush scenarios.
+- Rebuild the harness around the in-process Api (#642).
 - Add a thin Playwright smoke suite for browser-only behavior.
