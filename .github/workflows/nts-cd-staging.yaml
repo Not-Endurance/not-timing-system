@@ -8,18 +8,23 @@ on:
 
 env:
   CONFIGURATION: Release
-  DOTNET_CORE_VERSION: 8.0.x
-  APP_LOCATION: src/Apps/Witness/NTS.Witness.Web
-  API_LOCATION: src/Apps/Nexus/NTS.Nexus.HTTP
-  OUTPUT_LOCATION: wwwroot
-  SOURCE_PATH: src/Apps/Nexus/NTS.Nexus.Warp
-  ARTIFACT_PATH: NTS.Nexus.Warp/publish
+  # The hosts are .NET 10. .NET 10 bakes the Blazor environment into the Ui at build time and no longer reads the
+  # Blazor-Environment response header, so every build of the Ui names its environment.
+  DOTNET_HOST_VERSION: 10.0.x
+  WASM_ENVIRONMENT: Staging
+  API_PROJECT: src/NoTiming.Api/NoTiming.Api.csproj
+  API_ARTIFACT_PATH: NoTiming.Api/publish
   AZURE_RESOURCE: nts-nexus-warp-dev
+  UI_PROJECT: src/NoTiming.Ui/NoTiming.Ui.csproj
+  UI_ARTIFACT_PATH: NoTiming.Ui/publish
+  # The legacy Functions API still deploys with the static web app until it is retired (#647). Static Web Apps builds
+  # it from source; the Ui is built here and uploaded as it is.
+  FUNCTIONS_API_LOCATION: src/Apps/Nexus/NTS.Nexus.HTTP
 
 jobs:
-  deploy-message-bus:
+  deploy-api:
     runs-on: ubuntu-latest
-    name: Staging - MessageBus
+    name: Staging - Api
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -27,33 +32,28 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+        dotnet-version: ${{ env.DOTNET_HOST_VERSION }}
 
     - name: Restore
-      run: dotnet restore "${{ env.SOURCE_PATH }}"
-
-    - name: Build
-      run: |
-        dotnet build ${{ env.SOURCE_PATH }} \
-        --configuration ${{ env.CONFIGURATION }} \
-        --no-restore
+      run: dotnet restore "${{ env.API_PROJECT }}"
 
     - name: Publish
       run: |
-        dotnet publish ${{ env.SOURCE_PATH }} \
+        dotnet publish ${{ env.API_PROJECT }} \
         --configuration ${{ env.CONFIGURATION }} \
-        --no-build \
-        --output ${{ env.ARTIFACT_PATH }}
+        --no-restore \
+        -p:WasmApplicationEnvironmentName=${{ env.WASM_ENVIRONMENT }} \
+        --output ${{ env.API_ARTIFACT_PATH }}
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ env.AZURE_RESOURCE }}
         publish-profile: ${{ secrets.AZURE_NTS_NEXUS_WARP_DEV_PUBLISH_PROFILE }}
-        package: ${{ env.ARTIFACT_PATH }}
+        package: ${{ env.API_ARTIFACT_PATH }}
 
   deploy-client:
-    needs: deploy-message-bus
+    needs: deploy-api
     runs-on: ubuntu-latest
     name: Staging - Client
     steps:
@@ -65,22 +65,14 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+          dotnet-version: ${{ env.DOTNET_HOST_VERSION }}
 
-      - name: Configure Witness Environment
-        shell: pwsh
-        env:
-          WITNESS_ENVIRONMENT: Staging
+      - name: Publish Ui
         run: |
-          $configPath = Join-Path $env:GITHUB_WORKSPACE "${{ env.APP_LOCATION }}/wwwroot/staticwebapp.config.json"
-          $config = Get-Content -Raw -Path $configPath | ConvertFrom-Json
-
-          if ($null -eq $config.globalHeaders) {
-            $config | Add-Member -MemberType NoteProperty -Name globalHeaders -Value ([pscustomobject]@{})
-          }
-
-          $config.globalHeaders | Add-Member -MemberType NoteProperty -Name "Blazor-Environment" -Value $env:WITNESS_ENVIRONMENT -Force
-          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $configPath
+          dotnet publish ${{ env.UI_PROJECT }} \
+          --configuration ${{ env.CONFIGURATION }} \
+          -p:WasmApplicationEnvironmentName=${{ env.WASM_ENVIRONMENT }} \
+          --output ${{ env.UI_ARTIFACT_PATH }}
 
       - name: Build And Deploy
         id: builddeploy
@@ -90,6 +82,6 @@ jobs:
           production_branch: develop
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LIVELY_ROCK_07E20CD03 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
-          app_location: ${{ env.APP_LOCATION }}
-          api_location: ${{ env.API_LOCATION }}
-          output_location: ${{ env.OUTPUT_LOCATION }}
+          skip_app_build: true
+          app_location: ${{ env.UI_ARTIFACT_PATH }}/wwwroot
+          api_location: ${{ env.FUNCTIONS_API_LOCATION }}

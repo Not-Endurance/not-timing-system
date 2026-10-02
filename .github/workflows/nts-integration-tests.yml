@@ -1,10 +1,9 @@
-name: "[net8] Integration Tests"
+name: "Integration Tests"
 
 on:
   workflow_dispatch:
 
 env:
-  DOTNET_CORE_VERSION: 8.0.x
   CONFIGURATION: Release
   TEST_PROJECT_PATH: tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj
   DOTNET_CLI_HOME: ${{ github.workspace }}/.tmp/dotnet-home
@@ -18,10 +17,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      # .NET 10 builds and runs the tests and the Api. .NET 8 runs the legacy Functions worker, which stays on it until
+      # that API is retired (#647).
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
