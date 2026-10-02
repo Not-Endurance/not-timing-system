@@ -32,4 +32,4 @@ ADR-0002's "keyed by their int id" and the `rest-api` skill's "an integer in the
 
 ## Amendments
 
-ADR-0011 moves the shared libraries to .NET 10, so `Guid.CreateVersion7` is available to them; the choice of random Guids stands until index locality matters. Judge, Witness, the API and Warp no longer ship separately: the Api and the Ui do (ADR-0011).
+ADR-0011 moves the shared libraries to .NET 10 once the Functions API retires, so `Guid.CreateVersion7` becomes available to them then; the choice of random Guids stands until index locality matters. Judge, Witness, the API and Warp no longer ship separately: the Api and the Ui do (ADR-0011).
