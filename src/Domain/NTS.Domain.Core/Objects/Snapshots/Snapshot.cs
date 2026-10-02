@@ -4,7 +4,7 @@ using NTS.Domain.Enums;
 using NTS.Domain.Helpers;
 using NTS.Domain.Objects;
 
-namespace NTS.Domain.Watcher;
+namespace NTS.Domain.Core.Objects.Snapshots;
 
 public record Snapshot : IIdentifiable, INamed, INtsDisplayable
 {

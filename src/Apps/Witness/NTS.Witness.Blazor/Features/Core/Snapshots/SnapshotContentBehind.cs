@@ -4,7 +4,7 @@ using Not.Notify;
 using NTS.Application.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Domain.Watcher;
+using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Witness.Blazor.Features.Socket;
 using NTS.Witness.Contracts.Features.Access;
 using NTS.Witness.Contracts.Features.Snapshots;

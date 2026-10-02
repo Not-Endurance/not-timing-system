@@ -8,7 +8,7 @@ using NTS.Application.Contracts.Socket;
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Domain.Watcher;
+using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Nexus.Warp.Contracts;
 using NTS.Nexus.Warp.Contracts.Features.Witness.Procedures;
 using NTS.Witness.Features.Core.Dashboard;

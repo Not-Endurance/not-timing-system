@@ -1,6 +1,6 @@
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NTS.Domain.Core.Objects.Snapshots;
 
 namespace NTS.Application.Contracts.Watcher.Models;
 

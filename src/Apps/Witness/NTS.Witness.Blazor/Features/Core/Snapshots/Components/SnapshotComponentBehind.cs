@@ -4,7 +4,7 @@ using Not.Blazor.Dialogs;
 using Not.Blazor.Helpers;
 using Not.Exceptions;
 using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Witness.Blazor.Features.Core.Snapshots.SnapshotUpdate;
 using NTS.Witness.Contracts.Features.Snapshots;
 

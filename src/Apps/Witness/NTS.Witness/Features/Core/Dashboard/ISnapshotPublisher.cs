@@ -1,4 +1,4 @@
-using NTS.Domain.Watcher;
+using NTS.Domain.Core.Objects.Snapshots;
 
 namespace NTS.Witness.Features.Core.Dashboard;
 

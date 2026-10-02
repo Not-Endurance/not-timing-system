@@ -1,6 +1,6 @@
 using NTS.Application.Contracts.Watcher;
 using NTS.Application.Contracts.Watcher.Models;
-using NTS.Domain.Watcher;
+using NTS.Domain.Core.Objects.Snapshots;
 
 namespace NTS.Application.UserSession;
 

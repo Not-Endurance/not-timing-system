@@ -12,7 +12,7 @@ using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Witness.Contracts.Features.Snapshots;
 
 namespace NTS.Witness.Features.Core.Dashboard;

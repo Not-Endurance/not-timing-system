@@ -12,7 +12,7 @@ using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Core.Objects.Presentlists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
+using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
 using NTS.Judge.Contracts.Features.Core.Handouts;
 using NTS.Localization;
@@ -33,7 +33,7 @@ using SetupOperator = NTS.Domain.Setup.Aggregates.ConfigureEvents.Operator;
 using SetupParticipation = NTS.Domain.Setup.Aggregates.ConfigureEvents.Participation;
 using SetupPhase = NTS.Domain.Setup.Aggregates.ConfigureEvents.Phase;
 using SetupUser = NTS.Domain.Setup.Aggregates.User;
-using WitnessSnapshot = NTS.Domain.Watcher.Snapshot;
+using WitnessSnapshot = NTS.Domain.Core.Objects.Snapshots.Snapshot;
 using WitnessSnapshotService = NTS.Witness.Contracts.Features.Snapshots.ISnapshotService;
 
 namespace NTS.Tests.Integration;
