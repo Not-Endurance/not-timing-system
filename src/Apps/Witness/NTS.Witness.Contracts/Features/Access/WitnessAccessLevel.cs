@@ -3,6 +3,7 @@ namespace NTS.Witness.Contracts.Features.Access;
 public enum WitnessAccessLevel
 {
     Unknown = 0,
-    Participant = 1,
-    Official = 2,
+    Anonymous = 1,
+    Registered = 2,
+    Official = 3,
 }

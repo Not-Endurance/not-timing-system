@@ -1,5 +1,4 @@
 using Not.Application.Authentication.User;
-using Not.Blazor.Client.Authentication;
 using NTS.Witness.Contracts.Features.Profile;
 
 namespace NTS.Witness.Blazor.Features.Profile;
@@ -8,14 +7,16 @@ public static class WitnessProfileRoutePolicy
 {
     public static bool ShouldRedirectToProfile(NUserModel? user, string relativePath)
     {
-        return user != null && !WitnessProfilePolicy.IsComplete(user) && !IsProfileGateBypassRoute(relativePath);
+        return user != null && !WitnessProfilePolicy.IsComplete(user) && IsProfileGatedRoute(relativePath);
     }
 
-    public static bool IsProfileGateBypassRoute(string relativePath)
+    /// <summary>
+    /// Only Snapshotting is gated on a complete profile. Gating the read-only routes would leave a
+    /// signed-in user with less access than an anonymous visitor.
+    /// </summary>
+    public static bool IsProfileGatedRoute(string relativePath)
     {
-        var path = Normalize(relativePath);
-        return string.Equals(path, Routes.PROFILE_PAGE, StringComparison.OrdinalIgnoreCase)
-            || path.StartsWith($"/{AuthenticationContents.AUTHENTICATION}", StringComparison.OrdinalIgnoreCase);
+        return string.Equals(Normalize(relativePath), Routes.SNAPSHOT_PAGE, StringComparison.OrdinalIgnoreCase);
     }
 
     static string Normalize(string relativePath)

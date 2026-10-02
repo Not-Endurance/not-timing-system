@@ -30,6 +30,7 @@ public class NavMenuBehind : NStatefulComponent
     Func<Task>? CloseResponsiveDrawer { get; set; }
 
     protected bool ShowSnapshots => WitnessAccessPolicy.CanViewSnapshots(AccessState.AccessLevel);
+    protected bool ShowSignin => WitnessAccessPolicy.CanSignIn(AccessState.AccessLevel);
     protected bool ShowProfileHeader => ProfileContext.User != null;
     protected bool HasActiveEvent => SocketService.IsConnected && SocketService.Event != null;
     protected string ActiveEventTitle => SocketService.Event?.Name ?? Event_string;
@@ -42,13 +43,33 @@ public class NavMenuBehind : NStatefulComponent
         await Observe(SocketService);
     }
 
+    protected async Task Signin()
+    {
+        try
+        {
+            await CloseResponsiveDrawerSafe();
+            await Authentication.Signin();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    /// <summary>
+    /// Dropping the socket before signing out both closes the officiating connection while this
+    /// page is still alive and recomputes the access level, which keeps the drawer honest on the
+    /// paths where the logout resolves client-side instead of redirecting. Reconnecting is not
+    /// this component's job: a logout that does redirect reloads the app, and
+    /// <c>EventConnectionCoordinator</c> connects anonymously from there.
+    /// </summary>
     protected async Task Signout()
     {
         try
         {
-            await Authentication.Signout();
-            await SocketService.Disconnect();
             await CloseResponsiveDrawerSafe();
+            await SocketService.Disconnect();
+            await Authentication.Signout();
         }
         catch (Exception ex)
         {

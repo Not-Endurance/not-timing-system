@@ -10,5 +10,4 @@ public interface IWitnessClientProcedures
     Task OnPhaseCompleted(PhaseCompleted payload);
     Task OnParticipationEliminated(ParticipationEliminated payload);
     Task OnParticipationRestored(ParticipationRestored payload);
-    Task OnPresentationAcknoledged(VetInAcknoledged payload);
 }

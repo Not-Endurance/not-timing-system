@@ -1,15 +1,16 @@
+using Microsoft.AspNetCore.Components.Authorization;
 using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
-using Not.Application.Behinds.Adapters;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
 using NTS.Application.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
 using NTS.Witness.Contracts.Features.Profile;
+using NTS.Witness.Features.Sessions;
 
 namespace NTS.Witness.Features.Profile;
 
-public class WitnessProfileContext : NStatefulService, IWitnessProfileContext, IScoped
+public class WitnessProfileContext : WitnessAuthenticationAwareContext, IWitnessProfileContext, IScoped
 {
     readonly IRepository<Country> _countries;
     readonly IWitnessUserProfileRepository _profiles;
@@ -19,8 +20,10 @@ public class WitnessProfileContext : NStatefulService, IWitnessProfileContext, I
     public WitnessProfileContext(
         INUserSession userSession,
         IRepository<Country> countries,
-        IWitnessUserProfileRepository profiles
+        IWitnessUserProfileRepository profiles,
+        AuthenticationStateProvider authenticationStateProvider
     )
+        : base(authenticationStateProvider)
     {
         _userSession = userSession;
         _countries = countries;
