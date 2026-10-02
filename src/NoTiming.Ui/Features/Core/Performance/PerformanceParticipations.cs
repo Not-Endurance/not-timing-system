@@ -4,11 +4,11 @@ using Not.Collections;
 using Not.Injection;
 using Not.Observables.Structures;
 using NTS.Contracts.Core;
+using NTS.Contracts.Features.Performance;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Payloads;
-using NTS.Contracts.Features.Performance;
 
 namespace NoTiming.Ui.Features.Core.Performance;
 

@@ -1,9 +1,9 @@
 using Not.Blazor.Components.Abstractions;
+using NoTiming.Ui.Features.Socket;
 using NTS.Contracts.Core;
 using NTS.Contracts.Core.Models;
-using NTS.Domain.Core.Aggregates;
-using NoTiming.Ui.Features.Socket;
 using NTS.Contracts.Features.Performance;
+using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Features.Core.Performance;
 

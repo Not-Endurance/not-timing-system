@@ -9,6 +9,7 @@ using Not.Application.RPC.Clients;
 using Not.Krud.Abstractions;
 using Not.Notify;
 using Not.Startup;
+using NoTiming.Ui.Storage;
 using NTS.Contracts;
 using NTS.Contracts.Core;
 using NTS.Contracts.Socket;
@@ -16,7 +17,6 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
-using NoTiming.Ui.Storage;
 
 namespace NTS.Tests.Integration.Drivers;
 
@@ -31,12 +31,7 @@ internal sealed class JudgeDriver : IAsyncDisposable
 
     public JudgeDriver(Uri apiBaseUrl, Uri nexusBaseUrl)
     {
-        var configuration = CreateConfiguration(
-            apiBaseUrl,
-            nexusBaseUrl,
-            "judge-hub",
-            "IntegrationJudge"
-        );
+        var configuration = CreateConfiguration(apiBaseUrl, nexusBaseUrl, "judge-hub", "IntegrationJudge");
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));

@@ -2,10 +2,10 @@ using Not.Application.DomainEvents;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Injection;
+using NoTiming.Ui.Features.Core.Dashboard;
 using NTS.Contracts.Features.Witness.Procedures;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Snapshots;
-using NoTiming.Ui.Features.Core.Dashboard;
 
 namespace NoTiming.Ui.Features.Socket;
 

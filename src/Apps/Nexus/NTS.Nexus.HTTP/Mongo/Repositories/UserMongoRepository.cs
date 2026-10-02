@@ -1,9 +1,9 @@
 using MongoDB.Driver;
 using Not.Application.Authentication.User;
 using Not.Storage.Mongo;
+using NTS.Contracts.API;
 using NTS.Nexus.HTTP.Mongo.Models;
 using NTS.Nexus.HTTP.Telemetry;
-using NTS.Contracts.API;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 

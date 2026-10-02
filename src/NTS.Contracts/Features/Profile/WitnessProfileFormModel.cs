@@ -1,6 +1,6 @@
 using Not.Application.Authentication.User;
-using NTS.Domain.Aggregates;
 using NTS.Contracts.API;
+using NTS.Domain.Aggregates;
 
 namespace NTS.Contracts.Features.Profile;
 

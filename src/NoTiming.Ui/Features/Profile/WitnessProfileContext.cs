@@ -3,10 +3,10 @@ using Not.Application.Authentication.Abstractions;
 using Not.Application.Authentication.User;
 using Not.Application.CRUD.Ports;
 using Not.Injection;
+using NoTiming.Ui.Features.Sessions;
+using NTS.Contracts.Features.Profile;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
-using NTS.Contracts.Features.Profile;
-using NoTiming.Ui.Features.Sessions;
 
 namespace NoTiming.Ui.Features.Profile;
 

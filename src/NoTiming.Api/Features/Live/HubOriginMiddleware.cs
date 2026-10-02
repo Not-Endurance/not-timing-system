@@ -31,7 +31,11 @@ internal sealed class HubOriginMiddleware
         )
         {
             var origin = context.Request.Headers.Origin.ToString();
-            if (!string.IsNullOrWhiteSpace(origin) && !IsThisHost(origin, context.Request.Host) && !_originValidator.IsAllowed(origin))
+            if (
+                !string.IsNullOrWhiteSpace(origin)
+                && !IsThisHost(origin, context.Request.Host)
+                && !_originValidator.IsAllowed(origin)
+            )
             {
                 _logger.LogWarning(
                     "Live hub rejected WebSocket request for {Path} because origin {Origin} is not allowed. CorrelationId {CorrelationId}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",

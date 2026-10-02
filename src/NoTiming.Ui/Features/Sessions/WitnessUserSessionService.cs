@@ -1,7 +1,7 @@
 using Not.Application.Authentication.Abstractions;
 using Not.Injection;
-using NTS.Contracts.Watcher.Models;
 using NTS.Application.UserSession;
+using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Snapshots;
 
 namespace NoTiming.Ui.Features.Sessions;

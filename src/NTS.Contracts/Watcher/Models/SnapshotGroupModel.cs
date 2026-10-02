@@ -2,9 +2,9 @@ using Not.Application.Authentication.User;
 using Not.Krud.Abstractions;
 using NTS.Contracts.Shared;
 using NTS.Contracts.Shared.Models;
+using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Domain.Core.Objects.Snapshots;
 
 namespace NTS.Contracts.Watcher.Models;
 

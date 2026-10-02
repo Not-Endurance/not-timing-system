@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
-using NTS.Contracts.PastEvents;
 using NoTiming.Ui.Components.PastEvents;
+using NTS.Contracts.PastEvents;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
 

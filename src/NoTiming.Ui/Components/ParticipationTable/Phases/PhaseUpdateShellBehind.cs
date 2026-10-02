@@ -1,8 +1,8 @@
 using MudBlazor;
 using Not.Krud.Blazor.Components.Abstractions;
+using NoTiming.Ui.Constants;
 using NTS.Contracts.Core;
 using NTS.Contracts.Core.Models;
-using NoTiming.Ui.Constants;
 
 namespace NoTiming.Ui.Components.ParticipationTable.Phases;
 

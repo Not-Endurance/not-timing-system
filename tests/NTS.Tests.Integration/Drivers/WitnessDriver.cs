@@ -8,17 +8,17 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Application.RPC.SignalR;
 using Not.Startup;
+using NoTiming.Ui;
+using NoTiming.Ui.Features.Core.Dashboard;
+using NoTiming.Ui.Storage;
 using NTS.Contracts;
 using NTS.Contracts.Core;
+using NTS.Contracts.Features.Access;
 using NTS.Contracts.Socket;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Snapshots;
-using NoTiming.Ui.Storage;
 using NTS.Tests.Integration.Infrastructure;
-using NoTiming.Ui;
-using NTS.Contracts.Features.Access;
-using NoTiming.Ui.Features.Core.Dashboard;
 
 namespace NTS.Tests.Integration.Drivers;
 
@@ -35,12 +35,7 @@ internal sealed class WitnessDriver : IAsyncDisposable
     public WitnessDriver(Uri apiBaseUrl, Uri nexusBaseUrl, IntegrationUser? user, string clientName)
     {
         _clientName = clientName;
-        var configuration = CreateConfiguration(
-            apiBaseUrl,
-            nexusBaseUrl,
-            ApplicationConstants.LIVE_HUB,
-            clientName
-        );
+        var configuration = CreateConfiguration(apiBaseUrl, nexusBaseUrl, ApplicationConstants.LIVE_HUB, clientName);
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));

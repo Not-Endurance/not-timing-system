@@ -1,6 +1,6 @@
 using Not.Blazor.Components.Abstractions;
-using NTS.Domain.Aggregates;
 using NTS.Contracts.Features.Profile;
+using NTS.Domain.Aggregates;
 
 namespace NoTiming.Ui.Features.Profile;
 

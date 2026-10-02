@@ -5,11 +5,11 @@ using Not.Application.Authentication.Abstractions;
 using Not.Application.RPC.SignalR;
 using Not.Blazor.Client;
 using Not.Krud.ServiceRegistration;
-using NTS;
-using NTS.Application;
 using NoTiming.Ui.Features.Profile;
 using NoTiming.Ui.Features.Socket;
 using NoTiming.Ui.Storage.Repositories;
+using NTS;
+using NTS.Application;
 
 namespace NoTiming.Ui;
 

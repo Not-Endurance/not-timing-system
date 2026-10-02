@@ -1,11 +1,11 @@
 using MudBlazor;
 using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Components.Abstractions;
-using NTS.Contracts.Socket;
 using NoTiming.Ui.Components.SelectEvents;
 using NoTiming.Ui.Features;
 using NTS.Contracts.Features.Access;
 using NTS.Contracts.Features.Profile;
+using NTS.Contracts.Socket;
 
 namespace NoTiming.Ui.Layout.Drawer;
 

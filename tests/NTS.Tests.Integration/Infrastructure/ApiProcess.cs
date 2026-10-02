@@ -111,6 +111,8 @@ internal sealed class ApiProcess : IAsyncDisposable
             await Task.Delay(250, timeout.Token);
         }
 
-        throw new TimeoutException($"The Api did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}");
+        throw new TimeoutException(
+            $"The Api did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}"
+        );
     }
 }

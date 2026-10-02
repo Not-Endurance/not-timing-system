@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using NTS.Contracts.Core;
 using NTS.Application.Startlists;
+using NTS.Contracts.Core;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;

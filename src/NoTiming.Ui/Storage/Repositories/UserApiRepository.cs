@@ -3,8 +3,8 @@ using Not.Application.Authentication.User;
 using Not.Application.HTTP;
 using Not.Notify;
 using Not.Structures;
-using NTS.Contracts.API;
 using NoTiming.Ui.Features.Profile;
+using NTS.Contracts.API;
 
 namespace NoTiming.Ui.Storage.Repositories;
 

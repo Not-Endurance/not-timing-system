@@ -1,9 +1,9 @@
 using Not.Application.Behinds.Adapters;
 using Not.Observables.Structures;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Domain.Core.Objects.Snapshots;
 
 namespace NTS.Contracts.Features.Snapshots;
 
