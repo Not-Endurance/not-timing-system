@@ -10,7 +10,7 @@ Endpoints follow JSON:API 1.1 (jsonapi.org). Only the grammar of `filter` is bor
 ## Routes
 
 - A collection is a plural kebab-case noun: `/events`, `/snapshot-results`. An item is `/events/{id}`.
-- Event-scoped resources stay flat and carry `eventId` as an attribute: `/participations?filter=eventId eq 5`.
+- Event-scoped resources stay flat and carry `eventId` as an attribute: `/participations?filter=eventId eq 3f2504e0-4f89-41d3-9a0c-0305e82c3301`.
 - The method carries the meaning: POST creates (201, `Location`), GET reads, PATCH changes members (200 with the resource), DELETE removes (204).
 - A named collection is a GET-only view of one resource type that the glossary names: `/events/live`, `/events/historic`. It returns the same resource type, each item's `self` link points at the canonical item URL, and it takes the same query parameters. Every other narrowing uses `filter`.
 - Model an operation as a create, update or delete of a resource: starting an Event is `POST /events` naming the configure event, resetting one is `DELETE /events/{id}`. An operation whose effect differs from its method's default meaning shows its intent in the path, `POST /{collection}/{id}/actions/{verb}`, and is noted in this file.
@@ -18,7 +18,7 @@ Endpoints follow JSON:API 1.1 (jsonapi.org). Only the grammar of `filter` is bor
 ## Documents
 
 - Media type `application/vnd.api+json` on both `Content-Type` and `Accept`.
-- A resource object is `{ "type": "<collection>", "id": "<string>", "attributes": { ... } }`. The id is a string on the wire and an integer in the domain.
+- A resource object is `{ "type": "<collection>", "id": "<string>", "attributes": { ... } }`. The id is a string on the wire and a Guid in the domain (ADR-0009).
 - Members are camelCase. Foreign keys are plain attributes (`eventId`, `participationId`). `relationships` and `include` wait for a consumer that needs them.
 - Values the server computes (`isLive`) are read-only attributes; writes ignore them.
 
@@ -30,7 +30,7 @@ Endpoints follow JSON:API 1.1 (jsonapi.org). Only the grammar of `filter` is bor
 
 ## Query parameters
 
-- `filter` holds one OData `$filter` expression: `filter=eventId eq 5 and isNotRanked eq false`. The server maps it onto `ODataQueryOptions` and applies it to Mongo LINQ.
+- `filter` holds one OData `$filter` expression: `filter=eventId eq 3f2504e0-4f89-41d3-9a0c-0305e82c3301 and isNotRanked eq false`. A Guid is written unquoted, as the OData grammar has it. The server maps the expression onto `ODataQueryOptions` and applies it to Mongo LINQ.
 - `sort` lists members, `-` prefix for descending (`sort=-endDay`). It maps to `$orderby`.
 - `page[size]` and `page[number]` map to `$top` and `$skip`. A collection that can outgrow one screen takes them.
 - `fields[...]`, `include` and any other parameter answer 400 until a consumer needs them.

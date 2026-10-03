@@ -10,7 +10,7 @@ Every route of the Functions API returns a `Result<T>` envelope, turns a domain 
 
 **The client gets a JSON:API variant.** `Not.Storage`'s `ApiRepository` grows a variant that a resource opts into. `Result<T>` disappears per resource as it moves, and the client's request handling reads the error `code` instead of swallowing the failure.
 
-**One grammar for filtering.** `filter=eventId eq 5` is parsed by `Microsoft.AspNetCore.OData` and applied to Mongo LINQ, as `$filter` is today. The client's `ODataApiFilterAdapter` stays; it silently fetches everything when it meets an expression it cannot translate and has no tests, so each resource that depends on it gets tests first.
+**One grammar for filtering.** `filter=eventId eq 3f2504e0-4f89-41d3-9a0c-0305e82c3301` (a Guid literal, unquoted) is parsed by `Microsoft.AspNetCore.OData` and applied to Mongo LINQ, as `$filter` is today. The client's `ODataApiFilterAdapter` stays; it silently fetches everything when it meets an expression it cannot translate and has no tests, so each resource that depends on it gets tests first.
 
 **Domain errors become statuses.** A rule violation is 422, a conflict with the current state (`event-ended`) is 409, a malformed request or filter is 400, a missing item is 404, each with an error `code`.
 
