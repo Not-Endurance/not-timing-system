@@ -24,7 +24,7 @@ Endpoints follow JSON:API 1.1 (jsonapi.org). Only the grammar of `filter` is bor
 
 ## Status and errors
 
-- 200 read or update. 201 create. 204 delete. 400 malformed request, filter or parameter. 401 not signed in. 403 not allowed. 404 missing item. 409 conflict with current state. 422 domain rule violated. 500 unexpected. An empty collection is 200 with `"data": []`.
+- 200 read or update. 201 create. 202 taken, and the outcome is not told. 204 delete. 400 malformed request, filter or parameter. 401 not signed in. 403 not allowed. 404 missing item. 409 conflict with current state. 422 domain rule violated. 500 unexpected. An empty collection is 200 with `"data": []`.
 - Every error is `{ "status", "code", "title", "detail"? }` in `errors`. `code` is a stable kebab-case identifier (`event-ended`) that clients branch on. `title` and `detail` are for people and change with the wording.
 - The status always reports the outcome.
 
@@ -39,7 +39,17 @@ Endpoints follow JSON:API 1.1 (jsonapi.org). Only the grammar of `filter` is bor
 
 - Every route requires a signed-in caller unless it is on the public-read allowlist (ADR-0012): one list in the Api, enumerated by a test, read-only, and never a write. An unauthenticated caller gets 401; a signed-in caller who may not do it gets 403 with a code such as `not-main-operator`.
 - Repositories filter by the current Tenant by default. A cross-tenant read is a named view of its collection, never a parameter a caller can send to any resource.
-- There are no anonymous route groups.
+- There are no anonymous route groups. The sign-in routes below are the only writes that are anonymous: a person signs in to become a caller.
+- A write sends `Content-Type: application/vnd.api+json`, and nothing else is read (415 `unsupported-media-type`). A browser may not send that type to another origin without a preflight, which the CORS policy refuses, so another site cannot write with a visitor's cookie. A body that is not one resource of the expected type is 400 `malformed-request`.
+
+## Authentication
+
+A person signs in with a code sent by email, and the session is a cookie the server sets (ADR-0002). The cookie is `__Host-NoTiming`: host-only, HttpOnly, Secure, SameSite=Lax, persistent, 30 days sliding, and it carries only the key of a ticket the server keeps. The pages that use these routes are `/sign-in` and its assets, served by the Api; the Ui links to them.
+
+- `POST /api/code-challenges` with `{ "email" }` asks for a code. It answers 202 with no body whether or not the address has an account, and inside the resend cooldown of the previous code, so the answer tells nothing; a malformed address is 400 `invalid-email`.
+- `POST /api/sessions` with `{ "email", "code" }` signs in: 201, the `sessions` resource `current`, and the cookie. A wrong, spent, expired or exhausted code is 401 `invalid-code`, whatever the reason.
+- `DELETE /api/sessions/current` signs out: 204, the ticket is deleted and the cookie cleared. Without a session it is 204 as well.
+- `GET /api/me` is the `accounts` resource of the caller (`email`, `emailConfirmed`, `name`), or 401 `not-signed-in`. A route that needs a caller answers 401 with that code, never a redirect.
 
 ## Concurrency
 
