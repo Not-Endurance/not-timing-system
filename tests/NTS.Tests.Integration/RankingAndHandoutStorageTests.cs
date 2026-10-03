@@ -1,6 +1,4 @@
-using System.Text;
 using MongoDB.Bson;
-using MongoDB.Driver;
 using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Serialization.JSON;
@@ -24,10 +22,12 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
     static readonly string[] ENTRY_FIELDS = ["ParticipationId", "IsNotRanked", "Rank"];
 
     readonly NtsIntegrationFixture _fixture;
+    readonly StoredDocuments _stored;
 
     public RankingAndHandoutStorageTests(NtsIntegrationFixture fixture)
     {
         _fixture = fixture;
+        _stored = new StoredDocuments(fixture.MongoConnectionString);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
         );
         await nexus.Create(ranking);
 
-        var stored = await ReadStored(MongoConstants.RANKINGS_COLLECTION, rankingId);
+        var stored = await _stored.Read(MongoConstants.RANKINGS_COLLECTION, rankingId);
 
         Assert.Equal("CEI 1*", stored["Name"].AsString);
         Assert.Equal("FEI", stored["Ruleset"].AsString);
@@ -56,10 +56,10 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
         var entries = stored["Entries"].AsBsonArray;
         Assert.Equal(2, entries.Count);
         Assert.All(entries, entry => Assert.Empty(entry.AsBsonDocument.Names.Except(ENTRY_FIELDS)));
-        AssertStandardUuid(entries[0]["ParticipationId"], first.Id);
+        StoredDocuments.AssertStandardUuid(entries[0]["ParticipationId"], first.Id);
         Assert.False(entries[0].AsBsonDocument.GetValue("IsNotRanked", false).AsBoolean);
         Assert.Equal(1, entries[0]["Rank"].AsInt32);
-        AssertStandardUuid(entries[1]["ParticipationId"], second.Id);
+        StoredDocuments.AssertStandardUuid(entries[1]["ParticipationId"], second.Id);
         Assert.True(entries[1]["IsNotRanked"].AsBoolean);
         Assert.True(entries[1].AsBsonDocument.GetValue("Rank", BsonNull.Value).IsBsonNull);
 
@@ -77,11 +77,11 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
         await Seed(nexus, eventId, participation);
         await nexus.Create(IntegrationPayloadFactory.Handout(participation, handoutId));
 
-        var stored = await ReadStored(MongoConstants.HANDOUTS_COLLECTION, handoutId);
+        var stored = await _stored.Read(MongoConstants.HANDOUTS_COLLECTION, handoutId);
 
-        AssertStandardUuid(stored["_id"], handoutId);
-        AssertStandardUuid(stored["EventId"], eventId);
-        AssertStandardUuid(stored["ParticipationId"], participation.Id);
+        StoredDocuments.AssertStandardUuid(stored["_id"], handoutId);
+        StoredDocuments.AssertStandardUuid(stored["EventId"], eventId);
+        StoredDocuments.AssertStandardUuid(stored["ParticipationId"], participation.Id);
         Assert.DoesNotContain("Participation", stored.Names);
         var readBack = Assert.Single(await nexus.ReadHandouts(eventId));
         Assert.Equal(handoutId, readBack.Id);
@@ -136,13 +136,18 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
                 new RankingEntry(second.Id, false)
             )
         );
-        var before = await ReadStored(MongoConstants.RANKINGS_COLLECTION, rankingId);
+        var before = await _stored.Read(MongoConstants.RANKINGS_COLLECTION, rankingId);
 
         first.Withdraw();
-        await Send(HttpMethod.Patch, "api/participations", ParticipationModel.MapFrom(first));
+        await NexusRequests.Send(
+            _fixture.NexusBaseUrl,
+            HttpMethod.Patch,
+            "api/participations",
+            ParticipationModel.MapFrom(first)
+        );
 
         Assert.True((await nexus.ReadParticipation(eventId, first.Id)).IsEliminated()); // the change was written
-        Assert.Equal(before, await ReadStored(MongoConstants.RANKINGS_COLLECTION, rankingId)); // and the Ranking was not
+        Assert.Equal(before, await _stored.Read(MongoConstants.RANKINGS_COLLECTION, rankingId)); // and the Ranking was not
     }
 
     [Fact]
@@ -166,13 +171,13 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
 
         await nexus.Update(CreateRanking(eventId, rankingId, "Custom, edited", new RankingEntry(first.Id, true)));
 
-        var edited = await ReadStored(MongoConstants.RANKINGS_COLLECTION, rankingId);
+        var edited = await _stored.Read(MongoConstants.RANKINGS_COLLECTION, rankingId);
         Assert.Equal("Custom, edited", edited["Name"].AsString);
         var entry = Assert.Single(edited["Entries"].AsBsonArray);
-        AssertStandardUuid(entry["ParticipationId"], first.Id);
+        StoredDocuments.AssertStandardUuid(entry["ParticipationId"], first.Id);
         Assert.True(entry["IsNotRanked"].AsBoolean);
 
-        await Send(HttpMethod.Delete, $"api/rankings/{rankingId}");
+        await NexusRequests.Send(_fixture.NexusBaseUrl, HttpMethod.Delete, $"api/rankings/{rankingId}");
 
         Assert.Empty(await nexus.ReadRankings(eventId));
     }
@@ -200,40 +205,6 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
             entries,
             eventId,
             id
-        );
-    }
-
-    static void AssertStandardUuid(BsonValue value, Guid expected)
-    {
-        Assert.Equal(BsonType.Binary, value.BsonType);
-        Assert.Equal(BsonBinarySubType.UuidStandard, value.AsBsonBinaryData.SubType);
-        Assert.Equal(expected, value.AsBsonBinaryData.ToGuid(GuidRepresentation.Standard));
-    }
-
-    async Task<BsonDocument> ReadStored(string collection, Guid id)
-    {
-        var documents = new MongoClient(_fixture.MongoConnectionString)
-            .GetDatabase(MongoConstants.NTS_DATABASE)
-            .GetCollection<BsonDocument>(collection);
-        return await documents
-            .Find(new BsonDocument("_id", new BsonBinaryData(id, GuidRepresentation.Standard)))
-            .SingleAsync();
-    }
-
-    async Task Send(HttpMethod method, string endpoint, object? payload = null)
-    {
-        using var client = new HttpClient { BaseAddress = _fixture.NexusBaseUrl };
-        using var request = new HttpRequestMessage(method, endpoint);
-        if (payload != null)
-        {
-            request.Content = new StringContent(payload.ToJson(), Encoding.UTF8, "application/json");
-        }
-
-        using var response = await client.SendAsync(request);
-        var content = await response.Content.ReadAsStringAsync();
-        Assert.True(
-            response.IsSuccessStatusCode,
-            $"{method} {endpoint} answered {(int)response.StatusCode}: {content}"
         );
     }
 

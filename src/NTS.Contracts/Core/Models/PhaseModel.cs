@@ -24,15 +24,6 @@ public class PhaseModel
             IsRequiredInspectionRequested = phase.IsRequiredInspectionRequested || phase.IsRequiredInspectionCompulsory, // TODO: probably remove compulsory altogether
             IsRequiredInspectionCompulsory = phase.IsRequiredInspectionCompulsory,
             CompulsoryThresholdInterval = phase.CompulsoryThresholdSpan,
-            RequiredInspectionTime = phase.GetRequiredInspectionTime(),
-            OutTime = phase.GetOutTime(),
-            LoopInterval = phase.GetLoopInterval(),
-            PhaseInterval = phase.GetPhaseInterval(),
-            RecoveryInterval = phase.GetRecoveryInterval(),
-            AverageLoopSpeed = phase.GetAverageLoopSpeed(),
-            AveragePhaseSpeed = phase.GetAveragePhaseSpeed(),
-            AverageSpeed = phase.GetAverageSpeed(),
-            IsComplete = phase.IsComplete(),
         };
     }
 
@@ -50,16 +41,7 @@ public class PhaseModel
     public bool IsReinspectionRequested { get; init; }
     public bool IsRequiredInspectionRequested { get; init; }
     public bool IsRequiredInspectionCompulsory { get; init; }
-    public DateTimeOffset? RequiredInspectionTime { get; init; }
-    public DateTimeOffset? OutTime { get; init; }
-    public TimeSpan? LoopInterval { get; init; }
-    public TimeSpan? PhaseInterval { get; init; }
-    public TimeSpan? RecoveryInterval { get; init; }
     public TimeSpan? CompulsoryThresholdInterval { get; init; }
-    public double? AverageLoopSpeed { get; init; }
-    public double? AveragePhaseSpeed { get; init; }
-    public double? AverageSpeed { get; init; }
-    public bool IsComplete { get; init; }
 
     public Phase MapToEntity()
     {

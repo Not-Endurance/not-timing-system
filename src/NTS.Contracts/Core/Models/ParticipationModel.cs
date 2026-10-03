@@ -9,8 +9,6 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
-        var total = participation.GetTotal();
-
         return new ParticipationModel
         {
             Id = participation.Id,
@@ -19,7 +17,6 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
             Competition = CompetitionModel.MapFrom(participation.Competition),
             Combination = CombinationModel.MapFrom(participation.Combination),
             Phases = participation.Phases.Select(PhaseModel.MapFrom).ToArray(),
-            Total = total == null ? null : TotalModel.Create(total),
             Eliminated = participation.Eliminated == null ? null : EliminatedModel.MapFrom(participation.Eliminated),
         };
     }
@@ -31,7 +28,6 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
     public CompetitionModel Competition { get; set; } = default!;
     public CombinationModel Combination { get; set; } = default!;
     public PhaseModel[] Phases { get; set; } = default!;
-    public TotalModel? Total { get; set; }
     public EliminatedModel? Eliminated { get; set; }
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
@@ -47,15 +43,12 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
 
     void IKrudModel<Participation>.MapFrom(Participation participation)
     {
-        var total = participation.GetTotal();
-
         Id = participation.Id;
         EventId = participation.EventId;
         Category = participation.Category;
         Competition = CompetitionModel.MapFrom(participation.Competition);
         Combination = CombinationModel.MapFrom(participation.Combination);
         Phases = participation.Phases.Select(PhaseModel.MapFrom).ToArray();
-        Total = total == null ? null : TotalModel.Create(total);
         Eliminated = participation.Eliminated == null ? null : EliminatedModel.MapFrom(participation.Eliminated);
     }
 }
