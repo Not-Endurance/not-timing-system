@@ -27,8 +27,20 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
         _mongo = new MongoDbBuilder().WithImage("mongo:6.0").Build();
         await _mongo.StartAsync();
 
-        _nexusHttp = new NexusHttpProcess(paths, PortAllocator.GetFreeTcpPort(), _mongo.GetConnectionString());
-        await _nexusHttp.Start();
+        _nexusHttp = await PortAllocator.StartOnAFreePort(async port =>
+        {
+            var host = new NexusHttpProcess(paths, port, _mongo.GetConnectionString());
+            try
+            {
+                await host.Start();
+                return host;
+            }
+            catch
+            {
+                await host.DisposeAsync();
+                throw;
+            }
+        });
 
         _api = new ApiFactory(_mongo.GetConnectionString(), kestrel: true);
         _ = _api.BaseAddress; // starts the host
