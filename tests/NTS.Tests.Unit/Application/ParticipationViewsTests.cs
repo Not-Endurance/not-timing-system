@@ -3,7 +3,6 @@ using NoTiming.Ui.Features.Core.Participations;
 using NTS.Application.Arrivelists;
 using NTS.Application.Presentlists;
 using NTS.Application.Startlists;
-using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Tests.Unit.Application;
 
@@ -32,7 +31,7 @@ public sealed class ParticipationViewsTests
 
         var arrived = ParticipationFixtures.Arrived(1);
         repository.Store(arrived);
-        await store.Handle(new ParticipationArrived(arrived), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(arrived), CancellationToken.None);
 
         Assert.Equal([TestId.Of(1)], repository.Reads); // one read by id for the four views
         Assert.Empty(arrivelist.Entries);

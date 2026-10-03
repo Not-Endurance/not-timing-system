@@ -12,6 +12,10 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
     NexusHttpProcess? _nexusHttp;
     ApiFactory? _api;
 
+    /// <summary>The services of the Api, for a test that stands in for what the Api does after a write.</summary>
+    internal IServiceProvider ApiServices =>
+        _api?.Services ?? throw new InvalidOperationException("The Api is not started.");
+
     public string MongoConnectionString =>
         _mongo?.GetConnectionString() ?? throw new InvalidOperationException("MongoDB is not started.");
     public Uri NexusBaseUrl => _nexusHttp?.BaseUrl ?? throw new InvalidOperationException("Nexus HTTP is not started.");

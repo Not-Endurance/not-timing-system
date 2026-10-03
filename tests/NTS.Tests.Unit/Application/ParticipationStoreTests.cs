@@ -1,8 +1,6 @@
-using MediatR;
 using NoTiming.Ui.Features.Core.Participations;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Tests.Unit.Application;
 
@@ -12,36 +10,34 @@ namespace NTS.Tests.Unit.Application;
 /// </summary>
 public sealed class ParticipationStoreTests
 {
-    /// <summary>The six events that name a Participation. One <c>ParticipationChanged</c> replaces them in #623.</summary>
-    public static TheoryData<Type> ParticipationEvents =>
-        new()
-        {
-            typeof(ParticipationArrived),
-            typeof(PhaseCompleted),
-            typeof(InspectionRequired),
-            typeof(RepresentationRequired),
-            typeof(ParticipationEliminated),
-            typeof(ParticipationRestored),
-        };
-
-    [Theory]
-    [MemberData(nameof(ParticipationEvents))]
-    public async Task An_event_replaces_the_Participation_it_names_with_the_one_the_repository_holds(Type eventType)
+    [Fact]
+    public async Task A_change_notification_replaces_the_Participation_it_names_with_the_one_the_repository_holds()
     {
         var named = ParticipationFixtures.Active(7);
         var other = ParticipationFixtures.Active(8);
         var repository = new ControlledParticipationRepository(named, other);
-        var store = new ParticipationStore(repository);
+        var store = new ParticipationStore(repository, new FakeSocketContext());
         await store.Load();
         var holdsNow = ParticipationFixtures.Completed(7);
         repository.Store(holdsNow);
-        var carriedByTheEvent = ParticipationFixtures.Eliminated(7);
 
-        await Publish(store, eventType, carriedByTheEvent);
+        await store.Handle(new ParticipationChanged(FakeSocketContext.EVENT_ID, TestId.Of(7)), CancellationToken.None);
 
-        Assert.Same(holdsNow, store.Find(TestId.Of(7))); // what the event carried is not used
+        Assert.Same(holdsNow, store.Find(TestId.Of(7)));
         Assert.Same(other, store.Find(TestId.Of(8)));
         Assert.Equal([TestId.Of(7)], repository.Reads); // one read by id, of the Participation it names
+    }
+
+    [Fact]
+    public async Task A_change_notification_for_another_Event_is_ignored()
+    {
+        var repository = new ControlledParticipationRepository(ParticipationFixtures.Active(7));
+        var store = new ParticipationStore(repository, new FakeSocketContext());
+        await store.Load();
+
+        await store.Handle(new ParticipationChanged(TestId.Of(999), TestId.Of(7)), CancellationToken.None); // not this Event
+
+        Assert.Empty(repository.Reads);
     }
 
     [Fact]
@@ -54,7 +50,7 @@ public sealed class ParticipationStoreTests
         var added = ParticipationFixtures.Active(2);
         repository.Store(added);
 
-        await Publish(store, typeof(ParticipationArrived), added);
+        await Publish(store, added);
 
         Assert.Equal([known, added], store.Participations);
     }
@@ -68,9 +64,9 @@ public sealed class ParticipationStoreTests
         await store.Load();
         repository.Hold = true;
 
-        var first = Publish(store, typeof(PhaseCompleted), ParticipationFixtures.Active(1));
-        var second = Publish(store, typeof(ParticipationArrived), ParticipationFixtures.Active(1));
-        var third = Publish(store, typeof(InspectionRequired), ParticipationFixtures.Active(1));
+        var first = Publish(store, ParticipationFixtures.Active(1));
+        var second = Publish(store, ParticipationFixtures.Active(1));
+        var third = Publish(store, ParticipationFixtures.Active(1));
 
         Assert.Equal(1, repository.InFlight(id)); // one read, however many events came during it
         Assert.Single(repository.Reads);
@@ -105,8 +101,8 @@ public sealed class ParticipationStoreTests
         await store.Load();
         repository.Hold = true;
 
-        var first = Publish(store, typeof(PhaseCompleted), ParticipationFixtures.Active(1));
-        var second = Publish(store, typeof(PhaseCompleted), ParticipationFixtures.Active(2));
+        var first = Publish(store, ParticipationFixtures.Active(1));
+        var second = Publish(store, ParticipationFixtures.Active(2));
 
         Assert.Equal(1, repository.InFlight(one));
         Assert.Equal(1, repository.InFlight(two)); // started at once, while the first is still being read
@@ -151,7 +147,7 @@ public sealed class ParticipationStoreTests
         var store = new ParticipationStore(repository);
         await store.Load();
         repository.Hold = true;
-        var refreshing = Publish(store, typeof(PhaseCompleted), ParticipationFixtures.Active(1));
+        var refreshing = Publish(store, ParticipationFixtures.Active(1));
 
         await store.Handle(new EventDisconnected(TestId.Of(100)), CancellationToken.None);
         await repository.Release(TestId.Of(1));
@@ -188,7 +184,7 @@ public sealed class ParticipationStoreTests
         var late = ParticipationFixtures.Active(2);
         repository.Store(late);
 
-        await Publish(store, typeof(ParticipationArrived), late); // a message that was already on its way
+        await Publish(store, late); // a message that was already on its way
 
         Assert.Empty(store.Participations);
         Assert.Empty(repository.Reads);
@@ -211,7 +207,7 @@ public sealed class ParticipationStoreTests
                 repository.Store(participation);
             }
 
-            await Task.WhenAll(newer.Select(x => Task.Run(() => Publish(store, typeof(PhaseCompleted), x))));
+            await Task.WhenAll(newer.Select(x => Task.Run(() => Publish(store, x))));
 
             Assert.All(newer, x => Assert.Same(x, store.Find(x.Id))); // none of the updates was overwritten
         }
@@ -229,7 +225,7 @@ public sealed class ParticipationStoreTests
         await Until(() => repository.ReadManyCalls == 1); // the load has asked, and will answer with the older one
         var newer = ParticipationFixtures.Completed(1);
         repository.Store(newer);
-        var refreshing = Publish(store, typeof(PhaseCompleted), older);
+        var refreshing = Publish(store, older);
 
         await repository.Release(id);
         await refreshing;
@@ -254,8 +250,8 @@ public sealed class ParticipationStoreTests
         repository.Store(eliminated);
         repository.Store(completed);
 
-        await Publish(store, typeof(ParticipationEliminated), eliminated);
-        await Publish(store, typeof(PhaseCompleted), completed);
+        await Publish(store, eliminated);
+        await Publish(store, completed);
 
         Assert.Equal([eliminated, completed], store.Participations);
     }
@@ -270,7 +266,7 @@ public sealed class ParticipationStoreTests
         await store.Load();
         repository.Remove(gone.Id);
 
-        await Publish(store, typeof(ParticipationEliminated), gone);
+        await Publish(store, gone);
 
         Assert.Equal([kept], store.Participations);
     }
@@ -284,13 +280,11 @@ public sealed class ParticipationStoreTests
         await store.Load();
         repository.Fail = true;
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => Publish(store, typeof(PhaseCompleted), ParticipationFixtures.Active(1))
-        );
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Publish(store, ParticipationFixtures.Active(1)));
         repository.Fail = false;
         var holdsNow = ParticipationFixtures.Completed(1);
         repository.Store(holdsNow);
-        await Publish(store, typeof(PhaseCompleted), ParticipationFixtures.Active(1));
+        await Publish(store, ParticipationFixtures.Active(1));
 
         Assert.Same(holdsNow, store.Find(id)); // the failed read did not leave the Participation stuck
         Assert.Equal(2, repository.Reads.Count);
@@ -306,7 +300,7 @@ public sealed class ParticipationStoreTests
         store.ObservableEvent.Subscribe(() => changes++);
         repository.Store(ParticipationFixtures.Completed(1));
 
-        await Publish(store, typeof(PhaseCompleted), ParticipationFixtures.Active(1));
+        await Publish(store, ParticipationFixtures.Active(1));
 
         Assert.Equal(1, changes);
     }
@@ -337,13 +331,9 @@ public sealed class ParticipationStoreTests
         }
     }
 
-    /// <summary>Delivers an event of this type, carrying this Participation, as the hub client does.</summary>
-    static Task Publish(ParticipationStore store, Type eventType, Participation carried)
+    /// <summary>Delivers the change notification of this Participation, as the hub client does.</summary>
+    static Task Publish(ParticipationStore store, Participation changed)
     {
-        var notification = Activator.CreateInstance(eventType, carried)!;
-        var handle = typeof(INotificationHandler<>)
-            .MakeGenericType(eventType)
-            .GetMethod(nameof(INotificationHandler<INotification>.Handle))!;
-        return (Task)handle.Invoke(store, [notification, CancellationToken.None])!;
+        return store.Handle(ParticipationFixtures.Changed(changed), CancellationToken.None);
     }
 }

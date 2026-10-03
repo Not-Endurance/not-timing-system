@@ -4,7 +4,6 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
@@ -23,13 +22,13 @@ public sealed class StartlistServiceTests
         var eliminated = CreateParticipationWithHistoryAndFutureStart(301, new Withdrawn());
         repository.Store(eliminated);
 
-        await store.Handle(new ParticipationEliminated(active), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(active), CancellationToken.None);
 
         Assert.DoesNotContain(service.Upcoming, x => x.Number == 301);
         Assert.Contains(service.History, x => x.Number == 301);
 
         repository.Store(CreateParticipationWithHistoryAndFutureStart(301));
-        await store.Handle(new ParticipationRestored(eliminated), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(eliminated), CancellationToken.None);
 
         Assert.Contains(service.Upcoming, x => x.Number == 301);
         Assert.Contains(service.History, x => x.Number == 301);

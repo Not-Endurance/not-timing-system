@@ -65,7 +65,6 @@ public class Participation : Aggregate, IEventScoped
     //TODO rename to smthing better (including ISnapshotProcessor, IManualProcessor and other mentions..)
     public SnapshotResult Process(Snapshot snapshot)
     {
-        var hasArriveTime = Phases.Current.ArriveTime != null;
         var result = Phases.Process(snapshot, EventId);
         if (result.Type == SnapshotResultType.ActivePhaseComplete)
         {
@@ -74,12 +73,11 @@ public class Participation : Aggregate, IEventScoped
                 return SnapshotResult.NotApplied(EventId, snapshot, NotAppliedDueToParticipationComplete);
             }
 
-            hasArriveTime = false;
             result = Phases.Process(snapshot, EventId);
         }
         if (Eliminated == null && result.Type == Applied)
         {
-            EvaluatePhase(Phases.Current, hasArriveTime);
+            EvaluatePhase(Phases.Current);
         }
         return result;
     }
@@ -89,21 +87,15 @@ public class Participation : Aggregate, IEventScoped
         var phase = Phases.FirstOrDefault(x => x.Id == state.Id);
         GuardHelper.ThrowIfDefault(phase);
 
-        var hasArriveTime = phase.ArriveTime != null;
         phase.Update(state);
-        EvaluatePhase(phase, hasArriveTime);
+        EvaluatePhase(phase);
     }
 
     public void ToggleRepresentation(bool isRequested)
     {
         if (isRequested)
         {
-            var wasRequested = Phases.Current.IsReinspectionRequested;
             Phases.Current.RequireRepresentation();
-            if (!wasRequested && Phases.Current.IsReinspectionRequested)
-            {
-                RequireRepresentation();
-            }
         }
         else
         {
@@ -115,12 +107,7 @@ public class Participation : Aggregate, IEventScoped
     {
         if (isRequested)
         {
-            var wasRequested = Phases.Current.IsRequiredInspectionRequested;
             Phases.Current.RequestInspection();
-            if (!wasRequested && Phases.Current.IsRequiredInspectionRequested)
-            {
-                RequireInspection();
-            }
         }
         else
         {
@@ -157,30 +144,18 @@ public class Participation : Aggregate, IEventScoped
     public void Restore()
     {
         Eliminated = null;
-        var qualificationRestored = new ParticipationRestored(this);
-        Raise(qualificationRestored);
-
         if (!Phases.Current.IsComplete())
         {
             return;
         }
 
+        var completed = Phases.Current;
         Phases.StartIfNext();
-        var phaseCompleted = new PhaseCompleted(this);
-        Raise(phaseCompleted);
+        Raise(Completed(completed));
     }
 
-    void EvaluatePhase(Phase phase, bool hadArriveTimeBeforeProcess)
+    void EvaluatePhase(Phase phase)
     {
-        if (
-            ReferenceEquals(phase, Phases.Current)
-            && !hadArriveTimeBeforeProcess
-            && phase.ArriveTime != null
-            && !phase.IsComplete()
-        )
-        {
-            Arrive();
-        }
         if (phase.ViolatesRecoveryTime())
         {
             Eliminate(OUT_OF_TIME);
@@ -200,29 +175,16 @@ public class Participation : Aggregate, IEventScoped
         }
 
         Phases.StartIfNext();
-        var phaseCompleted = new PhaseCompleted(this);
-        Raise(phaseCompleted);
+        Raise(Completed(phase));
     }
 
-    void Arrive()
+    PhaseCompleted Completed(Phase phase)
     {
-        Raise(new ParticipationArrived(this));
+        return new PhaseCompleted(Id, Combination.Number, phase.Id, phase.IsFinal);
     }
 
     void Eliminate(Eliminated notQualified)
     {
         Eliminated = notQualified;
-        var qualificationRevoked = new ParticipationEliminated(this);
-        Raise(qualificationRevoked);
-    }
-
-    void RequireRepresentation()
-    {
-        Raise(new RepresentationRequired(this));
-    }
-
-    void RequireInspection()
-    {
-        Raise(new InspectionRequired(this));
     }
 }

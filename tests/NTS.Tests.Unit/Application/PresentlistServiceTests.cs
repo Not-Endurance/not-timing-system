@@ -1,7 +1,6 @@
 using NoTiming.Ui.Features.Core.Participations;
 using NTS.Application.Presentlists;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Tests.Unit.Application;
 
@@ -19,13 +18,13 @@ public sealed class PresentlistServiceTests
         var arrived = ParticipationFixtures.Arrived(1);
         repository.Store(arrived);
 
-        await store.Handle(new ParticipationArrived(arrived), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(arrived), CancellationToken.None);
 
         Assert.Equal([1], service.Entries.Select(x => x.Number));
 
         var eliminated = ParticipationFixtures.Arrived(1, new Withdrawn());
         repository.Store(eliminated);
-        await store.Handle(new ParticipationEliminated(eliminated), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(eliminated), CancellationToken.None);
 
         Assert.Empty(service.Entries);
     }
@@ -56,7 +55,7 @@ public sealed class PresentlistServiceTests
         var arrived = ParticipationFixtures.Arrived(1);
         repository.Store(arrived);
 
-        await store.Handle(new ParticipationArrived(arrived), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(arrived), CancellationToken.None);
 
         Assert.Equal(1, changes);
     }

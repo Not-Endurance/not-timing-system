@@ -4,7 +4,6 @@ using NTS.Application.UserSession;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -52,7 +51,7 @@ public sealed class SnapshotServiceTests
         var arrived = ParticipationFixtures.Arrived(1);
         repository.Store(arrived);
 
-        await store.Handle(new ParticipationArrived(arrived), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(arrived), CancellationToken.None);
 
         Assert.Same(arrived, Assert.Single(service.ParticipationsToSnapshot));
         Assert.Equal([2], service.Participations.Select(x => x.Combination.Number));
@@ -68,13 +67,13 @@ public sealed class SnapshotServiceTests
         var eliminated = ParticipationFixtures.Eliminated(1);
         repository.Store(eliminated);
 
-        await store.Handle(new ParticipationEliminated(eliminated), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(eliminated), CancellationToken.None);
 
         Assert.Equal([2], service.Participations.Select(x => x.Combination.Number));
 
         var restored = ParticipationFixtures.Active(1);
         repository.Store(restored);
-        await store.Handle(new ParticipationRestored(restored), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(restored), CancellationToken.None);
 
         Assert.Equal([1, 2], service.Participations.Select(x => x.Combination.Number));
     }

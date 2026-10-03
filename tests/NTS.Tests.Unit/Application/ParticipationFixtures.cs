@@ -2,6 +2,7 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
+using NTS.Domain.Core.Events;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
@@ -14,6 +15,12 @@ namespace NTS.Tests.Unit.Application;
 /// </summary>
 internal static class ParticipationFixtures
 {
+    /// <summary>The notification the Api sends when this Participation changed.</summary>
+    public static ParticipationChanged Changed(Participation participation)
+    {
+        return new ParticipationChanged(FakeSocketContext.EVENT_ID, participation.Id);
+    }
+
     /// <summary>On its way: started, not arrived yet.</summary>
     public static Participation Active(int number)
     {

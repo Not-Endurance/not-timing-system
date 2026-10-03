@@ -3,7 +3,6 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
-using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Objects.Competition;
@@ -207,17 +206,6 @@ internal static class IntegrationPayloadFactory
             SnapshotMethod.Manual,
             new Timestamp(timestamp)
         );
-    }
-
-    public static PhaseCompleted PhaseCompleted(Guid eventId, int participationNumber)
-    {
-        var participation = ActiveParticipation(eventId, participationNumber);
-        participation.Process(AutomaticSnapshot(participationNumber, DateTimeOffset.UtcNow.Date.AddHours(10)));
-        participation.Process(
-            AutomaticSnapshot(participationNumber, DateTimeOffset.UtcNow.Date.AddHours(10).AddMinutes(5))
-        );
-
-        return new PhaseCompleted(participation);
     }
 
     /// <summary>

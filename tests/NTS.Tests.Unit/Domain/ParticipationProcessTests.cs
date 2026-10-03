@@ -8,45 +8,80 @@ using NTS.Domain.Objects;
 
 namespace NTS.Tests.Unit.Domain;
 
-public sealed class ParticipationArrivedTests
+public sealed class ParticipationProcessTests
 {
     [Fact]
-    public void Process_raises_participation_arrived_when_arrive_time_is_first_recorded()
+    public void Process_raises_phase_completed_with_the_ids_and_not_final_when_a_phase_completes_and_another_follows()
     {
         var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
-        var participation = CreateParticipation(start);
-
-        participation.Process(
-            new Snapshot(1, SnapshotType.Arrive, SnapshotMethod.Manual, new Timestamp(start.AddHours(1)))
+        var arrive = start.AddHours(1);
+        var participation = CreateParticipation(
+            start,
+            CreatePhase(start, arrive, id: TestId.Of(1)),
+            CreatePhase(arrive.AddMinutes(50), isFinal: true, id: TestId.Of(2))
         );
 
-        Assert.Contains(participation.DequeueDomainEvents(), x => x is ParticipationArrived);
+        participation.Process(
+            new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(arrive.AddMinutes(10)))
+        );
+
+        var completed = Assert.Single(participation.DequeueDomainEvents().OfType<PhaseCompleted>());
+        Assert.Equal(participation.Id, completed.ParticipationId);
+        Assert.Equal(1, completed.Number);
+        Assert.Equal(TestId.Of(1), completed.PhaseId);
+        Assert.False(completed.IsFinal);
     }
 
     [Fact]
-    public void Process_does_not_raise_participation_arrived_for_later_phase_updates()
+    public void Process_raises_phase_completed_marked_final_when_the_final_phase_completes()
     {
         var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
-        var participation = CreateParticipation(start);
+        var arrive = start.AddHours(1);
+        var participation = CreateParticipation(start, CreatePhase(start, arrive, isFinal: true, id: TestId.Of(1)));
+
         participation.Process(
-            new Snapshot(1, SnapshotType.Arrive, SnapshotMethod.Manual, new Timestamp(start.AddHours(1)))
+            new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(arrive.AddMinutes(10)))
         );
+
+        var completed = Assert.Single(participation.DequeueDomainEvents().OfType<PhaseCompleted>());
+        Assert.Equal(TestId.Of(1), completed.PhaseId);
+        Assert.True(completed.IsFinal);
+    }
+
+    [Fact]
+    public void Restore_raises_phase_completed_when_the_restored_Participation_had_completed_its_phase()
+    {
+        var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
+        var arrive = start.AddHours(1);
+        var participation = CreateParticipation(
+            start,
+            CreatePhase(start, arrive, arrive.AddMinutes(10), isFinal: true, id: TestId.Of(1))
+        );
+        participation.Withdraw();
         participation.DequeueDomainEvents();
 
-        participation.Process(
-            new Snapshot(
-                1,
-                SnapshotType.Present,
-                SnapshotMethod.Manual,
-                new Timestamp(start.AddHours(1).AddMinutes(10))
-            )
-        );
+        participation.Restore();
 
-        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is ParticipationArrived);
+        var completed = Assert.Single(participation.DequeueDomainEvents().OfType<PhaseCompleted>());
+        Assert.Equal(TestId.Of(1), completed.PhaseId);
+        Assert.True(completed.IsFinal);
     }
 
     [Fact]
-    public void Process_raises_participation_arrived_when_next_phase_is_selected()
+    public void Process_raises_no_phase_completed_while_the_phase_is_not_complete()
+    {
+        var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
+        var participation = CreateParticipation(start);
+
+        participation.Process(
+            new Snapshot(1, SnapshotType.Arrive, SnapshotMethod.Manual, new Timestamp(start.AddHours(1)))
+        );
+
+        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is PhaseCompleted);
+    }
+
+    [Fact]
+    public void Process_selects_the_next_phase_when_its_arrive_time_is_recorded()
     {
         var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
         var firstArrive = start.AddHours(1);
@@ -65,11 +100,10 @@ public sealed class ParticipationArrivedTests
 
         Assert.Equal(SnapshotResultType.Applied, result.Type);
         Assert.Equal(TestId.Of(2), participation.Phases.Current.Id);
-        Assert.Contains(participation.DequeueDomainEvents(), x => x is ParticipationArrived);
     }
 
     [Fact]
-    public void Update_does_not_raise_participation_arrived_for_non_current_phase()
+    public void Update_leaves_the_current_phase_alone_when_it_changes_a_phase_that_is_not_current()
     {
         var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
         var firstArrive = start.AddHours(1);
@@ -84,7 +118,6 @@ public sealed class ParticipationArrivedTests
         participation.Update(new PhaseState(TestId.Of(2), secondStart, secondStart.AddMinutes(45), null, null));
 
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
-        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is ParticipationArrived);
     }
 
     static Participation CreateParticipation(DateTimeOffset start, params Phase[] phases)

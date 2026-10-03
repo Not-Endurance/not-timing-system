@@ -1,7 +1,6 @@
 using NoTiming.Ui.Features.Core.Dashboard;
 using NoTiming.Ui.Features.Core.Participations;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Tests.Unit.Application;
 
@@ -40,19 +39,19 @@ public sealed class ParticipationContextTests
         var arrived = ParticipationFixtures.Arrived(1);
         repository.Store(arrived);
 
-        await store.Handle(new ParticipationArrived(arrived), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(arrived), CancellationToken.None);
 
         Assert.Same(arrived, context.Selected); // not the instance that was selected: the one the store holds now
 
         var eliminated = ParticipationFixtures.Eliminated(1);
         repository.Store(eliminated);
-        await store.Handle(new ParticipationEliminated(eliminated), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(eliminated), CancellationToken.None);
 
         Assert.Null(context.Selected);
 
         var restored = ParticipationFixtures.Active(1);
         repository.Store(restored);
-        await store.Handle(new ParticipationRestored(restored), CancellationToken.None);
+        await store.Handle(ParticipationFixtures.Changed(restored), CancellationToken.None);
 
         Assert.Null(context.Selected); // a restored Participation is not selected again by itself
     }

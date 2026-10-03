@@ -5,25 +5,19 @@ using NTS.Contracts.Core;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
 
 namespace NoTiming.Ui.Features.Core.Participations;
 
 /// <summary>
 /// The one owner of the Event's Participations in the Ui (ADR-0006). It loads all of them when the Event connects,
-/// empties when it is left, and keeps them current by reading again the Participation an event names, never by what
-/// the event carries. At most one read per Participation is in flight; events that arrive during it cost one more
-/// read, once. Every list and page is a view over it.
+/// empties when it is left, and keeps them current by reading again the Participation a change notification names,
+/// never by what a notification carries. At most one read per Participation is in flight; notifications that arrive
+/// during it cost one more read, once. Every list and page is a view over it.
 /// </summary>
 public sealed class ParticipationStore
     : NStatefulService,
         IParticipationStore,
-        INotificationHandler<ParticipationArrived>,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<InspectionRequired>,
-        INotificationHandler<RepresentationRequired>,
-        INotificationHandler<ParticipationEliminated>,
-        INotificationHandler<ParticipationRestored>,
+        INotificationHandler<ParticipationChanged>,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
         IScoped
@@ -103,34 +97,14 @@ public sealed class ParticipationStore
         return Participations.FirstOrDefault(x => x.Id == id);
     }
 
-    public Task Handle(ParticipationArrived notification, CancellationToken cancellationToken)
+    public Task Handle(ParticipationChanged notification, CancellationToken cancellationToken)
     {
-        return Refresh(notification.Participation.Id);
-    }
+        if (_socketContext?.Event is { } connected && connected.Id != notification.EventId)
+        {
+            return Task.CompletedTask; // a message of an Event that is not the connected one
+        }
 
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
-    {
-        return Refresh(notification.Participation.Id);
-    }
-
-    public Task Handle(InspectionRequired notification, CancellationToken cancellationToken)
-    {
-        return Refresh(notification.Participation.Id);
-    }
-
-    public Task Handle(RepresentationRequired notification, CancellationToken cancellationToken)
-    {
-        return Refresh(notification.Participation.Id);
-    }
-
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        return Refresh(notification.Participation.Id);
-    }
-
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
-        return Refresh(notification.Participation.Id);
+        return Refresh(notification.ParticipationId);
     }
 
     public async Task Handle(EventConnected notification, CancellationToken cancellationToken)

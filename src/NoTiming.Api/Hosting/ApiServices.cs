@@ -36,6 +36,7 @@ internal static class ApiServices
             options.EnableDetailedErrors = environment.IsDevelopment();
             options.AddFilter<HubExceptionFilter>();
         });
+        services.AddSingleton<IParticipationChanges, ParticipationChanges>();
 
         return services.AddApiTelemetry(configuration);
     }

@@ -3,7 +3,6 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Presentlists;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -164,17 +163,18 @@ public sealed class PresentlistTests
     }
 
     [Fact]
-    public void ToggleInspection_raises_inspection_required_when_state_changes()
+    public void ToggleInspection_requests_the_inspection_and_turning_it_off_withdraws_it()
     {
         var participation = CreateParticipation(1, [CreatePhase()]);
 
         participation.ToggleInspection(true);
-
-        Assert.Contains(participation.DequeueDomainEvents(), x => x is InspectionRequired);
-
         participation.ToggleInspection(true);
 
-        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is InspectionRequired);
+        Assert.True(participation.Phases.Current.IsRequiredInspectionRequested);
+
+        participation.ToggleInspection(false);
+
+        Assert.False(participation.Phases.Current.IsRequiredInspectionRequested);
     }
 
     [Fact]
@@ -190,7 +190,6 @@ public sealed class PresentlistTests
         Assert.Throws<DomainException>(() => participation.ToggleInspection(true));
 
         Assert.False(participation.Phases.Current.IsRequiredInspectionRequested);
-        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is InspectionRequired);
     }
 
     [Fact]
@@ -214,11 +213,10 @@ public sealed class PresentlistTests
         participation.ToggleInspection(true);
 
         Assert.True(participation.Phases.Current.IsRequiredInspectionRequested);
-        Assert.Contains(participation.DequeueDomainEvents(), x => x is InspectionRequired);
     }
 
     [Fact]
-    public void ToggleRepresentation_raises_representation_required_when_state_changes()
+    public void ToggleRepresentation_requests_the_representation_and_turning_it_off_withdraws_it()
     {
         var arrive = DateTimeOffset.Now.AddMinutes(-20);
         var present = arrive.AddMinutes(5);
@@ -228,12 +226,13 @@ public sealed class PresentlistTests
         );
 
         participation.ToggleRepresentation(true);
-
-        Assert.Contains(participation.DequeueDomainEvents(), x => x is RepresentationRequired);
-
         participation.ToggleRepresentation(true);
 
-        Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is RepresentationRequired);
+        Assert.True(participation.Phases.Current.IsReinspectionRequested);
+
+        participation.ToggleRepresentation(false);
+
+        Assert.False(participation.Phases.Current.IsReinspectionRequested);
     }
 
     static Participation CreateParticipation(int number, IEnumerable<Phase> phases, Eliminated? eliminated = null)

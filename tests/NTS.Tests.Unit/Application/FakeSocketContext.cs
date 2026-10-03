@@ -12,6 +12,8 @@ namespace NTS.Tests.Unit.Application;
 /// </summary>
 internal sealed class FakeSocketContext : INtsSocketContext
 {
+    public static readonly Guid EVENT_ID = TestId.Of(100);
+
     public bool IsConnected => Event != null;
     public SocketConnectionStatus Status =>
         IsConnected ? SocketConnectionStatus.Connected : SocketConnectionStatus.Disconnected;
@@ -23,7 +25,7 @@ internal sealed class FakeSocketContext : INtsSocketContext
             "Location",
             new EventSpan(DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddDays(1)),
             null,
-            TestId.Of(100)
+            EVENT_ID
         );
 
     public void Leave()
