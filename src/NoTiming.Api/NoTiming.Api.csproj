@@ -17,9 +17,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\nugets\Not.Identity\Not.Identity.csproj" />
     <ProjectReference Include="..\NoTiming.Ui\NoTiming.Ui.csproj" />
     <ProjectReference Include="..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\NTS.Contracts\NTS.Contracts.csproj" />
+  </ItemGroup>
+
+  <!--
+    The account pages and their text are embedded, so the publish composition below, which replaces wwwroot with the
+    Ui's, cannot lose them.
+  -->
+  <ItemGroup>
+    <Content Remove="Features\Account\Text\*.json" />
+    <None Remove="Features\Account\Text\*.json" />
+    <EmbeddedResource Include="Features\Account\Pages\*" LogicalName="account/pages/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Features\Account\Text\*.json" LogicalName="account/text/%(Filename)%(Extension)" />
   </ItemGroup>
 
   <!--

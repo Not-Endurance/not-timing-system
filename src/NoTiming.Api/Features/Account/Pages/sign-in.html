@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="{{lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/account/assets/account.css" />
+  </head>
+  <body>
+    <main>
+      <h1>{{heading}}</h1>
+
+      <form id="email-form" novalidate>
+        <label for="email">{{email.label}}</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          inputmode="email"
+          autocomplete="username webauthn"
+          autocapitalize="none"
+          spellcheck="false"
+          required
+          autofocus
+        />
+        <p class="hint">{{email.hint}}</p>
+        <button type="submit">{{email.submit}}</button>
+      </form>
+
+      <form id="code-form" hidden novalidate>
+        <p id="code-sent" class="hint">{{code.sent}}</p>
+        <label for="code">{{code.label}}</label>
+        <input
+          id="code"
+          name="code"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          autocapitalize="none"
+          spellcheck="false"
+          maxlength="12"
+          required
+        />
+        <button type="submit">{{code.submit}}</button>
+        <div class="secondary">
+          <button type="button" id="resend" class="link" data-label="{{code.resend}}" disabled>{{code.resend}}</button>
+          <button type="button" id="change-email" class="link">{{code.change}}</button>
+        </div>
+      </form>
+
+      <p id="message" role="alert" aria-live="polite" hidden></p>
+    </main>
+
+    <script
+      src="/account/assets/sign-in.js"
+      defer
+      data-return-url="{{returnUrl}}"
+      data-error-email="{{error.email}}"
+      data-error-code="{{error.code}}"
+      data-error-generic="{{error.generic}}"
+      data-resend-in="{{code.resendIn}}"
+    ></script>
+  </body>
+</html>

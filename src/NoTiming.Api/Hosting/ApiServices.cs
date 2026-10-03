@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
+using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Live;
 using NTS.Application.Cors;
 
@@ -27,6 +28,8 @@ internal static class ApiServices
                         .AllowCredentials()
             )
         );
+
+        services.AddAccount();
 
         services.AddSignalR(options =>
         {

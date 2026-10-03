@@ -1,3 +1,4 @@
+using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Live;
 using NTS.Contracts;
 
@@ -24,6 +25,8 @@ internal static class ApiPipeline
         app.UseMiddleware<ConnectionDiagnosticsMiddleware>();
         app.UseMiddleware<HubOriginMiddleware>();
         app.UseCors(ApiServices.CORS_POLICY_NAME);
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         app.MapGet(
             "/healthz",
@@ -38,6 +41,7 @@ internal static class ApiPipeline
                     }
                 )
         );
+        app.MapAccount();
         app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
 
         // An unknown API route is a 404 in the error format of the rest-api skill, never the Ui's page.

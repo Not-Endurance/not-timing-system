@@ -1,0 +1,18 @@
+{
+  "title": "Giriş – NoTiming",
+  "heading": "Giriş",
+  "email.label": "E-posta adresi",
+  "email.hint": "Size e-postayla altı haneli bir kod göndeririz. Parola gerekmez.",
+  "email.submit": "Bana kod gönder",
+  "code.sent": "Bu adresle giriş yapılabiliyorsa kod yola çıktı. Bir kez geçerlidir ve 10 dakika sonra sona erer.",
+  "code.label": "Altı haneli kod",
+  "code.submit": "Giriş yap",
+  "code.resend": "Yeni kod gönder",
+  "code.resendIn": "{seconds} sn sonra yeni kod",
+  "code.change": "Başka bir adres kullan",
+  "error.email": "Geçerli bir e-posta adresi girin.",
+  "error.code": "Kod yanlış veya süresi dolmuş. Kontrol edin ya da yenisini isteyin.",
+  "error.generic": "Bir şeyler ters gitti. Birazdan tekrar deneyin.",
+  "email.code.subject": "NoTiming giriş kodunuz",
+  "email.code.body": "NoTiming giriş kodunuz: {code}.\n\nBir kez geçerlidir ve {minutes} dakika sonra sona erer. Siz istemediyseniz bu e-postayı yok sayabilirsiniz: kod olmadan kimse giriş yapamaz."
+}

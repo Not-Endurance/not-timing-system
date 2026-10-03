@@ -1,0 +1,18 @@
+{
+  "title": "Sign in – NoTiming",
+  "heading": "Sign in",
+  "email.label": "Email address",
+  "email.hint": "We email you a six-digit code. No password needed.",
+  "email.submit": "Send me a code",
+  "code.sent": "If this address can sign in, a code is on its way. It works once and expires in 10 minutes.",
+  "code.label": "Six-digit code",
+  "code.submit": "Sign in",
+  "code.resend": "Send a new code",
+  "code.resendIn": "Send a new code in {seconds} s",
+  "code.change": "Use another address",
+  "error.email": "Enter a valid email address.",
+  "error.code": "That code is wrong or has expired. Check it, or ask for a new one.",
+  "error.generic": "Something went wrong. Try again in a moment.",
+  "email.code.subject": "Your NoTiming sign-in code",
+  "email.code.body": "Your NoTiming sign-in code is {code}.\n\nIt works once and expires in {minutes} minutes. If you did not ask for it, you can ignore this email: nobody can sign in without the code."
+}
