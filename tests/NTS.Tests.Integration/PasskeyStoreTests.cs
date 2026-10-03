@@ -94,7 +94,7 @@ public sealed class PasskeyStoreTests : IClassFixture<MongoFixture>
         var stored = (await users.FindByIdAsync(user.Id.ToString()))!;
         var passkey = Assert.Single(await users.GetPasskeysAsync(stored));
         Assert.Equal(30u, passkey.SignCount);
-        Assert.Equal(1, (await store.Users.Find(Is(user.Id)).SingleAsync())["Passkeys"].AsBsonArray.Count);
+        Assert.Single((await store.Users.Find(Is(user.Id)).SingleAsync())["Passkeys"].AsBsonArray);
     }
 
     [Fact]

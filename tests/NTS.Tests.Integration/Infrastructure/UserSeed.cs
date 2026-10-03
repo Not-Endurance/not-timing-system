@@ -1,3 +1,4 @@
+using System.Buffers.Text;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -51,5 +52,24 @@ internal static class UserSeed
         shape?.Invoke(document);
         await Users(mongoConnectionString).InsertOneAsync(document);
         return id;
+    }
+
+    /// <summary>A passkey as the store keeps it, with a name to recognise it by.</summary>
+    public static BsonDocument StoredPasskey(byte[] credentialId, string? name = null)
+    {
+        return new BsonDocument
+        {
+            { "CredentialId", new BsonBinaryData(credentialId) },
+            { "PublicKey", new BsonBinaryData(new byte[] { 1 }) },
+            { "Name", name ?? "Stored " + Base64Url.EncodeToString(credentialId)[..6] },
+            { "CreatedAt", DateTime.UtcNow },
+            { "SignCount", 0L },
+            { "Transports", new BsonArray() },
+            { "IsUserVerified", true },
+            { "IsBackupEligible", false },
+            { "IsBackedUp", false },
+            { "AttestationObject", new BsonBinaryData(Array.Empty<byte>()) },
+            { "ClientDataJson", new BsonBinaryData(Array.Empty<byte>()) },
+        };
     }
 }

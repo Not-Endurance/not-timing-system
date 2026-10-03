@@ -52,6 +52,12 @@ internal static class JsonApiResults
         return location == null ? document : new LocatedResult(document, location);
     }
 
+    /// <summary>The answer of every route that needs a caller when there is none: 401, never a redirect.</summary>
+    public static IResult NotSignedIn()
+    {
+        return Error(StatusCodes.Status401Unauthorized, "not-signed-in", "Sign in to do this.");
+    }
+
     /// <summary>Writes the error without an endpoint, for the events of the authentication handlers.</summary>
     public static async Task WriteErrorAsync(HttpContext context, int status, string code, string title)
     {

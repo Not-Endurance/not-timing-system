@@ -8,9 +8,10 @@ These tests start real local infrastructure and the real hosts. They live in a s
 dotnet test .\tests\NTS.Tests.Integration\NTS.Tests.Integration.csproj -c Debug
 ```
 
-Three kinds of test run in the project:
+Four kinds of test run in the project:
 
-- The Api tests (`ApiHostTests`, `SignInTests`, `IdentityStoreTests`) host `NoTiming.Api`, or its identity stores, in this process on a MongoDB in a container. They need Docker and nothing else.
+- The Api tests (`ApiHostTests`, `SignInTests`, `IdentityStoreTests`, `PasskeyStoreTests`, `PasskeyServiceTests`, `PasskeyEndpointTests`) host `NoTiming.Api`, or its identity stores, in this process on a MongoDB in a container. They need Docker and nothing else.
+- The passkey ceremonies (`PasskeyCeremonyTests`) drive a real Chromium against the Api on a real port, and need Docker and the browser (see Browser Setup).
 - The tests that need no infrastructure at all (`IdentifierShapeTests`, `AccountTextTests`, `NameRenderingTests`) run anywhere the solution builds.
 - The scenarios that use the legacy Functions API (everything driven through `NexusApiDriver` and `ClientDriver`) need Docker, Azure Functions Core Tools and Azurite.
 
@@ -25,19 +26,21 @@ The Functions API, Azurite and Node leave the harness when that API is retired (
 
 ## The harness
 
-- `ApiFactory` is `NoTiming.Api` in this process, built on `WebApplicationFactory<Program>`, on the MongoDB the test gives it. By default a test reaches it in memory (at an https address, so the Secure session cookie is one a browser would take). In Kestrel mode (`UseKestrel(0)`, a free port of its own) it listens on a real loopback port, for the clients that need one: the SignalR client of the Ui, WebSockets and, later, browsers. `ApiHostFixture` starts it in Kestrel mode with its own MongoDB, and so does `NtsIntegrationFixture`, next to its MongoDB container and the Functions process; `MongoFixture` is just the container, for tests that build their own host or none.
+- `ApiFactory` is `NoTiming.Api` in this process, built on `WebApplicationFactory<Program>`, on the MongoDB the test gives it. By default a test reaches it in memory (at an https address, so the Secure session cookie is one a browser would take). In Kestrel mode (`UseKestrel(0)`, a free port of its own) it listens on a real loopback port, for the clients that need one: the SignalR client of the Ui, WebSockets and browsers. `ApiHostFixture` starts it in Kestrel mode with its own MongoDB, and so does `NtsIntegrationFixture`, next to its MongoDB container and the Functions process; `MongoFixture` is just the container, for tests that build their own host or none.
 - Every host the harness builds has its own data protection key ring under the test output, never in the user profile, and sends its email to an outbox. A test passes the clock it moves (`FakeTimeProvider`) for the lifetimes of codes and sessions, and a key ring folder to share when a second host must read what the first protected: that is how a restart is tested.
 - `ClientDriver` is the client: it builds the Ui's real service provider (the REST repositories and the live-connection client) against the Api and the Functions API, and drives it as an anonymous visitor or as a signed-in user. `NexusApiDriver` talks to the Functions API directly, to seed and read data.
 - Sign-in in a test is the way a person signs in (ADR-0002). `ApiSessions.SignInAsync` asks for a code, reads it from the outbox of the host (`IEmailOutbox`), sends it back and returns the session cookie, which the test carries by hand so it works for an in-memory client and for one on a real port alike (a Secure cookie of a plain-http address would not be sent back). `UserSeed` adds users as they exist before identity: a row of the Functions API with the profile fields and none of the identity ones. The host has no sign-in as, no test scheme and no test path: `ApiHostTests` asserts that the session cookie is its only scheme and that a bearer token of the old `integration|...` format signs nobody in.
 
-## PDF Browser Setup
+## Browser Setup
 
-Only the parked print scenarios (below) call the PDF routes of the Functions API, and they need Chromium. Use one browser cache per operating system. For example:
+The passkey ceremonies (`PasskeyCeremonyTests`) run Chromium with a virtual authenticator against the real pages of the Api, so they need the browser; so do the parked print scenarios (below), which call the PDF routes of the Functions API. Use one browser cache per operating system. For example, after building the test project:
 
 ```powershell
 $env:PLAYWRIGHT_BROWSERS_PATH = "$PWD\.tmp\ms-playwright"
-pwsh .\src\Apps\Nexus\NTS.Nexus.HTTP\bin\Debug\net8.0\playwright.ps1 install chromium
+pwsh .\tests\NTS.Tests.Integration\bin\Debug\net10.0\playwright.ps1 install chromium
 ```
+
+The conditional UI of the email field (the autofill list of passkeys) cannot be automated: the tests sign in through the button, which runs the same routes through the modal prompt, and the autofill on iOS Safari and Android Chrome goes on the manual device checklist in the go/no-go report of #600.
 
 The harness uses `NTS_INTEGRATION_PLAYWRIGHT_BROWSERS_PATH` when set, otherwise it keeps a valid `PLAYWRIGHT_BROWSERS_PATH`, then probes `/ms-playwright`, `.tools/ms-playwright`, and `.tmp/ms-playwright` for a browser matching the current OS. The Nexus HTTP container image uses `/ms-playwright`.
 
@@ -45,6 +48,7 @@ The harness uses `NTS_INTEGRATION_PLAYWRIGHT_BROWSERS_PATH` when set, otherwise 
 
 - The Api: health, the security headers, deep links into the Ui and the JSON 404 of an unknown API route, HTTPS redirection and HSTS outside Development, the live hub (an anonymous client joins an Event's group and receives only that Event's change notifications, no method is callable by a client, a connection that names no Event, or something that is not an Event id, is refused, the WebSocket origin check, CORS), and the session cookie as the only way in.
 - Signing in with an emailed code (`SignInTests`): the answer to a code request is the same for every address, a code works once, expires after ten minutes, is invalidated by five wrong attempts and replaced by a new request after the resend cooldown; the session cookie, `/api/me`, signing out, deleting a ticket, rotating the security stamp, a host restart, a user from before identity, the Production refusal of the console and outbox senders, the page text in en, bg and tr, and the media type every write needs.
+- Passkeys (ADR-0002, #600): the store (`PasskeyStoreTests`: a credential read back is the credential that was stored, three sign-ins leave one entry, passkeys enrolled at the same moment all persist, refusal when an update is not retried, removal, the unique index, the fields of the application untouched); the routes (`PasskeyEndpointTests`: what each requires and refuses, the options an authenticator is asked for, the origin rule, the antiforgery cookie per environment, adding, listing, renaming and removing over HTTP with a `SoftwareAuthenticator` that makes a passkey without a browser, the limit on a name, someone else's passkey, a mail that cannot be sent, a return path with a control character); the service (`PasskeyServiceTests`: a passkey removed while it was signing in is not added back, and a rename made meanwhile is kept); and the ceremonies in a real browser (`PasskeyCeremonyTests`: code sign-in, the offer, adding a passkey, signing out and back in with it, three sign-ins leaving one entry with the authenticator's sign count, two devices adding at the same moment, a removed passkey refused, the last one kept, the stamp ending a passkey session, the second-passkey offer, the mail in en, bg and tr).
 - The identity user store on a MongoDB (`IdentityStoreTests`): a row from before identity read and updated field for field, every identity field round-tripped, capitalisation, concurrent updates, stamp rotation and the partial unique indexes.
 - Every id is a Guid, stored as a standard UUID (`IdentifierShapeTests`, `GuidStorageTests`).
 - Witness registration resolution, profile completion, and sign-in completing after startup, against the Functions API with the Ui's real services.
@@ -61,5 +65,5 @@ The Judge app is gone (#598, ADR-0011), and with it the connected Judge that the
 
 ## Next Expansion
 
-- A thin Playwright smoke suite for browser-only behavior, against the Kestrel-hosted Api.
+- More browser coverage for the Ui pages as they arrive, on the same Chromium kit as the passkey ceremonies.
 - Snapshot POST scenarios once the server records them (#644), which replace the parked ones.

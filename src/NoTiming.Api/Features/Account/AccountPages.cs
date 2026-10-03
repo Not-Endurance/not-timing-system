@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
@@ -14,6 +15,8 @@ internal static class AccountPages
 {
     // Escapes what HTML treats specially and leaves letters of every language as they are.
     static readonly HtmlEncoder ENCODER = HtmlEncoder.Create(UnicodeRanges.All);
+    static readonly ConcurrentDictionary<string, string> TEXTS = new();
+    static readonly ConcurrentDictionary<string, byte[]> FILES = new();
     static readonly Dictionary<string, (string Resource, string ContentType)> ASSETS = new()
     {
         ["account.css"] = ("account/pages/account.css", "text/css; charset=utf-8"),
@@ -70,7 +73,11 @@ internal static class AccountPages
         return Results.Bytes(ReadBytes(asset.Resource), asset.ContentType);
     }
 
-    /// <summary>Only a path of this site, so a sign-in cannot be used to send a visitor somewhere else.</summary>
+    /// <summary>
+    /// Only a path of this site, so a sign-in cannot be used to send a visitor somewhere else. A control character
+    /// anywhere is refused: a browser removes tabs and line breaks from a URL, so <c>/&lt;tab&gt;/host</c> would become
+    /// <c>//host</c>.
+    /// </summary>
     public static string SafeReturnUrl(string? value)
     {
         return
@@ -78,6 +85,7 @@ internal static class AccountPages
             && value.StartsWith('/')
             && !value.StartsWith("//", StringComparison.Ordinal)
             && !value.StartsWith("/\\", StringComparison.Ordinal)
+            && !value.Any(char.IsControl)
             ? value
             : "/";
     }
@@ -116,18 +124,31 @@ internal static class AccountPages
         return Results.Content(html, "text/html; charset=utf-8");
     }
 
+    /// <summary>The files are embedded and cannot change while the host runs, so each is read once.</summary>
     static string ReadText(string resource)
     {
-        using var reader = new StreamReader(Open(resource));
-        return reader.ReadToEnd();
+        return TEXTS.GetOrAdd(
+            resource,
+            name =>
+            {
+                using var reader = new StreamReader(Open(name));
+                return reader.ReadToEnd();
+            }
+        );
     }
 
     static byte[] ReadBytes(string resource)
     {
-        using var stream = Open(resource);
-        using var buffer = new MemoryStream();
-        stream.CopyTo(buffer);
-        return buffer.ToArray();
+        return FILES.GetOrAdd(
+            resource,
+            name =>
+            {
+                using var stream = Open(name);
+                using var buffer = new MemoryStream();
+                stream.CopyTo(buffer);
+                return buffer.ToArray();
+            }
+        );
     }
 
     static Stream Open(string resource)

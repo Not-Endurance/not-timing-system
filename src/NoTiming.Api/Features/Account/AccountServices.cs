@@ -42,12 +42,7 @@ internal static class AccountServices
             {
                 // The Ui asks who is signed in and navigates to the sign-in page itself: no redirect, only the answer.
                 cookie.Events.OnRedirectToLogin = context =>
-                    JsonApiResults.WriteErrorAsync(
-                        context.HttpContext,
-                        StatusCodes.Status401Unauthorized,
-                        "not-signed-in",
-                        "Sign in to do this."
-                    );
+                    JsonApiResults.NotSignedIn().ExecuteAsync(context.HttpContext);
                 cookie.Events.OnRedirectToAccessDenied = context =>
                     JsonApiResults.WriteErrorAsync(
                         context.HttpContext,

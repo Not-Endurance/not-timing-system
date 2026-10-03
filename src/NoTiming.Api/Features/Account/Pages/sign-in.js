@@ -32,10 +32,13 @@
   let countdown = null;
   let autofill = null; // the passkey request that waits in the background for the email field's autofill
 
-  // Only a path of this site: anything that could leave it falls back to the start page.
+  // Only a path of this site: anything that could leave it falls back to the start page. The server has checked it
+  // already; a control character is refused here too, because a browser removes tabs and line breaks from a URL and
+  // '/<tab>/host' would become '//host'.
   const returnUrl = (() => {
     const value = script.dataset.returnUrl || '/';
-    return value.startsWith('/') && !value.startsWith('//') && !value.startsWith('/\\') ? value : '/';
+    const leavesTheSite = !value.startsWith('/') || value.startsWith('//') || value.startsWith('/\\');
+    return leavesTheSite || /[\u0000-\u001f\u007f-\u009f]/.test(value) ? '/' : value;
   })();
 
   function show(text) {
@@ -118,8 +121,8 @@
     autofill = new AbortController();
     try {
       const credential = await passkeys.getCredential(antiforgery, { conditional: true, signal: autofill.signal });
-      if (credential) {
-        await signInWithPasskey(credential);
+      if (credential && !(await signInWithPasskey(credential))) {
+        startAutofill(); // refused (a passkey that was removed, say): the list is offered again
       }
     } catch {
       // Aborted, or the person chose to type: the email field and the button still work.

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
 
 namespace NoTiming.Api.Features.Account;
@@ -12,6 +13,8 @@ internal static class PasskeyServices
 {
     public const string RELYING_PARTY_SETTING = "Passkeys:RelyingPartyId";
     public const string ANTIFORGERY_HEADER = "X-XSRF-TOKEN";
+    public const string ANTIFORGERY_COOKIE = "__Host-NoTiming-Xsrf";
+    public const string ANTIFORGERY_COOKIE_DEVELOPMENT = "NoTiming-Xsrf";
 
     public static string? RelyingPartyIdOf(IConfiguration configuration, IHostEnvironment environment)
     {
@@ -47,11 +50,25 @@ internal static class PasskeyServices
         services.AddAntiforgery(options =>
         {
             options.HeaderName = ANTIFORGERY_HEADER;
-            options.Cookie.Name = "__Host-NoTiming-Xsrf";
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Strict;
         });
+
+        // The antiforgery system refuses a Secure-only cookie on a request that is not https, and development runs on
+        // plain http. There the cookie follows the request and has no __Host- prefix (a browser rejects that prefix on a
+        // cookie that is not Secure). Everywhere else it is host-only and Secure.
+        services
+            .AddOptions<AntiforgeryOptions>()
+            .Configure<IHostEnvironment>(
+                (options, environment) =>
+                {
+                    var development = environment.IsDevelopment();
+                    options.Cookie.Name = development ? ANTIFORGERY_COOKIE_DEVELOPMENT : ANTIFORGERY_COOKIE;
+                    options.Cookie.SecurePolicy = development
+                        ? CookieSecurePolicy.SameAsRequest
+                        : CookieSecurePolicy.Always;
+                }
+            );
 
         services.AddSingleton(provider => new PasskeyAvailability(
             RelyingPartyIdOf(

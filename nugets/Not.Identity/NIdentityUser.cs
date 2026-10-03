@@ -51,8 +51,9 @@ public class NIdentityUser
     public string? ExternalSubject { get; set; }
 
     /// <summary>
-    /// The passkeys of the user. There is no field when there are none, so the partial unique index on the credential
-    /// id leaves every user without one out.
+    /// The passkeys of the user. The unique index on the credential id is partial, so a user without a passkey is left
+    /// out of it: an update that leaves none unsets the field, and a user created through the store starts with an
+    /// empty array, which has no credential id to index.
     /// </summary>
     [BsonIgnoreIfNull]
     public List<NIdentityPasskey> Passkeys { get; set; } = [];

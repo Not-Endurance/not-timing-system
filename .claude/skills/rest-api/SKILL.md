@@ -44,12 +44,21 @@ Endpoints follow JSON:API 1.1 (jsonapi.org). Only the grammar of `filter` is bor
 
 ## Authentication
 
-A person signs in with a code sent by email, and the session is a cookie the server sets (ADR-0002). The cookie is `__Host-NoTiming`: host-only, HttpOnly, Secure, SameSite=Lax, persistent, 30 days sliding, and it carries only the key of a ticket the server keeps. The pages that use these routes are `/sign-in` and its assets, served by the Api; the Ui links to them.
+A person signs in with a code sent by email or with a passkey, and the session is a cookie the server sets (ADR-0002). The cookie is `__Host-NoTiming`: host-only, HttpOnly, Secure, SameSite=Lax, persistent, 30 days sliding, and it carries only the key of a ticket the server keeps. The pages that use these routes are `/sign-in`, `/account/passkeys` and their assets, served by the Api; the Ui links to them.
 
 - `POST /api/code-challenges` with `{ "email" }` asks for a code. It answers 202 with no body whether or not the address has an account, and inside the resend cooldown of the previous code, so the answer tells nothing; a malformed address is 400 `invalid-email`.
-- `POST /api/sessions` with `{ "email", "code" }` signs in: 201, the `sessions` resource `current`, and the cookie. A wrong, spent, expired or exhausted code is 401 `invalid-code`, whatever the reason.
+- `POST /api/sessions` with `{ "email", "code" }` signs in: 201, the `sessions` resource `current` (`method`: `code` or `passkey`, and `passkeyCount`, which the sign-in page uses to decide whether to offer one) and the cookie. A wrong, spent, expired or exhausted code is 401 `invalid-code`, whatever the reason. With `{ "credential" }`, the assertion a passkey made as the browser's WebAuthn API serialises it, the same route signs in with a passkey; one that signs nobody in is 401 `invalid-passkey`, whatever the reason.
 - `DELETE /api/sessions/current` signs out: 204, the ticket is deleted and the cookie cleared. Without a session it is 204 as well.
-- `GET /api/me` is the `accounts` resource of the caller (`email`, `emailConfirmed`, `name`), or 401 `not-signed-in`. A route that needs a caller answers 401 with that code, never a redirect.
+- `GET /api/me` is the `accounts` resource of the caller (`email`, `emailConfirmed`, `name`, `passkeys`), or 401 `not-signed-in`. A route that needs a caller answers 401 with that code, never a redirect.
+
+### Passkeys
+
+A passkey is a resource of the signed-in person: `/api/passkeys`, with its credential id in base64url as the id. They are discoverable, require user verification and are never attested; the relying-party ID is configuration (`Passkeys:RelyingPartyId`, `localhost` in Development), and a host with none answers 503 `passkeys-not-configured` on every route below that needs one.
+
+- `POST /api/passkeys/actions/request-options` (anonymous) answers the options for `navigator.credentials.get`, and `POST /api/passkeys/actions/creation-options` (signed in) those for `navigator.credentials.create`, which exclude the passkeys the person has. Both are actions in the sense above: they create nothing, and they hold the challenge in a short-lived host-only cookie that the next call consumes.
+- `POST /api/passkeys` with `{ "credential", "name"? }` stores the passkey the browser made: 201 and the resource, and a "new passkey added" email in the language of the request (a mail that cannot be sent is logged and does not undo the passkey). A credential that does not verify, or arrives with no ceremony underway, is 400 `invalid-passkey`.
+- `GET /api/passkeys` lists them. `PATCH /api/passkeys/{id}` renames (`name`). A name is at most 60 characters, on both routes: longer is 400 `invalid-name`. `DELETE /api/passkeys/{id}` removes: 204, and the last passkey is 409 `last-passkey`, because losing the device would lock the person out. A passkey is looked up among the caller's own: someone else's, or none, is 404 `not-found`.
+- The ceremony routes (the two actions, `POST /api/passkeys`, and `POST /api/sessions` with a credential) verify an antiforgery token on top of the media type: the header `X-XSRF-TOKEN` carries the token the server put into the page, and the cookie that goes with it is `__Host-NoTiming-Xsrf` (unprefixed and not Secure-only in Development, which runs on plain http). A request without a matching pair is 400 `antiforgery-token-invalid`.
 
 ## Concurrency
 

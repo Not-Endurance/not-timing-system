@@ -15,17 +15,6 @@ namespace NTS.Tests.Integration.Infrastructure;
 /// </summary>
 internal sealed class IdentityStoreHarness : IAsyncDisposable
 {
-    IdentityStoreHarness(ServiceProvider provider, IMongoDatabase database)
-    {
-        Provider = provider;
-        Users = database.GetCollection<BsonDocument>("users");
-        Sessions = database.GetCollection<BsonDocument>("auth_sessions");
-    }
-
-    public ServiceProvider Provider { get; }
-    public IMongoCollection<BsonDocument> Users { get; }
-    public IMongoCollection<BsonDocument> Sessions { get; }
-
     public static async Task<IdentityStoreHarness> CreateAsync(MongoFixture mongo)
     {
         var database = "identity_store_" + Guid.NewGuid().ToString("N");
@@ -79,6 +68,17 @@ internal sealed class IdentityStoreHarness : IAsyncDisposable
     {
         return new BsonBinaryData(id, GuidRepresentation.Standard);
     }
+
+    IdentityStoreHarness(ServiceProvider provider, IMongoDatabase database)
+    {
+        Provider = provider;
+        Users = database.GetCollection<BsonDocument>("users");
+        Sessions = database.GetCollection<BsonDocument>("auth_sessions");
+    }
+
+    public ServiceProvider Provider { get; }
+    public IMongoCollection<BsonDocument> Users { get; }
+    public IMongoCollection<BsonDocument> Sessions { get; }
 
     public FilterDefinition<BsonDocument> SessionsOf(Guid userId)
     {

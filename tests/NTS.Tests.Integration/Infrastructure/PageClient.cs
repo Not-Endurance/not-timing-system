@@ -11,6 +11,12 @@ namespace NTS.Tests.Integration.Infrastructure;
 /// </summary>
 internal sealed class PageClient
 {
+    public static string? AntiforgeryTokenOf(string html)
+    {
+        var match = Regex.Match(html, "data-antiforgery=\"([^\"]*)\"");
+        return match.Success ? System.Net.WebUtility.HtmlDecode(match.Groups[1].Value) : null;
+    }
+
     readonly HttpClient _http;
     readonly Dictionary<string, string> _cookies = [];
 
@@ -20,12 +26,6 @@ internal sealed class PageClient
     }
 
     public string? AntiforgeryToken { get; private set; }
-
-    public static string? AntiforgeryTokenOf(string html)
-    {
-        var match = Regex.Match(html, "data-antiforgery=\"([^\"]*)\"");
-        return match.Success ? System.Net.WebUtility.HtmlDecode(match.Groups[1].Value) : null;
-    }
 
     public string? Cookie(string name)
     {

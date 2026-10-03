@@ -117,7 +117,7 @@ internal static class AccountEndpoints
         var user = await users.GetUserAsync(context.User);
         if (user is null)
         {
-            return JsonApiResults.Error(StatusCodes.Status401Unauthorized, "not-signed-in", "Sign in to do this.");
+            return JsonApiResults.NotSignedIn();
         }
 
         return JsonApiResults.Resource(

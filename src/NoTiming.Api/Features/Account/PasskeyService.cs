@@ -113,7 +113,16 @@ internal sealed class PasskeyService
         }
 
         _logger.LogInformation("A passkey was added for user {UserId}.", user.Id);
-        await NotifyAddedAsync(user, passkey, language);
+        try
+        {
+            await NotifyAddedAsync(user, passkey, language);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // The passkey is stored. A provider that is down is no reason to tell the person it was not.
+            _logger.LogWarning(ex, "The mail about the passkey added for user {UserId} could not be sent.", user.Id);
+        }
+
         return passkey;
     }
 
@@ -133,12 +142,7 @@ internal sealed class PasskeyService
             return null;
         }
 
-        // The credential is replaced in place: its sign count moved.
-        var stored = await _users.ChangeAsync(
-            assertion.User.Id,
-            changed => _users.AddOrUpdatePasskeyAsync(changed, assertion.Passkey)
-        );
-        if (!stored.Succeeded)
+        if (!await StoreAssertionAsync(assertion.User.Id, assertion.Passkey))
         {
             return null;
         }
@@ -154,14 +158,44 @@ internal sealed class PasskeyService
         return user;
     }
 
+    /// <summary>
+    /// The credential is replaced in place, because its sign count moved with the sign-in. It is replaced only if it is
+    /// still there, with the name it has now: the person may have removed it, or renamed it, while the assertion was
+    /// being checked, and a removed passkey must stay removed.
+    /// </summary>
+    public async Task<bool> StoreAssertionAsync(Guid userId, UserPasskeyInfo asserted)
+    {
+        var stored = await _users.ChangeAsync(
+            userId,
+            async changed =>
+            {
+                var current = await _users.GetPasskeyAsync(changed, asserted.CredentialId);
+                if (current is null)
+                {
+                    return Failure(NO_SUCH_PASSKEY);
+                }
+
+                asserted.Name = current.Name;
+                return await _users.AddOrUpdatePasskeyAsync(changed, asserted);
+            }
+        );
+        return stored.Succeeded;
+    }
+
     public async Task<IReadOnlyList<UserPasskeyInfo>> ListAsync(NIdentityUser user)
     {
         return [.. (await _users.GetPasskeysAsync(user)).OrderBy(x => x.CreatedAt)];
     }
 
-    public async Task<IdentityResult> RenameAsync(Guid userId, byte[] credentialId, string? name)
+    /// <summary>The result, and the passkey as it is stored now when the rename succeeded.</summary>
+    public async Task<(IdentityResult Result, UserPasskeyInfo? Renamed)> RenameAsync(
+        Guid userId,
+        byte[] credentialId,
+        string? name
+    )
     {
-        return await _users.ChangeAsync(
+        UserPasskeyInfo? renamed = null;
+        var result = await _users.ChangeAsync(
             userId,
             async user =>
             {
@@ -172,9 +206,12 @@ internal sealed class PasskeyService
                 }
 
                 passkey.Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
-                return await _users.AddOrUpdatePasskeyAsync(user, passkey);
+                var saved = await _users.AddOrUpdatePasskeyAsync(user, passkey);
+                renamed = saved.Succeeded ? passkey : null;
+                return saved;
             }
         );
+        return (result, result.Succeeded ? renamed : null);
     }
 
     /// <summary>
@@ -221,10 +258,19 @@ internal sealed class PasskeyService
         {
             return await ceremony();
         }
-        catch (Exception ex) when (ex is InvalidOperationException or JsonException or FormatException)
+        catch (Exception ex) when (ex is JsonException or FormatException || IsNoCeremony(ex))
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Identity says that no ceremony is underway with an <c>InvalidOperationException</c> that starts "No passkey".
+    /// Any other one (a scheme that is not registered, a store that fails) is a fault of the host and must stay one.
+    /// </summary>
+    static bool IsNoCeremony(Exception ex)
+    {
+        return ex is InvalidOperationException && ex.Message.StartsWith("No passkey ", StringComparison.Ordinal);
     }
 
     static IdentityResult Failure(string code)

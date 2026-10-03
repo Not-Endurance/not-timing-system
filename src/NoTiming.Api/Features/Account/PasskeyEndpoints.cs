@@ -15,6 +15,7 @@ namespace NoTiming.Api.Features.Account;
 internal static class PasskeyEndpoints
 {
     const string PASSKEYS = "passkeys";
+    const int MAX_NAME_LENGTH = 60;
 
     public static IEndpointRouteBuilder MapPasskeys(this IEndpointRouteBuilder app)
     {
@@ -114,7 +115,7 @@ internal static class PasskeyEndpoints
         var user = await users.GetUserAsync(context.User);
         if (user is null)
         {
-            return NotSignedIn();
+            return JsonApiResults.NotSignedIn();
         }
 
         var options = await passkeys.CreationOptionsAsync(user);
@@ -131,7 +132,7 @@ internal static class PasskeyEndpoints
         var user = await users.GetUserAsync(context.User);
         if (user is null)
         {
-            return NotSignedIn();
+            return JsonApiResults.NotSignedIn();
         }
 
         var list = await passkeys.ListAsync(user);
@@ -184,10 +185,15 @@ internal static class PasskeyEndpoints
             );
         }
 
+        if (InvalidName(read.Attributes.Name) is { } invalidName)
+        {
+            return invalidName;
+        }
+
         var user = await users.GetUserAsync(context.User);
         if (user is null)
         {
-            return NotSignedIn();
+            return JsonApiResults.NotSignedIn();
         }
 
         var passkey = await passkeys.EnrolAsync(
@@ -228,6 +234,11 @@ internal static class PasskeyEndpoints
             return read.Error;
         }
 
+        if (InvalidName(read.Attributes!.Name) is { } invalidName)
+        {
+            return invalidName;
+        }
+
         if (!TryDecode(id, out var credentialId))
         {
             return NotFound();
@@ -236,20 +247,17 @@ internal static class PasskeyEndpoints
         var userId = users.GetUserId(context.User);
         if (!Guid.TryParse(userId, out var user))
         {
-            return NotSignedIn();
+            return JsonApiResults.NotSignedIn();
         }
 
-        var result = await passkeys.RenameAsync(user, credentialId, read.Attributes!.Name);
-        if (!result.Succeeded)
+        var (result, renamed) = await passkeys.RenameAsync(user, credentialId, read.Attributes!.Name);
+        if (renamed is null)
         {
             return result.Errors.Any(x => x.Code == PasskeyService.NO_SUCH_PASSKEY)
                 ? NotFound()
                 : JsonApiResults.Error(StatusCodes.Status409Conflict, "conflict", "The passkey could not be renamed.");
         }
 
-        var renamed = (await passkeys.ListAsync((await users.FindByIdAsync(userId))!)).First(x =>
-            x.CredentialId.AsSpan().SequenceEqual(credentialId)
-        );
         return JsonApiResults.Resource(StatusCodes.Status200OK, PASSKEYS, id, Describe(renamed));
     }
 
@@ -267,7 +275,7 @@ internal static class PasskeyEndpoints
 
         if (!Guid.TryParse(users.GetUserId(context.User), out var user))
         {
-            return NotSignedIn();
+            return JsonApiResults.NotSignedIn();
         }
 
         var result = await passkeys.RemoveAsync(user, credentialId);
@@ -291,9 +299,17 @@ internal static class PasskeyEndpoints
             : JsonApiResults.Error(StatusCodes.Status409Conflict, "conflict", "The passkey could not be removed.");
     }
 
-    static IResult NotSignedIn()
+    /// <summary>The page limits the name too, but a client need not use the page. Null when the name is good.</summary>
+    static IResult? InvalidName(string? name)
     {
-        return JsonApiResults.Error(StatusCodes.Status401Unauthorized, "not-signed-in", "Sign in to do this.");
+        return name is not null && name.Trim().Length > MAX_NAME_LENGTH
+            ? JsonApiResults.Error(
+                StatusCodes.Status400BadRequest,
+                "invalid-name",
+                "The name is too long.",
+                $"Use at most {MAX_NAME_LENGTH} characters."
+            )
+            : null;
     }
 
     static IResult NotFound()
