@@ -4,44 +4,60 @@ using NTS.Domain.Core.StaticOptions;
 
 namespace NTS.Domain.Core.Aggregates;
 
-public class Result : Aggregate, IEventScoped
+/// <summary>
+/// What a Ranking or a Handout shows, composed in memory from the Participations it names whenever it is needed
+/// (ADR-0006). It is a read model: it is never stored, and the next composition shows the Participations as they are
+/// by then.
+/// </summary>
+public sealed class Result
 {
     static readonly FeiRanker FEI_RANKER = new();
     static readonly Ranker[] REGIONAL_RANKERS = [];
 
-    protected Result(
-        Guid? id,
+    Result(
+        Guid id,
         Guid? rankingId,
-        string? name,
-        CompetitionRuleset? ruleset,
-        ParticipationCategory? category,
-        IEnumerable<ParticipationResult> entries,
-        Guid eventId
+        string name,
+        CompetitionRuleset ruleset,
+        ParticipationCategory category,
+        Guid eventId,
+        List<ParticipationResult> entries
     )
-        : base(id)
     {
+        Id = id;
         EventId = eventId;
         RankingId = rankingId;
-        Name = Required(nameof(Name), name);
-        Ruleset = Required(nameof(Ruleset), ruleset);
-        Category = Required(nameof(Category), category);
-
-        var participationResults = Required(nameof(Entries), entries).ToList();
-        AreUnique(nameof(Participations), participationResults.Select(x => x.Participation)).ToList();
-        Entries = RankIfRequired(participationResults, Ruleset).AsReadOnly();
+        Name = name;
+        Ruleset = ruleset;
+        Category = category;
+        Entries = RankIfRequired(entries, ruleset).AsReadOnly();
     }
 
-    public Result(Ranking ranking)
+    /// <summary>The Results of a Ranking, over the Participations of its Event.</summary>
+    public Result(Ranking ranking, IEnumerable<Participation> participations)
         : this(
             ranking.Id,
             ranking.Id,
             ranking.Name,
             ranking.Ruleset,
             ranking.Category,
-            ranking.Entries.Select(ParticipationResult.From),
-            ranking.EventId
+            ranking.EventId,
+            Compose(ranking, participations)
         ) { }
 
+    /// <summary>The sheet of a Handout, over the Participation it names.</summary>
+    public Result(Handout handout, Participation participation)
+        : this(
+            handout.Id,
+            null,
+            participation.Competition.Name,
+            participation.Competition.Ruleset,
+            participation.Category,
+            handout.EventId,
+            [new ParticipationResult(NamedBy(handout, participation))]
+        ) { }
+
+    public Guid Id { get; }
     public Guid EventId { get; }
     public Guid? RankingId { get; }
     public string Name { get; }
@@ -54,6 +70,42 @@ public class Result : Aggregate, IEventScoped
     public override string ToString()
     {
         return $"{Name} {Category}: {Entries.Count}";
+    }
+
+    static List<ParticipationResult> Compose(Ranking ranking, IEnumerable<Participation> participations)
+    {
+        var byId = participations.DistinctBy(x => x.Id).ToDictionary(x => x.Id);
+        return ranking
+            .Entries.Select(entry => new ParticipationResult(
+                Find(byId, ranking, entry.ParticipationId),
+                entry.IsNotRanked,
+                entry.Rank
+            ))
+            .ToList();
+    }
+
+    static Participation Find(Dictionary<Guid, Participation> participations, Ranking ranking, Guid id)
+    {
+        if (participations.TryGetValue(id, out var participation))
+        {
+            return participation;
+        }
+
+        throw GuardHelper.Exception(
+            $"Ranking {ranking.Id} counts Participation {id}, which is not there to compose its Results."
+        );
+    }
+
+    static Participation NamedBy(Handout handout, Participation participation)
+    {
+        if (handout.ParticipationId != participation.Id)
+        {
+            throw GuardHelper.Exception(
+                $"Handout {handout.Id} is of Participation {handout.ParticipationId}, not of {participation.Id}."
+            );
+        }
+
+        return participation;
     }
 
     static List<ParticipationResult> RankIfRequired(List<ParticipationResult> entries, CompetitionRuleset ruleset)

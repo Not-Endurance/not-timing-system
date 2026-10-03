@@ -35,6 +35,16 @@ internal static class ParticipationFixtures
         return Create(number, CreatePhase(start, arrive, arrive.AddMinutes(5), isFinal: true), eliminated: null);
     }
 
+    /// <summary>Every Phase has arrived (at that time) and presented.</summary>
+    public static Participation CompletedAt(int number, DateTimeOffset arrive)
+    {
+        return Create(
+            number,
+            CreatePhase(arrive.AddHours(-1), arrive, arrive.AddMinutes(5), isFinal: true),
+            eliminated: null
+        );
+    }
+
     /// <summary>Back from its Phase, not presented yet: it is on the presentlist.</summary>
     public static Participation Arrived(int number, Eliminated? eliminated = null)
     {

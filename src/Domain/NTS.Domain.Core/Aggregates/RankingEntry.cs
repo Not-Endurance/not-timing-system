@@ -1,21 +1,30 @@
-﻿namespace NTS.Domain.Core.Aggregates;
+﻿using Not.Domain.Exceptions;
 
-public class RankingEntry : Aggregate // TODO: refacator in a proper aggregate
+namespace NTS.Domain.Core.Aggregates;
+
+/// <summary>
+/// A line of a Ranking: the Participation it counts and whether this Ranking leaves it out of the placings. A
+/// Participation can be in several Rankings and has a mark of its own in each. The rank is the final placing (ADR-0006):
+/// null while the Event is Live, when the Results compute the ranks.
+/// </summary>
+public sealed record RankingEntry
 {
-    public RankingEntry(Participation? participation, int? rank, bool isNotRanked, Guid? id = null)
-        : base(id)
+    public RankingEntry(Guid participationId, bool isNotRanked, int? rank = null)
     {
-        Participation = Required(nameof(Participation), participation);
-        Rank = rank;
+        if (participationId == Guid.Empty)
+        {
+            throw new DomainPropertyException(
+                nameof(ParticipationId),
+                string.Format(Field_1_is_required_on_2_string, nameof(ParticipationId), nameof(RankingEntry))
+            );
+        }
+
+        ParticipationId = participationId;
         IsNotRanked = isNotRanked;
+        Rank = rank;
     }
 
-    public Participation Participation { get; internal set; }
-    public int? Rank { get; internal set; }
+    public Guid ParticipationId { get; }
     public bool IsNotRanked { get; }
-
-    public override string ToString()
-    {
-        return IsNotRanked ? $"{X_string} {Participation}" : Participation.ToString();
-    }
+    public int? Rank { get; }
 }

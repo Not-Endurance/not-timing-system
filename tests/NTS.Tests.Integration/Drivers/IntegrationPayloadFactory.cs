@@ -174,8 +174,7 @@ internal static class IntegrationPayloadFactory
     )
     {
         var entries = participations.Select(
-            (participation, index) =>
-                new RankingEntry(participation, index + 1, false, id == null ? null : Offset(id.Value, index + 1))
+            (participation, index) => new RankingEntry(participation.Id, false, index + 1)
         );
 
         return new Ranking(
@@ -195,7 +194,7 @@ internal static class IntegrationPayloadFactory
 
     public static Handout Handout(Participation participation, Guid? id = null)
     {
-        return new Handout(participation, id ?? TestId.Of(801));
+        return new Handout(participation.EventId, participation.Id, id ?? TestId.Of(801));
     }
 
     public static Snapshot AutomaticSnapshot(int participationNumber, DateTimeOffset timestamp)

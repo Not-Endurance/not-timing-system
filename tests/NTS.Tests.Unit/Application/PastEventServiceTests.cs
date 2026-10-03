@@ -1,0 +1,185 @@
+using System.Linq.Expressions;
+using Not.Application.CRUD.Ports;
+using Not.Domain;
+using NTS.Application.Core;
+using NTS.Application.PastEvents;
+using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Objects;
+using NTS.Domain.Core.Objects.Documents;
+using NTS.Domain.Enums;
+using NTS.Domain.Objects;
+
+namespace NTS.Tests.Unit.Application;
+
+/// <summary>
+/// The past-Event pages show the Results of a Ranking composed from the Participations the service read once for the
+/// Event and from the ids the Ranking holds (#624, ADR-0006).
+/// </summary>
+public sealed class PastEventServiceTests
+{
+    static readonly Guid EVENT_ID = TestId.Of(1);
+
+    [Fact]
+    public async Task The_document_of_a_Ranking_is_composed_from_the_Participations_it_names()
+    {
+        var arrive = DateTimeOffset.Now.AddHours(-3);
+        var first = ParticipationFixtures.CompletedAt(1, arrive);
+        var second = ParticipationFixtures.CompletedAt(2, arrive.AddMinutes(30));
+        var ranking = CreateRanking([new RankingEntry(second.Id, false), new RankingEntry(first.Id, false)]);
+        var service = CreateService([first, second], [ranking]);
+
+        await service.LoadEvent(EVENT_ID);
+
+        var document = Assert.IsType<ResultsDocument>(service.Document);
+        Assert.Equal([first.Id, second.Id], document.Entries.Select(x => x.ParticipationId));
+        Assert.Equal([1, 2], document.Entries.Select(x => x.Rank));
+        Assert.Same(first, document.Entries[0].Participation);
+    }
+
+    [Fact]
+    public async Task A_Participation_in_two_Rankings_is_marked_in_each_by_that_Ranking_alone()
+    {
+        var arrive = DateTimeOffset.Now.AddHours(-3);
+        var first = ParticipationFixtures.CompletedAt(1, arrive);
+        var second = ParticipationFixtures.CompletedAt(2, arrive.AddMinutes(30));
+        var regular = CreateRanking([new RankingEntry(first.Id, false), new RankingEntry(second.Id, false)]);
+        var custom = CreateRanking([new RankingEntry(first.Id, true), new RankingEntry(second.Id, false)]);
+        var service = CreateService([first, second], [regular, custom]);
+        await service.LoadEvent(EVENT_ID);
+
+        var inTheRegularOne = service.Document!.Entries.Select(x => x.ParticipationId).ToList();
+        service.Select(custom);
+        var inTheCustomOne = service.Document!.Entries.Select(x => x.ParticipationId).ToList();
+
+        Assert.Equal([first.Id, second.Id], inTheRegularOne);
+        Assert.Equal([second.Id, first.Id], inTheCustomOne);
+    }
+
+    static Ranking CreateRanking(IEnumerable<RankingEntry> entries)
+    {
+        return new Ranking(
+            "CEI 1*",
+            CompetitionRuleset.Regional,
+            ParticipationCategory.Senior,
+            null,
+            null,
+            null,
+            null,
+            null,
+            entries,
+            EVENT_ID
+        );
+    }
+
+    static PastEventService CreateService(IEnumerable<Participation> participations, IEnumerable<Ranking> rankings)
+    {
+        var pastEvent = new EventInformation(
+            new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG"),
+            "Event",
+            "Location",
+            new EventSpan(DateTimeOffset.Now.Date.AddDays(-1), DateTimeOffset.Now.Date),
+            null,
+            id: EVENT_ID
+        );
+
+        return new PastEventService(
+            new PastEvents(pastEvent),
+            new ReadOnlyRepository<Participation>(participations),
+            new ReadOnlyRepository<Ranking>(rankings),
+            new ReadOnlyRepository<Official>([])
+        );
+    }
+
+    class ReadOnlyRepository<T> : IRepository<T>
+        where T : Entity
+    {
+        readonly List<T> _items;
+
+        public ReadOnlyRepository(IEnumerable<T> items)
+        {
+            _items = [.. items];
+        }
+
+        public Task<T?> Read(Guid id)
+        {
+            return Task.FromResult(_items.FirstOrDefault(x => x.Id == id));
+        }
+
+        public Task<T?> Read(Expression<Func<T, bool>> filter)
+        {
+            return Task.FromResult(_items.AsQueryable().FirstOrDefault(filter));
+        }
+
+        public Task<IEnumerable<T>> ReadMany()
+        {
+            return Task.FromResult<IEnumerable<T>>(_items.ToArray());
+        }
+
+        public Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
+        {
+            return Task.FromResult<IEnumerable<T>>(_items.AsQueryable().Where(filter).ToArray());
+        }
+
+        public Task Create(T item)
+        {
+            throw new NotSupportedException("The service only reads.");
+        }
+
+        public Task Update(T item)
+        {
+            throw new NotSupportedException("The service only reads.");
+        }
+
+        public Task Delete(T item)
+        {
+            throw new NotSupportedException("The service only reads.");
+        }
+
+        public Task DeleteMany(IEnumerable<T> items)
+        {
+            throw new NotSupportedException("The service only reads.");
+        }
+
+        public Task DeleteMany(Expression<Func<T, bool>> filter)
+        {
+            throw new NotSupportedException("The service only reads.");
+        }
+    }
+
+    sealed class PastEvents : ReadOnlyRepository<EventInformation>, IEventInformationRepository
+    {
+        readonly EventInformation _pastEvent;
+
+        public PastEvents(EventInformation pastEvent)
+            : base([pastEvent])
+        {
+            _pastEvent = pastEvent;
+        }
+
+        public Task<IEnumerable<EventInformation>> ReadPast()
+        {
+            return Task.FromResult<IEnumerable<EventInformation>>([_pastEvent]);
+        }
+
+        public Task<IEnumerable<EventInformation>> ReadActive()
+        {
+            throw new NotSupportedException("The service reads past Events only.");
+        }
+
+        public Task<EventInformation> Start(Guid configureEventId)
+        {
+            throw new NotSupportedException("The service reads past Events only.");
+        }
+
+        public Task Deactivate()
+        {
+            throw new NotSupportedException("The service reads past Events only.");
+        }
+
+        public Task Reset()
+        {
+            throw new NotSupportedException("The service reads past Events only.");
+        }
+    }
+}

@@ -40,7 +40,7 @@ public static class ParticipationAndRankingFactory
             if (existingParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
-                var rankingEntry = new RankingEntry(participation, null, setupParticipation.IsNotRanked);
+                var rankingEntry = new RankingEntry(participation.Id, setupParticipation.IsNotRanked);
                 AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
             }
             else
@@ -50,7 +50,7 @@ public static class ParticipationAndRankingFactory
                     .Find(p => p.Combination.Number == participation.Combination.Number);
                 if (participationRef != null)
                 {
-                    var rankingEntry = new RankingEntry(participationRef, null, setupParticipation.IsNotRanked);
+                    var rankingEntry = new RankingEntry(participationRef.Id, setupParticipation.IsNotRanked);
                     AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
                 }
             }

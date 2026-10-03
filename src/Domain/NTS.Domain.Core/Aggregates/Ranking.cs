@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Not.Domain.Exceptions;
 
 namespace NTS.Domain.Core.Aggregates;
 
@@ -23,7 +24,7 @@ public class Ranking : Aggregate, IEventScoped
         Name = Required(nameof(Name), name);
         Ruleset = Required(nameof(Ruleset), ruleset);
         Category = Required(nameof(Category), category);
-        Entries = new(AreUnique(nameof(Entries), entries).ToList());
+        Entries = OnePerParticipation(entries);
         FeiEventId = feiEventId;
         FeiEventCode = feiEventCode;
         FeiCompetitionId = feiCompetitionId;
@@ -47,14 +48,14 @@ public class Ranking : Aggregate, IEventScoped
         return $"{Name} {Category}: {Entries.Count}";
     }
 
-    public bool Update(Participation participation)
+    static ReadOnlyCollection<RankingEntry> OnePerParticipation(IEnumerable<RankingEntry> entries)
     {
-        var existing = Entries.FirstOrDefault(x => x.Participation.Id == participation.Id);
-        if (existing == null)
+        var counted = entries.ToList();
+        if (counted.GroupBy(x => x.ParticipationId).Any(x => x.Count() > 1))
         {
-            return false;
+            throw new DomainPropertyException(nameof(Entries), "Collection_contains_duplicate_entries");
         }
-        existing.Participation = participation;
-        return true;
+
+        return counted.AsReadOnly();
     }
 }
