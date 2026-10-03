@@ -7,7 +7,7 @@ namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Official : Entity, INamed, INtsDisplayable
 {
-    public Official(string? name, string? nameEnglish, OfficialRole? role, int? id = null, User? user = null)
+    public Official(string? name, string? nameEnglish, OfficialRole? role, Guid? id = null, User? user = null)
         : base(id)
     {
         Role = Required(nameof(Role), role);

@@ -35,7 +35,7 @@ public class EventScopeFactory<T> : IRepositoryScopeFactory<T>
         return new EventRepositoryScope<T>(eventId);
     }
 
-    int ResolveEventId()
+    Guid ResolveEventId()
     {
         var eventId = _socketContext.Event?.Id;
         GuardHelper.ThrowIfDefault(eventId, "Cannot use event-scoped repository before selecting an event.");
@@ -46,7 +46,7 @@ public class EventScopeFactory<T> : IRepositoryScopeFactory<T>
 public class EventRepositoryScope<T> : IRepositoryScope<T>
     where T : IEventScoped
 {
-    public EventRepositoryScope(int eventId)
+    public EventRepositoryScope(Guid eventId)
     {
         Filter = document => document.EventId == eventId;
     }

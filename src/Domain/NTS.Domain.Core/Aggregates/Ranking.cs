@@ -14,8 +14,8 @@ public class Ranking : Aggregate, IEventScoped
         string? feiRule,
         string? feiScheduleNumber,
         IEnumerable<RankingEntry> entries,
-        int eventId,
-        int? id = null
+        Guid eventId,
+        Guid? id = null
     )
         : base(id)
     {
@@ -31,7 +31,7 @@ public class Ranking : Aggregate, IEventScoped
         FeiScheduleNumber = feiScheduleNumber;
     }
 
-    public int EventId { get; }
+    public Guid EventId { get; }
     public string Name { get; }
     public CompetitionRuleset Ruleset { get; }
     public ParticipationCategory Category { get; }

@@ -15,7 +15,7 @@ public static class ParticipationAndRankingFactory
     ) Create(
         Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
         IEnumerable<Participation> existingParticipations,
-        int eventId
+        Guid eventId
     )
     {
         if (setupCompetition.Phases.Count == 0)
@@ -61,7 +61,7 @@ public static class ParticipationAndRankingFactory
     public static Participation CreateParticipation(
         Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
         Domain.Setup.Aggregates.ConfigureEvents.Participation setupParticipation,
-        int eventId
+        Guid eventId
     )
     {
         var phases = CreatePhases(setupCompetition, setupParticipation);

@@ -53,7 +53,7 @@ public class UserSessionMongoRepository
         return await GetCollection().Find(x => x.UserIdentifier == userIdentifier).FirstOrDefaultAsync();
     }
 
-    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId)
+    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, Guid eventId)
     {
         using var activity = _telemetry.StartActivity(nameof(UserSessionMongoRepository), nameof(ReadByUserIdentifier));
 
@@ -67,7 +67,7 @@ public class UserSessionMongoRepository
             .FirstOrDefaultAsync();
     }
 
-    public Task DeleteAllForEvent(int eventId)
+    public Task DeleteAllForEvent(Guid eventId)
     {
         return DeleteMany(x => x.EventId == eventId);
     }

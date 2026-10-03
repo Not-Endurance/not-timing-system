@@ -7,7 +7,12 @@ public class ParticipationResult : Entity
         return new ParticipationResult(entry.Participation, entry.IsNotRanked, entry.Rank, entry.Id);
     }
 
-    public ParticipationResult(Participation? participation, bool isNotRanked = false, int? rank = null, int? id = null)
+    public ParticipationResult(
+        Participation? participation,
+        bool isNotRanked = false,
+        int? rank = null,
+        Guid? id = null
+    )
         : base(id ?? participation?.Id)
     {
         Participation = Required(nameof(Participation), participation);
@@ -18,7 +23,7 @@ public class ParticipationResult : Entity
     public Participation Participation { get; }
     public int? Rank { get; internal set; }
     public bool IsNotRanked { get; }
-    public int ParticipationId => Participation.Id;
+    public Guid ParticipationId => Participation.Id;
 
     public override string ToString()
     {

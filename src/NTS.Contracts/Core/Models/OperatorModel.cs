@@ -14,10 +14,10 @@ public class OperatorModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Op
         return model;
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public int EventId { get; set; }
-    public int UserId { get; set; }
+    public Guid EventId { get; set; }
+    public Guid UserId { get; set; }
     public OfficialRole Role { get; set; } = OfficialRole.Steward;
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }

@@ -6,5 +6,5 @@ namespace Not.Storage.Mongo;
 public interface IMongoRepository<T> : IRepository<T>
 {
     Task<IEnumerable<T>> ReadMany(ODataQueryOptions<T> options);
-    Task Delete(int id);
+    Task Delete(Guid id);
 }

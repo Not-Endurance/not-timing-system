@@ -30,7 +30,7 @@ public class CompetitionModel
         };
     }
 
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public string Name { get; init; } = default!;
     public CompetitionRuleset Ruleset { get; init; }
     public DateTimeOffset? Start { get; init; }

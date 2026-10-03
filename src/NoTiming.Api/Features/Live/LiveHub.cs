@@ -20,13 +20,12 @@ public sealed class LiveHub : Hub<ILiveClientProcedures>
     public override async Task OnConnectedAsync()
     {
         var httpContext = Context.GetHttpContext();
-        var group = ConnectionDiagnostics.GetConnectionGroup(httpContext);
         var correlationId = ConnectionDiagnostics.GetCorrelationId(httpContext);
 
-        if (string.IsNullOrWhiteSpace(group))
+        if (!LiveGroup.TryParse(ConnectionDiagnostics.GetConnectionGroup(httpContext), out var eventId))
         {
             _logger.LogWarning(
-                "Live hub rejected connection {ConnectionId}: the Event query parameter is missing. CorrelationId {CorrelationId}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
+                "Live hub rejected connection {ConnectionId}: the Event query parameter is missing or is not an Event id. CorrelationId {CorrelationId}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
                 Context.ConnectionId,
                 correlationId,
                 ConnectionDiagnostics.GetClientName(httpContext),
@@ -34,10 +33,11 @@ public sealed class LiveHub : Hub<ILiveClientProcedures>
                 ConnectionDiagnostics.GetInstanceId()
             );
             throw new InvalidOperationException(
-                "SignalR connection rejected because the event ID query parameter is missing."
+                "SignalR connection rejected because the event ID query parameter is missing or is not an Event id."
             );
         }
 
+        var group = LiveGroup.Name(eventId);
         await Groups.AddToGroupAsync(Context.ConnectionId, group);
         _logger.LogInformation(
             "Live hub connected {ConnectionId} to Event {EventId}. CorrelationId {CorrelationId}, Client {ClientName}, Version {ClientVersion}, InstanceId {InstanceId}.",
@@ -53,9 +53,10 @@ public sealed class LiveHub : Hub<ILiveClientProcedures>
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var httpContext = Context.GetHttpContext();
-        var group = ConnectionDiagnostics.GetConnectionGroup(httpContext);
-        if (!string.IsNullOrWhiteSpace(group))
+        string? group = null;
+        if (LiveGroup.TryParse(ConnectionDiagnostics.GetConnectionGroup(httpContext), out var eventId))
         {
+            group = LiveGroup.Name(eventId);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
         }
 

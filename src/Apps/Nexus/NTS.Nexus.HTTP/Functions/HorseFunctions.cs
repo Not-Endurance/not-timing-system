@@ -54,8 +54,8 @@ public class HorseFunctions : FunctionBase
 
     [Function("horses-safe-delete")]
     public async Task<IActionResult> SafeDelete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}/safe")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:guid}/safe")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(SafeDelete));
@@ -74,8 +74,8 @@ public class HorseFunctions : FunctionBase
 
     [Function("horses-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "horses/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Delete));
@@ -108,8 +108,8 @@ public class HorseFunctions : FunctionBase
 
     [Function("horses-get")]
     public async Task<IActionResult> GetOne(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "horses/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(GetOne));

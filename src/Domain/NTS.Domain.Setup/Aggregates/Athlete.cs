@@ -14,7 +14,7 @@ public class Athlete : Aggregate, IKurdMirror<Club>, INamed, INtsDisplayable
         string? feiId,
         Country? country,
         Club? club,
-        int? id = null,
+        Guid? id = null,
         User? user = null
     )
         : base(id)

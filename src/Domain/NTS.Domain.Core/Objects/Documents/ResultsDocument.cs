@@ -31,7 +31,7 @@ public sealed record ResultsDocument : Document, IIdentifiable
     }
 
     public Aggregates.Result Results { get; }
-    public int Id => Results.Id;
+    public Guid Id => Results.Id;
     public bool IsRanked => Results.IsRanked;
     public IReadOnlyList<ParticipationResult> Entries => Results.Entries;
 }

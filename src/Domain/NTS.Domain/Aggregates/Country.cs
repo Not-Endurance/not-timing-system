@@ -4,7 +4,7 @@ namespace NTS.Domain.Aggregates;
 
 public class Country : Aggregate
 {
-    public Country(int id, string? name, string? isoCode, string? nfCode, string? locale)
+    public Country(Guid id, string? name, string? isoCode, string? nfCode, string? locale)
         : base(id)
     {
         Name = Required(nameof(Name), name);

@@ -2,7 +2,7 @@ namespace NTS.Domain.Core.Aggregates;
 
 public class Operator : Aggregate, IEventScoped
 {
-    public Operator(int eventId, int? userId, OfficialRole? role = null, int? id = null)
+    public Operator(Guid eventId, Guid? userId, OfficialRole? role = null, Guid? id = null)
         : base(id)
     {
         EventId = eventId;
@@ -10,7 +10,7 @@ public class Operator : Aggregate, IEventScoped
         Role = OfficialRole.Steward;
     }
 
-    public int EventId { get; }
-    public int UserId { get; }
+    public Guid EventId { get; }
+    public Guid UserId { get; }
     public OfficialRole Role { get; }
 }

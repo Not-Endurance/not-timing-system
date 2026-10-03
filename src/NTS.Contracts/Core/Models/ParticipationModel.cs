@@ -24,9 +24,9 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
         };
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public int EventId { get; set; }
+    public Guid EventId { get; set; }
     public ParticipationCategory Category { get; set; } = default!;
     public CompetitionModel Competition { get; set; } = default!;
     public CombinationModel Combination { get; set; } = default!;

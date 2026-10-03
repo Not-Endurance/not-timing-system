@@ -7,7 +7,7 @@ public interface IEventInformationRepository : IRepository<EventInformation>
 {
     Task<IEnumerable<EventInformation>> ReadActive();
     Task<IEnumerable<EventInformation>> ReadPast();
-    Task<EventInformation> Start(int configureEventId);
+    Task<EventInformation> Start(Guid configureEventId);
     Task Deactivate();
 
     /// <summary>

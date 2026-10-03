@@ -4,10 +4,10 @@ namespace NTS.Domain.Setup.Events;
 
 public record ConfigureEventUpdated : IDomainEvent
 {
-    public ConfigureEventUpdated(int eventId)
+    public ConfigureEventUpdated(Guid eventId)
     {
         EventId = eventId;
     }
 
-    public int EventId { get; }
+    public Guid EventId { get; }
 }

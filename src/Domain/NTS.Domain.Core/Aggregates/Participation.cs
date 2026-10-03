@@ -18,8 +18,8 @@ public class Participation : Aggregate, IEventScoped
         Combination combination,
         PhaseCollection phases,
         Eliminated? notQualified,
-        int eventId,
-        int? id = null
+        Guid eventId,
+        Guid? id = null
     )
         : base(id)
     {
@@ -31,7 +31,7 @@ public class Participation : Aggregate, IEventScoped
         Eliminated = notQualified;
     }
 
-    public int EventId { get; }
+    public Guid EventId { get; }
     public Competition Competition { get; }
     public Combination Combination { get; }
     public ParticipationCategory Category { get; }

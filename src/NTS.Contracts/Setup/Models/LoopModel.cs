@@ -14,7 +14,7 @@ public class LoopModel
         return new() { Id = loop.Id, Distance = loop.Distance };
     }
 
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public double Distance { get; init; }
 
     public Loop MapToEntity()

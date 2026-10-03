@@ -21,6 +21,9 @@ namespace NTS.Tests.Integration;
 public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
 {
     static readonly TimeSpan PATIENCE = TimeSpan.FromSeconds(10);
+    static readonly Guid AN_EVENT = TestId.Of(7);
+    static readonly Guid ANOTHER_EVENT = TestId.Of(8);
+    static readonly Guid A_PARTICIPATION = TestId.Of(42);
 
     readonly ApiHostFixture _host;
     readonly HttpClient _http;
@@ -99,15 +102,15 @@ public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
     [Fact]
     public async Task An_anonymous_client_receives_the_change_notifications_of_its_Event_only()
     {
-        await using var inTheEvent = ConnectToEvent(7);
-        await using var elsewhere = ConnectToEvent(8);
-        var received = new TaskCompletionSource<(int EventId, int ParticipationId)>();
-        var missed = new List<(int, int)>();
-        inTheEvent.On<int, int>(
+        await using var inTheEvent = ConnectToEvent(AN_EVENT);
+        await using var elsewhere = ConnectToEvent(ANOTHER_EVENT);
+        var received = new TaskCompletionSource<(Guid EventId, Guid ParticipationId)>();
+        var missed = new List<(Guid, Guid)>();
+        inTheEvent.On<Guid, Guid>(
             nameof(ILiveClientProcedures.ParticipationChanged),
             (eventId, participationId) => received.TrySetResult((eventId, participationId))
         );
-        elsewhere.On<int, int>(
+        elsewhere.On<Guid, Guid>(
             nameof(ILiveClientProcedures.ParticipationChanged),
             (eventId, participationId) => missed.Add((eventId, participationId))
         );
@@ -115,9 +118,9 @@ public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
         await elsewhere.StartAsync();
 
         var hub = _host.Api.Services.GetRequiredService<IHubContext<LiveHub, ILiveClientProcedures>>();
-        await hub.Clients.Group("7").ParticipationChanged(7, 42);
+        await hub.Clients.Group(LiveGroup.Name(AN_EVENT)).ParticipationChanged(AN_EVENT, A_PARTICIPATION);
 
-        Assert.Equal((7, 42), await received.Task.WaitAsync(PATIENCE));
+        Assert.Equal((AN_EVENT, A_PARTICIPATION), await received.Task.WaitAsync(PATIENCE));
         await Task.Delay(300);
         Assert.Empty(missed);
     }
@@ -130,7 +133,7 @@ public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
             .Where(method => method.Name is not (nameof(Hub.OnConnectedAsync) or nameof(Hub.OnDisconnectedAsync)));
         Assert.Empty(callable);
 
-        await using var connection = ConnectToEvent(7);
+        await using var connection = ConnectToEvent(AN_EVENT);
         await connection.StartAsync();
         var refused = await Assert.ThrowsAsync<HubException>(() => connection.InvokeAsync("Receive", 7));
         Assert.Contains("Method does not exist", refused.Message);
@@ -143,30 +146,46 @@ public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
             .WithUrl(new Uri(_host.BaseAddress, ApplicationConstants.LIVE_HUB))
             .AddNewtonsoftJsonProtocol()
             .Build();
-        var closed = new TaskCompletionSource<Exception?>();
-        connection.Closed += error =>
-        {
-            closed.TrySetResult(error);
-            return Task.CompletedTask;
-        };
 
-        try
-        {
-            await connection.StartAsync();
-        }
-        catch (Exception)
-        {
-            return; // refused while connecting
-        }
+        await AssertRefused(connection);
+    }
 
-        Assert.NotNull(await closed.Task.WaitAsync(PATIENCE));
-        Assert.Equal(HubConnectionState.Disconnected, connection.State);
+    [Theory]
+    [InlineData("7")]
+    [InlineData("not-an-id")]
+    [InlineData("00000000-0000-0000-0000-000000000000")]
+    public async Task The_hub_refuses_a_connection_whose_Event_is_not_an_Event_id(string group)
+    {
+        await using var connection = ConnectToGroup(group);
+
+        await AssertRefused(connection);
+    }
+
+    [Theory]
+    [InlineData("N")]
+    [InlineData("B")]
+    [InlineData("D-upper")]
+    public async Task The_spelling_of_the_Event_id_does_not_decide_the_group(string format)
+    {
+        var spelled = format == "D-upper" ? AN_EVENT.ToString().ToUpperInvariant() : AN_EVENT.ToString(format);
+        await using var connection = ConnectToGroup(Uri.EscapeDataString(spelled));
+        var received = new TaskCompletionSource<(Guid, Guid)>();
+        connection.On<Guid, Guid>(
+            nameof(ILiveClientProcedures.ParticipationChanged),
+            (eventId, participationId) => received.TrySetResult((eventId, participationId))
+        );
+        await connection.StartAsync();
+
+        var hub = _host.Api.Services.GetRequiredService<IHubContext<LiveHub, ILiveClientProcedures>>();
+        await hub.Clients.Group(LiveGroup.Name(AN_EVENT)).ParticipationChanged(AN_EVENT, A_PARTICIPATION);
+
+        Assert.Equal((AN_EVENT, A_PARTICIPATION), await received.Task.WaitAsync(PATIENCE));
     }
 
     [Fact]
     public async Task A_WebSocket_from_a_foreign_origin_is_refused()
     {
-        var address = await OpenWebSocketAddress(7);
+        var address = await OpenWebSocketAddress(AN_EVENT);
         using var socket = new ClientWebSocket();
         socket.Options.SetRequestHeader("Origin", "https://evil.example");
 
@@ -181,7 +200,7 @@ public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
     [InlineData("http://localhost:7000")]
     public async Task A_WebSocket_without_an_origin_from_this_host_or_from_an_allowed_origin_connects(string? origin)
     {
-        var address = await OpenWebSocketAddress(7);
+        var address = await OpenWebSocketAddress(AN_EVENT);
         using var socket = new ClientWebSocket();
         if (origin != null)
         {
@@ -280,15 +299,42 @@ public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
         Assert.Equal("official@integration.test", body.GetProperty("email").GetString());
     }
 
-    HubConnection ConnectToEvent(int eventId)
+    async Task AssertRefused(HubConnection connection)
+    {
+        var closed = new TaskCompletionSource<Exception?>();
+        connection.Closed += error =>
+        {
+            closed.TrySetResult(error);
+            return Task.CompletedTask;
+        };
+
+        try
+        {
+            await connection.StartAsync();
+        }
+        catch (Exception)
+        {
+            return; // refused while connecting
+        }
+
+        Assert.NotNull(await closed.Task.WaitAsync(PATIENCE));
+        Assert.Equal(HubConnectionState.Disconnected, connection.State);
+    }
+
+    HubConnection ConnectToEvent(Guid eventId)
+    {
+        return ConnectToGroup(eventId.ToString());
+    }
+
+    HubConnection ConnectToGroup(string group)
     {
         return new HubConnectionBuilder()
-            .WithUrl(new Uri(_host.BaseAddress, $"{ApplicationConstants.LIVE_HUB}?connectionGroup={eventId}"))
+            .WithUrl(new Uri(_host.BaseAddress, $"{ApplicationConstants.LIVE_HUB}?connectionGroup={group}"))
             .AddNewtonsoftJsonProtocol()
             .Build();
     }
 
-    async Task<Uri> OpenWebSocketAddress(int eventId)
+    async Task<Uri> OpenWebSocketAddress(Guid eventId)
     {
         var negotiated = await _http.PostAsync(
             $"{ApplicationConstants.LIVE_HUB}/negotiate?negotiateVersion=1&connectionGroup={eventId}",

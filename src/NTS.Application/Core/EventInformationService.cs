@@ -48,7 +48,7 @@ public class EventInformationService : NStatefulService, IActiveEventsContext, I
         EmitChanged();
     }
 
-    public void Remove(int eventId)
+    public void Remove(Guid eventId)
     {
         _activeEvents.RemoveAll(x => x.Id == eventId);
         EmitChanged();

@@ -9,6 +9,6 @@ public interface INtsUserSessionRepository
     : IRepository<NtsUserSessionModel>,
         INUserSessionRepository<NtsUserSessionModel>
 {
-    Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId);
+    Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, Guid eventId);
     new Task Delete(NtsUserSessionModel item);
 }

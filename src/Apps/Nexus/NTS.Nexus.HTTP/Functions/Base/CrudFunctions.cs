@@ -32,7 +32,7 @@ public class CrudFunctions<T> : FunctionBase
         return Ok();
     }
 
-    protected async Task<IActionResult> ReadCore(int id)
+    protected async Task<IActionResult> ReadCore(Guid id)
     {
         return Ok(await _repository.Read(id));
     }
@@ -59,7 +59,7 @@ public class CrudFunctions<T> : FunctionBase
         return Ok();
     }
 
-    protected async Task<IActionResult> DeleteCore(int id)
+    protected async Task<IActionResult> DeleteCore(Guid id)
     {
         await _repository.Delete(id);
         return Ok();

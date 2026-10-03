@@ -13,7 +13,7 @@ public record PhaseUpdateModel : KrudFormModel<Phase>, IPhaseState
         MapFrom(phase);
     }
 
-    int IPhaseState.Id => Id ?? default;
+    Guid IPhaseState.Id => Id ?? default;
 
     public string? StartTimeInput { get; set; }
     public string? ArriveTimeInput { get; set; }

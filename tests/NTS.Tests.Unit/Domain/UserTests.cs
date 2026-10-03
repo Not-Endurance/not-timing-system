@@ -10,7 +10,7 @@ public sealed class UserTests
         var user = new User(
             "rider@example.test",
             "Fallback Rider",
-            id: 1,
+            id: TestId.Of(1),
             givenName: "Rosa",
             surname: "Rider",
             displayName: "Rosa Display"
@@ -22,7 +22,7 @@ public sealed class UserTests
     [Fact]
     public void ToString_falls_back_to_email_when_no_distinct_name_exists()
     {
-        var user = new User("rider@example.test", "rider@example.test", id: 1);
+        var user = new User("rider@example.test", "rider@example.test", id: TestId.Of(1));
 
         Assert.Equal("rider@example.test", user.ToString());
     }

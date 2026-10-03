@@ -4,10 +4,10 @@ namespace NTS.Domain.Core.Events;
 
 public record EventDisconnected : IDomainEvent
 {
-    public EventDisconnected(int? eventId)
+    public EventDisconnected(Guid? eventId)
     {
         EventId = eventId;
     }
 
-    public int? EventId { get; }
+    public Guid? EventId { get; }
 }

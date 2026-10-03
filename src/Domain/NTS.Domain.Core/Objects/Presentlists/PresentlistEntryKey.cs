@@ -2,7 +2,7 @@ namespace NTS.Domain.Core.Objects.Presentlists;
 
 public sealed record PresentlistEntryKey
 {
-    public PresentlistEntryKey(int number, int phaseId, PresentlistEntryType type)
+    public PresentlistEntryKey(int number, Guid phaseId, PresentlistEntryType type)
     {
         Number = number;
         PhaseId = phaseId;
@@ -10,6 +10,6 @@ public sealed record PresentlistEntryKey
     }
 
     public int Number { get; }
-    public int PhaseId { get; }
+    public Guid PhaseId { get; }
     public PresentlistEntryType Type { get; }
 }

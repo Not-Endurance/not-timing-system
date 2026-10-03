@@ -1,6 +1,4 @@
-﻿using Not.Objects;
-using Not.Random;
-using Not.Structures;
+﻿using Not.Structures;
 
 namespace Not.Application.Authentication.User;
 
@@ -8,14 +6,14 @@ public class NUserModel : IIdentifiable, IEquatable<NUserModel>
 {
     string? _name;
 
-    public NUserModel(string email, string[]? roles = null, int? id = null)
+    public NUserModel(string email, string[]? roles = null, Guid? id = null)
     {
-        Id = id ?? RandomHelper.GenerateUniqueInteger();
+        Id = id ?? Guid.NewGuid();
         Roles = roles ?? [];
         Email = email;
     }
 
-    public int Id { get; }
+    public Guid Id { get; }
     public string Email { get; }
     public string[] Roles { get; } = [];
     public string? Name
@@ -42,7 +40,7 @@ public class NUserModel : IIdentifiable, IEquatable<NUserModel>
 
     public bool Equals(NUserModel? other)
     {
-        return ObjectHelper.AreEqual(this, other);
+        return other is not null && other.GetType() == GetType() && other.Id == Id;
     }
 
     public override int GetHashCode()

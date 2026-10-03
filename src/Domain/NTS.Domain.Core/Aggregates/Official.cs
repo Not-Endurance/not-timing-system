@@ -9,9 +9,9 @@ public class Official : Aggregate, IEventScoped, INamed, INtsDisplayable
         string? name,
         string? nameEnglish,
         OfficialRole? role,
-        int eventId,
-        int? id = null,
-        int? userId = null
+        Guid eventId,
+        Guid? id = null,
+        Guid? userId = null
     )
         : base(id)
     {
@@ -22,11 +22,11 @@ public class Official : Aggregate, IEventScoped, INamed, INtsDisplayable
         UserId = userId;
     }
 
-    public int EventId { get; }
+    public Guid EventId { get; }
     public string Name { get; }
     public string? NameEnglish { get; }
     public OfficialRole Role { get; }
-    public int? UserId { get; }
+    public Guid? UserId { get; }
 
     public string GetDisplayName(CompetitionRuleset? ruleset = null, CultureInfo? culture = null)
     {

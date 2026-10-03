@@ -4,7 +4,7 @@ namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Loop : Entity
 {
-    public Loop(double? distance, int? id = null)
+    public Loop(double? distance, Guid? id = null)
         : base(id)
     {
         Distance = PositiveDistance(distance);

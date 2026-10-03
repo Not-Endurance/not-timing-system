@@ -4,7 +4,7 @@ namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Operator : Entity
 {
-    public Operator(User? user, int? id = null, OfficialRole? role = null)
+    public Operator(User? user, Guid? id = null, OfficialRole? role = null)
         : base(id)
     {
         User = Required(nameof(User), user);

@@ -2,7 +2,7 @@
 
 public class Club : Entity
 {
-    public Club(string name, int id)
+    public Club(string name, Guid id)
         : base(id)
     {
         Name = name;

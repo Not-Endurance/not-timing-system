@@ -45,11 +45,20 @@ public sealed class StartlistServiceTests
             CreatePhase(firstStart, firstArrive, firstPresent),
             CreatePhase(now.AddMinutes(30), isFinal: true),
         };
-        var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
-        var horse = new Horse($"Horse {number}", null, null, number);
+        var country = new Country(TestId.Of(number), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete($"Athlete {number}", null, country, null, null, TestId.Of(number));
+        var horse = new Horse($"Horse {number}", null, null, TestId.Of(number));
         var totalDistance = phases.Sum(x => x.Length);
-        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", null, null, number);
+        var combination = new Combination(
+            number,
+            athlete,
+            horse,
+            null,
+            $"{totalDistance:0.##}",
+            null,
+            null,
+            TestId.Of(number)
+        );
 
         return new Participation(
             ParticipationCategory.Senior,
@@ -57,8 +66,8 @@ public sealed class StartlistServiceTests
             combination,
             new PhaseCollection(phases),
             eliminated,
-            eventId: 1,
-            id: number
+            eventId: TestId.Of(1),
+            id: TestId.Of(number)
         );
     }
 
@@ -102,7 +111,7 @@ public sealed class StartlistServiceTests
             return Task.CompletedTask;
         }
 
-        public Task<Participation?> Read(int id)
+        public Task<Participation?> Read(Guid id)
         {
             return Task.FromResult(_items.FirstOrDefault(x => x.Id == id));
         }

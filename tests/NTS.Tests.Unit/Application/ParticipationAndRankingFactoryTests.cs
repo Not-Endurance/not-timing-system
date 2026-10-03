@@ -15,7 +15,7 @@ public sealed class ParticipationAndRankingFactoryTests
     {
         var competition = CreateCompetition(minSpeedRestriction: 10, maxSpeedRestriction: 16);
 
-        var (participations, _) = ParticipationAndRankingFactory.Create(competition, [], eventId: 100);
+        var (participations, _) = ParticipationAndRankingFactory.Create(competition, [], eventId: TestId.Of(100));
 
         var combination = Assert.Single(participations).Combination;
         Assert.Equal(10, combination.MinAverageSpeed);
@@ -32,7 +32,7 @@ public sealed class ParticipationAndRankingFactoryTests
             maxSpeedOverride: 12
         );
 
-        var (participations, _) = ParticipationAndRankingFactory.Create(competition, [], eventId: 100);
+        var (participations, _) = ParticipationAndRankingFactory.Create(competition, [], eventId: TestId.Of(100));
 
         var combination = Assert.Single(participations).Combination;
         Assert.Equal(8, combination.MinAverageSpeed);
@@ -44,7 +44,7 @@ public sealed class ParticipationAndRankingFactoryTests
     {
         var competition = CreateCompetition(minSpeedRestriction: null, maxSpeedRestriction: null);
 
-        var (participations, _) = ParticipationAndRankingFactory.Create(competition, [], eventId: 100);
+        var (participations, _) = ParticipationAndRankingFactory.Create(competition, [], eventId: TestId.Of(100));
 
         var combination = Assert.Single(participations).Combination;
         Assert.Null(combination.MinAverageSpeed);
@@ -56,11 +56,25 @@ public sealed class ParticipationAndRankingFactoryTests
     {
         var competition = CreateCompetition(minSpeedRestriction: 16, maxSpeedRestriction: 10);
 
-        var (participations, _) = ParticipationAndRankingFactory.Create(competition, [], eventId: 100);
+        var (participations, _) = ParticipationAndRankingFactory.Create(competition, [], eventId: TestId.Of(100));
 
         var combination = Assert.Single(participations).Combination;
         Assert.Equal(16, combination.MinAverageSpeed);
         Assert.Equal(10, combination.MaxAverageSpeed);
+    }
+
+    [Fact]
+    public void Create_copies_the_Guids_of_the_Setup_Athlete_Horse_and_Combination_into_the_Core_copies()
+    {
+        var competition = CreateCompetition(minSpeedRestriction: null, maxSpeedRestriction: null);
+        var setupCombination = Assert.Single(competition.Participations).Combination;
+
+        var (participations, _) = ParticipationAndRankingFactory.Create(competition, [], eventId: TestId.Of(100));
+
+        var combination = Assert.Single(participations).Combination;
+        Assert.Equal(setupCombination.Athlete.Id, combination.Athlete.Id);
+        Assert.Equal(setupCombination.Horse.Id, combination.Horse.Id);
+        Assert.Equal(setupCombination.Id, combination.Id);
     }
 
     static SetupCompetition CreateCompetition(
@@ -70,11 +84,11 @@ public sealed class ParticipationAndRankingFactoryTests
         double? maxSpeedOverride = null
     )
     {
-        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete("Rider", "Rider", null, country, null, id: 1);
-        var horse = new Horse("Horse", "Horse", null, id: 2);
-        var combination = new Combination(1, athlete, horse, id: 3);
-        var phase = new Phase(new Loop(40, id: 4), recovery: 40, rest: null, id: 5);
+        var country = new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete("Rider", "Rider", null, country, null, id: TestId.Of(1));
+        var horse = new Horse("Horse", "Horse", null, id: TestId.Of(2));
+        var combination = new Combination(1, athlete, horse, id: TestId.Of(3));
+        var phase = new Phase(new Loop(40, id: TestId.Of(4)), recovery: 40, rest: null, id: TestId.Of(5));
         var participation = new SetupParticipation(
             isNotRanked: false,
             combination: combination,
@@ -82,7 +96,7 @@ public sealed class ParticipationAndRankingFactoryTests
             startTimeOverride: null,
             maxSpeedOverride: maxSpeedOverride,
             minSpeedOverride: minSpeedOverride,
-            id: 6
+            id: TestId.Of(6)
         );
 
         return new SetupCompetition(
@@ -99,7 +113,7 @@ public sealed class ParticipationAndRankingFactoryTests
             feiScheduleNumber: null,
             phases: [phase],
             participations: [participation],
-            id: 7
+            id: TestId.Of(7)
         );
     }
 }

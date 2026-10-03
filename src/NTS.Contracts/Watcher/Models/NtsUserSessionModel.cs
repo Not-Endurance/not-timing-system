@@ -20,9 +20,9 @@ public class NtsUserSessionModel
     [System.Text.Json.Serialization.JsonIgnore]
     public ObjectId MongoId { get; set; } = ObjectId.GenerateNewId();
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public int EventId { get; set; }
+    public Guid EventId { get; set; }
 
     public void MapFrom(NtsUserSessionModel session)
     {

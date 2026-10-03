@@ -16,7 +16,7 @@ public class ConfigureEventModel : IDocument, IKrudModel<ConfigureEvent>
         return model;
     }
 
-    public int Id { get; set; } = default!;
+    public Guid Id { get; set; } = default!;
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Location { get; set; } = default!;
     public CountryModel Country { get; set; } = default!;

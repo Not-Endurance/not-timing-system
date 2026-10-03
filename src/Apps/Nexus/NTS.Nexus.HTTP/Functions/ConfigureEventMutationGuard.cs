@@ -7,8 +7,8 @@ namespace NTS.Nexus.HTTP.Functions;
 
 public interface IConfigureEventMutationGuard
 {
-    Task EnsureCanMutate(int configureEventId);
-    Task EnsureCanMutate(IEnumerable<int> configureEventIds);
+    Task EnsureCanMutate(Guid configureEventId);
+    Task EnsureCanMutate(IEnumerable<Guid> configureEventIds);
 }
 
 public class ConfigureEventMutationGuard : IConfigureEventMutationGuard, ITransient
@@ -20,7 +20,7 @@ public class ConfigureEventMutationGuard : IConfigureEventMutationGuard, ITransi
         _eventInformation = eventInformation;
     }
 
-    public async Task EnsureCanMutate(int configureEventId)
+    public async Task EnsureCanMutate(Guid configureEventId)
     {
         var activeEvent = await _eventInformation.Read(x => x.Id == configureEventId && x.IsActive);
         if (activeEvent == null)
@@ -31,7 +31,7 @@ public class ConfigureEventMutationGuard : IConfigureEventMutationGuard, ITransi
         throw new DomainException($"Cannot mutate configure event '{configureEventId}' because the event is started.");
     }
 
-    public async Task EnsureCanMutate(IEnumerable<int> configureEventIds)
+    public async Task EnsureCanMutate(IEnumerable<Guid> configureEventIds)
     {
         foreach (var configureEventId in configureEventIds.Distinct())
         {

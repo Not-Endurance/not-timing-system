@@ -6,5 +6,5 @@ namespace NTS.Contracts.PastEvents;
 public interface IPastEventContext : IStatefulService
 {
     EventInformation? Event { get; }
-    int EventId { get; }
+    Guid EventId { get; }
 }

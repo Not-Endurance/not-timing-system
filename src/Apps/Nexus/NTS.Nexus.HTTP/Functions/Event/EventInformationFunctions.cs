@@ -60,8 +60,8 @@ public class EventInformationFunctions : FunctionBase
 
     [Function("event-information-read")]
     public async Task<IActionResult> Read(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "event/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "event/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Read));
@@ -110,8 +110,8 @@ public class EventInformationFunctions : FunctionBase
 
     [Function("event-information-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "event/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "event/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Delete));
@@ -130,8 +130,8 @@ public class EventInformationFunctions : FunctionBase
 
     [Function("event-information-reset")]
     public async Task<IActionResult> Reset(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "event/{id:int}/reset")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "event/{id:guid}/reset")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Reset));
@@ -144,8 +144,8 @@ public class EventInformationFunctions : FunctionBase
 
     [Function("event-information-deactivate")]
     public async Task<IActionResult> Deactivate(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "event/{id:int}/deactivate")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "event/{id:guid}/deactivate")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Deactivate));
@@ -158,8 +158,8 @@ public class EventInformationFunctions : FunctionBase
 
     [Function("event-information-start")]
     public async Task<IActionResult> Start(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "event/{id:int}/start")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "event/{id:guid}/start")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Start));

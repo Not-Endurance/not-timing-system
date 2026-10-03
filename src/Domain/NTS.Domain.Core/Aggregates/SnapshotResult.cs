@@ -4,17 +4,17 @@ namespace NTS.Domain.Core.Aggregates;
 
 public class SnapshotResult : Aggregate, IEventScoped
 {
-    public static SnapshotResult Applied(int eventId, Snapshot snapshot)
+    public static SnapshotResult Applied(Guid eventId, Snapshot snapshot)
     {
         return new(snapshot, SnapshotResultType.Applied, eventId);
     }
 
-    public static SnapshotResult NotApplied(int eventId, Snapshot snapshot, SnapshotResultType type)
+    public static SnapshotResult NotApplied(Guid eventId, Snapshot snapshot, SnapshotResultType type)
     {
         return new(snapshot, type, eventId);
     }
 
-    public SnapshotResult(Snapshot snapshot, SnapshotResultType type, int eventId, int? id = null)
+    public SnapshotResult(Snapshot snapshot, SnapshotResultType type, Guid eventId, Guid? id = null)
         : base(id)
     {
         EventId = eventId;
@@ -22,11 +22,11 @@ public class SnapshotResult : Aggregate, IEventScoped
         Type = type;
     }
 
-    public int EventId { get; }
+    public Guid EventId { get; }
     public Snapshot Snapshot { get; }
     public SnapshotResultType Type { get; }
 
-    internal static SnapshotResult ActivePhaseComplete(int eventId, Snapshot snapshot)
+    internal static SnapshotResult ActivePhaseComplete(Guid eventId, Snapshot snapshot)
     {
         return new(snapshot, SnapshotResultType.ActivePhaseComplete, eventId);
     }

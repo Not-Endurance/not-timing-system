@@ -6,7 +6,7 @@ namespace NTS.Domain.Aggregates;
 
 public class Setting : Aggregate
 {
-    public Setting(Country? country, DetectionMode? detectionMode, int? id = null)
+    public Setting(Country? country, DetectionMode? detectionMode, Guid? id = null)
         : base(id)
     {
         Country = Required(nameof(Country), country);

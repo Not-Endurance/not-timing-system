@@ -55,8 +55,8 @@ public sealed class ParticipationArrivedTests
         var secondArrive = secondStart.AddMinutes(31);
         var participation = CreateParticipation(
             start,
-            CreatePhase(start, firstArrive, firstPresent, id: 1),
-            CreatePhase(secondStart, id: 2)
+            CreatePhase(start, firstArrive, firstPresent, id: TestId.Of(1)),
+            CreatePhase(secondStart, id: TestId.Of(2))
         );
 
         var result = participation.Process(
@@ -64,7 +64,7 @@ public sealed class ParticipationArrivedTests
         );
 
         Assert.Equal(SnapshotResultType.Applied, result.Type);
-        Assert.Equal(2, participation.Phases.Current.Id);
+        Assert.Equal(TestId.Of(2), participation.Phases.Current.Id);
         Assert.Contains(participation.DequeueDomainEvents(), x => x is ParticipationArrived);
     }
 
@@ -77,23 +77,23 @@ public sealed class ParticipationArrivedTests
         var secondStart = firstPresent.AddMinutes(40);
         var participation = CreateParticipation(
             start,
-            CreatePhase(start, firstArrive, firstPresent, id: 1),
-            CreatePhase(secondStart, id: 2)
+            CreatePhase(start, firstArrive, firstPresent, id: TestId.Of(1)),
+            CreatePhase(secondStart, id: TestId.Of(2))
         );
 
-        participation.Update(new PhaseState(2, secondStart, secondStart.AddMinutes(45), null, null));
+        participation.Update(new PhaseState(TestId.Of(2), secondStart, secondStart.AddMinutes(45), null, null));
 
-        Assert.Equal(1, participation.Phases.Current.Id);
+        Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
         Assert.DoesNotContain(participation.DequeueDomainEvents(), x => x is ParticipationArrived);
     }
 
     static Participation CreateParticipation(DateTimeOffset start, params Phase[] phases)
     {
         const int number = 1;
-        var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete("Athlete", null, country, null, null, number);
-        var horse = new Horse("Horse", null, null, number);
-        var combination = new Combination(number, athlete, horse, null, "20", null, null, number);
+        var country = new Country(TestId.Of(number), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete("Athlete", null, country, null, null, TestId.Of(number));
+        var horse = new Horse("Horse", null, null, TestId.Of(number));
+        var combination = new Combination(number, athlete, horse, null, "20", null, null, TestId.Of(number));
         var phaseList = phases.Length == 0 ? [CreatePhase(start)] : phases;
 
         return new Participation(
@@ -102,7 +102,7 @@ public sealed class ParticipationArrivedTests
             combination,
             new PhaseCollection(phaseList),
             null,
-            eventId: 1
+            eventId: TestId.Of(1)
         );
     }
 
@@ -111,7 +111,7 @@ public sealed class ParticipationArrivedTests
         DateTimeOffset? arrive = null,
         DateTimeOffset? present = null,
         bool isFinal = false,
-        int? id = null
+        Guid? id = null
     )
     {
         return new Phase(
@@ -141,7 +141,7 @@ public sealed class ParticipationArrivedTests
     sealed class PhaseState : IPhaseState
     {
         public PhaseState(
-            int id,
+            Guid id,
             DateTimeOffset? startTime,
             DateTimeOffset? arriveTime,
             DateTimeOffset? presentTime,
@@ -155,7 +155,7 @@ public sealed class ParticipationArrivedTests
             RepresentTime = representTime;
         }
 
-        public int Id { get; }
+        public Guid Id { get; }
         public DateTimeOffset? StartTime { get; }
         public DateTimeOffset? ArriveTime { get; }
         public DateTimeOffset? PresentTime { get; }

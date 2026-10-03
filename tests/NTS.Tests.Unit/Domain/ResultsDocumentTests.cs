@@ -26,16 +26,16 @@ public sealed class ResultsDocumentTests
             null,
             null,
             [new RankingEntry(second, null, false), new RankingEntry(first, null, false)],
-            eventId: 10,
-            id: 99
+            eventId: TestId.Of(10),
+            id: TestId.Of(99)
         );
 
         var results = new Result(ranking);
         var document = new ResultsDocument(results, CreateEvent(), []);
 
         Assert.True(document.IsRanked);
-        Assert.Equal(99, document.Id);
-        Assert.Equal(99, document.Results.RankingId);
+        Assert.Equal(TestId.Of(99), document.Id);
+        Assert.Equal(TestId.Of(99), document.Results.RankingId);
         Assert.Equal([first.Id, second.Id], document.Entries.Select(x => x.ParticipationId));
         Assert.Equal([1, 2], document.Entries.Select(x => x.Rank));
     }
@@ -54,15 +54,15 @@ public sealed class ResultsDocumentTests
             null,
             null,
             [new RankingEntry(participation, 7, false)],
-            eventId: 10,
-            id: 99
+            eventId: TestId.Of(10),
+            id: TestId.Of(99)
         );
 
         var results = new Result(ranking);
         var document = new ResultsDocument(results, CreateEvent(), []);
 
         Assert.False(document.IsRanked);
-        Assert.Equal(99, document.Results.RankingId);
+        Assert.Equal(TestId.Of(99), document.Results.RankingId);
         var entry = Assert.Single(document.Entries);
         Assert.Equal(7, entry.Rank);
     }
@@ -71,12 +71,12 @@ public sealed class ResultsDocumentTests
     public void Handout_results_use_unranked_single_participation_shape()
     {
         var participation = CreateParticipation(12, DateTimeOffset.Now.AddHours(-2), DateTimeOffset.Now.AddHours(-1));
-        var handout = new Handout(participation, id: 42);
+        var handout = new Handout(participation, id: TestId.Of(42));
 
         var document = new ResultsDocument(handout, CreateEvent(), []);
 
         Assert.False(document.IsRanked);
-        Assert.Equal(42, document.Id);
+        Assert.Equal(TestId.Of(42), document.Id);
         Assert.Null(document.Results.RankingId);
         Assert.Equal("Competition", document.Header.Title);
         var entry = Assert.Single(document.Entries);
@@ -92,16 +92,16 @@ public sealed class ResultsDocumentTests
             "Location",
             new EventSpan(DateTimeOffset.Now.Date, DateTimeOffset.Now.Date.AddDays(1)),
             null,
-            id: 10
+            id: TestId.Of(10)
         );
     }
 
     static Participation CreateParticipation(int number, DateTimeOffset start, DateTimeOffset arrive)
     {
         var country = CreateCountry();
-        var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
-        var horse = new Horse($"Horse {number}", null, null, number);
-        var combination = new Combination(number, athlete, horse, null, "20", null, null, number);
+        var athlete = new Athlete($"Athlete {number}", null, country, null, null, TestId.Of(number));
+        var horse = new Horse($"Horse {number}", null, null, TestId.Of(number));
+        var combination = new Combination(number, athlete, horse, null, "20", null, null, TestId.Of(number));
 
         return new Participation(
             ParticipationCategory.Senior,
@@ -109,8 +109,8 @@ public sealed class ResultsDocumentTests
             combination,
             new PhaseCollection([CreateCompletePhase(start, arrive)]),
             null,
-            eventId: 10,
-            id: number
+            eventId: TestId.Of(10),
+            id: TestId.Of(number)
         );
     }
 
@@ -136,6 +136,6 @@ public sealed class ResultsDocumentTests
 
     static Country CreateCountry()
     {
-        return new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        return new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
     }
 }

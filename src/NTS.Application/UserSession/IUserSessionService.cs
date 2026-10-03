@@ -7,7 +7,7 @@ namespace NTS.Application.UserSession;
 public interface IWitnessUserSession
 {
     Task<NtsUserSessionStateModel?> GetCurrent();
-    Task SetEventId(int? eventId);
+    Task SetEventId(Guid? eventId);
     Task AppendSnapshot(SnapshotGroup snapshot);
     Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots);
     Task DeleteCurrent();

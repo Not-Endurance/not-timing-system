@@ -18,7 +18,7 @@ public class AthleteModel
         };
     }
 
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public string Name { get; init; } = default!;
     public string? NameEnglish { get; init; }
     public CountryModel Country { get; init; } = default!;

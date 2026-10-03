@@ -41,7 +41,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
 
     public IReadOnlyList<EventInformation> Events => _pastEvents.AsReadOnly();
     public EventInformation? Event { get; private set; }
-    public int EventId =>
+    public Guid EventId =>
         Event?.Id ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
     public IReadOnlyList<Ranking> Rankings => _rankings;
     public Ranking? CurrentRanking => _currentRanking;
@@ -58,7 +58,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
         return true;
     }
 
-    public async Task LoadEvent(int eventId)
+    public async Task LoadEvent(Guid eventId)
     {
         await Load();
 

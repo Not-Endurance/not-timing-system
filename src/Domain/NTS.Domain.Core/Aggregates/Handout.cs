@@ -4,7 +4,7 @@ namespace NTS.Domain.Core.Aggregates;
 
 public sealed class Handout : Result
 {
-    public Handout(Participation participation, int? id = null)
+    public Handout(Participation participation, Guid? id = null)
         : base(
             id,
             null,

@@ -7,7 +7,7 @@ public interface ICache<T> : ISingleton
     where T : IAggregate
 {
     Task<IEnumerable<T>> List();
-    Task<T?> Get(int id);
+    Task<T?> Get(Guid id);
     void Clear();
 
     /// <summary>

@@ -4,7 +4,7 @@ namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Combination : Entity, IKurdMirror<Athlete>, IKurdMirror<Horse>
 {
-    public Combination(int? number, Athlete? athlete, Horse? horse, int? id)
+    public Combination(int? number, Athlete? athlete, Horse? horse, Guid? id)
         : base(id)
     {
         Number = Required(nameof(Number), number);

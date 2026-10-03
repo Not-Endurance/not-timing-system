@@ -18,7 +18,7 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
     }
 
     [BsonId]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public CountryModel Country { get; set; } = default!;
     public string Name { get; set; } = default!;

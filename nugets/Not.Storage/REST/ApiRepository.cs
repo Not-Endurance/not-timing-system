@@ -125,7 +125,7 @@ public abstract class ApiRepository<T, TModel> : IRepository<T>
         await HandleRequest(CreateCore(item));
     }
 
-    public async Task Delete(int id)
+    public async Task Delete(Guid id)
     {
         var url = BuildEndpoint(id);
         await HandleRequest(Client.Delete(url));
@@ -158,7 +158,7 @@ public abstract class ApiRepository<T, TModel> : IRepository<T>
         return (await ReadMany(filter)).FirstOrDefault();
     }
 
-    public async Task<T?> Read(int id)
+    public async Task<T?> Read(Guid id)
     {
         var url = BuildEndpoint(id);
         var model = await HandleRequest(Client.Get<TModel>(url));

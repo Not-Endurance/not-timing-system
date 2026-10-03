@@ -1,12 +1,11 @@
 using System.Globalization;
-using Not.Structures;
 using NTS.Domain.Enums;
 using NTS.Domain.Helpers;
 using NTS.Domain.Objects;
 
 namespace NTS.Domain.Core.Objects.Snapshots;
 
-public record Snapshot : IIdentifiable, INamed, INtsDisplayable
+public record Snapshot : INamed, INtsDisplayable
 {
     public Snapshot(
         int number,
@@ -26,7 +25,6 @@ public record Snapshot : IIdentifiable, INamed, INtsDisplayable
     }
 
     public int Number { get; }
-    public int Id => Number;
     public string Name { get; }
     public string? NameEnglish { get; }
     public CompetitionRuleset? Ruleset { get; }

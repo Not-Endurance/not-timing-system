@@ -66,7 +66,7 @@ public abstract class MongoRepository<T> : IMongoRepository<T>
         return await GetCollection().Find(filter).FirstOrDefaultAsync();
     }
 
-    public virtual async Task<T?> Read(int id)
+    public virtual async Task<T?> Read(Guid id)
     {
         using var activity = StartActivity(nameof(Read));
         return await GetCollection().Find(x => x.Id == id).FirstOrDefaultAsync();
@@ -99,7 +99,7 @@ public abstract class MongoRepository<T> : IMongoRepository<T>
         await GetCollection().UpdateOneAsync(filter, updateDefinition);
     }
 
-    public virtual async Task Delete(int id)
+    public virtual async Task Delete(Guid id)
     {
         using var activity = StartActivity(nameof(DeleteMany));
         await GetCollection().DeleteOneAsync(x => x.Id == id);

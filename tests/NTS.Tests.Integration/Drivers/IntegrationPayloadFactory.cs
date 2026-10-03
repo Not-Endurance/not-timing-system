@@ -12,9 +12,9 @@ namespace NTS.Tests.Integration.Drivers;
 
 internal static class IntegrationPayloadFactory
 {
-    public static EventInformation EventInformation(int eventId, EventSpan? eventSpan = null, string? name = null)
+    public static EventInformation EventInformation(Guid eventId, EventSpan? eventSpan = null, string? name = null)
     {
-        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
+        var country = new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
         var today = DateTimeOffset.UtcNow.Date;
         return new EventInformation(
             country,
@@ -27,19 +27,19 @@ internal static class IntegrationPayloadFactory
     }
 
     public static Participation ActiveParticipation(
-        int eventId,
+        Guid eventId,
         int participationNumber,
-        int? id = null,
+        Guid? id = null,
         double? minAverageSpeed = null,
         double? maxAverageSpeed = null,
         DateTimeOffset? startTime = null
     )
     {
-        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athleteId = id == null ? 101 : id.Value + 100;
-        var horseId = id == null ? 201 : id.Value + 200;
-        var combinationId = id == null ? 301 : id.Value + 300;
-        var phaseId = id == null ? 401 : id.Value + 400;
+        var country = new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athleteId = id == null ? TestId.Of(101) : Offset(id.Value, 100);
+        var horseId = id == null ? TestId.Of(201) : Offset(id.Value, 200);
+        var combinationId = id == null ? TestId.Of(301) : Offset(id.Value, 300);
+        var phaseId = id == null ? TestId.Of(401) : Offset(id.Value, 400);
         var athlete = new Athlete("Integration Rider", "Integration Rider", country, null, null, athleteId);
         var horse = new Horse("Integration Horse", "Integration Horse", null, horseId);
         var combination = new Combination(
@@ -78,21 +78,21 @@ internal static class IntegrationPayloadFactory
             new PhaseCollection([phase]),
             notQualified: null,
             eventId,
-            id: id ?? 501
+            id: id ?? TestId.Of(501)
         );
     }
 
     public static Participation TwoPhaseParticipation(
-        int eventId,
+        Guid eventId,
         int participationNumber,
-        int id,
+        Guid id,
         TimeSpan? compulsoryThresholdSpan = null,
         DateTimeOffset? startTime = null
     )
     {
-        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete("Integration Rider", "Integration Rider", country, null, null, id + 100);
-        var horse = new Horse("Integration Horse", "Integration Horse", null, id + 200);
+        var country = new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete("Integration Rider", "Integration Rider", country, null, null, Offset(id, 100));
+        var horse = new Horse("Integration Horse", "Integration Horse", null, Offset(id, 200));
         var combination = new Combination(
             participationNumber,
             athlete,
@@ -101,7 +101,7 @@ internal static class IntegrationPayloadFactory
             distance: "40",
             minAverageSpeed: null,
             maxAverageSpeed: null,
-            id: id + 300
+            id: Offset(id, 300)
         );
         var competition = new Competition("CEI 1*", CompetitionRuleset.FEI);
         var firstPhase = new Phase(
@@ -119,7 +119,7 @@ internal static class IntegrationPayloadFactory
             isRepresentationRequested: false,
             isRequiredInspectionRequested: false,
             isRequiredInspectionCompulsory: false,
-            id: id + 400
+            id: Offset(id, 400)
         );
         var finalPhase = new Phase(
             gate: "GATE2/40",
@@ -136,7 +136,7 @@ internal static class IntegrationPayloadFactory
             isRepresentationRequested: false,
             isRequiredInspectionRequested: false,
             isRequiredInspectionCompulsory: false,
-            id: id + 401
+            id: Offset(id, 401)
         );
 
         return new Participation(
@@ -150,32 +150,33 @@ internal static class IntegrationPayloadFactory
         );
     }
 
-    public static Official Official(int eventId, int? userId, int? id = null)
+    public static Official Official(Guid eventId, Guid? userId, Guid? id = null)
     {
         return new Official(
             "Integration Official",
             "Integration Official",
             OfficialRole.GroundJury,
             eventId,
-            id: id ?? 601,
+            id: id ?? TestId.Of(601),
             userId: userId
         );
     }
 
-    public static Operator Operator(int eventId, int userId, int? id = null)
+    public static Operator Operator(Guid eventId, Guid userId, Guid? id = null)
     {
-        return new Operator(eventId, userId, OfficialRole.Steward, id ?? 602);
+        return new Operator(eventId, userId, OfficialRole.Steward, id ?? TestId.Of(602));
     }
 
     public static Ranking Ranking(
-        int eventId,
+        Guid eventId,
         IEnumerable<Participation> participations,
-        int? id = null,
+        Guid? id = null,
         string? name = null
     )
     {
         var entries = participations.Select(
-            (participation, index) => new RankingEntry(participation, index + 1, false, id + index + 1)
+            (participation, index) =>
+                new RankingEntry(participation, index + 1, false, id == null ? null : Offset(id.Value, index + 1))
         );
 
         return new Ranking(
@@ -189,13 +190,13 @@ internal static class IntegrationPayloadFactory
             null,
             entries,
             eventId,
-            id ?? 701
+            id ?? TestId.Of(701)
         );
     }
 
-    public static Handout Handout(Participation participation, int? id = null)
+    public static Handout Handout(Participation participation, Guid? id = null)
     {
-        return new Handout(participation, id ?? 801);
+        return new Handout(participation, id ?? TestId.Of(801));
     }
 
     public static Snapshot AutomaticSnapshot(int participationNumber, DateTimeOffset timestamp)
@@ -208,7 +209,7 @@ internal static class IntegrationPayloadFactory
         );
     }
 
-    public static PhaseCompleted PhaseCompleted(int eventId, int participationNumber)
+    public static PhaseCompleted PhaseCompleted(Guid eventId, int participationNumber)
     {
         var participation = ActiveParticipation(eventId, participationNumber);
         participation.Process(AutomaticSnapshot(participationNumber, DateTimeOffset.UtcNow.Date.AddHours(10)));
@@ -217,5 +218,15 @@ internal static class IntegrationPayloadFactory
         );
 
         return new PhaseCompleted(participation);
+    }
+
+    /// <summary>
+    /// A stable id derived from another: <c>Offset(TestId.Of(5), 100)</c> is <c>TestId.Of(105)</c>.
+    /// </summary>
+    static Guid Offset(Guid id, int offset)
+    {
+        var bytes = id.ToByteArray();
+        BitConverter.GetBytes(BitConverter.ToInt32(bytes, 0) + offset).CopyTo(bytes, 0);
+        return new Guid(bytes);
     }
 }

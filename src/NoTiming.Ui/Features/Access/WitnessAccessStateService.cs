@@ -77,7 +77,7 @@ public class WitnessAccessContext
         await ReloadState();
     }
 
-    static bool CanWriteSnapshots(int userId, IEnumerable<Official> officials, IEnumerable<Operator> operators)
+    static bool CanWriteSnapshots(Guid userId, IEnumerable<Official> officials, IEnumerable<Operator> operators)
     {
         return operators.Any(x => x.UserId == userId && SnapshotAccessPolicy.CanWriteAsOperator(x.Role))
             || officials.Any(x => x.UserId == userId && SnapshotAccessPolicy.CanWriteAsOfficial(x.Role));

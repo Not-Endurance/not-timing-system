@@ -14,7 +14,7 @@ public class SettingModel : IDocument, IKrudModel<Setting>
         return model;
     }
 
-    public int Id { get; set; } = default!;
+    public Guid Id { get; set; } = default!;
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
     public string AccountId { get; set; } = default!;
     public CountryModel Country { get; set; } = default!;

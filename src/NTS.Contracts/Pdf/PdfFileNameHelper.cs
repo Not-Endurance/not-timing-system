@@ -18,17 +18,17 @@ public static class PdfFileNameHelper
         '*',
     ];
 
-    public static string HandoutsPdf(int eventId)
+    public static string HandoutsPdf(Guid eventId)
     {
         return $"handouts-{eventId}.pdf";
     }
 
-    public static string RanklistPdf(int rankingId, string? name)
+    public static string RanklistPdf(Guid rankingId, string? name)
     {
         return $"{SanitizeName(name, $"ranklist-{rankingId}")}.pdf";
     }
 
-    public static string ResultsZip(int eventId)
+    public static string ResultsZip(Guid eventId)
     {
         return $"results-{eventId}.zip";
     }

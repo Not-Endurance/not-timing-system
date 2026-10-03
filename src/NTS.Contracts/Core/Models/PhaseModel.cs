@@ -36,7 +36,7 @@ public class PhaseModel
         };
     }
 
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public string Gate { get; init; } = default!;
     public double Length { get; init; }
     public int MaxRecovery { get; init; }

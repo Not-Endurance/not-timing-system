@@ -9,7 +9,7 @@ public class ClubModel
         return new ClubModel { Id = club.Id, Name = club.Name };
     }
 
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public string TenantId { get; init; } = StorageConstants.DEFAULT_TENANT;
     public string Name { get; init; } = default!;
 

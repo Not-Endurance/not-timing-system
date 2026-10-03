@@ -5,7 +5,7 @@ namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 public class Horse : Entity, INamed, INtsDisplayable
 {
-    public Horse(string? name, string? nameEnglish, string? feiId, int id)
+    public Horse(string? name, string? nameEnglish, string? feiId, Guid id)
         : base(id)
     {
         Name = Required(nameof(Name), name);

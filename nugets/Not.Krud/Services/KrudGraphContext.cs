@@ -73,7 +73,7 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         }
 
         var pending = new Queue<Entity>();
-        var seen = new HashSet<(Type Type, int Id)>();
+        var seen = new HashSet<(Type Type, Guid Id)>();
         pending.Enqueue(principal);
         seen.Add((principal.GetType(), principal.Id));
 
@@ -81,7 +81,7 @@ public class KrudGraphContext<T> : Observer, IKrudNodeSetter, IKrudGraphProvider
         while (pending.Count > 0)
         {
             var current = pending.Dequeue();
-            var updatedDependents = new HashSet<(Type Type, int Id)>();
+            var updatedDependents = new HashSet<(Type Type, Guid Id)>();
 
             foreach (var usage in ResolveUsages(root, current))
             {

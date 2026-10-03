@@ -5,16 +5,14 @@ namespace NTS.Domain.Core.Objects.Snapshots;
 
 public class SnapshotGroup : IIdentifiable
 {
-    static int _nextId;
-
     public SnapshotGroup(IEnumerable<Snapshot> snapshots, SnapshotType type)
     {
-        Id = Interlocked.Increment(ref _nextId);
+        Id = Guid.NewGuid();
         Entries = FilterEmptyTimestamps(snapshots);
         Type = type;
     }
 
-    public int Id { get; }
+    public Guid Id { get; }
     public IEnumerable<Snapshot> Entries { get; set; } = [];
 
     public SnapshotType Type { get; set; }

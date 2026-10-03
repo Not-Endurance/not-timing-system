@@ -117,7 +117,7 @@ public sealed class KrudListReadOnlyTests
     {
         readonly string? _name;
 
-        public TestEntity(int? id = null, string? name = null)
+        public TestEntity(Guid? id = null, string? name = null)
             : base(id)
         {
             _name = name;
@@ -160,7 +160,7 @@ public sealed class KrudListReadOnlyTests
 
     sealed class TestModel : IKrudModel<TestEntity>, IKrudFormModel
     {
-        public int? Id { get; set; }
+        public Guid? Id { get; set; }
 
         public void MapFrom(TestEntity entity)
         {

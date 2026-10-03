@@ -4,7 +4,7 @@ public record PresentlistEntry : ValueObject
 {
     internal PresentlistEntry(
         int number,
-        int phaseId,
+        Guid phaseId,
         string athleteName,
         string? athleteNameEnglish,
         CompetitionRuleset ruleset,
@@ -22,7 +22,7 @@ public record PresentlistEntry : ValueObject
     }
 
     public int Number { get; }
-    public int PhaseId { get; }
+    public Guid PhaseId { get; }
     public string AthleteName { get; }
     public string? AthleteNameEnglish { get; }
     public CompetitionRuleset Ruleset { get; }

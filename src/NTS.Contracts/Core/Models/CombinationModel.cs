@@ -18,7 +18,7 @@ public class CombinationModel
         };
     }
 
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public int Number { get; init; }
     public string? Distance { get; init; }
     public double? MinAverageSpeed { get; init; }

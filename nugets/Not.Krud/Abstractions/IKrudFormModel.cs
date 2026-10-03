@@ -2,5 +2,5 @@
 
 public interface IKrudFormModel
 {
-    int? Id { get; }
+    Guid? Id { get; }
 }

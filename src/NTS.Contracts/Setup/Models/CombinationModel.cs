@@ -20,7 +20,7 @@ public class CombinationModel
         };
     }
 
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public int Number { get; init; }
     public AthleteModel Athlete { get; init; } = default!;
     public HorseModel Horse { get; init; } = default!;

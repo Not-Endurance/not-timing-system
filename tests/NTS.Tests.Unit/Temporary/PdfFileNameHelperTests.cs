@@ -8,7 +8,7 @@ public class PdfFileNameHelperTests
     public void ResultPdfEntries_UsesSanitizedResultNames()
     {
         var entries = PdfFileNameHelper.ResultPdfEntries(
-            [new PdfNamedResult(10, "CEI 1* / Senior"), new PdfNamedResult(11, "CEI 2*")]
+            [new PdfNamedResult(TestId.Of(10), "CEI 1* / Senior"), new PdfNamedResult(TestId.Of(11), "CEI 2*")]
         );
 
         Assert.Collection(
@@ -22,13 +22,13 @@ public class PdfFileNameHelperTests
     public void ResultPdfEntries_DisambiguatesDuplicateNames()
     {
         var entries = PdfFileNameHelper.ResultPdfEntries(
-            [new PdfNamedResult(10, "CEI 1*"), new PdfNamedResult(11, "CEI 1*")]
+            [new PdfNamedResult(TestId.Of(10), "CEI 1*"), new PdfNamedResult(TestId.Of(11), "CEI 1*")]
         );
 
         Assert.Collection(
             entries,
             first => Assert.Equal("CEI-1.pdf", first.EntryName),
-            second => Assert.Equal("CEI-1-11.pdf", second.EntryName)
+            second => Assert.Equal($"CEI-1-{TestId.Of(11)}.pdf", second.EntryName)
         );
     }
 }

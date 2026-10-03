@@ -67,11 +67,20 @@ public sealed class StartlistTests
             phaseNumber == 1
                 ? new[] { CreatePhase(start, isFinal: true) }
                 : [CreatePhase(null), CreatePhase(start, isFinal: true)];
-        var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
-        var horse = new Horse($"Horse {number}", null, null, number);
+        var country = new Country(TestId.Of(number), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete($"Athlete {number}", null, country, null, null, TestId.Of(number));
+        var horse = new Horse($"Horse {number}", null, null, TestId.Of(number));
         var totalDistance = phases.Sum(x => x.Length);
-        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", null, null, number);
+        var combination = new Combination(
+            number,
+            athlete,
+            horse,
+            null,
+            $"{totalDistance:0.##}",
+            null,
+            null,
+            TestId.Of(number)
+        );
 
         return new Participation(
             ParticipationCategory.Senior,
@@ -79,18 +88,27 @@ public sealed class StartlistTests
             combination,
             new PhaseCollection(phases),
             null,
-            eventId: 1
+            eventId: TestId.Of(1)
         );
     }
 
     static Participation CreateParticipation(int number, IEnumerable<Phase> phases, Eliminated? eliminated = null)
     {
         var phaseList = phases.ToList();
-        var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
-        var horse = new Horse($"Horse {number}", null, null, number);
+        var country = new Country(TestId.Of(number), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete($"Athlete {number}", null, country, null, null, TestId.Of(number));
+        var horse = new Horse($"Horse {number}", null, null, TestId.Of(number));
         var totalDistance = phaseList.Sum(x => x.Length);
-        var combination = new Combination(number, athlete, horse, null, $"{totalDistance:0.##}", null, null, number);
+        var combination = new Combination(
+            number,
+            athlete,
+            horse,
+            null,
+            $"{totalDistance:0.##}",
+            null,
+            null,
+            TestId.Of(number)
+        );
 
         return new Participation(
             ParticipationCategory.Senior,
@@ -98,7 +116,7 @@ public sealed class StartlistTests
             combination,
             new PhaseCollection(phaseList),
             eliminated,
-            eventId: 1
+            eventId: TestId.Of(1)
         );
     }
 

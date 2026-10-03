@@ -23,7 +23,7 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
     public Phase Current { get; private set; }
     public double Distance => this.Sum(x => x.Length);
 
-    internal SnapshotResult Process(Snapshot snapshot, int eventId)
+    internal SnapshotResult Process(Snapshot snapshot, Guid eventId)
     {
         var isComplete = Current.IsComplete();
         if (isComplete && Current.IsFinal)

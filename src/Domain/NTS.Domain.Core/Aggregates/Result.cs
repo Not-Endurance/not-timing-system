@@ -10,13 +10,13 @@ public class Result : Aggregate, IEventScoped
     static readonly Ranker[] REGIONAL_RANKERS = [];
 
     protected Result(
-        int? id,
-        int? rankingId,
+        Guid? id,
+        Guid? rankingId,
         string? name,
         CompetitionRuleset? ruleset,
         ParticipationCategory? category,
         IEnumerable<ParticipationResult> entries,
-        int eventId
+        Guid eventId
     )
         : base(id)
     {
@@ -42,8 +42,8 @@ public class Result : Aggregate, IEventScoped
             ranking.EventId
         ) { }
 
-    public int EventId { get; }
-    public int? RankingId { get; }
+    public Guid EventId { get; }
+    public Guid? RankingId { get; }
     public string Name { get; }
     public CompetitionRuleset Ruleset { get; }
     public ParticipationCategory Category { get; }

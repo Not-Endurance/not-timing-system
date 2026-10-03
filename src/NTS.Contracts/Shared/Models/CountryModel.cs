@@ -13,7 +13,7 @@ public class CountryModel : IDocument, IKrudModel<Country>
         return model;
     }
 
-    public int Id { get; set; } = default!;
+    public Guid Id { get; set; } = default!;
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Name { get; set; } = default!;
     public string? IsoCode { get; set; }

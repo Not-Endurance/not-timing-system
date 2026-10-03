@@ -6,5 +6,5 @@ namespace NTS.Contracts.Live;
 /// </summary>
 public interface ILiveClientProcedures
 {
-    Task ParticipationChanged(int eventId, int participationId);
+    Task ParticipationChanged(Guid eventId, Guid participationId);
 }
