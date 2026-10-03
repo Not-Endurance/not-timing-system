@@ -17,6 +17,7 @@
     <ProjectReference Include="..\..\src\NoTiming.Api\NoTiming.Api.csproj" />
     <ProjectReference Include="..\..\src\NoTiming.Ui\NoTiming.Ui.csproj" />
     <ProjectReference Include="..\..\src\NTS.Contracts\NTS.Contracts.csproj" />
+    <ProjectReference Include="..\..\tools\NTS.Tools\NTS.Tools.csproj" />
   </ItemGroup>
 
   <ItemGroup>

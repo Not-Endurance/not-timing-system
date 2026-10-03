@@ -15,19 +15,6 @@ namespace NTS.Tests.Integration;
 /// </summary>
 public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixture>
 {
-    /// <summary>The nine values of a Phase that the domain derives and that were stored beside its times.</summary>
-    static readonly string[] DERIVED_PHASE_FIELDS =
-    [
-        "RequiredInspectionTime",
-        "OutTime",
-        "LoopInterval",
-        "PhaseInterval",
-        "RecoveryInterval",
-        "AverageLoopSpeed",
-        "AveragePhaseSpeed",
-        "AverageSpeed",
-        "IsComplete",
-    ];
     static readonly DateTimeOffset START = new(2026, 4, 28, 8, 0, 0, TimeSpan.Zero);
 
     readonly NtsIntegrationFixture _fixture;
@@ -73,7 +60,7 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
         await nexus.Create(IntegrationPayloadFactory.EventInformation(eventId));
         await nexus.Create(PresentedInTheFirstPhase(eventId, id));
         var stored = await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id);
-        CarryTheDerivedValuesOfBefore(stored);
+        LegacyDocuments.AddDerivedValues(stored);
         await _stored.Replace(MongoConstants.PARTICIPATIONS_COLLECTION, id, stored);
 
         var loaded = await nexus.ReadParticipation(eventId, id);
@@ -109,38 +96,8 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
         Assert.DoesNotContain("Total", stored.Names);
         var phases = stored["Phases"].AsBsonArray.Select(x => x.AsBsonDocument).ToList();
         Assert.Equal(2, phases.Count);
-        Assert.All(phases, phase => Assert.Empty(phase.Names.Intersect(DERIVED_PHASE_FIELDS)));
+        Assert.All(phases, phase => Assert.Empty(phase.Names.Intersect(LegacyDocuments.DERIVED_PHASE_FIELDS)));
         Assert.Contains("ArriveTime", phases[0].Names); // what was recorded is stored
         Assert.Contains("PresentTime", phases[0].Names);
-    }
-
-    /// <summary>
-    /// The derived values as the code before wrote them, but wrong on purpose: whatever reads them shows the difference.
-    /// </summary>
-    static void CarryTheDerivedValuesOfBefore(BsonDocument stored)
-    {
-        var wrongTime = new BsonDateTime(START.AddYears(1).UtcDateTime);
-        foreach (var phase in stored["Phases"].AsBsonArray.Select(x => x.AsBsonDocument))
-        {
-            phase["RequiredInspectionTime"] = wrongTime;
-            phase["OutTime"] = wrongTime;
-            phase["LoopInterval"] = "09:09:09";
-            phase["PhaseInterval"] = "09:09:09";
-            phase["RecoveryInterval"] = "09:09:09";
-            phase["AverageLoopSpeed"] = 99.9;
-            phase["AveragePhaseSpeed"] = 99.9;
-            phase["AverageSpeed"] = 99.9;
-            phase["IsComplete"] = false;
-        }
-
-        stored["Total"] = new BsonDocument
-        {
-            ["LastArriveTime"] = wrongTime,
-            ["AverageSpeed"] = 99.9,
-            ["Interval"] = "09:09:09",
-            ["RideInterval"] = "09:09:09",
-            ["RecoveryInterval"] = "09:09:09",
-            ["RecoveryIntervalWithoutFinal"] = "09:09:09",
-        };
     }
 }

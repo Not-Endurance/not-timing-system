@@ -29,9 +29,24 @@ internal sealed class StoredDocuments
         return await Collection(collection).Find(IdFilter(id)).SingleAsync();
     }
 
+    public async Task<List<BsonDocument>> ReadAll(string collection)
+    {
+        return await Collection(collection).Find(FilterDefinition<BsonDocument>.Empty).ToListAsync();
+    }
+
     public async Task Replace(string collection, Guid id, BsonDocument document)
     {
         await Collection(collection).ReplaceOneAsync(IdFilter(id), document);
+    }
+
+    public async Task Insert(string collection, BsonDocument document)
+    {
+        await Collection(collection).InsertOneAsync(document);
+    }
+
+    public async Task Empty(string collection)
+    {
+        await Collection(collection).DeleteManyAsync(FilterDefinition<BsonDocument>.Empty);
     }
 
     IMongoCollection<BsonDocument> Collection(string collection)
