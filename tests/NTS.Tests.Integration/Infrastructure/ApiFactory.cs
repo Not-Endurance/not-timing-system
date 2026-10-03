@@ -30,7 +30,8 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         _configureHost = configureHost;
         if (kestrel)
         {
-            UseKestrel();
+            // Port 0 is a free port of its own. Without a port every factory binds 5000 and only one can run.
+            UseKestrel(0);
         }
     }
 
