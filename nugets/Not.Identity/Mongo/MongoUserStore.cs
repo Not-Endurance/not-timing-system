@@ -15,7 +15,8 @@ public sealed class MongoUserStore<TUser>
     : IUserStore<TUser>,
         IUserEmailStore<TUser>,
         IUserSecurityStampStore<TUser>,
-        IUserLockoutStore<TUser>
+        IUserLockoutStore<TUser>,
+        IUserPasskeyStore<TUser>
     where TUser : NIdentityUser
 {
     readonly IMongoCollection<TUser> _users;
@@ -94,6 +95,9 @@ public sealed class MongoUserStore<TUser>
             .Set(x => x.AccessFailedCount, user.AccessFailedCount)
             .Set(x => x.ExternalProvider, user.ExternalProvider)
             .Set(x => x.ExternalSubject, user.ExternalSubject);
+
+        // The field exists only while there is a passkey, so a user without one stays out of the credential index.
+        update = user.Passkeys.Count == 0 ? update.Unset(x => x.Passkeys) : update.Set(x => x.Passkeys, user.Passkeys);
 
         // A row from before identity has no concurrency stamp: a null matches a missing field.
         var before = await _users.FindOneAndUpdateAsync(
@@ -253,7 +257,85 @@ public sealed class MongoUserStore<TUser>
         return Task.CompletedTask;
     }
 
+    public Task AddOrUpdatePasskeyAsync(TUser user, UserPasskeyInfo passkey, CancellationToken cancellationToken)
+    {
+        // Replaced in place when the credential is known, because its sign count moves each time it signs in.
+        var stored = ToDocument(passkey);
+        var index = user.Passkeys.FindIndex(x => x.CredentialId.AsSpan().SequenceEqual(passkey.CredentialId));
+        if (index >= 0)
+        {
+            user.Passkeys[index] = stored;
+        }
+        else
+        {
+            user.Passkeys.Add(stored);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public async Task<TUser?> FindByPasskeyIdAsync(byte[] credentialId, CancellationToken cancellationToken)
+    {
+        return await _users
+            .Find(Builders<TUser>.Filter.ElemMatch(x => x.Passkeys, x => x.CredentialId == credentialId))
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<UserPasskeyInfo?> FindPasskeyAsync(TUser user, byte[] credentialId, CancellationToken cancellationToken)
+    {
+        var passkey = user.Passkeys.Find(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
+        return Task.FromResult(passkey is null ? null : ToInfo(passkey));
+    }
+
+    public Task<IList<UserPasskeyInfo>> GetPasskeysAsync(TUser user, CancellationToken cancellationToken)
+    {
+        return Task.FromResult<IList<UserPasskeyInfo>>([.. user.Passkeys.Select(ToInfo)]);
+    }
+
+    public Task RemovePasskeyAsync(TUser user, byte[] credentialId, CancellationToken cancellationToken)
+    {
+        user.Passkeys.RemoveAll(x => x.CredentialId.AsSpan().SequenceEqual(credentialId));
+        return Task.CompletedTask;
+    }
+
     public void Dispose() { }
+
+    static NIdentityPasskey ToDocument(UserPasskeyInfo passkey)
+    {
+        return new NIdentityPasskey
+        {
+            CredentialId = passkey.CredentialId,
+            PublicKey = passkey.PublicKey,
+            Name = passkey.Name,
+            CreatedAt = passkey.CreatedAt,
+            SignCount = passkey.SignCount,
+            Transports = passkey.Transports ?? [],
+            IsUserVerified = passkey.IsUserVerified,
+            IsBackupEligible = passkey.IsBackupEligible,
+            IsBackedUp = passkey.IsBackedUp,
+            AttestationObject = passkey.AttestationObject,
+            ClientDataJson = passkey.ClientDataJson,
+        };
+    }
+
+    static UserPasskeyInfo ToInfo(NIdentityPasskey passkey)
+    {
+        return new UserPasskeyInfo(
+            passkey.CredentialId,
+            passkey.PublicKey,
+            passkey.CreatedAt,
+            passkey.SignCount,
+            passkey.Transports,
+            passkey.IsUserVerified,
+            passkey.IsBackupEligible,
+            passkey.IsBackedUp,
+            passkey.AttestationObject,
+            passkey.ClientDataJson
+        )
+        {
+            Name = passkey.Name,
+        };
+    }
 
     static string NewStamp()
     {

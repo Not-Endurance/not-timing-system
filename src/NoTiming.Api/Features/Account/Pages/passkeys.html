@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="{{lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{{passkeys.title}}</title>
+    <link rel="stylesheet" href="/account/assets/account.css" />
+  </head>
+  <body>
+    <main>
+      <h1>{{passkeys.heading}}</h1>
+      <p class="hint">{{passkeys.intro}}</p>
+
+      <section id="offer" class="notice" hidden>
+        <p id="offer-text"></p>
+      </section>
+
+      <ul id="list" class="passkeys"></ul>
+      <p id="empty" class="hint" hidden>{{passkeys.empty}}</p>
+
+      <button type="button" id="add" hidden>{{passkeys.add}}</button>
+      <p id="message" role="alert" aria-live="polite" hidden></p>
+
+      <div class="secondary">
+        <a id="done" class="link" href="{{returnUrl}}">{{passkeys.done}}</a>
+      </div>
+    </main>
+
+    <script src="/account/assets/passkey-support.js" defer></script>
+    <script
+      src="/account/assets/passkeys.js"
+      defer
+      data-lang="{{lang}}"
+      data-return-url="{{returnUrl}}"
+      data-enabled="{{passkeysEnabled}}"
+      data-offer="{{offer}}"
+      data-antiforgery="{{antiforgery}}"
+      data-text-offer="{{passkeys.offer}}"
+      data-text-offer-second="{{passkeys.offerSecond}}"
+      data-text-add="{{passkeys.add}}"
+      data-text-add-another="{{passkeys.addAnother}}"
+      data-text-skip="{{passkeys.skip}}"
+      data-text-done="{{passkeys.done}}"
+      data-text-rename="{{passkeys.rename}}"
+      data-text-save="{{passkeys.save}}"
+      data-text-remove="{{passkeys.remove}}"
+      data-text-confirm-remove="{{passkeys.confirmRemove}}"
+      data-text-default="{{passkeys.default}}"
+      data-text-created="{{passkeys.created}}"
+      data-text-unsupported="{{passkeys.unsupported}}"
+      data-text-unavailable="{{passkeys.unavailable}}"
+      data-text-cancelled="{{passkeys.error.cancelled}}"
+      data-text-failed="{{passkeys.error.failed}}"
+      data-text-last="{{passkeys.error.last}}"
+      data-text-generic="{{passkeys.error.generic}}"
+    ></script>
+  </body>
+</html>

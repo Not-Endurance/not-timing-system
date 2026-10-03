@@ -130,3 +130,51 @@ button:disabled {
 [hidden] {
   display: none !important;
 }
+
+.notice {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.notice p {
+  margin: 0;
+}
+
+ul.passkeys {
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+ul.passkeys li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+ul.passkeys li > div:first-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+ul.passkeys .actions {
+  display: flex;
+  gap: 16px;
+}
+
+ul.passkeys button.link {
+  margin-top: 0;
+}
+
+a.link {
+  color: var(--accent);
+  font-weight: 500;
+}

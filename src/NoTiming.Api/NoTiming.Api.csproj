@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="NTS.Tests.Integration" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\nugets\Not.Identity\Not.Identity.csproj" />
     <ProjectReference Include="..\NoTiming.Ui\NoTiming.Ui.csproj" />
     <ProjectReference Include="..\NTS.Application\NTS.Application.csproj" />

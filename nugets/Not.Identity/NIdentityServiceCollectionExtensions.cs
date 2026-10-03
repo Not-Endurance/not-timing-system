@@ -57,7 +57,25 @@ public static class NIdentityServiceCollectionExtensions
                 (validator, identity) => validator.ValidationInterval = identity.Value.StampValidationInterval
             );
 
-        services.AddAuthentication(IdentityConstants.ApplicationScheme).AddCookie(IdentityConstants.ApplicationScheme);
+        var authentication = services.AddAuthentication(IdentityConstants.ApplicationScheme);
+        authentication.AddCookie(IdentityConstants.ApplicationScheme);
+
+        // A passkey ceremony keeps its challenge in a cookie of this scheme for the few minutes it takes. It is not a
+        // session: nothing is signed in with it.
+        authentication
+            .AddTwoFactorUserIdCookie()
+            .Configure<IOptions<NIdentityOptions>, TimeProvider>(
+                (cookie, identity, time) =>
+                {
+                    cookie.TimeProvider = time;
+                    cookie.Cookie.Name = identity.Value.CeremonyCookieName;
+                    cookie.Cookie.HttpOnly = true;
+                    cookie.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    cookie.Cookie.SameSite = SameSiteMode.Lax;
+                    cookie.Cookie.Path = "/";
+                    cookie.ExpireTimeSpan = identity.Value.CeremonyLifetime;
+                }
+            );
         services
             .AddOptions<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme)
             .Configure<IOptions<NIdentityOptions>, ITicketStore, TimeProvider>(

@@ -9,6 +9,7 @@ using Not.Identity;
 using Not.Identity.Email;
 using Not.Identity.Mongo;
 using NTS.Tests.Integration.Infrastructure;
+using static NTS.Tests.Integration.Infrastructure.IdentityStoreHarness;
 
 namespace NTS.Tests.Integration;
 
@@ -320,94 +321,8 @@ public sealed class IdentityStoreTests : IClassFixture<MongoFixture>
         Assert.Equal("some-other-tenant", found.OtherFields!["TenantId"].AsString);
     }
 
-    static BsonDocument LegacyRow(string email, Guid id)
+    Task<IdentityStoreHarness> StoreAsync()
     {
-        return new BsonDocument
-        {
-            { "_id", Binary(id) },
-            { "Email", email },
-            { "Name", "Ana Petrova" },
-            { "DisplayName", "Ana" },
-            { "GivenName", "Ana" },
-            { "Surname", "Petrova" },
-            { "MiddleName", "K." },
-            { "CountryRegion", "Bulgaria" },
-            { "Club", "Rider Club" },
-            { "FeiId", "10012345" },
-            {
-                "Roles",
-                new BsonArray { "official", "operator" }
-            },
-            { "TenantId", "nts" },
-            {
-                "UnknownToIdentity",
-                new BsonDocument
-                {
-                    {
-                        "kept",
-                        new BsonArray { 1, "two", 3.5 }
-                    },
-                }
-            },
-        };
-    }
-
-    static BsonBinaryData Binary(Guid id)
-    {
-        return new BsonBinaryData(id, GuidRepresentation.Standard);
-    }
-
-    async Task<StoreHarness> StoreAsync()
-    {
-        var database = "identity_store_" + Guid.NewGuid().ToString("N");
-        var services = new ServiceCollection();
-        services.AddLogging();
-        services.AddSingleton<IHostEnvironment>(new HostingEnvironment { EnvironmentName = "Development" });
-        services.AddSingleton<IMongoClient>(new MongoClient(_mongo.ConnectionString));
-        services.AddSingleton<IEmailSender, OutboxEmailSender>();
-        services.AddNIdentity(options => options.Database = database);
-        var provider = services.BuildServiceProvider();
-
-        var initializer = provider.GetServices<IHostedService>().OfType<IdentityIndexInitializer>().Single();
-        await initializer.StartAsync(CancellationToken.None);
-        return new StoreHarness(provider, provider.GetRequiredService<IMongoClient>().GetDatabase(database));
-    }
-
-    sealed class StoreHarness : IAsyncDisposable
-    {
-        public StoreHarness(ServiceProvider provider, IMongoDatabase database)
-        {
-            Provider = provider;
-            Users = database.GetCollection<BsonDocument>("users");
-            Sessions = database.GetCollection<BsonDocument>("auth_sessions");
-        }
-
-        public ServiceProvider Provider { get; }
-        public IMongoCollection<BsonDocument> Users { get; }
-        public IMongoCollection<BsonDocument> Sessions { get; }
-
-        public FilterDefinition<BsonDocument> SessionsOf(Guid userId)
-        {
-            return new BsonDocument("UserId", Binary(userId));
-        }
-
-        public Task AddSession(Guid userId)
-        {
-            return Sessions.InsertOneAsync(
-                new BsonDocument
-                {
-                    { "_id", Guid.NewGuid().ToString("N") },
-                    { "UserId", Binary(userId) },
-                    { "Ticket", new BsonBinaryData(Array.Empty<byte>()) },
-                    { "CreatedAt", DateTime.UtcNow },
-                    { "ExpiresAt", DateTime.UtcNow.AddDays(30) },
-                }
-            );
-        }
-
-        public ValueTask DisposeAsync()
-        {
-            return Provider.DisposeAsync();
-        }
+        return IdentityStoreHarness.CreateAsync(_mongo);
     }
 }

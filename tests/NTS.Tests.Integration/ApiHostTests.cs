@@ -274,7 +274,8 @@ public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
     public async Task The_session_cookie_is_the_only_way_in_and_a_bearer_token_or_a_test_header_signs_nobody_in()
     {
         var schemes = await _host.Api.Services.GetRequiredService<IAuthenticationSchemeProvider>().GetAllSchemesAsync();
-        Assert.Equal(["Identity.Application"], schemes.Select(x => x.Name));
+        // The session cookie, and the short-lived cookie that holds the challenge of a passkey ceremony: nothing signs in with that one.
+        Assert.Equal(["Identity.Application", "Identity.TwoFactorUserId"], schemes.Select(x => x.Name));
 
         var oldBearerToken = new HttpRequestMessage(HttpMethod.Get, "/api/me");
         oldBearerToken.Headers.Authorization = new(

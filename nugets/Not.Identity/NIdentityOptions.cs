@@ -19,6 +19,11 @@ public sealed class NIdentityOptions
 
     public TimeSpan SessionLifetime { get; set; } = TimeSpan.FromDays(30);
 
+    /// <summary>The cookie that holds the challenge of a passkey ceremony for the minutes it takes.</summary>
+    public string CeremonyCookieName { get; set; } = "__Host-ceremony";
+
+    public TimeSpan CeremonyLifetime { get; set; } = TimeSpan.FromMinutes(5);
+
     /// <summary>
     /// How often a session is checked against the user's security stamp. Rotating the stamp also deletes the user's
     /// sessions at once, so this only covers a stamp that changed by another route.

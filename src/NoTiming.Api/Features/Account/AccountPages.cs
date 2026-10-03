@@ -1,13 +1,14 @@
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
+using Microsoft.AspNetCore.Antiforgery;
 
 namespace NoTiming.Api.Features.Account;
 
 /// <summary>
 /// The sign-in, registration and passkey pages are static pages of the Api that the Ui links to (decided for #599,
-/// #600 and #601). Their text is rendered into them on the server in the visitor's language; the files are embedded in
-/// the assembly so a publish of the Ui cannot lose them.
+/// #600 and #601). Their text is rendered into them on the server in the visitor's language, together with the token
+/// the ceremony requests send back; the files are embedded in the assembly so a publish of the Ui cannot lose them.
 /// </summary>
 internal static class AccountPages
 {
@@ -17,29 +18,45 @@ internal static class AccountPages
     {
         ["account.css"] = ("account/pages/account.css", "text/css; charset=utf-8"),
         ["sign-in.js"] = ("account/pages/sign-in.js", "text/javascript; charset=utf-8"),
+        ["passkey-support.js"] = ("account/pages/passkey-support.js", "text/javascript; charset=utf-8"),
+        ["passkeys.js"] = ("account/pages/passkeys.js", "text/javascript; charset=utf-8"),
     };
 
-    public static IResult SignIn(HttpContext context, AccountText text)
+    public static IResult SignIn(
+        HttpContext context,
+        AccountText text,
+        IAntiforgery antiforgery,
+        PasskeyAvailability passkeys
+    )
     {
-        var language = text.Resolve(context.Request);
-        var values = new Dictionary<string, string>
-        {
-            ["lang"] = language,
-            ["returnUrl"] = SafeReturnUrl(context.Request.Query["returnUrl"]),
-        };
-        var html = Regex.Replace(
-            ReadText("account/pages/sign-in.html"),
-            @"\{\{([A-Za-z0-9_.]+)\}\}",
-            match =>
-            {
-                var key = match.Groups[1].Value;
-                return ENCODER.Encode(values.TryGetValue(key, out var value) ? value : text.Get(language, key));
-            }
-        );
+        return Render(context, "account/pages/sign-in.html", text, antiforgery, passkeys, offer: false);
+    }
 
-        // What the page says depends on the visitor and where they came from: nothing keeps a copy of it.
-        context.Response.Headers.CacheControl = "no-store";
-        return Results.Content(html, "text/html; charset=utf-8");
+    /// <summary>
+    /// The passkeys of the signed-in person. Anyone else is sent to sign in and back. With <c>?offer=1</c> it opens
+    /// as the offer made after a code sign-in: add a passkey, or go on.
+    /// </summary>
+    public static IResult Passkeys(
+        HttpContext context,
+        AccountText text,
+        IAntiforgery antiforgery,
+        PasskeyAvailability passkeys
+    )
+    {
+        if (context.User.Identity?.IsAuthenticated != true)
+        {
+            var back = context.Request.Path + context.Request.QueryString;
+            return Results.Redirect("/sign-in?returnUrl=" + Uri.EscapeDataString(back));
+        }
+
+        return Render(
+            context,
+            "account/pages/passkeys.html",
+            text,
+            antiforgery,
+            passkeys,
+            offer: context.Request.Query["offer"] == "1"
+        );
     }
 
     public static IResult Asset(HttpContext context, string name)
@@ -63,6 +80,40 @@ internal static class AccountPages
             && !value.StartsWith("/\\", StringComparison.Ordinal)
             ? value
             : "/";
+    }
+
+    static IResult Render(
+        HttpContext context,
+        string resource,
+        AccountText text,
+        IAntiforgery antiforgery,
+        PasskeyAvailability passkeys,
+        bool offer
+    )
+    {
+        var language = text.Resolve(context.Request);
+        var values = new Dictionary<string, string>
+        {
+            ["lang"] = language,
+            ["returnUrl"] = SafeReturnUrl(context.Request.Query["returnUrl"]),
+            ["antiforgery"] = antiforgery.GetAndStoreTokens(context).RequestToken ?? string.Empty,
+            ["passkeysEnabled"] = passkeys.Enabled ? "true" : "false",
+            ["offer"] = offer ? "true" : "false",
+        };
+        var html = Regex.Replace(
+            ReadText(resource),
+            @"\{\{([A-Za-z0-9_.]+)\}\}",
+            match =>
+            {
+                var key = match.Groups[1].Value;
+                return ENCODER.Encode(values.TryGetValue(key, out var value) ? value : text.Get(language, key));
+            }
+        );
+
+        // What the page says depends on the visitor and where they came from, and it carries their token: nothing
+        // keeps a copy of it.
+        context.Response.Headers.CacheControl = "no-store";
+        return Results.Content(html, "text/html; charset=utf-8");
     }
 
     static string ReadText(string resource)

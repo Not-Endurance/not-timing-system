@@ -50,6 +50,13 @@ public class NIdentityUser
     [BsonIgnoreIfNull]
     public string? ExternalSubject { get; set; }
 
+    /// <summary>
+    /// The passkeys of the user. There is no field when there are none, so the partial unique index on the credential
+    /// id leaves every user without one out.
+    /// </summary>
+    [BsonIgnoreIfNull]
+    public List<NIdentityPasskey> Passkeys { get; set; } = [];
+
     /// <summary>The application's own fields of the document, as they were loaded.</summary>
     [BsonExtraElements]
     public BsonDocument? OtherFields { get; set; }

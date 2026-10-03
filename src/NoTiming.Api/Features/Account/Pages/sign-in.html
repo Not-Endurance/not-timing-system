@@ -26,6 +26,9 @@
         />
         <p class="hint">{{email.hint}}</p>
         <button type="submit">{{email.submit}}</button>
+        <div class="secondary">
+          <button type="button" id="passkey" class="link" hidden>{{signin.passkey}}</button>
+        </div>
       </form>
 
       <form id="code-form" hidden novalidate>
@@ -52,13 +55,18 @@
       <p id="message" role="alert" aria-live="polite" hidden></p>
     </main>
 
+    <script src="/account/assets/passkey-support.js" defer></script>
     <script
       src="/account/assets/sign-in.js"
       defer
       data-return-url="{{returnUrl}}"
+      data-passkeys="{{passkeysEnabled}}"
+      data-antiforgery="{{antiforgery}}"
       data-error-email="{{error.email}}"
       data-error-code="{{error.code}}"
       data-error-generic="{{error.generic}}"
+      data-error-passkey="{{error.passkey}}"
+      data-passkey-busy="{{signin.passkeyBusy}}"
       data-resend-in="{{code.resendIn}}"
     ></script>
   </body>

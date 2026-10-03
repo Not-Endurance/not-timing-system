@@ -82,6 +82,22 @@ public sealed class IdentityIndexInitializer : IHostedService
             ),
             cancellationToken: cancellationToken
         );
+
+        // A credential id belongs to one user. Partial, because a user without a passkey has no field to index.
+        await users.Indexes.CreateOneAsync(
+            new CreateIndexModel<NIdentityUser>(
+                Builders<NIdentityUser>.IndexKeys.Ascending("Passkeys.CredentialId"),
+                new CreateIndexOptions<NIdentityUser>
+                {
+                    Name = "identity_passkey_credential_unique",
+                    Unique = true,
+                    PartialFilterExpression = new BsonDocumentFilterDefinition<NIdentityUser>(
+                        new BsonDocument("Passkeys.CredentialId", new BsonDocument("$exists", true))
+                    ),
+                }
+            ),
+            cancellationToken: cancellationToken
+        );
     }
 
     static async Task EnsureSessionIndexes(

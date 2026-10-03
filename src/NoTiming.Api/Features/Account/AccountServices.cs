@@ -30,9 +30,14 @@ internal static class AccountServices
         services.AddDataProtection().SetApplicationName(APPLICATION_NAME);
         services.AddSingleton(AccountText.Load());
         services.AddScoped<CodeSignIn>();
+        services.AddPasskeys();
 
         services.AddNIdentity(
-            options => options.CookieName = "__Host-NoTiming",
+            options =>
+            {
+                options.CookieName = "__Host-NoTiming";
+                options.CeremonyCookieName = "__Host-NoTiming-Ceremony";
+            },
             cookie =>
             {
                 // The Ui asks who is signed in and navigates to the sign-in page itself: no redirect, only the answer.
