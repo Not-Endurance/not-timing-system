@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\nugets\Not\Not.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Blazor\Not.Blazor.csproj" />
+    <ProjectReference Include="..\..\nugets\Not.Identity\Not.Identity.csproj" />
     <ProjectReference Include="..\..\nugets\Not.Krud\Not.Krud.csproj" />
     <ProjectReference Include="..\..\src\Apps\Nexus\NTS.Nexus.HTTP\NTS.Nexus.HTTP.csproj" />
     <ProjectReference Include="..\..\src\NoTiming.Api\NoTiming.Api.csproj" />
@@ -20,6 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Testcontainers.MongoDb" Version="4.11.0" />
     <PackageReference Include="xunit" Version="2.5.3" />

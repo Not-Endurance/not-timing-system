@@ -16,7 +16,7 @@ using NTS.Tests.Integration.Infrastructure;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// NoTiming.Api on its own, in this process on a real loopback port (ADR-0011, ADR-0013). None of it needs Docker.
+/// NoTiming.Api on its own, in this process on a real loopback port (ADR-0011, ADR-0013), on a MongoDB in a container.
 /// </summary>
 public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
 {
@@ -237,6 +237,7 @@ public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
     public async Task Outside_development_http_is_redirected_to_https_and_https_carries_HSTS()
     {
         await using var api = new ApiFactory(
+            _host.MongoConnectionString,
             environment: "Production",
             configureHost: builder => builder.UseSetting("https_port", "443")
         );
@@ -270,33 +271,53 @@ public sealed class ApiHostTests : IClassFixture<ApiHostFixture>
     }
 
     [Fact]
-    public void The_host_registers_no_authentication_scheme_of_its_own()
+    public async Task The_session_cookie_is_the_only_way_in_and_a_bearer_token_or_a_test_header_signs_nobody_in()
     {
-        Assert.Null(_host.Api.Services.GetService<IAuthenticationSchemeProvider>());
-    }
+        var schemes = await _host.Api.Services.GetRequiredService<IAuthenticationSchemeProvider>().GetAllSchemesAsync();
+        Assert.Equal(["Identity.Application"], schemes.Select(x => x.Name));
 
-    [Fact]
-    public async Task A_token_of_the_old_test_format_is_refused_and_only_the_scheme_of_the_tests_signs_anyone_in()
-    {
-        await using var api = new ApiFactory(configureServices: services => services.AddTestAuthentication());
-        var client = api.CreateClient();
-
-        var anonymous = await client.GetAsync(TestAuthentication.WHO_AM_I_PATH);
-        Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
-
-        var oldToken = new HttpRequestMessage(HttpMethod.Get, TestAuthentication.WHO_AM_I_PATH);
-        oldToken.Headers.Authorization = new(
+        var oldBearerToken = new HttpRequestMessage(HttpMethod.Get, "/api/me");
+        oldBearerToken.Headers.Authorization = new(
             "Bearer",
             "integration|official@integration.test|Official|nts-client-scope"
         );
-        Assert.Equal(HttpStatusCode.Unauthorized, (await client.SendAsync(oldToken)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await _http.SendAsync(oldBearerToken)).StatusCode);
 
-        var asTestUser = new HttpRequestMessage(HttpMethod.Get, TestAuthentication.WHO_AM_I_PATH);
-        asTestUser.Headers.Add(TestAuthenticationHandler.USER_HEADER, "official@integration.test|Official");
-        var signedIn = await client.SendAsync(asTestUser);
-        Assert.Equal(HttpStatusCode.OK, signedIn.StatusCode);
-        var body = await signedIn.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal("official@integration.test", body.GetProperty("email").GetString());
+        var testHeader = new HttpRequestMessage(HttpMethod.Get, "/api/me");
+        testHeader.Headers.Add("X-Test-User", "official@integration.test|Official");
+        Assert.Equal(HttpStatusCode.Unauthorized, (await _http.SendAsync(testHeader)).StatusCode);
+    }
+
+    [Fact]
+    public async Task The_cookie_container_of_the_login_helper_works_for_REST_and_SignalR_clients_on_a_real_port()
+    {
+        var email = UserSeed.NewEmail("real-port");
+        await UserSeed.AddLegacyUserAsync(_host.MongoConnectionString, email);
+        var cookie = await ApiSessions.SignInAsync(_host.Api, _http, email);
+        var container = cookie.ToContainer(_host.BaseAddress);
+
+        using var handler = new HttpClientHandler { CookieContainer = container };
+        using var rest = new HttpClient(handler) { BaseAddress = _host.BaseAddress };
+        var me = await rest.GetAsync("/api/me");
+        Assert.Equal(HttpStatusCode.OK, me.StatusCode);
+        Assert.Equal(
+            email,
+            (await ApiSessions.ReadJsonAsync(me))
+                .GetProperty("data")
+                .GetProperty("attributes")
+                .GetProperty("email")
+                .GetString()
+        );
+
+        await using var connection = new HubConnectionBuilder()
+            .WithUrl(
+                new Uri(_host.BaseAddress, $"{ApplicationConstants.LIVE_HUB}?connectionGroup={AN_EVENT}"),
+                options => options.Cookies = container
+            )
+            .AddNewtonsoftJsonProtocol()
+            .Build();
+        await connection.StartAsync();
+        Assert.Equal(HubConnectionState.Connected, connection.State);
     }
 
     async Task AssertRefused(HubConnection connection)

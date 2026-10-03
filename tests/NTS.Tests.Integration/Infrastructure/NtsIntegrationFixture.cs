@@ -26,7 +26,7 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
         _nexusHttp = new NexusHttpProcess(paths, PortAllocator.GetFreeTcpPort(), _mongo.GetConnectionString());
         await _nexusHttp.Start();
 
-        _api = new ApiFactory(kestrel: true);
+        _api = new ApiFactory(_mongo.GetConnectionString(), kestrel: true);
         _ = _api.BaseAddress; // starts the host
     }
 

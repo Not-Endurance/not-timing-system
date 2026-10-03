@@ -8,9 +8,10 @@ These tests start real local infrastructure and the real hosts. They live in a s
 dotnet test .\tests\NTS.Tests.Integration\NTS.Tests.Integration.csproj -c Debug
 ```
 
-Two kinds of test run in the project:
+Three kinds of test run in the project:
 
-- The Api tests (`ApiHostTests`) host `NoTiming.Api` in this process and need nothing else.
+- The Api tests (`ApiHostTests`, `SignInTests`, `IdentityStoreTests`) host `NoTiming.Api`, or its identity stores, in this process on a MongoDB in a container. They need Docker and nothing else.
+- The tests that need no infrastructure at all (`IdentifierShapeTests`, `AccountTextTests`, `NameRenderingTests`) run anywhere the solution builds.
 - The scenarios that use the legacy Functions API (everything driven through `NexusApiDriver` and `ClientDriver`) need Docker, Azure Functions Core Tools and Azurite.
 
 Requirements for the scenarios:
@@ -24,9 +25,10 @@ The Functions API, Azurite and Node leave the harness when that API is retired (
 
 ## The harness
 
-- `ApiFactory` is `NoTiming.Api` in this process, built on `WebApplicationFactory<Program>`. By default a test reaches it in memory. In Kestrel mode it listens on a real loopback port, for the clients that need one: the SignalR client of the Ui, WebSockets and, later, browsers. `ApiHostFixture` starts it in Kestrel mode, and so does `NtsIntegrationFixture`, next to the MongoDB container and the Functions process.
+- `ApiFactory` is `NoTiming.Api` in this process, built on `WebApplicationFactory<Program>`, on the MongoDB the test gives it. By default a test reaches it in memory (at an https address, so the Secure session cookie is one a browser would take). In Kestrel mode (`UseKestrel(0)`, a free port of its own) it listens on a real loopback port, for the clients that need one: the SignalR client of the Ui, WebSockets and, later, browsers. `ApiHostFixture` starts it in Kestrel mode with its own MongoDB, and so does `NtsIntegrationFixture`, next to its MongoDB container and the Functions process; `MongoFixture` is just the container, for tests that build their own host or none.
+- Every host the harness builds has its own data protection key ring under the test output, never in the user profile, and sends its email to an outbox. A test passes the clock it moves (`FakeTimeProvider`) for the lifetimes of codes and sessions, and a key ring folder to share when a second host must read what the first protected: that is how a restart is tested.
 - `ClientDriver` is the client: it builds the Ui's real service provider (the REST repositories and the live-connection client) against the Api and the Functions API, and drives it as an anonymous visitor or as a signed-in user. `NexusApiDriver` talks to the Functions API directly, to seed and read data.
-- Sign-in in a test goes through `TestAuthentication`, a scheme the tests register on their own copy of the host (`new ApiFactory(configureServices: services => services.AddTestAuthentication())`). The host has no authentication of its own and no test path: `ApiHostTests` asserts that, and that a bearer token of the old `integration|...` format is refused.
+- Sign-in in a test is the way a person signs in (ADR-0002). `ApiSessions.SignInAsync` asks for a code, reads it from the outbox of the host (`IEmailOutbox`), sends it back and returns the session cookie, which the test carries by hand so it works for an in-memory client and for one on a real port alike (a Secure cookie of a plain-http address would not be sent back). `UserSeed` adds users as they exist before identity: a row of the Functions API with the profile fields and none of the identity ones. The host has no sign-in as, no test scheme and no test path: `ApiHostTests` asserts that the session cookie is its only scheme and that a bearer token of the old `integration|...` format signs nobody in.
 
 ## PDF Browser Setup
 
@@ -41,7 +43,10 @@ The harness uses `NTS_INTEGRATION_PLAYWRIGHT_BROWSERS_PATH` when set, otherwise 
 
 ## Current Coverage
 
-- The Api: health, the security headers, deep links into the Ui and the JSON 404 of an unknown API route, HTTPS redirection and HSTS outside Development, the live hub (an anonymous client joins an Event's group and receives only that Event's change notifications, no method is callable by a client, a connection that names no Event is refused, the WebSocket origin check, CORS), and the absence of any authentication scheme in the host.
+- The Api: health, the security headers, deep links into the Ui and the JSON 404 of an unknown API route, HTTPS redirection and HSTS outside Development, the live hub (an anonymous client joins an Event's group and receives only that Event's change notifications, no method is callable by a client, a connection that names no Event, or something that is not an Event id, is refused, the WebSocket origin check, CORS), and the session cookie as the only way in.
+- Signing in with an emailed code (`SignInTests`): the answer to a code request is the same for every address, a code works once, expires after ten minutes, is invalidated by five wrong attempts and replaced by a new request after the resend cooldown; the session cookie, `/api/me`, signing out, deleting a ticket, rotating the security stamp, a host restart, a user from before identity, the Production refusal of the console and outbox senders, the page text in en, bg and tr, and the media type every write needs.
+- The identity user store on a MongoDB (`IdentityStoreTests`): a row from before identity read and updated field for field, every identity field round-tripped, capitalisation, concurrent updates, stamp rotation and the partial unique indexes.
+- Every id is a Guid, stored as a standard UUID (`IdentifierShapeTests`, `GuidStorageTests`).
 - Witness registration resolution, profile completion, and sign-in completing after startup, against the Functions API with the Ui's real services.
 
 ## Parked scenarios
