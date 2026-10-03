@@ -72,7 +72,7 @@ public sealed partial class IntegrationHarnessCheckTest : IClassFixture<NtsInteg
             "Rosa Display"
         );
         using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
-        await using var witness = new WitnessDriver(
+        await using var witness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             registeringUser,
@@ -153,7 +153,7 @@ public sealed partial class IntegrationHarnessCheckTest : IClassFixture<NtsInteg
             "late-signin-witness-user",
             "Late Signin Witness"
         );
-        await using var witness = new WitnessDriver(
+        await using var witness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             user: null,

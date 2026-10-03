@@ -10,14 +10,12 @@ internal sealed class RepositoryPaths
     RepositoryPaths(string root)
     {
         Root = root;
-        ApiProject = Path.Combine(root, "src", "NoTiming.Api", "NoTiming.Api.csproj");
         NexusHttpProjectDirectory = Path.Combine(root, "src", "Apps", "Nexus", "NTS.Nexus.HTTP");
         DotnetHome = Path.Combine(root, ".tmp", "integration-dotnet-home");
         NuGetPackages = Path.Combine(root, ".tmp", "integration-nuget-packages");
     }
 
     public string Root { get; }
-    public string ApiProject { get; }
     public string NexusHttpProjectDirectory { get; }
     public string DotnetHome { get; }
     public string NuGetPackages { get; }

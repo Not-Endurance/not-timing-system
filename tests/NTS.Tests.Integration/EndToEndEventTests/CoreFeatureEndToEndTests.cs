@@ -59,7 +59,7 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.Rankings.Count, startedRankings.Count);
         AssertStartedOperatorsMatchSetup(startedDocuments.Operators, setup.SetupEvent, eventInformation.Id);
 
-        await using var witness = new WitnessDriver(
+        await using var witness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             setup.WitnessOperator,

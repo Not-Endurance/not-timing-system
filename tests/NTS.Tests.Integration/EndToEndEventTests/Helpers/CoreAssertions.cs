@@ -15,7 +15,7 @@ internal static class CoreAssertions
     public static async Task AssertStartlistsMatchPersisted(
         NexusApiDriver api,
         JudgeDriver judge,
-        WitnessDriver witness,
+        ClientDriver witness,
         int eventId
     )
     {
@@ -36,7 +36,7 @@ internal static class CoreAssertions
         Assert.Equal(Flatten(expected.HistoryByStage), Flatten(witnessHistory.HistoryByStage));
     }
 
-    public static async Task AssertArrivelistMatchesPersisted(NexusApiDriver api, WitnessDriver witness, int eventId)
+    public static async Task AssertArrivelistMatchesPersisted(NexusApiDriver api, ClientDriver witness, int eventId)
     {
         var arrivelist = witness.GetRequiredService<IArrivelistService>();
         await arrivelist.Load();

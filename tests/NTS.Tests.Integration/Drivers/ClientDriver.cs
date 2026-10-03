@@ -22,7 +22,7 @@ using NTS.Tests.Integration.Infrastructure;
 
 namespace NTS.Tests.Integration.Drivers;
 
-internal sealed class WitnessDriver : IAsyncDisposable
+internal sealed class ClientDriver : IAsyncDisposable
 {
     readonly ServiceProvider _provider;
     readonly INtsSocketService _socketService;
@@ -32,7 +32,7 @@ internal sealed class WitnessDriver : IAsyncDisposable
     readonly string _clientName;
 
     /// <param name="user">A null user drives the Witness as an anonymous, read-only visitor.</param>
-    public WitnessDriver(Uri apiBaseUrl, Uri nexusBaseUrl, IntegrationUser? user, string clientName)
+    public ClientDriver(Uri apiBaseUrl, Uri nexusBaseUrl, IntegrationUser? user, string clientName)
     {
         _clientName = clientName;
         var configuration = CreateConfiguration(apiBaseUrl, nexusBaseUrl, ApplicationConstants.LIVE_HUB, clientName);
@@ -45,7 +45,7 @@ internal sealed class WitnessDriver : IAsyncDisposable
             nexusBaseUrl.ToString().TrimEnd('/'),
             typeof(NtsWitnessServices).Assembly
         );
-        services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, IntegrationRpcAccessTokenProvider>());
+        services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, AnonymousRpcAccessTokenProvider>());
         _authenticationStateProvider = new IntegrationAuthenticationStateProvider(user);
         services.AddScoped<AuthenticationStateProvider>(_ => _authenticationStateProvider);
 
@@ -163,5 +163,14 @@ internal sealed class WitnessDriver : IAsyncDisposable
                 }
             )
             .Build();
+    }
+}
+
+/// <summary>The live connection is anonymous (ADR-0001) and the hub reads no token, so the driver sends none.</summary>
+internal sealed class AnonymousRpcAccessTokenProvider : IRpcAccessTokenProvider
+{
+    public Task<string?> Get()
+    {
+        return Task.FromResult<string?>(null);
     }
 }

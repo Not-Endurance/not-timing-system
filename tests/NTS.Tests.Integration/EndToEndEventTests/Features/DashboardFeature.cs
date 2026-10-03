@@ -21,7 +21,7 @@ internal sealed class DashboardFeature
     static readonly TimeSpan PRESENT_SNAPSHOT_GROUP_DELTA = TimeSpan.FromSeconds(10);
 
     readonly JudgeDriver _judge;
-    readonly WitnessDriver _witness;
+    readonly ClientDriver _witness;
     readonly NexusApiDriver _api;
     readonly EndToEndPrintFeature _print;
     readonly EventInformation _eventInformation;
@@ -31,7 +31,7 @@ internal sealed class DashboardFeature
 
     public DashboardFeature(
         JudgeDriver judge,
-        WitnessDriver witness,
+        ClientDriver witness,
         NexusApiDriver api,
         EndToEndPrintFeature print,
         EventInformation eventInformation

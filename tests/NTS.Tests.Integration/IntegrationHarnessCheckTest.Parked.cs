@@ -79,19 +79,19 @@ public sealed partial class IntegrationHarnessCheckTest
         );
 
         await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
-        await using var officialWitness = new WitnessDriver(
+        await using var officialWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             OFFICIAL_USER,
             "IntegrationOfficialWitness"
         );
-        await using var registeredWitness = new WitnessDriver(
+        await using var registeredWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             REGISTERED_USER,
             "IntegrationRegisteredWitness"
         );
-        await using var anonymousWitness = new WitnessDriver(
+        await using var anonymousWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             user: null,
@@ -352,13 +352,13 @@ public sealed partial class IntegrationHarnessCheckTest
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6601));
 
         await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
-        await using var officialWitness = new WitnessDriver(
+        await using var officialWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             OFFICIAL_USER,
             "PresentlistOfficialWitness"
         );
-        await using var registeredWitness = new WitnessDriver(
+        await using var registeredWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             REGISTERED_USER,
@@ -622,7 +622,7 @@ public sealed partial class IntegrationHarnessCheckTest
         await api.Create(participation);
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6701));
 
-        await using var witness = new WitnessDriver(
+        await using var witness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             OFFICIAL_USER,
@@ -663,7 +663,7 @@ public sealed partial class IntegrationHarnessCheckTest
 
         await witness.Disconnect();
 
-        await using var restoredWitness = new WitnessDriver(
+        await using var restoredWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             OFFICIAL_USER,
@@ -750,25 +750,25 @@ public sealed partial class IntegrationHarnessCheckTest
         Assert.Equal(OfficialRole.Steward, activeOperators[0].Role);
         Assert.Single(activeRankings);
 
-        await using var operatorWitness = new WitnessDriver(
+        await using var operatorWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             operatorIdentity,
             "IntegrationOperatorWitness"
         );
-        await using var eligibleOfficialWitness = new WitnessDriver(
+        await using var eligibleOfficialWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             eligibleOfficialIdentity,
             "IntegrationEligibleOfficialWitness"
         );
-        await using var ineligibleOfficialWitness = new WitnessDriver(
+        await using var ineligibleOfficialWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             ineligibleOfficialIdentity,
             "IntegrationIneligibleOfficialWitness"
         );
-        await using var registeredWitness = new WitnessDriver(
+        await using var registeredWitness = new ClientDriver(
             _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             registeredIdentity,
