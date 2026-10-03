@@ -2,7 +2,6 @@ using Not.Blazor.Components.Abstractions;
 using NoTiming.Ui.Features.Socket;
 using NTS.Contracts.Core;
 using NTS.Contracts.Core.Models;
-using NTS.Contracts.Features.Performance;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Features.Core.Performance;
@@ -13,7 +12,7 @@ public class PerformanceContentBehind : NStatefulComponent
     IParticipationContext Context { get; set; } = default!;
 
     [Inject]
-    IPerformanceParticipations PerformanceParticipations { get; set; } = default!;
+    IParticipationStore Store { get; set; } = default!;
 
     [Inject]
     BlazorSocketService BlazorSocketService { get; set; } = default!;
@@ -26,12 +25,12 @@ public class PerformanceContentBehind : NStatefulComponent
         set => Context.Selected = value;
     }
 
-    protected IReadOnlyList<Participation> Participations => PerformanceParticipations.Participations;
+    protected IReadOnlyList<Participation> Participations => Store.Participations;
 
     protected override async Task OnInitializedAsync()
     {
         await Observe(Context);
-        await Observe(PerformanceParticipations);
+        await Observe(Store);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

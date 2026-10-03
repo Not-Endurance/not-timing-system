@@ -6,7 +6,6 @@ using NTS.Contracts.API;
 using NTS.Contracts.Arrivelists;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Access;
-using NTS.Contracts.Features.Performance;
 using NTS.Contracts.Features.Profile;
 using NTS.Contracts.Presentlists;
 using NTS.Contracts.Watcher.Models;

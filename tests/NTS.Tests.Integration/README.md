@@ -63,6 +63,8 @@ The Judge app is gone (#598, ADR-0011), and with it the connected Judge that the
 - `EndToEndEventTests/` (the event replays and the compulsory-inspection setup test, driven through the Judge)
 - `Drivers/JudgeDriver.cs`
 
+Since #622 the Ui keeps the Event's Participations in one store (`IParticipationStore`), and every list and page is a view over it. Un-parking a scenario that looks at them means reading the store: `IParticipationContext.Participations` is only the view of those still to be timed, so a completed Participation is not in it, `ClientDriver.WaitForParticipation` reads that view, and `IntegrationHarnessCheckTest.Parked.cs` still names `IPerformanceParticipations`, which is gone.
+
 ## Next Expansion
 
 - More browser coverage for the Ui pages as they arrive, on the same Chromium kit as the passkey ceremonies.
