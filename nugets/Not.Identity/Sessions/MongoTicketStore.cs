@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -18,12 +19,19 @@ public sealed class MongoTicketStore : ITicketStore, ISessionRevoker
     readonly IMongoCollection<SessionDocument> _sessions;
     readonly NIdentityOptions _options;
     readonly TimeProvider _time;
+    readonly ILogger<MongoTicketStore> _logger;
 
-    public MongoTicketStore(IMongoClient client, IOptions<NIdentityOptions> options, TimeProvider time)
+    public MongoTicketStore(
+        IMongoClient client,
+        IOptions<NIdentityOptions> options,
+        TimeProvider time,
+        ILogger<MongoTicketStore> logger
+    )
     {
         _options = options.Value;
         _sessions = client.GetDatabase(_options.Database).GetCollection<SessionDocument>(_options.SessionsCollection);
         _time = time;
+        _logger = logger;
     }
 
     public async Task<string> StoreAsync(AuthenticationTicket ticket)
@@ -72,7 +80,16 @@ public sealed class MongoTicketStore : ITicketStore, ISessionRevoker
 
     public async Task RevokeAllAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        await _sessions.DeleteManyAsync(x => x.UserId == userId, cancellationToken);
+        var revoked = await _sessions.DeleteManyAsync(x => x.UserId == userId, cancellationToken);
+        if (revoked.DeletedCount > 0)
+        {
+            _logger.LogInformation(
+                IdentityEvents.SESSIONS_REVOKED,
+                "{Count} sessions of user {UserId} were ended.",
+                revoked.DeletedCount,
+                userId
+            );
+        }
     }
 
     DateTime ExpiryOf(AuthenticationTicket ticket, DateTimeOffset now)

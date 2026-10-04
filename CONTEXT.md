@@ -43,6 +43,14 @@ A person's sign-in identity, one per person across all Tenants. What an Account 
 A country's equestrian federation (for example the Bulgarian Federation of Equestrian Sports) — the organiser that owns Events and the Setup data it prepares. A Tenant comes into being when the first person from its country registers, and becomes operational — able to hold Events — once the Developer gives it a Tenant Root. It sets the rules its Regional competitions use, such as how loop speed is judged; an Event keeps the rules as they were when it started. A Tenant organises data rather than walling it off: public views of Events and, where allowed, searches for Athletes, Horses, Clubs, Officials and accounts reach across Tenants. Authority never crosses: no access one Tenant grants carries into another Tenant's Events.
 _Avoid_: Organisation, account, customer
 
+**Home Tenant**:
+The Tenant an Account is placed in from its country: at registration, from the country the person chose, and for an Account from before Tenants, from the country its profile names, the first time it signs in. It is set once and profile edits never move it. An Account whose profile names no country that has an ISO code has none until the person picks one.
+_Avoid_: Primary tenant, default tenant
+
+**Membership**:
+An Account's standing in one Tenant: the Tenant and the roles held there. Registering gives one Membership, in the Home Tenant, with no role; being made a Tenant Root adds that role to a Membership. An Account has as many Memberships as Tenants it takes part in, and what it may do in a Tenant comes from the roles of its Membership there.
+_Avoid_: Tenant role, affiliation
+
 **Tenant Root**:
 A role within one Tenant, held by one or more accounts and created by the Developer — a Tenant Root cannot add another. A Tenant Root creates the Tenant's Events and is each one's Main Operator until it assigns that role to someone else, usually so the configuration and running of that single Event is done by another person. Once an Event is Live, a Tenant Root who is not its Main Operator cannot take the role over, and the Tenant Root role itself gives no right to run a Live Event.
 _Avoid_: Admin, owner

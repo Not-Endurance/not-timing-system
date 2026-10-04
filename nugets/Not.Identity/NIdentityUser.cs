@@ -61,4 +61,19 @@ public class NIdentityUser
     /// <summary>The application's own fields of the document, as they were loaded.</summary>
     [BsonExtraElements]
     public BsonDocument? OtherFields { get; set; }
+
+    /// <summary>
+    /// A text field of the application's own part of the document, which identity does not know. Null when there is
+    /// no such field, when it is not a text or when it is blank.
+    /// </summary>
+    public string? TextOf(string field)
+    {
+        return
+            OtherFields != null
+            && OtherFields.TryGetValue(field, out var value)
+            && value.IsString
+            && !string.IsNullOrWhiteSpace(value.AsString)
+            ? value.AsString
+            : null;
+    }
 }

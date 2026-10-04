@@ -29,6 +29,19 @@ internal static class AccountServices
 
         services.AddDataProtection().SetApplicationName(APPLICATION_NAME);
         services.AddSingleton(AccountText.Load());
+        services.AddSingleton<SelectableCountries>();
+        services.AddSingleton<TenantPlacement>();
+        services.AddSingleton<RegistrationPolicy>();
+        services.AddSingleton<EventThrottle>();
+        services
+            .AddOptions<AuthRateLimitOptions>()
+            .BindConfiguration(AuthRateLimitOptions.SECTION)
+            .Validate(
+                AuthRateLimitOptions.IsValid,
+                "Auth:RateLimits: every limit is at least 1 and the window is not zero."
+            )
+            .ValidateOnStart();
+        services.AddSingleton<AuthRateLimiter>();
         services.AddScoped<CodeSignIn>();
         services.AddPasskeys();
 
@@ -74,19 +87,32 @@ internal static class AccountServices
         var sender = configuration["Email:Sender"] ?? (environment.IsDevelopment() ? "Console" : null);
         return sender switch
         {
+            "Brevo" => CreateBrevoSender(configuration),
             "Console" => ActivatorUtilities.CreateInstance<ConsoleEmailSender>(provider),
             "Outbox" => new OutboxEmailSender(),
             null => new UnconfiguredEmailSender(),
             _ => throw new InvalidOperationException(
-                $"The email sender '{sender}' is not known: use Console or Outbox."
+                $"The email sender '{sender}' is not known: use Brevo, Console or Outbox."
             ),
         };
+    }
+
+    /// <summary>
+    /// Brevo's key and sender identity come from the configuration of the host (its secrets). A host that has none
+    /// starts, and the first code it has to send fails loudly. The client lives as long as the host does, so its
+    /// connections are renewed now and then to follow a change of the provider's addresses.
+    /// </summary>
+    static BrevoEmailSender CreateBrevoSender(IConfiguration configuration)
+    {
+        var options = configuration.GetSection(BrevoOptions.SECTION).Get<BrevoOptions>() ?? new BrevoOptions();
+        var client = new HttpClient(new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(5) });
+        return new BrevoEmailSender(client, options);
     }
 }
 
 /// <summary>
 /// What a host without an email provider has: it starts, and the first code it has to send fails loudly instead of
-/// being dropped. The real provider arrives with #601.
+/// being dropped.
 /// </summary>
 internal sealed class UnconfiguredEmailSender : IEmailSender
 {

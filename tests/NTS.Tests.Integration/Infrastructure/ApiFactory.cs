@@ -1,3 +1,5 @@
+using System.Net;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -14,6 +16,12 @@ namespace NTS.Tests.Integration.Infrastructure;
 /// </summary>
 internal sealed class ApiFactory : WebApplicationFactory<Program>
 {
+    /// <summary>
+    /// The request header with which a test says what address a request comes from. The in-memory host has no
+    /// connection to read it from: this stands in for the address a proxy would forward.
+    /// </summary>
+    public const string CLIENT_ADDRESS_HEADER = "X-Test-Client";
+
     public static string NewDataProtectionKeys()
     {
         return Path.Combine(AppContext.BaseDirectory, "data-protection", Guid.NewGuid().ToString("N"));
@@ -24,6 +32,7 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     readonly string? _emailSender;
     readonly string _dataProtectionKeys;
     readonly TimeProvider? _time;
+    readonly bool _productionRateLimits;
     readonly Action<IServiceCollection>? _configureServices;
     readonly Action<IWebHostBuilder>? _configureHost;
 
@@ -38,7 +47,11 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     /// The folder of the key ring. A host that must read what another protected shares it. By default each host has
     /// its own, under the test output, never in the user profile.
     /// </param>
-    /// <param name="time">A clock the test moves, for the lifetimes of codes and sessions.</param>
+    /// <param name="time">A clock the test moves, for the lifetimes of codes and sessions and the windows of the limits.</param>
+    /// <param name="productionRateLimits">
+    /// The limits of authentication as they are in production, which the tests of the limits run with. By default they
+    /// are lifted far above anything a test does, so that a test that asks for many codes is not stopped by them.
+    /// </param>
     public ApiFactory(
         string mongoConnectionString,
         bool kestrel = false,
@@ -47,7 +60,8 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         string? dataProtectionKeys = null,
         TimeProvider? time = null,
         Action<IServiceCollection>? configureServices = null,
-        Action<IWebHostBuilder>? configureHost = null
+        Action<IWebHostBuilder>? configureHost = null,
+        bool productionRateLimits = false
     )
     {
         // Azure supplies PORT to the deployed host. A developer's own PORT must not bind a second listener here.
@@ -58,6 +72,7 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         _emailSender = emailSender ?? (environment == "Production" ? null : "Outbox");
         _dataProtectionKeys = dataProtectionKeys ?? NewDataProtectionKeys();
         _time = time;
+        _productionRateLimits = productionRateLimits;
         _configureServices = configureServices;
         _configureHost = configureHost;
         if (kestrel)
@@ -86,10 +101,19 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
             builder.UseSetting("Email:Sender", _emailSender);
         }
 
+        if (!_productionRateLimits)
+        {
+            foreach (var limit in RateLimitSettings())
+            {
+                builder.UseSetting($"Auth:RateLimits:{limit}", "1000000");
+            }
+        }
+
         _configureHost?.Invoke(builder);
         builder.ConfigureTestServices(services =>
         {
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(_dataProtectionKeys));
+            services.AddSingleton<IStartupFilter, ClientAddressFromHeader>();
             if (_time != null)
             {
                 services.RemoveAll<TimeProvider>();
@@ -98,5 +122,44 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
 
             _configureServices?.Invoke(services);
         });
+    }
+
+    static string[] RateLimitSettings()
+    {
+        return
+        [
+            "SendsPerAddress",
+            "SendsPerClient",
+            "SendsOverall",
+            "FailedVerificationsPerAddress",
+            "FailedVerificationsPerClient",
+            "FailedVerificationsOverall",
+        ];
+    }
+
+    /// <summary>Gives the request the address a test named, as a forwarding proxy would have.</summary>
+    sealed class ClientAddressFromHeader : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+        {
+            return app =>
+            {
+                app.Use(
+                    (context, following) =>
+                    {
+                        if (
+                            context.Request.Headers.TryGetValue(CLIENT_ADDRESS_HEADER, out var value)
+                            && IPAddress.TryParse(value, out var address)
+                        )
+                        {
+                            context.Connection.RemoteIpAddress = address;
+                        }
+
+                        return following(context);
+                    }
+                );
+                next(app);
+            };
+        }
     }
 }

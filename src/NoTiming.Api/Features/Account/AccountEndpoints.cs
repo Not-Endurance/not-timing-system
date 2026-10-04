@@ -26,6 +26,7 @@ internal static class AccountEndpoints
         app.MapPost("/api/code-challenges", RequestCode).AllowAnonymous();
         app.MapPost("/api/sessions", CreateSession).AllowAnonymous();
         app.MapDelete("/api/sessions/current", DeleteSession).AllowAnonymous();
+        app.MapRegistration();
 
         // The page looks at the session itself and sends a visitor to sign in, so it is not an API route.
         app.MapGet("/account/passkeys", AccountPages.Passkeys).AllowAnonymous();
@@ -35,7 +36,12 @@ internal static class AccountEndpoints
         return app;
     }
 
-    static async Task<IResult> RequestCode(HttpContext context, CodeSignIn codeSignIn, AccountText text)
+    static async Task<IResult> RequestCode(
+        HttpContext context,
+        CodeSignIn codeSignIn,
+        AuthRateLimiter limits,
+        AccountText text
+    )
     {
         var read = await JsonApiRequests.ReadAsync<CodeChallengeAttributes>(context.Request, CODE_CHALLENGES);
         if (read.Error != null)
@@ -53,6 +59,12 @@ internal static class AccountEndpoints
             );
         }
 
+        // Asking costs the same whether or not the address has an account, so a refusal tells nothing about that.
+        if (limits.TrySend(email!, ClientAddress.Of(context)) is { } refusal)
+        {
+            return JsonApiResults.RateLimited(refusal.RetryAfter);
+        }
+
         await codeSignIn.RequestAsync(email!, text.Resolve(context.Request), context.RequestAborted);
 
         // 202 for an address with an account, without one and cooling down alike: the answer tells nothing.
@@ -62,6 +74,7 @@ internal static class AccountEndpoints
     static async Task<IResult> CreateSession(
         HttpContext context,
         CodeSignIn codeSignIn,
+        AuthRateLimiter limits,
         PasskeyService passkeys,
         IAntiforgery antiforgery,
         UserManager<NIdentityUser> users
@@ -101,14 +114,48 @@ internal static class AccountEndpoints
             return InvalidCode();
         }
 
-        var user = await codeSignIn.VerifyAsync(attributes.Email!, attributes.Code, context.RequestAborted);
-        return user is null ? InvalidCode() : await SessionOf(user, "code", users);
+        // An attempt costs the budgets of a wrong code before the code is looked at, and a right one gets it back.
+        var client = ClientAddress.Of(context);
+        if (limits.TryVerify(attributes.Email!, client) is { } refusal)
+        {
+            return JsonApiResults.RateLimited(refusal.RetryAfter);
+        }
+
+        var user = await codeSignIn.VerifyAsync(
+            attributes.Email!,
+            attributes.Code,
+            context.Request.Cookies[RegistrationTokens.COOKIE],
+            context.RequestAborted
+        );
+        if (user is null)
+        {
+            return InvalidCode();
+        }
+
+        limits.Succeeded(attributes.Email!, client);
+
+        // Whatever registration the browser had is over: the address is proved.
+        context.Response.Cookies.Delete(RegistrationTokens.COOKIE, RegistrationTokens.Options());
+        return await SessionOf(user, "code", users);
     }
 
-    static async Task<IResult> DeleteSession(SignInManager<NIdentityUser> signIn)
+    static async Task<IResult> DeleteSession(
+        HttpContext context,
+        SignInManager<NIdentityUser> signIn,
+        UserManager<NIdentityUser> users,
+        ILoggerFactory loggers
+    )
     {
         // Deletes the ticket the cookie names and clears the cookie. Without a session there is nothing to delete.
+        var userId = users.GetUserId(context.User);
         await signIn.SignOutAsync();
+        if (userId != null)
+        {
+            loggers
+                .CreateLogger(typeof(AccountEndpoints))
+                .LogInformation(AuthEvents.SIGNED_OUT, "User {UserId} signed out.", userId);
+        }
+
         return Results.NoContent();
     }
 
@@ -128,7 +175,7 @@ internal static class AccountEndpoints
             {
                 email = user.Email,
                 emailConfirmed = user.EmailConfirmed,
-                name = TextOf(user, "Name"),
+                name = user.TextOf("Name"),
                 passkeys = user.Passkeys.Count,
             }
         );
@@ -162,18 +209,6 @@ internal static class AccountEndpoints
             "invalid-code",
             "The code is wrong or has expired."
         );
-    }
-
-    /// <summary>A field of the application's own user document, which identity does not know.</summary>
-    static string? TextOf(NIdentityUser user, string field)
-    {
-        return
-            user.OtherFields != null
-            && user.OtherFields.TryGetValue(field, out var value)
-            && value.BsonType == BsonType.String
-            && !string.IsNullOrWhiteSpace(value.AsString)
-            ? value.AsString
-            : null;
     }
 }
 

@@ -59,7 +59,8 @@ label {
   font-weight: 600;
 }
 
-input {
+input,
+select {
   width: 100%;
   padding: 12px;
   border: 1px solid var(--border);
@@ -69,10 +70,25 @@ input {
   font: inherit;
 }
 
+select option {
+  background: var(--card);
+  color: var(--text);
+}
+
 input:focus-visible,
+select:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* A field only a program fills in: people never see it or reach it with the keyboard (#601). */
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
 #code {
@@ -177,4 +193,10 @@ ul.passkeys button.link {
 a.link {
   color: var(--accent);
   font-weight: 500;
+}
+
+/* Beside a button that is made to look like a link, so that the two sit on one line. */
+.secondary a.link {
+  margin-top: 8px;
+  padding: 8px 0;
 }

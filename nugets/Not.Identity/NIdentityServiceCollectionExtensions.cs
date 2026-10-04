@@ -29,6 +29,7 @@ public static class NIdentityServiceCollectionExtensions
 
         services.AddOptions<NIdentityOptions>().Configure(options => configure?.Invoke(options));
         services.TryAddSingleton(TimeProvider.System);
+        services.AddLogging();
         services.AddDataProtection();
 
         // Identity adds its own normalizer only when there is none: names and emails are normalized to lower case.

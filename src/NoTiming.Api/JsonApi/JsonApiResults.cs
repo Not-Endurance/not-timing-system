@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Net.Http.Headers;
 
 namespace NoTiming.Api.JsonApi;
 
@@ -49,7 +51,26 @@ internal static class JsonApiResults
             MEDIA_TYPE,
             status
         );
-        return location == null ? document : new LocatedResult(document, location);
+        return location == null ? document : new HeaderResult(document, HeaderNames.Location, location);
+    }
+
+    /// <summary>
+    /// 429 <c>rate-limited</c> with the seconds until there is room again. It is the same for whatever was asked, and
+    /// whatever its address has, so it tells nothing about accounts.
+    /// </summary>
+    public static IResult RateLimited(TimeSpan retryAfter)
+    {
+        var seconds = Math.Max(1, (int)Math.Ceiling(retryAfter.TotalSeconds));
+        return new HeaderResult(
+            Error(
+                StatusCodes.Status429TooManyRequests,
+                "rate-limited",
+                "Too many requests.",
+                "Wait a little and try again."
+            ),
+            HeaderNames.RetryAfter,
+            seconds.ToString(CultureInfo.InvariantCulture)
+        );
     }
 
     /// <summary>The answer of every route that needs a caller when there is none: 401, never a redirect.</summary>
@@ -67,20 +88,22 @@ internal static class JsonApiResults
     public static JsonSerializerOptions Options { get; } =
         new(JsonSerializerDefaults.Web) { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
 
-    sealed class LocatedResult : IResult
+    sealed class HeaderResult : IResult
     {
         readonly IResult _inner;
-        readonly string _location;
+        readonly string _name;
+        readonly string _value;
 
-        public LocatedResult(IResult inner, string location)
+        public HeaderResult(IResult inner, string name, string value)
         {
             _inner = inner;
-            _location = location;
+            _name = name;
+            _value = value;
         }
 
         public Task ExecuteAsync(HttpContext httpContext)
         {
-            httpContext.Response.Headers.Location = _location;
+            httpContext.Response.Headers[_name] = _value;
             return _inner.ExecuteAsync(httpContext);
         }
     }

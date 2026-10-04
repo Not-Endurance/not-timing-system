@@ -19,6 +19,7 @@ internal sealed class PasskeyService
     readonly UserManager<NIdentityUser> _users;
     readonly SignInManager<NIdentityUser> _signIn;
     readonly IEmailSender _email;
+    readonly TenantPlacement _tenants;
     readonly AccountText _text;
     readonly TimeProvider _time;
     readonly ILogger<PasskeyService> _logger;
@@ -27,6 +28,7 @@ internal sealed class PasskeyService
         UserManager<NIdentityUser> users,
         SignInManager<NIdentityUser> signIn,
         IEmailSender email,
+        TenantPlacement tenants,
         AccountText text,
         PasskeyAvailability availability,
         TimeProvider time,
@@ -36,6 +38,7 @@ internal sealed class PasskeyService
         _users = users;
         _signIn = signIn;
         _email = email;
+        _tenants = tenants;
         _text = text;
         Availability = availability;
         _time = time;
@@ -54,10 +57,7 @@ internal sealed class PasskeyService
             {
                 Id = id,
                 Name = email,
-                DisplayName =
-                    user.OtherFields != null && user.OtherFields.TryGetValue("Name", out var name) && name.IsString
-                        ? name.AsString
-                        : email,
+                DisplayName = user.TextOf("Name") ?? email,
             }
         );
     }
@@ -82,13 +82,18 @@ internal sealed class PasskeyService
         var attestation = await TryAsync(() => _signIn.PerformPasskeyAttestationAsync(credentialJson));
         if (attestation is null)
         {
-            _logger.LogInformation("A passkey was refused for user {UserId}: no ceremony is underway.", user.Id);
+            _logger.LogInformation(
+                AuthEvents.PASSKEY_REFUSED,
+                "A passkey was refused for user {UserId}: no ceremony is underway.",
+                user.Id
+            );
             return null;
         }
 
         if (!attestation.Succeeded)
         {
             _logger.LogInformation(
+                AuthEvents.PASSKEY_REFUSED,
                 "A passkey was refused for user {UserId}: {Reason}",
                 user.Id,
                 attestation.Failure?.Message
@@ -99,7 +104,11 @@ internal sealed class PasskeyService
         // The options named the user the ceremony was for: it must be the one asking now.
         if (attestation.UserEntity.Id != user.Id.ToString())
         {
-            _logger.LogWarning("A passkey made for another user was refused for user {UserId}.", user.Id);
+            _logger.LogWarning(
+                AuthEvents.PASSKEY_REFUSED,
+                "A passkey made for another user was refused for user {UserId}.",
+                user.Id
+            );
             return null;
         }
 
@@ -108,11 +117,11 @@ internal sealed class PasskeyService
         var result = await _users.ChangeAsync(user.Id, changed => _users.AddOrUpdatePasskeyAsync(changed, passkey));
         if (!result.Succeeded)
         {
-            _logger.LogWarning("A passkey could not be stored for user {UserId}.", user.Id);
+            _logger.LogWarning(AuthEvents.PASSKEY_REFUSED, "A passkey could not be stored for user {UserId}.", user.Id);
             return null;
         }
 
-        _logger.LogInformation("A passkey was added for user {UserId}.", user.Id);
+        _logger.LogInformation(AuthEvents.PASSKEY_ADDED, "A passkey was added for user {UserId}.", user.Id);
         try
         {
             await NotifyAddedAsync(user, passkey, language);
@@ -132,13 +141,20 @@ internal sealed class PasskeyService
         var assertion = await TryAsync(() => _signIn.PerformPasskeyAssertionAsync(credentialJson));
         if (assertion is null)
         {
-            _logger.LogInformation("A passkey sign-in was refused: no ceremony is underway.");
+            _logger.LogInformation(
+                AuthEvents.PASSKEY_REFUSED,
+                "A passkey sign-in was refused: no ceremony is underway."
+            );
             return null;
         }
 
         if (!assertion.Succeeded)
         {
-            _logger.LogInformation("A passkey sign-in was refused: {Reason}", assertion.Failure?.Message);
+            _logger.LogInformation(
+                AuthEvents.PASSKEY_REFUSED,
+                "A passkey sign-in was refused: {Reason}",
+                assertion.Failure?.Message
+            );
             return null;
         }
 
@@ -153,8 +169,9 @@ internal sealed class PasskeyService
             return null;
         }
 
+        await _tenants.EnsureHomeTenantAsync(user);
         await _signIn.SignInAsync(user, isPersistent: true);
-        _logger.LogInformation("User {UserId} signed in with a passkey.", user.Id);
+        _logger.LogInformation(AuthEvents.SIGNED_IN, "User {UserId} signed in with a passkey.", user.Id);
         return user;
     }
 
@@ -240,7 +257,7 @@ internal sealed class PasskeyService
         );
         if (result.Succeeded)
         {
-            _logger.LogInformation("A passkey was removed for user {UserId}.", userId);
+            _logger.LogInformation(AuthEvents.PASSKEY_REMOVED, "A passkey was removed for user {UserId}.", userId);
         }
 
         return result;

@@ -19,22 +19,34 @@ internal static class ApiSessions
     public const string COOKIE_NAME = "__Host-NoTiming";
     public const string MEDIA_TYPE = "application/vnd.api+json";
 
-    public static Task<HttpResponseMessage> RequestCodeAsync(HttpClient client, string email, string? language = null)
+    public static Task<HttpResponseMessage> RequestCodeAsync(
+        HttpClient client,
+        string email,
+        string? language = null,
+        string? from = null
+    )
     {
-        return PostAsync(client, "/api/code-challenges", "code-challenges", new { email }, language);
+        return PostAsync(client, "/api/code-challenges", "code-challenges", new { email }, language, from);
     }
 
-    public static Task<HttpResponseMessage> CreateSessionAsync(HttpClient client, string email, string code)
+    public static Task<HttpResponseMessage> CreateSessionAsync(
+        HttpClient client,
+        string email,
+        string code,
+        string? from = null
+    )
     {
-        return PostAsync(client, "/api/sessions", "sessions", new { email, code });
+        return PostAsync(client, "/api/sessions", "sessions", new { email, code }, from: from);
     }
 
+    /// <param name="from">The address the request comes from, for the host to see as the client's (see <see cref="ApiFactory"/>).</param>
     public static async Task<HttpResponseMessage> PostAsync(
         HttpClient client,
         string path,
         string type,
         object attributes,
-        string? language = null
+        string? language = null,
+        string? from = null
     )
     {
         var body = JsonSerializer.Serialize(new { data = new { type, attributes } });
@@ -45,6 +57,11 @@ internal static class ApiSessions
         if (language != null)
         {
             request.Headers.AcceptLanguage.ParseAdd(language);
+        }
+
+        if (from != null)
+        {
+            request.Headers.Add(ApiFactory.CLIENT_ADDRESS_HEADER, from);
         }
 
         return await client.SendAsync(request);

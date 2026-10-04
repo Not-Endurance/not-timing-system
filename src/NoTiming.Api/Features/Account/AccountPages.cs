@@ -23,6 +23,7 @@ internal static class AccountPages
         ["sign-in.js"] = ("account/pages/sign-in.js", "text/javascript; charset=utf-8"),
         ["passkey-support.js"] = ("account/pages/passkey-support.js", "text/javascript; charset=utf-8"),
         ["passkeys.js"] = ("account/pages/passkeys.js", "text/javascript; charset=utf-8"),
+        ["register.js"] = ("account/pages/register.js", "text/javascript; charset=utf-8"),
     };
 
     public static IResult SignIn(
@@ -32,7 +33,44 @@ internal static class AccountPages
         PasskeyAvailability passkeys
     )
     {
-        return Render(context, "account/pages/sign-in.html", text, antiforgery, passkeys, offer: false);
+        return Render(
+            context,
+            "account/pages/sign-in.html",
+            text,
+            Ceremony(context, antiforgery, passkeys, offer: false)
+        );
+    }
+
+    /// <summary>
+    /// The page a new person registers on (#601): their names, address and one of the countries that can be chosen.
+    /// Registering is a plain write that needs no ceremony, so the page carries no antiforgery token.
+    /// </summary>
+    public static async Task<IResult> Register(
+        HttpContext context,
+        AccountText text,
+        PasskeyAvailability passkeys,
+        SelectableCountries countries
+    )
+    {
+        var options = (await countries.AllAsync(context.RequestAborted)).Select(country =>
+            $"<option value=\"{country.Id}\">{ENCODER.Encode(country.Name)}</option>"
+        );
+        return Render(
+            context,
+            "account/pages/register.html",
+            text,
+            new Dictionary<string, string> { ["passkeysEnabled"] = passkeys.Enabled ? "true" : "false" },
+            new Dictionary<string, string> { ["raw.countryOptions"] = string.Concat(options) }
+        );
+    }
+
+    /// <summary>
+    /// The privacy notice that the registration page links to. It is a placeholder until the operator has a policy,
+    /// and says so.
+    /// </summary>
+    public static IResult Privacy(HttpContext context, AccountText text)
+    {
+        return Render(context, "account/pages/privacy.html", text, new Dictionary<string, string>());
     }
 
     /// <summary>
@@ -56,9 +94,7 @@ internal static class AccountPages
             context,
             "account/pages/passkeys.html",
             text,
-            antiforgery,
-            passkeys,
-            offer: context.Request.Query["offer"] == "1"
+            Ceremony(context, antiforgery, passkeys, offer: context.Request.Query["offer"] == "1")
         );
     }
 
@@ -90,30 +126,49 @@ internal static class AccountPages
             : "/";
     }
 
-    static IResult Render(
+    /// <summary>What the pages of a ceremony (a sign-in, a passkey) carry: the token its requests send back.</summary>
+    static Dictionary<string, string> Ceremony(
         HttpContext context,
-        string resource,
-        AccountText text,
         IAntiforgery antiforgery,
         PasskeyAvailability passkeys,
         bool offer
     )
     {
-        var language = text.Resolve(context.Request);
-        var values = new Dictionary<string, string>
+        return new Dictionary<string, string>
         {
-            ["lang"] = language,
-            ["returnUrl"] = SafeReturnUrl(context.Request.Query["returnUrl"]),
             ["antiforgery"] = antiforgery.GetAndStoreTokens(context).RequestToken ?? string.Empty,
             ["passkeysEnabled"] = passkeys.Enabled ? "true" : "false",
             ["offer"] = offer ? "true" : "false",
         };
+    }
+
+    /// <summary>
+    /// Fills <c>{{key}}</c> in a page: from the values of the page, and from the text of the visitor's language for a
+    /// key they lack. Both are HTML encoded. <paramref name="markup"/> holds the few values that are HTML themselves,
+    /// which the page builds from encoded parts, and that are put in as they are.
+    /// </summary>
+    static IResult Render(
+        HttpContext context,
+        string resource,
+        AccountText text,
+        Dictionary<string, string> values,
+        Dictionary<string, string>? markup = null
+    )
+    {
+        var language = text.Resolve(context.Request);
+        values["lang"] = language;
+        values["returnUrl"] = SafeReturnUrl(context.Request.Query["returnUrl"]);
         var html = Regex.Replace(
             ReadText(resource),
             @"\{\{([A-Za-z0-9_.]+)\}\}",
             match =>
             {
                 var key = match.Groups[1].Value;
+                if (markup != null && markup.TryGetValue(key, out var trusted))
+                {
+                    return trusted;
+                }
+
                 return ENCODER.Encode(values.TryGetValue(key, out var value) ? value : text.Get(language, key));
             }
         );

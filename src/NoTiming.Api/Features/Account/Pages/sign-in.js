@@ -7,6 +7,7 @@
   const messages = {
     email: script.dataset.errorEmail,
     code: script.dataset.errorCode,
+    limited: script.dataset.errorLimited,
     generic: script.dataset.errorGeneric,
     passkey: script.dataset.errorPasskey,
     resendIn: script.dataset.resendIn,
@@ -40,6 +41,9 @@
     const leavesTheSite = !value.startsWith('/') || value.startsWith('//') || value.startsWith('/\\');
     return leavesTheSite || /[\u0000-\u001f\u007f-\u009f]/.test(value) ? '/' : value;
   })();
+  if (returnUrl !== '/') {
+    document.getElementById('register-link').href = '/register?returnUrl=' + encodeURIComponent(returnUrl);
+  }
 
   function show(text) {
     message.textContent = text || '';
@@ -83,7 +87,7 @@
       if (response.status === 202) {
         return true;
       }
-      show(response.status === 400 ? messages.email : messages.generic);
+      show(response.status === 400 ? messages.email : response.status === 429 ? messages.limited : messages.generic);
     } catch {
       show(messages.generic);
     }
@@ -163,7 +167,7 @@
         goOn((await response.json()).data.attributes);
         return;
       }
-      show(response.status === 401 ? messages.code : messages.generic);
+      show(response.status === 401 ? messages.code : response.status === 429 ? messages.limited : messages.generic);
     } catch {
       show(messages.generic);
     }

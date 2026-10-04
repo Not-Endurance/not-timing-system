@@ -22,4 +22,18 @@ public class Country : Aggregate
     {
         return Name;
     }
+
+    /// <summary>
+    /// Whether the term is the name, the ISO code or the NF code of the country, in any case. It is how the profile of a
+    /// person finds their country, and how an existing person is placed in a Tenant.
+    /// </summary>
+    public bool Matches(string? term)
+    {
+        return !string.IsNullOrWhiteSpace(term)
+            && (
+                string.Equals(Name, term, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(IsoCode, term, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(NfCode, term, StringComparison.OrdinalIgnoreCase)
+            );
+    }
 }

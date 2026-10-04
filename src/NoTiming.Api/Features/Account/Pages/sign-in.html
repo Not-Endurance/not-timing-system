@@ -28,6 +28,7 @@
         <button type="submit">{{email.submit}}</button>
         <div class="secondary">
           <button type="button" id="passkey" class="link" hidden>{{signin.passkey}}</button>
+          <a id="register-link" class="link" href="/register">{{signin.register}}</a>
         </div>
       </form>
 
@@ -64,6 +65,7 @@
       data-antiforgery="{{antiforgery}}"
       data-error-email="{{error.email}}"
       data-error-code="{{error.code}}"
+      data-error-limited="{{error.limited}}"
       data-error-generic="{{error.generic}}"
       data-error-passkey="{{error.passkey}}"
       data-passkey-busy="{{signin.passkeyBusy}}"
