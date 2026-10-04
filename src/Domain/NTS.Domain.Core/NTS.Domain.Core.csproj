@@ -11,4 +11,8 @@
     <ProjectReference Include="..\NTS.Domain\NTS.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="NTS.Tests.Unit" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,5 @@
 ﻿using Not.Domain.Exceptions;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Core.StaticOptions;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
 namespace NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -231,9 +230,13 @@ public class Phase : Entity
         return Length / GetPhaseInterval();
     }
 
-    public Speed? GetAverageSpeed()
+    /// <summary>
+    /// The average speed of the Phase, judged by the rules of the Event it belongs to (ADR-0012): a Regional competition
+    /// may judge it on the loop alone. Asked without rules, it is judged as by an Event that has none.
+    /// </summary>
+    public Speed? GetAverageSpeed(RegionalRules? rules = null)
     {
-        if (StaticOption.ShouldOnlyUseAverageLoopSpeed(Ruleset))
+        if (Ruleset == CompetitionRuleset.Regional && rules is { OnlyAverageLoopSpeed: true })
         {
             return GetAverageLoopSpeed();
         }

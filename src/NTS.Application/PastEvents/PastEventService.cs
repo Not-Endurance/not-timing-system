@@ -94,7 +94,9 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
 
     public ResultsDocument? CreateDocument(Ranking ranking)
     {
-        return Event == null ? null : new ResultsDocument(new Result(ranking, _eventParticipations), Event, _officials);
+        return Event == null
+            ? null
+            : new ResultsDocument(new Result(ranking, _eventParticipations, Event.RegionalRules), Event, _officials);
     }
 
     public async Task<IEnumerable<EventInformation>> ReadMany()

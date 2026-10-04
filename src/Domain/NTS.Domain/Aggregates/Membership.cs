@@ -8,6 +8,9 @@ namespace NTS.Domain.Aggregates;
 /// </summary>
 public sealed record Membership
 {
+    /// <summary>The role of a Tenant Root: it creates the Tenant's Events. Only the Developer's command gives it.</summary>
+    public const string TENANT_ROOT = "tenant-root";
+
     public static Membership In(Tenant tenant)
     {
         return new Membership(tenant.Id);
@@ -26,4 +29,11 @@ public sealed record Membership
 
     public string TenantId { get; }
     public IReadOnlyList<string> Roles { get; }
+    public bool IsTenantRoot => Roles.Contains(TENANT_ROOT);
+
+    /// <summary>The Membership with the role as well. Having it already changes nothing.</summary>
+    public Membership WithRole(string role)
+    {
+        return Roles.Contains(role) ? this : new Membership(TenantId, [.. Roles, role]);
+    }
 }

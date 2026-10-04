@@ -1,14 +1,11 @@
+using NTS.Domain.Access;
+
 namespace NTS.Domain.Core.Objects;
 
 public static class SnapshotAccessPolicy
 {
-    public static readonly OfficialRole[] AllowedOfficialRoles =
-    [
-        OfficialRole.Steward,
-        OfficialRole.ChiefSteward,
-        OfficialRole.GroundJury,
-        OfficialRole.GroundJuryPresident,
-    ];
+    /// <summary>The roles of an Official that may send a Snapshot: the one list of the access policy (ADR-0012).</summary>
+    public static readonly OfficialRole[] AllowedOfficialRoles = [.. AccessPolicy.SnapshotOfficialRoles];
 
     public static bool CanWriteAsOfficial(OfficialRole role)
     {

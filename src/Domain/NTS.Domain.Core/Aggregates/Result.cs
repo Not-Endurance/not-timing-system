@@ -1,6 +1,5 @@
 using NTS.Domain.Core.Aggregates.Results;
 using NTS.Domain.Core.Objects.Rankers;
-using NTS.Domain.Core.StaticOptions;
 
 namespace NTS.Domain.Core.Aggregates;
 
@@ -21,7 +20,9 @@ public sealed class Result
         CompetitionRuleset ruleset,
         ParticipationCategory category,
         Guid eventId,
-        List<ParticipationResult> entries
+        List<ParticipationResult> entries,
+        RegionalRules? rules,
+        IReadOnlyList<Ranker>? regionalRankers
     )
     {
         Id = id;
@@ -30,11 +31,20 @@ public sealed class Result
         Name = name;
         Ruleset = ruleset;
         Category = category;
-        Entries = RankIfRequired(entries, ruleset).AsReadOnly();
+        Entries = RankIfRequired(entries, ruleset, rules ?? RegionalRules.None, regionalRankers ?? REGIONAL_RANKERS)
+            .AsReadOnly();
     }
 
-    /// <summary>The Results of a Ranking, over the Participations of its Event.</summary>
-    public Result(Ranking ranking, IEnumerable<Participation> participations)
+    /// <summary>
+    /// The Results of a Ranking, over the Participations of its Event, ranked by the rules of that Event (ADR-0012) with
+    /// the regional rankers given. There are none yet, so this is how a test can show the rules to be read.
+    /// </summary>
+    internal Result(
+        Ranking ranking,
+        IEnumerable<Participation> participations,
+        RegionalRules? rules,
+        IReadOnlyList<Ranker>? regionalRankers
+    )
         : this(
             ranking.Id,
             ranking.Id,
@@ -42,8 +52,17 @@ public sealed class Result
             ranking.Ruleset,
             ranking.Category,
             ranking.EventId,
-            Compose(ranking, participations)
+            Compose(ranking, participations),
+            rules,
+            regionalRankers
         ) { }
+
+    /// <summary>
+    /// The Results of a Ranking, over the Participations of its Event, ranked by the rules of that Event (ADR-0012).
+    /// Composed without rules, they are ranked as by an Event that has none.
+    /// </summary>
+    public Result(Ranking ranking, IEnumerable<Participation> participations, RegionalRules? rules = null)
+        : this(ranking, participations, rules, null) { }
 
     /// <summary>The sheet of a Handout, over the Participation it names.</summary>
     public Result(Handout handout, Participation participation)
@@ -54,7 +73,9 @@ public sealed class Result
             participation.Competition.Ruleset,
             participation.Category,
             handout.EventId,
-            [new ParticipationResult(NamedBy(handout, participation))]
+            [new ParticipationResult(NamedBy(handout, participation))],
+            null,
+            null
         ) { }
 
     public Guid Id { get; }
@@ -108,14 +129,24 @@ public sealed class Result
         return participation;
     }
 
-    static List<ParticipationResult> RankIfRequired(List<ParticipationResult> entries, CompetitionRuleset ruleset)
+    static List<ParticipationResult> RankIfRequired(
+        List<ParticipationResult> entries,
+        CompetitionRuleset ruleset,
+        RegionalRules rules,
+        IReadOnlyList<Ranker> regionalRankers
+    )
     {
-        return entries.Count > 1 ? Rank(entries, ruleset) : entries;
+        return entries.Count > 1 ? Rank(entries, ruleset, rules, regionalRankers) : entries;
     }
 
-    static List<ParticipationResult> Rank(IReadOnlyCollection<ParticipationResult> entries, CompetitionRuleset ruleset)
+    static List<ParticipationResult> Rank(
+        IReadOnlyCollection<ParticipationResult> entries,
+        CompetitionRuleset ruleset,
+        RegionalRules rules,
+        IReadOnlyList<Ranker> regionalRankers
+    )
     {
-        var ranker = StaticOption.ShouldUseRegionalRanker(ruleset) ? GetRanker(StaticOption.Regional) : FEI_RANKER;
+        var ranker = GetRanker(rules.RankerFor(ruleset), regionalRankers);
         var ranked = ranker.Rank(entries);
         var rank = 0;
         foreach (var entry in ranked)
@@ -125,8 +156,9 @@ public sealed class Result
         return ranked;
     }
 
-    static Ranker GetRanker(IRegionOption? configuration)
+    /// <summary>The regional ranker of the code the rules chose, and the FEI ranker when none was chosen or none has that code.</summary>
+    static Ranker GetRanker(string? code, IReadOnlyList<Ranker> regionalRankers)
     {
-        return REGIONAL_RANKERS.FirstOrDefault(x => x.CountryIsoCode == configuration?.CountryIsoCode) ?? FEI_RANKER;
+        return code == null ? FEI_RANKER : regionalRankers.FirstOrDefault(x => x.CountryIsoCode == code) ?? FEI_RANKER;
     }
 }

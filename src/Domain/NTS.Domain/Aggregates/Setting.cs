@@ -1,6 +1,5 @@
 ﻿using Not.Domain;
 using NTS.Domain.Enums;
-using NTS.Domain.Settings;
 
 namespace NTS.Domain.Aggregates;
 
@@ -11,7 +10,6 @@ public class Setting : Aggregate
     {
         Country = Required(nameof(Country), country);
         DetectionMode = detectionMode;
-        StaticSettings.Instance = this;
     }
 
     // TODO: Keep Id on Profile level, decouple settings

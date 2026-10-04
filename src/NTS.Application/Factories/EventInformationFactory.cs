@@ -7,7 +7,15 @@ namespace NTS.Application.Factories;
 
 public static class EventInformationFactory
 {
-    public static EventInformation Create(Domain.Setup.Aggregates.ConfigureEvent setupEvent)
+    /// <summary>
+    /// The Event as it starts from its Setup. It keeps the Tenant and the Main Operator of the Setup, and the rules of
+    /// the Regional competitions are those of its Tenant at this moment, copied: the Event keeps them whatever the Tenant
+    /// edits later (ADR-0012). An Event started without any has none.
+    /// </summary>
+    public static EventInformation Create(
+        Domain.Setup.Aggregates.ConfigureEvent setupEvent,
+        RegionalRules? regionalRules = null
+    )
     {
         if (!setupEvent.Competitions.Any())
         {
@@ -24,7 +32,10 @@ public static class EventInformationFactory
             new EventSpan(startDate, endDate),
             setupEvent.FeiShowId,
             setupEvent.Id,
-            isActive: true
+            isActive: true,
+            regionalRules: regionalRules,
+            tenantId: setupEvent.TenantId,
+            mainOperatorId: setupEvent.MainOperatorId
         );
         return eventInformation;
     }

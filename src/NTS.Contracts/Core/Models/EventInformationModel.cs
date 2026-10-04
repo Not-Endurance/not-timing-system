@@ -20,6 +20,7 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
     [BsonId]
     public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
+    public Guid? MainOperatorId { get; set; }
     public CountryModel Country { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string Location { get; set; } = default!;
@@ -27,12 +28,15 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
     public DateTimeOffset StartDay { get; set; }
     public DateTimeOffset EndDay { get; set; }
     public bool IsActive { get; set; }
+    public RegionalRulesModel? RegionalRules { get; set; }
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
 
     public void MapFrom(EventInformation eventInformation)
     {
         Id = eventInformation.Id;
+        TenantId = eventInformation.TenantId;
+        MainOperatorId = eventInformation.MainOperatorId;
         Country = CountryModel.From(eventInformation.Country);
         Name = eventInformation.Name;
         Location = eventInformation.Location;
@@ -40,12 +44,24 @@ public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKru
         StartDay = eventInformation.EventSpan.StartDay;
         EndDay = eventInformation.EventSpan.EndDay;
         IsActive = eventInformation.IsActive;
+        RegionalRules = RegionalRulesModel.From(eventInformation.RegionalRules);
     }
 
     public EventInformation MapToEntity()
     {
         var country = Country.MapToEntity();
         var span = new EventSpan(StartDay, EndDay);
-        return new EventInformation(country, Name, Location, span, FeiShowId, Id, IsActive);
+        return new EventInformation(
+            country,
+            Name,
+            Location,
+            span,
+            FeiShowId,
+            Id,
+            IsActive,
+            RegionalRules?.MapToEntity(),
+            TenantId,
+            MainOperatorId
+        );
     }
 }
