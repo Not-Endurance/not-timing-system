@@ -11,6 +11,8 @@ dotnet run --project tools/NTS.Tools -- <command> [options]
 | `watcher` | A placeholder. |
 | `migrate-names` | Moves the names of Athletes, Horses, Officials and snapshots to `Name` and `NameEnglish`. |
 | `migrate-participation-copies` | Turns the copy of a Participation inside every Ranking entry and Handout into a reference, and drops the values the domain derives (below). |
+| `seed-tenant-root` | Makes an account a Tenant Root of a Tenant, which makes the Tenant operational (below). |
+| `grant-developer` | Makes an account the Developer (below). |
 
 A migration is a dry run unless it is given `--apply`. Pass the connection string with `--connection-string`; never paste it into an issue, a log or a file in the repository.
 
@@ -59,3 +61,18 @@ The order of the migrations and the steps of the cutover are owned by the runboo
 - Rollback is a restore of the backup taken before the cutover. There is no way back from the new shape other than that.
 - The placings that Historic Events still lack are not filled in here. The last step of the cutover (#637) does it, because the code that computes the placings reads only Guid-keyed documents.
 - There is no dual-read, no lazy upgrade and no support for old builds: the new code reads only the new shape, and a Ranking entry or a Handout that names no Participation does not load.
+
+## seed-tenant-root and grant-developer
+
+```powershell
+dotnet run --project tools/NTS.Tools -- seed-tenant-root --connection-string <mongo> --tenant country-bg --email <exact email> [--database nts] [--apply]
+dotnet run --project tools/NTS.Tools -- grant-developer --connection-string <mongo> --email <exact email> [--database nts] [--apply]
+```
+
+What only the Developer does, and only by command (ADR-0012): no route of the Api gives a role, so there is no way for anyone who is signed in to become a Tenant Root or the Developer except by being named here. Like the migrations, they are a dry run unless given `--apply`, and what they print names neither the connection string nor anything an account keeps.
+
+- **`seed-tenant-root`** adds the role `tenant-root` to the Membership of the account in the Tenant (an id such as `country-bg`), or a Membership that has it when the account has none there. A Tenant becomes operational, able to hold Events, when it has a Tenant Root, and not before: nobody can create an Event in a Tenant that has none, the Developer included. The Tenant is made when the first person of its country registers, so it has to exist already, and so does the account, which is found by its exact email in any case: the person registers first, and the command is run after. Another Tenant Root of the same Tenant is another run with another email; a Tenant Root cannot make one.
+- **`grant-developer`** sets `IsDeveloper` on the account. The Developer holds every right across Tenants except acting as the Main Operator of a Live Event, and belongs to no Tenant.
+
+Both are idempotent: they change one thing of the user document in one atomic update, so running one twice changes nothing and nothing else of the account is touched. Running either on a hosted database is the owner's step, with the connection string supplied on the command line and never kept in a file; the exact commands for staging are in the hand-off of the checkpoint that needs them.
+

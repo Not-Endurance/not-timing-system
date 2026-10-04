@@ -1,3 +1,4 @@
+using NTS.Tools.Developer;
 using NTS.Tools.NameMigration;
 using NTS.Tools.ParticipationCopies;
 using NTS.Tools.Watcher;
@@ -7,6 +8,8 @@ return args.FirstOrDefault() switch
     "watcher" => await RunWatcher(),
     "migrate-names" => await RunNameMigration(args.Skip(1).ToArray()),
     "migrate-participation-copies" => await RunParticipationCopiesMigration(args.Skip(1).ToArray()),
+    "seed-tenant-root" => await DeveloperTool.SeedTenantRoot(args.Skip(1).ToArray()),
+    "grant-developer" => await DeveloperTool.GrantDeveloper(args.Skip(1).ToArray()),
     "-h" => ShowHelp(),
     "--help" => ShowHelp(),
     "help" => ShowHelp(),
@@ -27,6 +30,9 @@ static int ShowHelp()
           migrate-participation-copies
                                Turn the Participation copies in Rankings and Handouts into references
                                and drop the derived values (a dry run unless --apply)
+          seed-tenant-root     Make an account a Tenant Root of a Tenant, which makes the Tenant operational
+                               (a dry run unless --apply)
+          grant-developer      Make an account the Developer (a dry run unless --apply)
         """
     );
 
