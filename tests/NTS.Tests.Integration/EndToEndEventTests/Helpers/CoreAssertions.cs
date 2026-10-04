@@ -13,15 +13,15 @@ namespace NTS.Tests.Integration.EndToEndEventTests.Helpers;
 internal static class CoreAssertions
 {
     public static async Task AssertStartlistsMatchPersisted(
-        NexusApiDriver api,
-        JudgeDriver judge,
-        ClientDriver witness,
+        FunctionsApiDriver api,
+        ConsoleDriver console,
+        ViewerDriver witness,
         int eventId
     )
     {
         var expected = new Startlist(await api.ReadParticipations(eventId));
-        var judgeUpcoming = judge.GetRequiredService<IStartUpcoming>();
-        var judgeHistory = judge.GetRequiredService<IStartHistory>();
+        var judgeUpcoming = console.GetRequiredService<IStartUpcoming>();
+        var judgeHistory = console.GetRequiredService<IStartHistory>();
         var witnessUpcoming = witness.GetRequiredService<IStartUpcoming>();
         var witnessHistory = witness.GetRequiredService<IStartHistory>();
 
@@ -36,7 +36,7 @@ internal static class CoreAssertions
         Assert.Equal(Flatten(expected.HistoryByStage), Flatten(witnessHistory.HistoryByStage));
     }
 
-    public static async Task AssertArrivelistMatchesPersisted(NexusApiDriver api, ClientDriver witness, int eventId)
+    public static async Task AssertArrivelistMatchesPersisted(FunctionsApiDriver api, ViewerDriver witness, int eventId)
     {
         var arrivelist = witness.GetRequiredService<IArrivelistService>();
         await arrivelist.Load();

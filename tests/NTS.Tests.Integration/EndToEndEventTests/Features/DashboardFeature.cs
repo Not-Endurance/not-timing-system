@@ -20,9 +20,9 @@ internal sealed class DashboardFeature
     static readonly TimeSpan ARRIVE_SNAPSHOT_GROUP_DELTA = TimeSpan.FromMinutes(1);
     static readonly TimeSpan PRESENT_SNAPSHOT_GROUP_DELTA = TimeSpan.FromSeconds(10);
 
-    readonly JudgeDriver _judge;
-    readonly ClientDriver _witness;
-    readonly NexusApiDriver _api;
+    readonly ConsoleDriver _console;
+    readonly ViewerDriver _witness;
+    readonly FunctionsApiDriver _api;
     readonly EndToEndPrintFeature _print;
     readonly EventInformation _eventInformation;
     readonly HashSet<int> _manuallyEliminated = [];
@@ -30,14 +30,14 @@ internal sealed class DashboardFeature
     int _outerWaveNumber;
 
     public DashboardFeature(
-        JudgeDriver judge,
-        ClientDriver witness,
-        NexusApiDriver api,
+        ConsoleDriver console,
+        ViewerDriver witness,
+        FunctionsApiDriver api,
         EndToEndPrintFeature print,
         EventInformation eventInformation
     )
     {
-        _judge = judge;
+        _console = console;
         _witness = witness;
         _api = api;
         _print = print;
@@ -72,7 +72,7 @@ internal sealed class DashboardFeature
                 FEATURE,
                 $"Wave {outerWaveNumber}: assert startlists after arrival group",
                 group,
-                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
+                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _console, _witness, _eventInformation.Id)
             );
             await FeatureStep.Run(
                 FEATURE,
@@ -165,7 +165,7 @@ internal sealed class DashboardFeature
                 FEATURE,
                 $"Wave {outerWaveNumber}: assert startlists after presentation group",
                 group,
-                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id)
+                () => CoreAssertions.AssertStartlistsMatchPersisted(_api, _console, _witness, _eventInformation.Id)
             );
             await FeatureStep.Run(
                 FEATURE,
@@ -199,7 +199,7 @@ internal sealed class DashboardFeature
         var shouldUsePendingDelivery = ++_innerWaveNumber % 2 == 0;
         if (shouldUsePendingDelivery)
         {
-            await _judge.Disconnect();
+            await _console.Disconnect();
         }
 
         try
@@ -231,7 +231,7 @@ internal sealed class DashboardFeature
         {
             if (shouldUsePendingDelivery)
             {
-                await _judge.Connect(_eventInformation);
+                await _console.Connect(_eventInformation);
             }
         }
 
@@ -302,7 +302,7 @@ internal sealed class DashboardFeature
         }
 
         await SelectParticipation(entry.Number);
-        await _judge.GetRequiredService<IInspectionService>().RequestInspection(true);
+        await _console.GetRequiredService<IInspectionService>().RequestInspection(true);
         await Eventually.ReadParticipation(
             _api,
             _eventInformation.Id,
@@ -320,7 +320,7 @@ internal sealed class DashboardFeature
         }
 
         await SelectParticipation(entry.Number);
-        await _judge.GetRequiredService<IInspectionService>().RequestRepresent(true);
+        await _console.GetRequiredService<IInspectionService>().RequestRepresent(true);
         await Eventually.ReadParticipation(
             _api,
             _eventInformation.Id,
@@ -383,7 +383,7 @@ internal sealed class DashboardFeature
         {
             await _print.PrintPendingHandouts(_eventInformation, [entry.Number]);
         }
-        await CoreAssertions.AssertStartlistsMatchPersisted(_api, _judge, _witness, _eventInformation.Id);
+        await CoreAssertions.AssertStartlistsMatchPersisted(_api, _console, _witness, _eventInformation.Id);
     }
 
     async Task ApplyManualElimination(EndToEndPhaseSnapshot entry)
@@ -395,7 +395,7 @@ internal sealed class DashboardFeature
         }
 
         await SelectParticipation(entry.Number);
-        var eliminations = _judge.GetRequiredService<IEliminationService>();
+        var eliminations = _console.GetRequiredService<IEliminationService>();
         switch (expected)
         {
             case Withdrawn:
@@ -467,7 +467,7 @@ internal sealed class DashboardFeature
 
     async Task SelectParticipation(int number)
     {
-        var context = _judge.GetRequiredService<IParticipationContext>();
+        var context = _console.GetRequiredService<IParticipationContext>();
         if (context is NStatefulService stateful)
         {
             stateful.ResetHasLoaded();
@@ -514,7 +514,7 @@ internal sealed class DashboardFeature
 
     async Task WaitForStartlistUpcomingAbsence(int number)
     {
-        var judgeUpcoming = _judge.GetRequiredService<IStartUpcoming>();
+        var judgeUpcoming = _console.GetRequiredService<IStartUpcoming>();
         var witnessUpcoming = _witness.GetRequiredService<IStartUpcoming>();
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
         IReadOnlyList<int> lastJudgeUpcoming = [];

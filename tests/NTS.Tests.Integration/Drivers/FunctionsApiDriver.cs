@@ -21,11 +21,11 @@ using SetupHorseModel = NTS.Contracts.Setup.Models.HorseModel;
 
 namespace NTS.Tests.Integration.Drivers;
 
-internal sealed class NexusApiDriver : IDisposable
+internal sealed class FunctionsApiDriver : IDisposable
 {
     readonly HttpClient _client;
 
-    public NexusApiDriver(Uri baseUrl)
+    public FunctionsApiDriver(Uri baseUrl)
     {
         _client = new HttpClient { BaseAddress = baseUrl };
     }
@@ -223,7 +223,7 @@ internal sealed class NexusApiDriver : IDisposable
                 ? "no participation was returned"
                 : $"phase complete: {lastParticipation.Phases.Current.IsComplete()}";
         throw new TimeoutException(
-            $"Nexus API did not persist participation {participationId} before timeout ({state})."
+            $"The Functions API did not persist participation {participationId} before timeout ({state})."
         );
     }
 
@@ -300,7 +300,8 @@ internal sealed class NexusApiDriver : IDisposable
             throw new InvalidOperationException(string.Join(Environment.NewLine, result.Errors));
         }
 
-        return result.Data ?? throw new InvalidOperationException($"Nexus API returned no payload for '{endpoint}'.");
+        return result.Data
+            ?? throw new InvalidOperationException($"The Functions API returned no payload for '{endpoint}'.");
     }
 
     async Task<T?> SendNullable<T>(HttpMethod method, string endpoint, object? payload = null)

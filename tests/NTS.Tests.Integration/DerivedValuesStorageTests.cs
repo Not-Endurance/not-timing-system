@@ -29,18 +29,18 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
     [Fact]
     public async Task A_written_Participation_holds_none_of_the_values_the_domain_derives_and_no_Total()
     {
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var id = Guid.NewGuid();
-        await nexus.Create(IntegrationPayloadFactory.EventInformation(eventId));
+        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var participation = PresentedInTheFirstPhase(eventId, id);
-        await nexus.Create(participation);
+        await functionsApi.Create(participation);
 
         AssertNothingDerivedIsStored(await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id));
 
         participation.Process(IntegrationPayloadFactory.AutomaticSnapshot(1, START.AddHours(2).AddMinutes(30)));
-        await NexusRequests.Send(
-            _fixture.NexusBaseUrl,
+        await FunctionsRequests.Send(
+            _fixture.FunctionsBaseUrl,
             HttpMethod.Patch,
             "api/participations",
             ParticipationModel.MapFrom(participation)
@@ -54,16 +54,16 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
     [Fact]
     public async Task A_stored_Participation_that_still_carries_the_derived_values_loads_and_shows_what_the_domain_computes()
     {
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var id = Guid.NewGuid();
-        await nexus.Create(IntegrationPayloadFactory.EventInformation(eventId));
-        await nexus.Create(PresentedInTheFirstPhase(eventId, id));
+        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
+        await functionsApi.Create(PresentedInTheFirstPhase(eventId, id));
         var stored = await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id);
         LegacyDocuments.AddDerivedValues(stored);
         await _stored.Replace(MongoConstants.PARTICIPATIONS_COLLECTION, id, stored);
 
-        var loaded = await nexus.ReadParticipation(eventId, id);
+        var loaded = await functionsApi.ReadParticipation(eventId, id);
 
         // Worked out by hand: a 20 km Phase from 08:00, arriving 09:00 and presented 09:10, with a rest of 40 minutes.
         var phase = loaded.Phases[0];

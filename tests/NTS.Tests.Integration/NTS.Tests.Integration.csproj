@@ -35,11 +35,11 @@
     are edited only with the owner's approval per test (AGENTS.md rule 4, #642). See README.md, "Parked scenarios".
   -->
   <ItemGroup>
-    <Compile Remove="Drivers\JudgeDriver.cs" />
+    <Compile Remove="Drivers\ConsoleDriver.cs" />
     <Compile Remove="EndToEndEventTests\**" />
     <Compile Remove="FeiExportTests.cs" />
     <Compile Remove="IntegrationHarnessCheckTest.Parked.cs" />
-    <Compile Remove="JudgeDependencyInjectionTests.cs" />
+    <Compile Remove="ConsoleDependencyInjectionTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

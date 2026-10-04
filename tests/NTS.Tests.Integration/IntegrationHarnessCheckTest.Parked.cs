@@ -61,7 +61,7 @@ public sealed partial class IntegrationHarnessCheckTest
             maxAverageSpeed: 20,
             startTime: arrivelistStart
         );
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.RegisterUser(REGISTERED_USER);
@@ -75,30 +75,30 @@ public sealed partial class IntegrationHarnessCheckTest
         Assert.Equal(participationNumber, seededParticipation.Combination.Number);
         Assert.True(
             seededParticipations.Any(x => x.Combination.Number == participationNumber),
-            $"Nexus API list endpoint did not return participation #{participationNumber}. Raw response: {seededParticipationsRaw}"
+            $"The Functions API list endpoint did not return participation #{participationNumber}. Raw response: {seededParticipationsRaw}"
         );
 
-        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
-        await using var officialWitness = new ClientDriver(
+        await using var console = new ConsoleDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl);
+        await using var officialWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             OFFICIAL_USER,
             "IntegrationOfficialWitness"
         );
-        await using var registeredWitness = new ClientDriver(
+        await using var registeredWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             REGISTERED_USER,
             "IntegrationRegisteredWitness"
         );
-        await using var anonymousWitness = new ClientDriver(
+        await using var anonymousWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             user: null,
             "IntegrationAnonymousWitness"
         );
 
-        await judge.Start();
+        await console.Start();
         await officialWitness.Start();
         await registeredWitness.Start();
         await anonymousWitness.Start();
@@ -106,18 +106,18 @@ public sealed partial class IntegrationHarnessCheckTest
         await officialWitness.Connect(eventInformation);
         await registeredWitness.Connect(eventInformation);
         await anonymousWitness.Connect(eventInformation);
-        await judge.Connect(eventInformation);
+        await console.Connect(eventInformation);
         var officialArrivelist = officialWitness.GetRequiredService<IArrivelistService>();
         await officialArrivelist.Load();
         Assert.Contains(officialArrivelist.Entries, x => x.Number == arrivelistParticipationNumber);
 
-        var judgeRepositoryParticipations = await judge.ReadParticipations();
+        var judgeRepositoryParticipations = await console.ReadParticipations();
         Assert.True(
             judgeRepositoryParticipations.Any(x => x.Combination.Number == participationNumber),
             $"Judge repository did not return participation #{participationNumber}. Count: {judgeRepositoryParticipations.Count}, repository: {judge.ParticipationRepositoryType}, http: {judge.HttpBaseUrl}."
         );
 
-        await judge.Record(
+        await console.Record(
             IntegrationPayloadFactory.AutomaticSnapshot(arrivelistParticipationNumber, arrivelistStart.AddHours(2))
         );
         await WaitForArrivelist(
@@ -126,20 +126,22 @@ public sealed partial class IntegrationHarnessCheckTest
             $"remove participation #{arrivelistParticipationNumber} after arrival"
         );
 
-        await judge.Record(
+        await console.Record(
             IntegrationPayloadFactory.AutomaticSnapshot(participationNumber, DateTimeOffset.UtcNow.Date.AddHours(10))
         );
-        await judge.Record(
+        await console.Record(
             IntegrationPayloadFactory.AutomaticSnapshot(
                 participationNumber,
                 DateTimeOffset.UtcNow.Date.AddHours(10).AddMinutes(5)
             )
         );
 
-        var judgeParticipation = judge.Participations.FirstOrDefault(x => x.Combination.Number == participationNumber);
+        var judgeParticipation = console.Participations.FirstOrDefault(x =>
+            x.Combination.Number == participationNumber
+        );
         Assert.True(
             judgeParticipation?.Phases.Current.IsComplete() == true,
-            $"Judge did not complete participation #{participationNumber}. Loaded participations: {judge.Participations.Count}, recently timed: {string.Join(", ", judge.RecentlyTimed)}, repository: {judge.ParticipationRepositoryType}, http: {judge.HttpBaseUrl}."
+            $"Judge did not complete participation #{participationNumber}. Loaded participations: {judge.Participations.Count}, recently timed: {string.Join(", ", console.RecentlyTimed)}, repository: {judge.ParticipationRepositoryType}, http: {judge.HttpBaseUrl}."
         );
 
         var persistedParticipation = await api.WaitForParticipation(
@@ -216,7 +218,7 @@ public sealed partial class IntegrationHarnessCheckTest
         var manualNumber = 73;
         var start = DateTimeOffset.UtcNow.Date.AddHours(8);
         var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
 
         await api.Create(eventInformation);
         await api.Create(
@@ -229,11 +231,11 @@ public sealed partial class IntegrationHarnessCheckTest
             IntegrationPayloadFactory.ActiveParticipation(eventId, manualNumber, id: 5903, startTime: start)
         );
 
-        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
-        await judge.Start();
-        await judge.Connect(eventInformation);
+        await using var console = new ConsoleDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl);
+        await console.Start();
+        await console.Connect(eventInformation);
 
-        var context = judge.GetRequiredService<IParticipationContext>();
+        var context = console.GetRequiredService<IParticipationContext>();
         if (context is NStatefulService stateful)
         {
             stateful.ResetHasLoaded();
@@ -248,8 +250,8 @@ public sealed partial class IntegrationHarnessCheckTest
 
         var firstArrival = start.AddMinutes(30);
         var firstPresentation = firstArrival.AddMinutes(5);
-        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, firstArrival));
-        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, firstPresentation));
+        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, firstArrival));
+        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, firstPresentation));
 
         Assert.Equal(selectedId, context.Selected?.Id);
         var nonFinalHandouts = await WaitForHandouts(
@@ -262,8 +264,8 @@ public sealed partial class IntegrationHarnessCheckTest
 
         var finalArrival = firstPresentation.AddMinutes(75);
         var finalPresentation = finalArrival.AddMinutes(5);
-        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, finalArrival));
-        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, finalPresentation));
+        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, finalArrival));
+        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, finalPresentation));
 
         Assert.Equal(selectedId, context.Selected?.Id);
         await api.WaitForParticipation(
@@ -283,7 +285,7 @@ public sealed partial class IntegrationHarnessCheckTest
             $"keep only the existing non-final handout for #{selectedNumber}"
         );
 
-        var manualHandouts = judge.GetRequiredService<ICreateHandout>();
+        var manualHandouts = console.GetRequiredService<ICreateHandout>();
         await manualHandouts.Create(manualNumber);
 
         await WaitForHandouts(
@@ -311,7 +313,7 @@ public sealed partial class IntegrationHarnessCheckTest
         var criNumber = 54;
         var baseTime = DateTimeOffset.UtcNow.Date.AddHours(10);
         var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.RegisterUser(REGISTERED_USER);
@@ -351,34 +353,34 @@ public sealed partial class IntegrationHarnessCheckTest
         );
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6601));
 
-        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
-        await using var officialWitness = new ClientDriver(
+        await using var console = new ConsoleDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl);
+        await using var officialWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             OFFICIAL_USER,
             "PresentlistOfficialWitness"
         );
-        await using var registeredWitness = new ClientDriver(
+        await using var registeredWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             REGISTERED_USER,
             "PresentlistRegisteredWitness"
         );
 
-        await judge.Start();
+        await console.Start();
         await officialWitness.Start();
         await registeredWitness.Start();
 
         await officialWitness.Connect(eventInformation);
         await registeredWitness.Connect(eventInformation);
-        await judge.Connect(eventInformation);
+        await console.Connect(eventInformation);
 
         var officialPresentlist = officialWitness.GetRequiredService<IPresentlistService>();
         var registeredPresentlist = registeredWitness.GetRequiredService<IPresentlistService>();
         await officialPresentlist.Load();
         await registeredPresentlist.Load();
 
-        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(presentNumber, baseTime));
+        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(presentNumber, baseTime));
         var presentEntry = await WaitForPresentlistEntry(
             officialPresentlist,
             presentNumber,
@@ -393,11 +395,11 @@ public sealed partial class IntegrationHarnessCheckTest
             "show a Present entry on another connected Witness"
         );
 
-        await RecordArrivalAndPresentation(judge, representNumber, baseTime.AddMinutes(10), TimeSpan.FromMinutes(5));
-        await SelectJudgeParticipation(judge, representNumber);
-        await judge.GetRequiredService<IInspectionService>().RequestRepresent(true);
+        await RecordArrivalAndPresentation(console, representNumber, baseTime.AddMinutes(10), TimeSpan.FromMinutes(5));
+        await SelectJudgeParticipation(console, representNumber);
+        await console.GetRequiredService<IInspectionService>().RequestRepresent(true);
         var pendingRepresentationInspectionException = await Assert.ThrowsAnyAsync<Exception>(
-            () => judge.GetRequiredService<IInspectionService>().RequestInspection(true)
+            () => console.GetRequiredService<IInspectionService>().RequestInspection(true)
         );
         Assert.Equal(
             nameof(NtsStrings.Cannot_request_Required_Inspection_without_Representation_time_string),
@@ -405,7 +407,7 @@ public sealed partial class IntegrationHarnessCheckTest
         );
         Assert.Equal(
             "Cannot request Required Inspection without Representation time",
-            judge.GetRequiredService<IStringLocalizer>()[pendingRepresentationInspectionException.Message].Value
+            console.GetRequiredService<IStringLocalizer>()[pendingRepresentationInspectionException.Message].Value
         );
         var pendingRepresentation = await api.ReadParticipation(eventId, 5602);
         Assert.False(pendingRepresentation.Phases.Current.IsRequiredInspectionRequested);
@@ -423,11 +425,11 @@ public sealed partial class IntegrationHarnessCheckTest
             "show a Represent entry on another connected Witness"
         );
 
-        await RecordArrivalAndPresentation(judge, riNumber, baseTime.AddMinutes(20), TimeSpan.FromMinutes(5));
-        await SelectJudgeParticipation(judge, riNumber);
-        await judge.GetRequiredService<IInspectionService>().RequestInspection(true);
+        await RecordArrivalAndPresentation(console, riNumber, baseTime.AddMinutes(20), TimeSpan.FromMinutes(5));
+        await SelectJudgeParticipation(console, riNumber);
+        await console.GetRequiredService<IInspectionService>().RequestInspection(true);
 
-        await RecordArrivalAndPresentation(judge, criNumber, baseTime.AddMinutes(30), TimeSpan.FromMinutes(20));
+        await RecordArrivalAndPresentation(console, criNumber, baseTime.AddMinutes(30), TimeSpan.FromMinutes(20));
 
         await WaitForPresentlistEntry(
             officialPresentlist,
@@ -469,19 +471,19 @@ public sealed partial class IntegrationHarnessCheckTest
     }
 
     static async Task RecordArrivalAndPresentation(
-        JudgeDriver judge,
+        ConsoleDriver console,
         int number,
         DateTimeOffset arrival,
         TimeSpan recovery
     )
     {
-        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(number, arrival));
-        await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(number, arrival.Add(recovery)));
+        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(number, arrival));
+        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(number, arrival.Add(recovery)));
     }
 
-    static async Task SelectJudgeParticipation(JudgeDriver judge, int number)
+    static async Task SelectJudgeParticipation(ConsoleDriver console, int number)
     {
-        var context = judge.GetRequiredService<IParticipationContext>();
+        var context = console.GetRequiredService<IParticipationContext>();
         if (context is NStatefulService stateful)
         {
             stateful.ResetHasLoaded();
@@ -572,7 +574,7 @@ public sealed partial class IntegrationHarnessCheckTest
     }
 
     static async Task<IReadOnlyList<Handout>> WaitForHandouts(
-        NexusApiDriver api,
+        FunctionsApiDriver api,
         int eventId,
         Func<IReadOnlyList<Handout>, bool> predicate,
         string expectedState
@@ -615,16 +617,16 @@ public sealed partial class IntegrationHarnessCheckTest
             id: 5701,
             startTime: timestamp.AddHours(-2)
         );
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
         await api.Create(eventInformation);
         await api.Create(participation);
         await api.Create(IntegrationPayloadFactory.Official(eventId, officialUser.Id, id: 6701));
 
-        await using var witness = new ClientDriver(
+        await using var witness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             OFFICIAL_USER,
             "SnapshotSessionWitness"
         );
@@ -663,9 +665,9 @@ public sealed partial class IntegrationHarnessCheckTest
 
         await witness.Disconnect();
 
-        await using var restoredWitness = new ClientDriver(
+        await using var restoredWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             OFFICIAL_USER,
             "SnapshotSessionRestoredWitness"
         );
@@ -725,7 +727,7 @@ public sealed partial class IntegrationHarnessCheckTest
             "operator-registered-witness-user",
             "Operator Registered Witness"
         );
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
 
         var operatorUser = ToSetupUser(await api.RegisterUser(operatorIdentity));
         var eligibleOfficialUser = ToSetupUser(await api.RegisterUser(eligibleOfficialIdentity));
@@ -750,27 +752,27 @@ public sealed partial class IntegrationHarnessCheckTest
         Assert.Equal(OfficialRole.Steward, activeOperators[0].Role);
         Assert.Single(activeRankings);
 
-        await using var operatorWitness = new ClientDriver(
+        await using var operatorWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             operatorIdentity,
             "IntegrationOperatorWitness"
         );
-        await using var eligibleOfficialWitness = new ClientDriver(
+        await using var eligibleOfficialWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             eligibleOfficialIdentity,
             "IntegrationEligibleOfficialWitness"
         );
-        await using var ineligibleOfficialWitness = new ClientDriver(
+        await using var ineligibleOfficialWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             ineligibleOfficialIdentity,
             "IntegrationIneligibleOfficialWitness"
         );
-        await using var registeredWitness = new ClientDriver(
+        await using var registeredWitness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             registeredIdentity,
             "IntegrationOperatorRegisteredWitness"
         );
@@ -884,7 +886,7 @@ public sealed partial class IntegrationHarnessCheckTest
     }
 
     static async Task<NtsUserSessionModel> WaitForUserSession(
-        NexusApiDriver api,
+        FunctionsApiDriver api,
         string userIdentifier,
         int eventId,
         Func<NtsUserSessionStateModel, bool> predicate,

@@ -47,9 +47,9 @@ public sealed class ApiAndFunctionsCoexistTests : IClassFixture<NtsIntegrationFi
         var id = Guid.Parse(
             (await ApiSessions.ReadJsonAsync(created)).GetProperty("data").GetProperty("id").GetString()!
         );
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
 
-        var read = await nexus.ReadSetupConfigureEvent(id);
+        var read = await functionsApi.ReadSetupConfigureEvent(id);
 
         Assert.Equal("Spring Ride", read.Name);
         Assert.Equal("Sofia", read.Location);
@@ -61,9 +61,9 @@ public sealed class ApiAndFunctionsCoexistTests : IClassFixture<NtsIntegrationFi
 
         // Judge edits the Setup as it always did, with the models it has: the constant Tenant, and no Main Operator.
         var edited = new SetupConfigureEvent("Renamed Ride", "Plovdiv", read.Country, null, [], [], [], [], id: id);
-        await nexus.UpdateSetupConfigureEvent(edited);
+        await functionsApi.UpdateSetupConfigureEvent(edited);
 
-        var after = await nexus.ReadSetupConfigureEvent(id);
+        var after = await functionsApi.ReadSetupConfigureEvent(id);
         Assert.Equal("Renamed Ride", after.Name);
         Assert.Equal("Plovdiv", after.Location);
         Assert.Equal(tenant, after.TenantId);
@@ -76,7 +76,7 @@ public sealed class ApiAndFunctionsCoexistTests : IClassFixture<NtsIntegrationFi
     [Fact]
     public async Task A_started_Event_is_stored_by_the_Functions_API_with_its_Tenant_Main_Operator_and_rules_and_reads_back_with_them()
     {
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var mainOperator = Guid.NewGuid();
         var country = new Country(Guid.NewGuid(), "Bulgaria", "BG", "BUL", "bg-BG");
@@ -93,7 +93,7 @@ public sealed class ApiAndFunctionsCoexistTests : IClassFixture<NtsIntegrationFi
             mainOperator
         );
 
-        await nexus.Create(started);
+        await functionsApi.Create(started);
 
         var stored = await new MongoClient(_fixture.MongoConnectionString)
             .GetDatabase(UserSeed.DATABASE)
@@ -105,7 +105,7 @@ public sealed class ApiAndFunctionsCoexistTests : IClassFixture<NtsIntegrationFi
         var rules = stored["RegionalRules"].AsBsonDocument;
         Assert.True(rules["OnlyAverageLoopSpeed"].AsBoolean);
         Assert.Equal("BG", rules["RankerCode"].AsString);
-        var read = await nexus.ReadEventInformation(eventId);
+        var read = await functionsApi.ReadEventInformation(eventId);
         Assert.Equal("country-bg", read.TenantId);
         Assert.Equal(mainOperator, read.MainOperatorId);
         Assert.Equal(new RegionalRules(true, "BG"), read.RegionalRules);
@@ -114,9 +114,9 @@ public sealed class ApiAndFunctionsCoexistTests : IClassFixture<NtsIntegrationFi
     [Fact]
     public async Task An_Event_stored_before_Tenants_reads_with_the_constant_Tenant_no_Main_Operator_and_no_rules()
     {
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
-        await nexus.Create(IntegrationPayloadFactory.EventInformation(eventId));
+        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var stored = new MongoClient(_fixture.MongoConnectionString)
             .GetDatabase(UserSeed.DATABASE)
             .GetCollection<BsonDocument>("event_informations");
@@ -125,7 +125,7 @@ public sealed class ApiAndFunctionsCoexistTests : IClassFixture<NtsIntegrationFi
             Builders<BsonDocument>.Update.Unset("MainOperatorId").Unset("RegionalRules").Unset("TenantId")
         );
 
-        var read = await nexus.ReadEventInformation(eventId);
+        var read = await functionsApi.ReadEventInformation(eventId);
 
         Assert.Equal(Tenant.LEGACY_ID, read.TenantId);
         Assert.Null(read.MainOperatorId);

@@ -127,8 +127,8 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
     public async Task The_Results_composed_after_the_migration_equal_the_ones_before_for_every_entry_whose_copy_did_not_differ()
     {
         var seeded = await SeedLegacyEvent();
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
-        var copies = await nexus.ReadParticipations(seeded.EventId); // the copies of before are the stored Participations
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
+        var copies = await functionsApi.ReadParticipations(seeded.EventId); // the copies of before are the stored Participations
         var firstBefore = new Result(
             CreateRanking(
                 seeded.FirstRanking,
@@ -142,8 +142,8 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
 
         await Migrate(apply: true);
 
-        var rankings = await nexus.ReadRankings(seeded.EventId);
-        var participations = await nexus.ReadParticipations(seeded.EventId);
+        var rankings = await functionsApi.ReadRankings(seeded.EventId);
+        var participations = await functionsApi.ReadParticipations(seeded.EventId);
         var firstAfter = new Result(rankings.Single(x => x.Id == seeded.FirstRanking), participations);
         var secondAfter = new Result(rankings.Single(x => x.Id == seeded.SecondRanking), participations);
 
@@ -407,10 +407,10 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
     /// </summary>
     async Task<DanglingReferences> SeedDanglingReferences(SeededEvent seeded)
     {
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var otherEvent = Guid.NewGuid();
-        await nexus.Create(IntegrationPayloadFactory.EventInformation(otherEvent));
-        var elsewhere = await StoreLegacy(nexus, Finished(otherEvent, 5, START.AddHours(3)));
+        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(otherEvent));
+        var elsewhere = await StoreLegacy(functionsApi, Finished(otherEvent, 5, START.AddHours(3)));
         var dangling = new DanglingReferences(elsewhere["_id"].AsBsonBinaryData.ToGuid(GuidRepresentation.Standard));
         var invented = seeded.Copy(seeded.First).DeepClone().AsBsonDocument;
         invented["_id"] = LegacyDocuments.Uuid(dangling.Nowhere);
@@ -539,9 +539,9 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
     }
 
     /// <summary>Writes the Participation through the Functions API, then gives it the derived values of before.</summary>
-    async Task<BsonDocument> StoreLegacy(NexusApiDriver nexus, Participation participation)
+    async Task<BsonDocument> StoreLegacy(FunctionsApiDriver functionsApi, Participation participation)
     {
-        await nexus.Create(participation);
+        await functionsApi.Create(participation);
         var stored = await _stored.Read(PARTICIPATIONS, participation.Id);
         LegacyDocuments.AddDerivedValues(stored);
         await _stored.Replace(PARTICIPATIONS, participation.Id, stored);
@@ -555,16 +555,16 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
     /// </summary>
     async Task<SeededEvent> SeedLegacyEvent()
     {
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
-        await nexus.Create(IntegrationPayloadFactory.EventInformation(eventId));
+        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var participations = new List<Participation>();
         var copies = new Dictionary<Guid, BsonDocument>();
         for (var number = 1; number <= 4; number++)
         {
             var participation = Finished(eventId, number, START.AddHours(1).AddMinutes(30 * (number - 1)));
             participations.Add(participation);
-            copies[participation.Id] = await StoreLegacy(nexus, participation);
+            copies[participation.Id] = await StoreLegacy(functionsApi, participation);
         }
 
         var seeded = new SeededEvent(eventId, participations, copies);

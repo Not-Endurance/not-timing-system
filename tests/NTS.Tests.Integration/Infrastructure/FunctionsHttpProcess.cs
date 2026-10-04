@@ -3,13 +3,13 @@ using System.Diagnostics;
 
 namespace NTS.Tests.Integration.Infrastructure;
 
-internal sealed class NexusHttpProcess : IAsyncDisposable
+internal sealed class FunctionsHttpProcess : IAsyncDisposable
 {
     readonly RepositoryPaths _paths;
     readonly ProcessOutputCollector _output = new();
     Process? _process;
 
-    public NexusHttpProcess(RepositoryPaths paths, int port, string mongoConnectionString)
+    public FunctionsHttpProcess(RepositoryPaths paths, int port, string mongoConnectionString)
     {
         _paths = paths;
         Port = port;
@@ -35,11 +35,11 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
         Directory.CreateDirectory(dotnetHome);
         Directory.CreateDirectory(nugetPackages);
 
-        var outputDirectory = _paths.GetNexusHttpOutputDirectory(BuildConfiguration);
+        var outputDirectory = _paths.GetFunctionsHttpOutputDirectory(BuildConfiguration);
         if (!File.Exists(Path.Combine(outputDirectory, "functions.metadata")))
         {
             throw new InvalidOperationException(
-                $"Nexus HTTP build output was not found at '{outputDirectory}'. Build the integration test project before running with --no-build."
+                $"The Functions API build output was not found at '{outputDirectory}'. Build the integration test project before running with --no-build."
             );
         }
 
@@ -73,18 +73,18 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
         catch (Win32Exception ex)
         {
             throw new InvalidOperationException(
-                "Failed to start Nexus HTTP. Install Azure Functions Core Tools v4 and make sure 'func' is on PATH.",
+                "Failed to start the Functions API. Install Azure Functions Core Tools v4 and make sure 'func' is on PATH.",
                 ex
             );
         }
 
         if (_process == null)
         {
-            throw new InvalidOperationException("Failed to start Nexus HTTP process.");
+            throw new InvalidOperationException("Failed to start the Functions API process.");
         }
 
-        _process.OutputDataReceived += (_, args) => _output.Add("nexus-http", args.Data);
-        _process.ErrorDataReceived += (_, args) => _output.Add("nexus-http-error", args.Data);
+        _process.OutputDataReceived += (_, args) => _output.Add("functions-http", args.Data);
+        _process.ErrorDataReceived += (_, args) => _output.Add("functions-http-error", args.Data);
         _process.BeginOutputReadLine();
         _process.BeginErrorReadLine();
 
@@ -124,7 +124,7 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
             if (_process?.HasExited == true)
             {
                 throw new InvalidOperationException(
-                    $"Nexus HTTP exited before becoming healthy with exit code {_process.ExitCode}.{Environment.NewLine}{_output.Dump()}"
+                    $"The Functions API exited before becoming healthy with exit code {_process.ExitCode}.{Environment.NewLine}{_output.Dump()}"
                 );
             }
 
@@ -142,7 +142,7 @@ internal sealed class NexusHttpProcess : IAsyncDisposable
         }
 
         throw new TimeoutException(
-            $"Nexus HTTP did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}"
+            $"The Functions API did not become healthy at {BaseUrl}.{Environment.NewLine}{_output.Dump()}"
         );
     }
 }

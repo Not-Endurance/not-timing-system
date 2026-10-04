@@ -35,20 +35,20 @@ public sealed class CoreFeatureEndToEndTests
     public async Task Event_snapshot_runs_end_to_end(string snapshotName)
     {
         var snapshot = EndToEndEventSnapshot.Load(snapshotName);
-        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
-        using var nexusApi = new NexusApiDriver(_fixture.NexusBaseUrl);
-        using var print = new EndToEndPrintFeature(nexusApi);
-        var configureEvent = new ConfigureEventFeature(judge, nexusApi);
-        var startEvent = new StartCoreEventFeature(judge, nexusApi);
+        await using var console = new ConsoleDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
+        using var print = new EndToEndPrintFeature(functionsApi);
+        var configureEvent = new ConfigureEventFeature(console, functionsApi);
+        var startEvent = new StartCoreEventFeature(console, functionsApi);
 
-        await SeedOtherEventData(nexusApi, snapshot.EventId);
+        await SeedOtherEventData(functionsApi, snapshot.EventId);
 
         var setup = await configureEvent.Execute(snapshot);
         var eventInformation = await startEvent.Execute(setup);
-        await AssertStartedConfigureEventCannotBeUpdated(nexusApi, setup.SetupEvent);
+        await AssertStartedConfigureEventCannotBeUpdated(functionsApi, setup.SetupEvent);
 
         var startedDocuments = await ReadStartedDocumentsScopedToCurrentEvent(
-            nexusApi,
+            functionsApi,
             eventInformation,
             setup,
             snapshot
@@ -59,9 +59,9 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.Rankings.Count, startedRankings.Count);
         AssertStartedOperatorsMatchSetup(startedDocuments.Operators, setup.SetupEvent, eventInformation.Id);
 
-        await using var witness = new ClientDriver(
+        await using var witness = new ViewerDriver(
             _fixture.ApiBaseUrl,
-            _fixture.NexusBaseUrl,
+            _fixture.FunctionsBaseUrl,
             setup.WitnessOperator,
             $"CoreEndToEndOperatorWitness-{snapshot.Name}"
         );
@@ -73,8 +73,8 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, phaseWaves.Sum(x => x.Count));
         Assert.All(phaseWaves, AssertWaveFitsThirtyMinuteWindow);
 
-        var dashboard = new DashboardFeature(judge, witness, nexusApi, print, eventInformation);
-        await CoreAssertions.AssertArrivelistMatchesPersisted(nexusApi, witness, eventInformation.Id);
+        var dashboard = new DashboardFeature(console, witness, functionsApi, print, eventInformation);
+        await CoreAssertions.AssertArrivelistMatchesPersisted(functionsApi, witness, eventInformation.Id);
         var processedPhases = 0;
         var publishedSnapshotGroups = 0;
         foreach (var phaseWave in phaseWaves)
@@ -87,12 +87,12 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.PhasesWithSnapshots.Count, processedPhases);
         Assert.True(publishedSnapshotGroups > 0);
 
-        await AssertFinalStateMatchesSnapshots(nexusApi, eventInformation, setup, snapshot);
+        await AssertFinalStateMatchesSnapshots(functionsApi, eventInformation, setup, snapshot);
         await print.PrintFinalRanklists(eventInformation);
-        await AssertCompletedEventCanBeDeactivatedAndExported(judge, nexusApi, eventInformation);
+        await AssertCompletedEventCanBeDeactivatedAndExported(console, functionsApi, eventInformation);
     }
 
-    static async Task AssertStartedConfigureEventCannotBeUpdated(NexusApiDriver api, SetupConfigureEvent setupEvent)
+    static async Task AssertStartedConfigureEventCannotBeUpdated(FunctionsApiDriver api, SetupConfigureEvent setupEvent)
     {
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => api.UpdateSetupConfigureEvent(setupEvent)
@@ -101,7 +101,7 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Contains("started", exception.Message);
     }
 
-    static async Task SeedOtherEventData(NexusApiDriver api, int testedEventId)
+    static async Task SeedOtherEventData(FunctionsApiDriver api, int testedEventId)
     {
         var today = DateTimeOffset.UtcNow.Date;
         var (pastEventId, activeEventId) = CreateOtherEventIds(testedEventId);
@@ -133,7 +133,7 @@ public sealed class CoreFeatureEndToEndTests
             : (testedEventId - activeOffset, testedEventId - pastOffset);
     }
 
-    static async Task SeedOtherEvent(NexusApiDriver api, int eventId, EventSpan eventSpan, int idBase, string label)
+    static async Task SeedOtherEvent(FunctionsApiDriver api, int eventId, EventSpan eventSpan, int idBase, string label)
     {
         var eventInformation = IntegrationPayloadFactory.EventInformation(eventId, eventSpan, $"Seeded {label} Event");
         var participations = new[]
@@ -180,7 +180,7 @@ public sealed class CoreFeatureEndToEndTests
     }
 
     static async Task<StartedEventDocuments> ReadStartedDocumentsScopedToCurrentEvent(
-        NexusApiDriver api,
+        FunctionsApiDriver api,
         EventInformation eventInformation,
         SetupFeatureResult setup,
         EndToEndEventSnapshot snapshot
@@ -214,7 +214,7 @@ public sealed class CoreFeatureEndToEndTests
         }
 
         throw new TimeoutException(
-            "Nexus API did not reach the expected started event document counts. "
+            "The Functions API did not reach the expected started event document counts. "
                 + $"Participations: {last.Participations.Count}/{snapshot.Participations.Count}, "
                 + $"Rankings: {last.Rankings.Count}/{snapshot.Rankings.Count}, "
                 + $"Officials: {last.Officials.Count}/{setup.SetupEvent.Officials.Count}, "
@@ -311,7 +311,7 @@ public sealed class CoreFeatureEndToEndTests
     }
 
     static async Task AssertFinalStateMatchesSnapshots(
-        NexusApiDriver api,
+        FunctionsApiDriver api,
         EventInformation eventInformation,
         SetupFeatureResult setup,
         EndToEndEventSnapshot snapshot
@@ -339,8 +339,8 @@ public sealed class CoreFeatureEndToEndTests
     }
 
     static async Task AssertCompletedEventCanBeDeactivatedAndExported(
-        JudgeDriver judge,
-        NexusApiDriver api,
+        ConsoleDriver console,
+        FunctionsApiDriver api,
         EventInformation eventInformation
     )
     {
@@ -350,20 +350,20 @@ public sealed class CoreFeatureEndToEndTests
         var exportableRanking = CreateFeiExportRanking(finalRankings.First());
         await api.Update(exportableRanking);
 
-        Assert.True(judge.IsConnected);
-        await judge.GetRequiredService<IDashService>().Deactivate();
+        Assert.True(console.IsConnected);
+        await console.GetRequiredService<IDashService>().Deactivate();
 
-        Assert.False(judge.IsConnected);
+        Assert.False(console.IsConnected);
         var activeEvents = await api.ReadActiveEventInformation();
         Assert.DoesNotContain(activeEvents, x => x.Id == eventInformation.Id);
         var pastEvents = await api.ReadPastEventInformation();
         Assert.Contains(pastEvents, x => x.Id == eventInformation.Id);
 
-        var pastEventsService = judge.GetRequiredService<IPastEventService>();
+        var pastEventsService = console.GetRequiredService<IPastEventService>();
         await pastEventsService.LoadEvent(eventInformation.Id);
 
         var pastEvent = Assert.IsType<EventInformation>(pastEventsService.Event);
-        var export = judge.GetRequiredService<IFeiExportService>().Create(pastEvent, pastEventsService.Rankings);
+        var export = console.GetRequiredService<IFeiExportService>().Create(pastEvent, pastEventsService.Rankings);
 
         Assert.Equal("application/xml", export.ContentType);
         Assert.Contains(eventInformation.FeiShowId!, export.Content);

@@ -3,8 +3,8 @@ using Not.Serialization.JSON;
 
 namespace NTS.Tests.Integration.Infrastructure;
 
-/// <summary>A request to the Functions API for a route that <c>NexusApiDriver</c> has no method for.</summary>
-internal static class NexusRequests
+/// <summary>A request to the Functions API for a route that <c>FunctionsApiDriver</c> has no method for.</summary>
+internal static class FunctionsRequests
 {
     public static async Task Send(Uri baseUrl, HttpMethod method, string endpoint, object? payload = null)
     {

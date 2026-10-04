@@ -20,7 +20,7 @@ using NTS.Judge.Contracts.Features.Core.Dashboard;
 
 namespace NTS.Tests.Integration.Drivers;
 
-internal sealed class JudgeDriver : IAsyncDisposable
+internal sealed class ConsoleDriver : IAsyncDisposable
 {
     readonly ServiceProvider _provider;
     readonly INtsSocketService _socketService;
@@ -29,9 +29,9 @@ internal sealed class JudgeDriver : IAsyncDisposable
     readonly IEventScopedRepository<Participation> _participationRepository;
     readonly IOptions<NHttpSettings> _httpSettings;
 
-    public JudgeDriver(Uri apiBaseUrl, Uri nexusBaseUrl)
+    public ConsoleDriver(Uri apiBaseUrl, Uri functionsBaseUrl)
     {
-        var configuration = CreateConfiguration(apiBaseUrl, nexusBaseUrl, "judge-hub", "IntegrationJudge");
+        var configuration = CreateConfiguration(apiBaseUrl, functionsBaseUrl, "judge-hub", "IntegrationJudge");
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
@@ -115,7 +115,7 @@ internal sealed class JudgeDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri apiBaseUrl, Uri nexusBaseUrl, string hub, string clientName)
+    static IConfiguration CreateConfiguration(Uri apiBaseUrl, Uri functionsBaseUrl, string hub, string clientName)
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(
@@ -126,7 +126,9 @@ internal sealed class JudgeDriver : IAsyncDisposable
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ConnectTimeoutSeconds)}"] = "10",
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = nexusBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = functionsBaseUrl
+                        .ToString()
+                        .TrimEnd('/'),
                     [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
                 }
             )

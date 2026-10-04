@@ -22,7 +22,7 @@ using NTS.Tests.Integration.Infrastructure;
 
 namespace NTS.Tests.Integration.Drivers;
 
-internal sealed class ClientDriver : IAsyncDisposable
+internal sealed class ViewerDriver : IAsyncDisposable
 {
     readonly ServiceProvider _provider;
     readonly INtsSocketService _socketService;
@@ -32,17 +32,22 @@ internal sealed class ClientDriver : IAsyncDisposable
     readonly string _clientName;
 
     /// <param name="user">A null user drives the Witness as an anonymous, read-only visitor.</param>
-    public ClientDriver(Uri apiBaseUrl, Uri nexusBaseUrl, IntegrationUser? user, string clientName)
+    public ViewerDriver(Uri apiBaseUrl, Uri functionsBaseUrl, IntegrationUser? user, string clientName)
     {
         _clientName = clientName;
-        var configuration = CreateConfiguration(apiBaseUrl, nexusBaseUrl, ApplicationConstants.LIVE_HUB, clientName);
+        var configuration = CreateConfiguration(
+            apiBaseUrl,
+            functionsBaseUrl,
+            ApplicationConstants.LIVE_HUB,
+            clientName
+        );
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
         services.AddNtsWitness(
             configuration,
-            nexusBaseUrl.ToString().TrimEnd('/'),
+            functionsBaseUrl.ToString().TrimEnd('/'),
             typeof(NtsWitnessServices).Assembly
         );
         services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, AnonymousRpcAccessTokenProvider>());
@@ -144,7 +149,7 @@ internal sealed class ClientDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri apiBaseUrl, Uri nexusBaseUrl, string hub, string clientName)
+    static IConfiguration CreateConfiguration(Uri apiBaseUrl, Uri functionsBaseUrl, string hub, string clientName)
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(
@@ -155,7 +160,9 @@ internal sealed class ClientDriver : IAsyncDisposable
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ConnectTimeoutSeconds)}"] = "10",
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = nexusBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = functionsBaseUrl
+                        .ToString()
+                        .TrimEnd('/'),
                     [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
                     ["NClientAuthenticationSettings:ClientId"] = "integration-client",
                     ["NClientAuthenticationSettings:Instance"] = "https://login.microsoftonline.com",

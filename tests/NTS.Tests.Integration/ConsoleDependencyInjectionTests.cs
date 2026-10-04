@@ -8,15 +8,15 @@ using NTS.Tests.Integration.Drivers;
 
 namespace NTS.Tests.Integration;
 
-public sealed class JudgeDependencyInjectionTests
+public sealed class ConsoleDependencyInjectionTests
 {
     [Fact]
-    public async Task JudgeDriver_ResolvesSetupRootRepositoriesFromRestStorage()
+    public async Task ConsoleDriver_ResolvesSetupRootRepositoriesFromRestStorage()
     {
-        await using var judge = new JudgeDriver(new Uri("http://127.0.0.1:1"), new Uri("http://127.0.0.1:2"));
+        await using var console = new ConsoleDriver(new Uri("http://127.0.0.1:1"), new Uri("http://127.0.0.1:2"));
 
-        _ = judge.GetRequiredService<IKrudFormService<ClubFormModel>>();
-        var repository = judge.GetRequiredService<IRepository<Club>>();
+        _ = console.GetRequiredService<IKrudFormService<ClubFormModel>>();
+        var repository = console.GetRequiredService<IRepository<Club>>();
 
         Assert.IsNotType<KrudInMemoryNodeRepository<Club>>(repository);
         Assert.IsType<ClubApiRepository>(repository);

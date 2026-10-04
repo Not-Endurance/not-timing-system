@@ -6,7 +6,7 @@ namespace NTS.Tests.Integration.EndToEndEventTests.Helpers;
 internal static class Eventually
 {
     public static async Task<IReadOnlyList<Participation>> ReadParticipations(
-        NexusApiDriver api,
+        FunctionsApiDriver api,
         int eventId,
         Func<IReadOnlyList<Participation>, bool> predicate,
         string expectedState
@@ -25,11 +25,13 @@ internal static class Eventually
             await Task.Delay(100);
         }
 
-        throw new TimeoutException($"Nexus API did not reach {expectedState}. Participation count: {last.Count}.");
+        throw new TimeoutException(
+            $"The Functions API did not reach {expectedState}. Participation count: {last.Count}."
+        );
     }
 
     public static async Task<Participation> ReadParticipation(
-        NexusApiDriver api,
+        FunctionsApiDriver api,
         int eventId,
         int number,
         Func<Participation, bool> predicate,
@@ -54,7 +56,7 @@ internal static class Eventually
     }
 
     public static async Task<IReadOnlyList<Ranking>> ReadRankings(
-        NexusApiDriver api,
+        FunctionsApiDriver api,
         int eventId,
         Func<IReadOnlyList<Ranking>, bool> predicate,
         string expectedState
@@ -77,7 +79,7 @@ internal static class Eventually
     }
 
     public static async Task<IReadOnlyList<Handout>> ReadHandouts(
-        NexusApiDriver api,
+        FunctionsApiDriver api,
         int eventId,
         Func<IReadOnlyList<Handout>, bool> predicate,
         string expectedState

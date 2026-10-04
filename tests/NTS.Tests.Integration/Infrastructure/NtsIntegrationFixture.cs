@@ -9,7 +9,7 @@ namespace NTS.Tests.Integration.Infrastructure;
 public sealed class NtsIntegrationFixture : IAsyncLifetime
 {
     MongoDbContainer? _mongo;
-    NexusHttpProcess? _nexusHttp;
+    FunctionsHttpProcess? _functionsHttp;
     ApiFactory? _api;
 
     /// <summary>The services of the Api, for a test that stands in for what the Api does after a write.</summary>
@@ -18,7 +18,8 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
 
     public string MongoConnectionString =>
         _mongo?.GetConnectionString() ?? throw new InvalidOperationException("MongoDB is not started.");
-    public Uri NexusBaseUrl => _nexusHttp?.BaseUrl ?? throw new InvalidOperationException("Nexus HTTP is not started.");
+    public Uri FunctionsBaseUrl =>
+        _functionsHttp?.BaseUrl ?? throw new InvalidOperationException("The Functions API is not started.");
     public Uri ApiBaseUrl => _api?.BaseAddress ?? throw new InvalidOperationException("The Api is not started.");
 
     public async Task InitializeAsync()
@@ -27,9 +28,9 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
         _mongo = new MongoDbBuilder().WithImage("mongo:6.0").Build();
         await _mongo.StartAsync();
 
-        _nexusHttp = await PortAllocator.StartOnAFreePort(async port =>
+        _functionsHttp = await PortAllocator.StartOnAFreePort(async port =>
         {
-            var host = new NexusHttpProcess(paths, port, _mongo.GetConnectionString());
+            var host = new FunctionsHttpProcess(paths, port, _mongo.GetConnectionString());
             try
             {
                 await host.Start();
@@ -53,9 +54,9 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
             await _api.DisposeAsync();
         }
 
-        if (_nexusHttp != null)
+        if (_functionsHttp != null)
         {
-            await _nexusHttp.DisposeAsync();
+            await _functionsHttp.DisposeAsync();
         }
 
         if (_mongo != null)

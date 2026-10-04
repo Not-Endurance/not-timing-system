@@ -24,13 +24,13 @@ public sealed class ViewersFollowChangesTests : IClassFixture<NtsIntegrationFixt
     [Fact]
     public async Task Two_viewers_show_a_Participation_that_appeared_once_the_Api_announces_it_and_not_before()
     {
-        using var nexus = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventInformation = IntegrationPayloadFactory.EventInformation(Guid.NewGuid());
         var eventId = eventInformation.Id;
-        await nexus.Create(eventInformation);
-        await nexus.Create(IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid()));
-        await using var first = new ClientDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl, null, "viewer-one");
-        await using var second = new ClientDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl, null, "viewer-two");
+        await functionsApi.Create(eventInformation);
+        await functionsApi.Create(IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid()));
+        await using var first = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "viewer-one");
+        await using var second = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "viewer-two");
         await first.Start();
         await second.Start();
         await first.Connect(eventInformation);
@@ -39,7 +39,7 @@ public sealed class ViewersFollowChangesTests : IClassFixture<NtsIntegrationFixt
         await second.WaitForParticipation(1, _ => true, PATIENCE);
 
         var appeared = IntegrationPayloadFactory.ActiveParticipation(eventId, 2, Guid.NewGuid());
-        await nexus.Create(appeared);
+        await functionsApi.Create(appeared);
         await Task.Delay(500);
 
         Assert.Null(first.GetRequiredService<IParticipationStore>().Find(appeared.Id)); // nothing tells them yet

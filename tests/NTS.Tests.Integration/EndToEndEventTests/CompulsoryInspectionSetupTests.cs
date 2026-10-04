@@ -31,7 +31,7 @@ public sealed class CompulsoryInspectionSetupTests
     {
         const int eventId = 260521001;
         var setupEvent = CreateSetupEvent(eventId);
-        using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
+        using var api = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
 
         await api.CreateSetupConfigureEvent(setupEvent);
 
@@ -41,9 +41,9 @@ public sealed class CompulsoryInspectionSetupTests
         Assert.True(persistedPhases[1].IsCompulsoryInspectionRequired);
         Assert.False(persistedPhases[2].IsCompulsoryInspectionRequired);
 
-        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
-        await judge.Start();
-        await judge.GetRequiredService<IDashService>().Start(eventId);
+        await using var console = new ConsoleDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl);
+        await console.Start();
+        await console.GetRequiredService<IDashService>().Start(eventId);
 
         var participations = await api.ReadParticipations(eventId);
         Assert.Equal(2, participations.Count);

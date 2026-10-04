@@ -7,22 +7,22 @@ namespace NTS.Tests.Integration.EndToEndEventTests.Features;
 
 internal sealed class StartCoreEventFeature
 {
-    readonly JudgeDriver _judge;
-    readonly NexusApiDriver _nexusApi;
+    readonly ConsoleDriver _console;
+    readonly FunctionsApiDriver _functionsApi;
 
-    public StartCoreEventFeature(JudgeDriver judge, NexusApiDriver nexusApi)
+    public StartCoreEventFeature(ConsoleDriver console, FunctionsApiDriver functionsApi)
     {
-        _judge = judge;
-        _nexusApi = nexusApi;
+        _console = console;
+        _functionsApi = functionsApi;
     }
 
     public async Task<EventInformation> Execute(SetupFeatureResult setup)
     {
-        var setupEvent = await _nexusApi.ReadSetupConfigureEvent(setup.SetupEvent.Id);
+        var setupEvent = await _functionsApi.ReadSetupConfigureEvent(setup.SetupEvent.Id);
 
-        await _judge.Start();
-        await _judge.GetRequiredService<IDashService>().Start(setupEvent.Id);
+        await _console.Start();
+        await _console.GetRequiredService<IDashService>().Start(setupEvent.Id);
 
-        return await _nexusApi.ReadEventInformation(setupEvent.Id);
+        return await _functionsApi.ReadEventInformation(setupEvent.Id);
     }
 }
