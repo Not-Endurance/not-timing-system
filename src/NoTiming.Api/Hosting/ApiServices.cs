@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.SignalR;
 using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Profile;
+using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
 using NTS.Application.Cors;
 
@@ -33,6 +35,25 @@ internal static class ApiServices
 
         services.AddAccount();
         services.AddSingleton<ProfileStore>();
+        services.AddSingleton<TenancyLog>();
+        services.AddSingleton<TenantStore>();
+        services.AddSingleton<TenantCollections>();
+        services.AddSingleton<CrossTenantReads>();
+        services.AddSingleton<EventStore>();
+        services.AddSingleton<EventGrantStore>();
+        services.AddSingleton<GrantInvitations>();
+        services.AddHostedService<TenancyIndexes>();
+        services.AddSingleton<CallerReader>();
+        services.AddSingleton<AccountSearch>();
+        services
+            .AddOptions<SearchRateLimitOptions>()
+            .BindConfiguration(SearchRateLimitOptions.SECTION)
+            .Validate(
+                SearchRateLimitOptions.IsValid,
+                "Search:RateLimits: every limit is at least 1 and the window is not zero."
+            )
+            .ValidateOnStart();
+        services.AddSingleton<SearchRateLimiter>();
         services.AddSingleton<UserSessionStore>();
 
         services.AddSignalR(options =>

@@ -23,5 +23,6 @@ internal static class AuthEvents
     public static readonly EventId RATE_LIMITED = new(1030, "RateLimited");
     public static readonly EventId HONEYPOT_FILLED = new(1031, "HoneypotFilled");
     public static readonly EventId REGISTRATION_CLOSED = new(1032, "RegistrationClosed");
+    public static readonly EventId SEARCH_RATE_LIMITED = new(1033, "SearchRateLimited");
     public static readonly EventId TENANT_PLACEMENT_FAILED = new(1040, "TenantPlacementFailed");
 }

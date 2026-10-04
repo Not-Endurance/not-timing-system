@@ -8,11 +8,14 @@ internal static class CountrySeed
 {
     public const string COLLECTION = "countries";
 
-    /// <summary>An ISO code no other test uses, so that a test can tell its own Tenant from another's.</summary>
+    /// <summary>
+    /// An ISO code no other test uses, so that a test can tell its own Tenant from another's: six letters, so that two
+    /// codes of one run do not meet by chance (the Tenant of a country is named by its code, and a Tenant is made once).
+    /// </summary>
     public static string UniqueIsoCode()
     {
         return new string(
-            Guid.NewGuid().ToString("N")[..4].Select(x => (char)('A' + Convert.ToInt32(x.ToString(), 16))).ToArray()
+            Guid.NewGuid().ToString("N")[..6].Select(x => (char)('A' + Convert.ToInt32(x.ToString(), 16))).ToArray()
         );
     }
 

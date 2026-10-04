@@ -56,8 +56,18 @@ A role within one Tenant, held by one or more accounts and created by the Develo
 _Avoid_: Admin, owner
 
 **Developer**:
-A platform-level role reserved for the platform owner, with full rights across every Tenant. It is not granted through a Tenant.
+A platform-level role reserved for the platform owner, with full rights across every Tenant, except acting as the Main Operator of a Live Event: what the Main Operator does there is the Main Operator's alone, and a Live Event whose Main Operator is locked out is a database fix, not an action of the product. It is not granted through a Tenant, and only by command: no route gives it, or a Tenant Root.
 _Avoid_: Admin, superuser
+
+**Grant**:
+The access the Main Operator gives to a person for one Event: as an Operator, or as an Official of a role. A grant names the person by their exact email. When the email has an Account the grant is that Account's at once; when it has none it is a pending invitation, which gives nothing until the person registers with that email and then attaches to the new Account. A grant belongs to the Tenant of its Event and ends the moment it is removed. The Main Operator is not a grant: the Event names it.
+_Avoid_: Permission, role assignment, invite
+
+**Regional rules**:
+How a Tenant's Regional competitions are judged: whether the speed of a loop is judged on the average only, and which ranker applies. A Tenant Root sets them on the Tenant, and an Event copies them when it starts, so what an Event was judged by never changes when the Tenant edits them. An Event that started without any is judged by the FEI's rules.
+
+**Capabilities**:
+What the caller may do about an Event, or in a Tenant, told by the same access policy that refuses the action: `canSnapshot`, `isMainOperator`, `canHandOver`, `canAssignMainOperator`, `canCreateEvents` for an Event. A screen shows controls from these and never works them out for itself.
 
 ### Data
 

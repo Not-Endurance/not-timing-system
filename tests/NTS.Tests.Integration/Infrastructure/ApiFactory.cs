@@ -107,6 +107,11 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
             {
                 builder.UseSetting($"Auth:RateLimits:{limit}", "1000000");
             }
+
+            foreach (var limit in new[] { "PerAccount", "Overall" })
+            {
+                builder.UseSetting($"Search:RateLimits:{limit}", "1000000");
+            }
         }
 
         _configureHost?.Invoke(builder);
