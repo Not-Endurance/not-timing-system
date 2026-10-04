@@ -1,14 +1,19 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace NoTiming.Api.JsonApi;
 
 /// <summary>
 /// Reads the body of a write: a JSON:API document of one resource of the expected type. Requiring the media type
 /// <c>application/vnd.api+json</c> also keeps another site from writing with a visitor's cookie: a browser may not
-/// send that content type across origins without a preflight, which the CORS policy refuses.
+/// send that content type across origins without a preflight, which the CORS policy refuses. A body of more than a
+/// mebibyte is refused with 413 before it is read: nothing the Api takes comes near that, and a signed-in caller could
+/// otherwise fill the database a document at a time.
 /// </summary>
 internal static class JsonApiRequests
 {
+    public const int MAX_BODY_BYTES = 1_048_576;
+
     public static async Task<JsonApiRead<TAttributes>> ReadAsync<TAttributes>(HttpRequest request, string type)
         where TAttributes : class
     {
@@ -21,6 +26,18 @@ internal static class JsonApiRequests
                     $"Send {JsonApiResults.MEDIA_TYPE}."
                 )
             );
+        }
+
+        if (request.ContentLength > MAX_BODY_BYTES)
+        {
+            return JsonApiRead<TAttributes>.Rejected(TooLarge());
+        }
+
+        // A body that does not say how long it is (chunked) is cut off by the server when it passes the limit.
+        var limit = request.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>();
+        if (limit is { IsReadOnly: false })
+        {
+            limit.MaxRequestBodySize = MAX_BODY_BYTES;
         }
 
         try
@@ -37,12 +54,22 @@ internal static class JsonApiRequests
                 );
             }
 
-            return JsonApiRead<TAttributes>.Accepted(attributes);
+            return JsonApiRead<TAttributes>.Accepted(attributes, document.Data.Id);
         }
         catch (JsonException)
         {
             return JsonApiRead<TAttributes>.Rejected(Malformed("The body is not valid JSON."));
         }
+    }
+
+    static IResult TooLarge()
+    {
+        return JsonApiResults.Error(
+            StatusCodes.Status413PayloadTooLarge,
+            "payload-too-large",
+            "The body is too large.",
+            $"Send at most {MAX_BODY_BYTES} bytes."
+        );
     }
 
     static IResult Malformed(string detail)
@@ -79,22 +106,27 @@ internal sealed class JsonApiResourceObject<TAttributes>
 internal sealed class JsonApiRead<TAttributes>
     where TAttributes : class
 {
-    public static JsonApiRead<TAttributes> Accepted(TAttributes attributes)
+    public static JsonApiRead<TAttributes> Accepted(TAttributes attributes, string? id = null)
     {
-        return new(attributes, null);
+        return new(attributes, id, null);
     }
 
     public static JsonApiRead<TAttributes> Rejected(IResult error)
     {
-        return new(null, error);
+        return new(null, null, error);
     }
 
-    JsonApiRead(TAttributes? attributes, IResult? error)
+    JsonApiRead(TAttributes? attributes, string? id, IResult? error)
     {
         Attributes = attributes;
+        Id = id;
         Error = error;
     }
 
     public TAttributes? Attributes { get; }
+
+    /// <summary>The id the document gave its resource, when it gave one.</summary>
+    public string? Id { get; }
+
     public IResult? Error { get; }
 }

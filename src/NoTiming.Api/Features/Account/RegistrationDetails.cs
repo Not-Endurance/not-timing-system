@@ -1,4 +1,5 @@
 using MongoDB.Bson;
+using NoTiming.Api.Features.Profile;
 using NTS.Domain.Aggregates;
 
 namespace NoTiming.Api.Features.Account;
@@ -50,7 +51,7 @@ internal sealed class RegistrationDetails
 
     public static bool IsValidName(string? name)
     {
-        return !string.IsNullOrWhiteSpace(name) && name.Trim().Length <= MAX_NAME_LENGTH && !name.Any(char.IsControl);
+        return !string.IsNullOrWhiteSpace(name) && OneLineText.IsValid(name.Trim(), MAX_NAME_LENGTH);
     }
 
     public RegistrationDetails(string givenName, string surname, Country? country)

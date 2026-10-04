@@ -6,8 +6,9 @@ using System.Text.RegularExpressions;
 namespace NTS.Tests.Integration.Infrastructure;
 
 /// <summary>
-/// A browser's part in a request, by hand: the cookies it has been given and sends back, and the antiforgery token the
-/// pages of the Api carry for the ceremonies. A cookie the host clears is dropped, as a browser would.
+/// A browser's part in a request, by hand: the cookies it has been given and sends back, the antiforgery token the
+/// pages of the Api carry for the ceremonies, and the header the pages put on every write (#602). A cookie the host
+/// clears is dropped, as a browser would.
 /// </summary>
 internal sealed class PageClient
 {
@@ -26,6 +27,11 @@ internal sealed class PageClient
     }
 
     public string? AntiforgeryToken { get; private set; }
+
+    /// <summary>
+    /// What the pages send as <c>X-Requested-With</c> on a write; null sends none, for a test of a write that forgot it.
+    /// </summary>
+    public string? WriteHeader { get; set; } = "NoTiming";
 
     public string? Cookie(string name)
     {
@@ -57,6 +63,11 @@ internal sealed class PageClient
         if (_cookies.Count > 0)
         {
             request.Headers.Add("Cookie", string.Join("; ", _cookies.Select(x => $"{x.Key}={x.Value}")));
+        }
+
+        if (WriteHeader != null && ChangesState(request.Method) && !request.Headers.Contains("X-Requested-With"))
+        {
+            request.Headers.Add("X-Requested-With", WriteHeader);
         }
 
         var response = await _http.SendAsync(request);
@@ -112,6 +123,14 @@ internal sealed class PageClient
         }
 
         return SendAsync(request);
+    }
+
+    static bool ChangesState(HttpMethod method)
+    {
+        return method == HttpMethod.Post
+            || method == HttpMethod.Put
+            || method == HttpMethod.Patch
+            || method == HttpMethod.Delete;
     }
 
     void Absorb(HttpResponseMessage response)

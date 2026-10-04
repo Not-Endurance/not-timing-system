@@ -48,8 +48,9 @@
     message.hidden = !value;
   }
 
+  // A write is refused unless it carries the header that only a page of this site sends (#602).
   async function call(method, path, body) {
-    const headers = { Accept: MEDIA_TYPE, 'X-XSRF-TOKEN': token };
+    const headers = { Accept: MEDIA_TYPE, 'X-XSRF-TOKEN': token, 'X-Requested-With': 'NoTiming' };
     if (body) {
       headers['Content-Type'] = MEDIA_TYPE;
     }

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.SignalR;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Profile;
+using NoTiming.Api.Features.UserSessions;
 using NTS.Application.Cors;
 
 namespace NoTiming.Api.Hosting;
@@ -30,6 +32,8 @@ internal static class ApiServices
         );
 
         services.AddAccount();
+        services.AddSingleton<ProfileStore>();
+        services.AddSingleton<UserSessionStore>();
 
         services.AddSignalR(options =>
         {

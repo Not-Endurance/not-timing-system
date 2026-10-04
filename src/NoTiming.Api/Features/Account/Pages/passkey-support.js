@@ -83,12 +83,13 @@
     return json;
   }
 
-  // The options of a ceremony. The token is the one the server put in the page: the same request fails without it.
+  // The options of a ceremony. The token is the one the server put in the page: the same request fails without it. The
+  // other header is the one a write to a protected route needs (#602), which only a page of this site sends.
   async function fetchOptions(path, token) {
     const response = await fetch(path, {
       method: 'POST',
       credentials: 'same-origin',
-      headers: { Accept: MEDIA_TYPE, 'X-XSRF-TOKEN': token },
+      headers: { Accept: MEDIA_TYPE, 'X-XSRF-TOKEN': token, 'X-Requested-With': 'NoTiming' },
     });
     if (!response.ok) {
       throw new Error('The options were refused: ' + response.status);

@@ -1,5 +1,8 @@
+using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Profile;
+using NoTiming.Api.Features.UserSessions;
 using NTS.Contracts;
 
 namespace NoTiming.Api.Hosting;
@@ -26,6 +29,9 @@ internal static class ApiPipeline
         app.UseMiddleware<HubOriginMiddleware>();
         app.UseCors(ApiServices.CORS_POLICY_NAME);
         app.UseAuthentication();
+
+        // Deny by default, and the header of a write: decided for every endpoint in one place, after the session is read.
+        app.UseMiddleware<AccessBaselineMiddleware>();
         app.UseAuthorization();
 
         app.MapGet(
@@ -42,6 +48,8 @@ internal static class ApiPipeline
                 )
         );
         app.MapAccount();
+        app.MapProfile();
+        app.MapUserSessions();
         app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
 
         // An unknown API route is a 404 in the error format of the rest-api skill, never the Ui's page.

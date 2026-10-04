@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
 using Not.Identity;
+using NoTiming.Api.Features.Profile;
 using NoTiming.Api.JsonApi;
 
 namespace NoTiming.Api.Features.Account;
@@ -20,16 +21,17 @@ internal static class AccountEndpoints
 
     public static IEndpointRouteBuilder MapAccount(this IEndpointRouteBuilder app)
     {
-        // The sign-in surface has to be anonymous: it is how anyone becomes signed in.
-        app.MapGet("/sign-in", AccountPages.SignIn).AllowAnonymous();
-        app.MapGet("/account/assets/{name}", AccountPages.Asset).AllowAnonymous();
-        app.MapPost("/api/code-challenges", RequestCode).AllowAnonymous();
-        app.MapPost("/api/sessions", CreateSession).AllowAnonymous();
-        app.MapDelete("/api/sessions/current", DeleteSession).AllowAnonymous();
+        // The sign-in surface is anonymous because it is how anyone becomes signed in. It is public because the list of
+        // public endpoints names it (PublicEndpoints), not because of anything declared here.
+        app.MapGet("/sign-in", AccountPages.SignIn);
+        app.MapGet("/account/assets/{name}", AccountPages.Asset);
+        app.MapPost("/api/code-challenges", RequestCode);
+        app.MapPost("/api/sessions", CreateSession);
+        app.MapDelete("/api/sessions/current", DeleteSession);
         app.MapRegistration();
 
         // The page looks at the session itself and sends a visitor to sign in, so it is not an API route.
-        app.MapGet("/account/passkeys", AccountPages.Passkeys).AllowAnonymous();
+        app.MapGet("/account/passkeys", AccountPages.Passkeys);
         app.MapPasskeys();
 
         app.MapGet("/api/me", GetMe).RequireAuthorization();
@@ -177,6 +179,8 @@ internal static class AccountEndpoints
                 emailConfirmed = user.EmailConfirmed,
                 name = user.TextOf("Name"),
                 passkeys = user.Passkeys.Count,
+                profileComplete = ProfileEndpoints.IsComplete(user),
+                homeTenantId = user.TextOf("HomeTenantId"),
             }
         );
     }

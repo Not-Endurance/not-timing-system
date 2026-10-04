@@ -13,10 +13,11 @@ internal static class RegistrationEndpoints
 
     public static IEndpointRouteBuilder MapRegistration(this IEndpointRouteBuilder app)
     {
-        // Like the sign-in page these have to be anonymous: they are how anyone gets an account.
-        app.MapGet("/register", AccountPages.Register).AllowAnonymous();
-        app.MapGet("/privacy", AccountPages.Privacy).AllowAnonymous();
-        app.MapPost("/api/registrations", Register).AllowAnonymous();
+        // Like the sign-in page these are anonymous, and the list of public endpoints says so: they are how anyone gets
+        // an account.
+        app.MapGet("/register", AccountPages.Register);
+        app.MapGet("/privacy", AccountPages.Privacy);
+        app.MapPost("/api/registrations", Register);
         return app;
     }
 

@@ -54,6 +54,34 @@ internal static class JsonApiResults
         return location == null ? document : new HeaderResult(document, HeaderNames.Location, location);
     }
 
+    /// <summary>The members of a collection: each is a resource of the type, 200 with an empty list when there are none.</summary>
+    public static IResult Collection(string type, IEnumerable<(string Id, object Attributes)> items)
+    {
+        return Results.Json(
+            new
+            {
+                data = items.Select(item => new
+                {
+                    type,
+                    id = item.Id,
+                    attributes = item.Attributes,
+                }),
+            },
+            Options,
+            MEDIA_TYPE,
+            StatusCodes.Status200OK
+        );
+    }
+
+    /// <summary>
+    /// 404 <c>not-found</c>. It is the answer for a record that is missing and for one that is somebody else's alike, so
+    /// that nobody learns which ids exist.
+    /// </summary>
+    public static IResult NotFound()
+    {
+        return Error(StatusCodes.Status404NotFound, "not-found", "Not found");
+    }
+
     /// <summary>
     /// 429 <c>rate-limited</c> with the seconds until there is room again. It is the same for whatever was asked, and
     /// whatever its address has, so it tells nothing about accounts.
@@ -85,8 +113,18 @@ internal static class JsonApiResults
         await Error(status, code, title).ExecuteAsync(context);
     }
 
-    public static JsonSerializerOptions Options { get; } =
-        new(JsonSerializerDefaults.Web) { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+    public static JsonSerializerOptions Options { get; } = CreateOptions();
+
+    /// <summary>camelCase members, no member that is null, and enums as their names: a name says what a number cannot.</summary>
+    static JsonSerializerOptions CreateOptions()
+    {
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        };
+        options.Converters.Add(new JsonStringEnumConverter());
+        return options;
+    }
 
     sealed class HeaderResult : IResult
     {

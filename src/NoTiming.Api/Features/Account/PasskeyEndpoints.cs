@@ -20,7 +20,7 @@ internal static class PasskeyEndpoints
     public static IEndpointRouteBuilder MapPasskeys(this IEndpointRouteBuilder app)
     {
         // Signing in with a passkey is a session created with a credential: see AccountEndpoints.
-        app.MapPost("/api/passkeys/actions/request-options", RequestOptions).AllowAnonymous();
+        app.MapPost("/api/passkeys/actions/request-options", RequestOptions);
 
         app.MapPost("/api/passkeys/actions/creation-options", CreationOptions).RequireAuthorization();
         app.MapGet("/api/passkeys", List).RequireAuthorization();
@@ -241,7 +241,7 @@ internal static class PasskeyEndpoints
 
         if (!TryDecode(id, out var credentialId))
         {
-            return NotFound();
+            return JsonApiResults.NotFound();
         }
 
         var userId = users.GetUserId(context.User);
@@ -254,7 +254,7 @@ internal static class PasskeyEndpoints
         if (renamed is null)
         {
             return result.Errors.Any(x => x.Code == PasskeyService.NO_SUCH_PASSKEY)
-                ? NotFound()
+                ? JsonApiResults.NotFound()
                 : JsonApiResults.Error(StatusCodes.Status409Conflict, "conflict", "The passkey could not be renamed.");
         }
 
@@ -270,7 +270,7 @@ internal static class PasskeyEndpoints
     {
         if (!TryDecode(id, out var credentialId))
         {
-            return NotFound();
+            return JsonApiResults.NotFound();
         }
 
         if (!Guid.TryParse(users.GetUserId(context.User), out var user))
@@ -295,7 +295,7 @@ internal static class PasskeyEndpoints
         }
 
         return result.Errors.Any(x => x.Code == PasskeyService.NO_SUCH_PASSKEY)
-            ? NotFound()
+            ? JsonApiResults.NotFound()
             : JsonApiResults.Error(StatusCodes.Status409Conflict, "conflict", "The passkey could not be removed.");
     }
 
@@ -310,11 +310,6 @@ internal static class PasskeyEndpoints
                 $"Use at most {MAX_NAME_LENGTH} characters."
             )
             : null;
-    }
-
-    static IResult NotFound()
-    {
-        return JsonApiResults.Error(StatusCodes.Status404NotFound, "not-found", "Not found");
     }
 
     static bool TryDecode(string id, out byte[] credentialId)
