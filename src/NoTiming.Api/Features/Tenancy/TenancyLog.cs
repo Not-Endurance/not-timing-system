@@ -18,6 +18,7 @@ internal static class TenancyEvents
     public static readonly EventId TENANT_RULES_EDITED = new(1106, "TenantRulesEdited");
     public static readonly EventId INVITATIONS_ATTACHED = new(1107, "InvitationsAttached");
     public static readonly EventId INVITATIONS_NOT_ATTACHED = new(1108, "InvitationsNotAttached");
+    public static readonly EventId EVENT_DELETED = new(1109, "EventDeleted");
 }
 
 /// <summary>
@@ -40,6 +41,17 @@ internal sealed class TenancyLog
         _logger.LogInformation(
             TenancyEvents.EVENT_CREATED,
             "User {UserId} made Event {EventId} in Tenant {TenantId}.",
+            user,
+            eventId,
+            tenantId
+        );
+    }
+
+    public void EventDeleted(Guid user, Guid eventId, string tenantId)
+    {
+        _logger.LogInformation(
+            TenancyEvents.EVENT_DELETED,
+            "User {UserId} deleted Event {EventId} of Tenant {TenantId}.",
             user,
             eventId,
             tenantId

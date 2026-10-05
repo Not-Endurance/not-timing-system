@@ -136,6 +136,14 @@ internal sealed class EventGrantStore
         return document == null ? null : GrantDocuments.ToGrant(document);
     }
 
+    /// <summary>Removes every grant of the Event, which the Event's own deletion does; how many there were.</summary>
+    public Task<long> RemoveAllOfAsync(EventRecord record, CancellationToken cancellationToken)
+    {
+        return _tenants
+            .Of(TenantOwned.EVENT_GRANTS, record.TenantId)
+            .DeleteManyAsync(new BsonDocument(GrantDocuments.EVENT_ID, BsonGuids.Binary(record.Id)), cancellationToken);
+    }
+
     public Task<bool> RemoveAsync(EventGrant grant, CancellationToken cancellationToken)
     {
         return _tenants

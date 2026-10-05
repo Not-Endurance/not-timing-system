@@ -72,7 +72,7 @@ What the caller may do about an Event, or in a Tenant, told by the same access p
 ### Data
 
 **Setup**:
-The reference data and Event configuration prepared before an Event, such as its Athletes, Horses and Clubs. An Athlete or Horse is registered in Setup once.
+The reference data and Event configuration prepared before an Event, such as its Athletes, Horses and Clubs. An Athlete or Horse is registered in Setup once. The Setup of an Event is changed by its Main Operator until the Event starts and by nobody from then on, because the Console works on the copies Core made of it; the registries and the countries it is made from go on changing.
 
 **Core**:
 What an Event produces while it runs and afterwards: its Participations, Rankings, Handouts and Officials. Core holds copies of Setup data as entered when the Event started, so a later Setup change does not rewrite a finished Event.

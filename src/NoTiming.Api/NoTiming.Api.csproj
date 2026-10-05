@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\nugets\Not.Identity\Not.Identity.csproj" />
+    <ProjectReference Include="..\..\nugets\Not.Storage\Not.Storage.csproj" />
     <ProjectReference Include="..\NoTiming.Ui\NoTiming.Ui.csproj" />
     <ProjectReference Include="..\NTS.Application\NTS.Application.csproj" />
     <ProjectReference Include="..\NTS.Contracts\NTS.Contracts.csproj" />

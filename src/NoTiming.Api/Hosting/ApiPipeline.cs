@@ -3,6 +3,7 @@ using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Profile;
+using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
 using NTS.Contracts;
@@ -53,9 +54,11 @@ internal static class ApiPipeline
         app.MapProfile();
         app.MapTenancy();
         app.MapEvents();
+        app.MapSetups();
         app.MapEventGrants();
         app.MapAccountSearch();
         app.MapRegistrySearch();
+        app.MapReference();
         app.MapUserSessions();
         app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
 

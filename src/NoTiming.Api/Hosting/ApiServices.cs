@@ -3,6 +3,7 @@ using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Profile;
+using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
 using NTS.Application.Cors;
@@ -35,6 +36,7 @@ internal static class ApiServices
 
         services.AddAccount();
         services.AddSingleton<ProfileStore>();
+        ApiMongo.Configure();
         services.AddSingleton<TenancyLog>();
         services.AddSingleton<TenantStore>();
         services.AddSingleton<TenantCollections>();
@@ -44,6 +46,8 @@ internal static class ApiServices
         services.AddSingleton<GrantInvitations>();
         services.AddHostedService<TenancyIndexes>();
         services.AddSingleton<CallerReader>();
+        services.AddSingleton<GlobalCollections>();
+        services.AddSingleton<ReferenceAccess>();
         services.AddSingleton<AccountSearch>();
         services
             .AddOptions<SearchRateLimitOptions>()

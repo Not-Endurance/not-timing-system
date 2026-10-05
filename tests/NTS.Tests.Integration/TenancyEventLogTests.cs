@@ -9,15 +9,15 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// What changes who may do what is logged (#643, ADR-0012): an Event made, its Main Operator assigned or handed over, a grant
-/// made or removed, the invitations that attached to an account, the rules of a Tenant edited. Each is an event with an id and
+/// What changes who may do what is logged (#643, ADR-0012): an Event made or deleted, its Main Operator assigned or handed
+/// over, a grant made or removed, the invitations that attached to an account, the rules of a Tenant edited. Each is an event with an id and
 /// a name that stay as they are, carries the user who did it and the ids of what it was done to, and carries no email, no
 /// name and nothing an account keeps: the log is the one place that is read by people who are not meant to read those.
 /// </summary>
 public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
 {
     const int FIRST_TENANCY_EVENT = 1101;
-    const int LAST_TENANCY_EVENT = 1108;
+    const int LAST_TENANCY_EVENT = 1109;
 
     readonly MongoFixture _mongo;
 
@@ -98,6 +98,8 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
             "main-operators",
             new { accountId = worker.Id }
         );
+        var doomed = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, colleague.Id, "Doomed Ride");
+        await root.Page.DeleteAsync($"/api/configure-events/{doomed}");
         await RegisterAsync(api, invited);
 
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
@@ -134,13 +136,17 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         var edited = Assert.Single(capture.Of("TenantRulesEdited"));
         Assert.Contains(tenant, edited.Message);
         Assert.Contains(root.Id.ToString(), edited.Message);
+        var deleted = Assert.Single(capture.Of("EventDeleted"));
+        Assert.Contains(doomed.ToString(), deleted.Message);
+        Assert.Contains(tenant, deleted.Message);
+        Assert.Contains(root.Id.ToString(), deleted.Message);
         var attached = Assert.Single(capture.Of("InvitationsAttached"));
         Assert.EndsWith(": 1.", attached.Message);
         var ofTenancy = capture
             .Entries.Where(x => x.EventId.Id is >= FIRST_TENANCY_EVENT and <= LAST_TENANCY_EVENT)
             .Select(x => x.Message)
             .ToList();
-        Assert.Equal(8, ofTenancy.Count);
+        Assert.Equal(9, ofTenancy.Count);
         foreach (
             var personal in new[] { worker.Email, invited, root.Email, colleague.Email, "Rositsa", "Kolyo", "Vasil" }
         )
@@ -180,6 +186,9 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
             "main-operators",
             new { accountId = member.Id }
         );
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, root.Id);
+        var refusedDelete = await member.Page.DeleteAsync($"/api/configure-events/{unstarted}");
+        var startedDelete = await root.Page.DeleteAsync($"/api/configure-events/{live}");
         var refusedGrant = await LinkAsync(member);
         var first = await LinkAsync(root);
         var again = await LinkAsync(root);
@@ -191,11 +200,14 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         );
 
         Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, refusedDelete.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, startedDelete.StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, refusedGrant.StatusCode);
         Assert.Equal(HttpStatusCode.Created, first.StatusCode);
         Assert.Equal(HttpStatusCode.OK, again.StatusCode);
         Assert.Equal(HttpStatusCode.OK, sameRules.StatusCode);
         Assert.Empty(capture.Of("EventHandedOver"));
+        Assert.Empty(capture.Of("EventDeleted"));
         Assert.Single(capture.Of("GrantLinked"));
         Assert.Empty(capture.Of("TenantRulesEdited"));
     }

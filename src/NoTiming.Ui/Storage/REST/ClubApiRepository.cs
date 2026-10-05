@@ -6,8 +6,9 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NoTiming.Ui.Storage.REST;
 
-public class ClubApiRepository : ApiRepository<Club, ClubModel>
+/// <summary>The clubs as the Api serves them (#603): JSON:API documents at <c>/api/clubs</c> (ADR-0008).</summary>
+public class ClubApiRepository : JsonApiRepository<Club, ClubModel>
 {
-    public ClubApiRepository(NHttpClient client)
+    public ClubApiRepository(JsonApiClient client)
         : base("clubs", client) { }
 }

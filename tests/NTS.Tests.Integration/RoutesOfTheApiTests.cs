@@ -63,8 +63,27 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
         var worker = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, root.Id, DateTimeOffset.UtcNow);
         await EventSeed.GrantAsync(_mongo.ConnectionString, tenant, live, "Operator", null, worker.Email, worker.Id);
+        var club = await RegistrySeed.ClubAsync(_mongo.ConnectionString, tenant, "Reads");
+        var horse = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, "Reads");
+        var athlete = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            tenant,
+            "Reads",
+            RegistrySeed.CountryOf("Bulgaria", "BG")
+        );
+        var country = await CountrySeed.AddAsync(_mongo.ConnectionString, "Reads", CountrySeed.UniqueIsoCode());
         var urls = new[]
         {
+            "/api/clubs",
+            $"/api/clubs/{club}",
+            "/api/horses",
+            $"/api/horses/{horse}",
+            "/api/athletes",
+            $"/api/athletes/{athlete}",
+            "/api/countries",
+            $"/api/countries/{country}",
+            "/api/configure-events",
+            $"/api/configure-events/{live}",
             "/api/me",
             "/api/me/profile",
             "/api/passkeys",
@@ -126,20 +145,33 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
     {
         return
         [
+            "DELETE api/athletes/{id}",
+            "DELETE api/clubs/{id}",
+            "DELETE api/configure-events/{id}",
             "DELETE api/event-grants/{id}",
+            "DELETE api/horses/{id}",
             "DELETE api/passkeys/{id}",
             "DELETE api/sessions/current",
             "DELETE api/user-sessions/{id}",
+            "PATCH api/athletes/{id}",
+            "PATCH api/clubs/{id}",
+            "PATCH api/configure-events/{id}",
+            "PATCH api/countries/{id}",
+            "PATCH api/horses/{id}",
             "PATCH api/me",
             "PATCH api/me/profile",
             "PATCH api/passkeys/{id}",
             "PATCH api/tenants/{id}",
             "PATCH api/user-sessions/{id}",
+            "POST api/athletes",
+            "POST api/clubs",
             "POST api/code-challenges",
             "POST api/configure-events",
+            "POST api/countries",
             "POST api/event-grants",
             "POST api/events/{id}/actions/assign-main-operator",
             "POST api/events/{id}/actions/hand-over",
+            "POST api/horses",
             "POST api/passkeys",
             "POST api/passkeys/actions/creation-options",
             "POST api/passkeys/actions/request-options",
@@ -156,11 +188,21 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
         [
             "GET api/accounts",
             "GET api/accounts/all-tenants",
+            "GET api/athletes",
             "GET api/athletes/all-tenants",
+            "GET api/athletes/{id}",
+            "GET api/clubs",
             "GET api/clubs/all-tenants",
+            "GET api/clubs/{id}",
+            "GET api/configure-events",
+            "GET api/configure-events/{id}",
+            "GET api/countries",
+            "GET api/countries/{id}",
             "GET api/event-grants",
             "GET api/events/{id}/capabilities",
+            "GET api/horses",
             "GET api/horses/all-tenants",
+            "GET api/horses/{id}",
             "GET api/me",
             "GET api/me/profile",
             "GET api/officials/all-tenants",

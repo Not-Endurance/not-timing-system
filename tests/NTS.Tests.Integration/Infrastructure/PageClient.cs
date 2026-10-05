@@ -92,10 +92,21 @@ internal sealed class PageClient
         string type,
         object attributes,
         bool withToken = true,
-        string? language = null
+        string? language = null,
+        string? id = null
     )
     {
-        var body = JsonSerializer.Serialize(new { data = new { type, attributes } });
+        var body = JsonSerializer.Serialize(
+            new
+            {
+                data = new
+                {
+                    type,
+                    id,
+                    attributes,
+                },
+            }
+        );
         var request = new HttpRequestMessage(method, path)
         {
             Content = new StringContent(body, Encoding.UTF8, ApiSessions.MEDIA_TYPE),

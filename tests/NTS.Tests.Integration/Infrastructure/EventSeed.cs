@@ -46,6 +46,7 @@ internal static class EventSeed
             { "TenantId", tenant },
             { "Name", name ?? "Event " + id.ToString("N")[..6] },
             { "Location", "Sofia" },
+            { "Country", RegistrySeed.CountryOf("Bulgaria", "BG") },
             { "Competitions", new BsonArray() },
             { "Officials", new BsonArray() },
             { "Operators", new BsonArray() },

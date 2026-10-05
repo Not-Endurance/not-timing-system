@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Not.Identity;
+using NTS.Contracts.Shared;
 
 namespace NoTiming.Api.Features.Tenancy;
 
@@ -60,16 +61,32 @@ internal sealed class TenantCollections
 
     public TenantCollection Of(string collection, string? currentTenantId)
     {
-        if (!TenantOwned.Collections.Contains(collection))
-        {
-            throw new ArgumentException($"'{collection}' is not a collection that a Tenant owns.", nameof(collection));
-        }
-
+        RequireOwned(collection);
         return new TenantCollection(
             collection,
             string.IsNullOrWhiteSpace(currentTenantId) ? null : currentTenantId,
             _database.GetCollection<BsonDocument>(collection)
         );
+    }
+
+    /// <summary>The same collection, read and written as the model that is stored in it.</summary>
+    public TypedTenantCollection<T> Of<T>(string collection, string? currentTenantId)
+        where T : class, IDocument
+    {
+        RequireOwned(collection);
+        return new TypedTenantCollection<T>(
+            collection,
+            string.IsNullOrWhiteSpace(currentTenantId) ? null : currentTenantId,
+            _database.GetCollection<T>(collection)
+        );
+    }
+
+    static void RequireOwned(string collection)
+    {
+        if (!TenantOwned.Collections.Contains(collection))
+        {
+            throw new ArgumentException($"'{collection}' is not a collection that a Tenant owns.", nameof(collection));
+        }
     }
 }
 
@@ -102,6 +119,24 @@ internal sealed class TenantCollection
     )
     {
         return TenantId == null ? [] : await _documents.Find(Scoped(filter)).ToListAsync(cancellationToken);
+    }
+
+    /// <summary>The ids of the Tenant's documents the filter finds, which is all that is read of them.</summary>
+    public async Task<IReadOnlyList<Guid>> FindIdsAsync(
+        FilterDefinition<BsonDocument>? filter,
+        CancellationToken cancellationToken
+    )
+    {
+        if (TenantId == null)
+        {
+            return [];
+        }
+
+        var found = await _documents
+            .Find(Scoped(filter))
+            .Project(new BsonDocument("_id", 1))
+            .ToListAsync(cancellationToken);
+        return [.. found.Select(x => BsonGuids.Of(x, "_id")).OfType<Guid>()];
     }
 
     public async Task<BsonDocument?> FindOneAsync(
@@ -165,6 +200,14 @@ internal sealed class TenantCollection
         Required();
         var result = await _documents.DeleteOneAsync(Scoped(filter), cancellationToken);
         return result.DeletedCount > 0;
+    }
+
+    /// <summary>Removes every one of the Tenant's documents the filter finds; how many there were.</summary>
+    public async Task<long> DeleteManyAsync(FilterDefinition<BsonDocument> filter, CancellationToken cancellationToken)
+    {
+        Required();
+        var result = await _documents.DeleteManyAsync(Scoped(filter), cancellationToken);
+        return result.DeletedCount;
     }
 
     FilterDefinition<BsonDocument> Scoped(FilterDefinition<BsonDocument>? filter)

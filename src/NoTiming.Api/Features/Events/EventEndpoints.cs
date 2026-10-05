@@ -6,6 +6,7 @@ using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
+using NTS.Contracts.Setup.Models;
 using NTS.Domain.Access;
 
 namespace NoTiming.Api.Features.Events;
@@ -38,6 +39,7 @@ internal static class EventEndpoints
         HttpContext context,
         UserManager<NIdentityUser> users,
         TenantStore tenants,
+        TenantCollections collections,
         EventStore events,
         TenancyLog log
     )
@@ -116,9 +118,44 @@ internal static class EventEndpoints
             );
         }
 
+        Guid? requested = null;
+        if (read.Id != null)
+        {
+            if (!Guid.TryParse(read.Id, out var named))
+            {
+                return JsonApiResults.InvalidId();
+            }
+
+            requested = named;
+        }
+
         try
         {
-            var id = await events.CreateAsync(tenantId, user.Id, name, location, feiShowId, context.RequestAborted);
+            var (id, created) = await events.CreateAsync(
+                tenantId,
+                requested,
+                user.Id,
+                name,
+                location,
+                feiShowId,
+                context.RequestAborted
+            );
+            if (!created)
+            {
+                // The same id again is the Event that was made. An Event of another Tenant with it is not told about.
+                var existing = await collections
+                    .Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId)
+                    .FindAsync(id, context.RequestAborted);
+                return existing is null
+                    ? JsonApiResults.IdTaken()
+                    : JsonApiResults.Resource(
+                        StatusCodes.Status200OK,
+                        CONFIGURE_EVENTS,
+                        id.ToString(),
+                        SetupEndpoints.Members.AttributesOf(existing)
+                    );
+            }
+
             log.EventCreated(user.Id, id, tenantId);
             return JsonApiResults.Resource(
                 StatusCodes.Status201Created,
@@ -131,7 +168,8 @@ internal static class EventEndpoints
                     feiShowId,
                     tenantId,
                     mainOperatorId = user.Id,
-                }
+                },
+                $"/api/{CONFIGURE_EVENTS}/{id}"
             );
         }
         catch (TenantCountryMissingException)
