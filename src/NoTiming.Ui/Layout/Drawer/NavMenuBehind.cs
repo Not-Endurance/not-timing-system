@@ -32,8 +32,8 @@ public class NavMenuBehind : NStatefulComponent
     protected bool ShowSnapshots => WitnessAccessPolicy.CanViewSnapshots(AccessState.AccessLevel);
     protected bool ShowSignin => WitnessAccessPolicy.CanSignIn(AccessState.AccessLevel);
     protected bool ShowProfileHeader => ProfileContext.User != null;
-    protected bool HasActiveEvent => SocketService.IsConnected && SocketService.Event != null;
-    protected string ActiveEventTitle => SocketService.Event?.Name ?? Event_string;
+    protected bool HasLiveEvent => SocketService.IsConnected && SocketService.Event != null;
+    protected string LiveEventTitle => SocketService.Event?.Name ?? Event_string;
     protected string WelcomeName => ProfileContext.WelcomeName;
 
     protected override async Task OnInitializedAsync()

@@ -4,14 +4,14 @@ using Not.Exceptions;
 using Not.Krud.Abstractions;
 using Not.Krud.Models;
 using NTS.Application.Core;
-using NTS.Contracts.PastEvents;
+using NTS.Contracts.HistoricEvents;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Startlists;
 
-namespace NTS.Application.PastEvents;
+namespace NTS.Application.HistoricEvents;
 
-public class PastEventService : NStatefulService, IPastEventService, IKrudListBehind<EventInformation>
+public class HistoricEventService : NStatefulService, IHistoricEventService, IKrudListBehind<EventInformation>
 {
     static readonly IReadOnlyDictionary<int, IReadOnlyList<Starter>> EMPTY_STARTLIST =
         new Dictionary<int, IReadOnlyList<Starter>>();
@@ -20,14 +20,14 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
     readonly IRepository<Participation> _participations;
     readonly IRepository<Ranking> _rankingRepository;
     readonly IRepository<Official> _officialRepository;
-    readonly List<EventInformation> _pastEvents = [];
+    readonly List<EventInformation> _historicEvents = [];
     IReadOnlyList<Participation> _eventParticipations = [];
     IReadOnlyList<Ranking> _rankings = [];
     IReadOnlyList<Official> _officials = [];
     Startlist? _startlist;
     Ranking? _currentRanking;
 
-    public PastEventService(
+    public HistoricEventService(
         IEventInformationRepository events,
         IRepository<Participation> participations,
         IRepository<Ranking> rankingRepository,
@@ -40,7 +40,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
         _officialRepository = officialRepository;
     }
 
-    public IReadOnlyList<EventInformation> Events => _pastEvents.AsReadOnly();
+    public IReadOnlyList<EventInformation> Events => _historicEvents.AsReadOnly();
     public EventInformation? Event { get; private set; }
     public Guid EventId =>
         Event?.Id ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
@@ -53,9 +53,9 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
 
     protected override async Task<bool> InitializeState()
     {
-        var pastEvents = await _events.ReadPast();
-        _pastEvents.Clear();
-        _pastEvents.AddRange(pastEvents);
+        var historicEvents = await _events.ReadHistoric();
+        _historicEvents.Clear();
+        _historicEvents.AddRange(historicEvents);
         return true;
     }
 
@@ -68,7 +68,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
             return;
         }
 
-        Event = _pastEvents.FirstOrDefault(x => x.Id == eventId);
+        Event = _historicEvents.FirstOrDefault(x => x.Id == eventId);
         if (Event == null)
         {
             ClearEventState();

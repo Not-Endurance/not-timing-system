@@ -18,8 +18,8 @@ namespace NTS.Nexus.HTTP.Functions.Event;
 
 public interface IEventInformationBusinessService
 {
-    Task<IEnumerable<CoreEventInformationModel>> ReadActive();
-    Task<IEnumerable<CoreEventInformationModel>> ReadPast();
+    Task<IEnumerable<CoreEventInformationModel>> ReadLive();
+    Task<IEnumerable<CoreEventInformationModel>> ReadHistoric();
     Task<CoreEventInformationModel> Start(Guid configureEventId);
     Task Deactivate(Guid eventInformationId);
 }
@@ -96,14 +96,14 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         return eventInformationModel;
     }
 
-    public async Task<IEnumerable<CoreEventInformationModel>> ReadActive()
+    public async Task<IEnumerable<CoreEventInformationModel>> ReadLive()
     {
         var now = DateTimeOffset.UtcNow;
         await DeactivateExpiredActiveEvents(now);
         return await _eventInformation.ReadMany(x => x.IsActive && x.EndDay > now) ?? [];
     }
 
-    public async Task<IEnumerable<CoreEventInformationModel>> ReadPast()
+    public async Task<IEnumerable<CoreEventInformationModel>> ReadHistoric()
     {
         var items = await _eventInformation.ReadMany(x => !x.IsActive) ?? [];
         return items.OrderByDescending(x => x.EndDay);

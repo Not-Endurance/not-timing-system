@@ -30,6 +30,8 @@ public sealed class DenyByDefaultTests : IClassFixture<MongoFixture>
         "public-read GET api/events/live",
         "public-read GET api/events/{id}",
         "public-read GET healthz",
+        "public-read GET past-events",
+        "public-read GET past-events/{eventId:guid}",
         "public-read GET,HEAD {**path:nonfile}",
         "sign-in DELETE api/sessions/current",
         "sign-in GET account/assets/{name}",

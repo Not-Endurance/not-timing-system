@@ -4,9 +4,9 @@ using NTS.Domain.Setup.Aggregates;
 
 namespace NTS.Contracts.Core;
 
-public interface IActiveEventsContext : IStatefulService
+public interface ILiveEventsContext : IStatefulService
 {
-    bool IsActive(ConfigureEvent configureEvent);
+    bool IsLive(ConfigureEvent configureEvent);
     void Add(EventInformation eventInformation);
     void Remove(Guid eventId);
 }

@@ -138,13 +138,13 @@ internal sealed class FunctionsApiDriver : IDisposable
         return model.MapToEntity();
     }
 
-    public async Task<IReadOnlyList<EventInformation>> ReadActiveEventInformation()
+    public async Task<IReadOnlyList<EventInformation>> ReadLiveEventInformation()
     {
         var models = await Send<IEnumerable<EventInformationModel>>(HttpMethod.Get, "api/event/active");
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public async Task<IReadOnlyList<EventInformation>> ReadPastEventInformation()
+    public async Task<IReadOnlyList<EventInformation>> ReadHistoricEventInformation()
     {
         var models = await Send<IEnumerable<EventInformationModel>>(HttpMethod.Get, "api/event/past");
         return models.Select(x => x.MapToEntity()).ToArray();

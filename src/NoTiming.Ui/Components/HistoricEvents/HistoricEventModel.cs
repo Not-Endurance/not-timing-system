@@ -3,9 +3,9 @@ using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 
-namespace NoTiming.Ui.Components.PastEvents;
+namespace NoTiming.Ui.Components.HistoricEvents;
 
-public class PastEventModel : IKrudModel<EventInformation>, IKrudFormModel
+public class HistoricEventModel : IKrudModel<EventInformation>, IKrudFormModel
 {
     public Guid? Id { get; private set; }
     public string Name { get; private set; } = string.Empty;

@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using NTS.Contracts.Core.Models;
 using NTS.Contracts.Features.Access;
-using NTS.Contracts.PastEvents;
+using NTS.Contracts.HistoricEvents;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Judge.Contracts.Features.Core;
@@ -104,12 +104,12 @@ public sealed class CoreFeatureEndToEndTests
     static async Task SeedOtherEventData(FunctionsApiDriver api, int testedEventId)
     {
         var today = DateTimeOffset.UtcNow.Date;
-        var (pastEventId, activeEventId) = CreateOtherEventIds(testedEventId);
+        var (historicEventId, activeEventId) = CreateOtherEventIds(testedEventId);
         var documentBase = Math.Abs(testedEventId % 1_000_000) + 1_000_000;
 
         await SeedOtherEvent(
             api,
-            pastEventId,
+            historicEventId,
             new EventSpan(today.AddDays(-30), today.AddDays(-29)),
             documentBase,
             "Past"
@@ -354,16 +354,18 @@ public sealed class CoreFeatureEndToEndTests
         await console.GetRequiredService<IDashService>().Deactivate();
 
         Assert.False(console.IsConnected);
-        var activeEvents = await api.ReadActiveEventInformation();
+        var activeEvents = await api.ReadLiveEventInformation();
         Assert.DoesNotContain(activeEvents, x => x.Id == eventInformation.Id);
-        var pastEvents = await api.ReadPastEventInformation();
-        Assert.Contains(pastEvents, x => x.Id == eventInformation.Id);
+        var historicEvents = await api.ReadHistoricEventInformation();
+        Assert.Contains(historicEvents, x => x.Id == eventInformation.Id);
 
-        var pastEventsService = console.GetRequiredService<IPastEventService>();
-        await pastEventsService.LoadEvent(eventInformation.Id);
+        var historicEventsService = console.GetRequiredService<IHistoricEventService>();
+        await historicEventsService.LoadEvent(eventInformation.Id);
 
-        var pastEvent = Assert.IsType<EventInformation>(pastEventsService.Event);
-        var export = console.GetRequiredService<IFeiExportService>().Create(pastEvent, pastEventsService.Rankings);
+        var historicEvent = Assert.IsType<EventInformation>(historicEventsService.Event);
+        var export = console
+            .GetRequiredService<IFeiExportService>()
+            .Create(historicEvent, historicEventsService.Rankings);
 
         Assert.Equal("application/xml", export.ContentType);
         Assert.Contains(eventInformation.FeiShowId!, export.Content);

@@ -1,9 +1,9 @@
 using Not.Application.Behinds.Adapters;
 using NTS.Domain.Core.Aggregates;
 
-namespace NTS.Contracts.PastEvents;
+namespace NTS.Contracts.HistoricEvents;
 
-public interface IPastEventContext : IStatefulService
+public interface IHistoricEventContext : IStatefulService
 {
     EventInformation? Event { get; }
     Guid EventId { get; }

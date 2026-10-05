@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
-using NoTiming.Ui.Components.PastEvents;
-using NTS.Contracts.PastEvents;
+using NoTiming.Ui.Components.HistoricEvents;
+using NTS.Contracts.HistoricEvents;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
 
-namespace NoTiming.Ui.Features.PastEvents;
+namespace NoTiming.Ui.Features.HistoricEvents;
 
-public class PastEventDetailsContentBehind : NStatefulComponent
+public class HistoricEventDetailsContentBehind : NStatefulComponent
 {
     [Inject]
-    IPastEventService Service { get; set; } = default!;
+    IHistoricEventService Service { get; set; } = default!;
 
     [Inject]
     IDialogService DialogService { get; set; } = default!;
@@ -54,12 +54,16 @@ public class PastEventDetailsContentBehind : NStatefulComponent
     {
         try
         {
-            var parameters = new DialogParameters<PastEventStartlistDialog>
+            var parameters = new DialogParameters<HistoricEventStartlistDialog>
             {
                 { x => x.HistoryByStage, Service.StartlistHistoryByStage },
             };
             var options = new DialogOptions { FullWidth = true, MaxWidth = MaxWidth.Large };
-            var dialog = await DialogService.ShowAsync<PastEventStartlistDialog>(Startlist_string, parameters, options);
+            var dialog = await DialogService.ShowAsync<HistoricEventStartlistDialog>(
+                Startlist_string,
+                parameters,
+                options
+            );
             await dialog.Result;
         }
         catch (Exception ex)

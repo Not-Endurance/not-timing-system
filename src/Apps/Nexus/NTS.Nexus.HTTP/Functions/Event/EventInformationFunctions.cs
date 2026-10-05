@@ -92,7 +92,7 @@ public class EventInformationFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(ListActive));
 
-        return Ok(await _businessService.ReadActive());
+        return Ok(await _businessService.ReadLive());
     }
 
     [Function("event-information-past-list")]
@@ -104,7 +104,7 @@ public class EventInformationFunctions : FunctionBase
         TagRequest(request);
         LogInformation(request, nameof(ListPast));
 
-        var events = await _businessService.ReadPast();
+        var events = await _businessService.ReadHistoric();
         return Ok(events);
     }
 

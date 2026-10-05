@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
 using Not.Domain;
 using NTS.Application.Core;
-using NTS.Application.PastEvents;
+using NTS.Application.HistoricEvents;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
@@ -16,7 +16,7 @@ namespace NTS.Tests.Unit.Application;
 /// The past-Event pages show the Results of a Ranking composed from the Participations the service read once for the
 /// Event and from the ids the Ranking holds (#624, ADR-0006).
 /// </summary>
-public sealed class PastEventServiceTests
+public sealed class HistoricEventServiceTests
 {
     static readonly Guid EVENT_ID = TestId.Of(1);
 
@@ -72,9 +72,9 @@ public sealed class PastEventServiceTests
         );
     }
 
-    static PastEventService CreateService(IEnumerable<Participation> participations, IEnumerable<Ranking> rankings)
+    static HistoricEventService CreateService(IEnumerable<Participation> participations, IEnumerable<Ranking> rankings)
     {
-        var pastEvent = new EventInformation(
+        var historicEvent = new EventInformation(
             new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG"),
             "Event",
             "Location",
@@ -83,8 +83,8 @@ public sealed class PastEventServiceTests
             id: EVENT_ID
         );
 
-        return new PastEventService(
-            new PastEvents(pastEvent),
+        return new HistoricEventService(
+            new HistoricEvents(historicEvent),
             new ReadOnlyRepository<Participation>(participations),
             new ReadOnlyRepository<Ranking>(rankings),
             new ReadOnlyRepository<Official>([])
@@ -147,22 +147,22 @@ public sealed class PastEventServiceTests
         }
     }
 
-    sealed class PastEvents : ReadOnlyRepository<EventInformation>, IEventInformationRepository
+    sealed class HistoricEvents : ReadOnlyRepository<EventInformation>, IEventInformationRepository
     {
-        readonly EventInformation _pastEvent;
+        readonly EventInformation _historicEvent;
 
-        public PastEvents(EventInformation pastEvent)
-            : base([pastEvent])
+        public HistoricEvents(EventInformation historicEvent)
+            : base([historicEvent])
         {
-            _pastEvent = pastEvent;
+            _historicEvent = historicEvent;
         }
 
-        public Task<IEnumerable<EventInformation>> ReadPast()
+        public Task<IEnumerable<EventInformation>> ReadHistoric()
         {
-            return Task.FromResult<IEnumerable<EventInformation>>([_pastEvent]);
+            return Task.FromResult<IEnumerable<EventInformation>>([_historicEvent]);
         }
 
-        public Task<IEnumerable<EventInformation>> ReadActive()
+        public Task<IEnumerable<EventInformation>> ReadLive()
         {
             throw new NotSupportedException("The service reads past Events only.");
         }

@@ -47,9 +47,9 @@
     
     <MudDivider Class="my-2" />
 
-    @if (HasActiveEvent)
+    @if (HasLiveEvent)
     {
-        <MudNavGroup Title="@ActiveEventTitle" Expanded="true">
+        <MudNavGroup Title="@LiveEventTitle" Expanded="true">
             @if (ShowSnapshots)
             {
                 <NNavLink Endpoint="@SNAPSHOT_PAGE">
@@ -78,8 +78,8 @@
     <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
 
     <MudNavGroup Title="@History_string" Expanded="true">
-        <NNavLink Endpoint="@PAST_EVENTS_PAGE">
-            <strong>@Past_events_string</strong>
+        <NNavLink Endpoint="@HISTORIC_EVENTS_PAGE">
+            <strong>@Historic_events_string</strong>
         </NNavLink>
     </MudNavGroup>
 

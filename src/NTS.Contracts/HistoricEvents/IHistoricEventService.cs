@@ -2,9 +2,9 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Documents;
 using NTS.Domain.Core.Objects.Startlists;
 
-namespace NTS.Contracts.PastEvents;
+namespace NTS.Contracts.HistoricEvents;
 
-public interface IPastEventService : IPastEventContext
+public interface IHistoricEventService : IHistoricEventContext
 {
     IReadOnlyList<EventInformation> Events { get; }
     IReadOnlyList<Ranking> Rankings { get; }

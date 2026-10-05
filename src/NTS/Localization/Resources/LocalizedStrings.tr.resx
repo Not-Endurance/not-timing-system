@@ -811,7 +811,7 @@
   <data name="Validation_errors_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-  <data name="Past_events_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
+  <data name="Historic_events_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
   <data name="FEI_ID_string" type="System.Resources.ResXNullRef, System.Windows.Forms">

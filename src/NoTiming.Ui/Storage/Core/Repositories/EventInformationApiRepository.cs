@@ -23,13 +23,13 @@ public class EventInformationApiRepository
         _socketContext = socketContext;
     }
 
-    public async Task<IEnumerable<EventInformation>> ReadActive()
+    public async Task<IEnumerable<EventInformation>> ReadLive()
     {
         var models = await HandleRequest(Client.Get<IEnumerable<EventInformationModel>>($"{Endpoint}/active")) ?? [];
         return models.Select(x => MapEntity(x)!);
     }
 
-    public async Task<IEnumerable<EventInformation>> ReadPast()
+    public async Task<IEnumerable<EventInformation>> ReadHistoric()
     {
         var models = await HandleRequest(Client.Get<IEnumerable<EventInformationModel>>($"{Endpoint}/past")) ?? [];
         return models.Select(x => MapEntity(x)!);

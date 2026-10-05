@@ -512,7 +512,7 @@ public sealed class SignInTests : IClassFixture<MongoFixture>
 
     [Theory]
     [InlineData("/startlist", "/startlist")]
-    [InlineData("/past-events/7?tab=results", "/past-events/7?tab=results")]
+    [InlineData("/historic-events/7?tab=results", "/historic-events/7?tab=results")]
     [InlineData("//evil.example/path", "/")]
     [InlineData("/\\evil.example", "/")]
     [InlineData("https://evil.example/", "/")]

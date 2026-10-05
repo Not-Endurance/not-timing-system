@@ -2,10 +2,10 @@
 @using NoTiming.Ui.Components.Rankings.Menu
 @using NoTiming.Ui.Components.Results
 
-@attribute [Route(PAST_EVENT_DETAILS_PAGE)]
-@inherits PastEventDetailsContentBehind
+@attribute [Route(HISTORIC_EVENT_DETAILS_PAGE)]
+@inherits HistoricEventDetailsContentBehind
 
-<NContent Title="@Past_events_string" IsLoading="@IsLoading" IsEmpty="@IsEmpty">
+<NContent Title="@Historic_events_string" IsLoading="@IsLoading" IsEmpty="@IsEmpty">
     <Main>
         @if (Document != null)
         {

@@ -1005,8 +1005,8 @@
   <data name="Validation_errors_string" xml:space="preserve">
     <value>Валидационни грешки</value>
   </data>
-  <data name="Past_events_string" xml:space="preserve">
-    <value>Минали събития</value>
+  <data name="Historic_events_string" xml:space="preserve">
+    <value>Исторически събития</value>
   </data>
   <data name="FEI_ID_string" xml:space="preserve">
     <value>ФЕИ Id</value>

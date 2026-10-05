@@ -55,6 +55,8 @@ internal static class PublicEndpoints
         return
         [
             new PublicEndpoint(EndpointAccess.PublicRead, "GET", "healthz"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "past-events"), // sent on to the historic events
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "past-events/{eventId:guid}"),
             new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events"),
             new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/live"),
             new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/historic"),
