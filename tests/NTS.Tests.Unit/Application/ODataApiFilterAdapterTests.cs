@@ -11,6 +11,37 @@ public class ODataApiFilterAdapterTests
     static readonly Guid ANOTHER_EVENT = Guid.Parse("9b2f1c64-7d0e-4a5b-8c31-5e6f7a8b9c0d");
     static readonly Guid A_PARTICIPATION = Guid.Parse("c1d2e3f4-0a1b-4c2d-8e3f-a4b5c6d7e8f9");
 
+    public static TheoryData<Expression<Func<Sample, bool>>, string> Comparisons()
+    {
+        return new()
+        {
+            { x => x.Number == 5, "Number eq 5" },
+            { x => x.Number != 5, "Number ne 5" },
+            { x => x.Number > 5, "Number gt 5" },
+            { x => x.Number >= 5, "Number ge 5" },
+            { x => x.Number < 5, "Number lt 5" },
+            { x => x.Number <= 5, "Number le 5" },
+            { x => 5 < x.Number, "Number gt 5" },
+            { x => 5 >= x.Number, "Number le 5" },
+            { x => "A" == x.Name, "Name eq 'A'" },
+        };
+    }
+
+    public static TheoryData<Expression<Func<Sample, bool>>> Untranslatable()
+    {
+        List<SampleKind> kinds = [SampleKind.Operator];
+        return new()
+        {
+            { x => x.Name!.StartsWith("A") },
+            { x => x.Name == "A" || x.Name == "B" },
+            { x => x.Country!.Name == "Bulgaria" },
+            { x => x.Number + 1 > 5 },
+            { x => x.Kind == SampleKind.Official },
+            { x => x.Kind != SampleKind.Official },
+            { x => kinds.Contains(x.Kind) },
+        };
+    }
+
     [Fact]
     public void A_Guid_comparison_is_written_as_an_unquoted_literal()
     {
@@ -118,22 +149,6 @@ public class ODataApiFilterAdapterTests
         Assert.Equal(expected, filters["$filter"]);
     }
 
-    public static TheoryData<Expression<Func<Sample, bool>>, string> Comparisons()
-    {
-        return new()
-        {
-            { x => x.Number == 5, "Number eq 5" },
-            { x => x.Number != 5, "Number ne 5" },
-            { x => x.Number > 5, "Number gt 5" },
-            { x => x.Number >= 5, "Number ge 5" },
-            { x => x.Number < 5, "Number lt 5" },
-            { x => x.Number <= 5, "Number le 5" },
-            { x => 5 < x.Number, "Number gt 5" },
-            { x => 5 >= x.Number, "Number le 5" },
-            { x => "A" == x.Name, "Name eq 'A'" },
-        };
-    }
-
     [Fact]
     public void A_list_with_nothing_in_it_matches_nothing_and_a_list_of_one_is_a_comparison()
     {
@@ -169,21 +184,6 @@ public class ODataApiFilterAdapterTests
         Assert.Throws<NotSupportedException>(() => ODataApiFilterAdapter.ParseFilters<Sample>([expression]));
     }
 
-    public static TheoryData<Expression<Func<Sample, bool>>> Untranslatable()
-    {
-        List<SampleKind> kinds = [SampleKind.Operator];
-        return new()
-        {
-            { x => x.Name!.StartsWith("A") },
-            { x => x.Name == "A" || x.Name == "B" },
-            { x => x.Country!.Name == "Bulgaria" },
-            { x => x.Number + 1 > 5 },
-            { x => x.Kind == SampleKind.Official },
-            { x => x.Kind != SampleKind.Official },
-            { x => kinds.Contains(x.Kind) },
-        };
-    }
-
     [Fact]
     public void The_JSON_API_variant_names_the_members_as_the_resource_does_in_camelCase()
     {
@@ -211,12 +211,6 @@ public class ODataApiFilterAdapterTests
         Assert.Equal("NameEnglish eq null", filters["$filter"]);
     }
 
-    public enum SampleKind
-    {
-        Operator = 1,
-        Official = 2,
-    }
-
     public sealed class Sample
     {
         public Guid EventId { get; set; }
@@ -228,5 +222,11 @@ public class ODataApiFilterAdapterTests
         public string? NameEnglish { get; set; }
         public SampleKind Kind { get; set; }
         public Sample? Country { get; set; }
+    }
+
+    public enum SampleKind
+    {
+        Operator = 1,
+        Official = 2,
     }
 }
