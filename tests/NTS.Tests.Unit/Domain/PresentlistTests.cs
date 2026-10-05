@@ -167,12 +167,12 @@ public sealed class PresentlistTests
     {
         var participation = CreateParticipation(1, [CreatePhase()]);
 
-        participation.ToggleInspection(true);
-        participation.ToggleInspection(true);
+        participation.ToggleInspection(true, DateTimeOffset.Now);
+        participation.ToggleInspection(true, DateTimeOffset.Now);
 
         Assert.True(participation.Phases.Current.IsRequiredInspectionRequested);
 
-        participation.ToggleInspection(false);
+        participation.ToggleInspection(false, DateTimeOffset.Now);
 
         Assert.False(participation.Phases.Current.IsRequiredInspectionRequested);
     }
@@ -187,7 +187,7 @@ public sealed class PresentlistTests
             [CreatePhase(start: arrive.AddHours(-1), arrive: arrive, present: present, isRepresentationRequested: true)]
         );
 
-        Assert.Throws<DomainException>(() => participation.ToggleInspection(true));
+        Assert.Throws<DomainException>(() => participation.ToggleInspection(true, DateTimeOffset.Now));
 
         Assert.False(participation.Phases.Current.IsRequiredInspectionRequested);
     }
@@ -210,7 +210,7 @@ public sealed class PresentlistTests
             ]
         );
 
-        participation.ToggleInspection(true);
+        participation.ToggleInspection(true, DateTimeOffset.Now);
 
         Assert.True(participation.Phases.Current.IsRequiredInspectionRequested);
     }
@@ -225,12 +225,12 @@ public sealed class PresentlistTests
             [CreatePhase(start: arrive.AddHours(-1), arrive: arrive, present: present)]
         );
 
-        participation.ToggleRepresentation(true);
-        participation.ToggleRepresentation(true);
+        participation.ToggleRepresentation(true, DateTimeOffset.Now);
+        participation.ToggleRepresentation(true, DateTimeOffset.Now);
 
         Assert.True(participation.Phases.Current.IsReinspectionRequested);
 
-        participation.ToggleRepresentation(false);
+        participation.ToggleRepresentation(false, DateTimeOffset.Now);
 
         Assert.False(participation.Phases.Current.IsReinspectionRequested);
     }

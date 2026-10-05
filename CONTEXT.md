@@ -115,7 +115,7 @@ The printable sheet of one Combination's times, produced for it after each Phase
 ### Timing
 
 **Phase**:
-One leg of a Participation: the loop ridden from Start to Arrival, then the vet gate where the Combination is Presented (again, if re-inspection is requested), then a Rest that ends at the Out time, which is the next Phase's Start.
+One leg of a Participation: the loop ridden from Start to Arrival, then the vet gate where the Combination is Presented (again, if re-inspection is requested), then a Rest that ends at the Out time, which is the next Phase's Start. A Snapshot is placed in a Phase by its own time, and a Representation or Inspection request by the time it is made, with one comparison: at or after the next Phase's Start it belongs to the next Phase and that Phase becomes the current one, otherwise it belongs to the current Phase. The time of a request is the clock of the server, which should agree with the clocks of the devices to within about a minute around the Out time; times are compared by the time of the day, so a ride that crosses midnight is not supported.
 
 **Presentation**:
 A Combination presenting at the vet gate, captured as a time. Presenting again after re-inspection is requested is a Represent: the same kind of time, marked as a re-presentation.

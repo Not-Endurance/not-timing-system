@@ -23,10 +23,32 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
     public Phase Current { get; private set; }
     public double Distance => this.Sum(x => x.Length);
 
+    /// <summary>The Phase a time belongs to, by the rule and with the limits that <see cref="Participation.PhaseAt"/> describes.</summary>
+    internal Phase PhaseAt(Timestamp time)
+    {
+        if (IsLast())
+        {
+            return Current;
+        }
+
+        var next = GetNext();
+        return next.StartTime != null && time >= next.StartTime ? next : Current;
+    }
+
+    /// <summary>Makes the Phase the current one: the Participation is in it once a Snapshot or a request was placed there.</summary>
+    internal void Select(Phase phase)
+    {
+        Current = phase;
+    }
+
+    /// <summary>
+    /// Places the Snapshot in a Phase once and applies it there. A complete final Phase takes nothing more. The Phase
+    /// that applied it is the current one afterwards.
+    /// </summary>
     internal SnapshotResult Process(Snapshot snapshot, Guid eventId)
     {
-        var isComplete = Current.IsComplete();
-        if (isComplete && Current.IsFinal)
+        var phase = PhaseAt(snapshot.Timestamp);
+        if (phase.IsFinal && phase.IsComplete())
         {
             return SnapshotResult.NotApplied(
                 eventId,
@@ -34,12 +56,14 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
                 SnapshotResultType.NotAppliedDueToParticipationComplete
             );
         }
-        var notProcessingWindow = TimeSpan.FromMinutes(30); // TODO settings: use settings?
-        if (isComplete && snapshot.Timestamp > Current.GetOutTime() + notProcessingWindow)
+
+        var result = phase.Process(snapshot, eventId);
+        if (result.Type == SnapshotResultType.Applied)
         {
-            return SnapshotResult.ActivePhaseComplete(eventId, snapshot);
+            Select(phase);
         }
-        return Current.Process(snapshot, eventId);
+
+        return result;
     }
 
     internal void StartIfNext()
@@ -54,16 +78,6 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
         }
         var next = GetNext();
         next.StartTime = Current.GetOutTime();
-    }
-
-    internal bool SelectNext()
-    {
-        if (Current == this.Last())
-        {
-            return false;
-        }
-        Current = GetNext();
-        return true;
     }
 
     public override string ToString()

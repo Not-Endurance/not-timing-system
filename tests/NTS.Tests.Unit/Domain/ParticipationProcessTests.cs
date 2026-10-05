@@ -68,6 +68,45 @@ public sealed class ParticipationProcessTests
     }
 
     [Fact]
+    public void Process_eliminates_for_time_when_the_recovery_of_the_phase_the_snapshot_was_placed_in_is_over_the_limit()
+    {
+        var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
+        var firstArrive = start.AddHours(1);
+        var firstPresent = firstArrive.AddMinutes(10);
+        var secondStart = firstPresent.AddMinutes(40);
+        var secondArrive = secondStart.AddMinutes(10);
+        var participation = CreateParticipation(
+            start,
+            CreatePhase(start, firstArrive, firstPresent, id: TestId.Of(1)),
+            CreatePhase(secondStart, secondArrive, id: TestId.Of(2))
+        );
+
+        var result = participation.Process(
+            new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(secondArrive.AddMinutes(50)))
+        );
+
+        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.IsType<FailedToQualify>(participation.Eliminated);
+        Assert.Equal(TestId.Of(2), participation.Phases.Current.Id);
+    }
+
+    [Fact]
+    public void Process_leaves_an_elimination_as_it_is_when_the_snapshot_is_applied_to_a_Participation_that_was_eliminated()
+    {
+        var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
+        var arrive = start.AddHours(1);
+        var participation = CreateParticipation(start, CreatePhase(start, arrive, isFinal: true, id: TestId.Of(1)));
+        participation.Withdraw();
+
+        var result = participation.Process(
+            new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(arrive.AddHours(2)))
+        );
+
+        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.IsType<Withdrawn>(participation.Eliminated);
+    }
+
+    [Fact]
     public void Process_raises_no_phase_completed_while_the_phase_is_not_complete()
     {
         var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
@@ -81,13 +120,13 @@ public sealed class ParticipationProcessTests
     }
 
     [Fact]
-    public void Process_selects_the_next_phase_when_its_arrive_time_is_recorded()
+    public void Process_places_an_arrive_stamped_after_the_Start_of_the_next_phase_in_it_and_selects_it()
     {
         var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
         var firstArrive = start.AddHours(1);
         var firstPresent = firstArrive.AddMinutes(10);
         var secondStart = firstPresent.AddMinutes(40);
-        var secondArrive = secondStart.AddMinutes(31);
+        var secondArrive = secondStart.AddMinutes(5);
         var participation = CreateParticipation(
             start,
             CreatePhase(start, firstArrive, firstPresent, id: TestId.Of(1)),

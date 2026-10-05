@@ -3,6 +3,7 @@ using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Payloads;
+using NTS.Domain.Objects;
 using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
 namespace NTS.Domain.Core.Aggregates;
@@ -63,23 +64,33 @@ public class Participation : Aggregate, IEventScoped
     }
 
     //TODO rename to smthing better (including ISnapshotProcessor, IManualProcessor and other mentions..)
+    /// <summary>
+    /// Places the Snapshot in a Phase by its time (see <see cref="PhaseAt"/>) and applies it there, once. A Snapshot stamped at
+    /// or after the Start of the next Phase belongs to that Phase and makes it the current one.
+    /// </summary>
     public SnapshotResult Process(Snapshot snapshot)
     {
         var result = Phases.Process(snapshot, EventId);
-        if (result.Type == SnapshotResultType.ActivePhaseComplete)
-        {
-            if (!Phases.SelectNext())
-            {
-                return SnapshotResult.NotApplied(EventId, snapshot, NotAppliedDueToParticipationComplete);
-            }
-
-            result = Phases.Process(snapshot, EventId);
-        }
         if (Eliminated == null && result.Type == Applied)
         {
             EvaluatePhase(Phases.Current);
         }
         return result;
+    }
+
+    /// <summary>
+    /// The Phase a Snapshot or a request made at the time belongs to: the next one when it has a Start and the time is at or
+    /// after it, the current one otherwise (ADR-0004). The Representation and Inspection indicators of a screen describe this
+    /// Phase, so that they show what a request made then would act on.
+    /// <para>
+    /// The time of a request is the clock of the server, and that of a Snapshot is the one its Official captured, so the clocks
+    /// of the devices should agree with the server's to within about a minute around the Out time of a Phase. Times are
+    /// compared by the time of the day, so a ride that crosses midnight is not supported.
+    /// </para>
+    /// </summary>
+    public Phase PhaseAt(DateTimeOffset time)
+    {
+        return Phases.PhaseAt(new Timestamp(time));
     }
 
     public void Update(IPhaseState state)
@@ -91,29 +102,43 @@ public class Participation : Aggregate, IEventScoped
         EvaluatePhase(phase);
     }
 
-    public void ToggleRepresentation(bool isRequested)
+    /// <summary>
+    /// A Representation is requested or withdrawn at the time, in the Phase that time belongs to (see <see cref="PhaseAt"/>),
+    /// which becomes the current one when the request is taken.
+    /// </summary>
+    public void ToggleRepresentation(bool isRequested, DateTimeOffset at)
     {
+        var phase = PhaseAt(at);
         if (isRequested)
         {
-            Phases.Current.RequireRepresentation();
+            phase.RequireRepresentation();
         }
         else
         {
-            Phases.Current.DisableRepresentation();
+            phase.DisableRepresentation();
         }
+
+        Phases.Select(phase);
     }
 
-    public void ToggleInspection(bool isRequested)
+    /// <summary>
+    /// An Inspection is requested or withdrawn at the time, in the Phase that time belongs to (see <see cref="PhaseAt"/>),
+    /// which becomes the current one when the request is taken.
+    /// </summary>
+    public void ToggleInspection(bool isRequested, DateTimeOffset at)
     {
+        var phase = PhaseAt(at);
         if (isRequested)
         {
-            Phases.Current.RequestInspection();
+            phase.RequestInspection();
         }
         else
         {
             // TODO: rename to IsInspectionRequested
-            Phases.Current.IsRequiredInspectionRequested = false;
+            phase.IsRequiredInspectionRequested = false;
         }
+
+        Phases.Select(phase);
     }
 
     public void Withdraw()
