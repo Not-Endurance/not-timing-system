@@ -11,6 +11,7 @@ dotnet run --project tools/NTS.Tools -- <command> [options]
 | `watcher` | A placeholder. |
 | `migrate-names` | Moves the names of Athletes, Horses, Officials and snapshots to `Name` and `NameEnglish`. |
 | `migrate-participation-copies` | Turns the copy of a Participation inside every Ranking entry and Handout into a reference, and drops the values the domain derives (below). |
+| `migrate-phase-times` | Turns the flat Arrive, Present and Represent times of every Phase into time events, renames the Representation request, and drops the snapshot-results collection (below). |
 | `seed-tenant-root` | Makes an account a Tenant Root of a Tenant, which makes the Tenant operational (below). |
 | `grant-developer` | Makes an account the Developer (below). |
 
@@ -61,6 +62,48 @@ The order of the migrations and the steps of the cutover are owned by the runboo
 - Rollback is a restore of the backup taken before the cutover. There is no way back from the new shape other than that.
 - The placings that Historic Events still lack are not filled in here. The last step of the cutover (#637) does it, because the code that computes the placings reads only Guid-keyed documents.
 - There is no dual-read, no lazy upgrade and no support for old builds: the new code reads only the new shape, and a Ranking entry or a Handout that names no Participation does not load.
+
+## migrate-phase-times
+
+```powershell
+dotnet run --project tools/NTS.Tools -- migrate-phase-times --connection-string <mongo> [--database nts] [--apply]
+```
+
+ADR-0005 makes a Phase store every time it receives as a time event and show its Arrive, Present and Represent times from the latest accepted event of each, and the code that does it reads no flat time. Before it, a Phase stored the three times flat beside its Start, and every Snapshot left a snapshot result in a collection of its own. This command moves the data to the new shape:
+
+- **A flat time** that is a date becomes one event of the Phase, in the order Arrive (`Arrived`), Present (`Presented`) and Represent (`Presented`, marked as a representation): accepted, of the manual method, with a new id, the time as it was, and no recorded-at time and no actor, which is how the domain tells a time that was there before events were kept. The flat members are removed. A time that is null is removed and makes no event. A Phase with no times is left as it is.
+- **The Representation request** `IsReinspectionRequested` is renamed `IsRepresentRequested`. The Start and the other flags are not touched.
+- **The snapshot-results collection** (`event-snapshotResults`) is dropped, on apply only. Nothing reads it any more, and its documents are discarded, not migrated.
+
+It works on the documents as they are, whatever the type of their ids. It is idempotent: a Phase that already has events is not given events again, only its leftover flat times and old flag are removed, so running it again changes nothing, and a run that stopped halfway is finished by running it again.
+
+### The dry run
+
+A dry run changes nothing. It prints the Participations read, the ones it would change with the events it would make, the snapshot results it would drop, and two lists that stop an apply:
+
+```text
+Database: nts
+Dry-run phase-times migration.
+event_participations: 26 documents read, 22 to change (118 events)
+event-snapshotResults: 340 documents, to drop
+Times that are not a date: 0
+Rankings and Handouts that still hold a copy of a Participation: 0
+Nothing was changed. Run again with --apply to persist.
+```
+
+- **Times that are not a date.** A flat time whose value is something other than a BSON date (a string, a document) cannot be turned into an event without guessing, so it is listed with its Participation and place (`Phases[0].PresentTime`) and the type it has. `--apply` refuses to run while this list is not empty, prints it, writes nothing and exits with 1.
+- **Rankings and Handouts that still hold a copy of a Participation.** `migrate-participation-copies` has not run, or has not run on them. This command runs after it (ADR-0005), so `--apply` refuses for this too, like it does for a time that is not a date.
+
+### The cutover
+
+The order of the migrations and the steps of the cutover are owned by the runbook of [#648](https://github.com/Not-Endurance/not-timing-system/issues/648); this is what concerns this command.
+
+1. Stop the legacy hosts, the Functions API and the Api. The command reads every Participation first and replaces the changed ones afterwards, so a write by another process in between would be overwritten, and the code that is deployed reads only the new shape.
+2. Take a backup. Rollback is a restore of it; there is no way back from the new shape other than that.
+3. Run `migrate-participation-copies --apply`, then this command with `--apply`, then the other data migrations of the runbook. Review each dry run before its apply.
+4. Deploy the Api and the Ui together, and follow the runbook of #648 for old Judge builds, which are not supported afterwards.
+
+Staging first, rehearsed on a restored copy of production data. There is no lazy upgrade and no dual-read: a Participation in the old shape that reaches the new code loads with no times, and the next write of it loses them for good, which is why the code is never deployed before this command has run.
 
 ## seed-tenant-root and grant-developer
 
