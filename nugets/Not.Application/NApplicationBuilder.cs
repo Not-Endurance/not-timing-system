@@ -26,6 +26,8 @@ public class NApplicationBuilder
     {
         _services.AddHttpClient();
         _services.AddTransient<NHttpClient>();
+        _services.AddTransient<JsonApiClient>();
+        _services.AddOptions<JsonApiSettings>();
         _services.AddSettings(_configuration, x => !string.IsNullOrWhiteSpace(x.Url), configure);
         return this;
     }

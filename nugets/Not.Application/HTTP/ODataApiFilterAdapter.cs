@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Text.Json;
 
 namespace Not.Application.HTTP;
 
@@ -8,9 +9,16 @@ public static class ODataApiFilterAdapter
 {
     const string FILTER_QUERY = "$filter";
 
-    public static IReadOnlyDictionary<string, string> ParseFilters<T>(IEnumerable<Expression<Func<T, bool>>> filters)
+    /// <summary>
+    /// The OData query the filters stand for, <c>$filter</c> and nothing else. The members are written as the type names
+    /// them, or in camelCase as a JSON:API resource does (ADR-0008), and a filter that cannot be written is refused.
+    /// </summary>
+    public static IReadOnlyDictionary<string, string> ParseFilters<T>(
+        IEnumerable<Expression<Func<T, bool>>> filters,
+        bool camelCase = false
+    )
     {
-        if (TryParseFilters(filters, out var queryParameters))
+        if (TryParseFilters(filters, out var queryParameters, camelCase))
         {
             return queryParameters;
         }
@@ -20,13 +28,15 @@ public static class ODataApiFilterAdapter
 
     public static bool TryParseFilters<T>(
         IEnumerable<Expression<Func<T, bool>>> filters,
-        out IReadOnlyDictionary<string, string> queryParameters
+        out IReadOnlyDictionary<string, string> queryParameters,
+        bool camelCase = false
     )
     {
+        Func<string, string> naming = camelCase ? CamelCase : Unchanged;
         var oDataFilters = new List<string>();
         foreach (var filter in filters)
         {
-            if (!TryCreateFilter(filter, out var oDataFilter))
+            if (!TryCreateFilter(filter, naming, out var oDataFilter))
             {
                 queryParameters = new Dictionary<string, string>();
                 return false;
@@ -46,9 +56,33 @@ public static class ODataApiFilterAdapter
         return true;
     }
 
-    static bool TryCreateFilter<T>(Expression<Func<T, bool>> filter, out string oDataFilter)
+    /// <summary>
+    /// Whether the member is an enum. The server does not take an enum literal from this adapter, so such a filter is not
+    /// written and the repository filters what it reads by itself, which is right and slower, not wrong.
+    /// </summary>
+    static bool IsEnum(Expression expression)
     {
-        if (TryCreateFilter(filter.Body, out oDataFilter))
+        var type = StripConversion(expression).Type;
+        return (Nullable.GetUnderlyingType(type) ?? type).IsEnum;
+    }
+
+    static string CamelCase(string name)
+    {
+        return JsonNamingPolicy.CamelCase.ConvertName(name);
+    }
+
+    static string Unchanged(string name)
+    {
+        return name;
+    }
+
+    static bool TryCreateFilter<T>(
+        Expression<Func<T, bool>> filter,
+        Func<string, string> naming,
+        out string oDataFilter
+    )
+    {
+        if (TryCreateFilter(filter.Body, naming, out oDataFilter))
         {
             return true;
         }
@@ -69,12 +103,15 @@ public static class ODataApiFilterAdapter
         return string.Join(" and ", values);
     }
 
-    static bool TryCreateFilter(Expression expression, out string oDataFilter)
+    static bool TryCreateFilter(Expression expression, Func<string, string> naming, out string oDataFilter)
     {
         expression = StripConversion(expression);
         if (expression is BinaryExpression { NodeType: ExpressionType.AndAlso or ExpressionType.And } binary)
         {
-            if (TryCreateFilter(binary.Left, out var left) && TryCreateFilter(binary.Right, out var right))
+            if (
+                TryCreateFilter(binary.Left, naming, out var left)
+                && TryCreateFilter(binary.Right, naming, out var right)
+            )
             {
                 oDataFilter = CombineInlineFilterValues([left, right]);
                 return true;
@@ -92,18 +129,36 @@ public static class ODataApiFilterAdapter
 
         if (expression is BinaryExpression comparison && TryGetOperator(comparison.NodeType, out var oDataOperator))
         {
-            return TryCreateComparison(comparison.Left, comparison.Right, oDataOperator, out oDataFilter)
+            return TryCreateComparison(comparison.Left, comparison.Right, oDataOperator, naming, out oDataFilter)
                 || TryCreateComparison(
                     comparison.Right,
                     comparison.Left,
                     ReverseOperator(oDataOperator),
+                    naming,
                     out oDataFilter
                 );
         }
 
+        // A member that is a boolean is a condition by itself, and so is the negation of one.
+        if (expression.Type == typeof(bool) && TryGetPropertyName(expression, naming, out var flag))
+        {
+            oDataFilter = $"{flag} eq true";
+            return true;
+        }
+
+        if (
+            expression is UnaryExpression { NodeType: ExpressionType.Not } negation
+            && negation.Operand.Type == typeof(bool)
+            && TryGetPropertyName(negation.Operand, naming, out var negated)
+        )
+        {
+            oDataFilter = $"{negated} eq false";
+            return true;
+        }
+
         if (expression is MethodCallExpression call)
         {
-            return TryCreateContains(call, out oDataFilter);
+            return TryCreateContains(call, naming, out oDataFilter);
         }
 
         oDataFilter = "";
@@ -114,10 +169,11 @@ public static class ODataApiFilterAdapter
         Expression propertyExpression,
         Expression valueExpression,
         string oDataOperator,
+        Func<string, string> naming,
         out string oDataFilter
     )
     {
-        if (!TryGetPropertyName(propertyExpression, out var propertyName))
+        if (!TryGetPropertyName(propertyExpression, naming, out var propertyName) || IsEnum(propertyExpression))
         {
             oDataFilter = "";
             return false;
@@ -133,11 +189,12 @@ public static class ODataApiFilterAdapter
         return true;
     }
 
-    static bool TryCreateContains(MethodCallExpression call, out string oDataFilter)
+    static bool TryCreateContains(MethodCallExpression call, Func<string, string> naming, out string oDataFilter)
     {
         if (
             !TryGetContainsArguments(call, out var valuesExpression, out var propertyExpression)
-            || !TryGetPropertyName(propertyExpression, out var propertyName)
+            || !TryGetPropertyName(propertyExpression, naming, out var propertyName)
+            || IsEnum(propertyExpression)
             || !TryEvaluate(valuesExpression, out var values)
             || values is string
             || values is not IEnumerable enumerable
@@ -186,7 +243,7 @@ public static class ODataApiFilterAdapter
         return false;
     }
 
-    static bool TryGetPropertyName(Expression expression, out string propertyName)
+    static bool TryGetPropertyName(Expression expression, Func<string, string> naming, out string propertyName)
     {
         expression = StripConversion(expression);
         if (
@@ -195,7 +252,7 @@ public static class ODataApiFilterAdapter
             && StripConversion(member.Expression) is ParameterExpression
         )
         {
-            propertyName = member.Member.Name;
+            propertyName = naming(member.Member.Name);
             return true;
         }
 
