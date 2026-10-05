@@ -483,8 +483,8 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
             Guid.NewGuid(),
             startTime: START
         );
-        participation.Process(IntegrationPayloadFactory.AutomaticSnapshot(number, arrive));
-        participation.Process(IntegrationPayloadFactory.AutomaticSnapshot(number, arrive.AddMinutes(10)));
+        participation.Process(IntegrationPayloadFactory.ArriveSnapshot(number, arrive));
+        participation.Process(IntegrationPayloadFactory.PresentSnapshot(number, arrive.AddMinutes(10)));
         return participation;
     }
 

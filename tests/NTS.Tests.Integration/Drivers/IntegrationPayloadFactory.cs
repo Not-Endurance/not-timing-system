@@ -197,14 +197,14 @@ internal static class IntegrationPayloadFactory
         return new Handout(participation.EventId, participation.Id, id ?? TestId.Of(801));
     }
 
-    public static Snapshot AutomaticSnapshot(int participationNumber, DateTimeOffset timestamp)
+    public static Snapshot ArriveSnapshot(int participationNumber, DateTimeOffset timestamp)
     {
-        return new Snapshot(
-            participationNumber,
-            SnapshotType.Automatic,
-            SnapshotMethod.Manual,
-            new Timestamp(timestamp)
-        );
+        return new Snapshot(participationNumber, SnapshotType.Arrive, SnapshotMethod.Manual, new Timestamp(timestamp));
+    }
+
+    public static Snapshot PresentSnapshot(int participationNumber, DateTimeOffset timestamp)
+    {
+        return new Snapshot(participationNumber, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(timestamp));
     }
 
     /// <summary>

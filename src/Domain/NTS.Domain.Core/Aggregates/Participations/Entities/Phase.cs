@@ -68,7 +68,6 @@ public class Phase : Entity
             SnapshotType.Present => Inspect(snapshot, eventId),
             SnapshotType.Arrive => Arrive(snapshot, eventId),
             SnapshotType.Final => Finish(snapshot, eventId),
-            SnapshotType.Automatic => Automatic(snapshot, eventId),
             _ => GuardUnknownSnapshot(snapshot),
         };
         static SnapshotResult GuardUnknownSnapshot(Snapshot snapshot)
@@ -254,23 +253,6 @@ public class Phase : Entity
             return false;
         }
         return true;
-    }
-
-    SnapshotResult Automatic(Snapshot snapshot, Guid eventId)
-    {
-        if (ArriveTime == null && IsFinal)
-        {
-            return Finish(snapshot, eventId);
-        }
-        if (ArriveTime == null)
-        {
-            return Arrive(snapshot, eventId);
-        }
-        if (PresentTime == null || RepresentTime == null && IsReinspectionRequested)
-        {
-            return Inspect(snapshot, eventId);
-        }
-        return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToInapplicableAutomatic);
     }
 
     SnapshotResult Finish(Snapshot snapshot, Guid eventId)

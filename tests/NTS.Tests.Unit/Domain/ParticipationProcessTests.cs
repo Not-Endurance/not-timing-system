@@ -1,3 +1,4 @@
+using Not.Exceptions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -104,6 +105,19 @@ public sealed class ParticipationProcessTests
 
         Assert.Equal(SnapshotResultType.Applied, result.Type);
         Assert.IsType<Withdrawn>(participation.Eliminated);
+    }
+
+    [Fact]
+    public void Process_refuses_a_snapshot_of_a_type_that_does_not_exist_such_as_the_untyped_one_that_was_removed()
+    {
+        var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
+        var participation = CreateParticipation(start);
+        const SnapshotType removedUntypedSnapshot = (SnapshotType)4;
+        var untyped = new Snapshot(1, removedUntypedSnapshot, SnapshotMethod.Manual, new Timestamp(start.AddHours(1)));
+
+        Assert.Throws<GuardException>(() => participation.Process(untyped));
+
+        Assert.Null(participation.Phases[0].ArriveTime);
     }
 
     [Fact]

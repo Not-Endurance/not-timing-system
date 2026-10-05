@@ -120,22 +120,6 @@ public sealed class ParticipationPlacementTests
     }
 
     [Fact]
-    public void An_untyped_snapshot_is_placed_by_the_same_comparison_until_it_is_removed()
-    {
-        var before = AfterPhaseOne();
-        var after = AfterPhaseOne();
-
-        var inPhaseOne = before.Process(Untyped(OUT.AddMinutes(-1)));
-        var inPhaseTwo = after.Process(Untyped(OUT));
-
-        Assert.Equal(SnapshotResultType.NotAppliedDueToInapplicableAutomatic, inPhaseOne.Type);
-        Assert.Null(before.Phases[1].ArriveTime);
-        Assert.Equal(SnapshotResultType.Applied, inPhaseTwo.Type);
-        Assert.Equal(OUT, after.Phases[1].ArriveTime!.ToDateTimeOffset());
-        Assert.Equal(TestId.Of(2), after.Phases.Current.Id);
-    }
-
-    [Fact]
     public void A_complete_final_phase_rejects_every_snapshot_as_participation_complete()
     {
         var participation = Ride(CreatePhase(START, ARRIVE, PRESENT, isFinal: true, id: TestId.Of(1)));
@@ -308,11 +292,6 @@ public sealed class ParticipationPlacementTests
     static Snapshot Present(DateTimeOffset time)
     {
         return new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(time));
-    }
-
-    static Snapshot Untyped(DateTimeOffset time)
-    {
-        return new Snapshot(1, SnapshotType.Automatic, SnapshotMethod.Manual, new Timestamp(time));
     }
 
     static Participation Ride(params Phase[] phases)

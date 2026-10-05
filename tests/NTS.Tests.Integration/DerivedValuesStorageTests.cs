@@ -38,7 +38,7 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
 
         AssertNothingDerivedIsStored(await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id));
 
-        participation.Process(IntegrationPayloadFactory.AutomaticSnapshot(1, START.AddHours(2).AddMinutes(30)));
+        participation.Process(IntegrationPayloadFactory.ArriveSnapshot(1, START.AddHours(2).AddMinutes(30)));
         await FunctionsRequests.Send(
             _fixture.FunctionsBaseUrl,
             HttpMethod.Patch,
@@ -86,8 +86,8 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
     static Participation PresentedInTheFirstPhase(Guid eventId, Guid id)
     {
         var participation = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 1, id, startTime: START);
-        participation.Process(IntegrationPayloadFactory.AutomaticSnapshot(1, START.AddHours(1)));
-        participation.Process(IntegrationPayloadFactory.AutomaticSnapshot(1, START.AddHours(1).AddMinutes(10)));
+        participation.Process(IntegrationPayloadFactory.ArriveSnapshot(1, START.AddHours(1)));
+        participation.Process(IntegrationPayloadFactory.PresentSnapshot(1, START.AddHours(1).AddMinutes(10)));
         return participation;
     }
 

@@ -118,7 +118,7 @@ public sealed partial class IntegrationHarnessCheckTest
         );
 
         await console.Record(
-            IntegrationPayloadFactory.AutomaticSnapshot(arrivelistParticipationNumber, arrivelistStart.AddHours(2))
+            IntegrationPayloadFactory.ArriveSnapshot(arrivelistParticipationNumber, arrivelistStart.AddHours(2))
         );
         await WaitForArrivelist(
             officialArrivelist,
@@ -127,10 +127,10 @@ public sealed partial class IntegrationHarnessCheckTest
         );
 
         await console.Record(
-            IntegrationPayloadFactory.AutomaticSnapshot(participationNumber, DateTimeOffset.UtcNow.Date.AddHours(10))
+            IntegrationPayloadFactory.ArriveSnapshot(participationNumber, DateTimeOffset.UtcNow.Date.AddHours(10))
         );
         await console.Record(
-            IntegrationPayloadFactory.AutomaticSnapshot(
+            IntegrationPayloadFactory.PresentSnapshot(
                 participationNumber,
                 DateTimeOffset.UtcNow.Date.AddHours(10).AddMinutes(5)
             )
@@ -250,8 +250,8 @@ public sealed partial class IntegrationHarnessCheckTest
 
         var firstArrival = start.AddMinutes(30);
         var firstPresentation = firstArrival.AddMinutes(5);
-        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, firstArrival));
-        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, firstPresentation));
+        await console.Record(IntegrationPayloadFactory.ArriveSnapshot(selectedNumber, firstArrival));
+        await console.Record(IntegrationPayloadFactory.PresentSnapshot(selectedNumber, firstPresentation));
 
         Assert.Equal(selectedId, context.Selected?.Id);
         var nonFinalHandouts = await WaitForHandouts(
@@ -264,8 +264,8 @@ public sealed partial class IntegrationHarnessCheckTest
 
         var finalArrival = firstPresentation.AddMinutes(75);
         var finalPresentation = finalArrival.AddMinutes(5);
-        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, finalArrival));
-        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(selectedNumber, finalPresentation));
+        await console.Record(IntegrationPayloadFactory.ArriveSnapshot(selectedNumber, finalArrival));
+        await console.Record(IntegrationPayloadFactory.PresentSnapshot(selectedNumber, finalPresentation));
 
         Assert.Equal(selectedId, context.Selected?.Id);
         await api.WaitForParticipation(
@@ -380,7 +380,7 @@ public sealed partial class IntegrationHarnessCheckTest
         await officialPresentlist.Load();
         await registeredPresentlist.Load();
 
-        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(presentNumber, baseTime));
+        await console.Record(IntegrationPayloadFactory.ArriveSnapshot(presentNumber, baseTime));
         var presentEntry = await WaitForPresentlistEntry(
             officialPresentlist,
             presentNumber,
@@ -477,8 +477,8 @@ public sealed partial class IntegrationHarnessCheckTest
         TimeSpan recovery
     )
     {
-        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(number, arrival));
-        await console.Record(IntegrationPayloadFactory.AutomaticSnapshot(number, arrival.Add(recovery)));
+        await console.Record(IntegrationPayloadFactory.ArriveSnapshot(number, arrival));
+        await console.Record(IntegrationPayloadFactory.PresentSnapshot(number, arrival.Add(recovery)));
     }
 
     static async Task SelectJudgeParticipation(ConsoleDriver console, int number)
@@ -945,7 +945,7 @@ public sealed partial class IntegrationHarnessCheckTest
     {
         return new SnapshotGroup(
             [new WitnessSnapshot(1, "Operator Rider", "Operator Rider", new Timestamp(DateTimeOffset.UtcNow))],
-            SnapshotType.Automatic
+            SnapshotType.Arrive
         );
     }
 }
