@@ -228,6 +228,15 @@ public sealed class AccessPolicyTests
     [InlineData(Who.MainOperator, Capability.LinkAccounts, EventStage.Historic, Refusal.EventEnded)]
     [InlineData(Who.Steward, Capability.SendSnapshot, EventStage.Unstarted, Refusal.EventNotStarted)]
     [InlineData(Who.Steward, Capability.SendSnapshot, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.SomeAccount, Capability.EditSetup, EventStage.Unstarted, Refusal.NotMainOperator)]
+    [InlineData(Who.TenantRoot, Capability.EditSetup, EventStage.Unstarted, Refusal.NotMainOperator)]
+    [InlineData(Who.Developer, Capability.EditSetup, EventStage.Live, Refusal.NotMainOperator)]
+    [InlineData(Who.MainOperator, Capability.EditSetup, EventStage.Live, Refusal.EventStarted)]
+    [InlineData(Who.MainOperator, Capability.EditSetup, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.Anonymous, Capability.ReadSetup, EventStage.Unstarted, Refusal.NotSignedIn)]
+    [InlineData(Who.SomeAccount, Capability.ReadSetup, EventStage.Unstarted, Refusal.NotAllowed)]
+    [InlineData(Who.Steward, Capability.ReadSetup, EventStage.Live, Refusal.NotAllowed)]
+    [InlineData(Who.TenantRootOfAnotherTenant, Capability.ReadSetup, EventStage.Historic, Refusal.NotAllowed)]
     public void A_refusal_says_what_is_missing_the_role_before_the_stage(
         Who who,
         Capability capability,
@@ -269,6 +278,8 @@ public sealed class AccessPolicyTests
     [InlineData(Who.TenantRoot, Capability.GrantDeveloper, Refusal.NotDeveloper)]
     [InlineData(Who.Anonymous, Capability.ReadRegistryAcrossTenants, Refusal.NotSignedIn)]
     [InlineData(Who.SomeAccount, Capability.SearchAccountsAcrossTenants, Refusal.NotAllowed)]
+    [InlineData(Who.TenantRoot, Capability.EditCountries, Refusal.NotDeveloper)]
+    [InlineData(Who.Anonymous, Capability.EditCountries, Refusal.NotSignedIn)]
     public void A_refusal_of_an_action_of_the_platform_says_what_is_missing(
         Who who,
         Capability capability,
@@ -380,6 +391,8 @@ public sealed class AccessPolicyTests
             Capability.SeeTimeEvents,
             Capability.SendSnapshot,
             Capability.ConfigureEvent,
+            Capability.EditSetup,
+            Capability.ReadSetup,
             Capability.AssignMainOperator,
             Capability.HandOverMainOperator,
             Capability.LinkAccounts,
@@ -441,6 +454,13 @@ public sealed class AccessPolicyTests
             // "Configure an Event and use the Console: The Main Operator".
             [(Capability.ConfigureEvent, EventStage.Unstarted)] = [Who.MainOperator, Who.Developer],
             [(Capability.ConfigureEvent, EventStage.Live)] = [Who.MainOperator],
+            // The Setup is what the Event is configured with before it starts: the Main Operator edits it until the Event
+            // starts and then the Console works on the copies in the Core, so a started Event's Setup is changed by nobody.
+            [(Capability.EditSetup, EventStage.Unstarted)] = [Who.MainOperator, Who.Developer],
+            // Reading a Setup is for the people who run the Event and the Tenant that holds it, at every stage.
+            [(Capability.ReadSetup, EventStage.Unstarted)] = [Who.MainOperator, Who.TenantRoot, Who.Developer],
+            [(Capability.ReadSetup, EventStage.Live)] = [Who.MainOperator, Who.TenantRoot, Who.Developer],
+            [(Capability.ReadSetup, EventStage.Historic)] = [Who.MainOperator, Who.TenantRoot, Who.Developer],
             // "Assign the Main Operator: The Tenant Root while the Event is not [yet] Live; once Live, only the Main Operator
             // hands it over".
             [(Capability.AssignMainOperator, EventStage.Unstarted)] = [Who.TenantRoot, Who.Developer],
@@ -497,6 +517,8 @@ public sealed class AccessPolicyTests
             // "Seed a Tenant Root, grant Developer: The Developer, by command".
             [Capability.SeedTenantRoot] = [Who.Developer],
             [Capability.GrantDeveloper] = [Who.Developer],
+            // The countries are the platform's reference data, which the owner of the platform keeps.
+            [Capability.EditCountries] = [Who.Developer],
         };
     }
 

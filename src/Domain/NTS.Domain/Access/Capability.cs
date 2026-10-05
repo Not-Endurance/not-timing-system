@@ -65,4 +65,17 @@ public enum Capability
 
     /// <summary>Grant Developer: the Developer, by command and never through a route.</summary>
     GrantDeveloper = 19,
+
+    /// <summary>
+    /// Edit the Setup of an Event that has not started: the Main Operator. The Setup is what the Event is configured
+    /// with until it starts and is not edited after (the Console works on the copies the Event made of it), so this is
+    /// narrower than configuring the Event, which the Main Operator does while it is Live too.
+    /// </summary>
+    EditSetup = 20,
+
+    /// <summary>Read the Setup of an Event: the Main Operator, and a Tenant Root of the Tenant that holds it.</summary>
+    ReadSetup = 21,
+
+    /// <summary>Edit the countries, the platform's reference data: the Developer.</summary>
+    EditCountries = 22,
 }

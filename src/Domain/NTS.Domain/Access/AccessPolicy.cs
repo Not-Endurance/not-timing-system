@@ -84,6 +84,13 @@ public static class AccessPolicy
                 scope,
                 BEFORE_THE_END
             ),
+            Capability.EditSetup => Check(isMainOperator || developerMayAct, Refusal.NotMainOperator, scope, UNSTARTED),
+            Capability.ReadSetup => Check(
+                isMainOperator || isTenantRoot || caller.IsDeveloper,
+                Refusal.NotAllowed,
+                scope,
+                ANY_STAGE
+            ),
             Capability.AssignMainOperator or Capability.DeleteEvent => Check(
                 isTenantRoot || caller.IsDeveloper,
                 Refusal.NotTenantRoot,
@@ -130,7 +137,10 @@ public static class AccessPolicy
                 caller.TenantRootIn.Count > 0 || caller.OpenMainOperatorIn.Count > 0 || caller.IsDeveloper,
                 Refusal.NotAllowed
             ),
-            Capability.SeedTenantRoot or Capability.GrantDeveloper => Role(caller.IsDeveloper, Refusal.NotDeveloper),
+            Capability.SeedTenantRoot or Capability.GrantDeveloper or Capability.EditCountries => Role(
+                caller.IsDeveloper,
+                Refusal.NotDeveloper
+            ),
             _ => throw NotAnActionOf(capability, ScopeKind.Platform),
         };
     }
@@ -198,6 +208,8 @@ public static class AccessPolicy
             Capability.SeeTimeEvents
             or Capability.SendSnapshot
             or Capability.ConfigureEvent
+            or Capability.EditSetup
+            or Capability.ReadSetup
             or Capability.AssignMainOperator
             or Capability.HandOverMainOperator
             or Capability.LinkAccounts
