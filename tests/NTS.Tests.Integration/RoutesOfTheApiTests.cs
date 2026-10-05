@@ -84,6 +84,10 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             $"/api/countries/{country}",
             "/api/configure-events",
             $"/api/configure-events/{live}",
+            "/api/events",
+            "/api/events/live",
+            "/api/events/historic",
+            $"/api/events/{live}",
             "/api/me",
             "/api/me/profile",
             "/api/passkeys",
@@ -149,6 +153,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "DELETE api/clubs/{id}",
             "DELETE api/configure-events/{id}",
             "DELETE api/event-grants/{id}",
+            "DELETE api/events/{id}",
             "DELETE api/horses/{id}",
             "DELETE api/passkeys/{id}",
             "DELETE api/sessions/current",
@@ -157,6 +162,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "PATCH api/clubs/{id}",
             "PATCH api/configure-events/{id}",
             "PATCH api/countries/{id}",
+            "PATCH api/events/{id}",
             "PATCH api/horses/{id}",
             "PATCH api/me",
             "PATCH api/me/profile",
@@ -169,6 +175,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "POST api/configure-events",
             "POST api/countries",
             "POST api/event-grants",
+            "POST api/events",
             "POST api/events/{id}/actions/assign-main-operator",
             "POST api/events/{id}/actions/hand-over",
             "POST api/horses",
@@ -181,7 +188,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
         ];
     }
 
-    /// <summary>Every route of the Api that reads, but the Ui, the hub and the ones that are public.</summary>
+    /// <summary>Every route of the Api that reads, the public views of the Events included, but the Ui and the hub.</summary>
     static string[] Reads()
     {
         return
@@ -199,6 +206,10 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "GET api/countries",
             "GET api/countries/{id}",
             "GET api/event-grants",
+            "GET api/events",
+            "GET api/events/historic",
+            "GET api/events/live",
+            "GET api/events/{id}",
             "GET api/events/{id}/capabilities",
             "GET api/horses",
             "GET api/horses/all-tenants",

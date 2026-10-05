@@ -123,6 +123,15 @@ internal sealed class UserSessionStore
         return deleted.DeletedCount > 0;
     }
 
+    /// <summary>
+    /// Removes what every person kept for the Event, as a reset of the Event does: the state is a part of the Event that
+    /// has stopped being there.
+    /// </summary>
+    public async Task DeleteOfEventAsync(Guid eventId, CancellationToken cancellationToken)
+    {
+        await _records.DeleteManyAsync(Builders<BsonDocument>.Filter.Eq("EventId", Binary(eventId)), cancellationToken);
+    }
+
     static FilterDefinition<BsonDocument> OwnedBy(string owner)
     {
         return Builders<BsonDocument>.Filter.Eq("UserIdentifier", owner);

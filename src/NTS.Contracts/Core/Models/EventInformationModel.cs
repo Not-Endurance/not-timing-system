@@ -8,7 +8,7 @@ using NTS.Domain.Core.Objects;
 
 namespace NTS.Contracts.Core.Models;
 
-public class EventInformationModel : IIdentifiable, ISoftDeletableDocument, IKrudModel<EventInformation>
+public class EventInformationModel : IDocument, ISoftDeletableDocument, IKrudModel<EventInformation>
 {
     public static EventInformationModel From(EventInformation eventInformation)
     {

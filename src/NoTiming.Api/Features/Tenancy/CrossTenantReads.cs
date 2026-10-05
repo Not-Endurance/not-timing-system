@@ -1,8 +1,12 @@
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Not.Identity;
+using NoTiming.Api.Features.Reference;
+using NTS.Contracts.Core.Models;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 
@@ -133,6 +137,44 @@ internal sealed class CrossTenantReads
                 ? new DateTimeOffset(end.ToUniversalTime(), TimeSpan.Zero)
                 : null
         );
+    }
+
+    /// <summary>
+    /// The Events that have started, of every Tenant, as the public views show them (ADR-0012: a Tenant organises data and
+    /// does not wall it off, and anybody may read an Event): the ones that are Live at the instant, the ones that are
+    /// Historic, or all, filtered and sorted as the options say. The caller says what it shows of each.
+    /// </summary>
+    public async Task<IReadOnlyList<EventInformationModel>> ReadPublicEventsAsync(
+        EventStage? stage,
+        DateTimeOffset now,
+        ODataQueryOptions<EventInformationModel>? options,
+        int skip,
+        int take,
+        CancellationToken cancellationToken
+    )
+    {
+        IQueryable<EventInformationModel> events = _database
+            .GetCollection<EventInformationModel>(TenantOwned.EVENT_INFORMATIONS)
+            .AsQueryable();
+        if (stage == EventStage.Live)
+        {
+            events = events.Where(x => x.EndDay > now);
+        }
+        else if (stage == EventStage.Historic)
+        {
+            events = events.Where(x => x.EndDay <= now);
+        }
+
+        return await ReferencePages.ReadAsync(events, options, skip, take, cancellationToken);
+    }
+
+    /// <summary>A started Event by its id, whatever Tenant it is in, as the public views show it; none when it has not started.</summary>
+    public async Task<EventInformationModel?> FindPublicEventAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _database
+            .GetCollection<EventInformationModel>(TenantOwned.EVENT_INFORMATIONS)
+            .Find(x => x.Id == id)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <summary>

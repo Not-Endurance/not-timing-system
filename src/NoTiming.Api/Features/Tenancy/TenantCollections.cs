@@ -19,6 +19,23 @@ internal static class TenantOwned
     public const string CONFIGURE_EVENTS = "configure_events";
     public const string EVENT_INFORMATIONS = "event_informations";
     public const string EVENT_GRANTS = "event_grants";
+    public const string EVENT_OFFICIALS = "event_officials";
+    public const string EVENT_OPERATORS = "event_operators";
+    public const string EVENT_PARTICIPATIONS = "event_participations";
+    public const string EVENT_RANKINGS = "event_rankings";
+    public const string EVENT_HANDOUTS = "event_handouts";
+    public const string EVENT_SNAPSHOT_RESULTS = "event-snapshotResults";
+
+    /// <summary>What an Event makes when it starts and keeps while it runs: its documents, each with the id of the Event.</summary>
+    public static IReadOnlyList<string> OfAnEvent { get; } =
+        [
+            EVENT_OFFICIALS,
+            EVENT_OPERATORS,
+            EVENT_PARTICIPATIONS,
+            EVENT_RANKINGS,
+            EVENT_HANDOUTS,
+            EVENT_SNAPSHOT_RESULTS,
+        ];
 
     public static IReadOnlyList<string> Collections { get; } =
         [
@@ -27,12 +44,12 @@ internal static class TenantOwned
             "clubs",
             CONFIGURE_EVENTS,
             EVENT_INFORMATIONS,
-            "event_officials",
-            "event_operators",
-            "event_participations",
-            "event_rankings",
-            "event_handouts",
-            "event-snapshotResults",
+            EVENT_OFFICIALS,
+            EVENT_OPERATORS,
+            EVENT_PARTICIPATIONS,
+            EVENT_RANKINGS,
+            EVENT_HANDOUTS,
+            EVENT_SNAPSHOT_RESULTS,
             EVENT_GRANTS,
         ];
 }
@@ -200,6 +217,26 @@ internal sealed class TenantCollection
         Required();
         var result = await _documents.DeleteOneAsync(Scoped(filter), cancellationToken);
         return result.DeletedCount > 0;
+    }
+
+    /// <summary>Inserts the documents, each stamped with the Tenant; the documents of an Event that starts are made so.</summary>
+    public async Task InsertManyAsync(IReadOnlyCollection<BsonDocument> documents, CancellationToken cancellationToken)
+    {
+        var tenant = Required();
+        if (documents.Count == 0)
+        {
+            return;
+        }
+
+        var stamped = documents
+            .Select(x =>
+            {
+                var copy = x.DeepClone().AsBsonDocument;
+                copy[TenantOwned.TENANT_ID] = tenant;
+                return copy;
+            })
+            .ToList();
+        await _documents.InsertManyAsync(stamped, cancellationToken: cancellationToken);
     }
 
     /// <summary>Removes every one of the Tenant's documents the filter finds; how many there were.</summary>

@@ -1,5 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
+using NoTiming.Api.Features.Reference;
+using NTS.Contracts.Setup.Models;
 
 namespace NTS.Tests.Integration.Infrastructure;
 
@@ -11,6 +13,17 @@ namespace NTS.Tests.Integration.Infrastructure;
 /// </summary>
 internal static class EventSeed
 {
+    /// <summary>The collections whose documents belong to an Event and to its Tenant.</summary>
+    public static readonly string[] EVENT_COLLECTIONS =
+    [
+        "event_officials",
+        "event_operators",
+        "event_participations",
+        "event_rankings",
+        "event_handouts",
+        "event-snapshotResults",
+    ];
+
     public static IMongoCollection<BsonDocument> Setups(string mongoConnectionString)
     {
         return Collection(mongoConnectionString, "configure_events");
@@ -36,15 +49,16 @@ internal static class EventSeed
         string mongoConnectionString,
         string tenant,
         Guid? mainOperator,
-        string? name = null
+        string? name = null,
+        Guid? id = null
     )
     {
-        var id = Guid.NewGuid();
+        id ??= Guid.NewGuid();
         var document = new BsonDocument
         {
-            { "_id", Binary(id) },
+            { "_id", Binary(id.Value) },
             { "TenantId", tenant },
-            { "Name", name ?? "Event " + id.ToString("N")[..6] },
+            { "Name", name ?? "Event " + id.Value.ToString("N")[..6] },
             { "Location", "Sofia" },
             { "Country", RegistrySeed.CountryOf("Bulgaria", "BG") },
             { "Competitions", new BsonArray() },
@@ -59,7 +73,60 @@ internal static class EventSeed
         }
 
         await Setups(mongoConnectionString).InsertOneAsync(document);
+        return id.Value;
+    }
+
+    /// <summary>
+    /// An Event that has not started with a Setup that can: a competition of three phases with a combination in it, an
+    /// Official and an Operator, and the FEI configuration complete (<see cref="SetupFactory.Full"/>).
+    /// </summary>
+    public static async Task<Guid> FullSetupAsync(
+        string mongoConnectionString,
+        string tenant,
+        Guid? mainOperator,
+        string name = "Full Setup"
+    )
+    {
+        ApiMongo.Configure();
+        var id = Guid.NewGuid();
+        var model = ConfigureEventModel.From(SetupFactory.Full(id, name));
+        model.TenantId = tenant;
+        model.MainOperatorId = mainOperator;
+        await Setups(mongoConnectionString).InsertOneAsync(model.ToBsonDocument());
         return id;
+    }
+
+    /// <summary>How many documents of the collection an Event has: what it made when it started.</summary>
+    public static async Task<long> CountOfAsync(string mongoConnectionString, string collection, Guid eventId)
+    {
+        return await Collection(mongoConnectionString, collection)
+            .CountDocumentsAsync(new BsonDocument("EventId", Binary(eventId)));
+    }
+
+    /// <summary>
+    /// One document of everything an Event keeps beside its Core document, and the state of a person and a pending
+    /// Snapshot of it, so that a test can tell that all of it goes when the Event is reset.
+    /// </summary>
+    public static async Task KeepsAsync(string mongoConnectionString, string tenant, Guid eventId)
+    {
+        foreach (var collection in EVENT_COLLECTIONS)
+        {
+            await Collection(mongoConnectionString, collection)
+                .InsertOneAsync(
+                    new BsonDocument
+                    {
+                        { "_id", Binary(Guid.NewGuid()) },
+                        { "TenantId", tenant },
+                        { "EventId", Binary(eventId) },
+                    }
+                );
+        }
+
+        foreach (var collection in new[] { "event_user_sessions", "event_pending_snapshots" })
+        {
+            await Collection(mongoConnectionString, collection)
+                .InsertOneAsync(new BsonDocument { { "_id", Binary(Guid.NewGuid()) }, { "EventId", Binary(eventId) } });
+        }
     }
 
     /// <summary>An Event that has started: the Core document of it, which ends at the instant given.</summary>
@@ -77,6 +144,7 @@ internal static class EventSeed
             { "TenantId", tenant },
             { "Name", "Event " + id.ToString("N")[..6] },
             { "Location", "Sofia" },
+            { "Country", RegistrySeed.CountryOf("Bulgaria", "BG") },
             { "StartDay", new BsonDateTime(end.AddDays(-1).UtcDateTime) },
             { "EndDay", new BsonDateTime(end.UtcDateTime) },
             { "IsActive", true },

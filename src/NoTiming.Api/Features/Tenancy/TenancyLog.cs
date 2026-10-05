@@ -4,9 +4,9 @@ using NTS.Domain.Objects;
 namespace NoTiming.Api.Features.Tenancy;
 
 /// <summary>
-/// The events that change who may do what (#643, ADR-0012), each with an id and a name that stay as they are, so that a
-/// dashboard or an alert can key off them whatever the wording of a message becomes. They are the 11xx range, next to the
-/// 10xx of signing in (<c>AuthEvents</c>).
+/// The events that change who may do what, and the Events that start and reset (#643, #628, ADR-0012), each with an id
+/// and a name that stay as they are, so that a dashboard or an alert can key off them whatever the wording of a message
+/// becomes. They are the 11xx range, next to the 10xx of signing in (<c>AuthEvents</c>).
 /// </summary>
 internal static class TenancyEvents
 {
@@ -19,6 +19,8 @@ internal static class TenancyEvents
     public static readonly EventId INVITATIONS_ATTACHED = new(1107, "InvitationsAttached");
     public static readonly EventId INVITATIONS_NOT_ATTACHED = new(1108, "InvitationsNotAttached");
     public static readonly EventId EVENT_DELETED = new(1109, "EventDeleted");
+    public static readonly EventId EVENT_STARTED = new(1110, "EventStarted");
+    public static readonly EventId EVENT_RESET = new(1111, "EventReset");
 }
 
 /// <summary>
@@ -52,6 +54,28 @@ internal sealed class TenancyLog
         _logger.LogInformation(
             TenancyEvents.EVENT_DELETED,
             "User {UserId} deleted Event {EventId} of Tenant {TenantId}.",
+            user,
+            eventId,
+            tenantId
+        );
+    }
+
+    public void EventStarted(Guid user, Guid eventId, string tenantId)
+    {
+        _logger.LogInformation(
+            TenancyEvents.EVENT_STARTED,
+            "User {UserId} started Event {EventId} of Tenant {TenantId}.",
+            user,
+            eventId,
+            tenantId
+        );
+    }
+
+    public void EventReset(Guid user, Guid eventId, string tenantId)
+    {
+        _logger.LogInformation(
+            TenancyEvents.EVENT_RESET,
+            "User {UserId} reset Event {EventId} of Tenant {TenantId}.",
             user,
             eventId,
             tenantId

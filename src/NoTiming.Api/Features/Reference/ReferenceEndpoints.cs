@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
+using MongoDB.Driver.Linq;
 using Not.Domain.Abstractions;
 using Not.Exceptions;
 using Not.Identity;
@@ -250,6 +251,33 @@ internal static class ReferenceEndpoints
             : null;
     }
 
+    /// <summary>
+    /// Reads a page of a list. An expression that is valid in the OData grammar and that the data cannot run, such as the
+    /// date parts of a date (<c>year(endDay)</c>), is for the caller to correct: 400 <c>invalid-filter</c>, and not a
+    /// server error.
+    /// </summary>
+    public static async Task<(IReadOnlyList<T>? Rows, IResult? Refusal)> ReadPageAsync<T>(
+        Func<Task<IReadOnlyList<T>>> read
+    )
+    {
+        try
+        {
+            return (await read(), null);
+        }
+        catch (ExpressionNotSupportedException)
+        {
+            return (
+                null,
+                JsonApiResults.Error(
+                    StatusCodes.Status400BadRequest,
+                    "invalid-filter",
+                    "The filter cannot be applied.",
+                    "The expression is valid, but the data cannot run it: write the comparison on the member itself."
+                )
+            );
+        }
+    }
+
     public static object Links<T>(HttpRequest request, ReferenceQuery<T> query, bool hasNext)
         where T : class
     {
@@ -278,14 +306,19 @@ internal static class ReferenceEndpoints
             return query.Refusal;
         }
 
-        var rows = await access
-            .Open(family, user)
-            .ReadAsync(query.Options, query.Skip, query.Take, context.RequestAborted);
-        var page = rows.Take(query.Size).ToList();
+        var (rows, unsupported) = await ReadPageAsync(
+            () => access.Open(family, user).ReadAsync(query.Options, query.Skip, query.Take, context.RequestAborted)
+        );
+        if (unsupported != null)
+        {
+            return unsupported;
+        }
+
+        var page = rows!.Take(query.Size).ToList();
         return JsonApiResults.Collection(
             family.Route,
             page.Select(x => (x.Id.ToString(), (object)family.Members.AttributesOf(x))),
-            links: Links(context.Request, query, rows.Count > query.Size),
+            links: Links(context.Request, query, rows!.Count > query.Size),
             meta: new { page = new { size = query.Size, number = query.Number } }
         );
     }

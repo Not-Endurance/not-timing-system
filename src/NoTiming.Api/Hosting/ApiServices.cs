@@ -6,6 +6,7 @@ using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
+using NTS;
 using NTS.Application.Cors;
 
 namespace NoTiming.Api.Hosting;
@@ -21,6 +22,10 @@ internal static class ApiServices
     )
     {
         var originValidator = services.AddNtsCorsOriginValidation(configuration);
+
+        // The texts of the domain (what is missing of a Setup that cannot start, say) come from the resources of the
+        // application, which have to be there for them to be text and not the name of the resource.
+        services.AddNts(configuration);
 
         services.AddCors(options =>
             options.AddPolicy(
@@ -42,6 +47,7 @@ internal static class ApiServices
         services.AddSingleton<TenantCollections>();
         services.AddSingleton<CrossTenantReads>();
         services.AddSingleton<EventStore>();
+        services.AddSingleton<EventStarter>();
         services.AddSingleton<EventGrantStore>();
         services.AddSingleton<GrantInvitations>();
         services.AddHostedService<TenancyIndexes>();

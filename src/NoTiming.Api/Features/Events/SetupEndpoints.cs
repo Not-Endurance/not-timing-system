@@ -62,16 +62,24 @@ internal static class SetupEndpoints
         var caller = AccountRoles.CallerOf(user);
         var all = caller.IsDeveloper || (tenantId != null && caller.TenantRootIn.Contains(tenantId));
         Guid[]? running = all ? null : [.. await events.RunByAsync(tenantId, user.Id, context.RequestAborted)];
-        var rows = await tenants
-            .Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId)
-            .ReadAsync(
-                running == null ? null : x => running.Contains(x.Id),
-                query.Options,
-                query.Skip,
-                query.Take,
-                context.RequestAborted
-            );
-        var page = rows.Take(query.Size).ToList();
+        var (rows, unsupported) = await ReferenceEndpoints.ReadPageAsync(
+            () =>
+                tenants
+                    .Of<ConfigureEventModel>(TenantOwned.CONFIGURE_EVENTS, tenantId)
+                    .ReadAsync(
+                        running == null ? null : x => running.Contains(x.Id),
+                        query.Options,
+                        query.Skip,
+                        query.Take,
+                        context.RequestAborted
+                    )
+        );
+        if (unsupported != null)
+        {
+            return unsupported;
+        }
+
+        var page = rows!.Take(query.Size).ToList();
 
         // An Event that has started has the Main Operator its Core says, which a hand-over changes.
         var started = await events.StartedOperatorsAsync(tenantId, [.. page.Select(x => x.Id)], context.RequestAborted);
@@ -83,7 +91,7 @@ internal static class SetupEndpoints
         return JsonApiResults.Collection(
             CONFIGURE_EVENTS,
             page.Select(x => (x.Id.ToString(), (object)Members.AttributesOf(x))),
-            links: ReferenceEndpoints.Links(context.Request, query, rows.Count > query.Size),
+            links: ReferenceEndpoints.Links(context.Request, query, rows!.Count > query.Size),
             meta: new { page = new { size = query.Size, number = query.Number } }
         );
     }

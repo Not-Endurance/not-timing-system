@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Localization;
+using Not.Localization;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.Events;
@@ -15,6 +17,7 @@ internal static class ApiPipeline
     public static WebApplication UseNoTimingApi(this WebApplication app)
     {
         BindAzurePort(app);
+        LocalizationHelper.Configure(app.Services.GetRequiredService<IStringLocalizer>());
 
         if (!app.Environment.IsDevelopment())
         {
@@ -54,6 +57,7 @@ internal static class ApiPipeline
         app.MapProfile();
         app.MapTenancy();
         app.MapEvents();
+        app.MapEventResources();
         app.MapSetups();
         app.MapEventGrants();
         app.MapAccountSearch();

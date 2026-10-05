@@ -9,15 +9,15 @@ using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// What changes who may do what is logged (#643, ADR-0012): an Event made or deleted, its Main Operator assigned or handed
-/// over, a grant made or removed, the invitations that attached to an account, the rules of a Tenant edited. Each is an event with an id and
+/// What changes who may do what is logged (#643, ADR-0012), and so are the Events that start and reset (#628): an Event
+/// made, deleted, started or reset, its Main Operator assigned or handed over, a grant made or removed, the invitations that attached to an account, the rules of a Tenant edited. Each is an event with an id and
 /// a name that stay as they are, carries the user who did it and the ids of what it was done to, and carries no email, no
 /// name and nothing an account keeps: the log is the one place that is read by people who are not meant to read those.
 /// </summary>
 public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
 {
     const int FIRST_TENANCY_EVENT = 1101;
-    const int LAST_TENANCY_EVENT = 1109;
+    const int LAST_TENANCY_EVENT = 1111;
 
     readonly MongoFixture _mongo;
 
@@ -100,6 +100,9 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         );
         var doomed = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, colleague.Id, "Doomed Ride");
         await root.Page.DeleteAsync($"/api/configure-events/{doomed}");
+        var fullSetup = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, colleague.Id);
+        await colleague.Page.WriteAsync(HttpMethod.Post, "/api/events", "events", new { }, id: fullSetup.ToString());
+        await colleague.Page.DeleteAsync($"/api/events/{fullSetup}");
         await RegisterAsync(api, invited);
 
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
@@ -136,6 +139,13 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         var edited = Assert.Single(capture.Of("TenantRulesEdited"));
         Assert.Contains(tenant, edited.Message);
         Assert.Contains(root.Id.ToString(), edited.Message);
+        var started = Assert.Single(capture.Of("EventStarted"));
+        Assert.Contains(fullSetup.ToString(), started.Message);
+        Assert.Contains(tenant, started.Message);
+        Assert.Contains(colleague.Id.ToString(), started.Message);
+        var reset = Assert.Single(capture.Of("EventReset"));
+        Assert.Contains(fullSetup.ToString(), reset.Message);
+        Assert.Contains(colleague.Id.ToString(), reset.Message);
         var deleted = Assert.Single(capture.Of("EventDeleted"));
         Assert.Contains(doomed.ToString(), deleted.Message);
         Assert.Contains(tenant, deleted.Message);
@@ -146,7 +156,7 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
             .Entries.Where(x => x.EventId.Id is >= FIRST_TENANCY_EVENT and <= LAST_TENANCY_EVENT)
             .Select(x => x.Message)
             .ToList();
-        Assert.Equal(9, ofTenancy.Count);
+        Assert.Equal(11, ofTenancy.Count);
         foreach (
             var personal in new[] { worker.Email, invited, root.Email, colleague.Email, "Rositsa", "Kolyo", "Vasil" }
         )
@@ -189,6 +199,14 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, root.Id);
         var refusedDelete = await member.Page.DeleteAsync($"/api/configure-events/{unstarted}");
         var startedDelete = await root.Page.DeleteAsync($"/api/configure-events/{live}");
+        var refusedStart = await member.Page.WriteAsync(
+            HttpMethod.Post,
+            "/api/events",
+            "events",
+            new { },
+            id: unstarted.ToString()
+        );
+        var refusedReset = await member.Page.DeleteAsync($"/api/events/{live}");
         var refusedGrant = await LinkAsync(member);
         var first = await LinkAsync(root);
         var again = await LinkAsync(root);
@@ -202,12 +220,16 @@ public sealed class TenancyEventLogTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, refusedDelete.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, startedDelete.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, refusedStart.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, refusedReset.StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, refusedGrant.StatusCode);
         Assert.Equal(HttpStatusCode.Created, first.StatusCode);
         Assert.Equal(HttpStatusCode.OK, again.StatusCode);
         Assert.Equal(HttpStatusCode.OK, sameRules.StatusCode);
         Assert.Empty(capture.Of("EventHandedOver"));
         Assert.Empty(capture.Of("EventDeleted"));
+        Assert.Empty(capture.Of("EventStarted"));
+        Assert.Empty(capture.Of("EventReset"));
         Assert.Single(capture.Of("GrantLinked"));
         Assert.Empty(capture.Of("TenantRulesEdited"));
     }

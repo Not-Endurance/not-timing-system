@@ -55,6 +55,10 @@ internal static class PublicEndpoints
         return
         [
             new PublicEndpoint(EndpointAccess.PublicRead, "GET", "healthz"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/live"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/historic"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/{id}"),
             new PublicEndpoint(EndpointAccess.PublicRead, "GET,HEAD", "{**path:nonfile}"), // the Ui
             new PublicEndpoint(EndpointAccess.PublicRead, "*", ApplicationConstants.LIVE_HUB),
             new PublicEndpoint(EndpointAccess.PublicRead, "*", ApplicationConstants.LIVE_HUB + "/negotiate"),

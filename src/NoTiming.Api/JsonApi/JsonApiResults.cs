@@ -57,13 +57,14 @@ internal static class JsonApiResults
     /// <summary>
     /// The members of a collection: each is a resource of the type, 200 with an empty list when there are none. A
     /// collection that is paged says where it is and where the next page is in its <c>links</c>, and which page it is in
-    /// its <c>meta</c>.
+    /// its <c>meta</c>. A named collection gives each item a <c>self</c> link to where the item is canonically.
     /// </summary>
     public static IResult Collection(
         string type,
         IEnumerable<(string Id, object Attributes)> items,
         object? links = null,
-        object? meta = null
+        object? meta = null,
+        Func<string, string>? itemLink = null
     )
     {
         return Results.Json(
@@ -74,6 +75,7 @@ internal static class JsonApiResults
                     type,
                     id = item.Id,
                     attributes = item.Attributes,
+                    links = itemLink == null ? null : new { self = itemLink(item.Id) },
                 }),
                 links,
                 meta,
