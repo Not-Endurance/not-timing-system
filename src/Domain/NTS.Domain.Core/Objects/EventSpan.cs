@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using NTS.Domain.Access;
 
 namespace NTS.Domain.Core.Objects;
 
@@ -13,9 +14,13 @@ public record EventSpan
     public DateTimeOffset StartDay { get; }
     public DateTimeOffset EndDay { get; }
 
-    public bool IsActive(DateTimeOffset now)
+    /// <summary>
+    /// Whether an Event with this span is Live at the instant: until the end of its last day, and Historic from that second
+    /// on, with no grace (ADR-0007). It is the rule of <see cref="EventStageRule"/>, so the Api and the domain cannot differ.
+    /// </summary>
+    public bool IsLive(DateTimeOffset now)
     {
-        return now < EndDay;
+        return EventStageRule.Of(true, EndDay, now) == EventStage.Live;
     }
 
     public override string ToString()

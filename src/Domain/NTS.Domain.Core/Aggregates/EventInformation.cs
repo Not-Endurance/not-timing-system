@@ -52,6 +52,12 @@ public class EventInformation : Aggregate
     /// </summary>
     public RegionalRules RegionalRules { get; }
 
+    /// <summary>Whether the Event is Live at the instant: a rule of its span and a clock, and never a stored flag (ADR-0007).</summary>
+    public bool IsLive(DateTimeOffset now)
+    {
+        return EventSpan.IsLive(now);
+    }
+
     public override string ToString()
     {
         return $"{Name} {Location} {Country} {EventSpan}";
