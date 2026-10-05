@@ -68,7 +68,7 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
         Assert.Equal(LegacyDocuments.Uuid(seeded.SecondRanking), differing.DocumentId);
         Assert.Equal("Entries[0]", differing.Where);
         Assert.Equal(LegacyDocuments.Uuid(seeded.Fourth.Id), differing.ParticipationId);
-        Assert.Equal(["Phases[0].PresentTime"], differing.Fields); // the copy was taken before it was presented
+        Assert.Equal(["Phases[0].Events"], differing.Fields); // the copy was taken before it was presented
     }
 
     [Fact]
@@ -483,8 +483,12 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
             Guid.NewGuid(),
             startTime: START
         );
-        participation.Process(IntegrationPayloadFactory.ArriveSnapshot(number, arrive));
-        participation.Process(IntegrationPayloadFactory.PresentSnapshot(number, arrive.AddMinutes(10)));
+        participation.Process(IntegrationPayloadFactory.ArriveSnapshot(number, arrive), TestId.Of(9), arrive);
+        participation.Process(
+            IntegrationPayloadFactory.PresentSnapshot(number, arrive.AddMinutes(10)),
+            TestId.Of(9),
+            arrive.AddMinutes(10)
+        );
         return participation;
     }
 
@@ -569,7 +573,7 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
 
         var seeded = new SeededEvent(eventId, participations, copies);
         var staleFourth = seeded.Copy(seeded.Fourth).DeepClone().AsBsonDocument;
-        staleFourth["Phases"].AsBsonArray[0].AsBsonDocument.Remove("PresentTime");
+        staleFourth["Phases"].AsBsonArray[0].AsBsonDocument["Events"].AsBsonArray.RemoveAt(1); // the Present event
         await _stored.Insert(
             RANKINGS,
             LegacyDocuments.Ranking(

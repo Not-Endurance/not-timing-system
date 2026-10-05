@@ -1,14 +1,14 @@
 ﻿using Not.Domain.Exceptions;
 using NTS.Domain.Aggregates;
-using static NTS.Domain.Core.Aggregates.SnapshotResultType;
+using static NTS.Domain.Core.Aggregates.Participations.Entities.TimeEventOutcome;
 
 namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 public class Phase : Entity
 {
-    // TODO: settings - Add setting for separate final. This is useful for some events such as Shumen where we need separate detection for the actual final
-    bool _isSeparateFinish = false;
+    readonly List<TimeEvent> _events;
 
+    /// <summary>A Phase made with times: each of them is an accepted event of the manual method.</summary>
     public Phase(
         string gate,
         double length,
@@ -26,6 +26,37 @@ public class Phase : Entity
         bool isRequiredInspectionCompulsory,
         Guid? id = null
     )
+        : this(
+            gate,
+            length,
+            maxRecovery,
+            rest,
+            ruleset,
+            isFinal,
+            compulsoryThresholdSpan,
+            startTime,
+            EventsOfTimes(arriveTime, presentTime, representTime),
+            isRepresentationRequested,
+            isRequiredInspectionRequested,
+            isRequiredInspectionCompulsory,
+            id
+        ) { }
+
+    public Phase(
+        string gate,
+        double length,
+        int maxRecovery,
+        int? rest,
+        CompetitionRuleset ruleset,
+        bool isFinal,
+        TimeSpan? compulsoryThresholdSpan,
+        Timestamp? startTime,
+        IEnumerable<TimeEvent> events,
+        bool isRepresentationRequested,
+        bool isRequiredInspectionRequested,
+        bool isRequiredInspectionCompulsory,
+        Guid? id = null
+    )
         : base(id)
     {
         Gate = gate;
@@ -35,16 +66,18 @@ public class Phase : Entity
         Ruleset = ruleset;
         IsFinal = isFinal;
         StartTime = startTime;
-        ArriveTime = arriveTime;
-        PresentTime = presentTime;
-        RepresentTime = representTime;
-        IsReinspectionRequested = isRepresentationRequested;
+        _events = events.ToList();
+        Events = _events.AsReadOnly();
+        IsRepresentRequested = isRepresentationRequested;
         IsRequiredInspectionRequested = isRequiredInspectionRequested;
         IsRequiredInspectionCompulsory = isRequiredInspectionCompulsory;
         CompulsoryThresholdSpan = compulsoryThresholdSpan;
     }
 
     Timestamp? VetTime => RepresentTime ?? PresentTime;
+
+    // TODO: settings - Add setting for separate final. This is useful for some events such as Shumen where we need separate detection for the actual final
+    internal bool IsSeparateFinish { get; set; }
 
     public string Gate { get; private set; }
     public double Length { get; }
@@ -53,31 +86,46 @@ public class Phase : Entity
     public CompetitionRuleset Ruleset { get; }
     public bool IsFinal { get; }
     public Timestamp? StartTime { get; internal set; } // TODO: does it have to be nullable?
-    public Timestamp? ArriveTime { get; private set; }
-    public Timestamp? PresentTime { get; private set; }
-    public Timestamp? RepresentTime { get; private set; }
-    public bool IsReinspectionRequested { get; internal set; } // TODO: rename to IsRepresentRequested
+
+    /// <summary>Every time the Phase received, accepted or not, in the order they were recorded.</summary>
+    public IReadOnlyList<TimeEvent> Events { get; }
+
+    // The times are the latest accepted event that feeds each of them (ADR-0005)
+    public Timestamp? ArriveTime => Shown(TimeSlot.Arrive);
+    public Timestamp? PresentTime => Shown(TimeSlot.Present);
+    public Timestamp? RepresentTime => Shown(TimeSlot.Represent);
+    public bool IsRepresentRequested { get; internal set; }
     public bool IsRequiredInspectionRequested { get; internal set; }
     public bool IsRequiredInspectionCompulsory { get; private set; }
     public TimeSpan? CompulsoryThresholdSpan { get; private set; }
 
-    internal SnapshotResult Process(Snapshot snapshot, Guid eventId)
+    /// <summary>
+    /// Records the Snapshot as a time event with the outcome that applies, whether it sets a time or not, and returns it. A
+    /// time that cannot be set is rejected, and nothing is thrown for it.
+    /// </summary>
+    internal TimeEvent Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
     {
-        return snapshot.Type switch
+        TimeEvent recorded = snapshot.Type switch
         {
-            SnapshotType.Present => Inspect(snapshot, eventId),
-            SnapshotType.Arrive => Arrive(snapshot, eventId),
-            SnapshotType.Final => Finish(snapshot, eventId),
+            SnapshotType.Present => Present(snapshot, actorId, recordedAt),
+            SnapshotType.Arrive or SnapshotType.Final => Arrive(snapshot, actorId, recordedAt),
             _ => GuardUnknownSnapshot(snapshot),
         };
-        static SnapshotResult GuardUnknownSnapshot(Snapshot snapshot)
+        _events.Add(recorded);
+        if (recorded.IsAccepted)
+        {
+            CheckCompulsoryThreshold();
+        }
+        return recorded;
+        static TimeEvent GuardUnknownSnapshot(Snapshot snapshot)
         {
             var message = $"Invalid snapshot '{snapshot.GetType()}'";
             throw GuardHelper.Exception(message);
         }
     }
 
-    internal void Update(IPhaseState state)
+    /// <summary>The state of the Phase form: each time that differs from the one the Phase shows becomes an accepted event.</summary>
+    internal void Update(IPhaseState state, Guid actorId, DateTimeOffset recordedAt)
     {
         if (state.StartTime != null)
         {
@@ -119,9 +167,9 @@ public class Phase : Entity
             }
         }
         StartTime = Timestamp.Create(state.StartTime);
-        ArriveTime = Timestamp.Create(state.ArriveTime);
-        PresentTime = Timestamp.Create(state.PresentTime);
-        RepresentTime = Timestamp.Create(state.RepresentTime);
+        Change(TimeSlot.Arrive, state.ArriveTime, actorId, recordedAt);
+        Change(TimeSlot.Present, state.PresentTime, actorId, recordedAt);
+        Change(TimeSlot.Represent, state.RepresentTime, actorId, recordedAt);
         CheckCompulsoryThreshold();
     }
 
@@ -140,7 +188,7 @@ public class Phase : Entity
         {
             throw new DomainException(Required_inspection_is_compulsory_string);
         }
-        if (IsReinspectionRequested && RepresentTime == null)
+        if (IsRepresentRequested && RepresentTime == null)
         {
             throw new DomainException(Cannot_request_Required_Inspection_without_Representation_time_string);
         }
@@ -153,12 +201,12 @@ public class Phase : Entity
         {
             throw new DomainException(Cannot_require_representation_without_presentation_time);
         }
-        IsReinspectionRequested = true;
+        IsRepresentRequested = true;
     }
 
     internal void DisableRepresentation()
     {
-        if (!IsReinspectionRequested)
+        if (!IsRepresentRequested)
         {
             return;
         }
@@ -168,7 +216,7 @@ public class Phase : Entity
                 Cannot_disable_Reinspection_because_time_of_Reinspection_is_already_present_string
             );
         }
-        IsReinspectionRequested = false;
+        IsRepresentRequested = false;
     }
 
     internal void SetGate(int number, double totalDistanceSoFar)
@@ -244,7 +292,7 @@ public class Phase : Entity
 
     public bool IsComplete()
     {
-        if (IsReinspectionRequested && RepresentTime == null)
+        if (IsRepresentRequested && RepresentTime == null)
         {
             return false;
         }
@@ -255,71 +303,132 @@ public class Phase : Entity
         return true;
     }
 
-    SnapshotResult Finish(Snapshot snapshot, Guid eventId)
+    static IEnumerable<TimeEvent> EventsOfTimes(Timestamp? arriveTime, Timestamp? presentTime, Timestamp? representTime)
     {
-        if (_isSeparateFinish && !IsFinal)
+        (TimeSlot Slot, Timestamp? Time)[] times =
+        [
+            (TimeSlot.Arrive, arriveTime),
+            (TimeSlot.Present, presentTime),
+            (TimeSlot.Represent, representTime),
+        ];
+        return times.Where(x => x.Time != null).Select(x => Manual(x.Slot, x.Time!, null, null));
+    }
+
+    static bool Feeds(TimeSlot slot, TimeEvent timeEvent)
+    {
+        return slot switch
         {
-            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToSeparateStageLine);
+            TimeSlot.Arrive => timeEvent is Arrived,
+            TimeSlot.Present => timeEvent is Presented { IsRepresent: false },
+            _ => timeEvent is Presented { IsRepresent: true },
+        };
+    }
+
+    /// <summary>An accepted event of the manual method, as the Phase form and a Phase made with times make it.</summary>
+    static TimeEvent Manual(TimeSlot slot, Timestamp time, DateTimeOffset? recordedAt, Guid? actorId)
+    {
+        return slot == TimeSlot.Arrive
+            ? new Arrived(time, Accepted, SnapshotMethod.Manual, recordedAt, actorId)
+            : new Presented(time, slot == TimeSlot.Represent, Accepted, SnapshotMethod.Manual, recordedAt, actorId);
+    }
+
+    Arrived Arrive(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
+    {
+        var outcome = OutcomeOfArrive(snapshot.Timestamp, SeparateLineOutcome(snapshot.Type));
+        return new Arrived(snapshot.Timestamp, outcome, snapshot.Method, recordedAt, actorId);
+    }
+
+    Presented Present(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
+    {
+        var slot = IsRepresentRequested ? TimeSlot.Represent : TimeSlot.Present;
+        var outcome = OutcomeOfPresent(slot, snapshot.Timestamp);
+        return new Presented(
+            snapshot.Timestamp,
+            slot == TimeSlot.Represent,
+            outcome,
+            snapshot.Method,
+            recordedAt,
+            actorId
+        );
+    }
+
+    /// <summary>When the finish line is separate, the final Phase is arrived at by a final Snapshot and no other Phase is.</summary>
+    TimeEventOutcome SeparateLineOutcome(SnapshotType type)
+    {
+        if (!IsSeparateFinish)
+        {
+            return Accepted;
+        }
+        if (type == SnapshotType.Final)
+        {
+            return IsFinal ? Accepted : RejectedSeparateStageLine;
+        }
+        return IsFinal ? RejectedSeparateFinishLine : Accepted;
+    }
+
+    TimeEventOutcome OutcomeOfArrive(Timestamp time, TimeEventOutcome line)
+    {
+        if (IsFinal && IsComplete())
+        {
+            return RejectedParticipationComplete;
+        }
+        if (line != Accepted)
+        {
+            return line;
         }
         if (ArriveTime != null)
         {
-            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToDuplicateArrive);
+            return RejectedDuplicateArrive;
         }
-        if (snapshot.Timestamp < StartTime)
-        {
-            throw new DomainException(__cannot_be_sooner_than__string, Arrival_string, StartTime);
-        }
-
-        ArriveTime = snapshot.Timestamp;
-        CheckCompulsoryThreshold();
-        return SnapshotResult.Applied(eventId, snapshot);
+        return IsInOrder(TimeSlot.Arrive, time) ? Accepted : RejectedInvalidTime;
     }
 
-    SnapshotResult Arrive(Snapshot snapshot, Guid eventId)
+    TimeEventOutcome OutcomeOfPresent(TimeSlot slot, Timestamp time)
     {
-        if (_isSeparateFinish && IsFinal)
+        if (IsFinal && IsComplete())
         {
-            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToSeparateFinishLine);
+            return RejectedParticipationComplete;
         }
-        if (ArriveTime != null)
+        if (IsRepresentRequested && RepresentTime != null && PresentTime != null)
         {
-            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToDuplicateArrive);
+            return RejectedDuplicatePresent;
         }
-        if (snapshot.Timestamp < StartTime)
-        {
-            throw new DomainException(__cannot_be_sooner_than__string, Arrival_string, StartTime);
-        }
-
-        ArriveTime = snapshot.Timestamp;
-        CheckCompulsoryThreshold();
-        return SnapshotResult.Applied(eventId, snapshot);
+        return IsInOrder(slot, time) ? Accepted : RejectedInvalidTime;
     }
 
-    SnapshotResult Inspect(Snapshot snapshot, Guid eventId)
+    /// <summary>
+    /// Start ≤ Arrive &lt; Presentation &lt; Representation, checked only among the times that exist: the time is in order when it
+    /// does not fall short of the nearest time before it, nor reach the nearest one after it.
+    /// </summary>
+    bool IsInOrder(TimeSlot slot, Timestamp time)
     {
-        if (IsReinspectionRequested && RepresentTime != null && PresentTime != null)
+        return slot switch
         {
-            return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToDuplicateInspect);
-        }
-        if (snapshot.Timestamp <= ArriveTime)
-        {
-            throw new DomainException(__cannot_be_sooner_than__string, Presentation_string, ArriveTime);
-        }
+            TimeSlot.Arrive => !(time < StartTime) && !(time >= (PresentTime ?? RepresentTime)),
+            TimeSlot.Present => !(time <= (ArriveTime ?? StartTime)) && !(time >= RepresentTime),
+            _ => !(time <= (PresentTime ?? ArriveTime ?? StartTime)),
+        };
+    }
 
-        if (IsReinspectionRequested)
+    Timestamp? Shown(TimeSlot slot)
+    {
+        return _events.LastOrDefault(x => x.IsAccepted && Feeds(slot, x))?.Time;
+    }
+
+    /// <summary>A time that differs from the one shown is an accepted event; one that is cleared rejects the events that feed it.</summary>
+    void Change(TimeSlot slot, DateTimeOffset? changed, Guid actorId, DateTimeOffset recordedAt)
+    {
+        var time = Timestamp.Create(changed);
+        if (time == Shown(slot))
         {
-            if (snapshot.Timestamp <= PresentTime)
-            {
-                throw new DomainException(__cannot_be_sooner_than__string, Representation_string, PresentTime);
-            }
-            RepresentTime = snapshot.Timestamp;
+            return;
         }
-        else
+        if (time == null)
         {
-            PresentTime = snapshot.Timestamp;
+            _events.Where(x => x.IsAccepted && Feeds(slot, x)).ToList().ForEach(x => x.RejectManually());
+            return;
         }
-        CheckCompulsoryThreshold();
-        return SnapshotResult.Applied(eventId, snapshot);
+        _events.Add(Manual(slot, time, recordedAt, actorId));
     }
 
     void CheckCompulsoryThreshold()
@@ -329,6 +438,13 @@ public class Phase : Entity
             return;
         }
         IsRequiredInspectionCompulsory = GetRecoveryInterval() >= CompulsoryThresholdSpan;
+    }
+
+    enum TimeSlot
+    {
+        Arrive,
+        Present,
+        Represent,
     }
 }
 

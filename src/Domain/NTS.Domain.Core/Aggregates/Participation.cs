@@ -4,7 +4,6 @@ using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
-using static NTS.Domain.Core.Aggregates.SnapshotResultType;
 
 namespace NTS.Domain.Core.Aggregates;
 
@@ -65,17 +64,29 @@ public class Participation : Aggregate, IEventScoped
 
     //TODO rename to smthing better (including ISnapshotProcessor, IManualProcessor and other mentions..)
     /// <summary>
-    /// Places the Snapshot in a Phase by its time (see <see cref="PhaseAt"/>) and applies it there, once. A Snapshot stamped at
-    /// or after the Start of the next Phase belongs to that Phase and makes it the current one.
+    /// Places the Snapshot in a Phase by its time (see <see cref="PhaseAt"/>) and records it there as a time event, once,
+    /// whatever its outcome: a time that cannot be set is recorded as rejected and nothing is thrown. A Snapshot stamped at or
+    /// after the Start of the next Phase belongs to that Phase, and when it is accepted that Phase becomes the current one.
     /// </summary>
-    public SnapshotResult Process(Snapshot snapshot)
+    /// <param name="snapshot">The time that was captured.</param>
+    /// <param name="actorId">The signed-in user that recorded it.</param>
+    /// <param name="recordedAt">The instant the server recorded it.</param>
+    public TimeEvent Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
     {
-        var result = Phases.Process(snapshot, EventId);
-        if (Eliminated == null && result.Type == Applied)
+        var phase = Phases.PhaseAt(snapshot.Timestamp);
+        var outBefore = phase.GetOutTime();
+        var recorded = phase.Process(snapshot, actorId, recordedAt);
+        if (!recorded.IsAccepted)
         {
-            EvaluatePhase(Phases.Current);
+            return recorded;
         }
-        return result;
+
+        Phases.Select(phase);
+        if (Eliminated == null)
+        {
+            Reevaluate(phase, outBefore);
+        }
+        return recorded;
     }
 
     /// <summary>
@@ -93,13 +104,15 @@ public class Participation : Aggregate, IEventScoped
         return Phases.PhaseAt(new Timestamp(time));
     }
 
-    public void Update(IPhaseState state)
+    /// <summary>The Phase form: each time of the Phase that the state changes is recorded as an accepted time event.</summary>
+    public void Update(IPhaseState state, Guid actorId, DateTimeOffset recordedAt)
     {
         var phase = Phases.FirstOrDefault(x => x.Id == state.Id);
         GuardHelper.ThrowIfDefault(phase);
 
-        phase.Update(state);
-        EvaluatePhase(phase);
+        var outBefore = phase.GetOutTime();
+        phase.Update(state, actorId, recordedAt);
+        Reevaluate(phase, outBefore);
     }
 
     /// <summary>
@@ -175,11 +188,16 @@ public class Participation : Aggregate, IEventScoped
         }
 
         var completed = Phases.Current;
-        Phases.StartIfNext();
+        Phases.StartNextAfter(completed);
         Raise(Completed(completed));
     }
 
-    void EvaluatePhase(Phase phase)
+    /// <summary>
+    /// What follows from a Phase's accepted change, whichever way it was made and whether or not the Phase is the current one:
+    /// eliminated for time when the recovery is over the limit, or restored when it no longer is, the Phase after it starting
+    /// when it is out, in place when its Out time moved, and the completion announced once when the Phase is complete.
+    /// </summary>
+    void Reevaluate(Phase phase, Timestamp? outBefore)
     {
         if (phase.ViolatesRecoveryTime())
         {
@@ -188,18 +206,17 @@ public class Participation : Aggregate, IEventScoped
         }
         if (Eliminated == OUT_OF_TIME || Eliminated == SPEED_RESTRICTION)
         {
-            Restore();
+            Eliminated = null;
         }
         if (!phase.IsComplete())
         {
             return;
         }
-        if (!ReferenceEquals(phase, Phases.Current))
-        {
-            return;
-        }
 
-        Phases.StartIfNext();
+        if (phase.GetOutTime() != outBefore)
+        {
+            Phases.StartNextAfter(phase);
+        }
         Raise(Completed(phase));
     }
 

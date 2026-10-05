@@ -203,10 +203,7 @@ public sealed partial class IntegrationHarnessCheckTest
         await snapshots.Load();
         Assert.DoesNotContain(snapshots.Participations, x => x.Combination.Number == participationNumber);
 
-        var persistedSnapshotResults = await api.ReadSnapshotResults(eventId);
-
         Assert.True(persistedParticipation.Phases.Current.IsComplete());
-        Assert.Equal(3, persistedSnapshotResults.Count);
     }
 
     [Fact]

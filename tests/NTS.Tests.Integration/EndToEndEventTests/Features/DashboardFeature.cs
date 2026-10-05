@@ -314,7 +314,7 @@ internal sealed class DashboardFeature
 
     async Task ApplyRequestedRepresentation(EndToEndPhaseSnapshot entry)
     {
-        if (!entry.Phase.IsReinspectionRequested)
+        if (!entry.Phase.IsRepresentRequested)
         {
             return;
         }
@@ -325,7 +325,7 @@ internal sealed class DashboardFeature
             _api,
             _eventInformation.Id,
             entry.Number,
-            participation => participation.Phases[entry.PhaseIndex].IsReinspectionRequested,
+            participation => participation.Phases[entry.PhaseIndex].IsRepresentRequested,
             $"requested representation for #{entry.Number} phase {entry.PhaseNumber}"
         );
     }
@@ -429,7 +429,7 @@ internal sealed class DashboardFeature
                 entry.RepresentTime == null
                 || CoreAssertions.SameTimeOfDay(phase.RepresentTime, entry.RepresentTime.Value)
             )
-            && phase.IsReinspectionRequested == entry.Phase.IsReinspectionRequested
+            && phase.IsRepresentRequested == entry.Phase.IsRepresentRequested
             && phase.IsRequiredInspectionRequested == entry.Phase.IsRequiredInspectionRequested
             && phase.IsRequiredInspectionCompulsory == entry.Phase.IsRequiredInspectionCompulsory;
     }

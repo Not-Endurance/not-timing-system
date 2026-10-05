@@ -21,7 +21,6 @@ internal static class EventSeed
         "event_participations",
         "event_rankings",
         "event_handouts",
-        "event-snapshotResults",
     ];
 
     public static IMongoCollection<BsonDocument> Setups(string mongoConnectionString)

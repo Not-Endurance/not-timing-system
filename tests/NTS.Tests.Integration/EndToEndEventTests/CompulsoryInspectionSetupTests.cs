@@ -70,7 +70,9 @@ public sealed class CompulsoryInspectionSetupTests
                     phaseStart.AddHours(1),
                     phaseStart.AddHours(1).AddMinutes(5),
                     null
-                )
+                ),
+                Guid.NewGuid(),
+                DateTimeOffset.UtcNow
             );
         Assert.True(participations[0].Phases[1].IsRequiredInspectionRequested);
         Assert.True(participations[0].Phases[1].IsRequiredInspectionCompulsory);

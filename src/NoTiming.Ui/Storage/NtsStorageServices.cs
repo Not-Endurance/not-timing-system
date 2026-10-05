@@ -62,7 +62,6 @@ public static class NtsStorageServices
             AddEventScopedRepository<Official, OfficialEventScopedApiRepository>();
             AddEventScopedRepository<Operator, OperatorEventScopedApiRepository>();
             AddEventScopedRepository<Handout, HandoutEventScopedApiRepository>();
-            AddEventScopedRepository<SnapshotResult, SnapshotResultEventScopedApiRepository>();
             return this;
         }
 

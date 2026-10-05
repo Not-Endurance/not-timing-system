@@ -41,43 +41,15 @@ public class PhaseCollection : ReadOnlyCollection<Phase>
         Current = phase;
     }
 
-    /// <summary>
-    /// Places the Snapshot in a Phase once and applies it there. A complete final Phase takes nothing more. The Phase
-    /// that applied it is the current one afterwards.
-    /// </summary>
-    internal SnapshotResult Process(Snapshot snapshot, Guid eventId)
+    /// <summary>The Phase after a complete one starts when it is out.</summary>
+    internal void StartNextAfter(Phase phase)
     {
-        var phase = PhaseAt(snapshot.Timestamp);
-        if (phase.IsFinal && phase.IsComplete())
-        {
-            return SnapshotResult.NotApplied(
-                eventId,
-                snapshot,
-                SnapshotResultType.NotAppliedDueToParticipationComplete
-            );
-        }
-
-        var result = phase.Process(snapshot, eventId);
-        if (result.Type == SnapshotResultType.Applied)
-        {
-            Select(phase);
-        }
-
-        return result;
-    }
-
-    internal void StartIfNext()
-    {
-        if (!Current.IsComplete())
-        {
-            throw GuardHelper.Exception("Cannot start next phase while current is active");
-        }
-        if (IsLast())
+        var index = IndexOf(phase);
+        if (index == Count - 1)
         {
             return;
         }
-        var next = GetNext();
-        next.StartTime = Current.GetOutTime();
+        this[index + 1].StartTime = phase.GetOutTime();
     }
 
     public override string ToString()

@@ -228,11 +228,11 @@ public sealed class PresentlistTests
         participation.ToggleRepresentation(true, DateTimeOffset.Now);
         participation.ToggleRepresentation(true, DateTimeOffset.Now);
 
-        Assert.True(participation.Phases.Current.IsReinspectionRequested);
+        Assert.True(participation.Phases.Current.IsRepresentRequested);
 
         participation.ToggleRepresentation(false, DateTimeOffset.Now);
 
-        Assert.False(participation.Phases.Current.IsReinspectionRequested);
+        Assert.False(participation.Phases.Current.IsRepresentRequested);
     }
 
     static Participation CreateParticipation(int number, IEnumerable<Phase> phases, Eliminated? eliminated = null)

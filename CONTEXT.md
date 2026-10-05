@@ -124,7 +124,7 @@ A Combination presenting at the vet gate, captured as a time. Presenting again a
 A time an Official captures for a Combination, by start number, and sends in for the Event as an Arrival or a Presentation. It is an input, not part of the Participation: every Snapshot is recorded as a time event on a Phase, accepted or rejected.
 
 **Time event**:
-A past-tense fact recorded on a Phase — Arrived or Presented, or an Update of one — with an outcome: accepted, or rejected with a reason (including a manual reject by the Main Operator). A Phase's times are the latest accepted time event of each kind; rejected ones stay in its history.
+A past-tense fact recorded on a Phase — Arrived or Presented, or an Update of one — with an outcome: accepted, or rejected with a reason (including a manual reject by the Main Operator). A Phase's times are the latest accepted time event of each kind; rejected ones stay in its history. A time that breaks the order Start, Arrival, Presentation, Representation, compared among the times that exist, is rejected as an invalid time and never thrown at; a Presentation without an Arrival is legal, because a delayed Arrival looks exactly like that.
 _Avoid_: Event (that is the show), phase event, snapshot event
 
 **Update**:

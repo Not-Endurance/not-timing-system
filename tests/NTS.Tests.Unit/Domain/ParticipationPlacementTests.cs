@@ -23,15 +23,17 @@ public sealed class ParticipationPlacementTests
     static readonly DateTimeOffset ARRIVE = START.AddHours(1);
     static readonly DateTimeOffset PRESENT = ARRIVE.AddMinutes(10);
     static readonly DateTimeOffset OUT = PRESENT.AddMinutes(40);
+    static readonly DateTimeOffset RECORDED = new(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
+    static readonly Guid ACTOR = TestId.Of(9);
 
     [Fact]
     public void A_snapshot_stamped_before_the_next_Start_is_placed_in_the_current_phase_where_a_second_arrive_is_a_duplicate()
     {
         var participation = AfterPhaseOne();
 
-        var result = participation.Process(Arrive(OUT.AddMinutes(-1)));
+        var result = Process(participation, Arrive(OUT.AddMinutes(-1)));
 
-        Assert.Equal(SnapshotResultType.NotAppliedDueToDuplicateArrive, result.Type);
+        Assert.Equal(TimeEventOutcome.RejectedDuplicateArrive, result.Outcome);
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
         Assert.Null(participation.Phases[1].ArriveTime);
     }
@@ -41,9 +43,9 @@ public sealed class ParticipationPlacementTests
     {
         var participation = AfterPhaseOne();
 
-        var result = participation.Process(Arrive(OUT));
+        var result = Process(participation, Arrive(OUT));
 
-        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.Equal(TimeEventOutcome.Accepted, result.Outcome);
         Assert.Equal(OUT, participation.Phases[1].ArriveTime!.ToDateTimeOffset());
         Assert.Equal(TestId.Of(2), participation.Phases.Current.Id);
     }
@@ -53,9 +55,9 @@ public sealed class ParticipationPlacementTests
     {
         var participation = AfterPhaseOne();
 
-        var result = participation.Process(Arrive(OUT.AddMinutes(15)));
+        var result = Process(participation, Arrive(OUT.AddMinutes(15)));
 
-        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.Equal(TimeEventOutcome.Accepted, result.Outcome);
         Assert.Equal(TestId.Of(2), participation.Phases.Current.Id);
     }
 
@@ -65,9 +67,9 @@ public sealed class ParticipationPlacementTests
         var participation = AfterPhaseOne();
         var later = PRESENT.AddMinutes(10);
 
-        var result = participation.Process(Present(later));
+        var result = Process(participation, Present(later));
 
-        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.Equal(TimeEventOutcome.Accepted, result.Outcome);
         Assert.Equal(later, participation.Phases[0].PresentTime!.ToDateTimeOffset());
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
         Assert.Equal(later.AddMinutes(40), participation.Phases[1].StartTime!.ToDateTimeOffset());
@@ -79,9 +81,9 @@ public sealed class ParticipationPlacementTests
         var participation = AfterPhaseOne();
         var presented = OUT.AddMinutes(40);
 
-        var result = participation.Process(Present(presented));
+        var result = Process(participation, Present(presented));
 
-        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.Equal(TimeEventOutcome.Accepted, result.Outcome);
         Assert.Equal(presented, participation.Phases[1].PresentTime!.ToDateTimeOffset());
         Assert.Null(participation.Phases[1].ArriveTime);
         Assert.Equal(PRESENT, participation.Phases[0].PresentTime!.ToDateTimeOffset());
@@ -96,9 +98,9 @@ public sealed class ParticipationPlacementTests
         var participation = Ride(CreatePhase(START, ARRIVE, id: TestId.Of(1)), CreatePhase(null, id: TestId.Of(2)));
         var time = ARRIVE.AddMinutes(minutesAfterArrival);
 
-        var result = participation.Process(Present(time));
+        var result = Process(participation, Present(time));
 
-        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.Equal(TimeEventOutcome.Accepted, result.Outcome);
         Assert.Equal(time, participation.Phases[0].PresentTime!.ToDateTimeOffset());
         Assert.Null(participation.Phases[1].PresentTime);
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
@@ -113,23 +115,10 @@ public sealed class ParticipationPlacementTests
         );
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
 
-        var result = participation.Process(Arrive(OUT.AddMinutes(60)));
+        var result = Process(participation, Arrive(OUT.AddMinutes(60)));
 
-        Assert.Equal(SnapshotResultType.NotAppliedDueToDuplicateArrive, result.Type);
+        Assert.Equal(TimeEventOutcome.RejectedDuplicateArrive, result.Outcome);
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
-    }
-
-    [Fact]
-    public void A_complete_final_phase_rejects_every_snapshot_as_participation_complete()
-    {
-        var participation = Ride(CreatePhase(START, ARRIVE, PRESENT, isFinal: true, id: TestId.Of(1)));
-
-        var arrive = participation.Process(Arrive(PRESENT.AddHours(1)));
-        var present = participation.Process(Present(PRESENT.AddHours(2)));
-
-        Assert.Equal(SnapshotResultType.NotAppliedDueToParticipationComplete, arrive.Type);
-        Assert.Equal(SnapshotResultType.NotAppliedDueToParticipationComplete, present.Type);
-        Assert.Equal(PRESENT, participation.Phases[0].PresentTime!.ToDateTimeOffset());
     }
 
     [Fact]
@@ -142,12 +131,12 @@ public sealed class ParticipationPlacementTests
         );
         var arrived = OUT.AddMinutes(55);
         var presented = arrived.AddMinutes(10);
-        participation.Process(Arrive(arrived));
+        Process(participation, Arrive(arrived));
         participation.DequeueDomainEvents();
 
-        var result = participation.Process(Present(presented));
+        var result = Process(participation, Present(presented));
 
-        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.Equal(TimeEventOutcome.Accepted, result.Outcome);
         Assert.Equal(presented.AddMinutes(40), participation.Phases[2].StartTime!.ToDateTimeOffset());
         var completed = Assert.Single(participation.DequeueDomainEvents().OfType<PhaseCompleted>());
         Assert.Equal(TestId.Of(2), completed.PhaseId);
@@ -161,8 +150,8 @@ public sealed class ParticipationPlacementTests
 
         participation.ToggleRepresentation(true, OUT.AddMinutes(-20));
 
-        Assert.True(participation.Phases[0].IsReinspectionRequested);
-        Assert.False(participation.Phases[1].IsReinspectionRequested);
+        Assert.True(participation.Phases[0].IsRepresentRequested);
+        Assert.False(participation.Phases[1].IsRepresentRequested);
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
     }
 
@@ -180,7 +169,7 @@ public sealed class ParticipationPlacementTests
         );
 
         Assert.Equal(Cannot_require_representation_without_presentation_time, thrown.Message);
-        Assert.False(participation.Phases[0].IsReinspectionRequested);
+        Assert.False(participation.Phases[0].IsRepresentRequested);
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
     }
 
@@ -195,8 +184,8 @@ public sealed class ParticipationPlacementTests
 
         participation.ToggleRepresentation(true, OUT.AddMinutes(70));
 
-        Assert.True(participation.Phases[1].IsReinspectionRequested);
-        Assert.False(participation.Phases[0].IsReinspectionRequested);
+        Assert.True(participation.Phases[1].IsRepresentRequested);
+        Assert.False(participation.Phases[0].IsRepresentRequested);
         Assert.Equal(TestId.Of(2), participation.Phases.Current.Id);
     }
 
@@ -282,6 +271,11 @@ public sealed class ParticipationPlacementTests
     static Participation AfterPhaseOne()
     {
         return Ride(CreatePhase(START, ARRIVE, PRESENT, id: TestId.Of(1)), CreatePhase(OUT, id: TestId.Of(2)));
+    }
+
+    static TimeEvent Process(Participation participation, Snapshot snapshot)
+    {
+        return participation.Process(snapshot, ACTOR, RECORDED);
     }
 
     static Snapshot Arrive(DateTimeOffset time)

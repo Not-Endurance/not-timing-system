@@ -9,7 +9,7 @@ Endpoints follow JSON:API 1.1 (jsonapi.org). Only the grammar of `filter` is bor
 
 ## Routes
 
-- A collection is a plural kebab-case noun: `/events`, `/snapshot-results`. An item is `/events/{id}`.
+- A collection is a plural kebab-case noun: `/events`, `/user-sessions`. An item is `/events/{id}`.
 - Event-scoped resources stay flat and carry `eventId` as an attribute: `/participations?filter=eventId eq 3f2504e0-4f89-41d3-9a0c-0305e82c3301`.
 - The method carries the meaning: POST creates (201, `Location`), GET reads, PATCH changes members (200 with the resource), DELETE removes (204).
 - A named collection is a GET-only view of one resource type that the glossary names: `/events/live`, `/events/historic`. It returns the same resource type, each item's `self` link points at the canonical item URL, and it takes the same query parameters. Every other narrowing uses `filter`.
@@ -132,7 +132,7 @@ The Clubs, Horses and Athletes of a Tenant's registry, the countries of the plat
 
 ## Legacy resources
 
-Served by the Functions project, in their old shape (`Result<T>` envelope, PascalCase, HTTP 200 for domain errors): handouts, officials, operators (the Operators of an Event are grants), participations, rankings, settings, snapshot-results, users (the profile of a user moved to `PATCH /api/me/profile`; user-sessions moved to the Api). The cross-tenant search of officials is served by the Api, and the family is not. The athletes, clubs, configure-event, countries, horses and event moved to the Api (above); the Functions project still answers their old routes until it is retired (#647), open as they always were, and nothing of the platform calls them. The routes of the event that went with a stored flag of its life (two lists and the verbs that started, ended and reset an Event) are gone: the Api starts and resets an Event, and an Event is over when its last day is. The ticket that ports a resource removes it from this list. Settings, snapshot-results, the print routes and the routes that list users are not ported: they go with the Functions project (ADR-0011, ADR-0012, ADR-0013).
+Served by the Functions project, in their old shape (`Result<T>` envelope, PascalCase, HTTP 200 for domain errors): handouts, officials, operators (the Operators of an Event are grants), participations, rankings, settings, users (the profile of a user moved to `PATCH /api/me/profile`; user-sessions moved to the Api). The cross-tenant search of officials is served by the Api, and the family is not. The athletes, clubs, configure-event, countries, horses and event moved to the Api (above); the Functions project still answers their old routes until it is retired (#647), open as they always were, and nothing of the platform calls them. The routes of the event that went with a stored flag of its life (two lists and the verbs that started, ended and reset an Event) are gone: the Api starts and resets an Event, and an Event is over when its last day is. The ticket that ports a resource removes it from this list. Settings, the print routes and the routes that list users are not ported: they go with the Functions project (ADR-0011, ADR-0012, ADR-0013). Snapshot results are gone: what became of a Snapshot is the outcome of its time event on the Phase (ADR-0005).
 
 ## Done
 

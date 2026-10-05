@@ -96,7 +96,7 @@ public class ParticipationTableBehind : NComponent
             return [];
         }
 
-        var anyRepresentation = phases.Any(x => x.IsReinspectionRequested);
+        var anyRepresentation = phases.Any(x => x.IsRepresentRequested);
         var anyRequiredInspection = phases.Any(x => x.IsRequiredInspectionRequested);
         var anyCompulsoryRequiredInspection = phases.Any(x => x.IsRequiredInspectionCompulsory);
 

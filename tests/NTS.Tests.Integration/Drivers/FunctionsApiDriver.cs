@@ -209,15 +209,6 @@ internal sealed class FunctionsApiDriver : IDisposable
         );
     }
 
-    public async Task<IReadOnlyList<SnapshotResultModel>> ReadSnapshotResults(Guid eventId)
-    {
-        var models = await Send<IEnumerable<SnapshotResultModel>>(
-            HttpMethod.Get,
-            EventFilter("api/snapshot-results", eventId)
-        );
-        return models.ToArray();
-    }
-
     public Task<NtsUserSessionModel?> ReadUserSession(string userIdentifier, Guid eventId)
     {
         var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);

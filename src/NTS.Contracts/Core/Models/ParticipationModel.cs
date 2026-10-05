@@ -29,6 +29,9 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
     public CombinationModel Combination { get; set; } = default!;
     public PhaseModel[] Phases { get; set; } = default!;
     public EliminatedModel? Eliminated { get; set; }
+
+    /// <summary>Counts the writes of the document, so that a write made from an older read can be told from the current (ADR-0013).</summary>
+    public int Version { get; set; }
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
 

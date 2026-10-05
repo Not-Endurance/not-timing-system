@@ -38,7 +38,11 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
 
         AssertNothingDerivedIsStored(await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id));
 
-        participation.Process(IntegrationPayloadFactory.ArriveSnapshot(1, START.AddHours(2).AddMinutes(30)));
+        participation.Process(
+            IntegrationPayloadFactory.ArriveSnapshot(1, START.AddHours(2).AddMinutes(30)),
+            TestId.Of(9),
+            START.AddHours(2).AddMinutes(30)
+        );
         await FunctionsRequests.Send(
             _fixture.FunctionsBaseUrl,
             HttpMethod.Patch,
@@ -48,7 +52,7 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
 
         var updated = await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id);
         AssertNothingDerivedIsStored(updated);
-        Assert.Contains("ArriveTime", updated["Phases"].AsBsonArray[1].AsBsonDocument.Names); // the update did write
+        Assert.Contains("Events", updated["Phases"].AsBsonArray[1].AsBsonDocument.Names); // the update did write
     }
 
     [Fact]
@@ -86,8 +90,16 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
     static Participation PresentedInTheFirstPhase(Guid eventId, Guid id)
     {
         var participation = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 1, id, startTime: START);
-        participation.Process(IntegrationPayloadFactory.ArriveSnapshot(1, START.AddHours(1)));
-        participation.Process(IntegrationPayloadFactory.PresentSnapshot(1, START.AddHours(1).AddMinutes(10)));
+        participation.Process(
+            IntegrationPayloadFactory.ArriveSnapshot(1, START.AddHours(1)),
+            TestId.Of(9),
+            START.AddHours(1)
+        );
+        participation.Process(
+            IntegrationPayloadFactory.PresentSnapshot(1, START.AddHours(1).AddMinutes(10)),
+            TestId.Of(9),
+            START.AddHours(1).AddMinutes(10)
+        );
         return participation;
     }
 
@@ -97,7 +109,7 @@ public sealed class DerivedValuesStorageTests : IClassFixture<NtsIntegrationFixt
         var phases = stored["Phases"].AsBsonArray.Select(x => x.AsBsonDocument).ToList();
         Assert.Equal(2, phases.Count);
         Assert.All(phases, phase => Assert.Empty(phase.Names.Intersect(LegacyDocuments.DERIVED_PHASE_FIELDS)));
-        Assert.Contains("ArriveTime", phases[0].Names); // what was recorded is stored
-        Assert.Contains("PresentTime", phases[0].Names);
+        Assert.Contains("Events", phases[0].Names); // what was recorded is stored, as time events
+        Assert.Equal(2, phases[0]["Events"].AsBsonArray.Count);
     }
 }

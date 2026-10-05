@@ -11,6 +11,9 @@ namespace NTS.Tests.Unit.Domain;
 
 public sealed class ParticipationProcessTests
 {
+    static readonly DateTimeOffset RECORDED = new(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
+    static readonly Guid ACTOR = TestId.Of(9);
+
     [Fact]
     public void Process_raises_phase_completed_with_the_ids_and_not_final_when_a_phase_completes_and_another_follows()
     {
@@ -22,7 +25,8 @@ public sealed class ParticipationProcessTests
             CreatePhase(arrive.AddMinutes(50), isFinal: true, id: TestId.Of(2))
         );
 
-        participation.Process(
+        Process(
+            participation,
             new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(arrive.AddMinutes(10)))
         );
 
@@ -40,7 +44,8 @@ public sealed class ParticipationProcessTests
         var arrive = start.AddHours(1);
         var participation = CreateParticipation(start, CreatePhase(start, arrive, isFinal: true, id: TestId.Of(1)));
 
-        participation.Process(
+        Process(
+            participation,
             new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(arrive.AddMinutes(10)))
         );
 
@@ -82,11 +87,12 @@ public sealed class ParticipationProcessTests
             CreatePhase(secondStart, secondArrive, id: TestId.Of(2))
         );
 
-        var result = participation.Process(
+        var result = Process(
+            participation,
             new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(secondArrive.AddMinutes(50)))
         );
 
-        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.Equal(TimeEventOutcome.Accepted, result.Outcome);
         Assert.IsType<FailedToQualify>(participation.Eliminated);
         Assert.Equal(TestId.Of(2), participation.Phases.Current.Id);
     }
@@ -99,11 +105,12 @@ public sealed class ParticipationProcessTests
         var participation = CreateParticipation(start, CreatePhase(start, arrive, isFinal: true, id: TestId.Of(1)));
         participation.Withdraw();
 
-        var result = participation.Process(
+        var result = Process(
+            participation,
             new Snapshot(1, SnapshotType.Present, SnapshotMethod.Manual, new Timestamp(arrive.AddHours(2)))
         );
 
-        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.Equal(TimeEventOutcome.Accepted, result.Outcome);
         Assert.IsType<Withdrawn>(participation.Eliminated);
     }
 
@@ -115,7 +122,7 @@ public sealed class ParticipationProcessTests
         const SnapshotType removedUntypedSnapshot = (SnapshotType)4;
         var untyped = new Snapshot(1, removedUntypedSnapshot, SnapshotMethod.Manual, new Timestamp(start.AddHours(1)));
 
-        Assert.Throws<GuardException>(() => participation.Process(untyped));
+        Assert.Throws<GuardException>(() => Process(participation, untyped));
 
         Assert.Null(participation.Phases[0].ArriveTime);
     }
@@ -126,7 +133,8 @@ public sealed class ParticipationProcessTests
         var start = new DateTimeOffset(2026, 1, 1, 8, 0, 0, TimeSpan.Zero);
         var participation = CreateParticipation(start);
 
-        participation.Process(
+        Process(
+            participation,
             new Snapshot(1, SnapshotType.Arrive, SnapshotMethod.Manual, new Timestamp(start.AddHours(1)))
         );
 
@@ -147,11 +155,12 @@ public sealed class ParticipationProcessTests
             CreatePhase(secondStart, id: TestId.Of(2))
         );
 
-        var result = participation.Process(
+        var result = Process(
+            participation,
             new Snapshot(1, SnapshotType.Arrive, SnapshotMethod.Manual, new Timestamp(secondArrive))
         );
 
-        Assert.Equal(SnapshotResultType.Applied, result.Type);
+        Assert.Equal(TimeEventOutcome.Accepted, result.Outcome);
         Assert.Equal(TestId.Of(2), participation.Phases.Current.Id);
     }
 
@@ -168,9 +177,18 @@ public sealed class ParticipationProcessTests
             CreatePhase(secondStart, id: TestId.Of(2))
         );
 
-        participation.Update(new PhaseState(TestId.Of(2), secondStart, secondStart.AddMinutes(45), null, null));
+        participation.Update(
+            new PhaseState(TestId.Of(2), secondStart, secondStart.AddMinutes(45), null, null),
+            ACTOR,
+            RECORDED
+        );
 
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
+    }
+
+    static TimeEvent Process(Participation participation, Snapshot snapshot)
+    {
+        return participation.Process(snapshot, ACTOR, RECORDED);
     }
 
     static Participation CreateParticipation(DateTimeOffset start, params Phase[] phases)

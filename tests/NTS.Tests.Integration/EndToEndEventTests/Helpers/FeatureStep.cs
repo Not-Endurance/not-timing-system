@@ -81,7 +81,7 @@ internal static class FeatureStep
             $"represent={Format(entry.RepresentTime)}",
             $"requestedInspection={phase.IsRequiredInspectionRequested}",
             $"compulsoryInspection={phase.IsRequiredInspectionCompulsory}",
-            $"reinspection={phase.IsReinspectionRequested}",
+            $"reinspection={phase.IsRepresentRequested}",
             $"complete={phase.IsComplete()}",
             $"eliminated={entry.ExpectedEliminated?.ToString() ?? "<none>"}"
         );
