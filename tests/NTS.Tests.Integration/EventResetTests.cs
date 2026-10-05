@@ -16,7 +16,7 @@ namespace NTS.Tests.Integration;
 /// </summary>
 public sealed class EventResetTests : IClassFixture<MongoFixture>
 {
-    static readonly DateTimeOffset NOW = new(2026, 6, 10, 12, 0, 0, TimeSpan.Zero);
+    static readonly DateTimeOffset NOW = DateTimeOffset.UtcNow;
 
     readonly MongoFixture _mongo;
 
@@ -100,6 +100,48 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
         Assert.Equal(0, await EventSeed.CountOfAsync(_mongo.ConnectionString, "event_participations", id));
+    }
+
+    [Fact]
+    public async Task A_reset_that_stops_part_way_leaves_the_Event_so_that_it_is_made_again()
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        await StartAsync(mainOperator, id);
+        // Nothing can be removed from a view, which is how the reset stops after what the Event made is gone.
+        var database = RegistrySeed.Collection(_mongo.ConnectionString, "event_pending_snapshots").Database;
+        await database.DropCollectionAsync("event_pending_snapshots");
+        await database.CreateViewAsync(
+            "event_pending_snapshots",
+            "event_officials",
+            new EmptyPipelineDefinition<BsonDocument>()
+        );
+        try
+        {
+            try
+            {
+                await mainOperator.Page.DeleteAsync($"/api/events/{id}");
+            }
+            catch (Exception)
+            {
+                // A failure nobody planned for is the host's to answer for: what matters is what it leaves.
+            }
+
+            Assert.NotNull(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
+            Assert.Equal(0, await EventSeed.CountOfAsync(_mongo.ConnectionString, "event_participations", id));
+        }
+        finally
+        {
+            await database.DropCollectionAsync("event_pending_snapshots");
+        }
+
+        var again = await mainOperator.Page.DeleteAsync($"/api/events/{id}");
+
+        Assert.Equal(HttpStatusCode.NoContent, again.StatusCode);
+        Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
     }
 
     [Fact]

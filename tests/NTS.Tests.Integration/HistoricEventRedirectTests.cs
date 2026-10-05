@@ -55,5 +55,6 @@ public sealed class HistoricEventRedirectTests : IClassFixture<MongoFixture>
         Assert.NotEqual(HttpStatusCode.MovedPermanently, historic.StatusCode);
         Assert.NotEqual(HttpStatusCode.MovedPermanently, details.StatusCode);
         Assert.NotEqual(HttpStatusCode.MovedPermanently, notAnEvent.StatusCode);
+        Assert.Equal(historic.StatusCode, notAnEvent.StatusCode);
     }
 }

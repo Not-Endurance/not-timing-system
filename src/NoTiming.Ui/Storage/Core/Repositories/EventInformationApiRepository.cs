@@ -29,9 +29,6 @@ public class EventInformationApiRepository
         _socketContext = socketContext;
     }
 
-    /// <summary>An Event is started from its Setup and takes nothing else, so the document names the Setup and no member.</summary>
-    protected override IReadOnlyCollection<string>? CreateMembers => [];
-
     public async Task<IEnumerable<EventInformation>> ReadLive()
     {
         return await ReadView("live");
@@ -43,7 +40,8 @@ public class EventInformationApiRepository
     }
 
     /// <summary>
-    /// Starts the Event from its Setup. What the Api refuses is thrown with what it says, and its code is in
+    /// Starts the Event from its Setup: the document names the Setup and no member, because an Event is started and takes
+    /// nothing else. What the Api refuses is thrown with what it says, and its code is in
     /// <see cref="JsonApiRepository{T, TModel}.LastError"/>: <c>invalid-setup</c> and <c>incomplete-fei-configuration</c> say
     /// what is missing, <c>not-main-operator</c> that the caller does not run the Event.
     /// </summary>

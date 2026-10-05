@@ -63,7 +63,8 @@ internal static class EventStartPlans
             );
         }
 
-        if (MissingFeiConfiguration(setup) is { } missing)
+        var missing = FeiExportConfiguration.MissingOf(setup);
+        if (missing.Count > 0)
         {
             return (
                 null,
@@ -71,7 +72,7 @@ internal static class EventStartPlans
                     StatusCodes.Status422UnprocessableEntity,
                     "incomplete-fei-configuration",
                     "The FEI export is only partly configured.",
-                    string.Format(Missing_FEI_export_configurations_colon__, Environment.NewLine + missing)
+                    string.Format(Missing_FEI_export_configurations_colon__, Environment.NewLine + Lines(missing))
                 )
             );
         }
@@ -111,11 +112,6 @@ internal static class EventStartPlans
         foreach (var issue in issues)
         {
             detail.AppendLine(issue.Summary);
-            if (!issue.IsAutoCorrectable)
-            {
-                continue;
-            }
-
             foreach (var competition in issue.Competitions)
             {
                 detail.AppendLine($"- {competition.CompetitionName}: {competition.PhaseSignature}");
@@ -140,9 +136,7 @@ internal static class EventStartPlans
                 setup.Id
             );
             participations.AddRange(made);
-            rankings.AddRange(
-                entriesByCategory.Where(x => x.Value.Any()).Select(x => CreateRanking(competition, x, setup.Id))
-            );
+            rankings.AddRange(entriesByCategory.Select(x => CreateRanking(competition, x, setup.Id)));
         }
 
         return (participations, rankings);
@@ -168,81 +162,32 @@ internal static class EventStartPlans
         );
     }
 
-    /// <summary>What is missing of the FEI configuration, a line each; none when there is none of it or all of it.</summary>
-    static string? MissingFeiConfiguration(ConfigureEvent setup)
+    /// <summary>What is missing of the FEI configuration, in the words of the application: a line each.</summary>
+    static string Lines(IReadOnlyList<MissingFeiExportValue> missing)
     {
-        if (!HasAnyFeiConfiguration(setup))
+        var lines = new StringBuilder();
+        foreach (var item in missing)
         {
-            return null;
+            var label = Label(item.Value);
+            lines.AppendLine(item.Subject == null ? label : $"{item.Subject}: {label}");
         }
 
-        var missing = new StringBuilder();
-        if (string.IsNullOrWhiteSpace(setup.FeiShowId))
-        {
-            missing.AppendLine(FEI_Show_ID_string);
-        }
-
-        foreach (var competition in setup.Competitions.Where(HasAnyCompetitionFeiConfiguration))
-        {
-            if (string.IsNullOrWhiteSpace(competition.FeiEventId))
-            {
-                missing.AppendLine($"{competition.Name}: {FEI_Event_ID_string}");
-            }
-
-            if (string.IsNullOrWhiteSpace(competition.FeiEventCode))
-            {
-                missing.AppendLine($"{competition.Name}: {FEI_Event_Code_string}");
-            }
-
-            if (string.IsNullOrWhiteSpace(competition.FeiCompetitionId))
-            {
-                missing.AppendLine($"{competition.Name}: {FEI_Competition_ID_string}");
-            }
-
-            if (string.IsNullOrWhiteSpace(competition.FeiRule))
-            {
-                missing.AppendLine($"{competition.Name}: {FEI_Rule_string}");
-            }
-
-            if (string.IsNullOrWhiteSpace(competition.FeiScheduleNumber))
-            {
-                missing.AppendLine($"{competition.Name}: {FEI_Schedule_Number_string}");
-            }
-
-            foreach (var participation in competition.Participations)
-            {
-                if (string.IsNullOrWhiteSpace(participation.Combination.Horse.FeiId))
-                {
-                    missing.AppendLine(
-                        $"#{participation.Combination.Number}, {participation.Combination.Horse.Name}: {FEI_ID_string}"
-                    );
-                }
-
-                if (string.IsNullOrWhiteSpace(participation.Combination.Athlete.FeiId))
-                {
-                    missing.AppendLine(
-                        $"#{participation.Combination.Number}, {participation.Combination.Athlete.Name}: {FEI_ID_string}"
-                    );
-                }
-            }
-        }
-
-        var text = missing.ToString();
-        return string.IsNullOrWhiteSpace(text) ? null : text;
+        return lines.ToString();
     }
 
-    static bool HasAnyFeiConfiguration(ConfigureEvent setup)
+    static string Label(FeiExportValue value)
     {
-        return !string.IsNullOrWhiteSpace(setup.FeiShowId) || setup.Competitions.Any(HasAnyCompetitionFeiConfiguration);
-    }
-
-    static bool HasAnyCompetitionFeiConfiguration(SetupCompetition competition)
-    {
-        return !string.IsNullOrWhiteSpace(competition.FeiEventId)
-            || !string.IsNullOrWhiteSpace(competition.FeiEventCode)
-            || !string.IsNullOrWhiteSpace(competition.FeiCompetitionId)
-            || !string.IsNullOrWhiteSpace(competition.FeiRule)
-            || !string.IsNullOrWhiteSpace(competition.FeiScheduleNumber);
+        return value switch
+        {
+            FeiExportValue.ShowId => FEI_Show_ID_string,
+            FeiExportValue.EventId => FEI_Event_ID_string,
+            FeiExportValue.EventCode => FEI_Event_Code_string,
+            FeiExportValue.CompetitionId => FEI_Competition_ID_string,
+            FeiExportValue.Rule => FEI_Rule_string,
+            FeiExportValue.ScheduleNumber => FEI_Schedule_Number_string,
+            FeiExportValue.FeiId => FEI_ID_string,
+            _ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+        };
     }
 }
 

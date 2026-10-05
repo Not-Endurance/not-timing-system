@@ -1,3 +1,5 @@
+using System.Net;
+using System.Text;
 using Microsoft.Extensions.Time.Testing;
 using Not.Application.RPC;
 using Not.Domain.Exceptions;
@@ -17,7 +19,7 @@ namespace NTS.Tests.Integration;
 /// </summary>
 public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture>
 {
-    static readonly DateTimeOffset NOW = new(2026, 6, 10, 12, 0, 0, TimeSpan.Zero);
+    static readonly DateTimeOffset NOW = DateTimeOffset.UtcNow;
 
     readonly MongoFixture _mongo;
 
@@ -108,6 +110,27 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
     }
 
     [Fact]
+    public async Task An_answer_to_a_start_that_holds_no_Event_is_not_taken_for_one()
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var events = new EventInformationApiRepository(
+            JsonApiClients.Of(api, mainOperator, out var requests),
+            new SocketOf(null)
+        );
+        requests.Answer = _ => new HttpResponseMessage(HttpStatusCode.Created)
+        {
+            Content = new StringContent("""{"data":null}""", Encoding.UTF8, "application/vnd.api+json"),
+        };
+
+        var thrown = await Assert.ThrowsAnyAsync<Exception>(() => events.Start(Guid.NewGuid()));
+
+        Assert.Contains("no event payload", thrown.Message);
+    }
+
+    [Fact]
     public async Task A_Live_Event_is_changed_and_what_the_Api_keeps_is_not_sent_back_with_it()
     {
         await using var api = NewApi();
@@ -160,6 +183,26 @@ public sealed class EventInformationRepositoryTests : IClassFixture<MongoFixture
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
         Assert.DoesNotContain(await events.ReadLive(), x => x.Id == id);
         Assert.NotNull(await EventSeed.SetupOfAsync(_mongo.ConnectionString, id));
+    }
+
+    [Fact]
+    public async Task Resetting_with_no_Event_selected_asks_nothing_of_the_Api_and_changes_nothing()
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        var events = new EventInformationApiRepository(
+            JsonApiClients.Of(api, mainOperator, out var requests),
+            new SocketOf(null)
+        );
+
+        await events.Reset();
+
+        Assert.Empty(requests.Asked);
+        Assert.Null(events.LastError);
+        Assert.NotNull(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
     }
 
     ApiFactory NewApi()

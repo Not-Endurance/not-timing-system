@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Text.Json;
 using Microsoft.Extensions.Time.Testing;
@@ -15,7 +16,7 @@ namespace NTS.Tests.Integration;
 /// </summary>
 public sealed class EventChangeTests : IClassFixture<MongoFixture>
 {
-    static readonly DateTimeOffset NOW = new(2026, 6, 10, 12, 0, 0, TimeSpan.Zero);
+    static readonly DateTimeOffset NOW = DateTimeOffset.UtcNow;
 
     readonly MongoFixture _mongo;
 
@@ -96,6 +97,64 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task Naming_one_of_the_days_makes_that_day_whole_and_leaves_the_other_as_it_is()
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await StartedAsync(api, mainOperator, tenant);
+        await ChangeAsync(
+            mainOperator,
+            id,
+            new { startDay = "2030-05-20T10:30:00+03:00", endDay = "2030-06-02T10:30:00+03:00" }
+        );
+
+        var endOnly = await ChangeAsync(mainOperator, id, new { endDay = "2030-06-05T10:30:00+03:00" });
+        var afterEnd = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
+        var startOnly = await ChangeAsync(mainOperator, id, new { startDay = "2030-05-21T15:00:00+03:00" });
+        var afterStart = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
+
+        Assert.Equal(HttpStatusCode.OK, endOnly.StatusCode);
+        Assert.Equal(new DateTimeOffset(2030, 5, 19, 21, 0, 0, TimeSpan.Zero), await DayAsync(endOnly, "startDay"));
+        Assert.Equal(new DateTime(2030, 5, 19, 21, 0, 0, DateTimeKind.Utc), afterEnd["StartDay"].ToUniversalTime());
+        Assert.Equal(new DateTime(2030, 6, 5, 20, 59, 59, DateTimeKind.Utc), afterEnd["EndDay"].ToUniversalTime());
+        Assert.Equal(HttpStatusCode.OK, startOnly.StatusCode);
+        Assert.Equal(new DateTimeOffset(2030, 6, 5, 20, 59, 59, TimeSpan.Zero), await DayAsync(startOnly, "endDay"));
+        Assert.Equal(new DateTime(2030, 5, 20, 21, 0, 0, DateTimeKind.Utc), afterStart["StartDay"].ToUniversalTime());
+        Assert.Equal(new DateTime(2030, 6, 5, 20, 59, 59, DateTimeKind.Utc), afterStart["EndDay"].ToUniversalTime());
+    }
+
+    [Fact]
+    public async Task An_Event_does_not_start_after_its_last_day_and_one_day_is_enough()
+    {
+        await using var api = NewApi();
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await StartedAsync(api, mainOperator, tenant);
+        var before = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
+
+        var startAfterEnd = await ChangeAsync(mainOperator, id, new { startDay = "2030-05-22T00:00:00Z" });
+        var endBeforeStart = await ChangeAsync(mainOperator, id, new { endDay = "2030-05-20T10:00:00Z" });
+        var unchanged = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
+        var oneDay = await ChangeAsync(
+            mainOperator,
+            id,
+            new { startDay = "2030-05-21T15:00:00Z", endDay = "2030-05-21T09:00:00Z" }
+        );
+
+        foreach (var refused in new[] { startAfterEnd, endBeforeStart })
+        {
+            Assert.Equal(HttpStatusCode.UnprocessableEntity, refused.StatusCode);
+            Assert.Equal("invalid-attribute", await ErrorCodeAsync(refused));
+        }
+
+        Assert.Equal(before, unchanged);
+        Assert.Equal(HttpStatusCode.OK, oneDay.StatusCode);
+    }
+
+    [Fact]
     public async Task An_Event_is_not_ended_by_changing_its_days_because_it_is_over_when_its_last_day_is()
     {
         await using var api = NewApi();
@@ -105,10 +164,18 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         var id = await StartedAsync(api, mainOperator, tenant);
         var before = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
 
-        var yesterday = await ChangeAsync(mainOperator, id, new { endDay = "2026-06-09T10:00:00Z" });
+        var yesterday = await ChangeAsync(
+            mainOperator,
+            id,
+            new { startDay = DayAt(-9, "00:00:00"), endDay = DayAt(-1, "10:00:00") }
+        );
         var unchanged = (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!;
-        var today = await ChangeAsync(mainOperator, id, new { endDay = "2026-06-10T10:00:00Z" });
-        var tomorrow = await ChangeAsync(mainOperator, id, new { endDay = "2026-06-11T10:00:00Z" });
+        var today = await ChangeAsync(
+            mainOperator,
+            id,
+            new { startDay = DayAt(-9, "00:00:00"), endDay = DayAt(0, "10:00:00") }
+        );
+        var tomorrow = await ChangeAsync(mainOperator, id, new { endDay = DayAt(1, "10:00:00") });
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, yesterday.StatusCode);
         Assert.Equal("invalid-attribute", await ErrorCodeAsync(yesterday));
@@ -116,7 +183,7 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.OK, today.StatusCode); // the last day is today: the Event is Live until its last second
         Assert.Equal(HttpStatusCode.OK, tomorrow.StatusCode);
         Assert.Equal(
-            new DateTime(2026, 6, 11, 23, 59, 59, DateTimeKind.Utc),
+            NOW.UtcDateTime.Date.AddDays(1).AddHours(23).AddMinutes(59).AddSeconds(59),
             (await EventSeed.CoreOfAsync(_mongo.ConnectionString, id))!["EndDay"].ToUniversalTime()
         );
     }
@@ -171,6 +238,7 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
 
         var ended = await ChangeAsync(mainOperator, historic, new { name = "Too late" });
         var notStarted = await ChangeAsync(mainOperator, unstarted, new { name = "Not an Event" });
+        var notStartedForAnybody = await ChangeAsync(member, unstarted, new { name = "Not an Event" });
         var anonymous = await client.PatchAsync($"/api/events/{live}", new StringContent("{}"));
         var mismatch = await mainOperator.Page.WriteAsync(
             HttpMethod.Patch,
@@ -183,6 +251,7 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.Conflict, ended.StatusCode);
         Assert.Equal("event-ended", await ErrorCodeAsync(ended));
         Assert.Equal(HttpStatusCode.NotFound, notStarted.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, notStartedForAnybody.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, mismatch.StatusCode);
         Assert.Equal("id-mismatch", await ErrorCodeAsync(mismatch));
@@ -212,6 +281,21 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
     static Task<HttpResponseMessage> ChangeAsync(Person person, Guid id, object attributes)
     {
         return person.Page.WriteAsync(HttpMethod.Patch, $"/api/events/{id}", "events", attributes);
+    }
+
+    /// <summary>A moment of a day counted from the day of the clock of the host, as a client writes it.</summary>
+    static string DayAt(int days, string time)
+    {
+        return NOW.UtcDateTime.Date.AddDays(days).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+            + "T"
+            + time
+            + "Z";
+    }
+
+    static async Task<DateTimeOffset> DayAsync(HttpResponseMessage response, string member)
+    {
+        var attributes = (await ApiSessions.ReadJsonAsync(response)).GetProperty("data").GetProperty("attributes");
+        return attributes.GetProperty(member).GetDateTimeOffset();
     }
 
     static async Task<string?> ErrorCodeAsync(HttpResponseMessage response)

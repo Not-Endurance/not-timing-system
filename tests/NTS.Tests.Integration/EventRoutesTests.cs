@@ -15,7 +15,7 @@ namespace NTS.Tests.Integration;
 /// </summary>
 public sealed class EventRoutesTests : IClassFixture<MongoFixture>
 {
-    static readonly DateTimeOffset NOW = new(2026, 6, 10, 12, 0, 0, TimeSpan.Zero);
+    static readonly DateTimeOffset NOW = DateTimeOffset.UtcNow;
 
     readonly MongoFixture _mongo;
 
@@ -160,6 +160,7 @@ public sealed class EventRoutesTests : IClassFixture<MongoFixture>
             client,
             $"/api/events/live?filter={filter}&sort=-endDay&page[size]=2&page[number]=2"
         );
+        var exact = await ListAsync(client, $"/api/events/live?filter={filter}&page[size]=3");
         var after = NOW.AddDays(1.5).UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
         var later = await ListAsync(
             client,
@@ -171,6 +172,8 @@ public sealed class EventRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal([first], Ids(rest));
         Assert.False(rest.GetProperty("links").TryGetProperty("next", out _));
         Assert.Equal([second, third], Ids(later));
+        Assert.Equal(3, Ids(exact).Count());
+        Assert.False(exact.GetProperty("links").TryGetProperty("next", out _));
     }
 
     [Theory]

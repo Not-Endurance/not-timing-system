@@ -286,8 +286,7 @@ internal static class EventResourceEndpoints
             // The days are whole days in the offset they are given in, as the span of an Event makes them, and the
             // Event is over when its last day is: an Event is not ended by changing its days.
             var span = new EventSpan(row.StartDay, row.EndDay);
-            var namedEnd = named.Any(x => x.Name == nameof(EventInformationModel.EndDay));
-            if (EventStageRule.Of(true, namedEnd ? span.EndDay : row.EndDay, now) != EventStage.Live)
+            if (EventStageRule.Of(true, span.EndDay, now) != EventStage.Live)
             {
                 return JsonApiResults.Error(
                     StatusCodes.Status422UnprocessableEntity,
@@ -297,12 +296,22 @@ internal static class EventResourceEndpoints
                 );
             }
 
+            if (span.StartDay > span.EndDay)
+            {
+                return JsonApiResults.Error(
+                    StatusCodes.Status422UnprocessableEntity,
+                    "invalid-attribute",
+                    "A member of the resource is not valid.",
+                    "An Event does not start after its last day."
+                );
+            }
+
             if (named.Any(x => x.Name == nameof(EventInformationModel.StartDay)))
             {
                 row.StartDay = span.StartDay;
             }
 
-            if (namedEnd)
+            if (named.Any(x => x.Name == nameof(EventInformationModel.EndDay)))
             {
                 row.EndDay = span.EndDay;
             }
