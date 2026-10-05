@@ -147,7 +147,6 @@ internal static class EventSeed
             { "Country", RegistrySeed.CountryOf("Bulgaria", "BG") },
             { "StartDay", new BsonDateTime(end.AddDays(-1).UtcDateTime) },
             { "EndDay", new BsonDateTime(end.UtcDateTime) },
-            { "IsActive", true },
         };
         if (mainOperator != null)
         {

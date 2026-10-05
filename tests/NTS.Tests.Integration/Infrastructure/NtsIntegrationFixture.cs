@@ -16,6 +16,9 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
     internal IServiceProvider ApiServices =>
         _api?.Services ?? throw new InvalidOperationException("The Api is not started.");
 
+    /// <summary>The clock of the Api, which a scenario moves forward to let an Event end (ADR-0007).</summary>
+    public OffsetTimeProvider Clock { get; } = new();
+
     public string MongoConnectionString =>
         _mongo?.GetConnectionString() ?? throw new InvalidOperationException("MongoDB is not started.");
     public Uri FunctionsBaseUrl =>
@@ -43,7 +46,7 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
             }
         });
 
-        _api = new ApiFactory(_mongo.GetConnectionString(), kestrel: true);
+        _api = new ApiFactory(_mongo.GetConnectionString(), kestrel: true, time: Clock);
         _ = _api.BaseAddress; // starts the host
     }
 

@@ -43,7 +43,7 @@ public class HistoricEventService : NStatefulService, IHistoricEventService, IKr
     public IReadOnlyList<EventInformation> Events => _historicEvents.AsReadOnly();
     public EventInformation? Event { get; private set; }
     public Guid EventId =>
-        Event?.Id ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
+        Event?.Id ?? throw GuardHelper.Exception("Cannot read Historic Event data before selecting a Historic Event.");
     public IReadOnlyList<Ranking> Rankings => _rankings;
     public Ranking? CurrentRanking => _currentRanking;
     public IReadOnlyDictionary<int, IReadOnlyList<Starter>> StartlistHistoryByStage =>
@@ -131,6 +131,6 @@ public class HistoricEventService : NStatefulService, IHistoricEventService, IKr
 
     static NotSupportedException CreateReadOnlyException()
     {
-        return new NotSupportedException("Past events are read-only.");
+        return new NotSupportedException("Historic Events are read-only.");
     }
 }

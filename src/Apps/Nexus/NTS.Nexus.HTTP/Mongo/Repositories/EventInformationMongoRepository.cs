@@ -5,7 +5,7 @@ using NTS.Contracts.Core.Models;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 
-public class EventInformationMongoRepository : MongoRepository<EventInformationModel>, IEventResetRepository
+public class EventInformationMongoRepository : MongoRepository<EventInformationModel>
 {
     public EventInformationMongoRepository(IMongoContext context)
         : base(context, MongoConstants.NTS_DATABASE, MongoConstants.EVENT_INFORMATION_COLLECTION) { }
@@ -18,8 +18,7 @@ public class EventInformationMongoRepository : MongoRepository<EventInformationM
             .Set(x => x.Location, document.Location)
             .Set(x => x.FeiShowId, document.FeiShowId)
             .Set(x => x.StartDay, document.StartDay)
-            .Set(x => x.EndDay, document.EndDay)
-            .Set(x => x.IsActive, document.IsActive);
+            .Set(x => x.EndDay, document.EndDay);
     }
 
     public override async Task Create(EventInformationModel item)
@@ -27,16 +26,9 @@ public class EventInformationMongoRepository : MongoRepository<EventInformationM
         var existing = await Read(item.Id);
         if (existing != null)
         {
-            throw GuardHelper.Exception(
-                $"Could not insert. Active event information with ID '{item.Id}' already exists"
-            );
+            throw GuardHelper.Exception($"Could not insert. Event information with ID '{item.Id}' already exists");
         }
 
         await base.Create(item);
-    }
-
-    public Task DeleteAllForEvent(Guid eventId)
-    {
-        return GetCollection().DeleteManyAsync(x => x.Id == eventId);
     }
 }

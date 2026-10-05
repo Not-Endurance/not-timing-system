@@ -27,7 +27,6 @@ public class EventInformationModel : IDocument, ISoftDeletableDocument, IKrudMod
     public string? FeiShowId { get; set; }
     public DateTimeOffset StartDay { get; set; }
     public DateTimeOffset EndDay { get; set; }
-    public bool IsActive { get; set; }
     public RegionalRulesModel? RegionalRules { get; set; }
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
@@ -43,7 +42,6 @@ public class EventInformationModel : IDocument, ISoftDeletableDocument, IKrudMod
         FeiShowId = eventInformation.FeiShowId;
         StartDay = eventInformation.EventSpan.StartDay;
         EndDay = eventInformation.EventSpan.EndDay;
-        IsActive = eventInformation.IsActive;
         RegionalRules = RegionalRulesModel.From(eventInformation.RegionalRules);
     }
 
@@ -58,7 +56,6 @@ public class EventInformationModel : IDocument, ISoftDeletableDocument, IKrudMod
             span,
             FeiShowId,
             Id,
-            IsActive,
             RegionalRules?.MapToEntity(),
             TenantId,
             MainOperatorId

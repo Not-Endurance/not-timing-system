@@ -22,8 +22,10 @@ public class ConfigureEventMutationGuard : IConfigureEventMutationGuard, ITransi
 
     public async Task EnsureCanMutate(Guid configureEventId)
     {
-        var activeEvent = await _eventInformation.Read(x => x.Id == configureEventId && x.IsActive);
-        if (activeEvent == null)
+        // A Setup is frozen from the day its Event starts, which is the day a Core document of the Event exists: the
+        // Console works on the copies the Event made, and the Event is reset to be configured again (ADR-0012).
+        var startedEvent = await _eventInformation.Read(x => x.Id == configureEventId);
+        if (startedEvent == null)
         {
             return;
         }

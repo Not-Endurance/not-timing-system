@@ -13,21 +13,15 @@ namespace NTS.Nexus.HTTP.Functions.Event;
 public class EventInformationFunctions : FunctionBase
 {
     readonly IRepository<EventInformationModel> _events;
-    readonly IEventInformationResetService _resetService;
-    readonly IEventInformationBusinessService _businessService;
 
     public EventInformationFunctions(
         IFunctionLogger<EventInformationFunctions> logger,
         IRepository<EventInformationModel> events,
-        IEventInformationResetService resetService,
-        IEventInformationBusinessService businessService,
         ITelemetryService telemetry
     )
         : base(logger, telemetry)
     {
         _events = events;
-        _resetService = resetService;
-        _businessService = businessService;
     }
 
     [Function("event-information-create")]
@@ -83,31 +77,6 @@ public class EventInformationFunctions : FunctionBase
         return Ok(await _events.ReadMany() ?? []);
     }
 
-    [Function("event-information-active-list")]
-    public async Task<IActionResult> ListActive(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "event/active")] HttpRequest request
-    )
-    {
-        using var activity = StartFunctionActivity(nameof(ListActive));
-        TagRequest(request);
-        LogInformation(request, nameof(ListActive));
-
-        return Ok(await _businessService.ReadLive());
-    }
-
-    [Function("event-information-past-list")]
-    public async Task<IActionResult> ListPast(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "event/past")] HttpRequest request
-    )
-    {
-        using var activity = StartFunctionActivity(nameof(ListPast));
-        TagRequest(request);
-        LogInformation(request, nameof(ListPast));
-
-        var events = await _businessService.ReadHistoric();
-        return Ok(events);
-    }
-
     [Function("event-information-delete")]
     public async Task<IActionResult> Delete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "event/{id:guid}")] HttpRequest request,
@@ -126,46 +95,5 @@ public class EventInformationFunctions : FunctionBase
 
         await _events.DeleteMany(x => x.Id == id);
         return Ok();
-    }
-
-    [Function("event-information-reset")]
-    public async Task<IActionResult> Reset(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "event/{id:guid}/reset")] HttpRequest request,
-        Guid id
-    )
-    {
-        using var activity = StartFunctionActivity(nameof(Reset));
-        TagRequest(request);
-        LogInformation(request, nameof(Reset));
-
-        await _resetService.Reset(id);
-        return Ok();
-    }
-
-    [Function("event-information-deactivate")]
-    public async Task<IActionResult> Deactivate(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "event/{id:guid}/deactivate")] HttpRequest request,
-        Guid id
-    )
-    {
-        using var activity = StartFunctionActivity(nameof(Deactivate));
-        TagRequest(request);
-        LogInformation(request, nameof(Deactivate));
-
-        await _businessService.Deactivate(id);
-        return Ok();
-    }
-
-    [Function("event-information-start")]
-    public async Task<IActionResult> Start(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "event/{id:guid}/start")] HttpRequest request,
-        Guid id
-    )
-    {
-        using var activity = StartFunctionActivity(nameof(Start));
-        TagRequest(request);
-        LogInformation(request, nameof(Start));
-
-        return Ok(await _businessService.Start(id));
     }
 }

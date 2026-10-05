@@ -132,10 +132,7 @@ public sealed class EventRoutesTests : IClassFixture<MongoFixture>
             ["country", "endDay", "isLive", "location", "name", "startDay", "tenantId"],
             x => Assert.Contains(x, shown)
         );
-        Assert.All(
-            ["id", "mainOperatorId", "isActive", "isDeleted", "deletedVersion"],
-            x => Assert.DoesNotContain(x, shown)
-        );
+        Assert.All(["id", "mainOperatorId", "isDeleted", "deletedVersion"], x => Assert.DoesNotContain(x, shown));
         Assert.Equal("BG", attributes.GetProperty("country").GetProperty("isoCode").GetString());
     }
 

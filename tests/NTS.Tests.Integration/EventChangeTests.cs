@@ -126,7 +126,6 @@ public sealed class EventChangeTests : IClassFixture<MongoFixture>
     [InlineData("mainOperatorId")]
     [InlineData("regionalRules")]
     [InlineData("isLive")]
-    [InlineData("isActive")]
     [InlineData("id")]
     [InlineData("nothing")]
     public async Task What_the_server_owns_or_keeps_or_the_Event_has_not_is_not_taken_and_nothing_changes(string member)

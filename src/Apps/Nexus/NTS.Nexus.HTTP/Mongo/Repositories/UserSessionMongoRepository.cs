@@ -13,7 +13,6 @@ public class UserSessionMongoRepository
     : MongoRepository<NtsUserSessionModel>,
         INtsUserSessionRepository,
         INUserSessionRepository<NtsUserSessionStateModel>,
-        IEventResetRepository,
         ITransient
 {
     readonly ITelemetryService _telemetry;
@@ -65,11 +64,6 @@ public class UserSessionMongoRepository
         return await GetCollection()
             .Find(x => x.UserIdentifier == userIdentifier && x.EventId == eventId)
             .FirstOrDefaultAsync();
-    }
-
-    public Task DeleteAllForEvent(Guid eventId)
-    {
-        return DeleteMany(x => x.EventId == eventId);
     }
 
     async Task<NtsUserSessionStateModel?> INUserSessionRepository<NtsUserSessionStateModel>.ReadByUserIdentifier(

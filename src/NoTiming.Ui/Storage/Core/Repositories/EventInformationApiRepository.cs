@@ -2,75 +2,72 @@ using Not.Application.HTTP;
 using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Storage.REST;
-using Not.Structures;
 using NTS.Application.Core;
-using NTS.Contracts.Core;
 using NTS.Contracts.Core.Models;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Storage.Core.Repositories;
 
+/// <summary>
+/// The Events as the Api serves them (#628): the <c>events</c> resource of ADR-0007 and ADR-0008. The Live Events and the
+/// Historic Events are its two named collections, which anybody reads; an Event is started from its Setup, which is the
+/// Main Operator's, and what the Api keeps (who runs the Event, the rules the Tenant had when it started) is read and never
+/// sent. Whether an Event is Live is the Api's rule and the clock of its host: nothing here stores or asks a flag.
+/// </summary>
 public class EventInformationApiRepository
-    : ApiRepository<EventInformation, EventInformationModel>,
+    : JsonApiRepository<EventInformation, EventInformationModel>,
         IEventInformationRepository
 {
+    static readonly string[] NOT_SENT = ["mainOperatorId", "regionalRules", "isDeleted", "deletedVersion"];
+
     readonly INtsSocketContext _socketContext;
 
-    public EventInformationApiRepository(NHttpClient client, INtsSocketContext socketContext)
-        : base("event", client)
+    public EventInformationApiRepository(JsonApiClient client, INtsSocketContext socketContext)
+        : base("events", client, NOT_SENT)
     {
         _socketContext = socketContext;
     }
 
+    /// <summary>An Event is started from its Setup and takes nothing else, so the document names the Setup and no member.</summary>
+    protected override IReadOnlyCollection<string>? CreateMembers => [];
+
     public async Task<IEnumerable<EventInformation>> ReadLive()
     {
-        var models = await HandleRequest(Client.Get<IEnumerable<EventInformationModel>>($"{Endpoint}/active")) ?? [];
-        return models.Select(x => MapEntity(x)!);
+        return await ReadView("live");
     }
 
     public async Task<IEnumerable<EventInformation>> ReadHistoric()
     {
-        var models = await HandleRequest(Client.Get<IEnumerable<EventInformationModel>>($"{Endpoint}/past")) ?? [];
-        return models.Select(x => MapEntity(x)!);
-    }
-
-    public async Task<EventInformation> Start(Guid configureEventId)
-    {
-        var result = await Client.Post<EventInformationModel>(
-            $"{Endpoint}/{configureEventId}/start",
-            new StartEventInformationRequest()
-        );
-        if (!result.IsSuccess)
-        {
-            throw new DomainException(string.Join(Environment.NewLine, result.Errors));
-        }
-
-        var eventInformation = result.Data?.MapToEntity();
-        return eventInformation ?? throw GuardHelper.Exception("Event information start returned no event payload.");
-    }
-
-    public async Task Deactivate()
-    {
-        var eventId = _socketContext.Event?.Id;
-        if (eventId == null)
-        {
-            return;
-        }
-
-        await Client.Post<Not.Structures.Result.Empty>(
-            $"{Endpoint}/{eventId.Value}/deactivate",
-            new DeactivateEventInformationRequest()
-        );
+        return await ReadView("historic", "-endDay");
     }
 
     /// <summary>
-    /// Permanently resets the currently selected event information in Nexus.
+    /// Starts the Event from its Setup. What the Api refuses is thrown with what it says, and its code is in
+    /// <see cref="JsonApiRepository{T, TModel}.LastError"/>: <c>invalid-setup</c> and <c>incomplete-fei-configuration</c> say
+    /// what is missing, <c>not-main-operator</c> that the caller does not run the Event.
     /// </summary>
-    /// <remarks>
-    /// This deletes the active event root together with its event-scoped Core child documents, which removes the
-    /// event from the active-event reads used by Home and startup reconnect logic.
-    /// </remarks>
+    public async Task<EventInformation> Start(Guid configureEventId)
+    {
+        var response = await Client.Send(
+            HttpMethod.Post,
+            Collection,
+            Document(new EventInformationModel { Id = configureEventId }, [])
+        );
+        if (!response.IsSuccess)
+        {
+            Failed(response, tell: false);
+            throw new DomainException(LastError!.Message);
+        }
+
+        return EntityOf(response.Document?.GetProperty("data"))
+            ?? throw GuardHelper.Exception("Event start returned no event payload.");
+    }
+
+    /// <summary>
+    /// Resets the currently selected Event to its Setup: the Main Operator's, while the Event is Live. It removes the Event
+    /// together with what it made and what was kept for it, so it no longer appears among the Live Events.
+    /// </summary>
     public async Task Reset()
     {
         var eventId = _socketContext.Event?.Id;
@@ -79,10 +76,6 @@ public class EventInformationApiRepository
             return;
         }
 
-        await Client.Delete($"{Endpoint}/{eventId.Value}/reset");
+        await Delete(eventId.Value);
     }
-
-    sealed class StartEventInformationRequest { }
-
-    sealed class DeactivateEventInformationRequest { }
 }

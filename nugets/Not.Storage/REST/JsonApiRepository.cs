@@ -81,15 +81,54 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
         return model;
     }
 
+    /// <summary>
+    /// Every resource of a named collection of the resource, read a page at a time, in the order asked for (<c>-endDay</c>
+    /// is the last day first): <c>events/live</c> is the view <c>live</c> of <c>events</c>.
+    /// </summary>
+    protected Task<IEnumerable<T>> ReadView(string view, string? sort = null)
+    {
+        return ReadPages(null, $"{_collection}/{view}", sort);
+    }
+
+    /// <summary>The resource of a document the Api answered with, as the entity it is.</summary>
+    protected T? EntityOf(JsonElement? resource)
+    {
+        if (resource is not { ValueKind: JsonValueKind.Object } data)
+        {
+            return null;
+        }
+
+        var model = data.TryGetProperty("attributes", out var attributes)
+            ? JsonSerializer.Deserialize<TModel>(attributes.GetRawText(), JsonApiClient.Options)
+            : new TModel();
+        if (model == null)
+        {
+            return null;
+        }
+
+        if (data.TryGetProperty("id", out var id) && Guid.TryParse(id.GetString(), out var parsed))
+        {
+            ID.SetValue(model, parsed);
+        }
+
+        return model.MapToEntity();
+    }
+
     protected bool Done()
     {
         return true;
     }
 
-    protected bool Failed(JsonApiResponse response)
+    /// <param name="response">The answer that was not taken.</param>
+    /// <param name="tell">Whether a person is told what it says: not when the caller tells them itself, by what it throws.</param>
+    protected bool Failed(JsonApiResponse response, bool tell = true)
     {
         LastError = response.Error ?? new JsonApiError((int)response.Status, null, null, null);
-        OnError(LastError);
+        if (tell)
+        {
+            OnError(LastError);
+        }
+
         return false;
     }
 
@@ -202,7 +241,7 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
         return (await ReadPages(null)).Where(predicate);
     }
 
-    async Task<IEnumerable<T>> ReadPages(string? filter)
+    async Task<IEnumerable<T>> ReadPages(string? filter, string? path = null, string? sort = null)
     {
         var items = new List<T>();
         var complete = false;
@@ -211,12 +250,17 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
             for (var number = 1; number <= MAX_PAGES; number++)
             {
                 var query = $"page[size]={PAGE_SIZE}&page[number]={number}";
+                if (sort != null)
+                {
+                    query = $"sort={Uri.EscapeDataString(sort)}&{query}";
+                }
+
                 if (filter != null)
                 {
                     query = $"filter={Uri.EscapeDataString(filter)}&{query}";
                 }
 
-                var response = await Client.Send(HttpMethod.Get, $"{_collection}?{query}");
+                var response = await Client.Send(HttpMethod.Get, $"{path ?? _collection}?{query}");
                 if (!response.IsSuccess)
                 {
                     return Failed(response);
@@ -244,29 +288,6 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
             && links.ValueKind == JsonValueKind.Object
             && links.TryGetProperty("next", out var next)
             && next.ValueKind == JsonValueKind.String;
-    }
-
-    T? EntityOf(JsonElement? resource)
-    {
-        if (resource is not { ValueKind: JsonValueKind.Object } data)
-        {
-            return null;
-        }
-
-        var model = data.TryGetProperty("attributes", out var attributes)
-            ? JsonSerializer.Deserialize<TModel>(attributes.GetRawText(), JsonApiClient.Options)
-            : new TModel();
-        if (model == null)
-        {
-            return null;
-        }
-
-        if (data.TryGetProperty("id", out var id) && Guid.TryParse(id.GetString(), out var parsed))
-        {
-            ID.SetValue(model, parsed);
-        }
-
-        return model.MapToEntity();
     }
 
     /// <summary>Runs a request and tells a person when it did not arrive, as the other variant does.</summary>

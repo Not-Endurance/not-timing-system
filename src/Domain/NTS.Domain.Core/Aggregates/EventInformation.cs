@@ -12,7 +12,6 @@ public class EventInformation : Aggregate
         EventSpan eventSpan,
         string? feiShowId,
         Guid id,
-        bool isActive = true,
         RegionalRules? regionalRules = null,
         string? tenantId = null,
         Guid? mainOperatorId = null
@@ -24,7 +23,6 @@ public class EventInformation : Aggregate
         Location = Required(nameof(Location), location);
         EventSpan = eventSpan;
         FeiShowId = feiShowId;
-        IsActive = isActive;
         RegionalRules = regionalRules ?? RegionalRules.None;
         TenantId = string.IsNullOrWhiteSpace(tenantId) ? Tenant.LEGACY_ID : tenantId;
         MainOperatorId = mainOperatorId;
@@ -35,7 +33,6 @@ public class EventInformation : Aggregate
     public string Location { get; }
     public EventSpan EventSpan { get; }
     public string? FeiShowId { get; }
-    public bool IsActive { get; }
 
     /// <summary>The Tenant the Event belongs to (ADR-0012). An Event from before Tenants has the constant one.</summary>
     public string TenantId { get; }

@@ -67,7 +67,7 @@ internal static class EventResourceEndpoints
 
     /// <summary>What an Event shows, and what a change of it may name: the rules the Tenant had when it started are shown and not written.</summary>
     public static ReferenceMembers<EventInformationModel> Members { get; } =
-        new(["MainOperatorId", "IsActive", "IsDeleted", "DeletedVersion"], ["RegionalRules"]);
+        new(["MainOperatorId", "IsDeleted", "DeletedVersion"], ["RegionalRules"]);
 
     static async Task<IResult> ListAsync(
         EventStage? stage,

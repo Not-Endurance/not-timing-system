@@ -13,7 +13,7 @@ using NTS.Domain.Objects;
 namespace NTS.Tests.Unit.Application;
 
 /// <summary>
-/// The past-Event pages show the Results of a Ranking composed from the Participations the service read once for the
+/// The Historic Event pages show the Results of a Ranking composed from the Participations the service read once for the
 /// Event and from the ids the Ranking holds (#624, ADR-0006).
 /// </summary>
 public sealed class HistoricEventServiceTests
@@ -164,22 +164,17 @@ public sealed class HistoricEventServiceTests
 
         public Task<IEnumerable<EventInformation>> ReadLive()
         {
-            throw new NotSupportedException("The service reads past Events only.");
+            throw new NotSupportedException("The service reads Historic Events only.");
         }
 
         public Task<EventInformation> Start(Guid configureEventId)
         {
-            throw new NotSupportedException("The service reads past Events only.");
-        }
-
-        public Task Deactivate()
-        {
-            throw new NotSupportedException("The service reads past Events only.");
+            throw new NotSupportedException("The service reads Historic Events only.");
         }
 
         public Task Reset()
         {
-            throw new NotSupportedException("The service reads past Events only.");
+            throw new NotSupportedException("The service reads Historic Events only.");
         }
     }
 }

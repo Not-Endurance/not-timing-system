@@ -87,7 +87,6 @@ public sealed class ApiAndFunctionsCoexistTests : IClassFixture<NtsIntegrationFi
             new EventSpan(DateTimeOffset.UtcNow.Date, DateTimeOffset.UtcNow.Date.AddDays(1)),
             null,
             eventId,
-            true,
             new RegionalRules(true, "BG"),
             "country-bg",
             mainOperator

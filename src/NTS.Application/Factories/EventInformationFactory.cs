@@ -32,7 +32,6 @@ public static class EventInformationFactory
             new EventSpan(startDate, endDate),
             setupEvent.FeiShowId,
             setupEvent.Id,
-            isActive: true,
             regionalRules: regionalRules,
             tenantId: setupEvent.TenantId,
             mainOperatorId: setupEvent.MainOperatorId

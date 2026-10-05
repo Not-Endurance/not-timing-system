@@ -89,7 +89,7 @@ public sealed class CoreFeatureEndToEndTests
 
         await AssertFinalStateMatchesSnapshots(functionsApi, eventInformation, setup, snapshot);
         await print.PrintFinalRanklists(eventInformation);
-        await AssertCompletedEventCanBeDeactivatedAndExported(console, functionsApi, eventInformation);
+        await AssertCompletedEventEndsAndCanBeExported(console, functionsApi, _fixture.Clock, eventInformation);
     }
 
     static async Task AssertStartedConfigureEventCannotBeUpdated(FunctionsApiDriver api, SetupConfigureEvent setupEvent)
@@ -104,7 +104,7 @@ public sealed class CoreFeatureEndToEndTests
     static async Task SeedOtherEventData(FunctionsApiDriver api, int testedEventId)
     {
         var today = DateTimeOffset.UtcNow.Date;
-        var (historicEventId, activeEventId) = CreateOtherEventIds(testedEventId);
+        var (historicEventId, liveEventId) = CreateOtherEventIds(testedEventId);
         var documentBase = Math.Abs(testedEventId % 1_000_000) + 1_000_000;
 
         await SeedOtherEvent(
@@ -112,25 +112,19 @@ public sealed class CoreFeatureEndToEndTests
             historicEventId,
             new EventSpan(today.AddDays(-30), today.AddDays(-29)),
             documentBase,
-            "Past"
+            "Historic"
         );
-        await SeedOtherEvent(
-            api,
-            activeEventId,
-            new EventSpan(today, today.AddDays(1)),
-            documentBase + 10_000,
-            "Active"
-        );
+        await SeedOtherEvent(api, liveEventId, new EventSpan(today, today.AddDays(1)), documentBase + 10_000, "Live");
     }
 
-    static (int Past, int Active) CreateOtherEventIds(int testedEventId)
+    static (int Historic, int Live) CreateOtherEventIds(int testedEventId)
     {
-        const int pastOffset = 10_000;
-        const int activeOffset = 20_000;
+        const int historicOffset = 10_000;
+        const int liveOffset = 20_000;
 
-        return testedEventId <= int.MaxValue - activeOffset
-            ? (testedEventId + pastOffset, testedEventId + activeOffset)
-            : (testedEventId - activeOffset, testedEventId - pastOffset);
+        return testedEventId <= int.MaxValue - liveOffset
+            ? (testedEventId + historicOffset, testedEventId + liveOffset)
+            : (testedEventId - liveOffset, testedEventId - historicOffset);
     }
 
     static async Task SeedOtherEvent(FunctionsApiDriver api, int eventId, EventSpan eventSpan, int idBase, string label)
@@ -338,9 +332,10 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(expectedRankings.ToString(Formatting.None), actualRankings.ToString(Formatting.None));
     }
 
-    static async Task AssertCompletedEventCanBeDeactivatedAndExported(
+    static async Task AssertCompletedEventEndsAndCanBeExported(
         ConsoleDriver console,
         FunctionsApiDriver api,
+        OffsetTimeProvider clock,
         EventInformation eventInformation
     )
     {
@@ -350,13 +345,16 @@ public sealed class CoreFeatureEndToEndTests
         var exportableRanking = CreateFeiExportRanking(finalRankings.First());
         await api.Update(exportableRanking);
 
+        // An Event is Live until the end of its last day and Historic from then on: it is not ended by an action, the
+        // clock of the Api moves past the end (ADR-0007).
         Assert.True(console.IsConnected);
-        await console.GetRequiredService<IDashService>().Deactivate();
+        var events = console.GetRequiredService<IEventInformationService>();
+        Assert.Contains(await events.GetLive(), x => x.Id == eventInformation.Id);
+        clock.Advance(eventInformation.EventSpan.EndDay - clock.GetUtcNow() + TimeSpan.FromSeconds(1));
 
-        Assert.False(console.IsConnected);
-        var activeEvents = await api.ReadLiveEventInformation();
-        Assert.DoesNotContain(activeEvents, x => x.Id == eventInformation.Id);
-        var historicEvents = await api.ReadHistoricEventInformation();
+        var liveEvents = await events.GetLive();
+        Assert.DoesNotContain(liveEvents, x => x.Id == eventInformation.Id);
+        var historicEvents = await events.GetHistoric();
         Assert.Contains(historicEvents, x => x.Id == eventInformation.Id);
 
         var historicEventsService = console.GetRequiredService<IHistoricEventService>();
@@ -381,8 +379,7 @@ public sealed class CoreFeatureEndToEndTests
             source.Location,
             source.EventSpan,
             $"FEI-SHOW-{source.Id}",
-            source.Id,
-            source.IsActive
+            source.Id
         );
     }
 

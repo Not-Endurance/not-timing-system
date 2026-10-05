@@ -126,28 +126,10 @@ internal sealed class FunctionsApiDriver : IDisposable
         return Send(HttpMethod.Patch, "api/configure-event", SetupConfigureEventModel.From(setupEvent));
     }
 
-    public async Task<EventInformation> StartEventInformation(Guid configureEventId)
-    {
-        var model = await Send<EventInformationModel>(HttpMethod.Post, $"api/event/{configureEventId}/start", new { });
-        return model.MapToEntity();
-    }
-
     public async Task<EventInformation> ReadEventInformation(Guid eventId)
     {
         var model = await Send<EventInformationModel>(HttpMethod.Get, $"api/event/{eventId}");
         return model.MapToEntity();
-    }
-
-    public async Task<IReadOnlyList<EventInformation>> ReadLiveEventInformation()
-    {
-        var models = await Send<IEnumerable<EventInformationModel>>(HttpMethod.Get, "api/event/active");
-        return models.Select(x => x.MapToEntity()).ToArray();
-    }
-
-    public async Task<IReadOnlyList<EventInformation>> ReadHistoricEventInformation()
-    {
-        var models = await Send<IEnumerable<EventInformationModel>>(HttpMethod.Get, "api/event/past");
-        return models.Select(x => x.MapToEntity()).ToArray();
     }
 
     public async Task<Participation> ReadParticipation(Guid eventId, Guid participationId)
