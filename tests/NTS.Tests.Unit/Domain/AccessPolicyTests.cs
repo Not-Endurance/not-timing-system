@@ -233,6 +233,15 @@ public sealed class AccessPolicyTests
     [InlineData(Who.Developer, Capability.EditSetup, EventStage.Live, Refusal.NotMainOperator)]
     [InlineData(Who.MainOperator, Capability.EditSetup, EventStage.Live, Refusal.EventStarted)]
     [InlineData(Who.MainOperator, Capability.EditSetup, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.Anonymous, Capability.EditEventData, EventStage.Live, Refusal.NotSignedIn)]
+    [InlineData(Who.SomeAccount, Capability.EditEventData, EventStage.Live, Refusal.NotMainOperator)]
+    [InlineData(Who.Steward, Capability.EditEventData, EventStage.Live, Refusal.NotMainOperator)]
+    [InlineData(Who.TenantRoot, Capability.EditEventData, EventStage.Live, Refusal.NotMainOperator)]
+    [InlineData(Who.Developer, Capability.EditEventData, EventStage.Live, Refusal.NotMainOperator)]
+    [InlineData(Who.MainOperator, Capability.EditEventData, EventStage.Unstarted, Refusal.EventNotStarted)]
+    [InlineData(Who.MainOperator, Capability.EditEventData, EventStage.Historic, Refusal.EventEnded)]
+    [InlineData(Who.Developer, Capability.EditEventData, EventStage.Unstarted, Refusal.EventNotStarted)]
+    [InlineData(Who.Developer, Capability.EditEventData, EventStage.Historic, Refusal.EventEnded)]
     [InlineData(Who.Anonymous, Capability.ReadSetup, EventStage.Unstarted, Refusal.NotSignedIn)]
     [InlineData(Who.SomeAccount, Capability.ReadSetup, EventStage.Unstarted, Refusal.NotAllowed)]
     [InlineData(Who.Steward, Capability.ReadSetup, EventStage.Live, Refusal.NotAllowed)]
@@ -392,6 +401,7 @@ public sealed class AccessPolicyTests
             Capability.SendSnapshot,
             Capability.ConfigureEvent,
             Capability.EditSetup,
+            Capability.EditEventData,
             Capability.ReadSetup,
             Capability.AssignMainOperator,
             Capability.HandOverMainOperator,
@@ -457,6 +467,9 @@ public sealed class AccessPolicyTests
             // The Setup is what the Event is configured with before it starts: the Main Operator edits it until the Event
             // starts and then the Console works on the copies in the Core, so a started Event's Setup is changed by nobody.
             [(Capability.EditSetup, EventStage.Unstarted)] = [Who.MainOperator, Who.Developer],
+            // What a started Event keeps is what the Console works on ("use the Console: The Main Operator"): only a Live
+            // Event has it to change, and the Developer's every right stops short of acting as the Main Operator of one.
+            [(Capability.EditEventData, EventStage.Live)] = [Who.MainOperator],
             // Reading a Setup is for the people who run the Event and the Tenant that holds it, at every stage.
             [(Capability.ReadSetup, EventStage.Unstarted)] = [Who.MainOperator, Who.TenantRoot, Who.Developer],
             [(Capability.ReadSetup, EventStage.Live)] = [Who.MainOperator, Who.TenantRoot, Who.Developer],

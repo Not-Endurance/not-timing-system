@@ -85,6 +85,7 @@ public static class AccessPolicy
                 BEFORE_THE_END
             ),
             Capability.EditSetup => Check(isMainOperator || developerMayAct, Refusal.NotMainOperator, scope, UNSTARTED),
+            Capability.EditEventData => Check(isMainOperator || developerMayAct, Refusal.NotMainOperator, scope, LIVE),
             Capability.ReadSetup => Check(
                 isMainOperator || isTenantRoot || caller.IsDeveloper,
                 Refusal.NotAllowed,
@@ -209,6 +210,7 @@ public static class AccessPolicy
             or Capability.SendSnapshot
             or Capability.ConfigureEvent
             or Capability.EditSetup
+            or Capability.EditEventData
             or Capability.ReadSetup
             or Capability.AssignMainOperator
             or Capability.HandOverMainOperator

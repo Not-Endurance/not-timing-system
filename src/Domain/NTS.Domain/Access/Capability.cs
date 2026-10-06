@@ -78,4 +78,11 @@ public enum Capability
 
     /// <summary>Edit the countries, the platform's reference data: the Developer.</summary>
     EditCountries = 22,
+
+    /// <summary>
+    /// Change what a started Event keeps, its Participations, Rankings, Officials and Handouts: the Main Operator, while
+    /// it is Live. It is the Console's work on the copies the Event made when it started, so there is nothing to change
+    /// before the start and nothing once the Event has ended.
+    /// </summary>
+    EditEventData = 23,
 }
