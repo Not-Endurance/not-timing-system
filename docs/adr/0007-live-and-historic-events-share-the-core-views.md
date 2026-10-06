@@ -45,3 +45,10 @@ Historic Events show recorded times only. Whether Staff see the time-event histo
 Integration tests make an Event historic by advancing the injected clock past `EndDay`. The tickets that remove Deactivate and rename the past-event types edit those tests under an explicit exception to rule 4 of `AGENTS.md`.
 
 Reverting the views is a revert. The migration rolls back with the backup taken at cutover.
+
+## Readings made when the guard was built (#629)
+
+- **The guard is the access policy, row by row.** Every write route of what an Event keeps asks `AccessPolicy` about the Event the row belongs to, and the rows are Live only (`EditEventData`, the Main Operator's manual edits; `SendSnapshot`, the Snapshot of #644) or before the end (`LinkAccounts`, which is how an Operator is linked, as grants replaced the Operator documents). A Historic Event answers 409 `event-ended` and an Event that has not started 409 `event-not-started`, and a role is checked before the stage. The instant `EndDay` is Historic: an Event is Live while the clock is before it (`EventStageRule`), tested with the clock at the last second of the Event and at its end. A delete by id names no Event, so the Event is found from the row first.
+- **The host's own writes are one named rule.** `HostPolicy` names the operations the host does by itself to an Event, with nobody to ask, and lets one through to an Event that has ended and to no other stage: the finalisation of the placings of its Rankings (#640). The host asks `EventDataAccess.OpenForHostAsync`, which gives the Event only at that stage, and no route of the Api reaches it; the same Ranking written by a client is refused like any other write.
+- **A client is told the code.** The JSON:API repository keeps what the Api answered with its code (`LastError`), so a caller reads `event-ended` where it would have read any other refusal, and the others keep their own codes (`participation-changed`, `not-main-operator`). What the views do about it (#631) is not decided here.
+- **The writes of the Functions API are not guarded** until it is retired (#647); nothing of the platform calls them.

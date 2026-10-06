@@ -203,8 +203,8 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
             mainOperator.Id,
             DateTimeOffset.UtcNow
         );
-        var existing = RowOf(route, live);
-        var ended = RowOf(route, historic);
+        var existing = EventDataRow.Of(route, live);
+        var ended = EventDataRow.Of(route, historic);
         await existing.SeedAsync(_mongo.ConnectionString, tenant);
         await ended.SeedAsync(_mongo.ConnectionString, tenant);
 
@@ -214,7 +214,7 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
                 HttpMethod.Post,
                 $"/api/{route}",
                 route,
-                RowOf(route, live).Attributes
+                EventDataRow.Of(route, live).Attributes
             );
             var changed = await person.Page.WriteAsync(HttpMethod.Patch, $"/api/{route}/{existing.Id}", route, new { });
             var removed = await person.Page.DeleteAsync($"/api/{route}/{existing.Id}");
@@ -237,7 +237,7 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
             HttpMethod.Post,
             $"/api/{route}",
             route,
-            RowOf(route, unstarted).Attributes
+            EventDataRow.Of(route, unstarted).Attributes
         );
         var late = new[]
         {
@@ -245,7 +245,7 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
                 HttpMethod.Post,
                 $"/api/{route}",
                 route,
-                RowOf(route, historic).Attributes
+                EventDataRow.Of(route, historic).Attributes
             ),
             await mainOperator.Page.WriteAsync(HttpMethod.Patch, $"/api/{route}/{ended.Id}", route, new { }),
             await mainOperator.Page.DeleteAsync($"/api/{route}/{ended.Id}"),
@@ -285,7 +285,7 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
             TestId.Of(99),
             DateTimeOffset.UtcNow
         );
-        var theirs = RowOf(route, foreign);
+        var theirs = EventDataRow.Of(route, foreign);
         await theirs.SeedAsync(_mongo.ConnectionString, otherTenant);
 
         var made = await mainOperator.Page.WriteAsync(HttpMethod.Post, $"/api/{route}", route, theirs.Attributes);
@@ -295,7 +295,7 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
             HttpMethod.Post,
             $"/api/{route}",
             route,
-            RowOf(route, live).Attributes,
+            EventDataRow.Of(route, live).Attributes,
             id: theirs.Id.ToString()
         );
 
@@ -317,77 +317,9 @@ public sealed class EventDataWriteTests : IClassFixture<MongoFixture>
         return new ApiFactory(_mongo.ConnectionString, configureServices: services => services.AddSingleton(changes));
     }
 
-    /// <summary>A row of the family for the Event: what a client sends to make it, and how to seed it.</summary>
-    static Row RowOf(string route, Guid eventId)
-    {
-        var participation = IntegrationPayloadFactory.TwoPhaseParticipation(eventId, 1, Guid.NewGuid());
-        switch (route)
-        {
-            case "rankings":
-                var ranking = IntegrationPayloadFactory.Ranking(eventId, [participation], Guid.NewGuid());
-                return new Row(
-                    route,
-                    "event_rankings",
-                    ranking.Id,
-                    JsonApiAttributes.Of(RankingModel.From(ranking)),
-                    (connection, tenant) => EventSeed.RankingAsync(connection, tenant, ranking)
-                );
-            case "officials":
-                var official = IntegrationPayloadFactory.Official(eventId, null, Guid.NewGuid());
-                return new Row(
-                    route,
-                    "event_officials",
-                    official.Id,
-                    JsonApiAttributes.Of(OfficialModel.MapFrom(official), "userId"),
-                    (connection, tenant) => EventSeed.OfficialAsync(connection, tenant, official)
-                );
-            default:
-                var handout = IntegrationPayloadFactory.Handout(participation, Guid.NewGuid());
-                return new Row(
-                    route,
-                    "event_handouts",
-                    handout.Id,
-                    JsonApiAttributes.Of(HandoutModel.From(handout)),
-                    (connection, tenant) => EventSeed.HandoutAsync(connection, tenant, handout)
-                );
-        }
-    }
-
     static async Task<string?> ErrorCodeAsync(HttpResponseMessage response)
     {
         var body = await ApiSessions.ReadJsonAsync(response);
         return body.GetProperty("errors")[0].GetProperty("code").GetString();
-    }
-
-    sealed class Row
-    {
-        readonly Func<string, string, Task> _seed;
-
-        public Row(
-            string route,
-            string collection,
-            Guid id,
-            Dictionary<string, JsonElement> attributes,
-            Func<string, string, Task> seed
-        )
-        {
-            Route = route;
-            Collection = collection;
-            Id = id;
-            Attributes = attributes;
-            _seed = seed;
-        }
-
-        public string Route { get; }
-        public string Collection { get; }
-        public Guid Id { get; }
-
-        /// <summary>What a client sends to make the row.</summary>
-        public Dictionary<string, JsonElement> Attributes { get; }
-
-        public Task SeedAsync(string mongoConnectionString, string tenant)
-        {
-            return _seed(mongoConnectionString, tenant);
-        }
     }
 }

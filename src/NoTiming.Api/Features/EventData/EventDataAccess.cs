@@ -64,6 +64,22 @@ internal sealed class EventDataAccess
     }
 
     /// <summary>
+    /// The Event, when the host may do the operation to it at the stage it is in (#629, ADR-0007), and none when it is not
+    /// there or the operation is not let through to that stage. The host asks this where a person's write asks
+    /// <see cref="OpenAsync"/>, so that what an Event that is no longer Live takes from the host is the one row of
+    /// <see cref="HostPolicy"/>, and no route of the Api reaches it.
+    /// </summary>
+    public async Task<EventFacts?> OpenForHostAsync(
+        HostOperation operation,
+        Guid eventId,
+        CancellationToken cancellationToken
+    )
+    {
+        var facts = await _events.FindAsync(eventId, cancellationToken);
+        return facts is not null && HostPolicy.IsAllowed(operation, facts.Stage) ? facts : null;
+    }
+
+    /// <summary>
     /// The row with the id, whichever Tenant it is in, which is how a row is found when only its id is known, as a reader
     /// finds it; and the Tenant it is in is then the Tenant of its Event, which is the one a write is made in.
     /// </summary>
