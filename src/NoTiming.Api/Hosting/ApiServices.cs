@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Profile;
@@ -54,6 +55,7 @@ internal static class ApiServices
         services.AddSingleton<CallerReader>();
         services.AddSingleton<GlobalCollections>();
         services.AddSingleton<ReferenceAccess>();
+        services.AddSingleton<EventDataAccess>();
         services.AddSingleton<AccountSearch>();
         services
             .AddOptions<SearchRateLimitOptions>()

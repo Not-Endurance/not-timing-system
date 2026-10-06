@@ -1,23 +1,10 @@
 using System.Linq.Expressions;
 using Not.Application.CRUD.Ports;
-using Not.Application.HTTP;
-using Not.Domain.Abstractions;
 using Not.Exceptions;
-using Not.Krud.Abstractions;
-using Not.Storage.REST;
-using NTS.Contracts.Core;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Storage.REST;
-
-public abstract class EventScopedApiRepository<T, TModel> : ApiRepository<T, TModel>, IEventScopedRepository<T>
-    where T : class, IEntity, IEventScoped
-    where TModel : class, IEventScoped, IKrudModel<T>, new()
-{
-    protected EventScopedApiRepository(string endpoint, NHttpClient client, EventScopeFactory<T> eventScopeFactory)
-        : base(endpoint, client, eventScopeFactory) { }
-}
 
 public class EventScopeFactory<T> : IRepositoryScopeFactory<T>
     where T : IEventScoped

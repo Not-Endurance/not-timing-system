@@ -35,7 +35,14 @@ internal static class JsonApiResults
         );
     }
 
-    public static IResult Resource(int status, string type, string id, object attributes, string? location = null)
+    public static IResult Resource(
+        int status,
+        string type,
+        string id,
+        object attributes,
+        string? location = null,
+        object? meta = null
+    )
     {
         var document = Results.Json(
             new
@@ -45,6 +52,7 @@ internal static class JsonApiResults
                     type,
                     id,
                     attributes,
+                    meta,
                 },
             },
             Options,
@@ -64,7 +72,8 @@ internal static class JsonApiResults
         IEnumerable<(string Id, object Attributes)> items,
         object? links = null,
         object? meta = null,
-        Func<string, string>? itemLink = null
+        Func<string, string>? itemLink = null,
+        Func<string, object?>? itemMeta = null
     )
     {
         return Results.Json(
@@ -76,6 +85,7 @@ internal static class JsonApiResults
                     id = item.Id,
                     attributes = item.Attributes,
                     links = itemLink == null ? null : new { self = itemLink(item.Id) },
+                    meta = itemMeta?.Invoke(item.Id),
                 }),
                 links,
                 meta,

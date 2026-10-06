@@ -285,6 +285,13 @@ internal static class ReferenceEndpoints
         return new { self, next = hasNext ? WithPage(request, query.Number + 1) : null };
     }
 
+    /// <summary>Gives a row the id its client made for it, which a document names as the id of the resource and never as an attribute.</summary>
+    public static void SetId<TModel>(TModel row, Guid id)
+        where TModel : class
+    {
+        typeof(TModel).GetProperty("Id")!.SetValue(row, id);
+    }
+
     static async Task<IResult> ListAsync<TModel, TEntity>(
         ReferenceFamily<TModel, TEntity> family,
         HttpContext context,
@@ -498,12 +505,6 @@ internal static class ReferenceEndpoints
             family.Members.AttributesOf(row),
             location
         );
-    }
-
-    static void SetId<TModel>(TModel row, Guid id)
-        where TModel : class
-    {
-        typeof(TModel).GetProperty("Id")!.SetValue(row, id);
     }
 
     static string WithPage(HttpRequest request, int number)

@@ -8,7 +8,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// Viewers learn that a Participation changed from the one change notification and nothing else (#623, ADR-0006): the
-/// Api's hub, the Ui's own client and store, and the Functions API they read from, all real.
+/// Api's hub, the Ui's own client and store, and the Api they read from, all real.
 /// </summary>
 public sealed class ViewersFollowChangesTests : IClassFixture<NtsIntegrationFixture>
 {
@@ -24,11 +24,14 @@ public sealed class ViewersFollowChangesTests : IClassFixture<NtsIntegrationFixt
     [Fact]
     public async Task Two_viewers_show_a_Participation_that_appeared_once_the_Api_announces_it_and_not_before()
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-        var eventInformation = IntegrationPayloadFactory.EventInformation(Guid.NewGuid());
-        var eventId = eventInformation.Id;
-        await functionsApi.Create(eventInformation);
-        await functionsApi.Create(IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid()));
+        var tenant = await TenancySeed.TenantAsync(_fixture.MongoConnectionString);
+        var eventId = await EventSeed.LiveAsync(_fixture.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        var eventInformation = IntegrationPayloadFactory.EventInformation(eventId);
+        await EventSeed.ParticipationAsync(
+            _fixture.MongoConnectionString,
+            tenant,
+            IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid())
+        );
         await using var first = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "viewer-one");
         await using var second = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "viewer-two");
         await first.Start();
@@ -39,7 +42,7 @@ public sealed class ViewersFollowChangesTests : IClassFixture<NtsIntegrationFixt
         await second.WaitForParticipation(1, _ => true, PATIENCE);
 
         var appeared = IntegrationPayloadFactory.ActiveParticipation(eventId, 2, Guid.NewGuid());
-        await functionsApi.Create(appeared);
+        await EventSeed.ParticipationAsync(_fixture.MongoConnectionString, tenant, appeared);
         await Task.Delay(500);
 
         Assert.Null(first.GetRequiredService<IParticipationStore>().Find(appeared.Id)); // nothing tells them yet

@@ -61,6 +61,15 @@ internal static class PublicEndpoints
             new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/live"),
             new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/historic"),
             new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/events/{id}"),
+            // what an Event keeps is what its public views show: Participations, Rankings, Officials and Handouts
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/participations"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/participations/{id}"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/rankings"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/rankings/{id}"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/officials"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/officials/{id}"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/handouts"),
+            new PublicEndpoint(EndpointAccess.PublicRead, "GET", "api/handouts/{id}"),
             new PublicEndpoint(EndpointAccess.PublicRead, "GET,HEAD", "{**path:nonfile}"), // the Ui
             new PublicEndpoint(EndpointAccess.PublicRead, "*", ApplicationConstants.LIVE_HUB),
             new PublicEndpoint(EndpointAccess.PublicRead, "*", ApplicationConstants.LIVE_HUB + "/negotiate"),

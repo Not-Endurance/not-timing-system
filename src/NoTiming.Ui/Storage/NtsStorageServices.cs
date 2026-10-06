@@ -48,7 +48,6 @@ public static class NtsStorageServices
             _services.AddTransient<IRepository<Participation>, ParticipationApiRepository>();
             _services.AddTransient<IRepository<Ranking>, RankingApiRepository>();
             _services.AddTransient<IRepository<Official>, OfficialApiRepository>();
-            _services.AddTransient<IRepository<Operator>, OperatorApiRepository>();
             _services.AddTransient<IRepository<Handout>, HandoutApiRepository>();
             _services.AddTransient<IRepository<Country>, CountryApiRepository>();
             _services.AddTransient<IRepository<Club>, ClubApiRepository>();
@@ -60,7 +59,6 @@ public static class NtsStorageServices
             AddEventScopedRepository<Participation, ParticipationEventScopedApiRepository>();
             AddEventScopedRepository<Ranking, RankingEventScopedApiRepository>();
             AddEventScopedRepository<Official, OfficialEventScopedApiRepository>();
-            AddEventScopedRepository<Operator, OperatorEventScopedApiRepository>();
             AddEventScopedRepository<Handout, HandoutEventScopedApiRepository>();
             return this;
         }

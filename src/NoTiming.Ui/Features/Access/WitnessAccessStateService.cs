@@ -1,17 +1,21 @@
+using System.Text.Json;
 using MediatR;
 using Microsoft.AspNetCore.Components.Authorization;
 using Not.Application.Authentication.Abstractions;
+using Not.Application.HTTP;
 using Not.Injection;
 using NoTiming.Ui.Features.Sessions;
-using NTS.Contracts.Core;
 using NTS.Contracts.Socket;
 using NTS.Contracts.Watcher.Models;
-using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects;
 
 namespace NoTiming.Ui.Features.Access;
 
+/// <summary>
+/// What the person at this Witness may do about the Event it follows. Whether they may send a Snapshot is told by the Api,
+/// which is the one that decides it (ADR-0012): the capabilities of the Event for the signed-in caller, and not the lists
+/// of its Officials and Operators, which the Api does not give away and a client could only guess a decision from.
+/// </summary>
 public class WitnessAccessContext
     : WitnessAuthenticationAwareContext,
         IWitnessAccessContext,
@@ -21,22 +25,19 @@ public class WitnessAccessContext
 {
     readonly INtsSocketContext _socketContext;
     readonly INUserSession _userSessionService;
-    readonly IEventScopedRepository<Official> _officialReader;
-    readonly IEventScopedRepository<Operator> _operatorReader;
+    readonly JsonApiClient _api;
 
     public WitnessAccessContext(
         INtsSocketContext socketContext,
         INUserSession userSessionService,
-        IEventScopedRepository<Official> officialRepository,
-        IEventScopedRepository<Operator> operatorRepository,
+        JsonApiClient api,
         AuthenticationStateProvider authenticationStateProvider
     )
         : base(authenticationStateProvider)
     {
         _socketContext = socketContext;
         _userSessionService = userSessionService;
-        _officialReader = officialRepository;
-        _operatorReader = operatorRepository;
+        _api = api;
     }
 
     public WitnessAccessLevel AccessLevel { get; private set; }
@@ -52,14 +53,12 @@ public class WitnessAccessContext
         }
 
         AccessLevel = WitnessAccessLevel.Registered;
-        if (_socketContext.Event == null)
+        if (_socketContext.Event is not { } selected)
         {
             return true;
         }
 
-        var officials = await _officialReader.ReadMany();
-        var operators = await _operatorReader.ReadMany();
-        if (CanWriteSnapshots(userId.Value, officials, operators))
+        if (await CanSendSnapshots(selected.Id))
         {
             AccessLevel = WitnessAccessLevel.Official;
         }
@@ -77,9 +76,16 @@ public class WitnessAccessContext
         await ReloadState();
     }
 
-    static bool CanWriteSnapshots(Guid userId, IEnumerable<Official> officials, IEnumerable<Operator> operators)
+    /// <summary>
+    /// Whether the Api lets the caller send a Snapshot to the Event. What it cannot answer, because the caller is not signed
+    /// in to it, is a no: the Snapshot is refused by the Api again when it is sent. An Api that cannot be reached leaves the
+    /// state to be loaded again, as it does for every stateful service.
+    /// </summary>
+    async Task<bool> CanSendSnapshots(Guid eventId)
     {
-        return operators.Any(x => x.UserId == userId && SnapshotAccessPolicy.CanWriteAsOperator(x.Role))
-            || officials.Any(x => x.UserId == userId && SnapshotAccessPolicy.CanWriteAsOfficial(x.Role));
+        var response = await _api.Send(HttpMethod.Get, $"events/{eventId}/capabilities");
+        return response is { IsSuccess: true, Document: { } document }
+            && document.GetProperty("data").GetProperty("attributes").TryGetProperty("canSnapshot", out var can)
+            && can.ValueKind == JsonValueKind.True;
     }
 }

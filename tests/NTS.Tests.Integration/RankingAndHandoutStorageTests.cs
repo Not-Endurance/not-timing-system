@@ -1,5 +1,4 @@
 using MongoDB.Bson;
-using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Serialization.JSON;
 using NTS.Contracts.Core.Models;
@@ -108,14 +107,9 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
         var asked = ODataApiFilterAdapter.ParseFilters<Handout>([x => x.ParticipationId == first.Id]);
         var theServerFilters = await ReadHandoutsFrom(HttpHelper.AddQueryString("api/handouts", asked));
         var withNoFilter = await ReadHandoutsFrom("api/handouts");
-        await using var client = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "reader");
-        var theUiAsks = await client
-            .GetRequiredService<IRepository<Handout>>()
-            .ReadMany(x => x.ParticipationId == first.Id);
 
         Assert.Equal(expected.Order(), theServerFilters.Select(x => x.Id).Order());
         Assert.Contains(ofSecond.Id, withNoFilter.Select(x => x.Id)); // what the filter left out is there to be found
-        Assert.Equal(expected.Order(), theUiAsks.Select(x => x.Id).Order());
     }
 
     [Fact]

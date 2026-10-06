@@ -1,12 +1,13 @@
 using Not.Application.HTTP;
 using NoTiming.Ui.Storage.REST;
-using NTS.Contracts.Core.Models;
+using NTS.Contracts.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Storage.Core.Repositories;
 
-public class OfficialEventScopedApiRepository : EventScopedApiRepository<Official, OfficialModel>
+/// <summary>The Officials of the Event the Ui has selected: every list names it.</summary>
+public class OfficialEventScopedApiRepository : OfficialApiRepository, IEventScopedRepository<Official>
 {
-    public OfficialEventScopedApiRepository(NHttpClient client, EventScopeFactory<Official> eventScopeFactory)
-        : base("officials", client, eventScopeFactory) { }
+    public OfficialEventScopedApiRepository(JsonApiClient client, EventScopeFactory<Official> eventScopeFactory)
+        : base(client, eventScopeFactory) { }
 }

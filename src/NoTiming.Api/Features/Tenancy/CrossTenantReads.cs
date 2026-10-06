@@ -7,6 +7,7 @@ using MongoDB.Driver.Linq;
 using Not.Identity;
 using NoTiming.Api.Features.Reference;
 using NTS.Contracts.Core.Models;
+using NTS.Contracts.Shared;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 
@@ -173,6 +174,25 @@ internal sealed class CrossTenantReads
     {
         return await _database
             .GetCollection<EventInformationModel>(TenantOwned.EVENT_INFORMATIONS)
+            .Find(x => x.Id == id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// A row of what an Event keeps (a Participation, a Ranking, an Official or a Handout) by its id, whatever Tenant it is in,
+    /// as the public views show it (ADR-0001): the id finds it, and none when there is none. Only the collections an Event
+    /// keeps can be opened this way.
+    /// </summary>
+    public async Task<T?> FindEventRowAsync<T>(string collection, Guid id, CancellationToken cancellationToken)
+        where T : class, IDocument
+    {
+        if (!TenantOwned.OfAnEvent.Contains(collection))
+        {
+            throw new ArgumentException($"'{collection}' is not a collection that an Event keeps.", nameof(collection));
+        }
+
+        return await _database
+            .GetCollection<T>(collection)
             .Find(x => x.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
     }

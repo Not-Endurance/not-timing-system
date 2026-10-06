@@ -1,12 +1,13 @@
 using Not.Application.HTTP;
 using NoTiming.Ui.Storage.REST;
-using NTS.Contracts.Core.Models;
+using NTS.Contracts.Core;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Ui.Storage.Core.Repositories;
 
-public class RankingEventScopedApiRepository : EventScopedApiRepository<Ranking, RankingModel>
+/// <summary>The Rankings of the Event the Ui has selected: every list names it.</summary>
+public class RankingEventScopedApiRepository : RankingApiRepository, IEventScopedRepository<Ranking>
 {
-    public RankingEventScopedApiRepository(NHttpClient client, EventScopeFactory<Ranking> eventScopeFactory)
-        : base("rankings", client, eventScopeFactory) { }
+    public RankingEventScopedApiRepository(JsonApiClient client, EventScopeFactory<Ranking> eventScopeFactory)
+        : base(client, eventScopeFactory) { }
 }

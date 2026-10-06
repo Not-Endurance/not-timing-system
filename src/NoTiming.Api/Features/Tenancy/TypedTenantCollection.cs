@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.AspNetCore.OData.Query;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Reference;
 using NTS.Contracts.Shared;
@@ -103,16 +104,36 @@ internal sealed class TypedTenantCollection<T> : IReferenceCollection<T>
     public async Task<bool> UpdateAsync(Guid id, BsonDocument update, CancellationToken cancellationToken)
     {
         var tenant = Required();
-        var set = update.TryGetValue("$set", out var named) ? named.AsBsonDocument.DeepClone().AsBsonDocument : new();
-        set[TenantOwned.TENANT_ID] = tenant;
-        var combined = new BsonDocument("$set", set);
-        if (update.TryGetValue("$unset", out var removed))
-        {
-            combined["$unset"] = removed;
-        }
-
         var result = await _documents.UpdateOneAsync(
             x => x.Id == id && x.TenantId == tenant,
+            new BsonDocumentUpdateDefinition<T>(InTheTenant(update, tenant)),
+            cancellationToken: cancellationToken
+        );
+        return result.MatchedCount > 0;
+    }
+
+    /// <summary>
+    /// The same for a document that counts its writes (ADR-0013): the update is applied when the row is at the version the
+    /// caller based it on, and the row is then at the next one, in the same write, so that of two changes made at one
+    /// version only one is taken. A row that no write has counted yet is at version 0. False when the row is not at the
+    /// version, is not the Tenant's or is not there.
+    /// </summary>
+    public async Task<bool> UpdateAtVersionAsync(
+        Guid id,
+        BsonDocument update,
+        int version,
+        CancellationToken cancellationToken
+    )
+    {
+        var tenant = Required();
+        var element = VersionElement();
+        var counted = Builders<T>.Filter.Eq(element, version);
+        var atVersion =
+            version == 0 ? Builders<T>.Filter.Or(counted, Builders<T>.Filter.Exists(element, false)) : counted;
+        var combined = InTheTenant(update, tenant);
+        combined["$inc"] = new BsonDocument(element, 1);
+        var result = await _documents.UpdateOneAsync(
+            Builders<T>.Filter.And(Builders<T>.Filter.Where(x => x.Id == id && x.TenantId == tenant), atVersion),
             new BsonDocumentUpdateDefinition<T>(combined),
             cancellationToken: cancellationToken
         );
@@ -124,6 +145,26 @@ internal sealed class TypedTenantCollection<T> : IReferenceCollection<T>
         var tenant = Required();
         var result = await _documents.DeleteOneAsync(x => x.Id == id && x.TenantId == tenant, cancellationToken);
         return result.DeletedCount > 0;
+    }
+
+    static string VersionElement()
+    {
+        return BsonClassMap.LookupClassMap(typeof(T)).GetMemberMap(nameof(IVersionedDocument.Version))?.ElementName
+            ?? throw new InvalidOperationException($"{typeof(T).Name} does not count its writes.");
+    }
+
+    /// <summary>The update with the Tenant set last, so that nothing a caller names moves the row to another Tenant.</summary>
+    static BsonDocument InTheTenant(BsonDocument update, string tenant)
+    {
+        var set = update.TryGetValue("$set", out var named) ? named.AsBsonDocument.DeepClone().AsBsonDocument : new();
+        set[TenantOwned.TENANT_ID] = tenant;
+        var combined = new BsonDocument("$set", set);
+        if (update.TryGetValue("$unset", out var removed))
+        {
+            combined["$unset"] = removed;
+        }
+
+        return combined;
     }
 
     string Required()

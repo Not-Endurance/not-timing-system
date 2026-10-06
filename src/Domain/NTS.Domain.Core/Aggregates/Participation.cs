@@ -19,11 +19,13 @@ public class Participation : Aggregate, IEventScoped
         PhaseCollection phases,
         Eliminated? notQualified,
         Guid eventId,
-        Guid? id = null
+        Guid? id = null,
+        int version = 0
     )
         : base(id)
     {
         EventId = eventId;
+        Version = version;
         Category = category;
         Competition = competition;
         Combination = combination;
@@ -37,6 +39,12 @@ public class Participation : Aggregate, IEventScoped
     public ParticipationCategory Category { get; }
     public PhaseCollection Phases { get; }
     public Eliminated? Eliminated { get; private set; }
+
+    /// <summary>
+    /// How many times the stored Participation has been written (ADR-0013): what a view of it was read at, so that a write
+    /// made from it can be told from a write made from the current one. The domain does not change it; the store does.
+    /// </summary>
+    public int Version { get; }
 
     public bool IsEliminated()
     {

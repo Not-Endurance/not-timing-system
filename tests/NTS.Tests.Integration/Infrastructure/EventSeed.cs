@@ -2,6 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Reference;
 using NTS.Contracts.Setup.Models;
+using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Tests.Integration.Infrastructure;
 
@@ -213,6 +214,48 @@ internal static class EventSeed
 
         await Grants(mongoConnectionString).InsertOneAsync(document);
         return id;
+    }
+
+    /// <summary>
+    /// A Participation as the Api keeps it: the model of the Participation stamped with the Tenant of its Event, and the
+    /// version its document carries (a document that was never written since the versions came has none, which is 0).
+    /// </summary>
+    public static async Task ParticipationAsync(
+        string mongoConnectionString,
+        string tenant,
+        Participation participation,
+        int version = 0
+    )
+    {
+        ApiMongo.Configure();
+        var model = NTS.Contracts.Core.Models.ParticipationModel.MapFrom(participation);
+        model.TenantId = tenant;
+        model.Version = version;
+        await Collection(mongoConnectionString, "event_participations").InsertOneAsync(model.ToBsonDocument());
+    }
+
+    public static async Task RankingAsync(string mongoConnectionString, string tenant, Ranking ranking)
+    {
+        ApiMongo.Configure();
+        var model = NTS.Contracts.Core.Models.RankingModel.From(ranking);
+        model.TenantId = tenant;
+        await Collection(mongoConnectionString, "event_rankings").InsertOneAsync(model.ToBsonDocument());
+    }
+
+    public static async Task OfficialAsync(string mongoConnectionString, string tenant, Official official)
+    {
+        ApiMongo.Configure();
+        var model = NTS.Contracts.Core.Models.OfficialModel.MapFrom(official);
+        model.TenantId = tenant;
+        await Collection(mongoConnectionString, "event_officials").InsertOneAsync(model.ToBsonDocument());
+    }
+
+    public static async Task HandoutAsync(string mongoConnectionString, string tenant, Handout handout)
+    {
+        ApiMongo.Configure();
+        var model = NTS.Contracts.Core.Models.HandoutModel.From(handout);
+        model.TenantId = tenant;
+        await Collection(mongoConnectionString, "event_handouts").InsertOneAsync(model.ToBsonDocument());
     }
 
     public static async Task<BsonDocument?> SetupOfAsync(string mongoConnectionString, Guid id)

@@ -45,6 +45,13 @@ internal sealed class ViewerDriver : IAsyncDisposable
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
+
+        // The families that moved to the Api are reached at the Api, as the Ui does where its page came from.
+        services.Configure<JsonApiSettings>(settings =>
+        {
+            settings.Url = $"{apiBaseUrl.ToString().TrimEnd('/')}/api";
+            settings.WriteHeaders[ApplicationConstants.WRITE_HEADER] = ApplicationConstants.WRITE_HEADER_VALUE;
+        });
         services.AddNtsWitness(
             configuration,
             functionsBaseUrl.ToString().TrimEnd('/'),

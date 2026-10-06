@@ -28,6 +28,7 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
 
     readonly string _collection;
     readonly HashSet<string> _notSent;
+    readonly IRepositoryScopeFactory<T>? _scopeFactory;
 
     /// <param name="collection">The type of the resource and the path of its collection, such as <c>clubs</c>.</param>
     /// <param name="notSent">
@@ -35,9 +36,27 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
     /// id and the Tenant never are.
     /// </param>
     protected JsonApiRepository(string collection, JsonApiClient client, params string[] notSent)
+        : this(collection, client, null, notSent) { }
+
+    /// <param name="collection">The type of the resource and the path of its collection, such as <c>clubs</c>.</param>
+    /// <param name="scopeFactory">
+    /// What every list is limited to, such as the Event whose rows these are, and which the Api asks every list of the
+    /// resource to name. None reads whatever the filter of a call says.
+    /// </param>
+    /// <param name="notSent">
+    /// The members of the model, in camelCase, that the Api owns or keeps to itself, so that they are not sent back: the
+    /// id and the Tenant never are.
+    /// </param>
+    protected JsonApiRepository(
+        string collection,
+        JsonApiClient client,
+        IRepositoryScopeFactory<T>? scopeFactory,
+        params string[] notSent
+    )
     {
         _collection = collection;
         Client = client;
+        _scopeFactory = scopeFactory;
         _notSent = ["id", "tenantId", .. notSent];
     }
 
@@ -48,6 +67,12 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
 
     /// <summary>The members a new resource is made with; none means every member there is.</summary>
     protected virtual IReadOnlyCollection<string>? CreateMembers => null;
+
+    /// <summary>
+    /// The members that are written when the resource is made and a change leaves as they are, such as the Event of a row:
+    /// the Api refuses a change that names one.
+    /// </summary>
+    protected virtual IReadOnlyCollection<string> NotChanged => [];
 
     /// <summary>
     /// What the Api answered to the last thing this repository did when it did not take it, with its code: a form that
@@ -70,9 +95,26 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
 
     protected virtual async Task<bool> UpdateCore(T item)
     {
-        var response = await Client.Send(HttpMethod.Patch, $"{_collection}/{item.Id}", Document(MapModel(item), null));
+        var model = MapModel(item);
+        var response = await Client.Send(
+            HttpMethod.Patch,
+            $"{_collection}/{item.Id}",
+            Document(model, null, NotChanged, ChangeMeta(model))
+        );
         return response.IsSuccess ? Done() : Failed(response);
     }
+
+    /// <summary>
+    /// What the document of a change says of the resource besides its attributes, in its <c>meta</c>: the version of a
+    /// resource that counts its writes, which the change is based on. None by default.
+    /// </summary>
+    protected virtual JsonObject? ChangeMeta(TModel model)
+    {
+        return null;
+    }
+
+    /// <summary>What the Api told of a resource besides its attributes, in its <c>meta</c>, put into the model that was read.</summary>
+    protected virtual void ReadMeta(TModel model, JsonElement meta) { }
 
     protected virtual TModel MapModel(T item)
     {
@@ -111,6 +153,11 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
             ID.SetValue(model, parsed);
         }
 
+        if (data.TryGetProperty("meta", out var meta) && meta.ValueKind == JsonValueKind.Object)
+        {
+            ReadMeta(model, meta);
+        }
+
         return model.MapToEntity();
     }
 
@@ -132,14 +179,26 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
         return false;
     }
 
-    /// <summary>The document of a write: the resource with the id of the model and the members it is sent with.</summary>
-    protected JsonElement Document(TModel model, IReadOnlyCollection<string>? members)
+    /// <summary>
+    /// The document of a write: the resource with the id of the model, the members it is sent with, and what it says of
+    /// itself besides them. Without a list of members it is sent with every one but the ones the Api keeps and the ones
+    /// that are left out.
+    /// </summary>
+    protected JsonElement Document(
+        TModel model,
+        IReadOnlyCollection<string>? members,
+        IReadOnlyCollection<string>? leftOut = null,
+        JsonObject? meta = null
+    )
     {
         var attributes = new JsonObject();
         var serialized = JsonSerializer.SerializeToElement(model, JsonApiClient.WriteOptions);
         foreach (var member in serialized.EnumerateObject())
         {
-            var sent = members == null ? !_notSent.Contains(member.Name) : members.Contains(member.Name);
+            var sent =
+                members == null
+                    ? !_notSent.Contains(member.Name) && leftOut?.Contains(member.Name) != true
+                    : members.Contains(member.Name);
             if (sent)
             {
                 attributes[member.Name] = JsonNode.Parse(member.Value.GetRawText());
@@ -154,6 +213,11 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
         }
 
         data["attributes"] = attributes;
+        if (meta != null)
+        {
+            data["meta"] = meta;
+        }
+
         return JsonSerializer.SerializeToElement(new JsonObject { ["data"] = data });
     }
 
@@ -226,19 +290,42 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
 
     public virtual async Task<IEnumerable<T>> ReadMany()
     {
-        return await ReadPages(null);
+        return await ReadWithin(null);
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany(Expression<Func<T, bool>> filter)
     {
-        if (ODataApiFilterAdapter.TryParseFilters(new[] { filter }, out var parameters, camelCase: true))
+        return await ReadWithin(filter);
+    }
+
+    /// <summary>
+    /// What satisfies the filter within the scope of the repository, the scope first, as the Api asks of a list of what an
+    /// Event keeps. What cannot be written for it is read within the scope and filtered here.
+    /// </summary>
+    async Task<IEnumerable<T>> ReadWithin(Expression<Func<T, bool>>? filter)
+    {
+        var scope = _scopeFactory?.Create().Filter;
+        if (ODataApiFilterAdapter.TryParseFilters(Filters(scope, filter), out var parameters, camelCase: true))
         {
             return await ReadPages(parameters.GetValueOrDefault("$filter"));
         }
 
+        if (filter == null)
+        {
+            return await ReadPages(null);
+        }
+
         // The expression cannot be written for the server, so what there is is read and filtered here.
         var predicate = filter.Compile();
-        return (await ReadPages(null)).Where(predicate);
+        var within = ODataApiFilterAdapter.TryParseFilters(Filters(scope, null), out var scoped, camelCase: true)
+            ? await ReadPages(scoped.GetValueOrDefault("$filter"))
+            : await ReadPages(null);
+        return within.Where(predicate);
+    }
+
+    static Expression<Func<T, bool>>[] Filters(Expression<Func<T, bool>>? scope, Expression<Func<T, bool>>? filter)
+    {
+        return [.. new[] { scope, filter }.OfType<Expression<Func<T, bool>>>()];
     }
 
     async Task<IEnumerable<T>> ReadPages(string? filter, string? path = null, string? sort = null)

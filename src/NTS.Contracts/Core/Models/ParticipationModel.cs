@@ -5,7 +5,12 @@ using NTS.Domain.Enums;
 
 namespace NTS.Contracts.Core.Models;
 
-public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Participation>
+public class ParticipationModel
+    : IDocument,
+        IEventScoped,
+        ISoftDeletableDocument,
+        IVersionedDocument,
+        IKrudModel<Participation>
 {
     public static ParticipationModel MapFrom(Participation participation)
     {
@@ -18,6 +23,7 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
             Combination = CombinationModel.MapFrom(participation.Combination),
             Phases = participation.Phases.Select(PhaseModel.MapFrom).ToArray(),
             Eliminated = participation.Eliminated == null ? null : EliminatedModel.MapFrom(participation.Eliminated),
+            Version = participation.Version,
         };
     }
 
@@ -41,7 +47,7 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
         var combination = Combination.MapToEntity();
         var phases = Phases!.Select(x => x.MapToEntity());
         var eliminated = Eliminated?.MapToEntity();
-        return new Participation(Category, competition, combination, new(phases), eliminated, EventId, Id);
+        return new Participation(Category, competition, combination, new(phases), eliminated, EventId, Id, Version);
     }
 
     void IKrudModel<Participation>.MapFrom(Participation participation)
@@ -53,5 +59,6 @@ public class ParticipationModel : IEventScoped, ISoftDeletableDocument, IKrudMod
         Combination = CombinationModel.MapFrom(participation.Combination);
         Phases = participation.Phases.Select(PhaseModel.MapFrom).ToArray();
         Eliminated = participation.Eliminated == null ? null : EliminatedModel.MapFrom(participation.Eliminated);
+        Version = participation.Version;
     }
 }

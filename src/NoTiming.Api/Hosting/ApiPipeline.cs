@@ -2,6 +2,7 @@ using Microsoft.Extensions.Localization;
 using Not.Localization;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Profile;
@@ -64,6 +65,7 @@ internal static class ApiPipeline
         app.MapAccountSearch();
         app.MapRegistrySearch();
         app.MapReference();
+        app.MapEventData();
         app.MapUserSessions();
         app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);
 

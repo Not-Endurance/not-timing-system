@@ -8,7 +8,7 @@ namespace NTS.Contracts.Core.Models;
 /// A stored Handout: its id, its Event and the id of its Participation. The Participation id is a top-level field so
 /// that the Handouts of a Participation are found by a filter the server applies (ADR-0006).
 /// </summary>
-public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Handout>
+public class HandoutModel : IDocument, IEventScoped, ISoftDeletableDocument, IKrudModel<Handout>
 {
     public static HandoutModel From(Handout handout)
     {

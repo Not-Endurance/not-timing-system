@@ -54,7 +54,7 @@ internal static class JsonApiRequests
                 );
             }
 
-            return JsonApiRead<TAttributes>.Accepted(attributes, document.Data.Id);
+            return JsonApiRead<TAttributes>.Accepted(attributes, document.Data.Id, document.Data.Meta);
         }
         catch (JsonException)
         {
@@ -101,29 +101,36 @@ internal sealed class JsonApiResourceObject<TAttributes>
     public string? Type { get; set; }
     public string? Id { get; set; }
     public TAttributes? Attributes { get; set; }
+
+    /// <summary>What the document says about the resource that is not its attributes, such as the version it was based on.</summary>
+    public JsonElement? Meta { get; set; }
 }
 
 internal sealed class JsonApiRead<TAttributes>
     where TAttributes : class
 {
-    public static JsonApiRead<TAttributes> Accepted(TAttributes attributes, string? id = null)
+    public static JsonApiRead<TAttributes> Accepted(TAttributes attributes, string? id = null, JsonElement? meta = null)
     {
-        return new(attributes, id, null);
+        return new(attributes, id, meta, null);
     }
 
     public static JsonApiRead<TAttributes> Rejected(IResult error)
     {
-        return new(null, null, error);
+        return new(null, null, null, error);
     }
 
-    JsonApiRead(TAttributes? attributes, string? id, IResult? error)
+    JsonApiRead(TAttributes? attributes, string? id, JsonElement? meta, IResult? error)
     {
         Attributes = attributes;
         Id = id;
+        Meta = meta;
         Error = error;
     }
 
     public TAttributes? Attributes { get; }
+
+    /// <summary>The <c>meta</c> the document gave its resource, when it gave one.</summary>
+    public JsonElement? Meta { get; }
 
     /// <summary>The id the document gave its resource, when it gave one.</summary>
     public string? Id { get; }

@@ -36,4 +36,14 @@ ADR-0004 and ADR-0005 are amended in place (they are only proposed): the server,
 
 A manual save that succeeded but whose response was lost gets 409 on the retry; the Console reloads and finds its change applied. Edits to two Phases of one Participation conflict although they are unrelated, which is rare and cheap to redo. Times are recorded while no Console is open, and an Official sees the outcome at once.
 
+## Readings made when the manual edits were built (#604)
+
+The manual edit is the `PATCH` of a Participation (`PATCH /api/participations/{id}`), and these are the readings.
+
+- **A change is a conditional update of the members it names, not a replace of the document.** It is applied when the document is at the version the change was based on, and the version is one more in the same write, so that of two changes made at one version only one is taken and the other is 409 `participation-changed`; the members it does not name are never overwritten. A document that no write has counted yet is at version 0.
+- **The version is a whole number from 0 in the `meta` of the document.** A change without one is 400 `version-required`, one that is not a number is 400 `malformed-request`, and one that was made on another version is 409 `participation-changed` and changes nothing, even when it names no member. A change that names nothing, at the right version, changes nothing and is not announced.
+- **A write that was stored is announced once, and one that was not is not.** The Participation that is made, changed or removed through the Api is announced to the clients of its Event after it was stored (`ParticipationChanged`); a refused write, a stale one and a change that named nothing announce nothing. A removal is announced too: the viewers read again and find the Participation gone.
+- **Rankings, Officials and Handouts are last-write-wins and are not announced.** They count no writes; what the viewers follow is the Participations.
+- **The Functions API does not count its writes.** What it writes of a Participation leaves the version as it was, so a change through the Api against a document it wrote at the same moment is not told to be stale until the Functions API is retired (#647).
+
 Scenarios of the integration suite in which "Judge records a snapshot and both Witnesses update" change meaning; their assertions are edited only with the owner's approval per test (AGENTS.md rule 4). Any endpoint this decision adds or changes follows `.claude/skills/rest-api/SKILL.md` (ADR-0008).

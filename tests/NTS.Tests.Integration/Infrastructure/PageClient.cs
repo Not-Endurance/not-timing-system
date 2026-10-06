@@ -93,7 +93,8 @@ internal sealed class PageClient
         object attributes,
         bool withToken = true,
         string? language = null,
-        string? id = null
+        string? id = null,
+        object? meta = null
     )
     {
         var body = JsonSerializer.Serialize(
@@ -104,6 +105,7 @@ internal sealed class PageClient
                     type,
                     id,
                     attributes,
+                    meta,
                 },
             }
         );
