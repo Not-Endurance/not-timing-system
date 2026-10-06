@@ -56,6 +56,9 @@ internal static class ApiServices
         services.AddSingleton<GlobalCollections>();
         services.AddSingleton<ReferenceAccess>();
         services.AddSingleton<EventDataAccess>();
+        services.AddSingleton<RankingFinaliser>();
+        services.AddOptions<RankingFinalisationOptions>().BindConfiguration(RankingFinalisationOptions.SECTION);
+        services.AddHostedService<RankingFinalisationSweep>();
         services.AddSingleton<AccountSearch>();
         services
             .AddOptions<SearchRateLimitOptions>()

@@ -198,6 +198,28 @@ internal sealed class CrossTenantReads
     }
 
     /// <summary>
+    /// The Events, of every Tenant, that keep a Ranking some entry of which holds no placing: what the host looks at to
+    /// finalise the Rankings of the Events that have ended (#640). It reads the ids of the Events and nothing else, and what
+    /// is done to an Event is then asked of the Event.
+    /// </summary>
+    public async Task<IReadOnlyList<Guid>> ReadEventsWithUnplacedRankingsAsync(CancellationToken cancellationToken)
+    {
+        var unplaced = new BsonDocument(
+            "Entries",
+            new BsonDocument("$elemMatch", new BsonDocument("Rank", BsonNull.Value))
+        );
+        var ids = await (
+            await Raw(TenantOwned.EVENT_RANKINGS)
+                .DistinctAsync<BsonValue>("EventId", unplaced, cancellationToken: cancellationToken)
+        ).ToListAsync(cancellationToken);
+        return
+        [
+            .. ids.Where(x => x is BsonBinaryData { SubType: BsonBinarySubType.UuidStandard })
+                .Select(x => x.AsBsonBinaryData.ToGuid(GuidRepresentation.Standard)),
+        ];
+    }
+
+    /// <summary>
     /// The document of the grant with the id, whatever Tenant it is in: a grant is found by its id to learn which Event it
     /// belongs to, and what may be done with it is then asked of that Event. None when there is no such grant.
     /// </summary>

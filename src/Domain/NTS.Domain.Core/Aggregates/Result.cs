@@ -22,7 +22,8 @@ public sealed class Result
         Guid eventId,
         List<ParticipationResult> entries,
         RegionalRules? rules,
-        IReadOnlyList<Ranker>? regionalRankers
+        IReadOnlyList<Ranker>? regionalRankers,
+        bool isFinal = false
     )
     {
         Id = id;
@@ -31,8 +32,11 @@ public sealed class Result
         Name = name;
         Ruleset = ruleset;
         Category = category;
-        Entries = RankIfRequired(entries, ruleset, rules ?? RegionalRules.None, regionalRankers ?? REGIONAL_RANKERS)
-            .AsReadOnly();
+        Entries = (
+            isFinal
+                ? ByStoredRank(entries)
+                : RankIfRequired(entries, ruleset, rules ?? RegionalRules.None, regionalRankers ?? REGIONAL_RANKERS)
+        ).AsReadOnly();
     }
 
     /// <summary>
@@ -54,7 +58,8 @@ public sealed class Result
             ranking.EventId,
             Compose(ranking, participations),
             rules,
-            regionalRankers
+            regionalRankers,
+            ranking.IsFinal
         ) { }
 
     /// <summary>
@@ -87,6 +92,25 @@ public sealed class Result
     public IReadOnlyList<ParticipationResult> Entries { get; }
     public bool IsRanked => Entries.Count > 1;
     public string Title => $"{Category}: {Name}";
+
+    /// <summary>
+    /// The placing of every entry of a Ranking that holds none, composed as the Results compose it, with a single entry
+    /// ranked too: what <see cref="Ranking.Finalise"/> stores.
+    /// </summary>
+    internal static IReadOnlyDictionary<Guid, int> PlacingsOf(
+        Ranking ranking,
+        IEnumerable<Participation> participations,
+        RegionalRules? rules
+    )
+    {
+        var placed = Rank(
+            Compose(ranking, participations),
+            ranking.Ruleset,
+            rules ?? RegionalRules.None,
+            REGIONAL_RANKERS
+        );
+        return placed.ToDictionary(x => x.ParticipationId, x => x.Rank!.Value);
+    }
 
     public override string ToString()
     {
@@ -127,6 +151,12 @@ public sealed class Result
         }
 
         return participation;
+    }
+
+    /// <summary>The entries of a final Ranking as they were placed when it was finalised, the stored ranks being what is shown.</summary>
+    static List<ParticipationResult> ByStoredRank(List<ParticipationResult> entries)
+    {
+        return [.. entries.OrderBy(x => x.Rank)];
     }
 
     static List<ParticipationResult> RankIfRequired(

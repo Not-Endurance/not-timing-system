@@ -33,6 +33,7 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     readonly string _dataProtectionKeys;
     readonly TimeProvider? _time;
     readonly bool _productionRateLimits;
+    readonly bool _finaliseRankings;
     readonly Action<IServiceCollection>? _configureServices;
     readonly Action<IWebHostBuilder>? _configureHost;
 
@@ -52,6 +53,10 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     /// The limits of authentication as they are in production, which the tests of the limits run with. By default they
     /// are lifted far above anything a test does, so that a test that asks for many codes is not stopped by them.
     /// </param>
+    /// <param name="finaliseRankings">
+    /// The host is given no word on the finalisation of Rankings, as in production, where the sweep runs at start and every
+    /// hour. By default it is told not to: a test that seeds Events must not find them finalised by a host it did not ask to.
+    /// </param>
     public ApiFactory(
         string mongoConnectionString,
         bool kestrel = false,
@@ -61,7 +66,8 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         TimeProvider? time = null,
         Action<IServiceCollection>? configureServices = null,
         Action<IWebHostBuilder>? configureHost = null,
-        bool productionRateLimits = false
+        bool productionRateLimits = false,
+        bool finaliseRankings = false
     )
     {
         // Azure supplies PORT to the deployed host. A developer's own PORT must not bind a second listener here.
@@ -73,6 +79,7 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         _dataProtectionKeys = dataProtectionKeys ?? NewDataProtectionKeys();
         _time = time;
         _productionRateLimits = productionRateLimits;
+        _finaliseRankings = finaliseRankings;
         _configureServices = configureServices;
         _configureHost = configureHost;
         if (kestrel)
@@ -99,6 +106,11 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         if (_emailSender != null)
         {
             builder.UseSetting("Email:Sender", _emailSender);
+        }
+
+        if (!_finaliseRankings)
+        {
+            builder.UseSetting("RankingFinalisation:Enabled", "false");
         }
 
         if (!_productionRateLimits)

@@ -81,6 +81,57 @@ internal static class IntegrationPayloadFactory
         );
     }
 
+    /// <summary>A Participation that has been through its one Phase: started, arrived at the time given and presented five minutes after.</summary>
+    public static Participation CompletedParticipation(
+        Guid eventId,
+        int participationNumber,
+        Guid id,
+        DateTimeOffset arrive,
+        bool eliminated = false
+    )
+    {
+        var country = new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete("Integration Rider", "Integration Rider", country, null, null, Offset(id, 100));
+        var horse = new Horse("Integration Horse", "Integration Horse", null, Offset(id, 200));
+        var combination = new Combination(
+            participationNumber,
+            athlete,
+            horse,
+            club: null,
+            distance: "40",
+            minAverageSpeed: null,
+            maxAverageSpeed: null,
+            id: Offset(id, 300)
+        );
+        var phase = new Phase(
+            gate: "GATE1/40",
+            length: 40,
+            maxRecovery: 40,
+            rest: null,
+            ruleset: CompetitionRuleset.FEI,
+            isFinal: true,
+            compulsoryThresholdSpan: null,
+            startTime: new Timestamp(arrive.AddHours(-3)),
+            arriveTime: new Timestamp(arrive),
+            presentTime: new Timestamp(arrive.AddMinutes(5)),
+            representTime: null,
+            isRepresentationRequested: false,
+            isRequiredInspectionRequested: false,
+            isRequiredInspectionCompulsory: false,
+            id: Offset(id, 400)
+        );
+
+        return new Participation(
+            ParticipationCategory.Senior,
+            new Competition("CEI 1*", CompetitionRuleset.FEI),
+            combination,
+            new PhaseCollection([phase]),
+            notQualified: eliminated ? new Withdrawn() : null,
+            eventId,
+            id
+        );
+    }
+
     public static Participation TwoPhaseParticipation(
         Guid eventId,
         int participationNumber,

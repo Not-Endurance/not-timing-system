@@ -113,6 +113,30 @@ internal sealed class TypedTenantCollection<T> : IReferenceCollection<T>
     }
 
     /// <summary>
+    /// The same for a row that also satisfies the condition, which is how a write that has to find the row as it expects it
+    /// to be is made: the update is taken in one operation with the check, so that of two writers that expect the same row
+    /// only one finds it so. False when the row is not as the condition says, is not the Tenant's or is not there.
+    /// </summary>
+    public async Task<bool> UpdateWhenAsync(
+        Guid id,
+        BsonDocument condition,
+        BsonDocument update,
+        CancellationToken cancellationToken
+    )
+    {
+        var tenant = Required();
+        var result = await _documents.UpdateOneAsync(
+            Builders<T>.Filter.And(
+                Builders<T>.Filter.Where(x => x.Id == id && x.TenantId == tenant),
+                new BsonDocumentFilterDefinition<T>(condition)
+            ),
+            new BsonDocumentUpdateDefinition<T>(InTheTenant(update, tenant)),
+            cancellationToken: cancellationToken
+        );
+        return result.MatchedCount > 0;
+    }
+
+    /// <summary>
     /// The same for a document that counts its writes (ADR-0013): the update is applied when the row is at the version the
     /// caller based it on, and the row is then at the next one, in the same write, so that of two changes made at one
     /// version only one is taken. A row that no write has counted yet is at version 0. False when the row is not at the
