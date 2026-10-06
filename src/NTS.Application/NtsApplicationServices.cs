@@ -4,18 +4,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Not.Application;
 using Not.Application.HTTP;
 using Not.Injection;
-using Not.Krud.Abstractions;
 using NTS.Application.Arrivelists;
 using NTS.Application.Core;
-using NTS.Application.HistoricEvents;
 using NTS.Application.Presentlists;
 using NTS.Application.Startlists;
 using NTS.Contracts.Arrivelists;
 using NTS.Contracts.Core;
-using NTS.Contracts.HistoricEvents;
 using NTS.Contracts.Presentlists;
 using NTS.Contracts.Startlists;
-using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Application;
 
@@ -49,12 +45,6 @@ public static class NtsApplicationServices
             _services.Add<IEventInformationService, ILiveEventsContext, EventInformationService>(
                 ServiceLifetime.Scoped
             );
-            _services.Add<
-                IHistoricEventService,
-                IHistoricEventContext,
-                IKrudListBehind<EventInformation>,
-                HistoricEventService
-            >(ServiceLifetime.Scoped);
             _services.Add<IArrivelistService, ArrivelistService>(ServiceLifetime.Scoped);
             _services.Add<IPresentlistService, PresentlistService>(ServiceLifetime.Scoped);
             _services.Add<IStartUpcoming, IStartHistory, StartlistService>(ServiceLifetime.Scoped);

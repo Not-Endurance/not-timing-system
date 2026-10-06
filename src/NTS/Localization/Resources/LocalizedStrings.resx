@@ -1056,4 +1056,16 @@
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Are you sure you want to delete '{0}'?</value>
   </data>
+  <data name="This_event_has_ended_string" xml:space="preserve">
+    <value>This Event has ended and cannot be changed.</value>
+  </data>
+  <data name="You_may_not_change_this_event_string" xml:space="preserve">
+    <value>You are not allowed to change this Event.</value>
+  </data>
+  <data name="Event_not_found_string" xml:space="preserve">
+    <value>Event not found.</value>
+  </data>
+  <data name="Not_available_for_historic_event_string" xml:space="preserve">
+    <value>This page is not available for an Event that has ended.</value>
+  </data>
 </root>

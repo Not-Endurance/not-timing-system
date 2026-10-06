@@ -14,7 +14,7 @@ namespace NoTiming.Ui.Storage.REST;
 /// What an Event keeps as the Api serves it (#604, ADR-0008): the Participations, Rankings, Officials and Handouts are flat
 /// resources with the Event as an attribute, and the Api asks every list of them to start with the Event. A repository that
 /// is scoped has the Event the Ui has selected at the head of every list, and one that is not reads what the filter of a
-/// call names, as <c>HistoricEventService</c> does for the Event it shows. The Event of a row is written when the row is
+/// call names, as the view of a Historic Event does (#630). The Event of a row is written when the row is
 /// made and a change leaves it as it is. A resource that counts its writes shows the count in its <c>meta</c>, and a change
 /// of it names the one it was read at, so that the Api can refuse a change that was made on what has changed since.
 /// </summary>

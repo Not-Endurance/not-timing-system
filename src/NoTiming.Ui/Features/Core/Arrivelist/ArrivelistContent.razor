@@ -1,13 +1,18 @@
-﻿@using NoTiming.Ui.Components.Arrivelist
+@using NoTiming.Ui.Components.Arrivelist
+@using NoTiming.Ui.Components.EventViews
 @using Not.Blazor.Components.Layout
+@using NTS.Domain.Access
 
 @attribute [Route(ARRIVELIST_PAGE)]
+@attribute [Route(EVENT_ARRIVELIST_PAGE)]
 @inherits ArrivelistContentBehind
 
-<NContent Title="@Arrivelist_string">
+<ViewedEventScope EventId="EventId" Shows="CoreView.Arrivelist">
+    <NContent Title="@Arrivelist_string">
 
-    <Main>
-        <ArrivelistTable />
-    </Main>
+        <Main>
+            <ArrivelistTable />
+        </Main>
 
-</NContent>
+    </NContent>
+</ViewedEventScope>

@@ -43,6 +43,12 @@ public class NavMenuBehind : NStatefulComponent
         await Observe(SocketService);
     }
 
+    /// <summary>The address of a page of the Live Event the app follows: its Event is in the address (#630).</summary>
+    protected string LiveEventRoute(string eventPage)
+    {
+        return Routes.Of(eventPage, SocketService.Event!.Id);
+    }
+
     protected async Task Signin()
     {
         try

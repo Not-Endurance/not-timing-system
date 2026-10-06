@@ -1,26 +1,16 @@
-using Not.Blazor.Components.Abstractions;
-using Not.Blazor.Components.Buttons;
-using Not.Notify;
-using NoTiming.Ui.Features.Socket;
+using NoTiming.Ui.Features.Core.EventViews;
 using NTS.Contracts.Features.Access;
 using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Snapshots;
-using NTS.Domain.Enums;
 
 namespace NoTiming.Ui.Features.Core.Snapshots;
 
-public class SnapshotContentBehind : NStatefulComponent
+public class SnapshotContentBehind : EventPageBehind
 {
     [Inject]
-    INotifier Notifier { get; set; } = default!;
-
-    [Inject]
     ISnapshotService SnapshotState { get; set; } = default!;
-
-    [Inject]
-    BlazorSocketService BlazorSocketService { get; set; } = default!;
 
     [Inject]
     IWitnessAccessContext AccessState { get; set; } = default!;
@@ -34,12 +24,6 @@ public class SnapshotContentBehind : NStatefulComponent
     protected ISnapshotService SnapshotService => SnapshotState;
     protected IReadOnlyList<Participation> Participations => SnapshotService.Participations;
     protected IReadOnlyList<Snapshot> Snapshots => SnapshotService.Snapshots;
-    protected IReadOnlyList<NDropdownButtonDescriptor> PublishDescriptors =>
-        [
-            new(Arrive_string, () => SendHandler(SnapshotType.Arrive)),
-            new(Presentation_string, () => SendHandler(SnapshotType.Present)),
-        ];
-    protected int CapturedSnapshotsCount => Snapshots.Count(x => x.Timestamp != null);
 
     protected override async Task OnInitializedAsync()
     {
@@ -52,33 +36,15 @@ public class SnapshotContentBehind : NStatefulComponent
         if (firstRender)
         {
             await Task.Delay(TimeSpan.FromSeconds(1));
-            await BlazorSocketService.EnsureConnected();
+            if (EventId == null)
+            {
+                await BlazorSocketService.EnsureConnected();
+            }
         }
 
         if (WitnessAccessPolicy.ShouldRedirectFromSnapshots(AccessState.AccessLevel, SocketService.Event != null))
         {
             Navigator.NavigateTo(WitnessAccessPolicy.ResolveSnapshotFallbackRoute());
-        }
-    }
-
-    protected async Task SendHandler(SnapshotType snapshotType)
-    {
-        try
-        {
-            if (!await SnapshotService.Publish(snapshotType))
-            {
-                return;
-            }
-
-            Notifier.Success(string.Format(Snapshots_sent_as__string, GetSnapshotTypeText(snapshotType)));
-        }
-        catch (Exception ex)
-        {
-            Handle(ex);
-        }
-        finally
-        {
-            StateHasChanged();
         }
     }
 
@@ -97,15 +63,5 @@ public class SnapshotContentBehind : NStatefulComponent
         }
 
         return Task.CompletedTask;
-    }
-
-    protected string GetSnapshotTypeText(SnapshotType snapshotType)
-    {
-        return snapshotType switch
-        {
-            SnapshotType.Arrive => Arrive_string,
-            SnapshotType.Present => Presentation_string,
-            _ => snapshotType.ToString(),
-        };
     }
 }

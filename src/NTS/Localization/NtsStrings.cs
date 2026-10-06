@@ -326,6 +326,12 @@ namespace NTS.Localization
         public static string File_not_found_string => LocalizeString(nameof(File_not_found_string));
         public static string Configure_events_cannot_be_deleted_string =>
             LocalizeString(nameof(Configure_events_cannot_be_deleted_string));
+        public static string This_event_has_ended_string => LocalizeString(nameof(This_event_has_ended_string));
+        public static string You_may_not_change_this_event_string =>
+            LocalizeString(nameof(You_may_not_change_this_event_string));
+        public static string Event_not_found_string => LocalizeString(nameof(Event_not_found_string));
+        public static string Not_available_for_historic_event_string =>
+            LocalizeString(nameof(Not_available_for_historic_event_string));
     }
 }
 #pragma warning restore NA0004

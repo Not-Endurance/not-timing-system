@@ -1,13 +1,18 @@
-﻿@using NoTiming.Ui.Components.Presentlist
+@using NoTiming.Ui.Components.EventViews
+@using NoTiming.Ui.Components.Presentlist
 @using Not.Blazor.Components.Layout
+@using NTS.Domain.Access
 
 @attribute [Route(PRESENTLIST_PAGE)]
+@attribute [Route(EVENT_PRESENTLIST_PAGE)]
 @inherits PresentlistContentBehind
 
-<NContent Title="@Presentlist_string">
+<ViewedEventScope EventId="EventId" Shows="CoreView.Presentlist">
+    <NContent Title="@Presentlist_string">
 
-    <Main>
-        <PresentlistTable />
-    </Main>
+        <Main>
+            <PresentlistTable />
+        </Main>
 
-</NContent>
+    </NContent>
+</ViewedEventScope>

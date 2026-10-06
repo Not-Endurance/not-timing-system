@@ -1,0 +1,20 @@
+@using NoTiming.Ui.Components.Rankings.Menu
+@using NoTiming.Ui.Components.Results
+@using Not.Blazor.Components.Layout
+
+@inherits EventResultsBehind
+
+<NContent Title="@Historic_events_string" IsLoading="@IsLoading" IsEmpty="@IsEmpty">
+    <Main>
+        @if (Document != null)
+        {
+            <ResultComponent Document="Document" />
+        }
+    </Main>
+
+    <Rightbar>
+        <RankingMenu Rankings="Rankings"
+                     Selected="CurrentRanking"
+                     OnSelectedSafe="SelectRanking" />
+    </Rightbar>
+</NContent>

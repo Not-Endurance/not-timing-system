@@ -1,16 +1,21 @@
-@using NoTiming.Ui.Components.Startlist.History
+@using NoTiming.Ui.Components.EventViews
 @using NoTiming.Ui.Components.Startlist
+@using NoTiming.Ui.Components.Startlist.History
 @using Not.Blazor.Components.Layout
+@using NTS.Domain.Access
 
 @attribute [Route(STARTLIST_PAGE)]
+@attribute [Route(EVENT_STARTLIST_PAGE)]
 @inherits StartlistContentBehind
 
-<NContent Title="@Startlist_string">
+<ViewedEventScope EventId="EventId" Shows="CoreView.Startlist">
+    <NContent Title="@Startlist_string">
 
-    <Main>
-        <StartlistTable />
+        <Main>
+            <StartlistTable />
 
-        <StartlistHistory />
-    </Main>
+            <StartlistHistory />
+        </Main>
 
-</NContent>
+    </NContent>
+</ViewedEventScope>

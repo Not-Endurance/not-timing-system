@@ -1,0 +1,24 @@
+@inherits ViewedEventScopeBehind
+
+@if (View == null)
+{
+    <NContent IsLoading="@IsOpening"
+              IsEmpty="@(!IsOpening)"
+              EmptyMessage="@(IsNotFound ? Event_not_found_string : Empty_string)" />
+}
+else if (IsHidden)
+{
+    <NContent IsEmpty EmptyMessage="@Not_available_for_historic_event_string">
+        <EmptyContent>
+            <NButtonSecondary OnClick="OpenResults"
+                              Text="@Historic_events_string"
+                              StartIcon="@Icons.Material.Filled.List" />
+        </EmptyContent>
+    </NContent>
+}
+else
+{
+    <CascadingValue Value="View" @key="View">
+        @ChildContent
+    </CascadingValue>
+}

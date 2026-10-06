@@ -1,49 +1,51 @@
+@using NoTiming.Ui.Components.EventViews
 @using NoTiming.Ui.Components.ParticipationChips
 @using NoTiming.Ui.Features.Core.Snapshots.Components
+@using NTS.Domain.Access
 @using MudBlazor
-@using Not.Blazor.Components.Buttons
 @using Not.Blazor.Components.Layout
 
 @attribute [Route(SNAPSHOT_PAGE)]
+@attribute [Route(EVENT_SNAPSHOT_PAGE)]
 @attribute [Authorize]
 @inherits SnapshotContentBehind
 
-<NContent Title="@Snapshot_page_string">
+<ViewedEventScope EventId="EventId" Shows="CoreView.SnapshotCapture">
+    <NContent Title="@Snapshot_page_string">
 
-    <Main>
-        <MudStack Spacing="4">
+        <Main>
+            <MudStack Spacing="4">
 
-            <MudHidden Breakpoint="Breakpoint.SmAndDown">
-                <SnapshotComponent Snapshots="@Snapshots" />
-            </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                    <SnapshotComponent Snapshots="@Snapshots" />
+                </MudHidden>
 
-            <MudHidden Breakpoint="Breakpoint.MdAndUp">
-                <SnapshotComponent Snapshots="@Snapshots"
-                                   Compact />
-            </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                    <SnapshotComponent Snapshots="@Snapshots"
+                                       Compact />
+                </MudHidden>
 
-            <MudHidden Breakpoint="Breakpoint.SmAndDown">
-                <ParticipationChips Participations="@Participations"
-                                    SelectedChanged="@MoveToSnapshot" />
-            </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                    <ParticipationChips Participations="@Participations"
+                                        SelectedChanged="@MoveToSnapshot" />
+                </MudHidden>
 
-            <MudHidden Breakpoint="Breakpoint.MdAndUp">
-                <ParticipationChips Participations="@Participations"
-                                    SelectedChanged="@MoveToSnapshot"
-                                    Compact />
-            </MudHidden>
+                <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                    <ParticipationChips Participations="@Participations"
+                                        SelectedChanged="@MoveToSnapshot"
+                                        Compact />
+                </MudHidden>
 
-        </MudStack>
-    </Main>
+            </MudStack>
+        </Main>
 
-    <Main2>
-        <SnapshotHistory />
-    </Main2>
+        <Main2>
+            <SnapshotHistory />
+        </Main2>
 
-    <Rightbar>
-        <NDropdownButton Descriptors="@PublishDescriptors"
-                         Disabled="CapturedSnapshotsCount == 0"
-                         MaxWidth />
-    </Rightbar>
+        <Rightbar>
+            <SnapshotPublishButton />
+        </Rightbar>
 
-</NContent>
+    </NContent>
+</ViewedEventScope>

@@ -116,8 +116,9 @@ public class SnapshotService
         Rebuild();
     }
 
-    public async Task<bool> Publish(SnapshotType snapshotType)
+    public async Task<bool> Publish(IViewedEvent view, SnapshotType snapshotType)
     {
+        view.EnsureCanWrite();
         var readySnapshots = _snapshots.Where(x => x.Timestamp != null).ToList();
         if (readySnapshots.Count == 0)
         {
@@ -135,8 +136,9 @@ public class SnapshotService
         return true;
     }
 
-    public async Task RePublish(SnapshotGroup snapshotGroup, SnapshotType snapshotType)
+    public async Task RePublish(IViewedEvent view, SnapshotGroup snapshotGroup, SnapshotType snapshotType)
     {
+        view.EnsureCanWrite();
         GuardHelper.ThrowIfDefault(snapshotGroup);
         var snapshotGroupToPublish = new SnapshotGroup(snapshotGroup.Entries, snapshotType);
         await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroupToPublish);

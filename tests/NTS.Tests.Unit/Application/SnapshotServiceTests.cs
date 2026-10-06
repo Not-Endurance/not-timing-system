@@ -1,12 +1,15 @@
+using Not.Domain.Exceptions;
 using NoTiming.Ui.Features.Core.Dashboard;
 using NoTiming.Ui.Features.Core.Participations;
 using NTS.Application.UserSession;
+using NTS.Contracts.Features.Access;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
+using static NTS.Tests.Unit.Application.ViewedEventFixtures;
 
 namespace NTS.Tests.Unit.Application;
 
@@ -81,15 +84,16 @@ public sealed class SnapshotServiceTests
     [Fact]
     public async Task Publishing_sends_the_timed_snapshots_records_them_and_returns_their_Participations_to_the_list()
     {
-        var (service, _, _, publisher) = await Connected(
+        var (service, store, _, publisher) = await Connected(
             ParticipationFixtures.Active(1),
             ParticipationFixtures.Active(2)
         );
         service.SelectForSnapshot(service.Participations[0]);
         service.SelectForSnapshot(service.Participations[0]);
         service.Capture(service.Snapshots[0]);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
 
-        var published = await service.Publish(SnapshotType.Arrive);
+        var published = await service.Publish(view, SnapshotType.Arrive);
 
         Assert.True(published);
         var group = Assert.Single(publisher.Published);
@@ -97,6 +101,50 @@ public sealed class SnapshotServiceTests
         Assert.Single(service.History);
         Assert.Equal([2], service.Snapshots.Select(x => x.Number)); // the other is still selected
         Assert.Equal([1], service.Participations.Select(x => x.Combination.Number));
+    }
+
+    [Fact]
+    public async Task Publishing_is_refused_before_anything_is_sent_when_the_Event_has_ended()
+    {
+        var (service, _, _, publisher) = await Connected(ParticipationFixtures.Active(1));
+        service.SelectForSnapshot(service.Participations[0]);
+        service.Capture(service.Snapshots[0]);
+        using var view = await HistoricView();
+
+        await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
+
+        Assert.Empty(publisher.Published);
+        Assert.Single(service.Snapshots); // nothing was sent, so nothing was taken off the page
+        Assert.Empty(service.History);
+    }
+
+    [Fact]
+    public async Task Publishing_is_refused_before_anything_is_sent_to_a_viewer_who_may_not_write()
+    {
+        var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
+        service.SelectForSnapshot(service.Participations[0]);
+        service.Capture(service.Snapshots[0]);
+        using var view = await LiveView(store, WitnessAccessLevel.Registered);
+
+        await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
+
+        Assert.Empty(publisher.Published);
+        Assert.Single(service.Snapshots);
+    }
+
+    [Fact]
+    public async Task Sending_a_group_again_is_refused_before_anything_is_sent_when_the_Event_has_ended()
+    {
+        var (service, _, _, publisher) = await Connected(ParticipationFixtures.Active(1));
+        var group = new SnapshotGroup(
+            [new Snapshot(1, "Athlete 1", null, new Timestamp(DateTimeOffset.Now))],
+            SnapshotType.Arrive
+        );
+        using var view = await HistoricView();
+
+        await Assert.ThrowsAsync<DomainException>(() => service.RePublish(view, group, SnapshotType.Present));
+
+        Assert.Empty(publisher.Published);
     }
 
     [Fact]

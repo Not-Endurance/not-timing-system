@@ -1056,4 +1056,16 @@
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
   </data>
+  <data name="This_event_has_ended_string" xml:space="preserve">
+    <value>Събитието е приключило и не може да бъде променяно.</value>
+  </data>
+  <data name="You_may_not_change_this_event_string" xml:space="preserve">
+    <value>Нямате право да променяте това събитие.</value>
+  </data>
+  <data name="Event_not_found_string" xml:space="preserve">
+    <value>Събитието не е намерено.</value>
+  </data>
+  <data name="Not_available_for_historic_event_string" xml:space="preserve">
+    <value>Тази страница не е достъпна за приключило събитие.</value>
+  </data>
 </root>

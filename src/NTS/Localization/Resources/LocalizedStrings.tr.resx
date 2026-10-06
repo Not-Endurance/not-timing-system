@@ -859,4 +859,16 @@
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>'{0}' öğesini silmek istediğinizden emin misiniz?</value>
   </data>
+  <data name="This_event_has_ended_string" xml:space="preserve">
+    <value>Etkinlik sona erdi ve değiştirilemez.</value>
+  </data>
+  <data name="You_may_not_change_this_event_string" xml:space="preserve">
+    <value>Bu etkinliği değiştirme yetkiniz yok.</value>
+  </data>
+  <data name="Event_not_found_string" xml:space="preserve">
+    <value>Etkinlik bulunamadı.</value>
+  </data>
+  <data name="Not_available_for_historic_event_string" xml:space="preserve">
+    <value>Bu sayfa sona ermiş bir etkinlik için kullanılamaz.</value>
+  </data>
 </root>

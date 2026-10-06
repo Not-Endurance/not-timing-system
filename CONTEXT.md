@@ -88,7 +88,7 @@ An Event that is still running: its Console and its viewers see changes as they 
 _Avoid_: Active event, current event
 
 **Historic Event**:
-An Event that has ended, viewed as a record: nothing about it can be changed, and its Results, Startlist and other produced documents can still be printed. Opening one never affects a Live Event.
+An Event that has ended, viewed as a record: nothing about it can be changed, and its Results and other produced documents can still be printed. It has no Startlist, which is about who starts next. Opening one never affects a Live Event.
 _Avoid_: Past event, archived event
 
 **Console**:

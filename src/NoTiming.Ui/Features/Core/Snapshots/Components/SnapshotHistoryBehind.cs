@@ -2,6 +2,7 @@ using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Components.Buttons;
 using Not.Notify;
+using NTS.Contracts.Core;
 using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Objects.Snapshots;
@@ -15,6 +16,9 @@ public class SnapshotHistoryBehind : NStatefulComponent
     int _historyCount = -1;
     bool _isResending;
 
+    [CascadingParameter]
+    IViewedEvent View { get; set; } = default!;
+
     [Inject]
     protected INotifier Notifier { get; set; } = default!;
 
@@ -25,7 +29,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
     protected ISnapshotService SnapshotService { get; set; } = default!;
 
     protected IReadOnlyList<SnapshotGroup> History => [.. SnapshotService.History.Reverse()];
-    protected bool CanResend => SocketContext.IsConnected && SocketContext.Event != null;
+    protected bool CanResend => View.CanWrite && SocketContext.IsConnected && SocketContext.Event != null;
     protected bool IsResending => _isResending;
 
     protected override async Task OnInitializedAsync()
@@ -87,7 +91,7 @@ public class SnapshotHistoryBehind : NStatefulComponent
             }
 
             _isResending = true;
-            await SnapshotService.RePublish(group, snapshotType);
+            await SnapshotService.RePublish(View, group, snapshotType);
             Notifier.Success(string.Format(Snapshots_sent_as__string, GetSnapshotTypeText(snapshotType)));
         }
         catch (Exception ex)
