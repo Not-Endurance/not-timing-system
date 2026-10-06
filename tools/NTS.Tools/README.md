@@ -12,6 +12,7 @@ dotnet run --project tools/NTS.Tools -- <command> [options]
 | `migrate-names` | Moves the names of Athletes, Horses, Officials and snapshots to `Name` and `NameEnglish`. |
 | `migrate-participation-copies` | Turns the copy of a Participation inside every Ranking entry and Handout into a reference, and drops the values the domain derives (below). |
 | `migrate-phase-times` | Turns the flat Arrive, Present and Represent times of every Phase into time events, renames the Representation request, and drops the snapshot-results collection (below). |
+| `migrate-event-liveness` | Removes the `IsActive` flag from every Event, after listing the Events that were inactive and whose last day is still ahead, which are Live again (below). |
 | `seed-tenant-root` | Makes an account a Tenant Root of a Tenant, which makes the Tenant operational (below). |
 | `grant-developer` | Makes an account the Developer (below). |
 
@@ -104,6 +105,47 @@ The order of the migrations and the steps of the cutover are owned by the runboo
 4. Deploy the Api and the Ui together, and follow the runbook of #648 for old Judge builds, which are not supported afterwards.
 
 Staging first, rehearsed on a restored copy of production data. There is no lazy upgrade and no dual-read: a Participation in the old shape that reaches the new code loads with no times, and the next write of it loses them for good, which is why the code is never deployed before this command has run.
+
+## migrate-event-liveness
+
+```powershell
+dotnet run --project tools/NTS.Tools -- migrate-event-liveness --connection-string <mongo> [--database nts] [--apply]
+```
+
+ADR-0007 makes an Event Live until the end of its last day and Historic from then on, which the clock decides, and the code stores no flag. Before it, an Event stored `IsActive`: true from its start, and false once someone deactivated it or once its end had passed and a list of the active Events was read. This command removes the field from every document of the Events collection (`event_informations`). Old documents still load without it, so the removal is cleanup and no precondition of the code. What the command is really for is what comes before it:
+
+- **An Event that was deactivated before its last day is Live again** from the release that carries #628, because the flag no longer says otherwise. The dry run lists those Events, so that the owner decides about each one before the flag that said otherwise goes.
+- **The counts** say how many Events there are, how many are Live and how many Historic under the rule (an Event is Live while the clock is before the end of its last day, and Historic from that instant), and how many are deleted (soft-deleted), which are neither and are not asked about. They lose the flag like the others.
+
+It is idempotent: a second run finds no flag to remove and nothing to ask about, so it changes nothing.
+
+### The dry run
+
+A dry run changes nothing. It prints the counts, how many documents store the flag, and two lists:
+
+```text
+Database: nts
+Dry-run event-liveness migration.
+As of 2026-10-06 12:00:00Z
+event_informations: 14 documents read: 3 Live under the rule, 10 Historic, 1 deleted
+IsActive: stored on 13 documents, to remove
+Events that are inactive and whose last day is still ahead: 1
+  event_informations 3f2504e0-4f89-41d3-9a0c-0305e82c3301 "Sofia CEI 2*": IsActive false, the last day ends 2026-10-11 20:59:59Z
+Events whose EndDay is not a date: 0
+Nothing was changed. Run again with --apply to persist.
+```
+
+- **Events that are inactive and whose last day is still ahead.** The flag says `false`, or says nothing while another Event still stores one, and the last day has not ended. Each is listed with its id, its name, what the flag said and when the last day ends. `--apply` refuses to run while this list is not empty, prints it, writes nothing and exits with 1. The owner resolves each one: correct its `EndDay` if the Event is over, or remove the Event, and run the dry run again. An Event with no flag is read as inactive only while some Event still stores the flag: once it is gone from every document (this command has run, or the Events were all made after #628) a Live Event has none, and nothing is asked.
+- **Events whose EndDay is not a date.** The rule cannot be applied to an Event whose `EndDay` is missing or is a string or a document, so it is listed with its id, its name and the type it has, and `--apply` refuses for it too.
+
+### The cutover
+
+The order of the migrations and the steps of the cutover are owned by the runbook of [#648](https://github.com/Not-Endurance/not-timing-system/issues/648); this is what concerns this command, which touches the Events collection only and does not depend on the other migrations.
+
+1. **Run the dry run before the release that carries #628**, between scheduled Events (ADR-0007), and resolve the list it prints: correct the `EndDay` or remove the Event, then run it again until the list is empty. Staging first, rehearsed on a restored copy of production data.
+2. Take a backup. Rollback is a restore of it; there is no way back from the new shape other than that.
+3. Run it with `--apply` only once the hosts are those of the release that carries #628, or are stopped, with the other data migrations of the runbook. The code before that release reads the flag, so an Event whose flag was removed is no longer active to it, and a Live Event would disappear from the old hosts.
+4. The removal is one update of the collection. If it is interrupted, some Events have lost the flag and others have not, and an Event that was active then shows in the list of the next run: restore the backup and run the dry run again.
 
 ## seed-tenant-root and grant-developer
 

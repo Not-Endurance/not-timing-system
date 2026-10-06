@@ -1,4 +1,5 @@
 using NTS.Tools.Developer;
+using NTS.Tools.EventLiveness;
 using NTS.Tools.NameMigration;
 using NTS.Tools.ParticipationCopies;
 using NTS.Tools.PhaseTimes;
@@ -10,6 +11,7 @@ return args.FirstOrDefault() switch
     "migrate-names" => await RunNameMigration(args.Skip(1).ToArray()),
     "migrate-participation-copies" => await RunParticipationCopiesMigration(args.Skip(1).ToArray()),
     "migrate-phase-times" => await RunPhaseTimesMigration(args.Skip(1).ToArray()),
+    "migrate-event-liveness" => await RunEventLivenessMigration(args.Skip(1).ToArray()),
     "seed-tenant-root" => await DeveloperTool.SeedTenantRoot(args.Skip(1).ToArray()),
     "grant-developer" => await DeveloperTool.GrantDeveloper(args.Skip(1).ToArray()),
     "-h" => ShowHelp(),
@@ -34,6 +36,9 @@ static int ShowHelp()
                                and drop the derived values (a dry run unless --apply)
           migrate-phase-times  Turn the flat Arrive, Present and Represent times of every Phase into time events
                                and drop the snapshot-results collection (a dry run unless --apply)
+          migrate-event-liveness
+                               Remove the IsActive flag from every Event, after listing the Events that were inactive and
+                               whose last day is still ahead, which are Live again (a dry run unless --apply)
           seed-tenant-root     Make an account a Tenant Root of a Tenant, which makes the Tenant operational
                                (a dry run unless --apply)
           grant-developer      Make an account the Developer (a dry run unless --apply)
@@ -68,4 +73,9 @@ static async Task<int> RunParticipationCopiesMigration(string[] args)
 static async Task<int> RunPhaseTimesMigration(string[] args)
 {
     return await PhaseTimesMigrationTool.Run(args);
+}
+
+static async Task<int> RunEventLivenessMigration(string[] args)
+{
+    return await EventLivenessMigrationTool.Run(args);
 }

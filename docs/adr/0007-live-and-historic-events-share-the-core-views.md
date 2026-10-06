@@ -61,3 +61,9 @@ Reverting the views is a revert. The migration rolls back with the backup taken 
 - **What a stage shows and whether a view may write are domain rules.** `EventViewPolicy.Shows(view, stage)` names the Core views a stage shows (a Historic Event: Rankings, Results and the Participation detail) and `CanWrite(stage, permitted)` is the Live stage and the Api's answer together. A page that the Event does not show says so and leads to the record of the Event; it is not reachable.
 - **Services refuse as well.** `ISnapshotService.Publish` and `RePublish` take the view and throw a `DomainException` before anything is sent when it cannot write; the controls are off for the same reason. The Console's services (#646) take the view the same way.
 - **Printing and the FEI export come back with the Console (#646).** The provider gives what they take: the Event, its Rankings and the Results document of a Ranking. So does the picker of Historic Events under the configure-events list, which is the Console's list.
+
+## Readings made when the migration was built (#632)
+
+- **The flag is read as an old shape.** An Event with no `IsActive` counts as inactive only while some Event still stores one. Once the flag is gone from every document, because the command has run or because the Events were all made after #628, a Live Event has none and is not asked about, which is what lets a second run change nothing.
+- **Deleted Events are counted and not asked about, and they lose the flag with the others.** An Event whose `EndDay` is not a date cannot be judged, so it is listed and stops an apply, like an Event that would be Live again.
+- **The apply waits for the new hosts.** The code before #628 reads the flag, so an Event that lost it is no longer active to that code and would drop out of the old hosts: the dry run is run before the release and the owner resolves its list, and `--apply` runs with the release or with the hosts stopped (`tools/NTS.Tools/README.md`).
