@@ -270,6 +270,65 @@ public sealed class SnapshotServiceTests
     }
 
     [Fact]
+    public async Task A_group_that_was_not_answered_is_sent_as_a_new_group_when_the_same_time_is_of_another_Participation()
+    {
+        var (service, store, _, publisher) = await Connected(
+            ParticipationFixtures.Active(1),
+            ParticipationFixtures.Active(2)
+        );
+        var captured = new Timestamp(DateTimeOffset.Now);
+        service.SelectForSnapshot(service.Participations[0]);
+        service.UpdateTimestamp(service.Snapshots[0], captured);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        publisher.Fail = new HttpRequestException("The answer was lost.");
+        await Assert.ThrowsAsync<HttpRequestException>(() => service.Publish(view, SnapshotType.Arrive));
+        publisher.Fail = null;
+        service.Remove(service.Snapshots[0]);
+        service.SelectForSnapshot(service.Participations.Single(x => x.Combination.Number == 2));
+        service.UpdateTimestamp(service.Snapshots[0], captured);
+
+        await service.Publish(view, SnapshotType.Arrive);
+
+        Assert.NotEqual(publisher.Published[0].Id, publisher.Published[1].Id);
+        Assert.Equal([2], publisher.Published[1].Entries.Select(x => x.Number));
+    }
+
+    [Fact]
+    public async Task A_group_that_was_recorded_is_sent_as_a_new_group_when_it_is_sent_again_from_the_history()
+    {
+        var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
+        SelectAndCapture(service);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        await service.Publish(view, SnapshotType.Arrive);
+        var sent = Assert.Single(service.History);
+
+        await service.RePublish(view, sent, SnapshotType.Arrive);
+
+        var (first, again) = (publisher.Published[0], publisher.Published[1]);
+        Assert.NotEqual(first.Id, again.Id);
+        Assert.Empty(first.Entries.Select(first.IdOf).Intersect(again.Entries.Select(again.IdOf)));
+    }
+
+    [Fact]
+    public async Task A_group_sent_again_from_the_history_is_a_new_group_when_a_time_of_it_was_changed_since()
+    {
+        var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
+        var group = new SnapshotGroup(
+            [new Snapshot(1, "Athlete 1", null, new Timestamp(DateTimeOffset.Now))],
+            SnapshotType.Arrive
+        );
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+        publisher.Fail = new HttpRequestException("The answer was lost.");
+        await Assert.ThrowsAsync<HttpRequestException>(() => service.RePublish(view, group, SnapshotType.Present));
+        publisher.Fail = null;
+        group.Entries.Single().Timestamp = new Timestamp(DateTimeOffset.Now.AddMinutes(4));
+
+        await service.RePublish(view, group, SnapshotType.Present);
+
+        Assert.NotEqual(publisher.Published[0].Id, publisher.Published[1].Id);
+    }
+
+    [Fact]
     public async Task What_a_partly_recorded_group_leaves_is_sent_as_a_new_group()
     {
         var (service, store, _, publisher) = await Connected(

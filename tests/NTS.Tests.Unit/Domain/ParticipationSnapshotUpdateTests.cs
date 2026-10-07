@@ -540,38 +540,18 @@ public sealed class ParticipationSnapshotUpdateTests
     [Fact]
     public void An_update_changes_the_representation_when_the_latest_presentation_accepted_is_an_update_of_one()
     {
-        var phase = new Phase(
-            "",
-            20,
-            40,
-            40,
-            CompetitionRuleset.Regional,
-            false,
-            null,
-            Timestamp.Create(START),
-            [
-                new Arrived(new Timestamp(ARRIVE), TimeEventOutcome.Accepted, SnapshotMethod.Manual, null, null),
-                new Presented(
-                    new Timestamp(PRESENT),
-                    false,
-                    TimeEventOutcome.Accepted,
-                    SnapshotMethod.Manual,
-                    null,
-                    null
-                ),
-                new PresentUpdated(
-                    new Timestamp(PRESENT.AddMinutes(20)),
-                    true,
-                    TimeEventOutcome.Accepted,
-                    SnapshotMethod.Manual,
-                    null,
-                    null,
-                    SENT
-                ),
-            ],
-            true,
-            false,
-            false
+        var phase = PhaseWith(
+            AcceptedArrived(ARRIVE),
+            AcceptedPresented(PRESENT, false),
+            new PresentUpdated(
+                new Timestamp(PRESENT.AddMinutes(20)),
+                true,
+                TimeEventOutcome.Accepted,
+                SnapshotMethod.Manual,
+                null,
+                null,
+                SENT
+            )
         );
         var participation = Ride(phase);
 
@@ -581,6 +561,30 @@ public sealed class ParticipationSnapshotUpdateTests
         Assert.Equal(TimeSlot.Represent, update.Slot);
         Assert.Equal(PRESENT.AddMinutes(25), phase.RepresentTime!.ToDateTimeOffset());
         Assert.Equal(PRESENT, phase.PresentTime!.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public void An_update_changes_the_representation_even_when_an_arrival_was_updated_after_it_was_made()
+    {
+        var phase = PhaseWith(
+            AcceptedArrived(ARRIVE),
+            AcceptedPresented(PRESENT, false),
+            AcceptedPresented(PRESENT.AddMinutes(20), true, SENT),
+            new ArriveUpdated(
+                new Timestamp(ARRIVE.AddMinutes(1)),
+                TimeEventOutcome.Accepted,
+                SnapshotMethod.Manual,
+                null,
+                null
+            )
+        );
+        var participation = Ride(phase);
+
+        var update = participation.UpdateSnapshot(SENT, new Timestamp(PRESENT.AddMinutes(25)), ACTOR, RECORDED);
+
+        Assert.True(update.IsAccepted);
+        Assert.Equal(TimeSlot.Represent, update.Slot);
+        Assert.Equal(PRESENT.AddMinutes(25), phase.RepresentTime!.ToDateTimeOffset());
     }
 
     [Fact]
@@ -635,6 +639,43 @@ public sealed class ParticipationSnapshotUpdateTests
     static Snapshot Present(DateTimeOffset time, Guid? id = null, SnapshotMethod method = SnapshotMethod.Manual)
     {
         return new Snapshot(1, SnapshotType.Present, method, new Timestamp(time), id);
+    }
+
+    static Arrived AcceptedArrived(DateTimeOffset time)
+    {
+        return new Arrived(new Timestamp(time), TimeEventOutcome.Accepted, SnapshotMethod.Manual, null, null);
+    }
+
+    static Presented AcceptedPresented(DateTimeOffset time, bool isRepresent, Guid? id = null)
+    {
+        return new Presented(
+            new Timestamp(time),
+            isRepresent,
+            TimeEventOutcome.Accepted,
+            SnapshotMethod.Manual,
+            null,
+            null,
+            id
+        );
+    }
+
+    /// <summary>The first Phase as it was stored with these events, a representation having been requested.</summary>
+    static Phase PhaseWith(params TimeEvent[] events)
+    {
+        return new Phase(
+            "",
+            20,
+            40,
+            40,
+            CompetitionRuleset.Regional,
+            false,
+            null,
+            Timestamp.Create(START),
+            events,
+            true,
+            false,
+            false
+        );
     }
 
     static Participation Ride(params Phase[] phases)

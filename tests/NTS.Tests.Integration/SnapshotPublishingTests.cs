@@ -275,6 +275,29 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task The_error_of_an_entry_of_a_group_keeps_its_code_its_title_and_its_detail()
+    {
+        await using var scene = await SceneAsync(1);
+        scene.Requests.Answer = _ =>
+            Answered(
+                """
+                { "meta": { "results": [ { "status": 400, "errors": [
+                    { "status": "400", "code": "invalid-snapshot", "title": "The document is not a Snapshot.", "detail": "The kind is Arrive, Present or Final." }
+                ] } ] } }
+                """
+            );
+
+        var receipt = Assert.Single(
+            await scene.Publisher.PublishSnapshotsAsync(scene.EventId, GroupOf(SnapshotType.Arrive, ARRIVE, 1))
+        );
+
+        Assert.False(receipt.IsRecorded);
+        Assert.Equal(400, receipt.Status);
+        Assert.Equal("invalid-snapshot", receipt.ErrorCode);
+        Assert.Equal("The document is not a Snapshot. The kind is Arrive, Present or Final.", receipt.ErrorMessage);
+    }
+
+    [Fact]
     public async Task An_answer_that_carries_no_Snapshot_is_not_taken_for_one_that_was_recorded()
     {
         await using var scene = await SceneAsync(1);
