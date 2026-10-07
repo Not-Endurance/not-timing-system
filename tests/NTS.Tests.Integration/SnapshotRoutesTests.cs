@@ -272,11 +272,13 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
     [Theory]
     [InlineData("id-missing", "id-required")]
     [InlineData("id-not-a-guid", "invalid-id")]
+    [InlineData("id-empty", "invalid-id")]
     [InlineData("kind-unknown", "invalid-snapshot")]
     [InlineData("kind-missing", "invalid-snapshot")]
     [InlineData("number-zero", "invalid-snapshot")]
     [InlineData("time-missing", "invalid-snapshot")]
     [InlineData("event-missing", "event-required")]
+    [InlineData("event-empty", "event-required")]
     public async Task A_Snapshot_that_is_not_made_as_one_is_refused_and_records_nothing(string flaw, string code)
     {
         await using var scene = await SceneAsync();
@@ -296,6 +298,9 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
             case "id-not-a-guid":
                 id = "seven";
                 break;
+            case "id-empty":
+                id = Guid.Empty.ToString();
+                break;
             case "kind-unknown":
                 attributes["kind"] = "Finish";
                 break;
@@ -310,6 +315,9 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
                 break;
             case "event-missing":
                 attributes.Remove("eventId");
+                break;
+            case "event-empty":
+                attributes["eventId"] = Guid.Empty;
                 break;
         }
 
@@ -356,6 +364,33 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
         );
         Assert.Equal(3, (await StoredAsync(scene.One))["Version"].AsInt32);
         Assert.Equal(3, scene.Changes.Announced.Count);
+    }
+
+    [Fact]
+    public async Task An_entry_of_a_group_that_is_not_a_Snapshot_is_refused_on_its_own_and_the_others_are_recorded()
+    {
+        await using var scene = await SceneAsync();
+        var notOne = new
+        {
+            type = "events",
+            id = Guid.NewGuid(),
+            attributes = AttributesOf(scene.EventId, 1, "Arrive", ARRIVE),
+        };
+        var sent = Guid.NewGuid();
+
+        var response = await GroupAsync(
+            scene.Official,
+            notOne,
+            "not even a resource",
+            Entry(sent, scene.EventId, 1, "Arrive", ARRIVE)
+        );
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var results = ResultsOf(await ApiSessions.ReadJsonAsync(response));
+        Assert.Equal([400, 400, 201], results.Select(x => x.GetProperty("status").GetInt32()).ToArray());
+        Assert.Equal("malformed-request", ErrorCodeOf(results[0]));
+        Assert.Equal("malformed-request", ErrorCodeOf(results[1]));
+        Assert.Equal([sent], EventsOf(await StoredAsync(scene.One), 0).Select(x => x["_id"].AsGuid).ToArray());
     }
 
     [Fact]
