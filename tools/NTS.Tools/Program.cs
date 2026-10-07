@@ -3,6 +3,7 @@ using NTS.Tools.EventLiveness;
 using NTS.Tools.NameMigration;
 using NTS.Tools.ParticipationCopies;
 using NTS.Tools.PhaseTimes;
+using NTS.Tools.Tenants;
 using NTS.Tools.Watcher;
 
 return args.FirstOrDefault() switch
@@ -12,6 +13,7 @@ return args.FirstOrDefault() switch
     "migrate-participation-copies" => await RunParticipationCopiesMigration(args.Skip(1).ToArray()),
     "migrate-phase-times" => await RunPhaseTimesMigration(args.Skip(1).ToArray()),
     "migrate-event-liveness" => await RunEventLivenessMigration(args.Skip(1).ToArray()),
+    "migrate-tenants" => await TenantsMigrationTool.Run(args.Skip(1).ToArray()),
     "seed-tenant-root" => await DeveloperTool.SeedTenantRoot(args.Skip(1).ToArray()),
     "grant-developer" => await DeveloperTool.GrantDeveloper(args.Skip(1).ToArray()),
     "-h" => ShowHelp(),
@@ -39,6 +41,9 @@ static int ShowHelp()
           migrate-event-liveness
                                Remove the IsActive flag from every Event, after listing the Events that were inactive and
                                whose last day is still ahead, which are Live again (a dry run unless --apply)
+          migrate-tenants      Turn the data of before Tenants into the data of Tenants: the accounts, the Tenants, the Tenant
+                               of every document, the Main Operators, the grants and the environment marker
+                               (a dry run unless --apply)
           seed-tenant-root     Make an account a Tenant Root of a Tenant, which makes the Tenant operational
                                (a dry run unless --apply)
           grant-developer      Make an account the Developer (a dry run unless --apply)
