@@ -179,6 +179,25 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task The_competition_starts_at_the_time_of_the_day_it_is_asked_to()
+    {
+        var data = NewData();
+
+        await StagingSeed.Run(data.Database, Seed(startTime: TimeSpan.FromHours(9)), NOW);
+
+        var participations = await data.ManyAsync("event_participations");
+        Assert.Equal(12, participations.Count);
+        Assert.All(
+            participations,
+            x =>
+                Assert.Equal(
+                    new DateTime(2031, 3, 14, 9, 0, 0, DateTimeKind.Utc),
+                    x["Phases"][0]["StartTime"].ToUniversalTime()
+                )
+        );
+    }
+
+    [Fact]
     public async Task Running_it_again_makes_nothing_twice()
     {
         var data = NewData();
@@ -268,6 +287,60 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task An_account_of_another_Tenant_keeps_its_home_and_gets_a_Membership_here_beside_the_one_it_has()
+    {
+        var data = NewData();
+        var root = await data.AccountAsync(
+            "root@example.test",
+            "Türkiye",
+            x =>
+            {
+                x["HomeTenantId"] = "country-tr";
+                x["Memberships"] = new BsonArray
+                {
+                    new BsonDocument { { "TenantId", "country-tr" }, { "Roles", new BsonArray() } },
+                };
+            }
+        );
+
+        var report = await StagingSeed.Run(data.Database, Seed(), NOW);
+
+        var after = await data.OneAsync("users", root);
+        Assert.Equal("country-tr", after["HomeTenantId"].AsString); // set once, never moved
+        var memberships = after["Memberships"].AsBsonArray.Select(x => x.AsBsonDocument).ToList();
+        Assert.Equal(2, memberships.Count);
+        Assert.Empty(memberships.Single(x => x["TenantId"].AsString == "country-tr")["Roles"].AsBsonArray);
+        Assert.Equal(
+            ["tenant-root"],
+            memberships.Single(x => x["TenantId"].AsString == "country-bg")["Roles"].AsBsonArray.Select(x => x.AsString)
+        );
+        Assert.True(report.TenantRootMade);
+    }
+
+    [Fact]
+    public async Task An_account_that_is_a_member_of_the_Tenant_without_the_role_is_given_the_role()
+    {
+        var data = NewData();
+        var root = await data.AccountAsync(
+            "root@example.test",
+            "Bulgaria",
+            x =>
+            {
+                x["HomeTenantId"] = "country-bg";
+                x["Memberships"] = new BsonArray
+                {
+                    new BsonDocument { { "TenantId", "country-bg" }, { "Roles", new BsonArray() } },
+                };
+            }
+        );
+
+        var report = await StagingSeed.Run(data.Database, Seed(), NOW);
+
+        Assert.Equal(["tenant-root"], RolesOf(await data.OneAsync("users", root)));
+        Assert.True(report.TenantRootMade);
+    }
+
+    [Fact]
     public async Task An_account_that_has_the_role_already_is_not_given_it_twice()
     {
         var data = NewData();
@@ -308,7 +381,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         var named = await StagingSeed.Run(data.Database, Seed(environment: "Staging"), NOW);
 
         Assert.True(report.Refused);
-        Assert.Contains(report.Refusals, x => x.Contains("Production"));
+        Assert.Contains(report.Refusals, x => x.Contains("nothing is seeded into production"));
         Assert.True(named.Refused);
         Assert.Equal(before, await data.AllAsync());
     }
@@ -328,6 +401,36 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         Assert.True(unknown.Refused);
         Assert.Null(await EnvironmentMarker.ReadAsync(data.Database));
         Assert.Empty(await data.AllAsync());
+
+        await EnvironmentMarker.WriteAsync(data.Database, "Staging", NOW);
+        var before = await data.AllAsync();
+        var misspelt = await StagingSeed.Run(data.Database, Seed(environment: "Prod"), NOW); // a marked database does not excuse it
+        Assert.True(misspelt.Refused);
+        Assert.Contains(misspelt.Refusals, x => x.Contains("'Prod'"));
+        Assert.Equal(before, await data.AllAsync());
+    }
+
+    [Fact]
+    public async Task A_Tenant_that_is_there_is_completed_in_what_it_lacks_and_not_overwritten()
+    {
+        var data = NewData();
+        await data.Collection("tenants")
+            .InsertOneAsync(
+                new BsonDocument
+                {
+                    { "_id", "country-bg" },
+                    { "Kind", "country" },
+                    { "Name", "България" },
+                }
+            );
+
+        var report = await StagingSeed.Run(data.Database, Seed(), NOW);
+
+        Assert.False(report.TenantMade);
+        Assert.True(report.TenantCompleted);
+        var tenant = await data.Collection("tenants").Find(new BsonDocument("_id", "country-bg")).SingleAsync();
+        Assert.Equal("България", tenant["Name"].AsString); // what it had stays
+        Assert.True(tenant["RegionalRules"]["OnlyAverageLoopSpeed"].AsBoolean); // what it lacked is given
     }
 
     [Theory]
@@ -371,6 +474,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
 
     [Theory]
     [InlineData("tenant-root", "nobody")]
+    [InlineData("tenant-root", "Root <root@example.test>")]
     [InlineData("main-operator", "")]
     [InlineData("days", "0")]
     [InlineData("days", "61")]
@@ -407,7 +511,8 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         bool dry = false,
         string? environment = "Staging",
         int days = 7,
-        string name = "Staging Seed Event"
+        string name = "Staging Seed Event",
+        TimeSpan startTime = default
     )
     {
         return new StagingSeedOptions
@@ -424,6 +529,7 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
             Operators = ["operator@example.test"],
             EventName = name,
             Days = days,
+            StartTime = startTime,
         };
     }
 

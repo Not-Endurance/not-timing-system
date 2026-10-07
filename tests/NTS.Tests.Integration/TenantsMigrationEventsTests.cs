@@ -49,6 +49,29 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task A_deleted_Event_is_asked_nothing_of_and_gets_neither_a_Main_Operator_nor_grants()
+    {
+        var data = await LegacyAsync();
+        await TenantRootAsync(data, "root@example.test");
+        await data.AccountAsync("steward@example.test", "Bulgaria");
+        var deleted = await data.SetupAsync(officials: [("steward@example.test", "Steward")]);
+        await data.StartedAsync(deleted, NOW.AddDays(2));
+        await data.Collection("event_informations")
+            .UpdateOneAsync(
+                new BsonDocument("_id", LegacyTenantData.Uuid(deleted)),
+                Builders<BsonDocument>.Update.Set("IsDeleted", true)
+            );
+
+        var report = await TenantsMigration.Run(data.Database, Apply(), NOW);
+
+        Assert.Equal(0, report.EventsNotHistoric);
+        Assert.Equal(0, report.MainOperatorsAssigned);
+        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", deleted)));
+        Assert.Null(MainOperatorOf(await data.OneAsync("event_informations", deleted)));
+        Assert.Empty(await data.ManyAsync("event_grants"));
+    }
+
+    [Fact]
     public async Task An_Event_that_has_a_Main_Operator_keeps_it()
     {
         var data = await LegacyAsync();
@@ -62,6 +85,45 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
         Assert.Equal(someone, MainOperatorOf(await data.OneAsync("configure_events", event_)));
         Assert.Equal(someone, MainOperatorOf(await data.OneAsync("event_informations", event_)));
         Assert.Equal(0, report.MainOperatorsAssigned);
+    }
+
+    [Fact]
+    public async Task An_account_that_is_named_does_not_replace_the_Main_Operator_an_Event_has()
+    {
+        var data = await LegacyAsync();
+        await data.AccountAsync("plain@example.test", "Bulgaria");
+        var someone = Guid.NewGuid();
+        var event_ = await data.SetupAsync(mainOperator: someone);
+        await data.StartedAsync(event_, NOW.AddDays(2), mainOperator: someone);
+
+        await TenantsMigration.Run(
+            data.Database,
+            new TenantsOptions
+            {
+                Apply = true,
+                Environment = "Staging",
+                MainOperatorEmail = "plain@example.test",
+            },
+            NOW
+        );
+
+        Assert.Equal(someone, MainOperatorOf(await data.OneAsync("configure_events", event_)));
+        Assert.Equal(someone, MainOperatorOf(await data.OneAsync("event_informations", event_)));
+    }
+
+    [Fact]
+    public async Task A_Tenant_Root_of_another_Tenant_is_not_the_Main_Operator_of_an_Event_of_this_one()
+    {
+        var data = await LegacyAsync();
+        await data.CountryAsync("Turkey", "TR");
+        var turkish = await data.AccountAsync("turkish@example.test", "Turkey");
+        await data.TenantRootAsync(turkish, "country-tr");
+        var waiting = await data.SetupAsync();
+
+        var report = await TenantsMigration.Run(data.Database, Apply(), NOW);
+
+        Assert.Equal([waiting], report.EventsWaitingForMainOperator);
+        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", waiting)));
     }
 
     [Fact]
@@ -101,6 +163,21 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
         Assert.Equal(account, MainOperatorOf(await data.OneAsync("configure_events", waiting)));
         Assert.Equal(1, second.MainOperatorsAssigned);
         Assert.Empty(second.EventsWaitingForMainOperator);
+    }
+
+    [Fact]
+    public async Task Without_a_Tenant_Root_the_Events_wait_again_on_a_second_run_though_every_account_has_a_Membership_now()
+    {
+        var data = await LegacyAsync();
+        await data.AccountAsync("one@example.test", "Bulgaria");
+        await data.AccountAsync("two@example.test", "Bulgaria");
+        var waiting = await data.SetupAsync();
+        await TenantsMigration.Run(data.Database, Apply(), NOW);
+
+        var again = await TenantsMigration.Run(data.Database, Apply(), NOW);
+
+        Assert.Equal([waiting], again.EventsWaitingForMainOperator);
+        Assert.Null(MainOperatorOf(await data.OneAsync("configure_events", waiting)));
     }
 
     [Fact]
@@ -261,6 +338,33 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
         Assert.Equal((operatorAccount, (OfficialRole?)null), (operator_.AccountId, operator_.OfficialRole));
         Assert.Equal(3, report.GrantsMade);
         Assert.Equal(1, report.GrantsPending);
+        Assert.Equal(
+            ["new@example.test", "operator@example.test", "steward@example.test"],
+            (await data.ManyAsync("event_grants")).Select(x => x["Email"].AsString).Order(StringComparer.Ordinal)
+        ); // as they are stored, in the form the Api matches them by
+    }
+
+    [Fact]
+    public async Task A_person_who_is_an_Official_in_two_roles_and_an_Operator_gets_a_grant_for_each()
+    {
+        var data = await LegacyAsync();
+        await data.AccountAsync("both@example.test", "Bulgaria");
+        await data.SetupAsync(
+            officials: [("both@example.test", "Steward"), ("both@example.test", "GroundJury")],
+            operators: ["both@example.test"]
+        );
+
+        var report = await TenantsMigration.Run(data.Database, Apply(), NOW);
+
+        var grants = (await data.ManyAsync("event_grants"))
+            .Select(GrantDocuments.ToGrant)
+            .OfType<EventGrant>()
+            .ToList();
+        Assert.Equal(3, grants.Count);
+        Assert.Contains(grants, x => x is { Kind: GrantKind.Official, OfficialRole: OfficialRole.Steward });
+        Assert.Contains(grants, x => x is { Kind: GrantKind.Official, OfficialRole: OfficialRole.GroundJury });
+        Assert.Contains(grants, x => x is { Kind: GrantKind.Operator });
+        Assert.Equal(3, report.GrantsMade);
     }
 
     [Fact]

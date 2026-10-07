@@ -304,11 +304,29 @@ public sealed class TenantsMigrationTests : IClassFixture<MongoFixture>
                     { "Email", "legacy@example.test" },
                 }
             );
+        // A placeholder, not an account. The driver gives a new id to a document whose id is empty, so it is inserted by the command.
+        await data.Database.RunCommandAsync<BsonDocument>(
+            new BsonDocument
+            {
+                { "insert", "users" },
+                {
+                    "documents",
+                    new BsonArray
+                    {
+                        new BsonDocument
+                        {
+                            { "_id", LegacyTenantData.Uuid(Guid.Empty) },
+                            { "Email", "empty@example.test" },
+                        },
+                    }
+                },
+            }
+        );
         var before = await data.ManyAsync("users");
 
         var report = await TenantsMigration.Run(data.Database, Apply("Staging"), NOW);
 
-        Assert.Equal(2, report.AccountsWithOtherIds);
+        Assert.Equal(3, report.AccountsWithOtherIds);
         Assert.Equal(before, await data.ManyAsync("users"));
         Assert.False(report.Refused);
     }
@@ -493,7 +511,7 @@ public sealed class TenantsMigrationTests : IClassFixture<MongoFixture>
     public async Task Every_document_a_Tenant_owns_that_has_the_constant_Tenant_or_none_gets_the_Tenant_of_Bulgaria()
     {
         var data = await LegacyAsync();
-        var stamped = new Dictionary<string, (Guid Constant, Guid None, Guid Other)>();
+        var stamped = new Dictionary<string, (Guid Constant, Guid None, Guid Empty, Guid Other)>();
         foreach (var collection in OWNED)
         {
             // a grant is one person in one place, so each of these is somebody else
@@ -508,6 +526,7 @@ public sealed class TenantsMigrationTests : IClassFixture<MongoFixture>
             stamped[collection] = (
                 await data.OwnedAsync(collection, "nts", person),
                 await data.OwnedAsync(collection, null, person),
+                await data.OwnedAsync(collection, "", person),
                 await data.OwnedAsync(collection, "country-tr", person)
             );
         }
@@ -518,8 +537,9 @@ public sealed class TenantsMigrationTests : IClassFixture<MongoFixture>
         {
             Assert.Equal("country-bg", (await data.OneAsync(collection, ids.Constant))["TenantId"].AsString);
             Assert.Equal("country-bg", (await data.OneAsync(collection, ids.None))["TenantId"].AsString);
+            Assert.Equal("country-bg", (await data.OneAsync(collection, ids.Empty))["TenantId"].AsString);
             Assert.Equal("country-tr", (await data.OneAsync(collection, ids.Other))["TenantId"].AsString); // another Tenant's
-            Assert.Equal(2, report.Stamped[collection]);
+            Assert.Equal(3, report.Stamped[collection]);
         }
     }
 
@@ -586,6 +606,76 @@ public sealed class TenantsMigrationTests : IClassFixture<MongoFixture>
         );
         await new Not.Identity.Mongo.IdentityIndexInitializer(client, options).StartAsync(CancellationToken.None);
         await new NoTiming.Api.Features.Tenancy.TenancyIndexes(client, options).StartAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task The_command_makes_every_index_the_hosts_make_when_they_start_and_no_other()
+    {
+        var made = await LegacyAsync();
+        await made.AccountAsync("ivan@example.test", "Bulgaria");
+        await TenantsMigration.Run(made.Database, Apply("Staging"), NOW);
+
+        var fresh = NewDatabase();
+        var client = new MongoClient(_mongo.ConnectionString);
+        var options = Microsoft.Extensions.Options.Options.Create(
+            new Not.Identity.NIdentityOptions { Database = fresh.DatabaseNamespace.DatabaseName }
+        );
+        await new Not.Identity.Mongo.IdentityIndexInitializer(client, options).StartAsync(CancellationToken.None);
+        await new NoTiming.Api.Features.Tenancy.TenancyIndexes(client, options).StartAsync(CancellationToken.None);
+
+        Assert.Equal(await IndexNamesAsync(fresh), await IndexNamesAsync(made.Database));
+    }
+
+    [Fact]
+    public async Task A_country_whose_ISO_code_has_spaces_around_it_is_still_the_country_it_names()
+    {
+        var data = new LegacyTenantData(NewDatabase());
+        await data.CountryAsync("Bulgaria", " BG ");
+
+        var report = await TenantsMigration.Run(data.Database, Apply("Staging"), NOW);
+
+        Assert.True(report.HasBulgaria);
+        Assert.False(report.Refused);
+        Assert.Equal(["country-bg"], report.TenantsMade);
+    }
+
+    [Fact]
+    public async Task A_unique_index_that_the_data_cannot_have_stops_the_run_before_the_Tenant_is_stamped()
+    {
+        var data = await LegacyAsync();
+        await data.AccountAsync(
+            "one@example.test",
+            "Bulgaria",
+            x => x["Passkeys"] = new BsonArray { new BsonDocument("CredentialId", "the-same") }
+        );
+        await data.AccountAsync(
+            "two@example.test",
+            "Bulgaria",
+            x => x["Passkeys"] = new BsonArray { new BsonDocument("CredentialId", "the-same") }
+        );
+        var club = await data.OwnedAsync("clubs");
+
+        await Assert.ThrowsAnyAsync<MongoException>(() => TenantsMigration.Run(data.Database, Apply("Staging"), NOW));
+
+        Assert.Equal("nts", (await data.OneAsync("clubs", club))["TenantId"].AsString); // the unique indexes come first
+    }
+
+    static async Task<SortedDictionary<string, string[]>> IndexNamesAsync(IMongoDatabase database)
+    {
+        var names = new SortedDictionary<string, string[]>(StringComparer.Ordinal);
+        foreach (var collection in await (await database.ListCollectionNamesAsync()).ToListAsync())
+        {
+            var indexes = await (
+                await database.GetCollection<BsonDocument>(collection).Indexes.ListAsync()
+            ).ToListAsync();
+            var named = indexes.Select(x => x["name"].AsString).Where(x => x != "_id_").Order(StringComparer.Ordinal);
+            if (named.Any())
+            {
+                names[collection] = [.. named];
+            }
+        }
+
+        return names;
     }
 
     static (string Tenant, int Accounts)[] PlacedOf(TenantsReport report)

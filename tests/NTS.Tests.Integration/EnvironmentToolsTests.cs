@@ -69,6 +69,8 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
             new DateTime(2031, 3, 14, 6, 30, 0, DateTimeKind.Utc),
             setup["Competitions"][0]["Start"].ToUniversalTime()
         );
+        var core = await data.Collection("event_informations").Find(FilterDefinition<BsonDocument>.Empty).SingleAsync();
+        Assert.Equal(new DateTime(2031, 3, 15, 23, 59, 59, DateTimeKind.Utc), core["EndDay"].ToUniversalTime()); // two days
         foreach (var text in new[] { output, error })
         {
             Assert.DoesNotContain(_mongo.ConnectionString, text);
@@ -93,6 +95,7 @@ public sealed class EnvironmentToolsTests : IClassFixture<MongoFixture>
     [Theory]
     [InlineData("--official", "steward@example.test")] // no role
     [InlineData("--official", "steward@example.test:Judge")] // a role that is none of ours
+    [InlineData("--official", "steward@example.test:99")] // a number that is no role either
     [InlineData("--days", "many")]
     [InlineData("--start", "6")]
     [InlineData("--unknown", "x")]
