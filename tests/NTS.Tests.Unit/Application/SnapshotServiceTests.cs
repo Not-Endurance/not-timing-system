@@ -3,8 +3,10 @@ using NoTiming.Ui.Features.Core.Dashboard;
 using NoTiming.Ui.Features.Core.Participations;
 using NTS.Application.UserSession;
 using NTS.Contracts.Features.Access;
+using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
@@ -97,10 +99,102 @@ public sealed class SnapshotServiceTests
 
         Assert.True(published);
         var group = Assert.Single(publisher.Published);
+        Assert.Equal([LIVE_EVENT_ID], publisher.Events); // to the Event the view shows
         Assert.Equal([1], group.Entries.Select(x => x.Number)); // only the one that was timed
         Assert.Single(service.History);
         Assert.Equal([2], service.Snapshots.Select(x => x.Number)); // the other is still selected
         Assert.Equal([1], service.Participations.Select(x => x.Combination.Number));
+    }
+
+    [Fact]
+    public async Task A_Snapshot_the_server_did_not_record_stays_selected_and_the_person_is_told_why_while_the_ones_it_did_leave_the_page()
+    {
+        var (service, store, _, publisher) = await Connected(
+            ParticipationFixtures.Active(1),
+            ParticipationFixtures.Active(2),
+            ParticipationFixtures.Active(3)
+        );
+        publisher.Answer = (number, id) =>
+            number == 2
+                ? SnapshotReceipt.Failed(
+                    id,
+                    409,
+                    "participation-busy",
+                    "The Participation was being changed by too many at once."
+                )
+                : SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.Accepted));
+        foreach (var participation in service.Participations.ToArray())
+        {
+            service.SelectForSnapshot(participation);
+        }
+
+        foreach (var snapshot in service.Snapshots.ToArray())
+        {
+            service.Capture(snapshot);
+        }
+
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+
+        var refused = await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
+
+        Assert.Contains("too many at once", refused.Message);
+        Assert.Equal([2], service.Snapshots.Select(x => x.Number)); // the one that was not recorded is still to be sent
+        var recorded = Assert.Single(service.History);
+        Assert.Equal([1, 3], recorded.Entries.Select(x => x.Number));
+    }
+
+    [Fact]
+    public async Task A_Snapshot_the_server_recorded_as_rejected_has_been_sent_and_leaves_the_page()
+    {
+        var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
+        publisher.Answer = (_, id) =>
+            SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.RejectedDuplicateArrive));
+        service.SelectForSnapshot(service.Participations[0]);
+        service.Capture(service.Snapshots[0]);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+
+        var published = await service.Publish(view, SnapshotType.Arrive);
+
+        Assert.True(published);
+        Assert.Empty(service.Snapshots);
+        Assert.Single(service.History);
+    }
+
+    [Fact]
+    public async Task When_the_server_records_none_nothing_leaves_the_page_and_nothing_enters_the_history()
+    {
+        var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
+        publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, 403, "not-allowed", "You may not do this.");
+        service.SelectForSnapshot(service.Participations[0]);
+        service.Capture(service.Snapshots[0]);
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+
+        await Assert.ThrowsAsync<DomainException>(() => service.Publish(view, SnapshotType.Arrive));
+
+        Assert.Single(service.Snapshots);
+        Assert.Empty(service.History);
+    }
+
+    [Fact]
+    public async Task Sending_a_group_again_sends_other_Snapshots_to_the_Event_the_view_shows_and_tells_the_person_when_one_was_not_recorded()
+    {
+        var (service, store, _, publisher) = await Connected(ParticipationFixtures.Active(1));
+        var group = new SnapshotGroup(
+            [new Snapshot(1, "Athlete 1", null, new Timestamp(DateTimeOffset.Now))],
+            SnapshotType.Arrive
+        );
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+
+        await service.RePublish(view, group, SnapshotType.Present);
+
+        var again = Assert.Single(publisher.Published);
+        Assert.Equal(SnapshotType.Present, again.Type);
+        Assert.Equal([LIVE_EVENT_ID], publisher.Events);
+        Assert.Empty(group.Entries.Select(group.IdOf).Intersect(again.Entries.Select(again.IdOf)));
+
+        publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, 409, "event-ended", "The Event has ended.");
+
+        await Assert.ThrowsAsync<DomainException>(() => service.RePublish(view, group, SnapshotType.Present));
     }
 
     [Fact]
@@ -244,14 +338,50 @@ public sealed class SnapshotServiceTests
         }
     }
 
+    static RecordedSnapshot Recorded(TimeEventOutcome outcome)
+    {
+        return new RecordedSnapshot
+        {
+            EventId = LIVE_EVENT_ID,
+            ParticipationId = TestId.Of(1),
+            Number = 1,
+            Slot = TimeSlot.Arrive,
+            Time = DateTimeOffset.Now,
+            Outcome = outcome,
+        };
+    }
+
     sealed class RecordingPublisher : ISnapshotPublisher
     {
         public List<SnapshotGroup> Published { get; } = [];
+        public List<Guid> Events { get; } = [];
 
-        public Task PublishSnapshotsAsync(SnapshotGroup snapshoutGroup)
+        /// <summary>What the server says of the Snapshot of a start number with the id it was sent under: recorded and accepted, unless a test says otherwise.</summary>
+        public Func<int, Guid, SnapshotReceipt> Answer { get; set; } =
+            (_, id) => SnapshotReceipt.Recorded(id, 201, Recorded(TimeEventOutcome.Accepted));
+
+        public Task<IReadOnlyList<SnapshotReceipt>> PublishSnapshotsAsync(
+            Guid eventId,
+            SnapshotGroup snapshotGroup,
+            CancellationToken cancellationToken = default
+        )
         {
-            Published.Add(snapshoutGroup);
-            return Task.CompletedTask;
+            Events.Add(eventId);
+            Published.Add(snapshotGroup);
+            IReadOnlyList<SnapshotReceipt> receipts =
+            [
+                .. snapshotGroup.Entries.Select(x => Answer(x.Number, snapshotGroup.IdOf(x))),
+            ];
+            return Task.FromResult(receipts);
+        }
+
+        public Task<SnapshotReceipt> UpdateSnapshotAsync(
+            Guid snapshotId,
+            DateTimeOffset time,
+            CancellationToken cancellationToken = default
+        )
+        {
+            return Task.FromResult(Answer(0, snapshotId));
         }
     }
 }

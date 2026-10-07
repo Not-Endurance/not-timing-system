@@ -2,9 +2,7 @@ using Not.Application.DomainEvents;
 using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Injection;
-using NoTiming.Ui.Features.Core.Dashboard;
 using NTS.Contracts.Live;
-using NTS.Domain.Core.Objects.Snapshots;
 using ParticipationChangedEvent = NTS.Domain.Core.Events.ParticipationChanged;
 
 namespace NoTiming.Ui.Features.Socket;
@@ -13,7 +11,7 @@ namespace NoTiming.Ui.Features.Socket;
 /// What the Api sends a viewer (ADR-0013): that a Participation changed. The store reads it again; nothing the hub
 /// sends describes a Participation.
 /// </summary>
-public class WitnessRpcClient : RpcClient, ILiveClientProcedures, ISnapshotPublisher, IScoped
+public class WitnessRpcClient : RpcClient, ILiveClientProcedures, IScoped
 {
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
@@ -26,12 +24,6 @@ public class WitnessRpcClient : RpcClient, ILiveClientProcedures, ISnapshotPubli
     protected override void RegisterProcedures()
     {
         RegisterInputProcedure<Guid, Guid>(nameof(ILiveClientProcedures.ParticipationChanged), ParticipationChanged);
-    }
-
-    public Task PublishSnapshotsAsync(SnapshotGroup snapshotGroup)
-    {
-        // The hub has no write path (ADR-0013). Snapshots are POSTed to the Api once the server records them (#644).
-        throw new NotSupportedException("Snapshots cannot be sent until the server records them.");
     }
 
     /// <summary>

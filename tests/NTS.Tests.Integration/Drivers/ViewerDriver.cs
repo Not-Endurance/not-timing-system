@@ -14,6 +14,7 @@ using NoTiming.Ui.Storage;
 using NTS.Contracts;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Access;
+using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Socket;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
@@ -89,9 +90,13 @@ internal sealed class ViewerDriver : IAsyncDisposable
         return _provider.Startup();
     }
 
-    public Task Publish(SnapshotGroup snapshotGroup)
+    /// <summary>Sends the group to the Event the viewer is connected to, through the client of the Api, and says what each came to.</summary>
+    public Task<IReadOnlyList<SnapshotReceipt>> Publish(SnapshotGroup snapshotGroup)
     {
-        return _provider.GetRequiredService<ISnapshotPublisher>().PublishSnapshotsAsync(snapshotGroup);
+        var eventId =
+            _provider.GetRequiredService<INtsSocketContext>().Event?.Id
+            ?? throw new InvalidOperationException($"Witness '{_clientName}' is not connected to an Event.");
+        return _provider.GetRequiredService<ISnapshotPublisher>().PublishSnapshotsAsync(eventId, snapshotGroup);
     }
 
     public async Task Connect(EventInformation eventInformation)

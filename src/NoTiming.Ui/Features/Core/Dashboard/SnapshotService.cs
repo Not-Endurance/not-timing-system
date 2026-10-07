@@ -1,5 +1,6 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
+using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Injection;
 using NTS.Application.UserSession;
@@ -126,14 +127,24 @@ public class SnapshotService
         }
 
         var snapshotGroup = new SnapshotGroup(readySnapshots, snapshotType);
-        await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroup);
-        await DrainSnapshotSelectionPersistence();
-        await _userSessionService.AppendSnapshot(snapshotGroup);
+        var receipts = await _snapshotPublisher.PublishSnapshotsAsync(view.Event.Id, snapshotGroup);
 
-        _history.Add(snapshotGroup);
-        FlushSnapshots(readySnapshots.Select(x => x.Number).ToHashSet());
-        Rebuild();
-        return true;
+        // What the server recorded is no longer the person's to keep, whatever its outcome: a rejected Snapshot is an event
+        // of its own. What it did not record stays selected, to be sent again, and the person is told why.
+        var recorded = snapshotGroup.Entries.Where(x => IsRecorded(receipts, snapshotGroup.IdOf(x))).ToList();
+        if (recorded.Count > 0)
+        {
+            var sent = new SnapshotGroup(recorded, snapshotType);
+            await DrainSnapshotSelectionPersistence();
+            await _userSessionService.AppendSnapshot(sent);
+
+            _history.Add(sent);
+            FlushSnapshots(recorded.Select(x => x.Number).ToHashSet());
+            Rebuild();
+        }
+
+        RefuseWhenNotRecorded(receipts);
+        return recorded.Count > 0;
     }
 
     public async Task RePublish(IViewedEvent view, SnapshotGroup snapshotGroup, SnapshotType snapshotType)
@@ -141,7 +152,7 @@ public class SnapshotService
         view.EnsureCanWrite();
         GuardHelper.ThrowIfDefault(snapshotGroup);
         var snapshotGroupToPublish = new SnapshotGroup(snapshotGroup.Entries, snapshotType);
-        await _snapshotPublisher.PublishSnapshotsAsync(snapshotGroupToPublish);
+        RefuseWhenNotRecorded(await _snapshotPublisher.PublishSnapshotsAsync(view.Event.Id, snapshotGroupToPublish));
     }
 
     public void UpdateTimestamp(Snapshot snapshot, Timestamp timestamp)
@@ -173,6 +184,20 @@ public class SnapshotService
         _participationsToSnapshot = [];
         ClearState();
         return Task.CompletedTask;
+    }
+
+    static bool IsRecorded(IReadOnlyList<SnapshotReceipt> receipts, Guid id)
+    {
+        return receipts.Any(x => x.Id == id && x.IsRecorded);
+    }
+
+    /// <summary>The person is told why the first Snapshot that was not recorded was not: the Api's own words.</summary>
+    static void RefuseWhenNotRecorded(IReadOnlyList<SnapshotReceipt> receipts)
+    {
+        if (receipts.FirstOrDefault(x => !x.IsRecorded) is { } failed)
+        {
+            throw new DomainException(failed.ErrorMessage ?? failed.ErrorCode ?? "The Snapshot was not recorded.");
+        }
     }
 
     void FlushSnapshots(HashSet<int> participationNumbers)
