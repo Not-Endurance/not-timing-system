@@ -175,6 +175,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "PATCH api/participations/{id}",
             "PATCH api/passkeys/{id}",
             "PATCH api/rankings/{id}",
+            "PATCH api/snapshots/{id}",
             "PATCH api/tenants/{id}",
             "PATCH api/user-sessions/{id}",
             "POST api/athletes",
@@ -196,6 +197,8 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "POST api/rankings",
             "POST api/registrations",
             "POST api/sessions",
+            "POST api/snapshots",
+            "POST api/snapshots/actions/send-group",
             "POST api/user-sessions",
         ];
     }

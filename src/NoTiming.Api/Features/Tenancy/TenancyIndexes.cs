@@ -9,8 +9,10 @@ namespace NoTiming.Api.Features.Tenancy;
 /// Creates the indexes the tenancy of #643 depends on when the host starts. One grant is one person in one place, and a
 /// unique index says it for requests that race (a missing role of an Operator is a value like any other, so two Operators
 /// of the same email cannot be linked to an Event twice). The others are the lookups: the grants of an account on an
-/// Event, the invitations that wait for an email, the Events a Main Operator runs, and the accounts of a Tenant. Creating
-/// an index that already exists with the same definition does nothing.
+/// Event, the invitations that wait for an email, the Events a Main Operator runs, and the accounts of a Tenant, and the two
+/// that a Snapshot is recorded by (#644): the Participation of an Event with a start number, and the Participation that
+/// holds a time event, which is how a Snapshot sent again, or Updated, is found by its id. Creating an index that already
+/// exists with the same definition does nothing.
 /// </summary>
 internal sealed class TenancyIndexes : IHostedService
 {
@@ -56,6 +58,18 @@ internal sealed class TenancyIndexes : IHostedService
             .Indexes.CreateOneAsync(
                 Index("events_by_main_operator", new BsonDocument("MainOperatorId", 1)),
                 cancellationToken: cancellationToken
+            );
+        await database
+            .GetCollection<BsonDocument>(TenantOwned.EVENT_PARTICIPATIONS)
+            .Indexes.CreateManyAsync(
+                [
+                    Index(
+                        "participations_of_an_event_by_number",
+                        new BsonDocument { { "EventId", 1 }, { "Combination.Number", 1 } }
+                    ),
+                    Index("participations_by_time_event", new BsonDocument("Phases.Events._id", 1)),
+                ],
+                cancellationToken
             );
         await database
             .GetCollection<BsonDocument>(_options.UsersCollection)

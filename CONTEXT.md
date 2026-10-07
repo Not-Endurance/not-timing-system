@@ -121,14 +121,14 @@ One leg of a Participation: the loop ridden from Start to Arrival, then the vet 
 A Combination presenting at the vet gate, captured as a time. Presenting again after re-inspection is requested is a Represent: the same kind of time, marked as a re-presentation.
 
 **Snapshot**:
-A time an Official captures for a Combination, by start number, and sends in for the Event as an Arrival or a Presentation. It is an input, not part of the Participation: every Snapshot is recorded as a time event on a Phase, accepted or rejected.
+A time an Official captures for a Combination, by start number, and sends in for the Event as an Arrival or a Presentation. It is an input, not part of the Participation: the server records every Snapshot as a time event on a Phase, accepted or rejected, and answers with it. The device makes its id, which is the id of the event, so that a Snapshot sent again is the same Snapshot and is recorded once.
 
 **Time event**:
 A past-tense fact recorded on a Phase — Arrived or Presented, or an Update of one — with an outcome: accepted, or rejected with a reason (including a manual reject by the Main Operator). A Phase's times are the latest accepted time event of each kind; rejected ones stay in its history. A time that breaks the order Start, Arrival, Presentation, Representation, compared among the times that exist, is rejected as an invalid time and never thrown at; a Presentation without an Arrival is legal, because a delayed Arrival looks exactly like that.
 _Avoid_: Event (that is the show), phase event, snapshot event
 
 **Update**:
-Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, or the Main Operator editing the Phase in the Console. It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history.
+Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, named by the Snapshot's id, or the Main Operator editing the Phase in the Console. It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history. It sets an absolute value, so the last one wins.
 
 **Disable**:
 The Main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again. The event stays in the history and can be enabled again.

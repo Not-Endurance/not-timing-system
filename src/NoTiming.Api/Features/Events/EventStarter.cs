@@ -1,8 +1,6 @@
 using System.Text;
-using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Not.Identity;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
 using NoTiming.Api.JsonApi;
@@ -195,27 +193,17 @@ internal static class EventStartPlans
 /// Starts and resets an Event (#628): starting writes the Core document of the Event, which is what makes it started, and
 /// then what it copies and creates; resetting removes all of that, the Core document last, so that an Event that is left
 /// half reset can be reset again, and a start that fails part way leaves no Event behind. Both stay inside the Event's
-/// Tenant. A reset also takes the state a person kept for the Event and the Snapshots still waiting for it, which are not
-/// the Tenant's documents.
+/// Tenant. A reset also takes the state a person kept for the Event, which is not the Tenant's document.
 /// </summary>
 internal sealed class EventStarter
 {
-    const string PENDING_SNAPSHOTS = "event_pending_snapshots";
-
     readonly TenantCollections _tenants;
     readonly UserSessionStore _sessions;
-    readonly IMongoCollection<BsonDocument> _pendingSnapshots;
 
-    public EventStarter(
-        TenantCollections tenants,
-        UserSessionStore sessions,
-        IMongoClient client,
-        IOptions<NIdentityOptions> options
-    )
+    public EventStarter(TenantCollections tenants, UserSessionStore sessions)
     {
         _tenants = tenants;
         _sessions = sessions;
-        _pendingSnapshots = client.GetDatabase(options.Value.Database).GetCollection<BsonDocument>(PENDING_SNAPSHOTS);
     }
 
     /// <summary>Starts the Event; false when it has been started already, by whoever got there first.</summary>
@@ -258,7 +246,6 @@ internal sealed class EventStarter
         }
 
         await _sessions.DeleteOfEventAsync(eventId, cancellationToken);
-        await _pendingSnapshots.DeleteManyAsync(ofTheEvent, cancellationToken);
         await _tenants
             .Of(TenantOwned.EVENT_INFORMATIONS, tenantId)
             .DeleteAsync(new BsonDocument("_id", BsonGuids.Binary(eventId)), cancellationToken);

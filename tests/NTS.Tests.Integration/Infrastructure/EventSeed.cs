@@ -104,8 +104,8 @@ internal static class EventSeed
     }
 
     /// <summary>
-    /// One document of everything an Event keeps beside its Core document, and the state of a person and a pending
-    /// Snapshot of it, so that a test can tell that all of it goes when the Event is reset.
+    /// One document of everything an Event keeps beside its Core document, and the state of a person, so that a test can
+    /// tell that all of it goes when the Event is reset.
     /// </summary>
     public static async Task KeepsAsync(string mongoConnectionString, string tenant, Guid eventId)
     {
@@ -122,11 +122,8 @@ internal static class EventSeed
                 );
         }
 
-        foreach (var collection in new[] { "event_user_sessions", "event_pending_snapshots" })
-        {
-            await Collection(mongoConnectionString, collection)
-                .InsertOneAsync(new BsonDocument { { "_id", Binary(Guid.NewGuid()) }, { "EventId", Binary(eventId) } });
-        }
+        await Collection(mongoConnectionString, "event_user_sessions")
+            .InsertOneAsync(new BsonDocument { { "_id", Binary(Guid.NewGuid()) }, { "EventId", Binary(eventId) } });
     }
 
     /// <summary>An Event that has started: the Core document of it, which ends at the instant given.</summary>

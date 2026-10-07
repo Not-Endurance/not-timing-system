@@ -14,30 +14,48 @@ internal static class JsonApiRequests
 {
     public const int MAX_BODY_BYTES = 1_048_576;
 
+    /// <summary>
+    /// The resources a request carries as a list, for the routes that take a group of them (the rest-api skill): the entries
+    /// as the document gave them, so that one that is not a resource of the expected type is the error of its own entry and
+    /// not the one of the request. A body that is not a list is refused.
+    /// </summary>
+    public static async Task<(IReadOnlyList<JsonElement>? Entries, IResult? Error)> ReadListAsync(HttpRequest request)
+    {
+        if (Refuse(request) is { } refused)
+        {
+            return (null, refused);
+        }
+
+        try
+        {
+            var document = await JsonSerializer.DeserializeAsync<JsonElement>(
+                request.Body,
+                JsonApiResults.Options,
+                request.HttpContext.RequestAborted
+            );
+            if (
+                document.ValueKind != JsonValueKind.Object
+                || !document.TryGetProperty("data", out var data)
+                || data.ValueKind != JsonValueKind.Array
+            )
+            {
+                return (null, Malformed("Send the resources as a list: the data of the document is an array."));
+            }
+
+            return ([.. data.EnumerateArray()], null);
+        }
+        catch (JsonException)
+        {
+            return (null, Malformed("The body is not valid JSON."));
+        }
+    }
+
     public static async Task<JsonApiRead<TAttributes>> ReadAsync<TAttributes>(HttpRequest request, string type)
         where TAttributes : class
     {
-        if (!request.HasJsonApiContentType())
+        if (Refuse(request) is { } refused)
         {
-            return JsonApiRead<TAttributes>.Rejected(
-                JsonApiResults.Error(
-                    StatusCodes.Status415UnsupportedMediaType,
-                    "unsupported-media-type",
-                    $"Send {JsonApiResults.MEDIA_TYPE}."
-                )
-            );
-        }
-
-        if (request.ContentLength > MAX_BODY_BYTES)
-        {
-            return JsonApiRead<TAttributes>.Rejected(TooLarge());
-        }
-
-        // A body that does not say how long it is (chunked) is cut off by the server when it passes the limit.
-        var limit = request.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>();
-        if (limit is { IsReadOnly: false })
-        {
-            limit.MaxRequestBodySize = MAX_BODY_BYTES;
+            return JsonApiRead<TAttributes>.Rejected(refused);
         }
 
         try
@@ -60,6 +78,33 @@ internal static class JsonApiRequests
         {
             return JsonApiRead<TAttributes>.Rejected(Malformed("The body is not valid JSON."));
         }
+    }
+
+    /// <summary>The answer that refuses a request whose media type is not the one of the Api or whose body is too large, none when it is read.</summary>
+    static IResult? Refuse(HttpRequest request)
+    {
+        if (!request.HasJsonApiContentType())
+        {
+            return JsonApiResults.Error(
+                StatusCodes.Status415UnsupportedMediaType,
+                "unsupported-media-type",
+                $"Send {JsonApiResults.MEDIA_TYPE}."
+            );
+        }
+
+        if (request.ContentLength > MAX_BODY_BYTES)
+        {
+            return TooLarge();
+        }
+
+        // A body that does not say how long it is (chunked) is cut off by the server when it passes the limit.
+        var limit = request.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>();
+        if (limit is { IsReadOnly: false })
+        {
+            limit.MaxRequestBodySize = MAX_BODY_BYTES;
+        }
+
+        return null;
     }
 
     static IResult TooLarge()

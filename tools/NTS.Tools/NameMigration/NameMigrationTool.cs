@@ -16,7 +16,6 @@ public static class NameMigrationTool
         "event_rankings",
         "event_handouts",
         "event_user_sessions",
-        "event_pending_snapshots",
     ];
 
     public static async Task<int> Run(string[] args)

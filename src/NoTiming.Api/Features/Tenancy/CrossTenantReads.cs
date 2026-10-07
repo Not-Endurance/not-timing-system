@@ -198,6 +198,23 @@ internal sealed class CrossTenantReads
     }
 
     /// <summary>
+    /// The Participation that holds the time event with the id, whatever Tenant it is in: a Snapshot is found by its id to
+    /// learn which Event it belongs to, and what may be done with it is then asked of that Event (#644). The id of a time
+    /// event is a Guid that a device made, so one that is in a Participation is not told to be anybody else's. None when no
+    /// Participation holds it.
+    /// </summary>
+    public async Task<ParticipationModel?> FindParticipationOfTimeEventAsync(
+        Guid timeEventId,
+        CancellationToken cancellationToken
+    )
+    {
+        return await _database
+            .GetCollection<ParticipationModel>(TenantOwned.EVENT_PARTICIPATIONS)
+            .Find(new BsonDocument("Phases.Events._id", BsonGuids.Binary(timeEventId)))
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// The Events, of every Tenant, that keep a Ranking some entry of which holds no placing: what the host looks at to
     /// finalise the Rankings of the Events that have ended (#640). It reads the ids of the Events and nothing else, and what
     /// is done to an Event is then asked of the Event.

@@ -44,9 +44,7 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Null(await EventSeed.CoreOfAsync(_mongo.ConnectionString, id));
-        foreach (
-            var collection in EventSeed.EVENT_COLLECTIONS.Concat(["event_user_sessions", "event_pending_snapshots"])
-        )
+        foreach (var collection in EventSeed.EVENT_COLLECTIONS.Concat(["event_user_sessions"]))
         {
             Assert.Equal(0, await EventSeed.CountOfAsync(_mongo.ConnectionString, collection, id));
         }
@@ -112,10 +110,10 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
         var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
         await StartAsync(mainOperator, id);
         // Nothing can be removed from a view, which is how the reset stops after what the Event made is gone.
-        var database = RegistrySeed.Collection(_mongo.ConnectionString, "event_pending_snapshots").Database;
-        await database.DropCollectionAsync("event_pending_snapshots");
+        var database = RegistrySeed.Collection(_mongo.ConnectionString, "event_user_sessions").Database;
+        await database.DropCollectionAsync("event_user_sessions");
         await database.CreateViewAsync(
-            "event_pending_snapshots",
+            "event_user_sessions",
             "event_officials",
             new EmptyPipelineDefinition<BsonDocument>()
         );
@@ -135,7 +133,7 @@ public sealed class EventResetTests : IClassFixture<MongoFixture>
         }
         finally
         {
-            await database.DropCollectionAsync("event_pending_snapshots");
+            await database.DropCollectionAsync("event_user_sessions");
         }
 
         var again = await mainOperator.Page.DeleteAsync($"/api/events/{id}");

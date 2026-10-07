@@ -5,6 +5,7 @@ using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
+using NoTiming.Api.Features.Snapshots;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
 using NTS;
@@ -56,6 +57,7 @@ internal static class ApiServices
         services.AddSingleton<GlobalCollections>();
         services.AddSingleton<ReferenceAccess>();
         services.AddSingleton<EventDataAccess>();
+        services.AddSingleton<SnapshotRecorder>();
         services.AddSingleton<RankingFinaliser>();
         services.AddOptions<RankingFinalisationOptions>().BindConfiguration(RankingFinalisationOptions.SECTION);
         services.AddHostedService<RankingFinalisationSweep>();
