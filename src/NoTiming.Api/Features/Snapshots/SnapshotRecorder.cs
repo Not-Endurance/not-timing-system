@@ -220,7 +220,7 @@ internal sealed class SnapshotRecorder
     static SnapshotResource Describe(Participation participation, Guid id, TimeEvent timeEvent)
     {
         var phase = participation.Phases.First(x => x.Events.Contains(timeEvent));
-        return DescribeIn(participation, id, phase, timeEvent, SlotOf(timeEvent));
+        return DescribeIn(participation, id, phase, timeEvent, timeEvent.Slot);
     }
 
     static SnapshotResource Describe(Participation participation, Guid id, SnapshotUpdate update)
@@ -251,16 +251,6 @@ internal sealed class SnapshotRecorder
             PhaseId = phase.Id,
             Gate = phase.Gate,
             RecordedAt = timeEvent.RecordedAt,
-        };
-    }
-
-    static TimeSlot SlotOf(TimeEvent timeEvent)
-    {
-        return timeEvent switch
-        {
-            Presented { IsRepresent: true } or PresentUpdated { IsRepresent: true } => TimeSlot.Represent,
-            Presented or PresentUpdated => TimeSlot.Present,
-            _ => TimeSlot.Arrive,
         };
     }
 

@@ -23,6 +23,8 @@ public sealed class Presented : TimeEvent
 
     public bool IsRepresent { get; }
 
+    public override TimeSlot Slot => IsRepresent ? TimeSlot.Represent : TimeSlot.Present;
+
     public override string ToString()
     {
         var label = IsRepresent ? Represent_string : IN_string;

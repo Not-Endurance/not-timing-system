@@ -37,6 +37,7 @@ public class SnapshotService
     IReadOnlyList<Participation> _participations = [];
     IReadOnlyList<Participation> _participationsToSnapshot = [];
     Task _snapshotSelectionPersistence = Task.CompletedTask;
+    SnapshotGroup? _unanswered;
 
     public SnapshotService(
         INtsSocketContext socketContext,
@@ -120,21 +121,20 @@ public class SnapshotService
     public async Task<bool> Publish(IViewedEvent view, SnapshotType snapshotType)
     {
         view.EnsureCanWrite();
-        var readySnapshots = _snapshots.Where(x => x.Timestamp != null).ToList();
+        var readySnapshots = _snapshots.Where(x => x.Timestamp != null).Select(CopySnapshot).ToList();
         if (readySnapshots.Count == 0)
         {
             return false;
         }
 
-        var snapshotGroup = new SnapshotGroup(readySnapshots, snapshotType);
-        var receipts = await _snapshotPublisher.PublishSnapshotsAsync(view.Event.Id, snapshotGroup);
+        var (snapshotGroup, receipts) = await SendAsync(view.Event.Id, readySnapshots, snapshotType);
 
         // What the server recorded is no longer the person's to keep, whatever its outcome: a rejected Snapshot is an event
         // of its own. What it did not record stays selected, to be sent again, and the person is told why.
         var recorded = snapshotGroup.Entries.Where(x => IsRecorded(receipts, snapshotGroup.IdOf(x))).ToList();
         if (recorded.Count > 0)
         {
-            var sent = new SnapshotGroup(recorded, snapshotType);
+            var sent = new SnapshotGroup(recorded, snapshotType, snapshotGroup.Id);
             await DrainSnapshotSelectionPersistence();
             await _userSessionService.AppendSnapshot(sent);
 
@@ -151,8 +151,12 @@ public class SnapshotService
     {
         view.EnsureCanWrite();
         GuardHelper.ThrowIfDefault(snapshotGroup);
-        var snapshotGroupToPublish = new SnapshotGroup(snapshotGroup.Entries, snapshotType);
-        RefuseWhenNotRecorded(await _snapshotPublisher.PublishSnapshotsAsync(view.Event.Id, snapshotGroupToPublish));
+        var (_, receipts) = await SendAsync(
+            view.Event.Id,
+            [.. snapshotGroup.Entries.Select(CopySnapshot)],
+            snapshotType
+        );
+        RefuseWhenNotRecorded(receipts);
     }
 
     public void UpdateTimestamp(Snapshot snapshot, Timestamp timestamp)
@@ -178,6 +182,7 @@ public class SnapshotService
 
     public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
     {
+        _unanswered = null;
         _history.Clear();
         _snapshots.Clear();
         _participations = [];
@@ -191,12 +196,48 @@ public class SnapshotService
         return receipts.Any(x => x.Id == id && x.IsRecorded);
     }
 
+    static bool IsSame(IEnumerable<Snapshot> sent, IReadOnlyList<Snapshot> snapshots)
+    {
+        var before = sent.ToList();
+        return before.Count == snapshots.Count
+            && before.Zip(snapshots, (x, y) => x.Number == y.Number && x.Timestamp == y.Timestamp).All(same => same);
+    }
+
     /// <summary>The person is told why the first Snapshot that was not recorded was not: the Api's own words.</summary>
     static void RefuseWhenNotRecorded(IReadOnlyList<SnapshotReceipt> receipts)
     {
         if (receipts.FirstOrDefault(x => !x.IsRecorded) is { } failed)
         {
             throw new DomainException(failed.ErrorMessage ?? failed.ErrorCode ?? "The Snapshot was not recorded.");
+        }
+    }
+
+    /// <summary>
+    /// Sends the Snapshots as a group and says what came of it. A group that was sent and is not known to have been recorded,
+    /// because the request failed or the server recorded none of it, is sent again as the same group, with the same ids, when
+    /// the same Snapshots are sent as the same kind: what the server did record, and whose answer was lost, comes back with
+    /// its first outcome and is not recorded twice (ADR-0013). Anything else is a new gesture, with new ids.
+    /// </summary>
+    async Task<(SnapshotGroup Group, IReadOnlyList<SnapshotReceipt> Receipts)> SendAsync(
+        Guid eventId,
+        IReadOnlyList<Snapshot> snapshots,
+        SnapshotType snapshotType
+    )
+    {
+        var group =
+            _unanswered is { } before && before.Type == snapshotType && IsSame(before.Entries, snapshots)
+                ? before
+                : new SnapshotGroup(snapshots, snapshotType);
+        try
+        {
+            var receipts = await _snapshotPublisher.PublishSnapshotsAsync(eventId, group);
+            _unanswered = receipts.Any(x => x.IsRecorded) ? null : group;
+            return (group, receipts);
+        }
+        catch
+        {
+            _unanswered = group;
+            throw;
         }
     }
 

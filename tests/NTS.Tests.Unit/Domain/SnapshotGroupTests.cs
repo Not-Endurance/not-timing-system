@@ -49,6 +49,16 @@ public sealed class SnapshotGroupTests
     }
 
     [Fact]
+    public void A_group_made_with_the_id_of_one_that_was_sent_has_that_id_and_makes_the_ids_it_made()
+    {
+        var first = GroupOf(1, 2);
+        var again = new SnapshotGroup(first.Entries, first.Type, first.Id);
+
+        Assert.Equal(first.Id, again.Id);
+        Assert.Equal(first.Entries.Select(first.IdOf), again.Entries.Select(again.IdOf));
+    }
+
+    [Fact]
     public void Two_groups_of_the_same_numbers_do_not_share_an_id()
     {
         var one = GroupOf(1, 2, 3);

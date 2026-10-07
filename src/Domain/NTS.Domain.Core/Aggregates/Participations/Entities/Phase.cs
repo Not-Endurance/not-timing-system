@@ -348,16 +348,6 @@ public class Phase : Entity
         return times.Where(x => x.Time != null).Select(x => Manual(x.Slot, x.Time!, null, null));
     }
 
-    static bool Feeds(TimeSlot slot, TimeEvent timeEvent)
-    {
-        return slot switch
-        {
-            TimeSlot.Arrive => timeEvent is Arrived or ArriveUpdated,
-            TimeSlot.Present => timeEvent is Presented { IsRepresent: false } or PresentUpdated { IsRepresent: false },
-            _ => timeEvent is Presented { IsRepresent: true } or PresentUpdated { IsRepresent: true },
-        };
-    }
-
     /// <summary>An accepted event of the manual method, as the Phase form and a Phase made with times make it.</summary>
     static TimeEvent Manual(TimeSlot slot, Timestamp time, DateTimeOffset? recordedAt, Guid? actorId)
     {
@@ -448,15 +438,13 @@ public class Phase : Entity
     /// <summary>The time a Present Update changes: the Represent time when the latest presentation accepted was a representation.</summary>
     TimeSlot PresentationSlot()
     {
-        var latest = _events.LastOrDefault(x => x.IsAccepted && (x is Presented or PresentUpdated));
-        return latest is Presented { IsRepresent: true } or PresentUpdated { IsRepresent: true }
-            ? TimeSlot.Represent
-            : TimeSlot.Present;
+        var latest = _events.LastOrDefault(x => x.IsAccepted && x.Slot != TimeSlot.Arrive);
+        return latest?.Slot == TimeSlot.Represent ? TimeSlot.Represent : TimeSlot.Present;
     }
 
     Timestamp? Shown(TimeSlot slot)
     {
-        return _events.LastOrDefault(x => x.IsAccepted && Feeds(slot, x))?.Time;
+        return _events.LastOrDefault(x => x.IsAccepted && x.Slot == slot)?.Time;
     }
 
     /// <summary>A time that differs from the one shown is an accepted event; one that is cleared rejects the events that feed it.</summary>
@@ -469,7 +457,7 @@ public class Phase : Entity
         }
         if (time == null)
         {
-            _events.Where(x => x.IsAccepted && Feeds(slot, x)).ToList().ForEach(x => x.RejectManually());
+            _events.Where(x => x.IsAccepted && x.Slot == slot).ToList().ForEach(x => x.RejectManually());
             return;
         }
         _events.Add(Manual(slot, time, recordedAt, actorId));

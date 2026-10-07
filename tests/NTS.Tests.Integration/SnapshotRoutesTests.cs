@@ -786,6 +786,26 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task An_Update_with_a_time_finer_than_the_database_keeps_is_answered_with_the_time_that_is_stored()
+    {
+        await using var scene = await SceneAsync();
+        var sent = Guid.NewGuid();
+        await PostAsync(scene.Official, scene.EventId, 1, "Arrive", ARRIVE, sent);
+
+        var response = await UpdateAsync(scene.Official, sent, ARRIVE.AddMinutes(5).AddTicks(1234)); // finer than the database keeps
+
+        var attributes = DataOf(await ApiSessions.ReadJsonAsync(response)).GetProperty("attributes");
+        var stored = (await LoadedAsync(scene.One)).Phases[0].ArriveTime!.ToDateTimeOffset();
+        Assert.Equal(ARRIVE.AddMinutes(5), stored);
+        Assert.Equal(stored, attributes.GetProperty("time").GetDateTimeOffset());
+        Assert.Equal(stored, attributes.GetProperty("currentTime").GetDateTimeOffset());
+        var recordedAt = attributes.GetProperty("recordedAt").GetDateTimeOffset();
+        Assert.Equal(0, recordedAt.Ticks % TimeSpan.TicksPerMillisecond);
+        var events = EventsOf(await StoredAsync(scene.One), 0);
+        Assert.Equal(recordedAt.UtcDateTime, events[1]["RecordedAt"].ToUniversalTime());
+    }
+
+    [Fact]
     public async Task A_Participation_is_found_by_the_start_number_it_has_in_an_Event_and_by_the_time_event_it_holds_through_indexes()
     {
         await using var scene = await SceneAsync();

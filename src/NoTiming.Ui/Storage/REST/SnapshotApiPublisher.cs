@@ -125,11 +125,10 @@ public sealed class SnapshotApiPublisher : ISnapshotPublisher, IScoped
             result.TryGetProperty("errors", out var errors) && errors.ValueKind == JsonValueKind.Array
                 ? errors.EnumerateArray().FirstOrDefault()
                 : default;
-        return SnapshotReceipt.Failed(
+        return Failed(
             id,
             status,
-            Text(error, "code"),
-            MessageOf(Text(error, "title"), Text(error, "detail"), status)
+            new JsonApiError(status, Text(error, "code"), Text(error, "title"), Text(error, "detail"))
         );
     }
 
@@ -152,13 +151,8 @@ public sealed class SnapshotApiPublisher : ISnapshotPublisher, IScoped
 
     static SnapshotReceipt Failed(Guid id, int status, JsonApiError? error)
     {
-        return SnapshotReceipt.Failed(id, status, error?.Code, error?.Message ?? MessageOf(null, null, status));
-    }
-
-    static string MessageOf(string? title, string? detail, int status)
-    {
-        var said = string.IsNullOrWhiteSpace(title) ? $"The server answered {status}." : title;
-        return string.IsNullOrWhiteSpace(detail) ? said : $"{said} {detail}";
+        var said = error ?? new JsonApiError(status, null, null, null);
+        return SnapshotReceipt.Failed(id, status, said.Code, said.Message);
     }
 
     static string? Text(JsonElement element, string member)

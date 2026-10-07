@@ -24,6 +24,9 @@ public abstract class TimeEvent : Entity
         ActorId = actorId;
     }
 
+    /// <summary>The time of a Phase the event feeds: a Phase shows as that time the latest accepted event that does.</summary>
+    public abstract TimeSlot Slot { get; }
+
     public Timestamp Time { get; }
     public TimeEventOutcome Outcome { get; private set; }
     public SnapshotMethod Method { get; }

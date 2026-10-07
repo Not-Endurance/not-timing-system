@@ -481,6 +481,108 @@ public sealed class ParticipationSnapshotUpdateTests
         Assert.Equal(ARRIVE.AddMinutes(2), participation.Phases[0].ArriveTime!.ToDateTimeOffset());
     }
 
+    [Theory]
+    [InlineData(10, false)]
+    [InlineData(15, true)]
+    [InlineData(20, true)]
+    public void An_update_that_takes_the_recovery_to_the_compulsory_threshold_makes_the_required_inspection_compulsory(
+        int recoveryMinutes,
+        bool isCompulsory
+    )
+    {
+        var participation = Ride(
+            CreatePhase(arrive: ARRIVE, present: ARRIVE.AddMinutes(5), compulsoryThreshold: TimeSpan.FromMinutes(15))
+        );
+        var presentation = participation.Phases[0].Events.OfType<Presented>().Single();
+
+        participation.UpdateSnapshot(
+            presentation.Id,
+            new Timestamp(ARRIVE.AddMinutes(recoveryMinutes)),
+            ACTOR,
+            RECORDED
+        );
+
+        Assert.Equal(isCompulsory, participation.Phases[0].IsRequiredInspectionCompulsory);
+    }
+
+    [Fact]
+    public void An_update_that_brings_the_recovery_under_the_compulsory_threshold_lifts_the_compulsory_required_inspection()
+    {
+        var participation = Ride(CreatePhase(arrive: ARRIVE, compulsoryThreshold: TimeSpan.FromMinutes(15)));
+        participation.Process(Present(ARRIVE.AddMinutes(20), SENT), ACTOR, RECORDED);
+        Assert.True(participation.Phases[0].IsRequiredInspectionCompulsory);
+
+        participation.UpdateSnapshot(SENT, new Timestamp(ARRIVE.AddMinutes(10)), ACTOR, RECORDED.AddMinutes(1));
+
+        Assert.False(participation.Phases[0].IsRequiredInspectionCompulsory);
+    }
+
+    [Fact]
+    public void An_update_of_a_presentation_changes_the_one_that_was_accepted_and_not_a_representation_that_was_refused()
+    {
+        var participation = Ride(CreatePhase(arrive: ARRIVE, present: PRESENT, isRepresentRequested: true));
+        participation.Process(Present(PRESENT.AddMinutes(-2), SENT), ACTOR, RECORDED); // a representation before the presentation
+        Assert.Equal(TimeEventOutcome.RejectedInvalidTime, participation.Phases[0].Events[^1].Outcome);
+
+        var update = participation.UpdateSnapshot(
+            SENT,
+            new Timestamp(PRESENT.AddMinutes(3)),
+            ACTOR,
+            RECORDED.AddMinutes(1)
+        );
+
+        Assert.True(update.IsAccepted);
+        Assert.Equal(TimeSlot.Present, update.Slot);
+        Assert.Equal(PRESENT.AddMinutes(3), participation.Phases[0].PresentTime!.ToDateTimeOffset());
+        Assert.Null(participation.Phases[0].RepresentTime);
+    }
+
+    [Fact]
+    public void An_update_changes_the_representation_when_the_latest_presentation_accepted_is_an_update_of_one()
+    {
+        var phase = new Phase(
+            "",
+            20,
+            40,
+            40,
+            CompetitionRuleset.Regional,
+            false,
+            null,
+            Timestamp.Create(START),
+            [
+                new Arrived(new Timestamp(ARRIVE), TimeEventOutcome.Accepted, SnapshotMethod.Manual, null, null),
+                new Presented(
+                    new Timestamp(PRESENT),
+                    false,
+                    TimeEventOutcome.Accepted,
+                    SnapshotMethod.Manual,
+                    null,
+                    null
+                ),
+                new PresentUpdated(
+                    new Timestamp(PRESENT.AddMinutes(20)),
+                    true,
+                    TimeEventOutcome.Accepted,
+                    SnapshotMethod.Manual,
+                    null,
+                    null,
+                    SENT
+                ),
+            ],
+            true,
+            false,
+            false
+        );
+        var participation = Ride(phase);
+
+        var update = participation.UpdateSnapshot(SENT, new Timestamp(PRESENT.AddMinutes(25)), ACTOR, RECORDED);
+
+        Assert.True(update.IsAccepted);
+        Assert.Equal(TimeSlot.Represent, update.Slot);
+        Assert.Equal(PRESENT.AddMinutes(25), phase.RepresentTime!.ToDateTimeOffset());
+        Assert.Equal(PRESENT, phase.PresentTime!.ToDateTimeOffset());
+    }
+
     [Fact]
     public void An_update_of_a_presentation_names_it_by_the_id_of_the_update_that_changed_it_too()
     {
@@ -565,7 +667,8 @@ public sealed class ParticipationSnapshotUpdateTests
         DateTimeOffset? represent = null,
         bool isRepresentRequested = false,
         bool isFinal = false,
-        int maxRecovery = 40
+        int maxRecovery = 40,
+        TimeSpan? compulsoryThreshold = null
     )
     {
         return new Phase(
@@ -575,7 +678,7 @@ public sealed class ParticipationSnapshotUpdateTests
             isFinal ? null : 40,
             CompetitionRuleset.Regional,
             isFinal,
-            null,
+            compulsoryThreshold,
             Timestamp.Create(START),
             Timestamp.Create(arrive),
             Timestamp.Create(present),

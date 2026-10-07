@@ -13,6 +13,8 @@ public sealed class Arrived : TimeEvent
     )
         : base(time, outcome, method, recordedAt, actorId, id) { }
 
+    public override TimeSlot Slot => TimeSlot.Arrive;
+
     public override string ToString()
     {
         return Combine($"{ARR_string}:{Time}", IsAccepted ? null : Outcome);
