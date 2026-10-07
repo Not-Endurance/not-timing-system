@@ -143,14 +143,44 @@ public sealed class EnvironmentMarkerTests : IClassFixture<MongoFixture>
     }
 
     [Theory]
+    [InlineData("{ }")]
+    [InlineData("{ Name: 5 }")]
+    [InlineData("{ Name: null }")]
+    public async Task A_marker_with_no_name_or_one_that_is_not_text_reads_as_no_marker(string document)
+    {
+        var database = NewDatabase();
+        var marker = BsonDocument.Parse(document);
+        marker["_id"] = "environment";
+        await database.GetCollection<BsonDocument>("environment").InsertOneAsync(marker);
+
+        Assert.Null(await EnvironmentMarker.ReadAsync(database));
+    }
+
+    [Theory]
     [InlineData("Production", true)]
     [InlineData("production", true)]
+    [InlineData(" Production ", true)]
     [InlineData("Staging", false)]
     [InlineData("Development", false)]
     [InlineData(null, false)]
     public void Production_is_told_in_any_case_and_only_by_its_name(string? name, bool isProduction)
     {
         Assert.Equal(isProduction, EnvironmentMarker.IsProduction(name));
+    }
+
+    [Theory]
+    [InlineData("Staging", true)]
+    [InlineData("development", true)]
+    [InlineData(" Development ", true)]
+    [InlineData("Production", false)]
+    [InlineData("production", false)]
+    [InlineData("Prod", false)]
+    [InlineData("staging-eu", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void Only_Staging_and_Development_say_that_a_database_is_not_production(string? name, bool isNonProduction)
+    {
+        Assert.Equal(isNonProduction, EnvironmentMarker.IsNonProduction(name));
     }
 
     [Fact]

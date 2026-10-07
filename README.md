@@ -26,7 +26,7 @@ A Debug build of the Api, in Development, reads the database named by `MONGO_CON
    ```
    dotnet user-secrets set MONGO_CONNECTION_STRING "<connection string>" --project src/NoTiming.Api
    ```
-2. Say which environment the database is, once. The route refuses a database that is marked Production and one that is not marked at all, so a connection string that points at the wrong database cannot be signed in to by mistake (`seed-staging` and `migrate-tenants --apply` mark the databases they prepare, see `tools/NTS.Tools/README.md`):
+2. Say which environment the database is, once. The route works only on a database that says it is Staging or Development: Production, no marker and anything else are refused, so a connection string that points at the wrong database cannot be signed in to by mistake (`seed-staging` and `migrate-tenants --apply` mark the databases they prepare, see `tools/NTS.Tools/README.md`):
    ```
    dotnet run --project tools/NTS.Tools -- mark-environment --connection-string <connection string> --environment Development --apply
    ```

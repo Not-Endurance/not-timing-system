@@ -24,8 +24,9 @@ namespace NTS.Tools.Staging;
 /// they are not there and otherwise left as they are but for what the seed gives them (a membership of the Tenant, the role of
 /// Tenant Root); the person signs in with a code sent to the address, which confirms it. The Event is made the way the Api
 /// starts one: its Setup, the Core document, and what the Event copies and creates, the documents of which come from the same
-/// code (<see cref="EventStartDocuments"/>). It refuses a database whose marker says Production and one that has no marker
-/// unless it is told which environment it is, and never marks a database as Production. Everything it makes is made once: it
+/// code (<see cref="EventStartDocuments"/>). It works only on a database that says it is Staging or Development, or that has no
+/// marker and is told which of the two it is: a marker that says Production or anything else is refused, and a database is
+/// never marked as Production. Everything it makes is made once: it
 /// can be run again, and a run that stopped is finished by running it again.
 /// </summary>
 public static class StagingSeed
@@ -208,6 +209,14 @@ public static class StagingSeed
 
             if (Report.MarkedAs != null)
             {
+                if (!EnvironmentMarker.IsNonProduction(Report.MarkedAs))
+                {
+                    Report.Refuse(
+                        $"The database says it is '{Report.MarkedAs}', which is not Staging or Development, and nothing is seeded into a database that does not say it is one: remove the document of the environment collection by hand if it is wrong."
+                    );
+                    return;
+                }
+
                 if (named != null && !string.Equals(named, Report.MarkedAs, StringComparison.Ordinal))
                 {
                     Report.Refuse(
@@ -402,12 +411,7 @@ public static class StagingSeed
                 { HOME_TENANT, StagingDataset.TENANT_ID },
                 {
                     MEMBERSHIPS,
-                    new BsonArray
-                    {
-                        root
-                            ? NewMembership(StagingDataset.TENANT_ID, Membership.TENANT_ROOT)
-                            : NewMembership(StagingDataset.TENANT_ID),
-                    }
+                    new BsonArray { MembershipOf(root) }
                 },
             };
         }
@@ -437,21 +441,8 @@ public static class StagingSeed
                     new UpdateOneModel<BsonDocument>(
                         filter,
                         account.TryGetValue(MEMBERSHIPS, out var existing) && existing.IsBsonArray
-                            ? set.Push(
-                                MEMBERSHIPS,
-                                root
-                                    ? NewMembership(StagingDataset.TENANT_ID, Membership.TENANT_ROOT)
-                                    : NewMembership(StagingDataset.TENANT_ID)
-                            )
-                            : set.Set(
-                                MEMBERSHIPS,
-                                new BsonArray
-                                {
-                                    root
-                                        ? NewMembership(StagingDataset.TENANT_ID, Membership.TENANT_ROOT)
-                                        : NewMembership(StagingDataset.TENANT_ID),
-                                }
-                            )
+                            ? set.Push(MEMBERSHIPS, MembershipOf(root))
+                            : set.Set(MEMBERSHIPS, new BsonArray { MembershipOf(root) })
                     )
                 );
                 _rootMade |= root;
@@ -612,6 +603,14 @@ public static class StagingSeed
             {
                 _grants.Add(document);
             }
+        }
+
+        /// <summary>The Membership of the Tenant of the seed, with the role of Tenant Root when the person is to have it.</summary>
+        static BsonDocument MembershipOf(bool root)
+        {
+            return root
+                ? NewMembership(StagingDataset.TENANT_ID, Membership.TENANT_ROOT)
+                : NewMembership(StagingDataset.TENANT_ID);
         }
 
         static BsonDocument Stamped(BsonDocument document)

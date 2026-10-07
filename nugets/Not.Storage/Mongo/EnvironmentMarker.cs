@@ -47,6 +47,16 @@ public static class EnvironmentMarker
     }
 
     /// <summary>
+    /// Whether the name says Staging or Development, in any case: the only names that let what must never touch a production
+    /// database work on this one. No name does not, Production does not, and nor does a name that is none of an environment (a
+    /// marker written by hand and misspelt): a database is worked on as a developer's only when it says that it is one.
+    /// </summary>
+    public static bool IsNonProduction(string? name)
+    {
+        return Canonical(name) is STAGING or DEVELOPMENT;
+    }
+
+    /// <summary>
     /// The name the database is marked with, as it is stored, or none when it has no marker. A name that is not one of an
     /// environment is told as it is: the database is not taken for another one because its marker is misspelt.
     /// </summary>

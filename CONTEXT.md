@@ -78,7 +78,7 @@ The reference data and Event configuration prepared before an Event, such as its
 What an Event produces while it runs and afterwards: its Participations, Rankings, Handouts and Officials. Core holds copies of Setup data as entered when the Event started, so a later Setup change does not rewrite a finished Event.
 
 **Environment marker**:
-The one document of a database that says which environment it is, Production, Staging or Development, which nothing else in it does: they hold the same collections. The commands that prepare a database write it and it is never changed to another name. What must not touch a production database, the staging seed and the local sign in as, refuses one that says Production and one that says nothing.
+The one document of a database that says which environment it is, Production, Staging or Development, which nothing else in it does: they hold the same collections. The commands that prepare a database write it and it is never changed to another name. What must not touch a production database, the staging seed and the local sign in as, works only on one that says it is Staging or Development, and refuses one that says Production, one that says nothing and one that says anything else.
 _Avoid_: Environment flag, database tag
 
 ### Competing

@@ -230,6 +230,26 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
         Assert.Equal(HttpStatusCode.Created, staging.StatusCode); // the marker is looked at on every request
     }
 
+    [Theory]
+    [InlineData("Prod")]
+    [InlineData("staging-eu")]
+    public async Task A_database_whose_marker_is_none_of_the_environments_is_refused_like_one_that_is_not_marked(
+        string marker
+    )
+    {
+        var email = UserSeed.NewEmail("local");
+        await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        await SetHandWrittenMarkerAsync(_mongo.ConnectionString, marker);
+        await using var api = ApiOf(email);
+        using var client = api.CreateClient();
+
+        var response = await SignInAsAsync(client, email);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.Equal("environment-not-marked", await ErrorCodeAsync(response));
+        Assert.Null(SessionCookie.From(response));
+    }
+
     [Fact]
     public async Task An_account_that_is_not_on_the_allow_list_is_refused_and_one_that_is_not_there_is_not_found()
     {

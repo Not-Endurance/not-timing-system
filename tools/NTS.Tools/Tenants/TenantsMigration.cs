@@ -726,7 +726,13 @@ public static class TenantsMigration
             var byEmail = _accounts.GroupBy(x => x.Email).ToDictionary(x => x.Key, x => x.First().Id);
             var rekeyed = 0;
             var kept = 0;
-            foreach (var record in await Collection(SESSIONS).Find(FilterDefinition<BsonDocument>.Empty).ToListAsync())
+            // Only the owner is needed, and what a person kept per Event (the history of Snapshots) can be large.
+            foreach (
+                var record in await Collection(SESSIONS)
+                    .Find(FilterDefinition<BsonDocument>.Empty)
+                    .Project<BsonDocument>(Builders<BsonDocument>.Projection.Include("UserIdentifier"))
+                    .ToListAsync()
+            )
             {
                 var owner = TextOf(record, "UserIdentifier", trim: false);
                 var email = NormalEmail(owner);

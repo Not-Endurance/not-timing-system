@@ -51,6 +51,16 @@ internal static class LocalSignInHarness
         }
     }
 
+    /// <summary>A marker as somebody could have written it by hand, with the name they typed and none of the checks.</summary>
+    public static async Task SetHandWrittenMarkerAsync(string connectionString, string name)
+    {
+        await SetMarkerAsync(connectionString, null);
+        await new MongoClient(connectionString)
+            .GetDatabase(UserSeed.DATABASE)
+            .GetCollection<BsonDocument>(EnvironmentMarker.COLLECTION)
+            .InsertOneAsync(new BsonDocument { { "_id", EnvironmentMarker.ID }, { "Name", name } });
+    }
+
     public static Task<HttpResponseMessage> SignInAsAsync(
         HttpClient client,
         string email,

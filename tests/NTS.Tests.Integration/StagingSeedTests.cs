@@ -330,6 +330,28 @@ public sealed class StagingSeedTests : IClassFixture<MongoFixture>
         Assert.Empty(await data.AllAsync());
     }
 
+    [Theory]
+    [InlineData("Prod")]
+    [InlineData("staging-eu")]
+    public async Task A_database_whose_marker_is_none_of_the_environments_is_refused_whatever_environment_is_named(
+        string marker
+    )
+    {
+        var data = NewData();
+        await data.Collection("environment")
+            .InsertOneAsync(new BsonDocument { { "_id", "environment" }, { "Name", marker } });
+        var before = await data.AllAsync();
+
+        var unnamed = await StagingSeed.Run(data.Database, Seed(environment: null), NOW);
+        var named = await StagingSeed.Run(data.Database, Seed(environment: "Staging"), NOW);
+
+        Assert.True(unnamed.Refused);
+        Assert.Contains(unnamed.Refusals, x => x.Contains(marker));
+        Assert.True(named.Refused);
+        Assert.Equal(before, await data.AllAsync());
+        Assert.Equal(marker, await EnvironmentMarker.ReadAsync(data.Database));
+    }
+
     [Fact]
     public async Task A_database_marked_as_the_other_non_production_environment_is_refused_and_one_that_says_the_same_is_seeded()
     {

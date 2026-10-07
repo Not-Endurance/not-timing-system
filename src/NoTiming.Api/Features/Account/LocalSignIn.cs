@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Not.Identity;
 using Not.Storage.Mongo;
@@ -29,9 +30,10 @@ internal sealed class HostPublicEndpoints
 /// staging one through user-secrets, signs in as an account on an allow-list without a code. It exists only in a Debug
 /// build (this file is compiled out of a Release one, so no deployed host has it), only in the Development environment,
 /// only when a setting names the emails that may be signed in as, and only for a request from the machine itself: from a
-/// loopback address, to a loopback host name, and not through a proxy. It refuses a database that is marked Production, and
-/// one that is not marked at all, so that a connection string that points at the wrong database cannot be signed in to
-/// by mistake: <c>mark-environment</c> says what a database is. The account has to exist, and nothing is proved of its
+/// loopback address, to a loopback host name, and not through a proxy. It works only on a database that says it is Staging or
+/// Development: Production, no marker and a marker that says anything else are refused, so that a connection string that
+/// points at the wrong database cannot be signed in to by mistake (<c>mark-environment</c> says what a database is). The
+/// account has to exist, and nothing is proved of its
 /// address: the address stays as unconfirmed as it was and no invitation is taken. What it creates is the session that a
 /// sign-in creates.
 /// </summary>
@@ -98,7 +100,7 @@ internal static class LocalSignIn
         UserManager<NIdentityUser> users,
         SignInManager<NIdentityUser> signIn,
         IMongoClient client,
-        Microsoft.Extensions.Options.IOptions<NIdentityOptions> options,
+        IOptions<NIdentityOptions> options,
         ILoggerFactory loggers
     )
     {
@@ -125,13 +127,15 @@ internal static class LocalSignIn
             );
         }
 
-        if (marked == null)
+        if (!EnvironmentMarker.IsNonProduction(marked))
         {
             return JsonApiResults.Error(
                 StatusCodes.Status409Conflict,
                 "environment-not-marked",
-                "The database is not marked with the environment it is.",
-                "Run mark-environment (or migrate-tenants, or seed-staging) so that it says it is not production."
+                marked == null
+                    ? "The database is not marked with the environment it is."
+                    : "The database says it is something that is not Staging or Development.",
+                "Run mark-environment (or migrate-tenants, or seed-staging) so that it says Staging or Development."
             );
         }
 
