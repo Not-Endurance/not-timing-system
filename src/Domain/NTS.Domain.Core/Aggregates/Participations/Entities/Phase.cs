@@ -1,5 +1,6 @@
 ﻿using Not.Domain.Exceptions;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using static NTS.Domain.Core.Aggregates.Participations.Entities.TimeEventOutcome;
 
 namespace NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -122,6 +123,39 @@ public class Phase : Entity
             var message = $"Invalid snapshot '{snapshot.GetType()}'";
             throw GuardHelper.Exception(message);
         }
+    }
+
+    /// <summary>
+    /// Records an Official's Update of a Snapshot they sent (ADR-0005, ADR-0013): the new time replaces the latest accepted
+    /// time of the kind, whatever the Snapshot did, and the Update is an event of its own, accepted or not. An Arrive Update
+    /// feeds the Arrive time. A Present Update changes the latest presentation the Phase accepted, so it feeds the Represent
+    /// time when that was a representation and the Present time otherwise, and when there is none it is a presentation:
+    /// it never makes a representation. A time that breaks the order is rejected as invalid, and the times stay. A time that
+    /// is there may be corrected whether or not the Participation is complete.
+    /// </summary>
+    internal SnapshotUpdate UpdateTime(SnapshotType kind, Timestamp time, Guid actorId, DateTimeOffset recordedAt)
+    {
+        var slot = kind == SnapshotType.Present ? PresentationSlot() : TimeSlot.Arrive;
+        var previous = Shown(slot);
+        var outcome = IsInOrder(slot, time) ? Accepted : RejectedInvalidTime;
+        TimeEvent recorded =
+            slot == TimeSlot.Arrive
+                ? new ArriveUpdated(time, outcome, SnapshotMethod.Manual, recordedAt, actorId)
+                : new PresentUpdated(
+                    time,
+                    slot == TimeSlot.Represent,
+                    outcome,
+                    SnapshotMethod.Manual,
+                    recordedAt,
+                    actorId
+                );
+        _events.Add(recorded);
+        if (recorded.IsAccepted)
+        {
+            CheckCompulsoryThreshold();
+        }
+
+        return new SnapshotUpdate(this, recorded, slot, previous, Shown(slot));
     }
 
     /// <summary>The state of the Phase form: each time that differs from the one the Phase shows becomes an accepted event.</summary>
@@ -318,9 +352,9 @@ public class Phase : Entity
     {
         return slot switch
         {
-            TimeSlot.Arrive => timeEvent is Arrived,
-            TimeSlot.Present => timeEvent is Presented { IsRepresent: false },
-            _ => timeEvent is Presented { IsRepresent: true },
+            TimeSlot.Arrive => timeEvent is Arrived or ArriveUpdated,
+            TimeSlot.Present => timeEvent is Presented { IsRepresent: false } or PresentUpdated { IsRepresent: false },
+            _ => timeEvent is Presented { IsRepresent: true } or PresentUpdated { IsRepresent: true },
         };
     }
 
@@ -335,7 +369,7 @@ public class Phase : Entity
     Arrived Arrive(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
     {
         var outcome = OutcomeOfArrive(snapshot.Timestamp, SeparateLineOutcome(snapshot.Type));
-        return new Arrived(snapshot.Timestamp, outcome, snapshot.Method, recordedAt, actorId);
+        return new Arrived(snapshot.Timestamp, outcome, snapshot.Method, recordedAt, actorId, snapshot.Id);
     }
 
     Presented Present(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
@@ -348,7 +382,8 @@ public class Phase : Entity
             outcome,
             snapshot.Method,
             recordedAt,
-            actorId
+            actorId,
+            snapshot.Id
         );
     }
 
@@ -410,6 +445,15 @@ public class Phase : Entity
         };
     }
 
+    /// <summary>The time a Present Update changes: the Represent time when the latest presentation accepted was a representation.</summary>
+    TimeSlot PresentationSlot()
+    {
+        var latest = _events.LastOrDefault(x => x.IsAccepted && (x is Presented or PresentUpdated));
+        return latest is Presented { IsRepresent: true } or PresentUpdated { IsRepresent: true }
+            ? TimeSlot.Represent
+            : TimeSlot.Present;
+    }
+
     Timestamp? Shown(TimeSlot slot)
     {
         return _events.LastOrDefault(x => x.IsAccepted && Feeds(slot, x))?.Time;
@@ -438,13 +482,6 @@ public class Phase : Entity
             return;
         }
         IsRequiredInspectionCompulsory = GetRecoveryInterval() >= CompulsoryThresholdSpan;
-    }
-
-    enum TimeSlot
-    {
-        Arrive,
-        Present,
-        Represent,
     }
 }
 

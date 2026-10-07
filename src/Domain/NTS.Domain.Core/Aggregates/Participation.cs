@@ -112,6 +112,41 @@ public class Participation : Aggregate, IEventScoped
         return Phases.PhaseAt(new Timestamp(time));
     }
 
+    /// <summary>
+    /// An Official corrects the time of a Snapshot they sent (ADR-0005, ADR-0013). The Snapshot names the kind of time, an
+    /// Arrive or a Present, and not the Phase: the Update is recorded in the Phase its new time belongs to (see
+    /// <see cref="PhaseAt"/>), replaces the latest accepted time of that kind there, and is an event of its own whatever
+    /// becomes of it, so that what was refused is not lost. The last write wins. An accepted one is evaluated like any
+    /// accepted change (see <see cref="Phase"/>): the Participation is eliminated for time or restored, the Phase completes,
+    /// and the next one starts when it is out. An elimination that a person gave is left as it is.
+    /// </summary>
+    /// <param name="snapshotId">The id of the Snapshot that was sent, which is the id of the event that recorded it.</param>
+    /// <param name="time">The time it should have had.</param>
+    /// <param name="actorId">The signed-in user that corrects it.</param>
+    /// <param name="recordedAt">The instant the server recorded the correction.</param>
+    public SnapshotUpdate UpdateSnapshot(Guid snapshotId, Timestamp time, Guid actorId, DateTimeOffset recordedAt)
+    {
+        var sent =
+            Phases.SelectMany(x => x.Events).FirstOrDefault(x => x.Id == snapshotId)
+            ?? throw GuardHelper.Exception($"Participation {Id} holds no Snapshot {snapshotId} to update.");
+        var kind = sent is Presented or PresentUpdated ? SnapshotType.Present : SnapshotType.Arrive;
+        var phase = Phases.PhaseAt(time);
+        var outBefore = phase.GetOutTime();
+        var update = phase.UpdateTime(kind, time, actorId, recordedAt);
+        if (!update.IsAccepted)
+        {
+            return update;
+        }
+
+        Phases.Select(phase);
+        if (Eliminated == null || IsMadeByEvaluation(Eliminated))
+        {
+            Reevaluate(phase, outBefore);
+        }
+
+        return update;
+    }
+
     /// <summary>The Phase form: each time of the Phase that the state changes is recorded as an accepted time event.</summary>
     public void Update(IPhaseState state, Guid actorId, DateTimeOffset recordedAt)
     {
@@ -212,7 +247,7 @@ public class Participation : Aggregate, IEventScoped
             Eliminate(OUT_OF_TIME);
             return;
         }
-        if (Eliminated == OUT_OF_TIME || Eliminated == SPEED_RESTRICTION)
+        if (IsMadeByEvaluation(Eliminated))
         {
             Eliminated = null;
         }
@@ -226,6 +261,20 @@ public class Participation : Aggregate, IEventScoped
             Phases.StartNextAfter(phase);
         }
         Raise(Completed(phase));
+    }
+
+    /// <summary>
+    /// Whether the elimination is one the evaluation made, for time or for the speed restriction, and may lift when the times
+    /// no longer call for it. One that was stored and read again is an instance of its own, so it is told by its codes and
+    /// not by being the one instance this class holds, and one that a person gave, with a reason, is not the evaluation's.
+    /// </summary>
+    static bool IsMadeByEvaluation(Eliminated? eliminated)
+    {
+        return eliminated is FailedToQualify { Complement: null } failed
+            && (
+                failed.FtqCodes.SequenceEqual(OUT_OF_TIME.FtqCodes)
+                || failed.FtqCodes.SequenceEqual(SPEED_RESTRICTION.FtqCodes)
+            );
     }
 
     PhaseCompleted Completed(Phase phase)
