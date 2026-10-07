@@ -65,6 +65,10 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(ARRIVE, attributes.GetProperty("time").GetDateTimeOffset());
         Assert.Equal(scene.Now, attributes.GetProperty("recordedAt").GetDateTimeOffset());
         Assert.Equal("GATE1/40", attributes.GetProperty("gate").GetString());
+        Assert.Equal(
+            (await StoredAsync(scene.One))["Phases"][0]["_id"].AsGuid.ToString(),
+            attributes.GetProperty("phaseId").GetString()
+        );
         var events = EventsOf(await StoredAsync(scene.One), 0);
         var recorded = Assert.Single(events);
         Assert.Equal(sent, recorded["_id"].AsGuid);
@@ -185,7 +189,7 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
     {
         await using var scene = await SceneAsync();
         var sent = Guid.NewGuid();
-        var first = await PostAsync(scene.Official, scene.EventId, 1, "Arrive", ARRIVE, sent);
+        var first = await PostAsync(scene.Official, scene.EventId, 1, "Arrive", ARRIVE.AddTicks(1234), sent); // finer than the database keeps
         scene.Changes.Announced.Clear();
 
         var again = await PostAsync(scene.Official, scene.EventId, 1, "Arrive", ARRIVE.AddMinutes(9), sent);
@@ -736,6 +740,63 @@ public sealed class SnapshotRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(corrected, attributes.GetProperty("previousTime").GetDateTimeOffset());
         Assert.Equal(corrected, attributes.GetProperty("currentTime").GetDateTimeOffset());
         Assert.Equal(corrected, (await LoadedAsync(scene.One)).Phases[0].ArriveTime!.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public async Task A_Present_after_a_representation_was_requested_is_the_Represent_time_and_an_Update_of_it_changes_the_representation()
+    {
+        await using var scene = await SceneAsync();
+        var requested = IntegrationPayloadFactory.ActiveParticipation(
+            scene.EventId,
+            3,
+            Guid.NewGuid(),
+            startTime: START
+        );
+        requested.Process(
+            IntegrationPayloadFactory.ArriveSnapshot(3, ARRIVE),
+            scene.Official.Id,
+            DateTimeOffset.UtcNow
+        );
+        requested.Process(
+            IntegrationPayloadFactory.PresentSnapshot(3, PRESENT),
+            scene.Official.Id,
+            DateTimeOffset.UtcNow
+        );
+        requested.ToggleRepresentation(true, DateTimeOffset.UtcNow);
+        await EventSeed.ParticipationAsync(_mongo.ConnectionString, scene.Tenant, requested);
+        var represent = Guid.NewGuid();
+
+        var sent = await PostAsync(scene.Official, scene.EventId, 3, "Present", PRESENT.AddMinutes(30), represent);
+        var updated = await UpdateAsync(scene.Official, represent, PRESENT.AddMinutes(35));
+
+        var attributes = DataOf(await ApiSessions.ReadJsonAsync(sent)).GetProperty("attributes");
+        Assert.Equal("Represent", attributes.GetProperty("slot").GetString());
+        Assert.Equal("Accepted", attributes.GetProperty("outcome").GetString());
+        var change = DataOf(await ApiSessions.ReadJsonAsync(updated)).GetProperty("attributes");
+        Assert.Equal("Represent", change.GetProperty("slot").GetString());
+        Assert.Equal(PRESENT.AddMinutes(30), change.GetProperty("previousTime").GetDateTimeOffset());
+        Assert.Equal(PRESENT.AddMinutes(35), change.GetProperty("currentTime").GetDateTimeOffset());
+        var loaded = await LoadedAsync(requested.Id);
+        Assert.Equal(PRESENT.AddMinutes(35), loaded.Phases[0].RepresentTime!.ToDateTimeOffset());
+        Assert.Equal(PRESENT, loaded.Phases[0].PresentTime!.ToDateTimeOffset());
+        Assert.Equal(
+            ["Arrived", "Presented", "Presented", "PresentUpdated"],
+            EventsOf(await StoredAsync(requested.Id), 0).Select(x => x["Kind"].AsString).ToArray()
+        );
+    }
+
+    [Fact]
+    public async Task A_Participation_is_found_by_the_start_number_it_has_in_an_Event_and_by_the_time_event_it_holds_through_indexes()
+    {
+        await using var scene = await SceneAsync();
+
+        var indexes = await (
+            await RegistrySeed.Collection(_mongo.ConnectionString, "event_participations").Indexes.ListAsync()
+        ).ToListAsync();
+
+        var keys = indexes.Select(x => x["key"].AsBsonDocument.ToJson()).ToArray();
+        Assert.Contains("""{ "EventId" : 1, "Combination.Number" : 1 }""", keys);
+        Assert.Contains("""{ "Phases.Events._id" : 1 }""", keys);
     }
 
     [Fact]

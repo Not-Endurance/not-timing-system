@@ -372,6 +372,19 @@ public sealed class ParticipationSnapshotUpdateTests
     }
 
     [Fact]
+    public void An_elimination_for_the_speed_restriction_that_somebody_gave_is_kept_whatever_the_times_say()
+    {
+        var phase = CreatePhase(arrive: ARRIVE, present: ARRIVE.AddMinutes(25), maxRecovery: 20);
+        var given = new FailedToQualify([FailToQualifyCode.SP]);
+        var participation = Ride(given, phase);
+        var arrival = phase.Events.OfType<Arrived>().Single();
+
+        participation.UpdateSnapshot(arrival.Id, new Timestamp(ARRIVE.AddMinutes(10)), ACTOR, RECORDED);
+
+        Assert.Same(given, participation.Eliminated);
+    }
+
+    [Fact]
     public void An_update_that_takes_the_recovery_over_the_limit_eliminates_the_participation_for_time()
     {
         var participation = Ride(CreatePhase(maxRecovery: 20));
@@ -466,6 +479,30 @@ public sealed class ParticipationSnapshotUpdateTests
 
         Assert.IsType<ArriveUpdated>(again.Event);
         Assert.Equal(ARRIVE.AddMinutes(2), participation.Phases[0].ArriveTime!.ToDateTimeOffset());
+    }
+
+    [Fact]
+    public void An_update_of_a_presentation_names_it_by_the_id_of_the_update_that_changed_it_too()
+    {
+        var participation = Ride(CreatePhase(arrive: ARRIVE));
+        participation.Process(Present(PRESENT, SENT), ACTOR, RECORDED);
+        var first = participation.UpdateSnapshot(
+            SENT,
+            new Timestamp(PRESENT.AddMinutes(1)),
+            ACTOR,
+            RECORDED.AddMinutes(1)
+        );
+
+        var again = participation.UpdateSnapshot(
+            first.Event.Id,
+            new Timestamp(PRESENT.AddMinutes(2)),
+            ACTOR,
+            RECORDED.AddMinutes(2)
+        );
+
+        Assert.IsType<PresentUpdated>(again.Event);
+        Assert.Equal(TimeSlot.Present, again.Slot);
+        Assert.Equal(PRESENT.AddMinutes(2), participation.Phases[0].PresentTime!.ToDateTimeOffset());
     }
 
     [Fact]

@@ -10,7 +10,6 @@ namespace NTS.Domain.Core.Aggregates;
 public class Participation : Aggregate, IEventScoped
 {
     static readonly FailedToQualify OUT_OF_TIME = new([FailToQualifyCode.OT]);
-    static readonly FailedToQualify SPEED_RESTRICTION = new([FailToQualifyCode.SP]);
 
     public Participation(
         ParticipationCategory category,
@@ -264,17 +263,15 @@ public class Participation : Aggregate, IEventScoped
     }
 
     /// <summary>
-    /// Whether the elimination is one the evaluation made, for time or for the speed restriction, and may lift when the times
-    /// no longer call for it. One that was stored and read again is an instance of its own, so it is told by its codes and
-    /// not by being the one instance this class holds, and one that a person gave, with a reason, is not the evaluation's.
+    /// Whether the elimination is the one the evaluation makes, for time, and may lift when the times no longer call for it.
+    /// One that was stored and read again is an instance of its own, so it is told by its codes and not by being the one
+    /// instance this class holds, and one that a person gave, with a reason, or for another cause, such as the speed
+    /// restriction, which the evaluation never makes, is not the evaluation's.
     /// </summary>
     static bool IsMadeByEvaluation(Eliminated? eliminated)
     {
         return eliminated is FailedToQualify { Complement: null } failed
-            && (
-                failed.FtqCodes.SequenceEqual(OUT_OF_TIME.FtqCodes)
-                || failed.FtqCodes.SequenceEqual(SPEED_RESTRICTION.FtqCodes)
-            );
+            && failed.FtqCodes.SequenceEqual(OUT_OF_TIME.FtqCodes);
     }
 
     PhaseCompleted Completed(Phase phase)

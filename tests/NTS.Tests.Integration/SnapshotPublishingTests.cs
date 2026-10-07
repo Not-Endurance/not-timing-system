@@ -252,6 +252,43 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
         Assert.IsType<SnapshotApiPublisher>(publisher);
     }
 
+    [Fact]
+    public async Task A_group_the_Api_answers_with_fewer_results_than_it_has_Snapshots_is_not_taken_for_recorded()
+    {
+        await using var scene = await SceneAsync(2);
+        scene.Requests.Answer = _ => Answered("""{ "meta": { "results": [] } }""");
+
+        var receipts = await scene.Publisher.PublishSnapshotsAsync(
+            scene.EventId,
+            GroupOf(SnapshotType.Arrive, ARRIVE, 1, 2)
+        );
+
+        Assert.Equal(2, receipts.Count);
+        Assert.All(
+            receipts,
+            receipt =>
+            {
+                Assert.False(receipt.IsRecorded);
+                Assert.Equal(502, receipt.Status);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task An_answer_that_carries_no_Snapshot_is_not_taken_for_one_that_was_recorded()
+    {
+        await using var scene = await SceneAsync(1);
+        scene.Requests.Answer = _ =>
+            Answered("""{ "meta": { "results": [ { "status": 201, "data": { "type": "snapshots" } } ] } }""");
+
+        var receipt = Assert.Single(
+            await scene.Publisher.PublishSnapshotsAsync(scene.EventId, GroupOf(SnapshotType.Arrive, ARRIVE, 1))
+        );
+
+        Assert.False(receipt.IsRecorded);
+        Assert.Contains("could not be read", receipt.ErrorMessage);
+    }
+
     async Task<Scene> SceneAsync(int participations)
     {
         var api = new ApiFactory(_mongo.ConnectionString);
@@ -295,6 +332,14 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
     {
         var stored = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_participations", participation))!;
         return [.. stored["Phases"][0]["Events"].AsBsonArray.Select(x => x.AsBsonDocument)];
+    }
+
+    static HttpResponseMessage Answered(string body)
+    {
+        return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent(body, System.Text.Encoding.UTF8, "application/vnd.api+json"),
+        };
     }
 
     /// <summary>The Snapshots of the numbers, each captured a minute after the one before it.</summary>
