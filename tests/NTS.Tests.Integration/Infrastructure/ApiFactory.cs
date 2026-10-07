@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -21,6 +23,7 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     /// connection to read it from: this stands in for the address a proxy would forward.
     /// </summary>
     public const string CLIENT_ADDRESS_HEADER = "X-Test-Client";
+    public const string USER_SECRETS_FILE = "secrets.json";
 
     public static string NewDataProtectionKeys()
     {
@@ -102,6 +105,23 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment(_environment);
+        builder.ConfigureAppConfiguration(
+            (_, configuration) =>
+            {
+                // The user-secrets of a developer hold what they run the platform with on their machine (the local sign in
+                // as and a connection string, #607). Development reads them, so a test host that is in Development would
+                // read them as well and depend on whose machine it runs on. The source names the file, not its path.
+                foreach (
+                    var secrets in configuration
+                        .Sources.OfType<JsonConfigurationSource>()
+                        .Where(x => x.Path == USER_SECRETS_FILE)
+                        .ToList()
+                )
+                {
+                    configuration.Sources.Remove(secrets);
+                }
+            }
+        );
         builder.UseSetting("MONGO_CONNECTION_STRING", _mongoConnectionString);
         if (_emailSender != null)
         {

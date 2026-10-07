@@ -37,15 +37,23 @@ internal sealed class PublicEndpoint
 /// </summary>
 internal static class PublicEndpoints
 {
-    /// <summary>How the route is reached; protected for any that the list does not name.</summary>
-    public static EndpointAccess AccessOf(string method, string? routePattern)
+    /// <summary>
+    /// How the route is reached; protected for any that the list does not name. A host that has endpoints of its own, which a
+    /// Debug build has for the local sign in as, says them as <paramref name="hostEntries"/>: a deployed host has none.
+    /// </summary>
+    public static EndpointAccess AccessOf(
+        string method,
+        string? routePattern,
+        IEnumerable<PublicEndpoint>? hostEntries = null
+    )
     {
         if (routePattern == null)
         {
             return EndpointAccess.Protected;
         }
 
-        return All.FirstOrDefault(x => x.Matches(method, routePattern))?.Access ?? EndpointAccess.Protected;
+        return All.Concat(hostEntries ?? []).FirstOrDefault(x => x.Matches(method, routePattern))?.Access
+            ?? EndpointAccess.Protected;
     }
 
     public static IReadOnlyList<PublicEndpoint> All { get; } = Create();

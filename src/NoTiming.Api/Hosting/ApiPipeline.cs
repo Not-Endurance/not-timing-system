@@ -56,6 +56,9 @@ internal static class ApiPipeline
                 )
         );
         app.MapAccount();
+#if DEBUG
+        app.MapLocalSignIn();
+#endif
         app.MapProfile();
         app.MapTenancy();
         app.MapEvents();

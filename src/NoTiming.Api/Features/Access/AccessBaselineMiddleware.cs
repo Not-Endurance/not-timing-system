@@ -23,9 +23,14 @@ internal sealed class AccessBaselineMiddleware
         if (context.GetEndpoint() is RouteEndpoint endpoint)
         {
             var method = context.Request.Method;
+#if DEBUG
+            var hostEntries = context.RequestServices.GetService<Account.HostPublicEndpoints>()?.Entries;
+#else
+            IEnumerable<PublicEndpoint>? hostEntries = null;
+#endif
             var decision = AccessBaseline.Decide(
                 method,
-                PublicEndpoints.AccessOf(method, endpoint.RoutePattern.RawText),
+                PublicEndpoints.AccessOf(method, endpoint.RoutePattern.RawText, hostEntries),
                 context.User.Identity?.IsAuthenticated == true,
                 context.Request.Headers[AccessBaseline.WRITE_HEADER].ToString()
             );

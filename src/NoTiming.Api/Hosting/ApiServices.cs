@@ -42,6 +42,9 @@ internal static class ApiServices
         );
 
         services.AddAccount();
+#if DEBUG
+        services.AddLocalSignIn(configuration, environment);
+#endif
         services.AddSingleton<ProfileStore>();
         ApiMongo.Configure();
         services.AddSingleton<TenancyLog>();
