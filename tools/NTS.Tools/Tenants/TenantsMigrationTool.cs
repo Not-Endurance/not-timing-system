@@ -104,8 +104,8 @@ public static class TenantsMigrationTool
               --connection-string <mongo>   MongoDB connection string.
               --database <name>             Database name. Defaults to nts.
               --environment <name>          Production, Staging or Development: what the database is. Written as its marker.
-              --main-operator <email>       The account that becomes the Main Operator of the Events that have none, when the
-                                            Tenant has no single Tenant Root to be it.
+              --main-operator <email>       The account that becomes the Main Operator of the Events that have none, in place of
+                                            the Tenant Root of their Tenant.
               --apply                       Persist changes. Omit for a dry run.
             """
         );

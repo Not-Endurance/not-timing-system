@@ -16,8 +16,9 @@ namespace NTS.Tools.Tenants;
 /// of the country of its profile, makes the Tenants, stamps every document a Tenant owns with the Tenant of Bulgaria, gives
 /// every Event that is not yet Historic its Tenant Root as Main Operator, turns the Officials and Operators that were linked
 /// by email into grants, finds the state a person kept under the account that person is, drops the settings and makes the
-/// indexes. What a Tenant owns is every collection of <see cref="Owned"/>, the list of the Api (<c>TenantOwned</c>). Every step writes only what is not there, so it is a dry run unless asked to apply and running it again changes
-/// nothing. Documents are read and written as they are stored, so what the command does not know of them is kept.
+/// indexes. What a Tenant owns is every collection of <see cref="Owned"/>, the list of the Api (<c>TenantOwned</c>). It is a
+/// dry run unless asked to apply, every step writes only what is not there, and so running it again changes nothing.
+/// Documents are read and written as they are stored, so what the command does not know of them is kept.
 /// </summary>
 public static class TenantsMigration
 {

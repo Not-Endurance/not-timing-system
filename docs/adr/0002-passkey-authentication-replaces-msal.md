@@ -32,6 +32,15 @@ Every user re-enrols: passkeys and Entra passwords cannot be migrated. The Ident
 
 Public read access (ADR-0001) is unaffected: anonymous visitors still read without a session, and only writes and the profile need one. Hosted environments get no authentication bypass; local development gets a Debug-only sign-in that refuses a database marked as production. Until the Functions API is retired (ADR-0003), it and the new host both read the `users` documents, which relies on the storage layer ignoring extra elements; that setting is currently marked as removable and must stay until then.
 
+## Readings made when the local sign in was built (#607)
+
+"Local development gets a Debug-only sign-in that refuses a database marked as production" is the route `POST /api/dev/sessions` and the page `/dev/sign-in-as`, and these are the readings. How a developer uses it is in the README of the repository.
+
+- **It is not in a deployed host at all.** The code is compiled out of a Release build (`#if DEBUG`), so there is nothing to switch off and no setting turns it on, and a test over a Release build asserts the type and the route are not there. Hosted environments have no bypass, as the ADR says.
+- **It takes four things to exist, and a fifth to answer.** A Debug build, the Development environment, an allow-list in the user-secrets (`Dev:SignInAs:AllowList`) that names somebody, and a request that is the machine's own: from a loopback address, to a loopback host name, with no forwarding header. A request that is not is 403 `local-only`. And the database has to say it is not production: its marker (ADR-0012) is read on every request, and Production is 403 and no marker is 409, so a connection string that points at the wrong database cannot be signed in to by mistake.
+- **It signs in as an account that exists and proves nothing about it.** It makes no account, leaves the address unconfirmed and takes no invitation waiting for it, and gives the account the security stamp a session needs when it has none. What it creates is the session that a sign-in creates.
+- **The tests do not read the user-secrets.** A host in Development reads them, and a test host is in Development, so an allow-list a developer set would have made the tests depend on whose machine they run on; `ApiFactory` builds a host without that source, and a test says so.
+
 ## Amendments
 
 ADR-0011 moves the hosts and tests to .NET 10 at once and the shared libraries when the Functions API retires: the reason in the paragraph above (MAUI Judge) is gone, but managed Functions still holds the libraries on .NET 8 until then. It also supersedes ADR-0003's anonymous Judge group: the Functions API retires at the single cutover. ADR-0013 removes Judge's in-memory primary connection, so that is no longer a reason for the hubs to share a process with REST; they still do, and stay single-instance until a hub backplane exists. ADR-0012 brings tenant-scoped authorization into scope: Tenants are created on demand at registration, become operational when the Developer seeds a Tenant Root, and the memberships carry the roles. ADR-0009 makes the identity store's key a Guid.
