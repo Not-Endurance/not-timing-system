@@ -252,7 +252,7 @@ internal static class LocalSignIn
             return false;
         }
 
-        // IsLoopback knows 127.0.0.0/8, ::1 and the loopback address in the form a dual-stack listener reports it (::ffff:127.0.0.1).
+        // IsLoopback knows 127.0.0.0/8, ::1 and the form a dual-stack listener reports the loopback address in.
         var remote = context.Connection.RemoteIpAddress;
         if (remote is null)
         {

@@ -94,7 +94,7 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
         await data.AccountAsync("plain@example.test", "Bulgaria");
         var someone = Guid.NewGuid();
         var event_ = await data.SetupAsync(mainOperator: someone);
-        await data.StartedAsync(event_, NOW.AddDays(2), mainOperator: someone);
+        await data.StartedAsync(event_, NOW.AddDays(2)); // the Core lacks what the Setup has
 
         await TenantsMigration.Run(
             data.Database,
@@ -169,8 +169,7 @@ public sealed class TenantsMigrationEventsTests : IClassFixture<MongoFixture>
     public async Task Without_a_Tenant_Root_the_Events_wait_again_on_a_second_run_though_every_account_has_a_Membership_now()
     {
         var data = await LegacyAsync();
-        await data.AccountAsync("one@example.test", "Bulgaria");
-        await data.AccountAsync("two@example.test", "Bulgaria");
+        await data.AccountAsync("one@example.test", "Bulgaria"); // the one account the first run gives a Membership
         var waiting = await data.SetupAsync();
         await TenantsMigration.Run(data.Database, Apply(), NOW);
 
