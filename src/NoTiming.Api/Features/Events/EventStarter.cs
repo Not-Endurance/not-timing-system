@@ -6,13 +6,10 @@ using NoTiming.Api.Features.UserSessions;
 using NoTiming.Api.JsonApi;
 using NTS.Application.Factories;
 using NTS.Contracts.Core.Models;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
 using static NTS.Localization.NtsStrings;
-using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
 
 namespace NoTiming.Api.Features.Events;
 
@@ -75,33 +72,15 @@ internal static class EventStartPlans
             );
         }
 
-        var eventInformation = EventInformationModel.From(EventInformationFactory.Create(setup, rules));
-        var (participations, rankings) = CreateParticipationsAndRankings(setup);
+        var documents = EventStartDocuments.From(setup, rules);
         IReadOnlyList<(string Collection, IReadOnlyList<BsonDocument> Documents)> children =
         [
-            (
-                TenantOwned.EVENT_OFFICIALS,
-                [
-                    .. setup.Officials.Select(x =>
-                        OfficialModel.MapFrom(OfficialFactory.Create(x, setup.Id)).ToBsonDocument()
-                    ),
-                ]
-            ),
-            (
-                TenantOwned.EVENT_OPERATORS,
-                [
-                    .. setup.Operators.Select(x =>
-                        OperatorModel.MapFrom(OperatorFactory.Create(x, setup.Id)).ToBsonDocument()
-                    ),
-                ]
-            ),
-            (
-                TenantOwned.EVENT_PARTICIPATIONS,
-                [.. participations.Select(x => ParticipationModel.MapFrom(x).ToBsonDocument())]
-            ),
-            (TenantOwned.EVENT_RANKINGS, [.. rankings.Select(x => RankingModel.From(x).ToBsonDocument())]),
+            (TenantOwned.EVENT_OFFICIALS, documents.Officials),
+            (TenantOwned.EVENT_OPERATORS, documents.Operators),
+            (TenantOwned.EVENT_PARTICIPATIONS, documents.Participations),
+            (TenantOwned.EVENT_RANKINGS, documents.Rankings),
         ];
-        return (new EventStartPlan(eventInformation, children), null);
+        return (new EventStartPlan(documents.EventInformation, children), null);
     }
 
     static string StartValidationDetail(IReadOnlyList<StartValidationIssue> issues)
@@ -117,47 +96,6 @@ internal static class EventStartPlans
         }
 
         return detail.ToString().TrimEnd();
-    }
-
-    static (
-        IReadOnlyList<Participation> Participations,
-        IReadOnlyList<Ranking> Rankings
-    ) CreateParticipationsAndRankings(ConfigureEvent setup)
-    {
-        var participations = new List<Participation>();
-        var rankings = new List<Ranking>();
-        foreach (var competition in setup.Competitions)
-        {
-            var (made, entriesByCategory) = ParticipationAndRankingFactory.Create(
-                competition,
-                participations,
-                setup.Id
-            );
-            participations.AddRange(made);
-            rankings.AddRange(entriesByCategory.Select(x => CreateRanking(competition, x, setup.Id)));
-        }
-
-        return (participations, rankings);
-    }
-
-    static Ranking CreateRanking(
-        SetupCompetition competition,
-        KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory,
-        Guid eventId
-    )
-    {
-        return new Ranking(
-            competition.Name,
-            competition.Ruleset,
-            entriesByCategory.Key,
-            competition.FeiEventId,
-            competition.FeiEventCode,
-            competition.FeiCompetitionId,
-            competition.FeiRule,
-            competition.FeiScheduleNumber,
-            entriesByCategory.Value,
-            eventId
-        );
     }
 
     /// <summary>What is missing of the FEI configuration, in the words of the application: a line each.</summary>

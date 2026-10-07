@@ -1,8 +1,10 @@
 using NTS.Tools.Developer;
+using NTS.Tools.EnvironmentMarking;
 using NTS.Tools.EventLiveness;
 using NTS.Tools.NameMigration;
 using NTS.Tools.ParticipationCopies;
 using NTS.Tools.PhaseTimes;
+using NTS.Tools.Staging;
 using NTS.Tools.Tenants;
 using NTS.Tools.Watcher;
 
@@ -14,6 +16,8 @@ return args.FirstOrDefault() switch
     "migrate-phase-times" => await RunPhaseTimesMigration(args.Skip(1).ToArray()),
     "migrate-event-liveness" => await RunEventLivenessMigration(args.Skip(1).ToArray()),
     "migrate-tenants" => await TenantsMigrationTool.Run(args.Skip(1).ToArray()),
+    "mark-environment" => await MarkEnvironmentTool.Run(args.Skip(1).ToArray()),
+    "seed-staging" => await StagingSeedTool.Run(args.Skip(1).ToArray()),
     "seed-tenant-root" => await DeveloperTool.SeedTenantRoot(args.Skip(1).ToArray()),
     "grant-developer" => await DeveloperTool.GrantDeveloper(args.Skip(1).ToArray()),
     "-h" => ShowHelp(),
@@ -44,6 +48,10 @@ static int ShowHelp()
           migrate-tenants      Turn the data of before Tenants into the data of Tenants: the accounts, the Tenants, the Tenant
                                of every document, the Main Operators, the grants and the environment marker
                                (a dry run unless --apply)
+          mark-environment     Mark a database as Production, Staging or Development, which the commands that must not touch
+                               a production database look at (a dry run unless --apply)
+          seed-staging         Make a Tenant Root, a Main Operator, Officials, Operators and a Live Event with Participations
+                               in the Tenant of Bulgaria, on a database that is not production (a dry run unless --apply)
           seed-tenant-root     Make an account a Tenant Root of a Tenant, which makes the Tenant operational
                                (a dry run unless --apply)
           grant-developer      Make an account the Developer (a dry run unless --apply)

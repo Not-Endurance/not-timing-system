@@ -4,6 +4,7 @@ using Not.Storage.Mongo;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
+using static NTS.Tools.Shared.Records;
 
 namespace NTS.Tools.Tenants;
 
@@ -29,9 +30,6 @@ public static class TenantsMigration
     const string CORES = "event_informations";
     const string OFFICIALS = "event_officials";
     const string OPERATORS = "event_operators";
-    const string TENANT_ID = "TenantId";
-    const string MEMBERSHIPS = "Memberships";
-    const string HOME_TENANT = "HomeTenantId";
     const string MAIN_OPERATOR = "MainOperatorId";
     const string BULGARIA_ISO = "BG";
 
@@ -111,94 +109,9 @@ public static class TenantsMigration
             : null;
     }
 
-    static BsonDocument GrantDocument(EventGrant grant)
-    {
-        var document = new BsonDocument
-        {
-            { "_id", Uuid(grant.Id) },
-            { TENANT_ID, grant.TenantId },
-            { "EventId", Uuid(grant.EventId) },
-            { "Kind", grant.Kind.ToString() },
-            { "Email", grant.Email },
-        };
-        if (grant.OfficialRole is { } role)
-        {
-            document["OfficialRole"] = role.ToString();
-        }
-
-        if (grant.AccountId is { } account)
-        {
-            document["AccountId"] = Uuid(account);
-        }
-
-        return document;
-    }
-
-    /// <summary>What makes a grant the same grant: the Event, the kind, the role of an Official, and the email.</summary>
-    static string GrantKeyOf(BsonDocument grant)
-    {
-        return string.Join(
-            "|",
-            GuidOf(grant, "EventId"),
-            TextOf(grant, "Kind"),
-            TextOf(grant, "OfficialRole"),
-            TextOf(grant, "Email", trim: false)
-        );
-    }
-
     static Guid? MainOperatorOf(BsonDocument? document)
     {
         return document == null ? null : GuidOf(document, MAIN_OPERATOR);
-    }
-
-    static bool HasMembership(BsonDocument account, string tenant)
-    {
-        return account.TryGetValue(MEMBERSHIPS, out var memberships)
-            && memberships.IsBsonArray
-            && memberships.AsBsonArray.Any(x =>
-                x.IsBsonDocument && x.AsBsonDocument.GetValue(TENANT_ID, BsonNull.Value) == tenant
-            );
-    }
-
-    static BsonDocument NewMembership(string tenant)
-    {
-        return new BsonDocument { { TENANT_ID, tenant }, { "Roles", new BsonArray() } };
-    }
-
-    static bool HasValue(BsonDocument document, string field)
-    {
-        return TextOf(document, field) != null;
-    }
-
-    static string? NormalEmail(string? typed)
-    {
-        return string.IsNullOrWhiteSpace(typed) ? null : typed.Trim().ToLowerInvariant();
-    }
-
-    static string? TextOf(BsonDocument document, string field, bool trim = true)
-    {
-        return
-            document.TryGetValue(field, out var value) && value.IsString && !string.IsNullOrWhiteSpace(value.AsString)
-            ? trim
-                ? value.AsString.Trim()
-                : value.AsString
-            : null;
-    }
-
-    static Guid? GuidOf(BsonDocument document, string field)
-    {
-        return
-            document.TryGetValue(field, out var value)
-            && value is BsonBinaryData { SubType: BsonBinarySubType.UuidStandard } binary
-            && binary.ToGuid(GuidRepresentation.Standard) is var guid
-            && guid != Guid.Empty
-            ? guid
-            : null;
-    }
-
-    static BsonBinaryData Uuid(Guid id)
-    {
-        return new BsonBinaryData(id, GuidRepresentation.Standard);
     }
 
     sealed class Migration
