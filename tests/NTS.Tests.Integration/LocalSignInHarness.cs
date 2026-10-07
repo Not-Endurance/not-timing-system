@@ -56,7 +56,7 @@ internal static class LocalSignInHarness
         string email,
         string? remote = LOOPBACK,
         string? host = null,
-        string? proxy = null
+        string? forwarding = null
     )
     {
         return PostAsync(
@@ -64,7 +64,7 @@ internal static class LocalSignInHarness
             JsonSerializer.Serialize(new { data = new { type = "sessions", attributes = new { email } } }),
             remote,
             host,
-            proxy
+            forwarding
         );
     }
 
@@ -73,14 +73,14 @@ internal static class LocalSignInHarness
         string body,
         string? remote = LOOPBACK,
         string? host = null,
-        string? proxy = null
+        string? forwarding = null
     )
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/dev/sessions")
         {
             Content = new StringContent(body, Encoding.UTF8, ApiSessions.MEDIA_TYPE),
         };
-        Address(request, remote, host, proxy);
+        Address(request, remote, host, forwarding);
         return client.SendAsync(request);
     }
 
@@ -96,7 +96,8 @@ internal static class LocalSignInHarness
         return (await ApiSessions.ReadJsonAsync(response)).GetProperty("errors")[0].GetProperty("code").GetString();
     }
 
-    static void Address(HttpRequestMessage request, string? remote, string? host, string? proxy)
+    /// <param name="forwarding">The name of a header a proxy puts on a request that it forwards, which the request carries.</param>
+    static void Address(HttpRequestMessage request, string? remote, string? host, string? forwarding)
     {
         if (remote != null)
         {
@@ -108,9 +109,9 @@ internal static class LocalSignInHarness
             request.Headers.Host = host;
         }
 
-        if (proxy != null)
+        if (forwarding != null)
         {
-            request.Headers.Add("X-Forwarded-For", "203.0.113.9");
+            request.Headers.TryAddWithoutValidation(forwarding, "for=203.0.113.9");
         }
     }
 }

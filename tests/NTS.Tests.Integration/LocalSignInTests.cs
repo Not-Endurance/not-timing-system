@@ -142,13 +142,18 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
 
     [Theory]
     [InlineData("10.0.0.7", null, null)] // from another machine
-    [InlineData("::1", null, "forwarded")] // behind a proxy
+    [InlineData("::ffff:10.0.0.7", null, null)] // from another machine, its address in the form of an IPv6 one
+    [InlineData("::1", null, "X-Forwarded-For")] // behind a proxy
+    [InlineData("::1", null, "X-Forwarded-Host")]
+    [InlineData("::1", null, "Forwarded")]
     [InlineData(LOOPBACK, "evil.example", null)] // by a name that is not the machine's own
+    [InlineData(LOOPBACK, "localhost.evil.example", null)]
+    [InlineData(LOOPBACK, "127.0.0.2", null)] // by an address, which is not a name of the machine's own either
     [InlineData(null, null, null)] // from nowhere it can be told
     public async Task A_request_that_does_not_come_from_the_machine_to_its_own_name_directly_is_refused(
         string? remote,
         string? host,
-        string? proxy
+        string? forwarding
     )
     {
         var email = UserSeed.NewEmail("local");
@@ -157,11 +162,49 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
         await using var api = ApiOf(email);
         using var client = api.CreateClient();
 
-        var response = await SignInAsAsync(client, email, remote, host, proxy);
+        var response = await SignInAsAsync(client, email, remote, host, forwarding);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal("local-only", await ErrorCodeAsync(response));
         Assert.Null(SessionCookie.From(response));
+    }
+
+    [Theory]
+    [InlineData("127.0.0.1", "localhost")]
+    [InlineData("127.0.0.1", "localhost:5000")]
+    [InlineData("127.0.0.1", "127.0.0.1:5000")]
+    [InlineData("::1", "[::1]:5000")]
+    [InlineData("127.8.8.8", "localhost")] // all of 127.0.0.0/8 is the machine
+    [InlineData("::ffff:127.0.0.1", "localhost")] // the loopback address in the form a dual-stack listener reports it
+    public async Task A_request_from_the_machine_to_any_of_its_own_names_is_signed_in(string remote, string host)
+    {
+        var email = UserSeed.NewEmail("local");
+        await UserSeed.AddLegacyUserAsync(_mongo.ConnectionString, email);
+        await MarkAsync("Staging");
+        await using var api = ApiOf(email);
+        using var client = api.CreateClient();
+
+        var response = await SignInAsAsync(client, email, remote, host);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.NotNull(SessionCookie.From(response));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task A_blank_entry_on_the_allow_list_names_nobody_so_there_is_no_route(string blank)
+    {
+        await MarkAsync("Staging");
+        await using var api = ApiOf(blank);
+        using var client = api.CreateClient();
+
+        var post = await SignInAsAsync(client, blank);
+        var page = await GetPageAsync(client);
+
+        Assert.Equal(HttpStatusCode.NotFound, post.StatusCode);
+        Assert.DoesNotContain("sign-in-as-page", await page.Content.ReadAsStringAsync());
+        Assert.Empty(api.Services.GetServices<HostPublicEndpoints>());
     }
 
     [Fact]
@@ -225,6 +268,21 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
         Assert.Contains(email, html);
         Assert.Equal(HttpStatusCode.Forbidden, remote.StatusCode);
         Assert.DoesNotContain(email, await remote.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task The_page_prints_what_the_allow_list_says_encoded_as_text()
+    {
+        const string ODD = "o'brien&co<b>@example.test";
+        await using var api = ApiOf(ODD);
+        using var client = api.CreateClient();
+
+        var page = await GetPageAsync(client);
+
+        Assert.Equal(HttpStatusCode.OK, page.StatusCode);
+        var html = await page.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("<b>", html);
+        Assert.Contains("&amp;co&lt;b&gt;@example.test", html);
     }
 
     [Fact]
