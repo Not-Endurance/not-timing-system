@@ -85,6 +85,8 @@ public sealed class NoTimingUiBrowserTests : IClassFixture<ApiHostFixture>, ICla
         await page.GetByText("Sign Out").ClickAsync();
 
         await Expect(page.GetByText("Sign In")).ToBeVisibleAsync(Loaded()); // the drawer is a visitor's again
+        await Expect(page.GetByText("Startlist", new PageGetByTextOptions { Exact = true }).First)
+            .ToBeVisibleAsync(Loaded()); // and the app follows the running Event again, as a visitor
         Assert.Equal(401, (await device.FetchAsync("GET", "/api/me")).Status);
         await AssertStorageHoldsNoSignInAsync(page, scene.Official.Email);
     }
