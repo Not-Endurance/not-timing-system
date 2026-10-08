@@ -466,8 +466,8 @@
     <value>Lütfen gelecekteki bir zaman seçin</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Cannot_connect_to_server_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Cannot_connect_to_server_string" xml:space="preserve">
+    <value>Sunucuya bağlanılamadı</value>
   </data>
   <data name="Athletes_string" xml:space="preserve">
     <value>Biniciler</value>
@@ -655,17 +655,14 @@
   <data name="Try_to_Reload_in_order_to_proceed_string" xml:space="preserve">
     <value>Devam etmek için yeniden yüklemeyi deneyin veya hata devam ederse Ana sayfaya gitmek için aşağıdaki düğmeye tıklayın.</value>
   </data>
-  <data name="Login_string" xml:space="preserve">
-    <value />
-  </data>
   <data name="Sign_In_string" xml:space="preserve">
     <value>Giriş Yap</value>
   </data>
   <data name="Snapshot_string" xml:space="preserve">
-    <value />
+    <value>Snapshot</value>
   </data>
   <data name="Performance_string" xml:space="preserve">
-    <value />
+    <value>Performans</value>
   </data>
   <data name="Vetin_string" xml:space="preserve">
     <value />
@@ -673,32 +670,23 @@
   <data name="Participant_string" xml:space="preserve">
     <value />
   </data>
-  <data name="Login_page_string" xml:space="preserve">
-    <value />
-  </data>
   <data name="Snapshot_page_string" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Username_string" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Password_string" xml:space="preserve">
-    <value />
+    <value>Snapshot</value>
   </data>
   <data name="Send_snapshot_string" xml:space="preserve">
     <value />
   </data>
   <data name="Select_participants_to_snapshot_string" xml:space="preserve">
-    <value />
+    <value>Zaman snapshot'ı almak için katılımcıları seçin</value>
   </data>
   <data name="Edit_timestamp_string" xml:space="preserve">
-    <value />
+    <value>Zaman damgasını düzenle</value>
   </data>
   <data name="Timestamp_string" xml:space="preserve">
-    <value />
+    <value>Zaman damgası</value>
   </data>
   <data name="Save_string" xml:space="preserve">
-    <value />
+    <value>Kaydet</value>
   </data>
   <data name="Use_image_string" xml:space="preserve">
     <value />
@@ -715,29 +703,14 @@
   <data name="Bulgaria" xml:space="preserve">
     <value>Булгаристан</value>
   </data>
-  <data name="Sign_in_to_continue_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Connect_string" xml:space="preserve">
+    <value>Bağlan</value>
   </data>
-  <data name="Profile_page_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Disconnect_string" xml:space="preserve">
+    <value>Bağlantıyı kes</value>
   </data>
-  <data name="Access_denied_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Try_another_account_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Access_denied_next_steps" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Connect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Disconnect_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Empty_event_list_message" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Empty_event_list_message" xml:space="preserve">
+    <value>Henüz etkinlik yapılandırılmadı</value>
   </data>
   <data name="Select_athlete_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
@@ -760,8 +733,8 @@
   <data name="Cannot_add_completed_participations_in_startlist" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-  <data name="Empty_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Empty_string" xml:space="preserve">
+    <value>Boş</value>
   </data>
   <data name="RI_string" xml:space="preserve">
     <value>RI</value>
@@ -808,14 +781,14 @@
   <data name="Register_string" xml:space="preserve">
     <value>Kaydol</value>
   </data>
-  <data name="Validation_errors_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Validation_errors_string" xml:space="preserve">
+    <value>Doğrulama hataları</value>
   </data>
-  <data name="Historic_events_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Historic_events_string" xml:space="preserve">
+    <value>Geçmiş etkinlikler</value>
   </data>
-  <data name="FEI_ID_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="FEI_ID_string" xml:space="preserve">
+    <value>FEI ID</value>
   </data>
   <data name="FEI_Show_ID_string" xml:space="preserve">
     <value>FEI Show ID</value>
@@ -850,8 +823,8 @@
   <data name="FEI_Schedule_Number_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
-  <data name="Athlete_FEI_ID_must_be_numeric_value_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Athlete_FEI_ID_must_be_numeric_value_string" xml:space="preserve">
+    <value>Binici FEI ID'si sayısal bir değer olmalıdır</value>
   </data>
   <data name="Name_in_English_string" xml:space="preserve">
     <value>İngilizce isim</value>
@@ -876,5 +849,83 @@
   </data>
   <data name="Snapshots_waiting_to_be_sent_string" xml:space="preserve">
     <value>Gönderilmeyi bekleyenler: {0}. Sunucu yanıt verene kadar yeniden gönderilirler.</value>
+  </data>
+  <data name="Account_string" xml:space="preserve">
+    <value>Hesap</value>
+  </data>
+  <data name="Federation_string" xml:space="preserve">
+    <value>Federasyon</value>
+  </data>
+  <data name="Passkeys_string" xml:space="preserve">
+    <value>Geçiş anahtarları</value>
+  </data>
+  <data name="Cascading_Delete_string" xml:space="preserve">
+    <value>İlişkili kayıtlarla birlikte sil</value>
+  </data>
+  <data name="hrs_string" xml:space="preserve">
+    <value>sa</value>
+  </data>
+  <data name="FEI_Event_ID_string" xml:space="preserve">
+    <value>FEI Etkinlik ID</value>
+  </data>
+  <data name="Missing_FEI_export_configurations_colon__" xml:space="preserve">
+    <value>FEI dışa aktarımı için eksik yapılandırmalar: {0}</value>
+  </data>
+  <data name="FEI_Competition_ID_string" xml:space="preserve">
+    <value>FEI Yarışma ID</value>
+  </data>
+  <data name="Arrive_string" xml:space="preserve">
+    <value>Varış</value>
+  </data>
+  <data name="Represent_string" xml:space="preserve">
+    <value>Yeniden sunum</value>
+  </data>
+  <data name="RI_Time_string" xml:space="preserve">
+    <value>RI zamanı</value>
+  </data>
+  <data name="CRI_Time_string" xml:space="preserve">
+    <value>CRI zamanı</value>
+  </data>
+  <data name="Loop_T_string" xml:space="preserve">
+    <value>Tur süresi</value>
+  </data>
+  <data name="Phase_T_string" xml:space="preserve">
+    <value>Aşama süresi</value>
+  </data>
+  <data name="Loop_S_string" xml:space="preserve">
+    <value>Tur hızı</value>
+  </data>
+  <data name="Phase_S_string" xml:space="preserve">
+    <value>Aşama hızı</value>
+  </data>
+  <data name="Start_In_string" xml:space="preserve">
+    <value>Başlangıca kalan</value>
+  </data>
+  <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
+    <value>Üzgünüz, bu adreste hiçbir şey yok.</value>
+  </data>
+  <data name="Sign_Out_string" xml:space="preserve">
+    <value>Çıkış Yap</value>
+  </data>
+  <data name="Snapshots_sent_as__string" xml:space="preserve">
+    <value>Snapshot'lar {0} olarak gönderildi</value>
+  </data>
+  <data name="Back_string" xml:space="preserve">
+    <value>Geri</value>
+  </data>
+  <data name="Updated_string" xml:space="preserve">
+    <value>Güncellendi</value>
+  </data>
+  <data name="Delete_string" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="List_is_empty_string" xml:space="preserve">
+    <value>Liste boş</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_remove__the_snapshot_will_be_lost_string" xml:space="preserve">
+    <value>'{0}' öğesini kaldırmak istediğinizden emin misiniz? Snapshot zamanı kaybolacak</value>
+  </data>
+  <data name="Confirm_action_string" xml:space="preserve">
+    <value>İşlemi onaylayın</value>
   </data>
 </root>

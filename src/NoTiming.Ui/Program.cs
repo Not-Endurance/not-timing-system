@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Not.Application.Environments;
 using NoTiming.Ui;
+using NoTiming.Ui.Features.Account;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -28,4 +29,7 @@ Console.WriteLine(
 );
 
 var host = builder.Build();
+
+// The language the person chose is the culture of the app before anything is rendered in it.
+await host.Services.GetRequiredService<ILanguagePreference>().Apply();
 await host.RunAsync();

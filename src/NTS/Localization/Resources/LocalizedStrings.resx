@@ -687,9 +687,6 @@
   <data name="Try_to_Reload_in_order_to_proceed_string" xml:space="preserve">
     <value>Try to Reload in order to proceed or click the button below to go to Home if the error is persistent.</value>
   </data>
-  <data name="Login_string" xml:space="preserve">
-    <value>Sign in</value>
-  </data>
   <data name="Snapshot_string" xml:space="preserve">
     <value>Snapshot</value>
   </data>
@@ -702,17 +699,8 @@
   <data name="Participant_string" xml:space="preserve">
     <value>Participant</value>
   </data>
-  <data name="Login_page_string" xml:space="preserve">
-    <value>Sign-in</value>
-  </data>
   <data name="Snapshot_page_string" xml:space="preserve">
     <value>Snapshot</value>
-  </data>
-  <data name="Username_string" xml:space="preserve">
-    <value>User Name</value>
-  </data>
-  <data name="Password_string" xml:space="preserve">
-    <value>Password</value>
   </data>
   <data name="Send_snapshot_string" xml:space="preserve">
     <value>Send {0} snapshots to Judge as</value>
@@ -794,21 +782,6 @@
   </data>
   <data name="Bulgaria" xml:space="preserve">
     <value>Bulgaria</value>
-  </data>
-  <data name="Sign_in_to_continue_string" xml:space="preserve">
-    <value>Sign in to continue</value>
-  </data>
-  <data name="Profile_page_string" xml:space="preserve">
-    <value>Profile</value>
-  </data>
-  <data name="Access_denied_string" xml:space="preserve">
-    <value>This account doesn't have sufficient privileges.</value>
-  </data>
-  <data name="Try_another_account_string" xml:space="preserve">
-    <value>Try another account</value>
-  </data>
-  <data name="Access_denied_next_steps" xml:space="preserve">
-    <value>Please contact a system Admin or try another.</value>
   </data>
   <data name="Connect_string" xml:space="preserve">
     <value>Connect</value>
@@ -909,26 +882,11 @@
   <data name="Sorry_theres_nothing_at_this_address_string" xml:space="preserve">
     <value>Sorry, there's nothing at this address.</value>
   </data>
-  <data name="Sign_in_with_Microsoft_string" xml:space="preserve">
-    <value>Sign in with Microsoft</value>
-  </data>
-  <data name="This_page_redirects_to_Signin_string" xml:space="preserve">
-    <value>This page redirects to Signin.</value>
-  </data>
-  <data name="Signed_in_as__string" xml:space="preserve">
-    <value>Signed in as {0}</value>
-  </data>
-  <data name="You_have___privileges_string" xml:space="preserve">
-    <value>You have {0} privileges.</value>
-  </data>
   <data name="Sign_In_string" xml:space="preserve">
     <value>Sign In</value>
   </data>
   <data name="Sign_Out_string" xml:space="preserve">
     <value>Sign Out</value>
-  </data>
-  <data name="No_roles_assigned_string" xml:space="preserve">
-    <value>No roles assigned</value>
   </data>
   <data name="An_error_occurred_while_sending_snapshots_Please_try_again_string" xml:space="preserve">
     <value>An error occurred while sending snapshots. Please try again.</value>
@@ -1073,5 +1031,17 @@
   </data>
   <data name="Snapshots_waiting_to_be_sent_string" xml:space="preserve">
     <value>Waiting to be sent: {0}. They are sent again until the server answers.</value>
+  </data>
+  <data name="Account_string" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Federation_string" xml:space="preserve">
+    <value>Federation</value>
+  </data>
+  <data name="Passkeys_string" xml:space="preserve">
+    <value>Passkeys</value>
+  </data>
+  <data name="Cascading_Delete_string" xml:space="preserve">
+    <value>Delete with the related records</value>
   </data>
 </root>

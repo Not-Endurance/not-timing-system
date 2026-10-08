@@ -1,12 +1,13 @@
 @using Not.Blazor.Components.Buttons
 @using Not.Blazor.Components.Input
 @using Not.Blazor.Components.Layout
+@using NoTiming.Ui.Features.Account
 @using NTS.Domain.Aggregates
 
 @attribute [Route(PROFILE_PAGE)]
 @inherits ProfileContentBehind
 
-<NContent Title="@Profile_page_string" IsLoading="@IsLoading" Class="not-mid-width">
+<NContent Title="@Account_string" IsLoading="@IsLoading" Class="not-mid-width">
     <Main>
         <MudStack Spacing="3">
 
@@ -46,6 +47,10 @@
                                 Disabled="@(!CanSave)"
                                 OnClick="Save" />
             </MudStack>
+
+            <MudDivider />
+
+            <AccountSettings />
         </MudStack>
     </Main>
 </NContent>

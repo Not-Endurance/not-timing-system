@@ -15,6 +15,7 @@ public static class Routes
     public const string EVENT_PRESENTLIST_PAGE = $"/events/{EVENT_ID_SEGMENT}/presentlist";
     public const string EVENT_PERFORMANCE_PAGE = $"/events/{EVENT_ID_SEGMENT}/performance";
     public const string PROFILE_PAGE = "/profile";
+    public const string PASSKEYS_PAGE = "/account/passkeys"; // a page of the host (ADR-0002), which the app leaves for
     public const string HISTORIC_EVENTS_PAGE = "/historic-events";
     public const string HISTORIC_EVENT_DETAILS_PAGE = $"{HISTORIC_EVENTS_PAGE}/{EVENT_ID_SEGMENT}";
 

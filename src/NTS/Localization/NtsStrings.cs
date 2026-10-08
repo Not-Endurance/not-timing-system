@@ -246,26 +246,18 @@ namespace NTS.Localization
             LocalizeString(nameof(Component_missing_required_value_string));
         public static string Sorry_we_seem_to_have_fallen_off_the_horseback_string =>
             LocalizeString(nameof(Sorry_we_seem_to_have_fallen_off_the_horseback_string));
-        public static string Login_string => LocalizeString(nameof(Login_string));
-        public static string Login_page_string => LocalizeString(nameof(Login_page_string));
         public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
         public static string Snapshot_page_string => LocalizeString(nameof(Snapshot_page_string));
         public static string Performance_string => LocalizeString(nameof(Performance_string));
         public static string Resend_string => LocalizeString(nameof(Resend_string));
         public static string Vetin_string => LocalizeString(nameof(Vetin_string));
         public static string Participant_string => LocalizeString(nameof(Participant_string));
-        public static string Username_string => LocalizeString(nameof(Username_string));
-        public static string Password_string => LocalizeString(nameof(Password_string));
         public static string Send_snapshot_string => LocalizeString(nameof(Send_snapshot_string));
         public static string Select_participants_to_snapshot_string =>
             LocalizeString(nameof(Select_participants_to_snapshot_string));
         public static string Edit_timestamp_string => LocalizeString(nameof(Edit_timestamp_string));
         public static string Timestamp_string => LocalizeString(nameof(Timestamp_string));
         public static string Save_string => LocalizeString(nameof(Save_string));
-        public static string Profile_page_string => LocalizeString(nameof(Profile_page_string));
-        public static string Access_denied_string => LocalizeString(nameof(Access_denied_string));
-        public static string Access_denied_next_steps => LocalizeString(nameof(Access_denied_next_steps));
-        public static string Try_another_account_string => LocalizeString(nameof(Try_another_account_string));
         public static string Connect_string => LocalizeString(nameof(Connect_string));
         public static string Disconnect_string => LocalizeString(nameof(Disconnect_string));
         public static string Connected_to__string => LocalizeString(nameof(Connected_to__string));
@@ -299,13 +291,8 @@ namespace NTS.Localization
         public static string Restore_string => LocalizeString(nameof(Restore_string));
         public static string Sorry_theres_nothing_at_this_address_string =>
             LocalizeString(nameof(Sorry_theres_nothing_at_this_address_string));
-        public static string This_page_redirects_to_Signin_string =>
-            LocalizeString(nameof(This_page_redirects_to_Signin_string));
-        public static string Signed_in_as__string => LocalizeString(nameof(Signed_in_as__string));
-        public static string You_have___privileges_string => LocalizeString(nameof(You_have___privileges_string));
         public static string Sign_In_string => LocalizeString(nameof(Sign_In_string));
         public static string Sign_Out_string => LocalizeString(nameof(Sign_Out_string));
-        public static string No_roles_assigned_string => LocalizeString(nameof(No_roles_assigned_string));
         public static string An_error_occurred_while_sending_snapshots_Please_try_again_string =>
             LocalizeString(nameof(An_error_occurred_while_sending_snapshots_Please_try_again_string));
         public static string Snapshots_sent_as__string => LocalizeString(nameof(Snapshots_sent_as__string));
@@ -336,6 +323,9 @@ namespace NTS.Localization
             LocalizeString(nameof(Snapshots_kept_to_be_sent_again_string));
         public static string Snapshots_waiting_to_be_sent_string =>
             LocalizeString(nameof(Snapshots_waiting_to_be_sent_string));
+        public static string Account_string => LocalizeString(nameof(Account_string));
+        public static string Federation_string => LocalizeString(nameof(Federation_string));
+        public static string Passkeys_string => LocalizeString(nameof(Passkeys_string));
     }
 }
 #pragma warning restore NA0004
