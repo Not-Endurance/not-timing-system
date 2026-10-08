@@ -1,17 +1,13 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Authentication.Abstractions;
 using Not.Application.CRUD.Ports;
 using Not.Storage;
 using NoTiming.Ui.Storage.Core.Repositories;
 using NoTiming.Ui.Storage.REST;
 using NTS.Application.Core;
 using NTS.Application.Settings;
-using NTS.Application.Setup;
-using NTS.Application.UserSession;
 using NTS.Contracts.Core;
-using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Setup.Aggregates;
@@ -43,8 +39,6 @@ public static class NtsStorageServices
 
             _services.AddTransient<IEventInformationRepository, EventInformationApiRepository>();
             _services.AddTransient<ISettingRepository, SettingApiRepository>();
-            _services.AddTransient<INtsUserSessionRepository, UserSessionApiRepository>();
-            _services.AddTransient<INUserSessionRepository<NtsUserSessionStateModel>, UserSessionApiRepository>();
             _services.AddTransient<IRepository<Participation>, ParticipationApiRepository>();
             _services.AddTransient<IRepository<Ranking>, RankingApiRepository>();
             _services.AddTransient<IRepository<Official>, OfficialApiRepository>();
@@ -54,7 +48,6 @@ public static class NtsStorageServices
             _services.AddTransient<IRepository<Horse>, HorseApiRepository>();
             _services.AddTransient<IRepository<Athlete>, AthleteApiRepository>();
             _services.AddTransient<IRepository<ConfigureEvent>, ConfigureEventApiRepository>();
-            _services.AddTransient<IUserLookup, UserApiRepository>();
 
             AddEventScopedRepository<Participation, ParticipationEventScopedApiRepository>();
             AddEventScopedRepository<Ranking, RankingEventScopedApiRepository>();

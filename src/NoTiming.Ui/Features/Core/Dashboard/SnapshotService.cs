@@ -136,7 +136,7 @@ public class SnapshotService
         {
             var sent = new SnapshotGroup(recorded, snapshotType, snapshotGroup.Id);
             await DrainSnapshotSelectionPersistence();
-            await _userSessionService.AppendSnapshot(sent);
+            await KeepInHistory(sent);
 
             _history.Add(sent);
             FlushSnapshots(recorded.Select(x => x.Number).ToHashSet());
@@ -316,6 +316,22 @@ public class SnapshotService
         catch
         {
             // Snapshot selection persistence must not block witness timing flow.
+        }
+    }
+
+    /// <summary>
+    /// The person's own record of what they sent is a convenience, and the server already has the Snapshots: a record that
+    /// cannot be kept (the host failed, the session ended) does not undo what was sent, or leave it selected to be sent twice.
+    /// </summary>
+    async Task KeepInHistory(SnapshotGroup sent)
+    {
+        try
+        {
+            await _userSessionService.AppendSnapshot(sent);
+        }
+        catch
+        {
+            // The history of this page still shows it, as it is held in memory.
         }
     }
 

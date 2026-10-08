@@ -1,21 +1,19 @@
-using Not.Application.Authentication.User;
-using NTS.Contracts.API;
 using NTS.Domain.Aggregates;
 
 namespace NTS.Contracts.Features.Profile;
 
 public class WitnessProfileFormModel
 {
-    public static WitnessProfileFormModel From(NUserModel? user, Country? country)
+    public static WitnessProfileFormModel From(AccountProfile? profile, Country? country)
     {
         return new WitnessProfileFormModel
         {
-            GivenName = user?.GivenName,
-            MiddleName = user?.MiddleName,
-            Surname = user?.Surname,
+            GivenName = profile?.GivenName,
+            MiddleName = profile?.MiddleName,
+            Surname = profile?.Surname,
             Country = country,
-            Club = user?.Club,
-            FeiId = user?.FeiId,
+            Club = profile?.Club,
+            FeiId = profile?.FeiId,
         };
     }
 
@@ -25,9 +23,4 @@ public class WitnessProfileFormModel
     public Country? Country { get; set; }
     public string? Club { get; set; }
     public string? FeiId { get; set; }
-
-    public UpdateUserProfilePayload ToPayload()
-    {
-        return new UpdateUserProfilePayload(GivenName, Surname, Country?.Name, MiddleName, Club, FeiId);
-    }
 }

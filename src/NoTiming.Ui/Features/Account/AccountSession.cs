@@ -31,21 +31,25 @@ public class AccountSession : NStatefulService, IAccountSession, IScoped
 
     public bool IsSignedIn => Current != null;
 
+    public bool IsKnown { get; private set; }
+
     protected override async Task<bool> InitializeState()
     {
         var response = await _api.Send(HttpMethod.Get, "me");
         if (response.Status == HttpStatusCode.Unauthorized)
         {
             Current = null;
+            IsKnown = true;
             return true;
         }
 
         if (!response.IsSuccess)
         {
-            throw new InvalidOperationException(MessageOf(response)); // not a visitor: the host could not say, so ask again
+            throw response.ToException(); // not a visitor: the host could not say, so ask again
         }
 
         Current = AccountOf(response.Document!.Value);
+        IsKnown = true;
         return true;
     }
 
@@ -59,10 +63,11 @@ public class AccountSession : NStatefulService, IAccountSession, IScoped
         var response = await _api.Send(HttpMethod.Delete, "sessions/current");
         if (!response.IsSuccess)
         {
-            throw new InvalidOperationException(MessageOf(response));
+            throw response.ToException();
         }
 
         Current = null;
+        IsKnown = true;
         EmitChanged();
     }
 
@@ -84,19 +89,11 @@ public class AccountSession : NStatefulService, IAccountSession, IScoped
         var response = await _api.Send(HttpMethod.Patch, "me", document);
         if (!response.IsSuccess)
         {
-            throw new InvalidOperationException(MessageOf(response));
+            throw response.ToException();
         }
 
         Current = AccountOf(response.Document!.Value);
         EmitChanged();
-    }
-
-    static string MessageOf(JsonApiResponse response)
-    {
-        var error = response.Error;
-        return error?.Code == null
-            ? $"{error?.Message ?? response.Status.ToString()}"
-            : $"{error.Message} ({error.Code})";
     }
 
     static CurrentAccount AccountOf(JsonElement document)

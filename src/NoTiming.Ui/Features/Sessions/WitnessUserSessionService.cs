@@ -1,62 +1,53 @@
-using Not.Application.Authentication.Abstractions;
+using System.Net;
+using System.Text.Json;
+using Not.Application.HTTP;
 using Not.Injection;
 using NTS.Application.UserSession;
+using NTS.Contracts.Features.Account;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Snapshots;
 
 namespace NoTiming.Ui.Features.Sessions;
 
+/// <summary>
+/// What a person keeps per Event (#645, #602): the Snapshots they have selected and the groups they have sent. The host
+/// keeps it under their account, at <c>/api/user-sessions</c>, and gives it back in any tab and on any device, so the Ui
+/// names no owner and holds nothing of it. A visitor keeps nothing, and nothing is kept before an Event is named. A host
+/// that fails is not a person who has kept nothing: the read or the change fails, as the person's state is not to be taken
+/// for empty and put over. A session that has ended is a visitor again, and the account is told so.
+/// </summary>
 public class WitnessUserSessionService : IWitnessUserSession, IScoped
 {
-    readonly INUserSession _nUserSessionService;
-    readonly INtsUserSessionRepository _userSessions;
+    const string USER_SESSIONS = "user-sessions";
+
+    readonly IAccountSession _account;
+    readonly JsonApiClient _api;
     Guid? _eventId;
 
-    public WitnessUserSessionService(INUserSession nUserSessionService, INtsUserSessionRepository userSessions)
+    public WitnessUserSessionService(IAccountSession account, JsonApiClient api)
     {
-        _nUserSessionService = nUserSessionService;
-        _userSessions = userSessions;
+        _account = account;
+        _api = api;
     }
 
     public async Task<NtsUserSessionStateModel?> GetCurrent()
     {
-        if (_eventId == null)
+        if (_eventId is not { } eventId || !await IsSignedIn())
         {
             return null;
         }
 
-        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
-        if (userSession == null)
-        {
-            return null;
-        }
-
-        return (await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier, _eventId.Value))?.State?.Copy();
+        return (await Find(eventId))?.State;
     }
 
-    public async Task SetEventId(Guid? eventId)
+    /// <summary>
+    /// Names the Event whose state is read and changed. The host is not asked: connecting to an Event is for every viewer,
+    /// and does not wait for, or fail with, what a person keeps. The record is made by the first change.
+    /// </summary>
+    public Task SetEventId(Guid? eventId)
     {
-        if (eventId == null)
-        {
-            return;
-        }
-
-        _eventId = eventId;
-
-        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
-        if (userSession == null)
-        {
-            return;
-        }
-
-        var currentSession = await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier, eventId.Value);
-        if (currentSession != null)
-        {
-            return;
-        }
-
-        var session = CreateSession(userSession, eventId.Value, new NtsUserSessionStateModel());
-        await _userSessions.Create(session);
+        _eventId = eventId ?? _eventId;
+        return Task.CompletedTask;
     }
 
     public async Task AppendSnapshot(SnapshotGroup snapshot)
@@ -64,88 +55,126 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
         ArgumentNullException.ThrowIfNull(snapshot);
         var sentNumbers = snapshot.Entries.Select(entry => entry.Number).ToHashSet();
 
-        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
-        if (userSession == null || _eventId == null)
+        await Change(state =>
         {
-            return;
-        }
-
-        var currentSession = await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier, _eventId.Value);
-        if (currentSession == null)
-        {
-            currentSession = CreateSession(
-                userSession,
-                _eventId.Value,
-                new NtsUserSessionStateModel { SnapshotHistory = [SnapshotGroupModel.MapFrom(snapshot)] }
-            );
-            await _userSessions.Create(currentSession);
-            return;
-        }
-
-        var currentState = currentSession.State?.Copy() ?? new NtsUserSessionStateModel();
-        currentState.SnapshotHistory = [.. currentState.SnapshotHistory, SnapshotGroupModel.MapFrom(snapshot)];
-        currentState.SnapshotSelections = currentState
-            .SnapshotSelections.Where(selection => !sentNumbers.Contains(selection.Number))
-            .ToArray();
-        currentSession.ReplaceState(currentState);
-        await _userSessions.Update(currentSession);
+            state.SnapshotHistory = [.. state.SnapshotHistory, SnapshotGroupModel.MapFrom(snapshot)];
+            state.SnapshotSelections =
+            [
+                .. state.SnapshotSelections.Where(selection => !sentNumbers.Contains(selection.Number)),
+            ];
+        });
     }
 
     public async Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots)
     {
         ArgumentNullException.ThrowIfNull(snapshots);
 
-        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
-        if (userSession == null || _eventId == null)
-        {
-            return;
-        }
-
-        var currentSession = await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier, _eventId.Value);
-        var currentState = currentSession?.State?.Copy() ?? new NtsUserSessionStateModel();
-        currentState.SnapshotSelections = snapshots.Select(SnapshotModel.MapFrom).ToArray();
-
-        if (currentSession == null)
-        {
-            currentSession = CreateSession(userSession, _eventId.Value, currentState);
-            await _userSessions.Create(currentSession);
-            return;
-        }
-
-        currentSession.ReplaceState(currentState);
-        await _userSessions.Update(currentSession);
+        await Change(state => state.SnapshotSelections = [.. snapshots.Select(SnapshotModel.MapFrom)]);
     }
 
     public async Task DeleteCurrent()
     {
-        var userSession = await _nUserSessionService.GetCurrent<NtsUserSessionStateModel>();
-        if (userSession == null || _eventId == null)
+        if (_eventId is not { } eventId || !await IsSignedIn())
         {
             return;
         }
 
-        var currentSession = await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier, _eventId.Value);
-        if (currentSession == null)
+        if (await Find(eventId) is { } kept)
         {
-            return;
+            await Send(HttpMethod.Delete, $"{USER_SESSIONS}/{kept.Id}");
         }
-
-        await _userSessions.Delete(currentSession);
     }
 
-    static NtsUserSessionModel CreateSession(
-        INUserSessionModel userSession,
-        Guid eventId,
-        NtsUserSessionStateModel? state
-    )
+    /// <summary>
+    /// Changes the state the host keeps of the person for the Event. It is read as it is now, as another tab may have
+    /// changed it, the change is made to it, and it is put back whole; the record is made when there is none, and making
+    /// it and reading it are one request, so that the record of another tab is never replaced by a new one.
+    /// </summary>
+    async Task Change(Action<NtsUserSessionStateModel> change)
     {
-        var session = new NtsUserSessionModel
+        if (_eventId is not { } eventId || !await IsSignedIn())
         {
-            Id = userSession.User.Id,
-            EventId = eventId,
-            UserIdentifier = userSession.UserIdentifier,
-        };
-        session.ReplaceState(state);
-        return session;
+            return;
+        }
+
+        var made = await Send(HttpMethod.Post, USER_SESSIONS, Document(null, new { eventId }));
+        if (made == null)
+        {
+            return;
+        }
+
+        var kept = KeptOf(made.Document!.Value.GetProperty("data"));
+        change(kept.State);
+        await Send(HttpMethod.Patch, $"{USER_SESSIONS}/{kept.Id}", Document(kept.Id, new { state = kept.State }));
+    }
+
+    async Task<Kept?> Find(Guid eventId)
+    {
+        var filter = Uri.EscapeDataString($"eventId eq {eventId}");
+        var listed = await Send(HttpMethod.Get, $"{USER_SESSIONS}?filter={filter}");
+        return listed?.Document!.Value.GetProperty("data").EnumerateArray().Select(KeptOf).FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Whether somebody is signed in. A host that has not said is not a visitor: nothing is read or kept on a guess, as
+    /// what the person has is not to be shown as empty, and a record made on one would be put over theirs.
+    /// </summary>
+    async Task<bool> IsSignedIn()
+    {
+        await _account.Load();
+        return _account.IsKnown
+            ? _account.IsSignedIn
+            : throw new InvalidOperationException("The host has not said who is signed in.");
+    }
+
+    /// <summary>The answer of the host, none when the session has ended: the account is asked again, and a visitor keeps nothing.</summary>
+    async Task<JsonApiResponse?> Send(HttpMethod method, string endpoint, JsonElement? document = null)
+    {
+        var response = await _api.Send(method, endpoint, document);
+        if (response.Status == HttpStatusCode.Unauthorized)
+        {
+            await _account.Refresh();
+            return null;
+        }
+
+        return response.IsSuccess ? response : throw response.ToException();
+    }
+
+    static JsonElement Document(string? id, object attributes)
+    {
+        return JsonSerializer.SerializeToElement(
+            new
+            {
+                data = new
+                {
+                    type = USER_SESSIONS,
+                    id,
+                    attributes,
+                },
+            },
+            JsonApiClient.Options
+        );
+    }
+
+    static Kept KeptOf(JsonElement resource)
+    {
+        var state =
+            resource.TryGetProperty("attributes", out var attributes)
+            && attributes.TryGetProperty("state", out var kept)
+                ? kept.Deserialize<NtsUserSessionStateModel>(JsonApiClient.Options)
+                : null;
+        return new Kept(resource.GetProperty("id").GetString()!, state ?? new NtsUserSessionStateModel());
+    }
+
+    sealed class Kept
+    {
+        public Kept(string id, NtsUserSessionStateModel state)
+        {
+            Id = id;
+            State = state;
+        }
+
+        public string Id { get; }
+        public NtsUserSessionStateModel State { get; }
     }
 }

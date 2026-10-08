@@ -1,17 +1,9 @@
-using Not.Application.Authentication.User;
+using NTS.Contracts.Features.Account;
 
 namespace NTS.Contracts.Features.Profile;
 
 public static class WitnessProfilePolicy
 {
-    public static bool IsComplete(NUserModel? user)
-    {
-        return user != null
-            && !string.IsNullOrWhiteSpace(user.GivenName)
-            && !string.IsNullOrWhiteSpace(user.Surname)
-            && !string.IsNullOrWhiteSpace(user.CountryRegion);
-    }
-
     public static bool IsComplete(WitnessProfileFormModel? model)
     {
         return model != null
@@ -20,13 +12,23 @@ public static class WitnessProfilePolicy
             && model.Country != null;
     }
 
-    public static string ResolveWelcomeName(NUserModel? user)
+    /// <summary>
+    /// What the drawer calls the person: the first name of the profile, else the name of the account, else the address, cut
+    /// to what fits. A visitor has no name.
+    /// </summary>
+    public static string ResolveWelcomeName(AccountProfile? profile, CurrentAccount? account)
     {
-        var value = FirstNonEmpty(user?.GivenName, user?.DisplayName, user?.Name, user?.Email);
+        if (account == null)
+        {
+            return string.Empty;
+        }
+
+        var value = FirstNonEmpty(profile?.GivenName, account.Name, account.Email);
         if (value?.Length >= 12)
         {
             value = value[..12];
         }
+
         return value ?? string.Empty;
     }
 

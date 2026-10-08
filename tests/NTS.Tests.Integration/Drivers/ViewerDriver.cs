@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Not.Application.HTTP;
 using Not.Application.RPC;
@@ -14,6 +12,7 @@ using NoTiming.Ui.Storage;
 using NTS.Contracts;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Access;
+using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Socket;
 using NTS.Contracts.Watcher.Models;
@@ -25,16 +24,40 @@ namespace NTS.Tests.Integration.Drivers;
 
 internal sealed class ViewerDriver : IAsyncDisposable
 {
+    /// <summary>A Witness whose person is already signed in at the Api when it starts, as one who opens the app after signing in.</summary>
+    public static async Task<ViewerDriver> SignedInAsync(
+        NtsIntegrationFixture fixture,
+        IntegrationUser user,
+        string clientName
+    )
+    {
+        var viewer = new ViewerDriver(fixture, clientName);
+        await viewer.SignIn(user);
+        return viewer;
+    }
+
     readonly ServiceProvider _provider;
     readonly INtsSocketService _socketService;
     readonly IParticipationContext _participationContext;
     readonly IWitnessAccessContext _accessContext;
-    readonly IntegrationAuthenticationStateProvider _authenticationStateProvider;
+    readonly SessionCookies _cookies = new();
+    readonly NtsIntegrationFixture? _fixture;
     readonly string _clientName;
 
-    /// <param name="user">A null user drives the Witness as an anonymous, read-only visitor.</param>
+    /// <param name="user">
+    /// Must be null: the Witness is a visitor until a person is signed in at the Api, which is done by
+    /// <see cref="SignedInAsync"/> or, on a driver made with the fixture, by <see cref="SignIn"/>.
+    /// </param>
     public ViewerDriver(Uri apiBaseUrl, Uri functionsBaseUrl, IntegrationUser? user, string clientName)
     {
+        if (user != null)
+        {
+            throw new ArgumentException(
+                "A person is signed in at the Api, which asks for the fixture: use ViewerDriver.SignedInAsync.",
+                nameof(user)
+            );
+        }
+
         _clientName = clientName;
         var configuration = CreateConfiguration(
             apiBaseUrl,
@@ -58,14 +81,21 @@ internal sealed class ViewerDriver : IAsyncDisposable
             functionsBaseUrl.ToString().TrimEnd('/'),
             typeof(NtsWitnessServices).Assembly
         );
-        services.Replace(ServiceDescriptor.Scoped<IRpcAccessTokenProvider, AnonymousRpcAccessTokenProvider>());
-        _authenticationStateProvider = new IntegrationAuthenticationStateProvider(user);
-        services.AddScoped<AuthenticationStateProvider>(_ => _authenticationStateProvider);
+
+        // A browser sends the session cookie of the page's own host on every request; a program has to send it itself.
+        services.AddHttpClient(nameof(JsonApiClient)).AddHttpMessageHandler(() => new SessionCookieHandler(_cookies));
 
         _provider = services.BuildServiceProvider();
         _socketService = _provider.GetRequiredService<INtsSocketService>();
         _participationContext = _provider.GetRequiredService<IParticipationContext>();
         _accessContext = _provider.GetRequiredService<IWitnessAccessContext>();
+    }
+
+    /// <summary>A Witness of the Api of the fixture, as a visitor, who can sign a person in later.</summary>
+    public ViewerDriver(NtsIntegrationFixture fixture, string clientName)
+        : this(fixture.ApiBaseUrl, fixture.FunctionsBaseUrl, null, clientName)
+    {
+        _fixture = fixture;
     }
 
     public WitnessAccessLevel AccessLevel => _accessContext.AccessLevel;
@@ -77,11 +107,23 @@ internal sealed class ViewerDriver : IAsyncDisposable
     }
 
     /// <summary>
-    /// Completes a sign-in on an already running Witness, the way the login callback does.
+    /// Signs the person in at the Api and tells the Witness, the way the host's sign-in page does: the session is a cookie
+    /// the Witness sends from then on, and the account is asked who is signed in. An account is made for the person.
     /// </summary>
-    public void SignIn(IntegrationUser user)
+    public async Task SignIn(IntegrationUser user)
     {
-        _authenticationStateProvider.SignIn(user);
+        var fixture =
+            _fixture ?? throw new InvalidOperationException("A person is signed in at the Api of the fixture.");
+        var seeded = await TenancySeed.AccountAsync(
+            fixture.MongoConnectionString,
+            home: null,
+            name: user.Name,
+            email: user.Email
+        );
+        using var client = fixture.Api.CreateClient();
+        var session = await ApiSessions.SignInAsync(fixture.Api, client, seeded.Email);
+        _cookies.Value = $"{session.Name}={session.Value}";
+        await _provider.GetRequiredService<IAccountSession>().Refresh();
     }
 
     public Task Start()
@@ -176,20 +218,37 @@ internal sealed class ViewerDriver : IAsyncDisposable
                         .ToString()
                         .TrimEnd('/'),
                     [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
-                    ["NClientAuthenticationSettings:ClientId"] = "integration-client",
-                    ["NClientAuthenticationSettings:Instance"] = "https://login.microsoftonline.com",
-                    ["NClientAuthenticationSettings:TenantId"] = "integration-tenant",
                 }
             )
             .Build();
     }
-}
 
-/// <summary>The live connection is anonymous (ADR-0001) and the hub reads no token, so the driver sends none.</summary>
-internal sealed class AnonymousRpcAccessTokenProvider : IRpcAccessTokenProvider
-{
-    public Task<string?> Get()
+    /// <summary>The cookie the Witness has been given, which it sends to the Api as a browser would.</summary>
+    sealed class SessionCookies
     {
-        return Task.FromResult<string?>(null);
+        public string? Value { get; set; }
+    }
+
+    sealed class SessionCookieHandler : DelegatingHandler
+    {
+        readonly SessionCookies _cookies;
+
+        public SessionCookieHandler(SessionCookies cookies)
+        {
+            _cookies = cookies;
+        }
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        )
+        {
+            if (_cookies.Value != null)
+            {
+                request.Headers.Add("Cookie", _cookies.Value);
+            }
+
+            return base.SendAsync(request, cancellationToken);
+        }
     }
 }

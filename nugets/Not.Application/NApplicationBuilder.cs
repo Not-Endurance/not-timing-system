@@ -1,8 +1,6 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Not.Application.Authentication.Abstractions;
-using Not.Application.Authentication.User;
 using Not.Application.Configurations;
 using Not.Application.DomainEvents;
 using Not.Application.HTTP;
@@ -50,12 +48,6 @@ public class NApplicationBuilder
                 .RegisterServicesFromAssembly(Assembly.GetCallingAssembly())
         );
         _services.AddTransient<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
-        return this;
-    }
-
-    public NApplicationBuilder AddUserSessions()
-    {
-        _services.AddScoped<INUserSession, NUserSessionService>();
         return this;
     }
 }

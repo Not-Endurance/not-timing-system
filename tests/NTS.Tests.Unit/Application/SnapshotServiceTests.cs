@@ -107,6 +107,32 @@ public sealed class SnapshotServiceTests
     }
 
     [Fact]
+    public async Task A_history_that_cannot_be_kept_does_not_undo_what_the_server_recorded_or_leave_it_to_be_sent_twice()
+    {
+        var session = new SessionOf(null) { AppendFails = new InvalidOperationException("The host failed (500)") };
+        var (service, store, _, publisher) = await ConnectedTo(
+            session,
+            ParticipationFixtures.Active(1),
+            ParticipationFixtures.Active(2)
+        );
+        service.SelectForSnapshot(service.Participations[0]);
+        service.SelectForSnapshot(service.Participations[0]);
+        foreach (var snapshot in service.Snapshots.ToArray())
+        {
+            service.Capture(snapshot);
+        }
+
+        using var view = await LiveView(store, WitnessAccessLevel.Official);
+
+        var published = await service.Publish(view, SnapshotType.Arrive);
+
+        Assert.True(published);
+        Assert.Single(publisher.Published);
+        Assert.Empty(service.Snapshots); // they are not selected, to be sent again
+        Assert.Equal([1, 2], Assert.Single(service.History).Entries.Select(x => x.Number)); // and the page shows them sent
+    }
+
+    [Fact]
     public async Task A_Snapshot_the_server_did_not_record_stays_selected_and_the_person_is_told_why_while_the_ones_it_did_leave_the_page()
     {
         var (service, store, _, publisher) = await Connected(
@@ -497,18 +523,28 @@ public sealed class SnapshotServiceTests
         return Connected(null, participations);
     }
 
-    static async Task<(
+    static Task<(
         SnapshotService Service,
         ParticipationStore Store,
         ControlledParticipationRepository Repository,
         RecordingPublisher Publisher
     )> Connected(NtsUserSessionStateModel? session, params Participation[] participations)
     {
+        return ConnectedTo(new SessionOf(session), participations);
+    }
+
+    static async Task<(
+        SnapshotService Service,
+        ParticipationStore Store,
+        ControlledParticipationRepository Repository,
+        RecordingPublisher Publisher
+    )> ConnectedTo(SessionOf session, params Participation[] participations)
+    {
         var repository = new ControlledParticipationRepository(participations);
         var socket = new FakeSocketContext();
         var store = new ParticipationStore(repository, socket);
         var publisher = new RecordingPublisher();
-        var service = new SnapshotService(socket, store, new SessionOf(session), publisher);
+        var service = new SnapshotService(socket, store, session, publisher);
         await service.Load();
         return (service, store, repository, publisher);
     }
@@ -545,9 +581,12 @@ public sealed class SnapshotServiceTests
             return Task.CompletedTask;
         }
 
+        /// <summary>What keeping a sent group fails with when a test says so: the host failed or the session ended.</summary>
+        public Exception? AppendFails { get; set; }
+
         public Task AppendSnapshot(SnapshotGroup snapshot)
         {
-            return Task.CompletedTask;
+            return AppendFails == null ? Task.CompletedTask : Task.FromException(AppendFails);
         }
 
         public Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots)

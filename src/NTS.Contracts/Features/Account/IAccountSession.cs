@@ -15,6 +15,9 @@ public interface IAccountSession : IStatefulService
 
     bool IsSignedIn { get; }
 
+    /// <summary>Whether the host has said who is signed in, nobody included. A host that could not be reached has said nothing.</summary>
+    bool IsKnown { get; }
+
     /// <summary>Asks the host again who is signed in, and tells who watches.</summary>
     Task Refresh();
 

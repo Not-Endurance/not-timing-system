@@ -12,9 +12,11 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
     FunctionsHttpProcess? _functionsHttp;
     ApiFactory? _api;
 
+    /// <summary>The Api, for a test that signs a person in at it.</summary>
+    internal ApiFactory Api => _api ?? throw new InvalidOperationException("The Api is not started.");
+
     /// <summary>The services of the Api, for a test that stands in for what the Api does after a write.</summary>
-    internal IServiceProvider ApiServices =>
-        _api?.Services ?? throw new InvalidOperationException("The Api is not started.");
+    internal IServiceProvider ApiServices => Api.Services;
 
     /// <summary>The clock of the Api, which a scenario moves forward to let an Event end (ADR-0007).</summary>
     public OffsetTimeProvider Clock { get; } = new();

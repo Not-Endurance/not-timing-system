@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.Extensions.Localization;
 using Not.Application.Authentication.User;
 using Not.Application.Behinds.Adapters;
@@ -6,6 +5,7 @@ using NTS.Contracts.API;
 using NTS.Contracts.Arrivelists;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Access;
+using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Profile;
 using NTS.Contracts.Presentlists;
 using NTS.Contracts.Watcher.Models;
@@ -56,58 +56,6 @@ public sealed partial class IntegrationHarnessCheckTest : IClassFixture<NtsInteg
     }
 
     [Fact]
-    public async Task Witness_registration_resolution_creates_missing_nexus_user()
-    {
-        var registeringUser = new IntegrationUser(
-            "registering.witness@integration.test",
-            "registering-witness-user",
-            "Rosa Maria Register",
-            "Rosa",
-            "Maria",
-            "Register",
-            "Bulgaria",
-            "Konarche",
-            "10101010",
-            "Rosa Display"
-        );
-        using var api = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-        await using var witness = new ViewerDriver(
-            _fixture.ApiBaseUrl,
-            _fixture.FunctionsBaseUrl,
-            registeringUser,
-            "IntegrationRegisteringWitness"
-        );
-        var resolver = witness.GetRequiredService<NUserResolver>();
-        var principal = CreatePrincipal(registeringUser);
-        var profile = new NUserRegistrationProfile(
-            registeringUser.Name,
-            registeringUser.GivenName,
-            registeringUser.MiddleName,
-            registeringUser.Surname,
-            registeringUser.Club,
-            registeringUser.FeiId,
-            registeringUser.DisplayName
-        );
-
-        Assert.Null(await api.ReadUser(registeringUser.Email));
-
-        var result = await resolver.ResolvePrincipal(principal, profile);
-
-        Assert.True(result.IsSuccess, result.Error);
-        var created = await api.ReadUser(registeringUser.Email);
-        Assert.NotNull(created);
-        Assert.Equal(registeringUser.Email, created!.Email);
-        Assert.Equal(registeringUser.Name, created.Name);
-        Assert.Equal(registeringUser.DisplayName, created.DisplayName);
-        Assert.Equal(registeringUser.GivenName, created.GivenName);
-        Assert.Equal(registeringUser.MiddleName, created.MiddleName);
-        Assert.Equal(registeringUser.Surname, created.Surname);
-        Assert.Equal(registeringUser.CountryRegion, created.CountryRegion);
-        Assert.Equal(registeringUser.Club, created.Club);
-        Assert.Equal(registeringUser.FeiId, created.FeiId);
-    }
-
-    [Fact]
     public async Task Witness_profile_update_completes_existing_email_only_user()
     {
         var profileUser = new IntegrationUser(
@@ -152,41 +100,37 @@ public sealed partial class IntegrationHarnessCheckTest : IClassFixture<NtsInteg
             "late-signin-witness-user",
             "Late Signin Witness"
         );
-        await using var witness = new ViewerDriver(
-            _fixture.ApiBaseUrl,
-            _fixture.FunctionsBaseUrl,
-            user: null,
-            "IntegrationLateSigninWitness"
-        );
+        await using var witness = new ViewerDriver(_fixture, "IntegrationLateSigninWitness");
         var profileContext = witness.GetRequiredService<IWitnessProfileContext>();
         var accessContext = witness.GetRequiredService<IWitnessAccessContext>();
 
-        // The sign-in round trip hands the browser back to a freshly booted app that is still
-        // anonymous, so both contexts initialize before anyone is signed in.
+        // The app starts as a visitor, so both contexts initialize before anyone is signed in.
         await profileContext.Load();
         await accessContext.Load();
 
-        Assert.Null(profileContext.User);
+        Assert.Null(profileContext.Profile);
         Assert.Equal(WitnessAccessLevel.Anonymous, accessContext.AccessLevel);
 
-        witness.SignIn(signingInUser);
+        await witness.SignIn(signingInUser);
 
-        var user = await WaitForProfileUser(profileContext);
-        Assert.Equal(signingInUser.Email, user.Email);
+        var profile = await WaitForProfile(profileContext);
+        Assert.Equal("Late", profile.GivenName);
+        Assert.Equal("Late", profileContext.WelcomeName);
+        Assert.Equal(signingInUser.Email, witness.GetRequiredService<IAccountSession>().Current!.Email);
         Assert.Equal(
             WitnessAccessLevel.Registered,
             await WaitForAccessLevel(accessContext, WitnessAccessLevel.Registered)
         );
     }
 
-    static async Task<NUserModel> WaitForProfileUser(IWitnessProfileContext profileContext)
+    static async Task<AccountProfile> WaitForProfile(IWitnessProfileContext profileContext)
     {
         var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
         while (DateTimeOffset.UtcNow < deadline)
         {
-            if (profileContext.User != null)
+            if (profileContext.Profile != null)
             {
-                return profileContext.User;
+                return profileContext.Profile;
             }
 
             await Task.Delay(50);
@@ -215,30 +159,5 @@ public sealed partial class IntegrationHarnessCheckTest : IClassFixture<NtsInteg
         }
 
         return accessContext.AccessLevel;
-    }
-
-    static ClaimsPrincipal CreatePrincipal(IntegrationUser user)
-    {
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.Email, user.Email),
-            new("oid", user.UserIdentifier),
-            new("name", user.DisplayName ?? user.Name),
-        };
-
-        AddClaim(claims, ClaimTypes.GivenName, user.GivenName);
-        AddClaim(claims, "middle_name", user.MiddleName);
-        AddClaim(claims, ClaimTypes.Surname, user.Surname);
-        AddClaim(claims, ClaimTypes.Country, user.CountryRegion);
-
-        return new ClaimsPrincipal(new ClaimsIdentity(claims, "IntegrationTest"));
-    }
-
-    static void AddClaim(List<Claim> claims, string type, string? value)
-    {
-        if (!string.IsNullOrWhiteSpace(value))
-        {
-            claims.Add(new Claim(type, value));
-        }
     }
 }

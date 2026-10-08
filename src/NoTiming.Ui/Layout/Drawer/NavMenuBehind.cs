@@ -1,9 +1,10 @@
 using MudBlazor;
-using Not.Application.Authentication.Abstractions;
 using Not.Blazor.Components.Abstractions;
 using NoTiming.Ui.Components.SelectEvents;
 using NoTiming.Ui.Features;
+using NoTiming.Ui.Features.Account;
 using NTS.Contracts.Features.Access;
+using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Profile;
 using NTS.Contracts.Socket;
 
@@ -15,7 +16,10 @@ public class NavMenuBehind : NStatefulComponent
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    INAuthentication Authentication { get; set; } = default!;
+    IAccountSession Account { get; set; } = default!;
+
+    [Inject]
+    NavigationManager Navigator { get; set; } = default!;
 
     [Inject]
     IWitnessAccessContext AccessState { get; set; } = default!;
@@ -31,13 +35,14 @@ public class NavMenuBehind : NStatefulComponent
 
     protected bool ShowSnapshots => WitnessAccessPolicy.CanViewSnapshots(AccessState.AccessLevel);
     protected bool ShowSignin => WitnessAccessPolicy.CanSignIn(AccessState.AccessLevel);
-    protected bool ShowProfileHeader => ProfileContext.User != null;
+    protected bool ShowProfileHeader => Account.IsSignedIn;
     protected bool HasLiveEvent => SocketService.IsConnected && SocketService.Event != null;
     protected string LiveEventTitle => SocketService.Event?.Name ?? Event_string;
     protected string WelcomeName => ProfileContext.WelcomeName;
 
     protected override async Task OnInitializedAsync()
     {
+        await Observe(Account);
         await Observe(ProfileContext);
         await Observe(AccessState);
         await Observe(SocketService);
@@ -49,12 +54,16 @@ public class NavMenuBehind : NStatefulComponent
         return Routes.Of(eventPage, SocketService.Event!.Id);
     }
 
+    /// <summary>Signing in is the host's page, which returns the person to the page they were on.</summary>
     protected async Task Signin()
     {
         try
         {
             await CloseResponsiveDrawerSafe();
-            await Authentication.Signin();
+            Navigator.NavigateTo(
+                AccountSession.SignInUrl($"/{Navigator.ToBaseRelativePath(Navigator.Uri)}"),
+                forceLoad: true
+            );
         }
         catch (Exception ex)
         {
@@ -63,19 +72,16 @@ public class NavMenuBehind : NStatefulComponent
     }
 
     /// <summary>
-    /// Dropping the socket before signing out both closes the officiating connection while this
-    /// page is still alive and recomputes the access level, which keeps the drawer honest on the
-    /// paths where the logout resolves client-side instead of redirecting. Reconnecting is not
-    /// this component's job: a logout that does redirect reloads the app, and
-    /// <c>EventConnectionCoordinator</c> connects anonymously from there.
+    /// Ends the session at the host and loads the app again, as a visitor: what the app holds of the person, such as the
+    /// Snapshots they had selected, goes with the page and not into whatever is shown next.
     /// </summary>
     protected async Task Signout()
     {
         try
         {
             await CloseResponsiveDrawerSafe();
-            await SocketService.Disconnect();
-            await Authentication.Signout();
+            await Account.SignOut();
+            Navigator.NavigateTo(Routes.HOME, forceLoad: true);
         }
         catch (Exception ex)
         {

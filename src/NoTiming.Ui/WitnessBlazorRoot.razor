@@ -1,38 +1,31 @@
 @using NoTiming.Ui.Layout
-@using NoTiming.Ui.Features.Profile
-@using Not.Blazor.Client.Authentication.Components
+@using NoTiming.Ui.Features.Account
 @using Not.Blazor.Components.Exceptions
 
 @inherits WitnessBlazorRootBehind
 
 <NExceptionHandlerErrorBoundary>
     <ChildContent>
-        <CascadingAuthenticationState>
-            <Router AppAssembly="@Assembly" AdditionalAssemblies="@RouteAssemblies">
+        <Router AppAssembly="@Assembly">
 
-                <Found Context="routeData">
+            <Found Context="routeData">
 
-                    <ProfileRouteGate RouteData="@routeData">
-                        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                            <NotAuthorized>
-                                <AuthenticateContent />
-                            </NotAuthorized>
-                        </AuthorizeRouteView>
-                    </ProfileRouteGate>
+                <AccountRouteGate RouteData="@routeData">
+                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                </AccountRouteGate>
 
-                    <FocusOnNavigate RouteData="@routeData" Selector=".n-route-focus-target" />
+                <FocusOnNavigate RouteData="@routeData" Selector=".n-route-focus-target" />
 
-                </Found>
+            </Found>
 
-                <NotFound>
+            <NotFound>
 
-                    <LayoutView Layout="@typeof(MainLayout)">
-                        <p role="alert">@Sorry_theres_nothing_at_this_address_string</p>
-                    </LayoutView>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">@Sorry_theres_nothing_at_this_address_string</p>
+                </LayoutView>
 
-                </NotFound>
-            </Router>
-        </CascadingAuthenticationState>
+            </NotFound>
+        </Router>
     </ChildContent>
 
     <ErrorContent>

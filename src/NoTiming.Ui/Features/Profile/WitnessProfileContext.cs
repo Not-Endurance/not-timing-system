@@ -1,56 +1,73 @@
-using Microsoft.AspNetCore.Components.Authorization;
-using Not.Application.Authentication.Abstractions;
-using Not.Application.Authentication.User;
+using System.Net;
+using System.Text.Json;
 using Not.Application.CRUD.Ports;
+using Not.Application.HTTP;
 using Not.Injection;
-using NoTiming.Ui.Features.Sessions;
+using NoTiming.Ui.Features.Account;
+using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Profile;
-using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Aggregates;
 
 namespace NoTiming.Ui.Features.Profile;
 
-public class WitnessProfileContext : WitnessAuthenticationAwareContext, IWitnessProfileContext, IScoped
+/// <summary>
+/// The profile of the person at the Ui (#645): what the host keeps of them, at <c>/api/me/profile</c>, and the countries to
+/// choose from. It follows the account: a visitor has none, and a person who has just signed in is read, so the drawer does
+/// not render without its header until the next full page load.
+/// </summary>
+public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext, IScoped
 {
     readonly IRepository<Country> _countries;
-    readonly IWitnessUserProfileRepository _profiles;
-    readonly INUserSession _userSession;
+    readonly JsonApiClient _api;
     IReadOnlyList<Country> _countryList = [];
 
-    public WitnessProfileContext(
-        INUserSession userSession,
-        IRepository<Country> countries,
-        IWitnessUserProfileRepository profiles,
-        AuthenticationStateProvider authenticationStateProvider
-    )
-        : base(authenticationStateProvider)
+    public WitnessProfileContext(IAccountSession account, IRepository<Country> countries, JsonApiClient api)
+        : base(account)
     {
-        _userSession = userSession;
         _countries = countries;
-        _profiles = profiles;
+        _api = api;
     }
 
-    public NUserModel? User { get; private set; }
-    public bool RequiresProfileCompletion => User != null && !WitnessProfilePolicy.IsComplete(User);
-    public string WelcomeName => WitnessProfilePolicy.ResolveWelcomeName(User);
+    public AccountProfile? Profile { get; private set; }
+
+    public bool RequiresProfileCompletion => Account.Current is { ProfileComplete: false };
+
+    public string WelcomeName => WitnessProfilePolicy.ResolveWelcomeName(Profile, Account.Current);
 
     protected override async Task<bool> InitializeState()
     {
-        var session = await _userSession.GetCurrent<NtsUserSessionStateModel>();
-        User = session?.User;
-        if (User == null)
+        await Account.Load();
+        if (!Account.IsKnown)
         {
-            _countryList = [];
-            return true;
+            return false; // the host has not said who is signed in: ask again
         }
 
-        _countryList = (await _countries.ReadMany()).OrderBy(country => country.Name).ToArray();
+        if (Account.IsSignedIn)
+        {
+            var response = await _api.Send(HttpMethod.Get, "me/profile");
+            if (response.IsSuccess)
+            {
+                // What was there is replaced once the new is known, so that nothing is shown as a visitor's meanwhile.
+                var profile = ProfileOf(response.Document!.Value);
+                _countryList = [.. (await _countries.ReadMany()).OrderBy(country => country.Name)];
+                Profile = profile;
+                return true;
+            }
+
+            if (response.Status != HttpStatusCode.Unauthorized)
+            {
+                throw response.ToException();
+            }
+        }
+
+        Profile = null; // a visitor, or a session that ended meanwhile, which the account is told of by its own refresh
+        _countryList = [];
         return true;
     }
 
     public WitnessProfileFormModel CreateFormModel()
     {
-        return WitnessProfileFormModel.From(User, ResolveCountry(User?.CountryRegion));
+        return WitnessProfileFormModel.From(Profile, ResolveCountry(Profile));
     }
 
     public Task<IEnumerable<Country>> SearchCountries(string term, CancellationToken ct)
@@ -72,33 +89,78 @@ public class WitnessProfileContext : WitnessAuthenticationAwareContext, IWitness
         );
     }
 
-    public async Task<NUserModel?> Save(WitnessProfileFormModel model)
+    public async Task<AccountProfile> Save(WitnessProfileFormModel model)
     {
-        if (User == null)
-        {
-            throw new InvalidOperationException("Cannot update profile before the user session is loaded.");
-        }
-
+        var account =
+            Account.Current
+            ?? throw new InvalidOperationException("Cannot save a profile before somebody is signed in.");
         if (!WitnessProfilePolicy.IsComplete(model))
         {
             throw new InvalidOperationException("Country, first name and last name are required.");
         }
 
-        var result = await _profiles.UpdateProfile(User.Email, model.ToPayload());
-        if (!result.IsSuccess || result.Data == null)
+        // Every member is named, so that one the person emptied is taken away, as a change names what it changes.
+        var document = JsonSerializer.SerializeToElement(
+            new
+            {
+                data = new
+                {
+                    type = "profiles",
+                    id = account.Id.ToString(),
+                    attributes = new
+                    {
+                        givenName = model.GivenName?.Trim(),
+                        middleName = model.MiddleName?.Trim(),
+                        surname = model.Surname?.Trim(),
+                        countryId = model.Country!.Id,
+                        club = model.Club?.Trim(),
+                        feiId = model.FeiId?.Trim(),
+                    },
+                },
+            },
+            JsonApiClient.WriteOptions
+        );
+        var response = await _api.Send(HttpMethod.Patch, "me/profile", document);
+        if (!response.IsSuccess)
         {
-            var errors = result.Errors.Length == 0 ? ["Could not update profile."] : result.Errors;
-            throw new ApplicationException(string.Join(Environment.NewLine, errors));
+            throw response.ToException();
         }
 
-        User = result.Data;
+        var saved = ProfileOf(response.Document!.Value);
+        Profile = saved;
         EmitChanged();
-        return User;
+        await Account.Refresh(); // the account says whether the profile is complete, and the host may have placed the person
+        return saved;
     }
 
-    Country? ResolveCountry(string? countryRegion)
+    Country? ResolveCountry(AccountProfile? profile)
     {
-        return _countryList.FirstOrDefault(country => country.Matches(countryRegion));
+        return _countryList.FirstOrDefault(country => country.Id == profile?.CountryId)
+            ?? _countryList.FirstOrDefault(country => country.Matches(profile?.CountryRegion));
+    }
+
+    static AccountProfile ProfileOf(JsonElement document)
+    {
+        var attributes = document.GetProperty("data").GetProperty("attributes");
+        return new AccountProfile
+        {
+            GivenName = Text(attributes, "givenName"),
+            MiddleName = Text(attributes, "middleName"),
+            Surname = Text(attributes, "surname"),
+            CountryId = Text(attributes, "countryId") is { } id && Guid.TryParse(id, out var country) ? country : null,
+            CountryRegion = Text(attributes, "countryRegion"),
+            Club = Text(attributes, "club"),
+            FeiId = Text(attributes, "feiId"),
+            Complete =
+                attributes.TryGetProperty("complete", out var complete) && complete.ValueKind == JsonValueKind.True,
+        };
+    }
+
+    static string? Text(JsonElement attributes, string member)
+    {
+        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
     }
 
     static bool Contains(string? value, string term)

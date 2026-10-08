@@ -74,6 +74,16 @@ public class JsonApiResponse
 
     /// <summary>The first error of a response that failed, or one made of its status when the body said none.</summary>
     public JsonApiError? Error { get; }
+
+    /// <summary>
+    /// What the Api answered when it did not succeed, as the exception of a caller that cannot go on: the words it said, and
+    /// the stable code it said them with when it named one.
+    /// </summary>
+    public InvalidOperationException ToException()
+    {
+        var message = Error?.Message ?? Status.ToString();
+        return new InvalidOperationException(Error?.Code == null ? message : $"{message} ({Error.Code})");
+    }
 }
 
 /// <summary>

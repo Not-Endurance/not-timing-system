@@ -31,6 +31,7 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
 
         Assert.Null(session.Current);
         Assert.False(session.IsSignedIn);
+        Assert.True(session.IsKnown); // the host said so: nobody
         Assert.Equal(["GET /api/me"], asked.Asked);
     }
 
@@ -159,12 +160,13 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
         using var session = new AccountSession(host.Client());
 
         await session.Load();
-        var whileDown = session.Current;
+        var whileDown = (session.Current, session.IsKnown);
         host.IsDown = false;
         await session.Load();
 
-        Assert.Null(whileDown);
-        Assert.Equal(2, host.Asked); // an unreachable host is not a visitor: it is asked again, not remembered
+        Assert.Equal((null, false), whileDown); // an unreachable host has said nothing: nobody is not what it said
+        Assert.True(session.IsKnown);
+        Assert.Equal(2, host.Asked); // and is asked again, not remembered
     }
 
     [Theory]

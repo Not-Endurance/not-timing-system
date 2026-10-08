@@ -1,8 +1,7 @@
 using System.Net;
 using System.Text;
-using Not.Application.Authentication.Abstractions;
-using Not.Application.Authentication.User;
 using NoTiming.Ui.Features.Access;
+using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Storage.Core.Repositories;
 using NoTiming.Ui.Storage.REST;
 using NTS.Contracts.Features.Access;
@@ -338,12 +337,12 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
             IntegrationPayloadFactory.Official(eventId, visitor.Id, Guid.NewGuid())
         );
 
-        var anonymous = await AccessLevelOfAsync(api, null, null, eventId);
-        var withoutAnEvent = await AccessLevelOfAsync(api, visitor, visitor.Id, null);
-        var asVisitor = await AccessLevelOfAsync(api, visitor, visitor.Id, eventId);
-        var asVeterinary = await AccessLevelOfAsync(api, veterinary, veterinary.Id, eventId);
-        var asSteward = await AccessLevelOfAsync(api, steward, steward.Id, eventId);
-        var asMainOperator = await AccessLevelOfAsync(api, mainOperator, mainOperator.Id, eventId);
+        var anonymous = await AccessLevelOfAsync(api, null, eventId);
+        var withoutAnEvent = await AccessLevelOfAsync(api, visitor, null);
+        var asVisitor = await AccessLevelOfAsync(api, visitor, eventId);
+        var asVeterinary = await AccessLevelOfAsync(api, veterinary, eventId);
+        var asSteward = await AccessLevelOfAsync(api, steward, eventId);
+        var asMainOperator = await AccessLevelOfAsync(api, mainOperator, eventId);
 
         Assert.Equal(WitnessAccessLevel.Anonymous, anonymous);
         Assert.Equal(WitnessAccessLevel.Registered, withoutAnEvent);
@@ -354,15 +353,15 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_person_who_is_not_signed_in_to_the_Api_may_not_send_Snapshots_whatever_the_session_says()
+    public async Task A_person_who_is_not_signed_in_to_the_Api_is_a_visitor_and_may_not_send_Snapshots()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var tenant = await TenantAsync(_mongo.ConnectionString);
         var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
 
-        var level = await AccessLevelOfAsync(api, null, TestId.Of(5), eventId);
+        var level = await AccessLevelOfAsync(api, null, eventId);
 
-        Assert.Equal(WitnessAccessLevel.Registered, level);
+        Assert.Equal(WitnessAccessLevel.Anonymous, level);
     }
 
     [Fact]
@@ -407,12 +406,10 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
             mainOperator.Id,
             DateTimeOffset.UtcNow
         );
-        using var context = new WitnessAccessContext(
-            new SelectedEvent(eventId),
-            new SessionOf(mainOperator.Id),
-            JsonApiClients.Of(api, mainOperator, out var requests),
-            new IntegrationAuthenticationStateProvider(null)
-        );
+        var json = JsonApiClients.Of(api, mainOperator, out var requests);
+        using var account = new AccountSession(json);
+        await account.Load();
+        using var context = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
         requests.Answer = _ => throw new HttpRequestException("The Api is down.");
 
         await context.Load();
@@ -424,14 +421,11 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
         Assert.Equal(WitnessAccessLevel.Official, context.AccessLevel);
     }
 
-    async Task<WitnessAccessLevel> AccessLevelOfAsync(ApiFactory api, Person? person, Guid? user, Guid? eventId)
+    async Task<WitnessAccessLevel> AccessLevelOfAsync(ApiFactory api, Person? person, Guid? eventId)
     {
-        using var context = new WitnessAccessContext(
-            new SelectedEvent(eventId),
-            new SessionOf(user),
-            JsonApiClients.Of(api, person, out _),
-            new IntegrationAuthenticationStateProvider(null)
-        );
+        var json = JsonApiClients.Of(api, person, out _);
+        using var account = new AccountSession(json);
+        using var context = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
 
         await context.Load();
 
@@ -453,35 +447,5 @@ public sealed class EventDataRepositoryTests : IClassFixture<MongoFixture>
             START.AddHours(2)
         );
         return participation;
-    }
-
-    /// <summary>The session of the person at the Witness, which says who they are and nothing of what they may do.</summary>
-    sealed class SessionOf : INUserSession
-    {
-        readonly Guid? _user;
-
-        public SessionOf(Guid? user)
-        {
-            _user = user;
-        }
-
-        public Task<INUserSessionModel<TSessionState>?> GetCurrent<TSessionState>()
-            where TSessionState : class
-        {
-            INUserSessionModel<TSessionState>? session = _user == null ? null : new Session<TSessionState>(_user.Value);
-            return Task.FromResult(session);
-        }
-    }
-
-    sealed class Session<TSessionState> : INUserSessionModel<TSessionState>
-    {
-        public Session(Guid user)
-        {
-            User = new NUserModel("someone@example.com", null, user);
-        }
-
-        public string UserIdentifier => User.Email;
-        public NUserModel User { get; }
-        public TSessionState? State => default;
     }
 }

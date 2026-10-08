@@ -13,15 +13,17 @@ internal static class JsonApiClients
 {
     public static JsonApiClient Of(ApiFactory api, TenancySeed.Person? person, out Requests requests)
     {
-        requests = new Requests();
-        var handlers = new List<DelegatingHandler>();
-        if (person != null)
-        {
-            handlers.Add(new CookieHandler($"{ApiSessions.COOKIE_NAME}={person.Page.Cookie(ApiSessions.COOKIE_NAME)}"));
-        }
+        var cookie = new Cookie(
+            person == null ? null : $"{ApiSessions.COOKIE_NAME}={person.Page.Cookie(ApiSessions.COOKIE_NAME)}"
+        );
+        return WithCookie(api, cookie, out requests);
+    }
 
-        handlers.Add(requests);
-        var http = api.CreateDefaultClient(new Uri("https://localhost"), [.. handlers]);
+    /// <summary>A client whose cookie is the one given, which a test can give or take away after the client was made.</summary>
+    public static JsonApiClient WithCookie(ApiFactory api, Cookie cookie, out Requests requests)
+    {
+        requests = new Requests();
+        var http = api.CreateDefaultClient(new Uri("https://localhost"), cookie, requests);
         var settings = new JsonApiSettings { Url = "https://localhost/api" };
         settings.WriteHeaders[ApplicationConstants.WRITE_HEADER] = ApplicationConstants.WRITE_HEADER_VALUE;
         return new JsonApiClient(new OneClient(http), Options.Create(settings));
@@ -46,21 +48,26 @@ internal static class JsonApiClients
         }
     }
 
-    sealed class CookieHandler : DelegatingHandler
+    /// <summary>The cookie a browser sends to the host, as <c>name=value</c>; none is a visitor.</summary>
+    internal sealed class Cookie : DelegatingHandler
     {
-        readonly string _cookie;
-
-        public CookieHandler(string cookie)
+        public Cookie(string? value)
         {
-            _cookie = cookie;
+            Value = value;
         }
+
+        public string? Value { get; set; }
 
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken
         )
         {
-            request.Headers.Add("Cookie", _cookie);
+            if (Value != null)
+            {
+                request.Headers.Add("Cookie", Value);
+            }
+
             return base.SendAsync(request, cancellationToken);
         }
     }

@@ -10,6 +10,7 @@ public abstract class NStatefulService : Observer, IStatefulService
     readonly Gate _gate = new();
     readonly Event _changed = new();
     bool _hasLoaded;
+    int _resets;
 
     public IEventSubscriber ObservableEvent => _changed;
 
@@ -46,6 +47,7 @@ public abstract class NStatefulService : Observer, IStatefulService
     /// </summary>
     public void ResetHasLoaded()
     {
+        Interlocked.Increment(ref _resets);
         _hasLoaded = false;
     }
 
@@ -58,7 +60,12 @@ public abstract class NStatefulService : Observer, IStatefulService
             {
                 return;
             }
-            _hasLoaded = await InitializeState();
+
+            // A reset that comes while the state is being made says that what is being made is already out of date: it
+            // is not taken for loaded, so that the load that asked for the reset (and is waiting at the gate) makes it again.
+            var resets = Volatile.Read(ref _resets);
+            var isLoaded = await InitializeState();
+            _hasLoaded = isLoaded && resets == Volatile.Read(ref _resets);
         }
         catch (Exception ex)
         {

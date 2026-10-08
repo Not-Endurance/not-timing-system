@@ -1,42 +1,35 @@
 using System.Text.Json;
 using MediatR;
-using Microsoft.AspNetCore.Components.Authorization;
-using Not.Application.Authentication.Abstractions;
 using Not.Application.HTTP;
 using Not.Injection;
-using NoTiming.Ui.Features.Sessions;
+using NoTiming.Ui.Features.Account;
+using NTS.Contracts.Features.Access;
+using NTS.Contracts.Features.Account;
 using NTS.Contracts.Socket;
-using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Events;
 
 namespace NoTiming.Ui.Features.Access;
 
 /// <summary>
-/// What the person at this Witness may do about the Event it follows. Whether they may send a Snapshot is told by the Api,
-/// which is the one that decides it (ADR-0012): the capabilities of the Event for the signed-in caller, and not the lists
-/// of its Officials and Operators, which the Api does not give away and a client could only guess a decision from.
+/// What the person at this Witness may do about the Event it follows. Who they are is told by the host (the account
+/// session), and whether they may send a Snapshot is told by the Api, which is the one that decides it (ADR-0012): the
+/// capabilities of the Event for the signed-in caller, and not the lists of its Officials and Operators, which the Api does
+/// not give away and a client could only guess a decision from.
 /// </summary>
 public class WitnessAccessContext
-    : WitnessAuthenticationAwareContext,
+    : AccountAwareContext,
         IWitnessAccessContext,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
         IScoped
 {
     readonly INtsSocketContext _socketContext;
-    readonly INUserSession _userSessionService;
     readonly JsonApiClient _api;
 
-    public WitnessAccessContext(
-        INtsSocketContext socketContext,
-        INUserSession userSessionService,
-        JsonApiClient api,
-        AuthenticationStateProvider authenticationStateProvider
-    )
-        : base(authenticationStateProvider)
+    public WitnessAccessContext(INtsSocketContext socketContext, IAccountSession account, JsonApiClient api)
+        : base(account)
     {
         _socketContext = socketContext;
-        _userSessionService = userSessionService;
         _api = api;
     }
 
@@ -44,9 +37,13 @@ public class WitnessAccessContext
 
     protected override async Task<bool> InitializeState()
     {
-        var session = await _userSessionService.GetCurrent<NtsUserSessionStateModel>();
-        var userId = session?.User.Id;
-        if (userId == null)
+        await Account.Load();
+        if (!Account.IsKnown)
+        {
+            return false; // the host has not said who is signed in: nobody is not an answer, so ask again
+        }
+
+        if (!Account.IsSignedIn)
         {
             AccessLevel = WitnessAccessLevel.Anonymous;
             return true;
