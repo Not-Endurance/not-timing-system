@@ -544,7 +544,16 @@ public sealed class SnapshotServiceTests
         var socket = new FakeSocketContext();
         var store = new ParticipationStore(repository, socket);
         var publisher = new RecordingPublisher();
-        var service = new SnapshotService(socket, store, session, publisher);
+        var service = new SnapshotService(
+            socket,
+            store,
+            session,
+            publisher,
+            new FakeAccount(TestId.Of(1)),
+            new InMemoryUnansweredSnapshots(),
+            new StepTimer(),
+            new RecordingNotifier()
+        );
         await service.Load();
         return (service, store, repository, publisher);
     }
@@ -571,6 +580,9 @@ public sealed class SnapshotServiceTests
             _session = session;
         }
 
+        /// <summary>What keeping a sent group fails with when a test says so: the host failed or the session ended.</summary>
+        public Exception? AppendFails { get; set; }
+
         public Task<NtsUserSessionStateModel?> GetCurrent()
         {
             return Task.FromResult(_session);
@@ -580,9 +592,6 @@ public sealed class SnapshotServiceTests
         {
             return Task.CompletedTask;
         }
-
-        /// <summary>What keeping a sent group fails with when a test says so: the host failed or the session ended.</summary>
-        public Exception? AppendFails { get; set; }
 
         public Task AppendSnapshot(SnapshotGroup snapshot)
         {

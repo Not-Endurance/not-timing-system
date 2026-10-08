@@ -15,20 +15,16 @@ the browser sends to the page's own origin and the app cannot read. The app asks
   changes. What a person keeps per Event (the selected and the sent Snapshots) is kept by the Api under their account
   (`/api/user-sessions`), not in the browser.
 
-Environment configuration files are loaded from:
-- `wwwroot/appsettings.json`
-- `wwwroot/appsettings.Development.json`
-- `wwwroot/appsettings.Staging.json`
-- `wwwroot/appsettings.Production.json`
+## One origin (ADR-0011)
 
-Localhost-only overrides are loaded when running from localhost:
-- `localhostsettings.Staging.json`
-- `localhostsettings.Production.json`
+The app, the resources (`/api`) and the live hub (`/live-hub`) are the Api's, so the app reaches them where it came
+from: `Program.cs` sets `RpcSettings:Host` to the page's own address whatever a settings file says, and the session
+cookie is sent to that origin only. There is no setting for another host, and an app served from `localhost` cannot be
+pointed at a hosted environment (its session would be another origin's cookie). Run the app by running the Api, which
+serves it.
 
-The `Development`, `Staging`, and `Production` launch profiles pass `?environment=...` so localhost can choose
-the target environment file while still running from `localhost`. If no environment is supplied, the client uses
-the environment baked into the build: .NET 10 no longer reads the `Blazor-Environment` response header, so the
-environment is the `WasmApplicationEnvironmentName` MSBuild property (Development for a Debug build, Production for
-a Release publish unless it is set). The delivery workflows publish with
-`-p:WasmApplicationEnvironmentName=Staging` or `Production`. A build without it that is deployed to staging would
-silently load `appsettings.Production.json` and connect to the production hub.
+Settings are read from `wwwroot/appsettings.json`, and from `wwwroot/appsettings.{environment}.json` when there is one
+(`appsettings.Development.json` is). The environment is the one baked into the build: .NET 10 no longer reads the
+`Blazor-Environment` response header, so it is the `WasmApplicationEnvironmentName` MSBuild property (Development for a
+Debug build, Production for a Release publish unless it is set). `?environment=Development|Staging|Production` in the
+address overrides it locally.

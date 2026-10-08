@@ -1068,4 +1068,10 @@
   <data name="Not_available_for_historic_event_string" xml:space="preserve">
     <value>This page is not available for an Event that has ended.</value>
   </data>
+  <data name="Snapshots_kept_to_be_sent_again_string" xml:space="preserve">
+    <value>The Snapshots could not be sent. They are kept and are sent again until the server answers.</value>
+  </data>
+  <data name="Snapshots_waiting_to_be_sent_string" xml:space="preserve">
+    <value>Waiting to be sent: {0}. They are sent again until the server answers.</value>
+  </data>
 </root>

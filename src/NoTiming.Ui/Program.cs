@@ -1,13 +1,16 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Not.Application.Configurations;
 using Not.Application.Environments;
 using NoTiming.Ui;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-await AddLocalhostOverrideSettings(builder);
+// One origin (ADR-0011): the live connection is the page's own, whatever the environment says, as the Api serves the app,
+// the resources and the hub, and the session is a cookie that only that origin is sent.
+builder.Configuration.AddInMemoryCollection(
+    new Dictionary<string, string?> { ["RpcSettings:Host"] = builder.HostEnvironment.BaseAddress.TrimEnd('/') }
+);
 
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -26,32 +29,3 @@ Console.WriteLine(
 
 var host = builder.Build();
 await host.RunAsync();
-
-static Task AddLocalhostOverrideSettings(WebAssemblyHostBuilder builder)
-{
-    if (!IsLocalhost(builder))
-    {
-        return Task.CompletedTask;
-    }
-
-    var environment = builder.HostEnvironment.Environment;
-    if (environment is not "Staging" and not "Production")
-    {
-        return Task.CompletedTask;
-    }
-
-    var fileName = $"localhostsettings.{environment}.json";
-    builder.Configuration.AddEmbeddedJsonFile(fileName, optional: true, typeof(App).Assembly);
-    return Task.CompletedTask;
-}
-
-static bool IsLocalhost(WebAssemblyHostBuilder builder)
-{
-    if (!Uri.TryCreate(builder.HostEnvironment.BaseAddress, UriKind.Absolute, out var uri))
-    {
-        return false;
-    }
-
-    return uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
-        || uri.Host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase);
-}

@@ -1,8 +1,0 @@
-{
-  "NHttpSettings": {
-    "Url": "https://production-url/api"
-  },
-  "RpcSettings": {
-    "Host": "https://production-url"
-  }
-}

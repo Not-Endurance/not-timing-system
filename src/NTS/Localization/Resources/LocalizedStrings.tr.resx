@@ -871,4 +871,10 @@
   <data name="Not_available_for_historic_event_string" xml:space="preserve">
     <value>Bu sayfa sona ermiş bir etkinlik için kullanılamaz.</value>
   </data>
+  <data name="Snapshots_kept_to_be_sent_again_string" xml:space="preserve">
+    <value>Snapshot'lar gönderilemedi. Saklandılar ve sunucu yanıt verene kadar yeniden gönderilecekler.</value>
+  </data>
+  <data name="Snapshots_waiting_to_be_sent_string" xml:space="preserve">
+    <value>Gönderilmeyi bekleyenler: {0}. Sunucu yanıt verene kadar yeniden gönderilirler.</value>
+  </data>
 </root>

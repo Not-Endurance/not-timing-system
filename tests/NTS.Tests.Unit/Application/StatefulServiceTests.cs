@@ -71,16 +71,6 @@ public sealed class StatefulServiceTests
         public int Runs { get; private set; }
         public bool Succeeds { get; set; } = true;
 
-        public Task Reload()
-        {
-            return ReloadState();
-        }
-
-        public void ReleaseFirstRun()
-        {
-            _firstRunMayEnd.SetResult();
-        }
-
         protected override async Task<bool> InitializeState()
         {
             var run = ++Runs;
@@ -93,6 +83,16 @@ public sealed class StatefulServiceTests
 
             State = seen;
             return Succeeds;
+        }
+
+        public Task Reload()
+        {
+            return ReloadState();
+        }
+
+        public void ReleaseFirstRun()
+        {
+            _firstRunMayEnd.SetResult();
         }
     }
 }

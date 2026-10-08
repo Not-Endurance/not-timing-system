@@ -1,6 +1,7 @@
 using MudBlazor;
 using Not.Blazor.Components.Abstractions;
 using Not.Blazor.Components.Buttons;
+using Not.Domain.Exceptions;
 using Not.Notify;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Snapshots;
@@ -93,6 +94,11 @@ public class SnapshotHistoryBehind : NStatefulComponent
             _isResending = true;
             await SnapshotService.RePublish(View, group, snapshotType);
             Notifier.Success(string.Format(Snapshots_sent_as__string, GetSnapshotTypeText(snapshotType)));
+        }
+        catch (Exception ex) when (ex is not DomainException && SnapshotService.Unanswered != null)
+        {
+            // No answer came: the group is kept, and the app sends it again until the server answers.
+            Notifier.Warn(Snapshots_kept_to_be_sent_again_string);
         }
         catch (Exception ex)
         {

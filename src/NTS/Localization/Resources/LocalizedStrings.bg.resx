@@ -1068,4 +1068,10 @@
   <data name="Not_available_for_historic_event_string" xml:space="preserve">
     <value>Тази страница не е достъпна за приключило събитие.</value>
   </data>
+  <data name="Snapshots_kept_to_be_sent_again_string" xml:space="preserve">
+    <value>Снимките не можаха да бъдат изпратени. Запазени са и ще се изпращат отново, докато сървърът отговори.</value>
+  </data>
+  <data name="Snapshots_waiting_to_be_sent_string" xml:space="preserve">
+    <value>Чакат да бъдат изпратени: {0}. Изпращат се отново, докато сървърът отговори.</value>
+  </data>
 </root>

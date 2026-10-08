@@ -332,6 +332,10 @@ namespace NTS.Localization
         public static string Event_not_found_string => LocalizeString(nameof(Event_not_found_string));
         public static string Not_available_for_historic_event_string =>
             LocalizeString(nameof(Not_available_for_historic_event_string));
+        public static string Snapshots_kept_to_be_sent_again_string =>
+            LocalizeString(nameof(Snapshots_kept_to_be_sent_again_string));
+        public static string Snapshots_waiting_to_be_sent_string =>
+            LocalizeString(nameof(Snapshots_waiting_to_be_sent_string));
     }
 }
 #pragma warning restore NA0004
