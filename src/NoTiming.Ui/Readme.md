@@ -28,3 +28,24 @@ Settings are read from `wwwroot/appsettings.json`, and from `wwwroot/appsettings
 `Blazor-Environment` response header, so it is the `WasmApplicationEnvironmentName` MSBuild property (Development for a
 Debug build, Production for a Release publish unless it is set). `?environment=Development|Staging|Production` in the
 address overrides it locally.
+
+## First load and the Console (#645)
+
+A visitor downloads the app to read a startlist, so its size is measured on what is delivered: `UiFirstLoadBudgetTests`
+publishes the Ui for Release and sums the Brotli files that the Api serves (a debug build is several times larger and says
+nothing about it). When it was written down the app was **8.29 MB over 180 files** (6.8 MB of assemblies, 0.9 MB of runtime,
+0.3 MB of globalization data, 0.2 MB of scripts and styles), and the budget is a **ceiling of 9 MB**. A change that raises
+the size past it raises it on purpose, and raises the ceiling in the test, here and in the ticket.
+
+- `BlazorWebAssemblyLoadAllGlobalizationData` is on. A person who chooses Bulgarian or Turkish changes the culture of the app
+  when it starts, which Blazor refuses with the globalization data that comes with the runtime (it has English and a few
+  other languages); the full data costs about 0.2 MB more than that.
+- What the app carries that a viewer does not need, and the first things to take out: the MongoDB driver (0.8 MB), OData (1.1
+  MB: Core, Edm, the Api's and the model builder), AngleSharp and the Razor language (printing, 0.55 MB) and XML (0.36 MB).
+  They arrive through `Not.Storage` and `Not.Application`, which the app uses for the repositories of its REST calls, so taking
+  them out is a split of those projects and a task of its own.
+- The pages of the Console are not part of it. `Features/Lazy/LazyRoutes` says which paths belong to an assembly that is fetched
+  when a person goes there, and the router fetches it before it looks for a page (`WitnessBlazorRoot`). Nothing is lazy today.
+  The Console (#646) fills the seam: it adds `["console"] = ["NoTiming.Console.wasm"]` to `LazyRoutes.Assemblies`, and the
+  file as a `<BlazorWebAssemblyLazyLoad Include="NoTiming.Console.wasm" />` item in `NoTiming.Ui.csproj`; no code of the router
+  changes.

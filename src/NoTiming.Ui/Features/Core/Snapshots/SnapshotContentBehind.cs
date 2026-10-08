@@ -1,7 +1,6 @@
 using NoTiming.Ui.Features.Core.EventViews;
 using NTS.Contracts.Features.Access;
 using NTS.Contracts.Features.Snapshots;
-using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects.Snapshots;
 
@@ -14,12 +13,6 @@ public class SnapshotContentBehind : EventPageBehind
 
     [Inject]
     IWitnessAccessContext AccessState { get; set; } = default!;
-
-    [Inject]
-    INtsSocketService SocketService { get; set; } = default!;
-
-    [Inject]
-    NavigationManager Navigator { get; set; } = default!;
 
     protected ISnapshotService SnapshotService => SnapshotState;
     protected IReadOnlyList<Participation> Participations => SnapshotService.Participations;
@@ -40,11 +33,6 @@ public class SnapshotContentBehind : EventPageBehind
             {
                 await BlazorSocketService.EnsureConnected();
             }
-        }
-
-        if (WitnessAccessPolicy.ShouldRedirectFromSnapshots(AccessState.AccessLevel, SocketService.Event != null))
-        {
-            Navigator.NavigateTo(WitnessAccessPolicy.ResolveSnapshotFallbackRoute());
         }
     }
 

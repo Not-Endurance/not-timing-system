@@ -6,7 +6,7 @@
 
 <NExceptionHandlerErrorBoundary>
     <ChildContent>
-        <Router AppAssembly="@Assembly">
+        <Router AppAssembly="@Assembly" AdditionalAssemblies="@LazyAssemblies.Loaded" OnNavigateAsync="LoadAssembliesFor">
 
             <Found Context="routeData">
 

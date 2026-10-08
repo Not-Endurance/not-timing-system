@@ -49,15 +49,20 @@ public class WitnessAccessContext
             return true;
         }
 
-        AccessLevel = WitnessAccessLevel.Registered;
-        if (_socketContext.Event is not { } selected)
+        // The level is said once, when the Api has answered: a person who may send Snapshots is not shown as one who may not
+        // for the time it takes to ask again, which a page that decides by the level (the Snapshot page) would act on. An Api
+        // that cannot be reached leaves the person registered, and the state is loaded again.
+        var level = WitnessAccessLevel.Registered;
+        try
         {
-            return true;
+            if (_socketContext.Event is { } selected && await CanSendSnapshots(selected.Id))
+            {
+                level = WitnessAccessLevel.Official;
+            }
         }
-
-        if (await CanSendSnapshots(selected.Id))
+        finally
         {
-            AccessLevel = WitnessAccessLevel.Official;
+            AccessLevel = level;
         }
 
         return true;

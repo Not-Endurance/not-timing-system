@@ -29,6 +29,23 @@ internal static class JsonApiClients
         return new JsonApiClient(new OneClient(http), Options.Create(settings));
     }
 
+    /// <summary>
+    /// A client of an Api on a real port (the Kestrel host of a browser test) and not in this process, with the session cookie
+    /// of the person, as a program outside the browser has one.
+    /// </summary>
+    public static JsonApiClient Over(Uri address, TenancySeed.Person person, out Requests requests)
+    {
+        requests = new Requests();
+        var cookie = new Cookie($"{ApiSessions.COOKIE_NAME}={person.Page.Cookie(ApiSessions.COOKIE_NAME)}");
+        var chain = new HttpClientHandler();
+        cookie.InnerHandler = requests;
+        requests.InnerHandler = chain;
+        var http = new HttpClient(cookie);
+        var settings = new JsonApiSettings { Url = $"{address.ToString().TrimEnd('/')}/api" };
+        settings.WriteHeaders[ApplicationConstants.WRITE_HEADER] = ApplicationConstants.WRITE_HEADER_VALUE;
+        return new JsonApiClient(new OneClient(http), Options.Create(settings));
+    }
+
     /// <summary>What a client asked of the host, in order, as <c>METHOD /path?query</c>.</summary>
     internal sealed class Requests : DelegatingHandler
     {
@@ -37,14 +54,25 @@ internal static class JsonApiClients
         /// <summary>Answers a request in the place of the host when it names an answer, so that a test can make one fail.</summary>
         public Func<HttpRequestMessage, HttpResponseMessage?>? Answer { get; set; }
 
-        protected override Task<HttpResponseMessage> SendAsync(
+        /// <summary>What a request waits for before it goes on, so that a test can hold one back and look at what happens meanwhile.</summary>
+        public Func<HttpRequestMessage, Task>? Before { get; set; }
+
+        protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken
         )
         {
-            Asked.Add($"{request.Method} {request.RequestUri!.PathAndQuery}");
-            var answer = Answer?.Invoke(request);
-            return answer != null ? Task.FromResult(answer) : base.SendAsync(request, cancellationToken);
+            lock (Asked)
+            {
+                Asked.Add($"{request.Method} {request.RequestUri!.PathAndQuery}");
+            }
+
+            if (Before != null)
+            {
+                await Before(request);
+            }
+
+            return Answer?.Invoke(request) ?? await base.SendAsync(request, cancellationToken);
         }
     }
 
