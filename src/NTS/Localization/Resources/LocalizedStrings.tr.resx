@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -637,8 +637,8 @@
   <data name="Component_missing_required_value_string" xml:space="preserve">
     <value>{0} oluşturulamadı. Lütfen geliştiriciyle iletişime geçin.</value>
   </data>
-  <data name="Setup_configuration_will_not_be_deleted_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Setup_configuration_will_not_be_deleted_string" xml:space="preserve">
+    <value>Kurulum yapılandırması silinmeyecektir</value>
   </data>
   <data name="Download_string" xml:space="preserve">
     <value />
@@ -802,26 +802,26 @@
   <data name="FEI_Rule_string" xml:space="preserve">
     <value>FEI Rule</value>
   </data>
-  <data name="FEI_Show_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="FEI_Show_ID_helper_text_string" xml:space="preserve">
+    <value>Show Detail -&gt; Sağ üst (örnek: 2026_CI_1446)</value>
   </data>
-  <data name="Locate_FEI_Show_data_instructions_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Locate_FEI_Show_data_instructions_string" xml:space="preserve">
+    <value>FEI ayarları yalnızca FEI dışa aktarma işlevi için gereklidir. Gerekli verileri bulmak için herkese açık FEI veri tabanını kullanın: data.fei.org adresini açın -&gt; "Calendar/Results" seçeneğine tıklayın ("Courses" değil) -&gt; Show'u bulun</value>
   </data>
-  <data name="FEI_Event_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="FEI_Event_ID_helper_text_string" xml:space="preserve">
+    <value>Event Detail -&gt; Sağ üst (örnek: 2026_CI_1446_E_S_02)</value>
   </data>
-  <data name="FEI_Event_Code_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="FEI_Event_Code_helper_text_string" xml:space="preserve">
+    <value>Event Detail -&gt; Event Code (örnek: CEI2* 120 CIM)</value>
   </data>
-  <data name="FEI_Competition_ID_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="FEI_Competition_ID_helper_text_string" xml:space="preserve">
+    <value>Competition Detail -&gt; Sağ üst (örnek: 2026_CI_1446_E_S_02_01)</value>
   </data>
-  <data name="FEI_Rule_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="FEI_Rule_helper_text_string" xml:space="preserve">
+    <value>Competition Detail -&gt; Rule (örnek: E-Comp - Endurance Competition)</value>
   </data>
-  <data name="FEI_Schedule_Number_helper_text_string" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="FEI_Schedule_Number_helper_text_string" xml:space="preserve">
+    <value>Competition Detail -&gt; Schedule Number (örnek: 01)</value>
   </data>
   <data name="Athlete_FEI_ID_must_be_numeric_value_string" xml:space="preserve">
     <value>Binici FEI ID'si sayısal bir değer olmalıdır</value>
@@ -984,5 +984,86 @@
   </data>
   <data name="Close_string" xml:space="preserve">
     <value>Kapat</value>
+  </data>
+  <data name="Competition_not_found_string" xml:space="preserve">
+    <value>Yarışma bulunamadı</value>
+  </data>
+  <data name="Event_not_yours_to_run_string" xml:space="preserve">
+    <value>Bir etkinliğin kurulumunu yalnızca etkinliğin Ana Operatörü açabilir.</value>
+  </data>
+  <data name="Access_string" xml:space="preserve">
+    <value>Erişim</value>
+  </data>
+  <data name="Access_description_string" xml:space="preserve">
+    <value>Etkinlikten Snapshot gönderebilen kişiler, tam e-posta adresleriyle bağlanır. Hesabı olmayan bir adres, kişi kayıt olana kadar bekleyen bir davettir.</value>
+  </data>
+  <data name="Link_person_string" xml:space="preserve">
+    <value>Kişi bağla</value>
+  </data>
+  <data name="Email_address_string" xml:space="preserve">
+    <value>E-posta adresi</value>
+  </data>
+  <data name="Pending_invitation_string" xml:space="preserve">
+    <value>Davet bekliyor</value>
+  </data>
+  <data name="Linked_string" xml:space="preserve">
+    <value>Bağlı</value>
+  </data>
+  <data name="Access_empty_string" xml:space="preserve">
+    <value>Henüz bağlı kimse yok.</value>
+  </data>
+  <data name="Person_linked_string" xml:space="preserve">
+    <value>Kişi bağlandı.</value>
+  </data>
+  <data name="Access_removed_string" xml:space="preserve">
+    <value>Erişim sona erdirildi.</value>
+  </data>
+  <data name="Linked_as_string" xml:space="preserve">
+    <value>Olarak bağlı</value>
+  </data>
+  <data name="Person_string" xml:space="preserve">
+    <value>Kişi</value>
+  </data>
+  <data name="Link_account_helper_string" xml:space="preserve">
+    <value>Kişinin giriş yaptığı tam adres. Henüz hesabı yoksa kişi davet edilir ve kayıt olduğunda erişim kazanır.</value>
+  </data>
+  <data name="Official_string" xml:space="preserve">
+    <value>Resmi Görevli</value>
+  </data>
+  <data name="Are_you_sure_you_want_to_reset_This_will_permanently_delete_Snapshots_Rankings_Protocols_and_Handouts_string" xml:space="preserve">
+    <value>Sıfırlamak istediğinizden emin misiniz? Bu işlem Snapshot'ları, Sıralamaları, Protokolleri ve Dokümanları kalıcı olarak silecektir.</value>
+  </data>
+  <data name="Automatic_CRI_string" xml:space="preserve">
+    <value>Otomatik CRI kullan</value>
+  </data>
+  <data name="Configure_Clubs_string" xml:space="preserve">
+    <value>Kulüpleri Yapılandır</value>
+  </data>
+  <data name="Configure_Combination_string" xml:space="preserve">
+    <value>Kombinasyonu Yapılandır</value>
+  </data>
+  <data name="Configure_Phase_string" xml:space="preserve">
+    <value>Aşamayı Yapılandır</value>
+  </data>
+  <data name="Confirm_string" xml:space="preserve">
+    <value>Onayla</value>
+  </data>
+  <data name="Confirmation_code_string" xml:space="preserve">
+    <value>Onay kodu</value>
+  </data>
+  <data name="Hard_reset_string" xml:space="preserve">
+    <value>Tam sıfırlama</value>
+  </data>
+  <data name="Require_Compulsory_Inspection_string" xml:space="preserve">
+    <value>Zorunlu muayene gerektir</value>
+  </data>
+  <data name="Reset_string" xml:space="preserve">
+    <value>Sıfırla</value>
+  </data>
+  <data name="This_action_is_final_There_is_no_recovery_string" xml:space="preserve">
+    <value>BU İŞLEM KESİNDİR. GERİ ALMA YOKTUR.</value>
+  </data>
+  <data name="Type_1337_to_enable_confirmation_string" xml:space="preserve">
+    <value>Onayı etkinleştirmek için 1337 yazın.</value>
   </data>
 </root>

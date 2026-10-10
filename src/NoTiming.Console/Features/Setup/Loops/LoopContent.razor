@@ -1,0 +1,17 @@
+@attribute [Route(LOOP_PAGE)]
+@inherits LoopContentBehind
+
+<NContent Title="@Configure_Loops_string" IsEmpty="Model == null">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="@(() => GoBack())" />
+            </MudStack>
+
+            <LoopShell Model="Model" ReadOnly="@ReadOnly" />
+        </MudStack>
+    </Main>
+
+</NContent>

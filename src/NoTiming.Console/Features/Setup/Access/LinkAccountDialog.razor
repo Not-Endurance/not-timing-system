@@ -1,0 +1,31 @@
+@using NTS.Domain.Access
+@using NTS.Domain.Enums
+@using Not.Blazor.Components.Input
+
+@inherits LinkAccountDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <NSelect T="GrantKind" Value="Kind" ValueChanged="@(x => Kind = x)" Items="Kinds" Label="@Linked_as_string" />
+
+            @if (IsOfficial)
+            {
+                <NSelect T="OfficialRole?" Value="Role" ValueChanged="@(x => Role = x)" Label="@Official_Role_string" Placeholder="@Select_a_role_string" />
+            }
+
+            <NTextField T="string" @bind-Value="Email" Label="@Email_address_string" HelperText="@Link_account_helper_string" Immediate="true" InputType="InputType.Email" />
+
+            @if (Refusal != null)
+            {
+                <MudAlert Severity="Severity.Warning" Dense="true">@Refusal</MudAlert>
+            }
+        </MudStack>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonPrimary Text="@Link_person_string" Disabled="@(!CanLink)" OnClick="Link" />
+
+        <NButtonSecondary Text="@Cancel_string" OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

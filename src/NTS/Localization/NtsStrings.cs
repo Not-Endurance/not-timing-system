@@ -345,6 +345,21 @@ namespace NTS.Localization
         public static string Event_started_string => LocalizeString(nameof(Event_started_string));
         public static string Event_was_reset_string => LocalizeString(nameof(Event_was_reset_string));
         public static string Close_string => LocalizeString(nameof(Close_string));
+        public static string Competition_not_found_string => LocalizeString(nameof(Competition_not_found_string));
+        public static string Event_not_yours_to_run_string => LocalizeString(nameof(Event_not_yours_to_run_string));
+        public static string Access_string => LocalizeString(nameof(Access_string));
+        public static string Access_description_string => LocalizeString(nameof(Access_description_string));
+        public static string Link_person_string => LocalizeString(nameof(Link_person_string));
+        public static string Email_address_string => LocalizeString(nameof(Email_address_string));
+        public static string Pending_invitation_string => LocalizeString(nameof(Pending_invitation_string));
+        public static string Linked_string => LocalizeString(nameof(Linked_string));
+        public static string Access_empty_string => LocalizeString(nameof(Access_empty_string));
+        public static string Person_linked_string => LocalizeString(nameof(Person_linked_string));
+        public static string Access_removed_string => LocalizeString(nameof(Access_removed_string));
+        public static string Linked_as_string => LocalizeString(nameof(Linked_as_string));
+        public static string Person_string => LocalizeString(nameof(Person_string));
+        public static string Link_account_helper_string => LocalizeString(nameof(Link_account_helper_string));
+        public static string Official_string => LocalizeString(nameof(Official_string));
     }
 }
 #pragma warning restore NA0004

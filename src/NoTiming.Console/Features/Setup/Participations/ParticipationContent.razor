@@ -1,0 +1,17 @@
+@attribute [Route(PARTICIPATION_PAGE)]
+@inherits ParticipationContentBehind
+
+<NContent Title="@Configure_Participation_string" IsEmpty="Model == null">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="@(() => GoBack())" />
+            </MudStack>
+
+            <ParticipationShell Model="Model" ReadOnly="@ReadOnly" />
+        </MudStack>
+    </Main>
+
+</NContent>

@@ -1,0 +1,57 @@
+@using NTS.Domain.Setup.Aggregates.ConfigureEvents
+@using Not.Krud.Blazor.Components
+@using NoTiming.Console.Features.Setup.Access
+@using NoTiming.Console.Features.Setup.Combinations
+@using NoTiming.Console.Features.Setup.Competitions
+@using NoTiming.Console.Features.Setup.Loops
+@using NoTiming.Console.Features.Setup.Officials
+
+@attribute [Route(EVENT_SETUP_PAGE)]
+@inherits ConfigureEventContentBehind
+
+<NContent Title="@Configure_Event_string" IsLoading="@IsLoading" IsEmpty="Opened == null" EmptyMessage="@Event_not_yours_to_run_string">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="GoHome" />
+            </MudStack>
+
+            @if (Opened != null)
+            {
+                <div @key="Reading">
+                    <ConfigureEventShell Model="Opened.Model" ReadOnly="@ReadOnly" OnSubmit="Reopen">
+                        <AdditionalContent>
+                            <NGrid Spacing="8">
+
+                                <MudItem xs="12" md="6">
+                                    <MudStack Spacing="8">
+                                        <KrudList T="Competition" TModel="CompetitionFormModel" TShell="CompetitionShell" Name="@Competitions_string"
+                                                  UpdateRoute="@CompetitionRoute" ReadOnly="@ReadOnly" />
+                                        <KrudList T="Loop" TModel="LoopFormModel" TShell="LoopShell" Name="@Loops_string"
+                                                  UpdateRoute="@LoopRoute" ReadOnly="@ReadOnly" />
+                                    </MudStack>
+                                </MudItem>
+
+                                <MudItem xs="12" md="6">
+                                    <MudStack Spacing="8">
+                                        <KrudList T="Official" TModel="OfficialFormModel" TShell="OfficialShell" Name="@Officials_string"
+                                                  UpdateRoute="@OfficialRoute" ReadOnly="@ReadOnly" />
+                                        <KrudList T="Combination" TModel="CombinationFormModel" TShell="CombinationShell" Name="@Combinations_string"
+                                                  UpdateRoute="@CombinationRoute" ReadOnly="@ReadOnly" />
+                                    </MudStack>
+                                </MudItem>
+
+                            </NGrid>
+                        </AdditionalContent>
+                    </ConfigureEventShell>
+
+                    <AccessPanel EventId="EventId" ReadOnly="@(!Opened.CanLinkAccounts)" />
+                </div>
+            }
+
+        </MudStack>
+    </Main>
+
+</NContent>

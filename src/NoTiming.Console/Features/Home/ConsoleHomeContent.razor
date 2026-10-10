@@ -11,7 +11,11 @@
             <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
                 <MudText Typo="Typo.h6">@Events_string</MudText>
 
-                <MudStack Row Spacing="2">
+                <MudStack Row Spacing="2" Wrap="Wrap.Wrap">
+                    <NButtonSecondary Text="@Athletes_and_Horses_string" OnClick="OpenAthletesAndHorses" />
+
+                    <NButtonSecondary Text="@Clubs_string" OnClick="OpenClubs" />
+
                     <NButtonSecondary Text="@Historic_events_string" OnClick="OpenHistoricEvents" />
 
                     @if (CanCreate)

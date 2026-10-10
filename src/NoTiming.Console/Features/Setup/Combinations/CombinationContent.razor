@@ -1,0 +1,17 @@
+@attribute [Route(COMBINATION_PAGE)]
+@inherits CombinationContentBehind
+
+<NContent Title="@Configure_Combination_string" IsEmpty="Model == null">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="@(() => GoBack())" />
+            </MudStack>
+
+            <CombinationShell Model="Model" ReadOnly="@ReadOnly" />
+        </MudStack>
+    </Main>
+
+</NContent>

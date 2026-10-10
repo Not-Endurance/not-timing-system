@@ -76,6 +76,16 @@ public class ConsoleHomeContentBehind : NStatefulComponent
         Navigator.NavigateTo(Routes.HISTORIC_EVENTS_PAGE);
     }
 
+    protected void OpenAthletesAndHorses()
+    {
+        Navigator.NavigateTo(ConsoleRoutes.ATHLETES_HORSES_PAGE);
+    }
+
+    protected void OpenClubs()
+    {
+        Navigator.NavigateTo(ConsoleRoutes.CLUBS_PAGE);
+    }
+
     protected void OpenResults(ConsoleEvent row)
     {
         Navigator.NavigateTo(Routes.Of(Routes.HISTORIC_EVENT_DETAILS_PAGE, row.Id));
@@ -111,9 +121,8 @@ public class ConsoleHomeContentBehind : NStatefulComponent
         await Safely(async () =>
         {
             var issues = await Events.Validate(row.Id);
-            if (issues.Count > 0)
+            if (issues.Count > 0 && !await Settle(row, issues))
             {
-                await ShowIssues(issues);
                 return;
             }
 
@@ -175,10 +184,17 @@ public class ConsoleHomeContentBehind : NStatefulComponent
         });
     }
 
-    async Task ShowIssues(IReadOnlyList<StartValidationIssue> issues)
+    /// <summary>Says what is missing, and whether the person settled it there: a start number that two Competitions hold at once is corrected in the dialog.</summary>
+    async Task<bool> Settle(ConsoleEvent row, IReadOnlyList<StartValidationIssue> issues)
     {
-        var parameters = new DialogParameters<StartIssuesDialog> { { x => x.Issues, issues } };
-        await DialogService.ShowAsync<StartIssuesDialog>(Invalid_setup_string, parameters);
+        var parameters = new DialogParameters<StartIssuesDialog>
+        {
+            { x => x.Issues, issues },
+            { x => x.EventId, row.Id },
+        };
+        var dialog = await DialogService.ShowAsync<StartIssuesDialog>(Invalid_setup_string, parameters);
+        var result = await dialog.Result;
+        return result is { Canceled: false, Data: true };
     }
 
     /// <summary>What the Api refuses is said, in its own words, to the person; anything else is an error of the app.</summary>

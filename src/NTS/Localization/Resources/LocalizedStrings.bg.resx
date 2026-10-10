@@ -1101,4 +1101,49 @@
   <data name="Close_string" xml:space="preserve">
     <value>Затвори</value>
   </data>
+  <data name="Competition_not_found_string" xml:space="preserve">
+    <value>Състезанието не е намерено</value>
+  </data>
+  <data name="Event_not_yours_to_run_string" xml:space="preserve">
+    <value>Само главният оператор на събитието отваря неговата настройка.</value>
+  </data>
+  <data name="Access_string" xml:space="preserve">
+    <value>Достъп</value>
+  </data>
+  <data name="Access_description_string" xml:space="preserve">
+    <value>Хората, които могат да изпращат засичания от събитието, свързани с точния си имейл. Адрес без профил е покана, която чака човекът да се регистрира.</value>
+  </data>
+  <data name="Link_person_string" xml:space="preserve">
+    <value>Свържи човек</value>
+  </data>
+  <data name="Email_address_string" xml:space="preserve">
+    <value>Имейл адрес</value>
+  </data>
+  <data name="Pending_invitation_string" xml:space="preserve">
+    <value>Чака регистрация</value>
+  </data>
+  <data name="Linked_string" xml:space="preserve">
+    <value>Свързан</value>
+  </data>
+  <data name="Access_empty_string" xml:space="preserve">
+    <value>Все още няма свързани хора.</value>
+  </data>
+  <data name="Person_linked_string" xml:space="preserve">
+    <value>Човекът е свързан.</value>
+  </data>
+  <data name="Access_removed_string" xml:space="preserve">
+    <value>Достъпът е прекратен.</value>
+  </data>
+  <data name="Linked_as_string" xml:space="preserve">
+    <value>Свързан като</value>
+  </data>
+  <data name="Person_string" xml:space="preserve">
+    <value>Човек</value>
+  </data>
+  <data name="Link_account_helper_string" xml:space="preserve">
+    <value>Точният адрес, с който човекът влиза. Ако още няма профил, човекът е поканен и получава достъп, когато се регистрира.</value>
+  </data>
+  <data name="Official_string" xml:space="preserve">
+    <value>Официално лице</value>
+  </data>
 </root>

@@ -221,6 +221,33 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
         }
     }
 
+    [Fact]
+    public async Task The_registry_is_open_for_writing_to_a_Tenant_Root_and_to_the_Main_Operator_of_an_Event_that_is_not_over_and_to_nobody_else()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var running = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var past = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var plain = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, running.Id, "Open");
+        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, past.Id, NOW);
+
+        var allowed = new Dictionary<string, bool>();
+        foreach (var (name, person) in new[] { ("root", root), ("running", running), ("past", past), ("plain", plain) })
+        {
+            using var console = Open(api, person);
+            await console.Events.Load();
+            allowed[name] = console.Events.CanEditRegistry;
+        }
+
+        Assert.True(allowed["root"]);
+        Assert.True(allowed["running"]);
+        Assert.False(allowed["past"]); // an Event that is over is not one to register for
+        Assert.False(allowed["plain"]);
+    }
+
     static Opened Open(ApiFactory api, Person person)
     {
         var json = JsonApiClients.Of(api, person, out _);

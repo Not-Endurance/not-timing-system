@@ -126,6 +126,12 @@ internal static class UiBrowser
         return new LocatorAssertionsToHaveCountOptions { Timeout = PATIENCE };
     }
 
+    /// <summary>The time to wait for a field that is to hold a value, which the page that holds it is loaded by when it does.</summary>
+    public static LocatorAssertionsToHaveValueOptions Filled()
+    {
+        return new LocatorAssertionsToHaveValueOptions { Timeout = PATIENCE };
+    }
+
     public static ILocatorAssertions Expect(ILocator locator)
     {
         return Assertions.Expect(locator);

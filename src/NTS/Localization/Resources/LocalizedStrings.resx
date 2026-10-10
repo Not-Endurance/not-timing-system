@@ -1101,4 +1101,49 @@
   <data name="Close_string" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="Competition_not_found_string" xml:space="preserve">
+    <value>Competition not found</value>
+  </data>
+  <data name="Event_not_yours_to_run_string" xml:space="preserve">
+    <value>Only the Main Operator of an Event opens its Setup.</value>
+  </data>
+  <data name="Access_string" xml:space="preserve">
+    <value>Access</value>
+  </data>
+  <data name="Access_description_string" xml:space="preserve">
+    <value>The people who may send Snapshots from the Event, linked by their exact email. An address that has no account is an invitation that waits until the person registers.</value>
+  </data>
+  <data name="Link_person_string" xml:space="preserve">
+    <value>Link a person</value>
+  </data>
+  <data name="Email_address_string" xml:space="preserve">
+    <value>Email address</value>
+  </data>
+  <data name="Pending_invitation_string" xml:space="preserve">
+    <value>Invitation pending</value>
+  </data>
+  <data name="Linked_string" xml:space="preserve">
+    <value>Linked</value>
+  </data>
+  <data name="Access_empty_string" xml:space="preserve">
+    <value>Nobody is linked yet.</value>
+  </data>
+  <data name="Person_linked_string" xml:space="preserve">
+    <value>The person was linked.</value>
+  </data>
+  <data name="Access_removed_string" xml:space="preserve">
+    <value>The access was ended.</value>
+  </data>
+  <data name="Linked_as_string" xml:space="preserve">
+    <value>Linked as</value>
+  </data>
+  <data name="Person_string" xml:space="preserve">
+    <value>Person</value>
+  </data>
+  <data name="Link_account_helper_string" xml:space="preserve">
+    <value>The exact address the person signs in with. If it has no account yet, the person is invited and gets the access when they register.</value>
+  </data>
+  <data name="Official_string" xml:space="preserve">
+    <value>Official</value>
+  </data>
 </root>

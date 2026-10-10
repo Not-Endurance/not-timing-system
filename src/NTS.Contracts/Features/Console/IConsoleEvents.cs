@@ -15,6 +15,12 @@ public interface IConsoleEvents : IStatefulService
     /// <summary>Whether the person may make an Event in the Tenant they act in.</summary>
     bool CanCreate { get; }
 
+    /// <summary>
+    /// Whether the person is one the registry of Athletes, Horses and Clubs is open to for writing: a Tenant Root, or the Main
+    /// Operator of an Event that is not over. It decides what the pages of the registry offer; the Api decides what it takes.
+    /// </summary>
+    bool CanEditRegistry { get; }
+
     /// <summary>Makes an Event in the Tenant the person acts in, with the person as its Main Operator.</summary>
     Task<ConsoleEvent> Create(string name, string location, string? feiShowId);
 

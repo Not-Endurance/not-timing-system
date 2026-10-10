@@ -6,6 +6,7 @@ using Not.Blazor.Client;
 using Not.Krud.ServiceRegistration;
 using NTS;
 using NTS.Application;
+using NTS.Domain.Setup.Aggregates;
 
 namespace NoTiming.Ui;
 
@@ -18,7 +19,12 @@ public static class NtsWitnessServices
         Assembly rootAssembly
     )
     {
-        services.ConfigureKrud();
+        services
+            .ConfigureKrud()
+            .RegisterAggregate<ConfigureEvent>()
+            .RegisterAggregate<Athlete>()
+            .RegisterAggregate<Horse>()
+            .RegisterAggregate<Club>();
         services
             .ConfigureNtsApplication(configuration, rootAssembly)
             .AddSharedCoreDomainServices()

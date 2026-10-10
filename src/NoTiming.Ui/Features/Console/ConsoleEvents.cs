@@ -42,6 +42,8 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
 
     public bool CanCreate { get; private set; }
 
+    public bool CanEditRegistry { get; private set; }
+
     protected override async Task<bool> InitializeState()
     {
         await Account.Load();
@@ -54,6 +56,7 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
         {
             _list = [];
             CanCreate = false;
+            CanEditRegistry = false;
             return true;
         }
 
@@ -62,6 +65,7 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
         var canCreate = await MayCreateIn(person.CurrentTenantId);
         _list = [.. rows.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase)];
         CanCreate = canCreate;
+        CanEditRegistry = canCreate || rows.Any(x => x.IsMainOperator && x.Stage != EventStage.Historic);
         return true;
     }
 
