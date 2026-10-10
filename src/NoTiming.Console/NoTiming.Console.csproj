@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AddRazorSupportForMvc>false</AddRazorSupportForMvc>
+    <RootNamespace>NoTiming.Console</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NTS.Blazor\NTS.Blazor.csproj" />
+    <ProjectReference Include="..\NTS.Contracts\NTS.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -928,4 +928,7 @@
   <data name="Confirm_action_string" xml:space="preserve">
     <value>İşlemi onaylayın</value>
   </data>
+  <data name="Console_string" xml:space="preserve">
+    <value>Konsol</value>
+  </data>
 </root>

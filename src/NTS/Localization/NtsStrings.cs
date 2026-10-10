@@ -326,6 +326,7 @@ namespace NTS.Localization
         public static string Account_string => LocalizeString(nameof(Account_string));
         public static string Federation_string => LocalizeString(nameof(Federation_string));
         public static string Passkeys_string => LocalizeString(nameof(Passkeys_string));
+        public static string Console_string => LocalizeString(nameof(Console_string));
     }
 }
 #pragma warning restore NA0004

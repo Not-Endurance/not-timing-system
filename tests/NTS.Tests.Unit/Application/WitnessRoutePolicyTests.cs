@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
+using NoTiming.Console;
 using NoTiming.Ui;
 using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Features.Core.Snapshots;
@@ -38,7 +39,10 @@ public sealed class WitnessRoutePolicyTests
     [InlineData("snapshot")]
     [InlineData("events/{event}/snapshot")]
     [InlineData("profile")]
-    public void A_visitor_is_taken_to_sign_in_for_the_pages_that_send_Snapshots_and_the_profile(string path)
+    [InlineData("console")]
+    [InlineData("console/events/{event}/dashboard")]
+    [InlineData("Console/Setup")]
+    public void A_visitor_is_taken_to_sign_in_for_the_pages_that_send_Snapshots_the_profile_and_the_Console(string path)
     {
         Assert.Equal(RouteAccess.SignIn, WitnessRoutePolicy.AccessTo(null, Of(path)));
     }
@@ -51,6 +55,10 @@ public sealed class WitnessRoutePolicyTests
     [InlineData("snapshot#history")]
     [InlineData("Events/{event}/Snapshot/?x=1#top")]
     [InlineData("/Profile")]
+    [InlineData("console/")]
+    [InlineData("/CONSOLE")]
+    [InlineData("console?tab=1")]
+    [InlineData("console/events#top")]
     public void The_page_is_known_by_its_path_whatever_the_case_the_slashes_the_query_or_the_fragment(string path)
     {
         Assert.Equal(RouteAccess.SignIn, WitnessRoutePolicy.AccessTo(null, Of(path)));
@@ -65,6 +73,9 @@ public sealed class WitnessRoutePolicyTests
     [InlineData("events/{event}")]
     [InlineData("profile/other")]
     [InlineData("my-profile")]
+    [InlineData("consoles")]
+    [InlineData("my-console/events")]
+    [InlineData("events/console")]
     public void An_address_that_is_not_one_of_those_pages_is_not_gated(string path)
     {
         Assert.Equal(RouteAccess.Open, WitnessRoutePolicy.AccessTo(null, Of(path)));
@@ -117,6 +128,26 @@ public sealed class WitnessRoutePolicyTests
             Assert.True(
                 RouteAccess.Open != WitnessRoutePolicy.AccessTo(null, address),
                 $"A visitor is not asked to sign in for {route}, a route of {page.Name}."
+            );
+        }
+    }
+
+    [Fact]
+    public void Every_route_of_the_Console_is_under_its_first_segment_and_is_one_a_visitor_is_taken_to_sign_in_for()
+    {
+        var routes = typeof(ConsoleRoutes)
+            .Assembly.GetTypes()
+            .SelectMany(page => page.GetCustomAttributes<RouteAttribute>().Select(x => (Page: page.Name, x.Template)))
+            .ToList();
+
+        Assert.NotEmpty(routes);
+        foreach (var (page, template) in routes)
+        {
+            var address = Regex.Replace(template, "{[^}]+}", EVENT);
+            Assert.StartsWith("/" + ConsoleRoutes.FIRST_SEGMENT, template, StringComparison.Ordinal);
+            Assert.True(
+                RouteAccess.SignIn == WitnessRoutePolicy.AccessTo(null, address),
+                $"A visitor is not asked to sign in for {template}, a route of {page}."
             );
         }
     }

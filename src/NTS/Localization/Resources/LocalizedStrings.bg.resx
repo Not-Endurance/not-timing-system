@@ -1044,4 +1044,7 @@
   <data name="Cascading_Delete_string" xml:space="preserve">
     <value>Изтрий със свързаните записи</value>
   </data>
+  <data name="Console_string" xml:space="preserve">
+    <value>Конзола</value>
+  </data>
 </root>

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using NTS.Tests.Integration.Infrastructure;
 using Xunit.Abstractions;
 
@@ -8,7 +9,9 @@ namespace NTS.Tests.Integration;
 /// The size of what a visitor downloads to open the app (#645), measured on what is delivered: the Ui published for Release,
 /// the files the Api serves as Brotli. A debug build is several times larger and says nothing about it. The budget is a
 /// ceiling the app stays under, set above what it was measured at when it was written down; a change that raises the size
-/// past it raises it on purpose, and says so by raising the ceiling here, in the Readme of the Ui and in the ticket.
+/// past it raises it on purpose, and says so by raising the ceiling here, in the Readme of the Ui and in the ticket. What the
+/// app fetches only when a person goes to the Console (#646: the assemblies the boot configuration lists as lazy) is
+/// published, and is not part of the first load: the Console is there, and not in what a viewer downloads.
 /// </summary>
 public sealed class UiFirstLoadBudgetTests
 {
@@ -34,8 +37,16 @@ public sealed class UiFirstLoadBudgetTests
         {
             await PublishAsync(paths, output);
 
-            var sent = SentFiles(Path.Combine(output, "wwwroot"));
+            var wwwroot = Path.Combine(output, "wwwroot");
+            var all = SentFiles(wwwroot);
+            var lazy = LazyAssemblies(wwwroot);
+            var sent = all.Where(x => !lazy.Contains(Path.GetFileName(x.Name))).ToList();
             var total = sent.Sum(x => x.Bytes);
+            Assert.Contains(lazy, x => x.StartsWith("NoTiming.Console.", StringComparison.Ordinal)); // the Console is lazy
+            Assert.Contains(all, x => x.Name.Contains("NoTiming.Console.", StringComparison.Ordinal)); // and it is published
+            _output.WriteLine(
+                $"lazy: {string.Join(", ", all.Where(x => lazy.Contains(Path.GetFileName(x.Name))).Select(x => $"{x.Name} {x.Bytes / 1024} KB"))}"
+            );
             foreach (var biggest in sent.OrderByDescending(x => x.Bytes).Take(12))
             {
                 _output.WriteLine($"{biggest.Bytes / 1024, 7} KB  {biggest.Name}");
@@ -49,6 +60,7 @@ public sealed class UiFirstLoadBudgetTests
                 $"The app is {total / 1024.0 / 1024.0:0.00} MB to download, over its budget of {BUDGET_BYTES / 1024.0 / 1024.0:0.00} MB."
             );
             Assert.DoesNotContain(sent, x => x.Name.Contains("Msal", StringComparison.OrdinalIgnoreCase));
+            Assert.DoesNotContain(sent, x => x.Name.Contains("NoTiming.Console.", StringComparison.Ordinal));
         }
         finally
         {
@@ -57,6 +69,29 @@ public sealed class UiFirstLoadBudgetTests
                 Directory.Delete(output, recursive: true);
             }
         }
+    }
+
+    /// <summary>
+    /// The files that the boot configuration, which the runtime script carries, lists as lazy: the browser fetches them only
+    /// when the app asks for them. They are named as they are published, with the fingerprint.
+    /// </summary>
+    static HashSet<string> LazyAssemblies(string wwwroot)
+    {
+        var script = Directory
+            .EnumerateFiles(Path.Combine(wwwroot, "_framework"), "dotnet.*.js")
+            .Single(x => !x.Contains(".native.") && !x.Contains(".runtime."));
+        var section = Regex.Match(
+            File.ReadAllText(script),
+            @"""lazyAssembly""\s*:\s*\[(?<list>.*?)\]",
+            RegexOptions.Singleline
+        );
+        Assert.True(section.Success, "The boot configuration lists no lazy assembly.");
+        return
+        [
+            .. Regex
+                .Matches(section.Groups["list"].Value, @"""name""\s*:\s*""(?<name>[^""]+)""")
+                .Select(x => x.Groups["name"].Value),
+        ];
     }
 
     /// <summary>The files of the published app as they are sent: the Brotli file where there is one, and the file itself where there is none.</summary>
