@@ -45,12 +45,12 @@ public sealed class NoTimingUiBrowserTests : IClassFixture<ApiHostFixture>, ICla
 
         await Expect(page.GetByText("Integration Rider").First).ToBeVisibleAsync(Loaded());
         await page.EvaluateAsync($"Blazor.navigateTo('/events/{scene.EventId}/arrivelist')");
-        await Expect(page.GetByText("Arrivelist").First).ToBeVisibleAsync(Loaded());
-        Assert.DoesNotContain("Integration Rider", await page.InnerTextAsync("body")); // nobody has arrived
+        var onTheirWay = page.GetByText("Integration Rider");
+        await Expect(onTheirWay).ToHaveCountAsync(3, Counted()); // all three started an hour ago, and nobody has arrived
 
         await scene.SendAsync(SnapshotType.Arrive, 1); // an Official sends a Snapshot, somewhere else
 
-        await Expect(page.GetByText("Integration Rider").First).ToBeVisibleAsync(Loaded());
+        await Expect(onTheirWay).ToHaveCountAsync(2, Counted()); // the one who arrived leaves the list, on a page nobody touched
         await AssertStorageHoldsNoSignInAsync(page, null);
 
         await page.GetByText("Sign In").ClickAsync(); // the drawer takes them to the host's page, and back to this one
@@ -452,6 +452,12 @@ public sealed class NoTimingUiBrowserTests : IClassFixture<ApiHostFixture>, ICla
     static LocatorAssertionsToBeVisibleOptions Loaded()
     {
         return new LocatorAssertionsToBeVisibleOptions { Timeout = PATIENCE };
+    }
+
+    /// <summary>The time to wait for a count that is to change, which the Ui is loaded by when it does.</summary>
+    static LocatorAssertionsToHaveCountOptions Counted()
+    {
+        return new LocatorAssertionsToHaveCountOptions { Timeout = PATIENCE };
     }
 
     static ILocatorAssertions Expect(ILocator locator)
