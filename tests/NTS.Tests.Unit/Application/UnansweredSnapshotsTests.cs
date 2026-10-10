@@ -1,5 +1,6 @@
 using Not.Domain.Exceptions;
 using NoTiming.Ui.Features.Core.Dashboard;
+using NoTiming.Ui.Features.Core.EventViews;
 using NoTiming.Ui.Features.Core.Participations;
 using NTS.Application.UserSession;
 using NTS.Contracts.Core;
@@ -8,6 +9,7 @@ using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -259,6 +261,135 @@ public sealed class UnansweredSnapshotsTests
     }
 
     [Fact]
+    public async Task A_group_is_not_sent_when_the_person_may_no_longer_send_it_by_the_time_the_wait_is_over()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        var (view, access) = await rig.ViewWithAccessAsync();
+        using var opened = view;
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+        var sent = rig.Publisher.Published.Count;
+        access.Become(WitnessAccessLevel.Registered); // what they may do was taken from them while the group waited
+
+        rig.Timer.Elapse();
+        await rig.Resent(rig.Service);
+
+        Assert.Equal(sent, rig.Publisher.Published.Count);
+        Assert.False(rig.Timer.IsWaiting);
+        Assert.NotNull(rig.Service.Unanswered); // it stays the device's, for when they may
+        Assert.NotNull(rig.Kept.Of(rig.Account.Current!.Id, LIVE_EVENT_ID));
+    }
+
+    [Fact]
+    public async Task A_group_is_only_sent_again_on_the_authority_of_the_Event_it_is_of()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+        using var other = await rig.ViewOfAnotherEventAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(other, SnapshotType.Arrive)); // now it is the other's that waits
+        var sent = rig.Publisher.Published.Count;
+        rig.Publisher.Fail = null;
+
+        rig.Timer.Elapse(); // the wait of the page of the first Event is over
+        await rig.Resent(rig.Service);
+
+        Assert.Equal(sent, rig.Publisher.Published.Count);
+    }
+
+    [Fact]
+    public async Task The_page_of_another_Event_does_not_send_a_group_that_waits_for_its_own()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+        var service = await rig.ReloadAsync();
+        var waits = rig.Timer.Spans.Count;
+        using var other = await rig.ViewOfAnotherEventAsync();
+
+        service.Resume(other);
+
+        Assert.True(service.Resending.IsCompleted);
+        Assert.Equal(waits, rig.Timer.Spans.Count);
+        Assert.NotNull(service.Unanswered);
+    }
+
+    [Fact]
+    public async Task A_group_the_device_could_not_keep_is_still_sent_from_the_page_after_the_state_is_loaded_again()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Kept.CannotKeep = true;
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+
+        await rig.Service.Handle(new EventConnected(LIVE_EVENT_ID), default); // the connection is back, and the state is read again
+        rig.Publisher.Fail = null;
+        rig.Timer.Elapse();
+        await rig.Resent(rig.Service);
+
+        Assert.Equal(2, rig.Publisher.Published.Count);
+        Assert.Equal(SnapshotIds.Of(rig.Publisher.Published[0]), SnapshotIds.Of(rig.Publisher.Published[1]));
+        Assert.Null(rig.Service.Unanswered);
+        Assert.Single(rig.Service.History);
+    }
+
+    [Fact]
+    public async Task What_the_page_held_of_another_Event_is_not_held_when_the_state_is_loaded_for_this_one()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var other = await rig.ViewOfAnotherEventAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(other, SnapshotType.Arrive));
+
+        await rig.Service.Handle(new EventConnected(LIVE_EVENT_ID), default);
+
+        Assert.Null(rig.Service.Unanswered);
+    }
+
+    [Fact]
+    public async Task Nothing_waits_for_a_person_who_is_gone_and_the_device_keeps_what_was_theirs()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+        var person = rig.Account.Current!.Id;
+        rig.Account.Current = null;
+
+        await rig.Service.Handle(new EventConnected(LIVE_EVENT_ID), default);
+
+        Assert.Null(rig.Service.Unanswered);
+        Assert.NotNull(rig.Kept.Of(person, LIVE_EVENT_ID));
+    }
+
+    [Fact]
+    public async Task Leaving_the_Event_ends_the_waiting_of_its_group_in_the_page_and_the_device_keeps_it()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+
+        await rig.Service.Handle(new EventDisconnected(LIVE_EVENT_ID), default);
+        rig.Timer.Elapse();
+        await rig.Resent(rig.Service);
+
+        Assert.Null(rig.Service.Unanswered);
+        Assert.Single(rig.Publisher.Published); // nothing was sent from a page that left the Event
+        Assert.NotNull(rig.Kept.Of(rig.Account.Current!.Id, LIVE_EVENT_ID)); // and it is the device's for when they are back
+    }
+
+    [Fact]
     public async Task What_is_sent_by_hand_and_what_is_sent_again_are_never_sent_at_the_same_time()
     {
         var rig = await Rig.StartAsync(ParticipationFixtures.Active(1), ParticipationFixtures.Active(2));
@@ -304,6 +435,21 @@ public sealed class UnansweredSnapshotsTests
         Assert.Equal(1, notAllowed.Account.Refreshes); // access that was removed shows on the next request
         Assert.Equal(1, signedOut.Account.Refreshes);
         Assert.Equal(0, ended.Account.Refreshes); // an Event that has ended is not about the person
+    }
+
+    [Fact]
+    public async Task A_refusal_of_a_group_sent_again_from_the_history_makes_the_account_be_asked_too()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        using var view = await rig.ViewAsync();
+        await rig.Service.Publish(view, SnapshotType.Arrive);
+        var sent = Assert.Single(rig.Service.History);
+        rig.Publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, 403, "not-allowed", "You may not.");
+
+        await Assert.ThrowsAsync<DomainException>(() => rig.Service.RePublish(view, sent, SnapshotType.Arrive));
+
+        Assert.Equal(1, rig.Account.Refreshes); // access that was removed shows on the next request, whichever it is
     }
 
     static async Task Eventually(Func<bool> condition)
@@ -360,6 +506,19 @@ public sealed class UnansweredSnapshotsTests
             return await LiveView(_store, level);
         }
 
+        /// <summary>The Event the app follows, opened, with what the person may do about it in the hands of the test.</summary>
+        public async Task<(IViewedEvent View, AccessOf Access)> ViewWithAccessAsync()
+        {
+            var access = new AccessOf(WitnessAccessLevel.Official);
+            return (await OpenAsync(LIVE_EVENT_ID, access), access);
+        }
+
+        /// <summary>Another Live Event, opened, as a person who may write to it sees it.</summary>
+        public Task<IViewedEvent> ViewOfAnotherEventAsync()
+        {
+            return OpenAsync(OTHER_LIVE_EVENT_ID, new AccessOf(WitnessAccessLevel.Official));
+        }
+
         /// <summary>Selects the Participations of the numbers and captures a time for each.</summary>
         public void Capture(params int[] numbers)
         {
@@ -378,6 +537,19 @@ public sealed class UnansweredSnapshotsTests
         public async Task Resent(SnapshotService service)
         {
             await service.Resending.WaitAsync(TimeSpan.FromSeconds(10));
+        }
+
+        async Task<IViewedEvent> OpenAsync(Guid eventId, AccessOf access)
+        {
+            var view = new LiveEventView(
+                EventOf(eventId),
+                _store,
+                access,
+                new ReadOnlyRepository<Ranking>([]),
+                new ReadOnlyRepository<Official>([])
+            );
+            await view.Load();
+            return view;
         }
     }
 

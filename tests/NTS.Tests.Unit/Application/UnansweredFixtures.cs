@@ -12,6 +12,9 @@ internal sealed class InMemoryUnansweredSnapshots : IUnansweredSnapshots
 {
     readonly Dictionary<(Guid, Guid), SnapshotGroup> _kept = [];
 
+    /// <summary>A storage that cannot be written, as a browser can be: it keeps nothing and says nothing.</summary>
+    public bool CannotKeep { get; set; }
+
     /// <summary>What was asked of the store, in order.</summary>
     public List<string> Calls { get; } = [];
 
@@ -29,7 +32,11 @@ internal sealed class InMemoryUnansweredSnapshots : IUnansweredSnapshots
     public Task Keep(Guid accountId, Guid eventId, SnapshotGroup group)
     {
         Calls.Add("keep");
-        _kept[(accountId, eventId)] = group;
+        if (!CannotKeep)
+        {
+            _kept[(accountId, eventId)] = group;
+        }
+
         return Task.CompletedTask;
     }
 

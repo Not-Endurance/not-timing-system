@@ -25,6 +25,7 @@ public class WitnessAccessContext
 {
     readonly INtsSocketContext _socketContext;
     readonly JsonApiClient _api;
+    (Guid Person, Guid? Event, WitnessAccessLevel Level)? _said;
 
     public WitnessAccessContext(INtsSocketContext socketContext, IAccountSession account, JsonApiClient api)
         : base(account)
@@ -43,7 +44,7 @@ public class WitnessAccessContext
             return false; // the host has not said who is signed in: nobody is not an answer, so ask again
         }
 
-        if (!Account.IsSignedIn)
+        if (Account.Current is not { } person)
         {
             AccessLevel = WitnessAccessLevel.Anonymous;
             return true;
@@ -51,14 +52,22 @@ public class WitnessAccessContext
 
         // The level is said once, when the Api has answered: a person who may send Snapshots is not shown as one who may not
         // for the time it takes to ask again, which a page that decides by the level (the Snapshot page) would act on. An Api
-        // that cannot be reached leaves the person registered, and the state is loaded again.
-        var level = WitnessAccessLevel.Registered;
+        // that cannot answer leaves what it last said of this person and Event, so that a phone that lost its connection for a
+        // moment does not take the page and the sending from an Official (the Api refuses what they may no longer do when it
+        // is sent), and the person registered when it has said nothing; and the state is loaded again.
+        var eventId = _socketContext.Event?.Id;
+        var level =
+            _said is { } said && said.Person == person.Id && said.Event == eventId
+                ? said.Level
+                : WitnessAccessLevel.Registered;
         try
         {
-            if (_socketContext.Event is { } selected && await CanSendSnapshots(selected.Id))
+            if (eventId is { } id)
             {
-                level = WitnessAccessLevel.Official;
+                level = await CanSendSnapshots(id) ? WitnessAccessLevel.Official : WitnessAccessLevel.Registered;
             }
+
+            _said = (person.Id, eventId, level);
         }
         finally
         {
@@ -80,12 +89,17 @@ public class WitnessAccessContext
 
     /// <summary>
     /// Whether the Api lets the caller send a Snapshot to the Event. What it cannot answer, because the caller is not signed
-    /// in to it, is a no: the Snapshot is refused by the Api again when it is sent. An Api that cannot be reached leaves the
-    /// state to be loaded again, as it does for every stateful service.
+    /// in to it, is a no: the Snapshot is refused by the Api again when it is sent. An Api that cannot be reached, or that
+    /// fails (5xx), has not answered: the state is loaded again, as it is for every stateful service.
     /// </summary>
     async Task<bool> CanSendSnapshots(Guid eventId)
     {
         var response = await _api.Send(HttpMethod.Get, $"events/{eventId}/capabilities");
+        if ((int)response.Status >= 500)
+        {
+            throw response.ToException();
+        }
+
         return response is { IsSuccess: true, Document: { } document }
             && document.GetProperty("data").GetProperty("attributes").TryGetProperty("canSnapshot", out var can)
             && can.ValueKind == JsonValueKind.True;

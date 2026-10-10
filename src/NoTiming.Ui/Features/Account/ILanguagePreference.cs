@@ -14,8 +14,8 @@ public interface ILanguagePreference
     Task Apply();
 
     /// <summary>
-    /// Keeps the language the person chose. The texts are written when a page is rendered, so the app is loaded again to
-    /// have all of them in it.
+    /// Keeps the language the person chose, and fails when the browser cannot keep it. The texts are written when a page is
+    /// rendered, so the app is loaded again to have all of them in it.
     /// </summary>
     Task Choose(string code);
 }

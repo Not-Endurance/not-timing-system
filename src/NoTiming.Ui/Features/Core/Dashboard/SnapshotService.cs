@@ -193,7 +193,7 @@ public class SnapshotService
 
     public void Resume(IViewedEvent view)
     {
-        if (_unanswered is { CanBeSentAgain: true } waiting && waiting.EventId == view.Event.Id && view.CanWrite)
+        if (CanResend(view))
         {
             StartResending(view);
         }
@@ -257,13 +257,10 @@ public class SnapshotService
     /// status), asked for time (408, 429) or said to send it again (a Participation changed by too many at once). Anything
     /// else, such as a person who may not or an Event that has ended, is its answer, and the same request gets the same one.
     /// </summary>
-    static bool IsOnlyForNow(SnapshotReceipt receipt)
+    static bool IsOnlyForNow(SnapshotReceipt notRecorded)
     {
-        return !receipt.IsRecorded
-            && (
-                receipt.Status is 0 or 408 or 429 or >= 500
-                || string.Equals(receipt.ErrorCode, "participation-busy", StringComparison.Ordinal)
-            );
+        return notRecorded.Status is 0 or 408 or 429 or >= 500
+            || string.Equals(notRecorded.ErrorCode, "participation-busy", StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -279,7 +276,7 @@ public class SnapshotService
         }
         finally
         {
-            if (_unanswered is { CanBeSentAgain: true })
+            if (CanResend(view))
             {
                 StartResending(view);
             }
@@ -382,6 +379,15 @@ public class SnapshotService
         }
     }
 
+    /// <summary>
+    /// Whether a group that can be sent again waits for the Event the view shows and the person may send it: a group is only
+    /// sent on the authority of the Event it is of, and not while the person may not.
+    /// </summary>
+    bool CanResend(IViewedEvent view)
+    {
+        return _unanswered is { CanBeSentAgain: true } waiting && waiting.EventId == view.Event.Id && view.CanWrite;
+    }
+
     void StartResending(IViewedEvent view)
     {
         if (_resending.IsCompleted)
@@ -397,7 +403,7 @@ public class SnapshotService
     async Task ResendUntilAnswered(IViewedEvent view)
     {
         var wait = FIRST_RESEND;
-        while (!_stopped.IsCancellationRequested && _unanswered is { CanBeSentAgain: true } && view.CanWrite)
+        while (!_stopped.IsCancellationRequested && CanResend(view))
         {
             try
             {
@@ -433,11 +439,13 @@ public class SnapshotService
         await _sending.WaitAsync(_stopped.Token);
         try
         {
-            if (_unanswered is not { CanBeSentAgain: true } waiting || waiting.EventId != view.Event.Id)
+            // What was true when the wait began may not be now: the group is answered, or the person may no longer send it.
+            if (!CanResend(view))
             {
                 return;
             }
 
+            var waiting = _unanswered!;
             var (group, receipts) = await SendAsync(
                 waiting.EventId,
                 [.. waiting.Group.Entries.Select(CopySnapshot)],
@@ -451,14 +459,23 @@ public class SnapshotService
         }
     }
 
-    /// <summary>The group the device kept for the person and the Event, if there is one, selected again with the times it was made with.</summary>
+    /// <summary>
+    /// The group the device kept for the person and the Event, if there is one, selected again with the times it was made
+    /// with. What the page holds of the same Event stays when the device holds nothing, as a storage that cannot be written
+    /// keeps nothing and the group is then sent from the page for as long as the page is open.
+    /// </summary>
     async Task RestoreUnanswered()
     {
-        _unanswered = null;
         await _account.Load();
         if (_account.Current is not { } person || _socketContext.Event is not { } selected)
         {
+            _unanswered = null;
             return;
+        }
+
+        if (_unanswered is { } held && held.EventId != selected.Id)
+        {
+            _unanswered = null;
         }
 
         if (await _unansweredSnapshots.Read(person.Id, selected.Id) is not { } kept)

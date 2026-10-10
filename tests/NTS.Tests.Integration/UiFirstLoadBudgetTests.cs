@@ -108,7 +108,15 @@ public sealed class UiFirstLoadBudgetTests
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(10));
-        await process.WaitForExitAsync(timeout.Token);
+        try
+        {
+            await process.WaitForExitAsync(timeout.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            process.Kill(entireProcessTree: true); // a publish that is taking this long is not left running behind the test
+            throw;
+        }
 
         Assert.True(process.ExitCode == 0, $"The Ui did not publish:{Environment.NewLine}{collected.Dump()}");
     }

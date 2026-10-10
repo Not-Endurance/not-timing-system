@@ -1,5 +1,10 @@
+using System.Reflection;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Components;
 using NoTiming.Ui;
 using NoTiming.Ui.Features.Account;
+using NoTiming.Ui.Features.Core.Snapshots;
+using NoTiming.Ui.Features.Profile;
 using NTS.Contracts.Features.Account;
 
 namespace NTS.Tests.Unit.Application;
@@ -96,6 +101,24 @@ public sealed class WitnessRoutePolicyTests
     public void A_person_without_a_complete_profile_still_has_the_profile_and_every_page_that_only_shows(string path)
     {
         Assert.Equal(RouteAccess.Open, WitnessRoutePolicy.AccessTo(Account(profileComplete: false), Of(path)));
+    }
+
+    [Theory]
+    [InlineData(typeof(SnapshotContent))]
+    [InlineData(typeof(ProfileContent))]
+    public void Every_route_of_a_page_that_asks_for_a_person_is_one_the_policy_asks_it_for(Type page)
+    {
+        var routes = page.GetCustomAttributes<RouteAttribute>().Select(x => x.Template).ToList();
+
+        Assert.NotEmpty(routes);
+        foreach (var route in routes)
+        {
+            var address = Regex.Replace(route, "{[^}]+}", EVENT);
+            Assert.True(
+                RouteAccess.Open != WitnessRoutePolicy.AccessTo(null, address),
+                $"A visitor is not asked to sign in for {route}, a route of {page.Name}."
+            );
+        }
     }
 
     static string Of(string path)

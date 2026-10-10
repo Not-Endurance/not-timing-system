@@ -140,12 +140,16 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
         );
         using var session = new AccountSession(JsonApiClients.Of(api, person, out _));
         await session.Load();
+        var told = 0;
+        session.ObservableEvent.Subscribe(() => told++);
 
         await session.SelectTenant(other);
         var selected = session.Current!;
+        var toldOfTheSelection = told;
         var refused = await Assert.ThrowsAsync<InvalidOperationException>(() => session.SelectTenant(stranger));
         await session.SelectTenant(null);
 
+        Assert.True(toldOfTheSelection > 0); // who watches is told, as the Tenant is where they read and write
         Assert.Equal(other, selected.SelectedTenantId);
         Assert.Equal(other, selected.CurrentTenantId);
         Assert.Contains("not-a-member", refused.Message);
@@ -169,6 +173,22 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
         Assert.Equal(2, host.Asked); // and is asked again, not remembered
     }
 
+    [Fact]
+    public async Task A_host_that_answers_with_a_failure_is_not_a_visitor_and_is_asked_again_on_the_next_load()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var session = new AccountSession(JsonApiClients.Of(api, null, out var asked));
+        asked.Answer = _ => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError);
+
+        await session.Load();
+        var whileFailing = (session.Current, session.IsKnown);
+        asked.Answer = null;
+        await session.Load();
+
+        Assert.Equal((null, false), whileFailing); // a host that failed has not said nobody
+        Assert.True(session.IsKnown);
+    }
+
     [Theory]
     [InlineData(
         "/events/3f2504e0-4f89-41d3-9a0c-0305e82c3301/snapshot",
@@ -179,6 +199,7 @@ public sealed class AccountSessionTests : IClassFixture<MongoFixture>
     [InlineData("", "/sign-in")]
     [InlineData("https://evil.example/steal", "/sign-in")]
     [InlineData("//evil.example/steal", "/sign-in")]
+    [InlineData("/\\evil.example/steal", "/sign-in")] // a browser reads the backslash as a slash
     public void The_server_page_to_sign_in_returns_to_a_page_of_the_app_and_to_no_other_site(
         string back,
         string expected

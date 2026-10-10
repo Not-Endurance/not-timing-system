@@ -1,8 +1,13 @@
+using System.Net;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Not.Application.RPC;
 using NoTiming.Ui.Features.Access;
 using NoTiming.Ui.Features.Account;
 using NTS.Contracts.Features.Access;
+using NTS.Contracts.Socket;
+using NTS.Domain.Core.Aggregates;
+using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 
@@ -70,6 +75,80 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         await Eventually(() => access.AccessLevel == WitnessAccessLevel.Registered);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task An_Official_stays_one_while_the_Api_cannot_answer_and_is_what_it_says_when_it_does(
+        bool failsWithAStatus
+    )
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = api.CreateClient();
+        var (eventId, official) = await SceneAsync(api, client);
+        var json = JsonApiClients.Of(api, official, out var asked);
+        using var account = new AccountSession(json);
+        using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
+        await access.Load();
+        var told = new List<WitnessAccessLevel>();
+        access.ObservableEvent.Subscribe(() => told.Add(access.AccessLevel));
+        asked.Answer = request =>
+            !request.RequestUri!.AbsolutePath.EndsWith("/capabilities", StringComparison.Ordinal) ? null
+            : failsWithAStatus ? new HttpResponseMessage(HttpStatusCode.BadGateway)
+            : throw new HttpRequestException("The connection dropped.");
+
+        await account.Refresh(); // the connection is back and the Api is asked what the person may do, and cannot answer
+        await Eventually(() => told.Count > 0);
+
+        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel);
+        await EventSeed.Grants(_mongo.ConnectionString).DeleteManyAsync(new BsonDocument("Email", official.Email));
+        asked.Answer = null;
+        await account.Refresh();
+        await Eventually(() => told.Count > 1);
+
+        Assert.Equal(WitnessAccessLevel.Registered, access.AccessLevel); // what the Api says is what the level is
+    }
+
+    [Fact]
+    public async Task What_the_Api_said_of_one_Event_is_not_kept_for_another_when_it_cannot_answer()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = api.CreateClient();
+        var (eventId, official) = await SceneAsync(api, client);
+        var json = JsonApiClients.Of(api, official, out var asked);
+        using var account = new AccountSession(json);
+        var followed = new FollowedEvent(eventId);
+        using var access = new WitnessAccessContext(followed, account, json);
+        await access.Load();
+        var told = new List<WitnessAccessLevel>();
+        access.ObservableEvent.Subscribe(() => told.Add(access.AccessLevel));
+        followed.Follow(Guid.NewGuid()); // the person is looking at another Event
+        asked.Answer = _ => throw new HttpRequestException("The connection dropped.");
+
+        await account.Refresh();
+        await Eventually(() => told.Count > 0);
+
+        Assert.Equal(WitnessAccessLevel.Registered, access.AccessLevel); // nothing was said of this one
+    }
+
+    [Fact]
+    public async Task The_level_is_not_said_while_the_host_has_not_said_who_is_signed_in_and_is_asked_again()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var json = JsonApiClients.Of(api, null, out var asked);
+        asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+        using var account = new AccountSession(json);
+        using var access = new WitnessAccessContext(new SelectedEvent(Guid.NewGuid()), account, json);
+
+        await access.Load();
+
+        Assert.Equal(WitnessAccessLevel.Unknown, access.AccessLevel); // nobody is not what the host said
+
+        asked.Answer = null;
+        await access.Load();
+
+        Assert.Equal(WitnessAccessLevel.Anonymous, access.AccessLevel); // it said, and a visitor is what it said
+    }
+
     static int CapabilityRequests(JsonApiClients.Requests asked)
     {
         lock (asked.Asked)
@@ -110,5 +189,26 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         }
 
         Assert.True(condition(), "The Witness did not do what was waited for.");
+    }
+
+    /// <summary>The Event the Ui follows, which the person can leave for another.</summary>
+    sealed class FollowedEvent : INtsSocketContext
+    {
+        public FollowedEvent(Guid eventId)
+        {
+            Follow(eventId);
+        }
+
+        public bool IsConnected => Event != null;
+
+        public SocketConnectionStatus Status =>
+            IsConnected ? SocketConnectionStatus.Connected : SocketConnectionStatus.Disconnected;
+
+        public EventInformation? Event { get; private set; }
+
+        public void Follow(Guid eventId)
+        {
+            Event = IntegrationPayloadFactory.EventInformation(eventId);
+        }
     }
 }

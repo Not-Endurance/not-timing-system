@@ -38,7 +38,7 @@ Judge is a Windows executable (MAUI Blazor Hybrid) with no sign-in, Witness is a
 
 ADR-0003 is superseded: no anonymous Judge route group is ever built. ADR-0002 is amended: the .NET scope, and the reason the hubs must share a process (it was Judge's in-memory connection, ADR-0013). REST and the hub stay in one process and single-instance until a hub backplane exists.
 
-Phones that follow an Event download the shared Ui bundle; a spike sizes it with the Console loaded on demand. Ranking, FEI export and Results rendering run in WebAssembly instead of natively, on Event-sized data; any step that proves slow moves behind the API. A Console tab survives a server restart, because its state is in the browser and the hub reconnects.
+Phones that follow an Event download the shared Ui bundle; a spike sizes it with the Console loaded on demand. #645 measured it: 8.29 MB as Brotli over 180 files for the viewers' app, which a test holds under 9 MB, and the Console's pages are kept out of it by a seam (the first segment of a path names the assemblies fetched when a person goes there) that the Console ticket fills. Ranking, FEI export and Results rendering run in WebAssembly instead of natively, on Event-sized data; any step that proves slow moves behind the API. A Console tab survives a server restart, because its state is in the browser and the hub reconnects.
 
 Judge and Witness stop existing as names: the remaining wording in ADRs, the glossary, routes, resource strings and the integration tests follows `CONTEXT.md` (Console, Snapshot), one ticket at a time.
 

@@ -24,6 +24,8 @@ public sealed class LazyRoutesTests
     [InlineData("Console/events/3f2504e0-4f89-41d3-9a0c-0305e82c3301/setup")]
     [InlineData("/CONSOLE/athletes?sort=name")]
     [InlineData("console#top")]
+    [InlineData("console?tab=1")]
+    [InlineData("/console/?tab=1#top")]
     public void A_path_under_a_prefix_needs_the_files_of_the_prefix(string path)
     {
         Assert.Equal(["NoTiming.Console.wasm", "NoTiming.Console.Setup.wasm"], LazyRoutes.NeededBy(path, TABLE));

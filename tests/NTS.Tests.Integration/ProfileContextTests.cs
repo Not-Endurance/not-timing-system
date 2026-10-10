@@ -1,3 +1,5 @@
+using System.Net;
+using System.Text.Json;
 using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Features.Profile;
 using NoTiming.Ui.Storage.REST;
@@ -25,13 +27,34 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
     public async Task A_visitor_has_no_profile_and_is_asked_for_none()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
-        using var ui = Open(api, null, out _);
+        using var ui = Open(api, null, out var asked);
 
         await ui.Profile.Load();
 
         Assert.Null(ui.Profile.Profile);
         Assert.False(ui.Profile.RequiresProfileCompletion);
         Assert.Equal("", ui.Profile.WelcomeName);
+        Assert.Equal(["GET /api/me"], asked.Asked); // only who is signed in: a visitor has no profile to read
+    }
+
+    [Fact]
+    public async Task A_session_that_ended_while_the_profile_was_read_leaves_no_profile_and_is_not_read_again_and_again()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = api.CreateClient();
+        var home = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home, name: "Ana Petrova");
+        using var ui = Open(api, person, out var asked);
+        asked.Answer = request =>
+            request.RequestUri!.AbsolutePath.EndsWith("/me/profile", StringComparison.Ordinal)
+                ? new HttpResponseMessage(HttpStatusCode.Unauthorized)
+                : null;
+
+        await ui.Profile.Load();
+        await ui.Profile.Load();
+
+        Assert.Null(ui.Profile.Profile);
+        Assert.Single(asked.Asked, x => x.EndsWith("/me/profile", StringComparison.Ordinal)); // the host said so, and it is loaded
     }
 
     [Fact]
@@ -153,6 +176,10 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
         var iso = CountrySeed.UniqueIsoCode();
         var nf = "N" + iso[..3];
         await CountrySeed.AddAsync(_mongo.ConnectionString, "Searchland " + iso, iso, nf);
+        var last = CountrySeed.UniqueIsoCode();
+        var first = CountrySeed.UniqueIsoCode();
+        await CountrySeed.AddAsync(_mongo.ConnectionString, "Zzz " + last, last, "Z" + last[..2]); // stored before the one it is to follow
+        await CountrySeed.AddAsync(_mongo.ConnectionString, "!!! " + first, first, "A" + first[..2]);
         var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null);
         using var ui = Open(api, person, out _);
         await ui.Profile.Load();
@@ -166,7 +193,50 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
         Assert.Equal(iso, Assert.Single(byIso).IsoCode);
         Assert.Equal(nf, Assert.Single(byNf).NfCode);
         Assert.Empty(none);
-        Assert.Contains(await ui.Profile.SearchCountries("", CancellationToken.None), x => x.IsoCode == iso);
+        var all = (await ui.Profile.SearchCountries("", CancellationToken.None)).Select(x => x.IsoCode).ToList();
+        Assert.Contains(iso, all);
+        Assert.True(all.IndexOf(first) < all.IndexOf(last)); // by name, whatever the order they are kept in
+    }
+
+    [Fact]
+    public async Task What_the_person_typed_is_saved_without_the_spaces_around_it()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = api.CreateClient();
+        var iso = CountrySeed.UniqueIsoCode();
+        await CountrySeed.AddAsync(_mongo.ConnectionString, "Testland " + iso, iso, "T" + iso[..2]);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null);
+        using var ui = Open(api, person, out var asked);
+        await ui.Profile.Load();
+        string? sent = null;
+        asked.Before = async request =>
+        {
+            if (
+                request.Method == HttpMethod.Patch
+                && request.RequestUri!.AbsolutePath.EndsWith("/me/profile", StringComparison.Ordinal)
+            )
+            {
+                sent = await request.Content!.ReadAsStringAsync();
+            }
+        };
+        var model = ui.Profile.CreateFormModel();
+        model.GivenName = "  Vera ";
+        model.MiddleName = " K. ";
+        model.Surname = " Georgieva  ";
+        model.Country = (await ui.Profile.SearchCountries(iso, CancellationToken.None)).Single();
+        model.Club = "  Sofia Riders";
+        model.FeiId = " 10012345 ";
+
+        await ui.Profile.Save(model);
+
+        using var document = JsonDocument.Parse(sent!);
+        var attributes = document.RootElement.GetProperty("data").GetProperty("attributes");
+        Assert.Equal(
+            ["Vera", "K.", "Georgieva", "Sofia Riders", "10012345"],
+            new[] { "givenName", "middleName", "surname", "club", "feiId" }.Select(x =>
+                attributes.GetProperty(x).GetString()
+            )
+        );
     }
 
     [Fact]

@@ -210,6 +210,58 @@ public sealed class NoTimingUiBrowserTests : IClassFixture<ApiHostFixture>, ICla
     }
 
     [Fact]
+    public async Task A_person_without_a_complete_profile_is_taken_to_complete_it_before_sending_Snapshots_and_has_the_pages_that_only_show()
+    {
+        var scene = await SceneAsync();
+        var person = await TenancySeed.AccountAsync(_host.MongoConnectionString, null, name: "Boris Ivanov"); // names no country
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+
+        await page.GotoAsync(device.Url($"/events/{scene.EventId}/snapshot"));
+        await page.WaitForURLAsync(
+            new Regex(@"/sign-in\?returnUrl="),
+            new PageWaitForURLOptions { Timeout = PATIENCE }
+        );
+        await SignInOnTheHostPagesAsync(page, person.Email);
+
+        await page.WaitForURLAsync(device.Url("/profile"), new PageWaitForURLOptions { Timeout = PATIENCE });
+        await Expect(page.GetByTestId("account-settings")).ToBeVisibleAsync(Loaded());
+        await page.EvaluateAsync($"Blazor.navigateTo('/events/{scene.EventId}/startlist')");
+        await Expect(page.GetByText("Integration Rider").First).ToBeVisibleAsync(Loaded()); // what only shows is theirs
+        Assert.Matches("/events/.+/startlist$", new Uri(page.Url).AbsolutePath);
+    }
+
+    [Fact]
+    public async Task A_host_that_cannot_say_who_is_signed_in_does_not_send_the_person_to_sign_in()
+    {
+        var scene = await SceneAsync();
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await page.RouteAsync(
+            "**/api/me",
+            route =>
+                route.FulfillAsync(
+                    new RouteFulfillOptions
+                    {
+                        Status = 503,
+                        ContentType = "application/vnd.api+json",
+                        Body = """{"errors":[{"status":"503","code":"unavailable","title":"Unavailable"}]}""",
+                    }
+                )
+        );
+
+        await page.GotoAsync(device.Url($"/events/{scene.EventId}/snapshot"));
+
+        await page.WaitForURLAsync(
+            device.Url($"/events/{scene.EventId}/performance"),
+            new PageWaitForURLOptions { Timeout = PATIENCE }
+        ); // it cannot tell who is there, so it does not ask them to prove it: the Api decides what they may do
+        Assert.DoesNotContain("/sign-in", page.Url);
+    }
+
+    [Fact]
     public async Task The_account_page_holds_the_language_and_the_Federation_choices_and_the_Federation_only_for_a_person_with_more_than_one()
     {
         var mongo = _host.MongoConnectionString;
