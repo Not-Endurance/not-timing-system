@@ -131,6 +131,40 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task What_the_Api_said_of_one_person_is_not_kept_for_another_when_it_cannot_answer()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = api.CreateClient();
+        var (eventId, official) = await SceneAsync(api, client);
+        var somebodyElse = await SignedInAsync(
+            api,
+            client,
+            _mongo.ConnectionString,
+            await TenantAsync(_mongo.ConnectionString)
+        );
+        var cookie = new JsonApiClients.Cookie(
+            $"{ApiSessions.COOKIE_NAME}={official.Page.Cookie(ApiSessions.COOKIE_NAME)}"
+        );
+        var json = JsonApiClients.WithCookie(api, cookie, out var asked);
+        using var account = new AccountSession(json);
+        using var access = new WitnessAccessContext(new SelectedEvent(eventId), account, json);
+        await access.Load();
+        Assert.Equal(WitnessAccessLevel.Official, access.AccessLevel);
+        var told = new List<WitnessAccessLevel>();
+        access.ObservableEvent.Subscribe(() => told.Add(access.AccessLevel));
+        cookie.Value = $"{ApiSessions.COOKIE_NAME}={somebodyElse.Page.Cookie(ApiSessions.COOKIE_NAME)}"; // another person has signed in
+        asked.Answer = request =>
+            request.RequestUri!.AbsolutePath.EndsWith("/capabilities", StringComparison.Ordinal)
+                ? throw new HttpRequestException("The connection dropped.")
+                : null;
+
+        await account.Refresh();
+        await Eventually(() => told.Count > 0);
+
+        Assert.Equal(WitnessAccessLevel.Registered, access.AccessLevel); // what the first person was is not what this one is
+    }
+
+    [Fact]
     public async Task The_level_is_not_said_while_the_host_has_not_said_who_is_signed_in_and_is_asked_again()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using MongoDB.Bson;
 using NoTiming.Ui.Features.Account;
 using NoTiming.Ui.Features.Profile;
 using NoTiming.Ui.Storage.REST;
@@ -178,8 +179,9 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
         await CountrySeed.AddAsync(_mongo.ConnectionString, "Searchland " + iso, iso, nf);
         var last = CountrySeed.UniqueIsoCode();
         var first = CountrySeed.UniqueIsoCode();
-        await CountrySeed.AddAsync(_mongo.ConnectionString, "Zzz " + last, last, "Z" + last[..2]); // stored before the one it is to follow
-        await CountrySeed.AddAsync(_mongo.ConnectionString, "!!! " + first, first, "A" + first[..2]);
+        // The Api lists them in the order of their ids, so the one that is first by name has the last id, and the other way round.
+        await AddCountryAsync("Zzz " + last, last, "Z" + last[..2], "00");
+        await AddCountryAsync("!!! " + first, first, "A" + first[..2], "ff");
         var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, null);
         using var ui = Open(api, person, out _);
         await ui.Profile.Load();
@@ -281,6 +283,23 @@ public sealed class ProfileContextTests : IClassFixture<MongoFixture>
         var json = JsonApiClients.Of(api, person, out asked);
         var account = new AccountSession(json);
         return new UiOfAPerson(account, new WitnessProfileContext(account, new CountryApiRepository(json), json));
+    }
+
+    async Task AddCountryAsync(string name, string iso, string nf, string idStartsWith)
+    {
+        var id = Guid.Parse(idStartsWith + Guid.NewGuid().ToString()[2..]);
+        await CountrySeed
+            .Countries(_mongo.ConnectionString)
+            .InsertOneAsync(
+                new BsonDocument
+                {
+                    { "_id", new BsonBinaryData(id, GuidRepresentation.Standard) },
+                    { "TenantId", "nts" },
+                    { "Name", name },
+                    { "IsoCode", iso },
+                    { "NfCode", nf },
+                }
+            );
     }
 
     sealed class UiOfAPerson : IDisposable
