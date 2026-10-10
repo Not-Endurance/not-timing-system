@@ -360,6 +360,14 @@ namespace NTS.Localization
         public static string Person_string => LocalizeString(nameof(Person_string));
         public static string Link_account_helper_string => LocalizeString(nameof(Link_account_helper_string));
         public static string Official_string => LocalizeString(nameof(Official_string));
+        public static string Select_a_participation_string => LocalizeString(nameof(Select_a_participation_string));
+        public static string Participation_not_found_string => LocalizeString(nameof(Participation_not_found_string));
+        public static string Participation_changed_string => LocalizeString(nameof(Participation_changed_string));
+        public static string Time_recorded_string => LocalizeString(nameof(Time_recorded_string));
+        public static string Time_not_recorded_string => LocalizeString(nameof(Time_not_recorded_string));
+        public static string Time_not_taken_string => LocalizeString(nameof(Time_not_taken_string));
+        public static string Not_signed_in_string => LocalizeString(nameof(Not_signed_in_string));
+        public static string Now_string => LocalizeString(nameof(Now_string));
     }
 }
 #pragma warning restore NA0004

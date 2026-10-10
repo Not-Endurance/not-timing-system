@@ -11,4 +11,10 @@ public interface IParticipationStore : IStatefulService
 {
     IReadOnlyList<Participation> Participations { get; }
     Participation? Find(Guid id);
+
+    /// <summary>
+    /// Reads one Participation again, and completes when what the Api holds of it is what the store holds: a write that was
+    /// taken leaves the one in hand at the version it was read at, and one that was refused leaves a change that was not stored.
+    /// </summary>
+    Task Refresh(Guid id);
 }

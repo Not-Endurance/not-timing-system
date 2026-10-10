@@ -1,6 +1,7 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Injection;
+using Not.Storage.REST;
 using NTS.Contracts.Core;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
@@ -134,7 +135,7 @@ public sealed class ParticipationStore
     /// it names is read again. At most one read per Participation is in flight; events that arrive during it ask for
     /// one more read, once, when it has finished, and wait for that one.
     /// </summary>
-    Task Refresh(Guid id)
+    public Task Refresh(Guid id)
     {
         if (!IsConnected)
         {
@@ -170,7 +171,12 @@ public sealed class ParticipationStore
                     connection = _connection;
                 }
 
-                Apply(id, await _participations.Read(id), connection);
+                var read = await ReadAsync(id);
+                if (!read.Failed)
+                {
+                    Apply(id, read.Row, connection);
+                }
+
                 lock (_lock)
                 {
                     if (!reading.ReadAgain)
@@ -194,6 +200,17 @@ public sealed class ParticipationStore
 
             reading.Finished.SetException(ex);
         }
+    }
+
+    /// <summary>
+    /// One Participation as the Api holds it now. A read that did not come is not a Participation that is gone: when the
+    /// repository can say which it was, the store keeps what it has, as it is told again by the next change or load.
+    /// </summary>
+    async Task<RowRead<Participation>> ReadAsync(Guid id)
+    {
+        return _participations is IRowReader<Participation> reader
+            ? await reader.Find(id)
+            : new RowRead<Participation>(await _participations.Read(id), failed: false);
     }
 
     /// <summary>

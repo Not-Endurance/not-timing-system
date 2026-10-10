@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Microsoft.Playwright;
+using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.UiBrowser;
 
@@ -195,6 +196,160 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         await page.GetByText("Barza").First.ClickAsync();
         await dialog.GetByRole(AriaRole.Button, new() { Name = "Create", Exact = true }).ClickAsync();
         await Expect(page.GetByText("#7", new() { Exact = false }).First).ToBeVisibleAsync(Loaded());
+    }
+
+    [Fact]
+    public async Task The_Main_Operator_runs_a_Live_Event_from_the_dashboard_recording_a_time_and_eliminating_a_Participation()
+    {
+        var mongo = _host.MongoConnectionString;
+        var scene = await LiveScene.CreateAsync(mongo);
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+
+        // the Participations of the Event, one of which is selected
+        await Expect(ChipOf(page, 2)).ToBeVisibleAsync(Loaded());
+        await ChipOf(page, 2).ClickAsync();
+
+        // a time the Main Operator names is recorded by the server and shows in the table of the Participation
+        var time = page.GetByTestId("console-time-panel").GetByLabel("Time");
+        await time.ClickAsync();
+        await time.PressAsync("Control+A"); // over the 00:00:00 that the field starts with
+        await time.PressSequentiallyAsync("070000");
+        await page.GetByTestId("console-time-panel")
+            .GetByRole(AriaRole.Button, new() { Name = "Arrive", Exact = true })
+            .ClickAsync();
+        await Expect(page.GetByText("The time was recorded.")).ToBeVisibleAsync();
+        await Expect(page.GetByText("07:00:00", new() { Exact = true }).First).ToBeVisibleAsync();
+
+        // an elimination is made and restored, each stored
+        var panel = page.GetByTestId("console-eliminations-panel");
+        await panel.GetByText("WD", new() { Exact = true }).ClickAsync();
+        await panel.GetByRole(AriaRole.Button, new() { Name = "Eliminate", Exact = true }).ClickAsync();
+        await Expect(panel.GetByRole(AriaRole.Button, new() { Name = "Restore", Exact = true })).ToBeEnabledAsync();
+        await Eventually(
+            async () => (await scene.StoredAsync(2)).TryGetValue("Eliminated", out var kept) && !kept.IsBsonNull
+        );
+        await panel.GetByRole(AriaRole.Button, new() { Name = "Restore", Exact = true }).ClickAsync();
+        await Eventually(
+            async () => !(await scene.StoredAsync(2)).TryGetValue("Eliminated", out var kept) || kept.IsBsonNull
+        );
+        await Expect(panel.GetByRole(AriaRole.Button, new() { Name = "Restore", Exact = true }))
+            .ToHaveCountAsync(0, Counted());
+    }
+
+    [Fact]
+    public async Task The_dashboard_works_in_two_tabs_and_an_edit_from_a_tab_that_is_stale_is_refused_and_keeps_what_was_typed()
+    {
+        var mongo = _host.MongoConnectionString;
+        var scene = await LiveScene.CreateAsync(mongo);
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var path = $"/console/events/{scene.EventId}/dashboard";
+        var first = device.Page;
+        first.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(device, scene.MainOperator.Email, path);
+        var second = await device.Context.NewPageAsync(); // the same person, in another tab
+        second.SetDefaultTimeout(PATIENCE);
+        await second.GotoAsync(device.Url(path));
+        await Expect(ChipOf(first, 1)).ToBeVisibleAsync(Loaded());
+        await Expect(ChipOf(second, 1)).ToBeVisibleAsync(Loaded());
+
+        // what the first tab does reaches the second one as it happens
+        var elimination = first.GetByTestId("console-eliminations-panel");
+        await elimination.GetByText("WD", new() { Exact = true }).ClickAsync();
+        await elimination.GetByRole(AriaRole.Button, new() { Name = "Eliminate", Exact = true }).ClickAsync();
+        await Expect(
+                second
+                    .GetByTestId("console-eliminations-panel")
+                    .GetByRole(AriaRole.Button, new() { Name = "Restore", Exact = true })
+            )
+            .ToBeEnabledAsync(new() { Timeout = PATIENCE });
+
+        // and a write whose news did not reach it (a connection that was down) leaves it with a Participation that is stale
+        await scene.WriteBehindTheBackOfTheTabsAsync(1);
+
+        // the second tab edits the times of its Participation, which has changed since it saw it: the Api refuses, the form
+        // stays as it was typed and is sent again over what is there now
+        await second.GetByText("GATE1/40").First.ClickAsync();
+        var dialog = second.GetByRole(AriaRole.Dialog);
+        var arrive = dialog.GetByLabel("Arrive", new() { Exact = true });
+        await arrive.ClickAsync();
+        await arrive.PressAsync("Control+A");
+        await arrive.PressSequentiallyAsync("083000");
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Update", Exact = true }).ClickAsync();
+        await Expect(second.GetByText("was changed meanwhile")).ToBeVisibleAsync();
+        await Expect(arrive).ToHaveValueAsync("08:30:00", Filled());
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Update", Exact = true }).ClickAsync();
+        await Expect(dialog).ToHaveCountAsync(0, Counted());
+        await Expect(second.GetByText("08:30:00", new() { Exact = true }).First).ToBeVisibleAsync();
+        var stored = await scene.StoredAsync(1);
+        Assert.False(stored["Eliminated"].IsBsonNull); // what the first tab did is still there
+        Assert.Contains("Manual", stored["Phases"][0]["Events"].ToString(), StringComparison.Ordinal);
+    }
+
+    async Task SignInAndOpenAsync(BrowserDevice device, string email, string path)
+    {
+        var page = device.Page;
+        await page.GotoAsync(device.Url(path));
+        await page.WaitForURLAsync(new Regex(@"/sign-in\?returnUrl="), new() { Timeout = PATIENCE });
+        await SignInOnTheHostPagesAsync(_host, page, email);
+        await page.WaitForURLAsync(device.Url(path), new() { Timeout = PATIENCE });
+    }
+
+    /// <summary>A Live Event with two Participations that started at six in the morning, and the Main Operator who runs it.</summary>
+    sealed class LiveScene
+    {
+        public static async Task<LiveScene> CreateAsync(string mongo)
+        {
+            var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
+            var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+            var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+            var ids = new List<Guid>();
+            foreach (var number in new[] { 1, 2 })
+            {
+                var participation = IntegrationPayloadFactory.ActiveParticipation(
+                    eventId,
+                    number,
+                    Guid.NewGuid(),
+                    startTime: new DateTimeOffset(DateTime.Today.AddHours(6))
+                );
+                await EventSeed.ParticipationAsync(mongo, tenant, participation);
+                ids.Add(participation.Id);
+            }
+
+            return new LiveScene(mongo, mainOperator, eventId, ids);
+        }
+
+        readonly string _mongo;
+        readonly IReadOnlyList<Guid> _participations;
+
+        LiveScene(string mongo, TenancySeed.Seeded mainOperator, Guid eventId, IReadOnlyList<Guid> participations)
+        {
+            _mongo = mongo;
+            _participations = participations;
+            MainOperator = mainOperator;
+            EventId = eventId;
+        }
+
+        public TenancySeed.Seeded MainOperator { get; }
+        public Guid EventId { get; }
+
+        public async Task<MongoDB.Bson.BsonDocument> StoredAsync(int number)
+        {
+            return (await RegistrySeed.StoredAsync(_mongo, "event_participations", _participations[number - 1]))!;
+        }
+
+        /// <summary>A write that no tab is told of: the version of the Participation moves on and nothing is announced.</summary>
+        public async Task WriteBehindTheBackOfTheTabsAsync(int number)
+        {
+            await RegistrySeed
+                .Collection(_mongo, "event_participations")
+                .UpdateOneAsync(
+                    new MongoDB.Bson.BsonDocument("_id", RegistrySeed.Binary(_participations[number - 1])),
+                    new MongoDB.Bson.BsonDocument("$inc", new MongoDB.Bson.BsonDocument("Version", 1))
+                );
+        }
     }
 
     /// <summary>Presses the button that makes a row in a list of the Setup: an icon beside the heading of the list.</summary>

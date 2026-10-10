@@ -1146,4 +1146,28 @@
   <data name="Official_string" xml:space="preserve">
     <value>Official</value>
   </data>
+  <data name="Select_a_participation_string" xml:space="preserve">
+    <value>Select a Participation</value>
+  </data>
+  <data name="Participation_not_found_string" xml:space="preserve">
+    <value>The Participation was not found.</value>
+  </data>
+  <data name="Participation_changed_string" xml:space="preserve">
+    <value>The Participation was changed meanwhile and has been read again. What you typed is kept: look at it over what is there now and send it again.</value>
+  </data>
+  <data name="Time_recorded_string" xml:space="preserve">
+    <value>The time was recorded.</value>
+  </data>
+  <data name="Time_not_recorded_string" xml:space="preserve">
+    <value>The time was not recorded.</value>
+  </data>
+  <data name="Time_not_taken_string" xml:space="preserve">
+    <value>The time was recorded but not taken: {0}.</value>
+  </data>
+  <data name="Not_signed_in_string" xml:space="preserve">
+    <value>Nobody is signed in.</value>
+  </data>
+  <data name="Now_string" xml:space="preserve">
+    <value>Now</value>
+  </data>
 </root>

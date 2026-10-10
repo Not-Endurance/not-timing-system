@@ -1066,4 +1066,37 @@
   <data name="Type_1337_to_enable_confirmation_string" xml:space="preserve">
     <value>Onayı etkinleştirmek için 1337 yazın.</value>
   </data>
+  <data name="Select_a_participation_string" xml:space="preserve">
+    <value>Bir katılım seçin</value>
+  </data>
+  <data name="Participation_not_found_string" xml:space="preserve">
+    <value>Katılım bulunamadı.</value>
+  </data>
+  <data name="Participation_changed_string" xml:space="preserve">
+    <value>Katılım bu arada değiştirildi ve yeniden okundu. Yazdıklarınız korundu: şimdiki durumun üzerinde gözden geçirip yeniden gönderin.</value>
+  </data>
+  <data name="Time_recorded_string" xml:space="preserve">
+    <value>Zaman kaydedildi.</value>
+  </data>
+  <data name="Time_not_recorded_string" xml:space="preserve">
+    <value>Zaman kaydedilmedi.</value>
+  </data>
+  <data name="Time_not_taken_string" xml:space="preserve">
+    <value>Zaman kaydedildi ancak kabul edilmedi: {0}.</value>
+  </data>
+  <data name="Not_signed_in_string" xml:space="preserve">
+    <value>Kimse oturum açmamış.</value>
+  </data>
+  <data name="Now_string" xml:space="preserve">
+    <value>Şimdi</value>
+  </data>
+  <data name="Eliminate_string" xml:space="preserve">
+    <value>Ele</value>
+  </data>
+  <data name="Reason_is_required_string" xml:space="preserve">
+    <value>Neden gereklidir</value>
+  </data>
+  <data name="Restore_string" xml:space="preserve">
+    <value>Geri al</value>
+  </data>
 </root>

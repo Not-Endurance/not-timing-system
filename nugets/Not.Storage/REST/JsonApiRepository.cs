@@ -18,7 +18,7 @@ namespace Not.Storage.REST;
 /// is read, as it is for the other variant. What a request answers is not swallowed: an error is read with its code, a
 /// person is told what it says, and a row that is not there is not an error.
 /// </summary>
-public abstract class JsonApiRepository<T, TModel> : IRepository<T>
+public abstract class JsonApiRepository<T, TModel> : IRepository<T>, IRowReader<T>
     where T : class, IEntity
     where TModel : class, IKrudModel<T>, new()
 {
@@ -268,12 +268,23 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
 
     public async Task<T?> Read(Guid id)
     {
-        T? read = null;
+        return (await Find(id)).Row;
+    }
+
+    /// <summary>
+    /// One row by its id, and whether the Api could say: a row that is not there is not a failure, and a request that was not
+    /// answered or that the Api refused is, which a caller that decides what is stored by what it read has to tell apart.
+    /// </summary>
+    public async Task<RowRead<T>> Find(Guid id)
+    {
+        T? row = null;
+        var failed = true;
         await Guarded(async () =>
         {
             var response = await Client.Send(HttpMethod.Get, $"{_collection}/{id}");
             if (response.IsNotFound)
             {
+                failed = false;
                 return Done();
             }
 
@@ -282,10 +293,11 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
                 return Failed(response);
             }
 
-            read = EntityOf(response.Document?.GetProperty("data"));
+            row = EntityOf(response.Document?.GetProperty("data"));
+            failed = false;
             return Done();
         });
-        return read;
+        return new RowRead<T>(row, failed);
     }
 
     public virtual async Task<IEnumerable<T>> ReadMany()

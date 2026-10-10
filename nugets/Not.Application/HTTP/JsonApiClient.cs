@@ -55,12 +55,19 @@ public class JsonApiError
 /// <summary>An answer of the Api: its status, its document when it has one, where it says a new resource is, and its error.</summary>
 public class JsonApiResponse
 {
-    public JsonApiResponse(HttpStatusCode status, JsonElement? document, string? location, JsonApiError? error)
+    public JsonApiResponse(
+        HttpStatusCode status,
+        JsonElement? document,
+        string? location,
+        JsonApiError? error,
+        DateTimeOffset? serverTime = null
+    )
     {
         Status = status;
         Document = document;
         Location = location;
         Error = error;
+        ServerTime = serverTime;
     }
 
     public HttpStatusCode Status { get; }
@@ -71,6 +78,9 @@ public class JsonApiResponse
     public JsonElement? Document { get; }
 
     public string? Location { get; }
+
+    /// <summary>The time the server said it was when it answered (the <c>Date</c> header, to the second), when it said.</summary>
+    public DateTimeOffset? ServerTime { get; }
 
     /// <summary>The first error of a response that failed, or one made of its status when the body said none.</summary>
     public JsonApiError? Error { get; }
@@ -143,7 +153,8 @@ public class JsonApiClient
             response.StatusCode,
             parsed,
             response.Headers.Location?.OriginalString,
-            response.IsSuccessStatusCode ? null : ErrorOf(response.StatusCode, parsed)
+            response.IsSuccessStatusCode ? null : ErrorOf(response.StatusCode, parsed),
+            response.Headers.Date
         );
     }
 

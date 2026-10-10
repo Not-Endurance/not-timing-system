@@ -1146,4 +1146,28 @@
   <data name="Official_string" xml:space="preserve">
     <value>Официално лице</value>
   </data>
+  <data name="Select_a_participation_string" xml:space="preserve">
+    <value>Изберете участник</value>
+  </data>
+  <data name="Participation_not_found_string" xml:space="preserve">
+    <value>Участникът не е намерен.</value>
+  </data>
+  <data name="Participation_changed_string" xml:space="preserve">
+    <value>Участникът е променен междувременно и е прочетен отново. Въведеното е запазено: прегледайте го върху текущото състояние и го изпратете отново.</value>
+  </data>
+  <data name="Time_recorded_string" xml:space="preserve">
+    <value>Времето е записано.</value>
+  </data>
+  <data name="Time_not_recorded_string" xml:space="preserve">
+    <value>Времето не е записано.</value>
+  </data>
+  <data name="Time_not_taken_string" xml:space="preserve">
+    <value>Времето е записано, но не е прието: {0}.</value>
+  </data>
+  <data name="Not_signed_in_string" xml:space="preserve">
+    <value>Никой не е влязъл.</value>
+  </data>
+  <data name="Now_string" xml:space="preserve">
+    <value>Сега</value>
+  </data>
 </root>
