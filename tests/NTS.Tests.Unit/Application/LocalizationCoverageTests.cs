@@ -71,9 +71,9 @@ public sealed class LocalizationCoverageTests
             return false;
         }
 
-        return (path.EndsWith(".cs") || path.EndsWith(".razor"))
-            && !path.EndsWith("/Localization/NtsStrings.cs")
-            && !path.EndsWith("/Localization/NStrings.cs");
+        return (path.EndsWith(".cs", StringComparison.Ordinal) || path.EndsWith(".razor", StringComparison.Ordinal))
+            && !path.EndsWith("/Localization/NtsStrings.cs", StringComparison.Ordinal)
+            && !path.EndsWith("/Localization/NStrings.cs", StringComparison.Ordinal);
     }
 
     static string RepositoryRoot()

@@ -52,7 +52,12 @@ public sealed class UserSessionStateTests : IClassFixture<MongoFixture>
 
         Assert.Null(await tab.Sessions.GetCurrent());
         Assert.Empty(await EventsKeptForAsync(ana));
-        Assert.DoesNotContain(asked.Asked, request => request.StartsWith("POST") || request.StartsWith("PATCH"));
+        Assert.DoesNotContain(
+            asked.Asked,
+            request =>
+                request.StartsWith("POST", StringComparison.Ordinal)
+                || request.StartsWith("PATCH", StringComparison.Ordinal)
+        );
     }
 
     [Fact]
@@ -297,7 +302,7 @@ public sealed class UserSessionStateTests : IClassFixture<MongoFixture>
         using var tab = Open(api, ana, out var asked);
         await tab.Sessions.SetEventId(Guid.NewGuid());
         asked.Answer = request =>
-            request.RequestUri!.AbsolutePath.EndsWith("/me")
+            request.RequestUri!.AbsolutePath.EndsWith("/me", StringComparison.Ordinal)
                 ? new HttpResponseMessage(HttpStatusCode.BadGateway)
                 : null;
 

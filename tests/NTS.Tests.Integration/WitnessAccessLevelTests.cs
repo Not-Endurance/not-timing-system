@@ -37,7 +37,9 @@ public sealed class WitnessAccessLevelTests : IClassFixture<MongoFixture>
         var told = new List<WitnessAccessLevel>();
         access.ObservableEvent.Subscribe(() => told.Add(access.AccessLevel));
         asked.Before = request =>
-            request.RequestUri!.AbsolutePath.EndsWith("/capabilities") ? held.Task : Task.CompletedTask;
+            request.RequestUri!.AbsolutePath.EndsWith("/capabilities", StringComparison.Ordinal)
+                ? held.Task
+                : Task.CompletedTask;
         var before = CapabilityRequests(asked);
 
         await account.Refresh(); // the account says the same, and the Api is asked what the person may do again
