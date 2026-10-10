@@ -40,4 +40,9 @@ public sealed class AccountMatch
     public Guid Id { get; }
     public string DisplayName { get; }
     public string Email { get; }
+
+    public override string ToString()
+    {
+        return string.IsNullOrWhiteSpace(Email) ? DisplayName : $"{DisplayName} ({Email})";
+    }
 }

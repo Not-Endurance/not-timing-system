@@ -1047,4 +1047,58 @@
   <data name="Console_string" xml:space="preserve">
     <value>Console</value>
   </data>
+  <data name="Events_string" xml:space="preserve">
+    <value>Events</value>
+  </data>
+  <data name="Event_status_string" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Event_stage_unstarted_string" xml:space="preserve">
+    <value>Not started</value>
+  </data>
+  <data name="Event_stage_live_string" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="Event_stage_historic_string" xml:space="preserve">
+    <value>Ended</value>
+  </data>
+  <data name="Create_event_string" xml:space="preserve">
+    <value>New event</value>
+  </data>
+  <data name="No_events_to_run_string" xml:space="preserve">
+    <value>There is no Event for you to run yet.</value>
+  </data>
+  <data name="Results_string" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="Assign_main_operator_string" xml:space="preserve">
+    <value>Assign the Main Operator</value>
+  </data>
+  <data name="Hand_over_string" xml:space="preserve">
+    <value>Hand over</value>
+  </data>
+  <data name="Hand_over_event_string" xml:space="preserve">
+    <value>Hand the Event over</value>
+  </data>
+  <data name="Find_account_string" xml:space="preserve">
+    <value>Find an account by name (at least three letters)</value>
+  </data>
+  <data name="Main_operator_string" xml:space="preserve">
+    <value>Main Operator</value>
+  </data>
+  <data name="Main_operator_assigned_string" xml:space="preserve">
+    <value>The Main Operator was assigned.</value>
+  </data>
+  <data name="Event_handed_over_string" xml:space="preserve">
+    <value>The Event was handed over.</value>
+  </data>
+  <data name="Event_started_string" xml:space="preserve">
+    <value>The Event was started.</value>
+  </data>
+  <data name="Event_was_reset_string" xml:space="preserve">
+    <value>The Event was reset to its Setup.</value>
+  </data>
+  <data name="Close_string" xml:space="preserve">
+    <value>Close</value>
+  </data>
 </root>

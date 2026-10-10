@@ -6,6 +6,9 @@ namespace NoTiming.Console;
 /// </summary>
 public static class ConsoleRoutes
 {
+    const string EVENT_ID_SEGMENT = "{eventId:guid}";
     public const string FIRST_SEGMENT = "console";
     public const string HOME = "/console";
+    public const string EVENT_SETUP_PAGE = $"/console/events/{EVENT_ID_SEGMENT}/setup";
+    public const string EVENT_DASHBOARD_PAGE = $"/console/events/{EVENT_ID_SEGMENT}/dashboard";
 }

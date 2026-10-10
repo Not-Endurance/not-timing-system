@@ -1,0 +1,20 @@
+@using NTS.Domain.Setup.Services.StartValidation
+
+@inherits StartIssuesDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body2" Class="mb-2">@Start_validation_invalid_setup_description_string</MudText>
+
+        @foreach (var issue in Issues)
+        {
+            <MudPaper Class="pa-3 mb-2" Outlined>
+                <MudText Typo="Typo.body1">@issue.Summary</MudText>
+            </MudPaper>
+        }
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonSecondary Text="@Close_string" OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

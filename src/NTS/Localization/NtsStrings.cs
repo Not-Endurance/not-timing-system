@@ -327,6 +327,24 @@ namespace NTS.Localization
         public static string Federation_string => LocalizeString(nameof(Federation_string));
         public static string Passkeys_string => LocalizeString(nameof(Passkeys_string));
         public static string Console_string => LocalizeString(nameof(Console_string));
+        public static string Events_string => LocalizeString(nameof(Events_string));
+        public static string Event_status_string => LocalizeString(nameof(Event_status_string));
+        public static string Event_stage_unstarted_string => LocalizeString(nameof(Event_stage_unstarted_string));
+        public static string Event_stage_live_string => LocalizeString(nameof(Event_stage_live_string));
+        public static string Event_stage_historic_string => LocalizeString(nameof(Event_stage_historic_string));
+        public static string Create_event_string => LocalizeString(nameof(Create_event_string));
+        public static string No_events_to_run_string => LocalizeString(nameof(No_events_to_run_string));
+        public static string Results_string => LocalizeString(nameof(Results_string));
+        public static string Assign_main_operator_string => LocalizeString(nameof(Assign_main_operator_string));
+        public static string Hand_over_string => LocalizeString(nameof(Hand_over_string));
+        public static string Hand_over_event_string => LocalizeString(nameof(Hand_over_event_string));
+        public static string Find_account_string => LocalizeString(nameof(Find_account_string));
+        public static string Main_operator_string => LocalizeString(nameof(Main_operator_string));
+        public static string Main_operator_assigned_string => LocalizeString(nameof(Main_operator_assigned_string));
+        public static string Event_handed_over_string => LocalizeString(nameof(Event_handed_over_string));
+        public static string Event_started_string => LocalizeString(nameof(Event_started_string));
+        public static string Event_was_reset_string => LocalizeString(nameof(Event_was_reset_string));
+        public static string Close_string => LocalizeString(nameof(Close_string));
     }
 }
 #pragma warning restore NA0004

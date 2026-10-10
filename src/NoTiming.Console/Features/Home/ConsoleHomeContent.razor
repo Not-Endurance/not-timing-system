@@ -1,8 +1,90 @@
+@using NTS.Contracts.Features.Console
+@using NTS.Domain.Access
+
 @attribute [Route(HOME)]
 @inherits ConsoleHomeContentBehind
 
-<NContent Title="@Console_string">
+<NContent Title="@Console_string" IsLoading="@IsLoading">
     <Main>
-        <MudText Typo="Typo.h6">@Console_string</MudText>
+        <MudStack Spacing="3">
+
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Wrap="Wrap.Wrap">
+                <MudText Typo="Typo.h6">@Events_string</MudText>
+
+                <MudStack Row Spacing="2">
+                    <NButtonSecondary Text="@Historic_events_string" OnClick="OpenHistoricEvents" />
+
+                    @if (CanCreate)
+                    {
+                        <NButtonPrimary Text="@Create_event_string" StartIcon="@Icons.Material.Filled.Add" OnClick="Create" />
+                    }
+                </MudStack>
+            </MudStack>
+
+            @if (Rows.Count == 0)
+            {
+                <MudText Typo="Typo.body1" data-testid="console-no-events">@No_events_to_run_string</MudText>
+            }
+            else
+            {
+                <MudTable Items="@Rows" Hover Dense Breakpoint="Breakpoint.Sm" data-testid="console-events">
+                    <HeaderContent>
+                        <MudTh>@Name_string</MudTh>
+                        <MudTh>@Location_string</MudTh>
+                        <MudTh>@Event_status_string</MudTh>
+                        <MudTh></MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate>
+                        <MudTd DataLabel="@Name_string">@context.Name</MudTd>
+                        <MudTd DataLabel="@Location_string">@context.Location</MudTd>
+                        <MudTd DataLabel="@Event_status_string">
+                            <MudChip T="string" Size="Size.Small" Color="@ColorOf(context.Stage)">@StageText(context.Stage)</MudChip>
+                        </MudTd>
+                        <MudTd>
+                            <MudStack Row Spacing="1" Justify="Justify.FlexEnd" Wrap="Wrap.Wrap">
+
+                                @if (ShowSetup(context))
+                                {
+                                    <NButtonSecondary Text="@Setup_string" OnClick="() => OpenSetup(context)" />
+                                }
+
+                                @if (ShowStart(context))
+                                {
+                                    <NButtonWarning Text="@Start_string" StartIcon="@Icons.Material.Filled.NotStarted" OnClick="() => Start(context)" />
+                                }
+
+                                @if (ShowDashboard(context))
+                                {
+                                    <NButtonPrimary Text="@Dashboard_string" OnClick="() => OpenDashboard(context)" />
+                                }
+
+                                @if (context.CanAssignMainOperator)
+                                {
+                                    <NButtonSecondary Text="@Assign_main_operator_string" OnClick="() => Assign(context)" />
+                                }
+
+                                @if (context.CanHandOver)
+                                {
+                                    <NButtonSecondary Text="@Hand_over_string" OnClick="() => HandOver(context)" />
+                                }
+
+                                @if (context.CanReset)
+                                {
+                                    <NButtonDanger Text="@Reset_string" OnClick="() => Reset(context)" />
+                                }
+
+                                @if (context.Stage == EventStage.Historic)
+                                {
+                                    <NButtonSecondary Text="@Results_string" OnClick="() => OpenResults(context)" />
+                                }
+
+                            </MudStack>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+
+        </MudStack>
     </Main>
 </NContent>

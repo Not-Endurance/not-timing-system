@@ -931,4 +931,58 @@
   <data name="Console_string" xml:space="preserve">
     <value>Konsol</value>
   </data>
+  <data name="Events_string" xml:space="preserve">
+    <value>Etkinlikler</value>
+  </data>
+  <data name="Event_status_string" xml:space="preserve">
+    <value>Durum</value>
+  </data>
+  <data name="Event_stage_unstarted_string" xml:space="preserve">
+    <value>Başlamadı</value>
+  </data>
+  <data name="Event_stage_live_string" xml:space="preserve">
+    <value>Canlı</value>
+  </data>
+  <data name="Event_stage_historic_string" xml:space="preserve">
+    <value>Sona erdi</value>
+  </data>
+  <data name="Create_event_string" xml:space="preserve">
+    <value>Yeni etkinlik</value>
+  </data>
+  <data name="No_events_to_run_string" xml:space="preserve">
+    <value>Henüz yönetebileceğiniz bir etkinlik yok.</value>
+  </data>
+  <data name="Results_string" xml:space="preserve">
+    <value>Sonuçlar</value>
+  </data>
+  <data name="Assign_main_operator_string" xml:space="preserve">
+    <value>Ana Operatörü ata</value>
+  </data>
+  <data name="Hand_over_string" xml:space="preserve">
+    <value>Devret</value>
+  </data>
+  <data name="Hand_over_event_string" xml:space="preserve">
+    <value>Etkinliği devret</value>
+  </data>
+  <data name="Find_account_string" xml:space="preserve">
+    <value>Hesabı ada göre bulun (en az üç harf)</value>
+  </data>
+  <data name="Main_operator_string" xml:space="preserve">
+    <value>Ana Operatör</value>
+  </data>
+  <data name="Main_operator_assigned_string" xml:space="preserve">
+    <value>Ana Operatör atandı.</value>
+  </data>
+  <data name="Event_handed_over_string" xml:space="preserve">
+    <value>Etkinlik devredildi.</value>
+  </data>
+  <data name="Event_started_string" xml:space="preserve">
+    <value>Etkinlik başlatıldı.</value>
+  </data>
+  <data name="Event_was_reset_string" xml:space="preserve">
+    <value>Etkinlik kurulumuna sıfırlandı.</value>
+  </data>
+  <data name="Close_string" xml:space="preserve">
+    <value>Kapat</value>
+  </data>
 </root>

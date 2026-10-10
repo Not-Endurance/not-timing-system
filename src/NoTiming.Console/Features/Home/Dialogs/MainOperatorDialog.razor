@@ -1,0 +1,18 @@
+@using Not.Blazor.Components.Input
+@using NTS.Contracts.Features.Console
+
+@inherits MainOperatorDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <NAutocomplete T="AccountMatch" @bind-Value="Chosen" Label="@Find_account_string" SearchSafe="Search" MinCharacters="3" />
+        </MudStack>
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonPrimary Text="@Confirm_string" Disabled="@(Chosen == null)" OnClick="Choose" />
+
+        <NButtonSecondary Text="@Cancel_string" OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

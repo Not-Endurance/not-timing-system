@@ -1047,4 +1047,58 @@
   <data name="Console_string" xml:space="preserve">
     <value>Конзола</value>
   </data>
+  <data name="Events_string" xml:space="preserve">
+    <value>Събития</value>
+  </data>
+  <data name="Event_status_string" xml:space="preserve">
+    <value>Състояние</value>
+  </data>
+  <data name="Event_stage_unstarted_string" xml:space="preserve">
+    <value>Не е стартирано</value>
+  </data>
+  <data name="Event_stage_live_string" xml:space="preserve">
+    <value>На живо</value>
+  </data>
+  <data name="Event_stage_historic_string" xml:space="preserve">
+    <value>Приключило</value>
+  </data>
+  <data name="Create_event_string" xml:space="preserve">
+    <value>Ново събитие</value>
+  </data>
+  <data name="No_events_to_run_string" xml:space="preserve">
+    <value>Все още няма събитие, което да ръководите.</value>
+  </data>
+  <data name="Results_string" xml:space="preserve">
+    <value>Резултати</value>
+  </data>
+  <data name="Assign_main_operator_string" xml:space="preserve">
+    <value>Назначаване на главен оператор</value>
+  </data>
+  <data name="Hand_over_string" xml:space="preserve">
+    <value>Предаване</value>
+  </data>
+  <data name="Hand_over_event_string" xml:space="preserve">
+    <value>Предаване на събитието</value>
+  </data>
+  <data name="Find_account_string" xml:space="preserve">
+    <value>Намерете профил по име (поне три букви)</value>
+  </data>
+  <data name="Main_operator_string" xml:space="preserve">
+    <value>Главен оператор</value>
+  </data>
+  <data name="Main_operator_assigned_string" xml:space="preserve">
+    <value>Главният оператор е назначен.</value>
+  </data>
+  <data name="Event_handed_over_string" xml:space="preserve">
+    <value>Събитието е предадено.</value>
+  </data>
+  <data name="Event_started_string" xml:space="preserve">
+    <value>Събитието е стартирано.</value>
+  </data>
+  <data name="Event_was_reset_string" xml:space="preserve">
+    <value>Събитието е върнато към настройката си.</value>
+  </data>
+  <data name="Close_string" xml:space="preserve">
+    <value>Затвори</value>
+  </data>
 </root>
