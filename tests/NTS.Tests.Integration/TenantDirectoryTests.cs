@@ -72,11 +72,13 @@ public sealed class TenantDirectoryTests : IClassFixture<MongoFixture>
             home,
             roles: new Dictionary<string, string[]> { [gone] = [] }
         );
-        using var ui = Open(api, person);
+        using var ui = Open(api, person, out var asked);
 
         var options = await ui.Tenants.OptionsOfTheAccount();
+        await ui.Tenants.OptionsOfTheAccount();
 
         Assert.Equal([(home, "Home Federation"), (gone, gone)], options.Select(x => (x.Id, x.Name)));
+        Assert.Equal(2, asked.Asked.Count(x => x.Contains("/tenants/"))); // each Tenant is asked about once, one that is not there too
     }
 
     [Fact]

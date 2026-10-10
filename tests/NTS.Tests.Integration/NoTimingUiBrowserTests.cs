@@ -52,6 +52,13 @@ public sealed class NoTimingUiBrowserTests : IClassFixture<ApiHostFixture>, ICla
 
         await Expect(page.GetByText("Integration Rider").First).ToBeVisibleAsync(Loaded());
         await AssertStorageHoldsNoSignInAsync(page, null);
+
+        await page.GetByText("Sign In").ClickAsync(); // the drawer takes them to the host's page, and back to this one
+        var back = Uri.EscapeDataString($"/events/{scene.EventId}/arrivelist");
+        await page.WaitForURLAsync(
+            new Regex(@"/sign-in\?returnUrl=" + Regex.Escape(back)),
+            new PageWaitForURLOptions { Timeout = PATIENCE }
+        );
     }
 
     [Fact]
@@ -81,6 +88,7 @@ public sealed class NoTimingUiBrowserTests : IClassFixture<ApiHostFixture>, ICla
         Assert.Equal(scene.Official.Id, sent["ActorId"].AsGuid);
         await AssertStorageHoldsNoSignInAsync(page, scene.Official.Email);
 
+        await page.EvaluateAsync("() => { window.__thePageThatWasLoaded = true; }");
         await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Ana" }).ClickAsync();
         await page.GetByText("Sign Out").ClickAsync();
 
@@ -88,6 +96,7 @@ public sealed class NoTimingUiBrowserTests : IClassFixture<ApiHostFixture>, ICla
         await Expect(page.GetByText("Startlist", new PageGetByTextOptions { Exact = true }).First)
             .ToBeVisibleAsync(Loaded()); // and the app follows the running Event again, as a visitor
         Assert.Equal(401, (await device.FetchAsync("GET", "/api/me")).Status);
+        Assert.Equal("undefined", await page.EvaluateAsync<string>("() => typeof window.__thePageThatWasLoaded")); // loaded again
         await AssertStorageHoldsNoSignInAsync(page, scene.Official.Email);
     }
 

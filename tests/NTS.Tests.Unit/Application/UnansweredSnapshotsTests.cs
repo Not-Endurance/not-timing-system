@@ -10,7 +10,7 @@ using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
-using NTS.Localization;
+using NTS.Domain.Objects;
 using static NTS.Tests.Unit.Application.ViewedEventFixtures;
 
 namespace NTS.Tests.Unit.Application;
@@ -136,6 +136,60 @@ public sealed class UnansweredSnapshotsTests
         Assert.Null(refused.Kept.Of(refused.Account.Current!.Id, LIVE_EVENT_ID));
         Assert.False(refused.Timer.IsWaiting);
         Assert.Equal([1], refused.Service.Snapshots.Select(x => x.Number)); // it is still the person's, to be seen
+    }
+
+    [Theory]
+    [InlineData(0, null, true)]
+    [InlineData(408, null, true)]
+    [InlineData(429, "rate-limited", true)]
+    [InlineData(500, null, true)]
+    [InlineData(502, null, true)]
+    [InlineData(503, null, true)]
+    [InlineData(409, "participation-busy", true)]
+    [InlineData(400, "invalid-snapshot", false)]
+    [InlineData(401, "not-signed-in", false)]
+    [InlineData(403, "not-allowed", false)]
+    [InlineData(404, "participation-not-found", false)]
+    [InlineData(409, "event-ended", false)]
+    [InlineData(409, "id-taken", false)]
+    [InlineData(422, null, false)]
+    public async Task What_the_server_says_decides_whether_a_group_is_sent_again(int status, string? code, bool again)
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1));
+        rig.Capture(1);
+        rig.Publisher.Answer = (_, id) => SnapshotReceipt.Failed(id, status, code, "The server said so.");
+        using var view = await rig.ViewAsync();
+
+        await Assert.ThrowsAsync<DomainException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+
+        Assert.Equal(again, rig.Timer.IsWaiting);
+        Assert.Equal(again, rig.Service.Unanswered != null);
+        Assert.Equal(again, rig.Kept.Of(rig.Account.Current!.Id, LIVE_EVENT_ID) != null);
+    }
+
+    [Fact]
+    public async Task A_group_that_was_kept_takes_the_place_of_what_the_session_had_of_its_Snapshots()
+    {
+        var rig = await Rig.StartAsync(ParticipationFixtures.Active(1), ParticipationFixtures.Active(2));
+        rig.Capture(1);
+        rig.Publisher.Fail = new HttpRequestException("Offline.");
+        using var view = await rig.ViewAsync();
+        await Assert.ThrowsAsync<HttpRequestException>(() => rig.Service.Publish(view, SnapshotType.Arrive));
+        var kept = rig.Kept.Of(rig.Account.Current!.Id, LIVE_EVENT_ID)!;
+        var sessionHadFirstAt = new Timestamp(new DateTimeOffset(2030, 5, 21, 6, 0, 0, TimeSpan.Zero));
+        var sessionHadSecondAt = new Timestamp(new DateTimeOffset(2030, 5, 21, 7, 0, 0, TimeSpan.Zero));
+        rig.Session.Selections =
+        [
+            new Snapshot(1, "Rider 1", null, sessionHadFirstAt),
+            new Snapshot(2, "Rider 2", null, sessionHadSecondAt),
+        ];
+
+        var service = await rig.ReloadAsync();
+
+        Assert.Equal([1, 2], service.Snapshots.Select(x => x.Number).Order());
+        Assert.Equal(kept.Entries.Single().Timestamp, service.Snapshots.Single(x => x.Number == 1).Timestamp); // the time that was sent
+        // and what the session had of the others, which it keeps as the time of day
+        Assert.Equal(sessionHadSecondAt.ToString(), service.Snapshots.Single(x => x.Number == 2).Timestamp!.ToString());
     }
 
     [Fact]
@@ -285,6 +339,7 @@ public sealed class UnansweredSnapshotsTests
         }
 
         public SnapshotService Service { get; private set; }
+        public NoSession Session { get; } = new();
         public Publisher Publisher { get; } = new();
         public InMemoryUnansweredSnapshots Kept { get; } = new();
         public StepTimer Timer { get; } = new();
@@ -295,7 +350,7 @@ public sealed class UnansweredSnapshotsTests
         public async Task<SnapshotService> ReloadAsync()
         {
             Service?.Dispose();
-            Service = new SnapshotService(_socket, _store, new NoSession(), Publisher, Account, Kept, Timer, Notifier);
+            Service = new SnapshotService(_socket, _store, Session, Publisher, Account, Kept, Timer, Notifier);
             await Service.Load();
             return Service;
         }
@@ -328,9 +383,19 @@ public sealed class UnansweredSnapshotsTests
 
     sealed class NoSession : IWitnessUserSession
     {
+        /// <summary>The Snapshots the session kept as selected, if the test says it kept any.</summary>
+        public IReadOnlyList<Snapshot>? Selections { get; set; }
+
         public Task<NtsUserSessionStateModel?> GetCurrent()
         {
-            return Task.FromResult<NtsUserSessionStateModel?>(null);
+            return Task.FromResult(
+                Selections == null
+                    ? null
+                    : new NtsUserSessionStateModel
+                    {
+                        SnapshotSelections = [.. Selections.Select(SnapshotModel.MapFrom)],
+                    }
+            );
         }
 
         public Task SetEventId(Guid? eventId)

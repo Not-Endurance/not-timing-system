@@ -13,7 +13,8 @@ public static class LazyRoutes
     public static IReadOnlyList<string> NeededBy(string path, IReadOnlyDictionary<string, string[]> assemblies)
     {
         var first = FirstSegment(path);
-        return first != null && assemblies.TryGetValue(first, out var files) ? files : [];
+        var named = assemblies.FirstOrDefault(x => string.Equals(x.Key, first, StringComparison.OrdinalIgnoreCase));
+        return first != null ? named.Value ?? [] : [];
     }
 
     /// <summary>
