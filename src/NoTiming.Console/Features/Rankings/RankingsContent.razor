@@ -1,0 +1,16 @@
+@using NoTiming.Ui.Components.EventViews
+@using NTS.Domain.Access
+
+@attribute [Route(EVENT_RANKINGS_PAGE)]
+@inherits RankingsContentBehind
+
+@if (IsLoading || !IsListed)
+{
+    <NContent Title="@Ranklist_string" IsLoading="@IsLoading" IsEmpty="@(!IsLoading)" EmptyMessage="@Event_not_yours_to_run_string" />
+}
+else
+{
+    <ViewedEventScope EventId="EventId" Shows="CoreView.Rankings">
+        <RankingsPage />
+    </ViewedEventScope>
+}

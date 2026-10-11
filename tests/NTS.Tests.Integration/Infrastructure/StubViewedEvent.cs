@@ -33,6 +33,9 @@ internal sealed class StubViewedEvent : IViewedEvent
     public IReadOnlyList<Ranking> Rankings => [];
     public IReadOnlyList<Official> Officials => [];
 
+    /// <summary>How many times the view was asked to read what it keeps beside its Participations again.</summary>
+    public int Refreshes { get; private set; }
+
     public Task Load()
     {
         return Task.CompletedTask;
@@ -41,6 +44,12 @@ internal sealed class StubViewedEvent : IViewedEvent
     public Participation? Find(Guid id)
     {
         return _store.Find(id);
+    }
+
+    public Task Refresh()
+    {
+        Refreshes++;
+        return Task.CompletedTask;
     }
 
     public ResultsDocument CreateDocument(Ranking ranking)

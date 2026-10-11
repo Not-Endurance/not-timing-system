@@ -27,6 +27,12 @@ public interface IViewedEvent : IStatefulService, IDisposable
 
     Participation? Find(Guid id);
 
+    /// <summary>
+    /// Reads what the Event keeps beside its Participations again (its Rankings and Officials), which is read once when the
+    /// view is opened: a page that makes or removes a Ranking asks for it to show the one that is stored.
+    /// </summary>
+    Task Refresh();
+
     /// <summary>The Results of a Ranking of this Event, composed from the Participations it names (ADR-0006).</summary>
     ResultsDocument CreateDocument(Ranking ranking);
 

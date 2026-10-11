@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1169,5 +1169,11 @@
   </data>
   <data name="Now_string" xml:space="preserve">
     <value>Сега</value>
+  </data>
+  <data name="Rankings_list_empty_message_string" xml:space="preserve">
+    <value>Събитието няма класирания.</value>
+  </data>
+  <data name="Select_participation_to_add_string" xml:space="preserve">
+    <value>Изберете участник за добавяне</value>
   </data>
 </root>

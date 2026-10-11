@@ -1099,4 +1099,28 @@
   <data name="Restore_string" xml:space="preserve">
     <value>Geri al</value>
   </data>
+  <data name="Rankings_list_empty_message_string" xml:space="preserve">
+    <value>Etkinliğin sıralaması yok.</value>
+  </data>
+  <data name="Add_string" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
+  <data name="Create_Custom_Ranking_string" xml:space="preserve">
+    <value>Özel Sıralama Oluştur</value>
+  </data>
+  <data name="Custom_ranking_string" xml:space="preserve">
+    <value>Özel sıralama</value>
+  </data>
+  <data name="Export_FEI_string" xml:space="preserve">
+    <value>FEI dışa aktar</value>
+  </data>
+  <data name="Optionally_select_existing_ranking_to_prepopulate_the_form_string" xml:space="preserve">
+    <value>İsteğe bağlı olarak mevcut Sıralamaları forma eklemek için seçin. Ardından istenen çıktıyı elde etmek için değerlerini ve girişlerini değiştirebilirsiniz.</value>
+  </data>
+  <data name="Select_participation_to_add_string" xml:space="preserve">
+    <value>Eklenecek bir Katılım seçin</value>
+  </data>
+  <data name="Template_ranking_string" xml:space="preserve">
+    <value>Şablon Sıralama</value>
+  </data>
 </root>

@@ -1170,4 +1170,7 @@
   <data name="Now_string" xml:space="preserve">
     <value>Now</value>
   </data>
+  <data name="Rankings_list_empty_message_string" xml:space="preserve">
+    <value>The Event has no Rankings.</value>
+  </data>
 </root>

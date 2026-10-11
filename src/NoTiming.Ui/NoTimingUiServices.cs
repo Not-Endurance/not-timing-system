@@ -19,6 +19,7 @@ public static class NoTimingUiServices
         services.TryAddSingleton(TimeProvider.System); // the clock of the device, which the server's clock is measured against
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
         services.AddTransient<ConsoleParticipationWrites>(); // not a repository of the app: the dashboard's writes (#646)
+        services.AddTransient<ConsoleRankingWrites>(); // and the Rankings the Console makes
 
         // The families that moved to the Api are reached where the page came from, which is the Api (ADR-0011), and not
         // where the legacy host is: the one is the page's own address and the other is a setting.

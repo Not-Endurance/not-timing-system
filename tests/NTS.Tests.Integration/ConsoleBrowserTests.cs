@@ -206,7 +206,7 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
+        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, $"/console/events/{scene.EventId}/dashboard");
 
         // the Participations of the Event, one of which is selected
         await Expect(ChipOf(page, 2)).ToBeVisibleAsync(Loaded());
@@ -248,7 +248,7 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         var path = $"/console/events/{scene.EventId}/dashboard";
         var first = device.Page;
         first.SetDefaultTimeout(PATIENCE);
-        await SignInAndOpenAsync(device, scene.MainOperator.Email, path);
+        await SignInAndOpenAsync(_host, device, scene.MainOperator.Email, path);
         var second = await device.Context.NewPageAsync(); // the same person, in another tab
         second.SetDefaultTimeout(PATIENCE);
         await second.GotoAsync(device.Url(path));
@@ -288,13 +288,13 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         Assert.Contains("Manual", stored["Phases"][0]["Events"].ToString(), StringComparison.Ordinal);
     }
 
-    async Task SignInAndOpenAsync(BrowserDevice device, string email, string path)
+    /// <summary>Presses the button that makes a row in a list of the Setup: an icon beside the heading of the list.</summary>
+    static async Task AddToListAsync(IPage page, string list)
     {
-        var page = device.Page;
-        await page.GotoAsync(device.Url(path));
-        await page.WaitForURLAsync(new Regex(@"/sign-in\?returnUrl="), new() { Timeout = PATIENCE });
-        await SignInOnTheHostPagesAsync(_host, page, email);
-        await page.WaitForURLAsync(device.Url(path), new() { Timeout = PATIENCE });
+        await page.Locator(
+                $"xpath=//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6][normalize-space()='{list}']/following-sibling::button[last()]"
+            )
+            .ClickAsync();
     }
 
     /// <summary>A Live Event with two Participations that started at six in the morning, and the Main Operator who runs it.</summary>
@@ -350,14 +350,5 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
                     new MongoDB.Bson.BsonDocument("$inc", new MongoDB.Bson.BsonDocument("Version", 1))
                 );
         }
-    }
-
-    /// <summary>Presses the button that makes a row in a list of the Setup: an icon beside the heading of the list.</summary>
-    static async Task AddToListAsync(IPage page, string list)
-    {
-        await page.Locator(
-                $"xpath=//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6][normalize-space()='{list}']/following-sibling::button[last()]"
-            )
-            .ClickAsync();
     }
 }
