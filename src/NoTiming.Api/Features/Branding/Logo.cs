@@ -46,12 +46,19 @@ internal sealed class Logo
             {
                 content = member.Value.ValueKind == JsonValueKind.String ? member.Value.GetString() : null;
             }
+            else if (
+                string.Equals(member.Name, "size", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(member.Name, "source", StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                // what the Api computes and tells, which a client that sends a logo back as it read it sends too: writes ignore it
+            }
             else
             {
                 return LogoRead.Refused(
                     StatusCodes.Status400BadRequest,
                     "invalid-logo",
-                    "A logo is an object with the contentType and the content of an image and nothing else."
+                    "A logo is an object with the contentType and the content of an image and nothing else (the size and the source are the Api's, and are ignored)."
                 );
             }
         }

@@ -47,6 +47,7 @@ public class TimePanelBehind : NComponent
         {
             if (Input is null or DEFAULT_TIME)
             {
+                Notifier.Inform(Time_format_is_incorrect_hrs_colon_mins_colon_secs_string); // there is no time to record
                 return;
             }
 

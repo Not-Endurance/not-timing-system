@@ -214,6 +214,10 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
 
         // a time the Main Operator names is recorded by the server and shows in the table of the Participation
         var time = page.GetByTestId("console-time-panel").GetByLabel("Time");
+        await page.GetByTestId("console-time-panel")
+            .GetByRole(AriaRole.Button, new() { Name = "Arrive", Exact = true })
+            .ClickAsync(); // with no time typed there is nothing to record, and the person is told so
+        await Expect(page.GetByText("Time format is incorect")).ToBeVisibleAsync();
         await time.ClickAsync();
         await time.PressAsync("Control+A"); // over the 00:00:00 that the field starts with
         await time.PressSequentiallyAsync("070000");

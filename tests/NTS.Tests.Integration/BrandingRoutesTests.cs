@@ -209,6 +209,31 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task A_logo_that_is_sent_back_as_it_was_read_is_taken_and_what_the_Api_computes_in_it_is_ignored()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var image = Png(40, 3);
+        var read = new
+        {
+            contentType = "image/png",
+            content = Convert.ToBase64String(image),
+            size = 9999,
+            source = "event",
+        };
+
+        var response = await Edit(root, $"/api/tenants/{tenant}/branding", new { left = read });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var logo = (await Body(response)).GetProperty("data").GetProperty("attributes").GetProperty("left");
+        Assert.Equal(40, logo.GetProperty("size").GetInt32()); // the weight of the image, whatever it was sent as
+        Assert.False(logo.TryGetProperty("source", out _)); // and whose it is, which a Tenant's logo has no need to say
+        Assert.Equal(image, (await StoredAsync($"tenant:{tenant}"))["Left"]["Content"].AsBsonBinaryData.Bytes);
+    }
+
+    [Fact]
     public async Task Two_large_logos_in_one_request_are_more_than_a_request_may_hold()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);

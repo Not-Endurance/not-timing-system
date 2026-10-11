@@ -34,7 +34,8 @@ address overrides it locally.
 A visitor downloads the app to read a startlist, so its size is measured on what is delivered: `UiFirstLoadBudgetTests`
 publishes the Ui for Release and sums the Brotli files that the Api serves (a debug build is several times larger and says
 nothing about it). When it was written down the app was **8.29 MB over 180 files** (6.8 MB of assemblies, 0.9 MB of runtime,
-0.3 MB of globalization data, 0.2 MB of scripts and styles), and the budget is a **ceiling of 9 MB**. A change that raises
+0.3 MB of globalization data, 0.2 MB of scripts and styles), and with the Console's services and its text in three languages
+(#646) it is **8.37 MB over 183 files**; the budget is a **ceiling of 9 MB**. A change that raises
 the size past it raises it on purpose, and raises the ceiling in the test, here and in the ticket.
 
 - `BlazorWebAssemblyLoadAllGlobalizationData` is on. A person who chooses Bulgarian or Turkish changes the culture of the app
