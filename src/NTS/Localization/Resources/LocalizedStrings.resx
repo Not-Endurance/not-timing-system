@@ -1182,4 +1182,34 @@
   <data name="Startlist_empty_message_string" xml:space="preserve">
     <value>No start has a time yet.</value>
   </data>
+  <data name="Regional_rules_string" xml:space="preserve">
+    <value>Rules of the regional competitions</value>
+  </data>
+  <data name="Only_average_loop_speed_string" xml:space="preserve">
+    <value>Judge the speed of a loop on its average only</value>
+  </data>
+  <data name="Ranker_code_string" xml:space="preserve">
+    <value>Code of the regional ranker</value>
+  </data>
+  <data name="Ranker_code_hint_string" xml:space="preserve">
+    <value>Leave it empty for the ranking of the FEI.</value>
+  </data>
+  <data name="Rules_saved_string" xml:space="preserve">
+    <value>The rules were saved.</value>
+  </data>
+  <data name="Federation_not_yours_string" xml:space="preserve">
+    <value>Only an administrator of the federation edits it.</value>
+  </data>
+  <data name="Already_registered_string" xml:space="preserve">
+    <value>This looks like a row that is registered already:</value>
+  </data>
+  <data name="Same_name_string" xml:space="preserve">
+    <value>the same name</value>
+  </data>
+  <data name="Same_FEI_ID_string" xml:space="preserve">
+    <value>the same FEI ID</value>
+  </data>
+  <data name="Of_another_federation_string" xml:space="preserve">
+    <value>of another federation</value>
+  </data>
 </root>

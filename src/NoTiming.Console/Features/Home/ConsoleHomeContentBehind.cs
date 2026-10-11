@@ -20,6 +20,9 @@ public class ConsoleHomeContentBehind : NStatefulComponent
     IConsoleEvents Events { get; set; } = default!;
 
     [Inject]
+    IConsoleTenant Federation { get; set; } = default!;
+
+    [Inject]
     IDialogService DialogService { get; set; } = default!;
 
     [Inject]
@@ -31,9 +34,13 @@ public class ConsoleHomeContentBehind : NStatefulComponent
     protected IReadOnlyList<ConsoleEvent> Rows => Events.Events;
     protected bool CanCreate => Events.CanCreate;
 
+    /// <summary>Whether the person has anything to do about the federation they act in, which is what the Api says of them.</summary>
+    protected bool ShowFederation => Federation.CanEditRules || Federation.CanEditBranding;
+
     protected override async Task OnInitializedAsync()
     {
         await Observe(Events);
+        await Observe(Federation);
     }
 
     protected static string StageText(EventStage stage)
@@ -90,6 +97,11 @@ public class ConsoleHomeContentBehind : NStatefulComponent
     protected void OpenClubs()
     {
         Navigator.NavigateTo(ConsoleRoutes.CLUBS_PAGE);
+    }
+
+    protected void OpenFederation()
+    {
+        Navigator.NavigateTo(ConsoleRoutes.FEDERATION_PAGE);
     }
 
     protected void OpenResults(ConsoleEvent row)

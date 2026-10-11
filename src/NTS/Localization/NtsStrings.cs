@@ -372,6 +372,16 @@ namespace NTS.Localization
         public static string Handout_made_string => LocalizeString(nameof(Handout_made_string));
         public static string Handout_not_made_string => LocalizeString(nameof(Handout_not_made_string));
         public static string Startlist_empty_message_string => LocalizeString(nameof(Startlist_empty_message_string));
+        public static string Regional_rules_string => LocalizeString(nameof(Regional_rules_string));
+        public static string Only_average_loop_speed_string => LocalizeString(nameof(Only_average_loop_speed_string));
+        public static string Ranker_code_string => LocalizeString(nameof(Ranker_code_string));
+        public static string Ranker_code_hint_string => LocalizeString(nameof(Ranker_code_hint_string));
+        public static string Rules_saved_string => LocalizeString(nameof(Rules_saved_string));
+        public static string Federation_not_yours_string => LocalizeString(nameof(Federation_not_yours_string));
+        public static string Already_registered_string => LocalizeString(nameof(Already_registered_string));
+        public static string Same_name_string => LocalizeString(nameof(Same_name_string));
+        public static string Same_FEI_ID_string => LocalizeString(nameof(Same_FEI_ID_string));
+        public static string Of_another_federation_string => LocalizeString(nameof(Of_another_federation_string));
     }
 }
 #pragma warning restore NA0004

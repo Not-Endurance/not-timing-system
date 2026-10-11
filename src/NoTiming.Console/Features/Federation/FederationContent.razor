@@ -1,0 +1,37 @@
+@using Not.Blazor.Components.Input
+
+@attribute [Route(FEDERATION_PAGE)]
+@inherits FederationContentBehind
+
+<NContent Title="@Title" IsLoading="@IsLoading" IsEmpty="@(!IsLoading && !MayEdit)" EmptyMessage="@Federation_not_yours_string">
+
+    <Main>
+        <MudStack Spacing="4" data-testid="console-federation-rules">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="GoHome" />
+            </MudStack>
+
+            <MudText Typo="Typo.h6">@Regional_rules_string</MudText>
+
+            <NSwitch @bind-Value="OnlyAverageLoopSpeed" Label="@Only_average_loop_speed_string" />
+
+            <NTextField T="string"
+                        @bind-Value="RankerCode"
+                        Label="@Ranker_code_string"
+                        HelperText="@Ranker_code_hint_string"
+                        MaxLength="40"
+                        Immediate="true"
+                        />
+
+            @if (CanEditRules)
+            {
+                <MudStack Row Justify="Justify.FlexEnd">
+                    <NButtonPrimary Text="@Save_string" OnClick="Save" />
+                </MudStack>
+            }
+
+        </MudStack>
+    </Main>
+
+</NContent>

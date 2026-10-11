@@ -1185,4 +1185,34 @@
   <data name="Startlist_empty_message_string" xml:space="preserve">
     <value>Все още няма старт с определено време.</value>
   </data>
+  <data name="Regional_rules_string" xml:space="preserve">
+    <value>Правила на регионалните състезания</value>
+  </data>
+  <data name="Only_average_loop_speed_string" xml:space="preserve">
+    <value>Скоростта на кръга се оценява само по средната</value>
+  </data>
+  <data name="Ranker_code_string" xml:space="preserve">
+    <value>Код на регионалния класиращ</value>
+  </data>
+  <data name="Ranker_code_hint_string" xml:space="preserve">
+    <value>Оставете го празно за класирането на FEI.</value>
+  </data>
+  <data name="Rules_saved_string" xml:space="preserve">
+    <value>Правилата бяха запазени.</value>
+  </data>
+  <data name="Federation_not_yours_string" xml:space="preserve">
+    <value>Само администратор на федерацията я редактира.</value>
+  </data>
+  <data name="Already_registered_string" xml:space="preserve">
+    <value>Това изглежда като вече регистриран запис:</value>
+  </data>
+  <data name="Same_name_string" xml:space="preserve">
+    <value>същото име</value>
+  </data>
+  <data name="Same_FEI_ID_string" xml:space="preserve">
+    <value>същият FEI ID</value>
+  </data>
+  <data name="Of_another_federation_string" xml:space="preserve">
+    <value>на друга федерация</value>
+  </data>
 </root>

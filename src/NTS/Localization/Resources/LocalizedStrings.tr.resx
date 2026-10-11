@@ -1135,4 +1135,34 @@
   <data name="Startlist_empty_message_string" xml:space="preserve">
     <value>Henüz zamanı belirlenmiş bir başlangıç yok.</value>
   </data>
+  <data name="Regional_rules_string" xml:space="preserve">
+    <value>Bölgesel yarışmaların kuralları</value>
+  </data>
+  <data name="Only_average_loop_speed_string" xml:space="preserve">
+    <value>Tur hızı yalnızca ortalamaya göre değerlendirilir</value>
+  </data>
+  <data name="Ranker_code_string" xml:space="preserve">
+    <value>Bölgesel sıralayıcının kodu</value>
+  </data>
+  <data name="Ranker_code_hint_string" xml:space="preserve">
+    <value>FEI sıralaması için boş bırakın.</value>
+  </data>
+  <data name="Rules_saved_string" xml:space="preserve">
+    <value>Kurallar kaydedildi.</value>
+  </data>
+  <data name="Federation_not_yours_string" xml:space="preserve">
+    <value>Federasyonu yalnızca federasyonun yöneticisi düzenleyebilir.</value>
+  </data>
+  <data name="Already_registered_string" xml:space="preserve">
+    <value>Bu zaten kayıtlı bir kayda benziyor:</value>
+  </data>
+  <data name="Same_name_string" xml:space="preserve">
+    <value>aynı ad</value>
+  </data>
+  <data name="Same_FEI_ID_string" xml:space="preserve">
+    <value>aynı FEI ID</value>
+  </data>
+  <data name="Of_another_federation_string" xml:space="preserve">
+    <value>başka bir federasyonun</value>
+  </data>
 </root>

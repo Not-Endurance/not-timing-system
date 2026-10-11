@@ -12,6 +12,12 @@ public class AthleteShellBehind : KrudShell<AthleteFormModel>
     [Inject]
     IConsoleLookups Lookups { get; set; } = default!;
 
+    [Inject]
+    IConsoleSameRows SameRows { get; set; } = default!;
+
+    /// <summary>The rows that the Athlete being registered looks like, which the form warns of.</summary>
+    protected IReadOnlyList<SameRow> Same { get; private set; } = [];
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -21,6 +27,18 @@ public class AthleteShellBehind : KrudShell<AthleteFormModel>
             {
                 Model.Country = await Lookups.TenantCountry();
             }
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
+    }
+
+    protected async Task Check()
+    {
+        try
+        {
+            Same = await SameRows.OfAthlete(Model);
         }
         catch (Exception ex)
         {

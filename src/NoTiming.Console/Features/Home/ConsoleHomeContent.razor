@@ -18,6 +18,11 @@
 
                     <NButtonSecondary Text="@Historic_events_string" OnClick="OpenHistoricEvents" />
 
+                    @if (ShowFederation)
+                    {
+                        <NButtonSecondary Text="@Federation_string" OnClick="OpenFederation" />
+                    }
+
                     @if (CanCreate)
                     {
                         <NButtonPrimary Text="@Create_event_string" StartIcon="@Icons.Material.Filled.Add" OnClick="Create" />

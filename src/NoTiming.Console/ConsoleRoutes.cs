@@ -13,6 +13,7 @@ public static class ConsoleRoutes
     const string SETUP = $"/console/events/{EVENT_ID_SEGMENT}/setup";
     public const string FIRST_SEGMENT = "console";
     public const string HOME = "/console";
+    public const string FEDERATION_PAGE = "/console/federation";
     public const string EVENT_SETUP_PAGE = SETUP;
     public const string EVENT_DASHBOARD_PAGE = $"/console/events/{EVENT_ID_SEGMENT}/dashboard";
     public const string EVENT_RANKINGS_PAGE = $"/console/events/{EVENT_ID_SEGMENT}/rankings";

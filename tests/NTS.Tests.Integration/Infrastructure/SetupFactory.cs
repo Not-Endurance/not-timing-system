@@ -22,7 +22,7 @@ namespace NTS.Tests.Integration.Infrastructure;
 /// </summary>
 internal static class SetupFactory
 {
-    public static SetupConfigureEvent Full(Guid id, string name = "Full Setup")
+    public static SetupConfigureEvent Full(Guid id, string name = "Full Setup", DateTimeOffset? start = null)
     {
         var country = new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
         var loop20 = new SetupLoop(20, TestId.Of(10));
@@ -55,7 +55,7 @@ internal static class SetupFactory
         var competition = new SetupCompetition(
             "CEI 1*",
             CompetitionRuleset.FEI,
-            new DateTimeOffset(2030, 5, 21, 8, 0, 0, TimeSpan.Zero),
+            start ?? new DateTimeOffset(2030, 5, 21, 8, 0, 0, TimeSpan.Zero),
             compulsoryThresholdSpan: TimeSpan.FromMinutes(10),
             minSpeedRestriction: 12.0,
             maxSpeedRestriction: 25.0,

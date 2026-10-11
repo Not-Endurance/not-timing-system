@@ -5,10 +5,12 @@
 
 <KrudForm Shell="this" AdditionalContent="AdditionalContent" DisableBack>
     <FormFields>
-        <NTextField @bind-Value="Model.Name" For="() => Model.Name" Label="@Name_string" />
+        <NTextField @bind-Value="Model.Name" @bind-Value:after="Check" For="() => Model.Name" Label="@Name_string" />
 
-        <NTextField @bind-Value="Model.NameEnglish" For="() => Model.NameEnglish" Label="@Name_in_English_string" />
+        <NTextField @bind-Value="Model.NameEnglish" @bind-Value:after="Check" For="() => Model.NameEnglish" Label="@Name_in_English_string" />
 
-        <NTextField @bind-Value="Model.FeiId" For="() => Model.FeiId" Label="@FEI_ID_string" />
+        <NTextField @bind-Value="Model.FeiId" @bind-Value:after="Check" For="() => Model.FeiId" Label="@FEI_ID_string" />
+
+        <SameRowsAlert Rows="Same" />
     </FormFields>
 </KrudForm>
