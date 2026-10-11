@@ -1,0 +1,20 @@
+@using Not.Blazor.Components.Print
+
+@inherits StartlistPageBehind
+
+<NContent Title="@Startlist_string" IsLoading="@IsLoading" IsEmpty="@(!IsLoading && !CanPrint)" EmptyMessage="@Startlist_empty_message_string">
+
+    <Main>
+        @if (Document != null)
+        {
+            <StartlistDocumentComponent Document="Document" LeftLogo="@LeftLogo" RightLogo="@RightLogo" />
+        }
+    </Main>
+
+    <Rightbar>
+        <MudStack Spacing="3" data-testid="console-startlist-panel">
+            <NPrintPanel @bind-Scale="PrintFontScale" Actions="@PrintActions" Disabled="@(!CanPrint)" />
+        </MudStack>
+    </Rightbar>
+
+</NContent>

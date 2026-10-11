@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Print;
 using Not.Print;
 using NoTiming.Console.Features.Printing;
+using NoTiming.Console.Features.Startlist;
 using NoTiming.Ui.Components.Results;
 using NTS.Contracts;
 using NTS.Domain.Aggregates;
@@ -77,6 +78,33 @@ public sealed class PrintRequestsTests
     }
 
     [Fact]
+    public async Task The_Startlist_is_one_A4_page_in_portrait_at_the_scale_the_person_chose_with_the_logos_of_the_Tenant()
+    {
+        var renderer = new RecordingRenderer();
+        var document = StartlistDocument.Compose([], EventOf(), []);
+
+        var request = await new PrintRequests(renderer).Startlist(
+            document,
+            new NPrintPanelContext(0.7m, NPrintPaperFormat.A3, NPrintOrientation.Landscape),
+            "left.png",
+            "right.png"
+        );
+
+        Assert.Equal(NPrintPaperFormat.A4, request.Page.PaperFormat); // the choice of the paper is for Handouts
+        Assert.Equal(NPrintOrientation.Portrait, request.Page.Orientation);
+        Assert.Equal(0.7m, request.Page.Scale);
+        Assert.Equal("10mm 10mm 12mm 10mm", request.Page.Margin);
+        Assert.Equal(Startlist_string, request.Title);
+        Assert.Equal("appicon.svg", request.BackdropImage);
+        Assert.StartsWith(Generated_by_NoTiming_System_v_string, request.FooterText, StringComparison.Ordinal);
+        Assert.Equal("<startlist of Event>", request.Html);
+        var rendered = Assert.Single(renderer.Rendered);
+        Assert.Same(document, rendered[nameof(StartlistDocumentComponent.Document)]);
+        Assert.Equal("left.png", rendered[nameof(StartlistDocumentComponent.LeftLogo)]);
+        Assert.Equal("right.png", rendered[nameof(StartlistDocumentComponent.RightLogo)]);
+    }
+
+    [Fact]
     public async Task No_Handout_is_an_empty_document()
     {
         var request = await new PrintRequests(new RecordingRenderer()).Handouts(
@@ -136,9 +164,14 @@ public sealed class PrintRequestsTests
             TestId.Of(10),
             Guid.NewGuid()
         );
+        return new ResultsDocument(new Result(ranking, [participation]), EventOf(), []);
+    }
+
+    static EventInformation EventOf()
+    {
+        var country = new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
         var span = new EventSpan(DateTimeOffset.Now.Date, DateTimeOffset.Now.Date.AddDays(1));
-        var eventInformation = new EventInformation(country, "Event", "Location", span, null, id: TestId.Of(10));
-        return new ResultsDocument(new Result(ranking, [participation]), eventInformation, []);
+        return new EventInformation(country, "Event", "Location", span, null, id: TestId.Of(10));
     }
 
     sealed class RecordingRenderer : INHtmlComponentRenderer
@@ -149,8 +182,14 @@ public sealed class PrintRequestsTests
             where TComponent : IComponent
         {
             Rendered.Add(parameters);
-            var document = (ResultsDocument)parameters[nameof(ResultComponent.Document)]!;
-            return Task.FromResult($"<document of {document.Results.Name}>");
+            return Task.FromResult(
+                parameters[nameof(ResultComponent.Document)] switch
+                {
+                    ResultsDocument results => $"<document of {results.Results.Name}>",
+                    StartlistDocument startlist => $"<startlist of {startlist.Header.Title}>",
+                    _ => throw new InvalidOperationException("The stub renders the documents of the Console only."),
+                }
+            );
         }
     }
 }

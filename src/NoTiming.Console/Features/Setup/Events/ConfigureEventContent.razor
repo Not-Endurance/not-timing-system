@@ -9,6 +9,8 @@
 @attribute [Route(EVENT_SETUP_PAGE)]
 @inherits ConfigureEventContentBehind
 
+<EventNavigation EventId="EventId" Current="@EVENT_SETUP_PAGE" />
+
 <NContent Title="@Configure_Event_string" IsLoading="@IsLoading" IsEmpty="Opened == null" EmptyMessage="@Event_not_yours_to_run_string">
 
     <Main>

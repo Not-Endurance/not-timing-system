@@ -371,6 +371,7 @@ namespace NTS.Localization
         public static string Rankings_list_empty_message_string => LocalizeString(nameof(Rankings_list_empty_message_string));
         public static string Handout_made_string => LocalizeString(nameof(Handout_made_string));
         public static string Handout_not_made_string => LocalizeString(nameof(Handout_not_made_string));
+        public static string Startlist_empty_message_string => LocalizeString(nameof(Startlist_empty_message_string));
     }
 }
 #pragma warning restore NA0004

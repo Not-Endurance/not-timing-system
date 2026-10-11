@@ -1132,4 +1132,7 @@
   <data name="Please_select_the_combination_string" xml:space="preserve">
     <value>Lütfen kombinasyonu seçin</value>
   </data>
+  <data name="Startlist_empty_message_string" xml:space="preserve">
+    <value>Henüz zamanı belirlenmiş bir başlangıç yok.</value>
+  </data>
 </root>

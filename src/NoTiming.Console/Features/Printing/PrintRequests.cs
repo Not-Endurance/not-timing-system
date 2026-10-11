@@ -1,6 +1,7 @@
 using System.Text;
 using Not.Blazor.Components.Print;
 using Not.Print;
+using NoTiming.Console.Features.Startlist;
 using NoTiming.Ui.Components.Results;
 using NTS.Contracts;
 using NTS.Domain.Core.Objects.Documents;
@@ -8,7 +9,7 @@ using NTS.Domain.Core.Objects.Documents;
 namespace NoTiming.Console.Features.Printing;
 
 /// <summary>
-/// What the Console prints through the browser (#646, ADR-0011): the Results of a Ranking and the Handouts of an Event as the
+/// What the Console prints through the browser (#646, ADR-0011): the Results of a Ranking, the Handouts and the Startlist of an Event as the
 /// HTML of their documents, in the page that the person chose (its size, its direction, its scale), with the logos of the Tenant
 /// at the head of each. The browser prints that page and the person saves it as a file there, if they want one: nothing is
 /// rendered on a server. The logos are the Tenant's, or the Event's when it has its own.
@@ -83,6 +84,38 @@ public sealed class PrintRequests
                 Orientation = context.Orientation,
                 Scale = context.Scale,
                 Margin = HANDOUT_PAGE_MARGIN,
+            },
+        };
+    }
+
+    public async Task<NPrintDocumentRequest> Startlist(
+        StartlistDocument document,
+        NPrintPanelContext context,
+        string? leftLogo,
+        string? rightLogo
+    )
+    {
+        var html = await _renderer.Render<StartlistDocumentComponent>(
+            new Dictionary<string, object?>
+            {
+                [nameof(StartlistDocumentComponent.Document)] = document,
+                [nameof(StartlistDocumentComponent.LeftLogo)] = leftLogo,
+                [nameof(StartlistDocumentComponent.RightLogo)] = rightLogo,
+            }
+        );
+        return new NPrintDocumentRequest
+        {
+            Title = Startlist_string,
+            FileName = "startlist.pdf",
+            Html = html,
+            FooterText = GeneratedByText,
+            BackdropImage = BACKDROP,
+            Page = new NPrintPageOptions
+            {
+                PaperFormat = NPrintPaperFormat.A4,
+                Orientation = NPrintOrientation.Portrait,
+                Scale = context.Scale,
+                Margin = RANKLIST_PAGE_MARGIN,
             },
         };
     }

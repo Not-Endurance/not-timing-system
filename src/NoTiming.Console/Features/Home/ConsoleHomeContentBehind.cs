@@ -71,6 +71,12 @@ public class ConsoleHomeContentBehind : NStatefulComponent
         return row is { Stage: EventStage.Live, IsMainOperator: true };
     }
 
+    /// <summary>The Results of an Event that is over, or of a Live one that the person does not run: the Console's page of them prints and exports.</summary>
+    protected static bool ShowResults(ConsoleEvent row)
+    {
+        return row.Stage == EventStage.Historic || row is { Stage: EventStage.Live, IsMainOperator: false };
+    }
+
     protected void OpenHistoricEvents()
     {
         Navigator.NavigateTo(Routes.HISTORIC_EVENTS_PAGE);
@@ -88,7 +94,7 @@ public class ConsoleHomeContentBehind : NStatefulComponent
 
     protected void OpenResults(ConsoleEvent row)
     {
-        Navigator.NavigateTo(Routes.Of(Routes.HISTORIC_EVENT_DETAILS_PAGE, row.Id));
+        Navigator.NavigateTo(Routes.Of(ConsoleRoutes.EVENT_RANKINGS_PAGE, row.Id));
     }
 
     protected void OpenSetup(ConsoleEvent row)

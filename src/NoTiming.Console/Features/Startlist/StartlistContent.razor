@@ -1,0 +1,18 @@
+@using NoTiming.Ui.Components.EventViews
+@using NTS.Domain.Access
+
+@attribute [Route(EVENT_STARTLIST_PAGE)]
+@inherits StartlistContentBehind
+
+<EventNavigation EventId="EventId" Current="@EVENT_STARTLIST_PAGE" />
+
+@if (IsLoading || !MayRun)
+{
+    <NContent Title="@Startlist_string" IsLoading="@IsLoading" IsEmpty="@(!IsLoading)" EmptyMessage="@Event_not_yours_to_run_string" />
+}
+else
+{
+    <ViewedEventScope EventId="EventId" Shows="CoreView.Startlist">
+        <StartlistPage />
+    </ViewedEventScope>
+}

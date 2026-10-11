@@ -4,6 +4,8 @@
 @attribute [Route(EVENT_HANDOUTS_PAGE)]
 @inherits HandoutsContentBehind
 
+<EventNavigation EventId="EventId" Current="@EVENT_HANDOUTS_PAGE" />
+
 @if (IsLoading || !MayRun)
 {
     <NContent Title="@Handouts_string" IsLoading="@IsLoading" IsEmpty="@(!IsLoading)" EmptyMessage="@Event_not_yours_to_run_string" />

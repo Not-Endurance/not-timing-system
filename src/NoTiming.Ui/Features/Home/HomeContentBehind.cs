@@ -4,9 +4,15 @@ using NTS.Contracts.Features.Access;
 
 namespace NoTiming.Ui.Features.Home;
 
+/// <summary>
+/// The first page of the app, which takes the person to the one that their access begins at once the app is connected. A
+/// person who leaves it before then (a link of the drawer, such as the Console, opened at once) is not taken from where they
+/// went to.
+/// </summary>
 public class HomeContentBehind : NStatefulComponent
 {
     bool _hasRedirected;
+    bool _left;
 
     [Inject]
     IWitnessAccessContext AccessState { get; set; } = default!;
@@ -31,6 +37,17 @@ public class HomeContentBehind : NStatefulComponent
 
         _hasRedirected = true;
         await BlazorSocketService.EnsureConnected();
+        if (_left)
+        {
+            return;
+        }
+
         Navigator.NavigateTo(WitnessAccessPolicy.ResolveHomeRoute(AccessState.AccessLevel));
+    }
+
+    public override void Dispose()
+    {
+        _left = true;
+        base.Dispose();
     }
 }

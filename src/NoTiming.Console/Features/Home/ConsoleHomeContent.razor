@@ -78,7 +78,7 @@
                                     <NButtonDanger Text="@Reset_string" OnClick="() => Reset(context)" />
                                 }
 
-                                @if (context.Stage == EventStage.Historic)
+                                @if (ShowResults(context))
                                 {
                                     <NButtonSecondary Text="@Results_string" OnClick="() => OpenResults(context)" />
                                 }

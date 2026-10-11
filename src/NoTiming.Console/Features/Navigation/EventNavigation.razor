@@ -1,0 +1,11 @@
+@inherits EventNavigationBehind
+
+@if (Links.Count > 1)
+{
+    <MudStack Row Wrap="Wrap.Wrap" Spacing="2" Class="mb-4" data-testid="console-event-navigation">
+        @foreach (var link in Links)
+        {
+            <NButtonSecondary @key="link.Route" Text="@link.Text" Disabled="@link.IsCurrent" OnClick="() => Open(link)" />
+        }
+    </MudStack>
+}

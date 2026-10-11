@@ -77,6 +77,15 @@
 
     <MudNavLink OnClick="OpenSelectEventDialog">@Select_event_string</MudNavLink>
 
+    @if (ShowProfileHeader)
+    {
+        <MudNavGroup Title="@Console_string" Expanded="true">
+            <NNavLink Endpoint="@CONSOLE_PAGE">
+                <strong>@Console_string</strong>
+            </NNavLink>
+        </MudNavGroup>
+    }
+
     <MudNavGroup Title="@History_string" Expanded="true">
         <NNavLink Endpoint="@HISTORIC_EVENTS_PAGE">
             <strong>@Historic_events_string</strong>

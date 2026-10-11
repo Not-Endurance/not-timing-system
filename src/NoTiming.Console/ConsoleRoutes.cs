@@ -17,6 +17,7 @@ public static class ConsoleRoutes
     public const string EVENT_DASHBOARD_PAGE = $"/console/events/{EVENT_ID_SEGMENT}/dashboard";
     public const string EVENT_RANKINGS_PAGE = $"/console/events/{EVENT_ID_SEGMENT}/rankings";
     public const string EVENT_HANDOUTS_PAGE = $"/console/events/{EVENT_ID_SEGMENT}/handouts";
+    public const string EVENT_STARTLIST_PAGE = $"/console/events/{EVENT_ID_SEGMENT}/startlist";
     public const string COMPETITION_PAGE = $"{SETUP}/competition";
     public const string PARTICIPATION_PAGE = $"{SETUP}/competition/participation";
     public const string PHASE_PAGE = $"{SETUP}/competition/phase";
