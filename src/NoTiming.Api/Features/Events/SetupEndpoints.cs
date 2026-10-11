@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Not.Identity;
 using NoTiming.Api.Features.Access;
+using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
@@ -195,6 +196,7 @@ internal static class SetupEndpoints
         EventStore events,
         TenantCollections tenants,
         EventGrantStore grants,
+        BrandingStore branding,
         TenancyLog log
     )
     {
@@ -227,6 +229,7 @@ internal static class SetupEndpoints
 
         // What the Main Operator gave on the Event goes with it, so that no grant is left waiting for an Event that is not there.
         await grants.RemoveAllOfAsync(facts.Record, context.RequestAborted);
+        await branding.RemoveOfEventAsync(facts.TenantId, eventId, context.RequestAborted); // and the logos it put in place of the Tenant's
         log.EventDeleted(user.Id, eventId, facts.TenantId);
         return Results.NoContent();
     }

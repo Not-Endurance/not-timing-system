@@ -1165,4 +1165,46 @@
   <data name="Of_another_federation_string" xml:space="preserve">
     <value>başka bir federasyonun</value>
   </data>
+  <data name="Logos_string" xml:space="preserve">
+    <value>Logolar</value>
+  </data>
+  <data name="Left_logo_string" xml:space="preserve">
+    <value>Sol logo</value>
+  </data>
+  <data name="Right_logo_string" xml:space="preserve">
+    <value>Sağ logo</value>
+  </data>
+  <data name="Choose_a_logo_string" xml:space="preserve">
+    <value>Bir resim seç</value>
+  </data>
+  <data name="Remove_logo_string" xml:space="preserve">
+    <value>Logoyu kaldır</value>
+  </data>
+  <data name="Use_the_federations_logo_string" xml:space="preserve">
+    <value>Federasyonun logosunu kullan</value>
+  </data>
+  <data name="No_logo_string" xml:space="preserve">
+    <value>Logo yok</value>
+  </data>
+  <data name="Logo_of_the_federation_string" xml:space="preserve">
+    <value>Federasyonun logosu</value>
+  </data>
+  <data name="Logo_of_the_event_string" xml:space="preserve">
+    <value>Bu etkinliğin logosu</value>
+  </data>
+  <data name="Logo_is_too_large_string" xml:space="preserve">
+    <value>Bir logo en fazla {0} KiB ağırlığında olabilir.</value>
+  </data>
+  <data name="Logo_not_an_image_string" xml:space="preserve">
+    <value>PNG, JPEG, GIF veya WebP türünde bir resim seçin.</value>
+  </data>
+  <data name="Logo_saved_string" xml:space="preserve">
+    <value>Logo kaydedildi.</value>
+  </data>
+  <data name="Logo_removed_string" xml:space="preserve">
+    <value>Logo kaldırıldı.</value>
+  </data>
+  <data name="Logos_hint_string" xml:space="preserve">
+    <value>PNG, JPEG, GIF veya WebP, en fazla {0} KiB; yazdırılan belgelerin başına konur.</value>
+  </data>
 </root>

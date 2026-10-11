@@ -46,7 +46,7 @@ public sealed class ConsoleNavigationBrowserTests : IClassFixture<ApiHostFixture
         var navigation = page.GetByTestId("console-event-navigation");
         await Expect(navigation.GetByRole(AriaRole.Button, new() { Name = "Dashboard", Exact = true }))
             .ToBeDisabledAsync(Settled());
-        await Expect(navigation.GetByRole(AriaRole.Button)).ToHaveCountAsync(7, Counted());
+        await Expect(navigation.GetByRole(AriaRole.Button)).ToHaveCountAsync(8, Counted());
         await navigation.GetByRole(AriaRole.Button, new() { Name = "Handouts", Exact = true }).ClickAsync();
         await page.WaitForURLAsync(device.Url($"/console/events/{eventId}/handouts"), new() { Timeout = PATIENCE });
         await Expect(page.GetByText("Create Handouts manually to print...").First).ToBeVisibleAsync(Loaded());

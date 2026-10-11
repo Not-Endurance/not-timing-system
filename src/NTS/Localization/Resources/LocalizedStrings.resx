@@ -1212,4 +1212,46 @@
   <data name="Of_another_federation_string" xml:space="preserve">
     <value>of another federation</value>
   </data>
+  <data name="Logos_string" xml:space="preserve">
+    <value>Logos</value>
+  </data>
+  <data name="Left_logo_string" xml:space="preserve">
+    <value>Left logo</value>
+  </data>
+  <data name="Right_logo_string" xml:space="preserve">
+    <value>Right logo</value>
+  </data>
+  <data name="Choose_a_logo_string" xml:space="preserve">
+    <value>Choose an image</value>
+  </data>
+  <data name="Remove_logo_string" xml:space="preserve">
+    <value>Remove the logo</value>
+  </data>
+  <data name="Use_the_federations_logo_string" xml:space="preserve">
+    <value>Use the logo of the federation</value>
+  </data>
+  <data name="No_logo_string" xml:space="preserve">
+    <value>No logo</value>
+  </data>
+  <data name="Logo_of_the_federation_string" xml:space="preserve">
+    <value>The logo of the federation</value>
+  </data>
+  <data name="Logo_of_the_event_string" xml:space="preserve">
+    <value>The logo of this Event</value>
+  </data>
+  <data name="Logo_is_too_large_string" xml:space="preserve">
+    <value>A logo weighs at most {0} KiB.</value>
+  </data>
+  <data name="Logo_not_an_image_string" xml:space="preserve">
+    <value>Choose a PNG, JPEG, GIF or WebP image.</value>
+  </data>
+  <data name="Logo_saved_string" xml:space="preserve">
+    <value>The logo was saved.</value>
+  </data>
+  <data name="Logo_removed_string" xml:space="preserve">
+    <value>The logo was removed.</value>
+  </data>
+  <data name="Logos_hint_string" xml:space="preserve">
+    <value>PNG, JPEG, GIF or WebP, of up to {0} KiB, which go at the head of what is printed.</value>
+  </data>
 </root>

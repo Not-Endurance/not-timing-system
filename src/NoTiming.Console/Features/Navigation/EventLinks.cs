@@ -30,6 +30,7 @@ public static class EventLinks
         if (row is { Stage: EventStage.Unstarted, IsMainOperator: true })
         {
             yield return (Setup_string, ConsoleRoutes.EVENT_SETUP_PAGE);
+            yield return (Logos_string, ConsoleRoutes.EVENT_BRANDING_PAGE);
         }
         else if (row is { Stage: EventStage.Live, IsMainOperator: true })
         {
@@ -37,6 +38,7 @@ public static class EventLinks
             yield return (Startlist_string, ConsoleRoutes.EVENT_STARTLIST_PAGE);
             yield return (Ranklist_string, ConsoleRoutes.EVENT_RANKINGS_PAGE);
             yield return (Handouts_string, ConsoleRoutes.EVENT_HANDOUTS_PAGE);
+            yield return (Logos_string, ConsoleRoutes.EVENT_BRANDING_PAGE);
             yield return (Arrivelist_string, Routes.EVENT_ARRIVELIST_PAGE);
             yield return (Presentlist_string, Routes.EVENT_PRESENTLIST_PAGE);
         }

@@ -5,6 +5,7 @@ using Not.Domain.Exceptions;
 using Not.Print;
 using NoTiming.Console.Features.Printing;
 using NTS.Contracts.Core;
+using NTS.Contracts.Features.Console;
 using NTS.Domain.Core.Objects.Documents;
 
 namespace NoTiming.Console.Features.Startlist;
@@ -21,9 +22,12 @@ public class StartlistPageBehind : NStatefulComponent
     [Inject]
     INHtmlComponentRenderer Renderer { get; set; } = default!;
 
+    [Inject]
+    IConsoleBranding Branding { get; set; } = default!;
+
     protected StartlistDocument? Document { get; private set; }
-    protected string? LeftLogo => null;
-    protected string? RightLogo => null;
+    protected string? LeftLogo => Branding.LeftLogo;
+    protected string? RightLogo => Branding.RightLogo;
     protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
     protected bool CanPrint => Document is { Stages.Count: > 0 };
 
@@ -36,6 +40,8 @@ public class StartlistPageBehind : NStatefulComponent
     protected override async Task OnInitializedAsync()
     {
         await Observe(View);
+        await Observe(Branding);
+        await Branding.Show(View); // the logos it is printed with
     }
 
     protected override void OnBeforeRender()

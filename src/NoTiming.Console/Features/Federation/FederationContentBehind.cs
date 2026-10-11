@@ -28,6 +28,7 @@ public class FederationContentBehind : NStatefulComponent
     protected string Title => string.IsNullOrWhiteSpace(Federation.Name) ? Federation_string : Federation.Name;
     protected bool MayEdit => Federation.CanEditRules || Federation.CanEditBranding;
     protected bool CanEditRules => Federation.CanEditRules;
+    protected bool CanEditBranding => Federation.CanEditBranding;
 
     protected bool OnlyAverageLoopSpeed
     {

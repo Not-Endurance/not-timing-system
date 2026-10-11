@@ -45,6 +45,9 @@ public class RankingsPageBehind : NStatefulComponent
     [Inject]
     INotifier Notifier { get; set; } = default!;
 
+    [Inject]
+    IConsoleBranding Branding { get; set; } = default!;
+
     protected ResultsDocument? Document { get; private set; }
     protected IReadOnlyList<Ranking> Ranked => View.Rankings;
     protected Ranking? CurrentRanking => _selected;
@@ -54,8 +57,8 @@ public class RankingsPageBehind : NStatefulComponent
     protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
     protected EventCallback<Ranking> OnDelete =>
         CanChange ? EventCallback.Factory.Create<Ranking>(this, OpenDeleteDialog) : default;
-    protected string? LeftLogo => null;
-    protected string? RightLogo => null;
+    protected string? LeftLogo => Branding.LeftLogo;
+    protected string? RightLogo => Branding.RightLogo;
 
     protected IReadOnlyList<NPrintPanelAction> PrintActions =>
         [NPrintPanelAction.PrintPdf(Print_string, CreatePrintRequest, Icons.Material.Outlined.Print)];
@@ -68,6 +71,8 @@ public class RankingsPageBehind : NStatefulComponent
         Rankings.Show(View);
         _selected = View.Rankings.FirstOrDefault();
         await Observe(View);
+        await Observe(Branding);
+        await Branding.Show(View); // the logos it is printed with
     }
 
     protected override void OnBeforeRender()

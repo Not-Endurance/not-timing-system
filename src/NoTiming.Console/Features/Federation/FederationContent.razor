@@ -1,3 +1,4 @@
+@using NoTiming.Console.Features.Branding
 @using Not.Blazor.Components.Input
 
 @attribute [Route(FEDERATION_PAGE)]
@@ -29,6 +30,11 @@
                 <MudStack Row Justify="Justify.FlexEnd">
                     <NButtonPrimary Text="@Save_string" OnClick="Save" />
                 </MudStack>
+            }
+
+            @if (CanEditBranding)
+            {
+                <BrandingPanel CanEdit="true" />
             }
 
         </MudStack>

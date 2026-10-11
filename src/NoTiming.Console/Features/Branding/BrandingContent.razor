@@ -1,0 +1,20 @@
+@attribute [Route(EVENT_BRANDING_PAGE)]
+@inherits BrandingContentBehind
+
+<EventNavigation EventId="EventId" Current="@EVENT_BRANDING_PAGE" />
+
+<NContent Title="@Logos_string" IsLoading="@IsLoading" IsEmpty="@(!IsLoading && !MayEdit)" EmptyMessage="@Event_not_yours_to_run_string">
+
+    <Main>
+        <MudStack Spacing="4">
+
+            <MudStack Row Justify="Justify.FlexStart">
+                <NButtonBack OnClick="GoHome" />
+            </MudStack>
+
+            <BrandingPanel EventId="EventId" CanEdit="true" />
+
+        </MudStack>
+    </Main>
+
+</NContent>

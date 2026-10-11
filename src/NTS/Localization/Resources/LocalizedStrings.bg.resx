@@ -1215,4 +1215,46 @@
   <data name="Of_another_federation_string" xml:space="preserve">
     <value>на друга федерация</value>
   </data>
+  <data name="Logos_string" xml:space="preserve">
+    <value>Лога</value>
+  </data>
+  <data name="Left_logo_string" xml:space="preserve">
+    <value>Ляво лого</value>
+  </data>
+  <data name="Right_logo_string" xml:space="preserve">
+    <value>Дясно лого</value>
+  </data>
+  <data name="Choose_a_logo_string" xml:space="preserve">
+    <value>Избери изображение</value>
+  </data>
+  <data name="Remove_logo_string" xml:space="preserve">
+    <value>Премахни логото</value>
+  </data>
+  <data name="Use_the_federations_logo_string" xml:space="preserve">
+    <value>Използвай логото на федерацията</value>
+  </data>
+  <data name="No_logo_string" xml:space="preserve">
+    <value>Няма лого</value>
+  </data>
+  <data name="Logo_of_the_federation_string" xml:space="preserve">
+    <value>Логото на федерацията</value>
+  </data>
+  <data name="Logo_of_the_event_string" xml:space="preserve">
+    <value>Логото на това събитие</value>
+  </data>
+  <data name="Logo_is_too_large_string" xml:space="preserve">
+    <value>Логото тежи най-много {0} KiB.</value>
+  </data>
+  <data name="Logo_not_an_image_string" xml:space="preserve">
+    <value>Изберете изображение PNG, JPEG, GIF или WebP.</value>
+  </data>
+  <data name="Logo_saved_string" xml:space="preserve">
+    <value>Логото беше запазено.</value>
+  </data>
+  <data name="Logo_removed_string" xml:space="preserve">
+    <value>Логото беше премахнато.</value>
+  </data>
+  <data name="Logos_hint_string" xml:space="preserve">
+    <value>PNG, JPEG, GIF или WebP, до {0} KiB, които се слагат най-горе на отпечатаното.</value>
+  </data>
 </root>

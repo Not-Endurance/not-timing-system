@@ -20,9 +20,12 @@ public sealed class EventLinksTests
     {
         var links = EventLinks.For(Row(EventStage.Unstarted, true), ConsoleRoutes.EVENT_SETUP_PAGE);
 
-        Assert.Equal([Console_string, Setup_string], links.Select(x => x.Text));
-        Assert.Equal(["/console", $"/console/events/{EVENT}/setup"], links.Select(x => x.Route));
-        Assert.Equal([false, true], links.Select(x => x.IsCurrent));
+        Assert.Equal([Console_string, Setup_string, Logos_string], links.Select(x => x.Text));
+        Assert.Equal(
+            ["/console", $"/console/events/{EVENT}/setup", $"/console/events/{EVENT}/branding"],
+            links.Select(x => x.Route)
+        );
+        Assert.Equal([false, true, false], links.Select(x => x.IsCurrent));
     }
 
     [Fact]
@@ -37,6 +40,7 @@ public sealed class EventLinksTests
                 Startlist_string,
                 Ranklist_string,
                 Handouts_string,
+                Logos_string,
                 Arrivelist_string,
                 Presentlist_string,
             ],
@@ -49,6 +53,7 @@ public sealed class EventLinksTests
                 $"/console/events/{EVENT}/startlist",
                 $"/console/events/{EVENT}/rankings",
                 $"/console/events/{EVENT}/handouts",
+                $"/console/events/{EVENT}/branding",
                 $"/events/{EVENT}/arrivelist",
                 $"/events/{EVENT}/presentlist",
             ],

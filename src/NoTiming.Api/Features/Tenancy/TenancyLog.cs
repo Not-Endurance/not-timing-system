@@ -21,6 +21,8 @@ internal static class TenancyEvents
     public static readonly EventId EVENT_DELETED = new(1109, "EventDeleted");
     public static readonly EventId EVENT_STARTED = new(1110, "EventStarted");
     public static readonly EventId EVENT_RESET = new(1111, "EventReset");
+    public static readonly EventId TENANT_BRANDING_EDITED = new(1112, "TenantBrandingEdited");
+    public static readonly EventId EVENT_BRANDING_EDITED = new(1113, "EventBrandingEdited");
 }
 
 /// <summary>
@@ -138,6 +140,29 @@ internal sealed class TenancyLog
             tenantId,
             rules.OnlyAverageLoopSpeed,
             rules.RankerCode
+        );
+    }
+
+    public void TenantBrandingEdited(Guid user, string tenantId, IReadOnlyCollection<string> positions)
+    {
+        _logger.LogInformation(
+            TenancyEvents.TENANT_BRANDING_EDITED,
+            "User {UserId} edited the logos of Tenant {TenantId}: {Positions}.",
+            user,
+            tenantId,
+            string.Join(", ", positions)
+        );
+    }
+
+    public void EventBrandingEdited(Guid user, Guid eventId, string tenantId, IReadOnlyCollection<string> positions)
+    {
+        _logger.LogInformation(
+            TenancyEvents.EVENT_BRANDING_EDITED,
+            "User {UserId} edited the logos of Event {EventId} of Tenant {TenantId}: {Positions}.",
+            user,
+            eventId,
+            tenantId,
+            string.Join(", ", positions)
         );
     }
 

@@ -33,9 +33,12 @@ public class HandoutsPageBehind : NStatefulComponent
     [Inject]
     INHtmlComponentRenderer Renderer { get; set; } = default!;
 
+    [Inject]
+    IConsoleBranding Branding { get; set; } = default!;
+
     protected IReadOnlyList<ResultsDocument> Documents { get; private set; } = [];
-    protected string? LeftLogo => null;
-    protected string? RightLogo => null;
+    protected string? LeftLogo => Branding.LeftLogo;
+    protected string? RightLogo => Branding.RightLogo;
     protected NPrintPaperFormat PaperFormat { get; set; } = NPrintPaperFormat.A5;
     protected NPrintOrientation Orientation { get; set; } = NPrintOrientation.Landscape;
     protected decimal PrintFontScale { get; set; } = DEFAULT_PRINT_SCALE;
@@ -56,6 +59,8 @@ public class HandoutsPageBehind : NStatefulComponent
             Watch();
             await Observe(Handouts);
             await Observe(View);
+            await Observe(Branding);
+            await Branding.Show(View); // the logos it is printed with
         }
         catch (Exception ex)
         {

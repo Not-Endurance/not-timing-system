@@ -382,6 +382,20 @@ namespace NTS.Localization
         public static string Same_name_string => LocalizeString(nameof(Same_name_string));
         public static string Same_FEI_ID_string => LocalizeString(nameof(Same_FEI_ID_string));
         public static string Of_another_federation_string => LocalizeString(nameof(Of_another_federation_string));
+        public static string Logos_string => LocalizeString(nameof(Logos_string));
+        public static string Left_logo_string => LocalizeString(nameof(Left_logo_string));
+        public static string Right_logo_string => LocalizeString(nameof(Right_logo_string));
+        public static string Choose_a_logo_string => LocalizeString(nameof(Choose_a_logo_string));
+        public static string Remove_logo_string => LocalizeString(nameof(Remove_logo_string));
+        public static string Use_the_federations_logo_string => LocalizeString(nameof(Use_the_federations_logo_string));
+        public static string No_logo_string => LocalizeString(nameof(No_logo_string));
+        public static string Logo_of_the_federation_string => LocalizeString(nameof(Logo_of_the_federation_string));
+        public static string Logo_of_the_event_string => LocalizeString(nameof(Logo_of_the_event_string));
+        public static string Logo_is_too_large_string => LocalizeString(nameof(Logo_is_too_large_string));
+        public static string Logo_not_an_image_string => LocalizeString(nameof(Logo_not_an_image_string));
+        public static string Logo_saved_string => LocalizeString(nameof(Logo_saved_string));
+        public static string Logo_removed_string => LocalizeString(nameof(Logo_removed_string));
+        public static string Logos_hint_string => LocalizeString(nameof(Logos_hint_string));
     }
 }
 #pragma warning restore NA0004

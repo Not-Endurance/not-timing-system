@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
@@ -50,6 +51,7 @@ internal static class ApiServices
         services.AddSingleton<TenancyLog>();
         services.AddSingleton<TenantStore>();
         services.AddSingleton<TenantCollections>();
+        services.AddSingleton<BrandingStore>();
         services.AddSingleton<CrossTenantReads>();
         services.AddSingleton<EventStore>();
         services.AddSingleton<EventStarter>();
