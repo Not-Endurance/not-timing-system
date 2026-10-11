@@ -1,5 +1,7 @@
 using Not.Blazor.Components.Abstractions;
 using NTS.Contracts.Features.Console;
+using NTS.Contracts.Socket;
+using NTS.Domain.Access;
 
 namespace NoTiming.Console.Features.Navigation;
 
@@ -16,8 +18,17 @@ public class EventNavigationBehind : NStatefulComponent
     [Inject]
     NavigationManager Navigator { get; set; } = default!;
 
+    [Inject]
+    INtsSocketService Socket { get; set; } = default!;
+
     protected IReadOnlyList<EventLink> Links =>
         Events.Events.FirstOrDefault(x => x.Id == EventId) is { } row ? EventLinks.For(row, Current) : [];
+
+    /// <summary>Whether the connection to the Event is up, said to the person who runs it while it is Live.</summary>
+    protected EventConnection? Connection =>
+        Events.Events.FirstOrDefault(x => x.Id == EventId) is { Stage: EventStage.Live, IsMainOperator: true } row
+            ? EventConnection.Of(Socket, row.Id, row.Name)
+            : null;
 
     [Parameter, EditorRequired]
     public Guid EventId { get; set; }
@@ -29,6 +40,7 @@ public class EventNavigationBehind : NStatefulComponent
     protected override async Task OnInitializedAsync()
     {
         await Observe(Events);
+        await Observe(Socket);
     }
 
     protected void Open(EventLink link)

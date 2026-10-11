@@ -47,6 +47,8 @@ public sealed class ConsoleNavigationBrowserTests : IClassFixture<ApiHostFixture
         await Expect(navigation.GetByRole(AriaRole.Button, new() { Name = "Dashboard", Exact = true }))
             .ToBeDisabledAsync(Settled());
         await Expect(navigation.GetByRole(AriaRole.Button)).ToHaveCountAsync(8, Counted());
+        await Expect(page.GetByTestId("console-connection"))
+            .ToContainTextAsync("Connected to", new() { Timeout = PATIENCE }); // the connection to the Event is up, and the person is told
         await navigation.GetByRole(AriaRole.Button, new() { Name = "Handouts", Exact = true }).ClickAsync();
         await page.WaitForURLAsync(device.Url($"/console/events/{eventId}/handouts"), new() { Timeout = PATIENCE });
         await Expect(page.GetByText("Create Handouts manually to print...").First).ToBeVisibleAsync(Loaded());

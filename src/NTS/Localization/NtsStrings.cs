@@ -396,6 +396,9 @@ namespace NTS.Localization
         public static string Logo_saved_string => LocalizeString(nameof(Logo_saved_string));
         public static string Logo_removed_string => LocalizeString(nameof(Logo_removed_string));
         public static string Logos_hint_string => LocalizeString(nameof(Logos_hint_string));
+        public static string Console_connected_string => LocalizeString(nameof(Console_connected_string));
+        public static string Console_connecting_string => LocalizeString(nameof(Console_connecting_string));
+        public static string Console_disconnected_string => LocalizeString(nameof(Console_disconnected_string));
     }
 }
 #pragma warning restore NA0004

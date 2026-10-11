@@ -1257,4 +1257,13 @@
   <data name="Logos_hint_string" xml:space="preserve">
     <value>PNG, JPEG, GIF или WebP, до {0} KiB, които се слагат най-горе на отпечатаното.</value>
   </data>
+  <data name="Console_connected_string" xml:space="preserve">
+    <value>Свързан със събитие: {0}</value>
+  </data>
+  <data name="Console_connecting_string" xml:space="preserve">
+    <value>Свързване със събитие: {0}…</value>
+  </data>
+  <data name="Console_disconnected_string" xml:space="preserve">
+    <value>Няма връзка със събитие: {0}</value>
+  </data>
 </root>

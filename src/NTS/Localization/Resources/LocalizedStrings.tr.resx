@@ -1207,4 +1207,13 @@
   <data name="Logos_hint_string" xml:space="preserve">
     <value>PNG, JPEG, GIF veya WebP, en fazla {0} KiB; yazdırılan belgelerin başına konur.</value>
   </data>
+  <data name="Console_connected_string" xml:space="preserve">
+    <value>{0} etkinliğine bağlı</value>
+  </data>
+  <data name="Console_connecting_string" xml:space="preserve">
+    <value>{0} etkinliğine bağlanılıyor…</value>
+  </data>
+  <data name="Console_disconnected_string" xml:space="preserve">
+    <value>{0} etkinliğine bağlı değil</value>
+  </data>
 </root>

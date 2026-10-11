@@ -1254,4 +1254,13 @@
   <data name="Logos_hint_string" xml:space="preserve">
     <value>PNG, JPEG, GIF or WebP, of up to {0} KiB, which go at the head of what is printed.</value>
   </data>
+  <data name="Console_connected_string" xml:space="preserve">
+    <value>Connected to {0}</value>
+  </data>
+  <data name="Console_connecting_string" xml:space="preserve">
+    <value>Connecting to {0}…</value>
+  </data>
+  <data name="Console_disconnected_string" xml:space="preserve">
+    <value>Not connected to {0}</value>
+  </data>
 </root>

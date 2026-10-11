@@ -7,5 +7,10 @@
         {
             <NButtonSecondary @key="link.Route" Text="@link.Text" Disabled="@link.IsCurrent" OnClick="() => Open(link)" />
         }
+
+        @if (Connection != null)
+        {
+            <MudChip T="string" Color="@Connection.Color" Variant="Variant.Outlined" data-testid="console-connection">@Connection.Text</MudChip>
+        }
     </MudStack>
 }
