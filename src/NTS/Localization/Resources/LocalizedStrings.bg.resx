@@ -1176,4 +1176,10 @@
   <data name="Select_participation_to_add_string" xml:space="preserve">
     <value>Изберете участник за добавяне</value>
   </data>
+  <data name="Handout_made_string" xml:space="preserve">
+    <value>Създадена е разпечатка за #{0}.</value>
+  </data>
+  <data name="Handout_not_made_string" xml:space="preserve">
+    <value>Разпечатката за #{0} не беше създадена: {1}</value>
+  </data>
 </root>

@@ -369,6 +369,8 @@ namespace NTS.Localization
         public static string Not_signed_in_string => LocalizeString(nameof(Not_signed_in_string));
         public static string Now_string => LocalizeString(nameof(Now_string));
         public static string Rankings_list_empty_message_string => LocalizeString(nameof(Rankings_list_empty_message_string));
+        public static string Handout_made_string => LocalizeString(nameof(Handout_made_string));
+        public static string Handout_not_made_string => LocalizeString(nameof(Handout_not_made_string));
     }
 }
 #pragma warning restore NA0004

@@ -1123,4 +1123,13 @@
   <data name="Template_ranking_string" xml:space="preserve">
     <value>Şablon Sıralama</value>
   </data>
+  <data name="Handout_made_string" xml:space="preserve">
+    <value>#{0} için çıktı oluşturuldu.</value>
+  </data>
+  <data name="Handout_not_made_string" xml:space="preserve">
+    <value>#{0} için çıktı oluşturulamadı: {1}</value>
+  </data>
+  <data name="Please_select_the_combination_string" xml:space="preserve">
+    <value>Lütfen kombinasyonu seçin</value>
+  </data>
 </root>

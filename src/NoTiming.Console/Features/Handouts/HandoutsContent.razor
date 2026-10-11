@@ -1,0 +1,16 @@
+@using NoTiming.Ui.Components.EventViews
+@using NTS.Domain.Access
+
+@attribute [Route(EVENT_HANDOUTS_PAGE)]
+@inherits HandoutsContentBehind
+
+@if (IsLoading || !MayRun)
+{
+    <NContent Title="@Handouts_string" IsLoading="@IsLoading" IsEmpty="@(!IsLoading)" EmptyMessage="@Event_not_yours_to_run_string" />
+}
+else
+{
+    <ViewedEventScope EventId="EventId" Shows="CoreView.Handouts">
+        <HandoutsPage />
+    </ViewedEventScope>
+}

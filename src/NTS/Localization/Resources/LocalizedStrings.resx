@@ -1173,4 +1173,10 @@
   <data name="Rankings_list_empty_message_string" xml:space="preserve">
     <value>The Event has no Rankings.</value>
   </data>
+  <data name="Handout_made_string" xml:space="preserve">
+    <value>A Handout was made for #{0}.</value>
+  </data>
+  <data name="Handout_not_made_string" xml:space="preserve">
+    <value>The Handout of #{0} was not made: {1}</value>
+  </data>
 </root>

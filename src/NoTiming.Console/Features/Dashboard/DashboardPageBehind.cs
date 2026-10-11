@@ -11,8 +11,14 @@ namespace NoTiming.Console.Features.Dashboard;
 /// </summary>
 public class DashboardPageBehind : NStatefulComponent
 {
+    IDisposable? _watching;
+    bool _disposed;
+
     [Inject]
     IConsoleDashboard Dashboard { get; set; } = default!;
+
+    [Inject]
+    IConsoleHandouts Handouts { get; set; } = default!;
 
     protected IReadOnlyList<Participation> Participations => Dashboard.Participations;
     protected IReadOnlyList<int> RecentlyTimed => Dashboard.RecentlyTimed;
@@ -44,11 +50,28 @@ public class DashboardPageBehind : NStatefulComponent
         try
         {
             await Dashboard.Show(View);
+            Watch();
             await Observe(Dashboard);
         }
         catch (Exception ex)
         {
             Handle(ex);
+        }
+    }
+
+    public override void Dispose()
+    {
+        _disposed = true;
+        _watching?.Dispose();
+        base.Dispose();
+    }
+
+    /// <summary>A Phase that completes while the page is open makes its Handout; a page that left meanwhile watches nothing.</summary>
+    void Watch()
+    {
+        if (!_disposed)
+        {
+            _watching = Handouts.Watch(View);
         }
     }
 }

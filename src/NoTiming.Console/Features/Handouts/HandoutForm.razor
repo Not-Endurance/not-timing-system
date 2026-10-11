@@ -1,0 +1,17 @@
+@using Not.Blazor.Components.Input
+@using NTS.Domain.Core.Aggregates.Participations.Entities
+
+@inherits HandoutFormBehind
+
+<MudStack Spacing="2">
+
+    <NAutocomplete T="Combination"
+                   @bind-Value="Combination"
+                   Label="@Combination_string"
+                   SearchSafe="Search"
+                   Clearable
+                   SelectOnActivation />
+
+    <NButtonCreate OnClick="Create" />
+
+</MudStack>
