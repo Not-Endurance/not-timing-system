@@ -83,18 +83,25 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
         await SignInAndOpenAsync(_host, device, scene.Email, $"/console/events/{scene.EventId}/rankings");
         await Expect(page.GetByText("Athlete 1").First).ToBeVisibleAsync(Loaded());
 
-        await page.GetByRole(AriaRole.Button, new() { Name = "Custom ranking", Exact = true }).ClickAsync();
-        var dialog = page.GetByRole(AriaRole.Dialog);
-        await Expect(dialog).ToBeVisibleAsync(Loaded());
-        await dialog.GetByLabel("Name", new() { Exact = true }).FillAsync("Open class"); // named first: choosing a template keeps it
-        await dialog.GetByLabel("Template ranking").ClickAsync(); // the settings of a Ranking that exists are the start of the new one
-        await page.Locator(".mud-popover-open .mud-list-item").Filter(new() { HasText = "CEI 1*" }).First.ClickAsync();
-        await dialog.GetByLabel("Select a Participation to add").FillAsync("Athlete 2");
-        await page.Locator(".mud-popover-open .mud-list-item")
-            .Filter(new() { HasText = "Athlete 2" })
-            .First.ClickAsync();
-        await dialog.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).ClickAsync();
-        await dialog.GetByRole(AriaRole.Button, new() { Name = "Create", Exact = true }).ClickAsync();
+        async Task CreateAsync(string name, string athlete)
+        {
+            await page.GetByRole(AriaRole.Button, new() { Name = "Custom ranking", Exact = true }).ClickAsync();
+            var form = page.GetByRole(AriaRole.Dialog);
+            await Expect(form).ToBeVisibleAsync(Loaded());
+            await form.GetByLabel("Name", new() { Exact = true }).FillAsync(name); // named first: choosing a template keeps it
+            await form.GetByLabel("Template ranking").ClickAsync(); // the settings of a Ranking that exists are the start of the new one
+            await page.Locator(".mud-popover-open .mud-list-item")
+                .Filter(new() { HasText = "CEI 1*" })
+                .First.ClickAsync();
+            await form.GetByLabel("Select a Participation to add").FillAsync(athlete);
+            await page.Locator(".mud-popover-open .mud-list-item")
+                .Filter(new() { HasText = athlete })
+                .First.ClickAsync();
+            await form.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).ClickAsync();
+            await form.GetByRole(AriaRole.Button, new() { Name = "Create", Exact = true }).ClickAsync();
+        }
+
+        await CreateAsync("Open class", "Athlete 2");
 
         await Eventually(async () => (await scene.RankingsStoredAsync()).Any(x => x.Name == "Open class"));
         await Expect(page.GetByText("Open class", new() { Exact = true }).First).ToBeVisibleAsync();
@@ -106,10 +113,14 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
         await rankings
             .Locator("xpath=.//*[normalize-space(text())='Open class']/following::*[contains(@class,'mud-chip')][1]")
             .ClickAsync(); // the chip that follows its name in the menu
+        await CreateAsync("Second class", "Athlete 1"); // and the page is drawn again with another Ranking in its menu
+        await Eventually(async () => (await scene.RankingsStoredAsync()).Any(x => x.Name == "Second class"));
+        await Expect(page.GetByText("Second class", new() { Exact = true }).First).ToBeVisibleAsync();
         await rankings.GetByRole(AriaRole.Button, new() { Name = "Print", Exact = true }).ClickAsync();
         await Eventually(async () => page.Frames.Any(x => x != page.MainFrame));
         var printed = page.Frames.First(x => x != page.MainFrame);
         await Eventually(async () => (await printed.ContentAsync()).Contains("Open class", StringComparison.Ordinal));
+        Assert.DoesNotContain("Second class", await printed.ContentAsync(), StringComparison.Ordinal);
 
         // and it is removed, after the person is asked, from the Api and from the page: the chip that follows its name in the menu
         var close = page.GetByTestId("console-rankings-panel")
@@ -233,7 +244,7 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
                     settings == Fei.All ? "01" : null,
                     participations.Select((x, index) => new RankingEntry(x.Id, false, index + 1)),
                     eventId,
-                    Guid.NewGuid()
+                    Guid.Parse("00" + Guid.NewGuid().ToString()[2..]) // the Api lists by id: these are the first, so that a Ranking a person makes is never the one the page starts on
                 );
                 await EventSeed.RankingAsync(mongo, tenant, ranking);
             }

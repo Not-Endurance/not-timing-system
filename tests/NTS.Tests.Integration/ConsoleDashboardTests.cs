@@ -202,6 +202,25 @@ public sealed class ConsoleDashboardTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task A_time_that_the_Api_does_not_record_for_the_person_is_said_in_its_words_and_nothing_is_marked_as_timed()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var (_, eventId, ids) = await SceneAsync(api);
+        var plain = await SomebodyElseAsync(api); // not the Main Operator of the Event, nor an Official of it
+        await using var tab = await Tab.OpenAsync(api, plain, eventId);
+        tab.Dashboard.Selected = tab.Dashboard.Participations.First();
+
+        var refused = await Assert.ThrowsAsync<DomainException>(
+            () => tab.Dashboard.RecordTime(SnapshotType.Arrive, TimeSpan.FromHours(7))
+        );
+
+        Assert.NotEmpty(refused.Message);
+        Assert.NotEqual(Time_not_recorded_string, refused.Message); // the Api said why
+        Assert.Empty(tab.Dashboard.RecentlyTimed);
+        Assert.Empty((await StoredAsync(ids[0]))["Phases"][0]["Events"].AsBsonArray);
+    }
+
+    [Fact]
     public async Task A_change_that_is_made_on_a_Participation_that_another_tab_changed_is_refused_and_the_Participation_is_read_again()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);

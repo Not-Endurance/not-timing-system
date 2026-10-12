@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Contracts", "NTS.Contra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NTS.Blazor", "NTS.Blazor\NTS.Blazor.csproj", "{E46BA04B-6329-4152-9E26-2985F2AD525C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTiming.Console", "NoTiming.Console\NoTiming.Console.csproj", "{3E094F83-3C5F-429B-B719-16F3B5894D07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -315,6 +317,18 @@ Global
 		{E46BA04B-6329-4152-9E26-2985F2AD525C}.Release|x64.Build.0 = Release|Any CPU
 		{E46BA04B-6329-4152-9E26-2985F2AD525C}.Release|x86.ActiveCfg = Release|Any CPU
 		{E46BA04B-6329-4152-9E26-2985F2AD525C}.Release|x86.Build.0 = Release|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Debug|x64.Build.0 = Debug|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Debug|x86.Build.0 = Debug|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Release|x64.ActiveCfg = Release|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Release|x64.Build.0 = Release|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Release|x86.ActiveCfg = Release|Any CPU
+		{3E094F83-3C5F-429B-B719-16F3B5894D07}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

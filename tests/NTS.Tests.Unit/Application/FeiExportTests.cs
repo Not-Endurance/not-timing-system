@@ -437,18 +437,15 @@ public sealed class FeiExportTests
         Assert.Equal(["1", "3"], xml.Descendants(ns + "Phase").Select(x => x.Attribute("Number")!.Value));
     }
 
-    /// <summary>Two days of two Phases: each is 20 km ridden in two hours, with ten minutes between the arrival and the vet gate.</summary>
+    /// <summary>
+    /// Two days of two Phases, the second of each day starting in the afternoon: each is 20 km ridden in two hours, with ten minutes
+    /// between the arrival and the vet gate.
+    /// </summary>
     static Phase[] TwoDaysOfTwoPhases()
     {
         var first = new DateTimeOffset(2026, 5, 1, 6, 0, 0, TimeSpan.Zero);
         var second = first.AddDays(1);
-        return
-        [
-            Leg(first),
-            Leg(first.AddHours(2).AddMinutes(50)),
-            Leg(second),
-            Leg(second.AddHours(2).AddMinutes(50), isFinal: true),
-        ];
+        return [Leg(first), Leg(first.AddHours(7)), Leg(second), Leg(second.AddHours(7), isFinal: true)];
     }
 
     static Phase Leg(DateTimeOffset start, bool isFinal = false)

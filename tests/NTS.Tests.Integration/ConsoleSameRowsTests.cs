@@ -58,6 +58,24 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task The_same_text_in_both_names_is_searched_once_and_the_row_it_finds_is_named_once()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var scene = await SceneAsync(api);
+        var rows = scene.Ui.Get<IConsoleSameRows>();
+        var name = $"Мария Друга {scene.Token}";
+
+        var found = await rows.OfAthlete(new AthleteFormModel { Name = name, NameEnglish = name });
+
+        var row = Assert.Single(found);
+        Assert.Equal(scene.Theirs, row.Id);
+        Assert.Equal(
+            1,
+            scene.Ui.Requests.Asked.Count(x => x.Contains("/athletes/all-tenants", StringComparison.Ordinal))
+        );
+    }
+
+    [Fact]
     public async Task The_other_Tenants_are_asked_for_a_name_of_three_characters_or_more_and_once_for_each_registry_whatever_its_case()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);

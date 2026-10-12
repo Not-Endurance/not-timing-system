@@ -57,6 +57,7 @@ public sealed class ConsoleAccessBrowserTests : IClassFixture<ApiHostFixture>, I
                 ("dashboard", "console-time-panel"),
                 ("handouts", "console-handouts-panel"),
                 ("startlist", "console-startlist-panel"),
+                ("branding", "console-branding"),
             }
         )
         {
@@ -64,6 +65,37 @@ public sealed class ConsoleAccessBrowserTests : IClassFixture<ApiHostFixture>, I
 
             await Expect(page.GetByText(REFUSAL).First).ToBeVisibleAsync(Loaded());
             await Expect(page.GetByTestId(panel)).ToHaveCountAsync(0, Counted());
+        }
+
+        // and the home does not offer the dashboard, the Setup or the start of an Event the person does not run, even when it lists the Event
+        await page.EvaluateAsync("Blazor.navigateTo('/console')");
+        await Expect(page.GetByTestId("console-events").Or(page.GetByTestId("console-no-events")))
+            .ToBeVisibleAsync(Loaded());
+        if (who.StartsWith("a Tenant Root", StringComparison.Ordinal))
+        {
+            await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Results", Exact = true }).First)
+                .ToBeVisibleAsync(Loaded()); // the Tenant's Live Event is listed, with the Results that it may read
+        }
+
+        if (who.StartsWith("a Tenant Root", StringComparison.Ordinal))
+        {
+            // the Results of the Live Event that it does not run have the row of buttons of the Event, and say nothing of a connection to it
+            await page.EvaluateAsync($"Blazor.navigateTo('/console/events/{scene.Live}/rankings')");
+            await Expect(
+                    page.GetByTestId("console-event-navigation")
+                        .GetByRole(AriaRole.Button, new() { Name = "Ranklist", Exact = true })
+                )
+                .ToBeDisabledAsync(new() { Timeout = PATIENCE });
+            await Expect(page.GetByTestId("console-connection")).ToHaveCountAsync(0, Counted());
+            await page.EvaluateAsync("Blazor.navigateTo('/console')");
+            await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Results", Exact = true }).First)
+                .ToBeVisibleAsync(Loaded());
+        }
+
+        foreach (var name in new[] { "Dashboard", "Setup", "start" })
+        {
+            await Expect(page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }))
+                .ToHaveCountAsync(0, Counted());
         }
     }
 

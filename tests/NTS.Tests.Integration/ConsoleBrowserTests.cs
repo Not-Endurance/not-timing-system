@@ -1,5 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.Playwright;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using static NTS.Tests.Integration.Infrastructure.UiBrowser;
@@ -143,6 +145,87 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
     }
 
     [Fact]
+    public async Task A_start_number_that_two_Competitions_hold_is_taken_out_of_the_one_the_person_chooses_and_the_Event_starts()
+    {
+        var mongo = _host.MongoConnectionString;
+        var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
+        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var id = await EventSeed.FullSetupAsync(
+            mongo,
+            tenant,
+            mainOperator.Id,
+            "Same Number Cup",
+            startNumberInTwoCompetitions: true
+        );
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, mainOperator.Email, "/console");
+        var row = page.GetByRole(AriaRole.Row).Filter(new() { HasText = "Same Number Cup" });
+
+        await row.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true }).ClickAsync();
+
+        // the Setup is not whole, and the person is asked which Competition the Participation is taken out of
+        var dialog = page.GetByRole(AriaRole.Dialog);
+        await Expect(dialog.GetByTestId("console-start-issue")).ToHaveCountAsync(1, Counted());
+        var start = dialog.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true });
+        await Expect(start).ToBeDisabledAsync(new() { Timeout = PATIENCE }); // nothing is chosen yet
+        await dialog.GetByText("Remove from CEI 2*").ClickAsync();
+        await Expect(start).ToBeEnabledAsync();
+        await start.ClickAsync();
+
+        // it is taken out of the one that was chosen and not out of the other, and the Event starts: the person is taken to its dashboard
+        await page.WaitForURLAsync(device.Url($"/console/events/{id}/dashboard"), new() { Timeout = PATIENCE });
+        var setup = await EventSeed.Setups(mongo).Find(new BsonDocument("_id", EventSeed.Binary(id))).FirstAsync();
+        var held = setup["Competitions"]
+            .AsBsonArray.ToDictionary(x => x["Name"].AsString, x => x["Participations"].AsBsonArray.Count);
+        Assert.Equal(2, held["CEI 1*"]); // the one it holds and the one of its own
+        Assert.Equal(1, held["CEI 2*"]); // the one of its own: the number is taken out of it
+    }
+
+    [Fact]
+    public async Task A_correction_that_leaves_the_Setup_not_whole_says_what_is_left_and_the_Event_does_not_start()
+    {
+        var mongo = _host.MongoConnectionString;
+        var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
+        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var id = await EventSeed.FullSetupAsync(
+            mongo,
+            tenant,
+            mainOperator.Id,
+            "Empty Competition Cup",
+            startNumberInTwoCompetitions: true,
+            eachHasAnother: false
+        );
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, mainOperator.Email, "/console");
+        var row = page.GetByRole(AriaRole.Row).Filter(new() { HasText = "Empty Competition Cup" });
+        await row.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true }).ClickAsync();
+        var dialog = page.GetByRole(AriaRole.Dialog);
+        await Expect(dialog.GetByTestId("console-start-issue")).ToHaveCountAsync(1, Counted());
+
+        await dialog.GetByText("Remove from CEI 2*").ClickAsync();
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true }).ClickAsync();
+
+        // the number is taken out of the Competition that was chosen, which is left with none, and the dialog says that and stays
+        await Expect(dialog.GetByText("must have at least one participation")).ToBeVisibleAsync(Loaded());
+        await Expect(dialog.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true }))
+            .ToHaveCountAsync(0, Counted()); // there is nothing left that the person can settle here
+        Assert.Equal(device.Url("/console"), page.Url);
+        var setup = await EventSeed.Setups(mongo).Find(new BsonDocument("_id", EventSeed.Binary(id))).FirstAsync();
+        var held = setup["Competitions"]
+            .AsBsonArray.ToDictionary(x => x["Name"].AsString, x => x["Participations"].AsBsonArray.Count);
+        Assert.Equal(1, held["CEI 1*"]);
+        Assert.Equal(0, held["CEI 2*"]);
+        Assert.Equal(
+            0,
+            await EventSeed.Cores(mongo).CountDocumentsAsync(new BsonDocument("_id", EventSeed.Binary(id)))
+        ); // and no Event was made
+    }
+
+    [Fact]
     public async Task The_Main_Operator_sets_up_its_Event_from_the_Console_and_a_page_that_is_reloaded_goes_back_to_the_Setup()
     {
         var mongo = _host.MongoConnectionString;
@@ -190,9 +273,22 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
 
         // an Operator is linked by an address that has no account yet, who waits as an invitation
         await page.GetByRole(AriaRole.Button, new() { Name = "Link a person", Exact = true }).ClickAsync();
+        var link = dialog.GetByRole(AriaRole.Button, new() { Name = "Link a person", Exact = true });
+        await Expect(link).ToBeDisabledAsync(new() { Timeout = PATIENCE }); // there is no address to link yet
         await dialog.GetByLabel("Email address").FillAsync("nobody.yet@example.test");
-        await dialog.GetByRole(AriaRole.Button, new() { Name = "Link a person", Exact = true }).ClickAsync();
+        await Expect(link).ToBeEnabledAsync();
+        await link.ClickAsync();
         await Expect(page.GetByText("Invitation pending")).ToBeVisibleAsync();
+
+        // and the person is taken out again by the row that names them
+        await page.GetByTestId("console-grants")
+            .GetByRole(AriaRole.Button, new() { Name = "Delete", Exact = true })
+            .ClickAsync();
+        await Expect(page.GetByText("Invitation pending")).ToHaveCountAsync(0, Counted());
+        Assert.Equal(
+            0,
+            await EventSeed.Grants(mongo).CountDocumentsAsync(new BsonDocument("EventId", EventSeed.Binary(id)))
+        );
     }
 
     [Fact]
@@ -257,8 +353,17 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
             .GetByRole(AriaRole.Button, new() { Name = "Arrive", Exact = true })
             .ClickAsync(); // with no time typed there is nothing to record, and the person is told so
         await Expect(page.GetByText("Time format is incorect")).ToBeVisibleAsync();
+        await Expect(page.GetByText("Time format is incorect")).ToHaveCountAsync(0, Counted()); // until it is gone
         await time.ClickAsync();
         await time.PressAsync("Control+A"); // over the 00:00:00 that the field starts with
+        await time.PressSequentiallyAsync("999999"); // which is no time of the day
+        await page.GetByTestId("console-time-panel")
+            .GetByRole(AriaRole.Button, new() { Name = "Arrive", Exact = true })
+            .ClickAsync();
+        await Expect(page.GetByText("Time format is incorect")).ToBeVisibleAsync();
+        await Expect(page.GetByText("Time format is incorect")).ToHaveCountAsync(0, Counted());
+        await time.ClickAsync();
+        await time.PressAsync("Control+A");
         await time.PressSequentiallyAsync("070000");
         await page.GetByTestId("console-time-panel")
             .GetByRole(AriaRole.Button, new() { Name = "Arrive", Exact = true })

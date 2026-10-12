@@ -84,12 +84,21 @@ internal static class EventSeed
         string mongoConnectionString,
         string tenant,
         Guid? mainOperator,
-        string name = "Full Setup"
+        string name = "Full Setup",
+        bool startNumberInTwoCompetitions = false,
+        bool eachHasAnother = true
     )
     {
         ApiMongo.Configure();
         var id = Guid.NewGuid();
-        var model = ConfigureEventModel.From(SetupFactory.Full(id, name));
+        var model = ConfigureEventModel.From(
+            SetupFactory.Full(
+                id,
+                name,
+                startNumberInTwoCompetitions: startNumberInTwoCompetitions,
+                eachHasAnother: eachHasAnother
+            )
+        );
         model.TenantId = tenant;
         model.MainOperatorId = mainOperator;
         await Setups(mongoConnectionString).InsertOneAsync(model.ToBsonDocument());

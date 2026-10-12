@@ -219,11 +219,23 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
         var opened = (await setup.Open(id))!;
         var competition = opened.Model.Competitions.Single();
         var number = competition.Participations.Single().Combination.Number;
+        var order = new List<string>();
         ui.Requests.Before = async request =>
         {
             if (request.Method == HttpMethod.Patch)
             {
                 await Task.Delay(600); // a change is saved a moment after the call that made it returns
+                lock (order)
+                {
+                    order.Add("saved");
+                }
+            }
+            else if (request.Method == HttpMethod.Get)
+            {
+                lock (order)
+                {
+                    order.Add("read");
+                }
             }
         };
         opened.Model.Name = "After";
@@ -234,7 +246,28 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
 
         var stored = (await setup.Open(id))!;
         Assert.Equal("After", stored.Model.Name); // the Setup that the removal read was the one with the change in it
+        Assert.Equal("saved", order.First()); // the change was saved before the Setup was read, not after
         Assert.Empty(stored.Model.Competitions.Single().Participations);
+    }
+
+    [Fact]
+    public async Task A_Setup_that_the_Api_does_not_give_is_not_opened()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        await using var ui = ConsoleUi.Open(api, mainOperator);
+        ui.Requests.Answer = request =>
+            request.Method == HttpMethod.Get
+            && request.RequestUri!.AbsolutePath.EndsWith($"/{id}", StringComparison.Ordinal)
+                ? new HttpResponseMessage(System.Net.HttpStatusCode.NotFound) // the list says it is there, and the read does not find it
+                : null;
+
+        var opened = await ui.Get<IConsoleSetup>().Open(id);
+
+        Assert.Null(opened);
     }
 
     [Fact]

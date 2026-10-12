@@ -28,6 +28,7 @@ public sealed class ConsoleNavigationBrowserTests : IClassFixture<ApiHostFixture
         var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
         var eventId = await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "The Cup");
         await EventSeed.StartAsync(mongo, eventId, tenant, mainOperator.Id, DateTimeOffset.UtcNow.AddDays(1));
+        await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "A first Event"); // another Event, listed before it: the row of buttons is the one of the Event the page is of
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
@@ -69,6 +70,24 @@ public sealed class ConsoleNavigationBrowserTests : IClassFixture<ApiHostFixture
         await page.GotoAsync(device.Url($"/console/events/{eventId}/rankings"));
         await navigation.GetByRole(AriaRole.Button, new() { Name = "Console", Exact = true }).ClickAsync();
         await page.WaitForURLAsync(new Regex(@"/console$"), new() { Timeout = PATIENCE });
+    }
+
+    [Fact]
+    public async Task The_pages_of_an_Event_that_has_not_started_say_nothing_of_a_connection_to_it()
+    {
+        var mongo = _host.MongoConnectionString;
+        var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
+        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var eventId = await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "Not yet");
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, mainOperator.Email, $"/console/events/{eventId}/setup");
+
+        var navigation = page.GetByTestId("console-event-navigation");
+        await Expect(navigation.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true }))
+            .ToBeDisabledAsync(Settled()); // the person is on it, and the row of buttons has loaded
+        await Expect(page.GetByTestId("console-connection")).ToHaveCountAsync(0, Counted());
     }
 
     [Fact]

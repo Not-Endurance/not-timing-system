@@ -1,3 +1,5 @@
+using MongoDB.Bson;
+using MongoDB.Driver;
 using Not.Application.DomainEvents;
 using Not.Domain;
 using Not.Domain.Abstractions;
@@ -132,6 +134,31 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
         Assert.NotEmpty(refused.Message);
         await console.Events.Load();
         Assert.Equal(EventStage.Live, console.Events.Events.Single(x => x.Id == live).Stage);
+    }
+
+    [Fact]
+    public async Task A_Tenant_Root_cannot_assign_the_Main_Operator_of_an_Event_that_is_Live_and_the_Api_says_why()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var other = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        using var console = Open(api, root);
+        await console.Events.Load();
+
+        var refused = await Assert.ThrowsAsync<DomainException>(
+            () => console.Events.AssignMainOperator(live, other.Id)
+        );
+
+        Assert.NotEmpty(refused.Message);
+        var stored = await EventSeed
+            .Cores(_mongo.ConnectionString)
+            .Find(new BsonDocument("_id", EventSeed.Binary(live)))
+            .FirstAsync();
+        Assert.Equal(mainOperator.Id, stored["MainOperatorId"].AsGuid); // the Event is still run by the one who ran it
     }
 
     [Fact]

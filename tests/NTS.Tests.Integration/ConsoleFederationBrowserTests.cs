@@ -51,6 +51,35 @@ public sealed class ConsoleFederationBrowserTests : IClassFixture<ApiHostFixture
         // and they are what the page shows when it is opened again
         await page.ReloadAsync();
         await Expect(rules.GetByLabel("Code of the regional ranker")).ToHaveValueAsync("BG-2026", Filled());
+
+        // and rules that the Api does not take are said to the person in its words, who keeps what was typed to correct it
+        await page.RouteAsync(
+            "**/api/tenants/*",
+            async route =>
+            {
+                if (route.Request.Method == "PATCH")
+                {
+                    await route.FulfillAsync(
+                        new()
+                        {
+                            Status = 422,
+                            ContentType = "application/vnd.api+json",
+                            Body =
+                                "{\"errors\":[{\"status\":\"422\",\"code\":\"invalid-rules\",\"title\":\"The rules are not valid.\"}]}",
+                        }
+                    );
+                }
+                else
+                {
+                    await route.ContinueAsync();
+                }
+            }
+        );
+        await rules.GetByLabel("Code of the regional ranker").FillAsync("BG-2027");
+        await rules.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true }).ClickAsync();
+        await Expect(page.GetByText("The rules are not valid.")).ToBeVisibleAsync(Loaded());
+        await Expect(rules.GetByLabel("Code of the regional ranker")).ToHaveValueAsync("BG-2027");
+        Assert.Equal((true, "BG-2026"), await StoredRulesAsync(mongo, tenant));
     }
 
     [Fact]

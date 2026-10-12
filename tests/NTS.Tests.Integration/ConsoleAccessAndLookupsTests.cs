@@ -1,3 +1,4 @@
+using MongoDB.Bson;
 using Not.Domain.Exceptions;
 using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Access;
@@ -208,6 +209,23 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         await TenantAsync(_mongo.ConnectionString, "Another Land", withCountry: true);
         await TenantAsync(_mongo.ConnectionString, "A Third Land", withCountry: true);
         await TenantAsync(_mongo.ConnectionString, "Yet Another Land", withCountry: true);
+        await CountrySeed
+            .Countries(_mongo.ConnectionString)
+            .InsertOneAsync(
+                new BsonDocument
+                {
+                    {
+                        "_id",
+                        new BsonBinaryData(
+                            Guid.Parse("00" + Guid.NewGuid().ToString()[2..]),
+                            GuidRepresentation.Standard
+                        )
+                    },
+                    { "TenantId", "nts" },
+                    { "Name", "Aardvark Land" },
+                    { "IsoCode", CountrySeed.UniqueIsoCode() },
+                }
+            ); // the first of the countries by its id, which is not the country of the Tenant
         var tenant = await TenantAsync(_mongo.ConnectionString, "Land of Test", withCountry: true);
         var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
         var nobody = await SignedInAsync(api, client, _mongo.ConnectionString, null);

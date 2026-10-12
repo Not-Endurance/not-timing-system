@@ -115,6 +115,15 @@ public sealed class WitnessRoutePolicyTests
     }
 
     [Theory]
+    [InlineData("console")]
+    [InlineData("console/events/{event}/dashboard")]
+    [InlineData("console/federation")]
+    public void A_person_without_a_complete_profile_still_has_the_Console(string path)
+    {
+        Assert.Equal(RouteAccess.Open, WitnessRoutePolicy.AccessTo(Account(profileComplete: false), Of(path)));
+    }
+
+    [Theory]
     [InlineData(typeof(SnapshotContent))]
     [InlineData(typeof(ProfileContent))]
     public void Every_route_of_a_page_that_asks_for_a_person_is_one_the_policy_asks_it_for(Type page)
