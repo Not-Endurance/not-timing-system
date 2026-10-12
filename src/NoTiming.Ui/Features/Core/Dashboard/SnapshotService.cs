@@ -45,6 +45,7 @@ public class SnapshotService
     readonly object _snapshotSelectionPersistenceLock = new();
     readonly List<Snapshot> _snapshots = [];
     readonly SemaphoreSlim _sending = new(1, 1);
+    readonly HashSet<SnapshotGroup> _withoutId = [];
     readonly CancellationTokenSource _stopped = new();
     readonly IWitnessUserSession _userSessionService;
     IReadOnlyList<Participation> _participations = [];
@@ -97,7 +98,17 @@ public class SnapshotService
 
         _snapshots.Clear();
         _history.Clear();
-        _history.AddRange(session?.GetSnapshotHistory() ?? []);
+        _withoutId.Clear();
+        foreach (var stored in session?.SnapshotHistory ?? [])
+        {
+            var group = stored.MapToDomain();
+            _history.Add(group);
+            if (stored.GroupId == null)
+            {
+                _withoutId.Add(group); // kept before the ids were: the server cannot be asked of its Snapshots
+            }
+        }
+
         RestoreSnapshotSelections(session?.GetSnapshotSelections() ?? []);
         await RestoreUnanswered();
         BuildViews();
@@ -191,6 +202,51 @@ public class SnapshotService
         );
     }
 
+    public bool CanUpdate(SnapshotGroup group, Snapshot entry)
+    {
+        return entry.Timestamp != null
+            && group.Type is SnapshotType.Arrive or SnapshotType.Present // the kinds that an Update names
+            && !_withoutId.Contains(group)
+            && ReferenceEquals(LatestOf(entry.Number, group.Type), group);
+    }
+
+    public async Task UpdateTime(IViewedEvent view, SnapshotGroup group, Snapshot entry, Timestamp time)
+    {
+        view.EnsureCanWrite();
+        GuardHelper.ThrowIfDefault(group);
+        GuardHelper.ThrowIfDefault(entry);
+        GuardHelper.ThrowIfDefault(time);
+        await Sending(
+            view,
+            async () =>
+            {
+                if (!CanUpdate(group, entry))
+                {
+                    throw new DomainException(Snapshot_not_the_latest_string);
+                }
+
+                var receipt = await _snapshotPublisher.UpdateSnapshotAsync(
+                    group.IdOf(entry),
+                    time.ToDateTimeOffset(),
+                    _stopped.Token
+                );
+                await AskAgainWhenRefused([receipt]);
+                RefuseWhenNotRecorded([receipt]);
+                if (!receipt.IsAccepted)
+                {
+                    throw new DomainException(
+                        string.Format(Time_not_taken_string, OutcomeWords.Of(receipt.Snapshot!.Outcome.ToString()))
+                    );
+                }
+
+                entry.Timestamp = time;
+                await KeepTimeInHistory(group, entry);
+                EmitChanged();
+                return true;
+            }
+        );
+    }
+
     public void Resume(IViewedEvent view)
     {
         if (CanResend(view))
@@ -224,6 +280,7 @@ public class SnapshotService
     {
         _unanswered = null;
         _history.Clear();
+        _withoutId.Clear();
         _snapshots.Clear();
         _participations = [];
         _participationsToSnapshot = [];
@@ -508,6 +565,12 @@ public class SnapshotService
         }
     }
 
+    /// <summary>The group of the history that was sent last as that kind of time for the start number: the one whose entry can be corrected.</summary>
+    SnapshotGroup? LatestOf(int number, SnapshotType type)
+    {
+        return _history.LastOrDefault(x => x.Type == type && x.Entries.Any(y => y.Number == number));
+    }
+
     void FlushSnapshots(HashSet<int> participationNumbers)
     {
         _snapshots.RemoveAll(x => participationNumbers.Contains(x.Number));
@@ -599,6 +662,19 @@ public class SnapshotService
         catch
         {
             // The history of this page still shows it, as it is held in memory.
+        }
+    }
+
+    /// <summary>The time the server took is what the history that is kept shows too; one that cannot be kept is shown by this page still.</summary>
+    async Task KeepTimeInHistory(SnapshotGroup group, Snapshot entry)
+    {
+        try
+        {
+            await _userSessionService.UpdateSnapshotInHistory(group.Id, entry.Number, entry.Timestamp!);
+        }
+        catch
+        {
+            // The server has the time, which is what matters; the history of this page shows it as it is held in memory.
         }
     }
 

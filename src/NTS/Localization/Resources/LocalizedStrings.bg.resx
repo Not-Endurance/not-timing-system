@@ -1266,4 +1266,13 @@
   <data name="Console_disconnected_string" xml:space="preserve">
     <value>Няма връзка със събитие: {0}</value>
   </data>
+  <data name="Snapshot_time_updated_string" xml:space="preserve">
+    <value>Времето е обновено.</value>
+  </data>
+  <data name="Snapshot_not_the_latest_string" xml:space="preserve">
+    <value>Може да се променя само последното изпратено време за стартов номер.</value>
+  </data>
+  <data name="Snapshot_update_not_answered_string" xml:space="preserve">
+    <value>Сървърът не отговори. Натиснете „Обнови“, за да изпратите времето отново.</value>
+  </data>
 </root>

@@ -366,9 +366,14 @@ namespace NTS.Localization
         public static string Time_recorded_string => LocalizeString(nameof(Time_recorded_string));
         public static string Time_not_recorded_string => LocalizeString(nameof(Time_not_recorded_string));
         public static string Time_not_taken_string => LocalizeString(nameof(Time_not_taken_string));
+        public static string Snapshot_time_updated_string => LocalizeString(nameof(Snapshot_time_updated_string));
+        public static string Snapshot_not_the_latest_string => LocalizeString(nameof(Snapshot_not_the_latest_string));
+        public static string Snapshot_update_not_answered_string =>
+            LocalizeString(nameof(Snapshot_update_not_answered_string));
         public static string Not_signed_in_string => LocalizeString(nameof(Not_signed_in_string));
         public static string Now_string => LocalizeString(nameof(Now_string));
-        public static string Rankings_list_empty_message_string => LocalizeString(nameof(Rankings_list_empty_message_string));
+        public static string Rankings_list_empty_message_string =>
+            LocalizeString(nameof(Rankings_list_empty_message_string));
         public static string Handout_made_string => LocalizeString(nameof(Handout_made_string));
         public static string Handout_not_made_string => LocalizeString(nameof(Handout_not_made_string));
         public static string Startlist_empty_message_string => LocalizeString(nameof(Startlist_empty_message_string));

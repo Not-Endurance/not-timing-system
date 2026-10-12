@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -184,11 +185,17 @@ internal sealed class UserSessionStore
 
     static BsonDocument GroupToBson(SnapshotGroupModel group)
     {
-        return new BsonDocument
+        var document = new BsonDocument
         {
             ["Entries"] = new BsonArray(group.Entries.Select(SnapshotToBson)),
             ["Type"] = group.Type.ToString(),
         };
+        if (group.GroupId is { } id)
+        {
+            document["GroupId"] = Binary(id);
+        }
+
+        return document;
     }
 
     static BsonDocument SnapshotToBson(SnapshotModel snapshot)
@@ -207,6 +214,11 @@ internal sealed class UserSessionStore
         if (snapshot.Timestamp != null)
         {
             document["Timestamp"] = snapshot.Timestamp;
+        }
+
+        if (snapshot.Time is { } time)
+        {
+            document["Time"] = time.ToString("O", CultureInfo.InvariantCulture); // text: it keeps its offset, and no serializer is asked
         }
 
         return document;
@@ -230,6 +242,7 @@ internal sealed class UserSessionStore
         {
             Entries = [.. ArrayOf(group, "Entries").Select(x => SnapshotFromBson(x.AsBsonDocument))],
             Type = EnumOf<SnapshotType>(group, "Type") ?? default,
+            GroupId = TryGuid(group, "GroupId", out var id) ? id : null,
         };
     }
 
@@ -242,6 +255,7 @@ internal sealed class UserSessionStore
             NameEnglish = TextOf(snapshot, "NameEnglish"),
             Ruleset = EnumOf<CompetitionRuleset>(snapshot, "Ruleset"),
             Timestamp = TextOf(snapshot, "Timestamp"),
+            Time = InstantOf(snapshot, "Time"),
         };
     }
 
@@ -250,6 +264,19 @@ internal sealed class UserSessionStore
         return document.TryGetValue(field, out var value) && value.IsBsonArray
             ? value.AsBsonArray.Where(x => x.IsBsonDocument)
             : [];
+    }
+
+    /// <summary>An instant kept as text, none when there is no such member or it is not one.</summary>
+    static DateTimeOffset? InstantOf(BsonDocument document, string field)
+    {
+        return DateTimeOffset.TryParse(
+            TextOf(document, field),
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.RoundtripKind,
+            out var instant
+        )
+            ? instant
+            : null;
     }
 
     static string? TextOf(BsonDocument document, string field)

@@ -2,6 +2,7 @@ using Not.Application.Behinds.Adapters;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Krud.Abstractions;
+using NoTiming.Ui.Features.Core;
 using NoTiming.Ui.Features.Core.Dashboard;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Account;

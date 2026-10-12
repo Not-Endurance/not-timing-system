@@ -580,6 +580,11 @@ public sealed class UnansweredSnapshotsTests
             return Task.CompletedTask;
         }
 
+        public Task UpdateSnapshotInHistory(Guid groupId, int number, Timestamp time)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task ReplaceSnapshotSelections(IReadOnlyCollection<Snapshot> snapshots)
         {
             return Task.CompletedTask;

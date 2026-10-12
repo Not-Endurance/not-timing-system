@@ -1216,4 +1216,13 @@
   <data name="Console_disconnected_string" xml:space="preserve">
     <value>{0} etkinliğine bağlı değil</value>
   </data>
+  <data name="Snapshot_time_updated_string" xml:space="preserve">
+    <value>Zaman güncellendi.</value>
+  </data>
+  <data name="Snapshot_not_the_latest_string" xml:space="preserve">
+    <value>Bir başlangıç numarası için yalnızca gönderilen son zaman değiştirilebilir.</value>
+  </data>
+  <data name="Snapshot_update_not_answered_string" xml:space="preserve">
+    <value>Sunucu yanıt vermedi. Zamanı yeniden göndermek için Güncelle'ye basın.</value>
+  </data>
 </root>

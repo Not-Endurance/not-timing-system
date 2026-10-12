@@ -15,7 +15,7 @@
     {
         var group = History[index];
 
-        <MudPaper @key="group.Id" Outlined Class="pa-2">
+        <MudPaper @key="group.Id" Outlined Class="pa-2" data-testid="history-group">
 
             <MudButton Variant="Variant.Text"
                        FullWidth="true"
@@ -37,7 +37,7 @@
                 <MudStack Spacing="2" Class="pt-2" AlignItems="AlignItems.Stretch">
                     @foreach (var snapshot in group.Entries)
                     {
-                        <MudPaper Class="pa-2">
+                        <MudPaper Class="pa-2" data-testid="@($"history-entry-{snapshot.Number}")">
 
                             <MudStack Row="true"
                                       Justify="Justify.SpaceBetween"
@@ -46,7 +46,39 @@
 
                                 <MudText Typo="Typo.body2">@snapshot</MudText>
 
-                                <MudText Typo="Typo.caption">@snapshot.Timestamp</MudText>
+                                @if (CanUpdate(group, snapshot))
+                                {
+                                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                        <MudTextField T="string"
+                                                      InputMode="InputMode.numeric"
+                                                      Mask="MaskOf(group, snapshot)"
+                                                      Immediate="true"
+                                                      Margin="Margin.Dense"
+                                                      Variant="Variant.Outlined"
+                                                      Label="@Timestamp_string"
+                                                      Style="width: 130px;"
+                                                      Disabled="@IsUpdating(group, snapshot)"
+                                                      Value="@TimeOf(group, snapshot)"
+                                                      ValueChanged="@(x => Typed(group, snapshot, x))" />
+
+                                        @if (IsUpdating(group, snapshot))
+                                        {
+                                            <MudProgressCircular Size="Size.Small" Indeterminate="true" data-testid="history-updating" />
+                                        }
+
+                                        <MudButton Variant="Variant.Filled"
+                                                   Color="Color.Primary"
+                                                   Size="Size.Small"
+                                                   Disabled="@IsUpdating(group, snapshot)"
+                                                   OnClick="@(() => Update(group, snapshot))">
+                                            @Update_string
+                                        </MudButton>
+                                    </MudStack>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.caption">@snapshot.Timestamp</MudText>
+                                }
                             </MudStack>
 
                         </MudPaper>

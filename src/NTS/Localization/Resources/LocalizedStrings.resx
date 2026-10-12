@@ -1263,4 +1263,13 @@
   <data name="Console_disconnected_string" xml:space="preserve">
     <value>Not connected to {0}</value>
   </data>
+  <data name="Snapshot_time_updated_string" xml:space="preserve">
+    <value>The time was updated.</value>
+  </data>
+  <data name="Snapshot_not_the_latest_string" xml:space="preserve">
+    <value>Only the latest time sent for a start number can be changed.</value>
+  </data>
+  <data name="Snapshot_update_not_answered_string" xml:space="preserve">
+    <value>The server did not answer. Press Update to send the time again.</value>
+  </data>
 </root>

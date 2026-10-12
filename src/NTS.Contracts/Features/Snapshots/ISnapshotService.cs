@@ -35,6 +35,22 @@ public interface ISnapshotService : IStatefulService
 
     /// <summary>Sends a Snapshot group again, as a write like <see cref="Publish"/> and refused the same way.</summary>
     Task RePublish(IViewedEvent view, SnapshotGroup snapshotGroup, SnapshotType snapshotType);
+
+    /// <summary>
+    /// Whether the time of an entry of the history can be corrected (#618): it is the latest that the person sent for its start
+    /// number as that kind of time, and its group was sent under an id that the history has kept, as the server names the Snapshot
+    /// by it (a group that was kept before the ids were has none). The person's access is the view's, as for a Publish.
+    /// </summary>
+    bool CanUpdate(SnapshotGroup group, Snapshot entry);
+
+    /// <summary>
+    /// Corrects the time of an entry of the history at the server (#618, ADR-0013), a write like <see cref="Publish"/> and refused the
+    /// same way: the entry shows the new time and the history that is kept has it when the server took it; when it did not, the entry
+    /// is left as it is and the person is told why, in the Api's words or as the outcome of the time. The request is absolute, so
+    /// one that no answer came to is sent again by the person.
+    /// </summary>
+    Task UpdateTime(IViewedEvent view, SnapshotGroup group, Snapshot entry, Timestamp time);
+
     void Capture(Snapshot snapshot);
     void SelectForSnapshot(Participation participation);
     void Remove(Snapshot snapshot);

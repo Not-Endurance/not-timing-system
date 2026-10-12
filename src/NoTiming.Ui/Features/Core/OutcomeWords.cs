@@ -1,6 +1,6 @@
-namespace NoTiming.Ui.Features.Console;
+namespace NoTiming.Ui.Features.Core;
 
-/// <summary>The outcome of a time as words (#646), as the person is told it: <c>RejectedDuplicateArrive</c> is "Rejected Duplicate Arrive".</summary>
+/// <summary>The outcome of a time as words (#646, #618), as the person is told it: <c>RejectedDuplicateArrive</c> is "Rejected Duplicate Arrive".</summary>
 public static class OutcomeWords
 {
     public static string Of(string name)
