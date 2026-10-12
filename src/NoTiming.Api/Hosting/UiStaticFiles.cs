@@ -68,7 +68,7 @@ internal static partial class UiStaticFiles
     /// they have and the fingerprint is only in the map. A file that is asked for by its fingerprint and is not there is served
     /// under its name when that file is there; the fingerprint is not checked, as the build has no other version of the file.
     /// </summary>
-    sealed partial class FingerprintedContentMiddleware
+    internal sealed partial class FingerprintedContentMiddleware
     {
         readonly RequestDelegate _next;
         readonly IFileProvider _files;

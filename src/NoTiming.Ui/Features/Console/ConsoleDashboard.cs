@@ -126,7 +126,7 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
         if (!recorded.IsAccepted)
         {
             throw new DomainException(
-                string.Format(Time_not_taken_string, Words(recorded.Snapshot!.Outcome.ToString()))
+                string.Format(Time_not_taken_string, OutcomeWords.Of(recorded.Snapshot!.Outcome.ToString()))
             );
         }
     }
@@ -245,22 +245,5 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
     Participation Chosen()
     {
         return Selected ?? throw new DomainException(Select_a_participation_string);
-    }
-
-    /// <summary>An outcome as words: <c>RejectedDuplicateArrive</c> is "Rejected Duplicate Arrive".</summary>
-    static string Words(string name)
-    {
-        var words = new List<char>();
-        foreach (var letter in name)
-        {
-            if (char.IsUpper(letter) && words.Count > 0)
-            {
-                words.Add(' ');
-            }
-
-            words.Add(letter);
-        }
-
-        return new string([.. words]);
     }
 }

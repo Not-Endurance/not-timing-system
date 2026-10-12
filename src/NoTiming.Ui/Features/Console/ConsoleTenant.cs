@@ -6,6 +6,7 @@ using Not.Injection;
 using NoTiming.Ui.Features.Account;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Console;
+using static NoTiming.Ui.Features.Console.ApiAnswers;
 
 namespace NoTiming.Ui.Features.Console;
 
@@ -84,12 +85,7 @@ public class ConsoleTenant : AccountAwareContext, IConsoleTenant, IScoped
                 ["attributes"] = new JsonObject { ["regionalRules"] = rules },
             },
         };
-        var response = await _api.Send(HttpMethod.Patch, Route(tenantId), JsonSerializer.SerializeToElement(document));
-        if (!response.IsSuccess)
-        {
-            throw new DomainException(response.Error?.Message ?? response.Status.ToString());
-        }
-
+        Accepted(await _api.Send(HttpMethod.Patch, Route(tenantId), JsonSerializer.SerializeToElement(document)));
         await ReloadState();
     }
 
@@ -106,17 +102,5 @@ public class ConsoleTenant : AccountAwareContext, IConsoleTenant, IScoped
     static string Route(string tenantId)
     {
         return $"tenants/{Uri.EscapeDataString(tenantId)}";
-    }
-
-    static bool Flag(JsonElement attributes, string member)
-    {
-        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.True;
-    }
-
-    static string? Text(JsonElement attributes, string member)
-    {
-        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.String
-            ? value.GetString()
-            : null;
     }
 }

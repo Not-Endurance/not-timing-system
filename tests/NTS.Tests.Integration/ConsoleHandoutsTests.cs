@@ -134,6 +134,66 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task The_Handouts_that_are_stored_are_shown_when_the_page_opens_and_the_Combinations_are_by_number()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var scene = await SceneAsync(api, [Plain(3), Plain(1), Plain(2)]);
+        await EventSeed.HandoutAsync(
+            _mongo.ConnectionString,
+            scene.Tenant,
+            new Handout(scene.EventId, scene.Ids[0], scene.Ids[0])
+        );
+        await EventSeed.HandoutAsync(
+            _mongo.ConnectionString,
+            scene.Tenant,
+            new Handout(scene.EventId, scene.Ids[2], scene.Ids[2])
+        );
+
+        await using var tab = await Tab.OpenAsync(api, scene, opensDashboard: false);
+
+        Assert.Equal([2, 3], tab.Handouts.Documents.Select(x => x.Entries.Single().Participation!.Combination.Number));
+        Assert.Equal([1, 2, 3], tab.Handouts.Combinations.Select(x => x.Number));
+    }
+
+    [Fact]
+    public async Task A_page_that_opens_the_Handouts_alone_watches_from_what_the_Event_was_when_it_opened()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var scene = await SceneAsync(api, [TwoPhases(1, arrived: true), TwoPhases(2)]);
+        await using var alone = await Tab.OpenAsync(api, scene, opensDashboard: false);
+        await using var other = await Tab.OpenAsync(api, scene);
+        using var watching = alone.Handouts.Watch(alone.View);
+
+        await CompleteFirstPhaseAsync(other, 2); // what the other tab does, which this one is told of by the store reading it again
+        await alone.Store.Refresh(scene.Ids[1]);
+
+        await UiBrowser.Eventually(async () => (await StoredAsync(scene.EventId)).Count >= 1);
+        await SettleAsync();
+        var kept = Assert.Single(await StoredAsync(scene.EventId)); // not the first Participation, whose Phase was complete before
+        Assert.Equal(scene.Ids[1], kept["_id"].AsGuid);
+    }
+
+    [Fact]
+    public async Task A_removal_that_the_Api_refuses_stops_at_the_first_Handout_and_says_why()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var scene = await SceneAsync(api, [Plain(1), Plain(2), Plain(3)], mainOperator: false);
+        foreach (var id in scene.Ids)
+        {
+            await EventSeed.HandoutAsync(_mongo.ConnectionString, scene.Tenant, new Handout(scene.EventId, id, id));
+        }
+
+        await using var tab = await Tab.OpenAsync(api, scene, opensDashboard: false); // it may not remove them
+
+        var refused = await Assert.ThrowsAsync<DomainException>(() => tab.Handouts.Delete(tab.Handouts.Documents));
+
+        Assert.NotEmpty(refused.Message);
+        Assert.Single(tab.Requests.Asked, x => x.StartsWith("DELETE", StringComparison.Ordinal));
+        Assert.Equal(3, (await StoredAsync(scene.EventId)).Count);
+        Assert.Equal(3, tab.Handouts.Documents.Count); // what is shown is what is stored
+    }
+
+    [Fact]
     public async Task A_Handout_that_the_Api_does_not_take_is_said_in_its_words_and_nothing_is_stored()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
@@ -178,6 +238,55 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
         Assert.Equal(scene.Ids[1], kept["_id"].AsGuid); // the Handout of the Participation that completed its Phase
         Assert.Equal([string.Format(Handout_made_string, 2)], tab.Informed);
         Assert.Empty(tab.Warned);
+        await UiBrowser.Eventually(async () => tab.Handouts.Documents.Count == 1); // and the page that lists them has it, once it has read them
+        var shown = Assert.Single(tab.Handouts.Documents);
+        Assert.Equal(scene.Ids[1], shown.Id);
+    }
+
+    [Fact]
+    public async Task A_Phase_that_completes_for_a_Participation_that_has_a_Handout_makes_no_second_and_tells_nothing()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var scene = await SceneAsync(api, [TwoPhases(1)]);
+        await EventSeed.HandoutAsync(
+            _mongo.ConnectionString,
+            scene.Tenant,
+            new Handout(scene.EventId, scene.Ids[0], Guid.NewGuid()) // one that came with the Event
+        );
+        await using var tab = await Tab.OpenAsync(api, scene);
+        using var watching = tab.Handouts.Watch(tab.View);
+        tab.Dashboard.Selected = tab.Dashboard.Participations.Single();
+
+        await tab.Dashboard.RecordTime(SnapshotType.Arrive, TimeSpan.FromHours(9));
+        await tab.Dashboard.RecordTime(SnapshotType.Present, TimeSpan.FromHours(9.25));
+        await SettleAsync();
+
+        Assert.Single(await StoredAsync(scene.EventId));
+        Assert.Empty(tab.Informed);
+        Assert.Empty(tab.Warned);
+        Assert.Empty(
+            tab.Requests.Asked.Where(x =>
+                x.StartsWith("POST", StringComparison.Ordinal) && x.Contains("handouts", StringComparison.Ordinal)
+            )
+        );
+    }
+
+    [Fact]
+    public async Task A_view_that_cannot_write_makes_no_Handout_when_a_Phase_completes_and_does_not_ask_the_Api_to()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var scene = await SceneAsync(api, [TwoPhases(1)]);
+        await using var reader = await Tab.OpenAsync(api, scene, canWrite: false);
+        await using var other = await Tab.OpenAsync(api, scene);
+        using var watching = reader.Handouts.Watch(reader.View);
+
+        await CompleteFirstPhaseAsync(other, 1);
+        await reader.Store.Refresh(scene.Ids[0]);
+        await SettleAsync();
+
+        Assert.Empty(await StoredAsync(scene.EventId));
+        Assert.Empty(reader.Warned);
+        Assert.Empty(reader.Requests.Asked.Where(x => x.StartsWith("POST", StringComparison.Ordinal)));
     }
 
     [Fact]
@@ -387,7 +496,8 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
             ApiFactory api,
             Scene scene,
             Person? person = null,
-            bool canWrite = true
+            bool canWrite = true,
+            bool opensDashboard = true
         )
         {
             var json = JsonApiClients.Of(api, person ?? scene.Person, out var requests);
@@ -403,7 +513,11 @@ public sealed class ConsoleHandoutsTests : IClassFixture<MongoFixture>
                 new AccountSession(json),
                 new SnapshotApiPublisher(json)
             );
-            await dashboard.Show(view);
+            if (opensDashboard)
+            {
+                await dashboard.Show(view); // which loads the store; a page of the Handouts that opens alone loads it itself
+            }
+
             var notifier = new Notifier();
             var tab = new Tab(
                 dashboard,

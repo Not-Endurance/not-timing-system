@@ -52,6 +52,7 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
         var html = await printed.ContentAsync();
         Assert.Contains("print-document", html);
         Assert.Contains("CEI 1*", html);
+        Assert.Contains($"data:image/png;base64,{Convert.ToBase64String(Scene.LOGO)}", html); // with the logo of the Tenant at its head
 
         // the export is a file the browser downloads, which the FEI takes
         var download = await page.RunAndWaitForDownloadAsync(
@@ -85,6 +86,7 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
         await page.GetByRole(AriaRole.Button, new() { Name = "Custom ranking", Exact = true }).ClickAsync();
         var dialog = page.GetByRole(AriaRole.Dialog);
         await Expect(dialog).ToBeVisibleAsync(Loaded());
+        await dialog.GetByLabel("Name", new() { Exact = true }).FillAsync("Open class"); // named first: choosing a template keeps it
         await dialog.GetByLabel("Template ranking").ClickAsync(); // the settings of a Ranking that exists are the start of the new one
         await page.Locator(".mud-popover-open .mud-list-item").Filter(new() { HasText = "CEI 1*" }).First.ClickAsync();
         await dialog.GetByLabel("Select a Participation to add").FillAsync("Athlete 2");
@@ -92,7 +94,6 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
             .Filter(new() { HasText = "Athlete 2" })
             .First.ClickAsync();
         await dialog.GetByRole(AriaRole.Button, new() { Name = "Add", Exact = true }).ClickAsync();
-        await dialog.GetByLabel("Name", new() { Exact = true }).FillAsync("Open class");
         await dialog.GetByRole(AriaRole.Button, new() { Name = "Create", Exact = true }).ClickAsync();
 
         await Eventually(async () => (await scene.RankingsStoredAsync()).Any(x => x.Name == "Open class"));
@@ -100,25 +101,117 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
         var stored = (await scene.RankingsStoredAsync()).Single(x => x.Name == "Open class");
         Assert.Equal(1, stored.Entries);
 
+        // the person chooses it, and it is the one that is shown and printed: the page does not choose another when it is drawn again
+        var rankings = page.GetByTestId("console-rankings-panel");
+        await rankings
+            .Locator("xpath=.//*[normalize-space(text())='Open class']/following::*[contains(@class,'mud-chip')][1]")
+            .ClickAsync(); // the chip that follows its name in the menu
+        await rankings.GetByRole(AriaRole.Button, new() { Name = "Print", Exact = true }).ClickAsync();
+        await Eventually(async () => page.Frames.Any(x => x != page.MainFrame));
+        var printed = page.Frames.First(x => x != page.MainFrame);
+        await Eventually(async () => (await printed.ContentAsync()).Contains("Open class", StringComparison.Ordinal));
+
         // and it is removed, after the person is asked, from the Api and from the page: the chip that follows its name in the menu
-        await page.GetByTestId("console-rankings-panel")
+        var close = page.GetByTestId("console-rankings-panel")
             .Locator(
                 "xpath=.//*[normalize-space(text())='Open class']/following::*[contains(@class,'mud-chip-close-button')][1]"
-            )
+            );
+        await close.ClickAsync();
+        await page.GetByRole(AriaRole.Dialog)
+            .GetByRole(AriaRole.Button, new() { Name = "Cancel", Exact = true })
             .ClickAsync();
+        await Expect(page.GetByRole(AriaRole.Dialog)).ToHaveCountAsync(0, Counted());
+        Assert.Contains(await scene.RankingsStoredAsync(), x => x.Name == "Open class"); // the person gave it up
+        await close.ClickAsync();
         await page.GetByRole(AriaRole.Dialog).GetByRole(AriaRole.Button, new() { Name = "Delete" }).ClickAsync();
         await Eventually(async () => (await scene.RankingsStoredAsync()).All(x => x.Name != "Open class"));
         await Expect(page.GetByText("Open class", new() { Exact = true })).ToHaveCountAsync(0, Counted());
         Assert.Contains(await scene.RankingsStoredAsync(), x => x.Name == "CEI 1*"); // the one that was there is still there
     }
 
+    [Fact]
+    public async Task The_Results_of_an_Event_that_is_over_offer_no_change_of_its_Rankings()
+    {
+        var scene = await Scene.CreateAsync(_host.MongoConnectionString, historic: true);
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, scene.Email, $"/console/events/{scene.EventId}/rankings");
+
+        await Expect(page.GetByText("Athlete 1").First).ToBeVisibleAsync(Loaded());
+        var panel = page.GetByTestId("console-rankings-panel");
+        await Expect(panel.GetByText("CEI 1*", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(panel.GetByRole(AriaRole.Button, new() { Name = "Custom ranking", Exact = true }))
+            .ToHaveCountAsync(0, Counted());
+        await Expect(panel.Locator(".mud-chip-close-button")).ToHaveCountAsync(0, Counted()); // and none can be removed
+        await Expect(panel.GetByRole(AriaRole.Button, new() { Name = "Print", Exact = true })).ToBeEnabledAsync(); // what it was can be printed
+    }
+
+    [Fact]
+    public async Task The_export_for_the_FEI_is_offered_when_a_Ranking_has_the_settings_of_the_FEI_and_not_when_none_has()
+    {
+        var some = await Scene.CreateAsync(
+            _host.MongoConnectionString,
+            false,
+            ("Local", Fei.None),
+            ("CEI 1*", Fei.All)
+        );
+        var none = await Scene.CreateAsync(_host.MongoConnectionString, false, ("Local", Fei.None));
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, some.Email, $"/console/events/{some.EventId}/rankings");
+        var export = page.GetByTestId("console-rankings-panel")
+            .GetByRole(AriaRole.Button, new() { Name = "Export FEI", Exact = true });
+        await Expect(page.GetByText("Athlete 1").First).ToBeVisibleAsync(Loaded());
+        var one = await export.IsEnabledAsync(); // one of the two Rankings is made for the FEI
+
+        await device.FetchAsync("DELETE", "/api/sessions/current");
+        await SignInAndOpenAsync(_host, device, none.Email, $"/console/events/{none.EventId}/rankings");
+        await Expect(page.GetByText("Athlete 1").First).ToBeVisibleAsync(Loaded());
+        var neither = await export.IsEnabledAsync();
+
+        Assert.True(one);
+        Assert.False(neither); // and there is nothing to export of what has none of its settings
+    }
+
+    [Fact]
+    public async Task An_export_that_cannot_be_made_is_said_to_the_person_in_its_words()
+    {
+        var scene = await Scene.CreateAsync(
+            _host.MongoConnectionString,
+            false,
+            ("CEI 1*", Fei.All),
+            ("Half", Fei.Some)
+        );
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, scene.Email, $"/console/events/{scene.EventId}/rankings");
+        await Expect(page.GetByText("Athlete 1").First).ToBeVisibleAsync(Loaded());
+
+        await page.GetByTestId("console-rankings-panel")
+            .GetByRole(AriaRole.Button, new() { Name = "Export FEI", Exact = true })
+            .ClickAsync(); // one of the Rankings has some of the settings and not all of them
+
+        await Expect(page.GetByText("missing FEI export configuration").First).ToBeVisibleAsync();
+    }
+
     sealed class Scene
     {
-        public static async Task<Scene> CreateAsync(string mongo)
+        public static readonly byte[] LOGO = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 5, 6, 7, 8];
+
+        public static async Task<Scene> CreateAsync(
+            string mongo,
+            bool historic = false,
+            params (string Name, Fei Settings)[] rankings
+        )
         {
             var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
             var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-            var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+            var eventId = historic
+                ? await EventSeed.HistoricAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow)
+                : await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
             var arrive = new DateTimeOffset(DateTime.Today.AddHours(11));
             var participations = new[] { Completed(eventId, 1, arrive), Completed(eventId, 2, arrive.AddMinutes(20)) };
             foreach (var participation in participations)
@@ -126,20 +219,42 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
                 await EventSeed.ParticipationAsync(mongo, tenant, participation);
             }
 
-            var ranking = new Ranking(
-                "CEI 1*",
-                CompetitionRuleset.FEI,
-                ParticipationCategory.Senior,
-                "FEI-EVENT-1",
-                "CEI1",
-                "FEI-COMP-1",
-                "E Comp",
-                "01",
-                participations.Select((x, index) => new RankingEntry(x.Id, false, index + 1)),
-                eventId,
-                Guid.NewGuid()
-            );
-            await EventSeed.RankingAsync(mongo, tenant, ranking);
+            (string Name, Fei Settings)[] made = rankings.Length == 0 ? [("CEI 1*", Fei.All)] : rankings;
+            foreach (var (name, settings) in made)
+            {
+                var ranking = new Ranking(
+                    name,
+                    CompetitionRuleset.FEI,
+                    ParticipationCategory.Senior,
+                    settings != Fei.None ? "FEI-EVENT-1" : null,
+                    settings == Fei.All ? "CEI1" : null,
+                    settings == Fei.All ? "FEI-COMP-1" : null,
+                    settings == Fei.All ? "E Comp" : null,
+                    settings == Fei.All ? "01" : null,
+                    participations.Select((x, index) => new RankingEntry(x.Id, false, index + 1)),
+                    eventId,
+                    Guid.NewGuid()
+                );
+                await EventSeed.RankingAsync(mongo, tenant, ranking);
+            }
+
+            await RegistrySeed
+                .Collection(mongo, "brandings")
+                .InsertOneAsync(
+                    new MongoDB.Bson.BsonDocument
+                    {
+                        { "_id", $"tenant:{tenant}" },
+                        { "TenantId", tenant },
+                        {
+                            "Right",
+                            new MongoDB.Bson.BsonDocument
+                            {
+                                { "ContentType", "image/png" },
+                                { "Content", new MongoDB.Bson.BsonBinaryData(LOGO) },
+                            }
+                        },
+                    }
+                );
             await EventSeed
                 .Cores(mongo)
                 .UpdateOneAsync(
@@ -209,5 +324,12 @@ public sealed class ConsoleRankingsBrowserTests : IClassFixture<ApiHostFixture>,
                 Guid.NewGuid()
             );
         }
+    }
+
+    enum Fei
+    {
+        None,
+        Some,
+        All,
     }
 }

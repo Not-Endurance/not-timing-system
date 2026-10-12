@@ -69,6 +69,7 @@ public sealed class ConsoleRankingsTests : IClassFixture<MongoFixture>
         );
 
         Assert.NotEmpty(refused.Message);
+        Assert.Contains(' ', refused.Message); // the words of the Api, and not the code it answered with
         Assert.Empty(await StoredAsync(scene.EventId));
         Assert.Equal(1, scene.View.Refreshes); // what is shown is read again from what is stored
     }

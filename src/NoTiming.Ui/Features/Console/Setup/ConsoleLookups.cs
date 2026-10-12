@@ -11,6 +11,7 @@ using NTS.Domain;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Aggregates.ConfigureEvents;
+using static NoTiming.Ui.Features.Console.ApiAnswers;
 
 namespace NoTiming.Ui.Features.Console.Setup;
 
@@ -216,13 +217,6 @@ public class ConsoleLookups : IConsoleLookups, IScoped
                 Text(attributes, "club"),
                 Text(attributes, "country")
             )
-            : null;
-    }
-
-    static string? Text(JsonElement attributes, string member)
-    {
-        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.String
-            ? value.GetString()
             : null;
     }
 

@@ -107,12 +107,6 @@ public class HandoutsPageBehind : NStatefulComponent
         }
 
         var parameters = new DialogParameters<HandoutsPrintConfirmationDialog> { { x => x.Documents, _lastPrinted } };
-        var dialog = await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>(string.Empty, parameters);
-        if (await dialog.IsCanceled())
-        {
-            return;
-        }
-
-        _lastPrinted = [];
+        await DialogService.ShowAsync<HandoutsPrintConfirmationDialog>(string.Empty, parameters); // which removes them when the person says they were printed
     }
 }

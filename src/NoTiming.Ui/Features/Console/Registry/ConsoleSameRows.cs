@@ -83,7 +83,7 @@ public class ConsoleSameRows : IConsoleSameRows, IScoped
             var key = $"{registry}|{term.ToUpperInvariant()}";
             if (!_searched.TryGetValue(key, out var rows))
             {
-                rows = _searched[key] = [.. (await search(term)).Where(x => !x.IsOwn)];
+                rows = _searched[key] = [.. await search(term)];
             }
 
             found.AddRange(rows);

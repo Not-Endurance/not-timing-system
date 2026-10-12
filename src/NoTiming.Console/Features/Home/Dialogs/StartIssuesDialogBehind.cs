@@ -7,11 +7,11 @@ namespace NoTiming.Console.Features.Home.Dialogs;
 /// <summary>
 /// What is missing from a Setup for its Event to start, as the domain's start validation says it (#646). A start number that
 /// two Competitions of different Phases hold at once is the one thing the person can settle here: they choose the Competition
-/// it stays in, and it is taken out of the others. The Event starts when nothing is left to say.
+/// it is taken out of (<see cref="StartCorrections"/>). The Event starts when nothing is left to say.
 /// </summary>
 public class StartIssuesDialogBehind : NDialog<bool>
 {
-    readonly Dictionary<int, Guid> _stays = [];
+    readonly Dictionary<int, Guid> _removeFrom = [];
 
     [Inject]
     IConsoleSetup Setup { get; set; } = default!;
@@ -21,11 +21,7 @@ public class StartIssuesDialogBehind : NDialog<bool>
 
     protected bool HasCorrections => Issues.Any(x => x.IsAutoCorrectable);
 
-    protected bool CanApplyCorrections =>
-        Issues.Count > 0
-        && Issues.All(x =>
-            x.IsAutoCorrectable && x.ParticipationNumber.HasValue && _stays.ContainsKey(x.ParticipationNumber.Value)
-        );
+    protected bool CanApplyCorrections => StartCorrections.CanApply(Issues, _removeFrom);
 
     [Parameter, EditorRequired]
     public IReadOnlyList<StartValidationIssue> Issues { get; set; } = [];
@@ -33,20 +29,20 @@ public class StartIssuesDialogBehind : NDialog<bool>
     [Parameter, EditorRequired]
     public Guid EventId { get; set; }
 
-    protected Guid? StaysIn(int participationNumber)
+    protected Guid? RemoveFromOf(int participationNumber)
     {
-        return _stays.TryGetValue(participationNumber, out var competition) ? competition : null;
+        return _removeFrom.TryGetValue(participationNumber, out var competition) ? competition : null;
     }
 
     protected void Choose(int participationNumber, Guid? competition)
     {
         if (competition is { } chosen)
         {
-            _stays[participationNumber] = chosen;
+            _removeFrom[participationNumber] = chosen;
         }
         else
         {
-            _stays.Remove(participationNumber);
+            _removeFrom.Remove(participationNumber);
         }
     }
 
@@ -59,17 +55,13 @@ public class StartIssuesDialogBehind : NDialog<bool>
 
         try
         {
-            foreach (var issue in Issues)
+            foreach (var (number, competition) in StartCorrections.Removals(Issues, _removeFrom))
             {
-                var number = issue.ParticipationNumber!.Value;
-                foreach (var competition in issue.Competitions.Where(x => x.CompetitionId != _stays[number]))
-                {
-                    await Setup.RemoveParticipation(EventId, number, competition.CompetitionId);
-                }
+                await Setup.RemoveParticipation(EventId, number, competition);
             }
 
             Issues = await Events.Validate(EventId);
-            _stays.Clear();
+            _removeFrom.Clear();
             if (Issues.Count == 0)
             {
                 await ConfirmDialog(true);

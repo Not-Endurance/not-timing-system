@@ -80,6 +80,7 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
         Assert.True(rows[open].CanConfigure && rows[open].CanEditSetup && rows[open].CanLinkAccounts);
         Assert.False(rows[open].CanReset || rows[open].CanHandOver || rows[open].CanEditData);
         Assert.True(rows[live].CanReset && rows[live].CanHandOver && rows[live].CanEditData);
+        Assert.True(rows[live].CanConfigure); // what is set up for the Event is seen to until it ends
         Assert.False(rows[live].CanEditSetup); // the Setup is not edited once the Event started
     }
 
@@ -109,6 +110,68 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
         using var theirs = Open(api, next);
         await theirs.Events.Load();
         Assert.True(theirs.Events.Events.Single(x => x.Id == made.Id).IsMainOperator);
+    }
+
+    [Fact]
+    public async Task An_account_is_found_by_a_name_that_has_a_quote_in_it_and_a_Tenant_Root_who_does_not_run_an_Event_does_not_reset_it()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var conan = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Conan O'Brien");
+        var live = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        using var console = Open(api, root);
+        await console.Events.Load();
+
+        var found = await console.Events.FindAccounts("O'Bri");
+        var refused = await Assert.ThrowsAsync<DomainException>(() => console.Events.Reset(live));
+
+        Assert.Equal([conan.Id], found.Select(x => x.Id));
+        Assert.NotEmpty(refused.Message);
+        await console.Events.Load();
+        Assert.Equal(EventStage.Live, console.Events.Events.Single(x => x.Id == live).Stage);
+    }
+
+    [Fact]
+    public async Task What_the_Console_lists_is_gone_when_the_session_ends()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, root.Id, "Open");
+        using var console = Open(api, root);
+        await console.Events.Load();
+        var before = (console.Events.Events.Count, console.Events.CanCreate, console.Events.CanEditRegistry);
+
+        await console.Account.SignOut();
+
+        Assert.Equal((1, true, true), before);
+        await UiBrowser.Eventually(async () => console.Events.Events.Count == 0);
+        Assert.False(console.Events.CanCreate);
+        Assert.False(console.Events.CanEditRegistry);
+    }
+
+    [Fact]
+    public async Task The_Events_are_listed_by_name_whatever_the_case_and_one_that_is_not_there_is_not_validated()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        foreach (var name in new[] { "delta", "Alpha", "charlie", "Bravo", "echo" })
+        {
+            await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, name);
+        }
+
+        using var console = Open(api, mainOperator);
+        await console.Events.Load();
+
+        Assert.Equal(["Alpha", "Bravo", "charlie", "delta", "echo"], console.Events.Events.Select(x => x.Name));
+        var missing = await Assert.ThrowsAsync<DomainException>(() => console.Events.Validate(Guid.NewGuid()));
+        Assert.Equal(NTS.Localization.NtsStrings.Event_not_found_string, missing.Message);
     }
 
     [Fact]

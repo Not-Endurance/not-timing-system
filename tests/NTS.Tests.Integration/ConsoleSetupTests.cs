@@ -207,6 +207,37 @@ public sealed class ConsoleSetupTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task What_was_changed_a_moment_ago_is_saved_before_the_Setup_is_read_again_to_take_a_Participation_out_of_it()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.FullSetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Before");
+        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var setup = ui.Get<IConsoleSetup>();
+        var opened = (await setup.Open(id))!;
+        var competition = opened.Model.Competitions.Single();
+        var number = competition.Participations.Single().Combination.Number;
+        ui.Requests.Before = async request =>
+        {
+            if (request.Method == HttpMethod.Patch)
+            {
+                await Task.Delay(600); // a change is saved a moment after the call that made it returns
+            }
+        };
+        opened.Model.Name = "After";
+
+        await ui.Get<IKrudFormService<ConfigureEventFormModel>>().Update(opened.Model);
+        await setup.RemoveParticipation(id, number, competition.Id);
+        ui.Requests.Before = null;
+
+        var stored = (await setup.Open(id))!;
+        Assert.Equal("After", stored.Model.Name); // the Setup that the removal read was the one with the change in it
+        Assert.Empty(stored.Model.Competitions.Single().Participations);
+    }
+
+    [Fact]
     public async Task A_Participation_is_taken_out_of_one_Competition_of_the_Setup_and_stays_in_the_others()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);

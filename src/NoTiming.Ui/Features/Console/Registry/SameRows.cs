@@ -53,7 +53,7 @@ public static partial class SameRows
 
     /// <summary>
     /// The FEI ID to compare by: an Athlete's as a number, so that <c>00012</c> is <c>12</c>, a Horse's as the text it is, case-folded.
-    /// None for one that is empty, is zero, or is a placeholder made only of the same character that is not a digit.
+    /// None for one that is empty, is zero, or is a placeholder made only of one character that is neither a letter nor a digit (<c>-----</c>).
     /// </summary>
     public static string? FeiIdOf(string? feiId, bool isNumber)
     {

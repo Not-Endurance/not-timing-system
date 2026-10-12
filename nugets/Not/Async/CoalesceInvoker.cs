@@ -44,7 +44,7 @@ public class CoalesceInvoker
         {
             return;
         }
-        var finished = new TaskCompletionSource();
+        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         Volatile.Write(ref _running, finished.Task);
         try
         {

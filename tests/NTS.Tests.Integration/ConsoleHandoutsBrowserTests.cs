@@ -40,6 +40,7 @@ public sealed class ConsoleHandoutsBrowserTests : IClassFixture<ApiHostFixture>,
         // the sheets of the Participations, as the Participations are
         await Expect(page.GetByText("Athlete 1").First).ToBeVisibleAsync(Loaded());
         await Expect(page.GetByText("Athlete 2").First).ToBeVisibleAsync();
+        await Expect(page.Locator("img[src^='data:image/png;base64,']").First).ToBeVisibleAsync(); // with the logo of the Tenant at their head
 
         // printing hands the browser the sheets in a page of its own, and the person is asked whether they were printed
         var panel = page.GetByTestId("console-handouts-panel");
@@ -48,6 +49,7 @@ public sealed class ConsoleHandoutsBrowserTests : IClassFixture<ApiHostFixture>,
         var printed = page.Frames.First(x => x != page.MainFrame);
         await Eventually(async () => (await printed.ContentAsync()).Contains("Athlete 2", StringComparison.Ordinal));
         Assert.Contains("Athlete 1", await printed.ContentAsync());
+        Assert.Contains($"data:image/png;base64,{Convert.ToBase64String(Scene.LOGO)}", await printed.ContentAsync());
         var dialog = page.GetByRole(AriaRole.Dialog);
         await Expect(dialog.GetByText("Print confirmation")).ToBeVisibleAsync();
 
@@ -102,6 +104,31 @@ public sealed class ConsoleHandoutsBrowserTests : IClassFixture<ApiHostFixture>,
         );
     }
 
+    [Fact]
+    public async Task The_page_of_the_Handouts_makes_the_Handout_of_a_Phase_that_completes_on_another_page_and_the_two_make_one()
+    {
+        var scene = await Scene.CreateAsync(_host.MongoConnectionString, arrived: false, handouts: false);
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var handouts = device.Page;
+        handouts.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, scene.Email, $"/console/events/{scene.EventId}/handouts");
+        await Expect(handouts.GetByText("Create Handouts manually to print...").First).ToBeVisibleAsync(Loaded());
+        var dashboard = await device.Context.NewPageAsync(); // another page of the same person, which records the times
+        dashboard.SetDefaultTimeout(PATIENCE);
+        await dashboard.GotoAsync(device.Url($"/console/events/{scene.EventId}/dashboard"));
+        await Expect(ChipOf(dashboard, 1)).ToBeVisibleAsync(Loaded());
+
+        await ChipOf(dashboard, 1).ClickAsync();
+        await RecordAsync(dashboard, "Arrive", "090000");
+        await Expect(dashboard.GetByText("09:00:00", new() { Exact = true }).First).ToBeVisibleAsync();
+        await RecordAsync(dashboard, "Present", "091500");
+
+        await Expect(handouts.GetByText("Athlete 1").First).ToBeVisibleAsync(Loaded()); // the page that was left open has it
+        await Eventually(async () => (await scene.HandoutsStoredAsync()).Count == 1);
+        await Task.Delay(1500); // and if the other page made it too, there is still the one: it is under the id of its Participation
+        Assert.Equal(scene.Ids[0], Assert.Single(await scene.HandoutsStoredAsync())["_id"].AsGuid);
+    }
+
     static async Task RecordAsync(IPage page, string button, string digits)
     {
         var panel = page.GetByTestId("console-time-panel");
@@ -114,6 +141,8 @@ public sealed class ConsoleHandoutsBrowserTests : IClassFixture<ApiHostFixture>,
 
     sealed class Scene
     {
+        public static readonly byte[] LOGO = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3, 4];
+
         public static async Task<Scene> CreateAsync(string mongo, bool arrived, bool handouts)
         {
             var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
@@ -136,6 +165,23 @@ public sealed class ConsoleHandoutsBrowserTests : IClassFixture<ApiHostFixture>,
                 }
             }
 
+            await RegistrySeed
+                .Collection(mongo, "brandings")
+                .InsertOneAsync(
+                    new MongoDB.Bson.BsonDocument
+                    {
+                        { "_id", $"tenant:{tenant}" },
+                        { "TenantId", tenant },
+                        {
+                            "Left",
+                            new MongoDB.Bson.BsonDocument
+                            {
+                                { "ContentType", "image/png" },
+                                { "Content", new MongoDB.Bson.BsonBinaryData(LOGO) },
+                            }
+                        },
+                    }
+                );
             return new Scene(mongo, eventId, mainOperator.Email, [.. ids]);
         }
 

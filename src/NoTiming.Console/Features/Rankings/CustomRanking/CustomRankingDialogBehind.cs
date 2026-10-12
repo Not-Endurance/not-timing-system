@@ -29,7 +29,11 @@ public class CustomRankingDialogBehind : NDialog<CustomRankingModel>
             _template = value;
             if (value != null)
             {
-                CustomModel = new CustomRankingModel(value) { Entries = [.. CustomModel.Entries] };
+                CustomModel = new CustomRankingModel(value)
+                {
+                    Name = CustomModel.Name,
+                    Entries = [.. CustomModel.Entries],
+                };
             }
         }
     }

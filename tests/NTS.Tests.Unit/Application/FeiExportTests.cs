@@ -1,8 +1,10 @@
+using System.Globalization;
 using System.Xml.Linq;
 using Not.Domain.Exceptions;
 using NoTiming.Console.Features.Rankings.Fei;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects;
@@ -17,6 +19,38 @@ namespace NTS.Tests.Unit.Application;
 /// </summary>
 public sealed class FeiExportTests
 {
+    const string EXPECTED = """
+        <HorseSport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.fei.org/Result">
+          <Generated Software="NTS" SoftwareVersion="1.0.0" Organization="NotACompany" />
+          <EventResult>
+            <Show FEIID="FEI-SHOW-1" StartDate="2026-05-01" EndDate="2026-05-02">
+              <Venue Name="Sofia" Country="BUL" />
+              <EnduranceEvent FEIID="FEI-EVENT-1" Code="CEI1" NF="BUL" StartDate="2026-05-01" EndDate="2026-05-02">
+                <Competitions>
+                  <Competition FEIID="FEI-COMP-1" ScheduleCompetitionNr="01" Rule="E Comp 2" Name="CEI 1*" StartDate="2026-05-01">
+                    <ParticipationList>
+                      <Participation>
+                        <Athlete FEIID="100001" FirstName="Athlete" FamilyName="1" CompetingFor="BUL" />
+                        <Horse FEIID="200001" Name="Horse 1" />
+                        <Complement BestCondition="false" />
+                        <Position Status="R" Rank="1" />
+                        <Phases>
+                          <Day Number="1">
+                            <Phase Number="1">
+                              <Result PhaseAverageSpeed="10" PhaseTime="02:00:00" RecoveryTime="00:10:00" />
+                            </Phase>
+                          </Day>
+                        </Phases>
+                        <Total Time="02:00:00" AverageSpeed="10" />
+                      </Participation>
+                    </ParticipationList>
+                  </Competition>
+                </Competitions>
+              </EnduranceEvent>
+            </Show>
+          </EventResult>
+        </HorseSport>
+        """;
     static readonly Guid EVENT = TestId.Of(10);
 
     [Fact]
@@ -225,6 +259,10 @@ public sealed class FeiExportTests
         );
 
         Assert.Contains("Show FEI ID", noShow.Message);
+        var blankShow = Assert.Throws<DomainException>(
+            () => new FeiExport().Create(EventOf(feiShowId: "  "), [ranking.Result], [ranking.Ranking])
+        );
+        Assert.Contains("Show FEI ID", blankShow.Message);
     }
 
     [Fact]
@@ -246,6 +284,7 @@ public sealed class FeiExportTests
         var ns = xml.Root!.Name.Namespace;
         var participation = xml.Descendants(ns + "Participation").Single();
         Assert.Equal("WD", participation.Element(ns + "Position")!.Attribute("Status")!.Value);
+        Assert.Null(participation.Element(ns + "Position")!.Attribute("Rank")); // it holds no placing, whatever the Ranking stored
         Assert.Null(participation.Element(ns + "Total"));
         Assert.Equal(
             "WD",
@@ -253,12 +292,191 @@ public sealed class FeiExportTests
         );
     }
 
-    static EventInformation EventOf(string? feiShowId = "FEI-SHOW-1")
+    [Fact]
+    public void The_file_says_what_the_Event_and_the_Ranking_hold_in_the_places_the_FEI_reads_them_from()
+    {
+        var one = RankingOf(
+            1,
+            "CEI 1*",
+            feiEventId: "FEI-EVENT-1",
+            feiEventCode: "CEI1",
+            feiCompetitionId: "FEI-COMP-1",
+            schedule: "01",
+            rule: "E Comp 2"
+        );
+
+        var document = new FeiExport().Create(EventOf(), [one.Result], [one.Ranking]);
+
+        var xml = XDocument.Parse(document.Content);
+        var generated = xml.Root!.Element(xml.Root.Name.Namespace + "Generated")!;
+        var madeAt = DateTimeOffset.Parse(generated.Attribute("Date")!.Value, CultureInfo.InvariantCulture);
+        Assert.InRange(madeAt, DateTimeOffset.UtcNow.AddMinutes(-5), DateTimeOffset.UtcNow.AddMinutes(1));
+        generated.Attribute("Date")!.Remove();
+        // The Ranking has one Phase of 20 km that was ridden in two hours and then rested ten minutes at the vet gate: 10 km/h
+        Assert.Equal(XDocument.Parse(EXPECTED).ToString(), xml.ToString());
+    }
+
+    [Fact]
+    public void Rankings_of_the_same_FEI_Event_with_other_codes_are_Endurance_Events_by_the_ID_and_then_the_code()
+    {
+        var late = RankingOf(1, "Two", "FEI-EVENT-1", "CEI2", "FEI-COMP-1", "01");
+        var early = RankingOf(2, "One", "FEI-EVENT-1", "CEI1", "FEI-COMP-2", "02");
+
+        var document = new FeiExport().Create(EventOf(), [late.Result, early.Result], [late.Ranking, early.Ranking]);
+
+        var xml = XDocument.Parse(document.Content);
+        var ns = xml.Root!.Name.Namespace;
+        Assert.Equal(["CEI1", "CEI2"], xml.Descendants(ns + "EnduranceEvent").Select(x => x.Attribute("Code")!.Value));
+    }
+
+    [Fact]
+    public void The_file_is_named_by_the_Event_with_a_dash_for_whatever_is_not_a_letter_or_a_digit_and_none_at_the_ends()
+    {
+        var ranking = RankingOf(1, "CEI 1*", "FEI-EVENT-1", "CEI1", "FEI-COMP-1", "01");
+
+        var named = new FeiExport().Create(EventOf(name: " (Spring) Cup! "), [ranking.Result], [ranking.Ranking]);
+        var punctuation = new FeiExport().Create(EventOf(name: "***"), [ranking.Result], [ranking.Ranking]);
+
+        Assert.Equal("fei-export-Spring--Cup.xml", named.FileName);
+        Assert.Equal($"fei-export-{EVENT}.xml", punctuation.FileName); // there is no name in it to give the file
+    }
+
+    [Fact]
+    public void The_Phases_of_a_day_are_in_its_Day_and_a_Participation_that_rode_two_days_has_two()
+    {
+        var ranking = RankingOf(
+            1,
+            "CEI 2*",
+            feiEventId: "FEI-EVENT-1",
+            feiEventCode: "CEI2",
+            feiCompetitionId: "FEI-COMP-1",
+            schedule: "01",
+            phases: TwoDaysOfTwoPhases()
+        );
+
+        var document = new FeiExport().Create(EventOf(), [ranking.Result], [ranking.Ranking]);
+
+        var xml = XDocument.Parse(document.Content);
+        var ns = xml.Root!.Name.Namespace;
+        var days = xml.Descendants(ns + "Day").ToList();
+        Assert.Equal(["1", "2"], days.Select(x => x.Attribute("Number")!.Value));
+        Assert.Equal(["1", "2"], days[0].Elements(ns + "Phase").Select(x => x.Attribute("Number")!.Value));
+        Assert.Equal(["3", "4"], days[1].Elements(ns + "Phase").Select(x => x.Attribute("Number")!.Value));
+        // 20 km in the 2 h 10 min of the ride and the wait for the vet gate is 9.23 km/h, and the last Phase has no vet gate
+        var phases = xml.Descendants(ns + "Phase").Select(x => x.Element(ns + "Result")!).ToList();
+        Assert.Equal(["9.23", "9.23", "9.23", "10"], phases.Select(x => x.Attribute("PhaseAverageSpeed")!.Value));
+        Assert.Equal(
+            ["02:10:00", "02:10:00", "02:10:00", "02:00:00"],
+            phases.Select(x => x.Attribute("PhaseTime")!.Value)
+        );
+        Assert.Equal(
+            ["00:10:00", "00:10:00", "00:10:00", "00:00:00"],
+            phases.Select(x => x.Attribute("RecoveryTime")!.Value)
+        );
+        Assert.Empty(xml.Descendants(ns + "VetInspection"));
+    }
+
+    [Fact]
+    public void An_elimination_is_in_the_last_Phase_the_Participation_rode_with_the_codes_it_failed_to_qualify_by()
+    {
+        var ranking = RankingOf(
+            1,
+            "CEI 2*",
+            feiEventId: "FEI-EVENT-1",
+            feiEventCode: "CEI2",
+            feiCompetitionId: "FEI-COMP-1",
+            schedule: "01",
+            eliminated: new FailedToQualify([FailToQualifyCode.GA, FailToQualifyCode.ME]),
+            phases: TwoDaysOfTwoPhases()
+        );
+
+        var document = new FeiExport().Create(EventOf(), [ranking.Result], [ranking.Ranking]);
+
+        var xml = XDocument.Parse(document.Content);
+        var ns = xml.Root!.Name.Namespace;
+        Assert.Equal("FTQ", xml.Descendants(ns + "Position").Single().Attribute("Status")!.Value);
+        var inspection = xml.Descendants(ns + "VetInspection").Single();
+        Assert.Equal("GA ME", inspection.Attribute("EliminationCode")!.Value);
+        Assert.Equal("4", inspection.Parent!.Attribute("Number")!.Value);
+    }
+
+    [Fact]
+    public void A_Phase_that_has_no_start_is_not_in_the_file_and_the_ones_after_it_keep_their_numbers()
+    {
+        var start = new DateTimeOffset(2026, 5, 1, 6, 0, 0, TimeSpan.Zero);
+        var withoutStart = new Phase(
+            "GATE",
+            20,
+            40,
+            40,
+            CompetitionRuleset.FEI,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            false,
+            false,
+            false
+        );
+        var ranking = RankingOf(
+            1,
+            "CEI 1*",
+            feiEventId: "FEI-EVENT-1",
+            feiEventCode: "CEI1",
+            feiCompetitionId: "FEI-COMP-1",
+            schedule: "01",
+            phases: [Leg(start), withoutStart, Leg(start.AddHours(5), isFinal: true)]
+        );
+
+        var document = new FeiExport().Create(EventOf(), [ranking.Result], [ranking.Ranking]);
+
+        var xml = XDocument.Parse(document.Content);
+        var ns = xml.Root!.Name.Namespace;
+        Assert.Equal(["1", "3"], xml.Descendants(ns + "Phase").Select(x => x.Attribute("Number")!.Value));
+    }
+
+    /// <summary>Two days of two Phases: each is 20 km ridden in two hours, with ten minutes between the arrival and the vet gate.</summary>
+    static Phase[] TwoDaysOfTwoPhases()
+    {
+        var first = new DateTimeOffset(2026, 5, 1, 6, 0, 0, TimeSpan.Zero);
+        var second = first.AddDays(1);
+        return
+        [
+            Leg(first),
+            Leg(first.AddHours(2).AddMinutes(50)),
+            Leg(second),
+            Leg(second.AddHours(2).AddMinutes(50), isFinal: true),
+        ];
+    }
+
+    static Phase Leg(DateTimeOffset start, bool isFinal = false)
+    {
+        return new Phase(
+            "GATE",
+            20,
+            40,
+            isFinal ? null : 40,
+            CompetitionRuleset.FEI,
+            isFinal,
+            null,
+            Timestamp.Create(start),
+            Timestamp.Create(start.AddHours(2)),
+            isFinal ? null : Timestamp.Create(start.AddHours(2).AddMinutes(10)),
+            null,
+            false,
+            false,
+            false
+        );
+    }
+
+    static EventInformation EventOf(string? feiShowId = "FEI-SHOW-1", string name = "Integration FEI Show")
     {
         var start = new DateTimeOffset(2026, 5, 1, 0, 0, 0, TimeSpan.Zero);
         return new EventInformation(
             new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG"),
-            "Integration FEI Show",
+            name,
             "Sofia",
             new EventSpan(start, start.AddDays(1)),
             feiShowId,
@@ -275,7 +493,8 @@ public sealed class FeiExportTests
         string? schedule,
         string? rule = "E Comp",
         string? horseFeiId = "200001",
-        Eliminated? eliminated = null
+        Eliminated? eliminated = null,
+        Phase[]? phases = null
     )
     {
         var country = new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
@@ -310,7 +529,7 @@ public sealed class FeiExportTests
             ParticipationCategory.Senior,
             new Competition(name, CompetitionRuleset.FEI),
             combination,
-            new PhaseCollection([phase]),
+            new PhaseCollection(phases ?? [phase]),
             eliminated,
             eventId: EVENT,
             id: TestId.Of(400 + number)

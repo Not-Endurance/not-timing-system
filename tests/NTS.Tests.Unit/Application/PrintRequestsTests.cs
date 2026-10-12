@@ -43,6 +43,7 @@ public sealed class PrintRequestsTests
         Assert.Equal(0.7m, request.Page.Scale);
         Assert.Equal("10mm 10mm 12mm 10mm", request.Page.Margin);
         Assert.Equal(Ranklist_string, request.Title);
+        Assert.Equal($"{document.Header.Title}.pdf", request.FileName);
         Assert.Equal("appicon.svg", request.BackdropImage);
         Assert.StartsWith(Generated_by_NoTiming_System_v_string, request.FooterText);
         Assert.EndsWith(ApplicationConstants.VERSION, request.FooterText);
@@ -60,15 +61,20 @@ public sealed class PrintRequestsTests
 
         var request = await new PrintRequests(renderer).Handouts(
             [DocumentOf("One"), DocumentOf("Two"), DocumentOf("Three")],
-            new NPrintPanelContext(1m, NPrintPaperFormat.A5, NPrintOrientation.Landscape),
+            new NPrintPanelContext(0.8m, NPrintPaperFormat.A5, NPrintOrientation.Landscape),
             null,
             null
         );
 
         Assert.Equal(NPrintPaperFormat.A5, request.Page.PaperFormat);
         Assert.Equal(NPrintOrientation.Landscape, request.Page.Orientation);
+        Assert.Equal(0.8m, request.Page.Scale);
         Assert.Equal("6mm 6mm 10mm 6mm", request.Page.Margin);
         Assert.Equal(Handouts_string, request.Title);
+        Assert.Equal("handouts.pdf", request.FileName);
+        Assert.Equal("appicon.svg", request.BackdropImage);
+        Assert.StartsWith(Generated_by_NoTiming_System_v_string, request.FooterText);
+        Assert.EndsWith(ApplicationConstants.VERSION, request.FooterText);
         Assert.Equal(
             ["<document of One>", "<document of Two>", "<document of Three>"],
             request.Html.Split(Environment.NewLine)
@@ -95,8 +101,10 @@ public sealed class PrintRequestsTests
         Assert.Equal(0.7m, request.Page.Scale);
         Assert.Equal("10mm 10mm 12mm 10mm", request.Page.Margin);
         Assert.Equal(Startlist_string, request.Title);
+        Assert.Equal("startlist.pdf", request.FileName);
         Assert.Equal("appicon.svg", request.BackdropImage);
         Assert.StartsWith(Generated_by_NoTiming_System_v_string, request.FooterText, StringComparison.Ordinal);
+        Assert.EndsWith(ApplicationConstants.VERSION, request.FooterText);
         Assert.Equal("<startlist of Event>", request.Html);
         var rendered = Assert.Single(renderer.Rendered);
         Assert.Same(document, rendered[nameof(StartlistDocumentComponent.Document)]);

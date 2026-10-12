@@ -99,6 +99,66 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task The_right_logo_of_an_Event_is_its_own_to_change_and_the_left_one_stays_the_Tenants()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        await using var rootUi = ConsoleUi.Open(api, root);
+        await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Left, "image/png", PNG);
+        await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Right, "image/jpeg", JPEG);
+        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var branding = ui.Get<IConsoleBranding>();
+
+        await branding.SetOfEvent(eventId, LogoPosition.Right, "image/png", OTHER_PNG);
+        var own = await branding.OfEvent(eventId);
+        await branding.ClearOfEvent(eventId, LogoPosition.Right);
+        var given = await branding.OfEvent(eventId);
+
+        Assert.Equal((LogoSource.Tenant, LogoSource.Event), (own.Left!.Source!.Value, own.Right!.Source!.Value));
+        Assert.Equal(OTHER_PNG, own.Right.Content);
+        Assert.Equal(PNG, own.Left.Content);
+        Assert.Equal((LogoSource.Tenant, LogoSource.Tenant), (given.Left!.Source!.Value, given.Right!.Source!.Value));
+        Assert.Equal(JPEG, given.Right.Content); // taking its own away gives back the Tenant's
+    }
+
+    [Fact]
+    public async Task A_file_of_the_largest_size_is_taken_and_so_is_every_kind_the_Api_takes()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        await using var ui = ConsoleUi.Open(api, root);
+        var branding = ui.Get<IConsoleBranding>();
+        var largest = new byte[LogoLimits.MAX_BYTES];
+        PNG.CopyTo(largest, 0);
+        var kinds = new Dictionary<string, byte[]>
+        {
+            ["image/png"] = PNG,
+            ["image/jpeg"] = JPEG,
+            ["image/gif"] = [0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 1, 2],
+            ["image/webp"] = [0x52, 0x49, 0x46, 0x46, 0x10, 0, 0, 0, 0x57, 0x45, 0x42, 0x50, 1, 2],
+        };
+
+        await branding.SetOfTenant(LogoPosition.Left, "image/png", largest); // exactly what a logo may weigh
+        var taken = (await branding.OfTenant()).Left!.Size;
+        var made = new Dictionary<string, string>();
+        foreach (var (kind, image) in kinds)
+        {
+            await branding.SetOfTenant(LogoPosition.Right, kind, image);
+            made[kind] = (await branding.OfTenant()).Right!.ContentType;
+        }
+
+        Assert.Equal(LogoLimits.MAX_BYTES, taken);
+        Assert.Equal(kinds.Keys, made.Values);
+        Assert.Equal(kinds.Keys.Order(), LogoLimits.CONTENT_TYPES.Order()); // the Console tells the person what the Api takes, no more and no less
+    }
+
+    [Fact]
     public async Task What_the_Api_does_not_take_from_a_person_is_said_in_its_words_and_nothing_is_kept()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
@@ -158,20 +218,28 @@ public sealed class ConsoleBrandingTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
-        var json = JsonApiClients.Of(api, person, out _);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, mainOperator.Id, NOW);
+        await using var rootUi = ConsoleUi.Open(api, root);
+        await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Left, "image/png", PNG);
+        await rootUi.Get<IConsoleBranding>().SetOfTenant(LogoPosition.Right, "image/jpeg", JPEG);
+        var json = JsonApiClients.Of(api, mainOperator, out _);
         var notifier = new Notifier();
         var warned = new List<string>();
         notifier.Warned.Subscribe(warned.Add);
         var branding = new ConsoleBranding(json, new ConsoleTenant(new AccountSession(json), json), notifier);
-        var view = new StubViewedEvent(
-            new NoParticipations(),
-            IntegrationPayloadFactory.EventInformation(Guid.NewGuid())
+        await branding.Show(
+            new StubViewedEvent(new NoParticipations(), IntegrationPayloadFactory.EventInformation(eventId))
         );
+        var before = (branding.LeftLogo, branding.RightLogo);
 
-        await branding.Show(view);
+        await branding.Show(
+            new StubViewedEvent(new NoParticipations(), IntegrationPayloadFactory.EventInformation(Guid.NewGuid()))
+        ); // an Event that is not there
 
-        Assert.Null(branding.LeftLogo);
+        Assert.Equal((DataUrl("image/png", PNG), DataUrl("image/jpeg", JPEG)), before);
+        Assert.Null(branding.LeftLogo); // not the logos of the Event that was shown before
         Assert.Null(branding.RightLogo);
         Assert.Single(warned);
     }

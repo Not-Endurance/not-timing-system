@@ -58,6 +58,32 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task The_other_Tenants_are_asked_for_a_name_of_three_characters_or_more_and_once_for_each_registry_whatever_its_case()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        var scene = await SceneAsync(api);
+        var rows = scene.Ui.Get<IConsoleSameRows>();
+        int Searches() => scene.Ui.Requests.Asked.Count(x => x.Contains("/all-tenants", StringComparison.Ordinal));
+
+        await rows.OfAthlete(new AthleteFormModel { Name = "Ма" });
+        var short2 = Searches();
+        await rows.OfAthlete(new AthleteFormModel { Name = "Мар" });
+        var first = Searches();
+        await rows.OfAthlete(new AthleteFormModel { Name = "  МАР " });
+        await rows.OfAthlete(new AthleteFormModel { Name = "мар", NameEnglish = "мар" });
+        var again = Searches();
+        await rows.OfHorse(new HorseFormModel { Name = "Мар" });
+        var horses = Searches();
+
+        Assert.Equal(0, short2); // two characters are not a name to ask the other Tenants for
+        Assert.Equal(1, first);
+        Assert.Equal(1, again); // a name is asked once, in whatever case and with whatever spaces around it
+        Assert.Equal(2, horses); // and the Horses are another registry
+        Assert.Contains(scene.Ui.Requests.Asked, x => x.Contains("/athletes/all-tenants", StringComparison.Ordinal));
+        Assert.Contains(scene.Ui.Requests.Asked, x => x.Contains("/horses/all-tenants", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task A_row_that_is_renamed_is_not_the_same_as_itself()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
@@ -86,10 +112,14 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
         var byName = await rows.OfHorse(new HorseFormModel { Name = $"далечен {scene.Token}" });
         var byFeiId = await rows.OfHorse(new HorseFormModel { Name = "Друг кон", FeiId = "xyz-9" });
         var notANumber = await rows.OfHorse(new HorseFormModel { Name = "Друг кон", FeiId = "9" });
+        var numeric = await rows.OfHorse(new HorseFormModel { Name = "Друг кон", FeiId = "0012" });
+        var notThatNumber = await rows.OfHorse(new HorseFormModel { Name = "Друг кон", FeiId = "12" });
 
         Assert.Equal([(scene.Horse, SameRowReason.Name, false)], byName.Select(x => (x.Id, x.Reason, x.IsOwn)));
         Assert.Equal([(scene.OwnHorse, SameRowReason.FeiId, true)], byFeiId.Select(x => (x.Id, x.Reason, x.IsOwn)));
         Assert.Empty(notANumber);
+        Assert.Equal([(scene.NumericHorse, SameRowReason.FeiId, true)], numeric.Select(x => (x.Id, x.Reason, x.IsOwn)));
+        Assert.Empty(notThatNumber); // the digits of a Horse's ID are text: 0012 is not 12
     }
 
     async Task<Scene> SceneAsync(ApiFactory api)
@@ -124,13 +154,21 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
             "ABC1"
         );
         var ownHorse = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, $"Свой {token}", null, "XYZ-9");
-        return new Scene(ConsoleUi.Open(api, person), token, own, theirs, horse, ownHorse);
+        var numericHorse = await RegistrySeed.HorseAsync(
+            _mongo.ConnectionString,
+            tenant,
+            $"Цифров {token}",
+            null,
+            "0012"
+        );
+        return new Scene(ConsoleUi.Open(api, person), token, own, theirs, horse, ownHorse, numericHorse);
     }
 
     sealed class Scene : IAsyncDisposable
     {
-        public Scene(ConsoleUi ui, string token, Guid own, Guid theirs, Guid horse, Guid ownHorse)
+        public Scene(ConsoleUi ui, string token, Guid own, Guid theirs, Guid horse, Guid ownHorse, Guid numericHorse)
         {
+            NumericHorse = numericHorse;
             OwnHorse = ownHorse;
             Ui = ui;
             Token = token;
@@ -145,6 +183,7 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
         public Guid Theirs { get; }
         public Guid Horse { get; }
         public Guid OwnHorse { get; }
+        public Guid NumericHorse { get; }
 
         public ValueTask DisposeAsync()
         {

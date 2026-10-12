@@ -33,7 +33,7 @@ public sealed class ConsoleTenantTests : IClassFixture<MongoFixture>
 
         await console.Tenant.Load();
         var before = (console.Tenant.OnlyAverageLoopSpeed, console.Tenant.RankerCode);
-        await console.Tenant.SaveRules(true, "BG-2026");
+        await console.Tenant.SaveRules(true, "  BG-2026 ");
 
         Assert.Equal(tenant, console.Tenant.TenantId);
         Assert.NotEmpty(console.Tenant.Name);
@@ -97,6 +97,32 @@ public sealed class ConsoleTenantTests : IClassFixture<MongoFixture>
         Assert.False(console.Tenant.CanEditBranding);
         Assert.NotEmpty(refused.Message);
         Assert.Equal((false, null), await StoredRulesAsync(tenant));
+    }
+
+    [Fact]
+    public async Task What_the_Api_cannot_say_of_the_Tenant_is_not_what_was_known_of_it_before()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var json = JsonApiClients.Of(api, root, out var requests);
+        var account = new AccountSession(json);
+        using var console = new Opened(account, new ConsoleTenant(account, json));
+        await console.Tenant.Load();
+        var before = (console.Tenant.TenantId, console.Tenant.CanEditRules, console.Tenant.CanEditBranding);
+        requests.Answer = request =>
+            request.RequestUri!.AbsolutePath.StartsWith("/api/tenants/", StringComparison.Ordinal)
+                ? new HttpResponseMessage(System.Net.HttpStatusCode.ServiceUnavailable)
+                : null;
+
+        await account.Refresh(); // the account is asked again, and the Tenant with it
+
+        Assert.Equal((tenant, true, true), before);
+        await UiBrowser.Eventually(async () => console.Tenant.TenantId == null);
+        Assert.False(console.Tenant.CanEditRules);
+        Assert.False(console.Tenant.CanEditBranding);
+        Assert.Empty(console.Tenant.Name);
     }
 
     [Fact]

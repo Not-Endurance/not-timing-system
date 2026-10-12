@@ -40,11 +40,10 @@ public sealed class FeiExport
 
     static string FileNameOf(EventInformation eventInformation)
     {
-        var source = string.IsNullOrWhiteSpace(eventInformation.Name)
-            ? eventInformation.Id.ToString()
-            : eventInformation.Name;
-        var sanitized = new string(source.Select(x => char.IsLetterOrDigit(x) ? x : '-').ToArray()).Trim('-');
-        return $"fei-export-{sanitized}.xml";
+        var sanitized = new string(eventInformation.Name.Select(x => char.IsLetterOrDigit(x) ? x : '-').ToArray()).Trim(
+            '-'
+        );
+        return $"fei-export-{(sanitized.Length == 0 ? eventInformation.Id.ToString() : sanitized)}.xml";
     }
 
     string CreateXmlContent(
@@ -67,11 +66,6 @@ public sealed class FeiExport
         if (string.IsNullOrWhiteSpace(eventInformation.FeiShowId))
         {
             throw new DomainException("Missing Show FEI ID");
-        }
-
-        if (string.IsNullOrWhiteSpace(eventInformation.Location))
-        {
-            throw new DomainException("Missing event information location");
         }
 
         var configuredResults = GetConfiguredResults(results, rankings).ToList();
@@ -140,11 +134,6 @@ public sealed class FeiExport
                 throw new DomainException(
                     $"Ranking '{ranking.Name}' is missing FEI export configuration: {string.Join(", ", missing)}"
                 );
-            }
-
-            if (string.IsNullOrWhiteSpace(result.Name))
-            {
-                throw new DomainException("Missing ranking Name");
             }
 
             yield return new ConfiguredResults(result, ranking);
@@ -307,7 +296,7 @@ public sealed class FeiExport
         var day = new ctEnduranceDayResult() { Number = 1 };
         var ctPhases = new List<ctEndurancePhaseResult>();
         var phases = participation.Phases.Where(x => x.StartTime != null);
-        var lastDay = phases.First().StartTime!.ToDateTimeOffset().Day;
+        var lastDay = phases.First().StartTime!.ToDateTimeOffset().Date;
         foreach (var phase in phases)
         {
             var averagePhaseSpeed = phase.GetAveragePhaseSpeed()?.ToDouble() ?? 0;
@@ -323,12 +312,14 @@ public sealed class FeiExport
                     RecoveryTime = FormattingHelper.Format(recoveryInterval),
                 },
             };
-            if (lastDay == phase.StartTime!.ToDateTimeOffset().Day)
+            var startDay = phase.StartTime!.ToDateTimeOffset().Date;
+            if (lastDay == startDay)
             {
                 ctPhases.Add(ctPhase);
             }
             else
             {
+                lastDay = startDay; // the Phases that follow on that day are in its Day
                 day.Phase = ctPhases.ToArray();
                 days.Add(day);
                 var number = day.Number + 1;

@@ -26,7 +26,8 @@ public sealed class ConsoleNavigationBrowserTests : IClassFixture<ApiHostFixture
         var mongo = _host.MongoConnectionString;
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
         var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
-        var eventId = await EventSeed.LiveAsync(mongo, tenant, mainOperator.Id, DateTimeOffset.UtcNow);
+        var eventId = await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "The Cup");
+        await EventSeed.StartAsync(mongo, eventId, tenant, mainOperator.Id, DateTimeOffset.UtcNow.AddDays(1));
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
@@ -48,7 +49,7 @@ public sealed class ConsoleNavigationBrowserTests : IClassFixture<ApiHostFixture
             .ToBeDisabledAsync(Settled());
         await Expect(navigation.GetByRole(AriaRole.Button)).ToHaveCountAsync(8, Counted());
         await Expect(page.GetByTestId("console-connection"))
-            .ToContainTextAsync("Connected to", new() { Timeout = PATIENCE }); // the connection to the Event is up, and the person is told
+            .ToHaveTextAsync("Connected to The Cup", new() { Timeout = PATIENCE }); // the connection to the Event is up, and the person is told which
         await navigation.GetByRole(AriaRole.Button, new() { Name = "Handouts", Exact = true }).ClickAsync();
         await page.WaitForURLAsync(device.Url($"/console/events/{eventId}/handouts"), new() { Timeout = PATIENCE });
         await Expect(page.GetByText("Create Handouts manually to print...").First).ToBeVisibleAsync(Loaded());

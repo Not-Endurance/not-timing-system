@@ -5,6 +5,7 @@ using Not.Injection;
 using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
+using static NoTiming.Ui.Features.Console.ApiAnswers;
 
 namespace NoTiming.Ui.Features.Console.Setup;
 
@@ -74,19 +75,5 @@ public class ConsoleGrants : IConsoleGrants, ITransient
             DisplayName = Text(attributes, "displayName"),
             Email = Text(attributes, "email") ?? string.Empty,
         };
-    }
-
-    static JsonApiResponse Accepted(JsonApiResponse response)
-    {
-        return response.IsSuccess
-            ? response
-            : throw new DomainException(response.Error?.Message ?? response.Status.ToString());
-    }
-
-    static string? Text(JsonElement attributes, string member)
-    {
-        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.String
-            ? value.GetString()
-            : null;
     }
 }

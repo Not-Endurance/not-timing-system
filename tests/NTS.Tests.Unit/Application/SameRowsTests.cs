@@ -47,20 +47,39 @@ public sealed class SameRowsTests
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    [InlineData("0")]
-    [InlineData("000")]
-    [InlineData("-----")]
-    public void No_FEI_ID_is_not_a_FEI_ID_that_two_rows_can_share(string? feiId)
+    [InlineData(null, true)]
+    [InlineData("", true)]
+    [InlineData("   ", true)]
+    [InlineData("0", true)]
+    [InlineData("000", true)]
+    [InlineData("-----", true)]
+    [InlineData(null, false)]
+    [InlineData("", false)]
+    [InlineData("   ", false)]
+    [InlineData("-----", false)]
+    public void No_FEI_ID_is_not_a_FEI_ID_that_two_rows_can_share(string? feiId, bool isAthlete)
     {
         var rows = new[] { Row(2, "Other Name", null, feiId) };
 
-        var found = SameRows.Among(rows, null, "New Name", null, feiId, true);
+        var found = SameRows.Among(rows, null, "New Name", null, feiId, isAthlete);
 
         Assert.Empty(found);
-        Assert.Null(SameRows.FeiIdOf(feiId, true));
+        Assert.Null(SameRows.FeiIdOf(feiId, isAthlete));
+    }
+
+    [Fact]
+    public void A_FEI_ID_made_of_one_letter_or_one_digit_is_an_ID_and_a_Horses_digits_are_text_and_spaces_around_it_are_not_part_of_it()
+    {
+        Assert.Equal("1111", SameRows.FeiIdOf("1111", true));
+        Assert.Equal("1111", SameRows.FeiIdOf("1111", false));
+        Assert.Equal("AAAA", SameRows.FeiIdOf(" aaaa ", false));
+        Assert.Equal("12", SameRows.FeiIdOf(" 0012 ", true));
+        Assert.Equal("0012", SameRows.FeiIdOf(" 0012 ", false)); // the digits of a Horse's ID are the text it is: 0012 is not 12
+        var horses = new[] { Row(2, "Other Name", null, "0012"), Row(3, "Another", null, "aaaa") };
+
+        Assert.Empty(SameRows.Among(horses, null, "New Name", null, "12", false));
+        Assert.Equal([TestId.Of(2)], SameRows.Among(horses, null, "New Name", null, " 0012", false).Select(x => x.Id));
+        Assert.Equal([TestId.Of(3)], SameRows.Among(horses, null, "New Name", null, "AAAA ", false).Select(x => x.Id));
     }
 
     [Fact]

@@ -10,6 +10,7 @@ using NTS.Contracts.Features.Console;
 using NTS.Domain.Access;
 using NTS.Domain.Setup.Aggregates;
 using NTS.Domain.Setup.Services.StartValidation;
+using static NoTiming.Ui.Features.Console.ApiAnswers;
 
 namespace NoTiming.Ui.Features.Console;
 
@@ -62,10 +63,10 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
 
         var setups = (await _setups.ReadMany()).ToList();
         var rows = await Task.WhenAll(setups.Select(RowOf));
-        var canCreate = await MayCreateIn(person.CurrentTenantId);
+        var tenant = await TenantMay(person.CurrentTenantId);
         _list = [.. rows.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase)];
-        CanCreate = canCreate;
-        CanEditRegistry = canCreate || rows.Any(x => x.IsMainOperator && x.Stage != EventStage.Historic);
+        CanCreate = tenant.CanCreateEvents;
+        CanEditRegistry = tenant.CanEditRegistry;
         return true;
     }
 
@@ -173,24 +174,22 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
         };
     }
 
-    async Task<bool> MayCreateIn(string? tenantId)
+    /// <summary>What the Api says the person may do in the Tenant they act in: make Events there, and write to its registries.</summary>
+    async Task<(bool CanCreateEvents, bool CanEditRegistry)> TenantMay(string? tenantId)
     {
         if (string.IsNullOrWhiteSpace(tenantId))
         {
-            return false;
+            return (false, false);
         }
 
         var response = await _api.Send(HttpMethod.Get, $"tenants/{Uri.EscapeDataString(tenantId)}/capabilities");
-        return response is { IsSuccess: true, Document: { } document }
-            && Flag(document.GetProperty("data").GetProperty("attributes"), "canCreateEvents");
-    }
+        if (response is not { IsSuccess: true, Document: { } document })
+        {
+            return (false, false);
+        }
 
-    /// <summary>The answer when the Api took the request; the Api's own words, as a domain error, when it did not.</summary>
-    static JsonApiResponse Accepted(JsonApiResponse response)
-    {
-        return response.IsSuccess
-            ? response
-            : throw new DomainException(response.Error?.Message ?? response.Status.ToString());
+        var may = document.GetProperty("data").GetProperty("attributes");
+        return (Flag(may, "canCreateEvents"), Flag(may, "canEditRegistry"));
     }
 
     static JsonElement Document(string type, string? id, object attributes)
@@ -207,17 +206,5 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
             },
             JsonApiClient.Options
         );
-    }
-
-    static bool Flag(JsonElement attributes, string member)
-    {
-        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.True;
-    }
-
-    static string? Text(JsonElement attributes, string member)
-    {
-        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.String
-            ? value.GetString()
-            : null;
     }
 }

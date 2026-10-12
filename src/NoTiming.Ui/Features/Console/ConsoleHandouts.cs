@@ -74,11 +74,7 @@ public class ConsoleHandouts : NStatefulService, IConsoleHandouts, IScoped
 
     public IDisposable Watch(IViewedEvent view)
     {
-        if (_watching.Count == 0 || _watching[^1].Event.Id != view.Event.Id)
-        {
-            _completed = _store.Participations.ToDictionary(x => x.Id, CompletedPhasesOf); // what is complete now was handed out before
-        }
-
+        _completed = _store.Participations.ToDictionary(x => x.Id, CompletedPhasesOf); // what is complete now was handed out before
         _watching.Add(view);
         return new Watching(this, view);
     }

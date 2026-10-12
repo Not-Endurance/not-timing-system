@@ -42,19 +42,25 @@ internal sealed class ConsoleUi : IAsyncDisposable
         services.AddNoTimingUi(configuration, ORIGIN, typeof(NoTimingUiServices).Assembly);
 
         // The page's own origin is the Api in this process, and the cookie is what a browser sends to it.
+        var requests = new JsonApiClients.Requests();
         services
             .AddHttpClient(nameof(JsonApiClient))
             .ConfigurePrimaryHttpMessageHandler(() => api.Server.CreateHandler())
-            .AddHttpMessageHandler(() => cookie);
-        return new ConsoleUi(services.BuildServiceProvider());
+            .AddHttpMessageHandler(() => cookie)
+            .AddHttpMessageHandler(() => requests);
+        return new ConsoleUi(services.BuildServiceProvider(), requests);
     }
 
     readonly ServiceProvider _provider;
 
-    ConsoleUi(ServiceProvider provider)
+    ConsoleUi(ServiceProvider provider, JsonApiClients.Requests requests)
     {
         _provider = provider;
+        Requests = requests;
     }
+
+    /// <summary>What the services of the Ui asked of the Api, in order, and a way to answer in its place.</summary>
+    public JsonApiClients.Requests Requests { get; }
 
     public T Get<T>()
         where T : notnull

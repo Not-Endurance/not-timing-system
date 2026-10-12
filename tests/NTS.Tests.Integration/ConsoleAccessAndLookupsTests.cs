@@ -3,6 +3,7 @@ using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
 using NTS.Tests.Integration.Infrastructure;
+using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 
 namespace NTS.Tests.Integration;
@@ -87,6 +88,77 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task An_Official_is_asked_for_a_role_before_the_Api_is_and_a_grant_is_removed_only_by_the_one_who_may()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Open");
+        await using var mine = ConsoleUi.Open(api, mainOperator);
+        await using var theirs = ConsoleUi.Open(api, root);
+        var grant = await mine.Get<IConsoleGrants>().Link(id, GrantKind.Operator, null, "someone@example.test");
+        var asked = mine.Requests.Asked.Count;
+
+        var noRole = await Assert.ThrowsAsync<DomainException>(
+            () => mine.Get<IConsoleGrants>().Link(id, GrantKind.Official, null, "other@example.test")
+        );
+        var notTheirs = await Assert.ThrowsAsync<DomainException>(() => theirs.Get<IConsoleGrants>().Remove(grant.Id));
+
+        Assert.Equal(Select_a_role_string, noRole.Message);
+        Assert.Equal(asked, mine.Requests.Asked.Count); // the Api was not asked
+        Assert.NotEmpty(notTheirs.Message);
+        Assert.Equal([grant.Id], (await mine.Get<IConsoleGrants>().List(id)).Select(x => x.Id)); // and it is still there
+    }
+
+    [Fact]
+    public async Task The_other_Tenants_are_asked_for_three_characters_a_quote_is_part_of_the_name_and_the_Tenants_own_rows_are_all_there_is_when_the_others_cannot_say()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
+        var own = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            tenant,
+            "Мария Тенант",
+            bulgaria,
+            "Maria Tenant"
+        );
+        var theirs = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            other,
+            "Конан О'Брайън",
+            bulgaria,
+            "Conan O'Brien"
+        );
+        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var lookups = ui.Get<IConsoleLookups>();
+        int Searches() => ui.Requests.Asked.Count(x => x.Contains("/all-tenants", StringComparison.Ordinal));
+
+        await lookups.SearchAthletes("Co");
+        var twoCharacters = Searches();
+        await lookups.SearchAthletes("Con");
+        var threeCharacters = Searches();
+        var quoted = await lookups.SearchAthletes("O'Bri");
+        ui.Requests.Answer = request =>
+            request.RequestUri!.AbsolutePath.EndsWith("/all-tenants", StringComparison.Ordinal)
+                ? new HttpResponseMessage((System.Net.HttpStatusCode)429)
+                : null;
+        var refused = await lookups.SearchAthletes("Maria");
+
+        Assert.Equal(0, twoCharacters);
+        Assert.Equal(1, threeCharacters);
+        var found = Assert.Single(quoted);
+        Assert.Equal(theirs, found.Id);
+        Assert.Null(found.Club); // a row of another Tenant that has no Club has none
+        Assert.Equal([own], refused.Select(x => x.Id)); // the Tenant's own rows are there when the others cannot be asked
+    }
+
+    [Fact]
     public async Task The_Tenants_own_rows_are_found_by_name_and_another_Tenants_rows_by_a_term_of_three_characters_or_more()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
@@ -133,13 +205,19 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
+        await TenantAsync(_mongo.ConnectionString, "Another Land", withCountry: true);
+        await TenantAsync(_mongo.ConnectionString, "A Third Land", withCountry: true);
+        await TenantAsync(_mongo.ConnectionString, "Yet Another Land", withCountry: true);
         var tenant = await TenantAsync(_mongo.ConnectionString, "Land of Test", withCountry: true);
         var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var nobody = await SignedInAsync(api, client, _mongo.ConnectionString, null);
         await using var ui = ConsoleUi.Open(api, mainOperator);
+        await using var none = ConsoleUi.Open(api, nobody);
         var lookups = ui.Get<IConsoleLookups>();
 
         var country = await lookups.TenantCountry();
 
+        Assert.Null(await none.Get<IConsoleLookups>().TenantCountry()); // a person who acts in no Tenant has no country to start with
         Assert.NotNull(country);
         Assert.Equal("Land of Test", country.Name);
         Assert.Contains(country.Id, (await lookups.SearchCountries("land of")).Select(x => x.Id));

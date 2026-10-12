@@ -34,6 +34,9 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
         var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
         var left = Png(100, 1);
         var right = Jpeg(200, 2);
+        var nothing = await Edit(root, $"/api/tenants/{tenant}/branding", new { });
+        Assert.Equal(HttpStatusCode.OK, nothing.StatusCode);
+        Assert.Null(await FindAsync($"tenant:{tenant}")); // a document that names no logo makes none
 
         var first = await Edit(root, $"/api/tenants/{tenant}/branding", new { left = Document("image/png", left) });
         var second = await Edit(root, $"/api/tenants/{tenant}/branding", new { right = Document("image/jpeg", right) });
@@ -117,6 +120,50 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
             ), // an image that is of another kind
             (new { left = good, right = Document("image/svg+xml", Text()) }, HttpStatusCode.BadRequest, "invalid-logo"), // a kind that is not printed
             (
+                new { left = good, right = Document("image/png", NearMiss(0x89, 0x50, 0x4E, 0x47)) },
+                HttpStatusCode.BadRequest,
+                "invalid-logo"
+            ), // the first bytes of a PNG and no more of its start
+            (
+                new { left = good, right = Document("image/jpeg", NearMiss(0xFF, 0xD8, 0x00)) },
+                HttpStatusCode.BadRequest,
+                "invalid-logo"
+            ),
+            (
+                new { left = good, right = Document("image/gif", NearMiss(0x47, 0x49, 0x46, 0x00)) },
+                HttpStatusCode.BadRequest,
+                "invalid-logo"
+            ),
+            (
+                new
+                {
+                    left = good,
+                    right = Document(
+                        "image/webp",
+                        NearMiss(0x52, 0x49, 0x46, 0x46, 0x10, 0, 0, 0, 0x57, 0x41, 0x56, 0x45)
+                    ),
+                },
+                HttpStatusCode.BadRequest,
+                "invalid-logo"
+            ), // a WAVE file is RIFF too
+            (
+                new
+                {
+                    left = good,
+                    right = Document(
+                        "image/webp",
+                        NearMiss(0x52, 0x49, 0x46, 0x46, 0x10, 0, 0, 0, 0x57, 0x45, 0x42, 0x58)
+                    ),
+                },
+                HttpStatusCode.BadRequest,
+                "invalid-logo"
+            ), // and one that says WEBX
+            (
+                new { left = good, right = Document("image/webp", [0x52, 0x49, 0x46, 0x46]) },
+                HttpStatusCode.BadRequest,
+                "invalid-logo"
+            ), // RIFF and nothing after it
+            (
                 new { left = good, right = new { contentType = "image/png", content = "not base64!" } },
                 HttpStatusCode.BadRequest,
                 "invalid-logo"
@@ -134,7 +181,7 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
                     right = new
                     {
                         contentType = "image/png",
-                        content = "AA==",
+                        content = Convert.ToBase64String(Png(10, 1)), // an image that is good, with a member that is not a logo's
                         other = 1,
                     },
                 },
@@ -142,12 +189,33 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
                 "invalid-logo"
             ),
             (new { left = good, right = "a text" }, HttpStatusCode.BadRequest, "invalid-logo"),
+            (new { left = good, right = new { content = "AA==" } }, HttpStatusCode.BadRequest, "invalid-logo"), // no kind
+            (
+                new { left = good, right = new { contentType = 5, content = "AA==" } },
+                HttpStatusCode.BadRequest,
+                "invalid-logo"
+            ), // a kind that is not a text
+            (
+                new { left = good, right = new { contentType = "image/png", content = 5 } },
+                HttpStatusCode.BadRequest,
+                "invalid-logo"
+            ), // nor is a content
+            (
+                new { left = good, right = new { contentType = "image/png", content = new string('!', 800_000) } },
+                HttpStatusCode.UnprocessableEntity,
+                "logo-too-large"
+            ), // a text that is longer than an image of the limit can be is refused for its weight, before it is read
             (
                 new { left = good, right = Document("image/png", Png(LIMIT + 1, 1)) },
                 HttpStatusCode.UnprocessableEntity,
                 "logo-too-large"
             ),
             (new { left = good, middle = good }, HttpStatusCode.BadRequest, "unsupported-attribute"),
+            (
+                new Dictionary<string, object> { ["left"] = good, ["LEFT"] = good },
+                HttpStatusCode.BadRequest,
+                "malformed-request"
+            ), // a logo is named once, whatever its case
         };
 
         foreach (var (attributes, status, code) in cases)
@@ -165,6 +233,55 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
             new { left = Document("image/png", Png(LIMIT, 1)) }
         );
         Assert.Equal(HttpStatusCode.OK, atTheLimit.StatusCode);
+    }
+
+    [Fact]
+    public async Task A_document_for_another_resource_than_the_route_names_or_for_one_that_is_not_there_is_not_taken()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var unstarted = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, root.Id, "Not yet");
+        var logo = new { left = Document("image/png", Png(10, 1)) };
+
+        var anotherTenant = await root.Page.WriteAsync(
+            HttpMethod.Patch,
+            $"/api/tenants/{tenant}/branding",
+            "brandings",
+            logo,
+            id: "country-xx"
+        );
+        var anotherEvent = await root.Page.WriteAsync(
+            HttpMethod.Patch,
+            $"/api/events/{unstarted}/branding",
+            "brandings",
+            logo,
+            id: Guid.NewGuid().ToString()
+        );
+
+        Assert.Equal(HttpStatusCode.Conflict, anotherTenant.StatusCode);
+        Assert.Equal("id-mismatch", await Code(anotherTenant));
+        Assert.Equal(HttpStatusCode.Conflict, anotherEvent.StatusCode);
+        Assert.Equal("id-mismatch", await Code(anotherEvent));
+        Assert.Null(await FindAsync($"tenant:{tenant}"));
+        Assert.Null(await FindAsync($"event:{unstarted}"));
+        foreach (
+            var missing in new[]
+            {
+                "/api/tenants/country-zz/branding",
+                $"/api/events/{Guid.NewGuid()}/branding",
+                "/api/events/not-an-id/branding",
+            }
+        )
+        {
+            Assert.Equal(HttpStatusCode.NotFound, (await Edit(root, missing, logo)).StatusCode);
+        }
+
+        Assert.Equal(
+            HttpStatusCode.NotFound,
+            (await root.Page.GetAsync("/api/tenants/country-zz/branding")).StatusCode
+        );
     }
 
     [Fact]
@@ -206,6 +323,14 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
         );
         Assert.Equal(HttpStatusCode.OK, upperCase.StatusCode);
         Assert.Equal("image/png", (await StoredAsync($"tenant:{tenant}"))["Right"]["ContentType"].AsString);
+
+        var spaced = await Edit(
+            root,
+            $"/api/tenants/{tenant}/branding",
+            new { right = Document("  image/jpeg ", Jpeg(30, 1)) }
+        );
+        Assert.Equal(HttpStatusCode.OK, spaced.StatusCode);
+        Assert.Equal("image/jpeg", (await StoredAsync($"tenant:{tenant}"))["Right"]["ContentType"].AsString);
     }
 
     [Fact]
@@ -429,6 +554,12 @@ public sealed class BrandingRoutesTests : IClassFixture<MongoFixture>
     static byte[] Webp(int size)
     {
         return Filled(size, 7, [0x52, 0x49, 0x46, 0x46, 0x10, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50]);
+    }
+
+    /// <summary>A file of a few bytes that begins with those given: what a check of less than the whole start of an image would take.</summary>
+    static byte[] NearMiss(params int[] start)
+    {
+        return Filled(40, 1, [.. start.Select(x => (byte)x)]);
     }
 
     static byte[] Text()

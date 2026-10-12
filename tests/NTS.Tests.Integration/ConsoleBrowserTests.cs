@@ -92,6 +92,8 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
 
         await Expect(row.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true }))
             .ToHaveCountAsync(0, Counted()); // and having assigned it away, it does not
+        await Expect(row.GetByRole(AriaRole.Button, new() { Name = "Results", Exact = true }))
+            .ToHaveCountAsync(0, Counted()); // there are no Results of an Event that has not started
         await device.FetchAsync("DELETE", "/api/sessions/current");
         await page.GotoAsync(device.Url("/console"));
         await page.WaitForURLAsync(new Regex(@"/sign-in\?returnUrl="), new() { Timeout = PATIENCE });
@@ -101,6 +103,43 @@ public sealed class ConsoleBrowserTests : IClassFixture<ApiHostFixture>, IClassF
         await Expect(theirs.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true }))
             .ToBeVisibleAsync(Loaded());
         await Expect(theirs.GetByRole(AriaRole.Button, new() { Name = "start", Exact = true })).ToBeVisibleAsync();
+    }
+
+    [Fact]
+    public async Task A_Live_Event_is_reset_when_the_Main_Operator_types_the_code_and_confirms_and_not_when_it_does_not()
+    {
+        var mongo = _host.MongoConnectionString;
+        var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
+        var mainOperator = await TenancySeed.AccountAsync(mongo, tenant, name: "Boris Ivanov");
+        var id = await EventSeed.SetupAsync(mongo, tenant, mainOperator.Id, "The Cup");
+        await EventSeed.StartAsync(mongo, id, tenant, mainOperator.Id, DateTimeOffset.UtcNow.AddDays(1));
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, mainOperator.Email, "/console");
+        var row = page.GetByRole(AriaRole.Row).Filter(new() { HasText = "The Cup" });
+        var dashboard = row.GetByRole(AriaRole.Button, new() { Name = "Dashboard", Exact = true });
+        var dialog = page.GetByRole(AriaRole.Dialog);
+        var confirm = dialog.GetByRole(AriaRole.Button, new() { Name = "Confirm", Exact = true });
+        await Expect(dashboard).ToBeVisibleAsync(Loaded());
+
+        // not until the code is typed, and not when the person gives it up
+        await row.GetByRole(AriaRole.Button, new() { Name = "Reset", Exact = true }).ClickAsync();
+        await Expect(confirm).ToBeDisabledAsync(new() { Timeout = PATIENCE });
+        await dialog.GetByLabel("Confirmation code").FillAsync("1336");
+        await Expect(confirm).ToBeDisabledAsync();
+        await dialog.GetByRole(AriaRole.Button, new() { Name = "Cancel", Exact = true }).ClickAsync();
+        await Expect(dialog).ToHaveCountAsync(0, Counted());
+        await Expect(dashboard).ToBeVisibleAsync(); // the Event is as it was
+        await Eventually(async () => await RegistrySeed.StoredAsync(mongo, "event_informations", id) != null);
+
+        // and with the code, when the person confirms, it is reset: the Setup is what it has again
+        await row.GetByRole(AriaRole.Button, new() { Name = "Reset", Exact = true }).ClickAsync();
+        await dialog.GetByLabel("Confirmation code").FillAsync("1337");
+        await confirm.ClickAsync();
+        await Expect(row.GetByRole(AriaRole.Button, new() { Name = "Setup", Exact = true })).ToBeVisibleAsync(Loaded());
+        await Expect(dashboard).ToHaveCountAsync(0, Counted());
+        await Eventually(async () => await RegistrySeed.StoredAsync(mongo, "event_informations", id) == null);
     }
 
     [Fact]

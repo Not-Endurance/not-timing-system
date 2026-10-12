@@ -55,6 +55,44 @@ public sealed class StartlistDocumentTests
     }
 
     [Fact]
+    public void Starts_at_the_same_time_are_by_number_whether_one_of_them_is_over_and_the_other_is_to_come()
+    {
+        var start = DateTimeOffset.Now.AddHours(1);
+        var participations = new[]
+        {
+            // its Phase is complete, so its start is over: the sheet reads it before the ones that are to come
+            Participation(
+                5,
+                Phase(start, arrive: start.AddHours(1), present: start.AddHours(1.1)),
+                Phase(null, isFinal: true)
+            ),
+            Participation(3, Phase(start, isFinal: true)),
+        };
+
+        var document = StartlistDocument.Compose(participations, Event(), []);
+
+        Assert.Equal([3, 5], document.Stages.Single(x => x.Number == 1).Starters.Select(x => x.Number));
+    }
+
+    [Fact]
+    public void The_stages_are_in_order_when_the_first_start_to_be_read_is_of_a_later_stage()
+    {
+        var now = DateTimeOffset.Now;
+        var participations = new[]
+        {
+            // its first Phase has no time, so its second one, which is over, is what the sheet reads first
+            Participation(1, Phase(null), Phase(now.AddHours(-2), isFinal: true)),
+            Participation(2, Phase(now.AddHours(1), isFinal: true)),
+        };
+
+        var document = StartlistDocument.Compose(participations, Event(), []);
+
+        Assert.Equal([1, 2], document.Stages.Select(x => x.Number));
+        Assert.Equal([2], document.Stages[0].Starters.Select(x => x.Number));
+        Assert.Equal([1], document.Stages[1].Starters.Select(x => x.Number));
+    }
+
+    [Fact]
     public void The_sheet_is_headed_by_the_Event_and_follows_the_ruleset_of_its_first_Participation()
     {
         var official = new Official("Ivan Ivanov", null, OfficialRole.ChiefSteward, TestId.Of(10), TestId.Of(30));
