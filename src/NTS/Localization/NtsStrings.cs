@@ -396,6 +396,8 @@ namespace NTS.Localization
         public static string Timeline_shown_string => LocalizeString(nameof(Timeline_shown_string));
         public static string Timeline_saved_string => LocalizeString(nameof(Timeline_saved_string));
         public static string Timeline_empty_string => LocalizeString(nameof(Timeline_empty_string));
+        public static string Timeline_phase_edit_string => LocalizeString(nameof(Timeline_phase_edit_string));
+        public static string Timeline_cleared_string => LocalizeString(nameof(Timeline_cleared_string));
         public static string Not_signed_in_string => LocalizeString(nameof(Not_signed_in_string));
         public static string Now_string => LocalizeString(nameof(Now_string));
         public static string Rankings_list_empty_message_string =>

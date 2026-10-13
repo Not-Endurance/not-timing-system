@@ -5,7 +5,7 @@ namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 /// <see cref="Presented"/>, because it records a different intent. It carries the marker of the presentation it changes: it
 /// feeds the Present time, or the Represent time when it changes the representation of the Phase, and never makes one.
 /// </summary>
-public sealed class PresentUpdated : TimeEvent
+public sealed class PresentUpdated : SnapshotTimeEvent
 {
     public PresentUpdated(
         Timestamp time,

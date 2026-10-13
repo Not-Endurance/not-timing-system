@@ -56,7 +56,7 @@ public sealed class ConsoleTimelineTests : IClassFixture<MongoFixture>
         Assert.Equal(["Olga Official", "Olga Official", "Olga Official", "Marin Main"], first.Select(x => x.Actor));
         Assert.Equal(
             [ARRIVE, ARRIVE.AddMinutes(1), ARRIVE.AddMinutes(3), PRESENT],
-            first.Select(x => x.Time.ToDateTimeOffset())
+            first.Select(x => x.Times.Single().Time!.ToDateTimeOffset())
         );
         Assert.Equal(
             [

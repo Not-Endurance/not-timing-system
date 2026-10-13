@@ -1,7 +1,7 @@
 namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 /// <summary>A Combination arrived at the end of a Phase's loop. It feeds the Arrive time.</summary>
-public sealed class Arrived : TimeEvent
+public sealed class Arrived : SnapshotTimeEvent
 {
     public Arrived(
         Timestamp time,

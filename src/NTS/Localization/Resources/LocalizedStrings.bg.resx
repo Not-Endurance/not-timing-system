@@ -1341,4 +1341,10 @@
   <data name="Timeline_empty_string" xml:space="preserve">
     <value>Все още няма записано време за този участник.</value>
   </data>
+  <data name="Timeline_phase_edit_string" xml:space="preserve">
+    <value>Редакция на фазата</value>
+  </data>
+  <data name="Timeline_cleared_string" xml:space="preserve">
+    <value>няма</value>
+  </data>
 </root>

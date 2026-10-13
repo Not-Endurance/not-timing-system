@@ -79,7 +79,7 @@ public class Participation : Aggregate, IEventScoped
     /// <param name="snapshot">The time that was captured.</param>
     /// <param name="actorId">The signed-in user that recorded it.</param>
     /// <param name="recordedAt">The instant the server recorded it.</param>
-    public TimeEvent Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
+    public SnapshotTimeEvent Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
     {
         var phase = Phases.PhaseAt(snapshot.Timestamp);
         var outBefore = phase.GetOutTime();
@@ -127,7 +127,7 @@ public class Participation : Aggregate, IEventScoped
     public SnapshotUpdate UpdateSnapshot(Guid snapshotId, Timestamp time, Guid actorId, DateTimeOffset recordedAt)
     {
         var sent =
-            Phases.SelectMany(x => x.Events).FirstOrDefault(x => x.Id == snapshotId)
+            Phases.SelectMany(x => x.Events).OfType<SnapshotTimeEvent>().FirstOrDefault(x => x.Id == snapshotId)
             ?? throw GuardHelper.Exception($"Participation {Id} holds no Snapshot {snapshotId} to update.");
         var kind = sent is Presented or PresentUpdated ? SnapshotType.Present : SnapshotType.Arrive;
         var phase = Phases.PhaseAt(time);
@@ -147,15 +147,24 @@ public class Participation : Aggregate, IEventScoped
         return update;
     }
 
-    /// <summary>The Phase form: each time of the Phase that the state changes is recorded as an accepted time event.</summary>
-    public void Update(IPhaseState state, Guid actorId, DateTimeOffset recordedAt)
+    /// <summary>
+    /// The Phase form (#620): the times of the Phase that the state changes are recorded as one accepted time event, Start is
+    /// changed in place, and the change is evaluated like any accepted change (see <see cref="Phase"/>). It tells whether the
+    /// state changed anything, and when it did not nothing is recorded and nothing is evaluated.
+    /// </summary>
+    public bool Update(IPhaseState state, Guid actorId, DateTimeOffset recordedAt)
     {
         var phase = Phases.FirstOrDefault(x => x.Id == state.Id);
         GuardHelper.ThrowIfDefault(phase);
 
         var outBefore = phase.GetOutTime();
-        phase.Update(state, actorId, recordedAt);
+        if (!phase.Update(state, actorId, recordedAt))
+        {
+            return false;
+        }
+
         Reevaluate(phase, outBefore);
+        return true;
     }
 
     /// <summary>

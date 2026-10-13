@@ -1,14 +1,14 @@
 namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 /// <summary>
-/// A time that reached a Phase, kept whatever became of it (ADR-0005): the time, how it was acquired, who recorded it and
-/// when, and whether it was accepted or why it was not. A Phase only adds events, and shows as each of its times the latest
-/// accepted event that feeds it.
+/// A time that reached a Phase, kept whatever became of it (ADR-0005): the times it sets, how it was acquired, who recorded it
+/// and when, and whether it was accepted or why it was not. A Phase only adds events, and shows as each of its times the latest
+/// accepted event that lists it. An event sets one time (a Snapshot, an Update of one: <see cref="SnapshotTimeEvent"/>) or
+/// several, which is what the Phase form records (<see cref="PhaseUpdated"/>).
 /// </summary>
 public abstract class TimeEvent : Entity
 {
     protected TimeEvent(
-        Timestamp time,
         TimeEventOutcome outcome,
         SnapshotMethod method,
         DateTimeOffset? recordedAt,
@@ -18,7 +18,6 @@ public abstract class TimeEvent : Entity
     )
         : base(id)
     {
-        Time = time;
         Outcome = outcome;
         Method = method;
         RecordedAt = recordedAt;
@@ -26,10 +25,9 @@ public abstract class TimeEvent : Entity
         DisabledAt = disabledAt;
     }
 
-    /// <summary>The time of a Phase the event feeds: a Phase shows as that time the latest accepted event that does.</summary>
-    public abstract TimeSlot Slot { get; }
+    /// <summary>The times of a Phase the event lists, each with the time it gives, or none when the event clears it.</summary>
+    public abstract IReadOnlyList<SlotTime> Times { get; }
 
-    public Timestamp Time { get; }
     public TimeEventOutcome Outcome { get; private set; }
     public SnapshotMethod Method { get; }
 
@@ -67,5 +65,17 @@ public abstract class TimeEvent : Entity
     {
         Outcome = outcome;
         DisabledAt = disabledAt;
+    }
+
+    /// <summary>Whether the event lists the time of a Phase: a Phase shows as that time the latest accepted event that does.</summary>
+    public bool Feeds(TimeSlot slot)
+    {
+        return Times.Any(x => x.Slot == slot);
+    }
+
+    /// <summary>The time the event gives a time of a Phase, none when it does not list it or clears it.</summary>
+    public Timestamp? TimeOf(TimeSlot slot)
+    {
+        return Times.FirstOrDefault(x => x.Slot == slot)?.Time;
     }
 }

@@ -1291,4 +1291,10 @@
   <data name="Timeline_empty_string" xml:space="preserve">
     <value>Bu katılım için henüz zaman kaydedilmedi.</value>
   </data>
+  <data name="Timeline_phase_edit_string" xml:space="preserve">
+    <value>Aşama düzenlemesi</value>
+  </data>
+  <data name="Timeline_cleared_string" xml:space="preserve">
+    <value>yok</value>
+  </data>
 </root>

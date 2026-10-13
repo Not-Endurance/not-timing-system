@@ -40,7 +40,7 @@ public class ConsoleTimeline : IConsoleTimeline, IScoped
                     {
                         Id = timeEvent.Id,
                         Kind = TimelineWords.KindOf(timeEvent),
-                        Time = timeEvent.Time,
+                        Times = TimelineWords.TimesOf(timeEvent),
                         Outcome = timeEvent.Outcome,
                         OutcomeText = OutcomeWords.Of(timeEvent.Outcome.ToString()),
                         Source = TimelineWords.SourceOf(timeEvent.Method),

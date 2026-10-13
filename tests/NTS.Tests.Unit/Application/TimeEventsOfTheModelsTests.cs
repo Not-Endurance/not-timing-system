@@ -67,6 +67,15 @@ public sealed class TimeEventsOfTheModelsTests
                 null,
                 disabled
             ),
+            new PhaseUpdated(
+                [new SlotTime(TimeSlot.Arrive, TIME), new SlotTime(TimeSlot.Present, null)],
+                TimeEventOutcome.RejectedManually,
+                SnapshotMethod.Manual,
+                RECORDED,
+                ACTOR,
+                null,
+                disabled
+            ),
         ];
 
         var read = events.Select(x => TimeEventModel.MapFrom(x).MapToEntity()).ToArray();

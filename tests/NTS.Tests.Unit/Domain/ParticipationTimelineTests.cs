@@ -599,23 +599,30 @@ public sealed class ParticipationTimelineTests
     }
 
     [Fact]
-    public void A_time_that_the_Phase_form_cleared_is_a_disabled_event_with_the_time_it_was_cleared_and_can_be_enabled()
+    public void A_time_that_the_Phase_form_cleared_is_an_empty_value_of_its_event_that_disabling_the_event_undoes()
     {
         var participation = Ride(
             CreatePhase(START, ARRIVE, PRESENT, id: TestId.Of(1)),
             CreatePhase(null, isFinal: true, id: TestId.Of(2))
         );
-        var presented = participation.Phases[0].Events[1];
 
         participation.Update(new Form(TestId.Of(1), START, ARRIVE, null), ACTOR, RECORDED);
+        var edit = participation.Phases[0].Events.OfType<PhaseUpdated>().Single();
 
         Assert.Null(participation.Phases[0].PresentTime);
-        Assert.Equal(RECORDED, presented.DisabledAt);
+        var cleared = Assert.Single(edit.Times);
+        Assert.Equal(TimeSlot.Present, cleared.Slot);
+        Assert.Null(cleared.Time);
 
-        participation.ChangeTimeEvents([], [presented.Id], DISABLED);
+        participation.ChangeTimeEvents([edit.Id], [], DISABLED);
 
         Assert.Equal(PRESENT, participation.Phases[0].PresentTime!.ToDateTimeOffset());
-        Assert.Null(presented.DisabledAt);
+        Assert.Equal(DISABLED, edit.DisabledAt);
+
+        participation.ChangeTimeEvents([], [edit.Id], DISABLED.AddMinutes(1));
+
+        Assert.Null(participation.Phases[0].PresentTime);
+        Assert.Null(edit.DisabledAt);
     }
 
     static TimeEvent Process(Participation participation, Snapshot snapshot)

@@ -5,7 +5,7 @@ namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 /// representation, which is taken from the Representation request of the Phase when the time is processed: a
 /// re-presentation is still a presentation.
 /// </summary>
-public sealed class Presented : TimeEvent
+public sealed class Presented : SnapshotTimeEvent
 {
     public Presented(
         Timestamp time,

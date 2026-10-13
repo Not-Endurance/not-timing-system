@@ -38,7 +38,7 @@
                              @onkeydown="@(key => Press(key, entry))">
                             <span>
                                 <strong>@entry.Kind</strong>
-                                <span data-testid="timeline-time">@entry.Time</span>
+                                <span data-testid="timeline-time">@string.Join(", ", entry.Times)</span>
                                 @if (entry.IsShown)
                                 {
                                     <MudChip T="string" Size="Size.Small" Class="ml-1" data-testid="timeline-shown">@Timeline_shown_string</MudChip>

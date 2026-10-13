@@ -1338,4 +1338,10 @@
   <data name="Timeline_empty_string" xml:space="preserve">
     <value>No time was recorded for this Participation yet.</value>
   </data>
+  <data name="Timeline_phase_edit_string" xml:space="preserve">
+    <value>Phase edit</value>
+  </data>
+  <data name="Timeline_cleared_string" xml:space="preserve">
+    <value>none</value>
+  </data>
 </root>

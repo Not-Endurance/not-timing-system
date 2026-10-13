@@ -1,5 +1,4 @@
 using NTS.Domain.Core.Aggregates.Participations.Entities;
-using NTS.Domain.Objects;
 
 namespace NTS.Contracts.Features.Console;
 
@@ -13,7 +12,9 @@ public sealed class TimelineEntry
 {
     public Guid Id { get; init; }
     public string Kind { get; init; } = string.Empty;
-    public Timestamp Time { get; init; } = default!;
+
+    /// <summary>The times the event lists: one for a Snapshot or an Update of one, up to three for an edit of the Phase form.</summary>
+    public IReadOnlyList<TimelineTime> Times { get; init; } = [];
     public TimeEventOutcome Outcome { get; init; }
     public string OutcomeText { get; init; } = string.Empty;
     public string Source { get; init; } = string.Empty;

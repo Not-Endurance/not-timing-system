@@ -193,7 +193,10 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
         throw new NotSupportedException("A Phase is made by the Setup and never by the dashboard.");
     }
 
-    /// <summary>The times of a Phase as the person typed them: each that differs from the one shown is an accepted time of its own.</summary>
+    /// <summary>
+    /// The times of a Phase as the person typed them: the ones that differ from the ones shown are one edit of the Phase, and a
+    /// Save that changes nothing writes nothing.
+    /// </summary>
     public async Task Update(PhaseUpdateModel model)
     {
         Shown().EnsureCanWrite();
@@ -202,7 +205,15 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
             ?? throw new DomainException(Participation_not_found_string);
         await _account.Load();
         var actor = _account.Current?.Id ?? throw new DomainException(Not_signed_in_string);
-        await Write(participation, (changed, now) => changed.Update(model, actor, now));
+        try
+        {
+            await Write(participation, (changed, now) => changed.Update(model, actor, now));
+        }
+        catch (DomainPropertyException invalid) when (invalid.Property != null)
+        {
+            // what is said of a time is shown at the input that holds it, where the person who corrects it clears it
+            throw new DomainPropertyException(PhaseUpdateModel.InputOf(invalid.Property), invalid.Message);
+        }
     }
 
     /// <summary>What the store holds changed: the list is rebuilt, and a selection that is gone is let go.</summary>
@@ -229,12 +240,28 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
         return Write(Chosen(), change);
     }
 
-    async Task Write(Participation participation, Action<Participation, DateTimeOffset> change)
+    Task Write(Participation participation, Action<Participation, DateTimeOffset> change)
+    {
+        return Write(
+            participation,
+            (changed, now) =>
+            {
+                change(changed, now);
+                return true;
+            }
+        );
+    }
+
+    /// <summary>Applies the change to the Participation of the store and writes it, unless the change says it changed nothing.</summary>
+    async Task Write(Participation participation, Func<Participation, DateTimeOffset, bool> change)
     {
         var id = participation.Id;
         try
         {
-            change(participation, _clock.Now);
+            if (!change(participation, _clock.Now))
+            {
+                return;
+            }
         }
         catch
         {
