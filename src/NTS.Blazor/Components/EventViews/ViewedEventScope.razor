@@ -1,5 +1,10 @@
 @inherits ViewedEventScopeBehind
 
+@if (HasEnded)
+{
+    <MudAlert Severity="Severity.Warning" Class="mb-2" data-testid="event-ended-banner">@This_event_has_ended_string</MudAlert>
+}
+
 @if (View == null)
 {
     <NContent IsLoading="@IsOpening"

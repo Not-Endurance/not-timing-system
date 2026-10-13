@@ -115,6 +115,7 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
         var receipts = await _publisher.PublishSnapshotsAsync(view.Event.Id, new SnapshotGroup([snapshot], type));
         if (receipts.FirstOrDefault() is not { IsRecorded: true } recorded)
         {
+            view.Refused(receipts.FirstOrDefault()?.ErrorCode);
             throw new DomainException(
                 receipts.FirstOrDefault()?.ErrorMessage
                     ?? receipts.FirstOrDefault()?.ErrorCode
@@ -275,6 +276,7 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
         EmitChanged();
         if (refused != null)
         {
+            Shown().Refused(refused.Code);
             throw new DomainException(
                 refused.Code == PARTICIPATION_CHANGED ? Participation_changed_string : refused.Message
             );

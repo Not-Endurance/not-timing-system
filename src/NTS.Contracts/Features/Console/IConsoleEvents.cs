@@ -12,6 +12,9 @@ public interface IConsoleEvents : IStatefulService
 {
     IReadOnlyList<ConsoleEvent> Events { get; }
 
+    /// <summary>Reads the Events again as the Api lists them now, which an Event that has ended since is told by (#631).</summary>
+    Task Refresh();
+
     /// <summary>Whether the person may make an Event in the Tenant they act in.</summary>
     bool CanCreate { get; }
 

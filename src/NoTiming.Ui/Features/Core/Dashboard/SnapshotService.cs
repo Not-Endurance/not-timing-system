@@ -177,7 +177,7 @@ public class SnapshotService
                 }
 
                 var (snapshotGroup, receipts) = await SendAsync(view.Event.Id, readySnapshots, snapshotType);
-                return await Settle(snapshotGroup, receipts, snapshotType);
+                return await Settle(view, snapshotGroup, receipts, snapshotType);
             }
         );
     }
@@ -196,7 +196,7 @@ public class SnapshotService
                     snapshotType
                 );
                 await AskAgainWhenRefused(receipts);
-                RefuseWhenNotRecorded(receipts);
+                RefuseWhenNotRecorded(view, receipts);
                 return true;
             }
         );
@@ -231,7 +231,7 @@ public class SnapshotService
                     _stopped.Token
                 );
                 await AskAgainWhenRefused([receipt]);
-                RefuseWhenNotRecorded([receipt]);
+                RefuseWhenNotRecorded(view, [receipt]);
                 if (!receipt.IsAccepted)
                 {
                     throw new DomainException(
@@ -300,11 +300,15 @@ public class SnapshotService
             && before.Zip(snapshots, (x, y) => x.Number == y.Number && x.Timestamp == y.Timestamp).All(same => same);
     }
 
-    /// <summary>The person is told why the first Snapshot that was not recorded was not: the Api's own words.</summary>
-    static void RefuseWhenNotRecorded(IReadOnlyList<SnapshotReceipt> receipts)
+    /// <summary>
+    /// The person is told why the first Snapshot that was not recorded was not: the Api's own words. The view is told the code,
+    /// which says to a view of a Live Event that the Event has ended when it has (#631).
+    /// </summary>
+    static void RefuseWhenNotRecorded(IViewedEvent view, IReadOnlyList<SnapshotReceipt> receipts)
     {
         if (receipts.FirstOrDefault(x => !x.IsRecorded) is { } failed)
         {
+            view.Refused(failed.ErrorCode);
             throw new DomainException(failed.ErrorMessage ?? failed.ErrorCode ?? "The Snapshot was not recorded.");
         }
     }
@@ -347,6 +351,7 @@ public class SnapshotService
     /// its own. What it did not record stays selected, to be sent again, and the person is told why.
     /// </summary>
     async Task<bool> Settle(
+        IViewedEvent view,
         SnapshotGroup snapshotGroup,
         IReadOnlyList<SnapshotReceipt> receipts,
         SnapshotType snapshotType
@@ -365,7 +370,7 @@ public class SnapshotService
         }
 
         await AskAgainWhenRefused(receipts);
-        RefuseWhenNotRecorded(receipts);
+        RefuseWhenNotRecorded(view, receipts);
         return recorded.Count > 0;
     }
 
@@ -508,7 +513,7 @@ public class SnapshotService
                 [.. waiting.Group.Entries.Select(CopySnapshot)],
                 waiting.Group.Type
             );
-            await Settle(group, receipts, group.Type);
+            await Settle(view, group, receipts, group.Type);
         }
         finally
         {

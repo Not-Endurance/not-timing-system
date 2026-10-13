@@ -10,13 +10,18 @@ namespace NoTiming.Ui.Components.EventViews;
 /// the viewed Event, and shows in its place what there is to say when there is none or when the Event does not show the
 /// Core view the page is. The Event is the route's, or, when the address names none, the Live Event the app follows, and
 /// it is opened again when either changes. The view it opened is disposed when it is replaced and when the page leaves.
+/// When a write to the Event it shows is refused because the Event has ended (#631), the provider says so and the Event is
+/// opened again on the spot, which gives the historic view in place of the live one: the connection closes, the controls go
+/// with the live view, and a banner says why. Nothing else interrupts a person who looks at an Event that ended.
 /// </summary>
 public class ViewedEventScopeBehind : NStatefulComponent
 {
     readonly SemaphoreSlim _opening = new(1, 1);
+    Guid _endedSubscription;
     bool _disposed;
     bool _opened;
     Guid? _openedFor;
+    Guid? _endedEvent;
 
     [Inject]
     IViewedEventProvider Provider { get; set; } = default!;
@@ -32,6 +37,9 @@ public class ViewedEventScopeBehind : NStatefulComponent
     protected bool IsNotFound { get; private set; }
     protected bool IsHidden => View != null && Shows is { } view && !View.Shows(view);
 
+    /// <summary>Whether the Event ended while the person was looking at it, which the banner says.</summary>
+    protected bool HasEnded { get; private set; }
+
     [Parameter]
     public Guid? EventId { get; set; }
 
@@ -41,6 +49,7 @@ public class ViewedEventScopeBehind : NStatefulComponent
 
     protected override async Task OnInitializedAsync()
     {
+        _endedSubscription = Provider.EventEnded.Subscribe(EventHasEnded);
         await Observe(SocketService);
     }
 
@@ -73,9 +82,47 @@ public class ViewedEventScopeBehind : NStatefulComponent
     public override void Dispose()
     {
         _disposed = true;
+        Provider.EventEnded.Unsubscribe(_endedSubscription);
         View?.Dispose();
         View = null;
         base.Dispose();
+    }
+
+    /// <summary>
+    /// A write to the Event that the page shows was refused because it has ended, which is the Api's word for it: the connection
+    /// that followed the Event is closed, and the Event is opened again, and the Api's list says it is Historic now. The Event
+    /// is kept as the target when the address names none and the connection was what named it.
+    /// </summary>
+    async Task EventHasEnded(Guid eventId)
+    {
+        if (_disposed || View is not { IsLive: true } || View.Event.Id != eventId)
+        {
+            return;
+        }
+
+        HasEnded = true;
+        _endedEvent = eventId;
+        _opened = false;
+        if (SocketService.Event?.Id == eventId)
+        {
+            await Disconnect();
+        }
+
+        await Open();
+        await InvokeRender();
+    }
+
+    /// <summary>Closes the connection to the Event, and goes on when it cannot be closed: the Event is opened again all the same.</summary>
+    async Task Disconnect()
+    {
+        try
+        {
+            await SocketService.Disconnect();
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     /// <summary>Opens the Event the route names, or the one the app follows, unless it is the one that is open.</summary>
@@ -93,6 +140,12 @@ public class ViewedEventScopeBehind : NStatefulComponent
             if (_disposed || (_opened && target == _openedFor))
             {
                 return;
+            }
+
+            if (target != _endedEvent)
+            {
+                HasEnded = false; // another Event than the one that ended
+                _endedEvent = null;
             }
 
             _opened = true;
@@ -129,6 +182,6 @@ public class ViewedEventScopeBehind : NStatefulComponent
 
     Guid? TargetEvent()
     {
-        return EventId ?? SocketService.Event?.Id;
+        return EventId ?? SocketService.Event?.Id ?? _endedEvent;
     }
 }

@@ -70,6 +70,11 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
         return true;
     }
 
+    public Task Refresh()
+    {
+        return ReloadState();
+    }
+
     public async Task<ConsoleEvent> Create(string name, string location, string? feiShowId)
     {
         var response = await _api.Send(

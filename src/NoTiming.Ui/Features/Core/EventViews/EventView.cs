@@ -81,4 +81,7 @@ public abstract class EventView : NStatefulService, IViewedEvent
 
         throw new DomainException(IsLive ? You_may_not_change_this_event_string : This_event_has_ended_string);
     }
+
+    /// <summary>Nothing is written to a Historic Event, so nothing of it is refused; a Live view tells what it is told.</summary>
+    public virtual void Refused(string? code) { }
 }

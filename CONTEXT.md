@@ -88,11 +88,11 @@ An endurance show held at one location over a span of days. Every Participation,
 _Avoid_: Competition (that is one ride within an Event)
 
 **Live Event**:
-An Event that is still running: its Console and its viewers see changes as they are recorded, and Staff may record and change times. It becomes a Historic Event at the end of its last day, and from then on changes to it are refused.
+An Event that is still running: its Console and its viewers see changes as they are recorded, and Staff may record and change times. It becomes a Historic Event at the end of its last day, and from then on changes to it are refused. Nobody is told when it ends: whoever has it open learns it from the first change that is refused, and the page they are on becomes the record of the Event where it is.
 _Avoid_: Active event, current event
 
 **Historic Event**:
-An Event that has ended, viewed as a record: nothing about it can be changed, and its Results and other produced documents can still be printed. It has no Startlist, which is about who starts next. Opening one never affects a Live Event.
+An Event that has ended, viewed as a record: nothing about it can be changed, and its Results and other produced documents can still be printed. It has no Startlist, which is about who starts next, and no Snapshot to capture. Opening one never affects a Live Event; the connection to an Event that has ended is closed when the page that shows it learns that it has.
 _Avoid_: Past event, archived event
 
 **Console**:

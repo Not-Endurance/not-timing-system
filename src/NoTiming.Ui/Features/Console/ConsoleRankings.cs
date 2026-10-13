@@ -55,6 +55,7 @@ public class ConsoleRankings : IConsoleRankings, IKrudFormService<CustomRankingM
         await view.Refresh();
         if (refused != null)
         {
+            view.Refused(refused.Code);
             throw new DomainException(refused.Message);
         }
     }
