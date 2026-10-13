@@ -21,6 +21,19 @@ internal sealed class AccountMatch
     public string MaskedEmail { get; }
 }
 
+/// <summary>An account named by its id: who it is, as the people who work with it know it.</summary>
+internal sealed class AccountName
+{
+    public AccountName(Guid id, string displayName)
+    {
+        Id = id;
+        DisplayName = displayName;
+    }
+
+    public Guid Id { get; }
+    public string DisplayName { get; }
+}
+
 /// <summary>
 /// The search of accounts by name (#643, ADR-0012). There is no listing of accounts: a search takes at least three
 /// characters, which it matches literally, finds at most ten accounts by name, and answers each with its id, its display
@@ -38,6 +51,31 @@ internal sealed class AccountSearch
     public AccountSearch(IMongoClient client, IOptions<NIdentityOptions> options)
     {
         _users = client.GetDatabase(options.Value.Database).GetCollection<BsonDocument>(options.Value.UsersCollection);
+    }
+
+    /// <summary>
+    /// The display names of the accounts with these ids, for a route that has already decided that the caller may be told who
+    /// they are (the people who recorded the times of an Event, #619). An id that is no account is left out.
+    /// </summary>
+    public async Task<IReadOnlyList<AccountName>> NamesOfAsync(
+        IReadOnlyCollection<Guid> ids,
+        CancellationToken cancellationToken
+    )
+    {
+        if (ids.Count == 0)
+        {
+            return [];
+        }
+
+        var rows = await _users
+            .Find(Builders<BsonDocument>.Filter.In("_id", ids.Select(BsonGuids.Binary)))
+            .Project(new BsonDocument { { "_id", 1 }, { "Name", 1 } })
+            .ToListAsync(cancellationToken);
+        return
+        [
+            .. rows.Where(x => BsonGuids.Of(x, "_id") != null && x.TryGetValue("Name", out var name) && name.IsString)
+                .Select(x => new AccountName(BsonGuids.Of(x, "_id")!.Value, x["Name"].AsString)),
+        ];
     }
 
     /// <param name="text">At least three characters, matched as they are written and in any case.</param>

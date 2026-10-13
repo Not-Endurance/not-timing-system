@@ -62,6 +62,7 @@ internal static class ApiServices
         services.AddSingleton<GlobalCollections>();
         services.AddSingleton<ReferenceAccess>();
         services.AddSingleton<EventDataAccess>();
+        services.AddSingleton<TimeEventViewers>();
         services.AddSingleton<SnapshotRecorder>();
         services.AddSingleton<RankingFinaliser>();
         services.AddOptions<RankingFinalisationOptions>().BindConfiguration(RankingFinalisationOptions.SECTION);

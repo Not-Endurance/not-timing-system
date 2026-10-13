@@ -247,6 +247,7 @@ public sealed class RoutesOfTheApiTests : IClassFixture<MongoFixture>
             "GET api/tenants/{id}",
             "GET api/tenants/{id}/branding",
             "GET api/tenants/{id}/capabilities",
+            "GET api/time-event-actors",
             "GET api/user-sessions",
             "GET api/user-sessions/{id}",
         ];

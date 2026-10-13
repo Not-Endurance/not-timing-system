@@ -54,4 +54,14 @@ public interface IConsoleDashboard : IStatefulService
     Task FailToQualify(FailToQualifyCode[] codes, string? reason);
 
     Task RestoreQualification();
+
+    /// <summary>
+    /// Disables the time events and enables the others as one change to the selected Participation, which is what the timeline's
+    /// Save does (#619): the outcome of a disabled event becomes a manual reject and its time is shown no more, the time before
+    /// it takes over, an enabled event is accepted again, and the Participation is evaluated once (eliminated or restored for
+    /// time, the next Phase started, the Phase announced). The change is made whole or not at all: one that leaves an earlier
+    /// Phase incomplete while a later one has times, or that names an event that is no longer as it was chosen, is refused with
+    /// the events named, and nothing is written.
+    /// </summary>
+    Task ChangeTimeEvents(IReadOnlyCollection<Guid> disable, IReadOnlyCollection<Guid> enable);
 }

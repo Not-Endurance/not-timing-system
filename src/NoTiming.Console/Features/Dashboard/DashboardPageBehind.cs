@@ -1,4 +1,6 @@
+using MudBlazor;
 using Not.Blazor.Components.Abstractions;
+using NoTiming.Console.Features.Dashboard.Timeline;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Console;
 using NTS.Domain.Core.Aggregates;
@@ -19,6 +21,9 @@ public class DashboardPageBehind : NStatefulComponent
 
     [Inject]
     IConsoleHandouts Handouts { get; set; } = default!;
+
+    [Inject]
+    IDialogService DialogService { get; set; } = default!;
 
     protected IReadOnlyList<Participation> Participations => Dashboard.Participations;
     protected IReadOnlyList<int> RecentlyTimed => Dashboard.RecentlyTimed;
@@ -43,6 +48,22 @@ public class DashboardPageBehind : NStatefulComponent
                 ),
             ];
         return Task.FromResult(found.Cast<Participation?>());
+    }
+
+    /// <summary>The timeline of the selected Participation: how each of its times was recorded, and which of them to disable or enable.</summary>
+    protected async Task ShowTimeline()
+    {
+        try
+        {
+            await DialogService.ShowAsync<TimelineDialog>(
+                $"{Timeline_string}: {Selected}",
+                new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true }
+            );
+        }
+        catch (Exception ex)
+        {
+            Handle(ex);
+        }
     }
 
     protected override async Task OnInitializedAsync()

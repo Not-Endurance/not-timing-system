@@ -51,7 +51,11 @@ public sealed class ParticipationRoutesTests : IClassFixture<MongoFixture>
         Assert.Equal(eventId.ToString(), attributes.GetProperty("eventId").GetString());
         Assert.Equal(2, attributes.GetProperty("combination").GetProperty("number").GetInt32());
         Assert.Equal(2, attributes.GetProperty("phases").GetArrayLength());
-        Assert.Equal(1, attributes.GetProperty("phases")[0].GetProperty("events").GetArrayLength());
+        Assert.Equal(0, attributes.GetProperty("phases")[0].GetProperty("events").GetArrayLength()); // how a time was recorded is for Staff (#619)
+        Assert.Equal(
+            START.AddHours(1),
+            attributes.GetProperty("phases")[0].GetProperty("arriveTime").GetDateTimeOffset()
+        );
         Assert.Equal(3, one.GetProperty("meta").GetProperty("version").GetInt32());
         Assert.Equal(
             0,

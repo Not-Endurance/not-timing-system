@@ -1275,4 +1275,70 @@
   <data name="Snapshot_update_not_answered_string" xml:space="preserve">
     <value>Сървърът не отговори. Натиснете „Обнови“, за да изпратите времето отново.</value>
   </data>
+  <data name="Disabling_these_would_leave_an_earlier_Phase_incomplete_string" xml:space="preserve">
+    <value>Ако се изключат тези, по-ранна фаза ще остане без всичките си времена, докато по-късна фаза има времена.</value>
+  </data>
+  <data name="Time_event_changed_string" xml:space="preserve">
+    <value>Дадено време вече не е такова, каквото беше при избора. Прегледайте хронологията отново.</value>
+  </data>
+  <data name="Time_event_set_aside_by_the_rules_string" xml:space="preserve">
+    <value>Правилата са отхвърлили това време, затова не може да се изключва или включва.</value>
+  </data>
+  <data name="Time_events_blocked_string" xml:space="preserve">
+    <value>{0} не може да бъде изключено: по-ранна фаза ще остане без всичките си времена, докато по-късна фаза има времена.</value>
+  </data>
+  <data name="Timeline_update_of__string" xml:space="preserve">
+    <value>{0} (корекция)</value>
+  </data>
+  <data name="Timeline_manual_string" xml:space="preserve">
+    <value>Ръчно</value>
+  </data>
+  <data name="Timeline_rfid_string" xml:space="preserve">
+    <value>RFID</value>
+  </data>
+  <data name="Timeline_ems_string" xml:space="preserve">
+    <value>EMS интеграция</value>
+  </data>
+  <data name="Timeline_string" xml:space="preserve">
+    <value>Хронология</value>
+  </data>
+  <data name="Timeline_outcome_string" xml:space="preserve">
+    <value>Резултат</value>
+  </data>
+  <data name="Timeline_source_string" xml:space="preserve">
+    <value>Източник</value>
+  </data>
+  <data name="Timeline_actor_string" xml:space="preserve">
+    <value>Записано от</value>
+  </data>
+  <data name="Timeline_recorded_string" xml:space="preserve">
+    <value>Записано</value>
+  </data>
+  <data name="Timeline_actor_unknown_string" xml:space="preserve">
+    <value>Непознат</value>
+  </data>
+  <data name="Timeline_click_to_disable_string" xml:space="preserve">
+    <value>Щракнете, за да изключите</value>
+  </data>
+  <data name="Timeline_click_to_enable_string" xml:space="preserve">
+    <value>Щракнете, за да включите</value>
+  </data>
+  <data name="Timeline_will_be_disabled_string" xml:space="preserve">
+    <value>Ще бъде изключено</value>
+  </data>
+  <data name="Timeline_will_be_enabled_string" xml:space="preserve">
+    <value>Ще бъде включено</value>
+  </data>
+  <data name="Timeline_disabled_at__string" xml:space="preserve">
+    <value>Изключено в {0}</value>
+  </data>
+  <data name="Timeline_shown_string" xml:space="preserve">
+    <value>Показано</value>
+  </data>
+  <data name="Timeline_saved_string" xml:space="preserve">
+    <value>Хронологията е запазена.</value>
+  </data>
+  <data name="Timeline_empty_string" xml:space="preserve">
+    <value>Все още няма записано време за този участник.</value>
+  </data>
 </root>

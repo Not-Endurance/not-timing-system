@@ -1,0 +1,120 @@
+@inherits TimelineDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        @if (!IsLoaded)
+        {
+            <MudProgressCircular Indeterminate="true" Size="Size.Small" data-testid="timeline-loading" />
+        }
+        else if (!HasEvents)
+        {
+            <MudText Typo="Typo.body2" data-testid="timeline-empty">@Timeline_empty_string</MudText>
+        }
+        else
+        {
+            @foreach (var phase in Phases)
+            {
+                <MudText Typo="Typo.subtitle2" Class="mt-2" data-testid="timeline-phase">@phase.Gate</MudText>
+
+                <div class="timeline-row timeline-row--heading">
+                    <span>@Time_string</span>
+                    <span>@Timeline_outcome_string</span>
+                    <span>@Timeline_source_string</span>
+                    <span>@Timeline_actor_string</span>
+                    <span>@Timeline_recorded_string</span>
+                </div>
+
+                @foreach (var entry in phase.Entries)
+                {
+                    <MudTooltip Text="@HintOf(entry)" Placement="Placement.Top" Inline="false">
+                        <div class="@RowClassOf(entry)"
+                             role="@(IsClickable(entry) ? "button" : null)"
+                             tabindex="@(IsClickable(entry) ? 0 : -1)"
+                             data-testid="timeline-entry"
+                             data-event="@entry.Id"
+                             data-outcome="@entry.Outcome"
+                             data-staged="@(IsStaged(entry) ? "true" : "false")"
+                             @onclick="@(() => Toggle(entry))"
+                             @onkeydown="@(key => Press(key, entry))">
+                            <span>
+                                <strong>@entry.Kind</strong>
+                                <span data-testid="timeline-time">@entry.Time</span>
+                                @if (entry.IsShown)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Class="ml-1" data-testid="timeline-shown">@Timeline_shown_string</MudChip>
+                                }
+                            </span>
+                            <span data-testid="timeline-outcome">
+                                @entry.OutcomeText
+                                @if (entry.DisabledAt is { } disabledAt)
+                                {
+                                    <br />
+                                    <small>@string.Format(Timeline_disabled_at__string, disabledAt.ToLocalTime().ToString("HH:mm:ss"))</small>
+                                }
+                            </span>
+                            <span data-testid="timeline-source">@entry.Source</span>
+                            <span data-testid="timeline-actor">@(entry.Actor ?? (entry.RecordedAt == null ? "-" : Timeline_actor_unknown_string))</span>
+                            <span data-testid="timeline-recorded">@(entry.RecordedAt?.ToLocalTime().ToString("HH:mm:ss") ?? "-")</span>
+                        </div>
+                    </MudTooltip>
+                }
+            }
+
+            @if (Refusal != null)
+            {
+                <MudAlert Severity="Severity.Warning" Class="mt-3" data-testid="timeline-refusal">@Refusal</MudAlert>
+            }
+        }
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonPrimary Text="@Save_string" Disabled="@(!CanSave)" OnClick="Save" />
+        <NButtonSecondary Text="@Close_string" OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>
+
+<style>
+    .timeline-row {
+        display: grid;
+        grid-template-columns: 2fr 2fr 1fr 2fr 1fr;
+        gap: 8px;
+        align-items: center;
+        padding: 4px 8px;
+        border-bottom: 1px solid var(--mud-palette-lines-default);
+    }
+
+    .timeline-row--heading {
+        font-weight: 600;
+        font-size: 0.75rem;
+        border-bottom-width: 2px;
+    }
+
+    .timeline-row--accepted,
+    .timeline-row--disabled {
+        cursor: pointer;
+    }
+
+    .timeline-row--accepted:hover,
+    .timeline-row--disabled:hover {
+        opacity: 0.5;
+    }
+
+    .timeline-row--disabled {
+        color: var(--mud-palette-text-disabled);
+        text-decoration: line-through;
+    }
+
+    .timeline-row--rejected {
+        color: var(--mud-palette-text-disabled);
+        cursor: not-allowed;
+    }
+
+    .timeline-row--staged {
+        outline: 2px dashed var(--mud-palette-warning);
+        opacity: 0.6;
+    }
+
+    .timeline-row--shown strong {
+        color: var(--mud-palette-primary);
+    }
+</style>

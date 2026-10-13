@@ -12,9 +12,10 @@ public sealed class ArriveUpdated : TimeEvent
         SnapshotMethod method,
         DateTimeOffset? recordedAt,
         Guid? actorId,
-        Guid? id = null
+        Guid? id = null,
+        DateTimeOffset? disabledAt = null
     )
-        : base(time, outcome, method, recordedAt, actorId, id) { }
+        : base(time, outcome, method, recordedAt, actorId, id, disabledAt) { }
 
     public override TimeSlot Slot => TimeSlot.Arrive;
 

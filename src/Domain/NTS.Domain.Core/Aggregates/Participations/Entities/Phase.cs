@@ -258,6 +258,16 @@ public class Phase : Entity
         Gate = $"GATE{number}/{totalDistanceSoFar:0.##}";
     }
 
+    /// <summary>Whether the recovery of the Phase makes its Inspection compulsory, which follows from its times and so is decided again whenever they change.</summary>
+    internal void CheckCompulsoryThreshold()
+    {
+        if (CompulsoryThresholdSpan == null || IsFinal)
+        {
+            return;
+        }
+        IsRequiredInspectionCompulsory = GetRecoveryInterval() >= CompulsoryThresholdSpan;
+    }
+
     public override string ToString()
     {
         var arrive = $"{ARR_string}:{ArriveTime}";
@@ -322,6 +332,18 @@ public class Phase : Entity
             return GetAverageLoopSpeed();
         }
         return IsFinal ? GetAverageLoopSpeed() : GetAveragePhaseSpeed();
+    }
+
+    /// <summary>Whether the Phase shows any of its times: a Phase that has none has not been ridden yet.</summary>
+    public bool HasTimes()
+    {
+        return ArriveTime != null || PresentTime != null || RepresentTime != null;
+    }
+
+    /// <summary>Whether the time the Phase shows is the time of this event: the latest accepted event that feeds its time (ADR-0005).</summary>
+    public bool Shows(TimeEvent timeEvent)
+    {
+        return ReferenceEquals(_events.LastOrDefault(x => x.IsAccepted && x.Slot == timeEvent.Slot), timeEvent);
     }
 
     public bool IsComplete()
@@ -457,19 +479,10 @@ public class Phase : Entity
         }
         if (time == null)
         {
-            _events.Where(x => x.IsAccepted && x.Slot == slot).ToList().ForEach(x => x.RejectManually());
+            _events.Where(x => x.IsAccepted && x.Slot == slot).ToList().ForEach(x => x.Disable(recordedAt));
             return;
         }
         _events.Add(Manual(slot, time, recordedAt, actorId));
-    }
-
-    void CheckCompulsoryThreshold()
-    {
-        if (CompulsoryThresholdSpan == null || IsFinal)
-        {
-            return;
-        }
-        IsRequiredInspectionCompulsory = GetRecoveryInterval() >= CompulsoryThresholdSpan;
     }
 }
 

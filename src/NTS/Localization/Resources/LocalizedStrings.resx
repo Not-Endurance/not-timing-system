@@ -1272,4 +1272,70 @@
   <data name="Snapshot_update_not_answered_string" xml:space="preserve">
     <value>The server did not answer. Press Update to send the time again.</value>
   </data>
+  <data name="Disabling_these_would_leave_an_earlier_Phase_incomplete_string" xml:space="preserve">
+    <value>Disabling these would leave an earlier Phase without all its times while a later Phase has times.</value>
+  </data>
+  <data name="Time_event_changed_string" xml:space="preserve">
+    <value>A time event is not as it was when it was chosen. Look at the timeline again.</value>
+  </data>
+  <data name="Time_event_set_aside_by_the_rules_string" xml:space="preserve">
+    <value>The rules set this time aside, so it cannot be disabled or enabled.</value>
+  </data>
+  <data name="Time_events_blocked_string" xml:space="preserve">
+    <value>{0} cannot be disabled: it would leave an earlier Phase without all its times while a later Phase has times.</value>
+  </data>
+  <data name="Timeline_update_of__string" xml:space="preserve">
+    <value>{0} (update)</value>
+  </data>
+  <data name="Timeline_manual_string" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="Timeline_rfid_string" xml:space="preserve">
+    <value>RFID</value>
+  </data>
+  <data name="Timeline_ems_string" xml:space="preserve">
+    <value>EMS integration</value>
+  </data>
+  <data name="Timeline_string" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="Timeline_outcome_string" xml:space="preserve">
+    <value>Outcome</value>
+  </data>
+  <data name="Timeline_source_string" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="Timeline_actor_string" xml:space="preserve">
+    <value>Recorded by</value>
+  </data>
+  <data name="Timeline_recorded_string" xml:space="preserve">
+    <value>Recorded</value>
+  </data>
+  <data name="Timeline_actor_unknown_string" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Timeline_click_to_disable_string" xml:space="preserve">
+    <value>Click to disable</value>
+  </data>
+  <data name="Timeline_click_to_enable_string" xml:space="preserve">
+    <value>Click to enable</value>
+  </data>
+  <data name="Timeline_will_be_disabled_string" xml:space="preserve">
+    <value>Will be disabled</value>
+  </data>
+  <data name="Timeline_will_be_enabled_string" xml:space="preserve">
+    <value>Will be enabled</value>
+  </data>
+  <data name="Timeline_disabled_at__string" xml:space="preserve">
+    <value>Disabled at {0}</value>
+  </data>
+  <data name="Timeline_shown_string" xml:space="preserve">
+    <value>Shown</value>
+  </data>
+  <data name="Timeline_saved_string" xml:space="preserve">
+    <value>The timeline was saved.</value>
+  </data>
+  <data name="Timeline_empty_string" xml:space="preserve">
+    <value>No time was recorded for this Participation yet.</value>
+  </data>
 </root>

@@ -32,13 +32,15 @@ internal sealed class EventDataFamily<TModel, TEntity>
         string collection,
         IEnumerable<string> hidden,
         bool announcesChanges = false,
-        IEnumerable<EventDataReference>? referencedBy = null
+        IEnumerable<EventDataReference>? referencedBy = null,
+        Func<TModel, bool, TModel>? shownTo = null
     )
     {
         Route = route;
         Collection = collection;
         AnnouncesChanges = announcesChanges;
         ReferencedBy = [.. referencedBy ?? []];
+        ShownTo = shownTo;
         var kept = hidden.ToArray();
         Made = new ReferenceMembers<TModel>(kept, []);
         Changed = new ReferenceMembers<TModel>(kept, [nameof(IEventScoped.EventId)]);
@@ -54,6 +56,12 @@ internal sealed class EventDataFamily<TModel, TEntity>
 
     /// <summary>Where the rows of other families name the rows of this one: a row that is named is not removed.</summary>
     public IReadOnlyList<EventDataReference> ReferencedBy { get; }
+
+    /// <summary>
+    /// How a row is read by someone who may, or may not, see how its times were recorded (ADR-0005, ADR-0012); none for a family
+    /// that has nothing to hide. A Participation tells every caller the times of its Phases and its events to Staff alone.
+    /// </summary>
+    public Func<TModel, bool, TModel>? ShownTo { get; }
 
     /// <summary>The members a row is made with, and the ones every read shows: all of the model's but the ones kept to the server.</summary>
     public ReferenceMembers<TModel> Made { get; }

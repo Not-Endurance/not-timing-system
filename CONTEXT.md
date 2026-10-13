@@ -32,7 +32,7 @@ _Avoid_: Admin, superuser, sysadmin
 The one Operator of an Event who runs it from the Console: the highest authority in the Event's scope, with full access, writes included. An Event has exactly one at a time. It is the Tenant Root who created the Event until that Tenant Root assigns it to someone else, which is only possible while the Event is not yet Live; once the Event is Live only the Main Operator can hand it over, to a named account. The Main Operator links accounts to the Event's Officials and Operators.
 
 **Staff**:
-Operators and Officials together — the people who work an Event and may see how its times were recorded. Everyone else, signed in or not, sees only the recorded times.
+Operators and Officials together — the people who work an Event and may see how its times were recorded: its time events, who recorded them and when. Everyone else, signed in or not, sees only the recorded times.
 
 ### Tenancy
 
@@ -139,7 +139,10 @@ _Avoid_: Event (that is the show), phase event, snapshot event
 Correcting times already recorded on a Phase — an Official changing a sent Snapshot's time, named by the Snapshot's id, or the Main Operator editing the Phase in the Console. It is its own kind of time event, not a repeat of Arrived or Presented, because it records a different intent; the earlier time stays in the history. It sets an absolute value, so the last one wins.
 
 **Disable**:
-The Main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again. The event stays in the history and can be enabled again.
+The Main Operator negating a time event: its outcome becomes a manual reject, so the previous accepted time of that kind takes over again, and it keeps when it was disabled. The event stays in the history and can be enabled again. Only an accepted event is disabled and only a disabled one is enabled: what the rules rejected stays as it is. The choices are made in the timeline of the Console and saved as one change.
+
+**Timeline**:
+The Console's dialog for one Participation: every time event of every Phase, in the order they were recorded, with what became of it, how it was acquired, who recorded it and when. The Main Operator chooses in it the events to disable and to enable, and saves the choice as one change; only Staff may read how times were recorded.
 
 **Change notification**:
 The signal sent to everyone viewing an Event when a Participation has been changed and saved. It names the Participation, never describes it: receivers read the Participation again.

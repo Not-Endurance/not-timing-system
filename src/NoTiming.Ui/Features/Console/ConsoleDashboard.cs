@@ -9,6 +9,7 @@ using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Console;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -170,6 +171,21 @@ public class ConsoleDashboard : NStatefulService, IConsoleDashboard, IKrudFormSe
     public Task RestoreQualification()
     {
         return Change((participation, _) => participation.Restore());
+    }
+
+    public async Task ChangeTimeEvents(IReadOnlyCollection<Guid> disable, IReadOnlyCollection<Guid> enable)
+    {
+        Shown().EnsureCanWrite();
+        try
+        {
+            await Write(Chosen(), (participation, now) => participation.ChangeTimeEvents(disable, enable, now));
+        }
+        catch (TimelineBlockedException blocked)
+        {
+            throw new DomainException(
+                string.Format(Time_events_blocked_string, TimelineWords.Describe(Chosen(), blocked.Blocking))
+            );
+        }
     }
 
     public Task Create(PhaseUpdateModel item)

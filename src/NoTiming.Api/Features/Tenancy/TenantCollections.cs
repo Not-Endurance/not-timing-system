@@ -149,6 +149,26 @@ internal sealed class TenantCollection
         return [.. found.Select(x => BsonGuids.Of(x, "_id")).OfType<Guid>()];
     }
 
+    /// <summary>The distinct values that the Tenant's documents the filter finds have at the path, which is all that is read of them.</summary>
+    public async Task<IReadOnlyList<BsonValue>> DistinctAsync(
+        string field,
+        FilterDefinition<BsonDocument>? filter,
+        CancellationToken cancellationToken
+    )
+    {
+        if (TenantId == null)
+        {
+            return [];
+        }
+
+        using var cursor = await _documents.DistinctAsync<BsonValue>(
+            field,
+            Scoped(filter),
+            cancellationToken: cancellationToken
+        );
+        return await cursor.ToListAsync(cancellationToken);
+    }
+
     public async Task<BsonDocument?> FindOneAsync(
         FilterDefinition<BsonDocument> filter,
         CancellationToken cancellationToken

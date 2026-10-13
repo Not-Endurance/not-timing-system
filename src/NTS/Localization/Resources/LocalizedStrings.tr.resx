@@ -1225,4 +1225,70 @@
   <data name="Snapshot_update_not_answered_string" xml:space="preserve">
     <value>Sunucu yanıt vermedi. Zamanı yeniden göndermek için Güncelle'ye basın.</value>
   </data>
+  <data name="Disabling_these_would_leave_an_earlier_Phase_incomplete_string" xml:space="preserve">
+    <value>Bunları devre dışı bırakmak, sonraki bir Aşamada zamanlar varken önceki bir Aşamayı eksik bırakır.</value>
+  </data>
+  <data name="Time_event_changed_string" xml:space="preserve">
+    <value>Bir zaman olayı seçildiği andaki gibi değil. Zaman çizelgesine yeniden bakın.</value>
+  </data>
+  <data name="Time_event_set_aside_by_the_rules_string" xml:space="preserve">
+    <value>Kurallar bu zamanı kenara ayırdı, bu yüzden devre dışı bırakılamaz veya etkinleştirilemez.</value>
+  </data>
+  <data name="Time_events_blocked_string" xml:space="preserve">
+    <value>{0} devre dışı bırakılamaz: sonraki bir Aşamada zamanlar varken önceki bir Aşamayı eksik bırakır.</value>
+  </data>
+  <data name="Timeline_update_of__string" xml:space="preserve">
+    <value>{0} (güncelleme)</value>
+  </data>
+  <data name="Timeline_manual_string" xml:space="preserve">
+    <value>Elle</value>
+  </data>
+  <data name="Timeline_rfid_string" xml:space="preserve">
+    <value>RFID</value>
+  </data>
+  <data name="Timeline_ems_string" xml:space="preserve">
+    <value>EMS entegrasyonu</value>
+  </data>
+  <data name="Timeline_string" xml:space="preserve">
+    <value>Zaman çizelgesi</value>
+  </data>
+  <data name="Timeline_outcome_string" xml:space="preserve">
+    <value>Sonuç</value>
+  </data>
+  <data name="Timeline_source_string" xml:space="preserve">
+    <value>Kaynak</value>
+  </data>
+  <data name="Timeline_actor_string" xml:space="preserve">
+    <value>Kaydeden</value>
+  </data>
+  <data name="Timeline_recorded_string" xml:space="preserve">
+    <value>Kaydedildi</value>
+  </data>
+  <data name="Timeline_actor_unknown_string" xml:space="preserve">
+    <value>Bilinmiyor</value>
+  </data>
+  <data name="Timeline_click_to_disable_string" xml:space="preserve">
+    <value>Devre dışı bırakmak için tıklayın</value>
+  </data>
+  <data name="Timeline_click_to_enable_string" xml:space="preserve">
+    <value>Etkinleştirmek için tıklayın</value>
+  </data>
+  <data name="Timeline_will_be_disabled_string" xml:space="preserve">
+    <value>Devre dışı bırakılacak</value>
+  </data>
+  <data name="Timeline_will_be_enabled_string" xml:space="preserve">
+    <value>Etkinleştirilecek</value>
+  </data>
+  <data name="Timeline_disabled_at__string" xml:space="preserve">
+    <value>{0} zamanında devre dışı bırakıldı</value>
+  </data>
+  <data name="Timeline_shown_string" xml:space="preserve">
+    <value>Gösterilen</value>
+  </data>
+  <data name="Timeline_saved_string" xml:space="preserve">
+    <value>Zaman çizelgesi kaydedildi.</value>
+  </data>
+  <data name="Timeline_empty_string" xml:space="preserve">
+    <value>Bu katılım için henüz zaman kaydedilmedi.</value>
+  </data>
 </root>

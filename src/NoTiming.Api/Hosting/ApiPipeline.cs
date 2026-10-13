@@ -72,6 +72,7 @@ internal static class ApiPipeline
         app.MapRegistrySearch();
         app.MapReference();
         app.MapEventData();
+        app.MapTimeEventActors();
         app.MapSnapshots();
         app.MapUserSessions();
         app.MapHub<LiveHub>(ApplicationConstants.LIVE_HUB).RequireCors(ApiServices.CORS_POLICY_NAME);

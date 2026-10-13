@@ -1,3 +1,4 @@
+using Not.Domain.Exceptions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
@@ -158,6 +159,89 @@ public class Participation : Aggregate, IEventScoped
     }
 
     /// <summary>
+    /// The Main Operator disables and enables time events as one change (ADR-0005): a disabled event stays in the history with
+    /// the outcome of a manual reject and the instant it was disabled, so that the previous accepted time of its kind takes
+    /// over again, and an enabled one is accepted again. Only an accepted event is disabled and only a disabled one is enabled:
+    /// what the rules rejected stays as it is, and so does an event that is no longer as it was when it was chosen, which
+    /// refuses the change. The change is made whole or not at all, and is evaluated once like any accepted change (see
+    /// <see cref="Phase"/>). It is refused, naming the events, when it would leave a Phase incomplete that was complete while a
+    /// later Phase has times, because the Start of that Phase was given by the Out time of the earlier one; within a Phase no
+    /// order of the times is asked for.
+    /// </summary>
+    /// <param name="disable">The accepted events to disable.</param>
+    /// <param name="enable">The disabled events to enable.</param>
+    /// <param name="at">The instant the change is made, which is when the disabled events were disabled.</param>
+    public void ChangeTimeEvents(IReadOnlyCollection<Guid> disable, IReadOnlyCollection<Guid> enable, DateTimeOffset at)
+    {
+        GuardHelper.ThrowIfDefault(disable);
+        GuardHelper.ThrowIfDefault(enable);
+        var toDisable = disable.Distinct().ToList();
+        var toEnable = enable.Distinct().ToList();
+        if (toDisable.Intersect(toEnable).Any())
+        {
+            throw GuardHelper.Exception("A time event cannot be disabled and enabled by the same change.");
+        }
+
+        if (toDisable.Count == 0 && toEnable.Count == 0)
+        {
+            return;
+        }
+
+        var chosen = toDisable.Select(x => (Event: TimeEventOf(x), Disable: true)).ToList();
+        chosen.AddRange(toEnable.Select(x => (Event: TimeEventOf(x), Disable: false)));
+        foreach (var (timeEvent, isDisabled) in chosen)
+        {
+            if (!timeEvent.CanBeDisabled && !timeEvent.CanBeEnabled)
+            {
+                throw new DomainException(Time_event_set_aside_by_the_rules_string);
+            }
+
+            if (isDisabled ? !timeEvent.CanBeDisabled : !timeEvent.CanBeEnabled)
+            {
+                throw new DomainException(Time_event_changed_string);
+            }
+        }
+
+        var touched = Phases
+            .Where(x => chosen.Any(y => x.Events.Contains(y.Event)))
+            .Select(x => (Phase: x, OutBefore: x.GetOutTime(), WasComplete: x.IsComplete()))
+            .ToList();
+        var before = chosen.Select(x => (x.Event, x.Event.Outcome, x.Event.DisabledAt)).ToList();
+        foreach (var (timeEvent, isDisabled) in chosen)
+        {
+            if (isDisabled)
+            {
+                timeEvent.Disable(at);
+            }
+            else
+            {
+                timeEvent.Enable();
+            }
+        }
+
+        var blocking = touched
+            .Where(x => x.WasComplete && !x.Phase.IsComplete() && Phases.After(x.Phase).Any(y => y.HasTimes()))
+            .SelectMany(x => chosen.Where(y => y.Disable && x.Phase.Events.Contains(y.Event)).Select(y => y.Event.Id))
+            .ToList();
+        if (blocking.Count > 0)
+        {
+            foreach (var (timeEvent, outcome, disabledAt) in before)
+            {
+                timeEvent.Restore(outcome, disabledAt);
+            }
+
+            throw new TimelineBlockedException(blocking);
+        }
+
+        foreach (var (phase, _, _) in touched)
+        {
+            phase.CheckCompulsoryThreshold();
+        }
+
+        Reevaluate([.. touched.Select(x => (x.Phase, x.OutBefore))]);
+    }
+
+    /// <summary>
     /// A Representation is requested or withdrawn at the time, in the Phase that time belongs to (see <see cref="PhaseAt"/>),
     /// which becomes the current one when the request is taken.
     /// </summary>
@@ -260,6 +344,53 @@ public class Participation : Aggregate, IEventScoped
             Phases.StartNextAfter(phase);
         }
         Raise(Completed(phase));
+    }
+
+    /// <summary>
+    /// What follows from a change of the times of several Phases at once, made as one change: the same as for one (see the
+    /// other overload), decided on all the Phases that changed together. An elimination that a person gave is left as it is. The
+    /// evaluation eliminates for time when a Phase that changed is over the limit, and lifts its own elimination only when no
+    /// Phase at all is, so that a Phase that is fine does not undo what another one calls for. The Phases that changed and are
+    /// complete start the ones after them when their Out time moved, and are announced once each.
+    /// </summary>
+    void Reevaluate(IReadOnlyList<(Phase Phase, Timestamp? OutBefore)> changed)
+    {
+        if (Eliminated != null && !IsMadeByEvaluation(Eliminated))
+        {
+            return;
+        }
+
+        if (changed.Any(x => x.Phase.ViolatesRecoveryTime()))
+        {
+            Eliminate(OUT_OF_TIME);
+            return;
+        }
+
+        if (IsMadeByEvaluation(Eliminated))
+        {
+            if (Phases.Any(x => x.ViolatesRecoveryTime()))
+            {
+                return;
+            }
+
+            Eliminated = null;
+        }
+
+        foreach (var (phase, outBefore) in changed.Where(x => x.Phase.IsComplete()))
+        {
+            if (phase.GetOutTime() != outBefore)
+            {
+                Phases.StartNextAfter(phase);
+            }
+
+            Raise(Completed(phase));
+        }
+    }
+
+    TimeEvent TimeEventOf(Guid id)
+    {
+        return Phases.SelectMany(x => x.Events).FirstOrDefault(x => x.Id == id)
+            ?? throw new DomainException(Time_event_changed_string);
     }
 
     /// <summary>

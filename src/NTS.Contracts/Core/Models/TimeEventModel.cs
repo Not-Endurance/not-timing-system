@@ -22,6 +22,7 @@ public class TimeEventModel
             Method = timeEvent.Method,
             RecordedAt = timeEvent.RecordedAt,
             ActorId = timeEvent.ActorId,
+            DisabledAt = timeEvent.DisabledAt,
         };
     }
 
@@ -34,14 +35,34 @@ public class TimeEventModel
     public DateTimeOffset? RecordedAt { get; init; }
     public Guid? ActorId { get; init; }
 
+    /// <summary>When the Main Operator disabled the event; none while it is not disabled.</summary>
+    public DateTimeOffset? DisabledAt { get; init; }
+
     public TimeEvent MapToEntity()
     {
         var time = new Timestamp(Time);
         return Kind switch
         {
-            TimeEventKind.Arrived => new Arrived(time, Outcome, Method, RecordedAt, ActorId, Id),
-            TimeEventKind.Presented => new Presented(time, IsRepresent, Outcome, Method, RecordedAt, ActorId, Id),
-            TimeEventKind.ArriveUpdated => new ArriveUpdated(time, Outcome, Method, RecordedAt, ActorId, Id),
+            TimeEventKind.Arrived => new Arrived(time, Outcome, Method, RecordedAt, ActorId, Id, DisabledAt),
+            TimeEventKind.Presented => new Presented(
+                time,
+                IsRepresent,
+                Outcome,
+                Method,
+                RecordedAt,
+                ActorId,
+                Id,
+                DisabledAt
+            ),
+            TimeEventKind.ArriveUpdated => new ArriveUpdated(
+                time,
+                Outcome,
+                Method,
+                RecordedAt,
+                ActorId,
+                Id,
+                DisabledAt
+            ),
             TimeEventKind.PresentUpdated => new PresentUpdated(
                 time,
                 IsRepresent,
@@ -49,7 +70,8 @@ public class TimeEventModel
                 Method,
                 RecordedAt,
                 ActorId,
-                Id
+                Id,
+                DisabledAt
             ),
             _ => throw new NotImplementedException(),
         };

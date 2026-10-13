@@ -14,9 +14,10 @@ public sealed class Presented : TimeEvent
         SnapshotMethod method,
         DateTimeOffset? recordedAt,
         Guid? actorId,
-        Guid? id = null
+        Guid? id = null,
+        DateTimeOffset? disabledAt = null
     )
-        : base(time, outcome, method, recordedAt, actorId, id)
+        : base(time, outcome, method, recordedAt, actorId, id, disabledAt)
     {
         IsRepresent = isRepresent;
     }
