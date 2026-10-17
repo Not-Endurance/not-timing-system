@@ -1,18 +1,20 @@
-using System.Globalization;
-using System.Text.RegularExpressions;
 using NTS.Contracts.Features.Console.Setup;
+using NTS.Domain.Setup.Services.Identities;
 
 namespace NoTiming.Ui.Features.Console.Registry;
 
 /// <summary>
-/// What makes two rows of the registry the same Athlete or Horse as far as a form can tell (#646, ADR-0010): the same FEI ID, or
-/// the same name once trimmed, with its spaces collapsed and its case folded, compared across the name and the name in English
-/// of both. It is the exact part of the rules only; the spelling variants and near-misses of ADR-0010 are for the matching of
-/// its migration, and #635 puts one service behind both.
+/// Which rows of the registry the Athlete or Horse being registered is a second copy of, as far as a form can tell (#646, #635,
+/// ADR-0010). The rules are the domain's (<see cref="IdentityMatcher"/>), the same that the migration of the registry and the
+/// search use: the same FEI ID, the same name in either script by the official transliteration, and the same name by the
+/// looser key, which is a spelling of it. What is only a near-miss is not a warning. The form warns and decides nothing.
 /// </summary>
-public static partial class SameRows
+public static class SameRows
 {
-    /// <summary>The rows of those given that the one being registered is a second copy of, by its FEI ID first, with the reason that decided; none is the row itself.</summary>
+    /// <summary>
+    /// The rows of those given that the one being registered is a second copy of, by its FEI ID first and then by its name, the
+    /// Tenant's own before the others', with the reason that decided; none is the row itself.
+    /// </summary>
     public static IReadOnlyList<SameRow> Among(
         IEnumerable<SameRow> candidates,
         Guid? itself,
@@ -22,62 +24,65 @@ public static partial class SameRows
         bool feiIdIsNumber
     )
     {
-        var names = Names(name, nameEnglish);
-        var wanted = FeiIdOf(feiId, feiIdIsNumber);
-        var found = new List<SameRow>();
-        foreach (var row in candidates.Where(x => x.Id != itself))
+        var kind = feiIdIsNumber ? IdentityKind.Athlete : IdentityKind.Horse;
+        var typed = new IdentityObservation(string.Empty, null, name, nameEnglish, feiId, null, null);
+        var rows = candidates
+            .Where(x => x.Id != itself)
+            .Select(x =>
+                (
+                    Row: x,
+                    Seen: new IdentityObservation(x.Id.ToString(), null, x.Name, x.NameEnglish, x.FeiId, null, null)
+                )
+            )
+            .ToList();
+        var rowOf = new Dictionary<string, SameRow>();
+        foreach (var (row, seen) in rows)
         {
-            if (wanted != null && FeiIdOf(row.FeiId, feiIdIsNumber) == wanted)
+            rowOf.TryAdd(seen.Key, row);
+        }
+
+        var found = new List<SameRow>();
+        foreach (var link in IdentityMatcher.Among(kind, typed, rows.Select(x => x.Seen)))
+        {
+            if (ReasonOf(kind, typed, link) is { } reason)
             {
-                found.Add(Of(row, SameRowReason.FeiId));
-            }
-            else if (names.Count > 0 && Names(row.Name, row.NameEnglish).Overlaps(names))
-            {
-                found.Add(Of(row, SameRowReason.Name));
+                found.Add(Of(rowOf[link.Another.Key], reason));
             }
         }
 
-        return [.. found.OrderByDescending(x => x.Reason).ThenByDescending(x => x.IsOwn)];
-    }
-
-    /// <summary>The names a row is known by, each trimmed, with runs of spaces made one and its case folded; none for a name that is empty.</summary>
-    public static HashSet<string> Names(string? name, string? nameEnglish)
-    {
-        return
-        [
-            .. new[] { name, nameEnglish }
-                .Select(x => Spaces().Replace((x ?? string.Empty).Trim(), " ").ToUpperInvariant())
-                .Where(x => x.Length > 0),
-        ];
+        return [.. found.OrderBy(x => RankOf(x.Reason)).ThenByDescending(x => x.IsOwn)];
     }
 
     /// <summary>
-    /// The FEI ID to compare by: an Athlete's as a number, so that <c>00012</c> is <c>12</c>, a Horse's as the text it is, case-folded.
-    /// None for one that is empty, is zero, or is a placeholder made only of one character that is neither a letter nor a digit (<c>-----</c>).
+    /// Why the row is shown: the same FEI ID, or the same name, or a name that is a spelling of it. A FEI ID that the names do
+    /// not bear out is still a FEI ID that is taken, and a name that is another's under a FEI ID that differs is still that name.
     /// </summary>
-    public static string? FeiIdOf(string? feiId, bool isNumber)
+    static SameRowReason? ReasonOf(IdentityKind kind, IdentityObservation typed, IdentityLink link)
     {
-        var text = (feiId ?? string.Empty).Trim();
-        if (text.Length == 0)
+        return link.Class switch
         {
-            return null;
-        }
+            MatchClass.SameFeiId => SameRowReason.FeiId,
+            MatchClass.Conflict => IdentityFeiIds.Of(kind, typed.FeiId) == IdentityFeiIds.Of(kind, link.Another.FeiId)
+                ? SameRowReason.FeiId
+                : SameRowReason.Name,
+            MatchClass.ExactName or MatchClass.StrictTransliteration => SameRowReason.Name,
+            MatchClass.SpellingVariant => SameRowReason.SimilarName,
+            _ => null,
+        };
+    }
 
-        if (isNumber && text.All(char.IsAsciiDigit))
+    static int RankOf(SameRowReason reason)
+    {
+        return reason switch
         {
-            var number = text.TrimStart('0');
-            return number.Length == 0 ? null : number;
-        }
-
-        var folded = text.ToUpper(CultureInfo.InvariantCulture);
-        return folded.Distinct().Count() == 1 && !char.IsAsciiLetterOrDigit(folded[0]) ? null : folded;
+            SameRowReason.FeiId => 0,
+            SameRowReason.Name => 1,
+            _ => 2,
+        };
     }
 
     static SameRow Of(SameRow row, SameRowReason reason)
     {
         return new SameRow(row.Id, row.Name, row.NameEnglish, row.FeiId, row.IsOwn, reason);
     }
-
-    [GeneratedRegex(@"\s+")]
-    private static partial Regex Spaces();
 }

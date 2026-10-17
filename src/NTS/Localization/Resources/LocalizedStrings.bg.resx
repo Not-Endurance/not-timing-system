@@ -1212,6 +1212,9 @@
   <data name="Same_FEI_ID_string" xml:space="preserve">
     <value>същият FEI ID</value>
   </data>
+  <data name="Similar_name_string" xml:space="preserve">
+    <value>подобно име</value>
+  </data>
   <data name="Of_another_federation_string" xml:space="preserve">
     <value>на друга федерация</value>
   </data>

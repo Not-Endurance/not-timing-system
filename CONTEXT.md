@@ -10,11 +10,11 @@ The NTS projects follow the layering of the Not projects, except that the applic
 ### People
 
 **Athlete**:
-The human rider, recognised as the same person across Events. One half of a Combination; a Participation shows the Athlete as entered at that Event.
+The human rider, recognised as the same person across Events. One half of a Combination; a Participation shows the Athlete as entered at that Event. Two copies are one Athlete when they have the same FEI ID, or the same name once trimmed and case-folded, in either script (the Bulgarian name and its Latin form by the official transliteration are the same name), or the same legacy id other than 0; a spelling variant or a near-miss of a name is for a person to decide, a conflict (equal names under different FEI IDs) is held, and the Country and the Club never decide. An Athlete that a Participation refers to is not deleted.
 _Avoid_: Rider, competitor
 
 **Horse**:
-The equine half of a Combination, recognised as the same animal across Events. A Participation shows the Horse as entered at that Event.
+The equine half of a Combination, recognised as the same animal across Events. A Participation shows the Horse as entered at that Event. The rules that make two copies one are the Athlete's, with the FEI ID taken as the text it is; a Horse that a Participation refers to is not deleted.
 
 **Combination**:
 An Athlete and a Horse entered together as a single competitor, identified by a start number. This is the pair that competes — it is *not* a person, and it is *not* called a Participant.

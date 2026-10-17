@@ -1209,6 +1209,9 @@
   <data name="Same_FEI_ID_string" xml:space="preserve">
     <value>the same FEI ID</value>
   </data>
+  <data name="Similar_name_string" xml:space="preserve">
+    <value>a similar name</value>
+  </data>
   <data name="Of_another_federation_string" xml:space="preserve">
     <value>of another federation</value>
   </data>

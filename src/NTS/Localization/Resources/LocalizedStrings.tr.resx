@@ -1162,6 +1162,9 @@
   <data name="Same_FEI_ID_string" xml:space="preserve">
     <value>aynı FEI ID</value>
   </data>
+  <data name="Similar_name_string" xml:space="preserve">
+    <value>benzer bir ad</value>
+  </data>
   <data name="Of_another_federation_string" xml:space="preserve">
     <value>başka bir federasyonun</value>
   </data>

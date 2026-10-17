@@ -414,6 +414,7 @@ namespace NTS.Localization
         public static string Already_registered_string => LocalizeString(nameof(Already_registered_string));
         public static string Same_name_string => LocalizeString(nameof(Same_name_string));
         public static string Same_FEI_ID_string => LocalizeString(nameof(Same_FEI_ID_string));
+        public static string Similar_name_string => LocalizeString(nameof(Similar_name_string));
         public static string Of_another_federation_string => LocalizeString(nameof(Of_another_federation_string));
         public static string Logos_string => LocalizeString(nameof(Logos_string));
         public static string Left_logo_string => LocalizeString(nameof(Left_logo_string));

@@ -28,8 +28,7 @@ public class AthleteMongoRepository : MongoRepository<AthleteModel>
                 .Set(x => x.NameEnglish, document.NameEnglish)
                 .Set(x => x.Club, document.Club)
                 .Set(x => x.Country, document.Country)
-                .Set(x => x.FeiId, document.FeiId)
-                .Set(x => x.User, document.User);
+                .Set(x => x.FeiId, document.FeiId);
         }
         catch (Exception ex)
         {

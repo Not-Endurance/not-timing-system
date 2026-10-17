@@ -87,8 +87,8 @@ internal sealed class CrossTenantRefusedException : InvalidOperationException
 
 /// <summary>
 /// What reaches across Tenants, each read a named capability of a collection and never a flag of a general one
-/// (ADR-0012, #643): an Event by its id, the Events a Main Operator runs, and the search of the registries of Athletes,
-/// Horses, Clubs and Officials. They are the only reads that open a collection of a Tenant without one: each takes only
+/// (ADR-0012, #643): an Event by its id, the Events a Main Operator runs, whether a Participation refers to a row of the
+/// registry (#635), and the search of the registries of Athletes, Horses, Clubs and Officials. They are the only reads that open a collection of a Tenant without one: each takes only
 /// what it needs, matches the text it is given literally, answers at most ten rows with only the fields that are meant to
 /// leave, and the searches ask the policy themselves as a second guard behind their routes. Reading an Event is public
 /// (ADR-0001), so an Event's id is what finds it; what the registries hold is for signed-in accounts alone.
@@ -234,6 +234,31 @@ internal sealed class CrossTenantReads
             .. ids.Where(x => x is BsonBinaryData { SubType: BsonBinarySubType.UuidStandard })
                 .Select(x => x.AsBsonBinaryData.ToGuid(GuidRepresentation.Standard)),
         ];
+    }
+
+    /// <summary>
+    /// Whether any Participation, of any Tenant, of an Event that has started or of one that has not, refers to the Athlete or the
+    /// Horse with the id (#635, ADR-0010): the copies a Participation keeps carry the id of the registry row they come from, so
+    /// a row that is named is the one thing that ties them together. It answers whether and nothing about what or whose, and the
+    /// route that asks it has found the row among the caller's own first.
+    /// </summary>
+    /// <param name="member">The member of the combination that holds the copy: <c>Athlete</c> or <c>Horse</c>.</param>
+    public async Task<bool> IsReferencedByParticipationAsync(
+        string member,
+        Guid id,
+        CancellationToken cancellationToken
+    )
+    {
+        var key = BsonGuids.Binary(id);
+        var started = await Raw(TenantOwned.EVENT_PARTICIPATIONS)
+            .Find(new BsonDocument($"Combination.{member}.{STANDARD_ID}", key))
+            .Limit(1)
+            .AnyAsync(cancellationToken);
+        return started
+            || await Raw(TenantOwned.CONFIGURE_EVENTS)
+                .Find(new BsonDocument($"Competitions.Participations.Combination.{member}.{STANDARD_ID}", key))
+                .Limit(1)
+                .AnyAsync(cancellationToken);
     }
 
     /// <summary>

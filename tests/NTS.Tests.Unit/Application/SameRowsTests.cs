@@ -64,22 +64,66 @@ public sealed class SameRowsTests
         var found = SameRows.Among(rows, null, "New Name", null, feiId, isAthlete);
 
         Assert.Empty(found);
-        Assert.Null(SameRows.FeiIdOf(feiId, isAthlete));
     }
 
     [Fact]
     public void A_FEI_ID_made_of_one_letter_or_one_digit_is_an_ID_and_a_Horses_digits_are_text_and_spaces_around_it_are_not_part_of_it()
     {
-        Assert.Equal("1111", SameRows.FeiIdOf("1111", true));
-        Assert.Equal("1111", SameRows.FeiIdOf("1111", false));
-        Assert.Equal("AAAA", SameRows.FeiIdOf(" aaaa ", false));
-        Assert.Equal("12", SameRows.FeiIdOf(" 0012 ", true));
-        Assert.Equal("0012", SameRows.FeiIdOf(" 0012 ", false)); // the digits of a Horse's ID are the text it is: 0012 is not 12
         var horses = new[] { Row(2, "Other Name", null, "0012"), Row(3, "Another", null, "aaaa") };
+        var athletes = new[] { Row(2, "Other Name", null, "1111") };
 
-        Assert.Empty(SameRows.Among(horses, null, "New Name", null, "12", false));
+        Assert.Empty(SameRows.Among(horses, null, "New Name", null, "12", false)); // the digits of a Horse's ID are the text it is: 0012 is not 12
         Assert.Equal([TestId.Of(2)], SameRows.Among(horses, null, "New Name", null, " 0012", false).Select(x => x.Id));
         Assert.Equal([TestId.Of(3)], SameRows.Among(horses, null, "New Name", null, "AAAA ", false).Select(x => x.Id));
+        Assert.Equal([TestId.Of(2)], SameRows.Among(athletes, null, "New Name", null, "1111", true).Select(x => x.Id));
+        Assert.Equal(
+            [TestId.Of(2)],
+            SameRows.Among(athletes, null, "New Name", null, " 001111", true).Select(x => x.Id)
+        );
+    }
+
+    [Fact]
+    public void A_name_in_the_other_script_is_the_same_name_and_a_spelling_of_it_is_a_similar_one_and_a_near_miss_is_nothing()
+    {
+        var rows = new[] { Row(2, "Мариела Тестова", null), Row(3, "Юлия Тестова", null), Row(4, "Ivan Testov", null) };
+
+        var latin = SameRows.Among(rows, null, "Mariela Testova", null, null, true);
+        var spelled = SameRows.Among(rows, null, "Iuliia Testova", null, null, true);
+        var nearMiss = SameRows.Among(rows, null, "Ivan Testoff", null, null, true);
+
+        Assert.Equal([(TestId.Of(2), SameRowReason.Name)], latin.Select(x => (x.Id, x.Reason)));
+        Assert.Equal([(TestId.Of(3), SameRowReason.SimilarName)], spelled.Select(x => (x.Id, x.Reason)));
+        Assert.Empty(nearMiss);
+    }
+
+    [Fact]
+    public void A_name_that_is_another_Athletes_under_a_FEI_ID_that_differs_is_still_that_name()
+    {
+        var rows = new[] { Row(2, "Мариела Тестова", null, "10012346") };
+
+        var found = SameRows.Among(rows, null, "Mariela Testova", null, "10012345", true);
+
+        Assert.Equal([(TestId.Of(2), SameRowReason.Name)], found.Select(x => (x.Id, x.Reason)));
+    }
+
+    [Fact]
+    public void The_rows_are_told_by_their_FEI_ID_first_then_their_name_then_their_spelling_and_the_Tenants_own_first_among_them()
+    {
+        var rows = new[]
+        {
+            Row(2, "Iuliia Testova", null, null, isOwn: true), // a spelling
+            Row(3, "Юлия Тестова", null, null, isOwn: false), // the name
+            Row(4, "Юлия Тестова", null, null, isOwn: true), // the name, the Tenant's own
+            Row(5, "Nobody", null, "12", isOwn: false), // the FEI ID
+        };
+
+        var found = SameRows.Among(rows, null, "Юлия Тестова", null, "12", true);
+
+        Assert.Equal([TestId.Of(5), TestId.Of(4), TestId.Of(3), TestId.Of(2)], found.Select(x => x.Id));
+        Assert.Equal(
+            [SameRowReason.FeiId, SameRowReason.Name, SameRowReason.Name, SameRowReason.SimilarName],
+            found.Select(x => x.Reason)
+        );
     }
 
     [Fact]
@@ -96,6 +140,16 @@ public sealed class SameRowsTests
 
         Assert.Equal([TestId.Of(3), TestId.Of(2)], found.Select(x => x.Id));
         Assert.Equal([SameRowReason.FeiId, SameRowReason.Name], found.Select(x => x.Reason));
+    }
+
+    [Fact]
+    public void A_row_with_the_same_FEI_ID_and_the_same_name_is_told_by_its_FEI_ID_and_once()
+    {
+        var rows = new[] { Row(2, "Ivan Petrov", null, "12"), Row(3, "Мария Друга", null, "99") };
+
+        var found = SameRows.Among(rows, null, "ivan  petrov", null, "0012", true);
+
+        Assert.Equal([(TestId.Of(2), SameRowReason.FeiId)], found.Select(x => (x.Id, x.Reason)));
     }
 
     [Fact]
