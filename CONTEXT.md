@@ -16,9 +16,12 @@ _Avoid_: Rider, competitor
 **Horse**:
 The equine half of a Combination, recognised as the same animal across Events. A Participation shows the Horse as entered at that Event. The rules that make two copies one are the Athlete's, with the FEI ID taken as the text it is; a Horse that a Participation refers to is not deleted.
 
+**Participant**:
+An Athlete or a Horse: the umbrella term for the two kinds of row of the registry (ADR-0010). A Participant is recognised across Events and Tenants, is found by name in either script, and has a history: the Participations it was in, newest first, each with its placing. It is one half of a Combination, never the Combination itself, and never a ride.
+
 **Combination**:
-An Athlete and a Horse entered together as a single competitor, identified by a start number. This is the pair that competes — it is *not* a person, and it is *not* called a Participant.
-_Avoid_: Participant, pair, entry, competitor
+An Athlete and a Horse entered together as a single competitor, identified by a start number. This is the pair that competes — it is *not* a person, and it is *not* a Participant: each of its halves is one.
+_Avoid_: pair, entry, competitor
 
 **Official**:
 Certified personnel appointed to an event: Ground Jury, Veterinary Commission, Stewards, Technical Delegate, Foreign Judge. Officials are named in produced documents such as Results and FEI exports.
@@ -100,10 +103,10 @@ The Operator's workspace for configuring and running an Event: Setup, the live d
 _Avoid_: Judge, Judge app
 
 **Participation**:
-One Combination's ride at an Event — its category, phases, and outcome. A record of competing, not a competitor and not a person. The same ride can count in the Rankings of more than one Competition.
-_Avoid_: Participant, entry, run
+One Combination's ride at an Event — its category, phases, and outcome: the act of Participants competing, recorded. A record of competing, not a competitor and not a person. The same ride can count in the Rankings of more than one Competition.
+_Avoid_: entry, run
 
-> **"Participant" is not a term in this domain.** The competing pair is a **Combination**; its ride is a **Participation**. Anything named `Participant` is a misnomer to be corrected. `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
+> **A Participant is an Athlete or a Horse, not the pair and not the ride.** The competing pair is a **Combination**; its ride is a **Participation**. A thing named `Participant` that means the pair, the ride or a signed-in account is a misnomer to be corrected: `WitnessAccessLevel.Participant` was one such misnomer and is now `Registered` — "signed in without a write role" (see #592).
 
 **Ranking**:
 The Participations that compete for placement in one Competition and Category, each marked ranked or not ranked. While its Event is Live it holds no placings and Results derive them; once the Event is Historic it keeps its final placings.

@@ -33,7 +33,8 @@ internal sealed class EventDataFamily<TModel, TEntity>
         IEnumerable<string> hidden,
         bool announcesChanges = false,
         IEnumerable<EventDataReference>? referencedBy = null,
-        Func<TModel, bool, TModel>? shownTo = null
+        Func<TModel, bool, TModel>? shownTo = null,
+        IEnumerable<string>? personMembers = null
     )
     {
         Route = route;
@@ -41,6 +42,7 @@ internal sealed class EventDataFamily<TModel, TEntity>
         AnnouncesChanges = announcesChanges;
         ReferencedBy = [.. referencedBy ?? []];
         ShownTo = shownTo;
+        PersonMembers = [.. personMembers ?? []];
         var kept = hidden.ToArray();
         Made = new ReferenceMembers<TModel>(kept, []);
         Changed = new ReferenceMembers<TModel>(kept, [nameof(IEventScoped.EventId)]);
@@ -62,6 +64,12 @@ internal sealed class EventDataFamily<TModel, TEntity>
     /// that has nothing to hide. A Participation tells every caller the times of its Phases and its events to Staff alone.
     /// </summary>
     public Func<TModel, bool, TModel>? ShownTo { get; }
+
+    /// <summary>
+    /// The members, as a filter writes them, that look a person up (ADR-0010): anybody reads what an Event keeps, but a list
+    /// that is cut by the Athlete or the Horse of a row is for a signed-in account, as the history of a Participant is.
+    /// </summary>
+    public IReadOnlyList<string> PersonMembers { get; }
 
     /// <summary>The members a row is made with, and the ones every read shows: all of the model's but the ones kept to the server.</summary>
     public ReferenceMembers<TModel> Made { get; }

@@ -36,7 +36,8 @@ internal static class EventDataFamilies
                 new(TenantOwned.EVENT_RANKINGS, "Entries.ParticipationId"),
                 new(TenantOwned.EVENT_HANDOUTS, nameof(HandoutModel.ParticipationId)),
             ],
-            shownTo: (row, seesTimeEvents) => row.ShownTo(seesTimeEvents)
+            shownTo: (row, seesTimeEvents) => row.ShownTo(seesTimeEvents),
+            personMembers: ["combination/athlete", "combination/horse"]
         );
     }
 

@@ -82,7 +82,15 @@ internal static class EventDataEndpoints
         where TModel : class, IDocument, IEventScoped, IKrudModel<TEntity>, new()
         where TEntity : class, IEntity
     {
-        var eventId = EventFilter.EventOf(context.Request.Query["filter"].ToString());
+        var filter = context.Request.Query["filter"].ToString();
+
+        // A visitor reads what an Event keeps, but does not look a person up in it (ADR-0010).
+        if (context.User.Identity?.IsAuthenticated != true && EventFilter.Names(filter, family.PersonMembers))
+        {
+            return JsonApiResults.NotSignedIn();
+        }
+
+        var eventId = EventFilter.EventOf(filter);
         if (eventId is not { } id)
         {
             return JsonApiResults.Error(

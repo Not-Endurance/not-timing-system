@@ -55,6 +55,30 @@ internal static class ReferencePages
         query = options?.OrderBy != null ? options.OrderBy.ApplyTo(query, settings) : query.OrderBy(x => x.Id);
         return await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
     }
+
+    /// <summary>
+    /// A page of rows that are already in memory (a list that is composed from several collections, such as the history of a
+    /// Participant), filtered and sorted as the options say, and in the order the rows come in when no sort was asked for. An
+    /// expression that the options accept and the rows cannot run is for the caller to correct, as it is for a page of a
+    /// collection: the exception it throws is the caller's to tell apart.
+    /// </summary>
+    public static IReadOnlyList<T> Page<T>(IEnumerable<T> rows, ODataQueryOptions<T>? options, int skip, int take)
+        where T : class
+    {
+        var settings = new ODataQuerySettings();
+        var query = rows.AsQueryable();
+        if (options?.Filter != null)
+        {
+            query = (IQueryable<T>)options.Filter.ApplyTo(query, settings);
+        }
+
+        if (options?.OrderBy != null)
+        {
+            query = options.OrderBy.ApplyTo(query, settings);
+        }
+
+        return [.. query.Skip(skip).Take(take)];
+    }
 }
 
 /// <summary>

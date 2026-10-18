@@ -6,6 +6,7 @@ using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Participants;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Snapshots;
@@ -70,6 +71,9 @@ internal static class ApiPipeline
         app.MapEventGrants();
         app.MapAccountSearch();
         app.MapRegistrySearch();
+        app.MapParticipants();
+        app.MapParticipationHistory();
+        app.MapParticipantLinks();
         app.MapReference();
         app.MapEventData();
         app.MapTimeEventActors();

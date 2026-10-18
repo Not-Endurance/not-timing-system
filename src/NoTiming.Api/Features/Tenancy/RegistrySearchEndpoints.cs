@@ -35,6 +35,55 @@ internal static class RegistrySearchEndpoints
         return app;
     }
 
+    /// <summary>
+    /// What every search of a registry asks before it reads (the rest-api skill): the caller is signed in and may read the
+    /// registries, the request is a search of the form <c>contains(name,'text')</c> and nothing else, the text is long enough,
+    /// and there is room for it in the budget of searches. The caller and the text are the answer, or the answer that refuses.
+    /// </summary>
+    public static async Task<SearchAdmission> AdmitAsync(
+        HttpContext context,
+        UserManager<NIdentityUser> users,
+        SearchRateLimiter limiter
+    )
+    {
+        var user = await users.GetUserAsync(context.User);
+        if (user is null)
+        {
+            return SearchAdmission.Refused(JsonApiResults.NotSignedIn());
+        }
+
+        var caller = AccountRoles.CallerOf(user);
+        var verdict = AccessPolicy.Decide(Capability.ReadRegistryAcrossTenants, caller, AccessScope.Platform);
+        if (!verdict.IsAllowed)
+        {
+            return SearchAdmission.Refused(AccessResults.Refused(verdict));
+        }
+
+        var query = JsonApiQuery.ReadSearch(context.Request, NAME);
+        if (query.Refusal != null)
+        {
+            return SearchAdmission.Refused(query.Refusal);
+        }
+
+        if (query.Text!.Length < CrossTenantReads.MIN_SEARCH_LENGTH)
+        {
+            return SearchAdmission.Refused(
+                JsonApiResults.Error(
+                    StatusCodes.Status400BadRequest,
+                    "search-too-short",
+                    $"Search for at least {CrossTenantReads.MIN_SEARCH_LENGTH} characters."
+                )
+            );
+        }
+
+        if (limiter.TrySearch(user.Id) is { } refusal)
+        {
+            return SearchAdmission.Refused(JsonApiResults.RateLimited(refusal.RetryAfter));
+        }
+
+        return SearchAdmission.Admitted(caller, query.Text);
+    }
+
     /// <summary>The named view <c>/api/{type}/all-tenants</c> of a registry, over the search of that registry.</summary>
     static void MapSearch(IEndpointRouteBuilder app, string type, Func<CrossTenantReads, RegistrySearch> searchOf)
     {
@@ -58,40 +107,13 @@ internal static class RegistrySearchEndpoints
         RegistrySearch search
     )
     {
-        var user = await users.GetUserAsync(context.User);
-        if (user is null)
+        var admission = await AdmitAsync(context, users, limiter);
+        if (admission.Refusal != null)
         {
-            return JsonApiResults.NotSignedIn();
+            return admission.Refusal;
         }
 
-        var caller = AccountRoles.CallerOf(user);
-        var verdict = AccessPolicy.Decide(Capability.ReadRegistryAcrossTenants, caller, AccessScope.Platform);
-        if (!verdict.IsAllowed)
-        {
-            return AccessResults.Refused(verdict);
-        }
-
-        var query = JsonApiQuery.ReadSearch(context.Request, NAME);
-        if (query.Refusal != null)
-        {
-            return query.Refusal;
-        }
-
-        if (query.Text!.Length < CrossTenantReads.MIN_SEARCH_LENGTH)
-        {
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "search-too-short",
-                $"Search for at least {CrossTenantReads.MIN_SEARCH_LENGTH} characters."
-            );
-        }
-
-        if (limiter.TrySearch(user.Id) is { } refusal)
-        {
-            return JsonApiResults.RateLimited(refusal.RetryAfter);
-        }
-
-        var found = await search(caller, query.Text, context.RequestAborted);
+        var found = await search(admission.Caller!, admission.Text!, context.RequestAborted);
         return JsonApiResults.Collection(
             type,
             found.Select(x =>
@@ -112,4 +134,29 @@ internal static class RegistrySearchEndpoints
             )
         );
     }
+}
+
+/// <summary>A search of a registry that may go on, with the caller and the text to look for, or the answer that refuses it.</summary>
+internal sealed class SearchAdmission
+{
+    public static SearchAdmission Admitted(Caller caller, string text)
+    {
+        return new SearchAdmission(caller, text, null);
+    }
+
+    public static SearchAdmission Refused(IResult refusal)
+    {
+        return new SearchAdmission(null, null, refusal);
+    }
+
+    SearchAdmission(Caller? caller, string? text, IResult? refusal)
+    {
+        Caller = caller;
+        Text = text;
+        Refusal = refusal;
+    }
+
+    public Caller? Caller { get; }
+    public string? Text { get; }
+    public IResult? Refusal { get; }
 }

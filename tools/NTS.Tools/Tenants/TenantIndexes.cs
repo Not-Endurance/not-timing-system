@@ -101,6 +101,11 @@ internal static class TenantIndexes
                 )
             ),
             ("event_participations", Plain("participations_by_time_event", new BsonDocument("Phases.Events._id", 1))),
+            (
+                "event_participations",
+                Plain("participations_of_an_athlete", new BsonDocument("Combination.Athlete._id", 1))
+            ),
+            ("event_participations", Plain("participations_of_a_horse", new BsonDocument("Combination.Horse._id", 1))),
             ("users", Plain("accounts_by_tenant", new BsonDocument("Memberships.TenantId", 1))),
         ];
 

@@ -10,6 +10,7 @@ using NTS.Contracts.Core.Models;
 using NTS.Contracts.Shared;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
+using NTS.Domain.Setup.Services.Identities;
 
 namespace NoTiming.Api.Features.Tenancy;
 
@@ -88,10 +89,13 @@ internal sealed class CrossTenantRefusedException : InvalidOperationException
 /// <summary>
 /// What reaches across Tenants, each read a named capability of a collection and never a flag of a general one
 /// (ADR-0012, #643): an Event by its id, the Events a Main Operator runs, whether a Participation refers to a row of the
-/// registry (#635), and the search of the registries of Athletes, Horses, Clubs and Officials. They are the only reads that open a collection of a Tenant without one: each takes only
-/// what it needs, matches the text it is given literally, answers at most ten rows with only the fields that are meant to
-/// leave, and the searches ask the policy themselves as a second guard behind their routes. Reading an Event is public
-/// (ADR-0001), so an Event's id is what finds it; what the registries hold is for signed-in accounts alone.
+/// registry (#635), the search of the registries of Athletes, Horses, Clubs and Officials, and what the history of a
+/// Participant, an Athlete or a Horse, is made of (#638): the Participations of the Participant, the Events and the Rankings those
+/// are in, and the search of both registries by name. They are the only reads that open a collection of a Tenant without one:
+/// each takes only what it needs, matches the text it is given literally, answers at most ten rows with only the fields that are
+/// meant to leave, and the searches ask the policy themselves as a second guard behind their routes. Reading an Event is public
+/// (ADR-0001), so an Event's id is what finds it; what the registries hold, and the Participations of a Participant across
+/// Events, are for signed-in accounts alone.
 /// </summary>
 internal sealed class CrossTenantReads
 {
@@ -259,6 +263,143 @@ internal sealed class CrossTenantReads
                 .Find(new BsonDocument($"Competitions.Participations.Combination.{member}.{STANDARD_ID}", key))
                 .Limit(1)
                 .AnyAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// The Participations of the Athlete with the id, in any Tenant and of any Event (#638, ADR-0010): the copies a
+    /// Participation keeps carry the id of the registry row they come from, so the id finds the rides of a person whatever
+    /// Tenant ran them. A Participation that the Functions host flagged as deleted is not one. Reading across the Events of a
+    /// Participant is for signed-in accounts alone, and the policy is asked here as a second guard behind the route.
+    /// </summary>
+    public Task<IReadOnlyList<ParticipationModel>> ReadRidesOfAthleteAsync(
+        Caller caller,
+        Guid id,
+        CancellationToken cancellationToken
+    )
+    {
+        return ReadRidesAsync("rides of an Athlete", nameof(ParticipantKind.Athlete), caller, id, cancellationToken);
+    }
+
+    /// <summary>The same for the Horse with the id.</summary>
+    public Task<IReadOnlyList<ParticipationModel>> ReadRidesOfHorseAsync(
+        Caller caller,
+        Guid id,
+        CancellationToken cancellationToken
+    )
+    {
+        return ReadRidesAsync("rides of a Horse", nameof(ParticipantKind.Horse), caller, id, cancellationToken);
+    }
+
+    /// <summary>
+    /// The Events that have started with the ids, whatever Tenant they are in, as the public views show them (ADR-0001), but
+    /// for the ones the Functions host flagged as deleted.
+    /// </summary>
+    public async Task<IReadOnlyList<EventInformationModel>> ReadStartedEventsAsync(
+        IReadOnlyCollection<Guid> ids,
+        CancellationToken cancellationToken
+    )
+    {
+        return await ReadOfEventsAsync<EventInformationModel>(
+            TenantOwned.EVENT_INFORMATIONS,
+            STANDARD_ID,
+            ids,
+            cancellationToken
+        );
+    }
+
+    /// <summary>
+    /// The Rankings of the Events with the ids, whatever Tenant they are in, as the public views show them (ADR-0001), but for
+    /// the ones the Functions host flagged as deleted.
+    /// </summary>
+    public async Task<IReadOnlyList<RankingModel>> ReadRankingsOfEventsAsync(
+        IReadOnlyCollection<Guid> eventIds,
+        CancellationToken cancellationToken
+    )
+    {
+        return await ReadOfEventsAsync<RankingModel>(
+            TenantOwned.EVENT_RANKINGS,
+            "EventId",
+            eventIds,
+            cancellationToken
+        );
+    }
+
+    /// <summary>
+    /// Every Participation of the Event with the id, as the public views show them (ADR-0001), but for the ones the Functions
+    /// host flagged as deleted: what a Ranking that holds no ranks is ranked over.
+    /// </summary>
+    public async Task<IReadOnlyList<ParticipationModel>> ReadParticipationsOfEventAsync(
+        Guid eventId,
+        CancellationToken cancellationToken
+    )
+    {
+        return await ReadOfEventsAsync<ParticipationModel>(
+            TenantOwned.EVENT_PARTICIPATIONS,
+            "EventId",
+            [eventId],
+            cancellationToken
+        );
+    }
+
+    /// <summary>
+    /// The Athletes and the Horses of every Tenant that the text finds by their name (#638, ADR-0010): in either script, as a
+    /// part of each word of the text in any order (<see cref="IdentitySearch"/>), at most ten, each with its names and nothing
+    /// else. The registries are read for the names alone and the text is matched here, because the key that makes a Latin
+    /// text find a Cyrillic name is not stored.
+    /// </summary>
+    public async Task<IReadOnlyList<Participant>> SearchParticipantsAsync(
+        Caller caller,
+        string text,
+        CancellationToken cancellationToken
+    )
+    {
+        var needle = Needle("search of Athletes and Horses", caller, text);
+        var found = new List<Participant>();
+        foreach (var kind in Enum.GetValues<ParticipantKind>())
+        {
+            var rows = await Raw(RegistryOf(kind))
+                .Find(FilterDefinition<BsonDocument>.Empty)
+                .Project(ParticipantFields())
+                .ToListAsync(cancellationToken);
+            found.AddRange(
+                rows.Select(x => ParticipantOf(kind, x))
+                    .OfType<Participant>()
+                    .Where(x => IdentitySearch.Matches(needle, x.Name, x.NameEnglish))
+            );
+        }
+
+        return
+        [
+            .. found
+                .OrderBy(x => IdentityNames.Looser(x.Name), StringComparer.Ordinal)
+                .ThenBy(x => x.Id)
+                .Take(MAX_MATCHES),
+        ];
+    }
+
+    /// <summary>
+    /// The Athletes or the Horses with the ids, of any Tenant, as the names they were registered with (#638): what a person
+    /// who has linked themselves to rows of the registries is shown of them. An id that is no row of the registry is not in
+    /// the answer.
+    /// </summary>
+    public async Task<IReadOnlyList<Participant>> FindParticipantsAsync(
+        Caller caller,
+        ParticipantKind kind,
+        IReadOnlyCollection<Guid> ids,
+        CancellationToken cancellationToken
+    )
+    {
+        Allow("registry names", caller);
+        if (ids.Count == 0)
+        {
+            return [];
+        }
+
+        var rows = await Raw(RegistryOf(kind))
+            .Find(new BsonDocument(STANDARD_ID, InAny(ids)))
+            .Project(ParticipantFields())
+            .ToListAsync(cancellationToken);
+        return [.. rows.Select(x => ParticipantOf(kind, x)).OfType<Participant>()];
     }
 
     /// <summary>
@@ -453,16 +594,87 @@ internal sealed class CrossTenantReads
     /// </summary>
     static string Needle(string read, Caller caller, string text)
     {
+        Allow(read, caller);
+        var needle = text.Trim();
+        return needle.Length < MIN_SEARCH_LENGTH
+            ? throw new ArgumentException($"A search is for at least {MIN_SEARCH_LENGTH} characters.", nameof(text))
+            : needle;
+    }
+
+    /// <summary>The second guard of a read of what the registries hold: the policy has to allow it to the caller, which it does for any account.</summary>
+    static void Allow(string read, Caller caller)
+    {
         var verdict = AccessPolicy.Decide(Capability.ReadRegistryAcrossTenants, caller, AccessScope.Platform);
         if (!verdict.IsAllowed)
         {
             throw new CrossTenantRefusedException(read, verdict.Reason!.Value);
         }
+    }
 
-        var needle = text.Trim();
-        return needle.Length < MIN_SEARCH_LENGTH
-            ? throw new ArgumentException($"A search is for at least {MIN_SEARCH_LENGTH} characters.", nameof(text))
-            : needle;
+    async Task<IReadOnlyList<ParticipationModel>> ReadRidesAsync(
+        string read,
+        string member,
+        Caller caller,
+        Guid id,
+        CancellationToken cancellationToken
+    )
+    {
+        Allow(read, caller);
+        return await _database
+            .GetCollection<ParticipationModel>(TenantOwned.EVENT_PARTICIPATIONS)
+            .Find(Undeleted(new BsonDocument($"Combination.{member}.{STANDARD_ID}", BsonGuids.Binary(id))))
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>The documents of a collection, found by the member that holds the id of their Event, but for the ones flagged as deleted.</summary>
+    async Task<IReadOnlyList<T>> ReadOfEventsAsync<T>(
+        string collection,
+        string member,
+        IReadOnlyCollection<Guid> ids,
+        CancellationToken cancellationToken
+    )
+    {
+        return ids.Count == 0
+            ? []
+            : await _database
+                .GetCollection<T>(collection)
+                .Find(Undeleted(new BsonDocument(member, InAny(ids))))
+                .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>The documents that the Functions host did not delete, which it did by flagging them: a member it never wrote is not a flag.</summary>
+    static BsonDocument Undeleted(BsonDocument conditions)
+    {
+        conditions["IsDeleted"] = new BsonDocument("$ne", true);
+        return conditions;
+    }
+
+    static BsonDocument InAny(IEnumerable<Guid> ids)
+    {
+        return new BsonDocument("$in", new BsonArray(ids.Select(x => (BsonValue)BsonGuids.Binary(x))));
+    }
+
+    static string RegistryOf(ParticipantKind kind)
+    {
+        return kind == ParticipantKind.Athlete ? "athletes" : "horses";
+    }
+
+    static BsonDocument ParticipantFields()
+    {
+        return new BsonDocument
+        {
+            { STANDARD_ID, 1 },
+            { "Name", 1 },
+            { "NameEnglish", 1 },
+        };
+    }
+
+    /// <summary>The names of a row of a registry, none for a document that has no id of the shape the application writes or no name.</summary>
+    static Participant? ParticipantOf(ParticipantKind kind, BsonDocument row)
+    {
+        return BsonGuids.Of(row, STANDARD_ID) is { } id && TextOf(row, "Name") is { } name
+            ? new Participant(kind, id, name, TextOf(row, "NameEnglish"))
+            : null;
     }
 
     /// <summary>Any of the fields contains the text, in any case, as it is written: it is never a pattern.</summary>

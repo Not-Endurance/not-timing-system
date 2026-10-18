@@ -4,6 +4,7 @@ using NoTiming.Api.Features.Branding;
 using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Participants;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Snapshots;
@@ -78,6 +79,9 @@ internal static class ApiServices
             .ValidateOnStart();
         services.AddSingleton<SearchRateLimiter>();
         services.AddSingleton<UserSessionStore>();
+        services.AddSingleton<ParticipationHistoryReader>();
+        services.AddSingleton<ParticipantLinkStore>();
+        services.AddSingleton<LinkedParticipants>();
 
         services.AddSignalR(options =>
         {

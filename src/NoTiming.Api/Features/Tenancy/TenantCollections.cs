@@ -10,8 +10,8 @@ namespace NoTiming.Api.Features.Tenancy;
 /// The collections whose documents belong to a Tenant (ADR-0012, #643): every document carries the id of its Tenant in
 /// <c>TenantId</c>, and every one of these collections is read and written through <see cref="TenantCollection"/> and
 /// never directly. A collection that no Tenant owns is not in the list and cannot be opened that way: accounts, the
-/// countries and the Tenants are global, the state a person keeps per Event is the person's own, and the pending
-/// Snapshots go with the Functions API.
+/// countries and the Tenants are global, the state a person keeps per Event and the links they make to the registries
+/// (#638) are the person's own, and the pending Snapshots go with the Functions API.
 /// </summary>
 internal static class TenantOwned
 {
