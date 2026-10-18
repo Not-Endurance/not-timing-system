@@ -14,6 +14,7 @@ dotnet run --project tools/NTS.Tools -- <command> [options]
 | `migrate-phase-times` | Turns the flat Arrive, Present and Represent times of every Phase into time events, renames the Representation request, and drops the snapshot-results collection (below). |
 | `migrate-event-liveness` | Removes the `IsActive` flag from every Event, after listing the Events that were inactive and whose last day is still ahead, which are Live again (below). |
 | `migrate-tenants` | Turns the data of before Tenants into the data of Tenants, and marks the database with the environment it is (below). |
+| `migrate-identities` | A dry run that groups the copies of every Athlete and Horse into the identities they are, and writes a report and a file of decisions for the owner (below). |
 | `mark-environment` | Says which environment a database is: Production, Staging or Development (below). |
 | `seed-staging` | Makes a Tenant Root, a Main Operator, Officials, Operators and a Live Event on a staging database (below). |
 | `seed-tenant-root` | Makes an account a Tenant Root of a Tenant, which makes the Tenant operational (below). |
@@ -244,6 +245,52 @@ The order of the migrations and the steps of the cutover are owned by the runboo
 6. **Run it once more after the ids are converted** (`migrate-identities`, #637): the documents the command counts as having another id (accounts, Events and their Setups that are not UUIDs yet) are left as they are until then, and the report says how many wait.
 
 The Api and the Ui are deployed together afterwards, as the runbook of #648 has it. There is no dual-read and no lazy upgrade: the code that is deployed reads only the new shape.
+
+## migrate-identities
+
+```powershell
+dotnet run --project tools/NTS.Tools -- migrate-identities --connection-string <mongo> [--database nts] [--report <path>] [--decisions <path>]
+```
+
+ADR-0010 registers an Athlete and a Horse once, in Setup, and every copy of one carries the Guid of its row. Today one person exists as dozens of copies, with ids that were minted per copy or are 0, names in Bulgarian in some Events and in Latin in others, and a FEI ID on a minority. This command is the first half of the migration that builds the registry from them: **a dry run, which changes nothing in the database**. It reads, groups the copies by the rules of the matching service (`NTS.Domain.Setup.Services.Identities`, the rules the registry form and the search use too), and writes two files for the owner. Applying what the owner decides is #637; until then this command takes no `--apply`, and an option it does not have is refused.
+
+- **It reads** every collection that holds an Athlete or a Horse, in whichever shape it has: the rows of Setup (`athletes`, `horses`), the Combinations of a configure event (its pool and the Participations of its Competitions), the Participations of a started Event, and the copies of a Participation that a Ranking and a Handout of before ADR-0006 still embed. A person is whatever is stored under a field called `Athlete` or `Horse`, so a nested shape is read as well. It also reads the names and the dates of the Events, to show them as evidence. The id 0 is no id. The integer id of a copy is its legacy id; a Guid or an object id is not one.
+- **It is read-only and deterministic.** The same data and the same decisions give the same report, byte for byte: nothing in it is a date of the run or a path, and the order of everything is that of the keys, whatever the order the documents came in. The reads are paged (100 documents at a time, in the order of the ids, so a page does not overlap the next) and a page is asked for again after the wait the server asks for when Cosmos DB for MongoDB throttles it (error 16500, `RetryAfterMs`), so it works on Cosmos DB for MongoDB and on Atlas. Run it with the hosts stopped, or on a restored copy: a collection that changes while it is read can show a document twice or not at all.
+- **The report** (`--report`, default `.tmp/migrate-identities/report.md`) is Markdown: first the counts for Athletes and Horses (copies read and where they were, distinct spellings and legacy ids, identities found, Setup rows that exist, rows that would be created, Setup duplicates that would merge, copies whose Setup row is gone, items left to review); then **one section per automatic rule** (same FEI ID, same name, same name in another script, same legacy id) that lists each pair of spellings it makes one, so that no merge is silent; the Setup duplicates; the rows that would be created; and the **review list**: groups that are held, conflicts, spelling variants and near misses, each under its key with the evidence for every spelling: its FEI ID, legacy id, Country as stored (`Bulgaria (BGR)` and `Bulgaria (BG/BUL)` show apart), Club, copies by place and the rides they are of (a Participation that two Rankings copy is one ride), the Events with their dates, the Horses or Athletes it was entered with, and whether the two sides were ever in the same Event, which two people can be and one cannot.
+- **The decisions file** (`--decisions`, default `.tmp/migrate-identities/decisions.json`) is JSON. The dry run writes it as a template with every item still to decide, and reads it back on the next run:
+
+  ```json
+  {
+    "rules": { "Held": null, "Conflict": null, "SpellingVariant": null, "NearMiss": "different" },
+    "items": {
+      "athlete (fei 100): stefan kolev <> athlete (fei 101): stefan kolev": "different",
+      "athlete (fei 400): nikola todorov <> athlete: nikola todorow": "same",
+      "horse: thunderbold <> horse: thunderbolt": null
+    }
+  }
+  ```
+
+  An item is `same` (one Athlete or Horse), `different` (two, and it is settled) or empty (still to decide, and so two for now). The **key** of an item is made of the normalised spellings of both groups (trimmed, spaces collapsed, lower case, in order) and their FEI IDs, never a database id, so it is the same on the next run, on a restored copy and after the ids are Guids; the report prints each item under its key to be found in the file. A **rule** settles every item of a class (`Held`, `Conflict`, `SpellingVariant`, `NearMiss`) that has no decision of its own, and an item's own decision beats the rule. A later run applies the decisions and no longer lists a settled item; it keeps everything the owner wrote in the file (and what it does not know of), adds the items that are new, and writes the file only when that changes it and the owner has not saved it since the run began (a decision saved while the run read the database is kept, the run says so, and is made again). A file that is not valid (not JSON, a word that is not `same` or `different`, a rule that is not a class) stops the run before anything is read or written, naming the item.
+- **Held groups.** Spellings that an automatic rule joins through a chain can still disagree: two of them are equal names under different FEI IDs, say, joined by a third that has none. Such a group is held whole, and nothing in it merges by itself: it is decided as a whole (`same` makes it one, `different` keeps every spelling apart), under the key of the group. A `same` for a pair next to a group that is held and undecided waits for it, and the report says so.
+- **The report also says** which decisions match nothing in this data (a typing mistake, or data that has changed), which `different` is overruled by other decisions of `same` that join the two (a contradiction, to resolve before applying), and which decision waits for a held group.
+
+### What the owner reads and decides
+
+1. Run the dry run, open the report, and read the counts. The rows that would be created and the copies whose Setup row is gone are people who rode but are not in Setup.
+2. Go through the review list. Decide each item in the decisions file, or set a rule for a class when the whole class is alike (near misses of Horses that are plainly different animals, say), and run the dry run again until nothing is left, or what is left is to stay as it is: items still undecided when the tool is applied stay separate identities.
+3. Keep both files out of git. They hold real names; the default folder `.tmp` is ignored, and a test pins that.
+
+### Readings of the rules that the report shows
+
+ADR-0010 has them: a zero FEI ID is none for both kinds; two different FEI IDs under names that are only a near miss are two people and are not listed; a legacy id shared under different FEI IDs is a conflict; a near miss is at most two edits of the words of the looser key **and fewer than half the length of the shorter name**, so that `Max` and `Mia` are not listed. The dry run ignores `TenantId`: the registry is one across Tenants.
+
+### The cutover
+
+The order of the migrations and the steps of the cutover are owned by the runbook of [#648](https://github.com/Not-Endurance/not-timing-system/issues/648); this is what concerns this command.
+
+- It runs last of the data migrations (ADR-0009), after `migrate-participation-copies`, which turns the Ranking and Handout copies into references (so on migrated data the Rankings and Handouts hold no person and the counts for them are 0), and after `migrate-tenants`.
+- Staging first, then a rehearsal on a restored copy of production data, with the report read and the decisions taken on the copy; the decisions are keys of spellings, so they carry over to production.
+- It is deleted after the deploy, like the other migrations: the folder `tools/NTS.Tools/IdentityMigration`, its line in `Program.cs` and this section, and its tests (`Temporary/Identity*Tests.cs`, `IdentityMigrationDocuments.cs`, `OutputFilesTests.cs`, `ThrottledReadsTests.cs` and `IdentitiesMigrationToolTests.cs` of the unit tests, `IdentitiesMigrationTests.cs` and `Infrastructure/IdentityRegistryData.cs` of the integration tests, and the reference to `NTS.Tools` in `NTS.Tests.Unit.csproj`).
 
 ## seed-staging
 
