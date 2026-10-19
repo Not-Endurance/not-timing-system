@@ -1300,4 +1300,40 @@
   <data name="Timeline_cleared_string" xml:space="preserve">
     <value>yok</value>
   </data>
+  <data name="My_participations_string" xml:space="preserve">
+    <value>Katılımlarım</value>
+  </data>
+  <data name="Show_more_string" xml:space="preserve">
+    <value>Daha fazla göster</value>
+  </data>
+  <data name="Also_counted_in_string" xml:space="preserve">
+    <value>Ayrıca şurada sayıldı</value>
+  </data>
+  <data name="No_participations_string" xml:space="preserve">
+    <value>Henüz katılım yok.</value>
+  </data>
+  <data name="Name_of_an_Athlete_or_a_Horse_string" xml:space="preserve">
+    <value>Bir binici veya atın adı</value>
+  </data>
+  <data name="My_Athlete_string" xml:space="preserve">
+    <value>Binicim</value>
+  </data>
+  <data name="My_Athlete_helper_string" xml:space="preserve">
+    <value>Yalnızca sizin için bir yer imi: bununla hiçbir şey verilmez.</value>
+  </data>
+  <data name="Add_a_Horse_string" xml:space="preserve">
+    <value>At ekle</value>
+  </data>
+  <data name="Remove__string" xml:space="preserve">
+    <value>{0} öğesini kaldır</value>
+  </data>
+  <data name="Horses_helper_string" xml:space="preserve">
+    <value>Binicinizin bindiği atlar sizin için listelenir. Eklediğiniz atlar kaldırılabilir.</value>
+  </data>
+  <data name="Competition_string" xml:space="preserve">
+    <value>Yarışma</value>
+  </data>
+  <data name="Nothing_found_string" xml:space="preserve">
+    <value>Hiçbir şey bulunamadı</value>
+  </data>
 </root>

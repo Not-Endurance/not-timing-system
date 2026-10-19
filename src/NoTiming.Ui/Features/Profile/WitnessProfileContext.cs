@@ -4,6 +4,7 @@ using Not.Application.CRUD.Ports;
 using Not.Application.HTTP;
 using Not.Injection;
 using NoTiming.Ui.Features.Account;
+using NoTiming.Ui.Features.Participants;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Profile;
 using NTS.Domain.Aggregates;
@@ -19,6 +20,7 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
 {
     readonly IRepository<Country> _countries;
     readonly JsonApiClient _api;
+    readonly SemaphoreSlim _linking = new(1, 1); // a link is made after the one before it, so that the profile that is kept is the latest
     IReadOnlyList<Country> _countryList = [];
 
     public WitnessProfileContext(IAccountSession account, IRepository<Country> countries, JsonApiClient api)
@@ -133,6 +135,64 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
         return saved;
     }
 
+    public Task LinkAthlete(Guid athleteId)
+    {
+        return Change(HttpMethod.Post, $"athletes/{athleteId}/link");
+    }
+
+    public async Task UnlinkAthlete()
+    {
+        if (Profile?.Athlete is { } athlete)
+        {
+            await Change(HttpMethod.Delete, $"athletes/{athlete.Id}/link");
+        }
+    }
+
+    public Task AddHorse(Guid horseId)
+    {
+        return Change(HttpMethod.Post, $"horses/{horseId}/link");
+    }
+
+    public Task RemoveHorse(Guid horseId)
+    {
+        return Change(HttpMethod.Delete, $"horses/{horseId}/link");
+    }
+
+    /// <summary>
+    /// Makes or takes away a link at the host and reads the profile again, so that what is shown is what the host keeps and
+    /// not what the person asked for. A link that is gone when it is taken away is taken away all the same.
+    /// </summary>
+    async Task Change(HttpMethod method, string link)
+    {
+        if (Profile == null)
+        {
+            throw new InvalidOperationException("Cannot link before somebody is signed in.");
+        }
+
+        await _linking.WaitAsync();
+        try
+        {
+            var changed = await _api.Send(method, link);
+            if (!changed.IsSuccess && !(method == HttpMethod.Delete && changed.IsNotFound))
+            {
+                throw changed.ToException();
+            }
+
+            var read = await _api.Send(HttpMethod.Get, "me/profile");
+            if (!read.IsSuccess)
+            {
+                throw read.ToException();
+            }
+
+            Profile = ProfileOf(read.Document!.Value);
+            EmitChanged();
+        }
+        finally
+        {
+            _linking.Release();
+        }
+    }
+
     Country? ResolveCountry(AccountProfile? profile)
     {
         return _countryList.FirstOrDefault(country => country.Id == profile?.CountryId)
@@ -153,6 +213,14 @@ public class WitnessProfileContext : AccountAwareContext, IWitnessProfileContext
             FeiId = Text(attributes, "feiId"),
             Complete =
                 attributes.TryGetProperty("complete", out var complete) && complete.ValueKind == JsonValueKind.True,
+            Athlete =
+                attributes.TryGetProperty("athlete", out var athlete) && athlete.ValueKind == JsonValueKind.Object
+                    ? ParticipantJson.NameIn(athlete)
+                    : null,
+            Horses =
+                attributes.TryGetProperty("horses", out var horses) && horses.ValueKind == JsonValueKind.Array
+                    ? [.. horses.EnumerateArray().Select(ParticipantJson.NameIn)]
+                    : [],
         };
     }
 

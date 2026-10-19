@@ -2,6 +2,7 @@ using System.Globalization;
 using Not.Exceptions;
 using NoTiming.Api.Features.Tenancy;
 using NTS.Contracts.Core.Models;
+using NTS.Contracts.Features.Participants;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;

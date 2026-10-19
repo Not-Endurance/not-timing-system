@@ -1347,4 +1347,40 @@
   <data name="Timeline_cleared_string" xml:space="preserve">
     <value>none</value>
   </data>
+  <data name="My_participations_string" xml:space="preserve">
+    <value>My Participations</value>
+  </data>
+  <data name="Show_more_string" xml:space="preserve">
+    <value>Show more</value>
+  </data>
+  <data name="Also_counted_in_string" xml:space="preserve">
+    <value>Also counted in</value>
+  </data>
+  <data name="No_participations_string" xml:space="preserve">
+    <value>No Participations yet.</value>
+  </data>
+  <data name="Name_of_an_Athlete_or_a_Horse_string" xml:space="preserve">
+    <value>Name of an Athlete or a Horse</value>
+  </data>
+  <data name="My_Athlete_string" xml:space="preserve">
+    <value>My Athlete</value>
+  </data>
+  <data name="My_Athlete_helper_string" xml:space="preserve">
+    <value>Only a bookmark for you: nothing is granted by it.</value>
+  </data>
+  <data name="Add_a_Horse_string" xml:space="preserve">
+    <value>Add a Horse</value>
+  </data>
+  <data name="Remove__string" xml:space="preserve">
+    <value>Remove {0}</value>
+  </data>
+  <data name="Horses_helper_string" xml:space="preserve">
+    <value>The Horses your Athlete has ridden are listed for you. The Horses you add can be removed.</value>
+  </data>
+  <data name="Competition_string" xml:space="preserve">
+    <value>Competition</value>
+  </data>
+  <data name="Nothing_found_string" xml:space="preserve">
+    <value>Nothing found</value>
+  </data>
 </root>

@@ -9,8 +9,12 @@ the browser sends to the page's own origin and the app cannot read. The app asks
   were on (only a path of this site is passed on). Signing out is `DELETE /api/sessions/current`, followed by loading
   the app again as a visitor.
 - What a page asks of a person is decided in one place (`WitnessRoutePolicy`, applied by `AccountRouteGate`): everything
-  that only shows is public, sending Snapshots and the profile need a person who is signed in, and sending Snapshots also
-  waits for a complete profile. The Api decides what is allowed whatever a page shows (ADR-0012).
+  that only shows is public, sending Snapshots, the profile and the search for the Participations of an Athlete or a Horse
+  (#639, ADR-0010) need a person who is signed in, and sending Snapshots also waits for a complete profile. The Api
+  decides what is allowed whatever a page shows (ADR-0012), and the drawer offers those pages to a person who is signed in
+  alone.
+- The Api tells names and words in the language of the request, so every request carries the language the app is in
+  (`Accept-Language`, from the culture the person chose), which is not always the language of the browser.
 - What depends on who is signed in (`AccountAwareContext`: the profile, the access level) loads again when the account
   changes. What a person keeps per Event (the selected and the sent Snapshots) is kept by the Api under their account
   (`/api/user-sessions`), not in the browser.

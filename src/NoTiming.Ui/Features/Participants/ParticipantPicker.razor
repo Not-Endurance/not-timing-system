@@ -1,0 +1,28 @@
+@using NTS.Contracts.Features.Participants
+@using Not.Blazor.Components.Input
+
+@inherits ParticipantPickerBehind
+
+<NAutocomplete T="ParticipantName"
+               @key="Generation"
+               Value="Chosen"
+               ValueChanged="Choose"
+               Label="@Label"
+               HelperText="@HelperText"
+               SearchSafe="FindSafe"
+               ToStringFunc="@(participant => participant?.DisplayName ?? string.Empty)"
+               MinCharacters="MinCharacters"
+               DebounceInterval="DEBOUNCE_MILLISECONDS"
+               Clearable="true"
+               OnClearButtonClick="Clear"
+               data-testid="participant-picker">
+    <ItemTemplate Context="participant">
+        <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="participant-match" data-testid="participant-match">
+            <MudText>@participant!.DisplayName</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">@KindText(participant)</MudText>
+        </MudStack>
+    </ItemTemplate>
+    <NoItemsTemplate>
+        <MudText Typo="Typo.body2" Class="pa-2">@Nothing_found_string</MudText>
+    </NoItemsTemplate>
+</NAutocomplete>

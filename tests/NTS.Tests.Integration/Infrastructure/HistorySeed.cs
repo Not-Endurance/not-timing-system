@@ -163,6 +163,96 @@ internal static class HistorySeed
         return new Ranking(name, ruleset, category, null, null, null, null, null, entries, eventId, id);
     }
 
+    /// <summary>
+    /// A ride of the Event, stored with the Ranking of its own Competition (Senior, FEI) that counts it: ranked with the rank
+    /// given, or not ranked, or eliminated.
+    /// </summary>
+    public static async Task<Participation> RideAsync(
+        string mongoConnectionString,
+        string tenant,
+        Guid eventId,
+        int number,
+        Participant athlete,
+        Participant horse,
+        int rank = 1,
+        bool notRanked = false,
+        Eliminated? eliminated = null,
+        string competition = "CEI 1*"
+    )
+    {
+        var ride = Ride(eventId, number, athlete, horse, competition, eliminated: eliminated);
+        await EventSeed.ParticipationAsync(mongoConnectionString, tenant, ride);
+        await EventSeed.RankingAsync(
+            mongoConnectionString,
+            tenant,
+            Ranking(
+                eventId,
+                competition,
+                CompetitionRuleset.FEI,
+                ParticipationCategory.Senior,
+                new RankingEntry(ride.Id, notRanked, notRanked ? null : rank)
+            )
+        );
+        return ride;
+    }
+
+    /// <summary>Another Ranking of the Event, which counts the ride too, with the rank given.</summary>
+    public static async Task CountAlsoAsync(
+        string mongoConnectionString,
+        string tenant,
+        Guid eventId,
+        string name,
+        Participation ride,
+        int rank,
+        ParticipationCategory category = ParticipationCategory.Senior
+    )
+    {
+        await EventSeed.RankingAsync(
+            mongoConnectionString,
+            tenant,
+            Ranking(eventId, name, CompetitionRuleset.Regional, category, new RankingEntry(ride.Id, false, rank))
+        );
+    }
+
+    /// <summary>
+    /// What the account has linked itself to: the Athlete that is the person, and the Horses they added. The links are one
+    /// document for the account, whose id is the account's.
+    /// </summary>
+    public static async Task LinkAsync(string mongoConnectionString, Guid account, Guid? athlete, params Guid[] horses)
+    {
+        var links = new BsonDocument
+        {
+            { "_id", EventSeed.Binary(account) },
+            { "HorseIds", new BsonArray(horses.Select(EventSeed.Binary)) },
+        };
+        if (athlete != null)
+        {
+            links["AthleteId"] = EventSeed.Binary(athlete.Value);
+        }
+
+        await RegistrySeed.Collection(mongoConnectionString, "user_links").InsertOneAsync(links);
+    }
+
+    /// <summary>
+    /// Letters that a Latin name and a Cyrillic one write the same, as a text for a name to hold: a Participant whose name has the
+    /// one is found by the other. The database is shared by every test, and a search reads all of it, so each test has a text of
+    /// its own.
+    /// </summary>
+    public static (string Latin, string Cyrillic) NameMarker()
+    {
+        const string LATIN = "bdlmnprt";
+        const string CYRILLIC = "бдлмнпрт";
+        var letters = Enumerable.Range(0, 8).Select(_ => Random.Shared.Next(LATIN.Length)).ToList();
+        return (string.Concat(letters.Select(x => LATIN[x])), string.Concat(letters.Select(x => CYRILLIC[x])));
+    }
+
+    /// <summary>Takes the stored Participation away.</summary>
+    public static async Task DeleteAsync(string mongoConnectionString, Guid participationId)
+    {
+        await Participations(mongoConnectionString)
+            .DeleteOneAsync(new BsonDocument("_id", EventSeed.Binary(participationId)));
+    }
+
     /// <summary>Marks the stored Participation as one that was deleted before the Api stopped keeping the flag.</summary>
     public static async Task SoftDeleteAsync(string mongoConnectionString, Guid participationId)
     {

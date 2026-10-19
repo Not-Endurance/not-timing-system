@@ -1,4 +1,5 @@
 using NoTiming.Api.Features.Tenancy;
+using NTS.Contracts.Features.Participants;
 using NTS.Domain.Core.Aggregates;
 
 namespace NoTiming.Api.Features.Participants;

@@ -1,0 +1,11 @@
+@inherits ParticipantDialogBehind
+
+<MudDialog>
+    <DialogContent>
+        <ParticipationHistoryList Kind="Participant.Kind" Id="Participant.Id" />
+    </DialogContent>
+
+    <DialogActions>
+        <NButtonSecondary Text="@Close_string" OnClick="CancelDialog" />
+    </DialogActions>
+</MudDialog>

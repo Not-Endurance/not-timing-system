@@ -1,6 +1,7 @@
 using System.Globalization;
 using Not.Identity;
 using NoTiming.Api.Features.Tenancy;
+using NTS.Contracts.Features.Participants;
 
 namespace NoTiming.Api.Features.Participants;
 

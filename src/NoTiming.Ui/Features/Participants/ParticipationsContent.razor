@@ -1,0 +1,18 @@
+@using Not.Blazor.Components.Layout
+
+@attribute [Route(PARTICIPATIONS_PAGE)]
+@inherits ParticipationsContentBehind
+
+<NContent Title="@Participations_string">
+    <Main>
+        <MudStack Spacing="3">
+            <ParticipantPicker Label="@Name_of_an_Athlete_or_a_Horse_string" OnChosen="Choose" />
+
+            @if (Chosen != null)
+            {
+                <MudText Typo="Typo.h6" data-testid="chosen-participant">@Chosen.DisplayName <MudText Typo="Typo.caption" Inline="true" Color="Color.Secondary">@KindText</MudText></MudText>
+                <ParticipationHistoryList Kind="Chosen.Kind" Id="Chosen.Id" />
+            }
+        </MudStack>
+    </Main>
+</NContent>

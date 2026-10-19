@@ -1,5 +1,6 @@
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.JsonApi;
+using NTS.Contracts.Features.Participants;
 
 namespace NoTiming.Api.Features.Participants;
 

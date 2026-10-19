@@ -1,0 +1,90 @@
+@using NTS.Contracts.Features.Participants
+@inherits ParticipationHistoryListBehind
+
+<div data-testid="participation-history" data-participant="@Id">
+    @if (IsLoading && Rows.Count == 0)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else if (IsEmpty)
+    {
+        <MudText Typo="Typo.body2" data-testid="participation-history-empty">@No_participations_string</MudText>
+    }
+    else if (HasFailed && Rows.Count == 0)
+    {
+        <NButtonSecondary Text="@Reload_string" OnClick="ShowMore" />
+    }
+    else
+    {
+        <MudTable T="HistoricParticipation"
+                  Items="Rows"
+                  Dense="true"
+                  Hover="true"
+                  Elevation="0"
+                  Breakpoint="Breakpoint.Sm"
+                  OnRowClick="Toggle"
+                  RowClass="participation-row"
+                  RowStyle="cursor:pointer">
+            <HeaderContent>
+                <MudTh></MudTh>
+                <MudTh>@Date_string</MudTh>
+                <MudTh>@OtherHeading</MudTh>
+                <MudTh>@Location_string</MudTh>
+                <MudTh>@Competition_string</MudTh>
+                <MudTh>@Place_string</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudIconButton Icon="@IconOf(context)"
+                                   Size="Size.Small"
+                                   ClickPropagation="true"
+                                   aria-expanded="@(IsOpen(context) ? "true" : "false")"
+                                   aria-label="@LabelOf(context)" />
+                </MudTd>
+                <MudTd DataLabel="@Date_string">
+                    <span data-testid="participation-date">@DayOf(context)</span>
+                </MudTd>
+                <MudTd DataLabel="@OtherHeading">
+                    <span data-testid="participation-other">@context.Other.DisplayName</span>
+                </MudTd>
+                <MudTd DataLabel="@Location_string">
+                    <span data-testid="participation-location">@context.Location</span>
+                </MudTd>
+                <MudTd DataLabel="@Competition_string">
+                    <span class="participation-competition" title="@context.Competition" data-testid="participation-competition">@context.Competition</span>
+                </MudTd>
+                <MudTd DataLabel="@Place_string">
+                    <span data-testid="participation-placing">@PlacingText.Of(context.Placing)</span>
+                </MudTd>
+            </RowTemplate>
+            <ChildRowContent>
+                @if (IsOpen(context))
+                {
+                    <MudTr>
+                        <td colspan="@COLUMNS" data-testid="participation-detail">
+                            @if (IsReading(context))
+                            {
+                                <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+                            }
+                            else if (ReadOf(context) is { } participation)
+                            {
+                                <ParticipationDetail Row="context" Participation="participation" />
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.body2" Class="pa-2">@Participation_not_found_string</MudText>
+                            }
+                        </td>
+                    </MudTr>
+                }
+            </ChildRowContent>
+        </MudTable>
+
+        @if (HasMore)
+        {
+            <MudStack Row Justify="Justify.Center" Class="mt-2">
+                <NButtonSecondary Text="@Show_more_string" Disabled="@IsLoading" OnClick="ShowMore" />
+            </MudStack>
+        }
+    }
+</div>

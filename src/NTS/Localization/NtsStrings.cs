@@ -433,6 +433,19 @@ namespace NTS.Localization
         public static string Console_connected_string => LocalizeString(nameof(Console_connected_string));
         public static string Console_connecting_string => LocalizeString(nameof(Console_connecting_string));
         public static string Console_disconnected_string => LocalizeString(nameof(Console_disconnected_string));
+        public static string My_participations_string => LocalizeString(nameof(My_participations_string));
+        public static string Show_more_string => LocalizeString(nameof(Show_more_string));
+        public static string Also_counted_in_string => LocalizeString(nameof(Also_counted_in_string));
+        public static string No_participations_string => LocalizeString(nameof(No_participations_string));
+        public static string Name_of_an_Athlete_or_a_Horse_string =>
+            LocalizeString(nameof(Name_of_an_Athlete_or_a_Horse_string));
+        public static string My_Athlete_string => LocalizeString(nameof(My_Athlete_string));
+        public static string My_Athlete_helper_string => LocalizeString(nameof(My_Athlete_helper_string));
+        public static string Add_a_Horse_string => LocalizeString(nameof(Add_a_Horse_string));
+        public static string Remove__string => LocalizeString(nameof(Remove__string));
+        public static string Horses_helper_string => LocalizeString(nameof(Horses_helper_string));
+        public static string Competition_string => LocalizeString(nameof(Competition_string));
+        public static string Nothing_found_string => LocalizeString(nameof(Nothing_found_string));
     }
 }
 #pragma warning restore NA0004

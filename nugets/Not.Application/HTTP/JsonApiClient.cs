@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -100,7 +101,8 @@ public class JsonApiResponse
 /// Sends requests to the Api and reads its answers as JSON:API documents (ADR-0008): the media type on both sides, the
 /// headers a write carries, and the errors read with their <c>code</c> and not thrown away. An answer that is not a success
 /// is a response with its error, as the status always reports the outcome; a request that did not arrive is the exception
-/// of the transport. The session is the cookie the browser keeps, which a request of the same origin carries.
+/// of the transport. The session is the cookie the browser keeps, which a request of the same origin carries, and the language
+/// is the one the app is in.
 /// </summary>
 public class JsonApiClient
 {
@@ -133,6 +135,12 @@ public class JsonApiClient
     {
         using var request = new HttpRequestMessage(method, BuildUrl(endpoint));
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(MEDIA_TYPE));
+        if (CultureInfo.CurrentUICulture.Name is { Length: > 0 } language)
+        {
+            // The words and the names the Api tells are in the language the app is in, which is not always the browser's.
+            request.Headers.AcceptLanguage.TryParseAdd(language); // a name that is no header value is left out, and does not fail every request
+        }
+
         if (method != HttpMethod.Get)
         {
             foreach (var (name, value) in _settings.WriteHeaders)

@@ -7,6 +7,7 @@ using MongoDB.Driver.Linq;
 using Not.Identity;
 using NoTiming.Api.Features.Reference;
 using NTS.Contracts.Core.Models;
+using NTS.Contracts.Features.Participants;
 using NTS.Contracts.Shared;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;

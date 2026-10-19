@@ -1,0 +1,377 @@
+using System.Globalization;
+using System.Net;
+using NoTiming.Ui.Features.Participants;
+using NoTiming.Ui.Storage.Core.Repositories;
+using NTS.Contracts.Features.Participants;
+using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Core.Aggregates.Participations.Objects;
+using NTS.Domain.Enums;
+using NTS.Tests.Integration.Infrastructure;
+
+namespace NTS.Tests.Integration;
+
+/// <summary>
+/// The Participants at the Ui (#639, ADR-0010): an Athlete or a Horse is found by a few letters of its name in either script,
+/// and told in the language the app is in, and the history of one is read a page at a time. Over the real Api in this process,
+/// as the Ui reaches it.
+/// </summary>
+public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
+{
+    // Every test has Participants of its own: the database is shared by all of them, and a Participant is found by its id.
+    readonly Participant _ana = new(Guid.NewGuid(), "Мариела Тестова", "Mariela Testova");
+    readonly Participant _fire = new(Guid.NewGuid(), "Огън", "Fire");
+    readonly Participant _wind = new(Guid.NewGuid(), "Вятър", "Wind");
+    readonly MongoFixture _mongo;
+
+    public ParticipantServiceTests(MongoFixture mongo)
+    {
+        _mongo = mongo;
+    }
+
+    [Fact]
+    public async Task A_Latin_text_finds_the_Cyrillic_name_of_an_Athlete_and_of_a_Horse_and_each_is_told_with_its_kind()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, cyrillic) = HistorySeed.NameMarker();
+        var athlete = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            tenant,
+            $"Иван {cyrillic}ов",
+            RegistrySeed.CountryOf("Bulgaria", "BG"),
+            nameEnglish: $"Ivan {latin}ov"
+        );
+        var horse = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, $"Звезда {cyrillic}ов");
+        var service = Open(api, person, out _);
+
+        var found = await service.Search($"{latin}ov", CancellationToken.None);
+
+        Assert.Equal(
+            [
+                (ParticipantKind.Athlete, athlete, $"Ivan {latin}ov"),
+                (ParticipantKind.Horse, horse, $"Звезда {cyrillic}ов"),
+            ],
+            found.Select(x => (x.Kind, x.Id, x.DisplayName))
+        );
+    }
+
+    [Fact]
+    public async Task The_names_are_told_in_the_language_the_app_is_in()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, cyrillic) = HistorySeed.NameMarker();
+        await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            tenant,
+            $"Иван {cyrillic}ов",
+            RegistrySeed.CountryOf("Bulgaria", "BG"),
+            nameEnglish: $"Ivan {latin}ov"
+        );
+        var service = Open(api, person, out _);
+
+        CultureInfo.CurrentUICulture = new CultureInfo("bg");
+        var inBulgarian = await service.Search($"{latin}ov", CancellationToken.None);
+        CultureInfo.CurrentUICulture = new CultureInfo("en-GB");
+        var inEnglish = await service.Search($"{latin}ov", CancellationToken.None);
+        CultureInfo.CurrentUICulture = new CultureInfo("tr");
+        var inTurkish = await service.Search($"{latin}ov", CancellationToken.None);
+
+        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inBulgarian).DisplayName);
+        Assert.Equal($"Ivan {latin}ov", Assert.Single(inEnglish).DisplayName);
+        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inTurkish).DisplayName); // as it was registered, where the language is not English
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("iv")]
+    [InlineData("  iv  ")]
+    public async Task A_text_of_fewer_than_three_characters_finds_none_and_asks_the_Api_nothing(string text)
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var service = Open(api, person, out var asked);
+
+        var found = await service.Search(text, CancellationToken.None);
+
+        Assert.Empty(found);
+        Assert.Empty(asked.Asked); // a search counts against the budget of the account
+    }
+
+    [Fact]
+    public async Task A_search_the_Api_refuses_says_so()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var service = Open(api, person, out var asked);
+        asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.TooManyRequests);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.Search("ivan", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task The_history_of_an_Athlete_is_read_a_page_at_a_time_newest_first_with_the_other_half_the_placing_and_the_other_Rankings()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var spring = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var winter = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Winter ride", "Plovdiv", 200);
+        var autumn = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Varna", 400);
+        var latest = await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, spring, 1, _ana, _wind, rank: 2);
+        await HistorySeed.CountAlsoAsync(
+            _mongo.ConnectionString,
+            tenant,
+            spring,
+            "National Championship",
+            latest,
+            rank: 1,
+            ParticipationCategory.JuniorOrYoungAdult
+        );
+        var withdrawn = await HistorySeed.RideAsync(
+            _mongo.ConnectionString,
+            tenant,
+            winter,
+            1,
+            _ana,
+            _fire,
+            eliminated: new Retired()
+        );
+        var counted = await HistorySeed.RideAsync(
+            _mongo.ConnectionString,
+            tenant,
+            autumn,
+            1,
+            _ana,
+            _fire,
+            notRanked: true,
+            competition: "CEI 2*"
+        );
+        var service = Open(api, person, out _);
+
+        var first = await service.HistoryOf(ParticipantKind.Athlete, _ana.Id, 1, 2, CancellationToken.None);
+        var second = await service.HistoryOf(ParticipantKind.Athlete, _ana.Id, 2, 2, CancellationToken.None);
+
+        Assert.True(first.HasMore);
+        Assert.False(second.HasMore);
+        Assert.Equal([latest.Id, withdrawn.Id, counted.Id], first.Items.Concat(second.Items).Select(x => x.Id));
+        var newest = first.Items[0];
+        Assert.Equal(
+            (spring, "Spring ride", "Sofia", "CEI 1*"),
+            (newest.EventId, newest.EventName, newest.Location, newest.Competition)
+        );
+        Assert.InRange(newest.StartDay, DateTimeOffset.UtcNow.AddDays(-12), DateTimeOffset.UtcNow.AddDays(-9));
+        Assert.Equal(
+            (ParticipantKind.Horse, _wind.Id, "Wind"),
+            (newest.Other.Kind, newest.Other.Id, newest.Other.DisplayName)
+        );
+        Assert.Equal(Placing.Ranked(2), newest.Placing);
+        var also = Assert.Single(newest.AlsoCountedIn);
+        Assert.Equal(
+            ("National Championship", "JuniorOrYoungAdult", Placing.Ranked(1)),
+            (also.Name, also.Category, also.Placing)
+        );
+        Assert.Equal(Placing.Eliminated("RET"), first.Items[1].Placing);
+        Assert.Empty(first.Items[1].AlsoCountedIn);
+        var oldest = second.Items.Single();
+        Assert.Equal(Placing.NotRanked(), oldest.Placing);
+        Assert.Equal("CEI 2*", oldest.Competition);
+    }
+
+    [Fact]
+    public async Task The_history_of_a_Horse_has_the_Athlete_as_the_other_half_and_a_ride_with_no_placing_has_none()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var ride = HistorySeed.Ride(past, 1, _ana, _fire); // no Ranking counts it
+        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, ride);
+        var service = Open(api, person, out _);
+
+        var page = await service.HistoryOf(ParticipantKind.Horse, _fire.Id, 1, 20, CancellationToken.None);
+
+        var only = Assert.Single(page.Items);
+        Assert.False(page.HasMore);
+        Assert.Equal(ride.Id, only.Id);
+        Assert.Equal(
+            (ParticipantKind.Athlete, _ana.Id, "Mariela Testova"),
+            (only.Other.Kind, only.Other.Id, only.Other.DisplayName)
+        );
+        Assert.Null(only.Placing);
+        Assert.Empty(only.AlsoCountedIn);
+    }
+
+    [Fact]
+    public async Task The_Horses_an_Athlete_has_ridden_are_the_other_halves_of_their_history_once_each_newest_first()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var recent = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var middle = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Winter ride", "Plovdiv", 200);
+        var old = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Varna", 400);
+        await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, recent, 1, _ana, _wind);
+        await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, middle, 1, _ana, _fire);
+        await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, old, 1, _ana, _wind);
+        var service = Open(api, person, out var asked);
+        asked.Before = request =>
+        {
+            // the Api cuts the pages of the history at two, so that the whole of it is more than one
+            request.RequestUri = new Uri(
+                request.RequestUri!.ToString().Replace("page%5Bsize%5D=500", "page%5Bsize%5D=2")
+            );
+            return Task.CompletedTask;
+        };
+
+        var horses = await service.HorsesRiddenBy(_ana.Id, CancellationToken.None);
+
+        Assert.Equal(
+            [(ParticipantKind.Horse, _wind.Id, "Wind"), (ParticipantKind.Horse, _fire.Id, "Fire")],
+            horses.Select(x => (x.Kind, x.Id, x.DisplayName))
+        );
+        Assert.Equal(2, asked.Asked.Count(x => x.Contains("participations/history", StringComparison.Ordinal))); // two pages of it
+    }
+
+    [Fact]
+    public async Task A_Participation_of_a_history_is_read_with_its_Phases_by_its_id_and_one_that_is_not_there_is_none()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var ride = await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, past, 7, _ana, _fire);
+        var service = Open(api, person, out _);
+
+        var read = await service.ParticipationOf(ride.Id);
+        var missing = await service.ParticipationOf(Guid.NewGuid());
+
+        Assert.False(read.Failed);
+        Assert.NotNull(read.Row);
+        Assert.Equal((ride.Id, 7), (read.Row.Id, read.Row.Combination.Number));
+        Assert.Single(read.Row.Phases);
+        Assert.NotNull(read.Row.Phases.Single().ArriveTime);
+        Assert.Null(missing.Row);
+        Assert.False(missing.Failed); // a Participation that is not there is not a read that failed
+    }
+
+    [Fact]
+    public async Task A_Participation_the_Api_does_not_answer_for_is_a_read_that_failed_and_not_one_that_is_not_there()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var ride = await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, past, 7, _ana, _fire);
+        var service = Open(api, person, out var asked);
+        asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.InternalServerError);
+
+        var read = await service.ParticipationOf(ride.Id);
+
+        Assert.True(read.Failed);
+        Assert.Null(read.Row);
+    }
+
+    [Fact]
+    public async Task A_text_of_three_characters_is_asked_of_the_Api()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var service = Open(api, person, out var asked);
+
+        var found = await service.Search(" qzx ", CancellationToken.None);
+
+        Assert.Empty(found);
+        Assert.Single(asked.Asked, x => x.StartsWith("GET /api/participants?filter=", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task A_name_with_an_apostrophe_is_found_by_it()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, _) = HistorySeed.NameMarker();
+        var athlete = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            tenant,
+            $"Shane O'Brien {latin}",
+            RegistrySeed.CountryOf("Ireland", "IE")
+        );
+        var service = Open(api, person, out _);
+
+        var found = await service.Search($"o'brien {latin}", CancellationToken.None);
+
+        Assert.Equal([athlete], found.Select(x => x.Id));
+    }
+
+    [Fact]
+    public async Task Every_request_carries_the_language_the_app_is_in_and_none_when_it_is_in_none()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var service = Open(api, person, out var asked);
+        var languages = new List<string>();
+        asked.Before = request =>
+        {
+            languages.AddRange(request.Headers.AcceptLanguage.Select(x => x.Value!));
+            return Task.CompletedTask;
+        };
+
+        CultureInfo.CurrentUICulture = new CultureInfo("bg-BG");
+        await service.Search("abc", CancellationToken.None);
+        CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+        await service.Search("abc", CancellationToken.None);
+
+        Assert.Equal(["bg-BG"], languages);
+    }
+
+    [Fact]
+    public async Task A_history_of_more_than_a_page_is_a_page_of_the_size_asked_for_and_the_rest()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Long ride", "Sofia", 10);
+        for (var number = 1; number <= 21; number++)
+        {
+            await HistorySeed.RideAsync(_mongo.ConnectionString, tenant, past, number, _ana, _wind);
+        }
+
+        var service = Open(api, person, out _);
+
+        var first = await service.HistoryOf(ParticipantKind.Athlete, _ana.Id, 1, 20, CancellationToken.None);
+        var second = await service.HistoryOf(ParticipantKind.Athlete, _ana.Id, 2, 20, CancellationToken.None);
+
+        Assert.Equal((20, true), (first.Items.Count, first.HasMore));
+        Assert.Equal((1, false), (second.Items.Count, second.HasMore));
+        Assert.Equal(21, first.Items.Concat(second.Items).Select(x => x.Id).Distinct().Count());
+    }
+
+    static ParticipantService Open(ApiFactory api, TenancySeed.Person person, out JsonApiClients.Requests asked)
+    {
+        var json = JsonApiClients.Of(api, person, out asked);
+        return new ParticipantService(json, new ParticipationApiRepository(json));
+    }
+}
