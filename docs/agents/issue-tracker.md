@@ -6,6 +6,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 - **Create an issue**: `gh issue create --title "..." --body "..." --label "source:agent"`. Use a heredoc for multi-line bodies.
 - **Always label agent-created issues `source:agent`.** This applies to every issue you open, whatever the skill or workflow — it is what lets a human tell agent-filed issues from their own at a glance. Add topic labels (`Bug`, `Testing`, …) alongside it, never instead of it. Never apply it to an issue a human opened.
+- **Label every parent issue `spec`.** A parent is an issue that has, or is meant to have, sub-issues: a spec or an umbrella (a wayfinder map has its own label). Apply `spec` alongside `source:agent` and the topic labels so specs can be selected by label, and never put it on a sub-issue. If the repository has no `spec` label yet, create it first: `gh label create spec --description "Parent issue that specifies a piece of work"`.
 - **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
 - **Comment on an issue**: `gh issue comment <number> --body "..."`

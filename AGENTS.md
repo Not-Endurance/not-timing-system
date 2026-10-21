@@ -18,15 +18,17 @@ Subject line
 '@
 
 # ✅ Correct - heredoc into a file, then -F
-cat > /tmp/msg.txt <<'EOF'
+cat > .tmp/msg.txt <<'EOF'
 Subject line
 
 Body.
 EOF
-rtk git commit -F /tmp/msg.txt
+rtk git commit -F .tmp/msg.txt
 ```
 
 After committing, check `rtk git log --oneline -1` and confirm the subject is the real subject.
+
+10. Temporary files (drafts, fetched issue bodies, commit message files, backups, intermediate output) go in `.tmp/` at the repository root, which is gitignored. Do not use the system temp directory, AppData, `/tmp` or any scratchpad a tool suggests: they are outside the working directory (rule 1). Create the folder if it is missing and keep what you create in a subfolder named for the task. Delete it as the last step of that task; when the task produces a spec, delete the drafts once the spec is published. Never delete anything in `.tmp/` that you did not create.
 
 <!-- rtk-instructions v2 -->
 # RTK (Rust Token Killer) - Token-Optimized Commands
