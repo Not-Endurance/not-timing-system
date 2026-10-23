@@ -1,9 +1,12 @@
 using MongoDB.Bson;
+using Not.Application.HTTP;
 using Not.Domain.Exceptions;
+using NoTiming.Ui.Features.Console;
 using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Access;
 using NTS.Domain.Enums;
 using NTS.Tests.Integration.Infrastructure;
+using static NoTiming.Ui.Features.Console.ApiAnswers;
 using static NTS.Localization.NtsStrings;
 using static NTS.Tests.Integration.Infrastructure.TenancySeed;
 
@@ -58,6 +61,44 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         await grants.Remove(invited.Id);
 
         Assert.Equal([official.Id], (await grants.List(id)).Select(x => x.Id));
+    }
+
+    [Fact]
+    public async Task A_list_that_the_Api_cuts_into_pages_is_read_page_after_page_to_its_end_and_the_grants_ask_for_the_biggest_page()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var id = await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id, "Open");
+        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var grants = ui.Get<IConsoleGrants>();
+        var marker = Guid.NewGuid().ToString("N");
+        var linked = new List<Guid>();
+        foreach (var name in new[] { "aaa", "bbb", "ccc" })
+        {
+            linked.Add((await grants.Link(id, GrantKind.Operator, null, $"{name}.{marker}@example.test")).Id);
+        }
+
+        ui.Requests.Asked.Clear();
+        var pages = await AcceptedPages(
+            ui.Get<JsonApiClient>(),
+            $"event-grants?filter={Uri.EscapeDataString($"eventId eq {id}")}",
+            x => Guid.Parse(x.GetProperty("id").GetString()!),
+            pageSize: 2
+        );
+        var asked = ui.Requests.Asked.Select(Unescaped).ToList();
+        ui.Requests.Asked.Clear();
+        var listed = await grants.List(id);
+
+        Assert.Equal(linked, pages); // the three, in the order of their emails, from two pages
+        Assert.Equal(2, asked.Count);
+        Assert.Contains("page[number]=1", asked[0]);
+        Assert.Contains("page[number]=2", asked[1]);
+        Assert.All(asked, x => Assert.Contains("page[size]=2", x));
+        Assert.Equal(linked, listed.Select(x => x.Id));
+        var listing = Assert.Single(ui.Requests.Asked); // and the page the grants ask for holds them all
+        Assert.Contains("page[size]=500", Unescaped(listing));
     }
 
     [Fact]
@@ -268,5 +309,10 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
         Assert.Equal("Land of Test", country.Name);
         Assert.Contains(country.Id, (await lookups.SearchCountries("land of")).Select(x => x.Id));
         Assert.Empty(await lookups.SearchCountries("no such country anywhere"));
+    }
+
+    static string Unescaped(string request)
+    {
+        return request.Replace("%5B", "[").Replace("%5D", "]");
     }
 }

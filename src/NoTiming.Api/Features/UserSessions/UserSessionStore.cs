@@ -43,10 +43,17 @@ internal sealed class UserSessionStore
         _records = client.GetDatabase(options.Value.Database).GetCollection<BsonDocument>(COLLECTION);
     }
 
-    /// <summary>The owner's records, of one Event when it is named.</summary>
-    public async Task<IReadOnlyList<UserSession>> ListAsync(
+    /// <summary>
+    /// A page of the owner's records, of one Event when it is named, in the order of the Events (the other way round when it is
+    /// asked) and then of the ids, so that none is twice or missing between two pages; and whether another page follows. A
+    /// record that cannot be addressed is left out of its page, which is then a record short.
+    /// </summary>
+    public async Task<(IReadOnlyList<UserSession> Sessions, bool HasMore)> ListAsync(
         string owner,
         Guid? eventId,
+        bool descending,
+        int skip,
+        int size,
         CancellationToken cancellationToken
     )
     {
@@ -56,8 +63,13 @@ internal sealed class UserSessionStore
             filter &= Builders<BsonDocument>.Filter.Eq("EventId", Binary(eventId.Value));
         }
 
-        var records = await _records.Find(filter).ToListAsync(cancellationToken);
-        return [.. records.Select(Read).OfType<UserSession>()];
+        var records = await _records
+            .Find(filter)
+            .Sort(new BsonDocument { { "EventId", descending ? -1 : 1 }, { "Id", 1 } })
+            .Skip(skip)
+            .Limit(size + 1)
+            .ToListAsync(cancellationToken);
+        return ([.. records.Take(size).Select(Read).OfType<UserSession>()], records.Count > size);
     }
 
     public async Task<UserSession?> FindAsync(string owner, Guid id, CancellationToken cancellationToken)

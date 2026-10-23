@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text.Json;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using NoTiming.Api.Features.Reference;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Objects;
@@ -184,6 +186,129 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
         Assert.Equal("not-allowed", await ErrorCodeAsync(stranger));
     }
 
+    [Fact]
+    public async Task The_people_who_recorded_times_are_cut_into_pages_in_the_order_of_their_names()
+    {
+        await using var scene = await SceneAsync();
+        var number = 10;
+        foreach (var name in new[] { "Cora Clerk", "Anna Actor", "Boris Barn" }) // named out of the order of their names
+        {
+            var person = await SignedInAsync(
+                scene.Api,
+                scene.Anonymous,
+                _mongo.ConnectionString,
+                scene.Tenant,
+                name: name
+            );
+            await EventSeed.ParticipationAsync(
+                _mongo.ConnectionString,
+                scene.Tenant,
+                Ridden(scene.EventId, number++, person.Id)
+            );
+        }
+
+        var path = $"/api/time-event-actors?filter=eventId eq {scene.EventId}";
+        var first = await ActorPageAsync(scene.MainOperator, path + "&page[size]=3");
+        var last = await ActorPageAsync(scene.MainOperator, path + "&page[size]=3&page[number]=2");
+        var followed = await ActorPageAsync(scene.MainOperator, first.Next!);
+        var backwards = await ActorPageAsync(scene.MainOperator, path + "&sort=-displayName&page[size]=3");
+        var full = await ActorPageAsync(scene.MainOperator, path + "&page[size]=4");
+        var unnamed = await ActorPageAsync(scene.MainOperator, path);
+
+        Assert.Equal(["Anna Actor", "Boris Barn", "Cora Clerk"], first.Names);
+        Assert.Equal((3, 1), (first.Size, first.Number));
+        Assert.Equal(["Olga Official"], last.Names);
+        Assert.Equal((3, 2), (last.Size, last.Number));
+        Assert.Null(last.Next);
+        Assert.Equal(last.Names, followed.Names); // the link is a way to the next page, whole
+        Assert.Equal(["Olga Official", "Cora Clerk", "Boris Barn"], backwards.Names);
+        Assert.Contains("sort=-displayName", backwards.Next);
+        Assert.Equal(["Anna Actor", "Boris Barn", "Cora Clerk", "Olga Official"], full.Names); // exactly full is the last page
+        Assert.Null(full.Next);
+        Assert.Equal(full.Names, unnamed.Names);
+        Assert.Equal((100, 1), (unnamed.Size, unnamed.Number));
+    }
+
+    [Fact]
+    public async Task People_of_the_same_name_follow_in_the_order_of_their_ids_so_that_none_is_twice_or_missing_between_pages()
+    {
+        await using var scene = await SceneAsync();
+        var low = Guid.Parse("00000000-0000-0000-0000-0000000000a1");
+        var high = Guid.Parse("00000000-0000-0000-0000-0000000000b2");
+        var number = 30;
+        foreach (var id in new[] { high, low }) // the greater id is written first: the order of writing is not the order of the ids
+        {
+            var person = await SignedInAsync(
+                scene.Api,
+                scene.Anonymous,
+                _mongo.ConnectionString,
+                scene.Tenant,
+                name: "Dara Dup",
+                id: id
+            );
+            await EventSeed.ParticipationAsync(
+                _mongo.ConnectionString,
+                scene.Tenant,
+                Ridden(scene.EventId, number++, person.Id)
+            );
+        }
+
+        var path = $"/api/time-event-actors?filter=eventId eq {scene.EventId}&page[size]=1";
+        var first = await ActorPageAsync(scene.MainOperator, path);
+        var second = await ActorPageAsync(scene.MainOperator, path + "&page[number]=2");
+        var third = await ActorPageAsync(scene.MainOperator, path + "&page[number]=3");
+
+        Assert.Equal([low], first.Ids);
+        Assert.Equal([high], second.Ids);
+        Assert.Equal(["Olga Official"], third.Names);
+        Assert.Null(third.Next);
+    }
+
+    [Fact]
+    public async Task An_account_with_no_name_is_not_named_and_does_not_break_the_list()
+    {
+        await using var scene = await SceneAsync();
+        var nameless = await SignedInAsync(scene.Api, scene.Anonymous, _mongo.ConnectionString, scene.Tenant);
+        await EventSeed.ParticipationAsync(
+            _mongo.ConnectionString,
+            scene.Tenant,
+            Ridden(scene.EventId, 20, nameless.Id)
+        );
+        await UserSeed
+            .Users(_mongo.ConnectionString)
+            .UpdateOneAsync(
+                new BsonDocument("_id", EventSeed.Binary(nameless.Id)),
+                Builders<BsonDocument>.Update.Unset("Name")
+            );
+
+        var page = await ActorPageAsync(
+            scene.MainOperator,
+            $"/api/time-event-actors?filter=eventId eq {scene.EventId}&page[size]=1"
+        );
+
+        Assert.Equal(["Olga Official"], page.Names);
+        Assert.Null(page.Next);
+    }
+
+    [Theory]
+    [InlineData("&page[size]=0", "invalid-page")]
+    [InlineData("&page[size]=501", "invalid-page")]
+    [InlineData("&page[number]=0", "invalid-page")]
+    [InlineData("&page[number]=999999999", "invalid-page")]
+    [InlineData("&sort=name", "invalid-sort")]
+    [InlineData("&sort=-id", "invalid-sort")]
+    public async Task A_page_or_a_sort_that_the_people_do_not_have_is_refused(string query, string code)
+    {
+        await using var scene = await SceneAsync();
+
+        var response = await scene.MainOperator.Page.GetAsync(
+            $"/api/time-event-actors?filter=eventId eq {scene.EventId}{query}"
+        );
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(code, await ErrorCodeAsync(response));
+    }
+
     [Theory]
     [InlineData("/api/time-event-actors")]
     [InlineData("/api/time-event-actors?filter=name eq 'x'")]
@@ -329,6 +454,32 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
         return participation;
     }
 
+    /// <summary>A page of the people: their display names, the page it says it is and where it says the next one is.</summary>
+    static async Task<(List<string> Names, List<Guid> Ids, int Size, int Number, string? Next)> ActorPageAsync(
+        Person caller,
+        string path
+    )
+    {
+        var response = await caller.Page.GetAsync(path);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await ApiSessions.ReadJsonAsync(response);
+        var page = body.GetProperty("meta").GetProperty("page");
+        var links = body.GetProperty("links");
+        return (
+            [
+                .. body.GetProperty("data")
+                    .EnumerateArray()
+                    .Select(x => x.GetProperty("attributes").GetProperty("displayName").GetString()!),
+            ],
+            [.. body.GetProperty("data").EnumerateArray().Select(x => Guid.Parse(x.GetProperty("id").GetString()!))],
+            page.GetProperty("size").GetInt32(),
+            page.GetProperty("number").GetInt32(),
+            links.TryGetProperty("next", out var next) && next.ValueKind == JsonValueKind.String
+                ? next.GetString()
+                : null
+        );
+    }
+
     static async Task<string?> ErrorCodeAsync(HttpResponseMessage response)
     {
         var body = await ApiSessions.ReadJsonAsync(response);
@@ -368,6 +519,7 @@ public sealed class ParticipationTimeEventsRoutesTests : IClassFixture<MongoFixt
             Participation = participation;
         }
 
+        public ApiFactory Api => _api;
         public HttpClient Anonymous { get; }
         public string Tenant { get; }
         public Guid EventId { get; }

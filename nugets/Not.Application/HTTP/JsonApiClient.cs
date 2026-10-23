@@ -75,6 +75,14 @@ public class JsonApiResponse
     public bool IsSuccess => (int)Status is >= 200 and < 300;
     public bool IsNotFound => Status == HttpStatusCode.NotFound;
 
+    /// <summary>Whether the Api says that another page of the list follows: the document has <c>links.next</c>.</summary>
+    public bool HasNextPage =>
+        Document is { ValueKind: JsonValueKind.Object } document
+        && document.TryGetProperty("links", out var links)
+        && links.ValueKind == JsonValueKind.Object
+        && links.TryGetProperty("next", out var next)
+        && next.ValueKind == JsonValueKind.String;
+
     /// <summary>The document of the body: <c>data</c>, <c>links</c>, <c>meta</c> or <c>errors</c>.</summary>
     public JsonElement? Document { get; }
 

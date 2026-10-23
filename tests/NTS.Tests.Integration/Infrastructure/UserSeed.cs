@@ -27,13 +27,14 @@ internal static class UserSeed
         string mongoConnectionString,
         string email,
         string tenantId = "nts",
-        Action<BsonDocument>? shape = null
+        Action<BsonDocument>? shape = null,
+        Guid? id = null
     )
     {
-        var id = Guid.NewGuid();
+        var userId = id ?? Guid.NewGuid();
         var document = new BsonDocument
         {
-            { "_id", new BsonBinaryData(id, GuidRepresentation.Standard) },
+            { "_id", new BsonBinaryData(userId, GuidRepresentation.Standard) },
             { "Email", email },
             { "Name", "Ana Petrova" },
             { "DisplayName", "Ana" },
@@ -51,7 +52,7 @@ internal static class UserSeed
         };
         shape?.Invoke(document);
         await Users(mongoConnectionString).InsertOneAsync(document);
-        return id;
+        return userId;
     }
 
     /// <summary>A passkey as the store keeps it, with a name to recognise it by.</summary>

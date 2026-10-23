@@ -217,13 +217,14 @@ internal static class EventSeed
         string kind,
         string? officialRole,
         string email,
-        Guid? accountId
+        Guid? accountId,
+        Guid? id = null
     )
     {
-        var id = Guid.NewGuid();
+        var grantId = id ?? Guid.NewGuid();
         var document = new BsonDocument
         {
-            { "_id", Binary(id) },
+            { "_id", Binary(grantId) },
             { "TenantId", tenant },
             { "EventId", Binary(eventId) },
             { "Kind", kind },
@@ -240,7 +241,7 @@ internal static class EventSeed
         }
 
         await Grants(mongoConnectionString).InsertOneAsync(document);
-        return id;
+        return grantId;
     }
 
     /// <summary>

@@ -54,14 +54,6 @@ internal static class ParticipantJson
         );
     }
 
-    /// <summary>Whether a page of a list says there is a next one.</summary>
-    public static bool HasNext(JsonElement document)
-    {
-        return document.TryGetProperty("links", out var links)
-            && links.TryGetProperty("next", out var next)
-            && next.ValueKind == JsonValueKind.String;
-    }
-
     static CountedPlacing CountedIn(JsonElement ranking)
     {
         return new CountedPlacing(

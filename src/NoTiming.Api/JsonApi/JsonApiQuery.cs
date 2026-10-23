@@ -4,10 +4,11 @@ namespace NoTiming.Api.JsonApi;
 
 /// <summary>
 /// The query string of a read, as the rest-api skill defines it: <c>filter</c> holds one OData <c>$filter</c>
-/// expression, and any other parameter answers 400 until a consumer needs it. This is the part of the filter grammar
-/// that the first consumers use: members compared with <c>eq</c> to a literal and joined by <c>and</c>, for the members
-/// a route allows. Anything else is refused as an invalid filter, so a route never applies an expression it does not
-/// understand, and a member that a route does not name (the owner of a record, say) cannot be asked for.
+/// expression, <c>sort</c> and <c>page[...]</c> are the ones of every list, and any other parameter answers 400 until a
+/// consumer needs it. The filter is the part of the grammar that the first consumers use: members compared with <c>eq</c> to
+/// a literal and joined by <c>and</c>, for the members a route allows. Anything else is refused as an invalid filter, so a
+/// route never applies an expression it does not understand, and a member that a route does not name (the owner of a record,
+/// say) cannot be asked for.
 /// </summary>
 internal static partial class JsonApiQuery
 {
@@ -15,53 +16,39 @@ internal static partial class JsonApiQuery
     const string SORT = "sort";
 
     /// <summary>
-    /// Reads the parameters of the request. A parameter that the route does not take is 400 <c>unsupported-parameter</c>,
-    /// and a filter that is not valid for the members given is 400 <c>invalid-filter</c>.
+    /// Reads the query of a list of the rows that one person or one Event keeps: the filter, which is members of the route
+    /// compared with <c>eq</c> and joined by <c>and</c>, the <c>sort</c> of the member the route names (<c>member</c>, or
+    /// <c>-member</c> the other way round; as it comes when there is none) and the pages of every list, <c>page[size]</c> from 1
+    /// to <see cref="JsonApiList.MAX_PAGE_SIZE"/> and <c>page[number]</c>. A parameter that the route does not take is 400
+    /// <c>unsupported-parameter</c>, a filter that is not valid for the members given 400 <c>invalid-filter</c>, a sort of
+    /// another member 400 <c>invalid-sort</c> and a page that is not one 400 <c>invalid-page</c>.
     /// </summary>
-    public static JsonApiFilter Read(HttpRequest request, params string[] members)
+    public static JsonApiList ReadList(HttpRequest request, string sortMember, params string[] filterMembers)
     {
-        foreach (var parameter in request.Query.Keys)
+        if (Unsupported(request, FILTER, SORT, JsonApiPaging.PAGE_SIZE, JsonApiPaging.PAGE_NUMBER) is { } unsupported)
         {
-            if (parameter != FILTER)
-            {
-                return JsonApiFilter.Refused(
-                    JsonApiResults.Error(
-                        StatusCodes.Status400BadRequest,
-                        "unsupported-parameter",
-                        "The parameter is not supported.",
-                        parameter
-                    )
-                );
-            }
+            return JsonApiList.Refused(unsupported);
         }
 
-        var filter = request.Query[FILTER].ToString();
-        if (filter.Length == 0)
+        var filter = ReadFilter(request, filterMembers);
+        if (filter.Refusal != null)
         {
-            return JsonApiFilter.Of(new Dictionary<string, string>());
+            return JsonApiList.Refused(filter.Refusal);
         }
 
-        var values = new Dictionary<string, string>(StringComparer.Ordinal);
-        var rest = filter.Trim();
-        while (rest.Length > 0)
-        {
-            var match = Predicate().Match(rest);
-            if (!match.Success || !members.Contains(match.Groups["member"].Value) || !Unique(values, match))
-            {
-                return JsonApiFilter.Refused(
-                    JsonApiResults.Error(
-                        StatusCodes.Status400BadRequest,
-                        "invalid-filter",
-                        "The filter is not valid.",
-                        $"Use {string.Join(" and ", members.Select(x => $"{x} eq <value>"))}."
-                    )
-                );
-            }
-
-            rest = rest[match.Length..];
-        }
-
-        return JsonApiFilter.Of(values);
+        return
+            ReadOrderAndPage(
+                request,
+                sortMember,
+                JsonApiList.DEFAULT_PAGE_SIZE,
+                JsonApiList.MAX_PAGE_SIZE,
+                out var descending,
+                out var size,
+                out var number
+            )
+                is { } refusal
+            ? JsonApiList.Refused(refusal)
+            : JsonApiList.Of(filter.EqualTo, descending, size, number);
     }
 
     /// <summary>
@@ -73,19 +60,9 @@ internal static partial class JsonApiQuery
     /// </summary>
     public static JsonApiSearch ReadSearch(HttpRequest request, string member)
     {
-        foreach (var parameter in request.Query.Keys)
+        if (Unsupported(request, FILTER, SORT, JsonApiPaging.PAGE_SIZE, JsonApiPaging.PAGE_NUMBER) is { } unsupported)
         {
-            if (parameter is not (FILTER or SORT or JsonApiPaging.PAGE_SIZE or JsonApiPaging.PAGE_NUMBER))
-            {
-                return JsonApiSearch.Refused(
-                    JsonApiResults.Error(
-                        StatusCodes.Status400BadRequest,
-                        "unsupported-parameter",
-                        "The parameter is not supported.",
-                        parameter
-                    )
-                );
-            }
+            return JsonApiSearch.Refused(unsupported);
         }
 
         var match = SearchPredicate().Match(request.Query[FILTER].ToString().Trim());
@@ -129,46 +106,107 @@ internal static partial class JsonApiQuery
             );
         }
 
-        var descending = false;
+        return
+            ReadOrderAndPage(
+                request,
+                member,
+                JsonApiSearch.DEFAULT_PAGE_SIZE,
+                JsonApiSearch.MAX_PAGE_SIZE,
+                out var descending,
+                out var size,
+                out var number
+            )
+                is { } refusal
+            ? JsonApiSearch.Refused(refusal)
+            : JsonApiSearch.Of(words, descending, size, number);
+    }
+
+    /// <summary>The refusal of a request that has a parameter other than those the route takes; none when it has not.</summary>
+    static IResult? Unsupported(HttpRequest request, params string[] taken)
+    {
+        return request.Query.Keys.FirstOrDefault(x => !taken.Contains(x)) is { } parameter
+            ? JsonApiResults.Error(
+                StatusCodes.Status400BadRequest,
+                "unsupported-parameter",
+                "The parameter is not supported.",
+                parameter
+            )
+            : null;
+    }
+
+    /// <summary>
+    /// Reads the <c>sort</c> of the member (<c>member</c>, or <c>-member</c> the other way round; as it comes when there is none) and
+    /// the pages, <c>page[size]</c> up to the greatest size that the list takes and <c>page[number]</c>. The answer that refuses
+    /// them, or none: a sort of another member is 400 <c>invalid-sort</c>, and a page that is not one 400 <c>invalid-page</c>.
+    /// </summary>
+    static IResult? ReadOrderAndPage(
+        HttpRequest request,
+        string member,
+        int defaultSize,
+        int maxSize,
+        out bool descending,
+        out int size,
+        out int number
+    )
+    {
+        descending = false;
+        size = defaultSize;
+        number = 1;
         if (request.Query.TryGetValue(SORT, out var sort))
         {
             if (sort.ToString() != member && sort.ToString() != "-" + member)
             {
-                return JsonApiSearch.Refused(
-                    JsonApiResults.Error(
-                        StatusCodes.Status400BadRequest,
-                        "invalid-sort",
-                        "The sort is not valid.",
-                        $"Sort by {member}, with a - for descending: sort=-{member}."
-                    )
+                return JsonApiResults.Error(
+                    StatusCodes.Status400BadRequest,
+                    "invalid-sort",
+                    "The sort is not valid.",
+                    $"Sort by {member}, with a - for descending: sort=-{member}."
                 );
             }
 
             descending = sort.ToString().StartsWith('-');
         }
 
-        var size = JsonApiSearch.DEFAULT_PAGE_SIZE;
-        var number = 1;
-        if (
-            !JsonApiPaging.TryRead(request, JsonApiPaging.PAGE_SIZE, JsonApiSearch.MAX_PAGE_SIZE, ref size)
-            || !JsonApiPaging.TryRead(
-                request,
-                JsonApiPaging.PAGE_NUMBER,
-                int.MaxValue / JsonApiSearch.MAX_PAGE_SIZE,
-                ref number
-            )
-        )
-        {
-            return JsonApiSearch.Refused(
-                JsonApiResults.Error(
-                    StatusCodes.Status400BadRequest,
-                    "invalid-page",
-                    "A page is a number of at least 1 and a size of 1 to 25."
-                )
+        return
+            JsonApiPaging.TryRead(request, JsonApiPaging.PAGE_SIZE, maxSize, ref size)
+            && JsonApiPaging.TryRead(request, JsonApiPaging.PAGE_NUMBER, int.MaxValue / maxSize, ref number)
+            ? null
+            : JsonApiResults.Error(
+                StatusCodes.Status400BadRequest,
+                "invalid-page",
+                $"A page is a number of at least 1 and a size of 1 to {maxSize}."
             );
+    }
+
+    static JsonApiFilter ReadFilter(HttpRequest request, string[] members)
+    {
+        var filter = request.Query[FILTER].ToString();
+        if (filter.Length == 0)
+        {
+            return JsonApiFilter.Of(new Dictionary<string, string>());
         }
 
-        return JsonApiSearch.Of(words, descending, size, number);
+        var values = new Dictionary<string, string>(StringComparer.Ordinal);
+        var rest = filter.Trim();
+        while (rest.Length > 0)
+        {
+            var match = Predicate().Match(rest);
+            if (!match.Success || !members.Contains(match.Groups["member"].Value) || !Unique(values, match))
+            {
+                return JsonApiFilter.Refused(
+                    JsonApiResults.Error(
+                        StatusCodes.Status400BadRequest,
+                        "invalid-filter",
+                        "The filter is not valid.",
+                        $"Use {string.Join(" and ", members.Select(x => $"{x} eq <value>"))}."
+                    )
+                );
+            }
+
+            rest = rest[match.Length..];
+        }
+
+        return JsonApiFilter.Of(values);
     }
 
     static bool Unique(Dictionary<string, string> values, Match match)
@@ -210,6 +248,49 @@ internal sealed class JsonApiFilter
     public IReadOnlyDictionary<string, string> EqualTo { get; }
 
     public IResult? Refusal { get; }
+}
+
+/// <summary>
+/// What the query string of a list of the rows one person or one Event keeps asked for, or the answer that refuses it: the
+/// filter, which way the rows are in the order, and the page that is wanted. A page is a hundred rows
+/// unless it is asked to be another size, and none is more than five hundred.
+/// </summary>
+internal sealed class JsonApiList
+{
+    public const int DEFAULT_PAGE_SIZE = 100;
+    public const int MAX_PAGE_SIZE = 500;
+
+    public static JsonApiList Of(IReadOnlyDictionary<string, string> equalTo, bool descending, int size, int number)
+    {
+        return new JsonApiList(equalTo, descending, size, number, null);
+    }
+
+    public static JsonApiList Refused(IResult refusal)
+    {
+        return new JsonApiList(new Dictionary<string, string>(), false, DEFAULT_PAGE_SIZE, 1, refusal);
+    }
+
+    JsonApiList(IReadOnlyDictionary<string, string> equalTo, bool descending, int size, int number, IResult? refusal)
+    {
+        EqualTo = equalTo;
+        Descending = descending;
+        Size = size;
+        Number = number;
+        Refusal = refusal;
+    }
+
+    /// <summary>The members the filter compares, and what each is compared with, as the text that was written.</summary>
+    public IReadOnlyDictionary<string, string> EqualTo { get; }
+
+    /// <summary>Whether the rows are in the order the other way round.</summary>
+    public bool Descending { get; }
+
+    public int Size { get; }
+    public int Number { get; }
+    public IResult? Refusal { get; }
+
+    /// <summary>How many rows to leave out.</summary>
+    public int Skip => (Number - 1) * Size;
 }
 
 /// <summary>

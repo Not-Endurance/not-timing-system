@@ -367,7 +367,7 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>, IRowReader<
 
                 var document = response.Document!.Value;
                 items.AddRange(document.GetProperty("data").EnumerateArray().Select(x => EntityOf(x)).OfType<T>());
-                if (!HasNext(document))
+                if (!response.HasNextPage)
                 {
                     break;
                 }
@@ -379,14 +379,6 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>, IRowReader<
 
         // A list that could not be read to its end is not a list: what a caller decides by it, or removes by it, is of all.
         return complete ? items : [];
-    }
-
-    static bool HasNext(JsonElement document)
-    {
-        return document.TryGetProperty("links", out var links)
-            && links.ValueKind == JsonValueKind.Object
-            && links.TryGetProperty("next", out var next)
-            && next.ValueKind == JsonValueKind.String;
     }
 
     /// <summary>Runs a request and tells a person when it did not arrive, as the other variant does.</summary>

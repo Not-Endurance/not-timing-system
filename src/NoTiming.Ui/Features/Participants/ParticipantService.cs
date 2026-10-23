@@ -97,7 +97,7 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
         var document = response.Document!.Value;
         return new ParticipantSearchPage(
             [.. document.GetProperty("data").EnumerateArray().Select(x => ParticipantJson.NameOfRow(kind, x))],
-            ParticipantJson.HasNext(document)
+            response.HasNextPage
         );
     }
 
@@ -125,7 +125,7 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
         var document = response.Document!.Value;
         return new ParticipationHistoryPage(
             [.. document.GetProperty("data").EnumerateArray().Select(ParticipantJson.ParticipationOf)],
-            ParticipantJson.HasNext(document)
+            response.HasNextPage
         );
     }
 

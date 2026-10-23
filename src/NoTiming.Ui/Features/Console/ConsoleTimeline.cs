@@ -59,14 +59,15 @@ public class ConsoleTimeline : IConsoleTimeline, IScoped
     async Task<IReadOnlyDictionary<Guid, string>> NamesOf(Guid eventId)
     {
         var filter = Uri.EscapeDataString($"eventId eq {eventId}");
-        var answer = Accepted(await _api.Send(HttpMethod.Get, $"time-event-actors?filter={filter}"));
-        return answer
-            .Document!.Value.GetProperty("data")
-            .EnumerateArray()
-            .Where(x => Guid.TryParse(x.GetProperty("id").GetString(), out _))
-            .ToDictionary(
-                x => Guid.Parse(x.GetProperty("id").GetString()!),
-                x => Text(x.GetProperty("attributes"), "displayName") ?? string.Empty
-            );
+        var actors = await AcceptedPages(
+            _api,
+            $"time-event-actors?filter={filter}",
+            x =>
+                (
+                    Id: Guid.TryParse(x.GetProperty("id").GetString(), out var id) ? id : (Guid?)null,
+                    Name: Text(x.GetProperty("attributes"), "displayName") ?? string.Empty
+                )
+        );
+        return actors.Where(x => x.Id != null).ToDictionary(x => x.Id!.Value, x => x.Name);
     }
 }

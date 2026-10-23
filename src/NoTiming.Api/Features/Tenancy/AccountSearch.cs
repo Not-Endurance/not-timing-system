@@ -50,28 +50,42 @@ internal sealed class AccountSearch
     }
 
     /// <summary>
-    /// The display names of the accounts with these ids, for a route that has already decided that the caller may be told who
-    /// they are (the people who recorded the times of an Event, #619). An id that is no account is left out.
+    /// A page of the display names of the accounts with these ids, in the order of the names (the other way round when it is
+    /// asked) and then of the ids, so that none is twice or missing between two pages; and whether another page follows. It is
+    /// for a route that has already decided that the caller may be told who they are (the people who recorded the times of an
+    /// Event, #619). An id that is no account, and an account with no name, is left out.
     /// </summary>
-    public async Task<IReadOnlyList<AccountName>> NamesOfAsync(
+    public async Task<(IReadOnlyList<AccountName> Names, bool HasMore)> NamesOfAsync(
         IReadOnlyCollection<Guid> ids,
+        bool descending,
+        int skip,
+        int size,
         CancellationToken cancellationToken
     )
     {
         if (ids.Count == 0)
         {
-            return [];
+            return ([], false);
         }
 
         var rows = await _users
-            .Find(Builders<BsonDocument>.Filter.In("_id", ids.Select(BsonGuids.Binary)))
+            .Find(
+                Builders<BsonDocument>.Filter.In("_id", ids.Select(BsonGuids.Binary))
+                    & Builders<BsonDocument>.Filter.Type("Name", BsonType.String)
+            )
             .Project(new BsonDocument { { "_id", 1 }, { "Name", 1 } })
+            .Sort(new BsonDocument { { "Name", descending ? -1 : 1 }, { "_id", 1 } })
+            .Skip(skip)
+            .Limit(size + 1)
             .ToListAsync(cancellationToken);
-        return
-        [
-            .. rows.Where(x => BsonGuids.Of(x, "_id") != null && x.TryGetValue("Name", out var name) && name.IsString)
-                .Select(x => new AccountName(BsonGuids.Of(x, "_id")!.Value, x["Name"].AsString)),
-        ];
+        return (
+            [
+                .. rows.Take(size)
+                    .Where(x => BsonGuids.Of(x, "_id") != null)
+                    .Select(x => new AccountName(BsonGuids.Of(x, "_id")!.Value, x["Name"].AsString)),
+            ],
+            rows.Count > size
+        );
     }
 
     /// <param name="search">The words to look for, matched as they are written and in any case, and the page that is wanted.</param>

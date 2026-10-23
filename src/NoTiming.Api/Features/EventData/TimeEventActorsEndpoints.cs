@@ -13,13 +13,15 @@ namespace NoTiming.Api.Features.EventData;
 /// answers one resource for each account that is the actor of a time event of the Event, whose id is the account's and whose
 /// only attribute is its display name. Time events carry the id of the account that recorded them and never a name, so this is
 /// how the timeline of the Console says who it was. It is for the people who may see how times were recorded and nobody else
-/// (403 <c>not-allowed</c>), it names only accounts that recorded a time of this Event, and it takes the Event and nothing
-/// else. An account that is gone is not named, and the timeline says it does not know it.
+/// (403 <c>not-allowed</c>), it names only accounts that recorded a time of this Event, and it takes the Event, the
+/// <c>sort</c> by the display name and the pages of every list, and nothing else. An account that is gone is not named,
+/// and the timeline says it does not know it.
 /// </summary>
 internal static class TimeEventActorsEndpoints
 {
     const string TYPE = "time-event-actors";
     const string EVENT_ID = "eventId";
+    const string DISPLAY_NAME = "displayName";
     const string EVENT_ID_FIELD = "EventId";
     const string ACTOR_ID = "Phases.Events.ActorId";
 
@@ -55,7 +57,7 @@ internal static class TimeEventActorsEndpoints
             return JsonApiResults.NotSignedIn();
         }
 
-        var query = JsonApiQuery.Read(context.Request, EVENT_ID);
+        var query = JsonApiQuery.ReadList(context.Request, DISPLAY_NAME, EVENT_ID);
         if (query.Refusal != null)
         {
             return query.Refusal;
@@ -90,15 +92,18 @@ internal static class TimeEventActorsEndpoints
                 new BsonDocument(EVENT_ID_FIELD, BsonGuids.Binary(eventId)),
                 context.RequestAborted
             );
-        var actors = await accounts.NamesOfAsync(
+        var (actors, hasMore) = await accounts.NamesOfAsync(
             [.. recorded.OfType<BsonBinaryData>().Select(x => x.ToGuid(GuidRepresentation.Standard)).Distinct()],
+            query.Descending,
+            query.Skip,
+            query.Size,
             context.RequestAborted
         );
         return JsonApiResults.Collection(
             TYPE,
-            actors
-                .OrderBy(x => x.DisplayName, StringComparer.CurrentCulture)
-                .Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName }))
+            actors.Select(x => (x.Id.ToString(), (object)new { displayName = x.DisplayName })),
+            links: JsonApiPaging.Links(context.Request, query.Number, hasMore),
+            meta: JsonApiPaging.Meta(query.Size, query.Number)
         );
     }
 }

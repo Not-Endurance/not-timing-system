@@ -131,6 +131,23 @@ internal sealed class TenantCollection
         return TenantId == null ? [] : await _documents.Find(Scoped(filter)).ToListAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// A page of the Tenant's documents the filter finds, in the order of the sort: the first <paramref name="skip"/> are left
+    /// out and no more than <paramref name="limit"/> are read.
+    /// </summary>
+    public async Task<IReadOnlyList<BsonDocument>> FindPageAsync(
+        FilterDefinition<BsonDocument>? filter,
+        BsonDocument sort,
+        int skip,
+        int limit,
+        CancellationToken cancellationToken
+    )
+    {
+        return TenantId == null
+            ? []
+            : await _documents.Find(Scoped(filter)).Sort(sort).Skip(skip).Limit(limit).ToListAsync(cancellationToken);
+    }
+
     /// <summary>The ids of the Tenant's documents the filter finds, which is all that is read of them.</summary>
     public async Task<IReadOnlyList<Guid>> FindIdsAsync(
         FilterDefinition<BsonDocument>? filter,
