@@ -93,4 +93,11 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
+    @@media print {
+        .results-row-header,
+        .results-row-identity {
+            column-gap: 0.5rem;
+        }
+    }
 </style>

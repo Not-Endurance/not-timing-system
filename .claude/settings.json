@@ -4,6 +4,10 @@
   },
   "permissions": {
     "defaultMode": "acceptEdits",
-    "allow": ["Read(//**)", "Bash", "PowerShell"]
+    "allow": [
+      "Read(//**)", 
+      "Bash", 
+      "PowerShell"
+    ]
   }
 }

@@ -4,6 +4,7 @@
 @using NTS.Domain.Aggregates
 
 @attribute [Route(PROFILE_PAGE)]
+@attribute [Authorize]
 @inherits ProfileContentBehind
 
 <NContent Title="@Profile_page_string" IsLoading="@IsLoading" Class="not-mid-width">

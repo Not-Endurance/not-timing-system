@@ -306,6 +306,7 @@ namespace NTS.Localization
             LocalizeString(nameof(This_page_redirects_to_Signin_string));
         public static string Signed_in_as__string => LocalizeString(nameof(Signed_in_as__string));
         public static string You_have___privileges_string => LocalizeString(nameof(You_have___privileges_string));
+        public static string Sign_In_string => LocalizeString(nameof(Sign_In_string));
         public static string Sign_Out_string => LocalizeString(nameof(Sign_Out_string));
         public static string No_roles_assigned_string => LocalizeString(nameof(No_roles_assigned_string));
         public static string An_error_occurred_while_sending_snapshots_Please_try_again_string =>

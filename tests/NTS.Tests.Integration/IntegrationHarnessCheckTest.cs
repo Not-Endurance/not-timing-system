@@ -21,6 +21,7 @@ using NTS.Tests.Integration.Infrastructure;
 using NTS.Witness.Contracts.API;
 using NTS.Witness.Contracts.Features.Access;
 using NTS.Witness.Contracts.Features.Performance;
+using NTS.Witness.Contracts.Features.Profile;
 using SetupAthlete = NTS.Domain.Setup.Aggregates.Athlete;
 using SetupCombination = NTS.Domain.Setup.Aggregates.ConfigureEvents.Combination;
 using SetupCompetition = NTS.Domain.Setup.Aggregates.ConfigureEvents.Competition;
@@ -44,10 +45,10 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         "official-witness-user",
         "Official Witness"
     );
-    static readonly IntegrationUser PARTICIPANT_USER = new(
-        "participant.witness@integration.test",
-        "participant-witness-user",
-        "Participant Witness"
+    static readonly IntegrationUser REGISTERED_USER = new(
+        "registered.witness@integration.test",
+        "registered-witness-user",
+        "Registered Witness"
     );
 
     readonly NtsIntegrationFixture _fixture;
@@ -77,7 +78,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
-        await api.RegisterUser(PARTICIPANT_USER);
+        await api.RegisterUser(REGISTERED_USER);
         await api.Create(eventInformation);
         await api.Create(participation);
         await api.Create(arrivelistParticipation);
@@ -98,19 +99,27 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             OFFICIAL_USER,
             "IntegrationOfficialWitness"
         );
-        await using var participantWitness = new WitnessDriver(
+        await using var registeredWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
             _fixture.NexusBaseUrl,
-            PARTICIPANT_USER,
-            "IntegrationParticipantWitness"
+            REGISTERED_USER,
+            "IntegrationRegisteredWitness"
+        );
+        await using var anonymousWitness = new WitnessDriver(
+            _fixture.WarpBaseUrl,
+            _fixture.NexusBaseUrl,
+            user: null,
+            "IntegrationAnonymousWitness"
         );
 
         await judge.Start();
         await officialWitness.Start();
-        await participantWitness.Start();
+        await registeredWitness.Start();
+        await anonymousWitness.Start();
 
         await officialWitness.Connect(eventInformation);
-        await participantWitness.Connect(eventInformation);
+        await registeredWitness.Connect(eventInformation);
+        await anonymousWitness.Connect(eventInformation);
         await judge.Connect(eventInformation);
         var officialArrivelist = officialWitness.GetRequiredService<IArrivelistService>();
         await officialArrivelist.Load();
@@ -159,7 +168,12 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             received => received.Phases.Current.IsComplete(),
             TimeSpan.FromSeconds(10)
         );
-        var participantReceived = await participantWitness.WaitForParticipation(
+        var registeredReceived = await registeredWitness.WaitForParticipation(
+            participationNumber,
+            received => received.Phases.Current.IsComplete(),
+            TimeSpan.FromSeconds(10)
+        );
+        var anonymousReceived = await anonymousWitness.WaitForParticipation(
             participationNumber,
             received => received.Phases.Current.IsComplete(),
             TimeSpan.FromSeconds(10)
@@ -167,10 +181,18 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         Assert.Equal(42, officialReceived.Combination.Number);
         Assert.Equal(eventId, officialReceived.EventId);
-        Assert.Equal(42, participantReceived.Combination.Number);
-        Assert.Equal(eventId, participantReceived.EventId);
+        Assert.Equal(42, registeredReceived.Combination.Number);
+        Assert.Equal(eventId, registeredReceived.EventId);
+        Assert.Equal(42, anonymousReceived.Combination.Number);
+        Assert.Equal(eventId, anonymousReceived.EventId);
         Assert.Equal(WitnessAccessLevel.Official, officialWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Participant, participantWitness.AccessLevel);
+        Assert.Equal(WitnessAccessLevel.Registered, registeredWitness.AccessLevel);
+        Assert.Equal(WitnessAccessLevel.Anonymous, anonymousWitness.AccessLevel);
+
+        var anonymousDenied = await Assert.ThrowsAnyAsync<Exception>(
+            () => anonymousWitness.Publish(CreateSnapshotGroup())
+        );
+        Assert.Contains("Authentication is required to send snapshots", anonymousDenied.Message);
 
         var performanceParticipations = officialWitness.GetRequiredService<IPerformanceParticipations>();
         if (performanceParticipations is NStatefulService performanceStateful)
@@ -394,7 +416,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
     }
 
     [Fact]
-    public async Task Presentlist_updates_from_judge_events_and_transient_acknowledgements()
+    public async Task Presentlist_updates_from_judge_events_on_every_connected_witness()
     {
         var eventId = 1702;
         var presentNumber = 51;
@@ -406,7 +428,7 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
 
         var officialUser = await api.RegisterUser(OFFICIAL_USER);
-        await api.RegisterUser(PARTICIPANT_USER);
+        await api.RegisterUser(REGISTERED_USER);
         await api.Create(eventInformation);
         await api.Create(
             IntegrationPayloadFactory.ActiveParticipation(
@@ -450,28 +472,25 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             OFFICIAL_USER,
             "PresentlistOfficialWitness"
         );
-        await using var participantWitness = new WitnessDriver(
+        await using var registeredWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
             _fixture.NexusBaseUrl,
-            PARTICIPANT_USER,
-            "PresentlistParticipantWitness"
+            REGISTERED_USER,
+            "PresentlistRegisteredWitness"
         );
 
         await judge.Start();
         await officialWitness.Start();
-        await participantWitness.Start();
+        await registeredWitness.Start();
 
         await officialWitness.Connect(eventInformation);
-        await participantWitness.Connect(eventInformation);
+        await registeredWitness.Connect(eventInformation);
         await judge.Connect(eventInformation);
 
         var officialPresentlist = officialWitness.GetRequiredService<IPresentlistService>();
-        var participantPresentlist = participantWitness.GetRequiredService<IPresentlistService>();
+        var registeredPresentlist = registeredWitness.GetRequiredService<IPresentlistService>();
         await officialPresentlist.Load();
-        await participantPresentlist.Load();
-
-        Assert.True(officialPresentlist.CanAcknowledge);
-        Assert.False(participantPresentlist.CanAcknowledge);
+        await registeredPresentlist.Load();
 
         await judge.Record(IntegrationPayloadFactory.AutomaticSnapshot(presentNumber, baseTime));
         var presentEntry = await WaitForPresentlistEntry(
@@ -481,12 +500,11 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "show a Present entry after arrival"
         );
         Assert.Equal(baseTime.AddMinutes(40), presentEntry.Time.ToDateTimeOffset());
-
-        await officialPresentlist.Acknowledge(presentEntry);
-        await WaitForPresentlist(
-            officialPresentlist,
-            entries => entries.All(x => x.Number != presentNumber),
-            "remove the Present entry after acknowledgement publishes a presentation snapshot"
+        await WaitForPresentlistEntry(
+            registeredPresentlist,
+            presentNumber,
+            PresentlistEntryType.Present,
+            "show a Present entry on another connected Witness"
         );
 
         await RecordArrivalAndPresentation(judge, representNumber, baseTime.AddMinutes(10), TimeSpan.FromMinutes(5));
@@ -506,18 +524,17 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         var pendingRepresentation = await api.ReadParticipation(eventId, 5602);
         Assert.False(pendingRepresentation.Phases.Current.IsRequiredInspectionRequested);
 
-        var representEntry = await WaitForPresentlistEntry(
+        await WaitForPresentlistEntry(
             officialPresentlist,
             representNumber,
             PresentlistEntryType.Represent,
             "show a Represent entry after representation is requested"
         );
-
-        await officialPresentlist.Acknowledge(representEntry);
-        await WaitForPresentlist(
-            officialPresentlist,
-            entries => entries.All(x => x.Number != representNumber),
-            "remove the Represent entry after acknowledgement publishes a presentation snapshot"
+        await WaitForPresentlistEntry(
+            registeredPresentlist,
+            representNumber,
+            PresentlistEntryType.Represent,
+            "show a Represent entry on another connected Witness"
         );
 
         await RecordArrivalAndPresentation(judge, riNumber, baseTime.AddMinutes(20), TimeSpan.FromMinutes(5));
@@ -526,62 +543,42 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
 
         await RecordArrivalAndPresentation(judge, criNumber, baseTime.AddMinutes(30), TimeSpan.FromMinutes(20));
 
-        var officialRiEntry = await WaitForPresentlistEntry(
+        await WaitForPresentlistEntry(
             officialPresentlist,
             riNumber,
             PresentlistEntryType.RI,
             "show an RI entry after required inspection is requested"
         );
-        var officialCriEntry = await WaitForPresentlistEntry(
+        await WaitForPresentlistEntry(
             officialPresentlist,
             criNumber,
             PresentlistEntryType.CRI,
             "show a CRI entry after compulsory inspection is calculated"
         );
         await WaitForPresentlistEntry(
-            participantPresentlist,
+            registeredPresentlist,
             riNumber,
             PresentlistEntryType.RI,
             "show an RI entry on another connected Witness"
         );
         await WaitForPresentlistEntry(
-            participantPresentlist,
+            registeredPresentlist,
             criNumber,
             PresentlistEntryType.CRI,
             "show a CRI entry on another connected Witness"
         );
 
-        await officialPresentlist.Acknowledge(officialRiEntry);
-        await officialPresentlist.Acknowledge(officialCriEntry);
-        await WaitForPresentlist(
-            officialPresentlist,
-            entries =>
-                !ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
-                && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
-            "hide acknowledged RI/CRI entries on the acknowledging Witness"
-        );
-        await WaitForPresentlist(
-            participantPresentlist,
-            entries =>
-                !ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
-                && !ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
-            "hide acknowledged RI/CRI entries on another connected Witness"
-        );
+        await registeredWitness.Disconnect();
+        await registeredWitness.Connect(eventInformation);
 
-        await participantWitness.Disconnect();
-        await participantWitness.Connect(eventInformation);
-
-        await WaitForPresentlistEntry(
-            participantPresentlist,
-            riNumber,
-            PresentlistEntryType.RI,
-            "restore transiently acknowledged RI from persisted state after reconnect"
-        );
-        await WaitForPresentlistEntry(
-            participantPresentlist,
-            criNumber,
-            PresentlistEntryType.CRI,
-            "restore transiently acknowledged CRI from persisted state after reconnect"
+        await WaitForPresentlist(
+            registeredPresentlist,
+            entries =>
+                ContainsPresentlistEntry(entries, presentNumber, PresentlistEntryType.Present)
+                && ContainsPresentlistEntry(entries, representNumber, PresentlistEntryType.Represent)
+                && ContainsPresentlistEntry(entries, riNumber, PresentlistEntryType.RI)
+                && ContainsPresentlistEntry(entries, criNumber, PresentlistEntryType.CRI),
+            "rebuild every entry from persisted state after reconnect"
         );
     }
 
@@ -604,17 +601,17 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             "ineligible-official-witness-user",
             "Ineligible Official Witness"
         );
-        var participantIdentity = new IntegrationUser(
-            "operator-participant.witness@integration.test",
-            "operator-participant-witness-user",
-            "Operator Participant Witness"
+        var registeredIdentity = new IntegrationUser(
+            "operator-registered.witness@integration.test",
+            "operator-registered-witness-user",
+            "Operator Registered Witness"
         );
         using var api = new NexusApiDriver(_fixture.NexusBaseUrl);
 
         var operatorUser = ToSetupUser(await api.RegisterUser(operatorIdentity));
         var eligibleOfficialUser = ToSetupUser(await api.RegisterUser(eligibleOfficialIdentity));
         var ineligibleOfficialUser = ToSetupUser(await api.RegisterUser(ineligibleOfficialIdentity));
-        await api.RegisterUser(participantIdentity);
+        await api.RegisterUser(registeredIdentity);
 
         var setupEvent = CreateOperatorSetupEvent(eventId, operatorUser, eligibleOfficialUser, ineligibleOfficialUser);
         await api.CreateSetupConfigureEvent(setupEvent);
@@ -652,27 +649,27 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
             ineligibleOfficialIdentity,
             "IntegrationIneligibleOfficialWitness"
         );
-        await using var participantWitness = new WitnessDriver(
+        await using var registeredWitness = new WitnessDriver(
             _fixture.WarpBaseUrl,
             _fixture.NexusBaseUrl,
-            participantIdentity,
-            "IntegrationOperatorParticipantWitness"
+            registeredIdentity,
+            "IntegrationOperatorRegisteredWitness"
         );
 
         await operatorWitness.Start();
         await eligibleOfficialWitness.Start();
         await ineligibleOfficialWitness.Start();
-        await participantWitness.Start();
+        await registeredWitness.Start();
 
         await operatorWitness.Connect(eventInformation);
         await eligibleOfficialWitness.Connect(eventInformation);
         await ineligibleOfficialWitness.Connect(eventInformation);
-        await participantWitness.Connect(eventInformation);
+        await registeredWitness.Connect(eventInformation);
 
         Assert.Equal(WitnessAccessLevel.Official, operatorWitness.AccessLevel);
         Assert.Equal(WitnessAccessLevel.Official, eligibleOfficialWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Participant, ineligibleOfficialWitness.AccessLevel);
-        Assert.Equal(WitnessAccessLevel.Participant, participantWitness.AccessLevel);
+        Assert.Equal(WitnessAccessLevel.Registered, ineligibleOfficialWitness.AccessLevel);
+        Assert.Equal(WitnessAccessLevel.Registered, registeredWitness.AccessLevel);
 
         await operatorWitness.Publish(CreateSnapshotGroup());
         await eligibleOfficialWitness.Publish(CreateSnapshotGroup());
@@ -769,6 +766,79 @@ public sealed class IntegrationHarnessCheckTest : IClassFixture<NtsIntegrationFi
         Assert.Equal(updated.Id, persisted!.Id);
         Assert.Equal(updated.Name, persisted.Name);
         Assert.Equal(updated.CountryRegion, persisted.CountryRegion);
+    }
+
+    [Fact]
+    public async Task Witness_contexts_pick_up_the_user_when_signin_completes_after_startup()
+    {
+        var signingInUser = new IntegrationUser(
+            "late-signin.witness@integration.test",
+            "late-signin-witness-user",
+            "Late Signin Witness"
+        );
+        await using var witness = new WitnessDriver(
+            _fixture.WarpBaseUrl,
+            _fixture.NexusBaseUrl,
+            user: null,
+            "IntegrationLateSigninWitness"
+        );
+        var profileContext = witness.GetRequiredService<IWitnessProfileContext>();
+        var accessContext = witness.GetRequiredService<IWitnessAccessContext>();
+
+        // The sign-in round trip hands the browser back to a freshly booted app that is still
+        // anonymous, so both contexts initialize before anyone is signed in.
+        await profileContext.Load();
+        await accessContext.Load();
+
+        Assert.Null(profileContext.User);
+        Assert.Equal(WitnessAccessLevel.Anonymous, accessContext.AccessLevel);
+
+        witness.SignIn(signingInUser);
+
+        var user = await WaitForProfileUser(profileContext);
+        Assert.Equal(signingInUser.Email, user.Email);
+        Assert.Equal(
+            WitnessAccessLevel.Registered,
+            await WaitForAccessLevel(accessContext, WitnessAccessLevel.Registered)
+        );
+    }
+
+    static async Task<NUserModel> WaitForProfileUser(IWitnessProfileContext profileContext)
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            if (profileContext.User != null)
+            {
+                return profileContext.User;
+            }
+
+            await Task.Delay(50);
+        }
+
+        throw new TimeoutException(
+            "Witness profile context did not pick up the signed-in user, so the drawer would keep "
+                + "rendering without its profile header until a full page reload."
+        );
+    }
+
+    static async Task<WitnessAccessLevel> WaitForAccessLevel(
+        IWitnessAccessContext accessContext,
+        WitnessAccessLevel expected
+    )
+    {
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            if (accessContext.AccessLevel == expected)
+            {
+                return accessContext.AccessLevel;
+            }
+
+            await Task.Delay(50);
+        }
+
+        return accessContext.AccessLevel;
     }
 
     static SetupConfigureEvent CreateOperatorSetupEvent(
