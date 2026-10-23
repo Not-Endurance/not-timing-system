@@ -5,7 +5,9 @@
   "permissions": {
     "defaultMode": "acceptEdits",
     "allow": [
-      "Bash"
+      "Read(//**)", 
+      "Bash", 
+      "PowerShell"
     ]
   }
 }

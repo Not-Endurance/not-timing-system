@@ -1,10 +1,24 @@
-﻿@using NTS.Domain.Core.Objects.Arrivelists
 @using NoTiming.Ui.Components.CountdownList
+@using NTS.Domain.Core.Objects.Arrivelists
 @using MudBlazor
 
 @inherits ArrivelistTableBehind
 
-<CountdownList TItem="ArrivelistEntry" Items="Service.Entries" Class="@Class" OnTick="Tick">
+<div class="arrivelist-selector">
+    <MudText Typo="Typo.caption" Class="arrivelist-selector-label">@Estimates_string</MudText>
+    <MudToggleGroup T="ArrivelistEstimateMode"
+                    @bind-Value="Mode"
+                    SelectionMode="SelectionMode.SingleSelection"
+                    Color="Color.Primary"
+                    Size="Size.Small"
+                    CheckMark="false">
+        <MudToggleItem T="ArrivelistEstimateMode" Value="ArrivelistEstimateMode.Regional" Text="@Regional_string" />
+        <MudToggleItem T="ArrivelistEstimateMode" Value="ArrivelistEstimateMode.Fei" Text="@FEI_string" />
+        <MudToggleItem T="ArrivelistEstimateMode" Value="ArrivelistEstimateMode.Both" Text="@Both_string" />
+    </MudToggleGroup>
+</div>
+
+<CountdownList TItem="ArrivelistEntry" Items="Entries" Class="@Class" OnTick="Tick">
 
     <HeaderContent>
         <MudTh>@Number_string</MudTh>
@@ -22,21 +36,24 @@
         </MudTd>
 
         <MudTd DataLabel="@Fast_string">
-            <MudText Typo="Typo.caption" Color="Color.Success" Class="countdown-list-nowrap">
-                @FormatEstimate(entry.Fast)
-            </MudText>
+            <ArrivelistEstimate Fei="entry.Fei.Fast"
+                                Regional="entry.Regional.Fast"
+                                Mode="Mode"
+                                TextColor="Color.Success" />
         </MudTd>
 
         <MudTd DataLabel="@Average_string">
-            <MudText Typo="Typo.caption" Color="Color.Warning" Class="countdown-list-nowrap">
-                @FormatEstimate(entry.Average)
-            </MudText>
+            <ArrivelistEstimate Fei="entry.Fei.Average"
+                                Regional="entry.Regional.Average"
+                                Mode="Mode"
+                                TextColor="Color.Warning" />
         </MudTd>
 
         <MudTd DataLabel="@Slow_string">
-            <MudText Typo="Typo.caption" Color="Color.Error" Class="countdown-list-nowrap">
-                @FormatEstimate(entry.Slow)
-            </MudText>
+            <ArrivelistEstimate Fei="entry.Fei.Slow"
+                                Regional="entry.Regional.Slow"
+                                Mode="Mode"
+                                TextColor="Color.Error" />
         </MudTd>
 
         <MudTd DataLabel="@Athlete_string" Class=" countdown-list-min-cell">
