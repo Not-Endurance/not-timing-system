@@ -199,6 +199,22 @@ public sealed class EventRoutesTests : IClassFixture<MongoFixture>
     }
 
     [Theory]
+    [InlineData("1 div 0 eq 1")]
+    [InlineData("substring(name,100) eq 'x'")]
+    public async Task A_filter_that_the_database_cannot_run_on_a_row_is_refused_and_is_not_a_server_error(string filter)
+    {
+        await using var api = NewApi(out _);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, NOW); // a row to run the filter on: a list with no rows runs nothing
+
+        var response = await client.GetAsync($"/api/events/live?filter={Uri.EscapeDataString(filter)}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("invalid-filter", await ErrorCodeAsync(response));
+    }
+
+    [Theory]
     [InlineData("include=anything")]
     [InlineData("fields[events]=name")]
     [InlineData("allTenants=true")]

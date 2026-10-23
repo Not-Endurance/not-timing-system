@@ -27,17 +27,27 @@ internal sealed class RankingPlacing
     public Placing? Placing { get; }
 }
 
+/// <summary>A page of the history of a Participant: the lines of the rides on it, and whether another page follows.</summary>
+internal sealed class HistoryPage
+{
+    public HistoryPage(IReadOnlyList<ParticipationHistory> lines, bool hasMore)
+    {
+        Lines = lines;
+        HasMore = hasMore;
+    }
+
+    public IReadOnlyList<ParticipationHistory> Lines { get; }
+    public bool HasMore { get; }
+}
+
 /// <summary>
 /// One ride in the history of an Athlete or a Horse (#638, ADR-0010): the Event it was ridden in, the Competition and Category,
 /// the other half of the Combination, and what the ride placed as. It is composed from the Participation, its Event and the
 /// Rankings that count it whenever it is asked for, and never stored (ADR-0006). The members that a list can be filtered and
-/// sorted on are the ones that stand for one value; the others are kept from the filter.
+/// sorted on are the ones of a <see cref="HistoryRide"/>, which the database makes; the others are composed for the rides of a page.
 /// </summary>
 internal sealed class ParticipationHistory
 {
-    /// <summary>The members that are objects or lists and so are not compared: a filter or a sort that names one is refused.</summary>
-    public static IReadOnlyCollection<string> Hidden { get; } = [nameof(Other), nameof(Placing), nameof(AlsoCountedIn)];
-
     /// <summary>The id of the Participation.</summary>
     public Guid Id { get; set; }
 

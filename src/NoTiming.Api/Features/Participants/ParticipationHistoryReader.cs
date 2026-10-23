@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.AspNetCore.OData.Query;
 using Not.Exceptions;
 using NoTiming.Api.Features.Tenancy;
 using NTS.Contracts.Core.Models;
@@ -14,11 +15,12 @@ namespace NoTiming.Api.Features.Participants;
 /// Composes the history of an Athlete or a Horse (#638, ADR-0010, ADR-0006, ADR-0007): a line for each ride of an Event that has
 /// ended, in any Tenant, with what the ride placed as. The copies a Participation keeps carry the id of the registry row they
 /// come from, so the id finds the rides whatever Tenant ran them. An Event that is Live has no line yet: its Rankings do not
-/// hold final placings, and a history is what a Participant finished. The placing is the one of the ride's own Ranking, the one
-/// of its Competition and Category; the other Rankings that count it are listed with the placing it has in each. A Ranking that
-/// holds its final placings gives the rank it stores; one that does not is ranked in memory as the Results rank it, over the
-/// Participations of its Event, which are read only then. A placing that cannot be told is left out and the ride is listed all
-/// the same.
+/// hold final placings, and a history is what a Participant finished. The database joins the rides with their Events, filters,
+/// sorts and cuts the page; only the rides on the page are read whole and composed, with the Events and the Rankings they are in.
+/// The placing is the one of the ride's own Ranking, the one of its Competition and Category; the other Rankings that count it
+/// are listed with the placing it has in each. A Ranking that holds its final placings gives the rank it stores; one that does
+/// not is ranked in memory as the Results rank it, over the Participations of its Event, which are read only then. A placing
+/// that cannot be told is left out and the ride is listed all the same.
 /// </summary>
 internal sealed class ParticipationHistoryReader
 {
@@ -31,39 +33,52 @@ internal sealed class ParticipationHistoryReader
         _log = log;
     }
 
-    /// <summary>The lines of the Athlete's or the Horse's history, the newest Event first.</summary>
+    /// <summary>
+    /// A page of the lines of the Athlete's or the Horse's history, the newest Event first unless the options sort, and whether
+    /// another page follows.
+    /// </summary>
     /// <param name="culture">The language the names of the other halves are told in.</param>
     /// <param name="now">The instant by which an Event has ended.</param>
-    public async Task<IReadOnlyList<ParticipationHistory>> ReadAsync(
+    /// <param name="options">The filter and the sort of the caller over the members of a ride.</param>
+    /// <param name="skip">How many rides to leave out.</param>
+    /// <param name="size">How many rides the page holds at most.</param>
+    public async Task<HistoryPage> ReadAsync(
         Caller caller,
         ParticipantKind kind,
         Guid id,
         CultureInfo culture,
         DateTimeOffset now,
+        ODataQueryOptions<HistoryRide>? options,
+        int skip,
+        int size,
         CancellationToken cancellationToken
     )
     {
-        var rides =
-            kind == ParticipantKind.Athlete
-                ? await _reads.ReadRidesOfAthleteAsync(caller, id, cancellationToken)
-                : await _reads.ReadRidesOfHorseAsync(caller, id, cancellationToken);
+        // one ride more than the page is read, to know whether another page follows
+        var read = await _reads.ReadHistoryAsync(caller, kind, id, now, options, skip, size + 1, cancellationToken);
+        var rides = read.Take(size).ToList();
+        var models = (
+            await _reads.ReadParticipationsAsync([.. rides.Select(x => x.Id)], cancellationToken)
+        ).ToDictionary(x => x.Id);
         var events = (
             await _reads.ReadStartedEventsAsync([.. rides.Select(x => x.EventId).Distinct()], cancellationToken)
-        )
-            .Where(x => EventStageRule.Of(true, x.EndDay, now) == EventStage.Historic)
-            .ToDictionary(x => x.Id);
+        ).ToDictionary(x => x.Id);
         var rankings = (await _reads.ReadRankingsOfEventsAsync([.. events.Keys], cancellationToken)).ToLookup(x =>
             x.EventId
         );
         var happenings = events.ToDictionary(x => x.Key, x => new HistoricEvent(x.Value, [.. rankings[x.Key]], _reads));
 
         var lines = new List<ParticipationHistory>();
-        foreach (var ride in rides.Where(x => happenings.ContainsKey(x.EventId)))
+        foreach (var ride in rides)
         {
-            lines.Add(await LineAsync(kind, ride, happenings[ride.EventId], culture, cancellationToken));
+            // a ride whose Participation or Event has gone since the page was cut is left out
+            if (models.TryGetValue(ride.Id, out var model) && happenings.TryGetValue(ride.EventId, out var happening))
+            {
+                lines.Add(await LineAsync(kind, model, happening, culture, cancellationToken));
+            }
         }
 
-        return [.. lines.OrderByDescending(x => x.EndDay).ThenByDescending(x => x.StartDay).ThenBy(x => x.Id)];
+        return new HistoryPage(lines, read.Count > size);
     }
 
     async Task<ParticipationHistory> LineAsync(

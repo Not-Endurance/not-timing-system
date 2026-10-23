@@ -147,6 +147,24 @@ public sealed class ParticipationRoutesTests : IClassFixture<MongoFixture>
         );
     }
 
+    [Theory]
+    [InlineData(" and 1 div 0 eq 1")]
+    [InlineData(" and substring(competition/name,100) eq 'x'")]
+    public async Task A_filter_that_the_database_cannot_run_on_a_row_is_refused_and_is_not_a_server_error(string more)
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var anonymous = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var eventId = await EventSeed.LiveAsync(_mongo.ConnectionString, tenant, null, DateTimeOffset.UtcNow);
+        await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, Ridden(eventId, 1)); // a row to run the filter on: a list with no rows runs nothing
+
+        var response = await anonymous.GetAsync($"/api/participations?filter=eventId eq {eventId}{more}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var error = (await ApiSessions.ReadJsonAsync(response)).GetProperty("errors")[0];
+        Assert.Equal("invalid-filter", error.GetProperty("code").GetString());
+    }
+
     [Fact]
     public async Task A_filter_the_way_a_client_joins_its_filters_has_the_Event_in_parentheses_and_is_the_same_list()
     {

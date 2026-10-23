@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.Time.Testing;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NTS.Domain.Core.Aggregates;
@@ -124,6 +125,146 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
             ["Sofia", "Plovdiv", "Varna"],
             listed.Select(x => x.GetProperty("attributes").GetProperty("location").GetString())
         );
+    }
+
+    [Fact]
+    public async Task A_ride_of_an_Event_that_was_deleted_is_not_listed()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var kept = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Kept ride", "Plovdiv", 30);
+        var gone = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Deleted ride", "Varna", 60);
+        var keptRide = HistorySeed.Ride(kept, 1, _ana, _fire);
+        var goneRide = HistorySeed.Ride(gone, 1, _ana, _fire);
+        await StoreAsync(
+            tenant,
+            keptRide,
+            Ranked(kept, "CEI 1*", (keptRide, 1)),
+            goneRide,
+            Ranked(gone, "CEI 1*", (goneRide, 1))
+        );
+        await HistorySeed.SoftDeleteEventAsync(_mongo.ConnectionString, gone);
+
+        var response = await me.Page.GetAsync($"/api/participations/history?filter=athleteId eq {_ana.Id}");
+
+        Assert.Equal(
+            [keptRide.Id.ToString()],
+            (await RowsAsync(response)).Select(x => x.GetProperty("id").GetString())
+        );
+    }
+
+    [Theory]
+    [InlineData(false)] // the ride was deleted
+    [InlineData(true)] // the Event was deleted
+    public async Task What_was_deleted_takes_no_place_on_a_page_and_makes_no_page_after_it(bool theEvent)
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var spring = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var goneFirst = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Deleted ride", "Varna", 30);
+        var autumn = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Ruse", 50);
+        var goneLast = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Deleted again", "Burgas", 70);
+        var springRide = HistorySeed.Ride(spring, 1, _ana, _fire);
+        var firstGone = HistorySeed.Ride(goneFirst, 1, _ana, _fire);
+        var autumnRide = HistorySeed.Ride(autumn, 1, _ana, _fire);
+        var lastGone = HistorySeed.Ride(goneLast, 1, _ana, _fire);
+        await StoreAsync(tenant, springRide, firstGone, autumnRide, lastGone);
+        if (theEvent)
+        {
+            await HistorySeed.SoftDeleteEventAsync(_mongo.ConnectionString, goneFirst);
+            await HistorySeed.SoftDeleteEventAsync(_mongo.ConnectionString, goneLast);
+        }
+        else
+        {
+            await HistorySeed.SoftDeleteAsync(_mongo.ConnectionString, firstGone.Id);
+            await HistorySeed.SoftDeleteAsync(_mongo.ConnectionString, lastGone.Id);
+        }
+
+        var response = await me.Page.GetAsync(
+            $"/api/participations/history?filter=athleteId eq {_ana.Id}&page[size]=2"
+        );
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await ApiSessions.ReadJsonAsync(response);
+        Assert.Equal(
+            new[] { springRide.Id, autumnRide.Id }.Select(x => x.ToString()), // the page is full: the one between them is not counted
+            body.GetProperty("data").EnumerateArray().Select(x => x.GetProperty("id").GetString())
+        );
+        Assert.False(body.GetProperty("links").TryGetProperty("next", out _)); // and the one after them is no page of its own
+    }
+
+    [Fact]
+    public async Task An_Event_is_over_from_the_second_its_last_day_ends_and_not_before()
+    {
+        var end = new DateTimeOffset(2030, 5, 21, 23, 59, 59, TimeSpan.Zero);
+        var time = new FakeTimeProvider(end.AddSeconds(-1));
+        await using var api = new ApiFactory(_mongo.ConnectionString, time: time);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var edge = await HistorySeed.EventAsync(
+            _mongo.ConnectionString,
+            tenant,
+            "Edge ride",
+            "Plovdiv",
+            end.AddHours(-23),
+            end
+        );
+        var ride = HistorySeed.Ride(edge, 1, _ana, _fire);
+        await StoreAsync(tenant, ride, Ranked(edge, "CEI 1*", (ride, 1)));
+        var path = $"/api/participations/history?filter=athleteId eq {_ana.Id}";
+
+        var before = await RowsAsync(await me.Page.GetAsync(path));
+        time.SetUtcNow(end);
+        var at = await RowsAsync(await me.Page.GetAsync(path));
+
+        Assert.Empty(before); // the last second is still the Event's
+        Assert.Equal([ride.Id.ToString()], at.Select(x => x.GetProperty("id").GetString()));
+    }
+
+    [Fact]
+    public async Task A_page_reads_only_the_rides_the_Events_and_the_Rankings_that_are_on_it()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var oldest = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Varna", 300);
+        var middle = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Winter ride", "Plovdiv", 200);
+        var newest = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 100);
+        var oldestRide = HistorySeed.Ride(oldest, 1, _ana, _fire);
+        var middleRide = HistorySeed.Ride(middle, 1, _ana, _fire);
+        var newestRide = HistorySeed.Ride(newest, 1, _ana, _fire);
+        var oldestRanking = Ranked(oldest, "CEI 1*", (oldestRide, 1));
+        await StoreAsync(
+            tenant,
+            oldestRide,
+            oldestRanking,
+            middleRide,
+            Ranked(middle, "CEI 1*", (middleRide, 1)),
+            newestRide,
+            Ranked(newest, "CEI 1*", (newestRide, 1))
+        );
+        await HistorySeed.SpoilParticipationAsync(_mongo.ConnectionString, oldestRide.Id); // something that cannot be read whole
+        await HistorySeed.SpoilRankingAsync(_mongo.ConnectionString, oldestRanking.Id);
+
+        var response = await me.Page.GetAsync(
+            $"/api/participations/history?filter=athleteId eq {_ana.Id}&page[size]=2"
+        );
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode); // the oldest ride is on the next page, and nothing of it is read for this one
+        var body = await ApiSessions.ReadJsonAsync(response);
+        var page = body.GetProperty("data").EnumerateArray().ToList();
+        Assert.Equal(
+            new[] { newestRide.Id, middleRide.Id }.Select(x => x.ToString()),
+            page.Select(x => x.GetProperty("id").GetString())
+        );
+        Assert.Equal(1, page[0].GetProperty("attributes").GetProperty("placing").GetProperty("rank").GetInt32());
+        Assert.Equal(JsonValueKind.String, body.GetProperty("links").GetProperty("next").ValueKind);
     }
 
     [Fact]
@@ -613,6 +754,31 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
         );
     }
 
+    [Theory]
+    [InlineData("location")]
+    [InlineData("-location")]
+    public async Task Rides_that_are_equal_in_the_sort_of_the_caller_come_in_the_order_of_their_ids(string sort)
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var past = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "One Event", "Sofia", 30);
+        var low = HistorySeed.Ride(past, 1, _ana, _fire, id: IdStartingWith("00"));
+        var middle = HistorySeed.Ride(past, 2, _ana, _wind, id: IdStartingWith("80"));
+        var high = HistorySeed.Ride(past, 3, _ana, _fire, id: IdStartingWith("ff"));
+        await StoreAsync(tenant, high, low, middle); // stored in an order of their own
+
+        var rows = await RowsAsync(
+            await me.Page.GetAsync($"/api/participations/history?filter=athleteId eq {_ana.Id}&sort={sort}")
+        );
+
+        Assert.Equal(
+            new[] { low.Id, middle.Id, high.Id }.Select(x => x.ToString()),
+            rows.Select(x => x.GetProperty("id").GetString())
+        ); // one location, so the sort does not tell them apart, and a page of them must not depend on how they are stored
+    }
+
     [Fact]
     public async Task The_person_may_be_in_parentheses_and_the_filter_may_have_spaces_around_it()
     {
@@ -694,14 +860,15 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
     [InlineData("&include=horse", "unsupported-parameter")]
     [InlineData("&fields[participation-histories]=location", "unsupported-parameter")]
     [InlineData(" and nonsense eq 1", "invalid-filter")]
+    [InlineData(" and eventIsDeleted eq false", "invalid-filter")] // what the database needs to leave a ride out is not a member of it
+    [InlineData(" and substring(competition,100) eq 'x'", "invalid-filter")] // valid, and the database cannot run it on a text that short
+    [InlineData(" and 1 div 0 eq 1", "invalid-filter")]
     [InlineData(" and other/displayName eq 'Fire'", "invalid-filter")] // what a row keeps to itself cannot be asked for
     [InlineData(" and placing/rank eq 1", "invalid-filter")]
     [InlineData(" and other eq null", "invalid-filter")]
     [InlineData(" and placing eq null", "invalid-filter")]
     [InlineData(" and alsoCountedIn/$count gt 0", "invalid-filter")]
     [InlineData("&sort=other/displayName", "invalid-sort")]
-    [InlineData(" and substring(competition,100) eq 'x'", "invalid-filter")] // valid, and it cannot be run on a text that short
-    [InlineData(" and 1 div 0 eq 1", "invalid-filter")]
     public async Task What_the_list_does_not_take_is_refused_with_the_code_the_skill_names(string more, string code)
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
@@ -762,6 +929,32 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
         Assert.Equal(onWind.Id.ToString(), Assert.Single(inTheText).GetProperty("id").GetString());
         Assert.Empty(beforeTheYear2000);
         Assert.Equal(2, afterTheYear2000.Count);
+    }
+
+    [Fact]
+    public async Task A_list_is_filtered_and_sorted_by_the_name_of_the_Event_and_by_the_ruleset_of_the_ride()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var me = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var spring = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Spring ride", "Sofia", 10);
+        var autumn = await HistorySeed.HistoricAsync(_mongo.ConnectionString, tenant, "Autumn ride", "Varna", 30);
+        var onFire = HistorySeed.Ride(spring, 1, _ana, _fire);
+        var onWind = HistorySeed.Ride(autumn, 1, _ana, _wind, "Regional 40", CompetitionRuleset.Regional);
+        await StoreAsync(tenant, onFire, onWind);
+
+        async Task<List<string?>> IdsAsync(string more)
+        {
+            var response = await me.Page.GetAsync($"/api/participations/history?filter=athleteId eq {_ana.Id}{more}");
+            return [.. (await RowsAsync(response)).Select(x => x.GetProperty("id").GetString())];
+        }
+
+        Assert.Equal([onWind.Id.ToString()], await IdsAsync(" and eventName eq 'Autumn ride'"));
+        Assert.Equal([onWind.Id.ToString()], await IdsAsync(" and ruleset eq 'Regional'"));
+        Assert.Equal([onFire.Id.ToString()], await IdsAsync(" and ruleset eq 'FEI'"));
+        Assert.Equal([onWind.Id.ToString(), onFire.Id.ToString()], await IdsAsync("&sort=eventName")); // Autumn, Spring
+        Assert.Equal([onWind.Id.ToString(), onFire.Id.ToString()], await IdsAsync("&sort=-ruleset")); // Regional, FEI
     }
 
     [Fact]
@@ -842,6 +1035,12 @@ public sealed class ParticipationHistoryTests : IClassFixture<MongoFixture>
                 await EventSeed.RankingAsync(_mongo.ConnectionString, tenant, (Ranking)document);
             }
         }
+    }
+
+    /// <summary>A new id that is ordered by the two hex digits it starts with, before or after another that starts with others.</summary>
+    static Guid IdStartingWith(string digits)
+    {
+        return Guid.Parse(digits + Guid.NewGuid().ToString("N")[2..]);
     }
 
     static RankingEntry Entry(Participation ride, int rank)

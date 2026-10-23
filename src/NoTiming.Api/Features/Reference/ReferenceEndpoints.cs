@@ -289,12 +289,12 @@ internal static class ReferenceEndpoints
 
     /// <summary>
     /// Reads a page of a list. An expression that is valid in the OData grammar and that the data cannot run, such as the
-    /// date parts of a date (<c>year(endDay)</c>), is for the caller to correct: 400 <c>invalid-filter</c>, and not a
-    /// server error.
+    /// date parts of a date (<c>year(endDay)</c>), or that the database cannot run on a row, such as a division by zero or a
+    /// part of a text that starts past its end, is for the caller to correct: 400 <c>invalid-filter</c>, and not a server
+    /// error.
     /// </summary>
-    public static async Task<(IReadOnlyList<T>? Rows, IResult? Refusal)> ReadPageAsync<T>(
-        Func<Task<IReadOnlyList<T>>> read
-    )
+    public static async Task<(TPage? Page, IResult? Refusal)> ReadPageAsync<TPage>(Func<Task<TPage>> read)
+        where TPage : class
     {
         try
         {
@@ -309,6 +309,18 @@ internal static class ReferenceEndpoints
                     "invalid-filter",
                     "The filter cannot be applied.",
                     "The expression is valid, but the data cannot run it: write the comparison on the member itself."
+                )
+            );
+        }
+        catch (UnrunnableExpressionException)
+        {
+            return (
+                null,
+                JsonApiResults.Error(
+                    StatusCodes.Status400BadRequest,
+                    "invalid-filter",
+                    "The filter cannot be applied.",
+                    "The expression is valid, but the database cannot run it on every row: look at what it divides by, or takes a part of."
                 )
             );
         }

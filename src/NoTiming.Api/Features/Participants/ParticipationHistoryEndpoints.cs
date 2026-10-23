@@ -62,47 +62,39 @@ internal static class ParticipationHistoryEndpoints
             );
         }
 
-        var query = ReferenceQuery<ParticipationHistory>.Read(context.Request, ParticipationHistory.Hidden);
+        var query = ReferenceQuery<HistoryRide>.Read(context.Request, HistoryRide.Hidden);
         if (query.Refusal != null)
         {
             return query.Refusal;
         }
 
         var culture = CultureInfo.GetCultureInfo(text.Resolve(context.Request));
-        var history = await reader.ReadAsync(
-            AccountRoles.CallerOf(user),
-            subject.Kind,
-            subject.Id,
-            culture,
-            time.GetUtcNow(),
-            context.RequestAborted
+        var (page, refusal) = await ReferenceEndpoints.ReadPageAsync(
+            () =>
+                reader.ReadAsync(
+                    AccountRoles.CallerOf(user),
+                    subject.Kind,
+                    subject.Id,
+                    culture,
+                    time.GetUtcNow(),
+                    query.Options,
+                    query.Skip,
+                    query.Size,
+                    context.RequestAborted
+                )
         );
-
-        IReadOnlyList<ParticipationHistory> rows;
-        try
+        if (refusal != null)
         {
-            rows = ReferencePages.Page(history, query.Options, query.Skip, query.Take);
-        }
-        catch (Exception ex)
-            when (ex is ArgumentException or ArithmeticException or InvalidOperationException or NotSupportedException)
-        {
-            // The rows are in memory, so an expression of the grammar that is valid is run on each of them, and the filter of a caller
-            // can fail there (a substring beyond the end of a text, a division by zero): it is theirs to correct, and not a server error.
-            return JsonApiResults.Error(
-                StatusCodes.Status400BadRequest,
-                "invalid-filter",
-                "The filter cannot be applied.",
-                "The expression is valid, but it cannot be run on the rides."
-            );
+            return refusal;
         }
 
         // The names are told in the language of the request.
         context.Response.Headers.Append(HeaderNames.Vary, HeaderNames.AcceptLanguage);
         return JsonApiResults.Collection(
             PARTICIPATION_HISTORIES,
-            rows.Take(query.Size).Select(x => (x.Id.ToString(), x.Attributes())),
-            links: ReferenceEndpoints.Links(context.Request, query, rows.Count > query.Size),
-            meta: new { page = new { size = query.Size, number = query.Number } },
+            page!.Lines.Select(x => (x.Id.ToString(), x.Attributes())),
+            links: ReferenceEndpoints.Links(context.Request, query, page.HasMore),
+            meta: JsonApiPaging.Meta(query.Size, query.Number),
             itemLink: id => $"/api/participations/{id}"
         );
     }

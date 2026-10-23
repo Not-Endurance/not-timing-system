@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Not.Identity;
+using NoTiming.Api.Features.Participants;
 using NoTiming.Api.Features.Reference;
 using NTS.Contracts.Core.Models;
 using NTS.Contracts.Features.Participants;
@@ -263,28 +264,83 @@ internal sealed class CrossTenantReads
     }
 
     /// <summary>
-    /// The Participations of the Athlete with the id, in any Tenant and of any Event (#638, ADR-0010): the copies a
-    /// Participation keeps carry the id of the registry row they come from, so the id finds the rides of a person whatever
-    /// Tenant ran them. A Participation that the Functions host flagged as deleted is not one. Reading across the Events of a
+    /// A page of the rides of the Athlete or the Horse with the id, in any Tenant and of the Events that have ended by the
+    /// instant (#638, ADR-0010): the copies a Participation keeps carry the id of the registry row they come from, so the id
+    /// finds the rides of a person whatever Tenant ran them, and the database joins each with its Event, filters and sorts the
+    /// rows as the options say (the newest Event first when they do not sort) and cuts the page, so that only the rides on it are
+    /// read. A Participation or an Event that the Functions host flagged as deleted is not one. Reading across the Events of a
     /// Participant is for signed-in accounts alone, and the policy is asked here as a second guard behind the route.
     /// </summary>
-    public Task<IReadOnlyList<ParticipationModel>> ReadRidesOfAthleteAsync(
+    public async Task<IReadOnlyList<HistoryRide>> ReadHistoryAsync(
         Caller caller,
+        ParticipantKind kind,
         Guid id,
+        DateTimeOffset now,
+        ODataQueryOptions<HistoryRide>? options,
+        int skip,
+        int take,
         CancellationToken cancellationToken
     )
     {
-        return ReadRidesAsync("rides of an Athlete", nameof(ParticipantKind.Athlete), caller, id, cancellationToken);
+        Allow("history of a Participant", caller);
+        var participations = _database
+            .GetCollection<ParticipationModel>(TenantOwned.EVENT_PARTICIPATIONS)
+            .AsQueryable()
+            .Where(x => !x.IsDeleted);
+        var rides =
+            kind == ParticipantKind.Athlete
+                ? participations.Where(x => x.Combination.Athlete.Id == id)
+                : participations.Where(x => x.Combination.Horse.Id == id);
+        var joined = rides
+            .Join(
+                _database.GetCollection<EventInformationModel>(TenantOwned.EVENT_INFORMATIONS).AsQueryable(),
+                ride => ride.EventId,
+                happening => happening.Id,
+                (ride, happening) =>
+                    new HistoryRide
+                    {
+                        Id = ride.Id,
+                        EventId = happening.Id,
+                        EventName = happening.Name,
+                        Location = happening.Location,
+                        StartDay = happening.StartDay,
+                        EndDay = happening.EndDay,
+                        Competition = ride.Competition.Name,
+                        Ruleset = ride.Competition.Ruleset.ToString(),
+                        Category = ride.Category.ToString(),
+                        AthleteId = ride.Combination.Athlete.Id,
+                        HorseId = ride.Combination.Horse.Id,
+                        EventIsDeleted = happening.IsDeleted,
+                    }
+            )
+            .Where(x => !x.EventIsDeleted && x.EndDay <= now);
+
+        return await ReferencePages.ReadAsync(
+            joined,
+            options,
+            x =>
+                x.OrderByDescending(ride => ride.EndDay)
+                    .ThenByDescending(ride => ride.StartDay)
+                    .ThenBy(ride => ride.Id),
+            x => x.ThenBy(ride => ride.Id),
+            skip,
+            take,
+            cancellationToken
+        );
     }
 
-    /// <summary>The same for the Horse with the id.</summary>
-    public Task<IReadOnlyList<ParticipationModel>> ReadRidesOfHorseAsync(
-        Caller caller,
-        Guid id,
+    /// <summary>The Participations with the ids, whatever Tenant they are in, but for the ones the Functions host flagged as deleted.</summary>
+    public async Task<IReadOnlyList<ParticipationModel>> ReadParticipationsAsync(
+        IReadOnlyCollection<Guid> ids,
         CancellationToken cancellationToken
     )
     {
-        return ReadRidesAsync("rides of a Horse", nameof(ParticipantKind.Horse), caller, id, cancellationToken);
+        return await ReadOfEventsAsync<ParticipationModel>(
+            TenantOwned.EVENT_PARTICIPATIONS,
+            STANDARD_ID,
+            ids,
+            cancellationToken
+        );
     }
 
     /// <summary>
@@ -571,21 +627,6 @@ internal sealed class CrossTenantReads
         {
             throw new CrossTenantRefusedException(read, verdict.Reason!.Value);
         }
-    }
-
-    async Task<IReadOnlyList<ParticipationModel>> ReadRidesAsync(
-        string read,
-        string member,
-        Caller caller,
-        Guid id,
-        CancellationToken cancellationToken
-    )
-    {
-        Allow(read, caller);
-        return await _database
-            .GetCollection<ParticipationModel>(TenantOwned.EVENT_PARTICIPATIONS)
-            .Find(Undeleted(new BsonDocument($"Combination.{member}.{STANDARD_ID}", BsonGuids.Binary(id))))
-            .ToListAsync(cancellationToken);
     }
 
     /// <summary>The documents of a collection, found by the member that holds the id of their Event, but for the ones flagged as deleted.</summary>

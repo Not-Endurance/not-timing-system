@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -30,6 +31,13 @@ internal interface IReferenceCollection<T>
     Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken);
 }
 
+/// <summary>A filter of the caller that is valid, and that the database could not run on a row of the list.</summary>
+internal sealed class UnrunnableExpressionException : Exception
+{
+    public UnrunnableExpressionException(Exception cause)
+        : base("The database could not run the filter on a row of the list.", cause) { }
+}
+
 /// <summary>How a page of the rows of a query is read, whoever the rows belong to.</summary>
 internal static class ReferencePages
 {
@@ -46,38 +54,69 @@ internal static class ReferencePages
     )
         where T : class, IDocument
     {
-        var settings = new ODataQuerySettings();
-        if (options?.Filter != null)
-        {
-            query = (IQueryable<T>)options.Filter.ApplyTo(query, settings);
-        }
-
-        query = options?.OrderBy != null ? options.OrderBy.ApplyTo(query, settings) : query.OrderBy(x => x.Id);
-        return await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+        return await ReadAsync(query, options, x => x.OrderBy(row => row.Id), null, skip, take, cancellationToken);
     }
 
     /// <summary>
-    /// A page of rows that are already in memory (a list that is composed from several collections, such as the history of a
-    /// Participant), filtered and sorted as the options say, and in the order the rows come in when no sort was asked for. An
-    /// expression that the options accept and the rows cannot run is for the caller to correct, as it is for a page of a
-    /// collection: the exception it throws is the caller's to tell apart.
+    /// The same for rows that are not documents of a collection (a join of two): <paramref name="unsorted"/> is the order of
+    /// the rows when the caller asked for none, and <paramref name="afterSort"/> what follows the sort of the caller, so that
+    /// two rows that are equal in it come in the same order whatever the page.
     /// </summary>
-    public static IReadOnlyList<T> Page<T>(IEnumerable<T> rows, ODataQueryOptions<T>? options, int skip, int take)
+    public static async Task<IReadOnlyList<T>> ReadAsync<T>(
+        IQueryable<T> query,
+        ODataQueryOptions<T>? options,
+        Func<IQueryable<T>, IOrderedQueryable<T>> unsorted,
+        Func<IOrderedQueryable<T>, IOrderedQueryable<T>>? afterSort,
+        int skip,
+        int take,
+        CancellationToken cancellationToken
+    )
         where T : class
     {
-        var settings = new ODataQuerySettings();
-        var query = rows.AsQueryable();
-        if (options?.Filter != null)
+        async Task<IReadOnlyList<T>> Page()
         {
-            query = (IQueryable<T>)options.Filter.ApplyTo(query, settings);
+            var settings = new ODataQuerySettings();
+            var filtered = options?.Filter != null ? (IQueryable<T>)options.Filter.ApplyTo(query, settings) : query;
+            var ordered = unsorted(filtered);
+            if (options?.OrderBy != null)
+            {
+                ordered = options.OrderBy.ApplyTo(filtered, settings);
+                ordered = afterSort == null ? ordered : afterSort(ordered);
+            }
+
+            return await ordered.Skip(skip).Take(take).ToListAsync(cancellationToken);
         }
 
-        if (options?.OrderBy != null)
+        try
         {
-            query = options.OrderBy.ApplyTo(query, settings);
+            return await Page();
         }
+        catch (Exception ex) when (options?.Filter != null && IsOfTheExpression(ex))
+        {
+            throw new UnrunnableExpressionException(ex);
+        }
+    }
 
-        return [.. query.Skip(skip).Take(take)];
+    /// <summary>
+    /// Whether the failure of a read that applies a filter of the caller is the expression's, which is for the caller to
+    /// correct, and not the database's (a sort is a list of members, which the database always runs). The driver reports an
+    /// error that it meets while it evaluates a part of the expression that does not depend on a row (<c>1 div 0</c>) as a
+    /// <see cref="TargetInvocationException"/>. A failure to connect, to authenticate or to answer in time is another kind of
+    /// exception, but a command that the server refuses is always a <see cref="MongoCommandException"/>, whether the query is
+    /// the reason or the state of the server is (not primary, shutting down, a time limit, rights), so the code tells: the
+    /// query cannot be run when the code is a bad value, a type mismatch, a failed parse, an overflow or a failed conversion,
+    /// or one of the numbered assertions of the expressions of the server, which it names <c>Location</c> and the number (a
+    /// division by zero, a part of a text that starts past its end).
+    /// </summary>
+    public static bool IsOfTheExpression(Exception ex)
+    {
+        return ex switch
+        {
+            TargetInvocationException => true,
+            MongoCommandException { Code: 2 or 9 or 14 or 15 or 241 } => true,
+            MongoCommandException { CodeName: { } name } => name.StartsWith("Location", StringComparison.Ordinal),
+            _ => false,
+        };
     }
 }
 

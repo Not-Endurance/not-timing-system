@@ -253,6 +253,17 @@ internal static class HistorySeed
             .DeleteOneAsync(new BsonDocument("_id", EventSeed.Binary(participationId)));
     }
 
+    /// <summary>Marks the stored Event as one that was deleted before the Api stopped keeping the flag.</summary>
+    public static async Task SoftDeleteEventAsync(string mongoConnectionString, Guid eventId)
+    {
+        await EventSeed
+            .Cores(mongoConnectionString)
+            .UpdateOneAsync(
+                new BsonDocument("_id", EventSeed.Binary(eventId)),
+                new BsonDocument("$set", new BsonDocument("IsDeleted", true))
+            );
+    }
+
     /// <summary>Marks the stored Participation as one that was deleted before the Api stopped keeping the flag.</summary>
     public static async Task SoftDeleteAsync(string mongoConnectionString, Guid participationId)
     {
@@ -260,6 +271,31 @@ internal static class HistorySeed
             .UpdateOneAsync(
                 new BsonDocument("_id", EventSeed.Binary(participationId)),
                 new BsonDocument("$set", new BsonDocument("IsDeleted", true))
+            );
+    }
+
+    /// <summary>
+    /// Spoils the stored Participation so that it cannot be read as one, as a document that something else wrote may be: its
+    /// Phases are a text. Whatever reads it whole fails; a read of the members around it does not.
+    /// </summary>
+    public static async Task SpoilParticipationAsync(string mongoConnectionString, Guid participationId)
+    {
+        await Participations(mongoConnectionString)
+            .UpdateOneAsync(
+                new BsonDocument("_id", EventSeed.Binary(participationId)),
+                new BsonDocument("$set", new BsonDocument("Phases", "spoiled"))
+            );
+    }
+
+    /// <summary>Spoils the stored Ranking in the same way: its Entries are a text.</summary>
+    public static async Task SpoilRankingAsync(string mongoConnectionString, Guid rankingId)
+    {
+        await new MongoClient(mongoConnectionString)
+            .GetDatabase(UserSeed.DATABASE)
+            .GetCollection<BsonDocument>("event_rankings")
+            .UpdateOneAsync(
+                new BsonDocument("_id", EventSeed.Binary(rankingId)),
+                new BsonDocument("$set", new BsonDocument("Entries", "spoiled"))
             );
     }
 
