@@ -19,21 +19,20 @@ internal static class ParticipantJson
     }
 
     /// <summary>
-    /// A row of the registry of Athletes or of Horses told as a resource: its <c>id</c>, and its <c>name</c> and <c>nameEnglish</c> as
-    /// attributes, named as the displays name it (<see cref="NameRenderingHelper"/>): in English where the language of the app is
-    /// English, as it was registered otherwise.
+    /// A row of the registry of Athletes or of Horses told as a resource: its <c>id</c>, and its <c>name</c>, <c>nameEnglish</c> and
+    /// <c>feiId</c> as attributes, which are what a search matches. The name a person reads is made from them when it is asked for
+    /// (<see cref="FoundParticipant.Named"/>), as the displays name it (<see cref="NameRenderingHelper"/>): in English where the
+    /// language of the app is English, as it was registered otherwise.
     /// </summary>
-    public static ParticipantName NameOfRow(ParticipantKind kind, JsonElement resource)
+    public static FoundParticipant FoundOf(ParticipantKind kind, JsonElement resource)
     {
         var attributes = resource.GetProperty("attributes");
-        var nameEnglish =
-            attributes.TryGetProperty("nameEnglish", out var english) && english.ValueKind == JsonValueKind.String
-                ? english.GetString()
-                : null;
-        return new ParticipantName(
+        return new FoundParticipant(
             kind,
             Guid.Parse(resource.GetProperty("id").GetString()!),
-            NameRenderingHelper.Render(attributes.GetProperty("name").GetString()!, nameEnglish)
+            attributes.GetProperty("name").GetString()!,
+            TextOf(attributes, "nameEnglish"),
+            TextOf(attributes, "feiId")
         );
     }
 
@@ -52,6 +51,13 @@ internal static class ParticipantJson
             PlacingIn(attributes),
             attributes.TryGetProperty("alsoCountedIn", out var also) ? [.. also.EnumerateArray().Select(CountedIn)] : []
         );
+    }
+
+    static string? TextOf(JsonElement attributes, string member)
+    {
+        return attributes.TryGetProperty(member, out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
     }
 
     static CountedPlacing CountedIn(JsonElement ranking)

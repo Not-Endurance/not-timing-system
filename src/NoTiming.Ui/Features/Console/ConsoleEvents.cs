@@ -144,7 +144,7 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
     {
         if (!ParticipantService.IsSearchable(text))
         {
-            return []; // the Api refuses a text with no word of three characters, and a person who is still typing is not told off
+            return []; // the Api refuses a text with no word of two characters, and a person who is still typing is not told off
         }
 
         var words = string.Join(' ', ParticipantService.WordsOf(text));

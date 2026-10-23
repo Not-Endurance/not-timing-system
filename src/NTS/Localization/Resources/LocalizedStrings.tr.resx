@@ -965,7 +965,7 @@
     <value>Etkinliği devret</value>
   </data>
   <data name="Find_account_string" xml:space="preserve">
-    <value>Hesabı ada göre bulun (en az üç harf)</value>
+    <value>Hesabı ada göre bulun (en az iki harf)</value>
   </data>
   <data name="Main_operator_string" xml:space="preserve">
     <value>Ana Operatör</value>

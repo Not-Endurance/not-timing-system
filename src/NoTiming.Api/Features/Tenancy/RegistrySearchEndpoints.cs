@@ -19,7 +19,7 @@ internal delegate Task<IReadOnlyList<RegistryMatch>> RegistrySearch(
 /// it and is found by another through the cross-tenant search, which every signed-in account may make. A search takes
 /// <c>filter=contains(name,'text')</c>, where the name stands for what names a row: its name, its English name and, for
 /// Athletes and Horses, its FEI ID. Every word of the text has to be part of one of those, whatever the case and in any
-/// order, and one of the words has to be of three characters at least (<see cref="NameSearch"/>). The names are in order, or
+/// order, and one of the words has to be of two characters at least (<see cref="NameSearch"/>). The names are in order, or
 /// in the order the other way round (<c>sort</c>), and a list is paged as every list is, ten rows to a page and twenty-five at
 /// most. It answers only the fields that are meant to leave, and draws on the budget of searches that the search of accounts
 /// draws on, a page being a search. The database does all of it. The Tenant's own list of a registry is a route of the

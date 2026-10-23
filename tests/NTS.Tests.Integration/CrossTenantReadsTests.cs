@@ -255,7 +255,7 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_search_needs_a_word_of_three_characters_and_reads_the_page_it_is_asked_for()
+    public async Task A_search_needs_a_word_of_two_characters_and_reads_the_page_it_is_asked_for()
     {
         var tenant = NewTenant();
         var marker = Guid.NewGuid().ToString("N")[..8];
@@ -272,14 +272,15 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         Assert.Equal(4, second.Count);
         Assert.Equal(Enumerable.Range(10, 4).Select(i => $"{marker} Rider {i:00}"), second.Select(x => x.Name));
         await Assert.ThrowsAsync<ArgumentException>(
-            () => Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("ab"), default)
+            () => Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("a"), default)
         );
         await Assert.ThrowsAsync<ArgumentException>(
             () => Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("  a  "), default)
         );
         await Assert.ThrowsAsync<ArgumentException>(
-            () => Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("ab cd e"), default)
+            () => Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("a b c"), default)
         );
+        await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("ab"), default); // two characters are enough
     }
 
     [Fact]

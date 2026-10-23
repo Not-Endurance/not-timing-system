@@ -11,7 +11,7 @@ namespace NTS.Tests.Integration;
 /// The registries of Athletes, Horses, Clubs and Officials are searched across Tenants by any signed-in account, each
 /// through a named view of its own (ADR-0012, ADR-0010, #643): <c>/api/athletes/all-tenants</c> and the like. A search takes
 /// <c>filter=contains(name,'text')</c>, whose words have to be parts of a name in any order and in any case, with a word of
-/// at least three characters, the <c>sort</c> of the names and the pages of every list (ten rows a page, at most
+/// at least two characters, the <c>sort</c> of the names and the pages of every list (ten rows a page, at most
 /// twenty-five), answers with only the fields that are meant to leave, and shares the budget of searches with the search of
 /// accounts, a page being a search. The rows of other Tenants are found only here: nothing that is sent to any other route
 /// turns it across Tenants. The database matches, sorts and pages (the rest-api skill, ADR-0010).
@@ -161,7 +161,7 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [InlineData("horses")]
     [InlineData("clubs")]
     [InlineData("officials")]
-    public async Task A_search_takes_only_the_filter_of_a_name_with_a_word_of_three_characters_and_no_parameter_widens_it(
+    public async Task A_search_takes_only_the_filter_of_a_name_with_a_word_of_two_characters_and_no_parameter_widens_it(
         string registry
     )
     {
@@ -170,7 +170,7 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
         var path = $"/api/{registry}/all-tenants";
 
-        var tooShort = await SearchAsync(person, registry, "ab");
+        var tooShort = await SearchAsync(person, registry, "a");
         var noFilter = await person.Page.GetAsync(path);
         var otherMember = await person.Page.GetAsync($"{path}?filter=contains(tenantId,'abc')");
         var parameter = await person.Page.GetAsync($"{path}?filter=contains(name,'abc')&tenantId=other");
@@ -394,13 +394,13 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     [InlineData("horses")]
     [InlineData("clubs")]
     [InlineData("officials")]
-    public async Task A_text_with_no_word_of_three_characters_is_too_short_however_long_it_is(string registry)
+    public async Task A_text_with_no_word_of_two_characters_is_too_short_however_long_it_is(string registry)
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
 
-        foreach (var text in new[] { "ab cd", "a b c d e", "  a  " })
+        foreach (var text in new[] { "a b", "a b c d e", "  a  " })
         {
             var tooShort = await SearchAsync(person, registry, text);
 
@@ -408,7 +408,8 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
             Assert.Equal("search-too-short", await ErrorCodeAsync(tooShort));
         }
 
-        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(person, registry, "a bcd")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(person, registry, "a bc")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(person, registry, "ab")).StatusCode); // two characters are enough
     }
 
     [Fact]

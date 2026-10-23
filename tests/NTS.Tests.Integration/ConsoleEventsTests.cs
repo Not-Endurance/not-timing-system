@@ -137,7 +137,7 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_text_with_no_word_of_three_characters_finds_no_account_and_is_not_sent_and_one_of_many_words_is_cut_to_six()
+    public async Task A_text_with_no_word_of_two_characters_finds_no_account_and_is_not_sent_and_one_of_many_words_is_cut_to_six()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
@@ -148,7 +148,7 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
         await console.Events.Load();
         int Searches() => requests.Asked.Count(x => x.Contains("/api/accounts", StringComparison.Ordinal));
 
-        var typed = await console.Events.FindAccounts("Li Wu"); // what a person has typed of the name so far: no word of three characters
+        var typed = await console.Events.FindAccounts("L W"); // what a person has typed of the name so far: no word of two characters
         var asked = Searches();
         var sevenWords = await console.Events.FindAccounts("li wu kon s t a n"); // the Api takes six words and the seventh is left out
 

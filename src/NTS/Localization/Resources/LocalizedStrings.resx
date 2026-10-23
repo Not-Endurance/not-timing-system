@@ -1081,7 +1081,7 @@
     <value>Hand the Event over</value>
   </data>
   <data name="Find_account_string" xml:space="preserve">
-    <value>Find an account by name (at least three letters)</value>
+    <value>Find an account by name (at least two letters)</value>
   </data>
   <data name="Main_operator_string" xml:space="preserve">
     <value>Main Operator</value>

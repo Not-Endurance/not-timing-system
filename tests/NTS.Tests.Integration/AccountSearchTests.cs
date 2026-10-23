@@ -13,7 +13,7 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The search of accounts by name (ADR-0012, #643) is how a Tenant Root or a Main Operator finds the person to link or
-/// to assign, in place of a listing of everybody. It takes words of a name, one of at least three characters, answers a page
+/// to assign, in place of a listing of everybody. It takes words of a name, one of at least two characters, answers a page
 /// (ten by default) of accounts in the order of their names with a display name and an email that is partly masked, is
 /// limited in how often it can be asked, a page being a search, and finds
 /// the accounts of the Tenant it is asked in. It reaches across Tenants only through a route of its own, which the caller
@@ -106,10 +106,10 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
     }
 
     [Theory]
-    [InlineData("ab")]
+    [InlineData("a")]
     [InlineData("  a  ")]
     [InlineData("")]
-    public async Task A_search_takes_at_least_three_characters(string text)
+    public async Task A_search_takes_at_least_two_characters(string text)
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
@@ -215,7 +215,7 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
         );
 
         await Assert.ThrowsAsync<ArgumentException>(
-            () => search.SearchAsync(new NameSearch(["ab", "c"], descending: false, skip: 0, take: 11), null, default)
+            () => search.SearchAsync(new NameSearch(["a", "b"], descending: false, skip: 0, take: 11), null, default)
         );
     }
 
@@ -238,9 +238,9 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
     }
 
     [Theory]
-    [InlineData("ab cd")]
+    [InlineData("a b")]
     [InlineData("a b c d")]
-    public async Task A_text_with_no_word_of_three_characters_is_too_short_however_long_it_is(string text)
+    public async Task A_text_with_no_word_of_two_characters_is_too_short_however_long_it_is(string text)
     {
         await using var api = NewApi();
         using var client = ApiClients.Of(api);
@@ -437,11 +437,11 @@ public sealed class AccountSearchTests : IClassFixture<MongoFixture>
 
         for (var i = 0; i < 5; i++)
         {
-            Assert.Equal(HttpStatusCode.BadRequest, (await SearchAsync(root, "ab")).StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, (await SearchAsync(root, "a")).StatusCode);
         }
 
-        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(root, "abc")).StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(root, "abc")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(root, "ab")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await SearchAsync(root, "ab")).StatusCode);
     }
 
     ApiFactory NewApi()

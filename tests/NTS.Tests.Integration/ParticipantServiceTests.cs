@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net;
+using Microsoft.Extensions.Time.Testing;
 using NoTiming.Ui.Features.Participants;
 using NoTiming.Ui.Storage.Core.Repositories;
 using NTS.Contracts.Features.Participants;
@@ -149,12 +150,12 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
 
     [Theory]
     [InlineData("")]
-    [InlineData("iv")]
-    [InlineData("  iv  ")]
-    [InlineData("iv an")]
+    [InlineData("i")]
+    [InlineData("  i  ")]
+    [InlineData("i a")]
     [InlineData("a b c d")]
-    [InlineData("a b c d e f abcdef")] // the long word is the seventh, and the Api is asked for the first six
-    public async Task A_text_with_no_word_of_three_characters_finds_none_and_asks_the_Api_nothing(string text)
+    [InlineData("a b c d e f ab")] // the long word is the seventh, and the Api is asked for the first six
+    public async Task A_text_with_no_word_of_two_characters_finds_none_and_asks_the_Api_nothing(string text)
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
@@ -182,6 +183,149 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
         );
 
         Assert.Equal("The server answered 429.", refused.Message); // what the Api answered, and not the failure of reading an answer that is not there
+    }
+
+    [Fact]
+    public async Task What_was_answered_is_not_asked_again_and_a_text_that_only_grows_from_a_complete_answer_is_answered_without_asking()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, cyrillic) = HistorySeed.NameMarker();
+        var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
+        var ivan = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            tenant,
+            $"Иван {cyrillic}ов",
+            bulgaria,
+            nameEnglish: $"Ivan {latin}ov",
+            feiId: "10007777"
+        );
+        var petar = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            tenant,
+            $"Петър {cyrillic}ев",
+            bulgaria,
+            nameEnglish: $"Petar {latin}ev",
+            feiId: "10008888"
+        );
+        var service = Open(api, person, out var asked);
+        var athlete = ParticipantKind.Athlete;
+
+        var both = await service.Search(athlete, latin, 1, CancellationToken.None); // asked
+        var again = await service.Search(athlete, latin.ToUpperInvariant(), 1, CancellationToken.None); // the same word in capitals
+        var grown = await service.Search(athlete, $"{latin}ov", 1, CancellationToken.None); // the word gets longer
+        var added = await service.Search(athlete, $"ivan {latin}ov", 1, CancellationToken.None); // a word comes with it
+        var byFeiId = await service.Search(athlete, $"{latin} 8888", 1, CancellationToken.None); // the FEI ID is matched as the Api matches it
+        var requests = asked.Asked.Count;
+        var another = await service.Search(athlete, $"{cyrillic}ев", 1, CancellationToken.None); // not a text that grows from the first: asked
+
+        Assert.Equal([petar], byFeiId.Items.Select(x => x.Id));
+        Assert.Equal(1, requests);
+        Assert.Equal(2, asked.Asked.Count);
+        Assert.Equal(new[] { ivan, petar }.Order(), both.Items.Select(x => x.Id).Order());
+        Assert.Equal(both.Items.Select(x => x.Id), again.Items.Select(x => x.Id));
+        Assert.Equal([ivan], grown.Items.Select(x => x.Id));
+        Assert.Equal([ivan], added.Items.Select(x => x.Id));
+        Assert.Equal([petar], another.Items.Select(x => x.Id));
+        Assert.False(grown.HasMore);
+        var fresh = Open(api, person, out _); // and what it tells is what the Api would have told
+        Assert.Equal(
+            (await fresh.Search(athlete, $"ivan {latin}ov", 1, CancellationToken.None)).Items.Select(Of),
+            added.Items.Select(Of)
+        );
+    }
+
+    [Fact]
+    public async Task A_page_is_remembered_by_its_number_and_a_page_that_is_not_complete_is_not_narrowed()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, _) = HistorySeed.NameMarker();
+        for (var i = 0; i < 12; i++)
+        {
+            await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, $"Horse {latin} {i:00}");
+        }
+
+        var service = Open(api, person, out var asked);
+        var horse = ParticipantKind.Horse;
+
+        await service.Search(horse, latin, 1, CancellationToken.None);
+        await service.Search(horse, latin, 2, CancellationToken.None);
+        var firstAgain = await service.Search(horse, latin, 1, CancellationToken.None);
+        var secondAgain = await service.Search(horse, latin, 2, CancellationToken.None);
+        var requests = asked.Asked.Count;
+        var longer = await service.Search(horse, $"{latin} 05", 1, CancellationToken.None); // the first answer had a next page, so it does not hold every row
+
+        Assert.Equal(2, requests);
+        Assert.Equal(3, asked.Asked.Count);
+        Assert.Equal(10, firstAgain.Items.Count);
+        Assert.True(firstAgain.HasMore);
+        Assert.Equal(2, secondAgain.Items.Count);
+        Assert.Equal([$"Horse {latin} 05"], longer.Items.Select(x => x.DisplayName));
+    }
+
+    [Fact]
+    public async Task A_remembered_answer_is_told_in_the_language_the_app_is_in_when_it_is_asked_for_and_not_in_the_one_it_was_made_in()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, cyrillic) = HistorySeed.NameMarker();
+        await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            tenant,
+            $"Иван {cyrillic}ов",
+            RegistrySeed.CountryOf("Bulgaria", "BG"),
+            nameEnglish: $"Ivan {latin}ov"
+        );
+        var service = Open(api, person, out var asked);
+
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        var inEnglish = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
+        CultureInfo.CurrentUICulture = new CultureInfo("bg");
+        var inBulgarian = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
+        var again = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
+
+        Assert.Single(asked.Asked);
+        Assert.Equal($"Ivan {latin}ov", Assert.Single(inEnglish.Items).DisplayName);
+        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inBulgarian.Items).DisplayName);
+        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(again.Items).DisplayName);
+    }
+
+    [Fact]
+    public async Task A_search_the_Api_refused_is_not_remembered_and_an_answer_is_forgotten_after_a_minute()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2030, 5, 21, 8, 0, 0, TimeSpan.Zero));
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var service = Open(api, person, out var asked, time);
+        var (latin, _) = HistorySeed.NameMarker();
+        asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.TooManyRequests);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => service.Search(ParticipantKind.Athlete, latin, 1, CancellationToken.None)
+        );
+        asked.Answer = null;
+        await service.Search(ParticipantKind.Athlete, latin, 1, CancellationToken.None); // asked again, and answered
+        await service.Search(ParticipantKind.Athlete, latin, 1, CancellationToken.None); // remembered
+        var before = asked.Asked.Count;
+        time.Advance(TimeSpan.FromSeconds(59));
+        await service.Search(ParticipantKind.Athlete, latin, 1, CancellationToken.None); // still remembered
+        var kept = asked.Asked.Count;
+        time.Advance(TimeSpan.FromSeconds(2));
+        await service.Search(ParticipantKind.Athlete, latin, 1, CancellationToken.None); // a registry may have changed since
+
+        Assert.Equal(2, before);
+        Assert.Equal(2, kept);
+        Assert.Equal(3, asked.Asked.Count);
     }
 
     [Fact]
@@ -443,10 +587,15 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
         Assert.Equal(21, first.Items.Concat(second.Items).Select(x => x.Id).Distinct().Count());
     }
 
-    static ParticipantService Open(ApiFactory api, TenancySeed.Person person, out JsonApiClients.Requests asked)
+    static ParticipantService Open(
+        ApiFactory api,
+        TenancySeed.Person person,
+        out JsonApiClients.Requests asked,
+        TimeProvider? time = null
+    )
     {
         var json = JsonApiClients.Of(api, person, out asked);
-        return new ParticipantService(json, new ParticipationApiRepository(json));
+        return new ParticipantService(json, new ParticipationApiRepository(json), time ?? TimeProvider.System);
     }
 
     static (ParticipantKind, Guid, string) Of(ParticipantName name)

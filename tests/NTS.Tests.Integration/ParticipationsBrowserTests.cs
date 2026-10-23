@@ -290,8 +290,8 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
                 Interlocked.Increment(ref searches);
             }
         };
-        await input.FillAsync(latin[..2]);
-        await Task.Delay(1500); // a text with no word of three characters asks for nothing, and what is not asked is not answered either
+        await input.FillAsync(latin[..1]);
+        await Task.Delay(1500); // a text with no word of two characters asks for nothing, and what is not asked is not answered either
         await Expect(page.GetByText("Nothing found")).ToHaveCountAsync(0);
         await Expect(athletes).ToHaveCountAsync(0);
         Assert.Equal(0, Volatile.Read(ref searches));

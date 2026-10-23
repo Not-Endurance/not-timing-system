@@ -49,12 +49,15 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
         var byEnglish = await rows.OfAthlete(
             new AthleteFormModel { Name = "Нова", NameEnglish = $"maria other {scene.Token}" }
         );
-        var tooShort = await rows.OfAthlete(new AthleteFormModel { Name = "Ма" });
+        var before = scene.Ui.Requests.Asked.Count;
+        var tooShort = await rows.OfAthlete(new AthleteFormModel { Name = "М" });
+        var askedForIt = scene.Ui.Requests.Asked.Skip(before).ToList();
 
         var row = Assert.Single(found);
         Assert.Equal((scene.Theirs, SameRowReason.Name, false), (row.Id, row.Reason, row.IsOwn));
         Assert.Equal([scene.Theirs], byEnglish.Select(x => x.Id));
-        Assert.Empty(tooShort); // the other Tenants are not asked for less than three characters, and the Tenant has no row by it
+        Assert.Empty(tooShort); // the other Tenants are not asked for less than two characters, and the Tenant has no row by it
+        Assert.Equal(["GET /api/athletes?page[size]=500&page[number]=1"], askedForIt); // only the Tenant's own rows, read once
     }
 
     [Fact]
@@ -76,24 +79,24 @@ public sealed class ConsoleSameRowsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task The_other_Tenants_are_asked_for_a_name_of_three_characters_or_more_and_once_for_each_registry_whatever_its_case()
+    public async Task The_other_Tenants_are_asked_for_a_name_with_a_word_of_two_characters_or_more_and_once_for_each_registry_whatever_its_case()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         var scene = await SceneAsync(api);
         var rows = scene.Ui.Get<IConsoleSameRows>();
         int Searches() => scene.Ui.Requests.Asked.Count(x => x.Contains("/all-tenants", StringComparison.Ordinal));
 
+        await rows.OfAthlete(new AthleteFormModel { Name = "М" });
+        var short1 = Searches();
         await rows.OfAthlete(new AthleteFormModel { Name = "Ма" });
-        var short2 = Searches();
-        await rows.OfAthlete(new AthleteFormModel { Name = "Мар" });
         var first = Searches();
-        await rows.OfAthlete(new AthleteFormModel { Name = "  МАР " });
-        await rows.OfAthlete(new AthleteFormModel { Name = "мар", NameEnglish = "мар" });
+        await rows.OfAthlete(new AthleteFormModel { Name = "  МА " });
+        await rows.OfAthlete(new AthleteFormModel { Name = "ма", NameEnglish = "ма" });
         var again = Searches();
-        await rows.OfHorse(new HorseFormModel { Name = "Мар" });
+        await rows.OfHorse(new HorseFormModel { Name = "Ма" });
         var horses = Searches();
 
-        Assert.Equal(0, short2); // two characters are not a name to ask the other Tenants for
+        Assert.Equal(0, short1); // one character is not a name to ask the other Tenants for
         Assert.Equal(1, first);
         Assert.Equal(1, again); // a name is asked once, in whatever case and with whatever spaces around it
         Assert.Equal(2, horses); // and the Horses are another registry

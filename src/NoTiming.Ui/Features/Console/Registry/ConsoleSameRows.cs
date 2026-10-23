@@ -1,5 +1,6 @@
 using Not.Application.CRUD.Ports;
 using Not.Injection;
+using NoTiming.Ui.Features.Participants;
 using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain.Setup.Aggregates;
 
@@ -12,8 +13,6 @@ namespace NoTiming.Ui.Features.Console.Registry;
 /// </summary>
 public class ConsoleSameRows : IConsoleSameRows, IScoped
 {
-    const int SEARCH_MIN_CHARACTERS = 3;
-
     readonly IRepository<Athlete> _athletes;
     readonly IRepository<Horse> _horses;
     readonly IConsoleLookups _lookups;
@@ -75,7 +74,7 @@ public class ConsoleSameRows : IConsoleSameRows, IScoped
         var found = new List<SameRow>();
         foreach (var term in new[] { name, nameEnglish }.Select(x => x?.Trim()).Distinct())
         {
-            if (term is not { Length: >= SEARCH_MIN_CHARACTERS })
+            if (term is null || !ParticipantService.IsSearchable(term))
             {
                 continue;
             }

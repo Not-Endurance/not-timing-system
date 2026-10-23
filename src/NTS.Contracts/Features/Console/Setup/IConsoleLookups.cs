@@ -6,7 +6,7 @@ namespace NTS.Contracts.Features.Console.Setup;
 
 /// <summary>
 /// What the forms of the Setup and of the registry pick from (#646). The Athletes, Horses and Clubs are the Tenant's own
-/// and, for a term of three characters or more, those of every Tenant (ADR-0010, ADR-0012): another Tenant's row is used by
+/// and, for a term with a word of two characters or more, those of every Tenant (ADR-0010, ADR-0012): another Tenant's row is used by
 /// its id and is not edited. The Loops and the Combinations are those of the Setup that is open.
 /// </summary>
 public interface IConsoleLookups

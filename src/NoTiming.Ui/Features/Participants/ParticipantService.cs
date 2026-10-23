@@ -14,7 +14,8 @@ public interface IParticipantSearch
     /// A page of the Athletes or of the Horses whose names have every word of the text in them, in any order and in any case,
     /// in the order of their names and <see cref="ParticipantService.SEARCH_PAGE_SIZE"/> to a page; the first page is number 1.
     /// A name is searched in the script it is registered in, and in the other if the row has its name in English. A text with
-    /// no word of <see cref="ParticipantService.MIN_CHARACTERS"/> characters finds none, without asking.
+    /// no word of <see cref="ParticipantService.MIN_CHARACTERS"/> characters finds none, without asking, and what was answered
+    /// before is not asked again (<see cref="ParticipantSearchMemory"/>).
     /// </summary>
     Task<ParticipantSearchPage> Search(ParticipantKind kind, string? text, int number, CancellationToken ct);
 }
@@ -42,7 +43,7 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
 {
     const int MAX_PAGE_SIZE = 500; // the most the Api puts in a page of a history
     const int MAX_WORDS = 6; // the most words the Api takes of a text
-    public const int MIN_CHARACTERS = 3; // the fewest characters of the longest word the Api searches for
+    public const int MIN_CHARACTERS = 2; // the fewest characters of the longest word the Api searches for
     public const int SEARCH_PAGE_SIZE = 10; // the size of a page of a search: the Api's own, asked for all the same
     public const int SEARCH_PAUSE_MILLISECONDS = 700; // how long a person has to stop typing before a search is made, each of which draws on the budget of the account
 
@@ -60,11 +61,13 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
 
     readonly JsonApiClient _api;
     readonly IRepository<Participation> _participations;
+    readonly ParticipantSearchMemory _searched;
 
-    public ParticipantService(JsonApiClient api, IRepository<Participation> participations)
+    public ParticipantService(JsonApiClient api, IRepository<Participation> participations, TimeProvider time)
     {
         _api = api;
         _participations = participations;
+        _searched = new ParticipantSearchMemory(time);
     }
 
     public async Task<ParticipantSearchPage> Search(
@@ -80,25 +83,8 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
             return new ParticipantSearchPage([], hasMore: false); // the Api would refuse it with a 400, so it is not asked
         }
 
-        var query = string.Join(
-            '&',
-            $"filter={Uri.EscapeDataString($"contains(name,'{string.Join(' ', words).Replace("'", "''")}')")}",
-            "sort=name",
-            $"{Uri.EscapeDataString("page[size]")}={SEARCH_PAGE_SIZE}",
-            $"{Uri.EscapeDataString("page[number]")}={number}"
-        );
-        var registry = kind == ParticipantKind.Athlete ? "athletes" : "horses";
-        var response = await _api.Send(HttpMethod.Get, $"{registry}/all-tenants?{query}", cancellationToken: ct);
-        if (!response.IsSuccess)
-        {
-            throw response.ToException();
-        }
-
-        var document = response.Document!.Value;
-        return new ParticipantSearchPage(
-            [.. document.GetProperty("data").EnumerateArray().Select(x => ParticipantJson.NameOfRow(kind, x))],
-            response.HasNextPage
-        );
+        var answer = _searched.Recall(kind, words, number) ?? await Ask(kind, words, number, ct);
+        return new ParticipantSearchPage([.. answer.Rows.Select(x => x.Named())], answer.HasMore);
     }
 
     public async Task<ParticipationHistoryPage> HistoryOf(
@@ -155,5 +141,35 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
         return _participations is IRowReader<Participation> reader
             ? await reader.Find(id)
             : new RowRead<Participation>(await _participations.Read(id), failed: false);
+    }
+
+    async Task<ParticipantSearchAnswer> Ask(
+        ParticipantKind kind,
+        IReadOnlyList<string> words,
+        int number,
+        CancellationToken ct
+    )
+    {
+        var query = string.Join(
+            '&',
+            $"filter={Uri.EscapeDataString($"contains(name,'{string.Join(' ', words).Replace("'", "''")}')")}",
+            "sort=name",
+            $"{Uri.EscapeDataString("page[size]")}={SEARCH_PAGE_SIZE}",
+            $"{Uri.EscapeDataString("page[number]")}={number}"
+        );
+        var registry = kind == ParticipantKind.Athlete ? "athletes" : "horses";
+        var response = await _api.Send(HttpMethod.Get, $"{registry}/all-tenants?{query}", cancellationToken: ct);
+        if (!response.IsSuccess)
+        {
+            throw response.ToException();
+        }
+
+        var document = response.Document!.Value;
+        var answer = new ParticipantSearchAnswer(
+            [.. document.GetProperty("data").EnumerateArray().Select(x => ParticipantJson.FoundOf(kind, x))],
+            response.HasNextPage
+        );
+        _searched.Remember(kind, words, number, answer);
+        return answer;
     }
 }

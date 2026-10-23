@@ -11,7 +11,7 @@ namespace NoTiming.Api.Features.Tenancy;
 /// or to assign. <c>GET /api/accounts</c> looks among the members of the Tenant the account acts in, and
 /// <c>GET /api/accounts/all-tenants</c> is the named view that reaches across Tenants for the people who may search at all:
 /// no parameter turns the first into the second. Both take <c>filter=contains(name,'text')</c>, whose words have to be parts of
-/// the name in any order and in any case, with one of at least three characters, the <c>sort</c> of the names and the pages
+/// the name in any order and in any case, with one of at least two characters, the <c>sort</c> of the names and the pages
 /// of every list (ten matches a page, twenty-five at most), and nothing else. A request is answered in this order: who is
 /// asking, whether they may, what they asked, and whether they have searched too often, a page being a search.
 /// </summary>

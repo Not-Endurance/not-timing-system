@@ -1081,7 +1081,7 @@
     <value>Предаване на събитието</value>
   </data>
   <data name="Find_account_string" xml:space="preserve">
-    <value>Намерете профил по име (поне три букви)</value>
+    <value>Намерете профил по име (поне две букви)</value>
   </data>
   <data name="Main_operator_string" xml:space="preserve">
     <value>Главен оператор</value>

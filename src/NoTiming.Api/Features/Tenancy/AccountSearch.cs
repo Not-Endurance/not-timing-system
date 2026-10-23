@@ -35,7 +35,7 @@ internal sealed class AccountName
 
 /// <summary>
 /// The search of accounts by name (#643, ADR-0012). There is no listing of accounts: a search takes words, one of at least
-/// three characters, which it matches literally and in the database (<see cref="NameSearch"/>), finds a page of accounts by
+/// two characters, which it matches literally and in the database (<see cref="NameSearch"/>), finds a page of accounts by
 /// name, and answers each with its id, its display name and an email that is partly masked, never anything an account keeps for
 /// signing in. It looks among the members of a Tenant, or, for the route that asks for it by name, among every account. Who may
 /// search at all, and how often, is the policy's and the limiter's, and the routes ask them first.

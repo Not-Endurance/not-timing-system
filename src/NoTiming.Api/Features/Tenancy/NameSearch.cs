@@ -15,7 +15,7 @@ namespace NoTiming.Api.Features.Tenancy;
 internal sealed class NameSearch
 {
     /// <summary>The fewest characters of the longest word of a search: less would be a list of the collection, which a search is not.</summary>
-    public const int MIN_WORD_LENGTH = 3;
+    public const int MIN_WORD_LENGTH = 2;
 
     /// <summary>Whether the words of a text are enough to look for: at least one of them is of <see cref="MIN_WORD_LENGTH"/> characters.</summary>
     public static bool HasLongWord(IReadOnlyList<string> words)
