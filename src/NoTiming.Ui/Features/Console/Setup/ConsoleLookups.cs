@@ -5,6 +5,7 @@ using Not.Domain;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using Not.Strings;
+using NoTiming.Ui.Features.Participants;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Console.Setup;
 using NTS.Domain;
@@ -17,15 +18,15 @@ namespace NoTiming.Ui.Features.Console.Setup;
 
 /// <summary>
 /// What the forms of the Setup and of the registry pick from (#646). The Tenant's own Athletes, Horses and Clubs are read
-/// and matched here; for a term of three characters or more the registries of every Tenant are searched too (ADR-0010,
-/// ADR-0012), which is one request the Api limits per account, so it is asked only for what the person typed. A row of another
-/// Tenant is used by its id and is not edited: the Api tells only what names it (its name, its FEI ID, the names of its country
-/// and club), which is what a Combination needs of it. The countries are read once.
+/// and matched here; for a term with a word of three characters or more the registries of every Tenant are searched too
+/// (ADR-0010, ADR-0012), which is one request the Api limits per account, so it is asked only for what the person typed, and
+/// for the first six words of it, which is all the Api takes. A row of another Tenant is used by its id and is not edited:
+/// the Api tells only what names it (its name, its FEI ID, the names of its country and club), which is what a Combination
+/// needs of it. The countries are read once.
 /// </summary>
 public class ConsoleLookups : IConsoleLookups, IScoped
 {
     const string ALL_TENANTS = "all-tenants";
-    const int SEARCH_MIN_CHARACTERS = 3;
 
     readonly IAccountSession _account;
     readonly JsonApiClient _api;
@@ -159,15 +160,15 @@ public class ConsoleLookups : IConsoleLookups, IScoped
     /// </summary>
     async Task<IReadOnlyList<T>> OtherTenants<T>(string registry, string term, Func<Match, T> entityOf)
     {
-        var text = term?.Trim() ?? string.Empty;
-        if (text.Length < SEARCH_MIN_CHARACTERS)
+        if (!ParticipantService.IsSearchable(term))
         {
             return [];
         }
 
         try
         {
-            var filter = Uri.EscapeDataString($"contains(name,'{text.Replace("'", "''")}')");
+            var words = string.Join(' ', ParticipantService.WordsOf(term));
+            var filter = Uri.EscapeDataString($"contains(name,'{words.Replace("'", "''")}')");
             var response = await _api.Send(HttpMethod.Get, $"{registry}/{ALL_TENANTS}?filter={filter}");
             if (!response.IsSuccess)
             {

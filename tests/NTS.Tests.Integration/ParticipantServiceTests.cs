@@ -11,9 +11,9 @@ using NTS.Tests.Integration.Infrastructure;
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// The Participants at the Ui (#639, ADR-0010): an Athlete or a Horse is found by a few letters of its name in either script,
-/// and told in the language the app is in, and the history of one is read a page at a time. Over the real Api in this process,
-/// as the Ui reaches it.
+/// The Participants at the Ui (#639, ADR-0010): an Athlete or a Horse is found by the words of its name, in the script it is
+/// registered in or in English, a page of ten at a time, and told in the language the app is in, and the history of one is read
+/// a page at a time. Over the real Api in this process, as the Ui reaches it.
 /// </summary>
 public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
 {
@@ -29,7 +29,7 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_Latin_text_finds_the_Cyrillic_name_of_an_Athlete_and_of_a_Horse_and_each_is_told_with_its_kind()
+    public async Task A_text_finds_the_Athletes_or_the_Horses_by_their_names_in_either_script_and_each_is_told_with_its_kind()
     {
         CultureInfo.CurrentUICulture = new CultureInfo("en");
         await using var api = new ApiFactory(_mongo.ConnectionString);
@@ -44,18 +44,78 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
             RegistrySeed.CountryOf("Bulgaria", "BG"),
             nameEnglish: $"Ivan {latin}ov"
         );
-        var horse = await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, $"Звезда {cyrillic}ов");
+        var horse = await RegistrySeed.HorseAsync(
+            _mongo.ConnectionString,
+            tenant,
+            $"Звезда {cyrillic}ов",
+            nameEnglish: $"Star {latin}ov"
+        );
         var service = Open(api, person, out _);
 
-        var found = await service.Search($"{latin}ov", CancellationToken.None);
+        var athletes = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
+        var horses = await service.Search(ParticipantKind.Horse, $"{latin}ov", 1, CancellationToken.None);
+        var byCyrillic = await service.Search(ParticipantKind.Athlete, $"{cyrillic}ОВ иван", 1, CancellationToken.None);
+
+        Assert.Equal([(ParticipantKind.Athlete, athlete, $"Ivan {latin}ov")], athletes.Items.Select(Of));
+        Assert.Equal([(ParticipantKind.Horse, horse, $"Star {latin}ov")], horses.Items.Select(Of));
+        Assert.False(athletes.HasMore);
+        Assert.Equal([athlete], byCyrillic.Items.Select(x => x.Id)); // the name in the script it is registered in, in any case and in any order
+    }
+
+    [Fact]
+    public async Task A_search_is_a_page_of_ten_and_the_rest_is_on_the_next_page()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, _) = HistorySeed.NameMarker();
+        for (var i = 0; i < 12; i++)
+        {
+            await RegistrySeed.HorseAsync(_mongo.ConnectionString, tenant, $"Horse {latin} {i:00}");
+        }
+
+        var service = Open(api, person, out var asked);
+
+        var first = await service.Search(ParticipantKind.Horse, latin, 1, CancellationToken.None);
+        var second = await service.Search(ParticipantKind.Horse, latin, 2, CancellationToken.None);
 
         Assert.Equal(
-            [
-                (ParticipantKind.Athlete, athlete, $"Ivan {latin}ov"),
-                (ParticipantKind.Horse, horse, $"Звезда {cyrillic}ов"),
-            ],
-            found.Select(x => (x.Kind, x.Id, x.DisplayName))
+            Enumerable.Range(0, 10).Select(i => $"Horse {latin} {i:00}"),
+            first.Items.Select(x => x.DisplayName)
         );
+        Assert.True(first.HasMore);
+        Assert.Equal([$"Horse {latin} 10", $"Horse {latin} 11"], second.Items.Select(x => x.DisplayName));
+        Assert.False(second.HasMore);
+        Assert.All(
+            asked.Asked,
+            x =>
+            {
+                Assert.StartsWith("GET /api/horses/all-tenants?filter=", x, StringComparison.Ordinal);
+                Assert.Contains("&sort=name&page%5Bsize%5D=10&page%5Bnumber%5D=", x, StringComparison.Ordinal);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task A_text_of_more_than_six_words_is_asked_for_with_the_first_six()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var service = Open(api, person, out var asked);
+
+        var found = await service.Search(
+            ParticipantKind.Athlete,
+            " one  two three four five six seven eight ",
+            1,
+            CancellationToken.None
+        );
+
+        Assert.Empty(found.Items);
+        var request = Assert.Single(asked.Asked);
+        Assert.Contains(Uri.EscapeDataString("contains(name,'one two three four five six')"), request);
     }
 
     [Fact]
@@ -76,31 +136,35 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
         var service = Open(api, person, out _);
 
         CultureInfo.CurrentUICulture = new CultureInfo("bg");
-        var inBulgarian = await service.Search($"{latin}ov", CancellationToken.None);
+        var inBulgarian = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
         CultureInfo.CurrentUICulture = new CultureInfo("en-GB");
-        var inEnglish = await service.Search($"{latin}ov", CancellationToken.None);
+        var inEnglish = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
         CultureInfo.CurrentUICulture = new CultureInfo("tr");
-        var inTurkish = await service.Search($"{latin}ov", CancellationToken.None);
+        var inTurkish = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
 
-        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inBulgarian).DisplayName);
-        Assert.Equal($"Ivan {latin}ov", Assert.Single(inEnglish).DisplayName);
-        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inTurkish).DisplayName); // as it was registered, where the language is not English
+        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inBulgarian.Items).DisplayName);
+        Assert.Equal($"Ivan {latin}ov", Assert.Single(inEnglish.Items).DisplayName);
+        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inTurkish.Items).DisplayName); // as it was registered, where the language is not English
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("iv")]
     [InlineData("  iv  ")]
-    public async Task A_text_of_fewer_than_three_characters_finds_none_and_asks_the_Api_nothing(string text)
+    [InlineData("iv an")]
+    [InlineData("a b c d")]
+    [InlineData("a b c d e f abcdef")] // the long word is the seventh, and the Api is asked for the first six
+    public async Task A_text_with_no_word_of_three_characters_finds_none_and_asks_the_Api_nothing(string text)
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
         var service = Open(api, person, out var asked);
 
-        var found = await service.Search(text, CancellationToken.None);
+        var found = await service.Search(ParticipantKind.Horse, text, 1, CancellationToken.None);
 
-        Assert.Empty(found);
+        Assert.Empty(found.Items);
+        Assert.False(found.HasMore);
         Assert.Empty(asked.Asked); // a search counts against the budget of the account
     }
 
@@ -113,7 +177,11 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
         var service = Open(api, person, out var asked);
         asked.Answer = _ => new HttpResponseMessage(HttpStatusCode.TooManyRequests);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.Search("ivan", CancellationToken.None));
+        var refused = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => service.Search(ParticipantKind.Athlete, "ivan", 1, CancellationToken.None)
+        );
+
+        Assert.Equal("The server answered 429.", refused.Message); // what the Api answered, and not the failure of reading an answer that is not there
     }
 
     [Fact]
@@ -288,17 +356,23 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task A_text_of_three_characters_is_asked_of_the_Api()
+    public async Task A_text_of_three_characters_is_asked_of_the_registry_of_the_kind()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, home: null);
         var service = Open(api, person, out var asked);
 
-        var found = await service.Search(" qzx ", CancellationToken.None);
+        var athletes = await service.Search(ParticipantKind.Athlete, " qzx ", 1, CancellationToken.None);
+        var horses = await service.Search(ParticipantKind.Horse, " qzx ", 1, CancellationToken.None);
 
-        Assert.Empty(found);
-        Assert.Single(asked.Asked, x => x.StartsWith("GET /api/participants?filter=", StringComparison.Ordinal));
+        Assert.Empty(athletes.Items);
+        Assert.Empty(horses.Items);
+        Assert.Single(
+            asked.Asked,
+            x => x.StartsWith("GET /api/athletes/all-tenants?filter=", StringComparison.Ordinal)
+        );
+        Assert.Single(asked.Asked, x => x.StartsWith("GET /api/horses/all-tenants?filter=", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -318,9 +392,9 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
         );
         var service = Open(api, person, out _);
 
-        var found = await service.Search($"o'brien {latin}", CancellationToken.None);
+        var found = await service.Search(ParticipantKind.Athlete, $"o'brien {latin}", 1, CancellationToken.None);
 
-        Assert.Equal([athlete], found.Select(x => x.Id));
+        Assert.Equal([athlete], found.Items.Select(x => x.Id));
     }
 
     [Fact]
@@ -338,9 +412,9 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
         };
 
         CultureInfo.CurrentUICulture = new CultureInfo("bg-BG");
-        await service.Search("abc", CancellationToken.None);
+        await service.Search(ParticipantKind.Athlete, "abc", 1, CancellationToken.None);
         CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
-        await service.Search("abc", CancellationToken.None);
+        await service.Search(ParticipantKind.Athlete, "abc", 1, CancellationToken.None);
 
         Assert.Equal(["bg-BG"], languages);
     }
@@ -373,5 +447,10 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
     {
         var json = JsonApiClients.Of(api, person, out asked);
         return new ParticipantService(json, new ParticipationApiRepository(json));
+    }
+
+    static (ParticipantKind, Guid, string) Of(ParticipantName name)
+    {
+        return (name.Kind, name.Id, name.DisplayName);
     }
 }

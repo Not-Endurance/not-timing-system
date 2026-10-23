@@ -1,6 +1,7 @@
 using System.Text.Json;
 using NTS.Contracts.Features.Participants;
 using NTS.Domain.Core.Aggregates;
+using NTS.Domain.Helpers;
 
 namespace NoTiming.Ui.Features.Participants;
 
@@ -17,14 +18,22 @@ internal static class ParticipantJson
         );
     }
 
-    /// <summary>A Participant told as a resource: its <c>id</c>, and its <c>kind</c> and <c>displayName</c> as attributes.</summary>
-    public static ParticipantName NameOf(JsonElement resource)
+    /// <summary>
+    /// A row of the registry of Athletes or of Horses told as a resource: its <c>id</c>, and its <c>name</c> and <c>nameEnglish</c> as
+    /// attributes, named as the displays name it (<see cref="NameRenderingHelper"/>): in English where the language of the app is
+    /// English, as it was registered otherwise.
+    /// </summary>
+    public static ParticipantName NameOfRow(ParticipantKind kind, JsonElement resource)
     {
         var attributes = resource.GetProperty("attributes");
+        var nameEnglish =
+            attributes.TryGetProperty("nameEnglish", out var english) && english.ValueKind == JsonValueKind.String
+                ? english.GetString()
+                : null;
         return new ParticipantName(
-            Enum.Parse<ParticipantKind>(attributes.GetProperty("kind").GetString()!),
+            kind,
             Guid.Parse(resource.GetProperty("id").GetString()!),
-            attributes.GetProperty("displayName").GetString()!
+            NameRenderingHelper.Render(attributes.GetProperty("name").GetString()!, nameEnglish)
         );
     }
 

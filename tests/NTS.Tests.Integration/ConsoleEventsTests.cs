@@ -137,6 +137,27 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task A_text_with_no_word_of_three_characters_finds_no_account_and_is_not_sent_and_one_of_many_words_is_cut_to_six()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var wu = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, name: "Li Wu Konstantin");
+        using var console = Open(api, root, out var requests);
+        await console.Events.Load();
+        int Searches() => requests.Asked.Count(x => x.Contains("/api/accounts", StringComparison.Ordinal));
+
+        var typed = await console.Events.FindAccounts("Li Wu"); // what a person has typed of the name so far: no word of three characters
+        var asked = Searches();
+        var sevenWords = await console.Events.FindAccounts("li wu kon s t a n"); // the Api takes six words and the seventh is left out
+
+        Assert.Empty(typed);
+        Assert.Equal(0, asked);
+        Assert.Equal([wu.Id], sevenWords.Select(x => x.Id));
+    }
+
+    [Fact]
     public async Task A_Tenant_Root_cannot_assign_the_Main_Operator_of_an_Event_that_is_Live_and_the_Api_says_why()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
@@ -340,7 +361,12 @@ public sealed class ConsoleEventsTests : IClassFixture<MongoFixture>
 
     static Opened Open(ApiFactory api, Person person)
     {
-        var json = JsonApiClients.Of(api, person, out _);
+        return Open(api, person, out _);
+    }
+
+    static Opened Open(ApiFactory api, Person person, out JsonApiClients.Requests requests)
+    {
+        var json = JsonApiClients.Of(api, person, out requests);
         var account = new AccountSession(json);
         var setups = new ConfigureEventApiRepository(json, new NoDispatcher());
         var events = new EventInformationApiRepository(json, new SelectedEvent(null));

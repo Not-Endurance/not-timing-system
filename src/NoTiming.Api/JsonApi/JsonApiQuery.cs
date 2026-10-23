@@ -12,6 +12,7 @@ namespace NoTiming.Api.JsonApi;
 internal static partial class JsonApiQuery
 {
     const string FILTER = "filter";
+    const string SORT = "sort";
 
     /// <summary>
     /// Reads the parameters of the request. A parameter that the route does not take is 400 <c>unsupported-parameter</c>,
@@ -64,15 +65,17 @@ internal static partial class JsonApiQuery
     }
 
     /// <summary>
-    /// Reads the query of a search: <c>filter=contains(member,'text')</c> and nothing else, the text as it is written (a
-    /// quote in it is doubled). A search is not a listing, so a request without one is refused, and so is any other
-    /// parameter, any other member and any other expression. How long the text has to be is for the route to say.
+    /// Reads the query of a search: <c>filter=contains(member,'text')</c>, the text as it is written (a quote in it is
+    /// doubled) and a few words long, the <c>sort</c> of the member (<c>member</c> or <c>-member</c>, the first by default) and
+    /// the pages of every list, but of a size up to <see cref="JsonApiSearch.MAX_PAGE_SIZE"/> only. A search is not a
+    /// listing, so a request without a filter is refused, and so is any other parameter, any other member and any other
+    /// expression. How long the words have to be is for the route to say.
     /// </summary>
     public static JsonApiSearch ReadSearch(HttpRequest request, string member)
     {
         foreach (var parameter in request.Query.Keys)
         {
-            if (parameter != FILTER)
+            if (parameter is not (FILTER or SORT or JsonApiPaging.PAGE_SIZE or JsonApiPaging.PAGE_NUMBER))
             {
                 return JsonApiSearch.Refused(
                     JsonApiResults.Error(
@@ -98,7 +101,74 @@ internal static partial class JsonApiQuery
             );
         }
 
-        return JsonApiSearch.Of(match.Groups["value"].Value.Replace("''", "'").Trim());
+        var text = match.Groups["value"].Value.Replace("''", "'").Trim();
+        if (text.Contains('\0'))
+        {
+            return JsonApiSearch.Refused(
+                JsonApiResults.Error(
+                    StatusCodes.Status400BadRequest,
+                    "invalid-filter",
+                    "The filter is not valid.",
+                    "A text has no null character."
+                )
+            );
+        }
+
+        var words = text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (words.Count > JsonApiSearch.MAX_WORDS)
+        {
+            return JsonApiSearch.Refused(
+                JsonApiResults.Error(
+                    StatusCodes.Status400BadRequest,
+                    "invalid-filter",
+                    "The filter is not valid.",
+                    $"Use at most {JsonApiSearch.MAX_WORDS} words."
+                )
+            );
+        }
+
+        var descending = false;
+        if (request.Query.TryGetValue(SORT, out var sort))
+        {
+            if (sort.ToString() != member && sort.ToString() != "-" + member)
+            {
+                return JsonApiSearch.Refused(
+                    JsonApiResults.Error(
+                        StatusCodes.Status400BadRequest,
+                        "invalid-sort",
+                        "The sort is not valid.",
+                        $"Sort by {member}, with a - for descending: sort=-{member}."
+                    )
+                );
+            }
+
+            descending = sort.ToString().StartsWith('-');
+        }
+
+        var size = JsonApiSearch.DEFAULT_PAGE_SIZE;
+        var number = 1;
+        if (
+            !JsonApiPaging.TryRead(request, JsonApiPaging.PAGE_SIZE, JsonApiSearch.MAX_PAGE_SIZE, ref size)
+            || !JsonApiPaging.TryRead(
+                request,
+                JsonApiPaging.PAGE_NUMBER,
+                int.MaxValue / JsonApiSearch.MAX_PAGE_SIZE,
+                ref number
+            )
+        )
+        {
+            return JsonApiSearch.Refused(
+                JsonApiResults.Error(
+                    StatusCodes.Status400BadRequest,
+                    "invalid-page",
+                    "A page is a number of at least 1 and a size of 1 to 25."
+                )
+            );
+        }
+
+        return JsonApiSearch.Of(words, descending, size, number);
     }
 
     static bool Unique(Dictionary<string, string> values, Match match)
@@ -142,27 +212,48 @@ internal sealed class JsonApiFilter
     public IResult? Refusal { get; }
 }
 
-/// <summary>What the query string of a search asked for, or the answer that refuses it.</summary>
+/// <summary>
+/// What the query string of a search asked for, or the answer that refuses it: the words to look for, the direction of the
+/// order of the names and the page that is wanted. A page is ten rows unless it is asked to be another size, and no search
+/// answers more than twenty-five rows.
+/// </summary>
 internal sealed class JsonApiSearch
 {
-    public static JsonApiSearch Of(string text)
+    public const int DEFAULT_PAGE_SIZE = 10;
+    public const int MAX_PAGE_SIZE = 25;
+    public const int MAX_WORDS = 6;
+
+    public static JsonApiSearch Of(IReadOnlyList<string> words, bool descending, int size, int number)
     {
-        return new JsonApiSearch(text, null);
+        return new JsonApiSearch(words, descending, size, number, null);
     }
 
     public static JsonApiSearch Refused(IResult refusal)
     {
-        return new JsonApiSearch(null, refusal);
+        return new JsonApiSearch(null, false, DEFAULT_PAGE_SIZE, 1, refusal);
     }
 
-    JsonApiSearch(string? text, IResult? refusal)
+    JsonApiSearch(IReadOnlyList<string>? words, bool descending, int size, int number, IResult? refusal)
     {
-        Text = text;
+        Words = words;
+        Descending = descending;
+        Size = size;
+        Number = number;
         Refusal = refusal;
     }
 
-    /// <summary>The text to look for, as it was written and without the spaces around it.</summary>
-    public string? Text { get; }
+    /// <summary>The words of the text, once each whatever the case.</summary>
+    public IReadOnlyList<string>? Words { get; }
 
+    /// <summary>Whether the names are in the order the other way round.</summary>
+    public bool Descending { get; }
+
+    public int Size { get; }
+    public int Number { get; }
     public IResult? Refusal { get; }
+
+    /// <summary>How many rows to leave out and how many to read: one more than a page, to know whether another follows.</summary>
+    public int Skip => (Number - 1) * Size;
+
+    public int Take => Size + 1;
 }

@@ -317,8 +317,7 @@ internal static class ReferenceEndpoints
     public static object Links<T>(HttpRequest request, ReferenceQuery<T> query, bool hasNext)
         where T : class
     {
-        var self = request.Path + request.QueryString;
-        return new { self, next = hasNext ? WithPage(request, query.Number + 1) : null };
+        return JsonApiPaging.Links(request, query.Number, hasNext);
     }
 
     /// <summary>Gives a row the id its client made for it, which a document names as the id of the resource and never as an attribute.</summary>
@@ -560,16 +559,5 @@ internal static class ReferenceEndpoints
             family.Members.AttributesOf(row),
             location
         );
-    }
-
-    static string WithPage(HttpRequest request, int number)
-    {
-        var parameters = request
-            .Query.Where(x => x.Key != "page[number]")
-            .SelectMany(x =>
-                x.Value.Select(value => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(value ?? "")}")
-            )
-            .Append($"{Uri.EscapeDataString("page[number]")}={number}");
-        return $"{request.Path}?{string.Join('&', parameters)}";
     }
 }

@@ -12,15 +12,12 @@
                SearchSafe="FindSafe"
                ToStringFunc="@(participant => participant?.DisplayName ?? string.Empty)"
                MinCharacters="MinCharacters"
-               DebounceInterval="DEBOUNCE_MILLISECONDS"
+               DebounceInterval="PauseMilliseconds"
                Clearable="true"
                OnClearButtonClick="Clear"
                data-testid="participant-picker">
     <ItemTemplate Context="participant">
-        <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="participant-match" data-testid="participant-match">
-            <MudText>@participant!.DisplayName</MudText>
-            <MudText Typo="Typo.caption" Color="Color.Secondary">@KindText(participant)</MudText>
-        </MudStack>
+        <MudText Class="participant-match" data-testid="participant-match">@participant!.DisplayName</MudText>
     </ItemTemplate>
     <NoItemsTemplate>
         <MudText Typo="Typo.body2" Class="pa-2">@Nothing_found_string</MudText>

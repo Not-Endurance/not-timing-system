@@ -160,6 +160,34 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task Other_Tenants_are_asked_for_a_term_with_a_word_of_three_characters_and_for_the_first_six_words_of_it()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the name is this test's own
+        var theirs = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            other,
+            $"Конан {cyrillic}",
+            RegistrySeed.CountryOf("Bulgaria", "BG"),
+            $"Conan {latin}"
+        );
+        await using var ui = ConsoleUi.Open(api, mainOperator);
+        var lookups = ui.Get<IConsoleLookups>();
+        int Searches() => ui.Requests.Asked.Count(x => x.Contains("/all-tenants", StringComparison.Ordinal));
+
+        await lookups.SearchAthletes("Co Bo"); // five characters, but no word of three: the Api would refuse it
+        var shortWords = Searches();
+        var sevenWords = await lookups.SearchAthletes($"Conan {latin} c o n a r"); // the Api takes six words and the seventh is left out
+
+        Assert.Equal(0, shortWords);
+        Assert.Equal(theirs, Assert.Single(sevenWords).Id);
+    }
+
+    [Fact]
     public async Task The_Tenants_own_rows_are_found_by_name_and_another_Tenants_rows_by_a_term_of_three_characters_or_more()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);

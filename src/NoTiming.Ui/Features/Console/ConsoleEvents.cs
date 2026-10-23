@@ -4,6 +4,7 @@ using Not.Application.HTTP;
 using Not.Domain.Exceptions;
 using Not.Injection;
 using NoTiming.Ui.Features.Account;
+using NoTiming.Ui.Features.Participants;
 using NTS.Application.Core;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Console;
@@ -141,7 +142,13 @@ public class ConsoleEvents : AccountAwareContext, IConsoleEvents, IScoped
 
     public async Task<IReadOnlyList<AccountMatch>> FindAccounts(string text)
     {
-        var filter = Uri.EscapeDataString($"contains(name,'{text.Replace("'", "''")}')");
+        if (!ParticipantService.IsSearchable(text))
+        {
+            return []; // the Api refuses a text with no word of three characters, and a person who is still typing is not told off
+        }
+
+        var words = string.Join(' ', ParticipantService.WordsOf(text));
+        var filter = Uri.EscapeDataString($"contains(name,'{words.Replace("'", "''")}')");
         var found = Accepted(await _api.Send(HttpMethod.Get, $"accounts?filter={filter}"));
         return
         [

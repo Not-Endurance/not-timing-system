@@ -120,7 +120,7 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         await Entry(page, "My Participations").ClickAsync();
         await page.WaitForURLAsync(device.Url("/profile"), new() { Timeout = PATIENCE });
         await page.GetByLabel("My Athlete").FillAsync($"{latin}ova");
-        await page.GetByTestId("participant-match").Filter(new() { HasText = "Athlete" }).ClickAsync();
+        await page.GetByTestId("participant-match").ClickAsync(); // the selector of the Athlete offers Athletes alone
 
         await Expect(page.GetByTestId("my-athlete")).ToHaveTextAsync($"Mariela {latin}ova", Texted());
         var rows = page.Locator("tr.participation-row");
@@ -214,7 +214,7 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
 
         var add = page.GetByLabel("Add a Horse");
         await add.FillAsync($"Storm {latin}");
-        await page.GetByTestId("participant-match").Filter(new() { HasText = "Horse" }).ClickAsync();
+        await page.GetByTestId("participant-match").ClickAsync(); // the selector of the Horses offers Horses alone
         await Expect(horses).ToHaveTextAsync(new[] { "Wind", "Blaze", "Fire", $"Storm {latin}" }, Texted());
         await Expect(add).ToHaveValueAsync(string.Empty, Filled()); // an input that adds is empty again
         await Remove(page, "Fire").ClickAsync();
@@ -254,7 +254,7 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         await page.GetByLabel("My Athlete").FillAsync(string.Empty);
         await page.GetByLabel("Add a Horse").FillAsync($"Storm {latin}");
         await Expect(matches).ToHaveCountAsync(1, Counted()); // and the one of the Horses, the Horse alone
-        await Expect(matches).ToContainTextAsync("Horse", Containing());
+        await Expect(matches).ToHaveTextAsync($"Storm {latin}", Texted());
         await matches.ClickAsync();
 
         await Expect(page.GetByTestId("my-horse")).ToHaveTextAsync(new[] { $"Storm {latin}" }, Texted());
@@ -263,16 +263,16 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
     }
 
     [Fact]
-    public async Task The_search_finds_an_Athlete_and_a_Horse_by_a_Latin_text_for_a_Cyrillic_name_and_choosing_one_shows_its_Participations()
+    public async Task The_search_finds_the_Athletes_and_the_Horses_as_two_lists_by_the_words_of_their_names_and_choosing_one_shows_its_Participations()
     {
         var mongo = _host.MongoConnectionString;
         var (latin, cyrillic) = HistorySeed.NameMarker();
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
         var me = await TenancySeed.AccountAsync(mongo, tenant, name: "Vera Georgieva");
-        var ivan = new Participant(Guid.NewGuid(), $"Иван {cyrillic}ов");
-        var star = new Participant(Guid.NewGuid(), $"Звезда {cyrillic}ов");
+        var ivan = new Participant(Guid.NewGuid(), $"Иван {cyrillic}ов", $"Ivan {latin}ov");
+        var star = new Participant(Guid.NewGuid(), $"Звезда {cyrillic}ов", $"Star {latin}ov");
         await RegisterAsync(mongo, tenant, ivan);
-        await RegistrySeed.HorseAsync(mongo, tenant, star.Name, id: star.Id);
+        await RegistrySeed.HorseAsync(mongo, tenant, star.Name, star.NameEnglish, id: star.Id);
         var spring = await HistorySeed.HistoricAsync(mongo, tenant, "Spring ride", "Sofia", 10);
         await HistorySeed.RideAsync(mongo, tenant, spring, 1, ivan, star, competition: "CEI 1*");
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
@@ -280,39 +280,90 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         page.SetDefaultTimeout(PATIENCE);
         await SignInAndOpenAsync(_host, device, me.Email, "/participations");
         var input = page.GetByLabel("Name of an Athlete or a Horse");
-        var matches = page.GetByTestId("participant-match");
+        var athletes = Matches(page, "Athlete");
+        var horses = Matches(page, "Horse");
+        var searches = 0;
+        page.Request += (_, request) =>
+        {
+            if (IsSearch(request.Url))
+            {
+                Interlocked.Increment(ref searches);
+            }
+        };
         await input.FillAsync(latin[..2]);
-        await Task.Delay(1500); // a text of two characters asks for nothing, and what is not asked is not answered either
+        await Task.Delay(1500); // a text with no word of three characters asks for nothing, and what is not asked is not answered either
         await Expect(page.GetByText("Nothing found")).ToHaveCountAsync(0);
+        await Expect(athletes).ToHaveCountAsync(0);
+        Assert.Equal(0, Volatile.Read(ref searches));
 
-        await input.FillAsync($"{latin}ov");
+        await input.FillAsync($"{latin}OV"); // in capitals, and the English name of each
 
-        await Expect(matches).ToHaveCountAsync(2, Counted()); // an Athlete and a Horse, with the kind of each shown
-        await Expect(matches.Nth(0)).ToContainTextAsync(ivan.Name, Containing());
-        await Expect(matches.Nth(0)).ToContainTextAsync("Athlete", Containing());
-        await Expect(matches.Nth(1)).ToContainTextAsync(star.Name, Containing());
-        await Expect(matches.Nth(1)).ToContainTextAsync("Horse", Containing());
-        await matches.Nth(0).ClickAsync();
-        await Expect(page.GetByTestId("chosen-participant")).ToContainTextAsync(ivan.Name, Containing());
+        await Expect(athletes).ToContainTextAsync("Athletes", Containing());
+        await Expect(horses).ToContainTextAsync("Horses", Containing());
+        await Expect(athletes.GetByTestId("participant-match")).ToHaveTextAsync([$"Ivan {latin}ov"], Texted());
+        await Expect(horses.GetByTestId("participant-match")).ToHaveTextAsync([$"Star {latin}ov"], Texted());
+        await athletes.GetByTestId("participant-match").ClickAsync();
+        await Expect(page.GetByTestId("chosen-participant")).ToContainTextAsync($"Ivan {latin}ov", Containing());
+        await Expect(page.GetByTestId("chosen-participant")).ToContainTextAsync("Athlete", Containing()); // and which kind it is
         var rows = page.Locator("tr.participation-row");
         await Expect(rows).ToHaveCountAsync(1, Counted());
-        await Expect(rows.GetByTestId("participation-other")).ToHaveTextAsync(star.Name, Texted()); // the Horse, the other half of the Athlete
+        await Expect(rows.GetByTestId("participation-other")).ToHaveTextAsync($"Star {latin}ov", Texted()); // the Horse, the other half of the Athlete
         await rows.GetByTestId("participation-date").ClickAsync();
         await Expect(page.GetByTestId("participation-detail")).ToHaveCountAsync(1, Counted());
 
-        await input.FillAsync($"{latin}ov");
-        await Expect(matches).ToHaveCountAsync(2, Counted());
-        await matches.Nth(1).ClickAsync();
+        await horses.GetByTestId("participant-match").ClickAsync();
 
-        await Expect(page.GetByTestId("chosen-participant")).ToContainTextAsync(star.Name, Containing());
+        await Expect(page.GetByTestId("chosen-participant")).ToContainTextAsync($"Star {latin}ov", Containing());
+        await Expect(page.GetByTestId("chosen-participant")).ToContainTextAsync("Horse", Containing());
         await Expect(rows).ToHaveCountAsync(1, Counted());
-        await Expect(rows.GetByTestId("participation-other")).ToHaveTextAsync(ivan.Name, Texted()); // and the Athlete, the other half of the Horse
+        await Expect(rows.GetByTestId("participation-other")).ToHaveTextAsync($"Ivan {latin}ov", Texted()); // and the Athlete, the other half of the Horse
         await Expect(page.GetByTestId("participation-detail")).ToHaveCountAsync(0, Counted()); // the row that was open for the Athlete is not open for the Horse
+        Assert.Equal(2, Volatile.Read(ref searches)); // one for the Athletes and one for the Horses: choosing one asked for no list again
+
+        await input.FillAsync($"{cyrillic}ов"); // the name in the script it is registered in
+        await Eventually(async () => Volatile.Read(ref searches) == 4); // the lists are asked for the new text, after the pause
+        await Expect(athletes.GetByTestId("participant-match")).ToHaveTextAsync([$"Ivan {latin}ov"], Texted()); // told in the language of the app all the same
+        await Expect(page.GetByTestId("chosen-participant")).ToContainTextAsync($"Star {latin}ov", Containing()); // and the one that was chosen stays
 
         await page.Locator(".mud-input-clear-button").ClickAsync();
 
         await Expect(page.GetByTestId("chosen-participant")).ToHaveCountAsync(0, Counted()); // nobody is chosen, and nothing is listed
         await Expect(rows).ToHaveCountAsync(0, Counted());
+        await Expect(athletes).ToHaveCountAsync(0, Counted());
+        await NoUnhandledErrorAsync(page);
+    }
+
+    [Fact]
+    public async Task A_list_of_more_than_ten_names_shows_ten_and_the_rest_when_asked_to_and_a_kind_with_none_says_so()
+    {
+        var mongo = _host.MongoConnectionString;
+        var (latin, _) = HistorySeed.NameMarker();
+        var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
+        var me = await TenancySeed.AccountAsync(mongo, tenant, name: "Vera Georgieva");
+        for (var i = 0; i < 12; i++)
+        {
+            await RegistrySeed.HorseAsync(mongo, tenant, $"Horse {latin} {i:00}");
+        }
+
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, me.Email, "/participations");
+        var horses = Matches(page, "Horse");
+        var more = horses.GetByRole(AriaRole.Button, new() { Name = "Show more", Exact = true });
+
+        await page.GetByLabel("Name of an Athlete or a Horse").FillAsync($"{latin} horse");
+
+        await Expect(horses.GetByTestId("participant-match")).ToHaveCountAsync(10, Counted());
+        await Expect(horses.GetByTestId("participant-match").First).ToHaveTextAsync($"Horse {latin} 00", Texted());
+        await Expect(Matches(page, "Athlete").GetByTestId("participant-matches-empty"))
+            .ToHaveTextAsync("Nothing found", Texted()); // the Athletes are another list, and have none
+        await more.ClickAsync();
+
+        await Expect(horses.GetByTestId("participant-match")).ToHaveCountAsync(12, Counted());
+        await Expect(horses.GetByTestId("participant-match").Last).ToHaveTextAsync($"Horse {latin} 11", Texted());
+        await Expect(more).ToHaveCountAsync(0, Counted());
+        await NoUnhandledErrorAsync(page);
     }
 
     [Fact]
@@ -322,7 +373,7 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         var (latin, cyrillic) = HistorySeed.NameMarker();
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
         var me = await TenancySeed.AccountAsync(mongo, tenant, name: "Vera Georgieva");
-        await RegisterAsync(mongo, tenant, new Participant(Guid.NewGuid(), $"Иван {cyrillic}ов"));
+        await RegisterAsync(mongo, tenant, new Participant(Guid.NewGuid(), $"Иван {cyrillic}ов", $"Ivan {latin}ov"));
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
@@ -330,7 +381,7 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         var searches = 0;
         page.Request += (_, request) =>
         {
-            if (request.Url.Contains("/api/participants?", StringComparison.Ordinal))
+            if (IsSearch(request.Url))
             {
                 Interlocked.Increment(ref searches);
             }
@@ -340,7 +391,54 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
             .PressSequentiallyAsync($"{latin}ov", new() { Delay = 80 });
 
         await Expect(page.GetByTestId("participant-match")).ToHaveCountAsync(1, Counted());
-        Assert.Equal(1, Volatile.Read(ref searches)); // the keys were typed faster than the pause that the search waits for, and each search draws on the budget of the account
+        Assert.Equal(2, Volatile.Read(ref searches)); // the keys were typed faster than the pause that the search waits for, and each search draws on the budget of the account: one for the Athletes and one for the Horses
+    }
+
+    [Fact]
+    public async Task A_list_that_cannot_be_read_offers_to_be_read_again_and_does_not_say_there_is_nothing()
+    {
+        var mongo = _host.MongoConnectionString;
+        var (latin, cyrillic) = HistorySeed.NameMarker();
+        var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
+        var me = await TenancySeed.AccountAsync(mongo, tenant, name: "Vera Georgieva");
+        await RegistrySeed.HorseAsync(mongo, tenant, $"Звезда {cyrillic}ов", $"Star {latin}ov");
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, me.Email, "/participations");
+        var failing = true;
+        await page.RouteAsync(
+            new Regex(@"/api/athletes/all-tenants\?"),
+            async route =>
+            {
+                if (failing)
+                {
+                    await route.AbortAsync();
+                }
+                else
+                {
+                    await route.ContinueAsync();
+                }
+            }
+        );
+
+        await page.GetByLabel("Name of an Athlete or a Horse").FillAsync($"{latin}ov");
+
+        var told = page.GetByRole(AriaRole.Dialog);
+        await Expect(told).ToContainTextAsync("Unhandled Exception", Containing()); // the person is told
+        await told.GetByRole(AriaRole.Button, new() { Name = "Close", Exact = true }).ClickAsync();
+        var athletes = Matches(page, "Athlete");
+        var reload = athletes.GetByRole(AriaRole.Button, new() { Name = "Reload", Exact = true });
+        await Expect(reload).ToBeVisibleAsync(Loaded()); // and is offered to ask again, and not told that there is nothing
+        await Expect(athletes.GetByTestId("participant-matches-empty")).ToHaveCountAsync(0);
+        await Expect(Matches(page, "Horse").GetByTestId("participant-match"))
+            .ToHaveTextAsync([$"Star {latin}ov"], Texted()); // the Horses are another list, which was read
+        failing = false;
+
+        await reload.ClickAsync();
+
+        await Expect(athletes.GetByTestId("participant-matches-empty")).ToHaveTextAsync("Nothing found", Texted()); // there are no Athletes of the name, and it is told so
+        await Expect(reload).ToHaveCountAsync(0, Counted());
     }
 
     [Fact]
@@ -371,11 +469,11 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         var input = page.GetByLabel("Name of an Athlete or a Horse");
         var matches = page.GetByTestId("participant-match");
         var rows = page.Locator("tr.participation-row");
-        await input.FillAsync($"{latin}ov");
+        await input.FillAsync($"{cyrillic}ов");
         await Expect(matches).ToHaveCountAsync(2, Counted());
         await matches.Nth(0).ClickAsync(); // the Athlete is chosen, and its list is waited for
 
-        await input.FillAsync($"{latin}ov");
+        await input.FillAsync($"{cyrillic}ов");
         await Expect(matches).ToHaveCountAsync(2, Counted());
         await matches.Nth(1).ClickAsync(); // and then the Horse, whose list comes at once
 
@@ -420,14 +518,14 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         var input = page.GetByLabel("Name of an Athlete or a Horse");
         var matches = page.GetByTestId("participant-match");
         var rows = page.Locator("tr.participation-row");
-        await input.FillAsync($"{latin}ov");
+        await input.FillAsync($"{cyrillic}ов");
         await Expect(matches).ToHaveCountAsync(2, Counted());
         await matches.Nth(0).ClickAsync(); // the Athlete
-        await input.FillAsync($"{latin}ov");
+        await input.FillAsync($"{cyrillic}ов");
         await Expect(matches).ToHaveCountAsync(2, Counted());
         await matches.Nth(1).ClickAsync(); // the Horse
         await Expect(rows).ToHaveCountAsync(1, Counted());
-        await input.FillAsync($"{latin}ov");
+        await input.FillAsync($"{cyrillic}ов");
         await Expect(matches).ToHaveCountAsync(2, Counted());
 
         await matches.Nth(0).ClickAsync(); // and the Athlete again, whose list is asked for the second time and comes at once
@@ -625,16 +723,18 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
     public async Task A_search_that_is_not_wanted_any_more_because_the_person_typed_on_is_not_a_failure()
     {
         var mongo = _host.MongoConnectionString;
-        var (latin, cyrillic) = HistorySeed.NameMarker();
+        var (_, first) = HistorySeed.NameMarker();
+        var (_, second) = HistorySeed.NameMarker();
         var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
         var me = await TenancySeed.AccountAsync(mongo, tenant, name: "Vera Georgieva");
-        await RegisterAsync(mongo, tenant, new Participant(Guid.NewGuid(), $"Иван {cyrillic}ов"));
+        await RegisterAsync(mongo, tenant, new Participant(Guid.NewGuid(), $"Иван {first}"));
+        await RegisterAsync(mongo, tenant, new Participant(Guid.NewGuid(), $"Мария {second}"));
         await using var device = await _browsers.OpenAsync(_host.BaseAddress);
         var page = device.Page;
         page.SetDefaultTimeout(PATIENCE);
         await SignInAndOpenAsync(_host, device, me.Email, "/participations");
         await page.RouteAsync(
-            new Regex(@"/api/participants\?"),
+            new Regex(@"/api/(athletes|horses)/all-tenants\?"),
             async route =>
             {
                 await Task.Delay(2500); // the Api is slow to answer
@@ -649,13 +749,59 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
             }
         );
         var input = page.GetByLabel("Name of an Athlete or a Horse");
+        var matches = page.GetByTestId("participant-match");
 
-        await input.FillAsync(latin);
+        await input.FillAsync(first);
         await Task.Delay(1500); // the search for it was sent and is waited for
-        await input.FillAsync($"{latin}ov"); // and what was asked for is not wanted now
+        await input.FillAsync(second); // and what was asked for is not wanted now: it finds another Athlete
+
+        await Expect(matches).ToHaveTextAsync([$"Мария {second}"], Texted());
+        await Expect(page.GetByRole(AriaRole.Dialog)).ToHaveCountAsync(0); // nobody is told of an error
+        await Task.Delay(4000); // the answers to the text that is not wanted are told now, to a list that has moved on
+        await Expect(matches).ToHaveTextAsync([$"Мария {second}"], Texted());
+        await NoUnhandledErrorAsync(page);
+    }
+
+    [Fact]
+    public async Task A_picker_asks_after_a_pause_and_a_search_that_is_not_wanted_any_more_is_not_a_failure()
+    {
+        var mongo = _host.MongoConnectionString;
+        var (_, cyrillic) = HistorySeed.NameMarker();
+        var tenant = await TenancySeed.TenantAsync(mongo, withCountry: true);
+        var me = await TenancySeed.AccountAsync(mongo, tenant, name: "Vera Georgieva");
+        await RegistrySeed.HorseAsync(mongo, tenant, $"Буря {cyrillic}");
+        await using var device = await _browsers.OpenAsync(_host.BaseAddress);
+        var page = device.Page;
+        page.SetDefaultTimeout(PATIENCE);
+        await SignInAndOpenAsync(_host, device, me.Email, "/profile");
+        var searches = 0;
+        await page.RouteAsync(
+            new Regex(@"/api/horses/all-tenants\?"),
+            async route =>
+            {
+                Interlocked.Increment(ref searches);
+                await Task.Delay(4000); // the Api is slow to answer
+                try
+                {
+                    await route.ContinueAsync();
+                }
+                catch (PlaywrightException)
+                {
+                    // the page has abandoned the request meanwhile
+                }
+            }
+        );
+        var add = page.GetByLabel("Add a Horse");
+
+        await add.PressSequentiallyAsync(cyrillic[..5], new() { Delay = 300 }); // the keys come slower than the pause of the autocomplete, and faster than the pause of this search
+        await Task.Delay(1500); // and the search for them was sent and is waited for
+        Assert.Equal(1, Volatile.Read(ref searches));
+        await add.PressSequentiallyAsync(cyrillic[5..], new() { Delay = 300 }); // and what was asked for is not wanted now
 
         await Expect(page.GetByTestId("participant-match")).ToHaveCountAsync(1, Counted());
+        Assert.Equal(2, Volatile.Read(ref searches));
         await Expect(page.GetByRole(AriaRole.Dialog)).ToHaveCountAsync(0); // nobody is told of an error
+        await NoUnhandledErrorAsync(page);
     }
 
     [Fact]
@@ -792,6 +938,28 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
         await Expect(Entry(page, search)).ToBeVisibleAsync(Loaded());
         await Expect(page.GetByTestId("profile-participations").GetByRole(AriaRole.Heading, new() { Name = section }))
             .ToBeVisibleAsync(Loaded());
+    }
+
+    /// <summary>
+    /// The app has met no error it could not handle. When a render fails, Blazor shows its error bar and leaves the page as it
+    /// was, so a list that stopped following what it is told looks right until this is asked.
+    /// </summary>
+    static Task NoUnhandledErrorAsync(IPage page)
+    {
+        return Expect(page.Locator("#blazor-error-ui")).ToBeHiddenAsync();
+    }
+
+    /// <summary>The list of the Athletes, or of the Horses, that the search found (kind is Athlete or Horse).</summary>
+    static ILocator Matches(IPage page, string kind)
+    {
+        return page.Locator($"[data-testid=participant-matches][data-kind={kind}]");
+    }
+
+    /// <summary>Whether a request is the search of the registry of Athletes or of the registry of Horses.</summary>
+    static bool IsSearch(string url)
+    {
+        return url.Contains("/api/athletes/all-tenants?", StringComparison.Ordinal)
+            || url.Contains("/api/horses/all-tenants?", StringComparison.Ordinal);
     }
 
     /// <summary>The button that takes a Horse away from the Horses of the person, by the Horse.</summary>

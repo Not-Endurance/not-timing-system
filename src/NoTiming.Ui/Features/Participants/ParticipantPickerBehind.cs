@@ -4,15 +4,13 @@ using NTS.Contracts.Features.Participants;
 namespace NoTiming.Ui.Features.Participants;
 
 /// <summary>
-/// An input that finds an Athlete or a Horse by a few letters of its name, in either script (#639, ADR-0010). The Api searches
-/// the registries of every Tenant for at least three characters and counts each search against the budget of the account, so
-/// the input asks after a pause and not at each key. What it finds is told with its kind, and a picker made for one kind shows
-/// only the matches of it.
+/// An input that finds an Athlete, or a Horse, by a few letters of its name (#639, ADR-0010). The Api searches the registry of
+/// the kind for a word of at least three characters and counts each search against the budget of the account, so the input asks
+/// after a pause and not at each key. It offers the first page of what is found, ten at most, and a person who wants another
+/// goes on typing.
 /// </summary>
 public class ParticipantPickerBehind : NComponent
 {
-    public const int DEBOUNCE_MILLISECONDS = 700;
-
     [Inject]
     IParticipantSearch Participants { get; set; } = default!;
 
@@ -23,15 +21,17 @@ public class ParticipantPickerBehind : NComponent
 
     protected static int MinCharacters => ParticipantService.MIN_CHARACTERS;
 
+    protected static int PauseMilliseconds => ParticipantService.SEARCH_PAUSE_MILLISECONDS;
+
     [Parameter]
     public string? Label { get; set; }
 
     [Parameter]
     public string? HelperText { get; set; }
 
-    /// <summary>The one kind this picker offers; both when none.</summary>
-    [Parameter]
-    public ParticipantKind? OnlyOf { get; set; }
+    /// <summary>The kind this picker offers: the Athletes, or the Horses.</summary>
+    [Parameter, EditorRequired]
+    public ParticipantKind Kind { get; set; }
 
     /// <summary>Whether the input is emptied once a Participant is chosen, as an input that adds does; otherwise it keeps its name.</summary>
     [Parameter]
@@ -45,8 +45,8 @@ public class ParticipantPickerBehind : NComponent
     {
         try
         {
-            var found = await Participants.Search(term, ct);
-            return found.Where(x => OnlyOf == null || x.Kind == OnlyOf).Cast<ParticipantName?>();
+            var found = await Participants.Search(Kind, term, 1, ct);
+            return found.Items.Cast<ParticipantName?>();
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -84,10 +84,5 @@ public class ParticipantPickerBehind : NComponent
         {
             Handle(ex);
         }
-    }
-
-    protected static string KindText(ParticipantName participant)
-    {
-        return participant.Kind == ParticipantKind.Athlete ? Athlete_string : Horse_string;
     }
 }

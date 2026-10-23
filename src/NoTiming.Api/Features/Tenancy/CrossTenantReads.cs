@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -11,7 +10,6 @@ using NTS.Contracts.Features.Participants;
 using NTS.Contracts.Shared;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
-using NTS.Domain.Setup.Services.Identities;
 
 namespace NoTiming.Api.Features.Tenancy;
 
@@ -92,17 +90,15 @@ internal sealed class CrossTenantRefusedException : InvalidOperationException
 /// (ADR-0012, #643): an Event by its id, the Events a Main Operator runs, whether a Participation refers to a row of the
 /// registry (#635), the search of the registries of Athletes, Horses, Clubs and Officials, and what the history of a
 /// Participant, an Athlete or a Horse, is made of (#638): the Participations of the Participant, the Events and the Rankings those
-/// are in, and the search of both registries by name. They are the only reads that open a collection of a Tenant without one:
-/// each takes only what it needs, matches the text it is given literally, answers at most ten rows with only the fields that are
-/// meant to leave, and the searches ask the policy themselves as a second guard behind their routes. Reading an Event is public
-/// (ADR-0001), so an Event's id is what finds it; what the registries hold, and the Participations of a Participant across
-/// Events, are for signed-in accounts alone.
+/// are in. They are the only reads that open a collection of a Tenant without one: each takes only what it needs, a search
+/// matches the words it is given literally and in the database (<see cref="NameSearch"/>) and answers a page of rows with only
+/// the fields that are meant to leave, and the searches ask the policy themselves as a second guard behind their routes.
+/// Reading an Event is public (ADR-0001), so an Event's id is what finds it; what the registries hold, and the Participations of
+/// a Participant across Events, are for signed-in accounts alone.
 /// </summary>
 internal sealed class CrossTenantReads
 {
     const string STANDARD_ID = "_id";
-    public const int MIN_SEARCH_LENGTH = 3;
-    public const int MAX_MATCHES = 10;
 
     readonly IMongoDatabase _database;
 
@@ -343,42 +339,6 @@ internal sealed class CrossTenantReads
     }
 
     /// <summary>
-    /// The Athletes and the Horses of every Tenant that the text finds by their name (#638, ADR-0010): in either script, as a
-    /// part of each word of the text in any order (<see cref="IdentitySearch"/>), at most ten, each with its names and nothing
-    /// else. The registries are read for the names alone and the text is matched here, because the key that makes a Latin
-    /// text find a Cyrillic name is not stored.
-    /// </summary>
-    public async Task<IReadOnlyList<Participant>> SearchParticipantsAsync(
-        Caller caller,
-        string text,
-        CancellationToken cancellationToken
-    )
-    {
-        var needle = Needle("search of Athletes and Horses", caller, text);
-        var found = new List<Participant>();
-        foreach (var kind in Enum.GetValues<ParticipantKind>())
-        {
-            var rows = await Raw(RegistryOf(kind))
-                .Find(FilterDefinition<BsonDocument>.Empty)
-                .Project(ParticipantFields())
-                .ToListAsync(cancellationToken);
-            found.AddRange(
-                rows.Select(x => ParticipantOf(kind, x))
-                    .OfType<Participant>()
-                    .Where(x => IdentitySearch.Matches(needle, x.Name, x.NameEnglish))
-            );
-        }
-
-        return
-        [
-            .. found
-                .OrderBy(x => IdentityNames.Looser(x.Name), StringComparer.Ordinal)
-                .ThenBy(x => x.Id)
-                .Take(MAX_MATCHES),
-        ];
-    }
-
-    /// <summary>
     /// The Athletes or the Horses with the ids, of any Tenant, as the names they were registered with (#638): what a person
     /// who has linked themselves to rows of the registries is shown of them. An id that is no row of the registry is not in
     /// the answer.
@@ -467,47 +427,49 @@ internal sealed class CrossTenantReads
         return [.. tenants];
     }
 
+    /// <summary>The page of Athletes whose name, name in English or FEI ID has the words of the search in it.</summary>
     public Task<IReadOnlyList<RegistryMatch>> SearchAthletesAsync(
         Caller caller,
-        string text,
+        NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        return SearchAsync("athletes", "athletes", ["Name", "NameEnglish", "FeiId"], caller, text, cancellationToken);
+        return SearchAsync("athletes", "athletes", ["Name", "NameEnglish", "FeiId"], caller, search, cancellationToken);
     }
 
     public Task<IReadOnlyList<RegistryMatch>> SearchHorsesAsync(
         Caller caller,
-        string text,
+        NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        return SearchAsync("horses", "horses", ["Name", "NameEnglish", "FeiId"], caller, text, cancellationToken);
+        return SearchAsync("horses", "horses", ["Name", "NameEnglish", "FeiId"], caller, search, cancellationToken);
     }
 
     public Task<IReadOnlyList<RegistryMatch>> SearchClubsAsync(
         Caller caller,
-        string text,
+        NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        return SearchAsync("clubs", "clubs", ["Name"], caller, text, cancellationToken);
+        return SearchAsync("clubs", "clubs", ["Name"], caller, search, cancellationToken);
     }
 
     /// <summary>
     /// The Officials of any Event, by name, once each: the same name in the same role in many Events is one row. They are
-    /// the Officials of the Events that have started, as the Core keeps them.
+    /// the Officials of the Events that have started, as the Core keeps them. The rows are the groups of the same name, name in
+    /// English and role, so those three are what orders them.
     /// </summary>
     public async Task<IReadOnlyList<RegistryMatch>> SearchOfficialsAsync(
         Caller caller,
-        string text,
+        NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        var filter = Matching(["Name", "NameEnglish"], Needle("officials", caller, text));
+        Admit("officials", caller, search);
         var rows = await Raw("event_officials")
             .Aggregate()
-            .Match(filter)
+            .Match(search.Matching("Name", "NameEnglish"))
             .Group(
                 new BsonDocument
                 {
@@ -524,8 +486,9 @@ internal sealed class CrossTenantReads
                     { "TenantId", new BsonDocument("$first", "$TenantId") },
                 }
             )
-            .Sort(new BsonDocument { { "_id.Name", 1 }, { "_id.Role", 1 } })
-            .Limit(MAX_MATCHES)
+            .Sort(search.OrderBy("_id.Name", "_id.NameEnglish", "_id.Role"))
+            .Skip(search.Skip)
+            .Limit(search.Take)
             .ToListAsync(cancellationToken);
 
         return
@@ -550,13 +513,13 @@ internal sealed class CrossTenantReads
         string collection,
         string[] fields,
         Caller caller,
-        string text,
+        NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        var filter = Matching(fields, Needle(read, caller, text));
+        Admit(read, caller, search);
         var rows = await Raw(collection)
-            .Find(filter)
+            .Find(search.Matching(fields))
             .Project(
                 new BsonDocument
                 {
@@ -569,8 +532,9 @@ internal sealed class CrossTenantReads
                     { "Country.Name", 1 },
                 }
             )
-            .Sort(new BsonDocument("Name", 1))
-            .Limit(MAX_MATCHES)
+            .Sort(search.OrderBy("Name", STANDARD_ID))
+            .Skip(search.Skip)
+            .Limit(search.Take)
             .ToListAsync(cancellationToken);
 
         return
@@ -590,16 +554,13 @@ internal sealed class CrossTenantReads
     }
 
     /// <summary>
-    /// The text to look for, once the policy has allowed the read and the text is long enough. A search for less than a
-    /// few characters would be a list, and a list is what the registries are not.
+    /// The second guards of a search: the policy has to allow it, and its words have to be enough. A search for less than a
+    /// word of a few characters would be a list, and a list is what the registries are not.
     /// </summary>
-    static string Needle(string read, Caller caller, string text)
+    static void Admit(string read, Caller caller, NameSearch search)
     {
         Allow(read, caller);
-        var needle = text.Trim();
-        return needle.Length < MIN_SEARCH_LENGTH
-            ? throw new ArgumentException($"A search is for at least {MIN_SEARCH_LENGTH} characters.", nameof(text))
-            : needle;
+        search.EnsureEnough();
     }
 
     /// <summary>The second guard of a read of what the registries hold: the policy has to allow it to the caller, which it does for any account.</summary>
@@ -676,13 +637,6 @@ internal sealed class CrossTenantReads
         return BsonGuids.Of(row, STANDARD_ID) is { } id && TextOf(row, "Name") is { } name
             ? new Participant(kind, id, name, TextOf(row, "NameEnglish"))
             : null;
-    }
-
-    /// <summary>Any of the fields contains the text, in any case, as it is written: it is never a pattern.</summary>
-    static FilterDefinition<BsonDocument> Matching(string[] fields, string needle)
-    {
-        var pattern = new BsonRegularExpression(Regex.Escape(needle), "i");
-        return Builders<BsonDocument>.Filter.Or(fields.Select(x => Builders<BsonDocument>.Filter.Regex(x, pattern)));
     }
 
     IMongoCollection<BsonDocument> Raw(string collection)

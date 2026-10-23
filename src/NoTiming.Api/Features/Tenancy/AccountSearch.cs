@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -35,17 +34,14 @@ internal sealed class AccountName
 }
 
 /// <summary>
-/// The search of accounts by name (#643, ADR-0012). There is no listing of accounts: a search takes at least three
-/// characters, which it matches literally, finds at most ten accounts by name, and answers each with its id, its display
-/// name and an email that is partly masked, never anything an account keeps for signing in. It looks among the members of
-/// a Tenant, or, for the route that asks for it by name, among every account. Who may search at all, and how often, is the
-/// policy's and the limiter's, and the routes ask them first.
+/// The search of accounts by name (#643, ADR-0012). There is no listing of accounts: a search takes words, one of at least
+/// three characters, which it matches literally and in the database (<see cref="NameSearch"/>), finds a page of accounts by
+/// name, and answers each with its id, its display name and an email that is partly masked, never anything an account keeps for
+/// signing in. It looks among the members of a Tenant, or, for the route that asks for it by name, among every account. Who may
+/// search at all, and how often, is the policy's and the limiter's, and the routes ask them first.
 /// </summary>
 internal sealed class AccountSearch
 {
-    public const int MIN_SEARCH_LENGTH = 3;
-    public const int MAX_MATCHES = 10;
-
     readonly IMongoCollection<BsonDocument> _users;
 
     public AccountSearch(IMongoClient client, IOptions<NIdentityOptions> options)
@@ -78,21 +74,16 @@ internal sealed class AccountSearch
         ];
     }
 
-    /// <param name="text">At least three characters, matched as they are written and in any case.</param>
+    /// <param name="search">The words to look for, matched as they are written and in any case, and the page that is wanted.</param>
     /// <param name="tenantId">The Tenant whose members are searched; none to search every account.</param>
     public async Task<IReadOnlyList<AccountMatch>> SearchAsync(
-        string text,
+        NameSearch search,
         string? tenantId,
         CancellationToken cancellationToken
     )
     {
-        var needle = text.Trim();
-        if (needle.Length < MIN_SEARCH_LENGTH)
-        {
-            throw new ArgumentException($"A search is for at least {MIN_SEARCH_LENGTH} characters.", nameof(text));
-        }
-
-        var filter = Builders<BsonDocument>.Filter.Regex("Name", new BsonRegularExpression(Regex.Escape(needle), "i"));
+        search.EnsureEnough();
+        var filter = search.Matching("Name");
         if (tenantId != null)
         {
             filter &= new BsonDocument(
@@ -111,8 +102,9 @@ internal sealed class AccountSearch
                     { "Email", 1 },
                 }
             )
-            .Sort(new BsonDocument("Name", 1))
-            .Limit(MAX_MATCHES)
+            .Sort(search.OrderBy("Name", "_id"))
+            .Skip(search.Skip)
+            .Limit(search.Take)
             .ToListAsync(cancellationToken);
 
         return

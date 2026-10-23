@@ -10,7 +10,7 @@
     {
         <ParticipantPicker Label="@My_Athlete_string"
                            HelperText="@My_Athlete_helper_string"
-                           OnlyOf="ParticipantKind.Athlete"
+                           Kind="ParticipantKind.Athlete"
                            ClearOnChosen="true"
                            OnChosen="LinkAthlete" />
     }
@@ -49,7 +49,7 @@
     </MudStack>
 
     <ParticipantPicker Label="@Add_a_Horse_string"
-                       OnlyOf="ParticipantKind.Horse"
+                       Kind="ParticipantKind.Horse"
                        ClearOnChosen="true"
                        OnChosen="AddHorse" />
 </MudStack>

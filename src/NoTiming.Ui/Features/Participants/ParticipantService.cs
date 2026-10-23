@@ -11,10 +11,12 @@ namespace NoTiming.Ui.Features.Participants;
 public interface IParticipantSearch
 {
     /// <summary>
-    /// The Participants whose names have the text in them, in either script, at most ten. A text of fewer than
-    /// <see cref="ParticipantService.MIN_CHARACTERS"/> characters finds none, without asking.
+    /// A page of the Athletes or of the Horses whose names have every word of the text in them, in any order and in any case,
+    /// in the order of their names and <see cref="ParticipantService.SEARCH_PAGE_SIZE"/> to a page; the first page is number 1.
+    /// A name is searched in the script it is registered in, and in the other if the row has its name in English. A text with
+    /// no word of <see cref="ParticipantService.MIN_CHARACTERS"/> characters finds none, without asking.
     /// </summary>
-    Task<IReadOnlyList<ParticipantName>> Search(string? text, CancellationToken ct);
+    Task<ParticipantSearchPage> Search(ParticipantKind kind, string? text, int number, CancellationToken ct);
 }
 
 /// <summary>What an Athlete or a Horse took part in (#639, ADR-0010): their history, and each Participation of it.</summary>
@@ -38,8 +40,23 @@ public interface IParticipationHistory
 
 public class ParticipantService : IParticipantSearch, IParticipationHistory, IScoped
 {
-    const int MAX_PAGE_SIZE = 500; // the most the Api puts in a page
-    public const int MIN_CHARACTERS = 3; // the fewest characters the Api searches for
+    const int MAX_PAGE_SIZE = 500; // the most the Api puts in a page of a history
+    const int MAX_WORDS = 6; // the most words the Api takes of a text
+    public const int MIN_CHARACTERS = 3; // the fewest characters of the longest word the Api searches for
+    public const int SEARCH_PAGE_SIZE = 10; // the size of a page of a search: the Api's own, asked for all the same
+    public const int SEARCH_PAUSE_MILLISECONDS = 700; // how long a person has to stop typing before a search is made, each of which draws on the budget of the account
+
+    /// <summary>The words of a text that the Api is asked for: the first six, because it takes no more.</summary>
+    public static IReadOnlyList<string> WordsOf(string? text)
+    {
+        return [.. (text ?? string.Empty).Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Take(MAX_WORDS)];
+    }
+
+    /// <summary>Whether a text is one that the Api searches for: one of its words has <see cref="MIN_CHARACTERS"/> characters at least.</summary>
+    public static bool IsSearchable(string? text)
+    {
+        return WordsOf(text).Any(x => x.Length >= MIN_CHARACTERS);
+    }
 
     readonly JsonApiClient _api;
     readonly IRepository<Participation> _participations;
@@ -50,22 +67,38 @@ public class ParticipantService : IParticipantSearch, IParticipationHistory, ISc
         _participations = participations;
     }
 
-    public async Task<IReadOnlyList<ParticipantName>> Search(string? text, CancellationToken ct)
+    public async Task<ParticipantSearchPage> Search(
+        ParticipantKind kind,
+        string? text,
+        int number,
+        CancellationToken ct
+    )
     {
-        var term = text?.Trim() ?? string.Empty;
-        if (term.Length < MIN_CHARACTERS)
+        var words = WordsOf(text);
+        if (!words.Any(x => x.Length >= MIN_CHARACTERS))
         {
-            return []; // the Api would refuse it, and a search counts against the budget of the account
+            return new ParticipantSearchPage([], hasMore: false); // the Api would refuse it with a 400, so it is not asked
         }
 
-        var filter = Uri.EscapeDataString($"contains(name,'{term.Replace("'", "''")}')");
-        var response = await _api.Send(HttpMethod.Get, $"participants?filter={filter}", cancellationToken: ct);
+        var query = string.Join(
+            '&',
+            $"filter={Uri.EscapeDataString($"contains(name,'{string.Join(' ', words).Replace("'", "''")}')")}",
+            "sort=name",
+            $"{Uri.EscapeDataString("page[size]")}={SEARCH_PAGE_SIZE}",
+            $"{Uri.EscapeDataString("page[number]")}={number}"
+        );
+        var registry = kind == ParticipantKind.Athlete ? "athletes" : "horses";
+        var response = await _api.Send(HttpMethod.Get, $"{registry}/all-tenants?{query}", cancellationToken: ct);
         if (!response.IsSuccess)
         {
             throw response.ToException();
         }
 
-        return [.. response.Document!.Value.GetProperty("data").EnumerateArray().Select(ParticipantJson.NameOf)];
+        var document = response.Document!.Value;
+        return new ParticipantSearchPage(
+            [.. document.GetProperty("data").EnumerateArray().Select(x => ParticipantJson.NameOfRow(kind, x))],
+            ParticipantJson.HasNext(document)
+        );
     }
 
     public async Task<ParticipationHistoryPage> HistoryOf(

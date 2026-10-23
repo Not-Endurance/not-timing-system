@@ -71,7 +71,6 @@ internal static class ApiPipeline
         app.MapEventGrants();
         app.MapAccountSearch();
         app.MapRegistrySearch();
-        app.MapParticipants();
         app.MapParticipationHistory();
         app.MapParticipantLinks();
         app.MapReference();

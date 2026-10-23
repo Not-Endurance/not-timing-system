@@ -40,6 +40,6 @@ public interface IConsoleEvents : IStatefulService
 
     Task HandOver(Guid eventId, Guid accountId);
 
-    /// <summary>The accounts of the Tenant whose name holds the text, at most ten.</summary>
+    /// <summary>The first page of the accounts of the Tenant whose name holds the words of the text, ten at most.</summary>
     Task<IReadOnlyList<AccountMatch>> FindAccounts(string text);
 }

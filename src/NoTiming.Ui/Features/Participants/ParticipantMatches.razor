@@ -1,0 +1,41 @@
+@using NTS.Contracts.Features.Participants
+
+@inherits ParticipantMatchesBehind
+
+@if (IsSearched)
+{
+    <MudStack Spacing="1" data-testid="participant-matches" data-kind="@Kind">
+        <MudText Typo="Typo.subtitle2">@Heading</MudText>
+
+        @if (IsLoading && Items.Count == 0)
+        {
+            <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+        }
+        else if (HasFailed && Items.Count == 0)
+        {
+            <NButtonSecondary Text="@Reload_string" OnClick="ShowMore" />
+        }
+        else if (IsEmpty)
+        {
+            <MudText Typo="Typo.body2" data-testid="participant-matches-empty">@Nothing_found_string</MudText>
+        }
+        else
+        {
+            @foreach (var participant in Items)
+            {
+                <MudButton Variant="Variant.Text"
+                           Class="justify-start"
+                           @key="participant.Id"
+                           OnClick="() => Choose(participant)"
+                           data-testid="participant-match">@participant.DisplayName</MudButton>
+            }
+
+            @if (HasMore)
+            {
+                <MudStack Row Justify="Justify.Center" Class="mt-1">
+                    <NButtonSecondary Text="@Show_more_string" Disabled="@IsLoading" OnClick="ShowMore" />
+                </MudStack>
+            }
+        }
+    </MudStack>
+}
