@@ -39,6 +39,11 @@
             <NHeadline3 Content="@Welcome_string" />
         }
     </MudDrawerHeader>
+
+    @if (ShowSignin)
+    {
+        <MudNavLink OnClick="Signin" Icon="@Icons.Material.Filled.Login">@Sign_In_string</MudNavLink>
+    }
     
     <MudDivider Class="my-2" />
 

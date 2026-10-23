@@ -5,6 +5,7 @@
 @using Not.Blazor.Components.Layout
 
 @attribute [Route(SNAPSHOT_PAGE)]
+@attribute [Authorize]
 @inherits SnapshotContentBehind
 
 <NContent Title="@Snapshot_page_string">
