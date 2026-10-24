@@ -22,10 +22,6 @@ internal static class AccountServices
             ConnectionStringOf(provider.GetRequiredService<IConfiguration>())
         ));
         services.AddSingleton<IEmailSender>(CreateEmailSender);
-        services.AddSingleton<IEmailOutbox>(provider =>
-            provider.GetRequiredService<IEmailSender>() as IEmailOutbox
-            ?? throw new InvalidOperationException("The email sender keeps no outbox: set Email:Sender to Outbox.")
-        );
 
         services.AddDataProtection().SetApplicationName(APPLICATION_NAME);
         services.AddSingleton(AccountText.Load());
@@ -88,12 +84,9 @@ internal static class AccountServices
         return sender switch
         {
             "Brevo" => CreateBrevoSender(configuration),
-            "Console" => ActivatorUtilities.CreateInstance<ConsoleEmailSender>(provider),
-            "Outbox" => new OutboxEmailSender(),
+            "Console" => ActivatorUtilities.CreateInstance<LogEmailSender>(provider),
             null => new UnconfiguredEmailSender(),
-            _ => throw new InvalidOperationException(
-                $"The email sender '{sender}' is not known: use Brevo, Console or Outbox."
-            ),
+            _ => throw new InvalidOperationException($"The email sender '{sender}' is not known: use Brevo or Console."),
         };
     }
 

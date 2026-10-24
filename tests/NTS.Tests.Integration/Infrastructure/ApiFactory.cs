@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Not.Identity.Email;
 
 namespace NTS.Tests.Integration.Infrastructure;
 
@@ -30,6 +31,7 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     readonly string _mongoConnectionString;
     readonly string _environment;
     readonly string? _emailSender;
+    readonly bool _outbox;
     readonly string _dataProtectionKeys;
     readonly TimeProvider? _time;
     readonly bool _productionRateLimits;
@@ -40,8 +42,9 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
     /// <param name="kestrel">Listen on a real loopback port instead of being reached in memory.</param>
     /// <param name="environment">The hosting environment: Production behaves as it does in production.</param>
     /// <param name="emailSender">
-    /// <c>Outbox</c> by default, so a test reads the codes it asks for. Production refuses the outbox, and a host in
-    /// Production has no sender at all unless a test adds one.
+    /// The <c>Email:Sender</c> setting of the host (<c>Brevo</c> or <c>Console</c>). By default a host sends to the
+    /// <see cref="OutboxEmailSender"/>, so a test reads the codes it asks for. A host in Production has no sender at
+    /// all unless a test adds one.
     /// </param>
     /// <param name="dataProtectionKeys">
     /// The folder of the key ring. A host that must read what another protected shares it. By default each host has
@@ -69,7 +72,8 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
 
         _mongoConnectionString = mongoConnectionString;
         _environment = environment;
-        _emailSender = emailSender ?? (environment == "Production" ? null : "Outbox");
+        _emailSender = emailSender;
+        _outbox = emailSender == null && environment != "Production";
         _dataProtectionKeys = dataProtectionKeys ?? NewDataProtectionKeys();
         _time = time;
         _productionRateLimits = productionRateLimits;
@@ -114,6 +118,17 @@ internal sealed class ApiFactory : WebApplicationFactory<Program>
         {
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(_dataProtectionKeys));
             services.AddSingleton<IStartupFilter, ClientAddressFromHeader>();
+            if (_outbox)
+            {
+                services.RemoveAll<IEmailSender>();
+                services.AddSingleton<IEmailSender, OutboxEmailSender>();
+            }
+
+            // A test that swaps the sender for one that keeps its mail reads it from the same place.
+            services.AddSingleton<IEmailOutbox>(provider =>
+                provider.GetRequiredService<IEmailSender>() as IEmailOutbox
+                ?? throw new InvalidOperationException("The email sender keeps no outbox.")
+            );
             if (_time != null)
             {
                 services.RemoveAll<TimeProvider>();

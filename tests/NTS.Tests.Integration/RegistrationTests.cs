@@ -1,7 +1,6 @@
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
-using Not.Identity.Email;
 using NTS.Tests.Integration.Infrastructure;
 
 namespace NTS.Tests.Integration;

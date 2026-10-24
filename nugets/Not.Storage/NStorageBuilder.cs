@@ -46,8 +46,8 @@ public class NStorageBuilder
 
     /// <summary>
     /// The driver keeps one serializer per type for the whole process and refuses a second registration,
-    /// so this runs once however many hosts are built. Every Guid, an <c>_id</c> included, is written as a
-    /// standard-representation BSON UUID (ADR-0009): nothing relies on the driver's default.
+    /// so this runs once however many hosts are built. Every Guid is a standard-representation BSON UUID
+    /// (ADR-0009, see <see cref="GuidSerialization"/>).
     /// </summary>
     static void RegisterSerializers()
     {
@@ -57,6 +57,6 @@ public class NStorageBuilder
         }
 
         BsonSerializer.RegisterSerializer(typeof(DateTimeOffset), new DateTimeOffsetSerializer(BsonType.DateTime));
-        BsonSerializer.RegisterSerializer(typeof(Guid), new GuidSerializer(GuidRepresentation.Standard));
+        GuidSerialization.Register();
     }
 }
