@@ -16,7 +16,7 @@ A Participation embeds the Athlete and the Horse it was entered with, and the co
 
 **Setup prevents duplicates.** An Athlete or Horse that any Participation refers to cannot be deleted, and creating or renaming one whose name (in any script) or FeiId exists warns and offers the existing row. `Athlete.User` is retired: it points from the Athlete to a user, nothing reads it, and the user's own link to an Athlete lives with the user.
 
-**Reading by Athlete or Horse needs sign-in.** The registry makes one person's whole record queryable, which per-Event Results never were. The Participations of an Athlete or of a Horse, the Search that finds them and the Profile that holds them are served to signed-in users only, enforced by the API and hidden from anonymous visitors in the UI. That is an exception to the public reads of ADR-0001, and the privacy policy has to cover it: the Junior and Young Rider categories include minors.
+**Reading by Athlete or Horse needs sign-in.** The registry makes one person's whole record queryable, which per-Event Results never were. The Participations of an Athlete or of a Horse, the Search that finds them and the Profile that holds them are served to signed-in users only, enforced by the API and hidden from anonymous visitors in the UI. That is an exception to the public reads of ADR-0001, and the privacy policy has to cover it: the Junior and Young Rider categories include minors. A draft of the privacy notice says what is kept, who reads what of a rider and that some riders are under 18 (`Account/Text`, 2026-10-23); it still has blanks for the organisation that runs the platform and has not been read by a lawyer.
 
 ## Considered options
 
