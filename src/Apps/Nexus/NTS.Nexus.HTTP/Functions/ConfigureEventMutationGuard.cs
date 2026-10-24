@@ -1,7 +1,7 @@
 using Not.Application.CRUD.Ports;
 using Not.Domain.Exceptions;
 using Not.Injection;
-using NTS.Application.Contracts.Core.Models;
+using NTS.Contracts.Core.Models;
 
 namespace NTS.Nexus.HTTP.Functions;
 

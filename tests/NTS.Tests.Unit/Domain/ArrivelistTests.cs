@@ -55,9 +55,9 @@ public sealed class ArrivelistTests
 
         var entry = Assert.Single(new Arrivelist([participation]).Entries);
 
-        Assert.Equal(currentStart.AddMinutes(50), entry.Fast!.ToDateTimeOffset());
-        Assert.Equal(currentStart.AddMinutes(70), entry.Average!.ToDateTimeOffset());
-        Assert.Equal(currentStart.AddMinutes(170), entry.Slow!.ToDateTimeOffset());
+        Assert.Equal(currentStart.AddMinutes(50), entry.Fei.Fast!.ToDateTimeOffset());
+        Assert.Equal(currentStart.AddMinutes(70), entry.Fei.Average!.ToDateTimeOffset());
+        Assert.Equal(currentStart.AddMinutes(170), entry.Fei.Slow!.ToDateTimeOffset());
     }
 
     [Fact]
@@ -73,9 +73,9 @@ public sealed class ArrivelistTests
 
         var entry = Assert.Single(new Arrivelist([participation]).Entries);
 
-        Assert.NotNull(entry.Fast);
-        Assert.Null(entry.Average);
-        Assert.NotNull(entry.Slow);
+        Assert.NotNull(entry.Fei.Fast);
+        Assert.Null(entry.Fei.Average);
+        Assert.NotNull(entry.Fei.Slow);
     }
 
     [Fact]
@@ -121,8 +121,121 @@ public sealed class ArrivelistTests
 
         var entry = Assert.Single(new Arrivelist([participation]).Entries);
 
-        Assert.Equal(currentStart.AddHours(-2), entry.Fast!.ToDateTimeOffset());
-        Assert.True(entry.Fast.ToDateTimeOffset() < currentStart);
+        Assert.Equal(currentStart.AddHours(-2), entry.Fei.Fast!.ToDateTimeOffset());
+        Assert.True(entry.Fei.Fast.ToDateTimeOffset() < currentStart);
+    }
+
+    [Fact]
+    public void Regional_fast_and_slow_ignore_ride_history()
+    {
+        var day = DateTimeOffset.Now.AddDays(-1).Date;
+        var completedStart = new DateTimeOffset(day.AddHours(8), DateTimeOffset.Now.Offset);
+        var completedArrive = new DateTimeOffset(day.AddHours(9), DateTimeOffset.Now.Offset);
+        var completedPresent = new DateTimeOffset(day.AddHours(9).AddMinutes(10), DateTimeOffset.Now.Offset);
+        var currentStart = new DateTimeOffset(day.AddHours(10), DateTimeOffset.Now.Offset);
+        var participation = CreateParticipation(
+            10,
+            [
+                CreatePhase(20, completedStart, completedArrive, completedPresent),
+                CreatePhase(20, currentStart, isFinal: true),
+            ],
+            minAverageSpeed: 10,
+            maxAverageSpeed: 20
+        );
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Equal(currentStart.AddMinutes(60), entry.Regional.Fast!.ToDateTimeOffset());
+        Assert.Equal(currentStart.AddMinutes(120), entry.Regional.Slow!.ToDateTimeOffset());
+        Assert.NotEqual(entry.Fei.Fast, entry.Regional.Fast);
+        Assert.NotEqual(entry.Fei.Slow, entry.Regional.Slow);
+    }
+
+    [Fact]
+    public void Regional_average_is_the_last_completed_loop_speed()
+    {
+        var day = DateTimeOffset.Now.AddDays(-1).Date;
+        var completedStart = new DateTimeOffset(day.AddHours(8), DateTimeOffset.Now.Offset);
+        var completedArrive = new DateTimeOffset(day.AddHours(10), DateTimeOffset.Now.Offset);
+        var completedPresent = new DateTimeOffset(day.AddHours(10).AddMinutes(10), DateTimeOffset.Now.Offset);
+        var currentStart = new DateTimeOffset(day.AddHours(11), DateTimeOffset.Now.Offset);
+        var participation = CreateParticipation(
+            11,
+            [
+                CreatePhase(20, completedStart, completedArrive, completedPresent),
+                CreatePhase(20, currentStart, isFinal: true),
+            ],
+            minAverageSpeed: 8,
+            maxAverageSpeed: 16
+        );
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        // Last completed loop rode 20km in 2h - 10km/h - so the active 20km loop takes 2h at that pace.
+        Assert.Equal(currentStart.AddHours(2), entry.Regional.Average!.ToDateTimeOffset());
+        Assert.Equal(currentStart.AddMinutes(75), entry.Regional.Fast!.ToDateTimeOffset());
+        Assert.Equal(currentStart.AddMinutes(150), entry.Regional.Slow!.ToDateTimeOffset());
+        Assert.NotEqual(entry.Fei.Average, entry.Regional.Average);
+    }
+
+    [Fact]
+    public void Regional_average_is_missing_without_a_completed_loop()
+    {
+        var day = DateTimeOffset.Now.AddDays(-1).Date;
+        var currentStart = new DateTimeOffset(day.AddHours(10), DateTimeOffset.Now.Offset);
+        var participation = CreateParticipation(
+            12,
+            [CreatePhase(20, currentStart, isFinal: true)],
+            minAverageSpeed: 10,
+            maxAverageSpeed: 20
+        );
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Null(entry.Regional.Average);
+        Assert.NotNull(entry.Regional.Fast);
+        Assert.NotNull(entry.Regional.Slow);
+    }
+
+    [Fact]
+    public void Regional_average_is_missing_when_the_last_completed_loop_has_no_interval()
+    {
+        var day = DateTimeOffset.Now.AddDays(-1).Date;
+        var completedStart = new DateTimeOffset(day.AddHours(9), DateTimeOffset.Now.Offset);
+        var completedPresent = new DateTimeOffset(day.AddHours(9).AddMinutes(10), DateTimeOffset.Now.Offset);
+        var currentStart = new DateTimeOffset(day.AddHours(10), DateTimeOffset.Now.Offset);
+        var participation = CreateParticipation(
+            13,
+            [
+                CreatePhase(20, completedStart, completedStart, completedPresent),
+                CreatePhase(20, currentStart, isFinal: true),
+            ],
+            minAverageSpeed: 10,
+            maxAverageSpeed: 20
+        );
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.Null(entry.Regional.Average);
+        Assert.NotNull(entry.Fei.Average);
+    }
+
+    [Fact]
+    public void Regional_and_fei_estimates_are_identical_on_the_first_loop()
+    {
+        var day = DateTimeOffset.Now.AddDays(-1).Date;
+        var currentStart = new DateTimeOffset(day.AddHours(10), DateTimeOffset.Now.Offset);
+        var participation = CreateParticipation(
+            14,
+            [CreatePhase(20, currentStart), CreatePhase(20, null, isFinal: true)],
+            minAverageSpeed: 10,
+            maxAverageSpeed: 20
+        );
+
+        var entry = Assert.Single(new Arrivelist([participation]).Entries);
+
+        Assert.NotNull(entry.Fei.Fast);
+        Assert.Equal(entry.Fei, entry.Regional);
     }
 
     static Participation CreateParticipation(

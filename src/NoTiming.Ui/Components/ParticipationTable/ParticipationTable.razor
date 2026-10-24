@@ -1,0 +1,99 @@
+@using NoTiming.Ui.Components.ParticipationTable.Phases
+@using Not.Blazor.Components.Tables
+
+@inherits ParticipationTableBehind
+
+<div class="participation-table-root">
+    <NTable Class="@CombineClass(TableClass)"
+            Style="@CombineStyle("width:100%;")"
+            Items="@Rows"
+            Headings="@PhaseHeadings"
+            LeadingHeading="@LeadingHeaderText"
+            LeadingCellAsHeader="true"
+            Transform="GetRowValues">
+
+        <LeadingCell Context="item">
+            @{
+                var row = (ParticipationTableRow)item;
+            }
+
+            <MudText Typo="Typo.caption">@row.Label</MudText>
+        </LeadingCell>
+
+        <HeadingCell Context="index">
+            @if (UseVerticalLayout)
+            {
+                var phase = DisplayPhases[index];
+
+                if (Editable)
+                {
+                    <MudTooltip Text="@Edit_times_string" Inline="false">
+                        <MudButton Variant="Variant.Text" Class="participation-table-phase-button" OnClick="() => ShowUpdate(phase)">
+                            <div class="participation-table-phase-heading">
+                                <MudText Typo="Typo.caption">@phase.Gate</MudText>
+                            </div>
+                        </MudButton>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <div class="participation-table-phase-heading">
+                        <MudText Typo="Typo.caption">@phase.Gate</MudText>
+                    </div>
+                }
+            }
+            else
+            {
+                <MudText Typo="Typo.caption">@PhaseHeadings[index]</MudText>
+            }
+        </HeadingCell>
+    </NTable>
+</div>
+
+<style>
+    .participation-table-root .participation-table table {
+        width: 100%;
+    }
+
+    .participation-table-root .participation-table thead th,
+    .participation-table-root .participation-table tbody th {
+        white-space: nowrap;
+    }
+
+    .participation-table-root .participation-table table th,
+    .participation-table-root .participation-table table td {
+        padding-block: 4px !important;
+        padding-inline: 8px !important;
+    }
+
+    .participation-table-root .participation-table tbody th {
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    .participation-table-root .participation-table-phase-heading {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.125rem;
+        line-height: 1.1;
+    }
+
+    .participation-table-root .participation-table .participation-table-phase-button {
+        min-width: 0;
+        padding: 0;
+        justify-content: flex-start;
+        text-transform: none;
+    }
+
+    .participation-table-root .participation-table .participation-table-phase-button .mud-button-label {
+        display: block;
+    }
+
+    @@media print {
+        .participation-table-root .participation-table table th,
+        .participation-table-root .participation-table table td {
+            padding-block: 0 !important;
+        }
+    }
+</style>

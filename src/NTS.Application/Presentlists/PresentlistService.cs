@@ -1,9 +1,9 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
 using Not.Collections;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Presentlists;
-using NTS.Application.Contracts.Socket;
+using NTS.Contracts.Core;
+using NTS.Contracts.Presentlists;
+using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Events;

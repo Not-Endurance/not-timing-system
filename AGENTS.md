@@ -184,7 +184,7 @@ Overall average: **60-90% token reduction** on common development operations.
 
 ### Issue tracker
 
-Issues and specs live as GitHub issues in Not-Endurance/not-timing-system, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+Issues and specs live as GitHub issues in Not-Endurance/not-timing-system, via the `gh` CLI. Issue bodies are Overview / Verification / Details, and implementing commits and PRs say `Closes #N`. See `docs/agents/issue-tracker.md`.
 
 ### Domain docs
 

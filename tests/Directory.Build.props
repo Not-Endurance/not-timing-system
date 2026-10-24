@@ -1,0 +1,12 @@
+<Project>
+
+  <!--
+    Testcontainers brings SSH.NET 2025.1.0 in. Both advisories are in its SCP client, which the tests never use. Remove
+    them when Testcontainers moves to 4.14 or later, which depends on SSH.NET 2026.0.0.
+  -->
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-mggc-4xg6-vcxf" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-q939-rpr3-3284" />
+  </ItemGroup>
+
+</Project>

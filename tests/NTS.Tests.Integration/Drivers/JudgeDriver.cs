@@ -9,14 +9,14 @@ using Not.Application.RPC.Clients;
 using Not.Krud.Abstractions;
 using Not.Notify;
 using Not.Startup;
-using NTS.Application.Contracts;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Socket;
+using NoTiming.Ui.Storage;
+using NTS.Contracts;
+using NTS.Contracts.Core;
+using NTS.Contracts.Socket;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Judge;
 using NTS.Judge.Contracts.Features.Core.Dashboard;
-using NTS.Storage;
 
 namespace NTS.Tests.Integration.Drivers;
 
@@ -29,14 +29,9 @@ internal sealed class JudgeDriver : IAsyncDisposable
     readonly IEventScopedRepository<Participation> _participationRepository;
     readonly IOptions<NHttpSettings> _httpSettings;
 
-    public JudgeDriver(Uri warpBaseUrl, Uri nexusBaseUrl)
+    public JudgeDriver(Uri apiBaseUrl, Uri nexusBaseUrl)
     {
-        var configuration = CreateConfiguration(
-            warpBaseUrl,
-            nexusBaseUrl,
-            ApplicationConstants.JUDGE_HUB,
-            "IntegrationJudge"
-        );
+        var configuration = CreateConfiguration(apiBaseUrl, nexusBaseUrl, "judge-hub", "IntegrationJudge");
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
@@ -120,13 +115,13 @@ internal sealed class JudgeDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri warpBaseUrl, Uri nexusBaseUrl, string hub, string clientName)
+    static IConfiguration CreateConfiguration(Uri apiBaseUrl, Uri nexusBaseUrl, string hub, string clientName)
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = warpBaseUrl.ToString().TrimEnd('/'),
+                    [$"{nameof(RpcSettings)}:{nameof(RpcSettings.Host)}"] = apiBaseUrl.ToString().TrimEnd('/'),
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.HubPattern)}"] = hub,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",

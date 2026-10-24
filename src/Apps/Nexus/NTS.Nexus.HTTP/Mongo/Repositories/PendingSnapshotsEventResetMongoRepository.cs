@@ -1,7 +1,7 @@
 using MongoDB.Driver;
 using Not.Injection;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Watcher.Models;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 

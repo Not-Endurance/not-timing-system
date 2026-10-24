@@ -5,4 +5,12 @@
    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts/**</DefaultItemExcludes>
   </PropertyGroup>
 
+  <!--
+    Legacy hosts are not audited: Nexus.HTTP stays only until its API is retired (#647), and Judge went with the hub
+    write path (#598). A package that only they bring in does not fail the build.
+  -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'NTS.Nexus.HTTP' Or $(MSBuildProjectName.StartsWith('NTS.Judge'))">
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+
 </Project>

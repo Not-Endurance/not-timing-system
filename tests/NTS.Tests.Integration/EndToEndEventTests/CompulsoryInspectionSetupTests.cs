@@ -41,7 +41,7 @@ public sealed class CompulsoryInspectionSetupTests
         Assert.True(persistedPhases[1].IsCompulsoryInspectionRequired);
         Assert.False(persistedPhases[2].IsCompulsoryInspectionRequired);
 
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
         await judge.Start();
         await judge.GetRequiredService<IDashService>().Start(eventId);
 

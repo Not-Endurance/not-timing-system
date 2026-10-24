@@ -1,0 +1,28 @@
+@using Not.Blazor.Components.Layout
+@using NoTiming.Ui.Components.Rankings.Menu
+@using NoTiming.Ui.Components.Results
+
+@attribute [Route(PAST_EVENT_DETAILS_PAGE)]
+@inherits PastEventDetailsContentBehind
+
+<NContent Title="@Past_events_string" IsLoading="@IsLoading" IsEmpty="@IsEmpty">
+    <Main>
+        @if (Document != null)
+        {
+            <ResultComponent Document="Document" />
+        }
+    </Main>
+
+    <Rightbar>
+        <MudStack Spacing="3">
+            <NButtonSecondary OnClick="OpenStartlist"
+                              Text="@Startlist_string"
+                              StartIcon="@Icons.Material.Filled.List"
+                              Disabled="@(!HasStartlist)" />
+
+            <RankingMenu Rankings="Rankings"
+                         Selected="CurrentRanking"
+                         OnSelectedSafe="SelectRanking" />
+        </MudStack>
+    </Rightbar>
+</NContent>
