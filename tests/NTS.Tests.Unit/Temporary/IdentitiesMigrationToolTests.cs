@@ -27,7 +27,7 @@ public sealed class IdentitiesMigrationToolTests : IDisposable
         Assert.Contains("--decisions <path>", output);
         Assert.Contains(IdentitiesMigrationTool.DEFAULT_REPORT, output);
         Assert.Contains(IdentitiesMigrationTool.DEFAULT_DECISIONS, output);
-        Assert.DoesNotContain("--apply", output); // this command only reports
+        Assert.Contains("--apply", output); // #637 gives it the apply
     }
 
     [Fact]
@@ -49,9 +49,9 @@ public sealed class IdentitiesMigrationToolTests : IDisposable
     }
 
     [Theory]
-    [InlineData("--apply")]
+    [InlineData("--rollback")]
     [InlineData("--bogus")]
-    public async Task An_option_it_does_not_have_is_refused_and_this_command_cannot_be_told_to_apply(string option)
+    public async Task An_option_it_does_not_have_is_refused(string option)
     {
         var (code, _, error) = await Run("--connection-string", "mongodb://never-used", option);
 

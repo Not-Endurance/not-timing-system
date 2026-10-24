@@ -289,4 +289,36 @@ public sealed class IdentityCopiesTests
         Assert.Null(copy.Name);
         Assert.Equal("5", copy.DocumentId);
     }
+
+    [Fact]
+    public void A_copy_tells_the_Guid_it_has_already_and_the_Tenant_of_its_document()
+    {
+        var guid = Guid.Parse("33333333-3333-4333-8333-333333333333");
+        var row = Person(new BsonBinaryData(guid, GuidRepresentation.Standard), "Ivan Petrov");
+        row["TenantId"] = "country-bg";
+
+        var written = Assert.Single(IdentityCopies.Read("athletes", row));
+        var legacy = Assert.Single(IdentityCopies.Read("athletes", Person(5, "Ivan Petrov")));
+
+        Assert.Equal(guid, written.CurrentId);
+        Assert.Equal("country-bg", written.TenantId);
+        Assert.Null(written.LegacyId); // a Guid is not a legacy id
+        Assert.Null(legacy.CurrentId);
+        Assert.Null(legacy.TenantId);
+    }
+
+    [Fact]
+    public void A_copy_keeps_the_country_and_the_club_it_stores_as_they_are_stored()
+    {
+        var country = Country("Bulgaria", "BGR");
+        var copy = Assert.Single(
+            IdentityCopies.Read("athletes", Person(5, "Ivan Petrov", country: country, club: "Sofia"))
+        );
+        var bare = Assert.Single(IdentityCopies.Read("athletes", Person(6, "Ivan Petrov")));
+
+        Assert.Equal(country, copy.CountryDocument);
+        Assert.Equal("Sofia", copy.ClubDocument!["Name"].AsString);
+        Assert.Null(bare.CountryDocument);
+        Assert.Null(bare.ClubDocument);
+    }
 }

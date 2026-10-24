@@ -36,7 +36,12 @@ public static class IdentityCopies
 
     public static IReadOnlyList<IdentityCopy> Read(string collection, BsonDocument document)
     {
-        var origin = new Origin(collection, IdOf(document), EventOf(collection, document));
+        var origin = new Origin(
+            collection,
+            IdOf(document),
+            EventOf(collection, document),
+            Records.TextOf(document, "TenantId")
+        );
         var found = new List<IdentityCopy>();
         if (collection is ATHLETES or HORSES)
         {
@@ -130,7 +135,19 @@ public static class IdentityCopies
             EventId = origin.EventId,
             ParticipationId = participation,
             Partner = partner,
+            CurrentId = CurrentIdOf(person),
+            TenantId = origin.TenantId,
+            CountryDocument = person.GetValue("Country", BsonNull.Value) as BsonDocument,
+            ClubDocument = person.GetValue("Club", BsonNull.Value) as BsonDocument,
         };
+    }
+
+    static Guid? CurrentIdOf(BsonDocument person)
+    {
+        return
+            person.GetValue("_id", BsonNull.Value) is BsonBinaryData { SubType: BsonBinarySubType.UuidStandard } binary
+            ? binary.ToGuid(GuidRepresentation.Standard)
+            : null;
     }
 
     static string IdOf(BsonDocument document)
@@ -230,15 +247,17 @@ public static class IdentityCopies
 
     sealed class Origin
     {
-        public Origin(string collection, string documentId, string? eventId)
+        public Origin(string collection, string documentId, string? eventId, string? tenantId)
         {
             Collection = collection;
             DocumentId = documentId;
             EventId = eventId;
+            TenantId = tenantId;
         }
 
         public string Collection { get; }
         public string DocumentId { get; }
         public string? EventId { get; }
+        public string? TenantId { get; }
     }
 }

@@ -51,7 +51,8 @@ static int ShowHelp()
                                of every document, the Main Operators, the grants and the environment marker
                                (a dry run unless --apply)
           migrate-identities   Group the copies of every Athlete and Horse into the identities they are, and write a report and a
-                               file of decisions for the owner (a dry run)
+                               file of decisions for the owner; with --apply convert every id to a Guid, merge the identities,
+                               finalise the Rankings of the Events that have ended and verify (a dry run unless --apply)
           mark-environment     Mark a database as Production, Staging or Development, which the commands that must not touch
                                a production database look at (a dry run unless --apply)
           seed-staging         Make a Tenant Root, a Main Operator, Officials, Operators and a Live Event with Participations

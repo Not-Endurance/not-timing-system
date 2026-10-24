@@ -26,7 +26,7 @@ public static class IdentityReport
         ("Handouts", [IdentityCopies.HANDOUTS]),
     ];
 
-    public static string Render(IdentityPlan plan, string database)
+    public static string Render(IdentityPlan plan, string database, PlannedCutover? cutover = null)
     {
         var text = new StringWriter { NewLine = "\n" };
         text.WriteLine("# Identity migration: dry run");
@@ -45,6 +45,11 @@ public static class IdentityReport
         WriteMerged(text, plan);
         WriteDecisions(text, plan);
         WriteUnnamed(text, plan);
+        if (cutover != null)
+        {
+            WriteCutover(text, cutover);
+        }
+
         return text.ToString();
     }
 
@@ -370,6 +375,68 @@ public static class IdentityReport
     }
 
     /// <summary>The blank line that ends a list, after "None." when it had nothing in it.</summary>
+    /// <summary>What an apply would do, beside the plan: what would stop it, the Rankings it would finalise, the planned result verified.</summary>
+    static void WriteCutover(TextWriter text, PlannedCutover cutover)
+    {
+        text.WriteLine("## What an apply would do");
+        text.WriteLine();
+        if (cutover.Refusals.Count > 0)
+        {
+            text.WriteLine($"An apply would be refused ({cutover.Refusals.Count}):");
+            text.WriteLine();
+            foreach (var refusal in cutover.Refusals)
+            {
+                text.WriteLine($"- {refusal}");
+            }
+
+            text.WriteLine();
+        }
+
+        var unplaced = cutover.Rankings.Where(x => x.State == PlacingsState.Unplaced).ToList();
+        var partial = cutover.Rankings.Where(x => x.State == PlacingsState.Partial).ToList();
+        text.WriteLine(
+            $"Rankings of Events that have ended: {cutover.Rankings.Count}, {unplaced.Count} with no placings (finalised by the apply, "
+                + $"by the Results code; the ranks are computed then) and {partial.Count} with only some of their ranks (left alone)."
+        );
+        text.WriteLine();
+        foreach (
+            var ranking in unplaced
+                .Concat(partial)
+                .OrderBy(x => x.EventId, StringComparer.Ordinal)
+                .ThenBy(x => x.Id, StringComparer.Ordinal)
+        )
+        {
+            var what =
+                ranking.State == PlacingsState.Unplaced
+                    ? "no placings, finalised at apply"
+                    : "only some of its ranks, left alone";
+            text.WriteLine($"- Ranking {ranking.Id} of Event {ranking.EventId} (\"{ranking.Name}\"): {what}");
+        }
+
+        if (unplaced.Count + partial.Count > 0)
+        {
+            text.WriteLine();
+        }
+
+        text.WriteLine("Verification of the planned result:");
+        text.WriteLine();
+        if (cutover.Checks.Count == 0)
+        {
+            text.WriteLine("- not made: an apply would be refused first.");
+        }
+
+        foreach (var check in cutover.Checks)
+        {
+            text.WriteLine($"- {(check.Passed ? "PASS" : "FAIL")} {check.Name}");
+            foreach (var detail in check.Details)
+            {
+                text.WriteLine($"  - {detail}");
+            }
+        }
+
+        text.WriteLine();
+    }
+
     static void EndList(TextWriter text, int count)
     {
         if (count == 0)

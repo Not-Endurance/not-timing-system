@@ -1,18 +1,16 @@
 using System.Net.Mail;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Not.Storage;
 using Not.Storage.Mongo;
 using NTS.Application.Factories;
-using NTS.Application.Mongo;
 using NTS.Contracts.Setup.Models;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Services.StartValidation;
+using NTS.Tools.Shared;
 using static NTS.Tools.Shared.Records;
 
 namespace NTS.Tools.Staging;
@@ -42,7 +40,6 @@ public static class StagingSeed
     const string OPERATORS = "event_operators";
     const string PARTICIPATIONS = "event_participations";
     const string RANKINGS = "event_rankings";
-    static readonly object CONVENTIONS = new();
 
     public static async Task<StagingSeedReport> Run(
         IMongoDatabase database,
@@ -50,7 +47,7 @@ public static class StagingSeed
         DateTimeOffset now
     )
     {
-        Configure();
+        ModelMapping.Configure();
         var run = new Seeding(database, options, now);
         await run.ReadAsync();
         if (options.Apply && !run.Report.Refused)
@@ -60,32 +57,6 @@ public static class StagingSeed
         }
 
         return run.Report;
-    }
-
-    /// <summary>How the models are written as documents: the way the Api maps them, so that what is seeded is read as it is.</summary>
-    static void Configure()
-    {
-        NStorageBuilder.RegisterSerializers();
-        NtsMongoSerialization.Configure();
-        lock (CONVENTIONS)
-        {
-            if (
-                !ConventionRegistry
-                    .Lookup(typeof(ConfigureEventModel))
-                    .Conventions.Any(x => x is EnumRepresentationConvention)
-            )
-            {
-                ConventionRegistry.Register(
-                    "NTS models of the seed",
-                    new ConventionPack
-                    {
-                        new IgnoreExtraElementsConvention(true),
-                        new EnumRepresentationConvention(BsonType.String),
-                    },
-                    type => type.FullName?.StartsWith("NTS.", StringComparison.Ordinal) == true
-                );
-            }
-        }
     }
 
     sealed class Seeding

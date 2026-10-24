@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -87,6 +89,18 @@ public sealed class IdentityDecisions
     public IdentityDecision? Rule(ReviewClass match)
     {
         return _rules.TryGetValue(match, out var decision) ? decision : null;
+    }
+
+    /// <summary>
+    /// A fingerprint of what is decided, and of nothing else in the file: a run that stopped keeps it with its assignments, and a run
+    /// that finishes it is made with the same decisions or refuses.
+    /// </summary>
+    public string Fingerprint()
+    {
+        var lines = Enum.GetValues<ReviewClass>()
+            .Select(x => $"rule {x}={Rule(x)}")
+            .Concat(_items.OrderBy(x => x.Key, StringComparer.Ordinal).Select(x => $"{x.Key}={x.Value}"));
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join(';', lines))));
     }
 
     /// <summary>

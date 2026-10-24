@@ -24,6 +24,18 @@ internal static class IdentityKeys
     }
 
     /// <summary>
+    /// The key by which assignments find a spelling: a copy by what it says, and a Setup row by its document alone, so that a row that
+    /// someone has corrected since the plan was made is still the row it was.
+    /// </summary>
+    public static string Told(string spellingKey)
+    {
+        var end = spellingKey.IndexOf(SEPARATOR);
+        return spellingKey.StartsWith("setup:", StringComparison.Ordinal) && end >= 0
+            ? spellingKey[..end]
+            : spellingKey;
+    }
+
+    /// <summary>
     /// The key of a group: the kind, the FEI IDs it has (as numbers for an Athlete) and every spelling of its names, normalised,
     /// in order. <c>athlete (fei 100): ivan petrov | иван петров</c>.
     /// </summary>

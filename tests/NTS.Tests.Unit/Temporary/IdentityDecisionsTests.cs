@@ -163,4 +163,30 @@ public sealed class IdentityDecisionsTests
 
         Assert.Contains("athlete: иван петров <> athlete: ivan petrov", written);
     }
+
+    [Fact]
+    public void The_fingerprint_is_of_what_is_decided_and_of_nothing_else()
+    {
+        var one = IdentityDecisions.Parse(
+            $$"""{ "rules": { "NearMiss": "different" }, "items": { "{{KEY}}": "same", "b": "different" } }"""
+        );
+        var reordered = IdentityDecisions.Parse(
+            $$"""{ "items": { "b": "different", "{{KEY}}": "SAME" }, "rules": { "NearMiss": "Different" }, "notes": 3 }"""
+        );
+        var undecided = IdentityDecisions.Parse(
+            $$"""{ "rules": { "NearMiss": "different" }, "items": { "{{KEY}}": "same", "b": null } }"""
+        );
+        var other = IdentityDecisions.Parse(
+            $$"""{ "rules": { "NearMiss": "same" }, "items": { "{{KEY}}": "same", "b": "different" } }"""
+        );
+        var another = IdentityDecisions.Parse(
+            $$"""{ "rules": { "NearMiss": "different" }, "items": { "{{KEY}}": "different", "b": "different" } }"""
+        );
+
+        Assert.Equal(one.Fingerprint(), reordered.Fingerprint());
+        Assert.NotEqual(one.Fingerprint(), undecided.Fingerprint());
+        Assert.NotEqual(one.Fingerprint(), other.Fingerprint());
+        Assert.NotEqual(one.Fingerprint(), another.Fingerprint());
+        Assert.Equal(IdentityDecisions.None.Fingerprint(), IdentityDecisions.Parse("").Fingerprint());
+    }
 }

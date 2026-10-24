@@ -44,6 +44,50 @@ public static class IdentityEvents
     }
 
     /// <summary>
+    /// When each Event began, by its id as text, to tell the latest of the copies of a person: the start of an Event that has started,
+    /// and the start of the first Competition of a Setup that has not.
+    /// </summary>
+    public static Dictionary<string, DateTime> Dates(
+        IEnumerable<BsonDocument> informations,
+        IEnumerable<BsonDocument> setups
+    )
+    {
+        var dates = new Dictionary<string, DateTime>(StringComparer.Ordinal);
+        foreach (var information in informations)
+        {
+            if (
+                information.TryGetValue("_id", out var id)
+                && (DateOf(information, "StartDay") ?? DateOf(information, "EndDay")) is { } date
+            )
+            {
+                dates[IdentityCopies.Describe(id)] = date;
+            }
+        }
+
+        foreach (var setup in setups)
+        {
+            if (
+                setup.TryGetValue("_id", out var id)
+                && !dates.ContainsKey(IdentityCopies.Describe(id))
+                && setup.TryGetValue("Competitions", out var competitions)
+                && competitions is BsonArray array
+                && array
+                    .OfType<BsonDocument>()
+                    .Select(x => DateOf(x, "Start"))
+                    .Where(x => x != null)
+                    .Select(x => x!.Value)
+                    .ToList()
+                    is { Count: > 0 } starts
+            )
+            {
+                dates[IdentityCopies.Describe(id)] = starts.Min();
+            }
+        }
+
+        return dates;
+    }
+
+    /// <summary>
     /// The first and the last day of an Event, as the days of the place. They are stored as instants: the first second of the first
     /// day and the last second of the last, wherever the Event is. Half a day on from the first and half a day back from the last is
     /// inside the right day in every zone, so the date is the same on whatever machine the report is made.

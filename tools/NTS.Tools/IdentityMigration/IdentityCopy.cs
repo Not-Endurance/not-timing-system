@@ -1,3 +1,4 @@
+using MongoDB.Bson;
 using NTS.Domain.Setup.Services.Identities;
 
 namespace NTS.Tools.IdentityMigration;
@@ -39,4 +40,15 @@ public sealed class IdentityCopy
 
     /// <summary>The name of the other half of its Combination: the Horse of an Athlete, the Athlete of a Horse.</summary>
     public string? Partner { get; init; }
+
+    /// <summary>The Guid the copy has, if it has one already: a row made since Guids, or a copy of one, or one a run converted.</summary>
+    public Guid? CurrentId { get; init; }
+
+    /// <summary>The Tenant of the document the copy is in.</summary>
+    public string? TenantId { get; init; }
+
+    /// <summary>The Country and the Club as the copy stores them, which a row made for its identity is given.</summary>
+    public BsonDocument? CountryDocument { get; init; }
+
+    public BsonDocument? ClubDocument { get; init; }
 }

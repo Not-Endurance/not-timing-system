@@ -55,35 +55,67 @@ public static partial class ThrottledReads
         }
     }
 
-    /// <summary>Runs the read, and again after the wait the server asks for while it throttles it, up to <paramref name="attempts"/> times.</summary>
-    public static async Task<T> Retried<T>(Func<Task<T>> read, Func<TimeSpan, Task> wait, int attempts = ATTEMPTS)
+    /// <summary>
+    /// Runs the request, a read or a write, and again after the wait the server asks for while it throttles it, up to
+    /// <paramref name="attempts"/> times. The server says so with a command error, and for a write with a write error. The wait is
+    /// the clock's delay unless a test gives its own.
+    /// </summary>
+    public static async Task<T> Retried<T>(
+        Func<Task<T>> request,
+        Func<TimeSpan, Task>? wait = null,
+        int attempts = ATTEMPTS
+    )
     {
+        wait ??= delay => Task.Delay(delay);
         var backoff = FirstBackoff;
         for (var attempt = 1; ; attempt++)
         {
             try
             {
-                return await read();
+                return await request();
             }
-            catch (MongoCommandException error) when (attempt < attempts && IsThrottled(error))
+            catch (Exception error) when (attempt < attempts && IsThrottled(error))
             {
-                var asked = AskedToWait(error);
-                await wait(Min(asked ?? backoff, LongestWait));
+                await wait(Min(AskedToWait(error.Message) ?? backoff, LongestWait));
                 backoff *= 2;
             }
         }
     }
 
-    static bool IsThrottled(MongoCommandException error)
+    /// <summary>The same for a request that answers nothing.</summary>
+    public static async Task Retried(Func<Task> request, Func<TimeSpan, Task>? wait = null, int attempts = ATTEMPTS)
     {
-        return error.Code is THROTTLED or TOO_MANY_REQUESTS
-            || error.Message.Contains("TooManyRequests", StringComparison.OrdinalIgnoreCase)
-            || RetryAfter().IsMatch(error.Message);
+        await Retried(
+            async () =>
+            {
+                await request();
+                return true;
+            },
+            wait,
+            attempts
+        );
     }
 
-    static TimeSpan? AskedToWait(MongoCommandException error)
+    static bool IsThrottled(Exception error)
     {
-        var match = RetryAfter().Match(error.Message);
+        return error switch
+        {
+            MongoCommandException command => IsThrottled(command.Code, command.Message),
+            MongoWriteException write => IsThrottled(write.WriteError.Code, write.Message),
+            _ => false,
+        };
+    }
+
+    static bool IsThrottled(int code, string message)
+    {
+        return code is THROTTLED or TOO_MANY_REQUESTS
+            || message.Contains("TooManyRequests", StringComparison.OrdinalIgnoreCase)
+            || RetryAfter().IsMatch(message);
+    }
+
+    static TimeSpan? AskedToWait(string message)
+    {
+        var match = RetryAfter().Match(message);
         return match.Success && double.TryParse(match.Groups[1].Value, out var milliseconds)
             ? TimeSpan.FromMilliseconds(milliseconds)
             : null;

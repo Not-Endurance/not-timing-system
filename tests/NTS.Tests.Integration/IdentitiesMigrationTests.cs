@@ -371,7 +371,7 @@ public sealed class IdentitiesMigrationTests : IClassFixture<MongoFixture>, IDis
             "migrate-identities",
             "--connection-string",
             _mongo.ConnectionString,
-            "--apply"
+            "--rollback" // an option it does not have: --apply is one since #637
         );
 
         Assert.Equal(0, run.Code);

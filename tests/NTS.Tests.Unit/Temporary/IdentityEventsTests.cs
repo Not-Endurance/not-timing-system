@@ -127,6 +127,49 @@ public sealed class IdentityEventsTests
         Assert.Equal("Odd ride", labels["904"]);
     }
 
+    [Fact]
+    public void The_date_of_an_Event_is_the_instant_it_starts_and_that_of_a_Setup_the_start_of_its_first_Competition()
+    {
+        var dates = IdentityEvents.Dates(
+            [
+                Information(900, "Spring ride", StartOf(4, 26), EndOf(4, 28)),
+                new BsonDocument { ["_id"] = 902, ["EndDay"] = new BsonDateTime(EndOf(5, 1)) },
+            ],
+            [
+                new BsonDocument
+                {
+                    ["_id"] = 903,
+                    ["Competitions"] = new BsonArray
+                    {
+                        new BsonDocument
+                        {
+                            ["Start"] = new BsonDateTime(new DateTime(2026, 12, 5, 7, 0, 0, DateTimeKind.Utc)),
+                        },
+                        new BsonDocument
+                        {
+                            ["Start"] = new BsonDateTime(new DateTime(2026, 12, 4, 7, 0, 0, DateTimeKind.Utc)),
+                        },
+                        new BsonDocument(),
+                    },
+                },
+                new BsonDocument { ["_id"] = 904, ["Competitions"] = new BsonArray() },
+                new BsonDocument
+                {
+                    ["_id"] = 900, // an Event that has started is told by its own document
+                    ["Competitions"] = new BsonArray
+                    {
+                        new BsonDocument { ["Start"] = new BsonDateTime(StartOf(1, 1)) },
+                    },
+                },
+            ]
+        );
+
+        Assert.Equal(StartOf(4, 26), dates["900"]);
+        Assert.Equal(EndOf(5, 1), dates["902"]); // one that has no start is told by its end
+        Assert.Equal(new DateTime(2026, 12, 4, 7, 0, 0, DateTimeKind.Utc), dates["903"]);
+        Assert.False(dates.ContainsKey("904"));
+    }
+
     static BsonDocument Information(BsonValue id, string name, DateTime? start = null, DateTime? end = null)
     {
         var information = new BsonDocument { ["_id"] = id, ["Name"] = name };
