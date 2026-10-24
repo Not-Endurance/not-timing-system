@@ -175,6 +175,11 @@ Overall average: **60-90% token reduction** on common development operations.
 ## Context
 - Primary sln file is src/not-timing-system.sln
 
+## MongoDB times
+- A time the server filters, sorts or expires on is a `DateTime` named `…Utc` with `[BsonDateTimeOptions(Kind = DateTimeKind.Utc)]`, converted with `DateTimeOffset.UtcDateTime`.
+- Every other time is a `DateTimeOffset` with `[BsonRepresentation(BsonType.Document)]`, which keeps the offset.
+- ADR-0014 has the reasons, and `DateTimeShapeTests` fails on a deviation.
+
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker
 2. When func is not resolved - ask the user to lift Rule #1 so you can set it up

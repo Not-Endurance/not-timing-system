@@ -19,7 +19,7 @@ public sealed class NIdentityPasskey
     [BsonIgnoreIfNull]
     public string? Name { get; set; }
 
-    [BsonRepresentation(BsonType.DateTime)]
+    [BsonRepresentation(BsonType.Document)]
     public DateTimeOffset CreatedAt { get; set; }
 
     [BsonRepresentation(BsonType.Int64)]

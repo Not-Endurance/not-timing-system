@@ -44,8 +44,8 @@ public sealed class MongoTicketStore : ITicketStore, ISessionRevoker
                 Id = key,
                 UserId = UserIdOf(ticket),
                 Ticket = TicketSerializer.Default.Serialize(ticket),
-                CreatedAt = now.UtcDateTime,
-                ExpiresAt = ExpiryOf(ticket, now),
+                CreatedAtUtc = now.UtcDateTime,
+                ExpiresAtUtc = ExpiryUtcOf(ticket, now),
             }
         );
         return key;
@@ -60,16 +60,16 @@ public sealed class MongoTicketStore : ITicketStore, ISessionRevoker
             x => x.Id == key,
             Builders<SessionDocument>
                 .Update.Set(x => x.Ticket, TicketSerializer.Default.Serialize(ticket))
-                .Set(x => x.ExpiresAt, ExpiryOf(ticket, now))
+                .Set(x => x.ExpiresAtUtc, ExpiryUtcOf(ticket, now))
         );
     }
 
     public async Task<AuthenticationTicket?> RetrieveAsync(string key)
     {
-        var now = _time.GetUtcNow().UtcDateTime;
+        var nowUtc = _time.GetUtcNow().UtcDateTime;
 
         // The TTL index removes a document up to a minute after it expires: the expiry is checked here as well.
-        var session = await _sessions.Find(x => x.Id == key && x.ExpiresAt > now).FirstOrDefaultAsync();
+        var session = await _sessions.Find(x => x.Id == key && x.ExpiresAtUtc > nowUtc).FirstOrDefaultAsync();
         return session is null ? null : TicketSerializer.Default.Deserialize(session.Ticket);
     }
 
@@ -92,7 +92,7 @@ public sealed class MongoTicketStore : ITicketStore, ISessionRevoker
         }
     }
 
-    DateTime ExpiryOf(AuthenticationTicket ticket, DateTimeOffset now)
+    DateTime ExpiryUtcOf(AuthenticationTicket ticket, DateTimeOffset now)
     {
         return (ticket.Properties.ExpiresUtc ?? now + _options.SessionLifetime).UtcDateTime;
     }

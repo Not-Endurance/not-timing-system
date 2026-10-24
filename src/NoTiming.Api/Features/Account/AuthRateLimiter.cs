@@ -73,7 +73,7 @@ internal sealed class AuthRateLimiter
     static readonly TimeSpan SWEEP_EVERY = TimeSpan.FromMinutes(1);
 
     readonly object _lock = new();
-    readonly Dictionary<string, Window> _windows = new();
+    readonly Dictionary<string, Window> _windows = [];
     readonly AuthRateLimitOptions _options;
     readonly ILookupNormalizer _normalizer;
     readonly TimeProvider _time;

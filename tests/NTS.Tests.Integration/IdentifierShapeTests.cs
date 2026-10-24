@@ -31,7 +31,7 @@ public sealed class IdentifierShapeTests
         ["AccountId"] = "SettingModel keeps the text of a Guid; the Setting aggregate is deleted by ADR-0012",
         ["MongoId"] = "the ObjectId _id of a session or pending-snapshots document, a storage key next to its Guid Id",
     };
-    static readonly Assembly[] OUR_ASSEMBLIES =
+    internal static readonly Assembly[] OUR_ASSEMBLIES =
     [
         typeof(IIdentifiable).Assembly, // Not
         typeof(Entity).Assembly, // Not.Domain
@@ -47,6 +47,18 @@ public sealed class IdentifierShapeTests
         typeof(LiveHub).Assembly, // NoTiming.Api
         typeof(MongoConstants).Assembly, // NTS.Nexus.HTTP
     ];
+
+    internal static IEnumerable<Type> TypesOf(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            return ex.Types.Where(x => x != null)!;
+        }
+    }
 
     [Fact]
     public void No_integer_identifier_remains_in_our_code()
@@ -168,18 +180,6 @@ public sealed class IdentifierShapeTests
     static bool IsExternalIdentifier(string name)
     {
         return name.StartsWith("Fei", StringComparison.Ordinal);
-    }
-
-    static IEnumerable<Type> TypesOf(Assembly assembly)
-    {
-        try
-        {
-            return assembly.GetTypes();
-        }
-        catch (ReflectionTypeLoadException ex)
-        {
-            return ex.Types.Where(x => x != null)!;
-        }
     }
 
     static IEnumerable<string> RouteTemplatesOf(Type type)
