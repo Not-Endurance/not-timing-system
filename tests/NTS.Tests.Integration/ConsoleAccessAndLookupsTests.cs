@@ -201,7 +201,36 @@ public sealed class ConsoleAccessAndLookupsTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task Other_Tenants_are_asked_for_a_term_with_a_word_of_three_characters_and_for_the_first_six_words_of_it()
+    public async Task The_FEI_ID_of_a_row_of_another_Tenant_reaches_the_Setup_of_a_Tenant_Root_and_no_other_account()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var other = await TenantAsync(_mongo.ConnectionString, withCountry: true);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, cyrillic) = HistorySeed.NameMarker(); // the registries are shared by the tests of this class: the name is this test's own
+        var theirs = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            other,
+            $"Мария Друга {cyrillic}",
+            RegistrySeed.CountryOf("Bulgaria", "BG"),
+            $"Maria Other {latin}",
+            feiId: "10009999"
+        );
+        await using var rootUi = ConsoleUi.Open(api, root);
+        await using var memberUi = ConsoleUi.Open(api, member);
+
+        var forTheRoot = await rootUi.Get<IConsoleLookups>().SearchAthletes(latin);
+        var forTheMember = await memberUi.Get<IConsoleLookups>().SearchAthletes(latin);
+
+        Assert.Equal(("10009999", theirs), (Assert.Single(forTheRoot).FeiId, forTheRoot[0].Id)); // what a Combination and the FEI export need
+        Assert.Equal(theirs, Assert.Single(forTheMember).Id);
+        Assert.Null(forTheMember[0].FeiId); // an account that sets nothing up reads the name of a rider, and not the FEI ID
+    }
+
+    [Fact]
+    public async Task Other_Tenants_are_asked_for_a_term_with_a_word_of_two_characters_and_for_the_first_six_words_of_it()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);

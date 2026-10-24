@@ -192,7 +192,13 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
-        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var person = await TenancySeed.SignedInAsync(
+            api,
+            client,
+            _mongo.ConnectionString,
+            tenant,
+            TenancySeed.TenantRootOf(tenant)
+        ); // one of the people who set an Event up, who read the FEI ID of a row
         var (latin, cyrillic) = HistorySeed.NameMarker();
         var bulgaria = RegistrySeed.CountryOf("Bulgaria", "BG");
         var ivan = await RegistrySeed.AthleteAsync(
@@ -236,6 +242,35 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
             (await fresh.Search(athlete, $"ivan {latin}ov", 1, CancellationToken.None)).Items.Select(Of),
             added.Items.Select(Of)
         );
+    }
+
+    [Fact]
+    public async Task An_account_that_sets_nothing_up_finds_a_Participant_by_its_names_and_not_by_its_FEI_ID_whether_the_Api_or_the_memory_answers()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en");
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenancySeed.TenantAsync(_mongo.ConnectionString);
+        var person = await TenancySeed.SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var (latin, cyrillic) = HistorySeed.NameMarker();
+        var ivan = await RegistrySeed.AthleteAsync(
+            _mongo.ConnectionString,
+            tenant,
+            $"Иван {cyrillic}ов",
+            RegistrySeed.CountryOf("Bulgaria", "BG"),
+            nameEnglish: $"Ivan {latin}ov",
+            feiId: "10007777"
+        );
+        var service = Open(api, person, out _);
+        var fresh = Open(api, person, out _);
+
+        var byName = await service.Search(ParticipantKind.Athlete, latin, 1, CancellationToken.None);
+        var remembered = await service.Search(ParticipantKind.Athlete, $"{latin} 7777", 1, CancellationToken.None);
+        var asked = await fresh.Search(ParticipantKind.Athlete, $"{latin} 7777", 1, CancellationToken.None);
+
+        Assert.Equal([ivan], byName.Items.Select(x => x.Id));
+        Assert.Empty(remembered.Items); // the row does not tell its FEI ID to this account, so the memory cannot match it
+        Assert.Empty(asked.Items); // and the Api does not match it either
     }
 
     [Fact]

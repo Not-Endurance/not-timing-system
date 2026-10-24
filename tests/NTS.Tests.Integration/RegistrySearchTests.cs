@@ -55,10 +55,19 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
             new[] { inA.ToString(), inB.ToString() }.Order(),
             items.Select(x => x.GetProperty("id").GetString()!).Order()
         );
-        Assert.Equal(
-            new[] { a, b }.Order(),
-            items.Select(x => x.GetProperty("attributes").GetProperty("tenantId").GetString()!).Order()
-        );
+        var attributes = items.Select(x => x.GetProperty("attributes")).ToList();
+        if (registry is "athletes" or "horses")
+        {
+            Assert.All(attributes, x => Assert.False(x.TryGetProperty("tenantId", out _))); // an account that sets nothing up reads the name
+        }
+        else
+        {
+            Assert.Equal(
+                new[] { a, b }.Order(),
+                attributes.Select(x => x.GetProperty("tenantId").GetString()!).Order()
+            );
+        }
+
         Assert.Equal(
             new[] { $"Alpha{marker} Name", $"Alpha{marker} Other" },
             items.Select(x => x.GetProperty("attributes").GetProperty("name").GetString()!)
@@ -66,12 +75,12 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
-    public async Task An_Athlete_is_found_by_the_English_name_or_the_FEI_ID_and_shows_the_club_the_country_and_nothing_of_its_account()
+    public async Task An_Athlete_is_found_by_the_English_name_or_the_FEI_ID_and_shows_the_club_the_country_and_nothing_of_its_account_to_a_Tenant_Root()
     {
         await using var api = new ApiFactory(_mongo.ConnectionString);
         using var client = ApiClients.Of(api);
         var tenant = await TenantAsync(_mongo.ConnectionString);
-        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var person = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
         var marker = Guid.NewGuid().ToString("N")[..8];
         await AddAsync(
             "athletes",
@@ -118,6 +127,85 @@ public sealed class RegistrySearchTests : IClassFixture<MongoFixture>
         Assert.DoesNotContain("stamp-value", text);
         Assert.DoesNotContain("official", text);
         Assert.Single((await ApiSessions.ReadJsonAsync(byFeiId)).GetProperty("data").EnumerateArray());
+    }
+
+    [Theory]
+    [InlineData("athletes")]
+    [InlineData("horses")]
+    public async Task An_account_that_sets_nothing_up_reads_the_name_and_the_name_in_English_of_an_Athlete_or_a_Horse_and_matches_nothing_else(
+        string registry
+    )
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var person = await SignedInAsync(api, client, _mongo.ConnectionString, home: null);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var marker = Guid.NewGuid().ToString("N")[..8];
+        await AddAsync(
+            registry,
+            tenant,
+            "Мария Попова",
+            nameEnglish: $"Maria{marker} Popova",
+            feiId: $"FEI{marker}",
+            extra: new BsonDocument
+            {
+                {
+                    "Club",
+                    new BsonDocument { { "Name", "Rider Club" } }
+                },
+                {
+                    "Country",
+                    new BsonDocument { { "Name", "Bulgaria" } }
+                },
+            }
+        );
+
+        var byName = await SearchAsync(person, registry, $"maria{marker}");
+        var byFeiId = await SearchAsync(person, registry, $"fei{marker}");
+        var byFeiIdForTheTenantRoot = await SearchAsync(root, registry, $"fei{marker}");
+
+        var row = Assert.Single((await ApiSessions.ReadJsonAsync(byName)).GetProperty("data").EnumerateArray());
+        var attributes = row.GetProperty("attributes");
+        Assert.Equal(["name", "nameEnglish"], attributes.EnumerateObject().Select(x => x.Name)); // and no more
+        Assert.Equal("Мария Попова", attributes.GetProperty("name").GetString());
+        Assert.Equal($"Maria{marker} Popova", attributes.GetProperty("nameEnglish").GetString());
+        Assert.Empty((await ApiSessions.ReadJsonAsync(byFeiId)).GetProperty("data").EnumerateArray()); // the FEI ID is not matched, so a search cannot tell who has which
+        Assert.Single((await ApiSessions.ReadJsonAsync(byFeiIdForTheTenantRoot)).GetProperty("data").EnumerateArray());
+    }
+
+    [Fact]
+    public async Task The_Tenant_Root_the_Main_Operator_of_an_Event_that_is_not_Historic_and_the_Developer_read_the_whole_row_and_no_other_account_does()
+    {
+        await using var api = new ApiFactory(_mongo.ConnectionString);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var other = await TenantAsync(_mongo.ConnectionString);
+        var root = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, TenantRootOf(tenant));
+        var rootElsewhere = await SignedInAsync(api, client, _mongo.ConnectionString, other, TenantRootOf(other));
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var formerMainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var developer = await SignedInAsync(api, client, _mongo.ConnectionString, tenant, isDeveloper: true);
+        var member = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        await EventSeed.SetupAsync(_mongo.ConnectionString, tenant, mainOperator.Id);
+        await EventSeed.HistoricAsync(_mongo.ConnectionString, tenant, formerMainOperator.Id, DateTimeOffset.UtcNow);
+        var marker = Guid.NewGuid().ToString("N")[..8];
+        await AddAsync("athletes", tenant, $"Rider{marker} Name", feiId: $"FEI{marker}");
+
+        async Task<bool> SeesTheFeiIdAsync(Person person)
+        {
+            var found = await SearchAsync(person, "athletes", $"fei{marker}");
+            var rows = (await ApiSessions.ReadJsonAsync(found)).GetProperty("data").EnumerateArray().ToList();
+            return rows.Count == 1
+                && rows[0].GetProperty("attributes").GetProperty("feiId").GetString() == $"FEI{marker}";
+        }
+
+        Assert.True(await SeesTheFeiIdAsync(root));
+        Assert.True(await SeesTheFeiIdAsync(rootElsewhere)); // of any Tenant: the rows are those of every Tenant
+        Assert.True(await SeesTheFeiIdAsync(mainOperator));
+        Assert.True(await SeesTheFeiIdAsync(developer));
+        Assert.False(await SeesTheFeiIdAsync(formerMainOperator)); // the Event it ran is Historic
+        Assert.False(await SeesTheFeiIdAsync(member));
     }
 
     [Fact]

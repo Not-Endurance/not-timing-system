@@ -17,7 +17,7 @@ _Avoid_: Rider, competitor
 The equine half of a Combination, recognised as the same animal across Events. A Participation shows the Horse as entered at that Event. The rules that make two copies one are the Athlete's, with the FEI ID taken as the text it is; a Horse that a Participation refers to is not deleted.
 
 **Participant**:
-An Athlete or a Horse: the umbrella term for the two kinds of row of the registry (ADR-0010). A Participant is recognised across Events and Tenants, is found by name (in the script it is registered in, and in English where the row has its name in English), and has a history: the Participations it was in, newest first, each with its placing. It is one half of a Combination, never the Combination itself, and never a ride.
+An Athlete or a Horse: the umbrella term for the two kinds of row of the registry (ADR-0010). A Participant is recognised across Events and Tenants, is found by name (in the script it is registered in, and in English where the row has its name in English; a signed-in account reads no more of a Participant than that name, and the FEI ID, the club and the country are for the people who set an Event up), and has a history: the Participations it was in, newest first, each with its placing. It is one half of a Combination, never the Combination itself, and never a ride.
 
 **Combination**:
 An Athlete and a Horse entered together as a single competitor, identified by a start number. This is the pair that competes — it is *not* a person, and it is *not* a Participant: each of its halves is one.

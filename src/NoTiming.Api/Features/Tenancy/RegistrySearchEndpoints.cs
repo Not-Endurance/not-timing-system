@@ -22,8 +22,10 @@ internal delegate Task<IReadOnlyList<RegistryMatch>> RegistrySearch(
 /// order, and one of the words has to be of two characters at least (<see cref="NameSearch"/>). The names are in order, or
 /// in the order the other way round (<c>sort</c>), and a list is paged as every list is, ten rows to a page and twenty-five at
 /// most. It answers only the fields that are meant to leave, and draws on the budget of searches that the search of accounts
-/// draws on, a page being a search. The database does all of it. The Tenant's own list of a registry is a route of the
-/// registry's family, and no parameter turns it into this one.
+/// draws on, a page being a search. The database does all of it. The row of an Athlete or a Horse is its name and its name in
+/// English to every signed-in account, and its whole row (FEI ID, club, country, the Tenant) to the people who set an Event up
+/// (<see cref="Capability.ReadRegistryDetailsAcrossTenants"/>), who are also the only ones whose words are matched against the FEI
+/// ID. The Tenant's own list of a registry is a route of the registry's family, and no parameter turns it into this one.
 /// </summary>
 internal static class RegistrySearchEndpoints
 {
@@ -47,6 +49,7 @@ internal static class RegistrySearchEndpoints
     public static async Task<SearchAdmission> AdmitAsync(
         HttpContext context,
         UserManager<NIdentityUser> users,
+        CallerReader callers,
         SearchRateLimiter limiter
     )
     {
@@ -56,7 +59,7 @@ internal static class RegistrySearchEndpoints
             return SearchAdmission.Refused(JsonApiResults.NotSignedIn());
         }
 
-        var caller = AccountRoles.CallerOf(user);
+        var caller = await callers.ReadAsync(user, context.RequestAborted);
         var verdict = AccessPolicy.Decide(Capability.ReadRegistryAcrossTenants, caller, AccessScope.Platform);
         if (!verdict.IsAllowed)
         {
@@ -100,9 +103,10 @@ internal static class RegistrySearchEndpoints
                 (
                     HttpContext context,
                     UserManager<NIdentityUser> users,
+                    CallerReader callers,
                     CrossTenantReads reads,
                     SearchRateLimiter limiter
-                ) => Search(context, users, limiter, type, searchOf(reads))
+                ) => Search(context, users, callers, limiter, type, searchOf(reads))
             )
             .RequireAuthorization();
     }
@@ -110,12 +114,13 @@ internal static class RegistrySearchEndpoints
     static async Task<IResult> Search(
         HttpContext context,
         UserManager<NIdentityUser> users,
+        CallerReader callers,
         SearchRateLimiter limiter,
         string type,
         RegistrySearch search
     )
     {
-        var admission = await AdmitAsync(context, users, limiter);
+        var admission = await AdmitAsync(context, users, callers, limiter);
         if (admission.Refusal != null)
         {
             return admission.Refusal;
@@ -130,8 +135,9 @@ internal static class RegistrySearchEndpoints
                 .Select(x =>
                     (
                         x.Id.ToString(),
-                        (object)
-                            new
+                        x.IsNameOnly
+                            ? (object)new { name = x.Name, nameEnglish = x.NameEnglish }
+                            : new
                             {
                                 tenantId = x.TenantId,
                                 name = x.Name,

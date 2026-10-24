@@ -44,10 +44,18 @@ internal sealed class EventRecord
 
 /// <summary>
 /// A row of a registry found across Tenants: the fields that are meant to leave, and the Tenant that owns the row. The
-/// account an Athlete is linked to, and anything else the document has, never does.
+/// account an Athlete is linked to, and anything else the document has, never does. The row of an Athlete or a Horse leaves whole
+/// only to the people who set an Event up (<see cref="Capability.ReadRegistryDetailsAcrossTenants"/>); to any other account it
+/// tells the name and the name in English, which is all it is meant to tell of a person.
 /// </summary>
 internal sealed class RegistryMatch
 {
+    /// <summary>A row that tells its name and its name in English and nothing else.</summary>
+    public static RegistryMatch NameOnly(Guid id, string name, string? nameEnglish)
+    {
+        return new RegistryMatch(id, string.Empty, name, nameEnglish, null, null, null, null, isNameOnly: true);
+    }
+
     public RegistryMatch(
         Guid id,
         string tenantId,
@@ -56,7 +64,8 @@ internal sealed class RegistryMatch
         string? feiId,
         string? club,
         string? country,
-        string? role
+        string? role,
+        bool isNameOnly = false
     )
     {
         Id = id;
@@ -67,7 +76,11 @@ internal sealed class RegistryMatch
         Club = club;
         Country = country;
         Role = role;
+        IsNameOnly = isNameOnly;
     }
+
+    /// <summary>Whether the row tells only its name and its name in English, as the row of a person does to an account that sets nothing up.</summary>
+    public bool IsNameOnly { get; }
 
     public Guid Id { get; }
     public string TenantId { get; }
@@ -483,23 +496,28 @@ internal sealed class CrossTenantReads
         return [.. tenants];
     }
 
-    /// <summary>The page of Athletes whose name, name in English or FEI ID has the words of the search in it.</summary>
+    /// <summary>
+    /// The page of Athletes whose name or name in English has the words of the search in it, and, for the people who set an Event up
+    /// (<see cref="Capability.ReadRegistryDetailsAcrossTenants"/>), whose FEI ID has them too, each with the whole row. To any other
+    /// account a row is its name and its name in English, and the FEI ID is not matched, so that a search cannot tell who has which.
+    /// </summary>
     public Task<IReadOnlyList<RegistryMatch>> SearchAthletesAsync(
         Caller caller,
         NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        return SearchAsync("athletes", "athletes", ["Name", "NameEnglish", "FeiId"], caller, search, cancellationToken);
+        return SearchPeopleAsync("athletes", caller, search, cancellationToken);
     }
 
+    /// <summary>The same for the Horses.</summary>
     public Task<IReadOnlyList<RegistryMatch>> SearchHorsesAsync(
         Caller caller,
         NameSearch search,
         CancellationToken cancellationToken
     )
     {
-        return SearchAsync("horses", "horses", ["Name", "NameEnglish", "FeiId"], caller, search, cancellationToken);
+        return SearchPeopleAsync("horses", caller, search, cancellationToken);
     }
 
     public Task<IReadOnlyList<RegistryMatch>> SearchClubsAsync(
@@ -508,7 +526,7 @@ internal sealed class CrossTenantReads
         CancellationToken cancellationToken
     )
     {
-        return SearchAsync("clubs", "clubs", ["Name"], caller, search, cancellationToken);
+        return SearchAsync("clubs", "clubs", ["Name"], true, caller, search, cancellationToken);
     }
 
     /// <summary>
@@ -564,30 +582,62 @@ internal sealed class CrossTenantReads
         ];
     }
 
+    /// <summary>The Athletes or the Horses: the whole row for the people who set an Event up, the name for every other account.</summary>
+    Task<IReadOnlyList<RegistryMatch>> SearchPeopleAsync(
+        string collection,
+        Caller caller,
+        NameSearch search,
+        CancellationToken cancellationToken
+    )
+    {
+        var whole = AccessPolicy
+            .Decide(Capability.ReadRegistryDetailsAcrossTenants, caller, AccessScope.Platform)
+            .IsAllowed;
+        return SearchAsync(
+            collection,
+            collection,
+            whole ? ["Name", "NameEnglish", "FeiId"] : ["Name", "NameEnglish"],
+            whole,
+            caller,
+            search,
+            cancellationToken
+        );
+    }
+
+    /// <param name="whole">Whether the rows are told whole, or by their name and their name in English alone.</param>
     async Task<IReadOnlyList<RegistryMatch>> SearchAsync(
         string read,
         string collection,
         string[] fields,
+        bool whole,
         Caller caller,
         NameSearch search,
         CancellationToken cancellationToken
     )
     {
         Admit(read, caller, search);
-        var rows = await Raw(collection)
-            .Find(search.Matching(fields))
-            .Project(
+        var projection = new BsonDocument
+        {
+            { STANDARD_ID, 1 },
+            { "Name", 1 },
+            { "NameEnglish", 1 },
+        };
+        if (whole)
+        {
+            projection.AddRange(
                 new BsonDocument
                 {
-                    { STANDARD_ID, 1 },
                     { TenantOwned.TENANT_ID, 1 },
-                    { "Name", 1 },
-                    { "NameEnglish", 1 },
                     { "FeiId", 1 },
                     { "Club.Name", 1 },
                     { "Country.Name", 1 },
                 }
-            )
+            );
+        }
+
+        var rows = await Raw(collection)
+            .Find(search.Matching(fields))
+            .Project(projection)
             .Sort(search.OrderBy("Name", STANDARD_ID))
             .Skip(search.Skip)
             .Limit(search.Take)
@@ -596,16 +646,24 @@ internal sealed class CrossTenantReads
         return
         [
             .. rows.Where(x => x.TryGetValue(STANDARD_ID, out var id) && id.IsBsonBinaryData)
-                .Select(x => new RegistryMatch(
-                    x[STANDARD_ID].AsGuid,
-                    TextOf(x, TenantOwned.TENANT_ID) ?? Tenant.LEGACY_ID,
-                    TextOf(x, "Name") ?? string.Empty,
-                    TextOf(x, "NameEnglish"),
-                    TextOf(x, "FeiId"),
-                    NestedTextOf(x, "Club", "Name"),
-                    NestedTextOf(x, "Country", "Name"),
-                    null
-                )),
+                .Select(x =>
+                    whole
+                        ? new RegistryMatch(
+                            x[STANDARD_ID].AsGuid,
+                            TextOf(x, TenantOwned.TENANT_ID) ?? Tenant.LEGACY_ID,
+                            TextOf(x, "Name") ?? string.Empty,
+                            TextOf(x, "NameEnglish"),
+                            TextOf(x, "FeiId"),
+                            NestedTextOf(x, "Club", "Name"),
+                            NestedTextOf(x, "Country", "Name"),
+                            null
+                        )
+                        : RegistryMatch.NameOnly(
+                            x[STANDARD_ID].AsGuid,
+                            TextOf(x, "Name") ?? string.Empty,
+                            TextOf(x, "NameEnglish")
+                        )
+                ),
         ];
     }
 

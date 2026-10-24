@@ -27,7 +27,8 @@ public sealed class FoundParticipant
 
     /// <summary>
     /// Whether the word is part of the name, of the name in English or of the FEI ID, in any case: what the Api matches each
-    /// word of a text against.
+    /// word of a text against. The FEI ID is there only when the Api told it, which it does to the people who set an Event up,
+    /// and then it matches it too: a row tells this code what the Api matched.
     /// </summary>
     public bool Has(string word)
     {

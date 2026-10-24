@@ -20,6 +20,9 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
 {
     static readonly Caller SIGNED_IN = Caller.Of(TestId.Of(1));
 
+    /// <summary>A Tenant Root: one of the people who set an Event up, who read the whole row of an Athlete or a Horse.</summary>
+    static readonly Caller STAFF = Caller.Of(TestId.Of(2), tenantRootIn: ["country-bg"]);
+
     readonly MongoFixture _mongo;
 
     public CrossTenantReadsTests(MongoFixture mongo)
@@ -142,10 +145,10 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         );
         await AddAsync("athletes", a, $"Boris{marker} Georgiev", feiId: "10000003");
 
-        var byName = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf($"ANA"), default);
-        var byMarker = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf($"Ana{marker}"), default);
-        var byEnglishName = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf($"MARIA{marker}"), default);
-        var byFeiId = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("10000002"), default);
+        var byName = await Reads().SearchAthletesAsync(STAFF, SearchOf($"ANA"), default);
+        var byMarker = await Reads().SearchAthletesAsync(STAFF, SearchOf($"Ana{marker}"), default);
+        var byEnglishName = await Reads().SearchAthletesAsync(STAFF, SearchOf($"MARIA{marker}"), default);
+        var byFeiId = await Reads().SearchAthletesAsync(STAFF, SearchOf("10000002"), default);
 
         Assert.Contains(ana, byName.Select(x => x.Id));
         Assert.Contains(anastasia, byName.Select(x => x.Id));
@@ -226,9 +229,12 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
             }
         );
 
-        var found = Assert.Single(await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("secret rider"), default));
+        var found = Assert.Single(await Reads().SearchAthletesAsync(STAFF, SearchOf("secret rider"), default));
+        var named = Assert.Single(await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("secret rider"), default));
+        var byFeiId = await Reads().SearchAthletesAsync(SIGNED_IN, SearchOf("10000009"), default);
 
         Assert.Equal(id, found.Id);
+        Assert.False(found.IsNameOnly);
         Assert.Equal("Rider Club", found.Club);
         Assert.Equal("Bulgaria", found.Country);
         Assert.Equal("10000009", found.FeiId);
@@ -236,6 +242,31 @@ public sealed class CrossTenantReadsTests : IClassFixture<MongoFixture>
         Assert.DoesNotContain("secret.rider@example.test", json);
         Assert.DoesNotContain("stamp", json);
         Assert.DoesNotContain("official", json);
+        Assert.Equal(id, named.Id); // an account that sets nothing up reads the name, and not what else the row holds
+        Assert.True(named.IsNameOnly);
+        Assert.Equal("Secret Rider", named.Name);
+        Assert.Null(named.NameEnglish);
+        Assert.Null(named.FeiId);
+        Assert.Null(named.Club);
+        Assert.Null(named.Country);
+        Assert.Equal(string.Empty, named.TenantId);
+        Assert.Empty(byFeiId); // and the FEI ID is not matched either
+    }
+
+    [Fact]
+    public async Task The_whole_row_of_a_Horse_is_for_the_people_who_set_an_Event_up_and_the_name_for_every_other_account()
+    {
+        var marker = Guid.NewGuid().ToString("N")[..6];
+        var id = await AddAsync("horses", NewTenant(), $"Zephyr{marker} Night", feiId: $"BUL{marker}");
+
+        var whole = Assert.Single(await Reads().SearchHorsesAsync(STAFF, SearchOf($"bul{marker}"), default));
+        var named = Assert.Single(await Reads().SearchHorsesAsync(SIGNED_IN, SearchOf($"zephyr{marker}"), default));
+        var byFeiId = await Reads().SearchHorsesAsync(SIGNED_IN, SearchOf($"bul{marker}"), default);
+
+        Assert.Equal((id, $"BUL{marker}", false), (whole.Id, whole.FeiId, whole.IsNameOnly));
+        Assert.Equal((id, true), (named.Id, named.IsNameOnly));
+        Assert.Null(named.FeiId);
+        Assert.Empty(byFeiId);
     }
 
     [Fact]
