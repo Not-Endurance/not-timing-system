@@ -4,7 +4,7 @@ using Not.Blazor.Components.Abstractions;
 using Not.Formatting;
 using NTS.Domain.Objects;
 
-namespace NTS.Blazor.Components.Arrivelist;
+namespace NoTiming.Ui.Components.Arrivelist;
 
 /// <summary>
 /// One Arrivelist time cell. Renders the FEI estimate, the Regional one, or both stacked and

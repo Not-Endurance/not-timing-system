@@ -1,4 +1,4 @@
-namespace NTS.Blazor.Components.Arrivelist;
+namespace NoTiming.Ui.Components.Arrivelist;
 
 /// <summary>
 /// Which of the Arrivelist's two estimate models the table renders. Presentation-only - the domain

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Not.Blazor.Components.Abstractions;
 using Not.Formatting;
 using NTS.Contracts.Arrivelists;
+using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Objects;
 
 namespace NoTiming.Ui.Components.Arrivelist;
