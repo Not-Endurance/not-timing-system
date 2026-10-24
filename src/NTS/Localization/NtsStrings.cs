@@ -247,7 +247,8 @@ namespace NTS.Localization
             LocalizeString(nameof(Cannot_select_another_event_before_disconnect__string));
         public static string Component_missing_required_value_string =>
             LocalizeString(nameof(Component_missing_required_value_string));
-        public static string Home_string => LocalizeString(nameof(Home_string));
+        public static string Sorry_we_seem_to_have_fallen_off_the_horseback_string =>
+            LocalizeString(nameof(Sorry_we_seem_to_have_fallen_off_the_horseback_string));
         public static string Login_string => LocalizeString(nameof(Login_string));
         public static string Login_page_string => LocalizeString(nameof(Login_page_string));
         public static string Snapshot_string => LocalizeString(nameof(Snapshot_string));
@@ -305,6 +306,7 @@ namespace NTS.Localization
             LocalizeString(nameof(This_page_redirects_to_Signin_string));
         public static string Signed_in_as__string => LocalizeString(nameof(Signed_in_as__string));
         public static string You_have___privileges_string => LocalizeString(nameof(You_have___privileges_string));
+        public static string Sign_In_string => LocalizeString(nameof(Sign_In_string));
         public static string Sign_Out_string => LocalizeString(nameof(Sign_Out_string));
         public static string No_roles_assigned_string => LocalizeString(nameof(No_roles_assigned_string));
         public static string An_error_occurred_while_sending_snapshots_Please_try_again_string =>
@@ -329,6 +331,10 @@ namespace NTS.Localization
             LocalizeString(nameof(Configure_events_cannot_be_deleted_string));
         public static string Is_on_time_for_Presentation_Inspection_string =>
             LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
+        public static string Estimates_string => LocalizeString(nameof(Estimates_string));
+        public static string FEI_string => LocalizeString(nameof(FEI_string));
+        public static string Regional_string => LocalizeString(nameof(Regional_string));
+        public static string Both_string => LocalizeString(nameof(Both_string));
     }
 }
 #pragma warning restore NA0004

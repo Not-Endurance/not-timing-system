@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
-using NTS.Application.Contracts.Core.Models;
-using NTS.Application.Contracts.PastEvents;
+using NTS.Contracts.Core.Models;
+using NTS.Contracts.Features.Access;
+using NTS.Contracts.PastEvents;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Objects;
 using NTS.Judge.Contracts.Features.Core;
@@ -9,7 +10,6 @@ using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.EndToEndEventTests.Features;
 using NTS.Tests.Integration.EndToEndEventTests.Helpers;
 using NTS.Tests.Integration.Infrastructure;
-using NTS.Witness.Contracts.Features.Access;
 using CoreAthlete = NTS.Domain.Core.Aggregates.Participations.Entities.Athlete;
 using CoreCombination = NTS.Domain.Core.Aggregates.Participations.Entities.Combination;
 using CoreHorse = NTS.Domain.Core.Aggregates.Participations.Entities.Horse;
@@ -35,7 +35,7 @@ public sealed class CoreFeatureEndToEndTests
     public async Task Event_snapshot_runs_end_to_end(string snapshotName)
     {
         var snapshot = EndToEndEventSnapshot.Load(snapshotName);
-        await using var judge = new JudgeDriver(_fixture.WarpBaseUrl, _fixture.NexusBaseUrl);
+        await using var judge = new JudgeDriver(_fixture.ApiBaseUrl, _fixture.NexusBaseUrl);
         using var nexusApi = new NexusApiDriver(_fixture.NexusBaseUrl);
         using var print = new EndToEndPrintFeature(nexusApi);
         var configureEvent = new ConfigureEventFeature(judge, nexusApi);
@@ -59,8 +59,8 @@ public sealed class CoreFeatureEndToEndTests
         Assert.Equal(snapshot.Rankings.Count, startedRankings.Count);
         AssertStartedOperatorsMatchSetup(startedDocuments.Operators, setup.SetupEvent, eventInformation.Id);
 
-        await using var witness = new WitnessDriver(
-            _fixture.WarpBaseUrl,
+        await using var witness = new ClientDriver(
+            _fixture.ApiBaseUrl,
             _fixture.NexusBaseUrl,
             setup.WitnessOperator,
             $"CoreEndToEndOperatorWitness-{snapshot.Name}"

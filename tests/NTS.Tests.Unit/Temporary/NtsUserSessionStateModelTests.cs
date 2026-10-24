@@ -1,7 +1,7 @@
-using NTS.Application.Contracts.Watcher.Models;
+using NTS.Contracts.Watcher.Models;
+using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Domain.Watcher;
 
 namespace NTS.Tests.Unit.Temporary;
 

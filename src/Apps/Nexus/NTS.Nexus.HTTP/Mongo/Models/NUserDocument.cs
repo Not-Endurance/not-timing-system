@@ -1,7 +1,7 @@
 using Not.Application.Authentication.User;
 using Not.Random;
-using NTS.Application.Contracts.Shared;
-using NTS.Application.Contracts.Shared.Models;
+using NTS.Contracts.Shared;
+using NTS.Contracts.Shared.Models;
 
 namespace NTS.Nexus.HTTP.Mongo.Models;
 

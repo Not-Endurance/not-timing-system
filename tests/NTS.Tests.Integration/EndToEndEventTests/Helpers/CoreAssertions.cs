@@ -1,7 +1,7 @@
 using Not.Application.Behinds.Adapters;
-using NTS.Application.Contracts.Arrivelists;
-using NTS.Application.Contracts.Core;
-using NTS.Application.Contracts.Startlists;
+using NTS.Contracts.Arrivelists;
+using NTS.Contracts.Core;
+using NTS.Contracts.Startlists;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Objects.Arrivelists;
 using NTS.Domain.Core.Objects.Startlists;
@@ -15,7 +15,7 @@ internal static class CoreAssertions
     public static async Task AssertStartlistsMatchPersisted(
         NexusApiDriver api,
         JudgeDriver judge,
-        WitnessDriver witness,
+        ClientDriver witness,
         int eventId
     )
     {
@@ -36,7 +36,7 @@ internal static class CoreAssertions
         Assert.Equal(Flatten(expected.HistoryByStage), Flatten(witnessHistory.HistoryByStage));
     }
 
-    public static async Task AssertArrivelistMatchesPersisted(NexusApiDriver api, WitnessDriver witness, int eventId)
+    public static async Task AssertArrivelistMatchesPersisted(NexusApiDriver api, ClientDriver witness, int eventId)
     {
         var arrivelist = witness.GetRequiredService<IArrivelistService>();
         await arrivelist.Load();
@@ -108,9 +108,14 @@ internal static class CoreAssertions
     {
         return entries
             .Select(entry =>
-                $"{entry.Number}:{entry.AthleteName}:{entry.HorseName}:{Format(entry.Fast)}:{Format(entry.Average)}:{Format(entry.Slow)}"
+                $"{entry.Number}:{entry.AthleteName}:{entry.HorseName}:{Flatten(entry.Fei)}:{Flatten(entry.Regional)}"
             )
             .ToArray();
+    }
+
+    static string Flatten(ArrivalEstimates estimates)
+    {
+        return $"{Format(estimates.Fast)}:{Format(estimates.Average)}:{Format(estimates.Slow)}";
     }
 
     static string Format(Timestamp? timestamp)

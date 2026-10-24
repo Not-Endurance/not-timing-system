@@ -1,7 +1,7 @@
 using MongoDB.Driver;
 using Not.Exceptions;
 using Not.Storage.Mongo;
-using NTS.Application.Contracts.Core.Models;
+using NTS.Contracts.Core.Models;
 
 namespace NTS.Nexus.HTTP.Mongo.Repositories;
 

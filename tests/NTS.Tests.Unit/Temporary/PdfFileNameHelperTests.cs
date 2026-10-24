@@ -1,4 +1,4 @@
-using NTS.Application.Contracts.Pdf;
+using NTS.Contracts.Pdf;
 
 namespace NTS.Tests.Unit.Temporary;
 

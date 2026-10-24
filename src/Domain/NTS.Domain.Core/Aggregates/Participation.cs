@@ -67,7 +67,7 @@ public class Participation : Aggregate, IEventScoped
     {
         var hasArriveTime = Phases.Current.ArriveTime != null;
         var result = Phases.Process(snapshot, EventId);
-        if (result.Type == ActivePhaseComplete)
+        if (result.Type == SnapshotResultType.ActivePhaseComplete)
         {
             if (!Phases.SelectNext())
             {

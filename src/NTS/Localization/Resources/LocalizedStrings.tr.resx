@@ -644,10 +644,22 @@
     <value />
   </data>
   <data name="Home_string" xml:space="preserve">
-    <value />
+    <value>Ana sayfa</value>
+  </data>
+  <data name="Reload_string" xml:space="preserve">
+    <value>Yeniden yükle</value>
+  </data>
+  <data name="Sorry_we_seem_to_have_fallen_off_the_horseback_string" xml:space="preserve">
+    <value>Üzgünüz, görünüşe göre attan düştük</value>
+  </data>
+  <data name="Try_to_Reload_in_order_to_proceed_string" xml:space="preserve">
+    <value>Devam etmek için yeniden yüklemeyi deneyin veya hata devam ederse Ana sayfaya gitmek için aşağıdaki düğmeye tıklayın.</value>
   </data>
   <data name="Login_string" xml:space="preserve">
     <value />
+  </data>
+  <data name="Sign_In_string" xml:space="preserve">
+    <value>Giriş Yap</value>
   </data>
   <data name="Snapshot_string" xml:space="preserve">
     <value />
@@ -844,10 +856,19 @@
   <data name="Name_in_English_string" xml:space="preserve">
     <value>İngilizce isim</value>
   </data>
-  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
-    <value>Sunum/Muayene için zamanında mı?</value>
-  </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>'{0}' öğesini silmek istediğinizden emin misiniz?</value>
+  </data>
+  <data name="Estimates_string" xml:space="preserve">
+    <value>Tahminler</value>
+  </data>
+  <data name="FEI_string" xml:space="preserve">
+    <value>FEI</value>
+  </data>
+  <data name="Regional_string" xml:space="preserve">
+    <value>Bölgesel</value>
+  </data>
+  <data name="Both_string" xml:space="preserve">
+    <value>Her ikisi</value>
   </data>
 </root>

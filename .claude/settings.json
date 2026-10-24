@@ -1,0 +1,19 @@
+{
+  "enabledPlugins": {
+    "mattpocock-skills@claude-plugins-official": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(//**)",
+      "Bash",
+      "PowerShell",
+      "WebFetch",
+      "Monitor",
+      "Read(~/AppData/Local/claude/**)",
+      "Edit(~/AppData/Local/claude/**)",
+      "Read(~/AppData/Local/Temp/claude/**)",
+      "Edit(~/AppData/Local/Temp/claude/**)"
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+using Microsoft.AspNetCore.Components;
+using Not.Blazor.Components.Abstractions;
+using NTS.Contracts.Startlists;
+using NTS.Domain.Core.Objects.Startlists;
+using NTS.Domain.Helpers;
+
+namespace NoTiming.Ui.Components.Startlist;
+
+public class StartlistTableBehind : NStatefulComponent
+{
+    protected string GateHeader => "Gate";
+
+    [Inject]
+    public IStartUpcoming Service { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Observe(Service);
+    }
+
+    protected string FormatAthlete(Starter entry)
+    {
+        return NameRenderingHelper.Render(entry.AthleteName, entry.AthleteNameEnglish, entry.Ruleset);
+    }
+
+    protected string GetTimerKey(Starter entry)
+    {
+        return $"{entry.PhaseNumber}:{entry.Number}:{entry.Start}";
+    }
+
+    protected void Tick()
+    {
+        Service.Tick();
+    }
+}

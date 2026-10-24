@@ -37,6 +37,12 @@ public class NLayoutBehind : LayoutComponentBase, IDisposable
     public RenderFragment? Drawer { get; set; }
 
     [Parameter]
+    public string? ExceptionHandlerErrorText { get; set; }
+
+    [Parameter]
+    public string? ExceptionHandlerImageUrl { get; set; }
+
+    [Parameter]
     public string? MenuTitle { get; set; }
 
     protected override void OnInitialized()

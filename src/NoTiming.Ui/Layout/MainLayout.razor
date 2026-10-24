@@ -1,0 +1,20 @@
+@using NTS.Contracts
+@using NoTiming.Ui.Layout.Drawer
+@using Not.Blazor.Components.Layout
+
+@inherits MainLayoutBehind
+
+<NLayout Watermark="@LayoutWatermark"
+         MenuTitle="@Main_menu_string"
+         ExceptionHandlerImageUrl="@ExceptionHandlerImageUrl"
+         ExceptionHandlerErrorText="@ExceptionHandlerErrorText">
+
+    <Drawer>
+        <NavMenu />
+    </Drawer>
+
+    <Content>
+        @Body
+    </Content>
+
+</NLayout>

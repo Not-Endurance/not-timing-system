@@ -1,37 +1,45 @@
+@using Not.Blazor.Components.Exceptions
 @using Not.Blazor.Components.Layout
 @using Not.Blazor.Components.Text
 
 @inherits NLayoutBehind
 
-<NTheme @ref="Theme"/>
+<CascadingValue Name="@NExceptionHandlerContent.IMAGE_URL_PARAMETER" Value="@ExceptionHandlerImageUrl">
+    <CascadingValue Name="@NExceptionHandlerContent.ERROR_TEXT_PARAMETER" Value="@ExceptionHandlerErrorText">
+        <NTheme @ref="Theme"/>
 
-<div class="n-layout-root">
-    <MudLayout>
-        @if (! HideLayout)
-        {
-            <MudAppBar Elevation="1">
-                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="(e) => ToggleDrawer()" />
+        <div class="n-layout-root">
+            <MudLayout>
+                @if (! HideLayout)
+                {
+                    <MudAppBar Elevation="1">
+                        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                                       Color="Color.Inherit"
+                                       Edge="Edge.Start"
+                                       OnClick="(e) => ToggleDrawer()" />
 
-                <MudSpacer />
+                        <MudSpacer />
 
-                <NHeadline3 Color="Color.Secondary" Content="@Watermark" />
-            </MudAppBar>
+                        <NHeadline3 Color="Color.Secondary" Content="@Watermark" />
+                    </MudAppBar>
 
-            <NDrawer @bind-Open="DrawerOpen">
-                @Drawer
-            </NDrawer>
-        }
+                    <NDrawer @bind-Open="DrawerOpen">
+                        @Drawer
+                    </NDrawer>
+                }
 
-        <MudMainContent>
-            <CascadingValue Value="@Theme.ThemeProvider">
-                <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
-                    <div class="n-route-focus-target" tabindex="-1">
-                        @Content
-                    </div>
-                </MudContainer>
-                <NNotifier />
-            </CascadingValue>
-        </MudMainContent>
+                <MudMainContent>
+                    <CascadingValue Value="@Theme.ThemeProvider">
+                        <MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+                            <div class="n-route-focus-target" tabindex="-1">
+                                @Content
+                            </div>
+                        </MudContainer>
+                        <NNotifier />
+                    </CascadingValue>
+                </MudMainContent>
 
-    </MudLayout>
-</div>
+            </MudLayout>
+        </div>
+    </CascadingValue>
+</CascadingValue>

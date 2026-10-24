@@ -684,6 +684,15 @@
   <data name="Home_string" xml:space="preserve">
     <value>Начало</value>
   </data>
+  <data name="Reload_string" xml:space="preserve">
+    <value>Презареди</value>
+  </data>
+  <data name="Sorry_we_seem_to_have_fallen_off_the_horseback_string" xml:space="preserve">
+    <value>Съжаляваме, изглежда сме паднали от коня</value>
+  </data>
+  <data name="Try_to_Reload_in_order_to_proceed_string" xml:space="preserve">
+    <value>Опитайте да презаредите, за да продължите, или натиснете бутона по-долу, за да отидете към Начало, ако грешката продължава.</value>
+  </data>
   <data name="Login_string" xml:space="preserve">
     <value>Вход</value>
   </data>
@@ -915,6 +924,9 @@
   <data name="You_have___privileges_string" xml:space="preserve">
     <value>Имате права: {0}.</value>
   </data>
+  <data name="Sign_In_string" xml:space="preserve">
+    <value>Вход</value>
+  </data>
   <data name="Sign_Out_string" xml:space="preserve">
     <value>Изход</value>
   </data>
@@ -1044,13 +1056,22 @@
   <data name="Name_in_English_string" xml:space="preserve">
     <value>Име на английски</value>
   </data>
-  <data name="Is_on_time_for_Presentation_Inspection_string" xml:space="preserve">
-    <value>Навреме ли е за презентация/инспекция?</value>
-  </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
   </data>
   <data name="Select_participant_to_add_string" xml:space="preserve">
     <value>Изберете участник да добавите</value>
+  </data>
+  <data name="Estimates_string" xml:space="preserve">
+    <value>Прогнози</value>
+  </data>
+  <data name="FEI_string" xml:space="preserve">
+    <value>FEI</value>
+  </data>
+  <data name="Regional_string" xml:space="preserve">
+    <value>Регионални</value>
+  </data>
+  <data name="Both_string" xml:space="preserve">
+    <value>Двете</value>
   </data>
 </root>
