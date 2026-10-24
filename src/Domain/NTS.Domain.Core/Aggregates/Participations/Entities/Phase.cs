@@ -25,7 +25,7 @@ public class Phase : Entity
         bool isRepresentationRequested,
         bool isRequiredInspectionRequested,
         bool isRequiredInspectionCompulsory,
-        int? id = null
+        Guid? id = null
     )
         : base(id)
     {
@@ -62,7 +62,7 @@ public class Phase : Entity
     public bool IsRequiredInspectionCompulsory { get; private set; }
     public TimeSpan? CompulsoryThresholdSpan { get; private set; }
 
-    internal SnapshotResult Process(Snapshot snapshot, int eventId)
+    internal SnapshotResult Process(Snapshot snapshot, Guid eventId)
     {
         return snapshot.Type switch
         {
@@ -253,7 +253,7 @@ public class Phase : Entity
         return true;
     }
 
-    SnapshotResult Automatic(Snapshot snapshot, int eventId)
+    SnapshotResult Automatic(Snapshot snapshot, Guid eventId)
     {
         if (ArriveTime == null && IsFinal)
         {
@@ -270,7 +270,7 @@ public class Phase : Entity
         return SnapshotResult.NotApplied(eventId, snapshot, NotAppliedDueToInapplicableAutomatic);
     }
 
-    SnapshotResult Finish(Snapshot snapshot, int eventId)
+    SnapshotResult Finish(Snapshot snapshot, Guid eventId)
     {
         if (_isSeparateFinish && !IsFinal)
         {
@@ -290,7 +290,7 @@ public class Phase : Entity
         return SnapshotResult.Applied(eventId, snapshot);
     }
 
-    SnapshotResult Arrive(Snapshot snapshot, int eventId)
+    SnapshotResult Arrive(Snapshot snapshot, Guid eventId)
     {
         if (_isSeparateFinish && IsFinal)
         {
@@ -310,7 +310,7 @@ public class Phase : Entity
         return SnapshotResult.Applied(eventId, snapshot);
     }
 
-    SnapshotResult Inspect(Snapshot snapshot, int eventId)
+    SnapshotResult Inspect(Snapshot snapshot, Guid eventId)
     {
         if (IsReinspectionRequested && RepresentTime != null && PresentTime != null)
         {
@@ -349,7 +349,7 @@ public class Phase : Entity
 
 public interface IPhaseState
 {
-    int Id { get; }
+    Guid Id { get; }
     public DateTimeOffset? StartTime { get; }
     public DateTimeOffset? ArriveTime { get; }
     public DateTimeOffset? PresentTime { get; }

@@ -98,16 +98,7 @@ public class WitnessProfileContext : WitnessAuthenticationAwareContext, IWitness
 
     Country? ResolveCountry(string? countryRegion)
     {
-        if (string.IsNullOrWhiteSpace(countryRegion))
-        {
-            return null;
-        }
-
-        return _countryList.FirstOrDefault(country =>
-            string.Equals(country.Name, countryRegion, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(country.IsoCode, countryRegion, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(country.NfCode, countryRegion, StringComparison.OrdinalIgnoreCase)
-        );
+        return _countryList.FirstOrDefault(country => country.Matches(countryRegion));
     }
 
     static bool Contains(string? value, string term)

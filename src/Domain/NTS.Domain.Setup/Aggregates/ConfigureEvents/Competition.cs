@@ -22,7 +22,7 @@ public class Competition : Entity, IKrudParent<Participation>, IKrudParent<Phase
         string? feiScheduleNumber,
         IEnumerable<Phase> phases,
         IEnumerable<Participation> participations,
-        int? id = null
+        Guid? id = null
     )
         : base(id)
     {

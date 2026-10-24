@@ -1,38 +1,19 @@
-using MediatR;
 using Not.Application.Behinds.Adapters;
-using Not.Collections;
 using NTS.Contracts.Arrivelists;
 using NTS.Contracts.Core;
-using NTS.Contracts.Socket;
-using NTS.Domain.Core.Aggregates;
-using NTS.Domain.Core.Aggregates.Participations.Objects;
-using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Arrivelists;
-using NTS.Domain.Core.Objects.Payloads;
 
 namespace NTS.Application.Arrivelists;
 
-public class ArrivelistService
-    : NStatefulService,
-        IArrivelistService,
-        INotificationHandler<ParticipationArrived>,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<ParticipationRestored>,
-        INotificationHandler<ParticipationEliminated>,
-        INotificationHandler<EventConnected>,
-        INotificationHandler<EventDisconnected>
+/// <summary>A view over the Participations of the store (ADR-0006): it rebuilds when the store changes.</summary>
+public class ArrivelistService : NStatefulService, IArrivelistService
 {
-    readonly IEventScopedRepository<Participation> _participations;
-    readonly INtsSocketContext? _socketContext;
-    UniqueParticipations _state = new();
+    readonly IParticipationStore _store;
 
-    public ArrivelistService(IEventScopedRepository<Participation> participations)
-        : this(participations, null) { }
-
-    public ArrivelistService(IEventScopedRepository<Participation> participations, INtsSocketContext? socketContext)
+    public ArrivelistService(IParticipationStore store)
     {
-        _participations = participations;
-        _socketContext = socketContext;
+        _store = store;
+        Observe(store, Rebuild);
     }
 
     public Arrivelist Arrivelist { get; private set; } = new([]);
@@ -40,82 +21,24 @@ public class ArrivelistService
 
     protected override async Task<bool> InitializeState()
     {
-        if (_socketContext?.Event == null && _socketContext != null)
-        {
-            _state.Clear();
-            Arrivelist = new Arrivelist([]);
-            return false;
-        }
-
-        var participations = await _participations.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
-        _state = new UniqueParticipations(participations);
-        Arrivelist = new Arrivelist(_state);
+        await _store.Load();
+        Arrivelist = Build();
         return Entries.Any();
-    }
-
-    public Task Handle(ParticipationArrived notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.Remove);
-        return Task.CompletedTask;
-    }
-
-    public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
-    {
-        await ReloadState();
-    }
-
-    public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
-    {
-        _state.Clear();
-        Arrivelist = new Arrivelist([]);
-        ClearState();
-        return Task.CompletedTask;
     }
 
     public void Tick()
     {
-        Arrivelist = new Arrivelist(_state);
+        Rebuild();
+    }
+
+    void Rebuild()
+    {
+        Arrivelist = Build();
         EmitChanged();
     }
 
-    void Update(Participation participation, NCollectionAction action)
+    Arrivelist Build()
     {
-        switch (action)
-        {
-            case NCollectionAction.AddOrUpdate:
-                if (!participation.IsComplete() && !participation.IsEliminated())
-                {
-                    _state.Upsert(participation);
-                }
-                else
-                {
-                    _state.Remove(participation);
-                }
-                break;
-            case NCollectionAction.Remove:
-                _state.Remove(participation);
-                break;
-        }
-
-        Arrivelist = new Arrivelist(_state);
-        EmitChanged();
+        return new Arrivelist(_store.Participations);
     }
 }

@@ -1,5 +1,4 @@
 using Not.Application.Authentication.User;
-using Not.Random;
 using NTS.Contracts.Shared;
 using NTS.Contracts.Shared.Models;
 
@@ -25,7 +24,7 @@ public class NUserDocument : IDocument
 
         return new NUserDocument
         {
-            Id = RandomHelper.GenerateUniqueInteger(),
+            Id = Guid.NewGuid(),
             Email = email,
             Name = BuildName(normalizedGivenName, normalizedMiddleName, normalizedSurname) ?? Normalize(name),
             DisplayName = Normalize(displayName),
@@ -42,7 +41,7 @@ public class NUserDocument : IDocument
     {
         return new NUserDocument
         {
-            Id = user.Id == default ? RandomHelper.GenerateUniqueInteger() : user.Id,
+            Id = user.Id == default ? Guid.NewGuid() : user.Id,
             Email = user.Email,
             Name = user.Name,
             DisplayName = user.DisplayName,
@@ -56,7 +55,7 @@ public class NUserDocument : IDocument
         };
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Email { get; set; } = default!;
     public string? Name { get; set; }
     public string? DisplayName { get; set; }

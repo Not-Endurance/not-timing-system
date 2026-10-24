@@ -10,5 +10,5 @@ public static class Routes
     public const string PERFORMANCE_PAGE = "/performance";
     public const string PROFILE_PAGE = "/profile";
     public const string PAST_EVENTS_PAGE = "/past-events";
-    public const string PAST_EVENT_DETAILS_PAGE = "/past-events/{eventId:int}";
+    public const string PAST_EVENT_DETAILS_PAGE = "/past-events/{eventId:guid}";
 }

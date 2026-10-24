@@ -50,8 +50,8 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
 
     [Function("user-sessions-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user-sessions/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user-sessions/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Delete));
@@ -62,10 +62,10 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
 
     [Function("user-sessions-delete-for-event")]
     public async Task<IActionResult> DeleteForEvent(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user-sessions/{eventId:int}/{id:int}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "user-sessions/{eventId:guid}/{id:guid}")]
             HttpRequest request,
-        int eventId,
-        int id
+        Guid eventId,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(DeleteForEvent));
@@ -89,8 +89,8 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
 
     [Function("user-sessions-read")]
     public async Task<IActionResult> Read(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "user-sessions/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "user-sessions/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Read));
@@ -118,10 +118,10 @@ public class UserSessionFunctions : CrudFunctions<NtsUserSessionModel>
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
             "get",
-            Route = "user-sessions/{eventId:int}/by-user-identifier/{userIdentifier}"
+            Route = "user-sessions/{eventId:guid}/by-user-identifier/{userIdentifier}"
         )]
             HttpRequest request,
-        int eventId,
+        Guid eventId,
         string userIdentifier
     )
     {

@@ -14,13 +14,13 @@ public class OfficialModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Of
         return model;
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public int EventId { get; set; }
+    public Guid EventId { get; set; }
     public string Name { get; set; } = default!;
     public string? NameEnglish { get; set; }
     public OfficialRole Role { get; set; } = default!;
-    public int? UserId { get; set; }
+    public Guid? UserId { get; set; }
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
 

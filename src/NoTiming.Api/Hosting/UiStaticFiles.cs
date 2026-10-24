@@ -18,6 +18,7 @@ internal static partial class UiStaticFiles
     {
         var contentTypes = new FileExtensionContentTypeProvider();
         contentTypes.Mappings[".dat"] = "application/octet-stream"; // ICU data of the .NET runtime
+        contentTypes.Mappings[".pdb"] = "application/octet-stream"; // symbols, which a Debug build of the Ui loads
 
         app.UseMiddleware<PrecompressedFilesMiddleware>();
         app.UseStaticFiles(

@@ -12,8 +12,8 @@ public sealed class UniqueParticipationsTests
     [Fact]
     public void Add_ignores_duplicate_numbers()
     {
-        var first = CreateParticipation(7, id: 101);
-        var duplicate = CreateParticipation(7, id: 202);
+        var first = CreateParticipation(7, id: TestId.Of(101));
+        var duplicate = CreateParticipation(7, id: TestId.Of(202));
         var participations = new UniqueParticipations();
 
         participations.Add(first);
@@ -26,9 +26,9 @@ public sealed class UniqueParticipationsTests
     [Fact]
     public void Constructor_ignores_duplicate_numbers()
     {
-        var first = CreateParticipation(7, id: 101);
-        var duplicate = CreateParticipation(7, id: 202);
-        var other = CreateParticipation(8, id: 303);
+        var first = CreateParticipation(7, id: TestId.Of(101));
+        var duplicate = CreateParticipation(7, id: TestId.Of(202));
+        var other = CreateParticipation(8, id: TestId.Of(303));
 
         var participations = new UniqueParticipations([first, duplicate, other]);
 
@@ -38,8 +38,8 @@ public sealed class UniqueParticipationsTests
     [Fact]
     public void Upsert_replaces_existing_number()
     {
-        var first = CreateParticipation(7, id: 101);
-        var replacement = CreateParticipation(7, id: 202);
+        var first = CreateParticipation(7, id: TestId.Of(101));
+        var replacement = CreateParticipation(7, id: TestId.Of(202));
         var participations = new UniqueParticipations([first]);
 
         participations.Upsert(replacement);
@@ -51,9 +51,9 @@ public sealed class UniqueParticipationsTests
     [Fact]
     public void Remove_removes_matching_number()
     {
-        var first = CreateParticipation(7, id: 101);
-        var sameNumber = CreateParticipation(7, id: 202);
-        var other = CreateParticipation(8, id: 303);
+        var first = CreateParticipation(7, id: TestId.Of(101));
+        var sameNumber = CreateParticipation(7, id: TestId.Of(202));
+        var other = CreateParticipation(8, id: TestId.Of(303));
         var participations = new UniqueParticipations([first, other]);
 
         Assert.True(participations.Remove(sameNumber));
@@ -61,12 +61,12 @@ public sealed class UniqueParticipationsTests
         Assert.Equal([8], participations.Select(x => x.Combination.Number));
     }
 
-    static Participation CreateParticipation(int number, int id)
+    static Participation CreateParticipation(int number, Guid id)
     {
-        var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
-        var horse = new Horse($"Horse {number}", null, null, number);
-        var combination = new Combination(number, athlete, horse, null, "20", null, null, number);
+        var country = new Country(TestId.Of(number), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete($"Athlete {number}", null, country, null, null, TestId.Of(number));
+        var horse = new Horse($"Horse {number}", null, null, TestId.Of(number));
+        var combination = new Combination(number, athlete, horse, null, "20", null, null, TestId.Of(number));
 
         return new Participation(
             ParticipationCategory.Senior,
@@ -74,7 +74,7 @@ public sealed class UniqueParticipationsTests
             combination,
             new PhaseCollection([CreatePhase()]),
             null,
-            eventId: 1,
+            eventId: TestId.Of(1),
             id
         );
     }

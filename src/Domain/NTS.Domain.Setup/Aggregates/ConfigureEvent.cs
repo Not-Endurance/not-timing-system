@@ -29,7 +29,7 @@ public class ConfigureEvent
         IEnumerable<Official> officials,
         IEnumerable<Loop> loops,
         IEnumerable<Combination> combinations,
-        int? id = null,
+        Guid? id = null,
         IEnumerable<Operator>? operators = null
     )
         : base(id)

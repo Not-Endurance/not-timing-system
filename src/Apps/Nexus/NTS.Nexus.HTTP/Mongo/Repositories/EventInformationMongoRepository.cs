@@ -35,7 +35,7 @@ public class EventInformationMongoRepository : MongoRepository<EventInformationM
         await base.Create(item);
     }
 
-    public Task DeleteAllForEvent(int eventId)
+    public Task DeleteAllForEvent(Guid eventId)
     {
         return GetCollection().DeleteManyAsync(x => x.Id == eventId);
     }

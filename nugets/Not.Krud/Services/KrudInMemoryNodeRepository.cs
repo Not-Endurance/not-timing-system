@@ -31,7 +31,7 @@ public class KrudInMemoryNodeRepository<T> : IRepository<T>, IKrudCascadeReposit
         return Task.FromResult(result);
     }
 
-    public Task<T?> Read(int id)
+    public Task<T?> Read(Guid id)
     {
         throw new NotImplementedException("Krud shouldn't need Read by ID");
     }
@@ -55,7 +55,7 @@ public class KrudInMemoryNodeRepository<T> : IRepository<T>, IKrudCascadeReposit
         return Task.CompletedTask;
     }
 
-    public Task Delete(int id)
+    public Task Delete(Guid id)
     {
         throw new NotImplementedException("Krud shouldn't need Delete by ID");
     }

@@ -101,7 +101,7 @@ internal sealed class NexusApiDriver : IDisposable
         return Send(HttpMethod.Post, "api/handouts", HandoutModel.From(handout));
     }
 
-    public Task DeleteHandout(int id)
+    public Task DeleteHandout(Guid id)
     {
         return Send(HttpMethod.Delete, $"api/handouts/{id}");
     }
@@ -126,13 +126,13 @@ internal sealed class NexusApiDriver : IDisposable
         return Send(HttpMethod.Patch, "api/configure-event", SetupConfigureEventModel.From(setupEvent));
     }
 
-    public async Task<EventInformation> StartEventInformation(int configureEventId)
+    public async Task<EventInformation> StartEventInformation(Guid configureEventId)
     {
         var model = await Send<EventInformationModel>(HttpMethod.Post, $"api/event/{configureEventId}/start", new { });
         return model.MapToEntity();
     }
 
-    public async Task<EventInformation> ReadEventInformation(int eventId)
+    public async Task<EventInformation> ReadEventInformation(Guid eventId)
     {
         var model = await Send<EventInformationModel>(HttpMethod.Get, $"api/event/{eventId}");
         return model.MapToEntity();
@@ -150,7 +150,7 @@ internal sealed class NexusApiDriver : IDisposable
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public async Task<Participation> ReadParticipation(int eventId, int participationId)
+    public async Task<Participation> ReadParticipation(Guid eventId, Guid participationId)
     {
         var model = await Send<ParticipationModel>(
             HttpMethod.Get,
@@ -159,7 +159,7 @@ internal sealed class NexusApiDriver : IDisposable
         return model.MapToEntity();
     }
 
-    public async Task<IReadOnlyList<Participation>> ReadParticipations(int eventId)
+    public async Task<IReadOnlyList<Participation>> ReadParticipations(Guid eventId)
     {
         var models = await Send<IEnumerable<ParticipationModel>>(
             HttpMethod.Get,
@@ -168,38 +168,38 @@ internal sealed class NexusApiDriver : IDisposable
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public async Task<IReadOnlyList<Ranking>> ReadRankings(int eventId)
+    public async Task<IReadOnlyList<Ranking>> ReadRankings(Guid eventId)
     {
         var models = await Send<IEnumerable<RankingModel>>(HttpMethod.Get, EventFilter("api/rankings", eventId));
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public async Task<IReadOnlyList<Official>> ReadOfficials(int eventId)
+    public async Task<IReadOnlyList<Official>> ReadOfficials(Guid eventId)
     {
         var models = await Send<IEnumerable<OfficialModel>>(HttpMethod.Get, EventFilter("api/officials", eventId));
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public async Task<IReadOnlyList<Operator>> ReadOperators(int eventId)
+    public async Task<IReadOnlyList<Operator>> ReadOperators(Guid eventId)
     {
         var models = await Send<IEnumerable<OperatorModel>>(HttpMethod.Get, EventFilter("api/operators", eventId));
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public async Task<IReadOnlyList<Handout>> ReadHandouts(int eventId)
+    public async Task<IReadOnlyList<Handout>> ReadHandouts(Guid eventId)
     {
         var models = await Send<IEnumerable<HandoutModel>>(HttpMethod.Get, EventFilter("api/handouts", eventId));
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public Task<string> ReadParticipationsRaw(int eventId)
+    public Task<string> ReadParticipationsRaw(Guid eventId)
     {
         return SendCore(HttpMethod.Get, EventFilter("api/participations", eventId), null);
     }
 
     public async Task<Participation> WaitForParticipation(
-        int eventId,
-        int participationId,
+        Guid eventId,
+        Guid participationId,
         Func<Participation, bool> predicate,
         TimeSpan timeout
     )
@@ -227,7 +227,7 @@ internal sealed class NexusApiDriver : IDisposable
         );
     }
 
-    public async Task<IReadOnlyList<SnapshotResultModel>> ReadSnapshotResults(int eventId)
+    public async Task<IReadOnlyList<SnapshotResultModel>> ReadSnapshotResults(Guid eventId)
     {
         var models = await Send<IEnumerable<SnapshotResultModel>>(
             HttpMethod.Get,
@@ -236,7 +236,7 @@ internal sealed class NexusApiDriver : IDisposable
         return models.ToArray();
     }
 
-    public Task<NtsUserSessionModel?> ReadUserSession(string userIdentifier, int eventId)
+    public Task<NtsUserSessionModel?> ReadUserSession(string userIdentifier, Guid eventId)
     {
         var encodedUserIdentifier = Uri.EscapeDataString(userIdentifier);
         return SendNullable<NtsUserSessionModel>(
@@ -269,7 +269,7 @@ internal sealed class NexusApiDriver : IDisposable
         return models.Select(x => x.MapToEntity()).ToArray();
     }
 
-    public async Task<SetupConfigureEvent> ReadSetupConfigureEvent(int id)
+    public async Task<SetupConfigureEvent> ReadSetupConfigureEvent(Guid id)
     {
         var model = await Send<SetupConfigureEventModel>(HttpMethod.Get, $"api/configure-event/{id}");
         return model.MapToEntity();
@@ -371,7 +371,7 @@ internal sealed class NexusApiDriver : IDisposable
         return content;
     }
 
-    static string EventFilter(string endpoint, int eventId)
+    static string EventFilter(string endpoint, Guid eventId)
     {
         return HttpHelper.AddQueryString(
             endpoint,
@@ -381,6 +381,6 @@ internal sealed class NexusApiDriver : IDisposable
 
     sealed class EventFilterDocument
     {
-        public int EventId { get; set; }
+        public Guid EventId { get; set; }
     }
 }

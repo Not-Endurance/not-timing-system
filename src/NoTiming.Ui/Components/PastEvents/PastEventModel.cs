@@ -7,7 +7,7 @@ namespace NoTiming.Ui.Components.PastEvents;
 
 public class PastEventModel : IKrudModel<EventInformation>, IKrudFormModel
 {
-    public int? Id { get; private set; }
+    public Guid? Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public string Location { get; private set; } = string.Empty;
     public EventSpan EventSpan { get; private set; } = default!;

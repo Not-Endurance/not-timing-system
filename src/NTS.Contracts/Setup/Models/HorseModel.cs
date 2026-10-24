@@ -13,7 +13,7 @@ public class HorseModel : IDocument, IKrudModel<Horse>
         return model;
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Name { get; set; } = default!;
     public string? NameEnglish { get; set; }

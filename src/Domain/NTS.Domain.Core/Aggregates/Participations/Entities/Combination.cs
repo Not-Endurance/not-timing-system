@@ -20,7 +20,7 @@ public class Combination : Entity, INtsDisplayable
         string distance,
         Speed? minAverageSpeed,
         Speed? maxAverageSpeed,
-        int id
+        Guid id
     )
         : base(id)
     {

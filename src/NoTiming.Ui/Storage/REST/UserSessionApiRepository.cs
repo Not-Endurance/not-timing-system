@@ -33,7 +33,7 @@ public class UserSessionApiRepository
         );
     }
 
-    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, int eventId)
+    public async Task<NtsUserSessionModel?> ReadByUserIdentifier(string userIdentifier, Guid eventId)
     {
         if (string.IsNullOrWhiteSpace(userIdentifier))
         {

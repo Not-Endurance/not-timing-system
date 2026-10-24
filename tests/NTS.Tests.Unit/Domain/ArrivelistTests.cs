@@ -247,9 +247,9 @@ public sealed class ArrivelistTests
     )
     {
         var phaseList = phases.ToList();
-        var country = new Country(number, "Bulgaria", "BG", "BUL", "bg-BG");
-        var athlete = new Athlete($"Athlete {number}", null, country, null, null, number);
-        var horse = new Horse($"Horse {number}", null, null, number);
+        var country = new Country(TestId.Of(number), "Bulgaria", "BG", "BUL", "bg-BG");
+        var athlete = new Athlete($"Athlete {number}", null, country, null, null, TestId.Of(number));
+        var horse = new Horse($"Horse {number}", null, null, TestId.Of(number));
         var totalDistance = phaseList.Sum(x => x.Length);
         var combination = new Combination(
             number,
@@ -259,7 +259,7 @@ public sealed class ArrivelistTests
             $"{totalDistance:0.##}",
             minAverageSpeed,
             maxAverageSpeed,
-            number
+            TestId.Of(number)
         );
 
         return new Participation(
@@ -268,7 +268,7 @@ public sealed class ArrivelistTests
             combination,
             new PhaseCollection(phaseList),
             eliminated,
-            eventId: 1
+            eventId: TestId.Of(1)
         );
     }
 

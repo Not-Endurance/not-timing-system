@@ -47,5 +47,11 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.TEST_PROJECT_PATH }} -c ${{ env.CONFIGURATION }} --no-restore
 
+      # The passkey ceremonies (#600) drive a real Chromium with a virtual authenticator. The test project's build puts the
+      # installer of its own Playwright version next to the tests, so the browser matches the library.
+      - name: Install Chromium for Playwright
+        shell: pwsh
+        run: ./tests/NTS.Tests.Integration/bin/${{ env.CONFIGURATION }}/net10.0/playwright.ps1 install --with-deps chromium
+
       - name: Test
         run: dotnet test ${{ env.TEST_PROJECT_PATH }} -c ${{ env.CONFIGURATION }} --no-build

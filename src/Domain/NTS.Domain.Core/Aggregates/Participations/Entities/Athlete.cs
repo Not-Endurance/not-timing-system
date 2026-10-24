@@ -6,7 +6,7 @@ namespace NTS.Domain.Core.Aggregates.Participations.Entities;
 
 public class Athlete : Entity, INamed, INtsDisplayable
 {
-    public Athlete(string? name, string? nameEnglish, Country country, Club? club, string? feiId, int id)
+    public Athlete(string? name, string? nameEnglish, Country country, Club? club, string? feiId, Guid id)
         : base(id)
     {
         Name = Required(nameof(Name), name);

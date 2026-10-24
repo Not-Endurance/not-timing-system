@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="{{lang}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{{register.title}}</title>
+    <link rel="stylesheet" href="/account/assets/account.css" />
+  </head>
+  <body>
+    <main>
+      <h1>{{register.heading}}</h1>
+
+      <form id="register-form" novalidate>
+        <p class="hint">{{register.intro}}</p>
+
+        <label for="given-name">{{register.givenName}}</label>
+        <input
+          id="given-name"
+          name="givenName"
+          type="text"
+          autocomplete="given-name"
+          maxlength="100"
+          required
+          autofocus
+        />
+
+        <label for="surname">{{register.surname}}</label>
+        <input id="surname" name="surname" type="text" autocomplete="family-name" maxlength="100" required />
+
+        <label for="email">{{email.label}}</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          autocapitalize="none"
+          spellcheck="false"
+          required
+        />
+
+        <label for="country">{{register.country}}</label>
+        <select id="country" name="country" autocomplete="country-name" required>
+          <option value="">{{register.countryChoose}}</option>
+          {{raw.countryOptions}}
+        </select>
+
+        <div class="trap" aria-hidden="true">
+          <label for="website">Website</label>
+          <input
+            id="website"
+            name="website"
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-bwignore="true"
+            data-form-type="other"
+          />
+        </div>
+
+        <p class="hint">{{register.privacyBefore}} <a class="link" href="/privacy">{{register.privacyLink}}</a>.</p>
+        <button type="submit">{{register.submit}}</button>
+        <div class="secondary">
+          <a id="sign-in-link" class="link" href="/sign-in">{{register.signIn}}</a>
+        </div>
+      </form>
+
+      <form id="code-form" hidden novalidate>
+        <p id="code-sent" class="hint">{{register.codeSent}}</p>
+        <label for="code">{{code.label}}</label>
+        <input
+          id="code"
+          name="code"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          autocapitalize="none"
+          spellcheck="false"
+          maxlength="12"
+          required
+        />
+        <button type="submit">{{register.verify}}</button>
+        <div class="secondary">
+          <button type="button" id="resend" class="link" data-label="{{code.resend}}" disabled>{{code.resend}}</button>
+          <button type="button" id="change-details" class="link">{{register.changeDetails}}</button>
+        </div>
+      </form>
+
+      <p id="message" role="alert" aria-live="polite" hidden></p>
+    </main>
+
+    <script src="/account/assets/passkey-support.js" defer></script>
+    <script
+      src="/account/assets/register.js"
+      defer
+      data-return-url="{{returnUrl}}"
+      data-passkeys="{{passkeysEnabled}}"
+      data-error-email="{{error.email}}"
+      data-error-name="{{register.errorName}}"
+      data-error-country="{{register.errorCountry}}"
+      data-error-code="{{error.code}}"
+      data-error-limited="{{error.limited}}"
+      data-error-generic="{{error.generic}}"
+      data-resend-in="{{code.resendIn}}"
+    ></script>
+  </body>
+</html>

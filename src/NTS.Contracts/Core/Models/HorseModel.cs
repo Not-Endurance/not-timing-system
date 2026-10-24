@@ -15,7 +15,7 @@ public class HorseModel
         };
     }
 
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public string? FeiId { get; init; }
     public string Name { get; init; } = default!;
     public string? NameEnglish { get; init; }
