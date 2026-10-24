@@ -108,9 +108,14 @@ internal static class CoreAssertions
     {
         return entries
             .Select(entry =>
-                $"{entry.Number}:{entry.AthleteName}:{entry.HorseName}:{Format(entry.Fast)}:{Format(entry.Average)}:{Format(entry.Slow)}"
+                $"{entry.Number}:{entry.AthleteName}:{entry.HorseName}:{Flatten(entry.Fei)}:{Flatten(entry.Regional)}"
             )
             .ToArray();
+    }
+
+    static string Flatten(ArrivalEstimates estimates)
+    {
+        return $"{Format(estimates.Fast)}:{Format(estimates.Average)}:{Format(estimates.Slow)}";
     }
 
     static string Format(Timestamp? timestamp)

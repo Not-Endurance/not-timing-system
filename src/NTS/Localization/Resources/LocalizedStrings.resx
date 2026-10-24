@@ -1062,4 +1062,16 @@
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Are you sure you want to delete '{0}'?</value>
   </data>
+  <data name="Estimates_string" xml:space="preserve">
+    <value>Estimates</value>
+  </data>
+  <data name="FEI_string" xml:space="preserve">
+    <value>FEI</value>
+  </data>
+  <data name="Regional_string" xml:space="preserve">
+    <value>Regional</value>
+  </data>
+  <data name="Both_string" xml:space="preserve">
+    <value>Both</value>
+  </data>
 </root>
