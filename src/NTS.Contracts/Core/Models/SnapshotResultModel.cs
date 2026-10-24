@@ -13,9 +13,9 @@ public class SnapshotResultModel : IEventScoped, ISoftDeletableDocument, IKrudMo
         return model;
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public int EventId { get; set; }
+    public Guid EventId { get; set; }
     public CoreSnapshotModel Snapshot { get; set; } = default!;
     public SnapshotResultType Type { get; set; }
     public bool IsDeleted { get; set; }

@@ -15,6 +15,7 @@ public class NStorageBuilder
 {
     readonly IServiceCollection _services;
     readonly NApplicationBuilder _nApplicationBuilder;
+    static int _serializersRegistered;
 
     public NStorageBuilder(IServiceCollection services, IConfiguration configuration)
     {
@@ -30,7 +31,7 @@ public class NStorageBuilder
             new EnumRepresentationConvention(BsonType.String),
         };
         ConventionRegistry.Register("DefaultConventions", pack, t => true);
-        BsonSerializer.RegisterSerializer(typeof(DateTimeOffset), new DateTimeOffsetSerializer(BsonType.DateTime));
+        RegisterSerializers();
 
         _services.AddSingleton<IMongoContext, MongoContext>(x => new MongoContext(connectionString));
         _services.AddAsInterfaces(typeof(MongoRepository<>), ServiceLifetime.Transient, assembly);
@@ -41,5 +42,21 @@ public class NStorageBuilder
     {
         _nApplicationBuilder.AddHttp();
         return this;
+    }
+
+    /// <summary>
+    /// The driver keeps one serializer per type for the whole process and refuses a second registration,
+    /// so this runs once however many hosts are built. Every Guid, an <c>_id</c> included, is written as a
+    /// standard-representation BSON UUID (ADR-0009): nothing relies on the driver's default.
+    /// </summary>
+    static void RegisterSerializers()
+    {
+        if (Interlocked.Exchange(ref _serializersRegistered, 1) == 1)
+        {
+            return;
+        }
+
+        BsonSerializer.RegisterSerializer(typeof(DateTimeOffset), new DateTimeOffsetSerializer(BsonType.DateTime));
+        BsonSerializer.RegisterSerializer(typeof(Guid), new GuidSerializer(GuidRepresentation.Standard));
     }
 }

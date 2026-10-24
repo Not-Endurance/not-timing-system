@@ -1,59 +1,57 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
-using Not.Collections;
 using Not.Exceptions;
 using Not.Injection;
-using Not.Observables.Structures;
 using NTS.Application.UserSession;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
 namespace NoTiming.Ui.Features.Core.Dashboard;
 
+/// <summary>
+/// The snapshot page's service: the Participations that are still to be timed are a view over the store (ADR-0006),
+/// and the person's selection, the timestamps they capture and the history of what they sent are its own. It keeps the
+/// numbers of the selected Participations, never the Participations.
+/// </summary>
 public class SnapshotService
-    : NStatefulService<ObservableList<Participation>>,
+    : NStatefulService,
         ISnapshotService,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<InspectionRequired>,
-        INotificationHandler<RepresentationRequired>,
-        INotificationHandler<ParticipationEliminated>,
-        INotificationHandler<ParticipationRestored>,
         INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
         IScoped
 {
-    readonly Dictionary<int, Participation> _allParticipations = [];
     readonly List<SnapshotGroup> _history = [];
     readonly INtsSocketContext _socketContext;
-    readonly IEventScopedRepository<Participation> _participationReader;
-    readonly List<Participation> _participationsToSnapshot = [];
+    readonly IParticipationStore _store;
     readonly ISnapshotPublisher _snapshotPublisher;
     readonly object _snapshotSelectionPersistenceLock = new();
     readonly List<Snapshot> _snapshots = [];
     readonly IWitnessUserSession _userSessionService;
+    IReadOnlyList<Participation> _participations = [];
+    IReadOnlyList<Participation> _participationsToSnapshot = [];
     Task _snapshotSelectionPersistence = Task.CompletedTask;
 
     public SnapshotService(
         INtsSocketContext socketContext,
-        IEventScopedRepository<Participation> participationReader,
+        IParticipationStore store,
         IWitnessUserSession userSessionService,
         ISnapshotPublisher snapshotPublisher
     )
     {
         _socketContext = socketContext;
-        _participationReader = participationReader;
+        _store = store;
         _userSessionService = userSessionService;
         _snapshotPublisher = snapshotPublisher;
+        Observe(store, Rebuild);
     }
 
-    public ObservableList<Participation> Participations => State;
+    public IReadOnlyList<Participation> Participations => _participations;
     public IReadOnlyList<Participation> ParticipationsToSnapshot => _participationsToSnapshot;
     public IReadOnlyList<Snapshot> Snapshots => _snapshots;
     public IReadOnlyList<SnapshotGroup> History => _history;
@@ -65,26 +63,16 @@ public class SnapshotService
             return false;
         }
 
-        var participations = (await _participationReader.ReadMany(x => !x.IsComplete() && !x.IsEliminated())).ToList();
+        await _store.Load();
         var session = await _userSessionService.GetCurrent();
 
-        _allParticipations.Clear();
-        _participationsToSnapshot.Clear();
         _snapshots.Clear();
-        foreach (var participation in participations)
-        {
-            _allParticipations[participation.Combination.Number] = participation;
-        }
-
         _history.Clear();
         _history.AddRange(session?.GetSnapshotHistory() ?? []);
+        RestoreSnapshotSelections(session?.GetSnapshotSelections() ?? []);
+        BuildViews();
 
-        var selectedNumbers = RestoreSnapshotSelections(session?.GetSnapshotSelections() ?? []);
-        Participations.ClearAndAddRange(
-            participations.Where(participation => !selectedNumbers.Contains(participation.Combination.Number))
-        );
-
-        return Participations.Any() || _participationsToSnapshot.Any() || _history.Any();
+        return _participations.Any() || _participationsToSnapshot.Any() || _history.Any();
     }
 
     public void Capture(Snapshot snapshot)
@@ -97,12 +85,11 @@ public class SnapshotService
     {
         GuardHelper.ThrowIfDefault(participation);
 
-        if (_participationsToSnapshot.Any(x => x.Id == participation.Id))
+        if (_snapshots.Any(x => x.Number == participation.Combination.Number))
         {
             return;
         }
 
-        _participationsToSnapshot.Add(participation);
         _snapshots.Add(
             new Snapshot(
                 participation.Combination.Number,
@@ -111,9 +98,8 @@ public class SnapshotService
                 ruleset: participation.Competition.Ruleset
             )
         );
-        Participations.Remove(participation);
         QueueSnapshotSelectionPersistence();
-        EmitChanged();
+        Rebuild();
     }
 
     public void Remove(Snapshot snapshot)
@@ -127,7 +113,7 @@ public class SnapshotService
 
         FlushSnapshots([snapshot.Number]);
         QueueSnapshotSelectionPersistence();
-        EmitChanged();
+        Rebuild();
     }
 
     public async Task<bool> Publish(SnapshotType snapshotType)
@@ -145,7 +131,7 @@ public class SnapshotService
 
         _history.Add(snapshotGroup);
         FlushSnapshots(readySnapshots.Select(x => x.Number).ToHashSet());
-        EmitChanged();
+        Rebuild();
         return true;
     }
 
@@ -172,36 +158,6 @@ public class SnapshotService
         EmitChanged();
     }
 
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(InspectionRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(RepresentationRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.Remove);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
     public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
     {
         await ReloadState();
@@ -209,77 +165,57 @@ public class SnapshotService
 
     public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
     {
-        _allParticipations.Clear();
         _history.Clear();
-        _participationsToSnapshot.Clear();
         _snapshots.Clear();
-        Participations.Clear();
+        _participations = [];
+        _participationsToSnapshot = [];
         ClearState();
         return Task.CompletedTask;
     }
 
     void FlushSnapshots(HashSet<int> participationNumbers)
     {
-        if (participationNumbers.Count == 0)
-        {
-            return;
-        }
-
-        _participationsToSnapshot.RemoveAll(x => participationNumbers.Contains(x.Combination.Number));
         _snapshots.RemoveAll(x => participationNumbers.Contains(x.Number));
-
-        foreach (var number in participationNumbers)
-        {
-            if (
-                _allParticipations.TryGetValue(number, out var participation)
-                && Participations.All(x => x.Id != participation.Id)
-            )
-            {
-                Participations.AddOrReplace(participation);
-            }
-        }
     }
 
-    void Update(Participation participation, NCollectionAction action)
+    void Rebuild()
     {
-        var number = participation.Combination.Number;
-        switch (action)
-        {
-            case NCollectionAction.AddOrUpdate:
-                _allParticipations[number] = participation;
-                break;
-            case NCollectionAction.Remove:
-                _allParticipations.Remove(number);
-                break;
-        }
-
-        if (_participationsToSnapshot.Any(x => x.Combination.Number == number))
-        {
-            return;
-        }
-
-        Participations.Update(participation, action);
+        BuildViews();
+        EmitChanged();
     }
 
-    HashSet<int> RestoreSnapshotSelections(IReadOnlyList<Snapshot> snapshots)
+    /// <summary>The selectable list and the selected Participations, from the store as it is now.</summary>
+    void BuildViews()
     {
-        var selectedNumbers = new HashSet<int>();
+        var selected = _snapshots.Select(x => x.Number).ToHashSet();
+        _participations =
+        [
+            .. _store.Participations.Where(x =>
+                !x.IsComplete() && !x.IsEliminated() && !selected.Contains(x.Combination.Number)
+            ),
+        ];
+        _participationsToSnapshot =
+        [
+            .. _snapshots
+                .Select(x => _store.Participations.FirstOrDefault(y => y.Combination.Number == x.Number))
+                .OfType<Participation>(),
+        ];
+    }
+
+    void RestoreSnapshotSelections(IReadOnlyList<Snapshot> snapshots)
+    {
         foreach (var snapshot in snapshots)
         {
-            if (
-                selectedNumbers.Contains(snapshot.Number)
-                || !_allParticipations.TryGetValue(snapshot.Number, out var participation)
-            )
+            var stillToBeTimed = _store.Participations.Any(x =>
+                x.Combination.Number == snapshot.Number && !x.IsComplete() && !x.IsEliminated()
+            );
+            if (!stillToBeTimed || _snapshots.Any(x => x.Number == snapshot.Number))
             {
                 continue;
             }
 
-            selectedNumbers.Add(snapshot.Number);
-            _participationsToSnapshot.Add(participation);
             _snapshots.Add(CopySnapshot(snapshot));
         }
-
-        return selectedNumbers;
     }
 
     void QueueSnapshotSelectionPersistence()

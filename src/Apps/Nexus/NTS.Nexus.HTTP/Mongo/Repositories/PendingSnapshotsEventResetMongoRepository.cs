@@ -14,7 +14,7 @@ public class PendingSnapshotsEventResetMongoRepository : IEventResetRepository, 
         _context = context;
     }
 
-    public Task DeleteAllForEvent(int eventId)
+    public Task DeleteAllForEvent(Guid eventId)
     {
         return _context
             .Client.GetDatabase(MongoConstants.NTS_DATABASE)

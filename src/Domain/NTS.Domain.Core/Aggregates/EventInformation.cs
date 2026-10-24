@@ -11,7 +11,7 @@ public class EventInformation : Aggregate
         string? location,
         EventSpan eventSpan,
         string? feiShowId,
-        int id,
+        Guid id,
         bool isActive = true
     )
         : base(id)

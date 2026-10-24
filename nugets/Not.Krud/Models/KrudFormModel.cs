@@ -10,7 +10,7 @@ public abstract record KrudFormModel<T> : IKrudModel<T>, IKrudFormModel
 
     protected abstract T MapTo();
 
-    public int? Id { get; set; }
+    public Guid? Id { get; set; }
 
     public T MapToEntity()
     {

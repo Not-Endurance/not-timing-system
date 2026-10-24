@@ -23,7 +23,7 @@ public class PastEventDetailsContentBehind : NStatefulComponent
     protected Ranking? CurrentRanking => Service.CurrentRanking;
 
     [Parameter]
-    public int EventId { get; set; }
+    public Guid EventId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

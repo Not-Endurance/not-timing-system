@@ -5,7 +5,7 @@ namespace NTS.Domain.Setup.Aggregates;
 
 public class Horse : Aggregate, INamed, INtsDisplayable
 {
-    public Horse(string? name, string? nameEnglish, string? feiId, int? id = null)
+    public Horse(string? name, string? nameEnglish, string? feiId, Guid? id = null)
         : base(id)
     {
         Name = Required(nameof(Name), name);

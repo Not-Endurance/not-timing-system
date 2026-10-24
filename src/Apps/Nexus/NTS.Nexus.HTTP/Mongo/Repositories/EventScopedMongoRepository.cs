@@ -16,7 +16,7 @@ public abstract class EventScopedMongoRepository<T> : MongoRepository<T>, IEvent
         return x => x.Id == item.Id && x.EventId == item.EventId;
     }
 
-    public virtual Task DeleteAllForEvent(int eventId)
+    public virtual Task DeleteAllForEvent(Guid eventId)
     {
         return DeleteMany(x => x.EventId == eventId);
     }

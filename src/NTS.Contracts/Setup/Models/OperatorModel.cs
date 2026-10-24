@@ -16,7 +16,7 @@ public class OperatorModel
         };
     }
 
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public UserModel User { get; init; } = default!;
     public OfficialRole Role { get; init; } = OfficialRole.Steward;
 

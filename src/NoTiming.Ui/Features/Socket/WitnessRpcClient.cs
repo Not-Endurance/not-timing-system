@@ -3,13 +3,17 @@ using Not.Application.RPC;
 using Not.Application.RPC.Clients;
 using Not.Injection;
 using NoTiming.Ui.Features.Core.Dashboard;
-using NTS.Contracts.Features.Witness.Procedures;
-using NTS.Domain.Core.Objects.Payloads;
+using NTS.Contracts.Live;
 using NTS.Domain.Core.Objects.Snapshots;
+using ParticipationChangedEvent = NTS.Domain.Core.Events.ParticipationChanged;
 
 namespace NoTiming.Ui.Features.Socket;
 
-public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPublisher, IScoped
+/// <summary>
+/// What the Api sends a viewer (ADR-0013): that a Participation changed. The store reads it again; nothing the hub
+/// sends describes a Participation.
+/// </summary>
+public class WitnessRpcClient : RpcClient, ILiveClientProcedures, ISnapshotPublisher, IScoped
 {
     readonly IDomainEventDispatcher _domainEventDispatcher;
 
@@ -21,12 +25,7 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPu
 
     protected override void RegisterProcedures()
     {
-        RegisterInputProcedure<ParticipationArrived>(nameof(OnParticipationArrived), OnParticipationArrived);
-        RegisterInputProcedure<InspectionRequired>(nameof(OnInspectionRequired), OnInspectionRequired);
-        RegisterInputProcedure<RepresentationRequired>(nameof(OnRepresentationRequired), OnRepresentationRequired);
-        RegisterInputProcedure<PhaseCompleted>(nameof(OnPhaseCompleted), OnPhaseCompleted);
-        RegisterInputProcedure<ParticipationEliminated>(nameof(OnParticipationEliminated), OnParticipationEliminated);
-        RegisterInputProcedure<ParticipationRestored>(nameof(OnParticipationRestored), OnParticipationRestored);
+        RegisterInputProcedure<Guid, Guid>(nameof(ILiveClientProcedures.ParticipationChanged), ParticipationChanged);
     }
 
     public Task PublishSnapshotsAsync(SnapshotGroup snapshotGroup)
@@ -35,33 +34,31 @@ public class WitnessRpcClient : RpcClient, IWitnessClientProcedures, ISnapshotPu
         throw new NotSupportedException("Snapshots cannot be sent until the server records them.");
     }
 
-    public Task OnPhaseCompleted(PhaseCompleted payload)
+    /// <summary>
+    /// Returns at once. The socket awaits a handler before it takes the next message, so a handler that waited for the
+    /// read would put a burst of changes behind one read after another. The store reads each Participation once at a
+    /// time, and a failure is reported through the error event of the socket.
+    /// </summary>
+    public Task ParticipationChanged(Guid eventId, Guid participationId)
     {
-        return _domainEventDispatcher.Dispatch(payload);
+        _ = DispatchAsync(new ParticipationChangedEvent(eventId, participationId));
+        return Task.CompletedTask;
     }
 
-    public Task OnParticipationArrived(ParticipationArrived payload)
+    async Task DispatchAsync(ParticipationChangedEvent change)
     {
-        return _domainEventDispatcher.Dispatch(payload);
-    }
-
-    public Task OnInspectionRequired(InspectionRequired payload)
-    {
-        return _domainEventDispatcher.Dispatch(payload);
-    }
-
-    public Task OnRepresentationRequired(RepresentationRequired payload)
-    {
-        return _domainEventDispatcher.Dispatch(payload);
-    }
-
-    public Task OnParticipationEliminated(ParticipationEliminated payload)
-    {
-        return _domainEventDispatcher.Dispatch(payload);
-    }
-
-    public Task OnParticipationRestored(ParticipationRestored payload)
-    {
-        return _domainEventDispatcher.Dispatch(payload);
+        try
+        {
+            await _domainEventDispatcher.Dispatch(change);
+        }
+        catch (Exception exception)
+        {
+            Socket.RaiseError(
+                exception,
+                nameof(ILiveClientProcedures.ParticipationChanged),
+                change.EventId,
+                change.ParticipationId
+            );
+        }
     }
 }

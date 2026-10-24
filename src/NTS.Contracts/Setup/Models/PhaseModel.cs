@@ -22,7 +22,7 @@ public class PhaseModel
         };
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int Recovery { get; init; }
     public LoopModel Loop { get; init; } = default!;
     public int? Rest { get; init; }

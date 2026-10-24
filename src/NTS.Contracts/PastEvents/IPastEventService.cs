@@ -12,7 +12,7 @@ public interface IPastEventService : IPastEventContext
     IReadOnlyDictionary<int, IReadOnlyList<Starter>> StartlistHistoryByStage { get; }
     ResultsDocument? Document { get; }
 
-    Task LoadEvent(int eventId);
+    Task LoadEvent(Guid eventId);
     ResultsDocument? CreateDocument(Ranking ranking);
     void Select(Ranking ranking);
 }

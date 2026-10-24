@@ -8,5 +8,5 @@ public interface IActiveEventsContext : IStatefulService
 {
     bool IsActive(ConfigureEvent configureEvent);
     void Add(EventInformation eventInformation);
-    void Remove(int eventId);
+    void Remove(Guid eventId);
 }

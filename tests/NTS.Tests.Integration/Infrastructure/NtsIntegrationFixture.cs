@@ -12,6 +12,12 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
     NexusHttpProcess? _nexusHttp;
     ApiFactory? _api;
 
+    /// <summary>The services of the Api, for a test that stands in for what the Api does after a write.</summary>
+    internal IServiceProvider ApiServices =>
+        _api?.Services ?? throw new InvalidOperationException("The Api is not started.");
+
+    public string MongoConnectionString =>
+        _mongo?.GetConnectionString() ?? throw new InvalidOperationException("MongoDB is not started.");
     public Uri NexusBaseUrl => _nexusHttp?.BaseUrl ?? throw new InvalidOperationException("Nexus HTTP is not started.");
     public Uri ApiBaseUrl => _api?.BaseAddress ?? throw new InvalidOperationException("The Api is not started.");
 
@@ -21,10 +27,22 @@ public sealed class NtsIntegrationFixture : IAsyncLifetime
         _mongo = new MongoDbBuilder().WithImage("mongo:6.0").Build();
         await _mongo.StartAsync();
 
-        _nexusHttp = new NexusHttpProcess(paths, PortAllocator.GetFreeTcpPort(), _mongo.GetConnectionString());
-        await _nexusHttp.Start();
+        _nexusHttp = await PortAllocator.StartOnAFreePort(async port =>
+        {
+            var host = new NexusHttpProcess(paths, port, _mongo.GetConnectionString());
+            try
+            {
+                await host.Start();
+                return host;
+            }
+            catch
+            {
+                await host.DisposeAsync();
+                throw;
+            }
+        });
 
-        _api = new ApiFactory(kestrel: true);
+        _api = new ApiFactory(_mongo.GetConnectionString(), kestrel: true);
         _ = _api.BaseAddress; // starts the host
     }
 

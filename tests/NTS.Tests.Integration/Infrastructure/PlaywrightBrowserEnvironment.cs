@@ -23,6 +23,19 @@ internal static class PlaywrightBrowserEnvironment
         }
     }
 
+    /// <summary>
+    /// Points this process at the browsers, for a test that drives Chromium itself (the passkey ceremonies) instead of
+    /// starting a process that does.
+    /// </summary>
+    public static void ConfigureCurrentProcess(RepositoryPaths paths)
+    {
+        var resolution = Resolve(paths);
+        if (resolution.BrowsersPath != null)
+        {
+            Environment.SetEnvironmentVariable(PLAYWRIGHT_BROWSERS_PATH, resolution.BrowsersPath);
+        }
+    }
+
     static Resolution Resolve(RepositoryPaths paths)
     {
         var explicitPath = Environment.GetEnvironmentVariable(NTS_INTEGRATION_PLAYWRIGHT_BROWSERS_PATH);

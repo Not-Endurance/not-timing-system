@@ -4,6 +4,10 @@ using NTS.Domain.Core.Aggregates;
 
 namespace NTS.Contracts.Core.Models;
 
+/// <summary>
+/// A stored Handout: its id, its Event and the id of its Participation. The Participation id is a top-level field so
+/// that the Handouts of a Participation are found by a filter the server applies (ADR-0006).
+/// </summary>
 public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Handout>
 {
     public static HandoutModel From(Handout handout)
@@ -13,10 +17,10 @@ public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Han
         return model;
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public int EventId { get; set; }
-    public ParticipationModel Participation { get; set; } = default!;
+    public Guid EventId { get; set; }
+    public Guid ParticipationId { get; set; }
     public bool IsDeleted { get; set; }
     public int? DeletedVersion { get; set; }
 
@@ -24,11 +28,11 @@ public class HandoutModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Han
     {
         Id = handout.Id;
         EventId = handout.EventId;
-        Participation = ParticipationModel.MapFrom(handout.Entries.Single().Participation);
+        ParticipationId = handout.ParticipationId;
     }
 
     public Handout MapToEntity()
     {
-        return new Handout(Participation.MapToEntity(), Id);
+        return new Handout(EventId, ParticipationId, Id);
     }
 }

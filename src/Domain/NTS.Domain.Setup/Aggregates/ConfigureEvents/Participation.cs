@@ -11,7 +11,7 @@ public class Participation : Entity, IKurdMirror<Combination>
         DateTimeOffset? startTimeOverride,
         double? maxSpeedOverride,
         double? minSpeedOverride,
-        int? id = null
+        Guid? id = null
     )
         : base(id)
     {

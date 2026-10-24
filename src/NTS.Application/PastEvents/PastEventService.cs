@@ -21,6 +21,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
     readonly IRepository<Ranking> _rankingRepository;
     readonly IRepository<Official> _officialRepository;
     readonly List<EventInformation> _pastEvents = [];
+    IReadOnlyList<Participation> _eventParticipations = [];
     IReadOnlyList<Ranking> _rankings = [];
     IReadOnlyList<Official> _officials = [];
     Startlist? _startlist;
@@ -41,7 +42,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
 
     public IReadOnlyList<EventInformation> Events => _pastEvents.AsReadOnly();
     public EventInformation? Event { get; private set; }
-    public int EventId =>
+    public Guid EventId =>
         Event?.Id ?? throw GuardHelper.Exception("Cannot read past-event data before selecting a past event.");
     public IReadOnlyList<Ranking> Rankings => _rankings;
     public Ranking? CurrentRanking => _currentRanking;
@@ -58,7 +59,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
         return true;
     }
 
-    public async Task LoadEvent(int eventId)
+    public async Task LoadEvent(Guid eventId)
     {
         await Load();
 
@@ -76,9 +77,10 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
         }
 
         var selectedEventId = EventId;
-        var participations = await _participations.ReadMany(x => x.EventId == selectedEventId);
+        var participations = (await _participations.ReadMany(x => x.EventId == selectedEventId)).ToList();
         _rankings = (await _rankingRepository.ReadMany(x => x.EventId == selectedEventId)).ToList();
         _officials = (await _officialRepository.ReadMany(x => x.EventId == selectedEventId)).ToList();
+        _eventParticipations = participations;
         _startlist = new Startlist(participations);
         _currentRanking = _rankings.FirstOrDefault();
         EmitChanged();
@@ -92,7 +94,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
 
     public ResultsDocument? CreateDocument(Ranking ranking)
     {
-        return Event == null ? null : new ResultsDocument(new Result(ranking), Event, _officials);
+        return Event == null ? null : new ResultsDocument(new Result(ranking, _eventParticipations), Event, _officials);
     }
 
     public async Task<IEnumerable<EventInformation>> ReadMany()
@@ -118,6 +120,7 @@ public class PastEventService : NStatefulService, IPastEventService, IKrudListBe
 
     void ClearEventState()
     {
+        _eventParticipations = [];
         _rankings = [];
         _officials = [];
         _startlist = null;

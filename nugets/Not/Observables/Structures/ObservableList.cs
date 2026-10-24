@@ -10,7 +10,7 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
     where T : IIdentifiable
 {
     readonly object _lock = new();
-    readonly Dictionary<int, T> _dictionary = [];
+    readonly Dictionary<Guid, T> _dictionary = [];
     Event _changed = new();
 
     public ObservableList() { }
@@ -68,7 +68,7 @@ public class ObservableList<T> : IReadOnlyList<T>, IObservable
         }
     }
 
-    public bool Remove(int id)
+    public bool Remove(Guid id)
     {
         lock (_lock)
         {

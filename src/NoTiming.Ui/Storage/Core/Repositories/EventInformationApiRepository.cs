@@ -35,7 +35,7 @@ public class EventInformationApiRepository
         return models.Select(x => MapEntity(x)!);
     }
 
-    public async Task<EventInformation> Start(int configureEventId)
+    public async Task<EventInformation> Start(Guid configureEventId)
     {
         var result = await Client.Post<EventInformationModel>(
             $"{Endpoint}/{configureEventId}/start",

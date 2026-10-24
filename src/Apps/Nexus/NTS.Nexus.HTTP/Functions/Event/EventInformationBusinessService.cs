@@ -20,8 +20,8 @@ public interface IEventInformationBusinessService
 {
     Task<IEnumerable<CoreEventInformationModel>> ReadActive();
     Task<IEnumerable<CoreEventInformationModel>> ReadPast();
-    Task<CoreEventInformationModel> Start(int configureEventId);
-    Task Deactivate(int eventInformationId);
+    Task<CoreEventInformationModel> Start(Guid configureEventId);
+    Task Deactivate(Guid eventInformationId);
 }
 
 public class EventInformationBusinessService : IEventInformationBusinessService, ITransient
@@ -50,7 +50,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         _rankings = rankings;
     }
 
-    public async Task<CoreEventInformationModel> Start(int configureEventId)
+    public async Task<CoreEventInformationModel> Start(Guid configureEventId)
     {
         await EnsureEventInformationNotStarted(configureEventId);
 
@@ -109,7 +109,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         return items.OrderByDescending(x => x.EndDay);
     }
 
-    public async Task Deactivate(int eventInformationId)
+    public async Task Deactivate(Guid eventInformationId)
     {
         var eventInformation = await _eventInformation.Read(eventInformationId);
         if (eventInformation == null)
@@ -154,14 +154,14 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
         return validationBuilder.ToString().TrimEnd();
     }
 
-    async Task<Domain.Setup.Aggregates.ConfigureEvent> GetSetupEvent(int configureEventId)
+    async Task<Domain.Setup.Aggregates.ConfigureEvent> GetSetupEvent(Guid configureEventId)
     {
         var configureEvent = await _configureEvents.Read(configureEventId);
         return configureEvent?.MapToEntity()
             ?? throw GuardHelper.Exception($"Event with id '{configureEventId}' is not selected");
     }
 
-    async Task EnsureEventInformationNotStarted(int configureEventId)
+    async Task EnsureEventInformationNotStarted(Guid configureEventId)
     {
         var existing = await _eventInformation.Read(configureEventId);
         if (existing != null)
@@ -199,7 +199,7 @@ public class EventInformationBusinessService : IEventInformationBusinessService,
     static Ranking CreateRanking(
         Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
         KeyValuePair<ParticipationCategory, List<RankingEntry>> entriesByCategory,
-        int eventId
+        Guid eventId
     )
     {
         return new Ranking(

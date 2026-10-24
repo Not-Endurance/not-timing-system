@@ -7,11 +7,11 @@ namespace NTS.Contracts.Watcher.Models;
 public class PendingSnapshotsModel : IIdentifiable
 {
     [BsonIgnore]
-    public int Id => default;
+    public Guid Id => default;
 
     [BsonId]
     public ObjectId MongoId { get; set; }
 
-    public int EventId { get; set; }
+    public Guid EventId { get; set; }
     public SnapshotGroupModel[] SnapshotGroups { get; set; } = [];
 }

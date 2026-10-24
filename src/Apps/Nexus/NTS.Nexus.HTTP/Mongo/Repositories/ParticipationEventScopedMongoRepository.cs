@@ -31,7 +31,6 @@ public class ParticipationEventScopedMongoRepository : EventScopedMongoRepositor
                 .Set(x => x.Competition, document.Competition)
                 .Set(x => x.Combination, document.Combination)
                 .Set(x => x.Phases, document.Phases)
-                .Set(x => x.Total, document.Total)
                 .Set(x => x.EventId, document.EventId)
                 .Set(x => x.Eliminated, document.Eliminated);
         }

@@ -1,6 +1,5 @@
 ﻿using Not.Domain.Abstractions;
 using Not.Extensions;
-using Not.Objects;
 
 namespace Not.Domain;
 
@@ -10,12 +9,12 @@ public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity
     /// Provide <paramref name="id"/> when updating state null to generate it
     /// </summary>
     /// <param name="id">Id, generated when null</param>
-    protected Entity(int? id)
+    protected Entity(Guid? id)
     {
-        Id = id ?? DomainModelHelper.GenerateId();
+        Id = id ?? Guid.NewGuid();
     }
 
-    public int Id { get; }
+    public Guid Id { get; }
 
     protected string Combine(params object?[] values)
     {
@@ -46,11 +45,7 @@ public abstract class Entity : InLineEntityValidator, IEntity, IEquatable<Entity
 
     bool IsEqual(object? other)
     {
-        if (other is null or not Entity)
-        {
-            return false;
-        }
-        return ObjectHelper.AreEqual(this, other);
+        return other is Entity entity && entity.GetType() == GetType() && entity.Id == Id;
     }
 
     public static bool operator ==(Entity? left, Entity? right)

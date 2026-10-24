@@ -15,7 +15,7 @@ public static class ParticipationAndRankingFactory
     ) Create(
         Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
         IEnumerable<Participation> existingParticipations,
-        int eventId
+        Guid eventId
     )
     {
         if (setupCompetition.Phases.Count == 0)
@@ -40,7 +40,7 @@ public static class ParticipationAndRankingFactory
             if (existingParticipations.All(p => p.Combination.Number != participation.Combination.Number))
             {
                 participations.Add(participation);
-                var rankingEntry = new RankingEntry(participation, null, setupParticipation.IsNotRanked);
+                var rankingEntry = new RankingEntry(participation.Id, setupParticipation.IsNotRanked);
                 AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
             }
             else
@@ -50,7 +50,7 @@ public static class ParticipationAndRankingFactory
                     .Find(p => p.Combination.Number == participation.Combination.Number);
                 if (participationRef != null)
                 {
-                    var rankingEntry = new RankingEntry(participationRef, null, setupParticipation.IsNotRanked);
+                    var rankingEntry = new RankingEntry(participationRef.Id, setupParticipation.IsNotRanked);
                     AddRanking(rankingEntriesByCategory, setupParticipation.Category, rankingEntry);
                 }
             }
@@ -61,7 +61,7 @@ public static class ParticipationAndRankingFactory
     public static Participation CreateParticipation(
         Domain.Setup.Aggregates.ConfigureEvents.Competition setupCompetition,
         Domain.Setup.Aggregates.ConfigureEvents.Participation setupParticipation,
-        int eventId
+        Guid eventId
     )
     {
         var phases = CreatePhases(setupCompetition, setupParticipation);

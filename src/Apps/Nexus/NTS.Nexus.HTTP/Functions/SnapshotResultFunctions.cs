@@ -42,8 +42,8 @@ public class SnapshotResultFunctions : CrudFunctions<SnapshotResultModel>
 
     [Function("snapshot-results-delete")]
     public async Task<IActionResult> Delete(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "snapshot-results/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "snapshot-results/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Delete));
@@ -65,8 +65,8 @@ public class SnapshotResultFunctions : CrudFunctions<SnapshotResultModel>
 
     [Function("snapshot-results-read")]
     public async Task<IActionResult> Read(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "snapshot-results/{id:int}")] HttpRequest request,
-        int id
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "snapshot-results/{id:guid}")] HttpRequest request,
+        Guid id
     )
     {
         using var activity = StartFunctionActivity(nameof(Read));

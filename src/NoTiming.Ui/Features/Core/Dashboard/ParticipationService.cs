@@ -1,122 +1,77 @@
 using MediatR;
 using Not.Application.Behinds.Adapters;
-using Not.Collections;
 using Not.Injection;
-using Not.Observables.Structures;
 using NTS.Contracts.Core;
-using NTS.Contracts.Core.Models;
-using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Events;
-using NTS.Domain.Core.Objects.Payloads;
 
 namespace NoTiming.Ui.Features.Core.Dashboard;
 
+/// <summary>
+/// What the dashboard pages share: the Participations that are still to be timed, as a view over the store (ADR-0006),
+/// and the one the person selected, which is page state and stays here.
+/// </summary>
 public class ParticipationService
-    : NStatefulService<ObservableList<Participation>>,
+    : NStatefulService,
         IParticipationContext,
-        INotificationHandler<PhaseCompleted>,
-        INotificationHandler<InspectionRequired>,
-        INotificationHandler<RepresentationRequired>,
-        INotificationHandler<ParticipationEliminated>,
-        INotificationHandler<ParticipationRestored>,
-        INotificationHandler<EventConnected>,
         INotificationHandler<EventDisconnected>,
         IScoped
 {
-    readonly IEventScopedRepository<Participation> _participationReader;
-    readonly INtsSocketContext? _socketContext;
-    Participation? _selected;
+    readonly IParticipationStore _store;
+    Guid? _selected;
 
-    public ParticipationService(IEventScopedRepository<Participation> participationReader)
-        : this(participationReader, null) { }
-
-    public ParticipationService(
-        IEventScopedRepository<Participation> participationReader,
-        INtsSocketContext? socketContext
-    )
+    public ParticipationService(IParticipationStore store)
     {
-        _participationReader = participationReader;
-        _socketContext = socketContext;
+        _store = store;
+        Observe(store, Rebuild);
     }
 
     public Participation? Selected
     {
-        get => _selected;
+        get => _selected is { } id ? _store.Find(id) : null;
         set
         {
-            _selected = value;
+            _selected = value?.Id;
             EmitChanged();
         }
     }
 
-    public IReadOnlyList<Participation> Participations => State;
+    public IReadOnlyList<Participation> Participations { get; private set; } = [];
     public IReadOnlyList<int> RecentlyTimed { get; } = [];
 
     protected override async Task<bool> InitializeState()
     {
-        if (_socketContext?.Event == null && _socketContext != null)
-        {
-            State.Clear();
-            return false;
-        }
-
-        var participations = await _participationReader.ReadMany(x => !x.IsComplete() && !x.IsEliminated());
-        State.ClearAndAddRange(participations);
-        return State.Any();
-    }
-
-    public Task Handle(PhaseCompleted notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(InspectionRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(RepresentationRequired notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationEliminated notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.Remove);
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ParticipationRestored notification, CancellationToken cancellationToken)
-    {
-        Update(notification.Participation, NCollectionAction.AddOrUpdate);
-        return Task.CompletedTask;
-    }
-
-    public async Task Handle(EventConnected notification, CancellationToken cancellationToken)
-    {
-        await ReloadState();
+        await _store.Load();
+        Participations = Active();
+        return Participations.Any();
     }
 
     public Task Handle(EventDisconnected notification, CancellationToken cancellationToken)
     {
         _selected = null;
-        State.Clear();
+        Participations = [];
         ClearState();
         return Task.CompletedTask;
     }
 
-    void Update(Participation participation, NCollectionAction action)
+    void Rebuild()
     {
-        State.Update(participation, action);
-        if (_selected == null)
+        Participations = Active();
+        if (_selected is { } id && IsGone(_store.Find(id)))
         {
-            return;
+            _selected = null; // an eliminated Participation is not selected any more, nor again when it is restored
         }
 
-        _selected = State.FirstOrDefault(x => x.Id == _selected.Id);
+        EmitChanged();
+    }
+
+    IReadOnlyList<Participation> Active()
+    {
+        return [.. _store.Participations.Where(x => !x.IsComplete() && !x.IsEliminated())];
+    }
+
+    static bool IsGone(Participation? participation)
+    {
+        return participation is null || participation.IsEliminated();
     }
 }

@@ -29,15 +29,15 @@ public sealed class OperatorTests
     [Fact]
     public void Core_operator_requires_user_id()
     {
-        Assert.Throws<DomainPropertyException>(() => new CoreOperator(eventId: 1, userId: null));
+        Assert.Throws<DomainPropertyException>(() => new CoreOperator(eventId: TestId.Of(1), userId: null));
     }
 
     [Fact]
     public void Configure_event_keeps_operators_separate_from_officials()
     {
-        var country = new Country(1, "Bulgaria", "BG", "BUL", "bg-BG");
-        var official = new Official("Ground Jury", null, OfficialRole.GroundJury, id: 101);
-        var @operator = new SetupOperator(CreateUser(), id: 201);
+        var country = new Country(TestId.Of(1), "Bulgaria", "BG", "BUL", "bg-BG");
+        var official = new Official("Ground Jury", null, OfficialRole.GroundJury, id: TestId.Of(101));
+        var @operator = new SetupOperator(CreateUser(), id: TestId.Of(201));
 
         var setupEvent = new ConfigureEvent(
             "Event",
@@ -48,7 +48,7 @@ public sealed class OperatorTests
             [official],
             [],
             [],
-            id: 301,
+            id: TestId.Of(301),
             operators: [@operator]
         );
 
@@ -58,6 +58,6 @@ public sealed class OperatorTests
 
     static User CreateUser()
     {
-        return new User("operator@example.test", "Operator User", id: 11);
+        return new User("operator@example.test", "Operator User", id: TestId.Of(11));
     }
 }

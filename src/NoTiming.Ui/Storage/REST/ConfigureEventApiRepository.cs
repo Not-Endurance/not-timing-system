@@ -28,7 +28,7 @@ public class ConfigureEventApiRepository : ApiRepository<ConfigureEvent, Configu
 
     Task DispatchUpdated(ConfigureEvent item)
     {
-        if (item.Id <= 0)
+        if (item.Id == Guid.Empty)
         {
             return Task.CompletedTask;
         }

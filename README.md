@@ -6,7 +6,7 @@ NoTiming is one web platform. `NoTiming.Api`, an ASP.NET Core host, serves `NoTi
 
 ## Prerequisites
 - .NET 10 SDK. The shared libraries still target .NET 8 and build with it; the Functions API runs on the .NET 8 runtime.
-- Docker, for the Functions API's MongoDB and Azurite.
+- Docker, for MongoDB (the Api keeps its users and their sessions there, the Functions API its data) and Azurite.
 
 ## Debug
 1. Start the legacy API and its storage (execute in the project root):
@@ -18,6 +18,7 @@ NoTiming is one web platform. `NoTiming.Api`, an ASP.NET Core host, serves `NoTi
    dotnet run --project src/NoTiming.Api --launch-profile Development
    ```
 3. Open http://localhost:11337
+4. To sign in, open `/sign-in`. In Development the Api has no mailbox to send to: it prints the email, with its six-digit code, in the log of `dotnet run`. The session cookie is Secure; Chrome and Firefox keep it on `http://localhost`, and for Safari use https://localhost:61380.
 
 ## Publish
 `dotnet publish src/NoTiming.Api -c Release` also publishes the Ui and ships it as the Api's `wwwroot`. Pass `-p:WasmApplicationEnvironmentName=Staging` (or `Production`): .NET 10 bakes the Blazor environment into the build, and without it the Ui loads the Production settings.
@@ -34,5 +35,5 @@ Read [CONTEXT.md](CONTEXT.md) for the language of the domain and `docs/adr` for 
 - `src/NTS.Contracts` holds the models and interfaces both hosts share. `src/NTS` holds the localization.
 - `src/NTS.Application` is the application layer the Functions API still uses; it moves into the hosts when that API is retired.
 - `src/Apps/Nexus/NTS.Nexus.HTTP` is the legacy Azure Functions API.
-- `nugets` holds the `Not.*` libraries: generic infrastructure and components, free of business logic.
+- `nugets` holds the `Not.*` libraries: generic infrastructure and components, free of business logic. `Not.Identity` is the one that targets .NET 10: ASP.NET Core Identity over the existing user documents, the server-side session and the one-time codes (ADR-0002).
 - `tests` holds the unit tests and the integration tests (see `tests/NTS.Tests.Integration/README.md`).

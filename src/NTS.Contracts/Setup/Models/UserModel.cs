@@ -18,7 +18,7 @@ public class UserModel : IDocument, IKrudModel<User>
 
     string? _name;
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
     public string Email { get; set; } = default!;
     public string Name

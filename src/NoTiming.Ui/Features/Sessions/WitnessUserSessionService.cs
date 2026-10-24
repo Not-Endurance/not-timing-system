@@ -10,7 +10,7 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
 {
     readonly INUserSession _nUserSessionService;
     readonly INtsUserSessionRepository _userSessions;
-    int? _eventId;
+    Guid? _eventId;
 
     public WitnessUserSessionService(INUserSession nUserSessionService, INtsUserSessionRepository userSessions)
     {
@@ -34,7 +34,7 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
         return (await _userSessions.ReadByUserIdentifier(userSession.UserIdentifier, _eventId.Value))?.State?.Copy();
     }
 
-    public async Task SetEventId(int? eventId)
+    public async Task SetEventId(Guid? eventId)
     {
         if (eventId == null)
         {
@@ -135,7 +135,7 @@ public class WitnessUserSessionService : IWitnessUserSession, IScoped
 
     static NtsUserSessionModel CreateSession(
         INUserSessionModel userSession,
-        int eventId,
+        Guid eventId,
         NtsUserSessionStateModel? state
     )
     {

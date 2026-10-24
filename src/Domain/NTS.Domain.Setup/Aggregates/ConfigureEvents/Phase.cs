@@ -6,7 +6,7 @@ namespace NTS.Domain.Setup.Aggregates.ConfigureEvents;
 
 public class Phase : Entity, IKurdMirror<Loop>, IIdentifiable
 {
-    public Phase(Loop? loop, int? recovery, int? rest, int? id = null, bool isCompulsoryInspectionRequired = false)
+    public Phase(Loop? loop, int? recovery, int? rest, Guid? id = null, bool isCompulsoryInspectionRequired = false)
         : base(id)
     {
         Loop = Required(nameof(Loop), loop);

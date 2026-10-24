@@ -14,9 +14,9 @@ public class RankingModel : IEventScoped, ISoftDeletableDocument, IKrudModel<Ran
         return model;
     }
 
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string TenantId { get; set; } = StorageConstants.DEFAULT_TENANT;
-    public int EventId { get; set; }
+    public Guid EventId { get; set; }
     public string Name { get; set; } = default!;
     public CompetitionRuleset Ruleset { get; set; }
     public ParticipationCategory Category { get; set; }

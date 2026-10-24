@@ -5,7 +5,7 @@ namespace NTS.Nexus.HTTP.Functions.Event;
 
 public interface IEventInformationResetService
 {
-    Task Reset(int eventId);
+    Task Reset(Guid eventId);
 }
 
 public class EventInformationResetService : IEventInformationResetService, ITransient
@@ -17,7 +17,7 @@ public class EventInformationResetService : IEventInformationResetService, ITran
         _repositories = repositories;
     }
 
-    public async Task Reset(int eventId)
+    public async Task Reset(Guid eventId)
     {
         foreach (var repository in _repositories)
         {
