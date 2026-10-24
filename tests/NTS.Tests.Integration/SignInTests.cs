@@ -498,15 +498,15 @@ public sealed class SignInTests : IClassFixture<MongoFixture>
 
         var english = await client.GetStringAsync("/sign-in");
         var bulgarian = await PageAsync(client, "/sign-in", "bg-BG,bg;q=0.9,en;q=0.8");
-        var turkish = await PageAsync(client, "/sign-in?lang=tr", "bg");
+        var notSpoken = await PageAsync(client, "/sign-in?lang=tr", "bg");
         var unsupported = await PageAsync(client, "/sign-in", "de-DE,de;q=0.9");
 
         Assert.Contains("<html lang=\"en\">", english);
         Assert.Contains("Send me a code", english);
         Assert.Contains("<html lang=\"bg\">", bulgarian);
         Assert.Contains("Изпрати ми код", bulgarian);
-        Assert.Contains("<html lang=\"tr\">", turkish);
-        Assert.Contains("Bana kod gönder", turkish);
+        Assert.Contains("<html lang=\"bg\">", notSpoken); // a language the page does not speak, asked for, leaves the language of the browser
+        Assert.Contains("Изпрати ми код", notSpoken);
         Assert.Contains("<html lang=\"en\">", unsupported);
     }
 

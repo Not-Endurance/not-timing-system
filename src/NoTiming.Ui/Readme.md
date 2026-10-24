@@ -42,7 +42,7 @@ nothing about it). When it was written down the app was **8.29 MB over 180 files
 (#646) it is **8.37 MB over 183 files**; the budget is a **ceiling of 9 MB**. A change that raises
 the size past it raises it on purpose, and raises the ceiling in the test, here and in the ticket.
 
-- `BlazorWebAssemblyLoadAllGlobalizationData` is on. A person who chooses Bulgarian or Turkish changes the culture of the app
+- `BlazorWebAssemblyLoadAllGlobalizationData` is on. A person who chooses Bulgarian changes the culture of the app
   when it starts, which Blazor refuses with the globalization data that comes with the runtime (it has English and a few
   other languages); the full data costs about 0.2 MB more than that.
 - What the app carries that a viewer does not need, and the first things to take out: the MongoDB driver (0.8 MB), OData (1.1

@@ -140,12 +140,12 @@ public sealed class ParticipantServiceTests : IClassFixture<MongoFixture>
         var inBulgarian = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
         CultureInfo.CurrentUICulture = new CultureInfo("en-GB");
         var inEnglish = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
-        CultureInfo.CurrentUICulture = new CultureInfo("tr");
-        var inTurkish = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
+        CultureInfo.CurrentUICulture = new CultureInfo("de");
+        var inGerman = await service.Search(ParticipantKind.Athlete, $"{latin}ov", 1, CancellationToken.None);
 
         Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inBulgarian.Items).DisplayName);
         Assert.Equal($"Ivan {latin}ov", Assert.Single(inEnglish.Items).DisplayName);
-        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inTurkish.Items).DisplayName); // as it was registered, where the language is not English
+        Assert.Equal($"Иван {cyrillic}ов", Assert.Single(inGerman.Items).DisplayName); // as it was registered, where the language is not English
     }
 
     [Theory]

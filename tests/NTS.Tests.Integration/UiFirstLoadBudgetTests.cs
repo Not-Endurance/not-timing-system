@@ -17,7 +17,7 @@ public sealed class UiFirstLoadBudgetTests
 {
     /// <summary>
     /// Measured at 8.29 MB (Brotli, 180 files, 28.3 MB as they are) when it was written down: 6.8 MB of assemblies, 0.9 MB of
-    /// runtime, 0.3 MB of the globalization data that the choice of Bulgarian or Turkish needs, and 0.2 MB of scripts and styles.
+    /// runtime, 0.3 MB of the globalization data that the choice of Bulgarian needs, and 0.2 MB of scripts and styles.
     /// </summary>
     const long BUDGET_BYTES = 9 * 1024 * 1024;
 

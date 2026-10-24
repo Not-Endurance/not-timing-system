@@ -915,7 +915,6 @@ public sealed class ParticipationsBrowserTests : IClassFixture<ApiHostFixture>, 
 
     [Theory]
     [InlineData("bg-BG", "Участия", "Моите участия", "Търси", "Участия")]
-    [InlineData("tr-TR", "Katılımlar", "Katılımlarım", "Ara", "Katılımlar")]
     public async Task The_text_is_in_the_language_of_the_browser(
         string locale,
         string group,

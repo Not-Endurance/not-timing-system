@@ -251,10 +251,9 @@ namespace NTS.Localization
         public static string Performance_string => LocalizeString(nameof(Performance_string));
         public static string Resend_string => LocalizeString(nameof(Resend_string));
         public static string Vetin_string => LocalizeString(nameof(Vetin_string));
-        public static string Participant_string => LocalizeString(nameof(Participant_string));
         public static string Send_snapshot_string => LocalizeString(nameof(Send_snapshot_string));
-        public static string Select_participants_to_snapshot_string =>
-            LocalizeString(nameof(Select_participants_to_snapshot_string));
+        public static string Select_participations_to_snapshot_string =>
+            LocalizeString(nameof(Select_participations_to_snapshot_string));
         public static string Edit_timestamp_string => LocalizeString(nameof(Edit_timestamp_string));
         public static string Timestamp_string => LocalizeString(nameof(Timestamp_string));
         public static string Save_string => LocalizeString(nameof(Save_string));

@@ -12,7 +12,7 @@ public sealed class BrowserLanguagePreferenceTests
 {
     [Theory]
     [InlineData("bg", "bg")]
-    [InlineData("TR", "tr")]
+    [InlineData("BG", "bg")]
     [InlineData(" en ", "en")]
     public async Task A_language_that_is_chosen_is_written_to_the_storage_of_the_browser(string chosen, string written)
     {
@@ -27,6 +27,7 @@ public sealed class BrowserLanguagePreferenceTests
 
     [Theory]
     [InlineData("fr")]
+    [InlineData("tr")]
     [InlineData("")]
     [InlineData("bg-BG")]
     public async Task A_language_the_app_is_not_written_in_is_refused_and_nothing_is_written(string chosen)

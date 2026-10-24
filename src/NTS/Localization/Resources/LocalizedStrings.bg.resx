@@ -379,7 +379,7 @@
     <value>Конфигурирай Комбинация</value>
   </data>
   <data name="Configure_Participation_string" xml:space="preserve">
-    <value>Конфигурирай Участник</value>
+    <value>Конфигурирай Участие</value>
   </data>
   <data name="Configure_Official_string" xml:space="preserve">
     <value>Конфигурирай Официално лице</value>
@@ -514,7 +514,7 @@
     <value>Не е класиран</value>
   </data>
   <data name="Override_Start_Time_string" xml:space="preserve">
-    <value>Промени времето на Старт за дадения Участник</value>
+    <value>Промени времето на Старт за даденото Участие</value>
   </data>
   <data name="Start_Time_string" xml:space="preserve">
     <value>Време на Старт</value>
@@ -696,17 +696,14 @@
   <data name="Vetin_string" xml:space="preserve">
     <value>Презентиране</value>
   </data>
-  <data name="Participant_string" xml:space="preserve">
-    <value>Участник</value>
-  </data>
   <data name="Snapshot_page_string" xml:space="preserve">
     <value>Времеизмерване</value>
   </data>
   <data name="Send_snapshot_string" xml:space="preserve">
     <value>Изпрати {0} записа за</value>
   </data>
-  <data name="Select_participants_to_snapshot_string" xml:space="preserve">
-    <value>Изберете участници за засичане на време</value>
+  <data name="Select_participations_to_snapshot_string" xml:space="preserve">
+    <value>Изберете участия за засичане на време</value>
   </data>
   <data name="Edit_timestamp_string" xml:space="preserve">
     <value>Редактиране на време</value>
@@ -808,7 +805,7 @@
     <value>Прекъсната връзка със събитие: {0}</value>
   </data>
   <data name="Cannot_add_completed_participations_in_startlist" xml:space="preserve">
-    <value>Не може да бъде добавен в Стартлист защото участникът е завършил</value>
+    <value>Не може да бъде добавено в Стартлист, защото участието е завършило</value>
   </data>
   <data name="Empty_string" xml:space="preserve">
     <value>Празно</value>
@@ -931,7 +928,7 @@
     <value>#{0}: конфигурацията на фазите се различава между състезанията:</value>
   </data>
   <data name="Start_validation_issue_explanation_string" xml:space="preserve">
-    <value>Участник не може да бъде добавен в няколко състезания с различни фази.</value>
+    <value>Участие не може да бъде добавено в няколко състезания с различни фази.</value>
   </data>
   <data name="Remove_from__string" xml:space="preserve">
     <value>Премахни от {0}</value>
@@ -1010,9 +1007,6 @@
   </data>
   <data name="Are_you_sure_you_want_to_delete_0_string" xml:space="preserve">
     <value>Сигурни ли сте че искате да изтриете '{0}'?</value>
-  </data>
-  <data name="Select_participant_to_add_string" xml:space="preserve">
-    <value>Изберете участник да добавите</value>
   </data>
   <data name="This_event_has_ended_string" xml:space="preserve">
     <value>Събитието е приключило и не може да бъде променяно.</value>
@@ -1147,13 +1141,13 @@
     <value>Официално лице</value>
   </data>
   <data name="Select_a_participation_string" xml:space="preserve">
-    <value>Изберете участник</value>
+    <value>Изберете участие</value>
   </data>
   <data name="Participation_not_found_string" xml:space="preserve">
-    <value>Участникът не е намерен.</value>
+    <value>Участието не е намерено.</value>
   </data>
   <data name="Participation_changed_string" xml:space="preserve">
-    <value>Участникът е променен междувременно и е прочетен отново. Въведеното е запазено: прегледайте го върху текущото състояние и го изпратете отново.</value>
+    <value>Участието е променено междувременно и е прочетено отново. Въведеното е запазено: прегледайте го върху текущото състояние и го изпратете отново.</value>
   </data>
   <data name="Time_recorded_string" xml:space="preserve">
     <value>Времето е записано.</value>
@@ -1174,7 +1168,7 @@
     <value>Събитието няма класирания.</value>
   </data>
   <data name="Select_participation_to_add_string" xml:space="preserve">
-    <value>Изберете участник за добавяне</value>
+    <value>Изберете участие за добавяне</value>
   </data>
   <data name="Handout_made_string" xml:space="preserve">
     <value>Създадена е разпечатка за #{0}.</value>
@@ -1342,7 +1336,7 @@
     <value>Хронологията е запазена.</value>
   </data>
   <data name="Timeline_empty_string" xml:space="preserve">
-    <value>Все още няма записано време за този участник.</value>
+    <value>Все още няма записано време за това участие.</value>
   </data>
   <data name="Timeline_phase_edit_string" xml:space="preserve">
     <value>Редакция на фазата</value>

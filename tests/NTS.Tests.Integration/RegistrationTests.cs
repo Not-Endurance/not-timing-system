@@ -249,7 +249,7 @@ public sealed class RegistrationTests : IClassFixture<MongoFixture>
 
     [Theory]
     [InlineData("bg", "Регистрация")]
-    [InlineData("tr", "Kayıt")]
+    [InlineData("tr", "Create an account")]
     [InlineData("de", "Create an account")]
     public async Task The_registration_page_speaks_the_language_of_the_visitor_and_falls_back_to_English(
         string language,

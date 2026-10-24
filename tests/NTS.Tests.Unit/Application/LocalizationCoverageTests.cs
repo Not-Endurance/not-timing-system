@@ -8,18 +8,17 @@ using NTS.Localization.Resources;
 namespace NTS.Tests.Unit.Application;
 
 /// <summary>
-/// Text is available in English, Bulgarian and Turkish (#645): every string that a page or a component of the app uses has
-/// a text in each of the three, so that a person who chose a language never sees the name of a string, or an empty place
+/// Text is available in English and Bulgarian (#645): every string that a page or a component of the app uses has
+/// a text in each of the two, so that a person who chose a language never sees the name of a string, or an empty place
 /// where a label should be. A string that no source uses is not asked for (it waits for a page that brings it back).
 /// </summary>
 public sealed class LocalizationCoverageTests
 {
-    static readonly string[] LANGUAGES = ["en", "bg", "tr"];
+    static readonly string[] LANGUAGES = ["en", "bg"];
 
     [Theory]
     [InlineData("en")]
     [InlineData("bg")]
-    [InlineData("tr")]
     public void Every_string_the_app_uses_has_a_text_in_the_language(string language)
     {
         var resources = new ResourceManager(typeof(LocalizedStrings));
