@@ -12,6 +12,7 @@ using NTS.Domain.Access;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -217,7 +218,7 @@ internal sealed class SnapshotRecorder
         return new DateTimeOffset(instant.Ticks - instant.Ticks % TimeSpan.TicksPerMillisecond, instant.Offset);
     }
 
-    static SnapshotResource Describe(Participation participation, Guid id, TimeEvent timeEvent)
+    static SnapshotResource Describe(Participation participation, Guid id, ParticipationEventBase timeEvent)
     {
         var phase = participation.Phases.First(x => x.Events.Contains(timeEvent));
         return DescribeIn(participation, id, phase, timeEvent, timeEvent.Slot);
@@ -235,7 +236,7 @@ internal sealed class SnapshotRecorder
         Participation participation,
         Guid id,
         Phase phase,
-        TimeEvent timeEvent,
+        ParticipationEventBase timeEvent,
         TimeSlot slot
     )
     {

@@ -1,13 +1,15 @@
-namespace NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
+
+namespace NTS.Domain.Core.Aggregates.Participations.Events;
 
 /// <summary>
 /// A time that reached a Phase, kept whatever became of it (ADR-0005): the time, how it was acquired, who recorded it and
 /// when, and whether it was accepted or why it was not. A Phase only adds events, and shows as each of its times the latest
 /// accepted event that feeds it.
 /// </summary>
-public abstract class TimeEvent : Entity
+public abstract class ParticipationEventBase : Entity
 {
-    protected TimeEvent(
+    protected ParticipationEventBase(
         Timestamp time,
         TimeEventOutcome outcome,
         SnapshotMethod method,

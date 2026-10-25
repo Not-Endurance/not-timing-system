@@ -1,5 +1,6 @@
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 
@@ -84,7 +85,7 @@ public sealed class TimeEventModelTests
     [Fact]
     public void Each_kind_is_stored_under_a_kind_of_its_own()
     {
-        TimeEvent[] events =
+        ParticipationEventBase[] events =
         [
             new Arrived(TIME, TimeEventOutcome.Accepted, SnapshotMethod.Manual, RECORDED, ACTOR),
             new Presented(TIME, false, TimeEventOutcome.Accepted, SnapshotMethod.Manual, RECORDED, ACTOR),

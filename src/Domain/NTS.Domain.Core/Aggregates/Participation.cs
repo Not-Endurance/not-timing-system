@@ -1,6 +1,7 @@
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Objects;
@@ -78,7 +79,7 @@ public class Participation : Aggregate, IEventScoped
     /// <param name="snapshot">The time that was captured.</param>
     /// <param name="actorId">The signed-in user that recorded it.</param>
     /// <param name="recordedAt">The instant the server recorded it.</param>
-    public TimeEvent Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
+    public ParticipationEventBase Process(Snapshot snapshot, Guid actorId, DateTimeOffset recordedAt)
     {
         var phase = Phases.PhaseAt(snapshot.Timestamp);
         var outBefore = phase.GetOutTime();

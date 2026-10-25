@@ -1,4 +1,4 @@
-namespace NTS.Domain.Core.Aggregates.Participations.Entities;
+namespace NTS.Domain.Core.Aggregates.Participations.Events;
 
 /// <summary>What became of a time that reached a Phase (ADR-0005): it set a time, or it was set aside and why.</summary>
 public enum TimeEventOutcome

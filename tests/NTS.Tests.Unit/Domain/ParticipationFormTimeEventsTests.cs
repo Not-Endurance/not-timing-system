@@ -2,6 +2,7 @@ using Not.Domain.Exceptions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
@@ -208,7 +209,7 @@ public sealed class ParticipationFormTimeEventsTests
 
     static Participation Ride(
         bool isRepresentRequested = false,
-        IEnumerable<TimeEvent>? events = null,
+        IEnumerable<ParticipationEventBase>? events = null,
         bool isFinal = true,
         TimeSpan? compulsoryThreshold = null
     )

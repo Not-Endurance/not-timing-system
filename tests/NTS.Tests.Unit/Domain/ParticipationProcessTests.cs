@@ -2,6 +2,7 @@ using Not.Exceptions;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Core.Objects.Payloads;
 using NTS.Domain.Enums;
@@ -186,7 +187,7 @@ public sealed class ParticipationProcessTests
         Assert.Equal(TestId.Of(1), participation.Phases.Current.Id);
     }
 
-    static TimeEvent Process(Participation participation, Snapshot snapshot)
+    static ParticipationEventBase Process(Participation participation, Snapshot snapshot)
     {
         return participation.Process(snapshot, ACTOR, RECORDED);
     }

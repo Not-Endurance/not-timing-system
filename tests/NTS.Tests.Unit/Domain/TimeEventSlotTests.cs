@@ -1,4 +1,5 @@
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
 

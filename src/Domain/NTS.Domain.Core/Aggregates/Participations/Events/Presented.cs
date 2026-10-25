@@ -1,11 +1,13 @@
-namespace NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Entities;
+
+namespace NTS.Domain.Core.Aggregates.Participations.Events;
 
 /// <summary>
 /// A Combination was presented at the vet gate. It feeds the Present time, or the Represent time when it is marked as a
 /// representation, which is taken from the Representation request of the Phase when the time is processed: a
 /// re-presentation is still a presentation.
 /// </summary>
-public sealed class Presented : TimeEvent
+public sealed class Presented : ParticipationEventBase
 {
     public Presented(
         Timestamp time,
