@@ -326,6 +326,12 @@ namespace NTS.Localization
         public static string Account_string => LocalizeString(nameof(Account_string));
         public static string Federation_string => LocalizeString(nameof(Federation_string));
         public static string Passkeys_string => LocalizeString(nameof(Passkeys_string));
+        public static string Is_on_time_for_Presentation_Inspection_string =>
+            LocalizeString(nameof(Is_on_time_for_Presentation_Inspection_string));
+        public static string Estimates_string => LocalizeString(nameof(Estimates_string));
+        public static string FEI_string => LocalizeString(nameof(FEI_string));
+        public static string Regional_string => LocalizeString(nameof(Regional_string));
+        public static string Both_string => LocalizeString(nameof(Both_string));
     }
 }
 #pragma warning restore NA0004

@@ -12,8 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="3.12.0" />
     <PackageReference Include="NotACompany.Analyzers" Version="0.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Not.Storage\Not.Storage.csproj" />
   </ItemGroup>
 
 </Project>

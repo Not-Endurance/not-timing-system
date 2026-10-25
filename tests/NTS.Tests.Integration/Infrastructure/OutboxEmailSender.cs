@@ -1,15 +1,17 @@
-namespace Not.Identity.Email;
+using Not.Identity.Email;
+
+namespace NTS.Tests.Integration.Infrastructure;
 
 /// <summary>What a test reads to find the code that was "sent".</summary>
-public interface IEmailOutbox
+internal interface IEmailOutbox
 {
     IReadOnlyList<EmailMessage> Messages { get; }
 
     void Clear();
 }
 
-/// <summary>Keeps the mail in memory instead of sending it, for tests.</summary>
-public sealed class OutboxEmailSender : IDevelopmentEmailSender, IEmailOutbox
+/// <summary>Keeps the mail in memory instead of sending it.</summary>
+internal sealed class OutboxEmailSender : IEmailSender, IEmailOutbox
 {
     readonly object _lock = new();
     readonly List<EmailMessage> _messages = [];

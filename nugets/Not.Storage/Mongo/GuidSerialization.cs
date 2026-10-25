@@ -2,14 +2,14 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Not.Identity.Mongo;
+namespace Not.Storage.Mongo;
 
-internal static class MongoSerialization
+public static class GuidSerialization
 {
     /// <summary>
     /// Every Guid, an <c>_id</c> included, is a standard-representation BSON UUID (ADR-0009). The driver keeps one
-    /// serializer per type for the whole process, so this registers once and checks that what is in force is the
-    /// standard one: nothing relies on the driver's default.
+    /// serializer per type for the whole process, so this registers once however many hosts, stores or packages ask for
+    /// it, and checks that what is in force is the standard one: nothing relies on the driver's default.
     /// </summary>
     public static void Register()
     {

@@ -1044,4 +1044,16 @@
   <data name="Cascading_Delete_string" xml:space="preserve">
     <value>Delete with the related records</value>
   </data>
+  <data name="Estimates_string" xml:space="preserve">
+    <value>Estimates</value>
+  </data>
+  <data name="FEI_string" xml:space="preserve">
+    <value>FEI</value>
+  </data>
+  <data name="Regional_string" xml:space="preserve">
+    <value>Regional</value>
+  </data>
+  <data name="Both_string" xml:space="preserve">
+    <value>Both</value>
+  </data>
 </root>

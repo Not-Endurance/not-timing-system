@@ -928,4 +928,16 @@
   <data name="Confirm_action_string" xml:space="preserve">
     <value>İşlemi onaylayın</value>
   </data>
+  <data name="Estimates_string" xml:space="preserve">
+    <value>Tahminler</value>
+  </data>
+  <data name="FEI_string" xml:space="preserve">
+    <value>FEI</value>
+  </data>
+  <data name="Regional_string" xml:space="preserve">
+    <value>Bölgesel</value>
+  </data>
+  <data name="Both_string" xml:space="preserve">
+    <value>Her ikisi</value>
+  </data>
 </root>

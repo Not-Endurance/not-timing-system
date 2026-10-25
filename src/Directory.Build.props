@@ -6,13 +6,11 @@
   </PropertyGroup>
 
   <!--
-    The .NET 10 projects audit transitive packages. These two reach NoTiming.Ui, and so NoTiming.Api that serves it,
-    through Not.Storage, which brings MongoDB.Driver 3.2.0 in: only the driver's wire compression uses them, and
-    neither project talks to Mongo through it. Remove them when Not.Storage moves to MongoDB.Driver 3.11 or later.
+    Legacy hosts are not audited: Nexus.HTTP stays only until its API is retired (#647), and Judge went with the hub
+    write path (#598). A package that only they bring in does not fail the build.
   -->
-  <ItemGroup>
-    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-6c8g-7p36-r338" />
-    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-pggp-6c3x-2xmx" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'NTS.Nexus.HTTP' Or $(MSBuildProjectName.StartsWith('NTS.Judge'))">
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
 
 </Project>

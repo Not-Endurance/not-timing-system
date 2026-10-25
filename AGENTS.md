@@ -175,6 +175,18 @@ Overall average: **60-90% token reduction** on common development operations.
 ## Context
 - Primary sln file is src/not-timing-system.sln
 
+## MongoDB times
+- A time the server filters, sorts or expires on is a `DateTime` named `…Utc` with `[BsonDateTimeOptions(Kind = DateTimeKind.Utc)]`, converted with `DateTimeOffset.UtcDateTime`.
+- Every other time is a `DateTimeOffset` with `[BsonRepresentation(BsonType.Document)]`, which keeps the offset.
+- ADR-0014 has the reasons, and `DateTimeShapeTests` fails on a deviation.
+
+## Concurrency
+- Repeated triggers that must collapse into one run use `Not.Async.CoalesceInvoker` (one action; a later caller returns at once) or `CoalesceInvoker<TKey>` (one run per key; every caller awaits the run that covers it).
+- A new resolver of this kind (debounce, throttle, latest-wins) is a small class in `Not.Async` with unit tests of its races, named in this section, so that callers never carry in-flight flags of their own.
+
+## Naming
+- The generic version of a type that already exists keeps its name. Its file takes the type parameters in braces, as the Microsoft repositories do: `CoalesceInvoker<TKey>` lives in `CoalesceInvoker{TKey}.cs` beside `CoalesceInvoker.cs`, and two parameters read `{TKey,TValue}`.
+
 ## WSL
 1. When docker cli is necessary - run from /mnt/wsl/docker-desktop/cli-tools/usr/bin/docker
 2. When func is not resolved - ask the user to lift Rule #1 so you can set it up
@@ -184,7 +196,7 @@ Overall average: **60-90% token reduction** on common development operations.
 
 ### Issue tracker
 
-Issues and specs live as GitHub issues in Not-Endurance/not-timing-system, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+Issues and specs live as GitHub issues in Not-Endurance/not-timing-system, via the `gh` CLI. Issue bodies are Overview / Verification / Details, and implementing commits and PRs say `Closes #N`. See `docs/agents/issue-tracker.md`.
 
 ### Domain docs
 
