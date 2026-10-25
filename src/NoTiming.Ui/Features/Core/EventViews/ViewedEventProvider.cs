@@ -1,7 +1,7 @@
 using Not.Application.CRUD.Ports;
 using Not.Events;
 using Not.Injection;
-using NTS.Application.Core;
+using NoTiming.Ui.Features.Core.Events;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Access;
 using NTS.Contracts.Socket;

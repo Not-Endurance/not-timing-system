@@ -7,7 +7,6 @@ using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Nexus.HTTP.Mongo;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Tools.PhaseTimes;
@@ -18,28 +17,28 @@ namespace NTS.Tests.Integration;
 /// <summary>
 /// ADR-0005, <c>migrate-phase-times</c>: a Phase that stored its Arrive, Present and Represent times flat is turned into
 /// one that stores them as accepted time events of the manual method, and the snapshot results go. The Participations are
-/// seeded through the Functions API and then given the shape the code before #615 stored (flat times, the Representation
-/// flag under its old name), so that what the application shows afterwards can be compared with the times they were made
-/// with. The migration is tested through its command, over the documents as they are in MongoDB.
+/// written the way the application stores them and then given the shape the code before #615 stored (flat times, the
+/// Representation flag under its old name), so that what the application shows afterwards can be compared with the times
+/// they were made with. The migration is tested through its command, over the documents as they are in MongoDB.
 /// </summary>
-public sealed class PhaseTimesMigrationTests : IClassFixture<NtsIntegrationFixture>, IAsyncLifetime
+public sealed class PhaseTimesMigrationTests : IClassFixture<MongoFixture>, IAsyncLifetime
 {
-    const string PARTICIPATIONS = MongoConstants.PARTICIPATIONS_COLLECTION;
-    const string RANKINGS = MongoConstants.RANKINGS_COLLECTION;
-    const string HANDOUTS = MongoConstants.HANDOUTS_COLLECTION;
+    const string PARTICIPATIONS = "event_participations";
+    const string RANKINGS = "event_rankings";
+    const string HANDOUTS = "event_handouts";
     const string SNAPSHOT_RESULTS = "event-snapshotResults";
     static readonly string[] COLLECTIONS = [PARTICIPATIONS, RANKINGS, HANDOUTS, SNAPSHOT_RESULTS];
     static readonly DateTimeOffset START = new(2026, 4, 28, 8, 0, 0, TimeSpan.Zero);
 
-    readonly NtsIntegrationFixture _fixture;
+    readonly string _connectionString;
     readonly StoredDocuments _stored;
     readonly IMongoDatabase _database;
 
-    public PhaseTimesMigrationTests(NtsIntegrationFixture fixture)
+    public PhaseTimesMigrationTests(MongoFixture mongo)
     {
-        _fixture = fixture;
-        _stored = new StoredDocuments(fixture.MongoConnectionString);
-        _database = new MongoClient(fixture.MongoConnectionString).GetDatabase(MongoConstants.NTS_DATABASE);
+        _connectionString = mongo.ConnectionString;
+        _stored = new StoredDocuments(mongo.ConnectionString);
+        _database = new MongoClient(mongo.ConnectionString).GetDatabase(UserSeed.DATABASE);
     }
 
     /// <summary>The migration reads every Participation, so each test starts from empty collections.</summary>
@@ -93,10 +92,9 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<NtsIntegrationFixtu
         Assert.Equal(documentsBefore[seeded.Untimed.Id], documentsAfter[seeded.Untimed.Id]); // nothing to turn into events
         Assert.Equal(documentsBefore[seeded.AlreadyNew.Id], documentsAfter[seeded.AlreadyNew.Id]); // already in the new shape
 
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         foreach (var original in seeded.All)
         {
-            var loaded = await functionsApi.ReadParticipation(seeded.EventId, original.Id);
+            var loaded = await _stored.LoadParticipation(original.Id);
             AssertSameTimesAndFlags(original, loaded);
         }
     }
@@ -214,8 +212,7 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<NtsIntegrationFixtu
         var report = await PhaseTimesMigration.Run(_database, apply: true);
 
         Assert.Equal(7, report.Participations.Events);
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-        var loaded = await functionsApi.ReadParticipation(seeded.EventId, seeded.Timed.Id);
+        var loaded = await _stored.LoadParticipation(seeded.Timed.Id);
         AssertSameTimesAndFlags(seeded.Timed, loaded);
     }
 
@@ -363,7 +360,7 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<NtsIntegrationFixtu
         await Seed();
         var before = await Everything();
 
-        var dryRun = await Command("--connection-string", _fixture.MongoConnectionString);
+        var dryRun = await Command("--connection-string", _connectionString);
 
         Assert.Equal(0, dryRun.ExitCode);
         Assert.Contains("Dry-run phase-times migration.", dryRun.Output);
@@ -372,12 +369,12 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<NtsIntegrationFixtu
         Assert.Contains("Nothing was changed. Run again with --apply to persist.", dryRun.Output);
         Assert.Equal(before, await Everything());
 
-        var applied = await Command("--connection-string", _fixture.MongoConnectionString, "--apply");
+        var applied = await Command("--connection-string", _connectionString, "--apply");
 
         Assert.Equal(0, applied.ExitCode);
         Assert.Contains("event_participations: 4 documents read, 2 changed (7 events)", applied.Output);
         Assert.Contains("Done.", applied.Output);
-        Assert.DoesNotContain(_fixture.MongoConnectionString, applied.Output);
+        Assert.DoesNotContain(_connectionString, applied.Output);
         Assert.DoesNotContain(SNAPSHOT_RESULTS, await CollectionNames());
     }
 
@@ -390,8 +387,8 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<NtsIntegrationFixtu
         await _stored.Replace(PARTICIPATIONS, seeded.Timed.Id, document);
 
         var withoutConnection = await Command("--apply");
-        var unknown = await Command("--connection-string", _fixture.MongoConnectionString, "--bogus");
-        var refused = await Command("--connection-string", _fixture.MongoConnectionString, "--apply");
+        var unknown = await Command("--connection-string", _connectionString, "--bogus");
+        var refused = await Command("--connection-string", _connectionString, "--apply");
 
         Assert.Equal(1, withoutConnection.ExitCode);
         Assert.Contains("--connection-string is required.", withoutConnection.Error);
@@ -458,16 +455,14 @@ public sealed class PhaseTimesMigrationTests : IClassFixture<NtsIntegrationFixtu
     /// </summary>
     async Task<Seeded> Seed()
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var timed = TwoPhases(eventId, 1, withTimes: true);
         var untimed = TwoPhases(eventId, 2, withTimes: false);
         var final = OnlyFinal(eventId, 3);
         var alreadyNew = TwoPhases(eventId, 4, withTimes: true);
         foreach (var participation in new[] { timed, untimed, final, alreadyNew })
         {
-            await functionsApi.Create(participation);
+            await _stored.WriteParticipation(participation);
         }
 
         foreach (var participation in new[] { timed, untimed, final })

@@ -4,7 +4,7 @@ namespace NTS.Tests.Integration.Infrastructure;
 
 /// <summary>
 /// The Api alone, on a real loopback port, with a MongoDB in a container for its users, sessions and codes. It needs
-/// Docker and nothing else: no Functions API and no Azurite.
+/// Docker and nothing else.
 /// </summary>
 public sealed class ApiHostFixture : IAsyncLifetime
 {

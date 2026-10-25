@@ -1,10 +1,6 @@
 using MongoDB.Bson;
-using Not.Application.HTTP;
-using Not.Serialization.JSON;
-using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Nexus.HTTP.Mongo;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 
@@ -13,31 +9,27 @@ namespace NTS.Tests.Integration;
 /// <summary>
 /// ADR-0006: a stored Ranking holds, per entry, the id of a Participation, a not-ranked mark and the stored rank, and a
 /// stored Handout holds its own id, its Event's id and the id of its Participation. Neither holds a Participation. The
-/// documents go in through the Functions API and the raw BSON is read straight from MongoDB.
+/// documents are written and loaded the way the application does and the raw BSON is read straight from MongoDB.
 /// </summary>
-public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegrationFixture>
+public sealed class RankingAndHandoutStorageTests : IClassFixture<MongoFixture>
 {
     /// <summary>A default (a mark that is false, a rank that is null) is not written: see NtsMongoSerialization.</summary>
     static readonly string[] ENTRY_FIELDS = ["ParticipationId", "IsNotRanked", "Rank"];
 
-    readonly NtsIntegrationFixture _fixture;
     readonly StoredDocuments _stored;
 
-    public RankingAndHandoutStorageTests(NtsIntegrationFixture fixture)
+    public RankingAndHandoutStorageTests(MongoFixture mongo)
     {
-        _fixture = fixture;
-        _stored = new StoredDocuments(fixture.MongoConnectionString);
+        _stored = new StoredDocuments(mongo.ConnectionString);
     }
 
     [Fact]
     public async Task A_stored_Ranking_holds_the_ids_of_its_Participations_and_no_Participation()
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var rankingId = Guid.NewGuid();
         var first = IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid());
         var second = IntegrationPayloadFactory.ActiveParticipation(eventId, 2, Guid.NewGuid());
-        await Seed(functionsApi, eventId, first, second);
         var ranking = CreateRanking(
             eventId,
             rankingId,
@@ -45,9 +37,9 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
             new RankingEntry(first.Id, false, 1),
             new RankingEntry(second.Id, true)
         );
-        await functionsApi.Create(ranking);
+        await _stored.WriteRanking(ranking);
 
-        var stored = await _stored.Read(MongoConstants.RANKINGS_COLLECTION, rankingId);
+        var stored = await _stored.Read("event_rankings", rankingId);
 
         Assert.Equal("CEI 1*", stored["Name"].AsString);
         Assert.Equal("FEI", stored["Ruleset"].AsString);
@@ -62,129 +54,28 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
         Assert.True(entries[1]["IsNotRanked"].AsBoolean);
         Assert.True(entries[1].AsBsonDocument.GetValue("Rank", BsonNull.Value).IsBsonNull);
 
-        var readBack = Assert.Single(await functionsApi.ReadRankings(eventId));
+        var readBack = Assert.Single(await _stored.LoadRankings(eventId));
         Assert.Equal(ranking.Entries, readBack.Entries);
     }
 
     [Fact]
     public async Task A_stored_Handout_holds_its_Event_and_its_Participation_by_id_and_nothing_of_the_Participation()
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var handoutId = Guid.NewGuid();
         var participation = IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid());
-        await Seed(functionsApi, eventId, participation);
-        await functionsApi.Create(IntegrationPayloadFactory.Handout(participation, handoutId));
+        await _stored.WriteHandout(IntegrationPayloadFactory.Handout(participation, handoutId));
 
-        var stored = await _stored.Read(MongoConstants.HANDOUTS_COLLECTION, handoutId);
+        var stored = await _stored.Read("event_handouts", handoutId);
 
         StoredDocuments.AssertStandardUuid(stored["_id"], handoutId);
         StoredDocuments.AssertStandardUuid(stored["EventId"], eventId);
         StoredDocuments.AssertStandardUuid(stored["ParticipationId"], participation.Id);
         Assert.DoesNotContain("Participation", stored.Names);
-        var readBack = Assert.Single(await functionsApi.ReadHandouts(eventId));
+        var readBack = Assert.Single(await _stored.LoadHandouts(eventId));
         Assert.Equal(handoutId, readBack.Id);
         Assert.Equal(eventId, readBack.EventId);
         Assert.Equal(participation.Id, readBack.ParticipationId);
-    }
-
-    [Fact]
-    public async Task The_Handouts_of_a_Participation_are_read_with_a_filter_the_server_applies()
-    {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-        var eventId = Guid.NewGuid();
-        var first = IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid());
-        var second = IntegrationPayloadFactory.ActiveParticipation(eventId, 2, Guid.NewGuid());
-        await Seed(functionsApi, eventId, first, second);
-        var ofFirstOnPhaseOne = IntegrationPayloadFactory.Handout(first, Guid.NewGuid());
-        var ofSecond = IntegrationPayloadFactory.Handout(second, Guid.NewGuid());
-        var ofFirstOnPhaseTwo = IntegrationPayloadFactory.Handout(first, Guid.NewGuid());
-        await functionsApi.Create(ofFirstOnPhaseOne);
-        await functionsApi.Create(ofSecond);
-        await functionsApi.Create(ofFirstOnPhaseTwo);
-        Guid[] expected = [ofFirstOnPhaseOne.Id, ofFirstOnPhaseTwo.Id];
-
-        var asked = ODataApiFilterAdapter.ParseFilters<Handout>([x => x.ParticipationId == first.Id]);
-        var theServerFilters = await ReadHandoutsFrom(HttpHelper.AddQueryString("api/handouts", asked));
-        var withNoFilter = await ReadHandoutsFrom("api/handouts");
-
-        Assert.Equal(expected.Order(), theServerFilters.Select(x => x.Id).Order());
-        Assert.Contains(ofSecond.Id, withNoFilter.Select(x => x.Id)); // what the filter left out is there to be found
-    }
-
-    [Fact]
-    public async Task A_Ranking_is_not_written_again_when_a_Participation_it_names_changes()
-    {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-        var eventId = Guid.NewGuid();
-        var rankingId = Guid.NewGuid();
-        var first = IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid());
-        var second = IntegrationPayloadFactory.ActiveParticipation(eventId, 2, Guid.NewGuid());
-        await Seed(functionsApi, eventId, first, second);
-        await functionsApi.Create(
-            CreateRanking(
-                eventId,
-                rankingId,
-                "CEI 1*",
-                new RankingEntry(first.Id, false),
-                new RankingEntry(second.Id, false)
-            )
-        );
-        var before = await _stored.Read(MongoConstants.RANKINGS_COLLECTION, rankingId);
-
-        first.Withdraw();
-        await FunctionsRequests.Send(
-            _fixture.FunctionsBaseUrl,
-            HttpMethod.Patch,
-            "api/participations",
-            ParticipationModel.MapFrom(first)
-        );
-
-        Assert.True((await functionsApi.ReadParticipation(eventId, first.Id)).IsEliminated()); // the change was written
-        Assert.Equal(before, await _stored.Read(MongoConstants.RANKINGS_COLLECTION, rankingId)); // and the Ranking was not
-    }
-
-    [Fact]
-    public async Task A_custom_Ranking_can_still_be_created_edited_and_deleted()
-    {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-        var eventId = Guid.NewGuid();
-        var rankingId = Guid.NewGuid();
-        var first = IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid());
-        var second = IntegrationPayloadFactory.ActiveParticipation(eventId, 2, Guid.NewGuid());
-        await Seed(functionsApi, eventId, first, second);
-        await functionsApi.Create(
-            CreateRanking(
-                eventId,
-                rankingId,
-                "Custom",
-                new RankingEntry(first.Id, false),
-                new RankingEntry(second.Id, false)
-            )
-        );
-
-        await functionsApi.Update(
-            CreateRanking(eventId, rankingId, "Custom, edited", new RankingEntry(first.Id, true))
-        );
-
-        var edited = await _stored.Read(MongoConstants.RANKINGS_COLLECTION, rankingId);
-        Assert.Equal("Custom, edited", edited["Name"].AsString);
-        var entry = Assert.Single(edited["Entries"].AsBsonArray);
-        StoredDocuments.AssertStandardUuid(entry["ParticipationId"], first.Id);
-        Assert.True(entry["IsNotRanked"].AsBoolean);
-
-        await FunctionsRequests.Send(_fixture.FunctionsBaseUrl, HttpMethod.Delete, $"api/rankings/{rankingId}");
-
-        Assert.Empty(await functionsApi.ReadRankings(eventId));
-    }
-
-    static async Task Seed(FunctionsApiDriver functionsApi, Guid eventId, params Participation[] participations)
-    {
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
-        foreach (var participation in participations)
-        {
-            await functionsApi.Create(participation);
-        }
     }
 
     static Ranking CreateRanking(Guid eventId, Guid id, string name, params RankingEntry[] entries)
@@ -202,14 +93,5 @@ public sealed class RankingAndHandoutStorageTests : IClassFixture<NtsIntegration
             eventId,
             id
         );
-    }
-
-    async Task<IReadOnlyList<HandoutModel>> ReadHandoutsFrom(string endpoint)
-    {
-        using var client = new HttpClient { BaseAddress = _fixture.FunctionsBaseUrl };
-        var content = await client.GetStringAsync(endpoint);
-        var result = content.FromJson<Not.Structures.Result<IEnumerable<HandoutModel>>>();
-        Assert.True(result.IsSuccess, string.Join(Environment.NewLine, result.Errors));
-        return result.Data!.ToArray();
     }
 }

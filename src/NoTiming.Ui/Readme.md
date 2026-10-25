@@ -28,7 +28,7 @@ pointed at a hosted environment (its session would be another origin's cookie). 
 serves it.
 
 Settings are read from `wwwroot/appsettings.json`, and from `wwwroot/appsettings.{environment}.json` when there is one
-(`appsettings.Development.json` is). The environment is the one baked into the build: .NET 10 no longer reads the
+(there is none now). The environment is the one baked into the build: .NET 10 no longer reads the
 `Blazor-Environment` response header, so it is the `WasmApplicationEnvironmentName` MSBuild property (Development for a
 Debug build, Production for a Release publish unless it is set). `?environment=Development|Staging|Production` in the
 address overrides it locally.
@@ -39,7 +39,8 @@ A visitor downloads the app to read a startlist, so its size is measured on what
 publishes the Ui for Release and sums the Brotli files that the Api serves (a debug build is several times larger and says
 nothing about it). When it was written down the app was **8.29 MB over 180 files** (6.8 MB of assemblies, 0.9 MB of runtime,
 0.3 MB of globalization data, 0.2 MB of scripts and styles), and with the Console's services and its text in three languages
-(#646) it is **8.37 MB over 183 files**; the budget is a **ceiling of 9 MB**. A change that raises
+(#646) it was **8.37 MB over 183 files**, and with the libraries on .NET 10 and the application layer a folder of the app (#647)
+it is **8.26 MB over 180 files**; the budget is a **ceiling of 9 MB**. A change that raises
 the size past it raises it on purpose, and raises the ceiling in the test, here and in the ticket.
 
 - `BlazorWebAssemblyLoadAllGlobalizationData` is on. A person who chooses Bulgarian changes the culture of the app

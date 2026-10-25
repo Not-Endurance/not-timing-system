@@ -13,9 +13,9 @@ Use this together with `$logic-separation` when a change also involves domain ru
 
 Keep the meaning of the behavior in the owning layer:
 
-- Put NTS business rules, event-specific workflows, ranking/handout semantics, domain entities, and application use cases in `src/Domain`, `src/NTS.Application*`, or app-specific NTS projects.
+- Put NTS business rules, event-specific workflows, ranking/handout semantics, domain entities, and application use cases in `src/Domain`, or in the `Features` folders of `src/NoTiming.Api` and `src/NoTiming.Ui`.
 - Put generic technical behavior in Not* nugets: browser file delivery, print rendering infrastructure, HTTP helpers, Blazor building blocks, storage adapters, authentication primitives, serialization, localization plumbing, and framework integration.
-- Put app adapters in `src/Apps/*`: Azure Functions, Blazor pages, hubs, process entrypoints, route binding, response shaping, and app-local wiring.
+- Put app adapters in the hosts (`src/NoTiming.Api`, `src/NoTiming.Ui`, `src/NoTiming.Console`): endpoints, Blazor pages, hubs, process entrypoints, route binding, response shaping, and app-local wiring.
 
 Not* code may know about generic contracts such as file content, print requests, HTTP settings, or component parameters. It must not know about NTS concepts such as event ids, document types, rankings, handouts, participations, officials, protocols, business statuses, or NTS-specific file naming.
 

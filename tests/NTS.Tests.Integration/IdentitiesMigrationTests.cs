@@ -390,13 +390,13 @@ public sealed class IdentitiesMigrationTests : IClassFixture<MongoFixture>, IDis
         return end < 0 ? text[start..] : text[start..end];
     }
 
-    /// <summary>The command where its own build put it, in the configuration this test was built in (the tests are .NET 10, the command .NET 8).</summary>
+    /// <summary>The command where its own build put it, in the configuration this test was built in, which is how the owner runs it.</summary>
     static string ToolPath()
     {
         var tests = new DirectoryInfo(AppContext.BaseDirectory); // <root>/tests/NTS.Tests.Integration/bin/<configuration>/net10.0
         var configuration = tests.Parent!.Name;
         var root = tests.Parent.Parent!.Parent!.Parent!.Parent!.FullName;
-        var path = Path.Combine(root, "tools", "NTS.Tools", "bin", configuration, "net8.0", "NTS.Tools.dll");
+        var path = Path.Combine(root, "tools", "NTS.Tools", "bin", configuration, "net10.0", "NTS.Tools.dll");
         return File.Exists(path) ? path : throw new FileNotFoundException("The tools were not built.", path);
     }
 

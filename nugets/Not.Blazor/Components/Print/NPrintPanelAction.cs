@@ -12,27 +12,7 @@ public sealed class NPrintPanelAction
         Func<Task>? afterSuccess = null
     )
     {
-        return new(content, icon, NPrintPanelActionKind.PrintPdf, request, null, null, afterSuccess);
-    }
-
-    public static NPrintPanelAction DownloadPdf(
-        string content,
-        Func<NPrintPanelContext, Task<NPrintDocumentRequest>> request,
-        string? icon = null,
-        Func<Task>? afterSuccess = null
-    )
-    {
-        return new(content, icon, NPrintPanelActionKind.DownloadPdf, request, null, null, afterSuccess);
-    }
-
-    public static NPrintPanelAction DownloadZip(
-        string content,
-        Func<NPrintPanelContext, Task<NPrintBatchRequest>> request,
-        string? icon = null,
-        Func<Task>? afterSuccess = null
-    )
-    {
-        return new(content, icon, NPrintPanelActionKind.DownloadZip, null, request, null, afterSuccess);
+        return new(content, icon, NPrintPanelActionKind.PrintPdf, request, null, afterSuccess);
     }
 
     public static NPrintPanelAction DownloadFile(
@@ -42,11 +22,10 @@ public sealed class NPrintPanelAction
         Func<Task>? afterSuccess = null
     )
     {
-        return new(content, icon, NPrintPanelActionKind.DownloadFile, null, null, file, afterSuccess);
+        return new(content, icon, NPrintPanelActionKind.DownloadFile, null, file, afterSuccess);
     }
 
     readonly Func<NPrintPanelContext, Task<NPrintDocumentRequest>>? _documentRequest;
-    readonly Func<NPrintPanelContext, Task<NPrintBatchRequest>>? _batchRequest;
     readonly Func<NPrintPanelContext, Task<NFile>>? _file;
     readonly Func<Task>? _afterSuccess;
 
@@ -55,7 +34,6 @@ public sealed class NPrintPanelAction
         string? icon,
         NPrintPanelActionKind kind,
         Func<NPrintPanelContext, Task<NPrintDocumentRequest>>? documentRequest,
-        Func<NPrintPanelContext, Task<NPrintBatchRequest>>? batchRequest,
         Func<NPrintPanelContext, Task<NFile>>? file,
         Func<Task>? afterSuccess
     )
@@ -64,7 +42,6 @@ public sealed class NPrintPanelAction
         Icon = icon;
         Kind = kind;
         _documentRequest = documentRequest;
-        _batchRequest = batchRequest;
         _file = file;
         _afterSuccess = afterSuccess;
     }
@@ -77,12 +54,6 @@ public sealed class NPrintPanelAction
     {
         return _documentRequest?.Invoke(context)
             ?? throw new InvalidOperationException("Print document request factory is missing.");
-    }
-
-    internal Task<NPrintBatchRequest> GetBatchRequest(NPrintPanelContext context)
-    {
-        return _batchRequest?.Invoke(context)
-            ?? throw new InvalidOperationException("Print batch request factory is missing.");
     }
 
     internal Task<NFile> GetFile(NPrintPanelContext context)

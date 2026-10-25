@@ -1,10 +1,8 @@
-using System.Reflection;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Not.Identity;
 using NoTiming.Api.Features.Tenancy;
-using NTS.Nexus.HTTP.Mongo;
 using NTS.Tests.Integration.Infrastructure;
 
 namespace NTS.Tests.Integration;
@@ -18,8 +16,8 @@ namespace NTS.Tests.Integration;
 /// </summary>
 public sealed class TenantScopedStoreTests : IClassFixture<MongoFixture>
 {
-    // The collections the Functions API keeps that no Tenant owns, and why: accounts, countries and Tenants are global;
-    // the state a person keeps per Event is the person's own; pending Snapshots go with the Functions API (#611).
+    // The collections that no Tenant owns, and why: accounts, countries and Tenants are global; the state a person keeps
+    // per Event is the person's own; pending Snapshots are gone with the Judge (#611).
     static readonly string[] NOT_OWNED_BY_A_TENANT =
     [
         "users",
@@ -44,20 +42,6 @@ public sealed class TenantScopedStoreTests : IClassFixture<MongoFixture>
     public TenantScopedStoreTests(MongoFixture mongo)
     {
         _mongo = mongo;
-    }
-
-    [Fact]
-    public void The_registry_names_every_collection_the_Functions_API_keeps_that_a_Tenant_owns()
-    {
-        var kept = typeof(MongoConstants)
-            .GetFields(BindingFlags.Public | BindingFlags.Static)
-            .Where(x => x.Name.EndsWith("_COLLECTION", StringComparison.Ordinal))
-            .Select(x => (string)x.GetRawConstantValue()!)
-            .Where(x => x != MongoConstants.NTS_DATABASE);
-
-        var owned = kept.Where(x => !NOT_OWNED_BY_A_TENANT.Contains(x));
-
-        Assert.Empty(owned.Except(TenantOwned.Collections));
     }
 
     [Fact]
@@ -350,7 +334,7 @@ public sealed class TenantScopedStoreTests : IClassFixture<MongoFixture>
         return id;
     }
 
-    /// <summary>Two documents of each of two Tenants, written as the Functions API would: straight into the collection.</summary>
+    /// <summary>Two documents of each of two Tenants, written as the Functions API did: straight into the collection.</summary>
     async Task<(Seeded A, Seeded B)> SeedTwoTenantsAsync(string collection)
     {
         var a = await SeedAsync(collection, NewTenant());

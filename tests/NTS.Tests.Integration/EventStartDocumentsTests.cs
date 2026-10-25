@@ -1,5 +1,5 @@
+using NoTiming.Api.Features.Events.Factories;
 using NoTiming.Api.Features.Reference;
-using NTS.Application.Factories;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;

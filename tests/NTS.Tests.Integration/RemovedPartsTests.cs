@@ -2,9 +2,7 @@ using System.Reflection;
 using NoTiming.Api.Features.Live;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Ui;
-using NTS.Application;
 using NTS.Contracts;
-using NTS.Nexus.HTTP.Mongo;
 
 namespace NTS.Tests.Integration;
 
@@ -34,9 +32,8 @@ public sealed class RemovedPartsTests
     static readonly Assembly[] WHAT_THE_HOSTS_ARE_MADE_OF =
     [
         typeof(LiveHub).Assembly,
-        typeof(MongoConstants).Assembly,
         typeof(Routes).Assembly,
-        typeof(NtsApplicationServices).Assembly,
+        typeof(NoTimingUiServices).Assembly,
         typeof(ApplicationConstants).Assembly,
         typeof(Not.Application.NApplicationBuilder).Assembly,
     ];
@@ -54,15 +51,8 @@ public sealed class RemovedPartsTests
     }
 
     [Fact]
-    public void No_collection_of_the_Api_or_of_the_Functions_host_holds_Snapshots_that_wait_for_a_Judge()
+    public void No_collection_of_the_Api_holds_Snapshots_that_wait_for_a_Judge()
     {
-        var collections = typeof(MongoConstants)
-            .GetFields(BindingFlags.Public | BindingFlags.Static)
-            .Where(x => x.IsLiteral)
-            .Select(x => (string)x.GetRawConstantValue()!)
-            .Concat(TenantOwned.Collections)
-            .ToArray();
-
-        Assert.DoesNotContain(collections, x => x.Contains("pending", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(TenantOwned.Collections, x => x.Contains("pending", StringComparison.OrdinalIgnoreCase));
     }
 }

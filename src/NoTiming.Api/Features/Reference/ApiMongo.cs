@@ -1,7 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
 using Not.Storage;
-using NTS.Application.Mongo;
 
 namespace NoTiming.Api.Features.Reference;
 

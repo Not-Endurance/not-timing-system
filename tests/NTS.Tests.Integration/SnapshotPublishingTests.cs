@@ -240,12 +240,7 @@ public sealed class SnapshotPublishingTests : IClassFixture<MongoFixture>
     [Fact]
     public async Task The_Ui_sends_its_Snapshots_through_the_client_of_the_Api_and_not_over_the_live_connection()
     {
-        await using var viewer = new ViewerDriver(
-            new Uri("https://localhost"),
-            new Uri("https://localhost"),
-            null,
-            "publisher"
-        );
+        await using var viewer = new ViewerDriver(new Uri("https://localhost"), null, "publisher");
 
         var publisher = viewer.GetRequiredService<ISnapshotPublisher>();
 

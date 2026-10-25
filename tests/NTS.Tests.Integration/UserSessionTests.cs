@@ -11,7 +11,7 @@ namespace NTS.Tests.Integration;
 /// The state a person keeps per Event (#602): the Snapshots they have sent and the ones they have selected. It is the
 /// caller's own and nobody else's: the routes list, read, change and delete the records of the caller, a record of
 /// another person is as good as missing, and there is no way to ask for everybody's. What is stored has the shape the
-/// Functions API stores (PascalCase members, enums as text), so the Event-scoped records that exist read the same.
+/// Functions API stored (PascalCase members, enums as text), so the Event-scoped records that exist read the same.
 /// </summary>
 public sealed class UserSessionTests : IClassFixture<MongoFixture>
 {
@@ -430,7 +430,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
         var ana = await SignedInAsync(api, client);
         var eventId = Guid.NewGuid();
         await MakeAsync(ana, eventId, AState());
-        // The Functions API leaves out a member that holds the default: a record with the id of nothing has no Id at all.
+        // The Functions API left out a member that held the default: a record with the id of nothing has no Id at all.
         await Records()
             .InsertOneAsync(
                 new BsonDocument
@@ -666,7 +666,7 @@ public sealed class UserSessionTests : IClassFixture<MongoFixture>
         return await Records().Find(new BsonDocument("UserIdentifier", owner.ToString())).ToListAsync();
     }
 
-    /// <summary>A record as the Functions API stores it: PascalCase members, enums as text, no member that is null.</summary>
+    /// <summary>A record as the Functions API stored it: PascalCase members, enums as text, no member that is null.</summary>
     async Task SeedAsync(string owner, Guid eventId, Guid id)
     {
         await Records()

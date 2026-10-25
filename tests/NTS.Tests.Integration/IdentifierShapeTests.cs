@@ -8,7 +8,6 @@ using NoTiming.Api.Features.Live;
 using NoTiming.Ui;
 using NTS.Contracts.Live;
 using NTS.Domain.Aggregates;
-using NTS.Nexus.HTTP.Mongo;
 
 namespace NTS.Tests.Integration;
 
@@ -28,7 +27,6 @@ public sealed class IdentifierShapeTests
     {
         // Identifiers that are not Guids yet, and why. Naming them here means a new one cannot hide.
         ["TenantId"] = "the constant \"nts\" until ADR-0012 puts a real tenant id on every document (#643)",
-        ["AccountId"] = "SettingModel keeps the text of a Guid; the Setting aggregate is deleted by ADR-0012",
         ["MongoId"] = "the ObjectId _id of a session or pending-snapshots document, a storage key next to its Guid Id",
     };
     static readonly Assembly[] OUR_ASSEMBLIES =
@@ -42,10 +40,8 @@ public sealed class IdentifierShapeTests
         typeof(NTS.Domain.Setup.Aggregates.Athlete).Assembly, // NTS.Domain.Setup
         typeof(NTS.Domain.Core.Aggregates.Participation).Assembly, // NTS.Domain.Core
         typeof(ILiveClientProcedures).Assembly, // NTS.Contracts
-        typeof(NTS.Application.Factories.ParticipationAndRankingFactory).Assembly, // NTS.Application
         typeof(NoTimingUiServices).Assembly, // NoTiming.Ui
         typeof(LiveHub).Assembly, // NoTiming.Api
-        typeof(MongoConstants).Assembly, // NTS.Nexus.HTTP
     ];
 
     [Fact]

@@ -2,17 +2,18 @@
 Integrated app to create, configure and run your Endurance category equestrian sport events. NTS is the improved version of [EMS](https://github.com/Not-Endurance/endurance-management-system) which was started in 2018 on WPF
 
 # Running the app
-NoTiming is one web platform. `NoTiming.Api`, an ASP.NET Core host, serves `NoTiming.Ui`, a Blazor WebAssembly app, and the live hub on one origin (ADR-0011). The legacy Azure Functions API (`NTS.Nexus.HTTP`) still serves the data until its routes are ported and it is retired.
+NoTiming is one web platform. `NoTiming.Api`, an ASP.NET Core host, serves `NoTiming.Ui`, a Blazor WebAssembly app, and the live hub on one origin (ADR-0011). It is the only server: the Azure Functions API and the Static Web App that served the Ui retired with it.
 
 ## Prerequisites
-- .NET 10 SDK. The shared libraries still target .NET 8 and build with it; the Functions API runs on the .NET 8 runtime.
-- Docker, for MongoDB (the Api keeps its users and their sessions there, the Functions API its data) and Azurite.
+- .NET 10 SDK. Every project targets .NET 10.
+- Docker, for MongoDB, where the Api keeps everything.
 
 ## Debug
-1. Start the legacy API and its storage (execute in the project root):
+1. Start MongoDB (execute in the project root):
    ```
-   docker compose -f docker/nexus.yaml up -d
+   docker compose -f docker/compose.yaml up -d mongodb
    ```
+   The same file runs the Aspire dashboard (`aspire-dashboard`, http://localhost:18888, the telemetry of the Api) and the Api in a container (`nts-api`, on http://localhost:11337, so start it instead of step 2 and not with it).
 2. Run the Api, which serves the Ui:
    ```
    dotnet run --project src/NoTiming.Api --launch-profile Development
@@ -41,17 +42,19 @@ The route and the page exist in a Debug build only (`dotnet run` builds one; the
 ## Publish
 `dotnet publish src/NoTiming.Api -c Release` also publishes the Ui and ships it as the Api's `wwwroot`. Pass `-p:WasmApplicationEnvironmentName=Staging` (or `Production`): .NET 10 bakes the Blazor environment into the build, and without it the Ui loads the Production settings.
 
+`.github/workflows/nts-cd.yaml` does that and deploys the result to the one App Service of the environment: staging from `develop`, production from `master`.
+
 ### Diagrams
 - A reasonably-updated [Domain Model diagram](https://github.com/Not-Endurance/not-timing-system/blob/develop/diagrams/NTS%20v2%20Domain%20Model.drawio.png)
 - [Appflow diagram](https://github.com/Not-Endurance/not-timing-system/blob/develop/diagrams/NTS%20v2%20Appflow.drawio.png)
 
 ### Project structure
 Read [CONTEXT.md](CONTEXT.md) for the language of the domain and `docs/adr` for the decisions behind the layout.
-- `src/NoTiming.Api` is the host: the live hub, health, security headers, and the Ui.
-- `src/NoTiming.Ui` is the Blazor WebAssembly app: the pages, layout, view services and the REST repositories.
-- `src/Domain` holds the domain model in three boundaries: `NTS.Domain` (shared), `NTS.Domain.Setup` (create and configure an Event) and `NTS.Domain.Core` (run the Event).
-- `src/NTS.Contracts` holds the models and interfaces both hosts share. `src/NTS` holds the localization.
-- `src/NTS.Application` is the application layer the Functions API still uses; it moves into the hosts when that API is retired.
-- `src/Apps/Nexus/NTS.Nexus.HTTP` is the legacy Azure Functions API.
-- `nugets` holds the `Not.*` libraries: generic infrastructure and components, free of business logic. `Not.Identity` is the one that targets .NET 10: ASP.NET Core Identity over the existing user documents, the server-side session and the one-time codes (ADR-0002).
-- `tests` holds the unit tests and the integration tests (see `tests/NTS.Tests.Integration/README.md`).
+- `src/NoTiming.Api` is the host, and the server: the JSON:API routes, the live hub, the sign-in pages, health, security headers and the Ui. What the application layer and the storage once were are folders of it (`Features`, `Hosting`), with the MongoDB wiring.
+- `src/NoTiming.Ui` is the Blazor WebAssembly app: the pages, layout, view services and the REST repositories. It never references the Api, which references it.
+- `src/NoTiming.Console` and `src/NTS.Blazor` are the Razor libraries of the Ui: the pages of the Console (set an Event up and run it) and the components they share.
+- `src/Domain` holds the domain model in three boundaries: `NTS.Domain` (shared), `NTS.Domain.Setup` (create and configure an Event) and `NTS.Domain.Core` (run the Event). It references no infrastructure.
+- `src/NTS.Contracts` holds the models and interfaces the Api and the Ui share. `src/NTS` holds the localization.
+- `nugets` holds the `Not.*` libraries: generic infrastructure and components, free of business logic. `Not.Identity` is ASP.NET Core Identity over the existing user documents, the server-side session and the one-time codes (ADR-0002).
+- `tools/NTS.Tools` is the command line of the developer: seeding, the data migrations and the checks of a database (see `tools/NTS.Tools/README.md`).
+- `tests` holds the unit tests and the integration tests (see `tests/NTS.Tests.Integration/README.md`). The layering above is checked from the project files by the tests in `tests/NTS.Tests.Integration/Architecture`: the Ui never references the Api, the domain references no infrastructure, nothing references Azure Functions, every project targets .NET 10, and only the tests take Playwright (printing is the browser's).

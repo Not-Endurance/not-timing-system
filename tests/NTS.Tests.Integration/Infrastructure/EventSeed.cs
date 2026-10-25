@@ -7,7 +7,7 @@ using NTS.Domain.Core.Aggregates;
 namespace NTS.Tests.Integration.Infrastructure;
 
 /// <summary>
-/// Events as the Api and the Functions API keep them, written straight into the collections: a Setup in
+/// Events as the Api keeps them, written straight into the collections: a Setup in
 /// <c>configure_events</c> and, once an Event has started, its Core document in <c>event_informations</c> with the Tenant,
 /// the Main Operator and the end of its last day (ADR-0007, ADR-0012). A test makes an Event Live or Historic by giving it
 /// an end after or before the clock of the host.

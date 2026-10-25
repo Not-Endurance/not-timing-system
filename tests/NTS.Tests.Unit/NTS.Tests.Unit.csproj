@@ -10,8 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\nugets\Not.Blazor.Client\Not.Blazor.Client.csproj" />
-    <ProjectReference Include="..\..\nugets\Not.Server\Not.Server.csproj" />
-    <ProjectReference Include="..\..\src\NTS.Application\NTS.Application.csproj" />
+    <ProjectReference Include="..\..\src\NoTiming.Api\NoTiming.Api.csproj" />
     <ProjectReference Include="..\..\src\NoTiming.Ui\NoTiming.Ui.csproj" />
     <ProjectReference Include="..\..\tools\NTS.Tools\NTS.Tools.csproj" />
   </ItemGroup>

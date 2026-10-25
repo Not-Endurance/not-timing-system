@@ -27,7 +27,7 @@ internal sealed class UserSession
 /// The state a person keeps per Event, in the <c>event_user_sessions</c> collection (#602). Every operation names the
 /// owner and finds only that owner's records: there is no operation without one, so there is no way to read, change or
 /// delete the record of another person through this class, and the routes cannot forget to ask. The records have the
-/// shape the Functions API writes (PascalCase members, enums as text, no member that is null), which is mapped by hand
+/// shape the Functions API wrote (PascalCase members, enums as text, no member that is null), which is mapped by hand
 /// here because that shape comes from conventions of the Functions host that this host does not share. The owner is
 /// the account id; the constant Tenant of today is written until the Tenants of ADR-0012 reach the data.
 /// </summary>
@@ -93,7 +93,7 @@ internal sealed class UserSessionStore
     {
         var id = Guid.NewGuid();
 
-        // A record that has no id (the Functions API leaves out an id that is empty) cannot be addressed by anything,
+        // A record that has no id (the Functions API left out an id that was empty) cannot be addressed by anything,
         // so it is not the owner's record for the Event: one is made, and the other is left where it is.
         var record = await _records.FindOneAndUpdateAsync(
             OwnedBy(owner)
@@ -296,7 +296,7 @@ internal sealed class UserSessionStore
         return document.TryGetValue(field, out var value) && value.IsString ? value.AsString : null;
     }
 
-    /// <summary>An enum as the Functions API writes it, text, or as an older record may hold it, a number.</summary>
+    /// <summary>An enum as the Functions API wrote it, text, or as an older record may hold it, a number.</summary>
     static T? EnumOf<T>(BsonDocument document, string field)
         where T : struct, Enum
     {

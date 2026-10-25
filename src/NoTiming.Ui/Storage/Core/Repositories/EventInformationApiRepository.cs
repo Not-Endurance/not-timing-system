@@ -2,7 +2,7 @@ using Not.Application.HTTP;
 using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Storage.REST;
-using NTS.Application.Core;
+using NoTiming.Ui.Features.Core.Events;
 using NTS.Contracts.Core.Models;
 using NTS.Contracts.Socket;
 using NTS.Domain.Core.Aggregates;

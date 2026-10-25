@@ -1,6 +1,4 @@
 using MongoDB.Bson;
-using Newtonsoft.Json;
-using Not.Serialization.JSON;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Aggregates;
@@ -9,7 +7,6 @@ using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Nexus.HTTP.Mongo;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using Competition = NTS.Domain.Core.Aggregates.Participations.Objects.Competition;
@@ -19,36 +16,32 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// ADR-0005: the time events of a Phase are stored in the Participation document as one discriminated type, and the times the
-/// Phase shows are projected from them, so the flat Arrive, Present and Represent times are not stored. The documents go
-/// through the Functions API and the raw BSON is read straight from MongoDB; the JSON of the models is round-tripped by both
-/// serializers the platform uses.
+/// Phase shows are projected from them, so the flat Arrive, Present and Represent times are not stored. The documents are
+/// written and loaded the way the application does and the raw BSON is read straight from MongoDB; the JSON of the models
+/// is round-tripped by the serializer of the Api.
 /// </summary>
-public sealed class TimeEventStorageTests : IClassFixture<NtsIntegrationFixture>
+public sealed class TimeEventStorageTests : IClassFixture<MongoFixture>
 {
     static readonly DateTimeOffset START = new(2026, 4, 28, 8, 0, 0, TimeSpan.Zero);
     static readonly Guid OFFICIAL = TestId.Of(9);
     static readonly Guid STEWARD = TestId.Of(10);
 
-    readonly NtsIntegrationFixture _fixture;
     readonly StoredDocuments _stored;
 
-    public TimeEventStorageTests(NtsIntegrationFixture fixture)
+    public TimeEventStorageTests(MongoFixture mongo)
     {
-        _fixture = fixture;
-        _stored = new StoredDocuments(fixture.MongoConnectionString);
+        _stored = new StoredDocuments(mongo.ConnectionString);
     }
 
     [Fact]
     public async Task The_time_events_of_a_Phase_are_stored_as_one_discriminated_type_and_load_whole()
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var id = Guid.NewGuid();
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var participation = Ridden(eventId, id);
-        await functionsApi.Create(participation);
+        await _stored.WriteParticipation(participation);
 
-        var stored = await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id);
+        var stored = await _stored.Read("event_participations", id);
 
         var phase = stored["Phases"].AsBsonArray[0].AsBsonDocument;
         Assert.Empty(phase.Names.Intersect(["ArriveTime", "PresentTime", "RepresentTime", "IsReinspectionRequested"]));
@@ -81,7 +74,7 @@ public sealed class TimeEventStorageTests : IClassFixture<NtsIntegrationFixture>
         Assert.Equal(BsonType.DateTime, events[0]["RecordedAt"].BsonType);
         Assert.Equal(BsonType.DateTime, events[0]["Time"].BsonType);
 
-        var loaded = await functionsApi.ReadParticipation(eventId, id);
+        var loaded = await _stored.LoadParticipation(id);
 
         AssertSameEvents(participation.Phases[0], loaded.Phases[0]);
         Assert.Equal(participation.Phases[0].ArriveTime, loaded.Phases[0].ArriveTime);
@@ -93,14 +86,12 @@ public sealed class TimeEventStorageTests : IClassFixture<NtsIntegrationFixture>
     [Fact]
     public async Task A_time_that_was_there_before_events_were_kept_is_stored_as_an_accepted_manual_event_with_no_actor()
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var id = Guid.NewGuid();
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var participation = WithTimes(eventId, id);
-        await functionsApi.Create(participation);
+        await _stored.WriteParticipation(participation);
 
-        var stored = await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id);
+        var stored = await _stored.Read("event_participations", id);
 
         var events = stored["Phases"]
             .AsBsonArray[0]
@@ -119,7 +110,7 @@ public sealed class TimeEventStorageTests : IClassFixture<NtsIntegrationFixture>
             }
         );
 
-        var loaded = await functionsApi.ReadParticipation(eventId, id);
+        var loaded = await _stored.LoadParticipation(id);
 
         AssertSameEvents(participation.Phases[0], loaded.Phases[0]);
         Assert.Equal(START.AddHours(1), loaded.Phases[0].ArriveTime!.ToDateTimeOffset());
@@ -128,43 +119,20 @@ public sealed class TimeEventStorageTests : IClassFixture<NtsIntegrationFixture>
     }
 
     [Fact]
-    public async Task The_Version_of_a_Participation_is_stored_with_its_document()
-    {
-        var eventId = Guid.NewGuid();
-        var id = Guid.NewGuid();
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
-        var model = ParticipationModel.MapFrom(Ridden(eventId, id));
-        model.Version = 3;
-
-        await FunctionsRequests.Send(_fixture.FunctionsBaseUrl, HttpMethod.Post, "api/participations", model);
-
-        var stored = await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id);
-        Assert.Equal(3, stored["Version"].AsInt32);
-    }
-
-    [Fact]
-    public void The_time_events_round_trip_through_both_JSON_serializers_the_platform_uses()
+    public void The_time_events_round_trip_through_the_JSON_of_the_Api()
     {
         var participation = Ridden(Guid.NewGuid(), Guid.NewGuid());
         var model = ParticipationModel.MapFrom(participation);
         model.Version = 7;
 
-        var viaSystemText = SystemTextJson.Deserialize<ParticipationModel>(
+        var received = SystemTextJson.Deserialize<ParticipationModel>(
             SystemTextJson.Serialize(model, JsonApiResults.Options),
             JsonApiResults.Options
         )!;
-        var viaNewtonsoft = JsonConvert.DeserializeObject<ParticipationModel>(
-            JsonConvert.SerializeObject(model, new NJsonSettings()),
-            new NJsonSettings()
-        )!;
 
-        foreach (var received in new[] { viaSystemText, viaNewtonsoft })
-        {
-            AssertSameEvents(participation.Phases[0], received.MapToEntity().Phases[0]);
-            Assert.Equal(7, received.Version);
-            Assert.True(received.Phases[0].IsRepresentRequested);
-        }
+        AssertSameEvents(participation.Phases[0], received.MapToEntity().Phases[0]);
+        Assert.Equal(7, received.Version);
+        Assert.True(received.Phases[0].IsRepresentRequested);
     }
 
     /// <summary>

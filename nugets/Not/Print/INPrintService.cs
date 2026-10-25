@@ -5,15 +5,8 @@ namespace Not.Print;
 
 public interface INPrintService : ITransient
 {
-    Task<NFile> CreatePdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default);
-
-    Task<NFile> CreateZip(NPrintBatchRequest request, CancellationToken cancellationToken = default);
-
+    /// <summary>Prints the document through the print dialog of the browser: nothing is sent to a server.</summary>
     Task PrintPdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default);
-
-    Task DownloadPdf(NPrintDocumentRequest request, CancellationToken cancellationToken = default);
-
-    Task DownloadZip(NPrintBatchRequest request, CancellationToken cancellationToken = default);
 
     Task DownloadFile(NFile file, CancellationToken cancellationToken = default);
 }

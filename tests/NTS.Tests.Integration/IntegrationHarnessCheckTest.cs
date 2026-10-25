@@ -56,43 +56,6 @@ public sealed partial class IntegrationHarnessCheckTest : IClassFixture<NtsInteg
     }
 
     [Fact]
-    public async Task Witness_profile_update_completes_existing_email_only_user()
-    {
-        var profileUser = new IntegrationUser(
-            "profile-completion.witness@integration.test",
-            "profile-completion-witness-user",
-            "Profile Completion"
-        );
-        using var api = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-
-        var registered = await api.RegisterUser(profileUser);
-
-        Assert.Equal(profileUser.Email, registered.Email);
-        Assert.Null(registered.GivenName);
-        Assert.Null(registered.Surname);
-        Assert.Null(registered.CountryRegion);
-
-        var updated = await api.UpdateUserProfile(
-            profileUser.Email,
-            new UpdateUserProfilePayload("Petra", "Profile", "Bulgaria", club: "Konarche", feiId: "20202020")
-        );
-        var persisted = await api.ReadUser(profileUser.Email);
-
-        Assert.Equal(registered.Id, updated.Id);
-        Assert.Equal(profileUser.Email, updated.Email);
-        Assert.Equal("Petra Profile", updated.Name);
-        Assert.Equal("Petra", updated.GivenName);
-        Assert.Equal("Profile", updated.Surname);
-        Assert.Equal("Bulgaria", updated.CountryRegion);
-        Assert.Equal("Konarche", updated.Club);
-        Assert.Equal("20202020", updated.FeiId);
-        Assert.NotNull(persisted);
-        Assert.Equal(updated.Id, persisted!.Id);
-        Assert.Equal(updated.Name, persisted.Name);
-        Assert.Equal(updated.CountryRegion, persisted.CountryRegion);
-    }
-
-    [Fact]
     public async Task Witness_contexts_pick_up_the_user_when_signin_completes_after_startup()
     {
         var signingInUser = new IntegrationUser(

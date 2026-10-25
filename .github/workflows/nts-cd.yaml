@@ -1,0 +1,60 @@
+name: CD
+run-name: CD ${{ github.ref_name == 'master' && 'Production' || 'Staging' }} [${{ github.ref_name }}]
+
+# One host, NoTiming.Api, which serves the Ui and the live hub (ADR-0011): develop deploys staging and master deploys
+# production.
+on:
+  push:
+    branches:
+      - develop
+      - master
+
+env:
+  CONFIGURATION: Release
+  DOTNET_HOST_VERSION: 10.0.x
+  API_PROJECT: src/NoTiming.Api/NoTiming.Api.csproj
+  API_ARTIFACT_PATH: NoTiming.Api/publish
+
+jobs:
+  deploy-api:
+    runs-on: ubuntu-latest
+    name: ${{ github.ref_name == 'master' && 'Production' || 'Staging' }} - Api
+    env:
+      # .NET 10 bakes the Blazor environment into the Ui at build time and no longer reads the Blazor-Environment
+      # response header, so every build of the Ui names its environment.
+      WASM_ENVIRONMENT: ${{ github.ref_name == 'master' && 'Production' || 'Staging' }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ env.DOTNET_HOST_VERSION }}
+
+    - name: Restore
+      run: dotnet restore "${{ env.API_PROJECT }}"
+
+    - name: Publish
+      run: |
+        dotnet publish ${{ env.API_PROJECT }} \
+        --configuration ${{ env.CONFIGURATION }} \
+        --no-restore \
+        -p:WasmApplicationEnvironmentName=${{ env.WASM_ENVIRONMENT }} \
+        --output ${{ env.API_ARTIFACT_PATH }}
+
+    - name: Deploy to the staging Azure Web App
+      if: github.ref_name == 'develop'
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: nts-nexus-warp-dev
+        publish-profile: ${{ secrets.AZURE_NTS_NEXUS_WARP_DEV_PUBLISH_PROFILE }}
+        package: ${{ env.API_ARTIFACT_PATH }}
+
+    - name: Deploy to the production Azure Web App
+      if: github.ref_name == 'master'
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: nts-warp-prod
+        publish-profile: ${{ secrets.AZURE_NTS_NEXUS_WARP_PRODUCTION_PUBLISH_PROFILE }}
+        package: ${{ env.API_ARTIFACT_PATH }}

@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using Newtonsoft.Json;
 using Not.Serialization.JSON;
-using NTS.Application.Mongo;
+using NoTiming.Api.Features.Reference;
 
 namespace NTS.Tests.Integration;
 

@@ -1,5 +1,5 @@
 using NoTiming.Ui.Features.Core.Participations;
-using NTS.Application.Arrivelists;
+using NoTiming.Ui.Features.Lists;
 using NTS.Domain.Core.Aggregates.Participations.Objects;
 
 namespace NTS.Tests.Unit.Application;

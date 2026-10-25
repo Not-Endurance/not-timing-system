@@ -2,7 +2,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Enums;
-using NTS.Nexus.HTTP.Mongo;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using NTS.Tools.ParticipationCopies;
@@ -12,26 +11,26 @@ namespace NTS.Tests.Integration;
 /// <summary>
 /// ADR-0006 and #626: <c>migrate-participation-copies</c> turns the copy of a Participation inside every Ranking entry
 /// and Handout into a reference, keeps the stored ranks and strips the derived values. It runs here over documents in
-/// the shape the production data has, on a MongoDB in a container; the Participations are written by the Functions API
-/// and then given the derived values the code before stored.
+/// the shape the production data has, on a MongoDB in a container; the Participations are written the way the
+/// application stores them and then given the derived values the code before stored.
 /// </summary>
-public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegrationFixture>, IAsyncLifetime
+public sealed class ParticipationCopiesMigrationTests : IClassFixture<MongoFixture>, IAsyncLifetime
 {
-    const string RANKINGS = MongoConstants.RANKINGS_COLLECTION;
-    const string HANDOUTS = MongoConstants.HANDOUTS_COLLECTION;
-    const string PARTICIPATIONS = MongoConstants.PARTICIPATIONS_COLLECTION;
+    const string RANKINGS = "event_rankings";
+    const string HANDOUTS = "event_handouts";
+    const string PARTICIPATIONS = "event_participations";
     static readonly string[] COLLECTIONS = [RANKINGS, HANDOUTS, PARTICIPATIONS];
     static readonly DateTimeOffset START = new(2026, 4, 28, 8, 0, 0, TimeSpan.Zero);
 
-    readonly NtsIntegrationFixture _fixture;
+    readonly string _connectionString;
     readonly StoredDocuments _stored;
     readonly IMongoDatabase _database;
 
-    public ParticipationCopiesMigrationTests(NtsIntegrationFixture fixture)
+    public ParticipationCopiesMigrationTests(MongoFixture mongo)
     {
-        _fixture = fixture;
-        _stored = new StoredDocuments(fixture.MongoConnectionString);
-        _database = new MongoClient(fixture.MongoConnectionString).GetDatabase(MongoConstants.NTS_DATABASE);
+        _connectionString = mongo.ConnectionString;
+        _stored = new StoredDocuments(mongo.ConnectionString);
+        _database = new MongoClient(mongo.ConnectionString).GetDatabase(UserSeed.DATABASE);
     }
 
     /// <summary>The migration reads every document of the three collections, so each test starts from empty ones.</summary>
@@ -127,8 +126,7 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
     public async Task The_Results_composed_after_the_migration_equal_the_ones_before_for_every_entry_whose_copy_did_not_differ()
     {
         var seeded = await SeedLegacyEvent();
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-        var copies = await functionsApi.ReadParticipations(seeded.EventId); // the copies of before are the stored Participations
+        var copies = await _stored.LoadParticipations(seeded.EventId); // the copies of before are the stored Participations
         var firstBefore = new Result(
             CreateRanking(
                 seeded.FirstRanking,
@@ -142,8 +140,8 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
 
         await Migrate(apply: true);
 
-        var rankings = await functionsApi.ReadRankings(seeded.EventId);
-        var participations = await functionsApi.ReadParticipations(seeded.EventId);
+        var rankings = await _stored.LoadRankings(seeded.EventId);
+        var participations = await _stored.LoadParticipations(seeded.EventId);
         var firstAfter = new Result(rankings.Single(x => x.Id == seeded.FirstRanking), participations);
         var secondAfter = new Result(rankings.Single(x => x.Id == seeded.SecondRanking), participations);
 
@@ -314,7 +312,7 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
     public async Task The_command_exits_with_1_when_it_refuses_or_is_asked_wrongly_and_with_0_otherwise()
     {
         await SeedDanglingReferences(await SeedLegacyEvent());
-        var connection = _fixture.MongoConnectionString;
+        var connection = _connectionString;
 
         var dryRun = await Command(["--connection-string", connection]);
         var refused = await Command(["--connection-string", connection, "--apply"]);
@@ -407,10 +405,8 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
     /// </summary>
     async Task<DanglingReferences> SeedDanglingReferences(SeededEvent seeded)
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var otherEvent = Guid.NewGuid();
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(otherEvent));
-        var elsewhere = await StoreLegacy(functionsApi, Finished(otherEvent, 5, START.AddHours(3)));
+        var elsewhere = await StoreLegacy(Finished(otherEvent, 5, START.AddHours(3)));
         var dangling = new DanglingReferences(elsewhere["_id"].AsBsonBinaryData.ToGuid(GuidRepresentation.Standard));
         var invented = seeded.Copy(seeded.First).DeepClone().AsBsonDocument;
         invented["_id"] = LegacyDocuments.Uuid(dangling.Nowhere);
@@ -542,10 +538,10 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
         return all;
     }
 
-    /// <summary>Writes the Participation through the Functions API, then gives it the derived values of before.</summary>
-    async Task<BsonDocument> StoreLegacy(FunctionsApiDriver functionsApi, Participation participation)
+    /// <summary>Writes the Participation the way the application stores it, then gives it the derived values of before.</summary>
+    async Task<BsonDocument> StoreLegacy(Participation participation)
     {
-        await functionsApi.Create(participation);
+        await _stored.WriteParticipation(participation);
         var stored = await _stored.Read(PARTICIPATIONS, participation.Id);
         LegacyDocuments.AddDerivedValues(stored);
         await _stored.Replace(PARTICIPATIONS, participation.Id, stored);
@@ -559,16 +555,14 @@ public sealed class ParticipationCopiesMigrationTests : IClassFixture<NtsIntegra
     /// </summary>
     async Task<SeededEvent> SeedLegacyEvent()
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var participations = new List<Participation>();
         var copies = new Dictionary<Guid, BsonDocument>();
         for (var number = 1; number <= 4; number++)
         {
             var participation = Finished(eventId, number, START.AddHours(1).AddMinutes(30 * (number - 1)));
             participations.Add(participation);
-            copies[participation.Id] = await StoreLegacy(functionsApi, participation);
+            copies[participation.Id] = await StoreLegacy(participation);
         }
 
         var seeded = new SeededEvent(eventId, participations, copies);

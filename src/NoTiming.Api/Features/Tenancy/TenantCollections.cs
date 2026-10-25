@@ -11,7 +11,7 @@ namespace NoTiming.Api.Features.Tenancy;
 /// <c>TenantId</c>, and every one of these collections is read and written through <see cref="TenantCollection"/> and
 /// never directly. A collection that no Tenant owns is not in the list and cannot be opened that way: accounts, the
 /// countries and the Tenants are global, the state a person keeps per Event and the links they make to the registries
-/// (#638) are the person's own, and the pending Snapshots go with the Functions API.
+/// (#638) are the person's own, and there are no pending Snapshots (ADR-0013).
 /// </summary>
 internal static class TenantOwned
 {

@@ -43,7 +43,7 @@ public sealed class ViewedEventTests : IClassFixture<NtsIntegrationFixture>
             tenant,
             IntegrationPayloadFactory.Official(historicId, null, Guid.NewGuid())
         );
-        await using var viewer = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "viewer-views");
+        await using var viewer = new ViewerDriver(_fixture.ApiBaseUrl, null, "viewer-views");
         await viewer.Start();
         await viewer.Connect(IntegrationPayloadFactory.EventInformation(liveId));
         await viewer.WaitForParticipation(13, _ => true, PATIENCE);
@@ -82,12 +82,7 @@ public sealed class ViewedEventTests : IClassFixture<NtsIntegrationFixture>
             DateTimeOffset.UtcNow
         );
         await SeedParticipationsAsync(tenant, historicId, 1, 2);
-        await using var viewer = new ViewerDriver(
-            _fixture.ApiBaseUrl,
-            _fixture.FunctionsBaseUrl,
-            null,
-            "viewer-record"
-        );
+        await using var viewer = new ViewerDriver(_fixture.ApiBaseUrl, null, "viewer-record");
         await viewer.Start();
 
         using var view = await viewer.GetRequiredService<IViewedEventProvider>().Open(historicId);
@@ -102,7 +97,7 @@ public sealed class ViewedEventTests : IClassFixture<NtsIntegrationFixture>
         var tenant = await TenancySeed.TenantAsync(_fixture.MongoConnectionString);
         var liveId = await EventSeed.LiveAsync(_fixture.MongoConnectionString, tenant, null, DateTimeOffset.UtcNow);
         await SeedParticipationsAsync(tenant, liveId, 21, 22);
-        await using var viewer = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "viewer-live");
+        await using var viewer = new ViewerDriver(_fixture.ApiBaseUrl, null, "viewer-live");
         await viewer.Start();
 
         using var view = await viewer.GetRequiredService<IViewedEventProvider>().Open(liveId);
@@ -118,7 +113,7 @@ public sealed class ViewedEventTests : IClassFixture<NtsIntegrationFixture>
     [Fact]
     public async Task An_Event_the_Api_does_not_have_is_not_opened()
     {
-        await using var viewer = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "viewer-none");
+        await using var viewer = new ViewerDriver(_fixture.ApiBaseUrl, null, "viewer-none");
         await viewer.Start();
 
         Assert.Null(await viewer.GetRequiredService<IViewedEventProvider>().Open(Guid.NewGuid()));

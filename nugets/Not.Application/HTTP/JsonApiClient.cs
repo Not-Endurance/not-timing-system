@@ -10,9 +10,7 @@ namespace Not.Application.HTTP;
 
 /// <summary>
 /// Where a client finds the resources of the Api, which move as JSON:API documents (ADR-0008), and what it sends with a
-/// write. The address is the one of the host that serves the Api, such as the host that served the page, and is not the
-/// one of the legacy host that <see cref="NHttpSettings"/> names, so a family that has moved is reached while the ones
-/// that have not are still reached where they are.
+/// write. The address is the one of the host that serves the Api, such as the host that served the page.
 /// </summary>
 public class JsonApiSettings
 {

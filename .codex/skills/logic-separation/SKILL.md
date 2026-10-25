@@ -14,7 +14,7 @@ When changing business behavior:
 1. Identify the use case, affected aggregate/entity/value object, state transition, and external dependencies.
 2. Put rules that decide whether a model state or transition is valid inside the domain object that owns that state.
 3. Put rules that coordinate repositories, external systems, domain boundaries, domain events, transactions, or multiple domain objects into an Application service.
-4. Put storage, HTTP, message bus, Azure Functions, SignalR, framework, serialization, and SDK details behind abstractions implemented outside the domain.
+4. Put storage, HTTP, message bus, SignalR, framework, serialization, and SDK details behind abstractions implemented outside the domain.
 5. Keep adapters limited to binding framework inputs, invoking Application services, and shaping framework results.
 6. Add focused tests at the layer that owns the behavior.
 
@@ -31,7 +31,7 @@ Domain objects must:
 - Keep constructors/factories and mutation methods responsible for their own invariants.
 - Leave persistence, transport, notification, clock, storage, and framework behavior outside unless accessed through a pure abstraction.
 
-Domain projects must not reference direct infrastructure dependencies such as storage repositories, Mongo/EF clients, HTTP clients, Azure Functions, SignalR, message bus SDKs, app projects, or UI projects.
+Domain projects must not reference direct infrastructure dependencies such as storage repositories, Mongo/EF clients, HTTP clients, SignalR, message bus SDKs, app projects, or UI projects.
 
 When a domain rule needs external knowledge, prefer this order:
 
@@ -62,7 +62,7 @@ Application services must not:
 
 ## Infrastructure And Adapters
 
-Infrastructure implements ports and persistence/transport details. Adapters are Azure Functions, controllers, minimal API endpoints, SignalR hubs, Blazor components, component-behind classes, jobs, and other framework entrypoints.
+Infrastructure implements ports and persistence/transport details. Adapters are controllers, minimal API endpoints, SignalR hubs, Blazor components, component-behind classes, jobs, and other framework entrypoints.
 
 Adapters may bind inputs, read route/body/form values, perform framework logging/telemetry, manage UI-only state, invoke Application services, and shape framework-specific responses. They must not contain business rules, multi-step workflows, domain state transitions, repository orchestration, or domain event publishing logic.
 
@@ -93,11 +93,13 @@ Keep logic in adapters only when it is framework or presentation plumbing.
 Use these default homes:
 
 - Domain model and invariant behavior: `src/Domain/NTS.Domain*`.
-- Shared application use cases, ports, factories, and orchestration: `src/NTS.Application*`.
-- Storage and direct infrastructure implementations: `src/NTS.Storage` or app infrastructure projects.
-- Azure Functions, Blazor components, hubs, controllers, and app entrypoints: `src/Apps/*`.
+- Application use cases, ports, factories, and orchestration: the `Features` folders of the host that owns them (ADR-0011). The server's are in `src/NoTiming.Api`, and the view services and REST repositories of the browser are in `src/NoTiming.Ui`.
+- Storage and direct infrastructure implementations: `src/NoTiming.Api` (the MongoDB wiring), and the generic ones in `nugets/Not.Storage`.
+- Blazor components, hubs, endpoints, and app entrypoints: `src/NoTiming.Api`, `src/NoTiming.Ui`, `src/NoTiming.Console` and `src/NTS.Blazor`.
 
-Prefer `src/NTS.Application` for reusable Application services. App-specific services may live near the app when the behavior is genuinely app-local, but still treat them as Application services: inject them, keep adapters thin, keep domain state changes inside domain objects, and keep infrastructure behind ports.
+The project graph keeps the layering: the Api references the Ui, the Ui never references the Api, and the domain references no infrastructure (`tests/NTS.Tests.Integration/Architecture`).
+
+Services live in the `Features` folder of the host that owns them, and are Application services all the same: inject them, keep adapters thin, keep domain state changes inside domain objects, and keep infrastructure behind ports.
 
 Use interfaces for injected collaborators, implement services with the repo's injection marker such as `ITransient` when appropriate, and see `$service-helper-collaborator-definitions` when deciding between a Service, Helper, Processor, or more specific collaborator.
 

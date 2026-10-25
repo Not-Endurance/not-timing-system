@@ -610,6 +610,37 @@ public sealed class ParticipationWriteTests : IClassFixture<MongoFixture>
     }
 
     [Fact]
+    public async Task A_Ranking_that_counts_a_Participation_is_not_written_again_when_the_Participation_changes()
+    {
+        var changes = new RecordedChanges();
+        await using var api = NewApi(changes);
+        using var client = ApiClients.Of(api);
+        var tenant = await TenantAsync(_mongo.ConnectionString);
+        var mainOperator = await SignedInAsync(api, client, _mongo.ConnectionString, tenant);
+        var eventId = await EventSeed.LiveAsync(
+            _mongo.ConnectionString,
+            tenant,
+            mainOperator.Id,
+            DateTimeOffset.UtcNow
+        );
+        var first = Ridden(eventId, 1);
+        var second = Ridden(eventId, 2);
+        foreach (var participation in new[] { first, second })
+        {
+            await EventSeed.ParticipationAsync(_mongo.ConnectionString, tenant, participation);
+        }
+
+        var ranking = IntegrationPayloadFactory.Ranking(eventId, [first, second], Guid.NewGuid(), "CEI 1*");
+        await EventSeed.RankingAsync(_mongo.ConnectionString, tenant, ranking);
+        var before = (await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_rankings", ranking.Id))!;
+
+        var response = await Change(mainOperator, first.Id, new { eliminated = new { code = "WD" } }, version: 0);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode); // the change was written
+        Assert.Equal(before, await RegistrySeed.StoredAsync(_mongo.ConnectionString, "event_rankings", ranking.Id)); // and the Ranking was not
+    }
+
+    [Fact]
     public async Task A_row_that_is_in_another_Tenant_than_its_Event_is_not_written_through_the_Event()
     {
         var changes = new RecordedChanges();

@@ -32,7 +32,6 @@ public sealed class IdPathsTests
         ("event_handouts", typeof(CoreModels.HandoutModel)),
         ("event_user_sessions", typeof(WatcherModels.NtsUserSessionModel)),
     ];
-    static readonly Type[] NOT_CONVERTED = [typeof(SharedModels.SettingModel)];
 
     public static TheoryData<string> Collections()
     {
@@ -68,7 +67,7 @@ public sealed class IdPathsTests
             .Where(x => x is { IsClass: true, IsAbstract: false } && typeof(IDocument).IsAssignableFrom(x))
             .ToList();
 
-        var unknown = documents.Except(COLLECTIONS.Select(x => x.Model)).Except(NOT_CONVERTED).Select(x => x.FullName);
+        var unknown = documents.Except(COLLECTIONS.Select(x => x.Model)).Select(x => x.FullName);
 
         Assert.Empty(unknown);
     }

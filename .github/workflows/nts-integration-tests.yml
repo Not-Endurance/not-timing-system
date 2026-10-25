@@ -17,29 +17,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      # .NET 10 builds and runs the tests and the Api. .NET 8 runs the legacy Functions worker, which stays on it until
-      # that API is retired (#647).
+      # The tests host the Api in their own process on a MongoDB in a container (Docker is on the runner), so .NET 10
+      # is all they need.
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: |
-            8.0.x
-            10.0.x
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          package-manager-cache: false
-
-      - name: Install Azure Functions tools
-        run: npm install -g azure-functions-core-tools@4 --unsafe-perm true azurite
-
-      - name: Start Azurite
-        shell: bash
-        run: |
-          mkdir -p "$RUNNER_TEMP/azurite"
-          nohup azurite --location "$RUNNER_TEMP/azurite" --silent > "$RUNNER_TEMP/azurite.log" 2>&1 &
+          dotnet-version: 10.0.x
 
       - name: Restore
         run: dotnet restore ${{ env.TEST_PROJECT_PATH }}

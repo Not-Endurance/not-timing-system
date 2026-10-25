@@ -29,8 +29,6 @@ internal sealed class ConsoleUi : IAsyncDisposable
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = "console-test",
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ConnectTimeoutSeconds)}"] = "10",
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = ORIGIN,
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
                 }
             )
             .Build();

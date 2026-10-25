@@ -70,9 +70,8 @@ internal sealed class EventStore
 
     /// <summary>
     /// Makes an Event in the Tenant: a Setup with a name and a location, the country of the Tenant, nothing configured yet,
-    /// and the account that makes it as its Main Operator, with the id the client made for it or one of the server's. The
-    /// Setup is the one the Functions API reads, so the Event shows in Judge until the Console replaces it. Created is
-    /// false when an Event with the id is there already, whoever's it is.
+    /// and the account that makes it as its Main Operator, with the id the client made for it or one of the server's.
+    /// Created is false when an Event with the id is there already, whoever's it is.
     /// </summary>
     public async Task<(Guid Id, bool Created)> CreateAsync(
         string tenantId,

@@ -1,10 +1,10 @@
 using System.Text;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using NoTiming.Api.Features.Events.Factories;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
 using NoTiming.Api.JsonApi;
-using NTS.Application.Factories;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Objects;
 using NTS.Domain.Setup.Aggregates;

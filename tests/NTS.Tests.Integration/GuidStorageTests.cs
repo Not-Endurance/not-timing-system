@@ -1,39 +1,34 @@
 using MongoDB.Bson;
-using MongoDB.Driver;
-using NTS.Nexus.HTTP.Mongo;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 
 namespace NTS.Tests.Integration;
 
 /// <summary>
-/// ADR-0009: every Guid is stored, <c>_id</c> included, as a standard-representation BSON UUID, and a filter on a Guid
-/// foreign key finds the right documents. The documents go in through the Functions API and the raw BSON is read
-/// straight from MongoDB.
+/// ADR-0009: every Guid is stored, <c>_id</c> included, as a standard-representation BSON UUID. The Participation is written
+/// the way the application stores one and the raw BSON is read straight from MongoDB.
 /// </summary>
-public sealed class GuidStorageTests : IClassFixture<NtsIntegrationFixture>
+public sealed class GuidStorageTests : IClassFixture<MongoFixture>
 {
-    readonly NtsIntegrationFixture _fixture;
+    readonly StoredDocuments _stored;
 
-    public GuidStorageTests(NtsIntegrationFixture fixture)
+    public GuidStorageTests(MongoFixture mongo)
     {
-        _fixture = fixture;
+        _stored = new StoredDocuments(mongo.ConnectionString);
     }
 
     [Fact]
     public async Task A_Guid_id_and_a_Guid_reference_are_stored_as_standard_UUIDs_and_read_back()
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var participationId = Guid.NewGuid();
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var participation = IntegrationPayloadFactory.ActiveParticipation(eventId, 1, participationId);
-        await functionsApi.Create(participation);
+        await _stored.WriteParticipation(participation);
 
-        var stored = await ReadStored(MongoConstants.PARTICIPATIONS_COLLECTION, participationId);
+        var stored = await _stored.Read("event_participations", participationId);
 
-        AssertStandardUuid(stored["_id"], participationId);
-        AssertStandardUuid(stored["EventId"], eventId);
+        StoredDocuments.AssertStandardUuid(stored["_id"], participationId);
+        StoredDocuments.AssertStandardUuid(stored["EventId"], eventId);
         var uuids = Walk("", stored).Where(x => x.Value.BsonType == BsonType.Binary).ToList();
         Assert.True(
             uuids.Count > 2,
@@ -54,48 +49,13 @@ public sealed class GuidStorageTests : IClassFixture<NtsIntegrationFixture>
                 .Select(x => x.Path)
         );
 
-        var readBack = await functionsApi.ReadParticipation(eventId, participationId);
+        var readBack = await _stored.LoadParticipation(participationId);
         Assert.Equal(participationId, readBack.Id);
         Assert.Equal(eventId, readBack.EventId);
         Assert.Equal(participation.Combination.Id, readBack.Combination.Id);
         Assert.Equal(participation.Combination.Athlete.Id, readBack.Combination.Athlete.Id);
         Assert.Equal(participation.Combination.Horse.Id, readBack.Combination.Horse.Id);
         Assert.Equal(participation.Phases.Single().Id, readBack.Phases.Single().Id);
-    }
-
-    [Fact]
-    public async Task A_filter_on_a_Guid_foreign_key_returns_the_documents_of_that_Event_only()
-    {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
-        var eventId = Guid.NewGuid();
-        var otherEventId = Guid.NewGuid();
-        var participationId = Guid.NewGuid();
-        var otherParticipationId = Guid.NewGuid();
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(otherEventId));
-        await functionsApi.Create(IntegrationPayloadFactory.ActiveParticipation(eventId, 1, participationId));
-        await functionsApi.Create(IntegrationPayloadFactory.ActiveParticipation(otherEventId, 2, otherParticipationId));
-
-        Assert.Equal(participationId, Assert.Single(await functionsApi.ReadParticipations(eventId)).Id);
-        Assert.Equal(otherParticipationId, Assert.Single(await functionsApi.ReadParticipations(otherEventId)).Id);
-        Assert.Empty(await functionsApi.ReadParticipations(Guid.NewGuid()));
-    }
-
-    async Task<BsonDocument> ReadStored(string collection, Guid id)
-    {
-        var documents = new MongoClient(_fixture.MongoConnectionString)
-            .GetDatabase(MongoConstants.NTS_DATABASE)
-            .GetCollection<BsonDocument>(collection);
-        return await documents
-            .Find(new BsonDocument("_id", new BsonBinaryData(id, GuidRepresentation.Standard)))
-            .SingleAsync();
-    }
-
-    static void AssertStandardUuid(BsonValue value, Guid expected)
-    {
-        Assert.Equal(BsonType.Binary, value.BsonType);
-        Assert.Equal(BsonBinarySubType.UuidStandard, value.AsBsonBinaryData.SubType);
-        Assert.Equal(expected, value.AsBsonBinaryData.ToGuid(GuidRepresentation.Standard));
     }
 
     /// <summary>An identifier of ours: <c>_id</c> or <c>*Id</c>. The FEI identifiers belong to the federation.</summary>

@@ -5,7 +5,7 @@ using MongoDB.Driver;
 namespace NTS.Tests.Integration.Infrastructure;
 
 /// <summary>
-/// Users as they exist before identity: a row of the Functions API with the profile fields and none of the identity
+/// Users as they exist before identity: a row as the Functions API wrote it, with the profile fields and none of the identity
 /// ones (ADR-0002). A test that signs in starts from one of these, as every existing user does.
 /// </summary>
 internal static class UserSeed

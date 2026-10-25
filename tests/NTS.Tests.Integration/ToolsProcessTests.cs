@@ -119,16 +119,15 @@ public sealed class ToolsProcessTests : IClassFixture<MongoFixture>
     }
 
     /// <summary>
-    /// The command where its own build put it, in the configuration this test was built in. The copy beside the tests is
-    /// not the one to run: the tests are .NET 10 and their folder holds the libraries of that, which the command, a .NET 8
-    /// program, cannot load.
+    /// The command where its own build put it, in the configuration this test was built in, which is how the owner runs it
+    /// (every project is .NET 10, #647).
     /// </summary>
     static string ToolPath()
     {
         var tests = new DirectoryInfo(AppContext.BaseDirectory); // <root>/tests/NTS.Tests.Integration/bin/<configuration>/net10.0
         var configuration = tests.Parent!.Name;
         var root = tests.Parent.Parent!.Parent!.Parent!.Parent!.FullName;
-        var path = Path.Combine(root, "tools", "NTS.Tools", "bin", configuration, "net8.0", "NTS.Tools.dll");
+        var path = Path.Combine(root, "tools", "NTS.Tools", "bin", configuration, "net10.0", "NTS.Tools.dll");
         return File.Exists(path) ? path : throw new FileNotFoundException("The tools were not built.", path);
     }
 

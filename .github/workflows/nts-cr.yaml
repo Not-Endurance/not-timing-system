@@ -6,8 +6,7 @@ on:
     types: [opened, reopened, synchronize, ready_for_review]
 
 env:
-  # The hosts and the tests are .NET 10; the libraries stay on .NET 8 and build with the .NET 10 SDK. Csharpier 0.30.6
-  # runs on .NET 8, so that job installs it.
+  # Every project is .NET 10 and builds with the .NET 10 SDK. Csharpier 0.30.6 runs on .NET 8, so that job installs it.
   DOTNET_CORE_VERSION: 8.0.x
   DOTNET_HOST_VERSION: 10.0.x
   SOURCE_DIR: src
@@ -78,3 +77,7 @@ jobs:
 
     - name: Build
       run: dotnet build ${{ env.SOURCE_DIR }}/${{ env.SOLUTION_FILE }} -c ${{ env.CONFIGURATION }} --no-restore
+
+    # The layering of ADR-0011, read from the project files: no Docker and no browser, a few seconds on the build above.
+    - name: Architecture tests
+      run: dotnet test tests/NTS.Tests.Integration/NTS.Tests.Integration.csproj -c ${{ env.CONFIGURATION }} --no-build --filter "FullyQualifiedName~NTS.Tests.Integration.Architecture"

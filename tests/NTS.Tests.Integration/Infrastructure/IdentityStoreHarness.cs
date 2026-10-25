@@ -31,7 +31,7 @@ internal sealed class IdentityStoreHarness : IAsyncDisposable
         return new IdentityStoreHarness(provider, provider.GetRequiredService<IMongoClient>().GetDatabase(database));
     }
 
-    /// <summary>A row of the Functions API with the profile fields, and one field no code of ours knows.</summary>
+    /// <summary>A row as the Functions API wrote it, with the profile fields, and one field no code of ours knows.</summary>
     public static BsonDocument LegacyRow(string email, Guid id)
     {
         return new BsonDocument

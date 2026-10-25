@@ -4,7 +4,7 @@ using Not.Domain.Exceptions;
 using Not.Exceptions;
 using Not.Injection;
 using Not.Notify;
-using NTS.Application.UserSession;
+using NoTiming.Ui.Features.Sessions;
 using NTS.Contracts.Core;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Features.Snapshots;

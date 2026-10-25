@@ -22,13 +22,12 @@ public static class NoTimingUiServices
         services.AddTransient<ConsoleRankingWrites>(); // and the Rankings the Console makes
         services.AddTransient<ConsoleHandoutWrites>(); // and its Handouts
 
-        // The families that moved to the Api are reached where the page came from, which is the Api (ADR-0011), and not
-        // where the legacy host is: the one is the page's own address and the other is a setting.
+        // The resources are reached where the page came from, which is the Api (ADR-0011).
         services.Configure<JsonApiSettings>(settings =>
         {
             settings.Url = $"{baseUrl.TrimEnd('/')}/api";
             settings.WriteHeaders[ApplicationConstants.WRITE_HEADER] = ApplicationConstants.WRITE_HEADER_VALUE;
         });
-        return services.AddNtsWitness(configuration, baseUrl, rootAssembly);
+        return services.AddNtsWitness(configuration, rootAssembly);
     }
 }

@@ -10,7 +10,7 @@ namespace NoTiming.Api.Features.Account;
 /// The countries a person can register from (#601): the ones in the <c>countries</c> collection that have a name and an
 /// ISO code, because a Tenant is made from the ISO code (ADR-0002). A country without one is not offered and is
 /// refused, and so is a row whose id is not a Guid. The documents are read as they are stored and not through the
-/// models of the Functions API, which refuse a country without an ISO code altogether.
+/// models of the countries, which refuse a country without an ISO code altogether.
 /// </summary>
 internal sealed class SelectableCountries
 {

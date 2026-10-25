@@ -1,8 +1,6 @@
 using NoTiming.Ui.Features.Core.Dashboard;
 using NoTiming.Ui.Features.Core.Participations;
-using NTS.Application.Arrivelists;
-using NTS.Application.Presentlists;
-using NTS.Application.Startlists;
+using NoTiming.Ui.Features.Lists;
 
 namespace NTS.Tests.Unit.Application;
 

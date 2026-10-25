@@ -1,5 +1,5 @@
 using NoTiming.Ui.Features.Core.Participations;
-using NTS.Application.Startlists;
+using NoTiming.Ui.Features.Lists;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;

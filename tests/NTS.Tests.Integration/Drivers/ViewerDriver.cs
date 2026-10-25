@@ -53,7 +53,6 @@ internal sealed class ViewerDriver : IAsyncDisposable
     /// <param name="unanswered">What the browser of the Witness keeps of a group that was sent and not answered: another Witness given the same stands for the page being opened again.</param>
     public ViewerDriver(
         Uri apiBaseUrl,
-        Uri functionsBaseUrl,
         IntegrationUser? user,
         string clientName,
         MemoryUnansweredSnapshots? unanswered = null
@@ -69,28 +68,19 @@ internal sealed class ViewerDriver : IAsyncDisposable
 
         _clientName = clientName;
         _unanswered = unanswered ?? new MemoryUnansweredSnapshots();
-        var configuration = CreateConfiguration(
-            apiBaseUrl,
-            functionsBaseUrl,
-            ApplicationConstants.LIVE_HUB,
-            clientName
-        );
+        var configuration = CreateConfiguration(apiBaseUrl, ApplicationConstants.LIVE_HUB, clientName);
         var services = new ServiceCollection();
 
         services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Warning));
         services.ConfigureNtsStorage(configuration).AddRestApiStorage();
 
-        // The families that moved to the Api are reached at the Api, as the Ui does where its page came from.
+        // The resources are reached at the Api, as the Ui does where its page came from.
         services.Configure<JsonApiSettings>(settings =>
         {
             settings.Url = $"{apiBaseUrl.ToString().TrimEnd('/')}/api";
             settings.WriteHeaders[ApplicationConstants.WRITE_HEADER] = ApplicationConstants.WRITE_HEADER_VALUE;
         });
-        services.AddNtsWitness(
-            configuration,
-            functionsBaseUrl.ToString().TrimEnd('/'),
-            typeof(NtsWitnessServices).Assembly
-        );
+        services.AddNtsWitness(configuration, typeof(NtsWitnessServices).Assembly);
 
         // A browser sends the session cookie of the page's own host on every request, and keeps what the app asks it to keep;
         // a program has to send the cookie itself, and keeps what a Witness keeps in memory.
@@ -105,7 +95,7 @@ internal sealed class ViewerDriver : IAsyncDisposable
 
     /// <summary>A Witness of the Api of the fixture, as a visitor, who can sign a person in later.</summary>
     public ViewerDriver(NtsIntegrationFixture fixture, string clientName, MemoryUnansweredSnapshots? unanswered = null)
-        : this(fixture.ApiBaseUrl, fixture.FunctionsBaseUrl, null, clientName, unanswered)
+        : this(fixture.ApiBaseUrl, null, clientName, unanswered)
     {
         _fixture = fixture;
     }
@@ -218,7 +208,7 @@ internal sealed class ViewerDriver : IAsyncDisposable
         }
     }
 
-    static IConfiguration CreateConfiguration(Uri apiBaseUrl, Uri functionsBaseUrl, string hub, string clientName)
+    static IConfiguration CreateConfiguration(Uri apiBaseUrl, string hub, string clientName)
     {
         return new ConfigurationBuilder()
             .AddInMemoryCollection(
@@ -229,10 +219,6 @@ internal sealed class ViewerDriver : IAsyncDisposable
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ClientName)}"] = clientName,
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.AppVersion)}"] = "integration-test",
                     [$"{nameof(RpcSettings)}:{nameof(RpcSettings.ConnectTimeoutSeconds)}"] = "10",
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.Host)}"] = functionsBaseUrl
-                        .ToString()
-                        .TrimEnd('/'),
-                    [$"{nameof(NHttpSettings)}:{nameof(NHttpSettings.EndpointPrefix)}"] = "api",
                 }
             )
             .Build();

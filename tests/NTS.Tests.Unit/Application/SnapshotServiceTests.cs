@@ -1,7 +1,7 @@
 using Not.Domain.Exceptions;
 using NoTiming.Ui.Features.Core.Dashboard;
 using NoTiming.Ui.Features.Core.Participations;
-using NTS.Application.UserSession;
+using NoTiming.Ui.Features.Sessions;
 using NTS.Contracts.Features.Access;
 using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Watcher.Models;

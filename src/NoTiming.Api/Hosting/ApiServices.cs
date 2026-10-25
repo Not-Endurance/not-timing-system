@@ -10,8 +10,8 @@ using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Snapshots;
 using NoTiming.Api.Features.Tenancy;
 using NoTiming.Api.Features.UserSessions;
+using NoTiming.Api.Hosting.Cors;
 using NTS;
-using NTS.Application.Cors;
 
 namespace NoTiming.Api.Hosting;
 

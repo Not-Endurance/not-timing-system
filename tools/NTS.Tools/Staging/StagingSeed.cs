@@ -3,7 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Not.Storage.Mongo;
-using NTS.Application.Factories;
+using NoTiming.Api.Features.Events.Factories;
 using NTS.Contracts.Setup.Models;
 using NTS.Domain.Access;
 using NTS.Domain.Aggregates;

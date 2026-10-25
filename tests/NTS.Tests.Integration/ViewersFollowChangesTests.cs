@@ -32,8 +32,8 @@ public sealed class ViewersFollowChangesTests : IClassFixture<NtsIntegrationFixt
             tenant,
             IntegrationPayloadFactory.ActiveParticipation(eventId, 1, Guid.NewGuid())
         );
-        await using var first = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "viewer-one");
-        await using var second = new ViewerDriver(_fixture.ApiBaseUrl, _fixture.FunctionsBaseUrl, null, "viewer-two");
+        await using var first = new ViewerDriver(_fixture.ApiBaseUrl, null, "viewer-one");
+        await using var second = new ViewerDriver(_fixture.ApiBaseUrl, null, "viewer-two");
         await first.Start();
         await second.Start();
         await first.Connect(eventInformation);

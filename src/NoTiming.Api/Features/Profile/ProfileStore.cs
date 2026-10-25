@@ -8,8 +8,8 @@ namespace NoTiming.Api.Features.Profile;
 /// <summary>
 /// Saves the profile of a person into their own user document (#602). It sets the fields of the profile by name and
 /// touches nothing else of the document: not the Tenant the person was placed in, not their roles, not what identity
-/// keeps. The fields and their shape are those the Functions API writes, because both read the same documents until it
-/// is retired, and an optional field that was cleared is not written at all, as that API does not write a null.
+/// keeps. The fields and their shape are those the Functions API wrote, which the documents that exist hold, and an
+/// optional field that was cleared is not written at all, as that API did not write a null.
 /// </summary>
 internal sealed class ProfileStore
 {

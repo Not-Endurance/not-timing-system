@@ -2,7 +2,6 @@ using System.Net;
 using System.Text.Json;
 using Not.Application.HTTP;
 using Not.Injection;
-using NTS.Application.UserSession;
 using NTS.Contracts.Features.Account;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Objects.Snapshots;

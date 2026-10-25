@@ -1,4 +1,4 @@
-using NTS.Application.Factories;
+using NoTiming.Api.Features.Events.Factories;
 using NTS.Contracts.Core.Models;
 using NTS.Contracts.Setup.Models;
 using NTS.Domain.Access;

@@ -1,4 +1,4 @@
-using NTS.Application.Factories;
+using NoTiming.Api.Features.Events.Factories;
 using NTS.Domain.Aggregates;
 using NTS.Domain.Enums;
 using NTS.Domain.Setup.Aggregates;

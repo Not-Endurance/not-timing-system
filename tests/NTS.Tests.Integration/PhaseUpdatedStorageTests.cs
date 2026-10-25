@@ -1,13 +1,10 @@
 using MongoDB.Bson;
-using Newtonsoft.Json;
-using Not.Serialization.JSON;
 using NoTiming.Api.JsonApi;
 using NTS.Contracts.Core.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
 using NTS.Domain.Enums;
 using NTS.Domain.Objects;
-using NTS.Nexus.HTTP.Mongo;
 using NTS.Tests.Integration.Drivers;
 using NTS.Tests.Integration.Infrastructure;
 using SystemTextJson = System.Text.Json.JsonSerializer;
@@ -16,35 +13,31 @@ namespace NTS.Tests.Integration;
 
 /// <summary>
 /// ADR-0005, #620: an edit of the Phase form is stored in the Participation document as an event that lists the times it
-/// changed, a time it cleared among them as a listed time with none, and loads whole through the Functions API; the JSON of
-/// the models round-trips it through both serializers the platform uses with the cleared time still listed.
+/// changed, a time it cleared among them as a listed time with none, and loads whole; the JSON of the models round-trips
+/// it through the serializer of the Api with the cleared time still listed.
 /// </summary>
-public sealed class PhaseUpdatedStorageTests : IClassFixture<NtsIntegrationFixture>
+public sealed class PhaseUpdatedStorageTests : IClassFixture<MongoFixture>
 {
     static readonly DateTimeOffset START = new(2026, 4, 28, 8, 0, 0, TimeSpan.Zero);
     static readonly Guid OFFICIAL = TestId.Of(9);
     static readonly Guid MAIN_OPERATOR = TestId.Of(10);
 
-    readonly NtsIntegrationFixture _fixture;
     readonly StoredDocuments _stored;
 
-    public PhaseUpdatedStorageTests(NtsIntegrationFixture fixture)
+    public PhaseUpdatedStorageTests(MongoFixture mongo)
     {
-        _fixture = fixture;
-        _stored = new StoredDocuments(fixture.MongoConnectionString);
+        _stored = new StoredDocuments(mongo.ConnectionString);
     }
 
     [Fact]
     public async Task An_edit_of_the_Phase_form_is_stored_as_one_event_that_lists_its_times_and_loads_whole()
     {
-        using var functionsApi = new FunctionsApiDriver(_fixture.FunctionsBaseUrl);
         var eventId = Guid.NewGuid();
         var id = Guid.NewGuid();
-        await functionsApi.Create(IntegrationPayloadFactory.EventInformation(eventId));
         var participation = Edited(eventId, id);
-        await functionsApi.Create(participation);
+        await _stored.WriteParticipation(participation);
 
-        var stored = await _stored.Read(MongoConstants.PARTICIPATIONS_COLLECTION, id);
+        var stored = await _stored.Read("event_participations", id);
 
         var phase = stored["Phases"].AsBsonArray[0].AsBsonDocument;
         var events = phase["Events"].AsBsonArray.Select(x => x.AsBsonDocument).ToList();
@@ -61,7 +54,7 @@ public sealed class PhaseUpdatedStorageTests : IClassFixture<NtsIntegrationFixtu
         Assert.Equal(BsonType.DateTime, listed[0]["Time"].BsonType);
         Assert.True(!listed[1].Contains("Time") || listed[1]["Time"].IsBsonNull); // a time that was cleared has none
 
-        var loaded = await functionsApi.ReadParticipation(eventId, id);
+        var loaded = await _stored.LoadParticipation(id);
 
         AssertSameEdit(participation.Phases[0], loaded.Phases[0]);
         Assert.Equal(participation.Phases[0].ArriveTime, loaded.Phases[0].ArriveTime);
@@ -69,26 +62,19 @@ public sealed class PhaseUpdatedStorageTests : IClassFixture<NtsIntegrationFixtu
     }
 
     [Fact]
-    public void An_edit_of_the_Phase_form_round_trips_through_both_JSON_serializers_the_platform_uses_with_the_cleared_time_listed()
+    public void An_edit_of_the_Phase_form_round_trips_through_the_JSON_of_the_Api_with_the_cleared_time_listed()
     {
         var participation = Edited(Guid.NewGuid(), Guid.NewGuid());
         var model = ParticipationModel.MapFrom(participation);
         model.Version = 7;
 
-        var viaSystemText = SystemTextJson.Deserialize<ParticipationModel>(
+        var received = SystemTextJson.Deserialize<ParticipationModel>(
             SystemTextJson.Serialize(model, JsonApiResults.Options),
             JsonApiResults.Options
         )!;
-        var viaNewtonsoft = JsonConvert.DeserializeObject<ParticipationModel>(
-            JsonConvert.SerializeObject(model, new NJsonSettings()),
-            new NJsonSettings()
-        )!;
 
-        foreach (var received in new[] { viaSystemText, viaNewtonsoft })
-        {
-            AssertSameEdit(participation.Phases[0], received.MapToEntity().Phases[0]);
-            Assert.Null(received.MapToEntity().Phases[0].PresentTime);
-        }
+        AssertSameEdit(participation.Phases[0], received.MapToEntity().Phases[0]);
+        Assert.Null(received.MapToEntity().Phases[0].PresentTime);
     }
 
     /// <summary>
