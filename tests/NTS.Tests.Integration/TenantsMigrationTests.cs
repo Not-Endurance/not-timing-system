@@ -126,14 +126,14 @@ public sealed class TenantsMigrationTests : IClassFixture<MongoFixture>
         );
 
         Assert.True(report.Refused);
-        Assert.Null(await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Null(await new MongoStorageEnvironment(data.Database).ReadAsync());
     }
 
     [Fact]
     public async Task A_database_marked_as_another_environment_is_refused_and_keeps_its_marker()
     {
         var data = await LegacyAsync();
-        await EnvironmentMarker.WriteAsync(data.Database, "Production", NOW);
+        await new MongoStorageEnvironment(data.Database).WriteAsync("Production", NOW);
         var before = await data.AllAsync();
 
         var report = await TenantsMigration.Run(
@@ -154,7 +154,7 @@ public sealed class TenantsMigrationTests : IClassFixture<MongoFixture>
 
         var dry = await TenantsMigration.Run(data.Database, new TenantsOptions { Environment = "staging" }, NOW);
         Assert.Equal("Staging", dry.MarkWith);
-        Assert.Null(await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Null(await new MongoStorageEnvironment(data.Database).ReadAsync());
 
         var applied = await TenantsMigration.Run(
             data.Database,
@@ -163,7 +163,7 @@ public sealed class TenantsMigrationTests : IClassFixture<MongoFixture>
         );
 
         Assert.True(applied.Applied);
-        Assert.Equal("Staging", await EnvironmentMarker.ReadAsync(data.Database));
+        Assert.Equal("Staging", await new MongoStorageEnvironment(data.Database).ReadAsync());
     }
 
     [Fact]

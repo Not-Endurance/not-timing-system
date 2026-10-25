@@ -2,10 +2,8 @@
 using System.Net;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+using Not.Application.Environments;
 using Not.Identity;
-using Not.Storage.Mongo;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.JsonApi;
 
@@ -99,8 +97,7 @@ internal static class LocalSignIn
         IConfiguration configuration,
         UserManager<NIdentityUser> users,
         SignInManager<NIdentityUser> signIn,
-        IMongoClient client,
-        IOptions<NIdentityOptions> options,
+        IStorageEnvironment storageEnvironment,
         ILoggerFactory loggers
     )
     {
@@ -115,9 +112,8 @@ internal static class LocalSignIn
             return read.Error;
         }
 
-        var database = client.GetDatabase(options.Value.Database);
-        var marked = await EnvironmentMarker.ReadAsync(database, context.RequestAborted);
-        if (EnvironmentMarker.IsProduction(marked))
+        var marked = await storageEnvironment.ReadAsync(context.RequestAborted);
+        if (StorageEnvironmentNames.IsProduction(marked))
         {
             return JsonApiResults.Error(
                 StatusCodes.Status403Forbidden,
@@ -127,7 +123,7 @@ internal static class LocalSignIn
             );
         }
 
-        if (!EnvironmentMarker.IsNonProduction(marked))
+        if (!StorageEnvironmentNames.IsNonProduction(marked))
         {
             return JsonApiResults.Error(
                 StatusCodes.Status409Conflict,

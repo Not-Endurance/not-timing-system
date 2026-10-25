@@ -7,6 +7,7 @@ using NTS.Contracts.Features.Snapshots;
 using NTS.Contracts.Watcher.Models;
 using NTS.Domain.Core.Aggregates;
 using NTS.Domain.Core.Aggregates.Participations.Entities;
+using NTS.Domain.Core.Aggregates.Participations.Events;
 using NTS.Domain.Core.Events;
 using NTS.Domain.Core.Objects.Snapshots;
 using NTS.Domain.Enums;

@@ -392,11 +392,7 @@ public abstract class JsonApiRepository<T, TModel> : IRepository<T>
                 && httpRequestException.HttpRequestError == HttpRequestError.ConnectionError
             )
             {
-#if DEBUG
-                Notifier?.Error(ex);
-#else
                 Notifier?.Warn(Not.Localization.NStrings.Cannot_connect_to_server_string);
-#endif
             }
             else
             {

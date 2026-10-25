@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Not.Application.Environments;
 using Not.Identity;
 using Not.Identity.Email;
+using Not.Storage.Mongo;
 using NoTiming.Api.JsonApi;
 
 namespace NoTiming.Api.Features.Account;
@@ -22,6 +25,13 @@ internal static class AccountServices
             ConnectionStringOf(provider.GetRequiredService<IConfiguration>())
         ));
         services.AddSingleton<IEmailSender>(CreateEmailSender);
+
+        // What the database says it is (#607): the commands and the routes that must never touch production look here.
+        services.AddSingleton<IStorageEnvironment>(provider =>
+        {
+            var database = provider.GetRequiredService<IOptions<NIdentityOptions>>().Value.Database;
+            return new MongoStorageEnvironment(provider.GetRequiredService<IMongoClient>().GetDatabase(database));
+        });
 
         services.AddDataProtection().SetApplicationName(APPLICATION_NAME);
         services.AddSingleton(AccountText.Load());
