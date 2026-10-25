@@ -4,25 +4,25 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NoTiming.Api.Features.Access;
-using NoTiming.Api.Features.Account;
+using NoTiming.Api.Features.Localhost;
 using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.LocalSignInHarness;
+using static NTS.Tests.Integration.LocalhostSignInHarness;
 
 namespace NTS.Tests.Integration;
 
 /// <summary>
 /// The local sign in as (#607): a developer who runs the platform on their machine signs in as an account on an allow-list
-/// without a code. It is in a Debug build only (<see cref="LocalSignInBuildTests"/> asserts the type is not in a Release one,
+/// without a code. It is in a Debug build only (<see cref="LocalhostSignInBuildTests"/> asserts the type is not in a Release one,
 /// and a Release host has no route even when it is told to), only in Development, only when a setting names the emails, only
 /// for a request from the machine itself, and never on a database that is marked Production or is not marked at all. It
 /// confirms nothing of the address and takes no invitation. The real host over a MongoDB in a container, the address of the
 /// caller named by the test.
 /// </summary>
-public sealed class LocalSignInTests : IClassFixture<MongoFixture>
+public sealed class LocalhostSignInTests : IClassFixture<MongoFixture>
 {
     readonly MongoFixture _mongo;
 
-    public LocalSignInTests(MongoFixture mongo)
+    public LocalhostSignInTests(MongoFixture mongo)
     {
         _mongo = mongo;
     }
@@ -121,7 +121,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.NotFound, post.StatusCode);
         Assert.DoesNotContain("sign-in-as-page", await page.Content.ReadAsStringAsync());
-        Assert.Empty(api.Services.GetServices<HostPublicEndpoints>());
+        Assert.Empty(api.Services.GetServices<LocalhostPublicEndpoints>());
     }
 
     [Fact]
@@ -204,7 +204,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
 
         Assert.Equal(HttpStatusCode.NotFound, post.StatusCode);
         Assert.DoesNotContain("sign-in-as-page", await page.Content.ReadAsStringAsync());
-        Assert.Empty(api.Services.GetServices<HostPublicEndpoints>());
+        Assert.Empty(api.Services.GetServices<LocalhostPublicEndpoints>());
     }
 
     [Fact]
@@ -311,7 +311,7 @@ public sealed class LocalSignInTests : IClassFixture<MongoFixture>
         var email = UserSeed.NewEmail("local");
         await using var api = ApiOf(email);
 
-        var entries = api.Services.GetRequiredService<HostPublicEndpoints>().Entries;
+        var entries = api.Services.GetRequiredService<LocalhostPublicEndpoints>().Entries;
 
         Assert.Equal(
             ["sign-in GET,HEAD dev/sign-in-as", "sign-in POST api/dev/sessions"],

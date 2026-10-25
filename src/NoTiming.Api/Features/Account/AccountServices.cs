@@ -94,7 +94,7 @@ internal static class AccountServices
         return sender switch
         {
             "Brevo" => CreateBrevoSender(configuration),
-            "Console" => ActivatorUtilities.CreateInstance<LogEmailSender>(provider),
+            "Console" => ActivatorUtilities.CreateInstance<LocalhostEmailSender>(provider),
             null => new UnconfiguredEmailSender(),
             _ => throw new InvalidOperationException($"The email sender '{sender}' is not known: use Brevo or Console."),
         };

@@ -1,20 +1,20 @@
 #if !DEBUG
 using System.Net;
 using NTS.Tests.Integration.Infrastructure;
-using static NTS.Tests.Integration.LocalSignInHarness;
+using static NTS.Tests.Integration.LocalhostSignInHarness;
 
 namespace NTS.Tests.Integration;
 
 /// <summary>
 /// What a Release host does with the local sign in as (#607) when it is told to have it: nothing. CI builds and tests in
 /// Release, so this is the assertion over the host that is deployed. The tests of the route itself are
-/// LocalSignInTests, which exist in a Debug build.
+/// LocalhostSignInTests, which exist in a Debug build.
 /// </summary>
-public sealed class LocalSignInReleaseTests : IClassFixture<MongoFixture>
+public sealed class LocalhostSignInReleaseTests : IClassFixture<MongoFixture>
 {
     readonly MongoFixture _mongo;
 
-    public LocalSignInReleaseTests(MongoFixture mongo)
+    public LocalhostSignInReleaseTests(MongoFixture mongo)
     {
         _mongo = mongo;
     }

@@ -7,21 +7,7 @@ using Not.Identity;
 using NoTiming.Api.Features.Access;
 using NoTiming.Api.JsonApi;
 
-namespace NoTiming.Api.Features.Account;
-
-/// <summary>
-/// The public endpoints that exist on one host only, and are not on the list of the Api (#607): the local sign in as. They
-/// are in a Debug build and nowhere else, so that the list stays the one list of what a deployed host makes public.
-/// </summary>
-internal sealed class HostPublicEndpoints
-{
-    public HostPublicEndpoints(IReadOnlyList<PublicEndpoint> entries)
-    {
-        Entries = entries;
-    }
-
-    public IReadOnlyList<PublicEndpoint> Entries { get; }
-}
+namespace NoTiming.Api.Features.Localhost;
 
 /// <summary>
 /// "Sign in as" (#607): a developer who runs the whole platform on their machine, against a container database or a hosted
@@ -35,7 +21,7 @@ internal sealed class HostPublicEndpoints
 /// address: the address stays as unconfirmed as it was and no invitation is taken. What it creates is the session that a
 /// sign-in creates.
 /// </summary>
-internal static class LocalSignIn
+internal static class LocalhostSignIn
 {
     public const string ALLOW_LIST = "Dev:SignInAs:AllowList";
     public const string PAGE = "dev/sign-in-as";
@@ -53,30 +39,27 @@ internal static class LocalSignIn
         ];
     }
 
-    /// <summary>Whether this host has the route: Development, and an allow-list that names somebody.</summary>
-    public static bool IsAvailable(IHostEnvironment environment, IConfiguration configuration)
+    /// <summary>Whether the setting names somebody to sign in as: without one the host has neither the route nor the page.</summary>
+    public static bool IsConfigured(IConfiguration configuration)
     {
-        return environment.IsDevelopment() && AllowListOf(configuration).Count > 0;
+        return AllowListOf(configuration).Count > 0;
     }
 
-    public static IServiceCollection AddLocalSignIn(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        IHostEnvironment environment
-    )
+    /// <summary>Called by <see cref="LocalhostServices"/> and nobody else, so that it only ever runs in Development.</summary>
+    public static IServiceCollection AddLocalhostSignIn(this IServiceCollection services, IConfiguration configuration)
     {
-        if (IsAvailable(environment, configuration))
+        if (IsConfigured(configuration))
         {
-            services.AddSingleton(new HostPublicEndpoints(Endpoints));
+            services.AddSingleton(new LocalhostPublicEndpoints(Endpoints));
         }
 
         return services;
     }
 
-    public static IEndpointRouteBuilder MapLocalSignIn(this IEndpointRouteBuilder app)
+    /// <summary>Called by <see cref="LocalhostServices"/> and nobody else, so that it only ever runs in Development.</summary>
+    public static IEndpointRouteBuilder MapLocalhostSignIn(this IEndpointRouteBuilder app, IConfiguration configuration)
     {
-        var configuration = app.ServiceProvider.GetRequiredService<IConfiguration>();
-        if (!IsAvailable(app.ServiceProvider.GetRequiredService<IHostEnvironment>(), configuration))
+        if (!IsConfigured(configuration))
         {
             return app;
         }
@@ -163,7 +146,7 @@ internal static class LocalSignIn
 
         await signIn.SignInAsync(user, isPersistent: true);
         loggers
-            .CreateLogger(typeof(LocalSignIn))
+            .CreateLogger(typeof(LocalhostSignIn))
             .LogWarning("User {UserId} was signed in as through the local route of a Debug build.", user.Id);
         return JsonApiResults.Resource(
             StatusCodes.Status201Created,

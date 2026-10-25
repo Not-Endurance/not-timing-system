@@ -184,10 +184,15 @@ Overall average: **60-90% token reduction** on common development operations.
 - Repeated triggers that must collapse into one run use `Not.Async.CoalesceInvoker` (one action; a later caller returns at once) or `CoalesceInvoker<TKey>` (one run per key; every caller awaits the run that covers it).
 - A new resolver of this kind (debounce, throttle, latest-wins) is a small class in `Not.Async` with unit tests of its races, named in this section, so that callers never carry in-flight flags of their own.
 
+## Localhost
+- Whatever lets a developer past authentication on their own machine lives in `src/NoTiming.Api/Features/Localhost`, is named `Localhost…` and is compiled out of a Release build.
+- It is registered in `LocalhostServices` (`AddLocalhost`, `MapLocalhost`) and nowhere else, behind the Development check made there; a new bypass is added there, and what it makes public goes through `LocalhostPublicEndpoints`, never onto `PublicEndpoints`.
+- A bypass that belongs to a package (`LocalhostEmailSender` in Not.Identity) carries the prefix, refuses Production itself, and is selected by a setting of the host.
+
 ## Naming
 - The generic version of a type that already exists keeps its name. Its file takes the type parameters in braces, as the Microsoft repositories do: `CoalesceInvoker<TKey>` lives in `CoalesceInvoker{TKey}.cs` beside `CoalesceInvoker.cs`, and two parameters read `{TKey,TValue}`.
 - A base class that only shares identity or behaviour, cannot be instantiated and has no identity of its own ends in `Base`. Its children are named for what they are and do not repeat it: `Arrived` and `Presented` derive from `ParticipationEventBase`, never `ArrivedParticipationEvent`.
-- An abstraction that decouples callers from its implementations is named for its role (`IEmailSender`). Each implementation keeps the role in its name and puts what sets it apart in front: `BrevoEmailSender`, `LogEmailSender`.
+- An abstraction that decouples callers from its implementations is named for its role (`IEmailSender`). Each implementation keeps the role in its name and puts what sets it apart in front: `BrevoEmailSender`, `LocalhostEmailSender`.
 - To choose between the two: children that are different things sharing code take their own names (`Arrived`); implementations that callers swap for one another keep the role (`BrevoEmailSender`).
 
 ## WSL

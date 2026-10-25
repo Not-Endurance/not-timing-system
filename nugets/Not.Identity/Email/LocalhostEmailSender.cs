@@ -7,16 +7,16 @@ namespace Not.Identity.Email;
 /// Writes the mail to the log, for a developer who has no inbox to read: the code is in the clear, and a code in a log
 /// is a way into an account (ADR-0002). Production refuses to have one.
 /// </summary>
-public sealed class LogEmailSender : IEmailSender
+public sealed class LocalhostEmailSender : IEmailSender
 {
-    readonly ILogger<LogEmailSender> _logger;
+    readonly ILogger<LocalhostEmailSender> _logger;
 
-    public LogEmailSender(ILogger<LogEmailSender> logger, IHostEnvironment environment)
+    public LocalhostEmailSender(ILogger<LocalhostEmailSender> logger, IHostEnvironment environment)
     {
         if (environment.IsProduction())
         {
             throw new InvalidOperationException(
-                $"Production refuses the {nameof(LogEmailSender)}: it prints the one-time codes it sends. Configure a real email provider."
+                $"Production refuses the {nameof(LocalhostEmailSender)}: it prints the one-time codes it sends. Configure a real email provider."
             );
         }
 

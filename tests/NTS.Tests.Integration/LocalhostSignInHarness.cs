@@ -13,7 +13,7 @@ namespace NTS.Tests.Integration;
 /// database of the container with the allow-list set, a marker written as the test asks, and the requests, each from the
 /// address the test names (the host of a test has none of its own, so the address is told in a header).
 /// </summary>
-internal static class LocalSignInHarness
+internal static class LocalhostSignInHarness
 {
     public const string LOOPBACK = "127.0.0.1";
 

@@ -3,6 +3,7 @@ using NoTiming.Api.Features.Account;
 using NoTiming.Api.Features.EventData;
 using NoTiming.Api.Features.Events;
 using NoTiming.Api.Features.Live;
+using NoTiming.Api.Features.Localhost;
 using NoTiming.Api.Features.Profile;
 using NoTiming.Api.Features.Reference;
 using NoTiming.Api.Features.Snapshots;
@@ -42,9 +43,7 @@ internal static class ApiServices
         );
 
         services.AddAccount();
-#if DEBUG
-        services.AddLocalSignIn(configuration, environment);
-#endif
+        services.AddLocalhost(configuration, environment);
         services.AddSingleton<ProfileStore>();
         ApiMongo.Configure();
         services.AddSingleton<TenancyLog>();
