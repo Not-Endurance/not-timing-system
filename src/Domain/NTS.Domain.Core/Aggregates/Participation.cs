@@ -92,7 +92,7 @@ public class Participation : Aggregate, IEventScoped
         Phases.Select(phase);
         if (Eliminated == null)
         {
-            Reevaluate(phase, outBefore);
+            ReEvaluate(phase, outBefore);
         }
         return recorded;
     }
@@ -141,7 +141,7 @@ public class Participation : Aggregate, IEventScoped
         Phases.Select(phase);
         if (Eliminated == null || IsMadeByEvaluation(Eliminated))
         {
-            Reevaluate(phase, outBefore);
+            ReEvaluate(phase, outBefore);
         }
 
         return update;
@@ -155,7 +155,7 @@ public class Participation : Aggregate, IEventScoped
 
         var outBefore = phase.GetOutTime();
         phase.Update(state, actorId, recordedAt);
-        Reevaluate(phase, outBefore);
+        ReEvaluate(phase, outBefore);
     }
 
     /// <summary>
@@ -240,7 +240,7 @@ public class Participation : Aggregate, IEventScoped
     /// eliminated for time when the recovery is over the limit, or restored when it no longer is, the Phase after it starting
     /// when it is out, in place when its Out time moved, and the completion announced once when the Phase is complete.
     /// </summary>
-    void Reevaluate(Phase phase, Timestamp? outBefore)
+    void ReEvaluate(Phase phase, Timestamp? outBefore)
     {
         if (phase.ViolatesRecoveryTime())
         {
